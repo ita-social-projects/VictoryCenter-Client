@@ -30,7 +30,7 @@ export const AppRouter = () => (
                 <Route index element={<AboutUsPage />} />
                 <Route path={PUBLIC_ROUTES.TEAM.FULL} element={<TeamPage />} />
                 <Route path={PUBLIC_ROUTES.PROGRAMS.FULL} element={<ProgramsPage />} />
-                <Route path={PUBLIC_ROUTES.PROGRAM_DETAIL.PATH} element={<DetailedProgramPage />} />
+                <Route path={PUBLIC_ROUTES.PROGRAM_DETAIL.FULL} element={<DetailedProgramPage />} />
                 <Route path={PUBLIC_ROUTES.PARTNERS.FULL} element={<PartnersPage />} />
                 <Route path={PUBLIC_ROUTES.ABOUT_US.FULL} element={<AboutUsPage />} />
                 <Route path={PUBLIC_ROUTES.DONATE.FULL} element={<DonatePage />} />

@@ -5,108 +5,109 @@
     position: relative;
     width: 100%;
     min-height: 100vh;
+}
 
-    .background-section {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 56rem;
-        overflow: hidden;
-        z-index: 0;
+.background-section {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    z-index: 0;
+}
 
-        .background-image {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
-        }
+.background-image {
+    display: block;
+    width: 100%;
+    height: auto;
+}
 
-        .overlay {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.5) 100%);
-            z-index: 1;
-        }
+.overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.5) 100%);
+    z-index: 1;
+}
 
-        .content-container {
-            position: relative;
-            z-index: 2;
-            display: flex;
-            width: 100%;
-            height: 100%;
-            align-items: center;
-            padding: 0 4rem;
-            color: c.$white;
+.content-container {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    padding: 0 4rem;
+    color: c.$white;
+}
 
-            .left-section {
-                flex: 0 0 60%;
-                display: flex;
-                align-items: center;
+.left-section {
+    flex: 0 0 60%;
+    display: flex;
+    align-items: center;
+}
 
-                .program-name {
-                    @include typo.h3-semibold;
-                    margin-bottom: 1rem;
-                    word-wrap: break-word;
-                }
+.program-name {
+    @include typo.h3-semibold;
+    margin-bottom: 1rem;
+    word-wrap: break-word;
+}
 
-                .program-info {
-                    @include typo.subtitle-2-medium;
-                    display: flex;
-                    gap: 2rem;
-                    margin-bottom: 0.5rem;
+.program-info {
+    @include typo.subtitle-2-medium;
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 0.5rem;
 
-                    span {
-                        word-wrap: break-word;
-                    }
+    span {
+        word-wrap: break-word;
+    }
+}
 
-                    .info-item {
-                        display: flex;
-                        align-items: center;
-                        gap: 0.5rem;
+.program-meetings {
+    @include typo.subtitle-2-medium;
 
-                        svg {
-                            flex-shrink: 0;
-                            filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(7500%)
-                                hue-rotate(151deg) brightness(120%) contrast(120%);
-                        }
-                    }
-                }
+    span {
+        word-wrap: break-word;
+    }
+}
 
-                .program-meetings {
-                    @include typo.subtitle-2-medium;
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 
-                    span {
-                        word-wrap: break-word;
-                    }
+    svg {
+        flex-shrink: 0;
+        filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(7500%)
+            hue-rotate(151deg) brightness(120%) contrast(120%);
+    }
+}
 
-                    .info-item {
-                        display: flex;
-                        align-items: center;
-                        gap: 0.5rem;
+.right-section {
+    flex: 0 0 40%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
-                        svg {
-                            flex-shrink: 0;
-                            filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(7500%)
-                                hue-rotate(151deg) brightness(120%) contrast(120%);
-                        }
-                    }
-                }
-            }
+.description {
+    @include typo.body-2-regular;
+    text-align: center;
+}
 
-            .right-section {
-                flex: 0 0 40%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
+@media (max-width: 1024px) {
+    .program-name {
+        font-size: clamp(3px, 2.4vw, 2rem);
+        line-height: clamp(3px, 2.4vw, 2.5rem);
+    }
 
-                .description {
-                    @include typo.body-2-regular;
-                    text-align: center;
-                }
-            }
-        }
+    .program-info,
+    .program-meetings {
+        font-size: clamp(3px, 1.4vw, 1rem);
+        line-height: clamp(3px, 1.4vw, 1.2rem);
+    }
+
+    .description {
+        font-size: clamp(3px, 1.3vw, 1rem);
+        line-height: clamp(3px, 1.5vw, 1rem);
     }
 }

@@ -19,10 +19,20 @@ export const ProgramCard = ({ program, className }: ProgramCardProps) => {
         }
     };
 
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleClick();
+        }
+    };
+
     return (
         <div
             className={`card-block ${className} ${program.slug ? 'clickable' : ''}`}
             onClick={handleClick}
+            onKeyDown={handleKeyDown}
+            role="button"
+            tabIndex={program.slug ? 0 : -1}
             style={{ cursor: program.slug ? 'pointer' : 'default' }}
         >
             <img src={program.previewImage?.url} alt={program.name} className="card-img" />

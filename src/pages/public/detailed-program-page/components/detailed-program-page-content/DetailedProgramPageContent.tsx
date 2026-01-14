@@ -76,22 +76,30 @@ export const DetailedProgramPageContent: React.FC = () => {
                     <div className={styles['left-section']}>
                         <div>
                             <h1 className={styles['program-name']}>{program.name}</h1>
-                            <div className={styles['program-info']}>
-                                <span className={styles['info-item']}>
-                                    <MapPin width={24} height={24} />
-                                    {program.location}
-                                </span>
-                                <span className={styles['info-item']}>
-                                    <UsersRound width={24} height={24} />
-                                    {program.participantsCount}
-                                </span>
-                            </div>
-                            <div className={styles['program-meetings']}>
-                                <span className={styles['info-item']}>
-                                    <CalendarDays width={24} height={24} />
-                                    {program.meetingsCount}
-                                </span>
-                            </div>
+                            {(program.location || program.participantsCount) && (
+                                <div className={styles['program-info']}>
+                                    {program.location && (
+                                        <span className={styles['info-item']}>
+                                            <MapPin width={24} height={24} />
+                                            {program.location}
+                                        </span>
+                                    )}
+                                    {program.participantsCount && (
+                                        <span className={styles['info-item']}>
+                                            <UsersRound width={24} height={24} />
+                                            {program.participantsCount}
+                                        </span>
+                                    )}
+                                </div>
+                            )}
+                            {program.meetingsCount && (
+                                <div className={styles['program-meetings']}>
+                                    <span className={styles['info-item']}>
+                                        <CalendarDays width={24} height={24} />
+                                        {program.meetingsCount}
+                                    </span>
+                                </div>
+                            )}
                         </div>
                     </div>
                     <div className={styles['right-section']}>

@@ -75,12 +75,12 @@ describe('getPlainTextFromHtml', () => {
 
     it('should handle HTML with script tags', () => {
         const result = getPlainTextFromHtml('<p>Before<script>console.log("test");</script>After</p>');
-        expect(result).toBe('Beforeconsole.log("test");After');
+        expect(result).toBe('BeforeAfter'); // script content is stripped
     });
 
     it('should handle HTML with style tags', () => {
         const result = getPlainTextFromHtml('<p>Before<style>.class { margin: 0; }</style>After</p>');
-        expect(result).toBe('Before.class { margin: 0; }After');
+        expect(result).toBe('BeforeAfter'); // style content is stripped
     });
 
     it('should handle whitespace-only HTML', () => {

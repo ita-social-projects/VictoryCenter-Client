@@ -85,12 +85,12 @@ describe('getTextLengthFromHtml', () => {
 
     it('should handle HTML with script tags', () => {
         const result = getTextLengthFromHtml('<p>Text<script>alert("test");</script>More text</p>');
-        expect(result).toBe(27);
+        expect(result).toBe(13); // script content is removed
     });
 
     it('should handle HTML with style tags', () => {
         const result = getTextLengthFromHtml('<p>Text<style>body { color: red; }</style>More text</p>');
-        expect(result).toBe(33);
+        expect(result).toBe(13); // style content is removed
     });
 
     it('should count whitespace in HTML', () => {

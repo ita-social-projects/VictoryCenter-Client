@@ -128,7 +128,9 @@ describe('getPlainTextFromHtml', () => {
     });
 
     it('should handle HTML with form elements', () => {
-        const result = getPlainTextFromHtml('<form><label>Name</label><input type="text"><button>Submit</button></form>');
+        const result = getPlainTextFromHtml(
+            '<form><label>Name</label><input type="text"><button>Submit</button></form>',
+        );
         expect(result).toBe('NameSubmit');
     });
 });

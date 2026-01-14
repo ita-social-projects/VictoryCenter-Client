@@ -4,6 +4,9 @@ import { LinearProgress } from '@mui/material';
 import { fetchProgramBySlug } from '@/services/api/public/programs/programs-api';
 import styles from './DetailedProgramPageContent.module.scss';
 import { Program } from '@/types/admin/programs';
+import { ReactComponent as MapPin } from '@/assets/icons/map-pin.svg';
+import { ReactComponent as UsersRound } from '@/assets/icons/users-round.svg';
+import { ReactComponent as CalendarDays } from '@/assets/icons/calendar-days.svg';
 
 export const DetailedProgramPageContent: React.FC = () => {
     const { slug } = useParams<{ slug: string }>();
@@ -71,7 +74,25 @@ export const DetailedProgramPageContent: React.FC = () => {
                 )}
                 <div className={styles['content-container']}>
                     <div className={styles['left-section']}>
-                        <h1>{program.name}</h1>
+                        <div>
+                            <h1 className={styles['program-name']}>{program.name}</h1>
+                            <div className={styles['program-info']}>
+                                <span className={styles['info-item']}>
+                                    <MapPin width={24} height={24} />
+                                    {program.location}
+                                </span>
+                                <span className={styles['info-item']}>
+                                    <UsersRound width={24} height={24} />
+                                    {program.participantsCount}
+                                </span>
+                            </div>
+                            <div className={styles['program-meetings']}>
+                                <span className={styles['info-item']}>
+                                    <CalendarDays width={24} height={24} />
+                                    {program.meetingsCount}
+                                </span>
+                            </div>
+                        </div>
                     </div>
                     <div className={styles['right-section']}>
                         <p className={styles['description']}>{program.description}</p>

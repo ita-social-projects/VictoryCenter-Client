@@ -45,6 +45,55 @@
                 flex: 0 0 60%;
                 display: flex;
                 align-items: center;
+
+                .program-name {
+                    @include typo.h3-semibold;
+                    margin-bottom: 1rem;
+                    word-wrap: break-word;
+                }
+
+                .program-info {
+                    @include typo.subtitle-2-medium;
+                    display: flex;
+                    gap: 2rem;
+                    margin-bottom: 0.5rem;
+
+                    span {
+                        word-wrap: break-word;
+                    }
+
+                    .info-item {
+                        display: flex;
+                        align-items: center;
+                        gap: 0.5rem;
+
+                        svg {
+                            flex-shrink: 0;
+                            filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(7500%)
+                                hue-rotate(151deg) brightness(120%) contrast(120%);
+                        }
+                    }
+                }
+
+                .program-meetings {
+                    @include typo.subtitle-2-medium;
+
+                    span {
+                        word-wrap: break-word;
+                    }
+
+                    .info-item {
+                        display: flex;
+                        align-items: center;
+                        gap: 0.5rem;
+
+                        svg {
+                            flex-shrink: 0;
+                            filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(7500%)
+                                hue-rotate(151deg) brightness(120%) contrast(120%);
+                        }
+                    }
+                }
             }
 
             .right-section {

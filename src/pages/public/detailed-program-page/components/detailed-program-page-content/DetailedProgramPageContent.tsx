@@ -69,10 +69,14 @@ export const DetailedProgramPageContent: React.FC = () => {
                         <div className={styles['overlay']} />
                     </>
                 )}
-            </div>
-            <div className={styles['content-wrapper']}>
-                <h1>{program.name}</h1>
-                <p>{program.description}</p>
+                <div className={styles['content-container']}>
+                    <div className={styles['left-section']}>
+                        <h1>{program.name}</h1>
+                    </div>
+                    <div className={styles['right-section']}>
+                        <p className={styles['description']}>{program.description}</p>
+                    </div>
+                </div>
             </div>
         </div>
     );

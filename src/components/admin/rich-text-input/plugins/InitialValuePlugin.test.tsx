@@ -133,10 +133,7 @@ describe('InitialValuePlugin', () => {
         updateCallback();
 
         expect(global.DOMParser).toHaveBeenCalled();
-        expect(mockParseFromString).toHaveBeenCalledWith(
-            '<p>Test <strong>HTML</strong></p>',
-            'text/html'
-        );
+        expect(mockParseFromString).toHaveBeenCalledWith('<p>Test <strong>HTML</strong></p>', 'text/html');
     });
 
     it('handles complex HTML with multiple elements', () => {
@@ -147,10 +144,7 @@ describe('InitialValuePlugin', () => {
         const updateCallback = mockUpdate.mock.calls[0][0];
         updateCallback();
 
-        expect(mockGenerateNodesFromDOM).toHaveBeenCalledWith(
-            mockEditor,
-            expect.any(Object)
-        );
+        expect(mockGenerateNodesFromDOM).toHaveBeenCalledWith(mockEditor, expect.any(Object));
     });
 
     it('resets to new value after external change', () => {

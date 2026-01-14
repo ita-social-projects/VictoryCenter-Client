@@ -152,9 +152,7 @@ describe('FocusPlugin', () => {
         const unregisterFocus = jest.fn();
         const unregisterBlur = jest.fn();
 
-        mockRegisterCommand
-            .mockReturnValueOnce(unregisterFocus)
-            .mockReturnValueOnce(unregisterBlur);
+        mockRegisterCommand.mockReturnValueOnce(unregisterFocus).mockReturnValueOnce(unregisterBlur);
 
         const { unmount } = render(<FocusPlugin />);
 

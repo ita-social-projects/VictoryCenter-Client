@@ -45,10 +45,7 @@ describe('MaxLengthPlugin', () => {
 
     it('registers node transform on mount', () => {
         render(<MaxLengthPlugin maxLength={100} />);
-        expect(mockRegisterNodeTransform).toHaveBeenCalledWith(
-            expect.any(Function),
-            expect.any(Function)
-        );
+        expect(mockRegisterNodeTransform).toHaveBeenCalledWith(expect.any(Function), expect.any(Function));
     });
 
     it('calls onLengthChange with current text length', () => {
@@ -128,7 +125,7 @@ describe('MaxLengthPlugin', () => {
         expect(trimTextContentFromAnchor).toHaveBeenCalledWith(
             mockEditor,
             mockSelection.anchor,
-            37 // overflow length: 47 - 10
+            37, // overflow length: 47 - 10
         );
     });
 

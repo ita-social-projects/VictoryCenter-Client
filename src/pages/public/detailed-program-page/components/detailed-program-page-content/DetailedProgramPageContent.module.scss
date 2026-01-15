@@ -1,4 +1,4 @@
-@use '@/assets/sass/mixins/typography.mixins' as typo;
+@use '@/assets/sass/mixins/typography.mixins' as type;
 @use '@/assets/sass/variables/colors' as c;
 
 .detailed-program-page-content {
@@ -46,13 +46,13 @@
 }
 
 .program-name {
-    @include typo.h3-semibold;
+    @include type.h3-semibold;
     margin-bottom: 1rem;
     word-wrap: break-word;
 }
 
 .program-info {
-    @include typo.subtitle-2-medium;
+    @include type.subtitle-2-medium;
     display: flex;
     gap: 2rem;
     margin-bottom: 0.5rem;
@@ -63,7 +63,7 @@
 }
 
 .program-meetings {
-    @include typo.subtitle-2-medium;
+    @include type.subtitle-2-medium;
 
     span {
         word-wrap: break-word;
@@ -90,7 +90,7 @@
 }
 
 .description {
-    @include typo.body-2-regular;
+    @include type.body-2-regular;
     text-align: center;
 }
 

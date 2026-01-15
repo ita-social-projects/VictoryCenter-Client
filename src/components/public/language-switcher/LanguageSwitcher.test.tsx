@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { fireEvent, render, waitFor, within } from '@testing-library/react';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { LOCALES } from '@/const/common/locales';
 
@@ -24,13 +24,11 @@ describe('LanguageSwitcher', () => {
         const selectButton = container.querySelector('.language-switcher-head') as HTMLElement;
         fireEvent.click(selectButton);
 
-        const optionsContainer = await waitFor(() => 
-            container.querySelector('.select-options') as HTMLElement
-        );
+        const optionsContainer = await waitFor(() => container.querySelector('.select-options') as HTMLElement);
 
         for (const locale of LOCALES) {
-            const option = within(optionsContainer).getByRole('button', { 
-                name: locale.toUpperCase() 
+            const option = within(optionsContainer).getByRole('button', {
+                name: locale.toUpperCase(),
             });
             expect(option).toBeInTheDocument();
         }
@@ -43,20 +41,18 @@ describe('LanguageSwitcher', () => {
         const selectButton = container.querySelector('.language-switcher-head') as HTMLElement;
         fireEvent.click(selectButton);
 
-        const optionsContainer = await waitFor(() => 
-            container.querySelector('.select-options') as HTMLElement
-        );
+        const optionsContainer = await waitFor(() => container.querySelector('.select-options') as HTMLElement);
 
         const nextLocale = LOCALES.find((lng) => lng !== 'uk')!;
-        
-        const nextOption = within(optionsContainer).getByRole('button', { 
-            name: nextLocale.toUpperCase() 
+
+        const nextOption = within(optionsContainer).getByRole('button', {
+            name: nextLocale.toUpperCase(),
         });
 
         fireEvent.click(nextOption);
 
         expect(mockChangeLanguage).toHaveBeenCalledWith(nextLocale);
-        
-        expect(onValueChange).toHaveBeenCalledWith(); 
+
+        expect(onValueChange).toHaveBeenCalledWith();
     });
 });

@@ -5,7 +5,7 @@ import { DEFAULT_LOCALE } from '@/const/common/locales';
 
 const mockChangeLanguage = jest.fn();
 const mockNavigate = jest.fn();
-let mockCurrentLanguage = 'uk'; 
+let mockCurrentLanguage = 'uk';
 
 jest.mock('react-i18next', () => ({
     useTranslation: () => ({
@@ -56,7 +56,7 @@ describe('useLocale hook', () => {
 
     it('should remove locale prefix when switching to default locale', () => {
         mockCurrentLanguage = 'en';
-        
+
         (useLocation as jest.Mock).mockReturnValue({
             pathname: '/en/about',
             search: '',
@@ -72,7 +72,7 @@ describe('useLocale hook', () => {
 
     it('should handle root path correctly when switching to default', () => {
         mockCurrentLanguage = 'en';
-        
+
         (useLocation as jest.Mock).mockReturnValue({
             pathname: '/en',
             search: '',

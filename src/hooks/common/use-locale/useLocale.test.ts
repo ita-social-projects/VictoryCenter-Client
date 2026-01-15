@@ -7,7 +7,6 @@ const mockChangeLanguage = jest.fn();
 const mockNavigate = jest.fn();
 let mockCurrentLanguage = 'uk'; 
 
-// 1. Мокаємо react-i18next
 jest.mock('react-i18next', () => ({
     useTranslation: () => ({
         i18n: {
@@ -18,7 +17,6 @@ jest.mock('react-i18next', () => ({
     }),
 }));
 
-// 2. Мокаємо react-router-dom
 jest.mock('react-router-dom', () => ({
     useNavigate: () => mockNavigate,
     useLocation: jest.fn(),
@@ -27,7 +25,7 @@ jest.mock('react-router-dom', () => ({
 describe('useLocale hook', () => {
     beforeEach(() => {
         jest.clearAllMocks();
-        mockCurrentLanguage = 'uk'; // Скидаємо перед кожним тестом
+        mockCurrentLanguage = 'uk';
         (useLocation as jest.Mock).mockReturnValue({
             pathname: '/',
             search: '',
@@ -57,7 +55,7 @@ describe('useLocale hook', () => {
     });
 
     it('should remove locale prefix when switching to default locale', () => {
-        mockCurrentLanguage = 'en'; // <-- ТУТ БУЛА ПОМИЛКА, ТЕПЕР НАЗВА ПРАВИЛЬНА
+        mockCurrentLanguage = 'en';
         
         (useLocation as jest.Mock).mockReturnValue({
             pathname: '/en/about',
@@ -73,7 +71,7 @@ describe('useLocale hook', () => {
     });
 
     it('should handle root path correctly when switching to default', () => {
-        mockCurrentLanguage = 'en'; // <-- ПЕРЕВІРТЕ ЦЕЙ РЯДОК
+        mockCurrentLanguage = 'en';
         
         (useLocation as jest.Mock).mockReturnValue({
             pathname: '/en',

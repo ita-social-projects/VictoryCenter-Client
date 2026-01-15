@@ -28,6 +28,19 @@ jest.mock('@/assets/icons/burger.svg', () => ({
 jest.mock('@/assets/icons/cross.svg', () => ({
     ReactComponent: () => <div data-testid="cross" />,
 }));
+jest.mock('react-i18next', () => {
+    const headerUk = require('@/locales/uk/header.json');
+
+    return {
+        useTranslation: () => ({
+            t: (key: string) => headerUk[key] ?? key,
+        }),
+    };
+});
+
+jest.mock('@/hooks/common/use-locale/useLocale', () => ({
+    useLocale: () => ({ currentLanguage: 'uk' }), // або DEFAULT_LOCALE
+}));
 
 describe('Header', () => {
     beforeEach(() => {

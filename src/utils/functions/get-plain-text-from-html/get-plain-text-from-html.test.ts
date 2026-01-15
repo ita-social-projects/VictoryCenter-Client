@@ -12,7 +12,11 @@ describe('getPlainTextFromHtml', () => {
         ['whitespace between text nodes', '<span>First</span> <span>Second</span>', 'First Second'],
         ['HTML with line breaks', '<p>First Line<br>Second Line</p>', 'First LineSecond Line'],
         ['HTML with multiple paragraphs', '<p>Paragraph One</p><p>Paragraph Two</p>', 'Paragraph OneParagraph Two'],
-        ['HTML with bold and italic tags', '<p><strong>Strong</strong> and <em>Emphasis</em></p>', 'Strong and Emphasis'],
+        [
+            'HTML with bold and italic tags',
+            '<p><strong>Strong</strong> and <em>Emphasis</em></p>',
+            'Strong and Emphasis',
+        ],
         ['HTML with special characters and entities', '<p>Price &amp; Value &lt;100&gt;</p>', 'Price & Value <100>'],
         ['HTML with self-closing tags', '<p>Before<img src="image.png">After</p>', 'BeforeAfter'],
         [

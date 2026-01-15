@@ -69,6 +69,7 @@ jest.mock('lexical', () => ({
 let mockMaxLengthPluginProps: any = null;
 let mockOnChangePluginProps: any = null;
 let mockFocusPluginProps: any = null;
+let mockInitialValuePluginProps: any = null;
 
 jest.mock('./plugins', () => {
     const MockMaxLengthPlugin = (props: any) => {
@@ -96,11 +97,16 @@ jest.mock('./plugins', () => {
             </button>
         </div>
     );
+    const MockInitialValuePlugin = (props: any) => {
+        mockInitialValuePluginProps = props;
+        return null;
+    };
     return {
         MaxLengthPlugin: MockMaxLengthPlugin,
         OnChangePlugin: MockOnChangePlugin,
         FocusPlugin: MockFocusPlugin,
         ToolbarPlugin: MockToolbarPlugin,
+        InitialValuePlugin: MockInitialValuePlugin,
     };
 });
 
@@ -232,6 +238,18 @@ describe('RichTextInput', () => {
             expect(mockFocusPluginProps.onFocus).toBeUndefined();
             expect(mockFocusPluginProps.onBlur).toBeUndefined();
             expect(typeof mockFocusPluginProps.onFocusChange).toBe('function');
+        });
+
+        it('passes value to InitialValuePlugin', () => {
+            renderRichTextInput({ value: '<p>Test content</p>' });
+            expect(mockInitialValuePluginProps).not.toBeNull();
+            expect(mockInitialValuePluginProps.value).toBe('<p>Test content</p>');
+        });
+
+        it('passes empty value to InitialValuePlugin when no value provided', () => {
+            renderRichTextInput({ value: '' });
+            expect(mockInitialValuePluginProps).not.toBeNull();
+            expect(mockInitialValuePluginProps.value).toBe('');
         });
     });
 

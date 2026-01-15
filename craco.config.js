@@ -7,6 +7,15 @@ module.exports = {
             '@': path.resolve(__dirname, 'src'),
         },
     },
+    devServer: {
+        proxy: {
+            '/api': {
+                target: 'https://backend.victorycenter.online',
+                changeOrigin: true,
+                secure: false,
+            },
+        },
+    },
     jest: {
         configure: (defaultJestConfig) => {
             const mergedConfig = {

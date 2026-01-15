@@ -77,6 +77,12 @@ export const COMMON_TEXT_ADMIN = {
     },
 
     LOCALIZATION: {
+        FORM: {
+            TITLE: {
+                ADD_TRANSLATION: 'Додати переклад',
+                UPDATE_TRANSLATION: 'Редагувати переклад',
+            },
+        },
         LANGUAGES: {
             MESSAGE: {
                 FAILED_TO_FETCH_LANGUAGES: 'Виникла помилка, не вдалось завантажити мови',

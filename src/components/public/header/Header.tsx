@@ -7,6 +7,7 @@ import { ReactComponent as BurgerIcon } from '@/assets/icons/burger.svg';
 import { LanguageSwitcher } from '@/components/public/language-switcher/LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
 import { Link } from '@/components/common/link/Link';
+import { Button } from '@/components/public/ui/button';
 
 export const Header = () => {
     const { t } = useTranslation('header');
@@ -31,53 +32,67 @@ export const Header = () => {
     };
 
     return (
-        <div className="header-block">
-            <div className="logo-container">
-                <Link to="/">
-                    <VictoryCenterLogo className="logo" />
-                </Link>
-            </div>
+        <>
+            <header className="header-block">
+                <div className="header-content-container">
+                    <div className="logo-container">
+                        <Link to="/">
+                            <VictoryCenterLogo className="logo" />
+                        </Link>
+                    </div>
 
-            <div className="link-container">
-                <nav>
-                    <DropdownMenu mainText={t('ABOUT_US')} links={dropdownMenuLinks}></DropdownMenu>
-                    <Link to={PUBLIC_ROUTES.PROGRAMS.FULL}>{t('PROGRAMS')}</Link>
-                    <Link to={PUBLIC_ROUTES.REPORTS.FULL}>{t('REPORTING')}</Link>
-                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
-                        {t('HOW_TO_SUPPORT')}
-                    </Link>
-                </nav>
-            </div>
+                    <div className="link-container">
+                        <nav>
+                            <DropdownMenu mainText={t('ABOUT_US')} links={dropdownMenuLinks}></DropdownMenu>
+                            <Link to={PUBLIC_ROUTES.PROGRAMS.FULL}>{t('PROGRAMS')}</Link>
+                            <Link to={PUBLIC_ROUTES.REPORTS.FULL}>{t('REPORTING')}</Link>
+                            <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
+                                {t('HOW_TO_SUPPORT')}
+                            </Link>
+                        </nav>
+                    </div>
 
-            <div className="button-container">
-                <LanguageSwitcher className="language-switcher" />
-                <button className="contact-us-button" onClick={onContactUsClick}>
-                    {t('CONTACT_US')}
-                </button>
-                <Link to={PUBLIC_ROUTES.DONATE.FULL} className="button donate-button">
-                    {t('DONATE')}
-                </Link>
-                <button onClick={toggleMenu} className="burger-menu-icon">
-                    <BurgerIcon />
-                </button>
-            </div>
-            {isMenuOpen && (
-                <div className="mobile-menu">
-                    <Link to={PUBLIC_ROUTES.ABOUT_US.FULL} onClick={toggleMenu}>
-                        {t('ABOUT_US')}
-                    </Link>
-                    <Link to={PUBLIC_ROUTES.PROGRAMS.FULL} onClick={toggleMenu}>
-                        {t('PROGRAMS')}
-                    </Link>
-                    <Link to={PUBLIC_ROUTES.REPORTS.FULL} onClick={toggleMenu}>
-                        {t('REPORTING')}
-                    </Link>
-                    <Link to={PUBLIC_ROUTES.MOCK.FULL} onClick={toggleMenu} className="disable">
-                        {t('HOW_TO_SUPPORT')}
-                    </Link>
-                    <LanguageSwitcher onValueChange={toggleMenu} className="mobile-language-switcher" />
+                    <div className="button-container">
+                        <LanguageSwitcher className="language-switcher" />
+
+                        <Button variant="secondary-dark" onClick={onContactUsClick} className="contact-us-button">
+                            {t('CONTACT_US')}
+                        </Button>
+
+                        <Button variant="primary-dark" href={PUBLIC_ROUTES.DONATE.FULL}>
+                            {t('DONATE')}
+                        </Button>
+
+                        <Button
+                            variant="tertiary"
+                            icon={BurgerIcon}
+                            ariaLabel="Open menu"
+                            onClick={toggleMenu}
+                            className="burger-menu-icon"
+                        />
+                    </div>
                 </div>
-            )}
-        </div>
+
+                {isMenuOpen && (
+                    <div className="mobile-menu">
+                        <Link to={PUBLIC_ROUTES.ABOUT_US.FULL} onClick={toggleMenu}>
+                            {t('ABOUT_US')}
+                        </Link>
+                        <Link to={PUBLIC_ROUTES.PROGRAMS.FULL} onClick={toggleMenu}>
+                            {t('PROGRAMS')}
+                        </Link>
+                        <Link to={PUBLIC_ROUTES.REPORTS.FULL} onClick={toggleMenu}>
+                            {t('REPORTING')}
+                        </Link>
+                        <Link to={PUBLIC_ROUTES.MOCK.FULL} onClick={toggleMenu} className="disable">
+                            {t('HOW_TO_SUPPORT')}
+                        </Link>
+                        <LanguageSwitcher onValueChange={toggleMenu} className="mobile-language-switcher" />
+                    </div>
+                )}
+            </header>
+
+            <div className="header-spacer" />
+        </>
     );
 };

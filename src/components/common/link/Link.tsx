@@ -12,7 +12,7 @@ export const Link = ({ to, children, ...props }: LinkProps) => {
 
         if (path.startsWith(`/${currentLanguage}`)) return path;
 
-        return `/${currentLanguage}${path.startsWith('/') ? path : `${path}`}`;
+        return `/${currentLanguage}${path.startsWith('/') ? path : `/${path}`}`;
     };
 
     return (

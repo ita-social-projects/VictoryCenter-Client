@@ -21,6 +21,7 @@ import { PartnersPage } from '@/pages/public/partners-page/PartnersPage';
 import { WhoWeArePageAdmin } from '@/pages/admin/who-we-are/WhoWeArePageAdmin';
 import { PartnerPanel } from '@/pages/admin/partners/PartnerPanel';
 import { ReportsPage } from '@/pages/public/reports-page';
+import { LanguageSyncWrapper } from '@/utils/functions/language-sync-wrapper/languageSyncWrapper';
 
 export const AppRouter = () => {
     const PublicContent = () => (
@@ -40,13 +41,17 @@ export const AppRouter = () => {
         <BrowserRouter>
             <Routes>
                 {/*For EN*/}
-                <Route path="/en/*" element={<PublicLayout />}>
-                    <Route path="*" element={<PublicContent />} />
+                <Route path="/en/*" element={<LanguageSyncWrapper />}>
+                    <Route element={<PublicLayout />}>
+                        <Route path="*" element={<PublicContent />} />
+                    </Route>
                 </Route>
 
                 {/*For UA*/}
-                <Route path="/*" element={<PublicLayout />}>
-                    <Route path="*" element={<PublicContent />} />
+                <Route path="/*" element={<LanguageSyncWrapper />}>
+                    <Route element={<PublicLayout />}>
+                        <Route path="*" element={<PublicContent />} />
+                    </Route>
                 </Route>
 
                 {/*Admin*/}

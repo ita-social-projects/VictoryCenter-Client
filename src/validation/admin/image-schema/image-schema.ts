@@ -1,9 +1,13 @@
 import * as Yup from 'yup';
 import { IMAGE_VALIDATION } from '@/const/admin/image';
 
-export const getImageValidationSchema = (minWidth: number, minHeight: number) => {
+export const getImageValidationSchema = (minWidth: number, minHeight: number, maxSizeMB: number) => {
     return Yup.mixed<File>()
-        .test('fileSize', IMAGE_VALIDATION.getSizeError, (file) => !!file && file.size <= IMAGE_VALIDATION.maxSizeBytes)
+        .test(
+            'fileSize',
+            IMAGE_VALIDATION.getSizeError(maxSizeMB),
+            (file) => !!file && file.size <= maxSizeMB * 1024 * 1024,
+        )
         .test(
             'fileType',
             IMAGE_VALIDATION.getFormatError,
@@ -35,9 +39,14 @@ export const getImageValidationSchema = (minWidth: number, minHeight: number) =>
 };
 
 export const IMAGE_VALIDATION_FUNCTIONS = {
-    validateImage: async (file: File, minWidth = 1920, minHeight = 1080): Promise<string | undefined> => {
+    validateImage: async (
+        file: File,
+        minWidth = 1920,
+        minHeight = 1080,
+        maxSizeMB = 3,
+    ): Promise<string | undefined> => {
         try {
-            const schema = getImageValidationSchema(minWidth, minHeight);
+            const schema = getImageValidationSchema(minWidth, minHeight, maxSizeMB);
             await schema.validate(file, { abortEarly: true });
             return undefined;
         } catch (err) {

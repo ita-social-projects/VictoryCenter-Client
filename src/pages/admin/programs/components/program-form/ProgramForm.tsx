@@ -344,6 +344,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                             PROGRAM_VALIDATION.backgroundImage.height,
                             PROGRAM_VALIDATION.backgroundImage.width,
                         )}
+                        maxSizeMB={PROGRAM_VALIDATION.images.maxSizeMB}
                     />
                     <div className={styles['body-inputs']}>
                         <div className={styles['col-left']}>
@@ -435,6 +436,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                     PROGRAM_VALIDATION.previewImage.height,
                                     PROGRAM_VALIDATION.previewImage.width,
                                 )}
+                                maxSizeMB={PROGRAM_VALIDATION.images.maxSizeMB}
                             />
                         </div>
                     </div>

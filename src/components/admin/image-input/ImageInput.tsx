@@ -42,6 +42,7 @@ export interface ImageInputProps {
     cropWidth?: number;
     minHeight?: number;
     minWidth?: number;
+    maxSizeMB?: number;
     enableCrop?: boolean;
 }
 
@@ -61,6 +62,7 @@ export const ImageInput = ({
     cropWidth = 1920,
     minHeight = 1080,
     minWidth = 1920,
+    maxSizeMB = 3,
     enableCrop = true,
 }: ImageInputProps) => {
     const [isFocused, setIsFocused] = useState(false);
@@ -84,7 +86,7 @@ export const ImageInput = ({
             setError(null);
             if (!file.type.startsWith('image/')) return;
 
-            const error = await IMAGE_VALIDATION_FUNCTIONS.validateImage(file, minWidth, minHeight);
+            const error = await IMAGE_VALIDATION_FUNCTIONS.validateImage(file, minWidth, minHeight, maxSizeMB);
             if (error) {
                 setError(error);
                 return;

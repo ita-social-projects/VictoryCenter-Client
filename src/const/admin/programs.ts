@@ -164,6 +164,9 @@ export const PROGRAM_VALIDATION = {
         max: 55,
         getRequiredWhenPublishingError: () => 'Кількість зустрічей обов’язкова при публікації',
     },
+    images: {
+        maxSizeMB: 5,
+    },
 };
 
 export const PROGRAM_CATEGORY_VALIDATION = {

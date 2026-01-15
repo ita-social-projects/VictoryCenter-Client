@@ -42,6 +42,17 @@ describe('ToolbarPlugin', () => {
         mockRegisterUpdateListener.mockReturnValue(jest.fn());
     });
 
+    // Helper function to get and execute selection change handler
+    const triggerSelectionChange = () => {
+        const calls = mockRegisterCommand.mock.calls;
+        const selectionCall = calls.find((call) => call[0] === 'SELECTION_CHANGE_COMMAND');
+        const selectionHandler = selectionCall[1];
+
+        act(() => {
+            selectionHandler();
+        });
+    };
+
     it('renders toolbar with three buttons', () => {
         render(<ToolbarPlugin />);
 
@@ -101,17 +112,8 @@ describe('ToolbarPlugin', () => {
 
         render(<ToolbarPlugin />);
 
-        // Get the SELECTION_CHANGE_COMMAND handler
-        const calls = mockRegisterCommand.mock.calls;
-        const selectionCall = calls.find((call) => call[0] === 'SELECTION_CHANGE_COMMAND');
-        const selectionHandler = selectionCall[1];
+        triggerSelectionChange();
 
-        // Execute handler
-        act(() => {
-            selectionHandler();
-        });
-
-        // Check that Bold button has active class
         const boldButton = screen.getByLabelText('Bold');
         expect(boldButton).toHaveClass('toolbarBtnActive');
     });
@@ -127,17 +129,8 @@ describe('ToolbarPlugin', () => {
 
         render(<ToolbarPlugin />);
 
-        // Get the SELECTION_CHANGE_COMMAND handler
-        const calls = mockRegisterCommand.mock.calls;
-        const selectionCall = calls.find((call) => call[0] === 'SELECTION_CHANGE_COMMAND');
-        const selectionHandler = selectionCall[1];
+        triggerSelectionChange();
 
-        // Execute handler
-        act(() => {
-            selectionHandler();
-        });
-
-        // Check that Italic button has active class
         const italicButton = screen.getByLabelText('Italic');
         expect(italicButton).toHaveClass('toolbarBtnActive');
     });
@@ -153,13 +146,7 @@ describe('ToolbarPlugin', () => {
 
         render(<ToolbarPlugin />);
 
-        const calls = mockRegisterCommand.mock.calls;
-        const selectionCall = calls.find((call) => call[0] === 'SELECTION_CHANGE_COMMAND');
-        const selectionHandler = selectionCall[1];
-
-        act(() => {
-            selectionHandler();
-        });
+        triggerSelectionChange();
 
         const boldButton = screen.getByLabelText('Bold');
         expect(boldButton).not.toHaveClass('toolbarBtnActive');

@@ -99,7 +99,8 @@ jest.mock('./plugins', () => {
     );
     const MockInitialValuePlugin = (props: any) => {
         mockInitialValuePluginProps = props;
-        return null;
+        // Render a hidden element with the value for testing purposes
+        return props.value ? <div data-testid="initial-value-content" dangerouslySetInnerHTML={{ __html: props.value }} /> : null;
     };
     return {
         MaxLengthPlugin: MockMaxLengthPlugin,
@@ -240,10 +241,24 @@ describe('RichTextInput', () => {
             expect(typeof mockFocusPluginProps.onFocusChange).toBe('function');
         });
 
-        it('passes value to InitialValuePlugin', () => {
+        it('passes value to InitialValuePlugin and renders content', () => {
             renderRichTextInput({ value: '<p>Test content</p>' });
             expect(mockInitialValuePluginProps).not.toBeNull();
             expect(mockInitialValuePluginProps.value).toBe('<p>Test content</p>');
+            // Verify the content is rendered on screen
+            expect(screen.getByTestId('initial-value-content')).toBeInTheDocument();
+            expect(screen.getByText('Test content')).toBeInTheDocument();
+        });
+
+        it('renders rich text with formatting from InitialValuePlugin', () => {
+            renderRichTextInput({ value: '<p><strong>Bold</strong> and <em>italic</em> text</p>' });
+            const contentElement = screen.getByTestId('initial-value-content');
+            expect(contentElement).toBeInTheDocument();
+            // Check that the formatted content is rendered
+            expect(screen.getByText('Bold')).toBeInTheDocument();
+            expect(screen.getByText('italic')).toBeInTheDocument();
+            // Verify the full text content is present
+            expect(contentElement.textContent).toBe('Bold and italic text');
         });
 
         it('passes empty value to InitialValuePlugin when no value provided', () => {

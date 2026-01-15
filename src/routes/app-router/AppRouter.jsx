@@ -21,7 +21,7 @@ import { PartnersPage } from '@/pages/public/partners-page/PartnersPage';
 import { WhoWeArePageAdmin } from '@/pages/admin/who-we-are/WhoWeArePageAdmin';
 import { PartnerPanel } from '@/pages/admin/partners/PartnerPanel';
 import { ReportsPage } from '@/pages/public/reports-page';
-import { LanguageSyncWrapper } from '@/utils/functions/language-sync-wrapper/languageSyncWrapper';
+import { LanguageSyncWrapper } from '@/components/public/language-sync-wrapper/languageSyncWrapper';
 
 export const AppRouter = () => {
     const PublicContent = () => (

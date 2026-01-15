@@ -6,7 +6,7 @@ import { DropdownLink, DropdownMenu } from '@/components/public/dropdown-menu/Dr
 import { ReactComponent as BurgerIcon } from '@/assets/icons/burger.svg';
 import { LanguageSwitcher } from '@/components/public/language-switcher/LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
-import { LocalizedLink as Link } from '@/utils/functions/localized-link/LocalizedLink';
+import { Link } from '@/components/common/link/Link';
 
 export const Header = () => {
     const { t } = useTranslation('header');

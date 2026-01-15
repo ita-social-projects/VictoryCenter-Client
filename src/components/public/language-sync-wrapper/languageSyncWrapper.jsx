@@ -31,6 +31,7 @@ export const LanguageSyncWrapper = () => {
         if (currentLang === DEFAULT_LOCALE) return;
 
         navigate(`/${currentLang}${pathname}${search}`, { replace: true });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [pathname, search, navigate, i18n]);
 
     return <Outlet />;

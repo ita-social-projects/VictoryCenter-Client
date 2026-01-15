@@ -7,6 +7,7 @@ import { FieldValues } from 'react-hook-form';
 import { GenericFormMode, GenericFormProps, GenericFormRef } from '../generic-form/GenericForm';
 import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
+import cn from 'classnames';
 
 export interface GenericDetailsProps<T extends FieldValues> {
     title?: string;
@@ -133,6 +134,7 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
             </div>
         );
     }
+    const isAddActionDisabled = !showNotFound && (isAddFormVisible || editingItemId !== null);
 
     return (
         <div className={`generic-details ${isChildForm ? 'child' : ''}`}>
@@ -155,9 +157,9 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
             {isChildForm && (
                 <div className="generic-details-buttons top-add-new">
                     <Button
-                        className={`generic-details ${showNotFound ? 'btn-add' : 'btn-add-new'} ${
-                            !showNotFound && (isAddFormVisible || editingItemId !== null) ? 'disabled' : ''
-                        }`}
+                        className={cn('generic-details', showNotFound ? 'btn-add' : 'btn-add-new', {
+                            disabled: isAddActionDisabled,
+                        })}
                         onClick={handleAdd}
                         buttonStyle={showNotFound ? (primaryAddButton ? 'primary' : 'secondary') : 'primary'}
                         disabled={

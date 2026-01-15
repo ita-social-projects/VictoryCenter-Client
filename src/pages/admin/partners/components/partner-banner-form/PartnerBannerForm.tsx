@@ -230,7 +230,6 @@ export const PartnerBanner = () => {
                                 error={touched.title ? errors.title : undefined}
                                 onChange={handleTitleChange}
                                 onBlur={handleTitleBlur}
-                                name="title"
                                 id="title"
                                 maxLength={PARTNER_BANNER_VALIDATION.title.max}
                                 disabled={isDisabled}

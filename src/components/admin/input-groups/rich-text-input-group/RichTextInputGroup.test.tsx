@@ -66,7 +66,6 @@ describe('RichTextInputGroup', () => {
     const defaultProps: RichTextInputGroupProps = {
         label: 'Test Label',
         id: 'test-id',
-        name: 'test-name',
         value: '<p>Initial value</p>',
         onChange: jest.fn(),
         maxLength: 30,
@@ -128,11 +127,6 @@ describe('RichTextInputGroup', () => {
         it('forwards id prop to RichTextInput', () => {
             renderRichTextInputGroup({ id: 'custom-id' });
             expect(getRichTextInput()).toHaveAttribute('data-id', 'custom-id');
-        });
-
-        it('forwards name prop to RichTextInput', () => {
-            renderRichTextInputGroup({ name: 'custom-name' });
-            expect(getRichTextInput()).toHaveAttribute('data-name', 'custom-name');
         });
 
         it('forwards value prop to RichTextInput', () => {
@@ -274,7 +268,6 @@ describe('RichTextInputGroup', () => {
                 label: 'Full Test',
                 isRequired: true,
                 id: 'full-test-id',
-                name: 'full-test-name',
                 value: '<p>Full value</p>',
                 onChange,
                 onBlur,

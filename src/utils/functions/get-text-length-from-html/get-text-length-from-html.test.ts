@@ -1,4 +1,4 @@
-import { getTextLengthFromHtml } from './get-text-lenght-from-html';
+import { getTextLengthFromHtml } from './get-text-length-from-html';
 
 describe('getTextLengthFromHtml', () => {
     it('should return length of plain text when input is plain text', () => {

@@ -10,7 +10,6 @@ describe('RichTextInput', () => {
     const defaultProps: RichTextInputProps = {
         value: '',
         onChange: jest.fn(),
-        name: 'testName',
         id: 'test-id',
         maxLength: 30,
     };

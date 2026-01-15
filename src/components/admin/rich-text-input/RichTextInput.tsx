@@ -1,14 +1,13 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import cn from 'classnames';
 import styles from './RichTextInput.module.scss';
-import { getTextLengthFromHtml } from '@/utils/functions/get-text-lenght-from-html/get-text-lenght-from-html';
+import { getTextLengthFromHtml } from '@/utils/functions/get-text-length-from-html/get-text-length-from-html';
 
 export interface RichTextInputProps {
     value: string;
     onChange: (value: string) => void;
     onBlur?: () => void;
     onFocus?: () => void;
-    name: string;
     id: string;
     maxLength: number;
     disabled?: boolean;
@@ -92,7 +91,30 @@ export const RichTextInput = ({
         if (availableSpace <= 0) return;
 
         const textToInsert = text.slice(0, availableSpace);
-        document.execCommand('insertText', false, textToInsert);
+
+        // Сучасний спосіб замість execCommand
+        const selection = window.getSelection();
+        if (!selection || selection.rangeCount === 0) return;
+
+        const range = selection.getRangeAt(0);
+        range.deleteContents();
+
+        const textNode = document.createTextNode(textToInsert);
+        range.insertNode(textNode);
+
+        // Переміщуємо курсор в кінець вставленого тексту
+        range.setStartAfter(textNode);
+        range.setEndAfter(textNode);
+        range.collapse(true);
+
+        selection.removeAllRanges();
+        selection.addRange(range);
+
+        // Тригеримо подію input для оновлення
+        if (editorRef.current) {
+            const event = new Event('input', { bubbles: true });
+            editorRef.current.dispatchEvent(event);
+        }
     };
 
     const isModifierKey = (e: React.KeyboardEvent<HTMLDivElement>) => e.ctrlKey || e.metaKey;
@@ -138,8 +160,35 @@ export const RichTextInput = ({
     };
 
     const updateFormatStates = () => {
-        setIsBold(document.queryCommandState('bold'));
-        setIsItalic(document.queryCommandState('italic'));
+        const selection = window.getSelection();
+        if (!selection || selection.rangeCount === 0) {
+            setIsBold(false);
+            setIsItalic(false);
+            return;
+        }
+
+        let node = selection.anchorNode;
+        if (!node) return;
+
+        let hasBold = false;
+        let hasItalic = false;
+
+        // Перевіряємо всі батьківські елементи
+        while (node && node !== editorRef.current) {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+                const element = node as HTMLElement;
+                if (element.tagName === 'STRONG' || element.tagName === 'B') {
+                    hasBold = true;
+                }
+                if (element.tagName === 'EM' || element.tagName === 'I') {
+                    hasItalic = true;
+                }
+            }
+            node = node.parentNode;
+        }
+
+        setIsBold(hasBold);
+        setIsItalic(hasItalic);
     };
 
     const handleFocus = () => {
@@ -163,7 +212,33 @@ export const RichTextInput = ({
     };
 
     const formatBold = () => {
-        document.execCommand('bold', false);
+        const selection = window.getSelection();
+        if (!selection || selection.rangeCount === 0) return;
+
+        const range = selection.getRangeAt(0);
+
+        // Перевіряємо чи вже є bold
+        let parent = range.commonAncestorContainer;
+        if (parent.nodeType === Node.TEXT_NODE) {
+            parent = parent.parentNode as Node;
+        }
+
+        const isBold = (parent as HTMLElement).tagName === 'STRONG' || (parent as HTMLElement).tagName === 'B';
+
+        if (isBold) {
+            // Видаляємо bold
+            const text = range.toString();
+            range.deleteContents();
+            const textNode = document.createTextNode(text);
+            range.insertNode(textNode);
+        } else {
+            // Додаємо bold
+            const contents = range.extractContents();
+            const strong = document.createElement('strong');
+            strong.appendChild(contents);
+            range.insertNode(strong);
+        }
+
         updateFormatStates();
         editorRef.current?.focus();
         if (editorRef.current) {
@@ -173,7 +248,32 @@ export const RichTextInput = ({
     };
 
     const formatItalic = () => {
-        document.execCommand('italic', false);
+        const selection = window.getSelection();
+        if (!selection || selection.rangeCount === 0) return;
+
+        const range = selection.getRangeAt(0);
+
+        let parent = range.commonAncestorContainer;
+        if (parent.nodeType === Node.TEXT_NODE) {
+            parent = parent.parentNode as Node;
+        }
+
+        const isItalic = (parent as HTMLElement).tagName === 'EM' || (parent as HTMLElement).tagName === 'I';
+
+        if (isItalic) {
+            // Видаляємо italic
+            const text = range.toString();
+            range.deleteContents();
+            const textNode = document.createTextNode(text);
+            range.insertNode(textNode);
+        } else {
+            // Додаємо italic
+            const contents = range.extractContents();
+            const em = document.createElement('em');
+            em.appendChild(contents);
+            range.insertNode(em);
+        }
+
         updateFormatStates();
         editorRef.current?.focus();
         if (editorRef.current) {
@@ -195,11 +295,12 @@ export const RichTextInput = ({
         const br = document.createElement('br');
         range.insertNode(br);
 
-        const textNode = document.createTextNode('\u200B');
-        br.parentNode?.insertBefore(textNode, br.nextSibling);
+        // Додаємо ще один br щоб курсор міг стати на новий рядок
+        const br2 = document.createElement('br');
+        br.parentNode?.insertBefore(br2, br.nextSibling);
 
-        range.setStart(textNode, 1);
-        range.setEnd(textNode, 1);
+        range.setStartAfter(br2);
+        range.setEndAfter(br2);
         range.collapse(true);
 
         selection.removeAllRanges();

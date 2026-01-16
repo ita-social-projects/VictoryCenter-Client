@@ -21,11 +21,7 @@ jest.mock('@lexical/html', () => ({
 /**
  * Helper function to test the onChange callback with mocked HTML generation
  */
-const testOnChangeCallback = (
-    onChange: jest.Mock,
-    mockHtml: string,
-    expectedOutput: string,
-) => {
+const testOnChangeCallback = (onChange: jest.Mock, mockHtml: string, expectedOutput: string) => {
     mockGenerateHtmlFromNodes.mockReturnValue(mockHtml);
     render(<OnChangePlugin onChange={onChange} />);
 
@@ -66,11 +62,7 @@ describe('OnChangePlugin', () => {
 
     it('calls onChange with sanitized HTML generated from nodes', () => {
         const onChange = jest.fn();
-        testOnChangeCallback(
-            onChange,
-            '<p>Custom <strong>HTML</strong></p>',
-            '<p>Custom <strong>HTML</strong></p>',
-        );
+        testOnChangeCallback(onChange, '<p>Custom <strong>HTML</strong></p>', '<p>Custom <strong>HTML</strong></p>');
     });
 
     it('unregisters listener on unmount', () => {
@@ -88,59 +80,50 @@ describe('OnChangePlugin', () => {
     });
 
     describe('HTML Sanitization', () => {
-        it('removes CSS module class attributes from HTML', () => {
-            const onChange = jest.fn();
-            testOnChangeCallback(
-                onChange,
-                '<p class="RichTextInput_paragraph__abc123">Text with <strong class="RichTextInput_textBold__xyz">bold</strong></p>',
-                '<p>Text with <strong>bold</strong></p>',
-            );
-        });
-
-        it('removes inline style attributes from HTML', () => {
-            const onChange = jest.fn();
-            testOnChangeCallback(
-                onChange,
-                '<p style="white-space: pre-wrap;">Text with <span style="white-space: pre-wrap;">span</span></p>',
-                '<p>Text with span</p>',
-            );
-        });
-
-        it('removes redundant b tags wrapping strong tags', () => {
-            const onChange = jest.fn();
-            testOnChangeCallback(
-                onChange,
-                '<p>Text <b><strong>bold</strong></b> here</p>',
-                '<p>Text <strong>bold</strong> here</p>',
-            );
-        });
-
-        it('removes redundant i tags wrapping em tags', () => {
-            const onChange = jest.fn();
-            testOnChangeCallback(
-                onChange,
-                '<p>Text <i><em>italic</em></i> here</p>',
-                '<p>Text <em>italic</em> here</p>',
-            );
-        });
-
-        it('handles empty string input', () => {
-            const onChange = jest.fn();
-            testOnChangeCallback(onChange, '', '');
-        });
-
-        it('sanitizes complex Lexical output with multiple issues', () => {
-            const onChange = jest.fn();
-            testOnChangeCallback(
-                onChange,
-                '<p class="RichTextInput_paragraph__wO3kv" style="text-align: center;">' +
+        const sanitizationTestCases = [
+            {
+                name: 'removes CSS module class attributes from HTML',
+                input: '<p class="RichTextInput_paragraph__abc123">Text with <strong class="RichTextInput_textBold__xyz">bold</strong></p>',
+                expected: '<p>Text with <strong>bold</strong></p>',
+            },
+            {
+                name: 'removes inline style attributes from HTML',
+                input: '<p style="white-space: pre-wrap;">Text with <span style="white-space: pre-wrap;">span</span></p>',
+                expected: '<p>Text with span</p>',
+            },
+            {
+                name: 'removes redundant b tags wrapping strong tags',
+                input: '<p>Text <b><strong>bold</strong></b> here</p>',
+                expected: '<p>Text <strong>bold</strong> here</p>',
+            },
+            {
+                name: 'removes redundant i tags wrapping em tags',
+                input: '<p>Text <i><em>italic</em></i> here</p>',
+                expected: '<p>Text <em>italic</em> here</p>',
+            },
+            {
+                name: 'handles empty string input',
+                input: '',
+                expected: '',
+            },
+            {
+                name: 'sanitizes complex Lexical output with multiple issues',
+                input:
+                    '<p class="RichTextInput_paragraph__wO3kv" style="text-align: center;">' +
                     '<span style="white-space: pre-wrap;">Ми не </span>' +
                     '<b><strong class="RichTextInput_textBold__TIQja" style="white-space: pre-wrap;">одні</strong></b>' +
                     '<span style="white-space: pre-wrap;">. І це наша </span>' +
                     '<b><strong class="RichTextInput_textBold__TIQja" style="white-space: pre-wrap;">сила</strong></b>' +
                     '</p>',
-                '<p>Ми не <strong>одні</strong>. І це наша <strong>сила</strong></p>',
-            );
+                expected: '<p>Ми не <strong>одні</strong>. І це наша <strong>сила</strong></p>',
+            },
+        ];
+
+        sanitizationTestCases.forEach(({ name, input, expected }) => {
+            it(name, () => {
+                const onChange = jest.fn();
+                testOnChangeCallback(onChange, input, expected);
+            });
         });
     });
 });

@@ -74,13 +74,13 @@ export const PartnerBanner = () => {
     });
 
     useEffect(() => {
-        if (bannerData) {
+        if (!isLoadingData && bannerData && bannerData.title) {
             setValues(bannerData);
             setTouched({});
             setErrors({});
             setTitleKey((prev) => prev + 1);
         }
-    }, [bannerData]);
+    }, [bannerData, isLoadingData]);
 
     useEffect(() => {
         if (fetchError) {

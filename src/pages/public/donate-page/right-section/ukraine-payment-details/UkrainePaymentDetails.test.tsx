@@ -97,6 +97,7 @@ describe('UkrainePaymentDetails', () => {
 
         it('should render multiple banks with all details', () => {
             const bankDetails = createMultipleBanks(2);
+            const sortedBankDetails = [...bankDetails].sort((a, b) => b.id - a.id);
 
             render(<UkrainePaymentDetails bankDetails={bankDetails} />);
 
@@ -109,7 +110,7 @@ describe('UkrainePaymentDetails', () => {
             expect(screen.getAllByText('Призначення платежу')).toHaveLength(2);
 
             bankDetails.forEach((bank) => expectBankDataToBePresent(bank));
-            expectCopyButtonsWithCorrectData(bankDetails);
+            expectCopyButtonsWithCorrectData(sortedBankDetails);
         });
 
         it('should apply separated class to non-first banks', () => {
@@ -237,11 +238,12 @@ describe('UkrainePaymentDetails', () => {
 
         it('should handle 3 banks correctly', () => {
             const bankDetails = createMultipleBanks(3);
+            const sortedBankDetails = [...bankDetails].sort((a, b) => b.id - a.id);
 
             render(<UkrainePaymentDetails bankDetails={bankDetails} />);
 
             expect(screen.getAllByText('Одержувач')).toHaveLength(3);
-            expectCopyButtonsWithCorrectData(bankDetails);
+            expectCopyButtonsWithCorrectData(sortedBankDetails);
 
             const separatedContainers = screen
                 .getByText('Реквізити для донатів в Україні')

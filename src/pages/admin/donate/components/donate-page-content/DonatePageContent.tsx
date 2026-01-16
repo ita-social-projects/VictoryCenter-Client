@@ -55,7 +55,7 @@ export const DonatePageContent = () => {
         SupportOptionsApi.getAll(client, bankCurrency)
             .then((data) => {
                 if (isAlive) {
-                    setSupportOptions(data);
+                    setSupportOptions(data.sort((a, b) => b.id - a.id));
                 }
             })
             .catch(() => {
@@ -95,7 +95,7 @@ export const DonatePageContent = () => {
             try {
                 const createData: CreateSupportOptionsDto = { name, value, currency: bankCurrency };
                 const newOption = await SupportOptionsApi.create(client, createData);
-                setSupportOptions((prev) => [...prev, newOption]);
+                setSupportOptions((prev) => [newOption, ...prev]);
 
                 addToast(DONATE_TEXT.MESSAGE.SUPPORT_OPTIONS.PUBLISHED, ToastType.Info);
             } finally {
@@ -273,7 +273,7 @@ export const DonatePageContent = () => {
             const existingItem = items.find((i) => i.id === parentId);
             const banksToShow = isParentCreating
                 ? []
-                : [...(existingItem?.correspondentBanks ?? [])].sort((a, b) => a.id - b.id);
+                : [...(existingItem?.correspondentBanks ?? [])].sort((a, b) => b.id - a.id);
 
             return (
                 <GenericDetails
@@ -322,7 +322,7 @@ export const DonatePageContent = () => {
                     {config && (
                         <GenericDetails
                             key={`bank-details-${selectedCategory}`}
-                            items={[...items].sort((a, b) => a.id - b.id)}
+                            items={[...items].sort((a, b) => b.id - a.id)}
                             isLoading={isLoading}
                             FormComponent={config.form}
                             notFoundText={DONATE_TEXT.BANK_DETAILS.NOT_FOUND}

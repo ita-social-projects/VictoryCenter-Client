@@ -14,7 +14,7 @@ export const UkrainePaymentDetails = ({ bankDetails }: UkrainePaymentDetailsProp
         return null;
     }
 
-    const sortedBankDetails = [...bankDetails].sort((a, b) => a.id - b.id);
+    const sortedBankDetails = [...bankDetails].sort((a, b) => b.id - a.id);
 
     return (
         <div className="UkrainePaymentDetails">

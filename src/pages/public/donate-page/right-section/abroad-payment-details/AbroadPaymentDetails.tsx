@@ -19,7 +19,7 @@ export const AbroadPaymentDetails = ({ currency, foreignBankDetails }: AbroadPay
         return null;
     }
 
-    const sortedForeignBankDetails = [...foreignBankDetails].sort((a, b) => a.id - b.id);
+    const sortedForeignBankDetails = [...foreignBankDetails].sort((a, b) => b.id - a.id);
     const currencyString = currencyToString(currency) as AbroadCurrency;
     const title = t(`${currencyString}_PAYMENT_DETAILS_LABEL`);
     const ibanLabel = ABROAD_PAYMENT_DETAILS[`IBAN_${currencyString}_LABEL`];

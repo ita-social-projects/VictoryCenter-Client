@@ -207,7 +207,9 @@ describe('OnChangePlugin', () => {
             listenerCallback({ editorState: mockEditorState });
 
             // Should produce clean HTML
-            expect(onChange).toHaveBeenCalledWith('<p>Ми не <strong>одні</strong>. І це наша <strong>сила</strong></p>');
+            expect(onChange).toHaveBeenCalledWith(
+                '<p>Ми не <strong>одні</strong>. І це наша <strong>сила</strong></p>',
+            );
         });
     });
 });

@@ -100,7 +100,9 @@ jest.mock('./plugins', () => {
     const MockInitialValuePlugin = (props: any) => {
         mockInitialValuePluginProps = props;
         // Render a hidden element with the value for testing purposes
-        return props.value ? <div data-testid="initial-value-content" dangerouslySetInnerHTML={{ __html: props.value }} /> : null;
+        return props.value ? (
+            <div data-testid="initial-value-content" dangerouslySetInnerHTML={{ __html: props.value }} />
+        ) : null;
     };
     return {
         MaxLengthPlugin: MockMaxLengthPlugin,

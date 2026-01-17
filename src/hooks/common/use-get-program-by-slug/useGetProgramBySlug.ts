@@ -9,6 +9,8 @@ export const useProgramBySlug = (slug?: string) => {
 
     useEffect(() => {
         if (!slug) {
+            setProgram(null);
+            setError(null);
             setIsLoading(false);
             return;
         }

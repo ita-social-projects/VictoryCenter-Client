@@ -154,4 +154,112 @@ describe('TextAreaWithBulletBehavior', () => {
 
         expect(handleChange).not.toHaveBeenCalled();
     });
+
+    it('should not insert any text on Enter if maxLength is already reached', () => {
+        render(
+            <TextAreaWithBulletBehavior
+                id="test-max"
+                name="test"
+                value="• 12345"
+                onChange={handleChange}
+                maxLength={7}
+            />,
+        );
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+        textarea.selectionStart = 7;
+        textarea.selectionEnd = 7;
+        jest.spyOn(document, 'getElementById').mockReturnValue(textarea);
+
+        fireEvent.focus(textarea);
+
+        (window as any).keydownHandler({
+            key: 'Enter',
+            target: textarea,
+            preventDefault: jest.fn(),
+        });
+
+        expect(handleChange).not.toHaveBeenCalled();
+    });
+
+    it('should trigger autosize logic on value change', () => {
+        jest.useFakeTimers();
+        renderComponent('• Initial');
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+
+        Object.defineProperty(textarea, 'scrollHeight', { value: 150 });
+        jest.spyOn(document, 'getElementById').mockReturnValue(textarea);
+
+        fireEvent.change(textarea, { target: { value: '• Initial\n• Second' } });
+
+        jest.runAllTimers();
+
+        expect(textarea.style.height).toBe('150px');
+        jest.useRealTimers();
+    });
+
+    it('does not reinsert bullet on blur if user deleted it', () => {
+        renderComponent('• ');
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+
+        jest.spyOn(document, 'getElementById').mockReturnValue(textarea);
+
+        fireEvent.change(textarea, { target: { value: '' } });
+        fireEvent.blur(textarea);
+
+        expect(handleChange).toHaveBeenCalledTimes(1); // тільки change
+    });
+
+    it('replaces selected text with new bullet on Enter', () => {
+        render(
+            <TextAreaWithBulletBehavior
+                id="select"
+                name="test"
+                value="• Hello World"
+                onChange={handleChange}
+                maxLength={100}
+            />,
+        );
+
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+        textarea.selectionStart = 2;
+        textarea.selectionEnd = 7; // "Hello"
+
+        jest.spyOn(document, 'getElementById').mockReturnValue(textarea);
+        fireEvent.focus(textarea);
+
+        (window as any).keydownHandler({
+            key: 'Enter',
+            target: textarea,
+            preventDefault: jest.fn(),
+        });
+
+        expect(handleChange.mock.calls[0][0].target.value).toBe('• \n•  World');
+    });
+
+    it('does not crash autosize when textarea element is missing', () => {
+        renderComponent('• Text');
+
+        jest.spyOn(document, 'getElementById').mockReturnValue(null);
+
+        fireEvent.change(screen.getByRole('textbox'), {
+            target: { value: '• Changed' },
+        });
+
+        expect(handleChange).toHaveBeenCalled();
+    });
+
+    it('inserts bullet on focus when value contains only spaces', () => {
+        renderComponent('   ');
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+
+        jest.spyOn(document, 'getElementById').mockReturnValue(textarea);
+
+        fireEvent.focus(textarea);
+
+        expect(handleChange).toHaveBeenCalledWith(
+            expect.objectContaining({
+                target: expect.objectContaining({ value: '• ' }),
+            }),
+        );
+    });
 });

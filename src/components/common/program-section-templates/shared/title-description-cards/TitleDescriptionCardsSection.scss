@@ -1,0 +1,55 @@
+@use '@/assets/sass/variables/colors' as colors;
+@use '@/assets/sass/mixins/typography.mixins' as type;
+
+.td-cards {
+    display: grid;
+    gap: 0.4rem;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    margin: 0 auto;
+}
+
+.td-cards.dual,
+.td-cards.quad {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.td-cards.triple {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.td-card {
+    background: colors.$light-blue-50;
+    border-radius: 16px;
+    padding: 1rem;
+}
+
+.title {
+    @include type.subtitle-2-bold;
+    font-size: 0.76rem;
+    margin-bottom: 0.5rem;
+}
+
+.description {
+    @include type.body-1-regular;
+    font-size: 0.64rem;
+    line-height: 1rem;
+    white-space: pre-wrap;
+    margin-bottom: 0.5rem;
+}
+
+.description-list {
+    list-style: none;
+    padding-left: 0.3rem;
+    margin: 0;
+
+    li {
+        padding-left: 0.7rem;
+        position: relative;
+
+        &::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+        }
+    }
+}

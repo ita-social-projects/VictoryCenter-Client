@@ -1,0 +1,22 @@
+@import '../shared/BaseSectionTemplate.module.scss';
+
+.container {
+    @extend .section-container;
+
+    padding: 2rem;
+    box-sizing: border-box;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    aspect-ratio: 1440 / 496;
+}
+
+.container.template {
+    pointer-events: none;
+}
+
+.container.editable {
+    max-height: none;
+}

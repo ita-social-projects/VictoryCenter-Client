@@ -12,6 +12,7 @@ export enum ContentType {
     Title = 0,
     Description = 1,
     Image = 2,
+    Card = 3,
 }
 
 export interface ProgramSectionContent {

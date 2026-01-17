@@ -148,7 +148,6 @@ export const renderProgramSection = ({
                     onDescriptionChange={handlers?.onCardDescriptionChange}
                 />
             );
-
         case ProgramSectionTemplate.TripleTitleDescription:
             return (
                 <TripleTitleDescription
@@ -159,7 +158,6 @@ export const renderProgramSection = ({
                     onDescriptionChange={handlers?.onCardDescriptionChange}
                 />
             );
-
         case ProgramSectionTemplate.QuadTitleDescription:
             return (
                 <QuadTitleDescription
@@ -170,7 +168,6 @@ export const renderProgramSection = ({
                     onDescriptionChange={handlers?.onCardDescriptionChange}
                 />
             );
-
         default:
             return null;
     }

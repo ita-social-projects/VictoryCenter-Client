@@ -6,6 +6,11 @@
     gap: 0.4rem;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     margin: 0 auto;
+    width: 100%;
+}
+
+.td-cards.editable {
+    gap: 2rem;
 }
 
 .td-cards.dual,
@@ -21,6 +26,10 @@
     background: colors.$light-blue-50;
     border-radius: 16px;
     padding: 1rem;
+}
+
+.td-card.td-card-editable {
+    padding: 1.5rem;
 }
 
 .title {

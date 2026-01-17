@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { Button } from '@/components/admin/button/Button';
 import { ProgramSection, ProgramSectionContent, ContentType } from '@/types/admin/programs';
+import { ProgramSectionTemplate } from '@/types/common/program-sections';
 import { ImageValues } from '@/types/common/image';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { renderProgramSection } from '@/utils/functions/render-program-section';
@@ -34,6 +35,19 @@ export const ProgramSectionForm = ({
         .filter((c) => c.contentType === ContentType.Image)
         .sort((a, b) => a.order - b.order)
         .map((c) => (c.image && 'url' in c.image ? c.image.url : '') || '');
+
+    const titleContents = localSection.contents
+        .filter((c) => c.contentType === ContentType.Title)
+        .sort((a, b) => a.order - b.order);
+
+    const descriptionContents = localSection.contents
+        .filter((c) => c.contentType === ContentType.Description)
+        .sort((a, b) => a.order - b.order);
+
+    const cards = titleContents.map((t, i) => ({
+        title: t.title || '',
+        description: descriptionContents[i]?.description || '',
+    }));
 
     const handleTitleChange = useCallback(
         (value: string) => {
@@ -91,18 +105,60 @@ export const ProgramSectionForm = ({
         [onSectionChange, updateImageContent],
     );
 
+    const isCardTemplate =
+        section.template === ProgramSectionTemplate.DualTitleDescription ||
+        section.template === ProgramSectionTemplate.TripleTitleDescription ||
+        section.template === ProgramSectionTemplate.QuadTitleDescription;
+
     const editableSection = renderProgramSection({
         templateId: section.template,
         data: {
             title: titleContent?.title || '',
             description: descriptionContent?.description || '',
             images: imageContents,
+            ...(isCardTemplate ? { cards } : {}),
         },
         isEditable: true,
         handlers: {
             onTitleChange: handleTitleChange,
             onDescriptionChange: handleDescriptionChange,
             onImagesChange: handleImagesChange,
+            ...(isCardTemplate
+                ? {
+                      onCardTitleChange: (index: number, value: string) => {
+                          setLocalSection((prev) => {
+                              const titles = prev.contents
+                                  .filter((c) => c.contentType === ContentType.Title)
+                                  .sort((a, b) => a.order - b.order);
+                              const target = titles[index];
+                              if (!target) return prev;
+
+                              const updatedContents = prev.contents.map((c) =>
+                                  c === target ? { ...c, title: value } : c,
+                              );
+                              const updatedSection = { ...prev, contents: updatedContents };
+                              onSectionChange?.(updatedSection);
+                              return updatedSection;
+                          });
+                      },
+                      onCardDescriptionChange: (index: number, value: string) => {
+                          setLocalSection((prev) => {
+                              const descriptions = prev.contents
+                                  .filter((c) => c.contentType === ContentType.Description)
+                                  .sort((a, b) => a.order - b.order);
+                              const target = descriptions[index];
+                              if (!target) return prev;
+
+                              const updatedContents = prev.contents.map((c) =>
+                                  c === target ? { ...c, description: value } : c,
+                              );
+                              const updatedSection = { ...prev, contents: updatedContents };
+                              onSectionChange?.(updatedSection);
+                              return updatedSection;
+                          });
+                      },
+                  }
+                : {}),
         },
     });
 

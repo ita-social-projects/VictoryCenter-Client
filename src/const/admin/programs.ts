@@ -40,6 +40,15 @@ export const PROGRAMS_TEXT = {
             },
         },
         CARD: {
+            FORM: {
+                TITLE: {
+                    TEXT: 'Заголовок',
+                    PLACEHOLDER: 'Введіть назву',
+                },
+                DESCRIPTION: {
+                    TEXT: 'Опис',
+                },
+            },
             TITLE_SAMPLE_TEXT: {
                 PROGRAM_GOALS: 'Мета програми',
                 MAIN_METHODS: 'Основні методи',
@@ -214,6 +223,16 @@ export const PROGRAM_SECTION_VALIDATION = {
     description: {
         min: 10,
         max: 600,
+        getRequiredError: () => "Опис обов'язковий",
+    },
+    cardTitle: {
+        min: 5,
+        max: 25,
+        getRequiredError: () => "Заголовок обов'язковий",
+    },
+    cardDescription: {
+        min: 10,
+        max: 300,
         getRequiredError: () => "Опис обов'язковий",
     },
 };

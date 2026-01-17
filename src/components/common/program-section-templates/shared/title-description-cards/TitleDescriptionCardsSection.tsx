@@ -1,14 +1,14 @@
-import { parseDescriptionList } from '@/utils/functions/formatters/text-formatters';
-import './TitleDescriptionCardsSection.scss';
 import cn from 'classnames';
+import { TitleDescriptionCard } from './TitleDescriptionCard';
+import './TitleDescriptionCardsSection.scss';
 
-export interface TitleDescriptionCard {
+export interface TitleDescriptionCardData {
     title: string;
     description: string;
 }
 
 interface Props {
-    cards: TitleDescriptionCard[];
+    cards: TitleDescriptionCardData[];
     cardsCount: number;
     isTemplate?: boolean;
     isEditable?: boolean;
@@ -35,42 +35,20 @@ export const TitleDescriptionCardsSection = ({
                 triple: cardsCount === 3,
                 quad: cardsCount === 4,
                 template: isTemplate,
+                editable: isEditable,
             })}
         >
-            {normalizedCards.map((card, index) => {
-                const { intro, items } = parseDescriptionList(card.description);
-
-                return (
-                    <div className="td-card" key={index}>
-                        {isEditable ? (
-                            <>
-                                <input value={card.title} onChange={(e) => onTitleChange?.(index, e.target.value)} />
-                                <textarea
-                                    value={card.description}
-                                    onChange={(e) => onDescriptionChange?.(index, e.target.value)}
-                                />
-                            </>
-                        ) : (
-                            <>
-                                <h3 className="title">{card.title || 'Заголовок'}</h3>
-                                <div className="description">
-                                    {intro && <p className="description-intro">{intro}</p>}
-
-                                    {items.length > 0 && (
-                                        <ul className="description-list">
-                                            {items.map((item, i) => (
-                                                <li key={i}>{item}</li>
-                                            ))}
-                                        </ul>
-                                    )}
-
-                                    {!intro && items.length === 0 && <p>Опис секції</p>}
-                                </div>
-                            </>
-                        )}
-                    </div>
-                );
-            })}
+            {normalizedCards.map((card, index) => (
+                <TitleDescriptionCard
+                    key={index}
+                    card={card}
+                    index={index}
+                    isEditable={isEditable}
+                    isTemplate={isTemplate}
+                    onTitleChange={onTitleChange}
+                    onDescriptionChange={onDescriptionChange}
+                />
+            ))}
         </div>
     );
 };

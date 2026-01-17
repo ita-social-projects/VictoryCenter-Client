@@ -1,8 +1,25 @@
 import cn from 'classnames';
-import { TitleDescriptionCardsSection } from '../shared/title-description-cards/TitleDescriptionCardsSection';
+import {
+    TitleDescriptionCardsSection,
+    TitleDescriptionCardData,
+} from '../shared/title-description-cards/TitleDescriptionCardsSection';
 import styles from './DualTitleDescription.module.scss';
 
-export const DualTitleDescription = ({ isTemplate = false, isEditable = false, ...props }: any) => {
+interface DualTitleDescriptionProps {
+    cards: TitleDescriptionCardData[];
+    isTemplate?: boolean;
+    isEditable?: boolean;
+    onTitleChange?: (index: number, value: string) => void;
+    onDescriptionChange?: (index: number, value: string) => void;
+}
+
+export const DualTitleDescription = ({
+    cards,
+    isTemplate = false,
+    isEditable = false,
+    onTitleChange,
+    onDescriptionChange,
+}: DualTitleDescriptionProps) => {
     return (
         <div
             className={cn(styles.container, {
@@ -10,7 +27,14 @@ export const DualTitleDescription = ({ isTemplate = false, isEditable = false, .
                 [styles.editable]: isEditable,
             })}
         >
-            <TitleDescriptionCardsSection {...props} cardsCount={2} isTemplate={isTemplate} isEditable={isEditable} />
+            <TitleDescriptionCardsSection
+                cards={cards}
+                cardsCount={2}
+                isTemplate={isTemplate}
+                isEditable={isEditable}
+                onTitleChange={onTitleChange}
+                onDescriptionChange={onDescriptionChange}
+            />
         </div>
     );
 };

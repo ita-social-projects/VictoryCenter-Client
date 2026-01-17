@@ -14,7 +14,7 @@ const renderLink = (to: string, children: string) => {
     render(
         <MemoryRouter>
             <Link to={to}>{children}</Link>
-        </MemoryRouter>
+        </MemoryRouter>,
     );
     return screen.getByRole('link');
 };
@@ -40,5 +40,9 @@ describe('Link component', () => {
     test('renders root path with non-default locale', () => {
         const anchor = renderLink('/', 'home');
         expect(anchor).toHaveAttribute('href', '/en');
+    });
+    test('renders with non-default locale for move throw pages', () => {
+        const anchor = renderLink('/donate', 'Donate');
+        expect(anchor).toHaveAttribute('href', '/en/donate');
     });
 });

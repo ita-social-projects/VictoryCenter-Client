@@ -23,13 +23,14 @@ jest.mock('react-router-dom', () => ({
 }));
 
 describe('useLocale hook', () => {
+    const setupLocation = (pathname = '/', search = '') => {
+        (useLocation as jest.Mock).mockReturnValue({ pathname, search });
+    };
+
     beforeEach(() => {
         jest.clearAllMocks();
         mockCurrentLanguage = 'uk';
-        (useLocation as jest.Mock).mockReturnValue({
-            pathname: '/',
-            search: '',
-        });
+        setupLocation();
     });
 
     it('should NOT call anything if new language is same as current', () => {
@@ -40,69 +41,30 @@ describe('useLocale hook', () => {
         expect(mockNavigate).not.toHaveBeenCalled();
     });
 
-    it('should add locale prefix when switching from default to non-default', () => {
-        (useLocation as jest.Mock).mockReturnValue({
-            pathname: '/about',
-            search: '',
-        });
+    describe('Navigation and path transformation', () => {
+        test.each([
+            ['uk', '/about', '', 'en', '/en/about'],
+            ['en', '/en/about', '', DEFAULT_LOCALE, '/about'],
+            ['en', '/en', '', DEFAULT_LOCALE, '/'],
+            ['uk', '/products', '?id=123', 'en', '/en/products?id=123'],
+        ])('from %s at %s%s to %s should navigate to %s', (currentLang, path, search, nextLang, expectedPath) => {
+            mockCurrentLanguage = currentLang;
+            setupLocation(path, search);
 
-        const { result } = renderHook(() => useLocale());
-        act(() => {
-            result.current.changeLanguage('en');
-        });
+            const { result } = renderHook(() => useLocale());
+            act(() => {
+                result.current.changeLanguage(nextLang);
+            });
 
-        expect(mockNavigate).toHaveBeenCalledWith('/en/about', { replace: true });
+            expect(mockNavigate).toHaveBeenCalledWith(expectedPath, { replace: true });
+        });
     });
 
-    it('should remove locale prefix when switching to default locale', () => {
-        mockCurrentLanguage = 'en';
-
-        (useLocation as jest.Mock).mockReturnValue({
-            pathname: '/en/about',
-            search: '',
-        });
-
-        const { result } = renderHook(() => useLocale());
-        act(() => {
-            result.current.changeLanguage(DEFAULT_LOCALE);
-        });
-
-        expect(mockNavigate).toHaveBeenCalledWith('/about', { replace: true });
-    });
-
-    it('should handle root path correctly when switching to default', () => {
-        mockCurrentLanguage = 'en';
-
-        (useLocation as jest.Mock).mockReturnValue({
-            pathname: '/en',
-            search: '',
-        });
-
-        const { result } = renderHook(() => useLocale());
-        act(() => {
-            result.current.changeLanguage(DEFAULT_LOCALE);
-        });
-
-        expect(mockNavigate).toHaveBeenCalledWith('/', { replace: true });
-    });
-
-    it('should keep search parameters after language change', () => {
-        (useLocation as jest.Mock).mockReturnValue({
-            pathname: '/products',
-            search: '?id=123',
-        });
-
-        const { result } = renderHook(() => useLocale());
-        act(() => {
-            result.current.changeLanguage('en');
-        });
-
-        expect(mockNavigate).toHaveBeenCalledWith('/en/products?id=123', { replace: true });
-    });
-
-    it('should correctly identify language with isUk and isEn', () => {
-        mockCurrentLanguage = 'uk';
+    it('should correctly identify language boolean flags', () => {
         const { result, rerender } = renderHook(() => useLocale());
+
+        mockCurrentLanguage = 'uk';
+        rerender();
         expect(result.current.isUk).toBe(true);
 
         mockCurrentLanguage = 'en';

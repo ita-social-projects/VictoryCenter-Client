@@ -16,7 +16,7 @@ export const Link = ({ to, children, ...props }: AppLinkProps) => {
 
         if (path === '/') return `/${currentLanguage}`;
 
-        return path;
+        return `/${currentLanguage}${path}`;
     };
     return (
         <RouterLink {...props} to={getLocalizedPath(to)}>

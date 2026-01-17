@@ -41,30 +41,30 @@ describe('LanguageSyncWrapper', () => {
 
     test('should change language if URL param differs from current', () => {
         setupMocks({ lang: 'uk', path: '/en/program' });
-        
+
         render(<LanguageSyncWrapper />);
-        
+
         expect(mockChangeLanguage).toHaveBeenCalledWith('en');
         expect(mockNavigateAction).not.toHaveBeenCalled();
     });
 
     test('should do nothing if URL language matches current', () => {
         setupMocks({ lang: 'en', path: '/en/program' });
-        
+
         render(<LanguageSyncWrapper />);
-        
+
         expect(mockChangeLanguage).not.toHaveBeenCalled();
         expect(mockNavigateAction).not.toHaveBeenCalled();
     });
 
     test('should reset to default locale on root path', () => {
         setupMocks({ lang: 'en', path: '/' });
-        
+
         render(<LanguageSyncWrapper />);
-        
+
         expect(mockChangeLanguage).toHaveBeenCalledWith('uk');
     });
-    test('should handle language change when current language is default and url not contain language prefix', () =>{
+    test('should handle language change when current language is default and url not contain language prefix', () => {
         setupMocks({ path: '/program' });
         render(<LanguageSyncWrapper />);
         expect(mockChangeLanguage).not.toHaveBeenCalled();
@@ -73,9 +73,9 @@ describe('LanguageSyncWrapper', () => {
 
     test('should redirect and add language prefix if missing in URL', () => {
         setupMocks({ lang: 'en', path: '/program', search: '?ref=test' });
-        
+
         render(<LanguageSyncWrapper />);
-        
+
         expect(mockNavigateAction).toHaveBeenCalledWith('/en/program?ref=test', { replace: true });
     });
 });

@@ -3,7 +3,6 @@ import { useLocale } from '@/hooks/common/use-locale/useLocale';
 import { LanguageSyncWrapper } from './LanguageSyncWrapper';
 import { useLocation } from 'react-router-dom';
 
-// Спільні мок-функції
 const mockNavigateAction = jest.fn();
 const mockChangeLanguage = jest.fn();
 

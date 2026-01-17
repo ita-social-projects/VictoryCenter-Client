@@ -98,7 +98,7 @@ jest.mock('react-i18next', () => {
 });
 
 jest.mock('@/hooks/common/use-locale/useLocale', () => ({
-    useLocale: () => ({ currentLanguage: 'uk' }), // або DEFAULT_LOCALE
+    useLocale: () => ({ currentLanguage: 'uk' }),
 }));
 
 describe('Header', () => {

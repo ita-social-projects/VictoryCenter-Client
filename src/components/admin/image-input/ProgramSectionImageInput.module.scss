@@ -1,0 +1,79 @@
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/variables/typography';
+@use '@/assets/sass/variables/z-index.scss';
+@use './ImageInput.module.scss';
+
+.container {
+    @extend %container;
+    width: 100%;
+    height: 100%;
+    background: c.$grey-50;
+    border: 1px solid c.$grey-700;
+
+    &-focused {
+        background-color: c.$grey-300;
+    }
+
+    &-disabled {
+        background-color: c.$grey-500;
+    }
+    cursor: pointer;
+}
+
+.image-placeholder {
+    padding: 2rem;
+}
+
+.placeholder-icon {
+    width: 4rem;
+    height: 4rem;
+    margin-bottom: 0.5rem;
+}
+
+.placeholder-text-primary {
+    font-family: typography.$font-family-base;
+    font-size: typography.$body2-size;
+    line-height: 28px;
+    font-weight: typography.$fw-semibold;
+    letter-spacing: typography.$ls-tight;
+    color: c.$blue-900;
+}
+
+.placeholder-text-secondary {
+    font-family: typography.$font-family-base;
+    font-size: typography.$small-size;
+    line-height: 28px;
+    font-weight: typography.$fw-regular;
+    letter-spacing: typography.$ls-tight;
+    color: c.$blue-900;
+}
+
+.image-preview {
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: c.$grey-400;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    &:hover {
+        &::after {
+            opacity: 0.5;
+        }
+    }
+}
+
+.preview-image {
+    object-fit: cover;
+}
+
+.delete-button,
+.crop-button {
+    width: 5rem;
+    height: 5rem;
+    aspect-ratio: 1 / 1;
+    opacity: 0.8;
+    z-index: z-index.admin('image-input-action-buttons');
+}

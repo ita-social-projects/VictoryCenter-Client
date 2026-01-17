@@ -1,7 +1,7 @@
-const getMinDigitsError = (count: number) => `Введено менше ${count} цифр`;
-const getMaxDigitsError = (count: number) => `Введено більше ${count} цифр`;
-const getMinSymbolsError = (count: number) => `Введено менше ${count} символів`;
-const getMaxSymbolsError = (count: number) => `Введено більше ${count} символів`;
+const getMinDigitsError = (count: number) => `Не менше ${count} цифр`;
+const getMaxDigitsError = (count: number) => `Не більше ${count} цифр`;
+const getMinSymbolsError = (count: number) => `Не менше ${count} символів`;
+const getMaxSymbolsError = (count: number) => `Не більше ${count} символів`;
 const getGenericRequiredError = () => `Поле обов'язкове`;
 
 const COMMON_TEXT = {
@@ -132,8 +132,7 @@ export const VALIDATION_PARAMS = {
 };
 
 export const DONATE_VALIDATION = {
-    getDigitsOnlyError: () => `Мають бути тільки цифри`,
-    getAlphaNumericError: () => `Мають бути тільки літери та цифри`,
+    getDigitsOnlyError: () => `Мають бути цифри`,
     name: {
         maxLength: VALIDATION_PARAMS.name.maxLength,
         getRequiredError: () => getGenericRequiredError(),

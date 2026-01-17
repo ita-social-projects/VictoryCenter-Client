@@ -4,6 +4,7 @@ import { PaymentDetailsSection } from './PaymentDetailsSection';
 import { Currency, PublishedForeignBankDetailsDto } from '@/types/public/donate-page';
 import { ABROAD_PAYMENT_DETAILS } from '@/const/public/donate-page';
 import { currencyToString } from '@/utils/functions/mappers/public/donate/donate';
+import { useTranslation } from 'react-i18next';
 
 type AbroadCurrency = 'USD' | 'EUR';
 
@@ -13,13 +14,14 @@ interface AbroadPaymentDetailsProps {
 }
 
 export const AbroadPaymentDetails = ({ currency, foreignBankDetails }: AbroadPaymentDetailsProps) => {
+    const { t } = useTranslation('donatePage');
     if (!foreignBankDetails.length) {
         return null;
     }
 
     const sortedForeignBankDetails = [...foreignBankDetails].sort((a, b) => a.id - b.id);
     const currencyString = currencyToString(currency) as AbroadCurrency;
-    const title = ABROAD_PAYMENT_DETAILS[`${currencyString}_PAYMENT_DETAILS_LABEL`];
+    const title = t(`${currencyString}_PAYMENT_DETAILS_LABEL`);
     const ibanLabel = ABROAD_PAYMENT_DETAILS[`IBAN_${currencyString}_LABEL`];
 
     return (

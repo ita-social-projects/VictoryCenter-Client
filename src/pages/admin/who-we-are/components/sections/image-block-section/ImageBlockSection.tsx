@@ -2,7 +2,6 @@ import { Content } from '@/types/admin/who-we-are';
 import { ImageInput, ImageInputProps } from '@/components/admin/image-input/ImageInput';
 import { WHO_WE_ARE_TEXT } from '@/const/admin/who-we-are';
 import React, { useState } from 'react';
-import { TextAreaWithCharacterLimit } from '@/components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
 import { ImageValues } from '@/types/common/image';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import './ImageBlockSection.scss';
@@ -10,6 +9,7 @@ import { InputWithCharacterLimit } from '@/components/admin/input-with-character
 import { Button } from '@/components/admin/button/Button';
 import { ContentType } from '@/types/common/about-us';
 import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '@/validation/admin/who-we-are-schema/WhoWeAreSchema';
+import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 
 export interface ImageSectionProps {
     content: Content[] | undefined;
@@ -99,7 +99,7 @@ export const ImageSection = ({
                     setError={setImageError}
                     value={imageContent?.image ?? null}
                     onChange={handleImageChange}
-                    className="image-input-featured"
+                    variant="whoWeAre"
                     label={WHO_WE_ARE_TEXT.IMAGE.INPUT}
                     {...imageInputProps}
                 />
@@ -136,10 +136,8 @@ export const ImageSection = ({
 
                 {descriptionContent && (
                     <div className="content-wrapper-description">
-                        <label htmlFor={descriptionContent.id.toString()} className="content-wrapper-description-label">
-                            {COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
-                        </label>
-                        <TextAreaWithCharacterLimit
+                        <TextAreaWithCharacterLimitGroup
+                            label={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
                             onChange={handleDescriptionChange}
                             value={descriptionContent.description ?? ''}
                             maxLength={descriptionLimit}
@@ -147,12 +145,8 @@ export const ImageSection = ({
                             id={descriptionContent.id.toString()}
                             rows={rows}
                             onBlur={handleDescriptionBlur}
+                            error={descriptionError || undefined}
                         />
-                        {descriptionError && (
-                            <p data-testid="description-error" className="error">
-                                {descriptionError}
-                            </p>
-                        )}
                     </div>
                 )}
                 <Button

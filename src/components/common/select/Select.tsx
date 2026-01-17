@@ -16,6 +16,7 @@ export type SelectProps<TValue> = {
     optionClassName?: string;
     isAutocomplete?: boolean;
     icon?: React.ElementType<React.SVGProps<SVGSVGElement>>;
+    openOnHover?: boolean;
 };
 
 export const Select = <TValue,>({
@@ -29,6 +30,7 @@ export const Select = <TValue,>({
     placeholder,
     isAutocomplete = false,
     icon: Icon,
+    openOnHover = false,
 }: SelectProps<TValue>) => {
     const options = React.Children.toArray(children).filter((child) => {
         return React.isValidElement(child) && child.type === Select.Option;
@@ -41,7 +43,8 @@ export const Select = <TValue,>({
     const displayLabel =
         hasValue && selectedOption ? selectedOption.props.name : (placeholder ?? COMMON_TEXT_ADMIN.STATUS.DEFAULT);
 
-    const handleOpenSelect = () => {
+    const handleOpenSelect = (e: React.MouseEvent) => {
+        if (openOnHover && e.detail !== 0) return;
         setIsOpen(!isOpen);
     };
 
@@ -55,6 +58,14 @@ export const Select = <TValue,>({
         handleSelect(val);
     };
 
+    const handleMouseEnter = () => {
+        if (openOnHover) setIsOpen(true);
+    };
+
+    const handleMouseLeave = () => {
+        if (openOnHover) setIsOpen(false);
+    };
+
     return (
         <div
             ref={selectContainerRef}
@@ -62,6 +73,8 @@ export const Select = <TValue,>({
                 'select-opened': isOpen,
                 'select-closed': !isOpen,
             })}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
         >
             <button
                 type="button"
@@ -70,7 +83,7 @@ export const Select = <TValue,>({
                 onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
-                        handleOpenSelect();
+                        setIsOpen((prev) => !prev);
                     }
                 }}
             >

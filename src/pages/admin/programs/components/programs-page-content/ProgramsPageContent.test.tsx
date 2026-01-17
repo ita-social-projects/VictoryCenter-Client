@@ -132,6 +132,7 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                             previewImage: null,
                             backgroundImage: null,
                             status: VisibilityStatus.Published,
+                            sections: [],
                             categories: [{ id: 1, name: 'Category A', programsCount: 2 }],
                         })
                     }
@@ -149,6 +150,7 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                             previewImage: null,
                             backgroundImage: null,
                             status: VisibilityStatus.Published,
+                            sections: [],
                             categories: [{ id: 2, name: 'Category B', programsCount: 1 }],
                         })
                     }
@@ -166,6 +168,7 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                             previewImage: null,
                             backgroundImage: null,
                             status: VisibilityStatus.Published,
+                            sections: [],
                             categories: [{ id: 1, name: 'Category A', programsCount: 2 }],
                         })
                     }
@@ -208,6 +211,7 @@ const mockPrograms: Program[] = [
         previewImage: null,
         backgroundImage: null,
         status: VisibilityStatus.Published,
+        sections: [],
         categories: [mockCategories[0]],
     },
     {
@@ -220,6 +224,7 @@ const mockPrograms: Program[] = [
         previewImage: null,
         backgroundImage: null,
         status: VisibilityStatus.Draft,
+        sections: [],
         categories: [mockCategories[0]],
     },
 ];

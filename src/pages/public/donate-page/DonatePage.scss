@@ -2,7 +2,7 @@
 
 .donatePage {
     background-color: colors.$light-blue-50;
-    padding-top: 4.125rem;
+    padding-top: 1rem;
 
     &-loader {
         width: 70%;
@@ -28,7 +28,7 @@
 
     .stickyBlock {
         position: sticky;
-        top: 2rem;
+        top: 21rem;
         height: fit-content;
     }
 }

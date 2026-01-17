@@ -284,9 +284,16 @@ export const TeamPageContent = () => {
     const handleTranslateMemberModalOpen = useCallback(
         (member: TeamMember) => {
             if (isAnyModalOpened) return;
-            openModalActions.openTranslateItemModal(member);
+
+            const hasTranslation = member.localizations?.some((l) => l.language?.id === englishLanguage?.id);
+
+            if (hasTranslation) {
+                openModalActions.openEditTranslationModal(member);
+            } else {
+                openModalActions.openTranslateItemModal(member);
+            }
         },
-        [isAnyModalOpened, openModalActions],
+        [isAnyModalOpened, openModalActions, englishLanguage],
     );
 
     const handleDeleteTeamMemberModalOpen = useCallback(

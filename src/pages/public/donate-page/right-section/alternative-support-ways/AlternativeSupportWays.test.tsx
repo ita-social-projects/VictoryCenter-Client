@@ -11,12 +11,6 @@ jest.mock('../../copy-text-button/CopyTextButton', () => ({
     ),
 }));
 
-jest.mock('@/const/public/donate-page', () => ({
-    ALTERNATIVE_SUPPORT_WAYS: {
-        ALTERNATIVE_SUPPORT_WAYS_LABEL: 'Інші варіанти підтримки',
-    },
-}));
-
 describe('AlternativeSupportWays', () => {
     const createMockSupportOption = (
         overrides: Partial<PublishedSupportOptionsDto> = {},

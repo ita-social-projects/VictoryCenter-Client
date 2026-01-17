@@ -37,13 +37,17 @@ jest.mock('./CorrespondentBanksSection', () => ({
     ),
 }));
 
-jest.mock('@/const/public/donate-page', () => ({
-    ABROAD_PAYMENT_DETAILS: {
-        USD_PAYMENT_DETAILS_LABEL: 'Реквізити для донатів в USD',
-        EUR_PAYMENT_DETAILS_LABEL: 'Реквізити для донатів в EUR',
-        IBAN_USD_LABEL: 'IBAN (USD)',
-        IBAN_EUR_LABEL: 'IBAN (EUR)',
-    },
+jest.mock('react-i18next', () => ({
+    useTranslation: () => ({
+        t: (key: string) => {
+            const map: Record<string, string> = {
+                USD_PAYMENT_DETAILS_LABEL: 'Реквізити для донатів в USD',
+                EUR_PAYMENT_DETAILS_LABEL: 'Реквізити для донатів в EUR',
+            };
+
+            return map[key] ?? key;
+        },
+    }),
 }));
 
 jest.mock('@/utils/functions/mappers/public/donate/donate.ts', () => ({

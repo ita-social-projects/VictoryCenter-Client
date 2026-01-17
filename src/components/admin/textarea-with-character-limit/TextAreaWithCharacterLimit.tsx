@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import classNames from 'classnames';
+import { ReactComponent as RemoveIcon } from '@/assets/icons/remove-query.svg';
 import './TextAreaWithCharacterLimit.scss';
 
 export interface TextAreaWithCharacterLimitProps {
@@ -13,6 +14,7 @@ export interface TextAreaWithCharacterLimitProps {
     disabled?: boolean;
     placeholder?: string;
     rows?: number;
+    hasError?: boolean;
 }
 
 export const TextAreaWithCharacterLimit = ({
@@ -26,9 +28,9 @@ export const TextAreaWithCharacterLimit = ({
     disabled = false,
     placeholder,
     rows = 4,
+    hasError = false,
 }: TextAreaWithCharacterLimitProps) => {
     const [isFocused, setIsFocused] = useState(false);
-    const currentLength = value.length;
 
     const handleFocus = (e: React.FocusEvent<HTMLTextAreaElement>) => {
         setIsFocused(true);
@@ -40,7 +42,14 @@ export const TextAreaWithCharacterLimit = ({
         onBlur?.(e);
     };
 
-    const countId = `${id}-character-count`;
+    const handleClear = () => {
+        const syntheticEvent = {
+            target: { value: '', name, id },
+        } as React.ChangeEvent<HTMLTextAreaElement>;
+        onChange(syntheticEvent);
+    };
+
+    const showClearButton = isFocused && value.length > 0 && !disabled;
 
     return (
         <div className="char-limit-textarea">
@@ -62,14 +71,20 @@ export const TextAreaWithCharacterLimit = ({
                     disabled={disabled}
                     placeholder={placeholder}
                     rows={rows}
-                    aria-describedby={countId}
-                    aria-invalid={currentLength > maxLength}
                 />
-            </div>
-            <div className="char-limit-textarea__counter-container">
-                <output className="char-limit-textarea__counter" id={countId} aria-live="polite">
-                    {currentLength}/{maxLength}
-                </output>
+                {showClearButton && (
+                    <button
+                        type="button"
+                        className={classNames('char-limit-textarea__clear-button', {
+                            'char-limit-textarea__clear-button--error': hasError,
+                        })}
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={handleClear}
+                        aria-label="Clear input"
+                    >
+                        <RemoveIcon />
+                    </button>
+                )}
             </div>
         </div>
     );

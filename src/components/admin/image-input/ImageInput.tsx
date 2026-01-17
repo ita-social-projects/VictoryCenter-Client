@@ -1,8 +1,10 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import cn from 'classnames';
-import './ImageInput.scss';
-import './WhoWeAreImageInput.scss';
-import './ProgramImageInput.scss';
+import defaultVariantStyles from './DefaultImageInput.module.scss';
+import whoWeAreVariantStyles from './WhoWeAreImageInput.module.scss';
+import programVariantStyles from './ProgramImageInput.module.scss';
+import programSectionVariantStyles from './ProgramSectionImageInput.module.scss';
+import partnerBannerVariantStyles from './PartnerBannerImageInput.module.scss';
 import { ReactComponent as DeleteIcon } from '@/assets/icons/delete.svg';
 import { ReactComponent as UploadIcon } from '@/assets/icons/cloud-download.svg';
 import { ReactComponent as CropIcon } from '@/assets/icons/crop.svg';
@@ -14,6 +16,16 @@ import { ConfirmationModal } from '../confirmation-modal/ConfirmationModal';
 import { COMMON_IMAGE_TEXT } from '@/const/admin/image';
 import { CropModal } from '../cropper-modal/CropperModal';
 
+const variantStylesMap = {
+    default: defaultVariantStyles,
+    whoWeAre: whoWeAreVariantStyles,
+    program: programVariantStyles,
+    programSection: programSectionVariantStyles,
+    partnerBanner: partnerBannerVariantStyles,
+} as const;
+
+export type ImageInputVariant = keyof typeof variantStylesMap;
+
 export interface ImageInputProps {
     value: ImageValues | Image | null;
     onChange: (image: ImageValues | null) => void;
@@ -22,7 +34,7 @@ export interface ImageInputProps {
     disabled?: boolean;
     id?: string;
     name?: string;
-    className?: string | null;
+    variant?: ImageInputVariant;
     label?: string | null;
     subText?: string | null;
     style?: React.CSSProperties;
@@ -34,7 +46,7 @@ export interface ImageInputProps {
 }
 
 export const ImageInput = ({
-    className = 'image-input-wrapper',
+    variant = 'default',
     label = COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER,
     subText = null,
     setError,
@@ -57,6 +69,8 @@ export const ImageInput = ({
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [showCropperModal, setShowCropperModal] = useState(false);
     const [rawImage, setRawImage] = useState<ImageValues | Image | null>(null);
+
+    const styles = variantStylesMap[variant];
 
     useEffect(() => {
         setPreviewImage(value);
@@ -173,86 +187,89 @@ export const ImageInput = ({
     const inputId = id ?? internalIdRef.current;
 
     return (
-        <div>
-            <div
-                className={cn(className, {
-                    'image-input-wrapper-focused': isFocused && !disabled,
-                    'image-input-wrapper-disabled': disabled,
-                })}
-                style={style}
-                onDrop={handleDrop}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
-                onClick={handleClick}
-                onKeyDown={handleKeyDown}
-                onFocus={handleFocus}
-                onBlur={handleBlurEvent}
-                aria-label={COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER}
-                tabIndex={disabled ? -1 : 0}
-                role="button"
-            >
-                <input
-                    ref={inputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleInputChange}
-                    style={{ display: 'none' }}
-                    disabled={disabled}
-                    data-testid="image-input-hidden"
-                    id={inputId}
-                    name={name ?? inputId}
-                    tabIndex={-1}
-                />
+        <div
+            className={cn(styles.container, {
+                [styles['container-focused']]: isFocused && !disabled,
+                [styles['container-disabled']]: disabled,
+            })}
+            style={style}
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+            onClick={handleClick}
+            onKeyDown={handleKeyDown}
+            onFocus={handleFocus}
+            onBlur={handleBlurEvent}
+            aria-label={COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER}
+            tabIndex={disabled ? -1 : 0}
+            role="button"
+        >
+            <input
+                aria-label="Image input"
+                ref={inputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleInputChange}
+                style={{ display: 'none' }}
+                disabled={disabled}
+                data-testid="image-input-hidden"
+                id={inputId}
+                name={name}
+                tabIndex={-1}
+            />
 
-                {previewImage ? (
-                    <div className="image-preview">
-                        <img
-                            src={getImageSrc(previewImage)}
-                            alt={COMMON_TEXT_ADMIN.ALT.IMAGE_PREVIEW}
-                            className="preview-image"
-                            data-testid="preview-image"
-                        />
-                        {!disabled && (
-                            <div className="preview-actions">
+            {previewImage ? (
+                <div className={styles['image-preview']}>
+                    <img
+                        src={getImageSrc(previewImage)}
+                        alt={COMMON_TEXT_ADMIN.ALT.IMAGE_PREVIEW}
+                        className={styles['preview-image']}
+                        data-testid="preview-image"
+                    />
+                    {!disabled && (
+                        <div className={styles['preview-actions']}>
+                            <button
+                                data-testid="remove-photo-button"
+                                type="button"
+                                aria-label="Remove image"
+                                title="Remove image"
+                                className={styles['delete-button']}
+                                disabled={disabled}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setShowConfirmModal(true);
+                                }}
+                            >
+                                <DeleteIcon className={styles['delete-icon']} />
+                            </button>
+                            {rawImage && 'base64' in rawImage ? (
                                 <button
-                                    data-testid="remove-photo-button"
+                                    data-testid="crop-photo-button"
                                     type="button"
-                                    className="delete-button"
+                                    aria-label="Crop image"
+                                    title="Crop image"
+                                    className={styles['crop-button']}
                                     disabled={disabled}
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        setShowConfirmModal(true);
+                                        setShowCropperModal(true);
                                     }}
                                 >
-                                    <DeleteIcon className={cn('delete-icon')} />
+                                    <CropIcon className={styles['crop-icon']} />
                                 </button>
-                                {rawImage && 'base64' in rawImage ? (
-                                    <button
-                                        data-testid="crop-photo-button"
-                                        type="button"
-                                        className="crop-button"
-                                        disabled={disabled}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setShowCropperModal(true);
-                                        }}
-                                    >
-                                        <CropIcon className={cn('crop-icon')} />
-                                    </button>
-                                ) : null}
-                            </div>
-                        )}
-                    </div>
-                ) : (
-                    <div className="image-placeholder">
-                        <UploadIcon className="placeholder-icon" />
-                        <span>{label}</span>
-                        <span>{subText}</span>
-                    </div>
-                )}
-            </div>
+                            ) : null}
+                        </div>
+                    )}
+                </div>
+            ) : (
+                <div className={styles['image-placeholder']}>
+                    <UploadIcon className={styles['placeholder-icon']} />
+                    <span className={styles['placeholder-text-primary']}>{label}</span>
+                    <span className={styles['placeholder-text-secondary']}>{subText}</span>
+                </div>
+            )}
 
             <ConfirmationModal
                 isOpen={showConfirmModal}

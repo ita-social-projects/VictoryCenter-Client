@@ -15,6 +15,7 @@ type NavigationButtonPropsBase = Omit<ButtonProps, 'onClick' | 'disabled'> & {
 };
 
 interface NavigationButtons {
+    classNamebuttonBlock?: string;
     prev?: NavigationButtonPropsBase;
     next?: NavigationButtonPropsBase;
 }
@@ -25,6 +26,7 @@ interface SwiperProps<T> {
     slidesPerView?: number | 'auto';
     breakpoints?: Record<number, { slidesPerView: number | 'auto' }>;
     showScrollbar?: ShowScrollbar;
+    onSlideChange?: (activeIndex: number) => void;
     classNameSwiperSlide?: string;
     navigationButtons?: NavigationButtons;
 }
@@ -35,6 +37,7 @@ export function Swiper<T>({
     slidesPerView = 'auto',
     breakpoints = {},
     showScrollbar = { isVisible: false },
+    onSlideChange,
     classNameSwiperSlide,
     navigationButtons,
 }: SwiperProps<T>) {
@@ -58,11 +61,15 @@ export function Swiper<T>({
         }
     }, [isOnlyNextButton]);
 
-    const handleInit = useCallback((swiper: SwiperClass) => {
-        swiperRef.current = swiper;
-        setIsPrevEnabled(!swiper.isBeginning);
-        setIsNextEnabled(!swiper.isEnd);
-    }, []);
+    const handleInit = useCallback(
+        (swiper: SwiperClass) => {
+            swiperRef.current = swiper;
+            setIsPrevEnabled(!swiper.isBeginning);
+            setIsNextEnabled(!swiper.isEnd);
+            onSlideChange?.(swiper.activeIndex);
+        },
+        [onSlideChange],
+    );
 
     const handleResize = useCallback((swiper: SwiperClass) => {
         setIsPrevEnabled(!swiper.isBeginning);
@@ -77,6 +84,15 @@ export function Swiper<T>({
         setIsPrevEnabled(true);
         setIsNextEnabled(true);
     }, []);
+
+    const handleSlideChangeInternal = useCallback(
+        (swiper: SwiperClass) => {
+            setIsPrevEnabled(!swiper.isBeginning);
+            setIsNextEnabled(!swiper.isEnd);
+            onSlideChange?.(swiper.activeIndex);
+        },
+        [onSlideChange],
+    );
 
     const swiperModules = useMemo(() => {
         const modules = [Navigation, Pagination];
@@ -106,6 +122,7 @@ export function Swiper<T>({
             <SwiperReact
                 modules={swiperModules}
                 onInit={handleInit}
+                onSlideChange={handleSlideChangeInternal}
                 onResize={handleResize}
                 onReachBeginning={handleReachBeginning}
                 onReachEnd={handleReachEnd}
@@ -120,16 +137,18 @@ export function Swiper<T>({
                     </SwiperSlide>
                 ))}
             </SwiperReact>
-            {prevButtonProps && (
-                <Button {...(prevButtonProps as ButtonProps)} onClick={handlePrev} disabled={!isPrevEnabled} />
-            )}
-            {nextButtonProps && (
-                <Button
-                    {...(nextButtonProps as ButtonProps)}
-                    onClick={handleNext}
-                    disabled={isOnlyNextButton ? false : !isNextEnabled}
-                />
-            )}
+            <div className={navigationButtons?.classNamebuttonBlock}>
+                {prevButtonProps && (
+                    <Button {...(prevButtonProps as ButtonProps)} onClick={handlePrev} disabled={!isPrevEnabled} />
+                )}
+                {nextButtonProps && (
+                    <Button
+                        {...(nextButtonProps as ButtonProps)}
+                        onClick={handleNext}
+                        disabled={isOnlyNextButton ? false : !isNextEnabled}
+                    />
+                )}
+            </div>
         </>
     );
 }

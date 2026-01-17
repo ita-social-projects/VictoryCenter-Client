@@ -1,12 +1,14 @@
 import { ABROAD_PAYMENT_DETAILS } from '@/const/public/donate-page';
 import { CorrespondentBankBlock } from './CorrespondentBankBlock';
 import { PublishedCorrespondentBankDetailsDto } from '@/types/public/donate-page';
+import { useTranslation } from 'react-i18next';
 
 export const CorrespondentBanksSection = ({
     correspondentBanks = [],
 }: {
     correspondentBanks?: PublishedCorrespondentBankDetailsDto[];
 }) => {
+    const { t } = useTranslation('donatePage');
     if (correspondentBanks.length === 0) {
         return null;
     }
@@ -23,7 +25,7 @@ export const CorrespondentBanksSection = ({
 
     return (
         <div className="abroadPaymentDetailsBlock">
-            <h2>{ABROAD_PAYMENT_DETAILS.CORRESPONDENT_BANKS_LABEL}</h2>
+            <h2>{t('CORRESPONDENT_BANKS_LABEL')}</h2>
             <div className="abroadPaymentDetailsContent">
                 {banks.map((bank) => (
                     <CorrespondentBankBlock key={bank.title} title={bank.title} fields={bank.fields} />

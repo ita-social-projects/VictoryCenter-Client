@@ -42,6 +42,7 @@ describe('ProgramListItem', () => {
         location: 'Somewhere in the world',
         previewImage: null,
         backgroundImage: null,
+        sections: [],
         categories: [
             { id: 1, name: 'Category 1', programsCount: 1 },
             { id: 2, name: 'Category 2', programsCount: 2 },

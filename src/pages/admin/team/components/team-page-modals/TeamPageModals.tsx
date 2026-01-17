@@ -62,6 +62,7 @@ export const TeamPageModals = ({
                 memberToDelete={modalState.itemToDelete}
                 onDeleteMember={onDeleteTeamMember}
             />
+
             {englishLanguage && modalState.itemToTranslate && (
                 <TranslateTeamMemberModal
                     isOpen={!!modalState.itemToTranslate}
@@ -69,6 +70,18 @@ export const TeamPageModals = ({
                     onTranslateMember={onTranslateTeamMember}
                     memberToTranslate={modalState.itemToTranslate}
                     language={englishLanguage}
+                    mode={ModalMode.Add}
+                />
+            )}
+
+            {englishLanguage && modalState.itemToEditTranslation && (
+                <TranslateTeamMemberModal
+                    isOpen={!!modalState.itemToEditTranslation}
+                    onClose={closeModalActions.closeEditTranslationModal}
+                    onTranslateMember={onTranslateTeamMember}
+                    memberToTranslate={modalState.itemToEditTranslation}
+                    language={englishLanguage}
+                    mode={ModalMode.Edit}
                 />
             )}
 

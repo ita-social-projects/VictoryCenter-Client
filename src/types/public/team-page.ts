@@ -1,4 +1,4 @@
-import { TeamCategory } from '../admin/team-category';
+import { TeamMemberLocalizationDto } from '../admin/team-members';
 import { Image } from '../common/image';
 
 export interface MemberCard {
@@ -6,6 +6,7 @@ export interface MemberCard {
     name: string;
     role: string;
     photo: string | null;
+    localizations?: TeamMemberLocalizationDto[];
 }
 
 export type Member = {
@@ -14,7 +15,6 @@ export type Member = {
     fullName: string;
     description: string;
     status: string;
-    category: TeamCategory;
 };
 
 export interface TeamItem {
@@ -35,6 +35,7 @@ export interface PublicTeamMemberDto {
     fullName: string;
     description: string | null;
     image: Image | null;
+    localizations: TeamMemberLocalizationDto[];
 }
 
 export interface TeamPageData {

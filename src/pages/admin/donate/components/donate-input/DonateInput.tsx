@@ -17,8 +17,11 @@ interface DonateInputProps {
     onValueChange?: (val: string) => void;
     onlyNumbers?: boolean;
     maxLength?: number;
+    ignoreSpacesInCount?: boolean;
     className?: string;
     error?: string;
+    maxLimitWarning?: string;
+    digitsOnlyWarning?: string;
 }
 
 export const DonateInput = ({
@@ -34,8 +37,11 @@ export const DonateInput = ({
     onValueChange,
     onlyNumbers = false,
     maxLength,
+    ignoreSpacesInCount = false,
     className,
     error,
+    maxLimitWarning,
+    digitsOnlyWarning,
 }: DonateInputProps) => {
     const computedInitialValue =
         externalValue !== undefined && externalValue !== null ? prefix + externalValue.replace(prefix, '') : prefix;
@@ -45,6 +51,16 @@ export const DonateInput = ({
     const [hasEdited, setHasEdited] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
     const textAreaRef = useRef<HTMLTextAreaElement>(null);
+    const [localWarning, setLocalWarning] = useState<string | null>(null);
+    const warningTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    useEffect(() => {
+        return () => {
+            if (warningTimerRef.current) {
+                clearTimeout(warningTimerRef.current);
+            }
+        };
+    }, []);
 
     useEffect(() => {
         const newValue =
@@ -67,15 +83,97 @@ export const DonateInput = ({
         }
     }, [value, prefix]);
 
+    const showTemporaryWarning = (text: string) => {
+        setLocalWarning(text);
+
+        if (warningTimerRef.current) {
+            clearTimeout(warningTimerRef.current);
+        }
+
+        warningTimerRef.current = setTimeout(() => {
+            setLocalWarning(null);
+            warningTimerRef.current = null;
+        }, 2000);
+    };
+
+    const clearWarning = () => {
+        setLocalWarning(null);
+        if (warningTimerRef.current) {
+            clearTimeout(warningTimerRef.current);
+            warningTimerRef.current = null;
+        }
+    };
+
+    const getTruncatedText = (text: string): string => {
+        if (!maxLength) return text;
+
+        if (ignoreSpacesInCount) {
+            let validCharsCount = 0;
+            let cutIndex = 0;
+
+            for (let i = 0; i < text.length; i++) {
+                if (text[i] !== ' ') {
+                    validCharsCount++;
+                }
+                if (validCharsCount > maxLength) {
+                    break;
+                }
+                cutIndex = i + 1;
+            }
+            return text.slice(0, cutIndex).trimEnd();
+        } else {
+            const leadingSpacesCount = text.length - text.trimStart().length;
+            return text.slice(0, maxLength + leadingSpacesCount);
+        }
+    };
+
+    const sanitizeNumbers = (input: string): { value: string; isModified: boolean } => {
+        if (!onlyNumbers) return { value: input, isModified: false };
+
+        const numbers = input.replace(/\D/g, '');
+        const sanitized = prefix ? prefix + numbers : numbers;
+
+        return { value: sanitized, isModified: input !== sanitized };
+    };
+
     const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         let newValue = e.target.value;
+        let warningTriggered = false;
 
-        if (onlyNumbers) {
-            const numbers = newValue.replace(/\D/g, '');
-            newValue = prefix ? prefix + numbers : numbers;
+        if (prefix && newValue === '') {
+            newValue = prefix;
         }
-        setValue(newValue);
 
+        const { value: sanitizedValue, isModified } = sanitizeNumbers(newValue);
+        if (isModified) {
+            newValue = sanitizedValue;
+            if (digitsOnlyWarning) {
+                showTemporaryWarning(digitsOnlyWarning);
+                warningTriggered = true;
+            }
+        }
+
+        if (maxLength) {
+            const textWithoutPrefix = newValue.startsWith(prefix) ? newValue.slice(prefix.length) : newValue;
+
+            const currentLength = ignoreSpacesInCount
+                ? textWithoutPrefix.replace(/\s/g, '').length
+                : textWithoutPrefix.trimStart().length;
+
+            if (currentLength > maxLength) {
+                if (maxLimitWarning) {
+                    showTemporaryWarning(maxLimitWarning);
+                    warningTriggered = true;
+                }
+
+                const allowedText = getTruncatedText(textWithoutPrefix);
+                newValue = prefix + allowedText;
+            } else if (!warningTriggered) {
+                clearWarning();
+            }
+        }
+
+        setValue(newValue);
         onValueChange?.(newValue);
 
         if (!hasEdited && newValue !== initialValue) {
@@ -91,9 +189,11 @@ export const DonateInput = ({
 
     const showClearButton = isFocused && value.length > prefix.length;
 
-    const currentLength = getNormalizedInputText(value, prefix).length;
+    const currentLength = ignoreSpacesInCount
+        ? getNormalizedInputText(value, prefix).replace(/\s/g, '').length
+        : getNormalizedInputText(value, prefix).length;
     const showCharacterCounter = maxLength !== undefined;
-    const showFooter = editable && (showCharacterCounter || error);
+    const showFooter = editable && (showCharacterCounter || error || localWarning);
 
     return (
         <>
@@ -132,7 +232,7 @@ export const DonateInput = ({
                         readOnly={!editable}
                         className="donate-input-textarea"
                         inputMode={onlyNumbers ? 'numeric' : undefined}
-                        maxLength={maxLength ? prefix.length + maxLength : undefined}
+                        maxLength={undefined}
                     />
 
                     {showClearButton && (
@@ -142,7 +242,7 @@ export const DonateInput = ({
                             onClick={handleClear}
                             aria-label="Clear input"
                             className={classNames('donate-input-clear-button', {
-                                error: !!error,
+                                error: !!error || !!localWarning,
                             })}
                         ></button>
                     )}
@@ -151,7 +251,7 @@ export const DonateInput = ({
 
             {showFooter && (
                 <div className="donate-input-footer">
-                    <span className="donate-input-error">{error || ''}</span>
+                    <span className="donate-input-error">{localWarning || error || ''}</span>
                     {showCharacterCounter && (
                         <span className="donate-input-character-counter">
                             {currentLength}/{maxLength}

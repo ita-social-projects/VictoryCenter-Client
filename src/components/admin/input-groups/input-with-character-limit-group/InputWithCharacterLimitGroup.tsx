@@ -45,6 +45,7 @@ export const InputWithCharacterLimitGroup = ({
                 type={type}
                 disabled={disabled}
                 placeholder={placeholder}
+                hasError={!!error}
             />
             <InputError error={error} />
         </div>

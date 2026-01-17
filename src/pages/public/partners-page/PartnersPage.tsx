@@ -38,9 +38,11 @@ export const PartnersPage: React.FC = () => {
     return (
         <>
             <IntroSection banner={partnersPageData?.banner ?? null} />
-            {partnersPageData?.sections.map((section) => (
-                <PartnersSection key={section.id} section={section} />
-            ))}
+            <div className={styles['partners-content-sections']}>
+                {partnersPageData?.sections.map((section) => (
+                    <PartnersSection key={section.id} section={section} />
+                ))}
+            </div>
             <CtaSection
                 title={CTA_DATA.title}
                 description={CTA_DATA.description}

@@ -10,12 +10,12 @@ jest.mock('@/components/admin/textarea-with-character-limit/TextAreaWithCharacte
     TextAreaWithCharacterLimit: () => <textarea title="mock-input" data-testid="mock-input" />,
 }));
 
-jest.mock('@/components/admin/input-error/InputError', () => ({
-    InputError: () => <div data-testid="mock-error">Error</div>,
+jest.mock('@/components/admin/input-error-with-character-counter/InputErrorWithCharacterCounter', () => ({
+    InputErrorWithCharacterCounter: () => <div data-testid="mock-error-counter">Error Counter</div>,
 }));
 
 describe('TextAreaWithCharacterLimitGroup', () => {
-    it('renders label, input and error', () => {
+    it('renders label, input and error counter', () => {
         render(
             <TextAreaWithCharacterLimitGroup
                 name={'test'}
@@ -29,6 +29,6 @@ describe('TextAreaWithCharacterLimitGroup', () => {
 
         expect(screen.getByTestId('mock-label')).toBeInTheDocument();
         expect(screen.getByTestId('mock-input')).toBeInTheDocument();
-        expect(screen.getByTestId('mock-error')).toBeInTheDocument();
+        expect(screen.getByTestId('mock-error-counter')).toBeInTheDocument();
     });
 });

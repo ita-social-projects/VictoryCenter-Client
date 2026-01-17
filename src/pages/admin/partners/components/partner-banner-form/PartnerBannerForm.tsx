@@ -1,7 +1,6 @@
 import React, { useCallback, useState, useEffect } from 'react';
 import { ImageValues, Image } from '@/types/common/image';
 import styles from './PartnerBannerForm.module.scss';
-import './PartnerBannerForm.scss';
 import { PARTNER_BANNER_VALIDATION, PARTNERS_TEXT } from '@/const/admin/partners';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { PartnersApi } from '@/services/api/admin/partners/partners-api';
@@ -182,6 +181,7 @@ export const PartnerBanner = () => {
                 <div className={styles.content}>
                     <div className={styles.image}>
                         <ImageInput
+                            variant="partnerBanner"
                             label={PARTNERS_TEXT.BANNER.ADD_IMAGE_HERE}
                             subText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
                                 PARTNER_BANNER_VALIDATION.image.height,
@@ -193,7 +193,6 @@ export const PartnerBanner = () => {
                             name="banner-image"
                             disabled={isDisabled}
                             setError={handleImageError}
-                            className="image-input-featured"
                             style={{
                                 backgroundImage: `
                                 linear-gradient(rgba(245, 245, 245, 0.85), rgba(245, 245, 245, 0.85)),

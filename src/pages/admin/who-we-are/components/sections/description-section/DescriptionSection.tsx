@@ -1,7 +1,7 @@
 import { Content } from '@/types/admin/who-we-are';
 import React, { useState } from 'react';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { TextAreaWithCharacterLimit } from '@/components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
+import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import './DescriptionSection.scss';
 import { Button } from '@/components/admin/button/Button';
 import { OurMission } from '@/pages/public/about-us-page/our-mission/OurMission';
@@ -53,17 +53,17 @@ export const DescriptionSection = ({
         <div className="description-section">
             <OurMission description={descriptionContent.description ?? ''} className="description-section-show-block" />
             <div className="description-section-textarea">
-                <span className="description-section-textarea-label">{COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}</span>
-                <TextAreaWithCharacterLimit
-                    onChange={handleDescriptionChange}
-                    value={descriptionContent.description ?? ''}
-                    name={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
+                <TextAreaWithCharacterLimitGroup
+                    label={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
                     id={descriptionContent.id.toString()}
+                    name={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
+                    value={descriptionContent.description ?? ''}
+                    onChange={handleDescriptionChange}
+                    onBlur={handleBlur}
                     maxLength={descriptionLimit}
                     rows={5}
-                    onBlur={handleBlur}
+                    error={descriptionError || undefined}
                 />
-                {descriptionError && <p className="error">{descriptionError}</p>}
                 <Button
                     className="button"
                     buttonStyle={'primary'}

@@ -3,95 +3,83 @@
 @use '@/assets/sass/mixins/utilits.mixins';
 @use '@/assets/sass/variables/z-index';
 
+$header-height: 4rem;
+
 .header-block {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     position: fixed;
     top: 0;
-    left: 0;
     width: 100%;
     z-index: z-index.public(header);
-
-    height: 4rem;
-    padding-top: 0.85rem;
-    padding-bottom: 0.85rem;
-    padding-left: 3.5rem;
-    padding-right: 3.5rem;
-
+    height: $header-height;
+    background-color: rgba(colors.$grey-50, 0.5);
+    backdrop-filter: blur(10.375rem);
     box-sizing: border-box;
 
-    background-color: rgba(colors.$grey-50, 0.5);
+    .header-content-container {
+        max-width: 1440px;
 
-    backdrop-filter: blur(10.375rem);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 100%;
 
-    .logo-container {
-        .logo {
-            user-select: none;
-            cursor: pointer;
+        padding-left: 3.5rem;
+        padding-right: 3.5rem;
+
+        .logo-container {
+            .logo {
+                user-select: none;
+                cursor: pointer;
+            }
         }
-    }
 
-    .link-container {
-        nav {
-            display: flex;
-            gap: 3rem;
+        .link-container {
+            nav {
+                display: flex;
+                gap: 2rem;
 
-            a {
-                font-size: 1rem;
-                @include utilits.link-base(colors.$blue-900, colors.$blue-300, colors.$blue-100);
-                font-weight: 600;
+                a {
+                    font-size: 1rem;
+                    @include utilits.link-base(colors.$blue-900, colors.$blue-300, colors.$blue-100);
+                    font-weight: 600;
 
-                &.disable {
-                    @include utilits.link-disabled();
+                    &.disable {
+                        @include utilits.link-disabled();
+                    }
                 }
             }
         }
-    }
 
-    .button-container {
-        display: flex;
-        gap: 0.5rem;
-        align-items: center;
-
-        .language-switcher {
-            margin-right: 1rem;
-        }
-        .contact-us-button {
-            background-color: transparent;
-            width: 8.2em;
-            height: 2.5rem;
-            font-family: fonts.$mulish-regular-font;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            border: 1px solid colors.$blue-900;
-        }
-        .donate-button {
-            background-color: colors.$blue-900;
-            color: white;
-            font-family: fonts.$mulish-regular-font;
-            font-size: 1rem;
-            width: 7.5rem;
-            height: 2.5rem;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-flex;
-            justify-content: center;
+        .button-container {
+            display: flex;
+            gap: 0.5rem;
             align-items: center;
-            border: 1px solid colors.$blue-900;
+
+            .language-switcher {
+                margin-right: 1rem;
+            }
         }
     }
 }
 
+.header-spacer {
+    height: $header-height;
+    width: 100%;
+}
+
 .burger-menu-icon {
     display: none;
-    font-size: 2rem;
-    cursor: pointer;
-    background: none;
-    border: none;
     align-self: center;
     color: black;
+    &.button {
+        width: 3.5rem !important;
+        height: 3.5rem !important;
+        padding: 0 !important;
+    }
+    svg {
+        width: 2.5rem !important;
+        height: 2.5rem !important;
+    }
 }
 
 .mobile-menu {
@@ -103,8 +91,12 @@
 }
 
 @media (max-width: 1024px) {
-    .link-container {
-        display: none;
+    .header-block {
+        .header-content-container {
+            .link-container {
+                display: none;
+            }
+        }
     }
 
     .mobile-menu {
@@ -152,17 +144,19 @@
 
 @media (max-width: 568px) {
     .header-block {
-        padding-left: 1rem;
-        padding-right: 0.5rem;
+        .header-content-container {
+            padding-left: 1rem;
+            padding-right: 0.5rem;
 
-        .button-container {
-            .contact-us-button {
-                display: none;
+            .button-container {
+                .contact-us-button {
+                    display: none;
+                }
             }
         }
     }
 
-    .button-container {
+    .header-block .header-content-container .button-container {
         .language-switcher {
             display: none;
         }

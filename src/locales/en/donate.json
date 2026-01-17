@@ -1,0 +1,30 @@
+{
+    "DONATE_PAGE_TITLE": "THANK YOU | FOR EVERY DONATION",
+    "DONATE_ONE_TIME_LABEL": "One-Time Donation",
+    "DONATE_SUBSCRIPTION_LABEL": "Subscription",
+    "ONE_TIME_DONATE_BUTTON_LABEL": "Donate",
+    "SUBSCRIPTION_DONATE_BUTTON_LABEL": "Donate Monthly",
+
+    "UKRAINE_PAYMENT_DETAILS_LABEL": "Payment Details for Donations in Ukraine",
+    "UKRAINE_UIDSREOU_LABEL": "EDRPOU",
+    "UKRAINE_PAYMENT_DESTINATION_LABEL": "Purpose of payment",
+    "PAYMENT_DETAILS_COMMON_RECIPIENT_LABEL": "Recipient",
+    "PAYMENT_DETAILS_COMMON_BANK_LABEL": "Bank",
+
+    "SWIFT_CODE_LABEL": "SWIFT",
+    "BANK_RECEIVER_LABEL": "Bank Receiver",
+    "ADDRESS_LABEL": "Address",
+
+    "CORRESPONDENT_BANKS_LABEL": "Correspondent Banks (one of the options to choose from)",
+
+    "USD_PAYMENT_DETAILS_LABEL": "For transfers in USD:",
+    "EUR_PAYMENT_DETAILS_LABEL": "For transfers in EUR:",
+
+    "CURRENCY_TABS": {
+        "UAH": "UAH",
+        "USD": "USD",
+        "EUR": "EUR"
+    },
+    "ALTERNATIVE_SUPPORT_WAYS_LABEL": "Other Support Options",
+    "LOADING_ERROR_MESSAGE": "Failed to load payment details"
+}

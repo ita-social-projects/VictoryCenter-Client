@@ -30,8 +30,3 @@ export const parseDescriptionList = (description?: string) => {
         items: (hasIntro ? lines.slice(1) : lines).map((item) => item.replace(/^[•\-\*]\s*/, '').trim()),
     };
 };
-
-export const serializeDescriptionList = (intro: string | null, items: string[]): string => {
-    const lines = intro ? [intro, ...items] : items;
-    return lines.join('\n');
-};

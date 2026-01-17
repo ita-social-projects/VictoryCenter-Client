@@ -10,13 +10,13 @@
     justify-content: center;
     align-items: center;
 
-        &.editable {
-            aspect-ratio: 1440 / 480;
-        }
+    &.editable {
+        aspect-ratio: 1440 / 480;
+    }
 
-        &.template {
-            aspect-ratio: 1440 / 496;
-        }
+    &.template {
+        aspect-ratio: 1440 / 496;
+    }
 }
 
 .container.template {

@@ -1,7 +1,7 @@
 import { parseDescriptionList } from '@/utils/functions/formatters/text-formatters';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { CardDescriptionField } from './CardDescriptionField';
-import { PROGRAM_SECTION_VALIDATION } from '@/const/admin/programs';
+import { PROGRAM_SECTION_VALIDATION, PROGRAMS_TEXT } from '@/const/admin/programs';
 import { useCardValidation } from '@/hooks/admin/use-section-card-validation/useCardValidation';
 import { TitleDescriptionCardData } from './TitleDescriptionCardsSection';
 
@@ -50,27 +50,35 @@ export const TitleDescriptionCard = ({
     if (isEditable) {
         return (
             <div className="td-card td-card-editable">
-                <InputWithCharacterLimitGroup
-                    label="Заголовок"
-                    id={`card-title-${index}`}
-                    name={`card-title-${index}`}
-                    value={card.title}
-                    onChange={handleTitleChange}
-                    onBlur={handleTitleBlur}
-                    maxLength={PROGRAM_SECTION_VALIDATION.cardTitle.max}
-                    error={titleError}
-                />
+                <div className="title-field">
+                    <InputWithCharacterLimitGroup
+                        label="Заголовок"
+                        id={`card-title-${index}`}
+                        name={`card-title-${index}`}
+                        value={card.title}
+                        isRequired={true}
+                        onChange={handleTitleChange}
+                        onBlur={handleTitleBlur}
+                        maxLength={PROGRAM_SECTION_VALIDATION.cardTitle.max}
+                        error={titleError}
+                        placeholder={PROGRAMS_TEXT.SECTION.CARD.FORM.TITLE.PLACEHOLDER}
+                    />
+                </div>
 
-                <CardDescriptionField
-                    label="Опис"
-                    id={`card-description-${index}`}
-                    name={`card-description-${index}`}
-                    value={card.description}
-                    onChange={handleDescriptionChange}
-                    onBlur={handleDescriptionBlur}
-                    maxLength={PROGRAM_SECTION_VALIDATION.cardDescription.max}
-                    error={descriptionError}
-                />
+                <div className="description-field">
+                    <CardDescriptionField
+                        label="Опис"
+                        id={`card-description-${index}`}
+                        name={`card-description-${index}`}
+                        value={card.description}
+                        isRequired={true}
+                        onChange={handleDescriptionChange}
+                        onBlur={handleDescriptionBlur}
+                        maxLength={PROGRAM_SECTION_VALIDATION.cardDescription.max}
+                        error={descriptionError}
+                        placeholder="• "
+                    />
+                </div>
             </div>
         );
     }

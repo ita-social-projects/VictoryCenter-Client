@@ -1,13 +1,14 @@
 import React from 'react';
 import { InputLabel } from '@/components/admin/input-label/InputLabel';
 import { InputErrorWithCharacterCounter } from '@/components/admin/input-error-with-character-counter/InputErrorWithCharacterCounter';
-import { TextAreaWithBulletBehavior } from '@/components/admin/textarea-with-character-limit/TextAreaWithBulletBehavior';
+import { TextAreaWithBulletBehavior } from '@/components/admin/textarea-with-bullets/TextAreaWithBulletBehavior';
 
 interface CardDescriptionFieldProps {
     label: string;
     id: string;
     name: string;
     value: string;
+    isRequired?: boolean;
     onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
     onBlur?: (e: React.FocusEvent<HTMLTextAreaElement>) => void;
     onFocus?: (e: React.FocusEvent<HTMLTextAreaElement>) => void;
@@ -24,6 +25,7 @@ export const CardDescriptionField = ({
     id,
     name,
     value,
+    isRequired,
     onChange,
     onBlur,
     onFocus,
@@ -39,7 +41,7 @@ export const CardDescriptionField = ({
 
     return (
         <div className="input-group">
-            <InputLabel htmlFor={id} text={label} />
+            <InputLabel htmlFor={id} text={label} isRequired={isRequired} />
 
             <TextAreaWithBulletBehavior
                 id={id}

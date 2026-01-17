@@ -1,8 +1,25 @@
 import cn from 'classnames';
-import { TitleDescriptionCardsSection } from '../shared/title-description-cards/TitleDescriptionCardsSection';
+import {
+    TitleDescriptionCardsSection,
+    TitleDescriptionCardData,
+} from '../shared/title-description-cards/TitleDescriptionCardsSection';
 import styles from './QuadTitleDescription.module.scss';
 
-export const QuadTitleDescription = ({ isTemplate = false, isEditable = false, ...props }: any) => {
+interface QuadTitleDescriptionProps {
+    cards: TitleDescriptionCardData[];
+    isTemplate?: boolean;
+    isEditable?: boolean;
+    onTitleChange?: (index: number, value: string) => void;
+    onDescriptionChange?: (index: number, value: string) => void;
+}
+
+export const QuadTitleDescription = ({
+    cards,
+    isTemplate = false,
+    isEditable = false,
+    onTitleChange,
+    onDescriptionChange,
+}: QuadTitleDescriptionProps) => {
     return (
         <div
             className={cn(styles.container, {
@@ -10,7 +27,14 @@ export const QuadTitleDescription = ({ isTemplate = false, isEditable = false, .
                 [styles.editable]: isEditable,
             })}
         >
-            <TitleDescriptionCardsSection {...props} cardsCount={4} isTemplate={isTemplate} isEditable={isEditable} />
+            <TitleDescriptionCardsSection
+                cards={cards}
+                cardsCount={4}
+                isTemplate={isTemplate}
+                isEditable={isEditable}
+                onTitleChange={onTitleChange}
+                onDescriptionChange={onDescriptionChange}
+            />
         </div>
     );
 };

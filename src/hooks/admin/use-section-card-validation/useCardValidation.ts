@@ -9,13 +9,13 @@ export interface UseCardValidationProps {
     required?: boolean;
 }
 
-export const useCardValidation = ({ value, onChange, min = 0, max = 300, required = true }: UseCardValidationProps) => {
+export const useCardValidation = ({ onChange, min = 0, max = 300, required = true }: UseCardValidationProps) => {
     const [error, setError] = useState<string | undefined>(undefined);
 
     const handleChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
             const newValue = e.target.value;
-            // enforce max on the hook side as a safety net
+
             const limited = newValue.length > max ? newValue.slice(0, max) : newValue;
             onChange?.(limited);
 

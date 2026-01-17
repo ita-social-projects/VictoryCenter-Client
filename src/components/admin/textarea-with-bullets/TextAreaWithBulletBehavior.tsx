@@ -1,5 +1,8 @@
 import React, { useCallback, useRef } from 'react';
-import { TextAreaWithCharacterLimit, TextAreaWithCharacterLimitProps } from './TextAreaWithCharacterLimit';
+import {
+    TextAreaWithCharacterLimit,
+    TextAreaWithCharacterLimitProps,
+} from '../textarea-with-character-limit/TextAreaWithCharacterLimit';
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
 
 export interface TextAreaWithBulletBehaviorProps extends Omit<TextAreaWithCharacterLimitProps, 'onChange'> {
@@ -92,40 +95,6 @@ export const TextAreaWithBulletBehavior = ({
         };
         keydownHandlerRef.current = handler;
         document.addEventListener('keydown', handler);
-    };
-
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            const el = document.getElementById(id) as HTMLTextAreaElement | null;
-            if (!el) return;
-            const current = el.value ?? '';
-            const start = el.selectionStart ?? 0;
-            const end = el.selectionEnd ?? 0;
-            const insert = '\n• ';
-            const before = current.slice(0, start);
-            const after = current.slice(end);
-            let newValue = before + insert + after;
-            if (newValue.length > maxLength) {
-                const available = maxLength - (before.length + after.length);
-                if (available <= 0) return;
-                newValue = before + insert.slice(0, available) + after;
-            }
-
-            const syntheticEvent = { target: { value: newValue, name, id } } as React.ChangeEvent<HTMLTextAreaElement>;
-            onChange(syntheticEvent);
-
-            setTimeout(() => {
-                try {
-                    const el2 = document.getElementById(id) as HTMLTextAreaElement | null;
-                    if (el2) {
-                        const pos = start + insert.length;
-                        el2.selectionStart = el2.selectionEnd = pos;
-                        el2.focus();
-                    }
-                } catch (err) {}
-            }, 0);
-        }
     };
 
     const handleBlurInternal = (e: React.FocusEvent<HTMLTextAreaElement>) => {

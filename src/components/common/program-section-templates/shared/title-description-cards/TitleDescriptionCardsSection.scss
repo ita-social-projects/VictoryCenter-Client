@@ -10,7 +10,7 @@
 }
 
 .td-cards.editable {
-    gap: 2rem;
+    gap: 1rem;
 }
 
 .td-cards.dual,
@@ -29,13 +29,33 @@
 }
 
 .td-card.td-card-editable {
-    padding: 1.5rem;
+    padding: 1.3rem;
 }
 
 .title {
     @include type.subtitle-2-bold;
     font-size: 0.76rem;
     margin-bottom: 0.5rem;
+}
+
+.title-field {
+    margin-bottom: 1rem;
+    input {
+        @include type.subtitle-2-bold;
+        font-size: 1.03rem;
+
+        &::placeholder {
+            opacity: 0.7;
+        }
+    }
+}
+
+.description-field {
+    textarea {
+        @include type.body-1-regular;
+        font-size: 1rem;
+        min-height: 10rem;
+    }
 }
 
 .description {

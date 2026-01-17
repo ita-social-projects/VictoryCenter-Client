@@ -1,6 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { ABOUT_US_DATA } from '@/const/public/about-us-page';
 import { AboutUsContent } from '@/types/public/about-us-page';
+import styles from './SupportCard.module.scss';
+import classNames from 'classnames';
 
 interface SupportCardProps {
     card: AboutUsContent;
@@ -16,9 +18,9 @@ export function SupportCard({ card, index }: SupportCardProps) {
     const description = card.description;
 
     return (
-        <div className={`support-card card-${index + 1}`}>
-            <img src={imageUrl} alt={altText} />
-            <p className="support-description">{description}</p>
+        <div className={classNames(styles.peopleCard, styles[`card${index + 1}`])}>
+            <img src={imageUrl} alt={altText} className={styles.image} />
+            <p className={styles.description}>{description}</p>
         </div>
     );
 }

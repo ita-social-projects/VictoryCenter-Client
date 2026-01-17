@@ -1,9 +1,11 @@
 import { useTranslation } from 'react-i18next';
 import { ABOUT_US_DATA } from '@/const/public/about-us-page';
-import './MainValue.scss';
+import styles from './MainValue.module.scss';
 import { Swiper } from '@/components/public/swiper/Swiper';
 import { AboutUsContent } from '@/types/public/about-us-page';
-
+import classNames from 'classnames';
+import { ReactComponent as ArrowRight } from '@/assets/icons/arrow-right.svg';
+import { ReactComponent as ArrowLeft } from '@/assets/icons/arrow-left.svg';
 export interface MainValuesProps {
     content: AboutUsContent[] | null;
 }
@@ -13,8 +15,8 @@ export const MainValues = ({ content }: MainValuesProps) => {
     const peopleData = t('PEOPLE_DATA', { returnObjects: true });
 
     return (
-        <div className="main-values-block">
-            <div className="main-values-title">
+        <div className={styles.root}>
+            <div className={styles.title}>
                 <h2>
                     {t('MAIN_VALUE.FIRST_PART')}
                     <span>{t('MAIN_VALUE.FIRST_HIGHLIGHT')}</span>
@@ -23,31 +25,41 @@ export const MainValues = ({ content }: MainValuesProps) => {
                 </h2>
             </div>
 
-            <div className="people-block">
+            <div className={styles.peopleBlock}>
                 <Swiper
                     items={content}
-                    slidesPerView={1}
-                    breakpoints={{
-                        568: { slidesPerView: 2 },
-                        768: { slidesPerView: 2 },
-                        1025: { slidesPerView: 4 },
-                    }}
                     renderItem={(person, index) => {
                         const imageUrl = person.image?.url ?? ABOUT_US_DATA.PEOPLE_DATA[index].IMG;
                         const altText = peopleData[index].ALT;
                         const description = person.description;
 
                         return (
-                            <div className={`people-card card-${index + 1}`}>
-                                <img src={imageUrl} alt={altText} />
-                                <p className="people-info">{description}</p>
+                            <div className={classNames(styles.peopleCard, styles[`card${index + 1}`])}>
+                                <img className={styles.peopleImg} src={imageUrl} alt={altText} />
+                                <p className={styles.peopleInfo}>{description}</p>
                             </div>
                         );
                     }}
+                    classNameSwiperSlide={styles.swiperSlide}
+                    navigationButtons={{
+                        prev: {
+                            icon: ArrowLeft,
+                            ariaLabel: 'back',
+                            variant: 'primary-dark',
+                            className: styles.left,
+                        },
+                        next: {
+                            icon: ArrowRight,
+                            ariaLabel: 'next',
+                            variant: 'primary-dark',
+                            className: styles.right,
+                        },
+                    }}
                 />
             </div>
-            <div className="summary-block">
-                <h3 className="summary-text">{t('MAIN_VALUE_DETAILS')}</h3>
+            <div className={styles.summaryBlock}>
+                <div className={styles.summaryLine} />
+                <h3 className={styles.summaryText}>{t('MAIN_VALUE_DETAILS')}</h3>
             </div>
         </div>
     );

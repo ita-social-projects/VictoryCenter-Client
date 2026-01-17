@@ -3,9 +3,10 @@ import { SupportSectionTablet } from './components/support-section-tablet/Suppor
 import { Swiper } from '@/components/public/swiper/Swiper';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { SupportCard } from './components/support-card/SupportCard';
-import './SupportSection.scss';
+import styles from './SupportSection.module.scss';
 import { AboutUsContent } from '@/types/public/about-us-page';
-
+import { ReactComponent as ArrowRight } from '@/assets/icons/arrow-right.svg';
+import { ReactComponent as ArrowLeft } from '@/assets/icons/arrow-left.svg';
 export interface SupportSectionProps {
     content: AboutUsContent[] | null;
 }
@@ -13,28 +14,40 @@ export interface SupportSectionProps {
 export const SupportSection = ({ content }: SupportSectionProps) => {
     const { t } = useTranslation('aboutUsPage');
 
-    const isTablet = useMediaQuery('(min-width:768px) and (max-width:1024px)');
+    const isTablet = useMediaQuery('(min-width:560px) and (max-width:1439px)');
 
     if (isTablet) return <SupportSectionTablet content={content} />;
 
     return (
-        <div className="support-block">
+        <div className={styles.root}>
             <Swiper
                 items={content}
-                slidesPerView={1}
-                breakpoints={{
-                    1025: { slidesPerView: 3 },
-                }}
+                slidesPerView={'auto'}
                 renderItem={(item, index) => (
                     <>
                         {index === 0 && (
-                            <div className="main-values-title">
-                                <h2 className="support-title">{t('SUPPORT_TITLE')}</h2>
+                            <div className={styles.title}>
+                                <h2>{t('SUPPORT_TITLE')}</h2>
                             </div>
                         )}
                         <SupportCard card={item} index={index} />
                     </>
                 )}
+                classNameSwiperSlide={styles.swiperSlide}
+                navigationButtons={{
+                    prev: {
+                        icon: ArrowLeft,
+                        ariaLabel: 'back',
+                        variant: 'primary-dark',
+                        className: styles.left,
+                    },
+                    next: {
+                        icon: ArrowRight,
+                        ariaLabel: 'next',
+                        variant: 'primary-dark',
+                        className: styles.right,
+                    },
+                }}
             />
         </div>
     );

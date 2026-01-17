@@ -24,20 +24,20 @@ describe('ProgramCard', () => {
     };
 
     it('renders program name, categories, and description', () => {
-        render(<ProgramCard program={program} className={''} />);
+        render(<ProgramCard program={program} variant={'aboutUs'} />);
         expect(screen.getByText('Program A')).toBeInTheDocument();
         expect(screen.getByText('Category 1, Category 2')).toBeInTheDocument();
         expect(screen.getByText('Description A')).toBeInTheDocument();
     });
 
     it('renders program image using mapImageToBase64', () => {
-        render(<ProgramCard program={program} className={''} />);
+        render(<ProgramCard program={program} variant={'aboutUs'} />);
         const img = screen.getByAltText('Program A') as HTMLImageElement;
         expect(img).toHaveAttribute('src', 'mocked-image');
     });
 
     it('renders arrow icons', () => {
-        render(<ProgramCard program={program} className={''} />);
+        render(<ProgramCard program={program} variant={'aboutUs'} />);
         const arrows = screen.getAllByTestId('arrow-up-right');
         expect(arrows).toHaveLength(1);
     });

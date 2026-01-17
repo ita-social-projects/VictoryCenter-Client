@@ -1,0 +1,15 @@
+.root {
+    margin-top: 140px;
+
+    @media (min-width: 560px) {
+        margin-top: 112px;
+    }
+
+    @media (min-width: 768px) {
+        margin-top: 192px;
+    }
+
+    @media (min-width: 1440px) {
+        margin-top: 226px;
+    }
+}

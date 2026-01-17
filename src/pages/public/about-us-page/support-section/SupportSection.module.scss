@@ -1,0 +1,74 @@
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
+@use '@/assets/sass/variables/z-index';
+
+.root {
+    display: flex;
+    flex-wrap: wrap;
+    position: relative;
+    width: 100%;
+    height: auto;
+    padding-top: 100px;
+
+    @media (min-width: 1440px) {
+        padding-bottom: 30px;
+    }
+}
+
+.swiperSlide {
+    width: 352px;
+
+    @media (min-width: 1440px) {
+        width: 480px;
+    }
+}
+
+.title {
+    padding: 0 16px;
+
+    h2 {
+        @include type.h4-bold-uppercase;
+        color: c.$blue-900;
+    }
+
+    @media (min-width: 1440px) {
+        padding: 0 0 0 56px;
+
+        h2 {
+            @include type.h4-bold-uppercase;
+        }
+    }
+}
+
+.left {
+    position: absolute;
+    top: 50%;
+    left: 4px;
+    transform: translateY(-50%);
+    z-index: z-index.$scrollable-frame-arrows;
+
+    &:disabled {
+        visibility: hidden;
+    }
+
+    @media (min-width: 560px) {
+        left: 16px;
+    }
+}
+
+.right {
+    position: absolute;
+    top: 50%;
+    right: 4px;
+    transform: translateY(-50%);
+    z-index: z-index.$scrollable-frame-arrows;
+
+    &:disabled {
+        visibility: hidden;
+    }
+
+    @media (min-width: 560px) {
+        right: 16px;
+    }
+}
+

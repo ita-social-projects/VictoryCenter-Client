@@ -4,6 +4,21 @@ import { ContentType } from '@/types/common/about-us';
 import { AboutUsContent } from '@/types/public/about-us-page';
 import { aboutUsPageUk } from '@/locales/uk';
 
+jest.mock('./SupportCard.module.scss', () => ({
+    peopleCard: 'peopleCard',
+    card1: 'card1',
+    card2: 'card2',
+    card3: 'card3',
+    image: 'image',
+    description: 'description',
+}));
+
+jest.mock('@/const/public/about-us-page', () => ({
+    ABOUT_US_DATA: {
+        SUPPORT_DATA: [{ IMG: 'default-image-1.jpg' }, { IMG: 'default-image-2.jpg' }, { IMG: 'default-image-3.jpg' }],
+    },
+}));
+
 describe('SupportCard component', () => {
     const card: AboutUsContent = {
         id: 1,
@@ -38,12 +53,12 @@ describe('SupportCard component', () => {
     it('renders correct classes for multiple indexes', () => {
         const { rerender } = render(<SupportCard card={card} index={0} />);
         const card1 = screen.getByRole('img').closest('div');
-        expect(card1).toHaveClass('support-card');
-        expect(card1).toHaveClass('card-1');
+        expect(card1).toHaveClass('peopleCard');
+        expect(card1).toHaveClass('card1');
 
         rerender(<SupportCard card={card} index={2} />);
         const card3 = screen.getByRole('img').closest('div');
-        expect(card3).toHaveClass('support-card');
-        expect(card3).toHaveClass('card-3');
+        expect(card3).toHaveClass('peopleCard');
+        expect(card3).toHaveClass('card3');
     });
 });

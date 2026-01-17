@@ -4,35 +4,59 @@ import { Navigation, Pagination, Scrollbar } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/scrollbar';
+import { Button, ButtonIcon, ButtonProps } from '@/components/public/ui/button';
 
-import { ReactComponent as ArrowRight } from '@/assets/icons/arrow-right.svg';
-import { ReactComponent as ArrowLeft } from '@/assets/icons/arrow-left.svg';
+export type ShowScrollbar = { isVisible: true; className: string; classNameDrag: string } | { isVisible: false };
+
+type NavigationButtonPropsBase = Omit<ButtonProps, 'onClick' | 'disabled'> & {
+    icon: ButtonIcon;
+    ariaLabel: string;
+    children?: never;
+};
+
+interface NavigationButtons {
+    prev?: NavigationButtonPropsBase;
+    next?: NavigationButtonPropsBase;
+}
 
 interface SwiperProps<T> {
     items: T[] | null;
     renderItem: (item: T, index: number) => React.ReactNode;
-    slidesPerView?: number;
-    breakpoints?: Record<number, { slidesPerView: number }>;
-    showScrollbar?: boolean;
+    slidesPerView?: number | 'auto';
+    breakpoints?: Record<number, { slidesPerView: number | 'auto' }>;
+    showScrollbar?: ShowScrollbar;
+    classNameSwiperSlide?: string;
+    navigationButtons?: NavigationButtons;
 }
 
 export function Swiper<T>({
     items,
     renderItem,
-    slidesPerView = 1,
+    slidesPerView = 'auto',
     breakpoints = {},
-    showScrollbar = false,
+    showScrollbar = { isVisible: false },
+    classNameSwiperSlide,
+    navigationButtons,
 }: SwiperProps<T>) {
     const swiperRef = useRef<SwiperClass | null>(null);
     const [isPrevEnabled, setIsPrevEnabled] = useState(false);
     const [isNextEnabled, setIsNextEnabled] = useState(true);
 
+    const isOnlyNextButton = Boolean(navigationButtons?.next && !navigationButtons?.prev);
+
     const handlePrev = useCallback(() => {
         swiperRef.current?.slidePrev();
     }, []);
+
     const handleNext = useCallback(() => {
-        swiperRef.current?.slideNext();
-    }, []);
+        if (swiperRef.current) {
+            if (isOnlyNextButton && swiperRef.current.isEnd) {
+                swiperRef.current.slideTo(0);
+            } else {
+                swiperRef.current.slideNext();
+            }
+        }
+    }, [isOnlyNextButton]);
 
     const handleInit = useCallback((swiper: SwiperClass) => {
         swiperRef.current = swiper;
@@ -56,15 +80,26 @@ export function Swiper<T>({
 
     const swiperModules = useMemo(() => {
         const modules = [Navigation, Pagination];
-        if (showScrollbar) {
+        if (showScrollbar.isVisible) {
             modules.push(Scrollbar);
         }
         return modules;
-    }, [showScrollbar]);
+    }, [showScrollbar.isVisible]);
 
     if (!items || items.length === 0) {
         return null;
     }
+
+    const scrollbarConfig = showScrollbar.isVisible
+        ? {
+              draggable: true,
+              el: `.${showScrollbar.className}`,
+              dragClass: `${showScrollbar.classNameDrag}`,
+          }
+        : false;
+
+    const prevButtonProps = navigationButtons?.prev;
+    const nextButtonProps = navigationButtons?.next;
 
     return (
         <>
@@ -76,31 +111,25 @@ export function Swiper<T>({
                 onReachEnd={handleReachEnd}
                 onFromEdge={handleFromEdge}
                 slidesPerView={slidesPerView}
-                scrollbar={{ draggable: true, el: '.custom-scrollbar' }}
+                scrollbar={scrollbarConfig}
                 breakpoints={breakpoints}
             >
                 {items.map((item, index) => (
-                    <SwiperSlide key={index}>{renderItem(item, index)}</SwiperSlide>
+                    <SwiperSlide className={classNameSwiperSlide} key={index}>
+                        {renderItem(item, index)}
+                    </SwiperSlide>
                 ))}
             </SwiperReact>
-            <div className="button-container">
-                <button
-                    type="button"
-                    onClick={handlePrev}
-                    className="arrow-button arrow-left"
-                    disabled={!isPrevEnabled}
-                >
-                    <ArrowLeft className="arrow-icon" />
-                </button>
-                <button
-                    type="button"
+            {prevButtonProps && (
+                <Button {...(prevButtonProps as ButtonProps)} onClick={handlePrev} disabled={!isPrevEnabled} />
+            )}
+            {nextButtonProps && (
+                <Button
+                    {...(nextButtonProps as ButtonProps)}
                     onClick={handleNext}
-                    className="arrow-button arrow-right"
-                    disabled={!isNextEnabled}
-                >
-                    <ArrowRight className="arrow-icon" />
-                </button>
-            </div>
+                    disabled={isOnlyNextButton ? false : !isNextEnabled}
+                />
+            )}
         </>
     );
 }

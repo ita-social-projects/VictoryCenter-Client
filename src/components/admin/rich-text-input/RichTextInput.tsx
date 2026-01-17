@@ -57,7 +57,7 @@ export const RichTextInput = ({
         () => ({
             namespace: 'RichTextInput-' + id,
             theme,
-            onError: (error: Error) => console.error('Lexical error:', error),
+            onError: () => {},
             editable: !disabled,
             editorState: (editor: LexicalEditor) => {
                 if (value) {
@@ -70,7 +70,7 @@ export const RichTextInput = ({
                 }
             },
         }),
-        [id, disabled],
+        [id, disabled, value],
     );
 
     return (

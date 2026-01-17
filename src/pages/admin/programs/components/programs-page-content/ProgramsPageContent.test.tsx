@@ -173,10 +173,7 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                         })
                     }
                 />
-                <button
-                    data-testid="trigger-delete-category"
-                    onClick={() => props.onDeleteCategory(1)}
-                />
+                <button data-testid="trigger-delete-category" onClick={() => props.onDeleteCategory(1)} />
             </div>
         ),
     };

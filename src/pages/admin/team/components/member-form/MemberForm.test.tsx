@@ -6,7 +6,16 @@ import { VisibilityStatus } from '@/types/admin/common';
 import { TeamCategory } from '@/types/admin/team-category';
 
 jest.mock('@/components/common/single-select-input/SingleSelectInput', () => ({
-    SingleSelectInput: ({ options, value, onChange, onBlur, placeholder, getOptionId, getOptionName, disabled }: any) => {
+    SingleSelectInput: ({
+        options,
+        value,
+        onChange,
+        onBlur,
+        placeholder,
+        getOptionId,
+        getOptionName,
+        disabled,
+    }: any) => {
         return (
             <select
                 data-testid="category-select"

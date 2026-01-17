@@ -1,41 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useParams } from 'react-router-dom';
 import { LinearProgress } from '@mui/material';
-import { fetchProgramBySlug } from '@/services/api/public/programs/programs-api';
 import styles from './DetailedProgramPageContent.module.scss';
-import { Program } from '@/types/admin/programs';
 import { ReactComponent as MapPin } from '@/assets/icons/map-pin.svg';
 import { ReactComponent as UsersRound } from '@/assets/icons/users-round.svg';
 import { ReactComponent as CalendarDays } from '@/assets/icons/calendar-days.svg';
+import { useProgramBySlug } from '@/hooks/common/use-get-program-by-slug/useGetProgramBySlug';
 
 export const DetailedProgramPageContent: React.FC = () => {
     const { slug } = useParams<{ slug: string }>();
 
-    const [program, setProgram] = useState<Program | null>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [error, setError] = useState<Error | null>(null);
-
-    useEffect(() => {
-        const fetchProgram = async () => {
-            if (!slug) {
-                setIsLoading(false);
-                return;
-            }
-
-            try {
-                setIsLoading(true);
-                const data = await fetchProgramBySlug(slug);
-                setProgram(data);
-                setError(null);
-            } catch (err) {
-                setError(err as Error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchProgram();
-    }, [slug]);
+    const { program, isLoading, error } = useProgramBySlug(slug);
 
     if (isLoading) {
         return (

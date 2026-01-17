@@ -2,6 +2,7 @@ import { PublishedProgramDto } from '@/types/public/programs-page';
 import { ReactComponent as ArrowIcon } from '@/assets/icons/arrow-up-right.svg';
 import { useNavigate } from 'react-router-dom';
 import { PUBLIC_ROUTES } from '@/const/public/routes';
+import cn from 'classnames';
 import './ProgramCardProgramsPage.scss';
 import './ProgramCardAboutUsPage.scss';
 
@@ -28,7 +29,7 @@ export const ProgramCard = ({ program, className }: ProgramCardProps) => {
 
     return (
         <div
-            className={`card-block ${className} ${program.slug ? 'clickable' : ''}`}
+            className={cn('card-block', className, { clickable: !!program.slug })}
             onClick={handleClick}
             onKeyDown={handleKeyDown}
             role="button"

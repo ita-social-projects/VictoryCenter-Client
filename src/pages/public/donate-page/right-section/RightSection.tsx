@@ -73,7 +73,7 @@ export const RightSection = ({ donateData, error }: RightSectionProps) => {
         switch (activeTab) {
             case Currency.UAH:
                 return (
-                    <UkrainePaymentDetails bankDetails={[...donateData.uahBankDetails].sort((a, b) => b.id - a.id)} />
+                    <UkrainePaymentDetails bankDetails={donateData.uahBankDetails.toSorted((a, b) => b.id - a.id)} />
                 );
             case Currency.USD:
                 return (
@@ -81,7 +81,7 @@ export const RightSection = ({ donateData, error }: RightSectionProps) => {
                         currency={activeTab}
                         foreignBankDetails={donateData.foreignBankDetails
                             .filter((b) => b.currency === Currency.USD)
-                            .sort((a, b) => b.id - a.id)}
+                            .toSorted((a, b) => b.id - a.id)}
                     />
                 );
             case Currency.EUR:
@@ -90,7 +90,7 @@ export const RightSection = ({ donateData, error }: RightSectionProps) => {
                         currency={activeTab}
                         foreignBankDetails={donateData.foreignBankDetails
                             .filter((b) => b.currency === Currency.EUR)
-                            .sort((a, b) => b.id - a.id)}
+                            .toSorted((a, b) => b.id - a.id)}
                     />
                 );
         }
@@ -133,7 +133,7 @@ export const RightSection = ({ donateData, error }: RightSectionProps) => {
             <div className="donatePaymentDetails">
                 {paymentDetails()}
                 <AlternativeSupportWays
-                    supportOptions={[...(donateData?.supportOptions || [])].sort((a, b) => b.id - a.id)}
+                    supportOptions={(donateData?.supportOptions || []).toSorted((a, b) => b.id - a.id)}
                     currentCurrency={activeTab}
                 />
             </div>

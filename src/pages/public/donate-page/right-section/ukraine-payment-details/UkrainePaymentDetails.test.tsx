@@ -97,7 +97,7 @@ describe('UkrainePaymentDetails', () => {
 
         it('should render multiple banks with all details', () => {
             const bankDetails = createMultipleBanks(2);
-            const sortedBankDetails = [...bankDetails].sort((a, b) => b.id - a.id);
+            const sortedBankDetails = bankDetails.toSorted((a, b) => b.id - a.id);
 
             render(<UkrainePaymentDetails bankDetails={bankDetails} />);
 
@@ -109,7 +109,7 @@ describe('UkrainePaymentDetails', () => {
             expect(screen.getAllByText('IBAN (UAH)')).toHaveLength(2);
             expect(screen.getAllByText('Призначення платежу')).toHaveLength(2);
 
-            bankDetails.forEach((bank) => expectBankDataToBePresent(bank));
+            sortedBankDetails.forEach((bank) => expectBankDataToBePresent(bank));
             expectCopyButtonsWithCorrectData(sortedBankDetails);
         });
 
@@ -238,7 +238,7 @@ describe('UkrainePaymentDetails', () => {
 
         it('should handle 3 banks correctly', () => {
             const bankDetails = createMultipleBanks(3);
-            const sortedBankDetails = [...bankDetails].sort((a, b) => b.id - a.id);
+            const sortedBankDetails = bankDetails.toSorted((a, b) => b.id - a.id);
 
             render(<UkrainePaymentDetails bankDetails={bankDetails} />);
 

@@ -6,7 +6,7 @@ import { DropdownLink, DropdownMenu } from '@/components/public/dropdown-menu/Dr
 import { ReactComponent as BurgerIcon } from '@/assets/icons/burger.svg';
 import { LanguageSwitcher } from '@/components/public/language-switcher/LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
-import { Link } from '@/components/common/link/Link';
+import { Link } from '@/components/common/link';
 import { Button } from '@/components/public/ui/button';
 
 export const Header = () => {

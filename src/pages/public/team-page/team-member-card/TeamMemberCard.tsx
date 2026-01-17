@@ -1,6 +1,7 @@
 import { MemberCard } from '@/types/public/team-page';
 import { ReactComponent as DefaultTeamMemberIcon } from '@/assets/icons/team-member-blank.svg';
 import { useState, useEffect } from 'react';
+import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
 
 interface TeamMemberProps {
     member: MemberCard;
@@ -13,6 +14,11 @@ export const TeamMemberCard = ({ member }: TeamMemberProps) => {
         setError(false);
     }, [member.photo]);
 
+    const { fullName, description } = useGetLocalization(member.localizations, {
+        fullName: member.name,
+        description: member.role,
+    });
+
     return (
         <div className="team-member">
             {error || !member.photo ? (
@@ -21,8 +27,8 @@ export const TeamMemberCard = ({ member }: TeamMemberProps) => {
                 <img src={member.photo} alt={member.name} className="member-photo" onError={() => setError(true)} />
             )}
             <div>
-                <p className="member-name">{member.name}</p>
-                <p className="member-role">{member.role}</p>
+                <p className="member-name">{fullName}</p>
+                <p className="member-role">{description}</p>
             </div>
         </div>
     );

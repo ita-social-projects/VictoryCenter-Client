@@ -6,6 +6,13 @@ import { ReactComponent as MapPin } from '@/assets/icons/map-pin.svg';
 import { ReactComponent as UsersRound } from '@/assets/icons/users-round.svg';
 import { ReactComponent as CalendarDays } from '@/assets/icons/calendar-days.svg';
 import { useProgramBySlug } from '@/hooks/common/use-get-program-by-slug/useGetProgramBySlug';
+import { InfoItem } from '../info-item/InfoItem';
+
+const getProgramImageUrl = (backgroundImage: { url: string } | { mimeType: string; base64: string }): string => {
+    return 'url' in backgroundImage
+        ? backgroundImage.url
+        : `data:${backgroundImage.mimeType};base64,${backgroundImage.base64}`;
+};
 
 export const DetailedProgramPageContent: React.FC = () => {
     const { slug } = useParams<{ slug: string }>();
@@ -36,11 +43,7 @@ export const DetailedProgramPageContent: React.FC = () => {
                 {program.backgroundImage && (
                     <>
                         <img
-                            src={
-                                'url' in program.backgroundImage
-                                    ? program.backgroundImage.url
-                                    : `data:${program.backgroundImage.mimeType};base64,${program.backgroundImage.base64}`
-                            }
+                            src={getProgramImageUrl(program.backgroundImage)}
                             className={styles['background-image']}
                             alt={`${program.name} background`}
                         />
@@ -53,26 +56,15 @@ export const DetailedProgramPageContent: React.FC = () => {
                             <h1 className={styles['program-name']}>{program.name}</h1>
                             {(program.location || program.participantsCount) && (
                                 <div className={styles['program-info']}>
-                                    {program.location && (
-                                        <span className={styles['info-item']}>
-                                            <MapPin width={24} height={24} />
-                                            {program.location}
-                                        </span>
-                                    )}
+                                    {program.location && <InfoItem icon={MapPin} text={program.location} />}
                                     {program.participantsCount && (
-                                        <span className={styles['info-item']}>
-                                            <UsersRound width={24} height={24} />
-                                            {program.participantsCount}
-                                        </span>
+                                        <InfoItem icon={UsersRound} text={program.participantsCount} />
                                     )}
                                 </div>
                             )}
                             {program.meetingsCount && (
                                 <div className={styles['program-meetings']}>
-                                    <span className={styles['info-item']}>
-                                        <CalendarDays width={24} height={24} />
-                                        {program.meetingsCount}
-                                    </span>
+                                    <InfoItem icon={CalendarDays} text={program.meetingsCount} />
                                 </div>
                             )}
                         </div>

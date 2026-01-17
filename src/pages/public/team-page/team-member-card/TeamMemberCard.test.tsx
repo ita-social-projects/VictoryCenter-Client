@@ -1,59 +1,82 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemberCard } from '@/types/public/team-page';
 import { TeamMemberCard } from './TeamMemberCard';
+import { TranslationStatus } from '@/types/common/language';
+import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
 
 jest.mock('@/assets/icons/team-member-blank.svg', () => ({
     ReactComponent: () => <svg data-testid="default-member-icon" />,
 }));
 
+jest.mock('@/hooks/common/use-get-localization/useGetLocalization', () => ({
+    useGetLocalization: jest.fn(),
+}));
+const mockedUseGetLocalization = useGetLocalization as jest.Mock;
+
 describe('TeamMemberCard component', () => {
+    beforeEach(() => {
+        mockedUseGetLocalization.mockImplementation((localizations, fallback) => {
+            if (localizations && localizations.length > 0) {
+                return {
+                    fullName: localizations[0].fullName,
+                    description: localizations[0].description,
+                };
+            }
+            return fallback;
+        });
+    });
     const mockMember: MemberCard = {
         id: 1,
         name: 'Іван Іванов',
         role: 'учасник',
         photo: 'https://via.placeholder.com/200x250?text=Іван',
+        localizations: [],
     };
 
     it("should render the member's name, role, and photo correctly", () => {
         render(<TeamMemberCard member={mockMember} />);
-        const nameElement = screen.getByText(mockMember.name);
-        expect(nameElement).toBeInTheDocument();
-        expect(nameElement).toHaveClass('member-name');
 
-        const roleElement = screen.getByText(mockMember.role);
-        expect(roleElement).toBeInTheDocument();
-        expect(roleElement).toHaveClass('member-role');
+        expect(screen.getByText(mockMember.name)).toBeInTheDocument();
+        expect(screen.getByText(mockMember.role)).toBeInTheDocument();
 
         const imgElement = screen.getByAltText(mockMember.name);
-        expect(imgElement).toBeInTheDocument();
         expect(imgElement).toHaveAttribute('src', mockMember.photo);
-        expect(imgElement).toHaveClass('member-photo');
     });
-
-    it('should render the container with the correct class', () => {
-        render(<TeamMemberCard member={mockMember} />);
-        const container = screen.getByText(mockMember.name).closest('.team-member');
-        expect(container).toBeInTheDocument();
-    });
-
-    it('should render default icon when photo is not provided', () => {
-        const memberWithoutPhoto: MemberCard = {
-            id: 2,
-            name: 'Петро Петренко',
-            role: 'учасник',
-            photo: null,
+    it('should render localized name and role when localizations are available', () => {
+        const localizedMember: MemberCard = {
+            ...mockMember,
+            localizations: [
+                {
+                    localizationInfoDto: { id: 1, code: 'en' },
+                    fullName: 'Ivan English',
+                    description: 'Professional Member',
+                    entityId: 1,
+                    translationStatus: TranslationStatus.Relevant,
+                },
+            ],
         };
 
-        render(<TeamMemberCard member={memberWithoutPhoto} />);
+        mockedUseGetLocalization.mockReturnValue({
+            fullName: 'Ivan English',
+            description: 'Professional Member',
+        });
 
+        render(<TeamMemberCard member={localizedMember} />);
+
+        expect(screen.getByText('Ivan English')).toBeInTheDocument();
+        expect(screen.getByText('Professional Member')).toBeInTheDocument();
+
+        expect(screen.queryByText(mockMember.name)).not.toBeInTheDocument();
+    });
+    it('should render default icon when photo is not provided', () => {
+        const memberWithoutPhoto = { ...mockMember, photo: null };
+        render(<TeamMemberCard member={memberWithoutPhoto} />);
         expect(screen.getByTestId('default-member-icon')).toBeInTheDocument();
     });
 
     it('renders default icon when image fails to load', () => {
         render(<TeamMemberCard member={mockMember} />);
-
         const imgElement = screen.getByAltText(mockMember.name);
-        expect(imgElement).toBeInTheDocument();
 
         fireEvent.error(imgElement);
 

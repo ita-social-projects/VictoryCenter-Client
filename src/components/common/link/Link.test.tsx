@@ -16,7 +16,6 @@ const renderLink = (to: string, children: string) => {
             <Link to={to}>{children}</Link>
         </MemoryRouter>,
     );
-    return screen.getByRole('link');
 };
 
 describe('Link component', () => {
@@ -30,19 +29,23 @@ describe('Link component', () => {
         mockedUseLocale.mockReturnValue({
             currentLanguage: DEFAULT_LOCALE,
         });
-        const anchor = renderLink('/programs', 'Programs');
-        expect(anchor).toHaveAttribute('href', '/programs');
+        renderLink('/programs', 'Programs');
+        const link = screen.getByRole('link');
+        expect(link).toHaveAttribute('href', '/programs');
     });
     test('renders path with aldready localized prefix', () => {
-        const anchor = renderLink('/en', 'home');
-        expect(anchor).toHaveAttribute('href', '/en');
+        renderLink('/en', 'home');
+        const link = screen.getByRole('link');
+        expect(link).toHaveAttribute('href', '/en');
     });
     test('renders root path with non-default locale', () => {
-        const anchor = renderLink('/', 'home');
-        expect(anchor).toHaveAttribute('href', '/en');
+        renderLink('/', 'home');
+        const link = screen.getByRole('link');
+        expect(link).toHaveAttribute('href', '/en');
     });
     test('renders with non-default locale for move throw pages', () => {
-        const anchor = renderLink('/donate', 'Donate');
-        expect(anchor).toHaveAttribute('href', '/en/donate');
+        renderLink('/donate', 'Donate');
+        const link = screen.getByRole('link');
+        expect(link).toHaveAttribute('href', '/en/donate');
     });
 });

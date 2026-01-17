@@ -4,7 +4,6 @@ import '@testing-library/jest-dom';
 import { RichTextInput, RichTextInputProps } from './RichTextInput';
 import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
 
-// Mock Lexical modules for Jest compatibility
 jest.mock('@lexical/react/LexicalComposer', () => {
     const MockLexicalComposer = ({ children }: { children: React.ReactNode }) => (
         <div data-testid="lexical-composer">{children}</div>
@@ -65,7 +64,6 @@ jest.mock('lexical', () => ({
     RootNode: class RootNode {},
 }));
 
-// Store plugin props for testing
 let mockMaxLengthPluginProps: any = null;
 let mockOnChangePluginProps: any = null;
 let mockFocusPluginProps: any = null;
@@ -99,7 +97,6 @@ jest.mock('./plugins', () => {
     );
     const MockInitialValuePlugin = (props: any) => {
         mockInitialValuePluginProps = props;
-        // Render a hidden element with the value for testing purposes
         return props.value ? (
             <div data-testid="initial-value-content" dangerouslySetInnerHTML={{ __html: props.value }} />
         ) : null;
@@ -247,7 +244,6 @@ describe('RichTextInput', () => {
             renderRichTextInput({ value: '<p>Test content</p>' });
             expect(mockInitialValuePluginProps).not.toBeNull();
             expect(mockInitialValuePluginProps.value).toBe('<p>Test content</p>');
-            // Verify the content is rendered on screen
             expect(screen.getByTestId('initial-value-content')).toBeInTheDocument();
             expect(screen.getByText('Test content')).toBeInTheDocument();
         });
@@ -256,10 +252,8 @@ describe('RichTextInput', () => {
             renderRichTextInput({ value: '<p><strong>Bold</strong> and <em>italic</em> text</p>' });
             const contentElement = screen.getByTestId('initial-value-content');
             expect(contentElement).toBeInTheDocument();
-            // Check that the formatted content is rendered
             expect(screen.getByText('Bold')).toBeInTheDocument();
             expect(screen.getByText('italic')).toBeInTheDocument();
-            // Verify the full text content is present
             expect(contentElement.textContent).toBe('Bold and italic text');
         });
 
@@ -275,7 +269,6 @@ describe('RichTextInput', () => {
             renderRichTextInput({ maxLength: 100 });
             expect(screen.getByText('0/100')).toBeInTheDocument();
 
-            // Simulate length change callback
             const onLengthChange = mockMaxLengthPluginProps.onLengthChange;
             act(() => {
                 onLengthChange(25);
@@ -290,7 +283,6 @@ describe('RichTextInput', () => {
 
             expect(rootElement).not.toHaveClass('root--focused');
 
-            // Simulate focus change callback
             const onFocusChange = mockFocusPluginProps.onFocusChange;
             act(() => {
                 onFocusChange(true);
@@ -303,7 +295,6 @@ describe('RichTextInput', () => {
             const { container } = renderRichTextInput({ disabled: true });
             const rootElement = container.firstChild as HTMLElement;
 
-            // Simulate focus change callback
             const onFocusChange = mockFocusPluginProps.onFocusChange;
             act(() => {
                 onFocusChange(true);
@@ -317,14 +308,12 @@ describe('RichTextInput', () => {
             const { container } = renderRichTextInput();
             const rootElement = container.firstChild as HTMLElement;
 
-            // Simulate focus
             const onFocusChange = mockFocusPluginProps.onFocusChange;
             act(() => {
                 onFocusChange(true);
             });
             expect(rootElement).toHaveClass('root--focused');
 
-            // Simulate blur
             act(() => {
                 onFocusChange(false);
             });
@@ -335,19 +324,16 @@ describe('RichTextInput', () => {
     describe('Initial Configuration', () => {
         it('creates namespace based on id', () => {
             renderRichTextInput({ id: 'custom-editor' });
-            // Configuration is tested implicitly through successful rendering
             expect(screen.getByTestId('lexical-composer')).toBeInTheDocument();
         });
 
         it('sets editable to false when disabled', () => {
             renderRichTextInput({ disabled: true });
-            // Verify disabled state is applied
             expect(screen.getByLabelText('Bold')).toBeDisabled();
         });
 
         it('handles initial value', () => {
             renderRichTextInput({ value: '<p>Initial content</p>' });
-            // Value handling is tested through the editorState callback
             expect(screen.getByTestId('content-editable')).toBeInTheDocument();
         });
 
@@ -361,7 +347,6 @@ describe('RichTextInput', () => {
         it('includes error handler in config', () => {
             const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
             renderRichTextInput();
-            // Error handler is configured in initialConfig
             expect(screen.getByTestId('lexical-composer')).toBeInTheDocument();
             consoleErrorSpy.mockRestore();
         });

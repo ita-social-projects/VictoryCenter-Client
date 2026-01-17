@@ -2,7 +2,6 @@ import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { OnChangePlugin } from './OnChangePlugin';
 
-// Mock Lexical modules
 const mockRegisterUpdateListener = jest.fn();
 const mockEditor = {
     registerUpdateListener: mockRegisterUpdateListener,
@@ -18,9 +17,6 @@ jest.mock('@lexical/html', () => ({
     $generateHtmlFromNodes: (...args: any[]) => mockGenerateHtmlFromNodes(...args),
 }));
 
-/**
- * Helper function to test the onChange callback with mocked HTML generation
- */
 const testOnChangeCallback = (onChange: jest.Mock, mockHtml: string, expectedOutput: string) => {
     mockGenerateHtmlFromNodes.mockReturnValue(mockHtml);
     render(<OnChangePlugin onChange={onChange} />);

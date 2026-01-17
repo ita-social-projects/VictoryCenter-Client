@@ -2,7 +2,6 @@ import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { InitialValuePlugin } from './InitialValuePlugin';
 
-// Mock Lexical modules
 const mockUpdate = jest.fn();
 const mockEditor = {
     update: mockUpdate,
@@ -35,7 +34,6 @@ describe('InitialValuePlugin', () => {
         mockGetRoot.mockReturnValue(mockRoot);
         mockGenerateNodesFromDOM.mockReturnValue([{ type: 'paragraph' }]);
 
-        // Setup DOMParser mock
         global.DOMParser = jest.fn().mockImplementation(() => ({
             parseFromString: jest.fn(() => ({
                 body: { innerHTML: '' },
@@ -53,7 +51,6 @@ describe('InitialValuePlugin', () => {
 
         expect(mockUpdate).toHaveBeenCalled();
 
-        // Execute the update callback
         const updateCallback = mockUpdate.mock.calls[0][0];
         updateCallback();
 
@@ -67,7 +64,6 @@ describe('InitialValuePlugin', () => {
 
         expect(mockUpdate).toHaveBeenCalledTimes(1);
 
-        // Change the value
         rerender(<InitialValuePlugin value="<p>Second</p>" />);
 
         expect(mockUpdate).toHaveBeenCalledTimes(2);
@@ -78,10 +74,8 @@ describe('InitialValuePlugin', () => {
 
         expect(mockUpdate).toHaveBeenCalledTimes(1);
 
-        // Re-render with same value
         rerender(<InitialValuePlugin value="<p>Same content</p>" />);
 
-        // Should not trigger update again
         expect(mockUpdate).toHaveBeenCalledTimes(1);
     });
 
@@ -93,7 +87,6 @@ describe('InitialValuePlugin', () => {
         const updateCallback = mockUpdate.mock.calls[0][0];
         updateCallback();
 
-        // Should parse empty value as '<p></p>'
         expect(global.DOMParser).toHaveBeenCalled();
         expect(mockGenerateNodesFromDOM).toHaveBeenCalled();
     });
@@ -112,7 +105,6 @@ describe('InitialValuePlugin', () => {
 
         expect(mockClear).toHaveBeenCalled();
         expect(mockInsertNodes).toHaveBeenCalled();
-        // Verify clear is called before insertNodes
         const clearCallOrder = mockClear.mock.invocationCallOrder[0];
         const insertCallOrder = mockInsertNodes.mock.invocationCallOrder[0];
         expect(clearCallOrder).toBeLessThan(insertCallOrder);
@@ -152,7 +144,6 @@ describe('InitialValuePlugin', () => {
 
         mockUpdate.mockClear();
 
-        // External value change
         rerender(<InitialValuePlugin value="<p>Updated externally</p>" />);
 
         expect(mockUpdate).toHaveBeenCalled();

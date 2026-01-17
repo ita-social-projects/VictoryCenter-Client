@@ -57,7 +57,6 @@ export const RichTextInput = ({
         () => ({
             namespace: 'RichTextInput-' + id,
             theme,
-            // eslint-disable-next-line no-console
             onError: (error: Error) => console.error('Lexical error:', error),
             editable: !disabled,
             editorState: (editor: LexicalEditor) => {
@@ -71,8 +70,6 @@ export const RichTextInput = ({
                 }
             },
         }),
-        // Only use id for initial config - value changes handled by plugin
-        // eslint-disable-next-line react-hooks/exhaustive-deps
         [id, disabled],
     );
 

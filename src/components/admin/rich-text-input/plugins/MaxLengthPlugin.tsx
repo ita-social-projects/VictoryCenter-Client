@@ -21,7 +21,6 @@ export const MaxLengthPlugin = ({ maxLength, onLengthChange }: MaxLengthPluginPr
             const prevTextContent = editor.getEditorState().read(() => $getRoot().getTextContent());
             const currentTextContent = rootNode.getTextContent();
 
-            // Report current length
             onLengthChange?.(currentTextContent.length);
 
             if (prevTextContent !== currentTextContent) {

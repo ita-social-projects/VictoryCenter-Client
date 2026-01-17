@@ -2,7 +2,6 @@ import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { FocusPlugin } from './FocusPlugin';
 
-// Mock Lexical modules
 const mockRegisterCommand = jest.fn();
 const mockEditor = {
     registerCommand: mockRegisterCommand,
@@ -21,7 +20,6 @@ jest.mock('lexical', () => ({
 describe('FocusPlugin', () => {
     beforeEach(() => {
         jest.clearAllMocks();
-        // Default return value for registerCommand
         mockRegisterCommand.mockReturnValue(jest.fn());
     });
 
@@ -38,7 +36,7 @@ describe('FocusPlugin', () => {
 
         expect(focusCall).toBeDefined();
         expect(focusCall[1]).toEqual(expect.any(Function));
-        expect(focusCall[2]).toBe(0); // COMMAND_PRIORITY_LOW
+        expect(focusCall[2]).toBe(0);
     });
 
     it('registers BLUR_COMMAND listener on mount', () => {
@@ -49,7 +47,7 @@ describe('FocusPlugin', () => {
 
         expect(blurCall).toBeDefined();
         expect(blurCall[1]).toEqual(expect.any(Function));
-        expect(blurCall[2]).toBe(0); // COMMAND_PRIORITY_LOW
+        expect(blurCall[2]).toBe(0);
     });
 
     it('calls onFocus when FOCUS_COMMAND is dispatched', () => {
@@ -143,7 +141,6 @@ describe('FocusPlugin', () => {
         const focusCall = calls.find((call) => call[0] === 'FOCUS_COMMAND');
         const blurCall = calls.find((call) => call[0] === 'BLUR_COMMAND');
 
-        // Should not throw when callbacks are undefined
         expect(() => focusCall[1]()).not.toThrow();
         expect(() => blurCall[1]()).not.toThrow();
     });

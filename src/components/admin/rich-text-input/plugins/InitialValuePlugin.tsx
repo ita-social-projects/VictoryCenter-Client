@@ -13,7 +13,6 @@ export const InitialValuePlugin = ({ value }: InitialValuePluginProps) => {
     const lastValue = useRef(value);
 
     useEffect(() => {
-        // Only update on initial render or when value changes externally
         if (isFirstRender.current || lastValue.current !== value) {
             isFirstRender.current = false;
             lastValue.current = value;
@@ -21,7 +20,6 @@ export const InitialValuePlugin = ({ value }: InitialValuePluginProps) => {
             editor.update(() => {
                 const root = $getRoot();
 
-                // Check if current content matches to avoid unnecessary updates
                 const parser = new DOMParser();
                 const dom = parser.parseFromString(value || '<p></p>', 'text/html');
                 const nodes = $generateNodesFromDOM(editor, dom);

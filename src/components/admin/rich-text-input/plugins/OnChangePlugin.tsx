@@ -7,28 +7,20 @@ export interface OnChangePluginProps {
     onChange: (html: string) => void;
 }
 
-/**
- * Sanitizes HTML from Lexical editor output.
- * Removes CSS module class names, unnecessary styles, and ensures clean portable HTML.
- */
 const sanitizeHtml = (html: string): string => {
     if (!html) return '';
 
-    // First pass: Use DOM to clean up the HTML
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = html;
 
-    // Remove all class attributes (CSS module hashes are environment-specific)
     tempDiv.querySelectorAll('[class]').forEach((el) => {
         el.removeAttribute('class');
     });
 
-    // Remove style attributes (white-space: pre-wrap, etc.)
     tempDiv.querySelectorAll('[style]').forEach((el) => {
         el.removeAttribute('style');
     });
 
-    // Remove redundant <b> tags that wrap <strong> tags
     tempDiv.querySelectorAll('b > strong').forEach((strong) => {
         const bTag = strong.parentElement;
         if (bTag && bTag.tagName === 'B') {
@@ -36,7 +28,6 @@ const sanitizeHtml = (html: string): string => {
         }
     });
 
-    // Remove redundant <i> tags that wrap <em> tags
     tempDiv.querySelectorAll('i > em').forEach((em) => {
         const iTag = em.parentElement;
         if (iTag && iTag.tagName === 'I') {
@@ -44,7 +35,6 @@ const sanitizeHtml = (html: string): string => {
         }
     });
 
-    // Unwrap span tags that have no attributes (but preserve their content including whitespace)
     tempDiv.querySelectorAll('span').forEach((span) => {
         if (!span.hasAttribute('style') && !span.hasAttribute('class')) {
             const parent = span.parentNode;
@@ -55,7 +45,6 @@ const sanitizeHtml = (html: string): string => {
         }
     });
 
-    // Second pass: DOMPurify for security (XSS protection)
     const cleanHtml = DOMPurify.sanitize(tempDiv.innerHTML, {
         ALLOWED_TAGS: ['p', 'strong', 'em', 'b', 'i', 'br'],
         ALLOWED_ATTR: [],

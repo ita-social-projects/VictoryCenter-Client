@@ -2,7 +2,6 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ToolbarPlugin } from './ToolbarPlugin';
 
-// Mock Lexical modules
 const mockRegisterCommand = jest.fn();
 const mockRegisterUpdateListener = jest.fn();
 const mockDispatchCommand = jest.fn();
@@ -37,12 +36,10 @@ jest.mock('../RichTextInput.module.scss', () => ({
 describe('ToolbarPlugin', () => {
     beforeEach(() => {
         jest.clearAllMocks();
-        // Default return values
         mockRegisterCommand.mockReturnValue(jest.fn());
         mockRegisterUpdateListener.mockReturnValue(jest.fn());
     });
 
-    // Helper function to get and execute selection change handler
     const triggerSelectionChange = () => {
         const calls = mockRegisterCommand.mock.calls;
         const selectionCall = calls.find((call) => call[0] === 'SELECTION_CHANGE_COMMAND');
@@ -92,7 +89,7 @@ describe('ToolbarPlugin', () => {
 
         expect(selectionCall).toBeDefined();
         expect(selectionCall[1]).toEqual(expect.any(Function));
-        expect(selectionCall[2]).toBe(1); // COMMAND_PRIORITY_CRITICAL
+        expect(selectionCall[2]).toBe(1);
     });
 
     it('registers update listener', () => {
@@ -189,10 +186,8 @@ describe('ToolbarPlugin', () => {
 
         expect(mockUpdate).toHaveBeenCalled();
 
-        // Get the update callback
         const updateCallback = mockUpdate.mock.calls[0][0];
 
-        // Execute the update callback
         updateCallback();
 
         expect($createLineBreakNode).toHaveBeenCalled();
@@ -215,7 +210,6 @@ describe('ToolbarPlugin', () => {
         const updateCallback = mockUpdate.mock.calls[0][0];
         updateCallback();
 
-        // insertNodes should not be called on non-range selection
         expect($getSelection).toHaveBeenCalled();
     });
 

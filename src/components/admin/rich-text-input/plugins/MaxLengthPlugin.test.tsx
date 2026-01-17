@@ -2,7 +2,6 @@ import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { MaxLengthPlugin } from './MaxLengthPlugin';
 
-// Mock Lexical modules
 const mockRegisterNodeTransform = jest.fn();
 const mockEditor = {
     registerNodeTransform: mockRegisterNodeTransform,
@@ -60,18 +59,15 @@ describe('MaxLengthPlugin', () => {
 
         render(<MaxLengthPlugin maxLength={100} onLengthChange={onLengthChange} />);
 
-        // Get the transform callback
         const transformCallback = mockRegisterNodeTransform.mock.calls[0][1];
 
-        // Create a mock root node
         const mockRootNode = {
             getTextContent: jest.fn(() => 'test content'),
         };
 
-        // Execute the transform
         transformCallback(mockRootNode);
 
-        expect(onLengthChange).toHaveBeenCalledWith(12); // 'test content'.length
+        expect(onLengthChange).toHaveBeenCalledWith(12);
     });
 
     it('does not trim text when under maxLength', () => {
@@ -108,7 +104,6 @@ describe('MaxLengthPlugin', () => {
         $getSelection.mockReturnValue(mockSelection);
         $isRangeSelection.mockReturnValue(true);
 
-        // Mock different text content for prev and current
         mockGetRoot.mockReturnValue({
             getTextContent: jest.fn(() => 'previous text'),
         });
@@ -122,11 +117,7 @@ describe('MaxLengthPlugin', () => {
 
         transformCallback(mockRootNode);
 
-        expect(trimTextContentFromAnchor).toHaveBeenCalledWith(
-            mockEditor,
-            mockSelection.anchor,
-            37, // overflow length: 47 - 10
-        );
+        expect(trimTextContentFromAnchor).toHaveBeenCalledWith(mockEditor, mockSelection.anchor, 37);
     });
 
     it('handles selection that is not collapsed', () => {
@@ -148,7 +139,6 @@ describe('MaxLengthPlugin', () => {
 
         transformCallback(mockRootNode);
 
-        // Should return early, not call onLengthChange
         expect(onLengthChange).not.toHaveBeenCalled();
     });
 
@@ -168,7 +158,6 @@ describe('MaxLengthPlugin', () => {
 
         transformCallback(mockRootNode);
 
-        // Should return early, not call onLengthChange
         expect(onLengthChange).not.toHaveBeenCalled();
     });
 

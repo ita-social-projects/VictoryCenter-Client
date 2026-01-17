@@ -61,6 +61,15 @@ describe('ImageValidationSchema', () => {
         await expect(validationSchema.validate(largeFile)).rejects.toThrow(IMAGE_VALIDATION.getSizeError(MAX_SIZE_MB));
     });
 
+    it('rejects a file exceeding custom maxSizeMB', async () => {
+        const customMaxMB = 5;
+        const customSchema = getImageValidationSchema(MIN_WIDTH, MIN_HEIGHT, customMaxMB);
+        mockImageDimensions(1920, 1080);
+        const largeFile = createTestFile(customMaxMB * 1024 * 1024 + 1024);
+
+        await expect(customSchema.validate(largeFile)).rejects.toThrow(IMAGE_VALIDATION.getSizeError(customMaxMB));
+    });
+
     it('rejects an invalid file type', async () => {
         mockImageDimensions(1920, 1080);
         const invalidTypeFile = createTestFile(100, 'text/plain');

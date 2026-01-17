@@ -12,9 +12,8 @@ export const LanguageSyncWrapper = () => {
         const segments = pathname.split('/').filter(Boolean);
         const langInUrl = segments[0];
         const isSupported = LOCALES.includes(langInUrl);
-        const currentLang = currentLanguage;
 
-        if (isSupported && langInUrl !== currentLang) {
+        if (isSupported && langInUrl !== currentLanguage) {
             i18n.changeLanguage(langInUrl);
             return;
         }
@@ -22,15 +21,15 @@ export const LanguageSyncWrapper = () => {
         if (isSupported) return;
 
         if (pathname === '/') {
-            if (currentLang !== DEFAULT_LOCALE) {
+            if (currentLanguage !== DEFAULT_LOCALE) {
                 i18n.changeLanguage(DEFAULT_LOCALE);
             }
             return;
         }
 
-        if (currentLang === DEFAULT_LOCALE) return;
+        if (currentLanguage === DEFAULT_LOCALE) return;
 
-        navigate(`/${currentLang}${pathname}${search}`, { replace: true });
+        navigate(`/${currentLanguage}${pathname}${search}`, { replace: true });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [pathname, search, navigate, i18n]);
 

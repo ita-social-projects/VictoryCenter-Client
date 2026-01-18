@@ -6,73 +6,73 @@
     justify-content: space-between;
     align-items: flex-start;
     gap: 1rem;
-}
 
-.title {
-    @include type.h3-semibold-uppercase;
-    flex-shrink: 0;
-}
-
-.title-section {
-    flex: 50% 0 0;
-}
-
-.description-section {
-    flex: 50% 0 0;
-}
-
-.container.editable {
-    padding: 8rem 6rem 0 6rem;
-    gap: 15%;
-    justify-content: center;
-
-    .title-section {
-        flex: 30% 0 0;
-    }
-
-    .description-section {
-        flex: 30% 0 0;
-    }
-}
-
-.description {
-    @include type.body-1-regular;
-    white-space: pre-wrap;
-}
-
-.template {
     .title {
-        font-size: clamp(3px, 1.5vw, 2rem);
-        line-height: clamp(3px, 0.9vw, 1rem);
-    }
-    .description {
-        font-size: clamp(3px, 0.9vw, 1rem);
-        line-height: clamp(3px, 0.9vw, 1rem);
-    }
-}
-
-.title-input {
-    input {
         @include type.h3-semibold-uppercase;
+        flex-shrink: 0;
     }
-}
 
-@media (max-width: 1024px) {
     .title-section {
-        flex: 40% 0 0;
+        flex: 50% 0 0;
     }
 
     .description-section {
-        flex: 60% 0 0;
-    }
-}
-
-@media (max-width: 768px) {
-    .title-section {
-        flex: 30% 0 0;
+        flex: 50% 0 0;
     }
 
-    .description-section {
-        flex: 70% 0 0;
+    .description {
+        @include type.body-1-regular;
+        white-space: pre-wrap;
+    }
+
+    .title-input {
+        input {
+            @include type.h3-semibold-uppercase;
+        }
+    }
+
+    &.editable {
+        padding: 8rem 6rem 0 6rem;
+        gap: 15%;
+        justify-content: center;
+
+        .title-section {
+            flex: 30% 0 0;
+        }
+
+        .description-section {
+            flex: 30% 0 0;
+        }
+    }
+
+    &.template {
+        .title {
+            font-size: clamp(3px, 1.5vw, 2rem);
+            line-height: clamp(3px, 0.9vw, 1rem);
+        }
+        .description {
+            font-size: clamp(3px, 0.9vw, 1rem);
+            line-height: clamp(3px, 0.9vw, 1rem);
+        }
+    }
+
+    @media (max-width: 1024px) {
+        .title-section {
+            flex: 40% 0 0;
+        }
+
+        .description-section {
+            flex: 60% 0 0;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .title-section {
+            flex: 30% 0 0;
+        }
+
+        .description-section {
+            flex: 70% 0 0;
+        }
     }
 }

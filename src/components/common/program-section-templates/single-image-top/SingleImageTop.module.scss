@@ -26,11 +26,24 @@
 .bottom-section {
     flex: 0 0 20%;
     padding-top: 1vw;
-}
 
-.template {
-    .bottom-section {
-        padding-top: 5% 1%;
+    
+    .title-section {
+        color: pink;
+    }
+
+    &.template {
+        padding: 1% 10%;
+
+        .description {
+            font-size: clamp(3px, 0.9vw, 1rem);
+            line-height: clamp(3px, 0.9vw, 1rem);
+            color: red;
+        }
+    }
+
+    &.editable {
+        padding: 0vw 8vw 0 8vw;
     }
 }
 
@@ -41,10 +54,6 @@
     .top-section {
         height: 300px;
         justify-content: center;
-    }
-
-    .bottom-section {
-        padding: 0vw 8vw 0 8vw;
     }
 
     .image-wrapper {

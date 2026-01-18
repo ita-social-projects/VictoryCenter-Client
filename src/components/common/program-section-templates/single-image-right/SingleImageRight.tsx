@@ -3,7 +3,12 @@ import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups
 import { PhotoInputGroup } from '@/components/admin/input-groups/photo-input-group/PhotoInputGroup';
 import { ImageValues } from '@/types/common/image';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { PROGRAMS_TEXT, PROGRAM_SECTION_IMAGE_CONFIGS, PROGRAM_SECTION_VALIDATION } from '@/const/admin/programs';
+import {
+    PROGRAMS_TEXT,
+    PROGRAM_SECTION_IMAGE_CONFIGS,
+    PROGRAM_SECTION_VALIDATION,
+    PROGRAM_VALIDATION,
+} from '@/const/admin/programs';
 import { useProgramSectionValidation } from '@/hooks/admin/use-program-section-validation';
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
 import styles from './SingleImageRight.module.scss';
@@ -102,6 +107,7 @@ export const SingleImageRight = ({
                                     PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_RIGHT.cropWidth,
                                 )}
                                 variant="programSection"
+                                maxSizeMB={PROGRAM_VALIDATION.images.maxSizeMB}
                             />
                         </div>
                     </div>

@@ -7,6 +7,7 @@ export interface ProgramCategoryDto {
 
 export interface PublishedProgramDto {
     id: number;
+    slug: string;
     previewImage: Image | null;
     name: string;
     description: string;

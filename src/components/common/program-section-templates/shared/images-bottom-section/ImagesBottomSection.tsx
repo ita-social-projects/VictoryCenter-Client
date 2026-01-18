@@ -9,6 +9,7 @@ import baseStyles from './ImagesBottomSection.module.scss';
 import quadStyles from '../../quad-images-bottom/QuadImagesBottom.module.scss';
 import tripleStyles from '../../triple-images-bottom/TripleImagesBottom.module.scss';
 import dualStyles from '../../dual-images-bottom/DualImagesBottom.module.scss';
+import { PROGRAM_VALIDATION } from '@/const/admin/programs';
 
 const stylesMap = {
     quad: quadStyles,
@@ -125,6 +126,7 @@ export const ImagesBottomSection = ({
                                           config.imageConfig.cropWidth,
                                       )}
                                       variant="programSection"
+                                      maxSizeMB={PROGRAM_VALIDATION.images.maxSizeMB}
                                   />
                               </div>
                           ))

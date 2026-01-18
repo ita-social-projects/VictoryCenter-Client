@@ -16,6 +16,11 @@ export const PUBLIC_ROUTES = {
         PATH: 'programs',
         FULL: '/programs',
     },
+    PROGRAM_DETAIL: {
+        PATH: 'programs/:slug',
+        FULL: '/programs/:slug',
+        getPath: (slug: string) => `/programs/${slug}`,
+    },
     DONATE: {
         PATH: 'donate',
         FULL: '/donate',

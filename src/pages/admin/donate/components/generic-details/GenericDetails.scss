@@ -32,6 +32,17 @@
             }
         }
     }
+    &-footer {
+        width: 100%;
+        margin-top: 1rem;
+        
+        padding-bottom: 2.5rem; 
+        
+        .btn-add-new {
+            width: 100%;
+            margin-bottom: 0; 
+        }
+    }
     .child {
         .generic-details {
             &.header {

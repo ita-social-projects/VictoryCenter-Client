@@ -1,0 +1,98 @@
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
+
+.root {
+  padding: 20px 16px 24px;
+  color: c.$blue-900;
+}
+
+.title {
+  @include type.subtitle-2-semibold;
+  margin-bottom: 16px;
+}
+
+.chart {
+  display: flex;
+  align-items: stretch;
+}
+
+.column {
+  min-width: 100px;
+  display: flex;
+  flex-direction: column;
+}
+
+.block {
+  min-height: 80px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+}
+
+.label {
+  @include type.small-text-regular;
+  z-index: 1;
+}
+
+.amount {
+  @include type.body-1-bold;
+  z-index: 1;
+}
+
+.number {
+  white-space: nowrap;
+}
+
+.currency {
+  white-space: normal;
+}
+
+.variant0 {
+  background: c.$white;
+}
+
+.variant1 {
+  background: c.$white;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+                    -45deg,
+                    c.$yellow-300 0,
+                    c.$yellow-300 3px,
+                    transparent 2px,
+                    transparent 10px
+    );
+    pointer-events: none;
+  }
+}
+
+.variant2 {
+  background: c.$yellow-100;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+                    -120deg,
+                    c.$yellow-500 0,
+                    c.$yellow-500 3px,
+                    transparent 2px,
+                    transparent 10px
+    );
+    pointer-events: none;
+  }
+}
+
+.variant3 {
+  background: c.$yellow-50;
+}

@@ -44,7 +44,7 @@ export const MainValues = ({ content }: MainValuesProps) => {
                     navigationButtons={{
                         prev: {
                             icon: ArrowLeft,
-                            ariaLabel: 'back',
+                            ariaLabel: 'previous',
                             variant: 'primary-dark',
                             className: styles.left,
                         },

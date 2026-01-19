@@ -88,7 +88,7 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
                             classNamebuttonBlock: swiperStyles.buttonBlock,
                             prev: {
                                 icon: ChevronLeft,
-                                ariaLabel: 'back',
+                                ariaLabel: 'previous',
                                 variant: 'tertiary',
                                 className: swiperStyles.left,
                             },

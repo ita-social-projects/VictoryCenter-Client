@@ -1,3 +1,4 @@
+@use '@/assets/sass/mixins/typography.mixins' as type;
 @import '../shared/BaseSectionTemplate.module.scss';
 
 .container {
@@ -27,24 +28,24 @@
     flex: 0 0 20%;
     padding-top: 1vw;
 
-    
-    .title-section {
-        color: pink;
-    }
-
     &.template {
         padding: 1% 10%;
-
-        .description {
-            font-size: clamp(3px, 0.9vw, 1rem);
-            line-height: clamp(3px, 0.9vw, 1rem);
-            color: red;
-        }
     }
 
     &.editable {
         padding: 0vw 8vw 0 8vw;
     }
+}
+
+.description-template {
+    @include type.body-1-regular;
+    font-size: clamp(3px, 0.9vw, 1.3vmin);
+    line-height: clamp(3px, 0.9vw, 1.6vmin);
+}
+
+.title-template {
+    font-size: clamp(3px, 1.5vw, 2.5vmin);
+    line-height: clamp(3px, 0.9vw, 2vmin);
 }
 
 .container.editable {

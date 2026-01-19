@@ -12,5 +12,5 @@ export interface TextOnlyProps {
 }
 
 export const TextOnly = (props: TextOnlyProps) => {
-    return <TitleDescriptionSection {...props} templateStyles={styles} />;
+    return <TitleDescriptionSection {...props} />;
 };

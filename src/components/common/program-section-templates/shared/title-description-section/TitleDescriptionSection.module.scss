@@ -1,4 +1,5 @@
 @use '@/assets/sass/mixins/typography.mixins' as type;
+@use '@/assets/sass/variables/typography' as t;
 
 .container {
     padding: 5% 15%;
@@ -8,7 +9,10 @@
     gap: 1rem;
 
     .title {
-        @include type.h3-semibold-uppercase;
+        font-family: t.$font-family-base;
+        font-weight: t.$fw-semibold;
+        letter-spacing: t.$h3-spacing;
+        text-transform: uppercase;
         flex-shrink: 0;
     }
 
@@ -21,7 +25,10 @@
     }
 
     .description {
-        @include type.body-1-regular;
+        font-family: t.$font-family-base;
+        font-weight: t.$fw-regular;
+        letter-spacing: t.$body1-spacing;
+        text-transform: none;
         white-space: pre-wrap;
     }
 
@@ -42,17 +49,6 @@
 
         .description-section {
             flex: 30% 0 0;
-        }
-    }
-
-    &.template {
-        .title {
-            font-size: clamp(3px, 1.5vw, 2rem);
-            line-height: clamp(3px, 0.9vw, 1rem);
-        }
-        .description {
-            font-size: clamp(3px, 0.9vw, 1rem);
-            line-height: clamp(3px, 0.9vw, 1rem);
         }
     }
 

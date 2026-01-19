@@ -79,12 +79,12 @@
 
 .template {
     .title {
-        font-size: clamp(3px, 1.5vw, 2rem);
-        line-height: clamp(3px, 0.9vw, 1rem);
+        font-size: clamp(3px, 1.5vw, 2.5vmin);
+        line-height: clamp(3px, 0.9vw, 2vmin);
     }
     .description {
-        font-size: clamp(3px, 0.9vw, 1rem);
-        line-height: clamp(3px, 0.9vw, 1rem);
+        font-size: clamp(3px, 0.9vw, 1.8vmin);
+        line-height: clamp(3px, 0.9vw, 1.8vmin);
     }
 }
 

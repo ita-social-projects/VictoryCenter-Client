@@ -10,7 +10,8 @@ export interface TitleDescriptionSectionProps {
     title?: string;
     description?: string;
     className?: string;
-    templateStyles?: Record<string, string>;
+    titleClassName?: string;
+    descriptionClassName?: string;
     isTemplate?: boolean;
     isEditable?: boolean;
     onTitleChange?: (value: string) => void;
@@ -21,7 +22,8 @@ export const TitleDescriptionSection = ({
     title = '',
     description = '',
     className = '',
-    templateStyles,
+    titleClassName = '',
+    descriptionClassName = '',
     isTemplate = false,
     isEditable = false,
     onTitleChange,
@@ -43,12 +45,9 @@ export const TitleDescriptionSection = ({
         <div
             className={cn(
                 styles.container,
-                templateStyles?.container,
                 {
                     [styles.template]: isTemplate,
-                    [templateStyles?.template || '']: isTemplate && templateStyles?.template,
                     [styles.editable]: isEditable,
-                    [templateStyles?.editable || '']: isEditable && templateStyles?.editable,
                 },
                 className,
             )}
@@ -69,7 +68,7 @@ export const TitleDescriptionSection = ({
                         error={titleError}
                     />
                 ) : (
-                    <h2 className={styles.title}>{title}</h2>
+                    <h2 className={cn(styles.title, titleClassName)}>{title}</h2>
                 )}
             </div>
             <div className={styles['description-section']}>
@@ -88,7 +87,7 @@ export const TitleDescriptionSection = ({
                         currentLength={getTrimmedInputText(description).length}
                     />
                 ) : (
-                    <p className={styles.description}>{description}</p>
+                    <p className={cn(styles.description, descriptionClassName)}>{description}</p>
                 )}
             </div>
         </div>

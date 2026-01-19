@@ -25,13 +25,15 @@ describe('programs-api', () => {
                         { id: 1, name: 'Category 1' },
                         { id: 2, name: 'Category 2' },
                     ],
+                    slug: 'program-a',
                 },
                 {
                     id: 2,
                     previewImage: null,
                     name: 'Program B',
                     description: 'Description B',
-                    categories: [{ id: 1, name: 'Category 1' }], // duplicate
+                    categories: [{ id: 1, name: 'Category 1' }],
+                    slug: 'program-b',
                 },
             ];
 

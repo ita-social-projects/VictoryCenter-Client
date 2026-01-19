@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ProgramSectionForm, ProgramSectionFormProps } from './ProgramSectionForm';
-import { ProgramSectionTemplate } from '@/types/common/program-sections';
-import { ContentType, ProgramSection } from '@/types/admin/programs';
+import { ProgramSection, ProgramSectionTemplate } from '@/types/common/program-sections';
+import { ContentType } from '@/types/common/programs';
 
 jest.mock('@/utils/functions/render-program-section', () => ({
     renderProgramSection: jest.fn(() => <div data-testid="editable-section" />),

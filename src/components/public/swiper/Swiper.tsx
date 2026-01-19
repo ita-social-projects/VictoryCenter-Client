@@ -132,12 +132,10 @@ export function Swiper<T>({
                 ))}
             </SwiperReact>
             <div className={navigationButtons?.classNamebuttonBlock}>
-                {prevButtonProps && (
-                    <Button {...(prevButtonProps as ButtonProps)} onClick={handlePrev} disabled={!isPrevEnabled} />
-                )}
+                {prevButtonProps && <Button {...prevButtonProps} onClick={handlePrev} disabled={!isPrevEnabled} />}
                 {nextButtonProps && (
                     <Button
-                        {...(nextButtonProps as ButtonProps)}
+                        {...nextButtonProps}
                         onClick={handleNext}
                         disabled={isOnlyNextButton ? false : !isNextEnabled}
                     />

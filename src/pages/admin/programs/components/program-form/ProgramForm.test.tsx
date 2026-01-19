@@ -10,7 +10,7 @@ import { TextAreaWithCharacterLimitGroupProps } from '@/components/admin/input-g
 import { MultiSelectInputGroupProps } from '@/components/admin/input-groups/multi-select-input-group/MultiSelectInputGroup';
 import { PhotoInputGroupProps } from '@/components/admin/input-groups/photo-input-group/PhotoInputGroup';
 import { ButtonProps } from '@/components/admin/button/Button';
-import { ProgramSection } from '@/types/admin/programs';
+import { ProgramSection } from '@/types/common/program-sections';
 
 jest.mock('@/validation/admin/program-schema/program-schema', () => ({
     PROGRAM_VALIDATION_FUNCTIONS: {

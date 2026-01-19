@@ -14,6 +14,12 @@
     z-index: 0;
 }
 
+.background-media-wrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 59.72%; // 1440x860 aspect ratio
+}
+
 .background-image {
     display: block;
     width: 100%;

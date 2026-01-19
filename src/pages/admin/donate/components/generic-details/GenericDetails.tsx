@@ -214,21 +214,25 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
                         </FormComponent>
                     )}
                     {!isChildForm && !showNotFound && (
-                        <Button
-                            className={`generic-details btn-add-new ${isAddFormVisible || editingItemId !== null ? 'disabled' : ''}`}
-                            onClick={handleAdd}
-                            buttonStyle="primary"
-                            disabled={
-                                isDisabled ||
-                                isAddButtonDisabled ||
-                                isParentAddFormVisible ||
-                                isAddFormVisible ||
-                                editingItemId !== null
-                            }
-                        >
-                            <div>{addNewText}</div>
-                            <PlusIcon className="plus-icon" />
-                        </Button>
+                        <div className="generic-details-footer">
+                            <Button
+                                className={cn('generic-details btn-add-new', {
+                                    disabled: isAddFormVisible || editingItemId !== null,
+                                })}
+                                onClick={handleAdd}
+                                buttonStyle="primary"
+                                disabled={
+                                    isDisabled ||
+                                    isAddButtonDisabled ||
+                                    isParentAddFormVisible ||
+                                    isAddFormVisible ||
+                                    editingItemId !== null
+                                }
+                            >
+                                <div>{addNewText}</div>
+                                <PlusIcon className="plus-icon" />
+                            </Button>
+                        </div>
                     )}
                 </div>
             )}

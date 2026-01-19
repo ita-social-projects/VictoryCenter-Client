@@ -1,8 +1,7 @@
-import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { DetailedProgramPageContent } from './DetailedProgramPageContent';
 import { fetchProgramBySlug } from '@/services/api/public/programs/programs-api';
-import { Program } from '@/types/admin/programs';
+import { DetailedProgram } from '@/types/public/programs-page';
 
 jest.mock('react-router-dom', () => ({
     useParams: jest.fn(),
@@ -24,6 +23,12 @@ jest.mock('@/assets/icons/calendar-days.svg', () => ({
     ReactComponent: () => <div data-testid="calendar-days-icon" />,
 }));
 
+jest.mock('@/components/public/background-media/BackgroundMedia', () => ({
+    BackgroundMedia: ({ mediaUrl }: { mediaUrl: string }) => (
+        <div data-testid="background-media" data-media-url={mediaUrl} />
+    ),
+}));
+
 const { useParams } = require('react-router-dom');
 const mockFetchProgramBySlug = fetchProgramBySlug as jest.MockedFunction<typeof fetchProgramBySlug>;
 
@@ -42,7 +47,7 @@ const mockProgram = {
     backgroundImage: {
         url: 'https://example.com/image.jpg',
     },
-} as unknown as Program;
+} as unknown as DetailedProgram;
 
 describe('DetailedProgramPageContent', () => {
     beforeEach(() => {
@@ -102,38 +107,15 @@ describe('DetailedProgramPageContent', () => {
         render(<DetailedProgramPageContent />);
 
         await waitFor(() => {
-            const image = screen.getByRole('img', { name: /test program background/i });
-            expect(image).toHaveAttribute('src', 'https://example.com/image.jpg');
-        });
-    });
-
-    it('renders base64 image when backgroundImage has base64 data', async () => {
-        const programWithBase64 = {
-            ...mockProgram,
-            backgroundImage: {
-                base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
-                mimeType: 'image/png',
-            },
-        };
-
-        useParams.mockReturnValue({ slug: 'test-program' });
-        mockFetchProgramBySlug.mockResolvedValue(programWithBase64 as Program);
-
-        render(<DetailedProgramPageContent />);
-
-        await waitFor(() => {
-            const image = screen.getByRole('img', { name: /test program background/i });
-            expect(image).toHaveAttribute(
-                'src',
-                'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
-            );
+            const backgroundMedia = screen.getByTestId('background-media');
+            expect(backgroundMedia).toHaveAttribute('data-media-url', 'https://example.com/image.jpg');
         });
     });
 
     it('does not render location when not provided', async () => {
         const programWithoutLocation = { ...mockProgram, location: undefined };
         useParams.mockReturnValue({ slug: 'test-program' });
-        mockFetchProgramBySlug.mockResolvedValue(programWithoutLocation as unknown as Program);
+        mockFetchProgramBySlug.mockResolvedValue(programWithoutLocation as unknown as DetailedProgram);
 
         render(<DetailedProgramPageContent />);
 
@@ -145,7 +127,7 @@ describe('DetailedProgramPageContent', () => {
     it('does not render participantsCount when not provided', async () => {
         const programWithoutParticipants = { ...mockProgram, participantsCount: undefined };
         useParams.mockReturnValue({ slug: 'test-program' });
-        mockFetchProgramBySlug.mockResolvedValue(programWithoutParticipants as unknown as Program);
+        mockFetchProgramBySlug.mockResolvedValue(programWithoutParticipants as unknown as DetailedProgram);
 
         render(<DetailedProgramPageContent />);
 
@@ -157,7 +139,7 @@ describe('DetailedProgramPageContent', () => {
     it('does not render meetingsCount when not provided', async () => {
         const programWithoutMeetings = { ...mockProgram, meetingsCount: undefined };
         useParams.mockReturnValue({ slug: 'test-program' });
-        mockFetchProgramBySlug.mockResolvedValue(programWithoutMeetings as unknown as Program);
+        mockFetchProgramBySlug.mockResolvedValue(programWithoutMeetings as unknown as DetailedProgram);
 
         render(<DetailedProgramPageContent />);
 

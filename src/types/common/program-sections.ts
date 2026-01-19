@@ -1,3 +1,6 @@
+import { Image, ImageValues } from '../common/image';
+import { ContentType } from './programs';
+
 export enum ProgramSectionType {
     Title,
     Description,
@@ -13,4 +16,22 @@ export enum ProgramSectionTemplate {
     SingleImageBottom = 5,
     SingleImageTop = 6,
     SingleImageRight = 7,
+}
+
+export interface ProgramSectionContent {
+    id?: number;
+    sectionId?: number;
+    contentType: ContentType;
+    order: number;
+    title?: string | null;
+    description?: string | null;
+    image?: Image | ImageValues | null;
+}
+
+export interface ProgramSection {
+    id?: number;
+    programId?: number;
+    template: ProgramSectionTemplate;
+    order: number;
+    contents: ProgramSectionContent[];
 }

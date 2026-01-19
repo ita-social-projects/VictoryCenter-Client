@@ -47,6 +47,7 @@ describe('ProgramListItem', () => {
             { id: 1, name: 'Category 1', programsCount: 1 },
             { id: 2, name: 'Category 2', programsCount: 2 },
         ],
+        slug: 'test-program',
     };
 
     const mockHandleOnDeleteProgram = jest.fn();

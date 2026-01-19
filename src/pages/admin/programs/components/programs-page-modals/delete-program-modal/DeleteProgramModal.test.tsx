@@ -73,6 +73,7 @@ describe('DeleteProgramModal', () => {
         meetingsCount: '',
         participantsCount: '',
         sections: [],
+        slug: 'test-program',
     };
 
     const defaultProps: DeleteProgramModalProps = {

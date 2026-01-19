@@ -3,7 +3,7 @@ import { TitleDescriptionSection } from '../shared/title-description-section/Tit
 import { PhotoInputGroup } from '@/components/admin/input-groups/photo-input-group/PhotoInputGroup';
 import { ImageValues } from '@/types/common/image';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { PROGRAM_SECTION_IMAGE_CONFIGS } from '@/const/admin/programs';
+import { PROGRAM_SECTION_IMAGE_CONFIGS, PROGRAM_VALIDATION } from '@/const/admin/programs';
 import styles from './SingleImageTop.module.scss';
 
 export interface SingleImageTopProps {
@@ -53,6 +53,7 @@ export const SingleImageTop = ({
                                 PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_TOP.cropWidth,
                             )}
                             variant="programSection"
+                            maxSizeMB={PROGRAM_VALIDATION.images.maxSizeMB}
                         />
                     ) : (
                         <img src={image || undefined} alt="" className={styles.image} />

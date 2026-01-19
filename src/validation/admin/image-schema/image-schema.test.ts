@@ -14,7 +14,8 @@ const createTestFile = (size: number, type: string = 'image/jpeg', name: string 
 describe('ImageValidationSchema', () => {
     const MIN_WIDTH = 1920;
     const MIN_HEIGHT = 1080;
-    const validationSchema = getImageValidationSchema(MIN_WIDTH, MIN_HEIGHT);
+    const MAX_SIZE_MB = 3;
+    const validationSchema = getImageValidationSchema(MIN_WIDTH, MIN_HEIGHT, MAX_SIZE_MB);
 
     beforeAll(() => {
         globalThis.URL.createObjectURL = jest.fn(() => 'mock-url');
@@ -57,7 +58,16 @@ describe('ImageValidationSchema', () => {
         mockImageDimensions(1920, 1080);
         const largeFile = createTestFile(IMAGE_VALIDATION.maxSizeBytes + 1024);
 
-        await expect(validationSchema.validate(largeFile)).rejects.toThrow(IMAGE_VALIDATION.getSizeError());
+        await expect(validationSchema.validate(largeFile)).rejects.toThrow(IMAGE_VALIDATION.getSizeError(MAX_SIZE_MB));
+    });
+
+    it('rejects a file exceeding custom maxSizeMB', async () => {
+        const customMaxMB = 5;
+        const customSchema = getImageValidationSchema(MIN_WIDTH, MIN_HEIGHT, customMaxMB);
+        mockImageDimensions(1920, 1080);
+        const largeFile = createTestFile(customMaxMB * 1024 * 1024 + 1024);
+
+        await expect(customSchema.validate(largeFile)).rejects.toThrow(IMAGE_VALIDATION.getSizeError(customMaxMB));
     });
 
     it('rejects an invalid file type', async () => {

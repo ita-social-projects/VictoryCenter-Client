@@ -26,14 +26,12 @@ jest.mock('@/utils/functions/render-program-section', () => ({
 
 const mockedGetInitialSectionContents = getInitialSectionContents as jest.Mock;
 
-let capturedAddSectionModalProps: any = {};
 jest.mock('../add-section-modal/AddSectionModal', () => {
     const React = require('react');
     const { ProgramSectionTemplate } = require('@/types/common/program-sections');
 
     return {
         AddSectionModal: (props: any) => {
-            capturedAddSectionModalProps = props;
             if (!props.isOpen) return null;
             return (
                 <div data-testid="add-section-modal-mock">
@@ -175,6 +173,7 @@ const mockProgram: Program = {
     meetingsCount: '',
     location: '',
     sections: [],
+    slug: 'test-program',
 };
 
 const mockCategories: ProgramCategory[] = [

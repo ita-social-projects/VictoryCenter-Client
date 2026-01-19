@@ -13,7 +13,7 @@ export const CorrespondentBanksSection = ({
         return null;
     }
 
-    const sortedCorrespondentBanks = [...correspondentBanks].sort((a, b) => a.id - b.id);
+    const sortedCorrespondentBanks = correspondentBanks.toSorted((a, b) => b.id - a.id);
     const banks = sortedCorrespondentBanks.map((apiBank) => ({
         title: apiBank.name,
         fields: [

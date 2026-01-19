@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { NotFound } from '@/pages/public/not-found-page/NotFound';
 import { ProgramsPage } from '@/pages/public/programs-page/ProgramsPage';
+import { DetailedProgramPage } from '@/pages/public/detailed-program-page/DetailedProgramPage';
 import { AdminLayout } from '@/layouts/admin-layout/AdminLayout';
 import { PublicLayout } from '@/layouts/public-layout/PublicLayout';
 import { TeamPageAdmin } from '@/pages/admin/team/TeamPage';
@@ -29,6 +30,7 @@ export const AppRouter = () => (
                 <Route index element={<AboutUsPage />} />
                 <Route path={PUBLIC_ROUTES.TEAM.FULL} element={<TeamPage />} />
                 <Route path={PUBLIC_ROUTES.PROGRAMS.FULL} element={<ProgramsPage />} />
+                <Route path={PUBLIC_ROUTES.PROGRAM_DETAIL.FULL} element={<DetailedProgramPage />} />
                 <Route path={PUBLIC_ROUTES.PARTNERS.FULL} element={<PartnersPage />} />
                 <Route path={PUBLIC_ROUTES.ABOUT_US.FULL} element={<AboutUsPage />} />
                 <Route path={PUBLIC_ROUTES.DONATE.FULL} element={<DonatePage />} />

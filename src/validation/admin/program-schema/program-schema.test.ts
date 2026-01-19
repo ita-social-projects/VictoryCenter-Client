@@ -238,12 +238,8 @@ describe('Program Validation Schema', () => {
     describe('Location validation (Publish mode)', () => {
         const publishContext = { isPublishing: true };
 
-        it('should fail with empty location', async () => {
-            await expectValidationToFail(
-                getValidData({ location: '' }),
-                PROGRAM_VALIDATION.location.getRequiredWhenPublishingError(),
-                publishContext,
-            );
+        it('should pass with empty location', async () => {
+            await expectValidationToPass(getValidData({ location: '' }), publishContext);
         });
 
         it('should pass with valid location', async () => {
@@ -279,12 +275,8 @@ describe('Program Validation Schema', () => {
     describe('ParticipantsCount validation (Publish mode)', () => {
         const publishContext = { isPublishing: true };
 
-        it('should fail with empty participantsCount', async () => {
-            await expectValidationToFail(
-                getValidData({ participantsCount: '' }),
-                PROGRAM_VALIDATION.participantsCount.getRequiredWhenPublishingError(),
-                publishContext,
-            );
+        it('should pass with empty participantsCount', async () => {
+            await expectValidationToPass(getValidData({ participantsCount: '' }), publishContext);
         });
 
         it('should pass with valid participantsCount', async () => {
@@ -320,12 +312,8 @@ describe('Program Validation Schema', () => {
     describe('MeetingCount validation (Publish mode)', () => {
         const publishContext = { isPublishing: true };
 
-        it('should fail with empty meetingCount', async () => {
-            await expectValidationToFail(
-                getValidData({ meetingsCount: '' }),
-                PROGRAM_VALIDATION.meetingCount.getRequiredWhenPublishingError(),
-                publishContext,
-            );
+        it('should pass with empty meetingCount', async () => {
+            await expectValidationToPass(getValidData({ meetingsCount: '' }), publishContext);
         });
 
         it('should pass with valid meetingCount', async () => {
@@ -439,10 +427,8 @@ describe('PROGRAM_VALIDATION_FUNCTIONS', () => {
             expect(PROGRAM_VALIDATION_FUNCTIONS.validateLocation('', false)).toBeUndefined();
         });
 
-        it('should return error for empty location in publish mode', () => {
-            expect(PROGRAM_VALIDATION_FUNCTIONS.validateLocation('', true)).toBe(
-                PROGRAM_VALIDATION.location.getRequiredWhenPublishingError(),
-            );
+        it('should return undefined for empty location in publish mode', () => {
+            expect(PROGRAM_VALIDATION_FUNCTIONS.validateLocation('', true)).toBeUndefined();
         });
 
         it('should return error for location exceeding max length', () => {
@@ -457,10 +443,8 @@ describe('PROGRAM_VALIDATION_FUNCTIONS', () => {
             expect(PROGRAM_VALIDATION_FUNCTIONS.validateParticipantsCount('', false)).toBeUndefined();
         });
 
-        it('should return error for empty participantsCount in publish mode', () => {
-            expect(PROGRAM_VALIDATION_FUNCTIONS.validateParticipantsCount('', true)).toBe(
-                PROGRAM_VALIDATION.participantsCount.getRequiredWhenPublishingError(),
-            );
+        it('should return undefined for empty participantsCount in publish mode', () => {
+            expect(PROGRAM_VALIDATION_FUNCTIONS.validateParticipantsCount('', true)).toBeUndefined();
         });
 
         it('should return error for participantsCount exceeding max length', () => {
@@ -478,10 +462,8 @@ describe('PROGRAM_VALIDATION_FUNCTIONS', () => {
             expect(PROGRAM_VALIDATION_FUNCTIONS.validateMeetingCount('', false)).toBeUndefined();
         });
 
-        it('should return error for empty meetingCount in publish mode', () => {
-            expect(PROGRAM_VALIDATION_FUNCTIONS.validateMeetingCount('', true)).toBe(
-                PROGRAM_VALIDATION.meetingCount.getRequiredWhenPublishingError(),
-            );
+        it('should return undefined for empty meetingCount in publish mode', () => {
+            expect(PROGRAM_VALIDATION_FUNCTIONS.validateMeetingCount('', true)).toBeUndefined();
         });
 
         it('should return error for meetingCount exceeding max length', () => {

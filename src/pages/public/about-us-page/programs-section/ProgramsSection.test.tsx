@@ -46,6 +46,7 @@ describe('ProgramsSection', () => {
     const createMockProgram = (id: number, name: string) => ({
         id,
         name,
+        slug: `program-${id}`,
         previewImage: { id: id, url: `image-${id}.jpg`, mimeType: 'image/jpeg' },
         description: `Description ${id}`,
         categories: [],

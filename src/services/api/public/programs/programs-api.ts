@@ -1,6 +1,5 @@
 import { axiosInstance } from '@/services/api/axios';
 import { DetailedProgram, ProgramsPageData, PublishedProgramDto } from '@/types/public/programs-page';
-import { Program } from '@/types/admin/programs';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
 
 export const programPageDataFetch = async (): Promise<ProgramsPageData> => {

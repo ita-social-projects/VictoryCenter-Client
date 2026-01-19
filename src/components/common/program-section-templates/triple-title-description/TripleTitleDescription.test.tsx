@@ -15,9 +15,8 @@ describe('TripleTitleDescription', () => {
         expect(screen.getByText('Desc 3')).toBeInTheDocument();
     });
 
-    it('applies isTemplate and isEditable classes', () => {
-        const { container } = render(<TripleTitleDescription cards={cardsMock} isTemplate isEditable />);
-        expect(container.firstChild).toHaveClass('template');
+    it('applies isEditable class', () => {
+        const { container } = render(<TripleTitleDescription cards={cardsMock} isEditable />);
         expect(container.firstChild).toHaveClass('editable');
     });
 });

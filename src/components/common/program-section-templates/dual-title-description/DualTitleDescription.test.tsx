@@ -14,9 +14,8 @@ describe('DualTitleDescription', () => {
         expect(screen.getByText('Desc 2')).toBeInTheDocument();
     });
 
-    it('applies isTemplate and isEditable classes', () => {
-        const { container } = render(<DualTitleDescription cards={cardsMock} isTemplate isEditable />);
-        expect(container.firstChild).toHaveClass('template');
+    it('applies isEditable class', () => {
+        const { container } = render(<DualTitleDescription cards={cardsMock} isEditable />);
         expect(container.firstChild).toHaveClass('editable');
     });
 });

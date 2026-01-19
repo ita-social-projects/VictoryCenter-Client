@@ -10,7 +10,6 @@ export interface TitleDescriptionCardData {
 interface Props {
     cards: TitleDescriptionCardData[];
     cardsCount: number;
-    isTemplate?: boolean;
     isEditable?: boolean;
     onTitleChange?: (index: number, value: string) => void;
     onDescriptionChange?: (index: number, value: string) => void;
@@ -19,7 +18,6 @@ interface Props {
 export const TitleDescriptionCardsSection = ({
     cards,
     cardsCount,
-    isTemplate = false,
     isEditable = false,
     onTitleChange,
     onDescriptionChange,
@@ -34,7 +32,6 @@ export const TitleDescriptionCardsSection = ({
                 dual: cardsCount === 2,
                 triple: cardsCount === 3,
                 quad: cardsCount === 4,
-                template: isTemplate,
                 editable: isEditable,
             })}
         >
@@ -44,7 +41,6 @@ export const TitleDescriptionCardsSection = ({
                     card={card}
                     index={index}
                     isEditable={isEditable}
-                    isTemplate={isTemplate}
                     onTitleChange={onTitleChange}
                     onDescriptionChange={onDescriptionChange}
                 />

@@ -52,7 +52,6 @@ describe('renderProgramSection', () => {
             const params: RenderProgramSectionParams = {
                 templateId: id,
                 data: baseData,
-                isTemplate: true,
                 isEditable: true,
                 handlers: baseHandlers,
             };

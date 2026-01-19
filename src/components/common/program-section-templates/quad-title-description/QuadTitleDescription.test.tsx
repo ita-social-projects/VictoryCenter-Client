@@ -16,9 +16,8 @@ describe('QuadTitleDescription', () => {
         expect(screen.getByText('Desc 4')).toBeInTheDocument();
     });
 
-    it('applies isTemplate and isEditable classes', () => {
-        const { container } = render(<QuadTitleDescription cards={cardsMock} isTemplate isEditable />);
-        expect(container.firstChild).toHaveClass('template');
+    it('applies isEditable class', () => {
+        const { container } = render(<QuadTitleDescription cards={cardsMock} isEditable />);
         expect(container.firstChild).toHaveClass('editable');
     });
 });

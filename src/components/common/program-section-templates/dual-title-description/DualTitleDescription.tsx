@@ -7,7 +7,6 @@ import styles from './DualTitleDescription.module.scss';
 
 interface DualTitleDescriptionProps {
     cards: TitleDescriptionCardData[];
-    isTemplate?: boolean;
     isEditable?: boolean;
     onTitleChange?: (index: number, value: string) => void;
     onDescriptionChange?: (index: number, value: string) => void;
@@ -15,7 +14,6 @@ interface DualTitleDescriptionProps {
 
 export const DualTitleDescription = ({
     cards,
-    isTemplate = false,
     isEditable = false,
     onTitleChange,
     onDescriptionChange,
@@ -23,14 +21,12 @@ export const DualTitleDescription = ({
     return (
         <div
             className={cn(styles.container, {
-                [styles.template]: isTemplate,
                 [styles.editable]: isEditable,
             })}
         >
             <TitleDescriptionCardsSection
                 cards={cards}
                 cardsCount={2}
-                isTemplate={isTemplate}
                 isEditable={isEditable}
                 onTitleChange={onTitleChange}
                 onDescriptionChange={onDescriptionChange}

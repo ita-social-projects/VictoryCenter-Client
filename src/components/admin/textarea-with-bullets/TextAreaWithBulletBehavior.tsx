@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useRef, useEffect } from 'react';
 import {
     TextAreaWithCharacterLimit,
     TextAreaWithCharacterLimitProps,
@@ -19,7 +19,7 @@ export const TextAreaWithBulletBehavior = ({
     onFocus,
     ...rest
 }: TextAreaWithBulletBehaviorProps) => {
-    const keydownHandlerRef = useRef<(e: KeyboardEvent) => void | null>(null);
+    const keydownHandlerRef = useRef<((e: KeyboardEvent) => void) | null>(null);
 
     const removeDocKeydown = useCallback(() => {
         if (keydownHandlerRef.current) {
@@ -27,6 +27,12 @@ export const TextAreaWithBulletBehavior = ({
             keydownHandlerRef.current = null;
         }
     }, []);
+
+    useEffect(() => {
+        return () => {
+            removeDocKeydown();
+        };
+    }, [removeDocKeydown]);
 
     const autosize = useCallback(() => {
         try {

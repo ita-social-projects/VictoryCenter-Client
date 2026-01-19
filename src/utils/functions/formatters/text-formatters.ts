@@ -27,6 +27,6 @@ export const parseDescriptionList = (description?: string) => {
 
     return {
         intro: hasIntro ? lines[0] : null,
-        items: (hasIntro ? lines.slice(1) : lines).map((item) => item.replace(/^[•\-*]\s*/, '').trim()),
+        items: (hasIntro ? lines.slice(1) : lines).map((item) => item.replace(/^[•\-*]\s*/, '').trim()).filter(Boolean),
     };
 };

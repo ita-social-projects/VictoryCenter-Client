@@ -64,14 +64,14 @@ describe('TitleDescriptionCard', () => {
 
     describe('editable mode', () => {
         it('should render input fields in editable mode', () => {
-            render(<TitleDescriptionCard card={mockCard} index={0} isEditable={true} isTemplate={false} />);
+            render(<TitleDescriptionCard card={mockCard} index={0} isEditable={true} />);
 
             expect(screen.getByTestId('input-with-limit')).toBeInTheDocument();
             expect(screen.getByTestId('card-description-field')).toBeInTheDocument();
         });
 
         it('should display title and description values in inputs', () => {
-            render(<TitleDescriptionCard card={mockCard} index={0} isEditable={true} isTemplate={false} />);
+            render(<TitleDescriptionCard card={mockCard} index={0} isEditable={true} />);
 
             expect((screen.getByTestId('input-card-title-0') as HTMLInputElement).value).toBe('Test Title');
             expect((screen.getByTestId('textarea-card-description-0') as HTMLTextAreaElement).value).toBe(
@@ -86,7 +86,7 @@ describe('TitleDescriptionCard', () => {
                 handleBlur: jest.fn(),
             }));
 
-            render(<TitleDescriptionCard card={mockCard} index={0} isEditable={true} isTemplate={false} />);
+            render(<TitleDescriptionCard card={mockCard} index={0} isEditable={true} />);
 
             expect(screen.getByText('Title is required')).toBeInTheDocument();
         });
@@ -94,26 +94,21 @@ describe('TitleDescriptionCard', () => {
 
     describe('read-only mode', () => {
         it('should not render input fields in read-only mode', () => {
-            render(<TitleDescriptionCard card={mockCard} index={0} isEditable={false} isTemplate={false} />);
+            render(<TitleDescriptionCard card={mockCard} index={0} isEditable={false} />);
 
             expect(screen.queryByTestId('input-with-limit')).not.toBeInTheDocument();
             expect(screen.queryByTestId('card-description-field')).not.toBeInTheDocument();
         });
 
         it('should display title as heading', () => {
-            render(<TitleDescriptionCard card={mockCard} index={0} isEditable={false} isTemplate={false} />);
+            render(<TitleDescriptionCard card={mockCard} index={0} isEditable={false} />);
 
             expect(screen.getByText('Test Title')).toBeInTheDocument();
         });
 
         it('should display default title when empty', () => {
             render(
-                <TitleDescriptionCard
-                    card={{ title: '', description: 'Description' }}
-                    index={0}
-                    isEditable={false}
-                    isTemplate={false}
-                />,
+                <TitleDescriptionCard card={{ title: '', description: 'Description' }} index={0} isEditable={false} />,
             );
 
             expect(screen.getByText('Заголовок')).toBeInTheDocument();
@@ -125,7 +120,7 @@ describe('TitleDescriptionCard', () => {
                 items: [],
             });
 
-            render(<TitleDescriptionCard card={mockCard} index={0} isEditable={false} isTemplate={false} />);
+            render(<TitleDescriptionCard card={mockCard} index={0} isEditable={false} />);
 
             expect(screen.getByText('Intro text')).toBeInTheDocument();
         });
@@ -136,7 +131,7 @@ describe('TitleDescriptionCard', () => {
                 items: ['Item 1', 'Item 2'],
             });
 
-            render(<TitleDescriptionCard card={mockCard} index={0} isEditable={false} isTemplate={false} />);
+            render(<TitleDescriptionCard card={mockCard} index={0} isEditable={false} />);
 
             expect(screen.getByText('Item 1')).toBeInTheDocument();
             expect(screen.getByText('Item 2')).toBeInTheDocument();
@@ -148,7 +143,7 @@ describe('TitleDescriptionCard', () => {
                 items: [],
             });
 
-            render(<TitleDescriptionCard card={mockCard} index={0} isEditable={false} isTemplate={false} />);
+            render(<TitleDescriptionCard card={mockCard} index={0} isEditable={false} />);
 
             expect(screen.getByText('Опис секції')).toBeInTheDocument();
         });
@@ -164,7 +159,7 @@ describe('TitleDescriptionCard', () => {
                 handleBlur: jest.fn(),
             }));
 
-            render(<TitleDescriptionCard card={mockCard} index={0} isEditable={true} isTemplate={false} />);
+            render(<TitleDescriptionCard card={mockCard} index={0} isEditable={true} />);
 
             const titleInput = screen.getByTestId('input-card-title-0');
             await userEvent.type(titleInput, 'New');
@@ -187,7 +182,7 @@ describe('TitleDescriptionCard', () => {
                     handleBlur: jest.fn(),
                 }));
 
-            render(<TitleDescriptionCard card={mockCard} index={0} isEditable={true} isTemplate={false} />);
+            render(<TitleDescriptionCard card={mockCard} index={0} isEditable={true} />);
 
             const descriptionInput = screen.getByTestId('textarea-card-description-0');
             await userEvent.type(descriptionInput, 'New');

@@ -9,7 +9,6 @@ interface TitleDescriptionCardProps {
     card: TitleDescriptionCardData;
     index: number;
     isEditable: boolean;
-    isTemplate: boolean;
     onTitleChange?: (index: number, value: string) => void;
     onDescriptionChange?: (index: number, value: string) => void;
 }

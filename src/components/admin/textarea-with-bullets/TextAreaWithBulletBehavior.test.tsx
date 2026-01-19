@@ -9,19 +9,27 @@ describe('TextAreaWithBulletBehavior', () => {
     let handleChange: jest.Mock;
     let handleFocus: jest.Mock;
     let handleBlur: jest.Mock;
+    const originalAddEventListener = document.addEventListener;
+    const originalRemoveEventListener = document.removeEventListener;
 
     beforeEach(() => {
         handleChange = jest.fn();
         handleFocus = jest.fn();
         handleBlur = jest.fn();
 
-        jest.spyOn(document, 'addEventListener').mockImplementation((event, handler) => {
+        jest.spyOn(document, 'addEventListener').mockImplementation((event, handler, options) => {
             if (event === 'keydown') {
                 (window as any).keydownHandler = handler;
             }
+            return originalAddEventListener.call(document, event, handler, options);
         });
 
-        jest.spyOn(document, 'removeEventListener').mockImplementation(() => {});
+        jest.spyOn(document, 'removeEventListener').mockImplementation((event, handler, options) => {
+            if (event === 'keydown' && (window as any).keydownHandler === handler) {
+                (window as any).keydownHandler = undefined;
+            }
+            return originalRemoveEventListener.call(document, event, handler, options);
+        });
     });
 
     afterEach(() => {

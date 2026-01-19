@@ -142,7 +142,6 @@ export const renderProgramSection = ({
             return (
                 <DualTitleDescription
                     cards={data.cards ?? []}
-                    isTemplate={isTemplate}
                     isEditable={isEditable}
                     onTitleChange={handlers?.onCardTitleChange}
                     onDescriptionChange={handlers?.onCardDescriptionChange}
@@ -152,7 +151,6 @@ export const renderProgramSection = ({
             return (
                 <TripleTitleDescription
                     cards={data.cards ?? []}
-                    isTemplate={isTemplate}
                     isEditable={isEditable}
                     onTitleChange={handlers?.onCardTitleChange}
                     onDescriptionChange={handlers?.onCardDescriptionChange}
@@ -162,7 +160,6 @@ export const renderProgramSection = ({
             return (
                 <QuadTitleDescription
                     cards={data.cards ?? []}
-                    isTemplate={isTemplate}
                     isEditable={isEditable}
                     onTitleChange={handlers?.onCardTitleChange}
                     onDescriptionChange={handlers?.onCardDescriptionChange}

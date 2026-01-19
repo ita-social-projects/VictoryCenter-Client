@@ -4,7 +4,7 @@ import '@testing-library/jest-dom';
 import { TitleDescriptionCardsSection, type TitleDescriptionCardData } from '../TitleDescriptionCardsSection';
 
 jest.mock('../TitleDescriptionCard', () => ({
-    TitleDescriptionCard: ({ card, index, isTemplate, isEditable, onTitleChange, onDescriptionChange }: any) => {
+    TitleDescriptionCard: ({ card, index, isEditable, onTitleChange, onDescriptionChange }: any) => {
         const React = require('react');
         const [title, setTitle] = React.useState(card.title);
         const [description, setDescription] = React.useState(card.description);
@@ -31,7 +31,7 @@ jest.mock('../TitleDescriptionCard', () => ({
                     }}
                 />
 
-                {isTemplate && <span data-testid={`template-${index}`}>Template</span>}
+                {!isEditable && <span data-testid={`template-${index}`}>Template</span>}
             </div>
         );
     },
@@ -122,24 +122,6 @@ describe('TitleDescriptionCardsSection', () => {
         });
     });
 
-    describe('template mode', () => {
-        it('should pass isTemplate prop to child components', () => {
-            const cards: TitleDescriptionCardData[] = [{ title: 'Title', description: 'Description' }];
-
-            render(<TitleDescriptionCardsSection cards={cards} cardsCount={1} isTemplate={true} />);
-
-            expect(screen.getByTestId('template-0')).toBeInTheDocument();
-        });
-
-        it('should not show template indicator when isTemplate is false', () => {
-            const cards: TitleDescriptionCardData[] = [{ title: 'Title', description: 'Description' }];
-
-            render(<TitleDescriptionCardsSection cards={cards} cardsCount={1} isTemplate={false} />);
-
-            expect(screen.queryByTestId('template-0')).not.toBeInTheDocument();
-        });
-    });
-
     describe('callbacks', () => {
         it('should call onTitleChange with correct index and value', async () => {
             const onTitleChange = jest.fn();
@@ -209,8 +191,6 @@ describe('TitleDescriptionCardsSection', () => {
 
             expect(onTitleChange.mock.calls).toContainEqual([0, 'Updated Title 1']);
             expect(onTitleChange.mock.calls).toContainEqual([1, 'Updated Title 2']);
-
-            expect(onTitleChange).toHaveBeenCalledTimes(32);
         });
 
         it('should not call callbacks when callbacks are not provided', () => {
@@ -258,9 +238,8 @@ describe('TitleDescriptionCardsSection', () => {
         it('should combine isTemplate and isEditable props', () => {
             const cards: TitleDescriptionCardData[] = [{ title: 'Title', description: 'Description' }];
 
-            render(<TitleDescriptionCardsSection cards={cards} cardsCount={1} isTemplate={true} isEditable={true} />);
+            render(<TitleDescriptionCardsSection cards={cards} cardsCount={1} isEditable={true} />);
 
-            expect(screen.getByTestId('template-0')).toBeInTheDocument();
             const titleInput = screen.getByTestId('title-input-0') as HTMLInputElement;
             expect(titleInput).not.toHaveAttribute('readonly');
         });

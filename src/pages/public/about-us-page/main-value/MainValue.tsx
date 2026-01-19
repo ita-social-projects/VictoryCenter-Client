@@ -3,7 +3,7 @@ import { ABOUT_US_DATA } from '@/const/public/about-us-page';
 import styles from './MainValue.module.scss';
 import { Swiper } from '@/components/public/swiper/Swiper';
 import { AboutUsContent } from '@/types/public/about-us-page';
-import classNames from 'classnames';
+import cn from 'classnames';
 import { ReactComponent as ArrowRight } from '@/assets/icons/arrow-right.svg';
 import { ReactComponent as ArrowLeft } from '@/assets/icons/arrow-left.svg';
 export interface MainValuesProps {
@@ -25,7 +25,7 @@ export const MainValues = ({ content }: MainValuesProps) => {
                 </h2>
             </div>
 
-            <div className={styles.peopleBlock}>
+            <div className={styles[`people-block`]}>
                 <Swiper
                     items={content}
                     renderItem={(person, index) => {
@@ -34,13 +34,13 @@ export const MainValues = ({ content }: MainValuesProps) => {
                         const description = person.description;
 
                         return (
-                            <div className={classNames(styles.peopleCard, styles[`card${index + 1}`])}>
-                                <img className={styles.peopleImg} src={imageUrl} alt={altText} />
-                                <p className={styles.peopleInfo}>{description}</p>
+                            <div className={cn(styles[`people-card`], styles[`card-${index + 1}`])}>
+                                <img className={styles[`people-img`]} src={imageUrl} alt={altText} />
+                                <p className={styles[`people-info`]}>{description}</p>
                             </div>
                         );
                     }}
-                    classNameSwiperSlide={styles.swiperSlide}
+                    classNameSwiperSlide={styles[`swiper-slide`]}
                     navigationButtons={{
                         prev: {
                             icon: ArrowLeft,
@@ -57,9 +57,9 @@ export const MainValues = ({ content }: MainValuesProps) => {
                     }}
                 />
             </div>
-            <div className={styles.summaryBlock}>
-                <div className={styles.summaryLine} />
-                <h3 className={styles.summaryText}>{t('MAIN_VALUE_DETAILS')}</h3>
+            <div className={styles[`summary-block`]}>
+                <div className={styles[`summary-line`]} />
+                <h3 className={styles[`summary-text`]}>{t('MAIN_VALUE_DETAILS')}</h3>
             </div>
         </div>
     );

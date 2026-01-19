@@ -1,4 +1,4 @@
-@use '@/assets/sass/variables/fonts' as f;
+@use '@/assets/sass/variables/typography' as f;
 @use '@/assets/sass/mixins/typography.mixins' as type;
 
 @keyframes revealColor {
@@ -67,7 +67,7 @@
 }
 
 .title {
-    font-family: f.$mulish-regular-font;
+    font-family: f.$font-family-base;
     font-weight: 500;
     font-size: 40px;
     line-height: 40px;

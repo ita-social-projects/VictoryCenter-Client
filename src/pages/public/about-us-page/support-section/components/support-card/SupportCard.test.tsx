@@ -5,10 +5,10 @@ import { AboutUsContent } from '@/types/public/about-us-page';
 import { aboutUsPageUk } from '@/locales/uk';
 
 jest.mock('./SupportCard.module.scss', () => ({
-    peopleCard: 'peopleCard',
-    card1: 'card1',
-    card2: 'card2',
-    card3: 'card3',
+    'people-card': 'people-card',
+    'card-1': 'card-1',
+    'card-2': 'card-2',
+    'card-3': 'card-3',
     image: 'image',
     description: 'description',
 }));
@@ -53,12 +53,12 @@ describe('SupportCard component', () => {
     it('renders correct classes for multiple indexes', () => {
         const { rerender } = render(<SupportCard card={card} index={0} />);
         const card1 = screen.getByRole('img').closest('div');
-        expect(card1).toHaveClass('peopleCard');
-        expect(card1).toHaveClass('card1');
+        expect(card1).toHaveClass('people-card');
+        expect(card1).toHaveClass('card-1');
 
         rerender(<SupportCard card={card} index={2} />);
         const card3 = screen.getByRole('img').closest('div');
-        expect(card3).toHaveClass('peopleCard');
-        expect(card3).toHaveClass('card3');
+        expect(card3).toHaveClass('people-card');
+        expect(card3).toHaveClass('card-3');
     });
 });

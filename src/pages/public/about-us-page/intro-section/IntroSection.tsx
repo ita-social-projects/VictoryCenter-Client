@@ -14,13 +14,15 @@ export const AboutUsIntro = ({ content }: AboutUsIntroProps) => {
     const description = content?.find((x) => x.contentType === ContentType.Description)?.description;
 
     return (
-        <section className={styles.root}>
-            <img src={imageUrl} className={styles.image} alt="Men and Horse" />
-            <img src={imageUrl} className={styles.overlay} alt="Men and Horse" />
-            <div className={styles.info}>
-                <h1 className={styles.title}>{title}</h1>
-                <p className={styles.description}>{description}</p>
-            </div>
-        </section>
+        <>
+            <section className={styles.root}>
+                <img src={imageUrl} className={styles.image} alt="Men and Horse" />
+                <img src={imageUrl} className={styles.overlay} alt="Men and Horse" />
+                <div className={styles.info}>
+                    <h1 className={styles.title}>{title}</h1>
+                    <p className={styles.description}>{description}</p>
+                </div>
+            </section>
+        </>
     );
 };

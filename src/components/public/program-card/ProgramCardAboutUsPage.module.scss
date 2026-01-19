@@ -1,4 +1,4 @@
-@use '@/assets/sass/variables/colors';
+@use '@/assets/sass/variables/colors' as c;
 @use '@/assets/sass/mixins/typography.mixins' as type;
 
 .root {
@@ -7,7 +7,7 @@
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    background-color: colors.$grey-50;
+    background-color: c.$grey-50;
     height: 520px;
 
     &:hover {
@@ -17,7 +17,7 @@
             width: 48px;
 
             path {
-                stroke: colors.$yellow-600;
+                stroke: c.$yellow-600;
             }
         }
 
@@ -48,11 +48,11 @@
     gap: 74px;
     padding: 16px;
     box-sizing: border-box;
-    background-color: colors.$grey-50;
+    background-color: c.$grey-50;
     transition: all 0.5s ease;
 }
 
-.subtitleContent {
+.subtitle-content {
     width: 100%;
     display: flex;
     align-items: center;
@@ -72,13 +72,13 @@
 
 .categories {
     @include type.body-1-regular;
-    color: colors.$grey-800;
+    color: c.$grey-800;
     vertical-align: middle;
 }
 
 .name {
     @include type.body-1-medium;
-    color: colors.$blue-900;
+    color: c.$blue-900;
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 1;
@@ -99,7 +99,7 @@
 
 .description {
     @include type.body-2-regular;
-    color: colors.$blue-900;
+    color: c.$blue-900;
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;

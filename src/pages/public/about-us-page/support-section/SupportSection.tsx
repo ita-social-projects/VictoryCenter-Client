@@ -33,7 +33,7 @@ export const SupportSection = ({ content }: SupportSectionProps) => {
                         <SupportCard card={item} index={index} />
                     </>
                 )}
-                classNameSwiperSlide={styles.swiperSlide}
+                classNameSwiperSlide={styles[`swiper-slide`]}
                 navigationButtons={{
                     prev: {
                         icon: ArrowLeft,

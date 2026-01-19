@@ -18,7 +18,7 @@ export function SupportCard({ card, index }: SupportCardProps) {
     const description = card.description;
 
     return (
-        <div className={classNames(styles.peopleCard, styles[`card${index + 1}`])}>
+        <div className={classNames(styles[`people-card`], styles[`card-${index + 1}`])}>
             <img src={imageUrl} alt={altText} className={styles.image} />
             <p className={styles.description}>{description}</p>
         </div>

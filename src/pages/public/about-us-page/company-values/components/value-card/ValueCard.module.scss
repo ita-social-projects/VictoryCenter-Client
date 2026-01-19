@@ -34,65 +34,65 @@
     justify-content: flex-start;
     gap: 32px;
 
-    &.card1,
-    &.card2,
-    &.card3 {
+    &.card-1,
+    &.card-2,
+    &.card-3 {
         padding: 64px 56px 64px 16px;
     }
 
-    &.card1 {
+    &.card-1 {
         margin-top: 74px;
     }
 
-    &.card2 {
+    &.card-2 {
         margin-top: 19px;
     }
 
-    &.card3 {
+    &.card-3 {
         margin-top: 103px;
     }
 
     @media (min-width: 560px) {
-        &.card1 {
+        &.card-1 {
             padding: 64px 16px 64px 56px;
         }
 
-        &.card2,
-        &.card3 {
+        &.card-2,
+        &.card-3 {
             padding: 64px 56px 64px 16px;
         }
 
-        &.card2 {
+        &.card-2 {
             margin-top: 0;
         }
 
-        &.card3 {
+        &.card-3 {
             margin-top: 120px;
         }
     }
 
     @media (min-width: 1440px) {
-        &.card1 {
+        &.card-1 {
             padding: 64px 104px 64px 56px;
         }
 
-        &.card2 {
+        &.card-2 {
             padding: 64px 148px 64px 16px;
         }
 
-        &.card3 {
+        &.card-3 {
             padding: 64px 144px 64px 16px;
         }
 
-        &.card1 {
+        &.card-1 {
             margin-top: 56px;
         }
 
-        &.card2 {
+        &.card-2 {
             margin-top: 280px;
         }
 
-        &.card3 {
+        &.card-3 {
             margin-top: 344px;
         }
     }

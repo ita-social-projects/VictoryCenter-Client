@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { ProgramCard } from './ProgramCard';
 import { PublishedProgramDto } from '@/types/public/programs-page';
@@ -24,20 +23,20 @@ describe('ProgramCard', () => {
     };
 
     it('renders program name, categories, and description', () => {
-        render(<ProgramCard program={program} variant={'aboutUs'} />);
+        render(<ProgramCard program={program} variant={'whoWeAre'} />);
         expect(screen.getByText('Program A')).toBeInTheDocument();
         expect(screen.getByText('Category 1, Category 2')).toBeInTheDocument();
         expect(screen.getByText('Description A')).toBeInTheDocument();
     });
 
     it('renders program image using mapImageToBase64', () => {
-        render(<ProgramCard program={program} variant={'aboutUs'} />);
+        render(<ProgramCard program={program} variant={'whoWeAre'} />);
         const img = screen.getByAltText('Program A') as HTMLImageElement;
         expect(img).toHaveAttribute('src', 'mocked-image');
     });
 
     it('renders arrow icons', () => {
-        render(<ProgramCard program={program} variant={'aboutUs'} />);
+        render(<ProgramCard program={program} variant={'whoWeAre'} />);
         const arrows = screen.getAllByTestId('arrow-up-right');
         expect(arrows).toHaveLength(1);
     });

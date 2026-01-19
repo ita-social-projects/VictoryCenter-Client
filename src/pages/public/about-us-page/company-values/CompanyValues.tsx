@@ -61,7 +61,7 @@ export const CompanyValues = () => {
                     1440: { slidesPerView: 3 },
                 }}
                 renderItem={(group, groupIndex) => <ValueCard key={groupIndex} group={group} groupIndex={groupIndex} />}
-                classNameSwiperSlide={styles.swiperSlide}
+                classNameSwiperSlide={styles[`swiper-slide`]}
                 navigationButtons={{
                     next: {
                         icon: ArrowRight,

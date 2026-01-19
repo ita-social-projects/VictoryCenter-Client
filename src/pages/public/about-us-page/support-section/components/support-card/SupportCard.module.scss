@@ -1,30 +1,30 @@
 @use '@/assets/sass/variables/colors' as c;
 @use '@/assets/sass/mixins/typography.mixins' as type;
 
-.peopleCard {
+.people-card {
     position: relative;
     display: flex;
     flex-direction: column;
     gap: 8px;
 
-    &.card1 {
+    &.card-1 {
         margin-top: 72px;
     }
 
-    &.card2 {
+    &.card-2 {
         margin-top: 264px;
     }
 
-    &.card3 {
+    &.card-3 {
         margin-top: 152px;
     }
 
     @media (min-width: 560px) {
-        &.card1 {
+        &.card-1 {
             margin-top: 0;
         }
 
-        &.card2 {
+        &.card-2 {
             margin-top: 230px;
         }
 
@@ -34,15 +34,15 @@
     }
 
     @media (min-width: 768px) {
-        &.card1 {
+        &.card-1 {
             margin-top: 0;
         }
 
-        &.card2 {
+        &.card-2 {
             margin-top: 284px;
         }
 
-        &.card3 {
+        &.card-3 {
             margin-top: 130px;
         }
     }
@@ -50,15 +50,15 @@
     @media (min-width: 1440px) {
         gap: 16px;
 
-        &.card1 {
+        &.card-1 {
             margin-top: 124px;
         }
 
-        &.card2 {
+        &.card-2 {
             margin-top: 364px;
         }
 
-        &.card3 {
+        &.card-3 {
             margin-top: 12px;
         }
     }

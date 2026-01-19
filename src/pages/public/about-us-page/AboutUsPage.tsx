@@ -64,7 +64,7 @@ export const AboutUsPage = () => {
     }
 
     return (
-        <div className={styles.root}>
+        <>
             <AboutUsIntro content={getContentBySection(sections, SectionType.Main)} />
             <OurMission content={getContentBySection(sections, SectionType.WhatWeDo)} />
             <ProgramsSection content={programsData} />
@@ -73,6 +73,6 @@ export const AboutUsPage = () => {
             <OurTeam content={getContentBySection(sections, SectionType.Team)} />
             <MainValues content={getContentBySection(sections, SectionType.People)} />
             <DonateSection />
-        </div>
+        </>
     );
 };

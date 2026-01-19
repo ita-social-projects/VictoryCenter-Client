@@ -9,6 +9,21 @@ export interface ProgramsSectionProps {
     content: ProgramsPageData | null;
 }
 
+const SWIPER_NAVIGATION_CONFIG = {
+    prev: {
+        icon: ArrowLeft,
+        ariaLabel: 'previous',
+        variant: 'primary-dark' as const,
+        className: styles.left,
+    },
+    next: {
+        icon: ArrowRight,
+        ariaLabel: 'next',
+        variant: 'primary-dark' as const,
+        className: styles.right,
+    },
+};
+
 export const ProgramsSection = ({ content }: ProgramsSectionProps) => {
     return (
         <div className={styles.root}>
@@ -18,20 +33,7 @@ export const ProgramsSection = ({ content }: ProgramsSectionProps) => {
                     renderItem={(program) => <ProgramCard program={program} variant="whoWeAre" />}
                     showScrollbar={{ isVisible: true, className: styles.line, classNameDrag: styles.drag }}
                     classNameSwiperSlide={styles[`swiper-slide`]}
-                    navigationButtons={{
-                        prev: {
-                            icon: ArrowLeft,
-                            ariaLabel: 'previous',
-                            variant: 'primary-dark',
-                            className: styles.left,
-                        },
-                        next: {
-                            icon: ArrowRight,
-                            ariaLabel: 'next',
-                            variant: 'primary-dark',
-                            className: styles.right,
-                        },
-                    }}
+                    navigationButtons={SWIPER_NAVIGATION_CONFIG}
                 />
             </div>
             <div className={styles.scrollbar}>

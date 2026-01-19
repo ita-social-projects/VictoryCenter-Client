@@ -10,6 +10,21 @@ export interface MainValuesProps {
     content: AboutUsContent[] | null;
 }
 
+const SWIPER_NAVIGATION_CONFIG = {
+    prev: {
+        icon: ArrowLeft,
+        ariaLabel: 'previous',
+        variant: 'primary-dark' as const,
+        className: styles.left,
+    },
+    next: {
+        icon: ArrowRight,
+        ariaLabel: 'next',
+        variant: 'primary-dark' as const,
+        className: styles.right,
+    },
+};
+
 export const MainValues = ({ content }: MainValuesProps) => {
     const { t } = useTranslation('aboutUsPage');
     const peopleData = t('PEOPLE_DATA', { returnObjects: true });
@@ -41,20 +56,7 @@ export const MainValues = ({ content }: MainValuesProps) => {
                         );
                     }}
                     classNameSwiperSlide={styles[`swiper-slide`]}
-                    navigationButtons={{
-                        prev: {
-                            icon: ArrowLeft,
-                            ariaLabel: 'previous',
-                            variant: 'primary-dark',
-                            className: styles.left,
-                        },
-                        next: {
-                            icon: ArrowRight,
-                            ariaLabel: 'next',
-                            variant: 'primary-dark',
-                            className: styles.right,
-                        },
-                    }}
+                    navigationButtons={SWIPER_NAVIGATION_CONFIG}
                 />
             </div>
             <div className={styles[`summary-block`]}>

@@ -11,6 +11,21 @@ export interface SupportSectionProps {
     content: AboutUsContent[] | null;
 }
 
+const SWIPER_NAVIGATION_CONFIG = {
+    prev: {
+        icon: ArrowLeft,
+        ariaLabel: 'previous',
+        variant: 'primary-dark' as const,
+        className: styles.left,
+    },
+    next: {
+        icon: ArrowRight,
+        ariaLabel: 'next',
+        variant: 'primary-dark' as const,
+        className: styles.right,
+    },
+};
+
 export const SupportSection = ({ content }: SupportSectionProps) => {
     const { t } = useTranslation('aboutUsPage');
 
@@ -34,20 +49,7 @@ export const SupportSection = ({ content }: SupportSectionProps) => {
                     </>
                 )}
                 classNameSwiperSlide={styles[`swiper-slide`]}
-                navigationButtons={{
-                    prev: {
-                        icon: ArrowLeft,
-                        ariaLabel: 'previous',
-                        variant: 'primary-dark',
-                        className: styles.left,
-                    },
-                    next: {
-                        icon: ArrowRight,
-                        ariaLabel: 'next',
-                        variant: 'primary-dark',
-                        className: styles.right,
-                    },
-                }}
+                navigationButtons={SWIPER_NAVIGATION_CONFIG}
             />
         </div>
     );

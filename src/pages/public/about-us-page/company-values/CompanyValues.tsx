@@ -8,6 +8,15 @@ import { ReactComponent as ArrowRight } from '@/assets/icons/arrow-right.svg';
 
 export type ValueItem = Record<string, string>;
 
+const SWIPER_NAVIGATION_CONFIG = {
+    next: {
+        icon: ArrowRight,
+        ariaLabel: 'next',
+        variant: 'primary-dark' as const,
+        className: styles.right,
+    },
+};
+
 const chunk = <T,>(arr: T[], size: number): T[][] => {
     const result: T[][] = [];
     for (let i = 0; i < arr.length; i += size) {
@@ -54,7 +63,7 @@ export const CompanyValues = () => {
         <div className={styles.root}>
             <Swiper
                 items={chunkedValues}
-                slidesPerView={'auto'}
+                slidesPerView="auto"
                 breakpoints={{
                     560: { slidesPerView: 2 },
                     768: { slidesPerView: 2 },
@@ -62,14 +71,7 @@ export const CompanyValues = () => {
                 }}
                 renderItem={(group, groupIndex) => <ValueCard key={groupIndex} group={group} groupIndex={groupIndex} />}
                 classNameSwiperSlide={styles[`swiper-slide`]}
-                navigationButtons={{
-                    next: {
-                        icon: ArrowRight,
-                        ariaLabel: 'next',
-                        variant: 'primary-dark',
-                        className: styles.right,
-                    },
-                }}
+                navigationButtons={SWIPER_NAVIGATION_CONFIG}
             />
         </div>
     );

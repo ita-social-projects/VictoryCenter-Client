@@ -4,20 +4,14 @@ import { Navigation, Pagination, Scrollbar } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/scrollbar';
-import { Button, ButtonIcon, ButtonProps } from '@/components/public/ui/button';
+import { Button, ButtonProps } from '@/components/public/ui/button';
 
 export type ShowScrollbar = { isVisible: true; className: string; classNameDrag: string } | { isVisible: false };
 
-type NavigationButtonPropsBase = Omit<ButtonProps, 'onClick' | 'disabled'> & {
-    icon: ButtonIcon;
-    ariaLabel: string;
-    children?: never;
-};
-
 interface NavigationButtons {
     classNamebuttonBlock?: string;
-    prev?: NavigationButtonPropsBase;
-    next?: NavigationButtonPropsBase;
+    prev?: ButtonProps;
+    next?: ButtonProps;
 }
 
 interface SwiperProps<T> {
@@ -44,7 +38,7 @@ export function Swiper<T>({
     const swiperRef = useRef<SwiperClass | null>(null);
     const [isPrevEnabled, setIsPrevEnabled] = useState(false);
     const [isNextEnabled, setIsNextEnabled] = useState(true);
-
+    const { isVisible } = showScrollbar;
     const isOnlyNextButton = Boolean(navigationButtons?.next && !navigationButtons?.prev);
 
     const handlePrev = useCallback(() => {
@@ -52,12 +46,12 @@ export function Swiper<T>({
     }, []);
 
     const handleNext = useCallback(() => {
-        if (swiperRef.current) {
-            if (isOnlyNextButton && swiperRef.current.isEnd) {
-                swiperRef.current.slideTo(0);
-            } else {
-                swiperRef.current.slideNext();
-            }
+        if (!swiperRef.current) return;
+
+        if (isOnlyNextButton && swiperRef.current.isEnd) {
+            swiperRef.current.slideTo(0);
+        } else {
+            swiperRef.current.slideNext();
         }
     }, [isOnlyNextButton]);
 
@@ -96,17 +90,17 @@ export function Swiper<T>({
 
     const swiperModules = useMemo(() => {
         const modules = [Navigation, Pagination];
-        if (showScrollbar.isVisible) {
+        if (isVisible) {
             modules.push(Scrollbar);
         }
         return modules;
-    }, [showScrollbar.isVisible]);
+    }, [isVisible]);
 
     if (!items || items.length === 0) {
         return null;
     }
 
-    const scrollbarConfig = showScrollbar.isVisible
+    const scrollbarConfig = isVisible
         ? {
               draggable: true,
               el: `.${showScrollbar.className}`,

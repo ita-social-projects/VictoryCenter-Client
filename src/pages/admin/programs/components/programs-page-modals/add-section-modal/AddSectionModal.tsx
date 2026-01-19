@@ -16,6 +16,22 @@ export interface AddSectionModalProps {
     onSelectTemplate: (templateId: ProgramSectionTemplate) => void;
 }
 
+const SWIPER_NAVIGATION_CONFIG = {
+    classNamebuttonBlock: swiperStyles.buttonBlock,
+    prev: {
+        icon: ChevronLeft,
+        ariaLabel: 'previous',
+        variant: 'tertiary' as const,
+        className: swiperStyles.left,
+    },
+    next: {
+        icon: ChevronRight,
+        ariaLabel: 'next',
+        variant: 'tertiary' as const,
+        className: swiperStyles.right,
+    },
+};
+
 const TEMPLATES = [
     ProgramSectionTemplate.QuadImagesBottom,
     ProgramSectionTemplate.DualImagesBottom,
@@ -84,21 +100,7 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
                         )}
                         slidesPerView={1}
                         onSlideChange={handleSlideChange}
-                        navigationButtons={{
-                            classNamebuttonBlock: swiperStyles.buttonBlock,
-                            prev: {
-                                icon: ChevronLeft,
-                                ariaLabel: 'previous',
-                                variant: 'tertiary',
-                                className: swiperStyles.left,
-                            },
-                            next: {
-                                icon: ChevronRight,
-                                ariaLabel: 'next',
-                                variant: 'tertiary',
-                                className: swiperStyles.right,
-                            },
-                        }}
+                        navigationButtons={SWIPER_NAVIGATION_CONFIG}
                     />
                 </div>
             </Modal.Content>

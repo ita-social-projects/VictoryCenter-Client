@@ -74,4 +74,15 @@
             }
         }
     }
+
+    &-buttons {
+        &.top-add-new {
+            margin-bottom: -0.5rem;
+            .btn-add,
+            .btn-add-new {
+                width: 100%;
+                margin-bottom: 0;
+            }
+        }
+    }
 }

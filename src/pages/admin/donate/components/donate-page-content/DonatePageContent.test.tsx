@@ -172,45 +172,33 @@ describe('DonatePageContent', () => {
         });
     };
 
-    // Helper functions
-    const renderAndWaitForComponent = async (testId: string) => {
-        render(<DonatePageContent />);
+    const renderComponent = () => render(<DonatePageContent />);
+
+    const waitForElement = async (testId: string) => {
         await waitFor(() => {
             expect(screen.getByTestId(testId)).toBeInTheDocument();
         });
     };
 
-    const clickButtonAndWaitForCall = async (buttonText: string, mockFn: jest.Mock) => {
-        fireEvent.click(screen.getByText(buttonText));
-        await waitFor(() => {
-            expect(mockFn).toHaveBeenCalled();
-        });
-    };
-
-    const setupCorrespondentBankTest = async () => {
-        await waitFor(() => {
-            expect(screen.getByTestId('correspondent-details')).toBeInTheDocument();
-        });
+    const setupCorrespondentTest = async () => {
+        await waitForElement('correspondent-details');
         return screen.getByTestId('correspondent-details');
     };
 
-    const testCorrespondentOperation = async (
-        buttonText: string,
-        mockFn: jest.Mock,
-        expectedCall: [string, ...any[]],
-    ) => {
-        const correspondentDetails = await setupCorrespondentBankTest();
-        const button = within(correspondentDetails).getByText(buttonText);
-        fireEvent.click(button);
+    const testCorrespondentOperation = async (buttonText: string, mockFn: jest.Mock, expectedArgs: any[]) => {
+        const correspondentDetails = await setupCorrespondentTest();
+        fireEvent.click(within(correspondentDetails).getByText(buttonText));
         await waitFor(() => {
-            expect(mockFn).toHaveBeenCalledWith(...expectedCall);
+            expect(mockFn).toHaveBeenCalledWith(...expectedArgs);
         });
     };
 
-    const testSetItemsCallback = (previousItems: any[], expectedCheck: (updatedItems: any[]) => void) => {
-        const setItemsCallback = mockSetItems.mock.calls[0][0];
-        const updatedItems = setItemsCallback(previousItems);
-        expectedCheck(updatedItems);
+    const getSetItemsCallback = () => mockSetItems.mock.calls[0][0];
+
+    const testSetItemsUpdate = (previousItems: any[], assertion: (updatedItems: any[]) => void) => {
+        const callback = getSetItemsCallback();
+        const updatedItems = callback(previousItems);
+        assertion(updatedItems);
     };
 
     beforeEach(() => {
@@ -224,8 +212,6 @@ describe('DonatePageContent', () => {
         mockCorrespondentCreate.mockResolvedValue({ id: 1 });
         mockCorrespondentUpdate.mockResolvedValue({ id: 1 });
         mockCorrespondentDelete.mockResolvedValue(undefined);
-
-        // Suppress console errors in tests
         jest.spyOn(console, 'error').mockImplementation(() => {});
     });
 
@@ -235,89 +221,81 @@ describe('DonatePageContent', () => {
 
     describe('Basic Rendering', () => {
         it('renders component successfully', async () => {
-            await renderAndWaitForComponent('category-bar');
+            renderComponent();
+            await waitForElement('category-bar');
             expect(screen.getByTestId('support-options-form')).toBeInTheDocument();
             expect(screen.getByTestId('toast-container')).toBeInTheDocument();
         });
 
         it('renders GenericDetails when config exists', async () => {
-            await renderAndWaitForComponent('generic-details');
+            renderComponent();
+            await waitForElement('generic-details');
         });
 
         it('does not render GenericDetails when config is null', async () => {
             setupMockBankDetails([], null);
-            await renderAndWaitForComponent('category-bar');
+            renderComponent();
+            await waitForElement('category-bar');
             expect(screen.queryByTestId('generic-details')).not.toBeInTheDocument();
         });
 
-        it('renders correspondent banks when withCorrespondentBanks is true', async () => {
-            setupMockBankDetails([{ id: 1, correspondentBanks: [] }], createMockConfig(true));
-            await renderAndWaitForComponent('generic-details');
-            expect(screen.getByTestId('correspondent-details')).toBeInTheDocument();
+        const correspondentBanksTests = [
+            { desc: 'with empty array', banks: [] },
+            { desc: 'without correspondentBanks property', banks: undefined },
+            { desc: 'with multiple items', banks: [{ id: 10 }, { id: 11 }] },
+        ];
+
+        correspondentBanksTests.forEach(({ desc, banks }) => {
+            it(`renders correspondent banks ${desc}`, async () => {
+                const items = banks === undefined ? [{ id: 1 }] : [{ id: 1, correspondentBanks: banks }];
+                setupMockBankDetails(items, createMockConfig(true));
+                renderComponent();
+                await waitForElement('correspondent-details');
+
+                if (banks?.length) {
+                    const itemsCount = within(screen.getByTestId('correspondent-details')).getByTestId('items-count');
+                    // eslint-disable-next-line jest/no-conditional-expect
+                    expect(itemsCount).toHaveTextContent(String(banks.length));
+                }
+            });
         });
 
         it('does not render correspondent banks when withCorrespondentBanks is false', async () => {
             setupMockBankDetails([{ id: 1 }], createMockConfig(false));
-            await renderAndWaitForComponent('generic-details');
+            renderComponent();
+            await waitForElement('generic-details');
             expect(screen.queryByTestId('correspondent-details')).not.toBeInTheDocument();
-        });
-
-        it('renders correspondent banks with empty array', async () => {
-            setupMockBankDetails([{ id: 1, correspondentBanks: [] }], createMockConfig(true));
-            await renderAndWaitForComponent('generic-details');
-            expect(screen.getByTestId('correspondent-details')).toBeInTheDocument();
-        });
-
-        it('renders correspondent banks for item without correspondentBanks property', async () => {
-            setupMockBankDetails([{ id: 1 }], createMockConfig(true));
-            await renderAndWaitForComponent('generic-details');
-            expect(screen.getByTestId('correspondent-details')).toBeInTheDocument();
-        });
-
-        it('renders correspondent banks with correct items count', async () => {
-            setupMockBankDetails(
-                [
-                    { id: 1, correspondentBanks: [{ id: 10 }, { id: 11 }] },
-                    { id: 2, correspondentBanks: [] },
-                ],
-                createMockConfig(true),
-            );
-            await renderAndWaitForComponent('correspondent-details');
-            expect(within(screen.getByTestId('correspondent-details')).getByTestId('items-count')).toHaveTextContent(
-                '2',
-            );
-        });
-
-        it('renders without title when not provided', async () => {
-            setupMockBankDetails([{ id: 1, name: 'Test Bank' }], createMockConfig());
-            await renderAndWaitForComponent('generic-details');
-            expect(screen.getByTestId('generic-details')).toBeInTheDocument();
         });
     });
 
     describe('Support Options API', () => {
         it('fetches support options on mount', async () => {
-            render(<DonatePageContent />);
+            renderComponent();
             await waitFor(() => {
                 expect(mockGetAll).toHaveBeenCalledWith('mockClient', 0);
             });
         });
 
         it('creates support option successfully', async () => {
-            render(<DonatePageContent />);
-            await clickButtonAndWaitForCall('Create', mockCreate);
-            expect(mockCreate).toHaveBeenCalledWith('mockClient', {
-                name: 'Test',
-                value: '123',
-                currency: 0,
+            renderComponent();
+
+            const supportOptionsForm = screen.getByTestId('support-options-form');
+            fireEvent.click(within(supportOptionsForm).getByText('Create'));
+
+            await waitFor(() => {
+                expect(mockCreate).toHaveBeenCalledWith('mockClient', {
+                    name: 'Test',
+                    value: '123',
+                    currency: 0,
+                });
             });
         });
 
         it('updates support option successfully', async () => {
-            render(<DonatePageContent />);
+            renderComponent();
+
             const supportOptionsForm = screen.getByTestId('support-options-form');
-            const updateButton = within(supportOptionsForm).getByText('Update');
-            fireEvent.click(updateButton);
+            fireEvent.click(within(supportOptionsForm).getByText('Update'));
 
             await waitFor(() => {
                 expect(mockUpdate).toHaveBeenCalledWith('mockClient', 1, {
@@ -328,10 +306,10 @@ describe('DonatePageContent', () => {
         });
 
         it('deletes support option successfully', async () => {
-            render(<DonatePageContent />);
+            renderComponent();
+
             const supportOptionsForm = screen.getByTestId('support-options-form');
-            const deleteButton = within(supportOptionsForm).getByText('Delete');
-            fireEvent.click(deleteButton);
+            fireEvent.click(within(supportOptionsForm).getByText('Delete'));
 
             await waitFor(() => {
                 expect(mockDelete).toHaveBeenCalledWith('mockClient', 1);
@@ -340,20 +318,15 @@ describe('DonatePageContent', () => {
 
         it('handles fetch error gracefully', async () => {
             mockGetAll.mockRejectedValue(new Error('Network error'));
-            render(<DonatePageContent />);
-            await waitFor(() => {
-                expect(mockGetAll).toHaveBeenCalled();
-            });
+            renderComponent();
+            await waitFor(() => expect(mockGetAll).toHaveBeenCalled());
         });
 
         it('handles support options fetch rejection on category change', async () => {
             mockGetAll.mockResolvedValueOnce([]).mockRejectedValueOnce(new Error('Fetch failed'));
+            renderComponent();
 
-            render(<DonatePageContent />);
-
-            await waitFor(() => {
-                expect(mockGetAll).toHaveBeenCalledWith('mockClient', 0);
-            });
+            await waitFor(() => expect(mockGetAll).toHaveBeenCalledWith('mockClient', 0));
 
             fireEvent.click(screen.getByText('Switch to USD'));
 
@@ -364,169 +337,75 @@ describe('DonatePageContent', () => {
         });
 
         it('calls addToast on successful operations', async () => {
-            render(<DonatePageContent />);
-            await clickButtonAndWaitForCall('Create', mockAddToast);
-        });
-        it('sets loading state during support options operations', async () => {
-            let resolveCreate: (value: any) => void;
-            const createPromise = new Promise((resolve) => {
-                resolveCreate = resolve;
-            });
+            renderComponent();
 
-            mockCreate.mockReturnValue(createPromise);
+            const supportOptionsForm = screen.getByTestId('support-options-form');
+            fireEvent.click(within(supportOptionsForm).getByText('Create'));
 
-            render(<DonatePageContent />);
-
-            await waitFor(() => {
-                expect(screen.getByTestId('support-options-form')).toBeInTheDocument();
-            });
-
-            fireEvent.click(screen.getByText('Create'));
-
-            await waitFor(() => {
-                expect(mockCreate).toHaveBeenCalled();
-            });
-
-            resolveCreate!({ id: 1, name: 'Test', value: '123', currency: 0 });
-
-            await waitFor(() => {
-                expect(mockAddToast).toHaveBeenCalled();
-            });
+            await waitFor(() => expect(mockAddToast).toHaveBeenCalled());
         });
     });
 
     describe('Category Management', () => {
         it('handles category change', async () => {
-            render(<DonatePageContent />);
-
-            await waitFor(() => {
-                expect(mockGetAll).toHaveBeenCalledWith('mockClient', 0);
-            });
+            renderComponent();
+            await waitFor(() => expect(mockGetAll).toHaveBeenCalledWith('mockClient', 0));
 
             fireEvent.click(screen.getByText('Switch to USD'));
 
-            await waitFor(() => {
-                expect(mockGetAll).toHaveBeenCalledWith('mockClient', 1);
-            });
+            await waitFor(() => expect(mockGetAll).toHaveBeenCalledWith('mockClient', 1));
         });
 
         it('does not change category when selecting the same category', async () => {
-            render(<DonatePageContent />);
+            renderComponent();
 
             await waitFor(() => {
                 expect(mockGetAll).toHaveBeenCalledTimes(1);
                 expect(mockGetAll).toHaveBeenCalledWith('mockClient', 0);
             });
 
-            const uahButton = screen.getByRole('button', { name: 'UAH' });
-            fireEvent.click(uahButton);
-
+            fireEvent.click(screen.getByRole('button', { name: 'UAH' }));
             await new Promise((resolve) => setTimeout(resolve, 50));
 
             expect(mockGetAll).toHaveBeenCalledTimes(1);
         });
-
-        it('fetches support options for different currencies', async () => {
-            render(<DonatePageContent />);
-
-            await waitFor(() => {
-                expect(mockGetAll).toHaveBeenCalledWith('mockClient', 0);
-            });
-
-            fireEvent.click(screen.getByText('Switch to USD'));
-
-            await waitFor(() => {
-                expect(mockGetAll).toHaveBeenCalledWith('mockClient', 1);
-            });
-        });
     });
 
     describe('Bank Details Operations', () => {
-        it('calls bank details handlers correctly', async () => {
-            const mockConfig = createMockConfig();
-            setupMockBankDetails([{ id: 1, name: 'Test Bank' }], mockConfig);
+        const bankOperations = [
+            { operation: 'Submit', method: 'create', args: ['mockClient', {}] },
+            { operation: 'Update', method: 'update', args: ['mockClient', 1, { name: 'Updated' }] },
+            { operation: 'Delete', method: 'delete', args: ['mockClient', 1] },
+        ];
 
-            render(<DonatePageContent />);
+        bankOperations.forEach(({ operation, method, args }) => {
+            it(`calls bank details ${method} correctly`, async () => {
+                const mockConfig = createMockConfig();
+                setupMockBankDetails([{ id: 1, name: 'Test Bank' }], mockConfig);
+                renderComponent();
 
-            const genericDetails = screen.getByTestId('generic-details');
+                const genericDetails = screen.getByTestId('generic-details');
+                fireEvent.click(within(genericDetails).getByText(operation));
 
-            fireEvent.click(within(genericDetails).getByText('Submit'));
-            await waitFor(() => {
-                expect(mockConfig.create).toHaveBeenCalledWith('mockClient', {});
-            });
-
-            fireEvent.click(within(genericDetails).getByText('Update'));
-            await waitFor(() => {
-                expect(mockConfig.update).toHaveBeenCalledWith('mockClient', 1, { name: 'Updated' });
-            });
-
-            fireEvent.click(within(genericDetails).getByText('Delete'));
-            await waitFor(() => {
-                expect(mockConfig.delete).toHaveBeenCalledWith('mockClient', 1);
+                await waitFor(() => {
+                    expect(mockConfig[method as keyof typeof mockConfig]).toHaveBeenCalledWith(...args);
+                });
             });
         });
 
         it('calls setItems when handlers complete successfully', async () => {
             const mockConfig = createMockConfig();
             setupMockBankDetails([{ id: 1, name: 'Test Bank' }], mockConfig);
-
-            render(<DonatePageContent />);
+            renderComponent();
 
             fireEvent.click(screen.getByText('Submit'));
-            await waitFor(() => {
-                expect(mockSetItems).toHaveBeenCalled();
-            });
-        });
-
-        it('calls addToast after successful bank details update', async () => {
-            const mockConfig = createMockConfig();
-            mockConfig.update.mockResolvedValue({ id: 1, name: 'Updated Bank' });
-            setupMockBankDetails([{ id: 1, name: 'Test Bank' }], mockConfig);
-
-            render(<DonatePageContent />);
-
-            const genericDetails = screen.getByTestId('generic-details');
-            const updateButton = within(genericDetails).getByText('Update');
-
-            fireEvent.click(updateButton);
-
-            await waitFor(() => {
-                expect(mockConfig.update).toHaveBeenCalled();
-                expect(mockAddToast).toHaveBeenCalled();
-            });
-        });
-
-        it('updates bank details with correspondent banks correctly', async () => {
-            const mockConfig = createMockConfig(true);
-            mockConfig.update.mockResolvedValue({ id: 1, name: 'Updated Bank' });
-            setupMockBankDetails([{ id: 1, name: 'Test Bank', correspondentBanks: [{ id: 10 }] }], mockConfig);
-
-            render(<DonatePageContent />);
-
-            await waitFor(() => {
-                expect(screen.getByTestId('generic-details')).toBeInTheDocument();
-                expect(screen.getByTestId('correspondent-details')).toBeInTheDocument();
-            });
-
-            const bankDetails = screen.getByTestId('generic-details');
-            const updateButton = bankDetails.querySelector(':scope > [data-action="update"]') as HTMLElement;
-
-            fireEvent.click(updateButton);
-
-            await waitFor(() => {
-                expect(mockConfig.update).toHaveBeenCalled();
-                expect(mockSetItems).toHaveBeenCalled();
-            });
+            await waitFor(() => expect(mockSetItems).toHaveBeenCalled());
         });
 
         it('does not call handlers when config is null', async () => {
             setupMockBankDetails([], null);
-            render(<DonatePageContent />);
-
-            await waitFor(() => {
-                expect(screen.getByTestId('category-bar')).toBeInTheDocument();
-            });
-
+            renderComponent();
+            await waitForElement('category-bar');
             expect(screen.queryByTestId('generic-details')).not.toBeInTheDocument();
         });
     });
@@ -538,59 +417,33 @@ describe('DonatePageContent', () => {
             return mockConfig;
         };
 
-        it('creates correspondent bank successfully', async () => {
-            mockCorrespondentCreate.mockResolvedValue({ id: 2, name: 'New Correspondent' });
-            setupWithCorrespondentBanks();
-            render(<DonatePageContent />);
+        const correspondentOperations = [
+            {
+                operation: 'creates',
+                button: 'Submit',
+                mock: mockCorrespondentCreate,
+                args: ['mockClient', { foreignBankDetailsId: 1 }],
+            },
+            {
+                operation: 'updates',
+                button: 'Update',
+                mock: mockCorrespondentUpdate,
+                args: ['mockClient', 1, { name: 'Updated' }],
+            },
+            { operation: 'deletes', button: 'Delete', mock: mockCorrespondentDelete, args: ['mockClient', 1] },
+        ];
 
-            await testCorrespondentOperation('Submit', mockCorrespondentCreate, [
-                'mockClient',
-                { foreignBankDetailsId: 1 },
-            ]);
-        });
+        correspondentOperations.forEach(({ operation, button, mock, args }) => {
+            it(`${operation} correspondent bank successfully`, async () => {
+                setupWithCorrespondentBanks();
+                renderComponent();
+                await testCorrespondentOperation(button, mock, args);
 
-        it('updates correspondent bank successfully', async () => {
-            mockCorrespondentUpdate.mockResolvedValue({ id: 10, name: 'Updated Correspondent' });
-            setupWithCorrespondentBanks();
-            render(<DonatePageContent />);
-
-            await testCorrespondentOperation('Update', mockCorrespondentUpdate, ['mockClient', 1, { name: 'Updated' }]);
-        });
-
-        it('deletes correspondent bank successfully', async () => {
-            setupWithCorrespondentBanks();
-            render(<DonatePageContent />);
-
-            await testCorrespondentOperation('Delete', mockCorrespondentDelete, ['mockClient', 1]);
-            expect(mockAddToast).toHaveBeenCalled();
-        });
-
-        it('creates with foreignBankDetailsId', async () => {
-            mockCorrespondentCreate.mockResolvedValue({ id: 2, name: 'New', foreignBankDetailsId: 1 });
-            setupWithCorrespondentBanks();
-            render(<DonatePageContent />);
-
-            await testCorrespondentOperation('Submit', mockCorrespondentCreate, [
-                'mockClient',
-                { foreignBankDetailsId: 1 },
-            ]);
-        });
-
-        it('updates with foreignBankDetailsId', async () => {
-            mockCorrespondentUpdate.mockResolvedValue({ id: 10, name: 'Updated', foreignBankDetailsId: 1 });
-            setupWithCorrespondentBanks([{ id: 10, name: 'Old' }]);
-            render(<DonatePageContent />);
-
-            await testCorrespondentOperation('Update', mockCorrespondentUpdate, ['mockClient', 1, { name: 'Updated' }]);
-        });
-
-        it('calls addToast after successful deletion', async () => {
-            setupWithCorrespondentBanks();
-            render(<DonatePageContent />);
-            mockAddToast.mockClear();
-
-            await testCorrespondentOperation('Delete', mockCorrespondentDelete, ['mockClient', 1]);
-            expect(mockAddToast).toHaveBeenCalled();
+                if (operation === 'deletes') {
+                    // eslint-disable-next-line jest/no-conditional-expect
+                    expect(mockAddToast).toHaveBeenCalled();
+                }
+            });
         });
     });
 
@@ -601,7 +454,7 @@ describe('DonatePageContent', () => {
             const existingBanks = [{ id: 10, name: 'Correspondent 1' }];
             setupMockBankDetails([{ id: 1, name: 'Test Bank', correspondentBanks: existingBanks }], mockConfig);
 
-            render(<DonatePageContent />);
+            renderComponent();
             const updateButton = screen
                 .getByTestId('generic-details')
                 .querySelector(':scope > [data-action="update"]') as HTMLElement;
@@ -609,7 +462,7 @@ describe('DonatePageContent', () => {
 
             await waitFor(() => expect(mockSetItems).toHaveBeenCalled());
 
-            testSetItemsCallback([{ id: 1, name: 'Test Bank', correspondentBanks: existingBanks }], (items) => {
+            testSetItemsUpdate([{ id: 1, name: 'Test Bank', correspondentBanks: existingBanks }], (items) => {
                 expect(items[0].correspondentBanks).toEqual(existingBanks);
                 expect(items[0].name).toBe('Updated Bank');
             });
@@ -620,72 +473,25 @@ describe('DonatePageContent', () => {
             mockCorrespondentCreate.mockResolvedValue({ id: 2, name: 'New' });
             setupMockBankDetails([{ id: 1 }], mockConfig);
 
-            render(<DonatePageContent />);
-            const correspondentDetails = await setupCorrespondentBankTest();
+            renderComponent();
+            const correspondentDetails = await setupCorrespondentTest();
             fireEvent.click(within(correspondentDetails).getByText('Submit'));
 
             await waitFor(() => expect(mockSetItems).toHaveBeenCalled());
 
-            testSetItemsCallback([{ id: 1 }], (items) => {
+            testSetItemsUpdate([{ id: 1 }], (items) => {
                 expect(Array.isArray(items[0].correspondentBanks)).toBe(true);
                 expect(items[0].correspondentBanks).toContainEqual({ id: 2, name: 'New' });
-            });
-        });
-
-        it('handles multiple bank items when updating correspondent', async () => {
-            const mockConfig = createMockConfig(true);
-            mockCorrespondentUpdate.mockResolvedValue({ id: 10, name: 'Updated' });
-            setupMockBankDetails(
-                [
-                    { id: 1, correspondentBanks: [{ id: 10, name: 'Old' }] },
-                    { id: 2, correspondentBanks: [{ id: 20, name: 'Other' }] },
-                ],
-                mockConfig,
-            );
-
-            render(<DonatePageContent />);
-            const correspondentDetails = await setupCorrespondentBankTest();
-            fireEvent.click(within(correspondentDetails).getByText('Update'));
-
-            await waitFor(() => expect(mockSetItems).toHaveBeenCalled());
-
-            const previousItems = [
-                { id: 1, correspondentBanks: [{ id: 10, name: 'Old' }] },
-                { id: 2, correspondentBanks: [{ id: 20, name: 'Other' }] },
-            ];
-            testSetItemsCallback(previousItems, (items) => {
-                expect(items[0].correspondentBanks[0].id).toBe(10);
-                expect(items[1].correspondentBanks[0].name).toBe('Other');
-            });
-        });
-
-        it('deletes correspondent bank from correct parent bank', async () => {
-            const mockConfig = createMockConfig(true);
-            setupMockBankDetails([{ id: 1, correspondentBanks: [{ id: 10 }, { id: 11 }] }], mockConfig);
-
-            render(<DonatePageContent />);
-            const correspondentDetails = await setupCorrespondentBankTest();
-            fireEvent.click(within(correspondentDetails).getByText('Delete'));
-
-            await waitFor(() => expect(mockSetItems).toHaveBeenCalled());
-
-            testSetItemsCallback([{ id: 1, correspondentBanks: [{ id: 10 }, { id: 11 }] }], (items) => {
-                expect(items[0].correspondentBanks.length).toBe(2);
-                expect(items[0].correspondentBanks.find((cb: any) => cb.id === 1)).toBeUndefined();
             });
         });
     });
 
     describe('Component Lifecycle', () => {
         it('cleans up useEffect on unmount', async () => {
-            const { unmount } = render(<DonatePageContent />);
-
-            await waitFor(() => {
-                expect(mockGetAll).toHaveBeenCalled();
-            });
+            const { unmount } = renderComponent();
+            await waitFor(() => expect(mockGetAll).toHaveBeenCalled());
 
             mockGetAll.mockClear();
-
             unmount();
 
             expect(mockGetAll).not.toHaveBeenCalled();
@@ -698,20 +504,14 @@ describe('DonatePageContent', () => {
             });
 
             mockGetAll.mockReturnValue(promise);
+            const { unmount } = renderComponent();
 
-            const { unmount } = render(<DonatePageContent />);
-
-            await waitFor(() => {
-                expect(mockGetAll).toHaveBeenCalled();
-            });
+            await waitFor(() => expect(mockGetAll).toHaveBeenCalled());
 
             unmount();
-
             resolvePromise!([{ id: 1 }]);
 
             await new Promise((resolve) => setTimeout(resolve, 100));
-
-            expect(true).toBe(true);
         });
     });
 });

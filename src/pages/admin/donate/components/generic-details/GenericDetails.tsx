@@ -216,7 +216,9 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
                     {!isChildForm && !showNotFound && (
                         <div className="generic-details-footer">
                             <Button
-                                className={`generic-details btn-add-new ${isAddFormVisible || editingItemId !== null ? 'disabled' : ''}`}
+                                className={cn('generic-details btn-add-new', {
+                                    disabled: isAddFormVisible || editingItemId !== null,
+                                })}
                                 onClick={handleAdd}
                                 buttonStyle="primary"
                                 disabled={

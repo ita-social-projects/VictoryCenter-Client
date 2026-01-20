@@ -7,7 +7,7 @@
 }
 
 .top-section {
-    flex: 0 0 60%;
+    flex: 0 0 56%;
     display: flex;
     align-items: center;
 }
@@ -25,8 +25,8 @@
 }
 
 .bottom-section {
-    flex: 0 0 20%;
-    padding-top: 1vw;
+    flex: 0 0 44%;
+    padding-top: 2vw;
 
     &.template {
         padding: 1% 10%;
@@ -38,13 +38,12 @@
 }
 
 .description-template {
-    @include type.body-1-regular;
-    font-size: clamp(3px, 0.9vw, 1.3vmin);
-    line-height: clamp(3px, 0.9vw, 1.6vmin);
+    font-size: clamp(3px, 0.9vw, 1.5vmin);
+    line-height: clamp(3px, 0.9vw, 1.4vmin);
 }
 
 .title-template {
-    font-size: clamp(3px, 1.5vw, 2.5vmin);
+    font-size: clamp(3px, 1.7vw, 3vmin);
     line-height: clamp(3px, 0.9vw, 2vmin);
 }
 

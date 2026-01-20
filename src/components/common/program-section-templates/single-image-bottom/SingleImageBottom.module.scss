@@ -7,11 +7,11 @@
 }
 
 .top-section {
-    flex: 0 0 40%;
+    flex: 0 0 44%;
 }
 
 .bottom-section {
-    flex: 0 0 60%;
+    flex: 0 0 56%;
     display: flex;
 }
 
@@ -25,6 +25,16 @@
     height: auto;
     object-fit: cover;
     aspect-ratio: 1330 / 680;
+}
+
+.description-template {
+    font-size: clamp(3px, 0.9vw, 1.4vmin);
+    line-height: clamp(3px, 0.9vw, 1.3vmin);
+}
+
+.title-template {
+    font-size: clamp(3px, 1.7vw, 3vmin);
+    line-height: clamp(3px, 0.9vw, 2vmin);
 }
 
 .container.editable {

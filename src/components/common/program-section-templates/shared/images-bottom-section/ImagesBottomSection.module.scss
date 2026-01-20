@@ -19,6 +19,16 @@
     justify-content: center;
 }
 
+.description-template {
+    font-size: clamp(3px, 0.9vw, 1.5vmin);
+    line-height: clamp(3px, 0.9vw, 1.5vmin);
+}
+
+.title-template {
+    font-size: clamp(3px, 1.7vw, 3vmin);
+    line-height: clamp(3px, 0.9vw, 2vmin);
+}
+
 .image-wrapper {
     height: 75%;
     &[data-elevated='true'] {

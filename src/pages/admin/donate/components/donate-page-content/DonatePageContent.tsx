@@ -264,15 +264,42 @@ export const DonatePageContent = () => {
         },
         [client, setItems, addToast],
     );
+    const handleLocalSubmit = useCallback(
+        (formState: any, setFormState: any, data: CorrespondentBankDetailsDto) => {
+            const updatedBanks = [...(formState.correspondentBanks || []), data];
+
+            setFormState({
+                ...formState,
+                correspondentBanks: updatedBanks,
+            });
+
+            addToast(DONATE_TEXT.MESSAGE.CORRESPONDENT_BANKS.ADD, ToastType.Info);
+        },
+        [addToast],
+    );
+
+    const handleLocalUpdate = useCallback(() => {
+        addToast(DONATE_TEXT.MESSAGE.CORRESPONDENT_BANKS.UPDATE, ToastType.Info);
+    }, [addToast]);
+
+    const handleLocalDelete = useCallback(
+        (formState: any, setFormState: any, index: number): void => {
+            const updatedBanks = [...(formState.correspondentBanks || [])];
+            updatedBanks.splice(index, 1);
+            setFormState({ ...formState, correspondentBanks: updatedBanks });
+            addToast(DONATE_TEXT.MESSAGE.CORRESPONDENT_BANKS.DELETED, ToastType.Info);
+        },
+        [addToast],
+    );
 
     const renderCorrespondentBanks = useCallback(
-        ({ formState, isItemsExpanded }: any) => {
+        ({ formState, isItemsExpanded, setFormState }: any) => {
             const parentId = formState.id;
             const isParentCreating = !parentId;
-
+            const localBanks = formState.correspondentBanks || [];
             const existingItem = items.find((i) => i.id === parentId);
             const banksToShow = isParentCreating
-                ? []
+                ? localBanks
                 : (existingItem?.correspondentBanks ?? []).toSorted(
                       (a: CorrespondentBankDetailsDto, b: CorrespondentBankDetailsDto) => b.id - a.id,
                   );
@@ -295,6 +322,9 @@ export const DonatePageContent = () => {
                     onDelete={(id) => handleDeleteCorrespondentBank(parentId, id)}
                     onEditingStateChange={setIsChildEditing}
                     onAddFormVisibilityChange={setIsCorrespondentBankFormVisible}
+                    onLocalSubmit={(data) => handleLocalSubmit(formState, setFormState, data)}
+                    onLocalUpdate={handleLocalUpdate}
+                    onLocalDelete={(index) => handleLocalDelete(formState, setFormState, index)}
                 />
             );
         },
@@ -306,6 +336,9 @@ export const DonatePageContent = () => {
             handleUpdateCorrespondentBank,
             handleDeleteCorrespondentBank,
             setIsChildEditing,
+            handleLocalSubmit,
+            handleLocalUpdate,
+            handleLocalDelete,
         ],
     );
 

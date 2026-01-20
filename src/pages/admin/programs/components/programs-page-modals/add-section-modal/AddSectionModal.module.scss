@@ -40,21 +40,20 @@
     }
 }
 
-.modal-container{
-    .modal-header{
+.modal-container {
+    .modal-header {
         margin-bottom: 0;
     }
 
-    .modal-body{
+    .modal-body {
         height: 10vh;
     }
 
-    [class~='modal-header']{
+    [class~='modal-header'] {
         margin-bottom: 0;
     }
 
-    [class~='modal-body']{
+    [class~='modal-body'] {
         height: 75vh;
     }
-
 }

@@ -17,20 +17,13 @@ $img-number: 3;
     padding-bottom: 1rem;
 }
 
-.images-grid {
-    display: flex;
-}
-
 .image {
     aspect-ratio: 730 / 430;
 }
 
-.container.editable {
-    gap: 2rem;
-
-    .image-wrapper {
-        aspect-ratio: #{$img-width} / #{$img-height};
-        max-width: #{$img-width};
-        max-height: #{$img-height};
-    }
+.image-wrapper {
+    aspect-ratio: #{$img-width} / #{$img-height};
+    max-width: #{$img-width};
+    max-height: #{$img-height};
 }
+

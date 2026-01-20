@@ -16,28 +16,15 @@ $img-number: 3;
     padding-bottom: 1rem;
 }
 
-.images-grid {
-    display: flex;
+.image-wrapper {
+    max-width: #{$img-width};
+    max-height: #{$img-height};
 }
 
 .image {
     aspect-ratio: #{$img-width} / #{$img-height};
 }
 
-.container.editable {
+.editable {
     gap: 2rem;
-
-    .top-section {
-        height: 10px;
-    }
-
-    .images-grid {
-        width: 100%;
-    }
-
-    .image-wrapper {
-        height: 100%;
-        max-width: #{$img-width};
-        max-height: #{$img-height};
-    }
 }

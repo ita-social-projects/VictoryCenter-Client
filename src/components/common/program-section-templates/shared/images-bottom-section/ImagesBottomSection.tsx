@@ -6,18 +6,7 @@ import { PhotoInputGroup } from '@/components/admin/input-groups/photo-input-gro
 import { ImageValues } from '@/types/common/image';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import baseStyles from './ImagesBottomSection.module.scss';
-import quadStyles from '../../quad-images-bottom/QuadImagesBottom.module.scss';
-import tripleStyles from '../../triple-images-bottom/TripleImagesBottom.module.scss';
-import dualStyles from '../../dual-images-bottom/DualImagesBottom.module.scss';
 import { PROGRAM_VALIDATION } from '@/const/admin/programs';
-
-const stylesMap = {
-    quad: quadStyles,
-    triple: tripleStyles,
-    dual: dualStyles,
-} as const;
-
-export type ImageVariant = keyof typeof stylesMap;
 
 export interface ImageConfig {
     cropWidth: number;
@@ -38,7 +27,6 @@ export interface ImagesBottomSectionConfig {
 }
 
 export interface ImagesBottomSectionProps {
-    variant: ImageVariant;
     title?: string;
     description?: string;
     images: string[];
@@ -49,10 +37,12 @@ export interface ImagesBottomSectionProps {
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
     className?: string;
+    topSectionClassName?: string;
+    bottomSectionClassName?: string;
+    imageWrapperClassName?: string;
 }
 
 export const ImagesBottomSection = ({
-    variant,
     title = '',
     description = '',
     images,
@@ -63,9 +53,10 @@ export const ImagesBottomSection = ({
     onTitleChange,
     onDescriptionChange,
     className = '',
+    topSectionClassName = '',
+    bottomSectionClassName = '',
+    imageWrapperClassName = '',
 }: ImagesBottomSectionProps) => {
-    const variantStyles = stylesMap[variant];
-
     const effectiveImages = useMemo(() => images.slice(0, config.imageCount), [images, config.imageCount]);
     const effectiveImageHandlers = useMemo(
         () => imageHandlers.slice(0, config.imageCount),
@@ -77,16 +68,12 @@ export const ImagesBottomSection = ({
         [effectiveImages.length],
     );
 
-    const cx = (name: string) =>
-        cn(baseStyles[name as keyof typeof baseStyles], variantStyles[name as keyof typeof variantStyles]);
-
     return (
         <div
             className={cn(
-                cx('container'),
+                baseStyles.container,
                 {
-                    [baseStyles.template]: isTemplate,
-                    [cx('editable')]: isEditable,
+                    [baseStyles.editable]: isEditable,
                 },
                 className,
             )}
@@ -94,7 +81,7 @@ export const ImagesBottomSection = ({
             <TitleDescriptionSection
                 title={title}
                 description={description}
-                className={cx('top-section')}
+                className={cn(baseStyles['top-section'], topSectionClassName)}
                 titleClassName={isTemplate ? baseStyles['title-template'] : ''}
                 descriptionClassName={isTemplate ? baseStyles['description-template'] : ''}
                 isEditable={isEditable}
@@ -102,13 +89,13 @@ export const ImagesBottomSection = ({
                 onTitleChange={onTitleChange}
                 onDescriptionChange={onDescriptionChange}
             />
-            <div className={cx('bottom-section')}>
-                <div className={cx('images-grid')}>
+            <div className={cn(baseStyles['bottom-section'], bottomSectionClassName)}>
+                <div className={baseStyles['images-grid']}>
                     {isEditable
                         ? effectiveImageHandlers.map(({ handler, key, value }, index) => (
                               <div
                                   key={key}
-                                  className={cx('image-wrapper')}
+                                  className={cn(baseStyles['image-wrapper'], imageWrapperClassName)}
                                   data-elevated={config.elevatedIndices.includes(index) ? 'true' : undefined}
                                   data-testid="image-wrapper"
                               >
@@ -135,11 +122,11 @@ export const ImagesBottomSection = ({
                         : effectiveImages.map((image, index) => (
                               <div
                                   key={imageKeys[index]}
-                                  className={cx('image-wrapper')}
+                                  className={cn(baseStyles['image-wrapper'], imageWrapperClassName)}
                                   data-elevated={config.elevatedIndices.includes(index) ? 'true' : undefined}
                                   data-testid="image-wrapper"
                               >
-                                  <img src={image} alt="" className={cx('image')} />
+                                  <img src={image} alt="" className={baseStyles.image} />
                               </div>
                           ))}
                 </div>

@@ -17,20 +17,8 @@ $img-number: 4;
     padding-bottom: 1rem;
 }
 
-.images-grid {
-    display: flex;
-}
-
 .image-wrapper {
     aspect-ratio: #{$img-width} / #{$img-height};
-}
-
-.container.editable {
-    gap: 2rem;
-
-    .image-wrapper {
-        aspect-ratio: #{$img-width} / #{$img-height};
-        max-width: #{$img-width};
-        max-height: #{$img-height};
-    }
+    max-width: #{$img-width};
+    max-height: #{$img-height};
 }

@@ -82,7 +82,7 @@ export const TitleDescriptionSection = ({
                         onChange={handleDescriptionChange}
                         onBlur={handleDescriptionBlur}
                         maxLength={PROGRAM_SECTION_VALIDATION.description.max}
-                        rows={8}
+                        rows={10}
                         error={descriptionError}
                         currentLength={getTrimmedInputText(description).length}
                     />

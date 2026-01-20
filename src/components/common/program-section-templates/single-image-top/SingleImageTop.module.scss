@@ -3,7 +3,7 @@
 
 .container {
     @extend .section-container;
-    aspect-ratio: 1330 / 1200;
+    aspect-ratio: 1440 / 1200;
 }
 
 .top-section {
@@ -14,14 +14,14 @@
 
 .image-wrapper {
     height: 100%;
-    aspect-ratio: 1330 / 680;
+    aspect-ratio: 1440 / 680;
 }
 
 .image {
     width: 100%;
     height: auto;
     object-fit: contain;
-    aspect-ratio: 1330 / 680;
+    aspect-ratio: 1440 / 680;
 }
 
 .bottom-section {
@@ -58,7 +58,7 @@
 
     .image-wrapper {
         width: 100%;
-        max-width: 1330px;
+        max-width: 1440px;
         max-height: 680px;
 
         [class~='input-group'] {

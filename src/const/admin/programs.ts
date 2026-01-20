@@ -101,15 +101,15 @@ export const PROGRAM_SECTION_IMAGE_CONFIGS = {
         minHeight: 480,
     },
     SINGLE_IMAGE_TOP: {
-        cropWidth: 1330,
+        cropWidth: 1440,
         cropHeight: 680,
-        minWidth: 1330,
+        minWidth: 1440,
         minHeight: 680,
     },
     SINGLE_IMAGE_BOTTOM: {
-        cropWidth: 1330,
+        cropWidth: 1440,
         cropHeight: 680,
-        minWidth: 1330,
+        minWidth: 1440,
         minHeight: 680,
     },
     SINGLE_IMAGE_RIGHT: {

@@ -20,6 +20,7 @@ export const TextAreaWithBulletBehavior = ({
     id,
     onBlur,
     onFocus,
+    onKeyDown,
     ...rest
 }: TextAreaWithBulletBehaviorProps) => {
     const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -64,7 +65,8 @@ export const TextAreaWithBulletBehavior = ({
 
     const handleKeyDown = useCallback(
         (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-            if (e.key !== 'Enter' || e.shiftKey) return;
+            onKeyDown?.(e);
+            if (e.defaultPrevented || e.key !== 'Enter' || e.shiftKey) return;
 
             e.preventDefault();
             const textarea = e.currentTarget;
@@ -87,7 +89,7 @@ export const TextAreaWithBulletBehavior = ({
             notifyChange(newValue);
             pendingCursorPosRef.current = start + newlineWithBullet.length;
         },
-        [maxLength, notifyChange],
+        [maxLength, notifyChange, onKeyDown],
     );
 
     const handleBlur = useCallback(
@@ -112,8 +114,8 @@ export const TextAreaWithBulletBehavior = ({
             onChange={onChange}
             onBlur={handleBlur}
             onFocus={handleFocus}
-            onKeyDown={handleKeyDown}
             {...rest}
+            onKeyDown={handleKeyDown}
             name={name}
             id={id}
             maxLength={maxLength}

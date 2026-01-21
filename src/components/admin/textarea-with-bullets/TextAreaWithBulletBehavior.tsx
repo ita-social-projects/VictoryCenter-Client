@@ -82,7 +82,7 @@ export const TextAreaWithBulletBehavior = ({
 
             if (newValue.length > maxLength) {
                 const available = maxLength - (before.length + after.length);
-                if (available <= newlineWithBullet.length) return;
+                if (available < newlineWithBullet.length) return;
                 newValue = before + newlineWithBullet.slice(0, available) + after;
             }
 

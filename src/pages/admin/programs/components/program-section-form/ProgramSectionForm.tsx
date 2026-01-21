@@ -105,10 +105,13 @@ export const ProgramSectionForm = ({
         [onSectionChange, updateImageContent],
     );
 
-    const isCardTemplate =
-        section.template === ProgramSectionTemplate.DualTitleDescription ||
-        section.template === ProgramSectionTemplate.TripleTitleDescription ||
-        section.template === ProgramSectionTemplate.QuadTitleDescription;
+    const CARD_TEMPLATES = [
+        ProgramSectionTemplate.DualTitleDescription,
+        ProgramSectionTemplate.TripleTitleDescription,
+        ProgramSectionTemplate.QuadTitleDescription,
+    ];
+
+    const isCardTemplate = CARD_TEMPLATES.includes(section.template);
 
     const editableSection = renderProgramSection({
         templateId: section.template,

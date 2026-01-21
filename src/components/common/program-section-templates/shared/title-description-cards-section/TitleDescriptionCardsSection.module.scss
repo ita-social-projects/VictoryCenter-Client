@@ -1,35 +1,37 @@
 @use '@/assets/sass/variables/colors' as colors;
 @use '@/assets/sass/mixins/typography.mixins' as type;
 
-.td-cards {
+.tdCards {
     display: grid;
     gap: 0.4rem;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     margin: 0 auto;
     width: 100%;
+    height: fit-content;
+    align-content: start;
+
+    &.editable {
+        gap: 1rem;
+    }
+
+    &.dual,
+    &.quad {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    &.triple {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
 
-.td-cards.editable {
-    gap: 1rem;
-}
-
-.td-cards.dual,
-.td-cards.quad {
-    grid-template-columns: repeat(2, 1fr);
-}
-
-.td-cards.triple {
-    grid-template-columns: repeat(3, 1fr);
-}
-
-.td-card {
+.tdCard {
     background: colors.$light-blue-50;
     border-radius: 16px;
     padding: 1rem;
-}
 
-.td-card.td-card-editable {
-    padding: 1.3rem;
+    &.tdCardEditable {
+        padding: 1.3rem;
+    }
 }
 
 .title {
@@ -38,8 +40,9 @@
     margin-bottom: 0.5rem;
 }
 
-.title-field {
+.titleField {
     margin-bottom: 1rem;
+
     input {
         @include type.subtitle-2-bold;
         font-size: 1.03rem;
@@ -50,7 +53,7 @@
     }
 }
 
-.description-field {
+.descriptionField {
     textarea {
         @include type.body-1-regular;
         font-size: 1rem;
@@ -66,7 +69,7 @@
     margin-bottom: 0.5rem;
 }
 
-.description-list {
+.descriptionList {
     list-style: none;
     padding-left: 0.3rem;
     margin: 0;

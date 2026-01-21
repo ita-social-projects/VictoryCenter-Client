@@ -24,6 +24,11 @@ jest.mock('@/components/common/program-section-templates/single-image-bottom/Sin
 jest.mock('@/components/common/program-section-templates/single-image-right/SingleImageRight', () => ({
     SingleImageRight: (props: any) => <div data-testid="SingleImageRight" {...props} />,
 }));
+jest.mock('@/components/common/program-section-templates/title-description-cards/TitleDescriptionCardsWrapper', () => ({
+    TitleDescriptionCardsWrapper: (props: any) => (
+        <div data-testid="TitleDescriptionCardsWrapper" data-cards-count={props.cardsCount} />
+    ),
+}));
 
 describe('renderProgramSection', () => {
     const baseData = {
@@ -57,6 +62,45 @@ describe('renderProgramSection', () => {
             };
             render(renderProgramSection(params));
             expect(screen.getByTestId(testId)).toBeInTheDocument();
+        });
+    });
+});
+
+describe('renderProgramSection – TitleDescription templates', () => {
+    const baseData = {
+        cards: [
+            { title: 'T1', description: 'D1' },
+            { title: 'T2', description: 'D2' },
+            { title: 'T3', description: 'D3' },
+            { title: 'T4', description: 'D4' },
+        ],
+    };
+
+    const baseHandlers = {
+        onCardTitleChange: jest.fn(),
+        onCardDescriptionChange: jest.fn(),
+    };
+
+    const cases = [
+        { id: ProgramSectionTemplate.DualTitleDescription, cardsCount: '2' },
+        { id: ProgramSectionTemplate.TripleTitleDescription, cardsCount: '3' },
+        { id: ProgramSectionTemplate.QuadTitleDescription, cardsCount: '4' },
+    ];
+
+    cases.forEach(({ id, cardsCount }) => {
+        it(`renders TitleDescriptionCardsWrapper for ${id}`, () => {
+            render(
+                renderProgramSection({
+                    templateId: id,
+                    data: baseData,
+                    isEditable: true,
+                    handlers: baseHandlers,
+                }),
+            );
+
+            const wrapper = screen.getByTestId('TitleDescriptionCardsWrapper');
+            expect(wrapper).toBeInTheDocument();
+            expect(wrapper).toHaveAttribute('data-cards-count', cardsCount);
         });
     });
 });

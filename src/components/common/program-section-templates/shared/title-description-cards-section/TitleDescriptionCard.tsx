@@ -1,9 +1,11 @@
+import cn from 'classnames';
 import { parseDescriptionList } from '@/utils/functions/formatters/text-formatters';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { CardDescriptionField } from './CardDescriptionField';
 import { PROGRAM_SECTION_VALIDATION, PROGRAMS_TEXT } from '@/const/admin/programs';
 import { useCardValidation } from '@/hooks/admin/use-section-card-validation/useCardValidation';
 import { TitleDescriptionCardData } from './TitleDescriptionCardsSection';
+import styles from './TitleDescriptionCardsSection.module.scss';
 
 interface TitleDescriptionCardProps {
     card: TitleDescriptionCardData;
@@ -48,8 +50,8 @@ export const TitleDescriptionCard = ({
 
     if (isEditable) {
         return (
-            <div className="td-card td-card-editable">
-                <div className="title-field">
+            <div className={cn(styles.tdCard, styles.tdCardEditable)}>
+                <div className={styles.titleField}>
                     <InputWithCharacterLimitGroup
                         label="Заголовок"
                         id={`card-title-${index}`}
@@ -64,7 +66,7 @@ export const TitleDescriptionCard = ({
                     />
                 </div>
 
-                <div className="description-field">
+                <div className={styles.descriptionField}>
                     <CardDescriptionField
                         label="Опис"
                         id={`card-description-${index}`}
@@ -83,13 +85,13 @@ export const TitleDescriptionCard = ({
     }
 
     return (
-        <div className="td-card">
-            <h3 className="title">{card.title || 'Заголовок'}</h3>
-            <div className="description">
-                {intro && <p className="description-intro">{intro}</p>}
+        <div className={styles.tdCard}>
+            <h3 className={styles.title}>{card.title || 'Заголовок'}</h3>
+            <div className={styles.description}>
+                {intro && <p>{intro}</p>}
 
                 {items.length > 0 && (
-                    <ul className="description-list">
+                    <ul className={styles.descriptionList}>
                         {items.map((item, i) => (
                             <li key={i}>{item}</li>
                         ))}

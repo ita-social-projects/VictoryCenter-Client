@@ -1,6 +1,6 @@
 import cn from 'classnames';
 import { TitleDescriptionCard } from './TitleDescriptionCard';
-import './TitleDescriptionCardsSection.scss';
+import styles from './TitleDescriptionCardsSection.module.scss';
 
 export interface TitleDescriptionCardData {
     title: string;
@@ -28,11 +28,11 @@ export const TitleDescriptionCardsSection = ({
 
     return (
         <div
-            className={cn('td-cards', {
-                dual: cardsCount === 2,
-                triple: cardsCount === 3,
-                quad: cardsCount === 4,
-                editable: isEditable,
+            className={cn(styles.tdCards, {
+                [styles.dual]: cardsCount === 2,
+                [styles.triple]: cardsCount === 3,
+                [styles.quad]: cardsCount === 4,
+                [styles.editable]: isEditable,
             })}
         >
             {normalizedCards.map((card, index) => (

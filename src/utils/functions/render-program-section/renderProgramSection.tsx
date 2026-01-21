@@ -9,9 +9,7 @@ import { TextOnly } from '@/components/common/program-section-templates/text-onl
 import { SingleImageTop } from '@/components/common/program-section-templates/single-image-top/SingleImageTop';
 import { SingleImageBottom } from '@/components/common/program-section-templates/single-image-bottom/SingleImageBottom';
 import { SingleImageRight } from '@/components/common/program-section-templates/single-image-right/SingleImageRight';
-import { DualTitleDescription } from '@/components/common/program-section-templates/dual-title-description/DualTitleDescription';
-import { QuadTitleDescription } from '@/components/common/program-section-templates/quad-title-description/QuadTitleDescription';
-import { TripleTitleDescription } from '@/components/common/program-section-templates/triple-title-description/TripleTitleDescription';
+import { TitleDescriptionCardsWrapper } from '@/components/common/program-section-templates/title-description-cards/TitleDescriptionCardsWrapper';
 
 export interface ProgramSectionCardData {
     title: string;
@@ -140,8 +138,9 @@ export const renderProgramSection = ({
             );
         case ProgramSectionTemplate.DualTitleDescription:
             return (
-                <DualTitleDescription
+                <TitleDescriptionCardsWrapper
                     cards={data.cards ?? []}
+                    cardsCount={2}
                     isEditable={isEditable}
                     onTitleChange={handlers?.onCardTitleChange}
                     onDescriptionChange={handlers?.onCardDescriptionChange}
@@ -149,8 +148,9 @@ export const renderProgramSection = ({
             );
         case ProgramSectionTemplate.TripleTitleDescription:
             return (
-                <TripleTitleDescription
+                <TitleDescriptionCardsWrapper
                     cards={data.cards ?? []}
+                    cardsCount={3}
                     isEditable={isEditable}
                     onTitleChange={handlers?.onCardTitleChange}
                     onDescriptionChange={handlers?.onCardDescriptionChange}
@@ -158,8 +158,9 @@ export const renderProgramSection = ({
             );
         case ProgramSectionTemplate.QuadTitleDescription:
             return (
-                <QuadTitleDescription
+                <TitleDescriptionCardsWrapper
                     cards={data.cards ?? []}
+                    cardsCount={4}
                     isEditable={isEditable}
                     onTitleChange={handlers?.onCardTitleChange}
                     onDescriptionChange={handlers?.onCardDescriptionChange}

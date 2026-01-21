@@ -61,61 +61,53 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
 
     const renderSection = (templateId: ProgramSectionTemplate) => {
         const cardSamples = PROGRAMS_TEXT.SECTION.CARD;
+        const CARD_CONFIGS: Partial<Record<ProgramSectionTemplate, { title: string; description: string }[]>> = {
+            [ProgramSectionTemplate.DualTitleDescription]: [
+                {
+                    title: cardSamples.TITLE_SAMPLE_TEXT.PROGRAM_GOALS,
+                    description: cardSamples.DESCRIPTION_SAMPLE_TEXT.PROGRAM_GOALS,
+                },
+                {
+                    title: cardSamples.TITLE_SAMPLE_TEXT.MAIN_METHODS,
+                    description: cardSamples.DESCRIPTION_SAMPLE_TEXT.MAIN_METHODS,
+                },
+            ],
+            [ProgramSectionTemplate.TripleTitleDescription]: [
+                {
+                    title: cardSamples.TITLE_SAMPLE_TEXT.PROGRAM_GOALS,
+                    description: cardSamples.DESCRIPTION_SAMPLE_TEXT.PROGRAM_GOALS,
+                },
+                {
+                    title: cardSamples.TITLE_SAMPLE_TEXT.MAIN_METHODS,
+                    description: cardSamples.DESCRIPTION_SAMPLE_TEXT.MAIN_METHODS,
+                },
+                {
+                    title: cardSamples.TITLE_SAMPLE_TEXT.PROGRAM_FORMAT,
+                    description: cardSamples.DESCRIPTION_SAMPLE_TEXT.PROGRAM_FORMAT,
+                },
+            ],
+            [ProgramSectionTemplate.QuadTitleDescription]: [
+                {
+                    title: cardSamples.TITLE_SAMPLE_TEXT.PROGRAM_GOALS,
+                    description: cardSamples.DESCRIPTION_SAMPLE_TEXT.PROGRAM_GOALS,
+                },
+                {
+                    title: cardSamples.TITLE_SAMPLE_TEXT.MAIN_METHODS,
+                    description: cardSamples.DESCRIPTION_SAMPLE_TEXT.MAIN_METHODS,
+                },
+                {
+                    title: cardSamples.TITLE_SAMPLE_TEXT.PROGRAM_GOALS,
+                    description: cardSamples.DESCRIPTION_SAMPLE_TEXT.PROGRAM_GOALS,
+                },
+                {
+                    title: cardSamples.TITLE_SAMPLE_TEXT.MAIN_METHODS,
+                    description: cardSamples.DESCRIPTION_SAMPLE_TEXT.MAIN_METHODS,
+                },
+            ],
+        };
 
-        let cards: { title: string; description: string }[] | undefined;
+        const cards = CARD_CONFIGS[templateId];
 
-        switch (templateId) {
-            case ProgramSectionTemplate.DualTitleDescription:
-                cards = [
-                    {
-                        title: cardSamples.TITLE_SAMPLE_TEXT.PROGRAM_GOALS,
-                        description: cardSamples.DESCRIPTION_SAMPLE_TEXT.PROGRAM_GOALS,
-                    },
-                    {
-                        title: cardSamples.TITLE_SAMPLE_TEXT.MAIN_METHODS,
-                        description: cardSamples.DESCRIPTION_SAMPLE_TEXT.MAIN_METHODS,
-                    },
-                ];
-                break;
-
-            case ProgramSectionTemplate.TripleTitleDescription:
-                cards = [
-                    {
-                        title: cardSamples.TITLE_SAMPLE_TEXT.PROGRAM_GOALS,
-                        description: cardSamples.DESCRIPTION_SAMPLE_TEXT.PROGRAM_GOALS,
-                    },
-                    {
-                        title: cardSamples.TITLE_SAMPLE_TEXT.MAIN_METHODS,
-                        description: cardSamples.DESCRIPTION_SAMPLE_TEXT.MAIN_METHODS,
-                    },
-                    {
-                        title: cardSamples.TITLE_SAMPLE_TEXT.PROGRAM_FORMAT,
-                        description: cardSamples.DESCRIPTION_SAMPLE_TEXT.PROGRAM_FORMAT,
-                    },
-                ];
-                break;
-
-            case ProgramSectionTemplate.QuadTitleDescription:
-                cards = [
-                    {
-                        title: cardSamples.TITLE_SAMPLE_TEXT.PROGRAM_GOALS,
-                        description: cardSamples.DESCRIPTION_SAMPLE_TEXT.PROGRAM_GOALS,
-                    },
-                    {
-                        title: cardSamples.TITLE_SAMPLE_TEXT.MAIN_METHODS,
-                        description: cardSamples.DESCRIPTION_SAMPLE_TEXT.MAIN_METHODS,
-                    },
-                    {
-                        title: cardSamples.TITLE_SAMPLE_TEXT.PROGRAM_GOALS,
-                        description: cardSamples.DESCRIPTION_SAMPLE_TEXT.PROGRAM_GOALS,
-                    },
-                    {
-                        title: cardSamples.TITLE_SAMPLE_TEXT.MAIN_METHODS,
-                        description: cardSamples.DESCRIPTION_SAMPLE_TEXT.MAIN_METHODS,
-                    },
-                ];
-                break;
-        }
         return renderProgramSection({
             templateId,
             data: cards

@@ -21,6 +21,7 @@ $img-height: 680px;
 }
 
 .image-wrapper {
+    height: 100%;
     aspect-ratio: $img-width / $img-height;
 }
 
@@ -49,13 +50,13 @@ $img-height: 680px;
         flex: auto;
         height: auto;
         justify-content: center;
+        padding: 1vw 10vw;
     }
 
     .image-wrapper {
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 1vw 10vw;
         width: 100%;
 
         [class~='input-group'] {

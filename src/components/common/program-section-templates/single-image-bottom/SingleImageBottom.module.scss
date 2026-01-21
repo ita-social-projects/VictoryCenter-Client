@@ -4,9 +4,11 @@ $img-height: 680px;
 
 .container {
     @extend .section-container;
-    aspect-ratio: 1440 / 1200;
     display: flex;
-    padding-bottom: 5rem;
+}
+
+.template{
+    aspect-ratio: 1440 / 1200;
 }
 
 .top-section {
@@ -19,7 +21,6 @@ $img-height: 680px;
 }
 
 .image-wrapper {
-    //height: 100%;
     aspect-ratio: $img-width / $img-height;
 }
 

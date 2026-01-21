@@ -1,8 +1,14 @@
 @use '@/assets/sass/mixins/typography.mixins' as type;
 @import '../shared/BaseSectionTemplate.module.scss';
 
+$img-width: 1440px;
+$img-height: 680px;
+
 .container {
     @extend .section-container;
+}
+
+.template{
     aspect-ratio: 1440 / 1200;
 }
 
@@ -14,14 +20,24 @@
 
 .image-wrapper {
     height: 100%;
-    aspect-ratio: 1440 / 680;
+    aspect-ratio: $img-width / $img-height;
 }
 
 .image {
     width: 100%;
     height: auto;
-    object-fit: contain;
-    aspect-ratio: 1440 / 680;
+    object-fit: cover;
+    aspect-ratio: $img-width / $img-height;
+}
+
+.description-template {
+    font-size: clamp(3px, 0.9vw, 1.5vmin);
+    line-height: clamp(3px, 0.9vw, 1.4vmin);
+}
+
+.title-template {
+    font-size: clamp(3px, 1.7vw, 3vmin);
+    line-height: clamp(3px, 0.9vw, 2vmin);
 }
 
 .bottom-section {
@@ -37,22 +53,13 @@
     }
 }
 
-.description-template {
-    font-size: clamp(3px, 0.9vw, 1.5vmin);
-    line-height: clamp(3px, 0.9vw, 1.4vmin);
-}
-
-.title-template {
-    font-size: clamp(3px, 1.7vw, 3vmin);
-    line-height: clamp(3px, 0.9vw, 2vmin);
-}
-
 .container.editable {
     max-height: 1300px;
     gap: 2rem;
 
     .top-section {
-        height: 300px;
+        flex: auto;
+        height: auto;
         justify-content: center;
     }
 
@@ -61,8 +68,17 @@
         max-width: 1440px;
         max-height: 680px;
 
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1vw 10vw;
+        width: 100%;
+
         [class~='input-group'] {
-            height: 100%;
+            width: 100%;
+            aspect-ratio: $img-width / $img-height;
+            max-width: $img-width;
+            max-height: $img-height;
         }
     }
 }

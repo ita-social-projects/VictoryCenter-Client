@@ -4,10 +4,10 @@ $img-height: 680px;
 
 .container {
     @extend .section-container;
-    display: flex;
+    padding-bottom: 2rem;
 }
 
-.template{
+.template {
     aspect-ratio: 1440 / 1200;
 }
 
@@ -43,7 +43,7 @@ $img-height: 680px;
 }
 
 .container.editable {
-    max-height: 1300px;
+    max-height: 1400px;
     gap: 2rem;
 
     .bottom-section {

@@ -6,9 +6,10 @@ $img-height: 680px;
 
 .container {
     @extend .section-container;
+    padding-bottom: 4rem;
 }
 
-.template{
+.template {
     aspect-ratio: 1440 / 1200;
 }
 
@@ -37,20 +38,11 @@ $img-height: 680px;
 
 .title-template {
     font-size: clamp(3px, 1.7vw, 3vmin);
-    line-height: clamp(3px, 0.9vw, 2vmin);
+    line-height: clamp(3px, 2vw, 3.6vmin);
 }
 
 .bottom-section {
     flex: 0 0 44%;
-    padding-top: 2vw;
-
-    &.template {
-        padding: 1% 10%;
-    }
-
-    &.editable {
-        padding: 0vw 8vw 0 8vw;
-    }
 }
 
 .container.editable {
@@ -72,7 +64,6 @@ $img-height: 680px;
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 100%;
 
         [class~='input-group'] {
             width: 100%;

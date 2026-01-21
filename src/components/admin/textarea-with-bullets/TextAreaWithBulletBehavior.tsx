@@ -113,7 +113,7 @@ export const TextAreaWithBulletBehavior = ({
             onBlur={handleBlur}
             onFocus={handleFocus}
             onKeyDown={handleKeyDown}
-            {...(rest as any)}
+            {...rest}
             name={name}
             id={id}
             maxLength={maxLength}

@@ -235,7 +235,7 @@ describe('TitleDescriptionCardsSection', () => {
             expect(screen.getByTestId('card-4')).toBeInTheDocument();
         });
 
-        it('should combine isTemplate and isEditable props', () => {
+        it('should be editable when isEditable is true', () => {
             const cards: TitleDescriptionCardData[] = [{ title: 'Title', description: 'Description' }];
 
             render(<TitleDescriptionCardsSection cards={cards} cardsCount={1} isEditable={true} />);

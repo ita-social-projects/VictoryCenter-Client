@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useEffect } from 'react';
+import { useCallback, useRef, useEffect } from 'react';
 import {
     TextAreaWithCharacterLimit,
     TextAreaWithCharacterLimitProps,
@@ -8,6 +8,9 @@ import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatter
 export interface TextAreaWithBulletBehaviorProps extends Omit<TextAreaWithCharacterLimitProps, 'onChange'> {
     onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
 }
+
+const BULLET_PREFIX = '• ';
+const BULLET = '•';
 
 export const TextAreaWithBulletBehavior = ({
     value,
@@ -19,116 +22,97 @@ export const TextAreaWithBulletBehavior = ({
     onFocus,
     ...rest
 }: TextAreaWithBulletBehaviorProps) => {
-    const keydownHandlerRef = useRef<((e: KeyboardEvent) => void) | null>(null);
-
-    const removeDocKeydown = useCallback(() => {
-        if (keydownHandlerRef.current) {
-            document.removeEventListener('keydown', keydownHandlerRef.current);
-            keydownHandlerRef.current = null;
-        }
-    }, []);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const pendingCursorPosRef = useRef<number | null>(null);
 
     useEffect(() => {
-        return () => {
-            removeDocKeydown();
-        };
-    }, [removeDocKeydown]);
-
-    const autosize = useCallback(() => {
-        try {
-            const el = document.getElementById(id) as HTMLTextAreaElement | null;
-            if (!el) return;
-            el.style.height = 'auto';
-            el.style.overflow = 'hidden';
-            el.style.height = `${Math.max(el.scrollHeight, 40)}px`;
-        } catch (err) {}
-    }, [id]);
-
-    const handleFocus = (e: React.FocusEvent<HTMLTextAreaElement>) => {
-        onFocus?.(e);
-        if (!value || getTrimmedInputText(value).length === 0) {
-            const syntheticEvent = { target: { value: '• ', name, id } } as React.ChangeEvent<HTMLTextAreaElement>;
-            onChange(syntheticEvent);
-            setTimeout(() => {
-                try {
-                    const el = document.getElementById(id) as HTMLTextAreaElement | null;
-                    if (el) {
-                        el.focus();
-                        el.selectionStart = el.selectionEnd = 2;
-                        autosize();
-                    }
-                } catch (err) {}
-            }, 0);
+        if (pendingCursorPosRef.current !== null && textareaRef.current) {
+            textareaRef.current.selectionStart = pendingCursorPosRef.current;
+            textareaRef.current.selectionEnd = pendingCursorPosRef.current;
+            pendingCursorPosRef.current = null;
         }
+    }, [value]);
 
-        removeDocKeydown();
-        const handler = (ev: KeyboardEvent) => {
-            const target = ev.target as HTMLElement | null;
-            const el = document.getElementById(id) as HTMLTextAreaElement | null;
-            if (!el || target !== el) return;
-            if (ev.key === 'Enter' && !(ev as KeyboardEvent & { shiftKey?: boolean }).shiftKey) {
-                ev.preventDefault();
-                const current = el.value ?? '';
-                const start = el.selectionStart ?? 0;
-                const end = el.selectionEnd ?? 0;
-                const insert = '\n• ';
-                const before = current.slice(0, start);
-                const after = current.slice(end);
-                let newValue = before + insert + after;
-                if (newValue.length > maxLength) {
-                    const available = maxLength - (before.length + after.length);
-                    if (available <= 0) return;
-                    newValue = before + insert.slice(0, available) + after;
-                }
+    const ensureBulletPrefix = useCallback((text: string): string => {
+        const trimmed = getTrimmedInputText(text);
+        if (trimmed.length === 0) return BULLET_PREFIX;
+        if (trimmed.startsWith(BULLET)) return trimmed;
+        return `${BULLET_PREFIX}${trimmed}`;
+    }, []);
 
-                const syntheticEvent = {
-                    target: { value: newValue, name, id },
-                } as React.ChangeEvent<HTMLTextAreaElement>;
-                onChange(syntheticEvent);
+    const notifyChange = useCallback(
+        (newValue: string) => {
+            const syntheticEvent = {
+                target: { value: newValue, name, id },
+            } as React.ChangeEvent<HTMLTextAreaElement>;
+            onChange(syntheticEvent);
+        },
+        [onChange, name, id],
+    );
 
-                setTimeout(() => {
-                    try {
-                        const el2 = document.getElementById(id) as HTMLTextAreaElement | null;
-                        if (el2) {
-                            const pos = start + insert.length;
-                            el2.selectionStart = el2.selectionEnd = pos;
-                            el2.focus();
-                            autosize();
-                        }
-                    } catch (err) {}
-                }, 0);
+    const handleFocus = useCallback(
+        (e: React.FocusEvent<HTMLTextAreaElement>) => {
+            onFocus?.(e);
+
+            if (!value || getTrimmedInputText(value).length === 0) {
+                notifyChange(BULLET_PREFIX);
+                pendingCursorPosRef.current = BULLET_PREFIX.length;
             }
-        };
-        keydownHandlerRef.current = handler;
-        document.addEventListener('keydown', handler);
-    };
+        },
+        [value, onFocus, notifyChange],
+    );
 
-    const handleBlurInternal = (e: React.FocusEvent<HTMLTextAreaElement>) => {
-        removeDocKeydown();
-        try {
-            const trimmed = getTrimmedInputText(value);
-            if (trimmed.length > 0 && !value.trimStart().startsWith('•')) {
-                const syntheticEvent = {
-                    target: { value: `• ${trimmed}`, name, id },
-                } as React.ChangeEvent<HTMLTextAreaElement>;
-                onChange(syntheticEvent);
-                setTimeout(() => autosize(), 0);
+    const handleKeyDown = useCallback(
+        (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+            if (e.key !== 'Enter' || e.shiftKey) return;
+
+            e.preventDefault();
+            const textarea = e.currentTarget;
+            const current = textarea.value;
+            const start = textarea.selectionStart ?? 0;
+            const end = textarea.selectionEnd ?? 0;
+
+            const newlineWithBullet = '\n' + BULLET_PREFIX;
+            const before = current.slice(0, start);
+            const after = current.slice(end);
+
+            let newValue = before + newlineWithBullet + after;
+
+            if (newValue.length > maxLength) {
+                const available = maxLength - (before.length + after.length);
+                if (available <= newlineWithBullet.length) return;
+                newValue = before + newlineWithBullet.slice(0, available) + after;
             }
-        } catch (err) {}
-        onBlur?.(e);
-    };
 
-    const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        onChange(e);
-        setTimeout(() => autosize(), 0);
-    };
+            notifyChange(newValue);
+            pendingCursorPosRef.current = start + newlineWithBullet.length;
+        },
+        [maxLength, notifyChange],
+    );
+
+    const handleBlur = useCallback(
+        (e: React.FocusEvent<HTMLTextAreaElement>) => {
+            const currentValue = e.currentTarget.value;
+            const trimmed = getTrimmedInputText(currentValue);
+
+            if (trimmed.length > 0 && !trimmed.startsWith(BULLET)) {
+                const newValue = ensureBulletPrefix(currentValue);
+                notifyChange(newValue);
+            }
+
+            onBlur?.(e);
+        },
+        [onBlur, ensureBulletPrefix, notifyChange],
+    );
 
     return (
         <TextAreaWithCharacterLimit
+            ref={textareaRef}
             value={value}
-            onChange={handleChange}
-            onBlur={handleBlurInternal}
+            onChange={onChange}
+            onBlur={handleBlur}
             onFocus={handleFocus}
+            onKeyDown={handleKeyDown}
             {...(rest as any)}
             name={name}
             id={id}

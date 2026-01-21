@@ -1,4 +1,3 @@
-import React from 'react';
 import { InputLabel } from '@/components/admin/input-label/InputLabel';
 import { InputErrorWithCharacterCounter } from '@/components/admin/input-error-with-character-counter/InputErrorWithCharacterCounter';
 import { TextAreaWithBulletBehavior } from '@/components/admin/textarea-with-bullets/TextAreaWithBulletBehavior';

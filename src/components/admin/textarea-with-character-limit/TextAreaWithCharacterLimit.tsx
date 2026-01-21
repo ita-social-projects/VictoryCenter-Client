@@ -8,6 +8,7 @@ export interface TextAreaWithCharacterLimitProps {
     onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
     onBlur?: (e: React.FocusEvent<HTMLTextAreaElement>) => void;
     onFocus?: (e: React.FocusEvent<HTMLTextAreaElement>) => void;
+    onKeyDown?: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
     name: string;
     id: string;
     maxLength: number;
@@ -22,6 +23,7 @@ export const TextAreaWithCharacterLimit = ({
     onChange,
     onBlur,
     onFocus,
+    onKeyDown,
     name,
     id,
     maxLength,
@@ -65,6 +67,7 @@ export const TextAreaWithCharacterLimit = ({
                     onChange={onChange}
                     onFocus={handleFocus}
                     onBlur={handleBlur}
+                    onKeyDown={onKeyDown}
                     maxLength={maxLength}
                     name={name}
                     id={id}

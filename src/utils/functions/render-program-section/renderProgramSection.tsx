@@ -1,6 +1,5 @@
 import React from 'react';
-import { ProgramSectionTemplate } from '@/types/common/program-sections';
-import { ProgramSectionContent, ContentType } from '@/types/admin/programs';
+import { ProgramSectionContent, ProgramSectionTemplate } from '@/types/common/program-sections';
 import { ImageValues } from '@/types/common/image';
 import { QuadImagesBottom } from '@/components/common/program-section-templates/quad-images-bottom/QuadImagesBottom';
 import { TripleImagesBottom } from '@/components/common/program-section-templates/triple-images-bottom/TripleImagesBottom';
@@ -9,6 +8,7 @@ import { TextOnly } from '@/components/common/program-section-templates/text-onl
 import { SingleImageTop } from '@/components/common/program-section-templates/single-image-top/SingleImageTop';
 import { SingleImageBottom } from '@/components/common/program-section-templates/single-image-bottom/SingleImageBottom';
 import { SingleImageRight } from '@/components/common/program-section-templates/single-image-right/SingleImageRight';
+import { ContentType } from '@/types/common/programs';
 import { TitleDescriptionCardsWrapper } from '@/components/common/program-section-templates/title-description-cards/TitleDescriptionCardsWrapper';
 
 export interface ProgramSectionCardData {

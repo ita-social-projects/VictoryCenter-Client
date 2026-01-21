@@ -173,6 +173,7 @@ const mockProgram: Program = {
     meetingsCount: '',
     location: '',
     sections: [],
+    slug: 'test-program',
 };
 
 const mockCategories: ProgramCategory[] = [

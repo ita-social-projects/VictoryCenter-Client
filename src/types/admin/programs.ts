@@ -1,36 +1,11 @@
 import { VisibilityStatus } from './common';
 import { Image, ImageValues } from '../common/image';
-import { ProgramSectionTemplate } from '../common/program-sections';
+import { ProgramSection } from '../common/program-sections';
 
 export interface ProgramCategory {
     id: number;
     name: string;
     programsCount: number;
-}
-
-export enum ContentType {
-    Title = 0,
-    Description = 1,
-    Image = 2,
-    Card = 3,
-}
-
-export interface ProgramSectionContent {
-    id?: number;
-    sectionId?: number;
-    contentType: ContentType;
-    order: number;
-    title?: string | null;
-    description?: string | null;
-    image?: Image | ImageValues | null;
-}
-
-export interface ProgramSection {
-    id?: number;
-    programId?: number;
-    template: ProgramSectionTemplate;
-    order: number;
-    contents: ProgramSectionContent[];
 }
 
 export interface Program {
@@ -45,6 +20,7 @@ export interface Program {
     participantsCount: string;
     meetingsCount: string;
     sections: ProgramSection[];
+    slug: string;
 }
 
 export interface ProgramSearchItemData {
@@ -67,6 +43,7 @@ export interface ProgramCreateUpdate {
     participantsCount: string;
     meetingsCount: string;
     sections: ProgramSection[];
+    slug?: string;
 }
 
 export interface ProgramCategoryCreateUpdate {

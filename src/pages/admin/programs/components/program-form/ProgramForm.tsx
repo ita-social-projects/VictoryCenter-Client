@@ -10,11 +10,12 @@ import { useFormManager } from '@/hooks/admin/use-form-manager/useFormManager';
 import { Button } from '@/components/admin/button/Button';
 import { ProgramSectionForm } from '../program-section-form/ProgramSectionForm';
 import { Image, ImageValues } from '@/types/common/image';
-import { ProgramCategory, ProgramSection } from '@/types/admin/programs';
+import { ProgramCategory } from '@/types/admin/programs';
 import { VisibilityStatus } from '@/types/admin/common';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import NotFoundIcon from '@/assets/icons/not-found.svg';
 import styles from './ProgramForm.module.scss';
+import { ProgramSection } from '@/types/common/program-sections';
 
 export interface ProgramFormValues {
     name: string;
@@ -344,6 +345,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                             PROGRAM_VALIDATION.backgroundImage.height,
                             PROGRAM_VALIDATION.backgroundImage.width,
                         )}
+                        maxSizeMB={PROGRAM_VALIDATION.images.maxSizeMB}
                     />
                     <div className={styles['body-inputs']}>
                         <div className={styles['col-left']}>
@@ -435,6 +437,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                     PROGRAM_VALIDATION.previewImage.height,
                                     PROGRAM_VALIDATION.previewImage.width,
                                 )}
+                                maxSizeMB={PROGRAM_VALIDATION.images.maxSizeMB}
                             />
                         </div>
                     </div>

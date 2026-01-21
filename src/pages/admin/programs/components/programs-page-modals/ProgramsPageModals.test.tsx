@@ -43,6 +43,7 @@ describe('ProgramsPageModals', () => {
         meetingsCount: '',
         participantsCount: '',
         sections: [],
+        slug: 'test-program',
     };
 
     const mockCategories: ProgramCategory[] = [

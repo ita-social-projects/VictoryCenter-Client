@@ -75,33 +75,21 @@ export const programValidationSchema = Yup.object({
             PROGRAM_VALIDATION.location.max,
             COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PROGRAM_VALIDATION.location.max),
         )
-        .when('$isPublishing', ([isPublishing], schema) =>
-            isPublishing
-                ? schema.required(PROGRAM_VALIDATION.location.getRequiredWhenPublishingError())
-                : schema.notRequired(),
-        ),
+        .notRequired(),
 
     participantsCount: Yup.string()
         .max(
             PROGRAM_VALIDATION.participantsCount.max,
             COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PROGRAM_VALIDATION.participantsCount.max),
         )
-        .when('$isPublishing', ([isPublishing], schema) =>
-            isPublishing
-                ? schema.required(PROGRAM_VALIDATION.participantsCount.getRequiredWhenPublishingError())
-                : schema.notRequired(),
-        ),
+        .notRequired(),
 
     meetingsCount: Yup.string()
         .max(
             PROGRAM_VALIDATION.meetingCount.max,
             COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PROGRAM_VALIDATION.meetingCount.max),
         )
-        .when('$isPublishing', ([isPublishing], schema) =>
-            isPublishing
-                ? schema.required(PROGRAM_VALIDATION.meetingCount.getRequiredWhenPublishingError())
-                : schema.notRequired(),
-        ),
+        .notRequired(),
 });
 
 export const PROGRAM_VALIDATION_FUNCTIONS = {

@@ -32,6 +32,7 @@ const mockPrograms: Program[] = [
         participantsCount: '10-15 осіб',
         meetingsCount: '12 занять',
         sections: [],
+        slug: 'koni-likuyut-lito-2025',
     },
     {
         id: 2,
@@ -45,6 +46,7 @@ const mockPrograms: Program[] = [
         participantsCount: '8-10 дітей',
         meetingsCount: '10 занять',
         sections: [],
+        slug: 'kinna-terapiya-dlya-ditey',
     },
     {
         id: 3,
@@ -58,6 +60,7 @@ const mockPrograms: Program[] = [
         participantsCount: '5-8 осіб',
         meetingsCount: '15 занять',
         sections: [],
+        slug: 'reabilitatsiya-pislya-poranen',
     },
 ];
 
@@ -496,6 +499,7 @@ describe('fetchProgramSearchItems', () => {
             meetingsCount: '5',
             categories: [{ id: 9, name: 'General', programsCount: 1 }],
             sections: [],
+            slug: 'core-pilates-workout',
         };
         const programWithCategoryMatch: Program = {
             id: 101,
@@ -509,6 +513,7 @@ describe('fetchProgramSearchItems', () => {
             meetingsCount: '5',
             categories: [{ id: 10, name: 'Pilates', programsCount: 1 }],
             sections: [],
+            slug: 'advanced-flexibility',
         };
 
         mockClient.get.mockResolvedValueOnce({

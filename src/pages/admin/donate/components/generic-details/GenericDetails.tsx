@@ -7,6 +7,7 @@ import { FieldValues } from 'react-hook-form';
 import { GenericFormMode, GenericFormProps, GenericFormRef } from '../generic-form/GenericForm';
 import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
+import cn from 'classnames';
 
 export interface GenericDetailsProps<T extends FieldValues> {
     title?: string;
@@ -133,6 +134,7 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
             </div>
         );
     }
+    const isAddActionDisabled = !showNotFound && (isAddFormVisible || editingItemId !== null);
 
     return (
         <div className={`generic-details ${isChildForm ? 'child' : ''}`}>
@@ -150,6 +152,27 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
                 >
                     {title}
                     <span className={`arrow ${isItemsExpanded ? 'expanded' : ''}`}></span>
+                </div>
+            )}
+            {isChildForm && (
+                <div className="generic-details-buttons top-add-new">
+                    <Button
+                        className={cn('generic-details', showNotFound ? 'btn-add' : 'btn-add-new', {
+                            disabled: isAddActionDisabled,
+                        })}
+                        onClick={handleAdd}
+                        buttonStyle={showNotFound ? (primaryAddButton ? 'primary' : 'secondary') : 'primary'}
+                        disabled={
+                            isDisabled ||
+                            isAddButtonDisabled ||
+                            isParentAddFormVisible ||
+                            isAddFormVisible ||
+                            (!showNotFound && editingItemId !== null)
+                        }
+                    >
+                        <div>{addNewText}</div>
+                        <PlusIcon className="plus-icon" />
+                    </Button>
                 </div>
             )}
             {!showNotFound && (
@@ -190,22 +213,26 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
                             {(formProps) => <>{children && children(formProps)}</>}
                         </FormComponent>
                     )}
-                    {!showNotFound && (
-                        <Button
-                            className={`generic-details btn-add-new ${isAddFormVisible || editingItemId !== null ? 'disabled' : ''}`}
-                            onClick={handleAdd}
-                            buttonStyle="primary"
-                            disabled={
-                                isDisabled ||
-                                isAddButtonDisabled ||
-                                isParentAddFormVisible ||
-                                isAddFormVisible ||
-                                editingItemId !== null
-                            }
-                        >
-                            <div>{addNewText}</div>
-                            <PlusIcon className="plus-icon" />
-                        </Button>
+                    {!isChildForm && !showNotFound && (
+                        <div className="generic-details-footer">
+                            <Button
+                                className={cn('generic-details btn-add-new', {
+                                    disabled: isAddFormVisible || editingItemId !== null,
+                                })}
+                                onClick={handleAdd}
+                                buttonStyle="primary"
+                                disabled={
+                                    isDisabled ||
+                                    isAddButtonDisabled ||
+                                    isParentAddFormVisible ||
+                                    isAddFormVisible ||
+                                    editingItemId !== null
+                                }
+                            >
+                                <div>{addNewText}</div>
+                                <PlusIcon className="plus-icon" />
+                            </Button>
+                        </div>
                     )}
                 </div>
             )}
@@ -220,17 +247,19 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
                                     <p>{notFoundText}</p>
                                 </div>
                             )}
-                            <Button
-                                className="generic-details btn-add"
-                                onClick={handleAdd}
-                                buttonStyle={primaryAddButton ? 'primary' : 'secondary'}
-                                disabled={
-                                    isDisabled || isAddButtonDisabled || isParentAddFormVisible || isAddFormVisible
-                                }
-                            >
-                                <div>{addNewText}</div>
-                                <PlusIcon className="plus-icon" />
-                            </Button>
+                            {!isChildForm && (
+                                <Button
+                                    className="generic-details btn-add"
+                                    onClick={handleAdd}
+                                    buttonStyle={primaryAddButton ? 'primary' : 'secondary'}
+                                    disabled={
+                                        isDisabled || isAddButtonDisabled || isParentAddFormVisible || isAddFormVisible
+                                    }
+                                >
+                                    <div>{addNewText}</div>
+                                    <PlusIcon className="plus-icon" />
+                                </Button>
+                            )}
                         </>
                     }
                 </div>

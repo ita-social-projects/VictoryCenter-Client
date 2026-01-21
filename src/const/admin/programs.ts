@@ -92,6 +92,8 @@ export const PROGRAMS_TEXT = {
             FAIL_TO_CREATE_PROGRAM: 'Виникла помилка під час додавання програми',
             FAIL_TO_UPDATE_PROGRAM: 'Виникла помилка під час оновлення програми',
             FAIL_TO_DELETE_PROGRAM: 'Виникла помилка під час видалення програми',
+            PROGRAM_SAVED_SUCCESSFULLY: 'Програма успішно збережена',
+            PROGRAM_PUBLISHED_SUCCESSFULLY: 'Програма успішно опублікована',
         },
         LABEL: {
             NAME: 'Назва',
@@ -198,6 +200,9 @@ export const PROGRAM_VALIDATION = {
     meetingCount: {
         max: 55,
         getRequiredWhenPublishingError: () => 'Кількість зустрічей обов’язкова при публікації',
+    },
+    images: {
+        maxSizeMB: 5,
     },
 };
 

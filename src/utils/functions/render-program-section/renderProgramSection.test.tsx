@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { renderProgramSection, RenderProgramSectionParams, getInitialSectionContents } from './renderProgramSection';
 import { ProgramSectionTemplate } from '@/types/common/program-sections';

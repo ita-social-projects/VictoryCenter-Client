@@ -120,6 +120,38 @@ export const PROGRAM_SECTION_IMAGE_CONFIGS = {
     },
 };
 
+export const QUAD_IMAGES_CONFIG = {
+    imageCount: 4,
+    gridColumns: 4,
+    imageConfig: PROGRAM_SECTION_IMAGE_CONFIGS.QUAD_IMAGES,
+    elevatedIndices: [0, 2],
+    imageLabel: COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE,
+    editableGridColumns: 4,
+    editableImageMaxHeight: 390,
+    editableImageMaxWidth: 360,
+};
+
+export const DUAL_IMAGES_CONFIG = {
+    imageCount: 2,
+    gridColumns: 2,
+    imageConfig: PROGRAM_SECTION_IMAGE_CONFIGS.DUAL_IMAGES,
+    elevatedIndices: [0],
+    imageLabel: COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE,
+    editableImageMaxHeight: 430,
+    editableImageMaxWidth: 730,
+};
+
+export const TRIPLE_IMAGES_CONFIG = {
+    imageCount: 3,
+    gridColumns: 3,
+    imageConfig: PROGRAM_SECTION_IMAGE_CONFIGS.TRIPLE_IMAGES,
+    elevatedIndices: [0, 2],
+    imageLabel: COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE,
+    editableGridColumns: 4,
+    editableImageMaxHeight: 480,
+    editableImageMaxWidth: 480,
+};
+
 export const PROGRAM_VALIDATION = {
     name: {
         min: 5,

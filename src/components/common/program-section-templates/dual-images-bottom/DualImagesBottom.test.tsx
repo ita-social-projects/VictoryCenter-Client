@@ -17,7 +17,6 @@ jest.mock('../shared/images-bottom-section/ImagesBottomSection', () => {
 
 createImagesBottomTestSuite<DualImagesBottomProps>({
     componentName: 'DualImagesBottom',
-    variant: 'dual',
     imageCount: 2,
     Component: DualImagesBottom,
     createDefaultProps: () => ({

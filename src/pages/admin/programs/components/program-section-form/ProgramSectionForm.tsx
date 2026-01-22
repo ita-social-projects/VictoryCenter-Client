@@ -34,7 +34,7 @@ export const ProgramSectionForm = ({
     const imageContents = localSection.contents
         .filter((c) => c.contentType === ContentType.Image)
         .sort((a, b) => a.order - b.order)
-        .map((c) => (c.image && 'url' in c.image ? c.image.url : '') || '');
+        .map((c) => c.image || null);
 
     const handleTitleChange = useCallback(
         (value: string) => {

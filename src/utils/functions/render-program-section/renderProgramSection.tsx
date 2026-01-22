@@ -1,6 +1,6 @@
 import React from 'react';
 import { ProgramSectionContent, ProgramSectionTemplate } from '@/types/common/program-sections';
-import { ImageValues } from '@/types/common/image';
+import { ImageValues, Image } from '@/types/common/image';
 import { QuadImagesBottom } from '@/components/common/program-section-templates/quad-images-bottom/QuadImagesBottom';
 import { TripleImagesBottom } from '@/components/common/program-section-templates/triple-images-bottom/TripleImagesBottom';
 import { DualImagesBottom } from '@/components/common/program-section-templates/dual-images-bottom/DualImagesBottom';
@@ -13,7 +13,7 @@ import { ContentType } from '@/types/common/programs';
 export interface ProgramSectionData {
     title?: string;
     description?: string;
-    images?: string[];
+    images?: (Image | ImageValues | null)[];
 }
 
 export interface ProgramSectionHandlers {

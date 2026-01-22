@@ -1,13 +1,13 @@
 import cn from 'classnames';
 import { ImagesBottomSection } from '../shared/images-bottom-section/ImagesBottomSection';
-import { ImageValues } from '@/types/common/image';
+import { ImageValues, Image } from '@/types/common/image';
 import { DUAL_IMAGES_CONFIG } from '@/const/admin/programs';
 import styles from './DualImagesBottom.module.scss';
 
 export interface DualImagesBottomProps {
     title?: string;
     description?: string;
-    images?: string[];
+    images?: (Image | ImageValues | null)[];
     isTemplate?: boolean;
     isEditable?: boolean;
     onTitleChange?: (value: string) => void;
@@ -18,7 +18,7 @@ export interface DualImagesBottomProps {
 export const DualImagesBottom = ({
     title = '',
     description = '',
-    images = ['', ''],
+    images = [null, null],
     isTemplate = false,
     isEditable = false,
     onTitleChange,

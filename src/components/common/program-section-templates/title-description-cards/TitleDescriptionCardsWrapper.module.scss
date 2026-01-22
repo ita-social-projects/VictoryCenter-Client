@@ -10,29 +10,23 @@
 
     max-height: none;
 
-    &.template {
+    &--template {
         pointer-events: none;
     }
 
-    &.editable {
+    &--editable {
         overflow: visible;
     }
 
-    &.cards-2 {
-        &.template {
-            aspect-ratio: 1440 / 496;
-        }
+    &--cards-2.container--template {
+        aspect-ratio: 1440 / 496;
     }
 
-    &.cards-3 {
-        &.template {
-            aspect-ratio: 1440 / 566;
-        }
+    &--cards-3.container--template {
+        aspect-ratio: 1440 / 566;
     }
 
-    &.cards-4 {
-        &.template {
-            aspect-ratio: 1440 / 666;
-        }
+    &--cards-4.container--template {
+        aspect-ratio: 1440 / 666;
     }
 }

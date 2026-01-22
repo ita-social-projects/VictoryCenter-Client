@@ -1,6 +1,7 @@
 import { InputLabel } from '@/components/admin/input-label/InputLabel';
 import { InputErrorWithCharacterCounter } from '@/components/admin/input-error-with-character-counter/InputErrorWithCharacterCounter';
 import { TextAreaWithBulletBehavior } from '@/components/admin/textarea-with-bullets/TextAreaWithBulletBehavior';
+import styles from './TitleDescriptionCardsSection.module.scss';
 
 interface CardDescriptionFieldProps {
     label: string;
@@ -39,7 +40,7 @@ export const CardDescriptionField = ({
     const resolvedCurrent = currentLength ?? value.length;
 
     return (
-        <div className="input-group">
+        <div className={styles['input-group']}>
             <InputLabel htmlFor={id} text={label} isRequired={isRequired} />
 
             <TextAreaWithBulletBehavior

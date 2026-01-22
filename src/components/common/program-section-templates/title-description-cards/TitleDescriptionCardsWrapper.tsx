@@ -23,8 +23,8 @@ export const TitleDescriptionCardsWrapper = ({
     return (
         <div
             className={cn(styles.container, {
-                [styles.editable]: isEditable,
-                [styles[`cards-${cardsCount}`]]: true,
+                [styles['container--editable']]: isEditable,
+                [styles[`container--cards-${cardsCount}`]]: true,
             })}
         >
             <TitleDescriptionCardsSection

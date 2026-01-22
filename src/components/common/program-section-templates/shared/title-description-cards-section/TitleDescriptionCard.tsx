@@ -50,8 +50,8 @@ export const TitleDescriptionCard = ({
 
     if (isEditable) {
         return (
-            <div className={cn(styles.tdCard, styles.tdCardEditable)}>
-                <div className={styles.titleField}>
+            <div className={cn(styles['td-card'], styles['td-card--editable'])}>
+                <div className={styles['title-field']}>
                     <InputWithCharacterLimitGroup
                         label="Заголовок"
                         id={`card-title-${index}`}
@@ -66,7 +66,7 @@ export const TitleDescriptionCard = ({
                     />
                 </div>
 
-                <div className={styles.descriptionField}>
+                <div className={styles['description-field']}>
                     <CardDescriptionField
                         label="Опис"
                         id={`card-description-${index}`}
@@ -85,13 +85,13 @@ export const TitleDescriptionCard = ({
     }
 
     return (
-        <div className={styles.tdCard}>
-            <h3 className={styles.title}>{card.title || 'Заголовок'}</h3>
-            <div className={styles.description}>
+        <div className={styles['td-card']}>
+            <h3 className={styles['title']}>{card.title || 'Заголовок'}</h3>
+            <div className={styles['description']}>
                 {intro && <p>{intro}</p>}
 
                 {items.length > 0 && (
-                    <ul className={styles.descriptionList}>
+                    <ul className={styles['description-list']}>
                         {items.map((item, i) => (
                             <li key={i}>{item}</li>
                         ))}

@@ -28,11 +28,11 @@ export const TitleDescriptionCardsSection = ({
 
     return (
         <div
-            className={cn(styles.tdCards, {
-                [styles.dual]: cardsCount === 2,
-                [styles.triple]: cardsCount === 3,
-                [styles.quad]: cardsCount === 4,
-                [styles.editable]: isEditable,
+            className={cn(styles['td-cards'], {
+                [styles['td-cards--dual']]: cardsCount === 2,
+                [styles['td-cards--triple']]: cardsCount === 3,
+                [styles['td-cards--quad']]: cardsCount === 4,
+                [styles['td-cards--editable']]: isEditable,
             })}
         >
             {normalizedCards.map((card, index) => (

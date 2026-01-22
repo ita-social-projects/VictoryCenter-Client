@@ -35,6 +35,7 @@ import {
     mapToUpdateCorrespondentBankDetails,
 } from '@/utils/functions/mappers/admin/donate-mappers';
 import './DonatePageContent.scss';
+import { GenericFormMode } from '../generic-form/GenericForm';
 
 export const DonatePageContent = () => {
     const { addToast } = useToast();
@@ -293,7 +294,7 @@ export const DonatePageContent = () => {
     );
 
     const renderCorrespondentBanks = useCallback(
-        ({ formState, isItemsExpanded, setFormState }: any) => {
+        ({ formState, isItemsExpanded, setFormState, isFormValid, formMode }: any) => {
             const parentId = formState.id;
             const isParentCreating = !parentId;
             const localBanks = formState.correspondentBanks || [];
@@ -303,6 +304,8 @@ export const DonatePageContent = () => {
                 : (existingItem?.correspondentBanks ?? []).toSorted(
                       (a: CorrespondentBankDetailsDto, b: CorrespondentBankDetailsDto) => b.id - a.id,
                   );
+
+            const shouldDisableAddButton = isParentCreating && formMode === GenericFormMode.Create && !isFormValid;
 
             return (
                 <GenericDetails
@@ -325,6 +328,7 @@ export const DonatePageContent = () => {
                     onLocalSubmit={(data) => handleLocalSubmit(formState, setFormState, data)}
                     onLocalUpdate={handleLocalUpdate}
                     onLocalDelete={(index) => handleLocalDelete(formState, setFormState, index)}
+                    isAddButtonDisabled={shouldDisableAddButton}
                 />
             );
         },

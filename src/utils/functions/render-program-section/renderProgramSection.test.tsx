@@ -29,7 +29,12 @@ describe('renderProgramSection', () => {
     const baseData = {
         title: 'Title',
         description: 'Desc',
-        images: ['img1', 'img2', 'img3', 'img4'],
+        images: [
+            { id: 1, url: 'img1', mimeType: 'image/jpeg' },
+            { id: 2, url: 'img2', mimeType: 'image/jpeg' },
+            { id: 3, url: 'img3', mimeType: 'image/jpeg' },
+            { id: 4, url: 'img4', mimeType: 'image/jpeg' },
+        ],
     };
     const baseHandlers = {
         onTitleChange: jest.fn(),

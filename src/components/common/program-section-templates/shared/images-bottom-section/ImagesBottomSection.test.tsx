@@ -46,10 +46,13 @@ describe('ImagesBottomSection', () => {
     const defaultProps: ImagesBottomSectionProps = {
         title: 'Section Title',
         description: 'Section Description',
-        images: ['img1.jpg', 'img2.jpg'],
+        images: [
+            { id: 1, url: 'img1.jpg', mimeType: 'image/jpeg' },
+            { id: 2, url: 'img2.jpg', mimeType: 'image/jpeg' },
+        ],
         imageHandlers: [
-            { key: '1', value: '', handler: jest.fn() },
-            { key: '2', value: '', handler: jest.fn() },
+            { key: '1', value: null, handler: jest.fn() },
+            { key: '2', value: null, handler: jest.fn() },
         ],
         config: baseConfig,
         isTemplate: false,
@@ -86,10 +89,13 @@ describe('ImagesBottomSection', () => {
 
     it('defaults isTemplate/isEditable/className and keeps optional handlers undefined when omitted', () => {
         const minimalProps: ImagesBottomSectionProps = {
-            images: ['img1.jpg', 'img2.jpg'],
+            images: [
+                { id: 1, url: 'img1.jpg', mimeType: 'image/jpeg' },
+                { id: 2, url: 'img2.jpg', mimeType: 'image/jpeg' },
+            ],
             imageHandlers: [
-                { key: '1', value: '', handler: jest.fn() },
-                { key: '2', value: '', handler: jest.fn() },
+                { key: '1', value: null, handler: jest.fn() },
+                { key: '2', value: null, handler: jest.fn() },
             ],
             config: baseConfig,
         };
@@ -111,22 +117,29 @@ describe('ImagesBottomSection', () => {
         // Use role 'presentation' because <img alt=""> is role=presentation
         const images = screen.getAllByRole('presentation');
         expect(images).toHaveLength(2);
-        expect(images[0]).toHaveAttribute('src', 'img1.jpg');
-        expect(images[1]).toHaveAttribute('src', 'img2.jpg');
+        expect(images[0]).toHaveAttribute('src', expect.stringContaining('img1.jpg'));
+        expect(images[1]).toHaveAttribute('src', expect.stringContaining('img2.jpg'));
     });
 
     it('renders when an image string is empty (key fallback branch coverage)', () => {
-        render(<ImagesBottomSection {...defaultProps} images={['', 'img2.jpg']} />);
+        render(
+            <ImagesBottomSection
+                {...defaultProps}
+                images={[null, { id: 2, url: 'img2.jpg', mimeType: 'image/jpeg' }]}
+            />,
+        );
 
         const wrappers = screen.getAllByTestId('image-wrapper');
         expect(wrappers).toHaveLength(2);
-        expect(screen.getAllByRole('presentation')).toHaveLength(2);
+
+        const presentations = screen.getAllByRole('presentation');
+        expect(presentations).toHaveLength(1);
     });
 
     it('wires PhotoInputGroup props for each editable image', () => {
         const imageHandlers: ImagesBottomSectionProps['imageHandlers'] = [
-            { key: '1', value: '', handler: undefined },
-            { key: '2', value: 'img2.jpg', handler: jest.fn() },
+            { key: '1', value: null, handler: undefined },
+            { key: '2', value: { id: 2, url: 'img2.jpg', mimeType: 'image/jpeg' }, handler: jest.fn() },
         ];
 
         render(<ImagesBottomSection {...defaultProps} imageHandlers={imageHandlers} isEditable={true} />);
@@ -148,7 +161,7 @@ describe('ImagesBottomSection', () => {
         const secondCallProps = (PhotoInputGroup as unknown as jest.Mock).mock.calls[1][0];
         expect(secondCallProps.id).toBe('section-image-2');
         expect(secondCallProps.name).toBe('section-image-2');
-        expect(secondCallProps.value).toEqual({ id: null, url: 'img2.jpg', mimeType: '' });
+        expect(secondCallProps.value).toEqual({ id: 2, url: 'img2.jpg', mimeType: 'image/jpeg' });
         expect(secondCallProps.onChange).toBe(imageHandlers[1].handler);
         expect(secondCallProps.variant).toBe('programSection');
     });

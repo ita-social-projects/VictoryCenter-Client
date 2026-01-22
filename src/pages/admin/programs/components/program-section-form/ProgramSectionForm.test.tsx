@@ -126,7 +126,7 @@ describe('ProgramSectionForm', () => {
         expect(callArg.data).toEqual({
             title: '',
             description: '',
-            images: ['img1-url', '', ''],
+            images: [{ id: 'img1', url: 'img1-url', mimeType: 'image/png' }, { id: 'no-url' }, null],
         });
 
         expect(callArg.handlers).toEqual({

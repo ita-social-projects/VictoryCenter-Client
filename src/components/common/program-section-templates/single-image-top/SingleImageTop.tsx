@@ -1,15 +1,16 @@
 import cn from 'classnames';
 import { TitleDescriptionSection } from '../shared/title-description-section/TitleDescriptionSection';
 import { PhotoInputGroup } from '@/components/admin/input-groups/photo-input-group/PhotoInputGroup';
-import { ImageValues } from '@/types/common/image';
+import { ImageValues, Image } from '@/types/common/image';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { PROGRAM_SECTION_IMAGE_CONFIGS, PROGRAM_VALIDATION } from '@/const/admin/programs';
+import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 import styles from './SingleImageTop.module.scss';
 
 export interface SingleImageTopProps {
     title?: string;
     description?: string;
-    image?: string;
+    image?: Image | ImageValues | null;
     isTemplate?: boolean;
     isEditable?: boolean;
     onTitleChange?: (value: string) => void;
@@ -20,13 +21,14 @@ export interface SingleImageTopProps {
 export const SingleImageTop = ({
     title = '',
     description = '',
-    image = '',
+    image = null,
     isTemplate = false,
     isEditable = false,
     onTitleChange,
     onDescriptionChange,
     onImageChange,
 }: SingleImageTopProps) => {
+    const imageSrc = getImageSrc(image);
     return (
         <div
             className={cn(styles.container, {
@@ -40,7 +42,7 @@ export const SingleImageTop = ({
                         <PhotoInputGroup
                             id="section-image-1"
                             name="section-image-1"
-                            value={null}
+                            value={image}
                             onChange={onImageChange || (() => {})}
                             setError={() => {}}
                             cropWidth={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_TOP.cropWidth}
@@ -56,7 +58,7 @@ export const SingleImageTop = ({
                             maxSizeMB={PROGRAM_VALIDATION.images.maxSizeMB}
                         />
                     ) : (
-                        <img src={image || undefined} alt="" className={styles.image} />
+                        imageSrc && <img src={imageSrc} alt="" className={styles.image} />
                     )}
                 </div>
             </div>

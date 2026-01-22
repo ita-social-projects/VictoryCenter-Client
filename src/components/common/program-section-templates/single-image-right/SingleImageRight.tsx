@@ -1,8 +1,9 @@
 import cn from 'classnames';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { PhotoInputGroup } from '@/components/admin/input-groups/photo-input-group/PhotoInputGroup';
-import { ImageValues } from '@/types/common/image';
+import { ImageValues, Image } from '@/types/common/image';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 import {
     PROGRAMS_TEXT,
     PROGRAM_SECTION_IMAGE_CONFIGS,
@@ -16,7 +17,7 @@ import styles from './SingleImageRight.module.scss';
 export interface SingleImageRightProps {
     title?: string;
     description?: string;
-    image?: string;
+    image?: Image | ImageValues | null;
     isTemplate?: boolean;
     isEditable?: boolean;
     onTitleChange?: (value: string) => void;
@@ -27,13 +28,14 @@ export interface SingleImageRightProps {
 export const SingleImageRight = ({
     title = '',
     description = '',
-    image = '',
+    image = null,
     isTemplate = false,
     isEditable = false,
     onTitleChange,
     onDescriptionChange,
     onImageChange,
 }: SingleImageRightProps) => {
+    const imageSrc = getImageSrc(image);
     const {
         titleError,
         descriptionError,
@@ -94,7 +96,7 @@ export const SingleImageRight = ({
                             <PhotoInputGroup
                                 id="section-image-1"
                                 name="section-image-1"
-                                value={null}
+                                value={image}
                                 onChange={onImageChange || (() => {})}
                                 setError={() => {}}
                                 cropWidth={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_RIGHT.cropWidth}
@@ -124,7 +126,7 @@ export const SingleImageRight = ({
                     </div>
                     <div className={styles['right-section']}>
                         <div className={styles['image-wrapper']}>
-                            <img src={image} alt="" className={styles.image} />
+                            {imageSrc && <img src={imageSrc} alt="" className={styles.image} />}
                         </div>
                     </div>
                 </>

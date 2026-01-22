@@ -1,15 +1,16 @@
 import cn from 'classnames';
 import { TitleDescriptionSection } from '../shared/title-description-section/TitleDescriptionSection';
 import { PhotoInputGroup } from '@/components/admin/input-groups/photo-input-group/PhotoInputGroup';
-import { ImageValues } from '@/types/common/image';
+import { ImageValues, Image } from '@/types/common/image';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { PROGRAM_SECTION_IMAGE_CONFIGS, PROGRAM_VALIDATION } from '@/const/admin/programs';
+import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 import styles from './SingleImageBottom.module.scss';
 
 export interface SingleImageBottomProps {
     title?: string;
     description?: string;
-    image?: string;
+    image?: Image | ImageValues | null;
     isTemplate?: boolean;
     isEditable?: boolean;
     onTitleChange?: (value: string) => void;
@@ -20,13 +21,14 @@ export interface SingleImageBottomProps {
 export const SingleImageBottom = ({
     title = '',
     description = '',
-    image = '',
+    image = null,
     isTemplate = false,
     isEditable = false,
     onTitleChange,
     onDescriptionChange,
     onImageChange,
 }: SingleImageBottomProps) => {
+    const imageSrc = getImageSrc(image);
     return (
         <div
             className={cn(styles.container, {
@@ -51,7 +53,7 @@ export const SingleImageBottom = ({
                         <PhotoInputGroup
                             id="section-image-1"
                             name="section-image-1"
-                            value={image ? { base64: image, mimeType: '' } : null}
+                            value={image}
                             onChange={onImageChange || (() => {})}
                             setError={() => {}}
                             cropWidth={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.cropWidth}
@@ -67,7 +69,7 @@ export const SingleImageBottom = ({
                             maxSizeMB={PROGRAM_VALIDATION.images.maxSizeMB}
                         />
                     ) : (
-                        <img src={image || undefined} alt="img1-of-single-image-bottom" className={styles.image} />
+                        imageSrc && <img src={imageSrc} alt="img1-of-single-image-bottom" className={styles.image} />
                     )}
                 </div>
             </div>

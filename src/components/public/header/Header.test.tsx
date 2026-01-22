@@ -87,6 +87,19 @@ jest.mock('@/components/public/language-switcher/LanguageSwitcher', () => ({
         </button>
     ),
 }));
+jest.mock('react-i18next', () => {
+    const headerUk = require('@/locales/uk/header.json');
+
+    return {
+        useTranslation: () => ({
+            t: (key: string) => headerUk[key] ?? key,
+        }),
+    };
+});
+
+jest.mock('@/hooks/common/use-locale/useLocale', () => ({
+    useLocale: () => ({ currentLanguage: 'uk' }),
+}));
 
 describe('Header', () => {
     beforeEach(() => {

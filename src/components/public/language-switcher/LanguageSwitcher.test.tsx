@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { fireEvent, render, waitFor, within, screen } from '@testing-library/react';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import i18n from '@/locales/i18n';
 
@@ -14,13 +14,25 @@ const EXPECTED_LABELS: Record<string, string> = {
 
 const getLabel = (locale: string) => EXPECTED_LABELS[locale] || locale.toUpperCase();
 
+jest.mock('./LanguageSwitcher.scss', () => ({}));
+
+const mockChangeLanguage = jest.fn();
+
+jest.mock('@/hooks/common/use-locale/useLocale', () => ({
+    useLocale: () => ({
+        currentLanguage: 'en',
+        changeLanguage: mockChangeLanguage,
+    }),
+}));
+
 describe('LanguageSwitcher', () => {
-    beforeEach(async () => {
-        await i18n.changeLanguage('uk');
+    beforeEach(() => {
+        jest.clearAllMocks();
     });
 
     it('renders all language options including fallback for unknown locale', () => {
         const { container } = render(<LanguageSwitcher />);
+
         const selectButton = container.querySelector('.language-switcher-head') as HTMLElement;
         fireEvent.click(selectButton);
         const optionsContainer = container.querySelector('.select-options');
@@ -43,20 +55,21 @@ describe('LanguageSwitcher', () => {
     it('calls onValueChange when language is changed', async () => {
         const onValueChange = jest.fn();
         const { container } = render(<LanguageSwitcher onValueChange={onValueChange} />);
+
         fireEvent.click(container.querySelector('.language-switcher-head') as HTMLElement);
 
-        fireEvent.click(screen.getByRole('button', { name: 'EN' }));
+        fireEvent.click(screen.getByRole('button', { name: 'UA' }));
 
         expect(onValueChange).toHaveBeenCalled();
         await waitFor(() => {
-            expect(i18n.language).toBe('en');
+            expect(mockChangeLanguage).toHaveBeenCalledWith('uk');
         });
     });
 
     it('does not crash if onValueChange is missing', async () => {
-        const { container } = render(<LanguageSwitcher />); // Без пропса
+        const { container } = render(<LanguageSwitcher />);
         fireEvent.click(container.querySelector('.language-switcher-head') as HTMLElement);
-        fireEvent.click(screen.getByRole('button', { name: 'EN' }));
-        await waitFor(() => expect(i18n.language).toBe('en'));
+        fireEvent.click(screen.getByRole('button', { name: 'UA' }));
+        await waitFor(() => expect(mockChangeLanguage).toHaveBeenCalledWith('uk'));
     });
 });

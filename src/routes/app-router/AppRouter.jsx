@@ -22,39 +22,58 @@ import { PartnersPage } from '@/pages/public/partners-page/PartnersPage';
 import { WhoWeArePageAdmin } from '@/pages/admin/who-we-are/WhoWeArePageAdmin';
 import { PartnerPanel } from '@/pages/admin/partners/PartnerPanel';
 import { ReportsPage } from '@/pages/public/reports-page';
+import { LanguageSyncWrapper } from '@/components/public/language-sync-wrapper/LanguageSyncWrapper';
 
-export const AppRouter = () => (
-    <BrowserRouter>
+export const AppRouter = () => {
+    const PublicContent = () => (
         <Routes>
-            <Route path="/" element={<PublicLayout />}>
-                <Route index element={<AboutUsPage />} />
-                <Route path={PUBLIC_ROUTES.TEAM.FULL} element={<TeamPage />} />
-                <Route path={PUBLIC_ROUTES.PROGRAMS.FULL} element={<ProgramsPage />} />
-                <Route path={PUBLIC_ROUTES.PROGRAM_DETAIL.FULL} element={<DetailedProgramPage />} />
-                <Route path={PUBLIC_ROUTES.PARTNERS.FULL} element={<PartnersPage />} />
-                <Route path={PUBLIC_ROUTES.ABOUT_US.FULL} element={<AboutUsPage />} />
-                <Route path={PUBLIC_ROUTES.DONATE.FULL} element={<DonatePage />} />
-                <Route path={PUBLIC_ROUTES.REPORTS.FULL} element={<ReportsPage />} />
-                <Route path="*" element={<NotFound />} />
-            </Route>
+            <Route index element={<AboutUsPage />} />
+            <Route path={PUBLIC_ROUTES.TEAM.PATH} element={<TeamPage />} />
+            <Route path={PUBLIC_ROUTES.PROGRAMS.PATH} element={<ProgramsPage />} />
+            <Route path={PUBLIC_ROUTES.PROGRAM_DETAIL.FULL} element={<DetailedProgramPage />} />
+            <Route path={PUBLIC_ROUTES.PARTNERS.PATH} element={<PartnersPage />} />
+            <Route path={PUBLIC_ROUTES.ABOUT_US.PATH} element={<AboutUsPage />} />
+            <Route path={PUBLIC_ROUTES.DONATE.PATH} element={<DonatePage />} />
+            <Route path={PUBLIC_ROUTES.REPORTS.PATH} element={<ReportsPage />} />
+            <Route path="*" element={<NotFound />} />
+        </Routes>
+    );
 
-            <Route element={<AdminContextWrapper />}>
-                <Route element={<PublicRoute />}>
-                    <Route path={ADMIN_ROUTES.LOGIN.FULL} element={<LoginPage />} />
-                </Route>
-
-                <Route element={<PrivateRoute />}>
-                    <Route path={ADMIN_ROUTES.ROOT} element={<AdminLayout />}>
-                        <Route index element={<AdminHomePage />} />
-                        <Route path={ADMIN_ROUTES.TEAM.PATH} element={<TeamPageAdmin />} />
-                        <Route path={ADMIN_ROUTES.PROGRAMS.PATH} element={<ProgramsPageAdmin />} />
-                        <Route path={ADMIN_ROUTES.DONATE.PATH} element={<DonatePageAdmin />} />
-                        <Route path={ADMIN_ROUTES.FAQ.PATH} element={<FaqPanel />} />
-                        <Route path={ADMIN_ROUTES.WHO_WE_ARE.PATH} element={<WhoWeArePageAdmin />} />
-                        <Route path={ADMIN_ROUTES.PARTNERS.PATH} element={<PartnerPanel />} />
+    return (
+        <BrowserRouter>
+            <Routes>
+                {/*For EN*/}
+                <Route path="/en/*" element={<LanguageSyncWrapper />}>
+                    <Route element={<PublicLayout />}>
+                        <Route path="*" element={<PublicContent />} />
                     </Route>
                 </Route>
-            </Route>
-        </Routes>
-    </BrowserRouter>
-);
+
+                {/*For UA*/}
+                <Route path="/*" element={<LanguageSyncWrapper />}>
+                    <Route element={<PublicLayout />}>
+                        <Route path="*" element={<PublicContent />} />
+                    </Route>
+                </Route>
+
+                {/*Admin*/}
+                <Route element={<AdminContextWrapper />}>
+                    <Route element={<PublicRoute />}>
+                        <Route path={ADMIN_ROUTES.LOGIN.FULL} element={<LoginPage />} />
+                    </Route>
+                    <Route element={<PrivateRoute />}>
+                        <Route path={ADMIN_ROUTES.ROOT} element={<AdminLayout />}>
+                            <Route index element={<AdminHomePage />} />
+                            <Route path={ADMIN_ROUTES.TEAM.PATH} element={<TeamPageAdmin />} />
+                            <Route path={ADMIN_ROUTES.PROGRAMS.PATH} element={<ProgramsPageAdmin />} />
+                            <Route path={ADMIN_ROUTES.DONATE.PATH} element={<DonatePageAdmin />} />
+                            <Route path={ADMIN_ROUTES.FAQ.PATH} element={<FaqPanel />} />
+                            <Route path={ADMIN_ROUTES.WHO_WE_ARE.PATH} element={<WhoWeArePageAdmin />} />
+                            <Route path={ADMIN_ROUTES.PARTNERS.PATH} element={<PartnerPanel />} />
+                        </Route>
+                    </Route>
+                </Route>
+            </Routes>
+        </BrowserRouter>
+    );
+};

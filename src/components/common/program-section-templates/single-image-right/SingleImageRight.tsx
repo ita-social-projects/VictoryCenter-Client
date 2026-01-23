@@ -13,6 +13,8 @@ import {
 import { useProgramSectionValidation } from '@/hooks/admin/use-program-section-validation';
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
 import styles from './SingleImageRight.module.scss';
+import { error } from 'console';
+import { useState } from 'react';
 
 export interface SingleImageRightProps {
     title?: string;
@@ -47,6 +49,12 @@ export const SingleImageRight = ({
         onTitleChange,
         onDescriptionChange,
     });
+
+    const [error, setError] = useState<string>('');
+
+    const handleSetError = (errorMessage: string | null) => {
+        setError(errorMessage || '');
+    };
 
     return (
         <div
@@ -98,7 +106,8 @@ export const SingleImageRight = ({
                                 name="section-image-1"
                                 value={image}
                                 onChange={onImageChange || (() => {})}
-                                setError={() => {}}
+                                setError={handleSetError}
+                                error={error}
                                 cropWidth={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_RIGHT.cropWidth}
                                 cropHeight={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_RIGHT.cropHeight}
                                 minWidth={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_RIGHT.minWidth}

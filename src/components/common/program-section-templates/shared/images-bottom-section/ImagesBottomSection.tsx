@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import cn from 'classnames';
 import { nanoid } from 'nanoid';
 import { TitleDescriptionSection } from '../title-description-section/TitleDescriptionSection';
@@ -62,6 +62,8 @@ export const ImagesBottomSection = ({
     bottomSectionClassName = '',
     imageWrapperClassName = '',
 }: ImagesBottomSectionProps) => {
+    const [errors, setErrors] = useState<string[]>([]);
+
     const displayedImages = useMemo(() => images.slice(0, config.imageCount), [images, config.imageCount]);
     const displayedImageHandlers = useMemo(
         () => imageHandlers.slice(0, config.imageCount),
@@ -72,6 +74,14 @@ export const ImagesBottomSection = ({
         () => Array.from({ length: displayedImages.length }, () => nanoid()),
         [displayedImages.length],
     );
+
+    const handleSetError = (index: number, error: string | null) => {
+        setErrors((prevErrors) => {
+            const newErrors = [...prevErrors];
+            newErrors[index] = error || '';
+            return newErrors;
+        });
+    };
 
     return (
         <div
@@ -109,7 +119,8 @@ export const ImagesBottomSection = ({
                                       name={`section-image-${index + 1}`}
                                       value={value}
                                       onChange={handler || (() => {})}
-                                      setError={() => {}}
+                                      setError={(error) => handleSetError(index, error)}
+                                      error={errors[index]}
                                       cropWidth={config.imageConfig.cropWidth}
                                       cropHeight={config.imageConfig.cropHeight}
                                       minWidth={config.imageConfig.minWidth}

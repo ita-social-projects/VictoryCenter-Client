@@ -6,6 +6,7 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { PROGRAM_SECTION_IMAGE_CONFIGS, PROGRAM_VALIDATION } from '@/const/admin/programs';
 import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 import styles from './SingleImageBottom.module.scss';
+import { useState } from 'react';
 
 export interface SingleImageBottomProps {
     title?: string;
@@ -29,6 +30,13 @@ export const SingleImageBottom = ({
     onImageChange,
 }: SingleImageBottomProps) => {
     const imageSrc = getImageSrc(image);
+
+    const [error, setError] = useState<string>('');
+
+    const handleSetError = (errorMessage: string | null) => {
+        setError(errorMessage || '');
+    };
+
     return (
         <div
             className={cn(styles.container, {
@@ -55,7 +63,8 @@ export const SingleImageBottom = ({
                             name="section-image-1"
                             value={image}
                             onChange={onImageChange || (() => {})}
-                            setError={() => {}}
+                            setError={handleSetError}
+                            error={error}
                             cropWidth={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.cropWidth}
                             cropHeight={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.cropHeight}
                             minWidth={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.minWidth}

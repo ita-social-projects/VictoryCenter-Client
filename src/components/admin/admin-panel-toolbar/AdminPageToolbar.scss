@@ -15,3 +15,26 @@
         width: 38.75rem;
     }
 }
+@media (max-width: 1810px) {
+    .admin-panel-toolbar {
+        &-search {
+            width: 28.75rem;
+        }
+    }
+}
+
+@media (max-width: 1660px) {
+    .admin-panel-toolbar {
+        &-search {
+            width: 20.75rem;
+        }
+    }
+}
+
+@media (max-width: 1520px) {
+    .admin-panel-toolbar {
+        &-search {
+            width: 15.75rem;
+        }
+    }
+}

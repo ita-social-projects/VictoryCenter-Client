@@ -17,9 +17,11 @@
 
         &-answer,
         &-question {
-            flex: 4;
+            width: 90%;
+            flex: 1;
             display: flex;
-            align-items: center;
+            flex-direction: column;
+            justify-content: space-between;
 
             font-size: 18px;
             font-weight: 400;

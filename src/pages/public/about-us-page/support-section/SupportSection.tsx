@@ -5,23 +5,16 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { SupportCard } from './components/support-card/SupportCard';
 import styles from './SupportSection.module.scss';
 import { AboutUsContent } from '@/types/public/about-us-page';
-import { ReactComponent as ArrowRight } from '@/assets/icons/arrow-right.svg';
-import { ReactComponent as ArrowLeft } from '@/assets/icons/arrow-left.svg';
+
 export interface SupportSectionProps {
     content: AboutUsContent[] | null;
 }
 
 const SWIPER_NAVIGATION_CONFIG = {
     prev: {
-        icon: ArrowLeft,
-        ariaLabel: 'previous',
-        variant: 'primary-dark' as const,
         className: styles.left,
     },
     next: {
-        icon: ArrowRight,
-        ariaLabel: 'next',
-        variant: 'primary-dark' as const,
         className: styles.right,
     },
 };

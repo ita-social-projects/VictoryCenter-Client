@@ -5,13 +5,28 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/scrollbar';
 import { Button, ButtonProps } from '@/components/public/ui/button';
+import { ReactComponent as ArrowRight } from '@/assets/icons/arrow-right.svg';
+import { ReactComponent as ArrowLeft } from '@/assets/icons/arrow-left.svg';
 
 export type ShowScrollbar = { isVisible: true; className: string; classNameDrag: string } | { isVisible: false };
 
+const SWIPER_NAVIGATION_CONFIG = {
+    prev: {
+        icon: ArrowLeft,
+        ariaLabel: 'previous',
+        variant: 'primary-dark' as const,
+    },
+    next: {
+        icon: ArrowRight,
+        ariaLabel: 'next',
+        variant: 'primary-dark' as const,
+    },
+};
+
 interface NavigationButtons {
     classNamebuttonBlock?: string;
-    prev?: ButtonProps;
-    next?: ButtonProps;
+    prev?: Partial<ButtonProps>;
+    next?: Partial<ButtonProps>;
 }
 
 interface SwiperProps<T> {
@@ -96,6 +111,29 @@ export function Swiper<T>({
         return modules;
     }, [isVisible]);
 
+    // Об'єднання дефолтної конфігурації з переданими пропсами
+    const prevButtonProps = useMemo(
+        () =>
+            navigationButtons?.prev
+                ? ({
+                      ...SWIPER_NAVIGATION_CONFIG.prev,
+                      ...navigationButtons.prev,
+                  } as ButtonProps)
+                : undefined,
+        [navigationButtons?.prev],
+    );
+
+    const nextButtonProps = useMemo(
+        () =>
+            navigationButtons?.next
+                ? ({
+                      ...SWIPER_NAVIGATION_CONFIG.next,
+                      ...navigationButtons.next,
+                  } as ButtonProps)
+                : undefined,
+        [navigationButtons?.next],
+    );
+
     if (!items || items.length === 0) {
         return null;
     }
@@ -107,9 +145,6 @@ export function Swiper<T>({
               dragClass: `${showScrollbar.classNameDrag}`,
           }
         : false;
-
-    const prevButtonProps = navigationButtons?.prev;
-    const nextButtonProps = navigationButtons?.next;
 
     return (
         <>

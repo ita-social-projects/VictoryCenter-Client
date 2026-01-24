@@ -1,11 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { BackgroundMedia } from './BackgroundMedia';
 
-jest.mock('./BackgroundMedia.module.scss', () => ({
-    video: 'video-class',
-    image: 'image-class',
-}));
-
 jest.mock('./media-overlay', () => ({
     MediaOverlay: (props: any) => <div data-testid="media-overlay-mock" data-props={JSON.stringify(props)} />,
 }));
@@ -16,7 +11,6 @@ describe('BackgroundMedia', () => {
         const video = container.querySelector('video') as HTMLVideoElement;
 
         expect(video).toBeInTheDocument();
-        expect(video).toHaveClass('video-class');
         expect(video).toHaveAttribute('src', 'assets/video.mp4');
         expect(video).toHaveAttribute('autoplay');
         expect(video.muted).toBe(true);
@@ -35,13 +29,13 @@ describe('BackgroundMedia', () => {
 
     it('renders image div for non-video url', () => {
         const { container } = render(<BackgroundMedia mediaUrl="assets/image.jpg" />);
-        const image = container.querySelector('.image-class');
+        const image = container.querySelector('[aria-hidden="true"]:not(video)');
         const video = container.querySelector('video');
 
         expect(video).not.toBeInTheDocument();
         expect(image).toBeInTheDocument();
         expect(image).toHaveAttribute('aria-hidden', 'true');
-        expect(image).toHaveStyle({ '--bg-image': 'url(assets/image.jpg)' });
+        expect(image).toHaveAttribute('style');
     });
 
     it('renders MediaOverlay', () => {

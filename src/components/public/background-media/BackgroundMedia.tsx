@@ -1,39 +1,40 @@
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
+import cn from 'classnames';
 import { MediaOverlay, MediaOverlayProps } from './media-overlay';
 import styles from './BackgroundMedia.module.scss';
-import cn from 'classnames';
+import { getMediaType } from '@/utils/functions/get-media-type/get-media-type';
 
 interface BackgroundMediaProps {
     mediaUrl: string;
     overlay?: MediaOverlayProps;
     className?: string;
+    mediaType?: 'video' | 'image';
 }
 
-const isVideo = (url: string) => url.endsWith('.mp4') || url.endsWith('.webm');
+export const BackgroundMedia: React.FC<BackgroundMediaProps> = memo(
+    ({ mediaUrl, overlay = {}, className, mediaType }) => {
+        const type = useMemo(() => mediaType ?? getMediaType(mediaUrl), [mediaUrl, mediaType]);
 
-export const BackgroundMedia: React.FC<BackgroundMediaProps> = memo(({ mediaUrl, overlay, className }) => {
-    return (
-        <>
-            {isVideo(mediaUrl) ? (
-                <video
-                    className={cn(styles.video, className)}
-                    src={mediaUrl}
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    aria-hidden="true"
-                />
-            ) : (
-                <div
-                    className={cn(styles.image, className)}
-                    style={{ '--bg-image': `url(${mediaUrl})` } as React.CSSProperties}
-                    aria-hidden="true"
-                />
-            )}
-            <MediaOverlay {...overlay} />
-        </>
-    );
-});
+        const style = useMemo(
+            () =>
+                ({
+                    '--bg-url': `url(${mediaUrl})`,
+                }) as React.CSSProperties,
+            [mediaUrl],
+        );
+
+        return (
+            <div className={cn(styles.root, className)}>
+                {type === 'video' ? (
+                    <video className={styles.media} src={mediaUrl} autoPlay muted loop playsInline aria-hidden="true" />
+                ) : (
+                    <div className={styles.media} style={style} role="img" aria-hidden="true" />
+                )}
+
+                <MediaOverlay {...overlay} />
+            </div>
+        );
+    },
+);
 
 BackgroundMedia.displayName = 'BackgroundMedia';

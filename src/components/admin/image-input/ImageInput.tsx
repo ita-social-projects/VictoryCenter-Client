@@ -1,5 +1,4 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
-import { createPortal } from 'react-dom';
 import cn from 'classnames';
 import defaultVariantStyles from './DefaultImageInput.module.scss';
 import whoWeAreVariantStyles from './WhoWeAreImageInput.module.scss';

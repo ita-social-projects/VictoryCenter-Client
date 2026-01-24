@@ -1,4 +1,5 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import cn from 'classnames';
 import defaultVariantStyles from './DefaultImageInput.module.scss';
 import whoWeAreVariantStyles from './WhoWeAreImageInput.module.scss';
@@ -281,21 +282,25 @@ export const ImageInput = ({
                 onCancel={() => setShowConfirmModal(false)}
                 onClose={() => setShowConfirmModal(false)}
             />
-            {showCropperModal && rawImage && 'base64' in rawImage && (
-                <CropModal
-                    data-testid="cropper"
-                    src={rawImage}
-                    onChange={(image: ImageValues) => {
-                        onChange(image);
-                        setError(null);
-                        setShowCropperModal(false);
-                    }}
-                    height={cropHeight}
-                    width={cropWidth}
-                    onCancel={handleCropCancel}
-                    isOpen={showCropperModal}
-                />
-            )}
+            {showCropperModal &&
+                rawImage &&
+                'base64' in rawImage &&
+                createPortal(
+                    <CropModal
+                        data-testid="cropper"
+                        src={rawImage}
+                        onChange={(image: ImageValues) => {
+                            onChange(image);
+                            setError(null);
+                            setShowCropperModal(false);
+                        }}
+                        height={cropHeight}
+                        width={cropWidth}
+                        onCancel={handleCropCancel}
+                        isOpen={showCropperModal}
+                    />,
+                    document.body,
+                )}
         </div>
     );
 };

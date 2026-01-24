@@ -17,11 +17,11 @@
     }
 
     .title-section {
-        flex: 50% 0 0;
+        flex: 0 0 50%;
     }
 
     .description-section {
-        flex: 50% 0 0;
+        flex: 0 0 50%;
     }
 
     .description {
@@ -44,31 +44,31 @@
         justify-content: center;
 
         .title-section {
-            flex: 30% 0 0;
+            flex: 0 0 30%;
         }
 
         .description-section {
-            flex: 30% 0 0;
+            flex: 0 0 30%;
         }
     }
 
     @media (max-width: 1024px) {
         .title-section {
-            flex: 40% 0 0;
+            flex: 0 0 40%;
         }
 
         .description-section {
-            flex: 60% 0 0;
+            flex: 0 0 60%;
         }
     }
 
     @media (max-width: 768px) {
         .title-section {
-            flex: 30% 0 0;
+            flex: 0 0 30%;
         }
 
         .description-section {
-            flex: 70% 0 0;
+            flex: 0 0 70%;
         }
     }
 }

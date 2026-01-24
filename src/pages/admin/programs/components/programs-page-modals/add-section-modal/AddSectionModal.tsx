@@ -69,7 +69,7 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} maxWidth="90vw">
+        <Modal isOpen={isOpen} onClose={onClose} maxWidth="90vw" className={styles['modal-container']}>
             <Modal.Content>
                 <div className={styles.container}>
                     <Swiper

@@ -6,7 +6,7 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 1rem;
+    gap: 16px;
 
     .title {
         font-family: t.$font-family-base;
@@ -39,7 +39,7 @@
     }
 
     &.editable {
-        padding: 8rem 6rem 0 6rem;
+        padding: 128px 100px 0 100px;
         gap: 15%;
         justify-content: center;
 

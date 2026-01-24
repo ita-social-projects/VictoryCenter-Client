@@ -6,7 +6,7 @@ $img-height: 680px;
 
 .container {
     @extend .section-container;
-    padding-bottom: 4rem;
+    padding-bottom: 60px;
 }
 
 .template {
@@ -47,7 +47,7 @@ $img-height: 680px;
 
 .container.editable {
     max-height: 1300px;
-    gap: 2rem;
+    gap: 30px;
 
     .top-section {
         flex: auto;

@@ -154,19 +154,8 @@ export const TRIPLE_IMAGES_CONFIG = {
     editableImageMaxWidth: 480,
 };
 
-export const SINGLE_TITLE_QUINTUPLE_DESCRIPTION_TEMPLATE_CONFIG = {
+export const SINGLE_TITLE_QUINTUPLE_DESCRIPTION_CONFIG = {
     descriptionsCount: 5,
-    requiredMark: '*',
-    preview: {
-        width: 1440,
-        height: 600,
-        minScale: 0.1,
-        maxScale: 1,
-    },
-};
-
-export const PROGRAM_SECTION_TEMPLATE_CONFIG = {
-    SINGLE_TITLE_QUINTUPLE_DESCRIPTION: SINGLE_TITLE_QUINTUPLE_DESCRIPTION_TEMPLATE_CONFIG,
 };
 
 export const PROGRAM_VALIDATION = {

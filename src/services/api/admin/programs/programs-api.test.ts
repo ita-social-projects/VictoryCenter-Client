@@ -212,6 +212,8 @@ describe('fetchPrograms', () => {
 describe('addProgram', () => {
     it('should add program with preview and background images', async () => {
         const programData = getValidProgramData();
+        const originalPreviewImage = programData.previewImage;
+        const originalBackgroundImage = programData.backgroundImage;
 
         const mockPreviewImageResponse = { id: 100, url: 'http://example.com/preview.png', mimeType: 'image/png' };
         const mockBackgroundImageResponse = {
@@ -238,14 +240,16 @@ describe('addProgram', () => {
         const result = await ProgramsApi.addProgram(mockClient, programData);
 
         expect(ImageApi.post).toHaveBeenCalledTimes(2);
-        expect(ImageApi.post).toHaveBeenCalledWith(mockClient, programData.previewImage);
-        expect(ImageApi.post).toHaveBeenCalledWith(mockClient, programData.backgroundImage);
+        expect(ImageApi.post).toHaveBeenCalledWith(mockClient, originalPreviewImage);
+        expect(ImageApi.post).toHaveBeenCalledWith(mockClient, originalBackgroundImage);
 
         expect(mockClient.post).toHaveBeenCalledWith(
             API_ROUTES.PROGRAMS.BASE,
             expect.objectContaining({
                 previewImageId: mockPreviewImageResponse.id,
                 backgroundImageId: mockBackgroundImageResponse.id,
+                previewImage: null,
+                backgroundImage: null,
             }),
         );
 

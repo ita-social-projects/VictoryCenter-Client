@@ -87,12 +87,14 @@ describe('useProgramSectionValidation', () => {
             expect(result.current.descriptionError).toBeUndefined();
         });
 
-        it('should show error on blur when description is too short', () => {
+        it.each([
+            ['empty', ''],
+            ['whitespace-only', '     '],
+        ])('should show error on blur when description is %s', (_, value) => {
             const { result } = renderHook(() => useProgramSectionValidation({}));
-            const invalidDescription = '';
 
             act(() => {
-                result.current.handleDescriptionBlur(createTextAreaBlurEvent(invalidDescription));
+                result.current.handleDescriptionBlur(createTextAreaBlurEvent(value));
             });
 
             expect(result.current.descriptionError).toBeDefined();
@@ -104,6 +106,17 @@ describe('useProgramSectionValidation', () => {
 
             act(() => {
                 result.current.handleDescriptionBlur(createTextAreaBlurEvent(validDescription));
+            });
+
+            expect(result.current.descriptionError).toBeUndefined();
+        });
+
+        it('should not show error for short but non-empty description in draft mode', () => {
+            const { result } = renderHook(() => useProgramSectionValidation({}));
+            const shortDescription = 'a'.repeat(PROGRAM_SECTION_VALIDATION.description.min - 1);
+
+            act(() => {
+                result.current.handleDescriptionBlur(createTextAreaBlurEvent(shortDescription));
             });
 
             expect(result.current.descriptionError).toBeUndefined();

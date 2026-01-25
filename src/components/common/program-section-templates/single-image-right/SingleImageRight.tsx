@@ -13,7 +13,6 @@ import {
 import { useProgramSectionValidation } from '@/hooks/admin/use-program-section-validation';
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
 import styles from './SingleImageRight.module.scss';
-import { error } from 'console';
 import { useState } from 'react';
 
 export interface SingleImageRightProps {

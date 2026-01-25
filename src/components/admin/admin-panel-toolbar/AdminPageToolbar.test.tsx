@@ -9,7 +9,6 @@ import { UI_CONFIG } from '@/const/admin/common';
 import { VisibilityStatus } from '@/types/admin/common';
 import { StatusFilterDropdownProps } from '@/components/admin/status-filter-dropdown/StatusFilterDropdown';
 import { ButtonProps } from '@/components/admin/button/Button';
-import { LocalizationLanguage, TranslationStatusFilter } from '@/types/common/language';
 
 jest.mock('@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch', () => ({
     useDataPaginationFetch: jest.fn(),

@@ -5,9 +5,21 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { VisibilityStatus } from '@/types/admin/common';
 import { FaqApi } from '@/services/api/admin/faq/faq-api';
-import { FaqQuestion, VisitorPage } from '@/types/admin/faq';
+import { FaqQuestion, FaqQuestionDto, VisitorPage } from '@/types/admin/faq';
 import { FAQ_TEXT } from '@/const/admin/faq';
 import axios from 'axios';
+
+// Додайте це до інших моків на початку файлу
+jest.mock('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit', () => ({
+    useLocalizationToolkit: () => ({
+        allLanguages: [{ id: 1, code: 'ua', name: 'Ukrainian' }],
+        translationLanguages: [{ id: 1, code: 'ua', name: 'Ukrainian' }],
+        selectedLanguage: { id: 1, code: 'ua' },
+        onLanguageChange: jest.fn(),
+        translationStatusFilter: 0, // TranslationStatusFilter.All
+        onTranslationStatusFilterChange: jest.fn(),
+    }),
+}));
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient');
 
@@ -170,6 +182,15 @@ const mockFaqs: FaqQuestion[] = [
         answerText: 'A sample answer.',
         status: 'published' as unknown as VisibilityStatus,
         pages: [mockPages[0]],
+        localizations: [
+            // Додаємо обов'язкове поле
+            {
+                language: { id: 1, code: 'ua' },
+                translationStatus: 1, // Relevant
+                questionText: 'Тест Альфа',
+                answerText: 'Відповідь Альфа',
+            },
+        ],
     },
     {
         id: 2,
@@ -177,6 +198,15 @@ const mockFaqs: FaqQuestion[] = [
         answerText: 'Another sample answer.',
         status: 'draft' as unknown as VisibilityStatus,
         pages: [mockPages[1]],
+        localizations: [
+            // Додаємо обов'язкове поле
+            {
+                language: { id: 1, code: 'ua' },
+                translationStatus: 1, // Relevant
+                questionText: 'Тест Бета',
+                answerText: 'Відповідь Бета',
+            },
+        ],
     },
 ];
 
@@ -186,6 +216,15 @@ const mockNewFaq: FaqQuestion = {
     answerText: 'Yet another sample answer.',
     status: 'draft' as unknown as VisibilityStatus,
     pages: mockPages,
+    localizations: [
+        // Додаємо обов'язкове поле
+        {
+            language: { id: 1, code: 'ua' },
+            translationStatus: 1, // Relevant
+            questionText: 'Тест Гамма',
+            answerText: 'Відповідь Гамма',
+        },
+    ],
 };
 
 jest.mock('@/components/admin/admin-panel-toolbar/AdminPageToolbar', () => {
@@ -273,13 +312,26 @@ jest.mock('@/components/admin/toast/toast-container/ToastContainer', () => ({
 }));
 
 // Helper function to convert mock faqs to DTO format
-const convertFaqsToDto = (faqs: FaqQuestion[]) => {
+const convertFaqsToDto = (faqs: FaqQuestion[]): FaqQuestionDto[] => {
     return faqs.map((faq) => ({
         id: faq.id,
         questionText: faq.questionText,
         answerText: faq.answerText,
         status: faq.status,
         pageIds: faq.pages.map((p) => p.id),
+        localizations: faq.localizations.map((l) => ({
+            // Поля з EntityLocalizationDto
+            localizationInfoDto: {
+                id: l.language.id,
+                code: l.language.code,
+            },
+            translationStatus: l.translationStatus,
+            // Поля з FaqLocalizationDto
+            entityId: faq.id,
+            // Поля з FaqLocalizableFields
+            questionText: l.questionText,
+            answerText: l.answerText,
+        })),
     }));
 };
 
@@ -339,7 +391,14 @@ describe('FaqPanelContent', () => {
 
             await waitFor(() => {
                 expect(mockFaqApi.getAll).toHaveBeenCalledTimes(1);
-                expect(mockFaqApi.getAll).toHaveBeenCalledWith(expect.anything(), 1, undefined, 0, expect.any(Number));
+                expect(mockFaqApi.getAll).toHaveBeenCalledWith(
+                    expect.anything(),
+                    1,
+                    0,
+                    undefined,
+                    0,
+                    expect.any(Number),
+                );
             });
 
             await waitFor(() => {
@@ -377,7 +436,14 @@ describe('FaqPanelContent', () => {
             fireEvent.click(screen.getByTestId(`category-2`));
 
             await waitFor(() => {
-                expect(mockFaqApi.getAll).toHaveBeenCalledWith(expect.anything(), 2, undefined, 0, expect.any(Number));
+                expect(mockFaqApi.getAll).toHaveBeenCalledWith(
+                    expect.anything(),
+                    2,
+                    0,
+                    undefined,
+                    0,
+                    expect.any(Number),
+                );
             });
         });
 
@@ -397,6 +463,7 @@ describe('FaqPanelContent', () => {
                 expect(mockFaqApi.getAll).toHaveBeenCalledWith(
                     expect.anything(),
                     1,
+                    0,
                     'published',
                     0,
                     expect.any(Number),
@@ -417,7 +484,7 @@ describe('FaqPanelContent', () => {
             fireEvent.click(screen.getByTestId('filter-draft'));
 
             await waitFor(() => {
-                expect(mockFaqApi.getAll).toHaveBeenCalledWith(expect.anything(), 1, 'draft', 0, expect.any(Number));
+                expect(mockFaqApi.getAll).toHaveBeenCalledWith(expect.anything(), 1, 0, 'draft', 0, expect.any(Number));
             });
         });
 
@@ -446,7 +513,14 @@ describe('FaqPanelContent', () => {
             fireEvent.click(screen.getByTestId('filter-clear'));
 
             await waitFor(() => {
-                expect(mockFaqApi.getAll).toHaveBeenCalledWith(expect.anything(), 1, undefined, 0, expect.any(Number));
+                expect(mockFaqApi.getAll).toHaveBeenCalledWith(
+                    expect.anything(),
+                    1,
+                    0,
+                    undefined,
+                    0,
+                    expect.any(Number),
+                );
             });
         });
     });
@@ -710,6 +784,7 @@ describe('FaqPanelContent', () => {
                     answerText: 'Third answer.',
                     status: VisibilityStatus.Published,
                     pages: [mockPages[0]],
+                    localizations: mockFaqs[0].localizations,
                 },
                 {
                     id: 4,
@@ -717,6 +792,7 @@ describe('FaqPanelContent', () => {
                     answerText: 'Fourth answer.',
                     status: VisibilityStatus.Draft,
                     pages: [mockPages[1]],
+                    localizations: mockFaqs[0].localizations,
                 },
             ];
 
@@ -734,6 +810,7 @@ describe('FaqPanelContent', () => {
                 expect(mockFaqApi.getAll).toHaveBeenCalledWith(
                     expect.anything(),
                     1,
+                    0,
                     undefined,
                     expect.any(Number),
                     expect.any(Number),

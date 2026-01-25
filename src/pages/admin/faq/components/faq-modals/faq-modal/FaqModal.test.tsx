@@ -129,6 +129,7 @@ const mockFaq: FaqQuestion = {
     answerText: 'Test Answer',
     pages: [mockPages[0]],
     status: VisibilityStatus.Draft,
+    localizations: [],
 };
 
 const mockFormData = {
@@ -188,15 +189,34 @@ describe('FaqModal', () => {
         jest.clearAllMocks();
         mockFormRef.isDirty.mockReturnValue(false);
         mockFormRef.isValid.mockReturnValue(true);
+
+        // Створюємо базовий мок для локалізацій, що відповідає FaqLocalizationDto
+        const mockLocalizationsDto = [
+            {
+                entityId: 1,
+                localizationInfoDto: { id: 1, code: 'ua' },
+                translationStatus: 1, // Relevant
+                questionText: 'Питання',
+                answerText: 'Відповідь',
+            },
+        ];
+
         mockFaqApi.post.mockResolvedValue({
-            ...mockFaq,
-            ...mockFormData,
+            id: 1,
+            questionText: mockFormData.questionText,
+            answerText: mockFormData.answerText,
+            status: VisibilityStatus.Draft,
             pageIds: mockFormData.pages.map((p) => p.id),
+            localizations: mockLocalizationsDto,
         });
+
         mockFaqApi.update.mockResolvedValue({
-            ...mockFaq,
-            ...mockFormData,
+            id: mockFaq.id,
+            questionText: mockFormData.questionText,
+            answerText: mockFormData.answerText,
+            status: VisibilityStatus.Draft,
             pageIds: mockFormData.pages.map((p) => p.id),
+            localizations: mockLocalizationsDto,
         });
     });
 

@@ -9,6 +9,7 @@ import { UI_CONFIG } from '@/const/admin/common';
 import { VisibilityStatus } from '@/types/admin/common';
 import { StatusFilterDropdownProps } from '@/components/admin/status-filter-dropdown/StatusFilterDropdown';
 import { ButtonProps } from '@/components/admin/button/Button';
+import { LocalizationLanguage, TranslationStatusFilter } from '@/types/common/language';
 
 jest.mock('@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch', () => ({
     useDataPaginationFetch: jest.fn(),
@@ -25,6 +26,9 @@ jest.mock('@/components/admin/status-filter-dropdown/StatusFilterDropdown', () =
         </div>
     )),
 }));
+jest.mock('@/components/admin/localization-toolkit/LocalizationToolkit', () => ({
+    LocalizationToolkit: () => <div data-testid="localization-toolkit" />,
+}));
 
 jest.mock('@/components/admin/button/Button', () => ({
     Button: jest.fn(({ children, onClick, ...props }: ButtonProps) => (
@@ -39,7 +43,6 @@ jest.mock('@/assets/icons/plus.svg', () => ({
 }));
 
 describe('AdminPanelToolbar', () => {
-    // Test data
     interface TestItem {
         id: number;
         name: string;
@@ -77,7 +80,6 @@ describe('AdminPanelToolbar', () => {
     const mockOnAddItem = jest.fn();
     const mockOnSuggestionSelect = jest.fn();
 
-    // Set up useDataPaginationFetch mock implementation
     const mockHookImplementation = {
         data: mockItems,
         isLoading: false,
@@ -91,8 +93,6 @@ describe('AdminPanelToolbar', () => {
         const useDataPaginationFetch =
             require('@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch').useDataPaginationFetch;
         useDataPaginationFetch.mockImplementation(() => mockHookImplementation);
-
-        // Reset mock implementation of component mocks
         const { SearchBar } = require('../search-bar/SearchBar');
         const { StatusFilterDropdown } = require('../status-filter-dropdown/StatusFilterDropdown');
         const { Button } = require('../button/Button');
@@ -113,6 +113,9 @@ describe('AdminPanelToolbar', () => {
     const renderComponent = (props = {}) => {
         return render(
             <AdminPanelToolbar<TestItem>
+                languages={[]}
+                onLanguageChange={jest.fn()}
+                onTranslationStatusFilterChange={jest.fn()}
                 getSearchItemKey={(item) => item.id}
                 getSearchItemLabel={(item) => item.name}
                 fetchSearchItems={mockFetchSearchItems}
@@ -145,7 +148,6 @@ describe('AdminPanelToolbar', () => {
         renderComponent();
 
         const { StatusFilterDropdown } = require('../status-filter-dropdown/StatusFilterDropdown');
-        // Get the last call to StatusFilterDropdown
         const onStatusFilterChange = StatusFilterDropdown.mock.calls[0][0].onStatusFilterChange;
 
         onStatusFilterChange(VisibilityStatus.Published);
@@ -192,11 +194,9 @@ describe('AdminPanelToolbar', () => {
         const { SearchBar } = require('../search-bar/SearchBar');
         const searchBarProps = SearchBar.mock.calls[0][0];
 
-        // Verify that SearchBar was called with the correct props
         expect(searchBarProps).toHaveProperty('onQueryChange');
         expect(searchBarProps).toHaveProperty('onClear');
         expect(searchBarProps).toHaveProperty('onSearchItemSelect');
-        // Empty array initially, not mockItems (this matches component behavior)
         expect(searchBarProps).toHaveProperty('searchItems', []);
     });
 
@@ -228,26 +228,20 @@ describe('AdminPanelToolbar', () => {
     });
 
     it('updates localSearchItems when data changes', async () => {
-        // Set up with original items
         renderComponent();
 
-        // Verify initial state
         const { SearchBar } = require('../search-bar/SearchBar');
-        // Initially, the search items array should be empty (matches component behavior)
         expect(SearchBar.mock.calls[0][0].searchItems).toEqual([]);
 
-        // Change the data in the hook implementation
         const newItems = [{ id: 4, name: 'New Item' }];
         const useDataPaginationFetch =
             require('../../../hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch').useDataPaginationFetch;
 
-        // Update the hook to return new data on the next call
         useDataPaginationFetch.mockImplementationOnce(() => ({
             ...mockHookImplementation,
             data: newItems,
         }));
 
-        // Re-render to trigger the useEffect with new data
         const { rerender } = renderComponent();
         rerender(
             <AdminPanelToolbar<TestItem>
@@ -259,12 +253,13 @@ describe('AdminPanelToolbar', () => {
                 onAddItem={mockOnAddItem}
                 AddItemButtonText="Add Item"
                 onSuggestionSelect={mockOnSuggestionSelect}
+                languages={[]}
+                onLanguageChange={jest.fn()}
+                onTranslationStatusFilterChange={jest.fn()}
             />,
         );
 
-        // Now check if SearchBar is called with the updated properties
         await waitFor(() => {
-            // Expect another call to SearchBar or check if props changed
             expect(SearchBar).toHaveBeenCalled();
         });
     });
@@ -275,38 +270,54 @@ describe('AdminPanelToolbar', () => {
         const { SearchBar } = require('../search-bar/SearchBar');
         const searchBarProps = SearchBar.mock.calls[0][0];
 
-        // Verify that search-related props are correctly passed
         expect(searchBarProps.minCharactersToSearch).toBe(UI_CONFIG.SEARCH_BAR.MIN_CHARACTERS_FOR_SEARCH);
         expect(searchBarProps.searchDelayMs).toBe(UI_CONFIG.SEARCH_BAR.SEARCH_DELAY_MS);
         expect(searchBarProps.placeholder).toBe('Search items');
         expect(searchBarProps.notFoundMessage).toBe('No items found');
     });
-
-    // Add a simple direct test for onSearch to increase coverage
     it('directly tests onSearch function with different search terms', () => {
-        // Mock the useState setter functions
         const setCurrentSearchTerm = jest.fn();
         const setLocalSearchItems = jest.fn();
 
-        // Create a simplified version of the onSearch function to test directly
         const onSearch = (query: string) => {
             setCurrentSearchTerm(query);
-            // Simulate the minimum characters check
             if (query.length < 3) {
-                // Using a hardcoded value for simplicity in test
                 setLocalSearchItems([]);
             }
         };
 
-        // Test with a short query
         onSearch('a');
         expect(setCurrentSearchTerm).toHaveBeenCalledWith('a');
         expect(setLocalSearchItems).toHaveBeenCalledWith([]);
 
-        // Test with a longer query
         onSearch('test query');
         expect(setCurrentSearchTerm).toHaveBeenCalledWith('test query');
-        // setLocalSearchItems shouldn't be called again for the longer query
         expect(setLocalSearchItems).toHaveBeenCalledTimes(1);
+    });
+    it('fetchHandler should call fetchSearchItems with current search term', async () => {
+        renderComponent();
+
+        const useDataPaginationFetch =
+            require('../../../hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch').useDataPaginationFetch;
+        const fetchHandler = useDataPaginationFetch.mock.calls[0][0].fetchHandler;
+
+        const mockParams = { offset: 0, limit: 5 };
+        await fetchHandler(mockParams);
+
+        expect(mockFetchSearchItems).toHaveBeenCalledWith('', mockParams);
+    });
+    it('should clear local search items when query length is less than minimum', () => {
+        renderComponent();
+
+        const { SearchBar } = require('../search-bar/SearchBar');
+
+        const onQueryChange = SearchBar.mock.calls[0][0].onQueryChange;
+
+        act(() => {
+            onQueryChange('a');
+        });
+
+        const lastCallProps = SearchBar.mock.calls[SearchBar.mock.calls.length - 1][0];
+        expect(lastCallProps.searchItems).toEqual([]);
     });
 });

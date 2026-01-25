@@ -15,6 +15,18 @@ import { AdminPanelToolbarProps } from '@/components/admin/admin-panel-toolbar/A
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
 }));
+jest.mock('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit', () => ({
+    useLocalizationToolkit: () => ({
+        allLanguages: [
+            { id: 1, code: 'uk', name: 'Українська' },
+            { id: 2, code: 'en', name: 'Англійська' },
+        ],
+        onLanguageChange: jest.fn(),
+        onTranslationStatusFilterChange: jest.fn(),
+        translationLanguages: [{ id: 1, code: 'en', name: 'Англійська' }],
+        language: { id: 1, code: 'uk', name: 'Українська' },
+    }),
+}));
 
 jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider', () => ({
     useToast: () => ({
@@ -565,7 +577,7 @@ describe('ProgramsPageContent', () => {
         await waitFor(() => {
             expect(screen.getByTestId('category-1')).not.toBeDisabled();
             expect(screen.getByTestId('category-2')).toBeDisabled();
-            expect(mockProgramsApi.fetchPrograms).toHaveBeenCalledTimes(2);
+            expect(mockProgramsApi.fetchPrograms).toHaveBeenCalledTimes(2); // Initial + on category change
         });
     });
 });

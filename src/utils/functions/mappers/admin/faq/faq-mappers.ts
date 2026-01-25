@@ -3,9 +3,7 @@ import { mapLocalizationDtoToModel } from '@/utils/functions/mappers/common/loca
 
 export function mapFaqQuestionDtoToModel(dto: FaqQuestionDto, pages: VisitorPage[]): FaqQuestion {
     const mappedPages = pages.filter((page) => dto.pageIds.includes(page.id));
-    const mappedLocalizations = dto.localizations.map((localization) =>
-        mapLocalizationDtoToModel(localization),
-    );
+    const mappedLocalizations = dto.localizations.map((localization) => mapLocalizationDtoToModel(localization));
     return {
         id: dto.id,
         questionText: dto.questionText,

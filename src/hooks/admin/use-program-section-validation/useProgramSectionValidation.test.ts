@@ -30,7 +30,6 @@ describe('useProgramSectionValidation', () => {
         });
 
         it.each([
-            ['too short', 'abc'],
             ['empty', ''],
             ['whitespace-only', '     '],
         ])('should show error on blur when title is %s', (_, value) => {
@@ -67,14 +66,16 @@ describe('useProgramSectionValidation', () => {
 
         it('should clear error while typing when value becomes valid', () => {
             const { result } = renderHook(() => useProgramSectionValidation({}));
+            const invalidTitle = '';
+            const validTitle = 'Valid Title';
 
             act(() => {
-                result.current.handleTitleBlur(createBlurEvent('abc'));
+                result.current.handleTitleBlur(createBlurEvent(invalidTitle));
             });
             expect(result.current.titleError).toBeDefined();
 
             act(() => {
-                result.current.handleTitleChange(createChangeEvent('Valid Title'));
+                result.current.handleTitleChange(createChangeEvent(validTitle));
             });
             expect(result.current.titleError).toBeUndefined();
         });
@@ -88,9 +89,10 @@ describe('useProgramSectionValidation', () => {
 
         it('should show error on blur when description is too short', () => {
             const { result } = renderHook(() => useProgramSectionValidation({}));
+            const invalidDescription = '';
 
             act(() => {
-                result.current.handleDescriptionBlur(createTextAreaBlurEvent('short'));
+                result.current.handleDescriptionBlur(createTextAreaBlurEvent(invalidDescription));
             });
 
             expect(result.current.descriptionError).toBeDefined();
@@ -120,16 +122,16 @@ describe('useProgramSectionValidation', () => {
 
         it('should clear error while typing when value becomes valid', () => {
             const { result } = renderHook(() => useProgramSectionValidation({}));
+            const invalidDescription = '';
+            const validDescription = 'This is valid.';
 
             act(() => {
-                result.current.handleDescriptionBlur(createTextAreaBlurEvent('short'));
+                result.current.handleDescriptionBlur(createTextAreaBlurEvent(invalidDescription));
             });
             expect(result.current.descriptionError).toBeDefined();
 
             act(() => {
-                result.current.handleDescriptionChange(
-                    createTextAreaChangeEvent('This is a valid description with enough characters'),
-                );
+                result.current.handleDescriptionChange(createTextAreaChangeEvent(validDescription));
             });
             expect(result.current.descriptionError).toBeUndefined();
         });

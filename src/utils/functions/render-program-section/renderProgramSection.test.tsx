@@ -66,6 +66,40 @@ describe('renderProgramSection', () => {
             expect(screen.getByTestId(testId)).toBeInTheDocument();
         });
     });
+
+    it('should return null for unknown template', () => {
+        const params: RenderProgramSectionParams = {
+            templateId: 999 as ProgramSectionTemplate,
+            data: baseData,
+        };
+        expect(renderProgramSection(params)).toBeNull();
+    });
+
+    it('should handle onImageChange callback for single image templates', () => {
+        const mockOnImagesChange = jest.fn();
+        const mockHandlers = {
+            onTitleChange: jest.fn(),
+            onDescriptionChange: jest.fn(),
+            onImagesChange: mockOnImagesChange,
+        };
+
+        [
+            ProgramSectionTemplate.SingleImageBottom,
+            ProgramSectionTemplate.SingleImageTop,
+            ProgramSectionTemplate.SingleImageRight,
+        ].forEach((templateId) => {
+            mockOnImagesChange.mockClear();
+
+            const params: RenderProgramSectionParams = {
+                templateId,
+                data: baseData,
+                handlers: mockHandlers,
+            };
+
+            render(renderProgramSection(params));
+            expect(mockOnImagesChange).not.toHaveBeenCalled();
+        });
+    });
 });
 
 describe('getInitialSectionContents', () => {

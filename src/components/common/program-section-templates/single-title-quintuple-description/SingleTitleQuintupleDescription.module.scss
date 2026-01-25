@@ -1,0 +1,288 @@
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/variables/fonts' as f;
+
+.container {
+    width: 100%;
+    overflow: visible;
+}
+
+.editable {
+    padding-top: 64px;
+    padding-bottom: 64px;
+}
+
+.editableInner {
+    width: 100%;
+    max-width: 1328px;
+    margin: 0 auto;
+
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 432px));
+    gap: 16px;
+
+    align-content: start;
+    justify-content: center;
+}
+
+.labelRow {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+
+    font-family: f.$mulish-regular-font;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    color: c.$grey-900;
+}
+
+.required {
+    color: c.$error;
+}
+
+.labelText {
+    color: c.$grey-900;
+}
+
+.titleCell {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.titleField {
+    position: relative;
+
+    width: 100%;
+    min-height: 76px;
+
+    border: 1px solid c.$grey-700;
+    border-radius: 8px;
+    background-color: c.$white;
+    box-shadow: 0px 1px 2px rgba(10, 13, 18, 0.05);
+
+    display: flex;
+    align-items: stretch;
+}
+
+.titleInput {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+
+    font-family: f.$mulish-regular-font;
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 48px;
+    letter-spacing: -0.8px;
+    text-transform: uppercase;
+
+    color: c.$grey-700;
+
+    padding: 10px 72px 10px 14px;
+
+    &::placeholder {
+        font-size: 32px;
+        line-height: 40px;
+        color: c.$grey-700;
+    }
+}
+
+.titleInputFilled {
+    color: c.$blue-900;
+}
+
+.titleCounter {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+
+    font-family: f.$mulish-regular-font;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    color: c.$grey-900;
+}
+
+.descCell {
+    width: 100%;
+    background-color: c.$light-blue-50;
+    border-radius: 24px;
+    padding: 16px 24px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    min-height: 211px;
+}
+
+.descField {
+    width: 100%;
+    min-height: 115px;
+
+    border: 1px solid c.$grey-700;
+    border-radius: 8px;
+    background-color: c.$white;
+    box-shadow: 0px 1px 2px rgba(10, 13, 18, 0.05);
+
+    overflow: hidden;
+}
+
+.descTextarea {
+    width: 100%;
+    min-height: 115px;
+
+    padding: 10px 14px;
+
+    border: none;
+    outline: none;
+    resize: none;
+    background: transparent;
+
+    font-family: f.$mulish-regular-font;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 28px;
+    letter-spacing: -0.36px;
+
+    color: c.$blue-900;
+}
+
+.descCounter {
+    width: 100%;
+    text-align: right;
+
+    font-family: f.$mulish-regular-font;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    color: c.$grey-900;
+}
+
+.display {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.displayInner {
+    width: 100%;
+    max-width: 1328px;
+
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-areas:
+        'title card1 card2'
+        'card3 card4 card5';
+    gap: 16px;
+
+    justify-content: center;
+    align-content: start;
+
+    overflow: visible;
+}
+
+.displayTitleCell {
+    grid-area: title;
+    min-width: 0;
+}
+
+.displayTitle {
+    margin: 0;
+
+    font-family: f.$mulish-regular-font;
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 40px;
+    letter-spacing: -0.64px;
+    text-transform: uppercase;
+
+    color: c.$blue-900;
+    white-space: pre-line;
+}
+
+.card {
+    background-color: c.$light-blue-50;
+    border-radius: 24px;
+    padding: 16px 24px;
+
+    min-height: 211px;
+    min-width: 0;
+}
+
+.cardText {
+    margin: 0;
+
+    font-family: f.$mulish-regular-font;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+
+    color: c.$blue-900;
+    white-space: pre-wrap;
+
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.card1 {
+    grid-area: card1;
+}
+.card2 {
+    grid-area: card2;
+}
+.card3 {
+    grid-area: card3;
+}
+.card4 {
+    grid-area: card4;
+}
+.card5 {
+    grid-area: card5;
+}
+
+.templateWrap {
+    width: 100%;
+    min-height: 600px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    background-color: transparent;
+}
+
+.templateScaler {
+    display: block;
+}
+
+.templateStage {
+    transform-origin: top left;
+    background-color: transparent;
+}
+
+.template {
+    .displayInner {
+        width: 1328px;
+        max-width: 1328px;
+        height: 100%;
+        margin: 0 auto;
+        align-content: center;
+    }
+
+    .card {
+        height: 200px;
+        min-height: 200px;
+        overflow: hidden;
+    }
+
+    .cardText {
+        display: -webkit-box;
+        -webkit-line-clamp: 7;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+}

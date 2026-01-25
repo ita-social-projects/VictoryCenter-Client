@@ -27,6 +27,8 @@ export const PROGRAMS_TEXT = {
         TITLE_SAMPLE_TEXT: 'ЗАГОЛОВОК',
         DESCRIPTION_SAMPLE_TEXT:
             'Ідея створення Victory Center виникла не як проєкт, а як відповідь на виклик часу - глибокий біль, виснаження, але водночас сильна віра в перемогу.\n\n Розмови з ветеранами/ками та волонтерами/ками, які до останньої краплі віддавали свої сили заради майбутнього країни, висвітлити потребу у просторі, в якому можна знову відчути момент “тут i зараз”.\n\n Так народився задум Victory Center — ініціативи, що допомагає людям, які пройшли крізь жахи війни, зупинитися, відновитися i найголовніше бути почутими. ',
+        DESCRIPTION_SAMPLE_TEXT_SHORT:
+            'Ідея створення Victory Center виникла не як проєкт, а як відповідь на виклик часу - глибокий біль, виснаження, але водночас сильна віра в перемогу. ',
         MODAL: {
             UNSAVED_CHANGES_TITLE: 'Відмінити додавання секції?',
         },
@@ -150,6 +152,21 @@ export const TRIPLE_IMAGES_CONFIG = {
     editableGridColumns: 4,
     editableImageMaxHeight: 480,
     editableImageMaxWidth: 480,
+};
+
+export const SINGLE_TITLE_QUINTUPLE_DESCRIPTION_TEMPLATE_CONFIG = {
+    descriptionsCount: 5,
+    requiredMark: '*',
+    preview: {
+        width: 1440,
+        height: 600,
+        minScale: 0.1,
+        maxScale: 1,
+    },
+};
+
+export const PROGRAM_SECTION_TEMPLATE_CONFIG = {
+    SINGLE_TITLE_QUINTUPLE_DESCRIPTION: SINGLE_TITLE_QUINTUPLE_DESCRIPTION_TEMPLATE_CONFIG,
 };
 
 export const PROGRAM_VALIDATION = {

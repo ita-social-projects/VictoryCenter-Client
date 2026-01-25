@@ -23,6 +23,7 @@ const TEMPLATES = [
     ProgramSectionTemplate.SingleImageBottom,
     ProgramSectionTemplate.SingleImageTop,
     ProgramSectionTemplate.SingleImageRight,
+    ProgramSectionTemplate.SingleTitleQuintupleDescription,
 ];
 
 export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectionModalProps) => {
@@ -41,9 +42,18 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
             case ProgramSectionTemplate.SingleImageRight:
                 return [placeholderImage];
             case ProgramSectionTemplate.TextOnly:
+            case ProgramSectionTemplate.SingleTitleQuintupleDescription:
+                return [];
             default:
                 return [];
         }
+    };
+
+    const getPlaceholderDescriptions = (templateId: ProgramSectionTemplate) => {
+        if (templateId === ProgramSectionTemplate.SingleTitleQuintupleDescription) {
+            return Array.from({ length: 5 }, () => PROGRAMS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT_SHORT);
+        }
+        return undefined;
     };
 
     const handleSave = () => {
@@ -62,6 +72,7 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
             data: {
                 title: PROGRAMS_TEXT.SECTION.TITLE_SAMPLE_TEXT,
                 description: PROGRAMS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT,
+                descriptions: getPlaceholderDescriptions(templateId),
                 images: getPlaceholderImages(templateId),
             },
             isTemplate: true,

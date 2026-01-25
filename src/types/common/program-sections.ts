@@ -16,6 +16,7 @@ export enum ProgramSectionTemplate {
     SingleImageBottom = 5,
     SingleImageTop = 6,
     SingleImageRight = 7,
+    SingleTitleQuintupleDescription = 11,
 }
 
 export interface ProgramSectionContent {

@@ -8,17 +8,20 @@ import { TextOnly } from '@/components/common/program-section-templates/text-onl
 import { SingleImageTop } from '@/components/common/program-section-templates/single-image-top/SingleImageTop';
 import { SingleImageBottom } from '@/components/common/program-section-templates/single-image-bottom/SingleImageBottom';
 import { SingleImageRight } from '@/components/common/program-section-templates/single-image-right/SingleImageRight';
+import { SingleTitleQuintupleDescription } from '@/components/common/program-section-templates/single-title-quintuple-description/SingleTitleQuintupleDescription';
 import { ContentType } from '@/types/common/programs';
 
 export interface ProgramSectionData {
     title?: string;
     description?: string;
+    descriptions?: string[];
     images?: string[];
 }
 
 export interface ProgramSectionHandlers {
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
+    onDescriptionsChange?: (index: number, value: string) => void;
     onImagesChange?: (index: number, file: ImageValues | null) => void;
 }
 
@@ -127,6 +130,17 @@ export const renderProgramSection = ({
                     onImageChange={handlers?.onImagesChange ? (file) => handlers.onImagesChange!(0, file) : undefined}
                 />
             );
+        case ProgramSectionTemplate.SingleTitleQuintupleDescription:
+            return (
+                <SingleTitleQuintupleDescription
+                    title={data.title}
+                    descriptions={data.descriptions ?? (data.description ? [data.description] : [])}
+                    isTemplate={isTemplate}
+                    isEditable={isEditable}
+                    onTitleChange={handlers?.onTitleChange}
+                    onDescriptionsChange={handlers?.onDescriptionsChange}
+                />
+            );
         default:
             return null;
     }
@@ -184,6 +198,24 @@ export const getInitialSectionContents = (templateId: ProgramSectionTemplate): P
                 { contentType: ContentType.Image, order: 3, title: null, description: null, image: null },
                 { contentType: ContentType.Image, order: 4, title: null, description: null, image: null },
                 { contentType: ContentType.Image, order: 5, title: null, description: null, image: null },
+            ];
+
+        case ProgramSectionTemplate.SingleTitleQuintupleDescription:
+            return [
+                {
+                    contentType: ContentType.Title,
+                    order: 0,
+                    title: '',
+                    description: null,
+                    image: null,
+                },
+                ...Array.from({ length: 5 }, (_, i) => ({
+                    contentType: ContentType.Description,
+                    order: i + 1,
+                    title: null,
+                    description: '',
+                    image: null,
+                })),
             ];
 
         default:

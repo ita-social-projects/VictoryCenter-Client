@@ -149,7 +149,7 @@ export const ImagesBottomSection = ({
                                       {imageSrc && (
                                           <img
                                               src={imageSrc}
-                                              alt={`Program section image ${index + 1}`}
+                                              alt={`Program section ${index + 1}`}
                                               className={baseStyles.image}
                                           />
                                       )}

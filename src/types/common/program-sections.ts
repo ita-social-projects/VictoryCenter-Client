@@ -28,6 +28,7 @@ export interface ProgramSectionContent {
     title?: string | null;
     description?: string | null;
     image?: Image | ImageValues | null;
+    imageId?: number | null;
     author?: string | null;
 }
 

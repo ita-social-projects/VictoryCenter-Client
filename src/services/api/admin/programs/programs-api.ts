@@ -132,6 +132,19 @@ export const ProgramsApi = {
             program.backgroundImageId = backgroundImageResult.id;
         }
 
+        await Promise.all(
+            program.sections.map(async (section) => {
+                await Promise.all(
+                    section.contents.map(async (content) => {
+                        if (content.image && 'base64' in content.image) {
+                            const imageResult = await ImageApi.post(client, content.image);
+                            content.imageId = imageResult.id;
+                        }
+                    }),
+                );
+            }),
+        );
+
         const response = await client.post(API_ROUTES.PROGRAMS.BASE, program);
 
         return mapProgramEditToProgram(response.data, client);
@@ -146,6 +159,31 @@ export const ProgramsApi = {
         program.previewImageId = finalPreviewImageId;
         program.backgroundImageId = finalBackgroundImageId;
 
+        const sectionImagesToDelete: number[] = [];
+        await Promise.all(
+            program.sections.map(async (section) => {
+                await Promise.all(
+                    section.contents.map(async (content) => {
+                        if (content.image || content.imageId) {
+                            const contentImageId =
+                                content.imageId ?? (content.image && 'id' in content.image ? content.image.id : null);
+                            const { finalImageId, imageIdToDelete } = await ImageApi.getUpdateImageId(
+                                client,
+                                content.image ?? null,
+                                contentImageId,
+                            );
+
+                            content.imageId = finalImageId;
+
+                            if (imageIdToDelete) {
+                                sectionImagesToDelete.push(imageIdToDelete);
+                            }
+                        }
+                    }),
+                );
+            }),
+        );
+
         const response = await client.put(`${API_ROUTES.PROGRAMS.BASE}/${program.id}`, program);
 
         if (previewImageIdToDelete && previewImageIdToDelete !== finalPreviewImageId) {
@@ -154,6 +192,8 @@ export const ProgramsApi = {
         if (backgroundImageIdToDelete && backgroundImageIdToDelete !== finalBackgroundImageId) {
             await ImageApi.delete(client, backgroundImageIdToDelete);
         }
+
+        await Promise.all(sectionImagesToDelete.map((imageId) => ImageApi.delete(client, imageId)));
 
         return response.data;
     },

@@ -1,0 +1,91 @@
+@use '@/assets/sass/variables/colors';
+@use '@/assets/sass/variables/fonts';
+
+.previewLayout {
+    height: 100%;
+    width: 100%;
+    max-width: 1320px;
+    margin: 0 auto;
+    box-sizing: border-box;
+
+    display: grid;
+    grid-template-areas:
+        'title c0 c1'
+        'c2 c3 c4';
+    grid-template-columns: repeat(3, minmax(0, clamp(220px, 21vw, 330px)));
+    grid-template-rows: auto auto;
+
+    column-gap: clamp(14px, 2vw, 28px);
+    row-gap: clamp(14px, 2vw, 28px);
+
+    padding: clamp(18px, 3.2vw, 56px);
+
+    justify-content: center;
+    align-content: center;
+    align-items: start;
+}
+
+.previewTitleBlock {
+    grid-area: title;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.previewTitleText {
+    margin: 0;
+    font-family: fonts.$mulish-regular-font;
+    font-weight: 700;
+    color: colors.$blue-900;
+    text-align: left;
+
+    font-size: clamp(12px, 2.1vw, 34px);
+    line-height: clamp(14px, 2.5vw, 42px);
+}
+
+.previewCard {
+    width: 100%;
+    min-width: 0;
+
+    background-color: colors.$light-blue-50;
+    border-radius: clamp(12px, 1.5vw, 20px);
+    box-sizing: border-box;
+
+    aspect-ratio: 432 / 211;
+
+    padding: clamp(14px, 1.6vw, 22px);
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.previewText {
+    margin: 0;
+    font-family: fonts.$mulish-regular-font;
+    font-weight: 400;
+    color: colors.$blue-900;
+    white-space: pre-wrap;
+
+    font-size: clamp(10px, 1vw, 16px);
+    line-height: clamp(12px, 1.25vw, 20px);
+}
+
+.card0 {
+    grid-area: c0;
+}
+
+.card1 {
+    grid-area: c1;
+}
+
+.card2 {
+    grid-area: c2;
+}
+
+.card3 {
+    grid-area: c3;
+}
+
+.card4 {
+    grid-area: c4;
+}

@@ -7,7 +7,8 @@ import {
     PROGRAM_SECTION_VALIDATION,
     SINGLE_TITLE_QUINTUPLE_DESCRIPTION_CONFIG,
 } from '@/const/admin/programs';
-import styles from './SingleTitleQuintupleDescription.module.scss';
+import baseStyles from './SingleTitleQuintupleDescription.module.scss';
+import previewStyles from './SingleTitleQuintupleDescription-preview.module.scss';
 
 export interface SingleTitleQuintupleDescriptionProps {
     title?: string;
@@ -26,20 +27,33 @@ export const SingleTitleQuintupleDescription = ({
     isEditable = false,
     onTitleChange,
     onDescriptionsChange,
-    className = '',
+    className,
 }: SingleTitleQuintupleDescriptionProps) => {
-    const normalizedDescriptions = useMemo(() => {
-        const count = SINGLE_TITLE_QUINTUPLE_DESCRIPTION_CONFIG.descriptionsCount;
-        return Array.from({ length: count }, (_, i) => descriptions[i] ?? '');
-    }, [descriptions]);
+    const descriptionsCount = SINGLE_TITLE_QUINTUPLE_DESCRIPTION_CONFIG.descriptionsCount;
+
+    const normalizedDescriptions = useMemo(
+        () => Array.from({ length: descriptionsCount }, (_, i) => descriptions[i] ?? ''),
+        [descriptions, descriptionsCount],
+    );
+
+    const rootClassName = cn(
+        baseStyles.container,
+        {
+            [baseStyles.template]: isTemplate && !isEditable,
+            [baseStyles.editable]: isEditable,
+        },
+        className,
+    );
 
     if (isEditable) {
+        const editableOrder = [1, 2, 0, 3, 4];
+
         return (
-            <div className={cn(styles.container, styles.editable, className)}>
-                <div className={styles.editableGrid}>
-                    <div className={styles.titleCell}>
+            <div className={rootClassName}>
+                <div className={baseStyles.editableGrid}>
+                    <div className={baseStyles.titleCell}>
                         <InputWithCharacterLimitGroup
-                            className={styles.titleInputGroup}
+                            className={baseStyles.titleInputGroup}
                             label={PROGRAMS_TEXT.SECTION.FORM.TITLE.TEXT}
                             isRequired={true}
                             id="single-title-quintuple-title"
@@ -51,109 +65,40 @@ export const SingleTitleQuintupleDescription = ({
                         />
                     </div>
 
-                    <div className={styles.descriptionCard}>
-                        <TextAreaWithCharacterLimitGroup
-                            className={styles.descriptionInputGroup}
-                            label={PROGRAMS_TEXT.SECTION.FORM.DESCRIPTION.TEXT}
-                            isRequired={true}
-                            id="single-title-quintuple-desc-1"
-                            name="single-title-quintuple-desc-1"
-                            value={normalizedDescriptions[1]}
-                            onChange={(e) => onDescriptionsChange?.(1, e.target.value)}
-                            maxLength={PROGRAM_SECTION_VALIDATION.description.max}
-                            rows={4}
-                        />
-                    </div>
-
-                    <div className={styles.descriptionCard}>
-                        <TextAreaWithCharacterLimitGroup
-                            className={styles.descriptionInputGroup}
-                            label={PROGRAMS_TEXT.SECTION.FORM.DESCRIPTION.TEXT}
-                            isRequired={true}
-                            id="single-title-quintuple-desc-2"
-                            name="single-title-quintuple-desc-2"
-                            value={normalizedDescriptions[2]}
-                            onChange={(e) => onDescriptionsChange?.(2, e.target.value)}
-                            maxLength={PROGRAM_SECTION_VALIDATION.description.max}
-                            rows={4}
-                        />
-                    </div>
-
-                    <div className={styles.descriptionCard}>
-                        <TextAreaWithCharacterLimitGroup
-                            className={styles.descriptionInputGroup}
-                            label={PROGRAMS_TEXT.SECTION.FORM.DESCRIPTION.TEXT}
-                            isRequired={true}
-                            id="single-title-quintuple-desc-0"
-                            name="single-title-quintuple-desc-0"
-                            value={normalizedDescriptions[0]}
-                            onChange={(e) => onDescriptionsChange?.(0, e.target.value)}
-                            maxLength={PROGRAM_SECTION_VALIDATION.description.max}
-                            rows={4}
-                        />
-                    </div>
-
-                    <div className={styles.descriptionCard}>
-                        <TextAreaWithCharacterLimitGroup
-                            className={styles.descriptionInputGroup}
-                            label={PROGRAMS_TEXT.SECTION.FORM.DESCRIPTION.TEXT}
-                            isRequired={true}
-                            id="single-title-quintuple-desc-3"
-                            name="single-title-quintuple-desc-3"
-                            value={normalizedDescriptions[3]}
-                            onChange={(e) => onDescriptionsChange?.(3, e.target.value)}
-                            maxLength={PROGRAM_SECTION_VALIDATION.description.max}
-                            rows={4}
-                        />
-                    </div>
-
-                    <div className={styles.descriptionCard}>
-                        <TextAreaWithCharacterLimitGroup
-                            className={styles.descriptionInputGroup}
-                            label={PROGRAMS_TEXT.SECTION.FORM.DESCRIPTION.TEXT}
-                            isRequired={true}
-                            id="single-title-quintuple-desc-4"
-                            name="single-title-quintuple-desc-4"
-                            value={normalizedDescriptions[4]}
-                            onChange={(e) => onDescriptionsChange?.(4, e.target.value)}
-                            maxLength={PROGRAM_SECTION_VALIDATION.description.max}
-                            rows={4}
-                        />
-                    </div>
+                    {editableOrder.map((index) => (
+                        <div key={index} className={baseStyles.descriptionCard}>
+                            <TextAreaWithCharacterLimitGroup
+                                className={baseStyles.descriptionInputGroup}
+                                label={PROGRAMS_TEXT.SECTION.FORM.DESCRIPTION.TEXT}
+                                isRequired={true}
+                                id={`single-title-quintuple-desc-${index}`}
+                                name={`single-title-quintuple-desc-${index}`}
+                                value={normalizedDescriptions[index]}
+                                onChange={(e) => onDescriptionsChange?.(index, e.target.value)}
+                                maxLength={PROGRAM_SECTION_VALIDATION.description.max}
+                                rows={4}
+                            />
+                        </div>
+                    ))}
                 </div>
             </div>
         );
     }
 
+    const previewOrder = [0, 1, 2, 3, 4];
+
     return (
-        <div className={cn(styles.container, { [styles.template]: isTemplate }, className)}>
-            <div className={styles.previewLayout}>
-                <div className={styles.previewTitleBlock}>
-                    <h2 className={styles.previewTitleText}>{title}</h2>
+        <div className={rootClassName}>
+            <div className={previewStyles.previewLayout}>
+                <div className={previewStyles.previewTitleBlock}>
+                    <h2 className={previewStyles.previewTitleText}>{title}</h2>
                 </div>
 
-                <div className={styles.previewCardsBlock}>
-                    <div className={styles.previewRowTop}>
-                        <div className={styles.previewCard}>
-                            <p className={styles.previewText}>{normalizedDescriptions[0]}</p>
-                        </div>
-                        <div className={styles.previewCard}>
-                            <p className={styles.previewText}>{normalizedDescriptions[1]}</p>
-                        </div>
+                {previewOrder.map((index) => (
+                    <div key={index} className={cn(previewStyles.previewCard, previewStyles[`card${index}`])}>
+                        <p className={previewStyles.previewText}>{normalizedDescriptions[index]}</p>
                     </div>
-
-                    <div className={styles.previewRowBottom}>
-                        <div className={styles.previewCard}>
-                            <p className={styles.previewText}>{normalizedDescriptions[2]}</p>
-                        </div>
-                        <div className={styles.previewCard}>
-                            <p className={styles.previewText}>{normalizedDescriptions[3]}</p>
-                        </div>
-                        <div className={styles.previewCard}>
-                            <p className={styles.previewText}>{normalizedDescriptions[4]}</p>
-                        </div>
-                    </div>
-                </div>
+                ))}
             </div>
         </div>
     );

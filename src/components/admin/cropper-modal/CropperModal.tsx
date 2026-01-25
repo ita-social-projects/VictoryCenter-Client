@@ -140,7 +140,7 @@ export const CropModal = ({ src, onChange, width, height, onCancel, isOpen }: Cr
         <Modal
             isOpen={isOpen}
             onClose={onCancel}
-            maxWidth={`${naturalWidth ? Math.min(1200, Math.max(800, naturalWidth)) : 800}px`}
+            maxWidth={`min(calc(100vw - 32px), ${naturalWidth ? Math.min(1200, Math.max(800, naturalWidth)) : 800}px)`}
         >
             <Modal.Title>{CROPPER_CONSTANTS.TITLE}</Modal.Title>
             <Modal.Content>

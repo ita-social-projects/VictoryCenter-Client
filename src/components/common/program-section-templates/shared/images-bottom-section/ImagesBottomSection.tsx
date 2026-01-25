@@ -27,15 +27,17 @@ export interface ImagesBottomSectionConfig {
     editableImageMaxWidth?: number;
 }
 
+export interface ImageHandler {
+    handler?: (file: ImageValues | null) => void;
+    key: string;
+    value: Image | ImageValues | null;
+}
+
 export interface ImagesBottomSectionProps {
     title?: string;
     description?: string;
     images: (Image | ImageValues | null)[];
-    imageHandlers: Array<{
-        handler?: (file: ImageValues | null) => void;
-        key: string;
-        value: Image | ImageValues | null;
-    }>;
+    imageHandlers: ImageHandler[];
     config: ImagesBottomSectionConfig;
     isTemplate?: boolean;
     isEditable?: boolean;
@@ -144,7 +146,13 @@ export const ImagesBottomSection = ({
                                       data-elevated={config.elevatedIndices.includes(index) ? 'true' : undefined}
                                       data-testid="image-wrapper"
                                   >
-                                      {imageSrc && <img src={imageSrc} alt="" className={baseStyles.image} />}
+                                      {imageSrc && (
+                                          <img
+                                              src={imageSrc}
+                                              alt={`Program section image ${index + 1}`}
+                                              className={baseStyles.image}
+                                          />
+                                      )}
                                   </div>
                               );
                           })}

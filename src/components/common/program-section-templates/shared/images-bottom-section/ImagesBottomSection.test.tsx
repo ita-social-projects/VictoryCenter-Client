@@ -114,8 +114,7 @@ describe('ImagesBottomSection', () => {
 
     it('renders images in view mode', () => {
         render(<ImagesBottomSection {...defaultProps} />);
-        // Use role 'presentation' because <img alt=""> is role=presentation
-        const images = screen.getAllByRole('presentation');
+        const images = screen.getAllByRole('img');
         expect(images).toHaveLength(2);
         expect(images[0]).toHaveAttribute('src', expect.stringContaining('img1.jpg'));
         expect(images[1]).toHaveAttribute('src', expect.stringContaining('img2.jpg'));
@@ -132,8 +131,8 @@ describe('ImagesBottomSection', () => {
         const wrappers = screen.getAllByTestId('image-wrapper');
         expect(wrappers).toHaveLength(2);
 
-        const presentations = screen.getAllByRole('presentation');
-        expect(presentations).toHaveLength(1);
+        const images = screen.getAllByRole('img');
+        expect(images).toHaveLength(1);
     });
 
     it('wires PhotoInputGroup props for each editable image', () => {

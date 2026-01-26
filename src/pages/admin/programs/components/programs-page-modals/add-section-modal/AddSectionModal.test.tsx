@@ -11,6 +11,7 @@ const mockRenderProgramSection = jest.fn((_: any) => <div data-testid="rendered-
 
 let mockSwiperActiveIndex = 0;
 let mockSwiperOnSlideChange: ((index: number) => void) | undefined;
+let mockSwiperItems: ProgramSectionTemplate[] = [];
 
 jest.mock('@/utils/functions/render-program-section', () => ({
     renderProgramSection: (args: any) => mockRenderProgramSection(args),
@@ -18,8 +19,9 @@ jest.mock('@/utils/functions/render-program-section', () => ({
 
 jest.mock('@/components/public/swiper/Swiper', () => ({
     Swiper: ({ items, renderItem, onSlideChange, className }: any) => {
+        mockSwiperItems = items;
         mockSwiperOnSlideChange = onSlideChange;
-        // Initialize on first render
+
         if (mockSwiperActiveIndex === -1) {
             mockSwiperActiveIndex = 0;
             setTimeout(() => onSlideChange?.(0), 0);
@@ -103,23 +105,6 @@ describe('AddSectionModal', () => {
     const mockOnClose = jest.fn();
     const mockOnSelectTemplate = jest.fn();
 
-    const TEMPLATES = [
-        ProgramSectionTemplate.QuadImagesBottom,
-        ProgramSectionTemplate.DualImagesBottom,
-        ProgramSectionTemplate.TextOnly,
-        ProgramSectionTemplate.TripleImagesBottom,
-        ProgramSectionTemplate.SingleImageBottom,
-        ProgramSectionTemplate.SingleImageTop,
-        ProgramSectionTemplate.SingleImageRight,
-    ];
-
-    const getLastTemplateId = () => {
-        const calls = mockRenderProgramSection.mock.calls as unknown as any[];
-        const lastCall = calls[calls.length - 1] as any[] | undefined;
-        const args = lastCall?.[0] as any;
-        return args?.templateId as ProgramSectionTemplate | undefined;
-    };
-
     const defaultProps: AddSectionModalProps = {
         isOpen: true,
         onClose: mockOnClose,
@@ -130,6 +115,7 @@ describe('AddSectionModal', () => {
         jest.clearAllMocks();
         mockSwiperActiveIndex = 0;
         mockSwiperOnSlideChange = undefined;
+        mockSwiperItems = [];
     });
 
     it('should render when isOpen is true', () => {
@@ -155,17 +141,14 @@ describe('AddSectionModal', () => {
     it('should call onClose when close button is clicked', () => {
         render(<AddSectionModal {...defaultProps} />);
 
-        const closeButton = screen.getByTestId('modal-close-btn');
-        fireEvent.click(closeButton);
-
+        fireEvent.click(screen.getByTestId('modal-close-btn'));
         expect(mockOnClose).toHaveBeenCalledTimes(1);
     });
 
     it('should call onClose and onSelectTemplate when choose template button is clicked', () => {
         render(<AddSectionModal {...defaultProps} />);
 
-        const chooseButton = screen.getByText(PROGRAMS_TEXT.BUTTON.CHOOSE_SECTION);
-        fireEvent.click(chooseButton);
+        fireEvent.click(screen.getByText(PROGRAMS_TEXT.BUTTON.CHOOSE_SECTION));
 
         expect(mockOnSelectTemplate).toHaveBeenCalledTimes(1);
         expect(mockOnClose).toHaveBeenCalledTimes(1);
@@ -188,40 +171,46 @@ describe('AddSectionModal', () => {
         render(<AddSectionModal {...defaultProps} />);
 
         expect(mockRenderProgramSection).toHaveBeenCalled();
+        expect(mockSwiperItems.length).toBeGreaterThan(0);
 
         fireEvent.click(screen.getByTitle('Previous slide'));
         fireEvent.click(screen.getByText(PROGRAMS_TEXT.BUTTON.CHOOSE_SECTION));
-        expect(mockOnSelectTemplate).toHaveBeenCalledWith(TEMPLATES[TEMPLATES.length - 1]);
+        expect(mockOnSelectTemplate).toHaveBeenCalledWith(mockSwiperItems[mockSwiperItems.length - 1]);
 
         mockOnSelectTemplate.mockClear();
-        mockSwiperActiveIndex = TEMPLATES.length - 1;
+        mockSwiperActiveIndex = mockSwiperItems.length - 1;
 
         fireEvent.click(screen.getByTitle('Next slide'));
         fireEvent.click(screen.getByText(PROGRAMS_TEXT.BUTTON.CHOOSE_SECTION));
-        expect(mockOnSelectTemplate).toHaveBeenCalledWith(TEMPLATES[0]);
+        expect(mockOnSelectTemplate).toHaveBeenCalledWith(mockSwiperItems[0]);
     });
 
     it('moves between adjacent templates: next increments, previous decrements', () => {
         render(<AddSectionModal {...defaultProps} />);
 
+        expect(mockSwiperItems.length).toBeGreaterThan(1);
+
         fireEvent.click(screen.getByTitle('Next slide'));
         fireEvent.click(screen.getByText(PROGRAMS_TEXT.BUTTON.CHOOSE_SECTION));
-        expect(mockOnSelectTemplate).toHaveBeenCalledWith(TEMPLATES[1]);
+        expect(mockOnSelectTemplate).toHaveBeenCalledWith(mockSwiperItems[1]);
 
         mockOnSelectTemplate.mockClear();
         mockSwiperActiveIndex = 1;
+
         fireEvent.click(screen.getByTitle('Previous slide'));
         fireEvent.click(screen.getByText(PROGRAMS_TEXT.BUTTON.CHOOSE_SECTION));
-        expect(mockOnSelectTemplate).toHaveBeenCalledWith(TEMPLATES[0]);
+        expect(mockOnSelectTemplate).toHaveBeenCalledWith(mockSwiperItems[0]);
     });
 
     it('selects the currently shown template when saving', () => {
         render(<AddSectionModal {...defaultProps} />);
 
+        expect(mockSwiperItems.length).toBeGreaterThan(1);
+
         fireEvent.click(screen.getByTitle('Next slide'));
         fireEvent.click(screen.getByText(PROGRAMS_TEXT.BUTTON.CHOOSE_SECTION));
 
-        expect(mockOnSelectTemplate).toHaveBeenCalledWith(TEMPLATES[1]);
+        expect(mockOnSelectTemplate).toHaveBeenCalledWith(mockSwiperItems[1]);
         expect(mockOnClose).toHaveBeenCalled();
     });
 });

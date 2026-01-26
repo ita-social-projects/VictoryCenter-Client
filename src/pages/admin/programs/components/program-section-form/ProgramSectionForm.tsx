@@ -19,6 +19,10 @@ const getContentByType = (contents: ProgramSectionContent[], type: ContentType):
     return contents.find((c) => c.contentType === type);
 };
 
+const getDescriptionsInOrder = (contents: ProgramSectionContent[]) => {
+    return contents.filter((c) => c.contentType === ContentType.Description).sort((a, b) => a.order - b.order);
+};
+
 export const ProgramSectionForm = ({
     section,
     onSave,
@@ -29,7 +33,10 @@ export const ProgramSectionForm = ({
     const [localSection, setLocalSection] = useState<ProgramSection>(section);
 
     const titleContent = getContentByType(localSection.contents, ContentType.Title);
-    const descriptionContent = getContentByType(localSection.contents, ContentType.Description);
+
+    const descriptionContents = getDescriptionsInOrder(localSection.contents);
+    const descriptions = descriptionContents.map((c) => c.description || '');
+    const description = descriptions[0] || '';
 
     const imageContents = localSection.contents
         .filter((c) => c.contentType === ContentType.Image)
@@ -56,6 +63,27 @@ export const ProgramSectionForm = ({
                 const updatedContents = prev.contents.map((c) =>
                     c.contentType === ContentType.Description ? { ...c, description: value } : c,
                 );
+                const updatedSection = { ...prev, contents: updatedContents };
+                onSectionChange?.(updatedSection);
+                return updatedSection;
+            });
+        },
+        [onSectionChange],
+    );
+
+    const handleDescriptionsChange = useCallback(
+        (index: number, value: string) => {
+            setLocalSection((prev) => {
+                const ordered = getDescriptionsInOrder(prev.contents);
+                const target = ordered[index];
+                if (!target) return prev;
+
+                const updatedContents = prev.contents.map((c) =>
+                    c.contentType === ContentType.Description && c.order === target.order
+                        ? { ...c, description: value }
+                        : c,
+                );
+
                 const updatedSection = { ...prev, contents: updatedContents };
                 onSectionChange?.(updatedSection);
                 return updatedSection;
@@ -96,13 +124,15 @@ export const ProgramSectionForm = ({
         templateId: section.template,
         data: {
             title: titleContent?.title || '',
-            description: descriptionContent?.description || '',
+            description,
+            descriptions,
             images: imageContents,
         },
         isEditable: true,
         handlers: {
             onTitleChange: handleTitleChange,
             onDescriptionChange: handleDescriptionChange,
+            onDescriptionsChange: handleDescriptionsChange,
             onImagesChange: handleImagesChange,
         },
     });

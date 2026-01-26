@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { Button } from '@/components/admin/button/Button';
 import { ImageValues } from '@/types/common/image';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
@@ -19,10 +19,6 @@ const getContentByType = (contents: ProgramSectionContent[], type: ContentType):
     return contents.find((c) => c.contentType === type);
 };
 
-const getDescriptionsInOrder = (contents: ProgramSectionContent[]) => {
-    return contents.filter((c) => c.contentType === ContentType.Description).sort((a, b) => a.order - b.order);
-};
-
 export const ProgramSectionForm = ({
     section,
     onSave,
@@ -32,28 +28,13 @@ export const ProgramSectionForm = ({
 }: ProgramSectionFormProps) => {
     const [localSection, setLocalSection] = useState<ProgramSection>(section);
 
-    useEffect(() => {
-        setLocalSection(section);
-    }, [section]);
+    const titleContent = getContentByType(localSection.contents, ContentType.Title);
+    const descriptionContent = getContentByType(localSection.contents, ContentType.Description);
 
-    const titleContent = useMemo(
-        () => getContentByType(localSection.contents, ContentType.Title),
-        [localSection.contents],
-    );
-
-    const descriptionContents = useMemo(() => getDescriptionsInOrder(localSection.contents), [localSection.contents]);
-
-    const descriptions = useMemo(() => descriptionContents.map((c) => c.description || ''), [descriptionContents]);
-    const description = useMemo(() => descriptions[0] || '', [descriptions]);
-
-    const imageContents = useMemo(
-        () =>
-            localSection.contents
-                .filter((c) => c.contentType === ContentType.Image)
-                .sort((a, b) => a.order - b.order)
-                .map((c) => (c.image && 'url' in c.image ? c.image.url : '') || ''),
-        [localSection.contents],
-    );
+    const imageContents = localSection.contents
+        .filter((c) => c.contentType === ContentType.Image)
+        .sort((a, b) => a.order - b.order)
+        .map((c) => (c.image && 'url' in c.image ? c.image.url : '') || '');
 
     const handleTitleChange = useCallback(
         (value: string) => {
@@ -83,63 +64,45 @@ export const ProgramSectionForm = ({
         [onSectionChange],
     );
 
-    const handleDescriptionsChange = useCallback(
-        (index: number, value: string) => {
-            setLocalSection((prev) => {
-                const ordered = getDescriptionsInOrder(prev.contents);
-                if (index < 0 || index >= ordered.length) return prev;
-
-                const targetOrder = ordered[index].order;
-
-                const updatedContents = prev.contents.map((c) =>
-                    c.contentType === ContentType.Description && c.order === targetOrder
-                        ? { ...c, description: value }
-                        : c,
-                );
-
-                const updatedSection = { ...prev, contents: updatedContents };
-                onSectionChange?.(updatedSection);
-                return updatedSection;
-            });
+    const updateImageContent = useCallback(
+        (order: number, file: ImageValues | null, prev: ProgramSection): ProgramSection => {
+            const updatedContents = prev.contents.map((c) =>
+                c.contentType === ContentType.Image && c.order === order ? { ...c, image: file } : c,
+            );
+            return { ...prev, contents: updatedContents };
         },
-        [onSectionChange],
+        [],
     );
 
     const handleImagesChange = useCallback(
         (index: number, file: ImageValues | null) => {
             setLocalSection((prev) => {
-                const images = prev.contents
-                    .filter((c) => c.contentType === ContentType.Image)
-                    .sort((a, b) => a.order - b.order);
+                const imageContentsList = prev.contents.filter((c) => c.contentType === ContentType.Image);
+                imageContentsList.sort((a, b) => a.order - b.order);
 
-                const target = images[index];
-                if (!target) return prev;
-
-                const updatedContents = prev.contents.map((c) =>
-                    c.contentType === ContentType.Image && c.order === target.order ? { ...c, image: file } : c,
-                );
-
-                const updatedSection = { ...prev, contents: updatedContents };
-                onSectionChange?.(updatedSection);
-                return updatedSection;
+                if (index < imageContentsList.length) {
+                    const targetOrder = imageContentsList[index].order;
+                    const updatedSection = updateImageContent(targetOrder, file, prev);
+                    onSectionChange?.(updatedSection);
+                    return updatedSection;
+                }
+                return prev;
             });
         },
-        [onSectionChange],
+        [onSectionChange, updateImageContent],
     );
 
     const editableSection = renderProgramSection({
-        templateId: localSection.template,
+        templateId: section.template,
         data: {
             title: titleContent?.title || '',
-            description,
-            descriptions,
+            description: descriptionContent?.description || '',
             images: imageContents,
         },
         isEditable: true,
         handlers: {
             onTitleChange: handleTitleChange,
             onDescriptionChange: handleDescriptionChange,
-            onDescriptionsChange: handleDescriptionsChange,
             onImagesChange: handleImagesChange,
         },
     });

@@ -150,17 +150,6 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             [setFormState],
         );
 
-        const handleSectionChange = useCallback(
-            (sectionIndex: number, updatedSection: ProgramSection) => {
-                setFormState((prev) => {
-                    const updatedSections = [...prev.sections];
-                    updatedSections[sectionIndex] = updatedSection;
-                    return { ...prev, sections: updatedSections };
-                });
-            },
-            [setFormState],
-        );
-
         useImperativeHandle(
             ref,
             () => ({
@@ -304,7 +293,6 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
 
         return (
             <form className={styles['container']} noValidate>
-                {/* Header Section */}
                 <div className={styles['header']}>
                     <div className={styles['header-left']}>
                         <MultiSelectInputGroup
@@ -335,7 +323,6 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                 </div>
                 <div className={styles['sections-divider']} />
 
-                {/* Main Content Layout */}
                 <div className={styles['body']}>
                     <PhotoInputGroup
                         id="backgroundImage"
@@ -456,7 +443,6 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
 
                 <div className={styles['sections-divider']} />
 
-                {/* Sections Area */}
                 <div className={styles['sections-container']}>
                     {!hasSections && (
                         <>
@@ -487,7 +473,6 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                         onSave={() => handleSaveSection(index)}
                                         onCancel={() => handleCancelSection(index)}
                                         isDisabled={isSubmitting || isFormDisabled}
-                                        onSectionChange={(updatedSection) => handleSectionChange(index, updatedSection)}
                                     />
                                     <div className={styles['sections-divider']} />
                                 </React.Fragment>

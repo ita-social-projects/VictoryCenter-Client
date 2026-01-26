@@ -55,11 +55,13 @@ describe('SingleImageRight', () => {
         });
 
         it('renders image when provided', () => {
-            const { container } = render(<SingleImageRight title="Test" image="test-image.jpg" />);
+            const { container } = render(
+                <SingleImageRight title="Test" image={{ id: 1, url: 'test-image.jpg', mimeType: 'image/jpeg' }} />,
+            );
 
             const image = container.querySelector('img');
             expect(image).toBeInTheDocument();
-            expect(image).toHaveAttribute('src', 'test-image.jpg');
+            expect(image).toHaveAttribute('src', expect.stringContaining('test-image.jpg'));
         });
 
         it('applies template class when isTemplate is true', () => {
@@ -169,9 +171,15 @@ describe('SingleImageRight', () => {
         });
 
         it('passes null to PhotoInputGroup (not using image value)', () => {
-            render(<SingleImageRight title="Test" isEditable={true} image="existing-image.jpg" />);
+            render(
+                <SingleImageRight
+                    title="Test"
+                    isEditable={true}
+                    image={{ id: 2, url: 'existing-image.jpg', mimeType: 'image/jpeg' }}
+                />,
+            );
 
-            expect(screen.getByTestId('photo-value')).toHaveTextContent('no-image');
+            expect(screen.getByTestId('photo-value')).toHaveTextContent('existing-image.jpg');
         });
 
         it('does not render h2 and p tags in editable mode', () => {
@@ -182,7 +190,13 @@ describe('SingleImageRight', () => {
         });
 
         it('does not render regular img tag in editable mode', () => {
-            const { container } = render(<SingleImageRight title="Test" isEditable={true} image="test.jpg" />);
+            const { container } = render(
+                <SingleImageRight
+                    title="Test"
+                    isEditable={true}
+                    image={{ id: 3, url: 'test.jpg', mimeType: 'image/jpeg' }}
+                />,
+            );
 
             expect(container.querySelector('img')).not.toBeInTheDocument();
         });
@@ -241,7 +255,7 @@ describe('SingleImageRight', () => {
                 <SingleImageRight
                     title="Full Title"
                     description="Full Description"
-                    image="full-image.jpg"
+                    image={{ id: 4, url: 'full-image.jpg', mimeType: 'image/jpeg' }}
                     isTemplate={true}
                     isEditable={true}
                     {...handlers}

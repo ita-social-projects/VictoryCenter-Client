@@ -113,13 +113,6 @@ describe('AddSectionModal', () => {
         ProgramSectionTemplate.SingleImageRight,
     ];
 
-    const getLastTemplateId = () => {
-        const calls = mockRenderProgramSection.mock.calls as unknown as any[];
-        const lastCall = calls[calls.length - 1] as any[] | undefined;
-        const args = lastCall?.[0] as any;
-        return args?.templateId as ProgramSectionTemplate | undefined;
-    };
-
     const defaultProps: AddSectionModalProps = {
         isOpen: true,
         onClose: mockOnClose,

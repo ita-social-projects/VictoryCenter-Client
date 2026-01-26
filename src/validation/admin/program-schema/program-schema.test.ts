@@ -3,6 +3,8 @@ import { PROGRAM_VALIDATION } from '@/const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ImageValues, Image } from '@/types/common/image';
 import { Program } from '@/types/admin/programs';
+import { ProgramSection, ProgramSectionTemplate } from '@/types/common/program-sections';
+import { ContentType } from '@/types/common/programs';
 
 const createMockFile = (type = 'image/jpeg'): ImageValues => ({
     base64: 'fsdgdsgdsdgsdgsd',
@@ -473,6 +475,135 @@ describe('PROGRAM_VALIDATION_FUNCTIONS', () => {
                     false,
                 ),
             ).toBe(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PROGRAM_VALIDATION.meetingCount.max));
+        });
+    });
+
+    describe('validateSections', () => {
+        const createMockSection = (
+            template: ProgramSectionTemplate,
+            title: string,
+            description: string,
+            imageCount: number,
+        ): ProgramSection => ({
+            template,
+            order: 1,
+            contents: [
+                { contentType: ContentType.Title, order: 0, title },
+                { contentType: ContentType.Description, order: 1, description },
+                ...Array.from({ length: imageCount }, (_, i) => ({
+                    contentType: ContentType.Image,
+                    order: i + 2,
+                    image: createMockImage(i + 1),
+                })),
+            ],
+        });
+
+        it('should return undefined for empty sections array', () => {
+            expect(PROGRAM_VALIDATION_FUNCTIONS.validateSections([], false)).toBeUndefined();
+        });
+
+        it('should pass validation for TextOnly template in draft mode', () => {
+            const section = createMockSection(ProgramSectionTemplate.TextOnly, 'Title', 'Description', 0);
+            expect(PROGRAM_VALIDATION_FUNCTIONS.validateSections([section], false)).toBeUndefined();
+        });
+
+        it('should pass validation for SingleImageBottom with 1 image in publish mode', () => {
+            const section = createMockSection(
+                ProgramSectionTemplate.SingleImageBottom,
+                'Valid Title',
+                'Valid Description',
+                1,
+            );
+            expect(PROGRAM_VALIDATION_FUNCTIONS.validateSections([section], true)).toBeUndefined();
+        });
+
+        it('should pass validation for DualImagesBottom with 2 images in publish mode', () => {
+            const section = createMockSection(
+                ProgramSectionTemplate.DualImagesBottom,
+                'Valid Title',
+                'Valid Description',
+                2,
+            );
+            expect(PROGRAM_VALIDATION_FUNCTIONS.validateSections([section], true)).toBeUndefined();
+        });
+
+        it('should pass validation for TripleImagesBottom with 3 images in publish mode', () => {
+            const section = createMockSection(
+                ProgramSectionTemplate.TripleImagesBottom,
+                'Valid Title',
+                'Valid Description',
+                3,
+            );
+            expect(PROGRAM_VALIDATION_FUNCTIONS.validateSections([section], true)).toBeUndefined();
+        });
+
+        it('should pass validation for QuadImagesBottom with 4 images in publish mode', () => {
+            const section = createMockSection(
+                ProgramSectionTemplate.QuadImagesBottom,
+                'Valid Title',
+                'Valid Description',
+                4,
+            );
+            expect(PROGRAM_VALIDATION_FUNCTIONS.validateSections([section], true)).toBeUndefined();
+        });
+
+        it('should fail when section title is invalid in publish mode', () => {
+            const section = createMockSection(ProgramSectionTemplate.TextOnly, '', 'Valid Description', 0);
+            expect(PROGRAM_VALIDATION_FUNCTIONS.validateSections([section], true)).toBe('invalid');
+        });
+
+        it('should fail when section description is invalid in publish mode', () => {
+            const section = createMockSection(ProgramSectionTemplate.TextOnly, 'Valid Title', '', 0);
+            expect(PROGRAM_VALIDATION_FUNCTIONS.validateSections([section], true)).toBe('invalid');
+        });
+
+        it('should fail when required images are missing in publish mode', () => {
+            const section = createMockSection(
+                ProgramSectionTemplate.SingleImageBottom,
+                'Valid Title',
+                'Valid Description',
+                0,
+            );
+            expect(PROGRAM_VALIDATION_FUNCTIONS.validateSections([section], true)).toBe('invalid');
+        });
+
+        it('should fail when image content exists but image is null in publish mode', () => {
+            const section: ProgramSection = {
+                template: ProgramSectionTemplate.SingleImageBottom,
+                order: 1,
+                contents: [
+                    { contentType: ContentType.Title, order: 0, title: 'Valid Title' },
+                    { contentType: ContentType.Description, order: 1, description: 'Valid Description' },
+                    { contentType: ContentType.Image, order: 2, image: null },
+                ],
+            };
+            expect(PROGRAM_VALIDATION_FUNCTIONS.validateSections([section], true)).toBe('invalid');
+        });
+
+        it('should pass validation for multiple valid sections', () => {
+            const sections = [
+                createMockSection(ProgramSectionTemplate.TextOnly, 'Title 1', 'Description 1', 0),
+                createMockSection(ProgramSectionTemplate.SingleImageBottom, 'Title 2', 'Description 2', 1),
+            ];
+            expect(PROGRAM_VALIDATION_FUNCTIONS.validateSections(sections, true)).toBeUndefined();
+        });
+
+        it('should fail if any section is invalid', () => {
+            const sections = [
+                createMockSection(ProgramSectionTemplate.TextOnly, 'Title 1', 'Description 1', 0),
+                createMockSection(ProgramSectionTemplate.SingleImageBottom, '', 'Description 2', 1),
+            ];
+            expect(PROGRAM_VALIDATION_FUNCTIONS.validateSections(sections, true)).toBe('invalid');
+        });
+
+        it('should allow missing images in draft mode', () => {
+            const section = createMockSection(
+                ProgramSectionTemplate.SingleImageBottom,
+                'Valid Title',
+                'Valid Description',
+                0,
+            );
+            expect(PROGRAM_VALIDATION_FUNCTIONS.validateSections([section], false)).toBeUndefined();
         });
     });
 });

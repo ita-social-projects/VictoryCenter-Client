@@ -29,17 +29,23 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
     const [selectedTemplateIndex, setSelectedTemplateIndex] = useState(0);
 
     const getPlaceholderImages = (templateId: ProgramSectionTemplate) => {
+        const placeholderImageObject = {
+            id: 0,
+            url: placeholderImage,
+            mimeType: 'image/png',
+        };
+
         switch (templateId) {
             case ProgramSectionTemplate.QuadImagesBottom:
-                return [placeholderImage, placeholderImage, placeholderImage, placeholderImage];
+                return [placeholderImageObject, placeholderImageObject, placeholderImageObject, placeholderImageObject];
             case ProgramSectionTemplate.TripleImagesBottom:
-                return [placeholderImage, placeholderImage, placeholderImage];
+                return [placeholderImageObject, placeholderImageObject, placeholderImageObject];
             case ProgramSectionTemplate.DualImagesBottom:
-                return [placeholderImage, placeholderImage];
+                return [placeholderImageObject, placeholderImageObject];
             case ProgramSectionTemplate.SingleImageBottom:
             case ProgramSectionTemplate.SingleImageTop:
             case ProgramSectionTemplate.SingleImageRight:
-                return [placeholderImage];
+                return [placeholderImageObject];
             case ProgramSectionTemplate.TextOnly:
             default:
                 return [];

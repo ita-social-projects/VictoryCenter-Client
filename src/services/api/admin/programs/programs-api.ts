@@ -123,39 +123,127 @@ export const ProgramsApi = {
     },
 
     addProgram: async (client: AxiosInstance, program: ProgramCreateUpdate): Promise<Program> => {
-        if (program.previewImage && 'base64' in program.previewImage) {
-            const previewImageResult = await ImageApi.post(client, program.previewImage);
-            program.previewImageId = previewImageResult.id;
-        }
-        if (program.backgroundImage && 'base64' in program.backgroundImage) {
-            const backgroundImageResult = await ImageApi.post(client, program.backgroundImage);
-            program.backgroundImageId = backgroundImageResult.id;
-        }
+        const uploadedImageIds: number[] = [];
 
-        const response = await client.post(API_ROUTES.PROGRAMS.BASE, program);
+        try {
+            if (program.previewImage && 'base64' in program.previewImage) {
+                const previewImageResult = await ImageApi.post(client, program.previewImage);
+                program.previewImageId = previewImageResult.id;
+                if (previewImageResult.id) {
+                    uploadedImageIds.push(previewImageResult.id);
+                }
+                program.previewImage = null;
+            }
+            if (program.backgroundImage && 'base64' in program.backgroundImage) {
+                const backgroundImageResult = await ImageApi.post(client, program.backgroundImage);
+                program.backgroundImageId = backgroundImageResult.id;
+                if (backgroundImageResult.id) {
+                    uploadedImageIds.push(backgroundImageResult.id);
+                }
+                program.backgroundImage = null;
+            }
 
-        return mapProgramEditToProgram(response.data, client);
+            await Promise.all(
+                program.sections.map(async (section) => {
+                    await Promise.all(
+                        section.contents.map(async (content) => {
+                            if (content.image && 'base64' in content.image) {
+                                const imageResult = await ImageApi.post(client, content.image);
+                                content.imageId = imageResult.id;
+                                if (imageResult.id) {
+                                    uploadedImageIds.push(imageResult.id);
+                                }
+                                content.image = null;
+                            }
+                        }),
+                    );
+                }),
+            );
+
+            const response = await client.post(API_ROUTES.PROGRAMS.BASE, program);
+
+            return mapProgramEditToProgram(response.data, client);
+        } catch (error) {
+            await Promise.allSettled(uploadedImageIds.map((imageId) => ImageApi.delete(client, imageId)));
+            throw error;
+        }
     },
 
     editProgram: async (program: ProgramCreateUpdate, client: AxiosInstance): Promise<Program> => {
-        const { finalImageId: finalPreviewImageId, imageIdToDelete: previewImageIdToDelete } =
-            await ImageApi.getUpdateImageId(client, program.previewImage, program.previewImageId);
-        const { finalImageId: finalBackgroundImageId, imageIdToDelete: backgroundImageIdToDelete } =
-            await ImageApi.getUpdateImageId(client, program.backgroundImage, program.backgroundImageId);
+        const newlyCreatedImageIds: number[] = [];
+        const originalPreviewImageId = program.previewImageId;
+        const originalBackgroundImageId = program.backgroundImageId;
 
-        program.previewImageId = finalPreviewImageId;
-        program.backgroundImageId = finalBackgroundImageId;
+        try {
+            const { finalImageId: finalPreviewImageId, imageIdToDelete: previewImageIdToDelete } =
+                await ImageApi.getUpdateImageId(client, program.previewImage, program.previewImageId);
+            const { finalImageId: finalBackgroundImageId, imageIdToDelete: backgroundImageIdToDelete } =
+                await ImageApi.getUpdateImageId(client, program.backgroundImage, program.backgroundImageId);
 
-        const response = await client.put(`${API_ROUTES.PROGRAMS.BASE}/${program.id}`, program);
+            if (finalPreviewImageId && finalPreviewImageId !== originalPreviewImageId) {
+                newlyCreatedImageIds.push(finalPreviewImageId);
+            }
+            if (finalBackgroundImageId && finalBackgroundImageId !== originalBackgroundImageId) {
+                newlyCreatedImageIds.push(finalBackgroundImageId);
+            }
 
-        if (previewImageIdToDelete && previewImageIdToDelete !== finalPreviewImageId) {
-            await ImageApi.delete(client, previewImageIdToDelete);
+            program.previewImageId = finalPreviewImageId;
+            program.backgroundImageId = finalBackgroundImageId;
+            program.previewImage = null;
+            program.backgroundImage = null;
+
+            const sectionImagesToDelete: number[] = [];
+            const originalContentImageIds = new Map<string, number | null>();
+
+            await Promise.all(
+                program.sections.map(async (section, sectionIndex) => {
+                    await Promise.all(
+                        section.contents.map(async (content, contentIndex) => {
+                            if (content.image || content.imageId) {
+                                const contentImageId =
+                                    content.imageId ??
+                                    (content.image && 'id' in content.image ? content.image.id : null);
+                                const contentKey = `${sectionIndex}-${contentIndex}`;
+                                originalContentImageIds.set(contentKey, contentImageId);
+
+                                const { finalImageId, imageIdToDelete } = await ImageApi.getUpdateImageId(
+                                    client,
+                                    content.image ?? null,
+                                    contentImageId,
+                                );
+
+                                if (finalImageId && finalImageId !== contentImageId) {
+                                    newlyCreatedImageIds.push(finalImageId);
+                                }
+
+                                content.imageId = finalImageId;
+                                content.image = null;
+
+                                if (imageIdToDelete) {
+                                    sectionImagesToDelete.push(imageIdToDelete);
+                                }
+                            }
+                        }),
+                    );
+                }),
+            );
+
+            const response = await client.put(`${API_ROUTES.PROGRAMS.BASE}/${program.id}`, program);
+
+            if (previewImageIdToDelete && previewImageIdToDelete !== finalPreviewImageId) {
+                await ImageApi.delete(client, previewImageIdToDelete);
+            }
+            if (backgroundImageIdToDelete && backgroundImageIdToDelete !== finalBackgroundImageId) {
+                await ImageApi.delete(client, backgroundImageIdToDelete);
+            }
+
+            await Promise.all(sectionImagesToDelete.map((imageId) => ImageApi.delete(client, imageId)));
+
+            return response.data;
+        } catch (error) {
+            await Promise.allSettled(newlyCreatedImageIds.map((imageId) => ImageApi.delete(client, imageId)));
+            throw error;
         }
-        if (backgroundImageIdToDelete && backgroundImageIdToDelete !== finalBackgroundImageId) {
-            await ImageApi.delete(client, backgroundImageIdToDelete);
-        }
-
-        return response.data;
     },
 
     deleteProgram: async (id: number, client: AxiosInstance): Promise<void> => {

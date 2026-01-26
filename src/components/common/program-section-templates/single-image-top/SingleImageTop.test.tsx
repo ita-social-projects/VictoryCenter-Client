@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react';
-import React from 'react';
 import { SingleImageTop, SingleImageTopProps } from './SingleImageTop';
 
 const mockTitleDescriptionSection = jest.fn();
@@ -23,7 +22,7 @@ describe('SingleImageTop', () => {
     const baseProps: SingleImageTopProps = {
         title: 'Test Title',
         description: 'Test Description',
-        image: 'test-image.png',
+        image: { id: 1, url: 'test-image.png', mimeType: 'image/png' },
         isTemplate: false,
         isEditable: false,
     };
@@ -84,7 +83,10 @@ describe('SingleImageTop', () => {
 
         const img = container.querySelector('img');
         expect(img).not.toBeNull();
-        expect(img).toHaveAttribute('src', baseProps.image);
+
+        const expectedSrc = baseProps.image && 'url' in baseProps.image ? baseProps.image.url : '';
+        expect(img).toHaveAttribute('src', expectedSrc);
+
         expect(screen.getByTestId('title-description-section')).toBeInTheDocument();
         expect(mockTitleDescriptionSection).toHaveBeenCalledWith(
             expect.objectContaining({
@@ -110,8 +112,7 @@ describe('SingleImageTop', () => {
 
         expect(container.firstChild).toBeInTheDocument();
         const img = container.querySelector('img');
-        expect(img).not.toBeNull();
-        expect(img).not.toHaveAttribute('src');
+        expect(img).toBeNull();
         expect(screen.getByTestId('title-description-section')).toBeInTheDocument();
         expect(mockTitleDescriptionSection).toHaveBeenCalledWith(
             expect.objectContaining({

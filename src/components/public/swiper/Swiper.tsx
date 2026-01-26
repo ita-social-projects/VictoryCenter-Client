@@ -111,7 +111,6 @@ export function Swiper<T>({
         return modules;
     }, [isVisible]);
 
-    // Об'єднання дефолтної конфігурації з переданими пропсами
     const prevButtonProps = useMemo(
         () =>
             navigationButtons?.prev

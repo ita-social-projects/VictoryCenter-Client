@@ -577,7 +577,7 @@ describe('ProgramsPageContent', () => {
         await waitFor(() => {
             expect(screen.getByTestId('category-1')).not.toBeDisabled();
             expect(screen.getByTestId('category-2')).toBeDisabled();
-            expect(mockProgramsApi.fetchPrograms).toHaveBeenCalledTimes(2); // Initial + on category change
+            expect(mockProgramsApi.fetchPrograms).toHaveBeenCalledTimes(2);
         });
     });
 });

@@ -9,14 +9,13 @@ import { FaqQuestion, FaqQuestionDto, VisitorPage } from '@/types/admin/faq';
 import { FAQ_TEXT } from '@/const/admin/faq';
 import axios from 'axios';
 
-// Додайте це до інших моків на початку файлу
 jest.mock('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit', () => ({
     useLocalizationToolkit: () => ({
         allLanguages: [{ id: 1, code: 'ua', name: 'Ukrainian' }],
         translationLanguages: [{ id: 1, code: 'ua', name: 'Ukrainian' }],
         selectedLanguage: { id: 1, code: 'ua' },
         onLanguageChange: jest.fn(),
-        translationStatusFilter: 0, // TranslationStatusFilter.All
+        translationStatusFilter: 0,
         onTranslationStatusFilterChange: jest.fn(),
     }),
 }));
@@ -183,10 +182,9 @@ const mockFaqs: FaqQuestion[] = [
         status: 'published' as unknown as VisibilityStatus,
         pages: [mockPages[0]],
         localizations: [
-            // Додаємо обов'язкове поле
             {
                 language: { id: 1, code: 'ua' },
-                translationStatus: 1, // Relevant
+                translationStatus: 1,
                 questionText: 'Тест Альфа',
                 answerText: 'Відповідь Альфа',
             },
@@ -199,10 +197,9 @@ const mockFaqs: FaqQuestion[] = [
         status: 'draft' as unknown as VisibilityStatus,
         pages: [mockPages[1]],
         localizations: [
-            // Додаємо обов'язкове поле
             {
                 language: { id: 1, code: 'ua' },
-                translationStatus: 1, // Relevant
+                translationStatus: 1,
                 questionText: 'Тест Бета',
                 answerText: 'Відповідь Бета',
             },
@@ -217,10 +214,9 @@ const mockNewFaq: FaqQuestion = {
     status: 'draft' as unknown as VisibilityStatus,
     pages: mockPages,
     localizations: [
-        // Додаємо обов'язкове поле
         {
             language: { id: 1, code: 'ua' },
-            translationStatus: 1, // Relevant
+            translationStatus: 1,
             questionText: 'Тест Гамма',
             answerText: 'Відповідь Гамма',
         },
@@ -320,15 +316,12 @@ const convertFaqsToDto = (faqs: FaqQuestion[]): FaqQuestionDto[] => {
         status: faq.status,
         pageIds: faq.pages.map((p) => p.id),
         localizations: faq.localizations.map((l) => ({
-            // Поля з EntityLocalizationDto
             localizationInfoDto: {
                 id: l.language.id,
                 code: l.language.code,
             },
             translationStatus: l.translationStatus,
-            // Поля з FaqLocalizationDto
             entityId: faq.id,
-            // Поля з FaqLocalizableFields
             questionText: l.questionText,
             answerText: l.answerText,
         })),

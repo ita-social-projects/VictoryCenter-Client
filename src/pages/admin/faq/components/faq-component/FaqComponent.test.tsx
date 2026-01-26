@@ -106,7 +106,7 @@ describe('FaqComponent', () => {
     });
 
     it('calls handleOnDeleteFaq when delete button is clicked', () => {
-        const handleOnDeleteFaq = jest.fn(); // IGNORE
+        const handleOnDeleteFaq = jest.fn();
         const { container } = render(
             <FaqComponent
                 faq={mockFaq}

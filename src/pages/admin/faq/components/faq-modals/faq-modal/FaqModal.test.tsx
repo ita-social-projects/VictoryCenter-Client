@@ -190,12 +190,11 @@ describe('FaqModal', () => {
         mockFormRef.isDirty.mockReturnValue(false);
         mockFormRef.isValid.mockReturnValue(true);
 
-        // Створюємо базовий мок для локалізацій, що відповідає FaqLocalizationDto
         const mockLocalizationsDto = [
             {
                 entityId: 1,
                 localizationInfoDto: { id: 1, code: 'ua' },
-                translationStatus: 1, // Relevant
+                translationStatus: 1,
                 questionText: 'Питання',
                 answerText: 'Відповідь',
             },

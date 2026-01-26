@@ -29,7 +29,7 @@ const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
 
 interface ErrorState {
     message: string | null;
-    type: 'categories' | 'programs' | 'search' | 'members' | 'languages' | null;
+    type: 'categories' | 'programs' | 'search' | null;
 }
 
 export const ProgramsPageContent = () => {
@@ -145,8 +145,7 @@ export const ProgramsPageContent = () => {
 
     // Errors handling
     const setErrorState = useCallback(
-        (message: string, type: 'categories' | 'programs' | 'search' | 'members' | 'languages') =>
-            setError({ message, type }),
+        (message: string, type: 'categories' | 'programs' | 'search') => setError({ message, type }),
         [],
     );
     const clearError = useCallback(() => setError({ message: null, type: null }), []);

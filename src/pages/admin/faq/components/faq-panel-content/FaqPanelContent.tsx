@@ -35,6 +35,7 @@ enum ErrorType {
     Pages,
     Faq,
     Search,
+    Language,
 }
 
 interface ErrorState {
@@ -77,12 +78,6 @@ export const FaqPanelContent = () => {
         setError({ message, type });
     }, []);
 
-    const setErrorStateForToolkit = useCallback(
-        (message: string, type: any) => {
-            setErrorState(message, type as ErrorType);
-        },
-        [setErrorState],
-    );
     const {
         allLanguages,
         translationLanguages,
@@ -90,7 +85,7 @@ export const FaqPanelContent = () => {
         onLanguageChange,
         translationStatusFilter,
         onTranslationStatusFilterChange,
-    } = useLocalizationToolkit({ setErrorState: setErrorStateForToolkit });
+    } = useLocalizationToolkit({ setErrorState });
 
     const isAnyModalOpened = useMemo(() => {
         return Object.values(modalState).some((value) => (typeof value === 'boolean' ? value : value !== null));

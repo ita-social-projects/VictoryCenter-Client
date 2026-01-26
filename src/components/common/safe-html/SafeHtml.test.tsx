@@ -1,9 +1,9 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { SafeHtml } from './SafeHtml';
-import DOMPurify from 'isomorphic-dompurify';
+import DOMPurify from 'dompurify';
 
-jest.mock('isomorphic-dompurify', () => ({
+jest.mock('dompurify', () => ({
     __esModule: true,
     default: {
         sanitize: jest.fn(),

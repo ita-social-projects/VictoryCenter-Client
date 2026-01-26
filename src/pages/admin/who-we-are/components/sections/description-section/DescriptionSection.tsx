@@ -51,11 +51,7 @@ export const DescriptionSection = ({
 
     return (
         <div className="description-section">
-            <OurMission
-                description={descriptionContent.description ?? ''}
-                className="description-section-show-block"
-                navigate={false}
-            />
+            <OurMission description={descriptionContent.description ?? ''} className="description-section-show-block" />
             <div className="description-section-textarea">
                 <TextAreaWithCharacterLimitGroup
                     label={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}

@@ -1,16 +1,17 @@
 import { PublishedProgramDto } from '@/types/public/programs-page';
 import { ReactComponent as ArrowIcon } from '@/assets/icons/arrow-up-right.svg';
+import styleswhoWeAre from './ProgramCardAboutUsPage.module.scss';
+import stylesPrograms from './ProgramCardProgramsPage.module.scss';
 import { useNavigate } from 'react-router-dom';
 import { PUBLIC_ROUTES } from '@/const/public/routes';
 import cn from 'classnames';
-import './ProgramCardProgramsPage.scss';
-import './ProgramCardAboutUsPage.scss';
 
 interface ProgramCardProps {
     program: PublishedProgramDto;
-    className: string;
+    variant: 'program' | 'whoWeAre';
 }
-export const ProgramCard = ({ program, className }: ProgramCardProps) => {
+
+export const ProgramCard = ({ program, variant }: ProgramCardProps) => {
     const navigate = useNavigate();
     const programCategories = program.categories.map((categorie) => categorie.name).join(', ');
 
@@ -27,31 +28,31 @@ export const ProgramCard = ({ program, className }: ProgramCardProps) => {
         }
     };
 
+    const styles = variant === 'whoWeAre' ? styleswhoWeAre : stylesPrograms;
+
     return (
         <div
-            className={cn('card-block', className, { clickable: !!program.slug })}
+            className={cn(styles.root, { clickable: !!program.slug })}
             onClick={handleClick}
             onKeyDown={handleKeyDown}
             role="button"
             tabIndex={program.slug ? 0 : -1}
             style={{ cursor: program.slug ? 'pointer' : 'default' }}
         >
-            <img src={program.previewImage?.url} alt={program.name} className="card-img" />
-            <div className="card-content">
-                <div className="subtitle-info">
-                    <div className="subtitle-content">
-                        <div className="subtitle-link">
-                            <p className="program-subtitle">{programCategories}</p>
-                            <h2 className="program-title">{program.name}</h2>
+            <img src={program.previewImage?.url} alt={program.name} className={styles.image} />
+            <div className={styles.content}>
+                <div className={styles[`subtitle-content`]}>
+                    <div className={styles.subtitle}>
+                        <div className={styles.link}>
+                            <p className={styles.categories}>{programCategories}</p>
+                            <h2 className={styles.name}>{program.name}</h2>
                         </div>
-                        <div className="arrow-container">
-                            <ArrowIcon className="arrow-icon" />
+                        <div className={styles.arrow}>
+                            <ArrowIcon className={styles.icon} />
                         </div>
                     </div>
                 </div>
-                <div className="subtitle-info-hover">
-                    <p className="program-description">{program.description}</p>
-                </div>
+                <p className={styles.description}>{program.description}</p>
             </div>
         </div>
     );

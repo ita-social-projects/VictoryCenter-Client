@@ -71,6 +71,8 @@ $desc-input-height: 115px;
         font-size: 40px;
         line-height: 48px;
         color: colors.$blue-900;
+        min-width: 0;
+        width: 100%;
     }
 
     :global(.char-limit-input__field::placeholder) {

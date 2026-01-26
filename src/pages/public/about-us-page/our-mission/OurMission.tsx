@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import { AboutUsContent } from '@/types/public/about-us-page';
 import { ContentType } from '@/types/common/about-us';
 import { useTranslation } from 'react-i18next';
+import DOMPurify from 'dompurify';
 import './OurMission.scss';
 
 export interface OurMissionProps {
@@ -19,6 +20,12 @@ export const OurMission = ({ content, description, className, navigate = true }:
 
     const descriptionValue = content?.find((x) => x.contentType === ContentType.Description)?.description ?? '';
 
+    const sanitizedDescription =
+        DOMPurify.sanitize(description ?? descriptionValue ?? '', {
+            ALLOWED_TAGS: ['p', 'strong', 'em', 'b', 'i', 'br'],
+            ALLOWED_ATTR: [],
+        }) || '';
+
     const linkContent = (
         <div className="link-block">
             <span className="link-title">{t('GO_TO_PROGRAMS')}</span>
@@ -31,7 +38,7 @@ export const OurMission = ({ content, description, className, navigate = true }:
             <div className="what-we-do">
                 <h2 className="mission-title">{t('WHAT_WE_DO')}</h2>
                 <div className="details-block">
-                    <p className="mission-details">{description ?? descriptionValue}</p>
+                    <p className="mission-details" dangerouslySetInnerHTML={{ __html: sanitizedDescription }} />
                     {navigate ? (
                         <NavLink to={PUBLIC_ROUTES.PROGRAMS.FULL} className="link-to-programs">
                             {linkContent}

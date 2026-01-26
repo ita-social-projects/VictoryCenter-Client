@@ -2,7 +2,6 @@ import { render, screen } from '@testing-library/react';
 import { AboutUsIntro } from './IntroSection';
 import { ContentType } from '@/types/common/about-us';
 import { AboutUsContent } from '@/types/public/about-us-page';
-import { aboutUsPageUk } from '@/locales/uk';
 
 describe('AboutUsIntro', () => {
     const Content: AboutUsContent[] = [
@@ -53,14 +52,9 @@ describe('AboutUsIntro', () => {
 
     it('should render title and description correctly', () => {
         render(<AboutUsIntro content={Content} />);
-        // TODO: Replace with: "expect(screen.getByText('Test title')).toBeInTheDocument();" when rich text component is implemented
         const title = screen.getByRole('heading', { level: 1 });
         expect(title).toBeInTheDocument();
-        expect(title).toHaveTextContent(aboutUsPageUk['INTRO_TITLE.FIRST_HIGHLIGHT']);
-        expect(title).toHaveTextContent(aboutUsPageUk['INTRO_TITLE.MIDDLE_PART']);
-        expect(title).toHaveTextContent(aboutUsPageUk['INTRO_TITLE.SECOND_HIGHLIGHT']);
-        const highlightedSpans = document.querySelectorAll('.highlighted');
-        expect(highlightedSpans).toHaveLength(2);
+        expect(title).toHaveTextContent('Test title');
 
         const description = screen.getByText('Test description');
         expect(description).toBeInTheDocument();

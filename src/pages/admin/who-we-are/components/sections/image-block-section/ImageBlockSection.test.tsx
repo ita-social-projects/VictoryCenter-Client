@@ -6,8 +6,7 @@ import { WHO_WE_ARE_TEXT } from '@/const/admin/who-we-are';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '@/validation/admin/who-we-are-schema/WhoWeAreSchema';
 import { Image } from '@/types/common/image';
-import { InputWithCharacterLimitProps } from '@/components/admin/input-with-character-limit/InputWithCharacterLimit';
-import { TextAreaWithCharacterLimitProps } from '@/components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
+import { RichTextInputGroupProps } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 
 jest.mock('@/components/admin/image-input/ImageInput', () => ({
     ImageInput: ({ onChange, label, setError }: any) => (
@@ -24,29 +23,19 @@ jest.mock('@/components/admin/image-input/ImageInput', () => ({
     ),
 }));
 
-jest.mock('@/components/admin/input-with-character-limit/InputWithCharacterLimit', () => ({
-    InputWithCharacterLimit: ({ onChange, value, maxLength, onBlur, id }: InputWithCharacterLimitProps) => (
-        <input
-            data-testid="mock-title-input"
-            onChange={onChange}
-            value={value}
-            maxLength={maxLength}
-            onBlur={onBlur}
-            id={id}
-        />
-    ),
-}));
-
-jest.mock('@/components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit', () => ({
-    TextAreaWithCharacterLimit: ({ onChange, value, maxLength, onBlur, id }: TextAreaWithCharacterLimitProps) => (
-        <textarea
-            data-testid="mock-description-textarea"
-            onChange={onChange}
-            value={value}
-            maxLength={maxLength}
-            onBlur={onBlur}
-            id={id}
-        />
+jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
+    RichTextInputGroup: ({ label, onChange, value, maxLength, onBlur, id }: RichTextInputGroupProps) => (
+        <div>
+            <label htmlFor={id}>{label}</label>
+            <input
+                data-testid={`mock-rich-input-${id}`}
+                onChange={(e) => onChange(e.target.value)}
+                value={value}
+                maxLength={maxLength}
+                onBlur={onBlur}
+                id={id}
+            />
+        </div>
     ),
 }));
 
@@ -119,12 +108,12 @@ describe('ImageSection', () => {
         expect(screen.getByLabelText(WHO_WE_ARE_TEXT.IMAGE.INPUT)).toBeInTheDocument();
         expect(screen.getByText(COMMON_TEXT_ADMIN.TYPE.TITLE)).toBeInTheDocument();
         expect(screen.getByText(COMMON_TEXT_ADMIN.TYPE.DESCRIPTION)).toBeInTheDocument();
-        const titleInput = screen.getByTestId('mock-title-input');
+        const titleInput = screen.getByTestId('mock-rich-input-2');
         expect(titleInput).toHaveValue('Initial Title');
         expect(titleInput).toHaveAttribute('maxLength', titleLimit.toString());
-        const descriptionTextarea = screen.getByTestId('mock-description-textarea');
-        expect(descriptionTextarea).toHaveValue('Initial Description');
-        expect(descriptionTextarea).toHaveAttribute('maxLength', descriptionLimit.toString());
+        const descriptionInput = screen.getByTestId('mock-rich-input-3');
+        expect(descriptionInput).toHaveValue('Initial Description');
+        expect(descriptionInput).toHaveAttribute('maxLength', descriptionLimit.toString());
         const publishButton = screen.getByRole('button', { name: 'Опублікувати' });
         expect(publishButton).toBeDisabled();
     });
@@ -152,23 +141,22 @@ describe('ImageSection', () => {
         expect(mockSetIsPublishButtonActive).toHaveBeenCalledWith(true);
     });
 
-    //TODO: uncomment this when title editing is enabled
-    //  it('should call onChange and setIsPublishButtonActive on title change', () => {
-    //      renderComponent();
-    //      const titleInput = screen.getByTestId('mock-title-input');
-    //      const newTitle = 'New Title';
-    //      fireEvent.change(titleInput, { target: { value: newTitle } });
-    //      expect(mockOnChange).toHaveBeenCalledWith(
-    //          expect.objectContaining({ contentType: ContentType.Title, title: newTitle }),
-    //      );
-    //      expect(mockSetIsPublishButtonActive).toHaveBeenCalledWith(true);
-    //  });
+    it('should call onChange and setIsPublishButtonActive on title change', () => {
+        renderComponent();
+        const titleInput = screen.getByTestId('mock-rich-input-2');
+        const newTitle = 'New Title';
+        fireEvent.change(titleInput, { target: { value: newTitle } });
+        expect(mockOnChange).toHaveBeenCalledWith(
+            expect.objectContaining({ contentType: ContentType.Title, title: newTitle }),
+        );
+        expect(mockSetIsPublishButtonActive).toHaveBeenCalledWith(true);
+    });
 
     it('should call onChange and setIsPublishButtonActive on description change', () => {
         renderComponent();
-        const descriptionTextarea = screen.getByTestId('mock-description-textarea');
+        const descriptionInput = screen.getByTestId('mock-rich-input-3');
         const newDescription = 'New Description';
-        fireEvent.change(descriptionTextarea, { target: { value: newDescription } });
+        fireEvent.change(descriptionInput, { target: { value: newDescription } });
         expect(mockOnChange).toHaveBeenCalledWith(
             expect.objectContaining({ contentType: ContentType.Description, description: newDescription }),
         );

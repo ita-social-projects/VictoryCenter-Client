@@ -3,6 +3,7 @@ import { ABOUT_US_DATA } from '@/const/public/about-us-page';
 import './MainValue.scss';
 import { Swiper } from '@/components/public/swiper/Swiper';
 import { AboutUsContent } from '@/types/public/about-us-page';
+import DOMPurify from 'dompurify';
 
 export interface MainValuesProps {
     content: AboutUsContent[] | null;
@@ -35,12 +36,17 @@ export const MainValues = ({ content }: MainValuesProps) => {
                     renderItem={(person, index) => {
                         const imageUrl = person.image?.url ?? ABOUT_US_DATA.PEOPLE_DATA[index].IMG;
                         const altText = peopleData[index].ALT;
-                        const description = person.description;
+
+                        const personDescription =
+                            DOMPurify.sanitize(person.description ?? '', {
+                                ALLOWED_TAGS: ['p', 'strong', 'em', 'b', 'i', 'br'],
+                                ALLOWED_ATTR: [],
+                            }) || '';
 
                         return (
                             <div className={`people-card card-${index + 1}`}>
                                 <img src={imageUrl} alt={altText} />
-                                <p className="people-info">{description}</p>
+                                <p className="people-info" dangerouslySetInnerHTML={{ __html: personDescription }} />
                             </div>
                         );
                     }}

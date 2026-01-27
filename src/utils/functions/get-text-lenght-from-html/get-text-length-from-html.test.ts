@@ -68,7 +68,7 @@ describe('getTextLengthFromHtml', () => {
         expect(result).toBe(41);
     });
 
-    it('should remove all newline characters from count', () => {
+    it('should preserve newline characters in text and count them', () => {
         const result = getTextLengthFromHtml('<p>Line 1\nLine 2\nLine 3</p>');
         expect(result).toBe(20);
     });

@@ -7,7 +7,6 @@
     &__wrapper {
         display: flex;
         position: relative;
-        padding: 0.625rem;
         background: white;
         border: 1px solid colors.$grey-700;
         border-radius: 8px;
@@ -38,6 +37,7 @@
         font-weight: 400;
         line-height: 1.75rem;
         letter-spacing: -0.0225rem;
+        padding: 10px 40px 10px 14px;
 
         &::placeholder {
             color: colors.$grey-700;
@@ -50,8 +50,8 @@
 
     &__clear-button {
         position: absolute;
-        top: 0.75rem;
-        right: 0.75rem;
+        top: 8px;
+        right: 8px;
         border: none;
         width: 1.5rem;
         height: 1.5rem;

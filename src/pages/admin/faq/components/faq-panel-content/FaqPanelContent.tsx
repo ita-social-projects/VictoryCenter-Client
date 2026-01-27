@@ -19,6 +19,7 @@ import { AdminPanelToolbar } from '@/components/admin/admin-panel-toolbar/AdminP
 import { FaqSearchItem } from '../faq-search-item/FaqSearchItem';
 import { mapFaqQuestionDtoToModel } from '@/utils/functions/mappers/admin/faq/faq-mappers';
 import axios from 'axios';
+import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
 import './FaqPanelContent.scss';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
@@ -28,12 +29,14 @@ interface ModalState {
     isAddFaqModalOpen: boolean;
     faqToDelete: FaqQuestion | null;
     faqToEdit: FaqQuestion | null;
+    faqToTranslate: FaqQuestion | null;
 }
 
 enum ErrorType {
     Pages,
     Faq,
     Search,
+    Languages,
 }
 
 interface ErrorState {
@@ -62,6 +65,7 @@ export const FaqPanelContent = () => {
         isAddFaqModalOpen: false,
         faqToDelete: null,
         faqToEdit: null,
+        faqToTranslate: null,
     });
 
     const listContainerRef = useRef<HTMLDivElement>(null);
@@ -76,6 +80,10 @@ export const FaqPanelContent = () => {
         setError({ message, type });
     }, []);
 
+    const { selectedLanguage, retryFetchLanguages } = useLocalizationToolkit({
+        setErrorState: (msg) => setErrorState(msg, ErrorType.Languages),
+    });
+
     const isAnyModalOpened = useMemo(() => {
         return Object.values(modalState).some((value) => (typeof value === 'boolean' ? value : value !== null));
     }, [modalState]);
@@ -89,8 +97,16 @@ export const FaqPanelContent = () => {
             addFaq: () => updateModalState({ isAddFaqModalOpen: false }),
             editFaq: () => updateModalState({ faqToEdit: null }),
             deleteFaq: () => updateModalState({ faqToDelete: null }),
+            translateFaq: () => updateModalState({ faqToTranslate: null }),
         }),
         [updateModalState],
+    );
+    const handleTranslateFaqModalOpen = useCallback(
+        (faq: FaqQuestion) => {
+            if (isAnyModalOpened) return;
+            updateModalState({ faqToTranslate: faq });
+        },
+        [isAnyModalOpened, updateModalState],
     );
 
     const resetFaqsState = useCallback(() => {
@@ -232,8 +248,10 @@ export const FaqPanelContent = () => {
             fetchFaqs(true);
         } else if (error.type === ErrorType.Pages) {
             refetchPages();
+        } else if (error.type === ErrorType.Languages) {
+            retryFetchLanguages();
         }
-    }, [error.type, fetchFaqs, resetFaqsState, refetchPages]);
+    }, [error.type, fetchFaqs, resetFaqsState, refetchPages, retryFetchLanguages]);
 
     const updateListSize = () => {
         if (listContainerRef.current) {
@@ -350,6 +368,7 @@ export const FaqPanelContent = () => {
                             faq={q}
                             handleOnDeleteFaq={handleDeleteFaqModalOpen}
                             handleOnEditFaq={handleEditFaqModalOpen}
+                            handleOnTranslateFaq={handleTranslateFaqModalOpen}
                         />
                     )}
                     entities={faqs}
@@ -363,10 +382,18 @@ export const FaqPanelContent = () => {
                         faq={faq}
                         handleOnDeleteFaq={handleDeleteFaqModalOpen}
                         handleOnEditFaq={handleEditFaqModalOpen}
+                        handleOnTranslateFaq={handleTranslateFaqModalOpen}
                     />
                 </div>
             ),
-        [handleDeleteFaqModalOpen, handleEditFaqModalOpen, handleEntitiesReordered, faqs, statusFilter],
+        [
+            handleDeleteFaqModalOpen,
+            handleEditFaqModalOpen,
+            handleEntitiesReordered,
+            faqs,
+            statusFilter,
+            handleTranslateFaqModalOpen,
+        ],
     );
 
     return (
@@ -411,7 +438,7 @@ export const FaqPanelContent = () => {
                     renderItem={renderFaqItem}
                     onLoadMore={fetchFaqs}
                     hasMore={hasMore}
-                    isLoading={isFaqsLoading || isVisitorPagesLoading}
+                    isLoading={isFaqsLoading || isVisitorPagesLoading || !selectedLanguage}
                     emptyStateMessage={COMMON_TEXT_ADMIN.LIST.NOT_FOUND}
                 />
             </div>

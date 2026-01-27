@@ -9,15 +9,20 @@ export interface FaqComponentProps {
     faq: FaqQuestion;
     handleOnDeleteFaq: (faq: FaqQuestion) => void;
     handleOnEditFaq: (faq: FaqQuestion) => void;
+    handleOnTranslateFaq: (faq: FaqQuestion) => void;
 }
 
-export const FaqComponent = ({ faq, handleOnDeleteFaq, handleOnEditFaq }: FaqComponentProps) => {
+export const FaqComponent = ({ faq, handleOnDeleteFaq, handleOnEditFaq, handleOnTranslateFaq }: FaqComponentProps) => {
     const handleEditFaq = () => {
         handleOnEditFaq(faq);
     };
 
     const handleDeleteFaq = () => {
         handleOnDeleteFaq(faq);
+    };
+
+    const handleTranslateFaq = () => {
+        handleOnTranslateFaq(faq);
     };
 
     return (
@@ -47,6 +52,7 @@ export const FaqComponent = ({ faq, handleOnDeleteFaq, handleOnEditFaq }: FaqCom
                     </div>
                 </ButtonTooltip>
                 <div className="faq-actions-buttons">
+                    <button type="button" onClick={handleTranslateFaq} className="faq-translate-btn" />
                     <button type="button" onClick={handleEditFaq} className="faq-edit-btn" />
                     <button type="button" onClick={handleDeleteFaq} className="faq-delete-btn" />
                 </div>

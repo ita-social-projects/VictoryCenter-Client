@@ -72,19 +72,25 @@ export const RightSection = ({ donateData, error }: RightSectionProps) => {
 
         switch (activeTab) {
             case Currency.UAH:
-                return <UkrainePaymentDetails bankDetails={donateData.uahBankDetails} />;
+                return (
+                    <UkrainePaymentDetails bankDetails={donateData.uahBankDetails.toSorted((a, b) => b.id - a.id)} />
+                );
             case Currency.USD:
                 return (
                     <AbroadPaymentDetails
                         currency={activeTab}
-                        foreignBankDetails={donateData.foreignBankDetails.filter((b) => b.currency === Currency.USD)}
+                        foreignBankDetails={donateData.foreignBankDetails
+                            .filter((b) => b.currency === Currency.USD)
+                            .toSorted((a, b) => b.id - a.id)}
                     />
                 );
             case Currency.EUR:
                 return (
                     <AbroadPaymentDetails
                         currency={activeTab}
-                        foreignBankDetails={donateData.foreignBankDetails.filter((b) => b.currency === Currency.EUR)}
+                        foreignBankDetails={donateData.foreignBankDetails
+                            .filter((b) => b.currency === Currency.EUR)
+                            .toSorted((a, b) => b.id - a.id)}
                     />
                 );
         }
@@ -126,7 +132,10 @@ export const RightSection = ({ donateData, error }: RightSectionProps) => {
             </div>
             <div className="donatePaymentDetails">
                 {paymentDetails()}
-                <AlternativeSupportWays supportOptions={donateData?.supportOptions || []} currentCurrency={activeTab} />
+                <AlternativeSupportWays
+                    supportOptions={(donateData?.supportOptions || []).toSorted((a, b) => b.id - a.id)}
+                    currentCurrency={activeTab}
+                />
             </div>
         </div>
     );

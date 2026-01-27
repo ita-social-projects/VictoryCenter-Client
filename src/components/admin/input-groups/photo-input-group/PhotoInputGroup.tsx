@@ -31,6 +31,7 @@ export const PhotoInputGroup = ({
     cropHeight,
     minWidth,
     minHeight,
+    maxSizeMB,
 }: PhotoInputGroupProps) => {
     return (
         <div className="input-group">
@@ -50,6 +51,7 @@ export const PhotoInputGroup = ({
                 cropWidth={cropWidth}
                 minHeight={minHeight}
                 minWidth={minWidth}
+                maxSizeMB={maxSizeMB}
             />
             <InputError error={error} />
         </div>

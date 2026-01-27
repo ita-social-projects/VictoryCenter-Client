@@ -44,7 +44,6 @@ const baseConfig = {
 
 describe('ImagesBottomSection', () => {
     const defaultProps: ImagesBottomSectionProps = {
-        variant: 'dual',
         title: 'Section Title',
         description: 'Section Description',
         images: ['img1.jpg', 'img2.jpg'],
@@ -87,7 +86,6 @@ describe('ImagesBottomSection', () => {
 
     it('defaults isTemplate/isEditable/className and keeps optional handlers undefined when omitted', () => {
         const minimalProps: ImagesBottomSectionProps = {
-            variant: 'dual',
             images: ['img1.jpg', 'img2.jpg'],
             imageHandlers: [
                 { key: '1', value: '', handler: jest.fn() },

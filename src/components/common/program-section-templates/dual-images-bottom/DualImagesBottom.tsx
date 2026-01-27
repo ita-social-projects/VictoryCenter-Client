@@ -1,7 +1,8 @@
-import { ImagesBottomSection, ImagesBottomSectionConfig } from '../shared/images-bottom-section/ImagesBottomSection';
+import cn from 'classnames';
+import { ImagesBottomSection } from '../shared/images-bottom-section/ImagesBottomSection';
 import { ImageValues } from '@/types/common/image';
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { PROGRAM_SECTION_IMAGE_CONFIGS } from '@/const/admin/programs';
+import { DUAL_IMAGES_CONFIG } from '@/const/admin/programs';
+import styles from './DualImagesBottom.module.scss';
 
 export interface DualImagesBottomProps {
     title?: string;
@@ -13,16 +14,6 @@ export interface DualImagesBottomProps {
     onDescriptionChange?: (value: string) => void;
     onImagesChange?: (index: number, file: ImageValues | null) => void;
 }
-
-const DUAL_IMAGES_CONFIG: ImagesBottomSectionConfig = {
-    imageCount: 2,
-    gridColumns: 2,
-    imageConfig: PROGRAM_SECTION_IMAGE_CONFIGS.DUAL_IMAGES,
-    elevatedIndices: [0],
-    imageLabel: COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE,
-    editableImageMaxHeight: 430,
-    editableImageMaxWidth: 730,
-};
 
 export const DualImagesBottom = ({
     title = '',
@@ -42,7 +33,6 @@ export const DualImagesBottom = ({
 
     return (
         <ImagesBottomSection
-            variant="dual"
             title={title}
             description={description}
             images={images}
@@ -52,6 +42,12 @@ export const DualImagesBottom = ({
             isEditable={isEditable}
             onTitleChange={onTitleChange}
             onDescriptionChange={onDescriptionChange}
+            className={cn(styles.container, {
+                [styles.editable]: isEditable,
+            })}
+            topSectionClassName={styles['top-section']}
+            bottomSectionClassName={styles['bottom-section']}
+            imageWrapperClassName={styles['image-wrapper']}
         />
     );
 };

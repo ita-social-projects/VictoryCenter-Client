@@ -8,9 +8,10 @@ export interface ModalProps {
     onClose: () => void;
     fullscreen?: boolean;
     maxWidth?: string;
+    className?: string;
 }
 
-export const Modal = ({ children, isOpen, onClose, maxWidth, fullscreen = false }: ModalProps) => {
+export const Modal = ({ children, isOpen, onClose, maxWidth, fullscreen = false, className }: ModalProps) => {
     const mouseDownInsideModal = useRef(false);
     const modalRef = useRef<HTMLDivElement>(null);
     const titleId = useId();
@@ -124,9 +125,13 @@ export const Modal = ({ children, isOpen, onClose, maxWidth, fullscreen = false 
                 ref={modalRef}
                 role="button"
                 aria-labelledby={titleId}
-                className={cn('modal-container', {
-                    fullscreen: fullscreen,
-                })}
+                className={cn(
+                    'modal-container',
+                    {
+                        fullscreen: fullscreen,
+                    },
+                    className,
+                )}
                 onMouseDown={handleOnMouseDownModal}
                 onClick={(e) => e.stopPropagation()}
                 onKeyDown={(e) => e.stopPropagation()}

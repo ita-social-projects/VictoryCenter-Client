@@ -2,7 +2,15 @@ import { render, screen } from '@testing-library/react';
 import { AboutUsIntro } from './IntroSection';
 import { ContentType } from '@/types/common/about-us';
 import { AboutUsContent } from '@/types/public/about-us-page';
-import { aboutUsPageUk } from '@/locales/uk';
+
+jest.mock('./IntroSection.module.scss', () => ({
+    root: 'root',
+    image: 'image',
+    overlay: 'overlay',
+    info: 'info',
+    title: 'title',
+    description: 'description',
+}));
 
 describe('AboutUsIntro', () => {
     const Content: AboutUsContent[] = [
@@ -37,8 +45,8 @@ describe('AboutUsIntro', () => {
         render(<AboutUsIntro content={null} />);
         const images = screen.getAllByRole('img');
         expect(images).toHaveLength(2);
-        expect(images[0]).toHaveClass('background-img');
-        expect(images[1]).toHaveClass('color-overlay');
+        expect(images[0]).toHaveClass('image');
+        expect(images[1]).toHaveClass('overlay');
     });
 
     it('should render custom images correctly', () => {
@@ -47,8 +55,8 @@ describe('AboutUsIntro', () => {
         expect(images).toHaveLength(2);
         expect(images[0]).toHaveAttribute('src', 'test.jpg');
         expect(images[1]).toHaveAttribute('src', 'test.jpg');
-        expect(images[0]).toHaveClass('background-img');
-        expect(images[1]).toHaveClass('color-overlay');
+        expect(images[0]).toHaveClass('image');
+        expect(images[1]).toHaveClass('overlay');
     });
 
     it('should render title and description correctly', () => {
@@ -56,11 +64,7 @@ describe('AboutUsIntro', () => {
         // TODO: Replace with: "expect(screen.getByText('Test title')).toBeInTheDocument();" when rich text component is implemented
         const title = screen.getByRole('heading', { level: 1 });
         expect(title).toBeInTheDocument();
-        expect(title).toHaveTextContent(aboutUsPageUk['INTRO_TITLE.FIRST_HIGHLIGHT']);
-        expect(title).toHaveTextContent(aboutUsPageUk['INTRO_TITLE.MIDDLE_PART']);
-        expect(title).toHaveTextContent(aboutUsPageUk['INTRO_TITLE.SECOND_HIGHLIGHT']);
-        const highlightedSpans = document.querySelectorAll('.highlighted');
-        expect(highlightedSpans).toHaveLength(2);
+        expect(title).toHaveTextContent('Test title');
 
         const description = screen.getByText('Test description');
         expect(description).toBeInTheDocument();

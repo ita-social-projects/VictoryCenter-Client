@@ -3,11 +3,11 @@
 
 .container {
     @extend .section-container;
-    aspect-ratio: 1330 / 736;
+    aspect-ratio: 1440 / 736;
     display: flex;
     flex-direction: row;
-    gap: 2rem;
-    padding: 2rem 0;
+    gap: 30px;
+    padding: 30px 0;
 }
 
 .left-section {
@@ -32,12 +32,12 @@
 .title-input {
     textarea {
         @include type.h3-semibold-uppercase;
-        height: 7rem;
+        height: 110px;
     }
 }
 
 .title {
-    font-size: 2rem;
+    font-size: 30px;
     font-weight: bold;
     line-height: 1.2;
     word-wrap: break-word;
@@ -52,8 +52,6 @@
 }
 
 .description {
-    font-size: 0.95rem;
-    line-height: 1.5;
     color: #333;
     word-wrap: break-word;
     white-space: pre-wrap;
@@ -79,12 +77,12 @@
 
 .template {
     .title {
-        font-size: clamp(3px, 1.5vw, 2rem);
-        line-height: clamp(3px, 0.9vw, 1rem);
+        font-size: clamp(3px, 1.5vw, 2.5vmin);
+        line-height: clamp(3px, 0.9vw, 2vmin);
     }
     .description {
-        font-size: clamp(3px, 0.9vw, 1rem);
-        line-height: clamp(3px, 0.9vw, 1rem);
+        font-size: clamp(3px, 0.9vw, 1.8vmin);
+        line-height: clamp(3px, 0.9vw, 1.8vmin);
     }
 }
 

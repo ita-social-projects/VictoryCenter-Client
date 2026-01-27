@@ -35,6 +35,7 @@ import {
     mapToUpdateCorrespondentBankDetails,
 } from '@/utils/functions/mappers/admin/donate-mappers';
 import './DonatePageContent.scss';
+import { GenericFormMode } from '../generic-form/GenericForm';
 
 export const DonatePageContent = () => {
     const { addToast } = useToast();
@@ -55,7 +56,7 @@ export const DonatePageContent = () => {
         SupportOptionsApi.getAll(client, bankCurrency)
             .then((data) => {
                 if (isAlive) {
-                    setSupportOptions(data);
+                    setSupportOptions(data.toSorted((a, b) => b.id - a.id));
                 }
             })
             .catch(() => {
@@ -95,7 +96,7 @@ export const DonatePageContent = () => {
             try {
                 const createData: CreateSupportOptionsDto = { name, value, currency: bankCurrency };
                 const newOption = await SupportOptionsApi.create(client, createData);
-                setSupportOptions((prev) => [...prev, newOption]);
+                setSupportOptions((prev) => [newOption, ...prev]);
 
                 addToast(DONATE_TEXT.MESSAGE.SUPPORT_OPTIONS.PUBLISHED, ToastType.Info);
             } finally {
@@ -264,16 +265,47 @@ export const DonatePageContent = () => {
         },
         [client, setItems, addToast],
     );
+    const handleLocalSubmit = useCallback(
+        (formState: any, setFormState: any, data: CorrespondentBankDetailsDto) => {
+            const updatedBanks = [...(formState.correspondentBanks || []), data];
+
+            setFormState({
+                ...formState,
+                correspondentBanks: updatedBanks,
+            });
+
+            addToast(DONATE_TEXT.MESSAGE.CORRESPONDENT_BANKS.ADD, ToastType.Info);
+        },
+        [addToast],
+    );
+
+    const handleLocalUpdate = useCallback(() => {
+        addToast(DONATE_TEXT.MESSAGE.CORRESPONDENT_BANKS.UPDATE, ToastType.Info);
+    }, [addToast]);
+
+    const handleLocalDelete = useCallback(
+        (formState: any, setFormState: any, index: number): void => {
+            const updatedBanks = [...(formState.correspondentBanks || [])];
+            updatedBanks.splice(index, 1);
+            setFormState({ ...formState, correspondentBanks: updatedBanks });
+            addToast(DONATE_TEXT.MESSAGE.CORRESPONDENT_BANKS.DELETED, ToastType.Info);
+        },
+        [addToast],
+    );
 
     const renderCorrespondentBanks = useCallback(
-        ({ formState, isItemsExpanded }: any) => {
+        ({ formState, isItemsExpanded, setFormState, isFormValid, formMode }: any) => {
             const parentId = formState.id;
             const isParentCreating = !parentId;
-
+            const localBanks = formState.correspondentBanks || [];
             const existingItem = items.find((i) => i.id === parentId);
             const banksToShow = isParentCreating
-                ? []
-                : [...(existingItem?.correspondentBanks ?? [])].sort((a, b) => a.id - b.id);
+                ? localBanks
+                : (existingItem?.correspondentBanks ?? []).toSorted(
+                      (a: CorrespondentBankDetailsDto, b: CorrespondentBankDetailsDto) => b.id - a.id,
+                  );
+
+            const shouldDisableAddButton = isParentCreating && formMode === GenericFormMode.Create && !isFormValid;
 
             return (
                 <GenericDetails
@@ -293,6 +325,10 @@ export const DonatePageContent = () => {
                     onDelete={(id) => handleDeleteCorrespondentBank(parentId, id)}
                     onEditingStateChange={setIsChildEditing}
                     onAddFormVisibilityChange={setIsCorrespondentBankFormVisible}
+                    onLocalSubmit={(data) => handleLocalSubmit(formState, setFormState, data)}
+                    onLocalUpdate={handleLocalUpdate}
+                    onLocalDelete={(index) => handleLocalDelete(formState, setFormState, index)}
+                    isAddButtonDisabled={shouldDisableAddButton}
                 />
             );
         },
@@ -304,6 +340,9 @@ export const DonatePageContent = () => {
             handleUpdateCorrespondentBank,
             handleDeleteCorrespondentBank,
             setIsChildEditing,
+            handleLocalSubmit,
+            handleLocalUpdate,
+            handleLocalDelete,
         ],
     );
 
@@ -322,7 +361,7 @@ export const DonatePageContent = () => {
                     {config && (
                         <GenericDetails
                             key={`bank-details-${selectedCategory}`}
-                            items={[...items].sort((a, b) => a.id - b.id)}
+                            items={items.toSorted((a, b) => b.id - a.id)}
                             isLoading={isLoading}
                             FormComponent={config.form}
                             notFoundText={DONATE_TEXT.BANK_DETAILS.NOT_FOUND}

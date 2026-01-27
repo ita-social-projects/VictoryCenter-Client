@@ -3,6 +3,17 @@ import { render, screen } from '@testing-library/react';
 import { ValueCard } from './ValueCard';
 import { aboutUsPageUk } from '@/locales/uk';
 
+jest.mock('./ValueCard.module.scss', () => ({
+    title: 'title',
+    column: 'column',
+    card1: 'card1',
+    card2: 'card2',
+    card3: 'card3',
+    item: 'item',
+    name: 'name',
+    description: 'description',
+}));
+
 jest.mock('@/const/public/about-us-page', () => ({
     ABOUT_US_DATA: {
         OUR_VALUES: 'Наші Цінності',
@@ -19,7 +30,7 @@ describe('ValueCard Component', () => {
         render(<ValueCard group={mockGroup} groupIndex={0} />);
         const title = screen.getByRole('heading', { name: aboutUsPageUk.OUR_VALUES });
         expect(title).toBeInTheDocument();
-        expect(title.closest('.values-title')).toBeInTheDocument();
+        expect(title.closest('.title')).toBeInTheDocument();
     });
 
     it('should not render the title for groupIndex > 0', () => {
@@ -36,10 +47,8 @@ describe('ValueCard Component', () => {
 
     it('should render correct text for each value item', () => {
         render(<ValueCard group={mockGroup} groupIndex={0} />);
-
         expect(screen.getByRole('heading', { name: 'Empathy' })).toBeInTheDocument();
         expect(screen.getByText("We understand others' feelings.")).toBeInTheDocument();
-
         expect(screen.getByRole('heading', { name: 'Diversity' })).toBeInTheDocument();
         expect(screen.getByText("We value everyone's uniqueness.")).toBeInTheDocument();
     });

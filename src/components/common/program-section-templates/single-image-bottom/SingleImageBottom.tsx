@@ -3,7 +3,7 @@ import { TitleDescriptionSection } from '../shared/title-description-section/Tit
 import { PhotoInputGroup } from '@/components/admin/input-groups/photo-input-group/PhotoInputGroup';
 import { ImageValues } from '@/types/common/image';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { PROGRAM_SECTION_IMAGE_CONFIGS } from '@/const/admin/programs';
+import { PROGRAM_SECTION_IMAGE_CONFIGS, PROGRAM_VALIDATION } from '@/const/admin/programs';
 import styles from './SingleImageBottom.module.scss';
 
 export interface SingleImageBottomProps {
@@ -38,6 +38,8 @@ export const SingleImageBottom = ({
                 title={title}
                 description={description}
                 className={styles['top-section']}
+                titleClassName={isTemplate ? styles['title-template'] : ''}
+                descriptionClassName={isTemplate ? styles['description-template'] : ''}
                 isTemplate={isTemplate}
                 isEditable={isEditable}
                 onTitleChange={onTitleChange}
@@ -62,6 +64,7 @@ export const SingleImageBottom = ({
                                 PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.cropWidth,
                             )}
                             variant="programSection"
+                            maxSizeMB={PROGRAM_VALIDATION.images.maxSizeMB}
                         />
                     ) : (
                         <img src={image || undefined} alt="img1-of-single-image-bottom" className={styles.image} />

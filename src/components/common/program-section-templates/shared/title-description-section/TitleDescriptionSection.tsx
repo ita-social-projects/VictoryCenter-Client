@@ -10,7 +10,8 @@ export interface TitleDescriptionSectionProps {
     title?: string;
     description?: string;
     className?: string;
-    templateStyles?: Record<string, string>;
+    titleClassName?: string;
+    descriptionClassName?: string;
     isTemplate?: boolean;
     isEditable?: boolean;
     onTitleChange?: (value: string) => void;
@@ -21,14 +22,13 @@ export const TitleDescriptionSection = ({
     title = '',
     description = '',
     className = '',
-    templateStyles,
+    titleClassName = '',
+    descriptionClassName = '',
     isTemplate = false,
     isEditable = false,
     onTitleChange,
     onDescriptionChange,
 }: TitleDescriptionSectionProps) => {
-    const cx = (name: string) => cn(styles[name as keyof typeof styles], templateStyles?.[name]);
-
     const {
         titleError,
         descriptionError,
@@ -44,15 +44,15 @@ export const TitleDescriptionSection = ({
     return (
         <div
             className={cn(
-                cx('container'),
+                styles.container,
                 {
-                    [cx('template')]: isTemplate,
-                    [cx('editable')]: isEditable,
+                    [styles.template]: isTemplate,
+                    [styles.editable]: isEditable,
                 },
                 className,
             )}
         >
-            <div className={cx('title-section')}>
+            <div className={styles['title-section']}>
                 {isEditable ? (
                     <InputWithCharacterLimitGroup
                         label={PROGRAMS_TEXT.SECTION.FORM.TITLE.TEXT}
@@ -64,14 +64,14 @@ export const TitleDescriptionSection = ({
                         onBlur={handleTitleBlur}
                         maxLength={PROGRAM_SECTION_VALIDATION.title.max}
                         placeholder={PROGRAMS_TEXT.SECTION.FORM.TITLE.PLACEHOLDER}
-                        className={cx('title-input')}
+                        className={styles['title-input']}
                         error={titleError}
                     />
                 ) : (
-                    <h2 className={cx('title')}>{title}</h2>
+                    <h2 className={cn(styles.title, titleClassName)}>{title}</h2>
                 )}
             </div>
-            <div className={cx('description-section')}>
+            <div className={styles['description-section']}>
                 {isEditable ? (
                     <TextAreaWithCharacterLimitGroup
                         label={PROGRAMS_TEXT.SECTION.FORM.DESCRIPTION.TEXT}
@@ -82,12 +82,12 @@ export const TitleDescriptionSection = ({
                         onChange={handleDescriptionChange}
                         onBlur={handleDescriptionBlur}
                         maxLength={PROGRAM_SECTION_VALIDATION.description.max}
-                        rows={8}
+                        rows={10}
                         error={descriptionError}
                         currentLength={getTrimmedInputText(description).length}
                     />
                 ) : (
-                    <p className={cx('description')}>{description}</p>
+                    <p className={cn(styles.description, descriptionClassName)}>{description}</p>
                 )}
             </div>
         </div>

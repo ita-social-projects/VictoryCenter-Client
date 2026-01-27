@@ -1,11 +1,21 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import './CompanyValues.scss';
 import { Swiper } from '@/components/public/swiper/Swiper';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { ValueCard } from './components/value-card/ValueCard';
+import styles from './CompanyValues.module.scss';
+import { ReactComponent as ArrowRight } from '@/assets/icons/arrow-right.svg';
 
 export type ValueItem = Record<string, string>;
+
+const SWIPER_NAVIGATION_CONFIG = {
+    next: {
+        icon: ArrowRight,
+        ariaLabel: 'next',
+        variant: 'primary-dark' as const,
+        className: styles.right,
+    },
+};
 
 const chunk = <T,>(arr: T[], size: number): T[][] => {
     const result: T[][] = [];
@@ -33,7 +43,7 @@ const toCamelCaseValues = (items: Record<string, string>[]): ValueItem[] =>
     }));
 
 export const CompanyValues = () => {
-    const isTablet = useMediaQuery('(min-width:768px) and (max-width:1024px)');
+    const isTablet = useMediaQuery('(min-width:768px) and (max-width:1439px)');
     const { t } = useTranslation('aboutUsPage');
 
     const data = useMemo<Record<string, string>[]>(() => {
@@ -50,16 +60,18 @@ export const CompanyValues = () => {
     }, [isTablet, valueItems]);
 
     return (
-        <div className="values-block">
+        <div className={styles.root}>
             <Swiper
                 items={chunkedValues}
-                slidesPerView={1}
+                slidesPerView="auto"
                 breakpoints={{
-                    568: { slidesPerView: 2 },
+                    560: { slidesPerView: 2 },
                     768: { slidesPerView: 2 },
-                    1025: { slidesPerView: 3 },
+                    1440: { slidesPerView: 3 },
                 }}
                 renderItem={(group, groupIndex) => <ValueCard key={groupIndex} group={group} groupIndex={groupIndex} />}
+                classNameSwiperSlide={styles[`swiper-slide`]}
+                navigationButtons={SWIPER_NAVIGATION_CONFIG}
             />
         </div>
     );

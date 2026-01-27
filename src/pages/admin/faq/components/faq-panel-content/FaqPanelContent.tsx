@@ -20,6 +20,7 @@ import { FaqSearchItem } from '../faq-search-item/FaqSearchItem';
 import { mapFaqQuestionDtoToModel } from '@/utils/functions/mappers/admin/faq/faq-mappers';
 import axios from 'axios';
 import './FaqPanelContent.scss';
+import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
@@ -34,6 +35,7 @@ enum ErrorType {
     Pages,
     Faq,
     Search,
+    Language,
 }
 
 interface ErrorState {
@@ -75,6 +77,15 @@ export const FaqPanelContent = () => {
     const setErrorState = useCallback((message: string | null, type: ErrorType | null = null) => {
         setError({ message, type });
     }, []);
+
+    const {
+        allLanguages,
+        translationLanguages,
+        selectedLanguage,
+        onLanguageChange,
+        translationStatusFilter,
+        onTranslationStatusFilterChange,
+    } = useLocalizationToolkit({ setErrorState });
 
     const isAnyModalOpened = useMemo(() => {
         return Object.values(modalState).some((value) => (typeof value === 'boolean' ? value : value !== null));
@@ -129,7 +140,14 @@ export const FaqPanelContent = () => {
                 const paginationPageToFetch = shouldResetList ? 0 : currentPaginationPageRef.current;
                 const offset = paginationPageToFetch * listSize;
 
-                const fetchedFaqs = await FaqApi.getAll(client, searchPageId.id, searchStatus, offset, listSize);
+                const fetchedFaqs = await FaqApi.getAll(
+                    client,
+                    searchPageId.id,
+                    translationStatusFilter,
+                    searchStatus,
+                    offset,
+                    listSize,
+                );
 
                 if (abortController.signal.aborted) {
                     return;
@@ -167,7 +185,7 @@ export const FaqPanelContent = () => {
                 setIsFaqsLoading(false);
             }
         },
-        [setErrorState, listSize, statusFilter, client, visitorPages],
+        [setErrorState, listSize, statusFilter, client, visitorPages, translationStatusFilter],
     );
 
     // TODO: Implement search functionality
@@ -337,36 +355,51 @@ export const FaqPanelContent = () => {
     );
 
     const renderFaqItem = useCallback(
-        (faq: FaqQuestion) =>
-            statusFilter === undefined ? (
-                <DraggableListItem
-                    key={faq.id}
-                    entity={faq}
-                    id={faq.id}
-                    ariaLabel={FAQ_TEXT.ACTIONS.REORDER}
-                    renderEntityComponent={(q) => (
-                        <FaqComponent
-                            key={q.id}
-                            faq={q}
-                            handleOnDeleteFaq={handleDeleteFaqModalOpen}
-                            handleOnEditFaq={handleEditFaqModalOpen}
-                        />
-                    )}
-                    entities={faqs}
-                    idSelector={(q) => q.id}
-                    onEntitiesReordered={handleEntitiesReordered}
-                ></DraggableListItem>
-            ) : (
+        (faq: FaqQuestion) => {
+            return statusFilter === undefined ? (
+                selectedLanguage ? (
+                    <DraggableListItem
+                        key={faq.id}
+                        entity={faq}
+                        id={faq.id}
+                        ariaLabel={FAQ_TEXT.ACTIONS.REORDER}
+                        renderEntityComponent={(q) => (
+                            <FaqComponent
+                                key={q.id}
+                                faq={q}
+                                handleOnDeleteFaq={handleDeleteFaqModalOpen}
+                                handleOnEditFaq={handleEditFaqModalOpen}
+                                language={selectedLanguage}
+                                translationLanguages={translationLanguages}
+                            />
+                        )}
+                        entities={faqs}
+                        idSelector={(q) => q.id}
+                        onEntitiesReordered={handleEntitiesReordered}
+                    />
+                ) : null
+            ) : selectedLanguage ? (
                 <div className="nondraggable-faq-item-wrapper">
                     <FaqComponent
                         key={faq.id}
                         faq={faq}
                         handleOnDeleteFaq={handleDeleteFaqModalOpen}
                         handleOnEditFaq={handleEditFaqModalOpen}
+                        language={selectedLanguage}
+                        translationLanguages={translationLanguages}
                     />
                 </div>
-            ),
-        [handleDeleteFaqModalOpen, handleEditFaqModalOpen, handleEntitiesReordered, faqs, statusFilter],
+            ) : null;
+        },
+        [
+            handleDeleteFaqModalOpen,
+            handleEditFaqModalOpen,
+            handleEntitiesReordered,
+            faqs,
+            statusFilter,
+            selectedLanguage,
+            translationLanguages,
+        ],
     );
 
     return (
@@ -384,6 +417,9 @@ export const FaqPanelContent = () => {
                     onAddItem={handleAddFaqModalOpen}
                     AddItemButtonText={FAQ_TEXT.BUTTON.ADD_FAQ}
                     onSuggestionSelect={() => {}}
+                    languages={allLanguages}
+                    onLanguageChange={onLanguageChange}
+                    onTranslationStatusFilterChange={onTranslationStatusFilterChange}
                 />
             </div>
 

@@ -13,11 +13,15 @@ import { SearchBar } from '@/components/admin/search-bar/SearchBar';
 import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
 import { StatusFilterDropdown } from '@/components/admin/status-filter-dropdown/StatusFilterDropdown';
 import { Button } from '@/components/admin/button/Button';
+import {
+    LocalizationToolkit,
+    LocalizationToolkitProps,
+} from '@/components/admin/localization-toolkit/LocalizationToolkit';
 import './AdminPageToolbar.scss';
 
 const DEFAULT_PAGE_SIZE = 5;
 
-export interface AdminPanelToolbarProps<T> {
+export interface AdminPanelToolbarProps<T> extends LocalizationToolkitProps {
     getSearchItemKey: (item: T) => string | number;
     getSearchItemLabel: (item: T) => string;
     fetchSearchItems: (searchTerm: string, requestOptions: PaginationRequestParams) => Promise<PaginationResult<T>>;
@@ -49,6 +53,9 @@ export const AdminPanelToolbar = <T,>({
     onAddItem,
     AddItemButtonText,
     onSuggestionSelect,
+    languages,
+    onLanguageChange,
+    onTranslationStatusFilterChange,
 }: AdminPanelToolbarProps<T>) => {
     const [currentSearchTerm, setCurrentSearchTerm] = useState<string>('');
     const [localSearchItems, setLocalSearchItems] = useState<T[]>([]);
@@ -124,6 +131,11 @@ export const AdminPanelToolbar = <T,>({
             </div>
 
             <div className="admin-panel-toolbar-actions">
+                <LocalizationToolkit
+                    languages={languages}
+                    onLanguageChange={onLanguageChange}
+                    onTranslationStatusFilterChange={onTranslationStatusFilterChange}
+                />
                 <StatusFilterDropdown value={statusFilter} onStatusFilterChange={onStatusFilterChange} />
                 <Button onClick={onAddItem} buttonStyle="primary">
                     {AddItemButtonText} <PlusIcon />

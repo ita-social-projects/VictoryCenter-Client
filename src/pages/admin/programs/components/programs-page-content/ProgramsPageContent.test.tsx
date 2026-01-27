@@ -197,6 +197,7 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                         })
                     }
                 />
+                <button data-testid="trigger-delete-category" onClick={() => props.onDeleteCategory(1)} />
             </div>
         ),
     };
@@ -578,6 +579,37 @@ describe('ProgramsPageContent', () => {
             expect(screen.getByTestId('category-1')).not.toBeDisabled();
             expect(screen.getByTestId('category-2')).toBeDisabled();
             expect(mockProgramsApi.fetchPrograms).toHaveBeenCalledTimes(2);
+        });
+    });
+
+    it('selects next category when deleting the selected category', async () => {
+        render(<ProgramsPageContent />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('category-1')).toBeDisabled();
+        });
+
+        fireEvent.click(screen.getByTestId('trigger-delete-category'));
+
+        await waitFor(() => {
+            expect(screen.queryByTestId('category-1')).not.toBeInTheDocument();
+            expect(screen.getByTestId('category-2')).toBeDisabled();
+        });
+    });
+
+    it('clears selection when deleting the last category', async () => {
+        mockProgramsCategoriesApi.fetchProgramCategories.mockResolvedValue([{ id: 1, name: 'Only', programsCount: 1 }]);
+
+        render(<ProgramsPageContent />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('category-1')).toBeDisabled();
+        });
+
+        fireEvent.click(screen.getByTestId('trigger-delete-category'));
+
+        await waitFor(() => {
+            expect(screen.queryByTestId('category-1')).not.toBeInTheDocument();
         });
     });
 });

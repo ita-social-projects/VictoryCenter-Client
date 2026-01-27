@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import DOMPurify from 'isomorphic-dompurify';
+import DOMPurify from 'dompurify';
 
 interface SafeHtmlProps extends React.HTMLAttributes<HTMLElement> {
     html: string;

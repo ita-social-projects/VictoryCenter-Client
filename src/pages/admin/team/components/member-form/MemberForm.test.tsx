@@ -1,12 +1,21 @@
 import React, { createRef } from 'react';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { createEvent, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemberForm, TeamMemberFormRef, TeamMemberFormValues } from './MemberForm';
 import { TEAM_MEMBER_VALIDATION, TEAM_MEMBERS_TEXT } from '@/const/admin/team';
 import { VisibilityStatus } from '@/types/admin/common';
 import { TeamCategory } from '@/types/admin/team-category';
 
 jest.mock('@/components/common/single-select-input/SingleSelectInput', () => ({
-    SingleSelectInput: ({ options, value, onChange, placeholder, getOptionId, getOptionName, disabled }: any) => {
+    SingleSelectInput: ({
+        options,
+        value,
+        onChange,
+        onBlur,
+        placeholder,
+        getOptionId,
+        getOptionName,
+        disabled,
+    }: any) => {
         return (
             <select
                 data-testid="category-select"
@@ -15,6 +24,7 @@ jest.mock('@/components/common/single-select-input/SingleSelectInput', () => ({
                     const selected = options.find((o: any) => String(getOptionId(o)) === e.target.value);
                     onChange?.(selected);
                 }}
+                onBlur={onBlur}
                 disabled={disabled}
                 aria-label={placeholder}
             >
@@ -72,7 +82,7 @@ jest.mock('../common-member-fields/CommonMemberFields', () => ({
 }));
 
 jest.mock('@/components/admin/image-input/ImageInput', () => ({
-    ImageInput: ({ onChange, disabled }: any) => (
+    ImageInput: ({ onChange, setError, disabled }: any) => (
         <div>
             <button
                 type="button"
@@ -81,6 +91,9 @@ jest.mock('@/components/admin/image-input/ImageInput', () => ({
                 onClick={() => onChange?.({ base64: 'abc', mimeType: 'image/png', size: 1024 })}
             >
                 set image
+            </button>
+            <button type="button" data-testid="set-image-error" onClick={() => setError?.('Image error')}>
+                set image error
             </button>
         </div>
     ),
@@ -223,5 +236,37 @@ describe('MemberForm', () => {
 
         rerender(<MemberForm ref={ref} categories={categories} onSubmit={onSubmit} initialData={initialData} />);
         expect(ref.current?.isDirty()).toBe(false);
+    });
+
+    it('shows category error on blur when empty', () => {
+        const onSubmit = jest.fn();
+        render(<MemberForm categories={categories} onSubmit={onSubmit} />);
+
+        const categorySelect = screen.getByTestId('category-select');
+        fireEvent.blur(categorySelect);
+
+        expect(screen.getByText(TEAM_MEMBER_VALIDATION.category.getRequiredError())).toBeInTheDocument();
+    });
+
+    it('prevents default submit behavior', () => {
+        const onSubmit = jest.fn();
+        render(<MemberForm categories={categories} onSubmit={onSubmit} />);
+
+        const form = screen.getByTestId('test-form');
+        const submitEvent = createEvent.submit(form);
+        submitEvent.preventDefault = jest.fn();
+
+        fireEvent(form, submitEvent);
+
+        expect(submitEvent.preventDefault).toHaveBeenCalled();
+    });
+
+    it('sets image error via ImageInput setError callback', () => {
+        const onSubmit = jest.fn();
+        render(<MemberForm categories={categories} onSubmit={onSubmit} />);
+
+        fireEvent.click(screen.getByTestId('set-image-error'));
+
+        expect(screen.getByText('Image error')).toBeInTheDocument();
     });
 });

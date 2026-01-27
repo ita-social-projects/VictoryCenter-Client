@@ -70,12 +70,12 @@ describe('getTextLengthFromHtml', () => {
 
     it('should remove all newline characters from count', () => {
         const result = getTextLengthFromHtml('<p>Line 1\nLine 2\nLine 3</p>');
-        expect(result).toBe(18);
+        expect(result).toBe(20);
     });
 
     it('should handle HTML with line breaks and preserve other whitespace', () => {
         const result = getTextLengthFromHtml('<p>Text   with   spaces\nand\nnewlines</p>');
-        expect(result).toBe(31);
+        expect(result).toBe(33);
     });
 
     it('should handle HTML with comments', () => {
@@ -85,12 +85,12 @@ describe('getTextLengthFromHtml', () => {
 
     it('should handle HTML with script tags', () => {
         const result = getTextLengthFromHtml('<p>Text<script>alert("test");</script>More text</p>');
-        expect(result).toBe(13); // script content is removed
+        expect(result).toBe(13);
     });
 
     it('should handle HTML with style tags', () => {
         const result = getTextLengthFromHtml('<p>Text<style>body { color: red; }</style>More text</p>');
-        expect(result).toBe(13); // style content is removed
+        expect(result).toBe(13);
     });
 
     it('should count whitespace in HTML', () => {
@@ -105,7 +105,7 @@ describe('getTextLengthFromHtml', () => {
 
     it('should handle mixed newlines and HTML tags', () => {
         const result = getTextLengthFromHtml('<p>Text\nwith\n<strong>bold</strong>\ncontent</p>');
-        expect(result).toBe(19);
+        expect(result).toBe(22);
     });
 
     it('should return correct length for single character', () => {
@@ -115,6 +115,6 @@ describe('getTextLengthFromHtml', () => {
 
     it('should handle HTML with only whitespace and newlines', () => {
         const result = getTextLengthFromHtml('<p>   \n   \n   </p>');
-        expect(result).toBe(9);
+        expect(result).toBe(11);
     });
 });

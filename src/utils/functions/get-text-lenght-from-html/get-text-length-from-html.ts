@@ -1,7 +1,5 @@
+import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
+
 export const getTextLengthFromHtml = (html: string): number => {
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = html;
-    tempDiv.querySelectorAll('script, style').forEach((el) => el.remove());
-    const text = tempDiv.innerText || tempDiv.textContent || '';
-    return text.replace(/\n/g, '').length;
+    return getPlainTextFromHtml(html).length;
 };

@@ -8,9 +8,12 @@ export interface IntroSectionProps {
 }
 
 export const IntroSection = ({ banner }: IntroSectionProps) => {
-    const title = banner?.title || '';
-    const description = banner?.description || '';
-    const imageUrl = banner?.image?.url || background;
+    if (!banner) {
+        return null;
+    }
+
+    const { title, description, image } = banner;
+    const imageUrl = image?.url ?? background;
 
     const sanitizedTitle = DOMPurify.sanitize(title, {
         ALLOWED_TAGS: ['strong', 'em', 'b', 'i', 'br'],

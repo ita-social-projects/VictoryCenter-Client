@@ -8,6 +8,7 @@ import { ReactComponent as UsersRound } from '@/assets/icons/users-round.svg';
 import { ReactComponent as CalendarDays } from '@/assets/icons/calendar-days.svg';
 import { useProgramBySlug } from '@/hooks/common/use-get-program-by-slug/useGetProgramBySlug';
 import { InfoItem } from '../info-item/InfoItem';
+import { DetailedProgramSection } from '@/components/public/detailed-program-section/DetailedProgramSection';
 
 export const DetailedProgramPageContent: React.FC = () => {
     const { slug } = useParams<{ slug: string }>();
@@ -31,6 +32,8 @@ export const DetailedProgramPageContent: React.FC = () => {
             </div>
         );
     }
+
+    const hasSections = program.sections && program.sections.length > 0;
 
     return (
         <div className={styles['detailed-program-page-content']}>
@@ -64,6 +67,13 @@ export const DetailedProgramPageContent: React.FC = () => {
                     </div>
                 )}
             </div>
+            {hasSections && (
+                <div className={styles['sections-list']}>
+                    {program.sections.map((section, index) => (
+                        <DetailedProgramSection key={section.id ?? `${section.template}-${index}`} section={section} />
+                    ))}
+                </div>
+            )}
         </div>
     );
 };

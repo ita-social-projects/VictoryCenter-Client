@@ -40,7 +40,10 @@ export const DetailedProgramPageContent: React.FC = () => {
             <div className={styles['background-section']}>
                 {program.backgroundImage && (
                     <div className={styles['background-media-wrapper']}>
-                        <BackgroundMedia mediaUrl={program.backgroundImage.url} />
+                        <BackgroundMedia
+                            mediaUrl={program.backgroundImage.url}
+                            className={styles['background-gradient']}
+                        />
                         <div className={styles['content-container']}>
                             <div className={styles['left-section']}>
                                 <div>

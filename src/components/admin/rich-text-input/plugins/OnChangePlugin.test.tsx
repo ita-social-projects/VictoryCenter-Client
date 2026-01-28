@@ -115,11 +115,12 @@ describe('OnChangePlugin', () => {
             },
         ];
 
-        sanitizationTestCases.forEach(({ name, input, expected }) => {
-            it(name, () => {
+        it.each(sanitizationTestCases.map(({ name, input, expected }) => [name, input, expected]))(
+            '%s',
+            (_name, input, expected) => {
                 const onChange = jest.fn();
                 testOnChangeCallback(onChange, input, expected);
-            });
-        });
+            },
+        );
     });
 });

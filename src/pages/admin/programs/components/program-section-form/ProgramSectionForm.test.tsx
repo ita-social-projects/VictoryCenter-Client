@@ -1,7 +1,13 @@
+import React from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
-import { ProgramSectionForm, ProgramSectionFormProps } from './ProgramSectionForm';
-import { ProgramSection, ProgramSectionTemplate } from '@/types/common/program-sections';
+import '@testing-library/jest-dom';
+
+import { ProgramSectionForm } from './ProgramSectionForm';
+import type { ProgramSectionFormProps } from './ProgramSectionForm';
+import type { ProgramSection } from '@/types/common/program-sections';
+import { ProgramSectionTemplate } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
+import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { renderProgramSection } from '@/utils/functions/render-program-section';
 
 jest.mock('@/utils/functions/render-program-section', () => ({
@@ -14,119 +20,150 @@ jest.mock('@/components/admin/button/Button', () => ({
 
 const renderProgramSectionMock = renderProgramSection as unknown as jest.Mock;
 
-const mockImage = (id: string, url: string): any => ({
-    id,
-    url,
-    mimeType: 'image/png',
+const makeImage = (id: string, url?: string): any =>
+    url
+        ? { id, url, mimeType: 'image/png' }
+        : {
+              id,
+          };
+
+const makeTitleContent = (title: string | null, order = 0) => ({
+    contentType: ContentType.Title,
+    order,
+    title,
+    description: null,
+    image: null,
+});
+
+const makeDescriptionContent = (order: number, description: string | null | undefined) => ({
+    contentType: ContentType.Description,
+    order,
+    title: null,
+    description,
+    image: null,
+});
+
+const makeImageContent = (order: number, image: any) => ({
+    contentType: ContentType.Image,
+    order,
+    title: null,
+    description: null,
+    image,
 });
 
 const makeSection = (overrides?: Partial<ProgramSection>): ProgramSection => ({
     template: ProgramSectionTemplate.TextOnly,
     order: 0,
     contents: [
-        { contentType: ContentType.Title, order: 0, title: 'Title', description: null, image: null },
-        { contentType: ContentType.Description, order: 1, title: null, description: 'Desc-1', image: null },
-        { contentType: ContentType.Description, order: 2, title: null, description: 'Desc-2', image: null },
-        {
-            contentType: ContentType.Image,
-            order: 3,
-            title: null,
-            description: null,
-            image: mockImage('img1', 'img1-url'),
-        },
-        { contentType: ContentType.Image, order: 4, title: null, description: null, image: { id: 'no-url' } as any },
-        { contentType: ContentType.Image, order: 5, title: null, description: null, image: null },
+        makeTitleContent('Title', 0),
+        makeDescriptionContent(1, 'Desc-1'),
+        makeDescriptionContent(2, 'Desc-2'),
+        makeImageContent(3, makeImage('img1', 'img1-url')),
+        makeImageContent(4, makeImage('no-url')),
+        makeImageContent(5, null),
     ],
     ...overrides,
 });
 
-const defaultProps: ProgramSectionFormProps = {
-    section: makeSection(),
-    onSave: jest.fn(),
-    onCancel: jest.fn(),
-    isDisabled: false,
-    onSectionChange: jest.fn(),
-};
-
 describe('ProgramSectionForm', () => {
+    let baseProps: ProgramSectionFormProps;
+
+    const renderForm = (overrides: Partial<ProgramSectionFormProps> = {}) => {
+        render(<ProgramSectionForm {...baseProps} {...overrides} />);
+    };
+
+    const renderWithHandlers = (overrides: Partial<ProgramSectionFormProps> = {}) => {
+        let capturedHandlers: any;
+
+        renderProgramSectionMock.mockImplementation((payload: any) => {
+            capturedHandlers = payload.handlers;
+            return <div data-testid="editable-section" />;
+        });
+
+        const onSectionChange = (overrides.onSectionChange as jest.Mock) ?? jest.fn();
+
+        renderForm({
+            ...overrides,
+            onSectionChange,
+        });
+
+        return { handlers: capturedHandlers, onSectionChange };
+    };
+
     beforeEach(() => {
         jest.clearAllMocks();
         renderProgramSectionMock.mockReturnValue(<div data-testid="editable-section" />);
+        baseProps = {
+            section: makeSection(),
+            onSave: jest.fn(),
+            onCancel: jest.fn(),
+            isDisabled: false,
+            onSectionChange: jest.fn(),
+        };
     });
 
     it('renders editable section', () => {
-        render(<ProgramSectionForm {...defaultProps} />);
+        renderForm();
         expect(screen.getByTestId('editable-section')).toBeInTheDocument();
     });
 
     it('renders template info if editableSection is null', () => {
         renderProgramSectionMock.mockReturnValueOnce(null);
-        render(<ProgramSectionForm {...defaultProps} />);
+        renderForm();
         expect(screen.getByText(/Template ID:/)).toBeInTheDocument();
     });
 
     it('calls onCancel when cancel button is clicked', () => {
-        render(<ProgramSectionForm {...defaultProps} />);
-        fireEvent.click(screen.getByText('Відмінити'));
-        expect(defaultProps.onCancel).toHaveBeenCalledTimes(1);
+        renderForm();
+        fireEvent.click(screen.getByText(PROGRAMS_TEXT.BUTTON.CANCEL));
+        expect(baseProps.onCancel).toHaveBeenCalledTimes(1);
     });
 
     it('save button is always disabled', () => {
-        render(<ProgramSectionForm {...defaultProps} />);
-        expect(screen.getByText('Зберегти')).toBeDisabled();
+        renderForm();
+        expect(screen.getByText(PROGRAMS_TEXT.BUTTON.SAVE)).toBeDisabled();
     });
 
     it('cancel button is disabled when isDisabled is true', () => {
-        render(<ProgramSectionForm {...defaultProps} isDisabled={true} />);
-        expect(screen.getByText('Відмінити')).toBeDisabled();
+        renderForm({ isDisabled: true });
+        expect(screen.getByText(PROGRAMS_TEXT.BUTTON.CANCEL)).toBeDisabled();
     });
 
     it('defaults isDisabled to false when omitted', () => {
-        const { isDisabled: _isDisabled, ...propsWithoutIsDisabled } = defaultProps;
+        const { isDisabled: _omit, ...propsWithoutIsDisabled } = baseProps;
         render(<ProgramSectionForm {...propsWithoutIsDisabled} />);
-        expect(screen.getByText('Відмінити')).not.toBeDisabled();
+        expect(screen.getByText(PROGRAMS_TEXT.BUTTON.CANCEL)).not.toBeDisabled();
     });
 
     it('passes normalized title/description/descriptions/images and handlers into renderProgramSection', () => {
         const section = makeSection({
             contents: [
-                { contentType: ContentType.Title, order: 0, title: null, description: null, image: null },
-                { contentType: ContentType.Description, order: 2, title: null, description: undefined, image: null },
-                { contentType: ContentType.Description, order: 1, title: null, description: 'D-1', image: null },
-                {
-                    contentType: ContentType.Image,
-                    order: 3,
-                    title: null,
-                    description: null,
-                    image: mockImage('img1', 'img1-url'),
-                },
-                {
-                    contentType: ContentType.Image,
-                    order: 4,
-                    title: null,
-                    description: null,
-                    image: { id: 'no-url' } as any,
-                },
-                { contentType: ContentType.Image, order: 5, title: null, description: null, image: null },
+                makeTitleContent(null, 0),
+                makeDescriptionContent(2, undefined),
+                makeDescriptionContent(1, 'D-1'),
+                makeImageContent(3, makeImage('img1', 'img1-url')),
+                makeImageContent(4, makeImage('no-url')),
+                makeImageContent(5, null),
             ],
         });
 
-        render(<ProgramSectionForm {...defaultProps} section={section} />);
+        renderForm({ section });
 
         expect(renderProgramSectionMock).toHaveBeenCalledTimes(1);
-        const arg = renderProgramSectionMock.mock.calls[0][0];
 
-        expect(arg.templateId).toBe(section.template);
-        expect(arg.isEditable).toBe(true);
+        const callPayload = renderProgramSectionMock.mock.calls[0][0];
 
-        expect(arg.data).toEqual({
+        expect(callPayload.templateId).toBe(section.template);
+        expect(callPayload.isEditable).toBe(true);
+
+        expect(callPayload.data).toEqual({
             title: '',
             description: 'D-1',
             descriptions: ['D-1', ''],
             images: ['img1-url', '', ''],
         });
 
-        expect(arg.handlers).toEqual({
+        expect(callPayload.handlers).toEqual({
             onTitleChange: expect.any(Function),
             onDescriptionChange: expect.any(Function),
             onDescriptionsChange: expect.any(Function),
@@ -135,86 +172,57 @@ describe('ProgramSectionForm', () => {
     });
 
     it('calls onSectionChange with updated title when onTitleChange is invoked', () => {
-        let handlers: any;
-
-        renderProgramSectionMock.mockImplementation((args: any) => {
-            handlers = args.handlers;
-            return <div data-testid="editable-section" />;
-        });
-
-        const onSectionChange = jest.fn();
         const section = makeSection();
-
-        render(<ProgramSectionForm {...defaultProps} section={section} onSectionChange={onSectionChange} />);
+        const { handlers, onSectionChange } = renderWithHandlers({ section });
 
         act(() => {
             handlers.onTitleChange('New Title');
         });
 
         expect(onSectionChange).toHaveBeenCalledTimes(1);
-        const updated = onSectionChange.mock.calls[0][0] as ProgramSection;
 
+        const updated = onSectionChange.mock.calls[0][0] as ProgramSection;
         const title = updated.contents.find((c) => c.contentType === ContentType.Title);
         expect(title?.title).toBe('New Title');
     });
 
     it('calls onSectionChange and updates all descriptions when onDescriptionChange is invoked', () => {
-        let handlers: any;
-
-        renderProgramSectionMock.mockImplementation((args: any) => {
-            handlers = args.handlers;
-            return <div data-testid="editable-section" />;
-        });
-
-        const onSectionChange = jest.fn();
         const section = makeSection({
-            contents: [
-                { contentType: ContentType.Title, order: 0, title: 'T', description: null, image: null },
-                { contentType: ContentType.Description, order: 1, title: null, description: 'A', image: null },
-                { contentType: ContentType.Description, order: 2, title: null, description: 'B', image: null },
-            ],
+            contents: [makeTitleContent('T', 0), makeDescriptionContent(1, 'A'), makeDescriptionContent(2, 'B')],
         });
 
-        render(<ProgramSectionForm {...defaultProps} section={section} onSectionChange={onSectionChange} />);
+        const { handlers, onSectionChange } = renderWithHandlers({ section });
 
         act(() => {
             handlers.onDescriptionChange('NEW');
         });
 
         expect(onSectionChange).toHaveBeenCalledTimes(1);
-        const updated = onSectionChange.mock.calls[0][0] as ProgramSection;
 
+        const updated = onSectionChange.mock.calls[0][0] as ProgramSection;
         const descs = updated.contents.filter((c) => c.contentType === ContentType.Description);
         expect(descs.map((d) => d.description)).toEqual(['NEW', 'NEW']);
     });
 
     it('calls onSectionChange and updates only targeted description when onDescriptionsChange is invoked', () => {
-        let handlers: any;
-
-        renderProgramSectionMock.mockImplementation((args: any) => {
-            handlers = args.handlers;
-            return <div data-testid="editable-section" />;
-        });
-
-        const onSectionChange = jest.fn();
         const section = makeSection({
             contents: [
-                { contentType: ContentType.Title, order: 0, title: 'T', description: null, image: null },
-                { contentType: ContentType.Description, order: 10, title: null, description: 'D10', image: null },
-                { contentType: ContentType.Description, order: 20, title: null, description: 'D20', image: null },
-                { contentType: ContentType.Description, order: 30, title: null, description: 'D30', image: null },
+                makeTitleContent('T', 0),
+                makeDescriptionContent(10, 'D10'),
+                makeDescriptionContent(20, 'D20'),
+                makeDescriptionContent(30, 'D30'),
             ],
         });
 
-        render(<ProgramSectionForm {...defaultProps} section={section} onSectionChange={onSectionChange} />);
+        const { handlers, onSectionChange } = renderWithHandlers({ section });
 
         act(() => {
             handlers.onDescriptionsChange(1, 'UPDATED');
         });
 
         expect(onSectionChange).toHaveBeenCalledTimes(1);
-        const updated = onSectionChange.mock.calls[0][0] as ProgramSection;
 
+        const updated = onSectionChange.mock.calls[0][0] as ProgramSection;
         const ordered = updated.contents
             .filter((c) => c.contentType === ContentType.Description)
             .sort((a, b) => a.order - b.order);
@@ -223,22 +231,11 @@ describe('ProgramSectionForm', () => {
     });
 
     it('does nothing when onDescriptionsChange index is out of range', () => {
-        let handlers: any;
-
-        renderProgramSectionMock.mockImplementation((args: any) => {
-            handlers = args.handlers;
-            return <div data-testid="editable-section" />;
-        });
-
-        const onSectionChange = jest.fn();
         const section = makeSection({
-            contents: [
-                { contentType: ContentType.Title, order: 0, title: 'T', description: null, image: null },
-                { contentType: ContentType.Description, order: 1, title: null, description: 'D1', image: null },
-            ],
+            contents: [makeTitleContent('T', 0), makeDescriptionContent(1, 'D1')],
         });
 
-        render(<ProgramSectionForm {...defaultProps} section={section} onSectionChange={onSectionChange} />);
+        const { handlers, onSectionChange } = renderWithHandlers({ section });
 
         act(() => {
             handlers.onDescriptionsChange(5, 'NOPE');
@@ -248,45 +245,25 @@ describe('ProgramSectionForm', () => {
     });
 
     it('calls onSectionChange and updates correct image by index when onImagesChange is invoked', () => {
-        let handlers: any;
-
-        renderProgramSectionMock.mockImplementation((args: any) => {
-            handlers = args.handlers;
-            return <div data-testid="editable-section" />;
-        });
-
-        const onSectionChange = jest.fn();
         const section = makeSection({
             contents: [
-                { contentType: ContentType.Title, order: 0, title: 'T', description: null, image: null },
-                {
-                    contentType: ContentType.Image,
-                    order: 2,
-                    title: null,
-                    description: null,
-                    image: mockImage('a', 'A'),
-                },
-                {
-                    contentType: ContentType.Image,
-                    order: 1,
-                    title: null,
-                    description: null,
-                    image: mockImage('b', 'B'),
-                },
+                makeTitleContent('T', 0),
+                makeImageContent(2, makeImage('a', 'A')),
+                makeImageContent(1, makeImage('b', 'B')),
             ],
         });
 
-        render(<ProgramSectionForm {...defaultProps} section={section} onSectionChange={onSectionChange} />);
+        const { handlers, onSectionChange } = renderWithHandlers({ section });
 
-        const newFile = { id: 'new', url: 'NEW', mimeType: 'image/png' } as any;
+        const newFile = makeImage('new', 'NEW');
 
         act(() => {
             handlers.onImagesChange(0, newFile);
         });
 
         expect(onSectionChange).toHaveBeenCalledTimes(1);
-        const updated = onSectionChange.mock.calls[0][0] as ProgramSection;
 
+        const updated = onSectionChange.mock.calls[0][0] as ProgramSection;
         const orderedImages = updated.contents
             .filter((c) => c.contentType === ContentType.Image)
             .sort((a, b) => a.order - b.order);
@@ -296,28 +273,11 @@ describe('ProgramSectionForm', () => {
     });
 
     it('does nothing when onImagesChange index is out of range', () => {
-        let handlers: any;
-
-        renderProgramSectionMock.mockImplementation((args: any) => {
-            handlers = args.handlers;
-            return <div data-testid="editable-section" />;
-        });
-
-        const onSectionChange = jest.fn();
         const section = makeSection({
-            contents: [
-                { contentType: ContentType.Title, order: 0, title: 'T', description: null, image: null },
-                {
-                    contentType: ContentType.Image,
-                    order: 1,
-                    title: null,
-                    description: null,
-                    image: mockImage('a', 'A'),
-                },
-            ],
+            contents: [makeTitleContent('T', 0), makeImageContent(1, makeImage('a', 'A'))],
         });
 
-        render(<ProgramSectionForm {...defaultProps} section={section} onSectionChange={onSectionChange} />);
+        const { handlers, onSectionChange } = renderWithHandlers({ section });
 
         act(() => {
             handlers.onImagesChange(5, null);

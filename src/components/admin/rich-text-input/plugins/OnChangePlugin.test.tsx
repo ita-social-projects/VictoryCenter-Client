@@ -79,7 +79,7 @@ describe('OnChangePlugin', () => {
         const sanitizationTestCases = [
             {
                 name: 'removes CSS module class attributes from HTML',
-                input: '<p class="RichTextInput_paragraph__abc123">Text with <strong class="RichTextInput_textBold__xyz">bold</strong></p>',
+                input: '<p class="RichTextInput_paragraph__abc123">Text with <strong class="RichTextInput_text-bold__xyz">bold</strong></p>',
                 expected: '<p>Text with <strong>bold</strong></p>',
             },
             {
@@ -107,9 +107,9 @@ describe('OnChangePlugin', () => {
                 input:
                     '<p class="RichTextInput_paragraph__wO3kv" style="text-align: center;">' +
                     '<span style="white-space: pre-wrap;">Ми не </span>' +
-                    '<b><strong class="RichTextInput_textBold__TIQja" style="white-space: pre-wrap;">одні</strong></b>' +
+                    '<b><strong class="RichTextInput_text-bold__TIQja" style="white-space: pre-wrap;">одні</strong></b>' +
                     '<span style="white-space: pre-wrap;">. І це наша </span>' +
-                    '<b><strong class="RichTextInput_textBold__TIQja" style="white-space: pre-wrap;">сила</strong></b>' +
+                    '<b><strong class="RichTextInput_text-bold__TIQja" style="white-space: pre-wrap;">сила</strong></b>' +
                     '</p>',
                 expected: '<p>Ми не <strong>одні</strong>. І це наша <strong>сила</strong></p>',
             },

@@ -256,7 +256,7 @@ describe('TitleDescriptionSection', () => {
             const descriptionTextarea = getDescriptionTextarea();
             expect(descriptionTextarea).toHaveAttribute('id', 'section-description');
             expect(descriptionTextarea).toHaveAttribute('maxLength', '600');
-            expect(descriptionTextarea).toHaveAttribute('rows', '8');
+            expect(descriptionTextarea).toHaveAttribute('rows', '10');
         });
     });
 

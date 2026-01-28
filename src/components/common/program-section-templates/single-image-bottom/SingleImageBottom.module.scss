@@ -1,47 +1,69 @@
 @import '../shared/BaseSectionTemplate.module.scss';
+$img-width: 1440px;
+$img-height: 680px;
 
 .container {
     @extend .section-container;
-    aspect-ratio: 1330 / 1200;
-    display: flex;
+    padding-bottom: 30px;
+}
+
+.template {
+    aspect-ratio: 1440 / 1200;
 }
 
 .top-section {
-    flex: 0 0 40%;
+    flex: 0 0 44%;
 }
 
 .bottom-section {
-    flex: 0 0 60%;
+    flex: 0 0 56%;
     display: flex;
 }
 
 .image-wrapper {
     height: 100%;
-    aspect-ratio: 1330 / 680;
+    aspect-ratio: $img-width / $img-height;
 }
 
 .image {
     width: 100%;
     height: auto;
     object-fit: cover;
-    aspect-ratio: 1330 / 680;
+    aspect-ratio: $img-width / $img-height;
+}
+
+.description-template {
+    font-size: clamp(3px, 0.9vw, 1.4vmin);
+    line-height: clamp(3px, 0.9vw, 1.3vmin);
+}
+
+.title-template {
+    font-size: clamp(3px, 1.7vw, 3vmin);
+    line-height: clamp(3px, 0.9vw, 2vmin);
 }
 
 .container.editable {
-    max-height: 1300px;
-    gap: 2rem;
+    max-height: 1400px;
+    gap: 30px;
 
     .bottom-section {
         flex: auto;
         height: auto;
         justify-content: center;
+        padding: 1vw 10vw;
     }
 
     .image-wrapper {
-        max-height: 680px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
 
         [class~='input-group'] {
-            height: 100%;
+            width: 100%;
+            aspect-ratio: $img-width / $img-height;
+            max-width: $img-width;
+            max-height: $img-height;
         }
     }
 }

@@ -307,4 +307,38 @@ describe('GenericDetails - Additional Coverage', () => {
 
         expect(screen.getByText('Add New').closest('button')).toBeDisabled();
     });
+
+    it('calls onLocalSubmit when isParentCreating is true', async () => {
+        const onLocalSubmit = jest.fn();
+        render(<GenericDetails {...defaultProps} items={[]} isParentCreating={true} onLocalSubmit={onLocalSubmit} />);
+
+        fireEvent.click(screen.getByText('Add New'));
+        fireEvent.click(screen.getByText('Submit'));
+
+        await waitFor(() => {
+            expect(onLocalSubmit).toHaveBeenCalled();
+        });
+    });
+
+    it('calls onLocalUpdate when isParentCreating is true', async () => {
+        const onLocalUpdate = jest.fn();
+        render(<GenericDetails {...defaultProps} isParentCreating={true} onLocalUpdate={onLocalUpdate} />);
+
+        fireEvent.click(screen.getByText('Submit'));
+
+        await waitFor(() => {
+            expect(onLocalUpdate).toHaveBeenCalledWith(0, expect.any(Object));
+        });
+    });
+
+    it('calls onLocalDelete when isParentCreating is true', async () => {
+        const onLocalDelete = jest.fn();
+        render(<GenericDetails {...defaultProps} isParentCreating={true} onLocalDelete={onLocalDelete} />);
+
+        fireEvent.click(screen.getByText('Delete'));
+
+        await waitFor(() => {
+            expect(onLocalDelete).toHaveBeenCalledWith(0);
+        });
+    });
 });

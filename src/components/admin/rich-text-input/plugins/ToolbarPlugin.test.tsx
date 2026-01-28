@@ -29,8 +29,8 @@ jest.mock('lexical', () => ({
 
 jest.mock('../RichTextInput.module.scss', () => ({
     toolbar: 'toolbar',
-    toolbarBtn: 'toolbarBtn',
-    toolbarBtnActive: 'toolbarBtnActive',
+    'toolbar-btn': 'toolbar-btn',
+    'toolbar-btn-active': 'toolbar-btn-active',
 }));
 
 describe('ToolbarPlugin', () => {
@@ -112,7 +112,7 @@ describe('ToolbarPlugin', () => {
         triggerSelectionChange();
 
         const boldButton = screen.getByLabelText('Bold');
-        expect(boldButton).toHaveClass('toolbarBtnActive');
+        expect(boldButton).toHaveClass('toolbar-btn-active');
     });
 
     it('updates isItalic state when selection has italic format', () => {
@@ -129,7 +129,7 @@ describe('ToolbarPlugin', () => {
         triggerSelectionChange();
 
         const italicButton = screen.getByLabelText('Italic');
-        expect(italicButton).toHaveClass('toolbarBtnActive');
+        expect(italicButton).toHaveClass('toolbar-btn-active');
     });
 
     it('does not apply active class when text is not bold', () => {
@@ -146,7 +146,7 @@ describe('ToolbarPlugin', () => {
         triggerSelectionChange();
 
         const boldButton = screen.getByLabelText('Bold');
-        expect(boldButton).not.toHaveClass('toolbarBtnActive');
+        expect(boldButton).not.toHaveClass('toolbar-btn-active');
     });
 
     it('clicking Bold button dispatches FORMAT_TEXT_COMMAND with bold', () => {

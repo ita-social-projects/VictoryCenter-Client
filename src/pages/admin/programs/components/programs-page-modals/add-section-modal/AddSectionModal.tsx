@@ -8,12 +8,29 @@ import { renderProgramSection } from '@/utils/functions/render-program-section';
 import placeholderImage from '@/assets/images/common/section-photo-placeholder.png';
 import styles from './AddSectionModal.module.scss';
 import swiperStyles from './AddSectionSwiper.module.scss';
-
+import { ReactComponent as ChevronRight } from '@/assets/icons/chevron-right.svg';
+import { ReactComponent as ChevronLeft } from '@/assets/icons/chevron-left.svg';
 export interface AddSectionModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSelectTemplate: (templateId: ProgramSectionTemplate) => void;
 }
+
+const SWIPER_NAVIGATION_CONFIG = {
+    classNamebuttonBlock: swiperStyles.buttonBlock,
+    prev: {
+        icon: ChevronLeft,
+        ariaLabel: 'previous',
+        variant: 'tertiary' as const,
+        className: swiperStyles.left,
+    },
+    next: {
+        icon: ChevronRight,
+        ariaLabel: 'next',
+        variant: 'tertiary' as const,
+        className: swiperStyles.right,
+    },
+};
 
 const TEMPLATES = [
     ProgramSectionTemplate.QuadImagesBottom,
@@ -69,7 +86,7 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} maxWidth="90vw">
+        <Modal isOpen={isOpen} onClose={onClose} maxWidth="90vw" className={styles['modal-container']}>
             <Modal.Content>
                 <div className={styles.container}>
                     <Swiper
@@ -83,8 +100,7 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
                         )}
                         slidesPerView={1}
                         onSlideChange={handleSlideChange}
-                        className={swiperStyles['button-container']}
-                        useChevrons={true}
+                        navigationButtons={SWIPER_NAVIGATION_CONFIG}
                     />
                 </div>
             </Modal.Content>

@@ -55,6 +55,8 @@ export const PROGRAMS_TEXT = {
             FAIL_TO_CREATE_PROGRAM: 'Виникла помилка під час додавання програми',
             FAIL_TO_UPDATE_PROGRAM: 'Виникла помилка під час оновлення програми',
             FAIL_TO_DELETE_PROGRAM: 'Виникла помилка під час видалення програми',
+            PROGRAM_SAVED_SUCCESSFULLY: 'Програма успішно збережена',
+            PROGRAM_PUBLISHED_SUCCESSFULLY: 'Програма успішно опублікована',
         },
         LABEL: {
             NAME: 'Назва',
@@ -99,15 +101,15 @@ export const PROGRAM_SECTION_IMAGE_CONFIGS = {
         minHeight: 480,
     },
     SINGLE_IMAGE_TOP: {
-        cropWidth: 1330,
+        cropWidth: 1440,
         cropHeight: 680,
-        minWidth: 1330,
+        minWidth: 1440,
         minHeight: 680,
     },
     SINGLE_IMAGE_BOTTOM: {
-        cropWidth: 1330,
+        cropWidth: 1440,
         cropHeight: 680,
-        minWidth: 1330,
+        minWidth: 1440,
         minHeight: 680,
     },
     SINGLE_IMAGE_RIGHT: {
@@ -116,6 +118,38 @@ export const PROGRAM_SECTION_IMAGE_CONFIGS = {
         minWidth: 700,
         minHeight: 600,
     },
+};
+
+export const QUAD_IMAGES_CONFIG = {
+    imageCount: 4,
+    gridColumns: 4,
+    imageConfig: PROGRAM_SECTION_IMAGE_CONFIGS.QUAD_IMAGES,
+    elevatedIndices: [0, 2],
+    imageLabel: COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE,
+    editableGridColumns: 4,
+    editableImageMaxHeight: 390,
+    editableImageMaxWidth: 360,
+};
+
+export const DUAL_IMAGES_CONFIG = {
+    imageCount: 2,
+    gridColumns: 2,
+    imageConfig: PROGRAM_SECTION_IMAGE_CONFIGS.DUAL_IMAGES,
+    elevatedIndices: [0],
+    imageLabel: COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE,
+    editableImageMaxHeight: 430,
+    editableImageMaxWidth: 730,
+};
+
+export const TRIPLE_IMAGES_CONFIG = {
+    imageCount: 3,
+    gridColumns: 3,
+    imageConfig: PROGRAM_SECTION_IMAGE_CONFIGS.TRIPLE_IMAGES,
+    elevatedIndices: [0, 2],
+    imageLabel: COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE,
+    editableGridColumns: 4,
+    editableImageMaxHeight: 480,
+    editableImageMaxWidth: 480,
 };
 
 export const PROGRAM_VALIDATION = {
@@ -161,6 +195,9 @@ export const PROGRAM_VALIDATION = {
     meetingCount: {
         max: 55,
         getRequiredWhenPublishingError: () => 'Кількість зустрічей обов’язкова при публікації',
+    },
+    images: {
+        maxSizeMB: 5,
     },
 };
 

@@ -12,7 +12,6 @@ interface ExpectedImageConfig {
 
 interface TestConfig<TProps> {
     componentName: string;
-    variant: string;
     imageCount: number;
     Component: React.ComponentType<TProps>;
     createDefaultProps: () => TProps;
@@ -75,7 +74,6 @@ const expectImageConfigMatches = (actual: any, expected: ExpectedImageConfig) =>
 
 // Element getters
 const getImagesBottomSection = () => screen.getByTestId('images-bottom-section');
-const getVariant = () => screen.getByTestId('variant');
 const getImagesCount = () => screen.getByTestId('images-count');
 const getNonEmptyImagesCount = () => screen.getByTestId('non-empty-images-count');
 const getImagesJson = () => screen.getByTestId('images-json');
@@ -87,7 +85,6 @@ const getHasOnDescriptionChange = () => screen.getByTestId('has-onDescriptionCha
 export function createImagesBottomTestSuite<TProps extends Record<string, any>>(config: TestConfig<TProps>) {
     const {
         componentName,
-        variant,
         imageCount,
         Component,
         createDefaultProps,
@@ -111,16 +108,8 @@ export function createImagesBottomTestSuite<TProps extends Record<string, any>>(
                 render(<Component {...({} as TProps)} />);
 
                 expect(getImagesBottomSection()).toBeInTheDocument();
-                expect(getVariant()).toHaveTextContent(variant);
                 expect(getImagesCount()).toHaveTextContent(imageCount.toString());
                 expect(getNonEmptyImagesCount()).toHaveTextContent('0');
-            });
-
-            it('renders ImagesBottomSection with correct variant', () => {
-                renderComponent();
-
-                expect(getImagesBottomSection()).toBeInTheDocument();
-                expect(getVariant()).toHaveTextContent(variant);
             });
 
             it(`passes all ${imageCount} images to ImagesBottomSection`, () => {
@@ -215,15 +204,6 @@ export function createImagesBottomTestSuite<TProps extends Record<string, any>>(
                 const imageProps = createImageProps(images);
 
                 renderComponent(imageProps);
-
-                const config = parseJsonFromTestId<any>('image-config', {});
-                expectImageConfigMatches(config, expectedConfig);
-            });
-        });
-
-        describe('Configuration', () => {
-            it(`passes correct ${variant.toUpperCase()}_IMAGES_CONFIG to ImagesBottomSection`, () => {
-                renderComponent();
 
                 const config = parseJsonFromTestId<any>('image-config', {});
                 expectImageConfigMatches(config, expectedConfig);

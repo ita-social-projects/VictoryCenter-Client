@@ -233,4 +233,31 @@ describe('ImageSection', () => {
         });
         expect(mockSetIsPublishButtonActive).toHaveBeenCalledWith(true);
     });
+
+    it('should disable publish button when image has error', () => {
+        renderComponent({ isPublishButtonActive: true });
+
+        const setErrorButton = screen.getByRole('button', { name: 'Set Error' });
+        fireEvent.click(setErrorButton);
+
+        const publishButton = screen.getByRole('button', { name: 'Опублікувати' });
+        expect(publishButton).toBeDisabled();
+    });
+
+    it('should not call onChange when titleContent is missing', () => {
+        renderComponent({
+            content: [
+                { id: 1, contentType: ContentType.Image, image: null, title: null, imageId: null, description: null },
+                {
+                    id: 3,
+                    contentType: ContentType.Description,
+                    description: 'Initial Description',
+                    title: null,
+                    imageId: null,
+                    image: null,
+                },
+            ],
+        });
+        expect(mockOnChange).not.toHaveBeenCalled();
+    });
 });

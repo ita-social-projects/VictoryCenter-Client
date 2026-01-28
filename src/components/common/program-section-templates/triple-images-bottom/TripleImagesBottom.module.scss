@@ -13,31 +13,18 @@ $img-number: 3;
 .bottom-section {
     flex: 0 0 51%;
     justify-content: end;
-    padding-bottom: 1rem;
+    padding-bottom: 16px;
 }
 
-.images-grid {
-    display: flex;
+.image-wrapper {
+    max-width: #{$img-width};
+    max-height: #{$img-height};
 }
 
 .image {
     aspect-ratio: #{$img-width} / #{$img-height};
 }
 
-.container.editable {
-    gap: 2rem;
-
-    .top-section {
-        height: 10px;
-    }
-
-    .images-grid {
-        width: 100%;
-    }
-
-    .image-wrapper {
-        height: 100%;
-        max-width: #{$img-width};
-        max-height: #{$img-height};
-    }
+.editable {
+    gap: 32px;
 }

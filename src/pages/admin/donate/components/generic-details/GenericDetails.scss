@@ -32,6 +32,17 @@
             }
         }
     }
+    &-footer {
+        width: 100%;
+        margin-top: 1rem;
+
+        padding-bottom: 2.5rem;
+
+        .btn-add-new {
+            width: 100%;
+            margin-bottom: 0;
+        }
+    }
     .child {
         .generic-details {
             &.header {
@@ -71,6 +82,17 @@
         .btn-secondary .plus-icon {
             path {
                 stroke: colors.$blue-500;
+            }
+        }
+    }
+
+    &-buttons {
+        &.top-add-new {
+            margin-bottom: -0.5rem;
+            .btn-add,
+            .btn-add-new {
+                width: 100%;
+                margin-bottom: 0;
             }
         }
     }

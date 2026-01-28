@@ -19,6 +19,16 @@
     justify-content: center;
 }
 
+.description-template {
+    font-size: clamp(3px, 0.9vw, 1.5vmin);
+    line-height: clamp(3px, 0.9vw, 1.5vmin);
+}
+
+.title-template {
+    font-size: clamp(3px, 1.7vw, 3vmin);
+    line-height: clamp(3px, 0.9vw, 2vmin);
+}
+
 .image-wrapper {
     height: 75%;
     &[data-elevated='true'] {
@@ -36,6 +46,7 @@
 
 .container.editable {
     max-height: 1200px;
+    gap: 30px;
 
     .top-section {
         flex: 40%;
@@ -43,7 +54,7 @@
 
     .bottom-section {
         flex: 40%;
-        padding-bottom: 6rem;
+        padding-bottom: 100px;
     }
 
     .image-wrapper {

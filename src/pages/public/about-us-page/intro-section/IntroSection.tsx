@@ -1,5 +1,5 @@
 import background from '@/assets/images/public/about-us-page/background.jpg';
-import './IntroSection.scss';
+import styles from './IntroSection.module.scss';
 import { ContentType } from '@/types/common/about-us';
 import { AboutUsContent } from '@/types/public/about-us-page';
 import DOMPurify from 'dompurify';
@@ -25,8 +25,6 @@ export const AboutUsIntro = ({ content }: AboutUsIntroProps) => {
             ALLOWED_ATTR: [],
         }) || '';
 
-    // TODO: Replace with real title when rich text component is implemented
-    // const title = content?.find((x) => x.contentType === ContentType.Title)?.title;
     const imageUrl = content?.find((x) => x.contentType === ContentType.Image)?.image?.url ?? background;
 
     return (

@@ -1,4 +1,5 @@
 import { Image } from '../common/image';
+import { ProgramSection } from '../common/program-sections';
 
 export interface ProgramCategoryDto {
     id: number;
@@ -7,6 +8,7 @@ export interface ProgramCategoryDto {
 
 export interface PublishedProgramDto {
     id: number;
+    slug: string;
     previewImage: Image | null;
     name: string;
     description: string;
@@ -16,4 +18,17 @@ export interface PublishedProgramDto {
 export interface ProgramsPageData {
     programsCategories: ProgramCategoryDto[];
     programsData: PublishedProgramDto[];
+}
+
+export interface DetailedProgram {
+    id: number;
+    name: string;
+    description: string;
+    previewImage: Image | null;
+    backgroundImage: Image | null;
+    location: string;
+    participantsCount: string;
+    meetingsCount: string;
+    sections: ProgramSection[];
+    slug: string;
 }

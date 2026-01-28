@@ -1,11 +1,11 @@
-import './OurTeam.scss';
-import { NavLink } from 'react-router-dom';
+import styles from './OurTeam.module.scss';
 import { PUBLIC_ROUTES } from '@/const/public/routes';
 import { AboutUsContent } from '@/types/public/about-us-page';
 import { ContentType } from '@/types/common/about-us';
 import { useTranslation } from 'react-i18next';
 import defaultOurTeamImage from '@/assets/images/public/about-us-page/our-team.jpg';
 import DOMPurify from 'dompurify';
+import { Button } from '@/components/public/ui/button';
 
 export interface OurTeamProps {
     content?: AboutUsContent[] | null;
@@ -24,13 +24,13 @@ export const OurTeam = ({ content }: OurTeamProps) => {
         }) || '';
 
     return (
-        <div className="our-team-block">
-            <img src={imageUrl} alt="Our Team" className="our-team-image" />
-            <div className="team-info">
-                <p className="team-description" dangerouslySetInnerHTML={{ __html: sanitizedDescription }} />
-                <NavLink to={PUBLIC_ROUTES.TEAM.FULL} className="link-to-team">
+        <div className={styles.root}>
+            <img src={imageUrl} alt="Our Team" className={styles.image} />
+            <div className={styles.info}>
+                <p className={styles.description} dangerouslySetInnerHTML={{ __html: sanitizedDescription }} />
+                <Button href={PUBLIC_ROUTES.TEAM.FULL} variant="tertiary">
                     {t('GO_TO_TEAM')}
-                </NavLink>
+                </Button>
             </div>
         </div>
     );

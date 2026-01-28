@@ -19,6 +19,10 @@ import './ProgramsPageContent.scss';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { AdminPanelToolbar } from '@/components/admin/admin-panel-toolbar/AdminPageToolbar';
 import { ProgramSearchItem } from '../program-search-item/ProgramSearchItem';
+import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
+import { ToastType } from '@/types/admin/toast';
+import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
+import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
@@ -32,6 +36,7 @@ export const ProgramsPageContent = () => {
     const [selectedCategory, setSelectedCategory] = useState<ProgramCategory | null>(null);
     const [pageSize, setPageSize] = useState(DEFAULT_LOAD_ITEMS_COUNT);
     const client = useAdminClient();
+    const { addToast } = useToast();
     const [statusFilter, setStatusFilter] = useState<VisibilityStatus | undefined>();
     const [searchProgramId, setSearchProgramId] = useState<number | undefined>();
     const [isSearchResultView, setIsSearchResultView] = useState(false);
@@ -156,6 +161,9 @@ export const ProgramsPageContent = () => {
             refetchSearchProgram();
         }
     }, [isSearchResultView, clearError, error.type, refetchCategories, refetchSearchProgram, fetchProgramsFromStart]);
+    const { allLanguages, onLanguageChange, onTranslationStatusFilterChange } = useLocalizationToolkit({
+        setErrorState,
+    });
 
     useEffect(() => {
         if (categoriesError) {
@@ -235,6 +243,11 @@ export const ProgramsPageContent = () => {
     // Program handlers
     const handleAddProgram = useCallback(
         (addedProgram: Program) => {
+            if (addedProgram.status === VisibilityStatus.Draft) {
+                addToast(PROGRAMS_TEXT.FORM.MESSAGE.PROGRAM_SAVED_SUCCESSFULLY, ToastType.Info);
+            } else if (addedProgram.status === VisibilityStatus.Published) {
+                addToast(PROGRAMS_TEXT.FORM.MESSAGE.PROGRAM_PUBLISHED_SUCCESSFULLY, ToastType.Info);
+            }
             // Update program counters in categories
             updateCategories((prevCategories) => incrementCategoriesCount(prevCategories, addedProgram));
 
@@ -246,11 +259,16 @@ export const ProgramsPageContent = () => {
                 updatePrograms((prev) => [addedProgram, ...prev]);
             }
         },
-        [updatePrograms, updateCategories, incrementCategoriesCount, selectedCategory, statusFilter],
+        [updatePrograms, updateCategories, incrementCategoriesCount, selectedCategory, statusFilter, addToast],
     );
 
     const handleEditProgram = useCallback(
         (updatedProgram: Program) => {
+            if (updatedProgram.status === VisibilityStatus.Draft) {
+                addToast(PROGRAMS_TEXT.FORM.MESSAGE.PROGRAM_SAVED_SUCCESSFULLY, ToastType.Info);
+            } else if (updatedProgram.status === VisibilityStatus.Published) {
+                addToast(PROGRAMS_TEXT.FORM.MESSAGE.PROGRAM_PUBLISHED_SUCCESSFULLY, ToastType.Info);
+            }
             if (isSearchResultView && fetchedSearchProgram?.id === updatedProgram.id) {
                 updateSearchedProgram(updatedProgram);
             }
@@ -290,6 +308,7 @@ export const ProgramsPageContent = () => {
             isSearchResultView,
             fetchedSearchProgram,
             statusFilter,
+            addToast,
         ],
     );
 
@@ -415,6 +434,9 @@ export const ProgramsPageContent = () => {
                     onAddItem={openModalActions.openAddItemModal}
                     AddItemButtonText={PROGRAMS_TEXT.BUTTON.ADD_PROGRAM}
                     onSuggestionSelect={handleProgramSuggestionSelect}
+                    languages={allLanguages}
+                    onLanguageChange={onLanguageChange}
+                    onTranslationStatusFilterChange={onTranslationStatusFilterChange}
                 />
             </div>
 
@@ -459,6 +481,7 @@ export const ProgramsPageContent = () => {
                 onEditCategory={handleEditCategory}
                 onDeleteCategory={handleDeleteCategory}
             />
+            <ToastContainer />
         </div>
     );
 };

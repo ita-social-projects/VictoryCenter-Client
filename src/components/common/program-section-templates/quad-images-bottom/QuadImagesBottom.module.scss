@@ -4,7 +4,7 @@ $img-number: 4;
 
 .container {
     aspect-ratio: 1440 / 1183;
-    gap: 1rem;
+    gap: 16px;
 }
 
 .top-section {
@@ -14,27 +14,11 @@ $img-number: 4;
 .bottom-section {
     flex: 0 0 48%;
     justify-content: end;
-    padding-bottom: 1rem;
-}
-
-.images-grid {
-    display: flex;
+    padding-bottom: 16px;
 }
 
 .image-wrapper {
     aspect-ratio: #{$img-width} / #{$img-height};
-}
-
-.container.editable {
-    gap: 2rem;
-
-    .top-section {
-        height: 10px;
-    }
-
-    .image-wrapper {
-        aspect-ratio: #{$img-width} / #{$img-height};
-        max-width: #{$img-width};
-        max-height: #{$img-height};
-    }
+    max-width: #{$img-width};
+    max-height: #{$img-height};
 }

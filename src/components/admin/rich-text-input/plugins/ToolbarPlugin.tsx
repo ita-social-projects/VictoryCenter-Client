@@ -68,8 +68,8 @@ export const ToolbarPlugin = ({ disabled = false }: ToolbarPluginProps) => {
         <div className={styles.toolbar}>
             <button
                 type="button"
-                className={cn(styles.toolbarBtn, {
-                    [styles.toolbarBtnActive]: isBold,
+                className={cn(styles['toolbar-btn'], {
+                    [styles['toolbar-btn-active']]: isBold,
                 })}
                 onClick={formatBold}
                 disabled={disabled}
@@ -80,8 +80,8 @@ export const ToolbarPlugin = ({ disabled = false }: ToolbarPluginProps) => {
             </button>
             <button
                 type="button"
-                className={cn(styles.toolbarBtn, {
-                    [styles.toolbarBtnActive]: isItalic,
+                className={cn(styles['toolbar-btn'], {
+                    [styles['toolbar-btn-active']]: isItalic,
                 })}
                 onClick={formatItalic}
                 disabled={disabled}
@@ -92,7 +92,7 @@ export const ToolbarPlugin = ({ disabled = false }: ToolbarPluginProps) => {
             </button>
             <button
                 type="button"
-                className={styles.toolbarBtn}
+                className={styles['toolbar-btn']}
                 onClick={insertLineBreak}
                 disabled={disabled}
                 aria-label="Line break"

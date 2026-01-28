@@ -26,8 +26,8 @@ export interface RichTextInputProps {
 const theme = {
     paragraph: styles.paragraph,
     text: {
-        bold: styles.textBold,
-        italic: styles.textItalic,
+        bold: styles['text-bold'],
+        italic: styles['text-italic'],
     },
 };
 
@@ -82,7 +82,7 @@ export const RichTextInput = ({
         >
             <LexicalComposer initialConfig={initialConfig}>
                 <ToolbarPlugin disabled={disabled} />
-                <div className={styles.editorContainer}>
+                <div className={styles['editor-container']}>
                     <RichTextPlugin
                         contentEditable={
                             <ContentEditable

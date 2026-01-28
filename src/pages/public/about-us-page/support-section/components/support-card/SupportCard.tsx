@@ -2,6 +2,8 @@ import { useTranslation } from 'react-i18next';
 import { ABOUT_US_DATA } from '@/const/public/about-us-page';
 import { AboutUsContent } from '@/types/public/about-us-page';
 import DOMPurify from 'dompurify';
+import styles from './SupportCard.module.scss';
+import cn from 'classnames';
 
 interface SupportCardProps {
     card: AboutUsContent;
@@ -23,9 +25,9 @@ export function SupportCard({ card, index }: SupportCardProps) {
         }) || '';
 
     return (
-        <div className={`support-card card-${index + 1}`}>
-            <img src={imageUrl} alt={altText} />
-            <p className="support-description" dangerouslySetInnerHTML={{ __html: sanitizedDescription }} />
+        <div className={cn(styles[`people-card`], styles[`card-${index + 1}`])}>
+            <img src={imageUrl} alt={altText} className={styles.image} />
+            <p className={styles.description} dangerouslySetInnerHTML={{ __html: sanitizedDescription }} />
         </div>
     );
 }

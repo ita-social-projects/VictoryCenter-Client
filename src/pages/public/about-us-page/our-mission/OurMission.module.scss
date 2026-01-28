@@ -1,0 +1,61 @@
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
+
+.root {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 60px 16px 90px;
+    gap: 24px;
+
+    @media (min-width: 560px) {
+        padding: 60px 64px 70px;
+    }
+
+    @media (min-width: 768px) {
+        padding: 60px 54px 90px;
+    }
+
+    @media (min-width: 1440px) {
+        padding: 115px 56px 101px;
+        flex-direction: row;
+    }
+}
+
+.title {
+    @include type.h4-bold-uppercase;
+    color: c.$blue-900;
+
+    @media (min-width: 768px) {
+        @include type.h3-bold-uppercase;
+    }
+
+    @media (min-width: 1440px) {
+        @include type.h4-bold-uppercase;
+    }
+}
+
+.block {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 24px;
+
+    @media (min-width: 1440px) {
+        width: 430px;
+    }
+}
+
+.text {
+    @include type.body-1-regular;
+    color: c.$blue-900;
+}
+
+.actions {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+}

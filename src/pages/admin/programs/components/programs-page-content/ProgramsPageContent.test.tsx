@@ -15,6 +15,27 @@ import { AdminPanelToolbarProps } from '@/components/admin/admin-panel-toolbar/A
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
 }));
+jest.mock('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit', () => ({
+    useLocalizationToolkit: () => ({
+        allLanguages: [
+            { id: 1, code: 'uk', name: 'Українська' },
+            { id: 2, code: 'en', name: 'Англійська' },
+        ],
+        onLanguageChange: jest.fn(),
+        onTranslationStatusFilterChange: jest.fn(),
+        translationLanguages: [{ id: 1, code: 'en', name: 'Англійська' }],
+        language: { id: 1, code: 'uk', name: 'Українська' },
+    }),
+}));
+
+jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider', () => ({
+    useToast: () => ({
+        addToast: jest.fn(),
+        removeToast: jest.fn(),
+        toasts: [],
+    }),
+    ToastProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
 
 jest.mock('@/services/api/admin/programs/programs-api', () => ({
     ProgramsApi: {
@@ -134,6 +155,7 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                             status: VisibilityStatus.Published,
                             sections: [],
                             categories: [{ id: 1, name: 'Category A', programsCount: 2 }],
+                            slug: 'new-program',
                         })
                     }
                 />
@@ -152,6 +174,7 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                             status: VisibilityStatus.Published,
                             sections: [],
                             categories: [{ id: 2, name: 'Category B', programsCount: 1 }],
+                            slug: 'alpha-edited',
                         })
                     }
                 />
@@ -170,6 +193,7 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                             status: VisibilityStatus.Published,
                             sections: [],
                             categories: [{ id: 1, name: 'Category A', programsCount: 2 }],
+                            slug: 'alpha',
                         })
                     }
                 />
@@ -214,6 +238,7 @@ const mockPrograms: Program[] = [
         status: VisibilityStatus.Published,
         sections: [],
         categories: [mockCategories[0]],
+        slug: 'alpha',
     },
     {
         id: 11,
@@ -227,6 +252,7 @@ const mockPrograms: Program[] = [
         status: VisibilityStatus.Draft,
         sections: [],
         categories: [mockCategories[0]],
+        slug: 'beta',
     },
 ];
 

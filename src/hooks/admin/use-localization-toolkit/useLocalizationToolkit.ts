@@ -5,13 +5,11 @@ import axios from 'axios';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { DEFAULT_LOCALE } from '@/const/common/locales';
 
-type ErrorType = 'categories' | 'members' | 'languages';
-
-export interface UseLocalizationToolkitProps {
-    setErrorState: (message: string, type: ErrorType) => void;
+export interface UseLocalizationToolkitProps<TError> {
+    setErrorState: (message: string, type: TError) => void;
 }
 
-export function useLocalizationToolkit({ setErrorState }: UseLocalizationToolkitProps) {
+export function useLocalizationToolkit<TError>({ setErrorState }: UseLocalizationToolkitProps<TError>) {
     const [allLanguages, setAllLanguages] = useState<LocalizationLanguage[]>([]);
     const [translationLanguages, setTranslationLanguages] = useState<LocalizationLanguage[]>([]);
     const [selectedLanguage, setSelectedLanguage] = useState<LocalizationLanguage>();
@@ -38,7 +36,10 @@ export function useLocalizationToolkit({ setErrorState }: UseLocalizationToolkit
                 return;
             }
 
-            setErrorState(COMMON_TEXT_ADMIN.LOCALIZATION.LANGUAGES.MESSAGE.FAILED_TO_FETCH_LANGUAGES, 'languages');
+            setErrorState(
+                COMMON_TEXT_ADMIN.LOCALIZATION.LANGUAGES.MESSAGE.FAILED_TO_FETCH_LANGUAGES,
+                'languages' as TError,
+            );
         }
     }, [setErrorState]);
 

@@ -7,6 +7,7 @@ import { SupportSection } from './support-section/SupportSection';
 import { OurTeam } from './our-team-section/OurTeam';
 import { MainValues } from './main-value/MainValue';
 import { SectionType } from '@/types/common/about-us';
+import { programPageDataFetch } from '@/services/api/public/programs/programs-api';
 
 jest.mock('./intro-section/IntroSection');
 jest.mock('./our-mission/OurMission');
@@ -20,8 +21,12 @@ jest.mock('./donate-section/DonateSection', () => ({
     DonateSection: () => <div data-testid="donate-section">Donate Section</div>,
 }));
 jest.mock('@/services/api/public/about-us/about-us-api');
-jest.mock('./scrollable-frame/ScrollableFrame', () => ({
-    ScrollableFrame: () => <div data-testid="scrollable-frame">Scrollable Frame</div>,
+jest.mock('./programs-section/ProgramsSection', () => ({
+    ProgramsSection: () => <div data-testid="programs-section">Programs Section</div>,
+}));
+
+jest.mock('@/services/api/public/programs/programs-api', () => ({
+    programPageDataFetch: jest.fn(),
 }));
 
 const MockedAboutUsIntro = AboutUsIntro as jest.Mock;
@@ -33,6 +38,7 @@ const MockedMainValues = MainValues as jest.Mock;
 describe('AboutUsPage', () => {
     beforeEach(() => {
         jest.clearAllMocks();
+        (programPageDataFetch as jest.Mock).mockResolvedValue(null);
         MockedAboutUsIntro.mockImplementation(() => <div data-testid="intro-section" />);
         MockedOurMission.mockImplementation(() => <div data-testid="mission-section" />);
         MockedSupportSection.mockImplementation(() => <div data-testid="support-section" />);

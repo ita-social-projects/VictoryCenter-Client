@@ -17,7 +17,6 @@ jest.mock('../shared/images-bottom-section/ImagesBottomSection', () => {
 
 createImagesBottomTestSuite<TripleImagesBottomProps>({
     componentName: 'TripleImagesBottom',
-    variant: 'triple',
     imageCount: 3,
     Component: TripleImagesBottom,
     createDefaultProps: () => ({

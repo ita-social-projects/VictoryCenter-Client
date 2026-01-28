@@ -33,7 +33,7 @@ jest.mock('@/services/api/admin/faq/faq-api', () => ({
     FaqApi: { delete: jest.fn() },
 }));
 
-const mockFaq = { id: 1, questionText: 'Q', answerText: 'A', status: 1, pages: [] };
+const mockFaq = { id: 1, questionText: 'Q', answerText: 'A', status: 1, pages: [], localizations: [] };
 
 describe('DeleteFaqModal', () => {
     it('renders modal with title and buttons', () => {

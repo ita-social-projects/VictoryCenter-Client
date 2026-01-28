@@ -1,0 +1,62 @@
+@use '@/assets/sass/variables/z-index';
+
+.root {
+    position: relative;
+    margin: 100px 0 60px 0;
+
+    @media (min-width: 560px) {
+        margin: 60px 0 60px 0;
+    }
+
+    @media (min-width: 1440px) {
+        margin: 74px 0 192px 0;
+    }
+}
+
+.swiper-slide {
+    width: 352px;
+
+    @media (min-width: 560px) {
+        width: 100%;
+    }
+}
+
+.left {
+    position: absolute;
+    top: 50%;
+    left: 14px;
+    transform: translateY(-50%);
+    z-index: z-index.$scrollable-frame-arrows;
+
+    &:disabled {
+        visibility: hidden;
+    }
+
+    @media (min-width: 560px) {
+        left: 16px;
+    }
+
+    @media (min-width: 768px) {
+        visibility: hidden;
+    }
+}
+
+.right {
+    position: absolute;
+    top: 50%;
+    right: 14px;
+    transform: translateY(-50%);
+    z-index: z-index.$scrollable-frame-arrows;
+
+    &:disabled {
+        visibility: hidden;
+    }
+
+    @media (min-width: 560px) {
+        right: 16px;
+    }
+
+    @media (min-width: 768px) {
+        visibility: hidden;
+    }
+}

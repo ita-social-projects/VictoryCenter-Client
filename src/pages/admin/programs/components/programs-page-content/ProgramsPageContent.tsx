@@ -22,6 +22,7 @@ import { ProgramSearchItem } from '../program-search-item/ProgramSearchItem';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { ToastType } from '@/types/admin/toast';
 import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
+import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
@@ -160,6 +161,9 @@ export const ProgramsPageContent = () => {
             refetchSearchProgram();
         }
     }, [isSearchResultView, clearError, error.type, refetchCategories, refetchSearchProgram, fetchProgramsFromStart]);
+    const { allLanguages, onLanguageChange, onTranslationStatusFilterChange } = useLocalizationToolkit({
+        setErrorState,
+    });
 
     useEffect(() => {
         if (categoriesError) {
@@ -430,6 +434,9 @@ export const ProgramsPageContent = () => {
                     onAddItem={openModalActions.openAddItemModal}
                     AddItemButtonText={PROGRAMS_TEXT.BUTTON.ADD_PROGRAM}
                     onSuggestionSelect={handleProgramSuggestionSelect}
+                    languages={allLanguages}
+                    onLanguageChange={onLanguageChange}
+                    onTranslationStatusFilterChange={onTranslationStatusFilterChange}
                 />
             </div>
 

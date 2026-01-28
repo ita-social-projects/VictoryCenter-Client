@@ -57,11 +57,42 @@ jest.mock('@/components/admin/input-error/InputError', () => ({
 }));
 
 jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
-    InputWithCharacterLimitGroup: ({ label, value, onChange, disabled, id }: InputWithCharacterLimitGroupProps) => (
+    InputWithCharacterLimitGroup: ({
+        label,
+        value,
+        onChange,
+        onBlur,
+        disabled,
+        id,
+        error,
+    }: InputWithCharacterLimitGroupProps) => (
         <label>
             {label}
-            <input data-testid={`${id}-input`} value={value} disabled={disabled} onChange={onChange} />
+            <input data-testid={`${id}-input`} value={value} disabled={disabled} onChange={onChange} onBlur={onBlur} />
+            {error && <span data-testid="input-error">{error}</span>}
         </label>
+    ),
+}));
+
+jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
+    RichTextInputGroup: ({ label, value, onChange, onBlur, disabled, id, error }: any) => (
+        <div>
+            <label htmlFor={id}>{label}</label>
+            <div
+                id={id}
+                contentEditable={!disabled}
+                data-testid={`${id}-rich-text`}
+                onInput={(e) => {
+                    const target = e.target as HTMLElement;
+                    onChange(target.innerHTML);
+                }}
+                onBlur={onBlur}
+                suppressContentEditableWarning
+            >
+                {value}
+            </div>
+            {error && <span data-testid="input-error">{error}</span>}
+        </div>
     ),
 }));
 
@@ -96,11 +127,16 @@ describe('PartnerBanner', () => {
         imageId: 1,
     };
 
-    // Helper functions for getting elements
     const getLoader = () => screen.queryByTestId('inline-loader');
     const getErrorMessage = () => screen.queryByText(PARTNERS_TEXT.MESSAGE.FAIL_TO_LOAD_BANNER);
     const getTryAgainButton = () => screen.queryByRole('button', { name: PARTNERS_TEXT.BUTTON.TRY_AGAIN });
-    const getTitleInput = () => screen.getByTestId('title-input');
+    const getTitleInput = () => {
+        const element = screen.getByTestId('title-rich-text') || document.getElementById('title');
+        if (!element) {
+            throw new Error('Title input not found');
+        }
+        return element as HTMLElement;
+    };
     const getDescriptionInput = () => screen.getByTestId('description-input');
     const getImageContainer = () => screen.queryByTestId('banner-image-container');
     const getImageValue = () => screen.queryByTestId('banner-image-value');
@@ -321,13 +357,13 @@ describe('PartnerBanner', () => {
         clickPublish();
 
         await waitFor(() => {
-            expect(getTitleInput()).toBeDisabled();
+            expect(getTitleInput()).toHaveAttribute('contentEditable', 'false');
             expect(getDescriptionInput()).toBeDisabled();
             expect(getPublishButton()).toBeDisabled();
         });
 
         await waitFor(() => {
-            expect(getTitleInput()).toBeEnabled();
+            expect(getTitleInput()).toHaveAttribute('contentEditable', 'true');
             expect(getDescriptionInput()).toBeEnabled();
             expect(getPublishButton()).toBeEnabled();
         });
@@ -354,7 +390,7 @@ describe('PartnerBanner', () => {
 
     it('renders title input as enabled', () => {
         render(<PartnerBanner />);
-        expect(getTitleInput()).toBeEnabled();
+        expect(getTitleInput()).toHaveAttribute('contentEditable', 'true');
     });
 
     it('shows toast for fetch error', () => {
@@ -482,5 +518,170 @@ describe('PartnerBanner', () => {
         await waitFor(() => {
             expect(getPublishButton()).toBeEnabled();
         });
+    });
+
+    it('resets touched and errors after successful publish', async () => {
+        const updatedBanner = {
+            ...defaultBannerData,
+            description: 'Published Description',
+        };
+        mockedPartnersApi.updateBanner.mockResolvedValue(updatedBanner);
+
+        render(<PartnerBanner />);
+
+        // Create an error by changing description to empty
+        changeDescriptionValue('');
+        await waitFor(() => {
+            expect(getPublishButton()).toBeDisabled();
+        });
+
+        // Fix the error
+        changeDescriptionValue('Valid Description');
+        await waitFor(() => {
+            expect(getPublishButton()).toBeEnabled();
+        });
+
+        clickPublish();
+
+        await waitFor(() => {
+            expect(mockedPartnersApi.updateBanner).toHaveBeenCalled();
+        });
+
+        // After successful publish, errors should be cleared
+        await waitFor(() => {
+            expect(screen.queryByTestId('input-error')).not.toBeInTheDocument();
+        });
+    });
+
+    it('does not show toast for canceled fetch error', () => {
+        const canceledError = { name: 'CanceledError' };
+        mockedUseDataFetch.mockReturnValueOnce({
+            data: null,
+            isLoading: false,
+            error: canceledError,
+            refetch: mockRefetch,
+            setData: mockSetData,
+        });
+
+        render(<PartnerBanner />);
+
+        expect(mockAddToast).not.toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.FAIL_TO_LOAD_BANNER, ToastType.Error);
+    });
+
+    it('does not show toast for axios canceled publish error', async () => {
+        const canceledError = { name: 'CanceledError' };
+        mockedPartnersApi.updateBanner.mockRejectedValue(canceledError);
+
+        render(<PartnerBanner />);
+
+        clickPublish();
+
+        await waitFor(() => {
+            expect(mockedPartnersApi.updateBanner).toHaveBeenCalled();
+        });
+
+        await waitFor(() => {
+            expect(mockAddToast).not.toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.FAIL_TO_UPDATE_BANNER, ToastType.Error);
+        });
+    });
+
+    it('resets imageId when image is removed', async () => {
+        render(<PartnerBanner />);
+
+        clickRemoveImage();
+
+        await waitFor(() => {
+            expect(getImageValue()).not.toBeInTheDocument();
+        });
+
+        mockedPartnersApi.updateBanner.mockResolvedValue({
+            ...defaultBannerData,
+            image: null,
+            imageId: null,
+        });
+
+        clickPublish();
+
+        await waitFor(() => {
+            expect(mockedPartnersApi.updateBanner).toHaveBeenCalledWith('mock-client', {
+                title: defaultBannerData.title,
+                description: defaultBannerData.description,
+                image: null,
+                imageId: null,
+            });
+        });
+    });
+
+    it('resets state when banner data changes', async () => {
+        const initialData = {
+            title: 'Initial Title',
+            description: 'Initial Description',
+            image: { id: 1, url: 'initial.jpg', mimeType: 'image/jpeg' },
+            imageId: 1,
+        };
+
+        mockedUseDataFetch.mockReturnValueOnce({
+            data: initialData,
+            isLoading: false,
+            error: null,
+            refetch: mockRefetch,
+            setData: mockSetData,
+        });
+
+        render(<PartnerBanner />);
+
+        await waitFor(() => {
+            expect(getTitleInput()).toHaveTextContent('Initial Title');
+        });
+
+        expect(screen.queryByTestId('input-error')).not.toBeInTheDocument();
+    });
+
+    it('validates title using plain text from HTML', async () => {
+        const htmlTitle = '<p><strong>Bold</strong> Title</p>';
+        mockValidateTitle.mockReturnValue(undefined);
+
+        render(<PartnerBanner />);
+
+        const titleInput = getTitleInput();
+        titleInput.innerHTML = htmlTitle;
+        fireEvent.input(titleInput);
+
+        await waitFor(() => {
+            expect(mockValidateTitle).toHaveBeenCalled();
+            const lastCall = mockValidateTitle.mock.calls[mockValidateTitle.mock.calls.length - 1];
+            expect(lastCall[0]).toBe('Bold Title');
+        });
+    });
+
+    it('marks description as touched on change and shows error', async () => {
+        mockValidateDescription.mockReturnValue('Description is required');
+
+        render(<PartnerBanner />);
+
+        const descriptionInput = getDescriptionInput();
+
+        changeDescriptionValue('');
+
+        await waitFor(() => {
+            const errorElement = screen.queryByTestId('input-error');
+            expect(errorElement).toBeInTheDocument();
+            expect(errorElement).toHaveTextContent('Description is required');
+        });
+    });
+
+    it('does not publish when values is null', async () => {
+        mockedUseDataFetch.mockReturnValueOnce({
+            data: null,
+            isLoading: false,
+            error: null,
+            refetch: mockRefetch,
+            setData: mockSetData,
+        });
+
+        render(<PartnerBanner />);
+
+        expect(getErrorMessage()).toBeInTheDocument();
+        expect(mockedPartnersApi.updateBanner).not.toHaveBeenCalled();
     });
 });

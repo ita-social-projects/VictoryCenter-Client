@@ -27,8 +27,8 @@
     gap: 1rem;
     align-items: center;
     justify-content: center;
-    width: 52.5625rem;
-    height: 33.125rem;
+    min-width: 52.5rem;
+    min-height: 33.125rem;
 
     > * {
         width: 100%;

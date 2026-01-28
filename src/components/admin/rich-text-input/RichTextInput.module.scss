@@ -1,0 +1,144 @@
+@use '@/assets/sass/variables/colors' as c;
+
+.root {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.625rem;
+    border: 1px solid c.$grey-700;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px 0 rgba(c.$blue-900, 0.05);
+    font-size: 16px;
+    background-color: white;
+
+    &--focused {
+        border-color: c.$blue-500;
+    }
+
+    &--disabled {
+        background-color: c.$grey-600;
+        border-color: c.$grey-900;
+    }
+}
+
+.toolbar {
+    display: flex;
+    gap: 0.25rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid c.$grey-700;
+}
+
+.toolbar-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 1px solid c.$grey-700;
+    border-radius: 4px;
+    background-color: white;
+    color: c.$blue-900;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover:not(:disabled) {
+        background-color: c.$grey-600;
+        border-color: c.$blue-500;
+    }
+
+    &:active:not(:disabled) {
+        background-color: c.$grey-700;
+    }
+
+    &.toolbar-btn-active {
+        background-color: c.$blue-500;
+        border-color: c.$blue-500;
+        color: white;
+
+        &:hover:not(:disabled) {
+            background-color: c.$blue-600;
+            border-color: c.$blue-600;
+        }
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    strong,
+    em {
+        font-style: normal;
+        font-weight: 600;
+    }
+
+    em {
+        font-style: italic;
+    }
+}
+
+.editor-container {
+    position: relative;
+    flex: 1;
+}
+
+.field {
+    min-height: 80px;
+    padding: 0;
+    border: none;
+    outline: none;
+    color: c.$blue-900;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    overflow-y: auto;
+
+    // Lexical content editable styles
+    &:focus {
+        outline: none;
+    }
+
+    &[contenteditable='true'] {
+        cursor: text;
+    }
+
+    &[contenteditable='false'] {
+        cursor: not-allowed;
+        user-select: none;
+    }
+}
+
+.placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: c.$grey-900;
+    opacity: 0.6;
+    pointer-events: none;
+    font-size: 16px;
+    line-height: 24px;
+}
+
+.paragraph {
+    margin: 0;
+    padding: 0;
+}
+
+.text-bold {
+    font-weight: bold;
+}
+.text-italic {
+    font-style: italic;
+}
+
+.counter {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 0.5rem;
+    border-top: 1px solid c.$grey-700;
+    white-space: nowrap;
+    color: c.$grey-900;
+    font-size: 14px;
+}

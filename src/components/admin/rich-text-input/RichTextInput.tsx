@@ -1,0 +1,109 @@
+import { useState, useCallback, useMemo } from 'react';
+import cn from 'classnames';
+import { LexicalComposer } from '@lexical/react/LexicalComposer';
+import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
+import { ContentEditable } from '@lexical/react/LexicalContentEditable';
+import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
+import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
+import { $generateNodesFromDOM } from '@lexical/html';
+import { $getRoot, $insertNodes, LexicalEditor } from 'lexical';
+import styles from './RichTextInput.module.scss';
+import { MaxLengthPlugin, OnChangePlugin, FocusPlugin, ToolbarPlugin, InitialValuePlugin } from './plugins';
+
+export interface RichTextInputProps {
+    value: string;
+    onChange: (value: string) => void;
+    onBlur?: () => void;
+    onFocus?: () => void;
+    name: string;
+    id: string;
+    maxLength: number;
+    disabled?: boolean;
+    placeholder?: string;
+    className?: string;
+}
+
+const theme = {
+    paragraph: styles.paragraph,
+    text: {
+        bold: styles['text-bold'],
+        italic: styles['text-italic'],
+    },
+};
+
+export const RichTextInput = ({
+    value,
+    onChange,
+    onBlur,
+    onFocus,
+    id,
+    maxLength,
+    disabled = false,
+    placeholder = 'Enter text...',
+    className,
+}: RichTextInputProps) => {
+    const [isFocused, setIsFocused] = useState(false);
+    const [currentLength, setCurrentLength] = useState(0);
+
+    const handleFocusChange = useCallback((focused: boolean) => {
+        setIsFocused(focused);
+    }, []);
+
+    const handleLengthChange = useCallback((length: number) => {
+        setCurrentLength(length);
+    }, []);
+
+    const initialConfig = useMemo(
+        () => ({
+            namespace: 'RichTextInput-' + id,
+            theme,
+            onError: () => {},
+            editable: !disabled,
+            editorState: (editor: LexicalEditor) => {
+                if (value) {
+                    const parser = new DOMParser();
+                    const dom = parser.parseFromString(value, 'text/html');
+                    const nodes = $generateNodesFromDOM(editor, dom);
+                    const root = $getRoot();
+                    root.clear();
+                    $insertNodes(nodes);
+                }
+            },
+        }),
+        [id, disabled, value],
+    );
+
+    return (
+        <div
+            className={cn(styles.root, {
+                [styles['root--disabled']]: disabled,
+                [styles['root--focused']]: isFocused && !disabled,
+            })}
+        >
+            <LexicalComposer initialConfig={initialConfig}>
+                <ToolbarPlugin disabled={disabled} />
+                <div className={styles['editor-container']}>
+                    <RichTextPlugin
+                        contentEditable={
+                            <ContentEditable
+                                id={id}
+                                className={cn(styles.field, className)}
+                                aria-label="Rich text editor"
+                            />
+                        }
+                        placeholder={<div className={styles.placeholder}>{placeholder}</div>}
+                        ErrorBoundary={LexicalErrorBoundary}
+                    />
+                </div>
+                <HistoryPlugin />
+                <OnChangePlugin onChange={onChange} />
+                <MaxLengthPlugin maxLength={maxLength} onLengthChange={handleLengthChange} />
+                <FocusPlugin onFocus={onFocus} onBlur={onBlur} onFocusChange={handleFocusChange} />
+                <InitialValuePlugin value={value} />
+            </LexicalComposer>
+            <output className={styles.counter}>
+                {currentLength}/{maxLength}
+            </output>
+        </div>
+    );
+};

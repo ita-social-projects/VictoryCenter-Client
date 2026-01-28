@@ -23,7 +23,7 @@ $desc-input-height: 115px;
 }
 
 .editable {
-    padding: 64px 80px;
+    padding: 64px clamp(16px, 3vw, 48px);
     box-sizing: border-box;
     display: flex;
     justify-content: center;
@@ -36,6 +36,7 @@ $desc-input-height: 115px;
     row-gap: 24px;
     align-items: start;
     justify-content: center;
+    margin: 0 auto;
 }
 
 .title-cell {
@@ -62,7 +63,7 @@ $desc-input-height: 115px;
         box-shadow: none;
         justify-content: flex-start;
         position: relative;
-        overflow: hidden;
+        overflow: visible;
     }
 
     :global(.char-limit-input__field) {
@@ -71,7 +72,6 @@ $desc-input-height: 115px;
         font-size: 40px;
         line-height: 48px;
         color: c.$blue-900;
-
         min-width: 0;
         width: 100%;
         max-width: 100%;
@@ -90,7 +90,7 @@ $desc-input-height: 115px;
 
     :global(.char-limit-input__counter) {
         position: absolute;
-        left: 0;
+        right: 0;
         bottom: -24px;
         color: c.$grey-700;
     }

@@ -19,6 +19,13 @@ export enum ProgramSectionTemplate {
     SingleImageRight = 7,
 }
 
+export enum ProgramSectionMode {
+    Template = 'template',
+    View = 'view',
+    Edit = 'edit',
+    Published = 'published',
+}
+
 export interface ProgramSectionContent {
     id?: number;
     sectionId?: number;

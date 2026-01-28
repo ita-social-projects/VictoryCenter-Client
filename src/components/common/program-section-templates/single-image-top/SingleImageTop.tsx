@@ -5,6 +5,7 @@ import { ImageValues, Image } from '@/types/common/image';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { PROGRAM_SECTION_IMAGE_CONFIGS, PROGRAM_VALIDATION } from '@/const/admin/programs';
 import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
+import { ProgramSectionMode } from '@/types/common/program-sections';
 import styles from './SingleImageTop.module.scss';
 import { useState } from 'react';
 
@@ -12,8 +13,7 @@ export interface SingleImageTopProps {
     title?: string;
     description?: string;
     image?: Image | ImageValues | null;
-    isTemplate?: boolean;
-    isEditable?: boolean;
+    mode?: ProgramSectionMode;
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
     onImageChange?: (file: ImageValues | null) => void;
@@ -23,8 +23,7 @@ export const SingleImageTop = ({
     title = '',
     description = '',
     image = null,
-    isTemplate = false,
-    isEditable = false,
+    mode = ProgramSectionMode.Published,
     onTitleChange,
     onDescriptionChange,
     onImageChange,
@@ -39,13 +38,13 @@ export const SingleImageTop = ({
     return (
         <div
             className={cn(styles.container, {
-                [styles.template]: isTemplate,
-                [styles.editable]: isEditable,
+                [styles.template]: mode === ProgramSectionMode.Template,
+                [styles.editable]: mode === ProgramSectionMode.Edit,
             })}
         >
             <div className={styles['top-section']}>
                 <div className={styles['image-wrapper']}>
-                    {isEditable ? (
+                    {mode === ProgramSectionMode.Edit ? (
                         <PhotoInputGroup
                             id="section-image-1"
                             name="section-image-1"
@@ -74,10 +73,9 @@ export const SingleImageTop = ({
                 title={title}
                 description={description}
                 className={styles['bottom-section']}
-                titleClassName={isTemplate ? styles['title-template'] : ''}
-                descriptionClassName={isTemplate ? styles['description-template'] : ''}
-                isTemplate={isTemplate}
-                isEditable={isEditable}
+                titleClassName={mode === ProgramSectionMode.Template ? styles['title-template'] : ''}
+                descriptionClassName={mode === ProgramSectionMode.Template ? styles['description-template'] : ''}
+                mode={mode}
                 onTitleChange={onTitleChange}
                 onDescriptionChange={onDescriptionChange}
             />

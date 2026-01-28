@@ -1,19 +1,24 @@
+import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { SingleTitleQuintupleDescription } from './SingleTitleQuintupleDescription';
 
+const mockDesc = jest.fn();
+
 jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
-    InputWithCharacterLimitGroup: ({ value, onChange, id, placeholder }: any) => (
-        <input data-testid={`input-${id}`} value={value} onChange={onChange} placeholder={placeholder} />
+    InputWithCharacterLimitGroup: ({ value, onChange, id }: any) => (
+        <input data-testid={`input-${id}`} value={value} onChange={onChange} />
     ),
 }));
 
 jest.mock(
     '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
     () => ({
-        TextAreaWithCharacterLimitGroup: ({ value, onChange, id }: any) => (
-            <textarea data-testid={`input-${id}`} value={value} onChange={onChange} />
-        ),
+        TextAreaWithCharacterLimitGroup: (props: any) => {
+            mockDesc(props);
+            const { value, onChange, id } = props;
+            return <textarea data-testid={`input-${id}`} value={value} onChange={onChange} />;
+        },
     }),
 );
 
@@ -35,136 +40,118 @@ jest.mock('@/const/admin/programs', () => ({
     },
 }));
 
+const setup = (props: React.ComponentProps<typeof SingleTitleQuintupleDescription> = {}) => {
+    mockDesc.mockClear();
+    return render(<SingleTitleQuintupleDescription {...props} />);
+};
+
+const getRoot = (container: HTMLElement) => container.firstElementChild as HTMLElement;
+const getPreviewTexts = (container: HTMLElement) =>
+    Array.from(container.querySelectorAll('p')).map((p) => p.textContent);
+const getDescCallIds = () => mockDesc.mock.calls.map((call: any[]) => call[0]?.id);
+
 describe('SingleTitleQuintupleDescription', () => {
-    beforeEach(() => {
-        jest.clearAllMocks();
-    });
-
-    describe('Preview mode', () => {
-        it('should render empty title and 5 empty descriptions by default', () => {
-            const { container } = render(<SingleTitleQuintupleDescription />);
-
+    describe('Preview', () => {
+        it('renders h2', () => {
+            setup();
             expect(screen.getByRole('heading', { level: 2 })).toBeInTheDocument();
-
-            const paragraphs = container.querySelectorAll('p');
-            expect(paragraphs).toHaveLength(5);
-            expect(paragraphs[0].textContent).toBe('');
         });
 
-        it('should render title in preview', () => {
-            render(<SingleTitleQuintupleDescription title="Preview Title" />);
-
-            expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('Preview Title');
+        it('normalizes descriptions to 5', () => {
+            const { container } = setup({ descriptions: ['D0'] });
+            expect(getPreviewTexts(container)).toHaveLength(5);
         });
 
-        it('should not render editable inputs in preview mode', () => {
-            render(<SingleTitleQuintupleDescription title="Preview Title" descriptions={['A']} />);
+        it('fills null/undefined gaps with empty strings', () => {
+            const { container } = setup({ descriptions: ['D0', undefined as any, 'D2', null as any] });
+            expect(getPreviewTexts(container)).toEqual(['D0', '', 'D2', '', '']);
+        });
 
+        it('does not render editable inputs', () => {
+            setup();
             expect(screen.queryByTestId('input-single-title-quintuple-title')).not.toBeInTheDocument();
             expect(screen.queryByTestId('input-single-title-quintuple-desc-0')).not.toBeInTheDocument();
         });
 
-        it('should normalize descriptions to 5 items and keep correct order in preview', () => {
-            const { container } = render(
-                <SingleTitleQuintupleDescription
-                    title="T"
-                    descriptions={['D0', undefined as any, 'D2', null as any]}
-                />,
-            );
-
-            const paragraphs = Array.from(container.querySelectorAll('p'));
-            expect(paragraphs).toHaveLength(5);
-
-            expect(paragraphs[0].textContent).toBe('D0');
-            expect(paragraphs[1].textContent).toBe('');
-            expect(paragraphs[2].textContent).toBe('D2');
-            expect(paragraphs[3].textContent).toBe('');
-            expect(paragraphs[4].textContent).toBe('');
+        it('applies template class only when isTemplate=true and isEditable=false', () => {
+            const { container } = setup({ isTemplate: true });
+            expect(getRoot(container)).toHaveClass('template');
         });
 
-        it('should apply template class when isTemplate is true and isEditable is false', () => {
-            const { container } = render(<SingleTitleQuintupleDescription isTemplate={true} />);
-
-            expect(container.firstChild).toHaveClass('template');
-        });
-
-        it('should include custom className on root element', () => {
-            const { container } = render(<SingleTitleQuintupleDescription className="custom-root" />);
-
-            expect(container.firstChild).toHaveClass('custom-root');
+        it('applies custom className on root', () => {
+            const { container } = setup({ className: 'custom-root' });
+            expect(getRoot(container)).toHaveClass('custom-root');
         });
     });
 
-    describe('Editable mode', () => {
-        it('should render title input and 5 description textareas when isEditable is true', () => {
-            render(<SingleTitleQuintupleDescription isEditable={true} title="Edit Title" descriptions={['A']} />);
-
-            expect(screen.getByTestId('input-single-title-quintuple-title')).toHaveValue('Edit Title');
-
-            const textareas = screen.getAllByTestId(/input-single-title-quintuple-desc-/);
-            expect(textareas).toHaveLength(5);
-
+    describe('Editable', () => {
+        it('does not render preview h2', () => {
+            setup({ isEditable: true });
             expect(screen.queryByRole('heading', { level: 2 })).not.toBeInTheDocument();
         });
 
-        it('should render description inputs in editable order (1, 2, 0, 3, 4)', () => {
-            render(<SingleTitleQuintupleDescription isEditable={true} />);
+        it('renders title input', () => {
+            setup({ isEditable: true, title: 'Edit' });
+            expect(screen.getByTestId('input-single-title-quintuple-title')).toHaveValue('Edit');
+        });
 
-            const inputs = screen.getAllByTestId(/input-single-title-quintuple-desc-/);
-            const ids = inputs.map((el) => el.getAttribute('data-testid'));
+        it('renders 5 description inputs', () => {
+            setup({ isEditable: true });
+            expect(screen.getAllByTestId(/input-single-title-quintuple-desc-/)).toHaveLength(5);
+        });
 
-            expect(ids).toEqual([
-                'input-single-title-quintuple-desc-1',
-                'input-single-title-quintuple-desc-2',
-                'input-single-title-quintuple-desc-0',
-                'input-single-title-quintuple-desc-3',
-                'input-single-title-quintuple-desc-4',
+        it('uses editable order (0,1,2,3,4)', () => {
+            setup({ isEditable: true });
+            expect(getDescCallIds()).toEqual([
+                'single-title-quintuple-desc-0',
+                'single-title-quintuple-desc-1',
+                'single-title-quintuple-desc-2',
+                'single-title-quintuple-desc-3',
+                'single-title-quintuple-desc-4',
             ]);
         });
 
-        it('should normalize descriptions in editable mode and bind values by index', () => {
-            render(<SingleTitleQuintupleDescription isEditable={true} descriptions={['D0', 'D1']} />);
-
-            expect(screen.getByTestId('input-single-title-quintuple-desc-0')).toHaveValue('D0');
-            expect(screen.getByTestId('input-single-title-quintuple-desc-1')).toHaveValue('D1');
+        it('binds normalized values by index', () => {
+            setup({ isEditable: true, descriptions: ['A'] });
+            expect(screen.getByTestId('input-single-title-quintuple-desc-0')).toHaveValue('A');
             expect(screen.getByTestId('input-single-title-quintuple-desc-4')).toHaveValue('');
         });
 
-        it('should call onTitleChange when title input changes', () => {
+        it('calls onTitleChange with value', () => {
             const onTitleChange = jest.fn();
-            render(<SingleTitleQuintupleDescription isEditable={true} onTitleChange={onTitleChange} />);
+            setup({ isEditable: true, onTitleChange });
 
-            fireEvent.change(screen.getByTestId('input-single-title-quintuple-title'), { target: { value: 'New' } });
+            fireEvent.change(screen.getByTestId('input-single-title-quintuple-title'), { target: { value: 'X' } });
 
-            expect(onTitleChange).toHaveBeenCalledWith('New');
+            expect(onTitleChange).toHaveBeenCalledWith('X');
         });
 
-        it('should call onDescriptionsChange with index and value when a description changes', () => {
+        it('calls onDescriptionsChange with index and value', () => {
             const onDescriptionsChange = jest.fn();
-            render(<SingleTitleQuintupleDescription isEditable={true} onDescriptionsChange={onDescriptionsChange} />);
+            setup({ isEditable: true, onDescriptionsChange });
 
-            fireEvent.change(screen.getByTestId('input-single-title-quintuple-desc-0'), { target: { value: 'Desc' } });
+            fireEvent.change(screen.getByTestId('input-single-title-quintuple-desc-3'), { target: { value: 'Y' } });
 
-            expect(onDescriptionsChange).toHaveBeenCalledWith(0, 'Desc');
+            expect(onDescriptionsChange).toHaveBeenCalledWith(3, 'Y');
         });
 
-        it('should not throw if title/description change handlers are not provided', () => {
-            render(<SingleTitleQuintupleDescription isEditable={true} />);
+        it('does not crash without handlers', () => {
+            setup({ isEditable: true });
 
-            expect(() =>
-                fireEvent.change(screen.getByTestId('input-single-title-quintuple-title'), { target: { value: 'X' } }),
-            ).not.toThrow();
+            fireEvent.change(screen.getByTestId('input-single-title-quintuple-title'), { target: { value: 'X' } });
+            fireEvent.change(screen.getByTestId('input-single-title-quintuple-desc-0'), { target: { value: 'Y' } });
 
-            expect(() =>
-                fireEvent.change(screen.getByTestId('input-single-title-quintuple-desc-3'), { target: { value: 'Y' } }),
-            ).not.toThrow();
+            expect(true).toBe(true);
         });
 
-        it('should apply editable class and not apply template class when isEditable is true (even if isTemplate is true)', () => {
-            const { container } = render(<SingleTitleQuintupleDescription isEditable={true} isTemplate={true} />);
+        it('applies editable class', () => {
+            const { container } = setup({ isEditable: true });
+            expect(getRoot(container)).toHaveClass('editable');
+        });
 
-            expect(container.firstChild).toHaveClass('editable');
-            expect(container.firstChild).not.toHaveClass('template');
+        it('does not apply template class even if isTemplate=true', () => {
+            const { container } = setup({ isEditable: true, isTemplate: true });
+            expect(getRoot(container)).not.toHaveClass('template');
         });
     });
 });

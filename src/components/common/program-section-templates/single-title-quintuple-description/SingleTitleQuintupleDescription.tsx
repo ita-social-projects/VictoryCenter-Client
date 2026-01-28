@@ -20,6 +20,10 @@ export interface SingleTitleQuintupleDescriptionProps {
     className?: string;
 }
 
+const DESCRIPTION_LAYOUT = {
+    editable: [0, 1, 2, 3, 4],
+} as const;
+
 export const SingleTitleQuintupleDescription = ({
     title = '',
     descriptions = [],
@@ -36,6 +40,14 @@ export const SingleTitleQuintupleDescription = ({
         [descriptions, descriptionsCount],
     );
 
+    const descriptionOrder = useMemo(() => {
+        if (isEditable) {
+            return DESCRIPTION_LAYOUT.editable;
+        }
+
+        return normalizedDescriptions.map((_, index) => index);
+    }, [isEditable, normalizedDescriptions]);
+
     const rootClassName = cn(
         baseStyles.container,
         {
@@ -45,17 +57,15 @@ export const SingleTitleQuintupleDescription = ({
         className,
     );
 
-    if (isEditable) {
-        const editableOrder = [1, 2, 0, 3, 4];
-
-        return (
-            <div className={rootClassName}>
-                <div className={baseStyles.editableGrid}>
-                    <div className={baseStyles.titleCell}>
+    return (
+        <div className={rootClassName}>
+            {isEditable ? (
+                <div className={baseStyles['editable-grid']}>
+                    <div className={baseStyles['title-cell']}>
                         <InputWithCharacterLimitGroup
-                            className={baseStyles.titleInputGroup}
+                            className={baseStyles['title-input-group']}
                             label={PROGRAMS_TEXT.SECTION.FORM.TITLE.TEXT}
-                            isRequired={true}
+                            isRequired
                             id="single-title-quintuple-title"
                             name="single-title-quintuple-title"
                             value={title}
@@ -65,12 +75,12 @@ export const SingleTitleQuintupleDescription = ({
                         />
                     </div>
 
-                    {editableOrder.map((index) => (
-                        <div key={index} className={baseStyles.descriptionCard}>
+                    {descriptionOrder.map((index) => (
+                        <div key={index} className={baseStyles['description-card']}>
                             <TextAreaWithCharacterLimitGroup
-                                className={baseStyles.descriptionInputGroup}
+                                className={baseStyles['description-input-group']}
                                 label={PROGRAMS_TEXT.SECTION.FORM.DESCRIPTION.TEXT}
-                                isRequired={true}
+                                isRequired
                                 id={`single-title-quintuple-desc-${index}`}
                                 name={`single-title-quintuple-desc-${index}`}
                                 value={normalizedDescriptions[index]}
@@ -81,25 +91,19 @@ export const SingleTitleQuintupleDescription = ({
                         </div>
                     ))}
                 </div>
-            </div>
-        );
-    }
-
-    const previewOrder = [0, 1, 2, 3, 4];
-
-    return (
-        <div className={rootClassName}>
-            <div className={previewStyles.previewLayout}>
-                <div className={previewStyles.previewTitleBlock}>
-                    <h2 className={previewStyles.previewTitleText}>{title}</h2>
-                </div>
-
-                {previewOrder.map((index) => (
-                    <div key={index} className={cn(previewStyles.previewCard, previewStyles[`card${index}`])}>
-                        <p className={previewStyles.previewText}>{normalizedDescriptions[index]}</p>
+            ) : (
+                <div className={previewStyles['preview-layout']}>
+                    <div className={previewStyles['preview-title-block']}>
+                        <h2 className={previewStyles['preview-title-text']}>{title}</h2>
                     </div>
-                ))}
-            </div>
+
+                    {descriptionOrder.map((index) => (
+                        <div key={index} className={cn(previewStyles['preview-card'], previewStyles[`card-${index}`])}>
+                            <p className={previewStyles['preview-text']}>{normalizedDescriptions[index]}</p>
+                        </div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 };

@@ -1,7 +1,7 @@
-@use '@/assets/sass/variables/colors';
-@use '@/assets/sass/variables/fonts';
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/variables/typography' as t;
 
-.previewLayout {
+.preview-layout {
     height: 100%;
     width: 100%;
     max-width: 1320px;
@@ -25,29 +25,29 @@
     align-items: start;
 }
 
-.previewTitleBlock {
+.preview-title-block {
     grid-area: title;
     display: flex;
     align-items: flex-start;
     justify-content: flex-start;
 }
 
-.previewTitleText {
+.preview-title-text {
     margin: 0;
-    font-family: fonts.$mulish-regular-font;
-    font-weight: 700;
-    color: colors.$blue-900;
+    font-family: t.$font-family-base;
+    font-weight: t.$fw-bold;
+    color: c.$blue-900;
     text-align: left;
 
     font-size: clamp(12px, 2.1vw, 34px);
     line-height: clamp(14px, 2.5vw, 42px);
 }
 
-.previewCard {
+.preview-card {
     width: 100%;
     min-width: 0;
 
-    background-color: colors.$light-blue-50;
+    background-color: c.$light-blue-50;
     border-radius: clamp(12px, 1.5vw, 20px);
     box-sizing: border-box;
 
@@ -59,33 +59,33 @@
     justify-content: flex-start;
 }
 
-.previewText {
+.preview-text {
     margin: 0;
-    font-family: fonts.$mulish-regular-font;
-    font-weight: 400;
-    color: colors.$blue-900;
+    font-family: t.$font-family-base;
+    font-weight: t.$fw-regular;
+    color: c.$blue-900;
     white-space: pre-wrap;
 
     font-size: clamp(10px, 1vw, 16px);
     line-height: clamp(12px, 1.25vw, 20px);
 }
 
-.card0 {
+.card-0 {
     grid-area: c0;
 }
 
-.card1 {
+.card-1 {
     grid-area: c1;
 }
 
-.card2 {
+.card-2 {
     grid-area: c2;
 }
 
-.card3 {
+.card-3 {
     grid-area: c3;
 }
 
-.card4 {
+.card-4 {
     grid-area: c4;
 }

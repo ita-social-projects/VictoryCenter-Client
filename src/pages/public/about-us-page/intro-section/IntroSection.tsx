@@ -28,12 +28,12 @@ export const AboutUsIntro = ({ content }: AboutUsIntroProps) => {
     const imageUrl = content?.find((x) => x.contentType === ContentType.Image)?.image?.url ?? background;
 
     return (
-        <section className="about-us-block">
-            <img src={imageUrl} className="background-img" alt="Men and Horse" />
-            <img src={imageUrl} className="color-overlay" alt="Men and Horse" />
-            <div className="about-us-info">
-                <h1 className="about-us-main-title" dangerouslySetInnerHTML={{ __html: sanitizedTitle }} />
-                <p className="title-details" dangerouslySetInnerHTML={{ __html: sanitizedDescription }} />
+        <section className={styles.root}>
+            <img src={imageUrl} className={styles.image} alt="Men and Horse" />
+            <img src={imageUrl} className={styles.overlay} alt="Men and Horse" />
+            <div className={styles.info}>
+                <h1 className={styles.title} dangerouslySetInnerHTML={{ __html: sanitizedTitle }} />
+                <p className={styles.description} dangerouslySetInnerHTML={{ __html: sanitizedDescription }} />
             </div>
         </section>
     );

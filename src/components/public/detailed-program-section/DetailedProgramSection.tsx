@@ -1,5 +1,5 @@
 import React from 'react';
-import { ProgramSection, ProgramSectionContent } from '@/types/common/program-sections';
+import { ProgramSection, ProgramSectionContent, ProgramSectionMode } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 import { renderProgramSection } from '@/utils/functions/render-program-section';
 import styles from './DetailedProgramSection.module.scss';
@@ -28,8 +28,7 @@ export const DetailedProgramSection: React.FC<DetailedProgramSectionProps> = ({ 
             description: descriptionContent?.description || '',
             images: imageContents,
         },
-        isTemplate: false,
-        isEditable: false,
+        mode: ProgramSectionMode.Published,
     });
 
     return <div className={styles.container}>{renderedSection}</div>;

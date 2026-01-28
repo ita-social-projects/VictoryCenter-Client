@@ -12,6 +12,7 @@ import {
 } from '@/const/admin/programs';
 import { useProgramSectionValidation } from '@/hooks/admin/use-program-section-validation';
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
+import { ProgramSectionMode } from '@/types/common/program-sections';
 import styles from './SingleImageRight.module.scss';
 import { useState } from 'react';
 
@@ -19,8 +20,7 @@ export interface SingleImageRightProps {
     title?: string;
     description?: string;
     image?: Image | ImageValues | null;
-    isTemplate?: boolean;
-    isEditable?: boolean;
+    mode?: ProgramSectionMode;
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
     onImageChange?: (file: ImageValues | null) => void;
@@ -30,8 +30,7 @@ export const SingleImageRight = ({
     title = '',
     description = '',
     image = null,
-    isTemplate = false,
-    isEditable = false,
+    mode = ProgramSectionMode.Published,
     onTitleChange,
     onDescriptionChange,
     onImageChange,
@@ -58,11 +57,11 @@ export const SingleImageRight = ({
     return (
         <div
             className={cn(styles.container, {
-                [styles.template]: isTemplate,
-                [styles.editable]: isEditable,
+                [styles.template]: mode === ProgramSectionMode.Template,
+                [styles.editable]: mode === ProgramSectionMode.Edit,
             })}
         >
-            {isEditable ? (
+            {mode === ProgramSectionMode.Edit ? (
                 <>
                     <div className={styles['left-section']}>
                         <div className={styles['title-section']}>

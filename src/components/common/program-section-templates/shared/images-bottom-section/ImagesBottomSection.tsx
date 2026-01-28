@@ -8,6 +8,7 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 import baseStyles from './ImagesBottomSection.module.scss';
 import { PROGRAM_VALIDATION } from '@/const/admin/programs';
+import { ProgramSectionMode } from '@/types/common/program-sections';
 
 export interface ImageConfig {
     cropWidth: number;
@@ -39,8 +40,7 @@ export interface ImagesBottomSectionProps {
     images: (Image | ImageValues | null)[];
     imageHandlers: ImageHandler[];
     config: ImagesBottomSectionConfig;
-    isTemplate?: boolean;
-    isEditable?: boolean;
+    mode?: ProgramSectionMode;
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
     className?: string;
@@ -55,8 +55,7 @@ export const ImagesBottomSection = ({
     images,
     imageHandlers,
     config,
-    isTemplate = false,
-    isEditable = false,
+    mode = ProgramSectionMode.Published,
     onTitleChange,
     onDescriptionChange,
     className = '',
@@ -90,7 +89,7 @@ export const ImagesBottomSection = ({
             className={cn(
                 baseStyles.container,
                 {
-                    [baseStyles.editable]: isEditable,
+                    [baseStyles.editable]: mode === ProgramSectionMode.Edit,
                 },
                 className,
             )}
@@ -99,16 +98,15 @@ export const ImagesBottomSection = ({
                 title={title}
                 description={description}
                 className={cn(baseStyles['top-section'], topSectionClassName)}
-                titleClassName={isTemplate ? baseStyles['title-template'] : ''}
-                descriptionClassName={isTemplate ? baseStyles['description-template'] : ''}
-                isEditable={isEditable}
-                isTemplate={isTemplate}
+                titleClassName={mode === ProgramSectionMode.Template ? baseStyles['title-template'] : ''}
+                descriptionClassName={mode === ProgramSectionMode.Template ? baseStyles['description-template'] : ''}
+                mode={mode}
                 onTitleChange={onTitleChange}
                 onDescriptionChange={onDescriptionChange}
             />
             <div className={cn(baseStyles['bottom-section'], bottomSectionClassName)}>
                 <div className={baseStyles['images-grid']}>
-                    {isEditable
+                    {mode === ProgramSectionMode.Edit
                         ? displayedImageHandlers.map(({ handler, key, value }, index) => (
                               <div
                                   key={key}

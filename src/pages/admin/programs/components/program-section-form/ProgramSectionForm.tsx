@@ -4,7 +4,7 @@ import { ImageValues } from '@/types/common/image';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { renderProgramSection } from '@/utils/functions/render-program-section';
 import styles from './ProgramSectionForm.module.scss';
-import { ProgramSection, ProgramSectionContent } from '@/types/common/program-sections';
+import { ProgramSection, ProgramSectionContent, ProgramSectionMode } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 
 export interface ProgramSectionFormProps {
@@ -99,7 +99,7 @@ export const ProgramSectionForm = ({
             description: descriptionContent?.description || '',
             images: imageContents,
         },
-        isEditable: true,
+        mode: ProgramSectionMode.Edit,
         handlers: {
             onTitleChange: handleTitleChange,
             onDescriptionChange: handleDescriptionChange,

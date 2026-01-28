@@ -5,6 +5,7 @@ import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups
 import { PROGRAMS_TEXT, PROGRAM_SECTION_VALIDATION } from '@/const/admin/programs';
 import { useProgramSectionValidation } from '@/hooks/admin/use-program-section-validation';
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
+import { ProgramSectionMode } from '@/types/common/program-sections';
 
 export interface TitleDescriptionSectionProps {
     title?: string;
@@ -12,8 +13,7 @@ export interface TitleDescriptionSectionProps {
     className?: string;
     titleClassName?: string;
     descriptionClassName?: string;
-    isTemplate?: boolean;
-    isEditable?: boolean;
+    mode?: ProgramSectionMode;
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
 }
@@ -24,8 +24,7 @@ export const TitleDescriptionSection = ({
     className = '',
     titleClassName = '',
     descriptionClassName = '',
-    isTemplate = false,
-    isEditable = false,
+    mode = ProgramSectionMode.Published,
     onTitleChange,
     onDescriptionChange,
 }: TitleDescriptionSectionProps) => {
@@ -46,14 +45,14 @@ export const TitleDescriptionSection = ({
             className={cn(
                 styles.container,
                 {
-                    [styles.template]: isTemplate,
-                    [styles.editable]: isEditable,
+                    [styles.template]: mode === ProgramSectionMode.Template,
+                    [styles.editable]: mode === ProgramSectionMode.Edit,
                 },
                 className,
             )}
         >
             <div className={styles['title-section']}>
-                {isEditable ? (
+                {mode === ProgramSectionMode.Edit ? (
                     <InputWithCharacterLimitGroup
                         label={PROGRAMS_TEXT.SECTION.FORM.TITLE.TEXT}
                         isRequired={true}
@@ -72,7 +71,7 @@ export const TitleDescriptionSection = ({
                 )}
             </div>
             <div className={styles['description-section']}>
-                {isEditable ? (
+                {mode === ProgramSectionMode.Edit ? (
                     <TextAreaWithCharacterLimitGroup
                         label={PROGRAMS_TEXT.SECTION.FORM.DESCRIPTION.TEXT}
                         isRequired={true}

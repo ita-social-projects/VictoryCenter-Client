@@ -1,5 +1,5 @@
 import React from 'react';
-import { ProgramSectionContent, ProgramSectionTemplate } from '@/types/common/program-sections';
+import { ProgramSectionContent, ProgramSectionTemplate, ProgramSectionMode } from '@/types/common/program-sections';
 import { ImageValues, Image } from '@/types/common/image';
 import { QuadImagesBottom } from '@/components/common/program-section-templates/quad-images-bottom/QuadImagesBottom';
 import { TripleImagesBottom } from '@/components/common/program-section-templates/triple-images-bottom/TripleImagesBottom';
@@ -25,16 +25,14 @@ export interface ProgramSectionHandlers {
 export interface RenderProgramSectionParams {
     templateId: ProgramSectionTemplate;
     data: ProgramSectionData;
-    isTemplate?: boolean;
-    isEditable?: boolean;
+    mode?: ProgramSectionMode;
     handlers?: ProgramSectionHandlers;
 }
 
 export const renderProgramSection = ({
     templateId,
     data,
-    isTemplate = false,
-    isEditable = false,
+    mode = ProgramSectionMode.Published,
     handlers,
 }: RenderProgramSectionParams): React.ReactElement | null => {
     switch (templateId) {
@@ -44,8 +42,7 @@ export const renderProgramSection = ({
                     title={data.title}
                     description={data.description}
                     images={data.images}
-                    isTemplate={isTemplate}
-                    isEditable={isEditable}
+                    mode={mode}
                     onTitleChange={handlers?.onTitleChange}
                     onDescriptionChange={handlers?.onDescriptionChange}
                     onImagesChange={handlers?.onImagesChange}
@@ -57,8 +54,7 @@ export const renderProgramSection = ({
                     title={data.title}
                     description={data.description}
                     images={data.images}
-                    isTemplate={isTemplate}
-                    isEditable={isEditable}
+                    mode={mode}
                     onTitleChange={handlers?.onTitleChange}
                     onDescriptionChange={handlers?.onDescriptionChange}
                     onImagesChange={handlers?.onImagesChange}
@@ -69,8 +65,7 @@ export const renderProgramSection = ({
                 <TextOnly
                     title={data.title}
                     description={data.description}
-                    isTemplate={isTemplate}
-                    isEditable={isEditable}
+                    mode={mode}
                     onTitleChange={handlers?.onTitleChange}
                     onDescriptionChange={handlers?.onDescriptionChange}
                 />
@@ -81,8 +76,7 @@ export const renderProgramSection = ({
                     title={data.title}
                     description={data.description}
                     images={data.images}
-                    isTemplate={isTemplate}
-                    isEditable={isEditable}
+                    mode={mode}
                     onTitleChange={handlers?.onTitleChange}
                     onDescriptionChange={handlers?.onDescriptionChange}
                     onImagesChange={handlers?.onImagesChange}
@@ -94,8 +88,7 @@ export const renderProgramSection = ({
                     title={data.title}
                     description={data.description}
                     image={data.images?.[0]}
-                    isTemplate={isTemplate}
-                    isEditable={isEditable}
+                    mode={mode}
                     onTitleChange={handlers?.onTitleChange}
                     onDescriptionChange={handlers?.onDescriptionChange}
                     onImageChange={handlers?.onImagesChange ? (file) => handlers.onImagesChange!(0, file) : undefined}
@@ -107,8 +100,7 @@ export const renderProgramSection = ({
                     title={data.title}
                     description={data.description}
                     image={data.images?.[0]}
-                    isTemplate={isTemplate}
-                    isEditable={isEditable}
+                    mode={mode}
                     onTitleChange={handlers?.onTitleChange}
                     onDescriptionChange={handlers?.onDescriptionChange}
                     onImageChange={handlers?.onImagesChange ? (file) => handlers.onImagesChange!(0, file) : undefined}
@@ -120,8 +112,7 @@ export const renderProgramSection = ({
                     title={data.title}
                     description={data.description}
                     image={data.images?.[0]}
-                    isTemplate={isTemplate}
-                    isEditable={isEditable}
+                    mode={mode}
                     onTitleChange={handlers?.onTitleChange}
                     onDescriptionChange={handlers?.onDescriptionChange}
                     onImageChange={handlers?.onImagesChange ? (file) => handlers.onImagesChange!(0, file) : undefined}

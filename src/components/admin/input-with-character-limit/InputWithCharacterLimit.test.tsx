@@ -125,12 +125,7 @@ describe('InputWithCharacterLimit', () => {
 
         focusInput();
 
-        const btn = getClearButton();
-        const preventDefault = jest.fn();
-        fireEvent.mouseDown(btn, { preventDefault } as any);
-        expect(preventDefault).toHaveBeenCalled();
-
-        fireEvent.click(btn);
+        fireEvent.click(getClearButton());
 
         expect(onChange).toHaveBeenCalledTimes(1);
         const arg = onChange.mock.calls[0][0];

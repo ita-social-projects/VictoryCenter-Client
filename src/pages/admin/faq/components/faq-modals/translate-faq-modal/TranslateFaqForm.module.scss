@@ -1,19 +1,7 @@
-@use '@/assets/sass/variables/colors' as c;
-@use '@/assets/sass/mixins/typography.mixins' as type;
-
 .form {
     display: flex;
     flex-direction: column;
     gap: 7px;
-}
-
-.functional-group {
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    gap: 10px;
-    margin: 0.5rem 0;
 }
 
 .form-group {
@@ -21,45 +9,4 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
-}
-
-.language-select {
-    width: 150px;
-}
-
-.language-select-head {
-    display: inline-flex;
-    align-items: center;
-}
-
-.language-select-head::before {
-    content: '';
-    width: 20px;
-    height: 20px;
-    display: inline-block;
-    margin: 4px;
-
-    background-image: url('../../../../../../assets/icons/globe.svg');
-    background-size: contain;
-    background-position: center;
-}
-
-.generate-button {
-    width: 45%;
-    font-size: 16px;
-}
-
-.translate-icon {
-    width: 1.5rem;
-    height: 1.5rem;
-}
-
-.error {
-    color: c.$error;
-    @include type.small-text-regular;
-}
-
-.desc-error {
-    position: absolute;
-    bottom: 0;
 }

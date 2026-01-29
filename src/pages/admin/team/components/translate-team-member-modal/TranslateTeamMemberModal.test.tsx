@@ -7,25 +7,11 @@ import { useTranslateTeamMember } from '@/hooks/admin/use-translate-team-member/
 import { ModalMode } from '@/types/admin/common';
 
 jest.mock('@/components/admin/button/Button', () => ({
-    Button: (props: any) => (
-        <button {...props} data-testid={props['data-testid'] || 'button'}>
-            {props.children}
-        </button>
-    ),
+    Button: (props: any) => require('@/utils/test-mocks/test-mocks').MockButton(props),
 }));
 
 jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
-    ConfirmationModal: ({ isOpen, onConfirm, onCancel }: any) =>
-        isOpen ? (
-            <div data-testid="confirmation-modal">
-                <button data-testid="confirm-close" onClick={onConfirm}>
-                    confirm
-                </button>
-                <button data-testid="cancel-close" onClick={onCancel}>
-                    cancel
-                </button>
-            </div>
-        ) : null,
+    ConfirmationModal: (props: any) => require('@/utils/test-mocks/test-mocks').MockConfirmationModal(props),
 }));
 
 jest.mock('@/components/common/modal/Modal', () => {

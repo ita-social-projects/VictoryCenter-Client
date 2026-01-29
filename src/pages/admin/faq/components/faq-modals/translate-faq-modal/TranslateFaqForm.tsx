@@ -1,15 +1,12 @@
 import { forwardRef } from 'react';
 import { useFormManager } from '@/hooks/admin/use-form-manager/useFormManager';
-import { Select } from '@/components/common/select/Select';
-import { Button } from '@/components/admin/button/Button';
-import { COMMON_TEXT_ADMIN, LANGUAGES } from '@/const/admin/common';
 import { VisibilityStatus } from '@/types/admin/common';
 import styles from './TranslateFaqForm.module.scss';
-import './TranslateFaqForm.scss';
 import cn from 'classnames';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { FAQ_TEXT } from '@/const/admin/faq';
+import { TranslationControls } from '@/components/admin/translation-controls/TranslationControls';
 
 export interface TranslateFaqFormValues {
     question: string;
@@ -76,21 +73,7 @@ export const TranslateFaqForm = forwardRef<TranslateFaqFormRef, TranslateFaqForm
                 data-testid="translate-faq-form"
                 noValidate
             >
-                <div className={styles['functional-group']}>
-                    <div className={styles['language-select']}>
-                        <Select<string>
-                            className="language-select"
-                            headClassName={styles['language-select-head']}
-                            value="EN"
-                            onValueChange={() => {}}
-                        >
-                            <Select.Option value="EN" name={LANGUAGES.EN} />
-                        </Select>
-                    </div>
-                    <Button className={styles['generate-button']} buttonStyle="primary" disabled={isSubmitting}>
-                        {COMMON_TEXT_ADMIN.BUTTON.GENERATE_TRANSLATION}
-                    </Button>
-                </div>
+                <TranslationControls isSubmitting={isSubmitting} />
 
                 <div className={cn(styles.root, 'common-faq-fields')}>
                     <div className={styles['form-group']}>

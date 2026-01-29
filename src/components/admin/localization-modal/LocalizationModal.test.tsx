@@ -31,7 +31,16 @@ jest.mock('@/components/common/modal/Modal', () => {
     const Modal = ({ isOpen, children, onClose }: any) =>
         isOpen ? (
             <div data-testid="modal-root">
-                <div data-testid="modal-overlay" onClick={onClose}></div>
+                <div
+                    data-testid="modal-overlay"
+                    onClick={onClose}
+                    role="button"
+                    tabIndex={0}
+                    aria-label="Close modal"
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') onClose();
+                    }}
+                ></div>
                 <div data-testid="modal-content-wrapper">{children}</div>
             </div>
         ) : null;

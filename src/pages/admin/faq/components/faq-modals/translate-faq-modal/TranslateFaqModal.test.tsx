@@ -7,101 +7,16 @@ import { useTranslateFaq } from '@/hooks/admin/use-translate-faq/useTranslateFaq
 import { ModalMode } from '@/types/admin/common';
 
 jest.mock('@/components/admin/button/Button', () => ({
-    Button: (props: any) => (
-        <button {...props} data-testid={props['data-testid'] || 'button'}>
-            {props.children}
-        </button>
-    ),
+    Button: (props: any) => require('@/utils/test-mocks/test-mocks').MockButton(props),
 }));
 
 jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
-    ConfirmationModal: ({ isOpen, onConfirm, onCancel }: any) =>
-        isOpen ? (
-            <div data-testid="confirmation-modal">
-                <button data-testid="confirm-close" onClick={onConfirm}>
-                    confirm
-                </button>
-                <button data-testid="cancel-close" onClick={onCancel}>
-                    cancel
-                </button>
-            </div>
-        ) : null,
+    ConfirmationModal: (props: any) => require('@/utils/test-mocks/test-mocks').MockConfirmationModal(props),
 }));
 
-jest.mock('@/components/admin/localization-modal/LocalizationModal', () => {
-    const React = require('react');
-
-    return {
-        LocalizationModal: ({
-            isOpen,
-            children,
-            onClose,
-            onSave,
-            isSubmitting,
-            isFormValid,
-            checkIsDirty,
-            title,
-        }: any) => {
-            const [showConfirmation, setShowConfirmation] = React.useState(false);
-
-            if (!isOpen) return null;
-
-            const handleClose = () => {
-                if (checkIsDirty && checkIsDirty()) {
-                    setShowConfirmation(true);
-                } else {
-                    onClose();
-                }
-            };
-
-            const handleConfirmClose = () => {
-                setShowConfirmation(false);
-                onClose();
-            };
-
-            const handleCancelClose = () => {
-                setShowConfirmation(false);
-            };
-
-            return (
-                <>
-                    <div
-                        data-testid="modal"
-                        onClick={handleClose}
-                        role="dialog"
-                        aria-modal="true"
-                        tabIndex={0}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Escape') handleClose();
-                        }}
-                    >
-                        <div data-testid="modal-title">{title}</div>
-                        <div data-testid="modal-content">{children}</div>
-                        <div data-testid="modal-actions">
-                            <button
-                                data-testid="save-localization-btn"
-                                onClick={onSave}
-                                disabled={isSubmitting || !isFormValid}
-                            >
-                                Save
-                            </button>
-                        </div>
-                    </div>
-                    {showConfirmation && (
-                        <div data-testid="confirmation-modal">
-                            <button data-testid="confirm-close" onClick={handleConfirmClose}>
-                                confirm
-                            </button>
-                            <button data-testid="cancel-close" onClick={handleCancelClose}>
-                                cancel
-                            </button>
-                        </div>
-                    )}
-                </>
-            );
-        },
-    };
-});
+jest.mock('@/components/admin/localization-modal/LocalizationModal', () => ({
+    LocalizationModal: (props: any) => require('@/utils/test-mocks/test-mocks').MockLocalizationModal(props),
+}));
 
 jest.mock('./TranslateFaqForm', () => {
     const React = require('react');

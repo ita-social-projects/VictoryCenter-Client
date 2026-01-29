@@ -1,32 +1,22 @@
 @use '@/assets/sass/mixins/typography.mixins' as type;
 @import '../shared/BaseSectionTemplate.module.scss';
 
-$img-width: 1440px;
 $img-height: 680px;
 
 .container {
-    @extend .section-container;
     padding-bottom: 60px;
 }
 
 .top-section {
-    flex: 0 0 56%;
-    display: flex;
-    align-items: center;
+    height: $img-height;
 }
 
 .image-wrapper {
     height: 100%;
-    aspect-ratio: $img-width / $img-height;
 }
 
 .image {
     width: 100%;
-    height: auto;
     object-fit: cover;
-    aspect-ratio: $img-width / $img-height;
-}
-
-.bottom-section {
-    flex: 0 0 44%;
+    height: $img-height;
 }

@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { SingleImageTop, SingleImageTopProps } from './SingleImageTop';
+import { ProgramSectionMode } from '@/types/common/program-sections';
 
 const mockTitleDescriptionSection = jest.fn();
 const mockPhotoInputGroup = jest.fn();
@@ -23,8 +24,7 @@ describe('SingleImageTop', () => {
         title: 'Test Title',
         description: 'Test Description',
         image: { id: 1, url: 'test-image.png', mimeType: 'image/png' },
-        isTemplate: false,
-        isEditable: false,
+        mode: ProgramSectionMode.Published,
     };
 
     beforeEach(() => {
@@ -38,7 +38,7 @@ describe('SingleImageTop', () => {
         render(
             <SingleImageTop
                 {...baseProps}
-                isEditable={true}
+                mode={ProgramSectionMode.Edit}
                 onTitleChange={onTitleChange}
                 onDescriptionChange={onDescriptionChange}
             />,
@@ -49,7 +49,7 @@ describe('SingleImageTop', () => {
             expect.objectContaining({
                 title: baseProps.title,
                 description: baseProps.description,
-                isEditable: true,
+                mode: ProgramSectionMode.Edit,
                 onTitleChange,
                 onDescriptionChange,
             }),
@@ -58,7 +58,7 @@ describe('SingleImageTop', () => {
 
     it('passes onImageChange to PhotoInputGroup in edit mode', () => {
         const onImageChange = jest.fn();
-        render(<SingleImageTop {...baseProps} isEditable={true} onImageChange={onImageChange} />);
+        render(<SingleImageTop {...baseProps} mode={ProgramSectionMode.Edit} onImageChange={onImageChange} />);
 
         expect(screen.getByTestId('photo-input-group')).toBeInTheDocument();
         expect(mockPhotoInputGroup).toHaveBeenCalledWith(
@@ -71,7 +71,7 @@ describe('SingleImageTop', () => {
     });
 
     it('uses a fallback onChange when onImageChange is missing', () => {
-        render(<SingleImageTop {...baseProps} isEditable={true} />);
+        render(<SingleImageTop {...baseProps} mode={ProgramSectionMode.Edit} />);
 
         const photoProps = mockPhotoInputGroup.mock.calls[0]?.[0];
         expect(photoProps).toEqual(expect.any(Object));
@@ -79,7 +79,7 @@ describe('SingleImageTop', () => {
     });
 
     it('renders correctly in non-edit mode', () => {
-        const { container } = render(<SingleImageTop {...baseProps} isEditable={false} />);
+        const { container } = render(<SingleImageTop {...baseProps} mode={ProgramSectionMode.Published} />);
 
         const img = container.querySelector('img');
         expect(img).not.toBeNull();
@@ -92,17 +92,17 @@ describe('SingleImageTop', () => {
             expect.objectContaining({
                 title: baseProps.title,
                 description: baseProps.description,
-                isTemplate: false,
+                mode: ProgramSectionMode.Published,
             }),
         );
     });
 
-    it('renders with isTemplate=true', () => {
-        const { container } = render(<SingleImageTop {...baseProps} isTemplate={true} />);
+    it('renders with mode=Template', () => {
+        const { container } = render(<SingleImageTop {...baseProps} mode={ProgramSectionMode.Template} />);
         expect(container.firstChild).toHaveClass('template');
         expect(mockTitleDescriptionSection).toHaveBeenCalledWith(
             expect.objectContaining({
-                isTemplate: true,
+                mode: ProgramSectionMode.Template,
             }),
         );
     });
@@ -118,15 +118,15 @@ describe('SingleImageTop', () => {
             expect.objectContaining({
                 title: '',
                 description: '',
-                isTemplate: false,
+                mode: ProgramSectionMode.Published,
             }),
         );
     });
 
-    it('applies correct classNames for isTemplate and isEditable', () => {
-        const { container, rerender } = render(<SingleImageTop isTemplate={true} isEditable={false} />);
+    it('applies correct classNames for Template and Edit modes', () => {
+        const { container, rerender } = render(<SingleImageTop mode={ProgramSectionMode.Template} />);
         expect(container.firstChild).toHaveClass('template');
-        rerender(<SingleImageTop isTemplate={false} isEditable={true} />);
-        expect(container.firstChild).toHaveClass('editable');
+        rerender(<SingleImageTop mode={ProgramSectionMode.Edit} />);
+        expect(container.firstChild).toHaveClass('form-container');
     });
 });

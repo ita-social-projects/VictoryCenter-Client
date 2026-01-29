@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { renderProgramSection, RenderProgramSectionParams, getInitialSectionContents } from './renderProgramSection';
-import { ProgramSectionTemplate } from '@/types/common/program-sections';
+import { ProgramSectionTemplate, ProgramSectionMode } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 
 jest.mock('@/components/common/program-section-templates/quad-images-bottom/QuadImagesBottom', () => ({
@@ -58,8 +58,7 @@ describe('renderProgramSection', () => {
             const params: RenderProgramSectionParams = {
                 templateId: id,
                 data: baseData,
-                isTemplate: true,
-                isEditable: true,
+                mode: ProgramSectionMode.Edit,
                 handlers: baseHandlers,
             };
             render(renderProgramSection(params));

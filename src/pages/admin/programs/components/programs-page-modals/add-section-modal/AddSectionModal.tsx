@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Modal } from '@/components/common/modal/Modal';
 import { Button } from '@/components/admin/button/Button';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
-import { ProgramSectionTemplate } from '@/types/common/program-sections';
+import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
 import { Swiper } from '@/components/public/swiper/Swiper';
 import { renderProgramSection } from '@/utils/functions/render-program-section';
 import placeholderImage from '@/assets/images/common/section-photo-placeholder.png';
@@ -87,7 +87,7 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
                 description: PROGRAMS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT,
                 images: getPlaceholderImages(templateId),
             },
-            isTemplate: true,
+            mode: ProgramSectionMode.Template,
         });
     };
 

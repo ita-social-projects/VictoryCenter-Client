@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ProgramSectionForm, ProgramSectionFormProps } from './ProgramSectionForm';
-import { ProgramSection, ProgramSectionTemplate } from '@/types/common/program-sections';
+import { ProgramSection, ProgramSectionTemplate, ProgramSectionMode } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 
 jest.mock('@/utils/functions/render-program-section', () => ({
@@ -122,7 +122,7 @@ describe('ProgramSectionForm', () => {
         const callArg = renderProgramSection.mock.calls[0][0];
 
         expect(callArg.templateId).toBe(section.template);
-        expect(callArg.isEditable).toBe(true);
+        expect(callArg.mode).toBe(ProgramSectionMode.Edit);
         expect(callArg.data).toEqual({
             title: '',
             description: '',

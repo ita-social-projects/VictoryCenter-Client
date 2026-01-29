@@ -69,6 +69,7 @@ export const TEAM_MEMBER_VALIDATION = {
     description: {
         min: 10,
         max: 200,
+        getRequiredError: () => "Опис обов'язковий",
         getRequiredWhenPublishingError: () => "Опис обов'язковий при публікації",
         getMinError: () => `Не менше ${TEAM_MEMBER_VALIDATION.description.min} символів`,
         getMaxError: () => `Не більше ${TEAM_MEMBER_VALIDATION.description.max} символів`,

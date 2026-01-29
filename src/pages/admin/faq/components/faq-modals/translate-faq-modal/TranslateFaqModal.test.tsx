@@ -6,6 +6,9 @@ import { FaqQuestion } from '@/types/admin/faq';
 import { useTranslateFaq } from '@/hooks/admin/use-translate-faq/useTranslateFaq';
 import { ModalMode } from '@/types/admin/common';
 
+let mockFormIsValid = true;
+let mockFormIsDirty = true;
+
 jest.mock('@/components/admin/button/Button', () => ({
     Button: (props: any) => require('@/utils/test-mocks/test-mocks').MockButton(props),
 }));
@@ -22,23 +25,30 @@ jest.mock('./TranslateFaqForm', () => {
     const React = require('react');
 
     return {
-        TranslateFaqForm: React.forwardRef(({ onSubmit, onValidationChange }: any, ref: React.Ref<any>) => {
-            React.useImperativeHandle(ref, () => ({
-                submit: () =>
-                    onSubmit({
-                        question: 'Translated Question',
-                        answer: 'Translated Answer',
-                    }),
-                isValid: () => true,
-                isDirty: () => true,
-            }));
+        TranslateFaqForm: React.forwardRef(
+            ({ onSubmit, onValidationChange, initialData }: any, ref: React.Ref<any>) => {
+                React.useImperativeHandle(ref, () => ({
+                    submit: () =>
+                        onSubmit({
+                            question: 'Translated Question',
+                            answer: 'Translated Answer',
+                        }),
+                    isValid: () => mockFormIsValid,
+                    isDirty: () => mockFormIsDirty,
+                }));
 
-            React.useEffect(() => {
-                onValidationChange?.(true);
-            }, [onValidationChange]);
+                React.useEffect(() => {
+                    onValidationChange?.(true);
+                }, [onValidationChange]);
 
-            return <div data-testid="translate-form" />;
-        }),
+                return (
+                    <div
+                        data-testid="translate-form"
+                        data-initial={initialData ? JSON.stringify(initialData) : undefined}
+                    />
+                );
+            },
+        ),
     };
 });
 
@@ -107,6 +117,9 @@ describe('TranslateFaqModal', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
+        mockFormIsValid = true;
+        mockFormIsDirty = true;
+
         mockTranslateFaq.mockResolvedValue(undefined);
         mockUseTranslateFaq.mockReturnValue({
             translateFaq: mockTranslateFaq,
@@ -130,14 +143,33 @@ describe('TranslateFaqModal', () => {
         expect(screen.queryByTestId('modal')).not.toBeInTheDocument();
     });
 
+    it('passes correct initialData to form when in edit mode', () => {
+        renderModal({ faqToTranslate: TEST_DATA.faqWithLocalization });
+
+        const form = screen.getByTestId('translate-form');
+        const initialDataAttr = form.getAttribute('data-initial');
+
+        expect(initialDataAttr).toBeTruthy();
+        expect(JSON.parse(initialDataAttr!)).toEqual({
+            question: 'Existing Question',
+            answer: 'Existing Answer',
+        });
+    });
+
+    it('passes null initialData when in add mode', () => {
+        renderModal({ faqToTranslate: TEST_DATA.faq });
+
+        const form = screen.getByTestId('translate-form');
+        expect(form).not.toHaveAttribute('data-initial');
+    });
+
     it('enables translate button when form is valid', () => {
         renderModal();
-
         const button = screen.getByTestId('save-localization-btn');
         expect(button).toBeEnabled();
     });
 
-    it('submits translation and calls translateFaq', async () => {
+    it('submits translation and calls translateFaq when form is valid', async () => {
         const onTranslateFaq = jest.fn();
         const onClose = jest.fn();
 
@@ -159,7 +191,20 @@ describe('TranslateFaqModal', () => {
         expect(onClose).toHaveBeenCalled();
     });
 
+    it('does not submit if form is invalid', () => {
+        mockFormIsValid = false;
+
+        const onTranslateFaq = jest.fn();
+        renderModal({ onTranslateFaq });
+
+        const button = screen.getByTestId('save-localization-btn');
+        fireEvent.click(button);
+
+        expect(mockTranslateFaq).not.toHaveBeenCalled();
+    });
+
     it('shows confirmation modal on close when form is dirty', () => {
+        mockFormIsDirty = true;
         const onClose = jest.fn();
 
         renderModal({ onClose });
@@ -168,6 +213,18 @@ describe('TranslateFaqModal', () => {
 
         expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
         expect(onClose).not.toHaveBeenCalled();
+    });
+
+    it('closes immediately without confirmation when form is NOT dirty', () => {
+        mockFormIsDirty = false;
+        const onClose = jest.fn();
+
+        renderModal({ onClose });
+
+        fireEvent.click(screen.getByTestId('modal'));
+
+        expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
+        expect(onClose).toHaveBeenCalledTimes(1);
     });
 
     it('disables translate button while submitting', () => {

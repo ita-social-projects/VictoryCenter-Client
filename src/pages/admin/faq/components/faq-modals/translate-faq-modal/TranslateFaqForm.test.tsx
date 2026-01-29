@@ -3,46 +3,51 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 import { TranslateFaqForm, TranslateFaqFormRef } from './TranslateFaqForm';
+import { FAQ_VALIDATION } from '@/const/admin/faq';
 
-jest.mock('@/components/common/select/Select', () => {
-    const Select = ({ children }: any) => <div data-testid="select">{children}</div>;
-    Select.Option = ({ children }: any) => <div data-testid="select-option">{children}</div>;
-    return { Select };
-});
-
-jest.mock('@/components/admin/button/Button', () => ({
-    Button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
+jest.mock('@/components/admin/translation-controls/TranslationControls', () => ({
+    TranslationControls: ({ isSubmitting }: any) => (
+        <div data-testid="translation-controls" data-submitting={isSubmitting}>
+            Controls
+        </div>
+    ),
 }));
 
 jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
-    InputWithCharacterLimitGroup: ({ value, onChange, disabled, id }: any) => (
-        <input data-testid={id} value={value} onChange={onChange} disabled={disabled} />
+    InputWithCharacterLimitGroup: ({ value, onChange, onBlur, disabled, id, error }: any) => (
+        <div data-testid={`${id}-wrapper`}>
+            <input data-testid={id} value={value} onChange={onChange} onBlur={onBlur} disabled={disabled} />
+            {error && <span data-testid={`${id}-error`}>{error}</span>}
+        </div>
     ),
 }));
 
 jest.mock(
     '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
     () => ({
-        TextAreaWithCharacterLimitGroup: ({ value, onChange, disabled, id }: any) => (
-            <textarea data-testid={id} value={value} onChange={onChange} disabled={disabled} />
+        TextAreaWithCharacterLimitGroup: ({ value, onChange, onBlur, disabled, id, error }: any) => (
+            <div data-testid={`${id}-wrapper`}>
+                <textarea data-testid={id} value={value} onChange={onChange} onBlur={onBlur} disabled={disabled} />
+                {error && <span data-testid={`${id}-error`}>{error}</span>}
+            </div>
         ),
     }),
 );
 
 const TEST_DATA = {
-    question: 'What is FAQ?',
-    answer: 'Frequently Asked Questions',
-    newQuestion: 'New question?',
-    newAnswer: 'New answer',
-    validQuestion: 'Valid question?',
-    validAnswer: 'Valid answer',
+    question: 'What is FAQ? This needs to be long enough.',
+    answer: 'Frequently Asked Questions '.repeat(5),
+    newQuestion: 'New question? Also long enough.',
+    newAnswer: 'New answer '.repeat(10),
+    shortQuestion: 'Short',
+    shortAnswer: 'Short',
 };
 
 const FIELD_IDS = {
     form: 'translate-faq-form',
     question: 'question',
     answer: 'answer',
-    select: 'select',
+    controls: 'translation-controls',
 };
 
 describe('TranslateFaqForm', () => {
@@ -55,6 +60,9 @@ describe('TranslateFaqForm', () => {
     const getFields = () => ({
         question: screen.getByTestId(FIELD_IDS.question),
         answer: screen.getByTestId(FIELD_IDS.answer),
+        questionError: screen.queryByTestId(`${FIELD_IDS.question}-error`),
+        answerError: screen.queryByTestId(`${FIELD_IDS.answer}-error`),
+        controls: screen.getByTestId(FIELD_IDS.controls),
     });
 
     const fillForm = (question: string, answer: string) => {
@@ -63,13 +71,16 @@ describe('TranslateFaqForm', () => {
         fireEvent.change(fields.answer, { target: { value: answer } });
     };
 
-    it('renders form and fields', () => {
+    it('renders form and structural elements', () => {
         renderForm();
+        const fields = getFields();
 
         expect(screen.getByTestId(FIELD_IDS.form)).toBeInTheDocument();
-        expect(screen.getByTestId(FIELD_IDS.question)).toBeInTheDocument();
-        expect(screen.getByTestId(FIELD_IDS.answer)).toBeInTheDocument();
-        expect(screen.getByTestId(FIELD_IDS.select)).toBeInTheDocument();
+        expect(fields.question).toBeInTheDocument();
+        expect(fields.answer).toBeInTheDocument();
+        expect(fields.controls).toBeInTheDocument();
+        expect(fields.questionError).not.toBeInTheDocument();
+        expect(fields.answerError).not.toBeInTheDocument();
     });
 
     it('fills fields with initialData', () => {
@@ -87,7 +98,6 @@ describe('TranslateFaqForm', () => {
 
     it('updates fields on change', () => {
         renderForm();
-
         fillForm(TEST_DATA.newQuestion, TEST_DATA.newAnswer);
 
         const fields = getFields();
@@ -95,7 +105,40 @@ describe('TranslateFaqForm', () => {
         expect(fields.answer).toHaveValue(TEST_DATA.newAnswer);
     });
 
-    it('submits form via ref', async () => {
+    it('shows validation error when leaving empty required fields (onBlur)', () => {
+        renderForm();
+        const fields = getFields();
+
+        fireEvent.focus(fields.question);
+        fireEvent.blur(fields.question);
+
+        fireEvent.focus(fields.answer);
+        fireEvent.blur(fields.answer);
+
+        expect(screen.getByTestId(`${FIELD_IDS.question}-error`)).toHaveTextContent(
+            FAQ_VALIDATION.question.getRequiredError(),
+        );
+        expect(screen.getByTestId(`${FIELD_IDS.answer}-error`)).toHaveTextContent(
+            FAQ_VALIDATION.answer.getRequiredWhenPublishingError(),
+        );
+    });
+
+    it('shows validation error for too short text on blur', () => {
+        renderForm();
+
+        fillForm(TEST_DATA.shortQuestion, TEST_DATA.shortAnswer);
+        const fields = getFields();
+
+        fireEvent.blur(fields.question);
+        fireEvent.blur(fields.answer);
+
+        expect(screen.getByTestId(`${FIELD_IDS.question}-error`)).toHaveTextContent(
+            FAQ_VALIDATION.question.getMinError(),
+        );
+        expect(screen.getByTestId(`${FIELD_IDS.answer}-error`)).toHaveTextContent(FAQ_VALIDATION.answer.getMinError());
+    });
+
+    it('submits form via ref with valid data', async () => {
         const onSubmit = jest.fn();
         const { ref } = renderForm({ onSubmit });
 
@@ -112,11 +155,32 @@ describe('TranslateFaqForm', () => {
         });
     });
 
-    it('exposes isValid and isDirty via ref', () => {
+    it('blocks submit via ref with invalid data', async () => {
+        const onSubmit = jest.fn();
+        const { ref } = renderForm({ onSubmit });
+
+        fillForm(TEST_DATA.shortQuestion, TEST_DATA.shortAnswer);
+
+        await act(async () => {
+            try {
+                await ref.current?.submit();
+            } catch {
+                // igmore erroes
+            }
+        });
+
+        expect(onSubmit).not.toHaveBeenCalled();
+    });
+
+    it('exposes isValid and isDirty via ref correctly', () => {
         const { ref } = renderForm();
 
         expect(ref.current?.isValid()).toBe(false);
         expect(ref.current?.isDirty()).toBe(false);
+
+        fillForm(TEST_DATA.question, TEST_DATA.answer);
+
+        expect(ref.current?.isDirty()).toBe(true);
     });
 
     it('disables fields when formDisabled is true', () => {
@@ -125,35 +189,5 @@ describe('TranslateFaqForm', () => {
         const fields = getFields();
         expect(fields.question).toBeDisabled();
         expect(fields.answer).toBeDisabled();
-    });
-
-    describe('Form validation', () => {
-        it('validates required fields on submit', async () => {
-            const onSubmit = jest.fn();
-            const { ref } = renderForm({ onSubmit });
-
-            await act(async () => {
-                try {
-                    await ref.current?.submit();
-                } catch {
-                    // Expected validation error
-                }
-            });
-
-            expect(onSubmit).not.toHaveBeenCalled();
-        });
-
-        it('passes validation with valid data', async () => {
-            const onSubmit = jest.fn();
-            const { ref } = renderForm({ onSubmit });
-
-            fillForm(TEST_DATA.validQuestion, TEST_DATA.validAnswer);
-
-            await act(async () => {
-                await ref.current?.submit();
-            });
-
-            expect(onSubmit).toHaveBeenCalledTimes(1);
-        });
     });
 });

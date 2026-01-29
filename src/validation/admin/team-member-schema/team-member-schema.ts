@@ -21,22 +21,13 @@ export const teamMemberValidationSchema = Yup.object({
         }),
 
     description: Yup.string()
-        .ensure()
+        .required(TEAM_MEMBER_VALIDATION.description.getRequiredError())
+        .min(TEAM_MEMBER_VALIDATION.description.min, TEAM_MEMBER_VALIDATION.description.getMinError())
         .max(TEAM_MEMBER_VALIDATION.description.max, TEAM_MEMBER_VALIDATION.description.getMaxError())
         .test('no-multiple-spaces', TEAM_MEMBER_VALIDATION.description.getMultipleSpacesError(), (value) => {
             if (!value) return true;
             return !/\s{2,}/.test(value);
-        })
-        .test('min-length-if-not-empty', TEAM_MEMBER_VALIDATION.description.getMinError(), (value) => {
-            return !value || value.length >= TEAM_MEMBER_VALIDATION.description.min;
-        })
-        .when('$isPublishing', ([isPublishing], schema) =>
-            isPublishing
-                ? schema
-                      .required(TEAM_MEMBER_VALIDATION.description.getRequiredWhenPublishingError())
-                      .min(TEAM_MEMBER_VALIDATION.description.min, TEAM_MEMBER_VALIDATION.description.getMinError())
-                : schema.notRequired(),
-        ),
+        }),
 
     category: Yup.number().required(TEAM_MEMBER_VALIDATION.category.getRequiredError()),
 

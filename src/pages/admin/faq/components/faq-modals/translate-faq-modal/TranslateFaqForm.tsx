@@ -5,8 +5,9 @@ import styles from './TranslateFaqForm.module.scss';
 import cn from 'classnames';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
-import { FAQ_TEXT } from '@/const/admin/faq';
+import { FAQ_TEXT, FAQ_VALIDATION } from '@/const/admin/faq';
 import { TranslationControls } from '@/components/admin/translation-controls/TranslationControls';
+import { FAQ_VALIDATION_FUNCTIONS } from '@/validation/admin/faq-schema/faq-schema'; // Импорт валидации
 
 export interface TranslateFaqFormValues {
     question: string;
@@ -38,15 +39,15 @@ const DEFAULT_FORM_STATE: TranslateFaqFormValues = {
 };
 
 const validateForm = (formState: TranslateFaqFormValues, _isPublishing: boolean): TranslateFaqFormErrorState => {
-    const errors: TranslateFaqFormErrorState = {};
-    if (!formState.question.trim()) errors.question = ['Question is required'];
-    if (!formState.answer.trim()) errors.answer = 'Answer is required';
-    return errors;
+    return {
+        question: FAQ_VALIDATION_FUNCTIONS.validateQuestion(formState.question),
+        answer: FAQ_VALIDATION_FUNCTIONS.validateAnswer(formState.answer),
+    };
 };
 
 export const TranslateFaqForm = forwardRef<TranslateFaqFormRef, TranslateFaqFormProps>(
     ({ initialData = null, onSubmit, formDisabled, onValidationChange }: TranslateFaqFormProps, ref) => {
-        const { formState, setFormState, errors, isSubmitting } = useFormManager<
+        const { formState, setFormState, errors, setErrors, isSubmitting } = useFormManager<
             TranslateFaqFormValues,
             TranslateFaqFormErrorState
         >({
@@ -62,8 +63,18 @@ export const TranslateFaqForm = forwardRef<TranslateFaqFormRef, TranslateFaqForm
             setFormState((prev) => ({ ...prev, question: e.target.value }));
         };
 
+        const handleQuestionBlur = () => {
+            const error = FAQ_VALIDATION_FUNCTIONS.validateQuestion(formState.question);
+            setErrors((prev) => ({ ...prev, question: error }));
+        };
+
         const handleAnswerChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
             setFormState((prev) => ({ ...prev, answer: e.target.value }));
+        };
+
+        const handleAnswerBlur = () => {
+            const error = FAQ_VALIDATION_FUNCTIONS.validateAnswer(formState.answer);
+            setErrors((prev) => ({ ...prev, answer: error }));
         };
 
         return (
@@ -82,9 +93,10 @@ export const TranslateFaqForm = forwardRef<TranslateFaqFormRef, TranslateFaqForm
                             isRequired
                             value={formState.question}
                             onChange={handleQuestionChange}
+                            onBlur={handleQuestionBlur}
                             id="question"
                             name="question"
-                            maxLength={200}
+                            maxLength={FAQ_VALIDATION.question.max}
                             disabled={isSubmitting || formDisabled}
                             error={errors.question && Array.isArray(errors.question) ? errors.question[0] : undefined}
                         />
@@ -95,11 +107,13 @@ export const TranslateFaqForm = forwardRef<TranslateFaqFormRef, TranslateFaqForm
                             label={FAQ_TEXT.FORM?.LABEL?.ANSWER || 'Answer'}
                             id="answer"
                             name="answer"
+                            isRequired
                             value={formState.answer}
                             onChange={handleAnswerChange}
+                            onBlur={handleAnswerBlur}
                             rows={8}
                             disabled={isSubmitting || formDisabled}
-                            maxLength={1000}
+                            maxLength={FAQ_VALIDATION.answer.max}
                             error={errors.answer}
                         />
                     </div>

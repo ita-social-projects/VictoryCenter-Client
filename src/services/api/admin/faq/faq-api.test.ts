@@ -2,6 +2,7 @@ import { FaqApi } from './faq-api';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
 import { FaqCreateUpdate, FaqQuestionDto, ReorderFaq, VisitorPage } from '@/types/admin/faq';
 import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
+import { TranslationStatusFilter } from '@/types/common/language';
 
 describe('FaqApi', () => {
     const mockClient = {
@@ -18,12 +19,20 @@ describe('FaqApi', () => {
     it('getAll should call GET with correct params and return data', async () => {
         const mockResult: PaginationResult<FaqQuestionDto> = { items: [], totalItemsCount: 0 };
         mockClient.get.mockResolvedValueOnce({ data: mockResult });
-        const result = await FaqApi.getAll(mockClient, 1, VisibilityStatus.Published, 5, 10);
+        const result = await FaqApi.getAll(
+            mockClient,
+            1,
+            TranslationStatusFilter.All,
+            VisibilityStatus.Published,
+            5,
+            10,
+        );
         expect(mockClient.get).toHaveBeenCalledWith(
             API_ROUTES.FAQ.BASE,
             expect.objectContaining({
                 params: expect.objectContaining({
                     pageId: 1,
+                    translationStatusFilter: TranslationStatusFilter.All,
                     status: VisibilityStatus.Published,
                     offset: 5,
                     limit: 10,
@@ -44,7 +53,7 @@ describe('FaqApi', () => {
     it('getAll should set only provided params', async () => {
         const mockResult: PaginationResult<FaqQuestionDto> = { items: [], totalItemsCount: 0 };
         mockClient.get.mockResolvedValueOnce({ data: mockResult });
-        await FaqApi.getAll(mockClient, 1, undefined, undefined, 5);
+        await FaqApi.getAll(mockClient, 1, undefined, undefined, undefined, 5);
         expect(mockClient.get).toHaveBeenCalledWith(
             API_ROUTES.FAQ.BASE,
             expect.objectContaining({ params: expect.objectContaining({ pageId: 1, limit: 5 }) }),

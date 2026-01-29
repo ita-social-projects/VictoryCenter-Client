@@ -1,0 +1,13 @@
+@use '@/assets/sass/variables/colors.scss' as c;
+
+.loader {
+    width: 70%;
+    position: relative;
+    margin: 128px auto 64px;
+}
+
+.error {
+    color: c.$error;
+    margin-top: 128px;
+    text-align: center;
+}

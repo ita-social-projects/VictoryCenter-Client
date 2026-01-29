@@ -344,6 +344,26 @@ describe('DonatePageContent', () => {
 
             await waitFor(() => expect(mockAddToast).toHaveBeenCalled());
         });
+
+        it('handles foreign bank update without correspondentBanks', async () => {
+            const mockConfig = createMockConfig(true);
+            mockConfig.update.mockResolvedValue({ id: 1, name: 'Updated' });
+            setupMockBankDetails([{ id: 1, name: 'Foreign Bank' }], mockConfig);
+
+            renderComponent();
+            const updateButton = screen
+                .getByTestId('generic-details')
+                .querySelector('[data-action="update"]') as HTMLElement;
+            fireEvent.click(updateButton);
+
+            await waitFor(() => {
+                expect(mockSetItems).toHaveBeenCalled();
+            });
+
+            const callback = mockSetItems.mock.calls[0][0];
+            const updated = callback([{ id: 1, name: 'Foreign Bank' }]);
+            expect(updated[0].correspondentBanks).toEqual([]);
+        });
     });
 
     describe('Category Management', () => {

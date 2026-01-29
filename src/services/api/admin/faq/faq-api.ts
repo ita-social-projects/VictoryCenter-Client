@@ -3,6 +3,7 @@ import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
 import { FaqCreateUpdate, FaqQuestionDto, FaqSearchItemData, ReorderFaq, VisitorPage } from '@/types/admin/faq';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
 import { PaginationRequestParams } from '@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
+import { TranslationStatusFilter } from '@/types/common/language';
 
 type FaqPayload = Omit<FaqCreateUpdate, 'id'>;
 const toPayload = (faq: FaqCreateUpdate): FaqPayload => {
@@ -14,6 +15,7 @@ export const FaqApi = {
     getAll: async (
         client: AxiosInstance,
         pageId?: number,
+        translationStatusFilter?: TranslationStatusFilter | null,
         status?: VisibilityStatus | null,
         offset?: number,
         limit?: number,
@@ -22,6 +24,9 @@ export const FaqApi = {
 
         if (pageId !== undefined) {
             params.pageId = pageId;
+        }
+        if (translationStatusFilter !== undefined && translationStatusFilter !== null) {
+            params.translationStatusFilter = translationStatusFilter;
         }
         if (status !== undefined) {
             params.status = status;

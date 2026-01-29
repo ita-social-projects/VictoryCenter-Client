@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ProgramCard } from './ProgramCard';
@@ -42,27 +41,27 @@ describe('ProgramCard', () => {
     };
 
     it('renders program name, categories, and description', () => {
-        render(<ProgramCard program={program} className={''} />);
+        render(<ProgramCard program={program} variant={'whoWeAre'} />);
         expect(screen.getByText('Program A')).toBeInTheDocument();
         expect(screen.getByText('Category 1, Category 2')).toBeInTheDocument();
         expect(screen.getByText('Description A')).toBeInTheDocument();
     });
 
     it('renders program image using mapImageToBase64', () => {
-        render(<ProgramCard program={program} className={''} />);
+        render(<ProgramCard program={program} variant={'whoWeAre'} />);
         const img = screen.getByAltText('Program A') as HTMLImageElement;
         expect(img).toHaveAttribute('src', 'mocked-image');
     });
 
     it('renders arrow icons', () => {
-        render(<ProgramCard program={program} className={''} />);
+        render(<ProgramCard program={program} variant={'whoWeAre'} />);
         const arrows = screen.getAllByTestId('arrow-up-right');
         expect(arrows).toHaveLength(1);
     });
 
     it('navigates to program detail page when card is clicked and slug exists', async () => {
         const user = userEvent.setup();
-        render(<ProgramCard program={program} className={''} />);
+        render(<ProgramCard program={program} variant={'whoWeAre'} />);
 
         const card = screen.getByRole('button');
         await user.click(card);
@@ -74,7 +73,7 @@ describe('ProgramCard', () => {
     it('does not navigate when card is clicked and slug is missing', async () => {
         const user = userEvent.setup();
         const programWithoutSlug = { ...program, slug: undefined } as unknown as PublishedProgramDto;
-        render(<ProgramCard program={programWithoutSlug} className={''} />);
+        render(<ProgramCard program={programWithoutSlug} variant={'whoWeAre'} />);
 
         const card = screen.getByRole('button');
         await user.click(card);
@@ -85,7 +84,7 @@ describe('ProgramCard', () => {
     describe('keyboard navigation', () => {
         const setupKeyboardTest = () => {
             const user = userEvent.setup();
-            render(<ProgramCard program={program} className={''} />);
+            render(<ProgramCard program={program} variant={'whoWeAre'} />);
             const card = screen.getByRole('button');
             card.focus();
             return { user, card };
@@ -112,14 +111,14 @@ describe('ProgramCard', () => {
     });
 
     it('has tabIndex 0 when slug exists', () => {
-        render(<ProgramCard program={program} className={''} />);
+        render(<ProgramCard program={program} variant={'whoWeAre'} />);
         const card = screen.getByRole('button');
         expect(card).toHaveAttribute('tabIndex', '0');
     });
 
     it('has tabIndex -1 when slug is missing', () => {
         const programWithoutSlug = { ...program, slug: undefined } as unknown as PublishedProgramDto;
-        render(<ProgramCard program={programWithoutSlug} className={''} />);
+        render(<ProgramCard program={programWithoutSlug} variant={'whoWeAre'} />);
         const card = screen.getByRole('button');
         expect(card).toHaveAttribute('tabIndex', '-1');
     });

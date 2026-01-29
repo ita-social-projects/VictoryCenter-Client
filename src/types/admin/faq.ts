@@ -1,4 +1,10 @@
 import { VisibilityStatus } from './common';
+import {
+    EntityLocalization,
+    EntityLocalizationDto,
+    EntityWithDtoLocalizations,
+    EntityWithLocalizations,
+} from '../common/language';
 
 export interface VisitorPage {
     id: number;
@@ -6,15 +12,19 @@ export interface VisitorPage {
     title: string;
 }
 
-export interface FaqQuestion {
+export interface FaqQuestion extends FaqLocalizableFields, EntityWithLocalizations<FaqLocalization> {
     id: number;
     questionText: string;
     answerText: string;
     status: VisibilityStatus;
     pages: VisitorPage[];
 }
+export interface FaqLocalizableFields {
+    questionText: string;
+    answerText: string;
+}
 
-export interface FaqQuestionDto {
+export interface FaqQuestionDto extends FaqLocalizableFields, EntityWithDtoLocalizations<FaqLocalizationDto> {
     id: number;
     questionText: string;
     answerText: string;
@@ -40,3 +50,7 @@ export interface FaqSearchItemData {
     question: string;
     pages: string[];
 }
+export interface FaqLocalizationDto extends EntityLocalizationDto, FaqLocalizableFields {
+    entityId: number;
+}
+export interface FaqLocalization extends EntityLocalization, FaqLocalizableFields {}

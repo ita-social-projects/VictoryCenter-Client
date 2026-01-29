@@ -16,6 +16,19 @@ jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
 }));
 
+jest.mock('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit', () => ({
+    useLocalizationToolkit: () => ({
+        allLanguages: [
+            { id: 1, code: 'uk', name: 'Українська' },
+            { id: 2, code: 'en', name: 'Англійська' },
+        ],
+        onLanguageChange: jest.fn(),
+        onTranslationStatusFilterChange: jest.fn(),
+        translationLanguages: [{ id: 1, code: 'en', name: 'Англійська' }],
+        language: { id: 1, code: 'uk', name: 'Українська' },
+    }),
+}));
+
 jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider', () => ({
     useToast: () => ({
         addToast: jest.fn(),
@@ -280,6 +293,7 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                         })
                     }
                 />
+
                 <button
                     data-testid="trigger-add-category"
                     onClick={() => props.onAddCategory({ id: 3, name: 'Category C', programsCount: 0 })}
@@ -288,6 +302,8 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                     data-testid="trigger-edit-category"
                     onClick={() => props.onEditCategory({ id: 2, name: 'Category B Updated', programsCount: 1 })}
                 />
+
+                <button data-testid="trigger-delete-category" onClick={() => props.onDeleteCategory(1)} />
                 <button data-testid="trigger-delete-category-1" onClick={() => props.onDeleteCategory(1)} />
                 <button data-testid="trigger-delete-category-2" onClick={() => props.onDeleteCategory(2)} />
             </div>
@@ -834,8 +850,8 @@ describe('ProgramsPageContent', () => {
         });
     });
 
-    it('sets selected category to null when last category deleted', async () => {
-        mockProgramsCategoriesApi.fetchProgramCategories.mockResolvedValue([{ id: 1, name: 'Only', programsCount: 0 }]);
+    it('clears selection when deleting the last category', async () => {
+        mockProgramsCategoriesApi.fetchProgramCategories.mockResolvedValue([{ id: 1, name: 'Only', programsCount: 1 }]);
 
         render(<ProgramsPageContent />);
 
@@ -843,7 +859,7 @@ describe('ProgramsPageContent', () => {
             expect(screen.getByTestId('category-1')).toBeDisabled();
         });
 
-        fireEvent.click(screen.getByTestId('trigger-delete-category-1'));
+        fireEvent.click(screen.getByTestId('trigger-delete-category'));
 
         await waitFor(() => {
             expect(screen.queryByTestId('category-1')).not.toBeInTheDocument();

@@ -2,16 +2,38 @@ import { ButtonTooltip } from '@/components/admin/button-tooltip/ButtonTooltip';
 import { VisibilityStatusLabel } from '@/components/admin/visibility-status-label/VisibilityStatusLabel';
 import { FAQ_TEXT } from '@/const/admin/faq';
 import { VisibilityStatus } from '@/types/admin/common';
-import { FaqQuestion } from '@/types/admin/faq';
+import { FaqLocalizableFields, FaqQuestion } from '@/types/admin/faq';
 import './FaqComponent.scss';
+import { LocalizationLanguage } from '@/types/common/language';
+import { useEffect, useState } from 'react';
+import { returnDisplayedLocalization } from '@/utils/functions/localization/localization';
+import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
 
 export interface FaqComponentProps {
     faq: FaqQuestion;
+    language: LocalizationLanguage;
+    translationLanguages: LocalizationLanguage[];
     handleOnDeleteFaq: (faq: FaqQuestion) => void;
     handleOnEditFaq: (faq: FaqQuestion) => void;
 }
 
-export const FaqComponent = ({ faq, handleOnDeleteFaq, handleOnEditFaq }: FaqComponentProps) => {
+export const FaqComponent = ({
+    faq,
+    handleOnDeleteFaq,
+    handleOnEditFaq,
+    language,
+    translationLanguages,
+}: FaqComponentProps) => {
+    const [textFields, setTextFields] = useState<FaqLocalizableFields>();
+
+    useEffect(() => {
+        const displayedLocalization = returnDisplayedLocalization(faq, language.code);
+        setTextFields({
+            questionText: displayedLocalization?.questionText || faq.questionText,
+            answerText: displayedLocalization?.answerText || faq.answerText,
+        });
+    }, [language, faq]);
+
     const handleEditFaq = () => {
         handleOnEditFaq(faq);
     };
@@ -24,10 +46,11 @@ export const FaqComponent = ({ faq, handleOnDeleteFaq, handleOnEditFaq }: FaqCom
         <div className="admin-page_faq-item">
             <div className="faq-info">
                 <div className="faq-info-question">
-                    <p>{faq.questionText}</p>
+                    <p>{textFields?.questionText}</p>
+                    <LocalizationStatuses languages={translationLanguages} localizedEntity={faq} />
                 </div>
                 <div className="faq-info-answer">
-                    <p>{faq.answerText}</p>
+                    <p>{textFields?.answerText}</p>
                 </div>
                 <div className="faq-info-status">
                     <VisibilityStatusLabel status={faq.status} />

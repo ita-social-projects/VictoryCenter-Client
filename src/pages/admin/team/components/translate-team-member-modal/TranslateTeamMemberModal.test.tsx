@@ -88,23 +88,41 @@ jest.mock('@/hooks/admin/use-translate-team-member/useTranslateTeamMember', () =
 
 const mockUseTranslateTeamMember = jest.mocked(useTranslateTeamMember);
 
-const member: TeamMember = {
-    id: 1,
-    fullName: 'Original Name',
-    description: 'Original Description',
-    status: 1,
-    categoryId: 1,
-    image: null,
-    localizations: [],
-};
-
-const language = {
-    id: 2,
-    code: 'en',
-    name: 'English',
+const TEST_DATA = {
+    member: {
+        id: 1,
+        fullName: 'Original Name',
+        description: 'Original Description',
+        status: 1,
+        categoryId: 1,
+        image: null,
+        localizations: [],
+    } as TeamMember,
+    language: {
+        id: 2,
+        code: 'en',
+        name: 'English',
+    },
+    translatedData: {
+        fullName: 'Translated Name',
+        description: 'Translated Description',
+    },
 };
 
 describe('TranslateTeamMemberModal', () => {
+    const renderModal = (props: Partial<React.ComponentProps<typeof TranslateTeamMemberModal>> = {}) => {
+        const defaultProps = {
+            mode: ModalMode.Add,
+            isOpen: true,
+            onClose: jest.fn(),
+            memberToTranslate: TEST_DATA.member,
+            onTranslateMember: jest.fn(),
+            language: TEST_DATA.language,
+        };
+
+        return render(<TranslateTeamMemberModal {...defaultProps} {...props} />);
+    };
+
     beforeEach(() => {
         jest.clearAllMocks();
         mockTranslateMember.mockResolvedValue(undefined);
@@ -117,16 +135,7 @@ describe('TranslateTeamMemberModal', () => {
     });
 
     it('renders modal when open and member exists', () => {
-        render(
-            <TranslateTeamMemberModal
-                mode={ModalMode.Add}
-                isOpen
-                onClose={jest.fn()}
-                memberToTranslate={member}
-                onTranslateMember={jest.fn()}
-                language={language}
-            />,
-        );
+        renderModal();
 
         expect(screen.getByTestId('modal')).toBeInTheDocument();
         expect(screen.getByTestId('translate-form')).toBeInTheDocument();
@@ -134,16 +143,7 @@ describe('TranslateTeamMemberModal', () => {
     });
 
     it('enables translate button when form is valid', () => {
-        render(
-            <TranslateTeamMemberModal
-                mode={ModalMode.Add}
-                isOpen
-                onClose={jest.fn()}
-                memberToTranslate={member}
-                onTranslateMember={jest.fn()}
-                language={language}
-            />,
-        );
+        renderModal();
 
         const button = screen.getByTestId('save-localization-btn');
         expect(button).toBeEnabled();
@@ -155,28 +155,16 @@ describe('TranslateTeamMemberModal', () => {
 
         mockTranslateMember.mockImplementation(async () => {
             const hookCall = mockUseTranslateTeamMember.mock.calls[0][0];
-            hookCall.onSuccess({ ...member });
+            hookCall.onSuccess({ ...TEST_DATA.member });
         });
 
-        render(
-            <TranslateTeamMemberModal
-                mode={ModalMode.Add}
-                isOpen
-                onClose={onClose}
-                memberToTranslate={member}
-                onTranslateMember={onTranslateMember}
-                language={language}
-            />,
-        );
+        renderModal({ onTranslateMember, onClose });
 
         const button = screen.getByTestId('save-localization-btn');
         fireEvent.click(button);
 
         await waitFor(() => {
-            expect(mockTranslateMember).toHaveBeenCalledWith({
-                fullName: 'Translated Name',
-                description: 'Translated Description',
-            });
+            expect(mockTranslateMember).toHaveBeenCalledWith(TEST_DATA.translatedData);
         });
 
         expect(onTranslateMember).toHaveBeenCalledTimes(1);
@@ -186,16 +174,7 @@ describe('TranslateTeamMemberModal', () => {
     it('shows confirmation modal on close when form is dirty', () => {
         const onClose = jest.fn();
 
-        render(
-            <TranslateTeamMemberModal
-                mode={ModalMode.Add}
-                isOpen
-                onClose={onClose}
-                memberToTranslate={member}
-                onTranslateMember={jest.fn()}
-                language={language}
-            />,
-        );
+        renderModal({ onClose });
 
         fireEvent.click(screen.getByTestId('modal'));
 
@@ -203,7 +182,7 @@ describe('TranslateTeamMemberModal', () => {
         expect(onClose).not.toHaveBeenCalled();
     });
 
-    it('disables translate button while submitting', async () => {
+    it('disables translate button while submitting', () => {
         mockUseTranslateTeamMember.mockReturnValue({
             translateMember: mockTranslateMember,
             isSubmitting: true,
@@ -211,16 +190,7 @@ describe('TranslateTeamMemberModal', () => {
             clearError: jest.fn(),
         });
 
-        render(
-            <TranslateTeamMemberModal
-                mode={ModalMode.Add}
-                isOpen
-                onClose={jest.fn()}
-                memberToTranslate={member}
-                onTranslateMember={jest.fn()}
-                language={language}
-            />,
-        );
+        renderModal();
 
         const button = screen.getByTestId('save-localization-btn');
         expect(button).toBeDisabled();

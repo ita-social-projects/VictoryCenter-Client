@@ -139,22 +139,57 @@ jest.mock('@/hooks/admin/use-translate-faq/useTranslateFaq', () => ({
 
 const mockUseTranslateFaq = jest.mocked(useTranslateFaq);
 
-const faq: FaqQuestion = {
-    id: 1,
-    questionText: 'Original Question',
-    answerText: 'Original Answer',
-    status: 1 as any,
-    pages: [],
-    localizations: [],
-};
-
-const language = {
-    id: 2,
-    code: 'en',
-    name: 'English',
+const TEST_DATA = {
+    faq: {
+        id: 1,
+        questionText: 'Original Question',
+        answerText: 'Original Answer',
+        status: 1 as any,
+        pages: [],
+        localizations: [],
+    } as FaqQuestion,
+    faqWithLocalization: {
+        id: 1,
+        questionText: 'Original Question',
+        answerText: 'Original Answer',
+        status: 1 as any,
+        pages: [],
+        localizations: [
+            {
+                questionText: 'Existing Question',
+                answerText: 'Existing Answer',
+                language: {
+                    id: 2,
+                    code: 'en',
+                },
+                translationStatus: 1,
+            },
+        ],
+    } as FaqQuestion,
+    language: {
+        id: 2,
+        code: 'en',
+        name: 'English',
+    },
+    translatedData: {
+        question: 'Translated Question',
+        answer: 'Translated Answer',
+    },
 };
 
 describe('TranslateFaqModal', () => {
+    const renderModal = (props: Partial<React.ComponentProps<typeof TranslateFaqModal>> = {}) => {
+        const defaultProps = {
+            isOpen: true,
+            onClose: jest.fn(),
+            faqToTranslate: TEST_DATA.faq,
+            onTranslateFaq: jest.fn(),
+            language: TEST_DATA.language,
+        };
+
+        return render(<TranslateFaqModal {...defaultProps} {...props} />);
+    };
+
     beforeEach(() => {
         jest.clearAllMocks();
         mockTranslateFaq.mockResolvedValue(undefined);
@@ -167,15 +202,7 @@ describe('TranslateFaqModal', () => {
     });
 
     it('renders modal when open and faq exists', () => {
-        render(
-            <TranslateFaqModal
-                isOpen
-                onClose={jest.fn()}
-                faqToTranslate={faq}
-                onTranslateFaq={jest.fn()}
-                language={language}
-            />,
-        );
+        renderModal();
 
         expect(screen.getByTestId('modal')).toBeInTheDocument();
         expect(screen.getByTestId('translate-form')).toBeInTheDocument();
@@ -183,29 +210,13 @@ describe('TranslateFaqModal', () => {
     });
 
     it('does not render modal when faqToTranslate is null', () => {
-        render(
-            <TranslateFaqModal
-                isOpen
-                onClose={jest.fn()}
-                faqToTranslate={null}
-                onTranslateFaq={jest.fn()}
-                language={language}
-            />,
-        );
+        renderModal({ faqToTranslate: null });
 
         expect(screen.queryByTestId('modal')).not.toBeInTheDocument();
     });
 
     it('enables translate button when form is valid', () => {
-        render(
-            <TranslateFaqModal
-                isOpen
-                onClose={jest.fn()}
-                faqToTranslate={faq}
-                onTranslateFaq={jest.fn()}
-                language={language}
-            />,
-        );
+        renderModal();
 
         const button = screen.getByTestId('save-localization-btn');
         expect(button).toBeEnabled();
@@ -217,27 +228,16 @@ describe('TranslateFaqModal', () => {
 
         mockTranslateFaq.mockImplementation(async () => {
             const hookCall = mockUseTranslateFaq.mock.calls[0][0];
-            hookCall.onSuccess({ ...faq });
+            hookCall.onSuccess({ ...TEST_DATA.faq });
         });
 
-        render(
-            <TranslateFaqModal
-                isOpen
-                onClose={onClose}
-                faqToTranslate={faq}
-                onTranslateFaq={onTranslateFaq}
-                language={language}
-            />,
-        );
+        renderModal({ onTranslateFaq, onClose });
 
         const button = screen.getByTestId('save-localization-btn');
         fireEvent.click(button);
 
         await waitFor(() => {
-            expect(mockTranslateFaq).toHaveBeenCalledWith({
-                question: 'Translated Question',
-                answer: 'Translated Answer',
-            });
+            expect(mockTranslateFaq).toHaveBeenCalledWith(TEST_DATA.translatedData);
         });
 
         expect(onTranslateFaq).toHaveBeenCalledTimes(1);
@@ -247,15 +247,7 @@ describe('TranslateFaqModal', () => {
     it('shows confirmation modal on close when form is dirty', () => {
         const onClose = jest.fn();
 
-        render(
-            <TranslateFaqModal
-                isOpen
-                onClose={onClose}
-                faqToTranslate={faq}
-                onTranslateFaq={jest.fn()}
-                language={language}
-            />,
-        );
+        renderModal({ onClose });
 
         fireEvent.click(screen.getByTestId('modal'));
 
@@ -263,7 +255,7 @@ describe('TranslateFaqModal', () => {
         expect(onClose).not.toHaveBeenCalled();
     });
 
-    it('disables translate button while submitting', async () => {
+    it('disables translate button while submitting', () => {
         mockUseTranslateFaq.mockReturnValue({
             translateFaq: mockTranslateFaq,
             isSubmitting: true,
@@ -271,15 +263,7 @@ describe('TranslateFaqModal', () => {
             clearError: jest.fn(),
         });
 
-        render(
-            <TranslateFaqModal
-                isOpen
-                onClose={jest.fn()}
-                faqToTranslate={faq}
-                onTranslateFaq={jest.fn()}
-                language={language}
-            />,
-        );
+        renderModal();
 
         const button = screen.getByTestId('save-localization-btn');
         expect(button).toBeDisabled();
@@ -293,41 +277,13 @@ describe('TranslateFaqModal', () => {
             clearError: jest.fn(),
         });
 
-        render(
-            <TranslateFaqModal
-                isOpen
-                onClose={jest.fn()}
-                faqToTranslate={faq}
-                onTranslateFaq={jest.fn()}
-                language={language}
-            />,
-        );
+        renderModal();
 
         expect(screen.getByText('Translation failed')).toBeInTheDocument();
     });
 
     it('determines edit mode when localization exists', () => {
-        const faqWithLocalization: FaqQuestion = {
-            ...faq,
-            localizations: [
-                {
-                    questionText: 'Existing Question',
-                    answerText: 'Existing Answer',
-                    language: language,
-                    translationStatus: 1,
-                },
-            ],
-        };
-
-        render(
-            <TranslateFaqModal
-                isOpen
-                onClose={jest.fn()}
-                faqToTranslate={faqWithLocalization}
-                onTranslateFaq={jest.fn()}
-                language={language}
-            />,
-        );
+        renderModal({ faqToTranslate: TEST_DATA.faqWithLocalization });
 
         expect(mockUseTranslateFaq).toHaveBeenCalledWith(
             expect.objectContaining({
@@ -337,15 +293,7 @@ describe('TranslateFaqModal', () => {
     });
 
     it('determines add mode when no localization exists', () => {
-        render(
-            <TranslateFaqModal
-                isOpen
-                onClose={jest.fn()}
-                faqToTranslate={faq}
-                onTranslateFaq={jest.fn()}
-                language={language}
-            />,
-        );
+        renderModal();
 
         expect(mockUseTranslateFaq).toHaveBeenCalledWith(
             expect.objectContaining({

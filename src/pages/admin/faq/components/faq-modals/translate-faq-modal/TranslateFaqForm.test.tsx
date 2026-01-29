@@ -6,9 +6,7 @@ import { TranslateFaqForm, TranslateFaqFormRef } from './TranslateFaqForm';
 
 jest.mock('@/components/common/select/Select', () => {
     const Select = ({ children }: any) => <div data-testid="select">{children}</div>;
-
     Select.Option = ({ children }: any) => <div data-testid="select-option">{children}</div>;
-
     return { Select };
 });
 
@@ -31,62 +29,77 @@ jest.mock(
     }),
 );
 
-const renderForm = (props: any = {}) => {
-    const ref = createRef<TranslateFaqFormRef>();
+const TEST_DATA = {
+    question: 'What is FAQ?',
+    answer: 'Frequently Asked Questions',
+    newQuestion: 'New question?',
+    newAnswer: 'New answer',
+    validQuestion: 'Valid question?',
+    validAnswer: 'Valid answer',
+};
 
-    render(<TranslateFaqForm ref={ref} onSubmit={jest.fn()} {...props} />);
-
-    return { ref };
+const FIELD_IDS = {
+    form: 'translate-faq-form',
+    question: 'question',
+    answer: 'answer',
+    select: 'select',
 };
 
 describe('TranslateFaqForm', () => {
+    const renderForm = (props: any = {}) => {
+        const ref = createRef<TranslateFaqFormRef>();
+        render(<TranslateFaqForm ref={ref} onSubmit={jest.fn()} {...props} />);
+        return { ref };
+    };
+
+    const getFields = () => ({
+        question: screen.getByTestId(FIELD_IDS.question),
+        answer: screen.getByTestId(FIELD_IDS.answer),
+    });
+
+    const fillForm = (question: string, answer: string) => {
+        const fields = getFields();
+        fireEvent.change(fields.question, { target: { value: question } });
+        fireEvent.change(fields.answer, { target: { value: answer } });
+    };
+
     it('renders form and fields', () => {
         renderForm();
 
-        expect(screen.getByTestId('translate-faq-form')).toBeInTheDocument();
-        expect(screen.getByTestId('question')).toBeInTheDocument();
-        expect(screen.getByTestId('answer')).toBeInTheDocument();
-        expect(screen.getByTestId('select')).toBeInTheDocument();
+        expect(screen.getByTestId(FIELD_IDS.form)).toBeInTheDocument();
+        expect(screen.getByTestId(FIELD_IDS.question)).toBeInTheDocument();
+        expect(screen.getByTestId(FIELD_IDS.answer)).toBeInTheDocument();
+        expect(screen.getByTestId(FIELD_IDS.select)).toBeInTheDocument();
     });
 
     it('fills fields with initialData', () => {
         renderForm({
             initialData: {
-                question: 'What is FAQ?',
-                answer: 'Frequently Asked Questions',
+                question: TEST_DATA.question,
+                answer: TEST_DATA.answer,
             },
         });
 
-        expect(screen.getByTestId('question')).toHaveValue('What is FAQ?');
-        expect(screen.getByTestId('answer')).toHaveValue('Frequently Asked Questions');
+        const fields = getFields();
+        expect(fields.question).toHaveValue(TEST_DATA.question);
+        expect(fields.answer).toHaveValue(TEST_DATA.answer);
     });
 
     it('updates fields on change', () => {
         renderForm();
 
-        fireEvent.change(screen.getByTestId('question'), {
-            target: { value: 'New question?' },
-        });
+        fillForm(TEST_DATA.newQuestion, TEST_DATA.newAnswer);
 
-        fireEvent.change(screen.getByTestId('answer'), {
-            target: { value: 'New answer' },
-        });
-
-        expect(screen.getByTestId('question')).toHaveValue('New question?');
-        expect(screen.getByTestId('answer')).toHaveValue('New answer');
+        const fields = getFields();
+        expect(fields.question).toHaveValue(TEST_DATA.newQuestion);
+        expect(fields.answer).toHaveValue(TEST_DATA.newAnswer);
     });
 
     it('submits form via ref', async () => {
         const onSubmit = jest.fn();
         const { ref } = renderForm({ onSubmit });
 
-        fireEvent.change(screen.getByTestId('question'), {
-            target: { value: 'What is FAQ?' },
-        });
-
-        fireEvent.change(screen.getByTestId('answer'), {
-            target: { value: 'Frequently Asked Questions' },
-        });
+        fillForm(TEST_DATA.question, TEST_DATA.answer);
 
         await act(async () => {
             await ref.current?.submit();
@@ -94,8 +107,8 @@ describe('TranslateFaqForm', () => {
 
         expect(onSubmit).toHaveBeenCalledTimes(1);
         expect(onSubmit).toHaveBeenCalledWith({
-            question: 'What is FAQ?',
-            answer: 'Frequently Asked Questions',
+            question: TEST_DATA.question,
+            answer: TEST_DATA.answer,
         });
     });
 
@@ -109,41 +122,38 @@ describe('TranslateFaqForm', () => {
     it('disables fields when formDisabled is true', () => {
         renderForm({ formDisabled: true });
 
-        expect(screen.getByTestId('question')).toBeDisabled();
-        expect(screen.getByTestId('answer')).toBeDisabled();
+        const fields = getFields();
+        expect(fields.question).toBeDisabled();
+        expect(fields.answer).toBeDisabled();
     });
 
-    it('validates required fields on submit', async () => {
-        const onSubmit = jest.fn();
-        const { ref } = renderForm({ onSubmit });
+    describe('Form validation', () => {
+        it('validates required fields on submit', async () => {
+            const onSubmit = jest.fn();
+            const { ref } = renderForm({ onSubmit });
 
-        await act(async () => {
-            try {
+            await act(async () => {
+                try {
+                    await ref.current?.submit();
+                } catch {
+                    // Expected validation error
+                }
+            });
+
+            expect(onSubmit).not.toHaveBeenCalled();
+        });
+
+        it('passes validation with valid data', async () => {
+            const onSubmit = jest.fn();
+            const { ref } = renderForm({ onSubmit });
+
+            fillForm(TEST_DATA.validQuestion, TEST_DATA.validAnswer);
+
+            await act(async () => {
                 await ref.current?.submit();
-            } catch {
-                // Expected validation error
-            }
+            });
+
+            expect(onSubmit).toHaveBeenCalledTimes(1);
         });
-
-        expect(onSubmit).not.toHaveBeenCalled();
-    });
-
-    it('passes validation with valid data', async () => {
-        const onSubmit = jest.fn();
-        const { ref } = renderForm({ onSubmit });
-
-        fireEvent.change(screen.getByTestId('question'), {
-            target: { value: 'Valid question?' },
-        });
-
-        fireEvent.change(screen.getByTestId('answer'), {
-            target: { value: 'Valid answer' },
-        });
-
-        await act(async () => {
-            await ref.current?.submit();
-        });
-
-        expect(onSubmit).toHaveBeenCalledTimes(1);
     });
 });

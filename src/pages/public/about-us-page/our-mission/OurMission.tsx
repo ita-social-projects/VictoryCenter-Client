@@ -3,9 +3,9 @@ import { PUBLIC_ROUTES } from '@/const/public/routes';
 import { AboutUsContent } from '@/types/public/about-us-page';
 import { ContentType } from '@/types/common/about-us';
 import { useTranslation } from 'react-i18next';
-import DOMPurify from 'dompurify';
 import styles from './OurMission.module.scss';
 import { Button } from '@/components/public/ui/button';
+import { SafeHtml } from '@/components/common/safe-html/SafeHtml';
 
 export interface OurMissionProps {
     content?: AboutUsContent[] | null;
@@ -18,17 +18,13 @@ export const OurMission = ({ content, description }: OurMissionProps) => {
 
     const descriptionValue = content?.find((x) => x.contentType === ContentType.Description)?.description ?? '';
 
-    const sanitizedDescription =
-        DOMPurify.sanitize(description ?? descriptionValue ?? '', {
-            ALLOWED_TAGS: ['p', 'strong', 'em', 'b', 'i', 'br'],
-            ALLOWED_ATTR: [],
-        }) || '';
+    const sanitizedDescription = description ?? descriptionValue;
 
     return (
         <div className={styles.root}>
             <h2 className={styles.title}>{t('WHAT_WE_DO')}</h2>
             <div className={styles.block}>
-                <p className={styles.text} dangerouslySetInnerHTML={{ __html: sanitizedDescription }} />
+                <SafeHtml as="p" className={styles.text} html={sanitizedDescription} />
                 <div className={styles.actions}>
                     <Button href={PUBLIC_ROUTES.PROGRAMS.FULL} icon={ArrowIcon} iconPosition="right" variant="tertiary">
                         {t('GO_TO_PROGRAMS')}

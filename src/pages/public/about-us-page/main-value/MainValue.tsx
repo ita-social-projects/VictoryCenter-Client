@@ -3,8 +3,8 @@ import { ABOUT_US_DATA } from '@/const/public/about-us-page';
 import styles from './MainValue.module.scss';
 import { Swiper } from '@/components/public/swiper/Swiper';
 import { AboutUsContent } from '@/types/public/about-us-page';
-import DOMPurify from 'dompurify';
 import cn from 'classnames';
+import { SafeHtml } from '@/components/common/safe-html/SafeHtml';
 
 export interface MainValuesProps {
     content: AboutUsContent[] | null;
@@ -41,19 +41,10 @@ export const MainValues = ({ content }: MainValuesProps) => {
                         const imageUrl = person.image?.url ?? ABOUT_US_DATA.PEOPLE_DATA[index].IMG;
                         const altText = peopleData[index].ALT;
 
-                        const personDescription =
-                            DOMPurify.sanitize(person.description ?? '', {
-                                ALLOWED_TAGS: ['p', 'strong', 'em', 'b', 'i', 'br'],
-                                ALLOWED_ATTR: [],
-                            }) || '';
-
                         return (
                             <div className={cn(styles[`people-card`], styles[`card-${index + 1}`])}>
                                 <img className={styles[`people-img`]} src={imageUrl} alt={altText} />
-                                <p
-                                    className={styles[`people-info`]}
-                                    dangerouslySetInnerHTML={{ __html: personDescription }}
-                                />
+                                <SafeHtml as="p" className={styles[`people-info`]} html={person.description ?? ''} />
                             </div>
                         );
                     }}

@@ -14,27 +14,23 @@ describe('InputWithCharacterLimit', () => {
         jest.clearAllMocks();
     });
 
-    // Render helpers
     const renderInputWithCharacterLimit = (overrideProps: Partial<InputWithCharacterLimitProps> = {}) =>
         render(<InputWithCharacterLimit {...defaultProps} {...overrideProps} />);
 
-    // Element getters
     const getInput = () => screen.getByRole('textbox');
     const getCharacterCounter = (current: number, max: number) => screen.getByText(`${current}/${max}`);
     const getWrapper = () => getInput().parentElement!;
+    const getClearButton = () => screen.getByRole('button', { name: /clear input/i });
 
-    // Action helpers
     const focusInput = () => fireEvent.focus(getInput());
     const blurInput = () => fireEvent.blur(getInput());
     const typeInInput = (value: string) => fireEvent.change(getInput(), { target: { value } });
 
-    // Assertion helpers
     const expectWrapperToHaveClass = (className: string) => expect(getWrapper()).toHaveClass(className);
     const expectWrapperNotToHaveClass = (className: string) => expect(getWrapper()).not.toHaveClass(className);
     const expectInputToHaveAttribute = (attribute: string, value: string) =>
         expect(getInput()).toHaveAttribute(attribute, value);
 
-    // Specific class assertion helpers
     const expectWrapperToBeDisabled = () => expectWrapperToHaveClass('char-limit-input--disabled');
     const expectWrapperToBeFocused = () => expectWrapperToHaveClass('char-limit-input--focused');
     const expectWrapperNotToBeFocused = () => expectWrapperNotToHaveClass('char-limit-input--focused');
@@ -107,11 +103,9 @@ describe('InputWithCharacterLimit', () => {
     it('handles blur event when onBlur prop is not provided', () => {
         renderInputWithCharacterLimit();
 
-        // Focus first to set focused state
         focusInput();
         expectWrapperToBeFocused();
 
-        // Blur should work without throwing error even when onBlur prop is not provided
         blurInput();
         expectWrapperNotToBeFocused();
     });
@@ -123,5 +117,30 @@ describe('InputWithCharacterLimit', () => {
         };
         render(<InputWithCharacterLimit {...propsWithUndefinedValue} />);
         expect(getCharacterCounter(0, 50)).toBeInTheDocument();
+    });
+
+    it('clears input via clear button and forwards synthetic change event', () => {
+        const onChange = jest.fn();
+        renderInputWithCharacterLimit({ value: 'Hello', onChange });
+
+        focusInput();
+
+        const btn = getClearButton();
+        const preventDefault = jest.fn();
+        fireEvent.mouseDown(btn, { preventDefault } as any);
+        expect(preventDefault).toHaveBeenCalled();
+
+        fireEvent.click(btn);
+
+        expect(onChange).toHaveBeenCalledTimes(1);
+        const arg = onChange.mock.calls[0][0];
+        expect(arg.target.value).toBe('');
+        expect(arg.target.name).toBe('testName');
+        expect(arg.target.id).toBe('test-id');
+    });
+
+    it('sets aria-invalid when current length exceeds maxLength', () => {
+        renderInputWithCharacterLimit({ value: 'abcd', maxLength: 3 });
+        expect(getInput()).toHaveAttribute('aria-invalid', 'true');
     });
 });

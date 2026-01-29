@@ -9,8 +9,7 @@ import './TranslateFaqForm.scss';
 import cn from 'classnames';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
-import { FAQ_TEXT } from '@/const/admin/faq'; // Предполагаю, что тексты тут
-// Если есть файл валидации для FAQ, импортируй его. Если нет — пока оставим простые проверки.
+import { FAQ_TEXT } from '@/const/admin/faq';
 
 export interface TranslateFaqFormValues {
     question: string;
@@ -41,7 +40,6 @@ const DEFAULT_FORM_STATE: TranslateFaqFormValues = {
     answer: '',
 };
 
-// Простая валидация (можно заменить на схему, если есть)
 const validateForm = (formState: TranslateFaqFormValues, _isPublishing: boolean): TranslateFaqFormErrorState => {
     const errors: TranslateFaqFormErrorState = {};
     if (!formState.question.trim()) errors.question = ['Question is required'];
@@ -94,17 +92,16 @@ export const TranslateFaqForm = forwardRef<TranslateFaqFormRef, TranslateFaqForm
                     </Button>
                 </div>
 
-                {/* Инпуты (аналог CommonMemberFields, но для FAQ) */}
                 <div className={cn(styles.root, 'common-faq-fields')}>
                     <div className={styles['form-group']}>
                         <InputWithCharacterLimitGroup
-                            label={FAQ_TEXT.FORM?.LABEL?.QUESTION || 'Question'} // Проверь ключи в своих константах
+                            label={FAQ_TEXT.FORM?.LABEL?.QUESTION || 'Question'}
                             isRequired
                             value={formState.question}
                             onChange={handleQuestionChange}
                             id="question"
                             name="question"
-                            maxLength={200} // Поставь нужный лимит
+                            maxLength={200}
                             disabled={isSubmitting || formDisabled}
                             error={errors.question && Array.isArray(errors.question) ? errors.question[0] : undefined}
                         />
@@ -119,7 +116,7 @@ export const TranslateFaqForm = forwardRef<TranslateFaqFormRef, TranslateFaqForm
                             onChange={handleAnswerChange}
                             rows={8}
                             disabled={isSubmitting || formDisabled}
-                            maxLength={1000} // Поставь нужный лимит
+                            maxLength={1000}
                             error={errors.answer}
                         />
                     </div>

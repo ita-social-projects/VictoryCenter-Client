@@ -20,8 +20,8 @@ import { FaqSearchItem } from '../faq-search-item/FaqSearchItem';
 import { mapFaqQuestionDtoToModel } from '@/utils/functions/mappers/admin/faq/faq-mappers';
 import axios from 'axios';
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
+import { TranslateFaqModal } from '../faq-modals/translate-faq-modal/TranslateFaqModal';
 import './FaqPanelContent.scss';
-import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
@@ -89,6 +89,7 @@ export const FaqPanelContent = () => {
         onLanguageChange,
         translationStatusFilter,
         onTranslationStatusFilterChange,
+        retryFetchLanguages,
     } = useLocalizationToolkit({ setErrorState });
 
     const isAnyModalOpened = useMemo(() => {
@@ -108,12 +109,28 @@ export const FaqPanelContent = () => {
         }),
         [updateModalState],
     );
+
     const handleTranslateFaqModalOpen = useCallback(
         (faq: FaqQuestion) => {
             if (isAnyModalOpened) return;
             updateModalState({ faqToTranslate: faq });
         },
         [isAnyModalOpened, updateModalState],
+    );
+
+    const handleTranslateFaqSuccess = useCallback(
+        (updatedFaq: FaqQuestion) => {
+            setFaqs((prevFaqs) => prevFaqs.map((faq) => (faq.id === updatedFaq.id ? updatedFaq : faq)));
+
+            updateModalState({ faqToTranslate: null });
+
+            if (updatedFaq.status === VisibilityStatus.Published) {
+                addToast(COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_PUBLISHED_SUCCESS, ToastType.Success);
+            } else {
+                addToast(COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS, ToastType.Success);
+            }
+        },
+        [updateModalState, addToast],
     );
 
     const resetFaqsState = useCallback(() => {
@@ -199,9 +216,6 @@ export const FaqPanelContent = () => {
         },
         [setErrorState, listSize, statusFilter, client, visitorPages, translationStatusFilter],
     );
-
-    // TODO: Implement search functionality
-    // const handleSearchQueryByName = useCallback((_: string) => {}, []);
 
     const onStatusFilterChange = useCallback((status: VisibilityStatus | undefined) => {
         setStatusFilter(status);
@@ -330,8 +344,8 @@ export const FaqPanelContent = () => {
             });
 
             currentItemsCountRef.current += 1;
-
             updateModalState({ isAddFaqModalOpen: false });
+
             if (faq.status === VisibilityStatus.Published) {
                 addToast(FAQ_TEXT.MESSAGE.DONT_FORGET_TO_ORDER, ToastType.Info);
             }
@@ -341,20 +355,22 @@ export const FaqPanelContent = () => {
 
     const handleEditFaq = useCallback(
         (updatedFaq: FaqQuestion) => {
-            const belongsToSelectedPage = updatedFaq.pages.some((p) => p.id === selectedVisitorPage?.id);
-            const passesStatusFilter = statusFilter === undefined || updatedFaq.status === statusFilter;
+            const mappedFaq = mapFaqQuestionDtoToModel(updatedFaq as any, visitorPages);
+
+            const belongsToSelectedPage = mappedFaq.pages.some((p) => p.id === selectedVisitorPage?.id);
+            const passesStatusFilter = statusFilter === undefined || mappedFaq.status === statusFilter;
 
             setFaqs((prevFaqs) => {
                 if (belongsToSelectedPage && passesStatusFilter) {
-                    return prevFaqs.map((faq) => (faq.id === updatedFaq.id ? updatedFaq : faq));
+                    return prevFaqs.map((faq) => (faq.id === mappedFaq.id ? mappedFaq : faq));
                 } else {
-                    return prevFaqs.filter((faq) => faq.id !== updatedFaq.id);
+                    return prevFaqs.filter((faq) => faq.id !== mappedFaq.id);
                 }
             });
 
             updateModalState({ faqToEdit: null });
         },
-        [updateModalState, selectedVisitorPage?.id, statusFilter],
+        [updateModalState, selectedVisitorPage?.id, statusFilter, visitorPages],
     );
 
     const handleDeleteFaq = useCallback(
@@ -368,42 +384,38 @@ export const FaqPanelContent = () => {
         [updateModalState],
     );
 
+    const englishLanguage = useMemo(() => allLanguages.find((l) => l.code === 'en'), [allLanguages]);
+
     const renderFaqItem = useCallback(
         (faq: FaqQuestion) => {
+            if (!selectedLanguage) return null;
+
+            const component = (
+                <FaqComponent
+                    key={faq.id}
+                    faq={faq}
+                    handleOnDeleteFaq={handleDeleteFaqModalOpen}
+                    handleOnEditFaq={handleEditFaqModalOpen}
+                    handleOnTranslateFaq={handleTranslateFaqModalOpen}
+                    language={selectedLanguage}
+                    translationLanguages={translationLanguages}
+                />
+            );
+
             return statusFilter === undefined ? (
-                selectedLanguage ? (
-                    <DraggableListItem
-                        key={faq.id}
-                        entity={faq}
-                        id={faq.id}
-                        ariaLabel={FAQ_TEXT.ACTIONS.REORDER}
-                        renderEntityComponent={(q) => (
-                            <FaqComponent
-                                key={q.id}
-                                faq={q}
-                                handleOnDeleteFaq={handleDeleteFaqModalOpen}
-                                handleOnEditFaq={handleEditFaqModalOpen}
-                                language={selectedLanguage}
-                                translationLanguages={translationLanguages}
-                            />
-                        )}
-                        entities={faqs}
-                        idSelector={(q) => q.id}
-                        onEntitiesReordered={handleEntitiesReordered}
-                    />
-                ) : null
-            ) : selectedLanguage ? (
-                <div className="nondraggable-faq-item-wrapper">
-                    <FaqComponent
-                        key={faq.id}
-                        faq={faq}
-                        handleOnDeleteFaq={handleDeleteFaqModalOpen}
-                        handleOnEditFaq={handleEditFaqModalOpen}
-                        language={selectedLanguage}
-                        translationLanguages={translationLanguages}
-                    />
-                </div>
-            ) : null;
+                <DraggableListItem
+                    key={faq.id}
+                    entity={faq}
+                    id={faq.id}
+                    ariaLabel={FAQ_TEXT.ACTIONS.REORDER}
+                    renderEntityComponent={() => component}
+                    entities={faqs}
+                    idSelector={(q) => q.id}
+                    onEntitiesReordered={handleEntitiesReordered}
+                />
+            ) : (
+                <div className="nondraggable-faq-item-wrapper">{component}</div>
+            );
         },
         [
             handleDeleteFaqModalOpen,
@@ -411,6 +423,7 @@ export const FaqPanelContent = () => {
             handleEntitiesReordered,
             faqs,
             statusFilter,
+            handleTranslateFaqModalOpen,
             selectedLanguage,
             translationLanguages,
         ],
@@ -489,6 +502,16 @@ export const FaqPanelContent = () => {
                 faqToDelete={modalState.faqToDelete}
                 onDeleteFaq={handleDeleteFaq}
             />
+
+            {englishLanguage && (
+                <TranslateFaqModal
+                    isOpen={!!modalState.faqToTranslate}
+                    onClose={closeModalActions.translateFaq}
+                    faqToTranslate={modalState.faqToTranslate}
+                    onTranslateFaq={handleTranslateFaqSuccess}
+                    language={englishLanguage!}
+                />
+            )}
 
             <ToastContainer />
         </div>

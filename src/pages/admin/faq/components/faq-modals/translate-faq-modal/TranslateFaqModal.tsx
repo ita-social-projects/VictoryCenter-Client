@@ -5,6 +5,7 @@ import { LocalizationLanguage } from '@/types/common/language';
 import { ModalMode } from '@/types/admin/common';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { TranslateFaqForm, TranslateFaqFormRef, TranslateFaqFormValues } from './TranslateFaqForm';
+import { useTranslateFaq } from '@/hooks/admin/use-translate-faq/useTranslateFaq';
 
 interface TranslateFaqModalProps {
     isOpen: boolean;
@@ -21,43 +22,38 @@ export const TranslateFaqModal = ({
     onTranslateFaq,
     language,
 }: TranslateFaqModalProps) => {
-    // Реф для доступа к методам формы
     const formRef = useRef<TranslateFaqFormRef>(null);
-
-    // Стейт валидности для кнопки "Сохранить"
     const [isFormValid, setIsFormValid] = useState(false);
 
-    // --- ЗАГЛУШКИ ДЛЯ API STATE ---
-    // В реальном коде это придет из хука useTranslateFaq
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-
-    // 1. Определяем, есть ли уже перевод (Logic)
     const existingLocalization = useMemo(() => {
-        // ВАЖНО: Проверь, как в типе FaqQuestion называется массив локализаций.
-        // Обычно это 'localizations'. Если TypeScript ругается, добавь 'any' или обнови тип.
-        // return faqToTranslate?.localizations?.find((loc) => loc.language.id === language.id);
+        if (!faqToTranslate?.localizations) return null;
 
-        // ПОКА ВОЗВРАЩАЕМ NULL (как будто перевода нет, режим создания)
-        return null;
+        return faqToTranslate.localizations.find((loc) => loc.language?.id === language.id);
     }, [faqToTranslate, language.id]);
 
     const mode = existingLocalization ? ModalMode.Edit : ModalMode.Add;
     const isEditMode = mode === ModalMode.Edit;
 
-    // 2. Готовим начальные данные для формы
+    const { translateFaq, isSubmitting, error } = useTranslateFaq({
+        faq: faqToTranslate,
+        language,
+        mode,
+        onSuccess: (updatedFaq) => {
+            onTranslateFaq(updatedFaq);
+            onClose();
+        },
+    });
+
     const initialData = useMemo<TranslateFaqFormValues | null>(() => {
         if (!isEditMode || !existingLocalization) return null;
 
         return {
-            question: existingLocalization.question, // или questionText
-            answer: existingLocalization.answer, // или answerText
+            question: existingLocalization.questionText || '',
+            answer: existingLocalization.answerText || '',
         };
     }, [existingLocalization, isEditMode]);
 
-    // 3. Обработчики
     const handleSaveClick = () => {
-        // Родитель (модалка) пинает ребенка (форму)
         if (!formRef.current?.isValid()) return;
         formRef.current.submit();
     };
@@ -66,31 +62,8 @@ export const TranslateFaqModal = ({
         return formRef.current?.isDirty() ?? false;
     };
 
-    // 4. Submit (ЗАГЛУШКА API)
     const handleFormSubmit = async (data: TranslateFaqFormValues) => {
-        setIsSubmitting(true);
-        setError(null);
-
-        console.log('SENDING DATA TO API:', {
-            faqId: faqToTranslate?.id,
-            languageId: language.id,
-            data,
-        });
-
-        // Эмуляция задержки сети
-        setTimeout(() => {
-            setIsSubmitting(false);
-
-            // Эмуляция успеха: возвращаем обновленный объект
-            // В реальности тут будет ответ от сервера
-            const mockUpdatedFaq = {
-                ...faqToTranslate!,
-                // Тут мы бы добавили новую локализацию в массив
-            };
-
-            onTranslateFaq(mockUpdatedFaq);
-            onClose();
-        }, 1000);
+        await translateFaq(data);
     };
 
     if (!faqToTranslate) return null;
@@ -109,7 +82,6 @@ export const TranslateFaqModal = ({
             isFormValid={isFormValid}
             checkIsDirty={checkIsDirty}
         >
-            {/* Блок ошибки */}
             {error && (
                 <div className="error-message" style={{ color: 'red', marginBottom: '10px' }}>
                     {error}

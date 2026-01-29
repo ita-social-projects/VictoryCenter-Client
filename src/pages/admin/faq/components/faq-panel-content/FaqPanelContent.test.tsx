@@ -86,7 +86,14 @@ jest.mock('../faq-modals/faq-modal/FaqModal', () => {
                                 };
                                 props.onAddFaq(mockNewFaq);
                             } else if (isEditMode && props.onEditFaq && props.faqToEdit) {
-                                props.onEditFaq({ ...props.faqToEdit, questionText: 'Updated FAQ' });
+                                // Return FAQ in DTO format (with pageIds instead of pages)
+                                const updatedFaq = {
+                                    ...props.faqToEdit,
+                                    questionText: 'Updated FAQ',
+                                    pageIds: props.faqToEdit.pages.map((p: any) => p.id),
+                                    localizations: props.faqToEdit.localizations || [],
+                                };
+                                props.onEditFaq(updatedFaq);
                             }
                             props.onClose();
                         }}

@@ -24,6 +24,22 @@ export interface FaqLocalizableFields {
     answerText: string;
 }
 
+export interface FaqLocalizationDto extends EntityLocalizationDto, FaqLocalizableFields {
+    entityId: number;
+}
+
+export type CreateFaqLocalizationDto = {
+    entityId: number;
+    languageId: number;
+    questionText: string;
+    answerText?: string | null;
+};
+
+export type UpdateFaqLocalizationDto = {
+    questionText: string;
+    answerText?: string | null;
+};
+
 export interface FaqQuestionDto extends FaqLocalizableFields, EntityWithDtoLocalizations<FaqLocalizationDto> {
     id: number;
     questionText: string;

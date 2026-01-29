@@ -56,6 +56,52 @@ describe('TextAreaWithBulletBehavior', () => {
         expect(handleChange.mock.calls.length).toBe(callCount);
     });
 
+    it('should return bullet prefix for empty text in ensureBulletPrefix logic', () => {
+        renderComponent('');
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+
+        fireEvent.change(textarea, { target: { value: '   ' } });
+        fireEvent.blur(textarea);
+    });
+
+    it('should stop Enter key behavior if there is no space even for a partial bullet', () => {
+        const shortMax = 10;
+        render(
+            <TextAreaWithBulletBehavior
+                id="test"
+                name="test"
+                value="• 1234567"
+                onChange={handleChange}
+                maxLength={shortMax}
+            />,
+        );
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+        textarea.selectionStart = 9;
+        textarea.selectionEnd = 9;
+
+        fireEvent.keyDown(textarea, { key: 'Enter', code: 'Enter' });
+
+        expect(handleChange).not.toHaveBeenCalled();
+    });
+
+    it('should trigger onKeyDown prop if provided', () => {
+        const onKeyDownMock = jest.fn();
+        const shortMax = 10;
+        render(
+            <TextAreaWithBulletBehavior
+                id="test"
+                name="test"
+                value="• test"
+                onChange={handleChange}
+                maxLength={shortMax}
+                onKeyDown={onKeyDownMock}
+            />,
+        );
+        const textarea = screen.getByRole('textbox');
+        fireEvent.keyDown(textarea, { key: 'a' });
+        expect(onKeyDownMock).toHaveBeenCalled();
+    });
+
     it('should prepend bullet on blur if text does not start with bullet', () => {
         renderComponent('Line without bullet');
         const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;

@@ -9,7 +9,7 @@ import * as useCardValidationModule from '../../../../../../hooks/admin/use-sect
 jest.mock('@/utils/functions/formatters/text-formatters');
 jest.mock('@/hooks/admin/use-section-card-validation/useCardValidation');
 jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
-    InputWithCharacterLimitGroup: ({ value, onChange, onBlur, error, label, ...props }: any) => (
+    InputWithCharacterLimitGroup: ({ value, onChange, onBlur, error, label, isRequired, ...props }: any) => (
         <div data-testid="input-with-limit">
             <label>{label}</label>
             <input
@@ -25,7 +25,7 @@ jest.mock('@/components/admin/input-groups/input-with-character-limit-group/Inpu
 }));
 
 jest.mock('../CardDescriptionField', () => ({
-    CardDescriptionField: ({ value, onChange, onBlur, error, label, ...props }: any) => (
+    CardDescriptionField: ({ value, onChange, onBlur, error, label, isRequired, ...props }: any) => (
         <div data-testid="card-description-field">
             <label>{label}</label>
             <textarea
@@ -187,6 +187,51 @@ describe('TitleDescriptionCard', () => {
             await userEvent.type(descriptionInput, 'New');
 
             expect(mockHandleChange).toHaveBeenCalled();
+        });
+
+        it('should call onTitleChange when validation hook triggers change', async () => {
+            const onTitleChangeMock = jest.fn();
+
+            (useCardValidationModule.useCardValidation as jest.Mock).mockImplementation(({ onChange }) => ({
+                error: null,
+                handleChange: (v: string) => onChange(v),
+                handleBlur: jest.fn(),
+            }));
+
+            render(
+                <TitleDescriptionCard card={mockCard} index={5} isEditable={true} onTitleChange={onTitleChangeMock} />,
+            );
+
+            const titleInput = screen.getByTestId('input-card-title-5');
+            await userEvent.type(titleInput, 'A');
+
+            expect(onTitleChangeMock).toHaveBeenCalledWith(5, 'Test TitleA');
+        });
+
+        it('should call onDescriptionChange when validation hook triggers change', async () => {
+            const onDescriptionChangeMock = jest.fn();
+
+            (useCardValidationModule.useCardValidation as jest.Mock)
+                .mockReturnValueOnce({ error: null, handleChange: jest.fn(), handleBlur: jest.fn() })
+                .mockImplementationOnce(({ onChange }) => ({
+                    error: null,
+                    handleChange: (v: string) => onChange(v),
+                    handleBlur: jest.fn(),
+                }));
+
+            render(
+                <TitleDescriptionCard
+                    card={mockCard}
+                    index={0}
+                    isEditable={true}
+                    onDescriptionChange={onDescriptionChangeMock}
+                />,
+            );
+
+            const descriptionInput = screen.getByTestId('textarea-card-description-0');
+            await userEvent.type(descriptionInput, 'B');
+
+            expect(onDescriptionChangeMock).toHaveBeenCalledWith(0, 'Test DescriptionB');
         });
     });
 });

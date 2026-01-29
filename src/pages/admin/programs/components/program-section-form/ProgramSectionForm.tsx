@@ -77,6 +77,32 @@ export const ProgramSectionForm = ({
         [onSectionChange],
     );
 
+    const handleCardContentChange = useCallback(
+        (index: number, value: string, type: ContentType.Title | ContentType.Description) => {
+            setLocalSection((prev) => {
+                const filteredContents = prev.contents
+                    .filter((c) => c.contentType === type)
+                    .sort((a, b) => a.order - b.order);
+
+                const target = filteredContents[index];
+                if (!target) return prev;
+
+                const updatedContents = prev.contents.map((c) =>
+                    c === target
+                        ? type === ContentType.Title
+                            ? { ...c, title: value }
+                            : { ...c, description: value }
+                        : c,
+                );
+
+                const updatedSection = { ...prev, contents: updatedContents };
+                onSectionChange?.(updatedSection);
+                return updatedSection;
+            });
+        },
+        [onSectionChange],
+    );
+
     const updateImageContent = useCallback(
         (order: number, file: ImageValues | null, prev: ProgramSection): ProgramSection => {
             const updatedContents = prev.contents.map((c) =>
@@ -128,38 +154,10 @@ export const ProgramSectionForm = ({
             onImagesChange: handleImagesChange,
             ...(isCardTemplate
                 ? {
-                      onCardTitleChange: (index: number, value: string) => {
-                          setLocalSection((prev) => {
-                              const titles = prev.contents
-                                  .filter((c) => c.contentType === ContentType.Title)
-                                  .sort((a, b) => a.order - b.order);
-                              const target = titles[index];
-                              if (!target) return prev;
-
-                              const updatedContents = prev.contents.map((c) =>
-                                  c === target ? { ...c, title: value } : c,
-                              );
-                              const updatedSection = { ...prev, contents: updatedContents };
-                              onSectionChange?.(updatedSection);
-                              return updatedSection;
-                          });
-                      },
-                      onCardDescriptionChange: (index: number, value: string) => {
-                          setLocalSection((prev) => {
-                              const descriptions = prev.contents
-                                  .filter((c) => c.contentType === ContentType.Description)
-                                  .sort((a, b) => a.order - b.order);
-                              const target = descriptions[index];
-                              if (!target) return prev;
-
-                              const updatedContents = prev.contents.map((c) =>
-                                  c === target ? { ...c, description: value } : c,
-                              );
-                              const updatedSection = { ...prev, contents: updatedContents };
-                              onSectionChange?.(updatedSection);
-                              return updatedSection;
-                          });
-                      },
+                      onCardTitleChange: (index: number, value: string) =>
+                          handleCardContentChange(index, value, ContentType.Title),
+                      onCardDescriptionChange: (index: number, value: string) =>
+                          handleCardContentChange(index, value, ContentType.Description),
                   }
                 : {}),
         },

@@ -1,5 +1,5 @@
 import { forwardRef, useState } from 'react';
-import classNames from 'classnames';
+import cn from 'classnames';
 import { ReactComponent as RemoveIcon } from '@/assets/icons/remove-query.svg';
 import './TextAreaWithCharacterLimit.scss';
 
@@ -60,7 +60,7 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
         return (
             <div className="char-limit-textarea">
                 <div
-                    className={classNames('char-limit-textarea__wrapper', {
+                    className={cn('char-limit-textarea__wrapper', {
                         'char-limit-textarea__wrapper--disabled': disabled,
                         'char-limit-textarea__wrapper--focused': isFocused && !disabled,
                     })}
@@ -83,7 +83,7 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
                     {showClearButton && (
                         <button
                             type="button"
-                            className={classNames('char-limit-textarea__clear-button', {
+                            className={cn('char-limit-textarea__clear-button', {
                                 'char-limit-textarea__clear-button--error': hasError,
                             })}
                             onMouseDown={(e) => e.preventDefault()}

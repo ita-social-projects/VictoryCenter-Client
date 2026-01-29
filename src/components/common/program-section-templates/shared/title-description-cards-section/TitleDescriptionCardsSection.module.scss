@@ -1,4 +1,4 @@
-@use '@/assets/sass/variables/colors' as colors;
+@use '@/assets/sass/variables/colors' as c;
 @use '@/assets/sass/mixins/typography.mixins' as type;
 
 .td-cards {
@@ -25,7 +25,7 @@
 }
 
 .td-card {
-    background: colors.$light-blue-50;
+    background: c.$light-blue-50;
     border-radius: 16px;
     padding: 1rem;
 

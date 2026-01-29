@@ -307,6 +307,71 @@ describe('addProgram', () => {
 
         expect(result.categories).toHaveLength(0);
     });
+
+    it('should not upload images when preview/background are existing image objects without base64', async () => {
+        const existingPreviewImage = { id: 200, url: 'http://example.com/existing-preview.png', mimeType: 'image/png' };
+        const existingBackgroundImage = {
+            id: 201,
+            url: 'http://example.com/existing-background.png',
+            mimeType: 'image/png',
+        };
+
+        const programData = getValidProgramData({
+            previewImage: existingPreviewImage as any,
+            previewImageId: 200,
+            backgroundImage: existingBackgroundImage as any,
+            backgroundImageId: 201,
+        });
+
+        mockClient.post.mockResolvedValueOnce({
+            data: {
+                ...programData,
+                id: 13,
+                previewImage: existingPreviewImage,
+                backgroundImage: existingBackgroundImage,
+                previewImageId: 200,
+                backgroundImageId: 201,
+            },
+        });
+
+        mockClient.get.mockResolvedValueOnce({ data: mockCategories });
+
+        const result = await ProgramsApi.addProgram(mockClient, programData);
+
+        expect(ImageApi.post).not.toHaveBeenCalled();
+        expect(mockClient.post).toHaveBeenCalledWith(
+            API_ROUTES.PROGRAMS.BASE,
+            expect.objectContaining({
+                previewImageId: 200,
+                backgroundImageId: 201,
+            }),
+        );
+        expect(result.previewImage).toEqual(existingPreviewImage);
+        expect(result.backgroundImage).toEqual(existingBackgroundImage);
+    });
+
+    it('should preserve slug when provided and map categories from categories endpoint', async () => {
+        const programData = getValidProgramData({ slug: 'my-program-slug' });
+
+        (ImageApi.post as jest.Mock).mockResolvedValueOnce({ id: 100 }).mockResolvedValueOnce({ id: 101 });
+
+        mockClient.post.mockResolvedValueOnce({
+            data: {
+                ...programData,
+                id: 13,
+                slug: 'my-program-slug',
+                previewImageId: 100,
+                backgroundImageId: 101,
+            },
+        });
+
+        mockClient.get.mockResolvedValueOnce({ data: mockCategories });
+
+        const result = await ProgramsApi.addProgram(mockClient, programData);
+
+        expect(result.slug).toBe('my-program-slug');
+        expect(result.categories).toEqual(mockCategories);
+    });
 });
 
 describe('editProgram', () => {
@@ -390,6 +455,34 @@ describe('editProgram', () => {
         expect(ImageApi.delete).toHaveBeenCalledWith(mockClient, 55);
         expect(ImageApi.delete).toHaveBeenCalledWith(mockClient, 56);
     });
+
+    it('should not delete images when imageIdToDelete is null or equals finalImageId', async () => {
+        (ImageApi.getUpdateImageId as jest.Mock).mockReset();
+        (ImageApi.getUpdateImageId as jest.Mock)
+            .mockResolvedValueOnce({ finalImageId: 101, imageIdToDelete: 101 })
+            .mockResolvedValueOnce({ finalImageId: 102, imageIdToDelete: null });
+
+        const programData = getValidProgramData({
+            id: 1,
+            previewImageId: 101,
+            backgroundImageId: 102,
+        });
+
+        mockClient.put.mockResolvedValueOnce({
+            data: programData,
+        });
+
+        await ProgramsApi.editProgram(programData, mockClient);
+
+        expect(mockClient.put).toHaveBeenCalledWith(
+            `${API_ROUTES.PROGRAMS.BASE}/${programData.id}`,
+            expect.objectContaining({
+                previewImageId: 101,
+                backgroundImageId: 102,
+            }),
+        );
+        expect(ImageApi.delete).not.toHaveBeenCalled();
+    });
 });
 
 describe('deleteProgram', () => {
@@ -424,6 +517,26 @@ describe('addProgramCategory', () => {
         const result = await ProgramsCategoriesApi.addProgramCategory(categoryData, mockClient);
 
         expect(result.id).toBeDefined();
+        expect(result.name).toBe(categoryData.name);
+        expect(result.programsCount).toBe(0);
+    });
+
+    it('should set programsCount to 0 when created category has no programs property', async () => {
+        const categoryData: ProgramCategoryCreateUpdate = {
+            id: null,
+            name: 'Category Without Programs',
+        };
+
+        mockClient.post.mockResolvedValueOnce({
+            data: {
+                id: 10,
+                name: categoryData.name,
+            },
+        });
+
+        const result = await ProgramsCategoriesApi.addProgramCategory(categoryData, mockClient);
+
+        expect(result.id).toBe(10);
         expect(result.name).toBe(categoryData.name);
         expect(result.programsCount).toBe(0);
     });
@@ -639,6 +752,57 @@ describe('fetchProgramSearchItems', () => {
         const actualNames = result.items.map((item) => item.name);
 
         expect(actualNames).toEqual(expectedOrder);
+    });
+
+    it('should map programs to suggestions and pass params and signal correctly', async () => {
+        const searchTerm = 'therapy';
+        const signal = {} as AbortSignal;
+
+        const apiPrograms: Program[] = [
+            {
+                id: 501,
+                name: 'Therapy Program',
+                description: 'Desc',
+                status: VisibilityStatus.Published,
+                previewImage: null,
+                backgroundImage: null,
+                location: 'Loc',
+                participantsCount: '1',
+                meetingsCount: '1',
+                categories: [
+                    { id: 1, name: 'Cat A', programsCount: 0 },
+                    { id: 2, name: 'Cat B', programsCount: 0 },
+                ],
+                sections: [],
+                slug: 'therapy-program',
+            },
+        ];
+
+        mockClient.get.mockResolvedValueOnce({
+            data: {
+                items: apiPrograms,
+                totalItemsCount: 1,
+            },
+        });
+
+        const result = await ProgramsApi.fetchProgramSearchItems(mockClient, searchTerm, 2, 7, signal);
+
+        expect(mockClient.get).toHaveBeenCalledWith(`${API_ROUTES.PROGRAMS.SEARCH}`, {
+            params: {
+                SearchQuery: searchTerm,
+                offset: 2,
+                limit: 7,
+            },
+            signal,
+        });
+
+        expect(result.totalItemsCount).toBe(1);
+        expect(result.items).toHaveLength(1);
+        expect(result.items[0]).toEqual({
+            id: 501,
+            name: 'Therapy Program',
+            categories: ['Cat A', 'Cat B'],
+        });
     });
 });
 

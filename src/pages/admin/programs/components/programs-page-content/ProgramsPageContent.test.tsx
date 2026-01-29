@@ -302,10 +302,7 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                     data-testid="trigger-edit-category"
                     onClick={() => props.onEditCategory({ id: 2, name: 'Category B Updated', programsCount: 1 })}
                 />
-
                 <button data-testid="trigger-delete-category" onClick={() => props.onDeleteCategory(1)} />
-                <button data-testid="trigger-delete-category-1" onClick={() => props.onDeleteCategory(1)} />
-                <button data-testid="trigger-delete-category-2" onClick={() => props.onDeleteCategory(2)} />
             </div>
         ),
     };
@@ -458,7 +455,7 @@ describe('ProgramsPageContent', () => {
         });
     });
 
-    it('switches to search view on program select and clears on request', async () => {
+    it('switches to search view on program select (number or string) and clears on request', async () => {
         render(<ProgramsPageContent />);
 
         await waitFor(() => {
@@ -468,9 +465,24 @@ describe('ProgramsPageContent', () => {
         fireEvent.click(screen.getByTestId('select-program'));
 
         await waitFor(() => {
-            expect(mockProgramsApi.fetchProgramById).toHaveBeenCalledWith(1, expect.any(Object));
+            expect(mockProgramsApi.fetchProgramById).toHaveBeenCalledTimes(1);
+            expect(mockProgramsApi.fetchProgramById).toHaveBeenNthCalledWith(1, 1, expect.any(Object));
             expect(screen.getAllByTestId('program-item')).toHaveLength(1);
             expect(screen.getByText('Alpha')).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByTestId('clear-search'));
+
+        await waitFor(() => {
+            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
+        });
+
+        fireEvent.click(screen.getByTestId('select-program-string'));
+
+        await waitFor(() => {
+            expect(mockProgramsApi.fetchProgramById).toHaveBeenCalledTimes(2);
+            expect(mockProgramsApi.fetchProgramById).toHaveBeenNthCalledWith(2, 1, expect.any(Object));
+            expect(screen.getAllByTestId('program-item')).toHaveLength(1);
         });
 
         fireEvent.click(screen.getByTestId('clear-search'));
@@ -671,21 +683,6 @@ describe('ProgramsPageContent', () => {
         });
     });
 
-    it('handles suggestion select with string id', async () => {
-        render(<ProgramsPageContent />);
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-        });
-
-        fireEvent.click(screen.getByTestId('select-program-string'));
-
-        await waitFor(() => {
-            expect(mockProgramsApi.fetchProgramById).toHaveBeenCalledWith(1, expect.any(Object));
-            expect(screen.getAllByTestId('program-item')).toHaveLength(1);
-        });
-    });
-
     it('calls fetchProgramSearchItems through toolbar and forwards cancellation signal', async () => {
         render(<ProgramsPageContent />);
 
@@ -842,7 +839,7 @@ describe('ProgramsPageContent', () => {
             expect(screen.getByText('Category B Updated')).toBeInTheDocument();
         });
 
-        fireEvent.click(screen.getByTestId('trigger-delete-category-1'));
+        fireEvent.click(screen.getByTestId('trigger-delete-category'));
 
         await waitFor(() => {
             expect(screen.queryByTestId('category-1')).not.toBeInTheDocument();

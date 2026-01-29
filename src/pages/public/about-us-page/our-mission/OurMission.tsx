@@ -5,7 +5,7 @@ import { ContentType } from '@/types/common/about-us';
 import { useTranslation } from 'react-i18next';
 import styles from './OurMission.module.scss';
 import { Button } from '@/components/public/ui/button';
-import { SafeHtml } from '@/components/common/safe-html/SafeHtml';
+import { SafeHtml } from '@/components/common/safe-html';
 
 export interface OurMissionProps {
     content?: AboutUsContent[] | null;
@@ -18,13 +18,13 @@ export const OurMission = ({ content, description }: OurMissionProps) => {
 
     const descriptionValue = content?.find((x) => x.contentType === ContentType.Description)?.description ?? '';
 
-    const sanitizedDescription = description ?? descriptionValue;
+    const finalDescription = description ?? descriptionValue;
 
     return (
         <div className={styles.root}>
             <h2 className={styles.title}>{t('WHAT_WE_DO')}</h2>
             <div className={styles.block}>
-                <SafeHtml as="p" className={styles.text} html={sanitizedDescription} />
+                <SafeHtml as="p" className={styles.text} html={finalDescription} />
                 <div className={styles.actions}>
                     <Button href={PUBLIC_ROUTES.PROGRAMS.FULL} icon={ArrowIcon} iconPosition="right" variant="tertiary">
                         {t('GO_TO_PROGRAMS')}

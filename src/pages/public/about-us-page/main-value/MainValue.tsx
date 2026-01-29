@@ -4,7 +4,7 @@ import styles from './MainValue.module.scss';
 import { Swiper } from '@/components/public/swiper/Swiper';
 import { AboutUsContent } from '@/types/public/about-us-page';
 import cn from 'classnames';
-import { SafeHtml } from '@/components/common/safe-html/SafeHtml';
+import { SafeHtml } from '@/components/common/safe-html';
 
 export interface MainValuesProps {
     content: AboutUsContent[] | null;

@@ -5,7 +5,7 @@ import { ContentType } from '@/types/common/about-us';
 import { useTranslation } from 'react-i18next';
 import defaultOurTeamImage from '@/assets/images/public/about-us-page/our-team.jpg';
 import { Button } from '@/components/public/ui/button';
-import { SafeHtml } from '@/components/common/safe-html/SafeHtml';
+import { SafeHtml } from '@/components/common/safe-html';
 
 export interface OurTeamProps {
     content?: AboutUsContent[] | null;

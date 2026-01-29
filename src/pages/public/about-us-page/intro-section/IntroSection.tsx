@@ -2,7 +2,7 @@ import background from '@/assets/images/public/about-us-page/background.jpg';
 import styles from './IntroSection.module.scss';
 import { ContentType } from '@/types/common/about-us';
 import { AboutUsContent } from '@/types/public/about-us-page';
-import { SafeHtml } from '@/components/common/safe-html/SafeHtml';
+import { SafeHtml } from '@/components/common/safe-html';
 
 export interface AboutUsIntroProps {
     content?: AboutUsContent[] | null;

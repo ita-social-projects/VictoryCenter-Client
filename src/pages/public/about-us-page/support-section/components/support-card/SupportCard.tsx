@@ -3,7 +3,7 @@ import { ABOUT_US_DATA } from '@/const/public/about-us-page';
 import { AboutUsContent } from '@/types/public/about-us-page';
 import styles from './SupportCard.module.scss';
 import cn from 'classnames';
-import { SafeHtml } from '@/components/common/safe-html/SafeHtml';
+import { SafeHtml } from '@/components/common/safe-html';
 
 interface SupportCardProps {
     card: AboutUsContent;

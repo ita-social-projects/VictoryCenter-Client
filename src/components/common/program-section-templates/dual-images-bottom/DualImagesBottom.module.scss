@@ -4,7 +4,7 @@ $img-number: 3;
 
 .container {
     aspect-ratio: 1460 / 1235;
-    gap: 1rem;
+    gap: 16px;
 }
 
 .top-section {
@@ -14,7 +14,7 @@ $img-number: 3;
 .bottom-section {
     flex: 0 0 49%;
     justify-content: end;
-    padding-bottom: 1rem;
+    padding-bottom: 16px;
 }
 
 .image {

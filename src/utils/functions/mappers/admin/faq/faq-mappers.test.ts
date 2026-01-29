@@ -16,6 +16,7 @@ describe('mapFaqQuestionDtoToModel', () => {
             answerText: 'This is a test.',
             status: VisibilityStatus.Published,
             pageIds: [1, 3],
+            localizations: [],
         };
 
         const result = mapFaqQuestionDtoToModel(dto, pages);
@@ -29,6 +30,7 @@ describe('mapFaqQuestionDtoToModel', () => {
                 { id: 1, title: 'Home', slug: 'home' },
                 { id: 3, title: 'Contact', slug: 'contact' },
             ],
+            localizations: [],
         });
     });
 
@@ -39,6 +41,7 @@ describe('mapFaqQuestionDtoToModel', () => {
             answerText: 'No pages should match.',
             status: VisibilityStatus.Draft,
             pageIds: [99],
+            localizations: [],
         };
 
         const result = mapFaqQuestionDtoToModel(dto, pages);
@@ -53,6 +56,7 @@ describe('mapFaqQuestionDtoToModel', () => {
             answerText: 'No pages.',
             status: VisibilityStatus.Draft,
             pageIds: [],
+            localizations: [],
         };
 
         const result = mapFaqQuestionDtoToModel(dto, pages);

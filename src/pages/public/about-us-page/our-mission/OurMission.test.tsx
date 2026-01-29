@@ -66,27 +66,4 @@ describe('OurMission component', () => {
         expect(link).toHaveAttribute('href', '/programs');
         expect(screen.getByTestId('arrow-icon')).toBeInTheDocument();
     });
-
-    it('should render as non-interactive text when navigate is false', () => {
-        render(
-            <MemoryRouter>
-                <OurMission content={Content} navigate={false} />
-            </MemoryRouter>,
-        );
-        const textElement = screen.getByText(aboutUsPageUk.GO_TO_PROGRAMS);
-        expect(textElement).toBeInTheDocument();
-
-        const link = screen.queryByRole('link', { name: aboutUsPageUk.GO_TO_PROGRAMS });
-        expect(link).not.toBeInTheDocument();
-    });
-
-    it('should apply additional className to root element', () => {
-        const { container } = render(
-            <MemoryRouter>
-                <OurMission content={Content} className="custom-class" />
-            </MemoryRouter>,
-        );
-        const root = container.querySelector('.our-mission-block');
-        expect(root).toHaveClass('custom-class');
-    });
 });

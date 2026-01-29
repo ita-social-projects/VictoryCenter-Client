@@ -3,6 +3,24 @@ import { render, screen } from '@testing-library/react';
 import { CompanyValues } from './CompanyValues';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
+jest.mock('./CompanyValues.module.scss', () => ({
+    root: 'root',
+    swiperSlide: 'swiperSlide',
+    left: 'left',
+    right: 'right',
+}));
+
+jest.mock('./components/value-card/ValueCard.module.scss', () => ({
+    title: 'title',
+    column: 'column',
+    card1: 'card1',
+    card2: 'card2',
+    card3: 'card3',
+    item: 'item',
+    name: 'name',
+    description: 'description',
+}));
+
 jest.mock('@mui/material/useMediaQuery', () => ({
     __esModule: true,
     default: jest.fn(),
@@ -46,17 +64,22 @@ describe('CompanyValues', () => {
         jest.clearAllMocks();
     });
 
-    it('renders wrapper and CustomSwiper', () => {
+    it('renders root wrapper and Swiper', () => {
         (useMediaQuery as jest.Mock).mockReturnValue(false);
-        render(<CompanyValues />);
+        const { container } = render(<CompanyValues />);
+        expect(container.firstChild).toBeInTheDocument();
         expect(screen.getByTestId('custom-swiper')).toBeInTheDocument();
-        expect(document.querySelector('.values-block')).toBeInTheDocument();
     });
 
     it('renders ValueCard groups', () => {
         (useMediaQuery as jest.Mock).mockReturnValue(false);
         render(<CompanyValues />);
-        expect(screen.getAllByTestId(/swiper-group-/).length).toBeGreaterThan(0);
+
+        const groups = screen.getAllByTestId(/swiper-group-/);
+        expect(groups.length).toBeGreaterThan(0);
+
+        const cards = screen.getAllByTestId(/value-card-/);
+        expect(cards.length).toBeGreaterThan(0);
     });
 
     it('updates layout when isTablet changes', () => {
@@ -66,10 +89,10 @@ describe('CompanyValues', () => {
 
         (useMediaQuery as jest.Mock).mockReturnValue(true);
         render(<CompanyValues />);
-        const tabletGroups = screen.getAllByTestId(/swiper-group-/);
+        const tabletGroups = screen.getAllByTestId(/swiper-group-/).length;
 
         expect(desktopGroups).toBeGreaterThan(0);
-        expect(tabletGroups.length).toBeGreaterThan(0);
+        expect(tabletGroups).toBeGreaterThan(0);
     });
 
     it('handles small screen widths gracefully', () => {

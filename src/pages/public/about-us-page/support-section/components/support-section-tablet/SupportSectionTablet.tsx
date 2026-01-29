@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { SupportCard } from '../support-card/SupportCard';
 import { useTranslation } from 'react-i18next';
 import { AboutUsContent } from '@/types/public/about-us-page';
+import styles from './SupportSectionTablet.module.scss';
 
 export interface SupportSectionTabletProps {
     content: AboutUsContent[] | null;
@@ -25,17 +26,17 @@ export const SupportSectionTablet = ({ content }: SupportSectionTabletProps) => 
     if (!content) return null;
 
     return (
-        <div className="support-block">
-            <div className="main-values-title">
-                <h2 className="support-title">{t('SUPPORT_TITLE')}</h2>
+        <div className={styles.root}>
+            <div className={styles.title}>
+                <h2>{t('SUPPORT_TITLE')}</h2>
             </div>
-            <div className="support-columns">
-                <div className="support-col left">
+            <div className={styles.columns}>
+                <div className={styles.column}>
                     {leftColumn.map(({ card, originalIndex }) => (
                         <SupportCard key={card.id} card={card} index={originalIndex} />
                     ))}
                 </div>
-                <div className="support-col right">
+                <div className={styles.column}>
                     {rightColumn.map(({ card, originalIndex }) => (
                         <SupportCard key={card.id} card={card} index={originalIndex} />
                     ))}

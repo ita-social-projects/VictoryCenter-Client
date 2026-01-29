@@ -13,7 +13,7 @@ $img-number: 3;
 .bottom-section {
     flex: 0 0 51%;
     justify-content: end;
-    padding-bottom: 1rem;
+    padding-bottom: 16px;
 }
 
 .image-wrapper {
@@ -26,5 +26,5 @@ $img-number: 3;
 }
 
 .editable {
-    gap: 2rem;
+    gap: 32px;
 }

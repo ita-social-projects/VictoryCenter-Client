@@ -5,7 +5,7 @@ import { Header } from '@/components/public/header/Header';
 import { Footer } from '@/components/public/footer/Footer';
 
 export const PublicLayout = ({ behavior = 'auto' }: { behavior?: 'auto' | 'smooth' }) => {
-    const pathname = useLocation().pathname;
+    const { pathname } = useLocation();
 
     //TODO: temp fix for issue when after redirecting view area would not be on top
     useEffect(() => {

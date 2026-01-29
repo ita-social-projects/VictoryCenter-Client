@@ -47,7 +47,7 @@
 
 .container.editable {
     max-height: 1200px;
-    gap: 2rem;
+    gap: 30px;
 
     .top-section {
         flex: 40%;
@@ -55,7 +55,7 @@
 
     .bottom-section {
         flex: 40%;
-        padding-bottom: 6rem;
+        padding-bottom: 100px;
     }
 
     .image-wrapper {

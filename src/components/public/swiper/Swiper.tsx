@@ -4,43 +4,71 @@ import { Navigation, Pagination, Scrollbar } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/scrollbar';
-
+import { Button, ButtonProps } from '@/components/public/ui/button';
 import { ReactComponent as ArrowRight } from '@/assets/icons/arrow-right.svg';
 import { ReactComponent as ArrowLeft } from '@/assets/icons/arrow-left.svg';
-import { ReactComponent as ChevronRight } from '@/assets/icons/chevron-right.svg';
-import { ReactComponent as ChevronLeft } from '@/assets/icons/chevron-left.svg';
+
+export type ShowScrollbar = { isVisible: true; className: string; classNameDrag: string } | { isVisible: false };
+
+const SWIPER_NAVIGATION_CONFIG = {
+    prev: {
+        icon: ArrowLeft,
+        ariaLabel: 'previous',
+        variant: 'primary-dark' as const,
+    },
+    next: {
+        icon: ArrowRight,
+        ariaLabel: 'next',
+        variant: 'primary-dark' as const,
+    },
+};
+
+interface NavigationButtons {
+    classNamebuttonBlock?: string;
+    prev?: Partial<ButtonProps>;
+    next?: Partial<ButtonProps>;
+}
 
 interface SwiperProps<T> {
     items: T[] | null;
     renderItem: (item: T, index: number) => React.ReactNode;
-    slidesPerView?: number;
-    breakpoints?: Record<number, { slidesPerView: number }>;
-    showScrollbar?: boolean;
+    slidesPerView?: number | 'auto';
+    breakpoints?: Record<number, { slidesPerView: number | 'auto' }>;
+    showScrollbar?: ShowScrollbar;
     onSlideChange?: (activeIndex: number) => void;
-    className?: string;
-    useChevrons?: boolean;
+    classNameSwiperSlide?: string;
+    navigationButtons?: NavigationButtons;
 }
 
 export function Swiper<T>({
     items,
     renderItem,
-    slidesPerView = 1,
+    slidesPerView = 'auto',
     breakpoints = {},
-    showScrollbar = false,
+    showScrollbar = { isVisible: false },
     onSlideChange,
-    className = '',
-    useChevrons = false,
+    classNameSwiperSlide,
+    navigationButtons,
 }: SwiperProps<T>) {
     const swiperRef = useRef<SwiperClass | null>(null);
     const [isPrevEnabled, setIsPrevEnabled] = useState(false);
     const [isNextEnabled, setIsNextEnabled] = useState(true);
+    const { isVisible } = showScrollbar;
+    const isOnlyNextButton = Boolean(navigationButtons?.next && !navigationButtons?.prev);
 
     const handlePrev = useCallback(() => {
         swiperRef.current?.slidePrev();
     }, []);
+
     const handleNext = useCallback(() => {
-        swiperRef.current?.slideNext();
-    }, []);
+        if (!swiperRef.current) return;
+
+        if (isOnlyNextButton && swiperRef.current.isEnd) {
+            swiperRef.current.slideTo(0);
+        } else {
+            swiperRef.current.slideNext();
+        }
+    }, [isOnlyNextButton]);
 
     const handleInit = useCallback(
         (swiper: SwiperClass) => {
@@ -77,18 +105,45 @@ export function Swiper<T>({
 
     const swiperModules = useMemo(() => {
         const modules = [Navigation, Pagination];
-        if (showScrollbar) {
+        if (isVisible) {
             modules.push(Scrollbar);
         }
         return modules;
-    }, [showScrollbar]);
+    }, [isVisible]);
+
+    const prevButtonProps = useMemo(
+        () =>
+            navigationButtons?.prev
+                ? ({
+                      ...SWIPER_NAVIGATION_CONFIG.prev,
+                      ...navigationButtons.prev,
+                  } as ButtonProps)
+                : undefined,
+        [navigationButtons?.prev],
+    );
+
+    const nextButtonProps = useMemo(
+        () =>
+            navigationButtons?.next
+                ? ({
+                      ...SWIPER_NAVIGATION_CONFIG.next,
+                      ...navigationButtons.next,
+                  } as ButtonProps)
+                : undefined,
+        [navigationButtons?.next],
+    );
 
     if (!items || items.length === 0) {
         return null;
     }
 
-    const LeftIcon = useChevrons ? ChevronLeft : ArrowLeft;
-    const RightIcon = useChevrons ? ChevronRight : ArrowRight;
+    const scrollbarConfig = isVisible
+        ? {
+              draggable: true,
+              el: `.${showScrollbar.className}`,
+              dragClass: `${showScrollbar.classNameDrag}`,
+          }
+        : false;
 
     return (
         <>
@@ -101,34 +156,24 @@ export function Swiper<T>({
                 onReachEnd={handleReachEnd}
                 onFromEdge={handleFromEdge}
                 slidesPerView={slidesPerView}
-                scrollbar={{ draggable: true, el: '.custom-scrollbar' }}
+                scrollbar={scrollbarConfig}
                 breakpoints={breakpoints}
             >
                 {items.map((item, index) => (
-                    <SwiperSlide key={index}>{renderItem(item, index)}</SwiperSlide>
+                    <SwiperSlide className={classNameSwiperSlide} key={index}>
+                        {renderItem(item, index)}
+                    </SwiperSlide>
                 ))}
             </SwiperReact>
-            <div className={`button-container ${className}`}>
-                <button
-                    type="button"
-                    onClick={handlePrev}
-                    className="arrow-button arrow-left"
-                    disabled={!isPrevEnabled}
-                    title="Previous slide"
-                    aria-label="Previous slide"
-                >
-                    <LeftIcon className="arrow-icon" />
-                </button>
-                <button
-                    type="button"
-                    onClick={handleNext}
-                    className="arrow-button arrow-right"
-                    disabled={!isNextEnabled}
-                    title="Next slide"
-                    aria-label="Next slide"
-                >
-                    <RightIcon className="arrow-icon" />
-                </button>
+            <div className={navigationButtons?.classNamebuttonBlock}>
+                {prevButtonProps && <Button {...prevButtonProps} onClick={handlePrev} disabled={!isPrevEnabled} />}
+                {nextButtonProps && (
+                    <Button
+                        {...nextButtonProps}
+                        onClick={handleNext}
+                        disabled={isOnlyNextButton ? false : !isNextEnabled}
+                    />
+                )}
             </div>
         </>
     );

@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, createEvent } from '@testing-library/react';
 import { InputWithCharacterLimit, InputWithCharacterLimitProps } from './InputWithCharacterLimit';
 
 describe('InputWithCharacterLimit', () => {
@@ -121,17 +121,31 @@ describe('InputWithCharacterLimit', () => {
 
     it('clears input via clear button and forwards synthetic change event', () => {
         const onChange = jest.fn();
-        renderInputWithCharacterLimit({ value: 'Hello', onChange });
+        render(
+            <InputWithCharacterLimit value="Hello" onChange={onChange} name="testName" id="test-id" maxLength={50} />,
+        );
 
-        focusInput();
+        const btn = screen.getByRole('button', { name: /clear input/i });
 
-        fireEvent.click(getClearButton());
+        fireEvent.focus(screen.getByRole('textbox'));
 
-        expect(onChange).toHaveBeenCalledTimes(1);
-        const arg = onChange.mock.calls[0][0];
-        expect(arg.target.value).toBe('');
-        expect(arg.target.name).toBe('testName');
-        expect(arg.target.id).toBe('test-id');
+        const ev = createEvent.mouseDown(btn);
+        ev.preventDefault = jest.fn();
+        fireEvent(btn, ev);
+
+        expect(ev.preventDefault).toHaveBeenCalled();
+
+        fireEvent.click(btn);
+
+        expect(onChange).toHaveBeenCalledWith(
+            expect.objectContaining({
+                target: expect.objectContaining({
+                    value: '',
+                    name: 'testName',
+                    id: 'test-id',
+                }),
+            }),
+        );
     });
 
     it('sets aria-invalid when current length exceeds maxLength', () => {

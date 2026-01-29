@@ -741,23 +741,25 @@ describe('ProgramsPageContent', () => {
     it('keeps edited program in list when it matches selected category and adds cache buster to image urls', async () => {
         const nowSpy = jest.spyOn(Date, 'now').mockReturnValue(123456);
 
-        render(<ProgramsPageContent />);
+        try {
+            render(<ProgramsPageContent />);
 
-        await waitFor(() => {
-            expect(screen.getByText('Alpha')).toBeInTheDocument();
-        });
+            await waitFor(() => {
+                expect(screen.getByText('Alpha')).toBeInTheDocument();
+            });
 
-        fireEvent.click(screen.getByTestId('trigger-edit-in-category-with-images'));
+            fireEvent.click(screen.getByTestId('trigger-edit-in-category-with-images'));
 
-        await waitFor(() => {
-            expect(screen.getByText('Alpha Edited With Images')).toBeInTheDocument();
-        });
+            await waitFor(() => {
+                expect(screen.getByText('Alpha Edited With Images')).toBeInTheDocument();
+            });
 
-        const edited = (globalThis as any).__lastEditedProgram;
-        expect(edited.previewImage.url).toBe('http://example.com/p.png?cb=123456');
-        expect(edited.backgroundImage.url).toBe('http://example.com/b.png?cb=123456');
-
-        nowSpy.mockRestore();
+            const edited = (globalThis as any).__lastEditedProgram;
+            expect(edited.previewImage.url).toBe('http://example.com/p.png?cb=123456');
+            expect(edited.backgroundImage.url).toBe('http://example.com/b.png?cb=123456');
+        } finally {
+            nowSpy.mockRestore();
+        }
     });
 
     it('ignores edit when original program is not found in local lists', async () => {

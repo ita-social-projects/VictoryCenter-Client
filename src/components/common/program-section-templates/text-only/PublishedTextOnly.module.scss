@@ -1,0 +1,11 @@
+.container {
+    display: flex;
+    width: auto;
+    margin: 0;
+    background-color: #fff;
+    box-sizing: border-box;
+    overflow: hidden;
+    aspect-ratio: 1440 / 511;
+    align-items: flex-start;
+    justify-content: space-between;
+}

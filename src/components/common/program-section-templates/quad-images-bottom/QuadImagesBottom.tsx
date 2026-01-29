@@ -4,6 +4,7 @@ import { ImageValues, Image } from '@/types/common/image';
 import { QUAD_IMAGES_CONFIG } from '@/const/admin/programs';
 import { ProgramSectionMode } from '@/types/common/program-sections';
 import styles from './QuadImagesBottom.module.scss';
+import publishedStyles from './PublishedQuadImagesBottom.module.scss';
 
 export interface QuadImagesBottomProps {
     title?: string;
@@ -24,6 +25,7 @@ export const QuadImagesBottom = ({
     onDescriptionChange,
     onImagesChange,
 }: QuadImagesBottomProps) => {
+    const baseStyles = mode === ProgramSectionMode.Published ? publishedStyles : styles;
     const imageHandlers = images.map((image, index) => ({
         handler: onImagesChange ? (file: ImageValues | null) => onImagesChange(index, file) : undefined,
         key: `image${index + 1}`,
@@ -40,12 +42,12 @@ export const QuadImagesBottom = ({
             mode={mode}
             onTitleChange={onTitleChange}
             onDescriptionChange={onDescriptionChange}
-            className={cn(styles.container, {
+            className={cn(baseStyles.container, {
                 [styles['form-container']]: mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View,
             })}
-            topSectionClassName={styles['top-section']}
-            bottomSectionClassName={styles['bottom-section']}
-            imageWrapperClassName={styles['image-wrapper']}
+            topSectionClassName={baseStyles['top-section']}
+            bottomSectionClassName={baseStyles['bottom-section']}
+            imageWrapperClassName={baseStyles['image-wrapper']}
         />
     );
 };

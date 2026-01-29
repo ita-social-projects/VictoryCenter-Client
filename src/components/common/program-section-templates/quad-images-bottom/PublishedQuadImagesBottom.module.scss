@@ -1,0 +1,23 @@
+$img-width: 360px;
+$img-height: 390px;
+
+.container {
+    aspect-ratio: 1440 / 1183;
+    gap: 16px;
+}
+
+.top-section {
+    flex: 0 0 53%;
+}
+
+.bottom-section {
+    flex: 0 0 48%;
+    justify-content: end;
+    padding-bottom: 16px;
+}
+
+.image-wrapper {
+    aspect-ratio: #{$img-width} / #{$img-height};
+    max-width: #{$img-width};
+    max-height: #{$img-height};
+}

@@ -1,0 +1,25 @@
+$img-width: 480px;
+$img-height: 480px;
+
+.container {
+    aspect-ratio: 1440 / 1302;
+}
+
+.top-section {
+    flex: 0 0 49%;
+}
+
+.bottom-section {
+    flex: 0 0 51%;
+    justify-content: end;
+    padding-bottom: 16px;
+}
+
+.image-wrapper {
+    max-width: #{$img-width};
+    max-height: #{$img-height};
+}
+
+.image {
+    aspect-ratio: #{$img-width} / #{$img-height};
+}

@@ -14,6 +14,7 @@ import { useProgramSectionValidation } from '@/hooks/admin/use-program-section-v
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
 import { ProgramSectionMode } from '@/types/common/program-sections';
 import styles from './SingleImageRight.module.scss';
+import publishedStyles from './PublishedSingleImageRight.module.scss';
 import { useState } from 'react';
 
 export interface SingleImageRightProps {
@@ -36,6 +37,7 @@ export const SingleImageRight = ({
     onImageChange,
 }: SingleImageRightProps) => {
     const imageSrc = getImageSrc(image);
+    const baseStyles = mode === ProgramSectionMode.Published ? publishedStyles : styles;
     const {
         titleError,
         descriptionError,
@@ -56,15 +58,15 @@ export const SingleImageRight = ({
 
     return (
         <div
-            className={cn(styles.container, {
+            className={cn(baseStyles.container, {
                 [styles.template]: mode === ProgramSectionMode.Template,
                 [styles['form-container']]: mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View,
             })}
         >
             {mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View ? (
                 <>
-                    <div className={styles['left-section']}>
-                        <div className={styles['title-section']}>
+                    <div className={baseStyles['left-section']}>
+                        <div className={baseStyles['title-section']}>
                             <TextAreaWithCharacterLimitGroup
                                 label={PROGRAMS_TEXT.SECTION.FORM.TITLE.TEXT}
                                 isRequired={true}
@@ -82,7 +84,7 @@ export const SingleImageRight = ({
                                 disabled={mode === ProgramSectionMode.View}
                             />
                         </div>
-                        <div className={styles['description-section']}>
+                        <div className={baseStyles['description-section']}>
                             <TextAreaWithCharacterLimitGroup
                                 label={PROGRAMS_TEXT.SECTION.FORM.DESCRIPTION.TEXT}
                                 isRequired={true}
@@ -99,8 +101,8 @@ export const SingleImageRight = ({
                             />
                         </div>
                     </div>
-                    <div className={styles['right-section']}>
-                        <div className={styles['image-wrapper']}>
+                    <div className={baseStyles['right-section']}>
+                        <div className={baseStyles['image-wrapper']}>
                             <PhotoInputGroup
                                 id="section-image-1"
                                 name="section-image-1"
@@ -126,17 +128,17 @@ export const SingleImageRight = ({
                 </>
             ) : (
                 <>
-                    <div className={styles['left-section']}>
-                        <div className={styles['title-section']}>
-                            <h2 className={styles.title}>{title}</h2>
+                    <div className={baseStyles['left-section']}>
+                        <div className={baseStyles['title-section']}>
+                            <h2 className={baseStyles.title}>{title}</h2>
                         </div>
-                        <div className={styles['description-section']}>
-                            <p className={styles.description}>{description}</p>
+                        <div className={baseStyles['description-section']}>
+                            <p className={baseStyles.description}>{description}</p>
                         </div>
                     </div>
-                    <div className={styles['right-section']}>
-                        <div className={styles['image-wrapper']}>
-                            {imageSrc && <img src={imageSrc} alt="" className={styles.image} />}
+                    <div className={baseStyles['right-section']}>
+                        <div className={baseStyles['image-wrapper']}>
+                            {imageSrc && <img src={imageSrc} alt="" className={baseStyles.image} />}
                         </div>
                     </div>
                 </>

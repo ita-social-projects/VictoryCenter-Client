@@ -1,4 +1,5 @@
 import styles from './TitleDescriptionSection.module.scss';
+import publishedStyles from './PublishedTitleDescriptionSection.module.scss';
 import cn from 'classnames';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
@@ -40,10 +41,12 @@ export const TitleDescriptionSection = ({
         onDescriptionChange,
     });
 
+    const baseStyles = mode === ProgramSectionMode.Published ? publishedStyles : styles;
+
     return (
         <div
             className={cn(
-                styles.container,
+                baseStyles.container,
                 {
                     [styles.template]: mode === ProgramSectionMode.Template,
                     [styles['form-container']]: mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View,
@@ -51,7 +54,7 @@ export const TitleDescriptionSection = ({
                 className,
             )}
         >
-            <div className={styles['title-section']}>
+            <div className={baseStyles['title-section']}>
                 {mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View ? (
                     <InputWithCharacterLimitGroup
                         label={PROGRAMS_TEXT.SECTION.FORM.TITLE.TEXT}
@@ -68,10 +71,10 @@ export const TitleDescriptionSection = ({
                         disabled={mode === ProgramSectionMode.View}
                     />
                 ) : (
-                    <h2 className={cn(styles.title, titleClassName)}>{title}</h2>
+                    <h2 className={cn(baseStyles.title, titleClassName)}>{title}</h2>
                 )}
             </div>
-            <div className={styles['description-section']}>
+            <div className={baseStyles['description-section']}>
                 {mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View ? (
                     <TextAreaWithCharacterLimitGroup
                         label={PROGRAMS_TEXT.SECTION.FORM.DESCRIPTION.TEXT}
@@ -88,7 +91,7 @@ export const TitleDescriptionSection = ({
                         disabled={mode === ProgramSectionMode.View}
                     />
                 ) : (
-                    <p className={cn(styles.description, descriptionClassName)}>{description}</p>
+                    <p className={cn(baseStyles.description, descriptionClassName)}>{description}</p>
                 )}
             </div>
         </div>

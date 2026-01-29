@@ -7,6 +7,7 @@ import { PROGRAM_SECTION_IMAGE_CONFIGS, PROGRAM_VALIDATION } from '@/const/admin
 import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 import { ProgramSectionMode } from '@/types/common/program-sections';
 import styles from './SingleImageTop.module.scss';
+import publishedStyles from './PublishedSingleImageTop.module.scss';
 import { useState } from 'react';
 
 export interface SingleImageTopProps {
@@ -29,6 +30,7 @@ export const SingleImageTop = ({
     onImageChange,
 }: SingleImageTopProps) => {
     const imageSrc = getImageSrc(image);
+    const baseStyles = mode === ProgramSectionMode.Published ? publishedStyles : styles;
     const [error, setError] = useState<string>('');
 
     const handleSetError = (errorMessage: string | null) => {
@@ -37,13 +39,13 @@ export const SingleImageTop = ({
 
     return (
         <div
-            className={cn(styles.container, {
+            className={cn(baseStyles.container, {
                 [styles.template]: mode === ProgramSectionMode.Template,
                 [styles['form-container']]: mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View,
             })}
         >
-            <div className={styles['top-section']}>
-                <div className={styles['image-wrapper']}>
+            <div className={baseStyles['top-section']}>
+                <div className={baseStyles['image-wrapper']}>
                     {mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View ? (
                         <PhotoInputGroup
                             id="section-image-1"
@@ -66,14 +68,14 @@ export const SingleImageTop = ({
                             disabled={mode === ProgramSectionMode.View}
                         />
                     ) : (
-                        imageSrc && <img src={imageSrc} alt="" className={styles.image} />
+                        imageSrc && <img src={imageSrc} alt="" className={baseStyles.image} />
                     )}
                 </div>
             </div>
             <TitleDescriptionSection
                 title={title}
                 description={description}
-                className={styles['bottom-section']}
+                className={baseStyles['bottom-section']}
                 titleClassName={mode === ProgramSectionMode.Template ? styles['title-template'] : ''}
                 descriptionClassName={mode === ProgramSectionMode.Template ? styles['description-template'] : ''}
                 mode={mode}

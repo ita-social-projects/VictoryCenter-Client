@@ -1,0 +1,36 @@
+@import '../BaseSectionTemplate.module.scss';
+
+.container {
+    @extend .section-container;
+    display: flex;
+}
+
+.bottom-section {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+.images-grid {
+    display: flex;
+    flex: 1;
+    align-items: end;
+    justify-content: center;
+}
+
+.image-wrapper {
+    height: 75%;
+    &[data-elevated='true'] {
+        position: relative;
+        top: -25%;
+    }
+    justify-content: end;
+}
+
+.image {
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    display: block;
+}

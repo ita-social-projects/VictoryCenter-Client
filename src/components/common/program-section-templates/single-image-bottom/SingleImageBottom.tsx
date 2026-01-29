@@ -7,6 +7,7 @@ import { PROGRAM_SECTION_IMAGE_CONFIGS, PROGRAM_VALIDATION } from '@/const/admin
 import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 import { ProgramSectionMode } from '@/types/common/program-sections';
 import styles from './SingleImageBottom.module.scss';
+import publishedStyles from './PublishedSingleImageBottom.module.scss';
 import { useState } from 'react';
 
 export interface SingleImageBottomProps {
@@ -29,6 +30,7 @@ export const SingleImageBottom = ({
     onImageChange,
 }: SingleImageBottomProps) => {
     const imageSrc = getImageSrc(image);
+    const baseStyles = mode === ProgramSectionMode.Published ? publishedStyles : styles;
 
     const [error, setError] = useState<string>('');
 
@@ -38,7 +40,7 @@ export const SingleImageBottom = ({
 
     return (
         <div
-            className={cn(styles.container, {
+            className={cn(baseStyles.container, {
                 [styles.template]: mode === ProgramSectionMode.Template,
                 [styles['form-container']]: mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View,
             })}
@@ -46,15 +48,15 @@ export const SingleImageBottom = ({
             <TitleDescriptionSection
                 title={title}
                 description={description}
-                className={styles['top-section']}
+                className={baseStyles['top-section']}
                 titleClassName={mode === ProgramSectionMode.Template ? styles['title-template'] : ''}
                 descriptionClassName={mode === ProgramSectionMode.Template ? styles['description-template'] : ''}
                 mode={mode}
                 onTitleChange={onTitleChange}
                 onDescriptionChange={onDescriptionChange}
             />
-            <div className={styles['bottom-section']}>
-                <div className={styles['image-wrapper']}>
+            <div className={baseStyles['bottom-section']}>
+                <div className={baseStyles['image-wrapper']}>
                     {mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View ? (
                         <PhotoInputGroup
                             id="section-image-1"
@@ -77,7 +79,7 @@ export const SingleImageBottom = ({
                             disabled={mode === ProgramSectionMode.View}
                         />
                     ) : (
-                        imageSrc && <img src={imageSrc} alt="img1-of-single-image-bottom" className={styles.image} />
+                        imageSrc && <img src={imageSrc} alt="" className={baseStyles.image} />
                     )}
                 </div>
             </div>

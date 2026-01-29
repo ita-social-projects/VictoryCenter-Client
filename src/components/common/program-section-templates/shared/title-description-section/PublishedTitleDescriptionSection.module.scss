@@ -1,0 +1,54 @@
+@use '@/assets/sass/mixins/typography.mixins' as type;
+@use '@/assets/sass/variables/typography' as t;
+
+.container {
+    padding: 5% 15%;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+
+    .title {
+        font-family: t.$font-family-base;
+        font-weight: t.$fw-semibold;
+        letter-spacing: t.$h3-spacing;
+        text-transform: uppercase;
+        flex-shrink: 0;
+    }
+
+    .title-section {
+        flex: 0 0 50%;
+    }
+
+    .description-section {
+        flex: 0 0 50%;
+    }
+
+    .description {
+        font-family: t.$font-family-base;
+        font-weight: t.$fw-regular;
+        letter-spacing: t.$body1-spacing;
+        text-transform: none;
+        white-space: pre-wrap;
+    }
+
+    @media (max-width: 1024px) {
+        .title-section {
+            flex: 0 0 40%;
+        }
+
+        .description-section {
+            flex: 0 0 60%;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .title-section {
+            flex: 0 0 30%;
+        }
+
+        .description-section {
+            flex: 0 0 70%;
+        }
+    }
+}

@@ -7,6 +7,7 @@ import { ImageValues, Image } from '@/types/common/image';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 import baseStyles from './ImagesBottomSection.module.scss';
+import publishedBaseStyles from './PublishedImagesBottomSection.module.scss';
 import { PROGRAM_VALIDATION } from '@/const/admin/programs';
 import { ProgramSectionMode } from '@/types/common/program-sections';
 
@@ -64,6 +65,7 @@ export const ImagesBottomSection = ({
     imageWrapperClassName = '',
 }: ImagesBottomSectionProps) => {
     const [errors, setErrors] = useState<string[]>([]);
+    const styles = mode === ProgramSectionMode.Published ? publishedBaseStyles : baseStyles;
 
     const displayedImages = useMemo(() => images.slice(0, config.imageCount), [images, config.imageCount]);
     const displayedImageHandlers = useMemo(
@@ -87,7 +89,7 @@ export const ImagesBottomSection = ({
     return (
         <div
             className={cn(
-                baseStyles.container,
+                styles.container,
                 {
                     [baseStyles['form-container']]:
                         mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View,
@@ -105,13 +107,13 @@ export const ImagesBottomSection = ({
                 onTitleChange={onTitleChange}
                 onDescriptionChange={onDescriptionChange}
             />
-            <div className={cn(baseStyles['bottom-section'], bottomSectionClassName)}>
-                <div className={baseStyles['images-grid']}>
+            <div className={cn(styles['bottom-section'], bottomSectionClassName)}>
+                <div className={styles['images-grid']}>
                     {mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View
                         ? displayedImageHandlers.map(({ handler, key, value }, index) => (
                               <div
                                   key={key}
-                                  className={cn(baseStyles['image-wrapper'], imageWrapperClassName)}
+                                  className={cn(styles['image-wrapper'], imageWrapperClassName)}
                                   data-elevated={config.elevatedIndices.includes(index) ? 'true' : undefined}
                                   data-testid="image-wrapper"
                               >
@@ -142,7 +144,7 @@ export const ImagesBottomSection = ({
                               return (
                                   <div
                                       key={imageKeys[index]}
-                                      className={cn(baseStyles['image-wrapper'], imageWrapperClassName)}
+                                      className={cn(styles['image-wrapper'], imageWrapperClassName)}
                                       data-elevated={config.elevatedIndices.includes(index) ? 'true' : undefined}
                                       data-testid="image-wrapper"
                                   >
@@ -150,7 +152,7 @@ export const ImagesBottomSection = ({
                                           <img
                                               src={imageSrc}
                                               alt={`Program section ${index + 1}`}
-                                              className={baseStyles.image}
+                                              className={styles.image}
                                           />
                                       )}
                                   </div>

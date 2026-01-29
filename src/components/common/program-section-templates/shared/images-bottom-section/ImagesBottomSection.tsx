@@ -89,7 +89,8 @@ export const ImagesBottomSection = ({
             className={cn(
                 baseStyles.container,
                 {
-                    [baseStyles.editable]: mode === ProgramSectionMode.Edit,
+                    [baseStyles['form-container']]:
+                        mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View,
                 },
                 className,
             )}
@@ -106,7 +107,7 @@ export const ImagesBottomSection = ({
             />
             <div className={cn(baseStyles['bottom-section'], bottomSectionClassName)}>
                 <div className={baseStyles['images-grid']}>
-                    {mode === ProgramSectionMode.Edit
+                    {mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View
                         ? displayedImageHandlers.map(({ handler, key, value }, index) => (
                               <div
                                   key={key}
@@ -132,6 +133,7 @@ export const ImagesBottomSection = ({
                                       )}
                                       variant="programSection"
                                       maxSizeMB={PROGRAM_VALIDATION.images.maxSizeMB}
+                                      disabled={mode === ProgramSectionMode.View}
                                   />
                               </div>
                           ))

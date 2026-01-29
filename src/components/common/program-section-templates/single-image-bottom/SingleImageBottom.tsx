@@ -40,7 +40,7 @@ export const SingleImageBottom = ({
         <div
             className={cn(styles.container, {
                 [styles.template]: mode === ProgramSectionMode.Template,
-                [styles.editable]: mode === ProgramSectionMode.Edit,
+                [styles['form-container']]: mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View,
             })}
         >
             <TitleDescriptionSection
@@ -55,7 +55,7 @@ export const SingleImageBottom = ({
             />
             <div className={styles['bottom-section']}>
                 <div className={styles['image-wrapper']}>
-                    {mode === ProgramSectionMode.Edit ? (
+                    {mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View ? (
                         <PhotoInputGroup
                             id="section-image-1"
                             name="section-image-1"
@@ -74,6 +74,7 @@ export const SingleImageBottom = ({
                             )}
                             variant="programSection"
                             maxSizeMB={PROGRAM_VALIDATION.images.maxSizeMB}
+                            disabled={mode === ProgramSectionMode.View}
                         />
                     ) : (
                         imageSrc && <img src={imageSrc} alt="img1-of-single-image-bottom" className={styles.image} />

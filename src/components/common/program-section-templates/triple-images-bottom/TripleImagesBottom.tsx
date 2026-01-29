@@ -41,7 +41,7 @@ export const TripleImagesBottom = ({
             onTitleChange={onTitleChange}
             onDescriptionChange={onDescriptionChange}
             className={cn(styles.container, {
-                [styles.editable]: mode === ProgramSectionMode.Edit,
+                [styles['form-container']]: mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View,
             })}
             topSectionClassName={styles['top-section']}
             bottomSectionClassName={styles['bottom-section']}

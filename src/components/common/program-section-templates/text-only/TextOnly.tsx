@@ -22,7 +22,7 @@ export const TextOnly = (props: TextOnlyProps) => {
                 styles.container,
                 {
                     [styles.template]: mode === ProgramSectionMode.Template,
-                    [styles.editable]: mode === ProgramSectionMode.Edit,
+                    [styles['form-container']]: mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View,
                 },
                 className,
             )}

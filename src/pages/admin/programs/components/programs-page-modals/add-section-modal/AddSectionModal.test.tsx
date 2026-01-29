@@ -19,7 +19,6 @@ jest.mock('@/utils/functions/render-program-section', () => ({
 jest.mock('@/components/public/swiper/Swiper', () => ({
     Swiper: ({ items, renderItem, onSlideChange, className }: any) => {
         mockSwiperOnSlideChange = onSlideChange;
-        // Initialize on first render
         if (mockSwiperActiveIndex === -1) {
             mockSwiperActiveIndex = 0;
             setTimeout(() => onSlideChange?.(0), 0);
@@ -99,6 +98,9 @@ jest.mock('@/components/admin/button/Button', () => ({
     ),
 }));
 
+const findRenderCallByTemplate = (templateId: ProgramSectionTemplate) =>
+    mockRenderProgramSection.mock.calls.map((call) => call[0]).find((args) => args.templateId === templateId);
+
 describe('AddSectionModal', () => {
     const mockOnClose = jest.fn();
     const mockOnSelectTemplate = jest.fn();
@@ -111,14 +113,10 @@ describe('AddSectionModal', () => {
         ProgramSectionTemplate.SingleImageBottom,
         ProgramSectionTemplate.SingleImageTop,
         ProgramSectionTemplate.SingleImageRight,
+        ProgramSectionTemplate.DualTitleDescription,
+        ProgramSectionTemplate.TripleTitleDescription,
+        ProgramSectionTemplate.QuadTitleDescription,
     ];
-
-    const getLastTemplateId = () => {
-        const calls = mockRenderProgramSection.mock.calls as unknown as any[];
-        const lastCall = calls[calls.length - 1] as any[] | undefined;
-        const args = lastCall?.[0] as any;
-        return args?.templateId as ProgramSectionTemplate | undefined;
-    };
 
     const defaultProps: AddSectionModalProps = {
         isOpen: true,
@@ -223,5 +221,33 @@ describe('AddSectionModal', () => {
 
         expect(mockOnSelectTemplate).toHaveBeenCalledWith(TEMPLATES[1]);
         expect(mockOnClose).toHaveBeenCalled();
+    });
+
+    it('renders DualTitleDescription template with 2 cards', () => {
+        render(<AddSectionModal {...defaultProps} />);
+
+        const utils = findRenderCallByTemplate(ProgramSectionTemplate.DualTitleDescription);
+
+        expect(utils).toBeDefined();
+        expect(utils?.data.cards).toHaveLength(2);
+        expect(utils?.isTemplate).toBe(true);
+    });
+
+    it('renders TripleTitleDescription template with 3 cards', () => {
+        render(<AddSectionModal {...defaultProps} />);
+
+        const utils = findRenderCallByTemplate(ProgramSectionTemplate.TripleTitleDescription);
+
+        expect(utils).toBeDefined();
+        expect(utils?.data.cards).toHaveLength(3);
+    });
+
+    it('renders QuadTitleDescription template with 4 cards', () => {
+        render(<AddSectionModal {...defaultProps} />);
+
+        const utils = findRenderCallByTemplate(ProgramSectionTemplate.QuadTitleDescription);
+
+        expect(utils).toBeDefined();
+        expect(utils?.data.cards).toHaveLength(4);
     });
 });

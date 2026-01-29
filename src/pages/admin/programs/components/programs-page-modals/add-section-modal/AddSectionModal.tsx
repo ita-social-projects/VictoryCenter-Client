@@ -40,6 +40,9 @@ const TEMPLATES = [
     ProgramSectionTemplate.SingleImageBottom,
     ProgramSectionTemplate.SingleImageTop,
     ProgramSectionTemplate.SingleImageRight,
+    ProgramSectionTemplate.DualTitleDescription,
+    ProgramSectionTemplate.TripleTitleDescription,
+    ProgramSectionTemplate.QuadTitleDescription,
 ];
 
 export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectionModalProps) => {
@@ -74,13 +77,63 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
     };
 
     const renderSection = (templateId: ProgramSectionTemplate) => {
+        const cardSamples = PROGRAMS_TEXT.SECTION.CARD;
+        const CARD_CONFIGS: Partial<Record<ProgramSectionTemplate, { title: string; description: string }[]>> = {
+            [ProgramSectionTemplate.DualTitleDescription]: [
+                {
+                    title: cardSamples.TITLE_SAMPLE_TEXT.PROGRAM_GOALS,
+                    description: cardSamples.DESCRIPTION_SAMPLE_TEXT.PROGRAM_GOALS,
+                },
+                {
+                    title: cardSamples.TITLE_SAMPLE_TEXT.MAIN_METHODS,
+                    description: cardSamples.DESCRIPTION_SAMPLE_TEXT.MAIN_METHODS,
+                },
+            ],
+            [ProgramSectionTemplate.TripleTitleDescription]: [
+                {
+                    title: cardSamples.TITLE_SAMPLE_TEXT.PROGRAM_GOALS,
+                    description: cardSamples.DESCRIPTION_SAMPLE_TEXT.PROGRAM_GOALS,
+                },
+                {
+                    title: cardSamples.TITLE_SAMPLE_TEXT.MAIN_METHODS,
+                    description: cardSamples.DESCRIPTION_SAMPLE_TEXT.MAIN_METHODS,
+                },
+                {
+                    title: cardSamples.TITLE_SAMPLE_TEXT.PROGRAM_FORMAT,
+                    description: cardSamples.DESCRIPTION_SAMPLE_TEXT.PROGRAM_FORMAT,
+                },
+            ],
+            [ProgramSectionTemplate.QuadTitleDescription]: [
+                {
+                    title: cardSamples.TITLE_SAMPLE_TEXT.PROGRAM_GOALS,
+                    description: cardSamples.DESCRIPTION_SAMPLE_TEXT.PROGRAM_GOALS,
+                },
+                {
+                    title: cardSamples.TITLE_SAMPLE_TEXT.MAIN_METHODS,
+                    description: cardSamples.DESCRIPTION_SAMPLE_TEXT.MAIN_METHODS,
+                },
+                {
+                    title: cardSamples.TITLE_SAMPLE_TEXT.PROGRAM_GOALS,
+                    description: cardSamples.DESCRIPTION_SAMPLE_TEXT.PROGRAM_GOALS,
+                },
+                {
+                    title: cardSamples.TITLE_SAMPLE_TEXT.MAIN_METHODS,
+                    description: cardSamples.DESCRIPTION_SAMPLE_TEXT.MAIN_METHODS,
+                },
+            ],
+        };
+
+        const cards = CARD_CONFIGS[templateId];
+
         return renderProgramSection({
             templateId,
-            data: {
-                title: PROGRAMS_TEXT.SECTION.TITLE_SAMPLE_TEXT,
-                description: PROGRAMS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT,
-                images: getPlaceholderImages(templateId),
-            },
+            data: cards
+                ? { cards }
+                : {
+                      title: PROGRAMS_TEXT.SECTION.TITLE_SAMPLE_TEXT,
+                      description: PROGRAMS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT,
+                      images: getPlaceholderImages(templateId),
+                  },
             isTemplate: true,
         });
     };

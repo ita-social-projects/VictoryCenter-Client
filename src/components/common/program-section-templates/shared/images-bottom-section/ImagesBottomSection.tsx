@@ -2,14 +2,11 @@ import { useMemo, useState } from 'react';
 import cn from 'classnames';
 import { nanoid } from 'nanoid';
 import { TitleDescriptionSection } from '../title-description-section/TitleDescriptionSection';
-import { PhotoInputGroup } from '@/components/admin/input-groups/photo-input-group/PhotoInputGroup';
 import { ImageValues, Image } from '@/types/common/image';
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 import baseStyles from './ImagesBottomSection.module.scss';
-import publishedBaseStyles from './PublishedImagesBottomSection.module.scss';
-import { PROGRAM_VALIDATION } from '@/const/admin/programs';
 import { ProgramSectionMode } from '@/types/common/program-sections';
+import { PublishedImagesBottomSection } from './PublishedImagesBottomSection';
+import { EditableImagesBottomSection } from './EditableImagesBottomSection';
 
 export interface ImageConfig {
     cropWidth: number;
@@ -65,7 +62,6 @@ export const ImagesBottomSection = ({
     imageWrapperClassName = '',
 }: ImagesBottomSectionProps) => {
     const [errors, setErrors] = useState<string[]>([]);
-    const styles = mode === ProgramSectionMode.Published ? publishedBaseStyles : baseStyles;
 
     const displayedImages = useMemo(() => images.slice(0, config.imageCount), [images, config.imageCount]);
     const displayedImageHandlers = useMemo(
@@ -89,7 +85,7 @@ export const ImagesBottomSection = ({
     return (
         <div
             className={cn(
-                styles.container,
+                baseStyles.container,
                 {
                     [baseStyles['form-container']]:
                         mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View,
@@ -107,59 +103,23 @@ export const ImagesBottomSection = ({
                 onTitleChange={onTitleChange}
                 onDescriptionChange={onDescriptionChange}
             />
-            <div className={cn(styles['bottom-section'], bottomSectionClassName)}>
-                <div className={styles['images-grid']}>
-                    {mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View
-                        ? displayedImageHandlers.map(({ handler, key, value }, index) => (
-                              <div
-                                  key={key}
-                                  className={cn(styles['image-wrapper'], imageWrapperClassName)}
-                                  data-elevated={config.elevatedIndices.includes(index) ? 'true' : undefined}
-                                  data-testid="image-wrapper"
-                              >
-                                  <PhotoInputGroup
-                                      id={`section-image-${index + 1}`}
-                                      name={`section-image-${index + 1}`}
-                                      value={value}
-                                      onChange={handler || (() => {})}
-                                      setError={(error) => handleSetError(index, error)}
-                                      error={errors[index]}
-                                      cropWidth={config.imageConfig.cropWidth}
-                                      cropHeight={config.imageConfig.cropHeight}
-                                      minWidth={config.imageConfig.minWidth}
-                                      minHeight={config.imageConfig.minHeight}
-                                      imageLabel={config.imageLabel}
-                                      imageSubText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
-                                          config.imageConfig.cropHeight,
-                                          config.imageConfig.cropWidth,
-                                      )}
-                                      variant="programSection"
-                                      maxSizeMB={PROGRAM_VALIDATION.images.maxSizeMB}
-                                      disabled={mode === ProgramSectionMode.View}
-                                  />
-                              </div>
-                          ))
-                        : displayedImages.map((image, index) => {
-                              const imageSrc = getImageSrc(image);
-                              return (
-                                  <div
-                                      key={imageKeys[index]}
-                                      className={cn(styles['image-wrapper'], imageWrapperClassName)}
-                                      data-elevated={config.elevatedIndices.includes(index) ? 'true' : undefined}
-                                      data-testid="image-wrapper"
-                                  >
-                                      {imageSrc && (
-                                          <img
-                                              src={imageSrc}
-                                              alt={`Program section ${index + 1}`}
-                                              className={styles.image}
-                                          />
-                                      )}
-                                  </div>
-                              );
-                          })}
-                </div>
-            </div>
+            {mode === ProgramSectionMode.Published ? (
+                <PublishedImagesBottomSection images={displayedImages} elevatedIndices={config.elevatedIndices} />
+            ) : (
+                <EditableImagesBottomSection
+                    images={displayedImages}
+                    imageHandlers={displayedImageHandlers}
+                    imageKeys={imageKeys}
+                    elevatedIndices={config.elevatedIndices}
+                    imageConfig={config.imageConfig}
+                    imageLabel={config.imageLabel}
+                    mode={mode}
+                    bottomSectionClassName={bottomSectionClassName}
+                    imageWrapperClassName={imageWrapperClassName}
+                    errors={errors}
+                    onSetError={handleSetError}
+                />
+            )}
         </div>
     );
 };

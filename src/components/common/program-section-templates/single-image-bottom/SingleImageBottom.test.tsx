@@ -35,13 +35,13 @@ describe('SingleImageBottom', () => {
         renderSingleImageBottom({
             title: 'T',
             description: 'D',
-            image: 'test-image.jpg',
+            image: { id: 1, url: 'test-image.jpg', mimeType: 'image/jpeg' },
             isTemplate: true,
             isEditable: false,
         });
 
         const img = screen.getByRole('img', { name: /img1-of-single-image-bottom/i });
-        expect(img).toHaveAttribute('src', 'test-image.jpg');
+        expect(img).toHaveAttribute('src', expect.stringContaining('test-image.jpg'));
         expect(screen.getByTestId('title-description-section')).toBeInTheDocument();
         expect(mockPhotoInputGroup).not.toHaveBeenCalled();
 
@@ -63,7 +63,7 @@ describe('SingleImageBottom', () => {
         renderSingleImageBottom({
             title: 'T',
             description: 'D',
-            image: 'base64-data',
+            image: { base64: 'base64-data', mimeType: 'image/jpeg' },
             isEditable: true,
             onTitleChange,
             onDescriptionChange,
@@ -94,7 +94,7 @@ describe('SingleImageBottom', () => {
                 cropHeight: PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.cropHeight,
                 minWidth: PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.minWidth,
                 minHeight: PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.minHeight,
-                value: { base64: 'base64-data', mimeType: '' },
+                value: { base64: 'base64-data', mimeType: 'image/jpeg' },
                 onChange: expect.any(Function),
             }),
         );
@@ -105,7 +105,7 @@ describe('SingleImageBottom', () => {
 
     it('uses null value for PhotoInputGroup when image is empty (editable branch)', () => {
         renderSingleImageBottom({
-            image: '',
+            image: null,
             isEditable: true,
         });
 

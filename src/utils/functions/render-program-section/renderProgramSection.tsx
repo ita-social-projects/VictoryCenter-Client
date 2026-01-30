@@ -1,6 +1,6 @@
 import React from 'react';
 import { ProgramSectionContent, ProgramSectionTemplate } from '@/types/common/program-sections';
-import { ImageValues } from '@/types/common/image';
+import { ImageValues, Image } from '@/types/common/image';
 import { ContentType } from '@/types/common/programs';
 import { QuadImagesBottom } from '@/components/common/program-section-templates/quad-images-bottom/QuadImagesBottom';
 import { TripleImagesBottom } from '@/components/common/program-section-templates/triple-images-bottom/TripleImagesBottom';
@@ -19,7 +19,7 @@ export interface ProgramSectionCardData {
 export interface ProgramSectionData {
     title?: string;
     description?: string;
-    images?: string[];
+    images?: (Image | ImageValues | null)[];
     cards?: ProgramSectionCardData[];
 }
 
@@ -98,11 +98,11 @@ interface StandardTemplateProps {
 
 type StandardTemplateComponentProps =
     | (StandardTemplateProps & {
-          image?: string;
+          image?: Image | ImageValues | null;
           onImageChange?: (file: ImageValues | null) => void;
       })
     | (StandardTemplateProps & {
-          images?: string[];
+          images?: (Image | ImageValues | null)[];
           onImagesChange?: (index: number, file: ImageValues | null) => void;
       });
 

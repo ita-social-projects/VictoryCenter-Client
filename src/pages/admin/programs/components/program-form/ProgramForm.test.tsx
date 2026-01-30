@@ -22,6 +22,7 @@ jest.mock('@/validation/admin/program-schema/program-schema', () => ({
         validateLocation: jest.fn(),
         validateParticipantsCount: jest.fn(),
         validateMeetingCount: jest.fn(),
+        validateSections: jest.fn(),
     },
 }));
 

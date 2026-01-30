@@ -1,13 +1,13 @@
 import cn from 'classnames';
 import { ImagesBottomSection } from '../shared/images-bottom-section/ImagesBottomSection';
-import { ImageValues } from '@/types/common/image';
+import { ImageValues, Image } from '@/types/common/image';
 import { TRIPLE_IMAGES_CONFIG } from '@/const/admin/programs';
 import styles from './TripleImagesBottom.module.scss';
 
 export interface TripleImagesBottomProps {
     title?: string;
     description?: string;
-    images?: string[];
+    images?: (Image | ImageValues | null)[];
     isTemplate?: boolean;
     isEditable?: boolean;
     onTitleChange?: (value: string) => void;
@@ -18,7 +18,7 @@ export interface TripleImagesBottomProps {
 export const TripleImagesBottom = ({
     title = '',
     description = '',
-    images = ['', '', ''],
+    images = [null, null, null],
     isTemplate = false,
     isEditable = false,
     onTitleChange,

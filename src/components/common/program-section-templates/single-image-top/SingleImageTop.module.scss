@@ -6,6 +6,7 @@ $img-height: 680px;
 
 .container {
     @extend .section-container;
+    background-color: #fff;
     padding-bottom: 60px;
 }
 

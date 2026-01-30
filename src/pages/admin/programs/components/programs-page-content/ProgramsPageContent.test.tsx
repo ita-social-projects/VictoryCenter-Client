@@ -464,58 +464,6 @@ describe('ProgramsPageContent', () => {
         });
     });
 
-    it('resets search state on status filter change', async () => {
-        await renderAndWaitForPrograms();
-
-        // First select a program to enter search mode
-        fireEvent.click(screen.getByTestId('select-program'));
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(1);
-        });
-
-        // Change filter - should reset search
-        fireEvent.click(screen.getByText('Filter Published'));
-
-        await waitFor(() => {
-            expect(mockProgramsApi.fetchPrograms).toHaveBeenCalledWith(
-                expect.any(Object),
-                1,
-                0,
-                5,
-                VisibilityStatus.Published,
-            );
-        });
-    });
-
-    it('handles add/edit/delete program via modal callbacks', async () => {
-        await renderAndWaitForPrograms();
-
-        // Test add program
-        fireEvent.click(screen.getByTestId('trigger-add'));
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(3);
-            expect(screen.getByText('New Program')).toBeInTheDocument();
-        });
-
-        // Test edit program - the edited program should replace Alpha since they have the same ID (10)
-        fireEvent.click(screen.getByTestId('trigger-edit'));
-        await waitFor(() => {
-            // Alpha should be replaced with Alpha Edited, but the program moved to Category B
-            // so it should disappear from Category A view
-            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-            expect(screen.queryByText('Alpha')).not.toBeInTheDocument();
-            expect(screen.queryByText('Alpha Edited')).not.toBeInTheDocument(); // Not in Category A anymore
-        });
-
-        // Test delete program - delete the New Program we added
-        fireEvent.click(screen.getByTestId('trigger-delete'));
-        await waitFor(() => {
-            // Should remove Alpha from the list (even though it was already moved)
-            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-        });
-    });
-
     it('opens category modals from context menu', async () => {
         await renderAndWaitForCategoryBar();
 

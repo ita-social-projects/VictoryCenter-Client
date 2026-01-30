@@ -24,6 +24,7 @@ export interface ImagesBottomSectionConfig {
     editableGridColumns?: number;
     editableImageMaxHeight?: number;
     editableImageMaxWidth?: number;
+    swiperBreakpoints?: Record<number, { slidesPerView: number | 'auto' }>;
 }
 
 export interface ImageHandler {
@@ -104,15 +105,18 @@ export const ImagesBottomSection = ({
                 onDescriptionChange={onDescriptionChange}
             />
             {mode === ProgramSectionMode.Published ? (
-                <PublishedImagesBottomSection images={displayedImages} elevatedIndices={config.elevatedIndices} />
+                <PublishedImagesBottomSection
+                    images={displayedImages}
+                    config={config}
+                    bottomSectionClassName={bottomSectionClassName}
+                    imageWrapperClassName={imageWrapperClassName}
+                />
             ) : (
                 <EditableImagesBottomSection
                     images={displayedImages}
                     imageHandlers={displayedImageHandlers}
                     imageKeys={imageKeys}
-                    elevatedIndices={config.elevatedIndices}
-                    imageConfig={config.imageConfig}
-                    imageLabel={config.imageLabel}
+                    config={config}
                     mode={mode}
                     bottomSectionClassName={bottomSectionClassName}
                     imageWrapperClassName={imageWrapperClassName}

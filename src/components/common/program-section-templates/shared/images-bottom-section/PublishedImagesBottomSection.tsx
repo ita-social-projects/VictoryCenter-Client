@@ -1,24 +1,33 @@
+import cn from 'classnames';
 import { Swiper } from '@/components/public/swiper/Swiper';
 import { ImageValues, Image } from '@/types/common/image';
 import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
+import { ImagesBottomSectionConfig } from './ImagesBottomSection';
 import styles from './PublishedImagesBottomSection.module.scss';
 
 interface PublishedImagesBottomSectionProps {
     images: (Image | ImageValues | null)[];
-    elevatedIndices: number[];
+    config: ImagesBottomSectionConfig;
+    bottomSectionClassName?: string;
+    imageWrapperClassName?: string;
 }
 
-export const PublishedImagesBottomSection = ({ images, elevatedIndices }: PublishedImagesBottomSectionProps) => {
+export const PublishedImagesBottomSection = ({
+    images,
+    config,
+    bottomSectionClassName = '',
+    imageWrapperClassName = '',
+}: PublishedImagesBottomSectionProps) => {
     return (
-        <div className={styles['bottom-section']}>
+        <div className={cn(styles['bottom-section'], bottomSectionClassName)}>
             <Swiper
                 items={images}
                 renderItem={(image, index) => {
                     const imageSrc = getImageSrc(image);
                     return (
                         <div
-                            className={styles['image-wrapper']}
-                            data-elevated={elevatedIndices.includes(index) ? 'true' : undefined}
+                            className={cn(styles['image-wrapper'], imageWrapperClassName)}
+                            data-elevated={config.elevatedIndices.includes(index) ? 'true' : undefined}
                             data-testid="image-wrapper"
                         >
                             {imageSrc && (
@@ -28,11 +37,7 @@ export const PublishedImagesBottomSection = ({ images, elevatedIndices }: Publis
                     );
                 }}
                 slidesPerView="auto"
-                breakpoints={{
-                    320: { slidesPerView: 1 },
-                    768: { slidesPerView: 2 },
-                    1024: { slidesPerView: 'auto' },
-                }}
+                breakpoints={config.swiperBreakpoints}
             />
         </div>
     );

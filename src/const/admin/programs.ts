@@ -129,6 +129,12 @@ export const QUAD_IMAGES_CONFIG = {
     editableGridColumns: 4,
     editableImageMaxHeight: 390,
     editableImageMaxWidth: 360,
+    swiperBreakpoints: {
+        320: { slidesPerView: 1 },
+        720: { slidesPerView: 2 },
+        1080: { slidesPerView: 3 },
+        1440: { slidesPerView: 4 },
+    },
 };
 
 export const DUAL_IMAGES_CONFIG = {
@@ -139,6 +145,10 @@ export const DUAL_IMAGES_CONFIG = {
     imageLabel: COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE,
     editableImageMaxHeight: 430,
     editableImageMaxWidth: 730,
+    swiperBreakpoints: {
+        320: { slidesPerView: 1 },
+        1440: { slidesPerView: 2 },
+    },
 };
 
 export const TRIPLE_IMAGES_CONFIG = {
@@ -150,6 +160,11 @@ export const TRIPLE_IMAGES_CONFIG = {
     editableGridColumns: 4,
     editableImageMaxHeight: 480,
     editableImageMaxWidth: 480,
+    swiperBreakpoints: {
+        320: { slidesPerView: 1 },
+        960: { slidesPerView: 2 },
+        1440: { slidesPerView: 3 },
+    },
 };
 
 export const PROGRAM_VALIDATION = {

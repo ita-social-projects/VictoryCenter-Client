@@ -314,7 +314,6 @@ jest.mock('@/components/admin/toast/toast-container/ToastContainer', () => ({
     ToastContainer: () => <div data-testid="toast-container"></div>,
 }));
 
-// Helper function to convert mock faqs to DTO format
 const convertFaqsToDto = (faqs: FaqQuestion[]): FaqQuestionDto[] => {
     return faqs.map((faq) => ({
         id: faq.id,
@@ -352,7 +351,6 @@ describe('FaqPanelContent', () => {
     beforeEach(() => {
         jest.clearAllMocks();
 
-        // Reset AbortController
         (global as any).AbortController = function () {
             return {
                 signal: { aborted: false },
@@ -360,12 +358,10 @@ describe('FaqPanelContent', () => {
             };
         };
 
-        // Mock API responses
         mockedUseAdminClient.mockReturnValue({
             client: {},
         });
 
-        // Mock FaqApi.getAll to return faqs in DTO format
         mockFaqApi.getAll = jest.fn().mockResolvedValue({
             items: convertFaqsToDto(mockFaqs),
             totalItemsCount: mockFaqs.length,
@@ -374,7 +370,6 @@ describe('FaqPanelContent', () => {
         mockFaqApi.reorder = jest.fn().mockResolvedValue({});
         mockFaqApi.getSearchItems = jest.fn().mockResolvedValue([]);
 
-        // Mock axios.isCancel
         (axios.isCancel as unknown as jest.Mock) = jest.fn().mockImplementation((error) => {
             return error && error.name === 'CanceledError';
         });
@@ -423,7 +418,7 @@ describe('FaqPanelContent', () => {
 
     describe('Category selection and filtering', () => {
         it('should change faqs when different category is selected', async () => {
-            const categoryBFaqs = [mockFaqs[1]]; // Just the second FAQ
+            const categoryBFaqs = [mockFaqs[1]];
             renderFaqPanelContent();
 
             await waitFor(() => expect(getFaqItems()).toHaveLength(2));
@@ -451,7 +446,6 @@ describe('FaqPanelContent', () => {
             renderFaqPanelContent();
             await waitFor(() => expect(getFaqItems()).toHaveLength(2));
 
-            // Filter to published
             mockFaqApi.getAll.mockResolvedValueOnce({
                 items: convertFaqsToDto([mockFaqs[0]]),
                 totalItemsCount: 1,
@@ -475,7 +469,6 @@ describe('FaqPanelContent', () => {
             renderFaqPanelContent();
             await waitFor(() => expect(getFaqItems()).toHaveLength(2));
 
-            // Filter to draft
             mockFaqApi.getAll.mockResolvedValueOnce({
                 items: convertFaqsToDto([mockFaqs[1]]),
                 totalItemsCount: 1,
@@ -492,7 +485,6 @@ describe('FaqPanelContent', () => {
             renderFaqPanelContent();
             await waitFor(() => expect(getFaqItems()).toHaveLength(2));
 
-            // First apply a filter
             mockFaqApi.getAll.mockResolvedValueOnce({
                 items: convertFaqsToDto([mockFaqs[0]]),
                 totalItemsCount: 1,
@@ -504,7 +496,6 @@ describe('FaqPanelContent', () => {
                 expect(mockFaqApi.getAll).toHaveBeenCalledTimes(2);
             });
 
-            // Then clear it
             mockFaqApi.getAll.mockResolvedValueOnce({
                 items: convertFaqsToDto(mockFaqs),
                 totalItemsCount: mockFaqs.length,
@@ -557,12 +548,10 @@ describe('FaqPanelContent', () => {
 
             renderFaqPanelContent();
 
-            // Should not display error for canceled requests
             await waitFor(() => {
                 expect(mockFaqApi.getAll).toHaveBeenCalled();
             });
 
-            // Verify no error is shown for canceled requests
             expect(screen.queryByTestId('faq-error-container')).not.toBeInTheDocument();
         });
 
@@ -576,12 +565,10 @@ describe('FaqPanelContent', () => {
 
             renderFaqPanelContent();
 
-            // Should not display error for aborted requests
             await waitFor(() => {
                 expect(mockFaqApi.getAll).toHaveBeenCalled();
             });
 
-            // Verify no error is shown for aborted requests
             expect(screen.queryByTestId('faq-error-container')).not.toBeInTheDocument();
         });
 
@@ -590,10 +577,8 @@ describe('FaqPanelContent', () => {
 
             await waitFor(() => expect(getFaqItems()).toHaveLength(2));
 
-            // Mock a reorder error
             mockFaqApi.reorder.mockRejectedValueOnce(new Error('Reorder error'));
 
-            // Simulate drag and drop
             const draggedItem = screen.getByTestId('draggable-item-1');
             const targetItem = screen.getByTestId('draggable-item-2');
 
@@ -617,20 +602,15 @@ describe('FaqPanelContent', () => {
         });
     });
 
-    //             // Force selectedCategoryRef.current and hasMoreRef.current true so fetchMembers tries to run
-    //             // This needs to be set on component instance, which is tricky. Instead, simulate by triggering fetchMembers indirectly:
-
     describe('Modal operations', () => {
         it('should open and close add FAQ modal', async () => {
             renderFaqPanelContent();
 
             await waitFor(() => expect(getFaqItems()).toHaveLength(2));
 
-            // Open add modal
             clickAddFaqButton();
             expect(getAddFaqModal()).toBeInTheDocument();
 
-            // Close add modal
             fireEvent.click(screen.getByTestId('close-add'));
             expect(getAddFaqModal()).not.toBeInTheDocument();
         });
@@ -640,11 +620,9 @@ describe('FaqPanelContent', () => {
 
             await waitFor(() => expect(getFaqItems()).toHaveLength(2));
 
-            // Open add modal
             clickAddFaqButton();
             expect(getAddFaqModal()).toBeInTheDocument();
 
-            // Confirm adding
             fireEvent.click(screen.getByTestId('confirm-add'));
 
             await waitFor(() => {
@@ -658,11 +636,9 @@ describe('FaqPanelContent', () => {
 
             await waitFor(() => expect(getFaqItems()).toHaveLength(2));
 
-            // Open edit modal
             clickEditFaqButton(1);
             expect(getEditFaqModal()).toBeInTheDocument();
 
-            // Close edit modal
             fireEvent.click(screen.getByTestId('close-edit'));
             expect(getEditFaqModal()).not.toBeInTheDocument();
         });
@@ -672,11 +648,9 @@ describe('FaqPanelContent', () => {
 
             await waitFor(() => expect(getFaqItems()).toHaveLength(2));
 
-            // Open edit modal
             clickEditFaqButton(1);
             expect(getEditFaqModal()).toBeInTheDocument();
 
-            // Confirm editing
             fireEvent.click(screen.getByTestId('confirm-edit'));
 
             await waitFor(() => {
@@ -689,11 +663,9 @@ describe('FaqPanelContent', () => {
 
             await waitFor(() => expect(getFaqItems()).toHaveLength(2));
 
-            // Open delete modal
             clickDeleteFaqButton(1);
             expect(getDeleteFaqModal()).toBeInTheDocument();
 
-            // Close delete modal
             fireEvent.click(screen.getByTestId('close-delete'));
             expect(getDeleteFaqModal()).not.toBeInTheDocument();
         });
@@ -703,11 +675,9 @@ describe('FaqPanelContent', () => {
 
             await waitFor(() => expect(getFaqItems()).toHaveLength(2));
 
-            // Open delete modal
             clickDeleteFaqButton(1);
             expect(getDeleteFaqModal()).toBeInTheDocument();
 
-            // Confirm deleting
             fireEvent.click(screen.getByTestId('confirm-delete'));
 
             await waitFor(() => {
@@ -721,19 +691,15 @@ describe('FaqPanelContent', () => {
 
             await waitFor(() => expect(getFaqItems()).toHaveLength(2));
 
-            // Open add modal
             clickAddFaqButton();
             expect(getAddFaqModal()).toBeInTheDocument();
 
-            // Try to open edit modal - should not work
             clickEditFaqButton(1);
             expect(getEditFaqModal()).not.toBeInTheDocument();
             expect(getAddFaqModal()).toBeInTheDocument();
 
-            // Close add modal
             fireEvent.click(screen.getByTestId('close-add'));
 
-            // Now edit modal should open
             clickEditFaqButton(1);
             expect(getEditFaqModal()).toBeInTheDocument();
         });
@@ -743,19 +709,15 @@ describe('FaqPanelContent', () => {
 
             await waitFor(() => expect(getFaqItems()).toHaveLength(2));
 
-            // Open add modal
             clickAddFaqButton();
             expect(getAddFaqModal()).toBeInTheDocument();
 
-            // Try to open delete modal - should not work
             clickDeleteFaqButton(1);
             expect(getDeleteFaqModal()).not.toBeInTheDocument();
             expect(getAddFaqModal()).toBeInTheDocument();
 
-            // Close add modal
             fireEvent.click(screen.getByTestId('close-add'));
 
-            // Now delete modal should open
             clickDeleteFaqButton(1);
             expect(getDeleteFaqModal()).toBeInTheDocument();
         });
@@ -763,10 +725,9 @@ describe('FaqPanelContent', () => {
 
     describe('Infinite scrolling', () => {
         it('should load more faqs when load more button is clicked', async () => {
-            // Set up mock for initial load
             mockFaqApi.getAll.mockResolvedValueOnce({
                 items: convertFaqsToDto(mockFaqs),
-                totalItemsCount: 4, // Total of 4, so there's more to load
+                totalItemsCount: 4,
             });
 
             renderFaqPanelContent();
@@ -776,7 +737,6 @@ describe('FaqPanelContent', () => {
                 expect(screen.getByTestId('load-more')).toBeInTheDocument();
             });
 
-            // Set up mock for load more
             const moreFaqs = [
                 {
                     id: 3,
@@ -870,152 +830,8 @@ describe('FaqPanelContent', () => {
             expect(mockUpdateListSize).toHaveBeenCalled();
         });
     });
-
     describe('Edge cases', () => {
-        it('should handle case when no visitor pages are available', async () => {
-            // Mock empty pages
-            jest.spyOn(
-                require('../../../../../contexts/admin/visitor-pages-provider/VisitorPagesProvider'),
-                'useVisitorPages',
-            ).mockReturnValueOnce({
-                pages: [],
-                isLoading: false,
-                error: null,
-                refetchPages: jest.fn(),
-            });
-
-            renderFaqPanelContent();
-
-            // Since there are no pages, getAll should not be called
-            await waitFor(() => {
-                expect(mockFaqApi.getAll).not.toHaveBeenCalled();
-            });
-        });
-
-        it('should handle visitor pages loading state', async () => {
-            // Mock loading pages
-            jest.spyOn(
-                require('../../../../../contexts/admin/visitor-pages-provider/VisitorPagesProvider'),
-                'useVisitorPages',
-            ).mockReturnValueOnce({
-                pages: [],
-                isLoading: true,
-                error: null,
-                refetchPages: jest.fn(),
-            });
-
-            renderFaqPanelContent();
-
-            // While pages are loading, should see loading indicator
-            expect(screen.getByTestId('infinite-scroll-loader')).toBeInTheDocument();
-        });
-
-        it('should handle visitor pages error', async () => {
-            // Mock pages error
-            jest.spyOn(
-                require('../../../../../contexts/admin/visitor-pages-provider/VisitorPagesProvider'),
-                'useVisitorPages',
-            ).mockReturnValue({
-                pages: [],
-                isLoading: false,
-                error: new Error('Failed to fetch pages'),
-                refetchPages: jest.fn(),
-            });
-
-            renderFaqPanelContent();
-
-            await waitFor(() => {
-                expect(getFaqErrorContainer()).toBeInTheDocument();
-                expect(screen.getByText(FAQ_TEXT.MESSAGE.FAIL_TO_FETCH_PAGES)).toBeInTheDocument();
-            });
-        });
-
-        it('should retry fetching pages when error type is Pages', async () => {
-            const mockRefetchPages = jest.fn();
-
-            // Mock visitor pages provider to return error
-            jest.spyOn(
-                require('../../../../../contexts/admin/visitor-pages-provider/VisitorPagesProvider'),
-                'useVisitorPages',
-            ).mockReturnValue({
-                pages: [],
-                isLoading: false,
-                error: new Error('Failed to fetch pages'),
-                refetchPages: mockRefetchPages,
-            });
-
-            renderFaqPanelContent();
-
-            await waitFor(() => {
-                expect(getFaqErrorContainer()).toBeInTheDocument();
-                expect(screen.getByText(FAQ_TEXT.MESSAGE.FAIL_TO_FETCH_PAGES)).toBeInTheDocument();
-            });
-
-            // Click Try Again button
-            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN));
-
-            // Verify refetchPages was called
-            expect(mockRefetchPages).toHaveBeenCalledTimes(1);
-        });
-
-        it('should handle adding FAQ when at list size limit', () => {
-            // Test the condition directly by mocking the component instance
-            const mockSetFaqs = jest.fn();
-            const mockSetHasMore = jest.fn();
-
-            // Create a test instance of handleAddFaq
-            const selectedVisitorPageRef = { current: { id: 1 } };
-            const listSize = 5;
-            const currentPaginationPageRef = { current: 1 };
-            const hasMoreRef = { current: false };
-
-            // Create test function simulating handleAddFaq from the component
-            const handleAddFaq = (faq: FaqQuestion) => {
-                const prevFaqs = mockFaqs;
-                if (
-                    prevFaqs.length < listSize * currentPaginationPageRef.current &&
-                    faq.pages.map((p: VisitorPage) => p.id).includes(selectedVisitorPageRef.current.id)
-                ) {
-                    mockSetFaqs([...prevFaqs, faq]);
-                } else {
-                    mockSetHasMore(true);
-                    hasMoreRef.current = true;
-                }
-            };
-
-            // Test Case 1: FAQ belongs to the selected page and there's space in the list
-            const faqToAdd = {
-                ...mockNewFaq,
-                pages: [{ id: 1, title: 'Selected Page', slug: 'selected' }],
-            };
-
-            handleAddFaq(faqToAdd);
-
-            // The FAQ should be added directly to the list
-            expect(mockSetFaqs).toHaveBeenCalledWith([...mockFaqs, faqToAdd]);
-            expect(mockSetHasMore).not.toHaveBeenCalled();
-
-            // Reset mocks for next test
-            jest.clearAllMocks();
-
-            // Test Case 2: FAQ belongs to a different page
-            const faqWithDifferentPage = {
-                ...mockNewFaq,
-                pages: [{ id: 999, title: 'Other Page', slug: 'other' }],
-            };
-
-            handleAddFaq(faqWithDifferentPage);
-
-            // The FAQ should not be added, but hasMore should be set to true
-            expect(mockSetFaqs).not.toHaveBeenCalled();
-            expect(mockSetHasMore).toHaveBeenCalledWith(true);
-            expect(hasMoreRef.current).toBe(true);
-        });
-    });
-    describe('Edgecases', () => {
-        // Добавьте afterEach для восстановления моков после каждого теста в Edge cases
         afterEach(() => {
-            // Восстанавливаем мок после каждого теста
             jest.restoreAllMocks();
         });
 

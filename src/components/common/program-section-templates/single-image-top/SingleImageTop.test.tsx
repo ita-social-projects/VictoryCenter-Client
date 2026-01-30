@@ -71,12 +71,17 @@ describe('SingleImageTop', () => {
         );
     });
 
-    it('uses a fallback onChange when onImageChange is missing', () => {
-        render(<SingleImageTop {...baseProps} isEditable={true} />);
+    it('executes default fallback handlers (onChange, setError)', () => {
+        render(<SingleImageTop {...baseProps} isEditable={true} onImageChange={undefined} />);
 
         const photoProps = mockPhotoInputGroup.mock.calls[0]?.[0];
-        expect(photoProps).toEqual(expect.any(Object));
+
+        expect(photoProps).toBeDefined();
         expect(photoProps.onChange).toEqual(expect.any(Function));
+        expect(() => photoProps.onChange()).not.toThrow();
+
+        expect(photoProps.setError).toEqual(expect.any(Function));
+        expect(() => photoProps.setError()).not.toThrow();
     });
 
     it('renders correctly in non-edit mode', () => {

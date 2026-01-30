@@ -1,6 +1,7 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { SingleImageRight } from './SingleImageRight';
-import { fireEvent } from '@testing-library/react';
+
+const mockPhotoInputGroup = jest.fn();
 
 jest.mock(
     '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
@@ -15,21 +16,31 @@ jest.mock(
 );
 
 jest.mock('@/components/admin/input-groups/photo-input-group/PhotoInputGroup', () => ({
-    PhotoInputGroup: ({ id, value, onChange }: any) => (
-        <div data-testid="photo-input-group">
-            <div data-testid="photo-id">{id}</div>
-            <div data-testid="photo-value">{value?.url || 'no-image'}</div>
-            <button
-                data-testid="photo-change"
-                onClick={() => onChange({ id: '123', url: 'new-image.jpg', mimeType: 'image/jpeg' })}
-            >
-                Change Photo
-            </button>
-        </div>
-    ),
+    PhotoInputGroup: (props: any) => {
+        mockPhotoInputGroup(props);
+        const { id, value, onChange } = props;
+
+        return (
+            <div data-testid="photo-input-group">
+                <div data-testid="photo-id">{id}</div>
+                <div data-testid="photo-value">{value?.url || 'no-image'}</div>
+                <button
+                    data-testid="photo-change"
+                    onClick={() => onChange({ id: '123', url: 'new-image.jpg', mimeType: 'image/jpeg' })}
+                >
+                    Change Photo
+                </button>
+            </div>
+        );
+    },
 }));
 
 describe('SingleImageRight', () => {
+    // 3. Чистим моки перед каждым тестом
+    beforeEach(() => {
+        mockPhotoInputGroup.mockClear();
+    });
+
     describe('Non-editable mode', () => {
         it('renders with title and description', () => {
             render(<SingleImageRight title="Test Title" description="Test Description" />);
@@ -154,6 +165,16 @@ describe('SingleImageRight', () => {
             });
         });
 
+        it('executes fallback handlers (onChange, setError) for PhotoInputGroup', () => {
+            render(<SingleImageRight title="Test" isEditable={true} onImageChange={undefined} />);
+            const props = mockPhotoInputGroup.mock.calls[0]?.[0];
+            expect(props).toBeDefined();
+            expect(props.onChange).toEqual(expect.any(Function));
+            expect(() => props.onChange(null)).not.toThrow();
+            expect(props.setError).toEqual(expect.any(Function));
+            expect(() => props.setError()).not.toThrow();
+        });
+
         it('passes title value to title TextAreaWithCharacterLimitGroup', () => {
             render(<SingleImageRight title="Existing Title" isEditable={true} />);
 
@@ -187,7 +208,7 @@ describe('SingleImageRight', () => {
             expect(container.querySelector('img')).not.toBeInTheDocument();
         });
 
-        it('handles missing callback props gracefully', () => {
+        it('handles missing callback props gracefully (render check)', () => {
             render(<SingleImageRight title="Test" isEditable={true} />);
 
             expect(screen.getByTestId('textarea-group-section-title')).toBeInTheDocument();

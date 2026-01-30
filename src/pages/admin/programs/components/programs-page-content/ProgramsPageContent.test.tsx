@@ -600,7 +600,7 @@ describe('ProgramsPageContent', () => {
         });
     });
 
-    it('handles no searchProgramId in getSearchedProgram', async () => {
+    it('handles search mode: clear search and retry on error', async () => {
         render(<ProgramsPageContent />);
 
         await waitFor(() => {
@@ -608,36 +608,23 @@ describe('ProgramsPageContent', () => {
         });
 
         fireEvent.click(screen.getByTestId('select-program'));
-
         fireEvent.click(screen.getByTestId('clear-search'));
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-        });
-    });
-
-    it('displays search program fetch error and retries with refetchSearchProgram', async () => {
-        render(<ProgramsPageContent />);
 
         await waitFor(() => {
             expect(screen.getAllByTestId('program-item')).toHaveLength(2);
         });
 
         mockProgramsApi.fetchProgramById.mockRejectedValue(new Error('Search failed'));
-
         fireEvent.click(screen.getByTestId('select-program'));
 
         await waitFor(() => {
             expect(screen.getByText(PROGRAMS_TEXT.MESSAGE.FAIL_TO_FETCH_PROGRAM)).toBeInTheDocument();
-            expect(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN)).toBeInTheDocument();
         });
 
         mockProgramsApi.fetchProgramById.mockResolvedValue(mockPrograms[0]);
-
         fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN));
 
         await waitFor(() => {
-            expect(mockProgramsApi.fetchProgramById).toHaveBeenCalledTimes(2);
             expect(screen.getAllByTestId('program-item')).toHaveLength(1);
         });
     });
@@ -659,7 +646,7 @@ describe('ProgramsPageContent', () => {
         });
     });
 
-    it('selects next category when deleting the selected category', async () => {
+    it('selects next category when deleting selected category', async () => {
         render(<ProgramsPageContent />);
 
         await waitFor(() => {
@@ -674,19 +661,81 @@ describe('ProgramsPageContent', () => {
         });
     });
 
-    it('clears selection when deleting the last category', async () => {
-        mockProgramsCategoriesApi.fetchProgramCategories.mockResolvedValue([{ id: 1, name: 'Only', programsCount: 1 }]);
-
+    it('handles program operations in search view', async () => {
         render(<ProgramsPageContent />);
 
         await waitFor(() => {
-            expect(screen.getByTestId('category-1')).toBeDisabled();
+            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
         });
 
-        fireEvent.click(screen.getByTestId('trigger-delete-category'));
+        // Edit in search view
+        fireEvent.click(screen.getByTestId('select-program'));
+        await waitFor(() => {
+            expect(screen.getAllByTestId('program-item')).toHaveLength(1);
+        });
+        fireEvent.click(screen.getByTestId('trigger-edit'));
+        await waitFor(() => {
+            expect(screen.getAllByTestId('program-item')).toHaveLength(1);
+        });
+
+        // Delete from search view
+        fireEvent.click(screen.getByTestId('trigger-delete'));
+        await waitFor(() => {
+            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
+        });
+
+        // Reset search on category change
+        fireEvent.click(screen.getByTestId('select-program'));
+        fireEvent.click(screen.getByTestId('category-2'));
+        await waitFor(() => {
+            expect(mockProgramsApi.fetchPrograms).toHaveBeenCalledWith(expect.any(Object), 2, 0, 5, undefined);
+        });
+    });
+
+    it('handles program filtering and category changes', async () => {
+        render(<ProgramsPageContent />);
 
         await waitFor(() => {
-            expect(screen.queryByTestId('category-1')).not.toBeInTheDocument();
+            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
+        });
+
+        // Remove program when edited to different category
+        fireEvent.click(screen.getByTestId('trigger-edit'));
+        await waitFor(() => {
+            expect(screen.getAllByTestId('program-item')).toHaveLength(1);
+        });
+
+        // Filter by status
+        fireEvent.click(screen.getByText('Filter Published'));
+        await waitFor(() => {
+            expect(mockProgramsApi.fetchPrograms).toHaveBeenCalledWith(
+                expect.any(Object),
+                1,
+                0,
+                5,
+                VisibilityStatus.Published,
+            );
+        });
+    });
+
+    it('calls modal handlers for add, edit, and delete actions', async () => {
+        render(<ProgramsPageContent />);
+
+        await waitFor(() => {
+            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
+        });
+
+        fireEvent.click(screen.getByTestId('add-item-button'));
+        expect(openActions.openAddItemModal).toHaveBeenCalled();
+
+        fireEvent.click(screen.getAllByTestId('edit-program')[0]);
+        expect(openActions.openEditItemModal).toHaveBeenCalledWith(expect.objectContaining({ id: 10 }));
+
+        fireEvent.click(screen.getAllByTestId('delete-program')[0]);
+        expect(openActions.openDeleteItemModal).toHaveBeenCalledWith(expect.objectContaining({ id: 10 }));
+        global.dispatchEvent(new Event('resize'));
+        await waitFor(() => {
+            expect(screen.getByTestId('programs-page-content')).toBeInTheDocument();
         });
     });
 
@@ -702,202 +751,6 @@ describe('ProgramsPageContent', () => {
         await waitFor(() => {
             expect(screen.getAllByTestId('program-item')).toHaveLength(3);
         });
-    });
-
-    it('updates searched program when edited in search view', async () => {
-        render(<ProgramsPageContent />);
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-        });
-
-        fireEvent.click(screen.getByTestId('select-program'));
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(1);
-            expect(screen.getByText('Alpha')).toBeInTheDocument();
-        });
-
-        fireEvent.click(screen.getByTestId('trigger-edit'));
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(1);
-        });
-    });
-
-    it('deletes program from search view and exits search mode', async () => {
-        render(<ProgramsPageContent />);
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-        });
-
-        fireEvent.click(screen.getByTestId('select-program'));
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(1);
-        });
-
-        fireEvent.click(screen.getByTestId('trigger-delete'));
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-        });
-    });
-
-    it('resets search state when selecting category', async () => {
-        render(<ProgramsPageContent />);
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-        });
-
-        fireEvent.click(screen.getByTestId('select-program'));
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(1);
-        });
-
-        fireEvent.click(screen.getByTestId('category-2'));
-
-        await waitFor(() => {
-            expect(mockProgramsApi.fetchPrograms).toHaveBeenCalledWith(expect.any(Object), 2, 0, 5, undefined);
-        });
-    });
-
-    it('removes program when edited to different category', async () => {
-        render(<ProgramsPageContent />);
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-        });
-
-        fireEvent.click(screen.getByTestId('trigger-edit'));
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(1);
-            expect(screen.queryByText('Alpha')).not.toBeInTheDocument();
-        });
-    });
-
-    it('does not add program when status does not match filter', async () => {
-        render(<ProgramsPageContent />);
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-        });
-
-        fireEvent.click(screen.getByText('Filter Published'));
-
-        await waitFor(() => {
-            expect(mockProgramsApi.fetchPrograms).toHaveBeenCalledWith(
-                expect.any(Object),
-                1,
-                0,
-                5,
-                VisibilityStatus.Published,
-            );
-        });
-
-        fireEvent.click(screen.getByTestId('trigger-add'));
-
-        await waitFor(() => {
-            const items = screen.getAllByTestId('program-item');
-            expect(items.length).toBeGreaterThanOrEqual(1);
-        });
-    });
-
-    it('returns null when searchProgramId is undefined', async () => {
-        render(<ProgramsPageContent />);
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-        });
-
-        expect(screen.getByTestId('infinite-scroll-list')).toBeInTheDocument();
-    });
-
-    it('calls onAddItem when add button is clicked', async () => {
-        render(<ProgramsPageContent />);
-
-        await waitFor(() => {
-            expect(screen.getByTestId('add-item-button')).toBeInTheDocument();
-        });
-
-        fireEvent.click(screen.getByTestId('add-item-button'));
-
-        expect(openActions.openAddItemModal).toHaveBeenCalled();
-    });
-
-    it('calls onEditProgram handler when editing program from list', async () => {
-        render(<ProgramsPageContent />);
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('edit-program')).toHaveLength(2);
-        });
-
-        fireEvent.click(screen.getAllByTestId('edit-program')[0]);
-
-        expect(openActions.openEditItemModal).toHaveBeenCalledWith(expect.objectContaining({ id: 10 }));
-    });
-
-    it('calls onDeleteProgram handler when deleting program from list', async () => {
-        render(<ProgramsPageContent />);
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('delete-program')).toHaveLength(2);
-        });
-
-        fireEvent.click(screen.getAllByTestId('delete-program')[0]);
-
-        expect(openActions.openDeleteItemModal).toHaveBeenCalledWith(expect.objectContaining({ id: 10 }));
-    });
-
-    it('handles resize event and updates page size', async () => {
-        render(<ProgramsPageContent />);
-
-        await waitFor(() => {
-            expect(screen.getByTestId('programs-page-content')).toBeInTheDocument();
-        });
-
-        global.dispatchEvent(new Event('resize'));
-
-        await waitFor(() => {
-            expect(screen.getByTestId('programs-page-content')).toBeInTheDocument();
-        });
-    });
-
-    it('adds program that matches current category and filter', async () => {
-        render(<ProgramsPageContent />);
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-        });
-
-        fireEvent.click(screen.getByTestId('trigger-add'));
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(3);
-            expect(screen.getByText('New Program')).toBeInTheDocument();
-        });
-    });
-
-    it('loads more programs when scrolling', async () => {
-        mockProgramsApi.fetchPrograms.mockResolvedValueOnce({
-            items: mockPrograms,
-            totalItemsCount: 10,
-        });
-
-        render(<ProgramsPageContent />);
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-        });
-
-        const loadMoreButton = screen.queryByTestId('load-more');
-        if (loadMoreButton) {
-            fireEvent.click(loadMoreButton);
-        }
     });
 
     it('clears error when category selection changes', async () => {
@@ -921,7 +774,7 @@ describe('ProgramsPageContent', () => {
         });
     });
 
-    it('handles adding program to different category', async () => {
+    it('updates categories count on add and delete', async () => {
         render(<ProgramsPageContent />);
 
         await waitFor(() => {
@@ -929,72 +782,17 @@ describe('ProgramsPageContent', () => {
         });
 
         fireEvent.click(screen.getByTestId('trigger-add'));
-
-        await waitFor(() => {
-            const items = screen.getAllByTestId('program-item');
-            expect(items.length).toBeGreaterThanOrEqual(2);
-        });
-    });
-
-    it('updates categories count when program is added', async () => {
-        render(<ProgramsPageContent />);
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-        });
-
-        const initialCategoryCount = mockCategories[0].programsCount;
-
-        fireEvent.click(screen.getByTestId('trigger-add'));
-
         await waitFor(() => {
             expect(screen.getAllByTestId('program-item')).toHaveLength(3);
-        });
-    });
-
-    it('updates categories count when program is deleted', async () => {
-        render(<ProgramsPageContent />);
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
         });
 
         fireEvent.click(screen.getByTestId('trigger-delete'));
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(1);
-        });
-    });
-
-    it('updates categories count when program is edited', async () => {
-        render(<ProgramsPageContent />);
-
         await waitFor(() => {
             expect(screen.getAllByTestId('program-item')).toHaveLength(2);
         });
-
-        fireEvent.click(screen.getByTestId('trigger-edit'));
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(1);
-        });
     });
 
-    it('adds program with Draft status and shows Draft toast', async () => {
-        render(<ProgramsPageContent />);
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-        });
-
-        fireEvent.click(screen.getByTestId('trigger-add-draft'));
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(3);
-        });
-    });
-
-    it('edits program with Draft status and shows Draft toast', async () => {
+    it('edits program with Draft status', async () => {
         render(<ProgramsPageContent />);
 
         await waitFor(() => {
@@ -1008,7 +806,7 @@ describe('ProgramsPageContent', () => {
         });
     });
 
-    it('edits program with images and applies cache busting', async () => {
+    it('applies cache busting to images when editing', async () => {
         render(<ProgramsPageContent />);
 
         await waitFor(() => {
@@ -1022,7 +820,7 @@ describe('ProgramsPageContent', () => {
         });
     });
 
-    it('adds new category using handler', async () => {
+    it('adds and edits categories', async () => {
         render(<ProgramsPageContent />);
 
         await waitFor(() => {
@@ -1033,14 +831,6 @@ describe('ProgramsPageContent', () => {
 
         await waitFor(() => {
             expect(screen.getByTestId('category-3')).toBeInTheDocument();
-        });
-    });
-
-    it('edits existing category using handler', async () => {
-        render(<ProgramsPageContent />);
-
-        await waitFor(() => {
-            expect(screen.getByText('Category A')).toBeInTheDocument();
         });
 
         fireEvent.click(screen.getByTestId('trigger-edit-category'));

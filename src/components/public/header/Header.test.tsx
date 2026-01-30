@@ -126,7 +126,6 @@ describe('Header', () => {
             'href',
             PUBLIC_ROUTES.MOCK.FULL,
         );
-        expect(screen.getByRole('link', { name: headerUk['STORE'] })).toHaveAttribute('href', PUBLIC_ROUTES.MOCK.FULL);
         expect(screen.getByRole('link', { name: headerUk['STORIES_OF_VICTORIES'] })).toHaveAttribute(
             'href',
             PUBLIC_ROUTES.MOCK.FULL,

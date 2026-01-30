@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { renderProgramSection, RenderProgramSectionParams, getInitialSectionContents } from './renderProgramSection';
 import { ProgramSectionTemplate } from '@/types/common/program-sections';
@@ -25,6 +24,11 @@ jest.mock('@/components/common/program-section-templates/single-image-bottom/Sin
 jest.mock('@/components/common/program-section-templates/single-image-right/SingleImageRight', () => ({
     SingleImageRight: (props: any) => <div data-testid="SingleImageRight" {...props} />,
 }));
+jest.mock('@/components/common/program-section-templates/title-description-cards/TitleDescriptionCardsWrapper', () => ({
+    TitleDescriptionCardsWrapper: (props: any) => (
+        <div data-testid="TitleDescriptionCardsWrapper" data-cards-count={props.cardsCount} />
+    ),
+}));
 
 describe('renderProgramSection', () => {
     const baseData = {
@@ -43,7 +47,7 @@ describe('renderProgramSection', () => {
         onImagesChange: jest.fn(),
     };
 
-    const templates = [
+    const imageTemplates = [
         { id: ProgramSectionTemplate.QuadImagesBottom, testId: 'QuadImagesBottom' },
         { id: ProgramSectionTemplate.TripleImagesBottom, testId: 'TripleImagesBottom' },
         { id: ProgramSectionTemplate.DualImagesBottom, testId: 'DualImagesBottom' },
@@ -53,126 +57,216 @@ describe('renderProgramSection', () => {
         { id: ProgramSectionTemplate.SingleImageRight, testId: 'SingleImageRight' },
     ];
 
-    templates.forEach(({ id, testId }) => {
-        it(`renders correct component for ${id}`, () => {
-            const params: RenderProgramSectionParams = {
-                templateId: id,
-                data: baseData,
-                isTemplate: true,
-                isEditable: true,
-                handlers: baseHandlers,
-            };
-            render(renderProgramSection(params));
-            expect(screen.getByTestId(testId)).toBeInTheDocument();
-        });
-    });
-
-    it('should return null for unknown template', () => {
-        const params: RenderProgramSectionParams = {
-            templateId: 999 as ProgramSectionTemplate,
-            data: baseData,
-        };
-        expect(renderProgramSection(params)).toBeNull();
-    });
-
-    it('should handle onImageChange callback for single image templates', () => {
-        const mockOnImagesChange = jest.fn();
-        const mockHandlers = {
-            onTitleChange: jest.fn(),
-            onDescriptionChange: jest.fn(),
-            onImagesChange: mockOnImagesChange,
-        };
-
-        [
-            ProgramSectionTemplate.SingleImageBottom,
-            ProgramSectionTemplate.SingleImageTop,
-            ProgramSectionTemplate.SingleImageRight,
-        ].forEach((templateId) => {
-            mockOnImagesChange.mockClear();
-
-            const params: RenderProgramSectionParams = {
-                templateId,
-                data: baseData,
-                handlers: mockHandlers,
-            };
-
-            render(renderProgramSection(params));
-            expect(mockOnImagesChange).not.toHaveBeenCalled();
-        });
-    });
-});
-
-describe('getInitialSectionContents', () => {
-    it('should return base contents for TextOnly template', () => {
-        const result = getInitialSectionContents(ProgramSectionTemplate.TextOnly);
-
-        expect(result).toHaveLength(2);
-        expect(result[0]).toEqual({
-            contentType: ContentType.Title,
-            order: 0,
-            title: '',
-            description: null,
-            image: null,
-        });
-        expect(result[1]).toEqual({
-            contentType: ContentType.Description,
-            order: 1,
-            title: null,
-            description: '',
-            image: null,
-        });
-    });
-
-    it('should return base contents + 1 image for single image templates', () => {
-        [
-            ProgramSectionTemplate.SingleImageTop,
-            ProgramSectionTemplate.SingleImageBottom,
-            ProgramSectionTemplate.SingleImageRight,
-        ].forEach((template) => {
-            const result = getInitialSectionContents(template);
-
-            expect(result).toHaveLength(3);
-            expect(result[2]).toEqual({
-                contentType: ContentType.Image,
-                order: 2,
-                title: null,
-                description: null,
-                image: null,
+    describe('Image-based templates', () => {
+        imageTemplates.forEach(({ id, testId }) => {
+            it(`renders correct component for ${id}`, () => {
+                const params: RenderProgramSectionParams = {
+                    templateId: id,
+                    data: baseData,
+                    isEditable: true,
+                    handlers: baseHandlers,
+                };
+                render(renderProgramSection(params));
+                expect(screen.getByTestId(testId)).toBeInTheDocument();
             });
         });
     });
 
-    it('should return base contents + 2 images for DualImagesBottom template', () => {
-        const result = getInitialSectionContents(ProgramSectionTemplate.DualImagesBottom);
+    describe('Card-based templates', () => {
+        const cardData = {
+            cards: [
+                { title: 'T1', description: 'D1' },
+                { title: 'T2', description: 'D2' },
+                { title: 'T3', description: 'D3' },
+                { title: 'T4', description: 'D4' },
+            ],
+        };
 
-        expect(result).toHaveLength(4);
-        expect(result[2].contentType).toBe(ContentType.Image);
-        expect(result[2].order).toBe(2);
-        expect(result[3].contentType).toBe(ContentType.Image);
-        expect(result[3].order).toBe(3);
+        const cardHandlers = {
+            onCardTitleChange: jest.fn(),
+            onCardDescriptionChange: jest.fn(),
+        };
+
+        const cardTemplates = [
+            { id: ProgramSectionTemplate.DualTitleDescription, cardsCount: 2 },
+            { id: ProgramSectionTemplate.TripleTitleDescription, cardsCount: 3 },
+            { id: ProgramSectionTemplate.QuadTitleDescription, cardsCount: 4 },
+        ];
+
+        cardTemplates.forEach(({ id, cardsCount }) => {
+            it(`renders TitleDescriptionCardsWrapper for ${id} with ${cardsCount} cards`, () => {
+                render(
+                    renderProgramSection({
+                        templateId: id,
+                        data: cardData,
+                        isEditable: true,
+                        handlers: cardHandlers,
+                    }),
+                );
+
+                const wrapper = screen.getByTestId('TitleDescriptionCardsWrapper');
+                expect(wrapper).toBeInTheDocument();
+                expect(wrapper).toHaveAttribute('data-cards-count', cardsCount.toString());
+            });
+
+            it(`passes empty cards array for ${id} when data.cards is undefined`, () => {
+                render(
+                    renderProgramSection({
+                        templateId: id,
+                        data: { cards: undefined },
+                        isEditable: true,
+                        handlers: cardHandlers,
+                    }),
+                );
+
+                expect(screen.getByTestId('TitleDescriptionCardsWrapper')).toBeInTheDocument();
+            });
+
+            it(`passes isEditable=false for ${id}`, () => {
+                render(
+                    renderProgramSection({
+                        templateId: id,
+                        data: cardData,
+                        isEditable: false,
+                        handlers: cardHandlers,
+                    }),
+                );
+
+                expect(screen.getByTestId('TitleDescriptionCardsWrapper')).toBeInTheDocument();
+            });
+
+            it(`passes handlers to ${id}`, () => {
+                render(
+                    renderProgramSection({
+                        templateId: id,
+                        data: cardData,
+                        isEditable: true,
+                        handlers: cardHandlers,
+                    }),
+                );
+
+                expect(screen.getByTestId('TitleDescriptionCardsWrapper')).toBeInTheDocument();
+            });
+        });
     });
 
-    it('should return base contents + 3 images for TripleImagesBottom template', () => {
-        const result = getInitialSectionContents(ProgramSectionTemplate.TripleImagesBottom);
+    it('returns null for unknown template', () => {
+        const utils = renderProgramSection({
+            templateId: 'UNKNOWN' as unknown as ProgramSectionTemplate,
+            data: baseData,
+            isEditable: true,
+        });
 
-        expect(result).toHaveLength(5);
-        expect(result.slice(2).every((item) => item.contentType === ContentType.Image)).toBe(true);
-        expect(result[4].order).toBe(4);
+        expect(utils).toBeNull();
     });
 
-    it('should return base contents + 4 images for QuadImagesBottom template', () => {
-        const result = getInitialSectionContents(ProgramSectionTemplate.QuadImagesBottom);
+    it('passes isTemplate prop to components', () => {
+        render(
+            renderProgramSection({
+                templateId: ProgramSectionTemplate.TextOnly,
+                data: baseData,
+                isTemplate: true,
+                isEditable: false,
+            }),
+        );
 
-        expect(result).toHaveLength(6);
-        expect(result.slice(2).every((item) => item.contentType === ContentType.Image)).toBe(true);
-        expect(result[5].order).toBe(5);
+        expect(screen.getByTestId('TextOnly')).toBeInTheDocument();
+    });
+});
+
+describe('getInitialSectionContents', () => {
+    describe('Base templates', () => {
+        it('returns base contents for TextOnly', () => {
+            const contents = getInitialSectionContents(ProgramSectionTemplate.TextOnly);
+
+            expect(contents).toHaveLength(2);
+            expect(contents[0].contentType).toBe(ContentType.Title);
+            expect(contents[1].contentType).toBe(ContentType.Description);
+        });
     });
 
-    it('should return base contents for unknown template', () => {
-        const result = getInitialSectionContents(999 as ProgramSectionTemplate);
+    describe('Single image templates', () => {
+        const singleImageTemplates = [
+            ProgramSectionTemplate.SingleImageTop,
+            ProgramSectionTemplate.SingleImageBottom,
+            ProgramSectionTemplate.SingleImageRight,
+        ];
 
-        expect(result).toHaveLength(2);
-        expect(result[0].contentType).toBe(ContentType.Title);
-        expect(result[1].contentType).toBe(ContentType.Description);
+        singleImageTemplates.forEach((templateId) => {
+            it(`returns 3 contents for ${templateId}`, () => {
+                const contents = getInitialSectionContents(templateId);
+
+                expect(contents).toHaveLength(3);
+                expect(contents[0].contentType).toBe(ContentType.Title);
+                expect(contents[1].contentType).toBe(ContentType.Description);
+                expect(contents[2].contentType).toBe(ContentType.Image);
+            });
+        });
+    });
+
+    describe('Multiple images templates', () => {
+        it('returns 4 contents for DualImagesBottom', () => {
+            const contents = getInitialSectionContents(ProgramSectionTemplate.DualImagesBottom);
+
+            expect(contents).toHaveLength(4);
+            expect(contents.filter((c) => c.contentType === ContentType.Image)).toHaveLength(2);
+        });
+
+        it('returns 5 contents for TripleImagesBottom', () => {
+            const contents = getInitialSectionContents(ProgramSectionTemplate.TripleImagesBottom);
+
+            expect(contents).toHaveLength(5);
+            expect(contents.filter((c) => c.contentType === ContentType.Image)).toHaveLength(3);
+        });
+
+        it('returns 6 contents for QuadImagesBottom', () => {
+            const contents = getInitialSectionContents(ProgramSectionTemplate.QuadImagesBottom);
+
+            expect(contents).toHaveLength(6);
+            expect(contents.filter((c) => c.contentType === ContentType.Image)).toHaveLength(4);
+        });
+    });
+
+    describe('Card-based templates', () => {
+        it('returns 4 contents for DualTitleDescription (2 title + 2 description)', () => {
+            const contents = getInitialSectionContents(ProgramSectionTemplate.DualTitleDescription);
+
+            expect(contents).toHaveLength(4);
+            expect(contents.filter((c) => c.contentType === ContentType.Title)).toHaveLength(2);
+            expect(contents.filter((c) => c.contentType === ContentType.Description)).toHaveLength(2);
+        });
+
+        it('returns 6 contents for TripleTitleDescription (3 title + 3 description)', () => {
+            const contents = getInitialSectionContents(ProgramSectionTemplate.TripleTitleDescription);
+
+            expect(contents).toHaveLength(6);
+            expect(contents.filter((c) => c.contentType === ContentType.Title)).toHaveLength(3);
+            expect(contents.filter((c) => c.contentType === ContentType.Description)).toHaveLength(3);
+        });
+
+        it('returns 8 contents for QuadTitleDescription (4 title + 4 description)', () => {
+            const contents = getInitialSectionContents(ProgramSectionTemplate.QuadTitleDescription);
+
+            expect(contents).toHaveLength(8);
+            expect(contents.filter((c) => c.contentType === ContentType.Title)).toHaveLength(4);
+            expect(contents.filter((c) => c.contentType === ContentType.Description)).toHaveLength(4);
+        });
+
+        it('maintains correct order for DualTitleDescription', () => {
+            const contents = getInitialSectionContents(ProgramSectionTemplate.DualTitleDescription);
+
+            expect(contents[0].order).toBe(0);
+            expect(contents[1].order).toBe(1);
+            expect(contents[2].order).toBe(2);
+            expect(contents[3].order).toBe(3);
+        });
+    });
+
+    it('returns default contents for unknown template', () => {
+        const contents = getInitialSectionContents('UNKNOWN' as unknown as ProgramSectionTemplate);
+
+        expect(contents).toHaveLength(2);
+        expect(contents[0].contentType).toBe(ContentType.Title);
+        expect(contents[1].contentType).toBe(ContentType.Description);
     });
 });

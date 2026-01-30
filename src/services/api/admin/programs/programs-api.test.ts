@@ -158,6 +158,21 @@ describe('fetchProgramById', () => {
 
         expect(result).toBeNull();
     });
+
+    it('should call API with correct route and ID', async () => {
+        const programId = 42;
+        mockClient.get.mockResolvedValueOnce({ data: mockPrograms[0] });
+
+        await ProgramsApi.fetchProgramById(programId, mockClient);
+
+        expect(mockClient.get).toHaveBeenCalledWith(`${API_ROUTES.PROGRAMS.BASE}/${programId}`);
+    });
+
+    it('should throw error when API fails', async () => {
+        mockClient.get.mockRejectedValueOnce(new Error('Server error'));
+
+        await expect(ProgramsApi.fetchProgramById(1, mockClient)).rejects.toThrow('Server error');
+    });
 });
 
 describe('fetchPrograms', () => {
@@ -206,6 +221,33 @@ describe('fetchPrograms', () => {
         const result = await ProgramsApi.fetchPrograms(mockClient, 1, 1, 1);
 
         expect(result).toBeDefined();
+    });
+
+    it('should pass correct parameters to API', async () => {
+        mockClient.get.mockResolvedValueOnce({
+            data: { items: [], totalItemsCount: 0 },
+        });
+        const categoryId = 3;
+        const offset = 10;
+        const limit = 20;
+        const status = VisibilityStatus.Draft;
+
+        await ProgramsApi.fetchPrograms(mockClient, categoryId, offset, limit, status);
+
+        expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.PROGRAMS.BASE, {
+            params: {
+                categoryId,
+                offset,
+                limit,
+                status,
+            },
+        });
+    });
+
+    it('should handle API errors gracefully', async () => {
+        mockClient.get.mockRejectedValueOnce(new Error('Network error'));
+
+        await expect(ProgramsApi.fetchPrograms(mockClient, 1, 0, 10)).rejects.toThrow('Network error');
     });
 });
 
@@ -663,6 +705,38 @@ describe('addProgramCategory', () => {
         expect(result.name).toBe(categoryData.name);
         expect(result.programsCount).toBe(0);
     });
+
+    it('should add category with existing programs', async () => {
+        const categoryData: ProgramCategoryCreateUpdate = {
+            id: null,
+            name: 'Category with Programs',
+        };
+        mockClient.post.mockResolvedValueOnce({
+            data: {
+                id: 5,
+                name: categoryData.name,
+                programs: [{}, {}, {}],
+            },
+        });
+
+        const result = await ProgramsCategoriesApi.addProgramCategory(categoryData, mockClient);
+
+        expect(result.id).toBe(5);
+        expect(result.name).toBe(categoryData.name);
+        expect(result.programsCount).toBe(3);
+    });
+
+    it('should handle API error during category creation', async () => {
+        const categoryData: ProgramCategoryCreateUpdate = {
+            id: null,
+            name: 'Invalid Category',
+        };
+        mockClient.post.mockRejectedValueOnce(new Error('Category name already exists'));
+
+        await expect(ProgramsCategoriesApi.addProgramCategory(categoryData, mockClient)).rejects.toThrow(
+            'Category name already exists',
+        );
+    });
 });
 
 describe('editCategory', () => {
@@ -875,6 +949,68 @@ describe('fetchProgramSearchItems', () => {
         const actualNames = result.items.map((item) => item.name);
 
         expect(actualNames).toEqual(expectedOrder);
+    });
+
+    it('should convert programs to search suggestions format correctly', async () => {
+        mockClient.get.mockResolvedValueOnce({
+            data: {
+                items: [mockPrograms[0]],
+                totalItemsCount: 1,
+            },
+        });
+
+        const result = await ProgramsApi.fetchProgramSearchItems(mockClient, 'search', 0, 5);
+
+        expect(result.items[0]).toHaveProperty('id');
+        expect(result.items[0]).toHaveProperty('name');
+        expect(result.items[0]).toHaveProperty('categories');
+        expect(Array.isArray(result.items[0].categories)).toBe(true);
+    });
+
+    it('should pass correct API parameters including signal', async () => {
+        const searchTerm = 'test search';
+        const offset = 5;
+        const limit = 10;
+        const abortController = new AbortController();
+        const signal = abortController.signal;
+
+        mockClient.get.mockResolvedValueOnce({
+            data: { items: [], totalItemsCount: 0 },
+        });
+
+        await ProgramsApi.fetchProgramSearchItems(mockClient, searchTerm, offset, limit, signal);
+
+        expect(mockClient.get).toHaveBeenCalledWith(
+            `${API_ROUTES.PROGRAMS.SEARCH}`,
+            expect.objectContaining({
+                params: {
+                    SearchQuery: searchTerm,
+                    offset,
+                    limit,
+                },
+                signal,
+            }),
+        );
+    });
+
+    it('should use default values for offset and limit', async () => {
+        const searchTerm = 'test';
+
+        mockClient.get.mockResolvedValueOnce({
+            data: { items: [], totalItemsCount: 0 },
+        });
+
+        await ProgramsApi.fetchProgramSearchItems(mockClient, searchTerm);
+
+        expect(mockClient.get).toHaveBeenCalledWith(
+            `${API_ROUTES.PROGRAMS.SEARCH}`,
+            expect.objectContaining({
+                params: expect.objectContaining({
+                    offset: 0,
+                    limit: 5,
+                }),
+            }),
+        );
     });
 });
 

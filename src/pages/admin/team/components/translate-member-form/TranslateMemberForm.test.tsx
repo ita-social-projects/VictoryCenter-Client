@@ -1,5 +1,5 @@
 import React, { createRef } from 'react';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent, act, createEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 import { TranslateMemberForm, TranslateTeamMemberFormRef } from './TranslateMemberForm';
@@ -12,7 +12,14 @@ jest.mock('@/validation/admin/team-member-schema/team-member-schema', () => ({
 }));
 
 jest.mock('@/components/common/select/Select', () => {
-    const Select = ({ children }: any) => <div data-testid="select">{children}</div>;
+    const Select = ({ children, onValueChange }: any) => (
+        <div data-testid="select">
+            {children}
+            <button data-testid="select-change-trigger" onClick={() => onValueChange && onValueChange('UA')}>
+                Change Lang
+            </button>
+        </div>
+    );
 
     Select.Option = ({ children }: any) => <div data-testid="select-option">{children}</div>;
 
@@ -53,9 +60,7 @@ jest.mock('../common-member-fields/CommonMemberFields', () => ({
 
 const renderForm = (props: any = {}) => {
     const ref = createRef<TranslateTeamMemberFormRef>();
-
     render(<TranslateMemberForm ref={ref} onSubmit={jest.fn()} {...props} />);
-
     return { ref };
 };
 
@@ -107,7 +112,6 @@ describe('TranslateMemberForm', () => {
         fireEvent.blur(screen.getByTestId('description'));
 
         expect(TEAM_MEMBER_VALIDATION_FUNCTIONS.validateFullName).toHaveBeenCalled();
-
         expect(TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription).toHaveBeenCalled();
     });
 
@@ -146,5 +150,24 @@ describe('TranslateMemberForm', () => {
 
         expect(screen.getByTestId('fullName')).toBeDisabled();
         expect(screen.getByTestId('description')).toBeDisabled();
+    });
+
+    it('prevents default behavior on form submit', () => {
+        renderForm();
+        const form = screen.getByTestId('test-form');
+
+        const event = createEvent.submit(form);
+
+        event.preventDefault = jest.fn();
+
+        fireEvent(form, event);
+
+        expect(event.preventDefault).toHaveBeenCalled();
+    });
+
+    it('executes the empty onValueChange handler for Select', () => {
+        renderForm();
+        const trigger = screen.getByTestId('select-change-trigger');
+        expect(() => fireEvent.click(trigger)).not.toThrow();
     });
 });

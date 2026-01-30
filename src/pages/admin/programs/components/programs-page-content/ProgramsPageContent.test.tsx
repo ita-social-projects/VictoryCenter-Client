@@ -337,6 +337,22 @@ describe('ProgramsPageContent', () => {
     let openActions: any;
     let closeActions: any;
 
+    // Helper function to render and wait for initial load
+    const renderAndWaitForPrograms = async (expectedCount = 2) => {
+        render(<ProgramsPageContent />);
+        await waitFor(() => {
+            expect(screen.getAllByTestId('program-item')).toHaveLength(expectedCount);
+        });
+    };
+
+    // Helper function to render and wait for category bar
+    const renderAndWaitForCategoryBar = async () => {
+        render(<ProgramsPageContent />);
+        await waitFor(() => {
+            expect(screen.getByTestId('category-bar')).toBeInTheDocument();
+        });
+    };
+
     beforeEach(() => {
         jest.clearAllMocks();
 
@@ -429,12 +445,7 @@ describe('ProgramsPageContent', () => {
     });
 
     it('switches to search view on program select and clears on request', async () => {
-        render(<ProgramsPageContent />);
-
-        // Wait for initial load
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-        });
+        await renderAndWaitForPrograms();
 
         // Select a program (triggers search view)
         fireEvent.click(screen.getByTestId('select-program'));
@@ -454,12 +465,7 @@ describe('ProgramsPageContent', () => {
     });
 
     it('resets search state on status filter change', async () => {
-        render(<ProgramsPageContent />);
-
-        // Wait for initial load
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-        });
+        await renderAndWaitForPrograms();
 
         // First select a program to enter search mode
         fireEvent.click(screen.getByTestId('select-program'));
@@ -483,12 +489,7 @@ describe('ProgramsPageContent', () => {
     });
 
     it('handles add/edit/delete program via modal callbacks', async () => {
-        render(<ProgramsPageContent />);
-
-        // Wait for initial load
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-        });
+        await renderAndWaitForPrograms();
 
         // Test add program
         fireEvent.click(screen.getByTestId('trigger-add'));
@@ -516,11 +517,7 @@ describe('ProgramsPageContent', () => {
     });
 
     it('opens category modals from context menu', async () => {
-        render(<ProgramsPageContent />);
-
-        await waitFor(() => {
-            expect(screen.getByTestId('category-bar')).toBeInTheDocument();
-        });
+        await renderAndWaitForCategoryBar();
 
         fireEvent.click(screen.getByTestId('ctx-add'));
         expect(openActions.openAddCategoryModal).toHaveBeenCalled();
@@ -601,11 +598,7 @@ describe('ProgramsPageContent', () => {
     });
 
     it('handles search mode: clear search and retry on error', async () => {
-        render(<ProgramsPageContent />);
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-        });
+        await renderAndWaitForPrograms();
 
         fireEvent.click(screen.getByTestId('select-program'));
         fireEvent.click(screen.getByTestId('clear-search'));
@@ -630,7 +623,7 @@ describe('ProgramsPageContent', () => {
     });
 
     it('handles category selection change', async () => {
-        render(<ProgramsPageContent />);
+        await renderAndWaitForCategoryBar();
 
         await waitFor(() => {
             expect(screen.getByTestId('category-1')).toBeDisabled();
@@ -647,7 +640,7 @@ describe('ProgramsPageContent', () => {
     });
 
     it('selects next category when deleting selected category', async () => {
-        render(<ProgramsPageContent />);
+        await renderAndWaitForCategoryBar();
 
         await waitFor(() => {
             expect(screen.getByTestId('category-1')).toBeDisabled();
@@ -662,11 +655,7 @@ describe('ProgramsPageContent', () => {
     });
 
     it('handles program operations in search view', async () => {
-        render(<ProgramsPageContent />);
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-        });
+        await renderAndWaitForPrograms();
 
         // Edit in search view
         fireEvent.click(screen.getByTestId('select-program'));
@@ -693,11 +682,7 @@ describe('ProgramsPageContent', () => {
     });
 
     it('handles program filtering and category changes', async () => {
-        render(<ProgramsPageContent />);
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-        });
+        await renderAndWaitForPrograms();
 
         // Remove program when edited to different category
         fireEvent.click(screen.getByTestId('trigger-edit'));
@@ -719,11 +704,7 @@ describe('ProgramsPageContent', () => {
     });
 
     it('calls modal handlers for add, edit, and delete actions', async () => {
-        render(<ProgramsPageContent />);
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-        });
+        await renderAndWaitForPrograms();
 
         fireEvent.click(screen.getByTestId('add-item-button'));
         expect(openActions.openAddItemModal).toHaveBeenCalled();
@@ -740,11 +721,7 @@ describe('ProgramsPageContent', () => {
     });
 
     it('adds program with Draft status', async () => {
-        render(<ProgramsPageContent />);
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-        });
+        await renderAndWaitForPrograms();
 
         fireEvent.click(screen.getByTestId('trigger-add'));
 
@@ -775,11 +752,7 @@ describe('ProgramsPageContent', () => {
     });
 
     it('updates categories count on add and delete', async () => {
-        render(<ProgramsPageContent />);
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-        });
+        await renderAndWaitForPrograms();
 
         fireEvent.click(screen.getByTestId('trigger-add'));
         await waitFor(() => {
@@ -792,36 +765,24 @@ describe('ProgramsPageContent', () => {
         });
     });
 
-    it('edits program with Draft status', async () => {
-        render(<ProgramsPageContent />);
+    it('handles special edit scenarios: Draft status and image cache busting', async () => {
+        await renderAndWaitForPrograms();
 
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-        });
-
+        // Edit with Draft status
         fireEvent.click(screen.getByTestId('trigger-edit-draft'));
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-        });
-    });
-
-    it('applies cache busting to images when editing', async () => {
-        render(<ProgramsPageContent />);
-
         await waitFor(() => {
             expect(screen.getAllByTestId('program-item')).toHaveLength(2);
         });
 
+        // Edit with images (tests cache busting)
         fireEvent.click(screen.getByTestId('trigger-edit-with-images'));
-
         await waitFor(() => {
             expect(screen.getAllByTestId('program-item')).toHaveLength(2);
         });
     });
 
     it('adds and edits categories', async () => {
-        render(<ProgramsPageContent />);
+        await renderAndWaitForCategoryBar();
 
         await waitFor(() => {
             expect(screen.getByTestId('category-1')).toBeInTheDocument();

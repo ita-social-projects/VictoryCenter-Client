@@ -12,35 +12,30 @@
 
 .language-select {
     width: 150px;
-
-    :global {
-        .select-head {
-            border: none;
-            background: transparent;
-            box-shadow: none;
-            padding: 0;
-        }
-
-        .select-options-selected {
-            justify-content: center;
-        }
-    }
 }
 
 .language-select-head {
     display: inline-flex;
     align-items: center;
-}
+    
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+    
+    justify-content: center; 
 
-.language-select-head::before {
-    content: '';
-    width: 20px;
-    height: 20px;
-    display: inline-block;
-    margin: 4px;
-    background-image: url('../../../assets/icons/globe.svg'); 
-    background-size: contain;
-    background-position: center;
+    &::before {
+        content: '';
+        width: 20px;
+        height: 20px;
+        display: inline-block;
+        margin: 4px;
+        background-image: url('../../../assets/icons/globe.svg'); 
+        background-size: contain;
+        background-position: center;
+        flex-shrink: 0;
+    }
 }
 
 .generate-button {

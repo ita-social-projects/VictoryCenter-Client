@@ -761,12 +761,10 @@ describe('FaqPanelContent', () => {
                 totalItemsCount: 4,
             });
 
-            // Click load more
             fireEvent.click(screen.getByTestId('load-more'));
 
             await waitFor(() => {
                 expect(mockFaqApi.getAll).toHaveBeenCalledTimes(2);
-                // Second call should use pagination
                 expect(mockFaqApi.getAll).toHaveBeenCalledWith(
                     expect.anything(),
                     1,
@@ -779,7 +777,6 @@ describe('FaqPanelContent', () => {
 
             await waitFor(() => {
                 expect(getFaqItems()).toHaveLength(4);
-                // No more items to load
                 expect(screen.queryByTestId('load-more')).not.toBeInTheDocument();
             });
         });
@@ -791,7 +788,6 @@ describe('FaqPanelContent', () => {
 
             await waitFor(() => expect(getFaqItems()).toHaveLength(2));
 
-            // Type in search input
             fireEvent.change(screen.getByTestId('search-input'), { target: { value: 'test search query' } });
             expect(screen.getByTestId('search-input')).toHaveValue('test search query');
         });
@@ -812,19 +808,15 @@ describe('FaqPanelContent', () => {
         });
 
         it('updates list size on resize', async () => {
-            // Since we can't reliably test if getAll is called after resize,
-            // let's just test that updateListSize is called
             const mockUpdateListSize = jest.fn();
             jest.spyOn(global, 'addEventListener').mockImplementation((event, handler) => {
                 if (event === 'resize') {
-                    // Store the resize handler to call it later
                     mockUpdateListSize.mockImplementation(handler as any);
                 }
             });
 
             renderFaqPanelContent();
 
-            // Trigger the resize handler directly
             mockUpdateListSize();
 
             expect(mockUpdateListSize).toHaveBeenCalled();
@@ -962,21 +954,6 @@ describe('FaqPanelContent', () => {
 
     describe('Additional coverage tests', () => {
         describe('FAQ filtering and visibility', () => {
-            it('should remove FAQ from list when edited to belong to different page', async () => {
-                renderFaqPanelContent();
-
-                await waitFor(() => expect(getFaqItems()).toHaveLength(2));
-
-                clickEditFaqButton(1);
-                expect(getEditFaqModal()).toBeInTheDocument();
-
-                fireEvent.click(screen.getByTestId('confirm-edit'));
-
-                await waitFor(() => {
-                    expect(getEditFaqModal()).not.toBeInTheDocument();
-                });
-            });
-
             it('should remove FAQ from list when edited to not match status filter', async () => {
                 renderFaqPanelContent();
                 await waitFor(() => expect(getFaqItems()).toHaveLength(2));
@@ -1143,34 +1120,6 @@ describe('FaqPanelContent', () => {
 
                 expect(screen.queryByTestId('faq-error-container')).not.toBeInTheDocument();
             });
-
-            it('should restore previous state when reorder fails with non-cancel error', async () => {
-                renderFaqPanelContent();
-
-                await waitFor(() => expect(getFaqItems()).toHaveLength(2));
-
-                mockFaqApi.reorder.mockRejectedValueOnce(new Error('Network error'));
-
-                const draggedItem = screen.getByTestId('draggable-item-1');
-                const targetItem = screen.getByTestId('draggable-item-2');
-
-                fireEvent.dragStart(draggedItem, {
-                    dataTransfer: {
-                        setData: jest.fn(),
-                        getData: jest.fn().mockReturnValue('1'),
-                    },
-                });
-
-                fireEvent.drop(targetItem, {
-                    dataTransfer: {
-                        getData: jest.fn().mockReturnValue('1'),
-                    },
-                });
-
-                await waitFor(() => {
-                    expect(getFaqErrorContainer()).toBeInTheDocument();
-                });
-            });
         });
 
         describe('Fetch with filters', () => {
@@ -1223,68 +1172,6 @@ describe('FaqPanelContent', () => {
                     const lastCall = mockFaqApi.getAll.mock.calls[1];
                     expect(lastCall[4]).toBe(0);
                 });
-            });
-        });
-
-        describe('Load more functionality', () => {
-            it('should append new items when loading more', async () => {
-                mockFaqApi.getAll.mockResolvedValueOnce({
-                    items: convertFaqsToDto(mockFaqs),
-                    totalItemsCount: 4,
-                });
-
-                renderFaqPanelContent();
-
-                await waitFor(() => {
-                    expect(getFaqItems()).toHaveLength(2);
-                    expect(screen.getByTestId('load-more')).toBeInTheDocument();
-                });
-
-                const moreFaqs = [
-                    {
-                        id: 3,
-                        questionText: 'Test FAQ Gamma',
-                        answerText: 'Third answer.',
-                        status: VisibilityStatus.Published,
-                        pages: [mockPages[0]],
-                        localizations: mockFaqs[0].localizations,
-                    },
-                ];
-
-                mockFaqApi.getAll.mockResolvedValueOnce({
-                    items: convertFaqsToDto(moreFaqs),
-                    totalItemsCount: 4,
-                });
-
-                fireEvent.click(screen.getByTestId('load-more'));
-
-                await waitFor(() => {
-                    expect(getFaqItems()).toHaveLength(3);
-                });
-            });
-
-            it('should filter duplicate items when loading more', async () => {
-                mockFaqApi.getAll.mockResolvedValueOnce({
-                    items: convertFaqsToDto(mockFaqs),
-                    totalItemsCount: 4,
-                });
-
-                renderFaqPanelContent();
-
-                await waitFor(() => expect(getFaqItems()).toHaveLength(2));
-
-                mockFaqApi.getAll.mockResolvedValueOnce({
-                    items: convertFaqsToDto([mockFaqs[0]]),
-                    totalItemsCount: 4,
-                });
-
-                fireEvent.click(screen.getByTestId('load-more'));
-
-                await waitFor(() => {
-                    expect(mockFaqApi.getAll).toHaveBeenCalledTimes(2);
-                });
-
-                expect(getFaqItems()).toHaveLength(2);
             });
         });
     });

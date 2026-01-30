@@ -53,9 +53,7 @@ export const LocalizationModal = ({
         <>
             <Modal isOpen={isOpen} onClose={handleRequestClose}>
                 <Modal.Title>{title}</Modal.Title>
-
                 <Modal.Content>{children}</Modal.Content>
-
                 <Modal.Actions>
                     <div className={cn(styles['modal-scope'], 'localization-modal')}>
                         <Button

@@ -106,10 +106,6 @@ export const Header = () => {
                         </Link>
 
                         <Link to={PUBLIC_ROUTES.MOCK.FULL} onClick={toggleMenu} className="disable">
-                            {t('STORE')}
-                        </Link>
-
-                        <Link to={PUBLIC_ROUTES.MOCK.FULL} onClick={toggleMenu} className="disable">
                             {t('STORIES_OF_VICTORIES')}
                         </Link>
 

@@ -2,6 +2,7 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import { LinearProgress } from '@mui/material';
 import styles from './DetailedProgramPageContent.module.scss';
+import { NotFound } from '@/pages/public/not-found-page/NotFound';
 import { BackgroundMedia } from '@/components/public/background-media/BackgroundMedia';
 import { ReactComponent as MapPin } from '@/assets/icons/map-pin.svg';
 import { ReactComponent as UsersRound } from '@/assets/icons/users-round.svg';
@@ -24,13 +25,7 @@ export const DetailedProgramPageContent: React.FC = () => {
     }
 
     if (error || !program) {
-        return (
-            <div className={styles['detailed-program-page-content']}>
-                <div className={styles['error-message']} role="alert">
-                    Failed to load program details
-                </div>
-            </div>
-        );
+        return <NotFound />;
     }
 
     const hasSections = program.sections && program.sections.length > 0;

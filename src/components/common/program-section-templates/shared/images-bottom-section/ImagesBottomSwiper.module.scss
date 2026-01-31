@@ -1,0 +1,49 @@
+.swiperContainer {
+    display: flex;
+    flex: 1;
+    height: 100%;
+    width: 100%;
+    position: relative;
+
+    [class~='swiper'] {
+        flex: 1 1 auto;
+    }
+}
+
+.swiperSlide {
+    display: flex;
+    justify-content: center;
+    align-items: end;
+}
+
+.left {
+    position: absolute;
+    top: 50%;
+    left: 4px;
+    transform: translateY(-50%);
+    z-index: 10;
+
+    &:disabled {
+        visibility: hidden;
+    }
+
+    @media (min-width: 560px) {
+        left: 16px;
+    }
+}
+
+.right {
+    position: absolute;
+    top: 50%;
+    right: 4px;
+    transform: translateY(-50%);
+    z-index: 10;
+
+    &:disabled {
+        visibility: hidden;
+    }
+
+    @media (min-width: 560px) {
+        right: 16px;
+    }
+}

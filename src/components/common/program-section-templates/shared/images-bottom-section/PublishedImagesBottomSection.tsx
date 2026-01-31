@@ -4,7 +4,7 @@ import { ImageValues, Image } from '@/types/common/image';
 import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 import { ImagesBottomSectionConfig } from './ImagesBottomSection';
 import styles from './PublishedImagesBottomSection.module.scss';
-import swiperStyles from './PublishedImagesBottomSwiper.module.scss';
+import swiperStyles from './ImagesBottomSwiper.module.scss';
 
 interface PublishedImagesBottomSectionProps {
     images: (Image | ImageValues | null)[];
@@ -13,6 +13,15 @@ interface PublishedImagesBottomSectionProps {
     imageWrapperClassName?: string;
     imageClassName?: string;
 }
+
+const SWIPER_NAVIGATION_CONFIG = {
+    prev: {
+        className: swiperStyles.left,
+    },
+    next: {
+        className: swiperStyles.right,
+    },
+};
 
 export const PublishedImagesBottomSection = ({
     images,
@@ -47,6 +56,7 @@ export const PublishedImagesBottomSection = ({
                     slidesPerView="auto"
                     breakpoints={config.swiperBreakpoints}
                     classNameSwiperSlide={swiperStyles.swiperSlide}
+                    navigationButtons={SWIPER_NAVIGATION_CONFIG}
                 />
             </div>
         </div>

@@ -147,6 +147,7 @@ export const DUAL_IMAGES_CONFIG = {
     editableImageMaxWidth: 730,
     swiperBreakpoints: {
         320: { slidesPerView: 1 },
+        768: { slidesPerView: 2 },
         1440: { slidesPerView: 2 },
     },
 };

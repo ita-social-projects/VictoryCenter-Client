@@ -46,6 +46,7 @@ export interface ImagesBottomSectionProps {
     topSectionClassName?: string;
     bottomSectionClassName?: string;
     imageWrapperClassName?: string;
+    imageClassName?: string;
 }
 
 export const ImagesBottomSection = ({
@@ -61,6 +62,7 @@ export const ImagesBottomSection = ({
     topSectionClassName = '',
     bottomSectionClassName = '',
     imageWrapperClassName = '',
+    imageClassName = '',
 }: ImagesBottomSectionProps) => {
     const [errors, setErrors] = useState<string[]>([]);
 
@@ -110,6 +112,7 @@ export const ImagesBottomSection = ({
                     config={config}
                     bottomSectionClassName={bottomSectionClassName}
                     imageWrapperClassName={imageWrapperClassName}
+                    imageClassName={imageClassName}
                 />
             ) : (
                 <EditableImagesBottomSection

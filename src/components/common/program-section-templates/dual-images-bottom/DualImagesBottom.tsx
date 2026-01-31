@@ -48,6 +48,7 @@ export const DualImagesBottom = ({
             topSectionClassName={baseStyles['top-section']}
             bottomSectionClassName={baseStyles['bottom-section']}
             imageWrapperClassName={baseStyles['image-wrapper']}
+            imageClassName={baseStyles.image}
         />
     );
 };

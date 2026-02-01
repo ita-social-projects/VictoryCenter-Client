@@ -160,7 +160,7 @@ describe('ProgramSectionForm', () => {
             title: '',
             description: 'D-1',
             descriptions: ['D-1', ''],
-            images: ['img1-url', '', ''],
+            images: [{ id: 'img1', url: 'img1-url', mimeType: 'image/png' }, { id: 'no-url' }, null],
         });
 
         expect(callPayload.handlers).toEqual({
@@ -246,11 +246,7 @@ describe('ProgramSectionForm', () => {
 
     it('calls onSectionChange and updates correct image by index when onImagesChange is invoked', () => {
         const section = makeSection({
-            contents: [
-                makeTitleContent('T', 0),
-                makeImageContent(2, makeImage('a', 'A')),
-                makeImageContent(1, makeImage('b', 'B')),
-            ],
+            contents: [makeTitleContent('T', 0), makeImageContent(2, makeImage('a', 'A')), makeImageContent(1, makeImage('b', 'B'))],
         });
 
         const { handlers, onSectionChange } = renderWithHandlers({ section });

@@ -10,6 +10,7 @@ import styles from './AddSectionModal.module.scss';
 import swiperStyles from './AddSectionSwiper.module.scss';
 import { ReactComponent as ChevronRight } from '@/assets/icons/chevron-right.svg';
 import { ReactComponent as ChevronLeft } from '@/assets/icons/chevron-left.svg';
+
 export interface AddSectionModalProps {
     isOpen: boolean;
     onClose: () => void;
@@ -41,25 +42,37 @@ const TEMPLATES = [
     ProgramSectionTemplate.SingleImageTop,
     ProgramSectionTemplate.SingleImageRight,
     ProgramSectionTemplate.SingleTitleQuintupleDescription,
+    ProgramSectionTemplate.DualTitleDescription,
+    ProgramSectionTemplate.TripleTitleDescription,
+    ProgramSectionTemplate.QuadTitleDescription,
 ];
 
 export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectionModalProps) => {
     const [selectedTemplateIndex, setSelectedTemplateIndex] = useState(0);
 
     const getPlaceholderImages = (templateId: ProgramSectionTemplate) => {
+        const placeholderImageObject = {
+            id: 0,
+            url: placeholderImage,
+            mimeType: 'image/png',
+        };
+
         switch (templateId) {
             case ProgramSectionTemplate.QuadImagesBottom:
-                return [placeholderImage, placeholderImage, placeholderImage, placeholderImage];
+                return [placeholderImageObject, placeholderImageObject, placeholderImageObject, placeholderImageObject];
             case ProgramSectionTemplate.TripleImagesBottom:
-                return [placeholderImage, placeholderImage, placeholderImage];
+                return [placeholderImageObject, placeholderImageObject, placeholderImageObject];
             case ProgramSectionTemplate.DualImagesBottom:
-                return [placeholderImage, placeholderImage];
+                return [placeholderImageObject, placeholderImageObject];
             case ProgramSectionTemplate.SingleImageBottom:
             case ProgramSectionTemplate.SingleImageTop:
             case ProgramSectionTemplate.SingleImageRight:
-                return [placeholderImage];
+                return [placeholderImageObject];
             case ProgramSectionTemplate.TextOnly:
             case ProgramSectionTemplate.SingleTitleQuintupleDescription:
+            case ProgramSectionTemplate.DualTitleDescription:
+            case ProgramSectionTemplate.TripleTitleDescription:
+            case ProgramSectionTemplate.QuadTitleDescription:
                 return [];
             default:
                 return [];
@@ -73,6 +86,57 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
         return undefined;
     };
 
+    const getCardSamples = (templateId: ProgramSectionTemplate) => {
+        const cardSamples = PROGRAMS_TEXT.SECTION.CARD;
+
+        const CARD_CONFIGS: Partial<Record<ProgramSectionTemplate, { title: string; description: string }[]>> = {
+            [ProgramSectionTemplate.DualTitleDescription]: [
+                {
+                    title: cardSamples.TITLE_SAMPLE_TEXT.PROGRAM_GOALS,
+                    description: cardSamples.DESCRIPTION_SAMPLE_TEXT.PROGRAM_GOALS,
+                },
+                {
+                    title: cardSamples.TITLE_SAMPLE_TEXT.MAIN_METHODS,
+                    description: cardSamples.DESCRIPTION_SAMPLE_TEXT.MAIN_METHODS,
+                },
+            ],
+            [ProgramSectionTemplate.TripleTitleDescription]: [
+                {
+                    title: cardSamples.TITLE_SAMPLE_TEXT.PROGRAM_GOALS,
+                    description: cardSamples.DESCRIPTION_SAMPLE_TEXT.PROGRAM_GOALS,
+                },
+                {
+                    title: cardSamples.TITLE_SAMPLE_TEXT.MAIN_METHODS,
+                    description: cardSamples.DESCRIPTION_SAMPLE_TEXT.MAIN_METHODS,
+                },
+                {
+                    title: cardSamples.TITLE_SAMPLE_TEXT.PROGRAM_FORMAT,
+                    description: cardSamples.DESCRIPTION_SAMPLE_TEXT.PROGRAM_FORMAT,
+                },
+            ],
+            [ProgramSectionTemplate.QuadTitleDescription]: [
+                {
+                    title: cardSamples.TITLE_SAMPLE_TEXT.PROGRAM_GOALS,
+                    description: cardSamples.DESCRIPTION_SAMPLE_TEXT.PROGRAM_GOALS,
+                },
+                {
+                    title: cardSamples.TITLE_SAMPLE_TEXT.MAIN_METHODS,
+                    description: cardSamples.DESCRIPTION_SAMPLE_TEXT.MAIN_METHODS,
+                },
+                {
+                    title: cardSamples.TITLE_SAMPLE_TEXT.PROGRAM_GOALS,
+                    description: cardSamples.DESCRIPTION_SAMPLE_TEXT.PROGRAM_GOALS,
+                },
+                {
+                    title: cardSamples.TITLE_SAMPLE_TEXT.MAIN_METHODS,
+                    description: cardSamples.DESCRIPTION_SAMPLE_TEXT.MAIN_METHODS,
+                },
+            ],
+        };
+
+        return CARD_CONFIGS[templateId];
+    };
+
     const handleSave = () => {
         const selectedTemplateId = TEMPLATES[selectedTemplateIndex];
         onSelectTemplate(selectedTemplateId);
@@ -84,14 +148,18 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
     };
 
     const renderSection = (templateId: ProgramSectionTemplate) => {
+        const cards = getCardSamples(templateId);
+
         return renderProgramSection({
             templateId,
-            data: {
-                title: PROGRAMS_TEXT.SECTION.TITLE_SAMPLE_TEXT,
-                description: PROGRAMS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT,
-                descriptions: getPlaceholderDescriptions(templateId),
-                images: getPlaceholderImages(templateId),
-            },
+            data: cards
+                ? { cards }
+                : {
+                      title: PROGRAMS_TEXT.SECTION.TITLE_SAMPLE_TEXT,
+                      description: PROGRAMS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT,
+                      descriptions: getPlaceholderDescriptions(templateId),
+                      images: getPlaceholderImages(templateId),
+                  },
             isTemplate: true,
         });
     };

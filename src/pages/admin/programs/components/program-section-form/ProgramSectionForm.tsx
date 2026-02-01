@@ -4,7 +4,7 @@ import { ImageValues } from '@/types/common/image';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { renderProgramSection } from '@/utils/functions/render-program-section';
 import styles from './ProgramSectionForm.module.scss';
-import { ProgramSection, ProgramSectionContent } from '@/types/common/program-sections';
+import { ProgramSection, ProgramSectionContent, ProgramSectionTemplate } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 
 export interface ProgramSectionFormProps {
@@ -34,14 +34,24 @@ export const ProgramSectionForm = ({
 
     const titleContent = getContentByType(localSection.contents, ContentType.Title);
 
-    const descriptionContents = getDescriptionsInOrder(localSection.contents);
-    const descriptions = descriptionContents.map((c) => c.description || '');
+    const orderedTitleContents = localSection.contents
+        .filter((c) => c.contentType === ContentType.Title)
+        .sort((a, b) => a.order - b.order);
+
+    const orderedDescriptionContents = getDescriptionsInOrder(localSection.contents);
+
+    const descriptions = orderedDescriptionContents.map((c) => c.description || '');
     const description = descriptions[0] || '';
 
     const imageContents = localSection.contents
         .filter((c) => c.contentType === ContentType.Image)
         .sort((a, b) => a.order - b.order)
-        .map((c) => (c.image && 'url' in c.image ? c.image.url : '') || '');
+        .map((c) => c.image || null);
+
+    const cards = orderedTitleContents.map((t, i) => ({
+        title: t.title || '',
+        description: orderedDescriptionContents[i]?.description || '',
+    }));
 
     const handleTitleChange = useCallback(
         (value: string) => {
@@ -79,8 +89,32 @@ export const ProgramSectionForm = ({
                 if (!target) return prev;
 
                 const updatedContents = prev.contents.map((c) =>
-                    c.contentType === ContentType.Description && c.order === target.order
-                        ? { ...c, description: value }
+                    c.contentType === ContentType.Description && c.order === target.order ? { ...c, description: value } : c,
+                );
+
+                const updatedSection = { ...prev, contents: updatedContents };
+                onSectionChange?.(updatedSection);
+                return updatedSection;
+            });
+        },
+        [onSectionChange],
+    );
+
+    const handleCardContentChange = useCallback(
+        (index: number, value: string, type: ContentType.Title | ContentType.Description) => {
+            setLocalSection((prev) => {
+                const filteredContents = prev.contents
+                    .filter((c) => c.contentType === type)
+                    .sort((a, b) => a.order - b.order);
+
+                const target = filteredContents[index];
+                if (!target) return prev;
+
+                const updatedContents = prev.contents.map((c) =>
+                    c === target
+                        ? type === ContentType.Title
+                            ? { ...c, title: value }
+                            : { ...c, description: value }
                         : c,
                 );
 
@@ -120,6 +154,14 @@ export const ProgramSectionForm = ({
         [onSectionChange, updateImageContent],
     );
 
+    const CARD_TEMPLATES = [
+        ProgramSectionTemplate.DualTitleDescription,
+        ProgramSectionTemplate.TripleTitleDescription,
+        ProgramSectionTemplate.QuadTitleDescription,
+    ];
+
+    const isCardTemplate = CARD_TEMPLATES.includes(section.template);
+
     const editableSection = renderProgramSection({
         templateId: section.template,
         data: {
@@ -127,6 +169,7 @@ export const ProgramSectionForm = ({
             description,
             descriptions,
             images: imageContents,
+            ...(isCardTemplate ? { cards } : {}),
         },
         isEditable: true,
         handlers: {
@@ -134,6 +177,14 @@ export const ProgramSectionForm = ({
             onDescriptionChange: handleDescriptionChange,
             onDescriptionsChange: handleDescriptionsChange,
             onImagesChange: handleImagesChange,
+            ...(isCardTemplate
+                ? {
+                      onCardTitleChange: (index: number, value: string) =>
+                          handleCardContentChange(index, value, ContentType.Title),
+                      onCardDescriptionChange: (index: number, value: string) =>
+                          handleCardContentChange(index, value, ContentType.Description),
+                  }
+                : {}),
         },
     });
 

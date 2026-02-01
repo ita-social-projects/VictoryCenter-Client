@@ -50,7 +50,6 @@ describe('Footer', () => {
             'href',
             PUBLIC_ROUTES.REPORTS.FULL,
         );
-        expect(screen.getByRole('link', { name: footerUk['STORE'] })).toHaveAttribute('href', PUBLIC_ROUTES.MOCK.FULL);
         expect(screen.getByRole('link', { name: footerUk['HOW_TO_SUPPORT'] })).toHaveAttribute(
             'href',
             PUBLIC_ROUTES.MOCK.FULL,

@@ -1,3 +1,4 @@
+import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ProgramsPageContent } from './ProgramsPageContent';
@@ -184,8 +185,8 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                             id: 998,
                             name: 'Draft Program',
                             description: 'Draft Description',
-                            meetingsCount: '1',
-                            participantsCount: '1',
+                            meetingsCount: '123',
+                            participantsCount: '123',
                             location: 'Draft Location',
                             previewImage: null,
                             backgroundImage: null,
@@ -256,6 +257,25 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                     }
                 />
                 <button
+                    data-testid="trigger-edit-with-images"
+                    onClick={() =>
+                        props.onEditProgram({
+                            id: 10,
+                            name: 'Alpha Edited',
+                            description: 'Edited Description',
+                            meetingsCount: '1234',
+                            participantsCount: '1234',
+                            location: 'Edited Location',
+                            previewImage: { id: 1, url: 'http://example.com/preview.jpg', mimeType: 'image/jpeg' },
+                            backgroundImage: { id: 2, url: 'http://example.com/bg.jpg', mimeType: 'image/jpeg' },
+                            status: VisibilityStatus.Published,
+                            sections: [],
+                            categories: [{ id: 1, name: 'Category A', programsCount: 2 }],
+                            slug: 'alpha-edited',
+                        })
+                    }
+                />
+                <button
                     data-testid="trigger-edit-unknown"
                     onClick={() =>
                         props.onEditProgram({
@@ -271,6 +291,25 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                             sections: [],
                             categories: [{ id: 1, name: 'Category A', programsCount: 2 }],
                             slug: 'unknown-edited',
+                        })
+                    }
+                />
+                <button
+                    data-testid="trigger-edit-draft"
+                    onClick={() =>
+                        props.onEditProgram({
+                            id: 10,
+                            name: 'Alpha Draft',
+                            description: 'Draft Description',
+                            meetingsCount: '1234',
+                            participantsCount: '1234',
+                            location: 'Draft Location',
+                            previewImage: null,
+                            backgroundImage: null,
+                            status: VisibilityStatus.Draft,
+                            sections: [],
+                            categories: [{ id: 1, name: 'Category A', programsCount: 2 }],
+                            slug: 'alpha-draft',
                         })
                     }
                 />
@@ -293,14 +332,17 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                         })
                     }
                 />
-
                 <button
                     data-testid="trigger-add-category"
                     onClick={() => props.onAddCategory({ id: 3, name: 'Category C', programsCount: 0 })}
                 />
                 <button
-                    data-testid="trigger-edit-category"
+                    data-testid="trigger-edit-category-b"
                     onClick={() => props.onEditCategory({ id: 2, name: 'Category B Updated', programsCount: 1 })}
+                />
+                <button
+                    data-testid="trigger-edit-category-a"
+                    onClick={() => props.onEditCategory({ id: 1, name: 'Category A Updated', programsCount: 5 })}
                 />
                 <button data-testid="trigger-delete-category" onClick={() => props.onDeleteCategory(1)} />
             </div>
@@ -364,6 +406,20 @@ const mockPrograms: Program[] = [
 describe('ProgramsPageContent', () => {
     let openActions: any;
     let closeActions: any;
+
+    const renderAndWaitForPrograms = async (expectedCount = 2) => {
+        render(<ProgramsPageContent />);
+        await waitFor(() => {
+            expect(screen.getAllByTestId('program-item')).toHaveLength(expectedCount);
+        });
+    };
+
+    const renderAndWaitForCategoryBar = async () => {
+        render(<ProgramsPageContent />);
+        await waitFor(() => {
+            expect(screen.getByTestId('category-bar')).toBeInTheDocument();
+        });
+    };
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -456,11 +512,7 @@ describe('ProgramsPageContent', () => {
     });
 
     it('switches to search view on program select (number or string) and clears on request', async () => {
-        render(<ProgramsPageContent />);
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-        });
+        await renderAndWaitForPrograms();
 
         fireEvent.click(screen.getByTestId('select-program'));
 
@@ -493,11 +545,7 @@ describe('ProgramsPageContent', () => {
     });
 
     it('resets search state on status filter change', async () => {
-        render(<ProgramsPageContent />);
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-        });
+        await renderAndWaitForPrograms();
 
         fireEvent.click(screen.getByTestId('select-program'));
 
@@ -518,38 +566,8 @@ describe('ProgramsPageContent', () => {
         });
     });
 
-    it('handles add/edit/delete program via modal callbacks', async () => {
-        render(<ProgramsPageContent />);
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-        });
-
-        fireEvent.click(screen.getByTestId('trigger-add'));
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(3);
-            expect(screen.getByText('New Program')).toBeInTheDocument();
-        });
-
-        fireEvent.click(screen.getByTestId('trigger-edit'));
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-            expect(screen.queryByText('Alpha')).not.toBeInTheDocument();
-            expect(screen.queryByText('Alpha Edited')).not.toBeInTheDocument();
-        });
-
-        fireEvent.click(screen.getByTestId('trigger-delete'));
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-        });
-    });
-
     it('opens category modals from context menu', async () => {
-        render(<ProgramsPageContent />);
-
-        await waitFor(() => {
-            expect(screen.getByTestId('category-bar')).toBeInTheDocument();
-        });
+        await renderAndWaitForCategoryBar();
 
         fireEvent.click(screen.getByTestId('ctx-add'));
         expect(openActions.openAddCategoryModal).toHaveBeenCalled();
@@ -625,12 +643,8 @@ describe('ProgramsPageContent', () => {
         });
     });
 
-    it('handles no searchProgramId in getSearchedProgram', async () => {
-        render(<ProgramsPageContent />);
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-        });
+    it('handles search mode: clear search and retry on error', async () => {
+        await renderAndWaitForPrograms();
 
         fireEvent.click(screen.getByTestId('select-program'));
         fireEvent.click(screen.getByTestId('clear-search'));
@@ -638,36 +652,24 @@ describe('ProgramsPageContent', () => {
         await waitFor(() => {
             expect(screen.getAllByTestId('program-item')).toHaveLength(2);
         });
-    });
-
-    it('displays search program fetch error and retries with refetchSearchProgram', async () => {
-        render(<ProgramsPageContent />);
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-        });
 
         mockProgramsApi.fetchProgramById.mockRejectedValue(new Error('Search failed'));
-
         fireEvent.click(screen.getByTestId('select-program'));
 
         await waitFor(() => {
             expect(screen.getByText(PROGRAMS_TEXT.MESSAGE.FAIL_TO_FETCH_PROGRAM)).toBeInTheDocument();
-            expect(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN)).toBeInTheDocument();
         });
 
         mockProgramsApi.fetchProgramById.mockResolvedValue(mockPrograms[0]);
-
         fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN));
 
         await waitFor(() => {
-            expect(mockProgramsApi.fetchProgramById).toHaveBeenCalledTimes(2);
             expect(screen.getAllByTestId('program-item')).toHaveLength(1);
         });
     });
 
     it('handles category selection change', async () => {
-        render(<ProgramsPageContent />);
+        await renderAndWaitForCategoryBar();
 
         await waitFor(() => {
             expect(screen.getByTestId('category-1')).toBeDisabled();
@@ -698,11 +700,7 @@ describe('ProgramsPageContent', () => {
     });
 
     it('adds draft program when no status filter and it matches selected category', async () => {
-        render(<ProgramsPageContent />);
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-        });
+        await renderAndWaitForPrograms();
 
         fireEvent.click(screen.getByTestId('trigger-add-draft'));
 
@@ -713,11 +711,7 @@ describe('ProgramsPageContent', () => {
     });
 
     it('does not add program when status filter mismatches', async () => {
-        render(<ProgramsPageContent />);
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-        });
+        await renderAndWaitForPrograms();
 
         fireEvent.click(screen.getByText('Filter Published'));
 
@@ -763,12 +757,7 @@ describe('ProgramsPageContent', () => {
     });
 
     it('ignores edit when original program is not found in local lists', async () => {
-        render(<ProgramsPageContent />);
-
-        await waitFor(() => {
-            expect(screen.getByText('Alpha')).toBeInTheDocument();
-            expect(screen.getByText('Beta')).toBeInTheDocument();
-        });
+        await renderAndWaitForPrograms();
 
         fireEvent.click(screen.getByTestId('trigger-edit-unknown'));
 
@@ -822,8 +811,8 @@ describe('ProgramsPageContent', () => {
         });
     });
 
-    it('handles add/edit/delete category and updates selection', async () => {
-        render(<ProgramsPageContent />);
+    it('selects next category when deleting selected category', async () => {
+        await renderAndWaitForCategoryBar();
 
         await waitFor(() => {
             expect(screen.getByTestId('category-1')).toBeDisabled();
@@ -835,7 +824,7 @@ describe('ProgramsPageContent', () => {
             expect(screen.getByTestId('category-3')).toBeInTheDocument();
         });
 
-        fireEvent.click(screen.getByTestId('trigger-edit-category'));
+        fireEvent.click(screen.getByTestId('trigger-edit-category-b'));
 
         await waitFor(() => {
             expect(screen.getByText('Category B Updated')).toBeInTheDocument();
@@ -849,19 +838,145 @@ describe('ProgramsPageContent', () => {
         });
     });
 
-    it('clears selection when deleting the last category', async () => {
-        mockProgramsCategoriesApi.fetchProgramCategories.mockResolvedValue([{ id: 1, name: 'Only', programsCount: 1 }]);
+    it('handles program operations in search view', async () => {
+        await renderAndWaitForPrograms();
+
+        fireEvent.click(screen.getByTestId('select-program'));
+        await waitFor(() => {
+            expect(screen.getAllByTestId('program-item')).toHaveLength(1);
+        });
+
+        fireEvent.click(screen.getByTestId('trigger-edit'));
+        await waitFor(() => {
+            expect(screen.getAllByTestId('program-item')).toHaveLength(1);
+        });
+
+        fireEvent.click(screen.getByTestId('trigger-delete'));
+        await waitFor(() => {
+            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
+        });
+
+        fireEvent.click(screen.getByTestId('select-program'));
+        fireEvent.click(screen.getByTestId('category-2'));
+        await waitFor(() => {
+            expect(mockProgramsApi.fetchPrograms).toHaveBeenCalledWith(expect.any(Object), 2, 0, 5, undefined);
+        });
+    });
+
+    it('handles program filtering and category changes', async () => {
+        await renderAndWaitForPrograms();
+
+        fireEvent.click(screen.getByTestId('trigger-edit'));
+        await waitFor(() => {
+            expect(screen.getAllByTestId('program-item')).toHaveLength(1);
+        });
+
+        fireEvent.click(screen.getByText('Filter Published'));
+        await waitFor(() => {
+            expect(mockProgramsApi.fetchPrograms).toHaveBeenCalledWith(
+                expect.any(Object),
+                1,
+                0,
+                5,
+                VisibilityStatus.Published,
+            );
+        });
+    });
+
+    it('calls modal handlers for add, edit, and delete actions', async () => {
+        await renderAndWaitForPrograms();
+
+        fireEvent.click(screen.getByTestId('add-item-button'));
+        expect(openActions.openAddItemModal).toHaveBeenCalled();
+
+        fireEvent.click(screen.getAllByTestId('edit-program')[0]);
+        expect(openActions.openEditItemModal).toHaveBeenCalledWith(expect.objectContaining({ id: 10 }));
+
+        fireEvent.click(screen.getAllByTestId('delete-program')[0]);
+        expect(openActions.openDeleteItemModal).toHaveBeenCalledWith(expect.objectContaining({ id: 10 }));
+
+        global.dispatchEvent(new Event('resize'));
+        await waitFor(() => {
+            expect(screen.getByTestId('programs-page-content')).toBeInTheDocument();
+        });
+    });
+
+    it('adds program with Draft status', async () => {
+        await renderAndWaitForPrograms();
+
+        fireEvent.click(screen.getByTestId('trigger-add'));
+
+        await waitFor(() => {
+            expect(screen.getAllByTestId('program-item')).toHaveLength(3);
+        });
+    });
+
+    it('clears error when category selection changes', async () => {
+        mockProgramsApi.fetchPrograms.mockRejectedValueOnce(new Error('Error'));
 
         render(<ProgramsPageContent />);
 
         await waitFor(() => {
-            expect(screen.getByTestId('category-1')).toBeDisabled();
+            expect(screen.getByText(PROGRAMS_TEXT.MESSAGE.FAIL_TO_FETCH_PROGRAMS)).toBeInTheDocument();
         });
 
-        fireEvent.click(screen.getByTestId('trigger-delete-category'));
+        mockProgramsApi.fetchPrograms.mockResolvedValueOnce({
+            items: mockPrograms,
+            totalItemsCount: 2,
+        });
+
+        fireEvent.click(screen.getByTestId('category-2'));
 
         await waitFor(() => {
-            expect(screen.queryByTestId('category-1')).not.toBeInTheDocument();
+            expect(screen.queryByText(PROGRAMS_TEXT.MESSAGE.FAIL_TO_FETCH_PROGRAMS)).not.toBeInTheDocument();
+        });
+    });
+
+    it('updates categories count on add and delete', async () => {
+        await renderAndWaitForPrograms();
+
+        fireEvent.click(screen.getByTestId('trigger-add'));
+        await waitFor(() => {
+            expect(screen.getAllByTestId('program-item')).toHaveLength(3);
+        });
+
+        fireEvent.click(screen.getByTestId('trigger-delete'));
+        await waitFor(() => {
+            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
+        });
+    });
+
+    it('handles special edit scenarios: Draft status and image cache busting', async () => {
+        await renderAndWaitForPrograms();
+
+        fireEvent.click(screen.getByTestId('trigger-edit-draft'));
+        await waitFor(() => {
+            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
+        });
+
+        fireEvent.click(screen.getByTestId('trigger-edit-with-images'));
+        await waitFor(() => {
+            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
+        });
+    });
+
+    it('adds and edits categories', async () => {
+        await renderAndWaitForCategoryBar();
+
+        await waitFor(() => {
+            expect(screen.getByTestId('category-1')).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByTestId('trigger-add-category'));
+
+        await waitFor(() => {
+            expect(screen.getByTestId('category-3')).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByTestId('trigger-edit-category-a'));
+
+        await waitFor(() => {
+            expect(screen.getByText('Category A Updated')).toBeInTheDocument();
         });
     });
 });

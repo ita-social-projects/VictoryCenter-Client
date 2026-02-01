@@ -1,10 +1,11 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import cn from 'classnames';
 import { nanoid } from 'nanoid';
 import { TitleDescriptionSection } from '../title-description-section/TitleDescriptionSection';
 import { PhotoInputGroup } from '@/components/admin/input-groups/photo-input-group/PhotoInputGroup';
-import { ImageValues } from '@/types/common/image';
+import { ImageValues, Image } from '@/types/common/image';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 import baseStyles from './ImagesBottomSection.module.scss';
 import { PROGRAM_VALIDATION } from '@/const/admin/programs';
 
@@ -26,11 +27,17 @@ export interface ImagesBottomSectionConfig {
     editableImageMaxWidth?: number;
 }
 
+export interface ImageHandler {
+    handler?: (file: ImageValues | null) => void;
+    key: string;
+    value: Image | ImageValues | null;
+}
+
 export interface ImagesBottomSectionProps {
     title?: string;
     description?: string;
-    images: string[];
-    imageHandlers: Array<{ handler?: (file: ImageValues | null) => void; key: string; value: string }>;
+    images: (Image | ImageValues | null)[];
+    imageHandlers: ImageHandler[];
     config: ImagesBottomSectionConfig;
     isTemplate?: boolean;
     isEditable?: boolean;
@@ -57,16 +64,26 @@ export const ImagesBottomSection = ({
     bottomSectionClassName = '',
     imageWrapperClassName = '',
 }: ImagesBottomSectionProps) => {
-    const effectiveImages = useMemo(() => images.slice(0, config.imageCount), [images, config.imageCount]);
-    const effectiveImageHandlers = useMemo(
+    const [errors, setErrors] = useState<string[]>([]);
+
+    const displayedImages = useMemo(() => images.slice(0, config.imageCount), [images, config.imageCount]);
+    const displayedImageHandlers = useMemo(
         () => imageHandlers.slice(0, config.imageCount),
         [imageHandlers, config.imageCount],
     );
 
     const imageKeys = useMemo(
-        () => Array.from({ length: effectiveImages.length }, () => nanoid()),
-        [effectiveImages.length],
+        () => Array.from({ length: displayedImages.length }, () => nanoid()),
+        [displayedImages.length],
     );
+
+    const handleSetError = (index: number, error: string | null) => {
+        setErrors((prevErrors) => {
+            const newErrors = [...prevErrors];
+            newErrors[index] = error || '';
+            return newErrors;
+        });
+    };
 
     return (
         <div
@@ -92,7 +109,7 @@ export const ImagesBottomSection = ({
             <div className={cn(baseStyles['bottom-section'], bottomSectionClassName)}>
                 <div className={baseStyles['images-grid']}>
                     {isEditable
-                        ? effectiveImageHandlers.map(({ handler, key, value }, index) => (
+                        ? displayedImageHandlers.map(({ handler, key, value }, index) => (
                               <div
                                   key={key}
                                   className={cn(baseStyles['image-wrapper'], imageWrapperClassName)}
@@ -102,9 +119,10 @@ export const ImagesBottomSection = ({
                                   <PhotoInputGroup
                                       id={`section-image-${index + 1}`}
                                       name={`section-image-${index + 1}`}
-                                      value={value ? { id: null, url: value, mimeType: '' } : null}
+                                      value={value}
                                       onChange={handler || (() => {})}
-                                      setError={() => {}}
+                                      setError={(error) => handleSetError(index, error)}
+                                      error={errors[index]}
                                       cropWidth={config.imageConfig.cropWidth}
                                       cropHeight={config.imageConfig.cropHeight}
                                       minWidth={config.imageConfig.minWidth}
@@ -119,16 +137,25 @@ export const ImagesBottomSection = ({
                                   />
                               </div>
                           ))
-                        : effectiveImages.map((image, index) => (
-                              <div
-                                  key={imageKeys[index]}
-                                  className={cn(baseStyles['image-wrapper'], imageWrapperClassName)}
-                                  data-elevated={config.elevatedIndices.includes(index) ? 'true' : undefined}
-                                  data-testid="image-wrapper"
-                              >
-                                  <img src={image} alt="" className={baseStyles.image} />
-                              </div>
-                          ))}
+                        : displayedImages.map((image, index) => {
+                              const imageSrc = getImageSrc(image);
+                              return (
+                                  <div
+                                      key={imageKeys[index]}
+                                      className={cn(baseStyles['image-wrapper'], imageWrapperClassName)}
+                                      data-elevated={config.elevatedIndices.includes(index) ? 'true' : undefined}
+                                      data-testid="image-wrapper"
+                                  >
+                                      {imageSrc && (
+                                          <img
+                                              src={imageSrc}
+                                              alt={`Program section ${index + 1}`}
+                                              className={baseStyles.image}
+                                          />
+                                      )}
+                                  </div>
+                              );
+                          })}
                 </div>
             </div>
         </div>

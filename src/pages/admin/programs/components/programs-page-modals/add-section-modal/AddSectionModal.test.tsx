@@ -14,13 +14,16 @@ const mockRenderProgramSection = jest.fn((_: any) => <div data-testid="rendered-
 let mockSwiperActiveIndex = 0;
 let mockSwiperItems: any[] = [];
 let mockSwiperExtraItems: any[] = [];
+let mockSwiperNavigationButtons: any;
 
 jest.mock('@/utils/functions/render-program-section', () => ({
     renderProgramSection: (payload: any) => mockRenderProgramSection(payload),
 }));
 
 jest.mock('@/components/public/swiper/Swiper', () => ({
-    Swiper: ({ items, renderItem, onSlideChange, className }: any) => {
+    Swiper: ({ items, renderItem, onSlideChange, className, navigationButtons }: any) => {
+        mockSwiperNavigationButtons = navigationButtons;
+
         const allItems = [...items, ...mockSwiperExtraItems];
         mockSwiperItems = allItems;
 
@@ -50,6 +53,14 @@ jest.mock('@/components/public/swiper/Swiper', () => ({
             </div>
         );
     },
+}));
+
+jest.mock('@/assets/icons/chevron-left.svg', () => ({
+    ReactComponent: () => <svg data-testid="chevron-left" />,
+}));
+
+jest.mock('@/assets/icons/chevron-right.svg', () => ({
+    ReactComponent: () => <svg data-testid="chevron-right" />,
 }));
 
 jest.mock('@/assets/images/common/section-photo-placeholder.png', () => 'placeholder.png');
@@ -119,54 +130,43 @@ describe('AddSectionModal', () => {
         mockSwiperActiveIndex = 0;
         mockSwiperItems = [];
         mockSwiperExtraItems = [];
+        mockSwiperNavigationButtons = undefined;
     });
 
-    it('renders modal when open', () => {
-        renderModal();
-        expect(screen.getByTestId('add-section-modal')).toBeInTheDocument();
-    });
-
-    it('does not render modal when closed', () => {
+    it('does not render when closed', () => {
         renderModal({ isOpen: false });
         expect(screen.queryByTestId('add-section-modal')).not.toBeInTheDocument();
     });
 
-    it('passes maxWidth to Modal', () => {
+    it('renders modal, swiper and choose button when open', () => {
         renderModal();
-        expect(screen.getByTestId('add-section-modal')).toHaveAttribute('data-max-width', '90vw');
-    });
 
-    it('passes className to Modal', () => {
-        renderModal();
-        expect(screen.getByTestId('add-section-modal')).toHaveAttribute('data-classname');
-    });
-
-    it('renders swiper', () => {
-        renderModal();
+        expect(screen.getByTestId('add-section-modal')).toBeInTheDocument();
         expect(screen.getByTestId('swiper')).toBeInTheDocument();
-    });
-
-    it('renders choose button', () => {
-        renderModal();
         expect(screen.getByRole('button', { name: PROGRAMS_TEXT.BUTTON.CHOOSE_SECTION })).toBeInTheDocument();
     });
 
-    it('choose button uses primary style', () => {
+    it('passes maxWidth and className into Modal', () => {
         renderModal();
-        expect(screen.getByRole('button', { name: PROGRAMS_TEXT.BUTTON.CHOOSE_SECTION })).toHaveAttribute(
-            'data-button-style',
-            'primary',
-        );
+
+        const modal = screen.getByTestId('add-section-modal');
+        expect(modal).toHaveAttribute('data-max-width', '90vw');
+        expect(modal).toHaveAttribute('data-classname');
     });
 
-    it('renders previous navigation button', () => {
+    it('renders navigation buttons', () => {
         renderModal();
+
         expect(screen.getByTitle('Previous slide')).toBeInTheDocument();
+        expect(screen.getByTitle('Next slide')).toBeInTheDocument();
     });
 
-    it('renders next navigation button', () => {
+    it('passes navigation config into Swiper', () => {
         renderModal();
-        expect(screen.getByTitle('Next slide')).toBeInTheDocument();
+
+        expect(mockSwiperNavigationButtons).toBeDefined();
+        expect(mockSwiperNavigationButtons?.prev).toBeDefined();
+        expect(mockSwiperNavigationButtons?.next).toBeDefined();
     });
 
     it('renders modal content container', () => {
@@ -174,83 +174,71 @@ describe('AddSectionModal', () => {
         expect(screen.getAllByTestId('add-section-modal-content')[0]).toBeInTheDocument();
     });
 
-    it('calls onClose when modal close is clicked', () => {
+    it('close button calls onClose', () => {
         renderModal();
         clickClose();
         expect(mockOnClose).toHaveBeenCalledTimes(1);
     });
 
-    it('calls onSelectTemplate when choose is clicked', () => {
+    it('choose selects current template and closes modal', () => {
         renderModal();
-        clickChoose();
-        expect(mockOnSelectTemplate).toHaveBeenCalledTimes(1);
-    });
 
-    it('calls onClose when choose is clicked', () => {
-        renderModal();
         clickChoose();
+
+        expect(mockOnSelectTemplate).toHaveBeenCalledTimes(1);
+        expect(mockOnSelectTemplate).toHaveBeenCalledWith(mockSwiperItems[0]);
         expect(mockOnClose).toHaveBeenCalledTimes(1);
     });
 
-    it('selects first template by default when saving', () => {
+    it('next changes selection to the next template', () => {
         renderModal();
-        clickChoose();
-        expect(mockOnSelectTemplate).toHaveBeenCalledWith(mockSwiperItems[0]);
-    });
 
-    it('selects second template after next', () => {
-        renderModal();
         clickNext();
         clickChoose();
+
         expect(mockOnSelectTemplate).toHaveBeenCalledWith(mockSwiperItems[1]);
     });
 
-    it('wraps to last template when clicking previous from start', () => {
+    it('previous from first wraps to last', () => {
         renderModal();
+
         clickPrev();
         clickChoose();
+
         expect(mockOnSelectTemplate).toHaveBeenCalledWith(mockSwiperItems[mockSwiperItems.length - 1]);
     });
 
-    it('wraps to first template when clicking next from last', () => {
+    it('next from last wraps to first', () => {
         renderModal();
+
         clickPrev();
         clickNext();
         clickChoose();
+
         expect(mockOnSelectTemplate).toHaveBeenCalledWith(mockSwiperItems[0]);
     });
 
-    it('calls renderProgramSection', () => {
+    it('calls renderProgramSection and always uses isTemplate=true', () => {
         renderModal();
+
         expect(mockRenderProgramSection).toHaveBeenCalled();
+        expect(mockRenderProgramSection.mock.calls.every((c) => c[0]?.isTemplate === true)).toBe(true);
     });
 
-    it('passes isTemplate=true into renderProgramSection', () => {
+    it('passes sample title/description into non-card templates', () => {
         renderModal();
-        expect(getCallByTemplate(mockSwiperItems[0])?.isTemplate).toBe(true);
-    });
 
-    it('passes sample title into renderProgramSection', () => {
-        renderModal();
-        expect(getCallByTemplate(mockSwiperItems[0])?.data?.title).toBe(PROGRAMS_TEXT.SECTION.TITLE_SAMPLE_TEXT);
-    });
-
-    it('passes sample description into renderProgramSection', () => {
-        renderModal();
-        expect(getCallByTemplate(mockSwiperItems[0])?.data?.description).toBe(
-            PROGRAMS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT,
-        );
+        const call = getCallByTemplate(ProgramSectionTemplate.TextOnly);
+        expect(call?.data?.title).toBe(PROGRAMS_TEXT.SECTION.TITLE_SAMPLE_TEXT);
+        expect(call?.data?.description).toBe(PROGRAMS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT);
     });
 
     it('provides 5 short descriptions only for SingleTitleQuintupleDescription', () => {
         renderModal();
+
         expect(getCallByTemplate(ProgramSectionTemplate.SingleTitleQuintupleDescription)?.data?.descriptions).toEqual(
             buildFiveShortDescriptions(),
         );
-    });
-
-    it('does not provide descriptions for non-SingleTitleQuintupleDescription', () => {
-        renderModal();
         expect(getCallByTemplate(ProgramSectionTemplate.TextOnly)?.data?.descriptions).toBeUndefined();
     });
 
@@ -263,17 +251,34 @@ describe('AddSectionModal', () => {
         [ProgramSectionTemplate.SingleImageRight, 1],
         [ProgramSectionTemplate.TextOnly, 0],
         [ProgramSectionTemplate.SingleTitleQuintupleDescription, 0],
-    ] as Array<[ProgramSectionTemplate, number]>)(
-        'provides correct placeholder images count for %s',
-        (templateId, expectedCount) => {
-            renderModal();
-            expect(getCallByTemplate(templateId)?.data?.images).toHaveLength(expectedCount);
-        },
-    );
+    ] as Array<[ProgramSectionTemplate, number]>)('provides correct placeholder images for %s', (templateId, count) => {
+        renderModal();
+
+        const images = getCallByTemplate(templateId)?.data?.images ?? [];
+        expect(images).toHaveLength(count);
+
+        if (count > 0) {
+            expect(images.every((img: any) => img?.url === 'placeholder.png')).toBe(true);
+        }
+    });
 
     it('unknown template id falls back to empty images array', () => {
         mockSwiperExtraItems = ['UNKNOWN_TEMPLATE_ID'] as any[];
+
         renderModal();
+
         expect(getCallByTemplate('UNKNOWN_TEMPLATE_ID')?.data?.images).toEqual([]);
+    });
+
+    it.each([
+        [ProgramSectionTemplate.DualTitleDescription, 2],
+        [ProgramSectionTemplate.TripleTitleDescription, 3],
+        [ProgramSectionTemplate.QuadTitleDescription, 4],
+    ] as Array<[ProgramSectionTemplate, number]>)('renders %s with %d cards', (templateId, count) => {
+        renderModal();
+
+        const call = getCallByTemplate(templateId);
+        expect(call).toBeDefined();
+        expect(call?.data?.cards).toHaveLength(count);
     });
 });

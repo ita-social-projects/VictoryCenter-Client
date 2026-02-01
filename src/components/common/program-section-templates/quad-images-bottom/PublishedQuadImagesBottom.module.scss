@@ -1,23 +1,30 @@
-$img-width: 360px;
-$img-height: 390px;
-
 .container {
-    aspect-ratio: 1440 / 1183;
     gap: 16px;
+    padding: 80px 0 0 0;
+
+    @media (min-width: 560px) {
+        padding: 80px 16px 0px 16px;
+    }
+
+    @media (min-width: 1440px) {
+        padding: 80px 16px 60px 16px;
+    }
 }
 
 .top-section {
-    flex: 0 0 53%;
+    height: auto;
 }
 
 .bottom-section {
-    flex: 0 0 48%;
     justify-content: end;
-    padding-bottom: 16px;
+    height: auto;
+}
+
+.image {
+    aspect-ratio: 360 / 390;
+    max-height: 100%;
 }
 
 .image-wrapper {
-    aspect-ratio: 360 / 390;
-    max-width: #{$img-width};
-    max-height: #{$img-height};
+    width: 100%;
 }

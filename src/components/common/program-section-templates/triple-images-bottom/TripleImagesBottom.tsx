@@ -48,6 +48,7 @@ export const TripleImagesBottom = ({
             topSectionClassName={baseStyles['top-section']}
             bottomSectionClassName={baseStyles['bottom-section']}
             imageWrapperClassName={baseStyles['image-wrapper']}
+            imageClassName={baseStyles.image}
         />
     );
 };

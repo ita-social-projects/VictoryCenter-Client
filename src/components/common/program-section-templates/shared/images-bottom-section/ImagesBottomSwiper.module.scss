@@ -1,12 +1,12 @@
 .swiperContainer {
     display: flex;
-    flex: 1;
-    height: 100%;
     width: 100%;
+    height: auto;
+
     position: relative;
 
     [class~='swiper'] {
-        flex: 1 1 auto;
+        width: 100%;
     }
 }
 

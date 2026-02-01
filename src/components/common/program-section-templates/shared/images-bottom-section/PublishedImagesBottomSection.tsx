@@ -40,7 +40,6 @@ export const PublishedImagesBottomSection = ({
                         return (
                             <div
                                 className={cn(styles['image-wrapper'], imageWrapperClassName)}
-                                data-elevated={config.elevatedIndices.includes(index) ? 'true' : undefined}
                                 data-testid="image-wrapper"
                             >
                                 {imageSrc && (
@@ -48,6 +47,7 @@ export const PublishedImagesBottomSection = ({
                                         src={imageSrc}
                                         alt={`Program section ${index + 1}`}
                                         className={cn(styles.image, imageClassName)}
+                                        data-elevated={config.elevatedIndices.includes(index) ? 'true' : 'false'}
                                     />
                                 )}
                             </div>

@@ -14,18 +14,9 @@
 }
 
 .image-wrapper {
-    height: 75%;
-    &[data-elevated='true'] {
-        position: relative;
-        top: -10%
-    }
-    justify-content: end;
-
-    @media (min-width: 768px) {
-        &[data-elevated='true'] {
-            top: -25%;
-        }
-    }
+    display: flex;
+    align-items: end;
+    height: auto;
 }
 
 .image {
@@ -33,4 +24,21 @@
     height: auto;
     object-fit: fill;
     display: block;
+
+    &[data-elevated='true'] {
+        margin-bottom: 100px;
+    }
+
+    @media (min-width: 768px) {
+        &[data-elevated='true'] {
+            margin-bottom: 70px;
+        }
+    }
+    
+    @media (min-width: 1024px) {
+        &[data-elevated='true'] {
+            margin-bottom: 100px
+        }
+    }
 }
+

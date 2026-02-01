@@ -1,0 +1,87 @@
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
+
+.td-cards {
+    display: grid;
+    gap: 0.4rem;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    margin: 0 auto;
+    width: 100%;
+    height: fit-content;
+    align-content: start;
+
+    &--editable {
+        gap: 1rem;
+    }
+
+    &--dual,
+    &--quad {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    &--triple {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.td-card {
+    background: c.$light-blue-50;
+    border-radius: 16px;
+    padding: 1rem;
+
+    &--editable {
+        padding: 1.3rem;
+    }
+}
+
+.title {
+    @include type.subtitle-2-bold;
+    font-size: 0.76rem;
+    margin-bottom: 0.5rem;
+}
+
+.title-field {
+    margin-bottom: 1rem;
+
+    input {
+        @include type.subtitle-2-bold;
+        font-size: 1.03rem;
+
+        &::placeholder {
+            opacity: 0.7;
+        }
+    }
+}
+
+.description-field {
+    textarea {
+        @include type.body-1-regular;
+        font-size: 1rem;
+        min-height: 10rem;
+    }
+}
+
+.description {
+    @include type.body-1-regular;
+    font-size: 0.64rem;
+    line-height: 1rem;
+    white-space: pre-wrap;
+    margin-bottom: 0.5rem;
+}
+
+.description-list {
+    list-style: none;
+    padding-left: 0.3rem;
+    margin: 0;
+
+    li {
+        padding-left: 0.7rem;
+        position: relative;
+
+        &::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+        }
+    }
+}

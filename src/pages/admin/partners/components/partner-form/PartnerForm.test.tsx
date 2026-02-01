@@ -106,7 +106,6 @@ const imageTestId = `partner-form-image-${cardHtmlId}`;
 describe('PartnerForm', () => {
     let onValuesChange: jest.Mock;
     let onDelete: jest.Mock;
-    let container: HTMLElement;
 
     const getDescriptionTextarea = () => screen.getByTestId(`${descriptionTestId}-textarea`);
     const getImageChangeButton = () => screen.getByTestId(`${imageTestId}-change`);
@@ -138,7 +137,6 @@ describe('PartnerForm', () => {
                 {...props}
             />,
         );
-        container = view.container;
     };
 
     beforeEach(() => {

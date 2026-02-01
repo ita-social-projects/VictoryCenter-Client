@@ -1,10 +1,8 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { TitleDescriptionSection, TitleDescriptionSectionProps } from './TitleDescriptionSection';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { ProgramSectionMode } from '@/types/common/program-sections';
 
-// Mock the input group components
 jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
     InputWithCharacterLimitGroup: ({
         label,
@@ -82,14 +80,12 @@ describe('TitleDescriptionSection', () => {
         jest.clearAllMocks();
     });
 
-    // Render helpers
     const renderTitleDescriptionSection = (overrideProps: Partial<TitleDescriptionSectionProps> = {}) =>
         render(<TitleDescriptionSection {...defaultProps} {...overrideProps} />);
 
     const renderBareTitleDescriptionSection = (overrideProps: Partial<TitleDescriptionSectionProps> = {}) =>
         render(<TitleDescriptionSection {...overrideProps} />);
 
-    // Element getters
     const getTitleHeading = () => screen.queryByRole('heading', { level: 2 });
     const getDescriptionParagraph = (text?: string) => {
         if (text) {
@@ -224,7 +220,6 @@ describe('TitleDescriptionSection', () => {
             fireEvent.change(titleInput!, { target: { value: 'New Title' } });
             fireEvent.change(descriptionTextarea!, { target: { value: 'New Description' } });
 
-            // Should not throw errors
             expect(titleInput).toBeInTheDocument();
             expect(descriptionTextarea).toBeInTheDocument();
         });

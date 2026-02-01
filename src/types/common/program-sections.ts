@@ -17,6 +17,10 @@ export enum ProgramSectionTemplate {
     SingleImageBottom = 5,
     SingleImageTop = 6,
     SingleImageRight = 7,
+    TripleTitleDescription = 8,
+    DualTitleDescription = 9,
+    QuadTitleDescription = 10,
+    SingleTitleQuintupleDescription = 11,
 }
 
 export enum ProgramSectionMode {

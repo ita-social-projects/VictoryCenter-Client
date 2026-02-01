@@ -13,9 +13,9 @@ import {
 import { useProgramSectionValidation } from '@/hooks/admin/use-program-section-validation';
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
 import { ProgramSectionMode } from '@/types/common/program-sections';
+import { useImageError } from '@/hooks/common/use-image-error/useImageError';
 import styles from './SingleImageRight.module.scss';
 import publishedStyles from './PublishedSingleImageRight.module.scss';
-import { useState } from 'react';
 
 export interface SingleImageRightProps {
     title?: string;
@@ -49,12 +49,7 @@ export const SingleImageRight = ({
         onTitleChange,
         onDescriptionChange,
     });
-
-    const [error, setError] = useState<string>('');
-
-    const handleSetError = (errorMessage: string | null) => {
-        setError(errorMessage || '');
-    };
+    const { error, handleSetError } = useImageError();
 
     return (
         <div

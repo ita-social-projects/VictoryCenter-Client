@@ -20,7 +20,6 @@ describe('InputWithCharacterLimit', () => {
     const getInput = () => screen.getByRole('textbox');
     const getCharacterCounter = (current: number, max: number) => screen.getByText(`${current}/${max}`);
     const getWrapper = () => getInput().parentElement!;
-    const getClearButton = () => screen.getByRole('button', { name: /clear input/i });
 
     const focusInput = () => fireEvent.focus(getInput());
     const blurInput = () => fireEvent.blur(getInput());

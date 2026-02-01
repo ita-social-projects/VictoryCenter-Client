@@ -6,9 +6,9 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { PROGRAM_SECTION_IMAGE_CONFIGS, PROGRAM_VALIDATION } from '@/const/admin/programs';
 import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 import { ProgramSectionMode } from '@/types/common/program-sections';
+import { useImageError } from '@/hooks/common/use-image-error/useImageError';
 import styles from './SingleImageBottom.module.scss';
 import publishedStyles from './PublishedSingleImageBottom.module.scss';
-import { useState } from 'react';
 
 export interface SingleImageBottomProps {
     title?: string;
@@ -31,12 +31,7 @@ export const SingleImageBottom = ({
 }: SingleImageBottomProps) => {
     const imageSrc = getImageSrc(image);
     const baseStyles = mode === ProgramSectionMode.Published ? publishedStyles : styles;
-
-    const [error, setError] = useState<string>('');
-
-    const handleSetError = (errorMessage: string | null) => {
-        setError(errorMessage || '');
-    };
+    const { error, handleSetError } = useImageError();
 
     return (
         <div

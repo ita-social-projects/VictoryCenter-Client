@@ -1,6 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { DetailedProgramPageContent } from './DetailedProgramPageContent';
-import { fetchProgramBySlug } from '@/services/api/public/programs/programs-api';
 import { DetailedProgram } from '@/types/public/programs-page';
 
 jest.mock('react-router-dom', () => ({

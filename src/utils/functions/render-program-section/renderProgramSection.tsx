@@ -55,7 +55,10 @@ const createItem = (
     ...overrides,
 });
 
-const createBaseContents = (): ProgramSectionContent[] => [createItem(ContentType.Title, 0), createItem(ContentType.Description, 1)];
+const createBaseContents = (): ProgramSectionContent[] => [
+    createItem(ContentType.Title, 0),
+    createItem(ContentType.Description, 1),
+];
 
 const createImageContents = (count: number): ProgramSectionContent[] =>
     Array.from({ length: count }, (_, i) => createItem(ContentType.Image, 2 + i));
@@ -123,7 +126,10 @@ export const getInitialSectionContents = (templateId: ProgramSectionTemplate): P
     if (cardCount) return createCardContents(cardCount);
 
     if (templateId === ProgramSectionTemplate.SingleTitleQuintupleDescription) {
-        return [createItem(ContentType.Title, 0), ...Array.from({ length: 5 }, (_, i) => createItem(ContentType.Description, i + 1))];
+        return [
+            createItem(ContentType.Title, 0),
+            ...Array.from({ length: 5 }, (_, i) => createItem(ContentType.Description, i + 1)),
+        ];
     }
 
     const imageCount = IMAGE_COUNT_MAP[templateId] ?? 0;
@@ -151,8 +157,7 @@ export const renderProgramSection = ({
     }
 
     if (templateId === ProgramSectionTemplate.SingleTitleQuintupleDescription) {
-        const descriptions =
-            data.descriptions ?? (data.description ? [data.description] : []);
+        const descriptions = data.descriptions ?? (data.description ? [data.description] : []);
 
         return (
             <SingleTitleQuintupleDescription

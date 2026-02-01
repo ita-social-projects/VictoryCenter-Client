@@ -89,7 +89,9 @@ export const ProgramSectionForm = ({
                 if (!target) return prev;
 
                 const updatedContents = prev.contents.map((c) =>
-                    c.contentType === ContentType.Description && c.order === target.order ? { ...c, description: value } : c,
+                    c.contentType === ContentType.Description && c.order === target.order
+                        ? { ...c, description: value }
+                        : c,
                 );
 
                 const updatedSection = { ...prev, contents: updatedContents };

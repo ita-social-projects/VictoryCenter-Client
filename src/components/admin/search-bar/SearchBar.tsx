@@ -83,7 +83,11 @@ export const SearchBar = <T,>({
     const clearActive = useCallback(() => setActiveIndex(-1), []);
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const newQuery = event.target.value;
+        const rawValue = event.target.value;
+
+        const newQuery =
+            typeof maxCharactersToSearch === 'number' ? rawValue.slice(0, maxCharactersToSearch) : rawValue;
+
         setSearchQuery(newQuery);
         setDebouncedValue(newQuery);
         setActiveIndex(-1);

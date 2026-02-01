@@ -3,6 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { SearchBar, SearchBarProps } from './SearchBar';
 import { SearchItemWrapperProps } from './search-item-wrapper/SearchItemWrapper';
 import { TooltipProps } from '@/components/admin/tooltip/Tooltip';
+import { UseDebouncedValueCallbackProps } from '@/hooks/common/use-debounced-value-callback/useDebouncedValueCallback';
 
 interface TestItem {
     id: number;
@@ -82,6 +83,13 @@ describe('SearchBar', () => {
                 calculatedSize: 200,
             },
         );
+        require('@/hooks/common/use-debounced-value-callback/useDebouncedValueCallback').useDebouncedValueCallback.mockImplementation(
+            ({ value, callback, isDisabled }: UseDebouncedValueCallbackProps<string>) => {
+                if (!isDisabled) {
+                    callback(value);
+                }
+            },
+        );
     });
 
     // Render helpers
@@ -158,6 +166,43 @@ describe('SearchBar', () => {
 
             const input = getInput();
             expect(input).not.toHaveAttribute('maxLength');
+        });
+
+        it('limits input value length according to maxCharactersToSearch', () => {
+            renderSearchBar({ maxCharactersToSearch: 5 });
+
+            typeInInput('123456789');
+
+            expect(getInput()).toHaveValue('12345');
+        });
+
+        it('does not pass value longer than maxCharactersToSearch to onQueryChange', () => {
+            const onQueryChange = jest.fn();
+            renderSearchBar({ maxCharactersToSearch: 5, onQueryChange });
+
+            typeInInput('123456789');
+
+            expect(onQueryChange).toHaveBeenCalledWith('12345');
+        });
+
+        it('supports different maxCharactersToSearch values', () => {
+            const { rerender } = renderSearchBar({ maxCharactersToSearch: 3 });
+
+            typeInInput('abcdef');
+            expect(getInput()).toHaveValue('abc');
+
+            rerender(<SearchBar {...defaultProps} maxCharactersToSearch={10} />);
+
+            typeInInput('abcdefghijk');
+            expect(getInput()).toHaveValue('abcdefghij');
+        });
+
+        it('allows only one character when maxCharactersToSearch is 1', () => {
+            renderSearchBar({ maxCharactersToSearch: 1 });
+
+            typeInInput('abc');
+
+            expect(getInput()).toHaveValue('a');
         });
     });
 

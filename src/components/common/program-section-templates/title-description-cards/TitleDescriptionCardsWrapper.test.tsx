@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { TitleDescriptionCardsWrapper } from './TitleDescriptionCardsWrapper';
 import { TitleDescriptionCardData } from '../shared/title-description-cards-section/TitleDescriptionCardsSection';
+import { ProgramSectionMode } from '@/types/common/program-sections';
 
 jest.mock('../shared/title-description-cards-section/TitleDescriptionCardsSection', () => ({
     TitleDescriptionCardsSection: (props: any) => (
@@ -35,7 +36,7 @@ describe('TitleDescriptionCardsWrapper', () => {
 
     it('should apply editable class when isEditable is true', () => {
         const { container } = render(
-            <TitleDescriptionCardsWrapper cards={mockCards} cardsCount={2} isEditable={true} />,
+            <TitleDescriptionCardsWrapper cards={mockCards} cardsCount={2} mode={ProgramSectionMode.Edit} />,
         );
 
         expect((container.firstChild as HTMLElement).className).toMatch(/editable/);
@@ -66,7 +67,7 @@ describe('TitleDescriptionCardsWrapper', () => {
     });
 
     it('should pass isEditable to child component', () => {
-        render(<TitleDescriptionCardsWrapper cards={mockCards} cardsCount={2} isEditable={true} />);
+        render(<TitleDescriptionCardsWrapper cards={mockCards} cardsCount={2} mode={ProgramSectionMode.Edit} />);
 
         expect(screen.getByTestId('title-description-cards-section')).toHaveAttribute('data-is-editable', 'true');
     });

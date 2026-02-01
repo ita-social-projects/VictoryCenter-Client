@@ -5,12 +5,13 @@ import { CardDescriptionField } from './CardDescriptionField';
 import { PROGRAM_SECTION_VALIDATION, PROGRAMS_TEXT } from '@/const/admin/programs';
 import { useCardValidation } from '@/hooks/admin/use-section-card-validation/useCardValidation';
 import { TitleDescriptionCardData } from './TitleDescriptionCardsSection';
+import { ProgramSectionMode } from '@/types/common/program-sections';
 import styles from './TitleDescriptionCardsSection.module.scss';
 
 interface TitleDescriptionCardProps {
     card: TitleDescriptionCardData;
     index: number;
-    isEditable: boolean;
+    mode?: ProgramSectionMode;
     onTitleChange?: (index: number, value: string) => void;
     onDescriptionChange?: (index: number, value: string) => void;
 }
@@ -18,10 +19,11 @@ interface TitleDescriptionCardProps {
 export const TitleDescriptionCard = ({
     card,
     index,
-    isEditable,
+    mode = ProgramSectionMode.Published,
     onTitleChange,
     onDescriptionChange,
 }: TitleDescriptionCardProps) => {
+    const isEditable = mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View;
     const {
         error: titleError,
         handleChange: handleTitleChange,

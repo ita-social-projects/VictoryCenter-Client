@@ -11,6 +11,10 @@ jest.mock('@/services/api/public/programs/programs-api', () => ({
     fetchProgramBySlug: jest.fn(),
 }));
 
+jest.mock('@/hooks/common/use-get-program-by-slug/useGetProgramBySlug', () => ({
+    useProgramBySlug: jest.fn(),
+}));
+
 jest.mock('@/assets/icons/map-pin.svg', () => ({
     ReactComponent: () => <div data-testid="map-pin-icon" />,
 }));
@@ -29,8 +33,25 @@ jest.mock('@/components/public/background-media/BackgroundMedia', () => ({
     ),
 }));
 
+jest.mock('@/components/public/ui/button', () => ({
+    Button: ({ children, href }: { children: React.ReactNode; href?: string }) => (
+        <a href={href || '#'} data-testid="button">
+            {children}
+        </a>
+    ),
+}));
+
+jest.mock('@/pages/public/not-found-page/NotFound', () => ({
+    NotFound: () => (
+        <div data-testid="not-found-page">
+            <div data-testid="not-found-message-container">NotFound</div>
+        </div>
+    ),
+}));
+
 const { useParams } = require('react-router-dom');
-const mockFetchProgramBySlug = fetchProgramBySlug as jest.MockedFunction<typeof fetchProgramBySlug>;
+const { useProgramBySlug } = require('@/hooks/common/use-get-program-by-slug/useGetProgramBySlug');
+const mockUseProgramBySlug = useProgramBySlug as jest.MockedFunction<typeof useProgramBySlug>;
 
 const mockProgram = {
     id: 1,
@@ -56,7 +77,11 @@ describe('DetailedProgramPageContent', () => {
 
     it('renders loading state', () => {
         useParams.mockReturnValue({ slug: 'test-program' });
-        mockFetchProgramBySlug.mockImplementation(() => new Promise(() => {}));
+        mockUseProgramBySlug.mockReturnValue({
+            program: null,
+            isLoading: true,
+            error: null,
+        });
 
         render(<DetailedProgramPageContent />);
 
@@ -65,29 +90,41 @@ describe('DetailedProgramPageContent', () => {
 
     it('renders error state when fetch fails', async () => {
         useParams.mockReturnValue({ slug: 'test-program' });
-        mockFetchProgramBySlug.mockRejectedValue(new Error('Failed to fetch'));
+        mockUseProgramBySlug.mockReturnValue({
+            program: null,
+            isLoading: false,
+            error: new Error('Failed to fetch'),
+        });
 
         render(<DetailedProgramPageContent />);
 
         await waitFor(() => {
-            expect(screen.getByRole('alert')).toBeInTheDocument();
-            expect(screen.getByText('Failed to load program details')).toBeInTheDocument();
+            expect(screen.getByTestId('not-found-message-container')).toBeInTheDocument();
         });
     });
 
     it('renders error state when no slug provided', async () => {
         useParams.mockReturnValue({ slug: undefined });
+        mockUseProgramBySlug.mockReturnValue({
+            program: null,
+            isLoading: false,
+            error: new Error('No slug provided'),
+        });
 
         render(<DetailedProgramPageContent />);
 
         await waitFor(() => {
-            expect(screen.getByRole('alert')).toBeInTheDocument();
+            expect(screen.getByTestId('not-found-message-container')).toBeInTheDocument();
         });
     });
 
     it('renders program details successfully', async () => {
         useParams.mockReturnValue({ slug: 'test-program' });
-        mockFetchProgramBySlug.mockResolvedValue(mockProgram);
+        mockUseProgramBySlug.mockReturnValue({
+            program: mockProgram,
+            isLoading: false,
+            error: null,
+        });
 
         render(<DetailedProgramPageContent />);
 
@@ -102,7 +139,11 @@ describe('DetailedProgramPageContent', () => {
 
     it('renders background image with correct src', async () => {
         useParams.mockReturnValue({ slug: 'test-program' });
-        mockFetchProgramBySlug.mockResolvedValue(mockProgram);
+        mockUseProgramBySlug.mockReturnValue({
+            program: mockProgram,
+            isLoading: false,
+            error: null,
+        });
 
         render(<DetailedProgramPageContent />);
 
@@ -115,7 +156,11 @@ describe('DetailedProgramPageContent', () => {
     it('does not render location when not provided', async () => {
         const programWithoutLocation = { ...mockProgram, location: undefined };
         useParams.mockReturnValue({ slug: 'test-program' });
-        mockFetchProgramBySlug.mockResolvedValue(programWithoutLocation as unknown as DetailedProgram);
+        mockUseProgramBySlug.mockReturnValue({
+            program: programWithoutLocation as unknown as DetailedProgram,
+            isLoading: false,
+            error: null,
+        });
 
         render(<DetailedProgramPageContent />);
 
@@ -127,7 +172,11 @@ describe('DetailedProgramPageContent', () => {
     it('does not render participantsCount when not provided', async () => {
         const programWithoutParticipants = { ...mockProgram, participantsCount: undefined };
         useParams.mockReturnValue({ slug: 'test-program' });
-        mockFetchProgramBySlug.mockResolvedValue(programWithoutParticipants as unknown as DetailedProgram);
+        mockUseProgramBySlug.mockReturnValue({
+            program: programWithoutParticipants as unknown as DetailedProgram,
+            isLoading: false,
+            error: null,
+        });
 
         render(<DetailedProgramPageContent />);
 
@@ -139,7 +188,11 @@ describe('DetailedProgramPageContent', () => {
     it('does not render meetingsCount when not provided', async () => {
         const programWithoutMeetings = { ...mockProgram, meetingsCount: undefined };
         useParams.mockReturnValue({ slug: 'test-program' });
-        mockFetchProgramBySlug.mockResolvedValue(programWithoutMeetings as unknown as DetailedProgram);
+        mockUseProgramBySlug.mockReturnValue({
+            program: programWithoutMeetings as unknown as DetailedProgram,
+            isLoading: false,
+            error: null,
+        });
 
         render(<DetailedProgramPageContent />);
 

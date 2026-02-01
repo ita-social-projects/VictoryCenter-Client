@@ -187,9 +187,9 @@ describe('ImagesBottomSection', () => {
 
     it('applies elevated data attribute', () => {
         render(<ImagesBottomSection {...defaultProps} />);
-        const wrappers = screen.getAllByTestId(/image-wrapper/);
-        expect((wrappers[1] as HTMLElement).dataset.elevated).toBe('true');
-        expect((wrappers[0] as HTMLElement).dataset.elevated).toBeUndefined();
+        const images = screen.getAllByRole('img');
+        expect((images[1] as HTMLElement).dataset.elevated).toBe('true');
+        expect((images[0] as HTMLElement).dataset.elevated).toBe('false');
     });
 
     it('applies elevated data attribute in Edit mode', () => {

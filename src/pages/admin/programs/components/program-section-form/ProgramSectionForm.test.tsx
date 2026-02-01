@@ -154,7 +154,7 @@ describe('ProgramSectionForm', () => {
         const callPayload = renderProgramSectionMock.mock.calls[0][0];
 
         expect(callPayload.templateId).toBe(section.template);
-        expect(callPayload.isEditable).toBe(true);
+        expect(callPayload.mode).toBe(ProgramSectionMode.Edit);
 
         expect(callPayload.data).toEqual({
             title: '',

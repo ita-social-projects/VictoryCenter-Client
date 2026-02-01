@@ -2,10 +2,13 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { TitleDescriptionCardsSection, type TitleDescriptionCardData } from '../TitleDescriptionCardsSection';
+import { ProgramSectionMode } from '@/types/common/program-sections';
 
 jest.mock('../TitleDescriptionCard', () => ({
-    TitleDescriptionCard: ({ card, index, isEditable, onTitleChange, onDescriptionChange }: any) => {
+    TitleDescriptionCard: ({ card, index, mode, onTitleChange, onDescriptionChange }: any) => {
         const React = require('react');
+        const { ProgramSectionMode } = require('@/types/common/program-sections');
+        const isEditable = mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View;
         const [title, setTitle] = React.useState(card.title);
         const [description, setDescription] = React.useState(card.description);
 
@@ -103,19 +106,19 @@ describe('TitleDescriptionCardsSection', () => {
     });
 
     describe('editable mode', () => {
-        it('should pass isEditable prop to child components', () => {
+        it('should pass mode prop to child components', () => {
             const cards: TitleDescriptionCardData[] = [{ title: 'Title', description: 'Description' }];
 
-            render(<TitleDescriptionCardsSection cards={cards} cardsCount={1} isEditable={true} />);
+            render(<TitleDescriptionCardsSection cards={cards} cardsCount={1} mode={ProgramSectionMode.Edit} />);
 
             const titleInput = screen.getByTestId('title-input-0') as HTMLInputElement;
             expect(titleInput).not.toHaveAttribute('readonly');
         });
 
-        it('should not be editable when isEditable is false', () => {
+        it('should not be editable when mode is Published', () => {
             const cards: TitleDescriptionCardData[] = [{ title: 'Title', description: 'Description' }];
 
-            render(<TitleDescriptionCardsSection cards={cards} cardsCount={1} isEditable={false} />);
+            render(<TitleDescriptionCardsSection cards={cards} cardsCount={1} mode={ProgramSectionMode.Published} />);
 
             const titleInput = screen.getByTestId('title-input-0') as HTMLInputElement;
             expect(titleInput).toHaveAttribute('readonly');
@@ -131,7 +134,7 @@ describe('TitleDescriptionCardsSection', () => {
                 <TitleDescriptionCardsSection
                     cards={cards}
                     cardsCount={1}
-                    isEditable={true}
+                    mode={ProgramSectionMode.Edit}
                     onTitleChange={onTitleChange}
                 />,
             );
@@ -151,7 +154,7 @@ describe('TitleDescriptionCardsSection', () => {
                 <TitleDescriptionCardsSection
                     cards={cards}
                     cardsCount={1}
-                    isEditable={true}
+                    mode={ProgramSectionMode.Edit}
                     onDescriptionChange={onDescriptionChange}
                 />,
             );
@@ -174,7 +177,7 @@ describe('TitleDescriptionCardsSection', () => {
                 <TitleDescriptionCardsSection
                     cards={cards}
                     cardsCount={2}
-                    isEditable={true}
+                    mode={ProgramSectionMode.Edit}
                     onTitleChange={onTitleChange}
                 />,
             );
@@ -197,7 +200,7 @@ describe('TitleDescriptionCardsSection', () => {
             const cards: TitleDescriptionCardData[] = [{ title: 'Title', description: 'Description' }];
 
             const { container } = render(
-                <TitleDescriptionCardsSection cards={cards} cardsCount={1} isEditable={true} />,
+                <TitleDescriptionCardsSection cards={cards} cardsCount={1} mode={ProgramSectionMode.Edit} />,
             );
 
             expect(container.querySelector('[data-testid="card-0"]')).toBeInTheDocument();
@@ -235,10 +238,10 @@ describe('TitleDescriptionCardsSection', () => {
             expect(screen.getByTestId('card-4')).toBeInTheDocument();
         });
 
-        it('should be editable when isEditable is true', () => {
+        it('should be editable when mode is Edit', () => {
             const cards: TitleDescriptionCardData[] = [{ title: 'Title', description: 'Description' }];
 
-            render(<TitleDescriptionCardsSection cards={cards} cardsCount={1} isEditable={true} />);
+            render(<TitleDescriptionCardsSection cards={cards} cardsCount={1} mode={ProgramSectionMode.Edit} />);
 
             const titleInput = screen.getByTestId('title-input-0') as HTMLInputElement;
             expect(titleInput).not.toHaveAttribute('readonly');

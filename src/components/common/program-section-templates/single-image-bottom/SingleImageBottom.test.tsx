@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { SingleImageBottom, SingleImageBottomProps } from './SingleImageBottom';
 import { PROGRAM_SECTION_IMAGE_CONFIGS } from '@/const/admin/programs';
@@ -33,14 +32,15 @@ describe('SingleImageBottom', () => {
     });
 
     it('renders non-editable layout: shows image and passes mode to TitleDescriptionSection', () => {
-        renderSingleImageBottom({
+        const { container } = renderSingleImageBottom({
             title: 'T',
             description: 'D',
             image: { id: 1, url: 'test-image.jpg', mimeType: 'image/jpeg' },
             mode: ProgramSectionMode.Template,
         });
 
-        const img = screen.getByRole('img', { name: /img1-of-single-image-bottom/i });
+        const img = container.querySelector('img');
+        expect(img).toBeInTheDocument();
         expect(img).toHaveAttribute('src', expect.stringContaining('test-image.jpg'));
         expect(screen.getByTestId('title-description-section')).toBeInTheDocument();
         expect(mockPhotoInputGroup).not.toHaveBeenCalled();
@@ -60,7 +60,7 @@ describe('SingleImageBottom', () => {
         const onDescriptionChange = jest.fn();
         const onImageChange = jest.fn();
 
-        renderSingleImageBottom({
+        const { container } = renderSingleImageBottom({
             title: 'T',
             description: 'D',
             image: { base64: 'base64-data', mimeType: 'image/jpeg' },
@@ -72,7 +72,7 @@ describe('SingleImageBottom', () => {
 
         expect(screen.getByTestId('title-description-section')).toBeInTheDocument();
         expect(screen.getByTestId('photo-input-group')).toBeInTheDocument();
-        expect(screen.queryByRole('img', { name: /img1-of-single-image-bottom/i })).not.toBeInTheDocument();
+        expect(container.querySelector('img')).not.toBeInTheDocument();
 
         expect(getLastCallProps(mockTitleDescriptionSection)).toEqual(
             expect.objectContaining({

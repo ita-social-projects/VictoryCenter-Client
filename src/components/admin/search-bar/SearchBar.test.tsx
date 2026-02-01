@@ -246,6 +246,42 @@ describe('SearchBar', () => {
         });
     });
 
+    describe('Focus behavior', () => {
+        it('does not show dropdown on focus when input is below minimum characters', () => {
+            renderSearchBar({ minCharactersToSearch: 3 });
+            typeInInput('ab');
+            expectDropdownToBeHidden();
+
+            fireEvent.focus(getInput());
+            expectDropdownToBeHidden();
+        });
+
+        it('restores dropdown on focus when input meets minimum characters', () => {
+            renderSearchBar();
+            typeInInput('test');
+            expectDropdownToBeVisible();
+
+            pressKey('Escape');
+            expectDropdownToBeHidden();
+
+            fireEvent.focus(getInput());
+            expectDropdownToBeVisible();
+        });
+    });
+
+    describe('Mouse interactions', () => {
+        it('resets active index on mouse leave from suggestions list', () => {
+            renderSearchBar();
+            typeInInput('a');
+            pressKey('ArrowDown');
+            expectSuggestionToBeActive('Apple');
+
+            const list = getSuggestionsList();
+            if (list) fireEvent.mouseLeave(list);
+
+            expect(getSuggestionItem('Apple')).not.toHaveClass('active');
+        });
+    });
     describe('User interactions', () => {
         it('calls onSuggestionSelect when suggestion is clicked', () => {
             renderSearchBar();

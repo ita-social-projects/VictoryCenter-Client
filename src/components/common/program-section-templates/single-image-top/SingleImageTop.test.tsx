@@ -76,6 +76,10 @@ describe('SingleImageTop', () => {
         const photoProps = mockPhotoInputGroup.mock.calls[0]?.[0];
         expect(photoProps).toEqual(expect.any(Object));
         expect(photoProps.onChange).toEqual(expect.any(Function));
+        expect(photoProps.setError).toEqual(expect.any(Function));
+
+        expect(() => photoProps.onChange(null)).not.toThrow();
+        expect(() => photoProps.setError('')).not.toThrow();
     });
 
     it('renders correctly in non-edit mode', () => {

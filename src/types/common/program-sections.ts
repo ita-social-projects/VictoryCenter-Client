@@ -20,6 +20,7 @@ export enum ProgramSectionTemplate {
     TripleTitleDescription = 8,
     DualTitleDescription = 9,
     QuadTitleDescription = 10,
+    SingleTitleQuintupleDescription = 11,
 }
 
 export interface ProgramSectionContent {

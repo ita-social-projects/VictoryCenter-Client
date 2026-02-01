@@ -10,6 +10,7 @@ import styles from './AddSectionModal.module.scss';
 import swiperStyles from './AddSectionSwiper.module.scss';
 import { ReactComponent as ChevronRight } from '@/assets/icons/chevron-right.svg';
 import { ReactComponent as ChevronLeft } from '@/assets/icons/chevron-left.svg';
+
 export interface AddSectionModalProps {
     isOpen: boolean;
     onClose: () => void;
@@ -40,6 +41,7 @@ const TEMPLATES = [
     ProgramSectionTemplate.SingleImageBottom,
     ProgramSectionTemplate.SingleImageTop,
     ProgramSectionTemplate.SingleImageRight,
+    ProgramSectionTemplate.SingleTitleQuintupleDescription,
     ProgramSectionTemplate.DualTitleDescription,
     ProgramSectionTemplate.TripleTitleDescription,
     ProgramSectionTemplate.QuadTitleDescription,
@@ -67,23 +69,26 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
             case ProgramSectionTemplate.SingleImageRight:
                 return [placeholderImageObject];
             case ProgramSectionTemplate.TextOnly:
+            case ProgramSectionTemplate.SingleTitleQuintupleDescription:
+            case ProgramSectionTemplate.DualTitleDescription:
+            case ProgramSectionTemplate.TripleTitleDescription:
+            case ProgramSectionTemplate.QuadTitleDescription:
+                return [];
             default:
                 return [];
         }
     };
 
-    const handleSave = () => {
-        const selectedTemplateId = TEMPLATES[selectedTemplateIndex];
-        onSelectTemplate(selectedTemplateId);
-        onClose();
+    const getPlaceholderDescriptions = (templateId: ProgramSectionTemplate) => {
+        if (templateId === ProgramSectionTemplate.SingleTitleQuintupleDescription) {
+            return Array.from({ length: 5 }, () => PROGRAMS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT_SHORT);
+        }
+        return undefined;
     };
 
-    const handleSlideChange = (activeIndex: number) => {
-        setSelectedTemplateIndex(activeIndex);
-    };
-
-    const renderSection = (templateId: ProgramSectionTemplate) => {
+    const getCardSamples = (templateId: ProgramSectionTemplate) => {
         const cardSamples = PROGRAMS_TEXT.SECTION.CARD;
+
         const CARD_CONFIGS: Partial<Record<ProgramSectionTemplate, { title: string; description: string }[]>> = {
             [ProgramSectionTemplate.DualTitleDescription]: [
                 {
@@ -129,7 +134,21 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
             ],
         };
 
-        const cards = CARD_CONFIGS[templateId];
+        return CARD_CONFIGS[templateId];
+    };
+
+    const handleSave = () => {
+        const selectedTemplateId = TEMPLATES[selectedTemplateIndex];
+        onSelectTemplate(selectedTemplateId);
+        onClose();
+    };
+
+    const handleSlideChange = (activeIndex: number) => {
+        setSelectedTemplateIndex(activeIndex);
+    };
+
+    const renderSection = (templateId: ProgramSectionTemplate) => {
+        const cards = getCardSamples(templateId);
 
         return renderProgramSection({
             templateId,
@@ -138,6 +157,7 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
                 : {
                       title: PROGRAMS_TEXT.SECTION.TITLE_SAMPLE_TEXT,
                       description: PROGRAMS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT,
+                      descriptions: getPlaceholderDescriptions(templateId),
                       images: getPlaceholderImages(templateId),
                   },
             isTemplate: true,

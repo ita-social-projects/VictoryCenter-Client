@@ -1,20 +1,20 @@
 @import '../shared/BaseSectionTemplate.module.scss';
-$img-height: 680px;
 
 .container {
     padding-top: 80px;
 }
 
 .bottom-section {
-    height: $img-height;
+    width: 100%;
 }
 
 .image-wrapper {
-    height: 100%;
+    aspect-ratio: 1440 / 680;
+    width: 100%;
 }
 
 .image {
     width: 100%;
-    height: $img-height;
     object-fit: cover;
+    max-height: 100%;
 }

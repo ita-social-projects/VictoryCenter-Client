@@ -109,13 +109,13 @@ jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
                     {cat.name}
                 </button>
             ))}
-            <button data-testid="ctx-add" onClick={() => onContextMenuOptionSelected!('add')}>
+            <button data-testid="ctx-add" onClick={() => onContextMenuOptionSelected?.('add')}>
                 Add Category
             </button>
-            <button data-testid="ctx-edit" onClick={() => onContextMenuOptionSelected!('edit')}>
+            <button data-testid="ctx-edit" onClick={() => onContextMenuOptionSelected?.('edit')}>
                 Edit Category
             </button>
-            <button data-testid="ctx-delete" onClick={() => onContextMenuOptionSelected!('delete')}>
+            <button data-testid="ctx-delete" onClick={() => onContextMenuOptionSelected?.('delete')}>
                 Delete Category
             </button>
         </div>
@@ -156,6 +156,7 @@ jest.mock('../program-list-item/ProgramListItem', () => ({
 
 jest.mock('../programs-page-modals/ProgramsPageModals', () => {
     const { VisibilityStatus } = require('@/types/admin/common');
+
     return {
         ProgramsPageModals: (props: ProgramsPageModalsProps) => (
             <div data-testid="programs-modals">
@@ -233,6 +234,7 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                             categories: [{ id: 1, name: 'Category A', programsCount: 2 }],
                             slug: 'alpha-edited-with-images',
                         } as any;
+
                         (globalThis as any).__lastEditedProgram = p;
                         props.onEditProgram(p);
                     }}
@@ -421,6 +423,20 @@ describe('ProgramsPageContent', () => {
         });
     };
 
+    const applyPublishedFilterAndExpectFetch = async () => {
+        fireEvent.click(screen.getByText('Filter Published'));
+
+        await waitFor(() => {
+            expect(mockProgramsApi.fetchPrograms).toHaveBeenCalledWith(
+                expect.any(Object),
+                1,
+                0,
+                5,
+                VisibilityStatus.Published,
+            );
+        });
+    };
+
     beforeEach(() => {
         jest.clearAllMocks();
 
@@ -432,6 +448,7 @@ describe('ProgramsPageContent', () => {
             openEditCategoryModal: jest.fn(),
             openDeleteCategoryModal: jest.fn(),
         };
+
         closeActions = {
             closeAddItemModal: jest.fn(),
             closeEditItemModal: jest.fn(),
@@ -553,17 +570,7 @@ describe('ProgramsPageContent', () => {
             expect(screen.getAllByTestId('program-item')).toHaveLength(1);
         });
 
-        fireEvent.click(screen.getByText('Filter Published'));
-
-        await waitFor(() => {
-            expect(mockProgramsApi.fetchPrograms).toHaveBeenCalledWith(
-                expect.any(Object),
-                1,
-                0,
-                5,
-                VisibilityStatus.Published,
-            );
-        });
+        await applyPublishedFilterAndExpectFetch();
     });
 
     it('opens category modals from context menu', async () => {
@@ -713,17 +720,7 @@ describe('ProgramsPageContent', () => {
     it('does not add program when status filter mismatches', async () => {
         await renderAndWaitForPrograms();
 
-        fireEvent.click(screen.getByText('Filter Published'));
-
-        await waitFor(() => {
-            expect(mockProgramsApi.fetchPrograms).toHaveBeenCalledWith(
-                expect.any(Object),
-                1,
-                0,
-                5,
-                VisibilityStatus.Published,
-            );
-        });
+        await applyPublishedFilterAndExpectFetch();
 
         fireEvent.click(screen.getByTestId('trigger-add-draft'));
 
@@ -842,22 +839,26 @@ describe('ProgramsPageContent', () => {
         await renderAndWaitForPrograms();
 
         fireEvent.click(screen.getByTestId('select-program'));
+
         await waitFor(() => {
             expect(screen.getAllByTestId('program-item')).toHaveLength(1);
         });
 
         fireEvent.click(screen.getByTestId('trigger-edit'));
+
         await waitFor(() => {
             expect(screen.getAllByTestId('program-item')).toHaveLength(1);
         });
 
         fireEvent.click(screen.getByTestId('trigger-delete'));
+
         await waitFor(() => {
             expect(screen.getAllByTestId('program-item')).toHaveLength(2);
         });
 
         fireEvent.click(screen.getByTestId('select-program'));
         fireEvent.click(screen.getByTestId('category-2'));
+
         await waitFor(() => {
             expect(mockProgramsApi.fetchPrograms).toHaveBeenCalledWith(expect.any(Object), 2, 0, 5, undefined);
         });
@@ -867,20 +868,12 @@ describe('ProgramsPageContent', () => {
         await renderAndWaitForPrograms();
 
         fireEvent.click(screen.getByTestId('trigger-edit'));
+
         await waitFor(() => {
             expect(screen.getAllByTestId('program-item')).toHaveLength(1);
         });
 
-        fireEvent.click(screen.getByText('Filter Published'));
-        await waitFor(() => {
-            expect(mockProgramsApi.fetchPrograms).toHaveBeenCalledWith(
-                expect.any(Object),
-                1,
-                0,
-                5,
-                VisibilityStatus.Published,
-            );
-        });
+        await applyPublishedFilterAndExpectFetch();
     });
 
     it('calls modal handlers for add, edit, and delete actions', async () => {
@@ -896,18 +889,9 @@ describe('ProgramsPageContent', () => {
         expect(openActions.openDeleteItemModal).toHaveBeenCalledWith(expect.objectContaining({ id: 10 }));
 
         global.dispatchEvent(new Event('resize'));
+
         await waitFor(() => {
             expect(screen.getByTestId('programs-page-content')).toBeInTheDocument();
-        });
-    });
-
-    it('adds program with Draft status', async () => {
-        await renderAndWaitForPrograms();
-
-        fireEvent.click(screen.getByTestId('trigger-add'));
-
-        await waitFor(() => {
-            expect(screen.getAllByTestId('program-item')).toHaveLength(3);
         });
     });
 
@@ -936,11 +920,13 @@ describe('ProgramsPageContent', () => {
         await renderAndWaitForPrograms();
 
         fireEvent.click(screen.getByTestId('trigger-add'));
+
         await waitFor(() => {
             expect(screen.getAllByTestId('program-item')).toHaveLength(3);
         });
 
         fireEvent.click(screen.getByTestId('trigger-delete'));
+
         await waitFor(() => {
             expect(screen.getAllByTestId('program-item')).toHaveLength(2);
         });
@@ -950,11 +936,13 @@ describe('ProgramsPageContent', () => {
         await renderAndWaitForPrograms();
 
         fireEvent.click(screen.getByTestId('trigger-edit-draft'));
+
         await waitFor(() => {
             expect(screen.getAllByTestId('program-item')).toHaveLength(2);
         });
 
         fireEvent.click(screen.getByTestId('trigger-edit-with-images'));
+
         await waitFor(() => {
             expect(screen.getAllByTestId('program-item')).toHaveLength(2);
         });

@@ -33,12 +33,12 @@
     }
 }
 
-.title{
+.title {
     @include type.h3-bold-uppercase;
     word-wrap: break-word;
 }
 
-.description{
+.description {
     @include type.body-1-medium;
     word-wrap: break-word;
     white-space: pre-wrap;

@@ -34,11 +34,10 @@
             margin-bottom: 70px;
         }
     }
-    
+
     @media (min-width: 1024px) {
         &[data-elevated='true'] {
-            margin-bottom: 100px
+            margin-bottom: 100px;
         }
     }
 }
-

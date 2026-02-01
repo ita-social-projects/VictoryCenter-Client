@@ -16,7 +16,7 @@ export const DetailedProgramPageContent: React.FC = () => {
 
     const { program, isLoading, error } = useProgramBySlug(slug);
 
-    if (isLoading) {
+    if (isLoading || (!program && !error)) {
         return (
             <div className={styles['detailed-program-page-content']}>
                 <LinearProgress />

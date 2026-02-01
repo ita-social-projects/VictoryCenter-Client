@@ -4,6 +4,9 @@
 .root {
   padding: 20px 16px 24px;
   color: c.$blue-900;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .title {
@@ -12,6 +15,7 @@
 }
 
 .chart {
+  flex: 1;
   display: flex;
   align-items: stretch;
 }

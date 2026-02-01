@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { KEY_ENTER_COMMAND, COMMAND_PRIORITY_HIGH, $getSelection, $isRangeSelection } from 'lexical';
-import { $insertNodes, LineBreakNode } from 'lexical';
+import { LineBreakNode } from 'lexical';
 
 export const EnterKeyPlugin = () => {
     const [editor] = useLexicalComposerContext();

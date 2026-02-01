@@ -9,7 +9,7 @@ import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
 import { useCategoriesCounter } from '@/hooks/admin/use-categories-counter/useCategoriesCounter';
 import { ProgramsApi, ProgramsCategoriesApi } from '@/services/api/admin/programs/programs-api';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { COMMON_TEXT_ADMIN, UI_CONFIG } from '@/const/admin/common';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import {
     PaginationRequestParams,
@@ -437,6 +437,7 @@ export const ProgramsPageContent = () => {
                     languages={allLanguages}
                     onLanguageChange={onLanguageChange}
                     onTranslationStatusFilterChange={onTranslationStatusFilterChange}
+                    maxCharactersToSearch={UI_CONFIG.SEARCH_BAR.MAX_CHARACTERS_FOR_SEARCH.PROGRAMS}
                 />
             </div>
 

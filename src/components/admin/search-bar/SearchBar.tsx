@@ -35,6 +35,7 @@ export interface SearchBarProps<T> {
     minCharactersToSearch?: number;
     onClear?: () => void;
     notFoundMessage?: string;
+    maxCharactersToSearch?: number;
 }
 
 export interface TooltipState {
@@ -58,6 +59,7 @@ export const SearchBar = <T,>({
     notFoundMessage = 'Nothing found',
     searchDelayMs = 300,
     minCharactersToSearch = 1,
+    maxCharactersToSearch,
 }: SearchBarProps<T>) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [debouncedValue, setDebouncedValue] = useState('');
@@ -244,6 +246,7 @@ export const SearchBar = <T,>({
                         onFocus={() => setDropdownVisible(searchQuery.length >= minCharactersToSearch)}
                         placeholder={placeholder}
                         autoComplete="off"
+                        maxLength={maxCharactersToSearch}
                     />
                     {isShowClearButton && (
                         <button

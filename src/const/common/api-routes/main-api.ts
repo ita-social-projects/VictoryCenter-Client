@@ -33,6 +33,7 @@ export const API_ROUTES = {
     },
     FAQ: {
         BASE: 'faq',
+        SEARCH: 'faq/search',
         PUBLISHED_BY_SLUG: 'faq/published',
         REORDER: 'faq/reorder',
         PAGES: 'faq/pages',

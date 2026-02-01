@@ -145,6 +145,20 @@ describe('SearchBar', () => {
             expect(getClearButton()).toBeInTheDocument();
             expect(getClearIcon()).toBeInTheDocument();
         });
+
+        it('sets maxLength on input when maxCharactersToSearch is provided', () => {
+            renderSearchBar({ maxCharactersToSearch: 5 });
+
+            const input = getInput();
+            expect(input).toHaveAttribute('maxLength', '5');
+        });
+
+        it('does not set maxLength on input when maxCharactersToSearch is not provided', () => {
+            renderSearchBar();
+
+            const input = getInput();
+            expect(input).not.toHaveAttribute('maxLength');
+        });
     });
 
     describe('Dropdown behavior', () => {

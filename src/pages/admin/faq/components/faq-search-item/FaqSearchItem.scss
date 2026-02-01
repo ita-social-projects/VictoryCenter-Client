@@ -9,8 +9,7 @@
     padding: 0.25rem 0.5rem;
 }
 
-.faq-search-item__name,
-.faq-search-item__pages {
+.faq-search-item__name {
     display: block;
     width: 100%;
     white-space: nowrap;
@@ -23,14 +22,7 @@
     font-weight: 500;
 }
 
-.faq-search-item__pages {
-    font-size: 0.875rem;
-    margin-top: 0.125rem;
-    color: colors.$grey-900;
-}
-
-.faq-search-item-tooltip__name,
-.faq-search-item-tooltip__pages {
+.faq-search-item-tooltip__name {
     display: block;
     width: 100%;
     white-space: normal;
@@ -40,10 +32,4 @@
 .faq-search-item-tooltip__name {
     font-size: 1rem;
     font-weight: 500;
-}
-
-.faq-search-item-tooltip__pages {
-    font-size: 0.875rem;
-    margin-top: 0.125rem;
-    color: colors.$grey-900;
 }

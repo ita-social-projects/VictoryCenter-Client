@@ -2,7 +2,6 @@ import { AxiosInstance } from 'axios';
 import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
 import { FaqCreateUpdate, FaqQuestionDto, FaqSearchItemData, ReorderFaq, VisitorPage } from '@/types/admin/faq';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
-import { PaginationRequestParams } from '@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
 import { TranslationStatusFilter } from '@/types/common/language';
 
 type FaqPayload = Omit<FaqCreateUpdate, 'id'>;
@@ -52,14 +51,30 @@ export const FaqApi = {
         return response.data;
     },
 
-    // TODO: Implement when search functionality will be completed
-    getSearchItems: async (
-        _searchTerm: string,
-        _parameters: PaginationRequestParams,
+    fetchFaqSearchItems: async (
+        client: AxiosInstance,
+        searchTerm: string,
+        offset: number = 0,
+        limit: number = 5,
+        signal?: AbortSignal,
     ): Promise<PaginationResult<FaqSearchItemData>> => {
+        const response = await client.get<PaginationResult<FaqQuestionDto>>(`${API_ROUTES.FAQ.SEARCH}`, {
+            params: {
+                searchQuery: searchTerm,
+                offset,
+                limit,
+            },
+            signal,
+        });
+
+        const suggestions: FaqSearchItemData[] = response.data.items.map((faq) => ({
+            id: faq.id,
+            question: faq.questionText,
+        }));
+
         return {
-            items: [],
-            totalItemsCount: 0,
+            items: suggestions,
+            totalItemsCount: response.data.totalItemsCount,
         };
     },
 

@@ -72,23 +72,7 @@ $img-height: 600px;
 }
 
 .image {
-    // height: auto;
-    // width: auto;
-    // object-fit: cover;
-    //aspect-ratio: $img-width / $img-height;
-
     width: auto;
     object-fit: cover;
     max-width: 100%;
 }
-
-// .image-wrapper {
-//     width: 100%;
-//     aspect-ratio: $img-width / $img-height;
-//     max-width: $img-width;
-// }
-
-// .image {
-//     width: 100%;
-//     object-fit: cover;
-// }

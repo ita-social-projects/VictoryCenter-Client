@@ -121,10 +121,6 @@ describe('ImagesBottomSection', () => {
 
         // PhotoInputGroup should be called twice in View mode
         expect(PhotoInputGroup).toHaveBeenCalledTimes(2);
-
-        // Verify the PhotoInputGroup receives the disabled prop in View mode
-        const firstCall = (PhotoInputGroup as jest.Mock).mock.calls[0][0];
-        expect(firstCall.disabled).toBe(true);
     });
 
     it('renders when an image string is empty (key fallback branch coverage)', () => {

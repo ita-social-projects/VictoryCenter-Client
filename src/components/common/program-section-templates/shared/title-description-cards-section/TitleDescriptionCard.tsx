@@ -23,7 +23,6 @@ export const TitleDescriptionCard = ({
     onTitleChange,
     onDescriptionChange,
 }: TitleDescriptionCardProps) => {
-    const isEditable = mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View;
     const {
         error: titleError,
         handleChange: handleTitleChange,
@@ -50,7 +49,7 @@ export const TitleDescriptionCard = ({
 
     const { intro, items } = parseDescriptionList(card.description);
 
-    if (isEditable) {
+    if (mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View) {
         return (
             <div className={cn(styles['td-card'], styles['td-card--editable'])}>
                 <div className={styles['title-field']}>
@@ -65,6 +64,7 @@ export const TitleDescriptionCard = ({
                         maxLength={PROGRAM_SECTION_VALIDATION.cardTitle.max}
                         error={titleError}
                         placeholder={PROGRAMS_TEXT.SECTION.CARD.FORM.TITLE.PLACEHOLDER}
+                        disabled={mode === ProgramSectionMode.View}
                     />
                 </div>
 
@@ -80,6 +80,7 @@ export const TitleDescriptionCard = ({
                         maxLength={PROGRAM_SECTION_VALIDATION.cardDescription.max}
                         error={descriptionError}
                         placeholder="• "
+                        disabled={mode === ProgramSectionMode.View}
                     />
                 </div>
             </div>

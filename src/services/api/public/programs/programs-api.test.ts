@@ -1,7 +1,7 @@
-import { programPageDataFetch } from './programs-api';
+import { programPageDataFetch, fetchProgramBySlug } from './programs-api';
 import { axiosInstance } from '@/services/api/axios';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
-import { PublishedProgramDto } from '@/types/public/programs-page';
+import { PublishedProgramDto, DetailedProgram } from '@/types/public/programs-page';
 
 jest.mock('@/services/api/axios');
 jest.mock('@/utils/mock-data/public/programs-page', () => ({
@@ -62,6 +62,65 @@ describe('programs-api', () => {
             (axiosInstance.get as jest.Mock).mockRejectedValue(new Error('Network error'));
 
             await expect(programPageDataFetch()).rejects.toThrow('Network error');
+        });
+    });
+
+    describe('fetchProgramBySlug', () => {
+        it('should fetch program by slug and return detailed program data', async () => {
+            const mockProgram: DetailedProgram = {
+                id: 1,
+                name: 'Test Program',
+                slug: 'test-program',
+                description: 'Test Description',
+                backgroundImage: null,
+                previewImage: null,
+                sections: [],
+                location: '',
+                participantsCount: '0',
+                meetingsCount: '0',
+            };
+
+            (axiosInstance.get as jest.Mock).mockResolvedValue({ data: mockProgram });
+
+            const result = await fetchProgramBySlug('test-program');
+
+            expect(axiosInstance.get).toHaveBeenCalledWith(`${API_ROUTES.PROGRAMS.BY_SLUG}/test-program`);
+            expect(result).toEqual(mockProgram);
+        });
+
+        it('should handle different slug formats', async () => {
+            const mockProgram: DetailedProgram = {
+                id: 2,
+                name: 'Another Program',
+                slug: 'another-program-2024',
+                description: 'Description',
+                previewImage: null,
+                backgroundImage: null,
+                location: '',
+                participantsCount: '0',
+                meetingsCount: '0',
+                sections: [],
+            };
+
+            (axiosInstance.get as jest.Mock).mockResolvedValue({ data: mockProgram });
+
+            const result = await fetchProgramBySlug('another-program-2024');
+
+            expect(axiosInstance.get).toHaveBeenCalledWith(`${API_ROUTES.PROGRAMS.BY_SLUG}/another-program-2024`);
+            expect(result).toEqual(mockProgram);
+        });
+
+        it('should throw an error when program is not found', async () => {
+            (axiosInstance.get as jest.Mock).mockRejectedValue(new Error('Program not found'));
+
+            await expect(fetchProgramBySlug('non-existent-program')).rejects.toThrow('Program not found');
+            expect(axiosInstance.get).toHaveBeenCalledWith(`${API_ROUTES.PROGRAMS.BY_SLUG}/non-existent-program`);
+        });
+
+        it('should throw an error when API fails', async () => {
+            (axiosInstance.get as jest.Mock).mockRejectedValue(new Error('Network error'));
+
+            await expect(fetchProgramBySlug('test-slug')).rejects.toThrow('Network error');
         });
     });
 });

@@ -49,6 +49,14 @@ jest.mock('@/pages/public/not-found-page/NotFound', () => ({
     ),
 }));
 
+jest.mock('@/components/public/detailed-program-section/DetailedProgramSection', () => ({
+    DetailedProgramSection: ({ section }: { section: any }) => (
+        <div data-testid="detailed-program-section" data-section-id={section.id}>
+            Section: {section.template}
+        </div>
+    ),
+}));
+
 const { useParams } = require('react-router-dom');
 const { useProgramBySlug } = require('@/hooks/common/use-get-program-by-slug/useGetProgramBySlug');
 const mockUseProgramBySlug = useProgramBySlug as jest.MockedFunction<typeof useProgramBySlug>;
@@ -198,6 +206,118 @@ describe('DetailedProgramPageContent', () => {
 
         await waitFor(() => {
             expect(screen.queryByTestId('calendar-days-icon')).not.toBeInTheDocument();
+        });
+    });
+
+    it('renders sections list when sections are provided', async () => {
+        const programWithSections = {
+            ...mockProgram,
+            sections: [
+                {
+                    id: 1,
+                    template: 'TextOnly',
+                    contents: [
+                        { id: 1, contentType: 'Title', title: 'Section 1', order: 0 },
+                        { id: 2, contentType: 'Description', description: 'Description 1', order: 1 },
+                    ],
+                },
+                {
+                    id: 2,
+                    template: 'SingleImageTop',
+                    contents: [
+                        { id: 3, contentType: 'Title', title: 'Section 2', order: 0 },
+                        { id: 4, contentType: 'Description', description: 'Description 2', order: 1 },
+                    ],
+                },
+            ],
+        };
+
+        useParams.mockReturnValue({ slug: 'test-program' });
+        mockUseProgramBySlug.mockReturnValue({
+            program: programWithSections as unknown as DetailedProgram,
+            isLoading: false,
+            error: null,
+        });
+
+        render(<DetailedProgramPageContent />);
+
+        await waitFor(() => {
+            const sections = screen.getAllByTestId('detailed-program-section');
+            expect(sections).toHaveLength(2);
+            expect(sections[0]).toHaveAttribute('data-section-id', '1');
+            expect(sections[1]).toHaveAttribute('data-section-id', '2');
+            expect(screen.getByText('Section: TextOnly')).toBeInTheDocument();
+            expect(screen.getByText('Section: SingleImageTop')).toBeInTheDocument();
+        });
+    });
+
+    it('does not render sections list when sections array is empty', async () => {
+        const programWithoutSections = {
+            ...mockProgram,
+            sections: [],
+        };
+
+        useParams.mockReturnValue({ slug: 'test-program' });
+        mockUseProgramBySlug.mockReturnValue({
+            program: programWithoutSections as unknown as DetailedProgram,
+            isLoading: false,
+            error: null,
+        });
+
+        render(<DetailedProgramPageContent />);
+
+        await waitFor(() => {
+            expect(screen.queryByTestId('detailed-program-section')).not.toBeInTheDocument();
+        });
+    });
+
+    it('uses section template as fallback key when section.id is missing', async () => {
+        const programWithSectionsNoIds = {
+            ...mockProgram,
+            sections: [
+                {
+                    template: 'TextOnly',
+                    contents: [],
+                },
+                {
+                    template: 'SingleImageTop',
+                    contents: [],
+                },
+            ],
+        };
+
+        useParams.mockReturnValue({ slug: 'test-program' });
+        mockUseProgramBySlug.mockReturnValue({
+            program: programWithSectionsNoIds as unknown as DetailedProgram,
+            isLoading: false,
+            error: null,
+        });
+
+        render(<DetailedProgramPageContent />);
+
+        await waitFor(() => {
+            const sections = screen.getAllByTestId('detailed-program-section');
+            expect(sections).toHaveLength(2);
+        });
+    });
+
+    it('does not render background section when backgroundImage is not provided', async () => {
+        const programWithoutBackground = {
+            ...mockProgram,
+            backgroundImage: null,
+        };
+
+        useParams.mockReturnValue({ slug: 'test-program' });
+        mockUseProgramBySlug.mockReturnValue({
+            program: programWithoutBackground as unknown as DetailedProgram,
+            isLoading: false,
+            error: null,
+        });
+
+        render(<DetailedProgramPageContent />);
+
+        await waitFor(() => {
+            expect(screen.queryByTestId('background-media')).not.toBeInTheDocument();
         });
     });
 });

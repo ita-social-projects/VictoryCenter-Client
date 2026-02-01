@@ -246,7 +246,11 @@ describe('ProgramSectionForm', () => {
 
     it('calls onSectionChange and updates correct image by index when onImagesChange is invoked', () => {
         const section = makeSection({
-            contents: [makeTitleContent('T', 0), makeImageContent(2, makeImage('a', 'A')), makeImageContent(1, makeImage('b', 'B'))],
+            contents: [
+                makeTitleContent('T', 0),
+                makeImageContent(2, makeImage('a', 'A')),
+                makeImageContent(1, makeImage('b', 'B')),
+            ],
         });
 
         const { handlers, onSectionChange } = renderWithHandlers({ section });

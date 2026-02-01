@@ -259,7 +259,11 @@ describe('addProgram', () => {
         const originalBackgroundImage = programData.backgroundImage;
 
         const mockPreviewImageResponse = { id: 100, url: 'http://example.com/preview.png', mimeType: 'image/png' };
-        const mockBackgroundImageResponse = { id: 101, url: 'http://example.com/background.png', mimeType: 'image/png' };
+        const mockBackgroundImageResponse = {
+            id: 101,
+            url: 'http://example.com/background.png',
+            mimeType: 'image/png',
+        };
 
         (ImageApi.post as jest.Mock)
             .mockResolvedValueOnce(mockPreviewImageResponse)
@@ -461,7 +465,11 @@ describe('addProgram', () => {
         const programData = getValidProgramData();
 
         const mockPreviewImageResponse = { id: 100, url: 'http://example.com/preview.png', mimeType: 'image/png' };
-        const mockBackgroundImageResponse = { id: 101, url: 'http://example.com/background.png', mimeType: 'image/png' };
+        const mockBackgroundImageResponse = {
+            id: 101,
+            url: 'http://example.com/background.png',
+            mimeType: 'image/png',
+        };
 
         (ImageApi.post as jest.Mock)
             .mockResolvedValueOnce(mockPreviewImageResponse)
@@ -1056,7 +1064,9 @@ describe('API Error and Cancellation Handling', () => {
     it('rejects fetchPrograms on cancellation-like error', async () => {
         mockClient.get.mockRejectedValueOnce(new Error('Request was cancelled'));
 
-        await expect(ProgramsApi.fetchPrograms(mockClient, 1, 0, 10, undefined)).rejects.toThrow('Request was cancelled');
+        await expect(ProgramsApi.fetchPrograms(mockClient, 1, 0, 10, undefined)).rejects.toThrow(
+            'Request was cancelled',
+        );
     });
 
     it('rejects fetchProgramSearchItems on cancellation-like error', async () => {

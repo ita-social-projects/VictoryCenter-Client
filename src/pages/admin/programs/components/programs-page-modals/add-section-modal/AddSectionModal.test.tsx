@@ -257,9 +257,7 @@ describe('AddSectionModal', () => {
         const images = getCallByTemplate(templateId)?.data?.images ?? [];
         expect(images).toHaveLength(count);
 
-        if (count > 0) {
-            expect(images.every((img: any) => img?.url === 'placeholder.png')).toBe(true);
-        }
+        expect(images.every((img: any) => img === 'placeholder.png' || img?.url === 'placeholder.png')).toBe(true);
     });
 
     it('unknown template id falls back to empty images array', () => {

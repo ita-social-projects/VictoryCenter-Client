@@ -12,6 +12,14 @@ jest.mock('@lexical/react/LexicalComposerContext', () => ({
     useLexicalComposerContext: () => [mockEditor],
 }));
 
+jest.mock('lexical', () => ({
+    KEY_ENTER_COMMAND: 'KEY_ENTER_COMMAND',
+    COMMAND_PRIORITY_HIGH: 1,
+    $getSelection: jest.fn(),
+    $isRangeSelection: jest.fn(),
+    LineBreakNode: class LineBreakNode {},
+}));
+
 describe('EnterKeyPlugin', () => {
     beforeEach(() => {
         jest.clearAllMocks();

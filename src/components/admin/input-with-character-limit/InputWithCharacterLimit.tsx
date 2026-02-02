@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import classNames from 'classnames';
 import { ReactComponent as RemoveIcon } from '@/assets/icons/remove-query.svg';
+import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
 import './InputWithCharacterLimit.scss';
 
 export interface InputWithCharacterLimitProps {
@@ -33,7 +34,27 @@ export const InputWithCharacterLimit = ({
     hasError = false,
 }: InputWithCharacterLimitProps) => {
     const [isFocused, setIsFocused] = useState(false);
-    const currentLength = value?.length ?? 0;
+
+    const currentLength = getNormalizedInputText(value).length;
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        let newValue = e.target.value;
+        const normalized = getNormalizedInputText(newValue);
+
+        if (maxLength && normalized.length > maxLength) {
+            newValue = normalized.slice(0, maxLength);
+        }
+
+        const syntheticEvent = {
+            ...e,
+            target: {
+                ...e.target,
+                value: newValue,
+            },
+        };
+
+        onChange(syntheticEvent);
+    };
 
     const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
         setIsFocused(true);
@@ -49,11 +70,11 @@ export const InputWithCharacterLimit = ({
         const syntheticEvent = {
             target: { value: '', name, id },
         } as React.ChangeEvent<HTMLInputElement>;
+
         onChange(syntheticEvent);
     };
 
     const showClearButton = isFocused && value.length > 0 && !disabled;
-
     const countId = `${id}-character-count`;
 
     return (
@@ -66,8 +87,7 @@ export const InputWithCharacterLimit = ({
             <input
                 className={classNames('char-limit-input__field', className)}
                 value={value}
-                onChange={onChange}
-                maxLength={maxLength}
+                onChange={handleChange}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
                 name={name}
@@ -76,8 +96,9 @@ export const InputWithCharacterLimit = ({
                 disabled={disabled}
                 placeholder={placeholder}
                 aria-describedby={countId}
-                aria-invalid={currentLength > maxLength}
+                aria-invalid={hasError || currentLength > maxLength}
             />
+
             <button
                 type="button"
                 className={classNames('char-limit-input__clear-button', {
@@ -91,7 +112,8 @@ export const InputWithCharacterLimit = ({
             >
                 <RemoveIcon />
             </button>
-            <output htmlFor={id} className="char-limit-input__counter" id={countId}>
+
+            <output id={countId} className="char-limit-input__counter">
                 {currentLength}/{maxLength}
             </output>
         </div>

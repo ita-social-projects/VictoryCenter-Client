@@ -57,6 +57,7 @@ export const CommonMemberFields = <TFormData extends CommonFields, TErrorState e
             <div className={styles['form-group']}>
                 <TextAreaWithCharacterLimitGroup
                     label={TEAM_MEMBERS_TEXT.FORM.LABEL.DESCRIPTION}
+                    isRequired
                     id="description"
                     name="description"
                     value={formState.description}

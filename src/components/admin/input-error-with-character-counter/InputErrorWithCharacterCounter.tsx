@@ -1,26 +1,28 @@
 import styles from './InputErrorWithCharacterCounter.module.scss';
+import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
 
 export interface InputErrorWithCharacterCounterProps {
     error?: string;
-    currentLength: number;
     maxLength: number;
     counterId: string;
     htmlFor: string;
+    value: string;
 }
 
 export const InputErrorWithCharacterCounter = ({
     error,
-    currentLength,
     maxLength,
     counterId,
     htmlFor,
+    value,
 }: InputErrorWithCharacterCounterProps) => {
+    const normalizedLength = getNormalizedInputText(value).length;
     return (
         <div className={styles.container}>
             <div className={styles['error-section']}>{error || ''}</div>
             <div className={styles['counter-section']}>
                 <output id={counterId} htmlFor={htmlFor}>
-                    {currentLength}/{maxLength}
+                    {normalizedLength}/{maxLength}
                 </output>
             </div>
         </div>

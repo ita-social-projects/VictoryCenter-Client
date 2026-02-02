@@ -30,12 +30,10 @@ export const TextAreaWithCharacterLimitGroup = ({
     disabled,
     placeholder,
     rows,
-    currentLength,
     error,
     className,
 }: TextAreaWithCharacterLimitGroupProps) => {
     const counterId = `${id}-character-count`;
-    const resolvedCurrentLength = currentLength ?? value.length;
 
     return (
         <div className={cn('input-group', className)}>
@@ -55,10 +53,10 @@ export const TextAreaWithCharacterLimitGroup = ({
             />
             <InputErrorWithCharacterCounter
                 error={error}
-                currentLength={resolvedCurrentLength}
                 maxLength={maxLength}
                 counterId={counterId}
                 htmlFor={id}
+                value={value}
             />
         </div>
     );

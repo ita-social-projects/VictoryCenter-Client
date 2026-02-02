@@ -2,7 +2,6 @@ import { InputLabel } from '@/components/admin/input-label/InputLabel';
 import { InputErrorWithCharacterCounter } from '@/components/admin/input-error-with-character-counter/InputErrorWithCharacterCounter';
 import { TextAreaWithBulletBehavior } from '@/components/admin/textarea-with-bullets/TextAreaWithBulletBehavior';
 import styles from './TitleDescriptionCardsSection.module.scss';
-import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
 
 interface CardDescriptionFieldProps {
     label: string;
@@ -35,10 +34,8 @@ export const CardDescriptionField = ({
     placeholder,
     rows,
     error,
-    currentLength,
 }: CardDescriptionFieldProps) => {
     const counterId = `${id}-character-count`;
-    const resolvedCurrent = currentLength ?? currentLength ?? getTrimmedInputText(value).length;
 
     return (
         <div className={styles['input-group']}>
@@ -59,10 +56,10 @@ export const CardDescriptionField = ({
 
             <InputErrorWithCharacterCounter
                 error={error}
-                currentLength={resolvedCurrent}
                 maxLength={maxLength}
                 counterId={counterId}
                 htmlFor={id}
+                value={value}
             />
         </div>
     );

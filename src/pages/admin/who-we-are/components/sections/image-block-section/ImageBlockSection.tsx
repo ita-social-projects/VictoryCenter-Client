@@ -5,11 +5,11 @@ import React, { useState } from 'react';
 import { ImageValues } from '@/types/common/image';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import './ImageBlockSection.scss';
-import { InputWithCharacterLimit } from '@/components/admin/input-with-character-limit/InputWithCharacterLimit';
 import { Button } from '@/components/admin/button/Button';
 import { ContentType } from '@/types/common/about-us';
 import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '@/validation/admin/who-we-are-schema/WhoWeAreSchema';
-import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
+import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
+import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
 
 export interface ImageSectionProps {
     content: Content[] | undefined;
@@ -27,7 +27,6 @@ export const ImageSection = ({
     content,
     titleLimit = 10,
     descriptionLimit,
-    rows,
     onChange,
     onPublish,
     imageInputProps,
@@ -58,37 +57,42 @@ export const ImageSection = ({
         setIsPublishButtonActive(true);
     };
 
-    const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleTitleChange = (value: string) => {
         if (!titleContent) return;
         onChange({
             ...titleContent,
-            title: e.target.value,
+            title: value,
         });
         setIsPublishButtonActive(true);
 
-        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(e.target.value);
+        const plainText = getPlainTextFromHtml(value);
+        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(plainText);
         setTitleError(error || null);
     };
 
-    const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const handleDescriptionChange = (value: string) => {
         if (!descriptionContent) return;
         onChange({
             ...descriptionContent,
-            description: e.target.value,
+            description: value,
         });
         setIsPublishButtonActive(true);
 
-        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(e.target.value);
+        const plainText = getPlainTextFromHtml(value);
+        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(plainText);
         setDescriptionError(error || null);
     };
 
-    const handleTitleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(e.target.value);
+    const handleTitleBlur = () => {
+        if (!titleContent) return;
+        const plainText = getPlainTextFromHtml(titleContent.title ?? '');
+        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(plainText);
         setTitleError(error || null);
     };
 
-    const handleDescriptionBlur = (e: React.FocusEvent<HTMLTextAreaElement>) => {
-        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(e.target.value);
+    const handleDescriptionBlur = () => {
+        const plainText = getPlainTextFromHtml(descriptionContent?.description ?? '');
+        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(plainText);
         setDescriptionError(error || null);
     };
 
@@ -113,37 +117,28 @@ export const ImageSection = ({
             <div className="content-wrapper">
                 {titleContent && (
                     <div className="content-wrapper-title">
-                        <label htmlFor={titleContent.id.toString()} className="content-wrapper-title-label">
-                            {COMMON_TEXT_ADMIN.TYPE.TITLE}
-                        </label>
-                        <InputWithCharacterLimit
+                        <RichTextInputGroup
+                            label={COMMON_TEXT_ADMIN.TYPE.TITLE}
                             value={titleContent.title ?? ''}
                             onChange={handleTitleChange}
                             name={COMMON_TEXT_ADMIN.TYPE.TITLE}
                             id={titleContent.id.toString()}
                             maxLength={titleLimit}
-                            className="content-wrapper-title-field"
                             onBlur={handleTitleBlur}
-                            disabled={true}
+                            error={titleError || undefined}
                         />
-                        {titleError && (
-                            <p data-testid="title-error" className="error">
-                                {titleError}
-                            </p>
-                        )}
                     </div>
                 )}
 
                 {descriptionContent && (
                     <div className="content-wrapper-description">
-                        <TextAreaWithCharacterLimitGroup
+                        <RichTextInputGroup
                             label={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
                             onChange={handleDescriptionChange}
                             value={descriptionContent.description ?? ''}
                             maxLength={descriptionLimit}
                             name={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
                             id={descriptionContent.id.toString()}
-                            rows={rows}
                             onBlur={handleDescriptionBlur}
                             error={descriptionError || undefined}
                         />

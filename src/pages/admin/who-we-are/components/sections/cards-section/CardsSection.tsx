@@ -6,6 +6,7 @@ import { Button } from '@/components/admin/button/Button';
 import { ContentType } from '@/types/common/about-us';
 import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '@/validation/admin/who-we-are-schema/WhoWeAreSchema';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
 
 export interface CardsSectionProps {
     content: Content[] | undefined;
@@ -37,7 +38,8 @@ export const CardsSection = ({
     const cardContents = content.filter((item) => item.contentType === ContentType.Card);
 
     const handleDescriptionValidate = (id: number, value: string) => {
-        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(value);
+        const plainText = getPlainTextFromHtml(value);
+        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(plainText);
 
         setErrors((prev) => {
             const cardErrors = prev[id] || { image: null, description: null };
@@ -80,7 +82,7 @@ export const CardsSection = ({
                             key={c.id}
                             content={c}
                             onChange={onChange}
-                            onDescriptionValidate={(value) => handleDescriptionValidate(c.id, value.target.value)}
+                            onDescriptionValidate={(value) => handleDescriptionValidate(c.id, value)}
                             descriptionError={errors[c.id]?.description ?? null}
                             imageError={errors[c.id]?.image ?? null}
                             setImageError={(value) => handleSetImageError(c.id, value)}

@@ -5,6 +5,7 @@ import { ContentType } from '@/types/common/about-us';
 import { useTranslation } from 'react-i18next';
 import defaultOurTeamImage from '@/assets/images/public/about-us-page/our-team.jpg';
 import { Button } from '@/components/public/ui/button';
+import { SafeHtml } from '@/components/common/safe-html';
 
 export interface OurTeamProps {
     content?: AboutUsContent[] | null;
@@ -20,7 +21,7 @@ export const OurTeam = ({ content }: OurTeamProps) => {
         <div className={styles.root}>
             <img src={imageUrl} alt="Our Team" className={styles.image} />
             <div className={styles.info}>
-                <p className={styles.description}>{description}</p>
+                <SafeHtml as="p" className={styles.description} html={description ?? ''} />
                 <Button href={PUBLIC_ROUTES.TEAM.FULL} variant="tertiary">
                     {t('GO_TO_TEAM')}
                 </Button>

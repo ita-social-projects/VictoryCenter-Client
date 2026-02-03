@@ -6,8 +6,7 @@ import cn from 'classnames';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { FAQ_TEXT, FAQ_VALIDATION } from '@/const/admin/faq';
-import { TranslationControls } from '@/components/admin/translation-controls/TranslationControls';
-import { FAQ_VALIDATION_FUNCTIONS } from '@/validation/admin/faq-schema/faq-schema'; // Импорт валидации
+import { FAQ_VALIDATION_FUNCTIONS } from '@/validation/admin/faq-schema/faq-schema';
 
 export interface TranslateFaqFormValues {
     question: string;
@@ -84,8 +83,6 @@ export const TranslateFaqForm = forwardRef<TranslateFaqFormRef, TranslateFaqForm
                 data-testid="translate-faq-form"
                 noValidate
             >
-                <TranslationControls isSubmitting={isSubmitting} />
-
                 <div className={cn(styles.root, 'common-faq-fields')}>
                     <div className={styles['form-group']}>
                         <InputWithCharacterLimitGroup

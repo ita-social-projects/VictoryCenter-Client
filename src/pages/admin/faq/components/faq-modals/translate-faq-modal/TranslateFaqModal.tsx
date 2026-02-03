@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { LocalizationModal } from '@/components/admin/localization-modal/LocalizationModal';
 import { FaqQuestion } from '@/types/admin/faq';
 import { LocalizationLanguage } from '@/types/common/language';
@@ -6,13 +6,15 @@ import { ModalMode } from '@/types/admin/common';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { TranslateFaqForm, TranslateFaqFormRef, TranslateFaqFormValues } from './TranslateFaqForm';
 import { useTranslateFaq } from '@/hooks/admin/use-translate-faq/useTranslateFaq';
+import { TranslationControls } from '@/components/admin/translation-controls/TranslationControls';
+import { DEFAULT_LOCALE } from '@/const/common/locales';
 
 interface TranslateFaqModalProps {
     isOpen: boolean;
     onClose: () => void;
     faqToTranslate: FaqQuestion | null;
     onTranslateFaq: (faq: FaqQuestion) => void;
-    language: LocalizationLanguage;
+    translatedLanguages: LocalizationLanguage[];
 }
 
 export const TranslateFaqModal = ({
@@ -20,23 +22,30 @@ export const TranslateFaqModal = ({
     onClose,
     faqToTranslate,
     onTranslateFaq,
-    language,
+    translatedLanguages,
 }: TranslateFaqModalProps) => {
     const formRef = useRef<TranslateFaqFormRef>(null);
     const [isFormValid, setIsFormValid] = useState(false);
+    const [language, setLanguage] = useState<LocalizationLanguage | null>(translatedLanguages?.[0] ?? null);
+
+    useEffect(() => {
+        if (translatedLanguages.length > 0 && !language) {
+            const defaultEnglish = translatedLanguages.find((l) => l.code !== DEFAULT_LOCALE) || translatedLanguages[0];
+            setLanguage(defaultEnglish);
+        }
+    }, [translatedLanguages]);
 
     const existingLocalization = useMemo(() => {
-        if (!faqToTranslate?.localizations) return null;
-
+        if (!faqToTranslate?.localizations || !language) return null;
         return faqToTranslate.localizations.find((loc) => loc.language?.id === language.id);
-    }, [faqToTranslate, language.id]);
+    }, [faqToTranslate, language?.id]);
 
     const mode = existingLocalization ? ModalMode.Edit : ModalMode.Add;
     const isEditMode = mode === ModalMode.Edit;
 
     const { translateFaq, isSubmitting, error } = useTranslateFaq({
         faq: faqToTranslate,
-        language,
+        language: language!,
         mode,
         onSuccess: (updatedFaq) => {
             onTranslateFaq(updatedFaq);
@@ -44,14 +53,12 @@ export const TranslateFaqModal = ({
         },
     });
 
-    const initialData = useMemo<TranslateFaqFormValues | null>(() => {
-        if (!isEditMode || !existingLocalization) return null;
-
+    const initialData = useMemo<TranslateFaqFormValues>(() => {
         return {
-            question: existingLocalization.questionText || '',
-            answer: existingLocalization.answerText || '',
+            question: existingLocalization?.questionText || '',
+            answer: existingLocalization?.answerText || '',
         };
-    }, [existingLocalization, isEditMode]);
+    }, [existingLocalization]);
 
     const handleSaveClick = () => {
         if (!formRef.current?.isValid()) return;
@@ -82,6 +89,12 @@ export const TranslateFaqModal = ({
             isFormValid={isFormValid}
             checkIsDirty={checkIsDirty}
         >
+            <TranslationControls
+                selectedLanguage={language}
+                isSubmitting={isSubmitting}
+                languages={translatedLanguages}
+                onLanguageChange={setLanguage}
+            />
             {error && (
                 <div className="error-message" style={{ color: 'red', marginBottom: '10px' }}>
                     {error}
@@ -89,6 +102,7 @@ export const TranslateFaqModal = ({
             )}
 
             <TranslateFaqForm
+                key={language?.id}
                 ref={formRef}
                 onSubmit={handleFormSubmit}
                 initialData={initialData}

@@ -384,8 +384,6 @@ export const FaqPanelContent = () => {
         [updateModalState],
     );
 
-    const englishLanguage = useMemo(() => allLanguages.find((l) => l.code === 'en'), [allLanguages]);
-
     const renderFaqItem = useCallback(
         (faq: FaqQuestion) => {
             if (!selectedLanguage) return null;
@@ -503,15 +501,13 @@ export const FaqPanelContent = () => {
                 onDeleteFaq={handleDeleteFaq}
             />
 
-            {englishLanguage && (
-                <TranslateFaqModal
-                    isOpen={!!modalState.faqToTranslate}
-                    onClose={closeModalActions.translateFaq}
-                    faqToTranslate={modalState.faqToTranslate}
-                    onTranslateFaq={handleTranslateFaqSuccess}
-                    language={englishLanguage!}
-                />
-            )}
+            <TranslateFaqModal
+                isOpen={!!modalState.faqToTranslate}
+                onClose={closeModalActions.translateFaq}
+                faqToTranslate={modalState.faqToTranslate}
+                onTranslateFaq={handleTranslateFaqSuccess}
+                translatedLanguages={translationLanguages}
+            />
 
             <ToastContainer />
         </div>

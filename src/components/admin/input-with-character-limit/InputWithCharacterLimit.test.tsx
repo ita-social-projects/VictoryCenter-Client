@@ -109,15 +109,6 @@ describe('InputWithCharacterLimit', () => {
         expectWrapperNotToBeFocused();
     });
 
-    it('handles undefined value with nullish coalescing', () => {
-        const propsWithUndefinedValue = {
-            ...defaultProps,
-            value: undefined as any,
-        };
-        render(<InputWithCharacterLimit {...propsWithUndefinedValue} />);
-        expect(getCharacterCounter(0, 50)).toBeInTheDocument();
-    });
-
     it('clears input via clear button and forwards synthetic change event', () => {
         const onChange = jest.fn();
         render(

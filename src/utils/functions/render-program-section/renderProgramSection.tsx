@@ -1,6 +1,6 @@
 import React from 'react';
 import { ProgramSectionContent, ProgramSectionTemplate } from '@/types/common/program-sections';
-import { ImageValues } from '@/types/common/image';
+import { ImageValues, Image } from '@/types/common/image';
 import { ContentType } from '@/types/common/programs';
 import { QuadImagesBottom } from '@/components/common/program-section-templates/quad-images-bottom/QuadImagesBottom';
 import { TripleImagesBottom } from '@/components/common/program-section-templates/triple-images-bottom/TripleImagesBottom';
@@ -10,6 +10,7 @@ import { SingleImageTop } from '@/components/common/program-section-templates/si
 import { SingleImageBottom } from '@/components/common/program-section-templates/single-image-bottom/SingleImageBottom';
 import { SingleImageRight } from '@/components/common/program-section-templates/single-image-right/SingleImageRight';
 import { TitleDescriptionCardsWrapper } from '@/components/common/program-section-templates/title-description-cards/TitleDescriptionCardsWrapper';
+import { SingleTitleQuintupleDescription } from '@/components/common/program-section-templates/single-title-quintuple-description/SingleTitleQuintupleDescription';
 
 export interface ProgramSectionCardData {
     title: string;
@@ -19,13 +20,15 @@ export interface ProgramSectionCardData {
 export interface ProgramSectionData {
     title?: string;
     description?: string;
-    images?: string[];
+    descriptions?: string[];
+    images?: (Image | ImageValues | null)[];
     cards?: ProgramSectionCardData[];
 }
 
 export interface ProgramSectionHandlers {
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
+    onDescriptionsChange?: (index: number, value: string) => void;
     onImagesChange?: (index: number, file: ImageValues | null) => void;
     onCardTitleChange?: (index: number, value: string) => void;
     onCardDescriptionChange?: (index: number, value: string) => void;
@@ -98,11 +101,11 @@ interface StandardTemplateProps {
 
 type StandardTemplateComponentProps =
     | (StandardTemplateProps & {
-          image?: string;
+          image?: Image | ImageValues | null;
           onImageChange?: (file: ImageValues | null) => void;
       })
     | (StandardTemplateProps & {
-          images?: string[];
+          images?: (Image | ImageValues | null)[];
           onImagesChange?: (index: number, file: ImageValues | null) => void;
       });
 
@@ -120,8 +123,13 @@ const STANDARD_TEMPLATES_MAP: Partial<
 
 export const getInitialSectionContents = (templateId: ProgramSectionTemplate): ProgramSectionContent[] => {
     const cardCount = CARD_COUNT_MAP[templateId];
-    if (cardCount) {
-        return createCardContents(cardCount);
+    if (cardCount) return createCardContents(cardCount);
+
+    if (templateId === ProgramSectionTemplate.SingleTitleQuintupleDescription) {
+        return [
+            createItem(ContentType.Title, 0),
+            ...Array.from({ length: 5 }, (_, i) => createItem(ContentType.Description, i + 1)),
+        ];
     }
 
     const imageCount = IMAGE_COUNT_MAP[templateId] ?? 0;
@@ -144,6 +152,21 @@ export const renderProgramSection = ({
                 isEditable={isEditable}
                 onTitleChange={handlers?.onCardTitleChange}
                 onDescriptionChange={handlers?.onCardDescriptionChange}
+            />
+        );
+    }
+
+    if (templateId === ProgramSectionTemplate.SingleTitleQuintupleDescription) {
+        const descriptions = data.descriptions ?? (data.description ? [data.description] : []);
+
+        return (
+            <SingleTitleQuintupleDescription
+                title={data.title}
+                descriptions={descriptions}
+                isTemplate={isTemplate}
+                isEditable={isEditable}
+                onTitleChange={handlers?.onTitleChange}
+                onDescriptionsChange={handlers?.onDescriptionsChange}
             />
         );
     }

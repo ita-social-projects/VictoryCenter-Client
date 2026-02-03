@@ -1,13 +1,13 @@
 import cn from 'classnames';
 import { ImagesBottomSection } from '../shared/images-bottom-section/ImagesBottomSection';
-import { ImageValues } from '@/types/common/image';
+import { ImageValues, Image } from '@/types/common/image';
 import { QUAD_IMAGES_CONFIG } from '@/const/admin/programs';
 import styles from './QuadImagesBottom.module.scss';
 
 export interface QuadImagesBottomProps {
     title?: string;
     description?: string;
-    images?: string[];
+    images?: (Image | ImageValues | null)[];
     isTemplate?: boolean;
     isEditable?: boolean;
     onTitleChange?: (value: string) => void;
@@ -18,7 +18,7 @@ export interface QuadImagesBottomProps {
 export const QuadImagesBottom = ({
     title = '',
     description = '',
-    images = ['', '', '', ''],
+    images = [null, null, null, null],
     isTemplate = false,
     isEditable = false,
     onTitleChange,

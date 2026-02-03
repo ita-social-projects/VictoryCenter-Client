@@ -14,15 +14,13 @@ $header-height: 4rem;
     background-color: rgba(colors.$grey-50, 0.5);
     backdrop-filter: blur(10.375rem);
     box-sizing: border-box;
+    max-width: 1440px;
 
     .header-content-container {
-        max-width: 1440px;
-
         display: flex;
         justify-content: space-between;
         align-items: center;
         height: 100%;
-
         padding-left: 3.5rem;
         padding-right: 3.5rem;
 

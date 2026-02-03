@@ -19,6 +19,10 @@ const getContentByType = (contents: ProgramSectionContent[], type: ContentType):
     return contents.find((c) => c.contentType === type);
 };
 
+const getDescriptionsInOrder = (contents: ProgramSectionContent[]) => {
+    return contents.filter((c) => c.contentType === ContentType.Description).sort((a, b) => a.order - b.order);
+};
+
 export const ProgramSectionForm = ({
     section,
     onSave,
@@ -29,24 +33,24 @@ export const ProgramSectionForm = ({
     const [localSection, setLocalSection] = useState<ProgramSection>(section);
 
     const titleContent = getContentByType(localSection.contents, ContentType.Title);
-    const descriptionContent = getContentByType(localSection.contents, ContentType.Description);
+
+    const orderedTitleContents = localSection.contents
+        .filter((c) => c.contentType === ContentType.Title)
+        .sort((a, b) => a.order - b.order);
+
+    const orderedDescriptionContents = getDescriptionsInOrder(localSection.contents);
+
+    const descriptions = orderedDescriptionContents.map((c) => c.description || '');
+    const description = descriptions[0] || '';
 
     const imageContents = localSection.contents
         .filter((c) => c.contentType === ContentType.Image)
         .sort((a, b) => a.order - b.order)
-        .map((c) => (c.image && 'url' in c.image ? c.image.url : '') || '');
+        .map((c) => c.image || null);
 
-    const titleContents = localSection.contents
-        .filter((c) => c.contentType === ContentType.Title)
-        .sort((a, b) => a.order - b.order);
-
-    const descriptionContents = localSection.contents
-        .filter((c) => c.contentType === ContentType.Description)
-        .sort((a, b) => a.order - b.order);
-
-    const cards = titleContents.map((t, i) => ({
+    const cards = orderedTitleContents.map((t, i) => ({
         title: t.title || '',
-        description: descriptionContents[i]?.description || '',
+        description: orderedDescriptionContents[i]?.description || '',
     }));
 
     const handleTitleChange = useCallback(
@@ -69,6 +73,27 @@ export const ProgramSectionForm = ({
                 const updatedContents = prev.contents.map((c) =>
                     c.contentType === ContentType.Description ? { ...c, description: value } : c,
                 );
+                const updatedSection = { ...prev, contents: updatedContents };
+                onSectionChange?.(updatedSection);
+                return updatedSection;
+            });
+        },
+        [onSectionChange],
+    );
+
+    const handleDescriptionsChange = useCallback(
+        (index: number, value: string) => {
+            setLocalSection((prev) => {
+                const ordered = getDescriptionsInOrder(prev.contents);
+                const target = ordered[index];
+                if (!target) return prev;
+
+                const updatedContents = prev.contents.map((c) =>
+                    c.contentType === ContentType.Description && c.order === target.order
+                        ? { ...c, description: value }
+                        : c,
+                );
+
                 const updatedSection = { ...prev, contents: updatedContents };
                 onSectionChange?.(updatedSection);
                 return updatedSection;
@@ -143,7 +168,8 @@ export const ProgramSectionForm = ({
         templateId: section.template,
         data: {
             title: titleContent?.title || '',
-            description: descriptionContent?.description || '',
+            description,
+            descriptions,
             images: imageContents,
             ...(isCardTemplate ? { cards } : {}),
         },
@@ -151,6 +177,7 @@ export const ProgramSectionForm = ({
         handlers: {
             onTitleChange: handleTitleChange,
             onDescriptionChange: handleDescriptionChange,
+            onDescriptionsChange: handleDescriptionsChange,
             onImagesChange: handleImagesChange,
             ...(isCardTemplate
                 ? {

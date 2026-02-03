@@ -1,46 +1,104 @@
 import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
+
 import { renderProgramSection, RenderProgramSectionParams, getInitialSectionContents } from './renderProgramSection';
 import { ProgramSectionTemplate } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 
+const capturedProps: Record<string, any> = {};
+
+const capture = (key: string, props: any) => {
+    capturedProps[key] = props;
+};
+
 jest.mock('@/components/common/program-section-templates/quad-images-bottom/QuadImagesBottom', () => ({
-    QuadImagesBottom: (props: any) => <div data-testid="QuadImagesBottom" {...props} />,
+    QuadImagesBottom: (props: any) => {
+        capture('QuadImagesBottom', props);
+        return <div data-testid="QuadImagesBottom" />;
+    },
 }));
+
 jest.mock('@/components/common/program-section-templates/triple-images-bottom/TripleImagesBottom', () => ({
-    TripleImagesBottom: (props: any) => <div data-testid="TripleImagesBottom" {...props} />,
+    TripleImagesBottom: (props: any) => {
+        capture('TripleImagesBottom', props);
+        return <div data-testid="TripleImagesBottom" />;
+    },
 }));
+
 jest.mock('@/components/common/program-section-templates/dual-images-bottom/DualImagesBottom', () => ({
-    DualImagesBottom: (props: any) => <div data-testid="DualImagesBottom" {...props} />,
+    DualImagesBottom: (props: any) => {
+        capture('DualImagesBottom', props);
+        return <div data-testid="DualImagesBottom" />;
+    },
 }));
+
 jest.mock('@/components/common/program-section-templates/text-only/TextOnly', () => ({
-    TextOnly: (props: any) => <div data-testid="TextOnly" {...props} />,
+    TextOnly: (props: any) => {
+        capture('TextOnly', props);
+        return <div data-testid="TextOnly" />;
+    },
 }));
+
 jest.mock('@/components/common/program-section-templates/single-image-top/SingleImageTop', () => ({
-    SingleImageTop: (props: any) => <div data-testid="SingleImageTop" {...props} />,
+    SingleImageTop: (props: any) => {
+        capture('SingleImageTop', props);
+        return <div data-testid="SingleImageTop" />;
+    },
 }));
+
 jest.mock('@/components/common/program-section-templates/single-image-bottom/SingleImageBottom', () => ({
-    SingleImageBottom: (props: any) => <div data-testid="SingleImageBottom" {...props} />,
+    SingleImageBottom: (props: any) => {
+        capture('SingleImageBottom', props);
+        return <div data-testid="SingleImageBottom" />;
+    },
 }));
+
 jest.mock('@/components/common/program-section-templates/single-image-right/SingleImageRight', () => ({
-    SingleImageRight: (props: any) => <div data-testid="SingleImageRight" {...props} />,
+    SingleImageRight: (props: any) => {
+        capture('SingleImageRight', props);
+        return <div data-testid="SingleImageRight" />;
+    },
 }));
+
 jest.mock('@/components/common/program-section-templates/title-description-cards/TitleDescriptionCardsWrapper', () => ({
-    TitleDescriptionCardsWrapper: (props: any) => (
-        <div data-testid="TitleDescriptionCardsWrapper" data-cards-count={props.cardsCount} />
-    ),
+    TitleDescriptionCardsWrapper: (props: any) => {
+        capture('TitleDescriptionCardsWrapper', props);
+        return <div data-testid="TitleDescriptionCardsWrapper" data-cards-count={String(props.cardsCount)} />;
+    },
 }));
+
+jest.mock(
+    '@/components/common/program-section-templates/single-title-quintuple-description/SingleTitleQuintupleDescription',
+    () => ({
+        SingleTitleQuintupleDescription: (props: any) => {
+            capture('SingleTitleQuintupleDescription', props);
+            return <div data-testid="SingleTitleQuintupleDescription" />;
+        },
+    }),
+);
 
 describe('renderProgramSection', () => {
     const baseData = {
         title: 'Title',
         description: 'Desc',
-        images: ['img1', 'img2', 'img3', 'img4'],
+        images: [
+            { id: 1, url: 'img1', mimeType: 'image/jpeg' },
+            { id: 2, url: 'img2', mimeType: 'image/jpeg' },
+            { id: 3, url: 'img3', mimeType: 'image/jpeg' },
+            { id: 4, url: 'img4', mimeType: 'image/jpeg' },
+        ],
     };
+
     const baseHandlers = {
         onTitleChange: jest.fn(),
         onDescriptionChange: jest.fn(),
         onImagesChange: jest.fn(),
     };
+
+    beforeEach(() => {
+        Object.keys(capturedProps).forEach((k) => delete capturedProps[k]);
+        jest.clearAllMocks();
+    });
 
     const imageTemplates = [
         { id: ProgramSectionTemplate.QuadImagesBottom, testId: 'QuadImagesBottom' },
@@ -61,9 +119,71 @@ describe('renderProgramSection', () => {
                     isEditable: true,
                     handlers: baseHandlers,
                 };
+
                 render(renderProgramSection(params));
                 expect(screen.getByTestId(testId)).toBeInTheDocument();
             });
+        });
+
+        it('maps single-image template to image prop and wraps onImagesChange into onImageChange', () => {
+            const params: RenderProgramSectionParams = {
+                templateId: ProgramSectionTemplate.SingleImageTop,
+                data: baseData,
+                isEditable: true,
+                handlers: baseHandlers,
+            };
+
+            render(renderProgramSection(params));
+
+            const props = capturedProps.SingleImageTop;
+            expect(props.image).toEqual(baseData.images[0]);
+            expect(typeof props.onImageChange).toBe('function');
+
+            const file = { url: 'new', mimeType: 'image/jpeg' } as any;
+            props.onImageChange(file);
+
+            expect(baseHandlers.onImagesChange).toHaveBeenCalledTimes(1);
+            expect(baseHandlers.onImagesChange).toHaveBeenCalledWith(0, file);
+        });
+
+        it('does not pass onImageChange when handlers.onImagesChange is not provided', () => {
+            const handlers = {
+                onTitleChange: jest.fn(),
+                onDescriptionChange: jest.fn(),
+            };
+
+            render(
+                renderProgramSection({
+                    templateId: ProgramSectionTemplate.SingleImageTop,
+                    data: baseData,
+                    isEditable: true,
+                    handlers: handlers as any,
+                }),
+            );
+
+            const props = capturedProps.SingleImageTop;
+            expect(props.onImageChange).toBeUndefined();
+        });
+
+        it('passes images and onImagesChange to multi-image template', () => {
+            const params: RenderProgramSectionParams = {
+                templateId: ProgramSectionTemplate.DualImagesBottom,
+                data: baseData,
+                isEditable: true,
+                handlers: baseHandlers,
+            };
+
+            render(renderProgramSection(params));
+
+            const props = capturedProps.DualImagesBottom;
+            expect(props.images).toEqual(baseData.images);
+            expect(typeof props.onImagesChange).toBe('function');
+
+            const file = { url: 'file', mimeType: 'image/jpeg' } as any;
+            props.onImagesChange(2, file);
+
+            expect(baseHandlers.onImagesChange).toHaveBeenCalledTimes(1);
+            expect(baseHandlers.onImagesChange).toHaveBeenCalledWith(2, file);
         });
     });
 
@@ -95,67 +215,136 @@ describe('renderProgramSection', () => {
                         templateId: id,
                         data: cardData,
                         isEditable: true,
-                        handlers: cardHandlers,
+                        handlers: cardHandlers as any,
                     }),
                 );
 
                 const wrapper = screen.getByTestId('TitleDescriptionCardsWrapper');
                 expect(wrapper).toBeInTheDocument();
-                expect(wrapper).toHaveAttribute('data-cards-count', cardsCount.toString());
+                expect(wrapper).toHaveAttribute('data-cards-count', String(cardsCount));
             });
 
-            it(`passes empty cards array for ${id} when data.cards is undefined`, () => {
+            it(`uses empty cards array for ${id} when data.cards is undefined`, () => {
                 render(
                     renderProgramSection({
                         templateId: id,
                         data: { cards: undefined },
                         isEditable: true,
-                        handlers: cardHandlers,
+                        handlers: cardHandlers as any,
                     }),
                 );
 
-                expect(screen.getByTestId('TitleDescriptionCardsWrapper')).toBeInTheDocument();
+                const props = capturedProps.TitleDescriptionCardsWrapper;
+                expect(props.cards).toEqual([]);
             });
 
-            it(`passes isEditable=false for ${id}`, () => {
-                render(
-                    renderProgramSection({
-                        templateId: id,
-                        data: cardData,
-                        isEditable: false,
-                        handlers: cardHandlers,
-                    }),
-                );
-
-                expect(screen.getByTestId('TitleDescriptionCardsWrapper')).toBeInTheDocument();
-            });
-
-            it(`passes handlers to ${id}`, () => {
+            it(`passes handlers to ${id} wrapper`, () => {
                 render(
                     renderProgramSection({
                         templateId: id,
                         data: cardData,
                         isEditable: true,
-                        handlers: cardHandlers,
+                        handlers: cardHandlers as any,
                     }),
                 );
 
-                expect(screen.getByTestId('TitleDescriptionCardsWrapper')).toBeInTheDocument();
+                const props = capturedProps.TitleDescriptionCardsWrapper;
+
+                expect(props.onTitleChange).toBe(cardHandlers.onCardTitleChange);
+                expect(props.onDescriptionChange).toBe(cardHandlers.onCardDescriptionChange);
+
+                props.onTitleChange(0, 'X');
+                props.onDescriptionChange(0, 'Y');
+
+                expect(cardHandlers.onCardTitleChange).toHaveBeenCalledWith(0, 'X');
+                expect(cardHandlers.onCardDescriptionChange).toHaveBeenCalledWith(0, 'Y');
             });
         });
     });
 
+    describe('SingleTitleQuintupleDescription', () => {
+        const handlers = {
+            onTitleChange: jest.fn(),
+            onDescriptionsChange: jest.fn(),
+        };
+
+        it('renders with data.descriptions when provided', () => {
+            render(
+                renderProgramSection({
+                    templateId: ProgramSectionTemplate.SingleTitleQuintupleDescription,
+                    data: { title: 'T', descriptions: ['a', 'b'] },
+                    isTemplate: true,
+                    isEditable: true,
+                    handlers: handlers as any,
+                }),
+            );
+
+            expect(screen.getByTestId('SingleTitleQuintupleDescription')).toBeInTheDocument();
+
+            const props = capturedProps.SingleTitleQuintupleDescription;
+            expect(props.title).toBe('T');
+            expect(props.descriptions).toEqual(['a', 'b']);
+            expect(props.isTemplate).toBe(true);
+            expect(props.isEditable).toBe(true);
+
+            props.onDescriptionsChange(1, 'x');
+            expect(handlers.onDescriptionsChange).toHaveBeenCalledWith(1, 'x');
+        });
+
+        it('falls back to [data.description] when descriptions are missing', () => {
+            render(
+                renderProgramSection({
+                    templateId: ProgramSectionTemplate.SingleTitleQuintupleDescription,
+                    data: { title: 'T', description: 'only' },
+                    isEditable: true,
+                    handlers: handlers as any,
+                }),
+            );
+
+            const props = capturedProps.SingleTitleQuintupleDescription;
+            expect(props.descriptions).toEqual(['only']);
+        });
+
+        it('uses empty array when descriptions are missing and description is absent', () => {
+            render(
+                renderProgramSection({
+                    templateId: ProgramSectionTemplate.SingleTitleQuintupleDescription,
+                    data: { title: 'T' },
+                    isEditable: true,
+                    handlers: handlers as any,
+                }),
+            );
+
+            const props = capturedProps.SingleTitleQuintupleDescription;
+            expect(props.descriptions).toEqual([]);
+        });
+
+        it('keeps empty descriptions array even if description exists', () => {
+            render(
+                renderProgramSection({
+                    templateId: ProgramSectionTemplate.SingleTitleQuintupleDescription,
+                    data: { title: 'T', description: 'ignored', descriptions: [] },
+                    isEditable: true,
+                    handlers: handlers as any,
+                }),
+            );
+
+            const props = capturedProps.SingleTitleQuintupleDescription;
+            expect(props.descriptions).toEqual([]);
+        });
+    });
+
     it('returns null for unknown template', () => {
-        const utils = renderProgramSection({
+        const view = renderProgramSection({
             templateId: 'UNKNOWN' as unknown as ProgramSectionTemplate,
             data: baseData,
             isEditable: true,
         });
 
-        expect(utils).toBeNull();
+        expect(view).toBeNull();
     });
 
-    it('passes isTemplate prop to components', () => {
+    it('passes isTemplate to standard templates', () => {
         render(
             renderProgramSection({
                 templateId: ProgramSectionTemplate.TextOnly,
@@ -166,98 +355,107 @@ describe('renderProgramSection', () => {
         );
 
         expect(screen.getByTestId('TextOnly')).toBeInTheDocument();
+        expect(capturedProps.TextOnly.isTemplate).toBe(true);
     });
 });
 
 describe('getInitialSectionContents', () => {
-    describe('Base templates', () => {
-        it('returns base contents for TextOnly', () => {
-            const contents = getInitialSectionContents(ProgramSectionTemplate.TextOnly);
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
 
-            expect(contents).toHaveLength(2);
+    it('returns base contents for TextOnly', () => {
+        const contents = getInitialSectionContents(ProgramSectionTemplate.TextOnly);
+
+        expect(contents).toHaveLength(2);
+        expect(contents[0].contentType).toBe(ContentType.Title);
+        expect(contents[1].contentType).toBe(ContentType.Description);
+        expect(contents[0].order).toBe(0);
+        expect(contents[1].order).toBe(1);
+    });
+
+    it('returns 6 contents for SingleTitleQuintupleDescription (1 title + 5 descriptions)', () => {
+        const contents = getInitialSectionContents(ProgramSectionTemplate.SingleTitleQuintupleDescription);
+
+        expect(contents).toHaveLength(6);
+        expect(contents[0].contentType).toBe(ContentType.Title);
+
+        const descriptions = contents.slice(1);
+        expect(descriptions).toHaveLength(5);
+        expect(descriptions.every((c) => c.contentType === ContentType.Description)).toBe(true);
+
+        expect(contents.map((c) => c.order)).toEqual([0, 1, 2, 3, 4, 5]);
+    });
+
+    const singleImageTemplates = [
+        ProgramSectionTemplate.SingleImageTop,
+        ProgramSectionTemplate.SingleImageBottom,
+        ProgramSectionTemplate.SingleImageRight,
+    ];
+
+    singleImageTemplates.forEach((templateId) => {
+        it(`returns 3 contents for ${templateId}`, () => {
+            const contents = getInitialSectionContents(templateId);
+
+            expect(contents).toHaveLength(3);
             expect(contents[0].contentType).toBe(ContentType.Title);
             expect(contents[1].contentType).toBe(ContentType.Description);
+            expect(contents[2].contentType).toBe(ContentType.Image);
         });
     });
 
-    describe('Single image templates', () => {
-        const singleImageTemplates = [
-            ProgramSectionTemplate.SingleImageTop,
-            ProgramSectionTemplate.SingleImageBottom,
-            ProgramSectionTemplate.SingleImageRight,
-        ];
+    it('returns 4 contents for DualImagesBottom', () => {
+        const contents = getInitialSectionContents(ProgramSectionTemplate.DualImagesBottom);
 
-        singleImageTemplates.forEach((templateId) => {
-            it(`returns 3 contents for ${templateId}`, () => {
-                const contents = getInitialSectionContents(templateId);
-
-                expect(contents).toHaveLength(3);
-                expect(contents[0].contentType).toBe(ContentType.Title);
-                expect(contents[1].contentType).toBe(ContentType.Description);
-                expect(contents[2].contentType).toBe(ContentType.Image);
-            });
-        });
+        expect(contents).toHaveLength(4);
+        expect(contents.filter((c) => c.contentType === ContentType.Image)).toHaveLength(2);
     });
 
-    describe('Multiple images templates', () => {
-        it('returns 4 contents for DualImagesBottom', () => {
-            const contents = getInitialSectionContents(ProgramSectionTemplate.DualImagesBottom);
+    it('returns 5 contents for TripleImagesBottom', () => {
+        const contents = getInitialSectionContents(ProgramSectionTemplate.TripleImagesBottom);
 
-            expect(contents).toHaveLength(4);
-            expect(contents.filter((c) => c.contentType === ContentType.Image)).toHaveLength(2);
-        });
-
-        it('returns 5 contents for TripleImagesBottom', () => {
-            const contents = getInitialSectionContents(ProgramSectionTemplate.TripleImagesBottom);
-
-            expect(contents).toHaveLength(5);
-            expect(contents.filter((c) => c.contentType === ContentType.Image)).toHaveLength(3);
-        });
-
-        it('returns 6 contents for QuadImagesBottom', () => {
-            const contents = getInitialSectionContents(ProgramSectionTemplate.QuadImagesBottom);
-
-            expect(contents).toHaveLength(6);
-            expect(contents.filter((c) => c.contentType === ContentType.Image)).toHaveLength(4);
-        });
+        expect(contents).toHaveLength(5);
+        expect(contents.filter((c) => c.contentType === ContentType.Image)).toHaveLength(3);
     });
 
-    describe('Card-based templates', () => {
-        it('returns 4 contents for DualTitleDescription (2 title + 2 description)', () => {
-            const contents = getInitialSectionContents(ProgramSectionTemplate.DualTitleDescription);
+    it('returns 6 contents for QuadImagesBottom', () => {
+        const contents = getInitialSectionContents(ProgramSectionTemplate.QuadImagesBottom);
 
-            expect(contents).toHaveLength(4);
-            expect(contents.filter((c) => c.contentType === ContentType.Title)).toHaveLength(2);
-            expect(contents.filter((c) => c.contentType === ContentType.Description)).toHaveLength(2);
-        });
-
-        it('returns 6 contents for TripleTitleDescription (3 title + 3 description)', () => {
-            const contents = getInitialSectionContents(ProgramSectionTemplate.TripleTitleDescription);
-
-            expect(contents).toHaveLength(6);
-            expect(contents.filter((c) => c.contentType === ContentType.Title)).toHaveLength(3);
-            expect(contents.filter((c) => c.contentType === ContentType.Description)).toHaveLength(3);
-        });
-
-        it('returns 8 contents for QuadTitleDescription (4 title + 4 description)', () => {
-            const contents = getInitialSectionContents(ProgramSectionTemplate.QuadTitleDescription);
-
-            expect(contents).toHaveLength(8);
-            expect(contents.filter((c) => c.contentType === ContentType.Title)).toHaveLength(4);
-            expect(contents.filter((c) => c.contentType === ContentType.Description)).toHaveLength(4);
-        });
-
-        it('maintains correct order for DualTitleDescription', () => {
-            const contents = getInitialSectionContents(ProgramSectionTemplate.DualTitleDescription);
-
-            expect(contents[0].order).toBe(0);
-            expect(contents[1].order).toBe(1);
-            expect(contents[2].order).toBe(2);
-            expect(contents[3].order).toBe(3);
-        });
+        expect(contents).toHaveLength(6);
+        expect(contents.filter((c) => c.contentType === ContentType.Image)).toHaveLength(4);
     });
 
-    it('returns default contents for unknown template', () => {
+    it('returns 4 contents for DualTitleDescription (2 title + 2 description)', () => {
+        const contents = getInitialSectionContents(ProgramSectionTemplate.DualTitleDescription);
+
+        expect(contents).toHaveLength(4);
+        expect(contents.filter((c) => c.contentType === ContentType.Title)).toHaveLength(2);
+        expect(contents.filter((c) => c.contentType === ContentType.Description)).toHaveLength(2);
+    });
+
+    it('returns 6 contents for TripleTitleDescription (3 title + 3 description)', () => {
+        const contents = getInitialSectionContents(ProgramSectionTemplate.TripleTitleDescription);
+
+        expect(contents).toHaveLength(6);
+        expect(contents.filter((c) => c.contentType === ContentType.Title)).toHaveLength(3);
+        expect(contents.filter((c) => c.contentType === ContentType.Description)).toHaveLength(3);
+    });
+
+    it('returns 8 contents for QuadTitleDescription (4 title + 4 description)', () => {
+        const contents = getInitialSectionContents(ProgramSectionTemplate.QuadTitleDescription);
+
+        expect(contents).toHaveLength(8);
+        expect(contents.filter((c) => c.contentType === ContentType.Title)).toHaveLength(4);
+        expect(contents.filter((c) => c.contentType === ContentType.Description)).toHaveLength(4);
+    });
+
+    it('maintains correct order for DualTitleDescription', () => {
+        const contents = getInitialSectionContents(ProgramSectionTemplate.DualTitleDescription);
+
+        expect(contents.map((c) => c.order)).toEqual([0, 1, 2, 3]);
+    });
+
+    it('returns default base contents for unknown template', () => {
         const contents = getInitialSectionContents('UNKNOWN' as unknown as ProgramSectionTemplate);
 
         expect(contents).toHaveLength(2);

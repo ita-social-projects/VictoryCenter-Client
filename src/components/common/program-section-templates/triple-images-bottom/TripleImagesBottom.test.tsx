@@ -22,7 +22,7 @@ createImagesBottomTestSuite<TripleImagesBottomProps>({
     createDefaultProps: () => ({
         title: '',
         description: '',
-        images: ['', '', ''],
+        images: [null, null, null],
         isTemplate: false,
         isEditable: false,
     }),

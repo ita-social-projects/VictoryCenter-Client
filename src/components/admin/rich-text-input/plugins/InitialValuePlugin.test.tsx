@@ -44,10 +44,8 @@ describe('InitialValuePlugin', () => {
         mockGenerateNodesFromDOM.mockReturnValue([{ type: 'paragraph' }]);
         mockGenerateHtmlFromNodes.mockReturnValue('<p></p>');
 
-        // Mock sanitizeHtml to return the input as-is (passthrough)
         mockSanitizeHtml.mockImplementation((html: string) => html);
 
-        // Mock getEditorState to return an object with a read method
         mockGetEditorState.mockReturnValue({
             read: (callback: () => any) => callback(),
         });
@@ -78,18 +76,14 @@ describe('InitialValuePlugin', () => {
     });
 
     it('updates editor when value prop changes to different content', () => {
-        // Initial render with "First"
         const { rerender } = render(<InitialValuePlugin value="<p>First</p>" />);
 
         expect(mockUpdate).toHaveBeenCalledTimes(1);
 
-        // Mock the current editor HTML to be different from new value
         mockGenerateHtmlFromNodes.mockReturnValue('<p>First</p>');
 
-        // Rerender with "Second" - this is truly different content
         rerender(<InitialValuePlugin value="<p>Second</p>" />);
 
-        // Should update because content is different
         expect(mockUpdate).toHaveBeenCalledTimes(2);
     });
 
@@ -168,7 +162,6 @@ describe('InitialValuePlugin', () => {
 
         mockUpdate.mockClear();
 
-        // Mock current HTML to be different from new value
         mockGenerateHtmlFromNodes.mockReturnValue('<p>Original</p>');
 
         rerender(<InitialValuePlugin value="<p>Updated externally</p>" />);
@@ -183,19 +176,15 @@ describe('InitialValuePlugin', () => {
     });
 
     it('does not update editor when value changes but HTML content is the same', () => {
-        // Simulates OnChangePlugin sanitizing and triggering a state update
         const { rerender } = render(<InitialValuePlugin value="<p>Content</p>" />);
 
         expect(mockUpdate).toHaveBeenCalledTimes(1);
         mockUpdate.mockClear();
 
-        // Mock current HTML to match the new value (after sanitization)
         mockGenerateHtmlFromNodes.mockReturnValue('<p>Content</p>');
 
-        // Rerender with same content (simulating OnChangePlugin feedback loop)
         rerender(<InitialValuePlugin value="<p>Content</p>" />);
 
-        // Should NOT update because content is the same
         expect(mockUpdate).not.toHaveBeenCalled();
     });
 
@@ -205,13 +194,10 @@ describe('InitialValuePlugin', () => {
         expect(mockUpdate).toHaveBeenCalledTimes(1);
         mockUpdate.mockClear();
 
-        // Mock current HTML with extra whitespace
         mockGenerateHtmlFromNodes.mockReturnValue('<p>First</p> <p>Second</p>');
 
-        // Rerender with same content but different whitespace
         rerender(<InitialValuePlugin value="<p>First</p><p>Second</p>" />);
 
-        // Should NOT update because content is semantically the same
         expect(mockUpdate).not.toHaveBeenCalled();
     });
 });

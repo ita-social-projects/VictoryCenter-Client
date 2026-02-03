@@ -32,38 +32,29 @@ export const InitialValuePlugin = ({ value }: InitialValuePluginProps) => {
             return;
         }
 
-        // Skip if value hasn't changed
         if (lastValue.current === value) {
             return;
         }
 
-        // Skip if this is an internal update from OnChangePlugin
         if (isInternalUpdate.current) {
             isInternalUpdate.current = false;
             lastValue.current = value;
             return;
         }
 
-        // Check if the incoming value matches current editor content
-        // This prevents cursor jumping when OnChangePlugin triggers a state update
         const currentHtmlRaw = editor.getEditorState().read(() => {
             return $generateHtmlFromNodes(editor);
         });
 
-        // CRITICAL: Sanitize currentHtml the same way OnChangePlugin does
-        // Otherwise they'll never match (raw spaces vs &nbsp; entities)
         const currentHtmlSanitized = sanitizeHtml(currentHtmlRaw);
 
-        // Normalize both HTMLs for comparison (remove insignificant whitespace differences)
         const normalizeHtml = (html: string) => html.replace(/>\s+</g, '><').trim();
 
         if (normalizeHtml(currentHtmlSanitized) === normalizeHtml(value)) {
-            // Content is the same, just update the ref without touching the editor
             lastValue.current = value;
             return;
         }
 
-        // Content is different (external change), update the editor
         lastValue.current = value;
         isInternalUpdate.current = true;
 

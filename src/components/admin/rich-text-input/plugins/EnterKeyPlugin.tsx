@@ -20,15 +20,12 @@ export const EnterKeyPlugin = () => {
                     return false;
                 }
 
-                // Prevent the default behavior only for Enter without Shift
-                // Let Shift+Enter work as default (it also inserts line breaks)
                 if (event.shiftKey) {
                     return false;
                 }
 
                 event.preventDefault();
 
-                // Insert a line break node
                 selection.insertNodes([new LineBreakNode()]);
 
                 return true;

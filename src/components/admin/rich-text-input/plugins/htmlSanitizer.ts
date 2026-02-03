@@ -1,9 +1,5 @@
 import DOMPurify from 'dompurify';
 
-/**
- * Sanitizes HTML by removing classes, styles, and redundant tags
- * Also preserves multiple consecutive spaces using &nbsp; entities
- */
 export const sanitizeHtml = (html: string): string => {
     if (!html) return '';
 
@@ -42,12 +38,8 @@ export const sanitizeHtml = (html: string): string => {
         }
     });
 
-    // Preserve multiple consecutive spaces by converting them to &nbsp;
-    // This prevents HTML from collapsing spaces and avoids cursor jumping
     const preserveSpaces = (node: Node) => {
         if (node.nodeType === Node.TEXT_NODE && node.textContent) {
-            // Replace sequences of 2+ spaces with nbsp entities
-            // Keep first space as regular space, rest as nbsp for better word wrapping
             node.textContent = node.textContent.replace(/ {2,}/g, (match) => {
                 return ' ' + '\u00A0'.repeat(match.length - 1);
             });

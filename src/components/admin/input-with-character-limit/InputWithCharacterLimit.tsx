@@ -1,7 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import classNames from 'classnames';
 import { ReactComponent as RemoveIcon } from '@/assets/icons/remove-query.svg';
 import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
+import { useTemporaryWarning } from '@/hooks/admin/use-temporary-warning/useTemporaryWarning';
 import './InputWithCharacterLimit.scss';
 
 export interface InputWithCharacterLimitProps {
@@ -38,41 +39,9 @@ export const InputWithCharacterLimit = ({
     onWarningChange,
 }: InputWithCharacterLimitProps) => {
     const [isFocused, setIsFocused] = useState(false);
-    const [localWarning, setLocalWarning] = useState<string | null>(null);
-    const warningTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-    useEffect(() => {
-        return () => {
-            if (warningTimerRef.current) {
-                clearTimeout(warningTimerRef.current);
-            }
-        };
-    }, []);
-
-    useEffect(() => {
-        onWarningChange?.(localWarning);
-    }, [localWarning, onWarningChange]);
-
-    const showTemporaryWarning = (text: string) => {
-        setLocalWarning(text);
-
-        if (warningTimerRef.current) {
-            clearTimeout(warningTimerRef.current);
-        }
-
-        warningTimerRef.current = setTimeout(() => {
-            setLocalWarning(null);
-            warningTimerRef.current = null;
-        }, 2000);
-    };
-
-    const clearWarning = () => {
-        setLocalWarning(null);
-        if (warningTimerRef.current) {
-            clearTimeout(warningTimerRef.current);
-            warningTimerRef.current = null;
-        }
-    };
+    const { localWarning, showTemporaryWarning, clearWarning } = useTemporaryWarning({
+        onWarningChange,
+    });
 
     const currentLength = getNormalizedInputText(value).length;
 

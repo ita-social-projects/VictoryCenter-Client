@@ -41,13 +41,6 @@ export const ProgramModal = (props: ProgramModalProps) => {
     const program = isEditMode ? props.programToEdit : undefined;
     const onSuccess = isEditMode ? props.onEditProgram : props.onAddProgram;
     const { modalState, openModalActions, closeModalActions } = useModalsState();
-    //TODO: const [sections, setSections] = useState<ProgramSection[]>(program?.sections || []);
-
-    useEffect(() => {
-        if (program?.sections) {
-            //TODO: setSections(program.sections);
-        }
-    }, [program?.sections]);
     const [isSectionUnsavedModalOpen, setIsSectionUnsavedModalOpen] = useState(false);
     const [sectionToCancel, setSectionToCancel] = useState<number | null>(null);
 

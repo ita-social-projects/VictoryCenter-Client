@@ -1,5 +1,30 @@
 .container {
     background-color: #fff;
+    position: relative;
+
+    &:hover .hoverButtons {
+        opacity: 1;
+        visibility: visible;
+    }
+}
+
+.hoverButtons {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    display: flex;
+    gap: 0.5rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    z-index: 10;
+}
+
+.actionButton {
+    padding: 0.5rem 1rem !important;
+    font-size: 0.875rem !important;
+    min-width: auto !important;
+    width: auto !important;
 }
 
 .content {

@@ -36,6 +36,7 @@ export const ProgramSectionForm = ({
     onSectionChange,
 }: ProgramSectionFormProps) => {
     const [localSection, setLocalSection] = useState<ProgramSection>(section);
+    const [sectionMode, setSectionMode] = useState<ProgramSectionMode>(ProgramSectionMode.View);
 
     const titleContent = getContentByType(localSection.contents, ContentType.Title);
 
@@ -161,6 +162,10 @@ export const ProgramSectionForm = ({
         [onSectionChange, updateImageContent],
     );
 
+    const handleEditClick = useCallback(() => {
+        setSectionMode(ProgramSectionMode.Edit);
+    }, []);
+
     const CARD_TEMPLATES = [
         ProgramSectionTemplate.DualTitleDescription,
         ProgramSectionTemplate.TripleTitleDescription,
@@ -178,7 +183,7 @@ export const ProgramSectionForm = ({
             images: imageContents,
             ...(isCardTemplate ? { cards } : {}),
         },
-        mode: ProgramSectionMode.Edit,
+        mode: sectionMode,
         handlers: {
             onTitleChange: handleTitleChange,
             onDescriptionChange: handleDescriptionChange,
@@ -197,21 +202,34 @@ export const ProgramSectionForm = ({
 
     return (
         <div className={styles.container}>
+            <div className={styles.hoverButtons}>
+                <Button buttonStyle="secondary" onClick={handleEditClick} className={styles.actionButton}>
+                    Edit
+                </Button>
+                <Button buttonStyle="secondary" className={styles.actionButton}>
+                    Delete
+                </Button>
+                <Button buttonStyle="secondary" className={styles.actionButton}>
+                    Replace
+                </Button>
+            </div>
             <div className={styles.content}>
                 {editableSection || (
                     <p className={styles['template-info']}>
-                        Template ID: <strong>{section.template}</strong> (not yet implemented)
+                        Template ID: <strong>{section.template}</strong> (not found in renderer)
                     </p>
                 )}
             </div>
-            <div className={styles.actions}>
-                <Button buttonStyle="secondary" onClick={onCancel} disabled={isDisabled}>
-                    {PROGRAMS_TEXT.BUTTON.CANCEL}
-                </Button>
-                <Button buttonStyle="primary" onClick={onSave} disabled={true}>
-                    {PROGRAMS_TEXT.BUTTON.SAVE}
-                </Button>
-            </div>
+            {sectionMode !== ProgramSectionMode.View && (
+                <div className={styles.actions}>
+                    <Button buttonStyle="secondary" onClick={onCancel} disabled={isDisabled}>
+                        {PROGRAMS_TEXT.BUTTON.CANCEL}
+                    </Button>
+                    <Button buttonStyle="primary" onClick={onSave} disabled={true}>
+                        {PROGRAMS_TEXT.BUTTON.SAVE}
+                    </Button>
+                </div>
+            )}
         </div>
     );
 };

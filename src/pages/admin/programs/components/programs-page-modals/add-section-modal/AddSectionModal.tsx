@@ -45,6 +45,7 @@ const TEMPLATES = [
     ProgramSectionTemplate.DualTitleDescription,
     ProgramSectionTemplate.TripleTitleDescription,
     ProgramSectionTemplate.QuadTitleDescription,
+    ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
 ];
 
 export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectionModalProps) => {

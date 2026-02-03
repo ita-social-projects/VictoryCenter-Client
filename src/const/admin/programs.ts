@@ -42,6 +42,9 @@ export const PROGRAMS_TEXT = {
             },
         },
         CARD: {
+            BUTTON: {
+                ADD_CARD: 'Додати карточку',
+            },
             FORM: {
                 TITLE: {
                     TEXT: 'Заголовок',
@@ -49,6 +52,14 @@ export const PROGRAMS_TEXT = {
                 },
                 DESCRIPTION: {
                     TEXT: 'Опис',
+                    PLACEHOLDER: 'Введіть текст',
+                },
+                AUTHOR: {
+                    TEXT: "Ім'я",
+                    PLACEHOLDER: "Введіть ім'я",
+                },
+                SAMPLE: {
+                    AUTHOR: 'Вікторія Яковенко',
                 },
             },
             TITLE_SAMPLE_TEXT: {
@@ -277,5 +288,10 @@ export const PROGRAM_SECTION_VALIDATION = {
         min: 10,
         max: 300,
         getRequiredError: () => "Опис обов'язковий",
+    },
+    cardAuthor: {
+        min: 2,
+        max: 60,
+        getRequiredError: () => "Ім'я обов'язкове",
     },
 };

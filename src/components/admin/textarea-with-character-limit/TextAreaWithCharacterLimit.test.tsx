@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { TextAreaWithCharacterLimit, TextAreaWithCharacterLimitProps } from './TextAreaWithCharacterLimit';
 
 describe('TextAreaWithCharacterLimit', () => {
@@ -13,6 +13,12 @@ describe('TextAreaWithCharacterLimit', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
+        jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+        jest.runOnlyPendingTimers();
+        jest.useRealTimers();
     });
 
     // Render helpers
@@ -22,6 +28,7 @@ describe('TextAreaWithCharacterLimit', () => {
     // Element getters
     const getTextArea = () => screen.getByRole('textbox') as HTMLTextAreaElement;
     const getWrapper = () => getTextArea().parentElement!;
+    const getClearButton = () => screen.queryByRole('button', { name: /clear input/i });
 
     // Action helpers
     const focusTextArea = () => fireEvent.focus(getTextArea());
@@ -41,7 +48,6 @@ describe('TextAreaWithCharacterLimit', () => {
 
     it('renders textarea with initial value', () => {
         renderTextAreaWithCharacterLimit({ value: 'test' });
-
         const textarea = getTextArea();
         expect(textarea).toBeInTheDocument();
         expect(textarea.value).toBe('test');
@@ -56,7 +62,6 @@ describe('TextAreaWithCharacterLimit', () => {
     it('calls onFocus and onBlur when appropriate', () => {
         const onFocus = jest.fn();
         const onBlur = jest.fn();
-
         renderTextAreaWithCharacterLimit({ onFocus, onBlur });
 
         focusTextArea();
@@ -80,18 +85,180 @@ describe('TextAreaWithCharacterLimit', () => {
 
     it('renders with disabled prop', () => {
         renderTextAreaWithCharacterLimit({ disabled: true });
-
         const textarea = getTextArea();
         expect(textarea.disabled).toBe(true);
-
         expectWrapperToBeDisabled();
     });
 
-    it('respects maxLength and placeholder props', () => {
-        renderTextAreaWithCharacterLimit({ maxLength: 50, placeholder: 'Enter text' });
-
-        const textarea = screen.getByPlaceholderText('Enter text') as HTMLTextAreaElement;
-        expect(textarea.maxLength).toBe(50);
+    it('respects placeholder prop', () => {
+        renderTextAreaWithCharacterLimit({ placeholder: 'Enter text' });
         expectTextAreaToHaveAttribute('placeholder', 'Enter text');
+    });
+
+    it('calls onKeyDown when key is pressed', () => {
+        const onKeyDown = jest.fn();
+        renderTextAreaWithCharacterLimit({ onKeyDown });
+
+        fireEvent.keyDown(getTextArea(), { key: 'Enter' });
+        expect(onKeyDown).toHaveBeenCalledTimes(1);
+    });
+
+    it('shows clear button when focused and has value', () => {
+        renderTextAreaWithCharacterLimit({ value: 'test' });
+
+        expect(getClearButton()).not.toBeInTheDocument();
+
+        focusTextArea();
+        expect(getClearButton()).toBeInTheDocument();
+    });
+
+    it('hides clear button when blurred', () => {
+        renderTextAreaWithCharacterLimit({ value: 'test' });
+
+        focusTextArea();
+        expect(getClearButton()).toBeInTheDocument();
+
+        blurTextArea();
+        expect(getClearButton()).not.toBeInTheDocument();
+    });
+
+    it('does not show clear button when disabled', () => {
+        renderTextAreaWithCharacterLimit({ value: 'test', disabled: true });
+
+        focusTextArea();
+        expect(getClearButton()).not.toBeInTheDocument();
+    });
+
+    it('clears value when clear button is clicked', () => {
+        const onChange = jest.fn();
+        renderTextAreaWithCharacterLimit({ value: 'test', onChange });
+
+        focusTextArea();
+        const clearButton = getClearButton();
+        expect(clearButton).toBeInTheDocument();
+
+        fireEvent.click(clearButton!);
+        expect(onChange).toHaveBeenCalledWith(
+            expect.objectContaining({
+                target: expect.objectContaining({ value: '' }),
+            }),
+        );
+    });
+
+    it('shows warning when max length is exceeded', () => {
+        const onWarningChange = jest.fn();
+        const maxLimitWarning = 'Maximum length exceeded';
+        renderTextAreaWithCharacterLimit({ maxLength: 10, maxLimitWarning, onWarningChange });
+
+        typeInTextArea('This is a very long text');
+
+        expect(onWarningChange).toHaveBeenCalledWith(maxLimitWarning);
+    });
+
+    it('clears warning after 2 seconds', async () => {
+        const onWarningChange = jest.fn();
+        const maxLimitWarning = 'Maximum length exceeded';
+        renderTextAreaWithCharacterLimit({ maxLength: 10, maxLimitWarning, onWarningChange });
+
+        typeInTextArea('This is a very long text');
+        expect(onWarningChange).toHaveBeenCalledWith(maxLimitWarning);
+
+        jest.advanceTimersByTime(2000);
+
+        await waitFor(() => {
+            expect(onWarningChange).toHaveBeenCalledWith(null);
+        });
+    });
+
+    it('clears warning when typing within limit after exceeding', () => {
+        const onWarningChange = jest.fn();
+        const maxLimitWarning = 'Maximum length exceeded';
+        renderTextAreaWithCharacterLimit({ maxLength: 10, maxLimitWarning, onWarningChange });
+
+        typeInTextArea('This is a very long text');
+        expect(onWarningChange).toHaveBeenCalledWith(maxLimitWarning);
+
+        typeInTextArea('Short');
+        expect(onWarningChange).toHaveBeenCalledWith(null);
+    });
+
+    it('truncates value to maxLength when exceeded', () => {
+        const onChange = jest.fn();
+        renderTextAreaWithCharacterLimit({ maxLength: 10, onChange });
+
+        typeInTextArea('This is a very long text');
+
+        expect(onChange).toHaveBeenCalledWith(
+            expect.objectContaining({
+                target: expect.objectContaining({
+                    value: expect.stringMatching(/^.{0,10}$/),
+                }),
+            }),
+        );
+    });
+
+    it('applies error class to clear button when hasError is true', () => {
+        renderTextAreaWithCharacterLimit({ value: 'test', hasError: true });
+
+        focusTextArea();
+        const clearButton = getClearButton();
+        expect(clearButton).toHaveClass('char-limit-textarea__clear-button--error');
+    });
+
+    it('applies error class to clear button when warning is shown', () => {
+        const maxLimitWarning = 'Maximum length exceeded';
+        renderTextAreaWithCharacterLimit({ maxLength: 10, maxLimitWarning, value: 'test' });
+
+        focusTextArea();
+        typeInTextArea('This is a very long text');
+
+        const clearButton = getClearButton();
+        expect(clearButton).toHaveClass('char-limit-textarea__clear-button--error');
+    });
+
+    it('clears warning timer on unmount', () => {
+        const onWarningChange = jest.fn();
+        const maxLimitWarning = 'Maximum length exceeded';
+        const { unmount } = renderTextAreaWithCharacterLimit({ maxLength: 10, maxLimitWarning, onWarningChange });
+
+        typeInTextArea('This is a very long text');
+        expect(onWarningChange).toHaveBeenCalledWith(maxLimitWarning);
+
+        const clearTimeoutSpy = jest.spyOn(global, 'clearTimeout');
+
+        unmount();
+
+        // Verify that clearTimeout was called (cleanup happened)
+        expect(clearTimeoutSpy).toHaveBeenCalled();
+
+        clearTimeoutSpy.mockRestore();
+    });
+
+    it('clears warning when clear button is clicked', () => {
+        const onWarningChange = jest.fn();
+        const maxLimitWarning = 'Maximum length exceeded';
+        renderTextAreaWithCharacterLimit({ maxLength: 10, maxLimitWarning, onWarningChange, value: 'test' });
+
+        focusTextArea();
+        typeInTextArea('This is a very long text');
+        expect(onWarningChange).toHaveBeenCalledWith(maxLimitWarning);
+
+        const clearButton = getClearButton();
+        fireEvent.click(clearButton!);
+
+        expect(onWarningChange).toHaveBeenCalledWith(null);
+    });
+
+    it('prevents default on mousedown for clear button', () => {
+        renderTextAreaWithCharacterLimit({ value: 'test' });
+
+        focusTextArea();
+        const clearButton = getClearButton();
+
+        const mouseDownEvent = new MouseEvent('mousedown', { bubbles: true });
+        const preventDefaultSpy = jest.spyOn(mouseDownEvent, 'preventDefault');
+
+        clearButton!.dispatchEvent(mouseDownEvent);
+        expect(preventDefaultSpy).toHaveBeenCalled();
     });
 });

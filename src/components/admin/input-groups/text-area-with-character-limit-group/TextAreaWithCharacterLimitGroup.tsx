@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { InputLabel, InputLabelProps } from '@/components/admin/input-label/InputLabel';
 import { InputErrorProps } from '@/components/admin/input-error/InputError';
 import {
@@ -15,6 +15,7 @@ export interface TextAreaWithCharacterLimitGroupProps extends TextAreaWithCharac
     error?: InputErrorProps['error'];
     className?: string;
     currentLength?: number;
+    maxLimitWarning?: string;
 }
 
 export const TextAreaWithCharacterLimitGroup = ({
@@ -32,7 +33,9 @@ export const TextAreaWithCharacterLimitGroup = ({
     rows,
     error,
     className,
+    maxLimitWarning,
 }: TextAreaWithCharacterLimitGroupProps) => {
+    const [localWarning, setLocalWarning] = useState<string | null>(null);
     const counterId = `${id}-character-count`;
 
     return (
@@ -49,10 +52,12 @@ export const TextAreaWithCharacterLimitGroup = ({
                 disabled={disabled}
                 placeholder={placeholder}
                 rows={rows}
-                hasError={!!error}
+                hasError={!!error || !!localWarning}
+                maxLimitWarning={maxLimitWarning}
+                onWarningChange={setLocalWarning}
             />
             <InputErrorWithCharacterCounter
-                error={error}
+                error={localWarning || error}
                 maxLength={maxLength}
                 counterId={counterId}
                 htmlFor={id}

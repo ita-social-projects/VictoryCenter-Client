@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import classNames from 'classnames';
 import { ReactComponent as RemoveIcon } from '@/assets/icons/remove-query.svg';
 import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
@@ -17,6 +17,8 @@ export interface InputWithCharacterLimitProps {
     placeholder?: string;
     className?: string;
     hasError?: boolean;
+    maxLimitWarning?: string;
+    onWarningChange?: (warning: string | null) => void;
 }
 
 export const InputWithCharacterLimit = ({
@@ -32,8 +34,45 @@ export const InputWithCharacterLimit = ({
     placeholder,
     className,
     hasError = false,
+    maxLimitWarning,
+    onWarningChange,
 }: InputWithCharacterLimitProps) => {
     const [isFocused, setIsFocused] = useState(false);
+    const [localWarning, setLocalWarning] = useState<string | null>(null);
+    const warningTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    useEffect(() => {
+        return () => {
+            if (warningTimerRef.current) {
+                clearTimeout(warningTimerRef.current);
+            }
+        };
+    }, []);
+
+    useEffect(() => {
+        onWarningChange?.(localWarning);
+    }, [localWarning, onWarningChange]);
+
+    const showTemporaryWarning = (text: string) => {
+        setLocalWarning(text);
+
+        if (warningTimerRef.current) {
+            clearTimeout(warningTimerRef.current);
+        }
+
+        warningTimerRef.current = setTimeout(() => {
+            setLocalWarning(null);
+            warningTimerRef.current = null;
+        }, 2000);
+    };
+
+    const clearWarning = () => {
+        setLocalWarning(null);
+        if (warningTimerRef.current) {
+            clearTimeout(warningTimerRef.current);
+            warningTimerRef.current = null;
+        }
+    };
 
     const currentLength = getNormalizedInputText(value).length;
 
@@ -42,7 +81,12 @@ export const InputWithCharacterLimit = ({
         const normalized = getNormalizedInputText(newValue);
 
         if (maxLength && normalized.length > maxLength) {
+            if (maxLimitWarning) {
+                showTemporaryWarning(maxLimitWarning);
+            }
             newValue = normalized.slice(0, maxLength);
+        } else {
+            clearWarning();
         }
 
         const syntheticEvent = {
@@ -52,7 +96,6 @@ export const InputWithCharacterLimit = ({
                 value: newValue,
             },
         };
-
         onChange(syntheticEvent);
     };
 
@@ -67,10 +110,10 @@ export const InputWithCharacterLimit = ({
     };
 
     const handleClear = () => {
+        clearWarning();
         const syntheticEvent = {
             target: { value: '', name, id },
         } as React.ChangeEvent<HTMLInputElement>;
-
         onChange(syntheticEvent);
     };
 
@@ -98,12 +141,11 @@ export const InputWithCharacterLimit = ({
                 aria-describedby={countId}
                 aria-invalid={hasError || currentLength > maxLength}
             />
-
             <button
                 type="button"
                 className={classNames('char-limit-input__clear-button', {
                     'char-limit-input__clear-button--visible': showClearButton,
-                    'char-limit-input__clear-button--error': hasError,
+                    'char-limit-input__clear-button--error': hasError || !!localWarning,
                 })}
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={handleClear}
@@ -112,7 +154,6 @@ export const InputWithCharacterLimit = ({
             >
                 <RemoveIcon />
             </button>
-
             <output id={countId} className="char-limit-input__counter">
                 {currentLength}/{maxLength}
             </output>

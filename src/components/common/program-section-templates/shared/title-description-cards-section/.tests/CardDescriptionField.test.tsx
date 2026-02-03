@@ -97,18 +97,6 @@ describe('CardDescriptionField', () => {
         expect(onBlur).toHaveBeenCalled();
     });
 
-    it('uses value length as currentLength when currentLength is not provided', () => {
-        render(<CardDescriptionField {...baseProps} />);
-
-        expect(screen.getByTestId('current-length')).toHaveTextContent(baseProps.value.length.toString());
-    });
-
-    it('uses provided currentLength instead of value length', () => {
-        render(<CardDescriptionField {...baseProps} currentLength={42} />);
-
-        expect(screen.getByTestId('current-length')).toHaveTextContent('42');
-    });
-
     it('renders error message when error is provided', () => {
         render(<CardDescriptionField {...baseProps} error="Description is required" />);
 

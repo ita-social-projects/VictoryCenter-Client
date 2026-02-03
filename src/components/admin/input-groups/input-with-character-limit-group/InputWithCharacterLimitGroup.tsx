@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { InputLabel, InputLabelProps } from '@/components/admin/input-label/InputLabel';
 import { InputError, InputErrorProps } from '@/components/admin/input-error/InputError';
 import {
@@ -13,6 +13,7 @@ export interface InputWithCharacterLimitGroupProps extends InputWithCharacterLim
     isRequired?: InputLabelProps['isRequired'];
     error?: InputErrorProps['error'];
     className?: string;
+    maxLimitWarning?: string;
 }
 
 export const InputWithCharacterLimitGroup = ({
@@ -30,7 +31,10 @@ export const InputWithCharacterLimitGroup = ({
     placeholder,
     error,
     className,
+    maxLimitWarning,
 }: InputWithCharacterLimitGroupProps) => {
+    const [localWarning, setLocalWarning] = useState<string | null>(null);
+
     return (
         <div className={cn('input-group', className)}>
             <InputLabel htmlFor={id} text={label} isRequired={isRequired} />
@@ -46,8 +50,10 @@ export const InputWithCharacterLimitGroup = ({
                 disabled={disabled}
                 placeholder={placeholder}
                 hasError={!!error}
+                maxLimitWarning={maxLimitWarning}
+                onWarningChange={setLocalWarning}
             />
-            <InputError error={error} />
+            <InputError error={localWarning || error} />
         </div>
     );
 };

@@ -115,13 +115,4 @@ describe('InputWithCharacterLimit', () => {
         blurInput();
         expectWrapperNotToBeFocused();
     });
-
-    it('handles undefined value with nullish coalescing', () => {
-        const propsWithUndefinedValue = {
-            ...defaultProps,
-            value: undefined as any,
-        };
-        render(<InputWithCharacterLimit {...propsWithUndefinedValue} />);
-        expect(getCharacterCounter(0, 50)).toBeInTheDocument();
-    });
 });

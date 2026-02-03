@@ -1,6 +1,7 @@
-import { forwardRef, useState } from 'react';
+import { forwardRef, useState, useRef, useEffect } from 'react';
 import cn from 'classnames';
 import { ReactComponent as RemoveIcon } from '@/assets/icons/remove-query.svg';
+import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
 import './TextAreaWithCharacterLimit.scss';
 
 export interface TextAreaWithCharacterLimitProps {
@@ -16,6 +17,8 @@ export interface TextAreaWithCharacterLimitProps {
     placeholder?: string;
     rows?: number;
     hasError?: boolean;
+    maxLimitWarning?: string;
+    onWarningChange?: (warning: string | null) => void;
 }
 
 export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAreaWithCharacterLimitProps>(
@@ -33,10 +36,70 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
             placeholder,
             rows = 4,
             hasError = false,
+            maxLimitWarning,
+            onWarningChange,
         },
         ref,
     ) => {
         const [isFocused, setIsFocused] = useState(false);
+        const [localWarning, setLocalWarning] = useState<string | null>(null);
+        const warningTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+        useEffect(() => {
+            return () => {
+                if (warningTimerRef.current) {
+                    clearTimeout(warningTimerRef.current);
+                }
+            };
+        }, []);
+
+        useEffect(() => {
+            onWarningChange?.(localWarning);
+        }, [localWarning, onWarningChange]);
+
+        const showTemporaryWarning = (text: string) => {
+            setLocalWarning(text);
+
+            if (warningTimerRef.current) {
+                clearTimeout(warningTimerRef.current);
+            }
+
+            warningTimerRef.current = setTimeout(() => {
+                setLocalWarning(null);
+                warningTimerRef.current = null;
+            }, 2000);
+        };
+
+        const clearWarning = () => {
+            setLocalWarning(null);
+            if (warningTimerRef.current) {
+                clearTimeout(warningTimerRef.current);
+                warningTimerRef.current = null;
+            }
+        };
+
+        const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+            let newValue = e.target.value;
+            const normalized = getNormalizedInputText(newValue);
+
+            if (maxLength && normalized.length > maxLength) {
+                if (maxLimitWarning) {
+                    showTemporaryWarning(maxLimitWarning);
+                }
+                newValue = normalized.slice(0, maxLength);
+            } else {
+                clearWarning();
+            }
+
+            const syntheticEvent = {
+                ...e,
+                target: {
+                    ...e.target,
+                    value: newValue,
+                },
+            };
+            onChange(syntheticEvent);
+        };
 
         const handleFocus = (e: React.FocusEvent<HTMLTextAreaElement>) => {
             setIsFocused(true);
@@ -49,6 +112,7 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
         };
 
         const handleClear = () => {
+            clearWarning();
             const syntheticEvent = {
                 target: { value: '', name, id },
             } as React.ChangeEvent<HTMLTextAreaElement>;
@@ -69,11 +133,10 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
                         ref={ref}
                         className="char-limit-textarea__field"
                         value={value}
-                        onChange={onChange}
+                        onChange={handleChange}
                         onFocus={handleFocus}
                         onBlur={handleBlur}
                         onKeyDown={onKeyDown}
-                        maxLength={maxLength}
                         name={name}
                         id={id}
                         disabled={disabled}
@@ -84,7 +147,7 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
                         <button
                             type="button"
                             className={cn('char-limit-textarea__clear-button', {
-                                'char-limit-textarea__clear-button--error': hasError,
+                                'char-limit-textarea__clear-button--error': hasError || !!localWarning,
                             })}
                             onMouseDown={(e) => e.preventDefault()}
                             onClick={handleClear}

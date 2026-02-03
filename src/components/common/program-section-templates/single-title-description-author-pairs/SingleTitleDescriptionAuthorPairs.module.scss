@@ -23,14 +23,15 @@
 .template {
     height: 100%;
     width: 100%;
+    padding: clamp(48px, 6vh, 84px) 0;
 
-    --pair-card-width: 360px;
-    --pair-card-height: 216px;
+    --pair-card-width: 400px;
+    --pair-card-height: 240px;
 
     --nav-side: clamp(80px, 8vw, 160px);
 
     --gap: 24px;
-    --peek: 0.55;
+    --peek: 0.35;
     --carousel-max-width: calc(
         (var(--pair-card-width) * 3) + (var(--gap) * 3) + (var(--pair-card-width) * var(--peek))
     );
@@ -67,6 +68,11 @@
     font-size: 40px;
     line-height: 48px;
     color: c.$blue-900;
+}
+
+.template .title {
+    font-size: 36px;
+    line-height: 44px;
 }
 
 .title-input-group {
@@ -107,6 +113,11 @@
     width: 100%;
     padding: 0;
     box-sizing: border-box;
+}
+
+.template .carousel-wrapper {
+    max-width: var(--carousel-max-width);
+    margin: 0 auto;
 }
 
 .carousel-viewport {
@@ -173,6 +184,14 @@
 .nav-right {
     right: 0;
     left: auto;
+}
+
+.template .nav-left {
+    left: 24px;
+}
+
+.template .nav-right {
+    right: 24px;
 }
 
 .actions-row {

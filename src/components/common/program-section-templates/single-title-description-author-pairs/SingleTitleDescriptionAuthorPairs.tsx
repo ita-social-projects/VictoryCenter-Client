@@ -104,8 +104,8 @@ export const SingleTitleDescriptionAuthorPairs = ({
         [styles.editable]: isEditable,
     });
 
-    return (
-        <div className={rootClassName}>
+    const content = (
+        <>
             <div className={styles['title-block']}>
                 {isEditable ? (
                     <InputWithCharacterLimitGroup
@@ -178,6 +178,12 @@ export const SingleTitleDescriptionAuthorPairs = ({
                     </Button>
                 </div>
             )}
+        </>
+    );
+
+    return (
+        <div className={rootClassName}>
+            {isTemplate && !isEditable ? <div className={styles['preview-scale']}>{content}</div> : content}
         </div>
     );
 };

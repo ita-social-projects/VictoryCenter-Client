@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo } from 'react';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { Button } from '@/components/admin/button/Button';
 import { PROGRAMS_TEXT, PROGRAM_SECTION_VALIDATION } from '@/const/admin/programs';
@@ -8,6 +8,7 @@ import { DescriptionAuthorPairCard } from './description-author-pair-card/Descri
 import { ReactComponent as ArrowLeft } from '@/assets/icons/arrow-left.svg';
 import { ReactComponent as ArrowRight } from '@/assets/icons/arrow-right.svg';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
+import { CardCarousel } from './card-carousel/CardCarousel';
 
 export interface DescriptionAuthorPairData {
     description: string;
@@ -26,7 +27,7 @@ export interface SingleTitleDescriptionAuthorPairsProps {
     canAddPair?: boolean;
 }
 
-const EPS = 2;
+const TEMPLATE_PAIRS_COUNT = 5;
 
 export const SingleTitleDescriptionAuthorPairs = ({
     title = '',
@@ -39,73 +40,27 @@ export const SingleTitleDescriptionAuthorPairs = ({
     onAddPair,
     canAddPair = true,
 }: SingleTitleDescriptionAuthorPairsProps) => {
-    const viewportRef = useRef<HTMLDivElement | null>(null);
-    const [canScrollLeft, setCanScrollLeft] = useState(false);
-    const [canScrollRight, setCanScrollRight] = useState(false);
-
     const normalizedPairs = useMemo(() => {
         if (!isTemplate) return pairs;
 
         const sampleDescription = PROGRAMS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT_SHORT;
         const sampleAuthor = PROGRAMS_TEXT.SECTION.CARD.FORM.SAMPLE.AUTHOR;
 
-        return Array.from({ length: 4 }, (_, i) => ({
+        return Array.from({ length: TEMPLATE_PAIRS_COUNT }, (_, i) => ({
             description: pairs[i]?.description ?? sampleDescription,
             author: pairs[i]?.author ?? sampleAuthor,
         }));
     }, [isTemplate, pairs]);
-
-    const scrollStep = useMemo(() => {
-        if (isTemplate) return 360 + 24;
-        return 432 + 24;
-    }, [isTemplate]);
-
-    const updateNavState = useCallback(() => {
-        const el = viewportRef.current;
-        if (!el) return;
-
-        const max = el.scrollWidth - el.clientWidth;
-        setCanScrollLeft(el.scrollLeft > EPS);
-        setCanScrollRight(max - el.scrollLeft > EPS);
-    }, []);
-
-    useEffect(() => {
-        updateNavState();
-        const onResize = () => updateNavState();
-        window.addEventListener('resize', onResize);
-        return () => window.removeEventListener('resize', onResize);
-    }, [updateNavState]);
-
-    useEffect(() => {
-        updateNavState();
-    }, [updateNavState, normalizedPairs.length, pairs.length, isTemplate, isEditable]);
-
-    const handleScroll = useCallback(() => {
-        updateNavState();
-    }, [updateNavState]);
-
-    const scrollBy = useCallback(
-        (direction: -1 | 1) => {
-            const el = viewportRef.current;
-            if (!el) return;
-
-            el.scrollBy({
-                left: direction * scrollStep,
-                behavior: 'smooth',
-            });
-
-            setTimeout(updateNavState, 250);
-        },
-        [scrollStep, updateNavState],
-    );
 
     const rootClassName = cn(styles.container, {
         [styles.template]: isTemplate && !isEditable,
         [styles.editable]: isEditable,
     });
 
-    const content = (
-        <>
+    const carouselVariant = isTemplate && !isEditable ? 'template' : isEditable ? 'editable' : 'default';
+
+    return (
+        <div className={rootClassName}>
             <div className={styles['title-block']}>
                 {isEditable ? (
                     <InputWithCharacterLimitGroup
@@ -124,45 +79,24 @@ export const SingleTitleDescriptionAuthorPairs = ({
                 )}
             </div>
 
-            <div className={styles['carousel-wrapper']}>
-                {canScrollLeft && (
-                    <button
-                        type="button"
-                        className={cn(styles['nav-button'], styles['nav-left'])}
-                        onClick={() => scrollBy(-1)}
-                        aria-label="previous"
-                    >
-                        <ArrowLeft />
-                    </button>
-                )}
-
-                <div ref={viewportRef} className={styles['carousel-viewport']} onScroll={handleScroll}>
-                    <div className={styles['carousel-track']}>
-                        {normalizedPairs.map((p, idx) => (
-                            <DescriptionAuthorPairCard
-                                key={idx}
-                                index={idx}
-                                description={p.description}
-                                author={p.author}
-                                isEditable={isEditable}
-                                onDescriptionChange={onPairDescriptionChange}
-                                onAuthorChange={onPairAuthorChange}
-                            />
-                        ))}
-                    </div>
-                </div>
-
-                {canScrollRight && (
-                    <button
-                        type="button"
-                        className={cn(styles['nav-button'], styles['nav-right'])}
-                        onClick={() => scrollBy(1)}
-                        aria-label="next"
-                    >
-                        <ArrowRight />
-                    </button>
-                )}
-            </div>
+            <CardCarousel
+                itemsCount={normalizedPairs.length}
+                LeftIcon={ArrowLeft}
+                RightIcon={ArrowRight}
+                variant={carouselVariant}
+            >
+                {normalizedPairs.map((p, idx) => (
+                    <DescriptionAuthorPairCard
+                        key={idx}
+                        index={idx}
+                        description={p.description}
+                        author={p.author}
+                        isEditable={isEditable}
+                        onDescriptionChange={onPairDescriptionChange}
+                        onAuthorChange={onPairAuthorChange}
+                    />
+                ))}
+            </CardCarousel>
 
             {isEditable && (
                 <div className={styles['actions-row']}>
@@ -178,12 +112,6 @@ export const SingleTitleDescriptionAuthorPairs = ({
                     </Button>
                 </div>
             )}
-        </>
-    );
-
-    return (
-        <div className={rootClassName}>
-            {isTemplate && !isEditable ? <div className={styles['preview-scale']}>{content}</div> : content}
         </div>
     );
 };

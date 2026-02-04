@@ -51,6 +51,7 @@ export const ProgramSectionForm = ({
     const [localSection, setLocalSection] = useState<ProgramSection>(section);
     const [originalSection, setOriginalSection] = useState<ProgramSection>(section);
     const [isDirty, setIsDirty] = useState(false);
+    const [validationResetKey, setValidationResetKey] = useState(0);
     const [sectionMode, setSectionMode] = useState<ProgramSectionMode>(
         isNewSection ? ProgramSectionMode.Edit : ProgramSectionMode.View,
     );
@@ -216,6 +217,7 @@ export const ProgramSectionForm = ({
         setOriginalSection(localSection);
         setIsDirty(false);
         setSectionMode(ProgramSectionMode.View);
+        setValidationResetKey((prev) => prev + 1);
     }, [isDisabled, isSectionValid, onSave, localSection]);
 
     const CARD_TEMPLATES = [
@@ -234,6 +236,7 @@ export const ProgramSectionForm = ({
                 setLocalSection(revertTo);
                 setIsDirty(false);
                 setSectionMode(ProgramSectionMode.View);
+                setValidationResetKey((prev) => prev + 1);
             }
         };
 
@@ -255,6 +258,7 @@ export const ProgramSectionForm = ({
             ...(isCardTemplate ? { cards } : {}),
         },
         mode: sectionMode,
+        validationResetKey,
         handlers: {
             onTitleChange: handleTitleChange,
             onDescriptionChange: handleDescriptionChange,

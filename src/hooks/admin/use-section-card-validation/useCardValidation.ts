@@ -7,10 +7,22 @@ export interface UseCardValidationProps {
     min?: number;
     max?: number;
     required?: boolean;
+    resetKey?: number;
 }
 
-export const useCardValidation = ({ value, onChange, min = 0, max = 300, required = true }: UseCardValidationProps) => {
+export const useCardValidation = ({
+    value,
+    onChange,
+    min = 0,
+    max = 300,
+    required = true,
+    resetKey,
+}: UseCardValidationProps) => {
     const [error, setError] = useState<string | undefined>(undefined);
+
+    useEffect(() => {
+        setError(undefined);
+    }, [resetKey]);
 
     useEffect(() => {
         if (!error) return;

@@ -42,6 +42,7 @@ export interface ImagesBottomSectionProps {
     mode?: ProgramSectionMode;
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
+    validationResetKey?: number;
     className?: string;
     topSectionClassName?: string;
     bottomSectionClassName?: string;
@@ -58,6 +59,7 @@ export const ImagesBottomSection = ({
     mode = ProgramSectionMode.Published,
     onTitleChange,
     onDescriptionChange,
+    validationResetKey,
     className = '',
     topSectionClassName = '',
     bottomSectionClassName = '',
@@ -105,6 +107,7 @@ export const ImagesBottomSection = ({
                 mode={mode}
                 onTitleChange={onTitleChange}
                 onDescriptionChange={onDescriptionChange}
+                validationResetKey={validationResetKey}
             />
             {mode === ProgramSectionMode.Published ? (
                 <PublishedImagesBottomSection

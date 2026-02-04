@@ -17,6 +17,7 @@ export interface TitleDescriptionSectionProps {
     mode?: ProgramSectionMode;
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
+    validationResetKey?: number;
 }
 
 export const TitleDescriptionSection = ({
@@ -28,6 +29,7 @@ export const TitleDescriptionSection = ({
     mode = ProgramSectionMode.Published,
     onTitleChange,
     onDescriptionChange,
+    validationResetKey,
 }: TitleDescriptionSectionProps) => {
     const {
         titleError,
@@ -39,6 +41,7 @@ export const TitleDescriptionSection = ({
     } = useProgramSectionValidation({
         onTitleChange,
         onDescriptionChange,
+        resetKey: validationResetKey,
     });
 
     const baseStyles = mode === ProgramSectionMode.Published ? publishedStyles : styles;

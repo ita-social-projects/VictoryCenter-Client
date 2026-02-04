@@ -19,6 +19,7 @@ export interface ProgramSectionFormProps {
     isDisabled?: boolean;
     onSectionChange?: (updatedSection: ProgramSection) => void;
     isNewSection?: boolean;
+    isSectionValid?: boolean;
 }
 
 export interface SectionCancelOptions {
@@ -43,6 +44,7 @@ export const ProgramSectionForm = ({
     isDisabled = false,
     onSectionChange,
     isNewSection = false,
+    isSectionValid = false,
 }: ProgramSectionFormProps) => {
     const [localSection, setLocalSection] = useState<ProgramSection>(section);
     const [originalSection, setOriginalSection] = useState<ProgramSection>(section);
@@ -202,6 +204,14 @@ export const ProgramSectionForm = ({
         setSectionMode(ProgramSectionMode.Edit);
     }, [localSection]);
 
+    const handleSaveClick = useCallback(() => {
+        if (isDisabled || !isSectionValid) return;
+        onSave();
+        setOriginalSection(localSection);
+        setIsDirty(false);
+        setSectionMode(ProgramSectionMode.View);
+    }, [isDisabled, isSectionValid, onSave, localSection]);
+
     const CARD_TEMPLATES = [
         ProgramSectionTemplate.DualTitleDescription,
         ProgramSectionTemplate.TripleTitleDescription,
@@ -283,7 +293,11 @@ export const ProgramSectionForm = ({
                         <Button buttonStyle="secondary" onClick={handleCancelClick} disabled={isDisabled}>
                             {PROGRAMS_TEXT.BUTTON.CANCEL}
                         </Button>
-                        <Button buttonStyle="primary" onClick={onSave} disabled={true}>
+                        <Button
+                            buttonStyle="primary"
+                            onClick={handleSaveClick}
+                            disabled={isDisabled || !isSectionValid}
+                        >
                             {PROGRAMS_TEXT.BUTTON.SAVE}
                         </Button>
                     </div>

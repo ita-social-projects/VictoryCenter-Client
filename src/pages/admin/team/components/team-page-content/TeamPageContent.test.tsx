@@ -9,7 +9,7 @@ import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { TeamMembersApi } from '@/services/api/admin/team/team-members/team-members-api';
 import { TeamMember } from '@/types/admin/team-members';
 import { VisibilityStatus } from '@/types/admin/common';
-import { TeamCategory } from '@/types/admin/team-category';
+import { TeamCategory, TeamCategoryDto } from '@/types/admin/team-category';
 import { ToastType } from '@/types/admin/toast';
 import { LocalizationLanguage, TranslationStatus } from '@/types/common/language';
 
@@ -391,9 +391,9 @@ const mockLanguages: LocalizationLanguage[] = [
     { id: 2, code: 'en', name: 'Англійська' },
 ];
 
-const mockCategories: TeamCategory[] = [
-    { id: 1, name: 'Category A', description: 'desc', teamMembersCount: 2 },
-    { id: 2, name: 'Category B', description: 'desc', teamMembersCount: 1 },
+const mockCategories: TeamCategoryDto[] = [
+    { id: 1, name: 'Category A', description: 'desc', localizations: [], teamMembersCount: 2 },
+    { id: 2, name: 'Category B', description: 'desc', localizations: [], teamMembersCount: 1 },
 ];
 
 const mockMembers: TeamMember[] = [
@@ -619,7 +619,7 @@ describe('TeamPageContent', () => {
                 resolveFirstCall = resolve;
             });
 
-            mockTeamCategoriesApi.getAll.mockImplementationOnce(() => firstCallPromise as Promise<TeamCategory[]>);
+            mockTeamCategoriesApi.getAll.mockImplementationOnce(() => firstCallPromise as Promise<TeamCategoryDto[]>);
 
             renderTeamPageContent();
 
@@ -756,7 +756,7 @@ describe('TeamPageContent', () => {
 
     describe('Empty categories handling', () => {
         it('should handle empty categories list without setting selected category', async () => {
-            mockTeamCategoriesApi.getAll.mockResolvedValueOnce([] as TeamCategory[]);
+            mockTeamCategoriesApi.getAll.mockResolvedValueOnce([] as TeamCategoryDto[]);
 
             renderTeamPageContent();
 
@@ -771,7 +771,7 @@ describe('TeamPageContent', () => {
 
     describe('Members fetching with null category', () => {
         it('should not fetch members when selectedCategory is null', async () => {
-            mockTeamCategoriesApi.getAll.mockResolvedValueOnce([] as TeamCategory[]);
+            mockTeamCategoriesApi.getAll.mockResolvedValueOnce([] as TeamCategoryDto[]);
 
             renderTeamPageContent();
 

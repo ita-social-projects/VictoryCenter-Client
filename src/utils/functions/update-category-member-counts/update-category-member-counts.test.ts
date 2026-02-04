@@ -4,9 +4,9 @@ import { TeamMember } from '@/types/admin/team-members';
 
 describe('updateCategoryMemberCounts', () => {
     const mockCategories: TeamCategory[] = [
-        { id: 1, name: 'Category 1', description: 'Description 1', teamMembersCount: 5 },
-        { id: 2, name: 'Category 2', description: 'Description 2', teamMembersCount: 3 },
-        { id: 3, name: 'Category 3', description: 'Description 3', teamMembersCount: 7 },
+        { id: 1, name: 'Category 1', description: 'Description 1', localizations: [], teamMembersCount: 5 },
+        { id: 2, name: 'Category 2', description: 'Description 2', localizations: [], teamMembersCount: 3 },
+        { id: 3, name: 'Category 3', description: 'Description 3', localizations: [], teamMembersCount: 7 },
     ];
 
     const mockMember: TeamMember = {

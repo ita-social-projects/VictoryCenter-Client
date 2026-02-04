@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { ProgramForm, ProgramFormRef, ProgramFormValues } from '../../program-form/ProgramForm';
 import { Program, ProgramCategory, ProgramCreateUpdate } from '@/types/admin/programs';
 import { VisibilityStatus, PendingAction, ModalMode } from '@/types/admin/common';
@@ -42,7 +42,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
     const onSuccess = isEditMode ? props.onEditProgram : props.onAddProgram;
     const { modalState, openModalActions, closeModalActions } = useModalsState();
     const [isSectionUnsavedModalOpen, setIsSectionUnsavedModalOpen] = useState(false);
-    const [sectionToCancel, setSectionToCancel] = useState<number | null>(null);
+    const [sectionDiscardAction, setSectionDiscardAction] = useState<(() => void) | null>(null);
 
     const initialData = useMemo<ProgramFormValues | null>(() => {
         if (!isEditMode || !program) return null;
@@ -145,25 +145,35 @@ export const ProgramModal = (props: ProgramModalProps) => {
         [modalHookData.formRef],
     );
 
-    const handleRequestCancelSection = useCallback((sectionIndex: number) => {
-        setSectionToCancel(sectionIndex);
-        setIsSectionUnsavedModalOpen(true);
-    }, []);
+    const handleRequestCancelSection = useCallback(
+        (onConfirmDiscard: (() => void) | number) => {
+            if (typeof onConfirmDiscard === 'number') {
+                const sectionIndex = onConfirmDiscard;
+                setSectionDiscardAction(() => () => {
+                    if (!modalHookData.formRef.current) return;
+                    if (isEditMode) {
+                        modalHookData.formRef.current.revertSection(sectionIndex);
+                    } else {
+                        modalHookData.formRef.current.removeSection(sectionIndex);
+                    }
+                });
+            } else {
+                setSectionDiscardAction(() => onConfirmDiscard);
+            }
+            setIsSectionUnsavedModalOpen(true);
+        },
+        [isEditMode, modalHookData.formRef],
+    );
 
     const handleCloseSectionUnsavedModal = useCallback(() => {
         setIsSectionUnsavedModalOpen(false);
-        setSectionToCancel(null);
+        setSectionDiscardAction(null);
     }, []);
 
     const handleConfirmDiscardSection = useCallback(() => {
-        if (sectionToCancel !== null) {
-            //TODO: setSections((prev) => prev.filter((_, index) => index !== sectionToCancel));
-            if (modalHookData.formRef.current) {
-                modalHookData.formRef.current.removeSection(sectionToCancel);
-            }
-        }
+        sectionDiscardAction?.();
         handleCloseSectionUnsavedModal();
-    }, [sectionToCancel, handleCloseSectionUnsavedModal, modalHookData.formRef]);
+    }, [sectionDiscardAction, handleCloseSectionUnsavedModal]);
 
     return (
         <div className="program-modal">
@@ -201,6 +211,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
                         onLanguageChange={handleLanguageChange}
                         onAddSection={openModalActions.openAddSectionModal}
                         onRequestCancelSection={handleRequestCancelSection}
+                        isEditMode={isEditMode}
                     />
                 )}
             />
@@ -212,7 +223,11 @@ export const ProgramModal = (props: ProgramModalProps) => {
             <ConfirmationModal
                 isOpen={isSectionUnsavedModalOpen}
                 onClose={handleCloseSectionUnsavedModal}
-                title={PROGRAMS_TEXT.SECTION.MODAL.UNSAVED_CHANGES_TITLE}
+                title={
+                    isEditMode
+                        ? COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE
+                        : PROGRAMS_TEXT.SECTION.MODAL.UNSAVED_CHANGES_TITLE
+                }
                 onConfirm={handleConfirmDiscardSection}
                 onCancel={handleCloseSectionUnsavedModal}
             />

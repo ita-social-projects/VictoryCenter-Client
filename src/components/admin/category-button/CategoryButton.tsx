@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, ReactNode } from 'react';
 import classNames from 'classnames';
 import './CategoryButton.scss';
 
@@ -8,6 +8,7 @@ export interface CategoryButtonProps<T> {
     getCategoryKey: (item: T) => string | number;
     getCategoryDisplayName: (item: T) => string;
     onSelect: (category: T) => void;
+    renderExtra?: (category: T) => ReactNode;
 }
 
 function CategoryButtonInner<T>({
@@ -16,20 +17,25 @@ function CategoryButtonInner<T>({
     getCategoryKey,
     getCategoryDisplayName,
     onSelect,
+    renderExtra,
 }: Readonly<CategoryButtonProps<T>>) {
     const key = getCategoryKey(category);
     const name = getCategoryDisplayName(category);
     const isSelected = !!selectedCategory && key === getCategoryKey(selectedCategory);
 
     return (
-        <button
-            onClick={() => onSelect(category)}
-            className={classNames('category-bar-button', {
-                'category-bar-button-selected': isSelected,
-            })}
-        >
-            {name}
-        </button>
+        <div className="category-bar-button-container">
+            {renderExtra && <div className="category-extra">{renderExtra(category)}</div>}
+            <button
+                type="button"
+                onClick={() => onSelect(category)}
+                className={classNames('category-bar-button', {
+                    'category-bar-button-selected': isSelected,
+                })}
+            >
+                {name}
+            </button>
+        </div>
     );
 }
 

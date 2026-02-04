@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Button } from '@/components/admin/button/Button';
 import { ImageValues } from '@/types/common/image';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
@@ -15,9 +15,17 @@ import { ContentType } from '@/types/common/programs';
 export interface ProgramSectionFormProps {
     section: ProgramSection;
     onSave: () => void;
-    onCancel: () => void;
+    onCancel: (options: SectionCancelOptions) => void;
     isDisabled?: boolean;
     onSectionChange?: (updatedSection: ProgramSection) => void;
+    isNewSection?: boolean;
+}
+
+export interface SectionCancelOptions {
+    isDirty: boolean;
+    shouldRemove: boolean;
+    revertTo: ProgramSection;
+    onAfterDiscard: () => void;
 }
 
 const getContentByType = (contents: ProgramSectionContent[], type: ContentType): ProgramSectionContent | undefined => {
@@ -34,9 +42,30 @@ export const ProgramSectionForm = ({
     onCancel,
     isDisabled = false,
     onSectionChange,
+    isNewSection = false,
 }: ProgramSectionFormProps) => {
     const [localSection, setLocalSection] = useState<ProgramSection>(section);
-    const [sectionMode, setSectionMode] = useState<ProgramSectionMode>(ProgramSectionMode.View);
+    const [originalSection, setOriginalSection] = useState<ProgramSection>(section);
+    const [isDirty, setIsDirty] = useState(false);
+    const [sectionMode, setSectionMode] = useState<ProgramSectionMode>(
+        isNewSection ? ProgramSectionMode.Edit : ProgramSectionMode.View,
+    );
+    const sectionModeRef = useRef(sectionMode);
+
+    useEffect(() => {
+        sectionModeRef.current = sectionMode;
+    }, [sectionMode]);
+
+    useEffect(() => {
+        setLocalSection(section);
+        if (sectionModeRef.current !== ProgramSectionMode.Edit) {
+            setOriginalSection(section);
+            setIsDirty(false);
+            if (!isNewSection) {
+                setSectionMode(ProgramSectionMode.View);
+            }
+        }
+    }, [section, isNewSection]);
 
     const titleContent = getContentByType(localSection.contents, ContentType.Title);
 
@@ -67,6 +96,7 @@ export const ProgramSectionForm = ({
                 );
                 const updatedSection = { ...prev, contents: updatedContents };
                 onSectionChange?.(updatedSection);
+                setIsDirty(true);
                 return updatedSection;
             });
         },
@@ -81,6 +111,7 @@ export const ProgramSectionForm = ({
                 );
                 const updatedSection = { ...prev, contents: updatedContents };
                 onSectionChange?.(updatedSection);
+                setIsDirty(true);
                 return updatedSection;
             });
         },
@@ -102,6 +133,7 @@ export const ProgramSectionForm = ({
 
                 const updatedSection = { ...prev, contents: updatedContents };
                 onSectionChange?.(updatedSection);
+                setIsDirty(true);
                 return updatedSection;
             });
         },
@@ -128,6 +160,7 @@ export const ProgramSectionForm = ({
 
                 const updatedSection = { ...prev, contents: updatedContents };
                 onSectionChange?.(updatedSection);
+                setIsDirty(true);
                 return updatedSection;
             });
         },
@@ -154,6 +187,7 @@ export const ProgramSectionForm = ({
                     const targetOrder = imageContentsList[index].order;
                     const updatedSection = updateImageContent(targetOrder, file, prev);
                     onSectionChange?.(updatedSection);
+                    setIsDirty(true);
                     return updatedSection;
                 }
                 return prev;
@@ -163,8 +197,10 @@ export const ProgramSectionForm = ({
     );
 
     const handleEditClick = useCallback(() => {
+        setOriginalSection(localSection);
+        setIsDirty(false);
         setSectionMode(ProgramSectionMode.Edit);
-    }, []);
+    }, [localSection]);
 
     const CARD_TEMPLATES = [
         ProgramSectionTemplate.DualTitleDescription,
@@ -173,6 +209,25 @@ export const ProgramSectionForm = ({
     ];
 
     const isCardTemplate = CARD_TEMPLATES.includes(section.template);
+
+    const handleCancelClick = useCallback(() => {
+        const shouldRemove = isNewSection;
+        const revertTo = originalSection;
+        const onAfterDiscard = () => {
+            if (!shouldRemove) {
+                setLocalSection(revertTo);
+                setIsDirty(false);
+                setSectionMode(ProgramSectionMode.View);
+            }
+        };
+
+        onCancel({
+            isDirty,
+            shouldRemove,
+            revertTo,
+            onAfterDiscard,
+        });
+    }, [isDirty, isNewSection, onCancel, originalSection]);
 
     const editableSection = renderProgramSection({
         templateId: section.template,
@@ -202,17 +257,19 @@ export const ProgramSectionForm = ({
 
     return (
         <div className={styles.container}>
-            <div className={styles.hoverButtons}>
-                <Button buttonStyle="secondary" onClick={handleEditClick} className={styles.actionButton}>
-                    Edit
-                </Button>
-                <Button buttonStyle="secondary" className={styles.actionButton}>
-                    Delete
-                </Button>
-                <Button buttonStyle="secondary" className={styles.actionButton}>
-                    Replace
-                </Button>
-            </div>
+            {sectionMode === ProgramSectionMode.View && (
+                <div className={styles.hoverButtons}>
+                    <Button buttonStyle="secondary" onClick={handleEditClick} className={styles.actionButton}>
+                        Edit
+                    </Button>
+                    <Button buttonStyle="secondary" className={styles.actionButton}>
+                        Delete
+                    </Button>
+                    <Button buttonStyle="secondary" className={styles.actionButton}>
+                        Replace
+                    </Button>
+                </div>
+            )}
             <div className={styles.content}>
                 {editableSection || (
                     <p className={styles['template-info']}>
@@ -222,7 +279,7 @@ export const ProgramSectionForm = ({
             </div>
             {sectionMode !== ProgramSectionMode.View && (
                 <div className={styles.actions}>
-                    <Button buttonStyle="secondary" onClick={onCancel} disabled={isDisabled}>
+                    <Button buttonStyle="secondary" onClick={handleCancelClick} disabled={isDisabled}>
                         {PROGRAMS_TEXT.BUTTON.CANCEL}
                     </Button>
                     <Button buttonStyle="primary" onClick={onSave} disabled={true}>

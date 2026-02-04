@@ -8,7 +8,7 @@ import { MultiSelectInputGroup } from '@/components/admin/input-groups/multi-sel
 import { PhotoInputGroup } from '@/components/admin/input-groups/photo-input-group/PhotoInputGroup';
 import { useFormManager } from '@/hooks/admin/use-form-manager/useFormManager';
 import { Button } from '@/components/admin/button/Button';
-import { ProgramSectionForm } from '../program-section-form/ProgramSectionForm';
+import { ProgramSectionForm, SectionCancelOptions } from '../program-section-form/ProgramSectionForm';
 import { Image, ImageValues } from '@/types/common/image';
 import { ProgramCategory } from '@/types/admin/programs';
 import { VisibilityStatus } from '@/types/admin/common';
@@ -51,6 +51,7 @@ export interface ProgramFormRef {
     addSection: (section: ProgramSection) => void;
     removeSection: (sectionIndex: number) => void;
     getSections: () => ProgramSection[];
+    revertSection: (sectionIndex: number) => void;
 }
 
 export interface ProgramFormProps {
@@ -62,7 +63,8 @@ export interface ProgramFormProps {
     onAddSection?: () => void;
     selectedLanguage?: string;
     onLanguageChange?: (language: string) => void;
-    onRequestCancelSection?: (sectionIndex: number) => void;
+    onRequestCancelSection?: (onConfirmDiscard: (() => void) | number) => void;
+    isEditMode?: boolean;
 }
 
 const validateForm = (formState: ProgramFormValues, isPublishing: boolean): ProgramFormErrors => {
@@ -92,6 +94,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             onValidationChange,
             onAddSection,
             onRequestCancelSection,
+            isEditMode = false,
         }: ProgramFormProps,
         ref,
     ) => {
@@ -152,6 +155,19 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             [setFormState],
         );
 
+        const handleRevertSection = useCallback(
+            (sectionIndex: number) => {
+                if (initialData && initialData.sections[sectionIndex]) {
+                    setFormState((prev) => {
+                        const updatedSections = [...prev.sections];
+                        updatedSections[sectionIndex] = initialData.sections[sectionIndex];
+                        return { ...prev, sections: updatedSections };
+                    });
+                }
+            },
+            [setFormState, initialData],
+        );
+
         useImperativeHandle(
             ref,
             () => ({
@@ -167,8 +183,9 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                 addSection: handleAddSection,
                 removeSection: handleRemoveSection,
                 getSections: () => formState.sections,
+                revertSection: handleRevertSection,
             }),
-            [handleAddSection, handleRemoveSection, formState.sections],
+            [handleAddSection, handleRemoveSection, handleRevertSection, formState.sections],
         );
 
         const handleNameChange = useCallback(
@@ -296,12 +313,28 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
         );
 
         const handleCancelSection = useCallback(
-            (sectionIndex: number) => {
-                if (onRequestCancelSection) {
-                    onRequestCancelSection(sectionIndex);
+            (sectionIndex: number, options: SectionCancelOptions) => {
+                const discard = () => {
+                    if (options.shouldRemove) {
+                        handleRemoveSection(sectionIndex);
+                    } else {
+                        handleSectionChange(sectionIndex, options.revertTo);
+                    }
+                    options.onAfterDiscard();
+                };
+
+                if (options.shouldRemove || options.isDirty) {
+                    if (onRequestCancelSection) {
+                        onRequestCancelSection(discard);
+                    } else {
+                        discard();
+                    }
+                    return;
                 }
+
+                discard();
             },
-            [onRequestCancelSection],
+            [handleRemoveSection, handleSectionChange, onRequestCancelSection],
         );
 
         const hasSections = formState.sections.length > 0;
@@ -489,9 +522,10 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                     <ProgramSectionForm
                                         section={section}
                                         onSave={() => handleSaveSection(index)}
-                                        onCancel={() => handleCancelSection(index)}
+                                        onCancel={(options) => handleCancelSection(index, options)}
                                         onSectionChange={(updatedSection) => handleSectionChange(index, updatedSection)}
                                         isDisabled={isSubmitting || isFormDisabled}
+                                        isNewSection={!section.id}
                                     />
                                     <div className={styles['sections-divider']} />
                                 </React.Fragment>

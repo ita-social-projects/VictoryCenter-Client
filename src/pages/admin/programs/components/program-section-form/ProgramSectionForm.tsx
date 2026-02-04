@@ -56,10 +56,15 @@ export const ProgramSectionForm = ({
         isNewSection ? ProgramSectionMode.Edit : ProgramSectionMode.View,
     );
     const sectionModeRef = useRef(sectionMode);
+    const onEditStateChangeRef = useRef(onEditStateChange);
 
     useEffect(() => {
         sectionModeRef.current = sectionMode;
     }, [sectionMode]);
+
+    useEffect(() => {
+        onEditStateChangeRef.current = onEditStateChange;
+    }, [onEditStateChange]);
 
     useEffect(() => {
         setLocalSection(section);
@@ -73,8 +78,8 @@ export const ProgramSectionForm = ({
     }, [section, isNewSection]);
 
     useEffect(() => {
-        onEditStateChange?.(sectionMode === ProgramSectionMode.Edit);
-    }, [onEditStateChange, sectionMode]);
+        onEditStateChangeRef.current?.(sectionMode === ProgramSectionMode.Edit);
+    }, [sectionMode]);
 
     const titleContent = getContentByType(localSection.contents, ContentType.Title);
 

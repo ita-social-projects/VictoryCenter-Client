@@ -41,7 +41,7 @@ export const useProgramSectionValidation = ({
             const trimmedValue = getTrimmedInputText(e.target.value);
             onTitleChange?.(trimmedValue);
 
-            setTitleError(PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateSectionTitle(trimmedValue));
+            setTitleError(PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateSectionTitle(trimmedValue, false));
         },
         [onTitleChange],
     );
@@ -66,7 +66,7 @@ export const useProgramSectionValidation = ({
             const trimmedValue = getTrimmedInputText(e.target.value);
             onDescriptionChange?.(trimmedValue);
 
-            setDescriptionError(PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateSectionDescription(trimmedValue));
+            setDescriptionError(PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateSectionDescription(trimmedValue, false));
         },
         [onDescriptionChange],
     );

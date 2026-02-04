@@ -1,8 +1,9 @@
 import cn from 'classnames';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { PhotoInputGroup } from '@/components/admin/input-groups/photo-input-group/PhotoInputGroup';
-import { ImageValues } from '@/types/common/image';
+import { ImageValues, Image } from '@/types/common/image';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 import {
     PROGRAMS_TEXT,
     PROGRAM_SECTION_IMAGE_CONFIGS,
@@ -12,11 +13,12 @@ import {
 import { useProgramSectionValidation } from '@/hooks/admin/use-program-section-validation';
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
 import styles from './SingleImageRight.module.scss';
+import { useState } from 'react';
 
 export interface SingleImageRightProps {
     title?: string;
     description?: string;
-    image?: string;
+    image?: Image | ImageValues | null;
     isTemplate?: boolean;
     isEditable?: boolean;
     onTitleChange?: (value: string) => void;
@@ -27,13 +29,14 @@ export interface SingleImageRightProps {
 export const SingleImageRight = ({
     title = '',
     description = '',
-    image = '',
+    image = null,
     isTemplate = false,
     isEditable = false,
     onTitleChange,
     onDescriptionChange,
     onImageChange,
 }: SingleImageRightProps) => {
+    const imageSrc = getImageSrc(image);
     const {
         titleError,
         descriptionError,
@@ -45,6 +48,12 @@ export const SingleImageRight = ({
         onTitleChange,
         onDescriptionChange,
     });
+
+    const [error, setError] = useState<string>('');
+
+    const handleSetError = (errorMessage: string | null) => {
+        setError(errorMessage || '');
+    };
 
     return (
         <div
@@ -94,9 +103,10 @@ export const SingleImageRight = ({
                             <PhotoInputGroup
                                 id="section-image-1"
                                 name="section-image-1"
-                                value={null}
+                                value={image}
                                 onChange={onImageChange || (() => {})}
-                                setError={() => {}}
+                                setError={handleSetError}
+                                error={error}
                                 cropWidth={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_RIGHT.cropWidth}
                                 cropHeight={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_RIGHT.cropHeight}
                                 minWidth={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_RIGHT.minWidth}
@@ -124,7 +134,7 @@ export const SingleImageRight = ({
                     </div>
                     <div className={styles['right-section']}>
                         <div className={styles['image-wrapper']}>
-                            <img src={image} alt="" className={styles.image} />
+                            {imageSrc && <img src={imageSrc} alt="" className={styles.image} />}
                         </div>
                     </div>
                 </>

@@ -32,7 +32,8 @@
 .image-wrapper {
     height: 75%;
     &[data-elevated='true'] {
-        transform: translateY(-25%);
+        position: relative;
+        top: -25%;
     }
     justify-content: end;
 }

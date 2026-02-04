@@ -1,5 +1,5 @@
 import { VisibilityStatus } from '@/types/admin/common';
-import { TEAM_MEMBERS_TEXT, TEAM_SEARCH } from '@/const/admin/team';
+import { TEAM_MEMBERS_TEXT } from '@/const/admin/team';
 import { COMMON_TEXT_ADMIN, UI_CONFIG } from '@/const/admin/common';
 import { SearchBar } from '@/components/admin/search-bar/SearchBar';
 import { StatusFilterDropdown } from '@/components/admin/status-filter-dropdown/StatusFilterDropdown';
@@ -31,6 +31,7 @@ export interface TeamPageToolbarProps extends LocalizationToolkitProps {
     categories: TeamCategory[];
     onSearchItemSelect: (item: TeamMember) => void;
     onSearchClear: () => void;
+    maxCharactersToSearch?: number;
 }
 
 const TeamMemberItemRenderer = forwardRef<
@@ -58,6 +59,7 @@ export const TeamPageToolbar = ({
     languages,
     onLanguageChange,
     onTranslationStatusFilterChange,
+    maxCharactersToSearch,
 }: TeamPageToolbarProps) => {
     const itemRenderer = useMemo(() => createItemRenderer(categories), [categories]);
 
@@ -76,9 +78,10 @@ export const TeamPageToolbar = ({
                     renderSearchItemComponent={itemRenderer}
                     placeholder={TEAM_MEMBERS_TEXT.SEARCH.INPUT_FULLNAME}
                     notFoundMessage={COMMON_TEXT_ADMIN.LIST.NOT_FOUND}
-                    minCharactersToSearch={TEAM_SEARCH.MIN_CHARACTERS_TO_SEARCH}
+                    minCharactersToSearch={UI_CONFIG.SEARCH_BAR.MIN_CHARACTERS_FOR_SEARCH}
                     searchDelayMs={UI_CONFIG.SEARCH_BAR.SEARCH_DELAY_MS}
                     onClear={onSearchClear}
+                    maxCharactersToSearch={maxCharactersToSearch}
                 />
             </div>
             <div className="toolbar-actions">

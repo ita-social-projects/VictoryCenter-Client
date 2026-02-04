@@ -22,7 +22,7 @@ createImagesBottomTestSuite<DualImagesBottomProps>({
     createDefaultProps: () => ({
         title: '',
         description: '',
-        images: ['', ''],
+        images: [null, null],
         isTemplate: false,
         isEditable: false,
     }),

@@ -2,6 +2,8 @@ import { PROGRAM_VALIDATION, PROGRAM_SECTION_VALIDATION } from '@/const/admin/pr
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ProgramCategory } from '@/types/admin/programs';
 import { Image, ImageValues } from '@/types/common/image';
+import { ProgramSection, ProgramSectionTemplate } from '@/types/common/program-sections';
+import { ContentType } from '@/types/common/programs';
 import * as Yup from 'yup';
 
 export interface ProgramValidationContext {
@@ -172,50 +174,144 @@ export const PROGRAM_VALIDATION_FUNCTIONS = {
             return error.message;
         }
     },
+
+    validateSections: (sections: ProgramSection[], isPublishing: boolean): string | undefined => {
+        const result = validateProgramSections(sections, isPublishing);
+        return result;
+    },
 };
 
 export const programSectionValidationSchema = Yup.object({
     sectionTitle: Yup.string()
         .trim()
         .required(PROGRAM_SECTION_VALIDATION.title.getRequiredError())
-        .min(
-            PROGRAM_SECTION_VALIDATION.title.min,
-            COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(PROGRAM_SECTION_VALIDATION.title.min),
-        )
-        .max(
-            PROGRAM_SECTION_VALIDATION.title.max,
-            COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PROGRAM_SECTION_VALIDATION.title.max),
+        .when('$isPublishing', ([isPublishing], schema) =>
+            isPublishing
+                ? schema
+                      .min(
+                          PROGRAM_SECTION_VALIDATION.title.min,
+                          COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(PROGRAM_SECTION_VALIDATION.title.min),
+                      )
+                      .max(
+                          PROGRAM_SECTION_VALIDATION.title.max,
+                          COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PROGRAM_SECTION_VALIDATION.title.max),
+                      )
+                : schema,
         ),
 
     sectionDescription: Yup.string()
         .trim()
         .required(PROGRAM_SECTION_VALIDATION.description.getRequiredError())
-        .min(
-            PROGRAM_SECTION_VALIDATION.description.min,
-            COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(PROGRAM_SECTION_VALIDATION.description.min),
-        )
-        .max(
-            PROGRAM_SECTION_VALIDATION.description.max,
-            COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PROGRAM_SECTION_VALIDATION.description.max),
+        .when('$isPublishing', ([isPublishing], schema) =>
+            isPublishing
+                ? schema
+                      .min(
+                          PROGRAM_SECTION_VALIDATION.description.min,
+                          COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(PROGRAM_SECTION_VALIDATION.description.min),
+                      )
+                      .max(
+                          PROGRAM_SECTION_VALIDATION.description.max,
+                          COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PROGRAM_SECTION_VALIDATION.description.max),
+                      )
+                : schema,
         ),
 });
 
 export const PROGRAM_SECTION_VALIDATION_FUNCTIONS = {
-    validateSectionTitle: (value: string): string | undefined => {
+    validateSectionTitle: (value: string, isPublishing: boolean): string | undefined => {
+        const context: ProgramValidationContext = { isPublishing };
         try {
-            programSectionValidationSchema.validateSyncAt('sectionTitle', { sectionTitle: value });
+            programSectionValidationSchema.validateSyncAt('sectionTitle', { sectionTitle: value }, { context });
             return undefined;
         } catch (error: any) {
             return error.message;
         }
     },
 
-    validateSectionDescription: (value: string): string | undefined => {
+    validateSectionDescription: (value: string, isPublishing: boolean): string | undefined => {
+        const context: ProgramValidationContext = { isPublishing };
         try {
-            programSectionValidationSchema.validateSyncAt('sectionDescription', { sectionDescription: value });
+            programSectionValidationSchema.validateSyncAt(
+                'sectionDescription',
+                { sectionDescription: value },
+                { context },
+            );
             return undefined;
         } catch (error: any) {
             return error.message;
         }
     },
+};
+
+const getRequiredImageCountForTemplate = (template: ProgramSectionTemplate): number => {
+    switch (template) {
+        case ProgramSectionTemplate.TextOnly:
+            return 0;
+        case ProgramSectionTemplate.SingleImageBottom:
+        case ProgramSectionTemplate.SingleImageTop:
+        case ProgramSectionTemplate.SingleImageRight:
+            return 1;
+        case ProgramSectionTemplate.DualImagesBottom:
+            return 2;
+        case ProgramSectionTemplate.TripleImagesBottom:
+            return 3;
+        case ProgramSectionTemplate.QuadImagesBottom:
+            return 4;
+        default:
+            return 0;
+    }
+};
+
+const validateProgramSection = (section: ProgramSection, isPublishing: boolean): boolean => {
+    const titleContent = section.contents.find((c) => c.contentType === ContentType.Title);
+    const titleError = PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateSectionTitle(
+        titleContent?.title || '',
+        isPublishing,
+    );
+
+    if (titleError) {
+        return false;
+    }
+
+    const descriptionContent = section.contents.find((c) => c.contentType === ContentType.Description);
+
+    const descriptionError = PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateSectionDescription(
+        descriptionContent?.description || '',
+        isPublishing,
+    );
+
+    if (descriptionError) {
+        return false;
+    }
+
+    if (isPublishing) {
+        const requiredImageCount = getRequiredImageCountForTemplate(section.template);
+        const imageContents = section.contents.filter((c) => c.contentType === ContentType.Image);
+
+        if (imageContents.length < requiredImageCount) {
+            return false;
+        }
+
+        const missingImages = imageContents.slice(0, requiredImageCount).filter((c) => !c.image);
+        if (missingImages.length > 0) {
+            return false;
+        }
+    }
+
+    return true;
+};
+
+export const validateProgramSections = (sections: ProgramSection[], isPublishing: boolean): string | undefined => {
+    if (!sections || sections.length === 0) {
+        return undefined;
+    }
+
+    for (let i = 0; i < sections.length; i++) {
+        const isValid = validateProgramSection(sections[i], isPublishing);
+        if (!isValid) {
+            return 'invalid';
+        }
+    }
+
+    return undefined;
 };

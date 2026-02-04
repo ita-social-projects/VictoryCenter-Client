@@ -274,6 +274,16 @@ describe('AdminPanelToolbar', () => {
         expect(searchBarProps.placeholder).toBe('Search items');
         expect(searchBarProps.notFoundMessage).toBe('No items found');
     });
+
+    it('passes maxCharactersToSearch to SearchBar', () => {
+        renderComponent({ maxCharactersToSearch: 10 });
+
+        const { SearchBar } = require('../search-bar/SearchBar');
+        const searchBarProps = SearchBar.mock.calls[SearchBar.mock.calls.length - 1][0];
+
+        expect(searchBarProps.maxCharactersToSearch).toBe(10);
+    });
+
     it('directly tests onSearch function with different search terms', () => {
         const setCurrentSearchTerm = jest.fn();
         const setLocalSearchItems = jest.fn();

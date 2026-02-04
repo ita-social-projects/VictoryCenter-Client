@@ -82,9 +82,91 @@ describe('FaqApi', () => {
         expect(result).toEqual(mockPages);
     });
 
-    it('getSearchItems should return empty result', async () => {
-        const result = await FaqApi.getSearchItems('term', { offset: 0, limit: 10, requestOptions: {} });
-        expect(result).toEqual({ items: [], totalItemsCount: 0 });
+    it('fetchFaqSearchItems should call GET with correct params and return mapped suggestions', async () => {
+        const apiResponse = {
+            data: {
+                items: [
+                    { id: 1, questionText: 'First question' },
+                    { id: 2, questionText: 'Second question' },
+                ],
+                totalItemsCount: 2,
+            },
+        };
+
+        mockClient.get.mockResolvedValueOnce(apiResponse);
+
+        const result = await FaqApi.fetchFaqSearchItems(mockClient, 'term', 0, 5);
+
+        expect(mockClient.get).toHaveBeenCalledWith(
+            API_ROUTES.FAQ.SEARCH,
+            expect.objectContaining({
+                params: {
+                    searchQuery: 'term',
+                    offset: 0,
+                    limit: 5,
+                },
+            }),
+        );
+
+        expect(result).toEqual({
+            items: [
+                { id: 1, question: 'First question' },
+                { id: 2, question: 'Second question' },
+            ],
+            totalItemsCount: 2,
+        });
+    });
+
+    it('fetchFaqSearchItems should pass AbortSignal when provided', async () => {
+        const controller = new AbortController();
+
+        mockClient.get.mockResolvedValueOnce({
+            data: {
+                items: [],
+                totalItemsCount: 0,
+            },
+        });
+
+        await FaqApi.fetchFaqSearchItems(mockClient, 'term', 0, 5, controller.signal);
+
+        expect(mockClient.get).toHaveBeenCalledWith(
+            API_ROUTES.FAQ.SEARCH,
+            expect.objectContaining({
+                params: {
+                    searchQuery: 'term',
+                    offset: 0,
+                    limit: 5,
+                },
+                signal: controller.signal,
+            }),
+        );
+    });
+
+    it('fetchFaqSearchItems should use default offset and limit', async () => {
+        mockClient.get.mockResolvedValueOnce({
+            data: {
+                items: [],
+                totalItemsCount: 0,
+            },
+        });
+
+        const result = await FaqApi.fetchFaqSearchItems(mockClient, 'term');
+
+        expect(mockClient.get).toHaveBeenCalledWith(
+            API_ROUTES.FAQ.SEARCH,
+            expect.objectContaining({
+                params: {
+                    searchQuery: 'term',
+                    offset: 0,
+                    limit: 5,
+                },
+            }),
+        );
+
+        expect(result).toEqual({
+            items: [],
+            totalItemsCount: 0,
+        });
     });
 
     it('delete should call DELETE with correct id', async () => {

@@ -277,16 +277,18 @@ export const ProgramSectionForm = ({
                     </p>
                 )}
             </div>
-            {sectionMode !== ProgramSectionMode.View && (
-                <div className={styles.actions}>
-                    <Button buttonStyle="secondary" onClick={handleCancelClick} disabled={isDisabled}>
-                        {PROGRAMS_TEXT.BUTTON.CANCEL}
-                    </Button>
-                    <Button buttonStyle="primary" onClick={onSave} disabled={true}>
-                        {PROGRAMS_TEXT.BUTTON.SAVE}
-                    </Button>
-                </div>
-            )}
+            <div className={styles.actionsContainer}>
+                {sectionMode !== ProgramSectionMode.View && (
+                    <div className={styles.actions}>
+                        <Button buttonStyle="secondary" onClick={handleCancelClick} disabled={isDisabled}>
+                            {PROGRAMS_TEXT.BUTTON.CANCEL}
+                        </Button>
+                        <Button buttonStyle="primary" onClick={onSave} disabled={true}>
+                            {PROGRAMS_TEXT.BUTTON.SAVE}
+                        </Button>
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

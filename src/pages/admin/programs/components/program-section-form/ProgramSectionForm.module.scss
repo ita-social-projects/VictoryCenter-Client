@@ -47,12 +47,15 @@
     }
 }
 
+.actionsContainer {
+    background-color: #fff;
+    min-height: 100px;
+}
+
 .actions {
     display: flex;
     justify-content: center;
-    background-color: #fff;
     gap: 2rem;
-    padding-bottom: 4rem;
 
     Button {
         width: 325px;

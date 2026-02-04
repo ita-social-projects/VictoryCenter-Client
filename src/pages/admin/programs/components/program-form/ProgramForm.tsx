@@ -94,7 +94,6 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             onValidationChange,
             onAddSection,
             onRequestCancelSection,
-            isEditMode = false,
         }: ProgramFormProps,
         ref,
     ) => {

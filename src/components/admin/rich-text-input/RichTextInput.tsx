@@ -8,7 +8,14 @@ import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { $generateNodesFromDOM } from '@lexical/html';
 import { $getRoot, $insertNodes, LexicalEditor } from 'lexical';
 import styles from './RichTextInput.module.scss';
-import { MaxLengthPlugin, OnChangePlugin, FocusPlugin, ToolbarPlugin, InitialValuePlugin } from './plugins';
+import {
+    MaxLengthPlugin,
+    OnChangePlugin,
+    FocusPlugin,
+    ToolbarPlugin,
+    InitialValuePlugin,
+    EnterKeyPlugin,
+} from './plugins';
 
 export interface RichTextInputProps {
     value: string;
@@ -100,6 +107,7 @@ export const RichTextInput = ({
                 <MaxLengthPlugin maxLength={maxLength} onLengthChange={handleLengthChange} />
                 <FocusPlugin onFocus={onFocus} onBlur={onBlur} onFocusChange={handleFocusChange} />
                 <InitialValuePlugin value={value} />
+                <EnterKeyPlugin />
             </LexicalComposer>
             <output className={styles.counter}>
                 {currentLength}/{maxLength}

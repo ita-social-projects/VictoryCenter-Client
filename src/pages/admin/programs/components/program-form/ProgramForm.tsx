@@ -134,9 +134,11 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
         });
 
         const [savedSections, setSavedSections] = useState<boolean[]>([]);
+        const [editingSections, setEditingSections] = useState<boolean[]>([]);
 
         useEffect(() => {
             setSavedSections(initialData?.sections?.map(() => true) ?? []);
+            setEditingSections(initialData?.sections?.map(() => false) ?? []);
         }, [initialData]);
 
         const isMainFormValid = useCallback(
@@ -152,9 +154,14 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             [savedSections, formState.sections.length],
         );
 
+        const hasEditingSections = useMemo(
+            () => editingSections.length > 0 && editingSections.some(Boolean),
+            [editingSections],
+        );
+
         useEffect(() => {
-            onValidationChange?.(isMainFormValid(false) && allSectionsSaved);
-        }, [onValidationChange, isMainFormValid, allSectionsSaved]);
+            onValidationChange?.(isMainFormValid(false) && allSectionsSaved && !hasEditingSections);
+        }, [onValidationChange, isMainFormValid, allSectionsSaved, hasEditingSections]);
 
         const handleAddSection = useCallback(
             (section: ProgramSection) => {
@@ -163,6 +170,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                     sections: [section, ...prev.sections],
                 }));
                 setSavedSections((prev) => [false, ...prev]);
+                setEditingSections((prev) => [true, ...prev]);
             },
             [setFormState],
         );
@@ -174,6 +182,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                     sections: prev.sections.filter((_, index) => index !== sectionIndex),
                 }));
                 setSavedSections((prev) => prev.filter((_, index) => index !== sectionIndex));
+                setEditingSections((prev) => prev.filter((_, index) => index !== sectionIndex));
             },
             [setFormState],
         );
@@ -191,6 +200,11 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                         next[sectionIndex] = true;
                         return next;
                     });
+                    setEditingSections((prev) => {
+                        const next = [...prev];
+                        next[sectionIndex] = false;
+                        return next;
+                    });
                 }
             },
             [setFormState, initialData],
@@ -203,7 +217,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                     await internalRef.current?.submit(status);
                 },
                 isValid: (isPublishing?: boolean) => {
-                    return isMainFormValid(!!isPublishing) && allSectionsSaved;
+                    return isMainFormValid(!!isPublishing) && allSectionsSaved && !hasEditingSections;
                 },
                 isDirty: () => {
                     return internalRef.current?.isDirty() ?? false;
@@ -220,6 +234,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                 formState.sections,
                 isMainFormValid,
                 allSectionsSaved,
+                hasEditingSections,
             ],
         );
 
@@ -359,6 +374,11 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                             next[sectionIndex] = true;
                             return next;
                         });
+                        setEditingSections((prev) => {
+                            const next = [...prev];
+                            next[sectionIndex] = false;
+                            return next;
+                        });
                     }
                     options.onAfterDiscard();
                 };
@@ -382,6 +402,14 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             () => formState.sections.map((section) => isProgramSectionValid(section, true)),
             [formState.sections],
         );
+
+        const handleSectionEditStateChange = useCallback((sectionIndex: number, isEditing: boolean) => {
+            setEditingSections((prev) => {
+                const next = [...prev];
+                next[sectionIndex] = isEditing;
+                return next;
+            });
+        }, []);
 
         return (
             <form className={styles['container']} noValidate>
@@ -571,6 +599,9 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                         isDisabled={isSubmitting || isFormDisabled}
                                         isNewSection={!(savedSections[index] ?? false)}
                                         isSectionValid={sectionValidity[index] ?? false}
+                                        onEditStateChange={(isEditing) =>
+                                            handleSectionEditStateChange(index, isEditing)
+                                        }
                                     />
                                     <div className={styles['sections-divider']} />
                                 </React.Fragment>

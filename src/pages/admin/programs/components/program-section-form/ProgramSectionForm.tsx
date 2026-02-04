@@ -20,6 +20,7 @@ export interface ProgramSectionFormProps {
     onSectionChange?: (updatedSection: ProgramSection) => void;
     isNewSection?: boolean;
     isSectionValid?: boolean;
+    onEditStateChange?: (isEditing: boolean) => void;
 }
 
 export interface SectionCancelOptions {
@@ -45,6 +46,7 @@ export const ProgramSectionForm = ({
     onSectionChange,
     isNewSection = false,
     isSectionValid = false,
+    onEditStateChange,
 }: ProgramSectionFormProps) => {
     const [localSection, setLocalSection] = useState<ProgramSection>(section);
     const [originalSection, setOriginalSection] = useState<ProgramSection>(section);
@@ -68,6 +70,10 @@ export const ProgramSectionForm = ({
             }
         }
     }, [section, isNewSection]);
+
+    useEffect(() => {
+        onEditStateChange?.(sectionMode === ProgramSectionMode.Edit);
+    }, [onEditStateChange, sectionMode]);
 
     const titleContent = getContentByType(localSection.contents, ContentType.Title);
 

@@ -5,7 +5,7 @@ import { FaqSearchItem } from './FaqSearchItem';
 const mockItem = {
     id: 1,
     question: 'What is Victory Center?',
-    pages: ['Home', 'About'], // лишаємо в мокові, але UI їх не показує
+    pages: ['Home', 'About'],
 };
 
 describe('FaqSearchItem', () => {

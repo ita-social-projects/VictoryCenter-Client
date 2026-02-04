@@ -1,5 +1,5 @@
-import React, { forwardRef, useCallback, useMemo, useImperativeHandle, useRef } from 'react';
-import { PROGRAM_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
+import React, { forwardRef, useCallback, useEffect, useMemo, useImperativeHandle, useRef, useState } from 'react';
+import { PROGRAM_VALIDATION_FUNCTIONS, isProgramSectionValid } from '@/validation/admin/program-schema/program-schema';
 import { PROGRAM_VALIDATION, PROGRAMS_TEXT } from '@/const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
@@ -80,7 +80,7 @@ const validateForm = (formState: ProgramFormValues, isPublishing: boolean): Prog
             isPublishing,
         ),
         meetingCount: PROGRAM_VALIDATION_FUNCTIONS.validateMeetingCount(formState.meetingCount, isPublishing),
-        sections: PROGRAM_VALIDATION_FUNCTIONS.validateSections(formState.sections, isPublishing),
+        sections: undefined,
     };
 };
 
@@ -130,9 +130,31 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             initialData,
             validateForm,
             onSubmit,
-            onValidationChange,
             ref: internalRef,
         });
+
+        const [savedSections, setSavedSections] = useState<boolean[]>([]);
+
+        useEffect(() => {
+            setSavedSections(initialData?.sections?.map(() => true) ?? []);
+        }, [initialData]);
+
+        const isMainFormValid = useCallback(
+            (isPublishing: boolean) => {
+                const formErrors = validateForm(formState, isPublishing) || {};
+                return !Object.values(formErrors).some((e) => e !== undefined);
+            },
+            [formState],
+        );
+
+        const allSectionsSaved = useMemo(
+            () => savedSections.length === formState.sections.length && savedSections.every(Boolean),
+            [savedSections, formState.sections.length],
+        );
+
+        useEffect(() => {
+            onValidationChange?.(isMainFormValid(false) && allSectionsSaved);
+        }, [onValidationChange, isMainFormValid, allSectionsSaved]);
 
         const handleAddSection = useCallback(
             (section: ProgramSection) => {
@@ -140,6 +162,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                     ...prev,
                     sections: [section, ...prev.sections],
                 }));
+                setSavedSections((prev) => [false, ...prev]);
             },
             [setFormState],
         );
@@ -150,6 +173,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                     ...prev,
                     sections: prev.sections.filter((_, index) => index !== sectionIndex),
                 }));
+                setSavedSections((prev) => prev.filter((_, index) => index !== sectionIndex));
             },
             [setFormState],
         );
@@ -161,6 +185,11 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                         const updatedSections = [...prev.sections];
                         updatedSections[sectionIndex] = initialData.sections[sectionIndex];
                         return { ...prev, sections: updatedSections };
+                    });
+                    setSavedSections((prev) => {
+                        const next = [...prev];
+                        next[sectionIndex] = true;
+                        return next;
                     });
                 }
             },
@@ -174,7 +203,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                     await internalRef.current?.submit(status);
                 },
                 isValid: (isPublishing?: boolean) => {
-                    return internalRef.current?.isValid(isPublishing) ?? false;
+                    return isMainFormValid(!!isPublishing) && allSectionsSaved;
                 },
                 isDirty: () => {
                     return internalRef.current?.isDirty() ?? false;
@@ -184,7 +213,14 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                 getSections: () => formState.sections,
                 revertSection: handleRevertSection,
             }),
-            [handleAddSection, handleRemoveSection, handleRevertSection, formState.sections],
+            [
+                handleAddSection,
+                handleRemoveSection,
+                handleRevertSection,
+                formState.sections,
+                isMainFormValid,
+                allSectionsSaved,
+            ],
         );
 
         const handleNameChange = useCallback(
@@ -287,18 +323,13 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             [setErrors],
         );
 
-        const handleSaveSection = useCallback(
-            (sectionIndex: number) => {
-                setFormState((prev) => {
-                    const updatedSections = [...prev.sections];
-                    updatedSections[sectionIndex] = { ...updatedSections[sectionIndex] };
-                    return { ...prev, sections: updatedSections };
-                });
-                const sectionsError = PROGRAM_VALIDATION_FUNCTIONS.validateSections(formState.sections, false);
-                setErrors((prev) => ({ ...prev, sections: sectionsError }));
-            },
-            [setFormState, formState.sections, setErrors],
-        );
+        const handleSaveSection = useCallback((sectionIndex: number) => {
+            setSavedSections((prev) => {
+                const next = [...prev];
+                next[sectionIndex] = true;
+                return next;
+            });
+        }, []);
 
         const handleSectionChange = useCallback(
             (sectionIndex: number, updatedSection: ProgramSection) => {
@@ -306,6 +337,11 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                     const updatedSections = [...prev.sections];
                     updatedSections[sectionIndex] = updatedSection;
                     return { ...prev, sections: updatedSections };
+                });
+                setSavedSections((prev) => {
+                    const next = [...prev];
+                    next[sectionIndex] = false;
+                    return next;
                 });
             },
             [setFormState],
@@ -318,6 +354,11 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                         handleRemoveSection(sectionIndex);
                     } else {
                         handleSectionChange(sectionIndex, options.revertTo);
+                        setSavedSections((prev) => {
+                            const next = [...prev];
+                            next[sectionIndex] = true;
+                            return next;
+                        });
                     }
                     options.onAfterDiscard();
                 };
@@ -337,6 +378,10 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
         );
 
         const hasSections = formState.sections.length > 0;
+        const sectionValidity = useMemo(
+            () => formState.sections.map((section) => isProgramSectionValid(section, true)),
+            [formState.sections],
+        );
 
         return (
             <form className={styles['container']} noValidate>
@@ -524,7 +569,8 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                         onCancel={(options) => handleCancelSection(index, options)}
                                         onSectionChange={(updatedSection) => handleSectionChange(index, updatedSection)}
                                         isDisabled={isSubmitting || isFormDisabled}
-                                        isNewSection={!section.id}
+                                        isNewSection={!(savedSections[index] ?? false)}
+                                        isSectionValid={sectionValidity[index] ?? false}
                                     />
                                     <div className={styles['sections-divider']} />
                                 </React.Fragment>

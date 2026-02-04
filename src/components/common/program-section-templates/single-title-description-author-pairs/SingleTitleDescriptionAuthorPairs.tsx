@@ -24,6 +24,7 @@ export interface SingleTitleDescriptionAuthorPairsProps {
     onPairDescriptionChange?: (index: number, value: string) => void;
     onPairAuthorChange?: (index: number, value: string) => void;
     onAddPair?: () => void;
+    onDeletePair?: (index: number) => void;
     canAddPair?: boolean;
 }
 
@@ -38,6 +39,7 @@ export const SingleTitleDescriptionAuthorPairs = ({
     onPairDescriptionChange,
     onPairAuthorChange,
     onAddPair,
+    onDeletePair,
     canAddPair = true,
 }: SingleTitleDescriptionAuthorPairsProps) => {
     const normalizedPairs = useMemo(() => {
@@ -94,6 +96,7 @@ export const SingleTitleDescriptionAuthorPairs = ({
                         isEditable={isEditable}
                         onDescriptionChange={onPairDescriptionChange}
                         onAuthorChange={onPairAuthorChange}
+                        onDelete={onDeletePair}
                     />
                 ))}
             </CardCarousel>

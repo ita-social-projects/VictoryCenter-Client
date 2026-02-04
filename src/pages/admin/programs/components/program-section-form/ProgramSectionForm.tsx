@@ -269,6 +269,25 @@ export const ProgramSectionForm = ({
         });
     }, [onSectionChange]);
 
+    const handleDeletePair = useCallback(
+        (index: number) => {
+            setLocalSection((prev) => {
+                const pairs = getDescriptionAuthorPairs(prev.contents);
+                const target = pairs[index];
+                if (!target) return prev;
+
+                const updatedSection: ProgramSection = {
+                    ...prev,
+                    contents: prev.contents.filter((c) => c.groupIndex !== target.groupIndex),
+                };
+
+                onSectionChange?.(updatedSection);
+                return updatedSection;
+            });
+        },
+        [onSectionChange],
+    );
+
     const CARD_TEMPLATES = [
         ProgramSectionTemplate.DualTitleDescription,
         ProgramSectionTemplate.TripleTitleDescription,
@@ -310,6 +329,7 @@ export const ProgramSectionForm = ({
                       onCardDescriptionChange: handlePairDescriptionChange,
                       onCardAuthorChange: handlePairAuthorChange,
                       onAddPair: handleAddPair,
+                      onDeletePair: handleDeletePair,
                       canAddPair,
                   }
                 : {}),

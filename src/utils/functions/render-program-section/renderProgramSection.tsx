@@ -41,6 +41,7 @@ export interface ProgramSectionHandlers {
     onCardDescriptionChange?: (index: number, value: string) => void;
     onCardAuthorChange?: (index: number, value: string) => void;
     onAddPair?: () => void;
+    onDeletePair?: (index: number) => void;
     canAddPair?: boolean;
 }
 
@@ -186,6 +187,7 @@ export const renderProgramSection = ({
                 onPairDescriptionChange={handlers?.onCardDescriptionChange}
                 onPairAuthorChange={handlers?.onCardAuthorChange}
                 onAddPair={handlers?.onAddPair}
+                onDeletePair={handlers?.onDeletePair}
                 canAddPair={handlers?.canAddPair}
             />
         );

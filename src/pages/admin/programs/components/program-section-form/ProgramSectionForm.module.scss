@@ -10,7 +10,7 @@
     }
 }
 
-.actions-section{
+.actions-section {
     display: flex;
     justify-content: end;
     height: 100px;
@@ -29,7 +29,9 @@
     background-color: c.$light-blue-100;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.2s ease, visibility 0.2s ease;
+    transition:
+        opacity 0.2s ease,
+        visibility 0.2s ease;
 }
 
 .iconButton {

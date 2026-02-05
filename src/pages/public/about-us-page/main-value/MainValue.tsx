@@ -4,6 +4,8 @@ import styles from './MainValue.module.scss';
 import { Swiper } from '@/components/public/swiper/Swiper';
 import { AboutUsContent } from '@/types/public/about-us-page';
 import cn from 'classnames';
+import { SafeHtml } from '@/components/common/safe-html';
+
 export interface MainValuesProps {
     content: AboutUsContent[] | null;
 }
@@ -38,12 +40,11 @@ export const MainValues = ({ content }: MainValuesProps) => {
                     renderItem={(person, index) => {
                         const imageUrl = person.image?.url ?? ABOUT_US_DATA.PEOPLE_DATA[index].IMG;
                         const altText = peopleData[index].ALT;
-                        const description = person.description;
 
                         return (
                             <div className={cn(styles[`people-card`], styles[`card-${index + 1}`])}>
                                 <img className={styles[`people-img`]} src={imageUrl} alt={altText} />
-                                <p className={styles[`people-info`]}>{description}</p>
+                                <SafeHtml as="p" className={styles[`people-info`]} html={person.description ?? ''} />
                             </div>
                         );
                     }}

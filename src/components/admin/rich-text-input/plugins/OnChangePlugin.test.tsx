@@ -113,13 +113,24 @@ describe('OnChangePlugin', () => {
                     '</p>',
                 expected: '<p>Ми не <strong>одні</strong>. І це наша <strong>сила</strong></p>',
             },
+            {
+                name: 'preserves multiple consecutive spaces using non-breaking spaces',
+                input: '<p><span style="white-space: pre-wrap;">text  with   multiple    spaces</span></p>',
+                expected: '<p>text &nbsp;with &nbsp;&nbsp;multiple &nbsp;&nbsp;&nbsp;spaces</p>',
+            },
+            {
+                name: 'preserves double spaces to prevent cursor jumping',
+                input: '<p>First  Second</p>',
+                expected: '<p>First &nbsp;Second</p>',
+            },
         ];
 
-        sanitizationTestCases.forEach(({ name, input, expected }) => {
-            it(name, () => {
+        it.each(sanitizationTestCases.map(({ name, input, expected }) => [name, input, expected]))(
+            '%s',
+            (_name, input, expected) => {
                 const onChange = jest.fn();
                 testOnChangeCallback(onChange, input, expected);
-            });
-        });
+            },
+        );
     });
 });

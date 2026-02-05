@@ -1,12 +1,13 @@
 import { Content } from '@/types/admin/who-we-are';
 import React, { useState } from 'react';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
+import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 import './DescriptionSection.scss';
 import { Button } from '@/components/admin/button/Button';
 import { OurMission } from '@/pages/public/about-us-page/our-mission/OurMission';
 import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '@/validation/admin/who-we-are-schema/WhoWeAreSchema';
 import { ContentType } from '@/types/common/about-us';
+import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
 
 export interface DescriptionSectionProps {
     content: Content[] | undefined;
@@ -33,19 +34,21 @@ export const DescriptionSection = ({
         return null;
     }
 
-    const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const handleDescriptionChange = (value: string) => {
         onChange({
             ...descriptionContent,
-            description: e.target.value,
+            description: value,
         });
-        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(e.target.value);
+        const plainText = getPlainTextFromHtml(value);
+        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(plainText);
         setDescriptionError(error || null);
 
         setIsPublishButtonActive(true);
     };
 
-    const handleBlur = (e: React.FocusEvent<HTMLTextAreaElement>) => {
-        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(e.target.value);
+    const handleBlur = () => {
+        const plainText = getPlainTextFromHtml(descriptionContent.description ?? '');
+        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(plainText);
         setDescriptionError(error || null);
     };
 
@@ -53,7 +56,7 @@ export const DescriptionSection = ({
         <div className="description-section">
             <OurMission description={descriptionContent.description ?? ''} className="description-section-show-block" />
             <div className="description-section-textarea">
-                <TextAreaWithCharacterLimitGroup
+                <RichTextInputGroup
                     label={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
                     id={descriptionContent.id.toString()}
                     name={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
@@ -61,7 +64,6 @@ export const DescriptionSection = ({
                     onChange={handleDescriptionChange}
                     onBlur={handleBlur}
                     maxLength={descriptionLimit}
-                    rows={5}
                     error={descriptionError || undefined}
                 />
                 <Button

@@ -37,6 +37,7 @@ export interface AdminPanelToolbarProps<T> extends LocalizationToolkitProps {
     onAddItem: () => void;
     AddItemButtonText: string;
     onSuggestionSelect: (itemKey: string | number) => void;
+    maxCharactersToSearch?: number;
 }
 
 export const AdminPanelToolbar = <T,>({
@@ -53,6 +54,7 @@ export const AdminPanelToolbar = <T,>({
     onAddItem,
     AddItemButtonText,
     onSuggestionSelect,
+    maxCharactersToSearch,
     languages,
     onLanguageChange,
     onTranslationStatusFilterChange,
@@ -126,6 +128,7 @@ export const AdminPanelToolbar = <T,>({
                     placeholder={placeholder}
                     notFoundMessage={suggestionsNotFoundMessage}
                     minCharactersToSearch={UI_CONFIG.SEARCH_BAR.MIN_CHARACTERS_FOR_SEARCH}
+                    maxCharactersToSearch={maxCharactersToSearch}
                     searchDelayMs={UI_CONFIG.SEARCH_BAR.SEARCH_DELAY_MS}
                 />
             </div>

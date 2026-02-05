@@ -8,7 +8,7 @@ jest.mock('@lexical/react/LexicalComposer', () => {
     const MockLexicalComposer = ({ children }: { children: React.ReactNode }) => (
         <div data-testid="lexical-composer">{children}</div>
     );
-    return { LexicalComposer: MockLexicalComposer };
+    return { __esModule: true, LexicalComposer: MockLexicalComposer };
 });
 
 jest.mock('@lexical/react/LexicalRichTextPlugin', () => {
@@ -18,7 +18,7 @@ jest.mock('@lexical/react/LexicalRichTextPlugin', () => {
             {placeholder}
         </div>
     );
-    return { RichTextPlugin: MockRichTextPlugin };
+    return { __esModule: true, RichTextPlugin: MockRichTextPlugin };
 });
 
 jest.mock('@lexical/react/LexicalContentEditable', () => {
@@ -31,17 +31,17 @@ jest.mock('@lexical/react/LexicalContentEditable', () => {
             aria-label={props['aria-label']}
         />
     );
-    return { ContentEditable: MockContentEditable };
+    return { __esModule: true, ContentEditable: MockContentEditable };
 });
 
 jest.mock('@lexical/react/LexicalHistoryPlugin', () => {
     const MockHistoryPlugin = () => null;
-    return { HistoryPlugin: MockHistoryPlugin };
+    return { __esModule: true, HistoryPlugin: MockHistoryPlugin };
 });
 
 jest.mock('@lexical/react/LexicalErrorBoundary', () => {
     const MockLexicalErrorBoundary = ({ children }: { children: React.ReactNode }) => <>{children}</>;
-    return { LexicalErrorBoundary: MockLexicalErrorBoundary };
+    return { __esModule: true, LexicalErrorBoundary: MockLexicalErrorBoundary };
 });
 
 jest.mock('@lexical/html', () => ({
@@ -101,12 +101,14 @@ jest.mock('./plugins', () => {
             <div data-testid="initial-value-content" dangerouslySetInnerHTML={{ __html: props.value }} />
         ) : null;
     };
+    const MockEnterKeyPlugin = () => null;
     return {
         MaxLengthPlugin: MockMaxLengthPlugin,
         OnChangePlugin: MockOnChangePlugin,
         FocusPlugin: MockFocusPlugin,
         ToolbarPlugin: MockToolbarPlugin,
         InitialValuePlugin: MockInitialValuePlugin,
+        EnterKeyPlugin: MockEnterKeyPlugin,
     };
 });
 

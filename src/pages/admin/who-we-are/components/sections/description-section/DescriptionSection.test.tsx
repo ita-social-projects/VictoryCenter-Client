@@ -6,19 +6,23 @@ import { ContentType } from '@/types/common/about-us';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '@/validation/admin/who-we-are-schema/WhoWeAreSchema';
 import { OurMissionProps } from '@/pages/public/about-us-page/our-mission/OurMission';
-import { TextAreaWithCharacterLimitProps } from '@/components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
+import { RichTextInputGroupProps } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 
-jest.mock('@/components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit', () => ({
-    TextAreaWithCharacterLimit: ({ onChange, value, maxLength, onBlur, name, id }: TextAreaWithCharacterLimitProps) => (
-        <textarea
-            data-testid="mock-textarea"
-            onChange={onChange}
-            value={value}
-            maxLength={maxLength}
-            onBlur={onBlur}
-            name={name}
-            id={id}
-        />
+jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
+    RichTextInputGroup: ({ label, onChange, value, maxLength, onBlur, name, id, error }: RichTextInputGroupProps) => (
+        <div>
+            <label htmlFor={id}>{label}</label>
+            <input
+                data-testid={`mock-rich-input-${id}`}
+                onChange={(e) => onChange(e.target.value)}
+                value={value}
+                maxLength={maxLength}
+                onBlur={onBlur}
+                name={name}
+                id={id}
+            />
+            {error && <span>{error}</span>}
+        </div>
     ),
 }));
 
@@ -75,9 +79,9 @@ describe('DescriptionSection', () => {
         renderComponent();
         expect(screen.getByTestId('mock-our-mission')).toHaveTextContent(initialDescription);
         expect(screen.getByText(COMMON_TEXT_ADMIN.TYPE.DESCRIPTION)).toBeInTheDocument();
-        const textarea = screen.getByTestId('mock-textarea');
-        expect(textarea).toHaveValue(initialDescription);
-        expect(textarea).toHaveAttribute('maxLength', descriptionLimit.toString());
+        const descriptionInput = screen.getByTestId('mock-rich-input-1');
+        expect(descriptionInput).toHaveValue(initialDescription);
+        expect(descriptionInput).toHaveAttribute('maxLength', descriptionLimit.toString());
         const publishButton = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED });
         expect(publishButton).toBeInTheDocument();
         expect(publishButton).toBeDisabled();
@@ -106,9 +110,9 @@ describe('DescriptionSection', () => {
 
     it('should call onChange and setIsPublishButtonActive on text area change', () => {
         renderComponent();
-        const textarea = screen.getByTestId('mock-textarea');
+        const descriptionInput = screen.getByTestId('mock-rich-input-1');
         const newText = 'This is a new test description.';
-        fireEvent.change(textarea, { target: { value: newText } });
+        fireEvent.change(descriptionInput, { target: { value: newText } });
 
         expect(mockOnChange).toHaveBeenCalledWith(
             expect.objectContaining({
@@ -124,9 +128,9 @@ describe('DescriptionSection', () => {
         (WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText as jest.Mock).mockReturnValue(errorMessage);
 
         renderComponent();
-        const textarea = screen.getByTestId('mock-textarea');
+        const descriptionInput = screen.getByTestId('mock-rich-input-1');
 
-        fireEvent.blur(textarea);
+        fireEvent.blur(descriptionInput);
 
         await waitFor(() => {
             expect(screen.getByText(errorMessage)).toBeInTheDocument();

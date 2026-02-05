@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, act, within } from '@testing-library/react';
 import { TeamPageToolbar } from './TeamPageToolbar';
 import { TEAM_MEMBERS_TEXT } from '@/const/admin/team';
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { COMMON_TEXT_ADMIN, UI_CONFIG } from '@/const/admin/common';
 import { VisibilityStatus } from '@/types/admin/common';
 import { SearchBarProps } from '@/components/admin/search-bar/SearchBar';
 import { ProgramSearchItemData } from '@/types/admin/programs';
@@ -53,18 +53,24 @@ jest.mock('@/components/admin/search-bar/SearchBar', () => ({
             onSearchItemSelect,
             hasMore,
             onLoadMore,
+            maxCharactersToSearch,
+            minCharactersToSearch,
         } = props;
 
         return (
             <div>
                 <input
                     placeholder={placeholder}
+                    maxLength={maxCharactersToSearch}
                     onChange={(e) => onQueryChange?.(e.target.value)}
                     data-testid="search-input"
                 />
+                <span data-testid="min-chars">{minCharactersToSearch}</span>
+
                 <button onClick={onClear} data-testid="clear-button">
                     Clear
                 </button>
+
                 <ul data-testid="search-results">
                     {View &&
                         searchItems.map((item: any, index: number) => {
@@ -85,6 +91,7 @@ jest.mock('@/components/admin/search-bar/SearchBar', () => ({
                             );
                         })}
                 </ul>
+
                 {hasMore ? (
                     <button onClick={onLoadMore} data-testid="load-more">
                         Load more
@@ -230,5 +237,20 @@ describe('TeamPageToolbar', () => {
         rerender(<TeamPageToolbar {...{ ...DEFAULT_PROPS, statusFilter: VisibilityStatus.Draft }} />);
 
         expect(screen.getByTestId('team-page-toolbar')).toBeInTheDocument();
+    });
+
+    it('passes maxCharactersToSearch to SearchBar', () => {
+        renderToolbar({ maxCharactersToSearch: 150 });
+
+        const input = screen.getByTestId('search-input') as HTMLInputElement;
+        expect(input.maxLength).toBe(150);
+    });
+
+    it('passes minCharactersToSearch from UI_CONFIG to SearchBar', () => {
+        renderToolbar();
+
+        expect(screen.getByTestId('min-chars')).toHaveTextContent(
+            UI_CONFIG.SEARCH_BAR.MIN_CHARACTERS_FOR_SEARCH.toString(),
+        );
     });
 });

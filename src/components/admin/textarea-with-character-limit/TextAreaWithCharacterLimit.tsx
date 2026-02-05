@@ -1,6 +1,7 @@
-import { forwardRef, useState } from 'react';
+import { forwardRef } from 'react';
 import cn from 'classnames';
 import { ReactComponent as RemoveIcon } from '@/assets/icons/remove-query.svg';
+import { useInputWithCharacterLimit } from '@/hooks/admin/use-input-with-character-limit/useInputWithCharacterLimit';
 import './TextAreaWithCharacterLimit.scss';
 
 export interface TextAreaWithCharacterLimitProps {
@@ -16,6 +17,8 @@ export interface TextAreaWithCharacterLimitProps {
     placeholder?: string;
     rows?: number;
     hasError?: boolean;
+    maxLimitWarning?: string;
+    onWarningChange?: (warning: string | null) => void;
 }
 
 export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAreaWithCharacterLimitProps>(
@@ -33,29 +36,24 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
             placeholder,
             rows = 4,
             hasError = false,
+            maxLimitWarning,
+            onWarningChange,
         },
         ref,
     ) => {
-        const [isFocused, setIsFocused] = useState(false);
-
-        const handleFocus = (e: React.FocusEvent<HTMLTextAreaElement>) => {
-            setIsFocused(true);
-            onFocus?.(e);
-        };
-
-        const handleBlur = (e: React.FocusEvent<HTMLTextAreaElement>) => {
-            setIsFocused(false);
-            onBlur?.(e);
-        };
-
-        const handleClear = () => {
-            const syntheticEvent = {
-                target: { value: '', name, id },
-            } as React.ChangeEvent<HTMLTextAreaElement>;
-            onChange(syntheticEvent);
-        };
-
-        const showClearButton = isFocused && value.length > 0 && !disabled;
+        const { isFocused, localWarning, showClearButton, handleChange, handleFocus, handleBlur, handleClear } =
+            useInputWithCharacterLimit<HTMLTextAreaElement>({
+                value,
+                maxLength,
+                name,
+                id,
+                disabled,
+                maxLimitWarning,
+                onChange,
+                onFocus,
+                onBlur,
+                onWarningChange,
+            });
 
         return (
             <div className="char-limit-textarea">
@@ -69,11 +67,10 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
                         ref={ref}
                         className="char-limit-textarea__field"
                         value={value}
-                        onChange={onChange}
+                        onChange={handleChange}
                         onFocus={handleFocus}
                         onBlur={handleBlur}
                         onKeyDown={onKeyDown}
-                        maxLength={maxLength}
                         name={name}
                         id={id}
                         disabled={disabled}
@@ -84,7 +81,7 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
                         <button
                             type="button"
                             className={cn('char-limit-textarea__clear-button', {
-                                'char-limit-textarea__clear-button--error': hasError,
+                                'char-limit-textarea__clear-button--error': hasError || !!localWarning,
                             })}
                             onMouseDown={(e) => e.preventDefault()}
                             onClick={handleClear}

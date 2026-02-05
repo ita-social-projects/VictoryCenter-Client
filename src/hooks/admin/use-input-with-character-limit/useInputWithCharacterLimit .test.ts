@@ -33,6 +33,19 @@ describe('useInputWithCharacterLimit', () => {
         });
     });
 
+    const createMockEvent = (value: string) =>
+        ({
+            target: { value, name: 'testInput', id: 'test-input' },
+        }) as React.ChangeEvent<HTMLInputElement>;
+
+    const triggerChange = (result: any, value: string) => {
+        const mockEvent = createMockEvent(value);
+        act(() => {
+            result.current.handleChange(mockEvent);
+        });
+        return mockEvent;
+    };
+
     describe('Initialization', () => {
         it('should initialize with correct default values', () => {
             const { result } = renderHook(() => useInputWithCharacterLimit(defaultProps));
@@ -60,173 +73,94 @@ describe('useInputWithCharacterLimit', () => {
     });
 
     describe('handleChange', () => {
-        it('should call onChange when normalized length is within limit', () => {
-            const inputValue = 'hello';
-            const normalizedLength = getNormalizedInputText(inputValue).length;
-            expect(normalizedLength).toBeLessThanOrEqual(defaultProps.maxLength);
+        describe('Valid input (within limit)', () => {
+            it('should call onChange when normalized length is within limit', () => {
+                const inputValue = 'hello';
+                const { result } = renderHook(() => useInputWithCharacterLimit(defaultProps));
 
-            const { result } = renderHook(() => useInputWithCharacterLimit(defaultProps));
+                const mockEvent = triggerChange(result, inputValue);
 
-            const mockEvent = {
-                target: { value: inputValue, name: 'testInput', id: 'test-input' },
-            } as React.ChangeEvent<HTMLInputElement>;
-
-            act(() => {
-                result.current.handleChange(mockEvent);
+                expect(mockOnChange).toHaveBeenCalledWith({
+                    ...mockEvent,
+                    target: {
+                        ...mockEvent.target,
+                        value: inputValue,
+                    },
+                });
+                expect(mockClearWarning).toHaveBeenCalled();
+                expect(mockShowTemporaryWarning).not.toHaveBeenCalled();
             });
 
-            expect(mockOnChange).toHaveBeenCalledWith({
-                ...mockEvent,
-                target: {
-                    ...mockEvent.target,
-                    value: inputValue,
-                },
-            });
-            expect(mockClearWarning).toHaveBeenCalled();
-            expect(mockShowTemporaryWarning).not.toHaveBeenCalled();
-        });
+            it('should allow input with spaces when normalized length is within limit', () => {
+                const inputValue = '  test  ';
+                const { result } = renderHook(() => useInputWithCharacterLimit(defaultProps));
 
-        it('should prevent input when normalized length exceeds maxLength', () => {
-            const inputValue = 'this is a very long text that exceeds the limit';
-            const normalizedLength = getNormalizedInputText(inputValue).length;
-            expect(normalizedLength).toBeGreaterThan(defaultProps.maxLength);
+                const mockEvent = triggerChange(result, inputValue);
 
-            const { result } = renderHook(() => useInputWithCharacterLimit(defaultProps));
-
-            const mockEvent = {
-                target: { value: inputValue, name: 'testInput', id: 'test-input' },
-            } as React.ChangeEvent<HTMLInputElement>;
-
-            act(() => {
-                result.current.handleChange(mockEvent);
+                expect(mockOnChange).toHaveBeenCalledWith({
+                    ...mockEvent,
+                    target: {
+                        ...mockEvent.target,
+                        value: inputValue,
+                    },
+                });
             });
 
-            expect(mockOnChange).not.toHaveBeenCalled();
-            expect(mockClearWarning).not.toHaveBeenCalled();
-        });
+            it('should clear warning when input becomes valid', () => {
+                const { result } = renderHook(() => useInputWithCharacterLimit(defaultProps));
 
-        it('should show warning when maxLength exceeded and maxLimitWarning is provided', () => {
-            const inputValue = 'this text is too long for the limit';
-            const normalizedLength = getNormalizedInputText(inputValue).length;
-            const warningMessage = 'Character limit exceeded';
+                triggerChange(result, 'valid');
 
-            expect(normalizedLength).toBeGreaterThan(defaultProps.maxLength);
-
-            const { result } = renderHook(() =>
-                useInputWithCharacterLimit({ ...defaultProps, maxLimitWarning: warningMessage }),
-            );
-
-            const mockEvent = {
-                target: { value: inputValue, name: 'testInput', id: 'test-input' },
-            } as React.ChangeEvent<HTMLInputElement>;
-
-            act(() => {
-                result.current.handleChange(mockEvent);
+                expect(mockClearWarning).toHaveBeenCalled();
             });
 
-            expect(mockShowTemporaryWarning).toHaveBeenCalledWith(warningMessage);
-            expect(mockOnChange).not.toHaveBeenCalled();
-        });
+            it('should handle edge case at exact maxLength', () => {
+                const inputValue = 'a'.repeat(defaultProps.maxLength);
+                const { result } = renderHook(() => useInputWithCharacterLimit(defaultProps));
 
-        it('should not show warning when maxLength exceeded but maxLimitWarning is not provided', () => {
-            const inputValue = 'this text exceeds limit';
-            const normalizedLength = getNormalizedInputText(inputValue).length;
+                triggerChange(result, inputValue);
 
-            expect(normalizedLength).toBeGreaterThan(defaultProps.maxLength);
-
-            const { result } = renderHook(() => useInputWithCharacterLimit(defaultProps));
-
-            const mockEvent = {
-                target: { value: inputValue, name: 'testInput', id: 'test-input' },
-            } as React.ChangeEvent<HTMLInputElement>;
-
-            act(() => {
-                result.current.handleChange(mockEvent);
-            });
-
-            expect(mockShowTemporaryWarning).not.toHaveBeenCalled();
-            expect(mockOnChange).not.toHaveBeenCalled();
-        });
-
-        it('should allow input with spaces when normalized length is within limit', () => {
-            const inputValue = '  test  ';
-            const normalizedLength = getNormalizedInputText(inputValue).length;
-
-            expect(normalizedLength).toBeLessThanOrEqual(defaultProps.maxLength);
-
-            const { result } = renderHook(() => useInputWithCharacterLimit(defaultProps));
-
-            const mockEvent = {
-                target: { value: inputValue, name: 'testInput', id: 'test-input' },
-            } as React.ChangeEvent<HTMLInputElement>;
-
-            act(() => {
-                result.current.handleChange(mockEvent);
-            });
-
-            expect(mockOnChange).toHaveBeenCalledWith({
-                ...mockEvent,
-                target: {
-                    ...mockEvent.target,
-                    value: inputValue,
-                },
+                expect(mockOnChange).toHaveBeenCalled();
+                expect(mockShowTemporaryWarning).not.toHaveBeenCalled();
             });
         });
 
-        it('should clear warning when input becomes valid', () => {
-            const inputValue = 'valid';
-            const normalizedLength = getNormalizedInputText(inputValue).length;
+        describe('Invalid input (exceeds limit)', () => {
+            it('should prevent input when normalized length exceeds maxLength', () => {
+                const inputValue = 'this is a very long text that exceeds the limit';
+                const { result } = renderHook(() => useInputWithCharacterLimit(defaultProps));
 
-            expect(normalizedLength).toBeLessThanOrEqual(defaultProps.maxLength);
+                triggerChange(result, inputValue);
 
-            const { result } = renderHook(() => useInputWithCharacterLimit(defaultProps));
-
-            const mockEvent = {
-                target: { value: inputValue, name: 'testInput', id: 'test-input' },
-            } as React.ChangeEvent<HTMLInputElement>;
-
-            act(() => {
-                result.current.handleChange(mockEvent);
+                expect(mockOnChange).not.toHaveBeenCalled();
+                expect(mockClearWarning).not.toHaveBeenCalled();
             });
 
-            expect(mockClearWarning).toHaveBeenCalled();
-        });
+            it('should show warning when maxLength exceeded and maxLimitWarning is provided', () => {
+                const warningMessage = 'Character limit exceeded';
+                const { result } = renderHook(() =>
+                    useInputWithCharacterLimit({ ...defaultProps, maxLimitWarning: warningMessage }),
+                );
 
-        it('should handle edge case at exact maxLength', () => {
-            const inputValue = 'a'.repeat(defaultProps.maxLength);
-            const normalizedLength = getNormalizedInputText(inputValue).length;
+                triggerChange(result, 'this text is too long for the limit');
 
-            expect(normalizedLength).toBe(defaultProps.maxLength);
-
-            const { result } = renderHook(() => useInputWithCharacterLimit(defaultProps));
-
-            const mockEvent = {
-                target: { value: inputValue, name: 'testInput', id: 'test-input' },
-            } as React.ChangeEvent<HTMLInputElement>;
-
-            act(() => {
-                result.current.handleChange(mockEvent);
+                expect(mockShowTemporaryWarning).toHaveBeenCalledWith(warningMessage);
+                expect(mockOnChange).not.toHaveBeenCalled();
             });
 
-            expect(mockOnChange).toHaveBeenCalled();
-            expect(mockShowTemporaryWarning).not.toHaveBeenCalled();
+            it('should not show warning when maxLength exceeded but maxLimitWarning is not provided', () => {
+                const { result } = renderHook(() => useInputWithCharacterLimit(defaultProps));
+
+                triggerChange(result, 'this text exceeds limit');
+
+                expect(mockShowTemporaryWarning).not.toHaveBeenCalled();
+                expect(mockOnChange).not.toHaveBeenCalled();
+            });
         });
     });
 
     describe('handleFocus', () => {
-        it('should set isFocused to true', () => {
-            const { result } = renderHook(() => useInputWithCharacterLimit(defaultProps));
-
-            expect(result.current.isFocused).toBe(false);
-
-            act(() => {
-                result.current.handleFocus({} as React.FocusEvent<HTMLInputElement>);
-            });
-
-            expect(result.current.isFocused).toBe(true);
-        });
-
-        it('should call onFocus callback if provided', () => {
+        it('should set isFocused to true and call onFocus callback if provided', () => {
             const { result } = renderHook(() => useInputWithCharacterLimit({ ...defaultProps, onFocus: mockOnFocus }));
 
             const mockEvent = {} as React.FocusEvent<HTMLInputElement>;
@@ -235,6 +169,7 @@ describe('useInputWithCharacterLimit', () => {
                 result.current.handleFocus(mockEvent);
             });
 
+            expect(result.current.isFocused).toBe(true);
             expect(mockOnFocus).toHaveBeenCalledWith(mockEvent);
         });
 
@@ -250,24 +185,12 @@ describe('useInputWithCharacterLimit', () => {
     });
 
     describe('handleBlur', () => {
-        it('should set isFocused to false', () => {
-            const { result } = renderHook(() => useInputWithCharacterLimit(defaultProps));
+        it('should set isFocused to false and call onBlur callback if provided', () => {
+            const { result } = renderHook(() => useInputWithCharacterLimit({ ...defaultProps, onBlur: mockOnBlur }));
 
             act(() => {
                 result.current.handleFocus({} as React.FocusEvent<HTMLInputElement>);
             });
-
-            expect(result.current.isFocused).toBe(true);
-
-            act(() => {
-                result.current.handleBlur({} as React.FocusEvent<HTMLInputElement>);
-            });
-
-            expect(result.current.isFocused).toBe(false);
-        });
-
-        it('should call onBlur callback if provided', () => {
-            const { result } = renderHook(() => useInputWithCharacterLimit({ ...defaultProps, onBlur: mockOnBlur }));
 
             const mockEvent = {} as React.FocusEvent<HTMLInputElement>;
 
@@ -275,6 +198,7 @@ describe('useInputWithCharacterLimit', () => {
                 result.current.handleBlur(mockEvent);
             });
 
+            expect(result.current.isFocused).toBe(false);
             expect(mockOnBlur).toHaveBeenCalledWith(mockEvent);
         });
     });

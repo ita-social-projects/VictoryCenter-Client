@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 
-export interface UseTemporaryWarningOptions {
+export interface UseTemporaryWarningProps {
     onWarningChange?: (warning: string | null) => void;
     warningDuration?: number;
 }
 
-export const useTemporaryWarning = ({ onWarningChange, warningDuration = 2000 }: UseTemporaryWarningOptions = {}) => {
+export const useTemporaryWarning = ({ onWarningChange, warningDuration = 2000 }: UseTemporaryWarningProps = {}) => {
     const [localWarning, setLocalWarning] = useState<string | null>(null);
     const warningTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 

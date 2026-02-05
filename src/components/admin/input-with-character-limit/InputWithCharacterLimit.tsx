@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import classNames from 'classnames';
 import { ReactComponent as RemoveIcon } from '@/assets/icons/remove-query.svg';
-import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
-import { useTemporaryWarning } from '@/hooks/admin/use-temporary-warning/useTemporaryWarning';
+import { useInputWithCharacterLimit } from '@/hooks/admin/use-input-with-character-limit/useInputWithCharacterLimit';
 import './InputWithCharacterLimit.scss';
 
 export interface InputWithCharacterLimitProps {
@@ -38,55 +37,28 @@ export const InputWithCharacterLimit = ({
     maxLimitWarning,
     onWarningChange,
 }: InputWithCharacterLimitProps) => {
-    const [isFocused, setIsFocused] = useState(false);
-    const { localWarning, showTemporaryWarning, clearWarning } = useTemporaryWarning({
+    const {
+        isFocused,
+        currentLength,
+        localWarning,
+        showClearButton,
+        handleChange,
+        handleFocus,
+        handleBlur,
+        handleClear,
+    } = useInputWithCharacterLimit<HTMLInputElement>({
+        value,
+        maxLength,
+        name,
+        id,
+        disabled,
+        maxLimitWarning,
+        onChange,
+        onFocus,
+        onBlur,
         onWarningChange,
     });
 
-    const currentLength = getNormalizedInputText(value).length;
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        let newValue = e.target.value;
-        const normalized = getNormalizedInputText(newValue);
-
-        if (maxLength && normalized.length > maxLength) {
-            if (maxLimitWarning) {
-                showTemporaryWarning(maxLimitWarning);
-            }
-            newValue = normalized.slice(0, maxLength);
-        } else {
-            clearWarning();
-        }
-
-        const syntheticEvent = {
-            ...e,
-            target: {
-                ...e.target,
-                value: newValue,
-            },
-        };
-        onChange(syntheticEvent);
-    };
-
-    const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-        setIsFocused(true);
-        onFocus?.(e);
-    };
-
-    const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-        setIsFocused(false);
-        onBlur?.(e);
-    };
-
-    const handleClear = () => {
-        clearWarning();
-        const syntheticEvent = {
-            target: { value: '', name, id },
-        } as React.ChangeEvent<HTMLInputElement>;
-        onChange(syntheticEvent);
-    };
-
-    const showClearButton = isFocused && value.length > 0 && !disabled;
     const countId = `${id}-character-count`;
 
     return (

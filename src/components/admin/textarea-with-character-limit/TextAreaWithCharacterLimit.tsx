@@ -1,8 +1,7 @@
-import { forwardRef, useState } from 'react';
+import { forwardRef } from 'react';
 import cn from 'classnames';
 import { ReactComponent as RemoveIcon } from '@/assets/icons/remove-query.svg';
-import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
-import { useTemporaryWarning } from '@/hooks/admin/use-temporary-warning/useTemporaryWarning';
+import { useInputWithCharacterLimit } from '@/hooks/admin/use-input-with-character-limit/useInputWithCharacterLimit';
 import './TextAreaWithCharacterLimit.scss';
 
 export interface TextAreaWithCharacterLimitProps {
@@ -42,53 +41,19 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
         },
         ref,
     ) => {
-        const [isFocused, setIsFocused] = useState(false);
-        const { localWarning, showTemporaryWarning, clearWarning } = useTemporaryWarning({
-            onWarningChange,
-        });
-
-        const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-            let newValue = e.target.value;
-            const normalized = getNormalizedInputText(newValue);
-
-            if (maxLength && normalized.length > maxLength) {
-                if (maxLimitWarning) {
-                    showTemporaryWarning(maxLimitWarning);
-                }
-                newValue = normalized.slice(0, maxLength);
-            } else {
-                clearWarning();
-            }
-
-            const syntheticEvent = {
-                ...e,
-                target: {
-                    ...e.target,
-                    value: newValue,
-                },
-            };
-            onChange(syntheticEvent);
-        };
-
-        const handleFocus = (e: React.FocusEvent<HTMLTextAreaElement>) => {
-            setIsFocused(true);
-            onFocus?.(e);
-        };
-
-        const handleBlur = (e: React.FocusEvent<HTMLTextAreaElement>) => {
-            setIsFocused(false);
-            onBlur?.(e);
-        };
-
-        const handleClear = () => {
-            clearWarning();
-            const syntheticEvent = {
-                target: { value: '', name, id },
-            } as React.ChangeEvent<HTMLTextAreaElement>;
-            onChange(syntheticEvent);
-        };
-
-        const showClearButton = isFocused && value.length > 0 && !disabled;
+        const { isFocused, localWarning, showClearButton, handleChange, handleFocus, handleBlur, handleClear } =
+            useInputWithCharacterLimit<HTMLTextAreaElement>({
+                value,
+                maxLength,
+                name,
+                id,
+                disabled,
+                maxLimitWarning,
+                onChange,
+                onFocus,
+                onBlur,
+                onWarningChange,
+            });
 
         return (
             <div className="char-limit-textarea">

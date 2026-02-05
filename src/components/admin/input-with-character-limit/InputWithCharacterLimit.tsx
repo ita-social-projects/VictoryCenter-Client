@@ -1,5 +1,5 @@
 import React from 'react';
-import classNames from 'classnames';
+import cn from 'classnames';
 import { ReactComponent as RemoveIcon } from '@/assets/icons/remove-query.svg';
 import { useInputWithCharacterLimit } from '@/hooks/admin/use-input-with-character-limit/useInputWithCharacterLimit';
 import './InputWithCharacterLimit.scss';
@@ -63,13 +63,13 @@ export const InputWithCharacterLimit = ({
 
     return (
         <div
-            className={classNames('char-limit-input', {
+            className={cn('char-limit-input', {
                 'char-limit-input--disabled': disabled,
                 'char-limit-input--focused': isFocused && !disabled,
             })}
         >
             <input
-                className={classNames('char-limit-input__field', className)}
+                className={cn('char-limit-input__field', className)}
                 value={value}
                 onChange={handleChange}
                 onFocus={handleFocus}
@@ -84,7 +84,7 @@ export const InputWithCharacterLimit = ({
             />
             <button
                 type="button"
-                className={classNames('char-limit-input__clear-button', {
+                className={cn('char-limit-input__clear-button', {
                     'char-limit-input__clear-button--visible': showClearButton,
                     'char-limit-input__clear-button--error': hasError || !!localWarning,
                 })}

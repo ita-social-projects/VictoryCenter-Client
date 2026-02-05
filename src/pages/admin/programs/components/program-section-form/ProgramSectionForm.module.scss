@@ -1,3 +1,5 @@
+@use '@/assets/sass/variables/colors.scss' as c;
+
 .container {
     background-color: #fff;
     position: relative;
@@ -8,23 +10,81 @@
     }
 }
 
-.hoverButtons {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
+.actions-section{
     display: flex;
-    gap: 0.5rem;
+    justify-content: end;
+    height: 100px;
+    padding: 30px 30px 0 0;
+}
+
+.hoverButtons {
+    display: flex;
+    height: 56px;
+    width: 152px;
+    gap: 16px;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 24px;
+    border-radius: 8px;
+    background-color: c.$light-blue-100;
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.2s ease, visibility 0.2s ease;
-    z-index: 10;
 }
 
-.actionButton {
-    padding: 0.5rem 1rem !important;
-    font-size: 0.875rem !important;
-    min-width: auto !important;
-    width: auto !important;
+.iconButton {
+    width: 24px;
+    height: 24px;
+    border: none;
+    border-radius: 0;
+    background-color: transparent;
+    background-repeat: no-repeat;
+    background-position: center;
+    transition: opacity 0.2s ease;
+    background-size: 24px 24px;
+    cursor: pointer;
+}
+
+.editButton {
+    background-image: url('~@/assets/icons/edit.svg');
+
+    &:hover {
+        background-image: url('~@/assets/icons/edit-pressed.svg');
+        opacity: 0.6;
+    }
+
+    &:active {
+        background-image: url('~@/assets/icons/edit-pressed.svg');
+        opacity: 1;
+    }
+}
+
+.deleteButton {
+    background-image: url('~@/assets/icons/delete.svg');
+
+    &:hover {
+        background-image: url('~@/assets/icons/delete-pressed.svg');
+        opacity: 0.6;
+    }
+
+    &:active {
+        background-image: url('~@/assets/icons/delete-pressed.svg');
+        opacity: 1;
+    }
+}
+
+.changeButton {
+    background-image: url('~@/assets/icons/change.svg');
+
+    &:hover {
+        background-image: url('~@/assets/icons/change-pressed.svg');
+        opacity: 0.6;
+    }
+
+    &:active {
+        background-image: url('~@/assets/icons/change-pressed.svg');
+        opacity: 1;
+    }
 }
 
 .content {
@@ -38,7 +98,7 @@
 }
 
 .template-info {
-    font-size: 1rem;
+    font-size: 10px;
     color: #666;
 
     strong {
@@ -55,7 +115,7 @@
 .actions {
     display: flex;
     justify-content: center;
-    gap: 2rem;
+    gap: 32px;
 
     Button {
         width: 325px;

@@ -282,19 +282,22 @@ export const ProgramSectionForm = ({
 
     return (
         <div className={styles.container}>
-            {sectionMode === ProgramSectionMode.View && (
-                <div className={styles.hoverButtons}>
-                    <Button buttonStyle="secondary" onClick={handleEditClick} className={styles.actionButton}>
-                        Edit
-                    </Button>
-                    <Button buttonStyle="secondary" className={styles.actionButton}>
-                        Delete
-                    </Button>
-                    <Button buttonStyle="secondary" className={styles.actionButton}>
-                        Replace
-                    </Button>
-                </div>
-            )}
+            <div className={styles['actions-section']}>
+                {sectionMode === ProgramSectionMode.View && (
+                    <div className={styles.hoverButtons}>
+                        <button
+                            onClick={handleEditClick}
+                            className={`${styles.iconButton} ${styles.editButton}`}
+                            aria-label="Edit section"
+                        />
+                        <button className={`${styles.iconButton} ${styles.deleteButton}`} aria-label="Delete section" />
+                        <button
+                            className={`${styles.iconButton} ${styles.changeButton}`}
+                            aria-label="Replace section"
+                        />
+                    </div>
+                )}
+            </div>
             <div className={styles.content}>
                 {editableSection || (
                     <p className={styles['template-info']}>

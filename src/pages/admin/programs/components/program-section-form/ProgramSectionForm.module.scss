@@ -4,7 +4,7 @@
     background-color: #fff;
     position: relative;
 
-    &:hover .hoverButtons {
+    &:hover .hover-buttons {
         opacity: 1;
         visibility: visible;
     }
@@ -17,7 +17,7 @@
     padding: 30px 30px 0 0;
 }
 
-.hoverButtons {
+.hover-buttons {
     display: flex;
     height: 56px;
     width: 152px;
@@ -34,7 +34,7 @@
         visibility 0.2s ease;
 }
 
-.iconButton {
+.icon-button {
     width: 24px;
     height: 24px;
     border: none;
@@ -47,45 +47,42 @@
     cursor: pointer;
 }
 
-.editButton {
+.edit-button {
     background-image: url('~@/assets/icons/edit.svg');
 
-    &:hover {
-        background-image: url('~@/assets/icons/edit-pressed.svg');
-        opacity: 0.6;
-    }
-
+    &:hover,
     &:active {
         background-image: url('~@/assets/icons/edit-pressed.svg');
-        opacity: 1;
+    }
+
+    &:hover {
+        opacity: 0.6;
     }
 }
 
-.deleteButton {
+.delete-button {
     background-image: url('~@/assets/icons/delete.svg');
 
-    &:hover {
-        background-image: url('~@/assets/icons/delete-pressed.svg');
-        opacity: 0.6;
-    }
-
+    &:hover,
     &:active {
         background-image: url('~@/assets/icons/delete-pressed.svg');
-        opacity: 1;
+    }
+
+    &:hover {
+        opacity: 0.6;
     }
 }
 
-.changeButton {
+.change-button {
     background-image: url('~@/assets/icons/change.svg');
 
-    &:hover {
-        background-image: url('~@/assets/icons/change-pressed.svg');
-        opacity: 0.6;
-    }
-
+    &:hover,
     &:active {
         background-image: url('~@/assets/icons/change-pressed.svg');
-        opacity: 1;
+    }
+
+    &:hover {
+        opacity: 0.6;
     }
 }
 
@@ -109,7 +106,7 @@
     }
 }
 
-.actionsContainer {
+.actions-container {
     background-color: #fff;
     min-height: 100px;
 }

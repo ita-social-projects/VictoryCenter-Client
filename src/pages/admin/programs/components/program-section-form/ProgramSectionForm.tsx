@@ -284,15 +284,18 @@ export const ProgramSectionForm = ({
         <div className={styles.container}>
             <div className={styles['actions-section']}>
                 {sectionMode === ProgramSectionMode.View && (
-                    <div className={styles.hoverButtons}>
+                    <div className={styles['hover-buttons']}>
                         <button
                             onClick={handleEditClick}
-                            className={`${styles.iconButton} ${styles.editButton}`}
+                            className={`${styles['icon-button']} ${styles['edit-button']}`}
                             aria-label="Edit section"
                         />
-                        <button className={`${styles.iconButton} ${styles.deleteButton}`} aria-label="Delete section" />
                         <button
-                            className={`${styles.iconButton} ${styles.changeButton}`}
+                            className={`${styles['icon-button']} ${styles['delete-button']}`}
+                            aria-label="Delete section"
+                        />
+                        <button
+                            className={`${styles['icon-button']} ${styles['change-button']}`}
                             aria-label="Replace section"
                         />
                     </div>
@@ -305,7 +308,7 @@ export const ProgramSectionForm = ({
                     </p>
                 )}
             </div>
-            <div className={styles.actionsContainer}>
+            <div className={styles['actions-container']}>
                 {sectionMode !== ProgramSectionMode.View && (
                     <div className={styles.actions}>
                         <Button buttonStyle="secondary" onClick={handleCancelClick} disabled={isDisabled}>

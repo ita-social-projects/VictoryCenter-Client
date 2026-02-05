@@ -5,7 +5,7 @@ import '@testing-library/jest-dom';
 import { ProgramSectionForm } from './ProgramSectionForm';
 import type { ProgramSectionFormProps } from './ProgramSectionForm';
 import type { ProgramSection } from '@/types/common/program-sections';
-import { ProgramSectionTemplate } from '@/types/common/program-sections';
+import { ProgramSectionTemplate, ProgramSectionMode } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { renderProgramSection } from '@/utils/functions/render-program-section';
@@ -154,7 +154,7 @@ describe('ProgramSectionForm', () => {
         const callPayload = renderProgramSectionMock.mock.calls[0][0];
 
         expect(callPayload.templateId).toBe(section.template);
-        expect(callPayload.isEditable).toBe(true);
+        expect(callPayload.mode).toBe(ProgramSectionMode.Edit);
 
         expect(callPayload.data).toEqual({
             title: '',

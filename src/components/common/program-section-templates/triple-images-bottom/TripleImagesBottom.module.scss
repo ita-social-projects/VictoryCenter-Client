@@ -22,9 +22,9 @@ $img-number: 3;
 }
 
 .image {
-    aspect-ratio: #{$img-width} / #{$img-height};
+    aspect-ratio: 480 / 480;
 }
 
-.editable {
+.form-container {
     gap: 32px;
 }

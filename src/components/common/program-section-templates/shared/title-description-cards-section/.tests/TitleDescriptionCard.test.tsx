@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { TitleDescriptionCard } from '../TitleDescriptionCard';
 import { TitleDescriptionCardData } from '../TitleDescriptionCardsSection';
+import { ProgramSectionMode } from '../../../../../../types/common/program-sections';
 import * as textFormatters from '../../../../../../utils/functions/formatters/text-formatters';
 import * as useCardValidationModule from '../../../../../../hooks/admin/use-section-card-validation/useCardValidation';
 
@@ -63,14 +64,14 @@ describe('TitleDescriptionCard', () => {
 
     describe('editable mode', () => {
         it('should render input fields in editable mode', () => {
-            render(<TitleDescriptionCard card={mockCard} index={0} isEditable={true} />);
+            render(<TitleDescriptionCard card={mockCard} index={0} mode={ProgramSectionMode.Edit} />);
 
             expect(screen.getByTestId('input-with-limit')).toBeInTheDocument();
             expect(screen.getByTestId('card-description-field')).toBeInTheDocument();
         });
 
         it('should display title and description values in inputs', () => {
-            render(<TitleDescriptionCard card={mockCard} index={0} isEditable={true} />);
+            render(<TitleDescriptionCard card={mockCard} index={0} mode={ProgramSectionMode.Edit} />);
 
             expect((screen.getByTestId('input-card-title-0') as HTMLInputElement).value).toBe('Test Title');
             expect((screen.getByTestId('textarea-card-description-0') as HTMLTextAreaElement).value).toBe(
@@ -85,7 +86,7 @@ describe('TitleDescriptionCard', () => {
                 handleBlur: jest.fn(),
             }));
 
-            render(<TitleDescriptionCard card={mockCard} index={0} isEditable={true} />);
+            render(<TitleDescriptionCard card={mockCard} index={0} mode={ProgramSectionMode.Edit} />);
 
             expect(screen.getByText('Title is required')).toBeInTheDocument();
         });
@@ -93,21 +94,25 @@ describe('TitleDescriptionCard', () => {
 
     describe('read-only mode', () => {
         it('should not render input fields in read-only mode', () => {
-            render(<TitleDescriptionCard card={mockCard} index={0} isEditable={false} />);
+            render(<TitleDescriptionCard card={mockCard} index={0} mode={ProgramSectionMode.Published} />);
 
             expect(screen.queryByTestId('input-with-limit')).not.toBeInTheDocument();
             expect(screen.queryByTestId('card-description-field')).not.toBeInTheDocument();
         });
 
         it('should display title as heading', () => {
-            render(<TitleDescriptionCard card={mockCard} index={0} isEditable={false} />);
+            render(<TitleDescriptionCard card={mockCard} index={0} mode={ProgramSectionMode.Published} />);
 
             expect(screen.getByText('Test Title')).toBeInTheDocument();
         });
 
         it('should display default title when empty', () => {
             render(
-                <TitleDescriptionCard card={{ title: '', description: 'Description' }} index={0} isEditable={false} />,
+                <TitleDescriptionCard
+                    card={{ title: '', description: 'Description' }}
+                    index={0}
+                    mode={ProgramSectionMode.Published}
+                />,
             );
 
             expect(screen.getByText('Заголовок')).toBeInTheDocument();
@@ -119,7 +124,7 @@ describe('TitleDescriptionCard', () => {
                 items: [],
             });
 
-            render(<TitleDescriptionCard card={mockCard} index={0} isEditable={false} />);
+            render(<TitleDescriptionCard card={mockCard} index={0} mode={ProgramSectionMode.Published} />);
 
             expect(screen.getByText('Intro text')).toBeInTheDocument();
         });
@@ -130,7 +135,7 @@ describe('TitleDescriptionCard', () => {
                 items: ['Item 1', 'Item 2'],
             });
 
-            render(<TitleDescriptionCard card={mockCard} index={0} isEditable={false} />);
+            render(<TitleDescriptionCard card={mockCard} index={0} mode={ProgramSectionMode.Published} />);
 
             expect(screen.getByText('Item 1')).toBeInTheDocument();
             expect(screen.getByText('Item 2')).toBeInTheDocument();
@@ -142,7 +147,7 @@ describe('TitleDescriptionCard', () => {
                 items: [],
             });
 
-            render(<TitleDescriptionCard card={mockCard} index={0} isEditable={false} />);
+            render(<TitleDescriptionCard card={mockCard} index={0} mode={ProgramSectionMode.Published} />);
 
             expect(screen.getByText('Опис секції')).toBeInTheDocument();
         });
@@ -158,7 +163,7 @@ describe('TitleDescriptionCard', () => {
                 handleBlur: jest.fn(),
             }));
 
-            render(<TitleDescriptionCard card={mockCard} index={0} isEditable={true} />);
+            render(<TitleDescriptionCard card={mockCard} index={0} mode={ProgramSectionMode.Edit} />);
 
             const titleInput = screen.getByTestId('input-card-title-0');
             await userEvent.type(titleInput, 'New');
@@ -181,7 +186,7 @@ describe('TitleDescriptionCard', () => {
                     handleBlur: jest.fn(),
                 }));
 
-            render(<TitleDescriptionCard card={mockCard} index={0} isEditable={true} />);
+            render(<TitleDescriptionCard card={mockCard} index={0} mode={ProgramSectionMode.Edit} />);
 
             const descriptionInput = screen.getByTestId('textarea-card-description-0');
             await userEvent.type(descriptionInput, 'New');
@@ -199,7 +204,12 @@ describe('TitleDescriptionCard', () => {
             }));
 
             render(
-                <TitleDescriptionCard card={mockCard} index={5} isEditable={true} onTitleChange={onTitleChangeMock} />,
+                <TitleDescriptionCard
+                    card={mockCard}
+                    index={5}
+                    mode={ProgramSectionMode.Edit}
+                    onTitleChange={onTitleChangeMock}
+                />,
             );
 
             const titleInput = screen.getByTestId('input-card-title-5');
@@ -223,7 +233,7 @@ describe('TitleDescriptionCard', () => {
                 <TitleDescriptionCard
                     card={mockCard}
                     index={0}
-                    isEditable={true}
+                    mode={ProgramSectionMode.Edit}
                     onDescriptionChange={onDescriptionChangeMock}
                 />,
             );

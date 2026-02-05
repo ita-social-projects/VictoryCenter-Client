@@ -2,19 +2,21 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import { LinearProgress } from '@mui/material';
 import styles from './DetailedProgramPageContent.module.scss';
+import { NotFound } from '@/pages/public/not-found-page/NotFound';
 import { BackgroundMedia } from '@/components/public/background-media/BackgroundMedia';
 import { ReactComponent as MapPin } from '@/assets/icons/map-pin.svg';
 import { ReactComponent as UsersRound } from '@/assets/icons/users-round.svg';
 import { ReactComponent as CalendarDays } from '@/assets/icons/calendar-days.svg';
 import { useProgramBySlug } from '@/hooks/common/use-get-program-by-slug/useGetProgramBySlug';
 import { InfoItem } from '../info-item/InfoItem';
+import { DetailedProgramSection } from '@/components/public/detailed-program-section/DetailedProgramSection';
 
 export const DetailedProgramPageContent: React.FC = () => {
     const { slug } = useParams<{ slug: string }>();
 
     const { program, isLoading, error } = useProgramBySlug(slug);
 
-    if (isLoading) {
+    if (isLoading || (!program && !error)) {
         return (
             <div className={styles['detailed-program-page-content']}>
                 <LinearProgress />
@@ -23,21 +25,20 @@ export const DetailedProgramPageContent: React.FC = () => {
     }
 
     if (error || !program) {
-        return (
-            <div className={styles['detailed-program-page-content']}>
-                <div className={styles['error-message']} role="alert">
-                    Failed to load program details
-                </div>
-            </div>
-        );
+        return <NotFound />;
     }
+
+    const hasSections = program.sections && program.sections.length > 0;
 
     return (
         <div className={styles['detailed-program-page-content']}>
             <div className={styles['background-section']}>
                 {program.backgroundImage && (
                     <div className={styles['background-media-wrapper']}>
-                        <BackgroundMedia mediaUrl={program.backgroundImage.url} />
+                        <BackgroundMedia
+                            mediaUrl={program.backgroundImage.url}
+                            className={styles['background-gradient']}
+                        />
                         <div className={styles['content-container']}>
                             <div className={styles['left-section']}>
                                 <div>
@@ -64,6 +65,13 @@ export const DetailedProgramPageContent: React.FC = () => {
                     </div>
                 )}
             </div>
+            {hasSections && (
+                <div className={styles['sections-list']}>
+                    {program.sections.map((section, index) => (
+                        <DetailedProgramSection key={section.id ?? `${section.template}-${index}`} section={section} />
+                    ))}
+                </div>
+            )}
         </div>
     );
 };

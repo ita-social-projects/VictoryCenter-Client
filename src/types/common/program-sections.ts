@@ -23,6 +23,13 @@ export enum ProgramSectionTemplate {
     SingleTitleQuintupleDescription = 11,
 }
 
+export enum ProgramSectionMode {
+    Template = 'template',
+    View = 'view',
+    Edit = 'edit',
+    Published = 'published',
+}
+
 export interface ProgramSectionContent {
     id?: number;
     sectionId?: number;

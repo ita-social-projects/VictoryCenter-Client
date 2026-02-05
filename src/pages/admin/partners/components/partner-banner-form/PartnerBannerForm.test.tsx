@@ -659,8 +659,6 @@ describe('PartnerBanner', () => {
 
         render(<PartnerBanner />);
 
-        const descriptionInput = getDescriptionInput();
-
         changeDescriptionValue('');
 
         await waitFor(() => {

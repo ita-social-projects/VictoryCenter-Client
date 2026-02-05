@@ -1,5 +1,6 @@
 import cn from 'classnames';
 import { TitleDescriptionCard } from './TitleDescriptionCard';
+import { ProgramSectionMode } from '@/types/common/program-sections';
 import styles from './TitleDescriptionCardsSection.module.scss';
 
 export interface TitleDescriptionCardData {
@@ -10,7 +11,7 @@ export interface TitleDescriptionCardData {
 interface Props {
     cards: TitleDescriptionCardData[];
     cardsCount: number;
-    isEditable?: boolean;
+    mode?: ProgramSectionMode;
     onTitleChange?: (index: number, value: string) => void;
     onDescriptionChange?: (index: number, value: string) => void;
 }
@@ -18,7 +19,7 @@ interface Props {
 export const TitleDescriptionCardsSection = ({
     cards,
     cardsCount,
-    isEditable = false,
+    mode = ProgramSectionMode.Published,
     onTitleChange,
     onDescriptionChange,
 }: Props) => {
@@ -32,7 +33,7 @@ export const TitleDescriptionCardsSection = ({
                 [styles['td-cards--dual']]: cardsCount === 2,
                 [styles['td-cards--triple']]: cardsCount === 3,
                 [styles['td-cards--quad']]: cardsCount === 4,
-                [styles['td-cards--editable']]: isEditable,
+                [styles['td-cards--editable']]: mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View,
             })}
         >
             {normalizedCards.map((card, index) => (
@@ -40,7 +41,7 @@ export const TitleDescriptionCardsSection = ({
                     key={index}
                     card={card}
                     index={index}
-                    isEditable={isEditable}
+                    mode={mode}
                     onTitleChange={onTitleChange}
                     onDescriptionChange={onDescriptionChange}
                 />

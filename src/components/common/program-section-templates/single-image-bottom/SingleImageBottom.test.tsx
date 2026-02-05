@@ -1,7 +1,7 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { SingleImageBottom, SingleImageBottomProps } from './SingleImageBottom';
 import { PROGRAM_SECTION_IMAGE_CONFIGS } from '@/const/admin/programs';
+import { ProgramSectionMode } from '@/types/common/program-sections';
 
 const mockTitleDescriptionSection = jest.fn();
 const mockPhotoInputGroup = jest.fn();
@@ -31,16 +31,16 @@ describe('SingleImageBottom', () => {
         mockPhotoInputGroup.mockClear();
     });
 
-    it('renders non-editable layout: shows image and passes isTemplate to TitleDescriptionSection', () => {
-        renderSingleImageBottom({
+    it('renders non-editable layout: shows image and passes mode to TitleDescriptionSection', () => {
+        const { container } = renderSingleImageBottom({
             title: 'T',
             description: 'D',
             image: { id: 1, url: 'test-image.jpg', mimeType: 'image/jpeg' },
-            isTemplate: true,
-            isEditable: false,
+            mode: ProgramSectionMode.Template,
         });
 
-        const img = screen.getByRole('img', { name: /img1-of-single-image-bottom/i });
+        const img = container.querySelector('img');
+        expect(img).toBeInTheDocument();
         expect(img).toHaveAttribute('src', expect.stringContaining('test-image.jpg'));
         expect(screen.getByTestId('title-description-section')).toBeInTheDocument();
         expect(mockPhotoInputGroup).not.toHaveBeenCalled();
@@ -49,7 +49,7 @@ describe('SingleImageBottom', () => {
             expect.objectContaining({
                 title: 'T',
                 description: 'D',
-                isTemplate: true,
+                mode: ProgramSectionMode.Template,
                 className: 'top-section',
             }),
         );
@@ -60,11 +60,11 @@ describe('SingleImageBottom', () => {
         const onDescriptionChange = jest.fn();
         const onImageChange = jest.fn();
 
-        renderSingleImageBottom({
+        const { container } = renderSingleImageBottom({
             title: 'T',
             description: 'D',
             image: { base64: 'base64-data', mimeType: 'image/jpeg' },
-            isEditable: true,
+            mode: ProgramSectionMode.Edit,
             onTitleChange,
             onDescriptionChange,
             onImageChange,
@@ -72,13 +72,13 @@ describe('SingleImageBottom', () => {
 
         expect(screen.getByTestId('title-description-section')).toBeInTheDocument();
         expect(screen.getByTestId('photo-input-group')).toBeInTheDocument();
-        expect(screen.queryByRole('img', { name: /img1-of-single-image-bottom/i })).not.toBeInTheDocument();
+        expect(container.querySelector('img')).not.toBeInTheDocument();
 
         expect(getLastCallProps(mockTitleDescriptionSection)).toEqual(
             expect.objectContaining({
                 title: 'T',
                 description: 'D',
-                isEditable: true,
+                mode: ProgramSectionMode.Edit,
                 onTitleChange,
                 onDescriptionChange,
                 className: 'top-section',
@@ -106,7 +106,7 @@ describe('SingleImageBottom', () => {
     it('uses null value for PhotoInputGroup when image is empty (editable branch)', () => {
         renderSingleImageBottom({
             image: null,
-            isEditable: true,
+            mode: ProgramSectionMode.Edit,
         });
 
         const photoProps = getLastCallProps(mockPhotoInputGroup);
@@ -115,7 +115,7 @@ describe('SingleImageBottom', () => {
 
     it('uses a fallback onChange when onImageChange is not provided', () => {
         renderSingleImageBottom({
-            isEditable: true,
+            mode: ProgramSectionMode.Edit,
         });
 
         const photoProps = getLastCallProps(mockPhotoInputGroup);
@@ -123,14 +123,14 @@ describe('SingleImageBottom', () => {
         expect(() => photoProps.onChange(null)).not.toThrow();
     });
 
-    it('applies template/editable CSS module class toggles on the container', () => {
-        const { container, rerender } = renderSingleImageBottom({ isTemplate: true, isEditable: false });
+    it('applies template/form-container CSS module class toggles on the container', () => {
+        const { container, rerender } = renderSingleImageBottom({ mode: ProgramSectionMode.Template });
         expect(container.firstChild).toHaveClass('container');
         expect(container.firstChild).toHaveClass('template');
-        expect(container.firstChild).not.toHaveClass('editable');
+        expect(container.firstChild).not.toHaveClass('form-container');
 
-        rerender(<SingleImageBottom isTemplate={false} isEditable={true} />);
-        expect(container.firstChild).toHaveClass('editable');
+        rerender(<SingleImageBottom mode={ProgramSectionMode.Edit} />);
+        expect(container.firstChild).toHaveClass('form-container');
         expect(container.firstChild).not.toHaveClass('template');
     });
 });

@@ -5,7 +5,7 @@ import '@testing-library/jest-dom';
 import { AddSectionModal } from './AddSectionModal';
 import type { AddSectionModalProps } from './AddSectionModal';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
-import { ProgramSectionTemplate } from '@/types/common/program-sections';
+import { ProgramSectionTemplate, ProgramSectionMode } from '@/types/common/program-sections';
 import type { ButtonProps } from '@/components/admin/button/Button';
 import type { ModalProps } from '@/components/common/modal/Modal';
 
@@ -218,11 +218,11 @@ describe('AddSectionModal', () => {
         expect(mockOnSelectTemplate).toHaveBeenCalledWith(mockSwiperItems[0]);
     });
 
-    it('calls renderProgramSection and always uses isTemplate=true', () => {
+    it('calls renderProgramSection and always uses mode=Template', () => {
         renderModal();
 
         expect(mockRenderProgramSection).toHaveBeenCalled();
-        expect(mockRenderProgramSection.mock.calls.every((c) => c[0]?.isTemplate === true)).toBe(true);
+        expect(mockRenderProgramSection.mock.calls.every((c) => c[0]?.mode === ProgramSectionMode.Template)).toBe(true);
     });
 
     it('passes sample title/description into non-card templates', () => {

@@ -1,5 +1,5 @@
 import { memo, ReactNode } from 'react';
-import classNames from 'classnames';
+import cn from 'classnames';
 import './CategoryButton.scss';
 
 export interface CategoryButtonProps<T> {
@@ -29,7 +29,7 @@ function CategoryButtonInner<T>({
             <button
                 type="button"
                 onClick={() => onSelect(category)}
-                className={classNames('category-bar-button', {
+                className={cn('category-bar-button', {
                     'category-bar-button-selected': isSelected,
                 })}
             >

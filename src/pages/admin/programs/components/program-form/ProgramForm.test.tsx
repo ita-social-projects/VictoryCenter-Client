@@ -24,6 +24,7 @@ jest.mock('@/validation/admin/program-schema/program-schema', () => ({
         validateMeetingCount: jest.fn(),
         validateSections: jest.fn(),
     },
+    isProgramSectionValid: jest.fn(() => true),
 }));
 
 jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
@@ -132,7 +133,18 @@ jest.mock('../program-section-form/ProgramSectionForm', () => ({
             <button type="button" data-testid={`save-section-${section.id ?? section.template}`} onClick={onSave}>
                 Save
             </button>
-            <button type="button" data-testid={`cancel-section-${section.id ?? section.template}`} onClick={onCancel}>
+            <button
+                type="button"
+                data-testid={`cancel-section-${section.id ?? section.template}`}
+                onClick={() =>
+                    onCancel({
+                        isDirty: true,
+                        shouldRemove: false,
+                        revertTo: section,
+                        onAfterDiscard: jest.fn(),
+                    })
+                }
+            >
                 Cancel
             </button>
         </div>
@@ -541,7 +553,7 @@ describe('ProgramForm', () => {
             });
 
             fireEvent.click(screen.getByTestId('cancel-section-101'));
-            expect(onRequestCancelSection).toHaveBeenCalledWith(0);
+            expect(onRequestCancelSection).toHaveBeenCalledWith(expect.any(Function));
         });
 
         it('does not throw if onRequestCancelSection is not provided', async () => {
@@ -564,7 +576,11 @@ describe('ProgramForm', () => {
                 expect(screen.getAllByTestId('program-section-form')).toHaveLength(1);
             });
 
-            expect(() => fireEvent.click(screen.getByTestId('cancel-section-101'))).not.toThrow();
+            fireEvent.click(screen.getByTestId('cancel-section-101'));
+
+            await waitFor(() => {
+                expect(screen.getAllByTestId('program-section-form')).toHaveLength(1);
+            });
         });
 
         it('wires ProgramSectionForm isDisabled based on isFormDisabled', async () => {

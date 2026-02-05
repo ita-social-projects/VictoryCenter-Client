@@ -114,24 +114,24 @@ describe('ProgramSectionForm', () => {
     });
 
     it('calls onCancel when cancel button is clicked', () => {
-        renderForm();
+        renderForm({ isNewSection: true });
         fireEvent.click(screen.getByText(PROGRAMS_TEXT.BUTTON.CANCEL));
         expect(baseProps.onCancel).toHaveBeenCalledTimes(1);
     });
 
-    it('save button is always disabled', () => {
-        renderForm();
+    it('save button is disabled when isSectionValid is false', () => {
+        renderForm({ isNewSection: true, isSectionValid: false });
         expect(screen.getByText(PROGRAMS_TEXT.BUTTON.SAVE)).toBeDisabled();
     });
 
     it('cancel button is disabled when isDisabled is true', () => {
-        renderForm({ isDisabled: true });
+        renderForm({ isDisabled: true, isNewSection: true });
         expect(screen.getByText(PROGRAMS_TEXT.BUTTON.CANCEL)).toBeDisabled();
     });
 
     it('defaults isDisabled to false when omitted', () => {
         const { isDisabled: _omit, ...propsWithoutIsDisabled } = baseProps;
-        render(<ProgramSectionForm {...propsWithoutIsDisabled} />);
+        render(<ProgramSectionForm {...propsWithoutIsDisabled} isNewSection={true} />);
         expect(screen.getByText(PROGRAMS_TEXT.BUTTON.CANCEL)).not.toBeDisabled();
     });
 
@@ -154,7 +154,7 @@ describe('ProgramSectionForm', () => {
         const callPayload = renderProgramSectionMock.mock.calls[0][0];
 
         expect(callPayload.templateId).toBe(section.template);
-        expect(callPayload.mode).toBe(ProgramSectionMode.Edit);
+        expect(callPayload.mode).toBe(ProgramSectionMode.View);
 
         expect(callPayload.data).toEqual({
             title: '',
@@ -284,5 +284,63 @@ describe('ProgramSectionForm', () => {
         });
 
         expect(onSectionChange).not.toHaveBeenCalled();
+    });
+
+    it('starts in View mode for saved sections and shows Edit/Delete/Replace buttons', () => {
+        renderForm({ isNewSection: false });
+
+        expect(screen.queryByText(PROGRAMS_TEXT.BUTTON.SAVE)).not.toBeInTheDocument();
+        expect(screen.queryByText(PROGRAMS_TEXT.BUTTON.CANCEL)).not.toBeInTheDocument();
+        expect(screen.getByLabelText('Edit section')).toBeInTheDocument();
+        expect(screen.getByLabelText('Delete section')).toBeInTheDocument();
+        expect(screen.getByLabelText('Replace section')).toBeInTheDocument();
+    });
+
+    it('starts in Edit mode for new sections and shows Save/Cancel buttons', () => {
+        renderForm({ isNewSection: true });
+
+        expect(screen.getByText(PROGRAMS_TEXT.BUTTON.SAVE)).toBeInTheDocument();
+        expect(screen.getByText(PROGRAMS_TEXT.BUTTON.CANCEL)).toBeInTheDocument();
+        expect(screen.queryByLabelText('Edit section')).not.toBeInTheDocument();
+    });
+
+    it('transitions from View to Edit mode when Edit button is clicked', () => {
+        renderForm({ isNewSection: false });
+
+        expect(screen.queryByText(PROGRAMS_TEXT.BUTTON.SAVE)).not.toBeInTheDocument();
+
+        fireEvent.click(screen.getByLabelText('Edit section'));
+
+        expect(screen.getByText(PROGRAMS_TEXT.BUTTON.SAVE)).toBeInTheDocument();
+        expect(screen.getByText(PROGRAMS_TEXT.BUTTON.CANCEL)).toBeInTheDocument();
+    });
+
+    it('calls onEditStateChange when transitioning to Edit mode', () => {
+        const onEditStateChange = jest.fn();
+        renderForm({ isNewSection: false, onEditStateChange });
+
+        expect(onEditStateChange).toHaveBeenCalledWith(false);
+
+        fireEvent.click(screen.getByLabelText('Edit section'));
+
+        expect(onEditStateChange).toHaveBeenCalledWith(true);
+    });
+
+    it('calls onSave and transitions back to View mode when Save button is clicked', () => {
+        renderForm({ isNewSection: true, isSectionValid: true });
+
+        fireEvent.click(screen.getByText(PROGRAMS_TEXT.BUTTON.SAVE));
+
+        expect(baseProps.onSave).toHaveBeenCalledTimes(1);
+        expect(screen.queryByText(PROGRAMS_TEXT.BUTTON.SAVE)).not.toBeInTheDocument();
+        expect(screen.getByLabelText('Edit section')).toBeInTheDocument();
+    });
+
+    it('does not call onSave when Save button is clicked but section is invalid', () => {
+        renderForm({ isNewSection: true, isSectionValid: false });
+
+        fireEvent.click(screen.getByText(PROGRAMS_TEXT.BUTTON.SAVE));
+
+        expect(baseProps.onSave).not.toHaveBeenCalled();
     });
 });

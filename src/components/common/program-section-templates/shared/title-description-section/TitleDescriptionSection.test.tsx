@@ -234,7 +234,7 @@ describe('TitleDescriptionSection', () => {
             expect(inputGroup).toBeInTheDocument();
 
             const titleInput = getTitleInput();
-            expect(titleInput).toHaveAttribute('id', expect.stringMatching(/.*-section-title/));
+            expect(titleInput).toHaveAttribute('id', expect.stringMatching(/^.+-section-title$/));
             expect(titleInput).toHaveAttribute('maxLength', '60');
             expect(titleInput).toHaveAttribute('placeholder', PROGRAMS_TEXT.SECTION.FORM.TITLE.PLACEHOLDER);
         });
@@ -249,7 +249,7 @@ describe('TitleDescriptionSection', () => {
             expect(textareaGroup).toBeInTheDocument();
 
             const descriptionTextarea = getDescriptionTextarea();
-            expect(descriptionTextarea).toHaveAttribute('id', expect.stringMatching(/.*-section-description/));
+            expect(descriptionTextarea).toHaveAttribute('id', expect.stringMatching(/^.+-section-description$/));
             expect(descriptionTextarea).toHaveAttribute('maxLength', '600');
             expect(descriptionTextarea).toHaveAttribute('rows', '10');
         });

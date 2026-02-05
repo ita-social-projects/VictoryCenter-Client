@@ -211,7 +211,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
                         onLanguageChange={handleLanguageChange}
                         onAddSection={openModalActions.openAddSectionModal}
                         onRequestCancelSection={handleRequestCancelSection}
-                        isEditMode={isEditMode}
+                        //isEditMode={isEditMode}
                     />
                 )}
             />

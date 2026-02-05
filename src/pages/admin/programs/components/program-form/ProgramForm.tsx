@@ -64,7 +64,7 @@ export interface ProgramFormProps {
     selectedLanguage?: string;
     onLanguageChange?: (language: string) => void;
     onRequestCancelSection?: (onConfirmDiscard: (() => void) | number) => void;
-    isEditMode?: boolean;
+    //isEditMode?: boolean;
 }
 
 const validateForm = (formState: ProgramFormValues, isPublishing: boolean): ProgramFormErrors => {

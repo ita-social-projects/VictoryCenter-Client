@@ -15,27 +15,18 @@ describe('TextAreaWithCharacterLimit', () => {
         jest.clearAllMocks();
     });
 
-    // Render helpers
     const renderTextAreaWithCharacterLimit = (overrideProps: Partial<TextAreaWithCharacterLimitProps> = {}) =>
         render(<TextAreaWithCharacterLimit {...defaultProps} {...overrideProps} />);
 
-    // Element getters
     const getTextArea = () => screen.getByRole('textbox') as HTMLTextAreaElement;
     const getWrapper = () => getTextArea().parentElement!;
 
-    // Action helpers
     const focusTextArea = () => fireEvent.focus(getTextArea());
     const blurTextArea = () => fireEvent.blur(getTextArea());
     const typeInTextArea = (value: string) => fireEvent.change(getTextArea(), { target: { value } });
 
-    // Assertion helpers
     const expectWrapperToHaveClass = (className: string) => expect(getWrapper().className).toContain(className);
     const expectWrapperNotToHaveClass = (className: string) => expect(getWrapper().className).not.toContain(className);
-
-    // Specific class assertion helpers
-    const expectWrapperToBeDisabled = () => expectWrapperToHaveClass('char-limit-textarea__wrapper--disabled');
-    const expectWrapperToBeFocused = () => expectWrapperToHaveClass('char-limit-textarea__wrapper--focused');
-    const expectWrapperNotToBeFocused = () => expectWrapperNotToHaveClass('char-limit-textarea__wrapper--focused');
 
     it('renders textarea with initial value', () => {
         renderTextAreaWithCharacterLimit({ value: 'test' });
@@ -43,6 +34,14 @@ describe('TextAreaWithCharacterLimit', () => {
         const textarea = getTextArea();
         expect(textarea).toBeInTheDocument();
         expect(textarea.value).toBe('test');
+    });
+
+    it('renders with disabled prop', () => {
+        renderTextAreaWithCharacterLimit({ disabled: true });
+
+        const textarea = getTextArea();
+        expect(textarea.disabled).toBe(true);
+        expectWrapperToHaveClass('char-limit-textarea__wrapper--disabled');
     });
 
     it('calls onChange when typing', () => {
@@ -67,21 +66,12 @@ describe('TextAreaWithCharacterLimit', () => {
     it('adds focused class on focus and removes on blur', () => {
         renderTextAreaWithCharacterLimit();
 
-        expectWrapperNotToBeFocused();
+        expectWrapperNotToHaveClass('char-limit-textarea__wrapper--focused');
 
         focusTextArea();
-        expectWrapperToBeFocused();
+        expectWrapperToHaveClass('char-limit-textarea__wrapper--focused');
 
         blurTextArea();
-        expectWrapperNotToBeFocused();
-    });
-
-    it('renders with disabled prop', () => {
-        renderTextAreaWithCharacterLimit({ disabled: true });
-
-        const textarea = getTextArea();
-        expect(textarea.disabled).toBe(true);
-
-        expectWrapperToBeDisabled();
+        expectWrapperNotToHaveClass('char-limit-textarea__wrapper--focused');
     });
 });

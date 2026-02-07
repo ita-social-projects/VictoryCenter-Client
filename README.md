@@ -387,6 +387,56 @@ REACT_APP_PROXY_TARGET=https://backend.historycode.online/api
 REACT_APP_BACKEND_URL=/api
 ```
 
+## AI Assistant Setup
+
+This project includes configurations for **Claude Code** and **GitHub Copilot** to enhance your development experience with AI-powered assistance.
+
+### Quick Start
+
+#### For Claude Code
+```bash
+# Add GitHub MCP integration
+claude mcp add github --scope user
+
+# Authenticate
+# Run /mcp in Claude Code and authenticate with GitHub
+```
+
+#### For GitHub Copilot
+No setup needed! Use `@github` in Copilot Chat for repository operations:
+```
+@github list recent pull requests
+@github create an issue titled "Bug fix"
+```
+
+### Available AI Features
+
+- **Agent Skills**: Custom skills for Victory Center project
+  - `/victory-center-docs` - Search project documentation
+  - `/victory-center-structure` - Navigate codebase
+  - `/victory-center-api` - API endpoints help
+  - `/victory-center-components` - Component patterns
+  - `/victory-center-forms` - Forms & validation
+
+- **MCP Integration**: Connect to GitHub for repository operations
+  - Create/manage issues and pull requests
+  - Search code across repository
+  - View file contents and commits
+  - Manage repository settings
+
+### Documentation
+
+- **[CLAUDE.md](CLAUDE.md)** - Concise project overview for AI assistants
+- **[AGENTS.md](AGENTS.md)** - Detailed coding guidelines for AI agents
+- **[MCP_SETUP.md](MCP_SETUP.md)** - Complete MCP setup guide
+- **[.claude/skills/](.claude/skills/)** - Claude Code Agent Skills
+- **[.github/skills/](.github/skills/)** - GitHub Copilot Agent Skills
+- **[.github/copilot-instructions.md](.github/copilot-instructions.md)** - Always-on Copilot guidance
+
+### Learn More
+
+See **[MCP_SETUP.md](MCP_SETUP.md)** for detailed setup instructions for both Claude Code and GitHub Copilot.
+
 ## Contributing
 
 ### Git flow

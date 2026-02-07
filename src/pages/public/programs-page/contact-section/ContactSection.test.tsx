@@ -17,14 +17,14 @@ describe('ContactSection', () => {
         render(<ContactSection />);
 
         const title = screen.getByRole('heading', {
-            name: 'Не впевнені, яка програма підійде саме вам?'
+            name: 'Не впевнені, яка програма підійде саме вам?',
         });
         expect(title).toBeInTheDocument();
         expect(title.tagName).toBe('H2');
 
         const description = screen.getByText(
             'Напишіть нам — ми разом підберемо те, ' +
-            'що найкраще відповідає вашим потребам або потребам вашої дитини.'
+                'що найкраще відповідає вашим потребам або потребам вашої дитини.',
         );
         expect(description).toBeInTheDocument();
 

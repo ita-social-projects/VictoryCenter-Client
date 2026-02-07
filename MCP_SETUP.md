@@ -178,6 +178,10 @@ Show me the latest commits in this repository
 
 GitHub Copilot in VS Code has **built-in access** to the GitHub MCP server remotely. No configuration needed!
 
+Use this URL for installing MCP plugins for VS Code
+https://github.com/mcp
+
+
 **Usage**:
 ```
 # In Copilot Chat (Ctrl+Alt+I or Cmd+Alt+I)

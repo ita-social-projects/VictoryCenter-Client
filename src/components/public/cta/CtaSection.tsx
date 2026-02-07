@@ -6,7 +6,8 @@ import styles from './CtaSection.module.scss';
 
 interface CtaButtonConfig {
     label: string;
-    href: string;
+    href?: string;
+    onClick?: () => void;
 }
 
 interface CtaSectionProps {
@@ -31,6 +32,7 @@ export const CtaSection: React.FC<CtaSectionProps> = memo(({ title, description,
                             <Button
                                 key={`${btn.href}-${index}`}
                                 href={btn.href}
+                                onClick={btn.onClick}
                                 variant={variant}
                                 className={styles.button}
                             >

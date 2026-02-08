@@ -73,9 +73,7 @@ export const ProgramSectionForm = ({
         if (sectionModeRef.current !== ProgramSectionMode.Edit) {
             setOriginalSection(section);
             setIsDirty(false);
-            if (!isNewSection) {
-                setSectionMode(ProgramSectionMode.View);
-            }
+            setSectionMode(isNewSection ? ProgramSectionMode.Edit : ProgramSectionMode.View);
         }
     }, [section, isNewSection]);
 

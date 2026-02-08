@@ -21,6 +21,7 @@ export interface ProgramSectionFormProps {
     isNewSection?: boolean;
     isSectionValid?: boolean;
     onEditStateChange?: (isEditing: boolean) => void;
+    onDelete?: () => void;
 }
 
 export interface SectionCancelOptions {
@@ -47,6 +48,7 @@ export const ProgramSectionForm = ({
     isNewSection = false,
     isSectionValid = false,
     onEditStateChange,
+    onDelete,
 }: ProgramSectionFormProps) => {
     const [localSection, setLocalSection] = useState<ProgramSection>(section);
     const [originalSection, setOriginalSection] = useState<ProgramSection>(section);
@@ -210,11 +212,16 @@ export const ProgramSectionForm = ({
         [onSectionChange, updateImageContent],
     );
 
-    const handleEditClick = useCallback(() => {
-        setOriginalSection(localSection);
-        setIsDirty(false);
-        setSectionMode(ProgramSectionMode.Edit);
-    }, [localSection]);
+    const handleEditClick = useCallback(
+        (e: React.MouseEvent<HTMLButtonElement>) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setOriginalSection(localSection);
+            setIsDirty(false);
+            setSectionMode(ProgramSectionMode.Edit);
+        },
+        [localSection],
+    );
 
     const handleSaveClick = useCallback(() => {
         if (isDisabled || !isSectionValid) return;
@@ -253,6 +260,17 @@ export const ProgramSectionForm = ({
         });
     }, [isDirty, isNewSection, onCancel, originalSection]);
 
+    const handleDeleteClick = useCallback(
+        (e: React.MouseEvent<HTMLButtonElement>) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (onDelete) {
+                onDelete();
+            }
+        },
+        [onDelete],
+    );
+
     const editableSection = renderProgramSection({
         templateId: section.template,
         data: {
@@ -286,15 +304,19 @@ export const ProgramSectionForm = ({
                 {sectionMode === ProgramSectionMode.View && (
                     <div className={styles['hover-buttons']}>
                         <button
+                            type="button"
                             onClick={handleEditClick}
                             className={`${styles['icon-button']} ${styles['edit-button']}`}
                             aria-label="Edit section"
                         />
                         <button
+                            type="button"
+                            onClick={handleDeleteClick}
                             className={`${styles['icon-button']} ${styles['delete-button']}`}
                             aria-label="Delete section"
                         />
                         <button
+                            type="button"
                             className={`${styles['icon-button']} ${styles['change-button']}`}
                             aria-label="Replace section"
                         />

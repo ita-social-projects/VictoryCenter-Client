@@ -7,6 +7,14 @@
   gap: 12px;
   padding-left: 4px;
   overflow: hidden;
+
+  @media (min-width: 560px) {
+    padding-left: 8px;
+  }
+
+  @media (min-width: 1440px) {
+    padding-left: 16px;
+  }
 }
 
 .bar {

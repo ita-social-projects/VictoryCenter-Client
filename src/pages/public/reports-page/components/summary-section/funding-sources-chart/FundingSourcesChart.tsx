@@ -20,7 +20,6 @@ export const FundingSourcesChart: React.FC<FundingSourcesChartProps> = ({ items 
         <div className={styles.root}>
             <p className={styles.title}>Звідки прийшли кошти</p>
             <div className={styles.chart}>
-                <div className={styles.axis} />
                 {items.map((item, index) => (
                     <FundingSourcesRow
                         key={item.label}

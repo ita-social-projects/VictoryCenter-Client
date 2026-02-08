@@ -2,16 +2,28 @@
 @use '@/assets/sass/mixins/typography.mixins' as type;
 
 .root {
-  padding: 20px 16px 24px;
+  padding: 16px 16px 28px;
   color: c.$blue-900;
   height: 100%;
   display: flex;
   flex-direction: column;
+
+  @media (min-width: 560px) {
+    padding: 32px 32px 40px;
+  }
+
+  @media (min-width: 1440px) {
+    padding: 40px 48px;
+  }
 }
 
 .title {
   @include type.subtitle-2-semibold;
   margin-bottom: 16px;
+
+  @media (min-width: 1440px) {
+    margin-bottom: 24px;
+  }
 }
 
 .chart {

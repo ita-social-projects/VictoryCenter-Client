@@ -2,24 +2,30 @@
 @use '@/assets/sass/mixins/typography.mixins' as type;
 
 .root {
-  padding: 18px 16px 30px;
+  padding: 16px 16px 28px;
+
+  @media (min-width: 560px) {
+    padding: 32px 32px 40px;
+  }
+
+  @media (min-width: 1440px) {
+    padding: 40px 32px 40px 40px;
+  }
 }
 
 .title {
   @include type.subtitle-2-semibold;
   color: c.$blue-50;
-  margin-bottom: 27px;
+  margin-bottom: 16px;
+
+  @media (min-width: 1440px) {
+    margin-bottom: 24px;
+  }
 }
 
 .chart {
   position: relative;
-}
-
-.axis {
-  position: absolute;
-  inset: 0;
-  width: 2px;
-  background: c.$blue-300;
+  border-left: 2px solid c.$blue-300;
 }
 
 .variant0 {
@@ -37,7 +43,7 @@
     top: 50%;
     left: 50%;
     width: 100%;
-    padding: 100%;
+    padding: 140%;
     transform: translate(-50%, -50%) rotate(-126deg);
     background-image: repeating-linear-gradient(
                     0deg,

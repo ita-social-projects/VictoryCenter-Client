@@ -104,36 +104,39 @@ export const ProgramSectionForm = ({
 
     const handleTitleChange = useCallback(
         (value: string) => {
+            let newSection: ProgramSection;
             setLocalSection((prev) => {
                 const updatedContents = prev.contents.map((c) =>
                     c.contentType === ContentType.Title ? { ...c, title: value } : c,
                 );
-                const updatedSection = { ...prev, contents: updatedContents };
-                onSectionChange?.(updatedSection);
-                setIsDirty(true);
-                return updatedSection;
+                newSection = { ...prev, contents: updatedContents };
+                return newSection;
             });
+            setIsDirty(true);
+            onSectionChange?.(newSection!);
         },
         [onSectionChange],
     );
 
     const handleDescriptionChange = useCallback(
         (value: string) => {
+            let newSection: ProgramSection;
             setLocalSection((prev) => {
                 const updatedContents = prev.contents.map((c) =>
                     c.contentType === ContentType.Description ? { ...c, description: value } : c,
                 );
-                const updatedSection = { ...prev, contents: updatedContents };
-                onSectionChange?.(updatedSection);
-                setIsDirty(true);
-                return updatedSection;
+                newSection = { ...prev, contents: updatedContents };
+                return newSection;
             });
+            setIsDirty(true);
+            onSectionChange?.(newSection!);
         },
         [onSectionChange],
     );
 
     const handleDescriptionsChange = useCallback(
         (index: number, value: string) => {
+            let newSection: ProgramSection | undefined;
             setLocalSection((prev) => {
                 const ordered = getDescriptionsInOrder(prev.contents);
                 const target = ordered[index];
@@ -145,17 +148,20 @@ export const ProgramSectionForm = ({
                         : c,
                 );
 
-                const updatedSection = { ...prev, contents: updatedContents };
-                onSectionChange?.(updatedSection);
-                setIsDirty(true);
-                return updatedSection;
+                newSection = { ...prev, contents: updatedContents };
+                return newSection;
             });
+            if (newSection) {
+                setIsDirty(true);
+                onSectionChange?.(newSection);
+            }
         },
         [onSectionChange],
     );
 
     const handleCardContentChange = useCallback(
         (index: number, value: string, type: ContentType.Title | ContentType.Description) => {
+            let newSection: ProgramSection | undefined;
             setLocalSection((prev) => {
                 const filteredContents = prev.contents
                     .filter((c) => c.contentType === type)
@@ -172,11 +178,13 @@ export const ProgramSectionForm = ({
                         : c,
                 );
 
-                const updatedSection = { ...prev, contents: updatedContents };
-                onSectionChange?.(updatedSection);
-                setIsDirty(true);
-                return updatedSection;
+                newSection = { ...prev, contents: updatedContents };
+                return newSection;
             });
+            if (newSection) {
+                setIsDirty(true);
+                onSectionChange?.(newSection);
+            }
         },
         [onSectionChange],
     );
@@ -193,19 +201,22 @@ export const ProgramSectionForm = ({
 
     const handleImagesChange = useCallback(
         (index: number, file: ImageValues | null) => {
+            let newSection: ProgramSection | undefined;
             setLocalSection((prev) => {
                 const imageContentsList = prev.contents.filter((c) => c.contentType === ContentType.Image);
                 imageContentsList.sort((a, b) => a.order - b.order);
 
                 if (index < imageContentsList.length) {
                     const targetOrder = imageContentsList[index].order;
-                    const updatedSection = updateImageContent(targetOrder, file, prev);
-                    onSectionChange?.(updatedSection);
-                    setIsDirty(true);
-                    return updatedSection;
+                    newSection = updateImageContent(targetOrder, file, prev);
+                    return newSection;
                 }
                 return prev;
             });
+            if (newSection) {
+                setIsDirty(true);
+                onSectionChange?.(newSection);
+            }
         },
         [onSectionChange, updateImageContent],
     );

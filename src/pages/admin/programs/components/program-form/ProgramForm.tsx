@@ -63,8 +63,7 @@ export interface ProgramFormProps {
     onAddSection?: () => void;
     selectedLanguage?: string;
     onLanguageChange?: (language: string) => void;
-    onRequestCancelSection?: (onConfirmDiscard: (() => void) | number) => void;
-    //isEditMode?: boolean;
+    onRequestCancelSection?: (onConfirmDiscard: (() => void) | number, actionType?: 'cancel' | 'delete') => void;
 }
 
 const validateForm = (formState: ProgramFormValues, isPublishing: boolean): ProgramFormErrors => {
@@ -394,6 +393,21 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             [handleRemoveSection, handleSectionChange, onRequestCancelSection, updateSectionFlag],
         );
 
+        const handleDeleteSection = useCallback(
+            (sectionIndex: number) => {
+                const confirmDelete = () => {
+                    handleRemoveSection(sectionIndex);
+                };
+
+                if (onRequestCancelSection) {
+                    onRequestCancelSection(confirmDelete, 'delete');
+                } else {
+                    confirmDelete();
+                }
+            },
+            [handleRemoveSection, onRequestCancelSection],
+        );
+
         const hasSections = formState.sections.length > 0;
         const sectionValidity = useMemo(
             () => formState.sections.map((section) => isProgramSectionValid(section, true)),
@@ -598,6 +612,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                         onEditStateChange={(isEditing) =>
                                             handleSectionEditStateChange(index, isEditing)
                                         }
+                                        onDelete={() => handleDeleteSection(index)}
                                     />
                                     <div className={styles['sections-divider']} />
                                 </React.Fragment>

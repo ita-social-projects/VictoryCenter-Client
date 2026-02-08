@@ -147,6 +147,7 @@ const mockFormRef = {
     getSections: undefined as undefined | (() => Array<{ order: number }>),
     addSection: jest.fn(),
     removeSection: jest.fn(),
+    revertSection: jest.fn(),
 };
 
 let capturedFormProps: any = {};
@@ -242,6 +243,7 @@ describe('ProgramModal', () => {
         mockFormRef.getSections = undefined;
         mockFormRef.addSection.mockReset();
         mockFormRef.removeSection.mockReset();
+        mockFormRef.revertSection.mockReset();
 
         mockedUseModalsState.mockReturnValue({
             modalState: { isAddSectionModalOpen: false },
@@ -309,6 +311,99 @@ describe('ProgramModal', () => {
 
             fireEvent.click(screen.getByTestId('question-cancel'));
             expect(screen.queryByTestId('question-modal')).not.toBeInTheDocument();
+        });
+
+        it('handleRequestCancelSection with number in Add mode calls removeSection on confirm', () => {
+            render(<ProgramModal {...addModeProps} />);
+
+            act(() => {
+                capturedFormProps.onRequestCancelSection(2);
+            });
+
+            expect(screen.getByTestId('question-modal')).toBeInTheDocument();
+            expect(mockFormRef.removeSection).not.toHaveBeenCalled();
+
+            fireEvent.click(screen.getByTestId('question-confirm'));
+
+            expect(mockFormRef.removeSection).toHaveBeenCalledWith(2);
+            expect(mockFormRef.removeSection).toHaveBeenCalledTimes(1);
+            expect(screen.queryByTestId('question-modal')).not.toBeInTheDocument();
+        });
+
+        it('handleRequestCancelSection with number in Edit mode calls revertSection on confirm', () => {
+            render(<ProgramModal {...editModeProps} />);
+
+            act(() => {
+                capturedFormProps.onRequestCancelSection(3);
+            });
+
+            expect(screen.getByTestId('question-modal')).toBeInTheDocument();
+            expect(screen.getByTestId('question-title')).toHaveTextContent(
+                COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE,
+            );
+
+            fireEvent.click(screen.getByTestId('question-confirm'));
+
+            expect(mockFormRef.revertSection).toHaveBeenCalledWith(3);
+            expect(mockFormRef.revertSection).toHaveBeenCalledTimes(1);
+            expect(screen.queryByTestId('question-modal')).not.toBeInTheDocument();
+        });
+
+        it('handleRequestCancelSection with function calls the provided discard callback on confirm', () => {
+            const mockDiscardCallback = jest.fn();
+            render(<ProgramModal {...addModeProps} />);
+
+            act(() => {
+                capturedFormProps.onRequestCancelSection(mockDiscardCallback);
+            });
+
+            expect(screen.getByTestId('question-modal')).toBeInTheDocument();
+            expect(mockDiscardCallback).not.toHaveBeenCalled();
+
+            fireEvent.click(screen.getByTestId('question-confirm'));
+
+            expect(mockDiscardCallback).toHaveBeenCalledTimes(1);
+            expect(screen.queryByTestId('question-modal')).not.toBeInTheDocument();
+        });
+
+        it('canceling the unsaved section modal does not execute discard action', () => {
+            const mockDiscardCallback = jest.fn();
+            render(<ProgramModal {...addModeProps} />);
+
+            act(() => {
+                capturedFormProps.onRequestCancelSection(mockDiscardCallback);
+            });
+
+            expect(screen.getByTestId('question-modal')).toBeInTheDocument();
+
+            fireEvent.click(screen.getByTestId('question-cancel'));
+
+            expect(mockDiscardCallback).not.toHaveBeenCalled();
+            expect(screen.queryByTestId('question-modal')).not.toBeInTheDocument();
+        });
+
+        it('displays correct modal title in Add mode vs Edit mode for unsaved section changes', () => {
+            const { rerender } = render(<ProgramModal {...addModeProps} />);
+
+            act(() => {
+                capturedFormProps.onRequestCancelSection(1);
+            });
+
+            expect(screen.getByTestId('question-title')).toHaveTextContent(
+                PROGRAMS_TEXT.SECTION.MODAL.UNSAVED_CHANGES_TITLE,
+            );
+
+            fireEvent.click(screen.getByTestId('question-cancel'));
+
+            rerender(<ProgramModal {...editModeProps} />);
+
+            act(() => {
+                capturedFormProps.onRequestCancelSection(1);
+            });
+
+            expect(screen.getByTestId('question-title')).toHaveTextContent(
+                COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE,
+            );
         });
     });
 

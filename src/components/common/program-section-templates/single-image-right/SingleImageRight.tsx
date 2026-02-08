@@ -25,6 +25,7 @@ export interface SingleImageRightProps {
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
     onImageChange?: (file: ImageValues | null) => void;
+    validationResetKey?: number;
 }
 
 export const SingleImageRight = ({
@@ -35,6 +36,7 @@ export const SingleImageRight = ({
     onTitleChange,
     onDescriptionChange,
     onImageChange,
+    validationResetKey,
 }: SingleImageRightProps) => {
     const imageSrc = getImageSrc(image);
     const baseStyles = mode === ProgramSectionMode.Published ? publishedStyles : styles;
@@ -48,6 +50,7 @@ export const SingleImageRight = ({
     } = useProgramSectionValidation({
         onTitleChange,
         onDescriptionChange,
+        resetKey: validationResetKey,
     });
     const { error, handleSetError } = useImageError();
 

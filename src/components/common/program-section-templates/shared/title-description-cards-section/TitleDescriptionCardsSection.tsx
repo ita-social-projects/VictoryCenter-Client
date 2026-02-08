@@ -14,6 +14,7 @@ interface Props {
     mode?: ProgramSectionMode;
     onTitleChange?: (index: number, value: string) => void;
     onDescriptionChange?: (index: number, value: string) => void;
+    validationResetKey?: number;
 }
 
 export const TitleDescriptionCardsSection = ({
@@ -22,6 +23,7 @@ export const TitleDescriptionCardsSection = ({
     mode = ProgramSectionMode.Published,
     onTitleChange,
     onDescriptionChange,
+    validationResetKey,
 }: Props) => {
     const normalizedCards = Array.from({ length: cardsCount }).map(
         (_, index) => cards[index] ?? { title: '', description: '' },
@@ -44,6 +46,7 @@ export const TitleDescriptionCardsSection = ({
                     mode={mode}
                     onTitleChange={onTitleChange}
                     onDescriptionChange={onDescriptionChange}
+                    validationResetKey={validationResetKey}
                 />
             ))}
         </div>

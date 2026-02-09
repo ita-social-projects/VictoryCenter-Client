@@ -43,8 +43,10 @@ export const ProgramModal = (props: ProgramModalProps) => {
     const { modalState, openModalActions, closeModalActions } = useModalsState();
     const [isSectionCancelModalOpen, setIsSectionCancelModalOpen] = useState(false);
     const [isSectionDeleteModalOpen, setIsSectionDeleteModalOpen] = useState(false);
+    const [isSectionReplaceModalOpen, setIsSectionReplaceModalOpen] = useState(false);
     const [sectionCancelAction, setSectionCancelAction] = useState<(() => void) | null>(null);
     const [sectionDeleteAction, setSectionDeleteAction] = useState<(() => void) | null>(null);
+    const [sectionToReplace, setSectionToReplace] = useState<number | null>(null);
 
     const initialData = useMemo<ProgramFormValues | null>(() => {
         if (!isEditMode || !program) return null;
@@ -131,29 +133,51 @@ export const ProgramModal = (props: ProgramModalProps) => {
     const handleTemplateSelect = useCallback(
         (templateId: ProgramSectionTemplate) => {
             if (modalHookData.formRef?.current) {
-                const currentSections = modalHookData.formRef.current.getSections
-                    ? modalHookData.formRef.current.getSections()
-                    : [];
-                const nextOrder =
-                    currentSections.length === 0 ? 0 : Math.max(...currentSections.map((s) => s.order)) + 1;
-                const newSection: ProgramSection = {
-                    template: templateId,
-                    order: nextOrder,
-                    contents: getInitialSectionContents(templateId),
-                };
-                modalHookData.formRef.current.addSection(newSection);
+                if (sectionToReplace !== null) {
+                    const currentSections = modalHookData.formRef.current.getSections
+                        ? modalHookData.formRef.current.getSections()
+                        : [];
+                    const oldSection = currentSections[sectionToReplace];
+                    const newSection: ProgramSection = {
+                        template: templateId,
+                        order: oldSection?.order ?? 0,
+                        contents: getInitialSectionContents(templateId),
+                    };
+                    modalHookData.formRef.current.replaceSection(sectionToReplace, newSection);
+                    setSectionToReplace(null);
+                } else {
+                    const currentSections = (
+                        modalHookData.formRef.current.getSections ? modalHookData.formRef.current.getSections() : []
+                    ).filter(Boolean);
+                    const nextOrder =
+                        currentSections.length === 0 ? 0 : Math.max(...currentSections.map((s) => s.order)) + 1;
+                    const newSection: ProgramSection = {
+                        template: templateId,
+                        order: nextOrder,
+                        contents: getInitialSectionContents(templateId),
+                    };
+                    modalHookData.formRef.current.addSection(newSection);
+                }
             }
         },
-        [modalHookData.formRef],
+        [modalHookData.formRef, sectionToReplace],
     );
 
     const handleRequestCancelSection = useCallback(
-        (onConfirmDiscard: (() => void) | number, actionType: 'cancel' | 'delete' = 'cancel') => {
+        (onConfirmDiscard: (() => void) | number, actionType: 'cancel' | 'delete' | 'replace' = 'cancel') => {
             if (actionType === 'delete') {
                 if (typeof onConfirmDiscard === 'function') {
                     setSectionDeleteAction(() => onConfirmDiscard);
                 }
                 setIsSectionDeleteModalOpen(true);
+            } else if (actionType === 'replace') {
+                if (typeof onConfirmDiscard === 'number') {
+                    setSectionToReplace(onConfirmDiscard);
+                    openModalActions.openAddSectionModal();
+                } else if (typeof onConfirmDiscard === 'function') {
+                    setSectionCancelAction(() => onConfirmDiscard);
+                    setIsSectionReplaceModalOpen(true);
+                }
             } else {
                 if (typeof onConfirmDiscard === 'number') {
                     const sectionIndex = onConfirmDiscard;
@@ -171,7 +195,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
                 setIsSectionCancelModalOpen(true);
             }
         },
-        [isEditMode, modalHookData.formRef],
+        [isEditMode, modalHookData.formRef, openModalActions],
     );
 
     const handleCloseSectionCancelModal = useCallback(() => {
@@ -193,6 +217,21 @@ export const ProgramModal = (props: ProgramModalProps) => {
         sectionDeleteAction?.();
         handleCloseSectionDeleteModal();
     }, [sectionDeleteAction, handleCloseSectionDeleteModal]);
+
+    const handleCloseSectionReplaceModal = useCallback(() => {
+        setIsSectionReplaceModalOpen(false);
+        setSectionCancelAction(null);
+    }, []);
+
+    const handleConfirmReplaceCancel = useCallback(() => {
+        sectionCancelAction?.();
+        handleCloseSectionReplaceModal();
+    }, [sectionCancelAction, handleCloseSectionReplaceModal]);
+
+    const handleCloseAddSectionModal = useCallback(() => {
+        setSectionToReplace(null);
+        closeModalActions.closeAddSectionModal();
+    }, [closeModalActions]);
 
     return (
         <div className="program-modal">
@@ -235,7 +274,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
             />
             <AddSectionModal
                 isOpen={modalState.isAddSectionModalOpen}
-                onClose={closeModalActions.closeAddSectionModal}
+                onClose={handleCloseAddSectionModal}
                 onSelectTemplate={handleTemplateSelect}
             />
 
@@ -259,6 +298,16 @@ export const ProgramModal = (props: ProgramModalProps) => {
                 title={PROGRAMS_TEXT.SECTION.MODAL.DELETE_SECTION_TITLE}
                 onConfirm={handleConfirmDeleteSection}
                 onCancel={handleCloseSectionDeleteModal}
+                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
+                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
+            />
+
+            <ConfirmationModal
+                isOpen={isSectionReplaceModalOpen}
+                onClose={handleCloseSectionReplaceModal}
+                title={PROGRAMS_TEXT.SECTION.MODAL.REPLACE_TEMPLATE_TITLE}
+                onConfirm={handleConfirmReplaceCancel}
+                onCancel={handleCloseSectionReplaceModal}
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
             />

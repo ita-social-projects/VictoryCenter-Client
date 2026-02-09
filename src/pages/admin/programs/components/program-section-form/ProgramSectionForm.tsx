@@ -32,6 +32,7 @@ export interface SectionCancelOptions {
     shouldRemove: boolean;
     revertTo: ProgramSection;
     onAfterDiscard: () => void;
+isTemplateReplacement?: boolean;
 }
 
 const getContentByType = (contents: ProgramSectionContent[], type: ContentType): ProgramSectionContent | undefined => {
@@ -52,16 +53,23 @@ export const ProgramSectionForm = ({
     isSectionValid = false,
     onEditStateChange,
     onDelete,
+isReplacingTemplate = false,
+    onRequestReplace,
+    preReplacementSection: prePropReplacementSection = null,
 }: ProgramSectionFormProps) => {
     const [localSection, setLocalSection] = useState<ProgramSection>(section);
     const [originalSection, setOriginalSection] = useState<ProgramSection>(section);
+const [preReplacementSection, setPreReplacementSection] = useState<ProgramSection | null>(
+        prePropReplacementSection,
+    );
     const [isDirty, setIsDirty] = useState(false);
     const [validationResetKey, setValidationResetKey] = useState(0);
     const [sectionMode, setSectionMode] = useState<ProgramSectionMode>(
-        isNewSection ? ProgramSectionMode.Edit : ProgramSectionMode.View,
+        isNewSection || isReplacingTemplate ? ProgramSectionMode.Edit : ProgramSectionMode.View,
     );
     const sectionModeRef = useRef(sectionMode);
     const onEditStateChangeRef = useRef(onEditStateChange);
+const lastEmittedSectionRef = useRef<ProgramSection | null>(null);
 
     useEffect(() => {
         sectionModeRef.current = sectionMode;
@@ -72,13 +80,20 @@ export const ProgramSectionForm = ({
     }, [onEditStateChange]);
 
     useEffect(() => {
+if (lastEmittedSectionRef.current === section) {
+            return;
+        }
         setLocalSection(section);
         if (sectionModeRef.current !== ProgramSectionMode.Edit) {
             setOriginalSection(section);
             setIsDirty(false);
-            setSectionMode(isNewSection ? ProgramSectionMode.Edit : ProgramSectionMode.View);
+            setSectionMode(isNewSection || isReplacingTemplate ? ProgramSectionMode.Edit : ProgramSectionMode.View);
         }
-    }, [section, isNewSection]);
+    }, [section, isNewSection, isReplacingTemplate]);
+
+    useEffect(() => {
+        setPreReplacementSection(prePropReplacementSection);
+    }, [prePropReplacementSection]);
 
     useEffect(() => {
         onEditStateChangeRef.current?.(sectionMode === ProgramSectionMode.Edit);
@@ -105,6 +120,15 @@ export const ProgramSectionForm = ({
         description: orderedDescriptionContents[i]?.description || '',
     }));
 
+    const emitSectionChange = useCallback(
+        (updatedSection: ProgramSection) => {
+            lastEmittedSectionRef.current = updatedSection;
+            setIsDirty(true);
+            onSectionChange?.(updatedSection);
+        },
+        [onSectionChange],
+    );
+
     const handleTitleChange = useCallback(
         (value: string) => {
             let newSection: ProgramSection;
@@ -115,10 +139,9 @@ export const ProgramSectionForm = ({
                 newSection = { ...prev, contents: updatedContents };
                 return newSection;
             });
-            setIsDirty(true);
-            onSectionChange?.(newSection!);
+            emitSectionChange(newSection!);
         },
-        [onSectionChange],
+        [emitSectionChange],
     );
 
     const handleDescriptionChange = useCallback(
@@ -131,10 +154,9 @@ export const ProgramSectionForm = ({
                 newSection = { ...prev, contents: updatedContents };
                 return newSection;
             });
-            setIsDirty(true);
-            onSectionChange?.(newSection!);
+            emitSectionChange(newSection!);
         },
-        [onSectionChange],
+        [emitSectionChange],
     );
 
     const handleDescriptionsChange = useCallback(
@@ -155,11 +177,10 @@ export const ProgramSectionForm = ({
                 return newSection;
             });
             if (newSection) {
-                setIsDirty(true);
-                onSectionChange?.(newSection);
+                emitSectionChange(newSection);
             }
         },
-        [onSectionChange],
+        [emitSectionChange],
     );
 
     const handleCardContentChange = useCallback(
@@ -185,11 +206,10 @@ export const ProgramSectionForm = ({
                 return newSection;
             });
             if (newSection) {
-                setIsDirty(true);
-                onSectionChange?.(newSection);
+                emitSectionChange(newSection);
             }
         },
-        [onSectionChange],
+        [emitSectionChange],
     );
 
     const updateImageContent = useCallback(
@@ -217,11 +237,10 @@ export const ProgramSectionForm = ({
                 return prev;
             });
             if (newSection) {
-                setIsDirty(true);
-                onSectionChange?.(newSection);
+                emitSectionChange(newSection);
             }
         },
-        [onSectionChange, updateImageContent],
+        [emitSectionChange, updateImageContent],
     );
 
     const handleEditClick = useCallback(

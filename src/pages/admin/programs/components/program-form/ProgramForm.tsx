@@ -194,6 +194,14 @@ if (initialData?.sections) {
             [],
         );
 
+        const updatePreReplacementSection = useCallback((sectionIndex: number, value: ProgramSection | null) => {
+            setPreReplacementSections((prev) => {
+                const next = [...prev];
+                next[sectionIndex] = value;
+                return next;
+            });
+        }, []);
+
         const handleAddSection = useCallback(
             (section: ProgramSection) => {
                 setFormState((prev) => ({
@@ -203,6 +211,8 @@ if (initialData?.sections) {
                 setSavedSections((prev) => [false, ...prev]);
                 setEditingSections((prev) => [true, ...prev]);
                 setNewSections((prev) => [true, ...prev]);
+setReplacingSections((prev) => [false, ...prev]);
+                setPreReplacementSections((prev) => [null, ...prev]);
             },
             [setFormState],
         );
@@ -216,6 +226,8 @@ if (initialData?.sections) {
                 setSavedSections((prev) => prev.filter((_, index) => index !== sectionIndex));
                 setEditingSections((prev) => prev.filter((_, index) => index !== sectionIndex));
                 setNewSections((prev) => prev.filter((_, index) => index !== sectionIndex));
+setReplacingSections((prev) => prev.filter((_, index) => index !== sectionIndex));
+                setPreReplacementSections((prev) => prev.filter((_, index) => index !== sectionIndex));
             },
             [setFormState],
         );
@@ -231,9 +243,29 @@ if (initialData?.sections) {
                     updateSectionFlag(setSavedSections, sectionIndex, true);
                     updateSectionFlag(setEditingSections, sectionIndex, false);
                     updateSectionFlag(setNewSections, sectionIndex, false);
+updateSectionFlag(setReplacingSections, sectionIndex, false);
+                    updatePreReplacementSection(sectionIndex, null);
                 }
             },
-            [setFormState, initialData, updateSectionFlag],
+            [setFormState, initialData, updateSectionFlag, updatePreReplacementSection],
+        );
+
+        const handleReplaceSection = useCallback(
+            (sectionIndex: number, newSection: ProgramSection) => {
+                const currentSection = sectionsRef.current[sectionIndex];
+                if (currentSection) {
+                    updatePreReplacementSection(sectionIndex, currentSection);
+                }
+                setFormState((prev) => {
+                    const updatedSections = [...prev.sections];
+                    updatedSections[sectionIndex] = newSection;
+                    return { ...prev, sections: updatedSections };
+                });
+                updateSectionFlag(setReplacingSections, sectionIndex, true);
+                updateSectionFlag(setSavedSections, sectionIndex, false);
+                updateSectionFlag(setEditingSections, sectionIndex, true);
+            },
+            [setFormState, updateSectionFlag, updatePreReplacementSection],
         );
 
         useImperativeHandle(
@@ -252,11 +284,13 @@ if (initialData?.sections) {
                 removeSection: handleRemoveSection,
                 getSections: () => formState.sections,
                 revertSection: handleRevertSection,
+replaceSection: handleReplaceSection,
             }),
             [
                 handleAddSection,
                 handleRemoveSection,
                 handleRevertSection,
+handleReplaceSection,
                 formState.sections,
                 isMainFormValid,
                 allSectionsSaved,
@@ -368,8 +402,10 @@ if (initialData?.sections) {
             (sectionIndex: number) => {
                 updateSectionFlag(setSavedSections, sectionIndex, true);
                 updateSectionFlag(setNewSections, sectionIndex, false);
+updateSectionFlag(setReplacingSections, sectionIndex, false);
+                updatePreReplacementSection(sectionIndex, null);
             },
-            [updateSectionFlag],
+            [updateSectionFlag, updatePreReplacementSection],
         );
 
         const handleSectionChange = useCallback(

@@ -77,6 +77,16 @@ jest.mock(
     }),
 );
 
+jest.mock(
+    '@/components/common/program-section-templates/single-title-description-author-pairs/SingleTitleDescriptionAuthorPairs',
+    () => ({
+        SingleTitleDescriptionAuthorPairs: (props: any) => {
+            capture('SingleTitleDescriptionAuthorPairs', props);
+            return <div data-testid="SingleTitleDescriptionAuthorPairs" />;
+        },
+    }),
+);
+
 describe('renderProgramSection', () => {
     const baseData = {
         title: 'Title',
@@ -262,6 +272,70 @@ describe('renderProgramSection', () => {
         });
     });
 
+    describe('SingleTitleDescriptionAuthorPairs', () => {
+        const handlers = {
+            onTitleChange: jest.fn(),
+            onCardDescriptionChange: jest.fn(),
+            onCardAuthorChange: jest.fn(),
+            onAddPair: jest.fn(),
+            onDeletePair: jest.fn(),
+            canAddPair: true,
+        };
+
+        it('renders SingleTitleDescriptionAuthorPairs component', () => {
+            render(
+                renderProgramSection({
+                    templateId: ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
+                    data: { title: 'T', descriptionAuthorPairs: [{ description: 'D', author: 'A' }] },
+                    isEditable: true,
+                    isTemplate: true,
+                    handlers: handlers as any,
+                }),
+            );
+
+            expect(screen.getByTestId('SingleTitleDescriptionAuthorPairs')).toBeInTheDocument();
+        });
+
+        it('maps props and handlers for SingleTitleDescriptionAuthorPairs', () => {
+            render(
+                renderProgramSection({
+                    templateId: ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
+                    data: { title: 'T', descriptionAuthorPairs: [{ description: 'D', author: 'A' }] },
+                    isEditable: true,
+                    isTemplate: true,
+                    handlers: handlers as any,
+                }),
+            );
+
+            const props = capturedProps.SingleTitleDescriptionAuthorPairs;
+
+            expect(props.title).toBe('T');
+            expect(props.pairs).toEqual([{ description: 'D', author: 'A' }]);
+            expect(props.isTemplate).toBe(true);
+            expect(props.isEditable).toBe(true);
+
+            expect(props.onTitleChange).toBe(handlers.onTitleChange);
+            expect(props.onPairDescriptionChange).toBe(handlers.onCardDescriptionChange);
+            expect(props.onPairAuthorChange).toBe(handlers.onCardAuthorChange);
+            expect(props.onAddPair).toBe(handlers.onAddPair);
+            expect(props.onDeletePair).toBe(handlers.onDeletePair);
+            expect(props.canAddPair).toBe(true);
+        });
+
+        it('uses empty pairs array when descriptionAuthorPairs is undefined', () => {
+            render(
+                renderProgramSection({
+                    templateId: ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
+                    data: { title: 'T' },
+                    isEditable: false,
+                    handlers: handlers as any,
+                }),
+            );
+
+            expect(capturedProps.SingleTitleDescriptionAuthorPairs.pairs).toEqual([]);
+        });
+    });
+
     describe('SingleTitleQuintupleDescription', () => {
         const handlers = {
             onTitleChange: jest.fn(),
@@ -372,6 +446,21 @@ describe('getInitialSectionContents', () => {
         expect(contents[1].contentType).toBe(ContentType.Description);
         expect(contents[0].order).toBe(0);
         expect(contents[1].order).toBe(1);
+    });
+
+    it('returns 3 contents for SingleTitleDescriptionAuthorPairs (title + description + author with groupIndex 0)', () => {
+        const contents = getInitialSectionContents(ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs);
+
+        expect(contents).toHaveLength(3);
+        expect(contents[0].contentType).toBe(ContentType.Title);
+
+        expect(contents[1].contentType).toBe(ContentType.Description);
+        expect((contents[1] as any).groupIndex).toBe(0);
+
+        expect(contents[2].contentType).toBe(ContentType.Author);
+        expect((contents[2] as any).groupIndex).toBe(0);
+
+        expect(contents.map((c) => c.order)).toEqual([0, 1, 2]);
     });
 
     it('returns 6 contents for SingleTitleQuintupleDescription (1 title + 5 descriptions)', () => {

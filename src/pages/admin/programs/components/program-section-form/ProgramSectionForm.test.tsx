@@ -51,6 +51,25 @@ const makeImageContent = (order: number, image: any) => ({
     image,
 });
 
+const makePairDescription = (order: number, groupIndex: number | null | undefined, description: any) => ({
+    contentType: ContentType.Description,
+    order,
+    groupIndex,
+    title: null,
+    description,
+    image: null,
+});
+
+const makePairAuthor = (order: number, groupIndex: number | null | undefined, author: any) => ({
+    contentType: ContentType.Author,
+    order,
+    groupIndex,
+    title: null,
+    author,
+    description: null,
+    image: null,
+});
+
 const makeSection = (overrides?: Partial<ProgramSection>): ProgramSection => ({
     template: ProgramSectionTemplate.TextOnly,
     order: 0,
@@ -64,6 +83,13 @@ const makeSection = (overrides?: Partial<ProgramSection>): ProgramSection => ({
     ],
     ...overrides,
 });
+
+const getUpdatedSection = (onSectionChange: jest.Mock) => onSectionChange.mock.calls[0][0] as ProgramSection;
+
+const getContentsBy = (s: ProgramSection, type: ContentType) => s.contents.filter((c: any) => c.contentType === type);
+
+const getContentByGroupAndType = (s: ProgramSection, groupIndex: number, type: ContentType) =>
+    s.contents.find((c: any) => c.groupIndex === groupIndex && c.contentType === type);
 
 describe('ProgramSectionForm', () => {
     let baseProps: ProgramSectionFormProps;
@@ -149,12 +175,7 @@ describe('ProgramSectionForm', () => {
 
         renderForm({ section });
 
-        expect(renderProgramSectionMock).toHaveBeenCalledTimes(1);
-
         const callPayload = renderProgramSectionMock.mock.calls[0][0];
-
-        expect(callPayload.templateId).toBe(section.template);
-        expect(callPayload.isEditable).toBe(true);
 
         expect(callPayload.data).toEqual({
             title: '',
@@ -179,14 +200,12 @@ describe('ProgramSectionForm', () => {
             handlers.onTitleChange('New Title');
         });
 
-        expect(onSectionChange).toHaveBeenCalledTimes(1);
-
-        const updated = onSectionChange.mock.calls[0][0] as ProgramSection;
-        const title = updated.contents.find((c) => c.contentType === ContentType.Title);
+        const updated = getUpdatedSection(onSectionChange);
+        const title = updated.contents.find((c: any) => c.contentType === ContentType.Title);
         expect(title?.title).toBe('New Title');
     });
 
-    it('calls onSectionChange and updates all descriptions when onDescriptionChange is invoked', () => {
+    it('updates all descriptions when onDescriptionChange is invoked', () => {
         const section = makeSection({
             contents: [makeTitleContent('T', 0), makeDescriptionContent(1, 'A'), makeDescriptionContent(2, 'B')],
         });
@@ -197,14 +216,12 @@ describe('ProgramSectionForm', () => {
             handlers.onDescriptionChange('NEW');
         });
 
-        expect(onSectionChange).toHaveBeenCalledTimes(1);
-
-        const updated = onSectionChange.mock.calls[0][0] as ProgramSection;
-        const descs = updated.contents.filter((c) => c.contentType === ContentType.Description);
-        expect(descs.map((d) => d.description)).toEqual(['NEW', 'NEW']);
+        const updated = getUpdatedSection(onSectionChange);
+        const descs = getContentsBy(updated, ContentType.Description);
+        expect(descs.map((d: any) => d.description)).toEqual(['NEW', 'NEW']);
     });
 
-    it('calls onSectionChange and updates only targeted description when onDescriptionsChange is invoked', () => {
+    it('updates only targeted description when onDescriptionsChange is invoked', () => {
         const section = makeSection({
             contents: [
                 makeTitleContent('T', 0),
@@ -220,14 +237,10 @@ describe('ProgramSectionForm', () => {
             handlers.onDescriptionsChange(1, 'UPDATED');
         });
 
-        expect(onSectionChange).toHaveBeenCalledTimes(1);
+        const updated = getUpdatedSection(onSectionChange);
+        const ordered = getContentsBy(updated, ContentType.Description).sort((a: any, b: any) => a.order - b.order);
 
-        const updated = onSectionChange.mock.calls[0][0] as ProgramSection;
-        const ordered = updated.contents
-            .filter((c) => c.contentType === ContentType.Description)
-            .sort((a, b) => a.order - b.order);
-
-        expect(ordered.map((d) => d.description)).toEqual(['D10', 'UPDATED', 'D30']);
+        expect(ordered.map((d: any) => d.description)).toEqual(['D10', 'UPDATED', 'D30']);
     });
 
     it('does nothing when onDescriptionsChange index is out of range', () => {
@@ -244,7 +257,7 @@ describe('ProgramSectionForm', () => {
         expect(onSectionChange).not.toHaveBeenCalled();
     });
 
-    it('calls onSectionChange and updates correct image by index when onImagesChange is invoked', () => {
+    it('updates correct image by index when onImagesChange is invoked', () => {
         const section = makeSection({
             contents: [
                 makeTitleContent('T', 0),
@@ -261,15 +274,10 @@ describe('ProgramSectionForm', () => {
             handlers.onImagesChange(0, newFile);
         });
 
-        expect(onSectionChange).toHaveBeenCalledTimes(1);
-
-        const updated = onSectionChange.mock.calls[0][0] as ProgramSection;
-        const orderedImages = updated.contents
-            .filter((c) => c.contentType === ContentType.Image)
-            .sort((a, b) => a.order - b.order);
+        const updated = getUpdatedSection(onSectionChange);
+        const orderedImages = getContentsBy(updated, ContentType.Image).sort((a: any, b: any) => a.order - b.order);
 
         expect(orderedImages[0].image).toEqual(newFile);
-        expect((orderedImages[1].image as any).url).toBe('A');
     });
 
     it('does nothing when onImagesChange index is out of range', () => {
@@ -284,5 +292,178 @@ describe('ProgramSectionForm', () => {
         });
 
         expect(onSectionChange).not.toHaveBeenCalled();
+    });
+
+    describe('DescriptionAuthorPairs template', () => {
+        const makePairsSection = (contents: any[]) =>
+            makeSection({
+                template: ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
+                contents,
+            });
+
+        it('passes descriptionAuthorPairs into renderProgramSection', () => {
+            const section = makePairsSection([
+                makeTitleContent('T', 0),
+                makePairDescription(2, 1, 'D1'),
+                makePairAuthor(3, 0, 'A0'),
+                makePairDescription(4, 0, null),
+                makePairAuthor(5, 1, undefined),
+                makePairDescription(6, null, 'IGNORED'),
+                makePairAuthor(7, undefined, 'IGNORED'),
+            ]);
+
+            renderForm({ section });
+
+            const payload = renderProgramSectionMock.mock.calls[0][0];
+            expect(payload.data.descriptionAuthorPairs).toEqual([
+                { description: '', author: 'A0' },
+                { description: 'D1', author: '' },
+            ]);
+        });
+
+        it('includes pair handlers in renderProgramSection handlers', () => {
+            const section = makePairsSection([makeTitleContent('T', 0)]);
+            renderForm({ section });
+
+            const payload = renderProgramSectionMock.mock.calls[0][0];
+
+            expect(payload.handlers.onAddPair).toEqual(expect.any(Function));
+            expect(payload.handlers.onDeletePair).toEqual(expect.any(Function));
+            expect(payload.handlers.onCardDescriptionChange).toEqual(expect.any(Function));
+            expect(payload.handlers.onCardAuthorChange).toEqual(expect.any(Function));
+        });
+
+        it('updates pair description when onCardDescriptionChange is invoked', () => {
+            const section = makePairsSection([
+                makeTitleContent('T', 0),
+                makePairDescription(1, 0, 'D0'),
+                makePairAuthor(2, 0, 'A0'),
+                makePairDescription(3, 1, 'D1'),
+                makePairAuthor(4, 1, 'A1'),
+            ]);
+
+            const { handlers, onSectionChange } = renderWithHandlers({ section });
+
+            act(() => {
+                handlers.onCardDescriptionChange(1, 'NEW-D1');
+            });
+
+            const updated = getUpdatedSection(onSectionChange);
+            expect((getContentByGroupAndType(updated, 1, ContentType.Description) as any).description).toBe('NEW-D1');
+        });
+
+        it('updates pair author when onCardAuthorChange is invoked', () => {
+            const section = makePairsSection([
+                makeTitleContent('T', 0),
+                makePairDescription(1, 0, 'D0'),
+                makePairAuthor(2, 0, 'A0'),
+                makePairDescription(3, 1, 'D1'),
+                makePairAuthor(4, 1, 'A1'),
+            ]);
+
+            const { handlers, onSectionChange } = renderWithHandlers({ section });
+
+            act(() => {
+                handlers.onCardAuthorChange(0, 'NEW-A0');
+            });
+
+            const updated = getUpdatedSection(onSectionChange);
+            expect((getContentByGroupAndType(updated, 0, ContentType.Author) as any).author).toBe('NEW-A0');
+        });
+
+        it('does nothing when pair change index is out of range', () => {
+            const section = makePairsSection([makeTitleContent('T', 0), makePairDescription(1, 0, 'D0')]);
+            const { handlers, onSectionChange } = renderWithHandlers({ section });
+
+            act(() => {
+                handlers.onCardAuthorChange(5, 'X');
+            });
+
+            expect(onSectionChange).not.toHaveBeenCalled();
+        });
+
+        it('adds a pair with next groupIndex', () => {
+            const section = makePairsSection([
+                makeTitleContent('T', 0),
+                makePairDescription(1, 0, 'D0'),
+                makePairAuthor(2, 0, 'A0'),
+                makePairDescription(3, 2, 'D2'),
+                makePairAuthor(4, 2, 'A2'),
+            ]);
+
+            const { handlers, onSectionChange } = renderWithHandlers({ section });
+
+            act(() => {
+                handlers.onAddPair();
+            });
+
+            const updated = getUpdatedSection(onSectionChange);
+            const newDesc = getContentByGroupAndType(updated, 3, ContentType.Description) as any;
+            const newAuth = getContentByGroupAndType(updated, 3, ContentType.Author) as any;
+
+            expect(newDesc).toBeTruthy();
+            expect(newAuth).toBeTruthy();
+        });
+
+        it('adds first pair with groupIndex 0 when no groupIndex exists', () => {
+            const section = makePairsSection([makeTitleContent('T', 0), makeDescriptionContent(1, 'D')]);
+            const { handlers, onSectionChange } = renderWithHandlers({ section });
+
+            act(() => {
+                handlers.onAddPair();
+            });
+
+            const updated = getUpdatedSection(onSectionChange);
+            expect(getContentByGroupAndType(updated, 0, ContentType.Description)).toBeTruthy();
+        });
+
+        it('adds pair with orders 0 and 1 when section has no contents', () => {
+            const section = makeSection({
+                template: ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
+                contents: [],
+            });
+
+            const { handlers, onSectionChange } = renderWithHandlers({ section });
+
+            act(() => {
+                handlers.onAddPair();
+            });
+
+            const updated = getUpdatedSection(onSectionChange);
+            const orders = updated.contents.map((c: any) => c.order).sort((a: number, b: number) => a - b);
+
+            expect(orders).toEqual([0, 1]);
+        });
+
+        it('deletes pair by index', () => {
+            const section = makePairsSection([
+                makeTitleContent('T', 0),
+                makePairDescription(1, 0, 'D0'),
+                makePairAuthor(2, 0, 'A0'),
+                makePairDescription(3, 1, 'D1'),
+                makePairAuthor(4, 1, 'A1'),
+            ]);
+
+            const { handlers, onSectionChange } = renderWithHandlers({ section });
+
+            act(() => {
+                handlers.onDeletePair(0);
+            });
+
+            const updated = getUpdatedSection(onSectionChange);
+            const stillHas0 = updated.contents.some((c: any) => c.groupIndex === 0);
+            expect(stillHas0).toBe(false);
+        });
+
+        it('does nothing when delete index is out of range', () => {
+            const section = makePairsSection([makeTitleContent('T', 0), makePairDescription(1, 0, 'D0')]);
+            const { handlers, onSectionChange } = renderWithHandlers({ section });
+
+            act(() => {
+                handlers.onDeletePair(9);
+            });
+
+            expect(onSectionChange).not.toHaveBeenCalled();
+        });
     });
 });

@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { SingleTitleDescriptionAuthorPairs } from './SingleTitleDescriptionAuthorPairs';
+import { ProgramSectionMode } from '@/types/common/program-sections';
 
 const mockCarousel = jest.fn();
 const mockPairCard = jest.fn();
@@ -65,28 +66,30 @@ jest.mock('@/const/admin/programs', () => ({
 const setup = (props: React.ComponentProps<typeof SingleTitleDescriptionAuthorPairs> = {}) => {
     mockCarousel.mockClear();
     mockPairCard.mockClear();
+
     const utils = render(<SingleTitleDescriptionAuthorPairs {...props} />);
     const root = utils.container.firstElementChild as HTMLElement;
-    return { ...utils, root };
+
+    return { root };
 };
 
 const getCarouselProps = () => mockCarousel.mock.calls[0]?.[0];
 const getPairProps = (index: number) => mockPairCard.mock.calls.find((c) => c?.[0]?.index === index)?.[0];
 
 describe('SingleTitleDescriptionAuthorPairs', () => {
-    it('renders title as h2 when not editable', () => {
+    it('renders title as h2 in published mode', () => {
         setup({ title: 'Hello' });
         expect(screen.getByRole('heading', { level: 2, name: 'Hello' })).toBeInTheDocument();
     });
 
-    it('renders title input when editable', () => {
-        setup({ isEditable: true, title: 'Edit' });
+    it('renders title input in edit mode', () => {
+        setup({ mode: ProgramSectionMode.Edit, title: 'Edit' });
         expect(screen.getByTestId('input-single-title-description-author-pairs-title')).toHaveValue('Edit');
     });
 
-    it('calls onTitleChange with value', () => {
+    it('calls onTitleChange with value in edit mode', () => {
         const onTitleChange = jest.fn();
-        setup({ isEditable: true, onTitleChange });
+        setup({ mode: ProgramSectionMode.Edit, onTitleChange });
 
         fireEvent.change(screen.getByTestId('input-single-title-description-author-pairs-title'), {
             target: { value: 'X' },
@@ -96,7 +99,7 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
     });
 
     it('does not crash on title change without onTitleChange', () => {
-        setup({ isEditable: true });
+        setup({ mode: ProgramSectionMode.Edit });
 
         fireEvent.change(screen.getByTestId('input-single-title-description-author-pairs-title'), {
             target: { value: 'X' },
@@ -105,38 +108,39 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
         expect(screen.getByTestId('input-single-title-description-author-pairs-title')).toBeInTheDocument();
     });
 
-    it('uses carousel variant "default" when not template and not editable', () => {
+    it('uses carousel variant "default" in published mode', () => {
         setup({ pairs: [{ description: 'D0', author: 'A0' }] });
         expect(getCarouselProps().variant).toBe('default');
     });
 
-    it('uses carousel variant "editable" when editable', () => {
-        setup({ isEditable: true });
+    it('uses carousel variant "editable" in edit mode', () => {
+        setup({ mode: ProgramSectionMode.Edit });
         expect(getCarouselProps().variant).toBe('editable');
     });
 
-    it('uses carousel variant "template" when template and not editable', () => {
-        setup({ isTemplate: true });
+    it('uses carousel variant "template" in template mode', () => {
+        setup({ mode: ProgramSectionMode.Template });
         expect(getCarouselProps().variant).toBe('template');
     });
 
-    it('passes itemsCount based on pairs when not template', () => {
+    it('passes itemsCount based on pairs in published mode', () => {
         setup({
             pairs: [
                 { description: 'D0', author: 'A0' },
                 { description: 'D1', author: 'A1' },
             ],
         });
+
         expect(getCarouselProps().itemsCount).toBe(2);
     });
 
     it('normalizes template pairs to 5 items', () => {
-        setup({ isTemplate: true, pairs: [{ description: 'D0', author: 'A0' }] });
+        setup({ mode: ProgramSectionMode.Template, pairs: [{ description: 'D0', author: 'A0' }] });
         expect(getCarouselProps().itemsCount).toBe(5);
     });
 
     it('uses provided values in template mode when present', () => {
-        setup({ isTemplate: true, pairs: [{ description: 'D0', author: 'A0' }] });
+        setup({ mode: ProgramSectionMode.Template, pairs: [{ description: 'D0', author: 'A0' }] });
 
         const p0 = getPairProps(0);
         expect(p0.description).toBe('D0');
@@ -144,24 +148,26 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
     });
 
     it('fills missing values with samples in template mode', () => {
-        setup({ isTemplate: true, pairs: [{ description: 'D0', author: 'A0' }] });
+        setup({ mode: ProgramSectionMode.Template, pairs: [{ description: 'D0', author: 'A0' }] });
 
         const p4 = getPairProps(4);
         expect(p4.description).toBe('SAMPLE_DESC');
         expect(p4.author).toBe('SAMPLE_AUTHOR');
     });
 
-    it('renders add button only when editable', () => {
+    it('does not render add button in published mode', () => {
         setup();
         expect(screen.queryByRole('button', { name: 'Add card' })).not.toBeInTheDocument();
+    });
 
-        setup({ isEditable: true });
+    it('renders add button in edit mode', () => {
+        setup({ mode: ProgramSectionMode.Edit });
         expect(screen.getByRole('button', { name: 'Add card' })).toBeInTheDocument();
     });
 
     it('calls onAddPair when add button clicked', () => {
         const onAddPair = jest.fn();
-        setup({ isEditable: true, onAddPair });
+        setup({ mode: ProgramSectionMode.Edit, onAddPair });
 
         fireEvent.click(screen.getByRole('button', { name: 'Add card' }));
 
@@ -169,7 +175,7 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
     });
 
     it('disables add button when canAddPair=false', () => {
-        setup({ isEditable: true, canAddPair: false });
+        setup({ mode: ProgramSectionMode.Edit, canAddPair: false });
         expect(screen.getByRole('button', { name: 'Add card' })).toBeDisabled();
     });
 
@@ -191,13 +197,13 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
         expect(p0.onDelete).toBe(onDeletePair);
     });
 
-    it('applies template class only when template and not editable', () => {
-        const { root } = setup({ isTemplate: true });
+    it('applies template class in template mode', () => {
+        const { root } = setup({ mode: ProgramSectionMode.Template });
         expect(root).toHaveClass('template');
     });
 
-    it('does not apply template class when editable', () => {
-        const { root } = setup({ isTemplate: true, isEditable: true });
+    it('does not apply template class in edit mode', () => {
+        const { root } = setup({ mode: ProgramSectionMode.Edit });
         expect(root).not.toHaveClass('template');
     });
 });

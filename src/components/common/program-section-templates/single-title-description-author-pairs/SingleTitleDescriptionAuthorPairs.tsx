@@ -9,6 +9,7 @@ import { ReactComponent as ArrowLeft } from '@/assets/icons/arrow-left.svg';
 import { ReactComponent as ArrowRight } from '@/assets/icons/arrow-right.svg';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import { CardCarousel } from './card-carousel/CardCarousel';
+import { ProgramSectionMode } from '@/types/common/program-sections';
 
 export interface DescriptionAuthorPairData {
     description: string;
@@ -18,8 +19,7 @@ export interface DescriptionAuthorPairData {
 export interface SingleTitleDescriptionAuthorPairsProps {
     title?: string;
     pairs?: DescriptionAuthorPairData[];
-    isTemplate?: boolean;
-    isEditable?: boolean;
+    mode?: ProgramSectionMode;
     onTitleChange?: (value: string) => void;
     onPairDescriptionChange?: (index: number, value: string) => void;
     onPairAuthorChange?: (index: number, value: string) => void;
@@ -33,8 +33,7 @@ const TEMPLATE_PAIRS_COUNT = 5;
 export const SingleTitleDescriptionAuthorPairs = ({
     title = '',
     pairs = [],
-    isTemplate = false,
-    isEditable = false,
+    mode = ProgramSectionMode.Published,
     onTitleChange,
     onPairDescriptionChange,
     onPairAuthorChange,
@@ -42,6 +41,9 @@ export const SingleTitleDescriptionAuthorPairs = ({
     onDeletePair,
     canAddPair = true,
 }: SingleTitleDescriptionAuthorPairsProps) => {
+    const isEditable = mode === ProgramSectionMode.Edit;
+    const isTemplate = mode === ProgramSectionMode.Template;
+
     const normalizedPairs = useMemo(() => {
         if (!isTemplate) return pairs;
 
@@ -55,11 +57,11 @@ export const SingleTitleDescriptionAuthorPairs = ({
     }, [isTemplate, pairs]);
 
     const rootClassName = cn(styles.container, {
-        [styles.template]: isTemplate && !isEditable,
+        [styles.template]: isTemplate,
         [styles.editable]: isEditable,
     });
 
-    const carouselVariant = isTemplate && !isEditable ? 'template' : isEditable ? 'editable' : 'default';
+    const carouselVariant = isTemplate ? 'template' : isEditable ? 'editable' : 'default';
 
     return (
         <div className={rootClassName}>

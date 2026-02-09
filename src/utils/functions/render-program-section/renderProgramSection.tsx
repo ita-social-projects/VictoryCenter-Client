@@ -178,8 +178,7 @@ export const renderProgramSection = ({
             <SingleTitleDescriptionAuthorPairs
                 title={data.title}
                 pairs={data.descriptionAuthorPairs ?? []}
-                isTemplate={isTemplate}
-                isEditable={isEditable}
+                mode={mode}
                 onTitleChange={handlers?.onTitleChange}
                 onPairDescriptionChange={handlers?.onCardDescriptionChange}
                 onPairAuthorChange={handlers?.onCardAuthorChange}

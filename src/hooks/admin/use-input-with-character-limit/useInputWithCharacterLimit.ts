@@ -70,7 +70,7 @@ export const useInputWithCharacterLimit = <T extends HTMLInputElement | HTMLText
         } as React.ChangeEvent<T>);
     };
 
-    const showClearButton = isFocused && value.length > 0 && !disabled;
+    const showClearButton = isFocused && (value ?? '').length > 0 && !disabled;
 
     return {
         isFocused,

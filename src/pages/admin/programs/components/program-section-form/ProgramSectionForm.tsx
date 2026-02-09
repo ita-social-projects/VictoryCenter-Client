@@ -22,7 +22,7 @@ export interface ProgramSectionFormProps {
     isSectionValid?: boolean;
     onEditStateChange?: (isEditing: boolean) => void;
     onDelete?: () => void;
-isReplacingTemplate?: boolean;
+    isReplacingTemplate?: boolean;
     onRequestReplace?: () => void;
     preReplacementSection?: ProgramSection | null;
 }
@@ -32,7 +32,7 @@ export interface SectionCancelOptions {
     shouldRemove: boolean;
     revertTo: ProgramSection;
     onAfterDiscard: () => void;
-isTemplateReplacement?: boolean;
+    isTemplateReplacement?: boolean;
 }
 
 const getContentByType = (contents: ProgramSectionContent[], type: ContentType): ProgramSectionContent | undefined => {
@@ -53,13 +53,13 @@ export const ProgramSectionForm = ({
     isSectionValid = false,
     onEditStateChange,
     onDelete,
-isReplacingTemplate = false,
+    isReplacingTemplate = false,
     onRequestReplace,
     preReplacementSection: prePropReplacementSection = null,
 }: ProgramSectionFormProps) => {
     const [localSection, setLocalSection] = useState<ProgramSection>(section);
     const [originalSection, setOriginalSection] = useState<ProgramSection>(section);
-const [preReplacementSection, setPreReplacementSection] = useState<ProgramSection | null>(
+    const [preReplacementSection, setPreReplacementSection] = useState<ProgramSection | null>(
         prePropReplacementSection,
     );
     const [isDirty, setIsDirty] = useState(false);
@@ -69,7 +69,7 @@ const [preReplacementSection, setPreReplacementSection] = useState<ProgramSectio
     );
     const sectionModeRef = useRef(sectionMode);
     const onEditStateChangeRef = useRef(onEditStateChange);
-const lastEmittedSectionRef = useRef<ProgramSection | null>(null);
+    const lastEmittedSectionRef = useRef<ProgramSection | null>(null);
 
     useEffect(() => {
         sectionModeRef.current = sectionMode;
@@ -80,7 +80,7 @@ const lastEmittedSectionRef = useRef<ProgramSection | null>(null);
     }, [onEditStateChange]);
 
     useEffect(() => {
-if (lastEmittedSectionRef.current === section) {
+        if (lastEmittedSectionRef.current === section) {
             return;
         }
         setLocalSection(section);
@@ -273,13 +273,17 @@ if (lastEmittedSectionRef.current === section) {
 
     const handleCancelClick = useCallback(() => {
         const shouldRemove = isNewSection;
-        const revertTo = originalSection;
+        const revertTo = preReplacementSection || originalSection;
+        const isTemplateReplacement = !!preReplacementSection;
         const onAfterDiscard = () => {
             if (!shouldRemove) {
                 setLocalSection(revertTo);
                 setIsDirty(false);
                 setSectionMode(ProgramSectionMode.View);
                 setValidationResetKey((prev) => prev + 1);
+                if (isTemplateReplacement) {
+                    setPreReplacementSection(null);
+                }
             }
         };
 
@@ -288,8 +292,9 @@ if (lastEmittedSectionRef.current === section) {
             shouldRemove,
             revertTo,
             onAfterDiscard,
+            isTemplateReplacement,
         });
-    }, [isDirty, isNewSection, onCancel, originalSection]);
+    }, [isDirty, isNewSection, onCancel, originalSection, preReplacementSection]);
 
     const handleDeleteClick = useCallback(
         (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -300,6 +305,17 @@ if (lastEmittedSectionRef.current === section) {
             }
         },
         [onDelete],
+    );
+
+    const handleReplaceClick = useCallback(
+        (e: React.MouseEvent<HTMLButtonElement>) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (onRequestReplace) {
+                onRequestReplace();
+            }
+        },
+        [onRequestReplace],
     );
 
     const editableSection = renderProgramSection({
@@ -348,6 +364,7 @@ if (lastEmittedSectionRef.current === section) {
                         />
                         <button
                             type="button"
+                            onClick={handleReplaceClick}
                             className={`${styles['icon-button']} ${styles['change-button']}`}
                             aria-label="Replace section"
                         />

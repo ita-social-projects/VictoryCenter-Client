@@ -52,7 +52,7 @@ export interface ProgramFormRef {
     removeSection: (sectionIndex: number) => void;
     getSections: () => ProgramSection[];
     revertSection: (sectionIndex: number) => void;
-replaceSection: (sectionIndex: number, newSection: ProgramSection) => void;
+    replaceSection: (sectionIndex: number, newSection: ProgramSection) => void;
 }
 
 export interface ProgramFormProps {
@@ -65,9 +65,9 @@ export interface ProgramFormProps {
     selectedLanguage?: string;
     onLanguageChange?: (language: string) => void;
     onRequestCancelSection?: (
-onConfirmDiscard: (() => void) | number,
-actionType?: 'cancel' | 'delete' | 'replace',
-) => void;
+        onConfirmDiscard: (() => void) | number,
+        actionType?: 'cancel' | 'delete' | 'replace',
+    ) => void;
 }
 
 const validateForm = (formState: ProgramFormValues, isPublishing: boolean): ProgramFormErrors => {
@@ -142,9 +142,9 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
         const [savedSections, setSavedSections] = useState<boolean[]>(initialData?.sections?.map(() => true) ?? []);
         const [editingSections, setEditingSections] = useState<boolean[]>(
             initialData?.sections?.map(() => false) ?? [],
-);
+        );
         const [newSections, setNewSections] = useState<boolean[]>(initialData?.sections?.map(() => false) ?? []);
-const [replacingSections, setReplacingSections] = useState<boolean[]>(
+        const [replacingSections, setReplacingSections] = useState<boolean[]>(
             initialData?.sections?.map(() => false) ?? [],
         );
         const [preReplacementSections, setPreReplacementSections] = useState<(ProgramSection | null)[]>(
@@ -152,10 +152,10 @@ const [replacingSections, setReplacingSections] = useState<boolean[]>(
         );
 
         useEffect(() => {
-if (initialData?.sections) {
-            setSavedSections(initialData.sections.map(() => true));
-            setEditingSections(initialData.sections.map(() => false));
-            setNewSections(initialData.sections.map(() => false));
+            if (initialData?.sections) {
+                setSavedSections(initialData.sections.map(() => true));
+                setEditingSections(initialData.sections.map(() => false));
+                setNewSections(initialData.sections.map(() => false));
                 setReplacingSections(initialData.sections.map(() => false));
                 setPreReplacementSections(initialData.sections.map(() => null));
             }
@@ -211,7 +211,7 @@ if (initialData?.sections) {
                 setSavedSections((prev) => [false, ...prev]);
                 setEditingSections((prev) => [true, ...prev]);
                 setNewSections((prev) => [true, ...prev]);
-setReplacingSections((prev) => [false, ...prev]);
+                setReplacingSections((prev) => [false, ...prev]);
                 setPreReplacementSections((prev) => [null, ...prev]);
             },
             [setFormState],
@@ -226,7 +226,7 @@ setReplacingSections((prev) => [false, ...prev]);
                 setSavedSections((prev) => prev.filter((_, index) => index !== sectionIndex));
                 setEditingSections((prev) => prev.filter((_, index) => index !== sectionIndex));
                 setNewSections((prev) => prev.filter((_, index) => index !== sectionIndex));
-setReplacingSections((prev) => prev.filter((_, index) => index !== sectionIndex));
+                setReplacingSections((prev) => prev.filter((_, index) => index !== sectionIndex));
                 setPreReplacementSections((prev) => prev.filter((_, index) => index !== sectionIndex));
             },
             [setFormState],
@@ -243,7 +243,7 @@ setReplacingSections((prev) => prev.filter((_, index) => index !== sectionIndex)
                     updateSectionFlag(setSavedSections, sectionIndex, true);
                     updateSectionFlag(setEditingSections, sectionIndex, false);
                     updateSectionFlag(setNewSections, sectionIndex, false);
-updateSectionFlag(setReplacingSections, sectionIndex, false);
+                    updateSectionFlag(setReplacingSections, sectionIndex, false);
                     updatePreReplacementSection(sectionIndex, null);
                 }
             },
@@ -284,13 +284,13 @@ updateSectionFlag(setReplacingSections, sectionIndex, false);
                 removeSection: handleRemoveSection,
                 getSections: () => formState.sections,
                 revertSection: handleRevertSection,
-replaceSection: handleReplaceSection,
+                replaceSection: handleReplaceSection,
             }),
             [
                 handleAddSection,
                 handleRemoveSection,
                 handleRevertSection,
-handleReplaceSection,
+                handleReplaceSection,
                 formState.sections,
                 isMainFormValid,
                 allSectionsSaved,
@@ -402,7 +402,7 @@ handleReplaceSection,
             (sectionIndex: number) => {
                 updateSectionFlag(setSavedSections, sectionIndex, true);
                 updateSectionFlag(setNewSections, sectionIndex, false);
-updateSectionFlag(setReplacingSections, sectionIndex, false);
+                updateSectionFlag(setReplacingSections, sectionIndex, false);
                 updatePreReplacementSection(sectionIndex, null);
             },
             [updateSectionFlag, updatePreReplacementSection],
@@ -430,13 +430,18 @@ updateSectionFlag(setReplacingSections, sectionIndex, false);
                         updateSectionFlag(setSavedSections, sectionIndex, true);
                         updateSectionFlag(setEditingSections, sectionIndex, false);
                         updateSectionFlag(setNewSections, sectionIndex, false);
+                        if (options.isTemplateReplacement) {
+                            updateSectionFlag(setReplacingSections, sectionIndex, false);
+                            updatePreReplacementSection(sectionIndex, null);
+                        }
                     }
                     options.onAfterDiscard();
                 };
 
                 if (options.shouldRemove || options.isDirty) {
                     if (onRequestCancelSection) {
-                        onRequestCancelSection(discard);
+                        const actionType = options.isTemplateReplacement ? 'replace' : 'cancel';
+                        onRequestCancelSection(discard, actionType as 'cancel' | 'delete');
                     } else {
                         discard();
                     }
@@ -445,7 +450,13 @@ updateSectionFlag(setReplacingSections, sectionIndex, false);
 
                 discard();
             },
-            [handleRemoveSection, handleSectionChange, onRequestCancelSection, updateSectionFlag],
+            [
+                handleRemoveSection,
+                handleSectionChange,
+                onRequestCancelSection,
+                updateSectionFlag,
+                updatePreReplacementSection,
+            ],
         );
 
         const handleDeleteSection = useCallback(
@@ -465,7 +476,14 @@ updateSectionFlag(setReplacingSections, sectionIndex, false);
 
         const hasSections = formState.sections.length > 0;
         const sectionValidity = useMemo(
-            () => formState.sections.map((section) => isProgramSectionValid(section, true)),
+            () =>
+                formState.sections.map((section) => {
+                    try {
+                        return section?.contents ? isProgramSectionValid(section, true) : false;
+                    } catch {
+                        return false;
+                    }
+                }),
             [formState.sections],
         );
 
@@ -654,24 +672,32 @@ updateSectionFlag(setReplacingSections, sectionIndex, false);
 
                     {hasSections && (
                         <div className={styles['sections-list']}>
-                            {formState.sections.map((section, index) => (
-                                <React.Fragment key={section.id ?? `${section.template}-${index}`}>
-                                    <ProgramSectionForm
-                                        section={section}
-                                        onSave={() => handleSaveSection(index)}
-                                        onCancel={(options) => handleCancelSection(index, options)}
-                                        onSectionChange={(updatedSection) => handleSectionChange(index, updatedSection)}
-                                        isDisabled={isSubmitting || isFormDisabled}
-                                        isNewSection={newSections[index] ?? false}
-                                        isSectionValid={sectionValidity[index] ?? false}
-                                        onEditStateChange={(isEditing) =>
-                                            handleSectionEditStateChange(index, isEditing)
-                                        }
-                                        onDelete={() => handleDeleteSection(index)}
-                                    />
-                                    <div className={styles['sections-divider']} />
-                                </React.Fragment>
-                            ))}
+                            {formState.sections.map((section, index) => {
+                                if (!section) return null;
+                                return (
+                                    <React.Fragment key={section.id ?? `${section.template}-${index}`}>
+                                        <ProgramSectionForm
+                                            section={section}
+                                            onSave={() => handleSaveSection(index)}
+                                            onCancel={(options) => handleCancelSection(index, options)}
+                                            onSectionChange={(updatedSection) =>
+                                                handleSectionChange(index, updatedSection)
+                                            }
+                                            isDisabled={isSubmitting || isFormDisabled}
+                                            isNewSection={newSections[index] ?? false}
+                                            isSectionValid={sectionValidity[index] ?? false}
+                                            onEditStateChange={(isEditing) =>
+                                                handleSectionEditStateChange(index, isEditing)
+                                            }
+                                            onDelete={() => handleDeleteSection(index)}
+                                            isReplacingTemplate={replacingSections[index] ?? false}
+                                            onRequestReplace={() => onRequestCancelSection?.(index, 'replace' as any)}
+                                            preReplacementSection={preReplacementSections[index] ?? null}
+                                        />
+                                        <div className={styles['sections-divider']} />
+                                    </React.Fragment>
+                                );
+                            })}
                         </div>
                     )}
                 </div>

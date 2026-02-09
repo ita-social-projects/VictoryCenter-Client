@@ -52,6 +52,7 @@ export interface ProgramFormRef {
     removeSection: (sectionIndex: number) => void;
     getSections: () => ProgramSection[];
     revertSection: (sectionIndex: number) => void;
+replaceSection: (sectionIndex: number, newSection: ProgramSection) => void;
 }
 
 export interface ProgramFormProps {
@@ -63,7 +64,10 @@ export interface ProgramFormProps {
     onAddSection?: () => void;
     selectedLanguage?: string;
     onLanguageChange?: (language: string) => void;
-    onRequestCancelSection?: (onConfirmDiscard: (() => void) | number, actionType?: 'cancel' | 'delete') => void;
+    onRequestCancelSection?: (
+onConfirmDiscard: (() => void) | number,
+actionType?: 'cancel' | 'delete' | 'replace',
+) => void;
 }
 
 const validateForm = (formState: ProgramFormValues, isPublishing: boolean): ProgramFormErrors => {
@@ -132,14 +136,29 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             ref: internalRef,
         });
 
-        const [savedSections, setSavedSections] = useState<boolean[]>([]);
-        const [editingSections, setEditingSections] = useState<boolean[]>([]);
-        const [newSections, setNewSections] = useState<boolean[]>([]);
+        const sectionsRef = useRef<ProgramSection[]>(formState.sections);
+        sectionsRef.current = formState.sections;
+
+        const [savedSections, setSavedSections] = useState<boolean[]>(initialData?.sections?.map(() => true) ?? []);
+        const [editingSections, setEditingSections] = useState<boolean[]>(
+            initialData?.sections?.map(() => false) ?? [],
+);
+        const [newSections, setNewSections] = useState<boolean[]>(initialData?.sections?.map(() => false) ?? []);
+const [replacingSections, setReplacingSections] = useState<boolean[]>(
+            initialData?.sections?.map(() => false) ?? [],
+        );
+        const [preReplacementSections, setPreReplacementSections] = useState<(ProgramSection | null)[]>(
+            initialData?.sections?.map(() => null) ?? [],
+        );
 
         useEffect(() => {
-            setSavedSections(initialData?.sections?.map(() => true) ?? []);
-            setEditingSections(initialData?.sections?.map(() => false) ?? []);
-            setNewSections(initialData?.sections?.map(() => false) ?? []);
+if (initialData?.sections) {
+            setSavedSections(initialData.sections.map(() => true));
+            setEditingSections(initialData.sections.map(() => false));
+            setNewSections(initialData.sections.map(() => false));
+                setReplacingSections(initialData.sections.map(() => false));
+                setPreReplacementSections(initialData.sections.map(() => null));
+            }
         }, [initialData]);
 
         const isMainFormValid = useCallback(

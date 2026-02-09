@@ -22,6 +22,9 @@ export interface ProgramSectionFormProps {
     isSectionValid?: boolean;
     onEditStateChange?: (isEditing: boolean) => void;
     onDelete?: () => void;
+isReplacingTemplate?: boolean;
+    onRequestReplace?: () => void;
+    preReplacementSection?: ProgramSection | null;
 }
 
 export interface SectionCancelOptions {

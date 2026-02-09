@@ -7,14 +7,14 @@ import {
     PROGRAM_SECTION_VALIDATION,
     SINGLE_TITLE_QUINTUPLE_DESCRIPTION_CONFIG,
 } from '@/const/admin/programs';
+import { ProgramSectionMode } from '@/types/common/program-sections';
 import baseStyles from './SingleTitleQuintupleDescription.module.scss';
 import previewStyles from './SingleTitleQuintupleDescription-preview.module.scss';
 
 export interface SingleTitleQuintupleDescriptionProps {
     title?: string;
     descriptions?: string[];
-    isTemplate?: boolean;
-    isEditable?: boolean;
+    mode?: ProgramSectionMode;
     onTitleChange?: (value: string) => void;
     onDescriptionsChange?: (index: number, value: string) => void;
     className?: string;
@@ -27,8 +27,7 @@ const DESCRIPTION_LAYOUT = {
 export const SingleTitleQuintupleDescription = ({
     title = '',
     descriptions = [],
-    isTemplate = false,
-    isEditable = false,
+    mode = ProgramSectionMode.Published,
     onTitleChange,
     onDescriptionsChange,
     className,
@@ -41,25 +40,25 @@ export const SingleTitleQuintupleDescription = ({
     );
 
     const descriptionOrder = useMemo(() => {
-        if (isEditable) {
+        if (mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View) {
             return DESCRIPTION_LAYOUT.editable;
         }
 
         return normalizedDescriptions.map((_, index) => index);
-    }, [isEditable, normalizedDescriptions]);
+    }, [mode, normalizedDescriptions]);
 
     const rootClassName = cn(
         baseStyles.container,
         {
-            [baseStyles.template]: isTemplate && !isEditable,
-            [baseStyles.editable]: isEditable,
+            [baseStyles.template]: mode === ProgramSectionMode.Template,
+            [baseStyles.editable]: mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View,
         },
         className,
     );
 
     return (
         <div className={rootClassName}>
-            {isEditable ? (
+            {mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View ? (
                 <div className={baseStyles['editable-grid']}>
                     <div className={baseStyles['title-cell']}>
                         <InputWithCharacterLimitGroup

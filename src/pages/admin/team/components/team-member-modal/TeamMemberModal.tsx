@@ -9,6 +9,7 @@ import { GenericModalWrapper } from '@/components/admin/generic-modal-wrapper/Ge
 import { useGenericModal } from '@/hooks/admin/use-generic-modal/useGenericModal';
 import { VisibilityStatus, PendingAction, ModalMode } from '@/types/admin/common';
 import { TeamCategory } from '@/types/admin/team-category';
+import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
 
 export interface TeamMemberModalProps {
     mode: ModalMode;
@@ -73,9 +74,9 @@ export const TeamMemberModal = ({
                 member?: TeamMember,
             ): TeamMemberCreateUpdateRequest => ({
                 id: mode === ModalMode.Edit && member ? member.id : null,
-                fullName: formData.fullName,
+                fullName: getNormalizedInputText(formData.fullName),
                 categoryId: formData.categoryId,
-                description: formData.description,
+                description: getNormalizedInputText(formData.description),
                 image: formData.image,
                 status: status,
                 imageId: formData.imageId,

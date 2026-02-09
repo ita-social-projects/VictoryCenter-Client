@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { TeamPageToolbar } from '../team-page-toolbar/TeamPageToolbar';
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { COMMON_TEXT_ADMIN, UI_CONFIG } from '@/const/admin/common';
 import './TeamPageContent.scss';
 import { TeamMember } from '@/types/admin/team-members';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
@@ -566,6 +566,7 @@ export const TeamPageContent = () => {
                     languages={allLanguages}
                     onLanguageChange={onLanguageChange}
                     onTranslationStatusFilterChange={onTranslationStatusFilterChange}
+                    maxCharactersToSearch={UI_CONFIG.SEARCH_BAR.MAX_CHARACTERS_FOR_SEARCH.TEAM_MEMBERS}
                 />
             </div>
 

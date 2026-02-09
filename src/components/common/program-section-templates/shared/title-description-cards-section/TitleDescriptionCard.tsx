@@ -5,12 +5,13 @@ import { CardDescriptionField } from './CardDescriptionField';
 import { PROGRAM_SECTION_VALIDATION, PROGRAMS_TEXT } from '@/const/admin/programs';
 import { useCardValidation } from '@/hooks/admin/use-section-card-validation/useCardValidation';
 import { TitleDescriptionCardData } from './TitleDescriptionCardsSection';
+import { ProgramSectionMode } from '@/types/common/program-sections';
 import styles from './TitleDescriptionCardsSection.module.scss';
 
 interface TitleDescriptionCardProps {
     card: TitleDescriptionCardData;
     index: number;
-    isEditable: boolean;
+    mode?: ProgramSectionMode;
     onTitleChange?: (index: number, value: string) => void;
     onDescriptionChange?: (index: number, value: string) => void;
 }
@@ -18,7 +19,7 @@ interface TitleDescriptionCardProps {
 export const TitleDescriptionCard = ({
     card,
     index,
-    isEditable,
+    mode = ProgramSectionMode.Published,
     onTitleChange,
     onDescriptionChange,
 }: TitleDescriptionCardProps) => {
@@ -48,7 +49,7 @@ export const TitleDescriptionCard = ({
 
     const { intro, items } = parseDescriptionList(card.description);
 
-    if (isEditable) {
+    if (mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View) {
         return (
             <div className={cn(styles['td-card'], styles['td-card--editable'])}>
                 <div className={styles['title-field']}>
@@ -63,6 +64,7 @@ export const TitleDescriptionCard = ({
                         maxLength={PROGRAM_SECTION_VALIDATION.cardTitle.max}
                         error={titleError}
                         placeholder={PROGRAMS_TEXT.SECTION.CARD.FORM.TITLE.PLACEHOLDER}
+                        disabled={mode === ProgramSectionMode.View}
                     />
                 </div>
 
@@ -78,6 +80,7 @@ export const TitleDescriptionCard = ({
                         maxLength={PROGRAM_SECTION_VALIDATION.cardDescription.max}
                         error={descriptionError}
                         placeholder="• "
+                        disabled={mode === ProgramSectionMode.View}
                     />
                 </div>
             </div>

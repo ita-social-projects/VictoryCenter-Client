@@ -48,7 +48,6 @@ export interface ReorderFaq {
 export interface FaqSearchItemData {
     id: number;
     question: string;
-    pages: string[];
 }
 export interface FaqLocalizationDto extends EntityLocalizationDto, FaqLocalizableFields {
     entityId: number;

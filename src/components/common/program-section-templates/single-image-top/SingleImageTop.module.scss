@@ -6,6 +6,7 @@ $img-height: 680px;
 
 .container {
     @extend .section-container;
+    background-color: #fff;
     padding-bottom: 60px;
 }
 
@@ -45,7 +46,7 @@ $img-height: 680px;
     flex: 0 0 44%;
 }
 
-.container.editable {
+.container.form-container {
     max-height: 1300px;
     gap: 30px;
 

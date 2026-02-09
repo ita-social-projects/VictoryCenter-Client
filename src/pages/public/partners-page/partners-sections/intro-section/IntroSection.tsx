@@ -2,6 +2,7 @@ import styles from './IntroSection.module.scss';
 import background from '@/assets/images/public/partners-page/horses.png';
 import { PartnersBanner } from '@/types/public/partners-page';
 import DOMPurify from 'dompurify';
+import { SafeHtml } from '@/components/common/safe-html';
 
 export interface IntroSectionProps {
     banner: PartnersBanner | null;
@@ -24,7 +25,7 @@ export const IntroSection = ({ banner }: IntroSectionProps) => {
         <div className={styles['intro-block']}>
             <img src={imageUrl} className={styles['bg-img']} alt="Horses" />
             <div className={styles.overlay}>
-                <h1 className={styles.title} dangerouslySetInnerHTML={{ __html: sanitizedTitle }} />
+                <SafeHtml as="h1" className={styles.title} html={sanitizedTitle} />
                 <p className={styles.subtitle}>{description}</p>
             </div>
         </div>

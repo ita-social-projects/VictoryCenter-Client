@@ -3,14 +3,11 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { TitleDescriptionCardsWrapper } from './TitleDescriptionCardsWrapper';
 import { TitleDescriptionCardData } from '../shared/title-description-cards-section/TitleDescriptionCardsSection';
+import { ProgramSectionMode } from '@/types/common/program-sections';
 
 jest.mock('../shared/title-description-cards-section/TitleDescriptionCardsSection', () => ({
     TitleDescriptionCardsSection: (props: any) => (
-        <div
-            data-testid="title-description-cards-section"
-            data-cards-count={props.cardsCount}
-            data-is-editable={props.isEditable}
-        />
+        <div data-testid="title-description-cards-section" data-cards-count={props.cardsCount} data-mode={props.mode} />
     ),
 }));
 
@@ -35,7 +32,7 @@ describe('TitleDescriptionCardsWrapper', () => {
 
     it('should apply editable class when isEditable is true', () => {
         const { container } = render(
-            <TitleDescriptionCardsWrapper cards={mockCards} cardsCount={2} isEditable={true} />,
+            <TitleDescriptionCardsWrapper cards={mockCards} cardsCount={2} mode={ProgramSectionMode.Edit} />,
         );
 
         expect((container.firstChild as HTMLElement).className).toMatch(/editable/);
@@ -65,16 +62,22 @@ describe('TitleDescriptionCardsWrapper', () => {
         expect(screen.getByTestId('title-description-cards-section')).toHaveAttribute('data-cards-count', '3');
     });
 
-    it('should pass isEditable to child component', () => {
-        render(<TitleDescriptionCardsWrapper cards={mockCards} cardsCount={2} isEditable={true} />);
+    it('should pass mode to child component', () => {
+        render(<TitleDescriptionCardsWrapper cards={mockCards} cardsCount={2} mode={ProgramSectionMode.Edit} />);
 
-        expect(screen.getByTestId('title-description-cards-section')).toHaveAttribute('data-is-editable', 'true');
+        expect(screen.getByTestId('title-description-cards-section')).toHaveAttribute(
+            'data-mode',
+            String(ProgramSectionMode.Edit),
+        );
     });
 
-    it('should have isEditable false by default', () => {
+    it('should have mode Published by default', () => {
         render(<TitleDescriptionCardsWrapper cards={mockCards} cardsCount={2} />);
 
-        expect(screen.getByTestId('title-description-cards-section')).toHaveAttribute('data-is-editable', 'false');
+        expect(screen.getByTestId('title-description-cards-section')).toHaveAttribute(
+            'data-mode',
+            String(ProgramSectionMode.Published),
+        );
     });
 
     it('should pass handlers to child component', () => {

@@ -1,0 +1,43 @@
+@import '../BaseSectionTemplate.module.scss';
+
+.container {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+}
+
+.bottom-section {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+.image-wrapper {
+    display: flex;
+    align-items: end;
+    height: auto;
+}
+
+.image {
+    width: 100%;
+    height: auto;
+    object-fit: fill;
+    display: block;
+
+    &[data-elevated='true'] {
+        margin-bottom: 70px;
+    }
+
+    @media (min-width: 768px) {
+        &[data-elevated='true'] {
+            margin-bottom: 70px;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        &[data-elevated='true'] {
+            margin-bottom: 100px;
+        }
+    }
+}

@@ -3,6 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { SearchBar, SearchBarProps } from './SearchBar';
 import { SearchItemWrapperProps } from './search-item-wrapper/SearchItemWrapper';
 import { TooltipProps } from '@/components/admin/tooltip/Tooltip';
+import { UseDebouncedValueCallbackProps } from '@/hooks/common/use-debounced-value-callback/useDebouncedValueCallback';
 
 interface TestItem {
     id: number;
@@ -82,6 +83,13 @@ describe('SearchBar', () => {
                 calculatedSize: 200,
             },
         );
+        require('@/hooks/common/use-debounced-value-callback/useDebouncedValueCallback').useDebouncedValueCallback.mockImplementation(
+            ({ value, callback, isDisabled }: UseDebouncedValueCallbackProps<string>) => {
+                if (!isDisabled) {
+                    callback(value);
+                }
+            },
+        );
     });
 
     // Render helpers
@@ -145,6 +153,57 @@ describe('SearchBar', () => {
             expect(getClearButton()).toBeInTheDocument();
             expect(getClearIcon()).toBeInTheDocument();
         });
+
+        it('sets maxLength on input when maxCharactersToSearch is provided', () => {
+            renderSearchBar({ maxCharactersToSearch: 5 });
+
+            const input = getInput();
+            expect(input).toHaveAttribute('maxLength', '5');
+        });
+
+        it('does not set maxLength on input when maxCharactersToSearch is not provided', () => {
+            renderSearchBar();
+
+            const input = getInput();
+            expect(input).not.toHaveAttribute('maxLength');
+        });
+
+        it('limits input value length according to maxCharactersToSearch', () => {
+            renderSearchBar({ maxCharactersToSearch: 5 });
+
+            typeInInput('123456789');
+
+            expect(getInput()).toHaveValue('12345');
+        });
+
+        it('does not pass value longer than maxCharactersToSearch to onQueryChange', () => {
+            const onQueryChange = jest.fn();
+            renderSearchBar({ maxCharactersToSearch: 5, onQueryChange });
+
+            typeInInput('123456789');
+
+            expect(onQueryChange).toHaveBeenCalledWith('12345');
+        });
+
+        it('supports different maxCharactersToSearch values', () => {
+            const { rerender } = renderSearchBar({ maxCharactersToSearch: 3 });
+
+            typeInInput('abcdef');
+            expect(getInput()).toHaveValue('abc');
+
+            rerender(<SearchBar {...defaultProps} maxCharactersToSearch={10} />);
+
+            typeInInput('abcdefghijk');
+            expect(getInput()).toHaveValue('abcdefghij');
+        });
+
+        it('allows only one character when maxCharactersToSearch is 1', () => {
+            renderSearchBar({ maxCharactersToSearch: 1 });
+
+            typeInInput('abc');
+
+            expect(getInput()).toHaveValue('a');
+        });
     });
 
     describe('Dropdown behavior', () => {
@@ -187,6 +246,42 @@ describe('SearchBar', () => {
         });
     });
 
+    describe('Focus behavior', () => {
+        it('does not show dropdown on focus when input is below minimum characters', () => {
+            renderSearchBar({ minCharactersToSearch: 3 });
+            typeInInput('ab');
+            expectDropdownToBeHidden();
+
+            fireEvent.focus(getInput());
+            expectDropdownToBeHidden();
+        });
+
+        it('restores dropdown on focus when input meets minimum characters', () => {
+            renderSearchBar();
+            typeInInput('test');
+            expectDropdownToBeVisible();
+
+            pressKey('Escape');
+            expectDropdownToBeHidden();
+
+            fireEvent.focus(getInput());
+            expectDropdownToBeVisible();
+        });
+    });
+
+    describe('Mouse interactions', () => {
+        it('resets active index on mouse leave from suggestions list', () => {
+            renderSearchBar();
+            typeInInput('a');
+            pressKey('ArrowDown');
+            expectSuggestionToBeActive('Apple');
+
+            const list = getSuggestionsList();
+            if (list) fireEvent.mouseLeave(list);
+
+            expect(getSuggestionItem('Apple')).not.toHaveClass('active');
+        });
+    });
     describe('User interactions', () => {
         it('calls onSuggestionSelect when suggestion is clicked', () => {
             renderSearchBar();

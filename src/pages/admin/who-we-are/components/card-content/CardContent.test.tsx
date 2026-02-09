@@ -5,11 +5,22 @@ import { ContentType } from '@/types/common/about-us';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { WHO_WE_ARE_TEXT } from '@/const/admin/who-we-are';
 import { Image } from '@/types/common/image';
-import { TextAreaWithCharacterLimitProps } from '@/components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
+import { RichTextInputGroupProps } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 
-jest.mock('@/components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit', () => ({
-    TextAreaWithCharacterLimit: ({ onChange, value, maxLength, onBlur }: TextAreaWithCharacterLimitProps) => (
-        <textarea data-testid="mock-textarea" onChange={onChange} value={value} maxLength={maxLength} onBlur={onBlur} />
+jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
+    RichTextInputGroup: ({ label, onChange, value, maxLength, onBlur, id, error }: RichTextInputGroupProps) => (
+        <div>
+            <label htmlFor={id}>{label}</label>
+            <input
+                data-testid={`mock-rich-input-${id}`}
+                onChange={(e) => onChange(e.target.value)}
+                value={value}
+                maxLength={maxLength}
+                onBlur={onBlur}
+                id={id}
+            />
+            {error && <span>{error}</span>}
+        </div>
     ),
 }));
 
@@ -74,9 +85,9 @@ describe('CardContent', () => {
         expect(screen.getByText(WHO_WE_ARE_TEXT.IMAGE.INPUT)).toBeInTheDocument();
         expect(screen.getByText(COMMON_TEXT_ADMIN.TYPE.DESCRIPTION)).toBeInTheDocument();
 
-        const textarea = screen.getByTestId('mock-textarea');
-        expect(textarea).toHaveValue('Initial description');
-        expect(textarea).toHaveAttribute('maxLength', descriptionLimit.toString());
+        const descriptionInput = screen.getByTestId('mock-rich-input-1');
+        expect(descriptionInput).toHaveValue('Initial description');
+        expect(descriptionInput).toHaveAttribute('maxLength', descriptionLimit.toString());
 
         expect(screen.queryByText('This is a description error message.')).not.toBeInTheDocument();
         expect(screen.queryByText('This is an image error message.')).not.toBeInTheDocument();
@@ -84,17 +95,17 @@ describe('CardContent', () => {
 
     it('should call onChange, onDescriptionValidate on change, and onDescriptionValidate on blur', () => {
         renderComponent();
-        const textarea = screen.getByTestId('mock-textarea');
+        const descriptionInput = screen.getByTestId('mock-rich-input-1');
         const newDescription = 'New description text';
 
-        fireEvent.change(textarea, { target: { value: newDescription } });
+        fireEvent.change(descriptionInput, { target: { value: newDescription } });
         expect(mockOnChange).toHaveBeenCalledWith({
             ...baseContent,
             description: newDescription,
         });
-        expect(mockOnDescriptionValidate).toHaveBeenCalled();
+        expect(mockOnDescriptionValidate).toHaveBeenCalledWith(newDescription);
 
-        fireEvent.blur(textarea);
+        fireEvent.blur(descriptionInput);
         expect(mockOnDescriptionValidate).toHaveBeenCalled();
     });
 
@@ -155,7 +166,7 @@ describe('CardContent', () => {
 
         renderComponent({ content: contentWithNullDescription });
 
-        const textarea = screen.getByTestId('mock-textarea');
-        expect(textarea).toHaveValue('');
+        const descriptionInput = screen.getByTestId('mock-rich-input-3');
+        expect(descriptionInput).toHaveValue('');
     });
 });

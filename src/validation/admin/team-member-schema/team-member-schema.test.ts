@@ -52,22 +52,9 @@ describe('teamMemberValidationSchema', () => {
             );
         });
 
-        it('accepts empty description when not publishing', () => {
-            expect(TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription('', false)).toBeUndefined();
-        });
-
-        it('rejects description with multiple spaces when not publishing', () => {
-            const descriptionWithMultipleSpaces = 'Valid text   with multiple spaces';
-            expect(TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription(descriptionWithMultipleSpaces, false)).toBe(
-                TEAM_MEMBER_VALIDATION.description.getMultipleSpacesError(),
-            );
-        });
-
-        it('rejects description with multiple spaces when publishing', () => {
-            const descriptionWithMultipleSpaces =
-                'Valid text    with multiple spaces but long enough to pass min length';
-            expect(TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription(descriptionWithMultipleSpaces, true)).toBe(
-                TEAM_MEMBER_VALIDATION.description.getMultipleSpacesError(),
+        it('rejects empty description when not publishing', () => {
+            expect(TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription('', false)).toBe(
+                TEAM_MEMBER_VALIDATION.description.getRequiredError(),
             );
         });
 
@@ -79,7 +66,7 @@ describe('teamMemberValidationSchema', () => {
 
         it('requires description when publishing and not provided', () => {
             expect(TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription('', true)).toBe(
-                TEAM_MEMBER_VALIDATION.description.getRequiredWhenPublishingError(),
+                TEAM_MEMBER_VALIDATION.description.getRequiredError(),
             );
         });
 

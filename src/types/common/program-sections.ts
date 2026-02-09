@@ -24,6 +24,13 @@ export enum ProgramSectionTemplate {
     SingleTitleDescriptionAuthorPairs = 12,
 }
 
+export enum ProgramSectionMode {
+    Template = 'template',
+    View = 'view',
+    Edit = 'edit',
+    Published = 'published',
+}
+
 export interface ProgramSectionContent {
     id?: number;
     sectionId?: number;

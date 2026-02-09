@@ -5,15 +5,16 @@ import { ImageValues, Image } from '@/types/common/image';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { PROGRAM_SECTION_IMAGE_CONFIGS, PROGRAM_VALIDATION } from '@/const/admin/programs';
 import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
+import { ProgramSectionMode } from '@/types/common/program-sections';
+import { useImageError } from '@/hooks/common/use-image-error/useImageError';
 import styles from './SingleImageTop.module.scss';
-import { useState } from 'react';
+import publishedStyles from './PublishedSingleImageTop.module.scss';
 
 export interface SingleImageTopProps {
     title?: string;
     description?: string;
     image?: Image | ImageValues | null;
-    isTemplate?: boolean;
-    isEditable?: boolean;
+    mode?: ProgramSectionMode;
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
     onImageChange?: (file: ImageValues | null) => void;
@@ -23,29 +24,25 @@ export const SingleImageTop = ({
     title = '',
     description = '',
     image = null,
-    isTemplate = false,
-    isEditable = false,
+    mode = ProgramSectionMode.Published,
     onTitleChange,
     onDescriptionChange,
     onImageChange,
 }: SingleImageTopProps) => {
     const imageSrc = getImageSrc(image);
-    const [error, setError] = useState<string>('');
-
-    const handleSetError = (errorMessage: string | null) => {
-        setError(errorMessage || '');
-    };
+    const baseStyles = mode === ProgramSectionMode.Published ? publishedStyles : styles;
+    const { error, handleSetError } = useImageError();
 
     return (
         <div
-            className={cn(styles.container, {
-                [styles.template]: isTemplate,
-                [styles.editable]: isEditable,
+            className={cn(baseStyles.container, {
+                [styles.template]: mode === ProgramSectionMode.Template,
+                [styles['form-container']]: mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View,
             })}
         >
-            <div className={styles['top-section']}>
-                <div className={styles['image-wrapper']}>
-                    {isEditable ? (
+            <div className={baseStyles['top-section']}>
+                <div className={baseStyles['image-wrapper']}>
+                    {mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View ? (
                         <PhotoInputGroup
                             id="section-image-1"
                             name="section-image-1"
@@ -64,20 +61,20 @@ export const SingleImageTop = ({
                             )}
                             variant="programSection"
                             maxSizeMB={PROGRAM_VALIDATION.images.maxSizeMB}
+                            disabled={mode === ProgramSectionMode.View}
                         />
                     ) : (
-                        imageSrc && <img src={imageSrc} alt="" className={styles.image} />
+                        imageSrc && <img src={imageSrc} alt="" className={baseStyles.image} />
                     )}
                 </div>
             </div>
             <TitleDescriptionSection
                 title={title}
                 description={description}
-                className={styles['bottom-section']}
-                titleClassName={isTemplate ? styles['title-template'] : ''}
-                descriptionClassName={isTemplate ? styles['description-template'] : ''}
-                isTemplate={isTemplate}
-                isEditable={isEditable}
+                className={baseStyles['bottom-section']}
+                titleClassName={mode === ProgramSectionMode.Template ? styles['title-template'] : ''}
+                descriptionClassName={mode === ProgramSectionMode.Template ? styles['description-template'] : ''}
+                mode={mode}
                 onTitleChange={onTitleChange}
                 onDescriptionChange={onDescriptionChange}
             />

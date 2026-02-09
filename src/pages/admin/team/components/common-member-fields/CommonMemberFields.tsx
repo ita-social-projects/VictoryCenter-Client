@@ -51,12 +51,14 @@ export const CommonMemberFields = <TFormData extends CommonFields, TErrorState e
                     maxLength={TEAM_MEMBER_VALIDATION.fullName.max}
                     disabled={isSubmitting || formDisabled}
                     error={errors.fullName && Array.isArray(errors.fullName) ? errors.fullName[0] : undefined}
+                    maxLimitWarning={TEAM_MEMBER_VALIDATION.fullName.getMaxError()}
                 />
             </div>
 
             <div className={styles['form-group']}>
                 <TextAreaWithCharacterLimitGroup
                     label={TEAM_MEMBERS_TEXT.FORM.LABEL.DESCRIPTION}
+                    isRequired
                     id="description"
                     name="description"
                     value={formState.description}
@@ -66,6 +68,7 @@ export const CommonMemberFields = <TFormData extends CommonFields, TErrorState e
                     disabled={isSubmitting || formDisabled}
                     maxLength={TEAM_MEMBER_VALIDATION.description.max}
                     error={errors.description}
+                    maxLimitWarning={TEAM_MEMBER_VALIDATION.description.getMaxError()}
                 />
             </div>
         </div>

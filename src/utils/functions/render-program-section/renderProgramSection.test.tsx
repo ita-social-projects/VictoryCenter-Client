@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 import { renderProgramSection, RenderProgramSectionParams, getInitialSectionContents } from './renderProgramSection';
-import { ProgramSectionTemplate } from '@/types/common/program-sections';
+import { ProgramSectionTemplate, ProgramSectionMode } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 
 const capturedProps: Record<string, any> = {};
@@ -126,7 +126,7 @@ describe('renderProgramSection', () => {
                 const params: RenderProgramSectionParams = {
                     templateId: id,
                     data: baseData,
-                    isEditable: true,
+                    mode: ProgramSectionMode.Edit,
                     handlers: baseHandlers,
                 };
 
@@ -139,7 +139,7 @@ describe('renderProgramSection', () => {
             const params: RenderProgramSectionParams = {
                 templateId: ProgramSectionTemplate.SingleImageTop,
                 data: baseData,
-                isEditable: true,
+                mode: ProgramSectionMode.Edit,
                 handlers: baseHandlers,
             };
 
@@ -166,7 +166,7 @@ describe('renderProgramSection', () => {
                 renderProgramSection({
                     templateId: ProgramSectionTemplate.SingleImageTop,
                     data: baseData,
-                    isEditable: true,
+                    mode: ProgramSectionMode.Edit,
                     handlers: handlers as any,
                 }),
             );
@@ -179,7 +179,7 @@ describe('renderProgramSection', () => {
             const params: RenderProgramSectionParams = {
                 templateId: ProgramSectionTemplate.DualImagesBottom,
                 data: baseData,
-                isEditable: true,
+                mode: ProgramSectionMode.Edit,
                 handlers: baseHandlers,
             };
 
@@ -224,7 +224,7 @@ describe('renderProgramSection', () => {
                     renderProgramSection({
                         templateId: id,
                         data: cardData,
-                        isEditable: true,
+                        mode: ProgramSectionMode.Edit,
                         handlers: cardHandlers as any,
                     }),
                 );
@@ -239,7 +239,7 @@ describe('renderProgramSection', () => {
                     renderProgramSection({
                         templateId: id,
                         data: { cards: undefined },
-                        isEditable: true,
+                        mode: ProgramSectionMode.Edit,
                         handlers: cardHandlers as any,
                     }),
                 );
@@ -253,7 +253,7 @@ describe('renderProgramSection', () => {
                     renderProgramSection({
                         templateId: id,
                         data: cardData,
-                        isEditable: true,
+                        mode: ProgramSectionMode.Edit,
                         handlers: cardHandlers as any,
                     }),
                 );
@@ -347,8 +347,7 @@ describe('renderProgramSection', () => {
                 renderProgramSection({
                     templateId: ProgramSectionTemplate.SingleTitleQuintupleDescription,
                     data: { title: 'T', descriptions: ['a', 'b'] },
-                    isTemplate: true,
-                    isEditable: true,
+                    mode: ProgramSectionMode.Edit,
                     handlers: handlers as any,
                 }),
             );
@@ -358,8 +357,7 @@ describe('renderProgramSection', () => {
             const props = capturedProps.SingleTitleQuintupleDescription;
             expect(props.title).toBe('T');
             expect(props.descriptions).toEqual(['a', 'b']);
-            expect(props.isTemplate).toBe(true);
-            expect(props.isEditable).toBe(true);
+            expect(props.mode).toBe(ProgramSectionMode.Edit);
 
             props.onDescriptionsChange(1, 'x');
             expect(handlers.onDescriptionsChange).toHaveBeenCalledWith(1, 'x');
@@ -370,7 +368,7 @@ describe('renderProgramSection', () => {
                 renderProgramSection({
                     templateId: ProgramSectionTemplate.SingleTitleQuintupleDescription,
                     data: { title: 'T', description: 'only' },
-                    isEditable: true,
+                    mode: ProgramSectionMode.Edit,
                     handlers: handlers as any,
                 }),
             );
@@ -384,7 +382,7 @@ describe('renderProgramSection', () => {
                 renderProgramSection({
                     templateId: ProgramSectionTemplate.SingleTitleQuintupleDescription,
                     data: { title: 'T' },
-                    isEditable: true,
+                    mode: ProgramSectionMode.Edit,
                     handlers: handlers as any,
                 }),
             );
@@ -398,7 +396,7 @@ describe('renderProgramSection', () => {
                 renderProgramSection({
                     templateId: ProgramSectionTemplate.SingleTitleQuintupleDescription,
                     data: { title: 'T', description: 'ignored', descriptions: [] },
-                    isEditable: true,
+                    mode: ProgramSectionMode.Edit,
                     handlers: handlers as any,
                 }),
             );
@@ -412,24 +410,23 @@ describe('renderProgramSection', () => {
         const view = renderProgramSection({
             templateId: 'UNKNOWN' as unknown as ProgramSectionTemplate,
             data: baseData,
-            isEditable: true,
+            mode: ProgramSectionMode.Edit,
         });
 
         expect(view).toBeNull();
     });
 
-    it('passes isTemplate to standard templates', () => {
+    it('passes mode to standard templates', () => {
         render(
             renderProgramSection({
                 templateId: ProgramSectionTemplate.TextOnly,
                 data: baseData,
-                isTemplate: true,
-                isEditable: false,
+                mode: ProgramSectionMode.Template,
             }),
         );
 
         expect(screen.getByTestId('TextOnly')).toBeInTheDocument();
-        expect(capturedProps.TextOnly.isTemplate).toBe(true);
+        expect(capturedProps.TextOnly.mode).toBe(ProgramSectionMode.Template);
     });
 });
 

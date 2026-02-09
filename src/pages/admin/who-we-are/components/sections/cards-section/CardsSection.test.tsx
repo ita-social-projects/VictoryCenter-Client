@@ -22,9 +22,9 @@ jest.mock('../../card-content/CardContent', () => ({
                 data-testid={`mock-textarea-${content.id}`}
                 onChange={(e) => {
                     onChange({ ...content, description: e.target.value });
-                    onDescriptionValidate(e);
+                    onDescriptionValidate(e.target.value);
                 }}
-                onBlur={onDescriptionValidate}
+                onBlur={(e) => onDescriptionValidate(e.currentTarget.value)}
                 value={content.description ?? undefined}
             />
             {descriptionError && <span data-testid={`desc-error-${content.id}`}>{descriptionError}</span>}

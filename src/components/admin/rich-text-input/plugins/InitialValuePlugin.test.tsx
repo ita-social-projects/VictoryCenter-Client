@@ -3,13 +3,17 @@ import '@testing-library/jest-dom';
 import { InitialValuePlugin } from './InitialValuePlugin';
 
 const mockUpdate = jest.fn();
+const mockGetEditorState = jest.fn();
 const mockEditor = {
     update: mockUpdate,
+    getEditorState: mockGetEditorState,
 };
 
 const mockGetRoot = jest.fn();
 const mockInsertNodes = jest.fn();
 const mockGenerateNodesFromDOM = jest.fn();
+const mockGenerateHtmlFromNodes = jest.fn();
+const mockSanitizeHtml = jest.fn();
 
 jest.mock('@lexical/react/LexicalComposerContext', () => ({
     useLexicalComposerContext: () => [mockEditor],
@@ -22,6 +26,11 @@ jest.mock('lexical', () => ({
 
 jest.mock('@lexical/html', () => ({
     $generateNodesFromDOM: (editor: any, dom: any) => mockGenerateNodesFromDOM(editor, dom),
+    $generateHtmlFromNodes: (editor: any) => mockGenerateHtmlFromNodes(editor),
+}));
+
+jest.mock('./htmlSanitizer', () => ({
+    sanitizeHtml: (html: string) => mockSanitizeHtml(html),
 }));
 
 describe('InitialValuePlugin', () => {
@@ -33,6 +42,13 @@ describe('InitialValuePlugin', () => {
         };
         mockGetRoot.mockReturnValue(mockRoot);
         mockGenerateNodesFromDOM.mockReturnValue([{ type: 'paragraph' }]);
+        mockGenerateHtmlFromNodes.mockReturnValue('<p></p>');
+
+        mockSanitizeHtml.mockImplementation((html: string) => html);
+
+        mockGetEditorState.mockReturnValue({
+            read: (callback: () => any) => callback(),
+        });
 
         global.DOMParser = jest.fn().mockImplementation(() => ({
             parseFromString: jest.fn(() => ({
@@ -59,10 +75,12 @@ describe('InitialValuePlugin', () => {
         expect(mockInsertNodes).toHaveBeenCalledWith([{ type: 'paragraph' }]);
     });
 
-    it('updates editor when value prop changes', () => {
+    it('updates editor when value prop changes to different content', () => {
         const { rerender } = render(<InitialValuePlugin value="<p>First</p>" />);
 
         expect(mockUpdate).toHaveBeenCalledTimes(1);
+
+        mockGenerateHtmlFromNodes.mockReturnValue('<p>First</p>');
 
         rerender(<InitialValuePlugin value="<p>Second</p>" />);
 
@@ -144,6 +162,8 @@ describe('InitialValuePlugin', () => {
 
         mockUpdate.mockClear();
 
+        mockGenerateHtmlFromNodes.mockReturnValue('<p>Original</p>');
+
         rerender(<InitialValuePlugin value="<p>Updated externally</p>" />);
 
         expect(mockUpdate).toHaveBeenCalled();
@@ -153,5 +173,31 @@ describe('InitialValuePlugin', () => {
 
         expect(mockGetRoot).toHaveBeenCalled();
         expect(mockInsertNodes).toHaveBeenCalled();
+    });
+
+    it('does not update editor when value changes but HTML content is the same', () => {
+        const { rerender } = render(<InitialValuePlugin value="<p>Content</p>" />);
+
+        expect(mockUpdate).toHaveBeenCalledTimes(1);
+        mockUpdate.mockClear();
+
+        mockGenerateHtmlFromNodes.mockReturnValue('<p>Content</p>');
+
+        rerender(<InitialValuePlugin value="<p>Content</p>" />);
+
+        expect(mockUpdate).not.toHaveBeenCalled();
+    });
+
+    it('handles whitespace differences in HTML comparison', () => {
+        const { rerender } = render(<InitialValuePlugin value="<p>First</p><p>Second</p>" />);
+
+        expect(mockUpdate).toHaveBeenCalledTimes(1);
+        mockUpdate.mockClear();
+
+        mockGenerateHtmlFromNodes.mockReturnValue('<p>First</p> <p>Second</p>');
+
+        rerender(<InitialValuePlugin value="<p>First</p><p>Second</p>" />);
+
+        expect(mockUpdate).not.toHaveBeenCalled();
     });
 });

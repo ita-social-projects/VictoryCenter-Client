@@ -1,5 +1,5 @@
 import React from 'react';
-import { ProgramSectionContent, ProgramSectionTemplate } from '@/types/common/program-sections';
+import { ProgramSectionContent, ProgramSectionTemplate, ProgramSectionMode } from '@/types/common/program-sections';
 import { ImageValues, Image } from '@/types/common/image';
 import { ContentType } from '@/types/common/programs';
 import { QuadImagesBottom } from '@/components/common/program-section-templates/quad-images-bottom/QuadImagesBottom';
@@ -48,8 +48,7 @@ export interface ProgramSectionHandlers {
 export interface RenderProgramSectionParams {
     templateId: ProgramSectionTemplate;
     data: ProgramSectionData;
-    isTemplate?: boolean;
-    isEditable?: boolean;
+    mode?: ProgramSectionMode;
     handlers?: ProgramSectionHandlers;
 }
 
@@ -105,8 +104,7 @@ const SINGLE_IMAGE_TEMPLATES = new Set<ProgramSectionTemplate>([
 interface StandardTemplateProps {
     title?: string;
     description?: string;
-    isTemplate?: boolean;
-    isEditable?: boolean;
+    mode?: ProgramSectionMode;
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
 }
@@ -159,8 +157,7 @@ export const getInitialSectionContents = (templateId: ProgramSectionTemplate): P
 export const renderProgramSection = ({
     templateId,
     data,
-    isTemplate = false,
-    isEditable = false,
+    mode = ProgramSectionMode.Published,
     handlers,
 }: RenderProgramSectionParams): React.ReactElement | null => {
     const cardCount = CARD_COUNT_MAP[templateId];
@@ -169,7 +166,7 @@ export const renderProgramSection = ({
             <TitleDescriptionCardsWrapper
                 cards={data.cards ?? []}
                 cardsCount={cardCount}
-                isEditable={isEditable}
+                mode={mode}
                 onTitleChange={handlers?.onCardTitleChange}
                 onDescriptionChange={handlers?.onCardDescriptionChange}
             />
@@ -200,8 +197,7 @@ export const renderProgramSection = ({
             <SingleTitleQuintupleDescription
                 title={data.title}
                 descriptions={descriptions}
-                isTemplate={isTemplate}
-                isEditable={isEditable}
+                mode={mode}
                 onTitleChange={handlers?.onTitleChange}
                 onDescriptionsChange={handlers?.onDescriptionsChange}
             />
@@ -214,8 +210,7 @@ export const renderProgramSection = ({
     const baseProps: StandardTemplateProps = {
         title: data.title,
         description: data.description,
-        isTemplate,
-        isEditable,
+        mode,
         onTitleChange: handlers?.onTitleChange,
         onDescriptionChange: handlers?.onDescriptionChange,
     };

@@ -1,10 +1,12 @@
 import styles from './TitleDescriptionSection.module.scss';
+import publishedStyles from './PublishedTitleDescriptionSection.module.scss';
 import cn from 'classnames';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { PROGRAMS_TEXT, PROGRAM_SECTION_VALIDATION } from '@/const/admin/programs';
 import { useProgramSectionValidation } from '@/hooks/admin/use-program-section-validation';
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
+import { ProgramSectionMode } from '@/types/common/program-sections';
 
 export interface TitleDescriptionSectionProps {
     title?: string;
@@ -12,8 +14,7 @@ export interface TitleDescriptionSectionProps {
     className?: string;
     titleClassName?: string;
     descriptionClassName?: string;
-    isTemplate?: boolean;
-    isEditable?: boolean;
+    mode?: ProgramSectionMode;
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
 }
@@ -24,8 +25,7 @@ export const TitleDescriptionSection = ({
     className = '',
     titleClassName = '',
     descriptionClassName = '',
-    isTemplate = false,
-    isEditable = false,
+    mode = ProgramSectionMode.Published,
     onTitleChange,
     onDescriptionChange,
 }: TitleDescriptionSectionProps) => {
@@ -41,19 +41,21 @@ export const TitleDescriptionSection = ({
         onDescriptionChange,
     });
 
+    const baseStyles = mode === ProgramSectionMode.Published ? publishedStyles : styles;
+
     return (
         <div
             className={cn(
-                styles.container,
+                baseStyles.container,
                 {
-                    [styles.template]: isTemplate,
-                    [styles.editable]: isEditable,
+                    [styles.template]: mode === ProgramSectionMode.Template,
+                    [styles['form-container']]: mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View,
                 },
                 className,
             )}
         >
-            <div className={styles['title-section']}>
-                {isEditable ? (
+            <div className={baseStyles['title-section']}>
+                {mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View ? (
                     <InputWithCharacterLimitGroup
                         label={PROGRAMS_TEXT.SECTION.FORM.TITLE.TEXT}
                         isRequired={true}
@@ -66,13 +68,14 @@ export const TitleDescriptionSection = ({
                         placeholder={PROGRAMS_TEXT.SECTION.FORM.TITLE.PLACEHOLDER}
                         className={styles['title-input']}
                         error={titleError}
+                        disabled={mode === ProgramSectionMode.View}
                     />
                 ) : (
-                    <h2 className={cn(styles.title, titleClassName)}>{title}</h2>
+                    <h2 className={cn(baseStyles.title, titleClassName)}>{title}</h2>
                 )}
             </div>
-            <div className={styles['description-section']}>
-                {isEditable ? (
+            <div className={baseStyles['description-section']}>
+                {mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View ? (
                     <TextAreaWithCharacterLimitGroup
                         label={PROGRAMS_TEXT.SECTION.FORM.DESCRIPTION.TEXT}
                         isRequired={true}
@@ -85,9 +88,10 @@ export const TitleDescriptionSection = ({
                         rows={10}
                         error={descriptionError}
                         currentLength={getTrimmedInputText(description).length}
+                        disabled={mode === ProgramSectionMode.View}
                     />
                 ) : (
-                    <p className={cn(styles.description, descriptionClassName)}>{description}</p>
+                    <p className={cn(baseStyles.description, descriptionClassName)}>{description}</p>
                 )}
             </div>
         </div>

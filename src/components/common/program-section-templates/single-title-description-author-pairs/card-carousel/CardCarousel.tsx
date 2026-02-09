@@ -1,5 +1,6 @@
 import cn from 'classnames';
 import { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
+import { CarouselNavButton } from './CarouselNavButton/CarouselNavButton';
 import styles from './CardCarousel.module.scss';
 
 type IconComponent = React.ComponentType<React.SVGProps<SVGSVGElement>>;
@@ -66,14 +67,13 @@ export const CardCarousel = ({ children, itemsCount, LeftIcon, RightIcon, varian
             })}
         >
             {canLeft && (
-                <button
-                    type="button"
-                    className={cn(styles['nav-button'], styles['nav-left'])}
+                <CarouselNavButton
+                    side="left"
+                    variant={variant}
+                    ariaLabel="previous"
+                    Icon={LeftIcon}
                     onClick={() => scrollByCard(-1)}
-                    aria-label="previous"
-                >
-                    <LeftIcon />
-                </button>
+                />
             )}
 
             <div ref={viewportRef} className={styles.viewport} onScroll={syncNav}>
@@ -81,14 +81,13 @@ export const CardCarousel = ({ children, itemsCount, LeftIcon, RightIcon, varian
             </div>
 
             {canRight && (
-                <button
-                    type="button"
-                    className={cn(styles['nav-button'], styles['nav-right'])}
+                <CarouselNavButton
+                    side="right"
+                    variant={variant}
+                    ariaLabel="next"
+                    Icon={RightIcon}
                     onClick={() => scrollByCard(1)}
-                    aria-label="next"
-                >
-                    <RightIcon />
-                </button>
+                />
             )}
         </div>
     );

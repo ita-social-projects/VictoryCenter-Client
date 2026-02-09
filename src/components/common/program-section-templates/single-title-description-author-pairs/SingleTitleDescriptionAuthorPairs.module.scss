@@ -1,5 +1,5 @@
 @use '@/assets/sass/variables/colors' as c;
-@use '@/assets/sass/variables/typography' as t;
+@use '@/assets/sass/mixins/typography.mixins' as type;
 
 @import '../shared/BaseSectionTemplate.module.scss';
 
@@ -43,16 +43,12 @@
 }
 
 .title {
-    font-family: t.$font-family-base;
-    font-weight: t.$fw-bold;
-    font-size: 40px;
-    line-height: 48px;
+    @include type.h3-bold;
     color: c.$blue-900;
 }
 
 .template .title {
-    font-size: 36px;
-    line-height: 44px;
+    @include type.h4-bold;
 }
 
 .title-input-group {
@@ -67,18 +63,12 @@
     }
 
     :global(.char-limit-input__field) {
-        font-family: t.$font-family-base;
-        font-weight: t.$fw-bold;
-        font-size: 40px;
-        line-height: 48px;
+        @include type.h3-bold;
         color: c.$blue-900;
     }
 
     :global(.char-limit-input__field::placeholder) {
-        font-family: t.$font-family-base;
-        font-weight: t.$fw-bold;
-        font-size: 40px;
-        line-height: 48px;
+        @include type.h3-bold;
         color: c.$grey-700;
         opacity: 1;
     }
@@ -115,11 +105,8 @@
 }
 
 .add-card-text {
+    @include type.small-text-medium;
     color: c.$grey-50;
-    font-family: t.$font-family-base;
-    font-weight: t.$fw-medium;
-    font-size: 14px;
-    line-height: 18px;
 }
 
 .add-card-icon :global(path) {

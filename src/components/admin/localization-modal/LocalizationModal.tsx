@@ -61,6 +61,7 @@ export const LocalizationModal = ({
                             onClick={onSave}
                             disabled={!isFormValid || isSubmitting}
                             data-testid="save-localization-btn"
+                            className={styles['save-localization-btn']}
                         >
                             {saveButtonText}
                         </Button>

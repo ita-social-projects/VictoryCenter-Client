@@ -3,6 +3,8 @@ import '@testing-library/jest-dom';
 import { TranslationControls } from './TranslationControls';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
+const mockTargetLocale = 'en';
+
 jest.mock('@/components/admin/button/Button', () => ({
     Button: (props: any) => (
         <button data-testid="generate-btn" disabled={props.disabled} onClick={props.onClick} type={props.type}>
@@ -13,10 +15,16 @@ jest.mock('@/components/admin/button/Button', () => ({
 
 jest.mock('@/components/common/select/Select', () => {
     const MockSelect = ({ children, className, onValueChange }: any) => (
-        <div data-testid="language-select" className={className} onClick={() => onValueChange('uk')}>
+        <button
+            data-testid="language-select"
+            className={className}
+            onClick={() => onValueChange(mockTargetLocale)}
+            type="button"
+        >
             {children}
-        </div>
+        </button>
     );
+
     (MockSelect as any).Option = ({ name }: any) => <div data-testid="select-option">{name}</div>;
 
     return { Select: MockSelect };
@@ -70,8 +78,8 @@ describe('TranslationControls', () => {
     });
     it('calls onLanguageChange when a new language is selected', () => {
         const languages = [
+            { id: 1, code: 'fr', name: 'French' },
             { id: 1, code: 'en', name: 'English' },
-            { id: 2, code: 'uk', name: 'Ukrainian' },
         ];
         const onLanguageChangeMock = jest.fn();
 

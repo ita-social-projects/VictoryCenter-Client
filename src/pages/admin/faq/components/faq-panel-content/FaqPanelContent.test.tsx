@@ -277,7 +277,7 @@ jest.mock('@/components/admin/admin-panel-toolbar/AdminPageToolbar', () => {
 export const getLastToolbarProps = () => lastToolbarProps;
 
 jest.mock('../faq-component/FaqComponent', () => ({
-    FaqComponent: ({ faq, handleOnDeleteFaq, handleOnEditFaq }: any) => (
+    FaqComponent: ({ faq, handleOnDeleteFaq, handleOnEditFaq, handleOnTranslateFaq }: any) => (
         <div data-testid={`faq-component-${faq.id}`}>
             <div data-testid={`faq-question-${faq.id}`}>{faq.questionText}</div>
             <div data-testid={`faq-answer-${faq.id}`}>{faq.answerText}</div>
@@ -287,8 +287,41 @@ jest.mock('../faq-component/FaqComponent', () => ({
             <button data-testid={`delete-faq-${faq.id}`} onClick={() => handleOnDeleteFaq(faq)}>
                 Delete
             </button>
+            <button data-testid={`translate-faq-${faq.id}`} onClick={() => handleOnTranslateFaq(faq)}>
+                Translate
+            </button>
         </div>
     ),
+}));
+
+jest.mock('../faq-modals/translate-faq-modal/TranslateFaqModal', () => ({
+    TranslateFaqModal: (props: any) => {
+        if (!props.isOpen) return null;
+
+        return (
+            <div data-testid="translate-faq-modal">
+                <p>Translate FAQ Modal</p>
+                <button
+                    data-testid="confirm-translate"
+                    onClick={() =>
+                        props.onTranslateFaq({
+                            id: props.faqToTranslate?.id ?? 1,
+                            questionText: 'Translated question',
+                            answerText: 'Translated answer',
+                            status: props.faqToTranslate?.status ?? 'draft',
+                            pages: props.faqToTranslate?.pages ?? [],
+                            localizations: props.faqToTranslate?.localizations ?? [],
+                        })
+                    }
+                >
+                    Confirm Translate
+                </button>
+                <button data-testid="close-translate" onClick={props.onClose}>
+                    Close Translate
+                </button>
+            </div>
+        );
+    },
 }));
 
 jest.mock('@/components/admin/draggable-list-item/DraggableListItem', () => ({
@@ -352,12 +385,14 @@ describe('FaqPanelContent', () => {
     const getAddFaqModal = () => screen.queryByTestId('add-faq-modal');
     const getEditFaqModal = () => screen.queryByTestId('edit-faq-modal');
     const getDeleteFaqModal = () => screen.queryByTestId('delete-faq-modal');
+    const getTranslateFaqModal = () => screen.queryByTestId('translate-faq-modal');
     const getFaqErrorContainer = () => screen.getByTestId('faq-error-container');
 
     const clickAddFaqButton = () => fireEvent.click(screen.getByTestId('add-faq-button'));
     const clickFilterPublishedButton = () => fireEvent.click(screen.getByTestId('filter-published'));
     const clickEditFaqButton = (id: number) => fireEvent.click(screen.getByTestId(`edit-faq-${id}`));
     const clickDeleteFaqButton = (id: number) => fireEvent.click(screen.getByTestId(`delete-faq-${id}`));
+    const clickTranslateFaqButton = (id: number) => fireEvent.click(screen.getByTestId(`translate-faq-${id}`));
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -394,6 +429,7 @@ describe('FaqPanelContent', () => {
             expect(screen.getByTestId('admin-panel-toolbar')).toBeInTheDocument();
             expect(screen.getByTestId('category-bar')).toBeInTheDocument();
             expect(screen.getByTestId('infinite-scroll-list')).toBeInTheDocument();
+            expect(screen.getByTestId('toast-container')).toBeInTheDocument();
 
             await waitFor(() => {
                 expect(mockFaqApi.getAll).toHaveBeenCalledTimes(1);
@@ -732,6 +768,37 @@ describe('FaqPanelContent', () => {
             clickDeleteFaqButton(1);
             expect(getDeleteFaqModal()).toBeInTheDocument();
         });
+
+        it('should open and close translate FAQ modal', async () => {
+            renderFaqPanelContent();
+
+            await waitFor(() => expect(getFaqItems()).toHaveLength(2));
+
+            clickTranslateFaqButton(1);
+            expect(getTranslateFaqModal()).toBeInTheDocument();
+
+            fireEvent.click(screen.getByTestId('close-translate'));
+            expect(getTranslateFaqModal()).not.toBeInTheDocument();
+        });
+
+        it('should handle translate success and show toast', async () => {
+            renderFaqPanelContent();
+
+            await waitFor(() => expect(getFaqItems()).toHaveLength(2));
+
+            clickTranslateFaqButton(1);
+            expect(getTranslateFaqModal()).toBeInTheDocument();
+
+            fireEvent.click(screen.getByTestId('confirm-translate'));
+
+            await waitFor(() => {
+                expect(getTranslateFaqModal()).not.toBeInTheDocument();
+                expect(mockAddToast).toHaveBeenCalledWith(
+                    COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS,
+                    expect.anything(),
+                );
+            });
+        });
     });
 
     describe('Infinite scrolling', () => {
@@ -810,6 +877,31 @@ describe('FaqPanelContent', () => {
                 const props = getLastToolbarProps();
                 expect(props.maxCharactersToSearch).toBe(UI_CONFIG.SEARCH_BAR.MAX_CHARACTERS_FOR_SEARCH.FAQ);
             });
+        });
+
+        it('passes placeholder and add button text to AdminPanelToolbar', async () => {
+            render(<FaqPanelContent />);
+
+            await waitFor(() => {
+                const props = getLastToolbarProps();
+                expect(props.placeholder).toBe(FAQ_TEXT.PLACEHOLDER.SEARCH_FAQ);
+                expect(props.AddItemButtonText).toBe(FAQ_TEXT.BUTTON.ADD_FAQ);
+            });
+        });
+
+        it('delegates fetch search items to FaqApi', async () => {
+            const fetchSearchItemsMock = jest.fn().mockResolvedValue([]);
+            mockFaqApi.fetchFaqSearchItems.mockImplementation(fetchSearchItemsMock);
+
+            render(<FaqPanelContent />);
+
+            await waitFor(() => expect(getLastToolbarProps()).toBeTruthy());
+
+            const props = getLastToolbarProps();
+            const pagination = { offset: 2, limit: 7, requestOptions: { cancellationSignal: 'signal' } } as any;
+            await props.fetchSearchItems('query', pagination);
+
+            expect(fetchSearchItemsMock).toHaveBeenCalledWith({ client: {} }, 'query', 2, 7, 'signal');
         });
 
         it('clears search and refetches faq list when search is cleared', async () => {

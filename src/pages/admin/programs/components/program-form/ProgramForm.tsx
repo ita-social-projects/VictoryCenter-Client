@@ -417,7 +417,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                     options.onAfterDiscard();
                 };
 
-                if (options.shouldRemove || options.isDirty) {
+                if (options.shouldRemove || options.isDirty || options.isTemplateReplacement) {
                     if (onRequestCancelSection) {
                         const actionType = options.isTemplateReplacement ? 'replace' : 'cancel';
                         onRequestCancelSection(discard, actionType);

@@ -203,18 +203,24 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
 
         const handleRevertSection = useCallback(
             (sectionIndex: number) => {
-                if (initialData && initialData.sections[sectionIndex]) {
-                    setFormState((prev) => {
-                        const updatedSections = [...prev.sections];
-                        updatedSections[sectionIndex] = initialData.sections[sectionIndex];
-                        return { ...prev, sections: updatedSections };
-                    });
-                    updateSectionFlag(setSavedSections, sectionIndex, true);
-                    updateSectionFlag(setEditingSections, sectionIndex, false);
-                    updateSectionFlag(setNewSections, sectionIndex, false);
-                }
+                if (!initialData) return;
+
+                const sectionToRevert = formState.sections[sectionIndex];
+                if (!sectionToRevert?.id) return;
+
+                const originalSection = initialData.sections.find((s) => s.id === sectionToRevert.id);
+                if (!originalSection) return;
+
+                setFormState((prev) => {
+                    const updatedSections = [...prev.sections];
+                    updatedSections[sectionIndex] = originalSection;
+                    return { ...prev, sections: updatedSections };
+                });
+                updateSectionFlag(setSavedSections, sectionIndex, true);
+                updateSectionFlag(setEditingSections, sectionIndex, false);
+                updateSectionFlag(setNewSections, sectionIndex, false);
             },
-            [setFormState, initialData, updateSectionFlag],
+            [setFormState, initialData, formState.sections, updateSectionFlag],
         );
 
         useImperativeHandle(

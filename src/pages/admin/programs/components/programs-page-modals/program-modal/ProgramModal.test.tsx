@@ -426,6 +426,21 @@ describe('ProgramModal', () => {
                 COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE,
             );
         });
+
+        it('handles unknown SectionDiscardType gracefully by not opening any modal', () => {
+            const mockDiscardCallback = jest.fn();
+            render(<ProgramModal {...addModeProps} />);
+
+            act(() => {
+                capturedFormProps.onRequestCancelSection({
+                    type: 999 as SectionDiscardType,
+                    onDiscard: mockDiscardCallback,
+                });
+            });
+
+            expect(screen.queryByTestId('question-modal')).not.toBeInTheDocument();
+            expect(mockDiscardCallback).not.toHaveBeenCalled();
+        });
     });
 
     describe('General rendering and closing behavior', () => {

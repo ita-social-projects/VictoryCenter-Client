@@ -156,6 +156,8 @@ export const ProgramModal = (props: ProgramModalProps) => {
             case SectionDiscardType.RevertSection:
                 setIsSectionRevertModalOpen(true);
                 break;
+            default:
+                break;
         }
     }, []);
 

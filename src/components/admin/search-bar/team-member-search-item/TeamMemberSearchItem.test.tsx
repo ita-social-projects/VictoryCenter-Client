@@ -12,6 +12,7 @@ describe('TeamMemberSearchItem', () => {
             id: 1,
             name: 'Category A',
             description: '',
+            localizations: [],
             teamMembersCount: 1,
         },
     ];

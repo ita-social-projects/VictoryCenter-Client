@@ -9,7 +9,7 @@ import { FAQ_TEXT } from '@/const/admin/faq';
 import { ToastType } from '@/types/admin/toast';
 import { DraggableListItem } from '@/components/admin/draggable-list-item/DraggableListItem';
 import { InfiniteScrollList } from '@/components/admin/infinite-scroll-list/InfiniteScrollList';
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { COMMON_TEXT_ADMIN, UI_CONFIG } from '@/const/admin/common';
 import { FaqModal } from '../faq-modals/faq-modal/FaqModal';
 import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
 import { DeleteFaqModal } from '../faq-modals/delete-faq-modal/DeleteFaqModal';
@@ -22,6 +22,8 @@ import axios from 'axios';
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
 import { TranslateFaqModal } from '../faq-modals/translate-faq-modal/TranslateFaqModal';
 import './FaqPanelContent.scss';
+import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
+import { PaginationRequestParams } from '@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
@@ -59,6 +61,8 @@ export const FaqPanelContent = () => {
     const [faqs, setFaqs] = useState<FaqQuestion[]>([]);
     const [listSize, setListSize] = useState(DEFAULT_LOAD_ITEMS_COUNT);
     const [hasMore, setHasMore] = useState(true);
+    const [searchFaqId, setSearchFaqId] = useState<number | undefined>();
+    const [isSearchResultView, setIsSearchResultView] = useState(false);
     const [isFaqsLoading, setIsFaqsLoading] = useState(false);
     const [statusFilter, setStatusFilter] = useState<VisibilityStatus | undefined>();
     const [error, setError] = useState<ErrorState>({ message: null, type: null });
@@ -217,9 +221,45 @@ export const FaqPanelContent = () => {
         [setErrorState, listSize, statusFilter, client, visitorPages, translationStatusFilter],
     );
 
+    const getSearchedFaq = useCallback(async (): Promise<FaqQuestion | null> => {
+        if (!searchFaqId) return null;
+
+        const dto = await FaqApi.getById(client, searchFaqId);
+        return mapFaqQuestionDtoToModel(dto, visitorPages);
+    }, [searchFaqId, client, visitorPages]);
+
     const onStatusFilterChange = useCallback((status: VisibilityStatus | undefined) => {
         setStatusFilter(status);
     }, []);
+
+    const handleFaqSuggestionSelect = useCallback(
+        (faqId: string | number) => {
+            setIsSearchResultView(true);
+            setSearchFaqId(typeof faqId === 'string' ? parseInt(faqId, 10) : faqId);
+            setStatusFilter(undefined);
+            resetFaqsState();
+        },
+        [resetFaqsState],
+    );
+
+    const {
+        data: fetchedSearchFaq,
+        isLoading: isSearchFaqLoading,
+        setData: updateSearchedFaq,
+    } = useDataFetch<FaqQuestion | null>({
+        initialData: null,
+        fetchHandler: getSearchedFaq,
+        autoFetchDependencies: [searchFaqId],
+        autoFetchDisabled: !isSearchResultView || !searchFaqId,
+    });
+
+    const handleSearchClear = useCallback(() => {
+        setIsSearchResultView(false);
+        setSearchFaqId(undefined);
+        updateSearchedFaq(null);
+        resetFaqsState();
+        fetchFaqs(true);
+    }, [fetchFaqs, resetFaqsState, updateSearchedFaq]);
 
     const handlePageSelect = useCallback(
         (page: VisitorPage) => {
@@ -427,24 +467,40 @@ export const FaqPanelContent = () => {
         ],
     );
 
+    const displayFaqItems = isSearchResultView ? (fetchedSearchFaq ? [fetchedSearchFaq] : []) : faqs;
+
+    const fetchFaqSearchItemsForToolbar = useCallback(
+        (searchTerm: string, pagination: PaginationRequestParams) => {
+            return FaqApi.fetchFaqSearchItems(
+                client,
+                searchTerm,
+                pagination.offset ?? 0,
+                pagination.limit ?? 5,
+                pagination.requestOptions?.cancellationSignal,
+            );
+        },
+        [client],
+    );
+
     return (
         <div className="faq-panel-wrapper" data-testid="faq-panel-content">
             <div className="faq-panel-toolbar-container">
                 <AdminPanelToolbar<FaqSearchItemData>
                     getSearchItemKey={(item) => item.id}
                     getSearchItemLabel={(item) => item.question}
-                    fetchSearchItems={FaqApi.getSearchItems}
+                    fetchSearchItems={fetchFaqSearchItemsForToolbar}
                     renderSearchItemComponent={FaqSearchItem}
                     placeholder={FAQ_TEXT.PLACEHOLDER.SEARCH_FAQ}
-                    onSearchClear={() => {}}
+                    onSearchClear={handleSearchClear}
                     statusFilter={statusFilter}
                     onStatusFilterChange={onStatusFilterChange}
                     onAddItem={handleAddFaqModalOpen}
                     AddItemButtonText={FAQ_TEXT.BUTTON.ADD_FAQ}
-                    onSuggestionSelect={() => {}}
+                    onSuggestionSelect={handleFaqSuggestionSelect}
                     languages={allLanguages}
                     onLanguageChange={onLanguageChange}
                     onTranslationStatusFilterChange={onTranslationStatusFilterChange}
+                    maxCharactersToSearch={UI_CONFIG.SEARCH_BAR.MAX_CHARACTERS_FOR_SEARCH.FAQ}
                 />
             </div>
 
@@ -468,11 +524,11 @@ export const FaqPanelContent = () => {
                 )}
 
                 <InfiniteScrollList<FaqQuestion>
-                    items={faqs}
+                    items={displayFaqItems}
                     renderItem={renderFaqItem}
                     onLoadMore={fetchFaqs}
-                    hasMore={hasMore}
-                    isLoading={isFaqsLoading || isVisitorPagesLoading || !selectedLanguage}
+                    hasMore={isSearchResultView ? false : hasMore}
+                    isLoading={isFaqsLoading || isVisitorPagesLoading || isSearchFaqLoading}
                     emptyStateMessage={COMMON_TEXT_ADMIN.LIST.NOT_FOUND}
                 />
             </div>

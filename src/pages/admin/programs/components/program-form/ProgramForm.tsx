@@ -40,6 +40,7 @@ export interface ProgramFormErrors {
     location?: string;
     participantsCount?: string;
     meetingCount?: string;
+    sections?: string;
     [key: string]: string | undefined;
 }
 
@@ -77,6 +78,7 @@ const validateForm = (formState: ProgramFormValues, isPublishing: boolean): Prog
             isPublishing,
         ),
         meetingCount: PROGRAM_VALIDATION_FUNCTIONS.validateMeetingCount(formState.meetingCount, isPublishing),
+        sections: PROGRAM_VALIDATION_FUNCTIONS.validateSections(formState.sections, isPublishing),
     };
 };
 
@@ -274,6 +276,19 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                 setFormState((prev) => {
                     const updatedSections = [...prev.sections];
                     updatedSections[sectionIndex] = { ...updatedSections[sectionIndex] };
+                    return { ...prev, sections: updatedSections };
+                });
+                const sectionsError = PROGRAM_VALIDATION_FUNCTIONS.validateSections(formState.sections, false);
+                setErrors((prev) => ({ ...prev, sections: sectionsError }));
+            },
+            [setFormState, formState.sections, setErrors],
+        );
+
+        const handleSectionChange = useCallback(
+            (sectionIndex: number, updatedSection: ProgramSection) => {
+                setFormState((prev) => {
+                    const updatedSections = [...prev.sections];
+                    updatedSections[sectionIndex] = updatedSection;
                     return { ...prev, sections: updatedSections };
                 });
             },
@@ -475,6 +490,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                         section={section}
                                         onSave={() => handleSaveSection(index)}
                                         onCancel={() => handleCancelSection(index)}
+                                        onSectionChange={(updatedSection) => handleSectionChange(index, updatedSection)}
                                         isDisabled={isSubmitting || isFormDisabled}
                                     />
                                     <div className={styles['sections-divider']} />

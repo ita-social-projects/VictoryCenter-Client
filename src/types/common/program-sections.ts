@@ -6,6 +6,7 @@ export enum ProgramSectionType {
     Description,
     Image,
     Card,
+    Author,
 }
 
 export enum ProgramSectionTemplate {
@@ -16,6 +17,17 @@ export enum ProgramSectionTemplate {
     SingleImageBottom = 5,
     SingleImageTop = 6,
     SingleImageRight = 7,
+    TripleTitleDescription = 8,
+    DualTitleDescription = 9,
+    QuadTitleDescription = 10,
+    SingleTitleQuintupleDescription = 11,
+}
+
+export enum ProgramSectionMode {
+    Template = 'template',
+    View = 'view',
+    Edit = 'edit',
+    Published = 'published',
 }
 
 export interface ProgramSectionContent {
@@ -23,9 +35,12 @@ export interface ProgramSectionContent {
     sectionId?: number;
     contentType: ContentType;
     order: number;
+    groupIndex?: number | null;
     title?: string | null;
     description?: string | null;
     image?: Image | ImageValues | null;
+    imageId?: number | null;
+    author?: string | null;
 }
 
 export interface ProgramSection {

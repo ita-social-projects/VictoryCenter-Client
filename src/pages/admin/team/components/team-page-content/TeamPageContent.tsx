@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { TeamPageToolbar } from '../team-page-toolbar/TeamPageToolbar';
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { COMMON_TEXT_ADMIN, UI_CONFIG } from '@/const/admin/common';
 import './TeamPageContent.scss';
 import { TeamMember } from '@/types/admin/team-members';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
@@ -23,6 +23,9 @@ import { useTeamMemberSearch } from '@/hooks/admin/team/useTeamMemberSearch';
 import { updateCategoryMemberCounts } from '@/utils/functions/update-category-member-counts/update-category-member-counts';
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
 import { mapEntityWithLocalizations } from '@/utils/functions/mappers/common/localization/localization-mappers';
+import { mapTeamCategoryDtoToTeamCategory } from '@/utils/functions/mappers/admin/team-category/team-category-mappers';
+import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
+import { returnDisplayedLocalization } from '@/utils/functions/localization/localization';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
@@ -143,10 +146,11 @@ export const TeamPageContent = () => {
             clearError();
 
             const fetchedCategories = await TeamCategoriesApi.getAll(client);
-            setCategories(fetchedCategories);
+            const mappedCategories = fetchedCategories.map((category) => mapTeamCategoryDtoToTeamCategory(category));
+            setCategories(mappedCategories);
 
-            if (fetchedCategories.length > 0) {
-                setSelectedCategory((prevSelected: TeamCategory | null) => prevSelected ?? fetchedCategories[0]);
+            if (mappedCategories.length > 0) {
+                setSelectedCategory((prevSelected: TeamCategory | null) => prevSelected ?? mappedCategories[0]);
             }
         } catch (error: any) {
             if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {
@@ -512,6 +516,14 @@ export const TeamPageContent = () => {
         if (!wasSelected) fetchMembers(true);
     }, [selectedSearchMember, resetMembersState, fetchMembers]);
 
+    const getCategoryName = useCallback(
+        (category: TeamCategory) => {
+            const localization = returnDisplayedLocalization(category, selectedLanguage?.code || '');
+            return localization?.name || category.name;
+        },
+        [selectedLanguage?.code],
+    );
+
     const renderMemberItem = useCallback(
         (member: TeamMember) => (
             <DraggableListItem
@@ -566,6 +578,7 @@ export const TeamPageContent = () => {
                     languages={allLanguages}
                     onLanguageChange={onLanguageChange}
                     onTranslationStatusFilterChange={onTranslationStatusFilterChange}
+                    maxCharactersToSearch={UI_CONFIG.SEARCH_BAR.MAX_CHARACTERS_FOR_SEARCH.TEAM_MEMBERS}
                 />
             </div>
 
@@ -575,10 +588,13 @@ export const TeamPageContent = () => {
                     selectedCategory={selectedCategory}
                     displayContextMenuButton={true}
                     onCategorySelect={handleCategorySelect}
-                    getCategoryDisplayName={(category) => category.name}
+                    getCategoryDisplayName={getCategoryName}
                     getCategoryKey={(category) => category.id}
                     contextMenuOptions={categoryBarContextMenuOptions}
                     onContextMenuOptionSelected={onContextMenuOptionSelected}
+                    renderCategoryExtra={(category) => (
+                        <LocalizationStatuses languages={translationLanguages} localizedEntity={category} />
+                    )}
                 />
 
                 {error.message && (

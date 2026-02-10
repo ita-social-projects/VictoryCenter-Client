@@ -32,7 +32,8 @@
 .image-wrapper {
     height: 75%;
     &[data-elevated='true'] {
-        transform: translateY(-25%);
+        position: relative;
+        top: -25%;
     }
     justify-content: end;
 }
@@ -44,7 +45,7 @@
     display: block;
 }
 
-.container.editable {
+.container.form-container {
     max-height: 1200px;
     gap: 30px;
 

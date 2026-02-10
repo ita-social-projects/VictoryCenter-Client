@@ -3,6 +3,7 @@
 
 .container {
     @extend .section-container;
+    background-color: #fff;
     aspect-ratio: 1440 / 736;
     display: flex;
     flex-direction: row;
@@ -44,6 +45,7 @@
 }
 
 .description-section {
+    width: 100%;
     display: flex;
     align-items: start;
     > div {
@@ -86,7 +88,7 @@
     }
 }
 
-.container.editable {
+.container.form-container {
     aspect-ratio: auto;
     max-height: 1000px;
     justify-content: center;

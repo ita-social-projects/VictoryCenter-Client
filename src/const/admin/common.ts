@@ -136,8 +136,13 @@ export const COMMON_TEXT_ADMIN = {
 
 export const UI_CONFIG = {
     SEARCH_BAR: {
-        MIN_CHARACTERS_FOR_SEARCH: 3,
         SEARCH_DELAY_MS: 100,
+        MIN_CHARACTERS_FOR_SEARCH: 3,
+        MAX_CHARACTERS_FOR_SEARCH: {
+            FAQ: 150,
+            PROGRAMS: 90,
+            TEAM_MEMBERS: 50,
+        },
     },
 };
 

@@ -1,5 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { SingleImageRight } from './SingleImageRight';
+import { ProgramSectionMode } from '@/types/common/program-sections';
 
 const mockPhotoInputGroup = jest.fn();
 
@@ -66,15 +67,17 @@ describe('SingleImageRight', () => {
         });
 
         it('renders image when provided', () => {
-            const { container } = render(<SingleImageRight title="Test" image="test-image.jpg" />);
+            const { container } = render(
+                <SingleImageRight title="Test" image={{ id: 1, url: 'test-image.jpg', mimeType: 'image/jpeg' }} />,
+            );
 
             const image = container.querySelector('img');
             expect(image).toBeInTheDocument();
-            expect(image).toHaveAttribute('src', 'test-image.jpg');
+            expect(image).toHaveAttribute('src', expect.stringContaining('test-image.jpg'));
         });
 
-        it('applies template class when isTemplate is true', () => {
-            const { container } = render(<SingleImageRight title="Test" isTemplate={true} />);
+        it('applies template class when mode is Template', () => {
+            const { container } = render(<SingleImageRight title="Test" mode={ProgramSectionMode.Template} />);
 
             expect(container.firstChild).toHaveClass('template');
         });
@@ -113,28 +116,28 @@ describe('SingleImageRight', () => {
     });
 
     describe('Editable mode', () => {
-        it('renders TextAreaWithCharacterLimitGroup components when isEditable is true', () => {
-            render(<SingleImageRight title="Test" isEditable={true} />);
+        it('renders TextAreaWithCharacterLimitGroup components when mode is Edit', () => {
+            render(<SingleImageRight title="Test" mode={ProgramSectionMode.Edit} />);
 
             expect(screen.getByTestId('textarea-group-section-title')).toBeInTheDocument();
             expect(screen.getByTestId('textarea-group-section-description')).toBeInTheDocument();
         });
 
-        it('renders PhotoInputGroup when isEditable is true', () => {
-            render(<SingleImageRight title="Test" isEditable={true} />);
+        it('renders PhotoInputGroup when mode is Edit', () => {
+            render(<SingleImageRight title="Test" mode={ProgramSectionMode.Edit} />);
 
             expect(screen.getByTestId('photo-input-group')).toBeInTheDocument();
         });
 
-        it('applies editable class when isEditable is true', () => {
-            const { container } = render(<SingleImageRight title="Test" isEditable={true} />);
+        it('applies form-container class when mode is Edit', () => {
+            const { container } = render(<SingleImageRight title="Test" mode={ProgramSectionMode.Edit} />);
 
-            expect(container.firstChild).toHaveClass('editable');
+            expect(container.firstChild).toHaveClass('form-container');
         });
 
         it('calls onTitleChange when title textarea is changed', () => {
             const onTitleChange = jest.fn();
-            render(<SingleImageRight title="Test" isEditable={true} onTitleChange={onTitleChange} />);
+            render(<SingleImageRight title="Test" mode={ProgramSectionMode.Edit} onTitleChange={onTitleChange} />);
 
             const titleTextarea = screen.getByTestId('textarea-section-title');
             // Simulate user typing
@@ -145,7 +148,13 @@ describe('SingleImageRight', () => {
 
         it('calls onDescriptionChange when description textarea is changed', () => {
             const onDescriptionChange = jest.fn();
-            render(<SingleImageRight title="Test" isEditable={true} onDescriptionChange={onDescriptionChange} />);
+            render(
+                <SingleImageRight
+                    title="Test"
+                    mode={ProgramSectionMode.Edit}
+                    onDescriptionChange={onDescriptionChange}
+                />,
+            );
 
             const descriptionTextarea = screen.getByTestId('textarea-section-description');
             fireEvent.change(descriptionTextarea, { target: { value: 'New Description' } });
@@ -155,7 +164,7 @@ describe('SingleImageRight', () => {
 
         it('calls onImageChange when image is changed', () => {
             const onImageChange = jest.fn();
-            render(<SingleImageRight title="Test" isEditable={true} onImageChange={onImageChange} />);
+            render(<SingleImageRight title="Test" mode={ProgramSectionMode.Edit} onImageChange={onImageChange} />);
 
             screen.getByTestId('photo-change').click();
             expect(onImageChange).toHaveBeenCalledWith({
@@ -166,7 +175,7 @@ describe('SingleImageRight', () => {
         });
 
         it('executes fallback handlers (onChange, setError) for PhotoInputGroup', () => {
-            render(<SingleImageRight title="Test" isEditable={true} onImageChange={undefined} />);
+            render(<SingleImageRight title="Test" onImageChange={undefined} />);
             const props = mockPhotoInputGroup.mock.calls[0]?.[0];
             expect(props).toBeDefined();
             expect(props.onChange).toEqual(expect.any(Function));
@@ -176,40 +185,54 @@ describe('SingleImageRight', () => {
         });
 
         it('passes title value to title TextAreaWithCharacterLimitGroup', () => {
-            render(<SingleImageRight title="Existing Title" isEditable={true} />);
+            render(<SingleImageRight title="Existing Title" mode={ProgramSectionMode.Edit} />);
 
             const titleTextarea = screen.getByTestId('textarea-section-title');
             expect(titleTextarea).toHaveValue('Existing Title');
         });
 
         it('passes description value to description TextAreaWithCharacterLimitGroup', () => {
-            render(<SingleImageRight description="Existing Description" isEditable={true} />);
+            render(<SingleImageRight description="Existing Description" mode={ProgramSectionMode.Edit} />);
 
             const descriptionTextarea = screen.getByTestId('textarea-section-description');
             expect(descriptionTextarea).toHaveValue('Existing Description');
         });
 
         it('passes null to PhotoInputGroup (not using image value)', () => {
-            render(<SingleImageRight title="Test" isEditable={true} image="existing-image.jpg" />);
+            render(
+                <SingleImageRight
+                    title="Test"
+                    mode={ProgramSectionMode.Edit}
+                    image={{ id: 2, url: 'existing-image.jpg', mimeType: 'image/jpeg' }}
+                />,
+            );
 
-            expect(screen.getByTestId('photo-value')).toHaveTextContent('no-image');
+            expect(screen.getByTestId('photo-value')).toHaveTextContent('existing-image.jpg');
         });
 
         it('does not render h2 and p tags in editable mode', () => {
-            const { container } = render(<SingleImageRight title="Test" description="Desc" isEditable={true} />);
+            const { container } = render(
+                <SingleImageRight title="Test" description="Desc" mode={ProgramSectionMode.Edit} />,
+            );
 
             expect(container.querySelector('h2')).not.toBeInTheDocument();
             expect(container.querySelector('p')).not.toBeInTheDocument();
         });
 
         it('does not render regular img tag in editable mode', () => {
-            const { container } = render(<SingleImageRight title="Test" isEditable={true} image="test.jpg" />);
+            const { container } = render(
+                <SingleImageRight
+                    title="Test"
+                    mode={ProgramSectionMode.Edit}
+                    image={{ id: 3, url: 'test.jpg', mimeType: 'image/jpeg' }}
+                />,
+            );
 
             expect(container.querySelector('img')).not.toBeInTheDocument();
         });
 
-        it('handles missing callback props gracefully (render check)', () => {
-            render(<SingleImageRight title="Test" isEditable={true} />);
+        it('handles missing callback props gracefully', () => {
+            render(<SingleImageRight title="Test" mode={ProgramSectionMode.Edit} />);
 
             expect(screen.getByTestId('textarea-group-section-title')).toBeInTheDocument();
             expect(screen.getByTestId('textarea-group-section-description')).toBeInTheDocument();
@@ -217,7 +240,7 @@ describe('SingleImageRight', () => {
         });
 
         it('has correct structure with left and right sections in editable mode', () => {
-            const { container } = render(<SingleImageRight title="Test" isEditable={true} />);
+            const { container } = render(<SingleImageRight title="Test" mode={ProgramSectionMode.Edit} />);
 
             const leftSection = container.querySelector('.left-section');
             const rightSection = container.querySelector('.right-section');
@@ -234,19 +257,18 @@ describe('SingleImageRight', () => {
             expect(container.firstChild).toHaveClass('container');
         });
 
-        it('applies both template and editable classes when both props are true', () => {
-            const { container } = render(<SingleImageRight title="Test" isTemplate={true} isEditable={true} />);
+        it('applies form-container class when mode is Edit', () => {
+            const { container } = render(<SingleImageRight title="Test" mode={ProgramSectionMode.Edit} />);
 
-            expect(container.firstChild).toHaveClass('template');
-            expect(container.firstChild).toHaveClass('editable');
+            expect(container.firstChild).toHaveClass('form-container');
         });
 
-        it('applies no additional classes when both props are false', () => {
-            const { container } = render(<SingleImageRight title="Test" isTemplate={false} isEditable={false} />);
+        it('applies no additional classes when mode is Published', () => {
+            const { container } = render(<SingleImageRight title="Test" mode={ProgramSectionMode.Published} />);
 
             expect(container.firstChild).toHaveClass('container');
             expect(container.firstChild).not.toHaveClass('template');
-            expect(container.firstChild).not.toHaveClass('editable');
+            expect(container.firstChild).not.toHaveClass('form-container');
         });
     });
 
@@ -262,9 +284,8 @@ describe('SingleImageRight', () => {
                 <SingleImageRight
                     title="Full Title"
                     description="Full Description"
-                    image="full-image.jpg"
-                    isTemplate={true}
-                    isEditable={true}
+                    image={{ id: 4, url: 'full-image.jpg', mimeType: 'image/jpeg' }}
+                    mode={ProgramSectionMode.Edit}
                     {...handlers}
                 />,
             );
@@ -284,7 +305,7 @@ describe('SingleImageRight', () => {
     describe('Event handlers', () => {
         it('handleTitleChange extracts value from event and calls onTitleChange', () => {
             const onTitleChange = jest.fn();
-            render(<SingleImageRight title="Old Title" isEditable={true} onTitleChange={onTitleChange} />);
+            render(<SingleImageRight title="Old Title" mode={ProgramSectionMode.Edit} onTitleChange={onTitleChange} />);
 
             const titleTextarea = screen.getByTestId('textarea-section-title');
             fireEvent.change(titleTextarea, { target: { value: 'New Title' } });
@@ -297,7 +318,7 @@ describe('SingleImageRight', () => {
             render(
                 <SingleImageRight
                     description="Old Description"
-                    isEditable={true}
+                    mode={ProgramSectionMode.Edit}
                     onDescriptionChange={onDescriptionChange}
                 />,
             );

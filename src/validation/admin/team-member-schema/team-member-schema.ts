@@ -1,6 +1,7 @@
 import * as Yup from 'yup';
 import { TEAM_MEMBER_VALIDATION } from '@/const/admin/team';
 import { Image, ImageValues } from '@/types/common/image';
+import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
 
 export interface TeamMemberValidationContext {
     isPublishing: boolean;
@@ -8,6 +9,7 @@ export interface TeamMemberValidationContext {
 
 export const teamMemberValidationSchema = Yup.object({
     fullName: Yup.string()
+        .transform((value) => (value ? getNormalizedInputText(value) : value))
         .required(TEAM_MEMBER_VALIDATION.fullName.getRequiredError())
         .min(TEAM_MEMBER_VALIDATION.fullName.min, TEAM_MEMBER_VALIDATION.fullName.getMinError())
         .max(TEAM_MEMBER_VALIDATION.fullName.max, TEAM_MEMBER_VALIDATION.fullName.getMaxError())
@@ -21,12 +23,11 @@ export const teamMemberValidationSchema = Yup.object({
         }),
 
     description: Yup.string()
+        .transform((value) => (value ? getNormalizedInputText(value) : value))
         .required(TEAM_MEMBER_VALIDATION.description.getRequiredError())
-        .min(TEAM_MEMBER_VALIDATION.description.min, TEAM_MEMBER_VALIDATION.description.getMinError())
         .max(TEAM_MEMBER_VALIDATION.description.max, TEAM_MEMBER_VALIDATION.description.getMaxError())
-        .test('no-multiple-spaces', TEAM_MEMBER_VALIDATION.description.getMultipleSpacesError(), (value) => {
-            if (!value) return true;
-            return !/\s{2,}/.test(value);
+        .test('min-length-if-not-empty', TEAM_MEMBER_VALIDATION.description.getMinError(), (value) => {
+            return !value || value.length >= TEAM_MEMBER_VALIDATION.description.min;
         }),
 
     category: Yup.number().required(TEAM_MEMBER_VALIDATION.category.getRequiredError()),

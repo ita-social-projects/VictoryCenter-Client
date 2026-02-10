@@ -65,6 +65,11 @@ describe('teamMemberValidationSchema', () => {
             expect(TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription(descriptionWithMultipleSpaces, true)).toBe(
                 TEAM_MEMBER_VALIDATION.description.getMultipleSpacesError(),
             );
+        });    
+        it('rejects empty description when not publishing', () => {
+            expect(TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription('', false)).toBe(
+                TEAM_MEMBER_VALIDATION.description.getRequiredError(),
+            );
         });
 
         it('rejects description too long', () => {

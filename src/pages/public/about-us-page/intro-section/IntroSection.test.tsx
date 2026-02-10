@@ -3,15 +3,6 @@ import { AboutUsIntro } from './IntroSection';
 import { ContentType } from '@/types/common/about-us';
 import { AboutUsContent } from '@/types/public/about-us-page';
 
-jest.mock('./IntroSection.module.scss', () => ({
-    root: 'root',
-    image: 'image',
-    overlay: 'overlay',
-    info: 'info',
-    title: 'title',
-    description: 'description',
-}));
-
 describe('AboutUsIntro', () => {
     const Content: AboutUsContent[] = [
         {
@@ -61,7 +52,6 @@ describe('AboutUsIntro', () => {
 
     it('should render title and description correctly', () => {
         render(<AboutUsIntro content={Content} />);
-        // TODO: Replace with: "expect(screen.getByText('Test title')).toBeInTheDocument();" when rich text component is implemented
         const title = screen.getByRole('heading', { level: 1 });
         expect(title).toBeInTheDocument();
         expect(title).toHaveTextContent('Test title');

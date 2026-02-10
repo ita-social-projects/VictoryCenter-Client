@@ -4,7 +4,7 @@ import { ImageInput, ImageInputProps } from '@/components/admin/image-input/Imag
 import { Content } from '@/types/admin/who-we-are';
 import { ImageValues } from '@/types/common/image';
 import { WHO_WE_ARE_TEXT } from '@/const/admin/who-we-are';
-import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
+import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 import './CardContent.scss';
 
 export interface CardContentProps {
@@ -13,7 +13,7 @@ export interface CardContentProps {
     descriptionLimit: number;
     rows?: number;
     imageInputProps: Omit<ImageInputProps, 'className' | 'value' | 'onChange' | 'setError'>;
-    onDescriptionValidate: (value: React.ChangeEvent<HTMLTextAreaElement>) => void;
+    onDescriptionValidate: (value: string) => void;
     descriptionError: string | null;
     imageError: string | null;
     setImageError: (value: string | null) => void;
@@ -24,7 +24,6 @@ export const CardContent = ({
     content,
     onChange,
     descriptionLimit,
-    rows,
     imageInputProps,
     onDescriptionValidate,
     descriptionError,
@@ -40,12 +39,12 @@ export const CardContent = ({
         setIsPublishButtonActive(true);
     };
 
-    const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const handleDescriptionChange = (value: string) => {
         onChange({
             ...content,
-            description: e.target.value,
+            description: value,
         });
-        onDescriptionValidate(e);
+        onDescriptionValidate(value);
     };
 
     return (
@@ -60,15 +59,14 @@ export const CardContent = ({
             />
             {imageError && <p className="error">{imageError}</p>}
             <div className="card-content-description-wrapper">
-                <TextAreaWithCharacterLimitGroup
+                <RichTextInputGroup
                     label={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
                     onChange={handleDescriptionChange}
                     value={content.description ?? ''}
                     maxLength={descriptionLimit}
                     name={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
                     id={content.id.toString()}
-                    rows={rows}
-                    onBlur={onDescriptionValidate}
+                    onBlur={() => onDescriptionValidate(content.description ?? '')}
                     error={descriptionError ?? undefined}
                 />
             </div>

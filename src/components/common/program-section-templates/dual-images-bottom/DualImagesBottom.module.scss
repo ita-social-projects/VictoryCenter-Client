@@ -22,7 +22,7 @@ $img-number: 3;
 }
 
 .image-wrapper {
-    aspect-ratio: #{$img-width} / #{$img-height};
+    aspect-ratio: 730 / 430;
     max-width: #{$img-width};
     max-height: #{$img-height};
 }

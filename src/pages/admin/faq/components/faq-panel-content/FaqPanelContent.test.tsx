@@ -1,7 +1,7 @@
 import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { FaqPanelContent } from './FaqPanelContent';
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { COMMON_TEXT_ADMIN, UI_CONFIG } from '@/const/admin/common';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { VisibilityStatus } from '@/types/admin/common';
 import { FaqApi } from '@/services/api/admin/faq/faq-api';
@@ -230,6 +230,8 @@ const mockNewFaq: FaqQuestion = {
     ],
 };
 
+let lastToolbarProps: any = null;
+
 jest.mock('@/components/admin/admin-panel-toolbar/AdminPageToolbar', () => {
     const mockVisibilityStatus = {
         Published: 'published',
@@ -237,33 +239,42 @@ jest.mock('@/components/admin/admin-panel-toolbar/AdminPageToolbar', () => {
     };
 
     return {
-        AdminPanelToolbar: ({ onAddItem, onStatusFilterChange, onSearchClear, placeholder }: any) => (
-            <div data-testid="admin-panel-toolbar">
-                <input
-                    data-testid="search-input"
-                    type="text"
-                    placeholder={placeholder}
-                    onChange={(e) => onSearchClear(e.target.value)}
-                />
-                <button
-                    data-testid="filter-published"
-                    onClick={() => onStatusFilterChange(mockVisibilityStatus.Published)}
-                >
-                    Filter Published
-                </button>
-                <button data-testid="filter-draft" onClick={() => onStatusFilterChange(mockVisibilityStatus.Draft)}>
-                    Filter Draft
-                </button>
-                <button data-testid="filter-clear" onClick={() => onStatusFilterChange(undefined)}>
-                    Clear Filters
-                </button>
-                <button data-testid="add-faq-button" onClick={onAddItem}>
-                    Add FAQ
-                </button>
-            </div>
-        ),
+        AdminPanelToolbar: (props: any) => {
+            lastToolbarProps = props;
+
+            return (
+                <div data-testid="admin-panel-toolbar">
+                    <input
+                        data-testid="search-input"
+                        type="text"
+                        placeholder={props.placeholder}
+                        onChange={(e) => props.onSearchClear(e.target.value)}
+                    />
+                    <button
+                        data-testid="filter-published"
+                        onClick={() => props.onStatusFilterChange(mockVisibilityStatus.Published)}
+                    >
+                        Filter Published
+                    </button>
+                    <button
+                        data-testid="filter-draft"
+                        onClick={() => props.onStatusFilterChange(mockVisibilityStatus.Draft)}
+                    >
+                        Filter Draft
+                    </button>
+                    <button data-testid="filter-clear" onClick={() => props.onStatusFilterChange(undefined)}>
+                        Clear Filters
+                    </button>
+                    <button data-testid="add-faq-button" onClick={props.onAddItem}>
+                        Add FAQ
+                    </button>
+                </div>
+            );
+        },
     };
 });
+
+export const getLastToolbarProps = () => lastToolbarProps;
 
 jest.mock('../faq-component/FaqComponent', () => ({
     FaqComponent: ({ faq, handleOnDeleteFaq, handleOnEditFaq }: any) => (
@@ -368,7 +379,7 @@ describe('FaqPanelContent', () => {
         });
 
         mockFaqApi.reorder = jest.fn().mockResolvedValue({});
-        mockFaqApi.getSearchItems = jest.fn().mockResolvedValue([]);
+        mockFaqApi.fetchFaqSearchItems = jest.fn().mockResolvedValue([]);
 
         (axios.isCancel as unknown as jest.Mock) = jest.fn().mockImplementation((error) => {
             return error && error.name === 'CanceledError';
@@ -790,6 +801,38 @@ describe('FaqPanelContent', () => {
 
             fireEvent.change(screen.getByTestId('search-input'), { target: { value: 'test search query' } });
             expect(screen.getByTestId('search-input')).toHaveValue('test search query');
+        });
+
+        it('passes maxCharactersToSearch for FAQ to AdminPanelToolbar', async () => {
+            render(<FaqPanelContent />);
+
+            await waitFor(() => {
+                const props = getLastToolbarProps();
+                expect(props.maxCharactersToSearch).toBe(UI_CONFIG.SEARCH_BAR.MAX_CHARACTERS_FOR_SEARCH.FAQ);
+            });
+        });
+
+        it('clears search and refetches faq list when search is cleared', async () => {
+            renderFaqPanelContent();
+
+            await waitFor(() => expect(mockFaqApi.getAll).toHaveBeenCalledTimes(1));
+
+            const input = screen.getByTestId('search-input');
+
+            fireEvent.change(input, { target: { value: 'test' } });
+
+            fireEvent.change(input, { target: { value: '' } });
+
+            await waitFor(() => {
+                expect(mockFaqApi.getAll).toHaveBeenLastCalledWith(
+                    expect.anything(),
+                    1,
+                    0,
+                    undefined,
+                    0,
+                    expect.any(Number),
+                );
+            });
         });
     });
 

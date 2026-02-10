@@ -27,6 +27,8 @@ export const PROGRAMS_TEXT = {
         TITLE_SAMPLE_TEXT: 'ЗАГОЛОВОК',
         DESCRIPTION_SAMPLE_TEXT:
             'Ідея створення Victory Center виникла не як проєкт, а як відповідь на виклик часу - глибокий біль, виснаження, але водночас сильна віра в перемогу.\n\n Розмови з ветеранами/ками та волонтерами/ками, які до останньої краплі віддавали свої сили заради майбутнього країни, висвітлити потребу у просторі, в якому можна знову відчути момент “тут i зараз”.\n\n Так народився задум Victory Center — ініціативи, що допомагає людям, які пройшли крізь жахи війни, зупинитися, відновитися i найголовніше бути почутими. ',
+        DESCRIPTION_SAMPLE_TEXT_SHORT:
+            'Ідея створення Victory Center виникла не як проєкт, а як відповідь на виклик часу - глибокий біль, виснаження, але водночас сильна віра в перемогу. ',
         MODAL: {
             UNSAVED_CHANGES_TITLE: 'Відмінити додавання секції?',
         },
@@ -37,6 +39,43 @@ export const PROGRAMS_TEXT = {
             },
             DESCRIPTION: {
                 TEXT: 'Опис',
+            },
+        },
+        CARD: {
+            FORM: {
+                TITLE: {
+                    TEXT: 'Заголовок',
+                    PLACEHOLDER: 'Введіть назву',
+                },
+                DESCRIPTION: {
+                    TEXT: 'Опис',
+                },
+            },
+            TITLE_SAMPLE_TEXT: {
+                PROGRAM_GOALS: 'Мета програми',
+                MAIN_METHODS: 'Основні методи',
+                PROGRAM_FORMAT: 'Формат програми',
+            },
+            DESCRIPTION_SAMPLE_TEXT: {
+                PROGRAM_GOALS:
+                    'Допомогти військовим:\n' +
+                    'зменшити прояви ПТСР, тривожності та емоційного виснаження;\n' +
+                    'відновити відчуття безпеки та самоцінності;\n' +
+                    'повернутися до мирного життя з підтримкою, спільнотою та внутрішнім ресурсом.',
+
+                MAIN_METHODS:
+                    'Іпотерапія (взаємодія з кіньми в терапевтичному контексті)\n' +
+                    'Майндфулнес-практики та тілесна терапія\n' +
+                    'Групова робота, фасилітовані бесіди\n' +
+                    'Музична та арт-терапія\n' +
+                    'Індивідуальна підтримка від психолога',
+
+                PROGRAM_FORMAT:
+                    'Тривалість: 3–5 днів поспіль\n' +
+                    'Локація: партнерські ранчо Victory Center у природному середовищі\n' +
+                    'Група: до 12 учасників\n' +
+                    'Проживання та харчування: забезпечуються організаторами\n' +
+                    'Підготовка: телефонне інтерв’ю та базовий психоемоційний скринінг',
             },
         },
     },
@@ -129,6 +168,12 @@ export const QUAD_IMAGES_CONFIG = {
     editableGridColumns: 4,
     editableImageMaxHeight: 390,
     editableImageMaxWidth: 360,
+    swiperBreakpoints: {
+        320: { slidesPerView: 1 },
+        720: { slidesPerView: 2 },
+        1080: { slidesPerView: 3 },
+        1440: { slidesPerView: 4 },
+    },
 };
 
 export const DUAL_IMAGES_CONFIG = {
@@ -139,6 +184,11 @@ export const DUAL_IMAGES_CONFIG = {
     imageLabel: COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE,
     editableImageMaxHeight: 430,
     editableImageMaxWidth: 730,
+    swiperBreakpoints: {
+        320: { slidesPerView: 1 },
+        768: { slidesPerView: 2 },
+        1440: { slidesPerView: 2 },
+    },
 };
 
 export const TRIPLE_IMAGES_CONFIG = {
@@ -146,10 +196,21 @@ export const TRIPLE_IMAGES_CONFIG = {
     gridColumns: 3,
     imageConfig: PROGRAM_SECTION_IMAGE_CONFIGS.TRIPLE_IMAGES,
     elevatedIndices: [0, 2],
+    //elevatedIndices: [0, 1],
     imageLabel: COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE,
     editableGridColumns: 4,
     editableImageMaxHeight: 480,
     editableImageMaxWidth: 480,
+    swiperBreakpoints: {
+        320: { slidesPerView: 1 },
+        560: { slidesPerView: 2 },
+        768: { slidesPerView: 3 },
+        1440: { slidesPerView: 3 },
+    },
+};
+
+export const SINGLE_TITLE_QUINTUPLE_DESCRIPTION_CONFIG = {
+    descriptionsCount: 5,
 };
 
 export const PROGRAM_VALIDATION = {
@@ -223,6 +284,16 @@ export const PROGRAM_SECTION_VALIDATION = {
     description: {
         min: 10,
         max: 600,
+        getRequiredError: () => "Опис обов'язковий",
+    },
+    cardTitle: {
+        min: 5,
+        max: 25,
+        getRequiredError: () => "Заголовок обов'язковий",
+    },
+    cardDescription: {
+        min: 10,
+        max: 300,
         getRequiredError: () => "Опис обов'язковий",
     },
 };

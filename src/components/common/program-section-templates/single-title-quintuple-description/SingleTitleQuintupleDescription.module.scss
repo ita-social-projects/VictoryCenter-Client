@@ -1,0 +1,152 @@
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/variables/typography' as t;
+
+@import '../shared/BaseSectionTemplate.module.scss';
+
+$card-width: 432px;
+$card-height: 211px;
+
+$title-input-height: 68px;
+
+$desc-input-width: 384px;
+$desc-input-height: 115px;
+
+.container {
+    @extend .section-container;
+    width: 100%;
+    background-color: c.$white;
+}
+
+.template {
+    height: 100%;
+    aspect-ratio: 1440 / 650;
+}
+
+.editable {
+    padding: 64px clamp(16px, 3vw, 48px);
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+}
+
+.editable-grid {
+    display: grid;
+    grid-template-columns: repeat(3, $card-width);
+    column-gap: 24px;
+    row-gap: 24px;
+    align-items: start;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.title-cell {
+    width: $card-width;
+    padding-bottom: 26px;
+}
+
+.title-input-group {
+    width: $card-width;
+
+    :global(label) {
+        font-family: t.$font-family-base;
+        font-weight: t.$fw-regular;
+        font-size: 16px;
+        line-height: 20px;
+        color: c.$grey-700;
+    }
+
+    :global(.char-limit-input) {
+        width: $card-width;
+        height: $title-input-height;
+        padding: 0 16px;
+        gap: 8px;
+        box-shadow: none;
+        justify-content: flex-start;
+        position: relative;
+        overflow: visible;
+    }
+
+    :global(.char-limit-input__field) {
+        font-family: t.$font-family-base;
+        font-weight: t.$fw-bold;
+        font-size: 40px;
+        line-height: 48px;
+        color: c.$blue-900;
+        min-width: 0;
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: clip;
+    }
+
+    :global(.char-limit-input__field::placeholder) {
+        font-family: t.$font-family-base;
+        font-weight: t.$fw-bold;
+        font-size: 40px;
+        line-height: 48px;
+        color: c.$grey-700;
+        opacity: 1;
+    }
+
+    :global(.char-limit-input__counter) {
+        position: absolute;
+        right: 0;
+        bottom: -24px;
+        color: c.$grey-700;
+    }
+}
+
+.description-card {
+    width: $card-width;
+    height: $card-height;
+    background-color: c.$light-blue-50;
+    border-radius: 20px;
+    padding: 14px 24px 12px 24px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: flex-start;
+}
+
+.description-input-group {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    :global(label) {
+        font-family: t.$font-family-base;
+        font-weight: t.$fw-regular;
+        font-size: 16px;
+        line-height: 20px;
+        color: c.$grey-700;
+    }
+
+    :global(textarea) {
+        width: $desc-input-width;
+        height: $desc-input-height;
+        box-sizing: border-box;
+
+        background-color: c.$white;
+        border: none;
+        outline: none;
+        border-radius: 8px;
+
+        padding: 12px 16px;
+        resize: none;
+
+        font-family: t.$font-family-base;
+        font-weight: t.$fw-regular;
+        font-size: 16px;
+        line-height: 20px;
+        color: c.$blue-900;
+    }
+
+    > div:last-child {
+        margin-top: auto;
+        width: 100%;
+    }
+
+    :global(output[id$='-character-count']) {
+        color: c.$grey-700;
+    }
+}

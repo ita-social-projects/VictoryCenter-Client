@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import type { Image, ImageValues } from '@/types/common/image';
 
 interface ExpectedImageConfig {
     imageCount: number;
@@ -15,17 +16,29 @@ interface TestConfig<TProps> {
     imageCount: number;
     Component: React.ComponentType<TProps>;
     createDefaultProps: () => TProps;
-    createImageProps: (images: string[]) => Partial<TProps>;
+    createImageProps: (images: (Image | ImageValues | null)[]) => Partial<TProps>;
     createImageHandlers: (handlers: Array<jest.Mock>) => Partial<TProps>;
     expectedConfig: ExpectedImageConfig;
 }
 
-const buildImages = (imageCount: number, prefix = 'image') => {
-    return Array.from({ length: imageCount }, (_, i) => `${prefix}${i + 1}.jpg`);
+const buildImages = (imageCount: number, prefix = 'image'): (Image | ImageValues | null)[] => {
+    return Array.from({ length: imageCount }, (_, i) => ({
+        id: i + 1,
+        url: `${prefix}${i + 1}.jpg`,
+        mimeType: 'image/jpeg',
+    }));
 };
 
-const buildAlternatingImages = (imageCount: number) => {
-    return Array.from({ length: imageCount }, (_, i) => (i % 2 === 0 ? `image${i + 1}.jpg` : ''));
+const buildAlternatingImages = (imageCount: number): (Image | ImageValues | null)[] => {
+    return Array.from({ length: imageCount }, (_, i) =>
+        i % 2 === 0
+            ? {
+                  id: i + 1,
+                  url: `image${i + 1}.jpg`,
+                  mimeType: 'image/jpeg',
+              }
+            : null,
+    );
 };
 
 const createMockHandlers = (count: number): Array<jest.Mock> => {
@@ -50,7 +63,7 @@ const parseJsonFromTestId = <T,>(testId: string, fallback: T): T => {
     return parseJson<T>(el.textContent, fallback);
 };
 
-const buildHandlersSummaryExpectation = (images: string[], hasHandler: boolean) => {
+const buildHandlersSummaryExpectation = (images: (Image | ImageValues | null)[], hasHandler: boolean) => {
     return images.map((value, i) => ({
         key: `image${i + 1}`,
         value,
@@ -144,14 +157,16 @@ export function createImagesBottomTestSuite<TProps extends Record<string, any>>(
         });
 
         describe('Props forwarding', () => {
-            it('forwards isTemplate prop to ImagesBottomSection', () => {
-                renderComponent({ isTemplate: true } as unknown as Partial<TProps>);
+            it('forwards template mode to ImagesBottomSection', () => {
+                const { ProgramSectionMode } = require('@/types/common/program-sections');
+                renderComponent({ mode: ProgramSectionMode.Template } as unknown as Partial<TProps>);
 
                 expect(screen.getByTestId('template-flag')).toBeInTheDocument();
             });
 
-            it('forwards isEditable prop to ImagesBottomSection', () => {
-                renderComponent({ isEditable: true } as unknown as Partial<TProps>);
+            it('forwards edit mode to ImagesBottomSection', () => {
+                const { ProgramSectionMode } = require('@/types/common/program-sections');
+                renderComponent({ mode: ProgramSectionMode.Edit } as unknown as Partial<TProps>);
 
                 expect(screen.getByTestId('editable-flag')).toBeInTheDocument();
             });

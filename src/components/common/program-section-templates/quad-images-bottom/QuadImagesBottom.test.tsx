@@ -1,5 +1,6 @@
 import { QuadImagesBottom, QuadImagesBottomProps } from './QuadImagesBottom';
 import { createImagesBottomTestSuite } from '../shared/test-utils/imagesBottomTestFactory';
+import { ProgramSectionMode } from '@/types/common/program-sections';
 
 jest.mock('../shared/title-description-section/TitleDescriptionSection', () => {
     const { mockTitleDescriptionSection } = require('../shared/test-utils/imagesBottomTestMocks');
@@ -22,9 +23,8 @@ createImagesBottomTestSuite<QuadImagesBottomProps>({
     createDefaultProps: () => ({
         title: '',
         description: '',
-        images: ['', '', '', ''],
-        isTemplate: false,
-        isEditable: false,
+        images: [null, null, null, null],
+        mode: ProgramSectionMode.Published,
     }),
     createImageProps: (images) => ({ images }),
     createImageHandlers: (handlers) => ({

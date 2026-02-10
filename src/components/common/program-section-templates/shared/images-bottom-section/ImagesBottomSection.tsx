@@ -1,12 +1,12 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import cn from 'classnames';
 import { nanoid } from 'nanoid';
 import { TitleDescriptionSection } from '../title-description-section/TitleDescriptionSection';
-import { PhotoInputGroup } from '@/components/admin/input-groups/photo-input-group/PhotoInputGroup';
-import { ImageValues } from '@/types/common/image';
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { ImageValues, Image } from '@/types/common/image';
 import baseStyles from './ImagesBottomSection.module.scss';
-import { PROGRAM_VALIDATION } from '@/const/admin/programs';
+import { ProgramSectionMode } from '@/types/common/program-sections';
+import { PublishedImagesBottomSection } from './PublishedImagesBottomSection';
+import { EditableImagesBottomSection } from './EditableImagesBottomSection';
 
 export interface ImageConfig {
     cropWidth: number;
@@ -24,22 +24,29 @@ export interface ImagesBottomSectionConfig {
     editableGridColumns?: number;
     editableImageMaxHeight?: number;
     editableImageMaxWidth?: number;
+    swiperBreakpoints?: Record<number, { slidesPerView: number | 'auto' }>;
+}
+
+export interface ImageHandler {
+    handler?: (file: ImageValues | null) => void;
+    key: string;
+    value: Image | ImageValues | null;
 }
 
 export interface ImagesBottomSectionProps {
     title?: string;
     description?: string;
-    images: string[];
-    imageHandlers: Array<{ handler?: (file: ImageValues | null) => void; key: string; value: string }>;
+    images: (Image | ImageValues | null)[];
+    imageHandlers: ImageHandler[];
     config: ImagesBottomSectionConfig;
-    isTemplate?: boolean;
-    isEditable?: boolean;
+    mode?: ProgramSectionMode;
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
     className?: string;
     topSectionClassName?: string;
     bottomSectionClassName?: string;
     imageWrapperClassName?: string;
+    imageClassName?: string;
 }
 
 export const ImagesBottomSection = ({
@@ -48,32 +55,43 @@ export const ImagesBottomSection = ({
     images,
     imageHandlers,
     config,
-    isTemplate = false,
-    isEditable = false,
+    mode = ProgramSectionMode.Published,
     onTitleChange,
     onDescriptionChange,
     className = '',
     topSectionClassName = '',
     bottomSectionClassName = '',
     imageWrapperClassName = '',
+    imageClassName = '',
 }: ImagesBottomSectionProps) => {
-    const effectiveImages = useMemo(() => images.slice(0, config.imageCount), [images, config.imageCount]);
-    const effectiveImageHandlers = useMemo(
+    const [errors, setErrors] = useState<string[]>([]);
+
+    const displayedImages = useMemo(() => images.slice(0, config.imageCount), [images, config.imageCount]);
+    const displayedImageHandlers = useMemo(
         () => imageHandlers.slice(0, config.imageCount),
         [imageHandlers, config.imageCount],
     );
 
     const imageKeys = useMemo(
-        () => Array.from({ length: effectiveImages.length }, () => nanoid()),
-        [effectiveImages.length],
+        () => Array.from({ length: displayedImages.length }, () => nanoid()),
+        [displayedImages.length],
     );
+
+    const handleSetError = (index: number, error: string | null) => {
+        setErrors((prevErrors) => {
+            const newErrors = [...prevErrors];
+            newErrors[index] = error || '';
+            return newErrors;
+        });
+    };
 
     return (
         <div
             className={cn(
                 baseStyles.container,
                 {
-                    [baseStyles.editable]: isEditable,
+                    [baseStyles['form-container']]:
+                        mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View,
                 },
                 className,
             )}
@@ -82,55 +100,33 @@ export const ImagesBottomSection = ({
                 title={title}
                 description={description}
                 className={cn(baseStyles['top-section'], topSectionClassName)}
-                titleClassName={isTemplate ? baseStyles['title-template'] : ''}
-                descriptionClassName={isTemplate ? baseStyles['description-template'] : ''}
-                isEditable={isEditable}
-                isTemplate={isTemplate}
+                titleClassName={mode === ProgramSectionMode.Template ? baseStyles['title-template'] : ''}
+                descriptionClassName={mode === ProgramSectionMode.Template ? baseStyles['description-template'] : ''}
+                mode={mode}
                 onTitleChange={onTitleChange}
                 onDescriptionChange={onDescriptionChange}
             />
-            <div className={cn(baseStyles['bottom-section'], bottomSectionClassName)}>
-                <div className={baseStyles['images-grid']}>
-                    {isEditable
-                        ? effectiveImageHandlers.map(({ handler, key, value }, index) => (
-                              <div
-                                  key={key}
-                                  className={cn(baseStyles['image-wrapper'], imageWrapperClassName)}
-                                  data-elevated={config.elevatedIndices.includes(index) ? 'true' : undefined}
-                                  data-testid="image-wrapper"
-                              >
-                                  <PhotoInputGroup
-                                      id={`section-image-${index + 1}`}
-                                      name={`section-image-${index + 1}`}
-                                      value={value ? { id: null, url: value, mimeType: '' } : null}
-                                      onChange={handler || (() => {})}
-                                      setError={() => {}}
-                                      cropWidth={config.imageConfig.cropWidth}
-                                      cropHeight={config.imageConfig.cropHeight}
-                                      minWidth={config.imageConfig.minWidth}
-                                      minHeight={config.imageConfig.minHeight}
-                                      imageLabel={config.imageLabel}
-                                      imageSubText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
-                                          config.imageConfig.cropHeight,
-                                          config.imageConfig.cropWidth,
-                                      )}
-                                      variant="programSection"
-                                      maxSizeMB={PROGRAM_VALIDATION.images.maxSizeMB}
-                                  />
-                              </div>
-                          ))
-                        : effectiveImages.map((image, index) => (
-                              <div
-                                  key={imageKeys[index]}
-                                  className={cn(baseStyles['image-wrapper'], imageWrapperClassName)}
-                                  data-elevated={config.elevatedIndices.includes(index) ? 'true' : undefined}
-                                  data-testid="image-wrapper"
-                              >
-                                  <img src={image} alt="" className={baseStyles.image} />
-                              </div>
-                          ))}
-                </div>
-            </div>
+            {mode === ProgramSectionMode.Published ? (
+                <PublishedImagesBottomSection
+                    images={displayedImages}
+                    config={config}
+                    bottomSectionClassName={bottomSectionClassName}
+                    imageWrapperClassName={imageWrapperClassName}
+                    imageClassName={imageClassName}
+                />
+            ) : (
+                <EditableImagesBottomSection
+                    images={displayedImages}
+                    imageHandlers={displayedImageHandlers}
+                    imageKeys={imageKeys}
+                    config={config}
+                    mode={mode}
+                    bottomSectionClassName={bottomSectionClassName}
+                    imageWrapperClassName={imageWrapperClassName}
+                    errors={errors}
+                    onSetError={handleSetError}
+                />
+            )}
         </div>
     );
 };

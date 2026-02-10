@@ -1,33 +1,32 @@
 import cn from 'classnames';
 import { TitleDescriptionSection } from '@/components/common/program-section-templates/shared/title-description-section/TitleDescriptionSection';
+import { ProgramSectionMode } from '@/types/common/program-sections';
 import styles from './TextOnly.module.scss';
 
 export interface TextOnlyProps {
     title?: string;
     description?: string;
     className?: string;
-    isTemplate?: boolean;
-    isEditable?: boolean;
+    mode?: ProgramSectionMode;
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
 }
 
 export const TextOnly = (props: TextOnlyProps) => {
-    const { className = '', isTemplate = false, isEditable = false } = props;
-
+    const { className = '', mode = ProgramSectionMode.Published } = props;
     return (
         <TitleDescriptionSection
             {...props}
             className={cn(
-                styles.container,
+                mode === ProgramSectionMode.Published ? '' : styles.container,
                 {
-                    [styles.template]: isTemplate,
-                    [styles.editable]: isEditable,
+                    [styles.template]: mode === ProgramSectionMode.Template,
+                    [styles['form-container']]: mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View,
                 },
                 className,
             )}
-            titleClassName={isTemplate ? styles['title-template'] : ''}
-            descriptionClassName={isTemplate ? styles['description-template'] : ''}
+            titleClassName={mode === ProgramSectionMode.Template ? styles['title-template'] : ''}
+            descriptionClassName={mode === ProgramSectionMode.Template ? styles['description-template'] : ''}
         />
     );
 };

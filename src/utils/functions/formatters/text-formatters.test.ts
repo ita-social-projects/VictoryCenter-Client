@@ -1,4 +1,4 @@
-import { generateInitials, getNormalizedInputText, getTrimmedInputText } from './text-formatters';
+import { generateInitials, getNormalizedInputText, getTrimmedInputText, parseDescriptionList } from './text-formatters';
 
 describe('text-formatters', () => {
     describe('generateInitials', () => {
@@ -114,6 +114,76 @@ describe('text-formatters', () => {
 
         it('should preserve multiple consecutive spaces in middle', () => {
             expect(getTrimmedInputText('  Program     Section     Title  ')).toBe('Program     Section     Title');
+        });
+    });
+    describe('parseDescriptionList', () => {
+        it('should return default when description is undefined', () => {
+            expect(parseDescriptionList(undefined)).toEqual({ intro: null, items: [] });
+        });
+
+        it('should return default when description is empty string', () => {
+            expect(parseDescriptionList('')).toEqual({ intro: null, items: [] });
+            expect(parseDescriptionList('   ')).toEqual({ intro: null, items: [] });
+            expect(parseDescriptionList('\n\n')).toEqual({ intro: null, items: [] });
+        });
+
+        it('should detect intro line ending with colon', () => {
+            const description = `
+            Intro line:
+            • First item
+            • Second item
+        `;
+            const result = parseDescriptionList(description);
+            expect(result.intro).toBe('Intro line:');
+            expect(result.items).toEqual(['First item', 'Second item']);
+        });
+
+        it('should return all lines as items if no intro', () => {
+            const description = `
+            First item
+            Second item
+            Third item
+        `;
+            const result = parseDescriptionList(description);
+            expect(result.intro).toBeNull();
+            expect(result.items).toEqual(['First item', 'Second item', 'Third item']);
+        });
+
+        it('should trim and remove bullet markers from items', () => {
+            const description = `
+            Tasks:
+            • Task one
+            - Task two
+            * Task three
+            Plain task
+        `;
+            const result = parseDescriptionList(description);
+            expect(result.intro).toBe('Tasks:');
+            expect(result.items).toEqual(['Task one', 'Task two', 'Task three', 'Plain task']);
+        });
+
+        it('should handle description with extra empty lines', () => {
+            const description = `Intro line:
+
+• First item
+
+• Second item
+`;
+            const result = parseDescriptionList(description);
+            expect(result.intro).toBe('Intro line:');
+            expect(result.items).toEqual(['First item', 'Second item']);
+        });
+
+        it('should handle description without bullets but with spaces', () => {
+            const description = `
+            Intro:
+            Item one
+              Item two with spaces
+            Item three
+        `;
+            const result = parseDescriptionList(description);
+            expect(result.intro).toBe('Intro:');
+            expect(result.items).toEqual(['Item one', 'Item two with spaces', 'Item three']);
         });
     });
 });

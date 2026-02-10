@@ -1,9 +1,8 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { TitleDescriptionSection, TitleDescriptionSectionProps } from './TitleDescriptionSection';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
+import { ProgramSectionMode } from '@/types/common/program-sections';
 
-// Mock the input group components
 jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
     InputWithCharacterLimitGroup: ({
         label,
@@ -74,22 +73,19 @@ describe('TitleDescriptionSection', () => {
         title: '',
         description: '',
         className: '',
-        isTemplate: false,
-        isEditable: false,
+        mode: ProgramSectionMode.Published,
     };
 
     beforeEach(() => {
         jest.clearAllMocks();
     });
 
-    // Render helpers
     const renderTitleDescriptionSection = (overrideProps: Partial<TitleDescriptionSectionProps> = {}) =>
         render(<TitleDescriptionSection {...defaultProps} {...overrideProps} />);
 
     const renderBareTitleDescriptionSection = (overrideProps: Partial<TitleDescriptionSectionProps> = {}) =>
         render(<TitleDescriptionSection {...overrideProps} />);
 
-    // Element getters
     const getTitleHeading = () => screen.queryByRole('heading', { level: 2 });
     const getDescriptionParagraph = (text?: string) => {
         if (text) {
@@ -116,7 +112,7 @@ describe('TitleDescriptionSection', () => {
             renderTitleDescriptionSection({
                 title: 'Test Title',
                 description: 'Test Description',
-                isEditable: false,
+                mode: ProgramSectionMode.Published,
             });
 
             expect(getTitleHeading()).toBeInTheDocument();
@@ -130,7 +126,7 @@ describe('TitleDescriptionSection', () => {
             const { container } = renderTitleDescriptionSection({
                 title: '',
                 description: '',
-                isEditable: false,
+                mode: ProgramSectionMode.Published,
             });
 
             expect(getTitleHeading()).toBeInTheDocument();
@@ -144,7 +140,7 @@ describe('TitleDescriptionSection', () => {
             renderTitleDescriptionSection({
                 title: 'Test Title',
                 description: 'Test Description',
-                isEditable: false,
+                mode: ProgramSectionMode.Published,
             });
 
             expect(getTitleInput()).not.toBeInTheDocument();
@@ -157,7 +153,7 @@ describe('TitleDescriptionSection', () => {
             renderTitleDescriptionSection({
                 title: 'Test Title',
                 description: 'Test Description',
-                isEditable: true,
+                mode: ProgramSectionMode.Edit,
             });
 
             expect(getTitleInput()).toBeInTheDocument();
@@ -170,7 +166,7 @@ describe('TitleDescriptionSection', () => {
             renderTitleDescriptionSection({
                 title: 'Test Title',
                 description: 'Test Description',
-                isEditable: true,
+                mode: ProgramSectionMode.Edit,
             });
 
             const heading = screen.queryByRole('heading', { level: 2 });
@@ -181,7 +177,7 @@ describe('TitleDescriptionSection', () => {
             const onTitleChange = jest.fn();
             renderTitleDescriptionSection({
                 title: 'Initial Title',
-                isEditable: true,
+                mode: ProgramSectionMode.Edit,
                 onTitleChange,
             });
 
@@ -198,7 +194,7 @@ describe('TitleDescriptionSection', () => {
             const onDescriptionChange = jest.fn();
             renderTitleDescriptionSection({
                 description: 'Initial Description',
-                isEditable: true,
+                mode: ProgramSectionMode.Edit,
                 onDescriptionChange,
             });
 
@@ -215,7 +211,7 @@ describe('TitleDescriptionSection', () => {
             renderTitleDescriptionSection({
                 title: 'Test Title',
                 description: 'Test Description',
-                isEditable: true,
+                mode: ProgramSectionMode.Edit,
             });
 
             const titleInput = getTitleInput();
@@ -224,7 +220,6 @@ describe('TitleDescriptionSection', () => {
             fireEvent.change(titleInput!, { target: { value: 'New Title' } });
             fireEvent.change(descriptionTextarea!, { target: { value: 'New Description' } });
 
-            // Should not throw errors
             expect(titleInput).toBeInTheDocument();
             expect(descriptionTextarea).toBeInTheDocument();
         });
@@ -232,7 +227,7 @@ describe('TitleDescriptionSection', () => {
         it('passes correct props to InputWithCharacterLimitGroup', () => {
             renderTitleDescriptionSection({
                 title: 'Test Title',
-                isEditable: true,
+                mode: ProgramSectionMode.Edit,
             });
 
             const inputGroup = screen.getByTestId('input-group-section-title');
@@ -247,7 +242,7 @@ describe('TitleDescriptionSection', () => {
         it('passes correct props to TextAreaWithCharacterLimitGroup', () => {
             renderTitleDescriptionSection({
                 description: 'Test Description',
-                isEditable: true,
+                mode: ProgramSectionMode.Edit,
             });
 
             const textareaGroup = screen.getByTestId('textarea-group-section-description');
@@ -270,35 +265,22 @@ describe('TitleDescriptionSection', () => {
             expect(sectionContainer).toHaveClass('custom-class');
         });
 
-        it('applies template class when isTemplate is true', () => {
+        it('applies template class when mode is Template', () => {
             const { container } = renderTitleDescriptionSection({
-                isTemplate: true,
+                mode: ProgramSectionMode.Template,
             });
 
             const sectionContainer = container.querySelector('.container');
             expect(sectionContainer).toHaveClass('template');
         });
 
-        it('applies editable class when isEditable is true', () => {
+        it('applies form-container class when mode is Edit', () => {
             const { container } = renderTitleDescriptionSection({
-                isEditable: true,
+                mode: ProgramSectionMode.Edit,
             });
 
             const sectionContainer = container.querySelector('.container');
-            expect(sectionContainer).toHaveClass('editable');
-        });
-
-        it('applies multiple classes when multiple props are true', () => {
-            const { container } = renderTitleDescriptionSection({
-                className: 'custom-class',
-                isTemplate: true,
-                isEditable: true,
-            });
-
-            const sectionContainer = container.querySelector('.container');
-            expect(sectionContainer).toHaveClass('custom-class');
-            expect(sectionContainer).toHaveClass('template');
-            expect(sectionContainer).toHaveClass('editable');
+            expect(sectionContainer).toHaveClass('form-container');
         });
     });
 
@@ -313,14 +295,14 @@ describe('TitleDescriptionSection', () => {
             expect(description).toHaveTextContent('');
         });
 
-        it('defaults isTemplate to false', () => {
+        it('defaults mode to Published', () => {
             const { container } = renderTitleDescriptionSection();
 
             const sectionContainer = container.querySelector('.container');
             expect(sectionContainer).not.toHaveClass('template');
         });
 
-        it('defaults isEditable to false', () => {
+        it('does not render input fields when mode is Published (default)', () => {
             renderTitleDescriptionSection();
 
             expect(getTitleInput()).not.toBeInTheDocument();

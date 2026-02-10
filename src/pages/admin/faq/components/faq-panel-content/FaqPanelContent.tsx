@@ -395,22 +395,18 @@ export const FaqPanelContent = () => {
 
     const handleEditFaq = useCallback(
         (updatedFaq: FaqQuestion) => {
-            const mappedFaq = mapFaqQuestionDtoToModel(updatedFaq as any, visitorPages);
-
-            const belongsToSelectedPage = mappedFaq.pages.some((p) => p.id === selectedVisitorPage?.id);
-            const passesStatusFilter = statusFilter === undefined || mappedFaq.status === statusFilter;
+            const belongsToSelectedPage = updatedFaq.pages.some((p) => p.id === selectedVisitorPage?.id);
+            const passesStatusFilter = statusFilter === undefined || updatedFaq.status === statusFilter;
 
             setFaqs((prevFaqs) => {
                 if (belongsToSelectedPage && passesStatusFilter) {
-                    return prevFaqs.map((faq) => (faq.id === mappedFaq.id ? mappedFaq : faq));
-                } else {
-                    return prevFaqs.filter((faq) => faq.id !== mappedFaq.id);
+                    return prevFaqs.map((faq) => (faq.id === updatedFaq.id ? updatedFaq : faq));
                 }
+                return prevFaqs.filter((faq) => faq.id !== updatedFaq.id);
             });
-
             updateModalState({ faqToEdit: null });
         },
-        [updateModalState, selectedVisitorPage?.id, statusFilter, visitorPages],
+        [updateModalState, selectedVisitorPage?.id, statusFilter],
     );
 
     const handleDeleteFaq = useCallback(

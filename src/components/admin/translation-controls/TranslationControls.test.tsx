@@ -1,8 +1,7 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { TranslationControls } from './TranslationControls';
-import { COMMON_TEXT_ADMIN, LANGUAGES } from '@/const/admin/common';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
 jest.mock('@/components/admin/button/Button', () => ({
     Button: (props: any) => (
@@ -13,8 +12,8 @@ jest.mock('@/components/admin/button/Button', () => ({
 }));
 
 jest.mock('@/components/common/select/Select', () => {
-    const MockSelect = ({ children, className }: any) => (
-        <div data-testid="language-select" className={className}>
+    const MockSelect = ({ children, className, onValueChange }: any) => (
+        <div data-testid="language-select" className={className} onClick={() => onValueChange('uk')}>
             {children}
         </div>
     );
@@ -26,6 +25,9 @@ jest.mock('@/components/common/select/Select', () => {
 describe('TranslationControls', () => {
     const defaultProps = {
         isSubmitting: false,
+        languages: [{ id: 1, code: 'en', name: 'English' }],
+        selectedLanguage: { id: 1, name: 'English', code: 'en' },
+        onLanguageChange: jest.fn(),
         onGenerate: jest.fn(),
     };
 
@@ -37,12 +39,10 @@ describe('TranslationControls', () => {
         render(<TranslationControls {...defaultProps} />);
 
         expect(screen.getByTestId('language-select')).toBeInTheDocument();
-        expect(screen.getByText(LANGUAGES.EN)).toBeInTheDocument();
-
         const button = screen.getByTestId('generate-btn');
         expect(button).toBeInTheDocument();
         expect(button).toHaveTextContent(COMMON_TEXT_ADMIN.BUTTON.GENERATE_TRANSLATION);
-        expect(button).toHaveAttribute('type', 'button'); // Важно, чтобы не было submit
+        expect(button).toHaveAttribute('type', 'button');
     });
 
     it('disables the button when isSubmitting is true', () => {
@@ -68,9 +68,21 @@ describe('TranslationControls', () => {
 
         expect(onGenerateMock).toHaveBeenCalledTimes(1);
     });
+    it('calls onLanguageChange when a new language is selected', () => {
+        const languages = [
+            { id: 1, code: 'en', name: 'English' },
+            { id: 2, code: 'uk', name: 'Ukrainian' },
+        ];
+        const onLanguageChangeMock = jest.fn();
+
+        render(<TranslationControls {...defaultProps} languages={languages} onLanguageChange={onLanguageChangeMock} />);
+        const select = screen.getByTestId('language-select');
+        fireEvent.click(select);
+        expect(onLanguageChangeMock).toHaveBeenCalledWith(languages[1]);
+    });
 
     it('does not crash if onGenerate is undefined and button is clicked', () => {
-        render(<TranslationControls isSubmitting={false} />);
+        render(<TranslationControls {...defaultProps} onGenerate={undefined} />);
 
         const button = screen.getByTestId('generate-btn');
         expect(() => fireEvent.click(button)).not.toThrow();

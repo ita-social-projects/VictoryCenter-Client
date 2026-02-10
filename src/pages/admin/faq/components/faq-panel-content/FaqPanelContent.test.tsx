@@ -1211,7 +1211,7 @@ describe('FaqPanelContent', () => {
                 fireEvent.click(screen.getByTestId('category-2'));
 
                 await waitFor(() => {
-                    expect(mockFaqApi.getAll).toHaveBeenCalledTimes(2);
+                    expect(mockFaqApi.getAll).toHaveBeenCalledTimes(2); // test
                     const lastCall = mockFaqApi.getAll.mock.calls[1];
                     expect(lastCall[4]).toBe(0);
                 });

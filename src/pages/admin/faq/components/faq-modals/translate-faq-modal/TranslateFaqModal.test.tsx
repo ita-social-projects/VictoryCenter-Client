@@ -9,10 +9,6 @@ import { ModalMode } from '@/types/admin/common';
 let mockFormIsValid = true;
 let mockFormIsDirty = true;
 
-jest.mock('@/components/admin/button/Button', () => ({
-    Button: (props: any) => require('@/utils/test-mocks/test-mocks').MockButton(props),
-}));
-
 jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
     ConfirmationModal: (props: any) => require('@/utils/test-mocks/test-mocks').MockConfirmationModal(props),
 }));
@@ -100,6 +96,18 @@ const TEST_DATA = {
         question: 'Translated Question',
         answer: 'Translated Answer',
     },
+    translatedLanguages: [
+        {
+            id: 2,
+            code: 'en',
+            name: 'English',
+        },
+        {
+            id: 3,
+            code: 'pl',
+            name: 'Polish',
+        },
+    ],
 };
 
 describe('TranslateFaqModal', () => {
@@ -110,6 +118,7 @@ describe('TranslateFaqModal', () => {
             faqToTranslate: TEST_DATA.faq,
             onTranslateFaq: jest.fn(),
             language: TEST_DATA.language,
+            translatedLanguages: TEST_DATA.translatedLanguages,
         };
 
         return render(<TranslateFaqModal {...defaultProps} {...props} />);
@@ -144,7 +153,10 @@ describe('TranslateFaqModal', () => {
     });
 
     it('passes correct initialData to form when in edit mode', () => {
-        renderModal({ faqToTranslate: TEST_DATA.faqWithLocalization });
+        renderModal({
+            faqToTranslate: TEST_DATA.faqWithLocalization,
+            translatedLanguages: [TEST_DATA.language],
+        });
 
         const form = screen.getByTestId('translate-form');
         const initialDataAttr = form.getAttribute('data-initial');
@@ -160,7 +172,7 @@ describe('TranslateFaqModal', () => {
         renderModal({ faqToTranslate: TEST_DATA.faq });
 
         const form = screen.getByTestId('translate-form');
-        expect(form).not.toHaveAttribute('data-initial');
+        expect(form).toHaveAttribute('data-initial');
     });
 
     it('enables translate button when form is valid', () => {

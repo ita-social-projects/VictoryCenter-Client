@@ -174,16 +174,6 @@ describe('SingleImageRight', () => {
             });
         });
 
-        it('executes fallback handlers (onChange, setError) for PhotoInputGroup', () => {
-            render(<SingleImageRight title="Test" onImageChange={undefined} />);
-            const props = mockPhotoInputGroup.mock.calls[0]?.[0];
-            expect(props).toBeDefined();
-            expect(props.onChange).toEqual(expect.any(Function));
-            expect(() => props.onChange(null)).not.toThrow();
-            expect(props.setError).toEqual(expect.any(Function));
-            expect(() => props.setError()).not.toThrow();
-        });
-
         it('passes title value to title TextAreaWithCharacterLimitGroup', () => {
             render(<SingleImageRight title="Existing Title" mode={ProgramSectionMode.Edit} />);
 

@@ -5,14 +5,6 @@ import '@testing-library/jest-dom';
 import { TranslateFaqForm, TranslateFaqFormRef } from './TranslateFaqForm';
 import { FAQ_VALIDATION } from '@/const/admin/faq';
 
-jest.mock('@/components/admin/translation-controls/TranslationControls', () => ({
-    TranslationControls: ({ isSubmitting }: any) => (
-        <div data-testid="translation-controls" data-submitting={isSubmitting}>
-            Controls
-        </div>
-    ),
-}));
-
 jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
     InputWithCharacterLimitGroup: ({ value, onChange, onBlur, disabled, id, error }: any) => (
         <div data-testid={`${id}-wrapper`}>
@@ -62,7 +54,6 @@ describe('TranslateFaqForm', () => {
         answer: screen.getByTestId(FIELD_IDS.answer),
         questionError: screen.queryByTestId(`${FIELD_IDS.question}-error`),
         answerError: screen.queryByTestId(`${FIELD_IDS.answer}-error`),
-        controls: screen.getByTestId(FIELD_IDS.controls),
     });
 
     const fillForm = (question: string, answer: string) => {
@@ -78,7 +69,6 @@ describe('TranslateFaqForm', () => {
         expect(screen.getByTestId(FIELD_IDS.form)).toBeInTheDocument();
         expect(fields.question).toBeInTheDocument();
         expect(fields.answer).toBeInTheDocument();
-        expect(fields.controls).toBeInTheDocument();
         expect(fields.questionError).not.toBeInTheDocument();
         expect(fields.answerError).not.toBeInTheDocument();
     });
@@ -187,7 +177,7 @@ describe('TranslateFaqForm', () => {
         renderForm({ formDisabled: true });
 
         const fields = getFields();
-        expect(fields.question).toBeDisabled();
+        expect(fields.question).toBeDisabled(); // question field should be disabled
         expect(fields.answer).toBeDisabled();
     });
 });

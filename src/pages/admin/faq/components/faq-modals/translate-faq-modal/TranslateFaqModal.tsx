@@ -33,12 +33,12 @@ export const TranslateFaqModal = ({
             const defaultEnglish = translatedLanguages.find((l) => l.code !== DEFAULT_LOCALE) || translatedLanguages[0];
             setLanguage(defaultEnglish);
         }
-    }, [translatedLanguages]);
+    }, [translatedLanguages, language]);
 
     const existingLocalization = useMemo(() => {
         if (!faqToTranslate?.localizations || !language) return null;
         return faqToTranslate.localizations.find((loc) => loc.language?.id === language.id);
-    }, [faqToTranslate, language?.id]);
+    }, [faqToTranslate, language]);
 
     const mode = existingLocalization ? ModalMode.Edit : ModalMode.Add;
     const isEditMode = mode === ModalMode.Edit;

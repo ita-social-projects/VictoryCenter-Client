@@ -147,9 +147,6 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
         const [replacingSections, setReplacingSections] = useState<boolean[]>(
             initialData?.sections?.map(() => false) ?? [],
         );
-        const [preReplacementSections, setPreReplacementSections] = useState<(ProgramSection | null)[]>(
-            initialData?.sections?.map(() => null) ?? [],
-        );
 
         useEffect(() => {
             if (initialData?.sections) {
@@ -157,7 +154,6 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                 setEditingSections(initialData.sections.map(() => false));
                 setNewSections(initialData.sections.map(() => false));
                 setReplacingSections(initialData.sections.map(() => false));
-                setPreReplacementSections(initialData.sections.map(() => null));
             }
         }, [initialData]);
 
@@ -194,14 +190,6 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             [],
         );
 
-        const updatePreReplacementSection = useCallback((sectionIndex: number, value: ProgramSection | null) => {
-            setPreReplacementSections((prev) => {
-                const next = [...prev];
-                next[sectionIndex] = value;
-                return next;
-            });
-        }, []);
-
         const handleAddSection = useCallback(
             (section: ProgramSection) => {
                 setFormState((prev) => ({
@@ -212,7 +200,6 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                 setEditingSections((prev) => [true, ...prev]);
                 setNewSections((prev) => [true, ...prev]);
                 setReplacingSections((prev) => [false, ...prev]);
-                setPreReplacementSections((prev) => [null, ...prev]);
             },
             [setFormState],
         );
@@ -227,7 +214,6 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                 setEditingSections((prev) => prev.filter((_, index) => index !== sectionIndex));
                 setNewSections((prev) => prev.filter((_, index) => index !== sectionIndex));
                 setReplacingSections((prev) => prev.filter((_, index) => index !== sectionIndex));
-                setPreReplacementSections((prev) => prev.filter((_, index) => index !== sectionIndex));
             },
             [setFormState],
         );
@@ -244,18 +230,13 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                     updateSectionFlag(setEditingSections, sectionIndex, false);
                     updateSectionFlag(setNewSections, sectionIndex, false);
                     updateSectionFlag(setReplacingSections, sectionIndex, false);
-                    updatePreReplacementSection(sectionIndex, null);
                 }
             },
-            [setFormState, initialData, updateSectionFlag, updatePreReplacementSection],
+            [setFormState, initialData, updateSectionFlag],
         );
 
         const handleReplaceSection = useCallback(
             (sectionIndex: number, newSection: ProgramSection) => {
-                const currentSection = sectionsRef.current[sectionIndex];
-                if (currentSection) {
-                    updatePreReplacementSection(sectionIndex, currentSection);
-                }
                 setFormState((prev) => {
                     const updatedSections = [...prev.sections];
                     updatedSections[sectionIndex] = newSection;
@@ -265,7 +246,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                 updateSectionFlag(setSavedSections, sectionIndex, false);
                 updateSectionFlag(setEditingSections, sectionIndex, true);
             },
-            [setFormState, updateSectionFlag, updatePreReplacementSection],
+            [setFormState, updateSectionFlag],
         );
 
         useImperativeHandle(
@@ -403,9 +384,8 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                 updateSectionFlag(setSavedSections, sectionIndex, true);
                 updateSectionFlag(setNewSections, sectionIndex, false);
                 updateSectionFlag(setReplacingSections, sectionIndex, false);
-                updatePreReplacementSection(sectionIndex, null);
             },
-            [updateSectionFlag, updatePreReplacementSection],
+            [updateSectionFlag],
         );
 
         const handleSectionChange = useCallback(
@@ -425,15 +405,14 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                 const discard = () => {
                     if (options.shouldRemove) {
                         handleRemoveSection(sectionIndex);
+                    } else if (options.isTemplateReplacement && !newSections[sectionIndex]) {
+                        handleRevertSection(sectionIndex);
                     } else {
                         handleSectionChange(sectionIndex, options.revertTo);
                         updateSectionFlag(setSavedSections, sectionIndex, true);
                         updateSectionFlag(setEditingSections, sectionIndex, false);
                         updateSectionFlag(setNewSections, sectionIndex, false);
-                        if (options.isTemplateReplacement) {
-                            updateSectionFlag(setReplacingSections, sectionIndex, false);
-                            updatePreReplacementSection(sectionIndex, null);
-                        }
+                        updateSectionFlag(setReplacingSections, sectionIndex, false);
                     }
                     options.onAfterDiscard();
                 };
@@ -441,7 +420,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                 if (options.shouldRemove || options.isDirty) {
                     if (onRequestCancelSection) {
                         const actionType = options.isTemplateReplacement ? 'replace' : 'cancel';
-                        onRequestCancelSection(discard, actionType as 'cancel' | 'delete');
+                        onRequestCancelSection(discard, actionType);
                     } else {
                         discard();
                     }
@@ -452,10 +431,11 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             },
             [
                 handleRemoveSection,
+                handleRevertSection,
                 handleSectionChange,
                 onRequestCancelSection,
                 updateSectionFlag,
-                updatePreReplacementSection,
+                newSections,
             ],
         );
 
@@ -691,8 +671,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                             }
                                             onDelete={() => handleDeleteSection(index)}
                                             isReplacingTemplate={replacingSections[index] ?? false}
-                                            onRequestReplace={() => onRequestCancelSection?.(index, 'replace' as any)}
-                                            preReplacementSection={preReplacementSections[index] ?? null}
+                                            onRequestReplace={() => onRequestCancelSection?.(index, 'replace')}
                                         />
                                         <div className={styles['sections-divider']} />
                                     </React.Fragment>

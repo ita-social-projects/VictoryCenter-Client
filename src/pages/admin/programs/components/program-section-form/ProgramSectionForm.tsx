@@ -24,7 +24,6 @@ export interface ProgramSectionFormProps {
     onDelete?: () => void;
     isReplacingTemplate?: boolean;
     onRequestReplace?: () => void;
-    preReplacementSection?: ProgramSection | null;
 }
 
 export interface SectionCancelOptions {
@@ -55,13 +54,9 @@ export const ProgramSectionForm = ({
     onDelete,
     isReplacingTemplate = false,
     onRequestReplace,
-    preReplacementSection: prePropReplacementSection = null,
 }: ProgramSectionFormProps) => {
     const [localSection, setLocalSection] = useState<ProgramSection>(section);
     const [originalSection, setOriginalSection] = useState<ProgramSection>(section);
-    const [preReplacementSection, setPreReplacementSection] = useState<ProgramSection | null>(
-        prePropReplacementSection,
-    );
     const [isDirty, setIsDirty] = useState(false);
     const [validationResetKey, setValidationResetKey] = useState(0);
     const [sectionMode, setSectionMode] = useState<ProgramSectionMode>(
@@ -90,10 +85,6 @@ export const ProgramSectionForm = ({
             setSectionMode(isNewSection || isReplacingTemplate ? ProgramSectionMode.Edit : ProgramSectionMode.View);
         }
     }, [section, isNewSection, isReplacingTemplate]);
-
-    useEffect(() => {
-        setPreReplacementSection(prePropReplacementSection);
-    }, [prePropReplacementSection]);
 
     useEffect(() => {
         onEditStateChangeRef.current?.(sectionMode === ProgramSectionMode.Edit);
@@ -273,17 +264,14 @@ export const ProgramSectionForm = ({
 
     const handleCancelClick = useCallback(() => {
         const shouldRemove = isNewSection;
-        const revertTo = preReplacementSection || originalSection;
-        const isTemplateReplacement = !!preReplacementSection;
+        const revertTo = originalSection;
+        const isTemplateReplacement = isReplacingTemplate;
         const onAfterDiscard = () => {
             if (!shouldRemove) {
                 setLocalSection(revertTo);
                 setIsDirty(false);
                 setSectionMode(ProgramSectionMode.View);
                 setValidationResetKey((prev) => prev + 1);
-                if (isTemplateReplacement) {
-                    setPreReplacementSection(null);
-                }
             }
         };
 
@@ -294,7 +282,7 @@ export const ProgramSectionForm = ({
             onAfterDiscard,
             isTemplateReplacement,
         });
-    }, [isDirty, isNewSection, onCancel, originalSection, preReplacementSection]);
+    }, [isDirty, isNewSection, onCancel, originalSection, isReplacingTemplate]);
 
     const handleDeleteClick = useCallback(
         (e: React.MouseEvent<HTMLButtonElement>) => {

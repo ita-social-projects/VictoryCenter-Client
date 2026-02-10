@@ -10,7 +10,7 @@ import { useFormManager } from '@/hooks/admin/use-form-manager/useFormManager';
 import { Button } from '@/components/admin/button/Button';
 import { ProgramSectionForm, SectionCancelOptions } from '../program-section-form/ProgramSectionForm';
 import { Image, ImageValues } from '@/types/common/image';
-import { ProgramCategory } from '@/types/admin/programs';
+import { ProgramCategory, SectionDiscardType } from '@/types/admin/programs';
 import { VisibilityStatus } from '@/types/admin/common';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import NotFoundIcon from '@/assets/icons/not-found.svg';
@@ -63,8 +63,7 @@ export interface ProgramFormProps {
     onAddSection?: () => void;
     selectedLanguage?: string;
     onLanguageChange?: (language: string) => void;
-    onRequestCancelSection?: (onConfirmDiscard: (() => void) | number) => void;
-    //isEditMode?: boolean;
+    onRequestCancelSection?: (request: { type: SectionDiscardType; onDiscard: () => void }) => void;
 }
 
 const validateForm = (formState: ProgramFormValues, isPublishing: boolean): ProgramFormErrors => {
@@ -382,7 +381,10 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
 
                 if (options.shouldRemove || options.isDirty) {
                     if (onRequestCancelSection) {
-                        onRequestCancelSection(discard);
+                        const type = options.shouldRemove
+                            ? SectionDiscardType.RemoveSection
+                            : SectionDiscardType.RevertSection;
+                        onRequestCancelSection({ type, onDiscard: discard });
                     } else {
                         discard();
                     }

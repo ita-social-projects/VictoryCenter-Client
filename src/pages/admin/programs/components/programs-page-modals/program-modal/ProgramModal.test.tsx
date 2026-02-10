@@ -1,7 +1,7 @@
 import React from 'react';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { BaseProgramModalProps, ProgramModal, ProgramModalProps } from './ProgramModal';
-import { Program, ProgramCategory, ProgramCreateUpdate } from '@/types/admin/programs';
+import { Program, ProgramCategory, ProgramCreateUpdate, SectionDiscardType } from '@/types/admin/programs';
 import { ModalMode } from '@/types/admin/common';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -301,7 +301,10 @@ describe('ProgramModal', () => {
             render(<ProgramModal {...addModeProps} />);
 
             act(() => {
-                capturedFormProps.onRequestCancelSection(2);
+                capturedFormProps.onRequestCancelSection({
+                    type: SectionDiscardType.RemoveSection,
+                    onDiscard: () => mockFormRef.removeSection(2),
+                });
             });
 
             expect(screen.getByTestId('question-modal')).toBeInTheDocument();
@@ -317,7 +320,10 @@ describe('ProgramModal', () => {
             render(<ProgramModal {...addModeProps} />);
 
             act(() => {
-                capturedFormProps.onRequestCancelSection(2);
+                capturedFormProps.onRequestCancelSection({
+                    type: SectionDiscardType.RemoveSection,
+                    onDiscard: () => mockFormRef.removeSection(2),
+                });
             });
 
             expect(screen.getByTestId('question-modal')).toBeInTheDocument();
@@ -334,7 +340,10 @@ describe('ProgramModal', () => {
             render(<ProgramModal {...editModeProps} />);
 
             act(() => {
-                capturedFormProps.onRequestCancelSection(3);
+                capturedFormProps.onRequestCancelSection({
+                    type: SectionDiscardType.RevertSection,
+                    onDiscard: () => mockFormRef.revertSection(3),
+                });
             });
 
             expect(screen.getByTestId('question-modal')).toBeInTheDocument();
@@ -354,7 +363,10 @@ describe('ProgramModal', () => {
             render(<ProgramModal {...addModeProps} />);
 
             act(() => {
-                capturedFormProps.onRequestCancelSection(mockDiscardCallback);
+                capturedFormProps.onRequestCancelSection({
+                    type: SectionDiscardType.RevertSection,
+                    onDiscard: mockDiscardCallback,
+                });
             });
 
             expect(screen.getByTestId('question-modal')).toBeInTheDocument();
@@ -371,7 +383,10 @@ describe('ProgramModal', () => {
             render(<ProgramModal {...addModeProps} />);
 
             act(() => {
-                capturedFormProps.onRequestCancelSection(mockDiscardCallback);
+                capturedFormProps.onRequestCancelSection({
+                    type: SectionDiscardType.RevertSection,
+                    onDiscard: mockDiscardCallback,
+                });
             });
 
             expect(screen.getByTestId('question-modal')).toBeInTheDocument();
@@ -386,7 +401,10 @@ describe('ProgramModal', () => {
             const { rerender } = render(<ProgramModal {...addModeProps} />);
 
             act(() => {
-                capturedFormProps.onRequestCancelSection(1);
+                capturedFormProps.onRequestCancelSection({
+                    type: SectionDiscardType.RemoveSection,
+                    onDiscard: () => mockFormRef.removeSection(1),
+                });
             });
 
             expect(screen.getByTestId('question-title')).toHaveTextContent(
@@ -398,7 +416,10 @@ describe('ProgramModal', () => {
             rerender(<ProgramModal {...editModeProps} />);
 
             act(() => {
-                capturedFormProps.onRequestCancelSection(1);
+                capturedFormProps.onRequestCancelSection({
+                    type: SectionDiscardType.RevertSection,
+                    onDiscard: () => mockFormRef.revertSection(1),
+                });
             });
 
             expect(screen.getByTestId('question-title')).toHaveTextContent(

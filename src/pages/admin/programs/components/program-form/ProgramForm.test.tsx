@@ -553,7 +553,10 @@ describe('ProgramForm', () => {
             });
 
             fireEvent.click(screen.getByTestId('cancel-section-101'));
-            expect(onRequestCancelSection).toHaveBeenCalledWith(expect.any(Function));
+            expect(onRequestCancelSection).toHaveBeenCalledWith({
+                type: expect.any(Number),
+                onDiscard: expect.any(Function),
+            });
         });
 
         it('does not throw if onRequestCancelSection is not provided', async () => {

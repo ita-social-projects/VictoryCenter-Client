@@ -12,103 +12,33 @@ interface LayoutColumn {
     blocks: LayoutBlock[];
 }
 
+const LAYOUT_PATTERNS: Record<number, number[][]> = {
+    1: [[0]],
+    2: [[0], [1]],
+    3: [[0], [1, 2]],
+    4: [[0], [1, 2], [3]],
+};
+
+const mapToBlock = (item: ProgramAllocationItem, variant: number): LayoutBlock => ({
+    label: item.label,
+    amount: item.amount,
+    flexGrow: item.amount,
+    variant,
+});
+
 export const resolveProgramsLayout = (items: ProgramAllocationItem[]): LayoutColumn[] => {
-    if (items.length < 2 || items.length > 4) {
-        return [];
-    }
+    const pattern = LAYOUT_PATTERNS[items.length];
+    if (!pattern) return [];
 
-    const total = items.reduce((s, i) => s + i.amount, 0);
+    const total = items.reduce((sum, item) => sum + item.amount, 0);
+    if (total === 0) return [];
 
-    if (items.length === 2) {
-        return items.map((item, index) => ({
-            widthPercent: (item.amount / total) * 100,
-            blocks: [
-                {
-                    label: item.label,
-                    amount: item.amount,
-                    flexGrow: item.amount,
-                    variant: index === 0 ? 0 : 1,
-                },
-            ],
-        }));
-    }
+    return pattern.map((group) => {
+        const groupAmount = group.reduce((sum, index) => sum + items[index].amount, 0);
 
-    if (items.length === 3) {
-        const [first, second, third] = items;
-
-        return [
-            {
-                widthPercent: (first.amount / total) * 100,
-                blocks: [
-                    {
-                        label: first.label,
-                        amount: first.amount,
-                        flexGrow: first.amount,
-                        variant: 0,
-                    },
-                ],
-            },
-            {
-                widthPercent: ((second.amount + third.amount) / total) * 100,
-                blocks: [
-                    {
-                        label: second.label,
-                        amount: second.amount,
-                        flexGrow: second.amount,
-                        variant: 1,
-                    },
-                    {
-                        label: third.label,
-                        amount: third.amount,
-                        flexGrow: third.amount,
-                        variant: 2,
-                    },
-                ],
-            },
-        ];
-    }
-
-    const [first, second, third, fourth] = items;
-
-    return [
-        {
-            widthPercent: (first.amount / total) * 100,
-            blocks: [
-                {
-                    label: first.label,
-                    amount: first.amount,
-                    flexGrow: first.amount,
-                    variant: 0,
-                },
-            ],
-        },
-        {
-            widthPercent: ((second.amount + third.amount) / total) * 100,
-            blocks: [
-                {
-                    label: second.label,
-                    amount: second.amount,
-                    flexGrow: second.amount,
-                    variant: 1,
-                },
-                {
-                    label: third.label,
-                    amount: third.amount,
-                    flexGrow: third.amount,
-                    variant: 2,
-                },
-            ],
-        },
-        {
-            widthPercent: (fourth.amount / total) * 100,
-            blocks: [
-                {
-                    label: fourth.label,
-                    amount: fourth.amount,
-                    flexGrow: fourth.amount,
-                    variant: 3,
-                },
-            ],
-        },
-    ];
+        return {
+            widthPercent: (groupAmount / total) * 100,
+            blocks: group.map((index) => mapToBlock(items[index], index)),
+        };
+    });
 };

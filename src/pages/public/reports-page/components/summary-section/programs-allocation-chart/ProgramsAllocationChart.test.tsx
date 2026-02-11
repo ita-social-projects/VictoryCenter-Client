@@ -46,10 +46,28 @@ describe('ProgramsAllocationChart', () => {
         expect(screen.getByText(/1\s+234\s+567/)).toBeInTheDocument();
     });
 
-    it('renders nothing in chart area if items count is invalid', () => {
+    it('renders correctly for 1 item structure', () => {
         render(<ProgramsAllocationChart items={[{ label: 'Solo', amount: 100 }]} />);
 
         expect(screen.getByText('Розподіл коштів по програмах')).toBeInTheDocument();
-        expect(screen.queryByText('Solo')).not.toBeInTheDocument();
+
+        expect(screen.getByText('Solo')).toBeInTheDocument();
+        expect(screen.getByText(/100/)).toBeInTheDocument();
+    });
+
+    it('renders nothing in chart area if items count exceeds supported limit', () => {
+        const items = [
+            { label: 'A', amount: 1 },
+            { label: 'B', amount: 1 },
+            { label: 'C', amount: 1 },
+            { label: 'D', amount: 1 },
+            { label: 'E', amount: 1 },
+        ];
+
+        render(<ProgramsAllocationChart items={items} />);
+
+        expect(screen.getByText('Розподіл коштів по програмах')).toBeInTheDocument();
+
+        expect(screen.queryByText('A')).not.toBeInTheDocument();
     });
 });

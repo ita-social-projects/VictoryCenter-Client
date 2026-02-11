@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
     TranslateMemberForm,
     TranslateTeamMemberFormRef,
@@ -10,14 +10,14 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { TeamMember } from '@/types/admin/team-members';
 import { LocalizationLanguage } from '@/types/common/language';
 import { ModalMode } from '@/types/admin/common';
+import { DEFAULT_LOCALE } from '@/const/common/locales';
 
 interface TranslateTeamMemberModalProps {
     isOpen: boolean;
     onClose: () => void;
     memberToTranslate: TeamMember | null;
     onTranslateMember: (member: TeamMember) => void;
-    language: LocalizationLanguage;
-    mode: ModalMode;
+    translatedLanguages: LocalizationLanguage[];
 }
 
 export const TranslateTeamMemberModal = ({
@@ -25,18 +25,27 @@ export const TranslateTeamMemberModal = ({
     onClose,
     memberToTranslate,
     onTranslateMember,
-    language,
-    mode,
+    translatedLanguages,
 }: TranslateTeamMemberModalProps) => {
     const formRef = useRef<TranslateTeamMemberFormRef>(null);
 
     const [isFormValid, setIsFormValid] = useState(false);
     const [isDirty, setIsDirty] = useState(false);
+    const [language, setLanguage] = useState<LocalizationLanguage | null>(translatedLanguages?.[0] ?? null);
+
+    useEffect(() => {
+        if (translatedLanguages.length > 0 && !language) {
+            const defaultEnglish = translatedLanguages.find((l) => l.code !== DEFAULT_LOCALE) || translatedLanguages[0];
+            setLanguage(defaultEnglish);
+        }
+    }, [translatedLanguages, language]);
 
     const existingLocalization = useMemo(() => {
-        return memberToTranslate?.localizations?.find((loc) => loc.language.id === language.id);
-    }, [memberToTranslate?.localizations, language.id]);
+        if (!memberToTranslate?.localizations || !language) return null;
+        return memberToTranslate?.localizations?.find((loc) => loc.language.id === language?.id);
+    }, [memberToTranslate?.localizations, language]);
 
+    const mode = existingLocalization ? ModalMode.Edit : ModalMode.Add;
     const isEditMode = mode === ModalMode.Edit;
 
     const initialData = useMemo<TranslateTeamMemberFormValues | null>(() => {
@@ -50,7 +59,7 @@ export const TranslateTeamMemberModal = ({
 
     const { translateMember, isSubmitting, error } = useTranslateTeamMember({
         member: memberToTranslate,
-        language,
+        language: language!,
         onSuccess: (updatedMember) => {
             onTranslateMember(updatedMember);
             onClose();
@@ -91,7 +100,11 @@ export const TranslateTeamMemberModal = ({
             {error && <div className="translate-member-error">{error}</div>}
 
             <TranslateMemberForm
+                key={language?.id}
                 ref={formRef}
+                selectedLanguage={language}
+                languages={translatedLanguages}
+                onLanguageChange={setLanguage}
                 onSubmit={handleFormSubmit}
                 initialData={initialData}
                 onValidationChange={setIsFormValid}

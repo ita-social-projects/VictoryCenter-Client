@@ -58,10 +58,22 @@ jest.mock('../common-member-fields/CommonMemberFields', () => ({
     ),
 }));
 
+const mockLanguages = [
+    { id: '1', code: 'EN', name: 'English' },
+    { id: '2', code: 'UA', name: 'Ukrainian' },
+];
+
 const renderForm = (props: any = {}) => {
     const ref = createRef<TranslateTeamMemberFormRef>();
-    render(<TranslateMemberForm ref={ref} onSubmit={jest.fn()} {...props} />);
-    return { ref };
+    const defaultProps = {
+        languages: mockLanguages,
+        selectedLanguage: mockLanguages[0],
+        onLanguageChange: jest.fn(),
+        onSubmit: jest.fn(),
+    };
+
+    render(<TranslateMemberForm ref={ref} {...defaultProps} {...props} />);
+    return { ref, ...defaultProps, ...props };
 };
 
 describe('TranslateMemberForm', () => {
@@ -169,5 +181,14 @@ describe('TranslateMemberForm', () => {
         renderForm();
         const trigger = screen.getByTestId('select-change-trigger');
         expect(() => fireEvent.click(trigger)).not.toThrow();
+    });
+    it('calls onLanguageChange when a new language is selected', () => {
+        const onLanguageChange = jest.fn();
+        renderForm({ onLanguageChange });
+
+        const trigger = screen.getByTestId('select-change-trigger');
+        fireEvent.click(trigger);
+
+        expect(onLanguageChange).toHaveBeenCalledWith(expect.objectContaining({ code: 'UA' }));
     });
 });

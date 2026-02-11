@@ -87,11 +87,13 @@ const TEST_DATA = {
         image: null,
         localizations: [],
     } as TeamMember,
-    language: {
-        id: 2,
-        code: 'en',
-        name: 'English',
-    },
+    translatedLanguages: [
+        {
+            id: 2,
+            code: 'en',
+            name: 'English',
+        },
+    ],
     translatedData: {
         fullName: 'Translated Name',
         description: 'Translated Description',
@@ -101,12 +103,11 @@ const TEST_DATA = {
 describe('TranslateTeamMemberModal', () => {
     const renderModal = (props: Partial<React.ComponentProps<typeof TranslateTeamMemberModal>> = {}) => {
         const defaultProps = {
-            mode: ModalMode.Add,
             isOpen: true,
             onClose: jest.fn(),
             memberToTranslate: TEST_DATA.member,
             onTranslateMember: jest.fn(),
-            language: TEST_DATA.language,
+            translatedLanguages: TEST_DATA.translatedLanguages,
         };
 
         return render(<TranslateTeamMemberModal {...defaultProps} {...props} />);
@@ -191,7 +192,7 @@ describe('TranslateTeamMemberModal', () => {
                     ...TEST_DATA.member,
                     localizations: [
                         {
-                            language: TEST_DATA.language,
+                            language: TEST_DATA.translatedLanguages[0],
                             fullName: 'Existing Translation',
                             description: 'Existing Description',
                             translationStatus: 1,
@@ -200,7 +201,6 @@ describe('TranslateTeamMemberModal', () => {
                 } as TeamMember;
 
                 renderModal({
-                    mode: ModalMode.Edit,
                     memberToTranslate: memberWithLocalization,
                 });
 
@@ -215,7 +215,7 @@ describe('TranslateTeamMemberModal', () => {
                     ...TEST_DATA.member,
                     localizations: [
                         {
-                            language: TEST_DATA.language,
+                            language: TEST_DATA.translatedLanguages[0],
                             fullName: 'Existing Translation',
                             description: 'Existing Description',
                             translationStatus: 1,
@@ -224,7 +224,6 @@ describe('TranslateTeamMemberModal', () => {
                 } as TeamMember;
 
                 renderModal({
-                    mode: ModalMode.Edit,
                     memberToTranslate: memberWithLocalization,
                 });
 
@@ -235,9 +234,7 @@ describe('TranslateTeamMemberModal', () => {
             it('shows correct title for add mode', () => {
                 const { COMMON_TEXT_ADMIN } = require('@/const/admin/common');
 
-                renderModal({
-                    mode: ModalMode.Add,
-                });
+                renderModal({});
 
                 const title = screen.getByTestId('modal-title');
                 expect(title).toHaveTextContent(COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION);
@@ -342,7 +339,7 @@ describe('TranslateTeamMemberModal', () => {
                             translationStatus: 1,
                         },
                         {
-                            language: TEST_DATA.language,
+                            language: TEST_DATA.translatedLanguages[0],
                             fullName: 'English Name',
                             description: 'English Description',
                             translationStatus: 1,
@@ -351,7 +348,6 @@ describe('TranslateTeamMemberModal', () => {
                 } as unknown as TeamMember;
 
                 renderModal({
-                    mode: ModalMode.Edit,
                     memberToTranslate: memberWithMultipleLocalizations,
                 });
 
@@ -360,7 +356,6 @@ describe('TranslateTeamMemberModal', () => {
 
             it('returns null for initialData in add mode', () => {
                 renderModal({
-                    mode: ModalMode.Add,
                     memberToTranslate: TEST_DATA.member,
                 });
 
@@ -374,7 +369,6 @@ describe('TranslateTeamMemberModal', () => {
                 } as TeamMember;
 
                 renderModal({
-                    mode: ModalMode.Edit,
                     memberToTranslate: memberWithoutLocalization,
                 });
 
@@ -399,14 +393,13 @@ describe('TranslateTeamMemberModal', () => {
 
                 renderModal({
                     memberToTranslate: TEST_DATA.member,
-                    language: TEST_DATA.language,
-                    mode: ModalMode.Add,
+                    translatedLanguages: TEST_DATA.translatedLanguages,
                     onTranslateMember,
                 });
 
                 expect(mockUseTranslateTeamMember).toHaveBeenCalledWith({
                     member: TEST_DATA.member,
-                    language: TEST_DATA.language,
+                    language: TEST_DATA.translatedLanguages[0],
                     onSuccess: expect.any(Function),
                     mode: ModalMode.Add,
                 });
@@ -471,7 +464,7 @@ describe('TranslateTeamMemberModal', () => {
                 };
 
                 renderModal({
-                    language: ukrainianLanguage,
+                    translatedLanguages: [ukrainianLanguage],
                 });
 
                 expect(screen.getByTestId('translate-form')).toBeInTheDocument();
@@ -491,9 +484,8 @@ describe('TranslateTeamMemberModal', () => {
                 } as unknown as TeamMember;
 
                 renderModal({
-                    mode: ModalMode.Edit,
                     memberToTranslate: memberWithLocalization,
-                    language: { id: 2, code: 'en', name: 'English' },
+                    translatedLanguages: [{ id: 2, code: 'en', name: 'English' }],
                 });
 
                 expect(screen.getByTestId('translate-form')).toBeInTheDocument();
@@ -507,7 +499,7 @@ describe('TranslateTeamMemberModal', () => {
                     ...TEST_DATA.member,
                     localizations: [
                         {
-                            language: TEST_DATA.language,
+                            language: TEST_DATA.translatedLanguages[0],
                             fullName: TEST_DATA.translatedData.fullName,
                             description: TEST_DATA.translatedData.description,
                             translationStatus: 1,
@@ -564,7 +556,7 @@ describe('TranslateTeamMemberModal', () => {
         describe('Hook dependencies', () => {
             it('recalculates existingLocalization when language changes', () => {
                 const { rerender } = renderModal({
-                    language: { id: 1, code: 'ua', name: 'Ukrainian' },
+                    translatedLanguages: [{ id: 1, code: 'ua', name: 'Ukrainian' }],
                 });
 
                 expect(screen.getByTestId('translate-form')).toBeInTheDocument();
@@ -572,12 +564,11 @@ describe('TranslateTeamMemberModal', () => {
                 const newLanguage = { id: 2, code: 'en', name: 'English' };
 
                 const defaultProps = {
-                    mode: ModalMode.Add,
                     isOpen: true,
                     onClose: jest.fn(),
                     memberToTranslate: TEST_DATA.member,
                     onTranslateMember: jest.fn(),
-                    language: newLanguage,
+                    translatedLanguages: [newLanguage],
                 };
 
                 rerender(<TranslateTeamMemberModal {...defaultProps} />);
@@ -590,7 +581,7 @@ describe('TranslateTeamMemberModal', () => {
                     ...TEST_DATA.member,
                     localizations: [
                         {
-                            language: TEST_DATA.language,
+                            language: TEST_DATA.translatedLanguages[0],
                             fullName: 'Existing Translation',
                             description: 'Existing Description',
                             translationStatus: 1,
@@ -599,7 +590,6 @@ describe('TranslateTeamMemberModal', () => {
                 } as TeamMember;
 
                 const { rerender } = renderModal({
-                    mode: ModalMode.Add,
                     memberToTranslate: memberWithLocalization,
                 });
 
@@ -611,7 +601,7 @@ describe('TranslateTeamMemberModal', () => {
                     onClose: jest.fn(),
                     memberToTranslate: memberWithLocalization,
                     onTranslateMember: jest.fn(),
-                    language: TEST_DATA.language,
+                    translatedLanguages: TEST_DATA.translatedLanguages,
                 };
 
                 rerender(<TranslateTeamMemberModal {...defaultProps} />);

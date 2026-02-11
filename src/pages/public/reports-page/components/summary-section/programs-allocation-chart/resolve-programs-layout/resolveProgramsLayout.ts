@@ -13,6 +13,10 @@ interface LayoutColumn {
 }
 
 export const resolveProgramsLayout = (items: ProgramAllocationItem[]): LayoutColumn[] => {
+    if (items.length < 2 || items.length > 4) {
+        return [];
+    }
+
     const total = items.reduce((s, i) => s + i.amount, 0);
 
     if (items.length === 2) {

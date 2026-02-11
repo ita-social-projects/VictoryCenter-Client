@@ -31,6 +31,7 @@ export const TranslateTeamMemberModal = ({
     const formRef = useRef<TranslateTeamMemberFormRef>(null);
 
     const [isFormValid, setIsFormValid] = useState(false);
+    const [isDirty, setIsDirty] = useState(false);
 
     const existingLocalization = useMemo(() => {
         return memberToTranslate?.localizations?.find((loc) => loc.language.id === language.id);
@@ -85,6 +86,7 @@ export const TranslateTeamMemberModal = ({
             isSubmitting={isSubmitting}
             isFormValid={isFormValid}
             checkIsDirty={checkIsDirty}
+            isDirty={isDirty}
         >
             {error && <div className="translate-member-error">{error}</div>}
 
@@ -93,6 +95,7 @@ export const TranslateTeamMemberModal = ({
                 onSubmit={handleFormSubmit}
                 initialData={initialData}
                 onValidationChange={setIsFormValid}
+                onDirtyChange={setIsDirty}
             />
         </LocalizationModal>
     );

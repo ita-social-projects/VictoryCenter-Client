@@ -15,6 +15,7 @@ interface LocalizationModalProps {
     isFormValid: boolean;
     saveButtonText?: string;
     checkIsDirty?: () => boolean;
+    isDirty?: boolean;
     children: React.ReactNode;
 }
 
@@ -27,6 +28,7 @@ export const LocalizationModal = ({
     isFormValid,
     saveButtonText = COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION,
     checkIsDirty,
+    isDirty,
     children,
 }: LocalizationModalProps) => {
     const [showCloseConfirm, setShowCloseConfirm] = useState(false);
@@ -39,7 +41,6 @@ export const LocalizationModal = ({
 
         onClose();
     };
-
     const handleConfirmClose = () => {
         setShowCloseConfirm(false);
         onClose();
@@ -59,7 +60,7 @@ export const LocalizationModal = ({
                         <Button
                             buttonStyle="primary"
                             onClick={onSave}
-                            disabled={!isFormValid || isSubmitting}
+                            disabled={!isFormValid || isSubmitting || !isDirty}
                             data-testid="save-localization-btn"
                             className={styles['save-localization-btn']}
                         >

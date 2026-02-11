@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import { forwardRef, useEffect } from 'react';
 import { useFormManager } from '@/hooks/admin/use-form-manager/useFormManager';
 import { VisibilityStatus } from '@/types/admin/common';
 import styles from './TranslateFaqForm.module.scss';
@@ -30,6 +30,7 @@ export interface TranslateFaqFormProps {
     initialData?: TranslateFaqFormValues | null;
     formDisabled?: boolean;
     onValidationChange?: (isValid: boolean) => void;
+    onDirtyChange?: (isDirty: boolean) => void;
 }
 
 const DEFAULT_FORM_STATE: TranslateFaqFormValues = {
@@ -45,7 +46,7 @@ const validateForm = (formState: TranslateFaqFormValues, _isPublishing: boolean)
 };
 
 export const TranslateFaqForm = forwardRef<TranslateFaqFormRef, TranslateFaqFormProps>(
-    ({ initialData = null, onSubmit, formDisabled, onValidationChange }: TranslateFaqFormProps, ref) => {
+    ({ initialData = null, onSubmit, formDisabled, onValidationChange, onDirtyChange }: TranslateFaqFormProps, ref) => {
         const { formState, setFormState, errors, setErrors, isSubmitting } = useFormManager<
             TranslateFaqFormValues,
             TranslateFaqFormErrorState
@@ -57,6 +58,10 @@ export const TranslateFaqForm = forwardRef<TranslateFaqFormRef, TranslateFaqForm
             ref,
             onSubmit: (data, _status) => onSubmit(data),
         });
+        useEffect(() => {
+            const isDirty = JSON.stringify(formState) !== JSON.stringify(initialData);
+            onDirtyChange?.(isDirty);
+        }, [formState, initialData, onDirtyChange]);
 
         const handleQuestionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             setFormState((prev) => ({ ...prev, question: e.target.value }));

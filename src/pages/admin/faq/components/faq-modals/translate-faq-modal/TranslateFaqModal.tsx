@@ -27,6 +27,7 @@ export const TranslateFaqModal = ({
     const formRef = useRef<TranslateFaqFormRef>(null);
     const [isFormValid, setIsFormValid] = useState(false);
     const [language, setLanguage] = useState<LocalizationLanguage | null>(translatedLanguages?.[0] ?? null);
+    const [isDirty, setIsDirty] = useState(false);
 
     useEffect(() => {
         if (translatedLanguages.length > 0 && !language) {
@@ -88,6 +89,7 @@ export const TranslateFaqModal = ({
             isSubmitting={isSubmitting}
             isFormValid={isFormValid}
             checkIsDirty={checkIsDirty}
+            isDirty={isDirty}
         >
             <TranslationControls
                 selectedLanguage={language}
@@ -107,6 +109,7 @@ export const TranslateFaqModal = ({
                 onSubmit={handleFormSubmit}
                 initialData={initialData}
                 onValidationChange={setIsFormValid}
+                onDirtyChange={setIsDirty}
             />
         </LocalizationModal>
     );

@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import { forwardRef, useEffect } from 'react';
 import { TEAM_MEMBER_VALIDATION_FUNCTIONS } from '@/validation/admin/team-member-schema/team-member-schema';
 import { useFormManager } from '@/hooks/admin/use-form-manager/useFormManager';
 import { Select } from '@/components/common/select/Select';
@@ -30,6 +30,7 @@ export interface TranslateMemberFormProps {
     initialData?: TranslateTeamMemberFormValues | null;
     formDisabled?: boolean;
     onValidationChange?: (isValid: boolean) => void;
+    onDirtyChange?: (isDirty: boolean) => void;
 }
 
 const DEFAULT_FORM_STATE: TranslateTeamMemberFormValues = {
@@ -48,7 +49,10 @@ const validateForm = (
 };
 
 export const TranslateMemberForm = forwardRef<TranslateTeamMemberFormRef, TranslateMemberFormProps>(
-    ({ initialData = null, onSubmit, formDisabled, onValidationChange }: TranslateMemberFormProps, ref) => {
+    (
+        { initialData = null, onSubmit, formDisabled, onValidationChange, onDirtyChange }: TranslateMemberFormProps,
+        ref,
+    ) => {
         const { formState, setFormState, errors, setErrors, isSubmitting } = useFormManager<
             TranslateTeamMemberFormValues,
             TranslateTeamMemberFormErrorState
@@ -60,6 +64,10 @@ export const TranslateMemberForm = forwardRef<TranslateTeamMemberFormRef, Transl
             ref,
             onSubmit: (data, _status) => onSubmit(data),
         });
+        useEffect(() => {
+            const isDirty = JSON.stringify(formState) !== JSON.stringify(initialData);
+            onDirtyChange?.(isDirty);
+        }, [formState, initialData, onDirtyChange]);
 
         const fieldHandlers = useCommonMemberFields({
             formState,

@@ -42,23 +42,26 @@ jest.mock('../translate-member-form/TranslateMemberForm', () => {
     const React = require('react');
 
     return {
-        TranslateMemberForm: React.forwardRef(({ onSubmit, onValidationChange }: any, ref: React.Ref<any>) => {
-            React.useImperativeHandle(ref, () => ({
-                submit: () =>
-                    onSubmit({
-                        fullName: 'Translated Name',
-                        description: 'Translated Description',
-                    }),
-                isValid: () => true,
-                isDirty: () => true,
-            }));
+        TranslateMemberForm: React.forwardRef(
+            ({ onSubmit, onValidationChange, onDirtyChange }: any, ref: React.Ref<any>) => {
+                React.useImperativeHandle(ref, () => ({
+                    submit: () =>
+                        onSubmit({
+                            fullName: 'Translated Name',
+                            description: 'Translated Description',
+                        }),
+                    isValid: () => true,
+                    isDirty: () => true,
+                }));
 
-            React.useEffect(() => {
-                onValidationChange?.(true);
-            }, [onValidationChange]);
+                React.useEffect(() => {
+                    onValidationChange?.(true);
+                    onDirtyChange?.(true);
+                }, [onValidationChange, onDirtyChange]);
 
-            return <div data-testid="translate-form" />;
-        }),
+                return <div data-testid="translate-form" />;
+            },
+        ),
     };
 });
 

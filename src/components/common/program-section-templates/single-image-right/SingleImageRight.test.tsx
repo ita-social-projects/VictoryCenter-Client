@@ -37,7 +37,6 @@ jest.mock('@/components/admin/input-groups/photo-input-group/PhotoInputGroup', (
 }));
 
 describe('SingleImageRight', () => {
-    // 3. Чистим моки перед каждым тестом
     beforeEach(() => {
         mockPhotoInputGroup.mockClear();
     });
@@ -140,7 +139,6 @@ describe('SingleImageRight', () => {
             render(<SingleImageRight title="Test" mode={ProgramSectionMode.Edit} onTitleChange={onTitleChange} />);
 
             const titleTextarea = screen.getByTestId('textarea-section-title');
-            // Simulate user typing
             fireEvent.change(titleTextarea, { target: { value: 'New Title' } });
 
             expect(onTitleChange).toHaveBeenCalledWith('New Title');

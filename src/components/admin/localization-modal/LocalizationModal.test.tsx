@@ -61,6 +61,7 @@ describe('LocalizationModal', () => {
         isSubmitting: false,
         isFormValid: true,
         children: <div data-testid="child-form">Form Content</div>,
+        isDirty: true,
     };
 
     beforeEach(() => {

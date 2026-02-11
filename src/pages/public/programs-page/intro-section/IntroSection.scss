@@ -6,23 +6,27 @@
     margin: 0;
     box-sizing: border-box;
 }
+
 .intro-section {
-    padding-top: 10.5rem;
-    padding-bottom: 8.875rem;
+    padding-top: 4rem;
+    padding-bottom: 3rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
     display: flex;
     flex-direction: column;
-    gap: 8.25rem;
+    gap: 3rem;
     justify-content: center;
     align-items: center;
     overflow-x: hidden;
 
     h1 {
-        width: 68.875rem;
-        height: 21rem;
+        max-width: 68.875rem;
+        width: 100%;
+        height: auto;
         font-family: fonts.$mulish-regular-font;
         font-weight: 500;
-        font-size: 6rem;
-        line-height: 7rem;
+        font-size: 2.5rem;
+        line-height: 3rem;
         letter-spacing: -0.02em;
         text-align: center;
         text-transform: uppercase;
@@ -32,8 +36,8 @@
         font-family: fonts.$mulish-regular-font;
         font-weight: 800;
         font-style: italic;
-        font-size: 6rem;
-        line-height: 7rem;
+        font-size: 2.5rem;
+        line-height: 3rem;
         letter-spacing: -0.02em;
         text-align: center;
         text-transform: uppercase;
@@ -50,7 +54,7 @@
     span:nth-child(2):before {
         content: '';
         width: 100vw;
-        height: 7rem;
+        height: 3rem;
         background: colors.$yellow-400;
         position: absolute;
         transform: translateX(-100%);
@@ -65,7 +69,7 @@
     span:nth-child(3):before {
         content: '';
         width: 100vw;
-        height: 7rem;
+        height: 3rem;
         background: colors.$light-blue-200;
         position: absolute;
         z-index: z-index.public(programs-page-intro-section-background);
@@ -73,22 +77,159 @@
 
     .additional-info {
         display: flex;
-        gap: 1rem;
+        flex-direction: column;
+        gap: 1.5rem;
         justify-content: center;
         align-items: center;
         font-family: fonts.$mulish-regular-font;
         font-weight: 500;
-        font-size: 1.25rem;
-        line-height: 1.75rem;
+        font-size: 1rem;
+        line-height: 1.5rem;
         letter-spacing: -0.02em;
         vertical-align: middle;
+        width: 100%;
+        max-width: 100%;
 
-        p:nth-child(1) {
-            width: 26.9rem;
+        p {
+            width: 100%;
+            max-width: 27rem;
+            text-align: center;
+        }
+    }
+}
+
+// ===============================================
+// Responsive Design - Media Queries
+// ===============================================
+//
+// NOTE: These measurements use logical scaling ratios.
+// For exact Figma design specs, refer to FIGMA_MEASUREMENTS.md
+// Figma frames: Mobile (375px), Tablet (768px), Desktop (1440px)
+
+@media (min-width: 768px) {
+    .intro-section {
+        padding-top: 6rem;
+        padding-bottom: 5rem;
+        padding-left: 2rem;
+        padding-right: 2rem;
+        gap: 5rem;
+
+        h1 {
+            font-size: 3.5rem;
+            line-height: 4.25rem;
         }
 
-        p:nth-child(2) {
-            width: 27rem;
+        span {
+            font-size: 3.5rem;
+            line-height: 4.25rem;
+        }
+
+        span:nth-child(2):before {
+            height: 4.25rem;
+        }
+
+        span:nth-child(3):before {
+            height: 4.25rem;
+        }
+
+        .additional-info {
+            font-size: 1.125rem;
+            line-height: 1.625rem;
+            gap: 1rem;
+        }
+    }
+}
+
+@media (min-width: 1024px) {
+    .intro-section {
+        padding-top: 8rem;
+        padding-bottom: 6.5rem;
+        padding-left: 3.5rem;
+        padding-right: 3.5rem;
+        gap: 6.5rem;
+
+        h1 {
+            font-size: 4rem;
+            line-height: 4.75rem;
+        }
+
+        span {
+            font-size: 4rem;
+            line-height: 4.75rem;
+        }
+
+        span:nth-child(2):before {
+            height: 4.75rem;
+        }
+
+        span:nth-child(3):before {
+            height: 4.75rem;
+        }
+
+        .additional-info {
+            flex-direction: row;
+            font-size: 1.25rem;
+            line-height: 1.75rem;
+
+            p {
+                text-align: left;
+            }
+
+            p:nth-child(1) {
+                max-width: 26.9rem;
+            }
+
+            p:nth-child(2) {
+                max-width: 27rem;
+            }
+        }
+    }
+}
+
+@media (min-width: 1280px) {
+    .intro-section {
+        h1 {
+            font-size: 5rem;
+            line-height: 5.875rem;
+        }
+
+        span {
+            font-size: 5rem;
+            line-height: 5.875rem;
+        }
+
+        span:nth-child(2):before {
+            height: 5.875rem;
+        }
+
+        span:nth-child(3):before {
+            height: 5.875rem;
+        }
+    }
+}
+
+@media (min-width: 1440px) {
+    .intro-section {
+        padding-top: 10.5rem;
+        padding-bottom: 8.875rem;
+        gap: 8.25rem;
+
+        h1 {
+            font-size: 6rem;
+            line-height: 7rem;
+        }
+
+        span {
+            font-size: 6rem;
+            line-height: 7rem;
+        }
+
+        span:nth-child(2):before {
+            height: 7rem;
+        }
+
+        span:nth-child(3):before {
+            height: 7rem;
         }
     }
 }

@@ -3,11 +3,13 @@
 
 .contact-us-block {
     position: relative;
+    min-height: 100vh;
     height: 100vh;
     width: 100%;
 
     video {
-        height: 100vh;
+        height: 100%;
+        min-height: 100vh;
         width: 100%;
         position: absolute;
         object-fit: cover;
@@ -17,25 +19,29 @@
     .contact-us-info {
         margin: 0 auto;
         padding-top: 3.75rem;
-        width: 65rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        width: 90%;
+        max-width: 65rem;
         position: relative;
         text-align: center;
 
         .contact-title {
             font-family: fonts.$mulish-regular-font;
             font-weight: 700;
-            font-size: 4rem;
-            line-height: 4.5rem;
+            font-size: 2rem;
+            line-height: 2.5rem;
             letter-spacing: 0;
             text-align: center;
             text-transform: uppercase;
             color: white;
-            padding-bottom: 19rem;
+            padding-bottom: 6rem;
         }
 
         .contact-button {
             margin: 0 auto;
-            width: 34rem;
+            width: 100%;
+            max-width: 20rem;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -45,8 +51,8 @@
             h4 {
                 font-family: fonts.$mulish-regular-font;
                 font-weight: 500;
-                font-size: 1.125rem;
-                line-height: 1.75rem;
+                font-size: 1rem;
+                line-height: 1.5rem;
                 letter-spacing: -0.02em;
                 text-align: center;
                 color: white;
@@ -66,6 +72,86 @@
                 letter-spacing: -0.02em;
                 vertical-align: middle;
                 color: colors.$blue-900;
+                cursor: pointer;
+                transition: opacity 0.3s ease;
+
+                &:hover {
+                    opacity: 0.9;
+                }
+            }
+        }
+    }
+}
+
+// ===============================================
+// Responsive Design - Media Queries
+// ===============================================
+//
+// NOTE: These measurements use logical scaling ratios.
+// For exact Figma design specs, refer to FIGMA_MEASUREMENTS.md
+// Figma frames: Mobile (375px), Tablet (768px), Desktop (1440px)
+
+@media (max-width: 768px) {
+    .contact-us-block {
+        min-height: 80vh;
+        height: auto;
+
+        video {
+            min-height: 80vh;
+        }
+    }
+}
+
+@media (min-width: 768px) {
+    .contact-us-block {
+        .contact-us-info {
+            width: 85%;
+            max-width: 50rem;
+
+            .contact-title {
+                font-size: 3rem;
+                line-height: 3.5rem;
+                padding-bottom: 12rem;
+            }
+
+            .contact-button {
+                max-width: 28rem;
+
+                h4 {
+                    font-size: 1.125rem;
+                    line-height: 1.75rem;
+                }
+            }
+        }
+    }
+}
+
+@media (min-width: 1024px) {
+    .contact-us-block {
+        .contact-us-info {
+            width: 80%;
+            max-width: 65rem;
+
+            .contact-title {
+                font-size: 3.5rem;
+                line-height: 4rem;
+                padding-bottom: 15rem;
+            }
+
+            .contact-button {
+                max-width: 34rem;
+            }
+        }
+    }
+}
+
+@media (min-width: 1440px) {
+    .contact-us-block {
+        .contact-us-info {
+            .contact-title {
+                font-size: 4rem;
+                line-height: 4.5rem;
+                padding-bottom: 19rem;
             }
         }
     }

@@ -154,8 +154,7 @@ describe('TranslateFaqForm', () => {
         await act(async () => {
             try {
                 await ref.current?.submit();
-            } catch {
-            }
+            } catch {}
         });
 
         expect(onSubmit).not.toHaveBeenCalled();

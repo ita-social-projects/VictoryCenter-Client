@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { REPORTS_DATA } from '@/utils/mock-data/public/reports-page';
 import { ReportItem } from './report-item';
@@ -7,7 +7,7 @@ import styles from './ReportsSection.module.scss';
 
 const INITIAL_VISIBLE_COUNT = 5;
 
-export const ReportsSection: React.FC = () => {
+export const ReportsSection = () => {
     const { t } = useTranslation('reportsPage');
     const [isExpanded, setIsExpanded] = useState(false);
 

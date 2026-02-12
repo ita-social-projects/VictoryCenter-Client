@@ -8,11 +8,11 @@ export interface ProgramAllocationItem {
     amount: number;
 }
 
-interface Props {
+interface ProgramsAllocationChartProps {
     items: ProgramAllocationItem[];
 }
 
-export const ProgramsAllocationChart: React.FC<Props> = ({ items }) => {
+export const ProgramsAllocationChart = ({ items }: ProgramsAllocationChartProps) => {
     const columns = useMemo(() => resolveProgramsLayout(items), [items]);
 
     return (

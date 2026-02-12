@@ -11,7 +11,7 @@ interface FundingSourcesChartProps {
     items: FundingSourceItem[];
 }
 
-export const FundingSourcesChart: React.FC<FundingSourcesChartProps> = ({ items }) => {
+export const FundingSourcesChart = ({ items }: FundingSourcesChartProps) => {
     const maxAmount = useMemo(() => {
         return Math.max(...items.map((item) => item.amount));
     }, [items]);

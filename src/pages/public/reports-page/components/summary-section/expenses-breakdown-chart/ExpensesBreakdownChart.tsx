@@ -7,7 +7,7 @@ interface ExpensesBreakdownChartProps {
     items: ExpenseItem[];
 }
 
-export const ExpensesBreakdownChart: React.FC<ExpensesBreakdownChartProps> = ({ items }) => {
+export const ExpensesBreakdownChart = ({ items }: ExpensesBreakdownChartProps) => {
     return (
         <div className={styles.container}>
             <h3 className={styles.title}>Основні витрати</h3>

@@ -7,7 +7,7 @@ interface ChartLegendProps {
     items: ExpenseItem[];
 }
 
-export const ChartLegend: React.FC<ChartLegendProps> = ({ items }) => {
+export const ChartLegend = ({ items }: ChartLegendProps) => {
     return (
         <div className={styles.root}>
             {items.toReversed().map((item, index) => (

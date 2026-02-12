@@ -12,7 +12,7 @@ import { FundingSourcesChart } from './funding-sources-chart';
 import { ProgramsAllocationChart } from './programs-allocation-chart';
 import styles from './SummarySection.module.scss';
 
-export const SummarySection: React.FC = () => {
+export const SummarySection = () => {
     const { t, i18n } = useTranslation('reportsPage');
 
     const isUa = i18n.language === 'uk';

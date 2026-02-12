@@ -11,6 +11,7 @@ import { TeamMember } from '@/types/admin/team-members';
 import { LocalizationLanguage } from '@/types/common/language';
 import { ModalMode } from '@/types/admin/common';
 import { DEFAULT_LOCALE } from '@/const/common/locales';
+import { TranslationControls } from '@/components/admin/translation-controls/TranslationControls';
 
 interface TranslateTeamMemberModalProps {
     isOpen: boolean;
@@ -97,14 +98,17 @@ export const TranslateTeamMemberModal = ({
             checkIsDirty={checkIsDirty}
             isDirty={isDirty}
         >
+            <TranslationControls
+                selectedLanguage={language}
+                isSubmitting={isSubmitting}
+                languages={translatedLanguages}
+                onLanguageChange={setLanguage}
+            />
             {error && <div className="translate-member-error">{error}</div>}
 
             <TranslateMemberForm
                 key={language?.id}
                 ref={formRef}
-                selectedLanguage={language}
-                languages={translatedLanguages}
-                onLanguageChange={setLanguage}
                 onSubmit={handleFormSubmit}
                 initialData={initialData}
                 onValidationChange={setIsFormValid}

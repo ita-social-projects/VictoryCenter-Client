@@ -1,16 +1,12 @@
 import { forwardRef, useEffect } from 'react';
 import { TEAM_MEMBER_VALIDATION_FUNCTIONS } from '@/validation/admin/team-member-schema/team-member-schema';
 import { useFormManager } from '@/hooks/admin/use-form-manager/useFormManager';
-import { Select } from '@/components/common/select/Select';
-import { Button } from '@/components/admin/button/Button';
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { CommonMemberFields } from '../common-member-fields/CommonMemberFields';
 import { VisibilityStatus } from '@/types/admin/common';
 import styles from './TranslateMemberForm.module.scss';
 import './TranslateMemberForm.scss';
 import { useCommonMemberFields } from '@/hooks/admin/use-common-member-fields/useCommonMemberFields';
 import cn from 'classnames';
-import { LocalizationLanguage } from '@/types/common/language';
 
 export interface TranslateTeamMemberFormValues {
     fullName: string;
@@ -29,9 +25,6 @@ export interface TranslateTeamMemberFormRef {
 export interface TranslateMemberFormProps {
     onSubmit: (data: TranslateTeamMemberFormValues, status?: VisibilityStatus) => void | Promise<void>;
     initialData?: TranslateTeamMemberFormValues | null;
-    languages: LocalizationLanguage[];
-    selectedLanguage: LocalizationLanguage | null;
-    onLanguageChange: (language: LocalizationLanguage) => void;
     formDisabled?: boolean;
     onValidationChange?: (isValid: boolean) => void;
     onDirtyChange?: (isDirty: boolean) => void;
@@ -54,16 +47,7 @@ const validateForm = (
 
 export const TranslateMemberForm = forwardRef<TranslateTeamMemberFormRef, TranslateMemberFormProps>(
     (
-        {
-            initialData = null,
-            onSubmit,
-            formDisabled,
-            onValidationChange,
-            onDirtyChange,
-            languages,
-            selectedLanguage,
-            onLanguageChange,
-        }: TranslateMemberFormProps,
+        { initialData = null, onSubmit, formDisabled, onValidationChange, onDirtyChange }: TranslateMemberFormProps,
         ref,
     ) => {
         const { formState, setFormState, errors, setErrors, isSubmitting } = useFormManager<
@@ -95,30 +79,6 @@ export const TranslateMemberForm = forwardRef<TranslateTeamMemberFormRef, Transl
                 data-testid="test-form"
                 noValidate
             >
-                <div className={styles['functional-group']}>
-                    <div className={styles['language-select']}>
-                        {selectedLanguage && (
-                            <Select<string>
-                                className="language-select"
-                                headClassName={styles['language-select-head']}
-                                value={selectedLanguage.code}
-                                onValueChange={(code) => {
-                                    const newLang = languages.find((l) => l.code === code);
-                                    if (newLang) onLanguageChange(newLang);
-                                }}
-                                placeholder={'Англійська'}
-                            >
-                                {languages.map((lang) => (
-                                    <Select.Option key={lang.id} value={lang.code} name={lang.name} />
-                                ))}
-                            </Select>
-                        )}
-                    </div>
-                    <Button className={styles['generate-button']} buttonStyle="primary" disabled={isSubmitting}>
-                        {COMMON_TEXT_ADMIN.BUTTON.GENERATE_TRANSLATION}
-                    </Button>
-                </div>
-
                 <CommonMemberFields
                     formState={formState}
                     errors={errors}

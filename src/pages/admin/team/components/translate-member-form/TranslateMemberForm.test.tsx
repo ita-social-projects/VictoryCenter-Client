@@ -11,25 +11,6 @@ jest.mock('@/validation/admin/team-member-schema/team-member-schema', () => ({
     },
 }));
 
-jest.mock('@/components/common/select/Select', () => {
-    const Select = ({ children, onValueChange }: any) => (
-        <div data-testid="select">
-            {children}
-            <button data-testid="select-change-trigger" onClick={() => onValueChange && onValueChange('UA')}>
-                Change Lang
-            </button>
-        </div>
-    );
-
-    Select.Option = ({ children }: any) => <div data-testid="select-option">{children}</div>;
-
-    return { Select };
-});
-
-jest.mock('@/components/admin/button/Button', () => ({
-    Button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
-}));
-
 jest.mock('../common-member-fields/CommonMemberFields', () => ({
     CommonMemberFields: ({
         formState,
@@ -83,7 +64,6 @@ describe('TranslateMemberForm', () => {
         expect(screen.getByTestId('test-form')).toBeInTheDocument();
         expect(screen.getByTestId('fullName')).toBeInTheDocument();
         expect(screen.getByTestId('description')).toBeInTheDocument();
-        expect(screen.getByTestId('select')).toBeInTheDocument();
     });
 
     it('fills fields with initialData', () => {
@@ -175,20 +155,5 @@ describe('TranslateMemberForm', () => {
         fireEvent(form, event);
 
         expect(event.preventDefault).toHaveBeenCalled();
-    });
-
-    it('executes the empty onValueChange handler for Select', () => {
-        renderForm();
-        const trigger = screen.getByTestId('select-change-trigger');
-        expect(() => fireEvent.click(trigger)).not.toThrow();
-    });
-    it('calls onLanguageChange when a new language is selected', () => {
-        const onLanguageChange = jest.fn();
-        renderForm({ onLanguageChange });
-
-        const trigger = screen.getByTestId('select-change-trigger');
-        fireEvent.click(trigger);
-
-        expect(onLanguageChange).toHaveBeenCalledWith(expect.objectContaining({ code: 'UA' }));
     });
 });

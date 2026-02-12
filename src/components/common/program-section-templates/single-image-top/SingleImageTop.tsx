@@ -18,6 +18,7 @@ export interface SingleImageTopProps {
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
     onImageChange?: (file: ImageValues | null) => void;
+    validationResetKey?: number;
 }
 
 export const SingleImageTop = ({
@@ -28,6 +29,7 @@ export const SingleImageTop = ({
     onTitleChange,
     onDescriptionChange,
     onImageChange,
+    validationResetKey,
 }: SingleImageTopProps) => {
     const imageSrc = getImageSrc(image);
     const baseStyles = mode === ProgramSectionMode.Published ? publishedStyles : styles;
@@ -77,6 +79,7 @@ export const SingleImageTop = ({
                 mode={mode}
                 onTitleChange={onTitleChange}
                 onDescriptionChange={onDescriptionChange}
+                validationResetKey={validationResetKey}
             />
         </div>
     );

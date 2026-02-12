@@ -29,11 +29,11 @@ export const useInputWithCharacterLimit = <T extends HTMLInputElement | HTMLText
 }: UseInputWithCharacterLimitProps<T>) => {
     const [isFocused, setIsFocused] = useState(false);
     const { localWarning, showTemporaryWarning, clearWarning } = useTemporaryWarning({ onWarningChange });
-    const currentLength = getNormalizedInputText(value).length;
+    const currentLength = getNormalizedInputText(value ?? '').length;
 
     const handleChange = (e: React.ChangeEvent<T>) => {
         const newValue = e.target.value;
-        const normalized = getNormalizedInputText(newValue);
+        const normalized = getNormalizedInputText(newValue ?? '');
 
         if (normalized.length > maxLength) {
             if (maxLimitWarning) {
@@ -70,7 +70,7 @@ export const useInputWithCharacterLimit = <T extends HTMLInputElement | HTMLText
         } as React.ChangeEvent<T>);
     };
 
-    const showClearButton = isFocused && value.length > 0 && !disabled;
+    const showClearButton = isFocused && (value ?? '').length > 0 && !disabled;
 
     return {
         isFocused,

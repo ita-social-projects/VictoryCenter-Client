@@ -10,7 +10,7 @@ import { useFormManager } from '@/hooks/admin/use-form-manager/useFormManager';
 import { Button } from '@/components/admin/button/Button';
 import { ProgramSectionForm, SectionCancelOptions } from '../program-section-form/ProgramSectionForm';
 import { Image, ImageValues } from '@/types/common/image';
-import { ProgramCategory } from '@/types/admin/programs';
+import { ProgramCategory, SectionDiscardType } from '@/types/admin/programs';
 import { VisibilityStatus } from '@/types/admin/common';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import NotFoundIcon from '@/assets/icons/not-found.svg';
@@ -64,10 +64,7 @@ export interface ProgramFormProps {
     onAddSection?: () => void;
     selectedLanguage?: string;
     onLanguageChange?: (language: string) => void;
-    onRequestCancelSection?: (
-        onConfirmDiscard: (() => void) | number,
-        actionType?: 'cancel' | 'delete' | 'replace',
-    ) => void;
+    onRequestCancelSection?: (request: { type: SectionDiscardType; onDiscard: () => void }) => void;
 }
 
 const validateForm = (formState: ProgramFormValues, isPublishing: boolean): ProgramFormErrors => {
@@ -220,19 +217,38 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
 
         const handleRevertSection = useCallback(
             (sectionIndex: number) => {
-                if (initialData && initialData.sections[sectionIndex]) {
-                    setFormState((prev) => {
-                        const updatedSections = [...prev.sections];
-                        updatedSections[sectionIndex] = initialData.sections[sectionIndex];
-                        return { ...prev, sections: updatedSections };
-                    });
-                    updateSectionFlag(setSavedSections, sectionIndex, true);
-                    updateSectionFlag(setEditingSections, sectionIndex, false);
-                    updateSectionFlag(setNewSections, sectionIndex, false);
-                    updateSectionFlag(setReplacingSections, sectionIndex, false);
-                }
+                if (!initialData) return;
+
+                const sectionToRevert = formState.sections[sectionIndex];
+                if (!sectionToRevert?.id) return;
+
+                const originalSection = initialData.sections.find((s) => s.id === sectionToRevert.id);
+                if (!originalSection) return;
+
+                setFormState((prev) => {
+                    const updatedSections = [...prev.sections];
+                    updatedSections[sectionIndex] = originalSection;
+                    return { ...prev, sections: updatedSections };
+                });
+                updateSectionFlag(setSavedSections, sectionIndex, true);
+                updateSectionFlag(setEditingSections, sectionIndex, false);
+                updateSectionFlag(setNewSections, sectionIndex, false);
             },
-            [setFormState, initialData, updateSectionFlag],
+            [setFormState, initialData, formState.sections, updateSectionFlag],
+        );
+
+        const handleReplaceSection = useCallback(
+            (sectionIndex: number, newSection: ProgramSection) => {
+                setFormState((prev) => {
+                    const updatedSections = [...prev.sections];
+                    updatedSections[sectionIndex] = newSection;
+                    return { ...prev, sections: updatedSections };
+                });
+                updateSectionFlag(setReplacingSections, sectionIndex, true);
+                updateSectionFlag(setSavedSections, sectionIndex, false);
+                updateSectionFlag(setEditingSections, sectionIndex, true);
+            },
+            [setFormState, updateSectionFlag],
         );
 
         const handleReplaceSection = useCallback(
@@ -419,8 +435,10 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
 
                 if (options.shouldRemove || options.isDirty || options.isTemplateReplacement) {
                     if (onRequestCancelSection) {
-                        const actionType = options.isTemplateReplacement ? 'replace' : 'cancel';
-                        onRequestCancelSection(discard, actionType);
+                        const type = options.shouldRemove
+                            ? SectionDiscardType.RemoveSection
+                            : SectionDiscardType.RevertSection;
+                        onRequestCancelSection({ type, onDiscard: discard });
                     } else {
                         discard();
                     }

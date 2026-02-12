@@ -70,7 +70,7 @@ export const InputWithCharacterLimit = ({
         >
             <input
                 className={cn('char-limit-input__field', className)}
-                value={value}
+                value={value ?? ''}
                 onChange={handleChange}
                 onFocus={handleFocus}
                 onBlur={handleBlur}

@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { TeamCategoryModal } from './TeamCategoryModal';
 import { ModalMode } from '@/types/admin/common';
-import { TeamCategory } from '@/types/admin/team-category';
+import { TeamCategory, TeamCategoryDto } from '@/types/admin/team-category';
 import { TeamCategoriesApi } from '@/services/api/admin/team/team-categories/team-categories-api';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { TEAM_CATEGORY_VALIDATION_FUNCTIONS } from '@/validation/admin/team-category-schema/team-category-schema';
@@ -185,8 +185,8 @@ jest.mock('@/components/admin/input-groups/single-select-input-group/SingleSelec
 }));
 
 const mockCategories: TeamCategory[] = [
-    { id: 1, name: 'Category 1', description: 'Description 1', teamMembersCount: 5 },
-    { id: 2, name: 'Category 2', description: 'Description 2', teamMembersCount: 3 },
+    { id: 1, name: 'Category 1', description: 'Description 1', localizations: [], teamMembersCount: 5 },
+    { id: 2, name: 'Category 2', description: 'Description 2', localizations: [], teamMembersCount: 3 },
 ];
 
 const mockClient = {
@@ -196,17 +196,19 @@ const mockClient = {
     delete: jest.fn(),
 };
 
-const mockCreatedCategory: TeamCategory = {
+const mockCreatedCategory: TeamCategoryDto = {
     id: 3,
     name: 'New Category',
     description: 'New Description',
+    localizations: [],
     teamMembersCount: 0,
 };
 
-const mockUpdatedCategory: TeamCategory = {
+const mockUpdatedCategory: TeamCategoryDto = {
     id: 1,
     name: 'Updated Category',
     description: 'Updated Description',
+    localizations: [],
     teamMembersCount: 5,
 };
 
@@ -533,8 +535,8 @@ describe('TeamCategoryModal', () => {
         });
 
         it('prevents closing modal when submitting', async () => {
-            let resolvePromise: (value: TeamCategory) => void;
-            const slowPromise = new Promise<TeamCategory>((resolve) => {
+            let resolvePromise: (value: TeamCategoryDto) => void;
+            const slowPromise = new Promise<TeamCategoryDto>((resolve) => {
                 resolvePromise = resolve;
             });
             getMockedApi().create.mockReturnValue(slowPromise);

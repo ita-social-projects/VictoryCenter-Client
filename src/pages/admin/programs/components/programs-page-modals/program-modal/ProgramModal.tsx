@@ -1,6 +1,6 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { ProgramForm, ProgramFormRef, ProgramFormValues } from '../../program-form/ProgramForm';
-import { Program, ProgramCategory, ProgramCreateUpdate } from '@/types/admin/programs';
+import { Program, ProgramCategory, ProgramCreateUpdate, SectionDiscardType } from '@/types/admin/programs';
 import { VisibilityStatus, PendingAction, ModalMode } from '@/types/admin/common';
 import { ProgramSection, ProgramSectionTemplate } from '@/types/common/program-sections';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
@@ -47,6 +47,9 @@ export const ProgramModal = (props: ProgramModalProps) => {
     const [sectionCancelAction, setSectionCancelAction] = useState<(() => void) | null>(null);
     const [sectionDeleteAction, setSectionDeleteAction] = useState<(() => void) | null>(null);
     const [sectionToReplace, setSectionToReplace] = useState<number | null>(null);
+    const [isSectionRemoveModalOpen, setIsSectionRemoveModalOpen] = useState(false);
+    const [isSectionRevertModalOpen, setIsSectionRevertModalOpen] = useState(false);
+    const sectionDiscardActionRef = useRef<(() => void) | null>(null);
 
     const initialData = useMemo<ProgramFormValues | null>(() => {
         if (!isEditMode || !program) return null;
@@ -163,75 +166,40 @@ export const ProgramModal = (props: ProgramModalProps) => {
         [modalHookData.formRef, sectionToReplace],
     );
 
-    const handleRequestCancelSection = useCallback(
-        (onConfirmDiscard: (() => void) | number, actionType: 'cancel' | 'delete' | 'replace' = 'cancel') => {
-            if (actionType === 'delete') {
-                if (typeof onConfirmDiscard === 'function') {
-                    setSectionDeleteAction(() => onConfirmDiscard);
-                }
-                setIsSectionDeleteModalOpen(true);
-            } else if (actionType === 'replace') {
-                if (typeof onConfirmDiscard === 'number') {
-                    setSectionToReplace(onConfirmDiscard);
-                    openModalActions.openAddSectionModal();
-                } else if (typeof onConfirmDiscard === 'function') {
-                    setSectionCancelAction(() => onConfirmDiscard);
-                    setIsSectionReplaceModalOpen(true);
-                }
-            } else {
-                if (typeof onConfirmDiscard === 'number') {
-                    const sectionIndex = onConfirmDiscard;
-                    setSectionCancelAction(() => () => {
-                        if (!modalHookData.formRef.current) return;
-                        if (isEditMode) {
-                            modalHookData.formRef.current.revertSection(sectionIndex);
-                        } else {
-                            modalHookData.formRef.current.removeSection(sectionIndex);
-                        }
-                    });
-                } else {
-                    setSectionCancelAction(() => onConfirmDiscard);
-                }
-                setIsSectionCancelModalOpen(true);
-            }
-        },
-        [isEditMode, modalHookData.formRef, openModalActions],
-    );
+    const handleRequestCancelSection = useCallback((request: { type: SectionDiscardType; onDiscard: () => void }) => {
+        sectionDiscardActionRef.current = request.onDiscard;
 
-    const handleCloseSectionCancelModal = useCallback(() => {
-        setIsSectionCancelModalOpen(false);
-        setSectionCancelAction(null);
+        switch (request.type) {
+            case SectionDiscardType.RemoveSection:
+                setIsSectionRemoveModalOpen(true);
+                break;
+            case SectionDiscardType.RevertSection:
+                setIsSectionRevertModalOpen(true);
+                break;
+            default:
+                break;
+        }
     }, []);
 
-    const handleConfirmCancelSection = useCallback(() => {
-        sectionCancelAction?.();
-        handleCloseSectionCancelModal();
-    }, [sectionCancelAction, handleCloseSectionCancelModal]);
-
-    const handleCloseSectionDeleteModal = useCallback(() => {
-        setIsSectionDeleteModalOpen(false);
-        setSectionDeleteAction(null);
+    const handleCloseSectionRemoveModal = useCallback(() => {
+        setIsSectionRemoveModalOpen(false);
+        sectionDiscardActionRef.current = null;
     }, []);
 
-    const handleConfirmDeleteSection = useCallback(() => {
-        sectionDeleteAction?.();
-        handleCloseSectionDeleteModal();
-    }, [sectionDeleteAction, handleCloseSectionDeleteModal]);
-
-    const handleCloseSectionReplaceModal = useCallback(() => {
-        setIsSectionReplaceModalOpen(false);
-        setSectionCancelAction(null);
+    const handleCloseSectionRevertModal = useCallback(() => {
+        setIsSectionRevertModalOpen(false);
+        sectionDiscardActionRef.current = null;
     }, []);
 
-    const handleConfirmReplaceCancel = useCallback(() => {
-        sectionCancelAction?.();
-        handleCloseSectionReplaceModal();
-    }, [sectionCancelAction, handleCloseSectionReplaceModal]);
+    const handleConfirmRemoveSection = useCallback(() => {
+        sectionDiscardActionRef.current?.();
+        handleCloseSectionRemoveModal();
+    }, [handleCloseSectionRemoveModal]);
 
-    const handleCloseAddSectionModal = useCallback(() => {
-        setSectionToReplace(null);
-        closeModalActions.closeAddSectionModal();
-    }, [closeModalActions]);
+    const handleConfirmRevertSection = useCallback(() => {
+        sectionDiscardActionRef.current?.();
+        handleCloseSectionRevertModal();
+    }, [handleCloseSectionRevertModal]);
 
     return (
         <div className="program-modal">
@@ -279,37 +247,19 @@ export const ProgramModal = (props: ProgramModalProps) => {
             />
 
             <ConfirmationModal
-                isOpen={isSectionCancelModalOpen}
-                onClose={handleCloseSectionCancelModal}
-                title={
-                    isEditMode
-                        ? COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE
-                        : PROGRAMS_TEXT.SECTION.MODAL.UNSAVED_CHANGES_TITLE
-                }
-                onConfirm={handleConfirmCancelSection}
-                onCancel={handleCloseSectionCancelModal}
-                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
-                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
+                isOpen={isSectionRemoveModalOpen}
+                onClose={handleCloseSectionRemoveModal}
+                title={PROGRAMS_TEXT.SECTION.MODAL.UNSAVED_CHANGES_TITLE}
+                onConfirm={handleConfirmRemoveSection}
+                onCancel={handleCloseSectionRemoveModal}
             />
 
             <ConfirmationModal
-                isOpen={isSectionDeleteModalOpen}
-                onClose={handleCloseSectionDeleteModal}
-                title={PROGRAMS_TEXT.SECTION.MODAL.DELETE_SECTION_TITLE}
-                onConfirm={handleConfirmDeleteSection}
-                onCancel={handleCloseSectionDeleteModal}
-                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
-                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
-            />
-
-            <ConfirmationModal
-                isOpen={isSectionReplaceModalOpen}
-                onClose={handleCloseSectionReplaceModal}
-                title={PROGRAMS_TEXT.SECTION.MODAL.REPLACE_TEMPLATE_TITLE}
-                onConfirm={handleConfirmReplaceCancel}
-                onCancel={handleCloseSectionReplaceModal}
-                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
-                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
+                isOpen={isSectionRevertModalOpen}
+                onClose={handleCloseSectionRevertModal}
+                title={COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE}
+                onConfirm={handleConfirmRevertSection}
+                onCancel={handleCloseSectionRevertModal}
             />
         </div>
     );

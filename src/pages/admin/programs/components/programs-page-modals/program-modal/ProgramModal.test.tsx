@@ -1,7 +1,7 @@
 import React from 'react';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { BaseProgramModalProps, ProgramModal, ProgramModalProps } from './ProgramModal';
-import { Program, ProgramCategory, ProgramCreateUpdate, SectionDiscardType } from '@/types/admin/programs';
+import { Program, ProgramCategory, ProgramCreateUpdate, SectionCancelActionType } from '@/types/admin/programs';
 import { ModalMode } from '@/types/admin/common';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -302,7 +302,7 @@ describe('ProgramModal', () => {
 
             act(() => {
                 capturedFormProps.onRequestCancelSection({
-                    type: SectionDiscardType.RemoveSection,
+                    type: SectionCancelActionType.RemoveSection,
                     onDiscard: () => mockFormRef.removeSection(2),
                 });
             });
@@ -321,7 +321,7 @@ describe('ProgramModal', () => {
 
             act(() => {
                 capturedFormProps.onRequestCancelSection({
-                    type: SectionDiscardType.RemoveSection,
+                    type: SectionCancelActionType.RemoveSection,
                     onDiscard: () => mockFormRef.removeSection(2),
                 });
             });
@@ -341,7 +341,7 @@ describe('ProgramModal', () => {
 
             act(() => {
                 capturedFormProps.onRequestCancelSection({
-                    type: SectionDiscardType.RevertSection,
+                    type: SectionCancelActionType.RevertSection,
                     onDiscard: () => mockFormRef.revertSection(3),
                 });
             });
@@ -364,7 +364,7 @@ describe('ProgramModal', () => {
 
             act(() => {
                 capturedFormProps.onRequestCancelSection({
-                    type: SectionDiscardType.RevertSection,
+                    type: SectionCancelActionType.RevertSection,
                     onDiscard: mockDiscardCallback,
                 });
             });
@@ -384,7 +384,7 @@ describe('ProgramModal', () => {
 
             act(() => {
                 capturedFormProps.onRequestCancelSection({
-                    type: SectionDiscardType.RevertSection,
+                    type: SectionCancelActionType.RevertSection,
                     onDiscard: mockDiscardCallback,
                 });
             });
@@ -402,7 +402,7 @@ describe('ProgramModal', () => {
 
             act(() => {
                 capturedFormProps.onRequestCancelSection({
-                    type: SectionDiscardType.RemoveSection,
+                    type: SectionCancelActionType.RemoveSection,
                     onDiscard: () => mockFormRef.removeSection(1),
                 });
             });
@@ -417,7 +417,7 @@ describe('ProgramModal', () => {
 
             act(() => {
                 capturedFormProps.onRequestCancelSection({
-                    type: SectionDiscardType.RevertSection,
+                    type: SectionCancelActionType.RevertSection,
                     onDiscard: () => mockFormRef.revertSection(1),
                 });
             });
@@ -427,19 +427,42 @@ describe('ProgramModal', () => {
             );
         });
 
-        it('handles unknown SectionDiscardType gracefully by not opening any modal', () => {
+        it('handles unknown SectionCancelActionType gracefully by not opening any modal', () => {
             const mockDiscardCallback = jest.fn();
             render(<ProgramModal {...addModeProps} />);
 
             act(() => {
                 capturedFormProps.onRequestCancelSection({
-                    type: 999 as SectionDiscardType,
+                    type: 999 as SectionCancelActionType,
                     onDiscard: mockDiscardCallback,
                 });
             });
 
             expect(screen.queryByTestId('question-modal')).not.toBeInTheDocument();
             expect(mockDiscardCallback).not.toHaveBeenCalled();
+        });
+
+        it('handleRequestCancelSection with RevertSection type opens revert confirmation modal', () => {
+            const mockDiscardCallback = jest.fn();
+            render(<ProgramModal {...addModeProps} />);
+
+            act(() => {
+                capturedFormProps.onRequestCancelSection({
+                    type: SectionCancelActionType.RevertSection,
+                    onDiscard: mockDiscardCallback,
+                });
+            });
+
+            expect(screen.getByTestId('question-modal')).toBeInTheDocument();
+            expect(screen.getByTestId('question-title')).toHaveTextContent(
+                COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE,
+            );
+            expect(mockDiscardCallback).not.toHaveBeenCalled();
+
+            fireEvent.click(screen.getByTestId('question-confirm'));
+
+            expect(mockDiscardCallback).toHaveBeenCalledTimes(1);
+            expect(screen.queryByTestId('question-modal')).not.toBeInTheDocument();
         });
     });
 

@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { ProgramForm, ProgramFormRef, ProgramFormValues } from '../../program-form/ProgramForm';
-import { Program, ProgramCategory, ProgramCreateUpdate, SectionDiscardType } from '@/types/admin/programs';
+import { Program, ProgramCategory, ProgramCreateUpdate, SectionCancelActionType } from '@/types/admin/programs';
 import { VisibilityStatus, PendingAction, ModalMode } from '@/types/admin/common';
 import { ProgramSection, ProgramSectionTemplate } from '@/types/common/program-sections';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
@@ -41,11 +41,6 @@ export const ProgramModal = (props: ProgramModalProps) => {
     const program = isEditMode ? props.programToEdit : undefined;
     const onSuccess = isEditMode ? props.onEditProgram : props.onAddProgram;
     const { modalState, openModalActions, closeModalActions } = useModalsState();
-    const [isSectionCancelModalOpen, setIsSectionCancelModalOpen] = useState(false);
-    const [isSectionDeleteModalOpen, setIsSectionDeleteModalOpen] = useState(false);
-    const [isSectionReplaceModalOpen, setIsSectionReplaceModalOpen] = useState(false);
-    const [sectionCancelAction, setSectionCancelAction] = useState<(() => void) | null>(null);
-    const [sectionDeleteAction, setSectionDeleteAction] = useState<(() => void) | null>(null);
     const [sectionToReplace, setSectionToReplace] = useState<number | null>(null);
     const [isSectionRemoveModalOpen, setIsSectionRemoveModalOpen] = useState(false);
     const [isSectionRevertModalOpen, setIsSectionRevertModalOpen] = useState(false);
@@ -166,20 +161,23 @@ export const ProgramModal = (props: ProgramModalProps) => {
         [modalHookData.formRef, sectionToReplace],
     );
 
-    const handleRequestCancelSection = useCallback((request: { type: SectionDiscardType; onDiscard: () => void }) => {
-        sectionDiscardActionRef.current = request.onDiscard;
+    const handleRequestCancelSection = useCallback(
+        (request: { type: SectionCancelActionType; onDiscard: () => void }) => {
+            sectionDiscardActionRef.current = request.onDiscard;
 
-        switch (request.type) {
-            case SectionDiscardType.RemoveSection:
-                setIsSectionRemoveModalOpen(true);
-                break;
-            case SectionDiscardType.RevertSection:
-                setIsSectionRevertModalOpen(true);
-                break;
-            default:
-                break;
-        }
-    }, []);
+            switch (request.type) {
+                case SectionCancelActionType.RemoveSection:
+                    setIsSectionRemoveModalOpen(true);
+                    break;
+                case SectionCancelActionType.RevertSection:
+                    setIsSectionRevertModalOpen(true);
+                    break;
+                default:
+                    break;
+            }
+        },
+        [],
+    );
 
     const handleCloseSectionRemoveModal = useCallback(() => {
         setIsSectionRemoveModalOpen(false);
@@ -200,6 +198,11 @@ export const ProgramModal = (props: ProgramModalProps) => {
         sectionDiscardActionRef.current?.();
         handleCloseSectionRevertModal();
     }, [handleCloseSectionRevertModal]);
+
+    const handleCloseAddSectionModal = useCallback(() => {
+        closeModalActions.closeAddSectionModal();
+        setSectionToReplace(null);
+    }, [closeModalActions]);
 
     return (
         <div className="program-modal">

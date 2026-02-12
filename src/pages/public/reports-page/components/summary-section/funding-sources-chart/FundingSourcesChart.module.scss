@@ -2,65 +2,65 @@
 @use '@/assets/sass/mixins/typography.mixins' as type;
 
 .root {
-  padding: 16px 16px 28px;
+    padding: 16px 16px 28px;
 
-  @media (min-width: 560px) {
-    padding: 32px 32px 40px;
-  }
+    @media (min-width: 560px) {
+        padding: 32px 32px 40px;
+    }
 
-  @media (min-width: 1440px) {
-    padding: 40px 32px 40px 40px;
-  }
+    @media (min-width: 1440px) {
+        padding: 40px 32px 40px 40px;
+    }
 }
 
 .title {
-  @include type.subtitle-2-semibold;
-  color: c.$blue-50;
-  margin-bottom: 16px;
+    @include type.subtitle-2-semibold;
+    color: c.$blue-50;
+    margin-bottom: 16px;
 
-  @media (min-width: 1440px) {
-    margin-bottom: 24px;
-  }
+    @media (min-width: 1440px) {
+        margin-bottom: 24px;
+    }
 }
 
 .chart {
-  position: relative;
-  border-left: 2px solid c.$blue-300;
+    position: relative;
+    border-left: 2px solid c.$blue-300;
 }
 
 .variant0 {
-  background: c.$blue-100;
+    background: c.$blue-100;
 }
 
 .variant1 {
-  background: c.$blue-200;
-  position: relative;
-  overflow: hidden;
+    background: c.$blue-200;
+    position: relative;
+    overflow: hidden;
 
-  &::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 100%;
-    padding: 140%;
-    transform: translate(-50%, -50%) rotate(-126deg);
-    background-image: repeating-linear-gradient(
-                    0deg,
-                    c.$blue-700 0,
-                    c.$blue-700 2px,
-                    transparent 2px,
-                    transparent 8px
-    );
-    will-change: transform;
-    pointer-events: none;
-  }
+    &::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 100%;
+        padding: 140%;
+        transform: translate(-50%, -50%) rotate(-126deg);
+        background-image: repeating-linear-gradient(
+            0deg,
+            c.$blue-700 0,
+            c.$blue-700 2px,
+            transparent 2px,
+            transparent 8px
+        );
+        will-change: transform;
+        pointer-events: none;
+    }
 }
 
 .variant2 {
-  background: c.$blue-200;
+    background: c.$blue-200;
 }
 
 .variant3 {
-  background: c.$blue-300;
+    background: c.$blue-300;
 }

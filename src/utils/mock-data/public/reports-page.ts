@@ -9,6 +9,13 @@ export const SUMMARY_DATA = {
 export const REPORTS_DATA = [
     { year: 2025, fileUrl: '/files/report-2025.pdf' },
     { year: 2024, fileUrl: '/files/report-2024.pdf' },
+    { year: 2023, fileUrl: '/files/report-2023.pdf' },
+    { year: 2022, fileUrl: '/files/report-2022.pdf' },
+    { year: 2021, fileUrl: '/files/report-2021.pdf' },
+    { year: 2020, fileUrl: '/files/report-2020.pdf' },
+    { year: 2019, fileUrl: '/files/report-2019.pdf' },
+    { year: 2018, fileUrl: '/files/report-2018.pdf' },
+    { year: 2017, fileUrl: '/files/report-2017.pdf' },
 ];
 
 export const CTA_DATA = {

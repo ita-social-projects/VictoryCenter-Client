@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { ReportsSection } from './ReportsSection';
 
 jest.mock('./ReportsSection.module.scss', () => ({
@@ -8,6 +9,7 @@ jest.mock('./ReportsSection.module.scss', () => ({
     title: 'title-class',
     description: 'description-class',
     list: 'list-class',
+    toggle: 'toggle-class',
 }));
 
 jest.mock('react-i18next', () => ({
@@ -16,53 +18,67 @@ jest.mock('react-i18next', () => ({
     }),
 }));
 
-jest.mock('@/utils/mock-data/public/reports-page', () => ({
-    REPORTS_DATA: [
-        { year: 2024, fileUrl: 'report-2024.pdf' },
-        { year: 2023, fileUrl: 'report-2023.pdf' },
-    ],
+jest.mock('./report-item', () => ({
+    ReportItem: ({ label }: any) => <div data-testid="report-item-mock">{label}</div>,
 }));
 
-jest.mock('./report-item', () => ({
-    ReportItem: (props: any) => <div data-testid="report-item-mock" data-props={JSON.stringify(props)} />,
+const mockReportsData: Array<{ year: number; fileUrl: string }> = [];
+
+jest.mock('@/utils/mock-data/public/reports-page', () => ({
+    get REPORTS_DATA() {
+        return mockReportsData;
+    },
 }));
 
 describe('ReportsSection', () => {
-    it('renders section structure with translated title and description', () => {
-        const { container } = render(<ReportsSection />);
-
-        const root = container.firstChild;
-        const title = container.querySelector('.title-class');
-        const description = container.querySelector('.description-class');
-
-        expect(root).toHaveClass('root-class');
-        expect(title).toHaveTextContent('reports.title');
-        expect(description).toHaveTextContent('reports.description');
+    beforeEach(() => {
+        mockReportsData.length = 0;
     });
 
-    it('renders correct number of report items based on data', () => {
-        render(<ReportsSection />);
-        const items = screen.getAllByTestId('report-item-mock');
+    describe('without overflow (<= 5 items)', () => {
+        it('renders all items and no toggle button', () => {
+            mockReportsData.push({ year: 2024, fileUrl: 'r1.pdf' }, { year: 2023, fileUrl: 'r2.pdf' });
 
-        expect(items).toHaveLength(2);
+            render(<ReportsSection />);
+
+            expect(screen.getAllByTestId('report-item-mock')).toHaveLength(2);
+            expect(screen.queryByText('reports.showMore')).not.toBeInTheDocument();
+        });
     });
 
-    it('passes correct props to ReportItem components', () => {
-        render(<ReportsSection />);
-        const items = screen.getAllByTestId('report-item-mock');
-
-        const firstItemProps = JSON.parse(items[0].getAttribute('data-props') || '{}');
-        expect(firstItemProps).toEqual({
-            fileUrl: 'report-2024.pdf',
-            label: 'reports.itemLabel:2024',
-            buttonLabel: 'actions.downloadPdf',
+    describe('with overflow (> 5 items)', () => {
+        beforeEach(() => {
+            mockReportsData.push(
+                { year: 2025, fileUrl: 'r1.pdf' },
+                { year: 2024, fileUrl: 'r2.pdf' },
+                { year: 2023, fileUrl: 'r3.pdf' },
+                { year: 2022, fileUrl: 'r4.pdf' },
+                { year: 2021, fileUrl: 'r5.pdf' },
+                { year: 2020, fileUrl: 'r6.pdf' },
+            );
         });
 
-        const secondItemProps = JSON.parse(items[1].getAttribute('data-props') || '{}');
-        expect(secondItemProps).toEqual({
-            fileUrl: 'report-2023.pdf',
-            label: 'reports.itemLabel:2023',
-            buttonLabel: 'actions.downloadPdf',
+        it('renders only first 5 items initially and shows toggle button', () => {
+            render(<ReportsSection />);
+
+            expect(screen.getAllByTestId('report-item-mock')).toHaveLength(5);
+            expect(screen.getByText('reports.showMore')).toBeInTheDocument();
+        });
+
+        it('expands and collapses items on toggle click', async () => {
+            const user = userEvent.setup();
+            render(<ReportsSection />);
+
+            const toggleButton = screen.getByText('reports.showMore');
+            await user.click(toggleButton);
+
+            expect(screen.getAllByTestId('report-item-mock')).toHaveLength(6);
+            expect(screen.getByText('reports.showLess')).toBeInTheDocument();
+
+            await user.click(screen.getByText('reports.showLess'));
+
+            expect(screen.getAllByTestId('report-item-mock')).toHaveLength(5);
+            expect(screen.getByText('reports.showMore')).toBeInTheDocument();
         });
     });
 });

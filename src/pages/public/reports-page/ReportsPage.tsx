@@ -6,7 +6,7 @@ import { CTA_DATA } from '@/utils/mock-data/public/reports-page';
 import { PUBLIC_ROUTES } from '@/const/public/routes';
 import outroVideo from '@/assets/videos/public/partners-page/outro.mp4';
 
-export const ReportsPage: React.FC = () => {
+export const ReportsPage = () => {
     const { t } = useTranslation('reportsPage');
 
     return (

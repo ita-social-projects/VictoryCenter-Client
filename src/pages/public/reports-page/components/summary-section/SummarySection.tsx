@@ -1,10 +1,18 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { SUMMARY_DATA } from '@/utils/mock-data/public/reports-page';
+import {
+    EXPENSES_DATA,
+    FUNDING_DATA,
+    PROGRAMS_ALLOCATION_DATA,
+    SUMMARY_DATA,
+} from '@/utils/mock-data/public/reports-page';
 import { StatCard } from './stat-card';
+import { ExpensesBreakdownChart } from './expenses-breakdown-chart';
+import { FundingSourcesChart } from './funding-sources-chart';
+import { ProgramsAllocationChart } from './programs-allocation-chart';
 import styles from './SummarySection.module.scss';
 
-export const SummarySection: React.FC = () => {
+export const SummarySection = () => {
     const { t, i18n } = useTranslation('reportsPage');
 
     const isUa = i18n.language === 'uk';
@@ -20,19 +28,15 @@ export const SummarySection: React.FC = () => {
                 label={t('summary.collected')}
                 color="blue"
             />
-
             <div className={styles.expenses}>
-                <div>Основні витрати</div>
+                <ExpensesBreakdownChart items={EXPENSES_DATA.items} />
             </div>
-
             <div className={styles.income}>
-                <div>Звідки прийшли кошти</div>
+                <FundingSourcesChart items={FUNDING_DATA.items} />
             </div>
-
             <div className={styles.programs}>
-                <div>Розподіл коштів по програмах</div>
+                <ProgramsAllocationChart items={PROGRAMS_ALLOCATION_DATA.items} />
             </div>
-
             <StatCard
                 className={styles.lives}
                 value={SUMMARY_DATA.livesChanged}

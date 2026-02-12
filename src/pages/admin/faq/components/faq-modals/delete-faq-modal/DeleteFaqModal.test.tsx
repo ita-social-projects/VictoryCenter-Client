@@ -65,7 +65,6 @@ describe('DeleteFaqModal', () => {
         expect(screen.queryByTestId('modal')).not.toBeInTheDocument();
     });
 
-    //
     it('calls API and callbacks on successful delete', async () => {
         mockFaqApi.delete.mockResolvedValue(undefined);
         renderModal();

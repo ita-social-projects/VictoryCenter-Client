@@ -4,21 +4,16 @@ import { FAQ_VALIDATION_FUNCTIONS } from './faq-schema';
 describe('FAQ_VALIDATION_FUNCTIONS', () => {
     describe('validateQuestion', () => {
         it('returns undefined for valid question', () => {
-            // Строка длиннее 10 символов
             expect(FAQ_VALIDATION_FUNCTIONS.validateQuestion('Valid question with enough length')).toBeUndefined();
         });
 
-        // Новый тест для проверки обязательности поля
         it('returns required error for empty question', () => {
             const result = FAQ_VALIDATION_FUNCTIONS.validateQuestion('');
-            // Проверяем, что вернулся массив
             expect(Array.isArray(result)).toBe(true);
-            // Проверяем текст ошибки (берем первый элемент массива)
             expect(result?.[0]).toBe(FAQ_VALIDATION.question.getRequiredError());
         });
 
         it('returns error for too short question', () => {
-            // Передаем непустую строку, которая короче минимума (например "Test")
             const result = FAQ_VALIDATION_FUNCTIONS.validateQuestion('Test');
 
             expect(Array.isArray(result)).toBe(true);
@@ -36,12 +31,10 @@ describe('FAQ_VALIDATION_FUNCTIONS', () => {
 
     describe('validateAnswer', () => {
         it('returns undefined for valid answer', () => {
-            // Генерируем строку достаточной длины (50+)
             const validAnswer = 'a'.repeat(FAQ_VALIDATION.answer.min + 1);
             expect(FAQ_VALIDATION_FUNCTIONS.validateAnswer(validAnswer)).toBeUndefined();
         });
 
-        // Новый тест для обязательности
         it('returns required error for empty answer', () => {
             const result = FAQ_VALIDATION_FUNCTIONS.validateAnswer('');
             expect(typeof result).toBe('string');
@@ -49,7 +42,6 @@ describe('FAQ_VALIDATION_FUNCTIONS', () => {
         });
 
         it('returns error for too short answer', () => {
-            // Передаем строку короче 50 символов, но не пустую
             const result = FAQ_VALIDATION_FUNCTIONS.validateAnswer('Too short');
 
             expect(typeof result).toBe('string');

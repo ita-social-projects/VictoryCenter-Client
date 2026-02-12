@@ -155,7 +155,6 @@ describe('TranslateFaqForm', () => {
             try {
                 await ref.current?.submit();
             } catch {
-                // igmore erroes
             }
         });
 
@@ -177,7 +176,7 @@ describe('TranslateFaqForm', () => {
         renderForm({ formDisabled: true });
 
         const fields = getFields();
-        expect(fields.question).toBeDisabled(); // question field should be disabled
+        expect(fields.question).toBeDisabled();
         expect(fields.answer).toBeDisabled();
     });
 });

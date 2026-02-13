@@ -218,6 +218,21 @@ describe('ProgramForm', () => {
         isFormDisabled: false,
     };
 
+    const createInitialData = (overrides: Partial<ProgramFormValues> = {}): ProgramFormValues => ({
+        name: '',
+        categories: [],
+        description: '',
+        previewImage: null,
+        previewImageId: null,
+        backgroundImage: null,
+        backgroundImageId: null,
+        location: '',
+        participantsCount: '',
+        meetingCount: '',
+        sections: [],
+        ...overrides,
+    });
+
     const renderProgramForm = (props: Partial<ProgramFormProps> = {}, ref?: React.Ref<ProgramFormRef>) => {
         return render(<ProgramForm {...defaultProps} {...props} ref={ref} />);
     };
@@ -240,7 +255,7 @@ describe('ProgramForm', () => {
         });
 
         it('should render with initial data when provided', () => {
-            const initialData: ProgramFormValues = {
+            const initialData = createInitialData({
                 name: 'Initial Name',
                 categories: [mockCategories[0]],
                 description: 'Initial Desc',
@@ -251,8 +266,7 @@ describe('ProgramForm', () => {
                 location: 'Kyiv',
                 participantsCount: '10',
                 meetingCount: '5',
-                sections: [],
-            };
+            });
 
             renderProgramForm({ initialData });
 
@@ -448,19 +462,13 @@ describe('ProgramForm', () => {
 
         it('should submit form when valid and call validateForm for all fields', async () => {
             const ref = React.createRef<ProgramFormRef>();
-            const initialData: ProgramFormValues = {
+            const initialData = createInitialData({
                 name: 'Program A',
-                categories: [],
                 description: 'Test description',
-                previewImage: null,
-                previewImageId: null,
-                backgroundImage: null,
-                backgroundImageId: null,
                 location: 'Kyiv',
                 participantsCount: '10',
                 meetingCount: '5',
-                sections: [],
-            };
+            });
             renderProgramForm({ initialData }, ref);
 
             Object.values(PROGRAM_VALIDATION_FUNCTIONS).forEach((fn) => (fn as jest.Mock).mockReturnValue(undefined));
@@ -523,19 +531,9 @@ describe('ProgramForm', () => {
             contents: [],
         } as ProgramSection;
 
-        const initialDataWithSections: ProgramFormValues = {
-            name: '',
-            categories: [],
-            description: '',
-            previewImage: null,
-            previewImageId: null,
-            backgroundImage: null,
-            backgroundImageId: null,
-            location: '',
-            participantsCount: '',
-            meetingCount: '',
+        const initialDataWithSections = createInitialData({
             sections: [sectionWithId, sectionWithoutId],
-        };
+        });
 
         it('renders empty state when there are no sections, and sections list when sections exist', async () => {
             const ref = React.createRef<ProgramFormRef>();
@@ -556,19 +554,9 @@ describe('ProgramForm', () => {
 
         it('supports addSection/removeSection/getSections via ref (and covers key id ?? template)', async () => {
             const ref = React.createRef<ProgramFormRef>();
-            const initialData: ProgramFormValues = {
-                name: '',
-                categories: [],
-                description: '',
-                previewImage: null,
-                previewImageId: null,
-                backgroundImage: null,
-                backgroundImageId: null,
-                location: '',
-                participantsCount: '',
-                meetingCount: '',
+            const initialData = createInitialData({
                 sections: [sectionWithId, sectionWithoutId],
-            };
+            });
 
             renderProgramForm({ initialData }, ref);
 
@@ -605,19 +593,9 @@ describe('ProgramForm', () => {
 
         it('calls onRequestCancelSection when section cancel is requested', async () => {
             const onRequestCancelSection = jest.fn();
-            const initialData: ProgramFormValues = {
-                name: '',
-                categories: [],
-                description: '',
-                previewImage: null,
-                previewImageId: null,
-                backgroundImage: null,
-                backgroundImageId: null,
-                location: '',
-                participantsCount: '',
-                meetingCount: '',
+            const initialData = createInitialData({
                 sections: [sectionWithId],
-            };
+            });
 
             renderProgramForm({ initialData, onRequestCancelSection });
 
@@ -633,19 +611,9 @@ describe('ProgramForm', () => {
         });
 
         it('does not throw if onRequestCancelSection is not provided', async () => {
-            const initialData: ProgramFormValues = {
-                name: '',
-                categories: [],
-                description: '',
-                previewImage: null,
-                previewImageId: null,
-                backgroundImage: null,
-                backgroundImageId: null,
-                location: '',
-                participantsCount: '',
-                meetingCount: '',
+            const initialData = createInitialData({
                 sections: [sectionWithId],
-            };
+            });
 
             renderProgramForm({ initialData });
             await waitFor(() => {
@@ -660,19 +628,9 @@ describe('ProgramForm', () => {
         });
 
         it('wires ProgramSectionForm isDisabled based on isFormDisabled', async () => {
-            const initialData: ProgramFormValues = {
-                name: '',
-                categories: [],
-                description: '',
-                previewImage: null,
-                previewImageId: null,
-                backgroundImage: null,
-                backgroundImageId: null,
-                location: '',
-                participantsCount: '',
-                meetingCount: '',
+            const initialData = createInitialData({
                 sections: [sectionWithId],
-            };
+            });
 
             renderProgramForm({ initialData, isFormDisabled: true });
             await waitFor(() => {
@@ -682,19 +640,9 @@ describe('ProgramForm', () => {
         });
 
         it('triggers handleSaveSection via ProgramSectionForm onSave', async () => {
-            const initialData: ProgramFormValues = {
-                name: '',
-                categories: [],
-                description: '',
-                previewImage: null,
-                previewImageId: null,
-                backgroundImage: null,
-                backgroundImageId: null,
-                location: '',
-                participantsCount: '',
-                meetingCount: '',
+            const initialData = createInitialData({
                 sections: [sectionWithId],
-            };
+            });
 
             renderProgramForm({ initialData });
             await waitFor(() => {
@@ -723,7 +671,7 @@ describe('ProgramForm', () => {
 
         it('triggers handleSectionEditStateChange and updates validation state via ProgramSectionForm onEditStateChange', async () => {
             const mockOnValidationChange = jest.fn();
-            const initialData: ProgramFormValues = {
+            const initialData = createInitialData({
                 name: 'Valid Name',
                 categories: [mockCategories[0]],
                 description: 'Valid Description',
@@ -735,7 +683,7 @@ describe('ProgramForm', () => {
                 participantsCount: '10',
                 meetingCount: '5',
                 sections: [sectionWithId],
-            };
+            });
 
             Object.values(PROGRAM_VALIDATION_FUNCTIONS).forEach((fn) => (fn as jest.Mock).mockReturnValue(undefined));
 
@@ -760,19 +708,9 @@ describe('ProgramForm', () => {
 
         it('calls onRequestCancelSection when section delete button is clicked', async () => {
             const mockOnRequestCancelSection = jest.fn();
-            const initialData: ProgramFormValues = {
-                name: '',
-                categories: [],
-                description: '',
-                previewImage: null,
-                previewImageId: null,
-                backgroundImage: null,
-                backgroundImageId: null,
-                location: '',
-                participantsCount: '',
-                meetingCount: '',
+            const initialData = createInitialData({
                 sections: [{ id: 101, template: 1, order: 0, contents: [] } as ProgramSection],
-            };
+            });
 
             renderProgramForm({ initialData, onRequestCancelSection: mockOnRequestCancelSection });
 
@@ -787,19 +725,9 @@ describe('ProgramForm', () => {
 
         it('calls onReplaceSection with correct index when replace button is clicked', async () => {
             const mockOnReplaceSection = jest.fn();
-            const initialData: ProgramFormValues = {
-                name: '',
-                categories: [],
-                description: '',
-                previewImage: null,
-                previewImageId: null,
-                backgroundImage: null,
-                backgroundImageId: null,
-                location: '',
-                participantsCount: '',
-                meetingCount: '',
+            const initialData = createInitialData({
                 sections: [{ id: 101, template: 1, order: 0, contents: [] } as ProgramSection],
-            };
+            });
 
             renderProgramForm({ initialData, onReplaceSection: mockOnReplaceSection });
 
@@ -813,19 +741,9 @@ describe('ProgramForm', () => {
         });
 
         it('deletes section directly when onRequestCancelSection is not provided', async () => {
-            const initialData: ProgramFormValues = {
-                name: '',
-                categories: [],
-                description: '',
-                previewImage: null,
-                previewImageId: null,
-                backgroundImage: null,
-                backgroundImageId: null,
-                location: '',
-                participantsCount: '',
-                meetingCount: '',
+            const initialData = createInitialData({
                 sections: [{ id: 101, template: 1, order: 0, contents: [] } as ProgramSection],
-            };
+            });
 
             renderProgramForm({ initialData });
 

@@ -191,16 +191,16 @@ describe('ProgramSectionForm', () => {
             images: [{ id: 'img1', url: 'img1-url', mimeType: 'image/png' }, { id: 'no-url' }, null],
         });
 
-        if (callPayload.handlers) {
-            expect(callPayload.handlers).toEqual(
-                expect.objectContaining({
-                    onTitleChange: expect.any(Function),
-                    onDescriptionChange: expect.any(Function),
-                    onDescriptionsChange: expect.any(Function),
-                    onImagesChange: expect.any(Function),
-                }),
-            );
-        }
+        expect(callPayload.handlers).toEqual(
+            callPayload.handlers
+                ? expect.objectContaining({
+                      onTitleChange: expect.any(Function),
+                      onDescriptionChange: expect.any(Function),
+                      onDescriptionsChange: expect.any(Function),
+                      onImagesChange: expect.any(Function),
+                  })
+                : undefined,
+        );
     });
 
     it('calls onSectionChange with updated title when onTitleChange is invoked', () => {

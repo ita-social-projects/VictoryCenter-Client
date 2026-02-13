@@ -6,8 +6,7 @@ import {
 } from '../common/language';
 
 export interface TeamCategoryDto
-    extends TeamCategoryLocalizableFields,
-        EntityWithDtoLocalizations<TeamCategoryLocalizationDto> {
+    extends TeamCategoryLocalizableFields, EntityWithDtoLocalizations<TeamCategoryLocalizationDto> {
     id: number;
     name: string;
     description: string;

@@ -39,10 +39,8 @@ export interface CorrespondentBankDetailsDto {
 
 export interface CreateCorrespondentBankDetails extends Omit<CorrespondentBankDetailsDto, 'id'> {}
 
-export interface UpdateCorrespondentBankDetails extends Omit<
-    CorrespondentBankDetailsDto,
-    'id' | 'foreignBankDetailsId'
-> {}
+export interface UpdateCorrespondentBankDetails
+    extends Omit<CorrespondentBankDetailsDto, 'id' | 'foreignBankDetailsId'> {}
 
 export interface ForeignBankDetailsDto {
     id: number;
@@ -59,7 +57,5 @@ export interface CreateForeignBankDetails extends Omit<ForeignBankDetailsDto, 'i
     correspondentBanks?: Omit<CorrespondentBankDetailsDto, 'id' | 'foreignBankDetailsId'>[];
 }
 
-export interface UpdateForeignBankDetails extends Omit<
-    ForeignBankDetailsDto,
-    'id' | 'correspondentBanks' | 'currency'
-> {}
+export interface UpdateForeignBankDetails
+    extends Omit<ForeignBankDetailsDto, 'id' | 'correspondentBanks' | 'currency'> {}

@@ -18,7 +18,6 @@
         grid-template-columns: 1fr 1.75fr;
         grid-template-areas: 'text list';
         column-gap: 128px;
-        align-items: center;
     }
 }
 
@@ -37,8 +36,22 @@
     @media (min-width: 560px) {
         @include type.h3-bold-uppercase;
     }
+
+    @media (min-width: 1440px) {
+        margin: 12px auto 8px;
+    }
 }
 
 .description {
     @include type.body-2-regular;
+}
+
+.toggle {
+    display: flex;
+    justify-content: center;
+    margin-top: 64px;
+
+    @media (min-width: 1440px) {
+        justify-content: start;
+    }
 }

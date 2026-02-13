@@ -99,13 +99,13 @@ jest.mock('@/components/admin/hint-box/HintBox', () => ({
 const mockCategoriesEmpty: TeamCategory[] = [];
 
 const mockCategoriesWithMembers: TeamCategory[] = [
-    { id: 1, name: 'Category 1', description: 'Description 1', teamMembersCount: 5 },
-    { id: 2, name: 'Category 2', description: 'Description 2', teamMembersCount: 3 },
+    { id: 1, name: 'Category 1', description: 'Description 1', localizations: [], teamMembersCount: 5 },
+    { id: 2, name: 'Category 2', description: 'Description 2', localizations: [], teamMembersCount: 3 },
 ];
 
 const mockCategoriesNoMembers: TeamCategory[] = [
-    { id: 10, name: 'Empty Category 1', description: 'Description 1', teamMembersCount: 0 },
-    { id: 20, name: 'Empty Category 2', description: 'Description 2', teamMembersCount: 0 },
+    { id: 10, name: 'Empty Category 1', description: 'Description 1', localizations: [], teamMembersCount: 0 },
+    { id: 20, name: 'Empty Category 2', description: 'Description 2', localizations: [], teamMembersCount: 0 },
 ];
 
 const mockClient = {

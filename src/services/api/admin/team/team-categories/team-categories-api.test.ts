@@ -1,5 +1,5 @@
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
-import { TeamCategory, TeamCategoryCreateUpdate } from '@/types/admin/team-category';
+import { TeamCategory, TeamCategoryCreateUpdate, TeamCategoryDto } from '@/types/admin/team-category';
 import { TeamCategoriesApi } from './team-categories-api';
 
 describe('TeamCategoriesApi', () => {
@@ -15,9 +15,9 @@ describe('TeamCategoriesApi', () => {
     });
 
     it('getAll should call GET and return data', async () => {
-        const mockCategories: TeamCategory[] = [
-            { id: 1, name: 'Category 1', description: 'Description 1', teamMembersCount: 1 },
-            { id: 2, name: 'Category 2', description: 'Description 2', teamMembersCount: 2 },
+        const mockCategories: TeamCategoryDto[] = [
+            { id: 1, name: 'Category 1', description: 'Description 1', localizations: [], teamMembersCount: 1 },
+            { id: 2, name: 'Category 2', description: 'Description 2', localizations: [], teamMembersCount: 2 },
         ];
         mockClient.get.mockResolvedValueOnce({ data: mockCategories });
         const result = await TeamCategoriesApi.getAll(mockClient);
@@ -31,7 +31,7 @@ describe('TeamCategoriesApi', () => {
             name: 'New Category',
             description: 'New Description',
         };
-        const createdCategory: TeamCategory = { ...newCategory, id: 3, teamMembersCount: 0 };
+        const createdCategory: TeamCategoryDto = { ...newCategory, id: 3, teamMembersCount: 0, localizations: [] };
         mockClient.post.mockResolvedValueOnce({ data: createdCategory });
         const result = await TeamCategoriesApi.create(mockClient, newCategory);
         expect(mockClient.post).toHaveBeenCalledWith(
@@ -47,9 +47,10 @@ describe('TeamCategoriesApi', () => {
             name: 'Updated Category',
             description: 'Updated Description',
         };
-        const returnedCategory: TeamCategory = {
+        const returnedCategory: TeamCategoryDto = {
             ...(updatedCategory as Omit<TeamCategory, 'teamMembersCount'>),
             teamMembersCount: 5,
+            localizations: [],
         };
         mockClient.put.mockResolvedValueOnce({ data: returnedCategory });
         const result = await TeamCategoriesApi.update(mockClient, updatedCategory);

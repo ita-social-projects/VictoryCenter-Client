@@ -50,6 +50,7 @@ export interface RenderProgramSectionParams {
     data: ProgramSectionData;
     mode?: ProgramSectionMode;
     handlers?: ProgramSectionHandlers;
+    validationResetKey?: number;
 }
 
 const createItem = (
@@ -107,6 +108,7 @@ interface StandardTemplateProps {
     mode?: ProgramSectionMode;
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
+    validationResetKey?: number;
 }
 
 type StandardTemplateComponentProps =
@@ -159,6 +161,7 @@ export const renderProgramSection = ({
     data,
     mode = ProgramSectionMode.Published,
     handlers,
+    validationResetKey,
 }: RenderProgramSectionParams): React.ReactElement | null => {
     const cardCount = CARD_COUNT_MAP[templateId];
     if (cardCount) {
@@ -169,6 +172,7 @@ export const renderProgramSection = ({
                 mode={mode}
                 onTitleChange={handlers?.onCardTitleChange}
                 onDescriptionChange={handlers?.onCardDescriptionChange}
+                validationResetKey={validationResetKey}
             />
         );
     }
@@ -212,6 +216,7 @@ export const renderProgramSection = ({
         mode,
         onTitleChange: handlers?.onTitleChange,
         onDescriptionChange: handlers?.onDescriptionChange,
+        validationResetKey,
     };
 
     if (SINGLE_IMAGE_TEMPLATES.has(templateId)) {

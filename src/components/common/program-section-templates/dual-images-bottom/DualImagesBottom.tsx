@@ -14,6 +14,7 @@ export interface DualImagesBottomProps {
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
     onImagesChange?: (index: number, file: ImageValues | null) => void;
+    validationResetKey?: number;
 }
 
 export const DualImagesBottom = ({
@@ -24,6 +25,7 @@ export const DualImagesBottom = ({
     onTitleChange,
     onDescriptionChange,
     onImagesChange,
+    validationResetKey,
 }: DualImagesBottomProps) => {
     const baseStyles = mode === ProgramSectionMode.Published ? publishedStyles : styles;
     const imageHandlers = images.map((image, index) => ({
@@ -42,6 +44,7 @@ export const DualImagesBottom = ({
             mode={mode}
             onTitleChange={onTitleChange}
             onDescriptionChange={onDescriptionChange}
+            validationResetKey={validationResetKey}
             className={cn(baseStyles.container, {
                 [styles['form-container']]: mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View,
             })}

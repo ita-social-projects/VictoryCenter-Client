@@ -94,8 +94,8 @@ describe('TitleDescriptionSection', () => {
         const container = document.querySelector('.container');
         return container?.querySelector('.description') || null;
     };
-    const getTitleInput = () => screen.queryByTestId('title-input-section-title');
-    const getDescriptionTextarea = () => screen.queryByTestId('description-textarea-section-description');
+    const getTitleInput = () => screen.queryByTestId(/title-input-.*-section-title/);
+    const getDescriptionTextarea = () => screen.queryByTestId(/description-textarea-.*-section-description/);
 
     describe('Non-editable mode', () => {
         it('uses default values when props are omitted', () => {
@@ -230,11 +230,11 @@ describe('TitleDescriptionSection', () => {
                 mode: ProgramSectionMode.Edit,
             });
 
-            const inputGroup = screen.getByTestId('input-group-section-title');
+            const inputGroup = screen.getByTestId(/input-group-.*-section-title/);
             expect(inputGroup).toBeInTheDocument();
 
             const titleInput = getTitleInput();
-            expect(titleInput).toHaveAttribute('id', 'section-title');
+            expect(titleInput).toHaveAttribute('id', expect.stringMatching(/^.+-section-title$/));
             expect(titleInput).toHaveAttribute('maxLength', '60');
             expect(titleInput).toHaveAttribute('placeholder', PROGRAMS_TEXT.SECTION.FORM.TITLE.PLACEHOLDER);
         });
@@ -245,11 +245,11 @@ describe('TitleDescriptionSection', () => {
                 mode: ProgramSectionMode.Edit,
             });
 
-            const textareaGroup = screen.getByTestId('textarea-group-section-description');
+            const textareaGroup = screen.getByTestId(/textarea-group-.*-section-description/);
             expect(textareaGroup).toBeInTheDocument();
 
             const descriptionTextarea = getDescriptionTextarea();
-            expect(descriptionTextarea).toHaveAttribute('id', 'section-description');
+            expect(descriptionTextarea).toHaveAttribute('id', expect.stringMatching(/^.+-section-description$/));
             expect(descriptionTextarea).toHaveAttribute('maxLength', '600');
             expect(descriptionTextarea).toHaveAttribute('rows', '10');
         });

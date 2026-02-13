@@ -109,6 +109,8 @@ describe('ProgramSectionForm', () => {
         const onSectionChange = (overrides.onSectionChange as jest.Mock) ?? jest.fn();
 
         renderForm({
+            isNewSection: true,
+            isSectionValid: true,
             ...overrides,
             onSectionChange,
         });
@@ -125,7 +127,9 @@ describe('ProgramSectionForm', () => {
             onCancel: jest.fn(),
             isDisabled: false,
             onSectionChange: jest.fn(),
-        };
+            isNewSection: false,
+            isSectionValid: false,
+        } as ProgramSectionFormProps;
     });
 
     it('renders editable section', () => {
@@ -140,28 +144,28 @@ describe('ProgramSectionForm', () => {
     });
 
     it('calls onCancel when cancel button is clicked', () => {
-        renderForm();
+        renderForm({ isNewSection: true });
         fireEvent.click(screen.getByText(PROGRAMS_TEXT.BUTTON.CANCEL));
         expect(baseProps.onCancel).toHaveBeenCalledTimes(1);
     });
 
-    it('save button is always disabled', () => {
-        renderForm();
+    it('save button is disabled when isSectionValid is false', () => {
+        renderForm({ isNewSection: true, isSectionValid: false });
         expect(screen.getByText(PROGRAMS_TEXT.BUTTON.SAVE)).toBeDisabled();
     });
 
     it('cancel button is disabled when isDisabled is true', () => {
-        renderForm({ isDisabled: true });
+        renderForm({ isDisabled: true, isNewSection: true });
         expect(screen.getByText(PROGRAMS_TEXT.BUTTON.CANCEL)).toBeDisabled();
     });
 
     it('defaults isDisabled to false when omitted', () => {
-        const { isDisabled: _omit, ...propsWithoutIsDisabled } = baseProps;
-        render(<ProgramSectionForm {...propsWithoutIsDisabled} />);
+        const { isDisabled: _omit, ...propsWithoutIsDisabled } = baseProps as any;
+        render(<ProgramSectionForm {...propsWithoutIsDisabled} isNewSection={true} isSectionValid={false} />);
         expect(screen.getByText(PROGRAMS_TEXT.BUTTON.CANCEL)).not.toBeDisabled();
     });
 
-    it('passes normalized title/description/descriptions/images and handlers into renderProgramSection', () => {
+    it('passes normalized title/description/descriptions/images into renderProgramSection', () => {
         const section = makeSection({
             contents: [
                 makeTitleContent(null, 0),
@@ -173,12 +177,12 @@ describe('ProgramSectionForm', () => {
             ],
         });
 
-        renderForm({ section });
+        renderForm({ section, isNewSection: false });
 
         const callPayload = renderProgramSectionMock.mock.calls[0][0];
 
         expect(callPayload.templateId).toBe(section.template);
-        expect(callPayload.mode).toBe(ProgramSectionMode.Edit);
+        expect(callPayload.mode).toBe(ProgramSectionMode.View);
 
         expect(callPayload.data).toEqual({
             title: '',
@@ -187,12 +191,16 @@ describe('ProgramSectionForm', () => {
             images: [{ id: 'img1', url: 'img1-url', mimeType: 'image/png' }, { id: 'no-url' }, null],
         });
 
-        expect(callPayload.handlers).toEqual({
-            onTitleChange: expect.any(Function),
-            onDescriptionChange: expect.any(Function),
-            onDescriptionsChange: expect.any(Function),
-            onImagesChange: expect.any(Function),
-        });
+        if (callPayload.handlers) {
+            expect(callPayload.handlers).toEqual(
+                expect.objectContaining({
+                    onTitleChange: expect.any(Function),
+                    onDescriptionChange: expect.any(Function),
+                    onDescriptionsChange: expect.any(Function),
+                    onImagesChange: expect.any(Function),
+                }),
+            );
+        }
     });
 
     it('calls onSectionChange with updated title when onTitleChange is invoked', () => {
@@ -315,7 +323,7 @@ describe('ProgramSectionForm', () => {
                 makePairAuthor(7, undefined, 'IGNORED'),
             ]);
 
-            renderForm({ section });
+            renderForm({ section, isNewSection: true });
 
             const payload = renderProgramSectionMock.mock.calls[0][0];
             expect(payload.data.descriptionAuthorPairs).toEqual([
@@ -326,7 +334,7 @@ describe('ProgramSectionForm', () => {
 
         it('includes pair handlers in renderProgramSection handlers', () => {
             const section = makePairsSection([makeTitleContent('T', 0)]);
-            renderForm({ section });
+            renderForm({ section, isNewSection: true });
 
             const payload = renderProgramSectionMock.mock.calls[0][0];
 
@@ -467,6 +475,66 @@ describe('ProgramSectionForm', () => {
             });
 
             expect(onSectionChange).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('View/Edit modes', () => {
+        it('starts in View mode for saved sections and shows Edit/Delete/Replace buttons', () => {
+            renderForm({ isNewSection: false });
+
+            expect(screen.queryByText(PROGRAMS_TEXT.BUTTON.SAVE)).not.toBeInTheDocument();
+            expect(screen.queryByText(PROGRAMS_TEXT.BUTTON.CANCEL)).not.toBeInTheDocument();
+            expect(screen.getByLabelText('Edit section')).toBeInTheDocument();
+            expect(screen.getByLabelText('Delete section')).toBeInTheDocument();
+            expect(screen.getByLabelText('Replace section')).toBeInTheDocument();
+        });
+
+        it('starts in Edit mode for new sections and shows Save/Cancel buttons', () => {
+            renderForm({ isNewSection: true });
+
+            expect(screen.getByText(PROGRAMS_TEXT.BUTTON.SAVE)).toBeInTheDocument();
+            expect(screen.getByText(PROGRAMS_TEXT.BUTTON.CANCEL)).toBeInTheDocument();
+            expect(screen.queryByLabelText('Edit section')).not.toBeInTheDocument();
+        });
+
+        it('transitions from View to Edit mode when Edit button is clicked', () => {
+            renderForm({ isNewSection: false });
+
+            expect(screen.queryByText(PROGRAMS_TEXT.BUTTON.SAVE)).not.toBeInTheDocument();
+
+            fireEvent.click(screen.getByLabelText('Edit section'));
+
+            expect(screen.getByText(PROGRAMS_TEXT.BUTTON.SAVE)).toBeInTheDocument();
+            expect(screen.getByText(PROGRAMS_TEXT.BUTTON.CANCEL)).toBeInTheDocument();
+        });
+
+        it('calls onEditStateChange when transitioning to Edit mode', () => {
+            const onEditStateChange = jest.fn();
+            renderForm({ isNewSection: false, onEditStateChange });
+
+            expect(onEditStateChange).toHaveBeenCalledWith(false);
+
+            fireEvent.click(screen.getByLabelText('Edit section'));
+
+            expect(onEditStateChange).toHaveBeenCalledWith(true);
+        });
+
+        it('calls onSave and transitions back to View mode when Save button is clicked', () => {
+            renderForm({ isNewSection: true, isSectionValid: true });
+
+            fireEvent.click(screen.getByText(PROGRAMS_TEXT.BUTTON.SAVE));
+
+            expect(baseProps.onSave).toHaveBeenCalledTimes(1);
+            expect(screen.queryByText(PROGRAMS_TEXT.BUTTON.SAVE)).not.toBeInTheDocument();
+            expect(screen.getByLabelText('Edit section')).toBeInTheDocument();
+        });
+
+        it('does not call onSave when Save button is clicked but section is invalid', () => {
+            renderForm({ isNewSection: true, isSectionValid: false });
+
+            fireEvent.click(screen.getByText(PROGRAMS_TEXT.BUTTON.SAVE));
+
+            expect(baseProps.onSave).not.toHaveBeenCalled();
         });
     });
 });

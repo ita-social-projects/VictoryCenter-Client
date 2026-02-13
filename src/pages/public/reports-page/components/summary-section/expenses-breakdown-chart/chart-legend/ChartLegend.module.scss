@@ -1,0 +1,37 @@
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
+
+.root {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.square {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.label {
+    @include type.small-text-regular;
+}
+
+.bg-level-0 {
+    background-color: c.$light-blue-300;
+}
+.bg-level-1 {
+    background-color: c.$light-blue-200;
+}
+.bg-level-2 {
+    background-color: c.$light-blue-100;
+}
+.bg-level-3 {
+    background-color: c.$light-blue-50;
+}

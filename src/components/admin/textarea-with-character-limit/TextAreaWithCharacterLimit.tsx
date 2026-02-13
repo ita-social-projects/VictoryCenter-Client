@@ -66,7 +66,7 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
                     <textarea
                         ref={ref}
                         className="char-limit-textarea__field"
-                        value={value}
+                        value={value ?? ''}
                         onChange={handleChange}
                         onFocus={handleFocus}
                         onBlur={handleBlur}

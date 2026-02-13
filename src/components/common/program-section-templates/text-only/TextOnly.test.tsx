@@ -41,8 +41,8 @@ describe('TextOnly', () => {
     it('should render input fields when mode is Edit', () => {
         render(<TextOnly mode={ProgramSectionMode.Edit} title="Edit Title" description="Edit Desc" />);
 
-        expect(screen.getByTestId('input-section-title')).toHaveValue('Edit Title');
-        expect(screen.getByTestId('input-section-description')).toHaveValue('Edit Desc');
+        expect(screen.getByTestId(/input-.*-section-title/)).toHaveValue('Edit Title');
+        expect(screen.getByTestId(/input-.*-section-description/)).toHaveValue('Edit Desc');
         expect(screen.queryByRole('heading')).not.toBeInTheDocument();
     });
 
@@ -57,8 +57,8 @@ describe('TextOnly', () => {
             />,
         );
 
-        fireEvent.change(screen.getByTestId('input-section-title'), { target: { value: 'New' } });
-        fireEvent.change(screen.getByTestId('input-section-description'), { target: { value: 'Desc' } });
+        fireEvent.change(screen.getByTestId(/input-.*-section-title/), { target: { value: 'New' } });
+        fireEvent.change(screen.getByTestId(/input-.*-section-description/), { target: { value: 'Desc' } });
 
         expect(onTitleChange).toHaveBeenCalledWith('New');
         expect(onDescriptionChange).toHaveBeenCalledWith('Desc');

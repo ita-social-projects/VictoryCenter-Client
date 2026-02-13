@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Button } from '@/components/admin/button/Button';
 import { ImageValues } from '@/types/common/image';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
@@ -15,9 +15,19 @@ import { ContentType } from '@/types/common/programs';
 export interface ProgramSectionFormProps {
     section: ProgramSection;
     onSave: () => void;
-    onCancel: () => void;
+    onCancel: (options: SectionCancelOptions) => void;
     isDisabled?: boolean;
     onSectionChange?: (updatedSection: ProgramSection) => void;
+    isNewSection?: boolean;
+    isSectionValid?: boolean;
+    onEditStateChange?: (isEditing: boolean) => void;
+}
+
+export interface SectionCancelOptions {
+    isDirty: boolean;
+    shouldRemove: boolean;
+    revertTo: ProgramSection;
+    onAfterDiscard: () => void;
 }
 
 const getContentByType = (contents: ProgramSectionContent[], type: ContentType): ProgramSectionContent | undefined => {
@@ -28,14 +38,80 @@ const getDescriptionsInOrder = (contents: ProgramSectionContent[]) => {
     return contents.filter((c) => c.contentType === ContentType.Description).sort((a, b) => a.order - b.order);
 };
 
+const getDescriptionAuthorPairs = (contents: ProgramSectionContent[]) => {
+    const map = new Map<number, { description: string; author: string }>();
+
+    for (const c of contents) {
+        if (c.groupIndex === null || c.groupIndex === undefined) continue;
+
+        const groupIndex = c.groupIndex;
+
+        if (!map.has(groupIndex)) {
+            map.set(groupIndex, { description: '', author: '' });
+        }
+
+        const entry = map.get(groupIndex)!;
+
+        if (c.contentType === ContentType.Description) {
+            entry.description = c.description || '';
+        }
+
+        if (c.contentType === ContentType.Author) {
+            entry.author = c.author || '';
+        }
+    }
+
+    return Array.from(map.entries())
+        .sort((a, b) => a[0] - b[0])
+        .map(([groupIndex, v]) => ({
+            groupIndex,
+            description: v.description,
+            author: v.author,
+        }));
+};
+
 export const ProgramSectionForm = ({
     section,
     onSave,
     onCancel,
     isDisabled = false,
     onSectionChange,
+    isNewSection = false,
+    isSectionValid = false,
+    onEditStateChange,
 }: ProgramSectionFormProps) => {
     const [localSection, setLocalSection] = useState<ProgramSection>(section);
+    const [originalSection, setOriginalSection] = useState<ProgramSection>(section);
+    const [isDirty, setIsDirty] = useState(false);
+    const [validationResetKey, setValidationResetKey] = useState(0);
+    const [sectionMode, setSectionMode] = useState<ProgramSectionMode>(
+        isNewSection ? ProgramSectionMode.Edit : ProgramSectionMode.View,
+    );
+    const sectionModeRef = useRef(sectionMode);
+    const onEditStateChangeRef = useRef(onEditStateChange);
+
+    useEffect(() => {
+        sectionModeRef.current = sectionMode;
+    }, [sectionMode]);
+
+    useEffect(() => {
+        onEditStateChangeRef.current = onEditStateChange;
+    }, [onEditStateChange]);
+
+    useEffect(() => {
+        setLocalSection(section);
+        if (sectionModeRef.current !== ProgramSectionMode.Edit) {
+            setOriginalSection(section);
+            setIsDirty(false);
+            if (!isNewSection) {
+                setSectionMode(ProgramSectionMode.View);
+            }
+        }
+    }, [section, isNewSection]);
+
+    useEffect(() => {
+        onEditStateChangeRef.current?.(sectionMode === ProgramSectionMode.Edit);
+    }, [sectionMode]);
 
     const titleContent = getContentByType(localSection.contents, ContentType.Title);
 
@@ -47,6 +123,16 @@ export const ProgramSectionForm = ({
 
     const descriptions = orderedDescriptionContents.map((c) => c.description || '');
     const description = descriptions[0] || '';
+
+    const isDescriptionAuthorPairsTemplate =
+        section.template === ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs;
+
+    const orderedPairs = getDescriptionAuthorPairs(localSection.contents);
+
+    const descriptionAuthorPairs = orderedPairs.map((p) => ({
+        description: p.description,
+        author: p.author,
+    }));
 
     const imageContents = localSection.contents
         .filter((c) => c.contentType === ContentType.Image)
@@ -66,6 +152,7 @@ export const ProgramSectionForm = ({
                 );
                 const updatedSection = { ...prev, contents: updatedContents };
                 onSectionChange?.(updatedSection);
+                setIsDirty(true);
                 return updatedSection;
             });
         },
@@ -80,6 +167,7 @@ export const ProgramSectionForm = ({
                 );
                 const updatedSection = { ...prev, contents: updatedContents };
                 onSectionChange?.(updatedSection);
+                setIsDirty(true);
                 return updatedSection;
             });
         },
@@ -101,6 +189,7 @@ export const ProgramSectionForm = ({
 
                 const updatedSection = { ...prev, contents: updatedContents };
                 onSectionChange?.(updatedSection);
+                setIsDirty(true);
                 return updatedSection;
             });
         },
@@ -127,6 +216,7 @@ export const ProgramSectionForm = ({
 
                 const updatedSection = { ...prev, contents: updatedContents };
                 onSectionChange?.(updatedSection);
+                setIsDirty(true);
                 return updatedSection;
             });
         },
@@ -153,6 +243,7 @@ export const ProgramSectionForm = ({
                     const targetOrder = imageContentsList[index].order;
                     const updatedSection = updateImageContent(targetOrder, file, prev);
                     onSectionChange?.(updatedSection);
+                    setIsDirty(true);
                     return updatedSection;
                 }
                 return prev;
@@ -161,13 +252,140 @@ export const ProgramSectionForm = ({
         [onSectionChange, updateImageContent],
     );
 
+    const handlePairFieldChange = useCallback(
+        (index: number, value: string, field: ContentType.Description | ContentType.Author) => {
+            setLocalSection((prev) => {
+                const pairs = getDescriptionAuthorPairs(prev.contents);
+                const target = pairs[index];
+                if (!target) return prev;
+
+                const updatedContents = prev.contents.map((c) => {
+                    if (c.groupIndex !== target.groupIndex || c.contentType !== field) return c;
+
+                    if (field === ContentType.Description) {
+                        return { ...c, description: value };
+                    }
+
+                    return { ...c, author: value };
+                });
+
+                const updatedSection = { ...prev, contents: updatedContents };
+                onSectionChange?.(updatedSection);
+                return updatedSection;
+            });
+        },
+        [onSectionChange],
+    );
+
+    const handlePairDescriptionChange = useCallback(
+        (index: number, value: string) => handlePairFieldChange(index, value, ContentType.Description),
+        [handlePairFieldChange],
+    );
+
+    const handlePairAuthorChange = useCallback(
+        (index: number, value: string) => handlePairFieldChange(index, value, ContentType.Author),
+        [handlePairFieldChange],
+    );
+
+    const handleAddPair = useCallback(() => {
+        setLocalSection((prev) => {
+            const groupIndexes = prev.contents
+                .map((c) => c.groupIndex)
+                .filter((x): x is number => x !== null && x !== undefined);
+
+            const nextGroupIndex = groupIndexes.length ? Math.max(...groupIndexes) + 1 : 0;
+
+            const maxOrder = prev.contents.length ? Math.max(...prev.contents.map((c) => c.order)) : -1;
+            const descriptionOrder = maxOrder + 1;
+            const authorOrder = maxOrder + 2;
+
+            const updatedSection: ProgramSection = {
+                ...prev,
+                contents: [
+                    ...prev.contents,
+                    {
+                        contentType: ContentType.Description,
+                        order: descriptionOrder,
+                        groupIndex: nextGroupIndex,
+                        description: '',
+                    },
+                    {
+                        contentType: ContentType.Author,
+                        order: authorOrder,
+                        groupIndex: nextGroupIndex,
+                        author: '',
+                    },
+                ],
+            };
+
+            onSectionChange?.(updatedSection);
+            return updatedSection;
+        });
+    }, [onSectionChange]);
+
+    const handleDeletePair = useCallback(
+        (index: number) => {
+            setLocalSection((prev) => {
+                const pairs = getDescriptionAuthorPairs(prev.contents);
+                const target = pairs[index];
+                if (!target) return prev;
+
+                const updatedSection: ProgramSection = {
+                    ...prev,
+                    contents: prev.contents.filter((c) => c.groupIndex !== target.groupIndex),
+                };
+
+                onSectionChange?.(updatedSection);
+                return updatedSection;
+            });
+        },
+        [onSectionChange],
+    );
+    const handleEditClick = useCallback(() => {
+        setOriginalSection(localSection);
+        setIsDirty(false);
+        setSectionMode(ProgramSectionMode.Edit);
+    }, [localSection]);
+
+    const handleSaveClick = useCallback(() => {
+        if (isDisabled || !isSectionValid) return;
+        onSave();
+        setOriginalSection(localSection);
+        setIsDirty(false);
+        setSectionMode(ProgramSectionMode.View);
+        setValidationResetKey((prev) => prev + 1);
+    }, [isDisabled, isSectionValid, onSave, localSection]);
+
     const CARD_TEMPLATES = [
         ProgramSectionTemplate.DualTitleDescription,
         ProgramSectionTemplate.TripleTitleDescription,
         ProgramSectionTemplate.QuadTitleDescription,
     ];
 
+    //TODO: implement validation
+    const canAddPair = true;
+
     const isCardTemplate = CARD_TEMPLATES.includes(section.template);
+
+    const handleCancelClick = useCallback(() => {
+        const shouldRemove = isNewSection;
+        const revertTo = originalSection;
+        const onAfterDiscard = () => {
+            if (!shouldRemove) {
+                setLocalSection(revertTo);
+                setIsDirty(false);
+                setSectionMode(ProgramSectionMode.View);
+                setValidationResetKey((prev) => prev + 1);
+            }
+        };
+
+        onCancel({
+            isDirty,
+            shouldRemove,
+            revertTo,
+            onAfterDiscard,
+        });
+    }, [isDirty, isNewSection, onCancel, originalSection]);
 
     const editableSection = renderProgramSection({
         templateId: section.template,
@@ -177,8 +395,10 @@ export const ProgramSectionForm = ({
             descriptions,
             images: imageContents,
             ...(isCardTemplate ? { cards } : {}),
+            ...(isDescriptionAuthorPairsTemplate ? { descriptionAuthorPairs } : {}),
         },
-        mode: ProgramSectionMode.Edit,
+        mode: sectionMode,
+        validationResetKey,
         handlers: {
             onTitleChange: handleTitleChange,
             onDescriptionChange: handleDescriptionChange,
@@ -192,25 +412,62 @@ export const ProgramSectionForm = ({
                           handleCardContentChange(index, value, ContentType.Description),
                   }
                 : {}),
+
+            ...(isDescriptionAuthorPairsTemplate
+                ? {
+                      onCardDescriptionChange: handlePairDescriptionChange,
+                      onCardAuthorChange: handlePairAuthorChange,
+                      onAddPair: handleAddPair,
+                      onDeletePair: handleDeletePair,
+                      canAddPair,
+                  }
+                : {}),
         },
     });
 
     return (
         <div className={styles.container}>
+            <div className={styles['actions-section']}>
+                {sectionMode === ProgramSectionMode.View && (
+                    <div className={styles['hover-buttons']}>
+                        <button
+                            onClick={handleEditClick}
+                            className={`${styles['icon-button']} ${styles['edit-button']}`}
+                            aria-label="Edit section"
+                        />
+                        <button
+                            className={`${styles['icon-button']} ${styles['delete-button']}`}
+                            aria-label="Delete section"
+                        />
+                        <button
+                            className={`${styles['icon-button']} ${styles['change-button']}`}
+                            aria-label="Replace section"
+                        />
+                    </div>
+                )}
+            </div>
             <div className={styles.content}>
                 {editableSection || (
                     <p className={styles['template-info']}>
-                        Template ID: <strong>{section.template}</strong> (not yet implemented)
+                        Template ID: <strong>{section.template}</strong> (not found in renderer)
                     </p>
                 )}
             </div>
-            <div className={styles.actions}>
-                <Button buttonStyle="secondary" onClick={onCancel} disabled={isDisabled}>
-                    {PROGRAMS_TEXT.BUTTON.CANCEL}
-                </Button>
-                <Button buttonStyle="primary" onClick={onSave} disabled={true}>
-                    {PROGRAMS_TEXT.BUTTON.SAVE}
-                </Button>
+            <div className={styles['actions-container']}>
+                {sectionMode !== ProgramSectionMode.View && (
+                    <div className={styles.actions}>
+                        <Button buttonStyle="secondary" onClick={handleCancelClick} disabled={isDisabled}>
+                            {PROGRAMS_TEXT.BUTTON.CANCEL}
+                        </Button>
+                        <Button
+                            buttonStyle="primary"
+                            onClick={handleSaveClick}
+                            disabled={isDisabled || !isSectionValid}
+                        >
+                            {PROGRAMS_TEXT.BUTTON.SAVE}
+                        </Button>
+                    </div>
+                )}
             </div>
         </div>
     );

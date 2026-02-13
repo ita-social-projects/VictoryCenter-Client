@@ -21,6 +21,7 @@ export enum ProgramSectionTemplate {
     DualTitleDescription = 9,
     QuadTitleDescription = 10,
     SingleTitleQuintupleDescription = 11,
+    SingleTitleDescriptionAuthorPairs = 12,
 }
 
 export enum ProgramSectionMode {

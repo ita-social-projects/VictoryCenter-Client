@@ -304,14 +304,14 @@ describe('ProgramModal', () => {
 
             act(() => {
                 capturedFormProps.onRequestCancelSection({
-                    type: SectionCancelActionType.RemoveSection,
+                    type: SectionCancelActionType.DiscardNewSection,
                     onDiscard: () => mockFormRef.removeSection(2),
                 });
             });
 
             expect(screen.getByTestId('question-modal')).toBeInTheDocument();
             expect(screen.getByTestId('question-title')).toHaveTextContent(
-                PROGRAMS_TEXT.SECTION.MODAL.DELETE_SECTION_TITLE,
+                PROGRAMS_TEXT.SECTION.MODAL.UNSAVED_CHANGES_TITLE,
             );
 
             fireEvent.click(screen.getByTestId('question-cancel'));
@@ -404,13 +404,13 @@ describe('ProgramModal', () => {
 
             act(() => {
                 capturedFormProps.onRequestCancelSection({
-                    type: SectionCancelActionType.RemoveSection,
+                    type: SectionCancelActionType.DiscardNewSection,
                     onDiscard: () => mockFormRef.removeSection(1),
                 });
             });
 
             expect(screen.getByTestId('question-title')).toHaveTextContent(
-                PROGRAMS_TEXT.SECTION.MODAL.DELETE_SECTION_TITLE,
+                PROGRAMS_TEXT.SECTION.MODAL.UNSAVED_CHANGES_TITLE,
             );
 
             fireEvent.click(screen.getByTestId('question-cancel'));

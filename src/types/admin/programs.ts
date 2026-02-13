@@ -55,4 +55,5 @@ export enum SectionCancelActionType {
     RemoveSection,
     RevertSection,
     RevertAfterReplace,
+    DiscardNewSection,
 }

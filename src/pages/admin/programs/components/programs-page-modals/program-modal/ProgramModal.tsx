@@ -173,6 +173,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
                     break;
                 case SectionCancelActionType.RevertSection:
                 case SectionCancelActionType.RevertAfterReplace:
+                case SectionCancelActionType.DiscardNewSection:
                     setIsSectionRevertModalOpen(true);
                     break;
                 default:
@@ -277,7 +278,9 @@ export const ProgramModal = (props: ProgramModalProps) => {
                 title={
                     pendingCancelActionType === SectionCancelActionType.RevertAfterReplace
                         ? PROGRAMS_TEXT.SECTION.MODAL.REPLACE_TEMPLATE_TITLE
-                        : COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE
+                        : pendingCancelActionType === SectionCancelActionType.DiscardNewSection
+                          ? PROGRAMS_TEXT.SECTION.MODAL.UNSAVED_CHANGES_TITLE
+                          : COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE
                 }
                 onConfirm={handleConfirmRevertSection}
                 onCancel={handleCloseSectionRevertModal}

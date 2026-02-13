@@ -97,6 +97,8 @@ export const ProgramSectionForm = ({
     const sectionModeRef = useRef(sectionMode);
     const onEditStateChangeRef = useRef(onEditStateChange);
     const lastEmittedSectionRef = useRef<ProgramSection | null>(null);
+    const localSectionRef = useRef<ProgramSection>(localSection);
+    localSectionRef.current = localSection;
 
     useEffect(() => {
         sectionModeRef.current = sectionMode;
@@ -166,83 +168,71 @@ export const ProgramSectionForm = ({
 
     const handleTitleChange = useCallback(
         (value: string) => {
-            let newSection: ProgramSection;
-            setLocalSection((prev) => {
-                const updatedContents = prev.contents.map((c) =>
-                    c.contentType === ContentType.Title ? { ...c, title: value } : c,
-                );
-                newSection = { ...prev, contents: updatedContents };
-                return newSection;
-            });
-            emitSectionChange(newSection!);
+            const prev = localSectionRef.current;
+            const updatedContents = prev.contents.map((c) =>
+                c.contentType === ContentType.Title ? { ...c, title: value } : c,
+            );
+            const newSection = { ...prev, contents: updatedContents };
+            localSectionRef.current = newSection;
+            setLocalSection(newSection);
+            emitSectionChange(newSection);
         },
         [emitSectionChange],
     );
 
     const handleDescriptionChange = useCallback(
         (value: string) => {
-            let newSection: ProgramSection;
-            setLocalSection((prev) => {
-                const updatedContents = prev.contents.map((c) =>
-                    c.contentType === ContentType.Description ? { ...c, description: value } : c,
-                );
-                newSection = { ...prev, contents: updatedContents };
-                return newSection;
-            });
-            emitSectionChange(newSection!);
+            const prev = localSectionRef.current;
+            const updatedContents = prev.contents.map((c) =>
+                c.contentType === ContentType.Description ? { ...c, description: value } : c,
+            );
+            const newSection = { ...prev, contents: updatedContents };
+            localSectionRef.current = newSection;
+            setLocalSection(newSection);
+            emitSectionChange(newSection);
         },
         [emitSectionChange],
     );
 
     const handleDescriptionsChange = useCallback(
         (index: number, value: string) => {
-            let newSection: ProgramSection | undefined;
-            setLocalSection((prev) => {
-                const ordered = getDescriptionsInOrder(prev.contents);
-                const target = ordered[index];
-                if (!target) return prev;
+            const prev = localSectionRef.current;
+            const ordered = getDescriptionsInOrder(prev.contents);
+            const target = ordered[index];
+            if (!target) return;
 
-                const updatedContents = prev.contents.map((c) =>
-                    c.contentType === ContentType.Description && c.order === target.order
-                        ? { ...c, description: value }
-                        : c,
-                );
+            const updatedContents = prev.contents.map((c) =>
+                c.contentType === ContentType.Description && c.order === target.order
+                    ? { ...c, description: value }
+                    : c,
+            );
 
-                newSection = { ...prev, contents: updatedContents };
-                return newSection;
-            });
-            if (newSection) {
-                emitSectionChange(newSection);
-            }
+            const newSection = { ...prev, contents: updatedContents };
+            localSectionRef.current = newSection;
+            setLocalSection(newSection);
+            emitSectionChange(newSection);
         },
         [emitSectionChange],
     );
 
     const handleCardContentChange = useCallback(
         (index: number, value: string, type: ContentType.Title | ContentType.Description) => {
-            let newSection: ProgramSection | undefined;
-            setLocalSection((prev) => {
-                const filteredContents = prev.contents
-                    .filter((c) => c.contentType === type)
-                    .sort((a, b) => a.order - b.order);
+            const prev = localSectionRef.current;
+            const filteredContents = prev.contents
+                .filter((c) => c.contentType === type)
+                .sort((a, b) => a.order - b.order);
 
-                const target = filteredContents[index];
-                if (!target) return prev;
+            const target = filteredContents[index];
+            if (!target) return;
 
-                const updatedContents = prev.contents.map((c) =>
-                    c === target
-                        ? type === ContentType.Title
-                            ? { ...c, title: value }
-                            : { ...c, description: value }
-                        : c,
-                );
+            const updatedContents = prev.contents.map((c) =>
+                c === target ? (type === ContentType.Title ? { ...c, title: value } : { ...c, description: value }) : c,
+            );
 
-                newSection = { ...prev, contents: updatedContents };
-                return newSection;
-            });
-            if (newSection) {
-                emitSectionChange(newSection);
-            }
+            const newSection = { ...prev, contents: updatedContents };
+            localSectionRef.current = newSection;
+            setLocalSection(newSection);
+            emitSectionChange(newSection);
         },
         [emitSectionChange],
     );
@@ -259,48 +249,44 @@ export const ProgramSectionForm = ({
 
     const handleImagesChange = useCallback(
         (index: number, file: ImageValues | null) => {
-            let newSection: ProgramSection | undefined;
-            setLocalSection((prev) => {
-                const imageContentsList = prev.contents.filter((c) => c.contentType === ContentType.Image);
-                imageContentsList.sort((a, b) => a.order - b.order);
+            const prev = localSectionRef.current;
+            const imageContentsList = prev.contents.filter((c) => c.contentType === ContentType.Image);
+            imageContentsList.sort((a, b) => a.order - b.order);
 
-                if (index < imageContentsList.length) {
-                    const targetOrder = imageContentsList[index].order;
-                    newSection = updateImageContent(targetOrder, file, prev);
-                    return newSection;
-                }
-                return prev;
-            });
-            if (newSection) {
-                emitSectionChange(newSection);
-            }
+            if (index >= imageContentsList.length) return;
+
+            const targetOrder = imageContentsList[index].order;
+            const newSection = updateImageContent(targetOrder, file, prev);
+            localSectionRef.current = newSection;
+            setLocalSection(newSection);
+            emitSectionChange(newSection);
         },
         [emitSectionChange, updateImageContent],
     );
 
     const handlePairFieldChange = useCallback(
         (index: number, value: string, field: ContentType.Description | ContentType.Author) => {
-            setLocalSection((prev) => {
-                const pairs = getDescriptionAuthorPairs(prev.contents);
-                const target = pairs[index];
-                if (!target) return prev;
+            const prev = localSectionRef.current;
+            const pairs = getDescriptionAuthorPairs(prev.contents);
+            const target = pairs[index];
+            if (!target) return;
 
-                const updatedContents = prev.contents.map((c) => {
-                    if (c.groupIndex !== target.groupIndex || c.contentType !== field) return c;
+            const updatedContents = prev.contents.map((c) => {
+                if (c.groupIndex !== target.groupIndex || c.contentType !== field) return c;
 
-                    if (field === ContentType.Description) {
-                        return { ...c, description: value };
-                    }
+                if (field === ContentType.Description) {
+                    return { ...c, description: value };
+                }
 
-                    return { ...c, author: value };
-                });
-
-                const updatedSection = { ...prev, contents: updatedContents };
-                onSectionChange?.(updatedSection);
-                return updatedSection;
+                return { ...c, author: value };
             });
+
+            const newSection = { ...prev, contents: updatedContents };
+            localSectionRef.current = newSection;
+            setLocalSection(newSection);
+            emitSectionChange(newSection);
         },
-        [onSectionChange],
+        [emitSectionChange],
     );
 
     const handlePairDescriptionChange = useCallback(
@@ -314,58 +300,58 @@ export const ProgramSectionForm = ({
     );
 
     const handleAddPair = useCallback(() => {
-        setLocalSection((prev) => {
-            const groupIndexes = prev.contents
-                .map((c) => c.groupIndex)
-                .filter((x): x is number => x !== null && x !== undefined);
+        const prev = localSectionRef.current;
+        const groupIndexes = prev.contents
+            .map((c) => c.groupIndex)
+            .filter((x): x is number => x !== null && x !== undefined);
 
-            const nextGroupIndex = groupIndexes.length ? Math.max(...groupIndexes) + 1 : 0;
+        const nextGroupIndex = groupIndexes.length ? Math.max(...groupIndexes) + 1 : 0;
 
-            const maxOrder = prev.contents.length ? Math.max(...prev.contents.map((c) => c.order)) : -1;
-            const descriptionOrder = maxOrder + 1;
-            const authorOrder = maxOrder + 2;
+        const maxOrder = prev.contents.length ? Math.max(...prev.contents.map((c) => c.order)) : -1;
+        const descriptionOrder = maxOrder + 1;
+        const authorOrder = maxOrder + 2;
 
-            const updatedSection: ProgramSection = {
-                ...prev,
-                contents: [
-                    ...prev.contents,
-                    {
-                        contentType: ContentType.Description,
-                        order: descriptionOrder,
-                        groupIndex: nextGroupIndex,
-                        description: '',
-                    },
-                    {
-                        contentType: ContentType.Author,
-                        order: authorOrder,
-                        groupIndex: nextGroupIndex,
-                        author: '',
-                    },
-                ],
-            };
+        const newSection: ProgramSection = {
+            ...prev,
+            contents: [
+                ...prev.contents,
+                {
+                    contentType: ContentType.Description,
+                    order: descriptionOrder,
+                    groupIndex: nextGroupIndex,
+                    description: '',
+                },
+                {
+                    contentType: ContentType.Author,
+                    order: authorOrder,
+                    groupIndex: nextGroupIndex,
+                    author: '',
+                },
+            ],
+        };
 
-            onSectionChange?.(updatedSection);
-            return updatedSection;
-        });
-    }, [onSectionChange]);
+        localSectionRef.current = newSection;
+        setLocalSection(newSection);
+        emitSectionChange(newSection);
+    }, [emitSectionChange]);
 
     const handleDeletePair = useCallback(
         (index: number) => {
-            setLocalSection((prev) => {
-                const pairs = getDescriptionAuthorPairs(prev.contents);
-                const target = pairs[index];
-                if (!target) return prev;
+            const prev = localSectionRef.current;
+            const pairs = getDescriptionAuthorPairs(prev.contents);
+            const target = pairs[index];
+            if (!target) return;
 
-                const updatedSection: ProgramSection = {
-                    ...prev,
-                    contents: prev.contents.filter((c) => c.groupIndex !== target.groupIndex),
-                };
+            const newSection: ProgramSection = {
+                ...prev,
+                contents: prev.contents.filter((c) => c.groupIndex !== target.groupIndex),
+            };
 
-                onSectionChange?.(updatedSection);
-                return updatedSection;
-            });
+            localSectionRef.current = newSection;
+            setLocalSection(newSection);
+            emitSectionChange(newSection);
         },
-        [onSectionChange],
+        [emitSectionChange],
     );
     const handleEditClick = useCallback(
         (e: React.MouseEvent<HTMLButtonElement>) => {

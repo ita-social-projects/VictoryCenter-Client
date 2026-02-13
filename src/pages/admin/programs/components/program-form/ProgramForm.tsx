@@ -493,9 +493,19 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                         onSectionChange={(updatedSection) => handleSectionChange(index, updatedSection)}
                                         isDisabled={isSubmitting || isFormDisabled}
                                     />
-                                    <div className={styles['sections-divider']} />
                                 </React.Fragment>
                             ))}
+                            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '40px' }}>
+                                <Button
+                                    buttonStyle="primary"
+                                    onClick={onAddSection}
+                                    data-testid="add-section-button-bottom"
+                                >
+                                    {PROGRAMS_TEXT.BUTTON.ADD_SECTION}
+                                    <PlusIcon className={styles['plus-icon']} />
+                                </Button>
+                            </div>
+                            <div className={styles['sections-divider']} />
                         </div>
                     )}
                 </div>

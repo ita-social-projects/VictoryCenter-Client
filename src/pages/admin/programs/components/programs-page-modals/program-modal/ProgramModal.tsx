@@ -266,7 +266,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
             <ConfirmationModal
                 isOpen={isSectionRemoveModalOpen}
                 onClose={handleCloseSectionRemoveModal}
-                title={PROGRAMS_TEXT.SECTION.MODAL.UNSAVED_CHANGES_TITLE}
+                title={PROGRAMS_TEXT.SECTION.MODAL.DELETE_SECTION_TITLE}
                 onConfirm={handleConfirmRemoveSection}
                 onCancel={handleCloseSectionRemoveModal}
             />

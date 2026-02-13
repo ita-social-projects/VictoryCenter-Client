@@ -311,7 +311,7 @@ describe('ProgramModal', () => {
 
             expect(screen.getByTestId('question-modal')).toBeInTheDocument();
             expect(screen.getByTestId('question-title')).toHaveTextContent(
-                PROGRAMS_TEXT.SECTION.MODAL.UNSAVED_CHANGES_TITLE,
+                PROGRAMS_TEXT.SECTION.MODAL.DELETE_SECTION_TITLE,
             );
 
             fireEvent.click(screen.getByTestId('question-cancel'));
@@ -410,7 +410,7 @@ describe('ProgramModal', () => {
             });
 
             expect(screen.getByTestId('question-title')).toHaveTextContent(
-                PROGRAMS_TEXT.SECTION.MODAL.UNSAVED_CHANGES_TITLE,
+                PROGRAMS_TEXT.SECTION.MODAL.DELETE_SECTION_TITLE,
             );
 
             fireEvent.click(screen.getByTestId('question-cancel'));

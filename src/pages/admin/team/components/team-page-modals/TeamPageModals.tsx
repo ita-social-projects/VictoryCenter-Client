@@ -12,7 +12,7 @@ import { LocalizationLanguage } from '@/types/common/language';
 export interface TeamPageModalsProps {
     modalsStateControl: UseModalsStateResult<TeamMember>;
     categories: TeamCategory[];
-    englishLanguage?: LocalizationLanguage;
+    translatedLanguages: LocalizationLanguage[];
     onAddTeamMember: (addedMember: TeamMember) => void;
     onEditTeamMember: (updatedMember: TeamMember) => void;
     onTranslateTeamMember: (translatedMember: TeamMember) => void;
@@ -25,7 +25,7 @@ export interface TeamPageModalsProps {
 export const TeamPageModals = ({
     modalsStateControl,
     categories,
-    englishLanguage,
+    translatedLanguages,
     onAddTeamMember,
     onTranslateTeamMember,
     onEditTeamMember,
@@ -63,25 +63,23 @@ export const TeamPageModals = ({
                 onDeleteMember={onDeleteTeamMember}
             />
 
-            {englishLanguage && modalState.itemToTranslate && (
+            {modalState.itemToTranslate && (
                 <TranslateTeamMemberModal
                     isOpen={!!modalState.itemToTranslate}
                     onClose={closeModalActions.closeTranslateItemModal}
                     onTranslateMember={onTranslateTeamMember}
                     memberToTranslate={modalState.itemToTranslate}
-                    language={englishLanguage}
-                    mode={ModalMode.Add}
+                    translatedLanguages={translatedLanguages}
                 />
             )}
 
-            {englishLanguage && modalState.itemToEditTranslation && (
+            {modalState.itemToEditTranslation && (
                 <TranslateTeamMemberModal
                     isOpen={!!modalState.itemToEditTranslation}
                     onClose={closeModalActions.closeEditTranslationModal}
                     onTranslateMember={onTranslateTeamMember}
                     memberToTranslate={modalState.itemToEditTranslation}
-                    language={englishLanguage}
-                    mode={ModalMode.Edit}
+                    translatedLanguages={translatedLanguages}
                 />
             )}
 

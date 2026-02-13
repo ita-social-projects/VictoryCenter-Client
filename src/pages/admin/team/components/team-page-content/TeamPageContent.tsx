@@ -619,7 +619,7 @@ export const TeamPageContent = () => {
             <TeamPageModals
                 modalsStateControl={modalsStateControl}
                 categories={categories}
-                englishLanguage={englishLanguage}
+                translatedLanguages={translationLanguages}
                 onAddTeamMember={handleAddMember}
                 onEditTeamMember={handleEditMember}
                 onTranslateTeamMember={handleTranslateMember}

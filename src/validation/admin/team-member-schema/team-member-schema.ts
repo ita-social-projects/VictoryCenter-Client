@@ -25,6 +25,12 @@ export const teamMemberValidationSchema = Yup.object({
     description: Yup.string()
         .transform((value) => (value ? getNormalizedInputText(value) : value))
         .required(TEAM_MEMBER_VALIDATION.description.getRequiredError())
+        .test('no-multiple-spaces', TEAM_MEMBER_VALIDATION.description.getMultipleSpacesError(), function (value) {
+            const rawValue = (this as any).originalValue as string | undefined;
+            const valueToCheck = rawValue ?? value;
+            if (!valueToCheck) return true;
+            return !/\s{2,}/.test(valueToCheck);
+        })
         .max(TEAM_MEMBER_VALIDATION.description.max, TEAM_MEMBER_VALIDATION.description.getMaxError())
         .test('min-length-if-not-empty', TEAM_MEMBER_VALIDATION.description.getMinError(), (value) => {
             return !value || value.length >= TEAM_MEMBER_VALIDATION.description.min;

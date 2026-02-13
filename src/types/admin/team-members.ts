@@ -24,7 +24,8 @@ export interface TeamMemberLocalizableFields {
 }
 
 export interface TeamMemberDto
-    extends TeamMemberLocalizableFields, EntityWithDtoLocalizations<TeamMemberLocalizationDto> {
+    extends TeamMemberLocalizableFields,
+        EntityWithDtoLocalizations<TeamMemberLocalizationDto> {
     id: number;
     image: Image | ImageValues | null;
     status: VisibilityStatus;

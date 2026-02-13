@@ -138,14 +138,18 @@ jest.mock('../program-section-form/ProgramSectionForm', () => ({
         onCancel,
         onSectionChange,
         onEditStateChange,
+        onDelete,
+        onRequestReplace,
         isDisabled,
         isNewSection,
+        isReplacingTemplate,
     }: any) => (
         <div
             data-testid="program-section-form"
             data-section-template={String(section.template)}
             data-disabled={String(isDisabled)}
             data-is-new={String(isNewSection)}
+            data-is-replacing={String(isReplacingTemplate)}
         >
             <button type="button" data-testid={`save-section-${section.id ?? section.template}`} onClick={onSave}>
                 Save
@@ -177,6 +181,20 @@ jest.mock('../program-section-form/ProgramSectionForm', () => ({
                 onClick={() => onEditStateChange?.(true)}
             >
                 Toggle Edit
+            </button>
+            <button
+                type="button"
+                data-testid={`delete-section-${section.id ?? section.template}`}
+                onClick={() => onDelete?.()}
+            >
+                Delete
+            </button>
+            <button
+                type="button"
+                data-testid={`replace-section-${section.id ?? section.template}`}
+                onClick={() => onRequestReplace?.()}
+            >
+                Replace
             </button>
         </div>
     ),
@@ -737,6 +755,88 @@ describe('ProgramForm', () => {
 
             await waitFor(() => {
                 expect(mockOnValidationChange).toHaveBeenLastCalledWith(false);
+            });
+        });
+
+        it('calls onRequestCancelSection when section delete button is clicked', async () => {
+            const mockOnRequestCancelSection = jest.fn();
+            const initialData: ProgramFormValues = {
+                name: '',
+                categories: [],
+                description: '',
+                previewImage: null,
+                previewImageId: null,
+                backgroundImage: null,
+                backgroundImageId: null,
+                location: '',
+                participantsCount: '',
+                meetingCount: '',
+                sections: [{ id: 101, template: 1, order: 0, contents: [] } as ProgramSection],
+            };
+
+            renderProgramForm({ initialData, onRequestCancelSection: mockOnRequestCancelSection });
+
+            await waitFor(() => {
+                expect(screen.getByTestId('delete-section-101')).toBeInTheDocument();
+            });
+
+            fireEvent.click(screen.getByTestId('delete-section-101'));
+
+            expect(mockOnRequestCancelSection).toHaveBeenCalledTimes(1);
+        });
+
+        it('calls onReplaceSection with correct index when replace button is clicked', async () => {
+            const mockOnReplaceSection = jest.fn();
+            const initialData: ProgramFormValues = {
+                name: '',
+                categories: [],
+                description: '',
+                previewImage: null,
+                previewImageId: null,
+                backgroundImage: null,
+                backgroundImageId: null,
+                location: '',
+                participantsCount: '',
+                meetingCount: '',
+                sections: [{ id: 101, template: 1, order: 0, contents: [] } as ProgramSection],
+            };
+
+            renderProgramForm({ initialData, onReplaceSection: mockOnReplaceSection });
+
+            await waitFor(() => {
+                expect(screen.getByTestId('replace-section-101')).toBeInTheDocument();
+            });
+
+            fireEvent.click(screen.getByTestId('replace-section-101'));
+
+            expect(mockOnReplaceSection).toHaveBeenCalledWith(0);
+        });
+
+        it('deletes section directly when onRequestCancelSection is not provided', async () => {
+            const initialData: ProgramFormValues = {
+                name: '',
+                categories: [],
+                description: '',
+                previewImage: null,
+                previewImageId: null,
+                backgroundImage: null,
+                backgroundImageId: null,
+                location: '',
+                participantsCount: '',
+                meetingCount: '',
+                sections: [{ id: 101, template: 1, order: 0, contents: [] } as ProgramSection],
+            };
+
+            renderProgramForm({ initialData });
+
+            await waitFor(() => {
+                expect(screen.getByTestId('program-section-form')).toBeInTheDocument();
+            });
+
+            fireEvent.click(screen.getByTestId('delete-section-101'));
+
+            await waitFor(() => {
+                expect(screen.queryByTestId('program-section-form')).not.toBeInTheDocument();
             });
         });
     });

@@ -148,6 +148,7 @@ const mockFormRef = {
     addSection: jest.fn(),
     removeSection: jest.fn(),
     revertSection: jest.fn(),
+    replaceSection: jest.fn(),
 };
 
 let capturedFormProps: any = {};
@@ -244,6 +245,7 @@ describe('ProgramModal', () => {
         mockFormRef.addSection.mockReset();
         mockFormRef.removeSection.mockReset();
         mockFormRef.revertSection.mockReset();
+        mockFormRef.replaceSection.mockReset();
 
         mockedUseModalsState.mockReturnValue({
             modalState: { isAddSectionModalOpen: false },
@@ -463,6 +465,48 @@ describe('ProgramModal', () => {
 
             expect(mockDiscardCallback).toHaveBeenCalledTimes(1);
             expect(screen.queryByTestId('question-modal')).not.toBeInTheDocument();
+        });
+
+        it('handleReplaceSection sets sectionToReplace and opens add section modal', () => {
+            const mockOpenAddSectionModal = jest.fn();
+            mockedUseModalsState.mockReturnValue({
+                modalState: { isAddSectionModalOpen: false },
+                openModalActions: { openAddSectionModal: mockOpenAddSectionModal },
+                closeModalActions: { closeAddSectionModal: jest.fn() },
+            });
+
+            render(<ProgramModal {...addModeProps} />);
+
+            act(() => {
+                capturedFormProps.onReplaceSection(1);
+            });
+
+            expect(mockOpenAddSectionModal).toHaveBeenCalledTimes(1);
+        });
+
+        it('handleTemplateSelect with sectionToReplace calls replaceSection instead of addSection', () => {
+            mockedUseModalsState.mockReturnValue({
+                modalState: { isAddSectionModalOpen: true },
+                openModalActions: { openAddSectionModal: jest.fn() },
+                closeModalActions: { closeAddSectionModal: jest.fn() },
+            });
+            mockFormRef.getSections = () => [{ order: 0 }, { order: 1 }];
+            mockedGetInitialSectionContents.mockReturnValue([{ contentType: 0, order: 0 }] as any);
+
+            render(<ProgramModal {...addModeProps} />);
+
+            act(() => {
+                capturedFormProps.onReplaceSection(1);
+            });
+
+            fireEvent.click(screen.getByTestId('add-section-select-template'));
+
+            expect(mockFormRef.replaceSection).toHaveBeenCalledWith(1, {
+                template: ProgramSectionTemplate.TextOnly,
+                order: 1,
+                contents: [{ contentType: 0, order: 0 }],
+            });
+            expect(mockFormRef.addSection).not.toHaveBeenCalled();
         });
     });
 

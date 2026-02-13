@@ -132,23 +132,13 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             ref: internalRef,
         });
 
+        const sectionsContainerRef = useRef<HTMLDivElement>(null);
+
         const handleAddSection = useCallback(
             (section: ProgramSection) => {
                 setFormState((prev) => ({
                     ...prev,
                     sections: [...prev.sections, section],
-                }));
-            },
-            [setFormState],
-        );
-
-        const sectionsContainerRef = useRef<HTMLDivElement>(null);
-
-        const handleRemoveSection = useCallback(
-            (sectionIndex: number) => {
-                setFormState((prev) => ({
-                    ...prev,
-                    sections: prev.sections.filter((_, index) => index !== sectionIndex),
                 }));
 
                 setTimeout(() => {
@@ -158,6 +148,16 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                         lastSection.focus({ preventScroll: true });
                     }
                 }, 0);
+            },
+            [setFormState],
+        );
+
+        const handleRemoveSection = useCallback(
+            (sectionIndex: number) => {
+                setFormState((prev) => ({
+                    ...prev,
+                    sections: prev.sections.filter((_, index) => index !== sectionIndex),
+                }));
             },
             [setFormState],
         );

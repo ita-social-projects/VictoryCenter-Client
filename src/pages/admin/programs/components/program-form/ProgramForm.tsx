@@ -495,7 +495,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                     />
                                 </React.Fragment>
                             ))}
-                            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '40px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '64px' }}>
                                 <Button
                                     buttonStyle="primary"
                                     onClick={onAddSection}

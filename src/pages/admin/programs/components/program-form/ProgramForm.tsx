@@ -622,6 +622,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 <Button
                                     buttonStyle="primary"
                                     onClick={onAddSection}
+                                    disabled={isSubmitting || isFormDisabled}
                                     data-testid="add-section-button-bottom"
                                 >
                                     {PROGRAMS_TEXT.BUTTON.ADD_SECTION}

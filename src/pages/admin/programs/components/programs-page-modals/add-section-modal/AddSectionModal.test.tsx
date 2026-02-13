@@ -233,6 +233,14 @@ describe('AddSectionModal', () => {
         expect(call?.data?.description).toBe(PROGRAMS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT);
     });
 
+    it('passes sample title/description into SingleTitleDescriptionAuthorPairs template', () => {
+        renderModal();
+
+        const call = getCallByTemplate(ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs);
+        expect(call?.data?.title).toBe(PROGRAMS_TEXT.SECTION.TITLE_SAMPLE_TEXT);
+        expect(call?.data?.description).toBe(PROGRAMS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT);
+    });
+
     it('provides 5 short descriptions only for SingleTitleQuintupleDescription', () => {
         renderModal();
 
@@ -251,6 +259,7 @@ describe('AddSectionModal', () => {
         [ProgramSectionTemplate.SingleImageRight, 1],
         [ProgramSectionTemplate.TextOnly, 0],
         [ProgramSectionTemplate.SingleTitleQuintupleDescription, 0],
+        [ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs, 0],
     ] as Array<[ProgramSectionTemplate, number]>)('provides correct placeholder images for %s', (templateId, count) => {
         renderModal();
 

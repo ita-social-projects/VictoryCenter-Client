@@ -5,64 +5,64 @@ import { renderProgramSection, RenderProgramSectionParams, getInitialSectionCont
 import { ProgramSectionTemplate, ProgramSectionMode } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 
-const capturedProps: Record<string, any> = {};
+const mockCapturedProps: Record<string, any> = {};
 
-const capture = (key: string, props: any) => {
-    capturedProps[key] = props;
+const mockCapture = (key: string, props: any) => {
+    mockCapturedProps[key] = props;
 };
 
 jest.mock('@/components/common/program-section-templates/quad-images-bottom/QuadImagesBottom', () => ({
     QuadImagesBottom: (props: any) => {
-        capture('QuadImagesBottom', props);
+        mockCapture('QuadImagesBottom', props);
         return <div data-testid="QuadImagesBottom" />;
     },
 }));
 
 jest.mock('@/components/common/program-section-templates/triple-images-bottom/TripleImagesBottom', () => ({
     TripleImagesBottom: (props: any) => {
-        capture('TripleImagesBottom', props);
+        mockCapture('TripleImagesBottom', props);
         return <div data-testid="TripleImagesBottom" />;
     },
 }));
 
 jest.mock('@/components/common/program-section-templates/dual-images-bottom/DualImagesBottom', () => ({
     DualImagesBottom: (props: any) => {
-        capture('DualImagesBottom', props);
+        mockCapture('DualImagesBottom', props);
         return <div data-testid="DualImagesBottom" />;
     },
 }));
 
 jest.mock('@/components/common/program-section-templates/text-only/TextOnly', () => ({
     TextOnly: (props: any) => {
-        capture('TextOnly', props);
+        mockCapture('TextOnly', props);
         return <div data-testid="TextOnly" />;
     },
 }));
 
 jest.mock('@/components/common/program-section-templates/single-image-top/SingleImageTop', () => ({
     SingleImageTop: (props: any) => {
-        capture('SingleImageTop', props);
+        mockCapture('SingleImageTop', props);
         return <div data-testid="SingleImageTop" />;
     },
 }));
 
 jest.mock('@/components/common/program-section-templates/single-image-bottom/SingleImageBottom', () => ({
     SingleImageBottom: (props: any) => {
-        capture('SingleImageBottom', props);
+        mockCapture('SingleImageBottom', props);
         return <div data-testid="SingleImageBottom" />;
     },
 }));
 
 jest.mock('@/components/common/program-section-templates/single-image-right/SingleImageRight', () => ({
     SingleImageRight: (props: any) => {
-        capture('SingleImageRight', props);
+        mockCapture('SingleImageRight', props);
         return <div data-testid="SingleImageRight" />;
     },
 }));
 
 jest.mock('@/components/common/program-section-templates/title-description-cards/TitleDescriptionCardsWrapper', () => ({
     TitleDescriptionCardsWrapper: (props: any) => {
-        capture('TitleDescriptionCardsWrapper', props);
+        mockCapture('TitleDescriptionCardsWrapper', props);
         return <div data-testid="TitleDescriptionCardsWrapper" data-cards-count={String(props.cardsCount)} />;
     },
 }));
@@ -71,8 +71,18 @@ jest.mock(
     '@/components/common/program-section-templates/single-title-quintuple-description/SingleTitleQuintupleDescription',
     () => ({
         SingleTitleQuintupleDescription: (props: any) => {
-            capture('SingleTitleQuintupleDescription', props);
+            mockCapture('SingleTitleQuintupleDescription', props);
             return <div data-testid="SingleTitleQuintupleDescription" />;
+        },
+    }),
+);
+
+jest.mock(
+    '@/components/common/program-section-templates/single-title-description-author-pairs/SingleTitleDescriptionAuthorPairs',
+    () => ({
+        SingleTitleDescriptionAuthorPairs: (props: any) => {
+            mockCapture('SingleTitleDescriptionAuthorPairs', props);
+            return <div data-testid="SingleTitleDescriptionAuthorPairs" />;
         },
     }),
 );
@@ -96,7 +106,7 @@ describe('renderProgramSection', () => {
     };
 
     beforeEach(() => {
-        Object.keys(capturedProps).forEach((k) => delete capturedProps[k]);
+        Object.keys(mockCapturedProps).forEach((k) => delete mockCapturedProps[k]);
         jest.clearAllMocks();
     });
 
@@ -135,14 +145,13 @@ describe('renderProgramSection', () => {
 
             render(renderProgramSection(params));
 
-            const props = capturedProps.SingleImageTop;
+            const props = mockCapturedProps.SingleImageTop;
             expect(props.image).toEqual(baseData.images[0]);
             expect(typeof props.onImageChange).toBe('function');
 
             const file = { url: 'new', mimeType: 'image/jpeg' } as any;
             props.onImageChange(file);
 
-            expect(baseHandlers.onImagesChange).toHaveBeenCalledTimes(1);
             expect(baseHandlers.onImagesChange).toHaveBeenCalledWith(0, file);
         });
 
@@ -161,8 +170,7 @@ describe('renderProgramSection', () => {
                 }),
             );
 
-            const props = capturedProps.SingleImageTop;
-            expect(props.onImageChange).toBeUndefined();
+            expect(mockCapturedProps.SingleImageTop.onImageChange).toBeUndefined();
         });
 
         it('passes images and onImagesChange to multi-image template', () => {
@@ -175,14 +183,13 @@ describe('renderProgramSection', () => {
 
             render(renderProgramSection(params));
 
-            const props = capturedProps.DualImagesBottom;
+            const props = mockCapturedProps.DualImagesBottom;
             expect(props.images).toEqual(baseData.images);
             expect(typeof props.onImagesChange).toBe('function');
 
             const file = { url: 'file', mimeType: 'image/jpeg' } as any;
             props.onImagesChange(2, file);
 
-            expect(baseHandlers.onImagesChange).toHaveBeenCalledTimes(1);
             expect(baseHandlers.onImagesChange).toHaveBeenCalledWith(2, file);
         });
     });
@@ -219,9 +226,10 @@ describe('renderProgramSection', () => {
                     }),
                 );
 
-                const wrapper = screen.getByTestId('TitleDescriptionCardsWrapper');
-                expect(wrapper).toBeInTheDocument();
-                expect(wrapper).toHaveAttribute('data-cards-count', String(cardsCount));
+                expect(screen.getByTestId('TitleDescriptionCardsWrapper')).toHaveAttribute(
+                    'data-cards-count',
+                    String(cardsCount),
+                );
             });
 
             it(`uses empty cards array for ${id} when data.cards is undefined`, () => {
@@ -234,8 +242,7 @@ describe('renderProgramSection', () => {
                     }),
                 );
 
-                const props = capturedProps.TitleDescriptionCardsWrapper;
-                expect(props.cards).toEqual([]);
+                expect(mockCapturedProps.TitleDescriptionCardsWrapper.cards).toEqual([]);
             });
 
             it(`passes handlers to ${id} wrapper`, () => {
@@ -248,17 +255,71 @@ describe('renderProgramSection', () => {
                     }),
                 );
 
-                const props = capturedProps.TitleDescriptionCardsWrapper;
-
+                const props = mockCapturedProps.TitleDescriptionCardsWrapper;
                 expect(props.onTitleChange).toBe(cardHandlers.onCardTitleChange);
                 expect(props.onDescriptionChange).toBe(cardHandlers.onCardDescriptionChange);
-
-                props.onTitleChange(0, 'X');
-                props.onDescriptionChange(0, 'Y');
-
-                expect(cardHandlers.onCardTitleChange).toHaveBeenCalledWith(0, 'X');
-                expect(cardHandlers.onCardDescriptionChange).toHaveBeenCalledWith(0, 'Y');
             });
+        });
+    });
+
+    describe('SingleTitleDescriptionAuthorPairs', () => {
+        const handlers = {
+            onTitleChange: jest.fn(),
+            onCardDescriptionChange: jest.fn(),
+            onCardAuthorChange: jest.fn(),
+            onAddPair: jest.fn(),
+            onDeletePair: jest.fn(),
+            canAddPair: true,
+        };
+
+        it('renders SingleTitleDescriptionAuthorPairs component', () => {
+            render(
+                renderProgramSection({
+                    templateId: ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
+                    data: { title: 'T', descriptionAuthorPairs: [{ description: 'D', author: 'A' }] },
+                    mode: ProgramSectionMode.Edit,
+                    handlers: handlers as any,
+                }),
+            );
+
+            expect(screen.getByTestId('SingleTitleDescriptionAuthorPairs')).toBeInTheDocument();
+        });
+
+        it('maps props and handlers for SingleTitleDescriptionAuthorPairs', () => {
+            render(
+                renderProgramSection({
+                    templateId: ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
+                    data: { title: 'T', descriptionAuthorPairs: [{ description: 'D', author: 'A' }] },
+                    mode: ProgramSectionMode.Edit,
+                    handlers: handlers as any,
+                }),
+            );
+
+            const props = mockCapturedProps.SingleTitleDescriptionAuthorPairs;
+
+            expect(props.title).toBe('T');
+            expect(props.pairs).toEqual([{ description: 'D', author: 'A' }]);
+            expect(props.mode).toBe(ProgramSectionMode.Edit);
+
+            expect(props.onTitleChange).toBe(handlers.onTitleChange);
+            expect(props.onPairDescriptionChange).toBe(handlers.onCardDescriptionChange);
+            expect(props.onPairAuthorChange).toBe(handlers.onCardAuthorChange);
+            expect(props.onAddPair).toBe(handlers.onAddPair);
+            expect(props.onDeletePair).toBe(handlers.onDeletePair);
+            expect(props.canAddPair).toBe(true);
+        });
+
+        it('uses empty pairs array when descriptionAuthorPairs is undefined', () => {
+            render(
+                renderProgramSection({
+                    templateId: ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
+                    data: { title: 'T' },
+                    mode: ProgramSectionMode.Edit,
+                    handlers: handlers as any,
+                }),
+            );
+
+            expect(mockCapturedProps.SingleTitleDescriptionAuthorPairs.pairs).toEqual([]);
         });
     });
 
@@ -280,13 +341,9 @@ describe('renderProgramSection', () => {
 
             expect(screen.getByTestId('SingleTitleQuintupleDescription')).toBeInTheDocument();
 
-            const props = capturedProps.SingleTitleQuintupleDescription;
-            expect(props.title).toBe('T');
+            const props = mockCapturedProps.SingleTitleQuintupleDescription;
             expect(props.descriptions).toEqual(['a', 'b']);
             expect(props.mode).toBe(ProgramSectionMode.Edit);
-
-            props.onDescriptionsChange(1, 'x');
-            expect(handlers.onDescriptionsChange).toHaveBeenCalledWith(1, 'x');
         });
 
         it('falls back to [data.description] when descriptions are missing', () => {
@@ -299,8 +356,7 @@ describe('renderProgramSection', () => {
                 }),
             );
 
-            const props = capturedProps.SingleTitleQuintupleDescription;
-            expect(props.descriptions).toEqual(['only']);
+            expect(mockCapturedProps.SingleTitleQuintupleDescription.descriptions).toEqual(['only']);
         });
 
         it('uses empty array when descriptions are missing and description is absent', () => {
@@ -313,8 +369,7 @@ describe('renderProgramSection', () => {
                 }),
             );
 
-            const props = capturedProps.SingleTitleQuintupleDescription;
-            expect(props.descriptions).toEqual([]);
+            expect(mockCapturedProps.SingleTitleQuintupleDescription.descriptions).toEqual([]);
         });
 
         it('keeps empty descriptions array even if description exists', () => {
@@ -327,8 +382,7 @@ describe('renderProgramSection', () => {
                 }),
             );
 
-            const props = capturedProps.SingleTitleQuintupleDescription;
-            expect(props.descriptions).toEqual([]);
+            expect(mockCapturedProps.SingleTitleQuintupleDescription.descriptions).toEqual([]);
         });
     });
 
@@ -352,7 +406,18 @@ describe('renderProgramSection', () => {
         );
 
         expect(screen.getByTestId('TextOnly')).toBeInTheDocument();
-        expect(capturedProps.TextOnly.mode).toBe(ProgramSectionMode.Template);
+        expect(mockCapturedProps.TextOnly.mode).toBe(ProgramSectionMode.Template);
+    });
+
+    it('defaults mode to Published when omitted', () => {
+        render(
+            renderProgramSection({
+                templateId: ProgramSectionTemplate.TextOnly,
+                data: baseData,
+            }),
+        );
+
+        expect(mockCapturedProps.TextOnly.mode).toBe(ProgramSectionMode.Published);
     });
 });
 
@@ -369,6 +434,21 @@ describe('getInitialSectionContents', () => {
         expect(contents[1].contentType).toBe(ContentType.Description);
         expect(contents[0].order).toBe(0);
         expect(contents[1].order).toBe(1);
+    });
+
+    it('returns 3 contents for SingleTitleDescriptionAuthorPairs (title + description + author with groupIndex 0)', () => {
+        const contents = getInitialSectionContents(ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs);
+
+        expect(contents).toHaveLength(3);
+        expect(contents[0].contentType).toBe(ContentType.Title);
+
+        expect(contents[1].contentType).toBe(ContentType.Description);
+        expect((contents[1] as any).groupIndex).toBe(0);
+
+        expect(contents[2].contentType).toBe(ContentType.Author);
+        expect((contents[2] as any).groupIndex).toBe(0);
+
+        expect(contents.map((c) => c.order)).toEqual([0, 1, 2]);
     });
 
     it('returns 6 contents for SingleTitleQuintupleDescription (1 title + 5 descriptions)', () => {

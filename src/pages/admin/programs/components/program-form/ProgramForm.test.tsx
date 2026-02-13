@@ -12,6 +12,8 @@ import { PhotoInputGroupProps } from '@/components/admin/input-groups/photo-inpu
 import { ButtonProps } from '@/components/admin/button/Button';
 import { ProgramSection } from '@/types/common/program-sections';
 
+HTMLElement.prototype.scrollIntoView = jest.fn();
+
 jest.mock('@/validation/admin/program-schema/program-schema', () => ({
     PROGRAM_VALIDATION_FUNCTIONS: {
         validateName: jest.fn(),

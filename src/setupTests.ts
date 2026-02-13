@@ -14,4 +14,3 @@ global.TextDecoder = TextDecoder as any;
 process.env.REACT_APP_BACKEND_URL = 'mocked-backend-url';
 
 HTMLElement.prototype.scrollIntoView = jest.fn();
-

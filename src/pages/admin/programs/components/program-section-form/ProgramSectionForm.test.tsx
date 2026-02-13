@@ -343,4 +343,81 @@ describe('ProgramSectionForm', () => {
 
         expect(baseProps.onSave).not.toHaveBeenCalled();
     });
+
+    it('calls onSectionChange and updates card title when onCardTitleChange is invoked', () => {
+        const section = makeSection({
+            template: ProgramSectionTemplate.DualTitleDescription,
+            contents: [
+                makeTitleContent('Card 1 Title', 0),
+                makeTitleContent('Card 2 Title', 1),
+                makeDescriptionContent(0, 'Card 1 Desc'),
+                makeDescriptionContent(1, 'Card 2 Desc'),
+            ],
+        });
+
+        const { handlers, onSectionChange } = renderWithHandlers({ section });
+
+        act(() => {
+            handlers.onCardTitleChange(1, 'Updated Card 2 Title');
+        });
+
+        expect(onSectionChange).toHaveBeenCalledTimes(1);
+
+        const updated = onSectionChange.mock.calls[0][0] as ProgramSection;
+        const orderedTitles = updated.contents
+            .filter((c) => c.contentType === ContentType.Title)
+            .sort((a, b) => a.order - b.order);
+
+        expect(orderedTitles[0].title).toBe('Card 1 Title');
+        expect(orderedTitles[1].title).toBe('Updated Card 2 Title');
+    });
+
+    it('calls onSectionChange and updates card description when onCardDescriptionChange is invoked', () => {
+        const section = makeSection({
+            template: ProgramSectionTemplate.TripleTitleDescription,
+            contents: [
+                makeTitleContent('Card 1', 0),
+                makeTitleContent('Card 2', 1),
+                makeTitleContent('Card 3', 2),
+                makeDescriptionContent(0, 'Desc 1'),
+                makeDescriptionContent(1, 'Desc 2'),
+                makeDescriptionContent(2, 'Desc 3'),
+            ],
+        });
+
+        const { handlers, onSectionChange } = renderWithHandlers({ section });
+
+        act(() => {
+            handlers.onCardDescriptionChange(0, 'Updated Desc 1');
+        });
+
+        expect(onSectionChange).toHaveBeenCalledTimes(1);
+
+        const updated = onSectionChange.mock.calls[0][0] as ProgramSection;
+        const orderedDescs = updated.contents
+            .filter((c) => c.contentType === ContentType.Description)
+            .sort((a, b) => a.order - b.order);
+
+        expect(orderedDescs[0].description).toBe('Updated Desc 1');
+        expect(orderedDescs[1].description).toBe('Desc 2');
+        expect(orderedDescs[2].description).toBe('Desc 3');
+    });
+
+    it('calls onDelete when Delete button is clicked', () => {
+        const onDelete = jest.fn();
+        renderForm({ isNewSection: false, onDelete });
+
+        fireEvent.click(screen.getByLabelText('Delete section'));
+
+        expect(onDelete).toHaveBeenCalledTimes(1);
+    });
+
+    it('calls onRequestReplace when Replace button is clicked', () => {
+        const onRequestReplace = jest.fn();
+        renderForm({ isNewSection: false, onRequestReplace });
+
+        fireEvent.click(screen.getByLabelText('Replace section'));
+
+        expect(onRequestReplace).toHaveBeenCalledTimes(1);
+    });
 });

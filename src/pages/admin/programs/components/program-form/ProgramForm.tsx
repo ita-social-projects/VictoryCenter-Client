@@ -62,6 +62,7 @@ export interface ProgramFormProps {
     categories?: ProgramCategory[];
     onValidationChange?: (isValid: boolean) => void;
     onAddSection?: () => void;
+    onReplaceSection?: (sectionIndex: number) => void;
     selectedLanguage?: string;
     onLanguageChange?: (language: string) => void;
     onRequestCancelSection?: (request: { type: SectionCancelActionType; onDiscard: () => void }) => void;
@@ -101,6 +102,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             categories = [],
             onValidationChange,
             onAddSection,
+            onReplaceSection,
             onRequestCancelSection,
         }: ProgramFormProps,
         ref,
@@ -701,14 +703,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                             }
                                             onDelete={() => handleDeleteSection(sectionKey)}
                                             isReplacingTemplate={sectionState.isReplacing}
-                                            onRequestReplace={() => {
-                                                if (onRequestCancelSection) {
-                                                    onRequestCancelSection({
-                                                        type: SectionCancelActionType.RevertSection,
-                                                        onDiscard: () => {},
-                                                    });
-                                                }
-                                            }}
+                                            onRequestReplace={() => onReplaceSection?.(index)}
                                         />
                                         <div className={styles['sections-divider']} />
                                     </React.Fragment>

@@ -80,7 +80,9 @@ export const ProgramSectionForm = ({
         }
         setLocalSection(section);
         if (sectionModeRef.current !== ProgramSectionMode.Edit) {
-            setOriginalSection(section);
+            if (!isReplacingTemplate) {
+                setOriginalSection(section);
+            }
             setIsDirty(false);
             setSectionMode(isNewSection || isReplacingTemplate ? ProgramSectionMode.Edit : ProgramSectionMode.View);
         }

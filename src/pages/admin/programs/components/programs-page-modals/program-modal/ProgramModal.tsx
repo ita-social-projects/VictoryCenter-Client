@@ -204,6 +204,14 @@ export const ProgramModal = (props: ProgramModalProps) => {
         setSectionToReplace(null);
     }, [closeModalActions]);
 
+    const handleReplaceSection = useCallback(
+        (sectionIndex: number) => {
+            setSectionToReplace(sectionIndex);
+            openModalActions.openAddSectionModal();
+        },
+        [openModalActions],
+    );
+
     return (
         <div className="program-modal">
             <GenericModalWrapper
@@ -239,6 +247,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
                         onValidationChange={props.onValidationChange}
                         onLanguageChange={handleLanguageChange}
                         onAddSection={openModalActions.openAddSectionModal}
+                        onReplaceSection={handleReplaceSection}
                         onRequestCancelSection={handleRequestCancelSection}
                     />
                 )}

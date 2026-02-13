@@ -136,7 +136,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             (section: ProgramSection) => {
                 setFormState((prev) => ({
                     ...prev,
-                    sections: [section, ...prev.sections],
+                    sections: [...prev.sections, section],
                 }));
             },
             [setFormState],
@@ -305,6 +305,8 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
         );
 
         const hasSections = formState.sections.length > 0;
+
+        const sectionsContainerRef = useRef<HTMLDivElement>(null);
 
         return (
             <form className={styles['container']} noValidate>
@@ -483,7 +485,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                     )}
 
                     {hasSections && (
-                        <div className={styles['sections-list']}>
+                        <div className={styles['sections-list']} ref={sectionsContainerRef}>
                             {formState.sections.map((section, index) => (
                                 <React.Fragment key={section.id ?? `${section.template}-${index}`}>
                                     <ProgramSectionForm

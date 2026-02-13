@@ -38,6 +38,38 @@ const getDescriptionsInOrder = (contents: ProgramSectionContent[]) => {
     return contents.filter((c) => c.contentType === ContentType.Description).sort((a, b) => a.order - b.order);
 };
 
+const getDescriptionAuthorPairs = (contents: ProgramSectionContent[]) => {
+    const map = new Map<number, { description: string; author: string }>();
+
+    for (const c of contents) {
+        if (c.groupIndex === null || c.groupIndex === undefined) continue;
+
+        const groupIndex = c.groupIndex;
+
+        if (!map.has(groupIndex)) {
+            map.set(groupIndex, { description: '', author: '' });
+        }
+
+        const entry = map.get(groupIndex)!;
+
+        if (c.contentType === ContentType.Description) {
+            entry.description = c.description || '';
+        }
+
+        if (c.contentType === ContentType.Author) {
+            entry.author = c.author || '';
+        }
+    }
+
+    return Array.from(map.entries())
+        .sort((a, b) => a[0] - b[0])
+        .map(([groupIndex, v]) => ({
+            groupIndex,
+            description: v.description,
+            author: v.author,
+        }));
+};
+
 export const ProgramSectionForm = ({
     section,
     onSave,
@@ -91,6 +123,16 @@ export const ProgramSectionForm = ({
 
     const descriptions = orderedDescriptionContents.map((c) => c.description || '');
     const description = descriptions[0] || '';
+
+    const isDescriptionAuthorPairsTemplate =
+        section.template === ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs;
+
+    const orderedPairs = getDescriptionAuthorPairs(localSection.contents);
+
+    const descriptionAuthorPairs = orderedPairs.map((p) => ({
+        description: p.description,
+        author: p.author,
+    }));
 
     const imageContents = localSection.contents
         .filter((c) => c.contentType === ContentType.Image)
@@ -210,6 +252,95 @@ export const ProgramSectionForm = ({
         [onSectionChange, updateImageContent],
     );
 
+    const handlePairFieldChange = useCallback(
+        (index: number, value: string, field: ContentType.Description | ContentType.Author) => {
+            setLocalSection((prev) => {
+                const pairs = getDescriptionAuthorPairs(prev.contents);
+                const target = pairs[index];
+                if (!target) return prev;
+
+                const updatedContents = prev.contents.map((c) => {
+                    if (c.groupIndex !== target.groupIndex || c.contentType !== field) return c;
+
+                    if (field === ContentType.Description) {
+                        return { ...c, description: value };
+                    }
+
+                    return { ...c, author: value };
+                });
+
+                const updatedSection = { ...prev, contents: updatedContents };
+                onSectionChange?.(updatedSection);
+                return updatedSection;
+            });
+        },
+        [onSectionChange],
+    );
+
+    const handlePairDescriptionChange = useCallback(
+        (index: number, value: string) => handlePairFieldChange(index, value, ContentType.Description),
+        [handlePairFieldChange],
+    );
+
+    const handlePairAuthorChange = useCallback(
+        (index: number, value: string) => handlePairFieldChange(index, value, ContentType.Author),
+        [handlePairFieldChange],
+    );
+
+    const handleAddPair = useCallback(() => {
+        setLocalSection((prev) => {
+            const groupIndexes = prev.contents
+                .map((c) => c.groupIndex)
+                .filter((x): x is number => x !== null && x !== undefined);
+
+            const nextGroupIndex = groupIndexes.length ? Math.max(...groupIndexes) + 1 : 0;
+
+            const maxOrder = prev.contents.length ? Math.max(...prev.contents.map((c) => c.order)) : -1;
+            const descriptionOrder = maxOrder + 1;
+            const authorOrder = maxOrder + 2;
+
+            const updatedSection: ProgramSection = {
+                ...prev,
+                contents: [
+                    ...prev.contents,
+                    {
+                        contentType: ContentType.Description,
+                        order: descriptionOrder,
+                        groupIndex: nextGroupIndex,
+                        description: '',
+                    },
+                    {
+                        contentType: ContentType.Author,
+                        order: authorOrder,
+                        groupIndex: nextGroupIndex,
+                        author: '',
+                    },
+                ],
+            };
+
+            onSectionChange?.(updatedSection);
+            return updatedSection;
+        });
+    }, [onSectionChange]);
+
+    const handleDeletePair = useCallback(
+        (index: number) => {
+            setLocalSection((prev) => {
+                const pairs = getDescriptionAuthorPairs(prev.contents);
+                const target = pairs[index];
+                if (!target) return prev;
+
+                const updatedSection: ProgramSection = {
+                    ...prev,
+                    contents: prev.contents.filter((c) => c.groupIndex !== target.groupIndex),
+                };
+
+                onSectionChange?.(updatedSection);
+                return updatedSection;
+            });
+        },
+        [onSectionChange],
+    );
     const handleEditClick = useCallback(() => {
         setOriginalSection(localSection);
         setIsDirty(false);
@@ -230,6 +361,9 @@ export const ProgramSectionForm = ({
         ProgramSectionTemplate.TripleTitleDescription,
         ProgramSectionTemplate.QuadTitleDescription,
     ];
+
+    //TODO: implement validation
+    const canAddPair = true;
 
     const isCardTemplate = CARD_TEMPLATES.includes(section.template);
 
@@ -261,6 +395,7 @@ export const ProgramSectionForm = ({
             descriptions,
             images: imageContents,
             ...(isCardTemplate ? { cards } : {}),
+            ...(isDescriptionAuthorPairsTemplate ? { descriptionAuthorPairs } : {}),
         },
         mode: sectionMode,
         validationResetKey,
@@ -275,6 +410,16 @@ export const ProgramSectionForm = ({
                           handleCardContentChange(index, value, ContentType.Title),
                       onCardDescriptionChange: (index: number, value: string) =>
                           handleCardContentChange(index, value, ContentType.Description),
+                  }
+                : {}),
+
+            ...(isDescriptionAuthorPairsTemplate
+                ? {
+                      onCardDescriptionChange: handlePairDescriptionChange,
+                      onCardAuthorChange: handlePairAuthorChange,
+                      onAddPair: handleAddPair,
+                      onDeletePair: handleDeletePair,
+                      canAddPair,
                   }
                 : {}),
         },

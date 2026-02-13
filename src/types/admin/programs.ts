@@ -54,4 +54,5 @@ export interface ProgramCategoryCreateUpdate {
 export enum SectionCancelActionType {
     RemoveSection,
     RevertSection,
+    RevertAfterReplace,
 }

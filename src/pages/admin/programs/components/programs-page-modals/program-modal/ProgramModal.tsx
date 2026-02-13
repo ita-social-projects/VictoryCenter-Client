@@ -44,6 +44,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
     const [sectionToReplace, setSectionToReplace] = useState<number | null>(null);
     const [isSectionRemoveModalOpen, setIsSectionRemoveModalOpen] = useState(false);
     const [isSectionRevertModalOpen, setIsSectionRevertModalOpen] = useState(false);
+    const [pendingCancelActionType, setPendingCancelActionType] = useState<SectionCancelActionType | null>(null);
     const sectionDiscardActionRef = useRef<(() => void) | null>(null);
 
     const initialData = useMemo<ProgramFormValues | null>(() => {
@@ -164,12 +165,14 @@ export const ProgramModal = (props: ProgramModalProps) => {
     const handleRequestCancelSection = useCallback(
         (request: { type: SectionCancelActionType; onDiscard: () => void }) => {
             sectionDiscardActionRef.current = request.onDiscard;
+            setPendingCancelActionType(request.type);
 
             switch (request.type) {
                 case SectionCancelActionType.RemoveSection:
                     setIsSectionRemoveModalOpen(true);
                     break;
                 case SectionCancelActionType.RevertSection:
+                case SectionCancelActionType.RevertAfterReplace:
                     setIsSectionRevertModalOpen(true);
                     break;
                 default:
@@ -181,11 +184,13 @@ export const ProgramModal = (props: ProgramModalProps) => {
 
     const handleCloseSectionRemoveModal = useCallback(() => {
         setIsSectionRemoveModalOpen(false);
+        setPendingCancelActionType(null);
         sectionDiscardActionRef.current = null;
     }, []);
 
     const handleCloseSectionRevertModal = useCallback(() => {
         setIsSectionRevertModalOpen(false);
+        setPendingCancelActionType(null);
         sectionDiscardActionRef.current = null;
     }, []);
 
@@ -269,7 +274,11 @@ export const ProgramModal = (props: ProgramModalProps) => {
             <ConfirmationModal
                 isOpen={isSectionRevertModalOpen}
                 onClose={handleCloseSectionRevertModal}
-                title={COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE}
+                title={
+                    pendingCancelActionType === SectionCancelActionType.RevertAfterReplace
+                        ? PROGRAMS_TEXT.SECTION.MODAL.REPLACE_TEMPLATE_TITLE
+                        : COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE
+                }
                 onConfirm={handleConfirmRevertSection}
                 onCancel={handleCloseSectionRevertModal}
             />

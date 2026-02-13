@@ -452,8 +452,13 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                     if (onRequestCancelSection) {
                         const type = options.shouldRemove
                             ? SectionCancelActionType.RemoveSection
-                            : SectionCancelActionType.RevertSection;
-                        onRequestCancelSection({ type, onDiscard: discard });
+                            : options.isTemplateReplacement
+                              ? SectionCancelActionType.RevertAfterReplace
+                              : SectionCancelActionType.RevertSection;
+                        onRequestCancelSection({
+                            type,
+                            onDiscard: discard,
+                        });
                     } else {
                         discard();
                     }

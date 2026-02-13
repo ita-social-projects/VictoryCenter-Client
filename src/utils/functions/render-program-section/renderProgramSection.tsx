@@ -11,10 +11,16 @@ import { SingleImageBottom } from '@/components/common/program-section-templates
 import { SingleImageRight } from '@/components/common/program-section-templates/single-image-right/SingleImageRight';
 import { TitleDescriptionCardsWrapper } from '@/components/common/program-section-templates/title-description-cards/TitleDescriptionCardsWrapper';
 import { SingleTitleQuintupleDescription } from '@/components/common/program-section-templates/single-title-quintuple-description/SingleTitleQuintupleDescription';
+import { SingleTitleDescriptionAuthorPairs } from '@/components/common/program-section-templates/single-title-description-author-pairs/SingleTitleDescriptionAuthorPairs';
 
 export interface ProgramSectionCardData {
     title: string;
     description: string;
+}
+
+export interface DescriptionAuthorPairData {
+    description: string;
+    author: string;
 }
 
 export interface ProgramSectionData {
@@ -23,6 +29,7 @@ export interface ProgramSectionData {
     descriptions?: string[];
     images?: (Image | ImageValues | null)[];
     cards?: ProgramSectionCardData[];
+    descriptionAuthorPairs?: DescriptionAuthorPairData[];
 }
 
 export interface ProgramSectionHandlers {
@@ -32,6 +39,10 @@ export interface ProgramSectionHandlers {
     onImagesChange?: (index: number, file: ImageValues | null) => void;
     onCardTitleChange?: (index: number, value: string) => void;
     onCardDescriptionChange?: (index: number, value: string) => void;
+    onCardAuthorChange?: (index: number, value: string) => void;
+    onAddPair?: () => void;
+    onDeletePair?: (index: number) => void;
+    canAddPair?: boolean;
 }
 
 export interface RenderProgramSectionParams {
@@ -39,6 +50,7 @@ export interface RenderProgramSectionParams {
     data: ProgramSectionData;
     mode?: ProgramSectionMode;
     handlers?: ProgramSectionHandlers;
+    validationResetKey?: number;
 }
 
 const createItem = (
@@ -50,6 +62,7 @@ const createItem = (
     order,
     title: type === ContentType.Title ? '' : null,
     description: type === ContentType.Description ? '' : null,
+    author: type === ContentType.Author ? '' : null,
     image: null,
     ...overrides,
 });
@@ -95,6 +108,7 @@ interface StandardTemplateProps {
     mode?: ProgramSectionMode;
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
+    validationResetKey?: number;
 }
 
 type StandardTemplateComponentProps =
@@ -120,6 +134,14 @@ const STANDARD_TEMPLATES_MAP: Partial<
 };
 
 export const getInitialSectionContents = (templateId: ProgramSectionTemplate): ProgramSectionContent[] => {
+    if (templateId === ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs) {
+        return [
+            createItem(ContentType.Title, 0),
+            createItem(ContentType.Description, 1, { groupIndex: 0 }),
+            createItem(ContentType.Author, 2, { groupIndex: 0 }),
+        ];
+    }
+
     const cardCount = CARD_COUNT_MAP[templateId];
     if (cardCount) return createCardContents(cardCount);
 
@@ -139,6 +161,7 @@ export const renderProgramSection = ({
     data,
     mode = ProgramSectionMode.Published,
     handlers,
+    validationResetKey,
 }: RenderProgramSectionParams): React.ReactElement | null => {
     const cardCount = CARD_COUNT_MAP[templateId];
     if (cardCount) {
@@ -149,6 +172,23 @@ export const renderProgramSection = ({
                 mode={mode}
                 onTitleChange={handlers?.onCardTitleChange}
                 onDescriptionChange={handlers?.onCardDescriptionChange}
+                validationResetKey={validationResetKey}
+            />
+        );
+    }
+
+    if (templateId === ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs) {
+        return (
+            <SingleTitleDescriptionAuthorPairs
+                title={data.title}
+                pairs={data.descriptionAuthorPairs ?? []}
+                mode={mode}
+                onTitleChange={handlers?.onTitleChange}
+                onPairDescriptionChange={handlers?.onCardDescriptionChange}
+                onPairAuthorChange={handlers?.onCardAuthorChange}
+                onAddPair={handlers?.onAddPair}
+                onDeletePair={handlers?.onDeletePair}
+                canAddPair={handlers?.canAddPair}
             />
         );
     }
@@ -176,6 +216,7 @@ export const renderProgramSection = ({
         mode,
         onTitleChange: handlers?.onTitleChange,
         onDescriptionChange: handlers?.onDescriptionChange,
+        validationResetKey,
     };
 
     if (SINGLE_IMAGE_TEMPLATES.has(templateId)) {

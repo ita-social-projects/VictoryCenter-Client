@@ -1,6 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import cn from 'classnames';
-import { nanoid } from 'nanoid';
 import { TitleDescriptionSection } from '../title-description-section/TitleDescriptionSection';
 import { ImageValues, Image } from '@/types/common/image';
 import baseStyles from './ImagesBottomSection.module.scss';
@@ -42,6 +41,7 @@ export interface ImagesBottomSectionProps {
     mode?: ProgramSectionMode;
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
+    validationResetKey?: number;
     className?: string;
     topSectionClassName?: string;
     bottomSectionClassName?: string;
@@ -58,12 +58,14 @@ export const ImagesBottomSection = ({
     mode = ProgramSectionMode.Published,
     onTitleChange,
     onDescriptionChange,
+    validationResetKey,
     className = '',
     topSectionClassName = '',
     bottomSectionClassName = '',
     imageWrapperClassName = '',
     imageClassName = '',
 }: ImagesBottomSectionProps) => {
+    const idPrefix = useId();
     const [errors, setErrors] = useState<string[]>([]);
 
     const displayedImages = useMemo(() => images.slice(0, config.imageCount), [images, config.imageCount]);
@@ -73,8 +75,8 @@ export const ImagesBottomSection = ({
     );
 
     const imageKeys = useMemo(
-        () => Array.from({ length: displayedImages.length }, () => nanoid()),
-        [displayedImages.length],
+        () => Array.from({ length: displayedImages.length }, (_, index) => `${idPrefix}-image-${index}`),
+        [displayedImages.length, idPrefix],
     );
 
     const handleSetError = (index: number, error: string | null) => {
@@ -105,6 +107,7 @@ export const ImagesBottomSection = ({
                 mode={mode}
                 onTitleChange={onTitleChange}
                 onDescriptionChange={onDescriptionChange}
+                validationResetKey={validationResetKey}
             />
             {mode === ProgramSectionMode.Published ? (
                 <PublishedImagesBottomSection

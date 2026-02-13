@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { PROGRAM_SECTION_VALIDATION } from '@/const/admin/programs';
 import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
@@ -15,14 +15,21 @@ export interface UseProgramSectionValidationReturn {
 export interface UseProgramSectionValidationProps {
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
+    resetKey?: number;
 }
 
 export const useProgramSectionValidation = ({
     onTitleChange,
     onDescriptionChange,
+    resetKey,
 }: UseProgramSectionValidationProps): UseProgramSectionValidationReturn => {
     const [titleError, setTitleError] = useState<string | undefined>(undefined);
     const [descriptionError, setDescriptionError] = useState<string | undefined>(undefined);
+
+    useEffect(() => {
+        setTitleError(undefined);
+        setDescriptionError(undefined);
+    }, [resetKey]);
 
     const handleTitleChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

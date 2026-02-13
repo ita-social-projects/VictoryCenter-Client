@@ -294,9 +294,9 @@ export const ProgramSectionForm = ({
     );
 
     const CARD_TEMPLATES = [
-        ProgramSectionTemplate.DualTitleDescription,
-        ProgramSectionTemplate.TripleTitleDescription,
-        ProgramSectionTemplate.QuadTitleDescription,
+        ProgramSectionTemplate.DualTitleDescriptionPairs,
+        ProgramSectionTemplate.TripleTitleDescriptionPairs,
+        ProgramSectionTemplate.QuadTitleDescriptionPairs,
     ];
 
     //TODO: implement validation

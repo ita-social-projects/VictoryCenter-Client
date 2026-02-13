@@ -90,9 +90,9 @@ const IMAGE_COUNT_MAP: Partial<Record<ProgramSectionTemplate, number>> = {
 };
 
 const CARD_COUNT_MAP: Partial<Record<ProgramSectionTemplate, number>> = {
-    [ProgramSectionTemplate.DualTitleDescription]: 2,
-    [ProgramSectionTemplate.TripleTitleDescription]: 3,
-    [ProgramSectionTemplate.QuadTitleDescription]: 4,
+    [ProgramSectionTemplate.DualTitleDescriptionPairs]: 2,
+    [ProgramSectionTemplate.TripleTitleDescriptionPairs]: 3,
+    [ProgramSectionTemplate.QuadTitleDescriptionPairs]: 4,
 };
 
 const SINGLE_IMAGE_TEMPLATES = new Set<ProgramSectionTemplate>([

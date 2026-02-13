@@ -43,9 +43,11 @@ export const DescriptionAuthorPairCard = ({
 
     return (
         <div className={cn(styles.card, styles.editable)}>
-            <button type="button" className={styles['delete-button']} onClick={handleDelete} aria-label="delete">
-                <DeleteIcon />
-            </button>
+            {index > 0 && (
+                <button type="button" className={styles['delete-button']} onClick={handleDelete} aria-label="delete">
+                    <DeleteIcon />
+                </button>
+            )}
 
             <div className={styles.fields}>
                 <div className={styles['description-field']}>

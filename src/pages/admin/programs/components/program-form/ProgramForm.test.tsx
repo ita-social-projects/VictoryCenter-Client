@@ -506,7 +506,9 @@ describe('ProgramForm', () => {
             await waitFor(() => {
                 expect(screen.getAllByTestId('program-section-form')).toHaveLength(3);
             });
-            expect(ref.current?.getSections()?.[0]).toMatchObject({ id: 202 });
+
+            const sections = ref.current?.getSections();
+            expect(sections?.[sections.length - 1]).toMatchObject({ id: newSection.id });
 
             await act(async () => {
                 ref.current?.removeSection(1);

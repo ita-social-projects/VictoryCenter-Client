@@ -142,12 +142,22 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             [setFormState],
         );
 
+        const sectionsContainerRef = useRef<HTMLDivElement>(null);
+
         const handleRemoveSection = useCallback(
             (sectionIndex: number) => {
                 setFormState((prev) => ({
                     ...prev,
                     sections: prev.sections.filter((_, index) => index !== sectionIndex),
                 }));
+
+                setTimeout(() => {
+                    const lastSection = sectionsContainerRef.current?.lastElementChild as HTMLElement | null;
+                    if (lastSection) {
+                        lastSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        lastSection.focus({ preventScroll: true });
+                    }
+                }, 0);
             },
             [setFormState],
         );
@@ -305,8 +315,6 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
         );
 
         const hasSections = formState.sections.length > 0;
-
-        const sectionsContainerRef = useRef<HTMLDivElement>(null);
 
         return (
             <form className={styles['container']} noValidate>

@@ -133,6 +133,7 @@ const mockTeamCategory: TeamCategory = {
     id: 1,
     name: 'Test Category',
     description: 'Test category description',
+    localizations: [],
     teamMembersCount: 5,
 };
 
@@ -142,6 +143,7 @@ const mockCategories: TeamCategory[] = [
         id: 2,
         name: 'Another Category',
         description: 'Another test category',
+        localizations: [],
         teamMembersCount: 3,
     },
 ];

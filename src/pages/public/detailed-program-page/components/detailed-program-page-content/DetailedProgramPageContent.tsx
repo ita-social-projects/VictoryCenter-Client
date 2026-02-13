@@ -43,19 +43,17 @@ export const DetailedProgramPageContent: React.FC = () => {
                             <div className={styles['left-section']}>
                                 <div>
                                     <h1 className={styles['program-name']}>{program.name}</h1>
-                                    {(program.location || program.participantsCount) && (
-                                        <div className={styles['program-info']}>
-                                            {program.location && <InfoItem icon={MapPin} text={program.location} />}
-                                            {program.participantsCount && (
-                                                <InfoItem icon={UsersRound} text={program.participantsCount} />
-                                            )}
-                                        </div>
-                                    )}
-                                    {program.meetingsCount && (
-                                        <div className={styles['program-meetings']}>
+                                    <div className={styles['program-info']}>
+                                        {program.location && <InfoItem icon={MapPin} text={program.location} />}
+                                        {program.participantsCount && (
+                                            <InfoItem icon={UsersRound} text={program.participantsCount} />
+                                        )}
+                                    </div>
+                                    <div className={styles['program-meetings']}>
+                                        {program.meetingsCount && (
                                             <InfoItem icon={CalendarDays} text={program.meetingsCount} />
-                                        </div>
-                                    )}
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                             <div className={styles['right-section']}>

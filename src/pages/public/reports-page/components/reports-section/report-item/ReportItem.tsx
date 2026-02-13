@@ -9,7 +9,7 @@ interface ReportItemProps {
     buttonLabel: string;
 }
 
-export const ReportItem: React.FC<ReportItemProps> = ({ fileUrl, label, buttonLabel }) => {
+export const ReportItem = ({ fileUrl, label, buttonLabel }: ReportItemProps) => {
     const handleClick = () => {
         if (fileUrl) window.open(fileUrl, '_blank');
     };

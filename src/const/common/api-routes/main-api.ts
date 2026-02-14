@@ -71,4 +71,8 @@ export const API_ROUTES = {
         SECTIONS: 'Partners/sections',
         PAGE: 'Partners/page',
     },
+    REPORTS: {
+        MEDIA_SETTINGS: 'Reports',
+        BASE: 'Reports',
+    },
 };

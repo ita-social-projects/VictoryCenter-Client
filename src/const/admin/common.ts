@@ -1,5 +1,6 @@
 export const COMMON_TEXT_ADMIN = {
     TAB: {
+        REPORTS: 'Звітність',
         TEAM_MEMBERS: 'Команда',
         PROGRAMS: 'Програми',
         DONATE: 'Донати',

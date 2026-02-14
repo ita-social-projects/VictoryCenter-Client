@@ -17,11 +17,12 @@ export enum ProgramSectionTemplate {
     SingleImageBottom = 5,
     SingleImageTop = 6,
     SingleImageRight = 7,
-    TripleTitleDescription = 8,
-    DualTitleDescription = 9,
+    DualTitleDescription = 8,
+    TripleTitleDescription = 9,
     QuadTitleDescription = 10,
     SingleTitleQuintupleDescription = 11,
     SingleTitleDescriptionAuthorPairs = 12,
+    SingleTitleQuestionAnswerPairs = 13,
 }
 
 export enum ProgramSectionMode {

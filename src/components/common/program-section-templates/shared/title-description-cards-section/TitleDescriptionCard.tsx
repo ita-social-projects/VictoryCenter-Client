@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import cn from 'classnames';
 import { parseDescriptionList } from '@/utils/functions/formatters/text-formatters';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
@@ -25,6 +26,7 @@ export const TitleDescriptionCard = ({
     onDescriptionChange,
     validationResetKey,
 }: TitleDescriptionCardProps) => {
+    const idPrefix = useId();
     const {
         error: titleError,
         handleChange: handleTitleChange,
@@ -59,8 +61,8 @@ export const TitleDescriptionCard = ({
                 <div className={styles['title-field']}>
                     <InputWithCharacterLimitGroup
                         label="Заголовок"
-                        id={`card-title-${index}`}
-                        name={`card-title-${index}`}
+                        id={`${idPrefix}-card-title-${index}`}
+                        name={`${idPrefix}-card-title-${index}`}
                         value={card.title}
                         isRequired={true}
                         onChange={handleTitleChange}
@@ -75,8 +77,8 @@ export const TitleDescriptionCard = ({
                 <div className={styles['description-field']}>
                     <CardDescriptionField
                         label="Опис"
-                        id={`card-description-${index}`}
-                        name={`card-description-${index}`}
+                        id={`${idPrefix}-card-description-${index}`}
+                        name={`${idPrefix}-card-description-${index}`}
                         value={card.description}
                         isRequired={true}
                         onChange={handleDescriptionChange}

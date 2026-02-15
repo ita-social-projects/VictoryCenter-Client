@@ -77,7 +77,9 @@ const createImageContents = (count: number): ProgramSectionContent[] =>
 
 const createCardContents = (cardCount: number): ProgramSectionContent[] =>
     Array.from({ length: cardCount * 2 }, (_, index) =>
-        createItem(index % 2 === 0 ? ContentType.Title : ContentType.Description, index),
+        createItem(index % 2 === 0 ? ContentType.Title : ContentType.Description, index, {
+            groupIndex: Math.floor(index / 2),
+        }),
     );
 
 const IMAGE_COUNT_MAP: Partial<Record<ProgramSectionTemplate, number>> = {

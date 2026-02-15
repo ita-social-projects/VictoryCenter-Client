@@ -508,6 +508,17 @@ describe('getInitialSectionContents', () => {
         expect(contents).toHaveLength(4);
         expect(contents.filter((c) => c.contentType === ContentType.Title)).toHaveLength(2);
         expect(contents.filter((c) => c.contentType === ContentType.Description)).toHaveLength(2);
+
+        // Verify groupIndex for card pairs
+        expect(contents[0].contentType).toBe(ContentType.Title);
+        expect((contents[0] as any).groupIndex).toBe(0);
+        expect(contents[1].contentType).toBe(ContentType.Description);
+        expect((contents[1] as any).groupIndex).toBe(0);
+
+        expect(contents[2].contentType).toBe(ContentType.Title);
+        expect((contents[2] as any).groupIndex).toBe(1);
+        expect(contents[3].contentType).toBe(ContentType.Description);
+        expect((contents[3] as any).groupIndex).toBe(1);
     });
 
     it('returns 6 contents for TripleTitleDescription (3 title + 3 description)', () => {
@@ -516,6 +527,22 @@ describe('getInitialSectionContents', () => {
         expect(contents).toHaveLength(6);
         expect(contents.filter((c) => c.contentType === ContentType.Title)).toHaveLength(3);
         expect(contents.filter((c) => c.contentType === ContentType.Description)).toHaveLength(3);
+
+        // Verify groupIndex for card pairs
+        expect(contents[0].contentType).toBe(ContentType.Title);
+        expect((contents[0] as any).groupIndex).toBe(0);
+        expect(contents[1].contentType).toBe(ContentType.Description);
+        expect((contents[1] as any).groupIndex).toBe(0);
+
+        expect(contents[2].contentType).toBe(ContentType.Title);
+        expect((contents[2] as any).groupIndex).toBe(1);
+        expect(contents[3].contentType).toBe(ContentType.Description);
+        expect((contents[3] as any).groupIndex).toBe(1);
+
+        expect(contents[4].contentType).toBe(ContentType.Title);
+        expect((contents[4] as any).groupIndex).toBe(2);
+        expect(contents[5].contentType).toBe(ContentType.Description);
+        expect((contents[5] as any).groupIndex).toBe(2);
     });
 
     it('returns 8 contents for QuadTitleDescription (4 title + 4 description)', () => {
@@ -524,6 +551,27 @@ describe('getInitialSectionContents', () => {
         expect(contents).toHaveLength(8);
         expect(contents.filter((c) => c.contentType === ContentType.Title)).toHaveLength(4);
         expect(contents.filter((c) => c.contentType === ContentType.Description)).toHaveLength(4);
+
+        // Verify groupIndex for card pairs
+        expect(contents[0].contentType).toBe(ContentType.Title);
+        expect((contents[0] as any).groupIndex).toBe(0);
+        expect(contents[1].contentType).toBe(ContentType.Description);
+        expect((contents[1] as any).groupIndex).toBe(0);
+
+        expect(contents[2].contentType).toBe(ContentType.Title);
+        expect((contents[2] as any).groupIndex).toBe(1);
+        expect(contents[3].contentType).toBe(ContentType.Description);
+        expect((contents[3] as any).groupIndex).toBe(1);
+
+        expect(contents[4].contentType).toBe(ContentType.Title);
+        expect((contents[4] as any).groupIndex).toBe(2);
+        expect(contents[5].contentType).toBe(ContentType.Description);
+        expect((contents[5] as any).groupIndex).toBe(2);
+
+        expect(contents[6].contentType).toBe(ContentType.Title);
+        expect((contents[6] as any).groupIndex).toBe(3);
+        expect(contents[7].contentType).toBe(ContentType.Description);
+        expect((contents[7] as any).groupIndex).toBe(3);
     });
 
     it('maintains correct order for DualTitleDescription', () => {

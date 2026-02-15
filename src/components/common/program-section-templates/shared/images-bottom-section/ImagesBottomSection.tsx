@@ -4,7 +4,7 @@ import { nanoid } from 'nanoid';
 import { TitleDescriptionSection } from '../title-description-section/TitleDescriptionSection';
 import { ImageValues, Image } from '@/types/common/image';
 import baseStyles from './ImagesBottomSection.module.scss';
-import { ProgramSectionMode } from '@/types/common/program-sections';
+import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
 import { PublishedImagesBottomSection } from './PublishedImagesBottomSection';
 import { EditableImagesBottomSection } from './EditableImagesBottomSection';
 
@@ -34,6 +34,7 @@ export interface ImageHandler {
 }
 
 export interface ImagesBottomSectionProps {
+    template: ProgramSectionTemplate;
     title?: string;
     description?: string;
     images: (Image | ImageValues | null)[];
@@ -50,6 +51,7 @@ export interface ImagesBottomSectionProps {
 }
 
 export const ImagesBottomSection = ({
+    template,
     title = '',
     description = '',
     images,
@@ -97,6 +99,7 @@ export const ImagesBottomSection = ({
             )}
         >
             <TitleDescriptionSection
+                template={template}
                 title={title}
                 description={description}
                 className={cn(baseStyles['top-section'], topSectionClassName)}
@@ -106,6 +109,7 @@ export const ImagesBottomSection = ({
                 onTitleChange={onTitleChange}
                 onDescriptionChange={onDescriptionChange}
             />
+
             {mode === ProgramSectionMode.Published ? (
                 <PublishedImagesBottomSection
                     images={displayedImages}

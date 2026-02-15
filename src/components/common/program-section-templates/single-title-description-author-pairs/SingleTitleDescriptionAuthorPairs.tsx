@@ -2,14 +2,16 @@ import cn from 'classnames';
 import { useMemo } from 'react';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { Button } from '@/components/admin/button/Button';
-import { PROGRAMS_TEXT, PROGRAM_SECTION_VALIDATION } from '@/const/admin/programs';
+import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import styles from './SingleTitleDescriptionAuthorPairs.module.scss';
 import { DescriptionAuthorPairCard } from './description-author-pair-card/DescriptionAuthorPairCard';
 import { ReactComponent as ArrowLeft } from '@/assets/icons/arrow-left.svg';
 import { ReactComponent as ArrowRight } from '@/assets/icons/arrow-right.svg';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import { CardCarousel } from './card-carousel/CardCarousel';
-import { ProgramSectionMode } from '@/types/common/program-sections';
+import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
+import { ContentType } from '@/types/common/programs';
+import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
 
 export interface DescriptionAuthorPairData {
     description: string;
@@ -29,6 +31,7 @@ export interface SingleTitleDescriptionAuthorPairsProps {
 }
 
 const TEMPLATE_PAIRS_COUNT = 5;
+const TEMPLATE = ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs;
 
 export const SingleTitleDescriptionAuthorPairs = ({
     title = '',
@@ -43,6 +46,8 @@ export const SingleTitleDescriptionAuthorPairs = ({
 }: SingleTitleDescriptionAuthorPairsProps) => {
     const isEditable = mode === ProgramSectionMode.Edit;
     const isTemplate = mode === ProgramSectionMode.Template;
+
+    const titleMaxLength = getProgramSectionTemplateMaxLength(TEMPLATE, ContentType.Title);
 
     const normalizedPairs = useMemo(() => {
         if (!isTemplate) return pairs;
@@ -75,7 +80,7 @@ export const SingleTitleDescriptionAuthorPairs = ({
                         name="single-title-description-author-pairs-title"
                         value={title}
                         onChange={(e) => onTitleChange?.(e.target.value)}
-                        maxLength={PROGRAM_SECTION_VALIDATION.title.max}
+                        maxLength={titleMaxLength}
                         placeholder={PROGRAMS_TEXT.SECTION.FORM.TITLE.PLACEHOLDER}
                     />
                 ) : (

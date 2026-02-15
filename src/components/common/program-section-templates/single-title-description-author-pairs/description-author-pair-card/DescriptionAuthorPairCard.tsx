@@ -1,9 +1,12 @@
 import cn from 'classnames';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
-import { PROGRAMS_TEXT, PROGRAM_SECTION_VALIDATION } from '@/const/admin/programs';
+import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import styles from './DescriptionAuthorPairCard.module.scss';
 import { ReactComponent as DeleteIcon } from '@/assets/icons/delete.svg';
+import { ProgramSectionTemplate } from '@/types/common/program-sections';
+import { ContentType } from '@/types/common/programs';
+import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
 
 export interface DescriptionAuthorPairCardProps {
     description: string;
@@ -14,6 +17,8 @@ export interface DescriptionAuthorPairCardProps {
     onAuthorChange?: (index: number, value: string) => void;
     onDelete?: (index: number) => void;
 }
+
+const TEMPLATE = ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs;
 
 export const DescriptionAuthorPairCard = ({
     description,
@@ -26,6 +31,9 @@ export const DescriptionAuthorPairCard = ({
 }: DescriptionAuthorPairCardProps) => {
     const descriptionId = `pair-description-${index}`;
     const authorId = `pair-author-${index}`;
+
+    const descriptionMaxLength = getProgramSectionTemplateMaxLength(TEMPLATE, ContentType.Description);
+    const authorMaxLength = getProgramSectionTemplateMaxLength(TEMPLATE, ContentType.Author);
 
     const handleDelete = () => onDelete?.(index);
     const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) =>
@@ -59,7 +67,7 @@ export const DescriptionAuthorPairCard = ({
                         name={descriptionId}
                         value={description}
                         onChange={handleDescriptionChange}
-                        maxLength={PROGRAM_SECTION_VALIDATION.cardDescription.max}
+                        maxLength={descriptionMaxLength}
                         rows={4}
                         placeholder={PROGRAMS_TEXT.SECTION.CARD.FORM.DESCRIPTION.PLACEHOLDER}
                     />
@@ -74,7 +82,7 @@ export const DescriptionAuthorPairCard = ({
                         name={authorId}
                         value={author}
                         onChange={handleAuthorChange}
-                        maxLength={PROGRAM_SECTION_VALIDATION.cardAuthor.max}
+                        maxLength={authorMaxLength}
                         placeholder={PROGRAMS_TEXT.SECTION.CARD.FORM.AUTHOR.PLACEHOLDER}
                     />
                 </div>

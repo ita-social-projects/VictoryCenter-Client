@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
-import { PROGRAM_SECTION_VALIDATION } from '@/const/admin/programs';
 import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
+import { ProgramSectionTemplate } from '@/types/common/program-sections';
 
 export interface UseProgramSectionValidationReturn {
     titleError: string | undefined;
@@ -13,27 +13,44 @@ export interface UseProgramSectionValidationReturn {
 }
 
 export interface UseProgramSectionValidationProps {
+    template: ProgramSectionTemplate;
+    isPublishing?: boolean;
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
 }
 
 export const useProgramSectionValidation = ({
+    template,
+    isPublishing = false,
     onTitleChange,
     onDescriptionChange,
 }: UseProgramSectionValidationProps): UseProgramSectionValidationReturn => {
     const [titleError, setTitleError] = useState<string | undefined>(undefined);
     const [descriptionError, setDescriptionError] = useState<string | undefined>(undefined);
 
+    const validateTitle = useCallback(
+        (value: string) => PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateSectionTitle(value, isPublishing, template),
+        [isPublishing, template],
+    );
+
+    const validateDescription = useCallback(
+        (value: string) =>
+            PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateSectionDescription(value, isPublishing, template),
+        [isPublishing, template],
+    );
+
     const handleTitleChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
             const newValue = e.target.value;
             onTitleChange?.(newValue);
 
-            if (titleError && getTrimmedInputText(newValue).length >= PROGRAM_SECTION_VALIDATION.title.min) {
-                setTitleError(undefined);
-            }
+            if (!titleError) return;
+
+            const trimmedValue = getTrimmedInputText(newValue);
+            const nextError = validateTitle(trimmedValue);
+            if (!nextError) setTitleError(undefined);
         },
-        [onTitleChange, titleError],
+        [onTitleChange, titleError, validateTitle],
     );
 
     const handleTitleBlur = useCallback(
@@ -41,9 +58,9 @@ export const useProgramSectionValidation = ({
             const trimmedValue = getTrimmedInputText(e.target.value);
             onTitleChange?.(trimmedValue);
 
-            setTitleError(PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateSectionTitle(trimmedValue, false));
+            setTitleError(validateTitle(trimmedValue));
         },
-        [onTitleChange],
+        [onTitleChange, validateTitle],
     );
 
     const handleDescriptionChange = useCallback(
@@ -51,14 +68,13 @@ export const useProgramSectionValidation = ({
             const newValue = e.target.value;
             onDescriptionChange?.(newValue);
 
-            if (
-                descriptionError &&
-                getTrimmedInputText(newValue).length >= PROGRAM_SECTION_VALIDATION.description.min
-            ) {
-                setDescriptionError(undefined);
-            }
+            if (!descriptionError) return;
+
+            const trimmedValue = getTrimmedInputText(newValue);
+            const nextError = validateDescription(trimmedValue);
+            if (!nextError) setDescriptionError(undefined);
         },
-        [onDescriptionChange, descriptionError],
+        [onDescriptionChange, descriptionError, validateDescription],
     );
 
     const handleDescriptionBlur = useCallback(
@@ -66,9 +82,9 @@ export const useProgramSectionValidation = ({
             const trimmedValue = getTrimmedInputText(e.target.value);
             onDescriptionChange?.(trimmedValue);
 
-            setDescriptionError(PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateSectionDescription(trimmedValue, false));
+            setDescriptionError(validateDescription(trimmedValue));
         },
-        [onDescriptionChange],
+        [onDescriptionChange, validateDescription],
     );
 
     return {

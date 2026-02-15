@@ -297,33 +297,18 @@ export const PROGRAM_CATEGORY_VALIDATION = {
         getHasProgramsCountError: (count: number) => `Категорія містить ${count} програм`,
     },
 };
+
 export const PROGRAM_SECTION_VALIDATION = {
     title: {
-        min: 5,
-        max: 60,
         getRequiredError: () => "Заголовок обов'язковий",
     },
     description: {
-        min: 10,
-        max: 600,
         getRequiredError: () => "Опис обов'язковий",
     },
-    cardTitle: {
-        min: 5,
-        max: 25,
-        getRequiredError: () => "Заголовок обов'язковий",
-    },
-    cardDescription: {
-        min: 10,
-        max: 300,
-        getRequiredError: () => "Опис обов'язковий",
-    },
-    cardAuthor: {
-        min: 2,
-        max: 60,
+    author: {
         getRequiredError: () => "Ім'я обов'язкове",
     },
-};
+} as const;
 
 export const PROGRAM_SECTION_TEMPLATE_VALIDATION = {
     [ProgramSectionTemplate.QuadImagesBottom]: {

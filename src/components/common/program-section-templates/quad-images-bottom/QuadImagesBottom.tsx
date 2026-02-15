@@ -2,7 +2,7 @@ import cn from 'classnames';
 import { ImagesBottomSection } from '../shared/images-bottom-section/ImagesBottomSection';
 import { ImageValues, Image } from '@/types/common/image';
 import { QUAD_IMAGES_CONFIG } from '@/const/admin/programs';
-import { ProgramSectionMode } from '@/types/common/program-sections';
+import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
 import styles from './QuadImagesBottom.module.scss';
 import publishedStyles from './PublishedQuadImagesBottom.module.scss';
 
@@ -26,6 +26,7 @@ export const QuadImagesBottom = ({
     onImagesChange,
 }: QuadImagesBottomProps) => {
     const baseStyles = mode === ProgramSectionMode.Published ? publishedStyles : styles;
+
     const imageHandlers = images.map((image, index) => ({
         handler: onImagesChange ? (file: ImageValues | null) => onImagesChange(index, file) : undefined,
         key: `image${index + 1}`,
@@ -34,6 +35,7 @@ export const QuadImagesBottom = ({
 
     return (
         <ImagesBottomSection
+            template={ProgramSectionTemplate.QuadImagesBottom}
             title={title}
             description={description}
             images={images}

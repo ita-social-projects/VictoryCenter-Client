@@ -1,35 +1,51 @@
+import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { TitleDescriptionSection, TitleDescriptionSectionProps } from './TitleDescriptionSection';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
-import { ProgramSectionMode } from '@/types/common/program-sections';
+import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
+import { ContentType } from '@/types/common/programs';
+import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
+import { useProgramSectionValidation } from '@/hooks/admin/use-program-section-validation';
+
+jest.mock('@/hooks/admin/use-program-section-validation', () => ({
+    useProgramSectionValidation: jest.fn(),
+}));
 
 jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
     InputWithCharacterLimitGroup: ({
         label,
         value,
         onChange,
+        onBlur,
         id,
         maxLength,
         placeholder,
         className,
+        error,
+        disabled,
     }: {
         label: string;
         value: string;
         onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+        onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
         id: string;
         maxLength: number;
         placeholder: string;
         className?: string;
+        error?: string;
+        disabled?: boolean;
     }) => (
-        <div data-testid={`input-group-${id}`} className={className}>
+        <div data-testid={`input-group-${id}`} className={className} data-error={error || ''}>
             <label htmlFor={id}>{label}</label>
             <input
                 id={id}
                 data-testid={`title-input-${id}`}
                 value={value}
                 onChange={onChange}
+                onBlur={onBlur}
                 maxLength={maxLength}
                 placeholder={placeholder}
+                disabled={disabled}
             />
         </div>
     ),
@@ -42,74 +58,124 @@ jest.mock(
             label,
             value,
             onChange,
+            onBlur,
             id,
             maxLength,
             rows,
+            error,
+            disabled,
         }: {
             label: string;
             value: string;
             onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+            onBlur?: (e: React.FocusEvent<HTMLTextAreaElement>) => void;
             id: string;
             maxLength: number;
             rows: number;
+            error?: string;
+            disabled?: boolean;
         }) => (
-            <div data-testid={`textarea-group-${id}`}>
+            <div data-testid={`textarea-group-${id}`} data-error={error || ''}>
                 <label htmlFor={id}>{label}</label>
                 <textarea
                     id={id}
                     data-testid={`description-textarea-${id}`}
                     value={value}
                     onChange={onChange}
+                    onBlur={onBlur}
                     maxLength={maxLength}
                     rows={rows}
+                    disabled={disabled}
                 />
             </div>
         ),
     }),
 );
 
+const useProgramSectionValidationMock = useProgramSectionValidation as unknown as jest.Mock;
+
 describe('TitleDescriptionSection', () => {
+    const TEMPLATE = ProgramSectionTemplate.TextOnly;
+
     const defaultProps: TitleDescriptionSectionProps = {
         title: '',
         description: '',
         className: '',
         mode: ProgramSectionMode.Published,
+        template: TEMPLATE,
     };
+
+    const setupHook = (overrides?: Partial<ReturnType<typeof useProgramSectionValidation>>) => {
+        useProgramSectionValidationMock.mockImplementation(
+            ({
+                onTitleChange,
+                onDescriptionChange,
+            }: {
+                onTitleChange?: (v: string) => void;
+                onDescriptionChange?: (v: string) => void;
+            }) => {
+                const handleTitleChange = jest.fn((e: React.ChangeEvent<HTMLInputElement>) =>
+                    onTitleChange?.(e.target.value),
+                );
+                const handleTitleBlur = jest.fn((e: React.FocusEvent<HTMLInputElement>) =>
+                    onTitleChange?.(e.target.value.trim()),
+                );
+
+                const handleDescriptionChange = jest.fn((e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                    onDescriptionChange?.(e.target.value),
+                );
+                const handleDescriptionBlur = jest.fn((e: React.FocusEvent<HTMLTextAreaElement>) =>
+                    onDescriptionChange?.(e.target.value.trim()),
+                );
+
+                return {
+                    titleError: undefined,
+                    descriptionError: undefined,
+                    handleTitleChange,
+                    handleTitleBlur,
+                    handleDescriptionChange,
+                    handleDescriptionBlur,
+                    ...overrides,
+                };
+            },
+        );
+    };
+
+    const renderComponent = (overrideProps: Partial<TitleDescriptionSectionProps> = {}) => {
+        setupHook();
+        return render(<TitleDescriptionSection {...defaultProps} {...overrideProps} />);
+    };
+
+    const renderBare = (overrideProps: Partial<TitleDescriptionSectionProps> = {}) => {
+        setupHook();
+        return render(<TitleDescriptionSection {...(overrideProps as any)} />);
+    };
+
+    const getTitleHeading = () => screen.queryByRole('heading', { level: 2 });
+    const getDescriptionText = (text: string) => screen.queryByText(text);
+    const getTitleInput = () => screen.queryByTestId('title-input-section-title');
+    const getDescriptionTextarea = () => screen.queryByTestId('description-textarea-section-description');
 
     beforeEach(() => {
         jest.clearAllMocks();
     });
 
-    const renderTitleDescriptionSection = (overrideProps: Partial<TitleDescriptionSectionProps> = {}) =>
-        render(<TitleDescriptionSection {...defaultProps} {...overrideProps} />);
+    it('calls useProgramSectionValidation with callbacks from props', () => {
+        const onTitleChange = jest.fn();
+        const onDescriptionChange = jest.fn();
 
-    const renderBareTitleDescriptionSection = (overrideProps: Partial<TitleDescriptionSectionProps> = {}) =>
-        render(<TitleDescriptionSection {...overrideProps} />);
+        renderComponent({ onTitleChange, onDescriptionChange });
 
-    const getTitleHeading = () => screen.queryByRole('heading', { level: 2 });
-    const getDescriptionParagraph = (text?: string) => {
-        if (text) {
-            return screen.queryByText(text);
-        }
-        const container = document.querySelector('.container');
-        return container?.querySelector('.description') || null;
-    };
-    const getTitleInput = () => screen.queryByTestId('title-input-section-title');
-    const getDescriptionTextarea = () => screen.queryByTestId('description-textarea-section-description');
-
-    describe('Non-editable mode', () => {
-        it('uses default values when props are omitted', () => {
-            const { container } = renderBareTitleDescriptionSection();
-
-            expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('');
-            expect(container.querySelector('.description')).toHaveTextContent('');
-            expect(container.firstChild).toHaveClass('container');
-            expect(container.firstChild).not.toHaveClass('template');
-            expect(container.firstChild).not.toHaveClass('editable');
+        expect(useProgramSectionValidationMock).toHaveBeenCalledTimes(1);
+        expect(useProgramSectionValidationMock.mock.calls[0][0]).toMatchObject({
+            onTitleChange,
+            onDescriptionChange,
         });
+    });
 
-        it('renders title and description as text when not editable', () => {
-            renderTitleDescriptionSection({
+    describe('Published / non-editable', () => {
+        it('renders title and description as text', () => {
+            renderComponent({
                 title: 'Test Title',
                 description: 'Test Description',
                 mode: ProgramSectionMode.Published,
@@ -117,40 +183,38 @@ describe('TitleDescriptionSection', () => {
 
             expect(getTitleHeading()).toBeInTheDocument();
             expect(getTitleHeading()).toHaveTextContent('Test Title');
-            const description = getDescriptionParagraph('Test Description');
+
+            const description = getDescriptionText('Test Description');
             expect(description).toBeInTheDocument();
-            expect(description).toHaveTextContent('Test Description');
-        });
-
-        it('renders empty title and description when values are empty', () => {
-            const { container } = renderTitleDescriptionSection({
-                title: '',
-                description: '',
-                mode: ProgramSectionMode.Published,
-            });
-
-            expect(getTitleHeading()).toBeInTheDocument();
-            expect(getTitleHeading()).toHaveTextContent('');
-            const description = container.querySelector('.description');
-            expect(description).toBeInTheDocument();
-            expect(description).toHaveTextContent('');
-        });
-
-        it('does not render input fields when not editable', () => {
-            renderTitleDescriptionSection({
-                title: 'Test Title',
-                description: 'Test Description',
-                mode: ProgramSectionMode.Published,
-            });
 
             expect(getTitleInput()).not.toBeInTheDocument();
             expect(getDescriptionTextarea()).not.toBeInTheDocument();
         });
+
+        it('applies titleClassName and descriptionClassName in text mode', () => {
+            renderComponent({
+                title: 'Title',
+                description: 'Desc',
+                mode: ProgramSectionMode.Published,
+                titleClassName: 't-class',
+                descriptionClassName: 'd-class',
+            });
+
+            expect(getTitleHeading()).toHaveClass('t-class');
+            expect(getDescriptionText('Desc')).toHaveClass('d-class');
+        });
+
+        it('uses defaults when props omitted', () => {
+            const { container } = renderBare();
+
+            expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('');
+            expect(container.querySelector('.description')).toHaveTextContent('');
+        });
     });
 
-    describe('Editable mode', () => {
-        it('renders input fields when editable', () => {
-            renderTitleDescriptionSection({
+    describe('Edit mode', () => {
+        it('renders input fields with values', () => {
+            renderComponent({
                 title: 'Test Title',
                 description: 'Test Description',
                 mode: ProgramSectionMode.Edit,
@@ -158,155 +222,116 @@ describe('TitleDescriptionSection', () => {
 
             expect(getTitleInput()).toBeInTheDocument();
             expect(getTitleInput()).toHaveValue('Test Title');
+
             expect(getDescriptionTextarea()).toBeInTheDocument();
             expect(getDescriptionTextarea()).toHaveValue('Test Description');
+
+            expect(getTitleHeading()).not.toBeInTheDocument();
         });
 
-        it('does not render heading and paragraph when editable', () => {
-            renderTitleDescriptionSection({
-                title: 'Test Title',
-                description: 'Test Description',
-                mode: ProgramSectionMode.Edit,
-            });
-
-            const heading = screen.queryByRole('heading', { level: 2 });
-            expect(heading).not.toBeInTheDocument();
-        });
-
-        it('calls onTitleChange when title input changes', () => {
+        it('wires onChange to callbacks through hook handlers', () => {
             const onTitleChange = jest.fn();
-            renderTitleDescriptionSection({
-                title: 'Initial Title',
-                mode: ProgramSectionMode.Edit,
-                onTitleChange,
-            });
-
-            const titleInput = getTitleInput();
-            expect(titleInput).toBeInTheDocument();
-
-            fireEvent.change(titleInput!, { target: { value: 'New Title' } });
-
-            expect(onTitleChange).toHaveBeenCalledTimes(1);
-            expect(onTitleChange).toHaveBeenCalledWith('New Title');
-        });
-
-        it('calls onDescriptionChange when description textarea changes', () => {
             const onDescriptionChange = jest.fn();
-            renderTitleDescriptionSection({
+
+            renderComponent({
+                title: 'Initial Title',
                 description: 'Initial Description',
                 mode: ProgramSectionMode.Edit,
+                onTitleChange,
                 onDescriptionChange,
             });
 
-            const descriptionTextarea = getDescriptionTextarea();
-            expect(descriptionTextarea).toBeInTheDocument();
+            fireEvent.change(getTitleInput()!, { target: { value: 'New Title' } });
+            fireEvent.change(getDescriptionTextarea()!, { target: { value: 'New Description' } });
 
-            fireEvent.change(descriptionTextarea!, { target: { value: 'New Description' } });
-
-            expect(onDescriptionChange).toHaveBeenCalledTimes(1);
+            expect(onTitleChange).toHaveBeenCalledWith('New Title');
             expect(onDescriptionChange).toHaveBeenCalledWith('New Description');
         });
 
-        it('does not call callbacks when they are not provided', () => {
-            renderTitleDescriptionSection({
-                title: 'Test Title',
-                description: 'Test Description',
+        it('wires onBlur to hook handlers', () => {
+            const onTitleChange = jest.fn();
+            const onDescriptionChange = jest.fn();
+
+            renderComponent({
+                title: '  Title  ',
+                description: '  Desc  ',
                 mode: ProgramSectionMode.Edit,
+                onTitleChange,
+                onDescriptionChange,
             });
 
-            const titleInput = getTitleInput();
-            const descriptionTextarea = getDescriptionTextarea();
+            fireEvent.blur(getTitleInput()!, { target: { value: '  Title  ' } });
+            fireEvent.blur(getDescriptionTextarea()!, { target: { value: '  Desc  ' } });
 
-            fireEvent.change(titleInput!, { target: { value: 'New Title' } });
-            fireEvent.change(descriptionTextarea!, { target: { value: 'New Description' } });
-
-            expect(titleInput).toBeInTheDocument();
-            expect(descriptionTextarea).toBeInTheDocument();
+            expect(onTitleChange).toHaveBeenLastCalledWith('Title');
+            expect(onDescriptionChange).toHaveBeenLastCalledWith('Desc');
         });
 
-        it('passes correct props to InputWithCharacterLimitGroup', () => {
-            renderTitleDescriptionSection({
-                title: 'Test Title',
+        it('passes correct maxLength/placeholder/rows from template rules', () => {
+            const titleMax = getProgramSectionTemplateMaxLength(TEMPLATE, ContentType.Title);
+            const descriptionMax = getProgramSectionTemplateMaxLength(TEMPLATE, ContentType.Description);
+
+            renderComponent({
                 mode: ProgramSectionMode.Edit,
+                template: TEMPLATE,
             });
 
-            const inputGroup = screen.getByTestId('input-group-section-title');
-            expect(inputGroup).toBeInTheDocument();
-
-            const titleInput = getTitleInput();
+            const titleInput = getTitleInput()!;
             expect(titleInput).toHaveAttribute('id', 'section-title');
-            expect(titleInput).toHaveAttribute('maxLength', '60');
+            expect(titleInput).toHaveAttribute('maxLength', String(titleMax));
             expect(titleInput).toHaveAttribute('placeholder', PROGRAMS_TEXT.SECTION.FORM.TITLE.PLACEHOLDER);
+
+            const descriptionTextarea = getDescriptionTextarea()!;
+            expect(descriptionTextarea).toHaveAttribute('id', 'section-description');
+            expect(descriptionTextarea).toHaveAttribute('maxLength', String(descriptionMax));
+            expect(descriptionTextarea).toHaveAttribute('rows', '10');
         });
 
-        it('passes correct props to TextAreaWithCharacterLimitGroup', () => {
-            renderTitleDescriptionSection({
-                description: 'Test Description',
-                mode: ProgramSectionMode.Edit,
+        it('passes errors to input groups', () => {
+            setupHook({ titleError: 't-err', descriptionError: 'd-err' });
+
+            render(<TitleDescriptionSection {...defaultProps} mode={ProgramSectionMode.Edit} />);
+
+            expect(screen.getByTestId('input-group-section-title')).toHaveAttribute('data-error', 't-err');
+            expect(screen.getByTestId('textarea-group-section-description')).toHaveAttribute('data-error', 'd-err');
+        });
+    });
+
+    describe('View mode', () => {
+        it('disables inputs', () => {
+            renderComponent({
+                mode: ProgramSectionMode.View,
+                title: 'Title',
+                description: 'Desc',
             });
 
-            const textareaGroup = screen.getByTestId('textarea-group-section-description');
-            expect(textareaGroup).toBeInTheDocument();
+            expect(getTitleInput()).toBeInTheDocument();
+            expect(getTitleInput()).toBeDisabled();
 
-            const descriptionTextarea = getDescriptionTextarea();
-            expect(descriptionTextarea).toHaveAttribute('id', 'section-description');
-            expect(descriptionTextarea).toHaveAttribute('maxLength', '600');
-            expect(descriptionTextarea).toHaveAttribute('rows', '10');
+            expect(getDescriptionTextarea()).toBeInTheDocument();
+            expect(getDescriptionTextarea()).toBeDisabled();
         });
     });
 
     describe('CSS classes', () => {
-        it('applies custom className to container', () => {
-            const { container } = renderTitleDescriptionSection({
-                className: 'custom-class',
-            });
-
-            const sectionContainer = container.querySelector('.container');
-            expect(sectionContainer).toHaveClass('custom-class');
+        it('applies custom className', () => {
+            const { container } = renderComponent({ className: 'custom-class' });
+            expect(container.querySelector('.container')).toHaveClass('custom-class');
         });
 
         it('applies template class when mode is Template', () => {
-            const { container } = renderTitleDescriptionSection({
-                mode: ProgramSectionMode.Template,
-            });
-
-            const sectionContainer = container.querySelector('.container');
-            expect(sectionContainer).toHaveClass('template');
+            const { container } = renderComponent({ mode: ProgramSectionMode.Template });
+            expect(container.querySelector('.container')).toHaveClass('template');
         });
 
         it('applies form-container class when mode is Edit', () => {
-            const { container } = renderTitleDescriptionSection({
-                mode: ProgramSectionMode.Edit,
-            });
-
-            const sectionContainer = container.querySelector('.container');
-            expect(sectionContainer).toHaveClass('form-container');
-        });
-    });
-
-    describe('Default values', () => {
-        it('uses empty strings as default for title and description', () => {
-            const { container } = renderTitleDescriptionSection();
-
-            expect(getTitleHeading()).toBeInTheDocument();
-            expect(getTitleHeading()).toHaveTextContent('');
-            const description = container.querySelector('.description');
-            expect(description).toBeInTheDocument();
-            expect(description).toHaveTextContent('');
+            const { container } = renderComponent({ mode: ProgramSectionMode.Edit });
+            expect(container.querySelector('.container')).toHaveClass('form-container');
         });
 
-        it('defaults mode to Published', () => {
-            const { container } = renderTitleDescriptionSection();
-
-            const sectionContainer = container.querySelector('.container');
-            expect(sectionContainer).not.toHaveClass('template');
-        });
-
-        it('does not render input fields when mode is Published (default)', () => {
-            renderTitleDescriptionSection();
-
-            expect(getTitleInput()).not.toBeInTheDocument();
-            expect(getDescriptionTextarea()).not.toBeInTheDocument();
+        it('applies form-container class when mode is View', () => {
+            const { container } = renderComponent({ mode: ProgramSectionMode.View });
+            expect(container.querySelector('.container')).toHaveClass('form-container');
         });
     });
 });

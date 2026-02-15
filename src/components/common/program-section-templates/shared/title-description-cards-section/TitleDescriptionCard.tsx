@@ -2,15 +2,21 @@ import cn from 'classnames';
 import { parseDescriptionList } from '@/utils/functions/formatters/text-formatters';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { CardDescriptionField } from './CardDescriptionField';
-import { PROGRAM_SECTION_VALIDATION, PROGRAMS_TEXT } from '@/const/admin/programs';
+import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { useCardValidation } from '@/hooks/admin/use-section-card-validation/useCardValidation';
 import { TitleDescriptionCardData } from './TitleDescriptionCardsSection';
-import { ProgramSectionMode } from '@/types/common/program-sections';
+import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
+import { ContentType } from '@/types/common/programs';
 import styles from './TitleDescriptionCardsSection.module.scss';
+import {
+    getProgramSectionTemplateMaxLength,
+    getProgramSectionTemplateMinLength,
+} from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
 
 interface TitleDescriptionCardProps {
     card: TitleDescriptionCardData;
     index: number;
+    template?: ProgramSectionTemplate;
     mode?: ProgramSectionMode;
     onTitleChange?: (index: number, value: string) => void;
     onDescriptionChange?: (index: number, value: string) => void;
@@ -19,10 +25,17 @@ interface TitleDescriptionCardProps {
 export const TitleDescriptionCard = ({
     card,
     index,
+    template = ProgramSectionTemplate.DualTitleDescriptionPairs,
     mode = ProgramSectionMode.Published,
     onTitleChange,
     onDescriptionChange,
 }: TitleDescriptionCardProps) => {
+    const titleMin = getProgramSectionTemplateMinLength(template, ContentType.Title);
+    const titleMax = getProgramSectionTemplateMaxLength(template, ContentType.Title);
+
+    const descriptionMin = getProgramSectionTemplateMinLength(template, ContentType.Description);
+    const descriptionMax = getProgramSectionTemplateMaxLength(template, ContentType.Description);
+
     const {
         error: titleError,
         handleChange: handleTitleChange,
@@ -30,8 +43,8 @@ export const TitleDescriptionCard = ({
     } = useCardValidation({
         value: card.title,
         onChange: (v) => onTitleChange?.(index, v),
-        min: PROGRAM_SECTION_VALIDATION.cardTitle.min,
-        max: PROGRAM_SECTION_VALIDATION.cardTitle.max,
+        min: titleMin,
+        max: titleMax,
         required: true,
     });
 
@@ -42,8 +55,8 @@ export const TitleDescriptionCard = ({
     } = useCardValidation({
         value: card.description,
         onChange: (v) => onDescriptionChange?.(index, v),
-        min: PROGRAM_SECTION_VALIDATION.cardDescription.min,
-        max: PROGRAM_SECTION_VALIDATION.cardDescription.max,
+        min: descriptionMin,
+        max: descriptionMax,
         required: true,
     });
 
@@ -54,14 +67,14 @@ export const TitleDescriptionCard = ({
             <div className={cn(styles['td-card'], styles['td-card--editable'])}>
                 <div className={styles['title-field']}>
                     <InputWithCharacterLimitGroup
-                        label="Заголовок"
+                        label={PROGRAMS_TEXT.SECTION.CARD.FORM.TITLE.TEXT}
                         id={`card-title-${index}`}
                         name={`card-title-${index}`}
                         value={card.title}
                         isRequired={true}
                         onChange={handleTitleChange}
                         onBlur={handleTitleBlur}
-                        maxLength={PROGRAM_SECTION_VALIDATION.cardTitle.max}
+                        maxLength={titleMax}
                         error={titleError}
                         placeholder={PROGRAMS_TEXT.SECTION.CARD.FORM.TITLE.PLACEHOLDER}
                         disabled={mode === ProgramSectionMode.View}
@@ -70,14 +83,14 @@ export const TitleDescriptionCard = ({
 
                 <div className={styles['description-field']}>
                     <CardDescriptionField
-                        label="Опис"
+                        label={PROGRAMS_TEXT.SECTION.CARD.FORM.DESCRIPTION.TEXT}
                         id={`card-description-${index}`}
                         name={`card-description-${index}`}
                         value={card.description}
                         isRequired={true}
                         onChange={handleDescriptionChange}
                         onBlur={handleDescriptionBlur}
-                        maxLength={PROGRAM_SECTION_VALIDATION.cardDescription.max}
+                        maxLength={descriptionMax}
                         error={descriptionError}
                         placeholder="• "
                         disabled={mode === ProgramSectionMode.View}
@@ -89,7 +102,7 @@ export const TitleDescriptionCard = ({
 
     return (
         <div className={styles['td-card']}>
-            <h3 className={styles['title']}>{card.title || 'Заголовок'}</h3>
+            <h3 className={styles['title']}>{card.title || PROGRAMS_TEXT.SECTION.CARD.FORM.TITLE.TEXT}</h3>
             <div className={styles['description']}>
                 {intro && <p>{intro}</p>}
 
@@ -101,7 +114,7 @@ export const TitleDescriptionCard = ({
                     </ul>
                 )}
 
-                {!intro && items.length === 0 && <p>Опис секції</p>}
+                {!intro && items.length === 0 && <p>{PROGRAMS_TEXT.SECTION.FORM.DESCRIPTION.TEXT}</p>}
             </div>
         </div>
     );

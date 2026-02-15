@@ -1,7 +1,7 @@
 import React from 'react';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { BaseProgramModalProps, ProgramModal, ProgramModalProps } from './ProgramModal';
-import { Program, ProgramCategory, ProgramCreateUpdate } from '@/types/admin/programs';
+import { Program, ProgramCategory, ProgramCreateUpdate, SectionCancelActionType } from '@/types/admin/programs';
 import { ModalMode } from '@/types/admin/common';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -147,6 +147,8 @@ const mockFormRef = {
     getSections: undefined as undefined | (() => Array<{ order: number }>),
     addSection: jest.fn(),
     removeSection: jest.fn(),
+    revertSection: jest.fn(),
+    replaceSection: jest.fn(),
 };
 
 let capturedFormProps: any = {};
@@ -242,6 +244,8 @@ describe('ProgramModal', () => {
         mockFormRef.getSections = undefined;
         mockFormRef.addSection.mockReset();
         mockFormRef.removeSection.mockReset();
+        mockFormRef.revertSection.mockReset();
+        mockFormRef.replaceSection.mockReset();
 
         mockedUseModalsState.mockReturnValue({
             modalState: { isAddSectionModalOpen: false },
@@ -299,7 +303,10 @@ describe('ProgramModal', () => {
             render(<ProgramModal {...addModeProps} />);
 
             act(() => {
-                capturedFormProps.onRequestCancelSection(2);
+                capturedFormProps.onRequestCancelSection({
+                    type: SectionCancelActionType.DiscardNewSection,
+                    onDiscard: () => mockFormRef.removeSection(2),
+                });
             });
 
             expect(screen.getByTestId('question-modal')).toBeInTheDocument();
@@ -309,6 +316,197 @@ describe('ProgramModal', () => {
 
             fireEvent.click(screen.getByTestId('question-cancel'));
             expect(screen.queryByTestId('question-modal')).not.toBeInTheDocument();
+        });
+
+        it('handleRequestCancelSection with number in Add mode calls removeSection on confirm', () => {
+            render(<ProgramModal {...addModeProps} />);
+
+            act(() => {
+                capturedFormProps.onRequestCancelSection({
+                    type: SectionCancelActionType.RemoveSection,
+                    onDiscard: () => mockFormRef.removeSection(2),
+                });
+            });
+
+            expect(screen.getByTestId('question-modal')).toBeInTheDocument();
+            expect(mockFormRef.removeSection).not.toHaveBeenCalled();
+
+            fireEvent.click(screen.getByTestId('question-confirm'));
+
+            expect(mockFormRef.removeSection).toHaveBeenCalledWith(2);
+            expect(mockFormRef.removeSection).toHaveBeenCalledTimes(1);
+            expect(screen.queryByTestId('question-modal')).not.toBeInTheDocument();
+        });
+
+        it('handleRequestCancelSection with number in Edit mode calls revertSection on confirm', () => {
+            render(<ProgramModal {...editModeProps} />);
+
+            act(() => {
+                capturedFormProps.onRequestCancelSection({
+                    type: SectionCancelActionType.RevertSection,
+                    onDiscard: () => mockFormRef.revertSection(3),
+                });
+            });
+
+            expect(screen.getByTestId('question-modal')).toBeInTheDocument();
+            expect(screen.getByTestId('question-title')).toHaveTextContent(
+                COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE,
+            );
+
+            fireEvent.click(screen.getByTestId('question-confirm'));
+
+            expect(mockFormRef.revertSection).toHaveBeenCalledWith(3);
+            expect(mockFormRef.revertSection).toHaveBeenCalledTimes(1);
+            expect(screen.queryByTestId('question-modal')).not.toBeInTheDocument();
+        });
+
+        it('handleRequestCancelSection with function calls the provided discard callback on confirm', () => {
+            const mockDiscardCallback = jest.fn();
+            render(<ProgramModal {...addModeProps} />);
+
+            act(() => {
+                capturedFormProps.onRequestCancelSection({
+                    type: SectionCancelActionType.RevertSection,
+                    onDiscard: mockDiscardCallback,
+                });
+            });
+
+            expect(screen.getByTestId('question-modal')).toBeInTheDocument();
+            expect(mockDiscardCallback).not.toHaveBeenCalled();
+
+            fireEvent.click(screen.getByTestId('question-confirm'));
+
+            expect(mockDiscardCallback).toHaveBeenCalledTimes(1);
+            expect(screen.queryByTestId('question-modal')).not.toBeInTheDocument();
+        });
+
+        it('canceling the unsaved section modal does not execute discard action', () => {
+            const mockDiscardCallback = jest.fn();
+            render(<ProgramModal {...addModeProps} />);
+
+            act(() => {
+                capturedFormProps.onRequestCancelSection({
+                    type: SectionCancelActionType.RevertSection,
+                    onDiscard: mockDiscardCallback,
+                });
+            });
+
+            expect(screen.getByTestId('question-modal')).toBeInTheDocument();
+
+            fireEvent.click(screen.getByTestId('question-cancel'));
+
+            expect(mockDiscardCallback).not.toHaveBeenCalled();
+            expect(screen.queryByTestId('question-modal')).not.toBeInTheDocument();
+        });
+
+        it('displays correct modal title in Add mode vs Edit mode for unsaved section changes', () => {
+            const { rerender } = render(<ProgramModal {...addModeProps} />);
+
+            act(() => {
+                capturedFormProps.onRequestCancelSection({
+                    type: SectionCancelActionType.DiscardNewSection,
+                    onDiscard: () => mockFormRef.removeSection(1),
+                });
+            });
+
+            expect(screen.getByTestId('question-title')).toHaveTextContent(
+                PROGRAMS_TEXT.SECTION.MODAL.UNSAVED_CHANGES_TITLE,
+            );
+
+            fireEvent.click(screen.getByTestId('question-cancel'));
+
+            rerender(<ProgramModal {...editModeProps} />);
+
+            act(() => {
+                capturedFormProps.onRequestCancelSection({
+                    type: SectionCancelActionType.RevertSection,
+                    onDiscard: () => mockFormRef.revertSection(1),
+                });
+            });
+
+            expect(screen.getByTestId('question-title')).toHaveTextContent(
+                COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE,
+            );
+        });
+
+        it('handles unknown SectionCancelActionType gracefully by not opening any modal', () => {
+            const mockDiscardCallback = jest.fn();
+            render(<ProgramModal {...addModeProps} />);
+
+            act(() => {
+                capturedFormProps.onRequestCancelSection({
+                    type: 999 as SectionCancelActionType,
+                    onDiscard: mockDiscardCallback,
+                });
+            });
+
+            expect(screen.queryByTestId('question-modal')).not.toBeInTheDocument();
+            expect(mockDiscardCallback).not.toHaveBeenCalled();
+        });
+
+        it('handleRequestCancelSection with RevertSection type opens revert confirmation modal', () => {
+            const mockDiscardCallback = jest.fn();
+            render(<ProgramModal {...addModeProps} />);
+
+            act(() => {
+                capturedFormProps.onRequestCancelSection({
+                    type: SectionCancelActionType.RevertSection,
+                    onDiscard: mockDiscardCallback,
+                });
+            });
+
+            expect(screen.getByTestId('question-modal')).toBeInTheDocument();
+            expect(screen.getByTestId('question-title')).toHaveTextContent(
+                COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE,
+            );
+            expect(mockDiscardCallback).not.toHaveBeenCalled();
+
+            fireEvent.click(screen.getByTestId('question-confirm'));
+
+            expect(mockDiscardCallback).toHaveBeenCalledTimes(1);
+            expect(screen.queryByTestId('question-modal')).not.toBeInTheDocument();
+        });
+
+        it('handleReplaceSection sets sectionToReplace and opens add section modal', () => {
+            const mockOpenAddSectionModal = jest.fn();
+            mockedUseModalsState.mockReturnValue({
+                modalState: { isAddSectionModalOpen: false },
+                openModalActions: { openAddSectionModal: mockOpenAddSectionModal },
+                closeModalActions: { closeAddSectionModal: jest.fn() },
+            });
+
+            render(<ProgramModal {...addModeProps} />);
+
+            act(() => {
+                capturedFormProps.onReplaceSection(1);
+            });
+
+            expect(mockOpenAddSectionModal).toHaveBeenCalledTimes(1);
+        });
+
+        it('handleTemplateSelect with sectionToReplace calls replaceSection instead of addSection', () => {
+            mockedUseModalsState.mockReturnValue({
+                modalState: { isAddSectionModalOpen: true },
+                openModalActions: { openAddSectionModal: jest.fn() },
+                closeModalActions: { closeAddSectionModal: jest.fn() },
+            });
+            mockFormRef.getSections = () => [{ order: 0 }, { order: 1 }];
+            mockedGetInitialSectionContents.mockReturnValue([{ contentType: 0, order: 0 }] as any);
+
+            render(<ProgramModal {...addModeProps} />);
+
+            act(() => {
+                capturedFormProps.onReplaceSection(1);
+            });
+
+            fireEvent.click(screen.getByTestId('add-section-select-template'));
+
+            expect(mockFormRef.replaceSection).toHaveBeenCalledWith(1, {
+                template: ProgramSectionTemplate.TextOnly,
+                order: 1,
+                contents: [{ contentType: 0, order: 0 }],
+            });
+            expect(mockFormRef.addSection).not.toHaveBeenCalled();
         });
     });
 

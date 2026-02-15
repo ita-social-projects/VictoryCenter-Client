@@ -50,3 +50,10 @@ export interface ProgramCategoryCreateUpdate {
     id: number | null;
     name: string;
 }
+
+export enum SectionCancelActionType {
+    RemoveSection,
+    RevertSection,
+    RevertAfterReplace,
+    DiscardNewSection,
+}

@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { TitleDescriptionSection, TitleDescriptionSectionProps } from './TitleDescriptionSection';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
@@ -98,11 +97,11 @@ describe('TitleDescriptionSection', () => {
     const TEMPLATE = ProgramSectionTemplate.TextOnly;
 
     const defaultProps: TitleDescriptionSectionProps = {
+        template: TEMPLATE,
         title: '',
         description: '',
         className: '',
         mode: ProgramSectionMode.Published,
-        template: TEMPLATE,
     };
 
     const setupHook = (overrides?: Partial<ReturnType<typeof useProgramSectionValidation>>) => {
@@ -148,11 +147,10 @@ describe('TitleDescriptionSection', () => {
 
     const renderBare = (overrideProps: Partial<TitleDescriptionSectionProps> = {}) => {
         setupHook();
-        return render(<TitleDescriptionSection {...(overrideProps as any)} />);
+        return render(<TitleDescriptionSection template={TEMPLATE} {...overrideProps} />);
     };
 
     const getTitleHeading = () => screen.queryByRole('heading', { level: 2 });
-    const getDescriptionText = (text: string) => screen.queryByText(text);
     const getTitleInput = () => screen.queryByTestId('title-input-section-title');
     const getDescriptionTextarea = () => screen.queryByTestId('description-textarea-section-description');
 
@@ -160,22 +158,25 @@ describe('TitleDescriptionSection', () => {
         jest.clearAllMocks();
     });
 
-    it('calls useProgramSectionValidation with callbacks from props', () => {
+    it('calls useProgramSectionValidation with callbacks and template', () => {
         const onTitleChange = jest.fn();
         const onDescriptionChange = jest.fn();
 
         renderComponent({ onTitleChange, onDescriptionChange });
 
         expect(useProgramSectionValidationMock).toHaveBeenCalledTimes(1);
-        expect(useProgramSectionValidationMock.mock.calls[0][0]).toMatchObject({
-            onTitleChange,
-            onDescriptionChange,
-        });
+        expect(useProgramSectionValidationMock).toHaveBeenCalledWith(
+            expect.objectContaining({
+                onTitleChange,
+                onDescriptionChange,
+                template: TEMPLATE,
+            }),
+        );
     });
 
     describe('Published / non-editable', () => {
         it('renders title and description as text', () => {
-            renderComponent({
+            const { container } = renderComponent({
                 title: 'Test Title',
                 description: 'Test Description',
                 mode: ProgramSectionMode.Published,
@@ -184,14 +185,15 @@ describe('TitleDescriptionSection', () => {
             expect(getTitleHeading()).toBeInTheDocument();
             expect(getTitleHeading()).toHaveTextContent('Test Title');
 
-            const description = getDescriptionText('Test Description');
-            expect(description).toBeInTheDocument();
+            expect(screen.getByText('Test Description')).toBeInTheDocument();
 
             expect(getTitleInput()).not.toBeInTheDocument();
             expect(getDescriptionTextarea()).not.toBeInTheDocument();
+
+            expect(container.firstElementChild).not.toHaveClass('form-container');
         });
 
-        it('applies titleClassName and descriptionClassName in text mode', () => {
+        it('applies titleClassName and descriptionClassName', () => {
             renderComponent({
                 title: 'Title',
                 description: 'Desc',
@@ -201,7 +203,7 @@ describe('TitleDescriptionSection', () => {
             });
 
             expect(getTitleHeading()).toHaveClass('t-class');
-            expect(getDescriptionText('Desc')).toHaveClass('d-class');
+            expect(screen.getByText('Desc')).toHaveClass('d-class');
         });
 
         it('uses defaults when props omitted', () => {
@@ -209,6 +211,9 @@ describe('TitleDescriptionSection', () => {
 
             expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('');
             expect(container.querySelector('.description')).toHaveTextContent('');
+
+            expect(getTitleInput()).not.toBeInTheDocument();
+            expect(getDescriptionTextarea()).not.toBeInTheDocument();
         });
     });
 
@@ -248,13 +253,11 @@ describe('TitleDescriptionSection', () => {
             expect(onDescriptionChange).toHaveBeenCalledWith('New Description');
         });
 
-        it('wires onBlur to hook handlers', () => {
+        it('wires onBlur to callbacks through hook handlers', () => {
             const onTitleChange = jest.fn();
             const onDescriptionChange = jest.fn();
 
             renderComponent({
-                title: '  Title  ',
-                description: '  Desc  ',
                 mode: ProgramSectionMode.Edit,
                 onTitleChange,
                 onDescriptionChange,
@@ -267,7 +270,7 @@ describe('TitleDescriptionSection', () => {
             expect(onDescriptionChange).toHaveBeenLastCalledWith('Desc');
         });
 
-        it('passes correct maxLength/placeholder/rows from template rules', () => {
+        it('uses template maxLength rules for inputs', () => {
             const titleMax = getProgramSectionTemplateMaxLength(TEMPLATE, ContentType.Title);
             const descriptionMax = getProgramSectionTemplateMaxLength(TEMPLATE, ContentType.Description);
 
@@ -277,17 +280,15 @@ describe('TitleDescriptionSection', () => {
             });
 
             const titleInput = getTitleInput()!;
-            expect(titleInput).toHaveAttribute('id', 'section-title');
             expect(titleInput).toHaveAttribute('maxLength', String(titleMax));
             expect(titleInput).toHaveAttribute('placeholder', PROGRAMS_TEXT.SECTION.FORM.TITLE.PLACEHOLDER);
 
             const descriptionTextarea = getDescriptionTextarea()!;
-            expect(descriptionTextarea).toHaveAttribute('id', 'section-description');
             expect(descriptionTextarea).toHaveAttribute('maxLength', String(descriptionMax));
             expect(descriptionTextarea).toHaveAttribute('rows', '10');
         });
 
-        it('passes errors to input groups', () => {
+        it('passes errors from hook to inputs', () => {
             setupHook({ titleError: 't-err', descriptionError: 'd-err' });
 
             render(<TitleDescriptionSection {...defaultProps} mode={ProgramSectionMode.Edit} />);
@@ -305,11 +306,26 @@ describe('TitleDescriptionSection', () => {
                 description: 'Desc',
             });
 
-            expect(getTitleInput()).toBeInTheDocument();
             expect(getTitleInput()).toBeDisabled();
-
-            expect(getDescriptionTextarea()).toBeInTheDocument();
             expect(getDescriptionTextarea()).toBeDisabled();
+        });
+    });
+
+    describe('Template mode', () => {
+        it('renders as text and applies template class', () => {
+            const { container } = renderComponent({
+                mode: ProgramSectionMode.Template,
+                title: 'T',
+                description: 'D',
+            });
+
+            expect(getTitleHeading()).toBeInTheDocument();
+            expect(screen.getByText('D')).toBeInTheDocument();
+
+            expect(getTitleInput()).not.toBeInTheDocument();
+            expect(getDescriptionTextarea()).not.toBeInTheDocument();
+
+            expect(container.querySelector('.container')).toHaveClass('template');
         });
     });
 
@@ -317,11 +333,6 @@ describe('TitleDescriptionSection', () => {
         it('applies custom className', () => {
             const { container } = renderComponent({ className: 'custom-class' });
             expect(container.querySelector('.container')).toHaveClass('custom-class');
-        });
-
-        it('applies template class when mode is Template', () => {
-            const { container } = renderComponent({ mode: ProgramSectionMode.Template });
-            expect(container.querySelector('.container')).toHaveClass('template');
         });
 
         it('applies form-container class when mode is Edit', () => {

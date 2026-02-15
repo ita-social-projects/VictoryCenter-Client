@@ -16,10 +16,10 @@ export interface FaqFormValues {
 }
 
 export interface FaqFormErrors {
-    questionText?: string;
+    questionText?: string[];
     answerText?: string;
     pages?: string;
-    [key: string]: string | undefined;
+    [key: string]: string | string[] | undefined;
 }
 
 export interface FaqFormRef {
@@ -136,7 +136,7 @@ export const FaqForm = forwardRef<FaqFormRef, FaqFormProps>(
                     onBlur={handleQuestionBlur}
                     maxLength={FAQ_VALIDATION.question.max}
                     disabled={isSubmitting || isFormDisabled}
-                    error={errors.questionText}
+                    error={errors.questionText && errors.questionText.length > 0 ? errors.questionText[0] : undefined}
                 />
 
                 {/* Description Field */}

@@ -143,7 +143,9 @@ const mockClient = {
     delete: jest.fn(),
 } as unknown as jest.Mocked<AxiosInstance>;
 
-const mockCategories: TeamCategory[] = [{ id: 1, name: 'Cat 1', description: '', teamMembersCount: 0 }];
+const mockCategories: TeamCategory[] = [
+    { id: 1, name: 'Cat 1', description: '', localizations: [], teamMembersCount: 0 },
+];
 
 const baseMember: TeamMember = {
     id: 10,

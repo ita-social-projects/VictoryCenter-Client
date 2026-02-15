@@ -10,6 +10,7 @@ export interface TextOnlyProps {
     mode?: ProgramSectionMode;
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
+    validationResetKey?: number;
 }
 
 export const TextOnly = (props: TextOnlyProps) => {

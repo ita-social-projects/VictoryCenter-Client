@@ -558,3 +558,7 @@ export const validateProgramSections = (sections: ProgramSection[], isPublishing
 
     return undefined;
 };
+
+export const isProgramSectionValid = (section: ProgramSection, isPublishing: boolean): boolean => {
+    return validateProgramSection(section, isPublishing);
+};

@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Button } from '@/components/admin/button/Button';
 import { ImageValues } from '@/types/common/image';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
@@ -15,9 +15,23 @@ import { ContentType } from '@/types/common/programs';
 export interface ProgramSectionFormProps {
     section: ProgramSection;
     onSave: () => void;
-    onCancel: () => void;
+    onCancel: (options: SectionCancelOptions) => void;
     isDisabled?: boolean;
     onSectionChange?: (updatedSection: ProgramSection) => void;
+    isNewSection?: boolean;
+    isSectionValid?: boolean;
+    onEditStateChange?: (isEditing: boolean) => void;
+    onDelete?: () => void;
+    isReplacingTemplate?: boolean;
+    onRequestReplace?: () => void;
+}
+
+export interface SectionCancelOptions {
+    isDirty: boolean;
+    shouldRemove: boolean;
+    revertTo: ProgramSection;
+    onAfterDiscard: () => void;
+    isTemplateReplacement?: boolean;
 }
 
 const getContentByType = (contents: ProgramSectionContent[], type: ContentType): ProgramSectionContent | undefined => {
@@ -66,8 +80,52 @@ export const ProgramSectionForm = ({
     onCancel,
     isDisabled = false,
     onSectionChange,
+    isNewSection = false,
+    isSectionValid = false,
+    onEditStateChange,
+    onDelete,
+    isReplacingTemplate = false,
+    onRequestReplace,
 }: ProgramSectionFormProps) => {
     const [localSection, setLocalSection] = useState<ProgramSection>(section);
+    const [originalSection, setOriginalSection] = useState<ProgramSection>(section);
+    const [isDirty, setIsDirty] = useState(false);
+    const [validationResetKey, setValidationResetKey] = useState(0);
+    const [sectionMode, setSectionMode] = useState<ProgramSectionMode>(
+        isNewSection || isReplacingTemplate ? ProgramSectionMode.Edit : ProgramSectionMode.View,
+    );
+
+    const sectionModeRef = useRef(sectionMode);
+    const onEditStateChangeRef = useRef(onEditStateChange);
+    const lastEmittedSectionRef = useRef<ProgramSection | null>(null);
+    const localSectionRef = useRef<ProgramSection>(localSection);
+    localSectionRef.current = localSection;
+
+    useEffect(() => {
+        sectionModeRef.current = sectionMode;
+    }, [sectionMode]);
+
+    useEffect(() => {
+        onEditStateChangeRef.current = onEditStateChange;
+    }, [onEditStateChange]);
+
+    useEffect(() => {
+        if (lastEmittedSectionRef.current === section) {
+            return;
+        }
+        setLocalSection(section);
+        if (sectionModeRef.current !== ProgramSectionMode.Edit) {
+            if (!isReplacingTemplate) {
+                setOriginalSection(section);
+            }
+            setIsDirty(false);
+            setSectionMode(isNewSection || isReplacingTemplate ? ProgramSectionMode.Edit : ProgramSectionMode.View);
+        }
+    }, [section, isNewSection, isReplacingTemplate]);
+
+    useEffect(() => {
+        onEditStateChangeRef.current?.(sectionMode === ProgramSectionMode.Edit);
+    }, [sectionMode]);
 
     const titleContent = getContentByType(localSection.contents, ContentType.Title);
 
@@ -100,79 +158,84 @@ export const ProgramSectionForm = ({
         description: orderedDescriptionContents[i]?.description || '',
     }));
 
-    const handleTitleChange = useCallback(
-        (value: string) => {
-            setLocalSection((prev) => {
-                const updatedContents = prev.contents.map((c) =>
-                    c.contentType === ContentType.Title ? { ...c, title: value } : c,
-                );
-                const updatedSection = { ...prev, contents: updatedContents };
-                onSectionChange?.(updatedSection);
-                return updatedSection;
-            });
+    const emitSectionChange = useCallback(
+        (updatedSection: ProgramSection) => {
+            lastEmittedSectionRef.current = updatedSection;
+            setIsDirty(true);
+            onSectionChange?.(updatedSection);
         },
         [onSectionChange],
+    );
+
+    const handleTitleChange = useCallback(
+        (value: string) => {
+            const prev = localSectionRef.current;
+            const updatedContents = prev.contents.map((c) =>
+                c.contentType === ContentType.Title ? { ...c, title: value } : c,
+            );
+            const newSection = { ...prev, contents: updatedContents };
+            localSectionRef.current = newSection;
+            setLocalSection(newSection);
+            emitSectionChange(newSection);
+        },
+        [emitSectionChange],
     );
 
     const handleDescriptionChange = useCallback(
         (value: string) => {
-            setLocalSection((prev) => {
-                const updatedContents = prev.contents.map((c) =>
-                    c.contentType === ContentType.Description ? { ...c, description: value } : c,
-                );
-                const updatedSection = { ...prev, contents: updatedContents };
-                onSectionChange?.(updatedSection);
-                return updatedSection;
-            });
+            const prev = localSectionRef.current;
+            const updatedContents = prev.contents.map((c) =>
+                c.contentType === ContentType.Description ? { ...c, description: value } : c,
+            );
+            const newSection = { ...prev, contents: updatedContents };
+            localSectionRef.current = newSection;
+            setLocalSection(newSection);
+            emitSectionChange(newSection);
         },
-        [onSectionChange],
+        [emitSectionChange],
     );
 
     const handleDescriptionsChange = useCallback(
         (index: number, value: string) => {
-            setLocalSection((prev) => {
-                const ordered = getDescriptionsInOrder(prev.contents);
-                const target = ordered[index];
-                if (!target) return prev;
+            const prev = localSectionRef.current;
+            const ordered = getDescriptionsInOrder(prev.contents);
+            const target = ordered[index];
+            if (!target) return;
 
-                const updatedContents = prev.contents.map((c) =>
-                    c.contentType === ContentType.Description && c.order === target.order
-                        ? { ...c, description: value }
-                        : c,
-                );
+            const updatedContents = prev.contents.map((c) =>
+                c.contentType === ContentType.Description && c.order === target.order
+                    ? { ...c, description: value }
+                    : c,
+            );
 
-                const updatedSection = { ...prev, contents: updatedContents };
-                onSectionChange?.(updatedSection);
-                return updatedSection;
-            });
+            const newSection = { ...prev, contents: updatedContents };
+            localSectionRef.current = newSection;
+            setLocalSection(newSection);
+            emitSectionChange(newSection);
         },
-        [onSectionChange],
+        [emitSectionChange],
     );
 
     const handleCardContentChange = useCallback(
         (index: number, value: string, type: ContentType.Title | ContentType.Description) => {
-            setLocalSection((prev) => {
-                const filteredContents = prev.contents
-                    .filter((c) => c.contentType === type)
-                    .sort((a, b) => a.order - b.order);
+            const prev = localSectionRef.current;
+            const filteredContents = prev.contents
+                .filter((c) => c.contentType === type)
+                .sort((a, b) => a.order - b.order);
 
-                const target = filteredContents[index];
-                if (!target) return prev;
+            const target = filteredContents[index];
+            if (!target) return;
 
-                const updatedContents = prev.contents.map((c) =>
-                    c === target
-                        ? type === ContentType.Title
-                            ? { ...c, title: value }
-                            : { ...c, description: value }
-                        : c,
-                );
+            const updatedContents = prev.contents.map((c) =>
+                c === target ? (type === ContentType.Title ? { ...c, title: value } : { ...c, description: value }) : c,
+            );
 
-                const updatedSection = { ...prev, contents: updatedContents };
-                onSectionChange?.(updatedSection);
-                return updatedSection;
-            });
+            const newSection = { ...prev, contents: updatedContents };
+            localSectionRef.current = newSection;
+            setLocalSection(newSection);
+            emitSectionChange(newSection);
         },
-        [onSectionChange],
+        [emitSectionChange],
     );
 
     const updateImageContent = useCallback(
@@ -187,45 +250,44 @@ export const ProgramSectionForm = ({
 
     const handleImagesChange = useCallback(
         (index: number, file: ImageValues | null) => {
-            setLocalSection((prev) => {
-                const imageContentsList = prev.contents.filter((c) => c.contentType === ContentType.Image);
-                imageContentsList.sort((a, b) => a.order - b.order);
+            const prev = localSectionRef.current;
+            const imageContentsList = prev.contents.filter((c) => c.contentType === ContentType.Image);
+            imageContentsList.sort((a, b) => a.order - b.order);
 
-                if (index < imageContentsList.length) {
-                    const targetOrder = imageContentsList[index].order;
-                    const updatedSection = updateImageContent(targetOrder, file, prev);
-                    onSectionChange?.(updatedSection);
-                    return updatedSection;
-                }
-                return prev;
-            });
+            if (index >= imageContentsList.length) return;
+
+            const targetOrder = imageContentsList[index].order;
+            const newSection = updateImageContent(targetOrder, file, prev);
+            localSectionRef.current = newSection;
+            setLocalSection(newSection);
+            emitSectionChange(newSection);
         },
-        [onSectionChange, updateImageContent],
+        [emitSectionChange, updateImageContent],
     );
 
     const handlePairFieldChange = useCallback(
         (index: number, value: string, field: ContentType.Description | ContentType.Author) => {
-            setLocalSection((prev) => {
-                const pairs = getDescriptionAuthorPairs(prev.contents);
-                const target = pairs[index];
-                if (!target) return prev;
+            const prev = localSectionRef.current;
+            const pairs = getDescriptionAuthorPairs(prev.contents);
+            const target = pairs[index];
+            if (!target) return;
 
-                const updatedContents = prev.contents.map((c) => {
-                    if (c.groupIndex !== target.groupIndex || c.contentType !== field) return c;
+            const updatedContents = prev.contents.map((c) => {
+                if (c.groupIndex !== target.groupIndex || c.contentType !== field) return c;
 
-                    if (field === ContentType.Description) {
-                        return { ...c, description: value };
-                    }
+                if (field === ContentType.Description) {
+                    return { ...c, description: value };
+                }
 
-                    return { ...c, author: value };
-                });
-
-                const updatedSection = { ...prev, contents: updatedContents };
-                onSectionChange?.(updatedSection);
-                return updatedSection;
+                return { ...c, author: value };
             });
+
+            const newSection = { ...prev, contents: updatedContents };
+            localSectionRef.current = newSection;
+            setLocalSection(newSection);
+            emitSectionChange(newSection);
         },
-        [onSectionChange],
+        [emitSectionChange],
     );
 
     const handlePairDescriptionChange = useCallback(
@@ -239,59 +301,79 @@ export const ProgramSectionForm = ({
     );
 
     const handleAddPair = useCallback(() => {
-        setLocalSection((prev) => {
-            const groupIndexes = prev.contents
-                .map((c) => c.groupIndex)
-                .filter((x): x is number => x !== null && x !== undefined);
+        const prev = localSectionRef.current;
+        const groupIndexes = prev.contents
+            .map((c) => c.groupIndex)
+            .filter((x): x is number => x !== null && x !== undefined);
 
-            const nextGroupIndex = groupIndexes.length ? Math.max(...groupIndexes) + 1 : 0;
+        const nextGroupIndex = groupIndexes.length ? Math.max(...groupIndexes) + 1 : 0;
 
-            const maxOrder = prev.contents.length ? Math.max(...prev.contents.map((c) => c.order)) : -1;
-            const descriptionOrder = maxOrder + 1;
-            const authorOrder = maxOrder + 2;
+        const maxOrder = prev.contents.length ? Math.max(...prev.contents.map((c) => c.order)) : -1;
+        const descriptionOrder = maxOrder + 1;
+        const authorOrder = maxOrder + 2;
 
-            const updatedSection: ProgramSection = {
-                ...prev,
-                contents: [
-                    ...prev.contents,
-                    {
-                        contentType: ContentType.Description,
-                        order: descriptionOrder,
-                        groupIndex: nextGroupIndex,
-                        description: '',
-                    },
-                    {
-                        contentType: ContentType.Author,
-                        order: authorOrder,
-                        groupIndex: nextGroupIndex,
-                        author: '',
-                    },
-                ],
-            };
+        const newSection: ProgramSection = {
+            ...prev,
+            contents: [
+                ...prev.contents,
+                {
+                    contentType: ContentType.Description,
+                    order: descriptionOrder,
+                    groupIndex: nextGroupIndex,
+                    description: '',
+                },
+                {
+                    contentType: ContentType.Author,
+                    order: authorOrder,
+                    groupIndex: nextGroupIndex,
+                    author: '',
+                },
+            ],
+        };
 
-            onSectionChange?.(updatedSection);
-            return updatedSection;
-        });
-    }, [onSectionChange]);
+        localSectionRef.current = newSection;
+        setLocalSection(newSection);
+        emitSectionChange(newSection);
+    }, [emitSectionChange]);
 
     const handleDeletePair = useCallback(
         (index: number) => {
-            setLocalSection((prev) => {
-                const pairs = getDescriptionAuthorPairs(prev.contents);
-                const target = pairs[index];
-                if (!target) return prev;
+            const prev = localSectionRef.current;
+            const pairs = getDescriptionAuthorPairs(prev.contents);
+            const target = pairs[index];
+            if (!target) return;
 
-                const updatedSection: ProgramSection = {
-                    ...prev,
-                    contents: prev.contents.filter((c) => c.groupIndex !== target.groupIndex),
-                };
+            const newSection: ProgramSection = {
+                ...prev,
+                contents: prev.contents.filter((c) => c.groupIndex !== target.groupIndex),
+            };
 
-                onSectionChange?.(updatedSection);
-                return updatedSection;
-            });
+            localSectionRef.current = newSection;
+            setLocalSection(newSection);
+            emitSectionChange(newSection);
         },
-        [onSectionChange],
+        [emitSectionChange],
     );
+
+    const handleEditClick = useCallback(
+        (e: React.MouseEvent<HTMLButtonElement>) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setOriginalSection(localSection);
+            setIsDirty(false);
+            setSectionMode(ProgramSectionMode.Edit);
+        },
+        [localSection],
+    );
+
+    const handleSaveClick = useCallback(() => {
+        if (isDisabled || !isSectionValid) return;
+        onSave();
+        setOriginalSection(localSection);
+        setIsDirty(false);
+        setSectionMode(ProgramSectionMode.View);
+        setValidationResetKey((prev) => prev + 1);
+    }, [isDisabled, isSectionValid, onSave, localSection]);
 
     const CARD_TEMPLATES = [
         ProgramSectionTemplate.DualTitleDescriptionPairs,
@@ -299,10 +381,55 @@ export const ProgramSectionForm = ({
         ProgramSectionTemplate.QuadTitleDescriptionPairs,
     ];
 
-    //TODO: implement validation
     const canAddPair = true;
 
     const isCardTemplate = CARD_TEMPLATES.includes(section.template);
+
+    const handleCancelClick = useCallback(() => {
+        const shouldRemove = isNewSection;
+        const revertTo = originalSection;
+        const isTemplateReplacement = isReplacingTemplate;
+
+        const onAfterDiscard = () => {
+            if (!shouldRemove) {
+                localSectionRef.current = revertTo;
+                setLocalSection(revertTo);
+                setIsDirty(false);
+                setSectionMode(ProgramSectionMode.View);
+                setValidationResetKey((prev) => prev + 1);
+            }
+        };
+
+        onCancel({
+            isDirty,
+            shouldRemove,
+            revertTo,
+            onAfterDiscard,
+            isTemplateReplacement,
+        });
+    }, [isDirty, isNewSection, onCancel, originalSection, isReplacingTemplate]);
+
+    const handleDeleteClick = useCallback(
+        (e: React.MouseEvent<HTMLButtonElement>) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (onDelete) {
+                onDelete();
+            }
+        },
+        [onDelete],
+    );
+
+    const handleReplaceClick = useCallback(
+        (e: React.MouseEvent<HTMLButtonElement>) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (onRequestReplace) {
+                onRequestReplace();
+            }
+        },
+        [onRequestReplace],
+    );
 
     const editableSection = renderProgramSection({
         templateId: section.template,
@@ -314,7 +441,8 @@ export const ProgramSectionForm = ({
             ...(isCardTemplate ? { cards } : {}),
             ...(isDescriptionAuthorPairsTemplate ? { descriptionAuthorPairs } : {}),
         },
-        mode: ProgramSectionMode.Edit,
+        mode: sectionMode,
+        validationResetKey,
         handlers: {
             onTitleChange: handleTitleChange,
             onDescriptionChange: handleDescriptionChange,
@@ -328,7 +456,6 @@ export const ProgramSectionForm = ({
                           handleCardContentChange(index, value, ContentType.Description),
                   }
                 : {}),
-
             ...(isDescriptionAuthorPairsTemplate
                 ? {
                       onCardDescriptionChange: handlePairDescriptionChange,
@@ -343,20 +470,54 @@ export const ProgramSectionForm = ({
 
     return (
         <div className={styles.container}>
+            <div className={styles['actions-section']}>
+                {sectionMode === ProgramSectionMode.View && (
+                    <div className={styles['hover-buttons']}>
+                        <button
+                            type="button"
+                            onClick={handleEditClick}
+                            className={`${styles['icon-button']} ${styles['edit-button']}`}
+                            aria-label="Edit section"
+                        />
+                        <button
+                            type="button"
+                            onClick={handleDeleteClick}
+                            className={`${styles['icon-button']} ${styles['delete-button']}`}
+                            aria-label="Delete section"
+                        />
+                        <button
+                            type="button"
+                            onClick={handleReplaceClick}
+                            className={`${styles['icon-button']} ${styles['change-button']}`}
+                            aria-label="Replace section"
+                        />
+                    </div>
+                )}
+            </div>
+
             <div className={styles.content}>
                 {editableSection || (
                     <p className={styles['template-info']}>
-                        Template ID: <strong>{section.template}</strong> (not yet implemented)
+                        Template ID: <strong>{section.template}</strong> (not found in renderer)
                     </p>
                 )}
             </div>
-            <div className={styles.actions}>
-                <Button buttonStyle="secondary" onClick={onCancel} disabled={isDisabled}>
-                    {PROGRAMS_TEXT.BUTTON.CANCEL}
-                </Button>
-                <Button buttonStyle="primary" onClick={onSave} disabled={true}>
-                    {PROGRAMS_TEXT.BUTTON.SAVE}
-                </Button>
+
+            <div className={styles['actions-container']}>
+                {sectionMode !== ProgramSectionMode.View && (
+                    <div className={styles.actions}>
+                        <Button buttonStyle="secondary" onClick={handleCancelClick} disabled={isDisabled}>
+                            {PROGRAMS_TEXT.BUTTON.CANCEL}
+                        </Button>
+                        <Button
+                            buttonStyle="primary"
+                            onClick={handleSaveClick}
+                            disabled={isDisabled || !isSectionValid}
+                        >
+                            {PROGRAMS_TEXT.BUTTON.SAVE}
+                        </Button>
+                    </div>
+                )}
             </div>
         </div>
     );

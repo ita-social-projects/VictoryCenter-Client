@@ -18,6 +18,7 @@ export interface SingleImageBottomProps {
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
     onImageChange?: (file: ImageValues | null) => void;
+    validationResetKey?: number;
 }
 
 export const SingleImageBottom = ({
@@ -28,6 +29,7 @@ export const SingleImageBottom = ({
     onTitleChange,
     onDescriptionChange,
     onImageChange,
+    validationResetKey,
 }: SingleImageBottomProps) => {
     const imageSrc = getImageSrc(image);
     const baseStyles = mode === ProgramSectionMode.Published ? publishedStyles : styles;
@@ -50,6 +52,7 @@ export const SingleImageBottom = ({
                 mode={mode}
                 onTitleChange={onTitleChange}
                 onDescriptionChange={onDescriptionChange}
+                validationResetKey={validationResetKey}
             />
             <div className={baseStyles['bottom-section']}>
                 <div className={baseStyles['image-wrapper']}>

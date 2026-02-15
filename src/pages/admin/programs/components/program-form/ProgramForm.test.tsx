@@ -24,6 +24,7 @@ jest.mock('@/validation/admin/program-schema/program-schema', () => ({
         validateMeetingCount: jest.fn(),
         validateSections: jest.fn(),
     },
+    isProgramSectionValid: jest.fn(() => true),
 }));
 
 jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
@@ -72,6 +73,8 @@ jest.mock('@/components/admin/input-groups/multi-select-input-group/MultiSelectI
         error,
         id,
         options,
+        getOptionId,
+        getOptionName,
     }: MultiSelectInputGroupProps<ProgramCategory>) => (
         <div data-testid={`group-${id}`}>
             <label>{label}</label>
@@ -84,6 +87,12 @@ jest.mock('@/components/admin/input-groups/multi-select-input-group/MultiSelectI
                 Blur
             </button>
             {error && <span data-testid={`error-${id}`}>{error}</span>}
+            {getOptionId && getOptionName && options[0] && (
+                <div data-testid={`category-accessor-${id}`}>
+                    <span data-testid={`category-id-${id}`}>{getOptionId(options[0])}</span>
+                    <span data-testid={`category-name-${id}`}>{getOptionName(options[0])}</span>
+                </div>
+            )}
         </div>
     ),
 }));
@@ -123,17 +132,69 @@ jest.mock('@/assets/icons/plus.svg', () => ({
 }));
 
 jest.mock('../program-section-form/ProgramSectionForm', () => ({
-    ProgramSectionForm: ({ section, onSave, onCancel, isDisabled }: any) => (
+    ProgramSectionForm: ({
+        section,
+        onSave,
+        onCancel,
+        onSectionChange,
+        onEditStateChange,
+        onDelete,
+        onRequestReplace,
+        isDisabled,
+        isNewSection,
+        isReplacingTemplate,
+    }: any) => (
         <div
             data-testid="program-section-form"
             data-section-template={String(section.template)}
             data-disabled={String(isDisabled)}
+            data-is-new={String(isNewSection)}
+            data-is-replacing={String(isReplacingTemplate)}
         >
             <button type="button" data-testid={`save-section-${section.id ?? section.template}`} onClick={onSave}>
                 Save
             </button>
-            <button type="button" data-testid={`cancel-section-${section.id ?? section.template}`} onClick={onCancel}>
+            <button
+                type="button"
+                data-testid={`cancel-section-${section.id ?? section.template}`}
+                onClick={() =>
+                    onCancel({
+                        isDirty: true,
+                        shouldRemove: false,
+                        revertTo: section,
+                        onAfterDiscard: jest.fn(),
+                    })
+                }
+            >
                 Cancel
+            </button>
+            <button
+                type="button"
+                data-testid={`change-section-${section.id ?? section.template}`}
+                onClick={() => onSectionChange?.({ ...section, order: 999 })}
+            >
+                Change
+            </button>
+            <button
+                type="button"
+                data-testid={`edit-state-${section.id ?? section.template}`}
+                onClick={() => onEditStateChange?.(true)}
+            >
+                Toggle Edit
+            </button>
+            <button
+                type="button"
+                data-testid={`delete-section-${section.id ?? section.template}`}
+                onClick={() => onDelete?.()}
+            >
+                Delete
+            </button>
+            <button
+                type="button"
+                data-testid={`replace-section-${section.id ?? section.template}`}
+                onClick={() => onRequestReplace?.()}
+            >
+                Replace
             </button>
         </div>
     ),
@@ -157,6 +218,21 @@ describe('ProgramForm', () => {
         isFormDisabled: false,
     };
 
+    const createInitialData = (overrides: Partial<ProgramFormValues> = {}): ProgramFormValues => ({
+        name: '',
+        categories: [],
+        description: '',
+        previewImage: null,
+        previewImageId: null,
+        backgroundImage: null,
+        backgroundImageId: null,
+        location: '',
+        participantsCount: '',
+        meetingCount: '',
+        sections: [],
+        ...overrides,
+    });
+
     const renderProgramForm = (props: Partial<ProgramFormProps> = {}, ref?: React.Ref<ProgramFormRef>) => {
         return render(<ProgramForm {...defaultProps} {...props} ref={ref} />);
     };
@@ -179,7 +255,7 @@ describe('ProgramForm', () => {
         });
 
         it('should render with initial data when provided', () => {
-            const initialData: ProgramFormValues = {
+            const initialData = createInitialData({
                 name: 'Initial Name',
                 categories: [mockCategories[0]],
                 description: 'Initial Desc',
@@ -190,8 +266,7 @@ describe('ProgramForm', () => {
                 location: 'Kyiv',
                 participantsCount: '10',
                 meetingCount: '5',
-                sections: [],
-            };
+            });
 
             renderProgramForm({ initialData });
 
@@ -295,6 +370,16 @@ describe('ProgramForm', () => {
             expect(PROGRAM_VALIDATION_FUNCTIONS.validateCategories).toHaveBeenCalled();
             expect(screen.getByTestId('error-toolbar-categories')).toHaveTextContent('Category Error');
         });
+
+        it('should pass getOptionId and getOptionName callbacks to MultiSelectInputGroup for categories', () => {
+            renderProgramForm();
+
+            const categoryIdElement = screen.getByTestId('category-id-toolbar-categories');
+            const categoryNameElement = screen.getByTestId('category-name-toolbar-categories');
+
+            expect(categoryIdElement).toHaveTextContent('1');
+            expect(categoryNameElement).toHaveTextContent('Tech');
+        });
     });
 
     describe('Image Handling', () => {
@@ -377,19 +462,13 @@ describe('ProgramForm', () => {
 
         it('should submit form when valid and call validateForm for all fields', async () => {
             const ref = React.createRef<ProgramFormRef>();
-            const initialData: ProgramFormValues = {
+            const initialData = createInitialData({
                 name: 'Program A',
-                categories: [],
                 description: 'Test description',
-                previewImage: null,
-                previewImageId: null,
-                backgroundImage: null,
-                backgroundImageId: null,
                 location: 'Kyiv',
                 participantsCount: '10',
                 meetingCount: '5',
-                sections: [],
-            };
+            });
             renderProgramForm({ initialData }, ref);
 
             Object.values(PROGRAM_VALIDATION_FUNCTIONS).forEach((fn) => (fn as jest.Mock).mockReturnValue(undefined));
@@ -452,6 +531,10 @@ describe('ProgramForm', () => {
             contents: [],
         } as ProgramSection;
 
+        const initialDataWithSections = createInitialData({
+            sections: [sectionWithId, sectionWithoutId],
+        });
+
         it('renders empty state when there are no sections, and sections list when sections exist', async () => {
             const ref = React.createRef<ProgramFormRef>();
             renderProgramForm({}, ref);
@@ -471,19 +554,9 @@ describe('ProgramForm', () => {
 
         it('supports addSection/removeSection/getSections via ref (and covers key id ?? template)', async () => {
             const ref = React.createRef<ProgramFormRef>();
-            const initialData: ProgramFormValues = {
-                name: '',
-                categories: [],
-                description: '',
-                previewImage: null,
-                previewImageId: null,
-                backgroundImage: null,
-                backgroundImageId: null,
-                location: '',
-                participantsCount: '',
-                meetingCount: '',
+            const initialData = createInitialData({
                 sections: [sectionWithId, sectionWithoutId],
-            };
+            });
 
             renderProgramForm({ initialData }, ref);
 
@@ -520,19 +593,9 @@ describe('ProgramForm', () => {
 
         it('calls onRequestCancelSection when section cancel is requested', async () => {
             const onRequestCancelSection = jest.fn();
-            const initialData: ProgramFormValues = {
-                name: '',
-                categories: [],
-                description: '',
-                previewImage: null,
-                previewImageId: null,
-                backgroundImage: null,
-                backgroundImageId: null,
-                location: '',
-                participantsCount: '',
-                meetingCount: '',
+            const initialData = createInitialData({
                 sections: [sectionWithId],
-            };
+            });
 
             renderProgramForm({ initialData, onRequestCancelSection });
 
@@ -541,46 +604,33 @@ describe('ProgramForm', () => {
             });
 
             fireEvent.click(screen.getByTestId('cancel-section-101'));
-            expect(onRequestCancelSection).toHaveBeenCalledWith(0);
+            expect(onRequestCancelSection).toHaveBeenCalledWith({
+                type: expect.any(Number),
+                onDiscard: expect.any(Function),
+            });
         });
 
         it('does not throw if onRequestCancelSection is not provided', async () => {
-            const initialData: ProgramFormValues = {
-                name: '',
-                categories: [],
-                description: '',
-                previewImage: null,
-                previewImageId: null,
-                backgroundImage: null,
-                backgroundImageId: null,
-                location: '',
-                participantsCount: '',
-                meetingCount: '',
+            const initialData = createInitialData({
                 sections: [sectionWithId],
-            };
+            });
 
             renderProgramForm({ initialData });
             await waitFor(() => {
                 expect(screen.getAllByTestId('program-section-form')).toHaveLength(1);
             });
 
-            expect(() => fireEvent.click(screen.getByTestId('cancel-section-101'))).not.toThrow();
+            fireEvent.click(screen.getByTestId('cancel-section-101'));
+
+            await waitFor(() => {
+                expect(screen.getAllByTestId('program-section-form')).toHaveLength(1);
+            });
         });
 
         it('wires ProgramSectionForm isDisabled based on isFormDisabled', async () => {
-            const initialData: ProgramFormValues = {
-                name: '',
-                categories: [],
-                description: '',
-                previewImage: null,
-                previewImageId: null,
-                backgroundImage: null,
-                backgroundImageId: null,
-                location: '',
-                participantsCount: '',
-                meetingCount: '',
+            const initialData = createInitialData({
                 sections: [sectionWithId],
-            };
+            });
 
             renderProgramForm({ initialData, isFormDisabled: true });
             await waitFor(() => {
@@ -590,19 +640,9 @@ describe('ProgramForm', () => {
         });
 
         it('triggers handleSaveSection via ProgramSectionForm onSave', async () => {
-            const initialData: ProgramFormValues = {
-                name: '',
-                categories: [],
-                description: '',
-                previewImage: null,
-                previewImageId: null,
-                backgroundImage: null,
-                backgroundImageId: null,
-                location: '',
-                participantsCount: '',
-                meetingCount: '',
+            const initialData = createInitialData({
                 sections: [sectionWithId],
-            };
+            });
 
             renderProgramForm({ initialData });
             await waitFor(() => {
@@ -611,6 +651,111 @@ describe('ProgramForm', () => {
 
             fireEvent.click(screen.getByTestId('save-section-101'));
             expect(screen.getAllByTestId('program-section-form')).toHaveLength(1);
+        });
+
+        it('triggers handleSectionChange with correct index via ProgramSectionForm onSectionChange', async () => {
+            const ref = React.createRef<ProgramFormRef>();
+            renderProgramForm({ initialData: initialDataWithSections }, ref);
+
+            await waitFor(() => {
+                expect(screen.getAllByTestId('program-section-form')).toHaveLength(2);
+            });
+
+            fireEvent.click(screen.getByTestId('change-section-101'));
+
+            await waitFor(() => {
+                const sections = ref.current?.getSections();
+                expect(sections?.[0].order).toBe(999);
+            });
+        });
+
+        it('triggers handleSectionEditStateChange and updates validation state via ProgramSectionForm onEditStateChange', async () => {
+            const mockOnValidationChange = jest.fn();
+            const initialData = createInitialData({
+                name: 'Valid Name',
+                categories: [mockCategories[0]],
+                description: 'Valid Description',
+                previewImage: { base64: 'test', mimeType: 'image/png' },
+                previewImageId: 1,
+                backgroundImage: { base64: 'test', mimeType: 'image/png' },
+                backgroundImageId: 2,
+                location: 'Valid Location',
+                participantsCount: '10',
+                meetingCount: '5',
+                sections: [sectionWithId],
+            });
+
+            Object.values(PROGRAM_VALIDATION_FUNCTIONS).forEach((fn) => (fn as jest.Mock).mockReturnValue(undefined));
+
+            renderProgramForm({ initialData, onValidationChange: mockOnValidationChange });
+
+            await waitFor(() => {
+                expect(screen.getAllByTestId('program-section-form')).toHaveLength(1);
+            });
+
+            await waitFor(() => {
+                expect(mockOnValidationChange).toHaveBeenLastCalledWith(true);
+            });
+
+            mockOnValidationChange.mockClear();
+
+            fireEvent.click(screen.getByTestId('edit-state-101'));
+
+            await waitFor(() => {
+                expect(mockOnValidationChange).toHaveBeenLastCalledWith(false);
+            });
+        });
+
+        it('calls onRequestCancelSection when section delete button is clicked', async () => {
+            const mockOnRequestCancelSection = jest.fn();
+            const initialData = createInitialData({
+                sections: [{ id: 101, template: 1, order: 0, contents: [] } as ProgramSection],
+            });
+
+            renderProgramForm({ initialData, onRequestCancelSection: mockOnRequestCancelSection });
+
+            await waitFor(() => {
+                expect(screen.getByTestId('delete-section-101')).toBeInTheDocument();
+            });
+
+            fireEvent.click(screen.getByTestId('delete-section-101'));
+
+            expect(mockOnRequestCancelSection).toHaveBeenCalledTimes(1);
+        });
+
+        it('calls onReplaceSection with correct index when replace button is clicked', async () => {
+            const mockOnReplaceSection = jest.fn();
+            const initialData = createInitialData({
+                sections: [{ id: 101, template: 1, order: 0, contents: [] } as ProgramSection],
+            });
+
+            renderProgramForm({ initialData, onReplaceSection: mockOnReplaceSection });
+
+            await waitFor(() => {
+                expect(screen.getByTestId('replace-section-101')).toBeInTheDocument();
+            });
+
+            fireEvent.click(screen.getByTestId('replace-section-101'));
+
+            expect(mockOnReplaceSection).toHaveBeenCalledWith(0);
+        });
+
+        it('deletes section directly when onRequestCancelSection is not provided', async () => {
+            const initialData = createInitialData({
+                sections: [{ id: 101, template: 1, order: 0, contents: [] } as ProgramSection],
+            });
+
+            renderProgramForm({ initialData });
+
+            await waitFor(() => {
+                expect(screen.getByTestId('program-section-form')).toBeInTheDocument();
+            });
+
+            fireEvent.click(screen.getByTestId('delete-section-101'));
+
+            await waitFor(() => {
+                expect(screen.queryByTestId('program-section-form')).not.toBeInTheDocument();
+            });
         });
     });
 });

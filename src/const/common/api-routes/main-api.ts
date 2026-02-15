@@ -71,4 +71,7 @@ export const API_ROUTES = {
         SECTIONS: 'Partners/sections',
         PAGE: 'Partners/page',
     },
+    FAQ_LOCALIZATIONS: {
+        BASE: 'FaqQuestionLocalizations',
+    },
 };

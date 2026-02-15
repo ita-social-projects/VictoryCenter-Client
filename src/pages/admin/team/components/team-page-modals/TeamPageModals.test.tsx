@@ -59,12 +59,11 @@ jest.mock('../delete-team-member-modal/DeleteTeamMemberModal', () => ({
 }));
 
 jest.mock('../translate-team-member-modal/TranslateTeamMemberModal', () => ({
-    TranslateTeamMemberModal: ({ isOpen, onClose, onTranslateMember, memberToTranslate, language, mode }: any) => (
+    TranslateTeamMemberModal: ({ isOpen, onClose, onTranslateMember, memberToTranslate, translatedLanguages }: any) => (
         <div data-testid="translate-team-member-modal">
             <span data-testid="translate-modal-is-open">{isOpen.toString()}</span>
-            <span data-testid="translate-modal-mode">{mode}</span>
             {memberToTranslate && <span data-testid="translate-modal-member">{memberToTranslate.id}</span>}
-            <span data-testid="translate-modal-language">{language?.code}</span>
+            <span data-testid="translate-modal-language">{translatedLanguages?.[0]?.code}</span>
 
             <button data-testid="translate-modal-close-btn" onClick={onClose}>
                 Close
@@ -133,6 +132,7 @@ const mockTeamCategory: TeamCategory = {
     id: 1,
     name: 'Test Category',
     description: 'Test category description',
+    localizations: [],
     teamMembersCount: 5,
 };
 
@@ -142,6 +142,7 @@ const mockCategories: TeamCategory[] = [
         id: 2,
         name: 'Another Category',
         description: 'Another test category',
+        localizations: [],
         teamMembersCount: 3,
     },
 ];
@@ -197,7 +198,7 @@ const createDefaultProps = (
 ): TeamPageModalsProps => ({
     modalsStateControl: createMockModalsStateControl(modalsStateOverrides),
     categories: mockCategories,
-    englishLanguage: mockEnglishLanguage,
+    translatedLanguages: [mockEnglishLanguage],
     onAddTeamMember: jest.fn(),
     onEditTeamMember: jest.fn(),
     onDeleteTeamMember: jest.fn(),
@@ -367,14 +368,13 @@ describe('TeamPageModals', () => {
         });
 
         describe('Translate Team Member Modal', () => {
-            it('does not render translate modal in ADD mode when englishLanguage is missing', () => {
+            it('does render translate modal in ADD mode', () => {
                 const props = {
                     ...createDefaultProps({ itemToTranslate: mockTeamMember }),
-                    englishLanguage: undefined,
                 };
 
                 render(<TeamPageModals {...props} />);
-                expect(document.querySelector('[data-testid="translate-team-member-modal"]')).not.toBeInTheDocument();
+                expect(document.querySelector('[data-testid="translate-team-member-modal"]')).toBeInTheDocument();
             });
 
             it('renders and passes correct props when itemToTranslate exists', () => {
@@ -403,9 +403,8 @@ describe('TeamPageModals', () => {
                 const props = createDefaultProps({ itemToTranslate: mockTeamMember });
                 render(<TeamPageModals {...props} />);
 
-                expect(document.querySelector('[data-testid="translate-modal-mode"]')).toHaveTextContent(
-                    ModalMode.Add.toString(),
-                );
+                const modal = document.querySelector('[data-testid="translate-team-member-modal"]');
+                expect(modal).toBeInTheDocument();
             });
 
             it('renders translate modal in EDIT mode', () => {
@@ -414,9 +413,6 @@ describe('TeamPageModals', () => {
 
                 const modal = document.querySelector('[data-testid="translate-team-member-modal"]');
                 expect(modal).toBeInTheDocument();
-                expect(modal?.querySelector('[data-testid="translate-modal-mode"]')).toHaveTextContent(
-                    ModalMode.Edit.toString(),
-                );
             });
 
             it('calls closeEditTranslationModal when close button clicked in edit translate modal', () => {

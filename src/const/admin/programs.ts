@@ -36,6 +36,8 @@ export const PROGRAMS_TEXT = {
         },
         MODAL: {
             UNSAVED_CHANGES_TITLE: 'Відмінити додавання секції?',
+            DELETE_SECTION_TITLE: 'Видалити секцію?',
+            REPLACE_TEMPLATE_TITLE: 'Відмінити заміну шаблона?',
         },
         FORM: {
             TITLE: {

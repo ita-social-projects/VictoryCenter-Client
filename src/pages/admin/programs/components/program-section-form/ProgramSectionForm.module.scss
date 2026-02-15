@@ -1,5 +1,89 @@
+@use '@/assets/sass/variables/colors.scss' as c;
+
 .container {
     background-color: #fff;
+    position: relative;
+
+    &:hover .hover-buttons {
+        opacity: 1;
+        visibility: visible;
+    }
+}
+
+.actions-section {
+    display: flex;
+    justify-content: end;
+    height: 100px;
+    padding: 30px 30px 0 0;
+}
+
+.hover-buttons {
+    display: flex;
+    height: 56px;
+    width: 152px;
+    gap: 16px;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 24px;
+    border-radius: 8px;
+    background-color: c.$light-blue-100;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+        opacity 0.2s ease,
+        visibility 0.2s ease;
+}
+
+.icon-button {
+    width: 24px;
+    height: 24px;
+    border: none;
+    border-radius: 0;
+    background-color: transparent;
+    background-repeat: no-repeat;
+    background-position: center;
+    transition: opacity 0.2s ease;
+    background-size: 24px 24px;
+    cursor: pointer;
+}
+
+.edit-button {
+    background-image: url('~@/assets/icons/edit.svg');
+
+    &:hover,
+    &:active {
+        background-image: url('~@/assets/icons/edit-pressed.svg');
+    }
+
+    &:hover {
+        opacity: 0.6;
+    }
+}
+
+.delete-button {
+    background-image: url('~@/assets/icons/delete.svg');
+
+    &:hover,
+    &:active {
+        background-image: url('~@/assets/icons/delete-pressed.svg');
+    }
+
+    &:hover {
+        opacity: 0.6;
+    }
+}
+
+.change-button {
+    background-image: url('~@/assets/icons/change.svg');
+
+    &:hover,
+    &:active {
+        background-image: url('~@/assets/icons/change-pressed.svg');
+    }
+
+    &:hover {
+        opacity: 0.6;
+    }
 }
 
 .content {
@@ -13,7 +97,7 @@
 }
 
 .template-info {
-    font-size: 1rem;
+    font-size: 14px;
     color: #666;
 
     strong {
@@ -22,12 +106,15 @@
     }
 }
 
+.actions-container {
+    background-color: #fff;
+    min-height: 100px;
+}
+
 .actions {
     display: flex;
     justify-content: center;
-    background-color: #fff;
-    gap: 2rem;
-    padding-bottom: 4rem;
+    gap: 32px;
 
     Button {
         width: 325px;

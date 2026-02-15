@@ -20,6 +20,7 @@ interface TitleDescriptionCardProps {
     mode?: ProgramSectionMode;
     onTitleChange?: (index: number, value: string) => void;
     onDescriptionChange?: (index: number, value: string) => void;
+    validationResetKey?: number;
 }
 
 export const TitleDescriptionCard = ({
@@ -29,6 +30,7 @@ export const TitleDescriptionCard = ({
     mode = ProgramSectionMode.Published,
     onTitleChange,
     onDescriptionChange,
+    validationResetKey,
 }: TitleDescriptionCardProps) => {
     const titleMin = getProgramSectionTemplateMinLength(template, ContentType.Title);
     const titleMax = getProgramSectionTemplateMaxLength(template, ContentType.Title);
@@ -46,6 +48,7 @@ export const TitleDescriptionCard = ({
         min: titleMin,
         max: titleMax,
         required: true,
+        resetKey: validationResetKey,
     });
 
     const {
@@ -58,6 +61,7 @@ export const TitleDescriptionCard = ({
         min: descriptionMin,
         max: descriptionMax,
         required: true,
+        resetKey: validationResetKey,
     });
 
     const { intro, items } = parseDescriptionList(card.description);

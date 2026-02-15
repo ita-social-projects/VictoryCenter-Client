@@ -100,8 +100,8 @@ jest.mock('@/components/admin/image-input/ImageInput', () => ({
 }));
 
 const categories: TeamCategory[] = [
-    { id: 1, name: 'Coaches', description: '', teamMembersCount: 0 },
-    { id: 2, name: 'Volunteers', description: '', teamMembersCount: 0 },
+    { id: 1, name: 'Coaches', description: '', localizations: [], teamMembersCount: 0 },
+    { id: 2, name: 'Volunteers', description: '', localizations: [], teamMembersCount: 0 },
 ];
 
 describe('MemberForm', () => {

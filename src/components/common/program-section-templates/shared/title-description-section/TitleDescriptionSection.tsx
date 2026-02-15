@@ -1,6 +1,7 @@
 import styles from './TitleDescriptionSection.module.scss';
 import publishedStyles from './PublishedTitleDescriptionSection.module.scss';
 import cn from 'classnames';
+import { useId } from 'react';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { PROGRAMS_TEXT, PROGRAM_SECTION_TEMPLATE_VALIDATION } from '@/const/admin/programs';
@@ -31,6 +32,7 @@ export interface TitleDescriptionSectionProps {
     isPublishing?: boolean;
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
+    validationResetKey?: number;
 }
 
 export const TitleDescriptionSection = ({
@@ -44,7 +46,9 @@ export const TitleDescriptionSection = ({
     isPublishing = false,
     onTitleChange,
     onDescriptionChange,
+    validationResetKey,
 }: TitleDescriptionSectionProps) => {
+    const idPrefix = useId();
     const {
         titleError,
         descriptionError,
@@ -57,6 +61,7 @@ export const TitleDescriptionSection = ({
         isPublishing,
         onTitleChange,
         onDescriptionChange,
+        resetKey: validationResetKey,
     });
 
     const baseStyles = mode === ProgramSectionMode.Published ? publishedStyles : styles;
@@ -80,8 +85,8 @@ export const TitleDescriptionSection = ({
                     <InputWithCharacterLimitGroup
                         label={PROGRAMS_TEXT.SECTION.FORM.TITLE.TEXT}
                         isRequired={true}
-                        id="section-title"
-                        name="section-title"
+                        id={`${idPrefix}-section-title`}
+                        name={`${idPrefix}-section-title`}
                         value={title}
                         onChange={handleTitleChange}
                         onBlur={handleTitleBlur}
@@ -101,8 +106,8 @@ export const TitleDescriptionSection = ({
                     <TextAreaWithCharacterLimitGroup
                         label={PROGRAMS_TEXT.SECTION.FORM.DESCRIPTION.TEXT}
                         isRequired={true}
-                        id="section-description"
-                        name="section-description"
+                        id={`${idPrefix}-section-description`}
+                        name={`${idPrefix}-section-description`}
                         value={description}
                         onChange={handleDescriptionChange}
                         onBlur={handleDescriptionBlur}

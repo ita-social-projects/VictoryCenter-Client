@@ -50,6 +50,7 @@ describe('DetailedProgramSection', () => {
             data: {
                 title: 'Test Title',
                 description: 'Test Description',
+                descriptions: ['Test Description'],
                 images: [],
             },
             mode: ProgramSectionMode.Published,
@@ -81,6 +82,7 @@ describe('DetailedProgramSection', () => {
             data: {
                 title: '',
                 description: 'Test Description',
+                descriptions: ['Test Description'],
                 images: [],
             },
             mode: ProgramSectionMode.Published,
@@ -111,6 +113,7 @@ describe('DetailedProgramSection', () => {
             data: {
                 title: 'Test Title',
                 description: '',
+                descriptions: [],
                 images: [],
             },
             mode: ProgramSectionMode.Published,
@@ -166,6 +169,7 @@ describe('DetailedProgramSection', () => {
             data: {
                 title: 'Title',
                 description: 'Desc',
+                descriptions: ['Desc'],
                 images: [
                     { id: 11, url: 'img1.jpg', mimeType: 'image/jpeg' },
                     { id: 12, url: 'img2.jpg', mimeType: 'image/jpeg' },
@@ -202,6 +206,7 @@ describe('DetailedProgramSection', () => {
             data: {
                 title: 'Title',
                 description: 'Desc',
+                descriptions: ['Desc'],
                 images: [null],
             },
             mode: ProgramSectionMode.Published,
@@ -223,6 +228,7 @@ describe('DetailedProgramSection', () => {
             data: {
                 title: '',
                 description: '',
+                descriptions: [],
                 images: [],
             },
             mode: ProgramSectionMode.Published,

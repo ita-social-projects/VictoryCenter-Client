@@ -16,6 +16,7 @@ import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import NotFoundIcon from '@/assets/icons/not-found.svg';
 import styles from './ProgramForm.module.scss';
 import { ProgramSection } from '@/types/common/program-sections';
+import { BackgroundMedia } from '@/components/public/background-media/BackgroundMedia';
 
 export interface ProgramFormValues {
     name: string;
@@ -415,6 +416,20 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             [updateSectionFlag],
         );
 
+        const getImageUrl = (image: Image | ImageValues | null): string | null => {
+            if (!image) return null;
+
+            if (typeof image === 'string') return image;
+
+            if ('url' in image && image.url) return image.url;
+
+            if (image instanceof File || image instanceof Blob) {
+                return URL.createObjectURL(image);
+            }
+
+            return null;
+        };
+
         return (
             <form className={styles['container']} noValidate>
                 {/* Header Section */}
@@ -471,6 +486,16 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                         )}
                         maxSizeMB={PROGRAM_VALIDATION.images.maxSizeMB}
                     />
+
+                    {formState.backgroundImage && (
+                        <BackgroundMedia
+                            mediaUrl={getImageUrl(formState.backgroundImage) || ''}
+                            overlay={{ opacity: 0.3 }}
+                            className={styles['body-background']}
+                            mediaType="image"
+                        />
+                    )}
+
                     <div className={styles['body-inputs']}>
                         <div className={styles['col-left']}>
                             <TextAreaWithCharacterLimitGroup

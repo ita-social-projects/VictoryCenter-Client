@@ -71,6 +71,7 @@ export const SingleTitleQuintupleDescription = ({
                             onChange={(e) => onTitleChange?.(e.target.value)}
                             maxLength={PROGRAM_SECTION_VALIDATION.title.max}
                             placeholder={PROGRAMS_TEXT.SECTION.FORM.TITLE.PLACEHOLDER}
+                            disabled={mode === ProgramSectionMode.View}
                         />
                     </div>
 
@@ -86,6 +87,7 @@ export const SingleTitleQuintupleDescription = ({
                                 onChange={(e) => onDescriptionsChange?.(index, e.target.value)}
                                 maxLength={PROGRAM_SECTION_VALIDATION.description.max}
                                 rows={4}
+                                disabled={mode === ProgramSectionMode.View}
                             />
                         </div>
                     ))}

@@ -9,6 +9,8 @@ export interface BaseModalState<TEntity> {
     isAddCategoryModalOpen: boolean;
     isEditCategoryModalOpen: boolean;
     isDeleteCategoryModalOpen: boolean;
+    categoryToTranslate: boolean;
+    categoryToEditTranslation: boolean;
     isAddSectionModalOpen: boolean;
 }
 
@@ -22,6 +24,8 @@ export interface BaseCloseModalActions {
     closeEditTranslationModal: () => void;
     closeDeleteCategoryModal: () => void;
     closeAddSectionModal: () => void;
+    closeTranslateCategoryModal: () => void;
+    closeEditCategoryTranslationModal: () => void;
 }
 
 export interface BaseOpenModalActions<TEntity> {
@@ -33,6 +37,8 @@ export interface BaseOpenModalActions<TEntity> {
     openAddCategoryModal: () => void;
     openEditCategoryModal: () => void;
     openDeleteCategoryModal: () => void;
+    openTranslateCategoryModal: () => void;
+    openEditCategoryTranslationModal: () => void;
     openAddSectionModal: () => void;
 }
 
@@ -54,6 +60,8 @@ export const useModalsState = <TEntity>(): UseModalsStateResult<TEntity> => {
         isEditCategoryModalOpen: false,
         isDeleteCategoryModalOpen: false,
         isAddSectionModalOpen: false,
+        categoryToTranslate: false,
+        categoryToEditTranslation: false,
     });
 
     const isAnyModalOpened = useMemo(() => {
@@ -75,6 +83,8 @@ export const useModalsState = <TEntity>(): UseModalsStateResult<TEntity> => {
             closeEditTranslationModal: () => updateModalState({ itemToEditTranslation: null }),
             closeDeleteCategoryModal: () => updateModalState({ isDeleteCategoryModalOpen: false }),
             closeAddSectionModal: () => updateModalState({ isAddSectionModalOpen: false }),
+            closeTranslateCategoryModal: () => updateModalState({ categoryToTranslate: false }),
+            closeEditCategoryTranslationModal: () => updateModalState({ categoryToEditTranslation: false }),
         }),
         [updateModalState],
     );
@@ -136,6 +146,18 @@ export const useModalsState = <TEntity>(): UseModalsStateResult<TEntity> => {
                 setModalState((prev) => {
                     if (isAnyModalOpenedInState(prev)) return prev;
                     return { ...prev, isAddSectionModalOpen: true };
+                });
+            },
+            openTranslateCategoryModal: () => {
+                setModalState((prev) => {
+                    if (isAnyModalOpenedInState(prev)) return prev;
+                    return { ...prev, categoryToTranslate: true };
+                });
+            },
+            openEditCategoryTranslationModal: () => {
+                setModalState((prev) => {
+                    if (isAnyModalOpenedInState(prev)) return prev;
+                    return { ...prev, categoryToEditTranslation: true };
                 });
             },
         };

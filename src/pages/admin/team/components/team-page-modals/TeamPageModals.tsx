@@ -8,14 +8,18 @@ import { TranslateTeamMemberModal } from '../translate-team-member-modal/Transla
 import { TeamCategoryModal } from '../team-category-modal/TeamCategoryModal';
 import { DeleteTeamCategoryModal } from '../delete-team-category-modal/DeleteTeamCategoryModal';
 import { LocalizationLanguage } from '@/types/common/language';
+import { TranslateTeamCategoryModal } from '../translate-team-category-modal/TranslateTeamCategoryModal';
+import { useState } from 'react';
 
 export interface TeamPageModalsProps {
     modalsStateControl: UseModalsStateResult<TeamMember>;
     categories: TeamCategory[];
+    selectedCategory: TeamCategory | null;
     translatedLanguages: LocalizationLanguage[];
     onAddTeamMember: (addedMember: TeamMember) => void;
     onEditTeamMember: (updatedMember: TeamMember) => void;
     onTranslateTeamMember: (translatedMember: TeamMember) => void;
+    onTranslateTeamCategory: (translatedCategory: TeamCategory) => void;
     onDeleteTeamMember: (member: TeamMember) => void;
     onAddTeamCategory: (newCategory: TeamCategory) => void;
     onEditTeamCategory: (updatedCategory: TeamCategory) => void;
@@ -25,9 +29,11 @@ export interface TeamPageModalsProps {
 export const TeamPageModals = ({
     modalsStateControl,
     categories,
+    selectedCategory,
     translatedLanguages,
     onAddTeamMember,
     onTranslateTeamMember,
+    onTranslateTeamCategory,
     onEditTeamMember,
     onDeleteTeamMember,
     onAddTeamCategory,
@@ -35,7 +41,6 @@ export const TeamPageModals = ({
     onDeleteTeamCategory,
 }: TeamPageModalsProps) => {
     const { modalState, closeModalActions } = modalsStateControl;
-
     return (
         <>
             {/* Team Member Modals */}
@@ -106,6 +111,28 @@ export const TeamPageModals = ({
                 onConfirm={onDeleteTeamCategory}
                 categories={categories}
             />
+
+            {modalState.categoryToTranslate && selectedCategory && (
+                <TranslateTeamCategoryModal
+                    isOpen={modalState.categoryToTranslate}
+                    onClose={closeModalActions.closeTranslateCategoryModal}
+                    onTranslateCategory={onTranslateTeamCategory}
+                    categoryToTranslate={selectedCategory}
+                    translatedLanguages={translatedLanguages}
+                    categories={categories}
+                />
+            )}
+
+            {modalState.categoryToEditTranslation && selectedCategory && (
+                <TranslateTeamCategoryModal
+                    isOpen={modalState.categoryToEditTranslation}
+                    onClose={closeModalActions.closeEditCategoryTranslationModal}
+                    onTranslateCategory={onTranslateTeamCategory}
+                    categoryToTranslate={selectedCategory}
+                    translatedLanguages={translatedLanguages}
+                    categories={categories}
+                />
+            )}
         </>
     );
 };

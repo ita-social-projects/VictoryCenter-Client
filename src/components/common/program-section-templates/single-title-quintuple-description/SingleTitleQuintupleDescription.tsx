@@ -40,7 +40,7 @@ export const SingleTitleQuintupleDescription = ({
     );
 
     const descriptionOrder = useMemo(() => {
-        if (mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View) {
+        if (mode === ProgramSectionMode.Edit) {
             return DESCRIPTION_LAYOUT.editable;
         }
 
@@ -51,14 +51,14 @@ export const SingleTitleQuintupleDescription = ({
         baseStyles.container,
         {
             [baseStyles.template]: mode === ProgramSectionMode.Template,
-            [baseStyles.editable]: mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View,
+            [baseStyles.editable]: mode === ProgramSectionMode.Edit,
         },
         className,
     );
 
     return (
         <div className={rootClassName}>
-            {mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View ? (
+            {mode === ProgramSectionMode.Edit ? (
                 <div className={baseStyles['editable-grid']}>
                     <div className={baseStyles['title-cell']}>
                         <InputWithCharacterLimitGroup
@@ -71,7 +71,6 @@ export const SingleTitleQuintupleDescription = ({
                             onChange={(e) => onTitleChange?.(e.target.value)}
                             maxLength={PROGRAM_SECTION_VALIDATION.title.max}
                             placeholder={PROGRAMS_TEXT.SECTION.FORM.TITLE.PLACEHOLDER}
-                            disabled={mode === ProgramSectionMode.View}
                         />
                     </div>
 
@@ -87,7 +86,6 @@ export const SingleTitleQuintupleDescription = ({
                                 onChange={(e) => onDescriptionsChange?.(index, e.target.value)}
                                 maxLength={PROGRAM_SECTION_VALIDATION.description.max}
                                 rows={4}
-                                disabled={mode === ProgramSectionMode.View}
                             />
                         </div>
                     ))}

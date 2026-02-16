@@ -117,9 +117,11 @@ describe('ImagesBottomSection', () => {
             { key: '2', value: { id: 2, url: 'img2.jpg', mimeType: 'image/jpeg' }, handler: jest.fn() },
         ];
 
-        render(<ImagesBottomSection {...defaultProps} imageHandlers={imageHandlers} mode={ProgramSectionMode.View} />);
+        render(
+            <ImagesBottomSection {...defaultProps} imageHandlers={imageHandlers} mode={ProgramSectionMode.Published} />,
+        );
 
-        // PhotoInputGroup should be called twice in View mode
+        // PhotoInputGroup should be called twice in Published mode
         expect(PhotoInputGroup).toHaveBeenCalledTimes(2);
     });
 

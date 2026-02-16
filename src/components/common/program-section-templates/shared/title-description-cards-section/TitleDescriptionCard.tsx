@@ -55,12 +55,12 @@ export const TitleDescriptionCard = ({
 
     const { intro, items } = parseDescriptionList(card.description);
 
-    if (mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View) {
+    if (mode === ProgramSectionMode.Edit) {
         return (
             <div className={cn(styles['td-card'], styles['td-card--editable'])}>
                 <div className={styles['title-field']}>
                     <InputWithCharacterLimitGroup
-                        label="Заголовок"
+                        label="Titile"
                         id={`${idPrefix}-card-title-${index}`}
                         name={`${idPrefix}-card-title-${index}`}
                         value={card.title}
@@ -70,13 +70,12 @@ export const TitleDescriptionCard = ({
                         maxLength={PROGRAM_SECTION_VALIDATION.cardTitle.max}
                         error={titleError}
                         placeholder={PROGRAMS_TEXT.SECTION.CARD.FORM.TITLE.PLACEHOLDER}
-                        disabled={mode === ProgramSectionMode.View}
                     />
                 </div>
 
                 <div className={styles['description-field']}>
                     <CardDescriptionField
-                        label="Опис"
+                        label="Description"
                         id={`${idPrefix}-card-description-${index}`}
                         name={`${idPrefix}-card-description-${index}`}
                         value={card.description}
@@ -86,7 +85,6 @@ export const TitleDescriptionCard = ({
                         maxLength={PROGRAM_SECTION_VALIDATION.cardDescription.max}
                         error={descriptionError}
                         placeholder="• "
-                        disabled={mode === ProgramSectionMode.View}
                     />
                 </div>
             </div>

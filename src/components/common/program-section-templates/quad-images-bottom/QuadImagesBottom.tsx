@@ -46,7 +46,7 @@ export const QuadImagesBottom = ({
             onDescriptionChange={onDescriptionChange}
             validationResetKey={validationResetKey}
             className={cn(baseStyles.container, {
-                [styles['form-container']]: mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View,
+                [styles['form-container']]: mode === ProgramSectionMode.Edit,
             })}
             topSectionClassName={baseStyles['top-section']}
             bottomSectionClassName={baseStyles['bottom-section']}

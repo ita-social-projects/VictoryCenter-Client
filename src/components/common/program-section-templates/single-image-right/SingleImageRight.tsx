@@ -58,10 +58,10 @@ export const SingleImageRight = ({
         <div
             className={cn(baseStyles.container, {
                 [styles.template]: mode === ProgramSectionMode.Template,
-                [styles['form-container']]: mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View,
+                [styles['form-container']]: mode === ProgramSectionMode.Edit,
             })}
         >
-            {mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View ? (
+            {mode === ProgramSectionMode.Edit ? (
                 <>
                     <div className={baseStyles['left-section']}>
                         <div className={baseStyles['title-section']}>
@@ -79,7 +79,6 @@ export const SingleImageRight = ({
                                 rows={2}
                                 error={titleError}
                                 currentLength={getTrimmedInputText(title).length}
-                                disabled={mode === ProgramSectionMode.View}
                             />
                         </div>
                         <div className={baseStyles['description-section']}>
@@ -95,7 +94,6 @@ export const SingleImageRight = ({
                                 rows={8}
                                 error={descriptionError}
                                 currentLength={getTrimmedInputText(description).length}
-                                disabled={mode === ProgramSectionMode.View}
                             />
                         </div>
                     </div>
@@ -119,7 +117,6 @@ export const SingleImageRight = ({
                                 )}
                                 variant="programSection"
                                 maxSizeMB={PROGRAM_VALIDATION.images.maxSizeMB}
-                                disabled={mode === ProgramSectionMode.View}
                             />
                         </div>
                     </div>

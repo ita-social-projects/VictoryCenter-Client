@@ -22,7 +22,7 @@ export const TextOnly = (props: TextOnlyProps) => {
                 mode === ProgramSectionMode.Published ? '' : styles.container,
                 {
                     [styles.template]: mode === ProgramSectionMode.Template,
-                    [styles['form-container']]: mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View,
+                    [styles['form-container']]: mode === ProgramSectionMode.Edit,
                 },
                 className,
             )}

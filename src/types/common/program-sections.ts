@@ -27,7 +27,6 @@ export enum ProgramSectionTemplate {
 
 export enum ProgramSectionMode {
     Template = 'template',
-    View = 'view',
     Edit = 'edit',
     Published = 'published',
 }

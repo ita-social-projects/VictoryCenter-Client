@@ -92,8 +92,7 @@ export const ImagesBottomSection = ({
             className={cn(
                 baseStyles.container,
                 {
-                    [baseStyles['form-container']]:
-                        mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View,
+                    [baseStyles['form-container']]: mode === ProgramSectionMode.Edit,
                 },
                 className,
             )}

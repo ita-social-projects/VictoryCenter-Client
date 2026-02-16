@@ -8,7 +8,7 @@ jest.mock('../TitleDescriptionCard', () => ({
     TitleDescriptionCard: ({ card, index, mode, onTitleChange, onDescriptionChange }: any) => {
         const React = require('react');
         const { ProgramSectionMode } = require('@/types/common/program-sections');
-        const isEditable = mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View;
+        const isEditable = mode === ProgramSectionMode.Edit;
         const [title, setTitle] = React.useState(card.title);
         const [description, setDescription] = React.useState(card.description);
 

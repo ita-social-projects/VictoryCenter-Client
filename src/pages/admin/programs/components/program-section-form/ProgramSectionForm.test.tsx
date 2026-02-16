@@ -182,7 +182,7 @@ describe('ProgramSectionForm', () => {
         const callPayload = renderProgramSectionMock.mock.calls[0][0];
 
         expect(callPayload.templateId).toBe(section.template);
-        expect(callPayload.mode).toBe(ProgramSectionMode.View);
+        expect(callPayload.mode).toBe(ProgramSectionMode.Published);
 
         expect(callPayload.data).toEqual({
             title: '',

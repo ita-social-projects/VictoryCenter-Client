@@ -54,13 +54,13 @@ export const TitleDescriptionSection = ({
                 baseStyles.container,
                 {
                     [styles.template]: mode === ProgramSectionMode.Template,
-                    [styles['form-container']]: mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View,
+                    [styles['form-container']]: mode === ProgramSectionMode.Edit,
                 },
                 className,
             )}
         >
             <div className={baseStyles['title-section']}>
-                {mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View ? (
+                {mode === ProgramSectionMode.Edit ? (
                     <InputWithCharacterLimitGroup
                         label={PROGRAMS_TEXT.SECTION.FORM.TITLE.TEXT}
                         isRequired={true}
@@ -73,14 +73,13 @@ export const TitleDescriptionSection = ({
                         placeholder={PROGRAMS_TEXT.SECTION.FORM.TITLE.PLACEHOLDER}
                         className={styles['title-input']}
                         error={titleError}
-                        disabled={mode === ProgramSectionMode.View}
                     />
                 ) : (
                     <h2 className={cn(baseStyles.title, titleClassName)}>{title}</h2>
                 )}
             </div>
             <div className={baseStyles['description-section']}>
-                {mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View ? (
+                {mode === ProgramSectionMode.Edit ? (
                     <TextAreaWithCharacterLimitGroup
                         label={PROGRAMS_TEXT.SECTION.FORM.DESCRIPTION.TEXT}
                         isRequired={true}
@@ -93,7 +92,6 @@ export const TitleDescriptionSection = ({
                         rows={10}
                         error={descriptionError}
                         currentLength={getTrimmedInputText(description).length}
-                        disabled={mode === ProgramSectionMode.View}
                     />
                 ) : (
                     <p className={cn(baseStyles.description, descriptionClassName)}>{description}</p>

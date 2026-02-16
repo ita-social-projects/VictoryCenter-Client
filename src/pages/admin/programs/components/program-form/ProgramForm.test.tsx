@@ -130,12 +130,19 @@ jest.mock('@/components/public/background-media/BackgroundMedia', () => ({
 
 jest.mock('@/utils/functions/image-helper/image-helper', () => ({
     getImageSrc: jest.fn((image) => {
-        if (!image) return null;
-        if ('url' in image) return image.url;
-        if ('base64' in image && 'mimeType' in image) {
+        if (!image) {
+            return '';
+        }
+        if (typeof image === 'string') {
+            return image;
+        }
+        if ('url' in image && image.url) {
+            return image.url;
+        }
+        if ('base64' in image && image.base64) {
             return `data:${image.mimeType};base64,${image.base64}`;
         }
-        return null;
+        return '';
     }),
 }));
 

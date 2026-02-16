@@ -11,6 +11,10 @@ import {
     ProgramSectionMode,
 } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
+import {
+    getProgramSectionTemplateMaxGroupCount,
+    normalizeGroupedContentsGroupIndexes,
+} from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
 
 export interface ProgramSectionFormProps {
     section: ProgramSection;
@@ -45,10 +49,10 @@ const getDescriptionsInOrder = (contents: ProgramSectionContent[]) => {
 const getDescriptionAuthorPairs = (contents: ProgramSectionContent[]) => {
     const map = new Map<number, { description: string; author: string }>();
 
-    for (const c of contents) {
-        if (c.groupIndex === null || c.groupIndex === undefined) continue;
+    for (const content of contents) {
+        if (content.groupIndex === null || content.groupIndex === undefined) continue;
 
-        const groupIndex = c.groupIndex;
+        const groupIndex = content.groupIndex;
 
         if (!map.has(groupIndex)) {
             map.set(groupIndex, { description: '', author: '' });
@@ -56,22 +60,71 @@ const getDescriptionAuthorPairs = (contents: ProgramSectionContent[]) => {
 
         const entry = map.get(groupIndex)!;
 
-        if (c.contentType === ContentType.Description) {
-            entry.description = c.description || '';
+        if (content.contentType === ContentType.Description) {
+            entry.description = (content as any).description || '';
         }
 
-        if (c.contentType === ContentType.Author) {
-            entry.author = c.author || '';
+        if (content.contentType === ContentType.Author) {
+            entry.author = (content as any).author || '';
         }
     }
 
     return Array.from(map.entries())
         .sort((a, b) => a[0] - b[0])
-        .map(([groupIndex, v]) => ({
+        .map(([groupIndex, value]) => ({
             groupIndex,
-            description: v.description,
-            author: v.author,
+            description: value.description,
+            author: value.author,
         }));
+};
+
+const ensureTitleContentAndOnePair = (section: ProgramSection): ProgramSection => {
+    if (section.template !== ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs) return section;
+
+    let updatedContents = section.contents;
+    let hasChanges = false;
+
+    const hasTitleContent = updatedContents.some((c) => c.contentType === ContentType.Title);
+
+    if (!hasTitleContent) {
+        const maxOrder = updatedContents.length ? Math.max(...updatedContents.map((c) => c.order)) : -1;
+
+        updatedContents = [
+            ...updatedContents,
+            {
+                contentType: ContentType.Title,
+                order: maxOrder + 1,
+                title: '',
+            } as any,
+        ];
+
+        hasChanges = true;
+    }
+
+    const pairs = getDescriptionAuthorPairs(updatedContents);
+    if (pairs.length > 0) {
+        return hasChanges ? { ...section, contents: updatedContents } : section;
+    }
+
+    const maxOrder = updatedContents.length ? Math.max(...updatedContents.map((c) => c.order)) : -1;
+
+    updatedContents = [
+        ...updatedContents,
+        {
+            contentType: ContentType.Description,
+            order: maxOrder + 1,
+            groupIndex: 0,
+            description: '',
+        } as any,
+        {
+            contentType: ContentType.Author,
+            order: maxOrder + 2,
+            groupIndex: 0,
+            author: '',
+        } as any,
+    ];
+
+    return { ...section, contents: updatedContents };
 };
 
 export const ProgramSectionForm = ({
@@ -87,8 +140,8 @@ export const ProgramSectionForm = ({
     isReplacingTemplate = false,
     onRequestReplace,
 }: ProgramSectionFormProps) => {
-    const [localSection, setLocalSection] = useState<ProgramSection>(section);
-    const [originalSection, setOriginalSection] = useState<ProgramSection>(section);
+    const [localSection, setLocalSection] = useState<ProgramSection>(() => ensureTitleContentAndOnePair(section));
+    const [originalSection, setOriginalSection] = useState<ProgramSection>(() => ensureTitleContentAndOnePair(section));
     const [isDirty, setIsDirty] = useState(false);
     const [validationResetKey, setValidationResetKey] = useState(0);
     const [sectionMode, setSectionMode] = useState<ProgramSectionMode>(
@@ -110,18 +163,27 @@ export const ProgramSectionForm = ({
     }, [onEditStateChange]);
 
     useEffect(() => {
-        if (lastEmittedSectionRef.current === section) {
-            return;
-        }
-        setLocalSection(section);
+        if (lastEmittedSectionRef.current === section) return;
+
+        const shouldPrepare = isNewSection || isReplacingTemplate;
+        const prepared = shouldPrepare ? ensureTitleContentAndOnePair(section) : section;
+
+        setLocalSection(prepared);
+        localSectionRef.current = prepared;
+
         if (sectionModeRef.current !== ProgramSectionMode.Edit) {
             if (!isReplacingTemplate) {
-                setOriginalSection(section);
+                setOriginalSection(prepared);
             }
             setIsDirty(false);
             setSectionMode(isNewSection || isReplacingTemplate ? ProgramSectionMode.Edit : ProgramSectionMode.View);
         }
-    }, [section, isNewSection, isReplacingTemplate]);
+
+        if (prepared !== section) {
+            lastEmittedSectionRef.current = prepared;
+            onSectionChange?.(prepared);
+        }
+    }, [section, isNewSection, isReplacingTemplate, onSectionChange]);
 
     useEffect(() => {
         onEditStateChangeRef.current?.(sectionMode === ProgramSectionMode.Edit);
@@ -135,7 +197,7 @@ export const ProgramSectionForm = ({
 
     const orderedDescriptionContents = getDescriptionsInOrder(localSection.contents);
 
-    const descriptions = orderedDescriptionContents.map((c) => c.description || '');
+    const descriptions = orderedDescriptionContents.map((c) => (c as any).description || '');
     const description = descriptions[0] || '';
 
     const isDescriptionAuthorPairsTemplate =
@@ -151,11 +213,11 @@ export const ProgramSectionForm = ({
     const imageContents = localSection.contents
         .filter((c) => c.contentType === ContentType.Image)
         .sort((a, b) => a.order - b.order)
-        .map((c) => c.image || null);
+        .map((c) => (c as any).image || null);
 
     const cards = orderedTitleContents.map((t, i) => ({
-        title: t.title || '',
-        description: orderedDescriptionContents[i]?.description || '',
+        title: (t as any).title || '',
+        description: (orderedDescriptionContents[i] as any)?.description || '',
     }));
 
     const emitSectionChange = useCallback(
@@ -171,7 +233,7 @@ export const ProgramSectionForm = ({
         (value: string) => {
             const prev = localSectionRef.current;
             const updatedContents = prev.contents.map((c) =>
-                c.contentType === ContentType.Title ? { ...c, title: value } : c,
+                c.contentType === ContentType.Title ? ({ ...c, title: value } as any) : c,
             );
             const newSection = { ...prev, contents: updatedContents };
             localSectionRef.current = newSection;
@@ -185,7 +247,7 @@ export const ProgramSectionForm = ({
         (value: string) => {
             const prev = localSectionRef.current;
             const updatedContents = prev.contents.map((c) =>
-                c.contentType === ContentType.Description ? { ...c, description: value } : c,
+                c.contentType === ContentType.Description ? ({ ...c, description: value } as any) : c,
             );
             const newSection = { ...prev, contents: updatedContents };
             localSectionRef.current = newSection;
@@ -204,7 +266,7 @@ export const ProgramSectionForm = ({
 
             const updatedContents = prev.contents.map((c) =>
                 c.contentType === ContentType.Description && c.order === target.order
-                    ? { ...c, description: value }
+                    ? ({ ...c, description: value } as any)
                     : c,
             );
 
@@ -227,7 +289,11 @@ export const ProgramSectionForm = ({
             if (!target) return;
 
             const updatedContents = prev.contents.map((c) =>
-                c === target ? (type === ContentType.Title ? { ...c, title: value } : { ...c, description: value }) : c,
+                c === target
+                    ? type === ContentType.Title
+                        ? ({ ...c, title: value } as any)
+                        : ({ ...c, description: value } as any)
+                    : c,
             );
 
             const newSection = { ...prev, contents: updatedContents };
@@ -241,7 +307,7 @@ export const ProgramSectionForm = ({
     const updateImageContent = useCallback(
         (order: number, file: ImageValues | null, prev: ProgramSection): ProgramSection => {
             const updatedContents = prev.contents.map((c) =>
-                c.contentType === ContentType.Image && c.order === order ? { ...c, image: file } : c,
+                c.contentType === ContentType.Image && c.order === order ? ({ ...c, image: file } as any) : c,
             );
             return { ...prev, contents: updatedContents };
         },
@@ -276,10 +342,10 @@ export const ProgramSectionForm = ({
                 if (c.groupIndex !== target.groupIndex || c.contentType !== field) return c;
 
                 if (field === ContentType.Description) {
-                    return { ...c, description: value };
+                    return { ...c, description: value } as any;
                 }
 
-                return { ...c, author: value };
+                return { ...c, author: value } as any;
             });
 
             const newSection = { ...prev, contents: updatedContents };
@@ -300,13 +366,20 @@ export const ProgramSectionForm = ({
         [handlePairFieldChange],
     );
 
+    const pairsMaxCount = isDescriptionAuthorPairsTemplate
+        ? getProgramSectionTemplateMaxGroupCount(section.template)
+        : 0;
+    const canAddPair = isDescriptionAuthorPairsTemplate ? orderedPairs.length < pairsMaxCount : true;
+
     const handleAddPair = useCallback(() => {
         const prev = localSectionRef.current;
-        const groupIndexes = prev.contents
-            .map((c) => c.groupIndex)
-            .filter((x): x is number => x !== null && x !== undefined);
+        if (prev.template !== ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs) return;
 
-        const nextGroupIndex = groupIndexes.length ? Math.max(...groupIndexes) + 1 : 0;
+        const pairs = getDescriptionAuthorPairs(prev.contents);
+        const maxGroupCount = getProgramSectionTemplateMaxGroupCount(prev.template);
+        if (pairs.length >= maxGroupCount) return;
+
+        const nextGroupIndex = pairs.length;
 
         const maxOrder = prev.contents.length ? Math.max(...prev.contents.map((c) => c.order)) : -1;
         const descriptionOrder = maxOrder + 1;
@@ -321,36 +394,53 @@ export const ProgramSectionForm = ({
                     order: descriptionOrder,
                     groupIndex: nextGroupIndex,
                     description: '',
-                },
+                } as any,
                 {
                     contentType: ContentType.Author,
                     order: authorOrder,
                     groupIndex: nextGroupIndex,
                     author: '',
-                },
+                } as any,
             ],
         };
 
         localSectionRef.current = newSection;
         setLocalSection(newSection);
         emitSectionChange(newSection);
+
+        const nextIndex = pairs.length;
+        setTimeout(() => {
+            const element = document.getElementById(`pair-description-${nextIndex}`) as HTMLTextAreaElement | null;
+            element?.focus();
+        }, 0);
     }, [emitSectionChange]);
 
-    const handleDeletePair = useCallback(
+    const performDeletePair = useCallback(
         (index: number) => {
             const prev = localSectionRef.current;
+            if (prev.template !== ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs) return;
+
             const pairs = getDescriptionAuthorPairs(prev.contents);
+            if (pairs.length <= 1) return;
+
             const target = pairs[index];
             if (!target) return;
 
-            const newSection: ProgramSection = {
+            const filtered: ProgramSection = {
                 ...prev,
                 contents: prev.contents.filter((c) => c.groupIndex !== target.groupIndex),
             };
 
-            localSectionRef.current = newSection;
-            setLocalSection(newSection);
-            emitSectionChange(newSection);
+            const normalizedContents = normalizeGroupedContentsGroupIndexes(filtered.contents, [
+                ContentType.Description,
+                ContentType.Author,
+            ]);
+
+            const normalizedSection = { ...filtered, contents: normalizedContents };
+
+            localSectionRef.current = normalizedSection;
+            setLocalSection(normalizedSection);
+            emitSectionChange(normalizedSection);
         },
         [emitSectionChange],
     );
@@ -380,8 +470,6 @@ export const ProgramSectionForm = ({
         ProgramSectionTemplate.TripleTitleDescriptionPairs,
         ProgramSectionTemplate.QuadTitleDescriptionPairs,
     ];
-
-    const canAddPair = true;
 
     const isCardTemplate = CARD_TEMPLATES.includes(section.template);
 
@@ -413,9 +501,7 @@ export const ProgramSectionForm = ({
         (e: React.MouseEvent<HTMLButtonElement>) => {
             e.preventDefault();
             e.stopPropagation();
-            if (onDelete) {
-                onDelete();
-            }
+            onDelete?.();
         },
         [onDelete],
     );
@@ -424,9 +510,7 @@ export const ProgramSectionForm = ({
         (e: React.MouseEvent<HTMLButtonElement>) => {
             e.preventDefault();
             e.stopPropagation();
-            if (onRequestReplace) {
-                onRequestReplace();
-            }
+            onRequestReplace?.();
         },
         [onRequestReplace],
     );
@@ -434,7 +518,7 @@ export const ProgramSectionForm = ({
     const editableSection = renderProgramSection({
         templateId: section.template,
         data: {
-            title: titleContent?.title || '',
+            title: (titleContent as any)?.title || '',
             description,
             descriptions,
             images: imageContents,
@@ -461,7 +545,7 @@ export const ProgramSectionForm = ({
                       onCardDescriptionChange: handlePairDescriptionChange,
                       onCardAuthorChange: handlePairAuthorChange,
                       onAddPair: handleAddPair,
-                      onDeletePair: handleDeletePair,
+                      onDeletePair: performDeletePair,
                       canAddPair,
                   }
                 : {}),

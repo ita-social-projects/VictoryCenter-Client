@@ -8,6 +8,9 @@
     width: 100%;
     background-color: c.$white;
 
+    padding: 20px clamp(16px, 3vw, 0px);
+    box-sizing: border-box;
+
     --pair-card-width: 432px;
     --pair-card-height: 259px;
 
@@ -40,6 +43,10 @@
 
 .title-block {
     margin-bottom: 24px;
+}
+
+.container:not(.editable) .title-block {
+    margin-bottom: 85px;
 }
 
 .title {

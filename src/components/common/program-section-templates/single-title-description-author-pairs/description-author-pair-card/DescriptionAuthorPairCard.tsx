@@ -1,4 +1,5 @@
 import cn from 'classnames';
+import { useCallback, useState } from 'react';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
@@ -7,6 +8,7 @@ import { ReactComponent as DeleteIcon } from '@/assets/icons/delete.svg';
 import { ProgramSectionTemplate } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
+import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
 
 export interface DescriptionAuthorPairCardProps {
     description: string;
@@ -32,13 +34,45 @@ export const DescriptionAuthorPairCard = ({
     const descriptionId = `pair-description-${index}`;
     const authorId = `pair-author-${index}`;
 
+    const [descriptionError, setDescriptionError] = useState<string | undefined>(undefined);
+    const [authorError, setAuthorError] = useState<string | undefined>(undefined);
+
     const descriptionMaxLength = getProgramSectionTemplateMaxLength(TEMPLATE, ContentType.Description);
     const authorMaxLength = getProgramSectionTemplateMaxLength(TEMPLATE, ContentType.Author);
 
+    const validate = useCallback((value: string, type: ContentType) => {
+        return PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateContentText(value, type, true, TEMPLATE);
+    }, []);
+
     const handleDelete = () => onDelete?.(index);
-    const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) =>
-        onDescriptionChange?.(index, e.target.value);
-    const handleAuthorChange = (e: React.ChangeEvent<HTMLInputElement>) => onAuthorChange?.(index, e.target.value);
+
+    const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const v = e.target.value;
+        onDescriptionChange?.(index, v);
+
+        if (descriptionError !== undefined) {
+            setDescriptionError(validate(v, ContentType.Description));
+        }
+    };
+
+    const handleAuthorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const v = e.target.value;
+        onAuthorChange?.(index, v);
+
+        if (authorError !== undefined) {
+            setAuthorError(validate(v, ContentType.Author));
+        }
+    };
+
+    const handleDescriptionBlur = () => {
+        if (!isEditable) return;
+        setDescriptionError(validate(description, ContentType.Description));
+    };
+
+    const handleAuthorBlur = () => {
+        if (!isEditable) return;
+        setAuthorError(validate(author, ContentType.Author));
+    };
 
     if (!isEditable) {
         return (
@@ -67,9 +101,11 @@ export const DescriptionAuthorPairCard = ({
                         name={descriptionId}
                         value={description}
                         onChange={handleDescriptionChange}
+                        onBlur={handleDescriptionBlur}
                         maxLength={descriptionMaxLength}
                         rows={4}
                         placeholder={PROGRAMS_TEXT.SECTION.CARD.FORM.DESCRIPTION.PLACEHOLDER}
+                        error={descriptionError}
                     />
                 </div>
 
@@ -82,8 +118,10 @@ export const DescriptionAuthorPairCard = ({
                         name={authorId}
                         value={author}
                         onChange={handleAuthorChange}
+                        onBlur={handleAuthorBlur}
                         maxLength={authorMaxLength}
                         placeholder={PROGRAMS_TEXT.SECTION.CARD.FORM.AUTHOR.PLACEHOLDER}
+                        error={authorError}
                     />
                 </div>
             </div>

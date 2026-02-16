@@ -32,7 +32,11 @@ export const PROGRAMS_TEXT = {
         DESCRIPTION_SAMPLE_TEXT_SHORT:
             'Ідея створення Victory Center виникла не як проєкт, а як відповідь на виклик часу - глибокий біль, виснаження, але водночас сильна віра в перемогу. ',
         SINGLE_TITLE_DESCRIPTION_AUTHOR_PAIRS: {
-            DEFAULT_TITLE: 'Що кажуть учасники',
+            DEFAULT_TITLE: 'ЩО КАЖУТЬ УЧАСНИКИ',
+            TITLE_PLACEHOLDER: '',
+            MODAL: {
+                DELETE_BLOCK_CONFIRMATION: 'Блок буде видалено. Бажаєте продовжити?',
+            },
         },
         MODAL: {
             UNSAVED_CHANGES_TITLE: 'Відмінити додавання секції?',
@@ -321,7 +325,7 @@ export const PROGRAM_SECTION_TEMPLATE_VALIDATION = {
             [ContentType.Author]: { min: 0, max: 0 },
         },
         lengths: {
-            [ContentType.Title]: { min: 5, max: 60 },
+            [ContentType.Title]: { min: 20, max: 60 },
             [ContentType.Description]: { min: 10, max: 600 },
         },
     },

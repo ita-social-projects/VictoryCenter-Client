@@ -151,6 +151,11 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
     const renderSection = (templateId: ProgramSectionTemplate) => {
         const cards = getCardSamples(templateId);
 
+        const titleForTemplate =
+            templateId === ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs
+                ? PROGRAMS_TEXT.SECTION.SINGLE_TITLE_DESCRIPTION_AUTHOR_PAIRS.DEFAULT_TITLE
+                : PROGRAMS_TEXT.SECTION.TITLE_SAMPLE_TEXT;
+
         return renderProgramSection({
             templateId,
             data: cards

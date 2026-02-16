@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import { useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { Button } from '@/components/admin/button/Button';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
@@ -12,6 +12,9 @@ import { CardCarousel } from './card-carousel/CardCarousel';
 import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
+import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
+import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
 export interface DescriptionAuthorPairData {
     description: string;
@@ -47,7 +50,14 @@ export const SingleTitleDescriptionAuthorPairs = ({
     const isEditable = mode === ProgramSectionMode.Edit;
     const isTemplate = mode === ProgramSectionMode.Template;
 
+    const [titleError, setTitleError] = useState<string | undefined>(undefined);
+    const [pendingDeletePairIndex, setPendingDeletePairIndex] = useState<number | null>(null);
+
     const titleMaxLength = getProgramSectionTemplateMaxLength(TEMPLATE, ContentType.Title);
+
+    const validate = useCallback((value: string, type: ContentType) => {
+        return PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateContentText(value, type, true, TEMPLATE);
+    }, []);
 
     const normalizedPairs = useMemo(() => {
         if (!isTemplate) return pairs;
@@ -60,6 +70,41 @@ export const SingleTitleDescriptionAuthorPairs = ({
             author: pairs[i]?.author ?? sampleAuthor,
         }));
     }, [isTemplate, pairs]);
+
+    const handleTitleBlur = useCallback(() => {
+        if (!isEditable) return;
+        setTitleError(validate(title, ContentType.Title));
+    }, [isEditable, title, validate]);
+
+    const handleTitleChange = useCallback(
+        (value: string) => {
+            const uppercasedTitle = value.toUpperCase();
+            onTitleChange?.(uppercasedTitle);
+
+            if (titleError !== undefined) {
+                setTitleError(validate(uppercasedTitle, ContentType.Title));
+            }
+        },
+        [onTitleChange, titleError, validate],
+    );
+
+    const requestDeletePair = useCallback(
+        (index: number) => {
+            if (!isEditable) return;
+            if (!onDeletePair) return;
+            if (pairs.length <= 1) return;
+            setPendingDeletePairIndex(index);
+        },
+        [isEditable, onDeletePair, pairs.length],
+    );
+
+    const handleCancelDeletePair = useCallback(() => setPendingDeletePairIndex(null), []);
+
+    const handleConfirmDeletePair = useCallback(() => {
+        if (pendingDeletePairIndex === null) return;
+        onDeletePair?.(pendingDeletePairIndex);
+        setPendingDeletePairIndex(null);
+    }, [pendingDeletePairIndex, onDeletePair]);
 
     const rootClassName = cn(styles.container, {
         [styles.template]: isTemplate,
@@ -79,9 +124,11 @@ export const SingleTitleDescriptionAuthorPairs = ({
                         id="single-title-description-author-pairs-title"
                         name="single-title-description-author-pairs-title"
                         value={title}
-                        onChange={(e) => onTitleChange?.(e.target.value)}
+                        onChange={(e) => handleTitleChange(e.target.value)}
+                        onBlur={handleTitleBlur}
                         maxLength={titleMaxLength}
-                        placeholder={PROGRAMS_TEXT.SECTION.FORM.TITLE.PLACEHOLDER}
+                        placeholder={PROGRAMS_TEXT.SECTION.SINGLE_TITLE_DESCRIPTION_AUTHOR_PAIRS.TITLE_PLACEHOLDER}
+                        error={titleError}
                     />
                 ) : (
                     <h2 className={styles.title}>{title}</h2>
@@ -94,16 +141,16 @@ export const SingleTitleDescriptionAuthorPairs = ({
                 RightIcon={ArrowRight}
                 variant={carouselVariant}
             >
-                {normalizedPairs.map((p, idx) => (
+                {normalizedPairs.map((pair, index) => (
                     <DescriptionAuthorPairCard
-                        key={idx}
-                        index={idx}
-                        description={p.description}
-                        author={p.author}
+                        key={index}
+                        index={index}
+                        description={pair.description}
+                        author={pair.author}
                         isEditable={isEditable}
                         onDescriptionChange={onPairDescriptionChange}
                         onAuthorChange={onPairAuthorChange}
-                        onDelete={onDeletePair}
+                        onDelete={requestDeletePair}
                     />
                 ))}
             </CardCarousel>
@@ -122,6 +169,17 @@ export const SingleTitleDescriptionAuthorPairs = ({
                     </Button>
                 </div>
             )}
+
+            <ConfirmationModal
+                isOpen={pendingDeletePairIndex !== null}
+                title={PROGRAMS_TEXT.SECTION.SINGLE_TITLE_DESCRIPTION_AUTHOR_PAIRS.MODAL.DELETE_BLOCK_CONFIRMATION}
+                isButtonsDisabled={false}
+                onConfirm={handleConfirmDeletePair}
+                onCancel={handleCancelDeletePair}
+                onClose={handleCancelDeletePair}
+                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
+                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
+            />
         </div>
     );
 };

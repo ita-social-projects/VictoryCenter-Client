@@ -484,6 +484,7 @@ describe('PROGRAM_VALIDATION_FUNCTIONS', () => {
             title: string,
             description: string,
             imageCount: number,
+            options?: { imageGroupIndexes?: number[] },
         ): ProgramSection => ({
             template,
             order: 1,
@@ -494,6 +495,7 @@ describe('PROGRAM_VALIDATION_FUNCTIONS', () => {
                     contentType: ContentType.Image,
                     order: i + 2,
                     image: createMockImage(i + 1),
+                    ...(options?.imageGroupIndexes ? { groupIndex: options.imageGroupIndexes[i] } : {}),
                 })),
             ],
         });
@@ -543,8 +545,19 @@ describe('PROGRAM_VALIDATION_FUNCTIONS', () => {
                 'Valid Title',
                 'Valid Description',
                 4,
+                { imageGroupIndexes: [0, 0, 1, 1] },
             );
-            expect(PROGRAM_VALIDATION_FUNCTIONS.validateSections([section], true)).toBeUndefined();
+            expect(PROGRAM_VALIDATION_FUNCTIONS.validateSections([section], true)).toBe('invalid');
+        });
+
+        it('should fail when QuadImagesBottom images have no groupIndex in publish mode', () => {
+            const section = createMockSection(
+                ProgramSectionTemplate.QuadImagesBottom,
+                'Valid Title',
+                'Valid Description',
+                4,
+            );
+            expect(PROGRAM_VALIDATION_FUNCTIONS.validateSections([section], true)).toBe('invalid');
         });
 
         it('should fail when section title is invalid in publish mode', () => {

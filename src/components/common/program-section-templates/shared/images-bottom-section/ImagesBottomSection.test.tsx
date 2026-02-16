@@ -1,10 +1,17 @@
-import { render, act } from '@testing-library/react';
+import React from 'react';
+import { act, render } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import type { ImagesBottomSectionProps } from './ImagesBottomSection';
+import { ImagesBottomSection } from './ImagesBottomSection';
 import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
 
-jest.mock('nanoid', () => ({
-    nanoid: jest.fn(),
-}));
+jest.mock('react', () => {
+    const actual = jest.requireActual('react');
+    return {
+        ...actual,
+        useId: jest.fn(),
+    };
+});
 
 jest.mock('../title-description-section/TitleDescriptionSection', () => ({
     TitleDescriptionSection: jest.fn(() => <div data-testid="title-description-section" />),
@@ -18,10 +25,6 @@ jest.mock('./EditableImagesBottomSection', () => ({
     EditableImagesBottomSection: jest.fn(() => <div data-testid="editable-images-bottom-section" />),
 }));
 
-const { ImagesBottomSection } = require('./ImagesBottomSection') as typeof import('./ImagesBottomSection');
-
-const { nanoid } = jest.requireMock('nanoid') as { nanoid: jest.Mock };
-
 const { TitleDescriptionSection } = jest.requireMock('../title-description-section/TitleDescriptionSection') as {
     TitleDescriptionSection: jest.Mock;
 };
@@ -34,7 +37,12 @@ const { EditableImagesBottomSection } = jest.requireMock('./EditableImagesBottom
     EditableImagesBottomSection: jest.Mock;
 };
 
-const baseConfig = {
+const getUseIdMock = () => {
+    const reactMod = jest.requireMock('react') as { useId: jest.Mock };
+    return reactMod.useId;
+};
+
+const baseConfig: ImagesBottomSectionProps['config'] = {
     imageCount: 2,
     gridColumns: 2,
     imageConfig: {
@@ -47,64 +55,80 @@ const baseConfig = {
     imageLabel: 'Test Image',
 };
 
-describe('ImagesBottomSection', () => {
-    const defaultProps: ImagesBottomSectionProps = {
-        template: ProgramSectionTemplate.DualImagesBottom,
-        title: 'Section Title',
-        description: 'Section Description',
-        images: [
-            { id: 1, url: 'img1.jpg', mimeType: 'image/jpeg' },
-            { id: 2, url: 'img2.jpg', mimeType: 'image/jpeg' },
-        ],
-        imageHandlers: [
-            { key: '1', value: null, handler: jest.fn() },
-            { key: '2', value: null, handler: jest.fn() },
-        ],
-        config: baseConfig,
-        mode: ProgramSectionMode.Published,
-        onTitleChange: jest.fn(),
-        onDescriptionChange: jest.fn(),
-        className: '',
-        topSectionClassName: '',
-        bottomSectionClassName: '',
-        imageWrapperClassName: '',
-        imageClassName: '',
-    };
+const makeProps = (override: Partial<ImagesBottomSectionProps> = {}): ImagesBottomSectionProps => ({
+    template: ProgramSectionTemplate.DualImagesBottom,
+    title: 'Section Title',
+    description: 'Section Description',
+    images: [
+        { id: 1, url: 'img1.jpg', mimeType: 'image/jpeg' } as any,
+        { id: 2, url: 'img2.jpg', mimeType: 'image/jpeg' } as any,
+    ],
+    imageHandlers: [
+        { key: '1', value: null, handler: jest.fn() },
+        { key: '2', value: null, handler: jest.fn() },
+    ],
+    config: baseConfig,
+    mode: ProgramSectionMode.Published,
+    onTitleChange: jest.fn(),
+    onDescriptionChange: jest.fn(),
+    validationResetKey: 1,
+    className: '',
+    topSectionClassName: '',
+    bottomSectionClassName: '',
+    imageWrapperClassName: '',
+    imageClassName: '',
+    ...override,
+});
 
+const renderComponent = (override: Partial<ImagesBottomSectionProps> = {}) => {
+    const useId = getUseIdMock();
+    useId.mockReturnValue('rid');
+
+    TitleDescriptionSection.mockClear();
+    PublishedImagesBottomSection.mockClear();
+    EditableImagesBottomSection.mockClear();
+
+    const props = makeProps(override);
+    const utils = render(<ImagesBottomSection {...props} />);
+    const root = utils.container.firstElementChild as HTMLElement;
+
+    return { props, root, ...utils };
+};
+
+describe('ImagesBottomSection', () => {
     beforeEach(() => {
         jest.clearAllMocks();
-        nanoid.mockReset();
     });
 
     it('passes template/title/description/mode and handlers to TitleDescriptionSection', () => {
-        render(<ImagesBottomSection {...defaultProps} mode={ProgramSectionMode.Edit} />);
+        const { props } = renderComponent({ mode: ProgramSectionMode.Edit });
 
         expect(TitleDescriptionSection).toHaveBeenCalledTimes(1);
 
-        const props = TitleDescriptionSection.mock.calls[0][0];
-        expect(props.template).toBe(defaultProps.template);
-        expect(props.title).toBe('Section Title');
-        expect(props.description).toBe('Section Description');
-        expect(props.mode).toBe(ProgramSectionMode.Edit);
-        expect(props.onTitleChange).toBe(defaultProps.onTitleChange);
-        expect(props.onDescriptionChange).toBe(defaultProps.onDescriptionChange);
+        const tdProps = TitleDescriptionSection.mock.calls[0][0];
+        expect(tdProps.template).toBe(props.template);
+        expect(tdProps.title).toBe(props.title);
+        expect(tdProps.description).toBe(props.description);
+        expect(tdProps.mode).toBe(ProgramSectionMode.Edit);
+        expect(tdProps.onTitleChange).toBe(props.onTitleChange);
+        expect(tdProps.onDescriptionChange).toBe(props.onDescriptionChange);
+        expect(tdProps.validationResetKey).toBe(props.validationResetKey);
     });
 
-    it('uses default values for optional props (title/description/className/mode)', () => {
-        const minimal: ImagesBottomSectionProps = {
-            template: ProgramSectionTemplate.DualImagesBottom,
-            images: [
-                { id: 1, url: 'img1.jpg', mimeType: 'image/jpeg' },
-                { id: 2, url: 'img2.jpg', mimeType: 'image/jpeg' },
-            ],
-            imageHandlers: [
-                { key: '1', value: null, handler: jest.fn() },
-                { key: '2', value: null, handler: jest.fn() },
-            ],
-            config: baseConfig,
-        };
-
-        const { container } = render(<ImagesBottomSection {...minimal} />);
+    it('uses default values for optional props (title/description/mode/className/top/bottom/wrapper/image)', () => {
+        const { root } = renderComponent({
+            title: undefined,
+            description: undefined,
+            mode: undefined,
+            onTitleChange: undefined,
+            onDescriptionChange: undefined,
+            validationResetKey: undefined,
+            className: undefined as any,
+            topSectionClassName: undefined as any,
+            bottomSectionClassName: undefined as any,
+            imageWrapperClassName: undefined as any,
+            imageClassName: undefined as any,
+        });
 
         const tdProps = TitleDescriptionSection.mock.calls[0][0];
         expect(tdProps.title).toBe('');
@@ -113,26 +137,23 @@ describe('ImagesBottomSection', () => {
         expect(tdProps.onTitleChange).toBeUndefined();
         expect(tdProps.onDescriptionChange).toBeUndefined();
 
-        expect(container.firstElementChild).toBeInTheDocument();
+        expect(root).toBeInTheDocument();
     });
 
     it('renders PublishedImagesBottomSection in Published mode and passes sliced images + styling props', () => {
         const images = [
-            { id: 1, url: 'img1.jpg', mimeType: 'image/jpeg' },
-            { id: 2, url: 'img2.jpg', mimeType: 'image/jpeg' },
-            { id: 3, url: 'img3.jpg', mimeType: 'image/jpeg' },
+            { id: 1, url: 'img1.jpg', mimeType: 'image/jpeg' } as any,
+            { id: 2, url: 'img2.jpg', mimeType: 'image/jpeg' } as any,
+            { id: 3, url: 'img3.jpg', mimeType: 'image/jpeg' } as any,
         ];
 
-        render(
-            <ImagesBottomSection
-                {...defaultProps}
-                images={images}
-                bottomSectionClassName="b"
-                imageWrapperClassName="w"
-                imageClassName="i"
-                mode={ProgramSectionMode.Published}
-            />,
-        );
+        renderComponent({
+            images,
+            bottomSectionClassName: 'b',
+            imageWrapperClassName: 'w',
+            imageClassName: 'i',
+            mode: ProgramSectionMode.Published,
+        });
 
         expect(PublishedImagesBottomSection).toHaveBeenCalledTimes(1);
         expect(EditableImagesBottomSection).not.toHaveBeenCalled();
@@ -145,13 +166,11 @@ describe('ImagesBottomSection', () => {
         expect(p.imageClassName).toBe('i');
     });
 
-    it('renders EditableImagesBottomSection in Edit mode and passes sliced images/handlers, keys, errors and onSetError', () => {
-        nanoid.mockImplementationOnce(() => 'k1').mockImplementationOnce(() => 'k2');
-
+    it('renders EditableImagesBottomSection in Edit mode and passes sliced images/handlers, keys and other props', () => {
         const images = [
-            { id: 1, url: 'img1.jpg', mimeType: 'image/jpeg' },
-            { id: 2, url: 'img2.jpg', mimeType: 'image/jpeg' },
-            { id: 3, url: 'img3.jpg', mimeType: 'image/jpeg' },
+            { id: 1, url: 'img1.jpg', mimeType: 'image/jpeg' } as any,
+            { id: 2, url: 'img2.jpg', mimeType: 'image/jpeg' } as any,
+            { id: 3, url: 'img3.jpg', mimeType: 'image/jpeg' } as any,
         ];
 
         const imageHandlers = [
@@ -160,16 +179,13 @@ describe('ImagesBottomSection', () => {
             { key: '3', value: null, handler: jest.fn() },
         ];
 
-        render(
-            <ImagesBottomSection
-                {...defaultProps}
-                images={images}
-                imageHandlers={imageHandlers}
-                bottomSectionClassName="b"
-                imageWrapperClassName="w"
-                mode={ProgramSectionMode.Edit}
-            />,
-        );
+        renderComponent({
+            images,
+            imageHandlers,
+            bottomSectionClassName: 'b',
+            imageWrapperClassName: 'w',
+            mode: ProgramSectionMode.Edit,
+        });
 
         expect(EditableImagesBottomSection).toHaveBeenCalledTimes(1);
         expect(PublishedImagesBottomSection).not.toHaveBeenCalled();
@@ -178,7 +194,7 @@ describe('ImagesBottomSection', () => {
 
         expect(first.images).toEqual(images.slice(0, baseConfig.imageCount));
         expect(first.imageHandlers).toEqual(imageHandlers.slice(0, baseConfig.imageCount));
-        expect(first.imageKeys).toEqual(['k1', 'k2']);
+        expect(first.imageKeys).toEqual(['rid-image-0', 'rid-image-1']);
         expect(first.config).toBe(baseConfig);
         expect(first.mode).toBe(ProgramSectionMode.Edit);
         expect(first.bottomSectionClassName).toBe('b');
@@ -187,10 +203,18 @@ describe('ImagesBottomSection', () => {
         expect(typeof first.onSetError).toBe('function');
     });
 
-    it('updates errors via onSetError and passes new errors to EditableImagesBottomSection', () => {
-        nanoid.mockImplementationOnce(() => 'k1').mockImplementationOnce(() => 'k2');
+    it('renders EditableImagesBottomSection in Template mode too and passes template mode through', () => {
+        renderComponent({ mode: ProgramSectionMode.Template });
 
-        render(<ImagesBottomSection {...defaultProps} mode={ProgramSectionMode.Edit} />);
+        expect(EditableImagesBottomSection).toHaveBeenCalledTimes(1);
+        expect(PublishedImagesBottomSection).not.toHaveBeenCalled();
+
+        const p = EditableImagesBottomSection.mock.calls[0][0];
+        expect(p.mode).toBe(ProgramSectionMode.Template);
+    });
+
+    it('updates errors via onSetError and passes new errors to EditableImagesBottomSection', () => {
+        renderComponent({ mode: ProgramSectionMode.Edit });
 
         const first = EditableImagesBottomSection.mock.calls[0][0];
         expect(first.errors).toEqual([]);
@@ -199,41 +223,84 @@ describe('ImagesBottomSection', () => {
             first.onSetError(1, 'err');
         });
 
-        const lastCall = EditableImagesBottomSection.mock.calls[EditableImagesBottomSection.mock.calls.length - 1][0];
-        expect(lastCall.errors[1]).toBe('err');
+        const last = EditableImagesBottomSection.mock.calls[EditableImagesBottomSection.mock.calls.length - 1][0];
+        expect(last.errors[1]).toBe('err');
 
         act(() => {
-            lastCall.onSetError(1, null);
+            last.onSetError(1, null);
         });
 
         const last2 = EditableImagesBottomSection.mock.calls[EditableImagesBottomSection.mock.calls.length - 1][0];
         expect(last2.errors[1]).toBe('');
     });
 
-    it('adds form-container class in Edit and View modes', () => {
-        const { container: c1 } = render(<ImagesBottomSection {...defaultProps} mode={ProgramSectionMode.Edit} />);
-        expect(c1.firstElementChild).toHaveClass('form-container');
+    it('adds form-container class in Edit and View modes only', () => {
+        {
+            const { root, unmount } = renderComponent({ mode: ProgramSectionMode.Edit });
+            expect(root).toHaveClass('form-container');
+            unmount();
+        }
 
-        const { container: c2 } = render(<ImagesBottomSection {...defaultProps} mode={ProgramSectionMode.View} />);
-        expect(c2.firstElementChild).toHaveClass('form-container');
+        {
+            const { root, unmount } = renderComponent({ mode: ProgramSectionMode.View });
+            expect(root).toHaveClass('form-container');
+            unmount();
+        }
+
+        {
+            const { root } = renderComponent({ mode: ProgramSectionMode.Template });
+            expect(root).not.toHaveClass('form-container');
+        }
     });
 
     it('adds custom className on root', () => {
-        const { container } = render(<ImagesBottomSection {...defaultProps} className="my-custom-class" />);
-        expect(container.firstElementChild).toHaveClass('my-custom-class');
+        const { root } = renderComponent({ className: 'my-custom-class' });
+        expect(root).toHaveClass('my-custom-class');
     });
 
     it('passes topSectionClassName into TitleDescriptionSection.className', () => {
-        render(<ImagesBottomSection {...defaultProps} topSectionClassName="my-top" />);
-        const props = TitleDescriptionSection.mock.calls[0][0];
-        expect(props.className).toContain('top-section');
-        expect(props.className).toContain('my-top');
+        renderComponent({ topSectionClassName: 'my-top' });
+
+        const tdProps = TitleDescriptionSection.mock.calls[0][0];
+        expect(tdProps.className).toContain('top-section');
+        expect(tdProps.className).toContain('my-top');
     });
 
-    it('passes template title/description classNames when mode is Template', () => {
-        render(<ImagesBottomSection {...defaultProps} mode={ProgramSectionMode.Template} />);
-        const props = TitleDescriptionSection.mock.calls[0][0];
-        expect(props.titleClassName).toBe('title-template');
-        expect(props.descriptionClassName).toBe('description-template');
+    it('passes template title/description classNames when mode is Template; otherwise empty strings', () => {
+        {
+            renderComponent({ mode: ProgramSectionMode.Template });
+
+            const tdProps = TitleDescriptionSection.mock.calls[0][0];
+            expect(tdProps.titleClassName).toBe('title-template');
+            expect(tdProps.descriptionClassName).toBe('description-template');
+        }
+
+        {
+            const { unmount } = renderComponent({ mode: ProgramSectionMode.Edit });
+            const tdProps = TitleDescriptionSection.mock.calls[0][0];
+            expect(tdProps.titleClassName).toBe('');
+            expect(tdProps.descriptionClassName).toBe('');
+            unmount();
+        }
+    });
+
+    it('slices images/handlers to imageCount for editable branch and keys length matches displayed images length', () => {
+        renderComponent({
+            mode: ProgramSectionMode.Edit,
+            config: { ...baseConfig, imageCount: 1 },
+            images: [
+                { id: 1, url: 'img1.jpg', mimeType: 'image/jpeg' } as any,
+                { id: 2, url: 'img2.jpg', mimeType: 'image/jpeg' } as any,
+            ],
+            imageHandlers: [
+                { key: '1', value: null, handler: jest.fn() },
+                { key: '2', value: null, handler: jest.fn() },
+            ],
+        });
+
+        const p = EditableImagesBottomSection.mock.calls[0][0];
+        expect(p.images).toHaveLength(1);
+        expect(p.imageHandlers).toHaveLength(1);
+        expect(p.imageKeys).toEqual(['rid-image-0']);
     });
 });

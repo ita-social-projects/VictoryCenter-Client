@@ -1,3 +1,4 @@
+import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { TitleDescriptionSection, TitleDescriptionSectionProps } from './TitleDescriptionSection';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
@@ -38,7 +39,6 @@ jest.mock('@/components/admin/input-groups/input-with-character-limit-group/Inpu
             <label htmlFor={id}>{label}</label>
             <input
                 id={id}
-                data-testid={`title-input-${id}`}
                 value={value}
                 onChange={onChange}
                 onBlur={onBlur}
@@ -63,6 +63,7 @@ jest.mock(
             rows,
             error,
             disabled,
+            currentLength,
         }: {
             label: string;
             value: string;
@@ -73,12 +74,16 @@ jest.mock(
             rows: number;
             error?: string;
             disabled?: boolean;
+            currentLength?: number;
         }) => (
-            <div data-testid={`textarea-group-${id}`} data-error={error || ''}>
+            <div
+                data-testid={`textarea-group-${id}`}
+                data-error={error || ''}
+                data-current-length={currentLength ?? ''}
+            >
                 <label htmlFor={id}>{label}</label>
                 <textarea
                     id={id}
-                    data-testid={`description-textarea-${id}`}
                     value={value}
                     onChange={onChange}
                     onBlur={onBlur}
@@ -151,18 +156,21 @@ describe('TitleDescriptionSection', () => {
     };
 
     const getTitleHeading = () => screen.queryByRole('heading', { level: 2 });
-    const getTitleInput = () => screen.queryByTestId('title-input-section-title');
-    const getDescriptionTextarea = () => screen.queryByTestId('description-textarea-section-description');
+
+    const getTitleInput = () =>
+        screen.queryByLabelText(PROGRAMS_TEXT.SECTION.FORM.TITLE.TEXT) as HTMLInputElement | null;
+    const getDescriptionTextarea = () =>
+        screen.queryByLabelText(PROGRAMS_TEXT.SECTION.FORM.DESCRIPTION.TEXT) as HTMLTextAreaElement | null;
 
     beforeEach(() => {
         jest.clearAllMocks();
     });
 
-    it('calls useProgramSectionValidation with callbacks and template', () => {
+    it('calls useProgramSectionValidation with callbacks, template, and flags', () => {
         const onTitleChange = jest.fn();
         const onDescriptionChange = jest.fn();
 
-        renderComponent({ onTitleChange, onDescriptionChange });
+        renderComponent({ onTitleChange, onDescriptionChange, isPublishing: true, validationResetKey: 7 });
 
         expect(useProgramSectionValidationMock).toHaveBeenCalledTimes(1);
         expect(useProgramSectionValidationMock).toHaveBeenCalledWith(
@@ -170,6 +178,8 @@ describe('TitleDescriptionSection', () => {
                 onTitleChange,
                 onDescriptionChange,
                 template: TEMPLATE,
+                isPublishing: true,
+                resetKey: 7,
             }),
         );
     });
@@ -293,8 +303,21 @@ describe('TitleDescriptionSection', () => {
 
             render(<TitleDescriptionSection {...defaultProps} mode={ProgramSectionMode.Edit} />);
 
-            expect(screen.getByTestId('input-group-section-title')).toHaveAttribute('data-error', 't-err');
-            expect(screen.getByTestId('textarea-group-section-description')).toHaveAttribute('data-error', 'd-err');
+            const titleGroup = getTitleInput()!.closest('div');
+            const descriptionGroup = getDescriptionTextarea()!.closest('div');
+
+            expect(titleGroup).toHaveAttribute('data-error', 't-err');
+            expect(descriptionGroup).toHaveAttribute('data-error', 'd-err');
+        });
+
+        it('passes trimmed currentLength to description group', () => {
+            renderComponent({
+                mode: ProgramSectionMode.Edit,
+                description: '   Hello world   ',
+            });
+
+            const descriptionGroup = getDescriptionTextarea()!.closest('div');
+            expect(descriptionGroup).toHaveAttribute('data-current-length', String('Hello world'.length));
         });
     });
 

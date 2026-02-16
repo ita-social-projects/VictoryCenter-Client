@@ -17,6 +17,7 @@ import NotFoundIcon from '@/assets/icons/not-found.svg';
 import styles from './ProgramForm.module.scss';
 import { ProgramSection } from '@/types/common/program-sections';
 import { BackgroundMedia } from '@/components/public/background-media/BackgroundMedia';
+import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 
 export interface ProgramFormValues {
     name: string;
@@ -416,19 +417,9 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             [updateSectionFlag],
         );
 
-        const getImageUrl = (image: Image | ImageValues | null): string | null => {
-            if (!image) return null;
-
-            if (typeof image === 'string') return image;
-
-            if ('url' in image && image.url) return image.url;
-
-            if (image instanceof File || image instanceof Blob) {
-                return URL.createObjectURL(image);
-            }
-
-            return null;
-        };
+        const hasBackgroundImage = useMemo(() => {
+            return !!getImageSrc(formState.backgroundImage);
+        }, [formState.backgroundImage]);
 
         return (
             <form className={styles['container']} noValidate>
@@ -465,38 +456,42 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
 
                 {/* Main Content Layout */}
                 <div className={styles['body']}>
-                    <PhotoInputGroup
-                        id="backgroundImage"
-                        isRequired={true}
-                        name="backgroundImage"
-                        value={formState.backgroundImage}
-                        onChange={handleBackgroundImageChange}
-                        disabled={isSubmitting || isFormDisabled}
-                        error={errors.backgroundImage}
-                        variant="program"
-                        setError={handleSetBackgroundImageError}
-                        cropWidth={PROGRAM_VALIDATION.backgroundImage.cropWidth}
-                        cropHeight={PROGRAM_VALIDATION.backgroundImage.cropHeight}
-                        minWidth={PROGRAM_VALIDATION.backgroundImage.minWidth}
-                        minHeight={PROGRAM_VALIDATION.backgroundImage.minHeight}
-                        imageLabel={COMMON_TEXT_ADMIN.INPUT.DRAG_AND_DROP_FILE_HERE}
-                        imageSubText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
-                            PROGRAM_VALIDATION.backgroundImage.height,
-                            PROGRAM_VALIDATION.backgroundImage.width,
-                        )}
-                        maxSizeMB={PROGRAM_VALIDATION.images.maxSizeMB}
-                    />
+                    <div className={styles['background-image-wrapper']}>
+                        <PhotoInputGroup
+                            id="backgroundImage"
+                            isRequired={true}
+                            name="backgroundImage"
+                            value={formState.backgroundImage}
+                            onChange={handleBackgroundImageChange}
+                            disabled={isSubmitting || isFormDisabled}
+                            error={errors.backgroundImage}
+                            variant="program"
+                            setError={handleSetBackgroundImageError}
+                            cropWidth={PROGRAM_VALIDATION.backgroundImage.cropWidth}
+                            cropHeight={PROGRAM_VALIDATION.backgroundImage.cropHeight}
+                            minWidth={PROGRAM_VALIDATION.backgroundImage.minWidth}
+                            minHeight={PROGRAM_VALIDATION.backgroundImage.minHeight}
+                            imageLabel={COMMON_TEXT_ADMIN.INPUT.DRAG_AND_DROP_FILE_HERE}
+                            imageSubText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
+                                PROGRAM_VALIDATION.backgroundImage.height,
+                                PROGRAM_VALIDATION.backgroundImage.width,
+                            )}
+                            maxSizeMB={PROGRAM_VALIDATION.images.maxSizeMB}
+                        />
+                    </div>
 
                     {formState.backgroundImage && (
                         <BackgroundMedia
-                            mediaUrl={getImageUrl(formState.backgroundImage) || ''}
+                            mediaUrl={getImageSrc(formState.backgroundImage) || ''}
                             overlay={{ opacity: 0.3 }}
                             className={styles['body-background']}
                             mediaType="image"
                         />
                     )}
 
-                    <div className={styles['body-inputs']}>
+                    <div
+                        className={`${styles['body-inputs']} ${hasBackgroundImage ? styles['has-background-image'] : ''}`}
+                    >
                         <div className={styles['col-left']}>
                             <TextAreaWithCharacterLimitGroup
                                 label={PROGRAMS_TEXT.FORM.LABEL.NAME}
@@ -510,6 +505,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 disabled={isSubmitting || isFormDisabled}
                                 error={errors.name}
                                 placeholder={PROGRAMS_TEXT.PLACEHOLDER.INSERT_PROGRAM_NAME}
+                                isWhiteTheme={hasBackgroundImage}
                             />
 
                             <InputWithCharacterLimitGroup
@@ -565,6 +561,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 disabled={isSubmitting || isFormDisabled}
                                 maxLength={PROGRAM_VALIDATION.description.max}
                                 error={errors.description}
+                                isWhiteTheme={hasBackgroundImage}
                             />
 
                             <PhotoInputGroup

@@ -7,6 +7,7 @@ export interface InputErrorWithCharacterCounterProps {
     counterId: string;
     htmlFor: string;
     value: string;
+    isWhiteTheme?: boolean;
 }
 
 export const InputErrorWithCharacterCounter = ({
@@ -15,12 +16,13 @@ export const InputErrorWithCharacterCounter = ({
     counterId,
     htmlFor,
     value,
+    isWhiteTheme,
 }: InputErrorWithCharacterCounterProps) => {
     const normalizedLength = getNormalizedInputText(value).length;
     return (
         <div className={styles.container}>
             <div className={styles['error-section']}>{error || ''}</div>
-            <div className={styles['counter-section']}>
+            <div className={`${styles['counter-section']} ${isWhiteTheme ? styles['white-theme'] : ''}`}>
                 <output id={counterId} htmlFor={htmlFor}>
                     {normalizedLength}/{maxLength}
                 </output>

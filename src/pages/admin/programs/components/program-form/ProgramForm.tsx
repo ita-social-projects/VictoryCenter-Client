@@ -18,6 +18,7 @@ import styles from './ProgramForm.module.scss';
 import { ProgramSection } from '@/types/common/program-sections';
 import { BackgroundMedia } from '@/components/public/background-media/BackgroundMedia';
 import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
+import cn from 'classnames';
 
 export interface ProgramFormValues {
     name: string;
@@ -490,7 +491,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                     )}
 
                     <div
-                        className={`${styles['body-inputs']} ${hasBackgroundImage ? styles['has-background-image'] : ''}`}
+                        className={cn(styles['body-inputs'], { [styles['has-background-image']]: hasBackgroundImage })}
                     >
                         <div className={styles['col-left']}>
                             <TextAreaWithCharacterLimitGroup
@@ -505,7 +506,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 disabled={isSubmitting || isFormDisabled}
                                 error={errors.name}
                                 placeholder={PROGRAMS_TEXT.PLACEHOLDER.INSERT_PROGRAM_NAME}
-                                isWhiteTheme={hasBackgroundImage}
+                                isWhiteLabel={hasBackgroundImage}
                             />
 
                             <InputWithCharacterLimitGroup
@@ -561,7 +562,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 disabled={isSubmitting || isFormDisabled}
                                 maxLength={PROGRAM_VALIDATION.description.max}
                                 error={errors.description}
-                                isWhiteTheme={hasBackgroundImage}
+                                isWhiteLabel={hasBackgroundImage}
                             />
 
                             <PhotoInputGroup

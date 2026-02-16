@@ -62,9 +62,10 @@ describe('test question card component', () => {
 
     test('should render localized question and answer when localizations are available', () => {
         const localizedQuestionText: string = 'How to join the program?';
-        const localizedAnswerText: string = 'You need to fill out a short questionnaire or write to ' +
-        'the coordinator via the form on the website. After that, we will contact you to clarify the details.'
-        
+        const localizedAnswerText: string =
+            'You need to fill out a short questionnaire or write to ' +
+            'the coordinator via the form on the website. After that, we will contact you to clarify the details.';
+
         const localizedQuestion: PublishedFaqQuestion = {
             ...mockQuestion,
             localizations: [
@@ -74,8 +75,8 @@ describe('test question card component', () => {
                     answerText: localizedAnswerText,
                     entityId: 1,
                     translationStatus: TranslationStatus.Relevant,
-                }
-            ]
+                },
+            ],
         };
 
         mockedUseGetLocalization.mockReturnValue({
@@ -90,5 +91,5 @@ describe('test question card component', () => {
 
         expect(screen.queryByText(mockQuestion.questionText)).not.toBeInTheDocument();
         expect(screen.queryByText(mockQuestion.answerText)).not.toBeInTheDocument();
-    })
+    });
 });

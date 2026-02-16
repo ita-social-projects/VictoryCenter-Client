@@ -1,4 +1,4 @@
-import { FaqLocalizationDto } from "@/types/admin/faq"
+import { FaqLocalizationDto } from '@/types/admin/faq';
 
 export interface PublishedFaqQuestion {
     id: number;

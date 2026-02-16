@@ -16,7 +16,7 @@ import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import NotFoundIcon from '@/assets/icons/not-found.svg';
 import styles from './ProgramForm.module.scss';
 import { ProgramSection } from '@/types/common/program-sections';
-import { BackgroundMedia } from '@/components/public/background-media/BackgroundMedia';
+import { BackgroundMedia } from '@/components/public/background-media';
 import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 import cn from 'classnames';
 

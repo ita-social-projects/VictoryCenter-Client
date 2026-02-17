@@ -45,7 +45,9 @@ export const normalizeGroupedContentsGroupIndexes = (
     if (uniqueSorted.length === 0) return contents;
 
     const map = new Map<number, number>();
-    uniqueSorted.forEach((oldIdx, newIdx) => map.set(oldIdx, newIdx));
+    uniqueSorted.forEach((oldIdx, newIdx) => {
+        map.set(oldIdx, newIdx);
+    });
 
     return contents.map((c) => {
         const gi = c.groupIndex;

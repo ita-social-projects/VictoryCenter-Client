@@ -16,7 +16,7 @@ import {
 interface TitleDescriptionCardProps {
     card: TitleDescriptionCardData;
     index: number;
-    template?: ProgramSectionTemplate;
+    template: ProgramSectionTemplate;
     mode?: ProgramSectionMode;
     onTitleChange?: (index: number, value: string) => void;
     onDescriptionChange?: (index: number, value: string) => void;
@@ -26,7 +26,7 @@ interface TitleDescriptionCardProps {
 export const TitleDescriptionCard = ({
     card,
     index,
-    template = ProgramSectionTemplate.DualTitleDescriptionPairs,
+    template,
     mode = ProgramSectionMode.Published,
     onTitleChange,
     onDescriptionChange,

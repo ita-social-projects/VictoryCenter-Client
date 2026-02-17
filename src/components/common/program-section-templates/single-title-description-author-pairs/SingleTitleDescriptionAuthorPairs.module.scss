@@ -8,7 +8,7 @@
     width: 100%;
     background-color: c.$white;
 
-    padding: 20px clamp(16px, 3vw, 0px);
+    padding: 20px clamp(0px, 3vw, 16px);
     box-sizing: border-box;
 
     --pair-card-width: 432px;

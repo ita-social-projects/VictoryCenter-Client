@@ -4,22 +4,12 @@ import cn from 'classnames';
 import { useId } from 'react';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
-import { PROGRAMS_TEXT, PROGRAM_SECTION_TEMPLATE_VALIDATION } from '@/const/admin/programs';
+import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { useProgramSectionValidation } from '@/hooks/admin/use-program-section-validation';
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
+import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
 import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
-
-const getTemplateMaxLength = (template: ProgramSectionTemplate, type: ContentType): number => {
-    const rules = (PROGRAM_SECTION_TEMPLATE_VALIDATION as any)[template];
-    const max = rules?.lengths?.[type]?.max ?? rules?.lengths?.[String(type)]?.max;
-
-    if (typeof max !== 'number') {
-        throw new Error(`Missing max length rule for template=${String(template)} type=${String(type)}`);
-    }
-
-    return max;
-};
 
 export interface TitleDescriptionSectionProps {
     template: ProgramSectionTemplate;
@@ -66,8 +56,8 @@ export const TitleDescriptionSection = ({
 
     const baseStyles = mode === ProgramSectionMode.Published ? publishedStyles : styles;
 
-    const titleMaxLength = getTemplateMaxLength(template, ContentType.Title);
-    const descriptionMaxLength = getTemplateMaxLength(template, ContentType.Description);
+    const titleMaxLength = getProgramSectionTemplateMaxLength(template, ContentType.Title);
+    const descriptionMaxLength = getProgramSectionTemplateMaxLength(template, ContentType.Description);
 
     return (
         <div

@@ -4,17 +4,13 @@ import { PhotoInputGroup } from '@/components/admin/input-groups/photo-input-gro
 import { ImageValues, Image } from '@/types/common/image';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
-import {
-    PROGRAMS_TEXT,
-    PROGRAM_SECTION_IMAGE_CONFIGS,
-    PROGRAM_SECTION_TEMPLATE_VALIDATION,
-    PROGRAM_VALIDATION,
-} from '@/const/admin/programs';
+import { PROGRAMS_TEXT, PROGRAM_SECTION_IMAGE_CONFIGS, PROGRAM_VALIDATION } from '@/const/admin/programs';
 import { useProgramSectionValidation } from '@/hooks/admin/use-program-section-validation';
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
 import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 import { useImageError } from '@/hooks/common/use-image-error/useImageError';
+import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
 import styles from './SingleImageRight.module.scss';
 import publishedStyles from './PublishedSingleImageRight.module.scss';
 
@@ -30,15 +26,6 @@ export interface SingleImageRightProps {
 }
 
 const TEMPLATE = ProgramSectionTemplate.SingleImageRight;
-
-type Range = { min: number; max: number };
-
-const getMaxLength = (type: ContentType): number => {
-    const lengths = PROGRAM_SECTION_TEMPLATE_VALIDATION[TEMPLATE]?.lengths as
-        | Partial<Record<ContentType, Range>>
-        | undefined;
-    return lengths?.[type]?.max ?? 0;
-};
 
 export const SingleImageRight = ({
     title = '',
@@ -69,8 +56,8 @@ export const SingleImageRight = ({
 
     const { error, handleSetError } = useImageError();
 
-    const titleMaxLength = getMaxLength(ContentType.Title);
-    const descriptionMaxLength = getMaxLength(ContentType.Description);
+    const titleMaxLength = getProgramSectionTemplateMaxLength(TEMPLATE, ContentType.Title);
+    const descriptionMaxLength = getProgramSectionTemplateMaxLength(TEMPLATE, ContentType.Description);
 
     return (
         <div

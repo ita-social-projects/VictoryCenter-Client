@@ -1,21 +1,19 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 
 import { TitleDescriptionCard } from '../TitleDescriptionCard';
 import type { TitleDescriptionCardData } from '../TitleDescriptionCardsSection';
 
 import { PROGRAMS_TEXT } from '../../../../../../const/admin/programs';
-import { ProgramSectionMode, ProgramSectionTemplate } from '../../../../../..//types/common/program-sections';
-import { ContentType } from '../../../../../..//types/common/programs';
+import { ProgramSectionMode, ProgramSectionTemplate } from '../../../../../../types/common/program-sections';
+import { ContentType } from '../../../../../../types/common/programs';
 
-import { parseDescriptionList } from '../../../../../..//utils/functions/formatters/text-formatters';
-import { useCardValidation } from '../../../../../..//hooks/admin/use-section-card-validation/useCardValidation';
-
+import { parseDescriptionList } from '../../../../../../utils/functions/formatters/text-formatters';
+import { useCardValidation } from '../../../../../../hooks/admin/use-section-card-validation/useCardValidation';
 import {
     getProgramSectionTemplateMaxLength,
     getProgramSectionTemplateMinLength,
-} from '../../../../../..//utils/functions/program-section-template-validation/programSectionTemplateValidation';
+} from '../../../../../../utils/functions/program-section-template-validation/programSectionTemplateValidation';
 
 jest.mock('@/utils/functions/formatters/text-formatters', () => ({
     parseDescriptionList: jest.fn(),
@@ -28,6 +26,22 @@ jest.mock('@/hooks/admin/use-section-card-validation/useCardValidation', () => (
 jest.mock('@/utils/functions/program-section-template-validation/programSectionTemplateValidation', () => ({
     getProgramSectionTemplateMaxLength: jest.fn(),
     getProgramSectionTemplateMinLength: jest.fn(),
+}));
+
+jest.mock('@/const/admin/programs', () => ({
+    PROGRAMS_TEXT: {
+        SECTION: {
+            FORM: {
+                DESCRIPTION: { TEXT: 'DEFAULT_DESC' },
+            },
+            CARD: {
+                FORM: {
+                    TITLE: { TEXT: 'DEFAULT_TITLE', PLACEHOLDER: 'TITLE_PH' },
+                    DESCRIPTION: { TEXT: 'DESC_LABEL', PLACEHOLDER: 'DESC_PH' },
+                },
+            },
+        },
+    },
 }));
 
 jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
@@ -68,50 +82,81 @@ const useCardValidationMock = useCardValidation as unknown as jest.Mock;
 const minMock = getProgramSectionTemplateMinLength as unknown as jest.Mock;
 const maxMock = getProgramSectionTemplateMaxLength as unknown as jest.Mock;
 
-describe('TitleDescriptionCard', () => {
-    const mockCard: TitleDescriptionCardData = {
-        title: 'Test Title',
-        description: 'Test Description',
-    };
+const TEMPLATE = ProgramSectionTemplate.DualTitleDescriptionPairs;
 
+const baseCard: TitleDescriptionCardData = {
+    title: 'Test Title',
+    description: 'Test Description',
+};
+
+const mockValidationPassThrough = () => {
+    useCardValidationMock.mockImplementation(({ onChange }: any) => ({
+        error: undefined,
+        handleChange: (v: string) => onChange?.(v),
+        handleBlur: jest.fn(),
+    }));
+};
+
+const renderCard = (overrides: Partial<React.ComponentProps<typeof TitleDescriptionCard>> = {}) => {
+    const props: React.ComponentProps<typeof TitleDescriptionCard> = {
+        card: baseCard,
+        index: 0,
+        template: TEMPLATE,
+        ...overrides,
+    };
+    return render(<TitleDescriptionCard {...props} />);
+};
+
+describe('TitleDescriptionCard', () => {
     beforeEach(() => {
         jest.clearAllMocks();
-
         minMock.mockReturnValue(1);
         maxMock.mockReturnValue(50);
-
-        useCardValidationMock.mockImplementation(() => ({
-            error: undefined,
-            handleChange: jest.fn(),
-            handleBlur: jest.fn(),
-        }));
-
-        parseDescriptionListMock.mockReturnValue({
-            intro: 'Intro',
-            items: [],
-        });
+        mockValidationPassThrough();
+        parseDescriptionListMock.mockReturnValue({ intro: 'Intro', items: [] });
     });
 
     it('calls min/max length getters for title and description', () => {
-        render(
-            <TitleDescriptionCard
-                card={mockCard}
-                index={0}
-                mode={ProgramSectionMode.Edit}
-                template={ProgramSectionTemplate.DualTitleDescriptionPairs}
-            />,
+        renderCard({ mode: ProgramSectionMode.Edit, template: TEMPLATE });
+
+        expect(minMock).toHaveBeenCalledWith(TEMPLATE, ContentType.Title);
+        expect(maxMock).toHaveBeenCalledWith(TEMPLATE, ContentType.Title);
+        expect(minMock).toHaveBeenCalledWith(TEMPLATE, ContentType.Description);
+        expect(maxMock).toHaveBeenCalledWith(TEMPLATE, ContentType.Description);
+    });
+
+    it('passes correct config into useCardValidation (title + description)', () => {
+        renderCard({ mode: ProgramSectionMode.Edit, validationResetKey: 123 });
+
+        expect(useCardValidationMock).toHaveBeenCalledTimes(2);
+
+        const call1 = useCardValidationMock.mock.calls[0][0];
+        const call2 = useCardValidationMock.mock.calls[1][0];
+
+        expect(call1).toEqual(
+            expect.objectContaining({
+                value: baseCard.title,
+                min: 1,
+                max: 50,
+                required: true,
+                resetKey: 123,
+            }),
         );
 
-        expect(minMock).toHaveBeenCalledWith(ProgramSectionTemplate.DualTitleDescriptionPairs, ContentType.Title);
-        expect(maxMock).toHaveBeenCalledWith(ProgramSectionTemplate.DualTitleDescriptionPairs, ContentType.Title);
-
-        expect(minMock).toHaveBeenCalledWith(ProgramSectionTemplate.DualTitleDescriptionPairs, ContentType.Description);
-        expect(maxMock).toHaveBeenCalledWith(ProgramSectionTemplate.DualTitleDescriptionPairs, ContentType.Description);
+        expect(call2).toEqual(
+            expect.objectContaining({
+                value: baseCard.description,
+                min: 1,
+                max: 50,
+                required: true,
+                resetKey: 123,
+            }),
+        );
     });
 
     describe('editable mode (Edit/View)', () => {
         it('renders inputs in Edit mode and keeps them enabled', () => {
-            render(<TitleDescriptionCard card={mockCard} index={0} mode={ProgramSectionMode.Edit} />);
+            renderCard({ mode: ProgramSectionMode.Edit });
 
             expect(screen.getByTestId('input-with-limit')).toBeInTheDocument();
             expect(screen.getByTestId('card-description-field')).toBeInTheDocument();
@@ -121,10 +166,7 @@ describe('TitleDescriptionCard', () => {
         });
 
         it('renders inputs in View mode and disables them', () => {
-            render(<TitleDescriptionCard card={mockCard} index={0} mode={ProgramSectionMode.View} />);
-
-            expect(screen.getByTestId('input-with-limit')).toBeInTheDocument();
-            expect(screen.getByTestId('card-description-field')).toBeInTheDocument();
+            renderCard({ mode: ProgramSectionMode.View });
 
             expect(screen.getByTestId('input-card-title-0')).toBeDisabled();
             expect(screen.getByTestId('textarea-card-description-0')).toBeDisabled();
@@ -135,18 +177,18 @@ describe('TitleDescriptionCard', () => {
             const descBlur = jest.fn();
 
             useCardValidationMock
-                .mockImplementationOnce(() => ({
+                .mockImplementationOnce(({ onChange }: any) => ({
                     error: undefined,
-                    handleChange: jest.fn(),
+                    handleChange: (v: string) => onChange?.(v),
                     handleBlur: titleBlur,
                 }))
-                .mockImplementationOnce(() => ({
+                .mockImplementationOnce(({ onChange }: any) => ({
                     error: undefined,
-                    handleChange: jest.fn(),
+                    handleChange: (v: string) => onChange?.(v),
                     handleBlur: descBlur,
                 }));
 
-            render(<TitleDescriptionCard card={mockCard} index={0} mode={ProgramSectionMode.Edit} />);
+            renderCard({ mode: ProgramSectionMode.Edit });
 
             expect(screen.getByTestId('input-card-title-0')).toHaveValue('Test Title');
             expect(screen.getByTestId('textarea-card-description-0')).toHaveValue('Test Description');
@@ -171,47 +213,62 @@ describe('TitleDescriptionCard', () => {
                     handleBlur: jest.fn(),
                 }));
 
-            render(<TitleDescriptionCard card={mockCard} index={0} mode={ProgramSectionMode.Edit} />);
+            renderCard({ mode: ProgramSectionMode.Edit });
 
             expect(screen.getByTestId('error-card-title-0')).toHaveTextContent('TITLE_ERR');
             expect(screen.getByTestId('error-card-description-0')).toHaveTextContent('DESC_ERR');
+        });
+
+        it('calls parseDescriptionList even in Edit mode (it is computed before the branch)', () => {
+            renderCard({ mode: ProgramSectionMode.Edit });
+            expect(parseDescriptionListMock).toHaveBeenCalledWith(baseCard.description);
+        });
+
+        it('calls onTitleChange and onDescriptionChange with (index, value) via hook change handlers', () => {
+            const onTitleChange = jest.fn();
+            const onDescriptionChange = jest.fn();
+
+            renderCard({
+                mode: ProgramSectionMode.Edit,
+                index: 5,
+                onTitleChange,
+                onDescriptionChange,
+            });
+
+            fireEvent.change(screen.getByTestId('input-card-title-5'), { target: { value: 'NEW_TITLE' } });
+            fireEvent.change(screen.getByTestId('textarea-card-description-5'), { target: { value: 'NEW_DESC' } });
+
+            expect(onTitleChange).toHaveBeenCalledWith(5, 'NEW_TITLE');
+            expect(onDescriptionChange).toHaveBeenCalledWith(5, 'NEW_DESC');
         });
     });
 
     describe('published mode', () => {
         it('does not render inputs and shows title as heading', () => {
-            render(<TitleDescriptionCard card={mockCard} index={0} mode={ProgramSectionMode.Published} />);
+            parseDescriptionListMock.mockReturnValueOnce({ intro: 'Intro text', items: [] });
+
+            renderCard({ mode: ProgramSectionMode.Published });
 
             expect(screen.queryByTestId('input-with-limit')).not.toBeInTheDocument();
             expect(screen.queryByTestId('card-description-field')).not.toBeInTheDocument();
 
-            expect(screen.getByText('Test Title')).toBeInTheDocument();
-        });
-
-        it('shows default title when empty', () => {
-            render(
-                <TitleDescriptionCard
-                    card={{ title: '', description: 'Any' }}
-                    index={0}
-                    mode={ProgramSectionMode.Published}
-                />,
-            );
-
-            expect(screen.getByText(PROGRAMS_TEXT.SECTION.CARD.FORM.TITLE.TEXT)).toBeInTheDocument();
-        });
-
-        it('renders intro paragraph when parseDescriptionList returns intro', () => {
-            parseDescriptionListMock.mockReturnValueOnce({ intro: 'Intro text', items: [] });
-
-            render(<TitleDescriptionCard card={mockCard} index={0} mode={ProgramSectionMode.Published} />);
-
+            expect(screen.getByRole('heading', { level: 3, name: 'Test Title' })).toBeInTheDocument();
             expect(screen.getByText('Intro text')).toBeInTheDocument();
         });
 
-        it('renders list when parseDescriptionList returns items', () => {
+        it('shows default title when empty', () => {
+            renderCard({
+                mode: ProgramSectionMode.Published,
+                card: { title: '', description: 'Any' },
+            });
+
+            expect(screen.getByRole('heading', { level: 3, name: PROGRAMS_TEXT.SECTION.CARD.FORM.TITLE.TEXT })).toBeInTheDocument();
+        });
+
+        it('renders list when parseDescriptionList returns items (no intro)', () => {
             parseDescriptionListMock.mockReturnValueOnce({ intro: null, items: ['Item 1', 'Item 2'] });
 
-            render(<TitleDescriptionCard card={mockCard} index={0} mode={ProgramSectionMode.Published} />);
+            renderCard({ mode: ProgramSectionMode.Published });
 
             expect(screen.getByText('Item 1')).toBeInTheDocument();
             expect(screen.getByText('Item 2')).toBeInTheDocument();
@@ -220,7 +277,7 @@ describe('TitleDescriptionCard', () => {
         it('renders both intro and items when both are present', () => {
             parseDescriptionListMock.mockReturnValueOnce({ intro: 'Intro X', items: ['I1'] });
 
-            render(<TitleDescriptionCard card={mockCard} index={0} mode={ProgramSectionMode.Published} />);
+            renderCard({ mode: ProgramSectionMode.Published });
 
             expect(screen.getByText('Intro X')).toBeInTheDocument();
             expect(screen.getByText('I1')).toBeInTheDocument();
@@ -229,63 +286,9 @@ describe('TitleDescriptionCard', () => {
         it('renders default description text when no intro and no items', () => {
             parseDescriptionListMock.mockReturnValueOnce({ intro: null, items: [] });
 
-            render(<TitleDescriptionCard card={mockCard} index={0} mode={ProgramSectionMode.Published} />);
+            renderCard({ mode: ProgramSectionMode.Published });
 
             expect(screen.getByText(PROGRAMS_TEXT.SECTION.FORM.DESCRIPTION.TEXT)).toBeInTheDocument();
-        });
-    });
-
-    describe('callbacks via validation hook', () => {
-        it('onTitleChange called with (index, value) when hook triggers change', async () => {
-            const onTitleChangeMock = jest.fn();
-
-            useCardValidationMock.mockImplementation(({ onChange }: any) => ({
-                error: undefined,
-                handleChange: (v: string) => onChange(v),
-                handleBlur: jest.fn(),
-            }));
-
-            render(
-                <TitleDescriptionCard
-                    card={mockCard}
-                    index={5}
-                    mode={ProgramSectionMode.Edit}
-                    onTitleChange={onTitleChangeMock}
-                />,
-            );
-
-            await userEvent.type(screen.getByTestId('input-card-title-5'), 'A');
-
-            expect(onTitleChangeMock).toHaveBeenCalledWith(5, 'Test TitleA');
-        });
-
-        it('onDescriptionChange called with (index, value) when hook triggers change', async () => {
-            const onDescriptionChangeMock = jest.fn();
-
-            useCardValidationMock
-                .mockImplementationOnce(() => ({
-                    error: undefined,
-                    handleChange: jest.fn(),
-                    handleBlur: jest.fn(),
-                }))
-                .mockImplementationOnce(({ onChange }: any) => ({
-                    error: undefined,
-                    handleChange: (v: string) => onChange(v),
-                    handleBlur: jest.fn(),
-                }));
-
-            render(
-                <TitleDescriptionCard
-                    card={mockCard}
-                    index={0}
-                    mode={ProgramSectionMode.Edit}
-                    onDescriptionChange={onDescriptionChangeMock}
-                />,
-            );
-
-            await userEvent.type(screen.getByTestId('textarea-card-description-0'), 'B');
-
-            expect(onDescriptionChangeMock).toHaveBeenCalledWith(0, 'Test DescriptionB');
         });
     });
 });

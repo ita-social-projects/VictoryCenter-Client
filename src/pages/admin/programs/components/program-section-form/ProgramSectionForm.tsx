@@ -24,10 +24,10 @@ export interface ProgramSectionFormProps {
     onDelete?: () => void;
     isReplacingTemplate?: boolean;
     onRequestReplace?: () => void;
-    isFirstSection?: boolean;
-    isLastSection?: boolean;
-    onMoveUpSection?: () => void;
-    onMoveDownSection?: () => void;
+    isFirstSection: boolean;
+    isLastSection: boolean;
+    onMoveUpSection: () => void;
+    onMoveDownSection: () => void;
 }
 
 export interface SectionCancelOptions {
@@ -90,8 +90,8 @@ export const ProgramSectionForm = ({
     onDelete,
     isReplacingTemplate = false,
     onRequestReplace,
-    isFirstSection,
-    isLastSection,
+    isFirstSection = false,
+    isLastSection = false,
     onMoveDownSection,
     onMoveUpSection,
 }: ProgramSectionFormProps) => {

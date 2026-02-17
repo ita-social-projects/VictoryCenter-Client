@@ -515,7 +515,6 @@ const validateTemplateImages = (contents: SectionContent[], rules: TemplateRules
                     return ao - bo;
                 });
 
-                if (ordered.length < imageReq.min) return false;
                 if (ordered.slice(0, imageReq.min).some((c) => !hasRequiredImageValue(c))) return false;
             }
         }

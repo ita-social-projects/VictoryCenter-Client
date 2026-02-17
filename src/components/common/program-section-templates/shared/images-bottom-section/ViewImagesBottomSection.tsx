@@ -3,10 +3,10 @@ import { Swiper } from '@/components/public/swiper/Swiper';
 import { ImageValues, Image } from '@/types/common/image';
 import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 import { ImagesBottomSectionConfig } from './ImagesBottomSection';
-import styles from './PublishedImagesBottomSection.module.scss';
+import styles from './ViewImagesBottomSection.module.scss';
 import swiperStyles from './ImagesBottomSwiper.module.scss';
 
-interface PublishedImagesBottomSectionProps {
+interface ViewImagesBottomSectionProps {
     images: (Image | ImageValues | null)[];
     config: ImagesBottomSectionConfig;
     bottomSectionClassName?: string;
@@ -23,13 +23,13 @@ const SWIPER_NAVIGATION_CONFIG = {
     },
 };
 
-export const PublishedImagesBottomSection = ({
+export const ViewImagesBottomSection = ({
     images,
     config,
     bottomSectionClassName = '',
     imageWrapperClassName = '',
     imageClassName = '',
-}: PublishedImagesBottomSectionProps) => {
+}: ViewImagesBottomSectionProps) => {
     return (
         <div className={cn(styles['bottom-section'], bottomSectionClassName)}>
             <div className={swiperStyles.swiperContainer}>

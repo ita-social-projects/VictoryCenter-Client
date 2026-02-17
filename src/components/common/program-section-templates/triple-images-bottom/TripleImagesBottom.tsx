@@ -4,7 +4,7 @@ import { ImageValues, Image } from '@/types/common/image';
 import { TRIPLE_IMAGES_CONFIG } from '@/const/admin/programs';
 import { ProgramSectionMode } from '@/types/common/program-sections';
 import styles from './TripleImagesBottom.module.scss';
-import publishedStyles from './PublishedTripleImagesBottom.module.scss';
+import viewStyles from './ViewTripleImagesBottom.module.scss';
 
 export interface TripleImagesBottomProps {
     title?: string;
@@ -27,7 +27,7 @@ export const TripleImagesBottom = ({
     onImagesChange,
     validationResetKey,
 }: TripleImagesBottomProps) => {
-    const baseStyles = mode === ProgramSectionMode.View ? publishedStyles : styles;
+    const baseStyles = mode === ProgramSectionMode.View ? viewStyles : styles;
     const imageHandlers = images.map((image, index) => ({
         handler: onImagesChange ? (file: ImageValues | null) => onImagesChange(index, file) : undefined,
         key: `image${index + 1}`,

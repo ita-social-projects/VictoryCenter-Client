@@ -1,5 +1,5 @@
 import styles from './TitleDescriptionSection.module.scss';
-import publishedStyles from './PublishedTitleDescriptionSection.module.scss';
+import viewStyles from './ViewTitleDescriptionSection.module.scss';
 import cn from 'classnames';
 import { useId } from 'react';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
@@ -46,7 +46,7 @@ export const TitleDescriptionSection = ({
         resetKey: validationResetKey,
     });
 
-    const baseStyles = mode === ProgramSectionMode.View ? publishedStyles : styles;
+    const baseStyles = mode === ProgramSectionMode.View ? viewStyles : styles;
 
     return (
         <div

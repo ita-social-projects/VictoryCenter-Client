@@ -8,7 +8,7 @@ import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 import { ProgramSectionMode } from '@/types/common/program-sections';
 import { useImageError } from '@/hooks/common/use-image-error/useImageError';
 import styles from './SingleImageTop.module.scss';
-import publishedStyles from './PublishedSingleImageTop.module.scss';
+import viewStyles from './ViewSingleImageTop.module.scss';
 
 export interface SingleImageTopProps {
     title?: string;
@@ -32,7 +32,7 @@ export const SingleImageTop = ({
     validationResetKey,
 }: SingleImageTopProps) => {
     const imageSrc = getImageSrc(image);
-    const baseStyles = mode === ProgramSectionMode.View ? publishedStyles : styles;
+    const baseStyles = mode === ProgramSectionMode.View ? viewStyles : styles;
     const { error, handleSetError } = useImageError();
 
     return (

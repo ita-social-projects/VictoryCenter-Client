@@ -4,7 +4,7 @@ import { TitleDescriptionSection } from '../title-description-section/TitleDescr
 import { ImageValues, Image } from '@/types/common/image';
 import baseStyles from './ImagesBottomSection.module.scss';
 import { ProgramSectionMode } from '@/types/common/program-sections';
-import { PublishedImagesBottomSection } from './PublishedImagesBottomSection';
+import { ViewImagesBottomSection } from './ViewImagesBottomSection';
 import { EditableImagesBottomSection } from './EditableImagesBottomSection';
 
 export interface ImageConfig {
@@ -109,7 +109,7 @@ export const ImagesBottomSection = ({
                 validationResetKey={validationResetKey}
             />
             {mode === ProgramSectionMode.View ? (
-                <PublishedImagesBottomSection
+                <ViewImagesBottomSection
                     images={displayedImages}
                     config={config}
                     bottomSectionClassName={bottomSectionClassName}

@@ -15,7 +15,7 @@ import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatter
 import { ProgramSectionMode } from '@/types/common/program-sections';
 import { useImageError } from '@/hooks/common/use-image-error/useImageError';
 import styles from './SingleImageRight.module.scss';
-import publishedStyles from './PublishedSingleImageRight.module.scss';
+import viewStyles from './ViewSingleImageRight.module.scss';
 
 export interface SingleImageRightProps {
     title?: string;
@@ -39,7 +39,7 @@ export const SingleImageRight = ({
     validationResetKey,
 }: SingleImageRightProps) => {
     const imageSrc = getImageSrc(image);
-    const baseStyles = mode === ProgramSectionMode.View ? publishedStyles : styles;
+    const baseStyles = mode === ProgramSectionMode.View ? viewStyles : styles;
     const {
         titleError,
         descriptionError,

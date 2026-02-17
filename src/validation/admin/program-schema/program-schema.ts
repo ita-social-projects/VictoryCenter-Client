@@ -415,7 +415,12 @@ const validateTemplateLengths = (contents: SectionContent[], rules: TemplateRule
 
         for (const item of items) {
             const t = getTextValue(item)?.trim();
-            if (!t) return false;
+
+            if (!t) {
+                if (isPublishing) return false;
+                continue;
+            }
+
             if (t.length > req.max) return false;
             if (isPublishing && t.length < req.min) return false;
         }

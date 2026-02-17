@@ -80,12 +80,6 @@ export const TranslateTeamCategoryForm = forwardRef<TranslateTeamCategoryFormRef
             onDirtyChange?.(isDirty);
         }, [formState, initialData, onDirtyChange]);
 
-        useEffect(() => {
-            if (initialData) {
-                setFormState(initialData);
-            }
-        }, [initialData, setFormState]);
-
         const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             setFormState((prev) => ({ ...prev, name: e.target.value }));
         };

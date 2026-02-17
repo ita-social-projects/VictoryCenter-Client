@@ -1,10 +1,9 @@
 import { ModalMode } from '@/types/admin/common';
-import { TeamCategory } from '@/types/admin/team-category';
+import { TeamCategory, TeamCategoryLocalization } from '@/types/admin/team-category';
 import { LocalizationLanguage } from '@/types/common/language';
 import { useAdminClient } from '../use-admin-client/useAdminClient';
 import { useState } from 'react';
 import { TeamCategoryLocalizationApi } from '@/services/api/admin/team/team-category-localizations/team-category-localizations-api';
-import { FaqLocalization } from '@/types/admin/faq';
 import { mapLocalizationDtoToModel } from '@/utils/functions/mappers/common/localization/localization-mappers';
 import { TEAM_CATEGORY_TEXT } from '@/const/admin/team';
 import { TranslateTeamCategoryFormValues } from '@/pages/admin/team/components/translate-team-category-form/TranslateTeamCategoryForm';
@@ -12,7 +11,7 @@ import { TranslateTeamCategoryFormValues } from '@/pages/admin/team/components/t
 interface UseTranslateTeamCategoryParams {
     teamCategory: TeamCategory | null;
     language: LocalizationLanguage;
-    onSuccess: (updatedMember: TeamCategory) => void;
+    onSuccess: (updatedTeamCategoryLocalization: TeamCategory) => void;
     mode: ModalMode;
 }
 
@@ -46,7 +45,7 @@ export const useTranslateTeamCategory = ({
                     },
                 );
 
-                const updatedLocalization = mapLocalizationDtoToModel<typeof updatedLocalizationDto, FaqLocalization>(
+                const updatedLocalization = mapLocalizationDtoToModel<typeof updatedLocalizationDto, TeamCategoryLocalization>(
                     updatedLocalizationDto,
                 );
 
@@ -66,7 +65,7 @@ export const useTranslateTeamCategory = ({
                     description: data.description,
                 });
 
-                const createdLocalization = mapLocalizationDtoToModel<typeof createdLocalizationDto, FaqLocalization>(
+                const createdLocalization = mapLocalizationDtoToModel<typeof createdLocalizationDto, TeamCategoryLocalization>(
                     createdLocalizationDto,
                 );
 

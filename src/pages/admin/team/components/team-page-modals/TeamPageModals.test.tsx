@@ -157,6 +157,8 @@ const createMockModalsStateControl = (
         itemToTranslate: null,
         itemToEditTranslation: null,
         isAddCategoryModalOpen: false,
+        isCategoryToEditTranslation: false,
+        isCategoryToTranslate: false,
         isEditCategoryModalOpen: false,
         isDeleteCategoryModalOpen: false,
         isAddSectionModalOpen: false,
@@ -172,6 +174,8 @@ const createMockModalsStateControl = (
         closeEditCategoryModal: jest.fn(),
         closeDeleteCategoryModal: jest.fn(),
         closeAddSectionModal: jest.fn(),
+        closeTranslateCategoryModal: jest.fn(),
+        closeEditCategoryTranslationModal: jest.fn(),
     },
     openModalActions: {
         openAddItemModal: jest.fn(),
@@ -183,6 +187,8 @@ const createMockModalsStateControl = (
         openEditCategoryModal: jest.fn(),
         openDeleteCategoryModal: jest.fn(),
         openAddSectionModal: jest.fn(),
+        openTranslateCategoryModal: jest.fn(),
+        openEditCategoryTranslationModal: jest.fn(),
     },
     isAnyModalOpened: false,
 });
@@ -206,6 +212,10 @@ const createDefaultProps = (
     onAddTeamCategory: jest.fn(),
     onEditTeamCategory: jest.fn(),
     onDeleteTeamCategory: jest.fn(),
+    selectedCategory: null,
+    onTranslateTeamCategory: function (translatedCategory: TeamCategory): void {
+        throw new Error('Function not implemented.');
+    }
 });
 
 describe('TeamPageModals', () => {

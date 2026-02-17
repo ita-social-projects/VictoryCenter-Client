@@ -15,6 +15,8 @@ describe('useModalsState', () => {
             isEditCategoryModalOpen: false,
             isDeleteCategoryModalOpen: false,
             isAddSectionModalOpen: false,
+            isCategoryToTranslate: false,
+            isCategoryToEditTranslation: false,
         });
         expect(result.current.isAnyModalOpened).toBe(false);
     });

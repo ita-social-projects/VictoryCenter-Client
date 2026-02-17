@@ -33,15 +33,12 @@ export const TranslateTeamCategoryModal = ({
     const formRef = useRef<TranslateTeamCategoryFormRef>(null);
     const [isFormValid, setIsFormValid] = useState(false);
     const [isDirty, setIsDirty] = useState(false);
-    const [language, setLanguage] = useState<LocalizationLanguage | null>(translatedLanguages?.[0] ?? null);
     const [selectedCategory, setSelectedCategory] = useState<TeamCategory | null>(null);
 
-    useEffect(() => {
-        if (translatedLanguages.length > 0 && !language) {
-            const defaultEnglish = translatedLanguages.find((l) => l.code !== DEFAULT_LOCALE) || translatedLanguages[0];
-            setLanguage(defaultEnglish);
-        }
-    }, [translatedLanguages, language]);
+    const [language, setLanguage] = useState<LocalizationLanguage | null>(() => {
+        if (!translatedLanguages?.length) return null;
+        return translatedLanguages.find((l) => l.code !== DEFAULT_LOCALE) || translatedLanguages[0];
+   });
 
     const existingLocalization = useMemo(() => {
         if (!selectedCategory?.localizations || !language) return null;
@@ -62,7 +59,7 @@ export const TranslateTeamCategoryModal = ({
 
     const { translateTeamCategory, isSubmitting, error } = useTranslateTeamCategory({
         teamCategory: selectedCategory,
-        language: language!,
+        language: language as LocalizationLanguage,
         onSuccess: (updatedTeamCategory) => {
             onTranslateCategory(updatedTeamCategory);
             onClose();

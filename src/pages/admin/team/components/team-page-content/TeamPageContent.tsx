@@ -505,7 +505,7 @@ export const TeamPageContent = () => {
             setCategories((prevCategories) =>
                 prevCategories.map((category) => (category.id === updatedCategory.id ? updatedCategory : category)),
             );
-            closeModalActions.closeTranslateItemModal();
+            closeModalActions.closeTranslateCategoryModal();
 
             addToast(COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS, ToastType.Success);
         },
@@ -640,8 +640,9 @@ export const TeamPageContent = () => {
                 onDeleteTeamMember={handleDeleteMember}
                 onAddTeamCategory={handleAddCategory}
                 onEditTeamCategory={handleEditCategory}
-                onDeleteTeamCategory={handleDeleteCategory} 
-                selectedCategory={selectedCategory}            />
+                onDeleteTeamCategory={handleDeleteCategory}
+                selectedCategory={selectedCategory}
+            />
             <ToastContainer />
         </div>
     );

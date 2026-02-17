@@ -8,14 +8,14 @@ $img-height: 600px;
     display: flex;
     flex-direction: column;
     gap: 64px;
-    padding: 80px 16px;
+    padding: 60px 16px 0px 16px;
 
     @media (min-width: 560px) {
-        padding: 80px 64px;
+        padding: 60px 64px 0px 64px;
     }
 
     @media (min-width: 768px) {
-        padding: 80px 56px;
+        padding: 60px 56px 0px 56px;
     }
 
     @media (min-width: 1440px) {

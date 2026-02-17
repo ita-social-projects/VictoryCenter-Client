@@ -325,6 +325,13 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                     [updated[idx - 1], updated[idx]] = [updated[idx], updated[idx - 1]];
                     return updated;
                 });
+
+                setTimeout(() => {
+                    document.querySelector(`[data-section-key="${sectionKey}"]`)?.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start',
+                    });
+                }, 50);
             },
             [setFormState],
         );
@@ -345,6 +352,13 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                     [updated[idx + 1], updated[idx]] = [updated[idx], updated[idx + 1]];
                     return updated;
                 });
+
+                setTimeout(() => {
+                    document.querySelector(`[data-section-key="${sectionKey}"]`)?.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start',
+                    });
+                }, 50);
             },
             [setFormState],
         );
@@ -733,27 +747,29 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 const { sectionKey } = sectionState;
                                 return (
                                     <React.Fragment key={sectionKey}>
-                                        <ProgramSectionForm
-                                            section={section}
-                                            onSave={() => handleSaveSection(sectionKey)}
-                                            onCancel={(options) => handleCancelSection(sectionKey, options)}
-                                            onSectionChange={(updatedSection) =>
-                                                handleSectionChange(sectionKey, updatedSection)
-                                            }
-                                            isDisabled={isSubmitting || isFormDisabled}
-                                            isNewSection={sectionState.isNew}
-                                            isSectionValid={sectionValidity[index] ?? false}
-                                            onEditStateChange={(isEditing) =>
-                                                handleSectionEditStateChange(sectionKey, isEditing)
-                                            }
-                                            onDelete={() => handleDeleteSection(sectionKey)}
-                                            isReplacingTemplate={sectionState.isReplacing}
-                                            onRequestReplace={() => onReplaceSection?.(index)}
-                                            isFirstSection={index === 0}
-                                            isLastSection={index === formState.sections.length - 1}
-                                            onMoveUpSection={() => handleMoveUpSection(sectionKey)}
-                                            onMoveDownSection={() => handleMoveDownSection(sectionKey)}
-                                        />
+                                        <div data-section-key={sectionKey}>
+                                            <ProgramSectionForm
+                                                section={section}
+                                                onSave={() => handleSaveSection(sectionKey)}
+                                                onCancel={(options) => handleCancelSection(sectionKey, options)}
+                                                onSectionChange={(updatedSection) =>
+                                                    handleSectionChange(sectionKey, updatedSection)
+                                                }
+                                                isDisabled={isSubmitting || isFormDisabled}
+                                                isNewSection={sectionState.isNew}
+                                                isSectionValid={sectionValidity[index] ?? false}
+                                                onEditStateChange={(isEditing) =>
+                                                    handleSectionEditStateChange(sectionKey, isEditing)
+                                                }
+                                                onDelete={() => handleDeleteSection(sectionKey)}
+                                                isReplacingTemplate={sectionState.isReplacing}
+                                                onRequestReplace={() => onReplaceSection?.(index)}
+                                                isFirstSection={index === 0}
+                                                isLastSection={index === formState.sections.length - 1}
+                                                onMoveUpSection={() => handleMoveUpSection(sectionKey)}
+                                                onMoveDownSection={() => handleMoveDownSection(sectionKey)}
+                                            />
+                                        </div>
                                         <div className={styles['sections-divider']} />
                                     </React.Fragment>
                                 );

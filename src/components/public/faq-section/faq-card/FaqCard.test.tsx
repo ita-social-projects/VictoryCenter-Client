@@ -70,10 +70,9 @@ describe('test question card component', () => {
             ...mockQuestion,
             localizations: [
                 {
-                    localizationInfoDto: { id: 1, code: 'en' },
+                    language: { id: 1, code: 'en' },
                     questionText: localizedQuestionText,
                     answerText: localizedAnswerText,
-                    entityId: 1,
                     translationStatus: TranslationStatus.Relevant,
                 },
             ],

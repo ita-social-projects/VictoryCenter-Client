@@ -47,10 +47,9 @@ describe('TeamMemberCard component', () => {
             ...mockMember,
             localizations: [
                 {
-                    localizationInfoDto: { id: 1, code: 'en' },
+                    language: { id: 1, code: 'en' },
                     fullName: 'Ivan English',
                     description: 'Professional Member',
-                    entityId: 1,
                     translationStatus: TranslationStatus.Relevant,
                 },
             ],

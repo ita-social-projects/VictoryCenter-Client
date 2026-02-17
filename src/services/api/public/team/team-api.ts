@@ -23,7 +23,12 @@ const mapTeamMemberDtoToTeamMember = (dto: PublicTeamMemberDto): MemberCard => (
     name: dto.fullName,
     role: dto.description || '',
     photo: dto.image?.url ?? null,
-    localizations: dto.localizations || [],
+    localizations: dto.localizations?.map((loc) => ({
+        language: loc.localizationInfoDto,
+        translationStatus: loc.translationStatus,
+        fullName: loc.fullName,
+        description: loc.description,
+    })) ?? [],
 });
 
 const mapCategoryDtoToTeamCategory = (dto: PublicCategoryWithTeamMembersDto): TeamItem => {

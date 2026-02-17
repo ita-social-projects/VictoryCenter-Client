@@ -312,7 +312,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
         const handleMoveUpSection = useCallback(
             (sectionKey: string) => {
                 const idx = sectionStatesRef.current.findIndex((s) => s.sectionKey === sectionKey);
-                if (idx === -1) return;
+                if (idx <= 0) return;
 
                 setFormState((prev) => {
                     const updatedSections = [...prev.sections];
@@ -339,7 +339,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
         const handleMoveDownSection = useCallback(
             (sectionKey: string) => {
                 const idx = sectionStatesRef.current.findIndex((s) => s.sectionKey === sectionKey);
-                if (idx === -1) return;
+                if (idx === -1 || idx >= sectionStatesRef.current.length - 1) return;
 
                 setFormState((prev) => {
                     const updatedSections = [...prev.sections];

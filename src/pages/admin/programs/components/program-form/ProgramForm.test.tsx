@@ -12,6 +12,8 @@ import { PhotoInputGroupProps } from '@/components/admin/input-groups/photo-inpu
 import { ButtonProps } from '@/components/admin/button/Button';
 import { ProgramSection } from '@/types/common/program-sections';
 
+HTMLElement.prototype.scrollIntoView = jest.fn();
+
 jest.mock('@/validation/admin/program-schema/program-schema', () => ({
     PROGRAM_VALIDATION_FUNCTIONS: {
         validateName: jest.fn(),
@@ -790,22 +792,23 @@ describe('ProgramForm', () => {
             });
         });
 
-        it('moves section up when Move Up button is clicked', async () => {
-            const initialData = createInitialData({
+        let initialData: ReturnType<typeof createInitialData>;
+
+        beforeEach(() => {
+            initialData = createInitialData({
                 sections: [
                     { id: 101, template: 1, order: 0, contents: [] } as ProgramSection,
                     { id: 202, template: 1, order: 1, contents: [] } as ProgramSection,
                 ],
             });
+        });
 
+        it('moves section up when Move Up button is clicked', async () => {
             renderProgramForm({ initialData });
-
             await waitFor(() => {
                 expect(screen.getAllByTestId('program-section-form')).toHaveLength(2);
             });
-
             fireEvent.click(screen.getByTestId('move-up-section-202'));
-
             await waitFor(() => {
                 const sections = screen.getAllByTestId('program-section-form');
                 expect(sections[0]).toHaveAttribute('data-section-id', '202');
@@ -813,21 +816,11 @@ describe('ProgramForm', () => {
         });
 
         it('moves section down when Move Down button is clicked', async () => {
-            const initialData = createInitialData({
-                sections: [
-                    { id: 101, template: 1, order: 0, contents: [] } as ProgramSection,
-                    { id: 202, template: 1, order: 1, contents: [] } as ProgramSection,
-                ],
-            });
-
             renderProgramForm({ initialData });
-
             await waitFor(() => {
                 expect(screen.getAllByTestId('program-section-form')).toHaveLength(2);
             });
-
             fireEvent.click(screen.getByTestId('move-down-section-101'));
-
             await waitFor(() => {
                 const sections = screen.getAllByTestId('program-section-form');
                 expect(sections[1]).toHaveAttribute('data-section-id', '101');

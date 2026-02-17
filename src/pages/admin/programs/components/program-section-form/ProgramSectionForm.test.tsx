@@ -129,6 +129,10 @@ describe('ProgramSectionForm', () => {
             onSectionChange: jest.fn(),
             isNewSection: false,
             isSectionValid: false,
+            isFirstSection: false,
+            isLastSection: false,
+            onMoveUpSection: jest.fn(),
+            onMoveDownSection: jest.fn(),
         } as ProgramSectionFormProps;
     });
 
@@ -613,5 +617,61 @@ describe('ProgramSectionForm', () => {
         fireEvent.click(screen.getByLabelText('Replace section'));
 
         expect(onRequestReplace).toHaveBeenCalledTimes(1);
+    });
+
+    it('calls onMoveUpSection when Move Up button is clicked', () => {
+        const onMoveUpSection = jest.fn();
+
+        renderForm({
+            isFirstSection: false,
+            isLastSection: false,
+            onMoveUpSection,
+        });
+
+        fireEvent.click(screen.getByLabelText('Move up section'));
+
+        expect(onMoveUpSection).toHaveBeenCalledTimes(1);
+    });
+
+    it('calls onMoveDownSection when Move Down button is clicked', () => {
+        const onMoveDownSection = jest.fn();
+
+        renderForm({
+            isFirstSection: false,
+            isLastSection: false,
+            onMoveDownSection,
+        });
+
+        fireEvent.click(screen.getByLabelText('Move down section'));
+
+        expect(onMoveDownSection).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not render Move Up button when section is first', () => {
+        renderForm({
+            isFirstSection: true,
+            isLastSection: false,
+        });
+
+        expect(screen.queryByLabelText('Move up section')).not.toBeInTheDocument();
+    });
+
+    it('does not render Move Down button when section is last', () => {
+        renderForm({
+            isFirstSection: false,
+            isLastSection: true,
+        });
+
+        expect(screen.queryByLabelText('Move down section')).not.toBeInTheDocument();
+    });
+
+    it('does not render move buttons when section is both first and last', () => {
+        renderForm({
+            isFirstSection: true,
+            isLastSection: true,
+        });
+
+        expect(screen.queryByLabelText('Move up section')).not.toBeInTheDocument();
+        expect(screen.queryByLabelText('Move down section')).not.toBeInTheDocument();
     });
 });

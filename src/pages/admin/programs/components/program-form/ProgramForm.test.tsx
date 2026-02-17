@@ -140,20 +140,28 @@ jest.mock('../program-section-form/ProgramSectionForm', () => ({
         onEditStateChange,
         onDelete,
         onRequestReplace,
+        onMoveUpSection,
+        onMoveDownSection,
+        isFirstSection,
+        isLastSection,
         isDisabled,
         isNewSection,
         isReplacingTemplate,
     }: any) => (
         <div
             data-testid="program-section-form"
+            data-section-id={section.id ?? section.template}
             data-section-template={String(section.template)}
             data-disabled={String(isDisabled)}
             data-is-new={String(isNewSection)}
             data-is-replacing={String(isReplacingTemplate)}
+            data-is-first={String(isFirstSection)}
+            data-is-last={String(isLastSection)}
         >
             <button type="button" data-testid={`save-section-${section.id ?? section.template}`} onClick={onSave}>
                 Save
             </button>
+
             <button
                 type="button"
                 data-testid={`cancel-section-${section.id ?? section.template}`}
@@ -168,6 +176,7 @@ jest.mock('../program-section-form/ProgramSectionForm', () => ({
             >
                 Cancel
             </button>
+
             <button
                 type="button"
                 data-testid={`change-section-${section.id ?? section.template}`}
@@ -175,6 +184,7 @@ jest.mock('../program-section-form/ProgramSectionForm', () => ({
             >
                 Change
             </button>
+
             <button
                 type="button"
                 data-testid={`edit-state-${section.id ?? section.template}`}
@@ -182,6 +192,7 @@ jest.mock('../program-section-form/ProgramSectionForm', () => ({
             >
                 Toggle Edit
             </button>
+
             <button
                 type="button"
                 data-testid={`delete-section-${section.id ?? section.template}`}
@@ -189,6 +200,7 @@ jest.mock('../program-section-form/ProgramSectionForm', () => ({
             >
                 Delete
             </button>
+
             <button
                 type="button"
                 data-testid={`replace-section-${section.id ?? section.template}`}
@@ -196,6 +208,26 @@ jest.mock('../program-section-form/ProgramSectionForm', () => ({
             >
                 Replace
             </button>
+
+            {!isFirstSection && (
+                <button
+                    type="button"
+                    data-testid={`move-up-section-${section.id ?? section.template}`}
+                    onClick={() => onMoveUpSection?.()}
+                >
+                    Move Up
+                </button>
+            )}
+
+            {!isLastSection && (
+                <button
+                    type="button"
+                    data-testid={`move-down-section-${section.id ?? section.template}`}
+                    onClick={() => onMoveDownSection?.()}
+                >
+                    Move Down
+                </button>
+            )}
         </div>
     ),
 }));
@@ -755,6 +787,68 @@ describe('ProgramForm', () => {
 
             await waitFor(() => {
                 expect(screen.queryByTestId('program-section-form')).not.toBeInTheDocument();
+            });
+        });
+
+        it('moves section up when Move Up button is clicked', async () => {
+            const initialData = createInitialData({
+                sections: [
+                    { id: 101, template: 1, order: 0, contents: [] } as ProgramSection,
+                    { id: 202, template: 1, order: 1, contents: [] } as ProgramSection,
+                ],
+            });
+
+            renderProgramForm({ initialData });
+
+            await waitFor(() => {
+                expect(screen.getAllByTestId('program-section-form')).toHaveLength(2);
+            });
+
+            fireEvent.click(screen.getByTestId('move-up-section-202'));
+
+            await waitFor(() => {
+                const sections = screen.getAllByTestId('program-section-form');
+                expect(sections[0]).toHaveAttribute('data-section-id', '202');
+            });
+        });
+
+        it('moves section down when Move Down button is clicked', async () => {
+            const initialData = createInitialData({
+                sections: [
+                    { id: 101, template: 1, order: 0, contents: [] } as ProgramSection,
+                    { id: 202, template: 1, order: 1, contents: [] } as ProgramSection,
+                ],
+            });
+
+            renderProgramForm({ initialData });
+
+            await waitFor(() => {
+                expect(screen.getAllByTestId('program-section-form')).toHaveLength(2);
+            });
+
+            fireEvent.click(screen.getByTestId('move-down-section-101'));
+
+            await waitFor(() => {
+                const sections = screen.getAllByTestId('program-section-form');
+                expect(sections[1]).toHaveAttribute('data-section-id', '101');
+            });
+        });
+
+        it('does nothing when section key is not found (covers idx === -1)', async () => {
+            const initialData = createInitialData({
+                sections: [{ id: 101, template: 1, order: 0, contents: [] } as ProgramSection],
+            });
+
+            renderProgramForm({ initialData });
+
+            await waitFor(() => {
+                expect(screen.getByTestId('program-section-form')).toBeInTheDocument();
+            });
+
+            fireEvent.click(screen.queryByTestId('move-up-section-101') || document.createElement('div'));
+
+            await waitFor(() => {
+                expect(screen.getAllByTestId('program-section-form')).toHaveLength(1);
             });
         });
     });

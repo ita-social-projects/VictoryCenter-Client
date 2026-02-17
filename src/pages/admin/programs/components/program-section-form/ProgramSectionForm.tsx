@@ -474,49 +474,29 @@ export const ProgramSectionForm = ({
         },
     });
 
-    const isSingleSection = isLastSection && isFirstSection;
-
     return (
         <div className={styles.container}>
             {sectionMode === ProgramSectionMode.View && (
                 <div className={styles['actions-section']}>
                     <div className={styles['order-controls']}>
-                        {!isSingleSection && (
-                            <>
-                                {isFirstSection && (
-                                    <button
-                                        type="button"
-                                        onClick={onMoveDownSection}
-                                        className={`${styles['icon-button']} ${styles['down-button']}`}
-                                        aria-label="Move down section"
-                                    />
-                                )}
-                                {isLastSection && (
-                                    <button
-                                        type="button"
-                                        onClick={onMoveUpSection}
-                                        className={`${styles['icon-button']} ${styles['up-button']}`}
-                                        aria-label="Move up section"
-                                    />
-                                )}
-                                {!isLastSection && !isFirstSection && (
-                                    <>
-                                        <button
-                                            type="button"
-                                            onClick={onMoveUpSection}
-                                            className={`${styles['icon-button']} ${styles['up-button']}`}
-                                            aria-label="Move up section"
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={onMoveDownSection}
-                                            className={`${styles['icon-button']} ${styles['down-button']}`}
-                                            aria-label="Move down section"
-                                        />
-                                    </>
-                                )}
-                            </>
-                        )}
+                        <div className={styles['order-controls']}>
+                            {!isFirstSection && (
+                                <button
+                                    type="button"
+                                    onClick={onMoveUpSection}
+                                    className={`${styles['icon-button']} ${styles['up-button']}`}
+                                    aria-label="Move up section"
+                                />
+                            )}
+                            {!isLastSection && (
+                                <button
+                                    type="button"
+                                    onClick={onMoveDownSection}
+                                    className={`${styles['icon-button']} ${styles['down-button']}`}
+                                    aria-label="Move down section"
+                                />
+                            )}
+                        </div>
                     </div>
                     <div className={styles['hover-buttons']}>
                         <button

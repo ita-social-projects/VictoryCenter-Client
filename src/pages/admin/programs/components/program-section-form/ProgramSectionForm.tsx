@@ -468,8 +468,20 @@ export const ProgramSectionForm = ({
 
     return (
         <div className={styles.container}>
-            <div className={styles['actions-section']}>
-                {sectionMode === ProgramSectionMode.View && (
+            {sectionMode === ProgramSectionMode.View && (
+                <div className={styles['actions-section']}>
+                    <div className={styles['order-controls']}>
+                        <button
+                            type="button"
+                            className={`${styles['icon-button']} ${styles['up-button']}`}
+                            aria-label="Move up section"
+                        />
+                        <button
+                            type="button"
+                            className={`${styles['icon-button']} ${styles['down-button']}`}
+                            aria-label="Move down section"
+                        />
+                    </div>
                     <div className={styles['hover-buttons']}>
                         <button
                             type="button"
@@ -490,8 +502,8 @@ export const ProgramSectionForm = ({
                             aria-label="Replace section"
                         />
                     </div>
-                )}
-            </div>
+                </div>
+            )}
             <div className={styles.content}>
                 {editableSection || (
                     <p className={styles['template-info']}>

@@ -65,7 +65,5 @@ export interface FaqSearchItemData {
     id: number;
     question: string;
 }
-export interface FaqLocalizationDto extends EntityLocalizationDto, FaqLocalizableFields {
-    entityId: number;
-}
+
 export interface FaqLocalization extends EntityLocalization, FaqLocalizableFields {}

@@ -161,7 +161,7 @@ export const getInitialSectionContents = (templateId: ProgramSectionTemplate): P
 export const renderProgramSection = ({
     templateId,
     data,
-    mode = ProgramSectionMode.Published,
+    mode = ProgramSectionMode.View,
     handlers,
     validationResetKey,
 }: RenderProgramSectionParams): React.ReactElement | null => {

@@ -55,7 +55,7 @@ export const ImagesBottomSection = ({
     images,
     imageHandlers,
     config,
-    mode = ProgramSectionMode.Published,
+    mode = ProgramSectionMode.View,
     onTitleChange,
     onDescriptionChange,
     validationResetKey,
@@ -108,7 +108,7 @@ export const ImagesBottomSection = ({
                 onDescriptionChange={onDescriptionChange}
                 validationResetKey={validationResetKey}
             />
-            {mode === ProgramSectionMode.Published ? (
+            {mode === ProgramSectionMode.View ? (
                 <PublishedImagesBottomSection
                     images={displayedImages}
                     config={config}

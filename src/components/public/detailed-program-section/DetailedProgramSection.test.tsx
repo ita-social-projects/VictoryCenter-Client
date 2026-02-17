@@ -53,7 +53,7 @@ describe('DetailedProgramSection', () => {
                 descriptions: ['Test Description'],
                 images: [],
             },
-            mode: ProgramSectionMode.Published,
+            mode: ProgramSectionMode.View,
         });
         expect(screen.getByTestId('rendered-section')).toBeInTheDocument();
     });
@@ -85,7 +85,7 @@ describe('DetailedProgramSection', () => {
                 descriptions: ['Test Description'],
                 images: [],
             },
-            mode: ProgramSectionMode.Published,
+            mode: ProgramSectionMode.View,
         });
     });
 
@@ -116,7 +116,7 @@ describe('DetailedProgramSection', () => {
                 descriptions: [],
                 images: [],
             },
-            mode: ProgramSectionMode.Published,
+            mode: ProgramSectionMode.View,
         });
     });
 
@@ -176,7 +176,7 @@ describe('DetailedProgramSection', () => {
                     { id: 10, url: 'img3.jpg', mimeType: 'image/jpeg' },
                 ],
             },
-            mode: ProgramSectionMode.Published,
+            mode: ProgramSectionMode.View,
         });
     });
 
@@ -209,7 +209,7 @@ describe('DetailedProgramSection', () => {
                 descriptions: ['Desc'],
                 images: [null],
             },
-            mode: ProgramSectionMode.Published,
+            mode: ProgramSectionMode.View,
         });
     });
 
@@ -231,7 +231,7 @@ describe('DetailedProgramSection', () => {
                 descriptions: [],
                 images: [],
             },
-            mode: ProgramSectionMode.Published,
+            mode: ProgramSectionMode.View,
         });
     });
 
@@ -246,6 +246,6 @@ describe('DetailedProgramSection', () => {
         render(<DetailedProgramSection section={section} />);
 
         const callArgs = mockRenderProgramSection.mock.calls[0][0];
-        expect(callArgs.mode).toBe(ProgramSectionMode.Published);
+        expect(callArgs.mode).toBe(ProgramSectionMode.View);
     });
 });

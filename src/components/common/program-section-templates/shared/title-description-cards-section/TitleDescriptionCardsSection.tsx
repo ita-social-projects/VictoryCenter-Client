@@ -20,7 +20,7 @@ interface Props {
 export const TitleDescriptionCardsSection = ({
     cards,
     cardsCount,
-    mode = ProgramSectionMode.Published,
+    mode = ProgramSectionMode.View,
     onTitleChange,
     onDescriptionChange,
     validationResetKey,

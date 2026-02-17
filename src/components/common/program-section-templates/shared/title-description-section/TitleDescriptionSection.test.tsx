@@ -73,7 +73,7 @@ describe('TitleDescriptionSection', () => {
         title: '',
         description: '',
         className: '',
-        mode: ProgramSectionMode.Published,
+        mode: ProgramSectionMode.View,
     };
 
     beforeEach(() => {
@@ -112,7 +112,7 @@ describe('TitleDescriptionSection', () => {
             renderTitleDescriptionSection({
                 title: 'Test Title',
                 description: 'Test Description',
-                mode: ProgramSectionMode.Published,
+                mode: ProgramSectionMode.View,
             });
 
             expect(getTitleHeading()).toBeInTheDocument();
@@ -126,7 +126,7 @@ describe('TitleDescriptionSection', () => {
             const { container } = renderTitleDescriptionSection({
                 title: '',
                 description: '',
-                mode: ProgramSectionMode.Published,
+                mode: ProgramSectionMode.View,
             });
 
             expect(getTitleHeading()).toBeInTheDocument();
@@ -140,7 +140,7 @@ describe('TitleDescriptionSection', () => {
             renderTitleDescriptionSection({
                 title: 'Test Title',
                 description: 'Test Description',
-                mode: ProgramSectionMode.Published,
+                mode: ProgramSectionMode.View,
             });
 
             expect(getTitleInput()).not.toBeInTheDocument();

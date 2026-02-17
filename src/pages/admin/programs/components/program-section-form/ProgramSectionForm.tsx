@@ -92,7 +92,7 @@ export const ProgramSectionForm = ({
     const [isDirty, setIsDirty] = useState(false);
     const [validationResetKey, setValidationResetKey] = useState(0);
     const [sectionMode, setSectionMode] = useState<ProgramSectionMode>(
-        isNewSection || isReplacingTemplate ? ProgramSectionMode.Edit : ProgramSectionMode.Published,
+        isNewSection || isReplacingTemplate ? ProgramSectionMode.Edit : ProgramSectionMode.View,
     );
     const sectionModeRef = useRef(sectionMode);
     const onEditStateChangeRef = useRef(onEditStateChange);
@@ -118,9 +118,7 @@ export const ProgramSectionForm = ({
                 setOriginalSection(section);
             }
             setIsDirty(false);
-            setSectionMode(
-                isNewSection || isReplacingTemplate ? ProgramSectionMode.Edit : ProgramSectionMode.Published,
-            );
+            setSectionMode(isNewSection || isReplacingTemplate ? ProgramSectionMode.Edit : ProgramSectionMode.View);
         }
     }, [section, isNewSection, isReplacingTemplate]);
 
@@ -371,7 +369,7 @@ export const ProgramSectionForm = ({
         onSave();
         setOriginalSection(localSection);
         setIsDirty(false);
-        setSectionMode(ProgramSectionMode.Published);
+        setSectionMode(ProgramSectionMode.View);
         setValidationResetKey((prev) => prev + 1);
     }, [isDisabled, isSectionValid, onSave, localSection]);
 
@@ -394,7 +392,7 @@ export const ProgramSectionForm = ({
             if (!shouldRemove) {
                 setLocalSection(revertTo);
                 setIsDirty(false);
-                setSectionMode(ProgramSectionMode.Published);
+                setSectionMode(ProgramSectionMode.View);
                 setValidationResetKey((prev) => prev + 1);
             }
         };
@@ -471,7 +469,7 @@ export const ProgramSectionForm = ({
     return (
         <div className={styles.container}>
             <div className={styles['actions-section']}>
-                {sectionMode === ProgramSectionMode.Published && (
+                {sectionMode === ProgramSectionMode.View && (
                     <div className={styles['hover-buttons']}>
                         <button
                             type="button"
@@ -502,7 +500,7 @@ export const ProgramSectionForm = ({
                 )}
             </div>
             <div className={styles['actions-container']}>
-                {sectionMode !== ProgramSectionMode.Published && (
+                {sectionMode !== ProgramSectionMode.View && (
                     <div className={styles.actions}>
                         <Button buttonStyle="secondary" onClick={handleCancelClick} disabled={isDisabled}>
                             {PROGRAMS_TEXT.BUTTON.CANCEL}

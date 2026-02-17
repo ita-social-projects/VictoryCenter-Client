@@ -32,14 +32,14 @@ export const SingleImageRight = ({
     title = '',
     description = '',
     image = null,
-    mode = ProgramSectionMode.Published,
+    mode = ProgramSectionMode.View,
     onTitleChange,
     onDescriptionChange,
     onImageChange,
     validationResetKey,
 }: SingleImageRightProps) => {
     const imageSrc = getImageSrc(image);
-    const baseStyles = mode === ProgramSectionMode.Published ? publishedStyles : styles;
+    const baseStyles = mode === ProgramSectionMode.View ? publishedStyles : styles;
     const {
         titleError,
         descriptionError,

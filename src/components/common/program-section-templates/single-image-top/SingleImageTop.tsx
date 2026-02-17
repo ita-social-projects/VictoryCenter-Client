@@ -25,14 +25,14 @@ export const SingleImageTop = ({
     title = '',
     description = '',
     image = null,
-    mode = ProgramSectionMode.Published,
+    mode = ProgramSectionMode.View,
     onTitleChange,
     onDescriptionChange,
     onImageChange,
     validationResetKey,
 }: SingleImageTopProps) => {
     const imageSrc = getImageSrc(image);
-    const baseStyles = mode === ProgramSectionMode.Published ? publishedStyles : styles;
+    const baseStyles = mode === ProgramSectionMode.View ? publishedStyles : styles;
     const { error, handleSetError } = useImageError();
 
     return (

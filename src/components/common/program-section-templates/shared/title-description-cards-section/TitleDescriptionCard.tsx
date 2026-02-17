@@ -21,7 +21,7 @@ interface TitleDescriptionCardProps {
 export const TitleDescriptionCard = ({
     card,
     index,
-    mode = ProgramSectionMode.Published,
+    mode = ProgramSectionMode.View,
     onTitleChange,
     onDescriptionChange,
     validationResetKey,

@@ -14,12 +14,12 @@ export interface TextOnlyProps {
 }
 
 export const TextOnly = (props: TextOnlyProps) => {
-    const { className = '', mode = ProgramSectionMode.Published } = props;
+    const { className = '', mode = ProgramSectionMode.View } = props;
     return (
         <TitleDescriptionSection
             {...props}
             className={cn(
-                mode === ProgramSectionMode.Published ? '' : styles.container,
+                mode === ProgramSectionMode.View ? '' : styles.container,
                 {
                     [styles.template]: mode === ProgramSectionMode.Template,
                     [styles['form-container']]: mode === ProgramSectionMode.Edit,

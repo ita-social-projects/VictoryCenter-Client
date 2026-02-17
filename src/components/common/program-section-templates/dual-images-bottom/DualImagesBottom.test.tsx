@@ -24,7 +24,7 @@ createImagesBottomTestSuite<DualImagesBottomProps>({
         title: '',
         description: '',
         images: [null, null],
-        mode: ProgramSectionMode.Published,
+        mode: ProgramSectionMode.View,
     }),
     createImageProps: (images) => ({ images }),
     createImageHandlers: (handlers) => ({

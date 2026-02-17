@@ -118,7 +118,7 @@ describe('TitleDescriptionCardsSection', () => {
         it('should not be editable when mode is Published', () => {
             const cards: TitleDescriptionCardData[] = [{ title: 'Title', description: 'Description' }];
 
-            render(<TitleDescriptionCardsSection cards={cards} cardsCount={1} mode={ProgramSectionMode.Published} />);
+            render(<TitleDescriptionCardsSection cards={cards} cardsCount={1} mode={ProgramSectionMode.View} />);
 
             const titleInput = screen.getByTestId('title-input-0') as HTMLInputElement;
             expect(titleInput).toHaveAttribute('readonly');

@@ -57,7 +57,7 @@ describe('ImagesBottomSection', () => {
             { key: '2', value: null, handler: jest.fn() },
         ],
         config: baseConfig,
-        mode: ProgramSectionMode.Published,
+        mode: ProgramSectionMode.View,
         onTitleChange: jest.fn(),
         onDescriptionChange: jest.fn(),
         className: '',
@@ -79,7 +79,7 @@ describe('ImagesBottomSection', () => {
 
     it('uses empty string defaults for title/description when omitted', () => {
         const { title: _title, description: _description, ...rest } = defaultProps;
-        render(<ImagesBottomSection {...rest} mode={ProgramSectionMode.Published} />);
+        render(<ImagesBottomSection {...rest} mode={ProgramSectionMode.View} />);
 
         expect(TitleDescriptionSection).toHaveBeenCalledTimes(1);
         const callProps = (TitleDescriptionSection as unknown as jest.Mock).mock.calls[0][0];
@@ -104,7 +104,7 @@ describe('ImagesBottomSection', () => {
 
         expect(TitleDescriptionSection).toHaveBeenCalledTimes(1);
         const callProps = (TitleDescriptionSection as unknown as jest.Mock).mock.calls[0][0];
-        expect(callProps.mode).toBe(ProgramSectionMode.Published);
+        expect(callProps.mode).toBe(ProgramSectionMode.View);
         expect(callProps.onTitleChange).toBeUndefined();
         expect(callProps.onDescriptionChange).toBeUndefined();
 
@@ -118,7 +118,7 @@ describe('ImagesBottomSection', () => {
         ];
 
         render(
-            <ImagesBottomSection {...defaultProps} imageHandlers={imageHandlers} mode={ProgramSectionMode.Published} />,
+            <ImagesBottomSection {...defaultProps} imageHandlers={imageHandlers} mode={ProgramSectionMode.View} />,
         );
 
         // PhotoInputGroup should be called twice in Published mode
@@ -171,7 +171,7 @@ describe('ImagesBottomSection', () => {
     });
 
     it('renders images in published mode', () => {
-        render(<ImagesBottomSection {...defaultProps} mode={ProgramSectionMode.Published} />);
+        render(<ImagesBottomSection {...defaultProps} mode={ProgramSectionMode.View} />);
         const images = screen.getAllByRole('img');
         expect(images).toHaveLength(2);
         expect(images[0]).toHaveAttribute('src', expect.stringContaining('img1.jpg'));

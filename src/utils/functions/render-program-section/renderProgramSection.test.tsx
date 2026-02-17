@@ -417,7 +417,7 @@ describe('renderProgramSection', () => {
             }),
         );
 
-        expect(mockCapturedProps.TextOnly.mode).toBe(ProgramSectionMode.Published);
+        expect(mockCapturedProps.TextOnly.mode).toBe(ProgramSectionMode.View);
     });
 });
 

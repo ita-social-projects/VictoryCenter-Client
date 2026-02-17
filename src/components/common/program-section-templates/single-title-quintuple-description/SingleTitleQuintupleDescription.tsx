@@ -27,7 +27,7 @@ const DESCRIPTION_LAYOUT = {
 export const SingleTitleQuintupleDescription = ({
     title = '',
     descriptions = [],
-    mode = ProgramSectionMode.Published,
+    mode = ProgramSectionMode.View,
     onTitleChange,
     onDescriptionsChange,
     className,

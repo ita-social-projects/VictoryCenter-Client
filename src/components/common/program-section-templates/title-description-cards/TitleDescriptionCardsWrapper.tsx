@@ -18,7 +18,7 @@ interface TitleDescriptionCardsWrapperProps {
 export const TitleDescriptionCardsWrapper = ({
     cards,
     cardsCount,
-    mode = ProgramSectionMode.Published,
+    mode = ProgramSectionMode.View,
     onTitleChange,
     onDescriptionChange,
     validationResetKey,

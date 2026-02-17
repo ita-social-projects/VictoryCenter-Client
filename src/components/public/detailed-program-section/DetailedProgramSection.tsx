@@ -80,7 +80,7 @@ export const DetailedProgramSection: React.FC<DetailedProgramSectionProps> = ({ 
             cards,
             descriptionAuthorPairs,
         },
-        mode: ProgramSectionMode.Published,
+        mode: ProgramSectionMode.View,
     });
 
     return <div className={styles.container}>{renderedSection}</div>;

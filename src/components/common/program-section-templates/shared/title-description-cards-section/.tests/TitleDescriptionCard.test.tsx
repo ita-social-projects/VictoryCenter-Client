@@ -94,14 +94,14 @@ describe('TitleDescriptionCard', () => {
 
     describe('read-only mode', () => {
         it('should not render input fields in read-only mode', () => {
-            render(<TitleDescriptionCard card={mockCard} index={0} mode={ProgramSectionMode.Published} />);
+            render(<TitleDescriptionCard card={mockCard} index={0} mode={ProgramSectionMode.View} />);
 
             expect(screen.queryByTestId('input-with-limit')).not.toBeInTheDocument();
             expect(screen.queryByTestId('card-description-field')).not.toBeInTheDocument();
         });
 
         it('should display title as heading', () => {
-            render(<TitleDescriptionCard card={mockCard} index={0} mode={ProgramSectionMode.Published} />);
+            render(<TitleDescriptionCard card={mockCard} index={0} mode={ProgramSectionMode.View} />);
 
             expect(screen.getByText('Test Title')).toBeInTheDocument();
         });
@@ -111,7 +111,7 @@ describe('TitleDescriptionCard', () => {
                 <TitleDescriptionCard
                     card={{ title: '', description: 'Description' }}
                     index={0}
-                    mode={ProgramSectionMode.Published}
+                    mode={ProgramSectionMode.View}
                 />,
             );
 
@@ -124,7 +124,7 @@ describe('TitleDescriptionCard', () => {
                 items: [],
             });
 
-            render(<TitleDescriptionCard card={mockCard} index={0} mode={ProgramSectionMode.Published} />);
+            render(<TitleDescriptionCard card={mockCard} index={0} mode={ProgramSectionMode.View} />);
 
             expect(screen.getByText('Intro text')).toBeInTheDocument();
         });
@@ -135,7 +135,7 @@ describe('TitleDescriptionCard', () => {
                 items: ['Item 1', 'Item 2'],
             });
 
-            render(<TitleDescriptionCard card={mockCard} index={0} mode={ProgramSectionMode.Published} />);
+            render(<TitleDescriptionCard card={mockCard} index={0} mode={ProgramSectionMode.View} />);
 
             expect(screen.getByText('Item 1')).toBeInTheDocument();
             expect(screen.getByText('Item 2')).toBeInTheDocument();
@@ -147,7 +147,7 @@ describe('TitleDescriptionCard', () => {
                 items: [],
             });
 
-            render(<TitleDescriptionCard card={mockCard} index={0} mode={ProgramSectionMode.Published} />);
+            render(<TitleDescriptionCard card={mockCard} index={0} mode={ProgramSectionMode.View} />);
 
             expect(screen.getByText('Опис секції')).toBeInTheDocument();
         });

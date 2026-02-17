@@ -33,7 +33,7 @@ const TEMPLATE_PAIRS_COUNT = 5;
 export const SingleTitleDescriptionAuthorPairs = ({
     title = '',
     pairs = [],
-    mode = ProgramSectionMode.Published,
+    mode = ProgramSectionMode.View,
     onTitleChange,
     onPairDescriptionChange,
     onPairAuthorChange,

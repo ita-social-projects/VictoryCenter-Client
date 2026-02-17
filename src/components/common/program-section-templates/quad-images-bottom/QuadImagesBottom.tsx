@@ -21,13 +21,13 @@ export const QuadImagesBottom = ({
     title = '',
     description = '',
     images = [null, null, null, null],
-    mode = ProgramSectionMode.Published,
+    mode = ProgramSectionMode.View,
     onTitleChange,
     onDescriptionChange,
     onImagesChange,
     validationResetKey,
 }: QuadImagesBottomProps) => {
-    const baseStyles = mode === ProgramSectionMode.Published ? publishedStyles : styles;
+    const baseStyles = mode === ProgramSectionMode.View ? publishedStyles : styles;
     const imageHandlers = images.map((image, index) => ({
         handler: onImagesChange ? (file: ImageValues | null) => onImagesChange(index, file) : undefined,
         key: `image${index + 1}`,

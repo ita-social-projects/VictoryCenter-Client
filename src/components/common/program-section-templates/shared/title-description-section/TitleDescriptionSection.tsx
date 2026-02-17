@@ -27,7 +27,7 @@ export const TitleDescriptionSection = ({
     className = '',
     titleClassName = '',
     descriptionClassName = '',
-    mode = ProgramSectionMode.Published,
+    mode = ProgramSectionMode.View,
     onTitleChange,
     onDescriptionChange,
     validationResetKey,
@@ -46,7 +46,7 @@ export const TitleDescriptionSection = ({
         resetKey: validationResetKey,
     });
 
-    const baseStyles = mode === ProgramSectionMode.Published ? publishedStyles : styles;
+    const baseStyles = mode === ProgramSectionMode.View ? publishedStyles : styles;
 
     return (
         <div

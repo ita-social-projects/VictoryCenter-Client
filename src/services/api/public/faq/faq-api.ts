@@ -1,6 +1,7 @@
 import { AxiosInstance } from 'axios';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
 import { PublishedFaqQuestion, PublishedFaqQuestionDto } from '@/types/public/faq-section';
+import { mapLocalizationDtoToModel } from '@/utils/functions/mappers/common/localization/localization-mappers';
 
 export const FaqApi = {
     getBySlug: async (client: AxiosInstance, slug: string): Promise<PublishedFaqQuestion[]> => {
@@ -15,10 +16,5 @@ export const mapPublishedFaqQuestionDtoToPublishedFaqQuestion = (
     id: dto.id,
     questionText: dto.questionText,
     answerText: dto.answerText || '',
-    localizations: dto.localizations?.map((loc) => ({
-        language: loc.localizationInfoDto,
-        translationStatus: loc.translationStatus,
-        questionText: loc.questionText,
-        answerText: loc.answerText,
-    })),
+    localizations: dto.localizations?.map((loc) => mapLocalizationDtoToModel(loc)),
 });

@@ -7,6 +7,7 @@ import {
     TeamPageData,
 } from '@/types/public/team-page';
 import { axiosInstance } from '@/services/api/axios';
+import { mapLocalizationDtoToModel } from '@/utils/functions/mappers/common/localization/localization-mappers';
 
 const isValidCategory = (category: PublicCategoryWithTeamMembersDto): boolean => {
     return Boolean(
@@ -23,13 +24,7 @@ const mapTeamMemberDtoToTeamMember = (dto: PublicTeamMemberDto): MemberCard => (
     name: dto.fullName,
     role: dto.description || '',
     photo: dto.image?.url ?? null,
-    localizations:
-        dto.localizations?.map((loc) => ({
-            language: loc.localizationInfoDto,
-            translationStatus: loc.translationStatus,
-            fullName: loc.fullName,
-            description: loc.description,
-        })) ?? [],
+    localizations: dto.localizations?.map((loc) => mapLocalizationDtoToModel(loc)) ?? [],
 });
 
 const mapCategoryDtoToTeamCategory = (dto: PublicCategoryWithTeamMembersDto): TeamItem => {

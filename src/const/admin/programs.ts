@@ -31,6 +31,8 @@ export const PROGRAMS_TEXT = {
             'Ідея створення Victory Center виникла не як проєкт, а як відповідь на виклик часу - глибокий біль, виснаження, але водночас сильна віра в перемогу. ',
         MODAL: {
             UNSAVED_CHANGES_TITLE: 'Відмінити додавання секції?',
+            DELETE_SECTION_TITLE: 'Видалити секцію?',
+            REPLACE_TEMPLATE_TITLE: 'Відмінити заміну шаблона?',
         },
         FORM: {
             TITLE: {

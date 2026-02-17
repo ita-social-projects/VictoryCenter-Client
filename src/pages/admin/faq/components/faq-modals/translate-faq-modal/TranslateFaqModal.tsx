@@ -1,38 +1,33 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import {
-    TranslateMemberForm,
-    TranslateTeamMemberFormRef,
-    TranslateTeamMemberFormValues,
-} from '../translate-member-form/TranslateMemberForm';
-import { LocalizationModal } from '@/components/admin/localization-modal/LocalizationModal'; // Импорт новой обертки
-import { useTranslateTeamMember } from '@/hooks/admin/use-translate-team-member/useTranslateTeamMember';
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { TeamMember } from '@/types/admin/team-members';
+import { LocalizationModal } from '@/components/admin/localization-modal/LocalizationModal';
+import { FaqQuestion } from '@/types/admin/faq';
 import { LocalizationLanguage } from '@/types/common/language';
 import { ModalMode } from '@/types/admin/common';
-import { DEFAULT_LOCALE } from '@/const/common/locales';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { TranslateFaqForm, TranslateFaqFormRef, TranslateFaqFormValues } from './TranslateFaqForm';
+import { useTranslateFaq } from '@/hooks/admin/use-translate-faq/useTranslateFaq';
 import { TranslationControls } from '@/components/admin/translation-controls/TranslationControls';
+import { DEFAULT_LOCALE } from '@/const/common/locales';
 
-interface TranslateTeamMemberModalProps {
+interface TranslateFaqModalProps {
     isOpen: boolean;
     onClose: () => void;
-    memberToTranslate: TeamMember | null;
-    onTranslateMember: (member: TeamMember) => void;
+    faqToTranslate: FaqQuestion | null;
+    onTranslateFaq: (faq: FaqQuestion) => void;
     translatedLanguages: LocalizationLanguage[];
 }
 
-export const TranslateTeamMemberModal = ({
+export const TranslateFaqModal = ({
     isOpen,
     onClose,
-    memberToTranslate,
-    onTranslateMember,
+    faqToTranslate,
+    onTranslateFaq,
     translatedLanguages,
-}: TranslateTeamMemberModalProps) => {
-    const formRef = useRef<TranslateTeamMemberFormRef>(null);
-
+}: TranslateFaqModalProps) => {
+    const formRef = useRef<TranslateFaqFormRef>(null);
     const [isFormValid, setIsFormValid] = useState(false);
-    const [isDirty, setIsDirty] = useState(false);
     const [language, setLanguage] = useState<LocalizationLanguage | null>(translatedLanguages?.[0] ?? null);
+    const [isDirty, setIsDirty] = useState(false);
 
     useEffect(() => {
         if (translatedLanguages.length > 0 && !language) {
@@ -42,31 +37,29 @@ export const TranslateTeamMemberModal = ({
     }, [translatedLanguages, language]);
 
     const existingLocalization = useMemo(() => {
-        if (!memberToTranslate?.localizations || !language) return null;
-        return memberToTranslate?.localizations?.find((loc) => loc.language.id === language?.id);
-    }, [memberToTranslate?.localizations, language]);
+        if (!faqToTranslate?.localizations || !language) return null;
+        return faqToTranslate.localizations.find((loc) => loc.language?.id === language.id);
+    }, [faqToTranslate, language]);
 
     const mode = existingLocalization ? ModalMode.Edit : ModalMode.Add;
     const isEditMode = mode === ModalMode.Edit;
 
-    const initialData = useMemo<TranslateTeamMemberFormValues | null>(() => {
-        if (!isEditMode || !existingLocalization) return null;
-
-        return {
-            fullName: existingLocalization.fullName,
-            description: existingLocalization.description,
-        };
-    }, [existingLocalization, isEditMode]);
-
-    const { translateMember, isSubmitting, error } = useTranslateTeamMember({
-        member: memberToTranslate,
+    const { translateFaq, isSubmitting, error } = useTranslateFaq({
+        faq: faqToTranslate,
         language: language!,
-        onSuccess: (updatedMember) => {
-            onTranslateMember(updatedMember);
+        mode,
+        onSuccess: (updatedFaq) => {
+            onTranslateFaq(updatedFaq);
             onClose();
         },
-        mode,
     });
+
+    const initialData = useMemo<TranslateFaqFormValues>(() => {
+        return {
+            question: existingLocalization?.questionText || '',
+            answer: existingLocalization?.answerText || '',
+        };
+    }, [existingLocalization]);
 
     const handleSaveClick = () => {
         if (!formRef.current?.isValid()) return;
@@ -77,11 +70,11 @@ export const TranslateTeamMemberModal = ({
         return formRef.current?.isDirty() ?? false;
     };
 
-    const handleFormSubmit = async (data: TranslateTeamMemberFormValues) => {
-        await translateMember(data);
+    const handleFormSubmit = async (data: TranslateFaqFormValues) => {
+        await translateFaq(data);
     };
 
-    if (!memberToTranslate) return null;
+    if (!faqToTranslate) return null;
 
     const modalTitle = isEditMode
         ? COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.UPDATE_TRANSLATION
@@ -104,9 +97,13 @@ export const TranslateTeamMemberModal = ({
                 languages={translatedLanguages}
                 onLanguageChange={setLanguage}
             />
-            {error && <div className="translate-member-error">{error}</div>}
+            {error && (
+                <div className="error-message" style={{ color: 'red', marginBottom: '10px' }}>
+                    {error}
+                </div>
+            )}
 
-            <TranslateMemberForm
+            <TranslateFaqForm
                 key={language?.id}
                 ref={formRef}
                 onSubmit={handleFormSubmit}

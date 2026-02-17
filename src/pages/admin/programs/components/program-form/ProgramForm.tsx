@@ -203,17 +203,26 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             [],
         );
 
+        const sectionsContainerRef = useRef<HTMLDivElement>(null);
+
         const handleAddSection = useCallback(
             (section: ProgramSection) => {
                 const sectionKey = generateSectionKey();
                 setFormState((prev) => ({
                     ...prev,
-                    sections: [section, ...prev.sections],
+                    sections: [...prev.sections, section],
                 }));
                 setSectionStates((prev) => [
-                    { sectionKey, isSaved: false, isEditing: true, isNew: true, isReplacing: false },
                     ...prev,
+                    { sectionKey, isSaved: false, isEditing: true, isNew: true, isReplacing: false },
                 ]);
+                setTimeout(() => {
+                    const lastSection = sectionsContainerRef.current?.lastElementChild as HTMLElement | null;
+                    if (lastSection) {
+                        lastSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        lastSection.focus({ preventScroll: true });
+                    }
+                }, 0);
             },
             [setFormState],
         );
@@ -685,7 +694,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                     )}
 
                     {hasSections && (
-                        <div className={styles['sections-list']}>
+                        <div className={styles['sections-list']} ref={sectionsContainerRef}>
                             {formState.sections.map((section, index) => {
                                 if (!section) return null;
                                 const sectionState = sectionStates[index];
@@ -710,6 +719,19 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                             isReplacingTemplate={sectionState.isReplacing}
                                             onRequestReplace={() => onReplaceSection?.(index)}
                                         />
+                                        {index === formState.sections.length - 1 && (
+                                            <div className={styles['add-section-wrapper']}>
+                                                <Button
+                                                    buttonStyle="primary"
+                                                    onClick={onAddSection}
+                                                    disabled={isSubmitting || isFormDisabled}
+                                                    data-testid="add-section-button-bottom"
+                                                >
+                                                    {PROGRAMS_TEXT.BUTTON.ADD_SECTION}
+                                                    <PlusIcon className={styles['plus-icon']} />
+                                                </Button>
+                                            </div>
+                                        )}
                                         <div className={styles['sections-divider']} />
                                     </React.Fragment>
                                 );

@@ -24,6 +24,10 @@ export interface ProgramSectionFormProps {
     onDelete?: () => void;
     isReplacingTemplate?: boolean;
     onRequestReplace?: () => void;
+    isFirstSection?: boolean;
+    isLastSection?: boolean;
+    onMoveUpSection?: () => void;
+    onMoveDownSection?: () => void;
 }
 
 export interface SectionCancelOptions {
@@ -86,6 +90,10 @@ export const ProgramSectionForm = ({
     onDelete,
     isReplacingTemplate = false,
     onRequestReplace,
+    isFirstSection,
+    isLastSection,
+    onMoveDownSection,
+    onMoveUpSection,
 }: ProgramSectionFormProps) => {
     const [localSection, setLocalSection] = useState<ProgramSection>(section);
     const [originalSection, setOriginalSection] = useState<ProgramSection>(section);
@@ -466,21 +474,49 @@ export const ProgramSectionForm = ({
         },
     });
 
+    const isSingleSection = isLastSection && isFirstSection;
+
     return (
         <div className={styles.container}>
             {sectionMode === ProgramSectionMode.View && (
                 <div className={styles['actions-section']}>
                     <div className={styles['order-controls']}>
-                        <button
-                            type="button"
-                            className={`${styles['icon-button']} ${styles['up-button']}`}
-                            aria-label="Move up section"
-                        />
-                        <button
-                            type="button"
-                            className={`${styles['icon-button']} ${styles['down-button']}`}
-                            aria-label="Move down section"
-                        />
+                        {!isSingleSection && (
+                            <>
+                                {isFirstSection && (
+                                    <button
+                                        type="button"
+                                        onClick={onMoveDownSection}
+                                        className={`${styles['icon-button']} ${styles['down-button']}`}
+                                        aria-label="Move down section"
+                                    />
+                                )}
+                                {isLastSection && (
+                                    <button
+                                        type="button"
+                                        onClick={onMoveUpSection}
+                                        className={`${styles['icon-button']} ${styles['up-button']}`}
+                                        aria-label="Move up section"
+                                    />
+                                )}
+                                {!isLastSection && !isFirstSection && (
+                                    <>
+                                        <button
+                                            type="button"
+                                            onClick={onMoveUpSection}
+                                            className={`${styles['icon-button']} ${styles['up-button']}`}
+                                            aria-label="Move up section"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={onMoveDownSection}
+                                            className={`${styles['icon-button']} ${styles['down-button']}`}
+                                            aria-label="Move down section"
+                                        />
+                                    </>
+                                )}
+                            </>
+                        )}
                     </div>
                     <div className={styles['hover-buttons']}>
                         <button

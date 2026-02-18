@@ -2,63 +2,75 @@
 @use '@/assets/sass/mixins/typography.mixins' as type;
 
 .td-cards {
-    display: grid;
+    display: flex;
+    flex-wrap: wrap;
     gap: 16px;
-    grid-template-columns: 1fr;
+    justify-content: center;
+    align-items: stretch;
     margin: 0 auto;
     width: 100%;
     max-width: 800px;
-    align-items: center;
-    place-items: center;
 
     @media (min-width: 1440px) {
         max-width: 100%;
         
-        &.td-cards--dual {
-            grid-template-columns: repeat(2, 1fr);
+        &.td-cards--dual > .td-card {
+            flex: 1 1 calc((100% - 16px) / 2);
+            min-width: 0;
         }
 
-        &.td-cards--triple {
-            grid-template-columns: repeat(3, 1fr);
+        &.td-cards--triple > .td-card {
+            flex: 1 1 calc((100% - 32px) / 3);
+            min-width: 0;
         }
 
-        &.td-cards--quad {
-            grid-template-columns: repeat(2, 1fr);
+        &.td-cards--quad > .td-card {
+            flex: 1 1 calc((100% - 16px) / 2);
+            min-width: 0;
         }
     }
 
     &--editable {
-        gap: 1rem;
+        gap: 16px;
         max-width: 100%;
         
-        &.td-cards--dual {
-            grid-template-columns: repeat(2, 1fr);
+        &.td-cards--dual > .td-card {
+            flex: 1 1 calc((100% - 16px) / 2);
+            min-width: 0;
         }
 
-        &.td-cards--triple {
-            grid-template-columns: repeat(3, 1fr);
+        &.td-cards--triple > .td-card {
+            flex: 1 1 calc((100% - 32px) / 3);
+            min-width: 0;
         }
 
-        &.td-cards--quad {
-            grid-template-columns: repeat(2, 1fr);
+        &.td-cards--quad > .td-card {
+            flex: 1 1 calc((100% - 16px) / 2);
+            min-width: 0;
         }
     }
 
     &--template {
         pointer-events: none;
-        gap: clamp(4px, 0.8vw, 16px);
+        gap: 16px;
         max-width: 100%;
+        > .td-card {
+            gap: 8px;
+        }
         
-        &.td-cards--dual {
-            grid-template-columns: repeat(2, 1fr);
+        &.td-cards--dual > .td-card {
+            flex: 1 1 calc((100% - 16px) / 2);
+            min-width: 0;
         }
 
-        &.td-cards--triple {
-            grid-template-columns: repeat(3, 1fr);
+        &.td-cards--triple > .td-card {
+            flex: 1 1 calc((100% - 32px) / 3);
+            min-width: 0;
         }
 
-        &.td-cards--quad {
-            grid-template-columns: repeat(2, 1fr);
+        &.td-cards--quad > .td-card {
+            flex: 1 1 calc((100% - 16px) / 2);
+            min-width: 0;
         }
     }
 }
@@ -66,18 +78,19 @@
 .td-card {
     display: flex;
     flex-direction: column;
+    box-sizing: border-box;
+    justify-content: center;
     gap: 32px;
     background: c.$light-blue-50;
     border-radius: 16px;
-    padding: 1rem;
+    padding: 16px;
     min-height: 200px;
-    //max-width: 600px;
-    width: auto;
     max-width: 600px;
-    min-width: 400px;
+    width: 100%;
 
     &--editable {
-        padding: 1.3rem;
+        padding: 36px;
+        gap: 18px;
     }
 }
 
@@ -85,17 +98,18 @@
     @include type.subtitle-2-bold;
 
     &--template {
-        font-size: clamp(8px, 0.76vw, 0.76rem);
-        line-height: clamp(10px, 0.9vw, 1rem);
+        padding-top: 10px;
+        font-size: clamp(8px, 0.76vw, 12px);
+        line-height: clamp(10px, 0.9vw, 16px);
     }
 }
 
 .title-field {
-    margin-bottom: 1rem;
+    margin-bottom: 16px;
 
     input {
         @include type.subtitle-2-bold;
-        font-size: 1.03rem;
+        font-size: 16px;
 
         &::placeholder {
             opacity: 0.7;
@@ -106,8 +120,8 @@
 .description-field {
     textarea {
         @include type.body-1-regular;
-        font-size: 1rem;
-        min-height: 10rem;
+        font-size: 16px;
+        min-height: 160px;
     }
 }
 
@@ -116,18 +130,18 @@
     white-space: pre-wrap;
 
     &--template {
-        font-size: clamp(6px, 0.64vw, 0.64rem);
-        line-height: clamp(8px, 0.8vw, 1rem);
+        font-size: clamp(6px, 0.64vw, 10px);
+        line-height: clamp(8px, 0.8vw, 16px);
     }
 }
 
 .description-list {
     list-style: none;
-    padding-left: 0.3rem;
+    padding-left: 5px;
     margin: 0;
 
     li {
-        padding-left: 0.7rem;
+        padding-left: 11px;
         position: relative;
 
         &::before {

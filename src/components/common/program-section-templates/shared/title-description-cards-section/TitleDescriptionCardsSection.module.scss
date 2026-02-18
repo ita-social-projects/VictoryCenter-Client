@@ -13,7 +13,7 @@
 
     @media (min-width: 1440px) {
         max-width: 100%;
-        
+
         &.td-cards--dual > .td-card {
             flex: 1 1 calc((100% - 16px) / 2);
             min-width: 0;
@@ -33,7 +33,7 @@
     &--editable {
         gap: 16px;
         max-width: 100%;
-        
+
         &.td-cards--dual > .td-card {
             flex: 1 1 calc((100% - 16px) / 2);
             min-width: 0;
@@ -57,7 +57,7 @@
         > .td-card {
             gap: 8px;
         }
-        
+
         &.td-cards--dual > .td-card {
             flex: 1 1 calc((100% - 16px) / 2);
             min-width: 0;
@@ -109,6 +109,7 @@
 
     input {
         @include type.subtitle-2-bold;
+        
         font-size: 16px;
 
         &::placeholder {

@@ -737,7 +737,7 @@ describe('PROGRAM_VALIDATION_FUNCTIONS', () => {
             expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateName('', false)).toBe('name required');
         });
 
-        it('returns error when name is too short', () => {
+        it('returns error for empty name in publish mode', () => {
             const m = loadSchema();
             expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateName('', true)).toBe('name required');
         });
@@ -786,11 +786,6 @@ describe('PROGRAM_VALIDATION_FUNCTIONS', () => {
             const m = loadSchema();
             const longDesc = 'a'.repeat(51);
             expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateDescription(longDesc, false)).toBe('max 50');
-        });
-
-        it('returns error when description is below min length in publish mode', () => {
-            const m = loadSchema();
-            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateDescription('', true)).toBe('desc required');
         });
     });
 

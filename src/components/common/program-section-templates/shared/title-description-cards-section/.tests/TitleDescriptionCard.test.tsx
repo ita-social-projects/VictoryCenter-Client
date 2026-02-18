@@ -251,12 +251,7 @@ describe('TitleDescriptionCard', () => {
 
         it('should display title as heading', () => {
             render(
-                <TitleDescriptionCard
-                    card={baseCard}
-                    index={0}
-                    mode={ProgramSectionMode.View}
-                    template={TEMPLATE}
-                />,
+                <TitleDescriptionCard card={baseCard} index={0} mode={ProgramSectionMode.View} template={TEMPLATE} />,
             );
 
             expect(screen.getByText('Test Title')).toBeInTheDocument();
@@ -282,12 +277,7 @@ describe('TitleDescriptionCard', () => {
             });
 
             render(
-                <TitleDescriptionCard
-                    card={baseCard}
-                    index={0}
-                    mode={ProgramSectionMode.View}
-                    template={TEMPLATE}
-                />,
+                <TitleDescriptionCard card={baseCard} index={0} mode={ProgramSectionMode.View} template={TEMPLATE} />,
             );
 
             expect(screen.getByText('Intro text')).toBeInTheDocument();
@@ -299,7 +289,9 @@ describe('TitleDescriptionCard', () => {
                 card: { title: '', description: 'Any' },
             });
 
-            expect(screen.getByRole('heading', { level: 3, name: PROGRAMS_TEXT.SECTION.CARD.FORM.TITLE.TEXT })).toBeInTheDocument();
+            expect(
+                screen.getByRole('heading', { level: 3, name: PROGRAMS_TEXT.SECTION.CARD.FORM.TITLE.TEXT }),
+            ).toBeInTheDocument();
         });
 
         it('renders list when parseDescriptionList returns items (no intro)', () => {

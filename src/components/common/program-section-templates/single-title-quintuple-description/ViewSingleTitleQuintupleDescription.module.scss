@@ -7,7 +7,6 @@
     max-width: 800px;
     margin: 0 auto;
     box-sizing: border-box;
-
     display: grid;
     grid-template-areas:
         'title'
@@ -18,11 +17,8 @@
         'c4';
     grid-template-columns: 1fr;
     grid-template-rows: auto;
-
     gap: 16px;
-
     padding: 60px 16px;
-
     justify-content: center;
     align-content: start;
     align-items: stretch;
@@ -63,7 +59,6 @@
     font-weight: t.$fw-bold;
     color: c.$blue-900;
     text-align: left;
-
     font-size: 28px;
     line-height: 36px;
 
@@ -76,13 +71,10 @@
 .view-card {
     width: 100%;
     min-width: 0;
-
     background-color: c.$light-blue-50;
     border-radius: 20px;
     box-sizing: border-box;
-
     min-height: 200px;
-
     padding: 16px;
     display: flex;
     align-items: flex-start;
@@ -102,7 +94,6 @@
     font-weight: t.$fw-regular;
     color: c.$blue-900;
     white-space: pre-wrap;
-
     font-size: 16px;
     line-height: 20px;
 }

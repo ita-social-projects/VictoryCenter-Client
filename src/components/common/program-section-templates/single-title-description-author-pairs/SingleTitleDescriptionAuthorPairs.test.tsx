@@ -159,7 +159,7 @@ const openDeleteModal = async (index: number) => {
 };
 
 describe('SingleTitleDescriptionAuthorPairs', () => {
-    it('renders h2 title in published mode and uses default carousel variant', () => {
+    it('renders h2 title in view mode and uses default carousel variant', () => {
         const { root } = renderComponent({
             title: 'Hello',
             pairs: pairs(pair('D0', 'A0')),

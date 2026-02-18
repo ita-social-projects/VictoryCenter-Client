@@ -4,35 +4,77 @@
 .td-cards {
     display: grid;
     gap: 16px;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: 1fr;
     margin: 0 auto;
     width: 100%;
-    height: fit-content;
-    align-content: start;
+    max-width: 800px;
+    align-items: center;
+    place-items: center;
+
+    @media (min-width: 1440px) {
+        max-width: 100%;
+        
+        &.td-cards--dual {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        &.td-cards--triple {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        &.td-cards--quad {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
 
     &--editable {
         gap: 1rem;
-    }
+        max-width: 100%;
+        
+        &.td-cards--dual {
+            grid-template-columns: repeat(2, 1fr);
+        }
 
-    &--dual,
-    &--quad {
-        grid-template-columns: repeat(2, 1fr);
-    }
+        &.td-cards--triple {
+            grid-template-columns: repeat(3, 1fr);
+        }
 
-    &--triple {
-        grid-template-columns: repeat(3, 1fr);
+        &.td-cards--quad {
+            grid-template-columns: repeat(2, 1fr);
+        }
     }
 
     &--template {
         pointer-events: none;
         gap: clamp(4px, 0.8vw, 16px);
+        max-width: 100%;
+        
+        &.td-cards--dual {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        &.td-cards--triple {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        &.td-cards--quad {
+            grid-template-columns: repeat(2, 1fr);
+        }
     }
 }
 
 .td-card {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
     background: c.$light-blue-50;
     border-radius: 16px;
     padding: 1rem;
+    min-height: 200px;
+    //max-width: 600px;
+    width: auto;
+    max-width: 600px;
+    min-width: 400px;
 
     &--editable {
         padding: 1.3rem;
@@ -41,11 +83,10 @@
 
 .title {
     @include type.subtitle-2-bold;
-    margin-bottom: 0.5rem;
 
     &--template {
-        font-size: clamp(4px, 0.76vw, 0.76rem);
-        line-height: clamp(5px, 0.9vw, 1rem);
+        font-size: clamp(8px, 0.76vw, 0.76rem);
+        line-height: clamp(10px, 0.9vw, 1rem);
     }
 }
 
@@ -73,11 +114,10 @@
 .description {
     @include type.body-1-regular;
     white-space: pre-wrap;
-    margin-bottom: 0.5rem;
 
     &--template {
-        font-size: clamp(3px, 0.64vw, 0.64rem);
-        line-height: clamp(4px, 0.8vw, 1rem);
+        font-size: clamp(6px, 0.64vw, 0.64rem);
+        line-height: clamp(8px, 0.8vw, 1rem);
     }
 }
 

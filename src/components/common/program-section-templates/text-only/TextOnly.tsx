@@ -1,6 +1,6 @@
 import cn from 'classnames';
 import { TitleDescriptionSection } from '@/components/common/program-section-templates/shared/title-description-section/TitleDescriptionSection';
-import { ProgramSectionMode } from '@/types/common/program-sections';
+import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
 import styles from './TextOnly.module.scss';
 
 export interface TextOnlyProps {
@@ -18,6 +18,7 @@ export const TextOnly = (props: TextOnlyProps) => {
     return (
         <TitleDescriptionSection
             {...props}
+            template={ProgramSectionTemplate.TextOnly}
             className={cn(
                 mode === ProgramSectionMode.View ? '' : styles.container,
                 {

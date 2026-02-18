@@ -4,30 +4,36 @@ import cn from 'classnames';
 import { useId } from 'react';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
-import { PROGRAMS_TEXT, PROGRAM_SECTION_VALIDATION } from '@/const/admin/programs';
+import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { useProgramSectionValidation } from '@/hooks/admin/use-program-section-validation';
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
-import { ProgramSectionMode } from '@/types/common/program-sections';
+import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
+import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
+import { ContentType } from '@/types/common/programs';
 
 export interface TitleDescriptionSectionProps {
+    template: ProgramSectionTemplate;
     title?: string;
     description?: string;
     className?: string;
     titleClassName?: string;
     descriptionClassName?: string;
     mode?: ProgramSectionMode;
+    isPublishing?: boolean;
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
     validationResetKey?: number;
 }
 
 export const TitleDescriptionSection = ({
+    template,
     title = '',
     description = '',
     className = '',
     titleClassName = '',
     descriptionClassName = '',
     mode = ProgramSectionMode.View,
+    isPublishing = false,
     onTitleChange,
     onDescriptionChange,
     validationResetKey,
@@ -41,12 +47,17 @@ export const TitleDescriptionSection = ({
         handleDescriptionChange,
         handleDescriptionBlur,
     } = useProgramSectionValidation({
+        template,
+        isPublishing,
         onTitleChange,
         onDescriptionChange,
         resetKey: validationResetKey,
     });
 
     const baseStyles = mode === ProgramSectionMode.View ? viewStyles : styles;
+
+    const titleMaxLength = getProgramSectionTemplateMaxLength(template, ContentType.Title);
+    const descriptionMaxLength = getProgramSectionTemplateMaxLength(template, ContentType.Description);
 
     return (
         <div
@@ -69,7 +80,7 @@ export const TitleDescriptionSection = ({
                         value={title}
                         onChange={handleTitleChange}
                         onBlur={handleTitleBlur}
-                        maxLength={PROGRAM_SECTION_VALIDATION.title.max}
+                        maxLength={titleMaxLength}
                         placeholder={PROGRAMS_TEXT.SECTION.FORM.TITLE.PLACEHOLDER}
                         className={styles['title-input']}
                         error={titleError}
@@ -78,6 +89,7 @@ export const TitleDescriptionSection = ({
                     <h2 className={cn(baseStyles.title, titleClassName)}>{title}</h2>
                 )}
             </div>
+
             <div className={baseStyles['description-section']}>
                 {mode === ProgramSectionMode.Edit ? (
                     <TextAreaWithCharacterLimitGroup
@@ -88,7 +100,7 @@ export const TitleDescriptionSection = ({
                         value={description}
                         onChange={handleDescriptionChange}
                         onBlur={handleDescriptionBlur}
-                        maxLength={PROGRAM_SECTION_VALIDATION.description.max}
+                        maxLength={descriptionMaxLength}
                         rows={10}
                         error={descriptionError}
                         currentLength={getTrimmedInputText(description).length}

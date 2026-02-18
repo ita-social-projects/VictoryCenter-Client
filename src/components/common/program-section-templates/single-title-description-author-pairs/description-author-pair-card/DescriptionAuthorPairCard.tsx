@@ -1,9 +1,14 @@
 import cn from 'classnames';
+import { useCallback, useState } from 'react';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
-import { PROGRAMS_TEXT, PROGRAM_SECTION_VALIDATION } from '@/const/admin/programs';
+import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import styles from './DescriptionAuthorPairCard.module.scss';
 import { ReactComponent as DeleteIcon } from '@/assets/icons/delete.svg';
+import { ProgramSectionTemplate } from '@/types/common/program-sections';
+import { ContentType } from '@/types/common/programs';
+import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
+import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
 
 export interface DescriptionAuthorPairCardProps {
     description: string;
@@ -14,6 +19,8 @@ export interface DescriptionAuthorPairCardProps {
     onAuthorChange?: (index: number, value: string) => void;
     onDelete?: (index: number) => void;
 }
+
+const TEMPLATE = ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs;
 
 export const DescriptionAuthorPairCard = ({
     description,
@@ -27,10 +34,45 @@ export const DescriptionAuthorPairCard = ({
     const descriptionId = `pair-description-${index}`;
     const authorId = `pair-author-${index}`;
 
+    const [descriptionError, setDescriptionError] = useState<string | undefined>(undefined);
+    const [authorError, setAuthorError] = useState<string | undefined>(undefined);
+
+    const descriptionMaxLength = getProgramSectionTemplateMaxLength(TEMPLATE, ContentType.Description);
+    const authorMaxLength = getProgramSectionTemplateMaxLength(TEMPLATE, ContentType.Author);
+
+    const validate = useCallback((value: string, type: ContentType) => {
+        return PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateContentText(value, type, true, TEMPLATE);
+    }, []);
+
     const handleDelete = () => onDelete?.(index);
-    const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) =>
-        onDescriptionChange?.(index, e.target.value);
-    const handleAuthorChange = (e: React.ChangeEvent<HTMLInputElement>) => onAuthorChange?.(index, e.target.value);
+
+    const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const v = e.target.value;
+        onDescriptionChange?.(index, v);
+
+        if (descriptionError !== undefined) {
+            setDescriptionError(validate(v, ContentType.Description));
+        }
+    };
+
+    const handleAuthorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const v = e.target.value;
+        onAuthorChange?.(index, v);
+
+        if (authorError !== undefined) {
+            setAuthorError(validate(v, ContentType.Author));
+        }
+    };
+
+    const handleDescriptionBlur = () => {
+        if (!isEditable) return;
+        setDescriptionError(validate(description, ContentType.Description));
+    };
+
+    const handleAuthorBlur = () => {
+        if (!isEditable) return;
+        setAuthorError(validate(author, ContentType.Author));
+    };
 
     if (!isEditable) {
         return (
@@ -43,9 +85,11 @@ export const DescriptionAuthorPairCard = ({
 
     return (
         <div className={cn(styles.card, styles.editable)}>
-            <button type="button" className={styles['delete-button']} onClick={handleDelete} aria-label="delete">
-                <DeleteIcon />
-            </button>
+            {index > 0 && (
+                <button type="button" className={styles['delete-button']} onClick={handleDelete} aria-label="delete">
+                    <DeleteIcon />
+                </button>
+            )}
 
             <div className={styles.fields}>
                 <div className={styles['description-field']}>
@@ -57,9 +101,11 @@ export const DescriptionAuthorPairCard = ({
                         name={descriptionId}
                         value={description}
                         onChange={handleDescriptionChange}
-                        maxLength={PROGRAM_SECTION_VALIDATION.cardDescription.max}
+                        onBlur={handleDescriptionBlur}
+                        maxLength={descriptionMaxLength}
                         rows={4}
                         placeholder={PROGRAMS_TEXT.SECTION.CARD.FORM.DESCRIPTION.PLACEHOLDER}
+                        error={descriptionError}
                     />
                 </div>
 
@@ -72,8 +118,10 @@ export const DescriptionAuthorPairCard = ({
                         name={authorId}
                         value={author}
                         onChange={handleAuthorChange}
-                        maxLength={PROGRAM_SECTION_VALIDATION.cardAuthor.max}
+                        onBlur={handleAuthorBlur}
+                        maxLength={authorMaxLength}
                         placeholder={PROGRAMS_TEXT.SECTION.CARD.FORM.AUTHOR.PLACEHOLDER}
+                        error={authorError}
                     />
                 </div>
             </div>

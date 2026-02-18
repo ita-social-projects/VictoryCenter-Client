@@ -4,16 +4,13 @@ import { PhotoInputGroup } from '@/components/admin/input-groups/photo-input-gro
 import { ImageValues, Image } from '@/types/common/image';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
-import {
-    PROGRAMS_TEXT,
-    PROGRAM_SECTION_IMAGE_CONFIGS,
-    PROGRAM_SECTION_VALIDATION,
-    PROGRAM_VALIDATION,
-} from '@/const/admin/programs';
+import { PROGRAMS_TEXT, PROGRAM_SECTION_IMAGE_CONFIGS, PROGRAM_VALIDATION } from '@/const/admin/programs';
 import { useProgramSectionValidation } from '@/hooks/admin/use-program-section-validation';
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
-import { ProgramSectionMode } from '@/types/common/program-sections';
+import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
+import { ContentType } from '@/types/common/programs';
 import { useImageError } from '@/hooks/common/use-image-error/useImageError';
+import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
 import styles from './SingleImageRight.module.scss';
 import viewStyles from './ViewSingleImageRight.module.scss';
 
@@ -28,6 +25,8 @@ export interface SingleImageRightProps {
     validationResetKey?: number;
 }
 
+const TEMPLATE = ProgramSectionTemplate.SingleImageRight;
+
 export const SingleImageRight = ({
     title = '',
     description = '',
@@ -40,6 +39,7 @@ export const SingleImageRight = ({
 }: SingleImageRightProps) => {
     const imageSrc = getImageSrc(image);
     const baseStyles = mode === ProgramSectionMode.View ? viewStyles : styles;
+
     const {
         titleError,
         descriptionError,
@@ -48,11 +48,16 @@ export const SingleImageRight = ({
         handleDescriptionChange,
         handleDescriptionBlur,
     } = useProgramSectionValidation({
+        template: TEMPLATE,
         onTitleChange,
         onDescriptionChange,
         resetKey: validationResetKey,
     });
+
     const { error, handleSetError } = useImageError();
+
+    const titleMaxLength = getProgramSectionTemplateMaxLength(TEMPLATE, ContentType.Title);
+    const descriptionMaxLength = getProgramSectionTemplateMaxLength(TEMPLATE, ContentType.Description);
 
     return (
         <div
@@ -73,7 +78,7 @@ export const SingleImageRight = ({
                                 value={title}
                                 onChange={handleTitleChange}
                                 onBlur={handleTitleBlur}
-                                maxLength={PROGRAM_SECTION_VALIDATION.title.max}
+                                maxLength={titleMaxLength}
                                 placeholder={PROGRAMS_TEXT.SECTION.FORM.TITLE.PLACEHOLDER}
                                 className={styles['title-input']}
                                 rows={2}
@@ -90,7 +95,7 @@ export const SingleImageRight = ({
                                 value={description}
                                 onChange={handleDescriptionChange}
                                 onBlur={handleDescriptionBlur}
-                                maxLength={PROGRAM_SECTION_VALIDATION.description.max}
+                                maxLength={descriptionMaxLength}
                                 rows={8}
                                 error={descriptionError}
                                 currentLength={getTrimmedInputText(description).length}

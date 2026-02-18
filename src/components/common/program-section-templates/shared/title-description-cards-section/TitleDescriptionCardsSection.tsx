@@ -1,6 +1,7 @@
 import cn from 'classnames';
 import { TitleDescriptionCard } from './TitleDescriptionCard';
-import { ProgramSectionMode } from '@/types/common/program-sections';
+import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
+import { getProgramSectionTemplateMaxGroupCount } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
 import styles from './TitleDescriptionCardsSection.module.scss';
 
 export interface TitleDescriptionCardData {
@@ -17,6 +18,16 @@ interface Props {
     validationResetKey?: number;
 }
 
+const PAIRS_TEMPLATES = [
+    ProgramSectionTemplate.DualTitleDescriptionPairs,
+    ProgramSectionTemplate.TripleTitleDescriptionPairs,
+    ProgramSectionTemplate.QuadTitleDescriptionPairs,
+] as const;
+
+const resolvePairsTemplateByCardsCount = (cardsCount: number): ProgramSectionTemplate =>
+    PAIRS_TEMPLATES.find((t) => getProgramSectionTemplateMaxGroupCount(t) === cardsCount) ??
+    ProgramSectionTemplate.DualTitleDescriptionPairs;
+
 export const TitleDescriptionCardsSection = ({
     cards,
     cardsCount,
@@ -28,6 +39,8 @@ export const TitleDescriptionCardsSection = ({
     const normalizedCards = Array.from({ length: cardsCount }).map(
         (_, index) => cards[index] ?? { title: '', description: '' },
     );
+
+    const template = resolvePairsTemplateByCardsCount(cardsCount);
 
     return (
         <div
@@ -44,6 +57,7 @@ export const TitleDescriptionCardsSection = ({
                     key={index}
                     card={card}
                     index={index}
+                    template={template}
                     mode={mode}
                     onTitleChange={onTitleChange}
                     onDescriptionChange={onDescriptionChange}

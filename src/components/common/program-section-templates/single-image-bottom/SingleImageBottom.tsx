@@ -5,7 +5,7 @@ import { ImageValues, Image } from '@/types/common/image';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { PROGRAM_SECTION_IMAGE_CONFIGS, PROGRAM_VALIDATION } from '@/const/admin/programs';
 import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
-import { ProgramSectionMode } from '@/types/common/program-sections';
+import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
 import { useImageError } from '@/hooks/common/use-image-error/useImageError';
 import styles from './SingleImageBottom.module.scss';
 import viewStyles from './ViewSingleImageBottom.module.scss';
@@ -43,6 +43,7 @@ export const SingleImageBottom = ({
             })}
         >
             <TitleDescriptionSection
+                template={ProgramSectionTemplate.SingleImageBottom}
                 title={title}
                 description={description}
                 className={baseStyles['top-section']}

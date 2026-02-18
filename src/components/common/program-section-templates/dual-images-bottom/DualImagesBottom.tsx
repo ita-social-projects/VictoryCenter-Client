@@ -2,7 +2,7 @@ import cn from 'classnames';
 import { ImagesBottomSection } from '../shared/images-bottom-section/ImagesBottomSection';
 import { ImageValues, Image } from '@/types/common/image';
 import { DUAL_IMAGES_CONFIG } from '@/const/admin/programs';
-import { ProgramSectionMode } from '@/types/common/program-sections';
+import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
 import styles from './DualImagesBottom.module.scss';
 import viewStyles from './ViewDualImagesBottom.module.scss';
 
@@ -36,6 +36,7 @@ export const DualImagesBottom = ({
 
     return (
         <ImagesBottomSection
+            template={ProgramSectionTemplate.DualImagesBottom}
             title={title}
             description={description}
             images={images}

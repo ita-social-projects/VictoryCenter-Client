@@ -50,4 +50,22 @@ describe('Tabs component', () => {
         expect(tooltipText).toBeInTheDocument();
         expect(screen.getByText('Please check back later!')).toBeInTheDocument();
     });
+
+    it('does not apply active class to inactive tabs', () => {
+        renderTabs(1);
+        expect(screen.getByText('Tab 3')).not.toHaveClass('active');
+    });
+
+    it('applies active class to disabled tab when it is active', () => {
+        renderTabs(2);
+        const disabledActive = screen.getByText('Tab 2');
+        expect(disabledActive).toHaveClass('active');
+        expect(disabledActive).toBeDisabled();
+    });
+
+    it('wraps disabled tab into tooltip container', () => {
+        renderTabs();
+        const disabledBtn = screen.getByText('Tab 2');
+        expect(disabledBtn.closest('.tooltip-container')).toBeInTheDocument();
+    });
 });

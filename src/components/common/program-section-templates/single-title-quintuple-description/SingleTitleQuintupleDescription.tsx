@@ -2,12 +2,10 @@ import cn from 'classnames';
 import { useMemo } from 'react';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
-import {
-    PROGRAMS_TEXT,
-    PROGRAM_SECTION_VALIDATION,
-    SINGLE_TITLE_QUINTUPLE_DESCRIPTION_CONFIG,
-} from '@/const/admin/programs';
-import { ProgramSectionMode } from '@/types/common/program-sections';
+import { PROGRAMS_TEXT, SINGLE_TITLE_QUINTUPLE_DESCRIPTION_CONFIG } from '@/const/admin/programs';
+import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
+import { ContentType } from '@/types/common/programs';
+import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
 import baseStyles from './SingleTitleQuintupleDescription.module.scss';
 import previewStyles from './SingleTitleQuintupleDescription-preview.module.scss';
 
@@ -24,6 +22,8 @@ const DESCRIPTION_LAYOUT = {
     editable: [0, 1, 2, 3, 4],
 } as const;
 
+const TEMPLATE = ProgramSectionTemplate.SingleTitleQuintupleDescription;
+
 export const SingleTitleQuintupleDescription = ({
     title = '',
     descriptions = [],
@@ -33,6 +33,9 @@ export const SingleTitleQuintupleDescription = ({
     className,
 }: SingleTitleQuintupleDescriptionProps) => {
     const descriptionsCount = SINGLE_TITLE_QUINTUPLE_DESCRIPTION_CONFIG.descriptionsCount;
+
+    const titleMaxLength = getProgramSectionTemplateMaxLength(TEMPLATE, ContentType.Title);
+    const descriptionMaxLength = getProgramSectionTemplateMaxLength(TEMPLATE, ContentType.Description);
 
     const normalizedDescriptions = useMemo(
         () => Array.from({ length: descriptionsCount }, (_, i) => descriptions[i] ?? ''),
@@ -69,7 +72,7 @@ export const SingleTitleQuintupleDescription = ({
                             name="single-title-quintuple-title"
                             value={title}
                             onChange={(e) => onTitleChange?.(e.target.value)}
-                            maxLength={PROGRAM_SECTION_VALIDATION.title.max}
+                            maxLength={titleMaxLength}
                             placeholder={PROGRAMS_TEXT.SECTION.FORM.TITLE.PLACEHOLDER}
                         />
                     </div>
@@ -84,7 +87,7 @@ export const SingleTitleQuintupleDescription = ({
                                 name={`single-title-quintuple-desc-${index}`}
                                 value={normalizedDescriptions[index]}
                                 onChange={(e) => onDescriptionsChange?.(index, e.target.value)}
-                                maxLength={PROGRAM_SECTION_VALIDATION.description.max}
+                                maxLength={descriptionMaxLength}
                                 rows={4}
                             />
                         </div>

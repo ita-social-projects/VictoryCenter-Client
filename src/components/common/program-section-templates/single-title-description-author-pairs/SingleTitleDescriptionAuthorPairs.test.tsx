@@ -136,7 +136,7 @@ const renderComponent = (overrideProps: Partial<ComponentProps> = {}) => {
     const defaultProps: ComponentProps = {
         title: '',
         pairs: [],
-        mode: ProgramSectionMode.Published,
+        mode: ProgramSectionMode.View,
         canAddPair: true,
     };
 
@@ -194,8 +194,8 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
         expect(root).not.toHaveClass('template');
     });
 
-    it('does not render title input in published mode', () => {
-        renderComponent({ mode: ProgramSectionMode.Published, title: 'X' });
+    it('does not render title input in View mode', () => {
+        renderComponent({ mode: ProgramSectionMode.View, title: 'X' });
 
         expect(screen.queryByTestId('input-single-title-description-author-pairs-title')).not.toBeInTheDocument();
         expect(getValidateContentTextMock().mock.calls.length).toBe(0);
@@ -269,7 +269,7 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
     });
 
     it('renders add button only in edit mode and respects canAddPair', () => {
-        const view = renderComponent({ mode: ProgramSectionMode.Published });
+        const view = renderComponent({ mode: ProgramSectionMode.View });
         expect(screen.queryByRole('button', { name: 'Add card' })).not.toBeInTheDocument();
         view.unmount();
 
@@ -317,7 +317,7 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
 
         {
             const view = renderComponent({
-                mode: ProgramSectionMode.Published,
+                mode: ProgramSectionMode.View,
                 pairs: pairs(pair('D0', 'A0'), pair('D1', 'A1')),
                 onDeletePair,
             });

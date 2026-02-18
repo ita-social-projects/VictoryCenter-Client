@@ -2,7 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { TitleDescriptionCardsSection, type TitleDescriptionCardData } from '../TitleDescriptionCardsSection';
-import { ProgramSectionMode } from '@/types/common/program-sections';
+import { ProgramSectionMode } from '../../../../../../types/common/program-sections';
 
 jest.mock('../TitleDescriptionCard', () => ({
     TitleDescriptionCard: ({ card, index, mode, onTitleChange, onDescriptionChange }: any) => {
@@ -16,6 +16,7 @@ jest.mock('../TitleDescriptionCard', () => ({
             <div data-testid={`card-${index}`}>
                 <input
                     data-testid={`title-input-${index}`}
+                    aria-label={`Title ${index}`}
                     value={title}
                     readOnly={!isEditable}
                     onChange={(e) => {
@@ -26,6 +27,7 @@ jest.mock('../TitleDescriptionCard', () => ({
 
                 <input
                     data-testid={`description-input-${index}`}
+                    aria-label={`Description ${index}`}
                     value={description}
                     readOnly={!isEditable}
                     onChange={(e) => {

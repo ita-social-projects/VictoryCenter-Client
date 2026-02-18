@@ -409,7 +409,7 @@ describe('renderProgramSection', () => {
         expect(mockCapturedProps.TextOnly.mode).toBe(ProgramSectionMode.Template);
     });
 
-    it('defaults mode to Published when omitted', () => {
+    it('defaults mode to View when omitted', () => {
         render(
             renderProgramSection({
                 templateId: ProgramSectionTemplate.TextOnly,

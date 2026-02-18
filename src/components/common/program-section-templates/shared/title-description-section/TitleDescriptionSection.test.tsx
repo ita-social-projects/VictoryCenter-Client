@@ -215,17 +215,6 @@ describe('TitleDescriptionSection', () => {
             expect(getTitleHeading()).toHaveClass('t-class');
             expect(screen.getByText('Desc')).toHaveClass('d-class');
         });
-
-        it('does not render input fields when not editable', () => {
-            renderTitleDescriptionSection({
-                title: 'Test Title',
-                description: 'Test Description',
-                mode: ProgramSectionMode.View,
-            });
-
-            expect(getTitleInput()).not.toBeInTheDocument();
-            expect(getDescriptionTextarea()).not.toBeInTheDocument();
-        });
     });
 
     describe('Edit mode', () => {

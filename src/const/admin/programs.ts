@@ -316,6 +316,20 @@ export const PROGRAM_SECTION_VALIDATION = {
     },
 } as const;
 
+const createSingleImageTemplateValidation = () =>
+    ({
+        counts: {
+            [ContentType.Title]: { min: 1, max: 1 },
+            [ContentType.Description]: { min: 1, max: 1 },
+            [ContentType.Image]: { min: 1, max: 1 },
+            [ContentType.Author]: { min: 0, max: 0 },
+        },
+        lengths: {
+            [ContentType.Title]: { min: 5, max: 60 },
+            [ContentType.Description]: { min: 10, max: 600 },
+        },
+    }) as const;
+
 export const PROGRAM_SECTION_TEMPLATE_VALIDATION = {
     [ProgramSectionTemplate.QuadImagesBottom]: {
         counts: {
@@ -369,44 +383,9 @@ export const PROGRAM_SECTION_TEMPLATE_VALIDATION = {
         },
     },
 
-    [ProgramSectionTemplate.SingleImageBottom]: {
-        counts: {
-            [ContentType.Title]: { min: 1, max: 1 },
-            [ContentType.Description]: { min: 1, max: 1 },
-            [ContentType.Image]: { min: 1, max: 1 },
-            [ContentType.Author]: { min: 0, max: 0 },
-        },
-        lengths: {
-            [ContentType.Title]: { min: 5, max: 60 },
-            [ContentType.Description]: { min: 10, max: 600 },
-        },
-    },
-
-    [ProgramSectionTemplate.SingleImageTop]: {
-        counts: {
-            [ContentType.Title]: { min: 1, max: 1 },
-            [ContentType.Description]: { min: 1, max: 1 },
-            [ContentType.Image]: { min: 1, max: 1 },
-            [ContentType.Author]: { min: 0, max: 0 },
-        },
-        lengths: {
-            [ContentType.Title]: { min: 5, max: 60 },
-            [ContentType.Description]: { min: 10, max: 600 },
-        },
-    },
-
-    [ProgramSectionTemplate.SingleImageRight]: {
-        counts: {
-            [ContentType.Title]: { min: 1, max: 1 },
-            [ContentType.Description]: { min: 1, max: 1 },
-            [ContentType.Image]: { min: 1, max: 1 },
-            [ContentType.Author]: { min: 0, max: 0 },
-        },
-        lengths: {
-            [ContentType.Title]: { min: 5, max: 60 },
-            [ContentType.Description]: { min: 10, max: 600 },
-        },
-    },
+    [ProgramSectionTemplate.SingleImageBottom]: createSingleImageTemplateValidation(),
+    [ProgramSectionTemplate.SingleImageTop]: createSingleImageTemplateValidation(),
+    [ProgramSectionTemplate.SingleImageRight]: createSingleImageTemplateValidation(),
 
     [ProgramSectionTemplate.DualTitleDescriptionPairs]: {
         counts: {

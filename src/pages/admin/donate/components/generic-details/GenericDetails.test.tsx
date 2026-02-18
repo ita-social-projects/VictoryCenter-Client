@@ -341,4 +341,19 @@ describe('GenericDetails - Additional Coverage', () => {
             expect(onLocalDelete).toHaveBeenCalledWith(0);
         });
     });
+
+    it('add button after cancel in child edit mode', async () => {
+        render(
+            <GenericDetails
+                {...defaultProps}
+                items={[{ id: 1, name: 'Item 1' }]}
+                isChildForm={true}
+                FormComponent={MockFormWithModeChange}
+            />,
+        );
+        fireEvent.click(screen.getByText('Edit Item 1'));
+        expect(screen.getByText('Add New').closest('button')).toBeDisabled();
+        fireEvent.click(screen.getByText('View Item 1'));
+        expect(screen.getByText('Add New').closest('button')).not.toBeDisabled();
+    });
 });

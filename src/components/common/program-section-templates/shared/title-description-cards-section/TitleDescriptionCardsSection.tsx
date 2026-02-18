@@ -36,6 +36,7 @@ export const TitleDescriptionCardsSection = ({
                 [styles['td-cards--triple']]: cardsCount === 3,
                 [styles['td-cards--quad']]: cardsCount === 4,
                 [styles['td-cards--editable']]: mode === ProgramSectionMode.Edit,
+                [styles['td-cards--template']]: mode === ProgramSectionMode.Template,
             })}
         >
             {normalizedCards.map((card, index) => (

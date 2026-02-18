@@ -93,8 +93,18 @@ export const TitleDescriptionCard = ({
 
     return (
         <div className={styles['td-card']}>
-            <h3 className={styles['title']}>{card.title || 'Заголовок'}</h3>
-            <div className={styles['description']}>
+            <h3
+                className={cn(styles['title'], {
+                    [styles['title--template']]: mode === ProgramSectionMode.Template,
+                })}
+            >
+                {card.title || 'Заголовок'}
+            </h3>
+            <div
+                className={cn(styles['description'], {
+                    [styles['description--template']]: mode === ProgramSectionMode.Template,
+                })}
+            >
                 {intro && <p>{intro}</p>}
 
                 {items.length > 0 && (

@@ -3,7 +3,7 @@
 
 .td-cards {
     display: grid;
-    gap: 0.4rem;
+    gap: 16px;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     margin: 0 auto;
     width: 100%;
@@ -22,6 +22,11 @@
     &--triple {
         grid-template-columns: repeat(3, 1fr);
     }
+
+    &--template {
+        pointer-events: none;
+        gap: clamp(4px, 0.8vw, 16px);
+    }
 }
 
 .td-card {
@@ -36,8 +41,12 @@
 
 .title {
     @include type.subtitle-2-bold;
-    font-size: 0.76rem;
     margin-bottom: 0.5rem;
+
+    &--template {
+        font-size: clamp(4px, 0.76vw, 0.76rem);
+        line-height: clamp(5px, 0.9vw, 1rem);
+    }
 }
 
 .title-field {
@@ -63,10 +72,13 @@
 
 .description {
     @include type.body-1-regular;
-    font-size: 0.64rem;
-    line-height: 1rem;
     white-space: pre-wrap;
     margin-bottom: 0.5rem;
+
+    &--template {
+        font-size: clamp(3px, 0.64vw, 0.64rem);
+        line-height: clamp(4px, 0.8vw, 1rem);
+    }
 }
 
 .description-list {

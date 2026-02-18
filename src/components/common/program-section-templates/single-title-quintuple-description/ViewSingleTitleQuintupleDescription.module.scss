@@ -1,0 +1,128 @@
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/variables/typography' as t;
+
+.view-layout {
+    height: 100%;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    box-sizing: border-box;
+
+    display: grid;
+    grid-template-areas:
+        'title'
+        'c0'
+        'c1'
+        'c2'
+        'c3'
+        'c4';
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+
+    gap: 16px;
+
+    padding: 60px 16px;
+
+    justify-content: center;
+    align-content: start;
+    align-items: stretch;
+
+    @media (min-width: 560px) {
+        padding: 60px 64px;
+    }
+
+    @media (min-width: 1024px) {
+        max-width: 100%;
+        grid-template-areas:
+            'title c0'
+            'c1 c2'
+            'c3 c4';
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (min-width: 1440px) {
+        padding: 80px 64px;
+        max-width: 1320px;
+        grid-template-areas:
+            'title c0 c1'
+            'c2 c3 c4';
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.view-title-block {
+    grid-area: title;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.view-title-text {
+    margin: 0;
+    font-family: t.$font-family-base;
+    font-weight: t.$fw-bold;
+    color: c.$blue-900;
+    text-align: left;
+
+    font-size: 28px;
+    line-height: 36px;
+
+    @media (min-width: 768px) {
+        font-size: 32px;
+        line-height: 40px;
+    }
+}
+
+.view-card {
+    width: 100%;
+    min-width: 0;
+
+    background-color: c.$light-blue-50;
+    border-radius: 20px;
+    box-sizing: border-box;
+
+    min-height: 200px;
+
+    padding: 16px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+
+    @media (min-width: 1440px) {
+        aspect-ratio: 432 / 211;
+        min-height: auto;
+        border-radius: clamp(12px, 1.5vw, 20px);
+        padding: clamp(14px, 1.6vw, 22px);
+    }
+}
+
+.view-text {
+    margin: 0;
+    font-family: t.$font-family-base;
+    font-weight: t.$fw-regular;
+    color: c.$blue-900;
+    white-space: pre-wrap;
+
+    font-size: 16px;
+    line-height: 20px;
+}
+
+.card-0 {
+    grid-area: c0;
+}
+
+.card-1 {
+    grid-area: c1;
+}
+
+.card-2 {
+    grid-area: c2;
+}
+
+.card-3 {
+    grid-area: c3;
+}
+
+.card-4 {
+    grid-area: c4;
+}

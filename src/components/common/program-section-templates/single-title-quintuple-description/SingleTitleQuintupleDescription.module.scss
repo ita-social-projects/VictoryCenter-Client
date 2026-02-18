@@ -22,11 +22,108 @@ $desc-input-height: 115px;
     aspect-ratio: 1440 / 650;
 }
 
+.template-layout {
+    height: 100%;
+    width: 100%;
+    max-width: 1320px;
+    margin: 0 auto;
+    box-sizing: border-box;
+
+    display: grid;
+    grid-template-areas:
+        'title c0 c1'
+        'c2 c3 c4';
+    grid-template-columns: repeat(3, minmax(0, clamp(220px, 21vw, 330px)));
+    grid-template-rows: auto auto;
+
+    column-gap: clamp(14px, 2vw, 28px);
+    row-gap: clamp(14px, 2vw, 28px);
+
+    padding: clamp(18px, 3.2vw, 56px);
+
+    justify-content: center;
+    align-content: center;
+    align-items: start;
+}
+
+.template-title-block {
+    grid-area: title;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.template-title-text {
+    margin: 0;
+    font-family: t.$font-family-base;
+    font-weight: t.$fw-bold;
+    color: c.$blue-900;
+    text-align: left;
+
+    font-size: clamp(12px, 2.1vw, 34px);
+    line-height: clamp(14px, 2.5vw, 42px);
+}
+
+.template-card {
+    width: 100%;
+    min-width: 0;
+
+    background-color: c.$light-blue-50;
+    border-radius: clamp(12px, 1.5vw, 20px);
+    box-sizing: border-box;
+
+    aspect-ratio: 432 / 211;
+
+    padding: clamp(14px, 1.6vw, 22px);
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.template-text {
+    margin: 0;
+    font-family: t.$font-family-base;
+    font-weight: t.$fw-regular;
+    color: c.$blue-900;
+    white-space: pre-wrap;
+
+    font-size: clamp(10px, 1vw, 16px);
+    line-height: clamp(12px, 1.25vw, 20px);
+}
+
+.card-0 {
+    grid-area: c0;
+}
+
+.card-1 {
+    grid-area: c1;
+}
+
+.card-2 {
+    grid-area: c2;
+}
+
+.card-3 {
+    grid-area: c3;
+}
+
+.card-4 {
+    grid-area: c4;
+}
+
 .editable {
-    padding: 64px clamp(16px, 3vw, 48px);
+    padding: 64px 16px;
     box-sizing: border-box;
     display: flex;
     justify-content: center;
+
+    @media (min-width: 560px) {
+        padding: 64px 64px;
+    }
+
+    @media (min-width: 1440px) {
+        padding: 64px clamp(16px, 3vw, 48px);
+    }
 }
 
 .editable-grid {

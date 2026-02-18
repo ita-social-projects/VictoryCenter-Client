@@ -7,7 +7,7 @@ import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/progr
 import { ContentType } from '@/types/common/programs';
 import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
 import baseStyles from './SingleTitleQuintupleDescription.module.scss';
-import previewStyles from './SingleTitleQuintupleDescription-preview.module.scss';
+import viewStyles from './ViewSingleTitleQuintupleDescription.module.scss';
 
 export interface SingleTitleQuintupleDescriptionProps {
     title?: string;
@@ -93,15 +93,27 @@ export const SingleTitleQuintupleDescription = ({
                         </div>
                     ))}
                 </div>
-            ) : (
-                <div className={previewStyles['preview-layout']}>
-                    <div className={previewStyles['preview-title-block']}>
-                        <h2 className={previewStyles['preview-title-text']}>{title}</h2>
+            ) : mode === ProgramSectionMode.Template ? (
+                <div className={baseStyles['template-layout']}>
+                    <div className={baseStyles['template-title-block']}>
+                        <h2 className={baseStyles['template-title-text']}>{title}</h2>
                     </div>
 
                     {descriptionOrder.map((index) => (
-                        <div key={index} className={cn(previewStyles['preview-card'], previewStyles[`card-${index}`])}>
-                            <p className={previewStyles['preview-text']}>{normalizedDescriptions[index]}</p>
+                        <div key={index} className={cn(baseStyles['template-card'], baseStyles[`card-${index}`])}>
+                            <p className={baseStyles['template-text']}>{normalizedDescriptions[index]}</p>
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <div className={viewStyles['view-layout']}>
+                    <div className={viewStyles['view-title-block']}>
+                        <h2 className={viewStyles['view-title-text']}>{title}</h2>
+                    </div>
+
+                    {descriptionOrder.map((index) => (
+                        <div key={index} className={cn(viewStyles['view-card'], viewStyles[`card-${index}`])}>
+                            <p className={viewStyles['view-text']}>{normalizedDescriptions[index]}</p>
                         </div>
                     ))}
                 </div>

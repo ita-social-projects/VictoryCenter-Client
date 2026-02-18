@@ -1,0 +1,19 @@
+.root {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+    margin-left: 50px;
+}
+
+.blocks {
+    display: flex;
+    flex-direction: row;
+    gap: 50px;
+}
+
+.content {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-bottom: 50px;
+}

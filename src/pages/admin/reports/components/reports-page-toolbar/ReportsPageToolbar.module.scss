@@ -1,0 +1,26 @@
+@use '@/assets/sass/variables/colors' as c;
+
+.button {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    width: 311px;
+    height: 60px;
+    font-size: 24px;
+    padding: 8px 14px;
+    font: Mulish, sans-serif;
+}
+
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    width: 1440px;
+    height: 60px;
+    margin: 130px 0 50px 0;
+    border-bottom: 1px solid #a4a49b;
+}
+
+.actions {
+    display: flex;
+    flex-direction: row;
+}

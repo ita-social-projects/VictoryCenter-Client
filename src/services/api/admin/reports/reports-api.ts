@@ -1,7 +1,12 @@
 import { AxiosInstance } from 'axios';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
 import { mapReportsMediaSettingsDtoToMediaSettings } from '@/utils/functions/mappers/admin/reports-mapper/reports-mapper';
-import { ReportsMediaSettings, ReportsMediaSettingsDto, ReportsMediaSettingsUpdateRequest, UpdateReportsMediaSettingsDto } from '@/types/admin/reports';
+import {
+    ReportsMediaSettings,
+    ReportsMediaSettingsDto,
+    ReportsMediaSettingsUpdateRequest,
+    UpdateReportsMediaSettingsDto,
+} from '@/types/admin/reports';
 import { ImageApi } from '../image/image-api';
 
 export const ReportsApi = {
@@ -10,9 +15,22 @@ export const ReportsApi = {
         return mapReportsMediaSettingsDtoToMediaSettings(response.data);
     },
 
-    updateMediaSettings: async (client: AxiosInstance, mediaSettings: ReportsMediaSettingsUpdateRequest): Promise<ReportsMediaSettings> => {
-        const { finalImageId: finalImageIdCollectedFunds, imageIdToDelete: imageIdToDeleteCollectedFunds } = await ImageApi.getUpdateImageId(client, mediaSettings.collectedFunds.image, mediaSettings.collectedFunds.imageId);
-        const { finalImageId: finalImageIdChangedLives, imageIdToDelete: imageIdToDeleteChangedLives } = await ImageApi.getUpdateImageId(client, mediaSettings.changedLives.image, mediaSettings.changedLives.imageId);
+    updateMediaSettings: async (
+        client: AxiosInstance,
+        mediaSettings: ReportsMediaSettingsUpdateRequest,
+    ): Promise<ReportsMediaSettings> => {
+        const { finalImageId: finalImageIdCollectedFunds, imageIdToDelete: imageIdToDeleteCollectedFunds } =
+            await ImageApi.getUpdateImageId(
+                client,
+                mediaSettings.collectedFunds.image,
+                mediaSettings.collectedFunds.imageId,
+            );
+        const { finalImageId: finalImageIdChangedLives, imageIdToDelete: imageIdToDeleteChangedLives } =
+            await ImageApi.getUpdateImageId(
+                client,
+                mediaSettings.changedLives.image,
+                mediaSettings.changedLives.imageId,
+            );
 
         const updateMediaSettingsDto: UpdateReportsMediaSettingsDto = {
             collectedFunds: {
@@ -27,7 +45,10 @@ export const ReportsApi = {
             },
         };
 
-        const response = await client.put<ReportsMediaSettingsDto>(API_ROUTES.REPORTS.MEDIA_SETTINGS, updateMediaSettingsDto);
+        const response = await client.put<ReportsMediaSettingsDto>(
+            API_ROUTES.REPORTS.MEDIA_SETTINGS,
+            updateMediaSettingsDto,
+        );
 
         if (imageIdToDeleteCollectedFunds && imageIdToDeleteCollectedFunds !== finalImageIdCollectedFunds) {
             await ImageApi.delete(client, imageIdToDeleteCollectedFunds);

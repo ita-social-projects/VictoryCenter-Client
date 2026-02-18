@@ -693,7 +693,6 @@ describe('TeamPageModals', () => {
             });
             render(<TeamPageModals {...props} />);
 
-            // Team Member Modals
             const addTeamMemberModal = document.querySelectorAll('[data-testid="team-member-modal"]')[0];
             expect(addTeamMemberModal.querySelector('[data-testid="modal-is-open"]')).toHaveTextContent('true');
 
@@ -705,7 +704,6 @@ describe('TeamPageModals', () => {
                 'true',
             );
 
-            // Team Category Modals
             const addCategoryModal = document.querySelectorAll('[data-testid="team-category-modal"]')[0];
             expect(addCategoryModal.querySelector('[data-testid="category-modal-is-open"]')).toHaveTextContent('true');
 
@@ -725,11 +723,9 @@ describe('TeamPageModals', () => {
             });
             render(<TeamPageModals {...props} />);
 
-            // Edit modal should be closed when itemToEdit is null
             const editModal = document.querySelectorAll('[data-testid="team-member-modal"]')[1];
             expect(editModal.querySelector('[data-testid="modal-is-open"]')).toHaveTextContent('false');
 
-            // Delete modal should be closed when itemToDelete is null
             const deleteModal = document.querySelector('[data-testid="delete-team-member-modal"]');
             expect(deleteModal?.querySelector('[data-testid="delete-modal-is-open"]')).toHaveTextContent('false');
         });

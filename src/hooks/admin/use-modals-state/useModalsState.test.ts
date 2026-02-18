@@ -381,7 +381,6 @@ describe('useModalsState', () => {
         expect(result.current.isAnyModalOpened).toBe(false);
     });
 
-    //Tranaslate category modal tests
     it('should open translate category modal when no other modals are open', () => {
         const { result } = renderHook(() => useModalsState<string>());
 
@@ -449,7 +448,6 @@ describe('useModalsState', () => {
         expect(result.current.modalState.isCategoryToEditTranslation).toBe(false);
         expect(result.current.isAnyModalOpened).toBe(false);
     });
-    //
     it('should correctly detect any modal opened - boolean values', () => {
         const { result } = renderHook(() => useModalsState<string>());
 

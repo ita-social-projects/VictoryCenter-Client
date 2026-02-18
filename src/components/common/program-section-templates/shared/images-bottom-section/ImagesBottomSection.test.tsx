@@ -234,7 +234,7 @@ describe('ImagesBottomSection', () => {
         expect(last2.errors[1]).toBe('');
     });
 
-    it('adds form-container class in Edit and View modes only', () => {
+    it('adds form-container class in Edit mode only', () => {
         {
             const { root, unmount } = renderComponent({ mode: ProgramSectionMode.Edit });
             expect(root).toHaveClass('form-container');
@@ -243,7 +243,7 @@ describe('ImagesBottomSection', () => {
 
         {
             const { root, unmount } = renderComponent({ mode: ProgramSectionMode.View });
-            expect(root).toHaveClass('form-container');
+            expect(root).not.toHaveClass('form-container');
             unmount();
         }
 

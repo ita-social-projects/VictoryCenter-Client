@@ -1,4 +1,3 @@
-import cn from 'classnames';
 import { ImagesBottomSection } from '../shared/images-bottom-section/ImagesBottomSection';
 import { ImageValues, Image } from '@/types/common/image';
 import { DUAL_IMAGES_CONFIG } from '@/const/admin/programs';
@@ -46,9 +45,7 @@ export const DualImagesBottom = ({
             onTitleChange={onTitleChange}
             onDescriptionChange={onDescriptionChange}
             validationResetKey={validationResetKey}
-            className={cn(baseStyles.container, {
-                [styles['form-container']]: mode === ProgramSectionMode.Edit,
-            })}
+            className={baseStyles.container}
             topSectionClassName={baseStyles['top-section']}
             bottomSectionClassName={baseStyles['bottom-section']}
             imageWrapperClassName={baseStyles['image-wrapper']}

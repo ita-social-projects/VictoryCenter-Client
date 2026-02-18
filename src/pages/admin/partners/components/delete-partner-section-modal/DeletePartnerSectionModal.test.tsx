@@ -6,6 +6,44 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { PartnersApi } from '@/services/api/admin/partners/partners-api';
 
+let capturedYesClick: (() => void) | undefined;
+
+jest.mock('@/components/common/modal/Modal', () => {
+    const React = require('react');
+
+    const Modal = ({ isOpen, onClose, children }: any) => {
+        if (!isOpen) return null;
+        return (
+            <div data-testid="modal">
+                <button type="button" aria-label="modal-close" onClick={onClose} />
+                {children}
+            </div>
+        );
+    };
+
+    Modal.Title = ({ children }: any) => <div>{children}</div>;
+    Modal.Content = ({ children }: any) => <div>{children}</div>;
+    Modal.Actions = ({ children }: any) => <div>{children}</div>;
+
+    return { Modal };
+});
+
+jest.mock('@/components/admin/button/Button', () => ({
+    Button: ({ children, onClick, disabled, ...rest }: any) => {
+        if (rest.buttonStyle === 'primary') capturedYesClick = onClick;
+        return (
+            <button type="button" onClick={onClick} disabled={disabled} {...rest}>
+                {children}
+            </button>
+        );
+    },
+}));
+
+jest.mock('./DeletePartnerSectionModal.module.scss', () => ({
+    'error-container': 'error-container',
+    'btn-danger': 'btn-danger',
+}));
+
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
 }));
@@ -41,6 +79,7 @@ describe('DeletePartnerSectionModal', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
+        capturedYesClick = undefined;
         (useAdminClient as jest.Mock).mockReturnValue({});
     });
 
@@ -155,11 +194,11 @@ describe('DeletePartnerSectionModal', () => {
     });
 
     it('prevents closing modal while submitting', async () => {
-        let resolvePromise: () => void;
-        const neverResolvingPromise = new Promise<void>((resolve) => {
+        let resolvePromise!: () => void;
+        const pending = new Promise<void>((resolve) => {
             resolvePromise = resolve;
         });
-        (PartnersApi.deleteSection as jest.Mock).mockReturnValue(neverResolvingPromise);
+        (PartnersApi.deleteSection as jest.Mock).mockReturnValue(pending);
 
         render(
             <DeletePartnerSectionModal
@@ -171,23 +210,17 @@ describe('DeletePartnerSectionModal', () => {
         );
 
         fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES }));
-
-        fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.NO }));
+        fireEvent.click(screen.getByLabelText('modal-close'));
 
         expect(onClose).not.toHaveBeenCalled();
 
-        resolvePromise!();
+        resolvePromise();
 
-        await waitFor(() => {
-            const btn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.NO });
-            expect(btn).toBeInTheDocument();
-        });
-
-        expect(onClose).toHaveBeenCalledTimes(1);
+        await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
     });
 
     it('disables "Yes" button while submitting to prevent duplicate requests', async () => {
-        let resolvePromise: () => void;
+        let resolvePromise!: () => void;
         (PartnersApi.deleteSection as jest.Mock).mockImplementation(
             () =>
                 new Promise<void>((resolve) => {
@@ -210,11 +243,10 @@ describe('DeletePartnerSectionModal', () => {
         fireEvent.click(yesButton);
         expect(yesButton).toBeDisabled();
 
-        // Try clicking again while submitting
         fireEvent.click(yesButton);
         expect(PartnersApi.deleteSection).toHaveBeenCalledTimes(1);
 
-        resolvePromise!();
+        resolvePromise();
 
         await waitFor(() => {
             expect(onClose).toHaveBeenCalled();
@@ -234,7 +266,6 @@ describe('DeletePartnerSectionModal', () => {
         );
 
         fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES }));
-
         expect(await screen.findByText(PARTNERS_TEXT.FORM.MESSAGE.FAIL_TO_DELETE_PARTNER_SECTION)).toBeInTheDocument();
 
         fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.NO }));
@@ -258,5 +289,64 @@ describe('DeletePartnerSectionModal', () => {
         );
 
         expect(screen.queryByText(PARTNERS_TEXT.FORM.MESSAGE.FAIL_TO_DELETE_PARTNER_SECTION)).not.toBeInTheDocument();
+    });
+
+    it('returns early on confirm when already submitting (branch coverage)', async () => {
+        let resolvePromise!: () => void;
+        (PartnersApi.deleteSection as jest.Mock).mockImplementation(
+            () =>
+                new Promise<void>((resolve) => {
+                    resolvePromise = resolve;
+                }),
+        );
+
+        render(
+            <DeletePartnerSectionModal
+                isOpen={true}
+                onClose={onClose}
+                sectionToDelete={section}
+                onDeleteSection={onDeleteSection}
+            />,
+        );
+
+        fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES }));
+        await waitFor(() => expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES })).toBeDisabled());
+
+        capturedYesClick?.();
+
+        expect(PartnersApi.deleteSection).toHaveBeenCalledTimes(1);
+
+        resolvePromise();
+        await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
+    });
+
+    it('returns early on close while submitting (branch coverage)', async () => {
+        let resolvePromise!: () => void;
+        (PartnersApi.deleteSection as jest.Mock).mockImplementation(
+            () =>
+                new Promise<void>((resolve) => {
+                    resolvePromise = resolve;
+                }),
+        );
+
+        render(
+            <DeletePartnerSectionModal
+                isOpen={true}
+                onClose={onClose}
+                sectionToDelete={section}
+                onDeleteSection={onDeleteSection}
+            />,
+        );
+
+        fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES }));
+        fireEvent.click(screen.getByLabelText('modal-close'));
+
+        expect(onClose).not.toHaveBeenCalled();
+
+        resolvePromise();
+        await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
+
+        fireEvent.click(screen.getByLabelText('modal-close'));
+        expect(onClose).toHaveBeenCalledTimes(2);
     });
 });

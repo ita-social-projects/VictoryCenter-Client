@@ -104,8 +104,7 @@ jest.mock('@/const/admin/common', () => ({
 
 type ComponentProps = React.ComponentProps<typeof SingleTitleDescriptionAuthorPairs>;
 
-const pid = (n: number) => `id-${n}`;
-const pair = (n: number, description = `D${n}`, author = `A${n}`) => ({ id: pid(n), description, author });
+const pair = (description: string, author: string) => ({ description, author });
 const pairs = (...items: Array<ReturnType<typeof pair>>) => items;
 
 const getTemplateMaxLengthMock = () => {
@@ -149,15 +148,20 @@ const renderComponent = (overrideProps: Partial<ComponentProps> = {}) => {
 };
 
 const getCardCarouselProps = () => mockCardCarousel.mock.calls[0]?.[0];
-
 const getPairCardProps = (index: number) =>
     mockDescriptionAuthorPairCard.mock.calls.find((call) => call?.[0]?.index === index)?.[0];
+const getConfirmationModalProps = () => mockConfirmationModal.mock.calls.at(-1)?.[0];
+
+const openDeleteModal = async (index: number) => {
+    getPairCardProps(index).onDelete(index);
+    await waitFor(() => expect(screen.getByTestId('confirmation-modal')).toHaveAttribute('data-open', '1'));
+};
 
 describe('SingleTitleDescriptionAuthorPairs', () => {
     it('renders h2 title in published mode and uses default carousel variant', () => {
         const { root } = renderComponent({
             title: 'Hello',
-            pairs: pairs(pair(0, 'D0', 'A0')),
+            pairs: pairs(pair('D0', 'A0')),
         });
 
         expect(screen.getByRole('heading', { level: 2, name: 'Hello' })).toBeInTheDocument();
@@ -168,7 +172,7 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
         expect(root).not.toHaveClass('editable');
     });
 
-    it('renders title input in edit mode and uppercases value for onTitleChange', () => {
+    it('renders title input in edit mode, uppercases on change, and does not validate when no error yet', () => {
         const onTitleChange = jest.fn();
         const { root } = renderComponent({
             mode: ProgramSectionMode.Edit,
@@ -183,20 +187,21 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
         });
 
         expect(onTitleChange).toHaveBeenCalledWith('AB');
-        expect(getCardCarouselProps().variant).toBe('editable');
+        expect(getValidateContentTextMock()).not.toHaveBeenCalled();
 
+        expect(getCardCarouselProps().variant).toBe('editable');
         expect(root).toHaveClass('editable');
         expect(root).not.toHaveClass('template');
     });
 
-    it('does not render title input in published mode and does not validate on blur', () => {
+    it('does not render title input in published mode', () => {
         renderComponent({ mode: ProgramSectionMode.Published, title: 'X' });
 
         expect(screen.queryByTestId('input-single-title-description-author-pairs-title')).not.toBeInTheDocument();
         expect(getValidateContentTextMock().mock.calls.length).toBe(0);
     });
 
-    it('validates title on blur and re-validates on change when error already exists', async () => {
+    it('validates title on blur and re-validates on change when error already exists (with correct args)', async () => {
         const onTitleChange = jest.fn();
 
         renderComponent({ mode: ProgramSectionMode.Edit, title: '', onTitleChange });
@@ -213,6 +218,13 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
             ),
         );
 
+        expect(validateContentText.mock.calls[0]).toEqual([
+            '',
+            ContentType.Title,
+            true,
+            ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
+        ]);
+
         fireEvent.change(screen.getByTestId('input-single-title-description-author-pairs-title'), {
             target: { value: 'abc' },
         });
@@ -224,24 +236,33 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
                 'ERR_AFTER_CHANGE',
             ),
         );
+
+        expect(validateContentText.mock.calls[1]).toEqual([
+            'ABC',
+            ContentType.Title,
+            true,
+            ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
+        ]);
     });
 
     it('normalizes template pairs to 5 and uses sample values for missing items', () => {
         const { root } = renderComponent({
             mode: ProgramSectionMode.Template,
-            pairs: pairs(pair(0, 'D0', 'A0')),
+            pairs: pairs(pair('D0', 'A0')),
         });
 
         expect(getCardCarouselProps().variant).toBe('template');
         expect(getCardCarouselProps().itemsCount).toBe(5);
 
+        expect(screen.getAllByTestId(/pair-/)).toHaveLength(5);
+
         expect(getPairCardProps(0).description).toBe('D0');
         expect(getPairCardProps(0).author).toBe('A0');
-        expect(getPairCardProps(0).pairId).toBe(pid(0));
+        expect(getPairCardProps(0).isEditable).toBe(false);
 
         expect(getPairCardProps(4).description).toBe('SAMPLE_DESC');
         expect(getPairCardProps(4).author).toBe('SAMPLE_AUTHOR');
-        expect(getPairCardProps(4).pairId).toBe('template-4');
+        expect(getPairCardProps(4).isEditable).toBe(false);
 
         expect(root).toHaveClass('template');
         expect(root).not.toHaveClass('editable');
@@ -267,14 +288,14 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
         expect(onAddPair).toHaveBeenCalledTimes(1);
     });
 
-    it('passes editability, ids and change handlers into cards (delete is wrapped)', () => {
+    it('passes editability and change handlers into cards (delete is wrapped by index)', async () => {
         const onPairDescriptionChange = jest.fn();
         const onPairAuthorChange = jest.fn();
         const onDeletePair = jest.fn();
 
         renderComponent({
             mode: ProgramSectionMode.Edit,
-            pairs: pairs(pair(0, 'D0', 'A0'), pair(1, 'D1', 'A1')),
+            pairs: pairs(pair('D0', 'A0'), pair('D1', 'A1')),
             onPairDescriptionChange,
             onPairAuthorChange,
             onDeletePair,
@@ -282,11 +303,13 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
 
         const p0 = getPairCardProps(0);
         expect(p0.isEditable).toBe(true);
-        expect(p0.pairId).toBe(pid(0));
+        expect(p0.index).toBe(0);
         expect(p0.onDescriptionChange).toBe(onPairDescriptionChange);
         expect(p0.onAuthorChange).toBe(onPairAuthorChange);
         expect(typeof p0.onDelete).toBe('function');
         expect(p0.onDelete).not.toBe(onDeletePair);
+
+        await openDeleteModal(0);
     });
 
     it('delete flow: blocks delete when not editable / when onDeletePair missing / when pairs length <= 1', () => {
@@ -295,11 +318,11 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
         {
             const view = renderComponent({
                 mode: ProgramSectionMode.Published,
-                pairs: pairs(pair(0), pair(1)),
+                pairs: pairs(pair('D0', 'A0'), pair('D1', 'A1')),
                 onDeletePair,
             });
 
-            getPairCardProps(1).onDelete(pid(1));
+            getPairCardProps(1).onDelete(1);
 
             expect(screen.getByTestId('confirmation-modal')).toHaveAttribute('data-open', '0');
             expect(onDeletePair).not.toHaveBeenCalled();
@@ -310,10 +333,10 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
         {
             const view = renderComponent({
                 mode: ProgramSectionMode.Edit,
-                pairs: pairs(pair(0), pair(1)),
+                pairs: pairs(pair('D0', 'A0'), pair('D1', 'A1')),
             });
 
-            getPairCardProps(1).onDelete(pid(1));
+            getPairCardProps(1).onDelete(1);
 
             expect(screen.getByTestId('confirmation-modal')).toHaveAttribute('data-open', '0');
 
@@ -323,11 +346,11 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
         {
             const view = renderComponent({
                 mode: ProgramSectionMode.Edit,
-                pairs: pairs(pair(0)),
+                pairs: pairs(pair('D0', 'A0')),
                 onDeletePair,
             });
 
-            getPairCardProps(0).onDelete(pid(0));
+            getPairCardProps(0).onDelete(0);
 
             expect(screen.getByTestId('confirmation-modal')).toHaveAttribute('data-open', '0');
             expect(onDeletePair).not.toHaveBeenCalled();
@@ -336,30 +359,33 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
         }
     });
 
-    it('delete flow: opens modal, cancel closes without calling onDeletePair, confirm calls onDeletePair', async () => {
+    it('delete flow: confirm without pending index does nothing; open -> cancel closes; open -> close closes; open -> confirm calls onDeletePair(index)', async () => {
         const onDeletePair = jest.fn();
 
         renderComponent({
             mode: ProgramSectionMode.Edit,
-            pairs: pairs(pair(0), pair(1)),
+            pairs: pairs(pair('D0', 'A0'), pair('D1', 'A1')),
             onDeletePair,
         });
 
         fireEvent.click(screen.getByTestId('confirmation-modal-confirm'));
         expect(onDeletePair).not.toHaveBeenCalled();
 
-        getPairCardProps(1).onDelete(pid(1));
-        await waitFor(() => expect(screen.getByTestId('confirmation-modal')).toHaveAttribute('data-open', '1'));
+        await openDeleteModal(1);
 
         fireEvent.click(screen.getByTestId('confirmation-modal-cancel'));
         expect(onDeletePair).not.toHaveBeenCalled();
         await waitFor(() => expect(screen.getByTestId('confirmation-modal')).toHaveAttribute('data-open', '0'));
 
-        getPairCardProps(1).onDelete(pid(1));
-        await waitFor(() => expect(screen.getByTestId('confirmation-modal')).toHaveAttribute('data-open', '1'));
+        await openDeleteModal(1);
+
+        getConfirmationModalProps().onClose();
+        await waitFor(() => expect(screen.getByTestId('confirmation-modal')).toHaveAttribute('data-open', '0'));
+
+        await openDeleteModal(1);
 
         fireEvent.click(screen.getByTestId('confirmation-modal-confirm'));
-        expect(onDeletePair).toHaveBeenCalledWith(pid(1));
+        expect(onDeletePair).toHaveBeenCalledWith(1);
         await waitFor(() => expect(screen.getByTestId('confirmation-modal')).toHaveAttribute('data-open', '0'));
     });
 

@@ -43,6 +43,15 @@ const MockRenderContent = forwardRef<SearchItemContentRef, SearchItemContentRend
     ),
 );
 
+const createTooltipRenderContent = (tooltip: React.ReactNode | null | undefined) =>
+    forwardRef<SearchItemContentRef, SearchItemContentRenderProps<TestItem>>(({ item }, ref) => {
+        React.useImperativeHandle(ref, () => ({
+            getTooltipContent: () => tooltip as any,
+        }));
+
+        return <div data-testid="tooltip-content">{item.name}</div>;
+    });
+
 describe('SuggestionWrapper', () => {
     beforeEach(() => {
         jest.clearAllMocks();
@@ -159,5 +168,48 @@ describe('SuggestionWrapper', () => {
         const tooltipContent = ref.current?.getTooltipContent();
 
         expect(tooltipContent).toBeNull();
+    });
+
+    it('should call onSelect on Enter keydown', () => {
+        const onSelectMock = jest.fn();
+        renderComponent({ onSelect: onSelectMock });
+
+        fireEvent.keyDown(getItem(), { key: 'Enter' });
+
+        expect(onSelectMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('should prevent default on Enter keydown', () => {
+        const preventDefaultSpy = jest.spyOn(Event.prototype, 'preventDefault');
+        renderComponent();
+
+        fireEvent.keyDown(getItem(), { key: 'Enter' });
+
+        expect(preventDefaultSpy).toHaveBeenCalled();
+        preventDefaultSpy.mockRestore();
+    });
+
+    it('should prevent default on mouse down', () => {
+        const preventDefaultSpy = jest.spyOn(Event.prototype, 'preventDefault');
+        renderComponent();
+
+        fireEvent.mouseDown(getItem());
+
+        expect(preventDefaultSpy).toHaveBeenCalled();
+        preventDefaultSpy.mockRestore();
+    });
+
+    it('should forward tooltip content from custom content ref', () => {
+        const view = createTooltipRenderContent('tooltip');
+        const { ref } = renderComponent({ renderContent: view });
+
+        expect(ref.current?.getTooltipContent()).toBe('tooltip');
+    });
+
+    it('should return null tooltip when custom content returns undefined', () => {
+        const view = createTooltipRenderContent(undefined);
+        const { ref } = renderComponent({ renderContent: view });
+
+        expect(ref.current?.getTooltipContent()).toBeNull();
     });
 });

@@ -6,7 +6,7 @@ import { useTranslateTeamCategory } from '@/hooks/admin/use-translate-team-categ
 import { ModalMode } from '@/types/admin/common';
 import { TeamCategory } from '@/types/admin/team-category';
 import { LocalizationLanguage } from '@/types/common/language';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import {
     TranslateTeamCategoryForm,
     TranslateTeamCategoryFormRef,
@@ -38,7 +38,7 @@ export const TranslateTeamCategoryModal = ({
     const [language, setLanguage] = useState<LocalizationLanguage | null>(() => {
         if (!translatedLanguages?.length) return null;
         return translatedLanguages.find((l) => l.code !== DEFAULT_LOCALE) || translatedLanguages[0];
-   });
+    });
 
     const existingLocalization = useMemo(() => {
         if (!selectedCategory?.localizations || !language) return null;

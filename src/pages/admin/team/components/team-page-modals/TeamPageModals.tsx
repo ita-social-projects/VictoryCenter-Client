@@ -9,7 +9,6 @@ import { TeamCategoryModal } from '../team-category-modal/TeamCategoryModal';
 import { DeleteTeamCategoryModal } from '../delete-team-category-modal/DeleteTeamCategoryModal';
 import { LocalizationLanguage } from '@/types/common/language';
 import { TranslateTeamCategoryModal } from '../translate-team-category-modal/TranslateTeamCategoryModal';
-import { useState } from 'react';
 
 export interface TeamPageModalsProps {
     modalsStateControl: UseModalsStateResult<TeamMember>;
@@ -112,9 +111,9 @@ export const TeamPageModals = ({
                 categories={categories}
             />
 
-            {modalState.categoryToTranslate && selectedCategory && (
+            {modalState.isCategoryToTranslate && selectedCategory && (
                 <TranslateTeamCategoryModal
-                    isOpen={modalState.categoryToTranslate}
+                    isOpen={modalState.isCategoryToTranslate}
                     onClose={closeModalActions.closeTranslateCategoryModal}
                     onTranslateCategory={onTranslateTeamCategory}
                     categoryToTranslate={selectedCategory}
@@ -123,9 +122,9 @@ export const TeamPageModals = ({
                 />
             )}
 
-            {modalState.categoryToEditTranslation && selectedCategory && (
+            {modalState.isCategoryToEditTranslation && selectedCategory && (
                 <TranslateTeamCategoryModal
-                    isOpen={modalState.categoryToEditTranslation}
+                    isOpen={modalState.isCategoryToEditTranslation}
                     onClose={closeModalActions.closeEditCategoryTranslationModal}
                     onTranslateCategory={onTranslateTeamCategory}
                     categoryToTranslate={selectedCategory}

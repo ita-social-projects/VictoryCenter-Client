@@ -118,6 +118,35 @@ jest.mock('../delete-team-category-modal/DeleteTeamCategoryModal', () => ({
     ),
 }));
 
+jest.mock('../translate-team-category-modal/TranslateTeamCategoryModal', () => ({
+    TranslateTeamCategoryModal: ({
+        isOpen,
+        onClose,
+        onTranslateCategory,
+        categoryToTranslate,
+        translatedLanguages,
+    }: any) => (
+        <div data-testid="translate-team-category-modal">
+            <span data-testid="translate-category-modal-is-open">{isOpen.toString()}</span>
+            {categoryToTranslate && (
+                <span data-testid="translate-category-modal-category">{categoryToTranslate.id}</span>
+            )}
+            <span data-testid="translate-category-modal-language">{translatedLanguages?.[0]?.code}</span>
+            <button data-testid="translate-category-modal-close-btn" onClick={onClose}>
+                Close
+            </button>
+            {onTranslateCategory && categoryToTranslate && (
+                <button
+                    data-testid="translate-category-modal-confirm-btn"
+                    onClick={() => onTranslateCategory(categoryToTranslate)}
+                >
+                    Translate Category
+                </button>
+            )}
+        </div>
+    ),
+}));
+
 const mockTeamMember: TeamMember = {
     id: 1,
     image: null,
@@ -213,9 +242,7 @@ const createDefaultProps = (
     onEditTeamCategory: jest.fn(),
     onDeleteTeamCategory: jest.fn(),
     selectedCategory: null,
-    onTranslateTeamCategory: function (translatedCategory: TeamCategory): void {
-        throw new Error('Function not implemented.');
-    }
+    onTranslateTeamCategory: jest.fn(),
 });
 
 describe('TeamPageModals', () => {
@@ -574,6 +601,82 @@ describe('TeamPageModals', () => {
                 deleteBtn.click();
 
                 expect(props.onDeleteTeamCategory).toHaveBeenCalledWith(1);
+            });
+        });
+
+        describe('Translate Team Category Modal', () => {
+            it('does not render translate category modal when selectedCategory is null', () => {
+                const props = createDefaultProps({ isCategoryToTranslate: true });
+                render(<TeamPageModals {...props} />);
+
+                expect(document.querySelector('[data-testid="translate-team-category-modal"]')).not.toBeInTheDocument();
+            });
+
+            it('renders translate category modal and handles close/confirm actions', () => {
+                const props = {
+                    ...createDefaultProps({ isCategoryToTranslate: true }),
+                    selectedCategory: mockTeamCategory,
+                };
+                render(<TeamPageModals {...props} />);
+
+                const modal = document.querySelector('[data-testid="translate-team-category-modal"]');
+                expect(modal).toBeInTheDocument();
+                expect(modal?.querySelector('[data-testid="translate-category-modal-is-open"]')).toHaveTextContent(
+                    'true',
+                );
+                expect(modal?.querySelector('[data-testid="translate-category-modal-category"]')).toHaveTextContent(
+                    mockTeamCategory.id.toString(),
+                );
+
+                const closeBtn = modal?.querySelector(
+                    '[data-testid="translate-category-modal-close-btn"]',
+                ) as HTMLElement;
+                closeBtn.click();
+                expect(props.modalsStateControl.closeModalActions.closeTranslateCategoryModal).toHaveBeenCalledTimes(1);
+
+                const confirmBtn = modal?.querySelector(
+                    '[data-testid="translate-category-modal-confirm-btn"]',
+                ) as HTMLElement;
+                confirmBtn.click();
+                expect(props.onTranslateTeamCategory).toHaveBeenCalledWith(mockTeamCategory);
+            });
+
+            it('does not render edit-translation category modal when selectedCategory is null', () => {
+                const props = createDefaultProps({ isCategoryToEditTranslation: true });
+                render(<TeamPageModals {...props} />);
+
+                expect(document.querySelector('[data-testid="translate-team-category-modal"]')).not.toBeInTheDocument();
+            });
+
+            it('renders edit-translation category modal and handles close/confirm actions', () => {
+                const props = {
+                    ...createDefaultProps({ isCategoryToEditTranslation: true }),
+                    selectedCategory: mockTeamCategory,
+                };
+                render(<TeamPageModals {...props} />);
+
+                const modal = document.querySelector('[data-testid="translate-team-category-modal"]');
+                expect(modal).toBeInTheDocument();
+                expect(modal?.querySelector('[data-testid="translate-category-modal-is-open"]')).toHaveTextContent(
+                    'true',
+                );
+                expect(modal?.querySelector('[data-testid="translate-category-modal-category"]')).toHaveTextContent(
+                    mockTeamCategory.id.toString(),
+                );
+
+                const closeBtn = modal?.querySelector(
+                    '[data-testid="translate-category-modal-close-btn"]',
+                ) as HTMLElement;
+                closeBtn.click();
+                expect(
+                    props.modalsStateControl.closeModalActions.closeEditCategoryTranslationModal,
+                ).toHaveBeenCalledTimes(1);
+
+                const confirmBtn = modal?.querySelector(
+                    '[data-testid="translate-category-modal-confirm-btn"]',
+                ) as HTMLElement;
+                confirmBtn.click();
+                expect(props.onTranslateTeamCategory).toHaveBeenCalledWith(mockTeamCategory);
             });
         });
     });

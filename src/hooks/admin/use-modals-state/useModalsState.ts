@@ -151,13 +151,13 @@ export const useModalsState = <TEntity>(): UseModalsStateResult<TEntity> => {
             openTranslateCategoryModal: () => {
                 setModalState((prev) => {
                     if (isAnyModalOpenedInState(prev)) return prev;
-                    return { ...prev, categoryToTranslate: true };
+                    return { ...prev, isCategoryToTranslate: true };
                 });
             },
             openEditCategoryTranslationModal: () => {
                 setModalState((prev) => {
                     if (isAnyModalOpenedInState(prev)) return prev;
-                    return { ...prev, categoryToEditTranslation: true };
+                    return { ...prev, isCategoryToEditTranslation: true };
                 });
             },
         };

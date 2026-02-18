@@ -45,9 +45,10 @@ export const useTranslateTeamCategory = ({
                     },
                 );
 
-                const updatedLocalization = mapLocalizationDtoToModel<typeof updatedLocalizationDto, TeamCategoryLocalization>(
-                    updatedLocalizationDto,
-                );
+                const updatedLocalization = mapLocalizationDtoToModel<
+                    typeof updatedLocalizationDto,
+                    TeamCategoryLocalization
+                >(updatedLocalizationDto);
 
                 const updatedTeamCategory: TeamCategory = {
                     ...teamCategory,
@@ -65,9 +66,10 @@ export const useTranslateTeamCategory = ({
                     description: data.description,
                 });
 
-                const createdLocalization = mapLocalizationDtoToModel<typeof createdLocalizationDto, TeamCategoryLocalization>(
-                    createdLocalizationDto,
-                );
+                const createdLocalization = mapLocalizationDtoToModel<
+                    typeof createdLocalizationDto,
+                    TeamCategoryLocalization
+                >(createdLocalizationDto);
 
                 const createdTeamCategory: TeamCategory = {
                     ...teamCategory,

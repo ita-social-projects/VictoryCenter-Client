@@ -6,7 +6,7 @@ import { useFormManager } from '@/hooks/admin/use-form-manager/useFormManager';
 import { VisibilityStatus } from '@/types/admin/common';
 import { TeamCategory } from '@/types/admin/team-category';
 import { TEAM_CATEGORY_VALIDATION_FUNCTIONS } from '@/validation/admin/team-category-schema/team-category-schema';
-import { forwardRef, useCallback, useEffect, useState } from 'react';
+import { forwardRef, useEffect, useState } from 'react';
 
 export interface TranslateTeamCategoryFormValues {
     name: string;

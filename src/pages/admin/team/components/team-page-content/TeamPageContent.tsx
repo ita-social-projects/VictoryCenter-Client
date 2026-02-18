@@ -91,7 +91,7 @@ export const TeamPageContent = () => {
                 openModalActions.openTranslateCategoryModal();
             }
         },
-        [openModalActions, selectedCategory],
+        [openModalActions],
     );
 
     const categoryBarContextMenuOptions: ContextMenuOption[] = useMemo(

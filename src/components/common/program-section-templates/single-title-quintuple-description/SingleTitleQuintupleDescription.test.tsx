@@ -146,12 +146,12 @@ describe('SingleTitleQuintupleDescription', () => {
             expect(true).toBe(true);
         });
 
-        it('applies editable class for Edit and View', () => {
+        it('applies editable class for Edit mode only', () => {
             const { container: editContainer } = setup({ mode: ProgramSectionMode.Edit });
             expect(getRoot(editContainer)).toHaveClass('editable');
 
             const { container: viewContainer } = setup({ mode: ProgramSectionMode.View });
-            expect(getRoot(viewContainer)).toHaveClass('editable');
+            expect(getRoot(viewContainer)).not.toHaveClass('editable');
         });
 
         it('does not apply template class when mode is Edit', () => {

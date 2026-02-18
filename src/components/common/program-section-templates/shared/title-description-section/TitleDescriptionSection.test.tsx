@@ -150,11 +150,6 @@ describe('TitleDescriptionSection', () => {
         return render(<TitleDescriptionSection {...defaultProps} {...overrideProps} />);
     };
 
-    const renderBare = (overrideProps: Partial<TitleDescriptionSectionProps> = {}) => {
-        setupHook();
-        return render(<TitleDescriptionSection template={TEMPLATE} {...overrideProps} />);
-    };
-
     const getTitleHeading = () => screen.queryByRole('heading', { level: 2 });
 
     const getTitleInput = () =>
@@ -312,15 +307,17 @@ describe('TitleDescriptionSection', () => {
     });
 
     describe('View mode', () => {
-        it('disables inputs', () => {
+        it('renders static HTML instead of inputs', () => {
             renderComponent({
                 mode: ProgramSectionMode.View,
                 title: 'Title',
                 description: 'Desc',
             });
 
-            expect(getTitleInput()).toBeDisabled();
-            expect(getDescriptionTextarea()).toBeDisabled();
+            expect(getTitleInput()).not.toBeInTheDocument();
+            expect(getDescriptionTextarea()).not.toBeInTheDocument();
+            expect(getTitleHeading()).toBeInTheDocument();
+            expect(screen.getByText('Desc')).toBeInTheDocument();
         });
     });
 
@@ -353,9 +350,14 @@ describe('TitleDescriptionSection', () => {
             expect(container.querySelector('.container')).toHaveClass('form-container');
         });
 
-        it('applies form-container class when mode is View', () => {
-            const { container } = renderComponent({ mode: ProgramSectionMode.View });
+        it('applies form-container class when mode is Edit only', () => {
+            const { container } = renderComponent({ mode: ProgramSectionMode.Edit });
             expect(container.querySelector('.container')).toHaveClass('form-container');
+        });
+
+        it('does not apply form-container class when mode is View', () => {
+            const { container } = renderComponent({ mode: ProgramSectionMode.View });
+            expect(container.querySelector('.container')).not.toHaveClass('form-container');
         });
     });
 });

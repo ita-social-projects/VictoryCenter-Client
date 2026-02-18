@@ -82,7 +82,7 @@ const useCardValidationMock = useCardValidation as unknown as jest.Mock;
 const minMock = getProgramSectionTemplateMinLength as unknown as jest.Mock;
 const maxMock = getProgramSectionTemplateMaxLength as unknown as jest.Mock;
 
-const TEMPLATE = ProgramSectionTemplate.DualTitleDescription;
+const TEMPLATE = ProgramSectionTemplate.DualTitleDescriptionPairs;
 
 const baseCard: TitleDescriptionCardData = {
     title: 'Test Title',
@@ -161,15 +161,8 @@ describe('TitleDescriptionCard', () => {
             expect(screen.getByTestId('input-with-limit')).toBeInTheDocument();
             expect(screen.getByTestId('card-description-field')).toBeInTheDocument();
 
-            expect(screen.getByTestId('input-card-title-0')).not.toBeDisabled();
-            expect(screen.getByTestId('textarea-card-description-0')).not.toBeDisabled();
-        });
-
-        it('renders inputs in View mode and disables them', () => {
-            renderCard({ mode: ProgramSectionMode.View });
-
-            expect(screen.getByTestId('input-card-title-0')).toBeDisabled();
-            expect(screen.getByTestId('textarea-card-description-0')).toBeDisabled();
+            expect(screen.getByTestId(/input-.*-card-title-0/)).not.toBeDisabled();
+            expect(screen.getByTestId(/textarea-.*-card-description-0/)).not.toBeDisabled();
         });
 
         it('shows values in inputs and calls hook blur handlers', () => {
@@ -190,11 +183,14 @@ describe('TitleDescriptionCard', () => {
 
             renderCard({ mode: ProgramSectionMode.Edit });
 
-            expect(screen.getByTestId('input-card-title-0')).toHaveValue('Test Title');
-            expect(screen.getByTestId('textarea-card-description-0')).toHaveValue('Test Description');
+            const titleInput = screen.getByTestId(/input-.*-card-title-0/);
+            const descTextarea = screen.getByTestId(/textarea-.*-card-description-0/);
 
-            fireEvent.blur(screen.getByTestId('input-card-title-0'));
-            fireEvent.blur(screen.getByTestId('textarea-card-description-0'));
+            expect(titleInput).toHaveValue('Test Title');
+            expect(descTextarea).toHaveValue('Test Description');
+
+            fireEvent.blur(titleInput);
+            fireEvent.blur(descTextarea);
 
             expect(titleBlur).toHaveBeenCalledTimes(1);
             expect(descBlur).toHaveBeenCalledTimes(1);
@@ -215,8 +211,8 @@ describe('TitleDescriptionCard', () => {
 
             renderCard({ mode: ProgramSectionMode.Edit });
 
-            expect(screen.getByTestId('error-card-title-0')).toHaveTextContent('TITLE_ERR');
-            expect(screen.getByTestId('error-card-description-0')).toHaveTextContent('DESC_ERR');
+            expect(screen.getByTestId(/error-.*-card-title-0/)).toHaveTextContent('TITLE_ERR');
+            expect(screen.getByTestId(/error-.*-card-description-0/)).toHaveTextContent('DESC_ERR');
         });
 
         it('calls parseDescriptionList even in Edit mode (it is computed before the branch)', () => {
@@ -235,8 +231,8 @@ describe('TitleDescriptionCard', () => {
                 onDescriptionChange,
             });
 
-            fireEvent.change(screen.getByTestId('input-card-title-5'), { target: { value: 'NEW_TITLE' } });
-            fireEvent.change(screen.getByTestId('textarea-card-description-5'), { target: { value: 'NEW_DESC' } });
+            fireEvent.change(screen.getByTestId(/input-.*-card-title-5/), { target: { value: 'NEW_TITLE' } });
+            fireEvent.change(screen.getByTestId(/textarea-.*-card-description-5/), { target: { value: 'NEW_DESC' } });
 
             expect(onTitleChange).toHaveBeenCalledWith(5, 'NEW_TITLE');
             expect(onDescriptionChange).toHaveBeenCalledWith(5, 'NEW_DESC');
@@ -276,7 +272,7 @@ describe('TitleDescriptionCard', () => {
                 />,
             );
 
-            expect(screen.getByText('Заголовок')).toBeInTheDocument();
+            expect(screen.getByText('DEFAULT_TITLE')).toBeInTheDocument();
         });
 
         it('should display parsed description intro', () => {

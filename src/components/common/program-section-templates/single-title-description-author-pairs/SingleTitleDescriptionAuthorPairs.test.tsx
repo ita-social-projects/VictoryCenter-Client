@@ -39,7 +39,8 @@ jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
 jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
     InputWithCharacterLimitGroup: ({ value, onChange, onBlur, id, error }: any) => (
         <div>
-            <input data-testid={`input-${id}`} value={value} onChange={onChange} onBlur={onBlur} />
+            <label htmlFor={`input-${id}`}>{id}</label>
+            <input id={`input-${id}`} data-testid={`input-${id}`} value={value} onChange={onChange} onBlur={onBlur} />
             <div data-testid={`error-${id}`}>{error ?? ''}</div>
         </div>
     ),

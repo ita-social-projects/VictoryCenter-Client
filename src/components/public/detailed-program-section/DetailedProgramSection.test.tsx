@@ -52,6 +52,8 @@ describe('DetailedProgramSection', () => {
                 description: 'Test Description',
                 descriptions: ['Test Description'],
                 images: [],
+                cards: [{ title: 'Test Title', description: 'Test Description' }],
+                descriptionAuthorPairs: [],
             },
             mode: ProgramSectionMode.View,
         });
@@ -84,6 +86,8 @@ describe('DetailedProgramSection', () => {
                 description: 'Test Description',
                 descriptions: ['Test Description'],
                 images: [],
+                cards: [],
+                descriptionAuthorPairs: [],
             },
             mode: ProgramSectionMode.View,
         });
@@ -115,6 +119,8 @@ describe('DetailedProgramSection', () => {
                 description: '',
                 descriptions: [],
                 images: [],
+                cards: [{ title: 'Test Title', description: '' }],
+                descriptionAuthorPairs: [],
             },
             mode: ProgramSectionMode.View,
         });
@@ -175,6 +181,8 @@ describe('DetailedProgramSection', () => {
                     { id: 12, url: 'img2.jpg', mimeType: 'image/jpeg' },
                     { id: 10, url: 'img3.jpg', mimeType: 'image/jpeg' },
                 ],
+                cards: [{ title: 'Title', description: 'Desc' }],
+                descriptionAuthorPairs: [],
             },
             mode: ProgramSectionMode.View,
         });
@@ -208,6 +216,8 @@ describe('DetailedProgramSection', () => {
                 description: 'Desc',
                 descriptions: ['Desc'],
                 images: [null],
+                cards: [{ title: 'Title', description: 'Desc' }],
+                descriptionAuthorPairs: [],
             },
             mode: ProgramSectionMode.View,
         });
@@ -230,6 +240,8 @@ describe('DetailedProgramSection', () => {
                 description: '',
                 descriptions: [],
                 images: [],
+                cards: [],
+                descriptionAuthorPairs: [],
             },
             mode: ProgramSectionMode.View,
         });

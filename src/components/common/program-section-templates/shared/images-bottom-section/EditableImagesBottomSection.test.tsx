@@ -132,11 +132,11 @@ describe('EditableImagesBottomSection', () => {
         expect(photoCalls[1].disabled).toBe(true);
     });
 
-    it('renders images with src in non-edit/view mode', () => {
+    it('renders images with src in Template mode', () => {
         (getImageSrc as jest.Mock).mockReturnValueOnce('src-1').mockReturnValueOnce('');
 
         renderComponent({
-            mode: ProgramSectionMode.View,
+            mode: ProgramSectionMode.Template,
             images: [{ url: 'u', mimeType: 'image/png', id: 1 } as any, null],
             imageKeys: ['a', 'b'],
         });

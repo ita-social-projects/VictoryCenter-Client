@@ -94,6 +94,11 @@ export const TEAM_CATEGORY_TEXT = {
             DESCRIPTION: 'Опис',
             CATEGORY: 'Категорія',
         },
+        MESSAGE: {
+            FAIL_TO_TRANSLATE_TEAM_CATEGORY: 'Виникла помилка під час додавання перекладу для категорії учасників',
+            FAIL_TO_UPDATE_TRANSLATION_FOR_TEAM_CATEGORY:
+                'Виникла помилка під час оновлення перекладу для категорії учасників',
+        },
     },
 };
 

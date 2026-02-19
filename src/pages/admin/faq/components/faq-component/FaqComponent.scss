@@ -96,6 +96,11 @@
                 background-repeat: no-repeat;
                 background-size: cover;
             }
+            .faq-translate-btn {
+                border: none;
+                width: 1.5rem;
+                height: 1.5rem;
+            }
 
             .faq-edit-btn {
                 background: url('~@/assets/icons/edit-default.svg');
@@ -128,6 +133,19 @@
                 &:disabled {
                     background: url('~@/assets/icons/delete-disabled.svg');
                     cursor: not-allowed;
+                }
+            }
+
+            .faq-translate-btn {
+                background: url('~@/assets/icons/translate.svg');
+
+                &:hover {
+                    cursor: pointer;
+                    background: url('~@/assets/icons/translate-grey.svg');
+                }
+
+                &:active {
+                    background: url('~@/assets/icons/translate.svg');
                 }
             }
         }

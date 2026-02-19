@@ -15,6 +15,8 @@ describe('useModalsState', () => {
             isEditCategoryModalOpen: false,
             isDeleteCategoryModalOpen: false,
             isAddSectionModalOpen: false,
+            isCategoryToTranslate: false,
+            isCategoryToEditTranslation: false,
         });
         expect(result.current.isAnyModalOpened).toBe(false);
     });
@@ -338,6 +340,114 @@ describe('useModalsState', () => {
         expect(result.current.isAnyModalOpened).toBe(false);
     });
 
+    it('should open add section modal when no other modals are open', () => {
+        const { result } = renderHook(() => useModalsState<string>());
+
+        act(() => {
+            result.current.openModalActions.openAddSectionModal();
+        });
+
+        expect(result.current.modalState.isAddSectionModalOpen).toBe(true);
+        expect(result.current.isAnyModalOpened).toBe(true);
+    });
+
+    it('should not open add section modal when another modal is already open', () => {
+        const { result } = renderHook(() => useModalsState<string>());
+
+        act(() => {
+            result.current.openModalActions.openAddItemModal();
+        });
+
+        act(() => {
+            result.current.openModalActions.openAddSectionModal();
+        });
+
+        expect(result.current.modalState.isAddSectionModalOpen).toBe(false);
+        expect(result.current.modalState.isAddModalOpen).toBe(true);
+    });
+
+    it('should close add section modal', () => {
+        const { result } = renderHook(() => useModalsState<string>());
+
+        act(() => {
+            result.current.openModalActions.openAddSectionModal();
+        });
+
+        act(() => {
+            result.current.closeModalActions.closeAddSectionModal();
+        });
+
+        expect(result.current.modalState.isAddSectionModalOpen).toBe(false);
+        expect(result.current.isAnyModalOpened).toBe(false);
+    });
+
+    it('should open translate category modal when no other modals are open', () => {
+        const { result } = renderHook(() => useModalsState<string>());
+
+        act(() => {
+            result.current.openModalActions.openTranslateCategoryModal();
+        });
+
+        expect(result.current.modalState.isCategoryToTranslate).toBe(true);
+        expect(result.current.isAnyModalOpened).toBe(true);
+    });
+    it('should not open translate category modal when another modal is already open', () => {
+        const { result } = renderHook(() => useModalsState<string>());
+
+        act(() => {
+            result.current.openModalActions.openAddItemModal();
+        });
+
+        act(() => {
+            result.current.openModalActions.openTranslateCategoryModal();
+        });
+
+        expect(result.current.modalState.isCategoryToTranslate).toBe(false);
+        expect(result.current.isAnyModalOpened).toBe(true);
+    });
+    it('should close translate category modal', () => {
+        const { result } = renderHook(() => useModalsState<string>());
+        act(() => {
+            result.current.openModalActions.openTranslateCategoryModal();
+        });
+
+        act(() => {
+            result.current.closeModalActions.closeTranslateCategoryModal();
+        });
+        expect(result.current.modalState.isCategoryToTranslate).toBe(false);
+        expect(result.current.isAnyModalOpened).toBe(false);
+    });
+    it('should open edit category translation modal when no other modals are open', () => {
+        const { result } = renderHook(() => useModalsState<string>());
+        act(() => {
+            result.current.openModalActions.openEditCategoryTranslationModal();
+        });
+
+        expect(result.current.modalState.isCategoryToEditTranslation).toBe(true);
+        expect(result.current.isAnyModalOpened).toBe(true);
+    });
+    it('should not open edit category translation modal when another modal is already open', () => {
+        const { result } = renderHook(() => useModalsState<string>());
+        act(() => {
+            result.current.openModalActions.openAddItemModal();
+        });
+        act(() => {
+            result.current.openModalActions.openEditCategoryTranslationModal();
+        });
+        expect(result.current.modalState.isCategoryToEditTranslation).toBe(false);
+        expect(result.current.isAnyModalOpened).toBe(true);
+    });
+    it('should close edit category translation modal', () => {
+        const { result } = renderHook(() => useModalsState<string>());
+        act(() => {
+            result.current.openModalActions.openEditCategoryTranslationModal();
+        });
+        act(() => {
+            result.current.closeModalActions.closeEditCategoryTranslationModal();
+        });
+        expect(result.current.modalState.isCategoryToEditTranslation).toBe(false);
+        expect(result.current.isAnyModalOpened).toBe(false);
+    });
     it('should correctly detect any modal opened - boolean values', () => {
         const { result } = renderHook(() => useModalsState<string>());
 

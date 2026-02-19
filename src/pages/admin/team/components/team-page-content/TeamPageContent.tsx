@@ -87,6 +87,8 @@ export const TeamPageContent = () => {
                 openModalActions.openEditCategoryModal();
             } else if (id === 'delete') {
                 openModalActions.openDeleteCategoryModal();
+            } else if (id === 'addTranslation') {
+                openModalActions.openTranslateCategoryModal();
             }
         },
         [openModalActions],
@@ -97,6 +99,7 @@ export const TeamPageContent = () => {
             { id: 'add', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_CATEGORY },
             { id: 'edit', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.EDIT_CATEGORY },
             { id: 'delete', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.DELETE_CATEGORY },
+            { id: 'addTranslation', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_TRANSLATION },
         ],
         [],
     );
@@ -299,7 +302,6 @@ export const TeamPageContent = () => {
         },
         [isAnyModalOpened, openModalActions, englishLanguage],
     );
-
     const handleDeleteTeamMemberModalOpen = useCallback(
         (member: TeamMember) => {
             if (isAnyModalOpened) return;
@@ -498,6 +500,17 @@ export const TeamPageContent = () => {
         },
         [selectedCategory?.id],
     );
+    const handleTranslateCategory = useCallback(
+        (updatedCategory: TeamCategory) => {
+            setCategories((prevCategories) =>
+                prevCategories.map((category) => (category.id === updatedCategory.id ? updatedCategory : category)),
+            );
+            closeModalActions.closeTranslateCategoryModal();
+
+            addToast(COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS, ToastType.Success);
+        },
+        [closeModalActions, addToast],
+    );
 
     const handleSearchItemSelect = useCallback(
         (member: TeamMember) => {
@@ -619,14 +632,16 @@ export const TeamPageContent = () => {
             <TeamPageModals
                 modalsStateControl={modalsStateControl}
                 categories={categories}
-                englishLanguage={englishLanguage}
+                translatedLanguages={translationLanguages}
                 onAddTeamMember={handleAddMember}
                 onEditTeamMember={handleEditMember}
                 onTranslateTeamMember={handleTranslateMember}
+                onTranslateTeamCategory={handleTranslateCategory}
                 onDeleteTeamMember={handleDeleteMember}
                 onAddTeamCategory={handleAddCategory}
                 onEditTeamCategory={handleEditCategory}
                 onDeleteTeamCategory={handleDeleteCategory}
+                selectedCategory={selectedCategory}
             />
             <ToastContainer />
         </div>

@@ -70,6 +70,8 @@ describe('ProgramsPageModals', () => {
         closeEditCategoryModal: jest.fn(),
         closeDeleteCategoryModal: jest.fn(),
         closeAddSectionModal: jest.fn(),
+        closeTranslateCategoryModal: jest.fn(),
+        closeEditCategoryTranslationModal: jest.fn(),
     };
 
     const createMockModalsState = (
@@ -85,6 +87,8 @@ describe('ProgramsPageModals', () => {
             isEditCategoryModalOpen: false,
             isDeleteCategoryModalOpen: false,
             isAddSectionModalOpen: false,
+            isCategoryToTranslate: false,
+            isCategoryToEditTranslation: false,
             ...overrides,
         },
         closeModalActions: mockCloseModalActions,
@@ -98,6 +102,8 @@ describe('ProgramsPageModals', () => {
             openEditCategoryModal: jest.fn(),
             openDeleteCategoryModal: jest.fn(),
             openAddSectionModal: jest.fn(),
+            openTranslateCategoryModal: jest.fn(),
+            openEditCategoryTranslationModal: jest.fn(),
         },
         isAnyModalOpened: false,
     });

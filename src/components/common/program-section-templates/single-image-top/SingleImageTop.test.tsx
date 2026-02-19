@@ -74,7 +74,8 @@ describe('SingleImageTop', () => {
         render(<SingleImageTop {...baseProps} mode={ProgramSectionMode.Edit} />);
 
         const photoProps = mockPhotoInputGroup.mock.calls[0]?.[0];
-        expect(photoProps).toEqual(expect.any(Object));
+
+        expect(photoProps).toBeDefined();
         expect(photoProps.onChange).toEqual(expect.any(Function));
         expect(photoProps.setError).toEqual(expect.any(Function));
 

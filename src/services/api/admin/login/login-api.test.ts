@@ -19,7 +19,6 @@ describe('login-page-data-fetch', () => {
 
     it('loginRequest returns accessToken on success', async () => {
         const creds: Credentials = { email: 'test@test.com', password: 'password' };
-        const mockToken = 'mock-access-token';
         const mockResponse = { data: { accessToken: mockToken } } as { data: AuthResponse };
 
         (AuthClient.post as jest.Mock).mockResolvedValueOnce(mockResponse);
@@ -27,11 +26,23 @@ describe('login-page-data-fetch', () => {
         const token = await loginRequest(creds);
 
         expect(token).toBe(mockToken);
+        expect(AuthClient.post).toHaveBeenCalledWith(API_ROUTES.AUTH.LOGIN, creds);
     });
 
     it('tokenRefreshRequest throws on error', async () => {
         (AuthClient.post as jest.Mock).mockRejectedValueOnce(new Error('fail'));
         await expect(tokenRefreshRequest()).rejects.toThrow('fail');
+    });
+
+    it('tokenRefreshRequest returns accessToken on success', async () => {
+        const mockResponse = { data: { accessToken: mockToken } } as { data: AuthResponse };
+
+        (AuthClient.post as jest.Mock).mockResolvedValueOnce(mockResponse);
+
+        const token = await tokenRefreshRequest();
+
+        expect(token).toBe(mockToken);
+        expect(AuthClient.post).toHaveBeenCalledWith(API_ROUTES.AUTH.REFRESH_TOKEN);
     });
 
     it('logoutRequest success', async () => {

@@ -1,29 +1,21 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { ContentType } from '@/types/common/programs';
+import { ProgramSectionTemplate } from '@/types/common/program-sections';
+
 import { DescriptionAuthorPairCard } from './DescriptionAuthorPairCard';
+import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
 
-const mockTextAreaProps = jest.fn();
-const mockInputProps = jest.fn();
-
-jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
-    InputWithCharacterLimitGroup: (props: any) => {
-        mockInputProps(props);
-        const { id, value, onChange } = props;
-        return <input data-testid={`input-${id}`} value={value} onChange={onChange} />;
-    },
+jest.mock('@/utils/functions/program-section-template-validation/programSectionTemplateValidation', () => ({
+    getProgramSectionTemplateMaxLength: jest.fn(() => 50),
 }));
 
-jest.mock(
-    '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
-    () => ({
-        TextAreaWithCharacterLimitGroup: (props: any) => {
-            mockTextAreaProps(props);
-            const { id, value, onChange } = props;
-            return <textarea data-testid={`textarea-${id}`} value={value} onChange={onChange} />;
-        },
-    }),
-);
+jest.mock('@/validation/admin/program-schema/program-schema', () => ({
+    PROGRAM_SECTION_VALIDATION_FUNCTIONS: {
+        validateContentText: jest.fn(),
+    },
+}));
 
 jest.mock('@/const/admin/programs', () => ({
     PROGRAMS_TEXT: {
@@ -36,121 +28,149 @@ jest.mock('@/const/admin/programs', () => ({
             },
         },
     },
-    PROGRAM_SECTION_VALIDATION: {
-        cardDescription: { max: 200 },
-        cardAuthor: { max: 50 },
-    },
 }));
 
 jest.mock('@/assets/icons/delete.svg', () => ({
     ReactComponent: () => <svg data-testid="delete-icon" />,
 }));
 
-const setup = (props: React.ComponentProps<typeof DescriptionAuthorPairCard>) => {
-    mockTextAreaProps.mockClear();
-    mockInputProps.mockClear();
+jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
+    InputWithCharacterLimitGroup: (props: any) => {
+        const { id, value, onChange, onBlur, error } = props;
+        return (
+            <div data-testid={`input-group-${id}`} data-error={error ?? ''}>
+                <input data-testid={`input-${id}`} value={value} onChange={onChange} onBlur={onBlur} />
+            </div>
+        );
+    },
+}));
+
+jest.mock(
+    '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
+    () => ({
+        TextAreaWithCharacterLimitGroup: (props: any) => {
+            const { id, value, onChange, onBlur, error } = props;
+            return (
+                <div data-testid={`textarea-group-${id}`} data-error={error ?? ''}>
+                    <textarea data-testid={`textarea-${id}`} value={value} onChange={onChange} onBlur={onBlur} />
+                </div>
+            );
+        },
+    }),
+);
+
+const validateContentTextMock = PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateContentText as unknown as jest.Mock<
+    string | undefined
+>;
+
+type DescriptionAuthorPairCardProps = React.ComponentProps<typeof DescriptionAuthorPairCard>;
+
+const renderCard = (overrides: Partial<DescriptionAuthorPairCardProps> = {}) => {
+    const props: DescriptionAuthorPairCardProps = {
+        description: 'D',
+        author: 'A',
+        index: 0,
+        isEditable: true,
+        ...overrides,
+    };
+
     return render(<DescriptionAuthorPairCard {...props} />);
 };
 
 describe('DescriptionAuthorPairCard', () => {
-    it('renders preview text when not editable', () => {
-        setup({ description: 'D', author: 'A', index: 0, isEditable: false });
+    beforeEach(() => {
+        validateContentTextMock.mockReset();
+        validateContentTextMock.mockReturnValue(undefined);
+    });
 
-        expect(screen.getByText('D')).toBeInTheDocument();
-        expect(screen.getByText('A')).toBeInTheDocument();
+    it('renders preview when not editable', () => {
+        renderCard({ isEditable: false, description: 'Desc', author: 'Auth' });
+
+        expect(screen.getByText('Desc')).toBeInTheDocument();
+        expect(screen.getByText('Auth')).toBeInTheDocument();
+        expect(screen.queryByTestId('delete-icon')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('textarea-pair-description-0')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('input-pair-author-0')).not.toBeInTheDocument();
+    });
+
+    it('renders editable inputs and hides delete for first card', () => {
+        renderCard({ index: 0 });
+
+        expect(screen.getByTestId('textarea-pair-description-0')).toBeInTheDocument();
+        expect(screen.getByTestId('input-pair-author-0')).toBeInTheDocument();
         expect(screen.queryByLabelText('delete')).not.toBeInTheDocument();
     });
 
-    it('renders editable fields and delete button when editable', () => {
-        setup({ description: 'D', author: 'A', index: 2, isEditable: true });
-
-        expect(screen.getByLabelText('delete')).toBeInTheDocument();
-        expect(screen.getByTestId('delete-icon')).toBeInTheDocument();
-
-        expect(screen.getByTestId('textarea-pair-description-2')).toBeInTheDocument();
-        expect(screen.getByTestId('input-pair-author-2')).toBeInTheDocument();
-    });
-
-    it('calls onDelete with index', () => {
+    it('renders delete for cards after the first and calls onDelete', () => {
         const onDelete = jest.fn();
-        setup({ description: 'D', author: 'A', index: 3, isEditable: true, onDelete });
+        renderCard({ index: 2, onDelete });
 
         fireEvent.click(screen.getByLabelText('delete'));
 
-        expect(onDelete).toHaveBeenCalledWith(3);
+        expect(onDelete).toHaveBeenCalledTimes(1);
+        expect(onDelete).toHaveBeenCalledWith(2);
     });
 
-    it('does not crash when delete clicked without onDelete', () => {
-        setup({ description: 'D', author: 'A', index: 1, isEditable: true });
+    it('does not throw when delete clicked without onDelete', () => {
+        renderCard({ index: 1, onDelete: undefined });
 
         fireEvent.click(screen.getByLabelText('delete'));
 
         expect(true).toBe(true);
     });
 
-    it('calls onDescriptionChange with index and value', () => {
+    it('calls change handlers with index and value', () => {
         const onDescriptionChange = jest.fn();
-        setup({
-            description: '',
-            author: 'A',
-            index: 4,
-            isEditable: true,
-            onDescriptionChange,
-        });
-
-        fireEvent.change(screen.getByTestId('textarea-pair-description-4'), { target: { value: 'X' } });
-
-        expect(onDescriptionChange).toHaveBeenCalledWith(4, 'X');
-    });
-
-    it('does not crash when description changes without onDescriptionChange', () => {
-        setup({
-            description: '',
-            author: 'A',
-            index: 5,
-            isEditable: true,
-        });
-
-        fireEvent.change(screen.getByTestId('textarea-pair-description-5'), { target: { value: 'X' } });
-
-        expect(true).toBe(true);
-    });
-
-    it('calls onAuthorChange with index and value', () => {
         const onAuthorChange = jest.fn();
-        setup({
-            description: 'D',
-            author: '',
-            index: 6,
-            isEditable: true,
-            onAuthorChange,
-        });
 
-        fireEvent.change(screen.getByTestId('input-pair-author-6'), { target: { value: 'Y' } });
+        renderCard({ index: 4, description: '', author: '', onDescriptionChange, onAuthorChange });
 
-        expect(onAuthorChange).toHaveBeenCalledWith(6, 'Y');
+        fireEvent.change(screen.getByTestId('textarea-pair-description-4'), { target: { value: 'New desc' } });
+        fireEvent.change(screen.getByTestId('input-pair-author-4'), { target: { value: 'New author' } });
+
+        expect(onDescriptionChange).toHaveBeenCalledWith(4, 'New desc');
+        expect(onAuthorChange).toHaveBeenCalledWith(4, 'New author');
     });
 
-    it('does not crash when author changes without onAuthorChange', () => {
-        setup({
-            description: 'D',
-            author: '',
-            index: 7,
-            isEditable: true,
+    it('validates on blur and re-validates on change after an error appears', async () => {
+        validateContentTextMock.mockReturnValue('error');
+
+        renderCard({ index: 3, description: '', author: '' });
+
+        fireEvent.blur(screen.getByTestId('textarea-pair-description-3'));
+        fireEvent.blur(screen.getByTestId('input-pair-author-3'));
+
+        expect(validateContentTextMock).toHaveBeenCalledTimes(2);
+        expect(validateContentTextMock).toHaveBeenNthCalledWith(
+            1,
+            '',
+            ContentType.Description,
+            true,
+            ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
+        );
+        expect(validateContentTextMock).toHaveBeenNthCalledWith(
+            2,
+            '',
+            ContentType.Author,
+            true,
+            ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
+        );
+
+        await waitFor(() => {
+            expect(screen.getByTestId('textarea-group-pair-description-3')).toHaveAttribute('data-error', 'error');
+            expect(screen.getByTestId('input-group-pair-author-3')).toHaveAttribute('data-error', 'error');
         });
 
-        fireEvent.change(screen.getByTestId('input-pair-author-7'), { target: { value: 'Y' } });
+        validateContentTextMock.mockReturnValue(undefined);
 
-        expect(true).toBe(true);
-    });
+        fireEvent.change(screen.getByTestId('textarea-pair-description-3'), { target: { value: 'X' } });
+        fireEvent.change(screen.getByTestId('input-pair-author-3'), { target: { value: 'Y' } });
 
-    it('passes ids based on index to inputs', () => {
-        setup({ description: 'D', author: 'A', index: 9, isEditable: true });
+        expect(validateContentTextMock).toHaveBeenCalledTimes(4);
 
-        expect(mockTextAreaProps).toHaveBeenCalled();
-        expect(mockInputProps).toHaveBeenCalled();
-
-        expect(mockTextAreaProps.mock.calls[0][0].id).toBe('pair-description-9');
-        expect(mockInputProps.mock.calls[0][0].id).toBe('pair-author-9');
+        await waitFor(() => {
+            expect(screen.getByTestId('textarea-group-pair-description-3')).toHaveAttribute('data-error', '');
+            expect(screen.getByTestId('input-group-pair-author-3')).toHaveAttribute('data-error', '');
+        });
     });
 });

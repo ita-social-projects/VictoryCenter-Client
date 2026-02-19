@@ -1,4 +1,4 @@
-@use '@/assets/sass/variables/colors';
+@use '@/assets/sass/variables/colors' as c;
 @use '@/assets/sass/variables/typography';
 
 .container {
@@ -34,6 +34,31 @@
     width: 100%;
     gap: 2.5rem;
     padding: 0 3rem 2rem 3rem;
+    position: relative;
+}
+
+.body-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.8) 100%);
+        z-index: 1;
+        pointer-events: none;
+    }
+}
+
+.background-image-wrapper {
+    max-height: 475px;
+    overflow: hidden;
 }
 
 .body-inputs {
@@ -41,7 +66,20 @@
     display: flex;
     flex-direction: row;
     gap: 2.5rem;
+    position: relative;
+    z-index: 1;
+
+    &.has-background-image {
+        label {
+            color: c.$white;
+        }
+        .counter-section {
+            color: c.$white;
+        }
+    }
 }
+
+
 
 .col-left {
     flex: 6;
@@ -73,7 +111,7 @@
 .sections-divider {
     width: 100%;
     height: 1px;
-    background-color: colors.$grey-700;
+    background-color: c.$grey-700;
 }
 
 .empty-sections-state {
@@ -95,7 +133,7 @@
 }
 
 .plus-icon path {
-    stroke: colors.$blue-500;
+    stroke: c.$blue-500;
 }
 
 .empty-sections-image {
@@ -108,7 +146,7 @@
     font-size: typography.$h3-size;
     font-weight: typography.$fw-semibold;
     line-height: typography.$h3-height;
-    color: colors.$blue-900;
+    color: c.$blue-900;
     margin: 0;
     text-align: center;
 }

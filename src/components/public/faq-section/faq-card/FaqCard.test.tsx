@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { FaqCard } from './FaqCard';
 import { PublishedFaqQuestion } from '../../../../types/public/faq-section';
 import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
-import { TranslationStatus } from '@/types/common/language';
+import { EntityLocalization, TranslationStatus } from '@/types/common/language';
 
 // Mock SVG imports as React components
 jest.mock('../../../../assets/icons/cross.svg', () => ({
@@ -18,16 +18,15 @@ const mockedUseGetLocalization = useGetLocalization as jest.Mock;
 
 describe('test question card component', () => {
     beforeEach(() => {
-        mockedUseGetLocalization.mockImplementation((localizations, fallback) => {
-            if (localizations && localizations.length > 0) {
-                return {
-                    questionText: localizations[0].questionText,
-                    answerText: localizations[0].answerText,
-                };
-            }
+        mockedUseGetLocalization.mockImplementation((_localizations, fallback) => {
             return fallback;
         });
     });
+
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
     const mockQuestion: PublishedFaqQuestion = {
         id: 1,
         questionText: 'Як долучитись до програми?',
@@ -36,8 +35,9 @@ describe('test question card component', () => {
             " Після цього ми зв'яжемось для уточнення деталей.",
         localizations: [],
     };
-    test('should contain correct information', () => {
+    test('should display Ukrainian content (fallback)', () => {
         render(<FaqCard faq={mockQuestion} />);
+        
         const question = screen.getByText(mockQuestion.questionText);
         expect(question).toBeInTheDocument();
 
@@ -61,6 +61,19 @@ describe('test question card component', () => {
     });
 
     test('should render localized question and answer when localizations are available', () => {
+        mockedUseGetLocalization.mockImplementation((localizations, fallback) => {
+            const enLocalization = localizations?.find((loc: EntityLocalization) => loc.language.code === 'en');
+            
+            if (enLocalization) {
+                const { language: _language, translationStatus: _translationStatus, ...localizableFields } = enLocalization;
+                return {
+                    ...fallback,
+                    ...localizableFields,
+                };
+            }
+            return fallback;
+        });
+        
         const localizedQuestionText: string = 'How to join the program?';
         const localizedAnswerText: string =
             'You need to fill out a short questionnaire or write to ' +
@@ -77,12 +90,7 @@ describe('test question card component', () => {
                 },
             ],
         };
-
-        mockedUseGetLocalization.mockReturnValue({
-            questionText: localizedQuestionText,
-            answerText: localizedAnswerText,
-        });
-
+        
         render(<FaqCard faq={localizedQuestion} />);
 
         expect(screen.getByText(localizedQuestionText)).toBeInTheDocument();

@@ -480,4 +480,16 @@ export const PROGRAM_SECTION_TEMPLATE_VALIDATION = {
             },
         },
     },
+
+    [ProgramSectionTemplate.SingleTitleQuestionAnswerPairs]: {
+        counts: {
+            [ContentType.Title]: { min: 1, max: 1 },
+            [ContentType.Description]: { min: 0, max: 0 },
+            [ContentType.Author]: { min: 0, max: 0 },
+            [ContentType.Image]: { min: 0, max: 0 },
+        },
+        lengths: {
+            [ContentType.Title]: { min: 5, max: 50 },
+        },
+    },
 } as const;

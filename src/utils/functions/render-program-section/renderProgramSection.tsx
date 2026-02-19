@@ -12,6 +12,7 @@ import { SingleImageRight } from '@/components/common/program-section-templates/
 import { TitleDescriptionCardsWrapper } from '@/components/common/program-section-templates/title-description-cards/TitleDescriptionCardsWrapper';
 import { SingleTitleQuintupleDescription } from '@/components/common/program-section-templates/single-title-quintuple-description/SingleTitleQuintupleDescription';
 import { SingleTitleDescriptionAuthorPairs } from '@/components/common/program-section-templates/single-title-description-author-pairs/SingleTitleDescriptionAuthorPairs';
+import { FaqProgramSection } from '@/components/common/program-section-templates/faq-program-section/FaqProgramSection';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 
 export interface ProgramSectionCardData {
@@ -31,6 +32,7 @@ export interface ProgramSectionData {
     images?: (Image | ImageValues | null)[];
     cards?: ProgramSectionCardData[];
     descriptionAuthorPairs?: DescriptionAuthorPairData[];
+    faqQuestions?: any[];
 }
 
 export interface ProgramSectionHandlers {
@@ -147,6 +149,14 @@ export const getInitialSectionContents = (templateId: ProgramSectionTemplate): P
         ];
     }
 
+    if (templateId === ProgramSectionTemplate.SingleTitleQuestionAnswerPairs) {
+        return [
+            createItem(ContentType.Title, 0, {
+                title: 'FAQ',
+            } as any),
+        ];
+    }
+
     const cardCount = CARD_COUNT_MAP[templateId];
     if (cardCount) return createCardContents(cardCount);
 
@@ -196,6 +206,10 @@ export const renderProgramSection = ({
                 canAddPair={handlers?.canAddPair}
             />
         );
+    }
+
+    if (templateId === ProgramSectionTemplate.SingleTitleQuestionAnswerPairs) {
+        return <FaqProgramSection questions={data.faqQuestions ?? []} mode={mode} title={data.title} />;
     }
 
     if (templateId === ProgramSectionTemplate.SingleTitleQuintupleDescription) {

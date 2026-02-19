@@ -2,37 +2,30 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ReportsPanelContent } from './ReportsPanelContent';
 
-var toolbarProps: any = null;
-var mediaSettingsProps: any = null;
-
 const mockSubmit = jest.fn();
 
 jest.mock('../reports-page-toolbar/ReportsPageToolbar', () => ({
-    ReportsPageToolbar: (props: any) => {
-        toolbarProps = props;
-        return (
-            <div data-testid="mock-toolbar">
-                <button data-testid="edit-btn" onClick={props.onEdit}>
-                    Edit
-                </button>
-                <button data-testid="cancel-btn" onClick={props.onCancel}>
-                    Cancel
-                </button>
-                <button data-testid="publish-btn" onClick={props.onPublish} disabled={props.isPublishDisabled}>
-                    Publish
-                </button>
-                <span data-testid="is-editing">{props.isEditing ? 'true' : 'false'}</span>
-                <span data-testid="is-publish-disabled">{props.isPublishDisabled ? 'true' : 'false'}</span>
-            </div>
-        );
-    },
+    ReportsPageToolbar: (props: any) => (
+        <div data-testid="mock-toolbar">
+            <button data-testid="edit-btn" onClick={props.onEdit}>
+                Edit
+            </button>
+            <button data-testid="cancel-btn" onClick={props.onCancel}>
+                Cancel
+            </button>
+            <button data-testid="publish-btn" onClick={props.onPublish} disabled={props.isPublishDisabled}>
+                Publish
+            </button>
+            <span data-testid="is-editing">{props.isEditing ? 'true' : 'false'}</span>
+            <span data-testid="is-publish-disabled">{props.isPublishDisabled ? 'true' : 'false'}</span>
+        </div>
+    ),
 }));
 
 jest.mock('../media-settings/MediaSettings', () => {
     const React = require('react');
     return {
         MediaSettings: React.forwardRef((props: any, ref: any) => {
-            mediaSettingsProps = props;
             React.useImperativeHandle(ref, () => ({
                 submit: (...args: any[]) => mockSubmit(...args),
             }));
@@ -62,6 +55,8 @@ jest.mock('./ReportsPanelContent.module.scss', () => ({
     content: 'content',
 }));
 
+const renderComponent = () => render(<ReportsPanelContent />);
+
 const clickEdit = () => fireEvent.click(screen.getByTestId('edit-btn'));
 const clickCancel = () => fireEvent.click(screen.getByTestId('cancel-btn'));
 const clickPublish = () => fireEvent.click(screen.getByTestId('publish-btn'));
@@ -79,35 +74,42 @@ const expectResetCounter = (value: number) =>
 describe('ReportsPanelContent', () => {
     beforeEach(() => {
         jest.clearAllMocks();
-        toolbarProps = null;
-        mediaSettingsProps = null;
         mockSubmit.mockResolvedValue(true);
-        render(<ReportsPanelContent />);
     });
 
     describe('Initial render', () => {
         it('should render toolbar, media settings, and toast container', () => {
+            renderComponent();
+
             expect(screen.getByTestId('mock-toolbar')).toBeInTheDocument();
             expect(screen.getByTestId('mock-media-settings')).toBeInTheDocument();
             expect(screen.getByTestId('mock-toast-container')).toBeInTheDocument();
         });
 
         it('should start in non-editing mode', () => {
+            renderComponent();
+
             expectEditing(false);
             expectMsEditing(false);
         });
 
         it('should start with publish button disabled (not dirty)', () => {
+            renderComponent();
+
             expectPublishDisabled(true);
         });
 
         it('should start with resetCounter at 0', () => {
+            renderComponent();
+
             expectResetCounter(0);
         });
     });
 
     describe('Edit mode', () => {
         it('should enter editing mode when Edit button is clicked', () => {
+            renderComponent();
+
             clickEdit();
 
             expectEditing(true);
@@ -115,6 +117,8 @@ describe('ReportsPanelContent', () => {
         });
 
         it('should reset dirty state when entering edit mode', () => {
+            renderComponent();
+
             markDirty();
             expectPublishDisabled(false);
 
@@ -125,6 +129,8 @@ describe('ReportsPanelContent', () => {
 
     describe('Cancel', () => {
         it('should exit editing mode when Cancel is clicked', () => {
+            renderComponent();
+
             clickEdit();
             expectEditing(true);
 
@@ -133,6 +139,8 @@ describe('ReportsPanelContent', () => {
         });
 
         it('should increment resetCounter when Cancel is clicked', () => {
+            renderComponent();
+
             expectResetCounter(0);
 
             clickCancel();
@@ -143,6 +151,8 @@ describe('ReportsPanelContent', () => {
         });
 
         it('should reset dirty state when Cancel is clicked', () => {
+            renderComponent();
+
             markDirty();
             expectPublishDisabled(false);
 
@@ -153,6 +163,8 @@ describe('ReportsPanelContent', () => {
 
     describe('Dirty state', () => {
         it('should enable publish button when dirty', () => {
+            renderComponent();
+
             expectPublishDisabled(true);
 
             markDirty();
@@ -160,6 +172,8 @@ describe('ReportsPanelContent', () => {
         });
 
         it('should disable publish button when marked clean', () => {
+            renderComponent();
+
             markDirty();
             expectPublishDisabled(false);
 
@@ -170,6 +184,8 @@ describe('ReportsPanelContent', () => {
 
     describe('Publish', () => {
         it('should reset dirty state after successful publish', async () => {
+            renderComponent();
+
             clickEdit();
             markDirty();
             expectPublishDisabled(false);
@@ -183,6 +199,7 @@ describe('ReportsPanelContent', () => {
 
         it('should stay in editing mode when publish fails', async () => {
             mockSubmit.mockResolvedValue(false);
+            renderComponent();
 
             clickEdit();
             clickPublish();

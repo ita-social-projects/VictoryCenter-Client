@@ -1,5 +1,5 @@
 import React, { createRef } from 'react';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent, act, createEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 import { TranslateMemberForm, TranslateTeamMemberFormRef } from './TranslateMemberForm';
@@ -9,18 +9,6 @@ jest.mock('@/validation/admin/team-member-schema/team-member-schema', () => ({
         validateFullName: jest.fn(() => undefined),
         validateDescription: jest.fn(() => undefined),
     },
-}));
-
-jest.mock('@/components/common/select/Select', () => {
-    const Select = ({ children }: any) => <div data-testid="select">{children}</div>;
-
-    Select.Option = ({ children }: any) => <div data-testid="select-option">{children}</div>;
-
-    return { Select };
-});
-
-jest.mock('@/components/admin/button/Button', () => ({
-    Button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
 }));
 
 jest.mock('../common-member-fields/CommonMemberFields', () => ({
@@ -51,12 +39,22 @@ jest.mock('../common-member-fields/CommonMemberFields', () => ({
     ),
 }));
 
+const mockLanguages = [
+    { id: '1', code: 'EN', name: 'English' },
+    { id: '2', code: 'UA', name: 'Ukrainian' },
+];
+
 const renderForm = (props: any = {}) => {
     const ref = createRef<TranslateTeamMemberFormRef>();
+    const defaultProps = {
+        languages: mockLanguages,
+        selectedLanguage: mockLanguages[0],
+        onLanguageChange: jest.fn(),
+        onSubmit: jest.fn(),
+    };
 
-    render(<TranslateMemberForm ref={ref} onSubmit={jest.fn()} {...props} />);
-
-    return { ref };
+    render(<TranslateMemberForm ref={ref} {...defaultProps} {...props} />);
+    return { ref, ...defaultProps, ...props };
 };
 
 describe('TranslateMemberForm', () => {
@@ -66,7 +64,6 @@ describe('TranslateMemberForm', () => {
         expect(screen.getByTestId('test-form')).toBeInTheDocument();
         expect(screen.getByTestId('fullName')).toBeInTheDocument();
         expect(screen.getByTestId('description')).toBeInTheDocument();
-        expect(screen.getByTestId('select')).toBeInTheDocument();
     });
 
     it('fills fields with initialData', () => {
@@ -107,7 +104,6 @@ describe('TranslateMemberForm', () => {
         fireEvent.blur(screen.getByTestId('description'));
 
         expect(TEAM_MEMBER_VALIDATION_FUNCTIONS.validateFullName).toHaveBeenCalled();
-
         expect(TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription).toHaveBeenCalled();
     });
 
@@ -146,5 +142,18 @@ describe('TranslateMemberForm', () => {
 
         expect(screen.getByTestId('fullName')).toBeDisabled();
         expect(screen.getByTestId('description')).toBeDisabled();
+    });
+
+    it('prevents default behavior on form submit', () => {
+        renderForm();
+        const form = screen.getByTestId('test-form');
+
+        const event = createEvent.submit(form);
+
+        event.preventDefault = jest.fn();
+
+        fireEvent(form, event);
+
+        expect(event.preventDefault).toHaveBeenCalled();
     });
 });

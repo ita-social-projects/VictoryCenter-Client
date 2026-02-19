@@ -75,4 +75,7 @@ export const API_ROUTES = {
         MEDIA_SETTINGS: 'Report/report',
         BASE: 'Report',
     },
+    FAQ_LOCALIZATIONS: {
+        BASE: 'FaqQuestionLocalizations',
+    },
 };

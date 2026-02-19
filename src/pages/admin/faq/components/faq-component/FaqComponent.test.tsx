@@ -12,6 +12,11 @@ jest.mock('@/components/admin/button-tooltip/ButtonTooltip', () => ({
 jest.mock('@/components/admin/visibility-status-label/VisibilityStatusLabel', () => ({
     VisibilityStatusLabel: ({ status }: any) => <span data-testid="status-label">{status}</span>,
 }));
+
+jest.mock('@/components/admin/localization-statuses/LocalizationStatuses', () => ({
+    LocalizationStatuses: () => <div data-testid="localization-statuses"></div>,
+}));
+
 const mockDefaultLocale: LocalizationLanguage = {
     id: 1,
     code: DEFAULT_LOCALE,
@@ -51,6 +56,7 @@ describe('FaqComponent', () => {
                 faq={mockFaq}
                 handleOnDeleteFaq={jest.fn()}
                 handleOnEditFaq={jest.fn()}
+                handleOnTranslateFaq={jest.fn()}
                 translationLanguages={mockTranslationLocale}
                 language={mockDefaultLocale}
             />,
@@ -67,6 +73,7 @@ describe('FaqComponent', () => {
                 faq={mockFaq}
                 handleOnDeleteFaq={jest.fn()}
                 handleOnEditFaq={jest.fn()}
+                handleOnTranslateFaq={jest.fn()}
                 translationLanguages={mockTranslationLocale}
                 language={mockDefaultLocale}
             />,
@@ -83,6 +90,7 @@ describe('FaqComponent', () => {
                 faq={draftFaq}
                 handleOnDeleteFaq={jest.fn()}
                 handleOnEditFaq={jest.fn()}
+                handleOnTranslateFaq={jest.fn()}
                 translationLanguages={mockTranslationLocale}
                 language={mockDefaultLocale}
             />,
@@ -97,6 +105,7 @@ describe('FaqComponent', () => {
                 faq={mockFaq}
                 handleOnDeleteFaq={jest.fn()}
                 handleOnEditFaq={handleOnEditFaq}
+                handleOnTranslateFaq={jest.fn()}
                 translationLanguages={mockTranslationLocale}
                 language={mockDefaultLocale}
             />,
@@ -112,11 +121,28 @@ describe('FaqComponent', () => {
                 faq={mockFaq}
                 handleOnDeleteFaq={handleOnDeleteFaq}
                 handleOnEditFaq={jest.fn()}
+                handleOnTranslateFaq={jest.fn()}
                 translationLanguages={mockTranslationLocale}
                 language={mockDefaultLocale}
             />,
         );
         fireEvent.click(container.querySelector('.faq-delete-btn')!);
         expect(handleOnDeleteFaq).toHaveBeenCalledWith(mockFaq);
+    });
+
+    it('calls handleOnTranslateFaq when translate button is clicked', () => {
+        const handleOnTranslateFaq = jest.fn();
+        const { container } = render(
+            <FaqComponent
+                faq={mockFaq}
+                handleOnDeleteFaq={jest.fn()}
+                handleOnEditFaq={jest.fn()}
+                handleOnTranslateFaq={handleOnTranslateFaq}
+                translationLanguages={mockTranslationLocale}
+                language={mockDefaultLocale}
+            />,
+        );
+        fireEvent.click(container.querySelector('.faq-translate-btn')!);
+        expect(handleOnTranslateFaq).toHaveBeenCalledWith(mockFaq);
     });
 });

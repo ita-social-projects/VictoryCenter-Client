@@ -262,7 +262,9 @@ describe('TitleDescriptionCard', () => {
                 card: { title: '', description: 'Any' },
             });
 
-            expect(screen.getByRole('heading', { level: 3, name: PROGRAMS_TEXT.SECTION.CARD.FORM.TITLE.TEXT })).toBeInTheDocument();
+            expect(
+                screen.getByRole('heading', { level: 3, name: PROGRAMS_TEXT.SECTION.CARD.FORM.TITLE.TEXT }),
+            ).toBeInTheDocument();
         });
 
         it('renders list when parseDescriptionList returns items (no intro)', () => {

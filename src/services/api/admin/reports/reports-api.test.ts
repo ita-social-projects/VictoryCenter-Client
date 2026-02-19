@@ -10,9 +10,7 @@ import { Image } from '@/types/common/image';
 
 jest.mock('../image/image-api');
 
-const createCollectedFundsBlockDto = (
-    overrides: Partial<ReportsMediaSettingsDto['collectedFundsBlock']> = {},
-) => ({
+const createCollectedFundsBlockDto = (overrides: Partial<ReportsMediaSettingsDto['collectedFundsBlock']> = {}) => ({
     title: 'CF Title',
     collectedAmount: 250000,
     image: { id: 10, url: 'https://img/cf.png', mimeType: 'image/png' } as Image,
@@ -20,9 +18,7 @@ const createCollectedFundsBlockDto = (
     ...overrides,
 });
 
-const createChangedLivesBlockDto = (
-    overrides: Partial<ReportsMediaSettingsDto['changedLivesBlock']> = {},
-) => ({
+const createChangedLivesBlockDto = (overrides: Partial<ReportsMediaSettingsDto['changedLivesBlock']> = {}) => ({
     title: 'CL Title',
     changedLives: 56,
     image: { id: 20, url: 'https://img/cl.png', mimeType: 'image/png' } as Image,
@@ -116,16 +112,34 @@ describe('ReportsApi', () => {
                 .mockResolvedValueOnce({ finalImageId: 21, imageIdToDelete: 20 });
 
             const responseDto = createResponseDto(
-                { title: 'New CF Title', collectedAmount: 300000, image: { id: 11, url: 'https://img/cf-new.png', mimeType: 'image/png' }, imageId: 11 },
-                { title: 'New CL Title', changedLives: 100, image: { id: 21, url: 'https://img/cl-new.png', mimeType: 'image/jpeg' }, imageId: 21 },
+                {
+                    title: 'New CF Title',
+                    collectedAmount: 300000,
+                    image: { id: 11, url: 'https://img/cf-new.png', mimeType: 'image/png' },
+                    imageId: 11,
+                },
+                {
+                    title: 'New CL Title',
+                    changedLives: 100,
+                    image: { id: 21, url: 'https://img/cl-new.png', mimeType: 'image/jpeg' },
+                    imageId: 21,
+                },
             );
             mockClient.put.mockResolvedValueOnce({ data: responseDto });
 
             const result = await ReportsApi.updateMediaSettings(mockClient, request);
 
             expect(mockedImageApi.getUpdateImageId).toHaveBeenCalledTimes(2);
-            expect(mockedImageApi.getUpdateImageId).toHaveBeenCalledWith(mockClient, request.collectedFunds.image, request.collectedFunds.imageId);
-            expect(mockedImageApi.getUpdateImageId).toHaveBeenCalledWith(mockClient, request.changedLives.image, request.changedLives.imageId);
+            expect(mockedImageApi.getUpdateImageId).toHaveBeenCalledWith(
+                mockClient,
+                request.collectedFunds.image,
+                request.collectedFunds.imageId,
+            );
+            expect(mockedImageApi.getUpdateImageId).toHaveBeenCalledWith(
+                mockClient,
+                request.changedLives.image,
+                request.changedLives.imageId,
+            );
 
             expect(mockClient.put).toHaveBeenCalledWith(API_ROUTES.REPORTS.MEDIA_SETTINGS, {
                 collectedFundsBlock: { title: 'New CF Title', collectedAmount: 300000, imageId: 11 },
@@ -136,8 +150,18 @@ describe('ReportsApi', () => {
             expect(mockedImageApi.delete).toHaveBeenCalledWith(mockClient, 20);
 
             expect(result).toEqual({
-                collectedFunds: { title: 'New CF Title', collectedFunds: 300000, image: responseDto.collectedFundsBlock.image, imageId: 11 },
-                changedLives: { title: 'New CL Title', changedLives: 100, image: responseDto.changedLivesBlock.image, imageId: 21 },
+                collectedFunds: {
+                    title: 'New CF Title',
+                    collectedFunds: 300000,
+                    image: responseDto.collectedFundsBlock.image,
+                    imageId: 11,
+                },
+                changedLives: {
+                    title: 'New CL Title',
+                    changedLives: 100,
+                    image: responseDto.changedLivesBlock.image,
+                    imageId: 21,
+                },
             });
         });
 
@@ -164,8 +188,18 @@ describe('ReportsApi', () => {
 
         it('should only delete the image that changed', async () => {
             const request: ReportsMediaSettingsUpdateRequest = {
-                collectedFunds: { title: 'CF Title', collectedFunds: 500, image: { base64: 'new-cf', mimeType: 'image/png' }, imageId: 5 },
-                changedLives: { title: 'CL Title', changedLives: 30, image: { id: 20, url: 'https://img/cl.png', mimeType: 'image/png' }, imageId: 20 },
+                collectedFunds: {
+                    title: 'CF Title',
+                    collectedFunds: 500,
+                    image: { base64: 'new-cf', mimeType: 'image/png' },
+                    imageId: 5,
+                },
+                changedLives: {
+                    title: 'CL Title',
+                    changedLives: 30,
+                    image: { id: 20, url: 'https://img/cl.png', mimeType: 'image/png' },
+                    imageId: 20,
+                },
             };
 
             mockedImageApi.getUpdateImageId
@@ -173,7 +207,12 @@ describe('ReportsApi', () => {
                 .mockResolvedValueOnce({ finalImageId: 20, imageIdToDelete: null });
 
             const responseDto = createResponseDto(
-                { title: 'CF Title', collectedAmount: 500, image: { id: 6, url: 'https://img/cf-new.png', mimeType: 'image/png' }, imageId: 6 },
+                {
+                    title: 'CF Title',
+                    collectedAmount: 500,
+                    image: { id: 6, url: 'https://img/cf-new.png', mimeType: 'image/png' },
+                    imageId: 6,
+                },
                 { title: 'CL Title', changedLives: 30 },
             );
             mockClient.put.mockResolvedValueOnce({ data: responseDto });

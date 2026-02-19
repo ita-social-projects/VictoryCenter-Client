@@ -17,13 +17,13 @@
 .language-select-head {
     display: inline-flex;
     align-items: center;
-    
+
     border: none;
     background: transparent;
     box-shadow: none;
     padding: 0;
-    
-    justify-content: center; 
+
+    justify-content: center;
 
     &::before {
         content: '';
@@ -31,7 +31,7 @@
         height: 20px;
         display: inline-block;
         margin: 4px;
-        background-image: url('../../../assets/icons/globe.svg'); 
+        background-image: url('../../../assets/icons/globe.svg');
         background-size: contain;
         background-position: center;
         flex-shrink: 0;

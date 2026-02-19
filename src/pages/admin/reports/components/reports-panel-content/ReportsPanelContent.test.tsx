@@ -68,8 +68,7 @@ const clickPublish = () => fireEvent.click(screen.getByTestId('publish-btn'));
 const markDirty = () => fireEvent.click(screen.getByTestId('ms-dirty-true'));
 const markClean = () => fireEvent.click(screen.getByTestId('ms-dirty-false'));
 
-const expectEditing = (value: boolean) =>
-    expect(screen.getByTestId('is-editing')).toHaveTextContent(String(value));
+const expectEditing = (value: boolean) => expect(screen.getByTestId('is-editing')).toHaveTextContent(String(value));
 const expectMsEditing = (value: boolean) =>
     expect(screen.getByTestId('ms-is-editing')).toHaveTextContent(String(value));
 const expectPublishDisabled = (value: boolean) =>

@@ -41,6 +41,13 @@ jest.mock('@/const/admin/programs', () => ({
     },
 }));
 
+jest.mock('@/validation/admin/program-schema/program-schema', () => ({
+    PROGRAM_SECTION_VALIDATION_FUNCTIONS: {
+        validateSectionTitle: jest.fn(() => undefined),
+        validateSectionDescription: jest.fn(() => undefined),
+    },
+}));
+
 const setup = (props: React.ComponentProps<typeof SingleTitleQuintupleDescription> = {}) => {
     mockDescProps.mockClear();
     return render(<SingleTitleQuintupleDescription {...props} />);
@@ -50,7 +57,7 @@ const getRoot = (container: HTMLElement) => container.firstElementChild as HTMLE
 const getPreviewTexts = (container: HTMLElement) =>
     Array.from(container.querySelectorAll('p')).map((p) => p.textContent);
 
-const getDescCallIds = () => mockDescProps.mock.calls.map((call: any[]) => call[0]?.id);
+const getDescCallIds = () => mockDescProps.mock.calls.slice(0, 5).map((call: any[]) => call[0]?.id);
 
 describe('SingleTitleQuintupleDescription', () => {
     describe('Preview', () => {

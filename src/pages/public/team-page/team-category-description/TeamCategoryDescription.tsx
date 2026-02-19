@@ -12,7 +12,7 @@ export function TeamCategoryDescription({ team }: TeamCategoryDescriptionProps) 
     });
 
     return (
-        <div className="team_description">
+        <div className="team_category_description">
             <h2>{name}</h2>
             <p>{description}</p>
         </div>

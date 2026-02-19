@@ -25,7 +25,8 @@ const mockTeamDataSingle: TeamItem[] = [
                     code: 'en',
                 },
                 name: 'Main team',
-                description: 'People who coordinate the work of the programs on a daily basis, accompany participants, organize logistics, and facilitate sessions.',
+                description:
+                    'People who coordinate the work of the programs on a daily basis, accompany participants, organize logistics, and facilitate sessions.',
                 translationStatus: 0,
             },
         ],
@@ -83,7 +84,7 @@ describe('TeamPage component', () => {
             return fallback;
         });
     });
-    
+
     afterEach(() => {
         jest.clearAllMocks();
     });
@@ -136,9 +137,13 @@ describe('TeamPage component', () => {
     it('should render team sections with English localization', async () => {
         mockedUseGetLocalization.mockImplementation((localizations, fallback) => {
             const enLocalization = localizations?.find((loc: EntityLocalization) => loc.language.code === 'en');
-            
+
             if (enLocalization) {
-                const { language: _language, translationStatus: _translationStatus, ...localizableFields } = enLocalization;
+                const {
+                    language: _language,
+                    translationStatus: _translationStatus,
+                    ...localizableFields
+                } = enLocalization;
                 return {
                     ...fallback,
                     ...localizableFields,
@@ -152,7 +157,7 @@ describe('TeamPage component', () => {
         });
 
         render(<TeamPage />);
-        
+
         await waitFor(() => {
             expect(screen.getByText('Main team')).toBeInTheDocument();
             expect(

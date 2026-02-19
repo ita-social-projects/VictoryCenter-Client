@@ -1,8 +1,8 @@
-import { useGetLocalization } from "@/hooks/common/use-get-localization/useGetLocalization";
-import { TeamItem } from "@/types/public/team-page";
-import { TeamDescription } from "./TeamDescription";
+import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
+import { TeamItem } from '@/types/public/team-page';
+import { TeamDescription } from './TeamDescription';
 import { render, screen } from '@testing-library/react';
-import { EntityLocalization } from "@/types/common/language";
+import { EntityLocalization } from '@/types/common/language';
 
 jest.mock('@/hooks/common/use-get-localization/useGetLocalization', () => ({
     useGetLocalization: jest.fn(),
@@ -17,11 +17,12 @@ describe('test team description component', () => {
     });
     afterEach(() => {
         jest.clearAllMocks();
-    })
+    });
 
     const mockTeamItem: TeamItem = {
         title: 'Керівництво проєкту',
-        description: 'Керівники компанією, що зібралися разом, аби змінити цей світ на краще та працювати на благо суспільства',
+        description:
+            'Керівники компанією, що зібралися разом, аби змінити цей світ на краще та працювати на благо суспільства',
         localizations: [
             {
                 language: {
@@ -29,15 +30,16 @@ describe('test team description component', () => {
                     code: 'en',
                 },
                 name: 'PROJECT MANAGERS',
-                description: 'Company leaders who have come together to change this world for the better and work for the benefit of society',
+                description:
+                    'Company leaders who have come together to change this world for the better and work for the benefit of society',
                 translationStatus: 0,
             },
         ],
-        members: []
+        members: [],
     };
 
     it('should display Ukrainian content (fallback)', () => {
-        render(<TeamDescription team={mockTeamItem}/>);
+        render(<TeamDescription team={mockTeamItem} />);
 
         const name = screen.getByText(mockTeamItem.title);
         const description = screen.getByText(mockTeamItem.description);
@@ -49,9 +51,13 @@ describe('test team description component', () => {
     it('should display English localized content', () => {
         mockedUseGetLocalization.mockImplementation((localizations, fallback) => {
             const enLocalization = localizations?.find((loc: EntityLocalization) => loc.language.code === 'en');
-            
+
             if (enLocalization) {
-                const { language: _language, translationStatus: _translationStatus, ...localizableFields } = enLocalization;
+                const {
+                    language: _language,
+                    translationStatus: _translationStatus,
+                    ...localizableFields
+                } = enLocalization;
                 return {
                     ...fallback,
                     ...localizableFields,
@@ -60,10 +66,12 @@ describe('test team description component', () => {
             return fallback;
         });
 
-        render(<TeamDescription team={mockTeamItem}/>);
+        render(<TeamDescription team={mockTeamItem} />);
 
         const englishName = screen.getByText('PROJECT MANAGERS');
-        const englishDescription = screen.getByText('Company leaders who have come together to change this world for the better and work for the benefit of society');
+        const englishDescription = screen.getByText(
+            'Company leaders who have come together to change this world for the better and work for the benefit of society',
+        );
 
         expect(englishName).toBeInTheDocument();
         expect(englishDescription).toBeInTheDocument();
@@ -73,7 +81,7 @@ describe('test team description component', () => {
     });
 
     it('should have correct class', () => {
-        const { container } = render(<TeamDescription team={mockTeamItem}/>);
+        const { container } = render(<TeamDescription team={mockTeamItem} />);
         expect(container.querySelector('.team_description')).toBeInTheDocument();
     });
 });

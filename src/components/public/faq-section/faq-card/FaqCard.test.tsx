@@ -37,7 +37,7 @@ describe('test question card component', () => {
     };
     test('should display Ukrainian content (fallback)', () => {
         render(<FaqCard faq={mockQuestion} />);
-        
+
         const question = screen.getByText(mockQuestion.questionText);
         expect(question).toBeInTheDocument();
 
@@ -63,9 +63,13 @@ describe('test question card component', () => {
     test('should render localized question and answer when localizations are available', () => {
         mockedUseGetLocalization.mockImplementation((localizations, fallback) => {
             const enLocalization = localizations?.find((loc: EntityLocalization) => loc.language.code === 'en');
-            
+
             if (enLocalization) {
-                const { language: _language, translationStatus: _translationStatus, ...localizableFields } = enLocalization;
+                const {
+                    language: _language,
+                    translationStatus: _translationStatus,
+                    ...localizableFields
+                } = enLocalization;
                 return {
                     ...fallback,
                     ...localizableFields,
@@ -73,7 +77,7 @@ describe('test question card component', () => {
             }
             return fallback;
         });
-        
+
         const localizedQuestionText: string = 'How to join the program?';
         const localizedAnswerText: string =
             'You need to fill out a short questionnaire or write to ' +
@@ -90,7 +94,7 @@ describe('test question card component', () => {
                 },
             ],
         };
-        
+
         render(<FaqCard faq={localizedQuestion} />);
 
         expect(screen.getByText(localizedQuestionText)).toBeInTheDocument();

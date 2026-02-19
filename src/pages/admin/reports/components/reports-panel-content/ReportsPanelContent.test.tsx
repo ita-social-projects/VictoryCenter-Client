@@ -62,147 +62,134 @@ jest.mock('./ReportsPanelContent.module.scss', () => ({
     content: 'content',
 }));
 
+const clickEdit = () => fireEvent.click(screen.getByTestId('edit-btn'));
+const clickCancel = () => fireEvent.click(screen.getByTestId('cancel-btn'));
+const clickPublish = () => fireEvent.click(screen.getByTestId('publish-btn'));
+const markDirty = () => fireEvent.click(screen.getByTestId('ms-dirty-true'));
+const markClean = () => fireEvent.click(screen.getByTestId('ms-dirty-false'));
+
+const expectEditing = (value: boolean) =>
+    expect(screen.getByTestId('is-editing')).toHaveTextContent(String(value));
+const expectMsEditing = (value: boolean) =>
+    expect(screen.getByTestId('ms-is-editing')).toHaveTextContent(String(value));
+const expectPublishDisabled = (value: boolean) =>
+    expect(screen.getByTestId('is-publish-disabled')).toHaveTextContent(String(value));
+const expectResetCounter = (value: number) =>
+    expect(screen.getByTestId('ms-reset-counter')).toHaveTextContent(String(value));
+
 describe('ReportsPanelContent', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         toolbarProps = null;
         mediaSettingsProps = null;
         mockSubmit.mockResolvedValue(true);
+        render(<ReportsPanelContent />);
     });
 
     describe('Initial render', () => {
         it('should render toolbar, media settings, and toast container', () => {
-            render(<ReportsPanelContent />);
-
             expect(screen.getByTestId('mock-toolbar')).toBeInTheDocument();
             expect(screen.getByTestId('mock-media-settings')).toBeInTheDocument();
             expect(screen.getByTestId('mock-toast-container')).toBeInTheDocument();
         });
 
         it('should start in non-editing mode', () => {
-            render(<ReportsPanelContent />);
-
-            expect(screen.getByTestId('is-editing')).toHaveTextContent('false');
-            expect(screen.getByTestId('ms-is-editing')).toHaveTextContent('false');
+            expectEditing(false);
+            expectMsEditing(false);
         });
 
         it('should start with publish button disabled (not dirty)', () => {
-            render(<ReportsPanelContent />);
-
-            expect(screen.getByTestId('is-publish-disabled')).toHaveTextContent('true');
+            expectPublishDisabled(true);
         });
 
         it('should start with resetCounter at 0', () => {
-            render(<ReportsPanelContent />);
-
-            expect(screen.getByTestId('ms-reset-counter')).toHaveTextContent('0');
+            expectResetCounter(0);
         });
     });
 
     describe('Edit mode', () => {
         it('should enter editing mode when Edit button is clicked', () => {
-            render(<ReportsPanelContent />);
+            clickEdit();
 
-            fireEvent.click(screen.getByTestId('edit-btn'));
-
-            expect(screen.getByTestId('is-editing')).toHaveTextContent('true');
-            expect(screen.getByTestId('ms-is-editing')).toHaveTextContent('true');
+            expectEditing(true);
+            expectMsEditing(true);
         });
 
         it('should reset dirty state when entering edit mode', () => {
-            render(<ReportsPanelContent />);
+            markDirty();
+            expectPublishDisabled(false);
 
-            // Mark dirty first
-            fireEvent.click(screen.getByTestId('ms-dirty-true'));
-            expect(screen.getByTestId('is-publish-disabled')).toHaveTextContent('false');
-
-            // Enter edit mode resets dirty
-            fireEvent.click(screen.getByTestId('edit-btn'));
-            expect(screen.getByTestId('is-publish-disabled')).toHaveTextContent('true');
+            clickEdit();
+            expectPublishDisabled(true);
         });
     });
 
     describe('Cancel', () => {
         it('should exit editing mode when Cancel is clicked', () => {
-            render(<ReportsPanelContent />);
+            clickEdit();
+            expectEditing(true);
 
-            fireEvent.click(screen.getByTestId('edit-btn'));
-            expect(screen.getByTestId('is-editing')).toHaveTextContent('true');
-
-            fireEvent.click(screen.getByTestId('cancel-btn'));
-            expect(screen.getByTestId('is-editing')).toHaveTextContent('false');
+            clickCancel();
+            expectEditing(false);
         });
 
         it('should increment resetCounter when Cancel is clicked', () => {
-            render(<ReportsPanelContent />);
+            expectResetCounter(0);
 
-            expect(screen.getByTestId('ms-reset-counter')).toHaveTextContent('0');
+            clickCancel();
+            expectResetCounter(1);
 
-            fireEvent.click(screen.getByTestId('cancel-btn'));
-            expect(screen.getByTestId('ms-reset-counter')).toHaveTextContent('1');
-
-            fireEvent.click(screen.getByTestId('cancel-btn'));
-            expect(screen.getByTestId('ms-reset-counter')).toHaveTextContent('2');
+            clickCancel();
+            expectResetCounter(2);
         });
 
         it('should reset dirty state when Cancel is clicked', () => {
-            render(<ReportsPanelContent />);
+            markDirty();
+            expectPublishDisabled(false);
 
-            fireEvent.click(screen.getByTestId('ms-dirty-true'));
-            expect(screen.getByTestId('is-publish-disabled')).toHaveTextContent('false');
-
-            fireEvent.click(screen.getByTestId('cancel-btn'));
-            expect(screen.getByTestId('is-publish-disabled')).toHaveTextContent('true');
+            clickCancel();
+            expectPublishDisabled(true);
         });
     });
 
     describe('Dirty state', () => {
         it('should enable publish button when dirty', () => {
-            render(<ReportsPanelContent />);
+            expectPublishDisabled(true);
 
-            expect(screen.getByTestId('is-publish-disabled')).toHaveTextContent('true');
-
-            fireEvent.click(screen.getByTestId('ms-dirty-true'));
-            expect(screen.getByTestId('is-publish-disabled')).toHaveTextContent('false');
+            markDirty();
+            expectPublishDisabled(false);
         });
 
         it('should disable publish button when marked clean', () => {
-            render(<ReportsPanelContent />);
+            markDirty();
+            expectPublishDisabled(false);
 
-            fireEvent.click(screen.getByTestId('ms-dirty-true'));
-            expect(screen.getByTestId('is-publish-disabled')).toHaveTextContent('false');
-
-            fireEvent.click(screen.getByTestId('ms-dirty-false'));
-            expect(screen.getByTestId('is-publish-disabled')).toHaveTextContent('true');
+            markClean();
+            expectPublishDisabled(true);
         });
     });
 
     describe('Publish', () => {
         it('should reset dirty state after successful publish', async () => {
-            render(<ReportsPanelContent />);
+            clickEdit();
+            markDirty();
+            expectPublishDisabled(false);
 
-            fireEvent.click(screen.getByTestId('edit-btn'));
-            fireEvent.click(screen.getByTestId('ms-dirty-true'));
-            expect(screen.getByTestId('is-publish-disabled')).toHaveTextContent('false');
-
-            fireEvent.click(screen.getByTestId('publish-btn'));
+            clickPublish();
 
             await waitFor(() => {
-                expect(screen.getByTestId('is-publish-disabled')).toHaveTextContent('true');
+                expectPublishDisabled(true);
             });
         });
 
         it('should stay in editing mode when publish fails', async () => {
             mockSubmit.mockResolvedValue(false);
 
-            render(<ReportsPanelContent />);
-
-            fireEvent.click(screen.getByTestId('edit-btn'));
-
-            fireEvent.click(screen.getByTestId('publish-btn'));
+            clickEdit();
+            clickPublish();
 
             await waitFor(() => {
-                expect(screen.getByTestId('is-editing')).toHaveTextContent('true');
+                expectEditing(true);
             });
         });
     });

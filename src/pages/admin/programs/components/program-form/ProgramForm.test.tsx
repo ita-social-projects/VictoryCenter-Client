@@ -11,6 +11,7 @@ import { MultiSelectInputGroupProps } from '@/components/admin/input-groups/mult
 import { PhotoInputGroupProps } from '@/components/admin/input-groups/photo-input-group/PhotoInputGroup';
 import { ButtonProps } from '@/components/admin/button/Button';
 import { ProgramSection } from '@/types/common/program-sections';
+import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 
 HTMLElement.prototype.scrollIntoView = jest.fn();
 
@@ -119,6 +120,32 @@ jest.mock('@/components/admin/input-groups/photo-input-group/PhotoInputGroup', (
             {error && <span data-testid={`error-${id}`}>{error}</span>}
         </div>
     ),
+}));
+
+jest.mock('@/components/public/background-media/BackgroundMedia', () => ({
+    BackgroundMedia: ({ mediaUrl, className }: any) => (
+        <div data-testid="background-media" className={className} data-media-url={mediaUrl}>
+            BackgroundMedia
+        </div>
+    ),
+}));
+
+jest.mock('@/utils/functions/image-helper/image-helper', () => ({
+    getImageSrc: jest.fn((image) => {
+        if (!image) {
+            return '';
+        }
+        if (typeof image === 'string') {
+            return image;
+        }
+        if ('url' in image && image.url) {
+            return image.url;
+        }
+        if ('base64' in image && image.base64) {
+            return `data:${image.mimeType};base64,${image.base64}`;
+        }
+        return '';
+    }),
 }));
 
 jest.mock('@/components/admin/button/Button', () => ({
@@ -417,6 +444,45 @@ describe('ProgramForm', () => {
             renderProgramForm();
             fireEvent.click(screen.getByTestId('error-trigger-previewImage'));
             expect(screen.getByTestId('error-previewImage')).toHaveTextContent('Manual Error');
+        });
+
+        it('should not render BackgroundMedia when backgroundImage is null', () => {
+            renderProgramForm();
+
+            expect(screen.queryByTestId('background-media')).not.toBeInTheDocument();
+        });
+
+        it('should render BackgroundMedia when backgroundImage exists', () => {
+            const initialData: ProgramFormValues = {
+                name: '',
+                categories: [],
+                description: '',
+                previewImage: null,
+                previewImageId: null,
+                backgroundImage: { base64: 'test-base64', mimeType: 'image/jpeg' },
+                backgroundImageId: null,
+                location: '',
+                participantsCount: '',
+                meetingCount: '',
+                sections: [],
+            };
+
+            renderProgramForm({ initialData });
+
+            expect(screen.getByTestId('background-media')).toBeInTheDocument();
+            expect(getImageSrc).toHaveBeenCalledWith(initialData.backgroundImage);
+        });
+
+        it('should render BackgroundMedia when background image is uploaded', async () => {
+            renderProgramForm();
+
+            expect(screen.queryByTestId('background-media')).not.toBeInTheDocument();
+
+            fireEvent.click(screen.getByTestId('upload-backgroundImage'));
+
+            await waitFor(() => {
+                expect(screen.getByTestId('background-media')).toBeInTheDocument();
+            });
         });
     });
 

@@ -1,14 +1,6 @@
 import { ImageValues } from '@/types/common/image';
 
-/**
- * Loads a static image URL, resizes it to the given dimensions via canvas,
- * and returns an ImageValues object (base64 + mimeType) ready for upload.
- */
-export const fetchDefaultImageAsImageValues = (
-    imageUrl: string,
-    width: number,
-    height: number,
-): Promise<ImageValues> =>
+export const fetchDefaultImageAsImageValues = (imageUrl: string, width: number, height: number): Promise<ImageValues> =>
     new Promise((resolve, reject) => {
         const img = new window.Image();
         img.onload = () => {

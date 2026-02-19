@@ -74,13 +74,11 @@ export const API_ROUTES = {
         SECTIONS: 'Partners/sections',
         PAGE: 'Partners/page',
     },
-<<<<<<< HEAD
     REPORTS: {
         MEDIA_SETTINGS: 'Report/report',
         BASE: 'Report',
-=======
+    },
     FAQ_LOCALIZATIONS: {
         BASE: 'FaqQuestionLocalizations',
->>>>>>> 6e165ee68803bf3f479e5c6edc4a179e926c335e
     },
 };

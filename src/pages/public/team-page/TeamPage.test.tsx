@@ -2,16 +2,33 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { TeamPage } from './TeamPage';
 import * as teamPageDataFetch from '@/services/api/public/team/team-api';
 import { MemberCard, TeamItem } from '@/types/public/team-page';
+import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
+import { EntityLocalization } from '@/types/common/language';
 
 jest.mock('@/assets/videos/public/team-page/quote_background.mp4', () => 'mocked-video.mp4');
+jest.mock('@/hooks/common/use-get-localization/useGetLocalization', () => ({
+    useGetLocalization: jest.fn(),
+}));
 
 const spyTeamPageDataFetch = jest.spyOn(teamPageDataFetch, 'teamPageDataFetch');
+const mockedUseGetLocalization = useGetLocalization as jest.Mock;
 
 const mockTeamDataSingle: TeamItem[] = [
     {
         title: 'Основна команда',
         description:
             'Люди, які щодня координують роботу програм, супроводжують учасників, будують логістику, фасилітують сесії.',
+        localizations: [
+            {
+                language: {
+                    id: 2,
+                    code: 'en',
+                },
+                name: 'Main team',
+                description: 'People who coordinate the work of the programs on a daily basis, accompany participants, organize logistics, and facilitate sessions.',
+                translationStatus: 0,
+            },
+        ],
         members: [
             {
                 id: 1,
@@ -28,6 +45,17 @@ const mockTeamDataMultiple: TeamItem[] = [
     {
         title: 'Додаткова команда',
         description: 'Інший опис',
+        localizations: [
+            {
+                language: {
+                    id: 2,
+                    code: 'en',
+                },
+                name: 'Additional team',
+                description: 'Another description',
+                translationStatus: 0,
+            },
+        ],
         members: [
             {
                 id: 1,
@@ -50,6 +78,12 @@ jest.mock('./team-member-card/TeamMemberCard', () => ({
 }));
 
 describe('TeamPage component', () => {
+    beforeEach(() => {
+        mockedUseGetLocalization.mockImplementation((_localizations, fallback) => {
+            return fallback;
+        });
+    });
+    
     afterEach(() => {
         jest.clearAllMocks();
     });
@@ -97,6 +131,38 @@ describe('TeamPage component', () => {
         expect(teamSections.length).toBe(2);
         expect(teamSections[0].classList.contains('last-section')).toBe(false);
         expect(teamSections[1].classList.contains('last-section')).toBe(true);
+    });
+
+    it('should render team sections with English localization', async () => {
+        mockedUseGetLocalization.mockImplementation((localizations, fallback) => {
+            const enLocalization = localizations?.find((loc: EntityLocalization) => loc.language.code === 'en');
+            
+            if (enLocalization) {
+                const { language: _language, translationStatus: _translationStatus, ...localizableFields } = enLocalization;
+                return {
+                    ...fallback,
+                    ...localizableFields,
+                };
+            }
+            return fallback;
+        });
+
+        spyTeamPageDataFetch.mockResolvedValueOnce({
+            teamData: mockTeamDataMultiple,
+        });
+
+        render(<TeamPage />);
+        
+        await waitFor(() => {
+            expect(screen.getByText('Main team')).toBeInTheDocument();
+            expect(
+                screen.getByText(
+                    'People who coordinate the work of the programs on a daily basis, accompany participants, organize logistics, and facilitate sessions.',
+                ),
+            ).toBeInTheDocument();
+            expect(screen.getByText('Additional team')).toBeInTheDocument();
+            expect(screen.getByText('Another description')).toBeInTheDocument();
+        });
     });
 
     it('should render no team sections if the data is an empty array', async () => {

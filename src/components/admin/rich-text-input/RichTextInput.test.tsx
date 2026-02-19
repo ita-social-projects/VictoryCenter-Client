@@ -82,19 +82,22 @@ jest.mock('./plugins', () => {
         mockFocusPluginProps = props;
         return null;
     };
-    const MockToolbarPlugin = ({ disabled }: { disabled?: boolean }) => (
-        <div data-testid="toolbar">
-            <button disabled={disabled} aria-label="Bold" title="Bold (Ctrl+B)">
-                <strong>B</strong>
-            </button>
-            <button disabled={disabled} aria-label="Italic" title="Italic (Ctrl+I)">
-                <em>I</em>
-            </button>
-            <button disabled={disabled} aria-label="Line break" title="Line break">
-                ↵
-            </button>
-        </div>
-    );
+    const MockToolbarPlugin = ({ disabled, hidden }: { disabled?: boolean; hidden?: boolean }) => {
+        if (hidden) return null;
+        return (
+            <div data-testid="toolbar">
+                <button disabled={disabled} aria-label="Bold" title="Bold (Ctrl+B)">
+                    <strong>B</strong>
+                </button>
+                <button disabled={disabled} aria-label="Italic" title="Italic (Ctrl+I)">
+                    <em>I</em>
+                </button>
+                <button disabled={disabled} aria-label="Line break" title="Line break">
+                    ↵
+                </button>
+            </div>
+        );
+    };
     const MockInitialValuePlugin = (props: any) => {
         mockInitialValuePluginProps = props;
         return props.value ? (
@@ -342,6 +345,23 @@ describe('RichTextInput', () => {
         it('handles empty initial value', () => {
             renderRichTextInput({ value: '' });
             expect(screen.getByTestId('content-editable')).toBeInTheDocument();
+        });
+    });
+
+    describe('HideToolbar functionality', () => {
+        it('hides toolbar when hideToolbar is true', () => {
+            renderRichTextInput({ hideToolbar: true });
+            expect(screen.queryByTestId('toolbar')).not.toBeInTheDocument();
+        });
+
+        it('shows toolbar when hideToolbar is false', () => {
+            renderRichTextInput({ hideToolbar: false });
+            expect(screen.getByTestId('toolbar')).toBeInTheDocument();
+        });
+
+        it('shows toolbar when hideToolbar is undefined', () => {
+            renderRichTextInput();
+            expect(screen.getByTestId('toolbar')).toBeInTheDocument();
         });
     });
 

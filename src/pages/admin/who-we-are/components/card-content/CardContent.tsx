@@ -7,7 +7,6 @@ import { WHO_WE_ARE_TEXT } from '@/const/admin/who-we-are';
 import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 import './CardContent.scss';
 import { LocalizationLanguage } from '@/types/common/language';
-import { ContentType } from '@/types/common/programs';
 import { DEFAULT_LOCALE } from '@/const/common/locales';
 import { returnDisplayedLocalization } from '@/utils/functions/localization/localization';
 
@@ -86,6 +85,7 @@ export const CardContent = ({
                     onBlur={() => onDescriptionValidate(displayedDescription ?? '')}
                     error={descriptionError ?? undefined}
                     disabled={!isBaseLanguage}
+                    hideToolbar={!isBaseLanguage}
                 />
             </div>
         </div>

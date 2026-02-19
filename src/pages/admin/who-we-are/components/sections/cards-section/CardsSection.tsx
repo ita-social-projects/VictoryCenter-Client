@@ -101,19 +101,21 @@ export const CardsSection = ({
                 </div>
             </div>
             <div className="button-section">
-                <Button
-                    className="button"
-                    buttonStyle="primary"
-                    onClick={onPublish}
-                    type="submit"
-                    disabled={
-                        Object.values(errors).some((error) => error.description != null) ||
-                        !isPublishButtonActive ||
-                        !isBaseLanguage
-                    }
-                >
-                    {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
-                </Button>
+                {isBaseLanguage && (
+                    <Button
+                        className="button"
+                        buttonStyle="primary"
+                        onClick={onPublish}
+                        type="submit"
+                        disabled={
+                            Object.values(errors).some((error) => error.description != null) ||
+                            !isPublishButtonActive ||
+                            !isBaseLanguage
+                        }
+                    >
+                        {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
+                    </Button>
+                )}
             </div>
         </>
     );

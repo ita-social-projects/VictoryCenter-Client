@@ -80,16 +80,19 @@ export const DescriptionSection = ({
                     maxLength={descriptionLimit}
                     error={descriptionError || undefined}
                     disabled={!isBaseLanguage}
+                    hideToolbar={!isBaseLanguage}
                 />
-                <Button
-                    className="button"
-                    buttonStyle={'primary'}
-                    onClick={onPublish}
-                    type={'submit'}
-                    disabled={!!descriptionError || !isPublishButtonActive || !isBaseLanguage}
-                >
-                    {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
-                </Button>
+                {isBaseLanguage && (
+                    <Button
+                        className="button"
+                        buttonStyle={'primary'}
+                        onClick={onPublish}
+                        type={'submit'}
+                        disabled={!!descriptionError || !isPublishButtonActive || !isBaseLanguage}
+                    >
+                        {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
+                    </Button>
+                )}
             </div>
         </div>
     );

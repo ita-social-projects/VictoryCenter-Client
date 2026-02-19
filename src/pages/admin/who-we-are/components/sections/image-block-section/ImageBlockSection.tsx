@@ -148,6 +148,7 @@ export const ImageSection = ({
                             onBlur={handleTitleBlur}
                             error={titleError || undefined}
                             disabled={!isBaseLanguage}
+                            hideToolbar={!isBaseLanguage}
                         />
                     </div>
                 )}
@@ -165,20 +166,21 @@ export const ImageSection = ({
                             onBlur={handleDescriptionBlur}
                             error={descriptionError || undefined}
                             disabled={!isBaseLanguage}
+                            hideToolbar={!isBaseLanguage}
                         />
                     </div>
                 )}
-                <Button
-                    className="button"
-                    buttonStyle="primary"
-                    onClick={onPublish}
-                    type="submit"
-                    disabled={
-                        !!imageError || !!descriptionError || !!titleError || !isPublishButtonActive || !isBaseLanguage
-                    }
-                >
-                    {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
-                </Button>
+                {isBaseLanguage && (
+                    <Button
+                        className="button"
+                        buttonStyle="primary"
+                        onClick={onPublish}
+                        type="submit"
+                        disabled={!!imageError || !!descriptionError || !!titleError || !isPublishButtonActive}
+                    >
+                        {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
+                    </Button>
+                )}
             </div>
         </div>
     );

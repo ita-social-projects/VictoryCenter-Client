@@ -1,6 +1,6 @@
 import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
 import { TeamItem } from '@/types/public/team-page';
-import { TeamDescription } from './TeamDescription';
+import { TeamCategoryDescription } from './TeamCategoryDescription';
 import { render, screen } from '@testing-library/react';
 import { EntityLocalization } from '@/types/common/language';
 
@@ -39,7 +39,7 @@ describe('test team description component', () => {
     };
 
     it('should display Ukrainian content (fallback)', () => {
-        render(<TeamDescription team={mockTeamItem} />);
+        render(<TeamCategoryDescription team={mockTeamItem} />);
 
         const name = screen.getByText(mockTeamItem.title);
         const description = screen.getByText(mockTeamItem.description);
@@ -66,7 +66,7 @@ describe('test team description component', () => {
             return fallback;
         });
 
-        render(<TeamDescription team={mockTeamItem} />);
+        render(<TeamCategoryDescription team={mockTeamItem} />);
 
         const englishName = screen.getByText('PROJECT MANAGERS');
         const englishDescription = screen.getByText(
@@ -81,7 +81,7 @@ describe('test team description component', () => {
     });
 
     it('should have correct class', () => {
-        const { container } = render(<TeamDescription team={mockTeamItem} />);
+        const { container } = render(<TeamCategoryDescription team={mockTeamItem} />);
         expect(container.querySelector('.team_description')).toBeInTheDocument();
     });
 });

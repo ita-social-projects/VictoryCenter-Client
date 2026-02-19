@@ -15,7 +15,7 @@ import { teamPageDataFetch } from '@/services/api/public/team/team-api';
 import { TeamItem } from '@/types/public/team-page';
 import { TeamMemberCard } from './team-member-card/TeamMemberCard';
 import { LinearProgress } from '@mui/material';
-import { TeamDescription } from './team-description/TeamDescription';
+import { TeamCategoryDescription } from './team-category-description/TeamCategoryDescription';
 
 export const TeamPage: React.FC = () => {
     const [teamData, setTeamData] = useState<TeamItem[]>([]);
@@ -61,7 +61,7 @@ export const TeamPage: React.FC = () => {
                     >
                         <div className="team_info">
                             <div className="members-grid">
-                                <TeamDescription team={team} />
+                                <TeamCategoryDescription team={team} />
                                 {team.members.map((member) => (
                                     <TeamMemberCard key={member.id} member={member} />
                                 ))}

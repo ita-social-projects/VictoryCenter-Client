@@ -1,11 +1,11 @@
 import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
 import { TeamItem } from '@/types/public/team-page';
 
-type TeamDescriptionProps = {
+type TeamCategoryDescriptionProps = {
     team: TeamItem;
 };
 
-export function TeamDescription({ team }: TeamDescriptionProps) {
+export function TeamCategoryDescription({ team }: TeamCategoryDescriptionProps) {
     const { name, description } = useGetLocalization(team.localizations, {
         name: team.title,
         description: team.description,

@@ -203,7 +203,7 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
         }
 
         return (
-            <div className={styles.blocks}>
+            <div>
                 {isLoading && (
                     <div className={styles.loader}>
                         <InlineLoader size={2} />
@@ -218,7 +218,7 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
                     </div>
                 )}
                 {!isLoading && !fetchError && mediaSettingsData && (
-                    <>
+                    <div className={styles.blocks}>
                         <ReportsMediaBlock
                             values={collectedFundsValues}
                             errors={collectedFundsErrors}
@@ -249,7 +249,7 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
                             validationFunctions={REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS}
                             onValuesChange={handleChangedLivesChange}
                         />
-                    </>
+                    </div>
                 )}
             </div>
         );

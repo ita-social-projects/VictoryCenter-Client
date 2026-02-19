@@ -1,9 +1,9 @@
-import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ReportsPanelContent } from './ReportsPanelContent';
 
-let toolbarProps: any = null;
-let mediaSettingsProps: any = null;
+var toolbarProps: any = null;
+var mediaSettingsProps: any = null;
 
 const mockSubmit = jest.fn();
 
@@ -185,9 +185,7 @@ describe('ReportsPanelContent', () => {
             fireEvent.click(screen.getByTestId('ms-dirty-true'));
             expect(screen.getByTestId('is-publish-disabled')).toHaveTextContent('false');
 
-            await act(async () => {
-                fireEvent.click(screen.getByTestId('publish-btn'));
-            });
+            fireEvent.click(screen.getByTestId('publish-btn'));
 
             await waitFor(() => {
                 expect(screen.getByTestId('is-publish-disabled')).toHaveTextContent('true');
@@ -201,9 +199,7 @@ describe('ReportsPanelContent', () => {
 
             fireEvent.click(screen.getByTestId('edit-btn'));
 
-            await act(async () => {
-                fireEvent.click(screen.getByTestId('publish-btn'));
-            });
+            fireEvent.click(screen.getByTestId('publish-btn'));
 
             await waitFor(() => {
                 expect(screen.getByTestId('is-editing')).toHaveTextContent('true');

@@ -1,5 +1,5 @@
 import React, { createRef } from 'react';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { MediaSettings, MediaSettingsRef } from './MediaSettings';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
@@ -108,8 +108,8 @@ describe('MediaSettings', () => {
 
     const renderComponent = (overrideProps: Partial<typeof defaultProps> = {}) => {
         const ref = createRef<MediaSettingsRef>();
-        const result = render(<MediaSettings ref={ref} {...defaultProps} {...overrideProps} />);
-        return { ...result, ref };
+        const view = render(<MediaSettings ref={ref} {...defaultProps} {...overrideProps} />);
+        return { ...view, ref };
     };
 
     beforeEach(() => {

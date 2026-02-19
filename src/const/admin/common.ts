@@ -99,6 +99,7 @@ export const COMMON_TEXT_ADMIN = {
             ADD_CATEGORY: 'Додати категорію',
             EDIT_CATEGORY: 'Редагувати',
             DELETE_CATEGORY: 'Видалити',
+            ADD_TRANSLATION: 'Додати переклад',
         },
 
         FORM: {

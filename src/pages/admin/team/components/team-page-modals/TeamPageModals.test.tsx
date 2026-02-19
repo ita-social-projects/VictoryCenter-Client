@@ -118,6 +118,35 @@ jest.mock('../delete-team-category-modal/DeleteTeamCategoryModal', () => ({
     ),
 }));
 
+jest.mock('../translate-team-category-modal/TranslateTeamCategoryModal', () => ({
+    TranslateTeamCategoryModal: ({
+        isOpen,
+        onClose,
+        onTranslateCategory,
+        categoryToTranslate,
+        translatedLanguages,
+    }: any) => (
+        <div data-testid="translate-team-category-modal">
+            <span data-testid="translate-category-modal-is-open">{isOpen.toString()}</span>
+            {categoryToTranslate && (
+                <span data-testid="translate-category-modal-category">{categoryToTranslate.id}</span>
+            )}
+            <span data-testid="translate-category-modal-language">{translatedLanguages?.[0]?.code}</span>
+            <button data-testid="translate-category-modal-close-btn" onClick={onClose}>
+                Close
+            </button>
+            {onTranslateCategory && categoryToTranslate && (
+                <button
+                    data-testid="translate-category-modal-confirm-btn"
+                    onClick={() => onTranslateCategory(categoryToTranslate)}
+                >
+                    Translate Category
+                </button>
+            )}
+        </div>
+    ),
+}));
+
 const mockTeamMember: TeamMember = {
     id: 1,
     image: null,
@@ -157,6 +186,8 @@ const createMockModalsStateControl = (
         itemToTranslate: null,
         itemToEditTranslation: null,
         isAddCategoryModalOpen: false,
+        isCategoryToEditTranslation: false,
+        isCategoryToTranslate: false,
         isEditCategoryModalOpen: false,
         isDeleteCategoryModalOpen: false,
         isAddSectionModalOpen: false,
@@ -172,6 +203,8 @@ const createMockModalsStateControl = (
         closeEditCategoryModal: jest.fn(),
         closeDeleteCategoryModal: jest.fn(),
         closeAddSectionModal: jest.fn(),
+        closeTranslateCategoryModal: jest.fn(),
+        closeEditCategoryTranslationModal: jest.fn(),
     },
     openModalActions: {
         openAddItemModal: jest.fn(),
@@ -183,6 +216,8 @@ const createMockModalsStateControl = (
         openEditCategoryModal: jest.fn(),
         openDeleteCategoryModal: jest.fn(),
         openAddSectionModal: jest.fn(),
+        openTranslateCategoryModal: jest.fn(),
+        openEditCategoryTranslationModal: jest.fn(),
     },
     isAnyModalOpened: false,
 });
@@ -206,6 +241,8 @@ const createDefaultProps = (
     onAddTeamCategory: jest.fn(),
     onEditTeamCategory: jest.fn(),
     onDeleteTeamCategory: jest.fn(),
+    selectedCategory: null,
+    onTranslateTeamCategory: jest.fn(),
 });
 
 describe('TeamPageModals', () => {
@@ -566,6 +603,82 @@ describe('TeamPageModals', () => {
                 expect(props.onDeleteTeamCategory).toHaveBeenCalledWith(1);
             });
         });
+
+        describe('Translate Team Category Modal', () => {
+            it('does not render translate category modal when selectedCategory is null', () => {
+                const props = createDefaultProps({ isCategoryToTranslate: true });
+                render(<TeamPageModals {...props} />);
+
+                expect(document.querySelector('[data-testid="translate-team-category-modal"]')).not.toBeInTheDocument();
+            });
+
+            it('renders translate category modal and handles close/confirm actions', () => {
+                const props = {
+                    ...createDefaultProps({ isCategoryToTranslate: true }),
+                    selectedCategory: mockTeamCategory,
+                };
+                render(<TeamPageModals {...props} />);
+
+                const modal = document.querySelector('[data-testid="translate-team-category-modal"]');
+                expect(modal).toBeInTheDocument();
+                expect(modal?.querySelector('[data-testid="translate-category-modal-is-open"]')).toHaveTextContent(
+                    'true',
+                );
+                expect(modal?.querySelector('[data-testid="translate-category-modal-category"]')).toHaveTextContent(
+                    mockTeamCategory.id.toString(),
+                );
+
+                const closeBtn = modal?.querySelector(
+                    '[data-testid="translate-category-modal-close-btn"]',
+                ) as HTMLElement;
+                closeBtn.click();
+                expect(props.modalsStateControl.closeModalActions.closeTranslateCategoryModal).toHaveBeenCalledTimes(1);
+
+                const confirmBtn = modal?.querySelector(
+                    '[data-testid="translate-category-modal-confirm-btn"]',
+                ) as HTMLElement;
+                confirmBtn.click();
+                expect(props.onTranslateTeamCategory).toHaveBeenCalledWith(mockTeamCategory);
+            });
+
+            it('does not render edit-translation category modal when selectedCategory is null', () => {
+                const props = createDefaultProps({ isCategoryToEditTranslation: true });
+                render(<TeamPageModals {...props} />);
+
+                expect(document.querySelector('[data-testid="translate-team-category-modal"]')).not.toBeInTheDocument();
+            });
+
+            it('renders edit-translation category modal and handles close/confirm actions', () => {
+                const props = {
+                    ...createDefaultProps({ isCategoryToEditTranslation: true }),
+                    selectedCategory: mockTeamCategory,
+                };
+                render(<TeamPageModals {...props} />);
+
+                const modal = document.querySelector('[data-testid="translate-team-category-modal"]');
+                expect(modal).toBeInTheDocument();
+                expect(modal?.querySelector('[data-testid="translate-category-modal-is-open"]')).toHaveTextContent(
+                    'true',
+                );
+                expect(modal?.querySelector('[data-testid="translate-category-modal-category"]')).toHaveTextContent(
+                    mockTeamCategory.id.toString(),
+                );
+
+                const closeBtn = modal?.querySelector(
+                    '[data-testid="translate-category-modal-close-btn"]',
+                ) as HTMLElement;
+                closeBtn.click();
+                expect(
+                    props.modalsStateControl.closeModalActions.closeEditCategoryTranslationModal,
+                ).toHaveBeenCalledTimes(1);
+
+                const confirmBtn = modal?.querySelector(
+                    '[data-testid="translate-category-modal-confirm-btn"]',
+                ) as HTMLElement;
+                confirmBtn.click();
+                expect(props.onTranslateTeamCategory).toHaveBeenCalledWith(mockTeamCategory);
+            });
+        });
     });
 
     describe('Modal State Integration', () => {
@@ -580,7 +693,6 @@ describe('TeamPageModals', () => {
             });
             render(<TeamPageModals {...props} />);
 
-            // Team Member Modals
             const addTeamMemberModal = document.querySelectorAll('[data-testid="team-member-modal"]')[0];
             expect(addTeamMemberModal.querySelector('[data-testid="modal-is-open"]')).toHaveTextContent('true');
 
@@ -592,7 +704,6 @@ describe('TeamPageModals', () => {
                 'true',
             );
 
-            // Team Category Modals
             const addCategoryModal = document.querySelectorAll('[data-testid="team-category-modal"]')[0];
             expect(addCategoryModal.querySelector('[data-testid="category-modal-is-open"]')).toHaveTextContent('true');
 
@@ -612,11 +723,9 @@ describe('TeamPageModals', () => {
             });
             render(<TeamPageModals {...props} />);
 
-            // Edit modal should be closed when itemToEdit is null
             const editModal = document.querySelectorAll('[data-testid="team-member-modal"]')[1];
             expect(editModal.querySelector('[data-testid="modal-is-open"]')).toHaveTextContent('false');
 
-            // Delete modal should be closed when itemToDelete is null
             const deleteModal = document.querySelector('[data-testid="delete-team-member-modal"]');
             expect(deleteModal?.querySelector('[data-testid="delete-modal-is-open"]')).toHaveTextContent('false');
         });

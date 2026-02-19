@@ -8,17 +8,17 @@ import {
 } from '@/types/admin/reports';
 
 export const mapReportsMediaSettingsDtoToMediaSettings = (dto: ReportsMediaSettingsDto): ReportsMediaSettings => ({
-    collectedFunds: mapReportsMediaSettingsCollectedFundsDtoToCollectedFunds(dto.collectedFunds),
-    changedLives: mapReportsMediaSettingsChangedLivesDtoToChangedLives(dto.changedLives),
+    collectedFunds: mapReportsMediaSettingsCollectedFundsDtoToCollectedFunds(dto.collectedFundsBlock),
+    changedLives: mapReportsMediaSettingsChangedLivesDtoToChangedLives(dto.changedLivesBlock),
 });
 
 export const mapReportsMediaSettingsCollectedFundsDtoToCollectedFunds = (
     dto: ReportsMediaSettingsCollectedFundsDto,
 ): ReportsMediaSettingsCollectedFunds => ({
     title: dto.title,
-    collectedFunds: dto.collectedFunds,
+    collectedFunds: dto.collectedAmount,
     image: dto.image,
-    imageId: dto.imageId,
+    imageId: dto.image?.id ?? null,
 });
 
 export const mapReportsMediaSettingsChangedLivesDtoToChangedLives = (
@@ -27,5 +27,5 @@ export const mapReportsMediaSettingsChangedLivesDtoToChangedLives = (
     title: dto.title,
     changedLives: dto.changedLives,
     image: dto.image,
-    imageId: dto.imageId,
+    imageId: dto.image?.id ?? null,
 });

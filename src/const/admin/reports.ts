@@ -6,23 +6,23 @@ export const REPORTS_TEXT = {
             CHANGED_LIVES_WINDOW: 'Вікно 2: Змінено життів',
             COLLECTED_FUNDS: 'Зібрані кошти',
             CHANGED_LIVES: 'Кількість змінених життів',
-            WINDOW_DESCRIPTION: 'Фото ««Репрезентативне фото»»',
+            WINDOW_DESCRIPTION: 'Фото «Репрезентативне фото»',
         },
         MAX_LENGTH: {
             TITLE: 50,
-            COLLECTED_FUNDS: 15,
-            CHANGED_LIVES: 10,
         },
     },
     BUTTON: {
         PUBLISH: 'Опублікувати',
         CANCEL: 'Відмінити',
         EDIT_PAGE: 'Редагувати сторінку',
+        TRY_AGAIN: 'Спробувати ще',
     },
     MESSAGE: {
         FAIL_TO_FETCH_REPORTS: 'Виникла помилка, не вдалось завантажити звітність',
-        FAIL_TO_UPDATE_REPORT: 'Виникла помилка під час оновлення звітністі',
-        INVALID_VALUE: 'Поле може містити лише цілі цифри',
+        FAIL_TO_UPDATE_REPORT: 'Виникла помилка під час оновлення звітності',
+        SUCCESSFULLY_PUBLISHED: 'Успішно опубліковано',
+        INVALID_VALUE: 'Значення повинно бути числом',
     },
 };
 
@@ -32,7 +32,7 @@ export const REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION = {
         max: 50,
         getRequiredError: () => `Заголовок обов'язковий`,
     },
-    collectedFunds: {
+    collectedAmount: {
         max: 15,
     },
     image: {

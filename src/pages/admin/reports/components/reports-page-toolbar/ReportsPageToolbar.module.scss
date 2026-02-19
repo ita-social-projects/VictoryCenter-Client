@@ -15,7 +15,7 @@
     display: flex;
     justify-content: space-between;
     width: 1440px;
-    height: 60px;
+    height: 61px;
     margin: 130px 0 50px 0;
     border-bottom: 1px solid #a4a49b;
 }
@@ -23,4 +23,10 @@
 .actions {
     display: flex;
     flex-direction: row;
+}
+
+.category-bar-button {
+    &-selected {
+        border-bottom: 2px solid c.$blue-900;
+    }
 }

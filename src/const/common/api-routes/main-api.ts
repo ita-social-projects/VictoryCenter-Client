@@ -72,7 +72,7 @@ export const API_ROUTES = {
         PAGE: 'Partners/page',
     },
     REPORTS: {
-        MEDIA_SETTINGS: 'Reports',
-        BASE: 'Reports',
+        MEDIA_SETTINGS: 'Report/report',
+        BASE: 'Report',
     },
 };

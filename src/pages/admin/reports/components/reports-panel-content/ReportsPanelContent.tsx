@@ -6,33 +6,46 @@ import { MediaSettings, MediaSettingsRef } from '../media-settings/MediaSettings
 
 export const ReportsPanelContent = () => {
     const [isEditing, setIsEditing] = useState(false);
+    const [isDirty, setIsDirty] = useState(false);
     const [resetCounter, setResetCounter] = useState(0);
     const mediaSettingsRef = useRef<MediaSettingsRef>(null);
 
-    const handleEdit = useCallback(() => setIsEditing(true), []);
+    const handleEdit = useCallback(() => {
+        setIsEditing(true);
+        setIsDirty(false);
+    }, []);
     const handleCancel = useCallback(() => {
         setIsEditing(false);
+        setIsDirty(false);
         setResetCounter((prev) => prev + 1);
     }, []);
     const handlePublish = useCallback(async () => {
         const result = await mediaSettingsRef.current?.submit();
         if (result) {
             setIsEditing(false);
+            setIsDirty(false);
         }
     }, []);
+    const handleDirtyChange = useCallback((dirty: boolean) => setIsDirty(dirty), []);
 
     return (
         <div className={styles.root}>
             <div className={styles.toolbar}>
                 <ReportsPageToolbar
                     isEditing={isEditing}
+                    isPublishDisabled={!isDirty}
                     onEdit={handleEdit}
                     onCancel={handleCancel}
                     onPublish={handlePublish}
                 />
             </div>
             <div className={styles.content}>
-                <MediaSettings ref={mediaSettingsRef} isEditing={isEditing} resetCounter={resetCounter} />
+                <MediaSettings
+                    ref={mediaSettingsRef}
+                    isEditing={isEditing}
+                    resetCounter={resetCounter}
+                    onDirtyChange={handleDirtyChange}
+                />
             </div>
 
             <ToastContainer />

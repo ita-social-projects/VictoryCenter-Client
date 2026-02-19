@@ -1,5 +1,24 @@
 import { Image, ImageValues } from '../common/image';
 
+export interface ReportsMediaSettingsCollectedFundsDto {
+    title: string;
+    collectedAmount: number;
+    image: Image | null;
+    imageId: number | null;
+}
+
+export interface ReportsMediaSettingsChangedLivesDto {
+    title: string;
+    changedLives: number;
+    image: Image | null;
+    imageId: number | null;
+}
+
+export interface ReportsMediaSettingsDto {
+    collectedFundsBlock: ReportsMediaSettingsCollectedFundsDto;
+    changedLivesBlock: ReportsMediaSettingsChangedLivesDto;
+}
+
 export type ReportsMediaSettingsCollectedFunds = {
     title: string;
     collectedFunds: number;
@@ -19,28 +38,10 @@ export type ReportsMediaSettings = {
     changedLives: ReportsMediaSettingsChangedLives;
 };
 
-export type ReportsMediaSettingsDto = {
-    collectedFunds: ReportsMediaSettingsCollectedFundsDto;
-    changedLives: ReportsMediaSettingsChangedLivesDto;
-};
-
-export interface ReportsMediaSettingsCollectedFundsDto {
-    title: string;
-    collectedFunds: number;
-    image: Image | ImageValues | null;
-    imageId: number | null;
-}
-
-export interface ReportsMediaSettingsChangedLivesDto {
-    title: string;
-    changedLives: number;
-    image: Image | ImageValues | null;
-    imageId: number | null;
-}
-
+// Update DTOs
 export interface UpdateReportsMediaSettingsCollectedFundsDto {
     title: string;
-    collectedFunds: number;
+    collectedAmount: number;
     imageId: number | null;
 }
 
@@ -51,15 +52,11 @@ export interface UpdateReportsMediaSettingsChangedLivesDto {
 }
 
 export interface UpdateReportsMediaSettingsDto {
-    collectedFunds: UpdateReportsMediaSettingsCollectedFundsDto;
-    changedLives: UpdateReportsMediaSettingsChangedLivesDto;
+    collectedFundsBlock: UpdateReportsMediaSettingsCollectedFundsDto;
+    changedLivesBlock: UpdateReportsMediaSettingsChangedLivesDto;
 }
 
-export interface ReportsMediaSettingsUpdateRequest {
-    collectedFunds: ReportsMediaSettingsCollectedFundsUpdateRequest;
-    changedLives: ReportsMediaSettingsChangedLivesUpdateRequest;
-}
-
+// Update Request
 export interface ReportsMediaSettingsCollectedFundsUpdateRequest {
     title: string;
     collectedFunds: number;
@@ -72,4 +69,9 @@ export interface ReportsMediaSettingsChangedLivesUpdateRequest {
     changedLives: number;
     imageId: number | null;
     image: Image | ImageValues | null;
+}
+
+export interface ReportsMediaSettingsUpdateRequest {
+    collectedFunds: ReportsMediaSettingsCollectedFundsUpdateRequest;
+    changedLives: ReportsMediaSettingsChangedLivesUpdateRequest;
 }

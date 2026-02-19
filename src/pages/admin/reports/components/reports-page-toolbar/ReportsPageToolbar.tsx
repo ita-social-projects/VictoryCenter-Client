@@ -17,12 +17,19 @@ const TOOLBAR_TABS: ReportsToolbarTab[] = [
 
 interface ReportsPageToolbarProps {
     isEditing: boolean;
+    isPublishDisabled: boolean;
     onEdit: () => void;
     onCancel: () => void;
     onPublish: () => void;
 }
 
-export const ReportsPageToolbar = ({ isEditing, onEdit, onCancel, onPublish }: ReportsPageToolbarProps) => {
+export const ReportsPageToolbar = ({
+    isEditing,
+    isPublishDisabled,
+    onEdit,
+    onCancel,
+    onPublish,
+}: ReportsPageToolbarProps) => {
     const [selectedTab, setSelectedTab] = useState<ReportsToolbarTab>(TOOLBAR_TABS[0]);
 
     return (
@@ -39,7 +46,12 @@ export const ReportsPageToolbar = ({ isEditing, onEdit, onCancel, onPublish }: R
                     <Button buttonStyle="secondary" className={styles.button} onClick={onCancel}>
                         {REPORTS_TEXT.BUTTON.CANCEL}
                     </Button>
-                    <Button buttonStyle="primary" className={styles.button} onClick={onPublish}>
+                    <Button
+                        buttonStyle="primary"
+                        className={styles.button}
+                        onClick={onPublish}
+                        disabled={isPublishDisabled}
+                    >
                         {REPORTS_TEXT.BUTTON.PUBLISH}
                     </Button>
                 </div>

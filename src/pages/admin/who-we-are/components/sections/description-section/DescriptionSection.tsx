@@ -1,5 +1,5 @@
 import { Content } from '@/types/admin/who-we-are';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 import './DescriptionSection.scss';
@@ -8,6 +8,9 @@ import { OurMission } from '@/pages/public/about-us-page/our-mission/OurMission'
 import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '@/validation/admin/who-we-are-schema/WhoWeAreSchema';
 import { ContentType } from '@/types/common/about-us';
 import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
+import { LocalizationLanguage } from '@/types/common/language';
+import { returnDisplayedLocalization } from '@/utils/functions/localization/localization';
+import { DEFAULT_LOCALE } from '@/const/common/locales';
 
 export interface DescriptionSectionProps {
     content: Content[] | undefined;
@@ -16,6 +19,7 @@ export interface DescriptionSectionProps {
     onPublish: () => void;
     isPublishButtonActive: boolean;
     setIsPublishButtonActive: (value: boolean) => void;
+    language: LocalizationLanguage;
 }
 
 export const DescriptionSection = ({
@@ -25,16 +29,25 @@ export const DescriptionSection = ({
     onPublish,
     setIsPublishButtonActive,
     isPublishButtonActive,
+    language,
 }: DescriptionSectionProps) => {
     const [descriptionError, setDescriptionError] = useState<string | null>(null);
-
+    const [displayedDescription, setDisplayedDescription] = useState<string | null>(null);
+    const isBaseLanguage = language.code === DEFAULT_LOCALE;
     const descriptionContent = content?.find((item) => item.contentType === ContentType.Description);
+
+    useEffect(() => {
+        if (!descriptionContent) return;
+        const displayedLocalization = returnDisplayedLocalization(descriptionContent, language.code);
+        setDisplayedDescription(displayedLocalization?.description || descriptionContent.description);
+    }, [language, descriptionContent]);
 
     if (!descriptionContent) {
         return null;
     }
 
     const handleDescriptionChange = (value: string) => {
+        if (!isBaseLanguage) return;
         onChange({
             ...descriptionContent,
             description: value,
@@ -47,31 +60,33 @@ export const DescriptionSection = ({
     };
 
     const handleBlur = () => {
-        const plainText = getPlainTextFromHtml(descriptionContent.description ?? '');
+        const plainText = getPlainTextFromHtml(displayedDescription ?? '');
         const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(plainText);
         setDescriptionError(error || null);
     };
 
     return (
         <div className="description-section">
-            <OurMission description={descriptionContent.description ?? ''} className="description-section-show-block" />
+            <OurMission description={displayedDescription ?? ''} className="description-section-show-block" />
             <div className="description-section-textarea">
                 <RichTextInputGroup
+                    key={`description-${language.code}`}
                     label={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
                     id={descriptionContent.id.toString()}
                     name={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
-                    value={descriptionContent.description ?? ''}
+                    value={displayedDescription ?? ''}
                     onChange={handleDescriptionChange}
                     onBlur={handleBlur}
                     maxLength={descriptionLimit}
                     error={descriptionError || undefined}
+                    disabled={!isBaseLanguage}
                 />
                 <Button
                     className="button"
                     buttonStyle={'primary'}
                     onClick={onPublish}
                     type={'submit'}
-                    disabled={!!descriptionError || !isPublishButtonActive}
+                    disabled={!!descriptionError || !isPublishButtonActive || !isBaseLanguage}
                 >
                     {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
                 </Button>

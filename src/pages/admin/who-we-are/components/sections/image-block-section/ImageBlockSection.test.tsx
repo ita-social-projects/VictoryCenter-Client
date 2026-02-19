@@ -67,6 +67,7 @@ describe('ImageSection', () => {
                     title: null,
                     imageId: 1,
                     description: null,
+                    localizations: [],
                 },
                 {
                     id: 2,
@@ -75,6 +76,7 @@ describe('ImageSection', () => {
                     image: null,
                     imageId: null,
                     description: null,
+                    localizations: [],
                 },
                 {
                     id: 3,
@@ -83,6 +85,7 @@ describe('ImageSection', () => {
                     title: null,
                     imageId: null,
                     image: null,
+                    localizations: [],
                 },
             ],
             titleLimit,
@@ -92,6 +95,7 @@ describe('ImageSection', () => {
             imageInputProps: { style: { width: '100%' }, subText: '1000x800' },
             isPublishButtonActive: false,
             setIsPublishButtonActive: mockSetIsPublishButtonActive,
+            language: { id: 1, code: 'uk', name: 'Ukrainian' },
         };
         return render(<ImageSection {...defaultProps} {...props} />);
     };
@@ -123,8 +127,8 @@ describe('ImageSection', () => {
         expect(nullContentContainer).toBeEmptyDOMElement();
         const { container: noDescriptionContainer } = renderComponent({
             content: [
-                { id: 1, contentType: ContentType.Image, title: null, description: null, imageId: null, image: null },
-                { id: 2, contentType: ContentType.Title, title: null, description: null, imageId: null, image: null },
+                { id: 1, contentType: ContentType.Image, title: null, description: null, imageId: null, image: null, localizations: [] },
+                { id: 2, contentType: ContentType.Title, title: null, description: null, imageId: null, image: null, localizations: [] },
             ],
         });
         expect(noDescriptionContainer).toBeEmptyDOMElement();
@@ -183,7 +187,7 @@ describe('ImageSection', () => {
     it('should render correctly without title content', () => {
         renderComponent({
             content: [
-                { id: 1, contentType: ContentType.Image, image: null, title: null, imageId: null, description: null },
+                { id: 1, contentType: ContentType.Image, image: null, title: null, imageId: null, description: null, localizations: [] },
                 {
                     id: 3,
                     contentType: ContentType.Description,
@@ -191,6 +195,7 @@ describe('ImageSection', () => {
                     title: null,
                     imageId: null,
                     image: null,
+                    localizations: [],
                 },
             ],
         });
@@ -207,6 +212,7 @@ describe('ImageSection', () => {
                 image: null,
                 imageId: null,
                 description: null,
+                localizations: [],
             },
             {
                 id: 3,
@@ -215,6 +221,7 @@ describe('ImageSection', () => {
                 title: null,
                 imageId: null,
                 image: null,
+                localizations: [],
             },
         ];
         renderComponent({ content: contentWithoutImage });
@@ -230,6 +237,7 @@ describe('ImageSection', () => {
             description: null,
             title: null,
             imageId: null,
+            localizations: [],
         });
         expect(mockSetIsPublishButtonActive).toHaveBeenCalledWith(true);
     });
@@ -247,7 +255,7 @@ describe('ImageSection', () => {
     it('should not call onChange when titleContent is missing', () => {
         renderComponent({
             content: [
-                { id: 1, contentType: ContentType.Image, image: null, title: null, imageId: null, description: null },
+                { id: 1, contentType: ContentType.Image, image: null, title: null, imageId: null, description: null, localizations: [] },
                 {
                     id: 3,
                     contentType: ContentType.Description,
@@ -255,6 +263,7 @@ describe('ImageSection', () => {
                     title: null,
                     imageId: null,
                     image: null,
+                    localizations: [],
                 },
             ],
         });

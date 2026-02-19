@@ -7,6 +7,8 @@ import { ContentType } from '@/types/common/about-us';
 import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '@/validation/admin/who-we-are-schema/WhoWeAreSchema';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
+import { LocalizationLanguage } from '@/types/common/language';
+import { DEFAULT_LOCALE } from '@/const/common/locales';
 
 export interface CardsSectionProps {
     content: Content[] | undefined;
@@ -18,6 +20,7 @@ export interface CardsSectionProps {
     onPublish: () => void;
     isPublishButtonActive: boolean;
     setIsPublishButtonActive: (value: boolean) => void;
+    language: LocalizationLanguage;
 }
 
 export const CardsSection = ({
@@ -30,12 +33,14 @@ export const CardsSection = ({
     titleText,
     isPublishButtonActive,
     setIsPublishButtonActive,
+    language,
 }: CardsSectionProps) => {
     const [errors, setErrors] = useState<Record<number, { image: string | null; description: string | null }>>({});
 
     if (!content) return null;
 
     const cardContents = content.filter((item) => item.contentType === ContentType.Card);
+    const isBaseLanguage = language.code === DEFAULT_LOCALE;
 
     const handleDescriptionValidate = (id: number, value: string) => {
         const plainText = getPlainTextFromHtml(value);
@@ -90,6 +95,7 @@ export const CardsSection = ({
                             imageInputProps={{ ...(cardImageConfigs[index] || {}) }}
                             rows={rows}
                             setIsPublishButtonActive={setIsPublishButtonActive}
+                            language={language}
                         />
                     ))}
                 </div>
@@ -101,7 +107,9 @@ export const CardsSection = ({
                     onClick={onPublish}
                     type="submit"
                     disabled={
-                        Object.values(errors).some((error) => error.description != null) || !isPublishButtonActive
+                        Object.values(errors).some((error) => error.description != null) ||
+                        !isPublishButtonActive ||
+                        !isBaseLanguage
                     }
                 >
                     {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}

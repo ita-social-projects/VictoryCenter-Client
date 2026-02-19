@@ -57,6 +57,7 @@ describe('DescriptionSection', () => {
                     image: null,
                     imageId: null,
                     title: null,
+                    localizations: [],
                 },
             ],
             descriptionLimit,
@@ -64,6 +65,7 @@ describe('DescriptionSection', () => {
             onPublish: mockOnPublish,
             isPublishButtonActive: false,
             setIsPublishButtonActive: mockSetIsPublishButtonActive,
+            language: { id: 1, code: 'uk', name: 'Ukrainian' },
         };
         return render(<DescriptionSection {...defaultProps} {...props} />);
     };
@@ -102,6 +104,7 @@ describe('DescriptionSection', () => {
                     image: null,
                     imageId: null,
                     title: null,
+                    localizations: [],
                 },
             ],
         });

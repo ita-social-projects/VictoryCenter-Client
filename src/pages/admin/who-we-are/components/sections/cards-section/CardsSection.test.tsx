@@ -70,6 +70,7 @@ describe('CardsSection', () => {
             } as Image,
             imageId: 10,
             title: null,
+            localizations: [],
         },
         {
             id: 2,
@@ -82,6 +83,7 @@ describe('CardsSection', () => {
             } as Image,
             imageId: 2,
             title: null,
+            localizations: [],
         },
     ];
 
@@ -95,6 +97,7 @@ describe('CardsSection', () => {
             titleText,
             isPublishButtonActive: false,
             setIsPublishButtonActive: mockSetIsPublishButtonActive,
+            language: { id: 1, code: 'uk', name: 'Ukrainian' },
         };
         return render(<CardsSection {...defaultProps} {...props} />);
     };
@@ -126,6 +129,7 @@ describe('CardsSection', () => {
                     image: null,
                     imageId: null,
                     title: null,
+                    localizations: [],
                 },
             ],
         });

@@ -12,7 +12,13 @@ import WomanAndHorse from '@/assets/images/public/about-us-page/woman-horse.jpg'
 import { DescriptionSectionProps } from './description-section/DescriptionSection';
 import { CardsSectionProps } from './cards-section/CardsSection';
 
-type OmittedProps = 'content' | 'onChange' | 'onPublish' | 'setIsPublishButtonActive' | 'isPublishButtonActive';
+type OmittedProps =
+    | 'content'
+    | 'onChange'
+    | 'onPublish'
+    | 'setIsPublishButtonActive'
+    | 'isPublishButtonActive'
+    | 'language';
 
 export type WhoWeAreImageConfigParams = {
     cropWidth: number;

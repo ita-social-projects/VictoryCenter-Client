@@ -1,11 +1,15 @@
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ImageInput, ImageInputProps } from '@/components/admin/image-input/ImageInput';
 import { Content } from '@/types/admin/who-we-are';
 import { ImageValues } from '@/types/common/image';
 import { WHO_WE_ARE_TEXT } from '@/const/admin/who-we-are';
 import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 import './CardContent.scss';
+import { LocalizationLanguage } from '@/types/common/language';
+import { ContentType } from '@/types/common/programs';
+import { DEFAULT_LOCALE } from '@/const/common/locales';
+import { returnDisplayedLocalization } from '@/utils/functions/localization/localization';
 
 export interface CardContentProps {
     content: Content;
@@ -18,6 +22,7 @@ export interface CardContentProps {
     imageError: string | null;
     setImageError: (value: string | null) => void;
     setIsPublishButtonActive: (value: boolean) => void;
+    language: LocalizationLanguage;
 }
 
 export const CardContent = ({
@@ -30,7 +35,17 @@ export const CardContent = ({
     imageError,
     setImageError,
     setIsPublishButtonActive,
+    language,
 }: CardContentProps) => {
+    const [displayedDescription, setDisplayedDescription] = useState<string | null>(null);
+    const isBaseLanguage = language.code === DEFAULT_LOCALE;
+
+    useEffect(() => {
+        if (!content) return;
+        const displayedLocalization = returnDisplayedLocalization(content, language.code);
+        setDisplayedDescription(displayedLocalization?.description || content.description);
+    }, [language, content]);
+
     const handleImageChange = (value: ImageValues | null) => {
         onChange({
             ...content,
@@ -40,6 +55,7 @@ export const CardContent = ({
     };
 
     const handleDescriptionChange = (value: string) => {
+        if (!isBaseLanguage) return;
         onChange({
             ...content,
             description: value,
@@ -60,14 +76,16 @@ export const CardContent = ({
             {imageError && <p className="error">{imageError}</p>}
             <div className="card-content-description-wrapper">
                 <RichTextInputGroup
+                    key={`description-${language.code}`}
                     label={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
                     onChange={handleDescriptionChange}
-                    value={content.description ?? ''}
+                    value={displayedDescription ?? ''}
                     maxLength={descriptionLimit}
                     name={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
                     id={content.id.toString()}
-                    onBlur={() => onDescriptionValidate(content.description ?? '')}
+                    onBlur={() => onDescriptionValidate(displayedDescription ?? '')}
                     error={descriptionError ?? undefined}
+                    disabled={!isBaseLanguage}
                 />
             </div>
         </div>

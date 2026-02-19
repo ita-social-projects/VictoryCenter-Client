@@ -207,6 +207,7 @@ export const TeamPageContent = () => {
                     items: fetchedMembers.items.map((item) => mapEntityWithLocalizations(item)),
                     totalItemsCount: fetchedMembers.totalItemsCount,
                 };
+                console.log('Fetched members:', mappedMembers);
 
                 if (abortController.signal.aborted) {
                     return;

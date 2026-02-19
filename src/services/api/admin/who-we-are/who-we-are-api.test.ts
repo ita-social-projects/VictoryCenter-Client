@@ -64,6 +64,7 @@ describe('WhoWeAreApi', () => {
                     imageId: null,
                     image: null,
                     description: null,
+                    localizations: [],
                 },
             ];
             const mockResponse: WhoWeAreSection = {
@@ -98,6 +99,7 @@ describe('WhoWeAreApi', () => {
                     image: newImageValues,
                     description: null,
                     contentType: ContentType.Description,
+                    localizations: [],
                 },
             ];
             const mockResponse: WhoWeAreSection = {
@@ -143,6 +145,7 @@ describe('WhoWeAreApi', () => {
                     image: replacingImageValues,
                     description: null,
                     contentType: ContentType.Title,
+                    localizations: [],
                 },
             ];
             const mockResponse: WhoWeAreSection = {
@@ -185,6 +188,7 @@ describe('WhoWeAreApi', () => {
                     image: null,
                     description: null,
                     contentType: ContentType.Title,
+                    localizations: [],
                 },
             ];
             const mockResponse: WhoWeAreSection = {

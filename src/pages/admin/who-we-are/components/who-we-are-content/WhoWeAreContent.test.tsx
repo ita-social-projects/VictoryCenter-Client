@@ -16,6 +16,35 @@ jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
     InlineLoader: () => <div data-testid="inline-loader" />,
 }));
 
+jest.mock('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit', () => ({
+    useLocalizationToolkit: () => ({
+        allLanguages: [{ id: 1, code: 'uk', name: 'Ukrainian' }],
+        translationLanguages: [{ id: 1, code: 'uk', name: 'Ukrainian' }],
+        selectedLanguage: { id: 1, code: 'uk' },
+        onLanguageChange: jest.fn(),
+        translationStatusFilter: 0,
+        onTranslationStatusFilterChange: jest.fn(),
+        retryFetchLanguages: jest.fn(),
+    }),
+}));
+
+jest.mock('../who-we-are-page-toolbar/WhoWeArePageToolbar', () => ({
+    WhoWeArePageToolbar: () => (
+        <div className="toolbar" data-testid="who-we-are-page-toolbar">
+            <div className="toolbar-actions">
+                <div className="toolkit" data-testid="localization-toolkit">
+                    <div className="select select-closed">
+                        <button className="select-head" type="button">
+                            <span className="empty not-empty">Усі</span>
+                            <svg />
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    ),
+}));
+
 jest.mock('@/services/api/admin/who-we-are/who-we-are-api');
 const mockedWhoWeAreApi = WhoWeAreApi as jest.Mocked<typeof WhoWeAreApi>;
 
@@ -100,6 +129,7 @@ const mockSection1: WhoWeAreSection = {
             title: null,
             image: { id: 1, url: 'url1.jpg', mimeType: 'image/png' },
             imageId: 1,
+            localizations: [],
         },
     ],
 };
@@ -109,7 +139,7 @@ const mockSection2: WhoWeAreSection = {
     title: 'Mission Section',
     sectionType: SectionType.People,
     contents: [
-        { id: 2, contentType: ContentType.Title, title: 'Our Goal', image: null, imageId: null, description: null },
+        { id: 2, contentType: ContentType.Title, title: 'Our Goal', image: null, imageId: null, description: null, localizations: [] },
     ],
 };
 

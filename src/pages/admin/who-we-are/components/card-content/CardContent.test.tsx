@@ -52,6 +52,7 @@ describe('CardContent', () => {
         } as Image,
         title: null,
         imageId: 10,
+        localizations: [],
     };
 
     const renderComponent = (props = {}) => {
@@ -68,6 +69,7 @@ describe('CardContent', () => {
             imageError: null,
             setImageError: mockSetImageError,
             setIsPublishButtonActive: mockSetIsPublishButtonActive,
+            language: { id: 1, code: 'uk', name: 'Ukrainian' },
         };
         return render(<CardContent {...baseProps} {...props} />);
     };

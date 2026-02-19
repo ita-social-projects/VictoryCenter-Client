@@ -33,6 +33,7 @@ const mockProps = {
     onPublish: jest.fn(),
     isPublishButtonActive: false,
     setIsPublishButtonActive: jest.fn(),
+    language: { id: 1, code: 'uk', name: 'Ukrainian' },
 };
 
 describe('SectionsWrapper', () => {

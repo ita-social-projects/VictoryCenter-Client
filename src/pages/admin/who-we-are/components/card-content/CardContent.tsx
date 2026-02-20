@@ -70,6 +70,7 @@ export const CardContent = ({
                 label={WHO_WE_ARE_TEXT.IMAGE.INPUT}
                 variant="whoWeAre"
                 setError={setImageError}
+                disabled={!isBaseLanguage}
                 {...imageInputProps}
             />
             {imageError && <p className="error">{imageError}</p>}

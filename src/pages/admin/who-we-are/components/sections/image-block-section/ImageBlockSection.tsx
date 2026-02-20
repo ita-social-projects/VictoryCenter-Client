@@ -125,6 +125,7 @@ export const ImageSection = ({
                     onChange={handleImageChange}
                     variant="whoWeAre"
                     label={WHO_WE_ARE_TEXT.IMAGE.INPUT}
+                    disabled={!isBaseLanguage}
                     {...imageInputProps}
                 />
                 {imageError && (

@@ -377,9 +377,8 @@ export const ProgramSectionForm = ({
         setLocalSection(newSection);
         emitSectionChange(newSection);
 
-        const nextIndex = pairs.length;
         setTimeout(() => {
-            const element = document.getElementById(`pair-description-${nextIndex}`) as HTMLTextAreaElement | null;
+            const element = document.getElementById(`pair-description-${nextGroupIndex}`) as HTMLTextAreaElement | null;
             element?.focus();
         }, 0);
     }, [emitSectionChange]);

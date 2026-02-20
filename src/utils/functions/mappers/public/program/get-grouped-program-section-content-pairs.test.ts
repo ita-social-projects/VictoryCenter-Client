@@ -2,7 +2,7 @@ import { ProgramSectionContent } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 import {
     getDescriptionAuthorPairsByGroup,
-    getGroupedProgramSectionTextPairs,
+    getGroupedProgramSectionValuesByGroup,
 } from './get-grouped-program-section-content-pairs';
 
 const makeContent = (overrides: Partial<ProgramSectionContent>): ProgramSectionContent =>
@@ -17,19 +17,85 @@ const makeContent = (overrides: Partial<ProgramSectionContent>): ProgramSectionC
     }) as ProgramSectionContent;
 
 describe('get-grouped-program-section-content-pairs', () => {
-    describe('getGroupedProgramSectionTextPairs', () => {
-        it('returns an empty array when there are no grouped items', () => {
+    describe('getGroupedProgramSectionValuesByGroup', () => {
+        it('supports 4 content types per group and keeps sorted group order', () => {
+            const unknownType = 999 as ContentType;
+            const contents: ProgramSectionContent[] = [
+                makeContent({ contentType: ContentType.Author, groupIndex: 2, author: 'A2' }),
+                makeContent({ contentType: ContentType.Title, groupIndex: 2, title: 'T2' }),
+                makeContent({ contentType: ContentType.Description, groupIndex: 2, description: 'D2' }),
+                makeContent({ contentType: unknownType, groupIndex: 2 } as any),
+                makeContent({ contentType: ContentType.Title, groupIndex: 0, title: 'T0' }),
+                makeContent({ contentType: ContentType.Description, groupIndex: 0, description: 'D0' }),
+                makeContent({ contentType: ContentType.Author, groupIndex: 0, author: null }),
+                makeContent({ contentType: unknownType, groupIndex: 0 } as any),
+            ];
+
+            const result = getGroupedProgramSectionValuesByGroup(contents, [
+                ContentType.Title,
+                ContentType.Description,
+                ContentType.Author,
+                unknownType,
+            ]);
+
+            expect(result).toEqual([
+                {
+                    groupIndex: 0,
+                    byType: {
+                        [ContentType.Title]: 'T0',
+                        [ContentType.Description]: 'D0',
+                        [ContentType.Author]: '',
+                        [unknownType]: '',
+                    },
+                },
+                {
+                    groupIndex: 2,
+                    byType: {
+                        [ContentType.Title]: 'T2',
+                        [ContentType.Description]: 'D2',
+                        [ContentType.Author]: 'A2',
+                        [unknownType]: '',
+                    },
+                },
+            ]);
+        });
+
+        it('returns empty array when requested types are empty', () => {
+            const contents: ProgramSectionContent[] = [
+                makeContent({ contentType: ContentType.Title, groupIndex: 0, title: 'T0' }),
+            ];
+
+            const result = getGroupedProgramSectionValuesByGroup(contents, []);
+
+            expect(result).toEqual([]);
+        });
+
+        it('does not create group when a group contains only unrequested content types', () => {
+            const contents: ProgramSectionContent[] = [
+                makeContent({ contentType: ContentType.Title, groupIndex: 0, title: 'T0' }),
+                makeContent({ contentType: ContentType.Author, groupIndex: 1, author: 'A1' }),
+            ];
+
+            const result = getGroupedProgramSectionValuesByGroup(contents, [ContentType.Description]);
+
+            expect(result).toEqual([]);
+        });
+
+        it('returns an empty array when there are no grouped items for requested types', () => {
             const contents: ProgramSectionContent[] = [
                 makeContent({ contentType: ContentType.Description, groupIndex: null, description: 'D' }),
                 makeContent({ contentType: ContentType.Author, groupIndex: undefined, author: 'A' }),
             ];
 
-            const result = getGroupedProgramSectionTextPairs(contents, ContentType.Description, ContentType.Author);
+            const result = getGroupedProgramSectionValuesByGroup(contents, [
+                ContentType.Description,
+                ContentType.Author,
+            ]);
 
             expect(result).toEqual([]);
         });
 
-        it('groups by groupIndex, sorts groups, and fills missing values with empty strings', () => {
+        it('fills missing values with empty strings for requested types', () => {
             const contents: ProgramSectionContent[] = [
                 makeContent({ contentType: ContentType.Description, groupIndex: 2, description: 'Desc 2' }),
                 makeContent({ contentType: ContentType.Author, groupIndex: 2, author: 'Author 2' }),
@@ -38,23 +104,49 @@ describe('get-grouped-program-section-content-pairs', () => {
                 makeContent({ contentType: ContentType.Description, groupIndex: null, description: 'Ignored' }),
             ];
 
-            const result = getGroupedProgramSectionTextPairs(contents, ContentType.Description, ContentType.Author);
+            const result = getGroupedProgramSectionValuesByGroup(contents, [
+                ContentType.Description,
+                ContentType.Author,
+            ]);
 
             expect(result).toEqual([
-                { groupIndex: 1, left: '', right: 'Author 1' },
-                { groupIndex: 2, left: 'Desc 2', right: 'Author 2' },
+                {
+                    groupIndex: 1,
+                    byType: {
+                        [ContentType.Description]: '',
+                        [ContentType.Author]: 'Author 1',
+                    },
+                },
+                {
+                    groupIndex: 2,
+                    byType: {
+                        [ContentType.Description]: 'Desc 2',
+                        [ContentType.Author]: 'Author 2',
+                    },
+                },
             ]);
         });
 
-        it('reads title values when Title is requested as leftType', () => {
+        it('reads title and description values for requested types', () => {
             const contents: ProgramSectionContent[] = [
                 makeContent({ contentType: ContentType.Title, groupIndex: 0, title: 'TITLE' }),
                 makeContent({ contentType: ContentType.Description, groupIndex: 0, description: 'DESC' }),
             ];
 
-            const result = getGroupedProgramSectionTextPairs(contents, ContentType.Title, ContentType.Description);
+            const result = getGroupedProgramSectionValuesByGroup(contents, [
+                ContentType.Title,
+                ContentType.Description,
+            ]);
 
-            expect(result).toEqual([{ groupIndex: 0, left: 'TITLE', right: 'DESC' }]);
+            expect(result).toEqual([
+                {
+                    groupIndex: 0,
+                    byType: {
+                        [ContentType.Title]: 'TITLE',
+                        [ContentType.Description]: 'DESC',
+                    },
+                },
+            ]);
         });
 
         it('falls back to empty string for null title and null author values', () => {
@@ -63,9 +155,17 @@ describe('get-grouped-program-section-content-pairs', () => {
                 makeContent({ contentType: ContentType.Author, groupIndex: 0, author: null }),
             ];
 
-            const result = getGroupedProgramSectionTextPairs(contents, ContentType.Title, ContentType.Author);
+            const result = getGroupedProgramSectionValuesByGroup(contents, [ContentType.Title, ContentType.Author]);
 
-            expect(result).toEqual([{ groupIndex: 0, left: '', right: '' }]);
+            expect(result).toEqual([
+                {
+                    groupIndex: 0,
+                    byType: {
+                        [ContentType.Title]: '',
+                        [ContentType.Author]: '',
+                    },
+                },
+            ]);
         });
 
         it('returns empty string for unknown text content type (default switch branch)', () => {
@@ -81,9 +181,17 @@ describe('get-grouped-program-section-content-pairs', () => {
                 } as any),
             ];
 
-            const result = getGroupedProgramSectionTextPairs(contents, unknownType, ContentType.Description);
+            const result = getGroupedProgramSectionValuesByGroup(contents, [unknownType, ContentType.Description]);
 
-            expect(result).toEqual([{ groupIndex: 0, left: '', right: '' }]);
+            expect(result).toEqual([
+                {
+                    groupIndex: 0,
+                    byType: {
+                        [unknownType]: '',
+                        [ContentType.Description]: '',
+                    },
+                },
+            ]);
         });
     });
 

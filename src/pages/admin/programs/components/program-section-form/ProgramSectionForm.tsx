@@ -15,6 +15,7 @@ import {
     getProgramSectionTemplateMaxGroupCount,
     normalizeGroupedContentsGroupIndexes,
 } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
+import { getDescriptionAuthorPairsByGroup } from '@/utils/functions/mappers/public/program/get-grouped-program-section-content-pairs';
 
 export interface ProgramSectionFormProps {
     section: ProgramSection;
@@ -46,38 +47,6 @@ const getDescriptionsInOrder = (contents: ProgramSectionContent[]) => {
     return contents.filter((c) => c.contentType === ContentType.Description).sort((a, b) => a.order - b.order);
 };
 
-const getDescriptionAuthorPairs = (contents: ProgramSectionContent[]) => {
-    const map = new Map<number, { description: string; author: string }>();
-
-    for (const content of contents) {
-        if (content.groupIndex === null || content.groupIndex === undefined) continue;
-
-        const groupIndex = content.groupIndex;
-
-        if (!map.has(groupIndex)) {
-            map.set(groupIndex, { description: '', author: '' });
-        }
-
-        const entry = map.get(groupIndex)!;
-
-        if (content.contentType === ContentType.Description) {
-            entry.description = (content as any).description || '';
-        }
-
-        if (content.contentType === ContentType.Author) {
-            entry.author = (content as any).author || '';
-        }
-    }
-
-    return Array.from(map.entries())
-        .sort((a, b) => a[0] - b[0])
-        .map(([groupIndex, value]) => ({
-            groupIndex,
-            description: value.description,
-            author: value.author,
-        }));
-};
-
 const ensureTitleContentAndOnePair = (section: ProgramSection): ProgramSection => {
     if (section.template !== ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs) return section;
 
@@ -101,7 +70,7 @@ const ensureTitleContentAndOnePair = (section: ProgramSection): ProgramSection =
         hasChanges = true;
     }
 
-    const pairs = getDescriptionAuthorPairs(updatedContents);
+    const pairs = getDescriptionAuthorPairsByGroup(updatedContents);
     if (pairs.length > 0) {
         return hasChanges ? { ...section, contents: updatedContents } : section;
     }
@@ -203,7 +172,7 @@ export const ProgramSectionForm = ({
     const isDescriptionAuthorPairsTemplate =
         section.template === ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs;
 
-    const orderedPairs = getDescriptionAuthorPairs(localSection.contents);
+    const orderedPairs = getDescriptionAuthorPairsByGroup(localSection.contents);
 
     const descriptionAuthorPairs = orderedPairs.map((p) => ({
         description: p.description,
@@ -334,7 +303,7 @@ export const ProgramSectionForm = ({
     const handlePairFieldChange = useCallback(
         (index: number, value: string, field: ContentType.Description | ContentType.Author) => {
             const prev = localSectionRef.current;
-            const pairs = getDescriptionAuthorPairs(prev.contents);
+            const pairs = getDescriptionAuthorPairsByGroup(prev.contents);
             const target = pairs[index];
             if (!target) return;
 
@@ -375,7 +344,7 @@ export const ProgramSectionForm = ({
         const prev = localSectionRef.current;
         if (prev.template !== ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs) return;
 
-        const pairs = getDescriptionAuthorPairs(prev.contents);
+        const pairs = getDescriptionAuthorPairsByGroup(prev.contents);
         const maxGroupCount = getProgramSectionTemplateMaxGroupCount(prev.template);
         if (pairs.length >= maxGroupCount) return;
 
@@ -420,7 +389,7 @@ export const ProgramSectionForm = ({
             const prev = localSectionRef.current;
             if (prev.template !== ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs) return;
 
-            const pairs = getDescriptionAuthorPairs(prev.contents);
+            const pairs = getDescriptionAuthorPairsByGroup(prev.contents);
             if (pairs.length <= 1) return;
 
             const target = pairs[index];

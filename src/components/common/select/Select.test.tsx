@@ -195,7 +195,6 @@ describe('Select Component', () => {
 
         expect(mockOnValueChange).toHaveBeenCalledWith('option1');
 
-        // Rerender with the new value to simulate parent component updating
         rerender(<Select {...defaultProps} value="option1" onValueChange={mockOnValueChange} />);
 
         expect(screen.getByText('Option 1')).toBeInTheDocument();
@@ -208,7 +207,6 @@ describe('Select Component', () => {
 
         expect(span).toHaveClass('empty');
 
-        // Rerender with value prop
         rerender(<Select {...defaultProps} value="option1" />);
 
         expect(span).toHaveClass('not-empty');
@@ -333,11 +331,9 @@ describe('Select Component', () => {
         const { container } = render(<Select {...defaultProps} onValueChange={mockOnValueChange} />);
         const selectButton = container.querySelector('.select-head') as HTMLElement;
 
-        // First selection
         fireEvent.click(selectButton);
         fireEvent.click(screen.getByRole('button', { name: 'Option 1' }));
 
-        // Second selection
         fireEvent.click(selectButton);
         fireEvent.click(screen.getByRole('button', { name: 'Option 2' }));
 
@@ -355,23 +351,19 @@ describe('Select Component', () => {
         expect(selectContainer).toHaveClass('select-closed');
         expect(screen.getByText(COMMON_TEXT_ADMIN.STATUS.DEFAULT)).toBeInTheDocument();
 
-        // Open and select Option 1
         fireEvent.click(selectButton);
         expect(selectContainer).toHaveClass('select-opened');
         fireEvent.click(screen.getByRole('button', { name: 'Option 1' }));
         expect(mockOnValueChange).toHaveBeenCalledWith('option1');
         expect(selectContainer).toHaveClass('select-closed');
 
-        // Rerender with new value
         rerender(<Select {...defaultProps} value="option1" onValueChange={mockOnValueChange} />);
         expect(screen.getByText('Option 1')).toBeInTheDocument();
 
-        // Open and select Option 2
         fireEvent.click(selectButton);
         fireEvent.click(screen.getByRole('button', { name: 'Option 2' }));
         expect(mockOnValueChange).toHaveBeenCalledWith('option2');
 
-        // Rerender with new value
         rerender(<Select {...defaultProps} value="option2" onValueChange={mockOnValueChange} />);
         expect(screen.getByText('Option 2')).toBeInTheDocument();
     });
@@ -455,5 +447,56 @@ describe('Select Component', () => {
 
         fireEvent.click(screen.getByRole('button', { name: 'Option 1' }));
         expect(selectContainer).toHaveClass('select-closed');
+    });
+});
+
+describe('Select Component (openOnHover coverage)', () => {
+    const props: SelectProps<string> = {
+        children: [
+            <Select.Option key="1" value="option1" name="Option 1" />,
+            <Select.Option key="2" value="option2" name="Option 2" />,
+        ],
+        onValueChange: jest.fn(),
+    };
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    it('opens on mouse enter and closes on mouse leave when openOnHover=true', () => {
+        const { container } = render(<Select {...props} openOnHover />);
+        const root = container.firstChild as HTMLElement;
+
+        expect(root).toHaveClass('select-closed');
+
+        fireEvent.mouseEnter(root);
+        expect(root).toHaveClass('select-opened');
+        expect(screen.getByText('Option 1')).toBeInTheDocument();
+
+        fireEvent.mouseLeave(root);
+        expect(root).toHaveClass('select-closed');
+        expect(screen.queryByText('Option 1')).not.toBeInTheDocument();
+    });
+
+    it('ignores real mouse click (detail=1) when openOnHover=true', () => {
+        const { container } = render(<Select {...props} openOnHover />);
+        const root = container.firstChild as HTMLElement;
+        const head = container.querySelector('.select-head') as HTMLElement;
+
+        fireEvent.click(head, { detail: 1 });
+
+        expect(root).toHaveClass('select-closed');
+        expect(screen.queryByText('Option 1')).not.toBeInTheDocument();
+    });
+
+    it('toggles on click with detail=0 when openOnHover=true', () => {
+        const { container } = render(<Select {...props} openOnHover />);
+        const root = container.firstChild as HTMLElement;
+        const head = container.querySelector('.select-head') as HTMLElement;
+
+        fireEvent.click(head, { detail: 0 });
+
+        expect(root).toHaveClass('select-opened');
+        expect(screen.getByText('Option 2')).toBeInTheDocument();
     });
 });

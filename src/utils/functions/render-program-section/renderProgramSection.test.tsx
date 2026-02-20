@@ -210,9 +210,9 @@ describe('renderProgramSection', () => {
         };
 
         const cardTemplates = [
-            { id: ProgramSectionTemplate.DualTitleDescription, cardsCount: 2 },
-            { id: ProgramSectionTemplate.TripleTitleDescription, cardsCount: 3 },
-            { id: ProgramSectionTemplate.QuadTitleDescription, cardsCount: 4 },
+            { id: ProgramSectionTemplate.DualTitleDescriptionPairs, cardsCount: 2 },
+            { id: ProgramSectionTemplate.TripleTitleDescriptionPairs, cardsCount: 3 },
+            { id: ProgramSectionTemplate.QuadTitleDescriptionPairs, cardsCount: 4 },
         ];
 
         cardTemplates.forEach(({ id, cardsCount }) => {
@@ -502,32 +502,32 @@ describe('getInitialSectionContents', () => {
         expect(contents.filter((c) => c.contentType === ContentType.Image)).toHaveLength(4);
     });
 
-    it('returns 4 contents for DualTitleDescription (2 title + 2 description)', () => {
-        const contents = getInitialSectionContents(ProgramSectionTemplate.DualTitleDescription);
+    it('returns 4 contents for DualTitleDescriptionPairs (2 title + 2 description)', () => {
+        const contents = getInitialSectionContents(ProgramSectionTemplate.DualTitleDescriptionPairs);
 
         expect(contents).toHaveLength(4);
         expect(contents.filter((c) => c.contentType === ContentType.Title)).toHaveLength(2);
         expect(contents.filter((c) => c.contentType === ContentType.Description)).toHaveLength(2);
     });
 
-    it('returns 6 contents for TripleTitleDescription (3 title + 3 description)', () => {
-        const contents = getInitialSectionContents(ProgramSectionTemplate.TripleTitleDescription);
+    it('returns 6 contents for TripleTitleDescriptionPairs (3 title + 3 description)', () => {
+        const contents = getInitialSectionContents(ProgramSectionTemplate.TripleTitleDescriptionPairs);
 
         expect(contents).toHaveLength(6);
         expect(contents.filter((c) => c.contentType === ContentType.Title)).toHaveLength(3);
         expect(contents.filter((c) => c.contentType === ContentType.Description)).toHaveLength(3);
     });
 
-    it('returns 8 contents for QuadTitleDescription (4 title + 4 description)', () => {
-        const contents = getInitialSectionContents(ProgramSectionTemplate.QuadTitleDescription);
+    it('returns 8 contents for QuadTitleDescriptionPairs (4 title + 4 description)', () => {
+        const contents = getInitialSectionContents(ProgramSectionTemplate.QuadTitleDescriptionPairs);
 
         expect(contents).toHaveLength(8);
         expect(contents.filter((c) => c.contentType === ContentType.Title)).toHaveLength(4);
         expect(contents.filter((c) => c.contentType === ContentType.Description)).toHaveLength(4);
     });
 
-    it('maintains correct order for DualTitleDescription', () => {
-        const contents = getInitialSectionContents(ProgramSectionTemplate.DualTitleDescription);
+    it('maintains correct order for DualTitleDescriptionPairs', () => {
+        const contents = getInitialSectionContents(ProgramSectionTemplate.DualTitleDescriptionPairs);
 
         expect(contents.map((c) => c.order)).toEqual([0, 1, 2, 3]);
     });

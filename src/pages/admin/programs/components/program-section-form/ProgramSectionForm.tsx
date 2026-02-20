@@ -344,20 +344,25 @@ export const ProgramSectionForm = ({
         const prev = localSectionRef.current;
         if (prev.template !== ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs) return;
 
-        const pairs = getDescriptionAuthorPairsByGroup(prev.contents);
+        const normalizedContents = normalizeGroupedContentsGroupIndexes(prev.contents, [
+            ContentType.Description,
+            ContentType.Author,
+        ]);
+
+        const pairs = getDescriptionAuthorPairsByGroup(normalizedContents);
         const maxGroupCount = getProgramSectionTemplateMaxGroupCount(prev.template);
         if (pairs.length >= maxGroupCount) return;
 
         const nextGroupIndex = pairs.length;
 
-        const maxOrder = prev.contents.length ? Math.max(...prev.contents.map((c) => c.order)) : -1;
+        const maxOrder = normalizedContents.length ? Math.max(...normalizedContents.map((c) => c.order)) : -1;
         const descriptionOrder = maxOrder + 1;
         const authorOrder = maxOrder + 2;
 
         const newSection: ProgramSection = {
             ...prev,
             contents: [
-                ...prev.contents,
+                ...normalizedContents,
                 {
                     contentType: ContentType.Description,
                     order: descriptionOrder,

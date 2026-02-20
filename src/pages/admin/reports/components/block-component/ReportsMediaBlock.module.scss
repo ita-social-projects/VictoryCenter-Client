@@ -1,7 +1,9 @@
+@use '@/assets/sass/variables/colors' as c;
+
 .root {
     width: 690px;
     height: 901px;
-    background-color: #ffffff;
+    background-color: c.$white;
     border-radius: 15px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
     padding: 40px 20px;
@@ -9,7 +11,7 @@
 }
 
 .root--editing {
-    border: 3px dashed #a4a49b;
+    border: 3px dashed c.$grey-700;
 }
 .image {
     display: block;
@@ -47,7 +49,7 @@
 .header {
     width: 100%;
     height: 67px;
-    border-bottom: 1px solid #a4a49b;
+    border-bottom: 1px solid c.$grey-700;
     display: flex;
     justify-content: start;
 }

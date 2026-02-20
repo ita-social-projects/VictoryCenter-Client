@@ -31,7 +31,7 @@ export const FaqProgramSection = ({
                 <h2 className={styles['title']}>{displayTitle}</h2>
                 <div className={styles['questions-container']}>
                     {questions.map((faq, index) => (
-                        <FaqCard key={faq.id || index} faq={faq} />
+                        <FaqCard key={faq.id || index} faq={faq} className={styles['faq-card-program-section']} />
                     ))}
                 </div>
             </div>

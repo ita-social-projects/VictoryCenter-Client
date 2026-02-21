@@ -18,6 +18,17 @@ describe('fetchTeamPageData', () => {
             {
                 categoryName: 'Engineering',
                 description: 'Dev team',
+                localizations: [
+                    {
+                        localizationInfoDto: {
+                            id: 2,
+                            code: 'en',
+                        },
+                        name: 'Engineering',
+                        description: 'Dev team',
+                        translationStatus: 0,
+                    },
+                ],
                 teamMembers: [
                     { id: 1, fullName: 'Alice', description: 'Frontend Dev', localizations: [] },
                     { id: 2, fullName: 'Bob', description: null, localizations: [] },
@@ -25,6 +36,7 @@ describe('fetchTeamPageData', () => {
             },
             {
                 categoryName: 'With no description',
+                localizations: [],
                 teamMembers: [{ id: 3, fullName: 'John', description: 'Backend Dev', localizations: [] }],
             },
         ];
@@ -34,6 +46,17 @@ describe('fetchTeamPageData', () => {
                 {
                     title: 'Engineering',
                     description: 'Dev team',
+                    localizations: [
+                        {
+                            language: {
+                                id: 2,
+                                code: 'en',
+                            },
+                            name: 'Engineering',
+                            description: 'Dev team',
+                            translationStatus: 0,
+                        },
+                    ],
                     members: [
                         { id: 1, name: 'Alice', role: 'Frontend Dev', photo: null, localizations: [] },
                         { id: 2, name: 'Bob', role: '', photo: null, localizations: [] },
@@ -42,6 +65,7 @@ describe('fetchTeamPageData', () => {
                 {
                     title: 'With no description',
                     description: '',
+                    localizations: [],
                     members: [{ id: 3, name: 'John', role: 'Backend Dev', photo: null, localizations: [] }],
                 },
             ],
@@ -61,6 +85,7 @@ describe('fetchTeamPageData', () => {
             {
                 categoryName: 'Design',
                 description: 'Design team',
+                localizations: [],
                 teamMembers: [
                     // Invalid
                     { id: 3, fullName: '', description: 'UX' },
@@ -77,6 +102,7 @@ describe('fetchTeamPageData', () => {
                 {
                     title: 'Design',
                     description: 'Design team',
+                    localizations: [],
                     members: [{ id: 5, name: 'John', role: 'Lead', photo: null, localizations: [] }],
                 },
             ],
@@ -97,18 +123,21 @@ describe('fetchTeamPageData', () => {
                 // Without name
                 categoryName: '',
                 description: 'Marketing team',
+                localizations: [],
                 teamMembers: [{ id: 6, fullName: 'Anna', description: 'SEO' }],
             },
             {
                 // Without team members
                 categoryName: 'QA',
                 description: 'Testers',
+                localizations: [],
                 teamMembers: [],
             },
             {
                 // Without valid team members
                 categoryName: 'PM',
                 description: 'Product',
+                localizations: [],
                 teamMembers: [
                     // Without fullName
                     { id: 7, fullName: '', description: 'Product Owner' },
@@ -117,6 +146,7 @@ describe('fetchTeamPageData', () => {
             {
                 // Without name
                 description: 'Manager',
+                localizations: [],
                 teamMembers: [{ id: 8, fullName: 'John', description: 'Cool manager' }],
             },
         ];

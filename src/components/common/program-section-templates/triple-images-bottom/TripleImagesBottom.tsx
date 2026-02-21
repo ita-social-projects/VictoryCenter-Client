@@ -48,6 +48,7 @@ export const TripleImagesBottom = ({
             onDescriptionChange={onDescriptionChange}
             validationResetKey={validationResetKey}
             className={cn(baseStyles.container, {
+                [styles.template]: mode === ProgramSectionMode.Template,
                 [styles['form-container']]: mode === ProgramSectionMode.Edit,
             })}
             topSectionClassName={baseStyles['top-section']}

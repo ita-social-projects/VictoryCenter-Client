@@ -226,7 +226,7 @@ describe('ReportsMediaBlock', () => {
 
             const root = container.firstChild as HTMLElement;
             expect(root).toHaveClass('root');
-            expect(root).not.toHaveClass('root--editing');
+            expect(root).not.toHaveClass('root-editing');
         });
 
         it('should apply editing class when isEditing is true', () => {
@@ -234,7 +234,7 @@ describe('ReportsMediaBlock', () => {
 
             const root = container.firstChild as HTMLElement;
             expect(root).toHaveClass('root');
-            expect(root).toHaveClass('root--editing');
+            expect(root).toHaveClass('root-editing');
         });
 
         it('should disable title input when not editing', () => {

@@ -82,6 +82,6 @@ describe('test team description component', () => {
 
     it('should have correct class', () => {
         const { container } = render(<TeamCategoryDescription team={mockTeamItem} />);
-        expect(container.querySelector('.team_category_description')).toBeInTheDocument();
+        expect(container.querySelector('.team-category-description')).toBeInTheDocument();
     });
 });

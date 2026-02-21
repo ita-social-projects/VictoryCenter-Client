@@ -48,7 +48,7 @@
         width: 100%;
     }
 
-    .team_category_description {
+    .team-category-description {
         float: left;
         margin-right: 4.5rem;
         width: 83%;
@@ -153,7 +153,7 @@
     .team-page-container {
         margin-top: 6.5rem;
 
-        .team_category_description {
+        .team-category-description {
             margin: 0;
             float: none;
             width: 100%;
@@ -225,7 +225,7 @@
 
 @media (max-width: 768px) {
     .team-page-container {
-        .team_category_description {
+        .team-category-description {
             h2 {
                 font-size: 2rem;
                 line-height: 2.5rem;
@@ -250,7 +250,7 @@
         margin: 8rem 0 0;
         width: 100%;
 
-        .team_category_description {
+        .team-category-description {
             padding-right: 0;
         }
 

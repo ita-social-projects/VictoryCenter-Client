@@ -115,7 +115,7 @@ export const ReportsMediaBlock = ({
                         </div>
                     </div>
 
-                    <div className={styles.field1}>
+                    <div className={styles['title-input']}>
                         <InputWithCharacterLimit
                             id={`${windowTitle}-title`}
                             name={`${windowTitle}-title`}
@@ -128,7 +128,7 @@ export const ReportsMediaBlock = ({
                         <InputError error={errors.title} />
                     </div>
 
-                    <div className={styles.field2}>
+                    <div className={styles['total-amount-input']}>
                         <InputWithCharacterLimitGroup
                             label={descriptionTitle}
                             id={`${windowTitle}-value`}

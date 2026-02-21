@@ -321,6 +321,60 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             ],
         );
 
+        const handleMoveUpSection = useCallback(
+            (sectionKey: string) => {
+                const idx = sectionStatesRef.current.findIndex((s) => s.sectionKey === sectionKey);
+                if (idx <= 0) return;
+
+                setFormState((prev) => {
+                    const updatedSections = [...prev.sections];
+                    [updatedSections[idx - 1], updatedSections[idx]] = [updatedSections[idx], updatedSections[idx - 1]];
+                    return { ...prev, sections: updatedSections };
+                });
+
+                setSectionStates((prev) => {
+                    const updated = [...prev];
+                    [updated[idx - 1], updated[idx]] = [updated[idx], updated[idx - 1]];
+                    return updated;
+                });
+
+                setTimeout(() => {
+                    document.querySelector(`[data-section-key="${sectionKey}"]`)?.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start',
+                    });
+                }, 50);
+            },
+            [setFormState],
+        );
+
+        const handleMoveDownSection = useCallback(
+            (sectionKey: string) => {
+                const idx = sectionStatesRef.current.findIndex((s) => s.sectionKey === sectionKey);
+                if (idx === -1 || idx >= sectionStatesRef.current.length - 1) return;
+
+                setFormState((prev) => {
+                    const updatedSections = [...prev.sections];
+                    [updatedSections[idx + 1], updatedSections[idx]] = [updatedSections[idx], updatedSections[idx + 1]];
+                    return { ...prev, sections: updatedSections };
+                });
+
+                setSectionStates((prev) => {
+                    const updated = [...prev];
+                    [updated[idx + 1], updated[idx]] = [updated[idx], updated[idx + 1]];
+                    return updated;
+                });
+
+                setTimeout(() => {
+                    document.querySelector(`[data-section-key="${sectionKey}"]`)?.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start',
+                    });
+                }, 50);
+            },
+            [setFormState],
+        );
+
         const handleNameChange = useCallback(
             (e: React.ChangeEvent<HTMLTextAreaElement>) => {
                 setFormState((prev) => ({ ...prev, name: e.target.value }));
@@ -741,6 +795,10 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                             onDelete={() => handleDeleteSection(sectionKey)}
                                             isReplacingTemplate={sectionState.isReplacing}
                                             onRequestReplace={() => onReplaceSection?.(index)}
+                                            isFirstSection={index === 0}
+                                            isLastSection={index === formState.sections.length - 1}
+                                            onMoveUpSection={() => handleMoveUpSection(sectionKey)}
+                                            onMoveDownSection={() => handleMoveDownSection(sectionKey)}
                                         />
                                         {index === formState.sections.length - 1 && (
                                             <div className={styles['add-section-wrapper']}>

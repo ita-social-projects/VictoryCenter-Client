@@ -1,20 +1,22 @@
 $img-width: 730px;
 $img-height: 430px;
-$img-number: 3;
+$img-number: 2;
 
 .container {
-    aspect-ratio: 1460 / 1235;
     gap: 16px;
 }
 
+.template {
+    aspect-ratio: 1440 / 1235;
+}
+
 .top-section {
-    flex: 0 0 51%;
+
 }
 
 .bottom-section {
-    flex: 0 0 49%;
+    height: $img-height + ($img-height * 0.25) + 50px;
     justify-content: end;
-    padding-bottom: 16px;
 }
 
 .image {

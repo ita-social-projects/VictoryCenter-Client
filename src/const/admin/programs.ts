@@ -192,7 +192,7 @@ export const QUAD_IMAGES_CONFIG = {
     editableImageMaxWidth: 360,
     swiperBreakpoints: {
         320: { slidesPerView: 1 },
-        720: { slidesPerView: 2 },
+        768: { slidesPerView: 2 },
         1080: { slidesPerView: 3 },
         1440: { slidesPerView: 4 },
     },
@@ -218,7 +218,6 @@ export const TRIPLE_IMAGES_CONFIG = {
     gridColumns: 3,
     imageConfig: PROGRAM_SECTION_IMAGE_CONFIGS.TRIPLE_IMAGES,
     elevatedIndices: [0, 2],
-    //elevatedIndices: [0, 1],
     imageLabel: COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE,
     editableGridColumns: 4,
     editableImageMaxHeight: 480,

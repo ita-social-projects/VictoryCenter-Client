@@ -8,13 +8,18 @@
         opacity: 1;
         visibility: visible;
     }
+
+    &:hover .order-controls {
+        opacity: 1;
+        visibility: visible;
+    }
 }
 
 .actions-section {
     display: flex;
-    justify-content: end;
+    justify-content: space-between;
     height: 100px;
-    padding: 30px 30px 0 0;
+    padding: 30px 30px 0 30px;
 }
 
 .hover-buttons {
@@ -86,12 +91,48 @@
     }
 }
 
+.order-controls {
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+        opacity 0.2s ease,
+        visibility 0.2s ease;
+}
+
+.up-button {
+    background-image: url('~@/assets/icons/chevron-up.svg');
+
+    &:hover,
+    &:active {
+        background-image: url('~@/assets/icons/chevron-up.svg');
+    }
+
+    &:hover {
+        opacity: 0.6;
+    }
+}
+
+.down-button {
+    background-image: url('~@/assets/icons/chevron-down.svg');
+
+    &:hover,
+    &:active {
+        background-image: url('~@/assets/icons/chevron-down.svg');
+    }
+
+    &:hover {
+        opacity: 0.6;
+    }
+}
+
 .content {
     width: 100%;
     display: flex;
     flex-direction: column;
 
-    > div {
+    >div {
         width: 100%;
     }
 }

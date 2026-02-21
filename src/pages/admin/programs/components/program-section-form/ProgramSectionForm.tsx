@@ -28,6 +28,10 @@ export interface ProgramSectionFormProps {
     onDelete?: () => void;
     isReplacingTemplate?: boolean;
     onRequestReplace?: () => void;
+    isFirstSection: boolean;
+    isLastSection: boolean;
+    onMoveUpSection: () => void;
+    onMoveDownSection: () => void;
 }
 
 export interface SectionCancelOptions {
@@ -139,6 +143,10 @@ export const ProgramSectionForm = ({
     onDelete,
     isReplacingTemplate = false,
     onRequestReplace,
+    isFirstSection = false,
+    isLastSection = false,
+    onMoveDownSection,
+    onMoveUpSection,
 }: ProgramSectionFormProps) => {
     const [localSection, setLocalSection] = useState<ProgramSection>(() => ensureTitleContentAndOnePair(section));
     const [originalSection, setOriginalSection] = useState<ProgramSection>(() => ensureTitleContentAndOnePair(section));
@@ -554,8 +562,28 @@ export const ProgramSectionForm = ({
 
     return (
         <div className={styles.container}>
-            <div className={styles['actions-section']}>
-                {sectionMode === ProgramSectionMode.View && (
+            {sectionMode === ProgramSectionMode.View && (
+                <div className={styles['actions-section']}>
+                    <div className={styles['order-controls']}>
+                        <div className={styles['order-controls']}>
+                            {!isFirstSection && (
+                                <button
+                                    type="button"
+                                    onClick={onMoveUpSection}
+                                    className={`${styles['icon-button']} ${styles['up-button']}`}
+                                    aria-label="Move up section"
+                                />
+                            )}
+                            {!isLastSection && (
+                                <button
+                                    type="button"
+                                    onClick={onMoveDownSection}
+                                    className={`${styles['icon-button']} ${styles['down-button']}`}
+                                    aria-label="Move down section"
+                                />
+                            )}
+                        </div>
+                    </div>
                     <div className={styles['hover-buttons']}>
                         <button
                             type="button"
@@ -576,9 +604,8 @@ export const ProgramSectionForm = ({
                             aria-label="Replace section"
                         />
                     </div>
-                )}
-            </div>
-
+                </div>
+            )}
             <div className={styles.content}>
                 {editableSection || (
                     <p className={styles['template-info']}>
@@ -586,7 +613,6 @@ export const ProgramSectionForm = ({
                     </p>
                 )}
             </div>
-
             <div className={styles['actions-container']}>
                 {sectionMode !== ProgramSectionMode.View && (
                     <div className={styles.actions}>

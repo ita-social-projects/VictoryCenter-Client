@@ -1,5 +1,4 @@
 import React from 'react';
-import cn from 'classnames';
 import { ExpenseItem } from '@/types/public/reports';
 import styles from './ChartLegend.module.scss';
 
@@ -10,9 +9,9 @@ interface ChartLegendProps {
 export const ChartLegend = ({ items }: ChartLegendProps) => {
     return (
         <div className={styles.root}>
-            {items.toReversed().map((item, index) => (
-                <div key={item.label} className={styles.item}>
-                    <span className={cn(styles.square, styles[`bg-level-${index}`])} />
+            {items.map((item, index) => (
+                <div key={`${item.label}-${index}`} className={styles.item}>
+                    <span className={styles.square} data-level={index} />
                     <span className={styles.label}>{item.label}</span>
                 </div>
             ))}

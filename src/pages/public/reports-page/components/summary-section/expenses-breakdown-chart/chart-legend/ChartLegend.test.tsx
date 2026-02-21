@@ -10,31 +10,30 @@ describe('ChartLegend', () => {
         { label: 'Item 3', amount: 300, percent: 0.5 },
     ];
 
-    it('renders all items in reversed order', () => {
+    it('renders all items in provided order', () => {
         render(<ChartLegend items={mockItems} />);
 
-        const items = screen.getAllByText(/Item/);
+        const labels = screen.getAllByText(/Item/);
 
-        expect(items).toHaveLength(3);
-        expect(items[0]).toHaveTextContent('Item 3');
-        expect(items[1]).toHaveTextContent('Item 2');
-        expect(items[2]).toHaveTextContent('Item 1');
+        expect(labels).toHaveLength(3);
+        expect(labels[0]).toHaveTextContent('Item 1');
+        expect(labels[1]).toHaveTextContent('Item 2');
+        expect(labels[2]).toHaveTextContent('Item 3');
     });
 
-    it('assigns correct background level classes based on reversed index', () => {
+    it('assigns correct data-level attribute based on index', () => {
         render(<ChartLegend items={mockItems} />);
 
-        const square3 = screen.getByText('Item 3').previousElementSibling;
-        expect(square3).toHaveClass('bg-level-0');
+        const square0 = screen.getByText('Item 1').previousElementSibling;
+        const square1 = screen.getByText('Item 2').previousElementSibling;
+        const square2 = screen.getByText('Item 3').previousElementSibling;
 
-        const square2 = screen.getByText('Item 2').previousElementSibling;
-        expect(square2).toHaveClass('bg-level-1');
-
-        const square1 = screen.getByText('Item 1').previousElementSibling;
-        expect(square1).toHaveClass('bg-level-2');
+        expect(square0).toHaveAttribute('data-level', '0');
+        expect(square1).toHaveAttribute('data-level', '1');
+        expect(square2).toHaveAttribute('data-level', '2');
     });
 
-    it('renders nothing gracefully if items array is empty', () => {
+    it('renders empty state correctly', () => {
         const { container } = render(<ChartLegend items={[]} />);
         expect(container.firstChild).toBeEmptyDOMElement();
     });

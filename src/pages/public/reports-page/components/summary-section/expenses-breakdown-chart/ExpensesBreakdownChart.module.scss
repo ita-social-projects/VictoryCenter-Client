@@ -2,8 +2,10 @@
 @use '@/assets/sass/mixins/typography.mixins' as type;
 
 .container {
+    height: 100%;
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
     padding: 16px 16px 28px;
     color: c.$blue-50;
 

@@ -51,7 +51,6 @@ export const TripleImagesBottom = ({
                 [styles.template]: mode === ProgramSectionMode.Template,
                 [styles['form-container']]: mode === ProgramSectionMode.Edit,
             })}
-            topSectionClassName={baseStyles['top-section']}
             bottomSectionClassName={baseStyles['bottom-section']}
             imageWrapperClassName={baseStyles['image-wrapper']}
             imageClassName={baseStyles.image}

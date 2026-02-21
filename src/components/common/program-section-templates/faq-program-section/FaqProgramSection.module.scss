@@ -1,61 +1,59 @@
 @use '@/assets/sass/variables/colors' as c;
 @use '@/assets/sass/mixins/typography.mixins' as type;
+@import '../shared/BaseSectionTemplate.module.scss';
 
 .faq-section {
+    @extend .section-container;
+
     box-sizing: border-box;
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100%;
+    width: clamp(100px, 1200px, 1200px);
+    height: 500px;
     background-color: c.$white;
+    padding: 0 60px;
 
     &.template {
-        aspect-ratio: 1440 / 600;
-        width: auto;
         overflow: hidden;
+        padding: 0 5%;
     }
 }
 
 .faq-block {
     width: 100%;
-    max-width: 83rem;
     display: flex;
     justify-content: space-between;
-    padding-top: 1rem;
     border-top: 2px solid c.$blue-100;
-    gap: 1rem;
+    gap: 10px;
 
     .template & {
         padding-top: 24px;
-        gap: 1.5rem;
     }
 }
 
 .title {
-    width: 34.2rem;
+    flex: 0 0 41%;
     @include type.h3-bold;
     text-transform: uppercase;
     color: c.$blue-900;
 
     .template & {
         width: 100%;
-        font-size: clamp(12px, 2vw, 2.5rem);
-        line-height: clamp(14px, 2.4vw, 3rem);
+        font-size: clamp(12px, 2vw, 40px);
+        line-height: clamp(14px, 2.4vw, 48px);
         text-align: center;
-        margin-bottom: 0;
     }
 }
 
 .questions-container {
     @include type.h3-semibold;
 
-    flex: 1;
+    flex: 1 1 auto;
     display: flex;
     flex-direction: column;
     gap: 0;
-    width: 100%;
     
-
     .template & {
         gap: clamp(4px, 0.5vw, 8px);
         max-width: 100%;
@@ -68,4 +66,5 @@
 
 .faq-card-program-section {
     border-bottom-color: c.$blue-100;
+    width: clamp(100px, 48rem, 100%);
 }

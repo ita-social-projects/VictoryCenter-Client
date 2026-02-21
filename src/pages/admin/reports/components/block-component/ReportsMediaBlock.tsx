@@ -105,7 +105,7 @@ export const ReportsMediaBlock = ({
     );
 
     return (
-        <div className={cn(styles.root, { [styles['root--editing']]: isEditing })}>
+        <div className={cn(styles.root, { [styles['root-editing']]: isEditing })}>
             <div className={styles.content}>
                 <div className={styles.inputs}>
                     <div className={styles.header}>

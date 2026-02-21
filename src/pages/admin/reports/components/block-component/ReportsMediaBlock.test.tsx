@@ -124,15 +124,15 @@ jest.mock('@/components/admin/input-error/InputError', () => ({
 
 jest.mock('./ReportsMediaBlock.module.scss', () => ({
     root: 'root',
-    'root--editing': 'root--editing',
+    'root-editing': 'root-editing',
     content: 'content',
     inputs: 'inputs',
     header: 'header',
     'title-wrapper': 'title-wrapper',
     title: 'title',
     description: 'description',
-    field1: 'field1',
-    field2: 'field2',
+    'title-input': 'title-input',
+    'total-amount-input': 'total-amount-input',
     image: 'image',
     'image-wrapper': 'image-wrapper',
 }));

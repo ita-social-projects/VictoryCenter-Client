@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import { useMemo } from 'react';
+import { useCallback, useMemo, useState, useEffect } from 'react';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { PROGRAMS_TEXT, SINGLE_TITLE_QUINTUPLE_DESCRIPTION_CONFIG } from '@/const/admin/programs';
@@ -8,6 +8,7 @@ import { ContentType } from '@/types/common/programs';
 import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
 import baseStyles from './SingleTitleQuintupleDescription.module.scss';
 import previewStyles from './SingleTitleQuintupleDescription-preview.module.scss';
+import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
 
 export interface SingleTitleQuintupleDescriptionProps {
     title?: string;
@@ -16,6 +17,7 @@ export interface SingleTitleQuintupleDescriptionProps {
     onTitleChange?: (value: string) => void;
     onDescriptionsChange?: (index: number, value: string) => void;
     className?: string;
+    validationResetKey?: number;
 }
 
 const DESCRIPTION_LAYOUT = {
@@ -31,6 +33,7 @@ export const SingleTitleQuintupleDescription = ({
     onTitleChange,
     onDescriptionsChange,
     className,
+    validationResetKey,
 }: SingleTitleQuintupleDescriptionProps) => {
     const descriptionsCount = SINGLE_TITLE_QUINTUPLE_DESCRIPTION_CONFIG.descriptionsCount;
 
@@ -59,6 +62,44 @@ export const SingleTitleQuintupleDescription = ({
         className,
     );
 
+    const [errors, setErrors] = useState<{
+        title?: string;
+        descriptions: Record<number, string | undefined>;
+    }>({
+        title: undefined,
+        descriptions: {},
+    });
+
+    useEffect(() => {
+        setErrors({
+            title: undefined,
+            descriptions: {},
+        });
+    }, [validationResetKey]);
+
+    const handleTitleBlur = useCallback(() => {
+        const error = PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateSectionTitle(title, true, TEMPLATE);
+        setErrors((prev) => ({ ...prev, title: error }));
+    }, [title]);
+
+    const handleDescriptionBlur = useCallback(
+        (index: number) => {
+            const error = PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateSectionDescription(
+                normalizedDescriptions[index],
+                true,
+                TEMPLATE,
+            );
+            setErrors((prev) => ({
+                ...prev,
+                descriptions: {
+                    ...prev.descriptions,
+                    [index]: error,
+                },
+            }));
+        },
+        [normalizedDescriptions],
+    );
+
     return (
         <div className={rootClassName}>
             {mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View ? (
@@ -74,6 +115,8 @@ export const SingleTitleQuintupleDescription = ({
                             onChange={(e) => onTitleChange?.(e.target.value)}
                             maxLength={titleMaxLength}
                             placeholder={PROGRAMS_TEXT.SECTION.FORM.TITLE.PLACEHOLDER}
+                            error={errors.title}
+                            onBlur={handleTitleBlur}
                         />
                     </div>
 
@@ -89,6 +132,8 @@ export const SingleTitleQuintupleDescription = ({
                                 onChange={(e) => onDescriptionsChange?.(index, e.target.value)}
                                 maxLength={descriptionMaxLength}
                                 rows={4}
+                                error={errors.descriptions[index]}
+                                onBlur={() => handleDescriptionBlur(index)}
                             />
                         </div>
                     ))}

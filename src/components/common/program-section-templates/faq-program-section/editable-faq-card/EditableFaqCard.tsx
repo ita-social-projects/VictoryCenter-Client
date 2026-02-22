@@ -3,7 +3,6 @@ import cn from 'classnames';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { FAQ_TEXT, FAQ_VALIDATION } from '@/const/admin/faq';
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
-import { ReactComponent as DeleteIcon } from '@/assets/icons/delete-default.svg';
 import { ReactComponent as ArrowIcon } from '@/assets/icons/arrow-down-right.svg';
 import styles from './EditableFaqCard.module.scss';
 
@@ -30,6 +29,14 @@ export const EditableFaqCard = ({
 
     return (
         <div className={cn(styles['card'], { [styles['card--expanded']]: isExpanded })}>
+            <div className={styles['card-top-row']}>
+                <button
+                    type="button"
+                    className={styles['delete-button']}
+                    onClick={() => onDelete(index)}
+                    aria-label="Delete question"
+                />
+            </div>
             <div className={styles['card-header']}>
                 <TextAreaWithCharacterLimitGroup
                     label={FAQ_TEXT.FORM.LABEL.QUESTION}
@@ -43,15 +50,7 @@ export const EditableFaqCard = ({
                     currentLength={getTrimmedInputText(questionText).length}
                     className={styles['question-input']}
                 />
-                <div className={styles['card-actions']}>
-                    <button
-                        type="button"
-                        className={styles['delete-button']}
-                        onClick={() => onDelete(index)}
-                        aria-label="Delete question"
-                    >
-                        <DeleteIcon />
-                    </button>
+                <div className={styles['expand-container']}>
                     <button
                         type="button"
                         className={cn(styles['expand-button'], { [styles['expand-button--open']]: isExpanded })}

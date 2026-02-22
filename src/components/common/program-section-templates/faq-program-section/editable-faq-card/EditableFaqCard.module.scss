@@ -3,29 +3,49 @@
 .card {
     display: flex;
     flex-direction: column;
-    padding-bottom: 16px;
-    border-bottom: 1px solid c.$blue-100;
+    border-bottom: 2px solid c.$blue-100;
+}
+
+.card-top-row {
+    position: relative;
+    display: flex;
+    justify-content: flex-end;
+    padding-right: 35px;
+    margin-bottom: -20px;
 }
 
 .card-header {
     display: flex;
     align-items: flex-start;
-    gap: 8px;
 }
 
 .question-input {
     flex: 1 1 auto;
 }
 
-.card-actions {
+.delete-button {
+    display: flex;
+    justify-self: flex-end;
+    cursor: pointer;
+    transition: background-image 0.2s ease;
+    border: none;
+    width: 24px;
+    height: 24px;
+    background: url('~@/assets/icons/delete.svg') no-repeat;
+
+    &:hover {
+        background: url('~@/assets/icons/delete-hover.svg') no-repeat;
+    }
+}
+
+.expand-container {
+    height: 90%;
     display: flex;
     align-items: center;
-    gap: 4px;
-    padding-top: 24px;
+    justify-content: flex-start;
     flex-shrink: 0;
 }
 
-.delete-button,
 .expand-button {
     background: none;
     border: none;
@@ -34,22 +54,20 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: transform 0.2s ease;
+    padding: 0;
 
     svg {
-        width: 20px;
-        height: 20px;
+        width: 24px;
+        height: 24px;
+    }
+
+    &--open {
+        transform: rotate(90deg);
     }
 
     &:hover svg path {
         stroke: c.$light-blue-600;
-    }
-}
-
-.expand-button {
-    transition: transform 0.2s ease;
-
-    &--open {
-        transform: rotate(90deg);
     }
 }
 

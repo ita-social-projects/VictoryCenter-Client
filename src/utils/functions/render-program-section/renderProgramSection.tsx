@@ -13,6 +13,7 @@ import { TitleDescriptionCardsWrapper } from '@/components/common/program-sectio
 import { SingleTitleQuintupleDescription } from '@/components/common/program-section-templates/single-title-quintuple-description/SingleTitleQuintupleDescription';
 import { SingleTitleDescriptionAuthorPairs } from '@/components/common/program-section-templates/single-title-description-author-pairs/SingleTitleDescriptionAuthorPairs';
 import { FaqProgramSection } from '@/components/common/program-section-templates/faq-program-section/FaqProgramSection';
+import { FaqQuestion } from '@/types/admin/faq';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 
 export interface ProgramSectionCardData {
@@ -33,6 +34,7 @@ export interface ProgramSectionData {
     cards?: ProgramSectionCardData[];
     descriptionAuthorPairs?: DescriptionAuthorPairData[];
     faqQuestions?: any[];
+    faqPairs?: FaqQuestion[];
 }
 
 export interface ProgramSectionHandlers {
@@ -46,6 +48,9 @@ export interface ProgramSectionHandlers {
     onAddPair?: () => void;
     onDeletePair?: (index: number) => void;
     canAddPair?: boolean;
+    onFaqQuestionChange?: (index: number, value: string) => void;
+    onFaqAnswerChange?: (index: number, value: string) => void;
+    onAddFaqPair?: () => void;
 }
 
 export interface RenderProgramSectionParams {
@@ -209,7 +214,19 @@ export const renderProgramSection = ({
     }
 
     if (templateId === ProgramSectionTemplate.SingleTitleQuestionAnswerPairs) {
-        return <FaqProgramSection questions={data.faqQuestions ?? []} mode={mode} title={data.title} />;
+        return (
+            <FaqProgramSection
+                questions={data.faqQuestions ?? []}
+                mode={mode}
+                title={data.title}
+                onTitleChange={handlers?.onTitleChange}
+                faqPairs={data.faqPairs ?? []}
+                onFaqQuestionChange={handlers?.onFaqQuestionChange}
+                onFaqAnswerChange={handlers?.onFaqAnswerChange}
+                onAddFaqPair={handlers?.onAddFaqPair}
+                validationResetKey={validationResetKey}
+            />
+        );
     }
 
     if (templateId === ProgramSectionTemplate.SingleTitleQuintupleDescription) {

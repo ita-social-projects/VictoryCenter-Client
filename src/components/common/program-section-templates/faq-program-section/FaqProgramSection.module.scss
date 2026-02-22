@@ -18,6 +18,13 @@
         overflow: hidden;
         padding: 0 5%;
     }
+
+    &.editable {
+        height: auto;
+        min-height: 500px;
+        padding: 64px 60px;
+        align-items: flex-start;
+    }
 }
 
 .faq-block {
@@ -29,6 +36,11 @@
 
     .template & {
         padding-top: 24px;
+    }
+
+    .editable & {
+        border-top: none;
+        gap: 16px;
     }
 }
 
@@ -44,6 +56,80 @@
         line-height: clamp(14px, 2.4vw, 48px);
         text-align: center;
     }
+}
+
+.left-section {
+    flex: 0 0 41%;
+}
+
+.right-section {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.title-input-group {
+    :global(.char-limit-input) {
+        box-shadow: none;
+    }
+
+    :global(.char-limit-input__field) {
+        @include type.h3-bold;
+        color: c.$blue-900;
+        text-transform: uppercase;
+    }
+
+    :global(.char-limit-input__field::placeholder) {
+        @include type.h3-bold;
+        color: c.$grey-700;
+        opacity: 1;
+    }
+
+    :global(.char-limit-input__counter) {
+        color: c.$grey-700;
+    }
+}
+
+.faq-pair {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid c.$blue-100;
+}
+
+.actions-row {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.add-button {
+    width: 200px;
+    height: 40px;
+
+    background-color: c.$blue-500;
+    border: none;
+    padding: 0;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    :global(svg) {
+        width: 12px;
+        height: 12px;
+    }
+}
+
+.add-button-text {
+    @include type.small-text-medium;
+    color: c.$grey-50;
+}
+
+.add-button-icon :global(path) {
+    stroke: c.$grey-50 !important;
 }
 
 .questions-container {

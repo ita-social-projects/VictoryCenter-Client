@@ -72,7 +72,7 @@ export const EditableFaqCard = ({
                         value={answerText}
                         onChange={(e) => onAnswerChange(index, e.target.value)}
                         maxLength={FAQ_VALIDATION.answer.max}
-                        rows={4}
+                        rows={3}
                         currentLength={getTrimmedInputText(answerText).length}
                     />
                 </div>

@@ -118,7 +118,7 @@ export const FaqProgramSection = ({
                                 value={newQuestion}
                                 onChange={(e) => setNewQuestion(e.target.value)}
                                 maxLength={FAQ_VALIDATION.question.max}
-                                rows={2}
+                                rows={1}
                                 currentLength={getTrimmedInputText(newQuestion).length}
                             />
                             <TextAreaWithCharacterLimitGroup
@@ -129,7 +129,7 @@ export const FaqProgramSection = ({
                                 value={newAnswer}
                                 onChange={(e) => setNewAnswer(e.target.value)}
                                 maxLength={FAQ_VALIDATION.answer.max}
-                                rows={4}
+                                rows={3}
                                 currentLength={getTrimmedInputText(newAnswer).length}
                             />
                         </div>
@@ -141,8 +141,8 @@ export const FaqProgramSection = ({
                                 onClick={handleAddClick}
                                 type="button"
                             >
-                                <span className={styles['add-button-text']}>{FAQ_TEXT.BUTTON.ADD_FAQ}</span>
-                                <PlusIcon className={styles['add-button-icon']} />
+                                {PROGRAMS_TEXT.BUTTON.ADD}
+                                <PlusIcon />
                             </Button>
                         </div>
                     </div>

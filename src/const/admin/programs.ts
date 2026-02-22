@@ -10,6 +10,7 @@ export const PROGRAMS_TEXT = {
         CHOOSE_SECTION: 'Обрати шаблон',
         CANCEL: 'Відмінити',
         SAVE: 'Зберегти',
+        ADD: 'Додати',
     },
     PLACEHOLDER: {
         SEARCH_PROGRAMS: 'Шукати програми...',

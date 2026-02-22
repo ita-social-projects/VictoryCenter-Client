@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import { useId, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import cn from 'classnames';
 import { FaqCard } from '@/components/public/faq-section/faq-card/FaqCard';
@@ -15,6 +15,7 @@ import { ContentType } from '@/types/common/programs';
 import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
+import { EditableFaqCard } from './editable-faq-card/EditableFaqCard';
 import styles from './FaqProgramSection.module.scss';
 
 export interface FaqProgramSectionProps {
@@ -25,7 +26,8 @@ export interface FaqProgramSectionProps {
     faqPairs?: FaqQuestion[];
     onFaqQuestionChange?: (index: number, value: string) => void;
     onFaqAnswerChange?: (index: number, value: string) => void;
-    onAddFaqPair?: () => void;
+    onAddFaqPair?: (questionText: string, answerText: string) => void;
+    onDeleteFaqPair?: (index: number) => void;
     validationResetKey?: number;
 }
 
@@ -40,6 +42,7 @@ export const FaqProgramSection = ({
     onFaqQuestionChange,
     onFaqAnswerChange,
     onAddFaqPair,
+    onDeleteFaqPair,
     validationResetKey,
 }: FaqProgramSectionProps) => {
     const { t } = useTranslation('programsPage');
@@ -57,6 +60,15 @@ export const FaqProgramSection = ({
         resetKey: validationResetKey,
     });
 
+    const [newQuestion, setNewQuestion] = useState('');
+    const [newAnswer, setNewAnswer] = useState('');
+
+    const handleAddClick = useCallback(() => {
+        onAddFaqPair?.(newQuestion, newAnswer);
+        setNewQuestion('');
+        setNewAnswer('');
+    }, [onAddFaqPair, newQuestion, newAnswer]);
+
     const rootClassName = cn(styles['faq-section'], {
         [styles['template']]: isTemplate,
         [styles['editable']]: isEditable,
@@ -72,7 +84,7 @@ export const FaqProgramSection = ({
                             isRequired
                             id={`${idPrefix}-faq-title`}
                             name={`${idPrefix}-faq-title`}
-                            value={title || PROGRAMS_TEXT.SECTION.FAQ_SECTION_TITLE}
+                            value={title || COMMON_TEXT_ADMIN.TAB.FAQ}
                             onChange={handleTitleChange}
                             onBlur={handleTitleBlur}
                             maxLength={titleMaxLength}
@@ -85,37 +97,48 @@ export const FaqProgramSection = ({
 
                     <div className={styles['right-section']}>
                         {faqPairs.map((pair, index) => (
-                            <div key={pair.id || index} className={styles['faq-pair']}>
-                                <TextAreaWithCharacterLimitGroup
-                                    label={FAQ_TEXT.FORM.LABEL.QUESTION}
-                                    isRequired
-                                    id={`${idPrefix}-faq-question-${index}`}
-                                    name={`${idPrefix}-faq-question-${index}`}
-                                    value={pair.questionText}
-                                    onChange={(e) => onFaqQuestionChange?.(index, e.target.value)}
-                                    maxLength={FAQ_VALIDATION.question.max}
-                                    rows={2}
-                                    currentLength={getTrimmedInputText(pair.questionText).length}
-                                />
-                                <TextAreaWithCharacterLimitGroup
-                                    label={FAQ_TEXT.FORM.LABEL.ANSWER}
-                                    isRequired
-                                    id={`${idPrefix}-faq-answer-${index}`}
-                                    name={`${idPrefix}-faq-answer-${index}`}
-                                    value={pair.answerText}
-                                    onChange={(e) => onFaqAnswerChange?.(index, e.target.value)}
-                                    maxLength={FAQ_VALIDATION.answer.max}
-                                    rows={4}
-                                    currentLength={getTrimmedInputText(pair.answerText).length}
-                                />
-                            </div>
+                            <EditableFaqCard
+                                key={pair.id || index}
+                                index={index}
+                                idPrefix={idPrefix}
+                                questionText={pair.questionText}
+                                answerText={pair.answerText}
+                                onQuestionChange={(i, val) => onFaqQuestionChange?.(i, val)}
+                                onAnswerChange={(i, val) => onFaqAnswerChange?.(i, val)}
+                                onDelete={(i) => onDeleteFaqPair?.(i)}
+                            />
                         ))}
+
+                        <div className={styles['new-pair']}>
+                            <TextAreaWithCharacterLimitGroup
+                                label={FAQ_TEXT.FORM.LABEL.QUESTION}
+                                isRequired
+                                id={`${idPrefix}-faq-new-question`}
+                                name={`${idPrefix}-faq-new-question`}
+                                value={newQuestion}
+                                onChange={(e) => setNewQuestion(e.target.value)}
+                                maxLength={FAQ_VALIDATION.question.max}
+                                rows={2}
+                                currentLength={getTrimmedInputText(newQuestion).length}
+                            />
+                            <TextAreaWithCharacterLimitGroup
+                                label={FAQ_TEXT.FORM.LABEL.ANSWER}
+                                isRequired
+                                id={`${idPrefix}-faq-new-answer`}
+                                name={`${idPrefix}-faq-new-answer`}
+                                value={newAnswer}
+                                onChange={(e) => setNewAnswer(e.target.value)}
+                                maxLength={FAQ_VALIDATION.answer.max}
+                                rows={4}
+                                currentLength={getTrimmedInputText(newAnswer).length}
+                            />
+                        </div>
 
                         <div className={styles['actions-row']}>
                             <Button
                                 buttonStyle="primary"
                                 className={styles['add-button']}
-                                onClick={onAddFaqPair}
+                                onClick={handleAddClick}
                                 type="button"
                             >
                                 <span className={styles['add-button-text']}>{FAQ_TEXT.BUTTON.ADD_FAQ}</span>

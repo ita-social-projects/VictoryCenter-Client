@@ -1,0 +1,58 @@
+@use '@/assets/sass/variables/colors' as c;
+
+.card {
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 16px;
+    border-bottom: 1px solid c.$blue-100;
+}
+
+.card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.question-input {
+    flex: 1 1 auto;
+}
+
+.card-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding-top: 24px;
+    flex-shrink: 0;
+}
+
+.delete-button,
+.expand-button {
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    &:hover svg path {
+        stroke: c.$light-blue-600;
+    }
+}
+
+.expand-button {
+    transition: transform 0.2s ease;
+
+    &--open {
+        transform: rotate(90deg);
+    }
+}
+
+.card-body {
+    margin-top: 16px;
+}

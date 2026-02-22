@@ -12,9 +12,9 @@ import { SingleImageRight } from '@/components/common/program-section-templates/
 import { TitleDescriptionCardsWrapper } from '@/components/common/program-section-templates/title-description-cards/TitleDescriptionCardsWrapper';
 import { SingleTitleQuintupleDescription } from '@/components/common/program-section-templates/single-title-quintuple-description/SingleTitleQuintupleDescription';
 import { SingleTitleDescriptionAuthorPairs } from '@/components/common/program-section-templates/single-title-description-author-pairs/SingleTitleDescriptionAuthorPairs';
-import { FaqProgramSection } from '@/components/common/program-section-templates/faq-program-section/FaqProgramSection';
 import { FaqQuestion } from '@/types/admin/faq';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
+import { FaqProgramSection } from '@/components/common/program-section-templates/faq-program-section';
 
 export interface ProgramSectionCardData {
     title: string;
@@ -157,7 +157,7 @@ export const getInitialSectionContents = (templateId: ProgramSectionTemplate): P
     if (templateId === ProgramSectionTemplate.SingleTitleQuestionAnswerPairs) {
         return [
             createItem(ContentType.Title, 0, {
-                title: 'FAQ',
+                title: PROGRAMS_TEXT.SECTION.FAQ_SECTION_TITLE,
             } as any),
         ];
     }

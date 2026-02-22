@@ -72,7 +72,7 @@ export const FaqProgramSection = ({
                             isRequired
                             id={`${idPrefix}-faq-title`}
                             name={`${idPrefix}-faq-title`}
-                            value={title || COMMON_TEXT_ADMIN.TAB.FAQ}
+                            value={title || PROGRAMS_TEXT.SECTION.FAQ_SECTION_TITLE}
                             onChange={handleTitleChange}
                             onBlur={handleTitleBlur}
                             maxLength={titleMaxLength}

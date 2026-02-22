@@ -70,24 +70,20 @@
 }
 
 .title-input-group {
-    :global(.char-limit-input) {
+    :global(.char-limit-textarea__wrapper) {
         box-shadow: none;
     }
 
-    :global(.char-limit-input__field) {
+    :global(.char-limit-textarea__field) {
         @include type.h3-bold;
         color: c.$blue-900;
         text-transform: uppercase;
     }
 
-    :global(.char-limit-input__field::placeholder) {
+    :global(.char-limit-textarea__field::placeholder) {
         @include type.h3-bold;
         color: c.$grey-700;
         opacity: 1;
-    }
-
-    :global(.char-limit-input__counter) {
-        color: c.$grey-700;
     }
 }
 
@@ -117,7 +113,7 @@
     justify-content: center;
     gap: 10px;
 
-    :global(svg) {
+    svg {
         width: 12px;
         height: 12px;
     }
@@ -128,8 +124,8 @@
     color: c.$grey-50;
 }
 
-.add-button-icon :global(path) {
-    stroke: c.$grey-50 !important;
+.add-button-icon path {
+    stroke: c.$grey-50;
 }
 
 .questions-container {

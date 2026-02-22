@@ -15,6 +15,7 @@ import { SingleTitleDescriptionAuthorPairs } from '@/components/common/program-s
 import { FaqQuestion } from '@/types/admin/faq';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { FaqProgramSection } from '@/components/common/program-section-templates/faq-program-section';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
 export interface ProgramSectionCardData {
     title: string;
@@ -50,7 +51,8 @@ export interface ProgramSectionHandlers {
     canAddPair?: boolean;
     onFaqQuestionChange?: (index: number, value: string) => void;
     onFaqAnswerChange?: (index: number, value: string) => void;
-    onAddFaqPair?: () => void;
+    onAddFaqPair?: (questionText: string, answerText: string) => void;
+    onDeleteFaqPair?: (index: number) => void;
 }
 
 export interface RenderProgramSectionParams {
@@ -157,7 +159,7 @@ export const getInitialSectionContents = (templateId: ProgramSectionTemplate): P
     if (templateId === ProgramSectionTemplate.SingleTitleQuestionAnswerPairs) {
         return [
             createItem(ContentType.Title, 0, {
-                title: PROGRAMS_TEXT.SECTION.FAQ_SECTION_TITLE,
+                title: COMMON_TEXT_ADMIN.TAB.FAQ,
             } as any),
         ];
     }
@@ -224,6 +226,7 @@ export const renderProgramSection = ({
                 onFaqQuestionChange={handlers?.onFaqQuestionChange}
                 onFaqAnswerChange={handlers?.onFaqAnswerChange}
                 onAddFaqPair={handlers?.onAddFaqPair}
+                onDeleteFaqPair={handlers?.onDeleteFaqPair}
                 validationResetKey={validationResetKey}
             />
         );

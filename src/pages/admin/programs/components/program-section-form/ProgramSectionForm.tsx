@@ -211,6 +211,8 @@ export const ProgramSectionForm = ({
     const isDescriptionAuthorPairsTemplate =
         section.template === ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs;
 
+    const isFaqTemplate = section.template === ProgramSectionTemplate.SingleTitleQuestionAnswerPairs;
+
     const orderedPairs = getDescriptionAuthorPairs(localSection.contents);
 
     const descriptionAuthorPairs = orderedPairs.map((p) => ({
@@ -453,6 +455,28 @@ export const ProgramSectionForm = ({
         [emitSectionChange],
     );
 
+    const [faqPairs, setFaqPairs] = useState<Array<{ questionText: string; answerText: string }>>([]);
+
+    const handleFaqQuestionChange = useCallback((index: number, value: string) => {
+        setFaqPairs((prev) => prev.map((p, i) => (i === index ? { ...p, questionText: value } : p)));
+        setIsDirty(true);
+    }, []);
+
+    const handleFaqAnswerChange = useCallback((index: number, value: string) => {
+        setFaqPairs((prev) => prev.map((p, i) => (i === index ? { ...p, answerText: value } : p)));
+        setIsDirty(true);
+    }, []);
+
+    const handleAddFaqPair = useCallback((questionText: string, answerText: string) => {
+        setFaqPairs((prev) => [...prev, { questionText, answerText }]);
+        setIsDirty(true);
+    }, []);
+
+    const handleDeleteFaqPair = useCallback((index: number) => {
+        setFaqPairs((prev) => prev.filter((_, i) => i !== index));
+        setIsDirty(true);
+    }, []);
+
     const handleEditClick = useCallback(
         (e: React.MouseEvent<HTMLButtonElement>) => {
             e.preventDefault();
@@ -532,6 +556,7 @@ export const ProgramSectionForm = ({
             images: imageContents,
             ...(isCardTemplate ? { cards } : {}),
             ...(isDescriptionAuthorPairsTemplate ? { descriptionAuthorPairs } : {}),
+            ...(isFaqTemplate ? { faqPairs: faqPairs as any } : {}),
         },
         mode: sectionMode,
         validationResetKey,
@@ -555,6 +580,14 @@ export const ProgramSectionForm = ({
                       onAddPair: handleAddPair,
                       onDeletePair: performDeletePair,
                       canAddPair,
+                  }
+                : {}),
+            ...(isFaqTemplate
+                ? {
+                      onFaqQuestionChange: handleFaqQuestionChange,
+                      onFaqAnswerChange: handleFaqAnswerChange,
+                      onAddFaqPair: handleAddFaqPair,
+                      onDeleteFaqPair: handleDeleteFaqPair,
                   }
                 : {}),
         },

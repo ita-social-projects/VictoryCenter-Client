@@ -1,0 +1,14 @@
+@use '@/assets/sass/variables/colors' as c;
+
+.char-limit-input--disabled {
+    background-color: c.$white;
+
+    .char-limit-input__counter {
+        color: transparent;
+    }
+}
+
+.reports-value-editing-disabled .char-limit-input--disabled {
+    background-color: c.$grey-600;
+    border-color: c.$grey-900;
+}

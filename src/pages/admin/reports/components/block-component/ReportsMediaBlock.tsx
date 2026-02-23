@@ -8,6 +8,7 @@ import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/in
 import { REPORTS_TEXT } from '@/const/admin/reports';
 import { ImageInput } from '@/components/admin/image-input/ImageInput';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import './ReportsMediaBlock.scss';
 
 export interface ReportsMediaBlockValues {
     title: string;
@@ -128,7 +129,11 @@ export const ReportsMediaBlock = ({
                         <InputError error={errors.title} />
                     </div>
 
-                    <div className={styles['total-amount-input']}>
+                    <div
+                        className={cn(styles['total-amount-input'], {
+                            'reports-value-editing-disabled': isEditing && !isValueEditable,
+                        })}
+                    >
                         <InputWithCharacterLimitGroup
                             label={descriptionTitle}
                             id={`${windowTitle}-value`}

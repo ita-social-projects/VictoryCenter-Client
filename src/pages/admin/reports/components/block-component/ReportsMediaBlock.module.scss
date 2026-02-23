@@ -11,14 +11,18 @@
 }
 
 .root-editing {
-    border: 3px dashed c.$grey-700;
+    border-radius: 16px;
+    background-color: rgba(221, 228, 242, 0.36);
+    background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='16' ry='16' stroke='%23a4a49b' stroke-width='2' stroke-dasharray='24%2c 16' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
 }
+
 .image {
     display: block;
     width: 650px;
     height: 504px;
     margin-top: 50px;
 }
+
 .content {
     width: 650px;
     height: 821px;
@@ -60,6 +64,7 @@
     line-height: 24px;
     letter-spacing: -0.02em;
 }
+
 .title-wrapper {
     height: 57px;
     margin-bottom: 10px;
@@ -77,6 +82,7 @@
     width: 100%;
     margin: 25px 0;
 }
+
 .total-amount-input {
     height: 90px;
     width: 100%;

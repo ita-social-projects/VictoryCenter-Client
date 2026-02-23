@@ -76,7 +76,7 @@ describe('TitleDescriptionCardsWrapper', () => {
 
         expect(screen.getByTestId('title-description-cards-section')).toHaveAttribute(
             'data-mode',
-            String(ProgramSectionMode.Published),
+            String(ProgramSectionMode.View),
         );
     });
 

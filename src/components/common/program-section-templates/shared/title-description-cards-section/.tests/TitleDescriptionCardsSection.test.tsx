@@ -2,13 +2,13 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { TitleDescriptionCardsSection, type TitleDescriptionCardData } from '../TitleDescriptionCardsSection';
-import { ProgramSectionMode } from '@/types/common/program-sections';
+import { ProgramSectionMode } from '../../../../../../types/common/program-sections';
 
 jest.mock('../TitleDescriptionCard', () => ({
     TitleDescriptionCard: ({ card, index, mode, onTitleChange, onDescriptionChange }: any) => {
         const React = require('react');
         const { ProgramSectionMode } = require('@/types/common/program-sections');
-        const isEditable = mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View;
+        const isEditable = mode === ProgramSectionMode.Edit;
         const [title, setTitle] = React.useState(card.title);
         const [description, setDescription] = React.useState(card.description);
 
@@ -16,6 +16,7 @@ jest.mock('../TitleDescriptionCard', () => ({
             <div data-testid={`card-${index}`}>
                 <input
                     data-testid={`title-input-${index}`}
+                    aria-label={`Title ${index}`}
                     value={title}
                     readOnly={!isEditable}
                     onChange={(e) => {
@@ -26,6 +27,7 @@ jest.mock('../TitleDescriptionCard', () => ({
 
                 <input
                     data-testid={`description-input-${index}`}
+                    aria-label={`Description ${index}`}
                     value={description}
                     readOnly={!isEditable}
                     onChange={(e) => {
@@ -118,7 +120,7 @@ describe('TitleDescriptionCardsSection', () => {
         it('should not be editable when mode is Published', () => {
             const cards: TitleDescriptionCardData[] = [{ title: 'Title', description: 'Description' }];
 
-            render(<TitleDescriptionCardsSection cards={cards} cardsCount={1} mode={ProgramSectionMode.Published} />);
+            render(<TitleDescriptionCardsSection cards={cards} cardsCount={1} mode={ProgramSectionMode.View} />);
 
             const titleInput = screen.getByTestId('title-input-0') as HTMLInputElement;
             expect(titleInput).toHaveAttribute('readonly');

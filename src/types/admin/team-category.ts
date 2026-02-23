@@ -31,6 +31,18 @@ export interface TeamCategoryLocalizableFields {
     description: string;
 }
 
+export interface CreateTeamCategoryLocalizationDto {
+    entityId: number;
+    languageId: number;
+    name: string;
+    description: string;
+}
+
+export interface UpdateTeamCategoryLocalizationDto {
+    name: string;
+    description: string;
+}
+
 export interface TeamCategoryLocalizationDto extends EntityLocalizationDto, TeamCategoryLocalizableFields {
     entityId: number;
 }

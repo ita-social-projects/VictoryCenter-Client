@@ -12,6 +12,7 @@ import { SingleImageRight } from '@/components/common/program-section-templates/
 import { TitleDescriptionCardsWrapper } from '@/components/common/program-section-templates/title-description-cards/TitleDescriptionCardsWrapper';
 import { SingleTitleQuintupleDescription } from '@/components/common/program-section-templates/single-title-quintuple-description/SingleTitleQuintupleDescription';
 import { SingleTitleDescriptionAuthorPairs } from '@/components/common/program-section-templates/single-title-description-author-pairs/SingleTitleDescriptionAuthorPairs';
+import { PROGRAMS_TEXT } from '@/const/admin/programs';
 
 export interface ProgramSectionCardData {
     title: string;
@@ -77,7 +78,9 @@ const createImageContents = (count: number): ProgramSectionContent[] =>
 
 const createCardContents = (cardCount: number): ProgramSectionContent[] =>
     Array.from({ length: cardCount * 2 }, (_, index) =>
-        createItem(index % 2 === 0 ? ContentType.Title : ContentType.Description, index),
+        createItem(index % 2 === 0 ? ContentType.Title : ContentType.Description, index, {
+            groupIndex: Math.floor(index / 2),
+        }),
     );
 
 const IMAGE_COUNT_MAP: Partial<Record<ProgramSectionTemplate, number>> = {
@@ -91,9 +94,9 @@ const IMAGE_COUNT_MAP: Partial<Record<ProgramSectionTemplate, number>> = {
 };
 
 const CARD_COUNT_MAP: Partial<Record<ProgramSectionTemplate, number>> = {
-    [ProgramSectionTemplate.DualTitleDescription]: 2,
-    [ProgramSectionTemplate.TripleTitleDescription]: 3,
-    [ProgramSectionTemplate.QuadTitleDescription]: 4,
+    [ProgramSectionTemplate.DualTitleDescriptionPairs]: 2,
+    [ProgramSectionTemplate.TripleTitleDescriptionPairs]: 3,
+    [ProgramSectionTemplate.QuadTitleDescriptionPairs]: 4,
 };
 
 const SINGLE_IMAGE_TEMPLATES = new Set<ProgramSectionTemplate>([
@@ -136,7 +139,9 @@ const STANDARD_TEMPLATES_MAP: Partial<
 export const getInitialSectionContents = (templateId: ProgramSectionTemplate): ProgramSectionContent[] => {
     if (templateId === ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs) {
         return [
-            createItem(ContentType.Title, 0),
+            createItem(ContentType.Title, 0, {
+                title: PROGRAMS_TEXT.SECTION.SINGLE_TITLE_DESCRIPTION_AUTHOR_PAIRS.DEFAULT_TITLE,
+            } as any),
             createItem(ContentType.Description, 1, { groupIndex: 0 }),
             createItem(ContentType.Author, 2, { groupIndex: 0 }),
         ];
@@ -159,7 +164,7 @@ export const getInitialSectionContents = (templateId: ProgramSectionTemplate): P
 export const renderProgramSection = ({
     templateId,
     data,
-    mode = ProgramSectionMode.Published,
+    mode = ProgramSectionMode.View,
     handlers,
     validationResetKey,
 }: RenderProgramSectionParams): React.ReactElement | null => {

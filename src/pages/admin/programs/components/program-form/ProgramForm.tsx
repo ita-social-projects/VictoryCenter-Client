@@ -16,6 +16,9 @@ import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import NotFoundIcon from '@/assets/icons/not-found.svg';
 import styles from './ProgramForm.module.scss';
 import { ProgramSection } from '@/types/common/program-sections';
+import { BackgroundMedia } from '@/components/public/background-media';
+import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
+import cn from 'classnames';
 
 export interface ProgramFormValues {
     name: string;
@@ -203,17 +206,26 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             [],
         );
 
+        const sectionsContainerRef = useRef<HTMLDivElement>(null);
+
         const handleAddSection = useCallback(
             (section: ProgramSection) => {
                 const sectionKey = generateSectionKey();
                 setFormState((prev) => ({
                     ...prev,
-                    sections: [section, ...prev.sections],
+                    sections: [...prev.sections, section],
                 }));
                 setSectionStates((prev) => [
-                    { sectionKey, isSaved: false, isEditing: true, isNew: true, isReplacing: false },
                     ...prev,
+                    { sectionKey, isSaved: false, isEditing: true, isNew: true, isReplacing: false },
                 ]);
+                setTimeout(() => {
+                    const lastSection = sectionsContainerRef.current?.lastElementChild as HTMLElement | null;
+                    if (lastSection) {
+                        lastSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        lastSection.focus({ preventScroll: true });
+                    }
+                }, 0);
             },
             [setFormState],
         );
@@ -307,6 +319,60 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                 allSectionsSaved,
                 hasEditingSections,
             ],
+        );
+
+        const handleMoveUpSection = useCallback(
+            (sectionKey: string) => {
+                const idx = sectionStatesRef.current.findIndex((s) => s.sectionKey === sectionKey);
+                if (idx <= 0) return;
+
+                setFormState((prev) => {
+                    const updatedSections = [...prev.sections];
+                    [updatedSections[idx - 1], updatedSections[idx]] = [updatedSections[idx], updatedSections[idx - 1]];
+                    return { ...prev, sections: updatedSections };
+                });
+
+                setSectionStates((prev) => {
+                    const updated = [...prev];
+                    [updated[idx - 1], updated[idx]] = [updated[idx], updated[idx - 1]];
+                    return updated;
+                });
+
+                setTimeout(() => {
+                    document.querySelector(`[data-section-key="${sectionKey}"]`)?.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start',
+                    });
+                }, 50);
+            },
+            [setFormState],
+        );
+
+        const handleMoveDownSection = useCallback(
+            (sectionKey: string) => {
+                const idx = sectionStatesRef.current.findIndex((s) => s.sectionKey === sectionKey);
+                if (idx === -1 || idx >= sectionStatesRef.current.length - 1) return;
+
+                setFormState((prev) => {
+                    const updatedSections = [...prev.sections];
+                    [updatedSections[idx + 1], updatedSections[idx]] = [updatedSections[idx], updatedSections[idx + 1]];
+                    return { ...prev, sections: updatedSections };
+                });
+
+                setSectionStates((prev) => {
+                    const updated = [...prev];
+                    [updated[idx + 1], updated[idx]] = [updated[idx], updated[idx + 1]];
+                    return updated;
+                });
+
+                setTimeout(() => {
+                    document.querySelector(`[data-section-key="${sectionKey}"]`)?.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start',
+                    });
+                }, 50);
+            },
+            [setFormState],
         );
 
         const handleNameChange = useCallback(
@@ -508,6 +574,10 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             [updateSectionState],
         );
 
+        const hasBackgroundImage = useMemo(() => {
+            return !!getImageSrc(formState.backgroundImage);
+        }, [formState.backgroundImage]);
+
         return (
             <form className={styles['container']} noValidate>
                 {/* Header Section */}
@@ -543,28 +613,42 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
 
                 {/* Main Content Layout */}
                 <div className={styles['body']}>
-                    <PhotoInputGroup
-                        id="backgroundImage"
-                        isRequired={true}
-                        name="backgroundImage"
-                        value={formState.backgroundImage}
-                        onChange={handleBackgroundImageChange}
-                        disabled={isSubmitting || isFormDisabled}
-                        error={errors.backgroundImage}
-                        variant="program"
-                        setError={handleSetBackgroundImageError}
-                        cropWidth={PROGRAM_VALIDATION.backgroundImage.cropWidth}
-                        cropHeight={PROGRAM_VALIDATION.backgroundImage.cropHeight}
-                        minWidth={PROGRAM_VALIDATION.backgroundImage.minWidth}
-                        minHeight={PROGRAM_VALIDATION.backgroundImage.minHeight}
-                        imageLabel={COMMON_TEXT_ADMIN.INPUT.DRAG_AND_DROP_FILE_HERE}
-                        imageSubText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
-                            PROGRAM_VALIDATION.backgroundImage.height,
-                            PROGRAM_VALIDATION.backgroundImage.width,
-                        )}
-                        maxSizeMB={PROGRAM_VALIDATION.images.maxSizeMB}
-                    />
-                    <div className={styles['body-inputs']}>
+                    <div className={styles['background-image-wrapper']}>
+                        <PhotoInputGroup
+                            id="backgroundImage"
+                            isRequired={true}
+                            name="backgroundImage"
+                            value={formState.backgroundImage}
+                            onChange={handleBackgroundImageChange}
+                            disabled={isSubmitting || isFormDisabled}
+                            error={errors.backgroundImage}
+                            variant="program"
+                            setError={handleSetBackgroundImageError}
+                            cropWidth={PROGRAM_VALIDATION.backgroundImage.cropWidth}
+                            cropHeight={PROGRAM_VALIDATION.backgroundImage.cropHeight}
+                            minWidth={PROGRAM_VALIDATION.backgroundImage.minWidth}
+                            minHeight={PROGRAM_VALIDATION.backgroundImage.minHeight}
+                            imageLabel={COMMON_TEXT_ADMIN.INPUT.DRAG_AND_DROP_FILE_HERE}
+                            imageSubText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
+                                PROGRAM_VALIDATION.backgroundImage.height,
+                                PROGRAM_VALIDATION.backgroundImage.width,
+                            )}
+                            maxSizeMB={PROGRAM_VALIDATION.images.maxSizeMB}
+                        />
+                    </div>
+
+                    {formState.backgroundImage && (
+                        <BackgroundMedia
+                            mediaUrl={getImageSrc(formState.backgroundImage) || ''}
+                            overlay={{ opacity: 0.3 }}
+                            className={styles['body-background']}
+                            mediaType="image"
+                        />
+                    )}
+
+                    <div
+                        className={cn(styles['body-inputs'], { [styles['has-background-image']]: hasBackgroundImage })}
+                    >
                         <div className={styles['col-left']}>
                             <TextAreaWithCharacterLimitGroup
                                 label={PROGRAMS_TEXT.FORM.LABEL.NAME}
@@ -578,6 +662,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 disabled={isSubmitting || isFormDisabled}
                                 error={errors.name}
                                 placeholder={PROGRAMS_TEXT.PLACEHOLDER.INSERT_PROGRAM_NAME}
+                                isWhiteLabel={hasBackgroundImage}
                             />
 
                             <InputWithCharacterLimitGroup
@@ -633,6 +718,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 disabled={isSubmitting || isFormDisabled}
                                 maxLength={PROGRAM_VALIDATION.description.max}
                                 error={errors.description}
+                                isWhiteLabel={hasBackgroundImage}
                             />
 
                             <PhotoInputGroup
@@ -685,7 +771,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                     )}
 
                     {hasSections && (
-                        <div className={styles['sections-list']}>
+                        <div className={styles['sections-list']} ref={sectionsContainerRef}>
                             {formState.sections.map((section, index) => {
                                 if (!section) return null;
                                 const sectionState = sectionStates[index];
@@ -709,7 +795,24 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                             onDelete={() => handleDeleteSection(sectionKey)}
                                             isReplacingTemplate={sectionState.isReplacing}
                                             onRequestReplace={() => onReplaceSection?.(index)}
+                                            isFirstSection={index === 0}
+                                            isLastSection={index === formState.sections.length - 1}
+                                            onMoveUpSection={() => handleMoveUpSection(sectionKey)}
+                                            onMoveDownSection={() => handleMoveDownSection(sectionKey)}
                                         />
+                                        {index === formState.sections.length - 1 && (
+                                            <div className={styles['add-section-wrapper']}>
+                                                <Button
+                                                    buttonStyle="primary"
+                                                    onClick={onAddSection}
+                                                    disabled={isSubmitting || isFormDisabled}
+                                                    data-testid="add-section-button-bottom"
+                                                >
+                                                    {PROGRAMS_TEXT.BUTTON.ADD_SECTION}
+                                                    <PlusIcon className={styles['plus-icon']} />
+                                                </Button>
+                                            </div>
+                                        )}
                                         <div className={styles['sections-divider']} />
                                     </React.Fragment>
                                 );

@@ -2,50 +2,115 @@
 @use '@/assets/sass/mixins/typography.mixins' as type;
 
 .td-cards {
-    display: grid;
-    gap: 0.4rem;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: center;
+    align-items: stretch;
     margin: 0 auto;
     width: 100%;
-    height: fit-content;
-    align-content: start;
+    max-width: 800px;
+
+    @media (min-width: 1440px) {
+        max-width: 100%;
+
+        &.td-cards--dual > .td-card {
+            flex: 1 1 calc((100% - 16px) / 2);
+            min-width: 0;
+        }
+
+        &.td-cards--triple > .td-card {
+            flex: 1 1 calc((100% - 32px) / 3);
+            min-width: 0;
+        }
+
+        &.td-cards--quad > .td-card {
+            flex: 1 1 calc((100% - 16px) / 2);
+            min-width: 0;
+        }
+    }
 
     &--editable {
-        gap: 1rem;
+        gap: 16px;
+        max-width: 100%;
+
+        &.td-cards--dual > .td-card {
+            flex: 1 1 calc((100% - 16px) / 2);
+            min-width: 0;
+        }
+
+        &.td-cards--triple > .td-card {
+            flex: 1 1 calc((100% - 32px) / 3);
+            min-width: 0;
+        }
+
+        &.td-cards--quad > .td-card {
+            flex: 1 1 calc((100% - 16px) / 2);
+            min-width: 0;
+        }
     }
 
-    &--dual,
-    &--quad {
-        grid-template-columns: repeat(2, 1fr);
-    }
+    &--template {
+        pointer-events: none;
+        gap: 16px;
+        max-width: 100%;
+        > .td-card {
+            gap: 8px;
+        }
 
-    &--triple {
-        grid-template-columns: repeat(3, 1fr);
+        &.td-cards--dual > .td-card {
+            flex: 1 1 calc((100% - 16px) / 2);
+            min-width: 0;
+        }
+
+        &.td-cards--triple > .td-card {
+            flex: 1 1 calc((100% - 32px) / 3);
+            min-width: 0;
+        }
+
+        &.td-cards--quad > .td-card {
+            flex: 1 1 calc((100% - 16px) / 2);
+            min-width: 0;
+        }
     }
 }
 
 .td-card {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    justify-content: center;
+    gap: 32px;
     background: c.$light-blue-50;
     border-radius: 16px;
-    padding: 1rem;
+    padding: 16px;
+    min-height: 200px;
+    max-width: 600px;
+    width: 100%;
 
     &--editable {
-        padding: 1.3rem;
+        padding: 36px;
+        gap: 18px;
     }
 }
 
 .title {
     @include type.subtitle-2-bold;
-    font-size: 0.76rem;
-    margin-bottom: 0.5rem;
+
+    &--template {
+        padding-top: 10px;
+        font-size: clamp(8px, 0.76vw, 12px);
+        line-height: clamp(10px, 0.9vw, 16px);
+    }
 }
 
 .title-field {
-    margin-bottom: 1rem;
+    margin-bottom: 16px;
 
     input {
         @include type.subtitle-2-bold;
-        font-size: 1.03rem;
+        
+        font-size: 16px;
 
         &::placeholder {
             opacity: 0.7;
@@ -56,26 +121,28 @@
 .description-field {
     textarea {
         @include type.body-1-regular;
-        font-size: 1rem;
-        min-height: 10rem;
+        font-size: 16px;
+        min-height: 160px;
     }
 }
 
 .description {
     @include type.body-1-regular;
-    font-size: 0.64rem;
-    line-height: 1rem;
     white-space: pre-wrap;
-    margin-bottom: 0.5rem;
+
+    &--template {
+        font-size: clamp(6px, 0.64vw, 10px);
+        line-height: clamp(8px, 0.8vw, 16px);
+    }
 }
 
 .description-list {
     list-style: none;
-    padding-left: 0.3rem;
+    padding-left: 5px;
     margin: 0;
 
     li {
-        padding-left: 0.7rem;
+        padding-left: 11px;
         position: relative;
 
         &::before {

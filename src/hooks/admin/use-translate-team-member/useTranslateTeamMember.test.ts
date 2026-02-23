@@ -189,6 +189,46 @@ describe('useTranslateTeamMember', () => {
         expect(result.current.isSubmitting).toBe(false);
     });
 
+    it('should set error when update fails in edit mode', async () => {
+        const onSuccess = jest.fn();
+
+        mockedUpdate.mockRejectedValue(new Error('API error'));
+
+        const memberWithLocalization: TeamMember = {
+            ...memberMock,
+            localizations: [
+                {
+                    ...localizationModelMock,
+                    language: languageMock,
+                },
+            ],
+        };
+
+        const { result } = renderHook(() =>
+            useTranslateTeamMember({
+                member: memberWithLocalization,
+                language: languageMock,
+                onSuccess,
+                mode: ModalMode.Edit,
+            }),
+        );
+
+        await act(async () => {
+            try {
+                await result.current.translateMember(formValues);
+            } catch {
+                // Ignoring error for test
+            }
+        });
+
+        await waitFor(() => {
+            expect(result.current.error).toBe(TEAM_MEMBERS_TEXT.FORM.MESSAGE.FAIL_TO_UPDATE_TRANSLATION);
+        });
+
+        expect(onSuccess).not.toHaveBeenCalled();
+        expect(result.current.isSubmitting).toBe(false);
+    });
+
     it('should clear error', () => {
         const { result } = renderHook(() =>
             useTranslateTeamMember({

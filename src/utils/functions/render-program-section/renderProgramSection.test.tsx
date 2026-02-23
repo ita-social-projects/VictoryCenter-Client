@@ -210,9 +210,9 @@ describe('renderProgramSection', () => {
         };
 
         const cardTemplates = [
-            { id: ProgramSectionTemplate.DualTitleDescription, cardsCount: 2 },
-            { id: ProgramSectionTemplate.TripleTitleDescription, cardsCount: 3 },
-            { id: ProgramSectionTemplate.QuadTitleDescription, cardsCount: 4 },
+            { id: ProgramSectionTemplate.DualTitleDescriptionPairs, cardsCount: 2 },
+            { id: ProgramSectionTemplate.TripleTitleDescriptionPairs, cardsCount: 3 },
+            { id: ProgramSectionTemplate.QuadTitleDescriptionPairs, cardsCount: 4 },
         ];
 
         cardTemplates.forEach(({ id, cardsCount }) => {
@@ -409,7 +409,7 @@ describe('renderProgramSection', () => {
         expect(mockCapturedProps.TextOnly.mode).toBe(ProgramSectionMode.Template);
     });
 
-    it('defaults mode to Published when omitted', () => {
+    it('defaults mode to View when omitted', () => {
         render(
             renderProgramSection({
                 templateId: ProgramSectionTemplate.TextOnly,
@@ -417,7 +417,7 @@ describe('renderProgramSection', () => {
             }),
         );
 
-        expect(mockCapturedProps.TextOnly.mode).toBe(ProgramSectionMode.Published);
+        expect(mockCapturedProps.TextOnly.mode).toBe(ProgramSectionMode.View);
     });
 });
 
@@ -502,34 +502,54 @@ describe('getInitialSectionContents', () => {
         expect(contents.filter((c) => c.contentType === ContentType.Image)).toHaveLength(4);
     });
 
-    it('returns 4 contents for DualTitleDescription (2 title + 2 description)', () => {
-        const contents = getInitialSectionContents(ProgramSectionTemplate.DualTitleDescription);
+    const titleDescriptionPairsTestCases = [
+        {
+            template: ProgramSectionTemplate.DualTitleDescriptionPairs,
+            name: 'DualTitleDescriptionPairs',
+            pairCount: 2,
+            totalContents: 4,
+        },
+        {
+            template: ProgramSectionTemplate.TripleTitleDescriptionPairs,
+            name: 'TripleTitleDescriptionPairs',
+            pairCount: 3,
+            totalContents: 6,
+        },
+        {
+            template: ProgramSectionTemplate.QuadTitleDescriptionPairs,
+            name: 'QuadTitleDescriptionPairs',
+            pairCount: 4,
+            totalContents: 8,
+        },
+    ];
 
-        expect(contents).toHaveLength(4);
-        expect(contents.filter((c) => c.contentType === ContentType.Title)).toHaveLength(2);
-        expect(contents.filter((c) => c.contentType === ContentType.Description)).toHaveLength(2);
-    });
+    test.each(titleDescriptionPairsTestCases)(
+        'returns $totalContents contents for $name ($pairCount title + $pairCount description)',
+        ({ template, pairCount, totalContents }) => {
+            const contents = getInitialSectionContents(template);
 
-    it('returns 6 contents for TripleTitleDescription (3 title + 3 description)', () => {
-        const contents = getInitialSectionContents(ProgramSectionTemplate.TripleTitleDescription);
+            expect(contents).toHaveLength(totalContents);
+            expect(contents.filter((c) => c.contentType === ContentType.Title)).toHaveLength(pairCount);
+            expect(contents.filter((c) => c.contentType === ContentType.Description)).toHaveLength(pairCount);
 
-        expect(contents).toHaveLength(6);
-        expect(contents.filter((c) => c.contentType === ContentType.Title)).toHaveLength(3);
-        expect(contents.filter((c) => c.contentType === ContentType.Description)).toHaveLength(3);
-    });
+            // Verify groupIndex for each pair
+            for (let i = 0; i < pairCount; i++) {
+                const titleIndex = i * 2;
+                const descIndex = i * 2 + 1;
 
-    it('returns 8 contents for QuadTitleDescription (4 title + 4 description)', () => {
-        const contents = getInitialSectionContents(ProgramSectionTemplate.QuadTitleDescription);
+                expect(contents[titleIndex].contentType).toBe(ContentType.Title);
+                expect((contents[titleIndex] as any).groupIndex).toBe(i);
 
-        expect(contents).toHaveLength(8);
-        expect(contents.filter((c) => c.contentType === ContentType.Title)).toHaveLength(4);
-        expect(contents.filter((c) => c.contentType === ContentType.Description)).toHaveLength(4);
-    });
+                expect(contents[descIndex].contentType).toBe(ContentType.Description);
+                expect((contents[descIndex] as any).groupIndex).toBe(i);
+            }
+        },
+    );
 
-    it('maintains correct order for DualTitleDescription', () => {
-        const contents = getInitialSectionContents(ProgramSectionTemplate.DualTitleDescription);
-
-        expect(contents.map((c) => c.order)).toEqual([0, 1, 2, 3]);
+    test.each(titleDescriptionPairsTestCases)('maintains correct order for $name', ({ template, totalContents }) => {
+        const contents = getInitialSectionContents(template);
+        const expectedOrder = Array.from({ length: totalContents }, (_, i) => i);
+        expect(contents.map((c) => c.order)).toEqual(expectedOrder);
     });
 
     it('returns default base contents for unknown template', () => {

@@ -4,7 +4,11 @@ import '@testing-library/jest-dom';
 import { SingleTitleQuintupleDescription } from './SingleTitleQuintupleDescription';
 import { ProgramSectionMode } from '@/types/common/program-sections';
 
-const mockDesc = jest.fn();
+const mockDescProps = jest.fn();
+
+jest.mock('@/utils/functions/program-section-template-validation/programSectionTemplateValidation', () => ({
+    getProgramSectionTemplateMaxLength: jest.fn(() => 50),
+}));
 
 jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
     InputWithCharacterLimitGroup: ({ value, onChange, id }: any) => (
@@ -16,7 +20,7 @@ jest.mock(
     '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
     () => ({
         TextAreaWithCharacterLimitGroup: (props: any) => {
-            mockDesc(props);
+            mockDescProps(props);
             const { value, onChange, id } = props;
             return <textarea data-testid={`input-${id}`} value={value} onChange={onChange} />;
         },
@@ -32,24 +36,28 @@ jest.mock('@/const/admin/programs', () => ({
             },
         },
     },
-    PROGRAM_SECTION_VALIDATION: {
-        title: { max: 100 },
-        description: { max: 200 },
-    },
     SINGLE_TITLE_QUINTUPLE_DESCRIPTION_CONFIG: {
         descriptionsCount: 5,
     },
 }));
 
+jest.mock('@/validation/admin/program-schema/program-schema', () => ({
+    PROGRAM_SECTION_VALIDATION_FUNCTIONS: {
+        validateSectionTitle: jest.fn(() => undefined),
+        validateSectionDescription: jest.fn(() => undefined),
+    },
+}));
+
 const setup = (props: React.ComponentProps<typeof SingleTitleQuintupleDescription> = {}) => {
-    mockDesc.mockClear();
+    mockDescProps.mockClear();
     return render(<SingleTitleQuintupleDescription {...props} />);
 };
 
 const getRoot = (container: HTMLElement) => container.firstElementChild as HTMLElement;
 const getPreviewTexts = (container: HTMLElement) =>
     Array.from(container.querySelectorAll('p')).map((p) => p.textContent);
-const getDescCallIds = () => mockDesc.mock.calls.map((call: any[]) => call[0]?.id);
+
+const getDescCallIds = () => mockDescProps.mock.calls.slice(0, 5).map((call: any[]) => call[0]?.id);
 
 describe('SingleTitleQuintupleDescription', () => {
     describe('Preview', () => {
@@ -145,9 +153,12 @@ describe('SingleTitleQuintupleDescription', () => {
             expect(true).toBe(true);
         });
 
-        it('applies editable class', () => {
-            const { container } = setup({ mode: ProgramSectionMode.Edit });
-            expect(getRoot(container)).toHaveClass('editable');
+        it('applies editable class for Edit mode only', () => {
+            const { container: editContainer } = setup({ mode: ProgramSectionMode.Edit });
+            expect(getRoot(editContainer)).toHaveClass('editable');
+
+            const { container: viewContainer } = setup({ mode: ProgramSectionMode.View });
+            expect(getRoot(viewContainer)).not.toHaveClass('editable');
         });
 
         it('does not apply template class when mode is Edit', () => {

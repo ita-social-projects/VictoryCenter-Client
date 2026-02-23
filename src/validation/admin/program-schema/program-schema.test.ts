@@ -1,609 +1,896 @@
-import { programValidationSchema, ProgramValidationContext, PROGRAM_VALIDATION_FUNCTIONS } from './program-schema';
-import { PROGRAM_VALIDATION } from '@/const/admin/programs';
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { ImageValues, Image } from '@/types/common/image';
-import { Program } from '@/types/admin/programs';
-import { ProgramSection, ProgramSectionTemplate } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
+import { ProgramSectionTemplate } from '@/types/common/program-sections';
 
-const createMockFile = (type = 'image/jpeg'): ImageValues => ({
-    base64: 'fsdgdsgdsdgsdgsd',
-    mimeType: type,
-});
+type Range = { min: number; max: number };
 
-const createMockImage = (id = 1): Image => ({
-    id,
-    url: 'https://example.com/image.jpg',
-    mimeType: 'image/jpeg',
-});
+const R = (min: number, max: number): Range => ({ min, max });
 
-const mockCategory = {
-    id: 1,
-    name: 'Test Category',
-    programsCount: 5,
+const T_ONLY_TITLE = 91001 as any;
+const T_GROUP_ONLY = 91002 as any;
+const T_GROUP_STRICT = 91003 as any;
+const T_GROUPCOUNT_ZERO = 91004 as any;
+const T_GROUP_ZERO_FAIL = 91005 as any;
+const T_GROUP_ZERO_PASS = 91006 as any;
+const T_IMG_REQ_UNDEF = 91007 as any;
+const T_LEN_IMAGE = 91008 as any;
+const T_IMG_SORT = 91009 as any;
+
+const loadSchema = (over?: { programValidation?: any; sectionValidation?: any; templateValidation?: any }) => {
+    jest.resetModules();
+
+    jest.doMock('@/const/admin/common', () => ({
+        COMMON_TEXT_ADMIN: {
+            VALIDATION_MESSAGE: {
+                FIELD_REQUIRED: 'required',
+                getMaxError: (n: number) => `max ${n}`,
+                getMinError: (n: number) => `min ${n}`,
+            },
+        },
+    }));
+
+    jest.doMock('@/const/admin/programs', () => {
+        const pv = {
+            name: { min: 1, max: 10, getRequiredError: () => 'name required' },
+            categories: { getAtLeastOneRequiredError: () => 'categories required' },
+            description: { min: 1, max: 50, getRequiredWhenPublishingError: () => 'desc required' },
+            previewImage: { getRequiredWhenPublishingError: () => 'preview required' },
+            backgroundImage: { getRequiredWhenPublishingError: () => 'bg required' },
+            location: { max: 20, getRequiredWhenPublishingError: () => 'loc required' },
+            participantsCount: { max: 20, getRequiredWhenPublishingError: () => 'pc required' },
+            meetingCount: { max: 20, getRequiredWhenPublishingError: () => 'mc required' },
+            images: { maxSizeMB: 1 },
+            ...(over?.programValidation ?? {}),
+        };
+
+        const sv = {
+            title: { getRequiredError: () => 'title required' },
+            description: { getRequiredError: () => 'description required' },
+            author: { getRequiredError: () => 'author required' },
+            cardAuthor: { getRequiredError: () => 'card author required' },
+            ...(over?.sectionValidation ?? {}),
+        };
+
+        const tv: any = {
+            [ProgramSectionTemplate.TextOnly]: {
+                counts: {
+                    [ContentType.Title]: R(1, 1),
+                    [ContentType.Description]: R(1, 1),
+                    [ContentType.Image]: R(0, 0),
+                    [ContentType.Author]: R(0, 0),
+                },
+                lengths: {
+                    [ContentType.Title]: R(2, 3),
+                    [ContentType.Description]: R(2, 4),
+                },
+            },
+
+            [ProgramSectionTemplate.SingleImageBottom]: {
+                counts: {
+                    [ContentType.Title]: R(1, 1),
+                    [ContentType.Description]: R(1, 1),
+                    [ContentType.Image]: R(1, 1),
+                    [ContentType.Author]: R(0, 0),
+                },
+                lengths: {
+                    [ContentType.Title]: R(1, 10),
+                    [ContentType.Description]: R(1, 10),
+                },
+            },
+
+            [ProgramSectionTemplate.DualTitleDescriptionPairs]: {
+                counts: {
+                    [ContentType.Title]: R(2, 2),
+                    [ContentType.Description]: R(2, 2),
+                    [ContentType.Image]: R(0, 0),
+                    [ContentType.Author]: R(0, 0),
+                },
+                lengths: {
+                    [ContentType.Title]: R(1, 10),
+                    [ContentType.Description]: R(1, 10),
+                },
+                grouping: {
+                    groupCount: R(2, 2),
+                    perGroupCounts: {
+                        [ContentType.Title]: R(1, 1),
+                        [ContentType.Description]: R(1, 1),
+                    },
+                },
+            },
+
+            [ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs]: {
+                counts: {
+                    [ContentType.Title]: R(1, 1),
+                    [ContentType.Description]: R(1, 5),
+                    [ContentType.Author]: R(1, 5),
+                    [ContentType.Image]: R(0, 0),
+                },
+                lengths: {
+                    [ContentType.Title]: R(1, 10),
+                    [ContentType.Description]: R(1, 10),
+                    [ContentType.Author]: R(1, 10),
+                },
+                grouping: {
+                    groupCount: R(1, 5),
+                    perGroupCounts: {
+                        [ContentType.Description]: R(1, 1),
+                        [ContentType.Author]: R(1, 1),
+                    },
+                },
+            },
+
+            [T_ONLY_TITLE]: {
+                counts: {
+                    [ContentType.Title]: R(1, 1),
+                    x: R(0, 0),
+                },
+                lengths: {
+                    [ContentType.Title]: R(1, 10),
+                },
+            },
+
+            [T_GROUP_ONLY]: {
+                grouping: {
+                    groupCount: R(1, 1),
+                    perGroupCounts: {
+                        [ContentType.Description]: R(1, 1),
+                    },
+                },
+            },
+
+            [T_GROUP_STRICT]: {
+                grouping: {
+                    groupCount: R(1, 1),
+                    perGroupCounts: {
+                        [ContentType.Description]: R(1, 1),
+                    },
+                },
+            },
+
+            [T_GROUPCOUNT_ZERO]: {
+                grouping: {
+                    groupCount: R(0, 0),
+                    perGroupCounts: {
+                        [ContentType.Description]: R(1, 1),
+                    },
+                },
+            },
+
+            [T_GROUP_ZERO_FAIL]: {
+                grouping: {
+                    groupCount: R(1, 1),
+                    perGroupCounts: {
+                        [ContentType.Title]: R(0, 0),
+                    },
+                },
+            },
+
+            [T_GROUP_ZERO_PASS]: {
+                grouping: {
+                    groupCount: R(1, 1),
+                    perGroupCounts: {
+                        [ContentType.Description]: R(1, 1),
+                        [ContentType.Author]: R(0, 0),
+                    },
+                },
+            },
+
+            [T_IMG_REQ_UNDEF]: {
+                counts: {
+                    [ContentType.Title]: R(1, 1),
+                },
+                lengths: {
+                    [ContentType.Title]: R(1, 10),
+                },
+                grouping: {
+                    groupCount: R(1, 1),
+                    perGroupCounts: {
+                        [ContentType.Image]: R(1, 1),
+                    },
+                },
+            },
+
+            [T_LEN_IMAGE]: {
+                counts: {
+                    [ContentType.Image]: R(1, 1),
+                },
+                lengths: {
+                    [ContentType.Image]: R(1, 1),
+                },
+            },
+
+            [T_IMG_SORT]: {
+                counts: {
+                    [ContentType.Title]: R(1, 1),
+                    [ContentType.Image]: R(1, 2),
+                },
+                lengths: {
+                    [ContentType.Title]: R(1, 10),
+                },
+            },
+
+            ...(over?.templateValidation ?? {}),
+        };
+
+        return {
+            PROGRAM_VALIDATION: pv,
+            PROGRAM_SECTION_VALIDATION: sv,
+            PROGRAM_SECTION_TEMPLATE_VALIDATION: tv,
+        };
+    });
+
+    let m: any;
+    jest.isolateModules(() => {
+        m = require('./program-schema');
+    });
+    return m;
 };
 
-const getValidData = (overrides?: Partial<Program>): Partial<Program> => ({
-    name: 'Valid Program Name',
-    categories: [mockCategory],
-    description: 'This is a valid description with enough characters.',
-    participantsCount: 'Some participants 123',
-    meetingsCount: 'Some meetings count 123',
-    backgroundImage: createMockFile(),
-    previewImage: createMockFile(),
-    location: 'Location 123',
-    ...overrides,
+const sec = (template: any, contents: any[]) => ({ template, order: 0, contents });
+
+const t = (value: string, order: any = 0, extra?: any) => ({
+    contentType: ContentType.Title,
+    ...(order !== undefined ? { order } : {}),
+    title: value,
+    ...(extra ?? {}),
 });
 
-const expectValidationToPass = async (data: any, context?: ProgramValidationContext) => {
-    await expect(programValidationSchema.validate(data, { context })).resolves.toBeDefined();
-};
+const d = (value: string, order: any = 1, extra?: any) => ({
+    contentType: ContentType.Description,
+    ...(order !== undefined ? { order } : {}),
+    description: value,
+    ...(extra ?? {}),
+});
 
-const expectValidationToFail = async (data: any, expectedError: string, context?: ProgramValidationContext) => {
-    await expect(programValidationSchema.validate(data, { context })).rejects.toThrow(expectedError);
-};
+const a = (value: string, order: any = 2, extra?: any) => ({
+    contentType: ContentType.Author,
+    ...(order !== undefined ? { order } : {}),
+    author: value,
+    ...(extra ?? {}),
+});
 
-describe('Program Validation Schema', () => {
-    describe('Name validation', () => {
-        const invalidNameCases = [
-            {
-                description: 'is empty',
-                data: getValidData({ name: '' }),
-                expectedError: PROGRAM_VALIDATION.name.getRequiredError(),
-            },
-            {
-                description: 'is too short',
-                data: getValidData({ name: 'A' }),
-                expectedError: COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(PROGRAM_VALIDATION.name.min),
-            },
-            {
-                description: 'is too long',
-                data: getValidData({ name: 'A'.repeat(PROGRAM_VALIDATION.name.max + 1) }),
-                expectedError: COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PROGRAM_VALIDATION.name.max),
-            },
-        ];
+const im = (order: any = 2, extra?: any) => ({
+    contentType: ContentType.Image,
+    ...(order !== undefined ? { order } : {}),
+    ...(extra ?? {}),
+});
 
-        it('should pass with a valid name', async () => {
-            await expectValidationToPass(getValidData());
-        });
+const validTextOnly = () => sec(ProgramSectionTemplate.TextOnly, [t('aa', 0), d('bbbb', 1)]);
 
-        it.each(invalidNameCases)('should fail when name $description', async ({ data, expectedError }) => {
-            await expectValidationToFail(data, expectedError);
-        });
+const validSingleImage = (imgExtra?: any) =>
+    sec(ProgramSectionTemplate.SingleImageBottom, [t('a', 0), d('b', 1), im(2, imgExtra)]);
+
+describe('program-schema.ts coverage (templates are bottom-only)', () => {
+    it('validateProgramSections returns undefined for undefined', () => {
+        const m = loadSchema();
+        expect(m.validateProgramSections(undefined as any, true)).toBeUndefined();
     });
 
-    describe('Categories validation', () => {
-        const invalidCategoryCases = [
-            {
-                description: 'is an empty array',
-                data: getValidData({ categories: [] }),
-                expectedError: PROGRAM_VALIDATION.categories.getAtLeastOneRequiredError(),
-            },
-            {
-                description: 'is null',
-                data: getValidData({ categories: null! }),
-                expectedError: PROGRAM_VALIDATION.categories.getAtLeastOneRequiredError(),
-            },
-        ];
-
-        it('should pass with valid categories', async () => {
-            await expectValidationToPass(getValidData());
-        });
-
-        it('should pass with multiple categories', async () => {
-            await expectValidationToPass(
-                getValidData({
-                    categories: [mockCategory, { id: 2, name: 'Another Category', programsCount: 3 }],
-                }),
-            );
-        });
-
-        it.each(invalidCategoryCases)('should fail when categories $description', async ({ data, expectedError }) => {
-            await expectValidationToFail(data, expectedError);
-        });
+    it('validateProgramSections returns undefined for empty array', () => {
+        const m = loadSchema();
+        expect(m.validateProgramSections([], true)).toBeUndefined();
     });
 
-    describe('Description validation (Draft mode)', () => {
-        it('should pass with empty description', async () => {
-            await expectValidationToPass(getValidData({ description: '' }));
-        });
-
-        it('should pass with valid description', async () => {
-            await expectValidationToPass(getValidData({ description: 'Valid description text' }));
-        });
-
-        it('should fail when description exceeds max length', async () => {
-            const data = getValidData({ description: 'A'.repeat(PROGRAM_VALIDATION.description.max + 1) });
-            await expectValidationToFail(
-                data,
-                COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PROGRAM_VALIDATION.description.max),
-            );
-        });
+    it('unknown template is valid in draft', () => {
+        const m = loadSchema();
+        expect(m.isProgramSectionValid(sec(777777, []), false)).toBe(true);
     });
 
-    describe('Description validation (Publish mode)', () => {
-        const publishContext = { isPublishing: true };
-        const validDataForPublish = getValidData({ previewImage: createMockFile(), backgroundImage: createMockFile() });
-
-        const invalidPublishCases = [
-            {
-                description: 'is empty',
-                data: { ...validDataForPublish, description: '' },
-                expectedError: PROGRAM_VALIDATION.description.getRequiredWhenPublishingError(),
-            },
-            {
-                description: 'is too short',
-                data: { ...validDataForPublish, description: 'Short' },
-                expectedError: COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(PROGRAM_VALIDATION.description.min),
-            },
-            {
-                description: 'is too long',
-                data: { ...validDataForPublish, description: 'A'.repeat(PROGRAM_VALIDATION.description.max + 1) },
-                expectedError: COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PROGRAM_VALIDATION.description.max),
-            },
-        ];
-
-        it('should pass with a valid description', async () => {
-            await expectValidationToPass(validDataForPublish, publishContext);
-        });
-
-        it.each(invalidPublishCases)('should fail when description $description', async ({ data, expectedError }) => {
-            await expectValidationToFail(data, expectedError, publishContext);
-        });
+    it('unknown template is invalid in publish', () => {
+        const m = loadSchema();
+        expect(m.isProgramSectionValid(sec(777777, []), true)).toBe(false);
     });
 
-    describe('PreviewImage validation (Draft mode)', () => {
-        it('should pass with null previewImage', async () => {
-            await expectValidationToPass(getValidData({ previewImage: null }));
-        });
-
-        it('should pass with ImageValues previewImage', async () => {
-            await expectValidationToPass(getValidData({ previewImage: createMockFile() }));
-        });
-
-        it('should pass with Image previewImage', async () => {
-            await expectValidationToPass(getValidData({ previewImage: createMockImage() }));
-        });
+    it('basic values: non-number contentType fails', () => {
+        const m = loadSchema();
+        expect(
+            m.isProgramSectionValid(sec(ProgramSectionTemplate.TextOnly, [{ contentType: 'x', order: 0 }]), false),
+        ).toBe(false);
     });
 
-    describe('PreviewImage validation (Publish mode)', () => {
-        const publishContext = { isPublishing: true };
-
-        it('should fail with null previewImage', async () => {
-            await expectValidationToFail(
-                getValidData({ previewImage: null }),
-                PROGRAM_VALIDATION.previewImage.getRequiredWhenPublishingError(),
-                publishContext,
-            );
-        });
-
-        it('should pass with ImageValues previewImage', async () => {
-            await expectValidationToPass(getValidData({ previewImage: createMockFile() }), publishContext);
-        });
-
-        it('should pass with Image previewImage', async () => {
-            await expectValidationToPass(getValidData({ previewImage: createMockImage() }), publishContext);
-        });
+    it('basic values: unknown numeric contentType fails', () => {
+        const m = loadSchema();
+        expect(
+            m.isProgramSectionValid(sec(ProgramSectionTemplate.TextOnly, [{ contentType: 999, order: 0 }]), false),
+        ).toBe(false);
     });
 
-    describe('BackgroundImage validation (Draft mode)', () => {
-        it('should pass with null backgroundImage', async () => {
-            await expectValidationToPass(getValidData({ backgroundImage: null }));
-        });
-
-        it('should pass with ImageValues backgroundImage', async () => {
-            await expectValidationToPass(getValidData({ backgroundImage: createMockFile() }));
-        });
-
-        it('should pass with Image backgroundImage', async () => {
-            await expectValidationToPass(getValidData({ backgroundImage: createMockImage() }));
-        });
+    it('basic values: negative order fails', () => {
+        const m = loadSchema();
+        expect(m.isProgramSectionValid(sec(ProgramSectionTemplate.TextOnly, [t('aa', -1), d('bbbb', 1)]), false)).toBe(
+            false,
+        );
     });
 
-    describe('BackgroundImage validation (Publish mode)', () => {
-        const publishContext = { isPublishing: true };
-
-        it('should fail with null backgroundImage', async () => {
-            await expectValidationToFail(
-                getValidData({ backgroundImage: null }),
-                PROGRAM_VALIDATION.backgroundImage.getRequiredWhenPublishingError(),
-                publishContext,
-            );
-        });
-
-        it('should pass with ImageValues backgroundImage', async () => {
-            await expectValidationToPass(getValidData({ backgroundImage: createMockFile() }), publishContext);
-        });
-
-        it('should pass with Image backgroundImage', async () => {
-            await expectValidationToPass(getValidData({ backgroundImage: createMockImage() }), publishContext);
-        });
+    it('basic values: groupIndex wrong type fails', () => {
+        const m = loadSchema();
+        expect(
+            m.isProgramSectionValid(sec(ProgramSectionTemplate.TextOnly, [t('aa', 0, { groupIndex: '0' })]), false),
+        ).toBe(false);
     });
 
-    describe('Location validation (Draft mode)', () => {
-        it('should pass with empty location', async () => {
-            await expectValidationToPass(getValidData({ location: '' }));
-        });
-
-        it('should pass with valid location', async () => {
-            await expectValidationToPass(getValidData({ location: 'Kyiv' }));
-        });
-
-        it('should fail when location exceeds max length', async () => {
-            await expectValidationToFail(
-                getValidData({ location: 'A'.repeat(PROGRAM_VALIDATION.location.max + 1) }),
-                COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PROGRAM_VALIDATION.location.max),
-            );
-        });
+    it('basic values: negative groupIndex fails', () => {
+        const m = loadSchema();
+        expect(
+            m.isProgramSectionValid(sec(ProgramSectionTemplate.TextOnly, [t('aa', 0, { groupIndex: -1 })]), false),
+        ).toBe(false);
     });
 
-    describe('Location validation (Publish mode)', () => {
-        const publishContext = { isPublishing: true };
-
-        it('should pass with empty location', async () => {
-            await expectValidationToPass(getValidData({ location: '' }), publishContext);
-        });
-
-        it('should pass with valid location', async () => {
-            await expectValidationToPass(getValidData({ location: 'Kyiv' }), publishContext);
-        });
-
-        it('should fail when location exceeds max length', async () => {
-            await expectValidationToFail(
-                getValidData({ location: 'A'.repeat(PROGRAM_VALIDATION.location.max + 1) }),
-                COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PROGRAM_VALIDATION.location.max),
-                publishContext,
-            );
-        });
+    it('orders: duplicate numeric orders fail', () => {
+        const m = loadSchema();
+        expect(m.isProgramSectionValid(sec(ProgramSectionTemplate.TextOnly, [t('aa', 0), d('bbbb', 0)]), false)).toBe(
+            false,
+        );
     });
 
-    describe('ParticipantsCount validation (Draft mode)', () => {
-        it('should pass with empty participantsCount', async () => {
-            await expectValidationToPass(getValidData({ participantsCount: '' }));
-        });
-
-        it('should pass with valid participantsCount', async () => {
-            await expectValidationToPass(getValidData({ participantsCount: '50' }));
-        });
-
-        it('should fail when participantsCount exceeds max length', async () => {
-            await expectValidationToFail(
-                getValidData({ participantsCount: 'A'.repeat(PROGRAM_VALIDATION.participantsCount.max + 1) }),
-                COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PROGRAM_VALIDATION.participantsCount.max),
-            );
-        });
+    it('orders: non-number orders are ignored', () => {
+        const m = loadSchema();
+        expect(
+            m.isProgramSectionValid(
+                sec(ProgramSectionTemplate.TextOnly, [t('aa', undefined), d('bbbb', undefined)]),
+                true,
+            ),
+        ).toBe(true);
     });
 
-    describe('ParticipantsCount validation (Publish mode)', () => {
-        const publishContext = { isPublishing: true };
-
-        it('should pass with empty participantsCount', async () => {
-            await expectValidationToPass(getValidData({ participantsCount: '' }), publishContext);
-        });
-
-        it('should pass with valid participantsCount', async () => {
-            await expectValidationToPass(getValidData({ participantsCount: '50' }), publishContext);
-        });
-
-        it('should fail when participantsCount exceeds max length', async () => {
-            await expectValidationToFail(
-                getValidData({ participantsCount: 'A'.repeat(PROGRAM_VALIDATION.participantsCount.max + 1) }),
-                COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PROGRAM_VALIDATION.participantsCount.max),
-                publishContext,
-            );
-        });
+    it('image ids: duplicates via imageId and image.id fail', () => {
+        const m = loadSchema();
+        expect(
+            m.isProgramSectionValid(
+                sec(ProgramSectionTemplate.SingleImageBottom, [
+                    t('a', 0),
+                    d('b', 1),
+                    im(2, { imageId: 1 }),
+                    im(3, { image: { id: 1 } }),
+                ]),
+                false,
+            ),
+        ).toBe(false);
     });
 
-    describe('MeetingCount validation (Draft mode)', () => {
-        it('should pass with empty meetingCount', async () => {
-            await expectValidationToPass(getValidData({ meetingsCount: '' }));
-        });
-
-        it('should pass with valid meetingCount', async () => {
-            await expectValidationToPass(getValidData({ meetingsCount: '10' }));
-        });
-
-        it('should fail when meetingCount exceeds max length', async () => {
-            await expectValidationToFail(
-                getValidData({ meetingsCount: 'A'.repeat(PROGRAM_VALIDATION.meetingCount.max + 1) }),
-                COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PROGRAM_VALIDATION.meetingCount.max),
-            );
-        });
+    it('image ids: duplicates via image.imageId fail', () => {
+        const m = loadSchema();
+        expect(
+            m.isProgramSectionValid(
+                sec(ProgramSectionTemplate.SingleImageBottom, [
+                    t('a', 0),
+                    d('b', 1),
+                    im(2, { image: { imageId: 2 } }),
+                    im(3, { imageId: 2 }),
+                ]),
+                false,
+            ),
+        ).toBe(false);
     });
 
-    describe('MeetingCount validation (Publish mode)', () => {
-        const publishContext = { isPublishing: true };
+    it('allowed types: valid type but not allowed by rules fails', () => {
+        const m = loadSchema();
+        expect(m.isProgramSectionValid(sec(T_ONLY_TITLE, [t('a', 0), d('b', 1)]), false)).toBe(false);
+    });
 
-        it('should pass with empty meetingCount', async () => {
-            await expectValidationToPass(getValidData({ meetingsCount: '' }), publishContext);
-        });
+    it('counts: draft fails when actual > max', () => {
+        const m = loadSchema();
+        expect(
+            m.isProgramSectionValid(
+                sec(ProgramSectionTemplate.SingleImageBottom, [
+                    t('a', 0),
+                    d('b', 1),
+                    im(2, { imageId: 1 }),
+                    im(3, { imageId: 2 }),
+                ]),
+                false,
+            ),
+        ).toBe(false);
+    });
 
-        it('should pass with valid meetingCount', async () => {
-            await expectValidationToPass(getValidData({ meetingsCount: '10' }), publishContext);
-        });
+    it('counts: draft passes when actual < min but <= max', () => {
+        const m = loadSchema();
+        expect(
+            m.isProgramSectionValid(sec(ProgramSectionTemplate.SingleImageBottom, [t('a', 0), d('b', 1)]), false),
+        ).toBe(true);
+    });
 
-        it('should fail when meetingCount exceeds max length', async () => {
-            await expectValidationToFail(
-                getValidData({ meetingsCount: 'A'.repeat(PROGRAM_VALIDATION.meetingCount.max + 1) }),
-                COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PROGRAM_VALIDATION.meetingCount.max),
-                publishContext,
-            );
+    it('counts: publish fails when not in range', () => {
+        const m = loadSchema();
+        expect(
+            m.isProgramSectionValid(sec(ProgramSectionTemplate.SingleImageBottom, [t('a', 0), d('b', 1)]), true),
+        ).toBe(false);
+    });
+
+    it('counts: 0..0 branch fails when author exists', () => {
+        const m = loadSchema();
+        expect(
+            m.isProgramSectionValid(sec(ProgramSectionTemplate.TextOnly, [t('aa', 0), d('bbbb', 1), a('x', 2)]), true),
+        ).toBe(false);
+    });
+
+    it('lengths: publish fails when text is empty after trim', () => {
+        const m = loadSchema();
+        expect(m.isProgramSectionValid(sec(ProgramSectionTemplate.TextOnly, [t('   ', 0), d('bbbb', 1)]), true)).toBe(
+            false,
+        );
+    });
+
+    it('lengths: draft allows empty after trim', () => {
+        const m = loadSchema();
+        expect(m.isProgramSectionValid(sec(ProgramSectionTemplate.TextOnly, [t('   ', 0), d('bbbb', 1)]), false)).toBe(
+            true,
+        );
+    });
+
+    it('lengths: fails when above max', () => {
+        const m = loadSchema();
+        expect(m.isProgramSectionValid(sec(ProgramSectionTemplate.TextOnly, [t('aaaa', 0), d('bbbb', 1)]), false)).toBe(
+            false,
+        );
+    });
+
+    it('lengths: publish fails when below min', () => {
+        const m = loadSchema();
+        expect(m.isProgramSectionValid(sec(ProgramSectionTemplate.TextOnly, [t('aa', 0), d('x', 1)]), true)).toBe(
+            false,
+        );
+    });
+
+    it('grouping: no grouped items is invalid in publish', () => {
+        const m = loadSchema();
+        expect(m.isProgramSectionValid(sec(T_GROUP_ONLY, []), true)).toBe(false);
+    });
+
+    it('grouping: no grouped items is valid in draft', () => {
+        const m = loadSchema();
+        expect(m.isProgramSectionValid(sec(T_GROUP_ONLY, []), false)).toBe(true);
+    });
+
+    it('grouping: missing groupIndex fails', () => {
+        const m = loadSchema();
+        expect(
+            m.isProgramSectionValid(
+                sec(ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs, [
+                    t('a', 0),
+                    d('b', 1, { groupIndex: null }),
+                    a('c', 2, { groupIndex: 0 }),
+                ]),
+                false,
+            ),
+        ).toBe(false);
+    });
+
+    it('grouping: publish fails when groupCount out of range', () => {
+        const m = loadSchema();
+        expect(
+            m.isProgramSectionValid(
+                sec(T_GROUP_STRICT, [d('b', 0, { groupIndex: 0 }), d('c', 1, { groupIndex: 1 })]),
+                true,
+            ),
+        ).toBe(false);
+    });
+
+    it('grouping: draft fails when groupCount exceeds max', () => {
+        const m = loadSchema();
+        expect(
+            m.isProgramSectionValid(
+                sec(T_GROUP_STRICT, [d('b', 0, { groupIndex: 0 }), d('c', 1, { groupIndex: 1 })]),
+                false,
+            ),
+        ).toBe(false);
+    });
+
+    it('grouping: inRange 0..0 is exercised through groupCount', () => {
+        const m = loadSchema();
+        expect(m.isProgramSectionValid(sec(T_GROUPCOUNT_ZERO, [d('b', 0, { groupIndex: 0 })]), true)).toBe(false);
+    });
+
+    it('grouping: perGroupCounts 0..0 fails when actual is not 0', () => {
+        const m = loadSchema();
+        expect(m.isProgramSectionValid(sec(T_GROUP_ZERO_FAIL, [t('a', 0, { groupIndex: 0 })]), true)).toBe(false);
+    });
+
+    it('grouping: perGroupCounts 0..0 passes when actual is 0', () => {
+        const m = loadSchema();
+        expect(m.isProgramSectionValid(sec(T_GROUP_ZERO_PASS, [d('b', 0, { groupIndex: 0 })]), true)).toBe(true);
+    });
+
+    it('images: min=0 max=0 branch is executed when there are zero images', () => {
+        const m = loadSchema();
+        expect(m.isProgramSectionValid(validTextOnly(), true)).toBe(true);
+    });
+
+    it('images: publish fails when required image value is missing', () => {
+        const m = loadSchema();
+        expect(m.isProgramSectionValid(validSingleImage({ image: null }), true)).toBe(false);
+    });
+
+    it('images: publish passes when required image value exists via imageId', () => {
+        const m = loadSchema();
+        expect(m.isProgramSectionValid(validSingleImage({ image: null, imageId: 1 }), true)).toBe(true);
+    });
+
+    it('images: required-image sorting treats missing order as 0', () => {
+        const m = loadSchema();
+        expect(
+            m.isProgramSectionValid(
+                sec(T_IMG_SORT, [t('a', 0), im(undefined, { image: null }), im(5, { imageId: 1 })]),
+                true,
+            ),
+        ).toBe(false);
+    });
+
+    it('images: imageReq undefined path is executed (allowed via grouping perGroupCounts)', () => {
+        const m = loadSchema({ programValidation: { images: { maxSizeMB: 0 } } });
+        expect(
+            m.isProgramSectionValid(sec(T_IMG_REQ_UNDEF, [t('a', 0), im(1, { groupIndex: 0, imageId: 1 })]), true),
+        ).toBe(true);
+    });
+
+    it('lengths: getTextValue default branch is exercised in publish', () => {
+        const m = loadSchema({ programValidation: { images: { maxSizeMB: 0 } } });
+        expect(m.isProgramSectionValid(sec(T_LEN_IMAGE, [im(0, { imageId: 1 })]), true)).toBe(false);
+    });
+
+    it('lengths: getTextValue default branch is exercised in draft', () => {
+        const m = loadSchema({ programValidation: { images: { maxSizeMB: 0 } } });
+        expect(m.isProgramSectionValid(sec(T_LEN_IMAGE, [im(0, { imageId: 1 })]), false)).toBe(true);
+    });
+
+    it('max-size: fails for image.file.size', () => {
+        const m = loadSchema();
+        expect(m.isProgramSectionValid(validSingleImage({ image: { file: { size: 2 * 1024 * 1024 } } }), true)).toBe(
+            false,
+        );
+    });
+
+    it('max-size: fails for image.originFileObj.size', () => {
+        const m = loadSchema();
+        expect(
+            m.isProgramSectionValid(validSingleImage({ image: { originFileObj: { size: 2 * 1024 * 1024 } } }), true),
+        ).toBe(false);
+    });
+
+    it('max-size: fails for image.originalFile.size', () => {
+        const m = loadSchema();
+        expect(
+            m.isProgramSectionValid(validSingleImage({ image: { originalFile: { size: 2 * 1024 * 1024 } } }), true),
+        ).toBe(false);
+    });
+
+    it('max-size: fails for image.size', () => {
+        const m = loadSchema();
+        expect(m.isProgramSectionValid(validSingleImage({ image: { size: 2 * 1024 * 1024 } }), true)).toBe(false);
+    });
+
+    it('max-size: fails for file.size', () => {
+        const m = loadSchema();
+        expect(
+            m.isProgramSectionValid(validSingleImage({ file: { size: 2 * 1024 * 1024 }, image: { id: 1 } }), true),
+        ).toBe(false);
+    });
+
+    it('max-size: fails for originFileObj.size', () => {
+        const m = loadSchema();
+        expect(
+            m.isProgramSectionValid(
+                validSingleImage({ originFileObj: { size: 2 * 1024 * 1024 }, image: { id: 1 } }),
+                true,
+            ),
+        ).toBe(false);
+    });
+
+    it('max-size: is skipped when maxSizeMB <= 0', () => {
+        const m = loadSchema({ programValidation: { images: { maxSizeMB: 0 } } });
+        expect(
+            m.isProgramSectionValid(validSingleImage({ image: { file: { size: 2 * 1024 * 1024 } }, imageId: 1 }), true),
+        ).toBe(true);
+    });
+
+    it('validateProgramSections returns invalid when any section is invalid', () => {
+        const m = loadSchema();
+        expect(
+            m.validateProgramSections([validTextOnly(), sec(ProgramSectionTemplate.TextOnly, [t('aa', 0)])], true),
+        ).toBe('invalid');
+    });
+
+    it('validateProgramSections returns undefined when all sections are valid', () => {
+        const m = loadSchema();
+        expect(m.validateProgramSections([validTextOnly(), validSingleImage({ imageId: 1 })], true)).toBeUndefined();
+    });
+
+    it('PROGRAM_SECTION_VALIDATION_FUNCTIONS: validateContentText passes when template is missing', () => {
+        const m = loadSchema();
+        expect(
+            m.PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateContentText('aaaaaa', ContentType.Title, true),
+        ).toBeUndefined();
+    });
+
+    it('PROGRAM_SECTION_VALIDATION_FUNCTIONS: validateContentText passes when rule is missing', () => {
+        const m = loadSchema();
+        expect(
+            m.PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateContentText(
+                'x',
+                ContentType.Image as any,
+                true,
+                ProgramSectionTemplate.TextOnly,
+            ),
+        ).toBeUndefined();
+    });
+
+    it('PROGRAM_SECTION_VALIDATION_FUNCTIONS: returns max error', () => {
+        const m = loadSchema();
+        expect(
+            m.PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateContentText(
+                'aaaa',
+                ContentType.Title,
+                false,
+                ProgramSectionTemplate.TextOnly,
+            ),
+        ).toBe('max 3');
+    });
+
+    it('PROGRAM_SECTION_VALIDATION_FUNCTIONS: returns min error in publish', () => {
+        const m = loadSchema();
+        expect(
+            m.PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateContentText(
+                'a',
+                ContentType.Title,
+                true,
+                ProgramSectionTemplate.TextOnly,
+            ),
+        ).toBe('min 2');
+    });
+
+    it('PROGRAM_SECTION_VALIDATION_FUNCTIONS: does not enforce min in draft', () => {
+        const m = loadSchema();
+        expect(
+            m.PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateContentText(
+                'a',
+                ContentType.Title,
+                false,
+                ProgramSectionTemplate.TextOnly,
+            ),
+        ).toBeUndefined();
+    });
+
+    it('PROGRAM_SECTION_VALIDATION_FUNCTIONS: validateSectionTitle returns required', () => {
+        const m = loadSchema();
+        expect(
+            m.PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateSectionTitle('', true, ProgramSectionTemplate.TextOnly),
+        ).toBe('title required');
+    });
+
+    it('PROGRAM_SECTION_VALIDATION_FUNCTIONS: validateSectionDescription returns max error', () => {
+        const m = loadSchema();
+        expect(
+            m.PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateSectionDescription(
+                'aaaaaaaaaaa',
+                false,
+                ProgramSectionTemplate.TextOnly,
+            ),
+        ).toBe('max 4');
+    });
+
+    it('programSectionValidationSchema is executed', async () => {
+        const m = loadSchema();
+        await expect(
+            m.programSectionValidationSchema.validate(
+                { sectionTitle: 'aa', sectionDescription: 'bbbb' },
+                { context: { isPublishing: true, template: ProgramSectionTemplate.TextOnly } },
+            ),
+        ).resolves.toBeDefined();
+    });
+});
+
+describe('program-schema.ts required-message fallbacks', () => {
+    it('author required uses cardAuthor when author is missing', () => {
+        const m = loadSchema({
+            sectionValidation: { author: undefined, cardAuthor: { getRequiredError: () => 'card author required' } },
         });
+        expect(
+            m.PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateContentText(
+                '',
+                ContentType.Author,
+                true,
+                ProgramSectionTemplate.TextOnly,
+            ),
+        ).toBe('card author required');
+    });
+
+    it('author required falls back to FIELD_REQUIRED when author and cardAuthor are missing', () => {
+        const m = loadSchema({ sectionValidation: { author: undefined, cardAuthor: undefined } });
+        expect(
+            m.PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateContentText(
+                '',
+                ContentType.Author,
+                true,
+                ProgramSectionTemplate.TextOnly,
+            ),
+        ).toBe('required');
+    });
+
+    it('unknown content type required falls back to FIELD_REQUIRED', () => {
+        const m = loadSchema({
+            sectionValidation: { title: undefined, description: undefined, author: undefined, cardAuthor: undefined },
+        });
+        expect(
+            m.PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateContentText(
+                '',
+                999 as any,
+                true,
+                ProgramSectionTemplate.TextOnly,
+            ),
+        ).toBe('required');
     });
 });
 
 describe('PROGRAM_VALIDATION_FUNCTIONS', () => {
     describe('validateName', () => {
-        it('should return undefined for valid name', () => {
-            expect(PROGRAM_VALIDATION_FUNCTIONS.validateName('Valid Name', false)).toBeUndefined();
+        it('returns undefined for valid name in draft mode', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateName('Test', false)).toBeUndefined();
         });
 
-        it('should return error for empty name', () => {
-            expect(PROGRAM_VALIDATION_FUNCTIONS.validateName('', false)).toBe(
-                PROGRAM_VALIDATION.name.getRequiredError(),
-            );
+        it('returns undefined for valid name in publish mode', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateName('Test', true)).toBeUndefined();
         });
 
-        it('should return error for name exceeding max length', () => {
-            expect(PROGRAM_VALIDATION_FUNCTIONS.validateName('A'.repeat(PROGRAM_VALIDATION.name.max + 1), false)).toBe(
-                COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PROGRAM_VALIDATION.name.max),
-            );
+        it('returns error for empty name', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateName('', false)).toBe('name required');
+        });
+
+        it('returns error for empty name in publish mode', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateName('', true)).toBe('name required');
+        });
+
+        it('returns error when name exceeds max length', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateName('12345678901', false)).toBe('max 10');
         });
     });
 
     describe('validateCategories', () => {
-        it('should return undefined for valid categories', () => {
-            expect(PROGRAM_VALIDATION_FUNCTIONS.validateCategories([mockCategory], false)).toBeUndefined();
+        it('returns undefined for valid categories', () => {
+            const m = loadSchema();
+            const categories = [{ id: 1, name: 'Cat1', programsCount: 5 }];
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateCategories(categories, false)).toBeUndefined();
         });
 
-        it('should return error for empty categories', () => {
-            expect(PROGRAM_VALIDATION_FUNCTIONS.validateCategories([], false)).toBe(
-                PROGRAM_VALIDATION.categories.getAtLeastOneRequiredError(),
-            );
+        it('returns error for empty categories array', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateCategories([], true)).toBe('categories required');
         });
     });
 
     describe('validateDescription', () => {
-        it('should return undefined for empty description in draft mode', () => {
-            expect(PROGRAM_VALIDATION_FUNCTIONS.validateDescription('', false)).toBeUndefined();
+        it('returns undefined for valid description in draft mode', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateDescription('Test description', false)).toBeUndefined();
         });
 
-        it('should return error for empty description in publish mode', () => {
-            expect(PROGRAM_VALIDATION_FUNCTIONS.validateDescription('', true)).toBe(
-                PROGRAM_VALIDATION.description.getRequiredWhenPublishingError(),
-            );
+        it('returns undefined for empty description in draft mode', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateDescription('', false)).toBeUndefined();
         });
 
-        it('should return error for description exceeding max length', () => {
-            expect(
-                PROGRAM_VALIDATION_FUNCTIONS.validateDescription(
-                    'A'.repeat(PROGRAM_VALIDATION.description.max + 1),
-                    false,
-                ),
-            ).toBe(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PROGRAM_VALIDATION.description.max));
+        it('returns undefined for valid description in publish mode', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateDescription('Test description', true)).toBeUndefined();
+        });
+
+        it('returns error for empty description when publishing', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateDescription('', true)).toBe('desc required');
+        });
+
+        it('returns error when description exceeds max length', () => {
+            const m = loadSchema();
+            const longDesc = 'a'.repeat(51);
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateDescription(longDesc, false)).toBe('max 50');
         });
     });
 
     describe('validatePreviewImage', () => {
-        it('should return undefined for null image in draft mode', () => {
-            expect(PROGRAM_VALIDATION_FUNCTIONS.validatePreviewImage(null, false)).toBeUndefined();
+        it('returns undefined for valid image in draft mode', () => {
+            const m = loadSchema();
+            const image = { id: 1, path: '/test.jpg', alt: 'Test' };
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validatePreviewImage(image, false)).toBeUndefined();
         });
 
-        it('should return error for null image in publish mode', () => {
-            expect(PROGRAM_VALIDATION_FUNCTIONS.validatePreviewImage(null, true)).toBe(
-                PROGRAM_VALIDATION.previewImage.getRequiredWhenPublishingError(),
-            );
+        it('returns undefined for null image in draft mode', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validatePreviewImage(null, false)).toBeUndefined();
         });
 
-        it('should return undefined for valid ImageValues', () => {
-            expect(PROGRAM_VALIDATION_FUNCTIONS.validatePreviewImage(createMockFile(), true)).toBeUndefined();
+        it('returns undefined for valid image in publish mode', () => {
+            const m = loadSchema();
+            const image = { id: 1, path: '/test.jpg', alt: 'Test' };
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validatePreviewImage(image, true)).toBeUndefined();
         });
 
-        it('should return undefined for valid Image', () => {
-            expect(PROGRAM_VALIDATION_FUNCTIONS.validatePreviewImage(createMockImage(), true)).toBeUndefined();
+        it('returns error for null image when publishing', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validatePreviewImage(null, true)).toBe('preview required');
         });
     });
 
     describe('validateBackgroundImage', () => {
-        it('should return undefined for null image in draft mode', () => {
-            expect(PROGRAM_VALIDATION_FUNCTIONS.validateBackgroundImage(null, false)).toBeUndefined();
+        it('returns undefined for valid image in draft mode', () => {
+            const m = loadSchema();
+            const image = { id: 2, path: '/bg.jpg', alt: 'Background' };
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateBackgroundImage(image, false)).toBeUndefined();
         });
 
-        it('should return error for null image in publish mode', () => {
-            expect(PROGRAM_VALIDATION_FUNCTIONS.validateBackgroundImage(null, true)).toBe(
-                PROGRAM_VALIDATION.backgroundImage.getRequiredWhenPublishingError(),
-            );
+        it('returns undefined for null image in draft mode', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateBackgroundImage(null, false)).toBeUndefined();
         });
 
-        it('should return undefined for valid ImageValues', () => {
-            expect(PROGRAM_VALIDATION_FUNCTIONS.validateBackgroundImage(createMockFile(), true)).toBeUndefined();
+        it('returns undefined for valid image in publish mode', () => {
+            const m = loadSchema();
+            const image = { id: 2, path: '/bg.jpg', alt: 'Background' };
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateBackgroundImage(image, true)).toBeUndefined();
         });
 
-        it('should return undefined for valid Image', () => {
-            expect(PROGRAM_VALIDATION_FUNCTIONS.validateBackgroundImage(createMockImage(), true)).toBeUndefined();
+        it('returns error for null image when publishing', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateBackgroundImage(null, true)).toBe('bg required');
         });
     });
 
     describe('validateLocation', () => {
-        it('should return undefined for empty location in draft mode', () => {
-            expect(PROGRAM_VALIDATION_FUNCTIONS.validateLocation('', false)).toBeUndefined();
+        it('returns undefined for valid location', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateLocation('Kyiv, Ukraine', false)).toBeUndefined();
         });
 
-        it('should return undefined for empty location in publish mode', () => {
-            expect(PROGRAM_VALIDATION_FUNCTIONS.validateLocation('', true)).toBeUndefined();
+        it('returns undefined for empty location (optional field)', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateLocation('', false)).toBeUndefined();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateLocation('', true)).toBeUndefined();
         });
 
-        it('should return error for location exceeding max length', () => {
-            expect(
-                PROGRAM_VALIDATION_FUNCTIONS.validateLocation('A'.repeat(PROGRAM_VALIDATION.location.max + 1), false),
-            ).toBe(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PROGRAM_VALIDATION.location.max));
+        it('returns error when location exceeds max length', () => {
+            const m = loadSchema();
+            const longLocation = 'a'.repeat(21);
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateLocation(longLocation, false)).toBe('max 20');
         });
     });
 
     describe('validateParticipantsCount', () => {
-        it('should return undefined for empty participantsCount in draft mode', () => {
-            expect(PROGRAM_VALIDATION_FUNCTIONS.validateParticipantsCount('', false)).toBeUndefined();
+        it('returns undefined for valid participants count', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateParticipantsCount('10-20', false)).toBeUndefined();
         });
 
-        it('should return undefined for empty participantsCount in publish mode', () => {
-            expect(PROGRAM_VALIDATION_FUNCTIONS.validateParticipantsCount('', true)).toBeUndefined();
+        it('returns undefined for empty participants count (optional field)', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateParticipantsCount('', false)).toBeUndefined();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateParticipantsCount('', true)).toBeUndefined();
         });
 
-        it('should return error for participantsCount exceeding max length', () => {
-            expect(
-                PROGRAM_VALIDATION_FUNCTIONS.validateParticipantsCount(
-                    'A'.repeat(PROGRAM_VALIDATION.participantsCount.max + 1),
-                    false,
-                ),
-            ).toBe(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PROGRAM_VALIDATION.participantsCount.max));
+        it('returns error when participants count exceeds max length', () => {
+            const m = loadSchema();
+            const longCount = 'a'.repeat(21);
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateParticipantsCount(longCount, false)).toBe('max 20');
         });
     });
 
     describe('validateMeetingCount', () => {
-        it('should return undefined for empty meetingCount in draft mode', () => {
-            expect(PROGRAM_VALIDATION_FUNCTIONS.validateMeetingCount('', false)).toBeUndefined();
+        it('returns undefined for valid meeting count', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateMeetingCount('5-10', false)).toBeUndefined();
         });
 
-        it('should return undefined for empty meetingCount in publish mode', () => {
-            expect(PROGRAM_VALIDATION_FUNCTIONS.validateMeetingCount('', true)).toBeUndefined();
+        it('returns undefined for empty meeting count (optional field)', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateMeetingCount('', false)).toBeUndefined();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateMeetingCount('', true)).toBeUndefined();
         });
 
-        it('should return error for meetingCount exceeding max length', () => {
-            expect(
-                PROGRAM_VALIDATION_FUNCTIONS.validateMeetingCount(
-                    'A'.repeat(PROGRAM_VALIDATION.meetingCount.max + 1),
-                    false,
-                ),
-            ).toBe(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PROGRAM_VALIDATION.meetingCount.max));
-        });
-    });
-
-    describe('validateSections', () => {
-        const createMockSection = (
-            template: ProgramSectionTemplate,
-            title: string,
-            description: string,
-            imageCount: number,
-        ): ProgramSection => ({
-            template,
-            order: 1,
-            contents: [
-                { contentType: ContentType.Title, order: 0, title },
-                { contentType: ContentType.Description, order: 1, description },
-                ...Array.from({ length: imageCount }, (_, i) => ({
-                    contentType: ContentType.Image,
-                    order: i + 2,
-                    image: createMockImage(i + 1),
-                })),
-            ],
-        });
-
-        it('should return undefined for empty sections array', () => {
-            expect(PROGRAM_VALIDATION_FUNCTIONS.validateSections([], false)).toBeUndefined();
-        });
-
-        it('should pass validation for TextOnly template in draft mode', () => {
-            const section = createMockSection(ProgramSectionTemplate.TextOnly, 'Title', 'Description', 0);
-            expect(PROGRAM_VALIDATION_FUNCTIONS.validateSections([section], false)).toBeUndefined();
-        });
-
-        it('should pass validation for SingleImageBottom with 1 image in publish mode', () => {
-            const section = createMockSection(
-                ProgramSectionTemplate.SingleImageBottom,
-                'Valid Title',
-                'Valid Description',
-                1,
-            );
-            expect(PROGRAM_VALIDATION_FUNCTIONS.validateSections([section], true)).toBeUndefined();
-        });
-
-        it('should pass validation for DualImagesBottom with 2 images in publish mode', () => {
-            const section = createMockSection(
-                ProgramSectionTemplate.DualImagesBottom,
-                'Valid Title',
-                'Valid Description',
-                2,
-            );
-            expect(PROGRAM_VALIDATION_FUNCTIONS.validateSections([section], true)).toBeUndefined();
-        });
-
-        it('should pass validation for TripleImagesBottom with 3 images in publish mode', () => {
-            const section = createMockSection(
-                ProgramSectionTemplate.TripleImagesBottom,
-                'Valid Title',
-                'Valid Description',
-                3,
-            );
-            expect(PROGRAM_VALIDATION_FUNCTIONS.validateSections([section], true)).toBeUndefined();
-        });
-
-        it('should pass validation for QuadImagesBottom with 4 images in publish mode', () => {
-            const section = createMockSection(
-                ProgramSectionTemplate.QuadImagesBottom,
-                'Valid Title',
-                'Valid Description',
-                4,
-            );
-            expect(PROGRAM_VALIDATION_FUNCTIONS.validateSections([section], true)).toBeUndefined();
-        });
-
-        it('should fail when section title is invalid in publish mode', () => {
-            const section = createMockSection(ProgramSectionTemplate.TextOnly, '', 'Valid Description', 0);
-            expect(PROGRAM_VALIDATION_FUNCTIONS.validateSections([section], true)).toBe('invalid');
-        });
-
-        it('should fail when section description is invalid in publish mode', () => {
-            const section = createMockSection(ProgramSectionTemplate.TextOnly, 'Valid Title', '', 0);
-            expect(PROGRAM_VALIDATION_FUNCTIONS.validateSections([section], true)).toBe('invalid');
-        });
-
-        it('should fail when required images are missing in publish mode', () => {
-            const section = createMockSection(
-                ProgramSectionTemplate.SingleImageBottom,
-                'Valid Title',
-                'Valid Description',
-                0,
-            );
-            expect(PROGRAM_VALIDATION_FUNCTIONS.validateSections([section], true)).toBe('invalid');
-        });
-
-        it('should fail when image content exists but image is null in publish mode', () => {
-            const section: ProgramSection = {
-                template: ProgramSectionTemplate.SingleImageBottom,
-                order: 1,
-                contents: [
-                    { contentType: ContentType.Title, order: 0, title: 'Valid Title' },
-                    { contentType: ContentType.Description, order: 1, description: 'Valid Description' },
-                    { contentType: ContentType.Image, order: 2, image: null },
-                ],
-            };
-            expect(PROGRAM_VALIDATION_FUNCTIONS.validateSections([section], true)).toBe('invalid');
-        });
-
-        it('should pass validation for multiple valid sections', () => {
-            const sections = [
-                createMockSection(ProgramSectionTemplate.TextOnly, 'Title 1', 'Description 1', 0),
-                createMockSection(ProgramSectionTemplate.SingleImageBottom, 'Title 2', 'Description 2', 1),
-            ];
-            expect(PROGRAM_VALIDATION_FUNCTIONS.validateSections(sections, true)).toBeUndefined();
-        });
-
-        it('should fail if any section is invalid', () => {
-            const sections = [
-                createMockSection(ProgramSectionTemplate.TextOnly, 'Title 1', 'Description 1', 0),
-                createMockSection(ProgramSectionTemplate.SingleImageBottom, '', 'Description 2', 1),
-            ];
-            expect(PROGRAM_VALIDATION_FUNCTIONS.validateSections(sections, true)).toBe('invalid');
-        });
-
-        it('should allow missing images in draft mode', () => {
-            const section = createMockSection(
-                ProgramSectionTemplate.SingleImageBottom,
-                'Valid Title',
-                'Valid Description',
-                0,
-            );
-            expect(PROGRAM_VALIDATION_FUNCTIONS.validateSections([section], false)).toBeUndefined();
+        it('returns error when meeting count exceeds max length', () => {
+            const m = loadSchema();
+            const longCount = 'a'.repeat(21);
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateMeetingCount(longCount, false)).toBe('max 20');
         });
     });
 });

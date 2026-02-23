@@ -1,4 +1,6 @@
 import { COMMON_TEXT_ADMIN } from './common';
+import { ProgramSectionTemplate } from '@/types/common/program-sections';
+import { ContentType } from '@/types/common/programs';
 
 export const PROGRAMS_TEXT = {
     BUTTON: {
@@ -29,6 +31,13 @@ export const PROGRAMS_TEXT = {
             'Ідея створення Victory Center виникла не як проєкт, а як відповідь на виклик часу - глибокий біль, виснаження, але водночас сильна віра в перемогу.\n\n Розмови з ветеранами/ками та волонтерами/ками, які до останньої краплі віддавали свої сили заради майбутнього країни, висвітлити потребу у просторі, в якому можна знову відчути момент “тут i зараз”.\n\n Так народився задум Victory Center — ініціативи, що допомагає людям, які пройшли крізь жахи війни, зупинитися, відновитися i найголовніше бути почутими. ',
         DESCRIPTION_SAMPLE_TEXT_SHORT:
             'Ідея створення Victory Center виникла не як проєкт, а як відповідь на виклик часу - глибокий біль, виснаження, але водночас сильна віра в перемогу. ',
+        SINGLE_TITLE_DESCRIPTION_AUTHOR_PAIRS: {
+            DEFAULT_TITLE: 'ЩО КАЖУТЬ УЧАСНИКИ',
+            TITLE_PLACEHOLDER: '',
+            MODAL: {
+                DELETE_BLOCK_CONFIRMATION: 'Блок буде видалено. Бажаєте продовжити?',
+            },
+        },
         MODAL: {
             UNSAVED_CHANGES_TITLE: 'Відмінити додавання секції?',
             DELETE_SECTION_TITLE: 'Видалити секцію?',
@@ -183,7 +192,7 @@ export const QUAD_IMAGES_CONFIG = {
     editableImageMaxWidth: 360,
     swiperBreakpoints: {
         320: { slidesPerView: 1 },
-        720: { slidesPerView: 2 },
+        768: { slidesPerView: 2 },
         1080: { slidesPerView: 3 },
         1440: { slidesPerView: 4 },
     },
@@ -209,7 +218,6 @@ export const TRIPLE_IMAGES_CONFIG = {
     gridColumns: 3,
     imageConfig: PROGRAM_SECTION_IMAGE_CONFIGS.TRIPLE_IMAGES,
     elevatedIndices: [0, 2],
-    //elevatedIndices: [0, 1],
     imageLabel: COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE,
     editableGridColumns: 4,
     editableImageMaxHeight: 480,
@@ -225,6 +233,12 @@ export const TRIPLE_IMAGES_CONFIG = {
 export const SINGLE_TITLE_QUINTUPLE_DESCRIPTION_CONFIG = {
     descriptionsCount: 5,
 };
+
+export const SINGLE_TITLE_DESCRIPTION_AUTHOR_PAIRS_CONFIG = {
+    blocks: {
+        defaultCount: 1,
+    },
+} as const;
 
 export const PROGRAM_VALIDATION = {
     name: {
@@ -288,30 +302,181 @@ export const PROGRAM_CATEGORY_VALIDATION = {
         getHasProgramsCountError: (count: number) => `Категорія містить ${count} програм`,
     },
 };
+
 export const PROGRAM_SECTION_VALIDATION = {
     title: {
-        min: 5,
-        max: 60,
         getRequiredError: () => "Заголовок обов'язковий",
     },
     description: {
-        min: 10,
-        max: 600,
         getRequiredError: () => "Опис обов'язковий",
     },
-    cardTitle: {
-        min: 5,
-        max: 25,
-        getRequiredError: () => "Заголовок обов'язковий",
-    },
-    cardDescription: {
-        min: 10,
-        max: 300,
-        getRequiredError: () => "Опис обов'язковий",
-    },
-    cardAuthor: {
-        min: 2,
-        max: 60,
+    author: {
         getRequiredError: () => "Ім'я обов'язкове",
     },
-};
+} as const;
+
+const createSingleImageTemplateValidation = () =>
+    ({
+        counts: {
+            [ContentType.Title]: { min: 1, max: 1 },
+            [ContentType.Description]: { min: 1, max: 1 },
+            [ContentType.Image]: { min: 1, max: 1 },
+            [ContentType.Author]: { min: 0, max: 0 },
+        },
+        lengths: {
+            [ContentType.Title]: { min: 5, max: 60 },
+            [ContentType.Description]: { min: 10, max: 600 },
+        },
+    }) as const;
+
+export const PROGRAM_SECTION_TEMPLATE_VALIDATION = {
+    [ProgramSectionTemplate.QuadImagesBottom]: {
+        counts: {
+            [ContentType.Title]: { min: 1, max: 1 },
+            [ContentType.Description]: { min: 1, max: 1 },
+            [ContentType.Image]: { min: 4, max: 4 },
+            [ContentType.Author]: { min: 0, max: 0 },
+        },
+        lengths: {
+            [ContentType.Title]: { min: 20, max: 60 },
+            [ContentType.Description]: { min: 10, max: 600 },
+        },
+    },
+
+    [ProgramSectionTemplate.DualImagesBottom]: {
+        counts: {
+            [ContentType.Title]: { min: 1, max: 1 },
+            [ContentType.Description]: { min: 1, max: 1 },
+            [ContentType.Image]: { min: 2, max: 2 },
+            [ContentType.Author]: { min: 0, max: 0 },
+        },
+        lengths: {
+            [ContentType.Title]: { min: 5, max: 60 },
+            [ContentType.Description]: { min: 10, max: 600 },
+        },
+    },
+
+    [ProgramSectionTemplate.TextOnly]: {
+        counts: {
+            [ContentType.Title]: { min: 1, max: 1 },
+            [ContentType.Description]: { min: 1, max: 1 },
+            [ContentType.Image]: { min: 0, max: 0 },
+            [ContentType.Author]: { min: 0, max: 0 },
+        },
+        lengths: {
+            [ContentType.Title]: { min: 5, max: 60 },
+            [ContentType.Description]: { min: 10, max: 600 },
+        },
+    },
+
+    [ProgramSectionTemplate.TripleImagesBottom]: {
+        counts: {
+            [ContentType.Title]: { min: 1, max: 1 },
+            [ContentType.Description]: { min: 1, max: 1 },
+            [ContentType.Image]: { min: 3, max: 3 },
+            [ContentType.Author]: { min: 0, max: 0 },
+        },
+        lengths: {
+            [ContentType.Title]: { min: 5, max: 60 },
+            [ContentType.Description]: { min: 10, max: 600 },
+        },
+    },
+
+    [ProgramSectionTemplate.SingleImageBottom]: createSingleImageTemplateValidation(),
+    [ProgramSectionTemplate.SingleImageTop]: createSingleImageTemplateValidation(),
+    [ProgramSectionTemplate.SingleImageRight]: createSingleImageTemplateValidation(),
+
+    [ProgramSectionTemplate.DualTitleDescriptionPairs]: {
+        counts: {
+            [ContentType.Title]: { min: 2, max: 2 },
+            [ContentType.Description]: { min: 2, max: 2 },
+            [ContentType.Image]: { min: 0, max: 0 },
+            [ContentType.Author]: { min: 0, max: 0 },
+        },
+        lengths: {
+            [ContentType.Title]: { min: 5, max: 60 },
+            [ContentType.Description]: { min: 10, max: 300 },
+        },
+        grouping: {
+            groupCount: { min: 2, max: 2 },
+            perGroupCounts: {
+                [ContentType.Title]: { min: 1, max: 1 },
+                [ContentType.Description]: { min: 1, max: 1 },
+            },
+        },
+    },
+
+    [ProgramSectionTemplate.TripleTitleDescriptionPairs]: {
+        counts: {
+            [ContentType.Title]: { min: 3, max: 3 },
+            [ContentType.Description]: { min: 3, max: 3 },
+            [ContentType.Image]: { min: 0, max: 0 },
+            [ContentType.Author]: { min: 0, max: 0 },
+        },
+        lengths: {
+            [ContentType.Title]: { min: 5, max: 60 },
+            [ContentType.Description]: { min: 10, max: 300 },
+        },
+        grouping: {
+            groupCount: { min: 3, max: 3 },
+            perGroupCounts: {
+                [ContentType.Title]: { min: 1, max: 1 },
+                [ContentType.Description]: { min: 1, max: 1 },
+            },
+        },
+    },
+
+    [ProgramSectionTemplate.QuadTitleDescriptionPairs]: {
+        counts: {
+            [ContentType.Title]: { min: 4, max: 4 },
+            [ContentType.Description]: { min: 4, max: 4 },
+            [ContentType.Image]: { min: 0, max: 0 },
+            [ContentType.Author]: { min: 0, max: 0 },
+        },
+        lengths: {
+            [ContentType.Title]: { min: 5, max: 60 },
+            [ContentType.Description]: { min: 10, max: 300 },
+        },
+        grouping: {
+            groupCount: { min: 4, max: 4 },
+            perGroupCounts: {
+                [ContentType.Title]: { min: 1, max: 1 },
+                [ContentType.Description]: { min: 1, max: 1 },
+            },
+        },
+    },
+
+    [ProgramSectionTemplate.SingleTitleQuintupleDescription]: {
+        counts: {
+            [ContentType.Title]: { min: 1, max: 1 },
+            [ContentType.Description]: { min: 5, max: 5 },
+            [ContentType.Image]: { min: 0, max: 0 },
+            [ContentType.Author]: { min: 0, max: 0 },
+        },
+        lengths: {
+            [ContentType.Title]: { min: 5, max: 60 },
+            [ContentType.Description]: { min: 10, max: 300 },
+        },
+    },
+
+    [ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs]: {
+        counts: {
+            [ContentType.Title]: { min: 1, max: 1 },
+            [ContentType.Description]: { min: 1, max: 5 },
+            [ContentType.Author]: { min: 1, max: 5 },
+            [ContentType.Image]: { min: 0, max: 0 },
+        },
+        lengths: {
+            [ContentType.Title]: { min: 5, max: 50 },
+            [ContentType.Description]: { min: 10, max: 100 },
+            [ContentType.Author]: { min: 2, max: 50 },
+        },
+        grouping: {
+            groupCount: { min: 1, max: 5 },
+            perGroupCounts: {
+                [ContentType.Description]: { min: 1, max: 1 },
+                [ContentType.Author]: { min: 1, max: 1 },
+            },
+        },
+    },
+} as const;

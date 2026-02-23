@@ -278,9 +278,9 @@ describe('AddSectionModal', () => {
     });
 
     it.each([
-        [ProgramSectionTemplate.DualTitleDescription, 2],
-        [ProgramSectionTemplate.TripleTitleDescription, 3],
-        [ProgramSectionTemplate.QuadTitleDescription, 4],
+        [ProgramSectionTemplate.DualTitleDescriptionPairs, 2],
+        [ProgramSectionTemplate.TripleTitleDescriptionPairs, 3],
+        [ProgramSectionTemplate.QuadTitleDescriptionPairs, 4],
     ] as Array<[ProgramSectionTemplate, number]>)('renders %s with %d cards', (templateId, count) => {
         renderModal();
 

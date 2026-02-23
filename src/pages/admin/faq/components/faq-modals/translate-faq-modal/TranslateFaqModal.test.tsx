@@ -9,10 +9,6 @@ import { ModalMode } from '@/types/admin/common';
 let mockFormIsValid = true;
 let mockFormIsDirty = true;
 
-jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
-    ConfirmationModal: (props: any) => require('@/utils/test-mocks/test-mocks').MockConfirmationModal(props),
-}));
-
 jest.mock('@/components/admin/localization-modal/LocalizationModal', () => ({
     LocalizationModal: (props: any) => require('@/utils/test-mocks/test-mocks').MockLocalizationModal(props),
 }));

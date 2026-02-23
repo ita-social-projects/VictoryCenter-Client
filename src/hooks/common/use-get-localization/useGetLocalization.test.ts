@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react';
 import { useGetLocalization } from './useGetLocalization';
 import { useLocale } from '@/hooks/common/use-locale/useLocale';
-import { EntityLocalizationDto, TranslationStatus } from '@/types/common/language';
+import { EntityLocalization, TranslationStatus } from '@/types/common/language';
 
 jest.mock('@/hooks/common/use-locale/useLocale', () => ({
     useLocale: jest.fn(),
@@ -9,7 +9,7 @@ jest.mock('@/hooks/common/use-locale/useLocale', () => ({
 
 const mockUseLocale = useLocale as jest.Mock;
 
-type LocalizedDto<T extends object> = EntityLocalizationDto & Partial<T>;
+type Localized<T extends object> = EntityLocalization & Partial<T>;
 
 describe('useGetLocalization (uk default)', () => {
     afterEach(() => {
@@ -26,9 +26,9 @@ describe('useGetLocalization (uk default)', () => {
         description: 'Оригінальний опис',
     };
 
-    const enLocalizations: LocalizedDto<Fields>[] = [
+    const enLocalizations: Localized<Fields>[] = [
         {
-            localizationInfoDto: { id: 1, code: 'en' },
+            language: { id: 1, code: 'en' },
             translationStatus: TranslationStatus.Relevant,
             fullName: 'English name',
             description: 'English description',

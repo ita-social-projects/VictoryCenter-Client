@@ -18,14 +18,28 @@ jest.mock('@/components/admin/button/Button', () => ({
     Button: ({ buttonStyle: _buttonStyle, ...props }: any) => <button {...props}>{props.children}</button>,
 }));
 
+jest.mock('@/utils/functions/program-section-template-validation/programSectionTemplateValidation', () => ({
+    getProgramSectionTemplateMaxGroupCount: jest.fn(),
+    normalizeGroupedContentsGroupIndexes: jest.fn(),
+}));
+
 const renderProgramSectionMock = renderProgramSection as unknown as jest.Mock;
 
-const makeImage = (id: string, url?: string): any =>
-    url
-        ? { id, url, mimeType: 'image/png' }
-        : {
-              id,
-          };
+const getTemplateValidationMocks = () => {
+    const mod = jest.requireMock(
+        '@/utils/functions/program-section-template-validation/programSectionTemplateValidation',
+    ) as {
+        getProgramSectionTemplateMaxGroupCount: jest.Mock;
+        normalizeGroupedContentsGroupIndexes: jest.Mock;
+    };
+
+    return {
+        getProgramSectionTemplateMaxGroupCount: mod.getProgramSectionTemplateMaxGroupCount,
+        normalizeGroupedContentsGroupIndexes: mod.normalizeGroupedContentsGroupIndexes,
+    };
+};
+
+const makeImage = (id: string, url?: string): any => (url ? { id, url, mimeType: 'image/png' } : { id });
 
 const makeTitleContent = (title: string | null, order = 0) => ({
     contentType: ContentType.Title,
@@ -84,12 +98,22 @@ const makeSection = (overrides?: Partial<ProgramSection>): ProgramSection => ({
     ...overrides,
 });
 
-const getUpdatedSection = (onSectionChange: jest.Mock) => onSectionChange.mock.calls[0][0] as ProgramSection;
+const getLastUpdatedSection = (onSectionChange: jest.Mock) =>
+    onSectionChange.mock.calls[onSectionChange.mock.calls.length - 1][0] as ProgramSection;
 
 const getContentsBy = (s: ProgramSection, type: ContentType) => s.contents.filter((c: any) => c.contentType === type);
 
 const getContentByGroupAndType = (s: ProgramSection, groupIndex: number, type: ContentType) =>
     s.contents.find((c: any) => c.groupIndex === groupIndex && c.contentType === type);
+
+const createFocusableTextarea = (id: string) => {
+    const el = document.createElement('textarea');
+    el.id = id;
+    const focusMock = jest.fn();
+    (el as any).focus = focusMock;
+    document.body.appendChild(el);
+    return { el, focusMock };
+};
 
 describe('ProgramSectionForm', () => {
     let baseProps: ProgramSectionFormProps;
@@ -120,7 +144,46 @@ describe('ProgramSectionForm', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
+
+        const { getProgramSectionTemplateMaxGroupCount, normalizeGroupedContentsGroupIndexes } =
+            getTemplateValidationMocks();
+
+        getProgramSectionTemplateMaxGroupCount.mockReset();
+        normalizeGroupedContentsGroupIndexes.mockReset();
+
+        getProgramSectionTemplateMaxGroupCount.mockReturnValue(10);
+
+        normalizeGroupedContentsGroupIndexes.mockImplementation((contents: any[], types: ContentType[]) => {
+            const allowed = new Set<number>(types as any);
+
+            const groups = Array.from(
+                new Set(
+                    contents
+                        .filter(
+                            (c: any) =>
+                                allowed.has(c.contentType) &&
+                                c.groupIndex !== null &&
+                                c.groupIndex !== undefined &&
+                                typeof c.groupIndex === 'number',
+                        )
+                        .map((c: any) => c.groupIndex as number),
+                ),
+            ).sort((a, b) => a - b);
+
+            const map = new Map<number, number>();
+            groups.forEach((g, i) => map.set(g, i));
+
+            return contents.map((c: any) => {
+                if (!allowed.has(c.contentType)) return c;
+                if (c.groupIndex === null || c.groupIndex === undefined) return c;
+                const ng = map.get(c.groupIndex);
+                if (ng === undefined) return c;
+                return { ...c, groupIndex: ng };
+            });
+        });
+
         renderProgramSectionMock.mockReturnValue(<div data-testid="editable-section" />);
+
         baseProps = {
             section: makeSection(),
             onSave: jest.fn(),
@@ -129,6 +192,10 @@ describe('ProgramSectionForm', () => {
             onSectionChange: jest.fn(),
             isNewSection: false,
             isSectionValid: false,
+            isFirstSection: false,
+            isLastSection: false,
+            onMoveUpSection: jest.fn(),
+            onMoveDownSection: jest.fn(),
         } as ProgramSectionFormProps;
     });
 
@@ -211,7 +278,7 @@ describe('ProgramSectionForm', () => {
             handlers.onTitleChange('New Title');
         });
 
-        const updated = getUpdatedSection(onSectionChange);
+        const updated = getLastUpdatedSection(onSectionChange);
         const title = updated.contents.find((c: any) => c.contentType === ContentType.Title);
         expect(title?.title).toBe('New Title');
     });
@@ -227,7 +294,7 @@ describe('ProgramSectionForm', () => {
             handlers.onDescriptionChange('NEW');
         });
 
-        const updated = getUpdatedSection(onSectionChange);
+        const updated = getLastUpdatedSection(onSectionChange);
         const descs = getContentsBy(updated, ContentType.Description);
         expect(descs.map((d: any) => d.description)).toEqual(['NEW', 'NEW']);
     });
@@ -248,7 +315,7 @@ describe('ProgramSectionForm', () => {
             handlers.onDescriptionsChange(1, 'UPDATED');
         });
 
-        const updated = getUpdatedSection(onSectionChange);
+        const updated = getLastUpdatedSection(onSectionChange);
         const ordered = getContentsBy(updated, ContentType.Description).sort((a: any, b: any) => a.order - b.order);
 
         expect(ordered.map((d: any) => d.description)).toEqual(['D10', 'UPDATED', 'D30']);
@@ -285,7 +352,7 @@ describe('ProgramSectionForm', () => {
             handlers.onImagesChange(0, newFile);
         });
 
-        const updated = getUpdatedSection(onSectionChange);
+        const updated = getLastUpdatedSection(onSectionChange);
         const orderedImages = getContentsBy(updated, ContentType.Image).sort((a: any, b: any) => a.order - b.order);
 
         expect(orderedImages[0].image).toEqual(newFile);
@@ -359,7 +426,7 @@ describe('ProgramSectionForm', () => {
                 handlers.onCardDescriptionChange(1, 'NEW-D1');
             });
 
-            const updated = getUpdatedSection(onSectionChange);
+            const updated = getLastUpdatedSection(onSectionChange);
             expect((getContentByGroupAndType(updated, 1, ContentType.Description) as any).description).toBe('NEW-D1');
         });
 
@@ -378,7 +445,7 @@ describe('ProgramSectionForm', () => {
                 handlers.onCardAuthorChange(0, 'NEW-A0');
             });
 
-            const updated = getUpdatedSection(onSectionChange);
+            const updated = getLastUpdatedSection(onSectionChange);
             expect((getContentByGroupAndType(updated, 0, ContentType.Author) as any).author).toBe('NEW-A0');
         });
 
@@ -393,7 +460,9 @@ describe('ProgramSectionForm', () => {
             expect(onSectionChange).not.toHaveBeenCalled();
         });
 
-        it('adds a pair with next groupIndex', () => {
+        it('adds a pair after normalizing grouped indexes and schedules focus on next textarea id', () => {
+            jest.useFakeTimers();
+
             const section = makePairsSection([
                 makeTitleContent('T', 0),
                 makePairDescription(1, 0, 'D0'),
@@ -404,16 +473,52 @@ describe('ProgramSectionForm', () => {
 
             const { handlers, onSectionChange } = renderWithHandlers({ section });
 
+            const maxOrder = Math.max(...section.contents.map((c: any) => c.order));
+            const nextIndex = 2;
+            const { focusMock } = createFocusableTextarea(`pair-description-${nextIndex}`);
+
             act(() => {
                 handlers.onAddPair();
             });
 
-            const updated = getUpdatedSection(onSectionChange);
-            const newDesc = getContentByGroupAndType(updated, 3, ContentType.Description) as any;
-            const newAuth = getContentByGroupAndType(updated, 3, ContentType.Author) as any;
+            act(() => {
+                jest.runAllTimers();
+            });
 
-            expect(newDesc).toBeTruthy();
-            expect(newAuth).toBeTruthy();
+            const updated = getLastUpdatedSection(onSectionChange);
+
+            const newDesc = updated.contents.find(
+                (c: any) => c.contentType === ContentType.Description && c.order === maxOrder + 1,
+            );
+            const newAuth = updated.contents.find(
+                (c: any) => c.contentType === ContentType.Author && c.order === maxOrder + 2,
+            );
+
+            expect(newDesc?.groupIndex).toBe(2);
+            expect((newDesc as any)?.description).toBe('');
+            expect(newAuth?.groupIndex).toBe(2);
+            expect((newAuth as any)?.author).toBe('');
+
+            const descGroups = updated.contents
+                .filter((c: any) => c.contentType === ContentType.Description)
+                .map((c: any) => c.groupIndex)
+                .filter((g: any) => g !== null && g !== undefined)
+                .sort((a: number, b: number) => a - b);
+
+            const authorGroups = updated.contents
+                .filter((c: any) => c.contentType === ContentType.Author)
+                .map((c: any) => c.groupIndex)
+                .filter((g: any) => g !== null && g !== undefined)
+                .sort((a: number, b: number) => a - b);
+
+            expect(descGroups).toEqual([0, 1, 2]);
+            expect(authorGroups).toEqual([0, 1, 2]);
+            expect((getContentByGroupAndType(updated, 1, ContentType.Description) as any)?.description).toBe('D2');
+            expect((getContentByGroupAndType(updated, 1, ContentType.Author) as any)?.author).toBe('A2');
+
+            expect(focusMock).toHaveBeenCalledTimes(1);
+
+            jest.useRealTimers();
         });
 
         it('adds first pair with groupIndex 0 when no groupIndex exists', () => {
@@ -424,11 +529,13 @@ describe('ProgramSectionForm', () => {
                 handlers.onAddPair();
             });
 
-            const updated = getUpdatedSection(onSectionChange);
+            const updated = getLastUpdatedSection(onSectionChange);
             expect(getContentByGroupAndType(updated, 0, ContentType.Description)).toBeTruthy();
         });
 
-        it('adds pair with orders 0 and 1 when section has no contents', () => {
+        it('when initial section has no contents, it is prepared with title+one pair, and then onAddPair appends another pair', () => {
+            jest.useFakeTimers();
+
             const section = makeSection({
                 template: ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
                 contents: [],
@@ -436,17 +543,35 @@ describe('ProgramSectionForm', () => {
 
             const { handlers, onSectionChange } = renderWithHandlers({ section });
 
+            const { focusMock } = createFocusableTextarea('pair-description-1');
+
             act(() => {
                 handlers.onAddPair();
             });
 
-            const updated = getUpdatedSection(onSectionChange);
+            act(() => {
+                jest.runAllTimers();
+            });
+
+            const updated = getLastUpdatedSection(onSectionChange);
             const orders = updated.contents.map((c: any) => c.order).sort((a: number, b: number) => a - b);
 
-            expect(orders).toEqual([0, 1]);
+            expect(orders).toEqual([0, 1, 2, 3, 4]);
+
+            const g1d = getContentByGroupAndType(updated, 1, ContentType.Description) as any;
+            const g1a = getContentByGroupAndType(updated, 1, ContentType.Author) as any;
+
+            expect(g1d).toBeTruthy();
+            expect(g1a).toBeTruthy();
+            expect(g1d.description).toBe('');
+            expect(g1a.author).toBe('');
+
+            expect(focusMock).toHaveBeenCalledTimes(1);
+
+            jest.useRealTimers();
         });
 
-        it('deletes pair by index', () => {
+        it('deletes pair by index and normalizes remaining group indexes', () => {
             const section = makePairsSection([
                 makeTitleContent('T', 0),
                 makePairDescription(1, 0, 'D0'),
@@ -461,13 +586,31 @@ describe('ProgramSectionForm', () => {
                 handlers.onDeletePair(0);
             });
 
-            const updated = getUpdatedSection(onSectionChange);
-            const stillHas0 = updated.contents.some((c: any) => c.groupIndex === 0);
-            expect(stillHas0).toBe(false);
+            const updated = getLastUpdatedSection(onSectionChange);
+
+            const hasOld0Desc = updated.contents.some(
+                (c: any) => c.contentType === ContentType.Description && c.description === 'D0',
+            );
+            const hasOld0Auth = updated.contents.some(
+                (c: any) => c.contentType === ContentType.Author && c.author === 'A0',
+            );
+
+            expect(hasOld0Desc).toBe(false);
+            expect(hasOld0Auth).toBe(false);
+
+            expect((getContentByGroupAndType(updated, 0, ContentType.Description) as any)?.description).toBe('D1');
+            expect((getContentByGroupAndType(updated, 0, ContentType.Author) as any)?.author).toBe('A1');
         });
 
-        it('does nothing when delete index is out of range', () => {
-            const section = makePairsSection([makeTitleContent('T', 0), makePairDescription(1, 0, 'D0')]);
+        it('does nothing when delete index is out of range (pairs length > 1)', () => {
+            const section = makePairsSection([
+                makeTitleContent('T', 0),
+                makePairDescription(1, 0, 'D0'),
+                makePairAuthor(2, 0, 'A0'),
+                makePairDescription(3, 1, 'D1'),
+                makePairAuthor(4, 1, 'A1'),
+            ]);
+
             const { handlers, onSectionChange } = renderWithHandlers({ section });
 
             act(() => {
@@ -510,7 +653,7 @@ describe('ProgramSectionForm', () => {
 
         it('calls onEditStateChange when transitioning to Edit mode', () => {
             const onEditStateChange = jest.fn();
-            renderForm({ isNewSection: false, onEditStateChange });
+            renderForm({ isNewSection: false, onEditStateChange } as any);
 
             expect(onEditStateChange).toHaveBeenCalledWith(false);
 
@@ -538,9 +681,9 @@ describe('ProgramSectionForm', () => {
         });
     });
 
-    it('calls onSectionChange and updates card title when onCardTitleChange is invoked', () => {
+    it('updates card title when onCardTitleChange is invoked', () => {
         const section = makeSection({
-            template: ProgramSectionTemplate.DualTitleDescription,
+            template: ProgramSectionTemplate.DualTitleDescriptionPairs,
             contents: [
                 makeTitleContent('Card 1 Title', 0),
                 makeTitleContent('Card 2 Title', 1),
@@ -555,20 +698,18 @@ describe('ProgramSectionForm', () => {
             handlers.onCardTitleChange(1, 'Updated Card 2 Title');
         });
 
-        expect(onSectionChange).toHaveBeenCalledTimes(1);
-
-        const updated = onSectionChange.mock.calls[0][0] as ProgramSection;
+        const updated = getLastUpdatedSection(onSectionChange);
         const orderedTitles = updated.contents
-            .filter((c) => c.contentType === ContentType.Title)
-            .sort((a, b) => a.order - b.order);
+            .filter((c: any) => c.contentType === ContentType.Title)
+            .sort((a: any, b: any) => a.order - b.order);
 
         expect(orderedTitles[0].title).toBe('Card 1 Title');
         expect(orderedTitles[1].title).toBe('Updated Card 2 Title');
     });
 
-    it('calls onSectionChange and updates card description when onCardDescriptionChange is invoked', () => {
+    it('updates card description when onCardDescriptionChange is invoked', () => {
         const section = makeSection({
-            template: ProgramSectionTemplate.TripleTitleDescription,
+            template: ProgramSectionTemplate.TripleTitleDescriptionPairs,
             contents: [
                 makeTitleContent('Card 1', 0),
                 makeTitleContent('Card 2', 1),
@@ -585,12 +726,10 @@ describe('ProgramSectionForm', () => {
             handlers.onCardDescriptionChange(0, 'Updated Desc 1');
         });
 
-        expect(onSectionChange).toHaveBeenCalledTimes(1);
-
-        const updated = onSectionChange.mock.calls[0][0] as ProgramSection;
+        const updated = getLastUpdatedSection(onSectionChange);
         const orderedDescs = updated.contents
-            .filter((c) => c.contentType === ContentType.Description)
-            .sort((a, b) => a.order - b.order);
+            .filter((c: any) => c.contentType === ContentType.Description)
+            .sort((a: any, b: any) => a.order - b.order);
 
         expect(orderedDescs[0].description).toBe('Updated Desc 1');
         expect(orderedDescs[1].description).toBe('Desc 2');
@@ -599,7 +738,7 @@ describe('ProgramSectionForm', () => {
 
     it('calls onDelete when Delete button is clicked', () => {
         const onDelete = jest.fn();
-        renderForm({ isNewSection: false, onDelete });
+        renderForm({ isNewSection: false, onDelete } as any);
 
         fireEvent.click(screen.getByLabelText('Delete section'));
 
@@ -608,10 +747,66 @@ describe('ProgramSectionForm', () => {
 
     it('calls onRequestReplace when Replace button is clicked', () => {
         const onRequestReplace = jest.fn();
-        renderForm({ isNewSection: false, onRequestReplace });
+        renderForm({ isNewSection: false, onRequestReplace } as any);
 
         fireEvent.click(screen.getByLabelText('Replace section'));
 
         expect(onRequestReplace).toHaveBeenCalledTimes(1);
+    });
+
+    it('calls onMoveUpSection when Move Up button is clicked', () => {
+        const onMoveUpSection = jest.fn();
+
+        renderForm({
+            isFirstSection: false,
+            isLastSection: false,
+            onMoveUpSection,
+        });
+
+        fireEvent.click(screen.getByLabelText('Move up section'));
+
+        expect(onMoveUpSection).toHaveBeenCalledTimes(1);
+    });
+
+    it('calls onMoveDownSection when Move Down button is clicked', () => {
+        const onMoveDownSection = jest.fn();
+
+        renderForm({
+            isFirstSection: false,
+            isLastSection: false,
+            onMoveDownSection,
+        });
+
+        fireEvent.click(screen.getByLabelText('Move down section'));
+
+        expect(onMoveDownSection).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not render Move Up button when section is first', () => {
+        renderForm({
+            isFirstSection: true,
+            isLastSection: false,
+        });
+
+        expect(screen.queryByLabelText('Move up section')).not.toBeInTheDocument();
+    });
+
+    it('does not render Move Down button when section is last', () => {
+        renderForm({
+            isFirstSection: false,
+            isLastSection: true,
+        });
+
+        expect(screen.queryByLabelText('Move down section')).not.toBeInTheDocument();
+    });
+
+    it('does not render move buttons when section is both first and last', () => {
+        renderForm({
+            isFirstSection: true,
+            isLastSection: true,
+        });
+
+        expect(screen.queryByLabelText('Move up section')).not.toBeInTheDocument();
+        expect(screen.queryByLabelText('Move down section')).not.toBeInTheDocument();
     });
 });

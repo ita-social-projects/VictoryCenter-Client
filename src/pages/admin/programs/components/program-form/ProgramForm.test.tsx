@@ -11,6 +11,11 @@ import { MultiSelectInputGroupProps } from '@/components/admin/input-groups/mult
 import { PhotoInputGroupProps } from '@/components/admin/input-groups/photo-input-group/PhotoInputGroup';
 import { ButtonProps } from '@/components/admin/button/Button';
 import { ProgramSection } from '@/types/common/program-sections';
+import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
+
+HTMLElement.prototype.scrollIntoView = jest.fn();
+
+HTMLElement.prototype.scrollIntoView = jest.fn();
 
 jest.mock('@/validation/admin/program-schema/program-schema', () => ({
     PROGRAM_VALIDATION_FUNCTIONS: {
@@ -119,6 +124,32 @@ jest.mock('@/components/admin/input-groups/photo-input-group/PhotoInputGroup', (
     ),
 }));
 
+jest.mock('@/components/public/background-media/BackgroundMedia', () => ({
+    BackgroundMedia: ({ mediaUrl, className }: any) => (
+        <div data-testid="background-media" className={className} data-media-url={mediaUrl}>
+            BackgroundMedia
+        </div>
+    ),
+}));
+
+jest.mock('@/utils/functions/image-helper/image-helper', () => ({
+    getImageSrc: jest.fn((image) => {
+        if (!image) {
+            return '';
+        }
+        if (typeof image === 'string') {
+            return image;
+        }
+        if ('url' in image && image.url) {
+            return image.url;
+        }
+        if ('base64' in image && image.base64) {
+            return `data:${image.mimeType};base64,${image.base64}`;
+        }
+        return '';
+    }),
+}));
+
 jest.mock('@/components/admin/button/Button', () => ({
     Button: ({ children, onClick, disabled, ...rest }: ButtonProps & { 'data-testid'?: string }) => (
         <button type="button" onClick={onClick} disabled={disabled} data-testid={rest['data-testid'] ?? 'button'}>
@@ -140,20 +171,28 @@ jest.mock('../program-section-form/ProgramSectionForm', () => ({
         onEditStateChange,
         onDelete,
         onRequestReplace,
+        onMoveUpSection,
+        onMoveDownSection,
+        isFirstSection,
+        isLastSection,
         isDisabled,
         isNewSection,
         isReplacingTemplate,
     }: any) => (
         <div
             data-testid="program-section-form"
+            data-section-id={section.id ?? section.template}
             data-section-template={String(section.template)}
             data-disabled={String(isDisabled)}
             data-is-new={String(isNewSection)}
             data-is-replacing={String(isReplacingTemplate)}
+            data-is-first={String(isFirstSection)}
+            data-is-last={String(isLastSection)}
         >
             <button type="button" data-testid={`save-section-${section.id ?? section.template}`} onClick={onSave}>
                 Save
             </button>
+
             <button
                 type="button"
                 data-testid={`cancel-section-${section.id ?? section.template}`}
@@ -168,6 +207,7 @@ jest.mock('../program-section-form/ProgramSectionForm', () => ({
             >
                 Cancel
             </button>
+
             <button
                 type="button"
                 data-testid={`change-section-${section.id ?? section.template}`}
@@ -175,6 +215,7 @@ jest.mock('../program-section-form/ProgramSectionForm', () => ({
             >
                 Change
             </button>
+
             <button
                 type="button"
                 data-testid={`edit-state-${section.id ?? section.template}`}
@@ -182,6 +223,7 @@ jest.mock('../program-section-form/ProgramSectionForm', () => ({
             >
                 Toggle Edit
             </button>
+
             <button
                 type="button"
                 data-testid={`delete-section-${section.id ?? section.template}`}
@@ -189,6 +231,7 @@ jest.mock('../program-section-form/ProgramSectionForm', () => ({
             >
                 Delete
             </button>
+
             <button
                 type="button"
                 data-testid={`replace-section-${section.id ?? section.template}`}
@@ -196,6 +239,26 @@ jest.mock('../program-section-form/ProgramSectionForm', () => ({
             >
                 Replace
             </button>
+
+            {!isFirstSection && (
+                <button
+                    type="button"
+                    data-testid={`move-up-section-${section.id ?? section.template}`}
+                    onClick={() => onMoveUpSection?.()}
+                >
+                    Move Up
+                </button>
+            )}
+
+            {!isLastSection && (
+                <button
+                    type="button"
+                    data-testid={`move-down-section-${section.id ?? section.template}`}
+                    onClick={() => onMoveDownSection?.()}
+                >
+                    Move Down
+                </button>
+            )}
         </div>
     ),
 }));
@@ -416,6 +479,45 @@ describe('ProgramForm', () => {
             fireEvent.click(screen.getByTestId('error-trigger-previewImage'));
             expect(screen.getByTestId('error-previewImage')).toHaveTextContent('Manual Error');
         });
+
+        it('should not render BackgroundMedia when backgroundImage is null', () => {
+            renderProgramForm();
+
+            expect(screen.queryByTestId('background-media')).not.toBeInTheDocument();
+        });
+
+        it('should render BackgroundMedia when backgroundImage exists', () => {
+            const initialData: ProgramFormValues = {
+                name: '',
+                categories: [],
+                description: '',
+                previewImage: null,
+                previewImageId: null,
+                backgroundImage: { base64: 'test-base64', mimeType: 'image/jpeg' },
+                backgroundImageId: null,
+                location: '',
+                participantsCount: '',
+                meetingCount: '',
+                sections: [],
+            };
+
+            renderProgramForm({ initialData });
+
+            expect(screen.getByTestId('background-media')).toBeInTheDocument();
+            expect(getImageSrc).toHaveBeenCalledWith(initialData.backgroundImage);
+        });
+
+        it('should render BackgroundMedia when background image is uploaded', async () => {
+            renderProgramForm();
+
+            expect(screen.queryByTestId('background-media')).not.toBeInTheDocument();
+
+            fireEvent.click(screen.getByTestId('upload-backgroundImage'));
+
+            await waitFor(() => {
+                expect(screen.getByTestId('background-media')).toBeInTheDocument();
+            });
+        });
     });
 
     describe('Form Submission & Ref Methods', () => {
@@ -579,7 +681,9 @@ describe('ProgramForm', () => {
             await waitFor(() => {
                 expect(screen.getAllByTestId('program-section-form')).toHaveLength(3);
             });
-            expect(ref.current?.getSections()?.[0]).toMatchObject({ id: 202 });
+
+            const sections = ref.current?.getSections();
+            expect(sections?.[sections.length - 1]).toMatchObject({ id: newSection.id });
 
             await act(async () => {
                 ref.current?.removeSection(1);
@@ -755,6 +859,59 @@ describe('ProgramForm', () => {
 
             await waitFor(() => {
                 expect(screen.queryByTestId('program-section-form')).not.toBeInTheDocument();
+            });
+        });
+
+        let initialData: ReturnType<typeof createInitialData>;
+
+        beforeEach(() => {
+            initialData = createInitialData({
+                sections: [
+                    { id: 101, template: 1, order: 0, contents: [] } as ProgramSection,
+                    { id: 202, template: 1, order: 1, contents: [] } as ProgramSection,
+                ],
+            });
+        });
+
+        it('moves section up when Move Up button is clicked', async () => {
+            renderProgramForm({ initialData });
+            await waitFor(() => {
+                expect(screen.getAllByTestId('program-section-form')).toHaveLength(2);
+            });
+            fireEvent.click(screen.getByTestId('move-up-section-202'));
+            await waitFor(() => {
+                const sections = screen.getAllByTestId('program-section-form');
+                expect(sections[0]).toHaveAttribute('data-section-id', '202');
+            });
+        });
+
+        it('moves section down when Move Down button is clicked', async () => {
+            renderProgramForm({ initialData });
+            await waitFor(() => {
+                expect(screen.getAllByTestId('program-section-form')).toHaveLength(2);
+            });
+            fireEvent.click(screen.getByTestId('move-down-section-101'));
+            await waitFor(() => {
+                const sections = screen.getAllByTestId('program-section-form');
+                expect(sections[1]).toHaveAttribute('data-section-id', '101');
+            });
+        });
+
+        it('does nothing when section key is not found (covers idx === -1)', async () => {
+            const initialData = createInitialData({
+                sections: [{ id: 101, template: 1, order: 0, contents: [] } as ProgramSection],
+            });
+
+            renderProgramForm({ initialData });
+
+            await waitFor(() => {
+                expect(screen.getByTestId('program-section-form')).toBeInTheDocument();
+            });
+
+            fireEvent.click(screen.queryByTestId('move-up-section-101') || document.createElement('div'));
+
+            await waitFor(() => {
+                expect(screen.getAllByTestId('program-section-form')).toHaveLength(1);
             });
         });
     });

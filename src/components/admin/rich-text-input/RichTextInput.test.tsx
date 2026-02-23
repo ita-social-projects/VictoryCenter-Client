@@ -3,11 +3,16 @@ import { render, screen, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { RichTextInput, RichTextInputProps } from './RichTextInput';
 import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
+import { $generateNodesFromDOM } from '@lexical/html';
+import { $getRoot, $insertNodes } from 'lexical';
 
 jest.mock('@lexical/react/LexicalComposer', () => {
-    const MockLexicalComposer = ({ children }: { children: React.ReactNode }) => (
-        <div data-testid="lexical-composer">{children}</div>
-    );
+    const MockLexicalComposer = ({ children, initialConfig }: any) => {
+        if (initialConfig?.editorState) {
+            initialConfig.editorState({});
+        }
+        return <div data-testid="lexical-composer">{children}</div>;
+    };
     return { __esModule: true, LexicalComposer: MockLexicalComposer };
 });
 
@@ -142,6 +147,14 @@ describe('RichTextInput', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
+        (mockMaxLengthPluginProps as any) = null;
+        (mockOnChangePluginProps as any) = null;
+        (mockFocusPluginProps as any) = null;
+        (mockInitialValuePluginProps as any) = null;
+
+        ($generateNodesFromDOM as jest.Mock).mockImplementation(() => []);
+        ($getRoot as jest.Mock).mockImplementation(() => ({ clear: jest.fn() }));
+        ($insertNodes as jest.Mock).mockImplementation(() => {});
     });
 
     const renderRichTextInput = (overrideProps: Partial<RichTextInputProps> = {}) =>
@@ -327,27 +340,26 @@ describe('RichTextInput', () => {
     });
 
     describe('Initial Configuration', () => {
-        it('creates namespace based on id', () => {
-            renderRichTextInput({ id: 'custom-editor' });
-            expect(screen.getByTestId('lexical-composer')).toBeInTheDocument();
+        it('runs editorState and inserts nodes when value is provided', () => {
+            const clear = jest.fn();
+            ($getRoot as jest.Mock).mockImplementation(() => ({ clear }));
+            ($generateNodesFromDOM as jest.Mock).mockImplementation(() => ['n1', 'n2']);
+
+            renderRichTextInput({ value: '<p>Hello</p>' });
+
+            expect($generateNodesFromDOM).toHaveBeenCalledTimes(1);
+            expect($getRoot).toHaveBeenCalledTimes(1);
+            expect(clear).toHaveBeenCalledTimes(1);
+            expect($insertNodes).toHaveBeenCalledWith(['n1', 'n2']);
         });
 
-        it('sets editable to false when disabled', () => {
-            renderRichTextInput({ disabled: true });
-            expect(screen.getByLabelText('Bold')).toBeDisabled();
-        });
+        it('does not generate nodes when value is empty', () => {
+            ($generateNodesFromDOM as jest.Mock).mockClear();
+            ($insertNodes as jest.Mock).mockClear();
 
-        it('handles initial value', () => {
-            renderRichTextInput({ value: '<p>Initial content</p>' });
-            expect(screen.getByTestId('content-editable')).toBeInTheDocument();
-        });
-
-        it('handles empty initial value', () => {
             renderRichTextInput({ value: '' });
-            expect(screen.getByTestId('content-editable')).toBeInTheDocument();
-        });
-    });
 
+<<<<<<< feature/issue-1160
     describe('HideToolbar functionality', () => {
         it('hides toolbar when hideToolbar is true', () => {
             renderRichTextInput({ hideToolbar: true });
@@ -371,6 +383,10 @@ describe('RichTextInput', () => {
             renderRichTextInput();
             expect(screen.getByTestId('lexical-composer')).toBeInTheDocument();
             consoleErrorSpy.mockRestore();
+=======
+            expect($generateNodesFromDOM).not.toHaveBeenCalled();
+            expect($insertNodes).not.toHaveBeenCalled();
+>>>>>>> release/1.0.0
         });
     });
 

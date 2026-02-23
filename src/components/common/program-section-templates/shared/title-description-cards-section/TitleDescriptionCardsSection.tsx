@@ -1,6 +1,7 @@
 import cn from 'classnames';
 import { TitleDescriptionCard } from './TitleDescriptionCard';
-import { ProgramSectionMode } from '@/types/common/program-sections';
+import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
+import { getProgramSectionTemplateMaxGroupCount } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
 import styles from './TitleDescriptionCardsSection.module.scss';
 
 export interface TitleDescriptionCardData {
@@ -17,10 +18,20 @@ interface Props {
     validationResetKey?: number;
 }
 
+const PAIRS_TEMPLATES = [
+    ProgramSectionTemplate.DualTitleDescriptionPairs,
+    ProgramSectionTemplate.TripleTitleDescriptionPairs,
+    ProgramSectionTemplate.QuadTitleDescriptionPairs,
+] as const;
+
+const resolvePairsTemplateByCardsCount = (cardsCount: number): ProgramSectionTemplate =>
+    PAIRS_TEMPLATES.find((t) => getProgramSectionTemplateMaxGroupCount(t) === cardsCount) ??
+    ProgramSectionTemplate.DualTitleDescriptionPairs;
+
 export const TitleDescriptionCardsSection = ({
     cards,
     cardsCount,
-    mode = ProgramSectionMode.Published,
+    mode = ProgramSectionMode.View,
     onTitleChange,
     onDescriptionChange,
     validationResetKey,
@@ -29,13 +40,16 @@ export const TitleDescriptionCardsSection = ({
         (_, index) => cards[index] ?? { title: '', description: '' },
     );
 
+    const template = resolvePairsTemplateByCardsCount(cardsCount);
+
     return (
         <div
             className={cn(styles['td-cards'], {
                 [styles['td-cards--dual']]: cardsCount === 2,
                 [styles['td-cards--triple']]: cardsCount === 3,
                 [styles['td-cards--quad']]: cardsCount === 4,
-                [styles['td-cards--editable']]: mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View,
+                [styles['td-cards--editable']]: mode === ProgramSectionMode.Edit,
+                [styles['td-cards--template']]: mode === ProgramSectionMode.Template,
             })}
         >
             {normalizedCards.map((card, index) => (
@@ -43,6 +57,7 @@ export const TitleDescriptionCardsSection = ({
                     key={index}
                     card={card}
                     index={index}
+                    template={template}
                     mode={mode}
                     onTitleChange={onTitleChange}
                     onDescriptionChange={onDescriptionChange}

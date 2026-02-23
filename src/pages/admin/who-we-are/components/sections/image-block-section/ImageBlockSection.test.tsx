@@ -212,29 +212,6 @@ describe('ImageSection', () => {
     });
 
     it('should call onChange with a new image content object if one does not exist', () => {
-<<<<<<< feature/issue-1160
-        const contentWithoutImage = [
-            {
-                id: 2,
-                contentType: ContentType.Title,
-                title: 'Initial Title',
-                image: null,
-                imageId: null,
-                description: null,
-                localizations: [],
-            },
-            {
-                id: 3,
-                contentType: ContentType.Description,
-                description: 'Initial Description',
-                title: null,
-                imageId: null,
-                image: null,
-                localizations: [],
-            },
-        ];
-        renderComponent({ content: contentWithoutImage });
-=======
         renderComponent({
             content: [
                 {
@@ -244,6 +221,7 @@ describe('ImageSection', () => {
                     image: null,
                     imageId: null,
                     description: null,
+                    localizations: [],
                 },
                 {
                     id: 3,
@@ -252,10 +230,10 @@ describe('ImageSection', () => {
                     title: null,
                     imageId: null,
                     image: null,
+                    localizations: [],
                 },
             ],
         });
->>>>>>> release/1.0.0
 
         const file = new File(['dummy content'], 'test.png', { type: 'image/png' });
         fireEvent.change(screen.getByTestId('mock-image-input-file'), { target: { files: [file] } });
@@ -299,12 +277,8 @@ describe('ImageSection', () => {
     it('should validate empty title on blur when title is null', () => {
         renderComponent({
             content: [
-<<<<<<< feature/issue-1160
                 { id: 1, contentType: ContentType.Image, image: null, title: null, imageId: null, description: null, localizations: [] },
-=======
-                { id: 1, contentType: ContentType.Image, image: null, title: null, imageId: null, description: null },
-                { id: 2, contentType: ContentType.Title, title: null, image: null, imageId: null, description: null },
->>>>>>> release/1.0.0
+                { id: 2, contentType: ContentType.Title, title: null, image: null, imageId: null, description: null, localizations: [] },
                 {
                     id: 3,
                     contentType: ContentType.Description,
@@ -325,7 +299,7 @@ describe('ImageSection', () => {
     it('should validate empty description on blur when description is null', () => {
         renderComponent({
             content: [
-                { id: 1, contentType: ContentType.Image, image: null, title: null, imageId: null, description: null },
+                { id: 1, contentType: ContentType.Image, image: null, title: null, imageId: null, description: null, localizations: [], },
                 {
                     id: 2,
                     contentType: ContentType.Title,
@@ -333,6 +307,7 @@ describe('ImageSection', () => {
                     image: null,
                     imageId: null,
                     description: null,
+                    localizations: [],
                 },
                 {
                     id: 3,
@@ -341,6 +316,7 @@ describe('ImageSection', () => {
                     title: null,
                     imageId: null,
                     image: null,
+                    localizations: [],
                 },
             ],
         });

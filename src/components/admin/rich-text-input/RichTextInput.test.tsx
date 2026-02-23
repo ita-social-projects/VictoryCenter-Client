@@ -359,7 +359,11 @@ describe('RichTextInput', () => {
 
             renderRichTextInput({ value: '' });
 
-<<<<<<< feature/issue-1160
+            expect($generateNodesFromDOM).not.toHaveBeenCalled();
+            expect($insertNodes).not.toHaveBeenCalled();
+        });
+    });
+
     describe('HideToolbar functionality', () => {
         it('hides toolbar when hideToolbar is true', () => {
             renderRichTextInput({ hideToolbar: true });
@@ -383,10 +387,8 @@ describe('RichTextInput', () => {
             renderRichTextInput();
             expect(screen.getByTestId('lexical-composer')).toBeInTheDocument();
             consoleErrorSpy.mockRestore();
-=======
             expect($generateNodesFromDOM).not.toHaveBeenCalled();
             expect($insertNodes).not.toHaveBeenCalled();
->>>>>>> release/1.0.0
         });
     });
 

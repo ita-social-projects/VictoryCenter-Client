@@ -1,10 +1,13 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import cn from 'classnames';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { FAQ_TEXT, FAQ_VALIDATION } from '@/const/admin/faq';
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
+import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
 import { ReactComponent as ArrowIcon } from '@/assets/icons/arrow-down-right.svg';
 import styles from './EditableFaqCard.module.scss';
+
+const { validateFaqQuestion, validateFaqAnswer } = PROGRAM_SECTION_VALIDATION_FUNCTIONS;
 
 interface EditableFaqCardProps {
     index: number;
@@ -26,6 +29,38 @@ export const EditableFaqCard = ({
     onDelete,
 }: EditableFaqCardProps) => {
     const [isExpanded, setIsExpanded] = useState(false);
+    const [questionError, setQuestionError] = useState<string | undefined>(undefined);
+    const [answerError, setAnswerError] = useState<string | undefined>(undefined);
+
+    const handleQuestionChange = useCallback(
+        (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+            const v = e.target.value;
+            onQuestionChange(index, v);
+            if (questionError !== undefined) {
+                setQuestionError(validateFaqQuestion(v));
+            }
+        },
+        [index, onQuestionChange, questionError],
+    );
+
+    const handleAnswerChange = useCallback(
+        (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+            const v = e.target.value;
+            onAnswerChange(index, v);
+            if (answerError !== undefined) {
+                setAnswerError(validateFaqAnswer(v));
+            }
+        },
+        [index, onAnswerChange, answerError],
+    );
+
+    const handleQuestionBlur = useCallback(() => {
+        setQuestionError(validateFaqQuestion(questionText));
+    }, [questionText]);
+
+    const handleAnswerBlur = useCallback(() => {
+        setAnswerError(validateFaqAnswer(answerText));
+    }, [answerText]);
 
     return (
         <div className={cn(styles['card'], { [styles['card--expanded']]: isExpanded })}>
@@ -44,11 +79,13 @@ export const EditableFaqCard = ({
                     id={`${idPrefix}-faq-question-${index}`}
                     name={`${idPrefix}-faq-question-${index}`}
                     value={questionText}
-                    onChange={(e) => onQuestionChange(index, e.target.value)}
+                    onChange={handleQuestionChange}
+                    onBlur={handleQuestionBlur}
                     maxLength={FAQ_VALIDATION.question.max}
                     rows={1}
                     currentLength={getTrimmedInputText(questionText).length}
                     className={styles['question-input']}
+                    error={questionError}
                 />
                 <div className={styles['expand-container']}>
                     <button
@@ -70,10 +107,12 @@ export const EditableFaqCard = ({
                         id={`${idPrefix}-faq-answer-${index}`}
                         name={`${idPrefix}-faq-answer-${index}`}
                         value={answerText}
-                        onChange={(e) => onAnswerChange(index, e.target.value)}
+                        onChange={handleAnswerChange}
+                        onBlur={handleAnswerBlur}
                         maxLength={FAQ_VALIDATION.answer.max}
                         rows={3}
                         currentLength={getTrimmedInputText(answerText).length}
+                        error={answerError}
                     />
                 </div>
             )}

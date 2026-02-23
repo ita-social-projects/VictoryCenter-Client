@@ -1,4 +1,4 @@
-import { useId, useState, useCallback } from 'react';
+import { useId, useState, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import cn from 'classnames';
 import { FaqCard } from '@/components/public/faq-section/faq-card/FaqCard';
@@ -14,9 +14,12 @@ import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/progr
 import { ContentType } from '@/types/common/programs';
 import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
+import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import { EditableFaqCard } from './editable-faq-card/EditableFaqCard';
 import styles from './FaqProgramSection.module.scss';
+
+const { validateFaqQuestion, validateFaqAnswer } = PROGRAM_SECTION_VALIDATION_FUNCTIONS;
 
 export interface FaqProgramSectionProps {
     questions?: PublishedFaqQuestion[];
@@ -62,11 +65,58 @@ export const FaqProgramSection = ({
 
     const [newQuestion, setNewQuestion] = useState('');
     const [newAnswer, setNewAnswer] = useState('');
+    const [newQuestionError, setNewQuestionError] = useState<string | undefined>(undefined);
+    const [newAnswerError, setNewAnswerError] = useState<string | undefined>(undefined);
+
+    const isNewPairValid = useMemo(() => {
+        return !validateFaqQuestion(newQuestion) && !validateFaqAnswer(newAnswer);
+    }, [newQuestion, newAnswer]);
+
+    const handleNewQuestionChange = useCallback(
+        (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+            const v = e.target.value;
+            setNewQuestion(v);
+            if (newQuestionError !== undefined) {
+                setNewQuestionError(validateFaqQuestion(v));
+            }
+        },
+        [newQuestionError],
+    );
+
+    const handleNewAnswerChange = useCallback(
+        (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+            const v = e.target.value;
+            setNewAnswer(v);
+            if (newAnswerError !== undefined) {
+                setNewAnswerError(validateFaqAnswer(v));
+            }
+        },
+        [newAnswerError],
+    );
+
+    const handleNewQuestionBlur = useCallback(() => {
+        setNewQuestionError(validateFaqQuestion(newQuestion));
+    }, [newQuestion]);
+
+    const handleNewAnswerBlur = useCallback(() => {
+        setNewAnswerError(validateFaqAnswer(newAnswer));
+    }, [newAnswer]);
 
     const handleAddClick = useCallback(() => {
+        const qError = validateFaqQuestion(newQuestion);
+        const aError = validateFaqAnswer(newAnswer);
+
+        if (qError || aError) {
+            setNewQuestionError(qError);
+            setNewAnswerError(aError);
+            return;
+        }
+
         onAddFaqPair?.(newQuestion, newAnswer);
         setNewQuestion('');
         setNewAnswer('');
+        setNewQuestionError(undefined);
+        setNewAnswerError(undefined);
     }, [onAddFaqPair, newQuestion, newAnswer]);
 
     const rootClassName = cn(styles['faq-section'], {
@@ -116,10 +166,12 @@ export const FaqProgramSection = ({
                                 id={`${idPrefix}-faq-new-question`}
                                 name={`${idPrefix}-faq-new-question`}
                                 value={newQuestion}
-                                onChange={(e) => setNewQuestion(e.target.value)}
+                                onChange={handleNewQuestionChange}
+                                onBlur={handleNewQuestionBlur}
                                 maxLength={FAQ_VALIDATION.question.max}
                                 rows={1}
                                 currentLength={getTrimmedInputText(newQuestion).length}
+                                error={newQuestionError}
                             />
                             <TextAreaWithCharacterLimitGroup
                                 label={FAQ_TEXT.FORM.LABEL.ANSWER}
@@ -127,10 +179,12 @@ export const FaqProgramSection = ({
                                 id={`${idPrefix}-faq-new-answer`}
                                 name={`${idPrefix}-faq-new-answer`}
                                 value={newAnswer}
-                                onChange={(e) => setNewAnswer(e.target.value)}
+                                onChange={handleNewAnswerChange}
+                                onBlur={handleNewAnswerBlur}
                                 maxLength={FAQ_VALIDATION.answer.max}
                                 rows={3}
                                 currentLength={getTrimmedInputText(newAnswer).length}
+                                error={newAnswerError}
                             />
                         </div>
 
@@ -140,6 +194,7 @@ export const FaqProgramSection = ({
                                 className={styles['add-button']}
                                 onClick={handleAddClick}
                                 type="button"
+                                disabled={!isNewPairValid}
                             >
                                 {PROGRAMS_TEXT.BUTTON.ADD}
                                 <PlusIcon />

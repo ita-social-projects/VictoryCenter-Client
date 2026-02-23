@@ -457,6 +457,8 @@ export const ProgramSectionForm = ({
 
     const [faqPairs, setFaqPairs] = useState<Array<{ questionText: string; answerText: string }>>([]);
 
+    const isSectionSaveValid = isSectionValid && (!isFaqTemplate || faqPairs.length > 0);
+
     const handleFaqQuestionChange = useCallback((index: number, value: string) => {
         setFaqPairs((prev) => prev.map((p, i) => (i === index ? { ...p, questionText: value } : p)));
         setIsDirty(true);
@@ -489,13 +491,13 @@ export const ProgramSectionForm = ({
     );
 
     const handleSaveClick = useCallback(() => {
-        if (isDisabled || !isSectionValid) return;
+        if (isDisabled || !isSectionSaveValid) return;
         onSave();
         setOriginalSection(localSection);
         setIsDirty(false);
         setSectionMode(ProgramSectionMode.View);
         setValidationResetKey((prev) => prev + 1);
-    }, [isDisabled, isSectionValid, onSave, localSection]);
+    }, [isDisabled, isSectionSaveValid, onSave, localSection]);
 
     const CARD_TEMPLATES = [
         ProgramSectionTemplate.DualTitleDescriptionPairs,
@@ -655,7 +657,7 @@ export const ProgramSectionForm = ({
                         <Button
                             buttonStyle="primary"
                             onClick={handleSaveClick}
-                            disabled={isDisabled || !isSectionValid}
+                            disabled={isDisabled || !isSectionSaveValid}
                         >
                             {PROGRAMS_TEXT.BUTTON.SAVE}
                         </Button>

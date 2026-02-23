@@ -3,6 +3,7 @@ import {
     PROGRAM_SECTION_VALIDATION,
     PROGRAM_SECTION_TEMPLATE_VALIDATION,
 } from '@/const/admin/programs';
+import { FAQ_VALIDATION } from '@/const/admin/faq';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ProgramCategory } from '@/types/admin/programs';
 import { Image, ImageValues } from '@/types/common/image';
@@ -330,6 +331,22 @@ export const PROGRAM_SECTION_VALIDATION_FUNCTIONS = {
         } catch (error: any) {
             return error.message;
         }
+    },
+
+    validateFaqQuestion: (value: string): string | undefined => {
+        const trimmed = value.trim();
+        if (!trimmed) return COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED;
+        if (trimmed.length < FAQ_VALIDATION.question.min) return FAQ_VALIDATION.question.getMinError();
+        if (trimmed.length > FAQ_VALIDATION.question.max) return FAQ_VALIDATION.question.getMaxError();
+        return undefined;
+    },
+
+    validateFaqAnswer: (value: string): string | undefined => {
+        const trimmed = value.trim();
+        if (!trimmed) return COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED;
+        if (trimmed.length < FAQ_VALIDATION.answer.min) return FAQ_VALIDATION.answer.getMinError();
+        if (trimmed.length > FAQ_VALIDATION.answer.max) return FAQ_VALIDATION.answer.getMaxError();
+        return undefined;
     },
 };
 

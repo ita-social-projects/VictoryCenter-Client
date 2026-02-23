@@ -290,4 +290,42 @@ describe('ImageSection', () => {
 
         expect(screen.queryByRole('button', { name: 'Опублікувати' })).not.toBeInTheDocument();
     });
+
+    it('should validate title on blur for base language', () => {
+        renderComponent();
+
+        const titleInput = screen.getByTestId('mock-rich-input-2');
+
+        fireEvent.change(titleInput, { target: { value: 'invalid text' } });
+
+        fireEvent.blur(titleInput);
+
+        expect(WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText).toHaveBeenCalled();
+    });
+
+    it('should validate description on blur for base language', () => {
+        renderComponent();
+
+        const descInput = screen.getByTestId('mock-rich-input-3');
+
+        fireEvent.change(descInput, { target: { value: 'invalid text' } });
+
+        fireEvent.blur(descInput);
+
+        expect(WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText).toHaveBeenCalled();
+    });
+
+    it('should not validate title or description on blur for non-base language', () => {
+        renderComponent({ language: { id: 2, code: 'en', name: 'English' } });
+
+        const titleInput = screen.getByTestId('mock-rich-input-2');
+        const descInput = screen.getByTestId('mock-rich-input-3');
+
+        (WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText as jest.Mock).mockClear();
+
+        fireEvent.blur(titleInput);
+        fireEvent.blur(descInput);
+
+        expect(WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText).not.toHaveBeenCalled();
+    });
 });

@@ -340,4 +340,57 @@ describe('WhoWeAreContent Component', () => {
             );
         });
     });
+
+    it('should set languages error state and allow retrying', async () => {
+        let injectedSetErrorState: any = null;
+        let mockRetryFetchLanguages = jest.fn();
+
+        const toolkitSpy = jest.spyOn(require('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit'), 'useLocalizationToolkit')
+            .mockImplementation(({ setErrorState }: any) => {
+                injectedSetErrorState = setErrorState;
+                return {
+                    allLanguages: [],
+                    selectedLanguage: null,
+                    onLanguageChange: jest.fn(),
+                    retryFetchLanguages: mockRetryFetchLanguages,
+                };
+            });
+
+        mockedWhoWeAreApi.getPreviews.mockResolvedValue(mockCategories);
+        mockedWhoWeAreApi.getByType.mockResolvedValue(mockSection1);
+
+        render(<WhoWeAreContent />);
+
+        await waitFor(() => {
+            expect(injectedSetErrorState).toBeTruthy();
+        });
+
+        injectedSetErrorState('Languages failed to load', 'languages');
+
+        const errorMessage = await screen.findByText('Languages failed to load');
+        expect(errorMessage).toBeInTheDocument();
+
+        const retryButton = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN });
+        fireEvent.click(retryButton);
+
+        expect(mockRetryFetchLanguages).toHaveBeenCalled();
+
+        toolkitSpy.mockRestore();
+    });
+
+
+    it('should not throw error if categories are loaded but fetch by type returns no contents', async () => {
+        const mockEmptySection = { ...mockSection1, contents: [] };
+        mockedWhoWeAreApi.getPreviews.mockResolvedValue(mockCategories);
+        mockedWhoWeAreApi.getByType.mockResolvedValue(mockEmptySection);
+
+        render(<WhoWeAreContent />);
+
+        expect(await screen.findByText('Main')).toBeInTheDocument();
+
+        await waitFor(() => {
+            expect(screen.queryByTestId('input-1')).not.toBeInTheDocument();
+        });
+    });
+
 });

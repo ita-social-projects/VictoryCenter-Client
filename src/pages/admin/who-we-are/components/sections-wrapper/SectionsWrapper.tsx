@@ -12,6 +12,7 @@ import {
 import { SectionType } from '@/types/common/about-us';
 import React from 'react';
 import { LocalizationLanguage } from '@/types/common/language';
+import './SectionsWrapper.scss';
 
 export interface MainSectionProps {
     section: WhoWeAreSection | null;
@@ -81,6 +82,9 @@ export const SectionsWrapper = ({
 
     return (
         <div className="who-we-are-main-section">
+            <div className="who-we-are-section-buttons">
+                <button type="button" className="who-we-are-translate-btn" aria-label="Translate" />
+            </div>
             <Component {...commonProps} {...additionalProps} />
         </div>
     );

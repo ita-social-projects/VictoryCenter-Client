@@ -1,0 +1,47 @@
+@use '@/assets/sass/variables/colors';
+
+.who-we-are-main-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 100%;
+
+    .who-we-are-section-buttons {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 0.625rem;
+        width: 100%;
+
+        .who-we-are-translate-btn {
+            border: none;
+            width: 1.5rem;
+            height: 1.5rem;
+
+            background: url('~@/assets/icons/translate.svg');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+
+            &:hover {
+                cursor: pointer;
+                background: url('~@/assets/icons/translate-grey.svg');
+                background-repeat: no-repeat;
+                background-position: center;
+                background-size: contain;
+            }
+
+            &:active {
+                background: url('~@/assets/icons/translate.svg');
+                background-repeat: no-repeat;
+                background-position: center;
+                background-size: contain;
+            }
+
+            &:focus {
+                outline: none;
+            }
+        }
+    }
+}

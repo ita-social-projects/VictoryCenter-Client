@@ -35,7 +35,6 @@ jest.mock('../who-we-are-page-toolbar/WhoWeArePageToolbar', () => ({
                 <div className="toolkit" data-testid="localization-toolkit">
                     <div className="select select-closed">
                         <button className="select-head" type="button">
-                            <span className="empty not-empty">Усі</span>
                             <svg />
                         </button>
                     </div>

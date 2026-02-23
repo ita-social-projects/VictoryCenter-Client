@@ -8,7 +8,16 @@ import { Image } from '@/types/common/image';
 import { RichTextInputGroupProps } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
-    RichTextInputGroup: ({ label, onChange, value, maxLength, onBlur, id, error, disabled }: RichTextInputGroupProps & { disabled?: boolean }) => (
+    RichTextInputGroup: ({
+        label,
+        onChange,
+        value,
+        maxLength,
+        onBlur,
+        id,
+        error,
+        disabled,
+    }: RichTextInputGroupProps & { disabled?: boolean }) => (
         <div>
             <label htmlFor={id}>{label}</label>
             <input

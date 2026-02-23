@@ -138,7 +138,15 @@ const mockSection2: WhoWeAreSection = {
     title: 'Mission Section',
     sectionType: SectionType.People,
     contents: [
-        { id: 2, contentType: ContentType.Title, title: 'Our Goal', image: null, imageId: null, description: null, localizations: [] },
+        {
+            id: 2,
+            contentType: ContentType.Title,
+            title: 'Our Goal',
+            image: null,
+            imageId: null,
+            description: null,
+            localizations: [],
+        },
     ],
 };
 
@@ -273,9 +281,9 @@ describe('WhoWeAreContent Component', () => {
     });
 
     it('should display the loader while categories are loading', () => {
-        mockedWhoWeAreApi.getPreviews.mockReturnValue(new Promise(() => { }));
+        mockedWhoWeAreApi.getPreviews.mockReturnValue(new Promise(() => {}));
 
-        mockedWhoWeAreApi.getByType.mockReturnValue(new Promise(() => { }));
+        mockedWhoWeAreApi.getByType.mockReturnValue(new Promise(() => {}));
 
         render(<WhoWeAreContent />);
 
@@ -288,7 +296,7 @@ describe('WhoWeAreContent Component', () => {
     it('should display the loader while the selected section is loading', async () => {
         mockedWhoWeAreApi.getPreviews.mockResolvedValue(mockCategories);
 
-        mockedWhoWeAreApi.getByType.mockReturnValue(new Promise(() => { }));
+        mockedWhoWeAreApi.getByType.mockReturnValue(new Promise(() => {}));
 
         render(<WhoWeAreContent />);
 
@@ -345,7 +353,8 @@ describe('WhoWeAreContent Component', () => {
         let injectedSetErrorState: any = null;
         let mockRetryFetchLanguages = jest.fn();
 
-        const toolkitSpy = jest.spyOn(require('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit'), 'useLocalizationToolkit')
+        const toolkitSpy = jest
+            .spyOn(require('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit'), 'useLocalizationToolkit')
             .mockImplementation(({ setErrorState }: any) => {
                 injectedSetErrorState = setErrorState;
                 return {
@@ -378,7 +387,6 @@ describe('WhoWeAreContent Component', () => {
         toolkitSpy.mockRestore();
     });
 
-
     it('should not throw error if categories are loaded but fetch by type returns no contents', async () => {
         const mockEmptySection = { ...mockSection1, contents: [] };
         mockedWhoWeAreApi.getPreviews.mockResolvedValue(mockCategories);
@@ -392,5 +400,4 @@ describe('WhoWeAreContent Component', () => {
             expect(screen.queryByTestId('input-1')).not.toBeInTheDocument();
         });
     });
-
 });

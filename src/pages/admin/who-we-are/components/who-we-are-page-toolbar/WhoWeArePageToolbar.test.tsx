@@ -6,23 +6,18 @@ jest.mock('@/components/admin/language-toolkit/LanguageToolkit', () => ({
         <div data-testid="mock-language-toolkit">
             <span data-testid="lang-count">{languages.length}</span>
         </div>
-    )
+    ),
 }));
 
 describe('WhoWeArePageToolbar', () => {
     it('renders the toolbar and passes props to LanguageToolkit', () => {
         const mockLanguages = [
             { id: 1, name: 'English', code: 'en' },
-            { id: 2, name: 'Ukrainian', code: 'uk' }
+            { id: 2, name: 'Ukrainian', code: 'uk' },
         ];
         const mockOnLanguageChange = jest.fn();
 
-        render(
-            <WhoWeArePageToolbar
-                languages={mockLanguages}
-                onLanguageChange={mockOnLanguageChange}
-            />
-        );
+        render(<WhoWeArePageToolbar languages={mockLanguages} onLanguageChange={mockOnLanguageChange} />);
 
         const toolbar = screen.getByTestId('who-we-are-page-toolbar');
         expect(toolbar).toBeInTheDocument();

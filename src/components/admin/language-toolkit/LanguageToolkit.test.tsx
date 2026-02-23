@@ -12,7 +12,9 @@ jest.mock('@/components/common/select/Select', () => {
     const MockSelect = ({ children, onValueChange, ...props }: any) => {
         const handleChange = (e: any) => {
             let val: any = e.target.value;
-            try { val = JSON.parse(val); } catch { }
+            try {
+                val = JSON.parse(val);
+            } catch {}
             onValueChange(val);
         };
         return (

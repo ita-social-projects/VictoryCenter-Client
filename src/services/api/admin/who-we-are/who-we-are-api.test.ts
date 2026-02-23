@@ -36,7 +36,12 @@ describe('WhoWeAreApi', () => {
 
     describe('getByType', () => {
         it('should call client.get with the correct URL and section type and return data', async () => {
-            const mockContent = { id: 1, contentType: ContentType.Title, title: 'Text 1', localizations: [] } as unknown as Content;
+            const mockContent = {
+                id: 1,
+                contentType: ContentType.Title,
+                title: 'Text 1',
+                localizations: [],
+            } as unknown as Content;
             const mockData: WhoWeAreSection = {
                 id: 1,
                 title: 'Section 1',

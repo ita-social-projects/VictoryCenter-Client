@@ -9,7 +9,17 @@ import { OurMissionProps } from '@/pages/public/about-us-page/our-mission/OurMis
 import { RichTextInputGroupProps } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
-    RichTextInputGroup: ({ label, onChange, value, maxLength, onBlur, name, id, error, disabled }: RichTextInputGroupProps & { disabled?: boolean }) => (
+    RichTextInputGroup: ({
+        label,
+        onChange,
+        value,
+        maxLength,
+        onBlur,
+        name,
+        id,
+        error,
+        disabled,
+    }: RichTextInputGroupProps & { disabled?: boolean }) => (
         <div>
             <label htmlFor={id}>{label}</label>
             <input
@@ -69,7 +79,8 @@ describe('DescriptionSection', () => {
         ...overrides,
     });
 
-    const renderComponent = (props: Partial<DescriptionSectionProps> = {}) => render(<DescriptionSection {...buildProps(props)} />);
+    const renderComponent = (props: Partial<DescriptionSectionProps> = {}) =>
+        render(<DescriptionSection {...buildProps(props)} />);
 
     beforeEach(() => {
         mockOnChange = jest.fn();
@@ -162,7 +173,9 @@ describe('DescriptionSection', () => {
         fireEvent.change(descriptionInput, { target: { value: 'Attempt edit' } });
         expect(mockOnChange).not.toHaveBeenCalled();
 
-        expect(screen.queryByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).not.toBeInTheDocument();
+        expect(
+            screen.queryByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED }),
+        ).not.toBeInTheDocument();
     });
 
     it('should hide validation error when switching to non-base language', async () => {

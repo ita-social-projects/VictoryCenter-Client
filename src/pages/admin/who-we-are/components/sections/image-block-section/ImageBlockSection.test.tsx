@@ -25,7 +25,15 @@ jest.mock('@/components/admin/image-input/ImageInput', () => ({
 }));
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
-    RichTextInputGroup: ({ label, onChange, value, maxLength, onBlur, id, disabled }: RichTextInputGroupProps & { disabled?: boolean }) => (
+    RichTextInputGroup: ({
+        label,
+        onChange,
+        value,
+        maxLength,
+        onBlur,
+        id,
+        disabled,
+    }: RichTextInputGroupProps & { disabled?: boolean }) => (
         <div>
             <label htmlFor={id}>{label}</label>
             <input
@@ -133,8 +141,24 @@ describe('ImageSection', () => {
 
         const { container: noDescriptionContainer } = renderComponent({
             content: [
-                { id: 1, contentType: ContentType.Image, title: null, description: null, imageId: null, image: null, localizations: [] },
-                { id: 2, contentType: ContentType.Title, title: null, description: null, imageId: null, image: null, localizations: [] },
+                {
+                    id: 1,
+                    contentType: ContentType.Image,
+                    title: null,
+                    description: null,
+                    imageId: null,
+                    image: null,
+                    localizations: [],
+                },
+                {
+                    id: 2,
+                    contentType: ContentType.Title,
+                    title: null,
+                    description: null,
+                    imageId: null,
+                    image: null,
+                    localizations: [],
+                },
             ],
         });
         expect(noDescriptionContainer).toBeEmptyDOMElement();
@@ -194,7 +218,15 @@ describe('ImageSection', () => {
     it('should render correctly without title content', () => {
         renderComponent({
             content: [
-                { id: 1, contentType: ContentType.Image, image: null, title: null, imageId: null, description: null, localizations: [] },
+                {
+                    id: 1,
+                    contentType: ContentType.Image,
+                    image: null,
+                    title: null,
+                    imageId: null,
+                    description: null,
+                    localizations: [],
+                },
                 {
                     id: 3,
                     contentType: ContentType.Description,
@@ -277,8 +309,24 @@ describe('ImageSection', () => {
     it('should validate empty title on blur when title is null', () => {
         renderComponent({
             content: [
-                { id: 1, contentType: ContentType.Image, image: null, title: null, imageId: null, description: null, localizations: [] },
-                { id: 2, contentType: ContentType.Title, title: null, image: null, imageId: null, description: null, localizations: [] },
+                {
+                    id: 1,
+                    contentType: ContentType.Image,
+                    image: null,
+                    title: null,
+                    imageId: null,
+                    description: null,
+                    localizations: [],
+                },
+                {
+                    id: 2,
+                    contentType: ContentType.Title,
+                    title: null,
+                    image: null,
+                    imageId: null,
+                    description: null,
+                    localizations: [],
+                },
                 {
                     id: 3,
                     contentType: ContentType.Description,
@@ -299,7 +347,15 @@ describe('ImageSection', () => {
     it('should validate empty description on blur when description is null', () => {
         renderComponent({
             content: [
-                { id: 1, contentType: ContentType.Image, image: null, title: null, imageId: null, description: null, localizations: [], },
+                {
+                    id: 1,
+                    contentType: ContentType.Image,
+                    image: null,
+                    title: null,
+                    imageId: null,
+                    description: null,
+                    localizations: [],
+                },
                 {
                     id: 2,
                     contentType: ContentType.Title,

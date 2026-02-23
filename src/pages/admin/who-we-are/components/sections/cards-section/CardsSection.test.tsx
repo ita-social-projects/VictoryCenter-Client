@@ -16,30 +16,41 @@ jest.mock('../../card-content/CardContent', () => ({
         imageError,
         setImageError,
         setIsPublishButtonActive,
-    }: CardContentProps) => (
-        <div data-testid={`mock-card-content-${content.id}`}>
-            <textarea
-                data-testid={`mock-textarea-${content.id}`}
-                onChange={(e) => {
-                    onChange({ ...content, description: e.target.value });
-                    onDescriptionValidate(e.target.value);
-                }}
-                onBlur={(e) => onDescriptionValidate(e.currentTarget.value)}
-                value={content.description ?? undefined}
-            />
-            {descriptionError && <span data-testid={`desc-error-${content.id}`}>{descriptionError}</span>}
-            <input
-                data-testid={`mock-image-input-${content.id}`}
-                onChange={(e) => {
-                    const newImage = JSON.parse(e.target.value);
-                    onChange({ ...content, image: newImage });
-                    setIsPublishButtonActive(true);
-                }}
-                onBlur={() => setImageError('test image error')}
-            />
-            {imageError && <span data-testid={`image-error-${content.id}`}>{imageError}</span>}
-        </div>
-    ),
+        language,
+    }: CardContentProps & { language?: any }) => {
+        const disabled = language && language.code !== 'uk';
+        return (
+            <div data-testid={`mock-card-content-${content.id}`}>
+                <textarea
+                    data-testid={`mock-textarea-${content.id}`}
+                    onChange={(e) => {
+                        if (!disabled) {
+                            onChange({ ...content, description: e.target.value });
+                            onDescriptionValidate(e.target.value);
+                            setIsPublishButtonActive(true);
+                        }
+                    }}
+                    onBlur={(e) => !disabled && onDescriptionValidate(e.currentTarget.value)}
+                    value={content.description ?? undefined}
+                    disabled={disabled}
+                />
+                {descriptionError && <span data-testid={`desc-error-${content.id}`}>{descriptionError}</span>}
+                <input
+                    data-testid={`mock-image-input-${content.id}`}
+                    onChange={(e) => {
+                        if (!disabled) {
+                            const newImage = JSON.parse(e.target.value);
+                            onChange({ ...content, image: newImage });
+                            setIsPublishButtonActive(true);
+                        }
+                    }}
+                    onBlur={() => !disabled && setImageError('test image error')}
+                    disabled={disabled}
+                />
+                {imageError && <span data-testid={`image-error-${content.id}`}>{imageError}</span>}
+            </div>
+        );
+    },
 }));
 
 jest.mock('@/validation/admin/who-we-are-schema/WhoWeAreSchema', () => ({
@@ -205,6 +216,20 @@ describe('CardsSection', () => {
 
         fireEvent.click(publishButton);
         expect(mockOnPublish).toHaveBeenCalled();
+    });
+
+    it('should not allow edits when language is not the base locale', () => {
+        renderComponent({ language: { id: 2, code: 'en', name: 'English' } });
+
+        const textarea = screen.getByTestId('mock-textarea-1');
+        expect(textarea).toBeDisabled();
+        fireEvent.change(textarea, { target: { value: 'Attempt' } });
+        expect(mockOnChange).not.toHaveBeenCalled();
+
+        const imageInput = screen.getByTestId('mock-image-input-1');
+        expect(imageInput).toBeDisabled();
+        fireEvent.change(imageInput, { target: { value: JSON.stringify({ id: 99 }) } });
+        expect(mockOnChange).not.toHaveBeenCalled();
     });
 
     it('should keep the publish button disabled if there are any validation errors', async () => {

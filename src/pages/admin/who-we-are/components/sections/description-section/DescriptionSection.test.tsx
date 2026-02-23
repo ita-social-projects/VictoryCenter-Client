@@ -9,17 +9,18 @@ import { OurMissionProps } from '@/pages/public/about-us-page/our-mission/OurMis
 import { RichTextInputGroupProps } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
-    RichTextInputGroup: ({ label, onChange, value, maxLength, onBlur, name, id, error }: RichTextInputGroupProps) => (
+    RichTextInputGroup: ({ label, onChange, value, maxLength, onBlur, name, id, error, disabled }: RichTextInputGroupProps & { disabled?: boolean }) => (
         <div>
             <label htmlFor={id}>{label}</label>
             <input
                 data-testid={`mock-rich-input-${id}`}
-                onChange={(e) => onChange(e.target.value)}
+                onChange={(e) => !disabled && onChange(e.target.value)}
                 value={value}
                 maxLength={maxLength}
                 onBlur={onBlur}
                 name={name}
                 id={id}
+                disabled={disabled}
             />
             {error && <span>{error}</span>}
         </div>
@@ -150,5 +151,17 @@ describe('DescriptionSection', () => {
 
         fireEvent.click(publishButton);
         expect(mockOnPublish).toHaveBeenCalled();
+    });
+
+    it('should not allow editing and should hide publish button for non-base language', () => {
+        renderComponent({ language: { id: 2, code: 'en', name: 'English' } });
+
+        const descriptionInput = screen.getByTestId('mock-rich-input-1');
+        expect(descriptionInput).toBeDisabled();
+
+        fireEvent.change(descriptionInput, { target: { value: 'Attempt edit' } });
+        expect(mockOnChange).not.toHaveBeenCalled();
+
+        expect(screen.queryByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).not.toBeInTheDocument();
     });
 });

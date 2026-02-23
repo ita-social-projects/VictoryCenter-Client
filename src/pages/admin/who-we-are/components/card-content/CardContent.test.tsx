@@ -8,16 +8,17 @@ import { Image } from '@/types/common/image';
 import { RichTextInputGroupProps } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
-    RichTextInputGroup: ({ label, onChange, value, maxLength, onBlur, id, error }: RichTextInputGroupProps) => (
+    RichTextInputGroup: ({ label, onChange, value, maxLength, onBlur, id, error, disabled }: RichTextInputGroupProps & { disabled?: boolean }) => (
         <div>
             <label htmlFor={id}>{label}</label>
             <input
                 data-testid={`mock-rich-input-${id}`}
-                onChange={(e) => onChange(e.target.value)}
+                onChange={(e) => !disabled && onChange(e.target.value)}
                 value={value}
                 maxLength={maxLength}
                 onBlur={onBlur}
                 id={id}
+                disabled={disabled}
             />
             {error && <span>{error}</span>}
         </div>
@@ -25,11 +26,16 @@ jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGr
 }));
 
 jest.mock('@/components/admin/image-input/ImageInput', () => ({
-    ImageInput: ({ onChange, label, setError }: any) => (
+    ImageInput: ({ onChange, label, setError, disabled }: any) => (
         <div data-testid="mock-image-input">
             <label>{label}</label>
-            <input data-testid="mock-image-input-file" type="file" onChange={(e) => onChange(e.target.files?.[0])} />
-            <button onClick={() => setError('image size error')}>Set Error</button>
+            <input
+                data-testid="mock-image-input-file"
+                type="file"
+                disabled={disabled}
+                onChange={(e) => !disabled && onChange(e.target.files?.[0])}
+            />
+            <button onClick={() => !disabled && setError('image size error')}>Set Error</button>
         </div>
     ),
 }));
@@ -170,5 +176,23 @@ describe('CardContent', () => {
 
         const descriptionInput = screen.getByTestId('mock-rich-input-3');
         expect(descriptionInput).toHaveValue('');
+    });
+
+    it('should not allow edits when language is not the base locale', () => {
+        renderComponent({ language: { id: 2, code: 'en', name: 'English' } });
+
+        const descriptionInput = screen.getByTestId('mock-rich-input-1');
+        fireEvent.change(descriptionInput, { target: { value: 'Attempt edit' } });
+
+        expect(mockOnChange).not.toHaveBeenCalled();
+        expect(mockOnDescriptionValidate).not.toHaveBeenCalled();
+
+        const imageInput = screen.getByTestId('mock-image-input-file');
+        expect(imageInput).toBeDisabled();
+
+        const file = new File(['dummy'], 'file.png', { type: 'image/png' });
+        fireEvent.change(imageInput, { target: { files: [file] } });
+
+        expect(mockOnChange).not.toHaveBeenCalledWith(expect.objectContaining({ image: file }));
     });
 });

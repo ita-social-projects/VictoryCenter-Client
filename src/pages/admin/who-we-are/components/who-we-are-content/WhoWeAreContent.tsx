@@ -17,7 +17,6 @@ import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import classNames from 'classnames';
 import { WhoWeArePageToolbar } from '../who-we-are-page-toolbar/WhoWeArePageToolbar';
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
-import { mapEntityWithLocalizations } from '@/utils/functions/mappers/common/localization/localization-mappers';
 
 interface ErrorState {
     message: string | null;
@@ -152,6 +151,16 @@ export const WhoWeAreContent = () => {
         return { message: null, type: null };
     }, [categoryError, sectionError, languagesError]);
 
+    const setErrorState = useCallback((message: string, type: 'categories' | 'entity' | 'languages') => {
+        if (type === 'languages') {
+            setLanguagesError(message);
+        }
+    }, []);
+
+    const { allLanguages, selectedLanguage, onLanguageChange, retryFetchLanguages } = useLocalizationToolkit({
+        setErrorState,
+    });
+
     const handleRetry = useCallback(() => {
         if (error.type === 'categories') {
             refetchCategories();
@@ -160,23 +169,7 @@ export const WhoWeAreContent = () => {
         } else if (error.type === 'languages') {
             retryFetchLanguages();
         }
-    }, [error.type, refetchCategories, refetchSection]);
-
-    const setErrorState = useCallback((message: string, type: 'categories' | 'entity' | 'languages') => {
-        if (type === 'languages') {
-            setLanguagesError(message);
-        }
-    }, []);
-
-    const {
-        allLanguages,
-        translationLanguages,
-        selectedLanguage,
-        onLanguageChange,
-        translationStatusFilter,
-        onTranslationStatusFilterChange,
-        retryFetchLanguages,
-    } = useLocalizationToolkit({ setErrorState });
+    }, [error.type, refetchCategories, refetchSection, retryFetchLanguages]);
 
     const isLoading = isCategoriesLoading || isSectionLoading;
     const isPending = isLoading || !!error.message;
@@ -219,11 +212,7 @@ export const WhoWeAreContent = () => {
         <>
             <div className="who-we-are-page-container">
                 <div className="who-we-are-toolbar-container">
-                    <WhoWeArePageToolbar
-                        languages={allLanguages}
-                        onLanguageChange={onLanguageChange}
-                        onTranslationStatusFilterChange={onTranslationStatusFilterChange}
-                    />
+                    <WhoWeArePageToolbar languages={allLanguages} onLanguageChange={onLanguageChange} />
                 </div>
                 <div className={classNames('who-we-are-main-box', { 'who-we-are-main-box--pending': isPending })}>
                     <CategoryBar<WhoWeAreCategory>

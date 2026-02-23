@@ -34,6 +34,14 @@ jest.mock('@/components/common/select/Select', () => {
     return { Select: MockSelect };
 });
 
+jest.mock('@/components/admin/language-toolkit/LanguageToolkit', () => ({
+    LanguageToolkit: ({ onLanguageChange, languages }: any) => (
+        <div data-testid="mock-language-toolkit">
+            Mock Language Toolkit
+        </div>
+    ),
+}));
+
 const mockLanguages = [
     { id: 1, code: DEFAULT_LOCALE, name: 'Українська' },
     { id: 2, code: 'en', name: 'Англійська' },
@@ -57,9 +65,10 @@ describe('LocalizationToolkit', () => {
         );
 
         expect(screen.getByTestId('localization-toolkit')).toBeInTheDocument();
+        expect(screen.getByTestId('mock-language-toolkit')).toBeInTheDocument();
     });
 
-    it('automatically selects default language and "All" status on mount', () => {
+    it('automatically selects "All" status on mount', () => {
         render(
             <LocalizationToolkit
                 languages={mockLanguages}
@@ -68,24 +77,7 @@ describe('LocalizationToolkit', () => {
             />,
         );
 
-        const expectedDefault = mockLanguages.find((l) => l.code === DEFAULT_LOCALE) || mockLanguages[0];
-
-        expect(mockOnLanguageChange).toHaveBeenCalledWith(expectedDefault);
         expect(mockOnTranslationStatusChange).toHaveBeenCalledWith(TranslationStatusFilter.All);
-    });
-
-    it('renders all language options', () => {
-        render(
-            <LocalizationToolkit
-                languages={mockLanguages}
-                onLanguageChange={mockOnLanguageChange}
-                onTranslationStatusFilterChange={mockOnTranslationStatusChange}
-            />,
-        );
-
-        mockLanguages.forEach((lang) => {
-            expect(screen.getByText(lang.name)).toBeInTheDocument();
-        });
     });
 
     it('renders all translation status options', () => {
@@ -102,25 +94,6 @@ describe('LocalizationToolkit', () => {
         });
     });
 
-    it('calls onLanguageChange when language is changed', () => {
-        render(
-            <LocalizationToolkit
-                languages={mockLanguages}
-                onLanguageChange={mockOnLanguageChange}
-                onTranslationStatusFilterChange={mockOnTranslationStatusChange}
-            />,
-        );
-
-        const selects = screen.getAllByRole('combobox');
-        const languageSelect = selects[0];
-
-        fireEvent.change(languageSelect, {
-            target: { value: JSON.stringify(mockLanguages[1]) },
-        });
-
-        expect(mockOnLanguageChange).toHaveBeenCalledWith(mockLanguages[1]);
-    });
-
     it('calls onTranslationStatusFilterChange when status is changed', () => {
         render(
             <LocalizationToolkit
@@ -130,8 +103,7 @@ describe('LocalizationToolkit', () => {
             />,
         );
 
-        const selects = screen.getAllByRole('combobox');
-        const statusSelect = selects[1];
+        const statusSelect = screen.getByRole('combobox');
 
         const firstStatusLabel = Object.values(LOCALIZATION_TEXT.FILTER.STATUS)[0];
         const expectedValue = mapLabelToTranslationStatusFilter(firstStatusLabel);

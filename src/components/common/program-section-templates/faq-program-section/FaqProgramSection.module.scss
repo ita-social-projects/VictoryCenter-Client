@@ -10,11 +10,12 @@
     justify-content: center;
     align-items: center;
     width: clamp(100px, 1200px, 1200px);
-    height: 500px;
+    min-height: 300px;
     background-color: c.$white;
     padding: 0 60px;
 
     &.template {
+        height: 500px;
         overflow: hidden;
         padding: 0 5%;
     }
@@ -32,6 +33,7 @@
     display: flex;
     justify-content: space-between;
     border-top: 2px solid c.$blue-100;
+    padding-top: 24px;
     gap: 10px;
 
     .template & {
@@ -126,5 +128,6 @@
 
 .faq-card-program-section {
     border-bottom-color: c.$blue-100;
-    width: clamp(100px, 48rem, 100%);
+    width: 100%;
+    max-width: 48rem;
 }

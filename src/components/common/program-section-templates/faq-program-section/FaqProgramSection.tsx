@@ -119,6 +119,16 @@ export const FaqProgramSection = ({
         setNewAnswerError(undefined);
     }, [onAddFaqPair, newQuestion, newAnswer]);
 
+    const viewQuestions: PublishedFaqQuestion[] = useMemo(() => {
+        if (questions.length > 0) return questions;
+
+        return faqPairs.map((pair, index) => ({
+            id: pair.id ?? -(index + 1),
+            questionText: pair.questionText,
+            answerText: pair.answerText,
+        }));
+    }, [questions, faqPairs]);
+
     const rootClassName = cn(styles['faq-section'], {
         [styles['template']]: isTemplate,
         [styles['editable']]: isEditable,
@@ -169,7 +179,7 @@ export const FaqProgramSection = ({
                                 onChange={handleNewQuestionChange}
                                 onBlur={handleNewQuestionBlur}
                                 maxLength={FAQ_VALIDATION.question.max}
-                                rows={1}
+                                rows={2}
                                 currentLength={getTrimmedInputText(newQuestion).length}
                                 error={newQuestionError}
                             />
@@ -211,7 +221,7 @@ export const FaqProgramSection = ({
             <div className={styles['faq-block']}>
                 <h2 className={styles['title']}>{displayTitle}</h2>
                 <div className={styles['questions-container']}>
-                    {questions.map((faq, index) => (
+                    {viewQuestions.map((faq, index) => (
                         <FaqCard key={faq.id || index} faq={faq} className={styles['faq-card-program-section']} />
                     ))}
                 </div>

@@ -42,11 +42,14 @@ export const DetailedProgramSection: React.FC<DetailedProgramSectionProps> = ({ 
         description: orderedDescriptionContents[i]?.description || '',
     }));
 
+    const descriptions = orderedDescriptionContents.map((d) => d.description || '');
+
     const renderedSection = renderProgramSection({
         templateId: section.template,
         data: {
             title: titleContent?.title || '',
             description: descriptionContent?.description || '',
+            descriptions,
             images: imageContents,
             cards,
             descriptionAuthorPairs,

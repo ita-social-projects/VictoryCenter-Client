@@ -50,6 +50,7 @@ describe('DetailedProgramSection', () => {
             data: {
                 title: 'Test Title',
                 description: 'Test Description',
+                descriptions: ['Test Description'],
                 images: [],
                 cards: [{ title: 'Test Title', description: 'Test Description' }],
                 descriptionAuthorPairs: [],
@@ -83,6 +84,7 @@ describe('DetailedProgramSection', () => {
             data: {
                 title: '',
                 description: 'Test Description',
+                descriptions: ['Test Description'],
                 images: [],
                 cards: [],
                 descriptionAuthorPairs: [],
@@ -115,6 +117,7 @@ describe('DetailedProgramSection', () => {
             data: {
                 title: 'Test Title',
                 description: '',
+                descriptions: [],
                 images: [],
                 cards: [{ title: 'Test Title', description: '' }],
                 descriptionAuthorPairs: [],
@@ -172,6 +175,7 @@ describe('DetailedProgramSection', () => {
             data: {
                 title: 'Title',
                 description: 'Desc',
+                descriptions: ['Desc'],
                 images: [
                     { id: 11, url: 'img1.jpg', mimeType: 'image/jpeg' },
                     { id: 12, url: 'img2.jpg', mimeType: 'image/jpeg' },
@@ -210,6 +214,7 @@ describe('DetailedProgramSection', () => {
             data: {
                 title: 'Title',
                 description: 'Desc',
+                descriptions: ['Desc'],
                 images: [null],
                 cards: [{ title: 'Title', description: 'Desc' }],
                 descriptionAuthorPairs: [],
@@ -233,6 +238,7 @@ describe('DetailedProgramSection', () => {
             data: {
                 title: '',
                 description: '',
+                descriptions: [],
                 images: [],
                 cards: [],
                 descriptionAuthorPairs: [],
@@ -304,6 +310,7 @@ describe('DetailedProgramSection', () => {
             data: {
                 title: '',
                 description: 'Desc 2',
+                descriptions: ['', 'Desc 2', 'Ignored no group'],
                 images: [],
                 cards: [],
                 descriptionAuthorPairs: [

@@ -247,6 +247,79 @@ describe('DetailedProgramSection', () => {
         });
     });
 
+    it('extracts description-author pairs by group index and passes them sorted', () => {
+        const section: ProgramSection = {
+            id: 1,
+            template: ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
+            contents: [
+                {
+                    id: 1,
+                    contentType: ContentType.Description,
+                    description: 'Desc 2',
+                    order: 5,
+                    groupIndex: 2,
+                    title: null,
+                    image: null,
+                },
+                {
+                    id: 2,
+                    contentType: ContentType.Author,
+                    author: 'Author 2',
+                    order: 6,
+                    groupIndex: 2,
+                    title: null,
+                    description: null,
+                    image: null,
+                },
+                {
+                    id: 3,
+                    contentType: ContentType.Author,
+                    author: 'Author 1',
+                    order: 3,
+                    groupIndex: 1,
+                    title: null,
+                    description: null,
+                    image: null,
+                },
+                {
+                    id: 4,
+                    contentType: ContentType.Description,
+                    description: null,
+                    order: 2,
+                    groupIndex: 1,
+                    title: null,
+                    image: null,
+                },
+                {
+                    id: 5,
+                    contentType: ContentType.Description,
+                    description: 'Ignored no group',
+                    order: 7,
+                    groupIndex: null,
+                    title: null,
+                    image: null,
+                },
+            ],
+            order: 0,
+        };
+
+        render(<DetailedProgramSection section={section} />);
+
+        expect(mockRenderProgramSection).toHaveBeenCalledWith({
+            templateId: ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
+            data: {
+                title: '',
+                description: 'Desc 2',
+                images: [],
+                descriptionAuthorPairs: [
+                    { description: '', author: 'Author 1' },
+                    { description: 'Desc 2', author: 'Author 2' },
+                ],
+            },
+            mode: ProgramSectionMode.View,
+        });
+    });
+
     it('always passes Published mode to renderProgramSection', () => {
         const section: ProgramSection = {
             id: 1,

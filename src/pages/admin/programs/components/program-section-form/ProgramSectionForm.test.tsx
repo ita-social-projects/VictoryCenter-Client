@@ -460,7 +460,7 @@ describe('ProgramSectionForm', () => {
             expect(onSectionChange).not.toHaveBeenCalled();
         });
 
-        it('adds a pair (groupIndex is pairs.length) and schedules focus on next textarea id', () => {
+        it('adds a pair after normalizing grouped indexes and schedules focus on next textarea id', () => {
             jest.useFakeTimers();
 
             const section = makePairsSection([
@@ -498,6 +498,23 @@ describe('ProgramSectionForm', () => {
             expect((newDesc as any)?.description).toBe('');
             expect(newAuth?.groupIndex).toBe(2);
             expect((newAuth as any)?.author).toBe('');
+
+            const descGroups = updated.contents
+                .filter((c: any) => c.contentType === ContentType.Description)
+                .map((c: any) => c.groupIndex)
+                .filter((g: any) => g !== null && g !== undefined)
+                .sort((a: number, b: number) => a - b);
+
+            const authorGroups = updated.contents
+                .filter((c: any) => c.contentType === ContentType.Author)
+                .map((c: any) => c.groupIndex)
+                .filter((g: any) => g !== null && g !== undefined)
+                .sort((a: number, b: number) => a - b);
+
+            expect(descGroups).toEqual([0, 1, 2]);
+            expect(authorGroups).toEqual([0, 1, 2]);
+            expect((getContentByGroupAndType(updated, 1, ContentType.Description) as any)?.description).toBe('D2');
+            expect((getContentByGroupAndType(updated, 1, ContentType.Author) as any)?.author).toBe('A2');
 
             expect(focusMock).toHaveBeenCalledTimes(1);
 

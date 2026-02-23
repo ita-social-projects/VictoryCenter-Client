@@ -7,7 +7,7 @@ import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/progr
 import { ContentType } from '@/types/common/programs';
 import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
 import baseStyles from './SingleTitleQuintupleDescription.module.scss';
-import previewStyles from './SingleTitleQuintupleDescription-preview.module.scss';
+import viewStyles from './ViewSingleTitleQuintupleDescription.module.scss';
 import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
 
 export interface SingleTitleQuintupleDescriptionProps {
@@ -29,7 +29,7 @@ const TEMPLATE = ProgramSectionTemplate.SingleTitleQuintupleDescription;
 export const SingleTitleQuintupleDescription = ({
     title = '',
     descriptions = [],
-    mode = ProgramSectionMode.Published,
+    mode = ProgramSectionMode.View,
     onTitleChange,
     onDescriptionsChange,
     className,
@@ -46,7 +46,7 @@ export const SingleTitleQuintupleDescription = ({
     );
 
     const descriptionOrder = useMemo(() => {
-        if (mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View) {
+        if (mode === ProgramSectionMode.Edit) {
             return DESCRIPTION_LAYOUT.editable;
         }
 
@@ -57,7 +57,7 @@ export const SingleTitleQuintupleDescription = ({
         baseStyles.container,
         {
             [baseStyles.template]: mode === ProgramSectionMode.Template,
-            [baseStyles.editable]: mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View,
+            [baseStyles.editable]: mode === ProgramSectionMode.Edit,
         },
         className,
     );
@@ -102,7 +102,7 @@ export const SingleTitleQuintupleDescription = ({
 
     return (
         <div className={rootClassName}>
-            {mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View ? (
+            {mode === ProgramSectionMode.Edit ? (
                 <div className={baseStyles['editable-grid']}>
                     <div className={baseStyles['title-cell']}>
                         <InputWithCharacterLimitGroup
@@ -138,15 +138,27 @@ export const SingleTitleQuintupleDescription = ({
                         </div>
                     ))}
                 </div>
-            ) : (
-                <div className={previewStyles['preview-layout']}>
-                    <div className={previewStyles['preview-title-block']}>
-                        <h2 className={previewStyles['preview-title-text']}>{title}</h2>
+            ) : mode === ProgramSectionMode.Template ? (
+                <div className={baseStyles['template-layout']}>
+                    <div className={baseStyles['template-title-block']}>
+                        <h2 className={baseStyles['template-title-text']}>{title}</h2>
                     </div>
 
                     {descriptionOrder.map((index) => (
-                        <div key={index} className={cn(previewStyles['preview-card'], previewStyles[`card-${index}`])}>
-                            <p className={previewStyles['preview-text']}>{normalizedDescriptions[index]}</p>
+                        <div key={index} className={cn(baseStyles['template-card'], baseStyles[`card-${index}`])}>
+                            <p className={baseStyles['template-text']}>{normalizedDescriptions[index]}</p>
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <div className={viewStyles['view-layout']}>
+                    <div className={viewStyles['view-title-block']}>
+                        <h2 className={viewStyles['view-title-text']}>{title}</h2>
+                    </div>
+
+                    {descriptionOrder.map((index) => (
+                        <div key={index} className={cn(viewStyles['view-card'], viewStyles[`card-${index}`])}>
+                            <p className={viewStyles['view-text']}>{normalizedDescriptions[index]}</p>
                         </div>
                     ))}
                 </div>

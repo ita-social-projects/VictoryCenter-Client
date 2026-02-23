@@ -39,7 +39,8 @@ jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
 jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
     InputWithCharacterLimitGroup: ({ value, onChange, onBlur, id, error }: any) => (
         <div>
-            <input data-testid={`input-${id}`} value={value} onChange={onChange} onBlur={onBlur} />
+            <label htmlFor={`input-${id}`}>{id}</label>
+            <input id={`input-${id}`} data-testid={`input-${id}`} value={value} onChange={onChange} onBlur={onBlur} />
             <div data-testid={`error-${id}`}>{error ?? ''}</div>
         </div>
     ),
@@ -136,7 +137,7 @@ const renderComponent = (overrideProps: Partial<ComponentProps> = {}) => {
     const defaultProps: ComponentProps = {
         title: '',
         pairs: [],
-        mode: ProgramSectionMode.Published,
+        mode: ProgramSectionMode.View,
         canAddPair: true,
     };
 
@@ -158,7 +159,7 @@ const openDeleteModal = async (index: number) => {
 };
 
 describe('SingleTitleDescriptionAuthorPairs', () => {
-    it('renders h2 title in published mode and uses default carousel variant', () => {
+    it('renders h2 title in view mode and uses default carousel variant', () => {
         const { root } = renderComponent({
             title: 'Hello',
             pairs: pairs(pair('D0', 'A0')),
@@ -194,8 +195,8 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
         expect(root).not.toHaveClass('template');
     });
 
-    it('does not render title input in published mode', () => {
-        renderComponent({ mode: ProgramSectionMode.Published, title: 'X' });
+    it('does not render title input in View mode', () => {
+        renderComponent({ mode: ProgramSectionMode.View, title: 'X' });
 
         expect(screen.queryByTestId('input-single-title-description-author-pairs-title')).not.toBeInTheDocument();
         expect(getValidateContentTextMock().mock.calls.length).toBe(0);
@@ -269,7 +270,7 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
     });
 
     it('renders add button only in edit mode and respects canAddPair', () => {
-        const view = renderComponent({ mode: ProgramSectionMode.Published });
+        const view = renderComponent({ mode: ProgramSectionMode.View });
         expect(screen.queryByRole('button', { name: 'Add card' })).not.toBeInTheDocument();
         view.unmount();
 
@@ -317,7 +318,7 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
 
         {
             const view = renderComponent({
-                mode: ProgramSectionMode.Published,
+                mode: ProgramSectionMode.View,
                 pairs: pairs(pair('D0', 'A0'), pair('D1', 'A1')),
                 onDeletePair,
             });

@@ -39,7 +39,7 @@ const TEMPLATE = ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs;
 export const SingleTitleDescriptionAuthorPairs = ({
     title = '',
     pairs = [],
-    mode = ProgramSectionMode.Published,
+    mode = ProgramSectionMode.View,
     onTitleChange,
     onPairDescriptionChange,
     onPairAuthorChange,

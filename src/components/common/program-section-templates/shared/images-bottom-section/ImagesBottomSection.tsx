@@ -4,7 +4,7 @@ import { TitleDescriptionSection } from '../title-description-section/TitleDescr
 import { ImageValues, Image } from '@/types/common/image';
 import baseStyles from './ImagesBottomSection.module.scss';
 import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
-import { PublishedImagesBottomSection } from './PublishedImagesBottomSection';
+import { ViewImagesBottomSection } from './ViewImagesBottomSection';
 import { EditableImagesBottomSection } from './EditableImagesBottomSection';
 
 export interface ImageConfig {
@@ -57,7 +57,7 @@ export const ImagesBottomSection = ({
     images,
     imageHandlers,
     config,
-    mode = ProgramSectionMode.Published,
+    mode = ProgramSectionMode.View,
     onTitleChange,
     onDescriptionChange,
     validationResetKey,
@@ -94,8 +94,7 @@ export const ImagesBottomSection = ({
             className={cn(
                 baseStyles.container,
                 {
-                    [baseStyles['form-container']]:
-                        mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View,
+                    [baseStyles['form-container']]: mode === ProgramSectionMode.Edit,
                 },
                 className,
             )}
@@ -112,9 +111,8 @@ export const ImagesBottomSection = ({
                 onDescriptionChange={onDescriptionChange}
                 validationResetKey={validationResetKey}
             />
-
-            {mode === ProgramSectionMode.Published ? (
-                <PublishedImagesBottomSection
+            {mode === ProgramSectionMode.View ? (
+                <ViewImagesBottomSection
                     images={displayedImages}
                     config={config}
                     bottomSectionClassName={bottomSectionClassName}

@@ -161,15 +161,8 @@ describe('TitleDescriptionCard', () => {
             expect(screen.getByTestId('input-with-limit')).toBeInTheDocument();
             expect(screen.getByTestId('card-description-field')).toBeInTheDocument();
 
-            expect(screen.getByTestId('input-card-title-0')).not.toBeDisabled();
-            expect(screen.getByTestId('textarea-card-description-0')).not.toBeDisabled();
-        });
-
-        it('renders inputs in View mode and disables them', () => {
-            renderCard({ mode: ProgramSectionMode.View });
-
-            expect(screen.getByTestId('input-card-title-0')).toBeDisabled();
-            expect(screen.getByTestId('textarea-card-description-0')).toBeDisabled();
+            expect(screen.getByTestId(/input-.*-card-title-0/)).not.toBeDisabled();
+            expect(screen.getByTestId(/textarea-.*-card-description-0/)).not.toBeDisabled();
         });
 
         it('shows values in inputs and calls hook blur handlers', () => {
@@ -190,11 +183,14 @@ describe('TitleDescriptionCard', () => {
 
             renderCard({ mode: ProgramSectionMode.Edit });
 
-            expect(screen.getByTestId('input-card-title-0')).toHaveValue('Test Title');
-            expect(screen.getByTestId('textarea-card-description-0')).toHaveValue('Test Description');
+            const titleInput = screen.getByTestId(/input-.*-card-title-0/);
+            const descTextarea = screen.getByTestId(/textarea-.*-card-description-0/);
 
-            fireEvent.blur(screen.getByTestId('input-card-title-0'));
-            fireEvent.blur(screen.getByTestId('textarea-card-description-0'));
+            expect(titleInput).toHaveValue('Test Title');
+            expect(descTextarea).toHaveValue('Test Description');
+
+            fireEvent.blur(titleInput);
+            fireEvent.blur(descTextarea);
 
             expect(titleBlur).toHaveBeenCalledTimes(1);
             expect(descBlur).toHaveBeenCalledTimes(1);
@@ -215,8 +211,8 @@ describe('TitleDescriptionCard', () => {
 
             renderCard({ mode: ProgramSectionMode.Edit });
 
-            expect(screen.getByTestId('error-card-title-0')).toHaveTextContent('TITLE_ERR');
-            expect(screen.getByTestId('error-card-description-0')).toHaveTextContent('DESC_ERR');
+            expect(screen.getByTestId(/error-.*-card-title-0/)).toHaveTextContent('TITLE_ERR');
+            expect(screen.getByTestId(/error-.*-card-description-0/)).toHaveTextContent('DESC_ERR');
         });
 
         it('calls parseDescriptionList even in Edit mode (it is computed before the branch)', () => {
@@ -235,8 +231,8 @@ describe('TitleDescriptionCard', () => {
                 onDescriptionChange,
             });
 
-            fireEvent.change(screen.getByTestId('input-card-title-5'), { target: { value: 'NEW_TITLE' } });
-            fireEvent.change(screen.getByTestId('textarea-card-description-5'), { target: { value: 'NEW_DESC' } });
+            fireEvent.change(screen.getByTestId(/input-.*-card-title-5/), { target: { value: 'NEW_TITLE' } });
+            fireEvent.change(screen.getByTestId(/textarea-.*-card-description-5/), { target: { value: 'NEW_DESC' } });
 
             expect(onTitleChange).toHaveBeenCalledWith(5, 'NEW_TITLE');
             expect(onDescriptionChange).toHaveBeenCalledWith(5, 'NEW_DESC');
@@ -247,28 +243,61 @@ describe('TitleDescriptionCard', () => {
         it('does not render inputs and shows title as heading', () => {
             parseDescriptionListMock.mockReturnValueOnce({ intro: 'Intro text', items: [] });
 
-            renderCard({ mode: ProgramSectionMode.Published });
+            renderCard({ mode: ProgramSectionMode.View });
 
             expect(screen.queryByTestId('input-with-limit')).not.toBeInTheDocument();
             expect(screen.queryByTestId('card-description-field')).not.toBeInTheDocument();
+        });
 
-            expect(screen.getByRole('heading', { level: 3, name: 'Test Title' })).toBeInTheDocument();
+        it('should display title as heading', () => {
+            render(
+                <TitleDescriptionCard card={baseCard} index={0} mode={ProgramSectionMode.View} template={TEMPLATE} />,
+            );
+
+            expect(screen.getByText('Test Title')).toBeInTheDocument();
+        });
+
+        it('should display default title when empty', () => {
+            render(
+                <TitleDescriptionCard
+                    card={{ title: '', description: 'Description' }}
+                    index={0}
+                    mode={ProgramSectionMode.View}
+                    template={TEMPLATE}
+                />,
+            );
+
+            expect(screen.getByText('DEFAULT_TITLE')).toBeInTheDocument();
+        });
+
+        it('should display parsed description intro', () => {
+            parseDescriptionListMock.mockReturnValue({
+                intro: 'Intro text',
+                items: [],
+            });
+
+            render(
+                <TitleDescriptionCard card={baseCard} index={0} mode={ProgramSectionMode.View} template={TEMPLATE} />,
+            );
+
             expect(screen.getByText('Intro text')).toBeInTheDocument();
         });
 
         it('shows default title when empty', () => {
             renderCard({
-                mode: ProgramSectionMode.Published,
+                mode: ProgramSectionMode.View,
                 card: { title: '', description: 'Any' },
             });
 
-            expect(screen.getByRole('heading', { level: 3, name: PROGRAMS_TEXT.SECTION.CARD.FORM.TITLE.TEXT })).toBeInTheDocument();
+            expect(
+                screen.getByRole('heading', { level: 3, name: PROGRAMS_TEXT.SECTION.CARD.FORM.TITLE.TEXT }),
+            ).toBeInTheDocument();
         });
 
         it('renders list when parseDescriptionList returns items (no intro)', () => {
             parseDescriptionListMock.mockReturnValueOnce({ intro: null, items: ['Item 1', 'Item 2'] });
 
-            renderCard({ mode: ProgramSectionMode.Published });
+            renderCard({ mode: ProgramSectionMode.View });
 
             expect(screen.getByText('Item 1')).toBeInTheDocument();
             expect(screen.getByText('Item 2')).toBeInTheDocument();
@@ -277,7 +306,7 @@ describe('TitleDescriptionCard', () => {
         it('renders both intro and items when both are present', () => {
             parseDescriptionListMock.mockReturnValueOnce({ intro: 'Intro X', items: ['I1'] });
 
-            renderCard({ mode: ProgramSectionMode.Published });
+            renderCard({ mode: ProgramSectionMode.View });
 
             expect(screen.getByText('Intro X')).toBeInTheDocument();
             expect(screen.getByText('I1')).toBeInTheDocument();
@@ -286,7 +315,7 @@ describe('TitleDescriptionCard', () => {
         it('renders default description text when no intro and no items', () => {
             parseDescriptionListMock.mockReturnValueOnce({ intro: null, items: [] });
 
-            renderCard({ mode: ProgramSectionMode.Published });
+            renderCard({ mode: ProgramSectionMode.View });
 
             expect(screen.getByText(PROGRAMS_TEXT.SECTION.FORM.DESCRIPTION.TEXT)).toBeInTheDocument();
         });

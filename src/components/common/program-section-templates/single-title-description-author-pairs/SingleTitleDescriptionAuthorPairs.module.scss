@@ -20,6 +20,10 @@
     --carousel-max-width: calc(
         (var(--pair-card-width) * 3) + (var(--gap) * 3) + (var(--pair-card-width) * var(--peek))
     );
+
+    @media (min-width: 560px) {
+        padding: 64px 0px 64px 64px;
+    }
 }
 
 .template {

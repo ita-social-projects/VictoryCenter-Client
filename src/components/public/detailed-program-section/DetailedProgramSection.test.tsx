@@ -50,10 +50,12 @@ describe('DetailedProgramSection', () => {
             data: {
                 title: 'Test Title',
                 description: 'Test Description',
+                descriptions: ['Test Description'],
                 images: [],
+                cards: [{ title: 'Test Title', description: 'Test Description' }],
                 descriptionAuthorPairs: [],
             },
-            mode: ProgramSectionMode.Published,
+            mode: ProgramSectionMode.View,
         });
         expect(screen.getByTestId('rendered-section')).toBeInTheDocument();
     });
@@ -82,10 +84,12 @@ describe('DetailedProgramSection', () => {
             data: {
                 title: '',
                 description: 'Test Description',
+                descriptions: ['Test Description'],
                 images: [],
+                cards: [],
                 descriptionAuthorPairs: [],
             },
-            mode: ProgramSectionMode.Published,
+            mode: ProgramSectionMode.View,
         });
     });
 
@@ -113,10 +117,12 @@ describe('DetailedProgramSection', () => {
             data: {
                 title: 'Test Title',
                 description: '',
+                descriptions: [],
                 images: [],
+                cards: [{ title: 'Test Title', description: '' }],
                 descriptionAuthorPairs: [],
             },
-            mode: ProgramSectionMode.Published,
+            mode: ProgramSectionMode.View,
         });
     });
 
@@ -169,14 +175,16 @@ describe('DetailedProgramSection', () => {
             data: {
                 title: 'Title',
                 description: 'Desc',
+                descriptions: ['Desc'],
                 images: [
                     { id: 11, url: 'img1.jpg', mimeType: 'image/jpeg' },
                     { id: 12, url: 'img2.jpg', mimeType: 'image/jpeg' },
                     { id: 10, url: 'img3.jpg', mimeType: 'image/jpeg' },
                 ],
+                cards: [{ title: 'Title', description: 'Desc' }],
                 descriptionAuthorPairs: [],
             },
-            mode: ProgramSectionMode.Published,
+            mode: ProgramSectionMode.View,
         });
     });
 
@@ -206,10 +214,12 @@ describe('DetailedProgramSection', () => {
             data: {
                 title: 'Title',
                 description: 'Desc',
+                descriptions: ['Desc'],
                 images: [null],
+                cards: [{ title: 'Title', description: 'Desc' }],
                 descriptionAuthorPairs: [],
             },
-            mode: ProgramSectionMode.Published,
+            mode: ProgramSectionMode.View,
         });
     });
 
@@ -228,10 +238,12 @@ describe('DetailedProgramSection', () => {
             data: {
                 title: '',
                 description: '',
+                descriptions: [],
                 images: [],
+                cards: [],
                 descriptionAuthorPairs: [],
             },
-            mode: ProgramSectionMode.Published,
+            mode: ProgramSectionMode.View,
         });
     });
 
@@ -298,13 +310,15 @@ describe('DetailedProgramSection', () => {
             data: {
                 title: '',
                 description: 'Desc 2',
+                descriptions: ['', 'Desc 2', 'Ignored no group'],
                 images: [],
+                cards: [],
                 descriptionAuthorPairs: [
                     { description: '', author: 'Author 1' },
                     { description: 'Desc 2', author: 'Author 2' },
                 ],
             },
-            mode: ProgramSectionMode.Published,
+            mode: ProgramSectionMode.View,
         });
     });
 
@@ -319,6 +333,6 @@ describe('DetailedProgramSection', () => {
         render(<DetailedProgramSection section={section} />);
 
         const callArgs = mockRenderProgramSection.mock.calls[0][0];
-        expect(callArgs.mode).toBe(ProgramSectionMode.Published);
+        expect(callArgs.mode).toBe(ProgramSectionMode.View);
     });
 });

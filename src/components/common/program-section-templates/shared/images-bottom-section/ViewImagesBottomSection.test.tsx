@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { PublishedImagesBottomSection } from './PublishedImagesBottomSection';
+import { ViewImagesBottomSection } from './ViewImagesBottomSection';
 import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 
 const mockSwiper = jest.fn();
@@ -25,7 +25,7 @@ jest.mock('@/utils/functions/image-helper/image-helper', () => ({
     getImageSrc: jest.fn(),
 }));
 
-jest.mock('./PublishedImagesBottomSection.module.scss', () => ({
+jest.mock('./ViewImagesBottomSection.module.scss', () => ({
     'bottom-section': 'bottom-section',
     'image-wrapper': 'image-wrapper',
     image: 'image',
@@ -38,17 +38,17 @@ jest.mock('./ImagesBottomSwiper.module.scss', () => ({
     right: 'right',
 }));
 
-describe('PublishedImagesBottomSection', () => {
+describe('ViewImagesBottomSection', () => {
     const config = {
         elevatedIndices: [1],
         swiperBreakpoints: { 320: { slidesPerView: 1 } },
     } as any;
 
-    const renderComponent = (override: Partial<React.ComponentProps<typeof PublishedImagesBottomSection>> = {}) => {
+    const renderComponent = (override: Partial<React.ComponentProps<typeof ViewImagesBottomSection>> = {}) => {
         mockSwiper.mockClear();
         (getImageSrc as jest.Mock).mockClear();
 
-        const props: React.ComponentProps<typeof PublishedImagesBottomSection> = {
+        const props: React.ComponentProps<typeof ViewImagesBottomSection> = {
             images: [],
             config,
             bottomSectionClassName: '',
@@ -57,7 +57,7 @@ describe('PublishedImagesBottomSection', () => {
             ...override,
         };
 
-        return render(<PublishedImagesBottomSection {...props} />);
+        return render(<ViewImagesBottomSection {...props} />);
     };
 
     const getSwiperProps = () => mockSwiper.mock.calls[0]?.[0];

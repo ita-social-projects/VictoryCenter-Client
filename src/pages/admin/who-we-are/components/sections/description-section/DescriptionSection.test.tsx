@@ -48,28 +48,28 @@ describe('DescriptionSection', () => {
     const descriptionLimit = 500;
     const initialDescription = 'This is an initial test description.';
 
-    const renderComponent = (props: Partial<DescriptionSectionProps> = {}) => {
-        const defaultProps: DescriptionSectionProps = {
-            content: [
-                {
-                    id: 1,
-                    contentType: ContentType.Description,
-                    description: initialDescription,
-                    image: null,
-                    imageId: null,
-                    title: null,
-                    localizations: [],
-                },
-            ],
-            descriptionLimit,
-            onChange: mockOnChange,
-            onPublish: mockOnPublish,
-            isPublishButtonActive: false,
-            setIsPublishButtonActive: mockSetIsPublishButtonActive,
-            language: { id: 1, code: 'uk', name: 'Ukrainian' },
-        };
-        return render(<DescriptionSection {...defaultProps} {...props} />);
-    };
+    const buildProps = (overrides: Partial<DescriptionSectionProps> = {}): DescriptionSectionProps => ({
+        content: [
+            {
+                id: 1,
+                contentType: ContentType.Description,
+                description: initialDescription,
+                image: null,
+                imageId: null,
+                title: null,
+                localizations: [],
+            },
+        ],
+        descriptionLimit,
+        onChange: mockOnChange,
+        onPublish: mockOnPublish,
+        isPublishButtonActive: false,
+        setIsPublishButtonActive: mockSetIsPublishButtonActive,
+        language: { id: 1, code: 'uk', name: 'Ukrainian' },
+        ...overrides,
+    });
+
+    const renderComponent = (props: Partial<DescriptionSectionProps> = {}) => render(<DescriptionSection {...buildProps(props)} />);
 
     beforeEach(() => {
         mockOnChange = jest.fn();
@@ -163,5 +163,23 @@ describe('DescriptionSection', () => {
         expect(mockOnChange).not.toHaveBeenCalled();
 
         expect(screen.queryByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).not.toBeInTheDocument();
+    });
+
+    it('should hide validation error when switching to non-base language', async () => {
+        const errorMessage = 'Description is too short.';
+        (WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText as jest.Mock).mockReturnValue(errorMessage);
+
+        const { rerender } = renderComponent();
+        const descriptionInput = screen.getByTestId('mock-rich-input-1');
+
+        fireEvent.blur(descriptionInput);
+
+        await waitFor(() => {
+            expect(screen.getByText(errorMessage)).toBeInTheDocument();
+        });
+
+        rerender(<DescriptionSection {...buildProps({ language: { id: 2, code: 'en', name: 'English' } })} />);
+
+        expect(screen.queryByText(errorMessage)).not.toBeInTheDocument();
     });
 });

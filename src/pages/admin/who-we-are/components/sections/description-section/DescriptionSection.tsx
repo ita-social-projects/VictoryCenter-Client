@@ -60,6 +60,7 @@ export const DescriptionSection = ({
     };
 
     const handleBlur = () => {
+        if (!isBaseLanguage) return;
         const plainText = getPlainTextFromHtml(displayedDescription ?? '');
         const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(plainText);
         setDescriptionError(error || null);
@@ -78,7 +79,7 @@ export const DescriptionSection = ({
                     onChange={handleDescriptionChange}
                     onBlur={handleBlur}
                     maxLength={descriptionLimit}
-                    error={descriptionError || undefined}
+                    error={isBaseLanguage ? (descriptionError ?? undefined) : undefined}
                     disabled={!isBaseLanguage}
                     hideToolbar={!isBaseLanguage}
                 />

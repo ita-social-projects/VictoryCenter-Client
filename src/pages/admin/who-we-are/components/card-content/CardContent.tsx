@@ -1,5 +1,5 @@
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ImageInput, ImageInputProps } from '@/components/admin/image-input/ImageInput';
 import { Content } from '@/types/admin/who-we-are';
 import { ImageValues } from '@/types/common/image';
@@ -83,8 +83,8 @@ export const CardContent = ({
                     maxLength={descriptionLimit}
                     name={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
                     id={content.id.toString()}
-                    onBlur={() => onDescriptionValidate(displayedDescription ?? '')}
-                    error={descriptionError ?? undefined}
+                    onBlur={() => isBaseLanguage && onDescriptionValidate(displayedDescription ?? '')}
+                    error={isBaseLanguage ? (descriptionError ?? undefined) : undefined}
                     disabled={!isBaseLanguage}
                     hideToolbar={!isBaseLanguage}
                 />

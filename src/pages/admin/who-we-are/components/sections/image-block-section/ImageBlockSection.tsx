@@ -105,12 +105,14 @@ export const ImageSection = ({
     };
 
     const handleTitleBlur = () => {
+        if (!isBaseLanguage) return;
         const plainText = getPlainTextFromHtml(displayedTitle ?? '');
         const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(plainText);
         setTitleError(error || null);
     };
 
     const handleDescriptionBlur = () => {
+        if (!isBaseLanguage) return;
         const plainText = getPlainTextFromHtml(displayedDescription ?? '');
         const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(plainText);
         setDescriptionError(error || null);
@@ -147,7 +149,7 @@ export const ImageSection = ({
                             id={titleContent.id.toString()}
                             maxLength={titleLimit}
                             onBlur={handleTitleBlur}
-                            error={titleError || undefined}
+                            error={isBaseLanguage ? (titleError ?? undefined) : undefined}
                             disabled={!isBaseLanguage}
                             hideToolbar={!isBaseLanguage}
                         />
@@ -165,7 +167,7 @@ export const ImageSection = ({
                             name={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
                             id={descriptionContent.id.toString()}
                             onBlur={handleDescriptionBlur}
-                            error={descriptionError || undefined}
+                            error={isBaseLanguage ? (descriptionError ?? undefined) : undefined}
                             disabled={!isBaseLanguage}
                             hideToolbar={!isBaseLanguage}
                         />

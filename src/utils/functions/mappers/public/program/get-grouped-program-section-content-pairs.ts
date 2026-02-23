@@ -33,7 +33,7 @@ export const getGroupedProgramSectionValuesByGroup = (
     if (requestedTypes.length === 0) return [];
 
     const requestedTypesSet = new Set<ContentType>(requestedTypes);
-    const map = new Map<number, Partial<Record<ContentType, string>>>();
+    const groupValuesByTypeMap = new Map<number, Partial<Record<ContentType, string>>>();
 
     for (const content of contents) {
         if (
@@ -46,21 +46,21 @@ export const getGroupedProgramSectionValuesByGroup = (
 
         const groupIndex = content.groupIndex;
 
-        let entry = map.get(groupIndex);
+        let entry = groupValuesByTypeMap.get(groupIndex);
 
         if (!entry) {
             const initial: Partial<Record<ContentType, string>> = {};
             for (const type of requestedTypes) {
                 initial[type] = '';
             }
-            map.set(groupIndex, initial);
+            groupValuesByTypeMap.set(groupIndex, initial);
             entry = initial;
         }
 
         entry[content.contentType] = getContentTextValueByType(content);
     }
 
-    return Array.from(map.entries())
+    return Array.from(groupValuesByTypeMap.entries())
         .sort((a, b) => a[0] - b[0])
         .map(([groupIndex, byType]) => ({
             groupIndex,

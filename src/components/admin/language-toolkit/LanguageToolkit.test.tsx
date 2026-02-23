@@ -1,7 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { LanguageToolkit } from './LanguageToolkit';
 import { DEFAULT_LOCALE } from '@/const/common/locales';
-import { LOCALIZATION_TEXT } from '@/const/admin/localization';
 
 jest.mock('@/components/common/select/Select', () => {
     const MockOption = ({ value, name, ...props }: any) => (

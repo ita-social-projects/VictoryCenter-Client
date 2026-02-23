@@ -1,5 +1,5 @@
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { ImageInput, ImageInputProps } from '@/components/admin/image-input/ImageInput';
 import { Content } from '@/types/admin/who-we-are';
 import { ImageValues } from '@/types/common/image';
@@ -36,14 +36,12 @@ export const CardContent = ({
     setIsPublishButtonActive,
     language,
 }: CardContentProps) => {
-    const [displayedDescription, setDisplayedDescription] = useState<string | null>(null);
     const isBaseLanguage = language.code === DEFAULT_LOCALE;
 
-    useEffect(() => {
-        if (!content) return;
+    const displayedDescription = useMemo(() => {
         const displayedLocalization = returnDisplayedLocalization(content, language.code);
-        setDisplayedDescription(displayedLocalization?.description ?? content.description);
-    }, [language, content]);
+        return displayedLocalization?.description ?? content.description;
+    }, [language.code, content]);
 
     const handleImageChange = (value: ImageValues | null) => {
         onChange({

@@ -1,5 +1,5 @@
 import { Content } from '@/types/admin/who-we-are';
-import React, { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 import './DescriptionSection.scss';
@@ -32,15 +32,14 @@ export const DescriptionSection = ({
     language,
 }: DescriptionSectionProps) => {
     const [descriptionError, setDescriptionError] = useState<string | null>(null);
-    const [displayedDescription, setDisplayedDescription] = useState<string | null>(null);
     const isBaseLanguage = language.code === DEFAULT_LOCALE;
     const descriptionContent = content?.find((item) => item.contentType === ContentType.Description);
 
-    useEffect(() => {
-        if (!descriptionContent) return;
+    const displayedDescription = useMemo(() => {
+        if (!descriptionContent) return null;
         const displayedLocalization = returnDisplayedLocalization(descriptionContent, language.code);
-        setDisplayedDescription(displayedLocalization?.description ?? descriptionContent.description);
-    }, [language, descriptionContent]);
+        return displayedLocalization?.description ?? descriptionContent.description;
+    }, [language.code, descriptionContent]);
 
     if (!descriptionContent) {
         return null;

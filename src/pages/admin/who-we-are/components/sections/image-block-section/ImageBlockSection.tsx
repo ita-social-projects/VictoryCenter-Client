@@ -1,7 +1,7 @@
 import { Content } from '@/types/admin/who-we-are';
 import { ImageInput, ImageInputProps } from '@/components/admin/image-input/ImageInput';
 import { WHO_WE_ARE_TEXT } from '@/const/admin/who-we-are';
-import React, { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ImageValues } from '@/types/common/image';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import './ImageBlockSection.scss';
@@ -41,25 +41,23 @@ export const ImageSection = ({
     const [imageError, setImageError] = useState<string | null>(null);
     const [titleError, setTitleError] = useState<string | null>(null);
     const [descriptionError, setDescriptionError] = useState<string | null>(null);
-    const [displayedTitle, setDisplayedTitle] = useState<string | null>(null);
-    const [displayedDescription, setDisplayedDescription] = useState<string | null>(null);
 
     const imageContent = content?.find((item) => item.contentType === ContentType.Image) ?? null;
     const titleContent = content?.find((item) => item.contentType === ContentType.Title);
     const descriptionContent = content?.find((item) => item.contentType === ContentType.Description);
     const isBaseLanguage = language.code === DEFAULT_LOCALE;
 
-    useEffect(() => {
-        if (!titleContent) return;
+    const displayedTitle = useMemo(() => {
+        if (!titleContent) return null;
         const titleLocalization = returnDisplayedLocalization(titleContent, language.code);
-        setDisplayedTitle(titleLocalization?.title ?? titleContent.title);
-    }, [language, titleContent]);
+        return titleLocalization?.title ?? titleContent.title;
+    }, [language.code, titleContent]);
 
-    useEffect(() => {
-        if (!descriptionContent) return;
+    const displayedDescription = useMemo(() => {
+        if (!descriptionContent) return null;
         const descriptionLocalization = returnDisplayedLocalization(descriptionContent, language.code);
-        setDisplayedDescription(descriptionLocalization?.description ?? descriptionContent.description);
-    }, [language, descriptionContent]);
+        return descriptionLocalization?.description ?? descriptionContent.description;
+    }, [language.code, descriptionContent]);
 
     if (!content || !descriptionContent) {
         return null;

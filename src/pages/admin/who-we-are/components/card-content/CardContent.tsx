@@ -42,7 +42,7 @@ export const CardContent = ({
     useEffect(() => {
         if (!content) return;
         const displayedLocalization = returnDisplayedLocalization(content, language.code);
-        setDisplayedDescription(displayedLocalization?.description || content.description);
+        setDisplayedDescription(displayedLocalization?.description ?? content.description);
     }, [language, content]);
 
     const handleImageChange = (value: ImageValues | null) => {

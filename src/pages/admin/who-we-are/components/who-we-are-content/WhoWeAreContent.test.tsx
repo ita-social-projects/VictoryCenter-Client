@@ -20,7 +20,7 @@ jest.mock('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit', () =>
     useLocalizationToolkit: () => ({
         allLanguages: [{ id: 1, code: 'uk', name: 'Ukrainian' }],
         translationLanguages: [{ id: 1, code: 'uk', name: 'Ukrainian' }],
-        selectedLanguage: { id: 1, code: 'uk' },
+        selectedLanguage: { id: 1, code: 'uk', name: 'Ukrainian' },
         onLanguageChange: jest.fn(),
         translationStatusFilter: 0,
         onTranslationStatusFilterChange: jest.fn(),
@@ -273,9 +273,9 @@ describe('WhoWeAreContent Component', () => {
     });
 
     it('should display the loader while categories are loading', () => {
-        mockedWhoWeAreApi.getPreviews.mockReturnValue(new Promise(() => {}));
+        mockedWhoWeAreApi.getPreviews.mockReturnValue(new Promise(() => { }));
 
-        mockedWhoWeAreApi.getByType.mockReturnValue(new Promise(() => {}));
+        mockedWhoWeAreApi.getByType.mockReturnValue(new Promise(() => { }));
 
         render(<WhoWeAreContent />);
 
@@ -288,7 +288,7 @@ describe('WhoWeAreContent Component', () => {
     it('should display the loader while the selected section is loading', async () => {
         mockedWhoWeAreApi.getPreviews.mockResolvedValue(mockCategories);
 
-        mockedWhoWeAreApi.getByType.mockReturnValue(new Promise(() => {}));
+        mockedWhoWeAreApi.getByType.mockReturnValue(new Promise(() => { }));
 
         render(<WhoWeAreContent />);
 

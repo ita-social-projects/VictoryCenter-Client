@@ -39,7 +39,7 @@ export const DescriptionSection = ({
     useEffect(() => {
         if (!descriptionContent) return;
         const displayedLocalization = returnDisplayedLocalization(descriptionContent, language.code);
-        setDisplayedDescription(displayedLocalization?.description || descriptionContent.description);
+        setDisplayedDescription(displayedLocalization?.description ?? descriptionContent.description);
     }, [language, descriptionContent]);
 
     if (!descriptionContent) {

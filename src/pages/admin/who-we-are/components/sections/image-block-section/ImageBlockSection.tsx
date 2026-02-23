@@ -52,13 +52,13 @@ export const ImageSection = ({
     useEffect(() => {
         if (!titleContent) return;
         const titleLocalization = returnDisplayedLocalization(titleContent, language.code);
-        setDisplayedTitle(titleLocalization?.title || titleContent.title);
+        setDisplayedTitle(titleLocalization?.title ?? titleContent.title);
     }, [language, titleContent]);
 
     useEffect(() => {
         if (!descriptionContent) return;
         const descriptionLocalization = returnDisplayedLocalization(descriptionContent, language.code);
-        setDisplayedDescription(descriptionLocalization?.description || descriptionContent.description);
+        setDisplayedDescription(descriptionLocalization?.description ?? descriptionContent.description);
     }, [language, descriptionContent]);
 
     if (!content || !descriptionContent) {

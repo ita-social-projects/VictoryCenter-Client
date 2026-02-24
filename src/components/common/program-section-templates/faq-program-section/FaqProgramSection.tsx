@@ -1,4 +1,4 @@
-import { useId, useState, useCallback, useMemo } from 'react';
+import { useId, useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import cn from 'classnames';
 import { FaqCard } from '@/components/public/faq-section/faq-card/FaqCard';
@@ -64,10 +64,20 @@ export const FaqProgramSection = ({
 
     const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
     const [autoFocusIndex, setAutoFocusIndex] = useState<number | null>(null);
+    const initialPairAddedRef = useRef(false);
 
-    const lastPair = faqPairs.length > 0 ? faqPairs[faqPairs.length - 1] : null;
+    useEffect(() => {
+        if (isEditable && faqPairs.length === 0 && !initialPairAddedRef.current) {
+            initialPairAddedRef.current = true;
+            onAddFaqPair?.('', '');
+            setExpandedIndex(0);
+            setAutoFocusIndex(0);
+        }
+    }, [isEditable, faqPairs.length, onAddFaqPair]);
+
     const isAddDisabled =
-        lastPair !== null && (!!validateFaqQuestion(lastPair.questionText) || !!validateFaqAnswer(lastPair.answerText));
+        faqPairs.length > 0 &&
+        faqPairs.some((pair) => !!validateFaqQuestion(pair.questionText) || !!validateFaqAnswer(pair.answerText));
 
     const handleAddClick = useCallback(() => {
         onAddFaqPair?.('', '');
@@ -131,21 +141,23 @@ export const FaqProgramSection = ({
                     </div>
 
                     <div className={styles['right-section']}>
-                        {faqPairs.map((pair, index) => (
-                            <EditableFaqCard
-                                key={pair.id || index}
-                                index={index}
-                                idPrefix={idPrefix}
-                                questionText={pair.questionText}
-                                answerText={pair.answerText}
-                                isExpanded={expandedIndex === index}
-                                autoFocus={autoFocusIndex === index}
-                                onQuestionChange={(i, val) => onFaqQuestionChange?.(i, val)}
-                                onAnswerChange={(i, val) => onFaqAnswerChange?.(i, val)}
-                                onDelete={handleDelete}
-                                onExpandToggle={handleExpandToggle}
-                            />
-                        ))}
+                        <div className={styles['cards-list']}>
+                            {faqPairs.map((pair, index) => (
+                                <EditableFaqCard
+                                    key={pair.id || index}
+                                    index={index}
+                                    idPrefix={idPrefix}
+                                    questionText={pair.questionText}
+                                    answerText={pair.answerText}
+                                    isExpanded={expandedIndex === index}
+                                    autoFocus={autoFocusIndex === index}
+                                    onQuestionChange={(i, val) => onFaqQuestionChange?.(i, val)}
+                                    onAnswerChange={(i, val) => onFaqAnswerChange?.(i, val)}
+                                    onDelete={handleDelete}
+                                    onExpandToggle={handleExpandToggle}
+                                />
+                            ))}
+                        </div>
 
                         <div className={styles['actions-row']}>
                             <Button

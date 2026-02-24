@@ -24,7 +24,7 @@
         height: auto;
         min-height: 500px;
         padding: 64px 60px;
-        align-items: flex-start;
+        align-items: space-between;
     }
 }
 
@@ -42,7 +42,7 @@
 
     .editable & {
         border-top: none;
-        gap: 16px;
+        gap: 12%;
     }
 }
 
@@ -62,13 +62,21 @@
 
 .left-section {
     flex: 0 0 41%;
+
+    .editable & {
+        flex: 0 0 30%;
+    }
 }
 
 .right-section {
     flex: 1 1 auto;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+}
+
+.cards-list {
+    display: flex;
+    flex-direction: column;
     gap: 8px;
 }
 

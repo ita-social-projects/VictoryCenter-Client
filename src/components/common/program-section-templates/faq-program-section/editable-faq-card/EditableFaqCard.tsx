@@ -5,6 +5,7 @@ import { FAQ_TEXT, FAQ_VALIDATION } from '@/const/admin/faq';
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
 import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
 import { ReactComponent as ArrowIcon } from '@/assets/icons/arrow-down-right.svg';
+import { ReactComponent as CloseIcon } from '@/assets/icons/cross.svg';
 import styles from './EditableFaqCard.module.scss';
 
 const { validateFaqQuestion, validateFaqAnswer } = PROGRAM_SECTION_VALIDATION_FUNCTIONS;
@@ -107,7 +108,8 @@ export const EditableFaqCard = ({
                         onClick={() => onExpandToggle(index)}
                         aria-label={isExpanded ? 'Collapse answer' : 'Expand answer'}
                     >
-                        <ArrowIcon />
+                        <ArrowIcon className={styles['arrow-icon']} />
+                        <CloseIcon className={styles['close-icon']} />
                     </button>
                 </div>
             </div>

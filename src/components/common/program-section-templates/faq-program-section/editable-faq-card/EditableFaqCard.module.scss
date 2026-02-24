@@ -60,16 +60,30 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.2s ease;
     padding: 8px;
+    position: relative;
 
     svg {
         width: 24px;
         height: 24px;
     }
 
+    .arrow-icon {
+        display: block;
+    }
+
+    .close-icon {
+        display: none;
+    }
+
     &--open {
-        transform: rotate(90deg);
+        .arrow-icon {
+            display: none;
+        }
+
+        .close-icon {
+            display: block;
+        }
     }
 
     &:hover svg path {
@@ -79,4 +93,5 @@
 
 .card-body {
     margin-top: 16px;
+    padding-right: 40px;
 }

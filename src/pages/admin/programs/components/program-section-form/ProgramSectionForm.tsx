@@ -83,8 +83,24 @@ const getDescriptionAuthorPairs = (contents: ProgramSectionContent[]) => {
         }));
 };
 
+const getFaqPairs = (contents: ProgramSectionContent[]) => {
+    return contents
+        .filter((c) => c.contentType === ContentType.FaqPair)
+        .sort((a, b) => a.order - b.order)
+        .map((c, index) => ({
+            groupIndex: c.groupIndex ?? index,
+            questionText: c.faqQuestion?.questionText || '',
+            answerText: c.faqQuestion?.answerText || '',
+        }));
+};
+
 const ensureTitleContentAndOnePair = (section: ProgramSection): ProgramSection => {
-    if (section.template !== ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs) return section;
+    if (
+        section.template !== ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs &&
+        section.template !== ProgramSectionTemplate.SingleTitleQuestionAnswerPairs
+    ) {
+        return section;
+    }
 
     let updatedContents = section.contents;
     let hasChanges = false;
@@ -106,28 +122,50 @@ const ensureTitleContentAndOnePair = (section: ProgramSection): ProgramSection =
         hasChanges = true;
     }
 
-    const pairs = getDescriptionAuthorPairs(updatedContents);
-    if (pairs.length > 0) {
-        return hasChanges ? { ...section, contents: updatedContents } : section;
+    if (section.template === ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs) {
+        const pairs = getDescriptionAuthorPairs(updatedContents);
+        if (pairs.length > 0) {
+            return hasChanges ? { ...section, contents: updatedContents } : section;
+        }
+
+        const maxOrder = updatedContents.length ? Math.max(...updatedContents.map((c) => c.order)) : -1;
+
+        updatedContents = [
+            ...updatedContents,
+            {
+                contentType: ContentType.Description,
+                order: maxOrder + 1,
+                groupIndex: 0,
+                description: '',
+            } as any,
+            {
+                contentType: ContentType.Author,
+                order: maxOrder + 2,
+                groupIndex: 0,
+                author: '',
+            } as any,
+        ];
     }
 
-    const maxOrder = updatedContents.length ? Math.max(...updatedContents.map((c) => c.order)) : -1;
+    if (section.template === ProgramSectionTemplate.SingleTitleQuestionAnswerPairs) {
+        const faqPairs = getFaqPairs(updatedContents);
+        if (faqPairs.length > 0) {
+            return hasChanges ? { ...section, contents: updatedContents } : section;
+        }
 
-    updatedContents = [
-        ...updatedContents,
-        {
-            contentType: ContentType.Description,
-            order: maxOrder + 1,
-            groupIndex: 0,
-            description: '',
-        } as any,
-        {
-            contentType: ContentType.Author,
-            order: maxOrder + 2,
-            groupIndex: 0,
-            author: '',
-        } as any,
-    ];
+        const maxOrder = updatedContents.length ? Math.max(...updatedContents.map((c) => c.order)) : -1;
+
+        updatedContents = [
+            ...updatedContents,
+            {
+                contentType: ContentType.FaqPair,
+                order: maxOrder + 1,
+                groupIndex: 0,
+                questionText: '',
+                answerText: '',
+            } as any,
+        ];
+    }
 
     return { ...section, contents: updatedContents };
 };
@@ -219,6 +257,11 @@ export const ProgramSectionForm = ({
     const descriptionAuthorPairs = orderedPairs.map((p) => ({
         description: p.description,
         author: p.author,
+    }));
+
+    const faqPairs = getFaqPairs(localSection.contents).map((p) => ({
+        questionText: p.questionText,
+        answerText: p.answerText,
     }));
 
     const imageContents = localSection.contents
@@ -456,8 +499,6 @@ export const ProgramSectionForm = ({
         [emitSectionChange],
     );
 
-    const [faqPairs, setFaqPairs] = useState<Array<{ questionText: string; answerText: string }>>([]);
-
     const isSectionSaveValid =
         isSectionValid &&
         (!isFaqTemplate ||
@@ -468,25 +509,123 @@ export const ProgramSectionForm = ({
                         !PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateFaqAnswer(pair.answerText),
                 )));
 
-    const handleFaqQuestionChange = useCallback((index: number, value: string) => {
-        setFaqPairs((prev) => prev.map((p, i) => (i === index ? { ...p, questionText: value } : p)));
-        setIsDirty(true);
-    }, []);
+    const handleFaqQuestionChange = useCallback(
+        (index: number, value: string) => {
+            const prev = localSectionRef.current;
+            const faq = getFaqPairs(prev.contents);
+            const target = faq[index];
+            if (!target) return;
 
-    const handleFaqAnswerChange = useCallback((index: number, value: string) => {
-        setFaqPairs((prev) => prev.map((p, i) => (i === index ? { ...p, answerText: value } : p)));
-        setIsDirty(true);
-    }, []);
+            const updatedContents = prev.contents.map((c) => {
+                if (c.contentType === ContentType.FaqPair && c.groupIndex === target.groupIndex) {
+                    return {
+                        ...c,
+                        faqQuestion: { ...c.faqQuestion, questionText: value } as any,
+                    };
+                }
+                return c;
+            });
 
-    const handleAddFaqPair = useCallback((questionText: string, answerText: string) => {
-        setFaqPairs((prev) => [...prev, { questionText, answerText }]);
-        setIsDirty(true);
-    }, []);
+            const newSection = { ...prev, contents: updatedContents };
+            localSectionRef.current = newSection;
+            setLocalSection(newSection);
+            emitSectionChange(newSection);
+        },
+        [emitSectionChange],
+    );
 
-    const handleDeleteFaqPair = useCallback((index: number) => {
-        setFaqPairs((prev) => prev.filter((_, i) => i !== index));
-        setIsDirty(true);
-    }, []);
+    const handleFaqAnswerChange = useCallback(
+        (index: number, value: string) => {
+            const prev = localSectionRef.current;
+            const faq = getFaqPairs(prev.contents);
+            const target = faq[index];
+            if (!target) return;
+
+            const updatedContents = prev.contents.map((c) => {
+                if (c.contentType === ContentType.FaqPair && c.groupIndex === target.groupIndex) {
+                    return {
+                        ...c,
+                        faqQuestion: { ...c.faqQuestion, answerText: value } as any,
+                    };
+                }
+                return c;
+            });
+
+            const newSection = { ...prev, contents: updatedContents };
+            localSectionRef.current = newSection;
+            setLocalSection(newSection);
+            emitSectionChange(newSection);
+        },
+        [emitSectionChange],
+    );
+
+    const handleAddFaqPair = useCallback(
+        (questionText: string, answerText: string) => {
+            const prev = localSectionRef.current;
+            if (prev.template !== ProgramSectionTemplate.SingleTitleQuestionAnswerPairs) return;
+
+            const faq = getFaqPairs(prev.contents);
+            const nextGroupIndex = faq.length;
+
+            const maxOrder = prev.contents.length ? Math.max(...prev.contents.map((c) => c.order)) : -1;
+
+            const newSection: ProgramSection = {
+                ...prev,
+                contents: [
+                    ...prev.contents,
+                    {
+                        contentType: ContentType.FaqPair,
+                        order: maxOrder + 1,
+                        groupIndex: nextGroupIndex,
+                        faqQuestion: {
+                            questionText,
+                            answerText,
+                        } as any,
+                    } as any,
+                ],
+            };
+
+            localSectionRef.current = newSection;
+            setLocalSection(newSection);
+            emitSectionChange(newSection);
+        },
+        [emitSectionChange],
+    );
+
+    const handleDeleteFaqPair = useCallback(
+        (index: number) => {
+            const prev = localSectionRef.current;
+            if (prev.template !== ProgramSectionTemplate.SingleTitleQuestionAnswerPairs) return;
+
+            const faq = getFaqPairs(prev.contents);
+
+            const target = faq[index];
+            if (!target) return;
+
+            const filtered: ProgramSection = {
+                ...prev,
+                contents: prev.contents.filter(
+                    (c) => !(c.contentType === ContentType.FaqPair && c.groupIndex === target.groupIndex),
+                ),
+            };
+
+            const normalizedContents = filtered.contents.map((c) => {
+                if (c.contentType === ContentType.FaqPair && c.groupIndex !== null && c.groupIndex !== undefined) {
+                    if (c.groupIndex > target.groupIndex) {
+                        return { ...c, groupIndex: c.groupIndex - 1 };
+                    }
+                }
+                return c;
+            });
+
+            const normalizedSection = { ...filtered, contents: normalizedContents };
+
+            localSectionRef.current = normalizedSection;
+            setLocalSection(normalizedSection);
+            emitSectionChange(normalizedSection);
+        },
+        [emitSectionChange],
+    );
 
     const handleEditClick = useCallback(
         (e: React.MouseEvent<HTMLButtonElement>) => {

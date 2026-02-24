@@ -2,31 +2,9 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { LanguageToolkit } from './LanguageToolkit';
 import { DEFAULT_LOCALE } from '@/const/common/locales';
 
-jest.mock('@/components/common/select/Select', () => {
-    const MockOption = ({ value, name, ...props }: any) => (
-        <option value={typeof value === 'object' ? JSON.stringify(value) : value} {...props}>
-            {name}
-        </option>
-    );
-
-    const MockSelect = ({ children, onValueChange, ...props }: any) => {
-        const handleChange = (e: any) => {
-            let val: any = e.target.value;
-            try {
-                val = JSON.parse(val);
-            } catch {}
-            onValueChange(val);
-        };
-        return (
-            <select data-testid={props['data-testid'] || 'select'} onChange={handleChange}>
-                {children}
-            </select>
-        );
-    };
-
-    MockSelect.Option = MockOption;
-    return { Select: MockSelect };
-});
+jest.mock('@/components/common/select/Select', () => ({
+    Select: require('@/utils/test-mocks/test-mocks').MockSelect,
+}));
 
 const mockLanguages = [
     { id: 1, code: DEFAULT_LOCALE, name: 'Українська' },

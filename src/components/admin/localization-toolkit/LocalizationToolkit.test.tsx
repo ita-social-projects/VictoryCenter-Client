@@ -5,34 +5,9 @@ import { LOCALIZATION_TEXT } from '@/const/admin/localization';
 import { TranslationStatusFilter } from '@/types/common/language';
 import { mapLabelToTranslationStatusFilter } from '@/utils/functions/mappers/admin/localization-status/localization-status-mappers';
 
-jest.mock('@/components/common/select/Select', () => {
-    const MockOption = ({ value, name, ...props }: any) => (
-        <option value={typeof value === 'object' ? JSON.stringify(value) : value} {...props}>
-            {name}
-        </option>
-    );
-
-    const MockSelect = ({ children, onValueChange, ...props }: any) => {
-        const handleChange = (e: any) => {
-            let val: any = e.target.value;
-
-            try {
-                val = JSON.parse(val);
-            } catch {}
-
-            onValueChange(val);
-        };
-
-        return (
-            <select data-testid={props['data-testid'] || 'select'} onChange={handleChange}>
-                {children}
-            </select>
-        );
-    };
-
-    MockSelect.Option = MockOption;
-    return { Select: MockSelect };
-});
+jest.mock('@/components/common/select/Select', () => ({
+    Select: require('@/utils/test-mocks/test-mocks').MockSelect,
+}));
 
 jest.mock('@/components/admin/language-toolkit/LanguageToolkit', () => ({
     LanguageToolkit: ({ onLanguageChange, languages }: any) => (

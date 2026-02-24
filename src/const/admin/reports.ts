@@ -24,6 +24,14 @@ export const REPORTS_TEXT = {
         SUCCESSFULLY_PUBLISHED: 'Успішно опубліковано',
         INVALID_VALUE: 'Значення повинно бути числом',
     },
+    REPORT_AND_ANALYTICS: {
+        TITLE: 'Управління фінансами',
+        TAB: {
+            INCOME_EXPENSES: 'Доходи та витрати',
+            PROGRAM_EXPENSES: 'Програмні витрати',
+            PDF_FILES: 'PDF Файли',
+        },
+    },
 };
 
 export const REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION = {

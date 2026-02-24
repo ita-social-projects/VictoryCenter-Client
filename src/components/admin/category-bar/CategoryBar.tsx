@@ -4,6 +4,7 @@ import { CategoryButton } from '../category-button/CategoryButton';
 import { ReactComponent as ArrowLeftIcon } from '@/assets/icons/arrow-left.svg';
 import { ReactComponent as ArrowRightIcon } from '@/assets/icons/arrow-right.svg';
 import './CategoryBar.scss';
+import cn from 'classnames';
 
 export interface ContextMenuOption {
     id: string;
@@ -13,6 +14,7 @@ export interface ContextMenuOption {
 export interface CategoryBarProps<T> {
     categories: T[];
     selectedCategory: T | null;
+    className?: string;
     displayContextMenuButton?: boolean;
     getCategoryDisplayName: (item: T) => string;
     getCategoryKey: (item: T) => string | number;
@@ -26,6 +28,7 @@ export interface CategoryBarProps<T> {
 export const CategoryBar = <T,>({
     categories,
     selectedCategory,
+    className,
     displayContextMenuButton = false,
     getCategoryDisplayName,
     getCategoryKey,
@@ -82,7 +85,7 @@ export const CategoryBar = <T,>({
     };
 
     return (
-        <div className="category-bar">
+        <div className={cn('category-bar', className)}>
             {displayContextMenuButton && contextMenuOptions.length > 0 && (
                 <ContextMenuButton onOptionSelected={handleContextMenuOptionSelected}>
                     {contextMenuOptions.map((option) => (

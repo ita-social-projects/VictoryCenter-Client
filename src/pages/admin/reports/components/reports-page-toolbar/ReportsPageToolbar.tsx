@@ -1,16 +1,15 @@
-import { useState } from 'react';
 import { CategoryBar } from '@/components/admin/category-bar/CategoryBar';
 import { Button } from '@/components/admin/button/Button';
 import { REPORTS_TEXT } from '@/const/admin/reports';
 import { ReactComponent as EditIcon } from '@/assets/icons/edit-disabled.svg';
 import styles from './ReportsPageToolbar.module.scss';
 
-interface ReportsToolbarTab {
+export interface ReportsToolbarTab {
     id: 'media-settings' | 'report-analytics';
     label: string;
 }
 
-const TOOLBAR_TABS: ReportsToolbarTab[] = [
+export const TOOLBAR_TABS: ReportsToolbarTab[] = [
     { id: 'media-settings', label: 'Налаштування медіа' },
     { id: 'report-analytics', label: 'Звіт та аналітика' },
 ];
@@ -21,6 +20,8 @@ interface ReportsPageToolbarProps {
     onEdit: () => void;
     onCancel: () => void;
     onPublish: () => void;
+    selectedTab: ReportsToolbarTab;
+    onTabChange: (tab: ReportsToolbarTab) => void;
 }
 
 export const ReportsPageToolbar = ({
@@ -29,9 +30,9 @@ export const ReportsPageToolbar = ({
     onEdit,
     onCancel,
     onPublish,
+    selectedTab,
+    onTabChange,
 }: ReportsPageToolbarProps) => {
-    const [selectedTab, setSelectedTab] = useState<ReportsToolbarTab>(TOOLBAR_TABS[0]);
-
     return (
         <div className={styles.toolbar}>
             <CategoryBar<ReportsToolbarTab>
@@ -39,7 +40,7 @@ export const ReportsPageToolbar = ({
                 selectedCategory={selectedTab}
                 getCategoryDisplayName={(tab) => tab.label}
                 getCategoryKey={(tab) => tab.id}
-                onCategorySelect={setSelectedTab}
+                onCategorySelect={onTabChange}
             />
             {isEditing ? (
                 <div className={styles.actions}>

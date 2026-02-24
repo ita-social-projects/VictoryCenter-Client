@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { ReportsPageToolbar } from './ReportsPageToolbar';
+import { TOOLBAR_TABS, ReportsPageToolbar } from './ReportsPageToolbar';
 import { REPORTS_TEXT } from '@/const/admin/reports';
 
 jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
@@ -42,6 +42,7 @@ describe('ReportsPageToolbar', () => {
     const mockOnEdit = jest.fn();
     const mockOnCancel = jest.fn();
     const mockOnPublish = jest.fn();
+    const mockOnTabChange = jest.fn();
 
     const defaultProps = {
         isEditing: false,
@@ -49,6 +50,8 @@ describe('ReportsPageToolbar', () => {
         onEdit: mockOnEdit,
         onCancel: mockOnCancel,
         onPublish: mockOnPublish,
+        selectedTab: TOOLBAR_TABS[0],
+        onTabChange: mockOnTabChange,
     };
 
     const renderComponent = (overrideProps: Partial<typeof defaultProps> = {}) =>

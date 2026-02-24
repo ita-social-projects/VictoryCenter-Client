@@ -1,0 +1,6 @@
+@use '@/assets/sass/variables/colors' as c;
+
+.title{
+    font-size: 36px;
+    color: c.$blue-500;
+}

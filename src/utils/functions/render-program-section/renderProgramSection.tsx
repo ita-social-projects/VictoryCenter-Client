@@ -161,6 +161,13 @@ export const getInitialSectionContents = (templateId: ProgramSectionTemplate): P
             createItem(ContentType.Title, 0, {
                 title: COMMON_TEXT_ADMIN.TAB.FAQ,
             } as any),
+            createItem(ContentType.FaqPair, 1, {
+                groupIndex: 0,
+                faqQuestion: {
+                    questionText: '',
+                    answerText: '',
+                } as any,
+            } as any),
         ];
     }
 

@@ -492,6 +492,7 @@ export const PROGRAM_SECTION_TEMPLATE_VALIDATION = {
             [ContentType.Description]: { min: 0, max: 0 },
             [ContentType.Author]: { min: 0, max: 0 },
             [ContentType.Image]: { min: 0, max: 0 },
+            [ContentType.FaqPair]: { min: 1, max: 10 },
         },
         lengths: {
             [ContentType.Title]: { min: 5, max: 50 },

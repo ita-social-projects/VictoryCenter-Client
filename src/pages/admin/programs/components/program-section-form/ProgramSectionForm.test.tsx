@@ -792,4 +792,109 @@ describe('ProgramSectionForm', () => {
         expect(screen.queryByLabelText('Move up section')).not.toBeInTheDocument();
         expect(screen.queryByLabelText('Move down section')).not.toBeInTheDocument();
     });
+
+    describe('FAQ template', () => {
+        const makeFaqPairContent = (order: number, groupIndex: number, questionText: string, answerText: string) => ({
+            contentType: ContentType.FaqPair,
+            order,
+            groupIndex,
+            faqQuestion: {
+                questionText,
+                answerText,
+            },
+        });
+
+        const makeFaqSection = (contents: any[]) =>
+            makeSection({
+                template: ProgramSectionTemplate.SingleTitleQuestionAnswerPairs,
+                contents,
+            });
+
+        it('adds FAQ pair with correct structure', () => {
+            const section = makeFaqSection([
+                makeTitleContent('FAQ Title', 0),
+                makeFaqPairContent(1, 0, 'Question 1', 'Answer 1'),
+            ]);
+
+            const { handlers, onSectionChange } = renderWithHandlers({ section });
+
+            act(() => {
+                handlers.onAddFaqPair('Question 2', 'Answer 2');
+            });
+
+            const updated = getLastUpdatedSection(onSectionChange);
+            const faqPairs = updated.contents.filter((c: any) => c.contentType === ContentType.FaqPair);
+
+            expect(faqPairs).toHaveLength(2);
+
+            const newPair = faqPairs[1];
+            expect(newPair.groupIndex).toBe(1);
+            expect(newPair.faqQuestion!.questionText).toBe('Question 2');
+            expect(newPair.faqQuestion!.answerText).toBe('Answer 2');
+        });
+
+        it('deletes FAQ pair and normalizes groupIndex', () => {
+            const section = makeFaqSection([
+                makeTitleContent('FAQ Title', 0),
+                makeFaqPairContent(1, 0, 'Q1', 'A1'),
+                makeFaqPairContent(2, 1, 'Q2', 'A2'),
+                makeFaqPairContent(3, 2, 'Q3', 'A3'),
+            ]);
+
+            const { handlers, onSectionChange } = renderWithHandlers({ section });
+
+            act(() => {
+                handlers.onDeleteFaqPair(1);
+            });
+
+            const updated = getLastUpdatedSection(onSectionChange);
+            const faqPairs = updated.contents
+                .filter((c: any) => c.contentType === ContentType.FaqPair)
+                .sort((a: any, b: any) => a.order - b.order);
+
+            expect(faqPairs).toHaveLength(2);
+            expect(faqPairs[0]!.faqQuestion!.questionText).toBe('Q1');
+            expect(faqPairs[0].groupIndex).toBe(0);
+            expect(faqPairs[1]!.faqQuestion!.questionText).toBe('Q3');
+            expect(faqPairs[1].groupIndex).toBe(1);
+        });
+
+        it('updates FAQ question text', () => {
+            const section = makeFaqSection([
+                makeTitleContent('FAQ', 0),
+                makeFaqPairContent(1, 0, 'Old Question', 'Answer'),
+            ]);
+
+            const { handlers, onSectionChange } = renderWithHandlers({ section });
+
+            act(() => {
+                handlers.onFaqQuestionChange(0, 'New Question');
+            });
+
+            const updated = getLastUpdatedSection(onSectionChange);
+            const faqPair = updated.contents.find((c: any) => c.contentType === ContentType.FaqPair);
+
+            expect(faqPair!.faqQuestion!.questionText).toBe('New Question');
+            expect(faqPair!.faqQuestion!.answerText).toBe('Answer');
+        });
+
+        it('updates FAQ answer text', () => {
+            const section = makeFaqSection([
+                makeTitleContent('FAQ', 0),
+                makeFaqPairContent(1, 0, 'Question', 'Old Answer'),
+            ]);
+
+            const { handlers, onSectionChange } = renderWithHandlers({ section });
+
+            act(() => {
+                handlers.onFaqAnswerChange(0, 'New Answer');
+            });
+
+            const updated = getLastUpdatedSection(onSectionChange);
+            const faqPair = updated.contents.find((c: any) => c.contentType === ContentType.FaqPair);
+
+            expect(faqPair!.faqQuestion!.questionText).toBe('Question');
+            expect(faqPair!.faqQuestion!.answerText).toBe('New Answer');
+        });
+    });
 });

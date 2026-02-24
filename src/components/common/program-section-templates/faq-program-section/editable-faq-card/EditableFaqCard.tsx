@@ -20,6 +20,7 @@ interface EditableFaqCardProps {
     answerText: string;
     isExpanded: boolean;
     autoFocus?: boolean;
+    canDelete?: boolean;
     onQuestionChange: (index: number, value: string) => void;
     onAnswerChange: (index: number, value: string) => void;
     onDelete: (index: number) => void;
@@ -33,6 +34,7 @@ export const EditableFaqCard = ({
     answerText,
     isExpanded,
     autoFocus = false,
+    canDelete = true,
     onQuestionChange,
     onAnswerChange,
     onDelete,
@@ -96,12 +98,14 @@ export const EditableFaqCard = ({
     return (
         <div ref={cardRef} className={cn(styles['card'], { [styles['card--expanded']]: isExpanded })}>
             <div className={styles['card-top-row']}>
-                <button
-                    type="button"
-                    className={styles['delete-button']}
-                    onClick={handleDeleteClick}
-                    aria-label="Delete question"
-                />
+                {canDelete && (
+                    <button
+                        type="button"
+                        className={styles['delete-button']}
+                        onClick={handleDeleteClick}
+                        aria-label="Delete question"
+                    />
+                )}
             </div>
             <div className={styles['card-header']}>
                 <TextAreaWithCharacterLimitGroup

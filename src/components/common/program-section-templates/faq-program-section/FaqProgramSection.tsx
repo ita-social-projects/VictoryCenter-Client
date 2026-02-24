@@ -151,6 +151,7 @@ export const FaqProgramSection = ({
                                     answerText={pair.answerText}
                                     isExpanded={expandedIndex === index}
                                     autoFocus={autoFocusIndex === index}
+                                    canDelete={faqPairs.length > 1}
                                     onQuestionChange={(i, val) => onFaqQuestionChange?.(i, val)}
                                     onAnswerChange={(i, val) => onFaqAnswerChange?.(i, val)}
                                     onDelete={handleDelete}

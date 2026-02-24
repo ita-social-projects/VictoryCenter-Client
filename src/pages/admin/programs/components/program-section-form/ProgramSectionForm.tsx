@@ -598,6 +598,7 @@ export const ProgramSectionForm = ({
             if (prev.template !== ProgramSectionTemplate.SingleTitleQuestionAnswerPairs) return;
 
             const faq = getFaqPairs(prev.contents);
+            if (faq.length <= 1) return;
 
             const target = faq[index];
             if (!target) return;

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import { LOCALIZATION_TEXT } from '@/const/admin/localization';
 import { DEFAULT_LOCALE } from '@/const/common/locales';
 import { Select } from '@/components/common/select/Select';
@@ -14,13 +14,13 @@ export interface LanguageToolkitProps {
 export const LanguageToolkit = ({ languages, onLanguageChange }: LanguageToolkitProps) => {
     const [selectedLanguage, setSelectedLanguage] = useState<LocalizationLanguage | null>(null);
 
-    const changeLanguage = useCallback(
-        (language: LocalizationLanguage) => {
-            setSelectedLanguage(language);
-            onLanguageChange(language);
-        },
-        [onLanguageChange],
-    );
+    const onLanguageChangeRef = useRef(onLanguageChange);
+    onLanguageChangeRef.current = onLanguageChange;
+
+    const changeLanguage = useCallback((language: LocalizationLanguage) => {
+        setSelectedLanguage(language);
+        onLanguageChangeRef.current(language);
+    }, []);
 
     useEffect(() => {
         if (!languages.length) {

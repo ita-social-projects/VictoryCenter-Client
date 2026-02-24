@@ -4,7 +4,6 @@ import cn from 'classnames';
 import { FaqCard } from '@/components/public/faq-section/faq-card/FaqCard';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { Button } from '@/components/admin/button/Button';
-import { FAQ_TEXT, FAQ_VALIDATION } from '@/const/admin/faq';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { useProgramSectionValidation } from '@/hooks/admin/use-program-section-validation';
@@ -63,61 +62,37 @@ export const FaqProgramSection = ({
         resetKey: validationResetKey,
     });
 
-    const [newQuestion, setNewQuestion] = useState('');
-    const [newAnswer, setNewAnswer] = useState('');
-    const [newQuestionError, setNewQuestionError] = useState<string | undefined>(undefined);
-    const [newAnswerError, setNewAnswerError] = useState<string | undefined>(undefined);
+    const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+    const [autoFocusIndex, setAutoFocusIndex] = useState<number | null>(null);
 
-    const isNewPairValid = useMemo(() => {
-        return !validateFaqQuestion(newQuestion) && !validateFaqAnswer(newAnswer);
-    }, [newQuestion, newAnswer]);
-
-    const handleNewQuestionChange = useCallback(
-        (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-            const v = e.target.value;
-            setNewQuestion(v);
-            if (newQuestionError !== undefined) {
-                setNewQuestionError(validateFaqQuestion(v));
-            }
-        },
-        [newQuestionError],
-    );
-
-    const handleNewAnswerChange = useCallback(
-        (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-            const v = e.target.value;
-            setNewAnswer(v);
-            if (newAnswerError !== undefined) {
-                setNewAnswerError(validateFaqAnswer(v));
-            }
-        },
-        [newAnswerError],
-    );
-
-    const handleNewQuestionBlur = useCallback(() => {
-        setNewQuestionError(validateFaqQuestion(newQuestion));
-    }, [newQuestion]);
-
-    const handleNewAnswerBlur = useCallback(() => {
-        setNewAnswerError(validateFaqAnswer(newAnswer));
-    }, [newAnswer]);
+    const lastPair = faqPairs.length > 0 ? faqPairs[faqPairs.length - 1] : null;
+    const isAddDisabled =
+        lastPair !== null && (!!validateFaqQuestion(lastPair.questionText) || !!validateFaqAnswer(lastPair.answerText));
 
     const handleAddClick = useCallback(() => {
-        const qError = validateFaqQuestion(newQuestion);
-        const aError = validateFaqAnswer(newAnswer);
+        onAddFaqPair?.('', '');
+        const newIndex = faqPairs.length;
+        setExpandedIndex(newIndex);
+        setAutoFocusIndex(newIndex);
+    }, [onAddFaqPair, faqPairs.length]);
 
-        if (qError || aError) {
-            setNewQuestionError(qError);
-            setNewAnswerError(aError);
-            return;
-        }
+    const handleExpandToggle = useCallback((index: number) => {
+        setExpandedIndex((prev) => (prev === index ? null : index));
+    }, []);
 
-        onAddFaqPair?.(newQuestion, newAnswer);
-        setNewQuestion('');
-        setNewAnswer('');
-        setNewQuestionError(undefined);
-        setNewAnswerError(undefined);
-    }, [onAddFaqPair, newQuestion, newAnswer]);
+    const handleDelete = useCallback(
+        (index: number) => {
+            onDeleteFaqPair?.(index);
+            setExpandedIndex((prev) => {
+                if (prev === null) return null;
+                if (prev === index) return null;
+                if (prev > index) return prev - 1;
+                return prev;
+            });
+            setAutoFocusIndex(null);
+        },
+        [onDeleteFaqPair],
+    );
 
     const viewQuestions: PublishedFaqQuestion[] = useMemo(() => {
         if (questions.length > 0) return questions;
@@ -163,40 +138,14 @@ export const FaqProgramSection = ({
                                 idPrefix={idPrefix}
                                 questionText={pair.questionText}
                                 answerText={pair.answerText}
+                                isExpanded={expandedIndex === index}
+                                autoFocus={autoFocusIndex === index}
                                 onQuestionChange={(i, val) => onFaqQuestionChange?.(i, val)}
                                 onAnswerChange={(i, val) => onFaqAnswerChange?.(i, val)}
-                                onDelete={(i) => onDeleteFaqPair?.(i)}
+                                onDelete={handleDelete}
+                                onExpandToggle={handleExpandToggle}
                             />
                         ))}
-
-                        <div className={styles['new-pair']}>
-                            <TextAreaWithCharacterLimitGroup
-                                label={FAQ_TEXT.FORM.LABEL.QUESTION}
-                                isRequired
-                                id={`${idPrefix}-faq-new-question`}
-                                name={`${idPrefix}-faq-new-question`}
-                                value={newQuestion}
-                                onChange={handleNewQuestionChange}
-                                onBlur={handleNewQuestionBlur}
-                                maxLength={FAQ_VALIDATION.question.max}
-                                rows={2}
-                                currentLength={getTrimmedInputText(newQuestion).length}
-                                error={newQuestionError}
-                            />
-                            <TextAreaWithCharacterLimitGroup
-                                label={FAQ_TEXT.FORM.LABEL.ANSWER}
-                                isRequired
-                                id={`${idPrefix}-faq-new-answer`}
-                                name={`${idPrefix}-faq-new-answer`}
-                                value={newAnswer}
-                                onChange={handleNewAnswerChange}
-                                onBlur={handleNewAnswerBlur}
-                                maxLength={FAQ_VALIDATION.answer.max}
-                                rows={3}
-                                currentLength={getTrimmedInputText(newAnswer).length}
-                                error={newAnswerError}
-                            />
-                        </div>
 
                         <div className={styles['actions-row']}>
                             <Button
@@ -204,7 +153,7 @@ export const FaqProgramSection = ({
                                 className={styles['add-button']}
                                 onClick={handleAddClick}
                                 type="button"
-                                disabled={!isNewPairValid}
+                                disabled={isAddDisabled}
                             >
                                 {PROGRAMS_TEXT.BUTTON.ADD}
                                 <PlusIcon />

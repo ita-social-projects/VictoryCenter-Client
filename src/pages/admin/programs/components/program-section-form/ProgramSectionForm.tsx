@@ -15,6 +15,7 @@ import {
     getProgramSectionTemplateMaxGroupCount,
     normalizeGroupedContentsGroupIndexes,
 } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
+import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
 
 export interface ProgramSectionFormProps {
     section: ProgramSection;
@@ -457,7 +458,15 @@ export const ProgramSectionForm = ({
 
     const [faqPairs, setFaqPairs] = useState<Array<{ questionText: string; answerText: string }>>([]);
 
-    const isSectionSaveValid = isSectionValid && (!isFaqTemplate || faqPairs.length > 0);
+    const isSectionSaveValid =
+        isSectionValid &&
+        (!isFaqTemplate ||
+            (faqPairs.length > 0 &&
+                faqPairs.every(
+                    (pair) =>
+                        !PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateFaqQuestion(pair.questionText) &&
+                        !PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateFaqAnswer(pair.answerText),
+                )));
 
     const handleFaqQuestionChange = useCallback((index: number, value: string) => {
         setFaqPairs((prev) => prev.map((p, i) => (i === index ? { ...p, questionText: value } : p)));

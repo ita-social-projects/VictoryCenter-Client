@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import cn from 'classnames';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { FAQ_TEXT, FAQ_VALIDATION } from '@/const/admin/faq';
@@ -14,9 +14,12 @@ interface EditableFaqCardProps {
     idPrefix: string;
     questionText: string;
     answerText: string;
+    isExpanded: boolean;
+    autoFocus?: boolean;
     onQuestionChange: (index: number, value: string) => void;
     onAnswerChange: (index: number, value: string) => void;
     onDelete: (index: number) => void;
+    onExpandToggle: (index: number) => void;
 }
 
 export const EditableFaqCard = ({
@@ -24,13 +27,23 @@ export const EditableFaqCard = ({
     idPrefix,
     questionText,
     answerText,
+    isExpanded,
+    autoFocus = false,
     onQuestionChange,
     onAnswerChange,
     onDelete,
+    onExpandToggle,
 }: EditableFaqCardProps) => {
-    const [isExpanded, setIsExpanded] = useState(false);
+    const cardRef = useRef<HTMLDivElement>(null);
     const [questionError, setQuestionError] = useState<string | undefined>(undefined);
     const [answerError, setAnswerError] = useState<string | undefined>(undefined);
+
+    useEffect(() => {
+        if (autoFocus && cardRef.current) {
+            const textarea = cardRef.current.querySelector('textarea');
+            textarea?.focus();
+        }
+    }, [autoFocus]);
 
     const handleQuestionChange = useCallback(
         (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -63,7 +76,7 @@ export const EditableFaqCard = ({
     }, [answerText]);
 
     return (
-        <div className={cn(styles['card'], { [styles['card--expanded']]: isExpanded })}>
+        <div ref={cardRef} className={cn(styles['card'], { [styles['card--expanded']]: isExpanded })}>
             <div className={styles['card-top-row']}>
                 <button
                     type="button"
@@ -91,7 +104,7 @@ export const EditableFaqCard = ({
                     <button
                         type="button"
                         className={cn(styles['expand-button'], { [styles['expand-button--open']]: isExpanded })}
-                        onClick={() => setIsExpanded((prev) => !prev)}
+                        onClick={() => onExpandToggle(index)}
                         aria-label={isExpanded ? 'Collapse answer' : 'Expand answer'}
                     >
                         <ArrowIcon />

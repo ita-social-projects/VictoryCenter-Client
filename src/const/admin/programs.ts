@@ -39,6 +39,11 @@ export const PROGRAMS_TEXT = {
                 DELETE_BLOCK_CONFIRMATION: 'Блок буде видалено. Бажаєте продовжити?',
             },
         },
+        SINGLE_TITLE_QUESTION_ANSWER_PAIRS: {
+            MODAL: {
+                DELETE_QUESTION_CONFIRMATION: 'Питання буде видалено. Бажаєте продовжити?',
+            },
+        },
         MODAL: {
             UNSAVED_CHANGES_TITLE: 'Відмінити додавання секції?',
             DELETE_SECTION_TITLE: 'Видалити секцію?',

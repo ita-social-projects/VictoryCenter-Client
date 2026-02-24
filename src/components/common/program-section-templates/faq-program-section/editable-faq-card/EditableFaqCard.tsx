@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import cn from 'classnames';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
+import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import { FAQ_TEXT, FAQ_VALIDATION } from '@/const/admin/faq';
+import { PROGRAMS_TEXT } from '@/const/admin/programs';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
 import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
 import { ReactComponent as ArrowIcon } from '@/assets/icons/arrow-down-right.svg';
@@ -38,6 +41,7 @@ export const EditableFaqCard = ({
     const cardRef = useRef<HTMLDivElement>(null);
     const [questionError, setQuestionError] = useState<string | undefined>(undefined);
     const [answerError, setAnswerError] = useState<string | undefined>(undefined);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
     useEffect(() => {
         if (autoFocus && cardRef.current) {
@@ -76,13 +80,26 @@ export const EditableFaqCard = ({
         setAnswerError(validateFaqAnswer(answerText));
     }, [answerText]);
 
+    const handleDeleteClick = useCallback(() => {
+        setIsDeleteModalOpen(true);
+    }, []);
+
+    const handleCancelDelete = useCallback(() => {
+        setIsDeleteModalOpen(false);
+    }, []);
+
+    const handleConfirmDelete = useCallback(() => {
+        onDelete(index);
+        setIsDeleteModalOpen(false);
+    }, [index, onDelete]);
+
     return (
         <div ref={cardRef} className={cn(styles['card'], { [styles['card--expanded']]: isExpanded })}>
             <div className={styles['card-top-row']}>
                 <button
                     type="button"
                     className={styles['delete-button']}
-                    onClick={() => onDelete(index)}
+                    onClick={handleDeleteClick}
                     aria-label="Delete question"
                 />
             </div>
@@ -131,6 +148,17 @@ export const EditableFaqCard = ({
                     />
                 </div>
             )}
+
+            <ConfirmationModal
+                isOpen={isDeleteModalOpen}
+                title={PROGRAMS_TEXT.SECTION.SINGLE_TITLE_QUESTION_ANSWER_PAIRS.MODAL.DELETE_QUESTION_CONFIRMATION}
+                isButtonsDisabled={false}
+                onConfirm={handleConfirmDelete}
+                onCancel={handleCancelDelete}
+                onClose={handleCancelDelete}
+                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
+                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
+            />
         </div>
     );
 };

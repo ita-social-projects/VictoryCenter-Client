@@ -1,6 +1,7 @@
 import { VisibilityStatus } from './common';
 import { Image, ImageValues } from '../common/image';
 import { ProgramSection } from '../common/program-sections';
+import { EntityLocalization, EntityWithLocalizations } from '../common/language';
 
 export interface ProgramCategory {
     id: number;
@@ -8,7 +9,7 @@ export interface ProgramCategory {
     programsCount: number;
 }
 
-export interface Program {
+export interface Program extends ProgramLocalizibleFields, EntityWithLocalizations<ProgramLocalization> {
     id: number;
     name: string;
     description: string;
@@ -30,6 +31,7 @@ export interface ProgramSearchItemData {
 }
 
 export interface ProgramCreateUpdate {
+    localizations: ProgramLocalization[];
     id: number | null;
     name: string;
     description: string;
@@ -57,3 +59,13 @@ export enum SectionCancelActionType {
     RevertAfterReplace,
     DiscardNewSection,
 }
+
+export interface ProgramLocalizibleFields {
+    name: string;
+    description: string;
+    location: string;
+    participantsCount: string;
+    meetingsCount: string;
+}
+
+export interface ProgramLocalization extends EntityLocalization, ProgramLocalizibleFields {}

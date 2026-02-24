@@ -1,18 +1,33 @@
 import { ButtonTooltip } from '@/components/admin/button-tooltip/ButtonTooltip';
 import { VisibilityStatusLabel } from '@/components/admin/visibility-status-label/VisibilityStatusLabel';
-import { Program } from '@/types/admin/programs';
+import { Program, ProgramLocalizibleFields } from '@/types/admin/programs';
 import { VisibilityStatus } from '@/types/admin/common';
 import { ReactComponent as BlankImage } from '@/assets/icons/blank-image.svg';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import './ProgramListItem.scss';
+import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
+import { LocalizationLanguage } from '@/types/common/language';
+import { returnDisplayedLocalization } from '@/utils/functions/localization/localization';
+import { useEffect, useState } from 'react';
 
 export interface ProgramListItemProps {
     program: Program;
+    language: LocalizationLanguage;
+    translationLanguages: LocalizationLanguage[];
     handleOnDeleteProgram: (program: Program) => void;
     handleOnEditProgram: (program: Program) => void;
 }
 
-export const ProgramListItem = ({ program, handleOnDeleteProgram, handleOnEditProgram }: ProgramListItemProps) => {
+export const ProgramListItem = ({ program, language, translationLanguages, handleOnDeleteProgram, handleOnEditProgram }: ProgramListItemProps) => {
+    const [textFields, setTextFields] = useState<Partial<ProgramLocalizibleFields>>();
+
+    useEffect(() => {
+        const displayedLocalization = returnDisplayedLocalization(program, language.code);
+        setTextFields({
+            name: displayedLocalization?.name || program.name,
+            description: displayedLocalization?.description || program.description,
+        });
+    }, [language, program]);
     return (
         <div className="program-item">
             <div className="program-info">
@@ -22,7 +37,8 @@ export const ProgramListItem = ({ program, handleOnDeleteProgram, handleOnEditPr
                     ) : (
                         <BlankImage className="program-info-identity-blank-image" />
                     )}
-                    <p>{program.name}</p>
+                    <p>{textFields?.name || program.name}</p>
+                    <LocalizationStatuses languages={translationLanguages} localizedEntity={program} />
                 </div>
                 <div className="program-info-description">
                     <p>{program.description}</p>

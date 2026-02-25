@@ -63,3 +63,34 @@ export const REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION = {
         height: 890,
     },
 };
+
+export const PDF_FILES_SECTION_VALIDATION = {
+    title: {
+        max: 100,
+    },
+    description: {
+        max: 500,
+    },
+};
+
+export const PDF_FILES_SECTION_TEXT = {
+    FORM: {
+        LABEL: {
+            TITLE: 'Заголовок',
+            DESCRIPTION: 'Опис',
+        },
+    },
+    TABLE: {
+        HEADER: {
+            NAME: 'Назва',
+            DATE_TIME: 'Дата/Час',
+            SIZE: 'Розмір',
+            ACTIONS: 'Дії',
+        },
+        ACTION: {
+            VIEW: 'Переглянути',
+            DELETE: 'Видалити',
+            DOWNLOAD: 'Завантажити',
+        },
+    },
+};

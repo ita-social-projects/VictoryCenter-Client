@@ -3,6 +3,7 @@ import { CategoryBar } from '@/components/admin/category-bar/CategoryBar';
 import { REPORTS_TEXT } from '@/const/admin/reports';
 import styles from './ReportAnalytics.module.scss';
 import './ReportAnalytics.scss';
+import { PdfFilesSection } from '../pdf-files-section/PdfFilesSection';
 
 interface ReportAnalyticsTab {
     id: 'income-expenses' | 'program-expenses' | 'pdf-files';
@@ -34,7 +35,7 @@ export const ReportAnalytics = ({ isEditing }: ReportAnalyticsProps) => {
                 onCategorySelect={setActiveTab}
             />
             <div>
-                {activeTab.id === 'pdf-files' && <div>PDF files tab</div>}
+                {activeTab.id === 'pdf-files' && <PdfFilesSection isEditing={isEditing} />}
                 {activeTab.id === 'income-expenses' && <div>Income expenses tab</div>}
                 {activeTab.id === 'program-expenses' && <div>Program expenses tab</div>}
             </div>

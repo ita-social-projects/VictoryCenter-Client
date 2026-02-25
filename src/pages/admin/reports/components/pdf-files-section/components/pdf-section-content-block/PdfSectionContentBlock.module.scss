@@ -1,0 +1,35 @@
+.root {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 630px;
+    width: 100%;
+}
+
+.field {
+    width: 100%;
+}
+
+.view-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.view-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0;
+}
+
+.view-text {
+    font-size: 1rem;
+    color: #333;
+    margin: 0;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+}

@@ -18,6 +18,7 @@ export const getFaqPairs = (contents: ProgramSectionContent[]) => {
         .filter((c) => c.contentType === ContentType.FaqPair)
         .sort((a, b) => a.order - b.order)
         .map((c, index) => ({
+            id: c.faqQuestion?.id,
             groupIndex: c.groupIndex ?? index,
             questionText: c.faqQuestion?.questionText || '',
             answerText: c.faqQuestion?.answerText || '',

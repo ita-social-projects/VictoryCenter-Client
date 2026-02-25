@@ -4,7 +4,12 @@ import { ImageValues } from '@/types/common/image';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { renderProgramSection } from '@/utils/functions/render-program-section';
 import styles from './ProgramSectionForm.module.scss';
-import { ProgramSection, ProgramSectionTemplate, ProgramSectionMode } from '@/types/common/program-sections';
+import {
+    FaqPairData,
+    ProgramSection,
+    ProgramSectionTemplate,
+    ProgramSectionMode,
+} from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 import {
     getProgramSectionTemplateMaxGroupCount,
@@ -134,7 +139,8 @@ export const ProgramSectionForm = ({
         author: p.author,
     }));
 
-    const faqPairs = getFaqPairs(localSection.contents).map((p) => ({
+    const faqPairs: FaqPairData[] = getFaqPairs(localSection.contents).map((p) => ({
+        id: p.id,
         questionText: p.questionText,
         answerText: p.answerText,
     }));
@@ -586,7 +592,7 @@ export const ProgramSectionForm = ({
             images: imageContents,
             ...(isCardTemplate ? { cards } : {}),
             ...(isDescriptionAuthorPairsTemplate ? { descriptionAuthorPairs } : {}),
-            ...(isFaqTemplate ? { faqPairs: faqPairs as any } : {}),
+            ...(isFaqTemplate ? { faqPairs } : {}),
         },
         mode: sectionMode,
         validationResetKey,

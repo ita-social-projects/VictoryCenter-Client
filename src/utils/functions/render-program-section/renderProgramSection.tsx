@@ -1,5 +1,10 @@
 import React from 'react';
-import { ProgramSectionContent, ProgramSectionTemplate, ProgramSectionMode } from '@/types/common/program-sections';
+import {
+    FaqPairData,
+    ProgramSectionContent,
+    ProgramSectionTemplate,
+    ProgramSectionMode,
+} from '@/types/common/program-sections';
 import { ImageValues, Image } from '@/types/common/image';
 import { ContentType } from '@/types/common/programs';
 import { QuadImagesBottom } from '@/components/common/program-section-templates/quad-images-bottom/QuadImagesBottom';
@@ -12,7 +17,6 @@ import { SingleImageRight } from '@/components/common/program-section-templates/
 import { TitleDescriptionCardsWrapper } from '@/components/common/program-section-templates/title-description-cards/TitleDescriptionCardsWrapper';
 import { SingleTitleQuintupleDescription } from '@/components/common/program-section-templates/single-title-quintuple-description/SingleTitleQuintupleDescription';
 import { SingleTitleDescriptionAuthorPairs } from '@/components/common/program-section-templates/single-title-description-author-pairs/SingleTitleDescriptionAuthorPairs';
-import { FaqQuestion } from '@/types/admin/faq';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { FaqProgramSection } from '@/components/common/program-section-templates/faq-program-section';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -35,7 +39,7 @@ export interface ProgramSectionData {
     cards?: ProgramSectionCardData[];
     descriptionAuthorPairs?: DescriptionAuthorPairData[];
     faqQuestions?: any[];
-    faqPairs?: FaqQuestion[];
+    faqPairs?: FaqPairData[];
 }
 
 export interface ProgramSectionHandlers {

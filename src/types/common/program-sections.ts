@@ -32,6 +32,12 @@ export enum ProgramSectionMode {
     View = 'view',
 }
 
+export interface FaqPairData {
+    id?: number;
+    questionText: string;
+    answerText: string;
+}
+
 export interface ProgramSectionContent {
     id?: number;
     sectionId?: number;

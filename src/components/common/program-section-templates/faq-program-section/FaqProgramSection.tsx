@@ -62,7 +62,7 @@ export const FaqProgramSection = ({
         resetKey: validationResetKey,
     });
 
-    const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+    const [expandedIndex, setExpandedIndex] = useState<number | null>(faqPairs.length === 1 ? 0 : null);
     const [autoFocusIndex, setAutoFocusIndex] = useState<number | null>(null);
     const initialPairAddedRef = useRef(false);
 

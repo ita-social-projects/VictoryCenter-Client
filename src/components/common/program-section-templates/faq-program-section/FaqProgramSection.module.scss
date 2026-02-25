@@ -32,7 +32,7 @@
     width: 100%;
     display: flex;
     justify-content: space-between;
-    border-top: 2px solid c.$blue-100;
+    border-top: 2px solid c.$light-blue-100;
     padding-top: 24px;
     gap: 10px;
 
@@ -130,7 +130,7 @@
 }
 
 .faq-card-program-section {
-    border-bottom-color: c.$blue-100;
+    border-bottom-color: c.$light-blue-100;
     width: 100%;
     max-width: 48rem;
 }

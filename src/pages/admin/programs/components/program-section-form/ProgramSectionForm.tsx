@@ -113,8 +113,10 @@ const ensureFaqPair = (contents: ProgramSectionContent[]): ProgramSectionContent
             contentType: ContentType.FaqPair,
             order: getNextOrder(contents),
             groupIndex: 0,
-            questionText: '',
-            answerText: '',
+            faqQuestion: {
+                questionText: '',
+                answerText: '',
+            },
         } as any,
     ];
 };

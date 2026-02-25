@@ -129,13 +129,13 @@ export const FaqProgramSection = ({
                             isRequired
                             id={`${idPrefix}-faq-title`}
                             name={`${idPrefix}-faq-title`}
-                            value={title || COMMON_TEXT_ADMIN.TAB.FAQ}
+                            value={title ?? ''}
                             onChange={handleTitleChange}
                             onBlur={handleTitleBlur}
                             maxLength={titleMaxLength}
                             rows={1}
                             error={titleError}
-                            currentLength={getTrimmedInputText(title || COMMON_TEXT_ADMIN.TAB.FAQ).length}
+                            currentLength={getTrimmedInputText(title ?? '').length}
                             className={styles['title-input-group']}
                         />
                     </div>

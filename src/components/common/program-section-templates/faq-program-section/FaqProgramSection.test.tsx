@@ -228,11 +228,11 @@ describe('FaqProgramSection', () => {
     });
 
     describe('Edit mode', () => {
-        it('renders editable title input with default value', () => {
+        it('renders editable title input with empty value when no title provided', () => {
             renderComponent({ mode: ProgramSectionMode.Edit });
 
             const textarea = screen.getByRole('textbox', { name: /заголовок/i });
-            expect(textarea).toHaveValue(COMMON_TEXT_ADMIN.TAB.FAQ);
+            expect(textarea).toHaveValue('');
         });
 
         it('displays title validation error', () => {

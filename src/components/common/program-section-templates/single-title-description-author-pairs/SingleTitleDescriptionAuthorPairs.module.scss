@@ -4,7 +4,7 @@
 @import '../shared/BaseSectionTemplate.module.scss';
 
 .container {
-    @extend .section-container;
+    @extend %section-container;
     width: 100%;
     background-color: c.$white;
 

@@ -2,7 +2,7 @@
 @import '../shared/BaseSectionTemplate.module.scss';
 
 .container {
-    @extend .section-container;
+    @extend %section-container;
     background-color: #fff;
     aspect-ratio: 1440 / 736;
     max-height: fit-content;

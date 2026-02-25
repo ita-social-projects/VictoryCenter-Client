@@ -3,7 +3,7 @@
 @import '../shared/BaseSectionTemplate.module.scss';
 
 .faq-section {
-    @extend .section-container;
+    @extend %section-container;
 
     box-sizing: border-box;
     display: flex;

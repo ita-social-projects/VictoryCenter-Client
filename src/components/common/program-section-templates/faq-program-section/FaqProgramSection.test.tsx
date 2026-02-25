@@ -297,13 +297,13 @@ describe('FaqProgramSection', () => {
 
             const expandButton = screen.getByTestId('expand-button-0');
 
-            expect(screen.getByTestId('editable-faq-card-0')).toHaveAttribute('data-expanded', 'false');
-
-            fireEvent.click(expandButton);
             expect(screen.getByTestId('editable-faq-card-0')).toHaveAttribute('data-expanded', 'true');
 
             fireEvent.click(expandButton);
             expect(screen.getByTestId('editable-faq-card-0')).toHaveAttribute('data-expanded', 'false');
+
+            fireEvent.click(expandButton);
+            expect(screen.getByTestId('editable-faq-card-0')).toHaveAttribute('data-expanded', 'true');
         });
 
         it('handles add FAQ pair', () => {

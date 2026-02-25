@@ -6,6 +6,7 @@ import {
     footerUk,
     aboutUsPageUk,
     programsPageUk,
+    detailedProgramPageUk,
     donateUk,
     reportsPageUk,
     partnersPageUk,
@@ -16,6 +17,7 @@ import {
     footerEn,
     aboutUsPageEn,
     programsPageEn,
+    detailedProgramPageEn,
     donateEn,
     reportsPageEn,
     partnersPageEn,
@@ -29,6 +31,7 @@ const resources = {
         footer: footerUk,
         aboutUsPage: aboutUsPageUk,
         programsPage: programsPageUk,
+        detailedProgramPage: detailedProgramPageUk,
         donatePage: donateUk,
         reportsPage: reportsPageUk,
         partnersPage: partnersPageUk,
@@ -39,6 +42,7 @@ const resources = {
         footer: footerEn,
         aboutUsPage: aboutUsPageEn,
         programsPage: programsPageEn,
+        detailedProgramPage: detailedProgramPageEn,
         donatePage: donateEn,
         reportsPage: reportsPageEn,
         partnersPage: partnersPageEn,
@@ -56,7 +60,17 @@ i18n.use(initReactI18next).init({
     resources,
     supportedLngs: LOCALES,
     fallbackLng: DEFAULT_LOCALE,
-    ns: ['header', 'footer', 'aboutUsPage', 'programsPage', 'donatePage', 'reportsPage', 'partnersPage', 'global'], // namespaces
+    ns: [
+        'header',
+        'footer',
+        'aboutUsPage',
+        'programsPage',
+        'detailedProgramPage',
+        'donatePage',
+        'reportsPage',
+        'partnersPage',
+        'global',
+    ], // namespaces
     defaultNS: 'aboutUsPage',
     interpolation: {
         escapeValue: false, // leave it for React

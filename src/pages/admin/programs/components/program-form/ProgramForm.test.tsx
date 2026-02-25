@@ -15,8 +15,6 @@ import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 
 HTMLElement.prototype.scrollIntoView = jest.fn();
 
-HTMLElement.prototype.scrollIntoView = jest.fn();
-
 jest.mock('@/validation/admin/program-schema/program-schema', () => ({
     PROGRAM_VALIDATION_FUNCTIONS: {
         validateName: jest.fn(),

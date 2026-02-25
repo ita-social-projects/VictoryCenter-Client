@@ -4,7 +4,6 @@ import cn from 'classnames';
 import { FaqCard } from '@/components/public/faq-section/faq-card/FaqCard';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { Button } from '@/components/admin/button/Button';
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { useProgramSectionValidation } from '@/hooks/admin/use-program-section-validation';
 import { PublishedFaqQuestion } from '@/types/public/faq-section';

@@ -63,80 +63,81 @@ const getFaqPairs = (contents: ProgramSectionContent[]) => {
         }));
 };
 
+const getNextOrder = (contents: ProgramSectionContent[]): number => {
+    return contents.length ? Math.max(...contents.map((c) => c.order)) + 1 : 0;
+};
+
+const ensureTitleContent = (contents: ProgramSectionContent[]): ProgramSectionContent[] => {
+    const hasTitleContent = contents.some((c) => c.contentType === ContentType.Title);
+    if (hasTitleContent) return contents;
+
+    return [
+        ...contents,
+        {
+            contentType: ContentType.Title,
+            order: getNextOrder(contents),
+            title: '',
+        } as any,
+    ];
+};
+
+const ensureDescriptionAuthorPair = (contents: ProgramSectionContent[]): ProgramSectionContent[] => {
+    const pairs = getDescriptionAuthorPairsByGroup(contents);
+    if (pairs.length > 0) return contents;
+
+    const nextOrder = getNextOrder(contents);
+    return [
+        ...contents,
+        {
+            contentType: ContentType.Description,
+            order: nextOrder,
+            groupIndex: 0,
+            description: '',
+        } as any,
+        {
+            contentType: ContentType.Author,
+            order: nextOrder + 1,
+            groupIndex: 0,
+            author: '',
+        } as any,
+    ];
+};
+
+const ensureFaqPair = (contents: ProgramSectionContent[]): ProgramSectionContent[] => {
+    const faqPairs = getFaqPairs(contents);
+    if (faqPairs.length > 0) return contents;
+
+    return [
+        ...contents,
+        {
+            contentType: ContentType.FaqPair,
+            order: getNextOrder(contents),
+            groupIndex: 0,
+            questionText: '',
+            answerText: '',
+        } as any,
+    ];
+};
+
+const PAIRED_TEMPLATES = [
+    ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
+    ProgramSectionTemplate.SingleTitleQuestionAnswerPairs,
+];
+
 const ensureTitleContentAndOnePair = (section: ProgramSection): ProgramSection => {
-    if (
-        section.template !== ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs &&
-        section.template !== ProgramSectionTemplate.SingleTitleQuestionAnswerPairs
-    ) {
+    if (!PAIRED_TEMPLATES.includes(section.template)) {
         return section;
     }
 
-    let updatedContents = section.contents;
-    let hasChanges = false;
-
-    const hasTitleContent = updatedContents.some((c) => c.contentType === ContentType.Title);
-
-    if (!hasTitleContent) {
-        const maxOrder = updatedContents.length ? Math.max(...updatedContents.map((c) => c.order)) : -1;
-
-        updatedContents = [
-            ...updatedContents,
-            {
-                contentType: ContentType.Title,
-                order: maxOrder + 1,
-                title: '',
-            } as any,
-        ];
-
-        hasChanges = true;
-    }
+    let contents = ensureTitleContent(section.contents);
 
     if (section.template === ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs) {
-        const pairs = getDescriptionAuthorPairsByGroup(updatedContents);
-        if (pairs.length > 0) {
-            return hasChanges ? { ...section, contents: updatedContents } : section;
-        }
-
-        const maxOrder = updatedContents.length ? Math.max(...updatedContents.map((c) => c.order)) : -1;
-
-        updatedContents = [
-            ...updatedContents,
-            {
-                contentType: ContentType.Description,
-                order: maxOrder + 1,
-                groupIndex: 0,
-                description: '',
-            } as any,
-            {
-                contentType: ContentType.Author,
-                order: maxOrder + 2,
-                groupIndex: 0,
-                author: '',
-            } as any,
-        ];
+        contents = ensureDescriptionAuthorPair(contents);
+    } else {
+        contents = ensureFaqPair(contents);
     }
 
-    if (section.template === ProgramSectionTemplate.SingleTitleQuestionAnswerPairs) {
-        const faqPairs = getFaqPairs(updatedContents);
-        if (faqPairs.length > 0) {
-            return hasChanges ? { ...section, contents: updatedContents } : section;
-        }
-
-        const maxOrder = updatedContents.length ? Math.max(...updatedContents.map((c) => c.order)) : -1;
-
-        updatedContents = [
-            ...updatedContents,
-            {
-                contentType: ContentType.FaqPair,
-                order: maxOrder + 1,
-                groupIndex: 0,
-                questionText: '',
-                answerText: '',
-            } as any,
-        ];
-    }
-
-    return { ...section, contents: updatedContents };
+    return contents === section.contents ? section : { ...section, contents };
 };
 
 export const ProgramSectionForm = ({

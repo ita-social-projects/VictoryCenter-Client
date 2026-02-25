@@ -119,13 +119,13 @@ const ensureFaqPair = (contents: ProgramSectionContent[]): ProgramSectionContent
     ];
 };
 
-const PAIRED_TEMPLATES = [
+const PAIRED_TEMPLATES = new Set([
     ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
     ProgramSectionTemplate.SingleTitleQuestionAnswerPairs,
-];
+]);
 
 const ensureTitleContentAndOnePair = (section: ProgramSection): ProgramSection => {
-    if (!PAIRED_TEMPLATES.includes(section.template)) {
+    if (!PAIRED_TEMPLATES.has(section.template)) {
         return section;
     }
 

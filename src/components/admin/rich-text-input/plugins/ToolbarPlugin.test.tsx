@@ -58,6 +58,13 @@ describe('ToolbarPlugin', () => {
         expect(screen.getByLabelText('Line break')).toBeInTheDocument();
     });
 
+    it('returns null and does not render when hidden prop is true', () => {
+        const { container } = render(<ToolbarPlugin hidden={true} />);
+
+        expect(container).toBeEmptyDOMElement();
+        expect(screen.queryByLabelText('Bold')).not.toBeInTheDocument();
+    });
+
     it('Bold button is disabled when disabled prop is true', () => {
         render(<ToolbarPlugin disabled={true} />);
         expect(screen.getByLabelText('Bold')).toBeDisabled();

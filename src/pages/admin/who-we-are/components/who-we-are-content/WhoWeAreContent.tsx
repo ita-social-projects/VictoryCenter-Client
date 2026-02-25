@@ -15,10 +15,12 @@ import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { WHO_WE_ARE_TEXT } from '@/const/admin/who-we-are';
 import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import classNames from 'classnames';
+import { WhoWeArePageToolbar } from '../who-we-are-page-toolbar/WhoWeArePageToolbar';
+import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
 
 interface ErrorState {
     message: string | null;
-    type: 'categories' | 'entity' | null;
+    type: 'categories' | 'entity' | 'languages' | null;
 }
 
 function isExistingImage(image: any): image is Image {
@@ -32,6 +34,7 @@ export const WhoWeAreContent = () => {
     const [updatedSection, setUpdatedSection] = useState<WhoWeAreSection | null>(null);
     const [isConfirmationModalOpen, setConfirmationModalOpen] = useState<boolean>(false);
     const [isPublishButtonActive, setIsPublishButtonActive] = useState<boolean>(false);
+    const [languagesError, setLanguagesError] = useState<string | null>(null);
 
     const { addToast } = useToast();
 
@@ -142,16 +145,31 @@ export const WhoWeAreContent = () => {
         if (sectionError) {
             return { message: WHO_WE_ARE_TEXT.FAIL_TO_FETCH_SECTION, type: 'entity' };
         }
+        if (languagesError) {
+            return { message: languagesError, type: 'languages' };
+        }
         return { message: null, type: null };
-    }, [categoryError, sectionError]);
+    }, [categoryError, sectionError, languagesError]);
+
+    const setErrorState = useCallback((message: string, type: 'categories' | 'entity' | 'languages') => {
+        if (type === 'languages') {
+            setLanguagesError(message);
+        }
+    }, []);
+
+    const { allLanguages, selectedLanguage, onLanguageChange, retryFetchLanguages } = useLocalizationToolkit({
+        setErrorState,
+    });
 
     const handleRetry = useCallback(() => {
         if (error.type === 'categories') {
             refetchCategories();
         } else if (error.type === 'entity') {
             refetchSection();
+        } else if (error.type === 'languages') {
+            retryFetchLanguages();
         }
-    }, [error.type, refetchCategories, refetchSection]);
+    }, [error.type, refetchCategories, refetchSection, retryFetchLanguages]);
 
     const isLoading = isCategoriesLoading || isSectionLoading;
     const isPending = isLoading || !!error.message;
@@ -177,28 +195,35 @@ export const WhoWeAreContent = () => {
         }
 
         return (
-            <SectionsWrapper
-                section={updatedSection}
-                onChange={handleContentChange}
-                onPublish={() => setConfirmationModalOpen(true)}
-                setIsPublishButtonActive={(value) => setIsPublishButtonActive(value)}
-                isPublishButtonActive={isPublishButtonActive}
-            />
+            selectedLanguage && (
+                <SectionsWrapper
+                    section={updatedSection}
+                    onChange={handleContentChange}
+                    onPublish={() => setConfirmationModalOpen(true)}
+                    setIsPublishButtonActive={(value) => setIsPublishButtonActive(value)}
+                    isPublishButtonActive={isPublishButtonActive}
+                    language={selectedLanguage}
+                />
+            )
         );
     };
 
     return (
         <>
-            <div className={classNames('who-we-are-main-box', { 'who-we-are-main-box--pending': isPending })}>
-                <CategoryBar<WhoWeAreCategory>
-                    categories={categories}
-                    selectedCategory={selectedCategory}
-                    getCategoryDisplayName={(category) => category.title}
-                    getCategoryKey={(category) => category.id}
-                    onCategorySelect={handleCategorySelect}
-                />
-
-                {renderContent()}
+            <div className="who-we-are-page-container">
+                <div className="who-we-are-toolbar-container">
+                    <WhoWeArePageToolbar languages={allLanguages} onLanguageChange={onLanguageChange} />
+                </div>
+                <div className={classNames('who-we-are-main-box', { 'who-we-are-main-box--pending': isPending })}>
+                    <CategoryBar<WhoWeAreCategory>
+                        categories={categories}
+                        selectedCategory={selectedCategory}
+                        getCategoryDisplayName={(category) => category.title}
+                        getCategoryKey={(category) => category.id}
+                        onCategorySelect={handleCategorySelect}
+                    />
+                    {renderContent()}
+                </div>
             </div>
             <ConfirmationModal
                 isOpen={isConfirmationModalOpen}

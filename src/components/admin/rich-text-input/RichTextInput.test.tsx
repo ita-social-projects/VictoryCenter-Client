@@ -87,19 +87,22 @@ jest.mock('./plugins', () => {
         mockFocusPluginProps = props;
         return null;
     };
-    const MockToolbarPlugin = ({ disabled }: { disabled?: boolean }) => (
-        <div data-testid="toolbar">
-            <button disabled={disabled} aria-label="Bold" title="Bold (Ctrl+B)">
-                <strong>B</strong>
-            </button>
-            <button disabled={disabled} aria-label="Italic" title="Italic (Ctrl+I)">
-                <em>I</em>
-            </button>
-            <button disabled={disabled} aria-label="Line break" title="Line break">
-                ↵
-            </button>
-        </div>
-    );
+    const MockToolbarPlugin = ({ disabled, hidden }: { disabled?: boolean; hidden?: boolean }) => {
+        if (hidden) return null;
+        return (
+            <div data-testid="toolbar">
+                <button disabled={disabled} aria-label="Bold" title="Bold (Ctrl+B)">
+                    <strong>B</strong>
+                </button>
+                <button disabled={disabled} aria-label="Italic" title="Italic (Ctrl+I)">
+                    <em>I</em>
+                </button>
+                <button disabled={disabled} aria-label="Line break" title="Line break">
+                    ↵
+                </button>
+            </div>
+        );
+    };
     const MockInitialValuePlugin = (props: any) => {
         mockInitialValuePluginProps = props;
         return props.value ? (
@@ -356,6 +359,34 @@ describe('RichTextInput', () => {
 
             renderRichTextInput({ value: '' });
 
+            expect($generateNodesFromDOM).not.toHaveBeenCalled();
+            expect($insertNodes).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('HideToolbar functionality', () => {
+        it('hides toolbar when hideToolbar is true', () => {
+            renderRichTextInput({ hideToolbar: true });
+            expect(screen.queryByTestId('toolbar')).not.toBeInTheDocument();
+        });
+
+        it('shows toolbar when hideToolbar is false', () => {
+            renderRichTextInput({ hideToolbar: false });
+            expect(screen.getByTestId('toolbar')).toBeInTheDocument();
+        });
+
+        it('shows toolbar when hideToolbar is undefined', () => {
+            renderRichTextInput();
+            expect(screen.getByTestId('toolbar')).toBeInTheDocument();
+        });
+    });
+
+    describe('Error Handling', () => {
+        it('includes error handler in config', () => {
+            const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+            renderRichTextInput();
+            expect(screen.getByTestId('lexical-composer')).toBeInTheDocument();
+            consoleErrorSpy.mockRestore();
             expect($generateNodesFromDOM).not.toHaveBeenCalled();
             expect($insertNodes).not.toHaveBeenCalled();
         });

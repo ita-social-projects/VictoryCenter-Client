@@ -11,6 +11,17 @@ export const WHO_WE_ARE_TEXT = {
     FAIL_TO_FETCH_PREVIEWS: 'Виникла помилка, не вдалось завантажити назви секцій',
     FAIL_TO_FETCH_SECTION: 'Виникла помилка, не вдалось завантажити секцію',
 
+    FORM: {
+        TITLE: {
+            ADD_TRANSLATION: 'Додати переклад',
+            EDIT_TRANSLATION: 'Редагувати переклад',
+        },
+        LABEL: {
+            TITLE: 'Заголовок',
+            DESCRIPTION: 'Опис',
+        },
+    },
+
     MIN_LENGTH: 10,
 };
 
@@ -45,4 +56,21 @@ export const IMAGE_CONFIGS = {
         displayWidth: 360,
         displayHeight: 430,
     } as WhoWeAreImageConfigParams,
+};
+
+export const WHO_WE_ARE_VALIDATION = {
+    title: {
+        min: 10,
+        max: 50,
+        getRequiredError: () => 'Назва обов’язкова',
+        getMinError: () => `Не менше ${WHO_WE_ARE_VALIDATION.title.min} символів`,
+        getMaxError: () => `Не більше ${WHO_WE_ARE_VALIDATION.title.max} символів`,
+    },
+    description: {
+        min: 50,
+        max: 300,
+        getRequiredError: () => 'Опис обов’язковий',
+        getMinError: () => `Не менше ${WHO_WE_ARE_VALIDATION.description.min} символів`,
+        getMaxError: () => `Не більше ${WHO_WE_ARE_VALIDATION.description.max} символів`,
+    },
 };

@@ -45,18 +45,18 @@ describe('useChartGeometry', () => {
             point: { x: 150, y: 200 },
         });
 
-        const { result, rerender } = renderHook(({ itemsLength, dep }) => useChartGeometry(itemsLength, [dep]), {
-            initialProps: {
-                itemsLength: 2,
-                dep: 1,
+        const { result, rerender } = renderHook(
+            ({ itemsLength, isDesktop }) => useChartGeometry(itemsLength, isDesktop),
+            {
+                initialProps: { itemsLength: 2, isDesktop: true },
             },
-        });
+        );
 
         act(() => {
             result.current.pathRefs.current = [mockPath1 as any, mockPath2 as any];
         });
 
-        rerender({ itemsLength: 2, dep: 2 });
+        rerender({ itemsLength: 2, isDesktop: false });
 
         expect(result.current.positions).toEqual([
             { x: 110, y: 55 },
@@ -65,15 +65,18 @@ describe('useChartGeometry', () => {
     });
 
     it('returns {0,0} when path is null', () => {
-        const { result, rerender } = renderHook(({ itemsLength, dep }) => useChartGeometry(itemsLength, [dep]), {
-            initialProps: { itemsLength: 1, dep: 1 },
-        });
+        const { result, rerender } = renderHook(
+            ({ itemsLength, isDesktop }) => useChartGeometry(itemsLength, isDesktop),
+            {
+                initialProps: { itemsLength: 1, isDesktop: true },
+            },
+        );
 
         act(() => {
             result.current.pathRefs.current = [null];
         });
 
-        rerender({ itemsLength: 1, dep: 2 });
+        rerender({ itemsLength: 1, isDesktop: false });
 
         expect(result.current.positions).toEqual([{ x: 0, y: 0 }]);
     });
@@ -85,15 +88,18 @@ describe('useChartGeometry', () => {
             point: { x: 100, y: 50 },
         });
 
-        const { result, rerender } = renderHook(({ itemsLength, dep }) => useChartGeometry(itemsLength, [dep]), {
-            initialProps: { itemsLength: 1, dep: 1 },
-        });
+        const { result, rerender } = renderHook(
+            ({ itemsLength, isDesktop }) => useChartGeometry(itemsLength, isDesktop),
+            {
+                initialProps: { itemsLength: 1, isDesktop: true },
+            },
+        );
 
         act(() => {
             result.current.pathRefs.current = [mockPath as any, mockPath as any];
         });
 
-        rerender({ itemsLength: 1, dep: 2 });
+        rerender({ itemsLength: 1, isDesktop: false });
 
         expect(result.current.positions).toHaveLength(1);
     });
@@ -105,15 +111,18 @@ describe('useChartGeometry', () => {
             point: { x: 100, y: 50 },
         });
 
-        const { result, rerender } = renderHook(({ itemsLength, dep }) => useChartGeometry(itemsLength, [dep]), {
-            initialProps: { itemsLength: 1, dep: 1 },
-        });
+        const { result, rerender } = renderHook(
+            ({ itemsLength, isDesktop }) => useChartGeometry(itemsLength, isDesktop),
+            {
+                initialProps: { itemsLength: 1, isDesktop: true },
+            },
+        );
 
         act(() => {
             result.current.pathRefs.current = [mockPath as any, mockPath as any];
         });
 
-        rerender({ itemsLength: 2, dep: 1 });
+        rerender({ itemsLength: 2, isDesktop: true });
 
         expect(result.current.positions).toHaveLength(2);
     });

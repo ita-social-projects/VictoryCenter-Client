@@ -11,7 +11,7 @@ interface ChartGraphicProps {
 
 export const ChartGraphic = ({ items }: ChartGraphicProps) => {
     const isDesktop = useMediaQuery('(min-width: 1440px)');
-    const { pathRefs, positions } = useChartGeometry(items.length, [items, isDesktop]);
+    const { pathRefs, positions } = useChartGeometry(items.length, isDesktop);
     const config = isDesktop ? CHART_CONFIG.desktop : CHART_CONFIG.mobile;
 
     return (

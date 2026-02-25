@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import { LABEL_OFFSETS } from '../chart-graphic/chart.config';
 
-export function useChartGeometry(itemsLength: number, deps: any[]) {
+export function useChartGeometry(itemsLength: number, isDesktop: boolean) {
     const pathRefs = useRef<(SVGPathElement | null)[]>([]);
     const [positions, setPositions] = useState<{ x: number; y: number }[]>([]);
 
@@ -25,7 +25,7 @@ export function useChartGeometry(itemsLength: number, deps: any[]) {
         });
 
         setPositions(result);
-    }, [itemsLength, ...deps]);
+    }, [itemsLength, isDesktop]);
 
     return { pathRefs, positions };
 }

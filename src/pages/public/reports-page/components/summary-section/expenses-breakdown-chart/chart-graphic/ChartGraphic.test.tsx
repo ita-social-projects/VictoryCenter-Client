@@ -117,6 +117,6 @@ describe('ChartGraphic', () => {
 
         render(<ChartGraphic items={items} />);
 
-        expect(mockedUseChartGeometry).toHaveBeenCalledWith(items.length, [items, true]);
+        expect(mockedUseChartGeometry).toHaveBeenCalledWith(items.length, true);
     });
 });

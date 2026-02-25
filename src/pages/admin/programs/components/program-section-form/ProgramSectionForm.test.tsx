@@ -216,6 +216,34 @@ describe('ProgramSectionForm', () => {
         expect(baseProps.onCancel).toHaveBeenCalledTimes(1);
     });
 
+    it('reverts section changes when onAfterDiscard is called for non-new section', () => {
+        const section = makeSection({
+            contents: [makeTitleContent('Original Title', 0), makeDescriptionContent(1, 'Original Description')],
+        });
+
+        const onCancel = jest.fn();
+        const { handlers } = renderWithHandlers({ section, isNewSection: false, onCancel });
+
+        const editButton = screen.getByLabelText('Edit section');
+        fireEvent.click(editButton);
+
+        act(() => {
+            handlers.onTitleChange('Modified Title');
+        });
+        fireEvent.click(screen.getByText(PROGRAMS_TEXT.BUTTON.CANCEL));
+
+        expect(onCancel).toHaveBeenCalledTimes(1);
+
+        const cancelOptions = onCancel.mock.calls[0][0];
+        expect(cancelOptions.shouldRemove).toBe(false);
+        expect(cancelOptions.revertTo.contents[0].title).toBe('Original Title');
+
+        act(() => {
+            cancelOptions.onAfterDiscard();
+        });
+        expect(screen.getByLabelText('Edit section')).toBeInTheDocument();
+    });
+
     it('save button is disabled when isSectionValid is false', () => {
         renderForm({ isNewSection: true, isSectionValid: false });
         expect(screen.getByText(PROGRAMS_TEXT.BUTTON.SAVE)).toBeDisabled();

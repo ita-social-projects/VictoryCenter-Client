@@ -1,14 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export function useMediaQuery(query: string): boolean {
     const [matches, setMatches] = useState(() => window.matchMedia(query).matches);
 
     useEffect(() => {
         const media = window.matchMedia(query);
-        const listener = () => setMatches(media.matches);
+        const updateMatches = (event?: MediaQueryListEvent) => {
+            setMatches(event?.matches ?? media.matches);
+        };
 
-        media.addEventListener('change', listener);
-        return () => media.removeEventListener('change', listener);
+        updateMatches();
+        media.addEventListener('change', updateMatches);
+        return () => media.removeEventListener('change', updateMatches);
     }, [query]);
 
     return matches;

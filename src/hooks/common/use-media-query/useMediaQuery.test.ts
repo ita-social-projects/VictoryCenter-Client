@@ -42,7 +42,7 @@ describe('useMediaQuery', () => {
         jest.clearAllMocks();
     });
 
-    it('returns initial match value', () => {
+    it('returns initial match value immediately', () => {
         matchMediaMock.matches = true;
 
         const { result } = renderHook(() => useMediaQuery('(min-width: 768px)'));
@@ -50,7 +50,7 @@ describe('useMediaQuery', () => {
         expect(result.current).toBe(true);
     });
 
-    it('updates value when media query changes', () => {
+    it('updates value when media query changes via event', () => {
         const { result } = renderHook(() => useMediaQuery('(min-width: 768px)'));
 
         expect(result.current).toBe(false);

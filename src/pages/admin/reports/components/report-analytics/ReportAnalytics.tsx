@@ -24,7 +24,7 @@ export const ReportAnalytics = ({ isEditing }: ReportAnalyticsProps) => {
     const [activeTab, setActiveTab] = useState<ReportAnalyticsTab>(ANALYTICS_TABS[0]);
 
     return (
-        <div className={styles.reportAnalytics}>
+        <div className={styles['report-analytics']}>
             <h2 className={styles.title}>{REPORTS_TEXT.REPORT_AND_ANALYTICS.TITLE}</h2>
             <CategoryBar<ReportAnalyticsTab>
                 className={`report-category-bar ${styles.reportCategoryBar}`}
@@ -34,7 +34,7 @@ export const ReportAnalytics = ({ isEditing }: ReportAnalyticsProps) => {
                 getCategoryKey={(tab) => tab.id}
                 onCategorySelect={setActiveTab}
             />
-            <div>
+            <div className={styles['tab-content']}>
                 {activeTab.id === 'pdf-files' && <PdfFilesSection isEditing={isEditing} />}
                 {activeTab.id === 'income-expenses' && <div>Income expenses tab</div>}
                 {activeTab.id === 'program-expenses' && <div>Program expenses tab</div>}

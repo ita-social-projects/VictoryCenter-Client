@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { PdfSectionContentBlock } from './components/pdf-section-content-block/PdfSectionContentBlock';
 import { PdfFilesTable } from './components/pdf-files-table/PdfFilesTable';
 import styles from './PdfFilesSection.module.scss';
+import { LanguageSwitcherButtons } from './components/language-switcher-buttons/LanguageSwitcherButtons';
 
 interface PdfSectionContent {
     title: string;
@@ -73,6 +74,9 @@ export const PdfFilesSection = ({ isEditing }: PdfFilesSectionProps) => {
                 onTitleChange={handleTitleChange}
                 onDescriptionChange={handleDescriptionChange}
             />
+            <div className={styles.languageSwitcherContainer}>
+                <LanguageSwitcherButtons />
+            </div>
             <PdfFilesTable
                 files={MOCK_PDF_FILES}
                 isEditing={isEditing}

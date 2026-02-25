@@ -1,38 +1,41 @@
+@use '@/assets/sass/variables/colors' as c; 
+
 .table-container {
     overflow-x: auto;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    margin-left: 10px;
+    max-width: 1440px;
+    border: 1px solid #e0e0e0;
 }
 
 .table {
+    max-width: 1440px;
     width: 100%;
     border-collapse: collapse;
-    font-family: inherit;
 
     thead {
-        background-color: #f5f5f5;
         border-bottom: 1px solid #e0e0e0;
+        color: c.$grey-900;
     }
+}
+
+th, td {
+    padding: 1rem;
 }
 
 .header-row {
     th {
-        padding: 1rem;
-        text-align: left;
-        font-weight: 600;
-        font-size: 0.875rem;
-        color: #333;
+        font-weight: 700;
+        font-size: 24px;
         white-space: nowrap;
     }
 }
 
 .row {
     border-bottom: 1px solid #f0f0f0;
-    transition: background-color 0.2s ease;
-
-    &:hover {
-        background-color: #fafafa;
-    }
+    font-size: 20px;
+    font-weight: 600;
+    color: c.$graphite_black;
 
     &:last-child {
         border-bottom: none;
@@ -43,36 +46,24 @@
     }
 }
 
-.cell {
-    font-size: 0.875rem;
-    color: #555;
-
-    &.name-cell {
-        min-width: 220px;
-    }
-
-    &.date-cell {
-        min-width: 140px;
-    }
-
-    &.size-cell {
-        min-width: 100px;
-        text-align: center;
-    }
-
-    &.actions-cell {
-        min-width: 120px;
-        text-align: right;
-    }
+.name-cell {
+    width: 25%;
+    text-align: left;
 }
 
-.file-name {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-weight: 500;
-    color: #333;
-    word-break: break-word;
+.date-cell {
+    width: 25%;
+    text-align: center;
+}
+
+.size-cell {
+    width: 25%;
+    text-align: center;
+}
+
+.actions-cell {
+    width: 25%;
+    text-align: right;
 }
 
 .action-buttons {
@@ -82,24 +73,17 @@
     align-items: center;
 }
 
-.action-button {
-    &:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-
-    svg {
-        color: #666;
-        transition: color 0.2s ease;
-    }
-
-    &:hover:not(:disabled) svg {
-        color: #1976d2;
+.icon-button{
+    cursor: pointer;
+    color: c.$blue-500;
+    &:hover {
+        color: c.$grey-700;
     }
 }
 
-.delete-button {
-    &:hover:not(:disabled) svg {
-        color: #d32f2f;
-    }
+.file-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 15px;
+    vertical-align: top;
 }

@@ -1,6 +1,5 @@
-import React from 'react';
-import { IconButton, Tooltip } from '@mui/material';
 import { ReactComponent as EyeIcon } from '@/assets/icons/eye-opened.svg';
+import { ReactComponent as FileIcon } from '@/assets/icons/file.svg';
 import { ReactComponent as DeleteIcon } from '@/assets/icons/delete.svg';
 import { ReactComponent as DownloadIcon } from '@/assets/icons/cloud-download.svg';
 import { PDF_FILES_SECTION_TEXT } from '@/const/admin/reports';
@@ -53,44 +52,20 @@ export const PdfFilesTable: React.FC<PdfFilesTableProps> = ({
                     {files.map((file) => (
                         <tr key={file.id} className={styles.row}>
                             <td className={cn(styles.cell, styles['name-cell'])}>
+                                <FileIcon className={styles['file-icon']} />
                                 <span className={styles['file-name']}>{file.name}</span>
                             </td>
                             <td className={cn(styles.cell, styles['date-cell'])}>{file.dateTime}</td>
                             <td className={cn(styles.cell, styles['size-cell'])}>{file.size}</td>
                             <td className={cn(styles.cell, styles['actions-cell'])}>
                                 <div className={styles['action-buttons']}>
-                                    <Tooltip title={PDF_FILES_SECTION_TEXT.TABLE.ACTION.VIEW} placement="top">
-                                        <IconButton
-                                            size="small"
-                                            onClick={() => onViewFile(file)}
-                                            className={styles['action-button']}
-                                        >
-                                            <EyeIcon width={20} height={20} />
-                                        </IconButton>
-                                    </Tooltip>
+                                    <EyeIcon className={cn(styles['view-icon'], styles['icon-button'])} />
                                     {isEditing && (
                                         <>
-                                            <Tooltip
-                                                title={PDF_FILES_SECTION_TEXT.TABLE.ACTION.DOWNLOAD}
-                                                placement="top"
-                                            >
-                                                <IconButton
-                                                    size="small"
-                                                    onClick={() => onDownloadFile(file)}
-                                                    className={styles['action-button']}
-                                                >
-                                                    <DownloadIcon width={20} height={20} />
-                                                </IconButton>
-                                            </Tooltip>
-                                            <Tooltip title={PDF_FILES_SECTION_TEXT.TABLE.ACTION.DELETE} placement="top">
-                                                <IconButton
-                                                    size="small"
-                                                    onClick={() => onDeleteFile(file.id)}
-                                                    className={cn(styles['action-button'], styles['delete-button'])}
-                                                >
-                                                    <DeleteIcon width={20} height={20} />
-                                                </IconButton>
-                                            </Tooltip>
+                                            <DownloadIcon
+                                                className={cn(styles['download-icon'], styles['icon-button'])}
+                                            />
+                                            <DeleteIcon className={cn(styles['delete-icon'], styles['icon-button'])} />
                                         </>
                                     )}
                                 </div>

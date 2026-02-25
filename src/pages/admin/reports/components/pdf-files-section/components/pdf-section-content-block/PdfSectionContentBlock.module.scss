@@ -1,9 +1,18 @@
+@use '@/assets/sass/variables/colors' as c; 
+
 .root {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-    max-width: 630px;
-    width: 100%;
+    max-width: 1440px;
+    width: auto;
+    height: 100%;
+    border: 1px solid #E2E2E2;
+    border-radius: 16px;
+    padding: 63px 40px;
+    margin: 0 15px;
+    box-shadow:
+        0 12px 15px rgba(17,17,19,0.19);
 }
 
 .field {
@@ -13,23 +22,38 @@
 .view-field {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 10px;
 }
 
 .view-label {
-    font-size: 0.875rem;
+    font-size: 24px;
     font-weight: 600;
-    color: #999;
+    color: rgba(98, 97, 97, 1);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin: 0;
+    letter-spacing: 0px;
 }
 
 .view-text {
-    font-size: 1rem;
-    color: #333;
-    margin: 0;
-    line-height: 1.6;
-    white-space: pre-wrap;
-    word-break: break-word;
+    color: c.$black;
+    font-weight: 600;
+    letter-spacing: 0px;
+    background-color: c.$light-blue-25;
+    border-radius: 5px;
+
+    &-title {
+        padding: 22px 25px;
+    }
+
+    &-description {
+        padding: 47px 25px;
+    }
+}
+
+.view-text-title {
+    font-size: 32px;
+}
+
+.view-text-description {
+    font-size: 24px;
+    line-height: 30px;
 }

@@ -1,8 +1,8 @@
-import React from 'react';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { PDF_FILES_SECTION_VALIDATION, PDF_FILES_SECTION_TEXT } from '@/const/admin/reports';
 import styles from './PdfSectionContentBlock.module.scss';
+import cn from 'classnames';
 
 interface PdfSectionContent {
     title: string;
@@ -57,12 +57,12 @@ export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({
     return (
         <div className={styles.root}>
             <div className={styles['view-field']}>
-                <label className={styles['view-label']}>{PDF_FILES_SECTION_TEXT.FORM.LABEL.TITLE}</label>
-                <p className={styles['view-text']}>{content.title}</p>
+                <label className={styles['view-label']}>{PDF_FILES_SECTION_TEXT.VIEW.TITLE}</label>
+                <p className={cn(styles['view-text'], styles['view-text-title'])}>{content.title}</p>
             </div>
             <div className={styles['view-field']}>
-                <label className={styles['view-label']}>{PDF_FILES_SECTION_TEXT.FORM.LABEL.DESCRIPTION}</label>
-                <p className={styles['view-text']}>{content.description}</p>
+                <label className={styles['view-label']}>{PDF_FILES_SECTION_TEXT.VIEW.DESCRIPTION}</label>
+                <p className={cn(styles['view-text'], styles['view-text-description'])}>{content.description}</p>
             </div>
         </div>
     );

@@ -74,6 +74,10 @@ export const PDF_FILES_SECTION_VALIDATION = {
 };
 
 export const PDF_FILES_SECTION_TEXT = {
+    VIEW: {
+        TITLE: 'Заголовок розділу PDF',
+        DESCRIPTION: 'Короткий опис для користувачів',
+    },
     FORM: {
         LABEL: {
             TITLE: 'Заголовок',

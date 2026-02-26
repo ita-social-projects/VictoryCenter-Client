@@ -17,6 +17,7 @@ import './SectionsWrapper.scss';
 export interface MainSectionProps {
     section: WhoWeAreSection | null;
     onChange: (data: Content) => void;
+    handleOnTranslateContent: (section: WhoWeAreSection) => void;
     onPublish: () => void;
     isPublishButtonActive: boolean;
     setIsPublishButtonActive: (value: boolean) => void;
@@ -31,6 +32,7 @@ interface SectionConfig {
 export const SectionsWrapper = ({
     section,
     onChange,
+    handleOnTranslateContent,
     onPublish,
     setIsPublishButtonActive,
     isPublishButtonActive,
@@ -80,10 +82,19 @@ export const SectionsWrapper = ({
 
     const { component: Component, additionalProps } = config;
 
+    const handleTranslateContent = () => {
+        handleOnTranslateContent(section); // TODO: hardcode for testing modal window
+    };
+
     return (
         <div className="who-we-are-main-section">
             <div className="who-we-are-section-buttons">
-                <button type="button" className="who-we-are-translate-btn" aria-label="Translate" />
+                <button
+                    type="button"
+                    className="who-we-are-translate-btn"
+                    aria-label="Translate"
+                    onClick={handleTranslateContent}
+                />
             </div>
             <Component {...commonProps} {...additionalProps} />
         </div>

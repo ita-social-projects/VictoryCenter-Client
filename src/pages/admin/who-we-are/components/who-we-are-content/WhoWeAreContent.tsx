@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { WhoWeAreApi } from '@/services/api/admin/who-we-are/who-we-are-api';
 import { Content, WhoWeAreCategory, WhoWeAreSection } from '@/types/admin/who-we-are';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
@@ -17,6 +17,9 @@ import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import classNames from 'classnames';
 import { WhoWeArePageToolbar } from '../who-we-are-page-toolbar/WhoWeArePageToolbar';
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
+import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
+import { WhoWeAreModals } from '../modals/WhoWeAreModals';
+import { LocalizationLanguage } from '@/types/common/language';
 
 interface ErrorState {
     message: string | null;
@@ -35,6 +38,8 @@ export const WhoWeAreContent = () => {
     const [isConfirmationModalOpen, setConfirmationModalOpen] = useState<boolean>(false);
     const [isPublishButtonActive, setIsPublishButtonActive] = useState<boolean>(false);
     const [languagesError, setLanguagesError] = useState<string | null>(null);
+    const modalsStateControl = useModalsState<WhoWeAreSection>();
+    const { isAnyModalOpened, openModalActions, closeModalActions } = modalsStateControl;
 
     const { addToast } = useToast();
 
@@ -88,6 +93,25 @@ export const WhoWeAreContent = () => {
         setSelectedCategory(category);
         setIsPublishButtonActive(false);
     }, []);
+
+    const handleTranslateContentModalOpen = useCallback(
+        (section: WhoWeAreSection) => {
+            console.log('WhoWeAreContent.tsx: isAnyModalOpened ->', isAnyModalOpened);
+            if (isAnyModalOpened) return;
+
+            // TODO: uncomment const hasTranslation = member.localizations?.some((l) => l.language?.id === englishLanguage?.id);
+            const hasTranslation = false;
+
+            if (hasTranslation) {
+                console.log('WhoWeAreContent.tsx: hasTranslation ->', hasTranslation);
+                openModalActions.openEditTranslationModal(section);
+            } else {
+                console.log('WhoWeAreContent.tsx: No Translation ->', hasTranslation);
+                openModalActions.openTranslateItemModal(section);
+            }
+        },
+        [isAnyModalOpened, openModalActions], // TODO: add englishLanguage
+    );
 
     const handleContentChange = useCallback((updatedContent: Content) => {
         setUpdatedSection((prevSection) => {
@@ -200,6 +224,7 @@ export const WhoWeAreContent = () => {
                     section={updatedSection}
                     onChange={handleContentChange}
                     onPublish={() => setConfirmationModalOpen(true)}
+                    handleOnTranslateContent={handleTranslateContentModalOpen}
                     setIsPublishButtonActive={(value) => setIsPublishButtonActive(value)}
                     isPublishButtonActive={isPublishButtonActive}
                     language={selectedLanguage}
@@ -207,6 +232,15 @@ export const WhoWeAreContent = () => {
             )
         );
     };
+
+    // TODO: DELETE MOCK DATA
+    const languages: LocalizationLanguage[] = [
+        {
+            id: 1,
+            code: 'en',
+            name: 'English',
+        },
+    ];
 
     return (
         <>
@@ -231,6 +265,11 @@ export const WhoWeAreContent = () => {
                 title={COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES}
                 onConfirm={handleConfirmPublish}
                 onCancel={() => setConfirmationModalOpen(false)}
+            />
+            <WhoWeAreModals
+                modalsStateControl={modalsStateControl}
+                translatedLanguages={languages}
+                onTranslateWhoWeAreSection={handleTranslateContentModalOpen}
             />
             <ToastContainer />
         </>

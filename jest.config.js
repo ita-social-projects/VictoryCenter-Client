@@ -20,6 +20,7 @@ module.exports = {
         'index.tsx',
         'react-app-env.d.ts',
         'reportWebVitals.ts',
+        '\\.config\\.ts$',
     ],
     coverageThreshold: {
         global: {

@@ -1,4 +1,4 @@
-import { WhoWeAreSection } from '@/types/admin/who-we-are';
+import { TranslateLimits, WhoWeAreSection } from '@/types/admin/who-we-are';
 import { LocalizationLanguage } from '@/types/common/language';
 import { useEffect, useRef, useState } from 'react';
 import { DEFAULT_LOCALE } from '@/const/common/locales';
@@ -10,6 +10,7 @@ import { GeneralFormRef, WhoWeAreModalStrategy } from '../strategies/who-we-are-
 import { SectionType } from '@/types/common/about-us';
 import { translateTitleAndDescriptionStrategy } from '../strategies/description/translate-title-and-description-strategy';
 import { translateDescriptionStrategy } from '../strategies/description/translate-description-strategy';
+import { LIMITS_BY_SECTION } from './translate-modal-config';
 
 interface TranslateModalProps {
     isOpen: boolean;
@@ -56,7 +57,7 @@ export const TranslateWhoWeAreModal = ({
         return formRef.current?.isDirty() ?? false;
     };
 
-    const renderFormWithStrategy = <TValues,>(strategy: WhoWeAreModalStrategy<TValues>) => {
+    const renderFormWithStrategy = <TValues,>(strategy: WhoWeAreModalStrategy<TValues>, limits: TranslateLimits) => {
         const FormComponent = strategy.FormComponent;
         const initialData = strategy.getInitialData(sectionToTranslate, language, isEditMode);
 
@@ -72,23 +73,27 @@ export const TranslateWhoWeAreModal = ({
                 initialData={initialData}
                 onValidationChange={setIsFormValid}
                 onDirtyChange={setIsDirty}
+                limits={limits}
             />
         );
     };
 
-    const renderSectionForm = () => {
-        switch (sectionToTranslate.sectionType) {
-            case SectionType.Main:
-                return renderFormWithStrategy(translateTitleAndDescriptionStrategy);
-            case SectionType.WhatWeDo:
-            case SectionType.WhoWeSupport:
-            case SectionType.Team:
-            case SectionType.People:
-                return renderFormWithStrategy(translateDescriptionStrategy);
-            default:
-                return null;
-        }
+    type SectionRenderer = () => React.ReactNode;
+
+    const renderersBySection: Record<SectionType, SectionRenderer> = {
+      [SectionType.Main]: () =>
+        renderFormWithStrategy(translateTitleAndDescriptionStrategy, LIMITS_BY_SECTION[SectionType.Main]),
+      [SectionType.WhatWeDo]: () =>
+        renderFormWithStrategy(translateDescriptionStrategy, LIMITS_BY_SECTION[SectionType.WhatWeDo]),
+      [SectionType.WhoWeSupport]: () =>
+        renderFormWithStrategy(translateDescriptionStrategy, LIMITS_BY_SECTION[SectionType.WhoWeSupport]),
+      [SectionType.Team]: () =>
+        renderFormWithStrategy(translateDescriptionStrategy, LIMITS_BY_SECTION[SectionType.Team]),
+      [SectionType.People]: () =>
+        renderFormWithStrategy(translateDescriptionStrategy, LIMITS_BY_SECTION[SectionType.People]),
     };
+
+    const renderSectionForm = () => renderersBySection[sectionToTranslate.sectionType]?.() ?? null;
 
     const modalTitle = isEditMode
         ? COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.UPDATE_TRANSLATION

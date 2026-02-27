@@ -63,3 +63,8 @@ export interface CardImageConfig {
     minWidth: number;
     minHeight: number;
 }
+
+export type TranslateLimits = {
+  descriptionLimit: number;
+  titleLimit?: number;
+};

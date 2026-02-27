@@ -1,11 +1,11 @@
 import { useFormManager } from '@/hooks/admin/use-form-manager/useFormManager';
-import { VisibilityStatus } from '@/types/admin/common';
 import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '@/validation/admin/who-we-are-schema/WhoWeAreSchema';
 import { forwardRef, useEffect } from 'react';
 import styles from './TranslateWhoWeAreTitleAndDescriptionForm.module.scss';
 import cn from 'classnames';
-import { WHO_WE_ARE_TEXT, WHO_WE_ARE_VALIDATION } from '@/const/admin/who-we-are';
+import { WHO_WE_ARE_TEXT } from '@/const/admin/who-we-are';
 import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
+import { GeneralFormProps, GeneralFormRef } from '../../strategies/who-we-are-modal-strategy';
 
 export interface TranslateWhoWeAreTitleAndDescriptionFormValues {
     title: string;
@@ -19,19 +19,10 @@ export interface TranslateWhoWeAreTitleAndDescriptionFormErrorState {
     [key: string]: string | string[] | undefined;
 }
 
-export interface TranslateWhoWeAreTitleAndDescriptionFormRef {
-    submit: (status?: VisibilityStatus) => Promise<void>;
-    isValid: () => boolean;
-    isDirty: () => boolean;
-}
+export interface TranslateWhoWeAreTitleAndDescriptionFormRef extends GeneralFormRef {}
 
-export interface TranslateWhoWeAreTitleAndDescriptionFormProps {
-    initialData?: TranslateWhoWeAreTitleAndDescriptionFormValues | null;
-    formDisabled?: boolean;
-    onSubmit: (data: TranslateWhoWeAreTitleAndDescriptionFormValues, status?: VisibilityStatus) => void | Promise<void>;
-    onValidationChange?: (isValid: boolean) => void;
-    onDirtyChange?: (isDirty: boolean) => void;
-}
+export interface TranslateWhoWeAreTitleAndDescriptionFormProps 
+    extends GeneralFormProps<TranslateWhoWeAreTitleAndDescriptionFormValues> {}
 
 const DEFAULT_FORM_STATE: TranslateWhoWeAreTitleAndDescriptionFormValues = {
     title: '',
@@ -59,6 +50,7 @@ export const TranslateWhoWeAreTitleAndDescriptionForm = forwardRef<
             onSubmit,
             onValidationChange,
             onDirtyChange,
+            limits,
         }: TranslateWhoWeAreTitleAndDescriptionFormProps,
         ref,
     ) => {
@@ -114,7 +106,7 @@ export const TranslateWhoWeAreTitleAndDescriptionForm = forwardRef<
                             onChange={handleTitleChange}
                             onBlur={handleTitleBlur}
                             disabled={isSubmitting || formDisabled}
-                            maxLength={WHO_WE_ARE_VALIDATION.title.max}
+                            maxLength={limits.titleLimit ?? 10}
                             error={typeof errors.title === 'string' ? errors.title : undefined}
                         />
                         <RichTextInputGroup
@@ -125,7 +117,7 @@ export const TranslateWhoWeAreTitleAndDescriptionForm = forwardRef<
                             onChange={handleDescriptionChange}
                             onBlur={handleDescriptionBlur}
                             disabled={isSubmitting || formDisabled}
-                            maxLength={WHO_WE_ARE_VALIDATION.description.max}
+                            maxLength={limits.descriptionLimit}
                             error={typeof errors.description === 'string' ? errors.description : undefined}
                         />
                     </div>

@@ -1,5 +1,5 @@
 import { VisibilityStatus } from '@/types/admin/common';
-import { WhoWeAreSection } from '@/types/admin/who-we-are';
+import { TranslateLimits, WhoWeAreSection } from '@/types/admin/who-we-are';
 import { LocalizationLanguage } from '@/types/common/language';
 
 export interface GeneralFormRef {
@@ -14,6 +14,7 @@ export interface GeneralFormProps<TValues> {
     onSubmit: (data: TValues, status?: VisibilityStatus) => void | Promise<void>;
     onValidationChange?: (isValid: boolean) => void;
     onDirtyChange?: (isDirty: boolean) => void;
+    limits: TranslateLimits;
 }
 
 export interface WhoWeAreModalStrategy<TValues> {

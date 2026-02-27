@@ -1,11 +1,11 @@
 import { useFormManager } from '@/hooks/admin/use-form-manager/useFormManager';
-import { VisibilityStatus } from '@/types/admin/common';
 import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '@/validation/admin/who-we-are-schema/WhoWeAreSchema';
 import { forwardRef, useEffect } from 'react';
 import styles from './TranslationWhoWeAreDescriptionForm.module.scss';
 import cn from 'classnames';
-import { WHO_WE_ARE_TEXT, WHO_WE_ARE_VALIDATION } from '@/const/admin/who-we-are';
+import { WHO_WE_ARE_TEXT } from '@/const/admin/who-we-are';
 import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
+import { GeneralFormProps, GeneralFormRef } from '../../strategies/who-we-are-modal-strategy';
 
 export interface TranslateWhoWeAreDescriptionFormValues {
     description: string;
@@ -16,19 +16,10 @@ export interface TranslateWhoWeAreDescriptionFormErrorState {
     [key: string]: string | string[] | undefined;
 }
 
-export interface TranslateWhoWeAreDescriptionFormRef {
-    submit: (status?: VisibilityStatus) => Promise<void>;
-    isValid: () => boolean;
-    isDirty: () => boolean;
-}
+export interface TranslateWhoWeAreDescriptionFormRef extends GeneralFormRef {}
 
-export interface TranslateWhoWeAreDescriptionFormProps {
-    initialData?: TranslateWhoWeAreDescriptionFormValues | null;
-    formDisabled?: boolean;
-    onSubmit: (data: TranslateWhoWeAreDescriptionFormValues, status?: VisibilityStatus) => void | Promise<void>;
-    onValidationChange?: (isValid: boolean) => void;
-    onDirtyChange?: (isDirty: boolean) => void;
-}
+export interface TranslateWhoWeAreDescriptionFormProps 
+    extends GeneralFormProps<TranslateWhoWeAreDescriptionFormValues> {}
 
 const DEFAULT_FORM_STATE: TranslateWhoWeAreDescriptionFormValues = {
     description: '',
@@ -54,6 +45,7 @@ export const TranslateWhoWeAreDescriptionForm = forwardRef<
             onSubmit,
             onValidationChange,
             onDirtyChange,
+            limits,
         }: TranslateWhoWeAreDescriptionFormProps,
         ref,
     ) => {
@@ -100,7 +92,7 @@ export const TranslateWhoWeAreDescriptionForm = forwardRef<
                             onChange={handleDescriptionChange}
                             onBlur={handleDescriptionBlur}
                             disabled={isSubmitting || formDisabled}
-                            maxLength={WHO_WE_ARE_VALIDATION.description.max}
+                            maxLength={limits.descriptionLimit}
                             error={typeof errors.description === 'string' ? errors.description : undefined}
                         />
                     </div>

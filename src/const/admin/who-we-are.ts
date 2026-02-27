@@ -57,20 +57,3 @@ export const IMAGE_CONFIGS = {
         displayHeight: 430,
     } as WhoWeAreImageConfigParams,
 };
-
-export const WHO_WE_ARE_VALIDATION = {
-    title: {
-        min: 10,
-        max: 50,
-        getRequiredError: () => 'Назва обов’язкова',
-        getMinError: () => `Не менше ${WHO_WE_ARE_VALIDATION.title.min} символів`,
-        getMaxError: () => `Не більше ${WHO_WE_ARE_VALIDATION.title.max} символів`,
-    },
-    description: {
-        min: 10,
-        max: 300,
-        getRequiredError: () => 'Опис обов’язковий',
-        getMinError: () => `Не менше ${WHO_WE_ARE_VALIDATION.description.min} символів`,
-        getMaxError: () => `Не більше ${WHO_WE_ARE_VALIDATION.description.max} символів`,
-    },
-};

@@ -31,7 +31,7 @@ export const WhoWeAreModals = ({
                 onClose={handleClose}
                 sectionToTranslate={activeSection}
                 onTranslateSection={onTranslateWhoWeAreSection}
-                translatedLanguages={translatedLanguages}
+                translatedLanguages={translatedLanguages}                
             />
         </>
     );

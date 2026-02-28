@@ -24,6 +24,7 @@ jest.mock('@/components/admin/rich-text-input/RichTextInput', () => ({
         onFocus,
         maxLength,
         disabled,
+        hideToolbar,
         placeholder,
     }: {
         id: string;
@@ -34,6 +35,7 @@ jest.mock('@/components/admin/rich-text-input/RichTextInput', () => ({
         onFocus?: () => void;
         maxLength: number;
         disabled?: boolean;
+        hideToolbar?: boolean;
         placeholder?: string;
     }) => (
         <div
@@ -43,6 +45,7 @@ jest.mock('@/components/admin/rich-text-input/RichTextInput', () => ({
             data-value={value}
             data-max-length={maxLength}
             data-disabled={disabled}
+            data-hide-toolbar={hideToolbar}
             data-placeholder={placeholder}
         >
             <button data-testid="mock-on-change" onClick={() => onChange('<p>Changed</p>')}>
@@ -244,6 +247,24 @@ describe('RichTextInputGroup', () => {
             renderRichTextInputGroup();
             const disabledAttr = getRichTextInput().getAttribute('data-disabled');
             expect(disabledAttr === null || disabledAttr === 'undefined').toBe(true);
+        });
+    });
+
+    describe('HideToolbar state', () => {
+        it('forwards hideToolbar prop to RichTextInput', () => {
+            renderRichTextInputGroup({ hideToolbar: true });
+            expect(getRichTextInput()).toHaveAttribute('data-hide-toolbar', 'true');
+        });
+
+        it('forwards hideToolbar=false prop to RichTextInput', () => {
+            renderRichTextInputGroup({ hideToolbar: false });
+            expect(getRichTextInput()).toHaveAttribute('data-hide-toolbar', 'false');
+        });
+
+        it('does not set hideToolbar when hideToolbar prop is not provided', () => {
+            renderRichTextInputGroup();
+            const hideToolbarAttr = getRichTextInput().getAttribute('data-hide-toolbar');
+            expect(hideToolbarAttr === null || hideToolbarAttr === 'undefined').toBe(true);
         });
     });
 

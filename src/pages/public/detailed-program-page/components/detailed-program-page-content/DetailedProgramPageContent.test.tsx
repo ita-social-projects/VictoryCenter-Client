@@ -56,6 +56,15 @@ jest.mock('@/components/public/detailed-program-section/DetailedProgramSection',
     ),
 }));
 
+jest.mock('@/components/public/cta', () => ({
+    CtaSection: ({ title, description }: any) => (
+        <div data-testid="cta-section">
+            <h2>{title}</h2>
+            <p>{description}</p>
+        </div>
+    ),
+}));
+
 const { useParams } = require('react-router-dom');
 const { useProgramBySlug } = require('@/hooks/common/use-get-program-by-slug/useGetProgramBySlug');
 const mockUseProgramBySlug = useProgramBySlug as jest.MockedFunction<typeof useProgramBySlug>;

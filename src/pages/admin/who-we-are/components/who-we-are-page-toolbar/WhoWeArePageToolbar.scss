@@ -1,0 +1,46 @@
+.toolbar {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 1.25rem;
+
+    &-search {
+        width: 38.75rem;
+        flex: 0 0 38.75rem;
+        min-width: 0;
+        margin-right: auto;
+    }
+
+    &-actions {
+        display: flex;
+        gap: 1.25rem;
+        flex-shrink: 0;
+    }
+}
+
+@media (max-width: 1810px) {
+    .toolbar {
+        &-search {
+            width: 28.75rem;
+            flex: 0 0 28.75rem;
+        }
+    }
+}
+
+@media (max-width: 1660px) {
+    .toolbar {
+        &-search {
+            width: 20.75rem;
+            flex: 0 0 20.75rem;
+        }
+    }
+}
+
+@media (max-width: 1520px) {
+    .toolbar {
+        &-search {
+            width: 15.75rem;
+            flex: 0 0 15.75rem;
+        }
+    }
+}

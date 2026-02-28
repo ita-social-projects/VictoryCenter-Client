@@ -36,11 +36,17 @@ describe('WhoWeAreApi', () => {
 
     describe('getByType', () => {
         it('should call client.get with the correct URL and section type and return data', async () => {
+            const mockContent = {
+                id: 1,
+                contentType: ContentType.Title,
+                title: 'Text 1',
+                localizations: [],
+            } as unknown as Content;
             const mockData: WhoWeAreSection = {
                 id: 1,
                 title: 'Section 1',
                 sectionType: SectionType.Main,
-                contents: [],
+                contents: [mockContent],
             };
             mockClient.get.mockResolvedValue({ data: mockData });
 
@@ -48,7 +54,9 @@ describe('WhoWeAreApi', () => {
             const result = await WhoWeAreApi.getByType(mockClient, SectionType.Main);
 
             expect(mockClient.get).toHaveBeenCalledWith(`${API_ROUTES.WHO_WE_ARE.BASE}/${SectionType.Main}`);
-            expect(result).toEqual(mockData);
+            expect(result.id).toEqual(mockData.id);
+            expect(result.contents.length).toEqual(1);
+            expect(result.contents[0].id).toEqual(mockContent.id);
         });
     });
 
@@ -64,6 +72,7 @@ describe('WhoWeAreApi', () => {
                     imageId: null,
                     image: null,
                     description: null,
+                    localizations: [],
                 },
             ];
             const mockResponse: WhoWeAreSection = {
@@ -98,6 +107,7 @@ describe('WhoWeAreApi', () => {
                     image: newImageValues,
                     description: null,
                     contentType: ContentType.Description,
+                    localizations: [],
                 },
             ];
             const mockResponse: WhoWeAreSection = {
@@ -143,6 +153,7 @@ describe('WhoWeAreApi', () => {
                     image: replacingImageValues,
                     description: null,
                     contentType: ContentType.Title,
+                    localizations: [],
                 },
             ];
             const mockResponse: WhoWeAreSection = {
@@ -185,6 +196,7 @@ describe('WhoWeAreApi', () => {
                     image: null,
                     description: null,
                     contentType: ContentType.Title,
+                    localizations: [],
                 },
             ];
             const mockResponse: WhoWeAreSection = {

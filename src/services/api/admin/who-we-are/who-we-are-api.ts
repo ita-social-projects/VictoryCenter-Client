@@ -1,8 +1,9 @@
 import { AxiosInstance } from 'axios';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
-import { Content, WhoWeAreCategory, WhoWeAreSection } from '@/types/admin/who-we-are';
+import { Content, WhoWeAreCategory, WhoWeAreSection, WhoWeAreSectionDto } from '@/types/admin/who-we-are';
 import { ImageApi } from '@/services/api/admin/image/image-api';
 import { SectionType } from '@/types/common/about-us';
+import { mapEntityWithLocalizations } from '@/utils/functions/mappers/common/localization/localization-mappers';
 
 export const WhoWeAreApi = {
     getPreviews: async (client: AxiosInstance): Promise<WhoWeAreCategory[]> => {
@@ -10,8 +11,15 @@ export const WhoWeAreApi = {
         return response.data as WhoWeAreCategory[];
     },
     getByType: async (client: AxiosInstance, type: SectionType): Promise<WhoWeAreSection> => {
-        const response = await client.get(`${API_ROUTES.WHO_WE_ARE.BASE}/${type}`);
-        return response.data as WhoWeAreSection;
+        const response = await client.get<WhoWeAreSectionDto>(`${API_ROUTES.WHO_WE_ARE.BASE}/${type}`);
+        const sectionDto = response.data;
+
+        const section: WhoWeAreSection = {
+            ...sectionDto,
+            contents: sectionDto.contents.map((contentDto) => mapEntityWithLocalizations(contentDto)),
+        };
+
+        return section;
     },
     updateContent: async (
         client: AxiosInstance,
@@ -38,10 +46,17 @@ export const WhoWeAreApi = {
             }),
         );
 
-        const response = await client.put<WhoWeAreSection>(`${API_ROUTES.WHO_WE_ARE.BASE}/${sectionType}`, contents);
+        const response = await client.put<WhoWeAreSectionDto>(`${API_ROUTES.WHO_WE_ARE.BASE}/${sectionType}`, contents);
 
         await Promise.all(imagesToDelete.map((imageId) => ImageApi.delete(client, imageId)));
 
-        return response.data;
+        const sectionDto = response.data;
+
+        const section: WhoWeAreSection = {
+            ...sectionDto,
+            contents: sectionDto.contents.map((contentDto) => mapEntityWithLocalizations(contentDto)),
+        };
+
+        return section;
     },
 };

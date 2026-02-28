@@ -5,6 +5,7 @@ import {
     footerUk,
     aboutUsPageUk,
     programsPageUk,
+    detailedProgramPageUk,
     donateUk,
     reportsPageUk,
     partnersPageUk,
@@ -19,6 +20,7 @@ declare module 'i18next' {
             footer: typeof footerUk;
             aboutUsPage: typeof aboutUsPageUk;
             programsPage: typeof programsPageUk;
+            detailedProgramPage: typeof detailedProgramPageUk;
             donatePage: typeof donateUk;
             reportsPage: typeof reportsPageUk;
             partnersPage: typeof partnersPageUk;

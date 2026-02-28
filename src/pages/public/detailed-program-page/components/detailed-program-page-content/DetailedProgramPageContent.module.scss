@@ -5,10 +5,22 @@
     position: relative;
     width: 100%;
     min-height: 100vh;
+    background-color: c.$white;
 }
 
 .sections-list {
+    display: flex;
+    flex-direction: column;
     height: auto;
+    gap: 64px;
+    padding-top: 40px;
+
+    @media (min-width: 768px) {
+        gap: 80px;
+    }
+    @media (min-width: 1440px) {
+        gap: 128px;
+    }
 }
 
 .background-section {
@@ -51,13 +63,13 @@
         flex-direction: row;
         padding: 0 56px 120px 56px;
         justify-content: space-between;
-        align-items: end;
+        align-items: stretch;
     }
 }
 
 .left-section {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
 
     @media (min-width: 1440px) {
         flex: 0 0 60%;
@@ -80,10 +92,12 @@
     flex-direction: column;
     gap: 5px;
     margin-bottom: 10px;
+    min-height: 50px;
 
     @media (min-width: 768px) {
         flex-direction: row;
         gap: 20px;
+        min-height: 24px;
     }
 
     span {
@@ -93,6 +107,7 @@
 
 .program-meetings {
     @include type.subtitle-2-medium;
+    min-height: 24px;
 
     span {
         word-wrap: break-word;
@@ -101,7 +116,7 @@
 
 .right-section {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: center;
 
     @media (min-width: 1440px) {
@@ -112,6 +127,7 @@
 .description {
     @include type.body-2-regular;
     text-align: left;
+    min-height: 150px;
 }
 
 .background-gradient {

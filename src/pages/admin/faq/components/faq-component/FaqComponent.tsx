@@ -15,6 +15,7 @@ export interface FaqComponentProps {
     translationLanguages: LocalizationLanguage[];
     handleOnDeleteFaq: (faq: FaqQuestion) => void;
     handleOnEditFaq: (faq: FaqQuestion) => void;
+    handleOnTranslateFaq: (faq: FaqQuestion) => void;
 }
 
 export const FaqComponent = ({
@@ -23,6 +24,7 @@ export const FaqComponent = ({
     handleOnEditFaq,
     language,
     translationLanguages,
+    handleOnTranslateFaq,
 }: FaqComponentProps) => {
     const [textFields, setTextFields] = useState<FaqLocalizableFields>();
 
@@ -40,6 +42,10 @@ export const FaqComponent = ({
 
     const handleDeleteFaq = () => {
         handleOnDeleteFaq(faq);
+    };
+
+    const handleTranslateFaq = () => {
+        handleOnTranslateFaq(faq);
     };
 
     return (
@@ -70,6 +76,7 @@ export const FaqComponent = ({
                     </div>
                 </ButtonTooltip>
                 <div className="faq-actions-buttons">
+                    <button type="button" onClick={handleTranslateFaq} className="faq-translate-btn" />
                     <button type="button" onClick={handleEditFaq} className="faq-edit-btn" />
                     <button type="button" onClick={handleDeleteFaq} className="faq-delete-btn" />
                 </div>

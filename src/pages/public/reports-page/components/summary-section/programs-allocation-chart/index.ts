@@ -1,0 +1,1 @@
+export { ProgramsAllocationChart } from './ProgramsAllocationChart';

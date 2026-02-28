@@ -1,7 +1,8 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { SingleImageRight } from './SingleImageRight';
-import { fireEvent } from '@testing-library/react';
 import { ProgramSectionMode } from '@/types/common/program-sections';
+
+const mockPhotoInputGroup = jest.fn();
 
 jest.mock(
     '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
@@ -16,21 +17,30 @@ jest.mock(
 );
 
 jest.mock('@/components/admin/input-groups/photo-input-group/PhotoInputGroup', () => ({
-    PhotoInputGroup: ({ id, value, onChange }: any) => (
-        <div data-testid="photo-input-group">
-            <div data-testid="photo-id">{id}</div>
-            <div data-testid="photo-value">{value?.url || 'no-image'}</div>
-            <button
-                data-testid="photo-change"
-                onClick={() => onChange({ id: '123', url: 'new-image.jpg', mimeType: 'image/jpeg' })}
-            >
-                Change Photo
-            </button>
-        </div>
-    ),
+    PhotoInputGroup: (props: any) => {
+        mockPhotoInputGroup(props);
+        const { id, value, onChange } = props;
+
+        return (
+            <div data-testid="photo-input-group">
+                <div data-testid="photo-id">{id}</div>
+                <div data-testid="photo-value">{value?.url || 'no-image'}</div>
+                <button
+                    data-testid="photo-change"
+                    onClick={() => onChange({ id: '123', url: 'new-image.jpg', mimeType: 'image/jpeg' })}
+                >
+                    Change Photo
+                </button>
+            </div>
+        );
+    },
 }));
 
 describe('SingleImageRight', () => {
+    beforeEach(() => {
+        mockPhotoInputGroup.mockClear();
+    });
+
     describe('Non-editable mode', () => {
         it('renders with title and description', () => {
             render(<SingleImageRight title="Test Title" description="Test Description" />);
@@ -129,7 +139,6 @@ describe('SingleImageRight', () => {
             render(<SingleImageRight title="Test" mode={ProgramSectionMode.Edit} onTitleChange={onTitleChange} />);
 
             const titleTextarea = screen.getByTestId('textarea-section-title');
-            // Simulate user typing
             fireEvent.change(titleTextarea, { target: { value: 'New Title' } });
 
             expect(onTitleChange).toHaveBeenCalledWith('New Title');
@@ -242,8 +251,8 @@ describe('SingleImageRight', () => {
             expect(container.firstChild).toHaveClass('form-container');
         });
 
-        it('applies no additional classes when mode is Published', () => {
-            const { container } = render(<SingleImageRight title="Test" mode={ProgramSectionMode.Published} />);
+        it('applies no additional classes when mode is View', () => {
+            const { container } = render(<SingleImageRight title="Test" mode={ProgramSectionMode.View} />);
 
             expect(container.firstChild).toHaveClass('container');
             expect(container.firstChild).not.toHaveClass('template');

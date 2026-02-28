@@ -3,22 +3,33 @@ $img-height: 390px;
 $img-number: 4;
 
 .container {
-    aspect-ratio: 1440 / 1183;
     gap: 16px;
 }
 
-.top-section {
-    flex: 0 0 53%;
+.template {
+    aspect-ratio: 1440 / 1183;
 }
 
 .bottom-section {
-    flex: 0 0 48%;
+    height: $img-height + ($img-height * 0.25) + 50px;
     justify-content: end;
-    padding-bottom: 16px;
+
+    .template & {
+        max-height: 50%;
+    }
 }
 
 .image-wrapper {
     aspect-ratio: 360 / 390;
     max-width: #{$img-width};
     max-height: #{$img-height};
+}
+
+
+.image {
+    aspect-ratio: 360 / 390;
+}
+
+.form-container {
+    gap: 32px;
 }

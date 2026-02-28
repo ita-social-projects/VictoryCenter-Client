@@ -17,17 +17,18 @@ export enum ProgramSectionTemplate {
     SingleImageBottom = 5,
     SingleImageTop = 6,
     SingleImageRight = 7,
-    TripleTitleDescription = 8,
-    DualTitleDescription = 9,
-    QuadTitleDescription = 10,
+    DualTitleDescriptionPairs = 8,
+    TripleTitleDescriptionPairs = 9,
+    QuadTitleDescriptionPairs = 10,
     SingleTitleQuintupleDescription = 11,
+    SingleTitleDescriptionAuthorPairs = 12,
+    SingleTitleQuestionAnswerPairs = 13,
 }
 
 export enum ProgramSectionMode {
     Template = 'template',
-    View = 'view',
     Edit = 'edit',
-    Published = 'published',
+    View = 'view',
 }
 
 export interface ProgramSectionContent {

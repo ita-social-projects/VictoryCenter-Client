@@ -16,6 +16,34 @@ jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
     InlineLoader: () => <div data-testid="inline-loader" />,
 }));
 
+jest.mock('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit', () => ({
+    useLocalizationToolkit: () => ({
+        allLanguages: [{ id: 1, code: 'uk', name: 'Ukrainian' }],
+        translationLanguages: [{ id: 1, code: 'uk', name: 'Ukrainian' }],
+        selectedLanguage: { id: 1, code: 'uk', name: 'Ukrainian' },
+        onLanguageChange: jest.fn(),
+        translationStatusFilter: 0,
+        onTranslationStatusFilterChange: jest.fn(),
+        retryFetchLanguages: jest.fn(),
+    }),
+}));
+
+jest.mock('../who-we-are-page-toolbar/WhoWeArePageToolbar', () => ({
+    WhoWeArePageToolbar: () => (
+        <div className="toolbar" data-testid="who-we-are-page-toolbar">
+            <div className="toolbar-actions">
+                <div className="toolkit" data-testid="localization-toolkit">
+                    <div className="select select-closed">
+                        <button className="select-head" type="button">
+                            <svg />
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    ),
+}));
+
 jest.mock('@/services/api/admin/who-we-are/who-we-are-api');
 const mockedWhoWeAreApi = WhoWeAreApi as jest.Mocked<typeof WhoWeAreApi>;
 
@@ -100,6 +128,7 @@ const mockSection1: WhoWeAreSection = {
             title: null,
             image: { id: 1, url: 'url1.jpg', mimeType: 'image/png' },
             imageId: 1,
+            localizations: [],
         },
     ],
 };
@@ -109,7 +138,15 @@ const mockSection2: WhoWeAreSection = {
     title: 'Mission Section',
     sectionType: SectionType.People,
     contents: [
-        { id: 2, contentType: ContentType.Title, title: 'Our Goal', image: null, imageId: null, description: null },
+        {
+            id: 2,
+            contentType: ContentType.Title,
+            title: 'Our Goal',
+            image: null,
+            imageId: null,
+            description: null,
+            localizations: [],
+        },
     ],
 };
 
@@ -309,6 +346,58 @@ describe('WhoWeAreContent Component', () => {
                 COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_PUBLISH_CHANGES,
                 ToastType.Error,
             );
+        });
+    });
+
+    it('should set languages error state and allow retrying', async () => {
+        let injectedSetErrorState: any = null;
+        let mockRetryFetchLanguages = jest.fn();
+
+        const toolkitSpy = jest
+            .spyOn(require('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit'), 'useLocalizationToolkit')
+            .mockImplementation(({ setErrorState }: any) => {
+                injectedSetErrorState = setErrorState;
+                return {
+                    allLanguages: [],
+                    selectedLanguage: null,
+                    onLanguageChange: jest.fn(),
+                    retryFetchLanguages: mockRetryFetchLanguages,
+                };
+            });
+
+        mockedWhoWeAreApi.getPreviews.mockResolvedValue(mockCategories);
+        mockedWhoWeAreApi.getByType.mockResolvedValue(mockSection1);
+
+        render(<WhoWeAreContent />);
+
+        await waitFor(() => {
+            expect(injectedSetErrorState).toBeTruthy();
+        });
+
+        injectedSetErrorState('Languages failed to load', 'languages');
+
+        const errorMessage = await screen.findByText('Languages failed to load');
+        expect(errorMessage).toBeInTheDocument();
+
+        const retryButton = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN });
+        fireEvent.click(retryButton);
+
+        expect(mockRetryFetchLanguages).toHaveBeenCalled();
+
+        toolkitSpy.mockRestore();
+    });
+
+    it('should not throw error if categories are loaded but fetch by type returns no contents', async () => {
+        const mockEmptySection = { ...mockSection1, contents: [] };
+        mockedWhoWeAreApi.getPreviews.mockResolvedValue(mockCategories);
+        mockedWhoWeAreApi.getByType.mockResolvedValue(mockEmptySection);
+
+        render(<WhoWeAreContent />);
+
+        expect(await screen.findByText('Main')).toBeInTheDocument();
+
+        await waitFor(() => {
+            expect(screen.queryByTestId('input-1')).not.toBeInTheDocument();
         });
     });
 });

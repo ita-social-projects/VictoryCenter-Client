@@ -5,10 +5,10 @@ import { ImageValues, Image } from '@/types/common/image';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { PROGRAM_SECTION_IMAGE_CONFIGS, PROGRAM_VALIDATION } from '@/const/admin/programs';
 import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
-import { ProgramSectionMode } from '@/types/common/program-sections';
+import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
 import { useImageError } from '@/hooks/common/use-image-error/useImageError';
 import styles from './SingleImageTop.module.scss';
-import publishedStyles from './PublishedSingleImageTop.module.scss';
+import viewStyles from './ViewSingleImageTop.module.scss';
 
 export interface SingleImageTopProps {
     title?: string;
@@ -18,31 +18,33 @@ export interface SingleImageTopProps {
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
     onImageChange?: (file: ImageValues | null) => void;
+    validationResetKey?: number;
 }
 
 export const SingleImageTop = ({
     title = '',
     description = '',
     image = null,
-    mode = ProgramSectionMode.Published,
+    mode = ProgramSectionMode.View,
     onTitleChange,
     onDescriptionChange,
     onImageChange,
+    validationResetKey,
 }: SingleImageTopProps) => {
     const imageSrc = getImageSrc(image);
-    const baseStyles = mode === ProgramSectionMode.Published ? publishedStyles : styles;
+    const baseStyles = mode === ProgramSectionMode.View ? viewStyles : styles;
     const { error, handleSetError } = useImageError();
 
     return (
         <div
             className={cn(baseStyles.container, {
                 [styles.template]: mode === ProgramSectionMode.Template,
-                [styles['form-container']]: mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View,
+                [styles['form-container']]: mode === ProgramSectionMode.Edit,
             })}
         >
             <div className={baseStyles['top-section']}>
                 <div className={baseStyles['image-wrapper']}>
-                    {mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View ? (
+                    {mode === ProgramSectionMode.Edit ? (
                         <PhotoInputGroup
                             id="section-image-1"
                             name="section-image-1"
@@ -61,14 +63,15 @@ export const SingleImageTop = ({
                             )}
                             variant="programSection"
                             maxSizeMB={PROGRAM_VALIDATION.images.maxSizeMB}
-                            disabled={mode === ProgramSectionMode.View}
                         />
                     ) : (
                         imageSrc && <img src={imageSrc} alt="" className={baseStyles.image} />
                     )}
                 </div>
             </div>
+
             <TitleDescriptionSection
+                template={ProgramSectionTemplate.SingleImageTop}
                 title={title}
                 description={description}
                 className={baseStyles['bottom-section']}
@@ -77,6 +80,7 @@ export const SingleImageTop = ({
                 mode={mode}
                 onTitleChange={onTitleChange}
                 onDescriptionChange={onDescriptionChange}
+                validationResetKey={validationResetKey}
             />
         </div>
     );

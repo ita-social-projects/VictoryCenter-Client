@@ -12,19 +12,21 @@ interface TitleDescriptionCardsWrapperProps {
     mode?: ProgramSectionMode;
     onTitleChange?: (index: number, value: string) => void;
     onDescriptionChange?: (index: number, value: string) => void;
+    validationResetKey?: number;
 }
 
 export const TitleDescriptionCardsWrapper = ({
     cards,
     cardsCount,
-    mode = ProgramSectionMode.Published,
+    mode = ProgramSectionMode.View,
     onTitleChange,
     onDescriptionChange,
+    validationResetKey,
 }: TitleDescriptionCardsWrapperProps) => {
     return (
         <div
             className={cn(styles.container, {
-                [styles['container--editable']]: mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View,
+                [styles['container--editable']]: mode === ProgramSectionMode.Edit,
                 [styles['container--template']]: mode === ProgramSectionMode.Template,
                 [styles[`container--cards-${cardsCount}`]]: true,
             })}
@@ -35,6 +37,7 @@ export const TitleDescriptionCardsWrapper = ({
                 mode={mode}
                 onTitleChange={onTitleChange}
                 onDescriptionChange={onDescriptionChange}
+                validationResetKey={validationResetKey}
             />
         </div>
     );

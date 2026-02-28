@@ -42,9 +42,10 @@ const TEMPLATES = [
     ProgramSectionTemplate.SingleImageTop,
     ProgramSectionTemplate.SingleImageRight,
     ProgramSectionTemplate.SingleTitleQuintupleDescription,
-    ProgramSectionTemplate.DualTitleDescription,
-    ProgramSectionTemplate.TripleTitleDescription,
-    ProgramSectionTemplate.QuadTitleDescription,
+    ProgramSectionTemplate.DualTitleDescriptionPairs,
+    ProgramSectionTemplate.TripleTitleDescriptionPairs,
+    ProgramSectionTemplate.QuadTitleDescriptionPairs,
+    ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
 ];
 
 export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectionModalProps) => {
@@ -70,9 +71,9 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
                 return [placeholderImageObject];
             case ProgramSectionTemplate.TextOnly:
             case ProgramSectionTemplate.SingleTitleQuintupleDescription:
-            case ProgramSectionTemplate.DualTitleDescription:
-            case ProgramSectionTemplate.TripleTitleDescription:
-            case ProgramSectionTemplate.QuadTitleDescription:
+            case ProgramSectionTemplate.DualTitleDescriptionPairs:
+            case ProgramSectionTemplate.TripleTitleDescriptionPairs:
+            case ProgramSectionTemplate.QuadTitleDescriptionPairs:
                 return [];
             default:
                 return [];
@@ -90,7 +91,7 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
         const cardSamples = PROGRAMS_TEXT.SECTION.CARD;
 
         const CARD_CONFIGS: Partial<Record<ProgramSectionTemplate, { title: string; description: string }[]>> = {
-            [ProgramSectionTemplate.DualTitleDescription]: [
+            [ProgramSectionTemplate.DualTitleDescriptionPairs]: [
                 {
                     title: cardSamples.TITLE_SAMPLE_TEXT.PROGRAM_GOALS,
                     description: cardSamples.DESCRIPTION_SAMPLE_TEXT.PROGRAM_GOALS,
@@ -100,7 +101,7 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
                     description: cardSamples.DESCRIPTION_SAMPLE_TEXT.MAIN_METHODS,
                 },
             ],
-            [ProgramSectionTemplate.TripleTitleDescription]: [
+            [ProgramSectionTemplate.TripleTitleDescriptionPairs]: [
                 {
                     title: cardSamples.TITLE_SAMPLE_TEXT.PROGRAM_GOALS,
                     description: cardSamples.DESCRIPTION_SAMPLE_TEXT.PROGRAM_GOALS,
@@ -114,7 +115,7 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
                     description: cardSamples.DESCRIPTION_SAMPLE_TEXT.PROGRAM_FORMAT,
                 },
             ],
-            [ProgramSectionTemplate.QuadTitleDescription]: [
+            [ProgramSectionTemplate.QuadTitleDescriptionPairs]: [
                 {
                     title: cardSamples.TITLE_SAMPLE_TEXT.PROGRAM_GOALS,
                     description: cardSamples.DESCRIPTION_SAMPLE_TEXT.PROGRAM_GOALS,

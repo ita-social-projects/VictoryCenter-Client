@@ -109,6 +109,8 @@ const mockModalState = {
     isAddCategoryModalOpen: false,
     isEditCategoryModalOpen: false,
     isDeleteCategoryModalOpen: false,
+    isCategoryToTranslate: false,
+    isCategoryToEditTranslation: false,
 };
 
 const mockOpenModalActions = {
@@ -120,6 +122,8 @@ const mockOpenModalActions = {
     openAddCategoryModal: jest.fn(),
     openEditCategoryModal: jest.fn(),
     openDeleteCategoryModal: jest.fn(),
+    openTranslateCategoryModal: jest.fn(),
+    openEditCategoryTranslationModal: jest.fn(),
 };
 
 const mockCloseModalActions = {
@@ -130,6 +134,8 @@ const mockCloseModalActions = {
     closeAddCategoryModal: jest.fn(),
     closeEditCategoryModal: jest.fn(),
     closeDeleteCategoryModal: jest.fn(),
+    closeTranslateCategoryModal: jest.fn(),
+    closeEditCategoryTranslationModal: jest.fn(),
 };
 
 jest.mock('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit', () => ({

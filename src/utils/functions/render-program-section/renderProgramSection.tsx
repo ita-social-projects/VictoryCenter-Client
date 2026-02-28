@@ -11,10 +11,17 @@ import { SingleImageBottom } from '@/components/common/program-section-templates
 import { SingleImageRight } from '@/components/common/program-section-templates/single-image-right/SingleImageRight';
 import { TitleDescriptionCardsWrapper } from '@/components/common/program-section-templates/title-description-cards/TitleDescriptionCardsWrapper';
 import { SingleTitleQuintupleDescription } from '@/components/common/program-section-templates/single-title-quintuple-description/SingleTitleQuintupleDescription';
+import { SingleTitleDescriptionAuthorPairs } from '@/components/common/program-section-templates/single-title-description-author-pairs/SingleTitleDescriptionAuthorPairs';
+import { PROGRAMS_TEXT } from '@/const/admin/programs';
 
 export interface ProgramSectionCardData {
     title: string;
     description: string;
+}
+
+export interface DescriptionAuthorPairData {
+    description: string;
+    author: string;
 }
 
 export interface ProgramSectionData {
@@ -23,6 +30,7 @@ export interface ProgramSectionData {
     descriptions?: string[];
     images?: (Image | ImageValues | null)[];
     cards?: ProgramSectionCardData[];
+    descriptionAuthorPairs?: DescriptionAuthorPairData[];
 }
 
 export interface ProgramSectionHandlers {
@@ -32,6 +40,10 @@ export interface ProgramSectionHandlers {
     onImagesChange?: (index: number, file: ImageValues | null) => void;
     onCardTitleChange?: (index: number, value: string) => void;
     onCardDescriptionChange?: (index: number, value: string) => void;
+    onCardAuthorChange?: (index: number, value: string) => void;
+    onAddPair?: () => void;
+    onDeletePair?: (index: number) => void;
+    canAddPair?: boolean;
 }
 
 export interface RenderProgramSectionParams {
@@ -39,6 +51,7 @@ export interface RenderProgramSectionParams {
     data: ProgramSectionData;
     mode?: ProgramSectionMode;
     handlers?: ProgramSectionHandlers;
+    validationResetKey?: number;
 }
 
 const createItem = (
@@ -50,6 +63,7 @@ const createItem = (
     order,
     title: type === ContentType.Title ? '' : null,
     description: type === ContentType.Description ? '' : null,
+    author: type === ContentType.Author ? '' : null,
     image: null,
     ...overrides,
 });
@@ -64,7 +78,9 @@ const createImageContents = (count: number): ProgramSectionContent[] =>
 
 const createCardContents = (cardCount: number): ProgramSectionContent[] =>
     Array.from({ length: cardCount * 2 }, (_, index) =>
-        createItem(index % 2 === 0 ? ContentType.Title : ContentType.Description, index),
+        createItem(index % 2 === 0 ? ContentType.Title : ContentType.Description, index, {
+            groupIndex: Math.floor(index / 2),
+        }),
     );
 
 const IMAGE_COUNT_MAP: Partial<Record<ProgramSectionTemplate, number>> = {
@@ -78,9 +94,9 @@ const IMAGE_COUNT_MAP: Partial<Record<ProgramSectionTemplate, number>> = {
 };
 
 const CARD_COUNT_MAP: Partial<Record<ProgramSectionTemplate, number>> = {
-    [ProgramSectionTemplate.DualTitleDescription]: 2,
-    [ProgramSectionTemplate.TripleTitleDescription]: 3,
-    [ProgramSectionTemplate.QuadTitleDescription]: 4,
+    [ProgramSectionTemplate.DualTitleDescriptionPairs]: 2,
+    [ProgramSectionTemplate.TripleTitleDescriptionPairs]: 3,
+    [ProgramSectionTemplate.QuadTitleDescriptionPairs]: 4,
 };
 
 const SINGLE_IMAGE_TEMPLATES = new Set<ProgramSectionTemplate>([
@@ -95,6 +111,7 @@ interface StandardTemplateProps {
     mode?: ProgramSectionMode;
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
+    validationResetKey?: number;
 }
 
 type StandardTemplateComponentProps =
@@ -120,6 +137,16 @@ const STANDARD_TEMPLATES_MAP: Partial<
 };
 
 export const getInitialSectionContents = (templateId: ProgramSectionTemplate): ProgramSectionContent[] => {
+    if (templateId === ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs) {
+        return [
+            createItem(ContentType.Title, 0, {
+                title: PROGRAMS_TEXT.SECTION.SINGLE_TITLE_DESCRIPTION_AUTHOR_PAIRS.DEFAULT_TITLE,
+            } as any),
+            createItem(ContentType.Description, 1, { groupIndex: 0 }),
+            createItem(ContentType.Author, 2, { groupIndex: 0 }),
+        ];
+    }
+
     const cardCount = CARD_COUNT_MAP[templateId];
     if (cardCount) return createCardContents(cardCount);
 
@@ -137,8 +164,9 @@ export const getInitialSectionContents = (templateId: ProgramSectionTemplate): P
 export const renderProgramSection = ({
     templateId,
     data,
-    mode = ProgramSectionMode.Published,
+    mode = ProgramSectionMode.View,
     handlers,
+    validationResetKey,
 }: RenderProgramSectionParams): React.ReactElement | null => {
     const cardCount = CARD_COUNT_MAP[templateId];
     if (cardCount) {
@@ -149,6 +177,23 @@ export const renderProgramSection = ({
                 mode={mode}
                 onTitleChange={handlers?.onCardTitleChange}
                 onDescriptionChange={handlers?.onCardDescriptionChange}
+                validationResetKey={validationResetKey}
+            />
+        );
+    }
+
+    if (templateId === ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs) {
+        return (
+            <SingleTitleDescriptionAuthorPairs
+                title={data.title}
+                pairs={data.descriptionAuthorPairs ?? []}
+                mode={mode}
+                onTitleChange={handlers?.onTitleChange}
+                onPairDescriptionChange={handlers?.onCardDescriptionChange}
+                onPairAuthorChange={handlers?.onCardAuthorChange}
+                onAddPair={handlers?.onAddPair}
+                onDeletePair={handlers?.onDeletePair}
+                canAddPair={handlers?.canAddPair}
             />
         );
     }
@@ -176,6 +221,7 @@ export const renderProgramSection = ({
         mode,
         onTitleChange: handlers?.onTitleChange,
         onDescriptionChange: handlers?.onDescriptionChange,
+        validationResetKey,
     };
 
     if (SINGLE_IMAGE_TEMPLATES.has(templateId)) {

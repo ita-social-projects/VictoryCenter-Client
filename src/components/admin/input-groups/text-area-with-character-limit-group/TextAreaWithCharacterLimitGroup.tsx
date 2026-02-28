@@ -16,6 +16,7 @@ export interface TextAreaWithCharacterLimitGroupProps extends TextAreaWithCharac
     className?: string;
     currentLength?: number;
     maxLimitWarning?: string;
+    isWhiteLabel?: boolean;
 }
 
 export const TextAreaWithCharacterLimitGroup = ({
@@ -34,6 +35,7 @@ export const TextAreaWithCharacterLimitGroup = ({
     error,
     className,
     maxLimitWarning,
+    isWhiteLabel,
 }: TextAreaWithCharacterLimitGroupProps) => {
     const [localWarning, setLocalWarning] = useState<string | null>(null);
     const counterId = `${id}-character-count`;
@@ -62,6 +64,7 @@ export const TextAreaWithCharacterLimitGroup = ({
                 counterId={counterId}
                 htmlFor={id}
                 value={value}
+                isWhiteLabel={isWhiteLabel}
             />
         </div>
     );

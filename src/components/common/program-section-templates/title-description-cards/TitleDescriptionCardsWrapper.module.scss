@@ -2,13 +2,21 @@
 
 .container {
     @extend .section-container;
-    padding: 3.5rem 2rem;
+
+    padding: 0px 16px;
     box-sizing: border-box;
     display: flex;
     justify-content: center;
     align-items: center;
-
     max-height: none;
+
+    @media (min-width: 560px) {
+        padding: 0px 64px;
+    }
+
+    @media (min-width: 1440px) {
+        padding: 0px 64px;
+    }
 
     &--template {
         pointer-events: none;

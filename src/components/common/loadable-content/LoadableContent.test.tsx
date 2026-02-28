@@ -20,7 +20,7 @@ describe('LoadableContent', () => {
     expect(screen.queryByText('Test Content')).toBeNull();
   });
 
-  it('should render a defauult error', () => {
+  it('should render a default error', () => {
     render(<LoadableContent isLoading={false} error={true}>Test Content</LoadableContent>);
     expect(screen.queryByTestId('loader')).toBeNull();
     const error = screen.getByTestId('error-message');
@@ -36,7 +36,7 @@ describe('LoadableContent', () => {
     expect(error).toHaveTextContent('Custom Error');
   });
 
-  it('should render chindren when is not loading or has an error', () => {
+  it('should render children when is not loading or has an error', () => {
     render(<LoadableContent isLoading={false} error={false}>Test Content</LoadableContent>);
     expect(screen.queryByTestId('loader')).toBeNull();
     expect(screen.queryByTestId('error-message')).toBeNull();

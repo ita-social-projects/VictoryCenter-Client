@@ -8,10 +8,6 @@
     margin: 0 auto;
     overflow: hidden;
 
-    // @media (min-width: 560px) {
-    //     height: 964px;
-    // }
-
     @media (min-width: 1440px) {
         height: 772px;
     }
@@ -34,7 +30,6 @@
     flex-direction: column;
     justify-content: flex-end;
     gap: 16px;
-    // align-items: flex-end;
     padding: 64px 16px;
     color: white;
     text-align: center;
@@ -54,15 +49,8 @@
 
 .title {
     @include type.h3-bold-uppercase;
-    font-family: f.$font-family-base;
-    // font-weight: 500;
-    // font-size: 40px;
-    // line-height: 48px;
     letter-spacing: f.$ls-tight;
     align-self: center;
-    // text-transform: uppercase;
-    
-    // text-align: center;
 
     @media (min-width: 560px) {
         font-size: 48px;

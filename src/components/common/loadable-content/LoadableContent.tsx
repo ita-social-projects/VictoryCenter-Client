@@ -15,14 +15,13 @@ export const LoadableContent = ({ isLoading, error, errorMessage, children }: Lo
 
     if (isLoading) {
         return (
-            <div className={styles['loadable-content-loader']}>
+            <div className={styles['loadable-content-loader']} data-testid="loader">
                 <LinearProgress />
             </div>
         );
-    }
-
-    if (error) {
-        return <div className={styles['loadable-content-error-message']}>{errorMessage || defaultErrorMessage}</div>;
-    }
-    return <>{children}</>;
+    } else if (error) {
+        return <div className={styles['loadable-content-error-message']} data-testid="error-message">{errorMessage || defaultErrorMessage}</div>;
+    } else {
+        return <>{children}</>;
+    };
 };

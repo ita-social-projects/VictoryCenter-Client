@@ -16,17 +16,17 @@ describe('LoadableContent', () => {
   it('should render loading state', () => {
     render(<LoadableContent isLoading={true} error={false}>Test Content</LoadableContent>);
     expect(screen.queryByTestId('loader')).toBeInTheDocument();
-    expect(screen.queryByTestId('error-message')).not.toBeInTheDocument();
-    expect(screen.getByText('Test Content')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('error-message')).toBeNull();
+    expect(screen.queryByText('Test Content')).toBeNull();
   });
 
   it('should render a defauult error', () => {
     render(<LoadableContent isLoading={false} error={true}>Test Content</LoadableContent>);
-    expect(screen.queryByTestId('loader')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('loader')).toBeNull();
     const error = screen.getByTestId('error-message');
     expect(error).toBeInTheDocument();
-    expect(error).toHaveTextContent('LOADING_ERROR');
-    expect(screen.getByText('Test Content')).not.toBeInTheDocument();
+    expect(error).toHaveTextContent('Помилка завантаження даних');
+    expect(screen.queryByText('Test Content')).toBeNull();
   });
 
   it('should render a custom error message', () => {
@@ -38,8 +38,8 @@ describe('LoadableContent', () => {
 
   it('should render chindren when is not loading or has an error', () => {
     render(<LoadableContent isLoading={false} error={false}>Test Content</LoadableContent>);
-    expect(screen.queryByTestId('loader')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('error-message')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('loader')).toBeNull();
+    expect(screen.queryByTestId('error-message')).toBeNull();
     expect(screen.getByText('Test Content')).toBeInTheDocument();
   });
 });

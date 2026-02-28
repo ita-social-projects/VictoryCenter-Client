@@ -213,6 +213,9 @@ describe('Header', () => {
 
         const programsLink = within(programsDropdown as HTMLElement).getByText(headerUk['PROGRAMS']);
         expect(programsLink).toHaveAttribute('data-disabled', 'false');
+
+        const hippotherapyLink = within(programsDropdown as HTMLElement).getByText(headerUk['HIPPOTHERAPY']);
+        expect(hippotherapyLink).toHaveAttribute('data-disabled', 'false'); 
     });
 
     it('toggles mobile menu open and closed', () => {

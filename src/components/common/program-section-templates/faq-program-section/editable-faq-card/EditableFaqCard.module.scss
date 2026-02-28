@@ -1,0 +1,96 @@
+@use '@/assets/sass/variables/colors' as c;
+
+.card {
+    display: flex;
+    flex-direction: column;
+    border-bottom: 2px solid c.$light-blue-100;
+    padding-bottom: 8px;
+
+    &:last-child {
+        border-bottom: none;
+    }
+}
+
+.card-top-row {
+    position: relative;
+    display: flex;
+    justify-content: flex-end;
+    padding-right: 40px;
+    transform: translateY(20px);
+    z-index: 2;
+}
+
+.card-header {
+    display: flex;
+    align-items: flex-start;
+}
+
+.question-input {
+    flex: 1 1 auto;
+}
+
+.delete-button {
+    display: flex;
+    justify-self: flex-end;
+    cursor: pointer;
+    transition: background-image 0.2s ease;
+    border: none;
+    width: 24px;
+    height: 24px;
+    background: url('~@/assets/icons/delete.svg') no-repeat;
+
+    &:hover {
+        background: url('~@/assets/icons/delete-hover.svg') no-repeat;
+    }
+}
+
+.expand-container {
+    height: 90%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-shrink: 0;
+}
+
+.expand-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    position: relative;
+
+    svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    .arrow-icon {
+        display: block;
+    }
+
+    .close-icon {
+        display: none;
+    }
+
+    &--open {
+        .arrow-icon {
+            display: none;
+        }
+
+        .close-icon {
+            display: block;
+        }
+    }
+
+    &:hover svg path {
+        stroke: c.$light-blue-600;
+    }
+}
+
+.card-body {
+    margin-top: 16px;
+    padding-right: 40px;
+}

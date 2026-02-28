@@ -1,5 +1,10 @@
 import React from 'react';
-import { ProgramSectionContent, ProgramSectionTemplate, ProgramSectionMode } from '@/types/common/program-sections';
+import {
+    FaqPairData,
+    ProgramSectionContent,
+    ProgramSectionTemplate,
+    ProgramSectionMode,
+} from '@/types/common/program-sections';
 import { ImageValues, Image } from '@/types/common/image';
 import { ContentType } from '@/types/common/programs';
 import { QuadImagesBottom } from '@/components/common/program-section-templates/quad-images-bottom/QuadImagesBottom';
@@ -13,6 +18,8 @@ import { TitleDescriptionCardsWrapper } from '@/components/common/program-sectio
 import { SingleTitleQuintupleDescription } from '@/components/common/program-section-templates/single-title-quintuple-description/SingleTitleQuintupleDescription';
 import { SingleTitleDescriptionAuthorPairs } from '@/components/common/program-section-templates/single-title-description-author-pairs/SingleTitleDescriptionAuthorPairs';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
+import { FaqProgramSection } from '@/components/common/program-section-templates/faq-program-section';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
 export interface ProgramSectionCardData {
     title: string;
@@ -31,6 +38,8 @@ export interface ProgramSectionData {
     images?: (Image | ImageValues | null)[];
     cards?: ProgramSectionCardData[];
     descriptionAuthorPairs?: DescriptionAuthorPairData[];
+    faqQuestions?: any[];
+    faqPairs?: FaqPairData[];
 }
 
 export interface ProgramSectionHandlers {
@@ -44,6 +53,10 @@ export interface ProgramSectionHandlers {
     onAddPair?: () => void;
     onDeletePair?: (index: number) => void;
     canAddPair?: boolean;
+    onFaqQuestionChange?: (index: number, value: string) => void;
+    onFaqAnswerChange?: (index: number, value: string) => void;
+    onAddFaqPair?: (questionText: string, answerText: string) => void;
+    onDeleteFaqPair?: (index: number) => void;
 }
 
 export interface RenderProgramSectionParams {
@@ -147,6 +160,21 @@ export const getInitialSectionContents = (templateId: ProgramSectionTemplate): P
         ];
     }
 
+    if (templateId === ProgramSectionTemplate.SingleTitleQuestionAnswerPairs) {
+        return [
+            createItem(ContentType.Title, 0, {
+                title: COMMON_TEXT_ADMIN.TAB.FAQ,
+            } as any),
+            createItem(ContentType.FaqPair, 1, {
+                groupIndex: 0,
+                faqQuestion: {
+                    questionText: '',
+                    answerText: '',
+                } as any,
+            } as any),
+        ];
+    }
+
     const cardCount = CARD_COUNT_MAP[templateId];
     if (cardCount) return createCardContents(cardCount);
 
@@ -194,6 +222,23 @@ export const renderProgramSection = ({
                 onAddPair={handlers?.onAddPair}
                 onDeletePair={handlers?.onDeletePair}
                 canAddPair={handlers?.canAddPair}
+            />
+        );
+    }
+
+    if (templateId === ProgramSectionTemplate.SingleTitleQuestionAnswerPairs) {
+        return (
+            <FaqProgramSection
+                questions={data.faqQuestions ?? []}
+                mode={mode}
+                title={data.title}
+                onTitleChange={handlers?.onTitleChange}
+                faqPairs={data.faqPairs ?? []}
+                onFaqQuestionChange={handlers?.onFaqQuestionChange}
+                onFaqAnswerChange={handlers?.onFaqAnswerChange}
+                onAddFaqPair={handlers?.onAddFaqPair}
+                onDeleteFaqPair={handlers?.onDeleteFaqPair}
+                validationResetKey={validationResetKey}
             />
         );
     }

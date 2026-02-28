@@ -1,5 +1,6 @@
 import { Image, ImageValues } from '../common/image';
 import { ContentType } from './programs';
+import { FaqQuestion } from '../admin/faq';
 
 export enum ProgramSectionType {
     Title,
@@ -31,6 +32,12 @@ export enum ProgramSectionMode {
     View = 'view',
 }
 
+export interface FaqPairData {
+    id?: number;
+    questionText: string;
+    answerText: string;
+}
+
 export interface ProgramSectionContent {
     id?: number;
     sectionId?: number;
@@ -42,6 +49,8 @@ export interface ProgramSectionContent {
     image?: Image | ImageValues | null;
     imageId?: number | null;
     author?: string | null;
+    faqQuestionId?: number | null;
+    faqQuestion?: FaqQuestion | null;
 }
 
 export interface ProgramSection {

@@ -20,8 +20,12 @@ export const LoadableContent = ({ isLoading, error, errorMessage, children }: Lo
             </div>
         );
     } else if (error) {
-        return <div className={styles['loadable-content-error-message']} data-testid="error-message">{errorMessage || defaultErrorMessage}</div>;
+        return (
+            <div className={styles['loadable-content-error-message']} data-testid="error-message">
+                {errorMessage || defaultErrorMessage}
+            </div>
+        );
     } else {
         return <>{children}</>;
-    };
+    }
 };

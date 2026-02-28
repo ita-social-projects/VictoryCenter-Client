@@ -16,7 +16,7 @@ export const HippotherapyPage = () => {
     return (
         <LoadableContent isLoading={isLoading} error={error || !data}>
             {data && <HippotherapyIntro introData={data.introSection} />}
-            <span>{t('SLOGAN')}</span>
+            <div style={{ textAlign: 'center', padding: '20px' }}>{t('SLOGAN')}</div>
         </LoadableContent>
     );
 };

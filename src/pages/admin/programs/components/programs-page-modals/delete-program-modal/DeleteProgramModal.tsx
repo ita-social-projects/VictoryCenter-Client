@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Modal } from '@/components/common/modal/Modal';
 import { Button } from '@/components/admin/button/Button';
-import { Program } from '@/types/admin/programs';
+import { HippotherapyProgramDto } from '@/types/admin/programs';
 import { ProgramsApi } from '@/services/api/admin/programs/programs-api';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -11,8 +11,8 @@ import './DeleteProgramModal.scss';
 export interface DeleteProgramModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onDeleteProgram: (program: Program) => void;
-    programToDelete: Program | null;
+    onDeleteProgram: (program: HippotherapyProgramDto) => void;
+    programToDelete: HippotherapyProgramDto | null;
 }
 
 export const DeleteProgramModal = ({ isOpen, onClose, onDeleteProgram, programToDelete }: DeleteProgramModalProps) => {

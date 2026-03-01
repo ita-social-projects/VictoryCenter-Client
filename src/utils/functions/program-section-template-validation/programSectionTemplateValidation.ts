@@ -1,5 +1,5 @@
 import { PROGRAM_SECTION_TEMPLATE_VALIDATION } from '@/const/admin/programs';
-import { ProgramSectionContent, ProgramSectionTemplate } from '@/types/common/program-sections';
+import { CreateProgramSectionContentDto, ProgramSectionTemplate } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 
 type Range = { min: number; max: number };
@@ -33,9 +33,9 @@ export const getProgramSectionTemplateMinGroupCount = (template: ProgramSectionT
     getTemplateRules(template)?.grouping?.groupCount?.min ?? 0;
 
 export const normalizeGroupedContentsGroupIndexes = (
-    contents: ProgramSectionContent[],
+    contents: CreateProgramSectionContentDto[],
     groupedTypes: ContentType[],
-): ProgramSectionContent[] => {
+): CreateProgramSectionContentDto[] => {
     const relevant = contents.filter(
         (c) => groupedTypes.includes(c.contentType) && c.groupIndex !== null && c.groupIndex !== undefined,
     );

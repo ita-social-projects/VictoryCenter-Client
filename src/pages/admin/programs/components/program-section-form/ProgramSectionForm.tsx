@@ -6,7 +6,7 @@ import { renderProgramSection } from '@/utils/functions/render-program-section';
 import styles from './ProgramSectionForm.module.scss';
 import {
     FaqSectionQuestionDto,
-    ProgramSection,
+    CreateHippotherapyProgramSectionDto,
     ProgramSectionTemplate,
     ProgramSectionMode,
 } from '@/types/common/program-sections';
@@ -25,11 +25,11 @@ import {
 } from '@/utils/functions/program-section-content/programSectionContent';
 
 export interface ProgramSectionFormProps {
-    section: ProgramSection;
+    section: CreateHippotherapyProgramSectionDto;
     onSave: () => void;
     onCancel: (options: SectionCancelOptions) => void;
     isDisabled?: boolean;
-    onSectionChange?: (updatedSection: ProgramSection) => void;
+    onSectionChange?: (updatedSection: CreateHippotherapyProgramSectionDto) => void;
     isNewSection?: boolean;
     isSectionValid?: boolean;
     onEditStateChange?: (isEditing: boolean) => void;
@@ -45,7 +45,7 @@ export interface ProgramSectionFormProps {
 export interface SectionCancelOptions {
     isDirty: boolean;
     shouldRemove: boolean;
-    revertTo: ProgramSection;
+    revertTo: CreateHippotherapyProgramSectionDto;
     onAfterDiscard: () => void;
     isTemplateReplacement?: boolean;
 }
@@ -67,8 +67,12 @@ export const ProgramSectionForm = ({
     onMoveDownSection,
     onMoveUpSection,
 }: ProgramSectionFormProps) => {
-    const [localSection, setLocalSection] = useState<ProgramSection>(() => ensureTitleContentAndOnePair(section));
-    const [originalSection, setOriginalSection] = useState<ProgramSection>(() => ensureTitleContentAndOnePair(section));
+    const [localSection, setLocalSection] = useState<CreateHippotherapyProgramSectionDto>(() =>
+        ensureTitleContentAndOnePair(section),
+    );
+    const [originalSection, setOriginalSection] = useState<CreateHippotherapyProgramSectionDto>(() =>
+        ensureTitleContentAndOnePair(section),
+    );
     const [isDirty, setIsDirty] = useState(false);
     const [validationResetKey, setValidationResetKey] = useState(0);
     const [sectionMode, setSectionMode] = useState<ProgramSectionMode>(
@@ -77,8 +81,8 @@ export const ProgramSectionForm = ({
 
     const sectionModeRef = useRef(sectionMode);
     const onEditStateChangeRef = useRef(onEditStateChange);
-    const lastEmittedSectionRef = useRef<ProgramSection | null>(null);
-    const localSectionRef = useRef<ProgramSection>(localSection);
+    const lastEmittedSectionRef = useRef<CreateHippotherapyProgramSectionDto | null>(null);
+    const localSectionRef = useRef<CreateHippotherapyProgramSectionDto>(localSection);
     localSectionRef.current = localSection;
 
     useEffect(() => {
@@ -140,7 +144,7 @@ export const ProgramSectionForm = ({
     }));
 
     const faqPairs: FaqSectionQuestionDto[] = getFaqPairs(localSection.contents).map((p) => ({
-        id: p.id,
+        id: p.id ?? undefined,
         questionText: p.questionText,
         answerText: p.answerText,
     }));
@@ -156,7 +160,7 @@ export const ProgramSectionForm = ({
     }));
 
     const emitSectionChange = useCallback(
-        (updatedSection: ProgramSection) => {
+        (updatedSection: CreateHippotherapyProgramSectionDto) => {
             lastEmittedSectionRef.current = updatedSection;
             setIsDirty(true);
             onSectionChange?.(updatedSection);
@@ -240,7 +244,11 @@ export const ProgramSectionForm = ({
     );
 
     const updateImageContent = useCallback(
-        (order: number, file: ImageValues | null, prev: ProgramSection): ProgramSection => {
+        (
+            order: number,
+            file: ImageValues | null,
+            prev: CreateHippotherapyProgramSectionDto,
+        ): CreateHippotherapyProgramSectionDto => {
             const updatedContents = prev.contents.map((c) =>
                 c.contentType === ContentType.Image && c.order === order ? ({ ...c, image: file } as any) : c,
             );
@@ -325,7 +333,7 @@ export const ProgramSectionForm = ({
         const descriptionOrder = maxOrder + 1;
         const authorOrder = maxOrder + 2;
 
-        const newSection: ProgramSection = {
+        const newSection: CreateHippotherapyProgramSectionDto = {
             ...prev,
             contents: [
                 ...normalizedContents,
@@ -365,7 +373,7 @@ export const ProgramSectionForm = ({
             const target = pairs[index];
             if (!target) return;
 
-            const filtered: ProgramSection = {
+            const filtered: CreateHippotherapyProgramSectionDto = {
                 ...prev,
                 contents: prev.contents.filter((c) => c.groupIndex !== target.groupIndex),
             };
@@ -454,7 +462,7 @@ export const ProgramSectionForm = ({
 
             const maxOrder = prev.contents.length ? Math.max(...prev.contents.map((c) => c.order)) : -1;
 
-            const newSection: ProgramSection = {
+            const newSection: CreateHippotherapyProgramSectionDto = {
                 ...prev,
                 contents: [
                     ...prev.contents,
@@ -488,7 +496,7 @@ export const ProgramSectionForm = ({
             const target = faq[index];
             if (!target) return;
 
-            const filtered: ProgramSection = {
+            const filtered: CreateHippotherapyProgramSectionDto = {
                 ...prev,
                 contents: prev.contents.filter(
                     (c) => !(c.contentType === ContentType.FaqQuestion && c.groupIndex === target.groupIndex),

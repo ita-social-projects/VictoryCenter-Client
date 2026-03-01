@@ -15,7 +15,7 @@ import { VisibilityStatus } from '@/types/admin/common';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import NotFoundIcon from '@/assets/icons/not-found.svg';
 import styles from './ProgramForm.module.scss';
-import { ProgramSection } from '@/types/common/program-sections';
+import { CreateHippotherapyProgramSectionDto } from '@/types/common/program-sections';
 import { BackgroundMedia } from '@/components/public/background-media';
 import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 import cn from 'classnames';
@@ -31,7 +31,7 @@ export interface ProgramFormValues {
     location: string;
     participantsCount: string;
     meetingCount: string;
-    sections: ProgramSection[];
+    sections: CreateHippotherapyProgramSectionDto[];
 }
 
 export interface ProgramFormErrors {
@@ -51,11 +51,11 @@ export interface ProgramFormRef {
     submit: (status: VisibilityStatus) => Promise<void>;
     isValid: (isPublishing?: boolean) => boolean;
     isDirty: () => boolean;
-    addSection: (section: ProgramSection) => void;
+    addSection: (section: CreateHippotherapyProgramSectionDto) => void;
     removeSection: (sectionIndex: number) => void;
-    getSections: () => ProgramSection[];
+    getSections: () => CreateHippotherapyProgramSectionDto[];
     revertSection: (sectionIndex: number) => void;
-    replaceSection: (sectionIndex: number, newSection: ProgramSection) => void;
+    replaceSection: (sectionIndex: number, newSection: CreateHippotherapyProgramSectionDto) => void;
 }
 
 export interface ProgramFormProps {
@@ -146,7 +146,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             ref: internalRef,
         });
 
-        const sectionsRef = useRef<ProgramSection[]>(formState.sections);
+        const sectionsRef = useRef<CreateHippotherapyProgramSectionDto[]>(formState.sections);
         sectionsRef.current = formState.sections;
 
         const nextSectionKeyRef = useRef(0);
@@ -209,7 +209,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
         const sectionsContainerRef = useRef<HTMLDivElement>(null);
 
         const handleAddSection = useCallback(
-            (section: ProgramSection) => {
+            (section: CreateHippotherapyProgramSectionDto) => {
                 const sectionKey = generateSectionKey();
                 setFormState((prev) => ({
                     ...prev,
@@ -268,7 +268,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
         );
 
         const handleReplaceSection = useCallback(
-            (sectionKey: string, newSection: ProgramSection) => {
+            (sectionKey: string, newSection: CreateHippotherapyProgramSectionDto) => {
                 const idx = sectionStatesRef.current.findIndex((s) => s.sectionKey === sectionKey);
                 if (idx === -1) return;
 
@@ -304,7 +304,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                     const state = sectionStatesRef.current[sectionIndex];
                     if (state) handleRevertSection(state.sectionKey);
                 },
-                replaceSection: (sectionIndex: number, newSection: ProgramSection) => {
+                replaceSection: (sectionIndex: number, newSection: CreateHippotherapyProgramSectionDto) => {
                     const state = sectionStatesRef.current[sectionIndex];
                     if (state) handleReplaceSection(state.sectionKey, newSection);
                 },
@@ -483,7 +483,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
         );
 
         const handleSectionChange = useCallback(
-            (sectionKey: string, updatedSection: ProgramSection) => {
+            (sectionKey: string, updatedSection: CreateHippotherapyProgramSectionDto) => {
                 const idx = sectionStatesRef.current.findIndex((s) => s.sectionKey === sectionKey);
                 if (idx === -1) return;
 

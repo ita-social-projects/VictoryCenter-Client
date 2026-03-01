@@ -1,5 +1,10 @@
-import { ProgramSectionContent } from '@/types/common/program-sections';
+import { HippotherapyProgramSectionContentDto } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
+
+type ContentTextData = Pick<
+    HippotherapyProgramSectionContentDto,
+    'contentType' | 'groupIndex' | 'title' | 'description' | 'author'
+>;
 
 export interface GroupedProgramSectionValuesByType {
     groupIndex: number;
@@ -12,7 +17,7 @@ export interface DescriptionAuthorPairGroup {
     author: string;
 }
 
-const getContentTextValueByType = (content: ProgramSectionContent): string => {
+const getContentTextValueByType = (content: ContentTextData): string => {
     switch (content.contentType) {
         case ContentType.Title:
             return content.title ?? '';
@@ -26,7 +31,7 @@ const getContentTextValueByType = (content: ProgramSectionContent): string => {
 };
 
 export const getGroupedProgramSectionValuesByGroup = (
-    contents: ProgramSectionContent[],
+    contents: ContentTextData[],
     types: ContentType[],
 ): GroupedProgramSectionValuesByType[] => {
     const requestedTypes = Array.from(new Set(types));
@@ -68,7 +73,7 @@ export const getGroupedProgramSectionValuesByGroup = (
         }));
 };
 
-export const getDescriptionAuthorPairsByGroup = (contents: ProgramSectionContent[]): DescriptionAuthorPairGroup[] => {
+export const getDescriptionAuthorPairsByGroup = (contents: ContentTextData[]): DescriptionAuthorPairGroup[] => {
     return getGroupedProgramSectionValuesByGroup(contents, [ContentType.Description, ContentType.Author]).map(
         (group) => ({
             groupIndex: group.groupIndex,

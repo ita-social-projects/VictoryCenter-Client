@@ -1,5 +1,5 @@
 import { Image } from '../common/image';
-import { ProgramSection } from '../common/program-sections';
+import { HippotherapyProgramSectionDto } from '../common/program-sections';
 
 export interface ProgramCategoryDto {
     id: number;
@@ -29,6 +29,6 @@ export interface DetailedProgram {
     location: string;
     participantsCount: string;
     meetingsCount: string;
-    sections: ProgramSection[];
+    sections: HippotherapyProgramSectionDto[];
     slug: string;
 }

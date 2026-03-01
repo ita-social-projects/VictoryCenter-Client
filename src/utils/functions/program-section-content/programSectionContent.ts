@@ -1,19 +1,25 @@
-import { ProgramSection, ProgramSectionContent, ProgramSectionTemplate } from '@/types/common/program-sections';
+import {
+    CreateHippotherapyProgramSectionDto,
+    CreateProgramSectionContentDto,
+    ProgramSectionTemplate,
+} from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 import { getDescriptionAuthorPairsByGroup } from '@/utils/functions/mappers/public/program/get-grouped-program-section-content-pairs';
 
 export const getContentByType = (
-    contents: ProgramSectionContent[],
+    contents: CreateProgramSectionContentDto[],
     type: ContentType,
-): ProgramSectionContent | undefined => {
+): CreateProgramSectionContentDto | undefined => {
     return contents.find((c) => c.contentType === type);
 };
 
-export const getDescriptionsInOrder = (contents: ProgramSectionContent[]): ProgramSectionContent[] => {
+export const getDescriptionsInOrder = (
+    contents: CreateProgramSectionContentDto[],
+): CreateProgramSectionContentDto[] => {
     return contents.filter((c) => c.contentType === ContentType.Description).sort((a, b) => a.order - b.order);
 };
 
-export const getFaqPairs = (contents: ProgramSectionContent[]) => {
+export const getFaqPairs = (contents: CreateProgramSectionContentDto[]) => {
     return contents
         .filter((c) => c.contentType === ContentType.FaqQuestion)
         .sort((a, b) => a.order - b.order)
@@ -25,11 +31,11 @@ export const getFaqPairs = (contents: ProgramSectionContent[]) => {
         }));
 };
 
-export const getNextOrder = (contents: ProgramSectionContent[]): number => {
+export const getNextOrder = (contents: CreateProgramSectionContentDto[]): number => {
     return contents.length ? Math.max(...contents.map((c) => c.order)) + 1 : 0;
 };
 
-export const ensureTitleContent = (contents: ProgramSectionContent[]): ProgramSectionContent[] => {
+export const ensureTitleContent = (contents: CreateProgramSectionContentDto[]): CreateProgramSectionContentDto[] => {
     const hasTitleContent = contents.some((c) => c.contentType === ContentType.Title);
     if (hasTitleContent) return contents;
 
@@ -43,7 +49,9 @@ export const ensureTitleContent = (contents: ProgramSectionContent[]): ProgramSe
     ];
 };
 
-export const ensureDescriptionAuthorPair = (contents: ProgramSectionContent[]): ProgramSectionContent[] => {
+export const ensureDescriptionAuthorPair = (
+    contents: CreateProgramSectionContentDto[],
+): CreateProgramSectionContentDto[] => {
     const pairs = getDescriptionAuthorPairsByGroup(contents);
     if (pairs.length > 0) return contents;
 
@@ -65,7 +73,7 @@ export const ensureDescriptionAuthorPair = (contents: ProgramSectionContent[]): 
     ];
 };
 
-export const ensureFaqPair = (contents: ProgramSectionContent[]): ProgramSectionContent[] => {
+export const ensureFaqPair = (contents: CreateProgramSectionContentDto[]): CreateProgramSectionContentDto[] => {
     const existing = getFaqPairs(contents);
     if (existing.length > 0) return contents;
 
@@ -88,7 +96,9 @@ export const PAIRED_TEMPLATES = new Set([
     ProgramSectionTemplate.SingleTitleQuestionAnswerPairs,
 ]);
 
-export const ensureTitleContentAndOnePair = (section: ProgramSection): ProgramSection => {
+export const ensureTitleContentAndOnePair = (
+    section: CreateHippotherapyProgramSectionDto,
+): CreateHippotherapyProgramSectionDto => {
     if (!PAIRED_TEMPLATES.has(section.template)) {
         return section;
     }

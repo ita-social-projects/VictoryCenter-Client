@@ -4,23 +4,27 @@ import { ReportsPanelContent } from './ReportsPanelContent';
 
 const mockSubmit = jest.fn();
 
-jest.mock('../reports-page-toolbar/ReportsPageToolbar', () => ({
-    ReportsPageToolbar: (props: any) => (
-        <div data-testid="mock-toolbar">
-            <button data-testid="edit-btn" onClick={props.onEdit}>
-                Edit
-            </button>
-            <button data-testid="cancel-btn" onClick={props.onCancel}>
-                Cancel
-            </button>
-            <button data-testid="publish-btn" onClick={props.onPublish} disabled={props.isPublishDisabled}>
-                Publish
-            </button>
-            <span data-testid="is-editing">{props.isEditing ? 'true' : 'false'}</span>
-            <span data-testid="is-publish-disabled">{props.isPublishDisabled ? 'true' : 'false'}</span>
-        </div>
-    ),
-}));
+jest.mock('../reports-page-toolbar/ReportsPageToolbar', () => {
+    const actual = jest.requireActual('../reports-page-toolbar/ReportsPageToolbar');
+    return {
+        ...actual,
+        ReportsPageToolbar: (props: any) => (
+            <div data-testid="mock-toolbar">
+                <button data-testid="edit-btn" onClick={props.onEdit}>
+                    Edit
+                </button>
+                <button data-testid="cancel-btn" onClick={props.onCancel}>
+                    Cancel
+                </button>
+                <button data-testid="publish-btn" onClick={props.onPublish} disabled={props.isPublishDisabled}>
+                    Publish
+                </button>
+                <span data-testid="is-editing">{props.isEditing ? 'true' : 'false'}</span>
+                <span data-testid="is-publish-disabled">{props.isPublishDisabled ? 'true' : 'false'}</span>
+            </div>
+        ),
+    };
+});
 
 jest.mock('../media-settings/MediaSettings', () => {
     const React = require('react');

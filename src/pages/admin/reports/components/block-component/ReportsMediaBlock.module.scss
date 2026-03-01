@@ -11,9 +11,26 @@
 }
 
 .root-editing {
-    border-radius: 16px;
     background-color: rgba(221, 228, 242, 0.36);
-    border: 3px dashed c.$grey-700;
+    background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='16' ry='16' stroke='%23333' stroke-width='2' stroke-dasharray='19%2c 19' stroke-dashoffset='24' stroke-linecap='round'/%3e%3c/svg%3e");
+    border-radius: 16px;
+
+    .title-input {
+        height: 116px;
+        margin-bottom: 0px;
+    }
+
+    .image {
+        margin-top: 25px;
+    }
+
+    .inputs {
+        height: 292px;
+    }
+
+    .total-amount-input {
+        margin-bottom: 0;
+    }
 }
 
 .image {
@@ -30,18 +47,26 @@
 
 .image-wrapper {
     width: 390px;
-    height: 504px;
+    min-height: 504px;
     margin: 0 129px;
     flex: 1;
     display: flex;
     flex-direction: column;
     gap: 1rem;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
 
-    >* {
+    > *:first-child {
         width: 100%;
-        height: 100%;
+        flex: 0 0 504px;
+        min-height: 504px;
+        height: 504px;
+    }
+
+    > *:not(:first-child) {
+        width: 100%;
+        flex: 0 0 auto;
+        margin-top: -5px;
     }
 }
 
@@ -58,11 +83,27 @@
     justify-content: start;
 }
 
+.root-editing .header {
+    border-bottom: 0;
+    border-style: solid;
+    border-width: 0 0 1px 0;
+    border-image: repeating-linear-gradient(
+            to right,
+            c.$grey-700 0,
+            c.$grey-700 12px,
+            transparent 12px,
+            transparent 24px
+        )
+        1;
+}
+
 .title {
     font-size: 24px;
     font-weight: 500;
     line-height: 24px;
     letter-spacing: -0.02em;
+    height: 28px;
+    margin-bottom: 5px;
 }
 
 .title-wrapper {
@@ -75,6 +116,7 @@
     font-weight: 400;
     line-height: 24px;
     letter-spacing: -0.02em;
+    height: 24px;
 }
 
 .title-input {
@@ -83,8 +125,20 @@
     margin: 25px 0;
 }
 
+.title-textarea-group {
+    width: 100%;
+}
+
 .total-amount-input {
     height: 90px;
     width: 100%;
     margin-bottom: 25px;
+}
+
+.total-amount-textarea-group {
+    width: 100%;
+}
+
+.root:not(.root-editing) output {
+    color: transparent;
 }

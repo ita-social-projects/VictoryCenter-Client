@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { ReportsPageToolbar } from './ReportsPageToolbar';
+import { ReportsPageToolbar, REPORTS_TOOLBAR_TABS } from './ReportsPageToolbar';
 import { REPORTS_TEXT } from '@/const/admin/reports';
 
 jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
@@ -44,9 +44,12 @@ describe('ReportsPageToolbar', () => {
     const mockOnPublish = jest.fn();
 
     const defaultProps = {
+        selectedTab: REPORTS_TOOLBAR_TABS[0],
+        onTabSelect: jest.fn(),
         isEditing: false,
         isPublishDisabled: false,
         onEdit: mockOnEdit,
+        onEditReportAnalytics: jest.fn(),
         onCancel: mockOnCancel,
         onPublish: mockOnPublish,
     };
@@ -75,13 +78,13 @@ describe('ReportsPageToolbar', () => {
         });
 
         it('should switch tab on click', () => {
-            renderComponent();
+            const mockOnTabSelect = jest.fn();
+            renderComponent({ onTabSelect: mockOnTabSelect });
 
             const secondTab = screen.getByTestId('tab-report-analytics');
             fireEvent.click(secondTab);
 
-            expect(secondTab).toHaveClass('selected');
-            expect(screen.getByTestId('tab-media-settings')).not.toHaveClass('selected');
+            expect(mockOnTabSelect).toHaveBeenCalledWith(REPORTS_TOOLBAR_TABS[1]);
         });
     });
 
@@ -188,6 +191,23 @@ describe('ReportsPageToolbar', () => {
             fireEvent.click(publishButton);
 
             expect(mockOnPublish).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('Report analytics tab', () => {
+        it('should render only Edit Page button when on report-analytics tab (no Cancel/Publish)', () => {
+            const mockOnEditReportAnalytics = jest.fn();
+            renderComponent({
+                selectedTab: REPORTS_TOOLBAR_TABS[1],
+                onEditReportAnalytics: mockOnEditReportAnalytics,
+            });
+
+            expect(screen.getByText(REPORTS_TEXT.BUTTON.EDIT_PAGE)).toBeInTheDocument();
+            expect(screen.queryByText(REPORTS_TEXT.BUTTON.CANCEL)).not.toBeInTheDocument();
+            expect(screen.queryByText(REPORTS_TEXT.BUTTON.PUBLISH)).not.toBeInTheDocument();
+
+            fireEvent.click(screen.getByText(REPORTS_TEXT.BUTTON.EDIT_PAGE));
+            expect(mockOnEditReportAnalytics).toHaveBeenCalledTimes(1);
         });
     });
 });

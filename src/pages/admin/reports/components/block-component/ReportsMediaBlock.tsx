@@ -2,13 +2,12 @@ import { Image, ImageValues } from '@/types/common/image';
 import { useCallback } from 'react';
 import cn from 'classnames';
 import styles from './ReportsMediaBlock.module.scss';
-import { InputWithCharacterLimit } from '@/components/admin/input-with-character-limit/InputWithCharacterLimit';
 import { InputError } from '@/components/admin/input-error/InputError';
-import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { REPORTS_TEXT } from '@/const/admin/reports';
 import { ImageInput } from '@/components/admin/image-input/ImageInput';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import './ReportsMediaBlock.scss';
+import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 
 export interface ReportsMediaBlockValues {
     title: string;
@@ -60,7 +59,7 @@ export const ReportsMediaBlock = ({
     onValuesChange,
 }: ReportsMediaBlockProps) => {
     const handleTitleChange = useCallback(
-        (e: React.ChangeEvent<HTMLInputElement>) => {
+        (e: React.ChangeEvent<HTMLTextAreaElement>) => {
             const value = e.target.value;
             const error = validationFunctions.validateTitle(value);
             onValuesChange({ ...values, title: value }, { ...errors, title: error });
@@ -68,13 +67,16 @@ export const ReportsMediaBlock = ({
         [onValuesChange, values, errors, validationFunctions],
     );
 
-    const handleTitleBlur = useCallback(() => {
-        const error = validationFunctions.validateTitle(values.title);
-        onValuesChange({ ...values }, { ...errors, title: error });
-    }, [onValuesChange, values, errors, validationFunctions]);
+    const handleTitleBlur = useCallback(
+        (_e: React.FocusEvent<HTMLTextAreaElement>) => {
+            const error = validationFunctions.validateTitle(values.title);
+            onValuesChange({ ...values }, { ...errors, title: error });
+        },
+        [onValuesChange, values, errors, validationFunctions],
+    );
 
     const handleTotalAmountChange = useCallback(
-        (e: React.ChangeEvent<HTMLInputElement>) => {
+        (e: React.ChangeEvent<HTMLTextAreaElement>) => {
             const value = Number(e.target.value);
             const error = validationFunctions.validateTotalAmount?.(value);
             onValuesChange({ ...values, totalAmount: value }, { ...errors, totalAmount: error });
@@ -116,8 +118,10 @@ export const ReportsMediaBlock = ({
                         </div>
                     </div>
 
-                    <div className={styles['title-input']}>
-                        <InputWithCharacterLimit
+                    <div className={cn(styles['title-input'], !isEditing && 'reports-title-input-no-label')}>
+                        <TextAreaWithCharacterLimitGroup
+                            className={cn(styles['title-textarea-group'], 'reports-title-textarea-group')}
+                            label={REPORTS_TEXT.FORM.LABEL.TITLE}
                             id={`${windowTitle}-title`}
                             name={`${windowTitle}-title`}
                             value={values.title}
@@ -125,8 +129,10 @@ export const ReportsMediaBlock = ({
                             onBlur={handleTitleBlur}
                             maxLength={REPORTS_TEXT.FORM.MAX_LENGTH.TITLE}
                             disabled={!isEditing}
+                            error={errors.title}
+                            rows={1}
+                            isRequired={isEditing}
                         />
-                        <InputError error={errors.title} />
                     </div>
 
                     <div
@@ -134,7 +140,8 @@ export const ReportsMediaBlock = ({
                             'reports-value-editing-disabled': isEditing && !isValueEditable,
                         })}
                     >
-                        <InputWithCharacterLimitGroup
+                        <TextAreaWithCharacterLimitGroup
+                            className={cn(styles['total-amount-textarea-group'], 'reports-total-amount-textarea-group')}
                             label={descriptionTitle}
                             id={`${windowTitle}-value`}
                             name={`${windowTitle}-value`}
@@ -142,9 +149,10 @@ export const ReportsMediaBlock = ({
                             onChange={handleTotalAmountChange}
                             onBlur={handleTotalAmountBlur}
                             maxLength={totalAmountMaxLength}
-                            type="text"
                             disabled={!isEditing || !isValueEditable}
                             error={errors.totalAmount}
+                            rows={1}
+                            isRequired={isEditing}
                         />
                     </div>
                 </div>

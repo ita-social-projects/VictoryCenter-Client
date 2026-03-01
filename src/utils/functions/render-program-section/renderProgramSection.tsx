@@ -1,7 +1,7 @@
 import React from 'react';
 import {
     FaqSectionQuestionDto,
-    ProgramSectionContent,
+    CreateProgramSectionContentDto,
     ProgramSectionTemplate,
     ProgramSectionMode,
 } from '@/types/common/program-sections';
@@ -70,8 +70,8 @@ export interface RenderProgramSectionParams {
 const createItem = (
     type: ContentType,
     order: number,
-    overrides: Partial<ProgramSectionContent> = {},
-): ProgramSectionContent => ({
+    overrides: Partial<CreateProgramSectionContentDto> = {},
+): CreateProgramSectionContentDto => ({
     contentType: type,
     order,
     title: type === ContentType.Title ? '' : null,
@@ -81,15 +81,15 @@ const createItem = (
     ...overrides,
 });
 
-const createBaseContents = (): ProgramSectionContent[] => [
+const createBaseContents = (): CreateProgramSectionContentDto[] => [
     createItem(ContentType.Title, 0),
     createItem(ContentType.Description, 1),
 ];
 
-const createImageContents = (count: number): ProgramSectionContent[] =>
+const createImageContents = (count: number): CreateProgramSectionContentDto[] =>
     Array.from({ length: count }, (_, i) => createItem(ContentType.Image, 2 + i));
 
-const createCardContents = (cardCount: number): ProgramSectionContent[] =>
+const createCardContents = (cardCount: number): CreateProgramSectionContentDto[] =>
     Array.from({ length: cardCount * 2 }, (_, index) =>
         createItem(index % 2 === 0 ? ContentType.Title : ContentType.Description, index, {
             groupIndex: Math.floor(index / 2),
@@ -149,7 +149,7 @@ const STANDARD_TEMPLATES_MAP: Partial<
     [ProgramSectionTemplate.QuadImagesBottom]: QuadImagesBottom,
 };
 
-export const getInitialSectionContents = (templateId: ProgramSectionTemplate): ProgramSectionContent[] => {
+export const getInitialSectionContents = (templateId: ProgramSectionTemplate): CreateProgramSectionContentDto[] => {
     if (templateId === ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs) {
         return [
             createItem(ContentType.Title, 0, {

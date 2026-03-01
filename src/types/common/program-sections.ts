@@ -38,7 +38,7 @@ export interface FaqSectionQuestionDto {
     answerText: string;
 }
 
-export interface ProgramSectionContent {
+export interface HippotherapyProgramSectionContentDto {
     id?: number;
     sectionId?: number;
     contentType: ContentType;
@@ -53,10 +53,38 @@ export interface ProgramSectionContent {
     faqQuestion?: FaqQuestion | null;
 }
 
-export interface ProgramSection {
+export interface HippotherapyProgramSectionDto {
     id?: number;
     programId?: number;
     template: ProgramSectionTemplate;
     order: number;
-    contents: ProgramSectionContent[];
+    contents: HippotherapyProgramSectionContentDto[];
+}
+
+export interface CreateFaqQuestionDto {
+    id?: number | null;
+    questionText: string;
+    answerText: string;
+}
+
+export interface CreateProgramSectionContentDto {
+    id?: number;
+    sectionId?: number;
+    contentType: ContentType;
+    order: number;
+    groupIndex?: number | null;
+    title?: string | null;
+    description?: string | null;
+    image?: Image | ImageValues | null;
+    imageId?: number | null;
+    author?: string | null;
+    faqQuestion?: CreateFaqQuestionDto | null;
+}
+
+export interface CreateHippotherapyProgramSectionDto {
+    id?: number;
+    programId?: number;
+    template: ProgramSectionTemplate;
+    order: number;
+    contents: CreateProgramSectionContentDto[];
 }

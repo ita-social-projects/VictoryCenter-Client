@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Program, ProgramCategory, ProgramSearchItemData } from '@/types/admin/programs';
+import { HippotherapyProgramDto, ProgramCategory, ProgramSearchItemData } from '@/types/admin/programs';
 import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
 import { ProgramsPageModals } from '../programs-page-modals/ProgramsPageModals';
 import { InfiniteScrollList } from '@/components/admin/infinite-scroll-list/InfiniteScrollList';
@@ -42,7 +42,7 @@ export const ProgramsPageContent = () => {
     const [isSearchResultView, setIsSearchResultView] = useState(false);
     const [error, setError] = useState<ErrorState>({ message: null, type: null });
     const listContainerRef = useRef<HTMLDivElement>(null);
-    const modalsStateControl = useModalsState<Program>();
+    const modalsStateControl = useModalsState<HippotherapyProgramDto>();
     const openModalActions = modalsStateControl.openModalActions;
 
     const { incrementCategoriesCount, decrementCategoriesCount, updateCategoriesCount } = useCategoriesCounter();
@@ -58,7 +58,7 @@ export const ProgramsPageContent = () => {
     }, [client]);
 
     const getFilteredPrograms = useCallback(
-        async (params: PaginationRequestParams): Promise<PaginationResult<Program>> => {
+        async (params: PaginationRequestParams): Promise<PaginationResult<HippotherapyProgramDto>> => {
             if (!selectedCategory) {
                 return { items: [], totalItemsCount: 0 };
             }
@@ -73,7 +73,7 @@ export const ProgramsPageContent = () => {
         [selectedCategory, statusFilter, client],
     );
 
-    const getSearchedProgram = useCallback(async (): Promise<Program | null> => {
+    const getSearchedProgram = useCallback(async (): Promise<HippotherapyProgramDto | null> => {
         if (!searchProgramId) {
             return null;
         }
@@ -96,7 +96,7 @@ export const ProgramsPageContent = () => {
         [client],
     );
 
-    const getProgramId = useCallback((program: Program) => program.id, []);
+    const getProgramId = useCallback((program: HippotherapyProgramDto) => program.id, []);
 
     // Data fetching hooks
     const {
@@ -121,7 +121,7 @@ export const ProgramsPageContent = () => {
         fetchFromStart: fetchProgramsFromStart,
         resetList: resetProgramsList,
         setData: updatePrograms,
-    } = useDataPaginationFetch<Program>({
+    } = useDataPaginationFetch<HippotherapyProgramDto>({
         initialData: [],
         getUniqueId: getProgramId,
         fetchHandler: getFilteredPrograms,
@@ -136,7 +136,7 @@ export const ProgramsPageContent = () => {
         error: searchProgramError,
         setData: updateSearchedProgram,
         refetch: refetchSearchProgram,
-    } = useDataFetch<Program | null>({
+    } = useDataFetch<HippotherapyProgramDto | null>({
         initialData: null,
         fetchHandler: getSearchedProgram,
         autoFetchDependencies: [searchProgramId],
@@ -242,7 +242,7 @@ export const ProgramsPageContent = () => {
 
     // Program handlers
     const handleAddProgram = useCallback(
-        (addedProgram: Program) => {
+        (addedProgram: HippotherapyProgramDto) => {
             if (addedProgram.status === VisibilityStatus.Draft) {
                 addToast(PROGRAMS_TEXT.FORM.MESSAGE.PROGRAM_SAVED_SUCCESSFULLY, ToastType.Info);
             } else if (addedProgram.status === VisibilityStatus.Published) {
@@ -263,7 +263,7 @@ export const ProgramsPageContent = () => {
     );
 
     const handleEditProgram = useCallback(
-        (updatedProgram: Program) => {
+        (updatedProgram: HippotherapyProgramDto) => {
             if (updatedProgram.status === VisibilityStatus.Draft) {
                 addToast(PROGRAMS_TEXT.FORM.MESSAGE.PROGRAM_SAVED_SUCCESSFULLY, ToastType.Info);
             } else if (updatedProgram.status === VisibilityStatus.Published) {
@@ -313,7 +313,7 @@ export const ProgramsPageContent = () => {
     );
 
     const handleDeleteProgram = useCallback(
-        (program: Program) => {
+        (program: HippotherapyProgramDto) => {
             // Update program counters in categories
             updateCategories((prevCategories) => decrementCategoriesCount(prevCategories, program));
 
@@ -405,7 +405,7 @@ export const ProgramsPageContent = () => {
 
     // Render helpers
     const renderProgramItem = useCallback(
-        (program: Program) => (
+        (program: HippotherapyProgramDto) => (
             <ProgramListItem
                 key={program.id}
                 program={program}
@@ -462,7 +462,7 @@ export const ProgramsPageContent = () => {
                     </div>
                 )}
 
-                <InfiniteScrollList<Program>
+                <InfiniteScrollList<HippotherapyProgramDto>
                     items={displayItems}
                     renderItem={renderProgramItem}
                     onLoadMore={fetchMorePrograms}

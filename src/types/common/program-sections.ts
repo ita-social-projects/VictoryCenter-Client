@@ -32,7 +32,7 @@ export enum ProgramSectionMode {
     View = 'view',
 }
 
-export interface FaqPairData {
+export interface FaqSectionQuestionDto {
     id?: number;
     questionText: string;
     answerText: string;

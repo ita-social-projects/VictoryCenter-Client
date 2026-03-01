@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-    FaqPairData,
+    FaqSectionQuestionDto,
     ProgramSectionContent,
     ProgramSectionTemplate,
     ProgramSectionMode,
@@ -39,7 +39,7 @@ export interface ProgramSectionData {
     cards?: ProgramSectionCardData[];
     descriptionAuthorPairs?: DescriptionAuthorPairData[];
     faqQuestions?: any[];
-    faqPairs?: FaqPairData[];
+    faqPairs?: FaqSectionQuestionDto[];
 }
 
 export interface ProgramSectionHandlers {
@@ -165,7 +165,7 @@ export const getInitialSectionContents = (templateId: ProgramSectionTemplate): P
             createItem(ContentType.Title, 0, {
                 title: COMMON_TEXT_ADMIN.TAB.FAQ,
             } as any),
-            createItem(ContentType.FaqPair, 1, {
+            createItem(ContentType.FaqQuestion, 1, {
                 groupIndex: 0,
                 faqQuestion: {
                     questionText: '',

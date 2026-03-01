@@ -5,7 +5,7 @@ import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { renderProgramSection } from '@/utils/functions/render-program-section';
 import styles from './ProgramSectionForm.module.scss';
 import {
-    FaqPairData,
+    FaqSectionQuestionDto,
     ProgramSection,
     ProgramSectionTemplate,
     ProgramSectionMode,
@@ -139,7 +139,7 @@ export const ProgramSectionForm = ({
         author: p.author,
     }));
 
-    const faqPairs: FaqPairData[] = getFaqPairs(localSection.contents).map((p) => ({
+    const faqPairs: FaqSectionQuestionDto[] = getFaqPairs(localSection.contents).map((p) => ({
         id: p.id,
         questionText: p.questionText,
         answerText: p.answerText,

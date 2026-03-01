@@ -15,7 +15,7 @@ export const getDescriptionsInOrder = (contents: ProgramSectionContent[]): Progr
 
 export const getFaqPairs = (contents: ProgramSectionContent[]) => {
     return contents
-        .filter((c) => c.contentType === ContentType.FaqPair)
+        .filter((c) => c.contentType === ContentType.FaqQuestion)
         .sort((a, b) => a.order - b.order)
         .map((c, index) => ({
             id: c.faqQuestion?.id,
@@ -72,7 +72,7 @@ export const ensureFaqPair = (contents: ProgramSectionContent[]): ProgramSection
     return [
         ...contents,
         {
-            contentType: ContentType.FaqPair,
+            contentType: ContentType.FaqQuestion,
             order: getNextOrder(contents),
             groupIndex: 0,
             faqQuestion: {

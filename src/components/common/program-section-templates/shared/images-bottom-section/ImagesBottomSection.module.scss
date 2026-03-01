@@ -1,7 +1,7 @@
 @import '../BaseSectionTemplate.module.scss';
 
 .container {
-    @extend .section-container;
+    @extend %section-container;
     display: flex;
 }
 

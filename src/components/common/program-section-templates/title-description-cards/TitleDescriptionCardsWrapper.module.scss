@@ -1,7 +1,7 @@
 @import '../shared/BaseSectionTemplate.module.scss';
 
 .container {
-    @extend .section-container;
+    @extend %section-container;
 
     padding: 0px 16px;
     box-sizing: border-box;

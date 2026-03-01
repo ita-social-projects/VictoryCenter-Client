@@ -5,8 +5,8 @@ import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { renderProgramSection } from '@/utils/functions/render-program-section';
 import styles from './ProgramSectionForm.module.scss';
 import {
+    FaqPairData,
     ProgramSection,
-    ProgramSectionContent,
     ProgramSectionTemplate,
     ProgramSectionMode,
 } from '@/types/common/program-sections';
@@ -15,7 +15,14 @@ import {
     getProgramSectionTemplateMaxGroupCount,
     normalizeGroupedContentsGroupIndexes,
 } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
+import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
 import { getDescriptionAuthorPairsByGroup } from '@/utils/functions/mappers/public/program/get-grouped-program-section-content-pairs';
+import {
+    getContentByType,
+    getDescriptionsInOrder,
+    getFaqPairs,
+    ensureTitleContentAndOnePair,
+} from '@/utils/functions/program-section-content/programSectionContent';
 
 export interface ProgramSectionFormProps {
     section: ProgramSection;
@@ -42,63 +49,6 @@ export interface SectionCancelOptions {
     onAfterDiscard: () => void;
     isTemplateReplacement?: boolean;
 }
-
-const getContentByType = (contents: ProgramSectionContent[], type: ContentType): ProgramSectionContent | undefined => {
-    return contents.find((c) => c.contentType === type);
-};
-
-const getDescriptionsInOrder = (contents: ProgramSectionContent[]) => {
-    return contents.filter((c) => c.contentType === ContentType.Description).sort((a, b) => a.order - b.order);
-};
-
-const ensureTitleContentAndOnePair = (section: ProgramSection): ProgramSection => {
-    if (section.template !== ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs) return section;
-
-    let updatedContents = section.contents;
-    let hasChanges = false;
-
-    const hasTitleContent = updatedContents.some((c) => c.contentType === ContentType.Title);
-
-    if (!hasTitleContent) {
-        const maxOrder = updatedContents.length ? Math.max(...updatedContents.map((c) => c.order)) : -1;
-
-        updatedContents = [
-            ...updatedContents,
-            {
-                contentType: ContentType.Title,
-                order: maxOrder + 1,
-                title: '',
-            } as any,
-        ];
-
-        hasChanges = true;
-    }
-
-    const pairs = getDescriptionAuthorPairsByGroup(updatedContents);
-    if (pairs.length > 0) {
-        return hasChanges ? { ...section, contents: updatedContents } : section;
-    }
-
-    const maxOrder = updatedContents.length ? Math.max(...updatedContents.map((c) => c.order)) : -1;
-
-    updatedContents = [
-        ...updatedContents,
-        {
-            contentType: ContentType.Description,
-            order: maxOrder + 1,
-            groupIndex: 0,
-            description: '',
-        } as any,
-        {
-            contentType: ContentType.Author,
-            order: maxOrder + 2,
-            groupIndex: 0,
-            author: '',
-        } as any,
-    ];
-
-    return { ...section, contents: updatedContents };
-};
 
 export const ProgramSectionForm = ({
     section,
@@ -180,11 +130,19 @@ export const ProgramSectionForm = ({
     const isDescriptionAuthorPairsTemplate =
         section.template === ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs;
 
+    const isFaqTemplate = section.template === ProgramSectionTemplate.SingleTitleQuestionAnswerPairs;
+
     const orderedPairs = getDescriptionAuthorPairsByGroup(localSection.contents);
 
     const descriptionAuthorPairs = orderedPairs.map((p) => ({
         description: p.description,
         author: p.author,
+    }));
+
+    const faqPairs: FaqPairData[] = getFaqPairs(localSection.contents).map((p) => ({
+        id: p.id,
+        questionText: p.questionText,
+        answerText: p.answerText,
     }));
 
     const imageContents = localSection.contents
@@ -426,6 +384,135 @@ export const ProgramSectionForm = ({
         [emitSectionChange],
     );
 
+    const isSectionSaveValid =
+        isSectionValid &&
+        (!isFaqTemplate ||
+            (faqPairs.length > 0 &&
+                faqPairs.every(
+                    (pair) =>
+                        !PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateFaqQuestion(pair.questionText) &&
+                        !PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateFaqAnswer(pair.answerText),
+                )));
+
+    const handleFaqQuestionChange = useCallback(
+        (index: number, value: string) => {
+            const prev = localSectionRef.current;
+            const faq = getFaqPairs(prev.contents);
+            const target = faq[index];
+            if (!target) return;
+
+            const updatedContents = prev.contents.map((c) => {
+                if (c.contentType === ContentType.FaqPair && c.groupIndex === target.groupIndex) {
+                    return {
+                        ...c,
+                        faqQuestion: { ...c.faqQuestion, questionText: value } as any,
+                    };
+                }
+                return c;
+            });
+
+            const newSection = { ...prev, contents: updatedContents };
+            localSectionRef.current = newSection;
+            setLocalSection(newSection);
+            emitSectionChange(newSection);
+        },
+        [emitSectionChange],
+    );
+
+    const handleFaqAnswerChange = useCallback(
+        (index: number, value: string) => {
+            const prev = localSectionRef.current;
+            const faq = getFaqPairs(prev.contents);
+            const target = faq[index];
+            if (!target) return;
+
+            const updatedContents = prev.contents.map((c) => {
+                if (c.contentType === ContentType.FaqPair && c.groupIndex === target.groupIndex) {
+                    return {
+                        ...c,
+                        faqQuestion: { ...c.faqQuestion, answerText: value } as any,
+                    };
+                }
+                return c;
+            });
+
+            const newSection = { ...prev, contents: updatedContents };
+            localSectionRef.current = newSection;
+            setLocalSection(newSection);
+            emitSectionChange(newSection);
+        },
+        [emitSectionChange],
+    );
+
+    const handleAddFaqPair = useCallback(
+        (questionText: string, answerText: string) => {
+            const prev = localSectionRef.current;
+            if (prev.template !== ProgramSectionTemplate.SingleTitleQuestionAnswerPairs) return;
+
+            const faq = getFaqPairs(prev.contents);
+            const nextGroupIndex = faq.length;
+
+            const maxOrder = prev.contents.length ? Math.max(...prev.contents.map((c) => c.order)) : -1;
+
+            const newSection: ProgramSection = {
+                ...prev,
+                contents: [
+                    ...prev.contents,
+                    {
+                        contentType: ContentType.FaqPair,
+                        order: maxOrder + 1,
+                        groupIndex: nextGroupIndex,
+                        faqQuestion: {
+                            questionText,
+                            answerText,
+                        } as any,
+                    } as any,
+                ],
+            };
+
+            localSectionRef.current = newSection;
+            setLocalSection(newSection);
+            emitSectionChange(newSection);
+        },
+        [emitSectionChange],
+    );
+
+    const handleDeleteFaqPair = useCallback(
+        (index: number) => {
+            const prev = localSectionRef.current;
+            if (prev.template !== ProgramSectionTemplate.SingleTitleQuestionAnswerPairs) return;
+
+            const faq = getFaqPairs(prev.contents);
+            if (faq.length <= 1) return;
+
+            const target = faq[index];
+            if (!target) return;
+
+            const filtered: ProgramSection = {
+                ...prev,
+                contents: prev.contents.filter(
+                    (c) => !(c.contentType === ContentType.FaqPair && c.groupIndex === target.groupIndex),
+                ),
+            };
+
+            const normalizedContents = filtered.contents.map((c) => {
+                if (c.contentType === ContentType.FaqPair && c.groupIndex !== null && c.groupIndex !== undefined) {
+                    if (c.groupIndex > target.groupIndex) {
+                        return { ...c, groupIndex: c.groupIndex - 1 };
+                    }
+                }
+                return c;
+            });
+
+            const normalizedSection = { ...filtered, contents: normalizedContents };
+
+            localSectionRef.current = normalizedSection;
+            setLocalSection(normalizedSection);
+            emitSectionChange(normalizedSection);
+        },
+        [emitSectionChange],
+    );
+
     const handleEditClick = useCallback(
         (e: React.MouseEvent<HTMLButtonElement>) => {
             e.preventDefault();
@@ -438,13 +525,13 @@ export const ProgramSectionForm = ({
     );
 
     const handleSaveClick = useCallback(() => {
-        if (isDisabled || !isSectionValid) return;
+        if (isDisabled || !isSectionSaveValid) return;
         onSave();
         setOriginalSection(localSection);
         setIsDirty(false);
         setSectionMode(ProgramSectionMode.View);
         setValidationResetKey((prev) => prev + 1);
-    }, [isDisabled, isSectionValid, onSave, localSection]);
+    }, [isDisabled, isSectionSaveValid, onSave, localSection]);
 
     const CARD_TEMPLATES = [
         ProgramSectionTemplate.DualTitleDescriptionPairs,
@@ -505,6 +592,7 @@ export const ProgramSectionForm = ({
             images: imageContents,
             ...(isCardTemplate ? { cards } : {}),
             ...(isDescriptionAuthorPairsTemplate ? { descriptionAuthorPairs } : {}),
+            ...(isFaqTemplate ? { faqPairs } : {}),
         },
         mode: sectionMode,
         validationResetKey,
@@ -528,6 +616,14 @@ export const ProgramSectionForm = ({
                       onAddPair: handleAddPair,
                       onDeletePair: performDeletePair,
                       canAddPair,
+                  }
+                : {}),
+            ...(isFaqTemplate
+                ? {
+                      onFaqQuestionChange: handleFaqQuestionChange,
+                      onFaqAnswerChange: handleFaqAnswerChange,
+                      onAddFaqPair: handleAddFaqPair,
+                      onDeleteFaqPair: handleDeleteFaqPair,
                   }
                 : {}),
         },
@@ -595,7 +691,7 @@ export const ProgramSectionForm = ({
                         <Button
                             buttonStyle="primary"
                             onClick={handleSaveClick}
-                            disabled={isDisabled || !isSectionValid}
+                            disabled={isDisabled || !isSectionSaveValid}
                         >
                             {PROGRAMS_TEXT.BUTTON.SAVE}
                         </Button>

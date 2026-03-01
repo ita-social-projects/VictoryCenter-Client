@@ -840,7 +840,7 @@ describe('ProgramSectionForm', () => {
 
     describe('FAQ template', () => {
         const makeFaqPairContent = (order: number, groupIndex: number, questionText: string, answerText: string) => ({
-            contentType: ContentType.FaqPair,
+            contentType: ContentType.FaqQuestion,
             order,
             groupIndex,
             faqQuestion: {
@@ -868,7 +868,7 @@ describe('ProgramSectionForm', () => {
             });
 
             const updated = getLastUpdatedSection(onSectionChange);
-            const faqPairs = updated.contents.filter((c: any) => c.contentType === ContentType.FaqPair);
+            const faqPairs = updated.contents.filter((c: any) => c.contentType === ContentType.FaqQuestion);
 
             expect(faqPairs).toHaveLength(2);
 
@@ -894,7 +894,7 @@ describe('ProgramSectionForm', () => {
 
             const updated = getLastUpdatedSection(onSectionChange);
             const faqPairs = updated.contents
-                .filter((c: any) => c.contentType === ContentType.FaqPair)
+                .filter((c: any) => c.contentType === ContentType.FaqQuestion)
                 .sort((a: any, b: any) => a.order - b.order);
 
             expect(faqPairs).toHaveLength(2);
@@ -917,7 +917,7 @@ describe('ProgramSectionForm', () => {
             });
 
             const updated = getLastUpdatedSection(onSectionChange);
-            const faqPair = updated.contents.find((c: any) => c.contentType === ContentType.FaqPair);
+            const faqPair = updated.contents.find((c: any) => c.contentType === ContentType.FaqQuestion);
 
             expect(faqPair!.faqQuestion!.questionText).toBe('New Question');
             expect(faqPair!.faqQuestion!.answerText).toBe('Answer');
@@ -936,7 +936,7 @@ describe('ProgramSectionForm', () => {
             });
 
             const updated = getLastUpdatedSection(onSectionChange);
-            const faqPair = updated.contents.find((c: any) => c.contentType === ContentType.FaqPair);
+            const faqPair = updated.contents.find((c: any) => c.contentType === ContentType.FaqQuestion);
 
             expect(faqPair!.faqQuestion!.questionText).toBe('Question');
             expect(faqPair!.faqQuestion!.answerText).toBe('New Answer');

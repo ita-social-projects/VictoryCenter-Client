@@ -402,7 +402,7 @@ export const ProgramSectionForm = ({
             if (!target) return;
 
             const updatedContents = prev.contents.map((c) => {
-                if (c.contentType === ContentType.FaqPair && c.groupIndex === target.groupIndex) {
+                if (c.contentType === ContentType.FaqQuestion && c.groupIndex === target.groupIndex) {
                     return {
                         ...c,
                         faqQuestion: { ...c.faqQuestion, questionText: value } as any,
@@ -427,7 +427,7 @@ export const ProgramSectionForm = ({
             if (!target) return;
 
             const updatedContents = prev.contents.map((c) => {
-                if (c.contentType === ContentType.FaqPair && c.groupIndex === target.groupIndex) {
+                if (c.contentType === ContentType.FaqQuestion && c.groupIndex === target.groupIndex) {
                     return {
                         ...c,
                         faqQuestion: { ...c.faqQuestion, answerText: value } as any,
@@ -459,7 +459,7 @@ export const ProgramSectionForm = ({
                 contents: [
                     ...prev.contents,
                     {
-                        contentType: ContentType.FaqPair,
+                        contentType: ContentType.FaqQuestion,
                         order: maxOrder + 1,
                         groupIndex: nextGroupIndex,
                         faqQuestion: {
@@ -491,12 +491,12 @@ export const ProgramSectionForm = ({
             const filtered: ProgramSection = {
                 ...prev,
                 contents: prev.contents.filter(
-                    (c) => !(c.contentType === ContentType.FaqPair && c.groupIndex === target.groupIndex),
+                    (c) => !(c.contentType === ContentType.FaqQuestion && c.groupIndex === target.groupIndex),
                 ),
             };
 
             const normalizedContents = filtered.contents.map((c) => {
-                if (c.contentType === ContentType.FaqPair && c.groupIndex !== null && c.groupIndex !== undefined) {
+                if (c.contentType === ContentType.FaqQuestion && c.groupIndex !== null && c.groupIndex !== undefined) {
                     if (c.groupIndex > target.groupIndex) {
                         return { ...c, groupIndex: c.groupIndex - 1 };
                     }

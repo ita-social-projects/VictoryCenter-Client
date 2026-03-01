@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { ProgramsPageModals } from './ProgramsPageModals';
-import { Program, ProgramCategory } from '@/types/admin/programs';
+import { HippotherapyProgramDto, ProgramCategory } from '@/types/admin/programs';
 import { BaseModalState, UseModalsStateResult } from '@/hooks/admin/use-modals-state/useModalsState';
 import { VisibilityStatus } from '@/types/admin/common';
 import { ProgramModalProps } from '@/pages/admin/programs/components/programs-page-modals/program-modal/ProgramModal';
@@ -31,7 +31,7 @@ jest.mock('../program-category-modals/DeleteCategoryModal', () => ({
 }));
 
 describe('ProgramsPageModals', () => {
-    const mockProgram: Program = {
+    const mockProgram: HippotherapyProgramDto = {
         id: 1,
         name: 'Test Program',
         description: 'Test Description',
@@ -75,8 +75,8 @@ describe('ProgramsPageModals', () => {
     };
 
     const createMockModalsState = (
-        overrides: Partial<BaseModalState<Program>> = {},
-    ): UseModalsStateResult<Program> => ({
+        overrides: Partial<BaseModalState<HippotherapyProgramDto>> = {},
+    ): UseModalsStateResult<HippotherapyProgramDto> => ({
         modalState: {
             isAddModalOpen: false,
             itemToDelete: null,
@@ -108,7 +108,7 @@ describe('ProgramsPageModals', () => {
         isAnyModalOpened: false,
     });
 
-    const renderProgramsPageModals = (modalsStateControl: UseModalsStateResult<Program>) =>
+    const renderProgramsPageModals = (modalsStateControl: UseModalsStateResult<HippotherapyProgramDto>) =>
         render(
             <ProgramsPageModals
                 modalsStateControl={modalsStateControl}

@@ -1,7 +1,13 @@
 import React from 'react';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { BaseProgramModalProps, ProgramModal, ProgramModalProps } from './ProgramModal';
-import { Program, ProgramCategory, ProgramCreateUpdate, SectionCancelActionType } from '@/types/admin/programs';
+import {
+    HippotherapyProgramDto,
+    ProgramCategory,
+    CreateHippotherapyProgramDto,
+    UpdateHippotherapyProgramDto,
+    SectionCancelActionType,
+} from '@/types/admin/programs';
 import { ModalMode } from '@/types/admin/common';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -163,7 +169,7 @@ jest.mock('../../program-form/ProgramForm', () => {
     return { ProgramForm: MockProgramForm };
 });
 
-const mockProgram: Program = {
+const mockProgram: HippotherapyProgramDto = {
     id: 1,
     name: 'Test Program',
     description: 'Test Description',
@@ -183,7 +189,7 @@ const mockCategories: ProgramCategory[] = [
     { id: 2, name: 'Category 2', programsCount: 2 },
 ];
 
-const mockFormData: Partial<Program> = {
+const mockFormData: Partial<HippotherapyProgramDto> = {
     name: 'Updated Name',
     description: 'Updated Description',
     categories: [mockCategories[0]],
@@ -583,14 +589,13 @@ describe('ProgramModal', () => {
             await waitFor(() => {
                 expect(mockedProgramsApi.addProgram).toHaveBeenCalledWith(
                     expect.any(Object),
-                    expect.objectContaining<Partial<ProgramCreateUpdate>>({
+                    expect.objectContaining<Partial<CreateHippotherapyProgramDto>>({
                         name: mockFormData.name,
                         description: mockFormData.description,
                         categoryIds: [1],
                         status: VisibilityStatus.Draft,
                         previewImage: null,
                         previewImageId: null,
-                        id: null,
                     }),
                 );
             });
@@ -615,7 +620,7 @@ describe('ProgramModal', () => {
             await waitFor(() => {
                 expect(mockedProgramsApi.addProgram).toHaveBeenCalledWith(
                     expect.any(Object),
-                    expect.objectContaining<Partial<ProgramCreateUpdate>>({
+                    expect.objectContaining<Partial<CreateHippotherapyProgramDto>>({
                         name: mockFormData.name,
                         description: mockFormData.description,
                         categoryIds: [1],
@@ -676,7 +681,7 @@ describe('ProgramModal', () => {
 
             await waitFor(() => {
                 expect(mockedProgramsApi.editProgram).toHaveBeenCalledWith(
-                    expect.objectContaining<Partial<ProgramCreateUpdate>>({
+                    expect.objectContaining<Partial<UpdateHippotherapyProgramDto>>({
                         id: mockProgram.id,
                         name: mockFormData.name,
                         description: mockFormData.description,

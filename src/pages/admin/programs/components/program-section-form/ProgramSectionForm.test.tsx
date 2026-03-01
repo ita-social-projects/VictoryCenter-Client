@@ -4,7 +4,7 @@ import '@testing-library/jest-dom';
 
 import { ProgramSectionForm } from './ProgramSectionForm';
 import type { ProgramSectionFormProps } from './ProgramSectionForm';
-import type { ProgramSection } from '@/types/common/program-sections';
+import type { CreateHippotherapyProgramSectionDto } from '@/types/common/program-sections';
 import { ProgramSectionTemplate, ProgramSectionMode } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
@@ -84,7 +84,9 @@ const makePairAuthor = (order: number, groupIndex: number | null | undefined, au
     image: null,
 });
 
-const makeSection = (overrides?: Partial<ProgramSection>): ProgramSection => ({
+const makeSection = (
+    overrides?: Partial<CreateHippotherapyProgramSectionDto>,
+): CreateHippotherapyProgramSectionDto => ({
     template: ProgramSectionTemplate.TextOnly,
     order: 0,
     contents: [
@@ -99,11 +101,12 @@ const makeSection = (overrides?: Partial<ProgramSection>): ProgramSection => ({
 });
 
 const getLastUpdatedSection = (onSectionChange: jest.Mock) =>
-    onSectionChange.mock.calls[onSectionChange.mock.calls.length - 1][0] as ProgramSection;
+    onSectionChange.mock.calls[onSectionChange.mock.calls.length - 1][0] as CreateHippotherapyProgramSectionDto;
 
-const getContentsBy = (s: ProgramSection, type: ContentType) => s.contents.filter((c: any) => c.contentType === type);
+const getContentsBy = (s: CreateHippotherapyProgramSectionDto, type: ContentType) =>
+    s.contents.filter((c: any) => c.contentType === type);
 
-const getContentByGroupAndType = (s: ProgramSection, groupIndex: number, type: ContentType) =>
+const getContentByGroupAndType = (s: CreateHippotherapyProgramSectionDto, groupIndex: number, type: ContentType) =>
     s.contents.find((c: any) => c.groupIndex === groupIndex && c.contentType === type);
 
 const createFocusableTextarea = (id: string) => {

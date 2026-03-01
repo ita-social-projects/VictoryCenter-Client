@@ -1,5 +1,10 @@
 import { VisibilityStatus } from '@/types/admin/common';
-import { ProgramCategoryCreateUpdate, ProgramCreateUpdate, Program, ProgramCategory } from '@/types/admin/programs';
+import {
+    ProgramCategoryCreateUpdate,
+    UpdateHippotherapyProgramDto,
+    HippotherapyProgramDto,
+    ProgramCategory,
+} from '@/types/admin/programs';
 import { ProgramsApi, ProgramsCategoriesApi } from './programs-api';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
@@ -18,7 +23,7 @@ const mockCategories: ProgramCategory[] = [
     { id: 3, name: 'Інклюзивні', programsCount: 0 },
 ];
 
-const mockPrograms: Program[] = [
+const mockPrograms: HippotherapyProgramDto[] = [
     {
         id: 1,
         name: 'Коні лікують Літо 2025',
@@ -68,8 +73,8 @@ const createMockFile = (): { base64: string; mimeType: string } => ({
     mimeType: 'image/png',
 });
 
-const getValidProgramData = (overrides?: Partial<ProgramCreateUpdate>): ProgramCreateUpdate => ({
-    id: null,
+const getValidProgramData = (overrides?: Partial<UpdateHippotherapyProgramDto>): UpdateHippotherapyProgramDto => ({
+    id: 0,
     name: 'Valid Program Name',
     description: 'This is a valid description with enough characters.',
     categoryIds: [1],
@@ -390,7 +395,7 @@ describe('addProgram', () => {
     });
 
     it('preserves slug when provided and maps categories from categories endpoint', async () => {
-        const programData = getValidProgramData({ slug: 'my-program-slug' });
+        const programData = getValidProgramData();
 
         (ImageApi.post as jest.Mock).mockResolvedValueOnce({ id: 100 }).mockResolvedValueOnce({ id: 101 });
 
@@ -860,7 +865,7 @@ describe('deleteCategory', () => {
 
 describe('fetchProgramSearchItems', () => {
     it('prioritizes direct name matches then sorts alphabetically', async () => {
-        const programWithNameMatch: Program = {
+        const programWithNameMatch: HippotherapyProgramDto = {
             id: 100,
             name: 'Core Pilates Workout',
             description: 'test',
@@ -875,7 +880,7 @@ describe('fetchProgramSearchItems', () => {
             slug: 'core-pilates-workout',
         };
 
-        const programWithCategoryMatch: Program = {
+        const programWithCategoryMatch: HippotherapyProgramDto = {
             id: 101,
             name: 'Advanced Flexibility',
             description: 'test',
@@ -1004,7 +1009,7 @@ describe('fetchProgramSearchItems', () => {
         const searchTerm = 'therapy';
         const signal = {} as AbortSignal;
 
-        const apiPrograms: Program[] = [
+        const apiPrograms: HippotherapyProgramDto[] = [
             {
                 id: 501,
                 name: 'Therapy Program',

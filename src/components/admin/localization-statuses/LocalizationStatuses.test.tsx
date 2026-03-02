@@ -17,30 +17,49 @@ const languages: LocalizationLanguage[] = [
     { id: 3, code: 'pl', name: 'Польська' },
 ];
 
+const translationStatusesByLanguage = [
+    {
+        languageId: 1,
+        languageCode: 'en',
+        translationStatus: TranslationStatus.Relevant,
+    },
+    {
+        languageId: 2,
+        languageCode: 'es',
+        translationStatus: TranslationStatus.Outdated,
+    },
+];
+
 const localizedEntity: EntityWithLocalizations<TestLocalization> = {
-    localizations: [
-        {
-            language: { id: 1, code: 'en' },
-            translationStatus: TranslationStatus.Relevant,
-        },
-        {
-            language: { id: 2, code: 'es' },
-            translationStatus: TranslationStatus.Outdated,
-        },
-    ],
+    localizations: translationStatusesByLanguage.map(({ languageId, languageCode, translationStatus }) => ({
+        language: { id: languageId, code: languageCode },
+        translationStatus,
+    })),
 };
 
 const entityWithTranslationStatuses: EntityWithTranslationStatuses = {
-    translationStatuses: [
-        {
-            languageId: 1,
-            translationStatus: TranslationStatus.Relevant,
-        },
-        {
-            languageId: 2,
-            translationStatus: TranslationStatus.Outdated,
-        },
-    ],
+    translationStatuses: translationStatusesByLanguage.map(({ languageId, translationStatus }) => ({
+        languageId,
+        translationStatus,
+    })),
+};
+
+const assertStatusBadges = () => {
+    const enBadge = screen.getByText('EN');
+    const esBadge = screen.getByText('ES');
+    const plBadge = screen.getByText('PL');
+
+    expect(enBadge).toHaveClass(styles.badge);
+    expect(enBadge).toHaveClass(styles.relevant);
+    expect(enBadge).not.toHaveClass(styles.outdated);
+
+    expect(esBadge).toHaveClass(styles.badge);
+    expect(esBadge).toHaveClass(styles.outdated);
+    expect(esBadge).not.toHaveClass(styles.relevant);
+
+    expect(plBadge).toHaveClass(styles.badge);
+    expect(plBadge).not.toHaveClass(styles.relevant);
+    expect(plBadge).not.toHaveClass(styles.outdated);
 };
 
 describe('LocalizationStatuses component', () => {
@@ -55,21 +74,7 @@ describe('LocalizationStatuses component', () => {
     it('applies correct class based on translation status', () => {
         render(<LocalizationStatuses languages={languages} localizedEntity={localizedEntity} />);
 
-        const enBadge = screen.getByText('EN');
-        const esBadge = screen.getByText('ES');
-        const plBadge = screen.getByText('PL');
-
-        expect(enBadge).toHaveClass(styles.badge);
-        expect(enBadge).toHaveClass(styles.relevant);
-        expect(enBadge).not.toHaveClass(styles.outdated);
-
-        expect(esBadge).toHaveClass(styles.badge);
-        expect(esBadge).toHaveClass(styles.outdated);
-        expect(esBadge).not.toHaveClass(styles.relevant);
-
-        expect(plBadge).toHaveClass(styles.badge);
-        expect(plBadge).not.toHaveClass(styles.relevant);
-        expect(plBadge).not.toHaveClass(styles.outdated);
+        assertStatusBadges();
     });
 
     it('renders wrapper with correct test id', () => {
@@ -81,20 +86,6 @@ describe('LocalizationStatuses component', () => {
     it('applies statuses correctly for entities with translationStatuses', () => {
         render(<LocalizationStatuses languages={languages} localizedEntity={entityWithTranslationStatuses} />);
 
-        const enBadge = screen.getByText('EN');
-        const esBadge = screen.getByText('ES');
-        const plBadge = screen.getByText('PL');
-
-        expect(enBadge).toHaveClass(styles.badge);
-        expect(enBadge).toHaveClass(styles.relevant);
-        expect(enBadge).not.toHaveClass(styles.outdated);
-
-        expect(esBadge).toHaveClass(styles.badge);
-        expect(esBadge).toHaveClass(styles.outdated);
-        expect(esBadge).not.toHaveClass(styles.relevant);
-
-        expect(plBadge).toHaveClass(styles.badge);
-        expect(plBadge).not.toHaveClass(styles.relevant);
-        expect(plBadge).not.toHaveClass(styles.outdated);
+        assertStatusBadges();
     });
 });

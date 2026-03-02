@@ -6,6 +6,7 @@ import {
     LocalizationLanguage,
     EntityWithLocalizations,
     EntityLocalization,
+    EntityWithTranslationStatuses,
 } from '@/types/common/language';
 
 type TestLocalization = EntityLocalization;
@@ -24,6 +25,19 @@ const localizedEntity: EntityWithLocalizations<TestLocalization> = {
         },
         {
             language: { id: 2, code: 'es' },
+            translationStatus: TranslationStatus.Outdated,
+        },
+    ],
+};
+
+const entityWithTranslationStatuses: EntityWithTranslationStatuses = {
+    translationStatuses: [
+        {
+            languageId: 1,
+            translationStatus: TranslationStatus.Relevant,
+        },
+        {
+            languageId: 2,
             translationStatus: TranslationStatus.Outdated,
         },
     ],
@@ -62,5 +76,25 @@ describe('LocalizationStatuses component', () => {
         render(<LocalizationStatuses languages={languages} localizedEntity={localizedEntity} />);
 
         expect(screen.getByTestId('localization-statuses')).toBeInTheDocument();
+    });
+
+    it('applies statuses correctly for entities with translationStatuses', () => {
+        render(<LocalizationStatuses languages={languages} localizedEntity={entityWithTranslationStatuses} />);
+
+        const enBadge = screen.getByText('EN');
+        const esBadge = screen.getByText('ES');
+        const plBadge = screen.getByText('PL');
+
+        expect(enBadge).toHaveClass(styles.badge);
+        expect(enBadge).toHaveClass(styles.relevant);
+        expect(enBadge).not.toHaveClass(styles.outdated);
+
+        expect(esBadge).toHaveClass(styles.badge);
+        expect(esBadge).toHaveClass(styles.outdated);
+        expect(esBadge).not.toHaveClass(styles.relevant);
+
+        expect(plBadge).toHaveClass(styles.badge);
+        expect(plBadge).not.toHaveClass(styles.relevant);
+        expect(plBadge).not.toHaveClass(styles.outdated);
     });
 });

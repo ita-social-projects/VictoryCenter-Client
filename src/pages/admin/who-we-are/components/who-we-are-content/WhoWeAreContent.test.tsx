@@ -276,6 +276,10 @@ describe('WhoWeAreContent Component', () => {
         });
 
         await waitFor(() => {
+            expect(mockedWhoWeAreApi.getPreviews).toHaveBeenCalledTimes(2);
+        });
+
+        await waitFor(() => {
             expect(publishButton).toBeDisabled();
         });
     });

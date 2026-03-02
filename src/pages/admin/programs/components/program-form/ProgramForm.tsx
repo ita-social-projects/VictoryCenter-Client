@@ -92,7 +92,7 @@ const validateForm = (formState: ProgramFormValues, isPublishing: boolean): Prog
             isPublishing,
         ),
         meetingCount: PROGRAM_VALIDATION_FUNCTIONS.validateMeetingCount(formState.meetingCount, isPublishing),
-        sections: undefined,
+        sections: PROGRAM_VALIDATION_FUNCTIONS.validateSections(formState.sections, isPublishing),
     };
 };
 

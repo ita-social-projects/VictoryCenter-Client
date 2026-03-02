@@ -106,7 +106,7 @@ const createTemplateTextSchema = (type: ContentType) =>
                 return this.createError({ message: COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(req.max) });
             }
 
-            if (ctx.isPublishing && t.length < req.min) {
+            if (t.length < req.min) {
                 return this.createError({ message: COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(req.min) });
             }
 

@@ -344,7 +344,7 @@ export const PROGRAM_SECTION_TEMPLATE_VALIDATION = {
             [ContentType.Author]: { min: 0, max: 0 },
         },
         lengths: {
-            [ContentType.Title]: { min: 20, max: 60 },
+            [ContentType.Title]: { min: 5, max: 60 },
             [ContentType.Description]: { min: 10, max: 600 },
         },
     },

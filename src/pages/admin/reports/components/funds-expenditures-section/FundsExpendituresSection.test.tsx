@@ -26,7 +26,6 @@ jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: () => ({}),
 }));
 
-// Mock useDataFetch to return the data synchronously
 const mockUseDataFetch = jest.fn();
 jest.mock('@/hooks/common/use-data-fetch/useDataFetch', () => ({
     useDataFetch: (props: { initialData: unknown }) => mockUseDataFetch(props),
@@ -57,21 +56,30 @@ jest.mock('./components/summary-card/SummaryCard', () => ({
 
 jest.mock('./components/funds-expenditures-toolbar/FundsExpendituresToolbar', () => ({
     FundsExpendituresToolbar: ({
+        categories,
+        selectedCategoryId,
         exchangeRate,
         onTypeChange,
         onCategoryChange,
     }: {
-        categories: unknown[];
+        categories: { id: number; name: string }[];
         selectedType: unknown;
         selectedCategoryId: unknown;
         exchangeRate: string | null;
         onTypeChange: (v: unknown) => void;
         onCategoryChange: (v: unknown) => void;
     }) => (
-        <div data-testid="funds-toolbar">
+        <div data-testid="funds-toolbar" data-category-count={categories.length}>
             <span data-testid="exchange-rate">{exchangeRate}</span>
+            <span data-testid="selected-category-id">{String(selectedCategoryId ?? 'none')}</span>
+            <button onClick={() => onTypeChange(undefined)} data-testid="filter-all">
+                Filter All
+            </button>
             <button onClick={() => onTypeChange('income')} data-testid="filter-income">
                 Filter Income
+            </button>
+            <button onClick={() => onTypeChange('expense')} data-testid="filter-expense">
+                Filter Expense
             </button>
             <button onClick={() => onCategoryChange(1)} data-testid="filter-cat-1">
                 Filter Cat 1
@@ -94,8 +102,9 @@ const setupMockDataFetch = (
     let callIndex = 0;
     mockUseDataFetch.mockImplementation(({ initialData }: { initialData: unknown }) => {
         const callOrder = callIndex++;
-        // 0 = settings, 1 = categories, 2 = records
-        const data = callOrder === 0 ? settings : callOrder === 1 ? categories : records;
+        // 0 = settings, 1 = categories, 2 = records (repeats each render cycle)
+        const slot = callOrder % 3;
+        const data = slot === 0 ? settings : slot === 1 ? categories : records;
         return { data: data ?? initialData, isLoading: false, error: null, refetch: jest.fn() };
     });
 };
@@ -171,7 +180,7 @@ describe('FundsExpenditureSection', () => {
         fireEvent.click(screen.getByTestId('filter-income'));
 
         const table = screen.getByTestId('funds-table');
-        // MOCK_FUNDS_EXPENDITURES_RECORDS has 5 income records (ids 1, 3, 5, 7, 9)
+
         expect(table).toHaveAttribute('data-record-count', '5');
     });
 
@@ -181,7 +190,38 @@ describe('FundsExpenditureSection', () => {
         fireEvent.click(screen.getByTestId('filter-cat-1'));
 
         const table = screen.getByTestId('funds-table');
-        // MOCK_FUNDS_EXPENDITURES_RECORDS has 2 records with categoryId 1 (ids 1, 7)
         expect(table).toHaveAttribute('data-record-count', '2');
+    });
+
+    it('should reset category when type changes', () => {
+        render(<FundsExpenditureSection isEditing={false} />);
+
+        fireEvent.click(screen.getByTestId('filter-cat-1'));
+        expect(screen.getByTestId('selected-category-id')).toHaveTextContent('1');
+
+        fireEvent.click(screen.getByTestId('filter-income'));
+        expect(screen.getByTestId('selected-category-id')).toHaveTextContent('none');
+    });
+
+    it('should pass only income categories to toolbar when income type is selected', () => {
+        render(<FundsExpenditureSection isEditing={false} />);
+
+        fireEvent.click(screen.getByTestId('filter-income'));
+
+        expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-category-count', '3');
+    });
+
+    it('should pass only expense categories to toolbar when expense type is selected', () => {
+        render(<FundsExpenditureSection isEditing={false} />);
+
+        fireEvent.click(screen.getByTestId('filter-expense'));
+
+        expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-category-count', '4');
+    });
+
+    it('should pass all categories to toolbar when no type is selected', () => {
+        render(<FundsExpenditureSection isEditing={false} />);
+
+        expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-category-count', '7');
     });
 });

@@ -27,6 +27,7 @@ export interface UseGenericModalConfig<TFormValues extends GenericFormValues, TE
     getErrorMessage: (mode: ModalMode) => string;
     getFormKey: (mode: ModalMode, entity?: TEntity) => string | number;
     transformFormData: (formData: TFormValues, status: VisibilityStatus, entity?: TEntity) => any;
+    closeOnDraftCancel?: boolean;
 }
 
 export interface UseGenericModalReturn<TFormValues, TFormRef> {
@@ -66,6 +67,7 @@ export const useGenericModal = <
     getErrorMessage,
     getFormKey,
     transformFormData,
+    closeOnDraftCancel = false,
 }: UseGenericModalConfig<TFormValues, TEntity>): UseGenericModalReturn<TFormValues, TFormRef> => {
     const formRef = useRef<TFormRef>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -116,9 +118,14 @@ export const useGenericModal = <
 
     const handleCancelConfirmation = useCallback(() => {
         setShowFormConfirmModal(false);
+
+        if (closeOnDraftCancel && pendingAction === PendingAction.Draft) {
+            onClose();
+        }
+
         resetPendingState();
         setIsSubmitting(false);
-    }, [resetPendingState]);
+    }, [closeOnDraftCancel, pendingAction, onClose, resetPendingState]);
 
     const handleConfirmAction = useCallback(async () => {
         if (!pendingFormData || pendingAction === null) return;

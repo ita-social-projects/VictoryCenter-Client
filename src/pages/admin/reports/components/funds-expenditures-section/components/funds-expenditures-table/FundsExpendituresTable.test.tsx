@@ -137,6 +137,36 @@ describe('FundsExpendituresTable', () => {
             const firstRowCells = within(rows[0]).getAllByRole('cell');
             expect(firstRowCells[0]).toHaveTextContent('2025');
         });
+
+        it('should sort by categoryName ascending on first click', () => {
+            render(<FundsExpendituresTable records={MOCK_RECORDS} />);
+            const categoryHeader = screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.CATEGORY);
+            fireEvent.click(categoryHeader);
+
+            const rows = screen.getAllByRole('row').slice(1);
+            const firstRowCells = within(rows[0]).getAllByRole('cell');
+            expect(firstRowCells[2]).toHaveTextContent('Благодійні внески');
+        });
+
+        it('should sort by amountUah ascending on first click', () => {
+            render(<FundsExpendituresTable records={MOCK_RECORDS} />);
+            const amountUahHeader = screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.AMOUNT_UAH);
+            fireEvent.click(amountUahHeader);
+
+            const rows = screen.getAllByRole('row').slice(1);
+            const firstRowCells = within(rows[0]).getAllByRole('cell');
+            expect(firstRowCells[3]).toHaveTextContent('1 000');
+        });
+
+        it('should sort by amountUsd ascending on first click', () => {
+            render(<FundsExpendituresTable records={MOCK_RECORDS} />);
+            const amountUsdHeader = screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.AMOUNT_USD);
+            fireEvent.click(amountUsdHeader);
+
+            const rows = screen.getAllByRole('row').slice(1);
+            const firstRowCells = within(rows[0]).getAllByRole('cell');
+            expect(firstRowCells[4]).toHaveTextContent('1 000');
+        });
     });
 
     it('should display amount values', () => {

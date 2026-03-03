@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { FundsExpenditureSection } from './FundsExpendituresSection';
 import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
@@ -163,5 +163,25 @@ describe('FundsExpenditureSection', () => {
         setupMockDataFetch({ id: 1, disclaimerTitle: null, exchangeRate: '42.18' });
         render(<FundsExpenditureSection isEditing={false} />);
         expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.DISCLAIMER_LABEL)).not.toBeInTheDocument();
+    });
+
+    it('should filter records by type when type filter is applied', () => {
+        render(<FundsExpenditureSection isEditing={false} />);
+
+        fireEvent.click(screen.getByTestId('filter-income'));
+
+        const table = screen.getByTestId('funds-table');
+        // MOCK_FUNDS_EXPENDITURES_RECORDS has 5 income records (ids 1, 3, 5, 7, 9)
+        expect(table).toHaveAttribute('data-record-count', '5');
+    });
+
+    it('should filter records by category when category filter is applied', () => {
+        render(<FundsExpenditureSection isEditing={false} />);
+
+        fireEvent.click(screen.getByTestId('filter-cat-1'));
+
+        const table = screen.getByTestId('funds-table');
+        // MOCK_FUNDS_EXPENDITURES_RECORDS has 2 records with categoryId 1 (ids 1, 7)
+        expect(table).toHaveAttribute('data-record-count', '2');
     });
 });

@@ -20,6 +20,10 @@ jest.mock('../reports-page-toolbar/ReportsPageToolbar', () => ({
             <span data-testid="is-publish-disabled">{props.isPublishDisabled ? 'true' : 'false'}</span>
         </div>
     ),
+    TOOLBAR_TABS: [
+        { id: 'media-settings', label: 'Налаштування медіа' },
+        { id: 'report-analytics', label: 'Звіт та аналітика' },
+    ],
 }));
 
 jest.mock('../media-settings/MediaSettings', () => {

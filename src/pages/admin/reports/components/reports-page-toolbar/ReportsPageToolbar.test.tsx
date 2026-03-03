@@ -77,14 +77,14 @@ describe('ReportsPageToolbar', () => {
             expect(firstTab).toHaveClass('selected');
         });
 
-        it('should switch tab on click', () => {
+        it('should call onTabChange with the clicked tab', () => {
             renderComponent();
 
             const secondTab = screen.getByTestId('tab-report-analytics');
             fireEvent.click(secondTab);
 
-            expect(secondTab).toHaveClass('selected');
-            expect(screen.getByTestId('tab-media-settings')).not.toHaveClass('selected');
+            expect(mockOnTabChange).toHaveBeenCalledWith(TOOLBAR_TABS[1]);
+            expect(mockOnTabChange).toHaveBeenCalledTimes(1);
         });
     });
 

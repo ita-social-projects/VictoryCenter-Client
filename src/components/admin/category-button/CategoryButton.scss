@@ -1,4 +1,4 @@
-@use '@/assets/sass/variables/colors';
+@use '@/assets/sass/variables/colors' as c;
 
 .category-extra {
     margin-left: 0.9375rem;
@@ -18,21 +18,20 @@
     transition: background-color 0.2s;
 
     &-selected {
-        color: colors.$blue-900;
+        color: c.$blue-900;
 
         &::after {
             content: '';
             position: absolute;
-            left: 0.75rem;
-            right: 0.75rem;
+            left: 0;
+            width: 100%;
             bottom: 0;
-            height: 0.1875rem;
-            border-radius: 9999px;
-            background-color: colors.$blue-900;
+            height: 2px;
+            background-color: c.$blue-900;
         }
     }
 
     &:hover {
-        background-color: colors.$blue-50;
+        background-color: c.$blue-50;
     }
 }

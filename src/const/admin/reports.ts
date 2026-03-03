@@ -125,8 +125,8 @@ export const FUNDS_EXPENDITURES_TEXT = {
             AMOUNT_USD: 'Сума USD',
         },
         TYPE_LABELS: {
-            INCOME: 'надходження',
-            EXPENSE: 'витрати',
+            INCOME: 'Надходження',
+            EXPENSE: 'Витрати',
         },
     },
 };

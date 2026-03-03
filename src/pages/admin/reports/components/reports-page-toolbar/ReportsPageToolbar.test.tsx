@@ -4,20 +4,7 @@ import { TOOLBAR_TABS, ReportsPageToolbar } from './ReportsPageToolbar';
 import { REPORTS_TEXT } from '@/const/admin/reports';
 
 jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
-    CategoryBar: ({ categories, selectedCategory, getCategoryDisplayName, onCategorySelect }: any) => (
-        <div data-testid="mock-category-bar">
-            {categories.map((cat: any) => (
-                <button
-                    key={cat.id}
-                    data-testid={`tab-${cat.id}`}
-                    className={selectedCategory?.id === cat.id ? 'selected' : ''}
-                    onClick={() => onCategorySelect(cat)}
-                >
-                    {getCategoryDisplayName(cat)}
-                </button>
-            ))}
-        </div>
-    ),
+    CategoryBar: require('@/utils/test-mocks/test-mocks').MockCategoryBar,
 }));
 
 jest.mock('@/components/admin/button/Button', () => ({

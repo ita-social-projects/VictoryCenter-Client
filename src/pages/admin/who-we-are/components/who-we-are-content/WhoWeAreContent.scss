@@ -10,12 +10,12 @@
         width: 100%;
         overflow-y: auto;
     }
-    
+
     &-toolbar-container {
         flex-shrink: 0;
         align-self: flex-end;
     }
-    
+
     &-main-box {
         display: flex;
         flex-direction: column;

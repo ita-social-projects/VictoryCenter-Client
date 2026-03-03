@@ -5,7 +5,7 @@ import { ProgramListItem } from './ProgramListItem';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { VisibilityStatusLabelProps } from '@/components/admin/visibility-status-label/VisibilityStatusLabel';
 import { VisibilityStatus } from '@/types/admin/common';
-import { Program } from '@/types/admin/programs';
+import { HippotherapyProgramDto } from '@/types/admin/programs';
 import { ButtonTooltipProps } from '@/components/admin/button-tooltip/ButtonTooltip';
 
 jest.mock('@/assets/icons/blank-image.svg', () => ({
@@ -32,7 +32,7 @@ jest.mock('@/components/admin/visibility-status-label/VisibilityStatusLabel', ()
 });
 
 describe('ProgramListItem', () => {
-    const mockProgram: Program = {
+    const mockProgram: HippotherapyProgramDto = {
         id: 1,
         name: 'Test Program',
         description: 'Test program description',
@@ -125,7 +125,7 @@ describe('ProgramListItem', () => {
     });
 
     it('displays drafted tooltip text for drafted program', () => {
-        const draftProgram: Program = { ...mockProgram, status: VisibilityStatus.Draft };
+        const draftProgram: HippotherapyProgramDto = { ...mockProgram, status: VisibilityStatus.Draft };
         renderProgramListItem({ program: draftProgram });
 
         expect(getDraftedTooltipText()).toBeInTheDocument();
@@ -166,7 +166,7 @@ describe('ProgramListItem', () => {
     });
 
     it('displays image when program has an image and', () => {
-        const programWithImage: Program = {
+        const programWithImage: HippotherapyProgramDto = {
             ...mockProgram,
             previewImage: {
                 id: 1,

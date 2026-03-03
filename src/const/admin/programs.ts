@@ -344,7 +344,7 @@ export const PROGRAM_SECTION_TEMPLATE_VALIDATION = {
             [ContentType.Author]: { min: 0, max: 0 },
         },
         lengths: {
-            [ContentType.Title]: { min: 20, max: 60 },
+            [ContentType.Title]: { min: 5, max: 60 },
             [ContentType.Description]: { min: 10, max: 600 },
         },
     },
@@ -492,7 +492,7 @@ export const PROGRAM_SECTION_TEMPLATE_VALIDATION = {
             [ContentType.Description]: { min: 0, max: 0 },
             [ContentType.Author]: { min: 0, max: 0 },
             [ContentType.Image]: { min: 0, max: 0 },
-            [ContentType.FaqPair]: { min: 1, max: 10 },
+            [ContentType.FaqQuestion]: { min: 1, max: 10 },
         },
         lengths: {
             [ContentType.Title]: { min: 5, max: 50 },

@@ -4,7 +4,7 @@ import '@testing-library/jest-dom';
 
 import { ProgramSectionForm } from './ProgramSectionForm';
 import type { ProgramSectionFormProps } from './ProgramSectionForm';
-import type { ProgramSection } from '@/types/common/program-sections';
+import type { CreateHippotherapyProgramSectionDto } from '@/types/common/program-sections';
 import { ProgramSectionTemplate, ProgramSectionMode } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
@@ -84,7 +84,9 @@ const makePairAuthor = (order: number, groupIndex: number | null | undefined, au
     image: null,
 });
 
-const makeSection = (overrides?: Partial<ProgramSection>): ProgramSection => ({
+const makeSection = (
+    overrides?: Partial<CreateHippotherapyProgramSectionDto>,
+): CreateHippotherapyProgramSectionDto => ({
     template: ProgramSectionTemplate.TextOnly,
     order: 0,
     contents: [
@@ -99,11 +101,12 @@ const makeSection = (overrides?: Partial<ProgramSection>): ProgramSection => ({
 });
 
 const getLastUpdatedSection = (onSectionChange: jest.Mock) =>
-    onSectionChange.mock.calls[onSectionChange.mock.calls.length - 1][0] as ProgramSection;
+    onSectionChange.mock.calls[onSectionChange.mock.calls.length - 1][0] as CreateHippotherapyProgramSectionDto;
 
-const getContentsBy = (s: ProgramSection, type: ContentType) => s.contents.filter((c: any) => c.contentType === type);
+const getContentsBy = (s: CreateHippotherapyProgramSectionDto, type: ContentType) =>
+    s.contents.filter((c: any) => c.contentType === type);
 
-const getContentByGroupAndType = (s: ProgramSection, groupIndex: number, type: ContentType) =>
+const getContentByGroupAndType = (s: CreateHippotherapyProgramSectionDto, groupIndex: number, type: ContentType) =>
     s.contents.find((c: any) => c.groupIndex === groupIndex && c.contentType === type);
 
 const createFocusableTextarea = (id: string) => {
@@ -840,7 +843,7 @@ describe('ProgramSectionForm', () => {
 
     describe('FAQ template', () => {
         const makeFaqPairContent = (order: number, groupIndex: number, questionText: string, answerText: string) => ({
-            contentType: ContentType.FaqPair,
+            contentType: ContentType.FaqQuestion,
             order,
             groupIndex,
             faqQuestion: {
@@ -868,7 +871,7 @@ describe('ProgramSectionForm', () => {
             });
 
             const updated = getLastUpdatedSection(onSectionChange);
-            const faqPairs = updated.contents.filter((c: any) => c.contentType === ContentType.FaqPair);
+            const faqPairs = updated.contents.filter((c: any) => c.contentType === ContentType.FaqQuestion);
 
             expect(faqPairs).toHaveLength(2);
 
@@ -894,7 +897,7 @@ describe('ProgramSectionForm', () => {
 
             const updated = getLastUpdatedSection(onSectionChange);
             const faqPairs = updated.contents
-                .filter((c: any) => c.contentType === ContentType.FaqPair)
+                .filter((c: any) => c.contentType === ContentType.FaqQuestion)
                 .sort((a: any, b: any) => a.order - b.order);
 
             expect(faqPairs).toHaveLength(2);
@@ -917,7 +920,7 @@ describe('ProgramSectionForm', () => {
             });
 
             const updated = getLastUpdatedSection(onSectionChange);
-            const faqPair = updated.contents.find((c: any) => c.contentType === ContentType.FaqPair);
+            const faqPair = updated.contents.find((c: any) => c.contentType === ContentType.FaqQuestion);
 
             expect(faqPair!.faqQuestion!.questionText).toBe('New Question');
             expect(faqPair!.faqQuestion!.answerText).toBe('Answer');
@@ -936,7 +939,7 @@ describe('ProgramSectionForm', () => {
             });
 
             const updated = getLastUpdatedSection(onSectionChange);
-            const faqPair = updated.contents.find((c: any) => c.contentType === ContentType.FaqPair);
+            const faqPair = updated.contents.find((c: any) => c.contentType === ContentType.FaqQuestion);
 
             expect(faqPair!.faqQuestion!.questionText).toBe('Question');
             expect(faqPair!.faqQuestion!.answerText).toBe('New Answer');

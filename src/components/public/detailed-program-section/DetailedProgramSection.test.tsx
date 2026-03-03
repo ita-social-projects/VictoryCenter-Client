@@ -1,6 +1,10 @@
 import { render, screen } from '@testing-library/react';
 import { DetailedProgramSection } from './DetailedProgramSection';
-import { ProgramSection, ProgramSectionTemplate, ProgramSectionMode } from '@/types/common/program-sections';
+import {
+    HippotherapyProgramSectionDto,
+    ProgramSectionTemplate,
+    ProgramSectionMode,
+} from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 import * as renderProgramSectionModule from '@/utils/functions/render-program-section';
 
@@ -19,7 +23,7 @@ describe('DetailedProgramSection', () => {
     });
 
     it('renders with title and description content', () => {
-        const section: ProgramSection = {
+        const section: HippotherapyProgramSectionDto = {
             id: 1,
             template: ProgramSectionTemplate.TextOnly,
             contents: [
@@ -61,7 +65,7 @@ describe('DetailedProgramSection', () => {
     });
 
     it('handles missing title content', () => {
-        const section: ProgramSection = {
+        const section: HippotherapyProgramSectionDto = {
             id: 1,
             template: ProgramSectionTemplate.TextOnly,
             contents: [
@@ -94,7 +98,7 @@ describe('DetailedProgramSection', () => {
     });
 
     it('handles missing description content', () => {
-        const section: ProgramSection = {
+        const section: HippotherapyProgramSectionDto = {
             id: 1,
             template: ProgramSectionTemplate.TextOnly,
             contents: [
@@ -127,7 +131,7 @@ describe('DetailedProgramSection', () => {
     });
 
     it('extracts and sorts images by order', () => {
-        const section: ProgramSection = {
+        const section: HippotherapyProgramSectionDto = {
             id: 1,
             template: ProgramSectionTemplate.QuadImagesBottom,
             contents: [
@@ -189,7 +193,7 @@ describe('DetailedProgramSection', () => {
     });
 
     it('handles image content with null image value', () => {
-        const section: ProgramSection = {
+        const section: HippotherapyProgramSectionDto = {
             id: 1,
             template: ProgramSectionTemplate.SingleImageTop,
             contents: [
@@ -224,7 +228,7 @@ describe('DetailedProgramSection', () => {
     });
 
     it('passes correct template to renderProgramSection', () => {
-        const section: ProgramSection = {
+        const section: HippotherapyProgramSectionDto = {
             id: 1,
             template: ProgramSectionTemplate.DualImagesBottom,
             contents: [],
@@ -248,7 +252,7 @@ describe('DetailedProgramSection', () => {
     });
 
     it('extracts description-author pairs by group index and passes them sorted', () => {
-        const section: ProgramSection = {
+        const section: HippotherapyProgramSectionDto = {
             id: 1,
             template: ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
             contents: [
@@ -323,7 +327,7 @@ describe('DetailedProgramSection', () => {
     });
 
     it('always passes Published mode to renderProgramSection', () => {
-        const section: ProgramSection = {
+        const section: HippotherapyProgramSectionDto = {
             id: 1,
             template: ProgramSectionTemplate.TextOnly,
             contents: [],

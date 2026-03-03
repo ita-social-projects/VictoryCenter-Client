@@ -7,7 +7,7 @@ import { Button } from '@/components/admin/button/Button';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { useProgramSectionValidation } from '@/hooks/admin/use-program-section-validation';
 import { PublishedFaqQuestion } from '@/types/public/faq-section';
-import { FaqPairData, ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
+import { FaqSectionQuestionDto, ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
@@ -23,7 +23,7 @@ export interface FaqProgramSectionProps {
     mode?: ProgramSectionMode;
     title?: string;
     onTitleChange?: (value: string) => void;
-    faqPairs?: FaqPairData[];
+    faqPairs?: FaqSectionQuestionDto[];
     onFaqQuestionChange?: (index: number, value: string) => void;
     onFaqAnswerChange?: (index: number, value: string) => void;
     onAddFaqPair?: (questionText: string, answerText: string) => void;

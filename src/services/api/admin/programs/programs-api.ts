@@ -1,17 +1,18 @@
 import { VisibilityStatus, PaginationResult } from '@/types/admin/common';
 
 import {
-    Program,
+    HippotherapyProgramDto,
     ProgramCategory,
     ProgramCategoryCreateUpdate,
-    ProgramCreateUpdate,
+    CreateHippotherapyProgramDto,
+    UpdateHippotherapyProgramDto,
     ProgramSearchItemData,
 } from '@/types/admin/programs';
 import { AxiosInstance } from 'axios';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
 import { ImageApi } from '@/services/api/admin/image/image-api';
 
-const convertProgramToSuggestion = (program: Program): ProgramSearchItemData => {
+const convertProgramToSuggestion = (program: HippotherapyProgramDto): ProgramSearchItemData => {
     return {
         id: program.id,
         name: program.name,
@@ -19,7 +20,10 @@ const convertProgramToSuggestion = (program: Program): ProgramSearchItemData => 
     };
 };
 
-const mapProgramEditToProgram = async (program: ProgramCreateUpdate, client: AxiosInstance): Promise<Program> => {
+const mapProgramEditToProgram = async (
+    program: HippotherapyProgramDto,
+    client: AxiosInstance,
+): Promise<HippotherapyProgramDto> => {
     const response = await client.get<ProgramCategory[]>(API_ROUTES.PROGRAMCATEGORY.BASE);
     return {
         id: program.id as number,
@@ -81,8 +85,8 @@ export const ProgramsApi = {
         offset: number,
         limit: number,
         status?: VisibilityStatus,
-    ): Promise<PaginationResult<Program>> => {
-        const response = await client.get<PaginationResult<Program>>(API_ROUTES.PROGRAMS.BASE, {
+    ): Promise<PaginationResult<HippotherapyProgramDto>> => {
+        const response = await client.get<PaginationResult<HippotherapyProgramDto>>(API_ROUTES.PROGRAMS.BASE, {
             params: {
                 categoryId,
                 offset,
@@ -100,7 +104,7 @@ export const ProgramsApi = {
         limit: number = 5,
         signal?: AbortSignal,
     ): Promise<PaginationResult<ProgramSearchItemData>> => {
-        const response = await client.get<PaginationResult<Program>>(`${API_ROUTES.PROGRAMS.SEARCH}`, {
+        const response = await client.get<PaginationResult<HippotherapyProgramDto>>(`${API_ROUTES.PROGRAMS.SEARCH}`, {
             params: {
                 SearchQuery: searchTerm,
                 offset: offset,
@@ -117,12 +121,15 @@ export const ProgramsApi = {
         };
     },
 
-    fetchProgramById: async (id: number, client: AxiosInstance): Promise<Program | null> => {
-        const response = await client.get<Program>(`${API_ROUTES.PROGRAMS.BASE}/${id}`);
+    fetchProgramById: async (id: number, client: AxiosInstance): Promise<HippotherapyProgramDto | null> => {
+        const response = await client.get<HippotherapyProgramDto>(`${API_ROUTES.PROGRAMS.BASE}/${id}`);
         return response.data;
     },
 
-    addProgram: async (client: AxiosInstance, program: ProgramCreateUpdate): Promise<Program> => {
+    addProgram: async (
+        client: AxiosInstance,
+        program: CreateHippotherapyProgramDto,
+    ): Promise<HippotherapyProgramDto> => {
         const uploadedImageIds: number[] = [];
 
         try {
@@ -169,16 +176,21 @@ export const ProgramsApi = {
         }
     },
 
-    editProgram: async (program: ProgramCreateUpdate, client: AxiosInstance): Promise<Program> => {
+    editProgram: async (
+        program: UpdateHippotherapyProgramDto,
+        client: AxiosInstance,
+    ): Promise<HippotherapyProgramDto> => {
         const newlyCreatedImageIds: number[] = [];
         const originalPreviewImageId = program.previewImageId;
         const originalBackgroundImageId = program.backgroundImageId;
+        const previewImageId: number | null = program.previewImageId ?? null;
+        const backgroundImageId: number | null = program.backgroundImageId ?? null;
 
         try {
             const { finalImageId: finalPreviewImageId, imageIdToDelete: previewImageIdToDelete } =
-                await ImageApi.getUpdateImageId(client, program.previewImage, program.previewImageId);
+                await ImageApi.getUpdateImageId(client, program.previewImage ?? null, previewImageId);
             const { finalImageId: finalBackgroundImageId, imageIdToDelete: backgroundImageIdToDelete } =
-                await ImageApi.getUpdateImageId(client, program.backgroundImage, program.backgroundImageId);
+                await ImageApi.getUpdateImageId(client, program.backgroundImage ?? null, backgroundImageId);
 
             if (finalPreviewImageId && finalPreviewImageId !== originalPreviewImageId) {
                 newlyCreatedImageIds.push(finalPreviewImageId);

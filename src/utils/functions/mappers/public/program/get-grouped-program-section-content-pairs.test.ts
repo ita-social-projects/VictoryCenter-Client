@@ -1,11 +1,11 @@
-import { ProgramSectionContent } from '@/types/common/program-sections';
+import { HippotherapyProgramSectionContentDto } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 import {
     getDescriptionAuthorPairsByGroup,
     getGroupedProgramSectionValuesByGroup,
 } from './get-grouped-program-section-content-pairs';
 
-const makeContent = (overrides: Partial<ProgramSectionContent>): ProgramSectionContent =>
+const makeContent = (overrides: Partial<HippotherapyProgramSectionContentDto>): HippotherapyProgramSectionContentDto =>
     ({
         contentType: ContentType.Description,
         order: 0,
@@ -14,13 +14,13 @@ const makeContent = (overrides: Partial<ProgramSectionContent>): ProgramSectionC
         author: null,
         image: null,
         ...overrides,
-    }) as ProgramSectionContent;
+    }) as HippotherapyProgramSectionContentDto;
 
 describe('get-grouped-program-section-content-pairs', () => {
     describe('getGroupedProgramSectionValuesByGroup', () => {
         it('supports 4 content types per group and keeps sorted group order', () => {
             const unknownType = 999 as ContentType;
-            const contents: ProgramSectionContent[] = [
+            const contents: HippotherapyProgramSectionContentDto[] = [
                 makeContent({ contentType: ContentType.Author, groupIndex: 2, author: 'A2' }),
                 makeContent({ contentType: ContentType.Title, groupIndex: 2, title: 'T2' }),
                 makeContent({ contentType: ContentType.Description, groupIndex: 2, description: 'D2' }),
@@ -61,7 +61,7 @@ describe('get-grouped-program-section-content-pairs', () => {
         });
 
         it('returns empty array when requested types are empty', () => {
-            const contents: ProgramSectionContent[] = [
+            const contents: HippotherapyProgramSectionContentDto[] = [
                 makeContent({ contentType: ContentType.Title, groupIndex: 0, title: 'T0' }),
             ];
 
@@ -71,7 +71,7 @@ describe('get-grouped-program-section-content-pairs', () => {
         });
 
         it('does not create group when a group contains only unrequested content types', () => {
-            const contents: ProgramSectionContent[] = [
+            const contents: HippotherapyProgramSectionContentDto[] = [
                 makeContent({ contentType: ContentType.Title, groupIndex: 0, title: 'T0' }),
                 makeContent({ contentType: ContentType.Author, groupIndex: 1, author: 'A1' }),
             ];
@@ -82,7 +82,7 @@ describe('get-grouped-program-section-content-pairs', () => {
         });
 
         it('returns an empty array when there are no grouped items for requested types', () => {
-            const contents: ProgramSectionContent[] = [
+            const contents: HippotherapyProgramSectionContentDto[] = [
                 makeContent({ contentType: ContentType.Description, groupIndex: null, description: 'D' }),
                 makeContent({ contentType: ContentType.Author, groupIndex: undefined, author: 'A' }),
             ];
@@ -96,7 +96,7 @@ describe('get-grouped-program-section-content-pairs', () => {
         });
 
         it('fills missing values with empty strings for requested types', () => {
-            const contents: ProgramSectionContent[] = [
+            const contents: HippotherapyProgramSectionContentDto[] = [
                 makeContent({ contentType: ContentType.Description, groupIndex: 2, description: 'Desc 2' }),
                 makeContent({ contentType: ContentType.Author, groupIndex: 2, author: 'Author 2' }),
                 makeContent({ contentType: ContentType.Author, groupIndex: 1, author: 'Author 1' }),
@@ -128,7 +128,7 @@ describe('get-grouped-program-section-content-pairs', () => {
         });
 
         it('reads title and description values for requested types', () => {
-            const contents: ProgramSectionContent[] = [
+            const contents: HippotherapyProgramSectionContentDto[] = [
                 makeContent({ contentType: ContentType.Title, groupIndex: 0, title: 'TITLE' }),
                 makeContent({ contentType: ContentType.Description, groupIndex: 0, description: 'DESC' }),
             ];
@@ -150,7 +150,7 @@ describe('get-grouped-program-section-content-pairs', () => {
         });
 
         it('falls back to empty string for null title and null author values', () => {
-            const contents: ProgramSectionContent[] = [
+            const contents: HippotherapyProgramSectionContentDto[] = [
                 makeContent({ contentType: ContentType.Title, groupIndex: 0, title: null }),
                 makeContent({ contentType: ContentType.Author, groupIndex: 0, author: null }),
             ];
@@ -171,7 +171,7 @@ describe('get-grouped-program-section-content-pairs', () => {
         it('returns empty string for unknown text content type (default switch branch)', () => {
             const unknownType = 999 as ContentType;
 
-            const contents: ProgramSectionContent[] = [
+            const contents: HippotherapyProgramSectionContentDto[] = [
                 makeContent({
                     contentType: unknownType,
                     groupIndex: 0,
@@ -197,7 +197,7 @@ describe('get-grouped-program-section-content-pairs', () => {
 
     describe('getDescriptionAuthorPairsByGroup', () => {
         it('maps grouped text pairs into description-author shape', () => {
-            const contents: ProgramSectionContent[] = [
+            const contents: HippotherapyProgramSectionContentDto[] = [
                 makeContent({ contentType: ContentType.Description, groupIndex: 1, description: 'D1' }),
                 makeContent({ contentType: ContentType.Author, groupIndex: 1, author: 'A1' }),
                 makeContent({ contentType: ContentType.Description, groupIndex: 0, description: 'D0' }),

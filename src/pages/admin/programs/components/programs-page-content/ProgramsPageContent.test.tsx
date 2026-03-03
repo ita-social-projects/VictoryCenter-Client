@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ProgramsPageContent } from './ProgramsPageContent';
-import { Program, ProgramCategory } from '@/types/admin/programs';
+import { HippotherapyProgramDto, ProgramCategory } from '@/types/admin/programs';
 import { VisibilityStatus } from '@/types/admin/common';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
@@ -130,7 +130,7 @@ jest.mock('@/components/admin/infinite-scroll-list/InfiniteScrollList', () => ({
         hasMore,
         onLoadMore,
         emptyStateMessage,
-    }: InfiniteScrollListProps<Program>) => (
+    }: InfiniteScrollListProps<HippotherapyProgramDto>) => (
         <div data-testid="infinite-scroll-list">
             {isLoading && <div data-testid="loader">Loading</div>}
             {!isLoading && items.length === 0 && <div data-testid="empty">{emptyStateMessage}</div>}
@@ -374,7 +374,7 @@ const mockCategories: ProgramCategory[] = [
     { id: 2, name: 'Category B', programsCount: 1 },
 ];
 
-const mockPrograms: Program[] = [
+const mockPrograms: HippotherapyProgramDto[] = [
     {
         id: 10,
         name: 'Alpha',

@@ -1,19 +1,26 @@
 import React from 'react';
-import { ProgramSection, ProgramSectionContent, ProgramSectionMode } from '@/types/common/program-sections';
+import {
+    HippotherapyProgramSectionDto,
+    HippotherapyProgramSectionContentDto,
+    ProgramSectionMode,
+} from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 import { renderProgramSection } from '@/utils/functions/render-program-section';
 import { getDescriptionAuthorPairsByGroup } from '@/utils/functions/mappers/public/program/get-grouped-program-section-content-pairs';
 import styles from './DetailedProgramSection.module.scss';
 
 export interface DetailedProgramSectionProps {
-    section: ProgramSection;
+    section: HippotherapyProgramSectionDto;
 }
 
-const getContentByType = (contents: ProgramSectionContent[], type: ContentType): ProgramSectionContent | undefined => {
+const getContentByType = (
+    contents: HippotherapyProgramSectionContentDto[],
+    type: ContentType,
+): HippotherapyProgramSectionContentDto | undefined => {
     return contents.find((c) => c.contentType === type);
 };
 
-const getDescriptionsInOrder = (contents: ProgramSectionContent[]) => {
+const getDescriptionsInOrder = (contents: HippotherapyProgramSectionContentDto[]) => {
     return contents.filter((c) => c.contentType === ContentType.Description).sort((a, b) => a.order - b.order);
 };
 

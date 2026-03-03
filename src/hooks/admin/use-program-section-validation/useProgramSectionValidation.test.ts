@@ -184,7 +184,7 @@ describe('useProgramSectionValidation', () => {
             expect(result.current.descriptionError).toBe(PROGRAM_SECTION_VALIDATION.description.getRequiredError());
         });
 
-        it('should not show error for short but non-empty description in draft mode', () => {
+        it('should show min error for short but non-empty description in draft mode', () => {
             const { result } = renderHook(() => useProgramSectionValidation({ template: TEMPLATE }));
             const shortButNotEmpty = 'a'.repeat(Math.max(1, descriptionReq.min - 1));
 
@@ -192,7 +192,9 @@ describe('useProgramSectionValidation', () => {
                 result.current.handleDescriptionBlur(createTextAreaBlurEvent(shortButNotEmpty));
             });
 
-            expect(result.current.descriptionError).toBeUndefined();
+            expect(result.current.descriptionError).toBe(
+                COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(descriptionReq.min),
+            );
         });
 
         it('should show min error when description is too short in publishing mode', () => {

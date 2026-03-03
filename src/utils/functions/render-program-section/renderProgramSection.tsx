@@ -1,7 +1,7 @@
 import React from 'react';
 import {
-    FaqPairData,
-    ProgramSectionContent,
+    FaqSectionQuestionDto,
+    CreateProgramSectionContentDto,
     ProgramSectionTemplate,
     ProgramSectionMode,
 } from '@/types/common/program-sections';
@@ -39,7 +39,7 @@ export interface ProgramSectionData {
     cards?: ProgramSectionCardData[];
     descriptionAuthorPairs?: DescriptionAuthorPairData[];
     faqQuestions?: any[];
-    faqPairs?: FaqPairData[];
+    faqPairs?: FaqSectionQuestionDto[];
 }
 
 export interface ProgramSectionHandlers {
@@ -70,8 +70,8 @@ export interface RenderProgramSectionParams {
 const createItem = (
     type: ContentType,
     order: number,
-    overrides: Partial<ProgramSectionContent> = {},
-): ProgramSectionContent => ({
+    overrides: Partial<CreateProgramSectionContentDto> = {},
+): CreateProgramSectionContentDto => ({
     contentType: type,
     order,
     title: type === ContentType.Title ? '' : null,
@@ -81,15 +81,15 @@ const createItem = (
     ...overrides,
 });
 
-const createBaseContents = (): ProgramSectionContent[] => [
+const createBaseContents = (): CreateProgramSectionContentDto[] => [
     createItem(ContentType.Title, 0),
     createItem(ContentType.Description, 1),
 ];
 
-const createImageContents = (count: number): ProgramSectionContent[] =>
+const createImageContents = (count: number): CreateProgramSectionContentDto[] =>
     Array.from({ length: count }, (_, i) => createItem(ContentType.Image, 2 + i));
 
-const createCardContents = (cardCount: number): ProgramSectionContent[] =>
+const createCardContents = (cardCount: number): CreateProgramSectionContentDto[] =>
     Array.from({ length: cardCount * 2 }, (_, index) =>
         createItem(index % 2 === 0 ? ContentType.Title : ContentType.Description, index, {
             groupIndex: Math.floor(index / 2),
@@ -149,7 +149,7 @@ const STANDARD_TEMPLATES_MAP: Partial<
     [ProgramSectionTemplate.QuadImagesBottom]: QuadImagesBottom,
 };
 
-export const getInitialSectionContents = (templateId: ProgramSectionTemplate): ProgramSectionContent[] => {
+export const getInitialSectionContents = (templateId: ProgramSectionTemplate): CreateProgramSectionContentDto[] => {
     if (templateId === ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs) {
         return [
             createItem(ContentType.Title, 0, {
@@ -165,7 +165,7 @@ export const getInitialSectionContents = (templateId: ProgramSectionTemplate): P
             createItem(ContentType.Title, 0, {
                 title: COMMON_TEXT_ADMIN.TAB.FAQ,
             } as any),
-            createItem(ContentType.FaqPair, 1, {
+            createItem(ContentType.FaqQuestion, 1, {
                 groupIndex: 0,
                 faqQuestion: {
                     questionText: '',

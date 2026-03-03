@@ -10,6 +10,8 @@ jest.mock('./FundsExpendituresToolbar.module.scss', () => ({
     exchangeRate: 'exchangeRate',
     exchangeRateLabel: 'exchangeRateLabel',
     exchangeRateValue: 'exchangeRateValue',
+    filterSelect: 'filterSelect',
+    filterOption: 'filterOption',
 }));
 
 jest.mock('@/components/common/select/Select', () => {

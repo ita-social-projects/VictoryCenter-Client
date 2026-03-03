@@ -128,5 +128,9 @@ export const FUNDS_EXPENDITURES_TEXT = {
             INCOME: 'Надходження',
             EXPENSE: 'Витрати',
         },
+        EMPTY_STATE: {
+            MESSAGE: 'За вашим запитом нічого не знайдено',
+            ALT_TEXT: 'Записів не знайдено',
+        },
     },
 };

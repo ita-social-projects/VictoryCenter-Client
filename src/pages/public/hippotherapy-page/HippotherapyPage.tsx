@@ -4,6 +4,7 @@ import { HippotherapyApi } from '@/services/api/public/hippotherapy/hippotherapy
 import { HippotherapyAbout } from '@/types/public/hippotherapy-page';
 import { HippotherapyIntro } from './intro/HippotherapyIntro';
 import { LoadableContent } from '@/components/common/loadable-content/LoadableContent';
+import { TextCard } from './text-card/TextCard';
 
 export const HippotherapyPage = () => {
     const { t } = useTranslation('hippotherapy');
@@ -15,7 +16,14 @@ export const HippotherapyPage = () => {
 
     return (
         <LoadableContent isLoading={isLoading} error={error || !data}>
-            {data && <HippotherapyIntro introData={data.introSection} />}
+            {data && (
+                <>
+                    <HippotherapyIntro introData={data.introSection} />
+                    <section>
+                        <TextCard content={data.descriptionSection} />
+                    </section>
+                </>
+            )}
             <div style={{ textAlign: 'center', padding: '20px' }}>{t('SLOGAN')}</div>
         </LoadableContent>
     );

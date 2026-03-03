@@ -1,4 +1,4 @@
-interface HippotherapyDefaultSection {
+export interface HippotherapyDefaultSection {
     title: string;
     text: string;
 }

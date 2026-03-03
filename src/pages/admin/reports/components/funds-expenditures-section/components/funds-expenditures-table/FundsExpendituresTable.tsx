@@ -3,6 +3,7 @@ import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
 import { FundsExpendituresTransactionType, ReportFundsExpendituresRecord } from '@/types/admin/reports';
 import { ReactComponent as ChevronUp } from '@/assets/icons/chevron-up.svg';
 import { ReactComponent as ChevronDown } from '@/assets/icons/chevron-down.svg';
+import emptyStateImage from '@/assets/images/admin/reports/empty-records-state.png';
 import classNames from 'classnames';
 import styles from './FundsExpendituresTable.module.scss';
 
@@ -115,24 +116,41 @@ export const FundsExpendituresTable = ({ records }: FundsExpendituresTableProps)
                     </tr>
                 </thead>
                 <tbody>
-                    {sortedRecords.map((record) => (
-                        <tr key={record.id} className={styles.tr}>
-                            <td className={styles.td}>{record.reportingYear}</td>
-                            <td className={styles.td}>
-                                <span
-                                    className={classNames(styles.typeChip, {
-                                        [styles.typeChipIncome]: record.type === 'income',
-                                        [styles.typeChipExpense]: record.type === 'expense',
-                                    })}
-                                >
-                                    {TYPE_LABEL_MAP[record.type]}
-                                </span>
+                    {sortedRecords.length === 0 ? (
+                        <tr>
+                            <td colSpan={5} className={styles.emptyCell}>
+                                <div className={styles.emptyState}>
+                                    <img
+                                        src={emptyStateImage}
+                                        alt={FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.ALT_TEXT}
+                                        className={styles.emptyStateImage}
+                                    />
+                                    <p className={styles.emptyStateMessage}>
+                                        {FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.MESSAGE}
+                                    </p>
+                                </div>
                             </td>
-                            <td className={styles.td}>{record.categoryName}</td>
-                            <td className={styles.td}>{record.amountUah}</td>
-                            <td className={styles.td}>{record.amountUsd}</td>
                         </tr>
-                    ))}
+                    ) : (
+                        sortedRecords.map((record) => (
+                            <tr key={record.id} className={styles.tr}>
+                                <td className={styles.td}>{record.reportingYear}</td>
+                                <td className={styles.td}>
+                                    <span
+                                        className={classNames(styles.typeChip, {
+                                            [styles.typeChipIncome]: record.type === 'income',
+                                            [styles.typeChipExpense]: record.type === 'expense',
+                                        })}
+                                    >
+                                        {TYPE_LABEL_MAP[record.type]}
+                                    </span>
+                                </td>
+                                <td className={styles.td}>{record.categoryName}</td>
+                                <td className={styles.td}>{record.amountUah}</td>
+                                <td className={styles.td}>{record.amountUsd}</td>
+                            </tr>
+                        ))
+                    )}
                 </tbody>
             </table>
         </div>

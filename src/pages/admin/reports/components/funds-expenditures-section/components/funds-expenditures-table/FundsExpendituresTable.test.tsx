@@ -17,6 +17,10 @@ jest.mock('./FundsExpendituresTable.module.scss', () => ({
     typeChip: 'typeChip',
     typeChipIncome: 'typeChipIncome',
     typeChipExpense: 'typeChipExpense',
+    emptyCell: 'emptyCell',
+    emptyState: 'emptyState',
+    emptyStateImage: 'emptyStateImage',
+    emptyStateMessage: 'emptyStateMessage',
 }));
 
 jest.mock('@/assets/icons/chevron-up.svg', () => ({
@@ -26,6 +30,8 @@ jest.mock('@/assets/icons/chevron-up.svg', () => ({
 jest.mock('@/assets/icons/chevron-down.svg', () => ({
     ReactComponent: ({ className }: { className?: string }) => <svg data-testid="chevron-down" className={className} />,
 }));
+
+jest.mock('@/assets/images/admin/reports/empty-records-state.png', () => 'empty-records-state.png');
 
 const MOCK_RECORDS: EnrichedRecord[] = [
     {
@@ -98,10 +104,18 @@ describe('FundsExpendituresTable', () => {
         });
     });
 
-    it('should render an empty table body when records is empty', () => {
+    it('should render empty state row when records is empty', () => {
         render(<FundsExpendituresTable records={[]} />);
         const rows = screen.queryAllByRole('row');
-        expect(rows).toHaveLength(1);
+        expect(rows).toHaveLength(2); // header row + empty state row
+    });
+
+    it('should show empty state message and image when records is empty', () => {
+        render(<FundsExpendituresTable records={[]} />);
+        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.MESSAGE)).toBeInTheDocument();
+        expect(
+            screen.getByRole('img', { name: FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.ALT_TEXT }),
+        ).toBeInTheDocument();
     });
 
     describe('sorting', () => {

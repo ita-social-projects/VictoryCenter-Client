@@ -3,8 +3,8 @@
 .tableWrapper {
     width: 100%;
     overflow-x: auto;
-    background: c.$light-blue-25;
-    border: 1px solid c.$grey-500;
+    background: #f8fafc;
+    border: 1px solid #e2e2e2;
     border-radius: 16px;
     box-shadow: 0 24px 48px -12px rgba(17, 17, 19, 0.2);
 }
@@ -16,7 +16,7 @@
 
 .thead {
     tr th {
-        border-bottom: 1px solid c.$grey-500;
+        border-bottom: 1px solid #a4a49b;
     }
 }
 
@@ -48,7 +48,7 @@
 
 .tr {
     background-color: c.$white;
-    border: 1px solid c.$grey-500;
+    border: 1px solid #e2e2e2;
 
     &:hover {
         background-color: c.$light-blue-50;
@@ -107,4 +107,33 @@
     background-color: #8b4459;
     border: 1px solid #5e1e2f;
     color: c.$white;
+}
+
+.emptyCell {
+    text-align: center;
+    padding: 48px 20px;
+    border: none;
+}
+
+.emptyState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.emptyStateImage {
+    width: 180px;
+    height: auto;
+}
+
+.emptyStateMessage {
+    font-family: 'Mulish', sans-serif;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 24px;
+    letter-spacing: -0.02em;
+    color: #061125;
+    margin: 0;
 }

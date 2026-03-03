@@ -8,6 +8,7 @@
     align-items: center;
     justify-content: center;
     padding: 0.9375rem;
+    position: relative;
     border: none;
     background: transparent;
     font-size: 24px;
@@ -17,7 +18,18 @@
     transition: background-color 0.2s;
 
     &-selected {
-        border-bottom: 1px solid colors.$blue-900;
+        color: colors.$blue-900;
+
+        &::after {
+            content: '';
+            position: absolute;
+            left: 0.75rem;
+            right: 0.75rem;
+            bottom: 0;
+            height: 0.1875rem;
+            border-radius: 9999px;
+            background-color: colors.$blue-900;
+        }
     }
 
     &:hover {

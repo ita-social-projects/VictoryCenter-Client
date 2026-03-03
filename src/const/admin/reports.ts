@@ -98,3 +98,35 @@ export const PDF_FILES_SECTION_TEXT = {
         },
     },
 };
+
+export const FUNDS_EXPENDITURES_TEXT = {
+    DISCLAIMER_LABEL: 'Дісклеймер/ENG',
+    EXCHANGE_RATE_LABEL: 'Курс USD/UAH',
+    FILTER: {
+        TYPE_PLACEHOLDER: 'Тип',
+        CATEGORY_PLACEHOLDER: 'Категорія',
+        ALL_OPTION: 'Всі',
+    },
+    SUMMARY_CARDS: {
+        COLLECTED: 'Зібрано коштів',
+        SPENT: 'Витрачено коштів',
+        INCOME_CATEGORIES: 'Категорії надходжень',
+        EXPENSE_CATEGORIES: 'Категорії витрат',
+        AMOUNT_SUFFIX_UAH: 'UA',
+        AMOUNT_SUFFIX_USD: 'USD',
+        CATEGORY_SUFFIX: 'категорії',
+    },
+    TABLE: {
+        COLUMNS: {
+            REPORTING_YEAR: 'Звітній рік',
+            TYPE: 'Тип',
+            CATEGORY: 'Категорія',
+            AMOUNT_UAH: 'Сума UA',
+            AMOUNT_USD: 'Сума USD',
+        },
+        TYPE_LABELS: {
+            INCOME: 'надходження',
+            EXPENSE: 'витрати',
+        },
+    },
+};

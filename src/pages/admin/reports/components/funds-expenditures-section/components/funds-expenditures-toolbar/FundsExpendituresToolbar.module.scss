@@ -1,0 +1,46 @@
+@use '@/assets/sass/variables/colors' as c;
+
+.toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.filters {
+    display: flex;
+    gap: 29px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.exchangeRate {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+}
+
+.exchangeRateLabel {
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    color: c.$bluish-black;
+}
+
+.exchangeRateValue {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 12px;
+    background-color: c.$grey-600;
+    border: 1px solid c.$bluish-black;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.1px;
+    color: c.$blue-900;
+    min-width: 64px;
+    text-align: center;
+}

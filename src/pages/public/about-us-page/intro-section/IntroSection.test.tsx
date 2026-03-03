@@ -2,8 +2,28 @@ import { render, screen } from '@testing-library/react';
 import { AboutUsIntro } from './IntroSection';
 import { ContentType } from '@/types/common/about-us';
 import { AboutUsContent } from '@/types/public/about-us-page';
+import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
+import { TranslationStatus } from '@/types/common/language';
+
+jest.mock('@/hooks/common/use-get-localization/useGetLocalization', () => ({
+    useGetLocalization: jest.fn(),
+}));
+
+const mockedUseGetLocalization = useGetLocalization as jest.Mock;
 
 describe('AboutUsIntro', () => {
+    beforeEach(() => {
+        mockedUseGetLocalization.mockImplementation((localizations, fallback) => {
+            if (localizations && localizations.length > 0) {
+                return {
+                    description: localizations[0].description,
+                    title: localizations[0].title,
+                };
+            }
+            return fallback;
+        });
+    });
+
     const Content: AboutUsContent[] = [
         {
             contentType: ContentType.Title,
@@ -11,6 +31,7 @@ describe('AboutUsIntro', () => {
             id: 1,
             image: null,
             description: null,
+            localizations: [],
         },
         {
             contentType: ContentType.Description,
@@ -18,6 +39,7 @@ describe('AboutUsIntro', () => {
             id: 2,
             image: null,
             title: null,
+            localizations: [],
         },
         {
             contentType: ContentType.Image,
@@ -29,6 +51,7 @@ describe('AboutUsIntro', () => {
             description: null,
             id: 3,
             title: null,
+            localizations: [],
         },
     ];
 
@@ -58,5 +81,38 @@ describe('AboutUsIntro', () => {
 
         const description = screen.getByText('Test description');
         expect(description).toBeInTheDocument();
+    });
+
+    it('should render localized title and description when localizations are provided', () => {
+        const contentWithLocalization = [
+            {
+                ...Content[0],
+                localizations: [
+                    {
+                        language: { id: 1, code: 'uk' },
+                        translationStatus: TranslationStatus.Relevant,
+                        title: 'Localized title',
+                        description: null,
+                    },
+                ],
+            },
+            {
+                ...Content[1],
+                localizations: [
+                    {
+                        language: { id: 1, code: 'uk' },
+                        translationStatus: TranslationStatus.Relevant,
+                        description: 'Localized description',
+                        title: null,
+                    },
+                ],
+            },
+            Content[2],
+        ];
+
+        render(<AboutUsIntro content={contentWithLocalization} />);
+
+        expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Localized title');
+        expect(screen.getByText('Localized description')).toBeInTheDocument();
     });
 });

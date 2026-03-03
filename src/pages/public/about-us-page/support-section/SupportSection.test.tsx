@@ -5,10 +5,30 @@ import { ContentType } from '@/types/common/about-us';
 import { AboutUsContent } from '@/types/public/about-us-page';
 import aboutUsPageUk from '@/locales/uk/about-us.json';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
+import { TranslationStatus } from '@/types/common/language';
 
 jest.mock('@mui/material/useMediaQuery');
 
+jest.mock('@/hooks/common/use-get-localization/useGetLocalization', () => ({
+    useGetLocalization: jest.fn(),
+}));
+
+const mockedUseGetLocalization = useGetLocalization as jest.Mock;
+
 describe('SupportSection component', () => {
+    beforeEach(() => {
+        mockedUseGetLocalization.mockImplementation((localizations, fallback) => {
+            if (localizations && localizations.length > 0) {
+                return {
+                    description: localizations[0].description,
+                    title: localizations[0].title,
+                };
+            }
+            return fallback;
+        });
+    });
+
     const Content: AboutUsContent[] = [
         {
             contentType: ContentType.Card,
@@ -20,6 +40,7 @@ describe('SupportSection component', () => {
                 mimeType: 'image.jpeg',
             },
             description: 'Description number 1',
+            localizations: [],
         },
         {
             contentType: ContentType.Card,
@@ -31,6 +52,7 @@ describe('SupportSection component', () => {
                 mimeType: 'image.jpeg',
             },
             title: null,
+            localizations: [],
         },
         {
             contentType: ContentType.Card,
@@ -42,6 +64,7 @@ describe('SupportSection component', () => {
             description: 'Description number 3',
             id: 3,
             title: null,
+            localizations: [],
         },
     ];
 
@@ -81,5 +104,27 @@ describe('SupportSection component', () => {
         (useMediaQuery as jest.Mock).mockReturnValue(true);
 
         render(<SupportSection content={Content} />);
+    });
+
+    it('renders localized description when localizations are provided', () => {
+        const contentWithLocalization = [
+            {
+                ...Content[0],
+                localizations: [
+                    {
+                        language: { id: 1, code: 'uk' },
+                        translationStatus: TranslationStatus.Relevant,
+                        description: 'Localized description 1',
+                        title: null,
+                    },
+                ],
+            },
+            Content[1],
+            Content[2],
+        ];
+
+        render(<SupportSection content={contentWithLocalization} />);
+
+        expect(screen.getByText('Localized description 1')).toBeInTheDocument();
     });
 });

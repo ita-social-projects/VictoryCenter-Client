@@ -4,6 +4,8 @@ import aboutUsPageUk from '@/locales/uk/about-us.json';
 import { OurMission } from './OurMission';
 import { ContentType } from '@/types/common/about-us';
 import { AboutUsContent } from '@/types/public/about-us-page';
+import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
+import { TranslationStatus } from '@/types/common/language';
 
 jest.mock('@/assets/icons/arrow-up-right.svg', () => ({
     ReactComponent: (props: any) => <svg data-testid="arrow-icon" {...props} />,
@@ -17,7 +19,25 @@ jest.mock('@/const/public/routes', () => ({
     },
 }));
 
+jest.mock('@/hooks/common/use-get-localization/useGetLocalization', () => ({
+    useGetLocalization: jest.fn(),
+}));
+
+const mockedUseGetLocalization = useGetLocalization as jest.Mock;
+
 describe('OurMission component', () => {
+    beforeEach(() => {
+        mockedUseGetLocalization.mockImplementation((localizations, fallback) => {
+            if (localizations && localizations.length > 0) {
+                return {
+                    description: localizations[0].description,
+                    title: localizations[0].title,
+                };
+            }
+            return fallback;
+        });
+    });
+
     const Content: AboutUsContent[] = [
         {
             contentType: ContentType.Description,
@@ -25,6 +45,7 @@ describe('OurMission component', () => {
             title: null,
             id: 1,
             image: null,
+            localizations: [],
         },
     ];
 
@@ -65,5 +86,29 @@ describe('OurMission component', () => {
         expect(link).toBeInTheDocument();
         expect(link).toHaveAttribute('href', '/programs');
         expect(screen.getByTestId('arrow-icon')).toBeInTheDocument();
+    });
+
+    it('should render localized description when localizations are provided', () => {
+        const contentWithLocalization = [
+            {
+                ...Content[0],
+                localizations: [
+                    {
+                        language: { id: 1, code: 'uk' },
+                        translationStatus: TranslationStatus.Relevant,
+                        description: 'Localized description',
+                        title: null,
+                    },
+                ],
+            },
+        ];
+
+        render(
+            <MemoryRouter>
+                <OurMission content={contentWithLocalization} />
+            </MemoryRouter>,
+        );
+
+        expect(screen.getByText('Localized description')).toBeInTheDocument();
     });
 });

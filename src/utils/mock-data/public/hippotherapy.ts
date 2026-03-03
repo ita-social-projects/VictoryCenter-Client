@@ -9,7 +9,7 @@ import { HippotherapyAbout } from '@/types/public/hippotherapy-page';
 
 export const hippotherapyMock: HippotherapyAbout = {
     introSection: {
-        title: '<h3><b>Кінь</b> не питає, він <b>просто поруч</b></h3>',
+        title: '<h3><b><i>Кінь</i></b> не питає, він <b><i>просто поруч</i></b></h3>',
         imgURL: introImg,
         imgAlternativeText: 'Hippotherapy',
         description:

@@ -1,87 +1,135 @@
-import { Select } from '@/components/common/select/Select';
-import { FundsExpendituresTable } from './components/funds-expenditures-table/FundsExpendituresTable';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
+import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
+import { FundsExpendituresApi } from '@/services/api/admin/reports/funds-expenditures-api';
+import {
+    FundsExpendituresSummary,
+    ReportFundsExpendituresCategory,
+    ReportFundsExpendituresRecord,
+    ReportFundsExpendituresSettings,
+} from '@/types/admin/reports';
+import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { SummaryCard } from './components/summary-card/SummaryCard';
-
-const MOCK_RECORDS: MockFundsExpendituresRecord[] = [
-    { id: 1, reportYear: 2026, type: 'income', category: 'Грантові кошти', amountUAH: 4200, amountUSD: 4200 },
-    { id: 2, reportYear: 2026, type: 'income', category: 'Грантові кошти', amountUAH: 4200, amountUSD: 4200 },
-    { id: 3, reportYear: 2025, type: 'income', category: 'Грантові кошти', amountUAH: 4200, amountUSD: 4200 },
-    { id: 4, reportYear: 2025, type: 'income', category: 'Грантові кошти', amountUAH: 4200, amountUSD: 4200 },
-    { id: 5, reportYear: 2024, type: 'income', category: 'Грантові кошти', amountUAH: 4200, amountUSD: 4200 },
-    { id: 6, reportYear: 2024, type: 'income', category: 'Грантові кошти', amountUAH: 4200, amountUSD: 4200 },
-    { id: 7, reportYear: 2023, type: 'income', category: 'Грантові кошти', amountUAH: 4200, amountUSD: 4200 },
-    { id: 8, reportYear: 2023, type: 'income', category: 'Грантові кошти', amountUAH: 4200, amountUSD: 4200 },
-];
-
-type TransactionType = 'income' | 'expense';
-
-interface MockFundsExpendituresRecord {
-    id: number;
-    reportYear: number;
-    type: TransactionType;
-    category: string;
-    amountUAH: number;
-    amountUSD: number;
-}
-
-interface SummaryCards {
-    totalCollectedUAH: number;
-    totalCollectedUSD: number;
-    totalSpentUAH: number;
-    totalSpentUSD: number;
-    incomeCategories: number;
-    expenseCategories: number;
-}
+import {
+    CategoryFilterValue,
+    FundsExpendituresToolbar,
+    TypeFilterValue,
+} from './components/funds-expenditures-toolbar/FundsExpendituresToolbar';
+import { EnrichedRecord, FundsExpendituresTable } from './components/funds-expenditures-table/FundsExpendituresTable';
+import styles from './FundsExpendituresSection.module.scss';
 
 interface FundsExpendituresSectionProps {
     isEditing: boolean;
 }
 
-export const FundsExpenditureSection = ({ isEditing }: FundsExpendituresSectionProps) => {
-    const [records, setRecords] = useState<MockFundsExpendituresRecord[]>(MOCK_RECORDS);
+const computeSummary = (records: ReportFundsExpendituresRecord[]): FundsExpendituresSummary => {
+    const incomeRecords = records.filter((r) => r.type === 'income');
+    const expenseRecords = records.filter((r) => r.type === 'expense');
 
-    const summary: SummaryCards = useMemo(() => {
-        const income = records.filter((r) => r.type === 'income');
-        const expense = records.filter((r) => r.type === 'expense');
-        return {
-            totalCollectedUAH: income.reduce((s, r) => s + r.amountUAH, 0),
-            totalCollectedUSD: income.reduce((s, r) => s + r.amountUSD, 0),
-            totalSpentUAH: expense.reduce((s, r) => s + r.amountUAH, 0),
-            totalSpentUSD: expense.reduce((s, r) => s + r.amountUSD, 0),
-            incomeCategories: new Set(income.map((r) => r.category)).size,
-            expenseCategories: new Set(expense.map((r) => r.category)).size,
-        };
-    }, [records]);
+    const parseAmount = (val: string) => parseFloat(val.replace(/\s/g, '')) || 0;
+
+    return {
+        totalCollectedUah: incomeRecords.reduce((sum, r) => sum + parseAmount(r.amountUah), 0),
+        totalCollectedUsd: incomeRecords.reduce((sum, r) => sum + parseAmount(r.amountUsd), 0),
+        totalSpentUah: expenseRecords.reduce((sum, r) => sum + parseAmount(r.amountUah), 0),
+        totalSpentUsd: expenseRecords.reduce((sum, r) => sum + parseAmount(r.amountUsd), 0),
+        incomeCategories: new Set(incomeRecords.map((r) => r.categoryId)).size,
+        expenseCategories: new Set(expenseRecords.map((r) => r.categoryId)).size,
+    };
+};
+
+const enrichRecords = (
+    records: ReportFundsExpendituresRecord[],
+    categories: ReportFundsExpendituresCategory[],
+): EnrichedRecord[] => {
+    const categoryMap = new Map(categories.map((c) => [c.id, c.name]));
+    return records.map((r) => ({
+        ...r,
+        categoryName: categoryMap.get(r.categoryId) ?? String(r.categoryId),
+    }));
+};
+
+export const FundsExpenditureSection = ({ isEditing: _isEditing }: FundsExpendituresSectionProps) => {
+    const adminClient = useAdminClient();
+
+    const [selectedType, setSelectedType] = useState<TypeFilterValue>(undefined);
+    const [selectedCategoryId, setSelectedCategoryId] = useState<CategoryFilterValue>(undefined);
+
+    const fetchSettings = useCallback(() => FundsExpendituresApi.getSettings(adminClient), [adminClient]);
+    const fetchCategories = useCallback(() => FundsExpendituresApi.getCategories(adminClient), [adminClient]);
+    const fetchRecords = useCallback(() => FundsExpendituresApi.getPublishedRecords(adminClient), [adminClient]);
+
+    const { data: settings } = useDataFetch<ReportFundsExpendituresSettings | null>({
+        initialData: null,
+        fetchHandler: fetchSettings,
+    });
+
+    const { data: categories } = useDataFetch<ReportFundsExpendituresCategory[]>({
+        initialData: [],
+        fetchHandler: fetchCategories,
+    });
+
+    const { data: allRecords } = useDataFetch<ReportFundsExpendituresRecord[]>({
+        initialData: [],
+        fetchHandler: fetchRecords,
+    });
+
+    const summary = useMemo(() => computeSummary(allRecords), [allRecords]);
+
+    const enrichedRecords = useMemo(() => enrichRecords(allRecords, categories), [allRecords, categories]);
+
+    const filteredRecords = useMemo((): EnrichedRecord[] => {
+        return enrichedRecords.filter((record) => {
+            const typeMatch = selectedType === undefined || record.type === selectedType;
+            const categoryMatch = selectedCategoryId === undefined || record.categoryId === selectedCategoryId;
+            return typeMatch && categoryMatch;
+        });
+    }, [enrichedRecords, selectedType, selectedCategoryId]);
 
     return (
-        <>
-            <div>Фінансовий звіт Victory Center за поточний рік. Ми забезпечуємо прозорість кожної гривні</div>
-            <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 28 }}>
-                <SummaryCard title="Зібрано коштів" uah={summary.totalCollectedUAH} usd={summary.totalCollectedUSD} />
+        <div className={styles.section}>
+            {settings?.disclaimerTitle && (
+                <div className={styles.disclaimer}>
+                    <span className={styles.disclaimerLabel}>{FUNDS_EXPENDITURES_TEXT.DISCLAIMER_LABEL}</span>
+                    <div className={styles.disclaimerTextArea}>
+                        <p className={styles.disclaimerText}>{settings.disclaimerTitle}</p>
+                    </div>
+                </div>
+            )}
+
+            <div className={styles.summaryCards}>
                 <SummaryCard
-                    title="Витрачено коштів"
-                    uah={summary.totalSpentUAH}
-                    usd={summary.totalSpentUSD}
+                    title={FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.COLLECTED}
+                    uah={summary.totalCollectedUah}
+                    usd={summary.totalCollectedUsd}
+                />
+                <SummaryCard
+                    title={FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.SPENT}
+                    uah={summary.totalSpentUah}
+                    usd={summary.totalSpentUsd}
                     blueTheme
                 />
-                <SummaryCard title="Категорії надходжень" count={summary.incomeCategories} />
-                <SummaryCard title="Категорії витрат" count={summary.expenseCategories} blueTheme />
+                <SummaryCard
+                    title={FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.INCOME_CATEGORIES}
+                    count={summary.incomeCategories}
+                />
+                <SummaryCard
+                    title={FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.EXPENSE_CATEGORIES}
+                    count={summary.expenseCategories}
+                    blueTheme
+                />
             </div>
-            <div>
-                {/* <Select
-                    children={undefined}
-                    onValueChange={function (value: unknown): void {
-                        throw new Error('Function not implemented.');
-                    }}
-                ></Select> */}
-                <div>
-                    <div>select 1</div>
-                    <div>select 2</div>
-                </div>
-                <div>exchange rate usd/uah</div>
-            </div>
-            <FundsExpendituresTable records={MOCK_RECORDS} />
-        </>
+
+            <FundsExpendituresToolbar
+                categories={categories}
+                selectedType={selectedType}
+                selectedCategoryId={selectedCategoryId}
+                exchangeRate={settings?.exchangeRate ?? null}
+                onTypeChange={setSelectedType}
+                onCategoryChange={setSelectedCategoryId}
+            />
+
+            <FundsExpendituresTable records={filteredRecords} />
+        </div>
     );
 };

@@ -75,3 +75,36 @@ export interface ReportsMediaSettingsUpdateRequest {
     collectedFunds: ReportsMediaSettingsCollectedFundsUpdateRequest;
     changedLives: ReportsMediaSettingsChangedLivesUpdateRequest;
 }
+
+// Funds & Expenditures
+
+export type FundsExpendituresTransactionType = 'income' | 'expense';
+
+export interface ReportFundsExpendituresSettings {
+    id: number;
+    disclaimerTitle: string | null;
+    exchangeRate: string | null;
+}
+
+export interface ReportFundsExpendituresCategory {
+    id: number;
+    name: string;
+}
+
+export interface ReportFundsExpendituresRecord {
+    id: number;
+    categoryId: number;
+    type: FundsExpendituresTransactionType;
+    reportingYear: string;
+    amountUah: string;
+    amountUsd: string;
+}
+
+export interface FundsExpendituresSummary {
+    totalCollectedUah: number;
+    totalCollectedUsd: number;
+    totalSpentUah: number;
+    totalSpentUsd: number;
+    incomeCategories: number;
+    expenseCategories: number;
+}

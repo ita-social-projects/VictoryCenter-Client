@@ -11,11 +11,9 @@ import { setupUseGetLocalizationAboutUsContentMock } from '@/utils/test-mocks/us
 
 jest.mock('@mui/material/useMediaQuery');
 
-jest.mock('@/hooks/common/use-get-localization/useGetLocalization', () => ({
-    useGetLocalization: jest.fn(),
-}));
+jest.mock('@/hooks/common/use-get-localization/useGetLocalization');
 
-const mockedUseGetLocalization = useGetLocalization as jest.Mock;
+const mockedUseGetLocalization = jest.mocked(useGetLocalization);
 
 describe('SupportSection component', () => {
     beforeEach(() => {

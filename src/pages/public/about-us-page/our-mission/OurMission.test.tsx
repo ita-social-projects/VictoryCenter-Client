@@ -22,11 +22,9 @@ jest.mock('@/const/public/routes', () => ({
     },
 }));
 
-jest.mock('@/hooks/common/use-get-localization/useGetLocalization', () => ({
-    useGetLocalization: jest.fn(),
-}));
+jest.mock('@/hooks/common/use-get-localization/useGetLocalization');
 
-const mockedUseGetLocalization = useGetLocalization as jest.Mock;
+const mockedUseGetLocalization = jest.mocked(useGetLocalization);
 
 describe('OurMission component', () => {
     beforeEach(() => {

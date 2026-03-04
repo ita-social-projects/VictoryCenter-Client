@@ -6,11 +6,9 @@ import { TranslationStatus } from '@/types/common/language';
 import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
 import { setupUseGetLocalizationAboutUsContentMock } from '@/utils/test-mocks/use-get-localization-mock';
 
-jest.mock('@/hooks/common/use-get-localization/useGetLocalization', () => ({
-    useGetLocalization: jest.fn(),
-}));
+jest.mock('@/hooks/common/use-get-localization/useGetLocalization');
 
-const mockedUseGetLocalization = useGetLocalization as jest.Mock;
+const mockedUseGetLocalization = jest.mocked(useGetLocalization);
 
 describe('MainValueCard component', () => {
     beforeEach(() => {

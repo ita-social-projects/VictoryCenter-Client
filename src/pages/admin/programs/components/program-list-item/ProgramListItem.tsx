@@ -1,18 +1,38 @@
 import { ButtonTooltip } from '@/components/admin/button-tooltip/ButtonTooltip';
 import { VisibilityStatusLabel } from '@/components/admin/visibility-status-label/VisibilityStatusLabel';
-import { HippotherapyProgram } from '@/types/admin/programs';
+import { HippotherapyProgram, HippotherapyProgramLocalizableFields } from '@/types/admin/programs';
 import { VisibilityStatus } from '@/types/admin/common';
 import { ReactComponent as BlankImage } from '@/assets/icons/blank-image.svg';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import './ProgramListItem.scss';
+import { LocalizationLanguage } from '@/types/common/language';
+import { useEffect, useState } from 'react';
+import { returnDisplayedLocalization } from '@/utils/functions/localization/localization';
+import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
 
 export interface ProgramListItemProps {
     program: HippotherapyProgram;
+    language: LocalizationLanguage;
+    translationLanguages: LocalizationLanguage[];
     handleOnDeleteProgram: (program: HippotherapyProgram) => void;
     handleOnEditProgram: (program: HippotherapyProgram) => void;
 }
 
-export const ProgramListItem = ({ program, handleOnDeleteProgram, handleOnEditProgram }: ProgramListItemProps) => {
+export const ProgramListItem = ({
+    program,
+    language,
+    translationLanguages,
+    handleOnDeleteProgram,
+    handleOnEditProgram,
+}: ProgramListItemProps) => {
+    const [textFields, setTextFields] = useState<Partial<HippotherapyProgramLocalizableFields>>();
+    useEffect(() => {
+        const displayedLocalization = returnDisplayedLocalization(program, language.code);
+        setTextFields({
+            name: displayedLocalization?.name || program.name,
+            description: displayedLocalization?.description || program.description,
+        });
+    }, [language, program]);
     return (
         <div className="program-item">
             <div className="program-info">
@@ -22,10 +42,11 @@ export const ProgramListItem = ({ program, handleOnDeleteProgram, handleOnEditPr
                     ) : (
                         <BlankImage className="program-info-identity-blank-image" />
                     )}
-                    <p>{program.name}</p>
+                    <p>{textFields?.name || program.name}</p>
+                    <LocalizationStatuses languages={translationLanguages} localizedEntity={program} />
                 </div>
                 <div className="program-info-description">
-                    <p>{program.description}</p>
+                    <p>{textFields?.description || program.description}</p>
                 </div>
                 <div className="program-info-status">
                     <VisibilityStatusLabel status={program.status} />

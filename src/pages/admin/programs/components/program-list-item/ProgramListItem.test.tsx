@@ -7,6 +7,7 @@ import { VisibilityStatusLabelProps } from '@/components/admin/visibility-status
 import { VisibilityStatus } from '@/types/admin/common';
 import { HippotherapyProgram } from '@/types/admin/programs';
 import { ButtonTooltipProps } from '@/components/admin/button-tooltip/ButtonTooltip';
+import { LocalizationLanguage } from '@/types/common/language';
 
 jest.mock('@/assets/icons/blank-image.svg', () => ({
     ReactComponent: ({ className }: { className?: string }) => <svg data-testid="blank-image" className={className} />,
@@ -53,9 +54,13 @@ describe('ProgramListItem', () => {
 
     const mockHandleOnDeleteProgram = jest.fn();
     const mockHandleOnEditProgram = jest.fn();
+    const mockLanguage: LocalizationLanguage = { id: 1, code: 'uk', name: 'Ukrainian' };
+    const mockTranslationLanguages: LocalizationLanguage[] = [mockLanguage];
 
     const defaultProps = {
         program: mockProgram,
+        language: mockLanguage,
+        translationLanguages: mockTranslationLanguages,
         handleOnDeleteProgram: mockHandleOnDeleteProgram,
         handleOnEditProgram: mockHandleOnEditProgram,
     };

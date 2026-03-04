@@ -417,8 +417,6 @@ const mockProgramsDto: HippotherapyProgramDto[] = [
     },
 ];
 
-const mockPrograms: HippotherapyProgram[] = mockProgramsDto.map(mapHippotherapyProgramDtoToModel);
-
 describe('ProgramsPageContent', () => {
     let openActions: any;
     let closeActions: any;

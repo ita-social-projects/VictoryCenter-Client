@@ -420,15 +420,21 @@ export const ProgramsPageContent = () => {
 
     // Render helpers
     const renderProgramItem = useCallback(
-        (program: HippotherapyProgram) => (
-            <ProgramListItem
-                key={program.id}
-                program={program}
-                handleOnEditProgram={openModalActions.openEditItemModal}
-                handleOnDeleteProgram={openModalActions.openDeleteItemModal}
-            />
-        ),
-        [openModalActions],
+        (program: HippotherapyProgram) => {
+            if (!selectedLanguage) return null;
+
+            return (
+                <ProgramListItem
+                    key={program.id}
+                    program={program}
+                    handleOnEditProgram={openModalActions.openEditItemModal}
+                    handleOnDeleteProgram={openModalActions.openDeleteItemModal}
+                    language={selectedLanguage}
+                    translationLanguages={translationLanguages}
+                />
+            );
+        },
+        [openModalActions, selectedLanguage, translationLanguages],
     );
 
     // Get the items to display

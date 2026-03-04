@@ -5,6 +5,9 @@ import { HippotherapyAbout } from '@/types/public/hippotherapy-page';
 import { HippotherapyIntro } from './intro/HippotherapyIntro';
 import { LoadableContent } from '@/components/common/loadable-content/LoadableContent';
 import { TextCard } from './text-card/TextCard';
+import { QuoteSection } from './quote/QuoteSection';
+import quote1DefaultImg from '@/assets/images/public/hippotherapy/quote_1.jpg';
+import quote2DefaultImg from '@/assets/images/public/hippotherapy/quote_2.jpg';
 
 export const HippotherapyPage = () => {
     const { t } = useTranslation('hippotherapy');
@@ -18,10 +21,15 @@ export const HippotherapyPage = () => {
         <LoadableContent isLoading={isLoading} error={error || !data}>
             {data && (
                 <>
-                    <HippotherapyIntro introData={data.introSection} />
+                    <HippotherapyIntro {...data.introSection} />
                     <section>
-                        <TextCard content={data.descriptionSection} />
+                        <TextCard {...data.descriptionSection} />
                     </section>
+                    <QuoteSection {...data.quoteSection} imgURL={data.quoteSection.imgURL || quote1DefaultImg} />
+                    <QuoteSection
+                        {...data.anotherQuoteSection}
+                        imgURL={data.anotherQuoteSection.imgURL || quote2DefaultImg}
+                    />
                 </>
             )}
             <div style={{ textAlign: 'center', padding: '20px' }}>{t('SLOGAN')}</div>

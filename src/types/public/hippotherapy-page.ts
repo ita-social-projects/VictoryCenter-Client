@@ -3,15 +3,15 @@ export interface HippotherapyDefaultSection {
     text: string;
 }
 
-interface Quote {
+export interface Quote {
     text: string;
     imgURL: string;
-    author: string;
+    imgAlternativeText?: string;
 }
 
 export interface HippotherapyIntroData {
     imgURL: string;
-    imgAlternativeText: string;
+    imgAlternativeText?: string;
     title: string;
     description: string;
 }

@@ -3,8 +3,7 @@ import introImg from '@/assets/images/public/hippotherapy/intro.jpg';
 import { HippotherapyIntroData } from '@/types/public/hippotherapy-page';
 import styles from './HippotherapyIntro.module.scss';
 
-export const HippotherapyIntro = ({ introData }: { introData: HippotherapyIntroData }) => {
-    const { imgURL, imgAlternativeText, title, description } = introData;
+export const HippotherapyIntro = ({ imgURL, imgAlternativeText, title, description }: HippotherapyIntroData) => {
     return (
         <>
             <section className={styles.root}>

@@ -3,11 +3,7 @@ import { TextCard } from "./TextCard";
 
 describe('TextCard', () => {
     it('renders title and text correctly', () => {
-        const content = {
-            title: 'Test Title',
-            text: 'Test Text',
-        };
-        render(<TextCard content={content} />);
+        render(<TextCard title='Test Title' text='Test Text' />);
         expect(screen.getByText('Test Title')).toBeInTheDocument();
         expect(screen.getByText('Test Text')).toBeInTheDocument();
     })

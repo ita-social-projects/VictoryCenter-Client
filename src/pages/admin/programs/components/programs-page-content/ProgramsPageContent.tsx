@@ -48,6 +48,23 @@ export const ProgramsPageContent = () => {
 
     const { incrementCategoriesCount, decrementCategoriesCount, updateCategoriesCount } = useCategoriesCounter();
 
+    const setErrorState = useCallback(
+        (message: string, type: 'categories' | 'programs' | 'search') => setError({ message, type }),
+        [],
+    );
+    const clearError = useCallback(() => setError({ message: null, type: null }), []);
+
+    const {
+        allLanguages,
+        translationLanguages,
+        selectedLanguage,
+        onLanguageChange,
+        translationStatusFilter,
+        onTranslationStatusFilterChange,
+    } = useLocalizationToolkit({
+        setErrorState,
+    });
+
     // Fetch functions
     const getProgramCategories = useCallback(async () => {
         const categories = await ProgramsCategoriesApi.fetchProgramCategories(client);
@@ -68,6 +85,7 @@ export const ProgramsPageContent = () => {
                 selectedCategory.id,
                 params.offset as number,
                 params.limit as number,
+                translationStatusFilter,
                 statusFilter,
             );
 
@@ -76,7 +94,7 @@ export const ProgramsPageContent = () => {
                 items: response.items.map(mapHippotherapyProgramDtoToModel),
             };
         },
-        [selectedCategory, statusFilter, client],
+        [selectedCategory, statusFilter, client, translationStatusFilter],
     );
 
     const getSearchedProgram = useCallback(async (): Promise<HippotherapyProgram | null> => {
@@ -133,7 +151,7 @@ export const ProgramsPageContent = () => {
         initialData: [],
         getUniqueId: getProgramId,
         fetchHandler: getFilteredPrograms,
-        autoFetchDependencies: [selectedCategory?.id, statusFilter],
+        autoFetchDependencies: [selectedCategory?.id, statusFilter, translationStatusFilter],
         autoFetchDisabled: isSearchResultView,
         pageSize: pageSize,
     });
@@ -151,13 +169,6 @@ export const ProgramsPageContent = () => {
         autoFetchDisabled: !isSearchResultView || !searchProgramId,
     });
 
-    // Errors handling
-    const setErrorState = useCallback(
-        (message: string, type: 'categories' | 'programs' | 'search') => setError({ message, type }),
-        [],
-    );
-    const clearError = useCallback(() => setError({ message: null, type: null }), []);
-
     const handleRetry = useCallback(() => {
         clearError();
 
@@ -169,16 +180,6 @@ export const ProgramsPageContent = () => {
             refetchSearchProgram();
         }
     }, [isSearchResultView, clearError, error.type, refetchCategories, refetchSearchProgram, fetchProgramsFromStart]);
-    const {
-        allLanguages,
-        translationLanguages,
-        selectedLanguage,
-        onLanguageChange,
-        translationStatusFilter,
-        onTranslationStatusFilterChange,
-    } = useLocalizationToolkit({
-        setErrorState,
-    });
 
     useEffect(() => {
         if (categoriesError) {

@@ -11,6 +11,7 @@ import {
 import { AxiosInstance } from 'axios';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
 import { ImageApi } from '@/services/api/admin/image/image-api';
+import { TranslationStatusFilter } from '@/types/common/language';
 
 const convertProgramToSuggestion = (program: HippotherapyProgramDto): ProgramSearchItemData => {
     return {
@@ -85,6 +86,7 @@ export const ProgramsApi = {
         categoryId: number,
         offset: number,
         limit: number,
+        translationStatusFilter?: TranslationStatusFilter | null,
         status?: VisibilityStatus,
     ): Promise<PaginationResult<HippotherapyProgramDto>> => {
         const response = await client.get<PaginationResult<HippotherapyProgramDto>>(API_ROUTES.PROGRAMS.BASE, {
@@ -93,6 +95,7 @@ export const ProgramsApi = {
                 offset,
                 limit,
                 status,
+                translationStatusFilter,
             },
         });
         return response.data;

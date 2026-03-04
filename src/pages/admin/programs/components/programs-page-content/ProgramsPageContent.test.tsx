@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ProgramsPageContent } from './ProgramsPageContent';
 import { HippotherapyProgram, HippotherapyProgramDto, ProgramCategory } from '@/types/admin/programs';
@@ -12,7 +12,6 @@ import { ProgramsPageModalsProps } from '@/pages/admin/programs/components/progr
 import { InfiniteScrollListProps } from '@/components/admin/infinite-scroll-list/InfiniteScrollList';
 import { ProgramListItemProps } from '@/pages/admin/programs/components/program-list-item/ProgramListItem';
 import { AdminPanelToolbarProps } from '@/components/admin/admin-panel-toolbar/AdminPageToolbar';
-import { mapHippotherapyProgramDtoToModel } from '@/utils/functions/mappers/admin/programs/programs-mappers';
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
@@ -24,10 +23,11 @@ jest.mock('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit', () =>
             { id: 1, code: 'uk', name: 'Українська' },
             { id: 2, code: 'en', name: 'Англійська' },
         ],
+        selectedLanguage: { id: 1, code: 'uk', name: 'Українська' },
+        translationStatusFilter: undefined,
         onLanguageChange: jest.fn(),
         onTranslationStatusFilterChange: jest.fn(),
         translationLanguages: [{ id: 1, code: 'en', name: 'Англійська' }],
-        language: { id: 1, code: 'uk', name: 'Українська' },
     }),
 }));
 
@@ -444,6 +444,7 @@ describe('ProgramsPageContent', () => {
                 1,
                 0,
                 5,
+                undefined,
                 VisibilityStatus.Published,
             );
         });
@@ -872,7 +873,14 @@ describe('ProgramsPageContent', () => {
         fireEvent.click(screen.getByTestId('category-2'));
 
         await waitFor(() => {
-            expect(mockProgramsApi.fetchPrograms).toHaveBeenCalledWith(expect.any(Object), 2, 0, 5, undefined);
+            expect(mockProgramsApi.fetchPrograms).toHaveBeenCalledWith(
+                expect.any(Object),
+                2,
+                0,
+                5,
+                undefined,
+                undefined,
+            );
         });
     });
 
@@ -900,7 +908,9 @@ describe('ProgramsPageContent', () => {
         fireEvent.click(screen.getAllByTestId('delete-program')[0]);
         expect(openActions.openDeleteItemModal).toHaveBeenCalledWith(expect.objectContaining({ id: 10 }));
 
-        global.dispatchEvent(new Event('resize'));
+        act(() => {
+            global.dispatchEvent(new Event('resize'));
+        });
 
         await waitFor(() => {
             expect(screen.getByTestId('programs-page-content')).toBeInTheDocument();

@@ -201,7 +201,14 @@ describe('fetchPrograms', () => {
             data: { items: mockPrograms.filter((p) => p.status === VisibilityStatus.Published), totalItemsCount: 2 },
         });
 
-        const result = await ProgramsApi.fetchPrograms(mockClient, 1, 0, 10, VisibilityStatus.Published);
+        const result = await ProgramsApi.fetchPrograms(
+            mockClient,
+            1,
+            0,
+            10,
+            undefined,
+            VisibilityStatus.Published,
+        );
 
         expect(result.items.every((program) => program.status === VisibilityStatus.Published)).toBe(true);
     });
@@ -246,10 +253,10 @@ describe('fetchPrograms', () => {
         const limit = 20;
         const status = VisibilityStatus.Draft;
 
-        await ProgramsApi.fetchPrograms(mockClient, categoryId, offset, limit, status);
+        await ProgramsApi.fetchPrograms(mockClient, categoryId, offset, limit, undefined, status);
 
         expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.PROGRAMS.BASE, {
-            params: { categoryId, offset, limit, status },
+            params: { categoryId, offset, limit, status, translationStatusFilter: undefined },
         });
     });
 

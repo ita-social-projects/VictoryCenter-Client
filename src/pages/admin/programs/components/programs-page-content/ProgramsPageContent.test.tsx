@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ProgramsPageContent } from './ProgramsPageContent';
-import { HippotherapyProgramDto, ProgramCategory } from '@/types/admin/programs';
+import { HippotherapyProgram, HippotherapyProgramDto, ProgramCategory } from '@/types/admin/programs';
 import { VisibilityStatus } from '@/types/admin/common';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
@@ -12,6 +12,7 @@ import { ProgramsPageModalsProps } from '@/pages/admin/programs/components/progr
 import { InfiniteScrollListProps } from '@/components/admin/infinite-scroll-list/InfiniteScrollList';
 import { ProgramListItemProps } from '@/pages/admin/programs/components/program-list-item/ProgramListItem';
 import { AdminPanelToolbarProps } from '@/components/admin/admin-panel-toolbar/AdminPageToolbar';
+import { mapHippotherapyProgramDtoToModel } from '@/utils/functions/mappers/admin/programs/programs-mappers';
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
@@ -130,7 +131,7 @@ jest.mock('@/components/admin/infinite-scroll-list/InfiniteScrollList', () => ({
         hasMore,
         onLoadMore,
         emptyStateMessage,
-    }: InfiniteScrollListProps<HippotherapyProgramDto>) => (
+    }: InfiniteScrollListProps<HippotherapyProgram>) => (
         <div data-testid="infinite-scroll-list">
             {isLoading && <div data-testid="loader">Loading</div>}
             {!isLoading && items.length === 0 && <div data-testid="empty">{emptyStateMessage}</div>}
@@ -176,6 +177,7 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                             sections: [],
                             categories: [{ id: 1, name: 'Category A', programsCount: 2 }],
                             slug: 'new-program',
+                            localizations: [],
                         })
                     }
                 />
@@ -195,6 +197,7 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                             sections: [],
                             categories: [{ id: 1, name: 'Category A', programsCount: 2 }],
                             slug: 'draft-program',
+                            localizations: [],
                         })
                     }
                 />
@@ -214,6 +217,7 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                             sections: [],
                             categories: [{ id: 2, name: 'Category B', programsCount: 1 }],
                             slug: 'alpha-edited',
+                            localizations: [],
                         })
                     }
                 />
@@ -233,6 +237,7 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                             sections: [],
                             categories: [{ id: 1, name: 'Category A', programsCount: 2 }],
                             slug: 'alpha-edited-with-images',
+                            localizations: [],
                         } as any;
 
                         (globalThis as any).__lastEditedProgram = p;
@@ -255,6 +260,7 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                             sections: [],
                             categories: [{ id: 1, name: 'Category A', programsCount: 2 }],
                             slug: 'alpha-search-edited',
+                            localizations: [],
                         })
                     }
                 />
@@ -274,6 +280,7 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                             sections: [],
                             categories: [{ id: 1, name: 'Category A', programsCount: 2 }],
                             slug: 'alpha-edited',
+                            localizations: [],
                         })
                     }
                 />
@@ -293,6 +300,7 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                             sections: [],
                             categories: [{ id: 1, name: 'Category A', programsCount: 2 }],
                             slug: 'unknown-edited',
+                            localizations: [],
                         })
                     }
                 />
@@ -312,6 +320,7 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                             sections: [],
                             categories: [{ id: 1, name: 'Category A', programsCount: 2 }],
                             slug: 'alpha-draft',
+                            localizations: [],
                         })
                     }
                 />
@@ -331,6 +340,7 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                             sections: [],
                             categories: [{ id: 1, name: 'Category A', programsCount: 2 }],
                             slug: 'alpha',
+                            localizations: [],
                         })
                     }
                 />
@@ -374,7 +384,7 @@ const mockCategories: ProgramCategory[] = [
     { id: 2, name: 'Category B', programsCount: 1 },
 ];
 
-const mockPrograms: HippotherapyProgramDto[] = [
+const mockProgramsDto: HippotherapyProgramDto[] = [
     {
         id: 10,
         name: 'Alpha',
@@ -388,6 +398,7 @@ const mockPrograms: HippotherapyProgramDto[] = [
         sections: [],
         categories: [mockCategories[0]],
         slug: 'alpha',
+        localizations: [],
     },
     {
         id: 11,
@@ -402,8 +413,11 @@ const mockPrograms: HippotherapyProgramDto[] = [
         sections: [],
         categories: [mockCategories[0]],
         slug: 'beta',
+        localizations: [],
     },
 ];
+
+const mockPrograms: HippotherapyProgram[] = mockProgramsDto.map(mapHippotherapyProgramDtoToModel);
 
 describe('ProgramsPageContent', () => {
     let openActions: any;
@@ -476,10 +490,10 @@ describe('ProgramsPageContent', () => {
 
         mockProgramsCategoriesApi.fetchProgramCategories.mockResolvedValue(mockCategories);
         mockProgramsApi.fetchPrograms.mockResolvedValue({
-            items: mockPrograms,
-            totalItemsCount: mockPrograms.length,
+            items: mockProgramsDto,
+            totalItemsCount: mockProgramsDto.length,
         });
-        mockProgramsApi.fetchProgramById.mockResolvedValue(mockPrograms[0]);
+        mockProgramsApi.fetchProgramById.mockResolvedValue(mockProgramsDto[0]);
         mockProgramsApi.fetchProgramSearchItems.mockResolvedValue({ items: [], totalItemsCount: 0 });
     });
 
@@ -629,8 +643,8 @@ describe('ProgramsPageContent', () => {
         });
 
         mockProgramsApi.fetchPrograms.mockResolvedValue({
-            items: mockPrograms,
-            totalItemsCount: mockPrograms.length,
+            items: mockProgramsDto,
+            totalItemsCount: mockProgramsDto.length,
         });
 
         fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN));
@@ -667,7 +681,7 @@ describe('ProgramsPageContent', () => {
             expect(screen.getByText(PROGRAMS_TEXT.MESSAGE.FAIL_TO_FETCH_PROGRAM)).toBeInTheDocument();
         });
 
-        mockProgramsApi.fetchProgramById.mockResolvedValue(mockPrograms[0]);
+        mockProgramsApi.fetchProgramById.mockResolvedValue(mockProgramsDto[0]);
         fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN));
 
         await waitFor(() => {
@@ -785,8 +799,8 @@ describe('ProgramsPageContent', () => {
 
     it('deletes program from search view and exits search mode', async () => {
         mockProgramsApi.fetchPrograms
-            .mockResolvedValueOnce({ items: mockPrograms, totalItemsCount: mockPrograms.length })
-            .mockResolvedValueOnce({ items: [mockPrograms[1]], totalItemsCount: 1 });
+            .mockResolvedValueOnce({ items: mockProgramsDto, totalItemsCount: mockProgramsDto.length })
+            .mockResolvedValueOnce({ items: [mockProgramsDto[1]], totalItemsCount: 1 });
 
         render(<ProgramsPageContent />);
 
@@ -905,7 +919,7 @@ describe('ProgramsPageContent', () => {
         });
 
         mockProgramsApi.fetchPrograms.mockResolvedValueOnce({
-            items: mockPrograms,
+            items: mockProgramsDto,
             totalItemsCount: 2,
         });
 

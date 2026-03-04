@@ -37,6 +37,7 @@ const mockPrograms: HippotherapyProgramDto[] = [
         meetingsCount: '12 занять',
         sections: [],
         slug: 'koni-likuyut-lito-2025',
+        localizations: []
     },
     {
         id: 2,
@@ -51,6 +52,7 @@ const mockPrograms: HippotherapyProgramDto[] = [
         meetingsCount: '10 занять',
         sections: [],
         slug: 'kinna-terapiya-dlya-ditey',
+        localizations: []
     },
     {
         id: 3,
@@ -65,6 +67,7 @@ const mockPrograms: HippotherapyProgramDto[] = [
         meetingsCount: '15 занять',
         sections: [],
         slug: 'reabilitatsiya-pislya-poranen',
+        localizations: []
     },
 ];
 
@@ -878,6 +881,7 @@ describe('fetchProgramSearchItems', () => {
             categories: [{ id: 9, name: 'General', programsCount: 1 }],
             sections: [],
             slug: 'core-pilates-workout',
+            localizations: []
         };
 
         const programWithCategoryMatch: HippotherapyProgramDto = {
@@ -893,6 +897,7 @@ describe('fetchProgramSearchItems', () => {
             categories: [{ id: 10, name: 'Pilates', programsCount: 1 }],
             sections: [],
             slug: 'advanced-flexibility',
+            localizations: []
         };
 
         mockClient.get.mockResolvedValueOnce({
@@ -1026,6 +1031,7 @@ describe('fetchProgramSearchItems', () => {
                 ],
                 sections: [],
                 slug: 'therapy-program',
+                localizations: []
             },
         ];
 

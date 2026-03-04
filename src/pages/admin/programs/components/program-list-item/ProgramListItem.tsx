@@ -1,15 +1,15 @@
 import { ButtonTooltip } from '@/components/admin/button-tooltip/ButtonTooltip';
 import { VisibilityStatusLabel } from '@/components/admin/visibility-status-label/VisibilityStatusLabel';
-import { HippotherapyProgramDto } from '@/types/admin/programs';
+import { HippotherapyProgram } from '@/types/admin/programs';
 import { VisibilityStatus } from '@/types/admin/common';
 import { ReactComponent as BlankImage } from '@/assets/icons/blank-image.svg';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import './ProgramListItem.scss';
 
 export interface ProgramListItemProps {
-    program: HippotherapyProgramDto;
-    handleOnDeleteProgram: (program: HippotherapyProgramDto) => void;
-    handleOnEditProgram: (program: HippotherapyProgramDto) => void;
+    program: HippotherapyProgram;
+    handleOnDeleteProgram: (program: HippotherapyProgram) => void;
+    handleOnEditProgram: (program: HippotherapyProgram) => void;
 }
 
 export const ProgramListItem = ({ program, handleOnDeleteProgram, handleOnEditProgram }: ProgramListItemProps) => {

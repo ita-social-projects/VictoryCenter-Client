@@ -38,6 +38,7 @@ const mapProgramEditToProgram = async (
         meetingsCount: program.meetingsCount,
         sections: program.sections,
         slug: program.slug || '',
+        localizations: program.localizations,
     };
 };
 

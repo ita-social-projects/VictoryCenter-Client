@@ -42,6 +42,20 @@ export interface HippotherapyProgramSectionContentDto {
     id?: number;
     sectionId?: number;
     contentType: ContentType;
+    order: number; //
+    groupIndex?: number | null;
+    title?: string | null;
+    description?: string | null;
+    image?: Image | ImageValues | null;
+    imageId?: number | null;
+    author?: string | null;
+    faqQuestionId?: number | null;
+    faqQuestion?: FaqQuestion | null;
+}
+export interface HippotherapyProgramSectionContent {
+    id?: number;
+    sectionId?: number;
+    contentType: ContentType;
     order: number;
     groupIndex?: number | null;
     title?: string | null;

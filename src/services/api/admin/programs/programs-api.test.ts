@@ -201,14 +201,7 @@ describe('fetchPrograms', () => {
             data: { items: mockPrograms.filter((p) => p.status === VisibilityStatus.Published), totalItemsCount: 2 },
         });
 
-        const result = await ProgramsApi.fetchPrograms(
-            mockClient,
-            1,
-            0,
-            10,
-            undefined,
-            VisibilityStatus.Published,
-        );
+        const result = await ProgramsApi.fetchPrograms(mockClient, 1, 0, 10, undefined, VisibilityStatus.Published);
 
         expect(result.items.every((program) => program.status === VisibilityStatus.Published)).toBe(true);
     });

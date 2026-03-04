@@ -5,8 +5,10 @@ import { OurMission } from './OurMission';
 import { ContentType } from '@/types/common/about-us';
 import { AboutUsContent } from '@/types/public/about-us-page';
 import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
-import { TranslationStatus } from '@/types/common/language';
-import { setupUseGetLocalizationTitleDescriptionMock } from '@/utils/test-mocks/use-get-localization-mock';
+import {
+    createRelevantAboutUsUkLocalization,
+    setupUseGetLocalizationAboutUsContentMock,
+} from '@/utils/test-mocks/use-get-localization-mock';
 
 jest.mock('@/assets/icons/arrow-up-right.svg', () => ({
     ReactComponent: (props: any) => <svg data-testid="arrow-icon" {...props} />,
@@ -28,7 +30,7 @@ const mockedUseGetLocalization = useGetLocalization as jest.Mock;
 
 describe('OurMission component', () => {
     beforeEach(() => {
-        setupUseGetLocalizationTitleDescriptionMock(mockedUseGetLocalization);
+        setupUseGetLocalizationAboutUsContentMock(mockedUseGetLocalization);
     });
 
     const Content: AboutUsContent[] = [
@@ -86,12 +88,7 @@ describe('OurMission component', () => {
             {
                 ...Content[0],
                 localizations: [
-                    {
-                        language: { id: 1, code: 'uk' },
-                        translationStatus: TranslationStatus.Relevant,
-                        description: 'Localized description',
-                        title: null,
-                    },
+                    createRelevantAboutUsUkLocalization({ description: 'Localized description', title: null }),
                 ],
             },
         ];

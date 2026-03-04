@@ -6,7 +6,7 @@ import { ABOUT_US_DATA } from '@/const/public/about-us-page';
 import { aboutUsPageUk } from '@/locales/uk';
 import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
 import { TranslationStatus } from '@/types/common/language';
-import { setupUseGetLocalizationTitleDescriptionMock } from '@/utils/test-mocks/use-get-localization-mock';
+import { setupUseGetLocalizationAboutUsContentMock } from '@/utils/test-mocks/use-get-localization-mock';
 
 jest.mock('@/const/public/about-us-page', () => ({
     ABOUT_US_DATA: {
@@ -39,7 +39,7 @@ const mockedUseGetLocalization = useGetLocalization as jest.Mock;
 
 describe('SupportSectionTablet component', () => {
     beforeEach(() => {
-        setupUseGetLocalizationTitleDescriptionMock(mockedUseGetLocalization);
+        setupUseGetLocalizationAboutUsContentMock(mockedUseGetLocalization);
     });
 
     const content: AboutUsContent[] = [

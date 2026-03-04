@@ -7,7 +7,7 @@ import aboutUsPageUk from '@/locales/uk/about-us.json';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
 import { TranslationStatus } from '@/types/common/language';
-import { setupUseGetLocalizationTitleDescriptionMock } from '@/utils/test-mocks/use-get-localization-mock';
+import { setupUseGetLocalizationAboutUsContentMock } from '@/utils/test-mocks/use-get-localization-mock';
 
 jest.mock('@mui/material/useMediaQuery');
 
@@ -19,7 +19,7 @@ const mockedUseGetLocalization = useGetLocalization as jest.Mock;
 
 describe('SupportSection component', () => {
     beforeEach(() => {
-        setupUseGetLocalizationTitleDescriptionMock(mockedUseGetLocalization);
+        setupUseGetLocalizationAboutUsContentMock(mockedUseGetLocalization);
     });
 
     const Content: AboutUsContent[] = [

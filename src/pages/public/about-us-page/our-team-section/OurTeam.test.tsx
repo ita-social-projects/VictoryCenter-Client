@@ -6,8 +6,10 @@ import { ContentType } from '@/types/common/about-us';
 import { aboutUsPageUk } from '@/locales/uk';
 import defaultOurTeamImage from '@/assets/images/public/about-us-page/our-team.jpg';
 import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
-import { TranslationStatus } from '@/types/common/language';
-import { setupUseGetLocalizationTitleDescriptionMock } from '@/utils/test-mocks/use-get-localization-mock';
+import {
+    createRelevantAboutUsUkLocalization,
+    setupUseGetLocalizationAboutUsContentMock,
+} from '@/utils/test-mocks/use-get-localization-mock';
 
 jest.mock('@/const/public/routes', () => ({
     PUBLIC_ROUTES: {
@@ -25,7 +27,7 @@ const mockedUseGetLocalization = useGetLocalization as jest.Mock;
 
 describe('OurTeam component', () => {
     beforeEach(() => {
-        setupUseGetLocalizationTitleDescriptionMock(mockedUseGetLocalization);
+        setupUseGetLocalizationAboutUsContentMock(mockedUseGetLocalization);
     });
 
     const Content: AboutUsContent[] = [
@@ -102,12 +104,7 @@ describe('OurTeam component', () => {
             {
                 ...Content[0],
                 localizations: [
-                    {
-                        language: { id: 1, code: 'uk' },
-                        translationStatus: TranslationStatus.Relevant,
-                        description: 'Localized description',
-                        title: null,
-                    },
+                    createRelevantAboutUsUkLocalization({ description: 'Localized description', title: null }),
                 ],
             },
             Content[1],

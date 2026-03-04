@@ -5,7 +5,7 @@ import { AboutUsContent } from '@/types/public/about-us-page';
 import { aboutUsPageUk } from '@/locales/uk';
 import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
 import { TranslationStatus } from '@/types/common/language';
-import { setupUseGetLocalizationTitleDescriptionMock } from '@/utils/test-mocks/use-get-localization-mock';
+import { setupUseGetLocalizationAboutUsContentMock } from '@/utils/test-mocks/use-get-localization-mock';
 
 jest.mock('./SupportCard.module.scss', () => ({
     'people-card': 'people-card',
@@ -30,7 +30,7 @@ const mockedUseGetLocalization = useGetLocalization as jest.Mock;
 
 describe('SupportCard component', () => {
     beforeEach(() => {
-        setupUseGetLocalizationTitleDescriptionMock(mockedUseGetLocalization);
+        setupUseGetLocalizationAboutUsContentMock(mockedUseGetLocalization);
     });
 
     const card: AboutUsContent = {

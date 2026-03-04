@@ -4,7 +4,7 @@ import { ContentType } from '@/types/common/about-us';
 import { AboutUsContent } from '@/types/public/about-us-page';
 import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
 import { TranslationStatus } from '@/types/common/language';
-import { setupUseGetLocalizationTitleDescriptionMock } from '@/utils/test-mocks/use-get-localization-mock';
+import { setupUseGetLocalizationAboutUsContentMock } from '@/utils/test-mocks/use-get-localization-mock';
 
 jest.mock('@/hooks/common/use-get-localization/useGetLocalization', () => ({
     useGetLocalization: jest.fn(),
@@ -14,7 +14,7 @@ const mockedUseGetLocalization = useGetLocalization as jest.Mock;
 
 describe('AboutUsIntro', () => {
     beforeEach(() => {
-        setupUseGetLocalizationTitleDescriptionMock(mockedUseGetLocalization);
+        setupUseGetLocalizationAboutUsContentMock(mockedUseGetLocalization);
     });
 
     const Content: AboutUsContent[] = [

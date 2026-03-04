@@ -7,19 +7,17 @@ export const createRelevantAboutUsUkLocalization = (content: AboutUsContentLocal
     ...content,
 });
 
-export const setupUseGetLocalizationAboutUsContentMock = (
-    mockedUseGetLocalization: jest.Mock,
-): void => {
+export const setupUseGetLocalizationAboutUsContentMock = (mockedUseGetLocalization: jest.Mock): void => {
     mockedUseGetLocalization.mockImplementation(
         (localizations: AboutUsContentLocalizableFields[] | null | undefined, fallback) => {
-        if (localizations && localizations.length > 0) {
-            return {
-                description: localizations[0].description,
-                title: localizations[0].title,
-            };
-        }
+            if (localizations && localizations.length > 0) {
+                return {
+                    description: localizations[0].description,
+                    title: localizations[0].title,
+                };
+            }
 
-        return fallback;
+            return fallback;
         },
     );
 };

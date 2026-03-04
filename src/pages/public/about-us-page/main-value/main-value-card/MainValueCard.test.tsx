@@ -52,9 +52,7 @@ describe('MainValueCard component', () => {
             ],
         };
 
-        render(
-            <MainValueCard person={personWithLocalization} index={0} imageUrl="test.jpg" altText="Test alt" />,
-        );
+        render(<MainValueCard person={personWithLocalization} index={0} imageUrl="test.jpg" altText="Test alt" />);
 
         expect(screen.getByText('Localized description')).toBeInTheDocument();
     });
@@ -72,9 +70,7 @@ describe('MainValueCard component', () => {
             ],
         };
 
-        render(
-            <MainValueCard person={personWithLocalization} index={0} imageUrl="test.jpg" altText="Test alt" />,
-        );
+        render(<MainValueCard person={personWithLocalization} index={0} imageUrl="test.jpg" altText="Test alt" />);
 
         expect(screen.queryByText('Fallback description')).not.toBeInTheDocument();
     });

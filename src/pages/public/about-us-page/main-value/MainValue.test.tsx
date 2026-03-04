@@ -7,6 +7,7 @@ import { checkForSubstrings } from '@/utils/functions/test-helpers/test-helpers'
 import { aboutUsPageUk } from '@/locales/uk';
 import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
 import { TranslationStatus } from '@/types/common/language';
+import { setupUseGetLocalizationTitleDescriptionMock } from '@/utils/test-mocks/use-get-localization-mock';
 
 jest.mock('@/components/public/swiper/Swiper', () => ({
     Swiper: ({ items, renderItem }: any) => (
@@ -29,15 +30,7 @@ const mockedUseGetLocalization = useGetLocalization as jest.Mock;
 
 describe('MainValues component', () => {
     beforeEach(() => {
-        mockedUseGetLocalization.mockImplementation((localizations, fallback) => {
-            if (localizations && localizations.length > 0) {
-                return {
-                    description: localizations[0].description,
-                    title: localizations[0].title,
-                };
-            }
-            return fallback;
-        });
+        setupUseGetLocalizationTitleDescriptionMock(mockedUseGetLocalization);
     });
 
     const Content: AboutUsContent[] = [

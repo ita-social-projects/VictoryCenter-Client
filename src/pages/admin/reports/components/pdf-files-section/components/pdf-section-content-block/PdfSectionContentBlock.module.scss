@@ -1,18 +1,21 @@
-@use '@/assets/sass/variables/colors' as c; 
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
 
 .root {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
-    max-width: 1440px;
     width: auto;
     height: 100%;
-    border: 1px solid #E2E2E2;
+    margin: 0 15px;
+}
+
+.view-root {
+    max-width: 1440px;
+    gap: 1.5rem;
+    border: 1px solid c.$grey-600;
     border-radius: 16px;
     padding: 63px 40px;
-    margin: 0 15px;
-    box-shadow:
-        0 12px 15px rgba(17,17,19,0.19);
+    box-shadow: 0 11px 18px rgba(c.$bluish-black, 0.19);
 }
 
 .field {
@@ -26,17 +29,14 @@
 }
 
 .view-label {
-    font-size: 24px;
-    font-weight: 600;
-    color: rgba(98, 97, 97, 1);
+    @include type.subtitle-1-bold;
+    color: c.$grey-900;
     text-transform: uppercase;
-    letter-spacing: 0px;
 }
 
 .view-text {
     color: c.$black;
-    font-weight: 600;
-    letter-spacing: 0px;
+    font-weight: 700;
     background-color: c.$light-blue-25;
     border-radius: 5px;
 
@@ -50,10 +50,9 @@
 }
 
 .view-text-title {
-    font-size: 32px;
+    @include type.h4-bold;
 }
 
 .view-text-description {
-    font-size: 24px;
-    line-height: 30px;
+    @include type.subtitle-1-bold;
 }

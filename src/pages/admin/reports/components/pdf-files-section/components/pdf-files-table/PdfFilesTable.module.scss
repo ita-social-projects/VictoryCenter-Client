@@ -5,7 +5,7 @@
     border-radius: 8px;
     margin-left: 10px;
     max-width: 1440px;
-    border: 1px solid #e0e0e0;
+    border: 1px solid c.$grey-600;
 }
 
 .table {
@@ -14,13 +14,9 @@
     border-collapse: collapse;
 
     thead {
-        border-bottom: 1px solid #e0e0e0;
+        border-bottom: 1px solid c.$grey-600;
         color: c.$grey-900;
     }
-}
-
-th, td {
-    padding: 1rem;
 }
 
 .header-row {
@@ -28,11 +24,12 @@ th, td {
         font-weight: 700;
         font-size: 24px;
         white-space: nowrap;
+        padding: 30px 20px;
     }
 }
 
 .row {
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid c.$grey-500;
     font-size: 20px;
     font-weight: 600;
     color: c.$graphite_black;
@@ -86,4 +83,29 @@ th, td {
     height: 24px;
     margin-right: 15px;
     vertical-align: top;
+}
+
+.empty-cell {
+    text-align: center;
+    padding: 0;
+}
+
+.empty-container {
+    display: flex;
+    justify-content: center;  
+    align-items: center;      
+    gap: 20px;                
+    width: 100%;
+    height: 100%;
+    padding: 10px 0;
+}
+
+.not-found-icon {
+    height: 112px;
+    width: auto;
+}
+
+.empty-text {
+    font-size: 20px;
+    font-weight: 500;
 }

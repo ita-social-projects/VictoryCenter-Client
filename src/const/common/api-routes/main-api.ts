@@ -78,6 +78,12 @@ export const API_ROUTES = {
         MEDIA_SETTINGS: 'Report/report',
         BASE: 'Report',
     },
+    PDF_SECTION: {
+        BASE: 'PdfSection',
+    },
+    PDF_REPORTS: {
+        BASE: 'PdfReports',
+    },
     FAQ_LOCALIZATIONS: {
         BASE: 'FaqQuestionLocalizations',
     },

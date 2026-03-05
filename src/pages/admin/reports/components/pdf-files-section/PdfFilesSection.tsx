@@ -1,89 +1,62 @@
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import { PdfSectionContentBlock } from './components/pdf-section-content-block/PdfSectionContentBlock';
 import { PdfFilesTable } from './components/pdf-files-table/PdfFilesTable';
 import styles from './PdfFilesSection.module.scss';
 import { LanguageSwitcherButtons } from './components/language-switcher-buttons/LanguageSwitcherButtons';
-
-interface PdfSectionContent {
-    title: string;
-    description: string;
-}
-
-interface MockPdfFile {
-    id: number;
-    name: string;
-    dateTime: string;
-    size: string;
-    url?: string;
-}
-
-const MOCK_CONTENT: PdfSectionContent = {
-    title: 'Результати у звітах',
-    description:
-        'Для того, щоб побачити детальнішу інформацію, завантажте звіт конкретного року. Якщо цікавить щось інше, чи бажаєте дізнатись більше, зверніться до нас.',
-};
-
-const MOCK_PDF_FILES: MockPdfFile[] = [
-    { id: 1, name: 'Звіт 2025', dateTime: '21.11.2025', size: '167KB' },
-    { id: 2, name: 'Звіт 2024', dateTime: '21.11.2024', size: '256KB' },
-    { id: 3, name: 'Звіт 2023', dateTime: '21.11.2023', size: '165KB' },
-    { id: 4, name: 'Звіт 2022', dateTime: '21.11.2022', size: '167KB' },
-];
+import { PdfSectionApi } from '@/services/api/admin/reports/pdf-section/pdf-section-api';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { PdfReportDto } from '@/types/admin/pdf-section';
+import { PdfReportsApi } from '@/services/api/admin/reports/pdf-reports/pdf-reports';
+import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
+import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 
 interface PdfFilesSectionProps {
     isEditing: boolean;
 }
 
 export const PdfFilesSection = ({ isEditing }: PdfFilesSectionProps) => {
-    const [content, setContent] = useState<PdfSectionContent>(MOCK_CONTENT);
+    const client = useAdminClient();
 
-    const handleTitleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        setContent((prev) => ({
-            ...prev,
-            title: e.target.value,
-        }));
-    }, []);
+    const fetchSection = useCallback(async () => {
+        return PdfSectionApi.getPdfSection(client);
+    }, [client]);
 
-    const handleDescriptionChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setContent((prev) => ({
-            ...prev,
-            description: e.target.value,
-        }));
-    }, []);
+    const fetchFiles = useCallback(async () => {
+        const data = await PdfReportsApi.getAll(client, { offset: 0, limit: 1000 });
+        return data.items;
+    }, [client]);
 
-    const handleViewFile = useCallback((file: MockPdfFile) => {
-        // TODO: Implement file preview or download
-        console.log('View file:', file);
-    }, []);
+    const { data: sectionData, isLoading: isSectionLoading } = useDataFetch({
+        initialData: null,
+        fetchHandler: fetchSection,
+        autoFetchDependencies: [fetchSection],
+    });
 
-    const handleDeleteFile = useCallback((fileId: number) => {
-        // TODO: Implement file deletion
-        console.log('Delete file:', fileId);
-    }, []);
+    const { data: pdfFiles, isLoading: isFilesLoading } = useDataFetch<PdfReportDto[]>({
+        initialData: [],
+        fetchHandler: fetchFiles,
+        autoFetchDependencies: [fetchFiles],
+    });
 
-    const handleDownloadFile = useCallback((file: MockPdfFile) => {
-        // TODO: Implement file download
-        console.log('Download file:', file);
-    }, []);
+    if (isSectionLoading || isFilesLoading) {
+        return (
+            <div className={styles.loader}>
+                <InlineLoader size={3} />
+            </div>
+        );
+    }
+
+    // TODO: Implement handler for viewing file
 
     return (
         <div className={styles.root}>
-            <PdfSectionContentBlock
-                content={content}
-                isEditing={isEditing}
-                onTitleChange={handleTitleChange}
-                onDescriptionChange={handleDescriptionChange}
-            />
-            <div className={styles.languageSwitcherContainer}>
+            <div className={styles['top-section']}>
+                <PdfSectionContentBlock content={sectionData ?? { title: '', description: '' }} isEditing={isEditing} />
+            </div>
+            <div className={styles['language-switcher-container']}>
                 <LanguageSwitcherButtons />
             </div>
-            <PdfFilesTable
-                files={MOCK_PDF_FILES}
-                isEditing={isEditing}
-                onViewFile={handleViewFile}
-                onDownloadFile={handleDownloadFile}
-                onDeleteFile={handleDeleteFile}
-            />
+            <PdfFilesTable files={pdfFiles} isEditing={isEditing} onViewFile={() => {}} />
         </div>
     );
 };

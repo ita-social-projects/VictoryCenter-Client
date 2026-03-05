@@ -36,8 +36,8 @@ export const ReportAnalytics = ({ isEditing }: ReportAnalyticsProps) => {
             />
             <div className={styles['tab-content']}>
                 {activeTab.id === 'pdf-files' && <PdfFilesSection isEditing={isEditing} />}
-                {activeTab.id === 'income-expenses' && <div>Income expenses tab</div>}
-                {activeTab.id === 'program-expenses' && <div>Program expenses tab</div>}
+                {activeTab.id === 'income-expenses' && <div></div>}
+                {activeTab.id === 'program-expenses' && <div></div>}
             </div>
         </div>
     );

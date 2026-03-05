@@ -92,7 +92,7 @@ describe('Footer', () => {
 
         expect(screen.getByRole('link', { name: footerUk['WHAT_IS_HIPPOTHERAPY'] })).toHaveAttribute(
             'href',
-            PUBLIC_ROUTES.MOCK.FULL,
+            PUBLIC_ROUTES.HIPPOTHERAPY.FULL,
         );
         expect(screen.getByRole('link', { name: footerUk['PROGRAMS'] })).toHaveAttribute(
             'href',

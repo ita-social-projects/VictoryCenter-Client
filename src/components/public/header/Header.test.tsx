@@ -213,6 +213,14 @@ describe('Header', () => {
 
         const programsLink = within(programsDropdown as HTMLElement).getByText(headerUk['PROGRAMS']);
         expect(programsLink).toHaveAttribute('data-disabled', 'false');
+
+        const hippotherapyLink = within(programsDropdown as HTMLElement).getByRole('link', {
+            name: headerUk['HIPPOTHERAPY'],
+        });
+        expect(hippotherapyLink).toHaveAttribute('data-disabled', 'false');
+
+        const prorgamsSessionsLink = within(programsDropdown as HTMLElement).getByText(headerUk['PROGRAMS_SESSIONS']);
+        expect(prorgamsSessionsLink).toHaveAttribute('data-disabled', 'true');
     });
 
     it('toggles mobile menu open and closed', () => {
@@ -238,9 +246,6 @@ describe('Header', () => {
 
         const aboutUsLink = within(mobileMenu as HTMLElement).getByText(headerUk['ABOUT_US']);
         expect(aboutUsLink).toHaveAttribute('href', PUBLIC_ROUTES.ABOUT_US.FULL);
-
-        const hippotherapyLink = within(mobileMenu as HTMLElement).getByText(headerUk['HIPPOTHERAPY']);
-        expect(hippotherapyLink).toHaveAttribute('href', PUBLIC_ROUTES.PROGRAMS.FULL);
 
         const reportingLink = within(mobileMenu as HTMLElement).getByText(headerUk['REPORTING']);
         expect(reportingLink).toHaveAttribute('href', PUBLIC_ROUTES.REPORTS.FULL);

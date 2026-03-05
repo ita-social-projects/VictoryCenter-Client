@@ -1,5 +1,5 @@
 import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
-import classNames from 'classnames';
+import cn from 'classnames';
 import styles from './SummaryCard.module.scss';
 
 interface SummaryCardProps {
@@ -7,14 +7,14 @@ interface SummaryCardProps {
     uah?: number;
     usd?: number;
     count?: number;
-    blueTheme?: boolean;
+    blueThemeCard?: boolean;
 }
 
-export const SummaryCard = ({ title, uah, usd, count, blueTheme = false }: SummaryCardProps) => {
+export const SummaryCard = ({ title, uah, usd, count, blueThemeCard = false }: SummaryCardProps) => {
     const isCountCard = count !== undefined;
 
     return (
-        <div className={classNames(styles.card, { [styles.cardBlue]: blueTheme })}>
+        <div className={cn(styles.card, { [styles.cardBlue]: blueThemeCard })}>
             <span className={styles.title}>{title}</span>
             {isCountCard ? (
                 <span className={styles.value}>

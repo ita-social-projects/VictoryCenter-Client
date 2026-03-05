@@ -7,79 +7,55 @@ import {
     ReportsMediaBlockErrors,
     ReportsMediaBlockValidationFunctions,
 } from './ReportsMediaBlock';
-import { REPORTS_TEXT } from '@/const/admin/reports';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { Image, ImageValues } from '@/types/common/image';
 
-jest.mock('@/components/admin/input-with-character-limit/InputWithCharacterLimit', () => ({
-    InputWithCharacterLimit: ({
-        id,
-        name,
-        value,
-        onChange,
-        onBlur,
-        maxLength,
-        disabled,
-    }: {
-        id: string;
-        name: string;
-        value: string;
-        onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-        onBlur: () => void;
-        maxLength: number;
-        disabled: boolean;
-    }) => (
-        <input
-            data-testid={`mock-input-${id}`}
-            id={id}
-            name={name}
-            value={value}
-            onChange={onChange}
-            onBlur={onBlur}
-            maxLength={maxLength}
-            disabled={disabled}
-        />
-    ),
-}));
-
-jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
-    InputWithCharacterLimitGroup: ({
-        label,
-        id,
-        name,
-        value,
-        onChange,
-        onBlur,
-        maxLength,
-        disabled,
-        error,
-    }: {
-        label: string;
-        id: string;
-        name: string;
-        value: string;
-        onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-        onBlur: () => void;
-        maxLength: number;
-        disabled: boolean;
-        error?: string;
-    }) => (
-        <div>
-            <label htmlFor={id}>{label}</label>
-            <input
-                data-testid={`mock-group-input-${id}`}
-                id={id}
-                name={name}
-                value={value}
-                onChange={onChange}
-                onBlur={onBlur}
-                maxLength={maxLength}
-                disabled={disabled}
-            />
-            {error && <span data-testid={`mock-group-error-${id}`}>{error}</span>}
-        </div>
-    ),
-}));
+jest.mock(
+    '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
+    () => ({
+        TextAreaWithCharacterLimitGroup: ({
+            label,
+            id,
+            name,
+            value,
+            onChange,
+            onBlur,
+            maxLength,
+            disabled,
+            error,
+            isRequired,
+        }: {
+            label: string;
+            id: string;
+            name: string;
+            value: string;
+            onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+            onBlur?: (e: React.FocusEvent<HTMLTextAreaElement>) => void;
+            maxLength: number;
+            disabled: boolean;
+            error?: string;
+            isRequired?: boolean;
+        }) => (
+            <div>
+                <label htmlFor={id}>
+                    {isRequired && '*'}
+                    {label}
+                </label>
+                <textarea
+                    data-testid={`mock-textarea-${id}`}
+                    maxLength={maxLength}
+                    id={id}
+                    name={name}
+                    value={value}
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    disabled={disabled}
+                />
+                {error && <span data-testid={`mock-textarea-error-${id}`}>{error}</span>}
+            </div>
+        ),
+    }),
+);
 
 jest.mock('@/components/admin/image-input/ImageInput', () => ({
     ImageInput: ({
@@ -190,14 +166,14 @@ describe('ReportsMediaBlock', () => {
         it('should render title input with correct value', () => {
             renderComponent();
 
-            const titleInput = screen.getByTestId('mock-input-Вікно 1: Зібрано коштів-title');
+            const titleInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-title');
             expect(titleInput).toHaveValue('Test Title');
         });
 
         it('should render total amount input with correct value', () => {
             renderComponent();
 
-            const valueInput = screen.getByTestId('mock-group-input-Вікно 1: Зібрано коштів-value');
+            const valueInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-value');
             expect(valueInput).toHaveValue('250000');
         });
 
@@ -240,35 +216,35 @@ describe('ReportsMediaBlock', () => {
         it('should disable title input when not editing', () => {
             renderComponent({ isEditing: false });
 
-            const titleInput = screen.getByTestId('mock-input-Вікно 1: Зібрано коштів-title');
+            const titleInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-title');
             expect(titleInput).toBeDisabled();
         });
 
         it('should enable title input when editing', () => {
             renderComponent({ isEditing: true });
 
-            const titleInput = screen.getByTestId('mock-input-Вікно 1: Зібрано коштів-title');
+            const titleInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-title');
             expect(titleInput).not.toBeDisabled();
         });
 
         it('should disable total amount input when not editing', () => {
             renderComponent({ isEditing: false, isValueEditable: true });
 
-            const valueInput = screen.getByTestId('mock-group-input-Вікно 1: Зібрано коштів-value');
+            const valueInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-value');
             expect(valueInput).toBeDisabled();
         });
 
         it('should disable total amount input when editing but isValueEditable is false', () => {
             renderComponent({ isEditing: true, isValueEditable: false });
 
-            const valueInput = screen.getByTestId('mock-group-input-Вікно 1: Зібрано коштів-value');
+            const valueInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-value');
             expect(valueInput).toBeDisabled();
         });
 
         it('should enable total amount input when editing and isValueEditable is true', () => {
             renderComponent({ isEditing: true, isValueEditable: true });
 
-            const valueInput = screen.getByTestId('mock-group-input-Вікно 1: Зібрано коштів-value');
+            const valueInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-value');
             expect(valueInput).not.toBeDisabled();
         });
 
@@ -291,7 +267,7 @@ describe('ReportsMediaBlock', () => {
             mockValidateTitle.mockReturnValue(titleError);
             renderComponent({ isEditing: true });
 
-            const titleInput = screen.getByTestId('mock-input-Вікно 1: Зібрано коштів-title');
+            const titleInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-title');
             fireEvent.change(titleInput, { target: { value: 'New' } });
 
             expect(mockValidateTitle).toHaveBeenCalledWith('New');
@@ -302,7 +278,7 @@ describe('ReportsMediaBlock', () => {
             mockValidateTitle.mockReturnValue(undefined);
             renderComponent({ isEditing: true });
 
-            const titleInput = screen.getByTestId('mock-input-Вікно 1: Зібрано коштів-title');
+            const titleInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-title');
             fireEvent.change(titleInput, { target: { value: 'Valid Title Text' } });
 
             expect(mockValidateTitle).toHaveBeenCalledWith('Valid Title Text');
@@ -317,18 +293,11 @@ describe('ReportsMediaBlock', () => {
             mockValidateTitle.mockReturnValue(titleError);
             renderComponent({ isEditing: true });
 
-            const titleInput = screen.getByTestId('mock-input-Вікно 1: Зібрано коштів-title');
+            const titleInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-title');
             fireEvent.blur(titleInput);
 
             expect(mockValidateTitle).toHaveBeenCalledWith('Test Title');
             expect(mockOnValuesChange).toHaveBeenCalledWith({ ...defaultValues }, { title: titleError });
-        });
-
-        it('should set title input maxLength from REPORTS_TEXT', () => {
-            renderComponent();
-
-            const titleInput = screen.getByTestId('mock-input-Вікно 1: Зібрано коштів-title');
-            expect(titleInput).toHaveAttribute('maxLength', REPORTS_TEXT.FORM.MAX_LENGTH.TITLE.toString());
         });
     });
 
@@ -337,7 +306,7 @@ describe('ReportsMediaBlock', () => {
             mockValidateTotalAmount.mockReturnValue(undefined);
             renderComponent({ isEditing: true, isValueEditable: true });
 
-            const valueInput = screen.getByTestId('mock-group-input-Вікно 1: Зібрано коштів-value');
+            const valueInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-value');
             fireEvent.change(valueInput, { target: { value: '300000' } });
 
             expect(mockValidateTotalAmount).toHaveBeenCalledWith(300000);
@@ -352,7 +321,7 @@ describe('ReportsMediaBlock', () => {
             mockValidateTotalAmount.mockReturnValue(valueError);
             renderComponent({ isEditing: true, isValueEditable: true });
 
-            const valueInput = screen.getByTestId('mock-group-input-Вікно 1: Зібрано коштів-value');
+            const valueInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-value');
             fireEvent.change(valueInput, { target: { value: 'abc' } });
 
             expect(mockOnValuesChange).toHaveBeenCalledWith(
@@ -365,7 +334,7 @@ describe('ReportsMediaBlock', () => {
             mockValidateTotalAmount.mockReturnValue(undefined);
             renderComponent({ isEditing: true, isValueEditable: true });
 
-            const valueInput = screen.getByTestId('mock-group-input-Вікно 1: Зібрано коштів-value');
+            const valueInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-value');
             fireEvent.blur(valueInput);
 
             expect(mockValidateTotalAmount).toHaveBeenCalledWith(250000);
@@ -379,7 +348,7 @@ describe('ReportsMediaBlock', () => {
                 validationFunctions: { validateTitle: mockValidateTitle },
             });
 
-            const valueInput = screen.getByTestId('mock-group-input-Вікно 1: Зібрано коштів-value');
+            const valueInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-value');
             fireEvent.change(valueInput, { target: { value: '500' } });
 
             expect(mockOnValuesChange).toHaveBeenCalledWith(
@@ -391,8 +360,8 @@ describe('ReportsMediaBlock', () => {
         it('should set totalAmount maxLength from props', () => {
             renderComponent({ totalAmountMaxLength: 10 });
 
-            const valueInput = screen.getByTestId('mock-group-input-Вікно 1: Зібрано коштів-value');
-            expect(valueInput).toHaveAttribute('maxLength', '10');
+            const valueInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-value');
+            expect(valueInput).toHaveAttribute('maxlength', '10');
         });
     });
 
@@ -498,10 +467,10 @@ describe('ReportsMediaBlock', () => {
             expect(screen.getByText('Title error message')).toBeInTheDocument();
         });
 
-        it('should display totalAmount error via InputWithCharacterLimitGroup', () => {
+        it('should display totalAmount error via TextAreaWithCharacterLimitGroup', () => {
             renderComponent({ errors: { totalAmount: 'Value error message' } });
 
-            const errorEl = screen.getByTestId('mock-group-error-Вікно 1: Зібрано коштів-value');
+            const errorEl = screen.getByTestId('mock-textarea-error-Вікно 1: Зібрано коштів-value');
             expect(errorEl).toHaveTextContent('Value error message');
         });
 

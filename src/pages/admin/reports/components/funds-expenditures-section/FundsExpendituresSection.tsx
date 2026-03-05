@@ -119,7 +119,7 @@ export const FundsExpenditureSection = ({ isEditing: _isEditing }: FundsExpendit
                     title={FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.SPENT}
                     uah={summary.totalSpentUah}
                     usd={summary.totalSpentUsd}
-                    blueTheme
+                    blueThemeCard
                 />
                 <SummaryCard
                     title={FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.INCOME_CATEGORIES}
@@ -128,7 +128,7 @@ export const FundsExpenditureSection = ({ isEditing: _isEditing }: FundsExpendit
                 <SummaryCard
                     title={FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.EXPENSE_CATEGORIES}
                     count={summary.expenseCategories}
-                    blueTheme
+                    blueThemeCard
                 />
             </div>
 

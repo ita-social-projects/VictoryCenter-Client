@@ -1,8 +1,11 @@
-@use '@/assets/sass/variables/colors' as c;
-@use '@/assets/sass/mixins/typography.mixins' as type;
-
 .root {
     display: flex;
     flex-direction: column;
 }
 
+.loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}

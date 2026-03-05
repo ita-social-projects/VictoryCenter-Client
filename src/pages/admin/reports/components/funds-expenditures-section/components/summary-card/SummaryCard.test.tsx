@@ -45,7 +45,7 @@ describe('SummaryCard', () => {
         });
 
         it('should apply blueTheme class when blueTheme is true', () => {
-            const { container } = render(<SummaryCard title="Test" uah={100} usd={100} blueTheme />);
+            const { container } = render(<SummaryCard title="Test" uah={100} usd={100} blueThemeCard />);
             expect(container.firstChild).toHaveClass('cardBlue');
         });
     });

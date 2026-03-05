@@ -1,6 +1,7 @@
 @use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
 
-.title{
+.title {
     font-size: 36px;
     color: c.$blue-500;
 }

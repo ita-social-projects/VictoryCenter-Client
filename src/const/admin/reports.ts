@@ -66,11 +66,14 @@ export const REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION = {
 
 export const PDF_FILES_SECTION_VALIDATION = {
     title: {
-        max: 100,
+        min: 2,
+        max: 30,
     },
     description: {
-        max: 500,
+        min: 2,
+        max: 160,
     },
+    page_size: 4,
 };
 
 export const PDF_FILES_SECTION_TEXT = {
@@ -96,6 +99,7 @@ export const PDF_FILES_SECTION_TEXT = {
             DELETE: 'Видалити',
             DOWNLOAD: 'Завантажити',
         },
+        NO_FILES: 'PDF файли відсутні',
     },
 };
 

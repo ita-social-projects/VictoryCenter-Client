@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { TOOLBAR_TABS, ReportsPageToolbar } from './ReportsPageToolbar';
+import { ReportsPageToolbar, REPORTS_TOOLBAR_TABS } from './ReportsPageToolbar';
 import { REPORTS_TEXT } from '@/const/admin/reports';
 
 jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
@@ -29,16 +29,16 @@ describe('ReportsPageToolbar', () => {
     const mockOnEdit = jest.fn();
     const mockOnCancel = jest.fn();
     const mockOnPublish = jest.fn();
-    const mockOnTabChange = jest.fn();
 
     const defaultProps = {
+        selectedTab: REPORTS_TOOLBAR_TABS[0],
+        onTabSelect: jest.fn(),
         isEditing: false,
         isPublishDisabled: false,
         onEdit: mockOnEdit,
+        onEditReportAnalytics: jest.fn(),
         onCancel: mockOnCancel,
         onPublish: mockOnPublish,
-        selectedTab: TOOLBAR_TABS[0],
-        onTabChange: mockOnTabChange,
     };
 
     const renderComponent = (overrideProps: Partial<typeof defaultProps> = {}) =>
@@ -64,14 +64,14 @@ describe('ReportsPageToolbar', () => {
             expect(firstTab).toHaveClass('selected');
         });
 
-        it('should call onTabChange with the clicked tab', () => {
-            renderComponent();
+        it('should switch tab on click', () => {
+            const mockOnTabSelect = jest.fn();
+            renderComponent({ onTabSelect: mockOnTabSelect });
 
             const secondTab = screen.getByTestId('tab-report-analytics');
             fireEvent.click(secondTab);
 
-            expect(mockOnTabChange).toHaveBeenCalledWith(TOOLBAR_TABS[1]);
-            expect(mockOnTabChange).toHaveBeenCalledTimes(1);
+            expect(mockOnTabSelect).toHaveBeenCalledWith(REPORTS_TOOLBAR_TABS[1]);
         });
     });
 
@@ -178,6 +178,23 @@ describe('ReportsPageToolbar', () => {
             fireEvent.click(publishButton);
 
             expect(mockOnPublish).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('Report analytics tab', () => {
+        it('should render only Edit Page button when on report-analytics tab (no Cancel/Publish)', () => {
+            const mockOnEditReportAnalytics = jest.fn();
+            renderComponent({
+                selectedTab: REPORTS_TOOLBAR_TABS[1],
+                onEditReportAnalytics: mockOnEditReportAnalytics,
+            });
+
+            expect(screen.getByText(REPORTS_TEXT.BUTTON.EDIT_PAGE)).toBeInTheDocument();
+            expect(screen.queryByText(REPORTS_TEXT.BUTTON.CANCEL)).not.toBeInTheDocument();
+            expect(screen.queryByText(REPORTS_TEXT.BUTTON.PUBLISH)).not.toBeInTheDocument();
+
+            fireEvent.click(screen.getByText(REPORTS_TEXT.BUTTON.EDIT_PAGE));
+            expect(mockOnEditReportAnalytics).toHaveBeenCalledTimes(1);
         });
     });
 });

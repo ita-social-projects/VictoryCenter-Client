@@ -27,9 +27,7 @@
     display: inline-block;
 }
 
-.category-bar.report-category-bar
-.category-bar-button-selected
-.category-bar-button-text::after {
+.category-bar.report-category-bar .category-bar-button-selected .category-bar-button-text::after {
     content: '';
     position: absolute;
     left: 0;

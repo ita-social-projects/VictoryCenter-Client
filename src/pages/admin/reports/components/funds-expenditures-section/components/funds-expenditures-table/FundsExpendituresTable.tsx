@@ -3,8 +3,8 @@ import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
 import { FundsExpendituresTransactionType, ReportFundsExpendituresRecord } from '@/types/admin/reports';
 import { ReactComponent as ChevronUp } from '@/assets/icons/chevron-up.svg';
 import { ReactComponent as ChevronDown } from '@/assets/icons/chevron-down.svg';
-import emptyStateImage from '@/assets/images/admin/reports/empty-records-state.png';
-import classNames from 'classnames';
+import { ReactComponent as NotFoundIcon } from '@/assets/icons/not-found.svg';
+import cn from 'classnames';
 import styles from './FundsExpendituresTable.module.scss';
 
 export interface EnrichedRecord extends ReportFundsExpendituresRecord {
@@ -61,9 +61,9 @@ const SortIcon = ({ column, sort }: { column: SortableColumn; sort: ColumnSort }
         );
     }
     return sort.direction === 'asc' ? (
-        <ChevronUp className={classNames(styles.sortIcon, styles.sortIconActive)} />
+        <ChevronUp className={cn(styles.sortIcon, styles.sortIconActive)} />
     ) : (
-        <ChevronDown className={classNames(styles.sortIcon, styles.sortIconActive)} />
+        <ChevronDown className={cn(styles.sortIcon, styles.sortIconActive)} />
     );
 };
 
@@ -86,28 +86,25 @@ export const FundsExpendituresTable = ({ records }: FundsExpendituresTableProps)
                 <thead>
                     <tr>
                         <th className={styles.th}>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.REPORTING_YEAR}</th>
-                        <th className={classNames(styles.th, styles.sortable)} onClick={() => handleSort('type')}>
+                        <th className={cn(styles.th, styles.sortable)} onClick={() => handleSort('type')}>
                             <span className={styles.thInner}>
                                 <span>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.TYPE}</span>
                                 <SortIcon column="type" sort={sort} />
                             </span>
                         </th>
-                        <th
-                            className={classNames(styles.th, styles.sortable)}
-                            onClick={() => handleSort('categoryName')}
-                        >
+                        <th className={cn(styles.th, styles.sortable)} onClick={() => handleSort('categoryName')}>
                             <span className={styles.thInner}>
                                 <span>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.CATEGORY}</span>
                                 <SortIcon column="categoryName" sort={sort} />
                             </span>
                         </th>
-                        <th className={classNames(styles.th, styles.sortable)} onClick={() => handleSort('amountUah')}>
+                        <th className={cn(styles.th, styles.sortable)} onClick={() => handleSort('amountUah')}>
                             <span className={styles.thInner}>
                                 <span>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.AMOUNT_UAH}</span>
                                 <SortIcon column="amountUah" sort={sort} />
                             </span>
                         </th>
-                        <th className={classNames(styles.th, styles.sortable)} onClick={() => handleSort('amountUsd')}>
+                        <th className={cn(styles.th, styles.sortable)} onClick={() => handleSort('amountUsd')}>
                             <span className={styles.thInner}>
                                 <span>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.AMOUNT_USD}</span>
                                 <SortIcon column="amountUsd" sort={sort} />
@@ -120,11 +117,7 @@ export const FundsExpendituresTable = ({ records }: FundsExpendituresTableProps)
                         <tr>
                             <td colSpan={5} className={styles.emptyCell}>
                                 <div className={styles.emptyState}>
-                                    <img
-                                        src={emptyStateImage}
-                                        alt={FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.ALT_TEXT}
-                                        className={styles.emptyStateImage}
-                                    />
+                                    <NotFoundIcon className={styles.emptyStateImage} />
                                     <p className={styles.emptyStateMessage}>
                                         {FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.MESSAGE}
                                     </p>
@@ -137,7 +130,7 @@ export const FundsExpendituresTable = ({ records }: FundsExpendituresTableProps)
                                 <td className={styles.td}>{record.reportingYear}</td>
                                 <td className={styles.td}>
                                     <span
-                                        className={classNames(styles.typeChip, {
+                                        className={cn(styles.typeChip, {
                                             [styles.typeChipIncome]: record.type === 'income',
                                             [styles.typeChipExpense]: record.type === 'expense',
                                         })}

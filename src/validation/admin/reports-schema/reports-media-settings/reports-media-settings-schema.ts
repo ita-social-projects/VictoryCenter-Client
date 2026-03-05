@@ -48,7 +48,7 @@ const changedLivesSchema = Yup.object({
     changedLives: Yup.number()
         .required(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED)
         .integer(REPORTS_TEXT.MESSAGE.INVALID_VALUE)
-        .min(0, COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(0))
+        .min(2, COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(2))
         .max(
             REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.changedLives.max,
             COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(

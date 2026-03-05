@@ -1,8 +1,6 @@
 import cn from 'classnames';
-import { useLocale } from '@/hooks/common/use-locale/useLocale';
 import styles from './LanguageSwitcherButtons.module.scss';
 import { useState } from 'react';
-import { changeLanguage } from 'i18next';
 
 interface LanguageSwitcherButtonsProps {
     className?: string;
@@ -14,7 +12,6 @@ const LANGUAGE_LABELS: Record<string, string> = {
 };
 
 export const LanguageSwitcherButtons = ({ className }: LanguageSwitcherButtonsProps) => {
-    //const { currentLanguage, changeLanguage } = useLocale();
     const [currentLanguage, setCurrentLanguage] = useState<'uk' | 'en'>('uk');
     const handleClick = (lang: 'uk' | 'en') => {
         setCurrentLanguage(lang);

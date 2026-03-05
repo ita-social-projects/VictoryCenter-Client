@@ -83,6 +83,12 @@ export const API_ROUTES = {
             CATEGORIES: 'ReportFundsExpendituresCategories',
         },
     },
+    PDF_SECTION: {
+        BASE: 'PdfSection',
+    },
+    PDF_REPORTS: {
+        BASE: 'PdfReports',
+    },
     FAQ_LOCALIZATIONS: {
         BASE: 'FaqQuestionLocalizations',
     },

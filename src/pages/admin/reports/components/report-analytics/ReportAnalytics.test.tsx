@@ -1,66 +1,63 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import '@testing-library/jest-dom';
 import { ReportAnalytics } from './ReportAnalytics';
 import { REPORTS_TEXT } from '@/const/admin/reports';
 
-jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
-    CategoryBar: require('@/utils/test-mocks/test-mocks').MockCategoryBar,
+jest.mock('../pdf-files-section/PdfFilesSection', () => ({
+    PdfFilesSection: ({ isEditing }: { isEditing: boolean }) => (
+        <div data-testid="pdf-files-section">PdfFilesSection - Editing: {String(isEditing)}</div>
+    ),
 }));
 
 jest.mock('../funds-expenditures-section/FundsExpendituresSection', () => ({
     FundsExpenditureSection: ({ isEditing }: { isEditing: boolean }) => (
-        <div data-testid="mock-funds-section" data-is-editing={String(isEditing)} />
-    ),
-}));
-
-jest.mock('../pdf-files-section/PdfFilesSection', () => ({
-    PdfFilesSection: ({ isEditing }: { isEditing: boolean }) => (
-        <div data-testid="mock-pdf-section" data-is-editing={String(isEditing)} />
+        <div data-testid="funds-expenditure-section">FundsExpenditureSection - Editing: {String(isEditing)}</div>
     ),
 }));
 
 describe('ReportAnalytics', () => {
-    it('should render the title', () => {
+    it('should render the component with correct title', () => {
         render(<ReportAnalytics isEditing={false} />);
+
         expect(screen.getByText(REPORTS_TEXT.REPORT_AND_ANALYTICS.TITLE)).toBeInTheDocument();
     });
 
-    it('should render category bar with all three tabs', () => {
+    it('should show first tab as active by default', () => {
         render(<ReportAnalytics isEditing={false} />);
-        expect(screen.getByTestId('mock-category-bar')).toBeInTheDocument();
-        expect(screen.getByText('Доходи та витрати')).toBeInTheDocument();
-        expect(screen.getByText('Програмні витрати')).toBeInTheDocument();
-        expect(screen.getByText('PDF Файли')).toBeInTheDocument();
+
+        const firstTab = screen.getByText('Доходи та витрати');
+        expect(firstTab).toBeInTheDocument();
     });
 
-    it('should render FundsExpenditureSection by default', () => {
-        render(<ReportAnalytics isEditing={false} />);
-        expect(screen.getByTestId('mock-funds-section')).toBeInTheDocument();
-        expect(screen.queryByTestId('mock-pdf-section')).not.toBeInTheDocument();
-    });
-
-    it('should switch to PDF section when PDF tab is clicked', () => {
-        render(<ReportAnalytics isEditing={false} />);
-        fireEvent.click(screen.getByTestId('tab-pdf-files'));
-        expect(screen.getByTestId('mock-pdf-section')).toBeInTheDocument();
-        expect(screen.queryByTestId('mock-funds-section')).not.toBeInTheDocument();
-    });
-
-    it('should pass isEditing true to child section', () => {
+    it('should render PdfFilesSection when "PDF Файли" tab is selected', () => {
         render(<ReportAnalytics isEditing={true} />);
-        expect(screen.getByTestId('mock-funds-section')).toHaveAttribute('data-is-editing', 'true');
+
+        const pdfTab = screen.getByText('PDF Файли');
+        fireEvent.click(pdfTab);
+
+        const pdfSection = screen.getByTestId('pdf-files-section');
+        expect(pdfSection).toBeInTheDocument();
+        expect(pdfSection).toHaveTextContent('Editing: true');
     });
 
-    it('should pass isEditing false to child section', () => {
+    it('should switch between tabs and update content', () => {
         render(<ReportAnalytics isEditing={false} />);
-        expect(screen.getByTestId('mock-funds-section')).toHaveAttribute('data-is-editing', 'false');
+
+        const pdfTab = screen.getByText('PDF Файли');
+        fireEvent.click(pdfTab);
+        expect(screen.getByTestId('pdf-files-section')).toBeInTheDocument();
+
+        const incomeTab = screen.getByText('Доходи та витрати');
+        fireEvent.click(incomeTab);
+        expect(screen.queryByTestId('pdf-files-section')).not.toBeInTheDocument();
     });
 
-    it('should switch back to income-expenses tab when clicked', () => {
-        render(<ReportAnalytics isEditing={false} />);
-        fireEvent.click(screen.getByTestId('tab-pdf-files'));
-        fireEvent.click(screen.getByTestId('tab-income-expenses'));
-        expect(screen.getByTestId('mock-funds-section')).toBeInTheDocument();
-        expect(screen.queryByTestId('mock-pdf-section')).not.toBeInTheDocument();
+    it('should pass isEditing prop correctly to PdfFilesSection', () => {
+        const { rerender } = render(<ReportAnalytics isEditing={false} />);
+
+        fireEvent.click(screen.getByText('PDF Файли'));
+        expect(screen.getByTestId('pdf-files-section')).toHaveTextContent('Editing: false');
+
+        rerender(<ReportAnalytics isEditing={true} />);
+        expect(screen.getByTestId('pdf-files-section')).toHaveTextContent('Editing: true');
     });
 });

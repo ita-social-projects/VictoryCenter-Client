@@ -28,7 +28,7 @@ const TYPE_LABEL_MAP: Record<FundsExpendituresTransactionType, string> = {
     expense: FUNDS_EXPENDITURES_TEXT.TABLE.TYPE_LABELS.EXPENSE,
 };
 
-const parseAmount = (value: string): number => parseFloat(value.replace(/\s/g, '')) || 0;
+const parseAmount = (value: string): number => Number.parseFloat(value.replaceAll(' ', '')) || 0;
 
 const sortRecords = (records: EnrichedRecord[], sort: ColumnSort): EnrichedRecord[] => {
     if (!sort.column || !sort.direction) return records;

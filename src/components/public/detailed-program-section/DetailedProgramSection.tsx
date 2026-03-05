@@ -51,6 +51,11 @@ export const DetailedProgramSection: React.FC<DetailedProgramSectionProps> = ({ 
 
     const descriptions = orderedDescriptionContents.map((d) => d.description || '');
 
+    const faqQuestions = section.contents
+        .filter((c) => c.contentType === ContentType.FaqQuestion && c.faqQuestion != null)
+        .sort((a, b) => a.order - b.order)
+        .map((c) => c.faqQuestion!);
+
     const renderedSection = renderProgramSection({
         templateId: section.template,
         data: {
@@ -60,6 +65,7 @@ export const DetailedProgramSection: React.FC<DetailedProgramSectionProps> = ({ 
             images: imageContents,
             cards,
             descriptionAuthorPairs,
+            faqQuestions,
         },
         mode: ProgramSectionMode.View,
     });

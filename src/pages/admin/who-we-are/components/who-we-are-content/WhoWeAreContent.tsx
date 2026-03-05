@@ -17,6 +17,7 @@ import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import classNames from 'classnames';
 import { WhoWeArePageToolbar } from '../who-we-are-page-toolbar/WhoWeArePageToolbar';
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
+import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
 
 interface ErrorState {
     message: string | null;
@@ -127,11 +128,13 @@ export const WhoWeAreContent = () => {
                 setUpdatedSection(result);
                 setIsPublishButtonActive(false);
                 addToast(COMMON_TEXT_ADMIN.MESSAGE.SUCCESSFULLY_PUBLISHED, ToastType.Info);
+
+                refetchCategories();
             } catch (error) {
                 addToast(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_PUBLISH_CHANGES, ToastType.Error);
             }
         }
-    }, [selectedSection, updatedSection, client, selectedCategory, addToast]);
+    }, [selectedSection, updatedSection, client, selectedCategory, addToast, refetchCategories]);
 
     const handleConfirmPublish = useCallback(() => {
         setConfirmationModalOpen(false);
@@ -157,9 +160,10 @@ export const WhoWeAreContent = () => {
         }
     }, []);
 
-    const { allLanguages, selectedLanguage, onLanguageChange, retryFetchLanguages } = useLocalizationToolkit({
-        setErrorState,
-    });
+    const { allLanguages, translationLanguages, selectedLanguage, onLanguageChange, retryFetchLanguages } =
+        useLocalizationToolkit({
+            setErrorState,
+        });
 
     const handleRetry = useCallback(() => {
         if (error.type === 'categories') {
@@ -221,6 +225,9 @@ export const WhoWeAreContent = () => {
                         getCategoryDisplayName={(category) => category.title}
                         getCategoryKey={(category) => category.id}
                         onCategorySelect={handleCategorySelect}
+                        renderCategoryExtra={(category) => (
+                            <LocalizationStatuses languages={translationLanguages} localizedEntity={category} />
+                        )}
                     />
                     {renderContent()}
                 </div>

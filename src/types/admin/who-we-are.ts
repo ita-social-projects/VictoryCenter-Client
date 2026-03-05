@@ -6,9 +6,10 @@ import {
     EntityLocalizationDto,
     EntityWithDtoLocalizations,
     EntityWithLocalizations,
+    EntityWithTranslationStatuses,
 } from '../common/language';
 
-export type WhoWeAreCategory = {
+export type WhoWeAreCategory = EntityWithTranslationStatuses & {
     id: number;
     sectionType: SectionType;
     title: string;

@@ -112,8 +112,8 @@ jest.mock('@/components/admin/toast/toast-container/ToastContainer', () => ({
 }));
 
 const mockCategories: WhoWeAreCategory[] = [
-    { id: 1, title: 'Main', sectionType: SectionType.Main },
-    { id: 2, title: 'People', sectionType: SectionType.People },
+    { id: 1, title: 'Main', sectionType: SectionType.Main, translationStatuses: [] },
+    { id: 2, title: 'People', sectionType: SectionType.People, translationStatuses: [] },
 ];
 
 const mockSection1: WhoWeAreSection = {
@@ -273,6 +273,10 @@ describe('WhoWeAreContent Component', () => {
 
         await waitFor(() => {
             expect(mockAddToast).toHaveBeenCalledWith(COMMON_TEXT_ADMIN.MESSAGE.SUCCESSFULLY_PUBLISHED, ToastType.Info);
+        });
+
+        await waitFor(() => {
+            expect(mockedWhoWeAreApi.getPreviews).toHaveBeenCalledTimes(2);
         });
 
         await waitFor(() => {

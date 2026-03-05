@@ -23,7 +23,7 @@ describe('SummaryCard', () => {
             render(<SummaryCard title="Зібрано коштів" uah={7265} usd={4200} />);
             const uahElements = screen.getAllByText(
                 (text) =>
-                    text.replace(/\s/g, ' ').includes('7') &&
+                    text.replaceAll('\u00A0', ' ').includes('7') &&
                     text.includes(FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.AMOUNT_SUFFIX_UAH),
             );
             expect(uahElements.length).toBeGreaterThan(0);
@@ -33,7 +33,7 @@ describe('SummaryCard', () => {
             render(<SummaryCard title="Зібрано коштів" uah={7265} usd={4200} />);
             const usdElements = screen.getAllByText(
                 (text) =>
-                    text.replace(/\s/g, ' ').includes('4') &&
+                    text.replaceAll('\u00A0', ' ').includes('4') &&
                     text.includes(FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.AMOUNT_SUFFIX_USD),
             );
             expect(usdElements.length).toBeGreaterThan(0);

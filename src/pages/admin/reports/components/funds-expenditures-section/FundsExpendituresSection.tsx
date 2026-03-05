@@ -26,7 +26,7 @@ const computeSummary = (records: ReportFundsExpendituresRecord[]): FundsExpendit
     const incomeRecords = records.filter((r) => r.type === 'income');
     const expenseRecords = records.filter((r) => r.type === 'expense');
 
-    const parseAmount = (val: string) => parseFloat(val.replace(/\s/g, '')) || 0;
+    const parseAmount = (val: string) => Number.parseFloat(val.replaceAll(' ', '')) || 0;
 
     return {
         totalCollectedUah: incomeRecords.reduce((sum, r) => sum + parseAmount(r.amountUah), 0),

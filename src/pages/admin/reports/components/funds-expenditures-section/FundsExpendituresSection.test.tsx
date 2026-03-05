@@ -47,9 +47,9 @@ jest.mock('./components/summary-card/SummaryCard', () => ({
     }) => (
         <div data-testid="summary-card" data-blue={blueTheme} data-title={title}>
             <span>{title}</span>
-            {count !== undefined ? <span data-testid="count">{count}</span> : null}
-            {uah !== undefined ? <span data-testid="uah">{uah}</span> : null}
-            {usd !== undefined ? <span data-testid="usd">{usd}</span> : null}
+            {count !== undefined && <span data-testid="count">{count}</span>}
+            {uah !== undefined && <span data-testid="uah">{uah}</span>}
+            {usd !== undefined && <span data-testid="usd">{usd}</span>}
         </div>
     ),
 }));
@@ -64,14 +64,14 @@ jest.mock('./components/funds-expenditures-toolbar/FundsExpendituresToolbar', ()
     }: {
         categories: { id: number; name: string }[];
         selectedType: unknown;
-        selectedCategoryId: unknown;
+        selectedCategoryId: number | null | undefined;
         exchangeRate: string | null;
         onTypeChange: (v: unknown) => void;
         onCategoryChange: (v: unknown) => void;
     }) => (
         <div data-testid="funds-toolbar" data-category-count={categories.length}>
             <span data-testid="exchange-rate">{exchangeRate}</span>
-            <span data-testid="selected-category-id">{String(selectedCategoryId ?? 'none')}</span>
+            <span data-testid="selected-category-id">{selectedCategoryId ?? 'none'}</span>
             <button onClick={() => onTypeChange(undefined)} data-testid="filter-all">
                 Filter All
             </button>
@@ -102,9 +102,9 @@ const setupMockDataFetch = (
     let callIndex = 0;
     mockUseDataFetch.mockImplementation(({ initialData }: { initialData: unknown }) => {
         const callOrder = callIndex++;
-        // 0 = settings, 1 = categories, 2 = records (repeats each render cycle)
         const slot = callOrder % 3;
-        const data = slot === 0 ? settings : slot === 1 ? categories : records;
+        const slotDataMap: Record<number, unknown> = { 0: settings, 1: categories, 2: records };
+        const data = slotDataMap[slot];
         return { data: data ?? initialData, isLoading: false, error: null, refetch: jest.fn() };
     });
 };

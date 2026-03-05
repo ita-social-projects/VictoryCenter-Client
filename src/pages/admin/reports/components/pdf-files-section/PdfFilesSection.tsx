@@ -6,7 +6,7 @@ import { LanguageSwitcherButtons } from './components/language-switcher-buttons/
 import { PdfSectionApi } from '@/services/api/admin/reports/pdf-section/pdf-section-api';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { PdfReportDto } from '@/types/admin/pdf-section';
-import { PdfReportsApi } from '@/services/api/admin/reports/pdf-reports/pdf-reports';
+import { PdfReportsApi } from '@/services/api/admin/reports/pdf-reports/pdf-reports-api';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 

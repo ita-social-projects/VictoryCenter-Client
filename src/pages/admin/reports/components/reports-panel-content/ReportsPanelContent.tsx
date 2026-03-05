@@ -69,8 +69,9 @@ export const ReportsPanelContent = () => {
                         resetCounter={resetCounter}
                         onDirtyChange={handleDirtyChange}
                     />
-                ) :
-                <ReportAnalytics isEditing={isEditing} />}
+                ) : (
+                    <ReportAnalytics isEditing={isEditing} />
+                )}
             </div>
 
             <ToastContainer />

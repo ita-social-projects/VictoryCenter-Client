@@ -1,4 +1,4 @@
-@use '@/assets/sass/variables/colors' as c; 
+@use '@/assets/sass/variables/colors' as c;
 
 .table-container {
     overflow-x: auto;
@@ -70,7 +70,7 @@
     align-items: center;
 }
 
-.icon-button{
+.icon-button {
     cursor: pointer;
     color: c.$blue-500;
     &:hover {
@@ -92,9 +92,9 @@
 
 .empty-container {
     display: flex;
-    justify-content: center;  
-    align-items: center;      
-    gap: 20px;                
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
     width: 100%;
     height: 100%;
     padding: 10px 0;

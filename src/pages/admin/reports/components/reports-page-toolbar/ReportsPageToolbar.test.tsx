@@ -42,7 +42,6 @@ describe('ReportsPageToolbar', () => {
     const mockOnEdit = jest.fn();
     const mockOnCancel = jest.fn();
     const mockOnPublish = jest.fn();
-    const mockOnTabChange = jest.fn();
 
     const defaultProps = {
         selectedTab: REPORTS_TOOLBAR_TABS[0],

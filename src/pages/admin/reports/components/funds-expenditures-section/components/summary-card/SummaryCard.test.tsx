@@ -6,6 +6,7 @@ import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
 jest.mock('./SummaryCard.module.scss', () => ({
     card: 'card',
     cardBlue: 'cardBlue',
+    cardCount: 'cardCount',
     title: 'title',
     amounts: 'amounts',
     amount: 'amount',

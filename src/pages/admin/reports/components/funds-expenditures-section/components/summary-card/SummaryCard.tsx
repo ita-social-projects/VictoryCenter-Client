@@ -14,7 +14,7 @@ export const SummaryCard = ({ title, uah, usd, count, blueThemeCard = false }: S
     const isCountCard = count !== undefined;
 
     return (
-        <div className={cn(styles.card, { [styles.cardBlue]: blueThemeCard })}>
+        <div className={cn(styles.card, { [styles.cardBlue]: blueThemeCard, [styles.cardCount]: isCountCard })}>
             <span className={styles.title}>{title}</span>
             {isCountCard ? (
                 <span className={styles.value}>

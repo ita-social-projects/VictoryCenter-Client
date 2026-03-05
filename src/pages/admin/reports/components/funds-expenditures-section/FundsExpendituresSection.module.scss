@@ -4,6 +4,7 @@
     display: flex;
     flex-direction: column;
     gap: 40px;
+    padding: 0 50px;
 }
 
 .disclaimer {
@@ -11,7 +12,7 @@
     background-color: c.$white;
     border: 1px solid c.$grey-500;
     border-radius: 16px;
-    box-shadow: 0 24px 48px -12px rgba(17, 17, 19, 0.2);
+    box-shadow: 0 11px 18px rgba(c.$bluish-black, 0.19);
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -40,6 +41,6 @@
 
 .summaryCards {
     display: flex;
-    gap: 16px;
+    gap: 83px;
     flex-wrap: wrap;
 }

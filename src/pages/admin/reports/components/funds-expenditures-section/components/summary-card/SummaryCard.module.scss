@@ -3,14 +3,21 @@
 .card {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: space-between;
     min-width: 200px;
+    min-height: 163px;
     flex: 1;
     padding: 20px;
     background-color: c.$white;
     border-radius: 16px;
-    box-shadow: 0 24px 48px -12px rgba(17, 17, 19, 0.2);
+    box-shadow: 0 11px 18px rgba(c.$bluish-black, 0.19);
     gap: 20px;
+}
+
+.cardCount {
+    padding: 24px 20px;
+    gap: 27px;
+    flex: 1.2;
 }
 
 .cardBlue {

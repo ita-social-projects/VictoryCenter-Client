@@ -170,6 +170,8 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
                 setChangedLivesValues(changedLives);
                 setChangedLivesErrors(INITIAL_BLOCK_ERRORS);
 
+                await refetch();
+
                 addToast(COMMON_TEXT_ADMIN.MESSAGE.SUCCESSFULLY_PUBLISHED, ToastType.Success);
                 return true;
             } catch (error: any) {
@@ -179,7 +181,7 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
                 addToast(REPORTS_TEXT.MESSAGE.FAIL_TO_UPDATE_REPORT, ToastType.Error);
                 return false;
             }
-        }, [addToast, client, collectedFundsValues, changedLivesValues]);
+        }, [addToast, client, collectedFundsValues, changedLivesValues, refetch]);
 
         useImperativeHandle(ref, () => ({ submit: handlePublish }));
 

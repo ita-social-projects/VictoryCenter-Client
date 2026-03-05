@@ -107,14 +107,14 @@ describe('reports-media-settings-schema', () => {
                 expect(result).toBeUndefined();
             });
 
-            it('should return undefined for zero', () => {
+            it('should return error for less than 2', () => {
                 const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateChangedLives(0);
-                expect(result).toBeUndefined();
+                expect(result).toBe(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(2));
             });
 
             it('should return error for negative number', () => {
                 const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateChangedLives(-1);
-                expect(result).toBe(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(0));
+                expect(result).toBe(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(2));
             });
 
             it('should return error for non-integer number', () => {

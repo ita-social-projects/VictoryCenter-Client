@@ -8,6 +8,7 @@ import { TextCard } from './text-card/TextCard';
 import { QuoteSection } from './quote/QuoteSection';
 import quote1DefaultImg from '@/assets/images/public/hippotherapy/quote_1.jpg';
 import quote2DefaultImg from '@/assets/images/public/hippotherapy/quote_2.jpg';
+import { SloganSection } from './slogan/SloganSection';
 
 export const HippotherapyPage = () => {
     const { t } = useTranslation('hippotherapy');
@@ -26,13 +27,16 @@ export const HippotherapyPage = () => {
                         <TextCard {...data.descriptionSection} />
                     </section>
                     <QuoteSection {...data.quoteSection} imgURL={data.quoteSection.imgURL || quote1DefaultImg} />
+                    <section>
+                        <TextCard {...data.hippoventionSection} />
+                    </section>
+                    <SloganSection />
                     <QuoteSection
                         {...data.anotherQuoteSection}
                         imgURL={data.anotherQuoteSection.imgURL || quote2DefaultImg}
                     />
                 </>
             )}
-            <div style={{ textAlign: 'center', padding: '20px' }}>{t('SLOGAN')}</div>
         </LoadableContent>
     );
 };

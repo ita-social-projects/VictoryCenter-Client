@@ -1,3 +1,7 @@
 {
-    "SLOGAN": "Іповенція ≠ лікування. Це — простір взаємодії"
+    "SLOGAN.FIRST_HIGHLIGHT": "Іповенція",
+    "SLOGAN.FIRST_TEXT": " ≠ лікування.",
+    "SLOGAN.SECOND_TEXT": "Це —",
+    "SLOGAN.SECOND_HIGHLIGHT": "простір ",
+    "SLOGAN.THIRD_HIGHLIGHT": " взаємодії"
 }

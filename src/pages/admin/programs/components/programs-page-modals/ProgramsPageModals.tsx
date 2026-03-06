@@ -1,4 +1,4 @@
-import { HippotherapyProgramDto, ProgramCategory } from '@/types/admin/programs';
+import { HippotherapyProgram, ProgramCategory } from '@/types/admin/programs';
 import { UseModalsStateResult } from '@/hooks/admin/use-modals-state/useModalsState';
 import { ProgramModal } from './program-modal/ProgramModal';
 import { DeleteProgramModal } from './delete-program-modal/DeleteProgramModal';
@@ -7,11 +7,11 @@ import { DeleteCategoryModal } from '../program-category-modals/DeleteCategoryMo
 import { ModalMode } from '@/types/admin/common';
 
 export interface ProgramsPageModalsProps {
-    modalsStateControl: UseModalsStateResult<HippotherapyProgramDto>;
+    modalsStateControl: UseModalsStateResult<HippotherapyProgram>;
     categories: ProgramCategory[];
-    onAddProgram: (addedProgram: HippotherapyProgramDto) => void;
-    onEditProgram: (updatedProgram: HippotherapyProgramDto) => void;
-    onDeleteProgram: (program: HippotherapyProgramDto) => void;
+    onAddProgram: (addedProgram: HippotherapyProgram) => void;
+    onEditProgram: (updatedProgram: HippotherapyProgram) => void;
+    onDeleteProgram: (program: HippotherapyProgram) => void;
     onAddCategory: (newCategory: ProgramCategory) => void;
     onEditCategory: (updatedCategory: ProgramCategory) => void;
     onDeleteCategory: (categoryIdToDelete: number) => void;

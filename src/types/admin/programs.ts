@@ -1,6 +1,12 @@
 import { VisibilityStatus } from './common';
 import { Image, ImageValues } from '../common/image';
 import { HippotherapyProgramSectionDto, CreateHippotherapyProgramSectionDto } from '../common/program-sections';
+import {
+    EntityLocalization,
+    EntityLocalizationDto,
+    EntityWithDtoLocalizations,
+    EntityWithLocalizations,
+} from '../common/language';
 
 export interface ProgramCategory {
     id: number;
@@ -8,7 +14,9 @@ export interface ProgramCategory {
     programsCount: number;
 }
 
-export interface HippotherapyProgramDto {
+export interface HippotherapyProgramDto
+    extends HippotherapyProgramLocalizableFields,
+        EntityWithDtoLocalizations<HippotherapyProgramLocalizationDto> {
     id: number;
     name: string;
     description: string;
@@ -21,6 +29,37 @@ export interface HippotherapyProgramDto {
     meetingsCount: string;
     sections: HippotherapyProgramSectionDto[];
     slug: string;
+}
+export interface HippotherapyProgramLocalizableFields {
+    name: string;
+    description: string;
+    location: string;
+    participantsCount: string;
+    meetingsCount: string;
+}
+
+export interface HippotherapyProgram
+    extends HippotherapyProgramLocalizableFields,
+        EntityWithLocalizations<HippotherapyProgramLocalization> {
+    id: number;
+    name: string;
+    description: string;
+    categories: ProgramCategory[];
+    status: VisibilityStatus;
+    previewImage: Image | ImageValues | null;
+    backgroundImage: Image | ImageValues | null;
+    location: string;
+    participantsCount: string;
+    meetingsCount: string;
+    sections: HippotherapyProgramSectionDto[];
+    slug: string;
+}
+export interface HippotherapyProgramLocalization extends EntityLocalization, HippotherapyProgramLocalizableFields {}
+
+export interface HippotherapyProgramLocalizationDto
+    extends EntityLocalizationDto,
+        HippotherapyProgramLocalizableFields {
+    entityId: number;
 }
 
 export interface ProgramSearchItemData {

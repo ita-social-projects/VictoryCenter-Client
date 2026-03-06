@@ -2,6 +2,7 @@ import React from 'react';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { BaseProgramModalProps, ProgramModal, ProgramModalProps } from './ProgramModal';
 import {
+    HippotherapyProgram,
     HippotherapyProgramDto,
     ProgramCategory,
     CreateHippotherapyProgramDto,
@@ -169,7 +170,7 @@ jest.mock('../../program-form/ProgramForm', () => {
     return { ProgramForm: MockProgramForm };
 });
 
-const mockProgram: HippotherapyProgramDto = {
+const mockProgram: HippotherapyProgram = {
     id: 1,
     name: 'Test Program',
     description: 'Test Description',
@@ -182,6 +183,7 @@ const mockProgram: HippotherapyProgramDto = {
     location: '',
     sections: [],
     slug: 'test-program',
+    localizations: [],
 };
 
 const mockCategories: ProgramCategory[] = [
@@ -189,7 +191,7 @@ const mockCategories: ProgramCategory[] = [
     { id: 2, name: 'Category 2', programsCount: 2 },
 ];
 
-const mockFormData: Partial<HippotherapyProgramDto> = {
+const mockFormData: Partial<HippotherapyProgram> = {
     name: 'Updated Name',
     description: 'Updated Description',
     categories: [mockCategories[0]],
@@ -259,8 +261,16 @@ describe('ProgramModal', () => {
             closeModalActions: { closeAddSectionModal: jest.fn() },
         });
         mockedGetInitialSectionContents.mockReturnValue([]);
-        mockedProgramsApi.addProgram.mockResolvedValue({ ...mockProgram, ...mockFormData });
-        mockedProgramsApi.editProgram.mockResolvedValue({ ...mockProgram, ...mockFormData });
+        mockedProgramsApi.addProgram.mockResolvedValue({
+            ...mockProgram,
+            ...mockFormData,
+            localizations: [],
+        } as HippotherapyProgramDto);
+        mockedProgramsApi.editProgram.mockResolvedValue({
+            ...mockProgram,
+            ...mockFormData,
+            localizations: [],
+        } as HippotherapyProgramDto);
     });
 
     describe('Section template + unsaved-section flows', () => {

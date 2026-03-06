@@ -42,7 +42,7 @@ export interface HippotherapyProgramSectionContentDto {
     id?: number;
     sectionId?: number;
     contentType: ContentType;
-    order: number; //
+    order: number;
     groupIndex?: number | null;
     title?: string | null;
     description?: string | null;

@@ -16,8 +16,7 @@
     }
 
     @media (min-width: 1440px) {
-        width: clamp(100px, 1200px, 1200px);
-        padding: 80px 60px;
+        padding: 80px 56px;
     }
 }
 
@@ -27,23 +26,23 @@
     flex-direction: column;
     border-top: 2px solid c.$light-blue-100;
     padding-top: 24px;
-    gap: 24px;
+    gap: 16px;
 
     @media (min-width: 1440px) {
         flex-direction: row;
         justify-content: space-between;
-        gap: 10px;
     }
 }
 
 .title {
-    @include type.h3-bold;
+    @include type.h4-bold-uppercase;
     text-transform: uppercase;
     color: c.$blue-900;
     word-wrap: break-word;
 
     @media (min-width: 1440px) {
         flex: 0 0 41%;
+        @include type.h3-bold-uppercase;
     }
 }
 
@@ -60,5 +59,4 @@
 .faq-card-program-section {
     border-bottom-color: c.$light-blue-100;
     width: 100%;
-    max-width: 48rem;
 }

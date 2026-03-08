@@ -1,6 +1,7 @@
 @use '@/assets/sass/variables/colors';
-@use '@/assets/sass/variables/fonts';
 @use '@/assets/sass/variables/z-index';
+@use '@/assets/sass/mixins/typography.mixins' as type;
+@use '@/assets/sass/variables/typography' as t;
 
 * {
     margin: 0;
@@ -8,36 +9,27 @@
 }
 
 .intro-section {
-    padding-top: 64px;
-    padding-bottom: 48px;
-    padding-left: 16px;
-    padding-right: 16px;
+    padding: 64px 16px 48px;
     display: flex;
     flex-direction: column;
     gap: 48px;
     justify-content: center;
     align-items: center;
     overflow-x: hidden;
+    font-family: t.$font-family-base;
 
     @media (min-width: 768px) {
-        padding-top: 96px;
-        padding-bottom: 80px;
-        padding-left: 32px;
-        padding-right: 32px;
+        padding: 96px 32px 80px;
         gap: 80px;
     }
 
     @media (min-width: 1024px) {
-        padding-top: 128px;
-        padding-bottom: 104px;
-        padding-left: 56px;
-        padding-right: 56px;
+        padding: 128px 56px 104px;
         gap: 104px;
     }
 
     @media (min-width: 1440px) {
-        padding-top: 168px;
-        padding-bottom: 142px;
+        padding: 168px 56px 142px;
         gap: 132px;
     }
 
@@ -45,7 +37,6 @@
         max-width: 1102px;
         width: 100%;
         height: auto;
-        font-family: fonts.$mulish-regular-font;
         font-weight: 500;
         font-size: 40px;
         line-height: 48px;
@@ -75,7 +66,6 @@
     }
 
     span {
-        font-family: fonts.$mulish-regular-font;
         font-weight: 800;
         font-style: italic;
         font-size: 40px;
@@ -170,16 +160,12 @@
     }
 
     .additional-info {
+        @include type.body-2-medium;
         display: flex;
         flex-direction: column;
         gap: 24px;
         justify-content: center;
         align-items: center;
-        font-family: fonts.$mulish-regular-font;
-        font-weight: 500;
-        font-size: 16px;
-        line-height: 24px;
-        letter-spacing: -0.02em;
         vertical-align: middle;
         width: 100%;
         max-width: 100%;
@@ -216,134 +202,6 @@
             @media (min-width: 1024px) {
                 max-width: 432px;
             }
-        }
-    }
-}
-
-@media (min-width: 768px) {
-    .intro-section {
-        padding-top: 96px;
-        padding-bottom: 80px;
-        padding-left: 32px;
-        padding-right: 32px;
-        gap: 80px;
-
-        h1 {
-            font-size: 56px;
-            line-height: 68px;
-        }
-
-        span {
-            font-size: 56px;
-            line-height: 68px;
-        }
-
-        span:nth-child(2):before {
-            height: 68px;
-        }
-
-        span:nth-child(3):before {
-            height: 68px;
-        }
-
-        .additional-info {
-            font-size: 18px;
-            line-height: 26px;
-            gap: 16px;
-        }
-    }
-}
-
-@media (min-width: 1024px) {
-    .intro-section {
-        padding-top: 128px;
-        padding-bottom: 104px;
-        padding-left: 56px;
-        padding-right: 56px;
-        gap: 104px;
-
-        h1 {
-            font-size: 64px;
-            line-height: 76px;
-        }
-
-        span {
-            font-size: 64px;
-            line-height: 76px;
-        }
-
-        span:nth-child(2):before {
-            height: 76px;
-        }
-
-        span:nth-child(3):before {
-            height: 76px;
-        }
-
-        .additional-info {
-            flex-direction: row;
-            font-size: 20px;
-            line-height: 28px;
-
-            p {
-                text-align: left;
-            }
-
-            p:nth-child(1) {
-                max-width: 430px;
-            }
-
-            p:nth-child(2) {
-                max-width: 432px;
-            }
-        }
-    }
-}
-
-@media (min-width: 1280px) {
-    .intro-section {
-        h1 {
-            font-size: 80px;
-            line-height: 94px;
-        }
-
-        span {
-            font-size: 80px;
-            line-height: 94px;
-        }
-
-        span:nth-child(2):before {
-            height: 94px;
-        }
-
-        span:nth-child(3):before {
-            height: 94px;
-        }
-    }
-}
-
-@media (min-width: 1440px) {
-    .intro-section {
-        padding-top: 168px;
-        padding-bottom: 142px;
-        gap: 132px;
-
-        h1 {
-            font-size: 96px;
-            line-height: 112px;
-        }
-
-        span {
-            font-size: 96px;
-            line-height: 112px;
-        }
-
-        span:nth-child(2):before {
-            height: 112px;
-        }
-
-        span:nth-child(3):before {
-            height: 112px;
         }
     }
 }

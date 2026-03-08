@@ -1,5 +1,5 @@
 @use '@/assets/sass/variables/colors';
-@use '@/assets/sass/variables/fonts';
+@use '@/assets/sass/mixins/typography.mixins' as type;
 
 .contact-us-block {
     position: relative;
@@ -27,9 +27,7 @@
 
     .contact-us-info {
         margin: 0 auto;
-        padding-top: 60px;
-        padding-left: 16px;
-        padding-right: 16px;
+        padding: 60px 16px 0;
         width: 90%;
         max-width: 1040px;
         position: relative;
@@ -46,13 +44,8 @@
         }
 
         .contact-title {
-            font-family: fonts.$mulish-regular-font;
-            font-weight: 700;
-            font-size: 32px;
-            line-height: 40px;
+            @include type.h4-bold-uppercase;
             letter-spacing: 0;
-            text-align: center;
-            text-transform: uppercase;
             color: white;
             padding-bottom: 96px;
 
@@ -94,11 +87,7 @@
             }
 
             h4 {
-                font-family: fonts.$mulish-regular-font;
-                font-weight: 500;
-                font-size: 16px;
-                line-height: 24px;
-                letter-spacing: -0.02em;
+                @include type.body-2-medium;
                 text-align: center;
                 color: white;
 
@@ -109,17 +98,13 @@
             }
 
             button {
+                @include type.body-2-regular;
                 border: none;
                 width: 130px;
                 height: 40px;
                 gap: 8px;
                 padding: 8px 24px;
                 background: colors.$yellow-500;
-                font-family: fonts.$mulish-regular-font;
-                font-weight: 400;
-                font-size: 16px;
-                line-height: 24px;
-                letter-spacing: -0.02em;
                 vertical-align: middle;
                 color: colors.$blue-900;
                 cursor: pointer;

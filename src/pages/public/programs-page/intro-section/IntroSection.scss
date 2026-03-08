@@ -8,69 +8,69 @@
 }
 
 .intro-section {
-    padding-top: 4rem;
-    padding-bottom: 3rem;
-    padding-left: 1rem;
-    padding-right: 1rem;
+    padding-top: 64px;
+    padding-bottom: 48px;
+    padding-left: 16px;
+    padding-right: 16px;
     display: flex;
     flex-direction: column;
-    gap: 3rem;
+    gap: 48px;
     justify-content: center;
     align-items: center;
     overflow-x: hidden;
 
     @media (min-width: 768px) {
-        padding-top: 6rem;
-        padding-bottom: 5rem;
-        padding-left: 2rem;
-        padding-right: 2rem;
-        gap: 5rem;
+        padding-top: 96px;
+        padding-bottom: 80px;
+        padding-left: 32px;
+        padding-right: 32px;
+        gap: 80px;
     }
 
     @media (min-width: 1024px) {
-        padding-top: 8rem;
-        padding-bottom: 6.5rem;
-        padding-left: 3.5rem;
-        padding-right: 3.5rem;
-        gap: 6.5rem;
+        padding-top: 128px;
+        padding-bottom: 104px;
+        padding-left: 56px;
+        padding-right: 56px;
+        gap: 104px;
     }
 
     @media (min-width: 1440px) {
-        padding-top: 10.5rem;
-        padding-bottom: 8.875rem;
-        gap: 8.25rem;
+        padding-top: 168px;
+        padding-bottom: 142px;
+        gap: 132px;
     }
 
     h1 {
-        max-width: 68.875rem;
+        max-width: 1102px;
         width: 100%;
         height: auto;
         font-family: fonts.$mulish-regular-font;
         font-weight: 500;
-        font-size: 2.5rem;
-        line-height: 3rem;
+        font-size: 40px;
+        line-height: 48px;
         letter-spacing: -0.02em;
         text-align: center;
         text-transform: uppercase;
 
         @media (min-width: 768px) {
-            font-size: 3.5rem;
-            line-height: 4.25rem;
+            font-size: 56px;
+            line-height: 68px;
         }
 
         @media (min-width: 1024px) {
-            font-size: 4rem;
-            line-height: 4.75rem;
+            font-size: 64px;
+            line-height: 76px;
         }
 
         @media (min-width: 1280px) {
-            font-size: 5rem;
-            line-height: 5.875rem;
+            font-size: 80px;
+            line-height: 94px;
         }
 
         @media (min-width: 1440px) {
-            font-size: 6rem;
-            line-height: 7rem;
+            font-size: 96px;
+            line-height: 112px;
         }
     }
 
@@ -78,8 +78,8 @@
         font-family: fonts.$mulish-regular-font;
         font-weight: 800;
         font-style: italic;
-        font-size: 2.5rem;
-        line-height: 3rem;
+        font-size: 40px;
+        line-height: 48px;
         letter-spacing: -0.02em;
         text-align: center;
         text-transform: uppercase;
@@ -88,23 +88,23 @@
         background: antiquewhite;
 
         @media (min-width: 768px) {
-            font-size: 3.5rem;
-            line-height: 4.25rem;
+            font-size: 56px;
+            line-height: 68px;
         }
 
         @media (min-width: 1024px) {
-            font-size: 4rem;
-            line-height: 4.75rem;
+            font-size: 64px;
+            line-height: 76px;
         }
 
         @media (min-width: 1280px) {
-            font-size: 5rem;
-            line-height: 5.875rem;
+            font-size: 80px;
+            line-height: 94px;
         }
 
         @media (min-width: 1440px) {
-            font-size: 6rem;
-            line-height: 7rem;
+            font-size: 96px;
+            line-height: 112px;
         }
     }
 
@@ -116,25 +116,25 @@
     span:nth-child(2):before {
         content: '';
         width: 100vw;
-        height: 3rem;
+        height: 48px;
         background: colors.$yellow-400;
         position: absolute;
         transform: translateX(-100%);
 
         @media (min-width: 768px) {
-            height: 4.25rem;
+            height: 68px;
         }
 
         @media (min-width: 1024px) {
-            height: 4.75rem;
+            height: 76px;
         }
 
         @media (min-width: 1280px) {
-            height: 5.875rem;
+            height: 94px;
         }
 
         @media (min-width: 1440px) {
-            height: 7rem;
+            height: 112px;
         }
     }
 
@@ -147,58 +147,58 @@
     span:nth-child(3):before {
         content: '';
         width: 100vw;
-        height: 3rem;
+        height: 48px;
         background: colors.$light-blue-200;
         position: absolute;
         z-index: z-index.public(programs-page-intro-section-background);
 
         @media (min-width: 768px) {
-            height: 4.25rem;
+            height: 68px;
         }
 
         @media (min-width: 1024px) {
-            height: 4.75rem;
+            height: 76px;
         }
 
         @media (min-width: 1280px) {
-            height: 5.875rem;
+            height: 94px;
         }
 
         @media (min-width: 1440px) {
-            height: 7rem;
+            height: 112px;
         }
     }
 
     .additional-info {
         display: flex;
         flex-direction: column;
-        gap: 1.5rem;
+        gap: 24px;
         justify-content: center;
         align-items: center;
         font-family: fonts.$mulish-regular-font;
         font-weight: 500;
-        font-size: 1rem;
-        line-height: 1.5rem;
+        font-size: 16px;
+        line-height: 24px;
         letter-spacing: -0.02em;
         vertical-align: middle;
         width: 100%;
         max-width: 100%;
 
         @media (min-width: 768px) {
-            font-size: 1.125rem;
-            line-height: 1.625rem;
-            gap: 1rem;
+            font-size: 18px;
+            line-height: 26px;
+            gap: 16px;
         }
 
         @media (min-width: 1024px) {
             flex-direction: row;
-            font-size: 1.25rem;
-            line-height: 1.75rem;
+            font-size: 20px;
+            line-height: 28px;
         }
 
         p {
             width: 100%;
-            max-width: 27rem;
+            max-width: 432px;
             text-align: center;
 
             @media (min-width: 1024px) {
@@ -208,13 +208,13 @@
 
         p:nth-child(1) {
             @media (min-width: 1024px) {
-                max-width: 26.9rem;
+                max-width: 430px;
             }
         }
 
         p:nth-child(2) {
             @media (min-width: 1024px) {
-                max-width: 27rem;
+                max-width: 432px;
             }
         }
     }
@@ -222,79 +222,79 @@
 
 @media (min-width: 768px) {
     .intro-section {
-        padding-top: 6rem;
-        padding-bottom: 5rem;
-        padding-left: 2rem;
-        padding-right: 2rem;
-        gap: 5rem;
+        padding-top: 96px;
+        padding-bottom: 80px;
+        padding-left: 32px;
+        padding-right: 32px;
+        gap: 80px;
 
         h1 {
-            font-size: 3.5rem;
-            line-height: 4.25rem;
+            font-size: 56px;
+            line-height: 68px;
         }
 
         span {
-            font-size: 3.5rem;
-            line-height: 4.25rem;
+            font-size: 56px;
+            line-height: 68px;
         }
 
         span:nth-child(2):before {
-            height: 4.25rem;
+            height: 68px;
         }
 
         span:nth-child(3):before {
-            height: 4.25rem;
+            height: 68px;
         }
 
         .additional-info {
-            font-size: 1.125rem;
-            line-height: 1.625rem;
-            gap: 1rem;
+            font-size: 18px;
+            line-height: 26px;
+            gap: 16px;
         }
     }
 }
 
 @media (min-width: 1024px) {
     .intro-section {
-        padding-top: 8rem;
-        padding-bottom: 6.5rem;
-        padding-left: 3.5rem;
-        padding-right: 3.5rem;
-        gap: 6.5rem;
+        padding-top: 128px;
+        padding-bottom: 104px;
+        padding-left: 56px;
+        padding-right: 56px;
+        gap: 104px;
 
         h1 {
-            font-size: 4rem;
-            line-height: 4.75rem;
+            font-size: 64px;
+            line-height: 76px;
         }
 
         span {
-            font-size: 4rem;
-            line-height: 4.75rem;
+            font-size: 64px;
+            line-height: 76px;
         }
 
         span:nth-child(2):before {
-            height: 4.75rem;
+            height: 76px;
         }
 
         span:nth-child(3):before {
-            height: 4.75rem;
+            height: 76px;
         }
 
         .additional-info {
             flex-direction: row;
-            font-size: 1.25rem;
-            line-height: 1.75rem;
+            font-size: 20px;
+            line-height: 28px;
 
             p {
                 text-align: left;
             }
 
             p:nth-child(1) {
-                max-width: 26.9rem;
+                max-width: 430px;
             }
 
             p:nth-child(2) {
-                max-width: 27rem;
+                max-width: 432px;
             }
         }
     }
@@ -303,47 +303,47 @@
 @media (min-width: 1280px) {
     .intro-section {
         h1 {
-            font-size: 5rem;
-            line-height: 5.875rem;
+            font-size: 80px;
+            line-height: 94px;
         }
 
         span {
-            font-size: 5rem;
-            line-height: 5.875rem;
+            font-size: 80px;
+            line-height: 94px;
         }
 
         span:nth-child(2):before {
-            height: 5.875rem;
+            height: 94px;
         }
 
         span:nth-child(3):before {
-            height: 5.875rem;
+            height: 94px;
         }
     }
 }
 
 @media (min-width: 1440px) {
     .intro-section {
-        padding-top: 10.5rem;
-        padding-bottom: 8.875rem;
-        gap: 8.25rem;
+        padding-top: 168px;
+        padding-bottom: 142px;
+        gap: 132px;
 
         h1 {
-            font-size: 6rem;
-            line-height: 7rem;
+            font-size: 96px;
+            line-height: 112px;
         }
 
         span {
-            font-size: 6rem;
-            line-height: 7rem;
+            font-size: 96px;
+            line-height: 112px;
         }
 
         span:nth-child(2):before {
-            height: 7rem;
+            height: 112px;
         }
 
         span:nth-child(3):before {
-            height: 7rem;
+            height: 112px;
         }
     }
 }

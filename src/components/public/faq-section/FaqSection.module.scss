@@ -28,9 +28,13 @@
     padding-top: 24px;
     gap: 16px;
 
-    @media (min-width: 1440px) {
+    @media (min-width: 768px) {
         flex-direction: row;
-        justify-content: space-between;
+        
+    }
+
+    @media (min-width: 1440px) {
+       justify-content: space-between; 
     }
 }
 
@@ -40,8 +44,11 @@
     color: c.$blue-900;
     word-wrap: break-word;
 
-    @media (min-width: 1440px) {
+    @media(min-width: 768px) {
         flex: 0 0 41%;
+    }
+
+    @media (min-width: 1440px) {
         @include type.h3-bold-uppercase;
     }
 }
@@ -51,7 +58,7 @@
     flex-direction: column;
     gap: 0;
 
-    @media (min-width: 1440px) {
+    @media (min-width: 768px) {
         flex: 1 1 auto;
     }
 }

@@ -14,6 +14,7 @@ import './TeamCategoryModal.scss';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { ModalMode } from '@/types/admin/common';
+import { mapTeamCategoryDtoToTeamCategory } from '@/utils/functions/mappers/admin/team-category/team-category-mappers';
 
 interface TeamCategoryFormValues {
     name: string;
@@ -139,10 +140,12 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
 
                 if (mode === ModalMode.Add) {
                     const newCategory = await TeamCategoriesApi.create(client, categoryData);
-                    props.onAddCategory(newCategory);
+                    const mappedCategory = mapTeamCategoryDtoToTeamCategory(newCategory);
+                    props.onAddCategory(mappedCategory);
                 } else {
                     const updatedCategory = await TeamCategoriesApi.update(client, categoryData);
-                    props.onEditCategory(updatedCategory);
+                    const mappedCategory = mapTeamCategoryDtoToTeamCategory(updatedCategory);
+                    props.onEditCategory(mappedCategory);
                 }
 
                 onClose();

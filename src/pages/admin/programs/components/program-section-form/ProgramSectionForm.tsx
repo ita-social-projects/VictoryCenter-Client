@@ -1,32 +1,54 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Button } from '@/components/admin/button/Button';
 import { ImageValues } from '@/types/common/image';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { renderProgramSection } from '@/utils/functions/render-program-section';
 import styles from './ProgramSectionForm.module.scss';
 import {
-    ProgramSection,
-    ProgramSectionContent,
+    FaqSectionQuestionDto,
+    CreateHippotherapyProgramSectionDto,
     ProgramSectionTemplate,
     ProgramSectionMode,
 } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
+import {
+    getProgramSectionTemplateMaxGroupCount,
+    normalizeGroupedContentsGroupIndexes,
+} from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
+import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
+import { getDescriptionAuthorPairsByGroup } from '@/utils/functions/mappers/public/program/get-grouped-program-section-content-pairs';
+import {
+    getContentByType,
+    getDescriptionsInOrder,
+    getFaqPairs,
+    ensureTitleContentAndOnePair,
+} from '@/utils/functions/program-section-content/programSectionContent';
 
 export interface ProgramSectionFormProps {
-    section: ProgramSection;
+    section: CreateHippotherapyProgramSectionDto;
     onSave: () => void;
-    onCancel: () => void;
+    onCancel: (options: SectionCancelOptions) => void;
     isDisabled?: boolean;
-    onSectionChange?: (updatedSection: ProgramSection) => void;
+    onSectionChange?: (updatedSection: CreateHippotherapyProgramSectionDto) => void;
+    isNewSection?: boolean;
+    isSectionValid?: boolean;
+    onEditStateChange?: (isEditing: boolean) => void;
+    onDelete?: () => void;
+    isReplacingTemplate?: boolean;
+    onRequestReplace?: () => void;
+    isFirstSection: boolean;
+    isLastSection: boolean;
+    onMoveUpSection: () => void;
+    onMoveDownSection: () => void;
 }
 
-const getContentByType = (contents: ProgramSectionContent[], type: ContentType): ProgramSectionContent | undefined => {
-    return contents.find((c) => c.contentType === type);
-};
-
-const getDescriptionsInOrder = (contents: ProgramSectionContent[]) => {
-    return contents.filter((c) => c.contentType === ContentType.Description).sort((a, b) => a.order - b.order);
-};
+export interface SectionCancelOptions {
+    isDirty: boolean;
+    shouldRemove: boolean;
+    revertTo: CreateHippotherapyProgramSectionDto;
+    onAfterDiscard: () => void;
+    isTemplateReplacement?: boolean;
+}
 
 export const ProgramSectionForm = ({
     section,
@@ -34,8 +56,69 @@ export const ProgramSectionForm = ({
     onCancel,
     isDisabled = false,
     onSectionChange,
+    isNewSection = false,
+    isSectionValid = false,
+    onEditStateChange,
+    onDelete,
+    isReplacingTemplate = false,
+    onRequestReplace,
+    isFirstSection = false,
+    isLastSection = false,
+    onMoveDownSection,
+    onMoveUpSection,
 }: ProgramSectionFormProps) => {
-    const [localSection, setLocalSection] = useState<ProgramSection>(section);
+    const [localSection, setLocalSection] = useState<CreateHippotherapyProgramSectionDto>(() =>
+        ensureTitleContentAndOnePair(section),
+    );
+    const [originalSection, setOriginalSection] = useState<CreateHippotherapyProgramSectionDto>(() =>
+        ensureTitleContentAndOnePair(section),
+    );
+    const [isDirty, setIsDirty] = useState(false);
+    const [validationResetKey, setValidationResetKey] = useState(0);
+    const [sectionMode, setSectionMode] = useState<ProgramSectionMode>(
+        isNewSection || isReplacingTemplate ? ProgramSectionMode.Edit : ProgramSectionMode.View,
+    );
+
+    const sectionModeRef = useRef(sectionMode);
+    const onEditStateChangeRef = useRef(onEditStateChange);
+    const lastEmittedSectionRef = useRef<CreateHippotherapyProgramSectionDto | null>(null);
+    const localSectionRef = useRef<CreateHippotherapyProgramSectionDto>(localSection);
+    localSectionRef.current = localSection;
+
+    useEffect(() => {
+        sectionModeRef.current = sectionMode;
+    }, [sectionMode]);
+
+    useEffect(() => {
+        onEditStateChangeRef.current = onEditStateChange;
+    }, [onEditStateChange]);
+
+    useEffect(() => {
+        if (lastEmittedSectionRef.current === section) return;
+
+        const shouldPrepare = isNewSection || isReplacingTemplate;
+        const prepared = shouldPrepare ? ensureTitleContentAndOnePair(section) : section;
+
+        setLocalSection(prepared);
+        localSectionRef.current = prepared;
+
+        if (sectionModeRef.current !== ProgramSectionMode.Edit) {
+            if (!isReplacingTemplate) {
+                setOriginalSection(prepared);
+            }
+            setIsDirty(false);
+            setSectionMode(isNewSection || isReplacingTemplate ? ProgramSectionMode.Edit : ProgramSectionMode.View);
+        }
+
+        if (prepared !== section) {
+            lastEmittedSectionRef.current = prepared;
+            onSectionChange?.(prepared);
+        }
+    }, [section, isNewSection, isReplacingTemplate, onSectionChange]);
+
+    useEffect(() => {
+        onEditStateChangeRef.current?.(sectionMode === ProgramSectionMode.Edit);
+    }, [sectionMode]);
 
     const titleContent = getContentByType(localSection.contents, ContentType.Title);
 
@@ -45,98 +128,129 @@ export const ProgramSectionForm = ({
 
     const orderedDescriptionContents = getDescriptionsInOrder(localSection.contents);
 
-    const descriptions = orderedDescriptionContents.map((c) => c.description || '');
+    const descriptions = orderedDescriptionContents.map((c) => (c as any).description || '');
     const description = descriptions[0] || '';
+
+    const isDescriptionAuthorPairsTemplate =
+        section.template === ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs;
+
+    const isFaqTemplate = section.template === ProgramSectionTemplate.SingleTitleQuestionAnswerPairs;
+
+    const orderedPairs = getDescriptionAuthorPairsByGroup(localSection.contents);
+
+    const descriptionAuthorPairs = orderedPairs.map((p) => ({
+        description: p.description,
+        author: p.author,
+    }));
+
+    const faqPairs: FaqSectionQuestionDto[] = getFaqPairs(localSection.contents).map((p) => ({
+        id: p.id ?? undefined,
+        questionText: p.questionText,
+        answerText: p.answerText,
+    }));
 
     const imageContents = localSection.contents
         .filter((c) => c.contentType === ContentType.Image)
         .sort((a, b) => a.order - b.order)
-        .map((c) => c.image || null);
+        .map((c) => (c as any).image || null);
 
     const cards = orderedTitleContents.map((t, i) => ({
-        title: t.title || '',
-        description: orderedDescriptionContents[i]?.description || '',
+        title: (t as any).title || '',
+        description: (orderedDescriptionContents[i] as any)?.description || '',
     }));
+
+    const emitSectionChange = useCallback(
+        (updatedSection: CreateHippotherapyProgramSectionDto) => {
+            lastEmittedSectionRef.current = updatedSection;
+            setIsDirty(true);
+            onSectionChange?.(updatedSection);
+        },
+        [onSectionChange],
+    );
 
     const handleTitleChange = useCallback(
         (value: string) => {
-            setLocalSection((prev) => {
-                const updatedContents = prev.contents.map((c) =>
-                    c.contentType === ContentType.Title ? { ...c, title: value } : c,
-                );
-                const updatedSection = { ...prev, contents: updatedContents };
-                onSectionChange?.(updatedSection);
-                return updatedSection;
-            });
+            const prev = localSectionRef.current;
+            const updatedContents = prev.contents.map((c) =>
+                c.contentType === ContentType.Title ? ({ ...c, title: value } as any) : c,
+            );
+            const newSection = { ...prev, contents: updatedContents };
+            localSectionRef.current = newSection;
+            setLocalSection(newSection);
+            emitSectionChange(newSection);
         },
-        [onSectionChange],
+        [emitSectionChange],
     );
 
     const handleDescriptionChange = useCallback(
         (value: string) => {
-            setLocalSection((prev) => {
-                const updatedContents = prev.contents.map((c) =>
-                    c.contentType === ContentType.Description ? { ...c, description: value } : c,
-                );
-                const updatedSection = { ...prev, contents: updatedContents };
-                onSectionChange?.(updatedSection);
-                return updatedSection;
-            });
+            const prev = localSectionRef.current;
+            const updatedContents = prev.contents.map((c) =>
+                c.contentType === ContentType.Description ? ({ ...c, description: value } as any) : c,
+            );
+            const newSection = { ...prev, contents: updatedContents };
+            localSectionRef.current = newSection;
+            setLocalSection(newSection);
+            emitSectionChange(newSection);
         },
-        [onSectionChange],
+        [emitSectionChange],
     );
 
     const handleDescriptionsChange = useCallback(
         (index: number, value: string) => {
-            setLocalSection((prev) => {
-                const ordered = getDescriptionsInOrder(prev.contents);
-                const target = ordered[index];
-                if (!target) return prev;
+            const prev = localSectionRef.current;
+            const ordered = getDescriptionsInOrder(prev.contents);
+            const target = ordered[index];
+            if (!target) return;
 
-                const updatedContents = prev.contents.map((c) =>
-                    c.contentType === ContentType.Description && c.order === target.order
-                        ? { ...c, description: value }
-                        : c,
-                );
+            const updatedContents = prev.contents.map((c) =>
+                c.contentType === ContentType.Description && c.order === target.order
+                    ? ({ ...c, description: value } as any)
+                    : c,
+            );
 
-                const updatedSection = { ...prev, contents: updatedContents };
-                onSectionChange?.(updatedSection);
-                return updatedSection;
-            });
+            const newSection = { ...prev, contents: updatedContents };
+            localSectionRef.current = newSection;
+            setLocalSection(newSection);
+            emitSectionChange(newSection);
         },
-        [onSectionChange],
+        [emitSectionChange],
     );
 
     const handleCardContentChange = useCallback(
         (index: number, value: string, type: ContentType.Title | ContentType.Description) => {
-            setLocalSection((prev) => {
-                const filteredContents = prev.contents
-                    .filter((c) => c.contentType === type)
-                    .sort((a, b) => a.order - b.order);
+            const prev = localSectionRef.current;
+            const filteredContents = prev.contents
+                .filter((c) => c.contentType === type)
+                .sort((a, b) => a.order - b.order);
 
-                const target = filteredContents[index];
-                if (!target) return prev;
+            const target = filteredContents[index];
+            if (!target) return;
 
-                const updatedContents = prev.contents.map((c) =>
-                    c === target
-                        ? type === ContentType.Title
-                            ? { ...c, title: value }
-                            : { ...c, description: value }
-                        : c,
-                );
+            const updatedContents = prev.contents.map((c) =>
+                c === target
+                    ? type === ContentType.Title
+                        ? ({ ...c, title: value } as any)
+                        : ({ ...c, description: value } as any)
+                    : c,
+            );
 
-                const updatedSection = { ...prev, contents: updatedContents };
-                onSectionChange?.(updatedSection);
-                return updatedSection;
-            });
+            const newSection = { ...prev, contents: updatedContents };
+            localSectionRef.current = newSection;
+            setLocalSection(newSection);
+            emitSectionChange(newSection);
         },
-        [onSectionChange],
+        [emitSectionChange],
     );
 
     const updateImageContent = useCallback(
-        (order: number, file: ImageValues | null, prev: ProgramSection): ProgramSection => {
+        (
+            order: number,
+            file: ImageValues | null,
+            prev: CreateHippotherapyProgramSectionDto,
+        ): CreateHippotherapyProgramSectionDto => {
             const updatedContents = prev.contents.map((c) =>
-                c.contentType === ContentType.Image && c.order === order ? { ...c, image: file } : c,
+                c.contentType === ContentType.Image && c.order === order ? ({ ...c, image: file } as any) : c,
             );
             return { ...prev, contents: updatedContents };
         },
@@ -145,40 +259,351 @@ export const ProgramSectionForm = ({
 
     const handleImagesChange = useCallback(
         (index: number, file: ImageValues | null) => {
-            setLocalSection((prev) => {
-                const imageContentsList = prev.contents.filter((c) => c.contentType === ContentType.Image);
-                imageContentsList.sort((a, b) => a.order - b.order);
+            const prev = localSectionRef.current;
+            const imageContentsList = prev.contents.filter((c) => c.contentType === ContentType.Image);
+            imageContentsList.sort((a, b) => a.order - b.order);
 
-                if (index < imageContentsList.length) {
-                    const targetOrder = imageContentsList[index].order;
-                    const updatedSection = updateImageContent(targetOrder, file, prev);
-                    onSectionChange?.(updatedSection);
-                    return updatedSection;
-                }
-                return prev;
-            });
+            if (index >= imageContentsList.length) return;
+
+            const targetOrder = imageContentsList[index].order;
+            const newSection = updateImageContent(targetOrder, file, prev);
+            localSectionRef.current = newSection;
+            setLocalSection(newSection);
+            emitSectionChange(newSection);
         },
-        [onSectionChange, updateImageContent],
+        [emitSectionChange, updateImageContent],
     );
 
+    const handlePairFieldChange = useCallback(
+        (index: number, value: string, field: ContentType.Description | ContentType.Author) => {
+            const prev = localSectionRef.current;
+            const pairs = getDescriptionAuthorPairsByGroup(prev.contents);
+            const target = pairs[index];
+            if (!target) return;
+
+            const updatedContents = prev.contents.map((c) => {
+                if (c.groupIndex !== target.groupIndex || c.contentType !== field) return c;
+
+                if (field === ContentType.Description) {
+                    return { ...c, description: value } as any;
+                }
+
+                return { ...c, author: value } as any;
+            });
+
+            const newSection = { ...prev, contents: updatedContents };
+            localSectionRef.current = newSection;
+            setLocalSection(newSection);
+            emitSectionChange(newSection);
+        },
+        [emitSectionChange],
+    );
+
+    const handlePairDescriptionChange = useCallback(
+        (index: number, value: string) => handlePairFieldChange(index, value, ContentType.Description),
+        [handlePairFieldChange],
+    );
+
+    const handlePairAuthorChange = useCallback(
+        (index: number, value: string) => handlePairFieldChange(index, value, ContentType.Author),
+        [handlePairFieldChange],
+    );
+
+    const pairsMaxCount = isDescriptionAuthorPairsTemplate
+        ? getProgramSectionTemplateMaxGroupCount(section.template)
+        : 0;
+    const canAddPair = isDescriptionAuthorPairsTemplate ? orderedPairs.length < pairsMaxCount : true;
+
+    const handleAddPair = useCallback(() => {
+        const prev = localSectionRef.current;
+        if (prev.template !== ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs) return;
+
+        const normalizedContents = normalizeGroupedContentsGroupIndexes(prev.contents, [
+            ContentType.Description,
+            ContentType.Author,
+        ]);
+
+        const pairs = getDescriptionAuthorPairsByGroup(normalizedContents);
+        const maxGroupCount = getProgramSectionTemplateMaxGroupCount(prev.template);
+        if (pairs.length >= maxGroupCount) return;
+
+        const nextGroupIndex = pairs.length;
+
+        const maxOrder = normalizedContents.length ? Math.max(...normalizedContents.map((c) => c.order)) : -1;
+        const descriptionOrder = maxOrder + 1;
+        const authorOrder = maxOrder + 2;
+
+        const newSection: CreateHippotherapyProgramSectionDto = {
+            ...prev,
+            contents: [
+                ...normalizedContents,
+                {
+                    contentType: ContentType.Description,
+                    order: descriptionOrder,
+                    groupIndex: nextGroupIndex,
+                    description: '',
+                } as any,
+                {
+                    contentType: ContentType.Author,
+                    order: authorOrder,
+                    groupIndex: nextGroupIndex,
+                    author: '',
+                } as any,
+            ],
+        };
+
+        localSectionRef.current = newSection;
+        setLocalSection(newSection);
+        emitSectionChange(newSection);
+
+        setTimeout(() => {
+            const element = document.getElementById(`pair-description-${nextGroupIndex}`) as HTMLTextAreaElement | null;
+            element?.focus();
+        }, 0);
+    }, [emitSectionChange]);
+
+    const performDeletePair = useCallback(
+        (index: number) => {
+            const prev = localSectionRef.current;
+            if (prev.template !== ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs) return;
+
+            const pairs = getDescriptionAuthorPairsByGroup(prev.contents);
+            if (pairs.length <= 1) return;
+
+            const target = pairs[index];
+            if (!target) return;
+
+            const filtered: CreateHippotherapyProgramSectionDto = {
+                ...prev,
+                contents: prev.contents.filter((c) => c.groupIndex !== target.groupIndex),
+            };
+
+            const normalizedContents = normalizeGroupedContentsGroupIndexes(filtered.contents, [
+                ContentType.Description,
+                ContentType.Author,
+            ]);
+
+            const normalizedSection = { ...filtered, contents: normalizedContents };
+
+            localSectionRef.current = normalizedSection;
+            setLocalSection(normalizedSection);
+            emitSectionChange(normalizedSection);
+        },
+        [emitSectionChange],
+    );
+
+    const isSectionSaveValid =
+        isSectionValid &&
+        (!isFaqTemplate ||
+            (faqPairs.length > 0 &&
+                faqPairs.every(
+                    (pair) =>
+                        !PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateFaqQuestion(pair.questionText) &&
+                        !PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateFaqAnswer(pair.answerText),
+                )));
+
+    const handleFaqQuestionChange = useCallback(
+        (index: number, value: string) => {
+            const prev = localSectionRef.current;
+            const faq = getFaqPairs(prev.contents);
+            const target = faq[index];
+            if (!target) return;
+
+            const updatedContents = prev.contents.map((c) => {
+                if (c.contentType === ContentType.FaqQuestion && c.groupIndex === target.groupIndex) {
+                    return {
+                        ...c,
+                        faqQuestion: { ...c.faqQuestion, questionText: value } as any,
+                    };
+                }
+                return c;
+            });
+
+            const newSection = { ...prev, contents: updatedContents };
+            localSectionRef.current = newSection;
+            setLocalSection(newSection);
+            emitSectionChange(newSection);
+        },
+        [emitSectionChange],
+    );
+
+    const handleFaqAnswerChange = useCallback(
+        (index: number, value: string) => {
+            const prev = localSectionRef.current;
+            const faq = getFaqPairs(prev.contents);
+            const target = faq[index];
+            if (!target) return;
+
+            const updatedContents = prev.contents.map((c) => {
+                if (c.contentType === ContentType.FaqQuestion && c.groupIndex === target.groupIndex) {
+                    return {
+                        ...c,
+                        faqQuestion: { ...c.faqQuestion, answerText: value } as any,
+                    };
+                }
+                return c;
+            });
+
+            const newSection = { ...prev, contents: updatedContents };
+            localSectionRef.current = newSection;
+            setLocalSection(newSection);
+            emitSectionChange(newSection);
+        },
+        [emitSectionChange],
+    );
+
+    const handleAddFaqPair = useCallback(
+        (questionText: string, answerText: string) => {
+            const prev = localSectionRef.current;
+            if (prev.template !== ProgramSectionTemplate.SingleTitleQuestionAnswerPairs) return;
+
+            const faq = getFaqPairs(prev.contents);
+            const nextGroupIndex = faq.length;
+
+            const maxOrder = prev.contents.length ? Math.max(...prev.contents.map((c) => c.order)) : -1;
+
+            const newSection: CreateHippotherapyProgramSectionDto = {
+                ...prev,
+                contents: [
+                    ...prev.contents,
+                    {
+                        contentType: ContentType.FaqQuestion,
+                        order: maxOrder + 1,
+                        groupIndex: nextGroupIndex,
+                        faqQuestion: {
+                            questionText,
+                            answerText,
+                        } as any,
+                    } as any,
+                ],
+            };
+
+            localSectionRef.current = newSection;
+            setLocalSection(newSection);
+            emitSectionChange(newSection);
+        },
+        [emitSectionChange],
+    );
+
+    const handleDeleteFaqPair = useCallback(
+        (index: number) => {
+            const prev = localSectionRef.current;
+            if (prev.template !== ProgramSectionTemplate.SingleTitleQuestionAnswerPairs) return;
+
+            const faq = getFaqPairs(prev.contents);
+            if (faq.length <= 1) return;
+
+            const target = faq[index];
+            if (!target) return;
+
+            const filtered: CreateHippotherapyProgramSectionDto = {
+                ...prev,
+                contents: prev.contents.filter(
+                    (c) => !(c.contentType === ContentType.FaqQuestion && c.groupIndex === target.groupIndex),
+                ),
+            };
+
+            const normalizedContents = filtered.contents.map((c) => {
+                if (c.contentType === ContentType.FaqQuestion && c.groupIndex !== null && c.groupIndex !== undefined) {
+                    if (c.groupIndex > target.groupIndex) {
+                        return { ...c, groupIndex: c.groupIndex - 1 };
+                    }
+                }
+                return c;
+            });
+
+            const normalizedSection = { ...filtered, contents: normalizedContents };
+
+            localSectionRef.current = normalizedSection;
+            setLocalSection(normalizedSection);
+            emitSectionChange(normalizedSection);
+        },
+        [emitSectionChange],
+    );
+
+    const handleEditClick = useCallback(
+        (e: React.MouseEvent<HTMLButtonElement>) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setOriginalSection(localSection);
+            setIsDirty(false);
+            setSectionMode(ProgramSectionMode.Edit);
+        },
+        [localSection],
+    );
+
+    const handleSaveClick = useCallback(() => {
+        if (isDisabled || !isSectionSaveValid) return;
+        onSave();
+        setOriginalSection(localSection);
+        setIsDirty(false);
+        setSectionMode(ProgramSectionMode.View);
+        setValidationResetKey((prev) => prev + 1);
+    }, [isDisabled, isSectionSaveValid, onSave, localSection]);
+
     const CARD_TEMPLATES = [
-        ProgramSectionTemplate.DualTitleDescription,
-        ProgramSectionTemplate.TripleTitleDescription,
-        ProgramSectionTemplate.QuadTitleDescription,
+        ProgramSectionTemplate.DualTitleDescriptionPairs,
+        ProgramSectionTemplate.TripleTitleDescriptionPairs,
+        ProgramSectionTemplate.QuadTitleDescriptionPairs,
     ];
 
     const isCardTemplate = CARD_TEMPLATES.includes(section.template);
 
+    const handleCancelClick = useCallback(() => {
+        const shouldRemove = isNewSection;
+        const revertTo = originalSection;
+        const isTemplateReplacement = isReplacingTemplate;
+
+        const onAfterDiscard = () => {
+            if (!shouldRemove) {
+                localSectionRef.current = revertTo;
+                setLocalSection(revertTo);
+                setIsDirty(false);
+                setSectionMode(ProgramSectionMode.View);
+                setValidationResetKey((prev) => prev + 1);
+            }
+        };
+
+        onCancel({
+            isDirty,
+            shouldRemove,
+            revertTo,
+            onAfterDiscard,
+            isTemplateReplacement,
+        });
+    }, [isDirty, isNewSection, onCancel, originalSection, isReplacingTemplate]);
+
+    const handleDeleteClick = useCallback(
+        (e: React.MouseEvent<HTMLButtonElement>) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onDelete?.();
+        },
+        [onDelete],
+    );
+
+    const handleReplaceClick = useCallback(
+        (e: React.MouseEvent<HTMLButtonElement>) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onRequestReplace?.();
+        },
+        [onRequestReplace],
+    );
+
     const editableSection = renderProgramSection({
         templateId: section.template,
         data: {
-            title: titleContent?.title || '',
+            title: (titleContent as any)?.title || '',
             description,
             descriptions,
             images: imageContents,
             ...(isCardTemplate ? { cards } : {}),
+            ...(isDescriptionAuthorPairsTemplate ? { descriptionAuthorPairs } : {}),
+            ...(isFaqTemplate ? { faqPairs } : {}),
         },
-        mode: ProgramSectionMode.Edit,
+        mode: sectionMode,
+        validationResetKey,
         handlers: {
             onTitleChange: handleTitleChange,
             onDescriptionChange: handleDescriptionChange,
@@ -192,25 +617,94 @@ export const ProgramSectionForm = ({
                           handleCardContentChange(index, value, ContentType.Description),
                   }
                 : {}),
+            ...(isDescriptionAuthorPairsTemplate
+                ? {
+                      onCardDescriptionChange: handlePairDescriptionChange,
+                      onCardAuthorChange: handlePairAuthorChange,
+                      onAddPair: handleAddPair,
+                      onDeletePair: performDeletePair,
+                      canAddPair,
+                  }
+                : {}),
+            ...(isFaqTemplate
+                ? {
+                      onFaqQuestionChange: handleFaqQuestionChange,
+                      onFaqAnswerChange: handleFaqAnswerChange,
+                      onAddFaqPair: handleAddFaqPair,
+                      onDeleteFaqPair: handleDeleteFaqPair,
+                  }
+                : {}),
         },
     });
 
     return (
         <div className={styles.container}>
+            {sectionMode === ProgramSectionMode.View && (
+                <div className={styles['actions-section']}>
+                    <div className={styles['order-controls']}>
+                        <div className={styles['order-controls']}>
+                            {!isFirstSection && (
+                                <button
+                                    type="button"
+                                    onClick={onMoveUpSection}
+                                    className={`${styles['icon-button']} ${styles['up-button']}`}
+                                    aria-label="Move up section"
+                                />
+                            )}
+                            {!isLastSection && (
+                                <button
+                                    type="button"
+                                    onClick={onMoveDownSection}
+                                    className={`${styles['icon-button']} ${styles['down-button']}`}
+                                    aria-label="Move down section"
+                                />
+                            )}
+                        </div>
+                    </div>
+                    <div className={styles['hover-buttons']}>
+                        <button
+                            type="button"
+                            onClick={handleEditClick}
+                            className={`${styles['icon-button']} ${styles['edit-button']}`}
+                            aria-label="Edit section"
+                        />
+                        <button
+                            type="button"
+                            onClick={handleDeleteClick}
+                            className={`${styles['icon-button']} ${styles['delete-button']}`}
+                            aria-label="Delete section"
+                        />
+                        <button
+                            type="button"
+                            onClick={handleReplaceClick}
+                            className={`${styles['icon-button']} ${styles['change-button']}`}
+                            aria-label="Replace section"
+                        />
+                    </div>
+                </div>
+            )}
             <div className={styles.content}>
                 {editableSection || (
                     <p className={styles['template-info']}>
-                        Template ID: <strong>{section.template}</strong> (not yet implemented)
+                        Template ID: <strong>{section.template}</strong> (not found in renderer)
                     </p>
                 )}
             </div>
-            <div className={styles.actions}>
-                <Button buttonStyle="secondary" onClick={onCancel} disabled={isDisabled}>
-                    {PROGRAMS_TEXT.BUTTON.CANCEL}
-                </Button>
-                <Button buttonStyle="primary" onClick={onSave} disabled={true}>
-                    {PROGRAMS_TEXT.BUTTON.SAVE}
-                </Button>
+            <div className={styles['actions-container']}>
+                {sectionMode !== ProgramSectionMode.View && (
+                    <div className={styles.actions}>
+                        <Button buttonStyle="secondary" onClick={handleCancelClick} disabled={isDisabled}>
+                            {PROGRAMS_TEXT.BUTTON.CANCEL}
+                        </Button>
+                        <Button
+                            buttonStyle="primary"
+                            onClick={handleSaveClick}
+                            disabled={isDisabled || !isSectionSaveValid}
+                        >
+                            {PROGRAMS_TEXT.BUTTON.SAVE}
+                        </Button>
+                    </div>
+                )}
             </div>
         </div>
     );

@@ -5,11 +5,13 @@ import { VisitorPage } from '@/types/admin/faq';
 export const FaqValidationSchema = Yup.object({
     questionText: Yup.string()
         .trim()
+        .required(FAQ_VALIDATION.question.getRequiredError())
         .min(FAQ_VALIDATION.question.min, FAQ_VALIDATION.question.getMinError())
         .max(FAQ_VALIDATION.question.max, FAQ_VALIDATION.question.getMaxError()),
 
     answerText: Yup.string()
         .trim()
+        .required(FAQ_VALIDATION.answer.getRequiredWhenPublishingError())
         .min(FAQ_VALIDATION.answer.min, FAQ_VALIDATION.answer.getMinError())
         .max(FAQ_VALIDATION.answer.max, FAQ_VALIDATION.answer.getMaxError()),
 
@@ -19,12 +21,12 @@ export const FaqValidationSchema = Yup.object({
 });
 
 export const FAQ_VALIDATION_FUNCTIONS = {
-    validateQuestion: (value: string): string | undefined => {
+    validateQuestion: (value: string): string[] | undefined => {
         try {
             FaqValidationSchema.validateSyncAt('questionText', { questionText: value });
             return undefined;
         } catch (error: any) {
-            return error.message;
+            return [error.message];
         }
     },
 

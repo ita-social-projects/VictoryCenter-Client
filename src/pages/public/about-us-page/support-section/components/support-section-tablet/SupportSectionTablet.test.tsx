@@ -4,6 +4,9 @@ import { AboutUsContent } from '@/types/public/about-us-page';
 import { ContentType } from '@/types/common/about-us';
 import { ABOUT_US_DATA } from '@/const/public/about-us-page';
 import { aboutUsPageUk } from '@/locales/uk';
+import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
+import { TranslationStatus } from '@/types/common/language';
+import { setupUseGetLocalizationAboutUsContentMock } from '@/utils/test-mocks/use-get-localization-mock';
 
 jest.mock('@/const/public/about-us-page', () => ({
     ABOUT_US_DATA: {
@@ -28,7 +31,15 @@ jest.mock('@/const/public/about-us-page', () => ({
     },
 }));
 
+jest.mock('@/hooks/common/use-get-localization/useGetLocalization');
+
+const mockedUseGetLocalization = jest.mocked(useGetLocalization);
+
 describe('SupportSectionTablet component', () => {
+    beforeEach(() => {
+        setupUseGetLocalizationAboutUsContentMock(mockedUseGetLocalization);
+    });
+
     const content: AboutUsContent[] = [
         {
             contentType: ContentType.Card,
@@ -36,6 +47,7 @@ describe('SupportSectionTablet component', () => {
             id: 1,
             image: { id: null, url: 'card1.jpg', mimeType: 'image/jpeg' },
             description: 'Description 1',
+            localizations: [],
         },
         {
             contentType: ContentType.Card,
@@ -43,6 +55,7 @@ describe('SupportSectionTablet component', () => {
             id: 2,
             image: { id: null, url: 'card2.jpg', mimeType: 'image/jpeg' },
             description: 'Description 2',
+            localizations: [],
         },
         {
             contentType: ContentType.Card,
@@ -50,6 +63,7 @@ describe('SupportSectionTablet component', () => {
             id: 3,
             image: { id: null, url: 'card3.jpg', mimeType: 'image/jpeg' },
             description: 'Description 3',
+            localizations: [],
         },
     ];
 
@@ -94,5 +108,27 @@ describe('SupportSectionTablet component', () => {
     it('renders nothing when content is null', () => {
         const { container } = render(<SupportSectionTablet content={null} />);
         expect(container.firstChild).toBeNull();
+    });
+
+    it('renders localized description when localizations are provided', () => {
+        const contentWithLocalization = [
+            {
+                ...content[0],
+                localizations: [
+                    {
+                        language: { id: 1, code: 'uk' },
+                        translationStatus: TranslationStatus.Relevant,
+                        description: 'Localized description 1',
+                        title: null,
+                    },
+                ],
+            },
+            content[1],
+            content[2],
+        ];
+
+        render(<SupportSectionTablet content={contentWithLocalization} />);
+
+        expect(screen.getByText('Localized description 1')).toBeInTheDocument();
     });
 });

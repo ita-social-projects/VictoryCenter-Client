@@ -13,7 +13,7 @@ interface StatCardProps {
     className?: string;
 }
 
-export const StatCard: React.FC<StatCardProps> = ({ value, label, color = 'blue', currency, className }) => {
+export const StatCard = ({ value, label, color = 'blue', currency, className }: StatCardProps) => {
     const { i18n } = useTranslation();
 
     const formattedValue = useMemo(() => {

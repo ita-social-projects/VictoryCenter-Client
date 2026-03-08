@@ -4,6 +4,11 @@ import aboutUsPageUk from '@/locales/uk/about-us.json';
 import { OurMission } from './OurMission';
 import { ContentType } from '@/types/common/about-us';
 import { AboutUsContent } from '@/types/public/about-us-page';
+import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
+import {
+    createRelevantAboutUsUkLocalization,
+    setupUseGetLocalizationAboutUsContentMock,
+} from '@/utils/test-mocks/use-get-localization-mock';
 
 jest.mock('@/assets/icons/arrow-up-right.svg', () => ({
     ReactComponent: (props: any) => <svg data-testid="arrow-icon" {...props} />,
@@ -17,7 +22,15 @@ jest.mock('@/const/public/routes', () => ({
     },
 }));
 
+jest.mock('@/hooks/common/use-get-localization/useGetLocalization');
+
+const mockedUseGetLocalization = jest.mocked(useGetLocalization);
+
 describe('OurMission component', () => {
+    beforeEach(() => {
+        setupUseGetLocalizationAboutUsContentMock(mockedUseGetLocalization);
+    });
+
     const Content: AboutUsContent[] = [
         {
             contentType: ContentType.Description,
@@ -25,6 +38,7 @@ describe('OurMission component', () => {
             title: null,
             id: 1,
             image: null,
+            localizations: [],
         },
     ];
 
@@ -65,5 +79,24 @@ describe('OurMission component', () => {
         expect(link).toBeInTheDocument();
         expect(link).toHaveAttribute('href', '/programs');
         expect(screen.getByTestId('arrow-icon')).toBeInTheDocument();
+    });
+
+    it('should render localized description when localizations are provided', () => {
+        const contentWithLocalization = [
+            {
+                ...Content[0],
+                localizations: [
+                    createRelevantAboutUsUkLocalization({ description: 'Localized description', title: null }),
+                ],
+            },
+        ];
+
+        render(
+            <MemoryRouter>
+                <OurMission content={contentWithLocalization} />
+            </MemoryRouter>,
+        );
+
+        expect(screen.getByText('Localized description')).toBeInTheDocument();
     });
 });

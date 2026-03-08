@@ -9,7 +9,9 @@
     "reports": {
         "title": "Results in Reports",
         "description": "To see detailed information, please download the report for a specific year. If you are interested in something else or want to know more, please contact us.",
-        "itemLabel": "Annual Report {{ year }}"
+        "itemLabel": "Annual Report {{ year }}",
+        "showMore": "Show More",
+        "showLess": "Show Less"
     },
     "actions": {
         "downloadPdf": "Download PDF"

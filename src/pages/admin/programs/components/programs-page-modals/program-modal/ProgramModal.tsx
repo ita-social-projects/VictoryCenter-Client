@@ -1,8 +1,14 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { ProgramForm, ProgramFormRef, ProgramFormValues } from '../../program-form/ProgramForm';
-import { Program, ProgramCategory, ProgramCreateUpdate } from '@/types/admin/programs';
+import {
+    HippotherapyProgram,
+    ProgramCategory,
+    CreateHippotherapyProgramDto,
+    UpdateHippotherapyProgramDto,
+    SectionCancelActionType,
+} from '@/types/admin/programs';
 import { VisibilityStatus, PendingAction, ModalMode } from '@/types/admin/common';
-import { ProgramSection, ProgramSectionTemplate } from '@/types/common/program-sections';
+import { CreateHippotherapyProgramSectionDto, ProgramSectionTemplate } from '@/types/common/program-sections';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ProgramsApi } from '@/services/api/admin/programs/programs-api';
@@ -13,6 +19,7 @@ import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
 import { AddSectionModal } from '../add-section-modal/AddSectionModal';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import { getInitialSectionContents } from '@/utils/functions/render-program-section';
+import { mapHippotherapyProgramDtoToModel } from '@/utils/functions/mappers/admin/programs/programs-mappers';
 import './ProgramModal.scss';
 
 export interface BaseProgramModalProps {
@@ -23,13 +30,13 @@ export interface BaseProgramModalProps {
 
 interface AddModalProps extends BaseProgramModalProps {
     mode: ModalMode.Add;
-    onAddProgram: (program: Program) => void;
+    onAddProgram: (program: HippotherapyProgram) => void;
 }
 
 interface EditModalProps extends BaseProgramModalProps {
     mode: ModalMode.Edit;
-    programToEdit: Program;
-    onEditProgram: (program: Program) => void;
+    programToEdit: HippotherapyProgram;
+    onEditProgram: (program: HippotherapyProgram) => void;
 }
 
 export type ProgramModalProps = AddModalProps | EditModalProps;
@@ -41,15 +48,11 @@ export const ProgramModal = (props: ProgramModalProps) => {
     const program = isEditMode ? props.programToEdit : undefined;
     const onSuccess = isEditMode ? props.onEditProgram : props.onAddProgram;
     const { modalState, openModalActions, closeModalActions } = useModalsState();
-    //TODO: const [sections, setSections] = useState<ProgramSection[]>(program?.sections || []);
-
-    useEffect(() => {
-        if (program?.sections) {
-            //TODO: setSections(program.sections);
-        }
-    }, [program?.sections]);
-    const [isSectionUnsavedModalOpen, setIsSectionUnsavedModalOpen] = useState(false);
-    const [sectionToCancel, setSectionToCancel] = useState<number | null>(null);
+    const [sectionToReplace, setSectionToReplace] = useState<number | null>(null);
+    const [isSectionRemoveModalOpen, setIsSectionRemoveModalOpen] = useState(false);
+    const [isSectionRevertModalOpen, setIsSectionRevertModalOpen] = useState(false);
+    const [pendingCancelActionType, setPendingCancelActionType] = useState<SectionCancelActionType | null>(null);
+    const sectionDiscardActionRef = useRef<(() => void) | null>(null);
 
     const initialData = useMemo<ProgramFormValues | null>(() => {
         if (!isEditMode || !program) return null;
@@ -77,12 +80,18 @@ export const ProgramModal = (props: ProgramModalProps) => {
             onClose,
             entity: program,
             onSuccess: onSuccess || (() => {}),
-            apiCall: async (data: ProgramCreateUpdate) => {
-                return isEditMode
-                    ? await ProgramsApi.editProgram(data, client)
+            apiCall: async (data: CreateHippotherapyProgramDto) => {
+                const result = isEditMode
+                    ? await ProgramsApi.editProgram(data as UpdateHippotherapyProgramDto, client)
                     : await ProgramsApi.addProgram(client, data);
+
+                return mapHippotherapyProgramDtoToModel(result);
             },
-            getConfirmTitle: (mode: ModalMode, program: Program | undefined, pendingAction: PendingAction | null) => {
+            getConfirmTitle: (
+                mode: ModalMode,
+                program: HippotherapyProgram | undefined,
+                pendingAction: PendingAction | null,
+            ) => {
                 if (mode === ModalMode.Edit && program) {
                     if (program.status === VisibilityStatus.Published)
                         return pendingAction === PendingAction.Draft
@@ -101,33 +110,38 @@ export const ProgramModal = (props: ProgramModalProps) => {
                     ? PROGRAMS_TEXT.FORM.MESSAGE.FAIL_TO_UPDATE_PROGRAM
                     : PROGRAMS_TEXT.FORM.MESSAGE.FAIL_TO_CREATE_PROGRAM;
             },
-            getFormKey: (mode: ModalMode, program?: Program) => {
+            getFormKey: (mode: ModalMode, program?: HippotherapyProgram) => {
                 return mode === ModalMode.Edit && program?.id ? program.id : 'add';
             },
             transformFormData: (
                 formData: ProgramFormValues,
                 status: VisibilityStatus,
-                program?: Program,
-            ): ProgramCreateUpdate => ({
-                id: mode === ModalMode.Edit && program ? program.id : null,
-                name: formData.name,
-                description: formData.description,
-                previewImage: formData.previewImage,
-                backgroundImage: formData.backgroundImage,
-                status: status,
-                categoryIds: formData.categories.map((x) => x.id),
-                previewImageId: initialData?.previewImageId ?? null,
-                backgroundImageId: initialData?.backgroundImageId ?? null,
-                location: formData.location,
-                participantsCount: formData.participantsCount,
-                meetingsCount: formData.meetingCount,
-                sections: formData.sections,
-            }),
+                program?: HippotherapyProgram,
+            ): CreateHippotherapyProgramDto => {
+                const base: CreateHippotherapyProgramDto = {
+                    name: formData.name,
+                    description: formData.description,
+                    previewImage: formData.previewImage,
+                    backgroundImage: formData.backgroundImage,
+                    status: status,
+                    categoryIds: formData.categories.map((x) => x.id),
+                    previewImageId: initialData?.previewImageId ?? null,
+                    backgroundImageId: initialData?.backgroundImageId ?? null,
+                    location: formData.location,
+                    participantsCount: formData.participantsCount,
+                    meetingsCount: formData.meetingCount,
+                    sections: formData.sections,
+                };
+                if (mode === ModalMode.Edit && program) {
+                    return { ...base, id: program.id } as UpdateHippotherapyProgramDto;
+                }
+                return base;
+            },
         }),
         [isEditMode, isOpen, mode, onClose, onSuccess, program, client, initialData],
     );
 
-    const modalHookData = useGenericModal<ProgramFormValues, Program, ProgramFormRef>(modalConfig);
+    const modalHookData = useGenericModal<ProgramFormValues, HippotherapyProgram, ProgramFormRef>(modalConfig);
 
     const handleLanguageChange = useCallback((_: string) => {
         // TODO: Implement language selection
@@ -135,42 +149,96 @@ export const ProgramModal = (props: ProgramModalProps) => {
 
     const handleTemplateSelect = useCallback(
         (templateId: ProgramSectionTemplate) => {
-            if (modalHookData.formRef?.current) {
+            if (!modalHookData.formRef?.current) {
+                setSectionToReplace(null);
+                return;
+            }
+
+            if (sectionToReplace !== null) {
                 const currentSections = modalHookData.formRef.current.getSections
                     ? modalHookData.formRef.current.getSections()
                     : [];
+                const oldSection = currentSections[sectionToReplace];
+                const newSection: CreateHippotherapyProgramSectionDto = {
+                    template: templateId,
+                    order: oldSection?.order ?? 0,
+                    contents: getInitialSectionContents(templateId),
+                };
+                modalHookData.formRef.current.replaceSection(sectionToReplace, newSection);
+            } else {
+                const currentSections = (
+                    modalHookData.formRef.current.getSections ? modalHookData.formRef.current.getSections() : []
+                ).filter(Boolean);
                 const nextOrder =
                     currentSections.length === 0 ? 0 : Math.max(...currentSections.map((s) => s.order)) + 1;
-                const newSection: ProgramSection = {
+                const newSection: CreateHippotherapyProgramSectionDto = {
                     template: templateId,
                     order: nextOrder,
                     contents: getInitialSectionContents(templateId),
                 };
                 modalHookData.formRef.current.addSection(newSection);
             }
+
+            setSectionToReplace(null);
         },
-        [modalHookData.formRef],
+        [modalHookData.formRef, sectionToReplace],
     );
 
-    const handleRequestCancelSection = useCallback((sectionIndex: number) => {
-        setSectionToCancel(sectionIndex);
-        setIsSectionUnsavedModalOpen(true);
-    }, []);
+    const handleRequestCancelSection = useCallback(
+        (request: { type: SectionCancelActionType; onDiscard: () => void }) => {
+            sectionDiscardActionRef.current = request.onDiscard;
+            setPendingCancelActionType(request.type);
 
-    const handleCloseSectionUnsavedModal = useCallback(() => {
-        setIsSectionUnsavedModalOpen(false);
-        setSectionToCancel(null);
-    }, []);
-
-    const handleConfirmDiscardSection = useCallback(() => {
-        if (sectionToCancel !== null) {
-            //TODO: setSections((prev) => prev.filter((_, index) => index !== sectionToCancel));
-            if (modalHookData.formRef.current) {
-                modalHookData.formRef.current.removeSection(sectionToCancel);
+            switch (request.type) {
+                case SectionCancelActionType.RemoveSection:
+                    setIsSectionRemoveModalOpen(true);
+                    break;
+                case SectionCancelActionType.RevertSection:
+                case SectionCancelActionType.RevertAfterReplace:
+                case SectionCancelActionType.DiscardNewSection:
+                    setIsSectionRevertModalOpen(true);
+                    break;
+                default:
+                    break;
             }
-        }
-        handleCloseSectionUnsavedModal();
-    }, [sectionToCancel, handleCloseSectionUnsavedModal, modalHookData.formRef]);
+        },
+        [],
+    );
+
+    const handleCloseSectionRemoveModal = useCallback(() => {
+        setIsSectionRemoveModalOpen(false);
+        setPendingCancelActionType(null);
+        sectionDiscardActionRef.current = null;
+    }, []);
+
+    const handleCloseSectionRevertModal = useCallback(() => {
+        setIsSectionRevertModalOpen(false);
+        setPendingCancelActionType(null);
+        sectionDiscardActionRef.current = null;
+    }, []);
+
+    const handleConfirmRemoveSection = useCallback(() => {
+        sectionDiscardActionRef.current?.();
+        handleCloseSectionRemoveModal();
+    }, [handleCloseSectionRemoveModal]);
+
+    const handleConfirmRevertSection = useCallback(() => {
+        sectionDiscardActionRef.current?.();
+        handleCloseSectionRevertModal();
+    }, [handleCloseSectionRevertModal]);
+
+    const handleCloseAddSectionModal = useCallback(() => {
+        closeModalActions.closeAddSectionModal();
+        setSectionToReplace(null);
+    }, [closeModalActions]);
+
+    const handleReplaceSection = useCallback(
+        (sectionIndex: number) => {
+            setSectionToReplace(sectionIndex);
+            openModalActions.openAddSectionModal();
+        },
+        [openModalActions],
+    );
 
     return (
         <div className="program-modal">
@@ -207,21 +275,37 @@ export const ProgramModal = (props: ProgramModalProps) => {
                         onValidationChange={props.onValidationChange}
                         onLanguageChange={handleLanguageChange}
                         onAddSection={openModalActions.openAddSectionModal}
+                        onReplaceSection={handleReplaceSection}
                         onRequestCancelSection={handleRequestCancelSection}
                     />
                 )}
             />
             <AddSectionModal
                 isOpen={modalState.isAddSectionModalOpen}
-                onClose={closeModalActions.closeAddSectionModal}
+                onClose={handleCloseAddSectionModal}
                 onSelectTemplate={handleTemplateSelect}
             />
+
             <ConfirmationModal
-                isOpen={isSectionUnsavedModalOpen}
-                onClose={handleCloseSectionUnsavedModal}
-                title={PROGRAMS_TEXT.SECTION.MODAL.UNSAVED_CHANGES_TITLE}
-                onConfirm={handleConfirmDiscardSection}
-                onCancel={handleCloseSectionUnsavedModal}
+                isOpen={isSectionRemoveModalOpen}
+                onClose={handleCloseSectionRemoveModal}
+                title={PROGRAMS_TEXT.SECTION.MODAL.DELETE_SECTION_TITLE}
+                onConfirm={handleConfirmRemoveSection}
+                onCancel={handleCloseSectionRemoveModal}
+            />
+
+            <ConfirmationModal
+                isOpen={isSectionRevertModalOpen}
+                onClose={handleCloseSectionRevertModal}
+                title={
+                    pendingCancelActionType === SectionCancelActionType.RevertAfterReplace
+                        ? PROGRAMS_TEXT.SECTION.MODAL.REPLACE_TEMPLATE_TITLE
+                        : pendingCancelActionType === SectionCancelActionType.DiscardNewSection
+                          ? PROGRAMS_TEXT.SECTION.MODAL.UNSAVED_CHANGES_TITLE
+                          : COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE
+                }
+                onConfirm={handleConfirmRevertSection}
+                onCancel={handleCloseSectionRevertModal}
             />
         </div>
     );

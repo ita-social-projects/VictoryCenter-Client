@@ -76,9 +76,7 @@ export const Footer = () => {
 
                 <div className="hippotherapy">
                     <span className="title">{t('HIPPOTHERAPY')}</span>
-                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
-                        {t('WHAT_IS_HIPPOTHERAPY')}
-                    </Link>
+                    <Link to={PUBLIC_ROUTES.HIPPOTHERAPY.FULL}>{t('WHAT_IS_HIPPOTHERAPY')}</Link>
                     <Link to={PUBLIC_ROUTES.PROGRAMS.FULL}>{t('PROGRAMS')}</Link>
                     <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
                         {t('PROGRAMS_SESSIONS')}

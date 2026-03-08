@@ -23,6 +23,9 @@ import { useTeamMemberSearch } from '@/hooks/admin/team/useTeamMemberSearch';
 import { updateCategoryMemberCounts } from '@/utils/functions/update-category-member-counts/update-category-member-counts';
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
 import { mapEntityWithLocalizations } from '@/utils/functions/mappers/common/localization/localization-mappers';
+import { mapTeamCategoryDtoToTeamCategory } from '@/utils/functions/mappers/admin/team-category/team-category-mappers';
+import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
+import { returnDisplayedLocalization } from '@/utils/functions/localization/localization';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
@@ -84,6 +87,8 @@ export const TeamPageContent = () => {
                 openModalActions.openEditCategoryModal();
             } else if (id === 'delete') {
                 openModalActions.openDeleteCategoryModal();
+            } else if (id === 'addTranslation') {
+                openModalActions.openTranslateCategoryModal();
             }
         },
         [openModalActions],
@@ -94,6 +99,7 @@ export const TeamPageContent = () => {
             { id: 'add', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_CATEGORY },
             { id: 'edit', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.EDIT_CATEGORY },
             { id: 'delete', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.DELETE_CATEGORY },
+            { id: 'addTranslation', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_TRANSLATION },
         ],
         [],
     );
@@ -143,10 +149,11 @@ export const TeamPageContent = () => {
             clearError();
 
             const fetchedCategories = await TeamCategoriesApi.getAll(client);
-            setCategories(fetchedCategories);
+            const mappedCategories = fetchedCategories.map((category) => mapTeamCategoryDtoToTeamCategory(category));
+            setCategories(mappedCategories);
 
-            if (fetchedCategories.length > 0) {
-                setSelectedCategory((prevSelected: TeamCategory | null) => prevSelected ?? fetchedCategories[0]);
+            if (mappedCategories.length > 0) {
+                setSelectedCategory((prevSelected: TeamCategory | null) => prevSelected ?? mappedCategories[0]);
             }
         } catch (error: any) {
             if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {
@@ -295,7 +302,6 @@ export const TeamPageContent = () => {
         },
         [isAnyModalOpened, openModalActions, englishLanguage],
     );
-
     const handleDeleteTeamMemberModalOpen = useCallback(
         (member: TeamMember) => {
             if (isAnyModalOpened) return;
@@ -494,6 +500,17 @@ export const TeamPageContent = () => {
         },
         [selectedCategory?.id],
     );
+    const handleTranslateCategory = useCallback(
+        (updatedCategory: TeamCategory) => {
+            setCategories((prevCategories) =>
+                prevCategories.map((category) => (category.id === updatedCategory.id ? updatedCategory : category)),
+            );
+            closeModalActions.closeTranslateCategoryModal();
+
+            addToast(COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS, ToastType.Success);
+        },
+        [closeModalActions, addToast],
+    );
 
     const handleSearchItemSelect = useCallback(
         (member: TeamMember) => {
@@ -511,6 +528,14 @@ export const TeamPageContent = () => {
         resetMembersState();
         if (!wasSelected) fetchMembers(true);
     }, [selectedSearchMember, resetMembersState, fetchMembers]);
+
+    const getCategoryName = useCallback(
+        (category: TeamCategory) => {
+            const localization = returnDisplayedLocalization(category, selectedLanguage?.code || '');
+            return localization?.name || category.name;
+        },
+        [selectedLanguage?.code],
+    );
 
     const renderMemberItem = useCallback(
         (member: TeamMember) => (
@@ -576,10 +601,13 @@ export const TeamPageContent = () => {
                     selectedCategory={selectedCategory}
                     displayContextMenuButton={true}
                     onCategorySelect={handleCategorySelect}
-                    getCategoryDisplayName={(category) => category.name}
+                    getCategoryDisplayName={getCategoryName}
                     getCategoryKey={(category) => category.id}
                     contextMenuOptions={categoryBarContextMenuOptions}
                     onContextMenuOptionSelected={onContextMenuOptionSelected}
+                    renderCategoryExtra={(category) => (
+                        <LocalizationStatuses languages={translationLanguages} localizedEntity={category} />
+                    )}
                 />
 
                 {error.message && (
@@ -604,14 +632,16 @@ export const TeamPageContent = () => {
             <TeamPageModals
                 modalsStateControl={modalsStateControl}
                 categories={categories}
-                englishLanguage={englishLanguage}
+                translatedLanguages={translationLanguages}
                 onAddTeamMember={handleAddMember}
                 onEditTeamMember={handleEditMember}
                 onTranslateTeamMember={handleTranslateMember}
+                onTranslateTeamCategory={handleTranslateCategory}
                 onDeleteTeamMember={handleDeleteMember}
                 onAddTeamCategory={handleAddCategory}
                 onEditTeamCategory={handleEditCategory}
                 onDeleteTeamCategory={handleDeleteCategory}
+                selectedCategory={selectedCategory}
             />
             <ToastContainer />
         </div>

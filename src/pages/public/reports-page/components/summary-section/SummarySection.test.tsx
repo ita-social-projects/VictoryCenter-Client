@@ -3,103 +3,99 @@ import { render, screen } from '@testing-library/react';
 import { useTranslation } from 'react-i18next';
 import { SummarySection } from './SummarySection';
 
-jest.mock('./SummarySection.module.scss', () => ({
-    root: 'root-class',
-    collected: 'collected-class',
-    expenses: 'expenses-class',
-    income: 'income-class',
-    programs: 'programs-class',
-    lives: 'lives-class',
-}));
-
 jest.mock('@/utils/mock-data/public/reports-page', () => ({
     SUMMARY_DATA: {
-        collected: {
-            uah: 100000,
-            usd: 2500,
-        },
+        collected: { uah: 100000, usd: 2500 },
         livesChanged: 42,
     },
+    EXPENSES_DATA: { items: [{ label: 'Expense 1', amount: 10 }] },
+    FUNDING_DATA: { items: [{ label: 'Funding 1', amount: 20 }] },
+    PROGRAMS_ALLOCATION_DATA: { items: [{ label: 'Program 1', amount: 30 }] },
+}));
+
+jest.mock('./stat-card', () => ({
+    StatCard: ({ label, value, currency }: any) => (
+        <div data-testid="stat-card">
+            {label}: {value} {currency}
+        </div>
+    ),
+}));
+
+jest.mock('./expenses-breakdown-chart', () => ({
+    ExpensesBreakdownChart: ({ items }: any) => <div data-testid="expenses-chart">{JSON.stringify(items)}</div>,
+}));
+
+jest.mock('./funding-sources-chart', () => ({
+    FundingSourcesChart: ({ items }: any) => <div data-testid="funding-chart">{JSON.stringify(items)}</div>,
+}));
+
+jest.mock('./programs-allocation-chart', () => ({
+    ProgramsAllocationChart: ({ items }: any) => <div data-testid="programs-chart">{JSON.stringify(items)}</div>,
 }));
 
 jest.mock('react-i18next', () => ({
     useTranslation: jest.fn(),
 }));
 
-jest.mock('./stat-card', () => ({
-    StatCard: (props: any) => <div data-testid="stat-card-mock" data-props={JSON.stringify(props)} />,
-}));
-
 describe('SummarySection', () => {
-    const mockT = (key: string) => key;
+    const useTranslationMock = useTranslation as jest.Mock;
 
     beforeEach(() => {
         jest.clearAllMocks();
-    });
 
-    const setupTranslation = (language: string) => {
-        (useTranslation as jest.Mock).mockReturnValue({
-            t: mockT,
-            i18n: { language },
+        useTranslationMock.mockReturnValue({
+            t: (key: string) => key,
+            i18n: { language: 'uk' },
         });
-    };
-
-    it('renders layout structure correctly', () => {
-        setupTranslation('en');
-        const { container } = render(<SummarySection />);
-        const root = container.firstChild;
-
-        expect(root).toHaveClass('root-class');
-        expect(container.querySelector('.expenses-class')).toHaveTextContent('Основні витрати');
-        expect(container.querySelector('.income-class')).toHaveTextContent('Звідки прийшли кошти');
-        expect(container.querySelector('.programs-class')).toHaveTextContent('Розподіл коштів по програмах');
     });
 
-    it('renders correct data for Ukrainian language (UAH)', () => {
-        setupTranslation('uk');
+    it('renders correct collected amount and currency for Ukrainian (Default)', () => {
         render(<SummarySection />);
 
-        const statCards = screen.getAllByTestId('stat-card-mock');
-        expect(statCards).toHaveLength(2);
-
-        const collectedProps = JSON.parse(statCards[0].getAttribute('data-props') || '{}');
-        expect(collectedProps).toEqual({
-            className: 'collected-class',
-            value: 100000,
-            currency: 'UAH',
-            label: 'summary.collected',
-            color: 'blue',
-        });
+        const cards = screen.getAllByTestId('stat-card');
+        expect(cards[0]).toHaveTextContent('summary.collected: 100000 UAH');
     });
 
-    it('renders correct data for English language (USD)', () => {
-        setupTranslation('en');
+    it('renders correct collected amount and currency for English', () => {
+        useTranslationMock.mockReturnValue({
+            t: (key: string) => key,
+            i18n: { language: 'en' },
+        });
+
         render(<SummarySection />);
 
-        const statCards = screen.getAllByTestId('stat-card-mock');
-
-        const collectedProps = JSON.parse(statCards[0].getAttribute('data-props') || '{}');
-        expect(collectedProps).toEqual({
-            className: 'collected-class',
-            value: 2500,
-            currency: 'USD',
-            label: 'summary.collected',
-            color: 'blue',
-        });
+        const cards = screen.getAllByTestId('stat-card');
+        expect(cards[0]).toHaveTextContent('summary.collected: 2500 USD');
     });
 
-    it('renders lives changed card correctly (static data)', () => {
-        setupTranslation('en');
+    it('renders lives changed card with static data', () => {
         render(<SummarySection />);
 
-        const statCards = screen.getAllByTestId('stat-card-mock');
+        const cards = screen.getAllByTestId('stat-card');
+        expect(cards[1]).toHaveTextContent('summary.lives: 42');
+    });
 
-        const livesProps = JSON.parse(statCards[1].getAttribute('data-props') || '{}');
-        expect(livesProps).toEqual({
-            className: 'lives-class',
-            value: 42,
-            label: 'summary.lives',
-            color: 'yellow',
-        });
+    it('passes correct data props to Expenses chart', () => {
+        render(<SummarySection />);
+
+        const chart = screen.getByTestId('expenses-chart');
+        const expectedData = [{ label: 'Expense 1', amount: 10 }];
+        expect(chart).toHaveTextContent(JSON.stringify(expectedData));
+    });
+
+    it('passes correct data props to Funding chart', () => {
+        render(<SummarySection />);
+
+        const chart = screen.getByTestId('funding-chart');
+        const expectedData = [{ label: 'Funding 1', amount: 20 }];
+        expect(chart).toHaveTextContent(JSON.stringify(expectedData));
+    });
+
+    it('passes correct data props to Programs chart', () => {
+        render(<SummarySection />);
+
+        const chart = screen.getByTestId('programs-chart');
+        const expectedData = [{ label: 'Program 1', amount: 30 }];
+        expect(chart).toHaveTextContent(JSON.stringify(expectedData));
     });
 });

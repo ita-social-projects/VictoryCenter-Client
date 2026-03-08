@@ -20,6 +20,7 @@ export interface CategoryBarProps<T> {
     contextMenuOptions?: ContextMenuOption[];
     onContextMenuOptionSelected?: (id: string) => void;
     scrollAmount?: number;
+    renderCategoryExtra?: (item: T) => React.ReactNode;
 }
 
 export const CategoryBar = <T,>({
@@ -32,6 +33,7 @@ export const CategoryBar = <T,>({
     contextMenuOptions = [],
     onContextMenuOptionSelected,
     scrollAmount = 400,
+    renderCategoryExtra,
 }: CategoryBarProps<T>) => {
     const categoriesContainerRef = useRef<HTMLDivElement>(null);
     const [showLeftArrow, setShowLeftArrow] = useState(false);
@@ -109,6 +111,7 @@ export const CategoryBar = <T,>({
                         getCategoryKey={getCategoryKey}
                         getCategoryDisplayName={getCategoryDisplayName}
                         onSelect={onCategorySelect}
+                        renderExtra={renderCategoryExtra}
                     />
                 ))}
             </div>

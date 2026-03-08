@@ -1,0 +1,126 @@
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
+
+@import '../shared/BaseSectionTemplate.module.scss';
+
+.container {
+    @extend %section-container;
+    width: 100%;
+    background-color: c.$white;
+
+    padding: 20px clamp(0px, 3vw, 16px);
+    box-sizing: border-box;
+
+    --pair-card-width: 432px;
+    --pair-card-height: 259px;
+
+    --gap: 24px;
+    --peek: 0.55;
+
+    --carousel-max-width: calc(
+        (var(--pair-card-width) * 3) + (var(--gap) * 3) + (var(--pair-card-width) * var(--peek))
+    );
+
+    @media (min-width: 560px) {
+        padding: 64px 0px 64px 64px;
+    }
+}
+
+.template {
+    height: 100%;
+    width: 100%;
+    padding: clamp(48px, 6vh, 84px) 0;
+    padding-left: 30px;
+
+    --pair-card-width: 400px;
+    --pair-card-height: 240px;
+
+    --peek: 0.35;
+}
+
+.editable {
+    padding: 64px clamp(16px, 3vw, 0px);
+    box-sizing: border-box;
+
+    --pair-card-width: 432px;
+    --pair-card-height: 356px;
+}
+
+.title-block {
+    margin-bottom: 24px;
+}
+
+.container:not(.editable) .title-block {
+    margin-bottom: 85px;
+}
+
+.title {
+    @include type.h3-bold;
+    color: c.$blue-900;
+}
+
+.template .title {
+    @include type.h4-bold;
+}
+
+.title-input-group {
+    width: 721px;
+    margin-left: 50px;
+    margin-bottom: 50px;
+
+    :global(.char-limit-input) {
+        width: 721px;
+        height: 68px;
+        box-shadow: none;
+    }
+
+    :global(.char-limit-input__field) {
+        @include type.h3-bold;
+        color: c.$blue-900;
+    }
+
+    :global(.char-limit-input__field::placeholder) {
+        @include type.h3-bold;
+        color: c.$grey-700;
+        opacity: 1;
+    }
+
+    :global(.char-limit-input__counter) {
+        color: c.$grey-700;
+    }
+}
+
+.actions-row {
+    margin-top: 24px;
+    margin-right: 50px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.add-card-button {
+    width: 180px;
+    height: 40px;
+
+    background-color: c.$blue-500;
+    border: none;
+    padding: 0;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    :global(svg) {
+        width: 12px;
+        height: 12px;
+    }
+}
+
+.add-card-text {
+    @include type.small-text-medium;
+    color: c.$grey-50;
+}
+
+.add-card-icon :global(path) {
+    stroke: c.$grey-50 !important;
+}

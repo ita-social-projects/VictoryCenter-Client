@@ -3,9 +3,11 @@ import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import {
     headerUk,
+    hippotherapyUk,
     footerUk,
     aboutUsPageUk,
     programsPageUk,
+    detailedProgramPageUk,
     donateUk,
     reportsPageUk,
     partnersPageUk,
@@ -13,9 +15,11 @@ import {
 } from './uk';
 import {
     headerEn,
+    hippotherapyEn,
     footerEn,
     aboutUsPageEn,
     programsPageEn,
+    detailedProgramPageEn,
     donateEn,
     reportsPageEn,
     partnersPageEn,
@@ -26,9 +30,11 @@ import { DEFAULT_LOCALE, LOCALES } from '../const/common/locales';
 const resources = {
     uk: {
         header: headerUk,
+        hippotherapy: hippotherapyUk,
         footer: footerUk,
         aboutUsPage: aboutUsPageUk,
         programsPage: programsPageUk,
+        detailedProgramPage: detailedProgramPageUk,
         donatePage: donateUk,
         reportsPage: reportsPageUk,
         partnersPage: partnersPageUk,
@@ -36,9 +42,11 @@ const resources = {
     },
     en: {
         header: headerEn,
+        hippotherapy: hippotherapyEn,
         footer: footerEn,
         aboutUsPage: aboutUsPageEn,
         programsPage: programsPageEn,
+        detailedProgramPage: detailedProgramPageEn,
         donatePage: donateEn,
         reportsPage: reportsPageEn,
         partnersPage: partnersPageEn,
@@ -56,7 +64,18 @@ i18n.use(initReactI18next).init({
     resources,
     supportedLngs: LOCALES,
     fallbackLng: DEFAULT_LOCALE,
-    ns: ['header', 'footer', 'aboutUsPage', 'programsPage', 'donatePage', 'reportsPage', 'partnersPage', 'global'], // namespaces
+    ns: [
+        'header',
+        'footer',
+        'aboutUsPage',
+        'hippotherapy',
+        'programsPage',
+        'detailedProgramPage',
+        'donatePage',
+        'reportsPage',
+        'partnersPage',
+        'global',
+    ], // namespaces
     defaultNS: 'aboutUsPage',
     interpolation: {
         escapeValue: false, // leave it for React

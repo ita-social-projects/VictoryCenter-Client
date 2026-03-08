@@ -1,4 +1,4 @@
-@use '@/assets/sass/variables/colors';
+@use '@/assets/sass/variables/colors' as c;
 @use '@/assets/sass/mixins/typography.mixins' as type;
 
 .container {
@@ -13,14 +13,18 @@
 .error-section {
     @include type.small-text-regular;
     word-spacing: 0;
-    color: colors.$error;
+    color: c.$error;
     flex: 1;
     min-width: 0;
 }
 
 .counter-section {
     @include type.body-2-regular;
-    color: colors.$grey-900;
+    color: c.$grey-900;
     white-space: nowrap;
     flex-shrink: 0;
+
+    &.white-label {
+        color: c.$white;
+    }
 }

@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { ProgramsPageModals } from './ProgramsPageModals';
-import { Program, ProgramCategory } from '@/types/admin/programs';
+import { HippotherapyProgram, ProgramCategory } from '@/types/admin/programs';
 import { BaseModalState, UseModalsStateResult } from '@/hooks/admin/use-modals-state/useModalsState';
 import { VisibilityStatus } from '@/types/admin/common';
 import { ProgramModalProps } from '@/pages/admin/programs/components/programs-page-modals/program-modal/ProgramModal';
@@ -31,7 +31,7 @@ jest.mock('../program-category-modals/DeleteCategoryModal', () => ({
 }));
 
 describe('ProgramsPageModals', () => {
-    const mockProgram: Program = {
+    const mockProgram: HippotherapyProgram = {
         id: 1,
         name: 'Test Program',
         description: 'Test Description',
@@ -44,6 +44,7 @@ describe('ProgramsPageModals', () => {
         participantsCount: '',
         sections: [],
         slug: 'test-program',
+        localizations: [],
     };
 
     const mockCategories: ProgramCategory[] = [
@@ -70,11 +71,13 @@ describe('ProgramsPageModals', () => {
         closeEditCategoryModal: jest.fn(),
         closeDeleteCategoryModal: jest.fn(),
         closeAddSectionModal: jest.fn(),
+        closeTranslateCategoryModal: jest.fn(),
+        closeEditCategoryTranslationModal: jest.fn(),
     };
 
     const createMockModalsState = (
-        overrides: Partial<BaseModalState<Program>> = {},
-    ): UseModalsStateResult<Program> => ({
+        overrides: Partial<BaseModalState<HippotherapyProgram>> = {},
+    ): UseModalsStateResult<HippotherapyProgram> => ({
         modalState: {
             isAddModalOpen: false,
             itemToDelete: null,
@@ -85,6 +88,8 @@ describe('ProgramsPageModals', () => {
             isEditCategoryModalOpen: false,
             isDeleteCategoryModalOpen: false,
             isAddSectionModalOpen: false,
+            isCategoryToTranslate: false,
+            isCategoryToEditTranslation: false,
             ...overrides,
         },
         closeModalActions: mockCloseModalActions,
@@ -98,11 +103,13 @@ describe('ProgramsPageModals', () => {
             openEditCategoryModal: jest.fn(),
             openDeleteCategoryModal: jest.fn(),
             openAddSectionModal: jest.fn(),
+            openTranslateCategoryModal: jest.fn(),
+            openEditCategoryTranslationModal: jest.fn(),
         },
         isAnyModalOpened: false,
     });
 
-    const renderProgramsPageModals = (modalsStateControl: UseModalsStateResult<Program>) =>
+    const renderProgramsPageModals = (modalsStateControl: UseModalsStateResult<HippotherapyProgram>) =>
         render(
             <ProgramsPageModals
                 modalsStateControl={modalsStateControl}

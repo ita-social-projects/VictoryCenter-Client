@@ -1,0 +1,121 @@
+@use '@/assets/sass/variables/colors';
+@use '@/assets/sass/mixins/typography.mixins' as type;
+
+.program-block {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    .menu-block {
+        width: 100%;
+        padding: 0 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        align-items: flex-start;
+        margin-bottom: 32px;
+
+        @media (min-width: 768px) {
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0;
+            padding: 0 32px;
+        }
+
+        @media (min-width: 1024px) {
+            padding: 0 56px;
+        }
+
+        h2 {
+            @include type.h4-semibold;
+            font-size: 24px;
+            line-height: 32px;
+
+            @media (min-width: 768px) {
+                font-size: 32px;
+                line-height: 40px;
+            }
+
+            @media (min-width: 1024px) {
+                font-size: 28px;
+                line-height: 36px;
+            }
+        }
+
+        .button-block {
+            width: 100%;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+
+            @media (min-width: 768px) {
+                width: auto;
+                justify-content: center;
+            }
+
+            .white-button {
+                border-radius: 24px;
+                padding: 6px 14px;
+                border: 1px solid colors.$blue-100;
+                background: none;
+                font-size: 14px;
+                line-height: 24px;
+                letter-spacing: -0.32px;
+                vertical-align: middle;
+                transition: 0.3s ease;
+                cursor: pointer;
+
+                @media (min-width: 768px) {
+                    padding: 8px 16px;
+                    font-size: 16px;
+                }
+
+                &:hover {
+                    background: colors.$blue-50;
+                    transition: 0.3s ease;
+                }
+            }
+
+            .black-button {
+                background: colors.$blue-900;
+                padding: 6px 14px;
+                border-radius: 24px;
+                border: 1px solid colors.$blue-900;
+                font-size: 14px;
+                line-height: 24px;
+                letter-spacing: -0.32px;
+                vertical-align: middle;
+                color: colors.$grey-50;
+                cursor: pointer;
+
+                @media (min-width: 768px) {
+                    padding: 8px 16px;
+                    font-size: 16px;
+                }
+            }
+        }
+    }
+
+    .cards-block {
+        display: grid;
+        grid-template-columns: 1fr;
+        width: 100%;
+
+        @media (min-width: 768px) {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            padding: 0 32px;
+        }
+
+        @media (min-width: 1280px) {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+            padding: 0 56px;
+        }
+    }
+}

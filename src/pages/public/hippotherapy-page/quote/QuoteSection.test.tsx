@@ -12,7 +12,8 @@ describe('QuoteSection', () => {
         const image = screen.getByRole('img');
         expect(image).toHaveAttribute('src', '/path/test-image.jpg');
         expect(image).toHaveAttribute('alt', 'Test Image');
-        expect(screen.getByText('Test Quote Text')).toBeInTheDocument();
-        expect(screen.getByText('Test Author')).toBeInTheDocument();
+        const text = screen.getByTestId('quote-text');
+        expect(text).toHaveTextContent('Test Quote Text');
+        expect(text).toHaveTextContent('Test Author');
     });
 });

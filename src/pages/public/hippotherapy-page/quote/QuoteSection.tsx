@@ -7,7 +7,7 @@ export const QuoteSection = ({ imgURL, imgAlternativeText, text }: Quote) => {
         <>
             <section className={styles.root}>
                 <img src={imgURL} alt={imgAlternativeText} className={styles.image} />
-                <SafeHtml as="p" html={text ?? ''} className={styles.text} />
+                <SafeHtml data-testid="quote-text" as="p" html={text ?? ''} className={styles.text} />
             </section>
         </>
     );

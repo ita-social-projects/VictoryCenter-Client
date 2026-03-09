@@ -16,6 +16,6 @@ describe('SloganSection', () => {
         render(<SloganSection />);
         const slogan = screen.getByTestId('slogan-section');
         expect(slogan).toBeInTheDocument();
-        expect(slogan).toHaveTextContent('Іповенція ≠ лікування. Це —простір взаємодії');
+        expect(slogan).toHaveTextContent('Іповенція ≠ лікування.Це — простір взаємодії');
     });
 });

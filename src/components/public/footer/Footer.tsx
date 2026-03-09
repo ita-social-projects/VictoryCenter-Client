@@ -1,6 +1,5 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ReactComponent as ArrowUpIcon } from '@/assets/icons/arrow-up-right.svg';
+import { ReactComponent as VictoryCenterLogo } from '@/assets/icons/logo-with-text.svg';
 import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
 import { ReactComponent as MailIcon } from '@/assets/icons/mail.svg';
 import { PUBLIC_ROUTES } from '@/const/public/routes';
@@ -9,12 +8,6 @@ import './Footer.scss';
 
 export const Footer = () => {
     const { t } = useTranslation('footer');
-
-    const [email, setEmail] = useState('');
-
-    const handleClick = () => {
-        setEmail('');
-    };
 
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text);
@@ -34,28 +27,16 @@ export const Footer = () => {
     return (
         <div className="footer-content">
             <div className="main-block">
-                <div className="email-field">
-                    <span className="title">{t('STAY_UP_TO_DATE_WITH_THE_NEWS')}</span>
-                    <div className="input-block">
-                        <input
-                            type="email"
-                            placeholder={t('ENTER_YOUR_EMAIL')}
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                        />
-                        <button onClick={handleClick} className="subscribe-btn" aria-label={t('SIGN_UP')}>
-                            <ArrowUpIcon className="arrow-up-icon" />
-                        </button>
-                    </div>
+                <div className="logo-container">
+                    <Link to="/">
+                        <VictoryCenterLogo className="logo" />
+                    </Link>
                 </div>
 
                 <div className="menu">
                     <span className="title">{t('MENU')}</span>
                     <Link to={PUBLIC_ROUTES.REPORTS.FULL}>{t('REPORTING')}</Link>
-                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
-                        {t('HOW_TO_SUPPORT')}
-                    </Link>
+                    <Link to={PUBLIC_ROUTES.DONATE.FULL}>{t('HOW_TO_SUPPORT')}</Link>
                     <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
                         {t('STORIES_OF_VICTORIES')}
                     </Link>

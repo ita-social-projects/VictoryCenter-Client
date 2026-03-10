@@ -83,7 +83,7 @@ describe('MemberComponent', () => {
         expect(handleOnEditMember).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }));
     });
 
-    it('calls handleOnTranslateMember when translate button clicked', () => {
+    it.skip('calls handleOnTranslateMember when translate button clicked', () => {
         renderComponent();
 
         const translateBtn = screen.getByRole('button', {
@@ -93,6 +93,17 @@ describe('MemberComponent', () => {
         fireEvent.click(translateBtn);
 
         expect(handleOnTranslateMember).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }));
+    });
+
+    it('renders translate button as disabled and hidden', () => {
+        renderComponent();
+
+        const translateBtn = screen.getByRole('button', {
+            name: TEAM_MEMBERS_TEXT.ACTIONS.TRANSLATE,
+        });
+
+        expect(translateBtn).toBeDisabled();
+        expect(translateBtn).toHaveClass('disable');
     });
 
     it('calls handleOnDeleteMember when delete button clicked', () => {

@@ -82,7 +82,8 @@ export const MemberComponent = ({
                         aria-label={TEAM_MEMBERS_TEXT.ACTIONS.TRANSLATE}
                         type="button"
                         onClick={handleTranslateMember}
-                        className="members-actions-translate"
+                        className="members-actions-translate disable"
+                        disabled
                     />
                     <button
                         aria-label={TEAM_MEMBERS_TEXT.ACTIONS.EDIT}

@@ -104,6 +104,11 @@ describe('MediaSettings', () => {
         isEditing: false,
         resetCounter: 0,
         onDirtyChange: mockOnDirtyChange,
+        onCancel: jest.fn(),
+        onPublish: jest.fn(),
+        isPublishDisabled: false,
+        isCancelDisabled: false,
+        isActive: true,
     };
 
     const renderComponent = (overrideProps: Partial<typeof defaultProps> = {}) => {

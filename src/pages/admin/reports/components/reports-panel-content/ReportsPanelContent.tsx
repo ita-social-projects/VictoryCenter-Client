@@ -10,35 +10,23 @@ import { MediaSettings, MediaSettingsRef } from '../media-settings/MediaSettings
 
 export const ReportsPanelContent = () => {
     const [selectedTab, setSelectedTab] = useState<ReportsToolbarTab>(REPORTS_TOOLBAR_TABS[0]);
-    const [isEditing, setIsEditing] = useState(false);
     const [isDirty, setIsDirty] = useState(false);
     const [resetCounter, setResetCounter] = useState(0);
     const mediaSettingsRef = useRef<MediaSettingsRef>(null);
 
+    const isEditing = true;
+
     const handleCancel = useCallback(() => {
-        setIsEditing(false);
         setIsDirty(false);
         setResetCounter((prev) => prev + 1);
     }, []);
 
-    const handleTabSelect = useCallback(
-        (tab: ReportsToolbarTab) => {
-            if (tab.id === 'report-analytics' && isEditing) {
-                handleCancel();
-            }
-            setSelectedTab(tab);
-        },
-        [isEditing, handleCancel],
-    );
-
-    const handleEdit = useCallback(() => {
-        setIsEditing(true);
-        setIsDirty(false);
+    const handleTabSelect = useCallback((tab: ReportsToolbarTab) => {
+        setSelectedTab(tab);
     }, []);
     const handlePublish = useCallback(async () => {
         const result = await mediaSettingsRef.current?.submit();
         if (result) {
-            setIsEditing(false);
             setIsDirty(false);
         }
     }, []);
@@ -49,26 +37,20 @@ export const ReportsPanelContent = () => {
     return (
         <div className={styles.root}>
             <div className={styles.toolbar}>
-                <ReportsPageToolbar
-                    selectedTab={selectedTab}
-                    onTabSelect={handleTabSelect}
-                    isEditing={isEditing}
-                    isPublishDisabled={!isDirty}
-                    onEdit={handleEdit}
-                    onEditReportAnalytics={() => {}}
-                    onCancel={handleCancel}
-                    onPublish={handlePublish}
-                />
+                <ReportsPageToolbar selectedTab={selectedTab} onTabSelect={handleTabSelect} />
             </div>
             <div className={styles.content}>
-                {isMediaSettingsTab ? (
-                    <MediaSettings
-                        ref={mediaSettingsRef}
-                        isEditing={isEditing}
-                        resetCounter={resetCounter}
-                        onDirtyChange={handleDirtyChange}
-                    />
-                ) : null}
+                <MediaSettings
+                    ref={mediaSettingsRef}
+                    isEditing={isEditing}
+                    resetCounter={resetCounter}
+                    onDirtyChange={handleDirtyChange}
+                    onCancel={handleCancel}
+                    onPublish={handlePublish}
+                    isPublishDisabled={!isEditing || !isDirty}
+                    isCancelDisabled={!isDirty}
+                    isActive={isMediaSettingsTab}
+                />
             </div>
 
             <ToastContainer />

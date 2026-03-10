@@ -16,3 +16,17 @@
 .error-button {
     width: 200px;
 }
+
+.actions {
+    display: flex;
+    gap: 60px;
+    margin-top: 60px;
+    align-items: center;
+    padding-left: 385px;
+
+    Button {
+        width: 305px;
+        height: 60px;
+        font-size: 24px;
+    }
+}

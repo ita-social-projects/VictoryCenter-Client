@@ -4,6 +4,7 @@
     position: relative;
     height: 622px;
     margin: 16px;
+    margin-bottom: 100px; // temporary, will be removed after adding the next section
 
     @media (min-width: 560px) {
         height: 880px;

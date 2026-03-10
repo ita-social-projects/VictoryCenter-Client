@@ -118,7 +118,7 @@ export const FUNDS_EXPENDITURES_TEXT = {
         EXPENSE_CATEGORIES: 'Категорії витрат',
         AMOUNT_SUFFIX_UAH: 'UA',
         AMOUNT_SUFFIX_USD: 'USD',
-        CATEGORY_SUFFIX: 'категорії',
+        CATEGORY_SUFFIX_FORMS: ['категорія', 'категорії', 'категорій'],
     },
     TABLE: {
         COLUMNS: {
@@ -130,7 +130,7 @@ export const FUNDS_EXPENDITURES_TEXT = {
         },
         TYPE_LABELS: {
             INCOME: 'Надходження',
-            EXPENSE: 'Витрати',
+            EXPENSE: 'Витрата',
         },
         EMPTY_STATE: {
             MESSAGE: 'За вашим запитом нічого не знайдено',

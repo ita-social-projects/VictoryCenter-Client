@@ -1,4 +1,5 @@
 import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
+import { getUkrainianPlural } from '@/utils/functions/get-ukrainian-plural/get-ukrainian-plural';
 import cn from 'classnames';
 import styles from './SummaryCard.module.scss';
 
@@ -18,7 +19,8 @@ export const SummaryCard = ({ title, uah, usd, count, blueThemeCard = false }: S
             <span className={styles.title}>{title}</span>
             {isCountCard ? (
                 <span className={styles.value}>
-                    {count}&nbsp;{FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.CATEGORY_SUFFIX}
+                    {count}&nbsp;
+                    {getUkrainianPlural(count, FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.CATEGORY_SUFFIX_FORMS)}
                 </span>
             ) : (
                 <div className={styles.amounts}>

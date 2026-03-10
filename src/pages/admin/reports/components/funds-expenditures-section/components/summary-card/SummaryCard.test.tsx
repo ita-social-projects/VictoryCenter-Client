@@ -55,14 +55,28 @@ describe('SummaryCard', () => {
         it('should display the count with category suffix', () => {
             render(<SummaryCard title="Категорії надходжень" count={3} />);
             expect(
-                screen.getByText(new RegExp(`3.*${FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.CATEGORY_SUFFIX}`)),
+                screen.getByText(new RegExp(`3.*${FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.CATEGORY_SUFFIX_FORMS[1]}`)),
             ).toBeInTheDocument();
         });
 
-        it('should display zero count correctly', () => {
+        it('should display zero count correctly with plural genitive form', () => {
             render(<SummaryCard title="Категорії" count={0} />);
             expect(
-                screen.getByText(new RegExp(`0.*${FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.CATEGORY_SUFFIX}`)),
+                screen.getByText(new RegExp(`0.*${FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.CATEGORY_SUFFIX_FORMS[2]}`)),
+            ).toBeInTheDocument();
+        });
+
+        it('should display count=1 with nominative singular form', () => {
+            render(<SummaryCard title="Категорії" count={1} />);
+            expect(
+                screen.getByText(new RegExp(`1.*${FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.CATEGORY_SUFFIX_FORMS[0]}`)),
+            ).toBeInTheDocument();
+        });
+
+        it('should display count=5 with genitive plural form', () => {
+            render(<SummaryCard title="Категорії" count={5} />);
+            expect(
+                screen.getByText(new RegExp(`5.*${FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.CATEGORY_SUFFIX_FORMS[2]}`)),
             ).toBeInTheDocument();
         });
 

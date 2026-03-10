@@ -30,8 +30,8 @@ export const FundsExpendituresToolbar = ({
                     value={selectedType}
                     onValueChange={onTypeChange}
                     placeholder={FUNDS_EXPENDITURES_TEXT.FILTER.TYPE_PLACEHOLDER}
-                    className={styles.filterSelect}
-                    optionClassName={styles.filterOption}
+                    className={styles['filter-select']}
+                    optionClassName={styles['filter-option']}
                 >
                     <Select.Option value={undefined} name={FUNDS_EXPENDITURES_TEXT.FILTER.ALL_OPTION} />
                     <Select.Option value="income" name={FUNDS_EXPENDITURES_TEXT.TABLE.TYPE_LABELS.INCOME} />
@@ -42,8 +42,8 @@ export const FundsExpendituresToolbar = ({
                     value={selectedCategoryId}
                     onValueChange={onCategoryChange}
                     placeholder={FUNDS_EXPENDITURES_TEXT.FILTER.CATEGORY_PLACEHOLDER}
-                    className={styles.filterSelect}
-                    optionClassName={styles.filterOption}
+                    className={styles['filter-select']}
+                    optionClassName={styles['filter-option']}
                 >
                     <Select.Option value={undefined} name={FUNDS_EXPENDITURES_TEXT.FILTER.ALL_OPTION} />
                     {categories.map((category) => (
@@ -53,9 +53,9 @@ export const FundsExpendituresToolbar = ({
             </div>
 
             {exchangeRate && (
-                <div className={styles.exchangeRate}>
-                    <span className={styles.exchangeRateLabel}>{FUNDS_EXPENDITURES_TEXT.EXCHANGE_RATE_LABEL}</span>
-                    <span className={styles.exchangeRateValue}>{exchangeRate}</span>
+                <div className={styles['exchange-rate']}>
+                    <span className={styles['exchange-rate-label']}>{FUNDS_EXPENDITURES_TEXT.EXCHANGE_RATE_LABEL}</span>
+                    <span className={styles['exchange-rate-value']}>{exchangeRate}</span>
                 </div>
             )}
         </div>

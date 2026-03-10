@@ -4,23 +4,23 @@ import { FundsExpendituresTable, EnrichedRecord } from './FundsExpendituresTable
 import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
 
 jest.mock('./FundsExpendituresTable.module.scss', () => ({
-    tableWrapper: 'tableWrapper',
+    'table-wrapper': 'table-wrapper',
     table: 'table',
     th: 'th',
     sortable: 'sortable',
-    thInner: 'thInner',
+    'th-inner': 'th-inner',
     tr: 'tr',
     td: 'td',
-    sortIcons: 'sortIcons',
-    sortIcon: 'sortIcon',
-    sortIconActive: 'sortIconActive',
-    typeChip: 'typeChip',
-    typeChipIncome: 'typeChipIncome',
-    typeChipExpense: 'typeChipExpense',
-    emptyCell: 'emptyCell',
-    emptyState: 'emptyState',
-    emptyStateImage: 'emptyStateImage',
-    emptyStateMessage: 'emptyStateMessage',
+    'sort-icons': 'sort-icons',
+    'sort-icon': 'sort-icon',
+    'sort-icon-active': 'sort-icon-active',
+    'type-chip': 'type-chip',
+    'type-chip-income': 'type-chip-income',
+    'type-chip-expense': 'type-chip-expense',
+    'empty-cell': 'empty-cell',
+    'empty-state': 'empty-state',
+    'empty-state-image': 'empty-state-image',
+    'empty-state-message': 'empty-state-message',
 }));
 
 jest.mock('@/assets/icons/chevron-up.svg', () => ({
@@ -93,7 +93,7 @@ describe('FundsExpendituresTable', () => {
         const incomeChips = screen.getAllByText(FUNDS_EXPENDITURES_TEXT.TABLE.TYPE_LABELS.INCOME);
         expect(incomeChips.length).toBeGreaterThan(0);
         incomeChips.forEach((chip) => {
-            expect(chip).toHaveClass('typeChipIncome');
+            expect(chip).toHaveClass('type-chip-income');
         });
     });
 
@@ -102,7 +102,7 @@ describe('FundsExpendituresTable', () => {
         const expenseChips = screen.getAllByText(FUNDS_EXPENDITURES_TEXT.TABLE.TYPE_LABELS.EXPENSE);
         expect(expenseChips.length).toBeGreaterThan(0);
         expenseChips.forEach((chip) => {
-            expect(chip).toHaveClass('typeChipExpense');
+            expect(chip).toHaveClass('type-chip-expense');
         });
     });
 

@@ -5,8 +5,8 @@ import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
 
 jest.mock('./SummaryCard.module.scss', () => ({
     card: 'card',
-    cardBlue: 'cardBlue',
-    cardCount: 'cardCount',
+    'card-blue': 'card-blue',
+    'card-count': 'card-count',
     title: 'title',
     amounts: 'amounts',
     amount: 'amount',
@@ -42,12 +42,12 @@ describe('SummaryCard', () => {
 
         it('should not apply blueTheme class by default', () => {
             const { container } = render(<SummaryCard title="Test" uah={100} usd={100} />);
-            expect(container.firstChild).not.toHaveClass('cardBlue');
+            expect(container.firstChild).not.toHaveClass('card-blue');
         });
 
         it('should apply blueTheme class when blueTheme is true', () => {
             const { container } = render(<SummaryCard title="Test" uah={100} usd={100} blueThemeCard />);
-            expect(container.firstChild).toHaveClass('cardBlue');
+            expect(container.firstChild).toHaveClass('card-blue');
         });
     });
 

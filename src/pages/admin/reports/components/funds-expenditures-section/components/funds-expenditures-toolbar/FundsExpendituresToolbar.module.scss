@@ -1,4 +1,5 @@
 @use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
 
 .toolbar {
     display: flex;
@@ -15,21 +16,20 @@
     flex-wrap: wrap;
 }
 
-.exchangeRate {
+.exchange-rate {
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 12px;
 }
 
-.exchangeRateLabel {
-    font-size: 20px;
-    font-weight: 500;
-    letter-spacing: -0.02em;
+.exchange-rate-label {
+    @include type.subtitle-2-medium;
     color: c.$bluish-black;
 }
 
-.exchangeRateValue {
+.exchange-rate-value {
+    @include type.small-text-medium;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -37,15 +37,13 @@
     background-color: c.$grey-600;
     border: 1px solid c.$bluish-black;
     border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
     letter-spacing: 0.1px;
     color: c.$blue-900;
     min-width: 64px;
     text-align: center;
 }
 
-.filterSelect {
+.filter-select {
     :global(.select-head) {
         border: 1px solid #e55345;
         border-radius: 12px;
@@ -53,7 +51,6 @@
         height: 42px;
         min-width: 123px;
         width: auto;
-        font-family: 'Roboto', sans-serif;
         font-size: 16px;
         font-weight: 600;
         color: #061125;
@@ -73,10 +70,8 @@
     }
 }
 
-.filterOption {
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    font-weight: 400;
+.filter-option {
+    @include type.small-text-regular;
     line-height: 17px;
     letter-spacing: 0.05em;
     color: #25213b;

@@ -102,14 +102,14 @@ export const FundsExpenditureSection = ({ isEditing: _isEditing }: FundsExpendit
         <div className={styles.section}>
             {settings?.disclaimerTitle && (
                 <div className={styles.disclaimer}>
-                    <span className={styles.disclaimerLabel}>{FUNDS_EXPENDITURES_TEXT.DISCLAIMER_LABEL}</span>
-                    <div className={styles.disclaimerTextArea}>
-                        <p className={styles.disclaimerText}>{settings.disclaimerTitle}</p>
+                    <span className={styles['disclaimer-label']}>{FUNDS_EXPENDITURES_TEXT.DISCLAIMER_LABEL}</span>
+                    <div className={styles['disclaimer-text-area']}>
+                        <p className={styles['disclaimer-text']}>{settings.disclaimerTitle}</p>
                     </div>
                 </div>
             )}
 
-            <div className={styles.summaryCards}>
+            <div className={styles['summary-cards']}>
                 <SummaryCard
                     title={FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.COLLECTED}
                     uah={summary.totalCollectedUah}

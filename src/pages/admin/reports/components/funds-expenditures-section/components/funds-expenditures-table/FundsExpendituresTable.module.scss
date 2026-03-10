@@ -1,6 +1,7 @@
 @use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
 
-.tableWrapper {
+.table-wrapper {
     width: 100%;
     overflow-x: auto;
     background: #f8fafc;
@@ -21,12 +22,10 @@
 }
 
 .th {
+    @include type.subtitle-1-medium;
     padding: 16px 20px;
     text-align: left;
-    font-size: 24px;
-    font-weight: 500;
     line-height: 24px;
-    letter-spacing: -0.02em;
     color: rgba(29, 27, 32, 0.88);
     white-space: nowrap;
 
@@ -40,7 +39,7 @@
     }
 }
 
-.thInner {
+.th-inner {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -56,36 +55,35 @@
 }
 
 .td {
+    @include type.subtitle-2-medium;
     padding: 13px 20px;
-    font-size: 20px;
     font-weight: 400;
     line-height: 24px;
-    letter-spacing: -0.02em;
     color: c.$graphite_black;
     vertical-align: middle;
     height: 65px;
     box-sizing: border-box;
 }
 
-.sortIcons {
+.sort-icons {
     display: inline-flex;
     flex-direction: column;
     align-items: center;
     gap: 1px;
 }
 
-.sortIcon {
+.sort-icon {
     width: 14px;
     height: 14px;
     color: c.$grey-700;
     flex-shrink: 0;
 }
 
-.sortIconActive {
+.sort-icon-active {
     color: c.$blue-500;
 }
 
-.typeChip {
+.type-chip {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -97,43 +95,39 @@
     white-space: nowrap;
 }
 
-.typeChipIncome {
+.type-chip-income {
     background-color: #4e6183;
     border: 1px solid #123288;
     color: c.$white;
 }
 
-.typeChipExpense {
+.type-chip-expense {
     background-color: #8b4459;
     border: 1px solid #5e1e2f;
     color: c.$white;
 }
 
-.emptyCell {
+.empty-cell {
     text-align: center;
     padding: 48px 20px;
     border: none;
 }
 
-.emptyState {
+.empty-state {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 16px;
 }
 
-.emptyStateImage {
+.empty-state-image {
     width: 180px;
     height: auto;
 }
 
-.emptyStateMessage {
-    font-family: 'Mulish', sans-serif;
-    font-style: normal;
-    font-weight: 500;
-    font-size: 20px;
+.empty-state-message {
+    @include type.subtitle-2-medium;
     line-height: 24px;
-    letter-spacing: -0.02em;
     color: #061125;
     margin: 0;
 }

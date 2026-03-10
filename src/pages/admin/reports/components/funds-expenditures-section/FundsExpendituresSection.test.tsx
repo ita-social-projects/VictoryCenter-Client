@@ -16,10 +16,10 @@ import {
 jest.mock('./FundsExpendituresSection.module.scss', () => ({
     section: 'section',
     disclaimer: 'disclaimer',
-    disclaimerLabel: 'disclaimerLabel',
-    disclaimerTextArea: 'disclaimerTextArea',
-    disclaimerText: 'disclaimerText',
-    summaryCards: 'summaryCards',
+    'disclaimer-label': 'disclaimer-label',
+    'disclaimer-text-area': 'disclaimer-text-area',
+    'disclaimer-text': 'disclaimer-text',
+    'summary-cards': 'summary-cards',
 }));
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({

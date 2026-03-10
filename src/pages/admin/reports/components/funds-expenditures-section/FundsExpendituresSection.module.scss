@@ -1,4 +1,5 @@
 @use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
 
 .section {
     display: flex;
@@ -18,28 +19,27 @@
     gap: 20px;
 }
 
-.disclaimerLabel {
-    font-size: 24px;
-    font-weight: 500;
+.disclaimer-label {
+    @include type.subtitle-1-medium;
     line-height: 24px;
     color: c.$grey-900;
 }
 
-.disclaimerTextArea {
+.disclaimer-text-area {
     background: rgba(182, 208, 228, 0.29);
     border-radius: 6px;
     padding: 20px 25px;
 }
 
-.disclaimerText {
-    font-size: 24px;
+.disclaimer-text {
+    @include type.subtitle-1-medium;
     font-weight: 400;
     line-height: 24px;
     color: c.$black;
     margin: 0;
 }
 
-.summaryCards {
+.summary-cards {
     display: flex;
     gap: 83px;
     flex-wrap: wrap;

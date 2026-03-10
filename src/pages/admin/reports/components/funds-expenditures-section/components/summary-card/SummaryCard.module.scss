@@ -1,4 +1,5 @@
 @use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
 
 .card {
     display: flex;
@@ -14,13 +15,13 @@
     gap: 20px;
 }
 
-.cardCount {
+.card-count {
     padding: 24px 20px;
     gap: 27px;
     flex: 1.2;
 }
 
-.cardBlue {
+.card-blue {
     background-color: c.$blue-500;
 
     .title {
@@ -49,14 +50,13 @@
 }
 
 .amount {
-    font-size: 18px;
-    font-weight: 400;
+    @include type.body-1-regular;
     line-height: 20px;
     color: c.$blue-500;
 }
 
 .value {
-    font-size: 24px;
+    @include type.subtitle-1-medium;
     font-weight: 400;
     line-height: 20px;
     color: c.$blue-500;

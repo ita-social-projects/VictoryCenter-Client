@@ -23,10 +23,9 @@
     @media (min-width: 1440px) {
         grid-template-columns: 1fr 1fr 1fr 2fr 1fr;
         margin: 120px 0;
-        background-color: transparent;
     }
 
-    &>h3 {
+    &>p:first-child {
         @include type.subtitle-2-bold;
 
         @media (min-width: 768px) {
@@ -39,7 +38,7 @@
         }
     }
 
-    &>p {
+    &>p:last-child {
         @include type.body-1-regular;
 
         @media (min-width: 768px) {

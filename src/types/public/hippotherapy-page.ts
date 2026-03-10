@@ -16,17 +16,20 @@ export interface HippotherapyIntroData {
     description: string;
 }
 
+export interface HippoventionCenterData {
+    title: string;
+    imgURL: string;
+    imgAlternativeText?: string;
+    pros: string[];
+    text: string;
+}
+
 export interface HippotherapyAbout {
     introSection: HippotherapyIntroData;
     descriptionSection: HippotherapyDefaultSection;
     quoteSection: Quote;
     hippoventionSection: HippotherapyDefaultSection;
-    hippoventionCenterSection: {
-        title: string;
-        imgURL: string;
-        props: string[];
-        text: string;
-    };
+    hippoventionCenterSection: HippoventionCenterData;
     advantagesSection: {
         title: string;
         advantages: { imgURL: string; text: string }[];

@@ -6,7 +6,7 @@ export const QuoteSection = ({ imgURL, imgAlternativeText, text }: Quote) => {
     return (
         <>
             <section className={styles.root}>
-                <img src={imgURL} alt={imgAlternativeText} className={styles.image} />
+                <img src={imgURL} alt={imgAlternativeText ?? 'Людина і кінь'} className={styles.image} />
                 <SafeHtml data-testid="quote-text" as="p" html={text ?? ''} className={styles.text} />
             </section>
         </>

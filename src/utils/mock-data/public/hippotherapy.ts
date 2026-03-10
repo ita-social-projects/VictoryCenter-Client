@@ -1,7 +1,7 @@
 import introImg from '@/assets/images/public/hippotherapy/intro.jpg';
 import quoteImg from '@/assets/images/public/hippotherapy/quote_1.jpg';
 import anotherQuoteImg from '@/assets/images/public/hippotherapy/quote_2.jpg';
-import ipoventionImg from '@/assets/images/public/programs-page/first.png';
+import hippoventionImg from '@/assets/images/public/hippotherapy/hippovention_center.jpg';
 import advantageImage0 from '@/assets/images/public/programs-page/first.png';
 import advantageImage1 from '@/assets/images/public/programs-page/first.png';
 import advantageImage2 from '@/assets/images/public/programs-page/first.png';
@@ -17,7 +17,7 @@ export const hippotherapyMock: HippotherapyAbout = {
             'Це про зустріч. Між людиною, яка вчиться знову довіряти, і конем, який відповідає без слів. Тут зцілення йде не з розмови, а з присутності.',
     },
     descriptionSection: {
-        title: 'Що таке іпотерапія?',
+        title: '<b>Що таке іпотерапія?</b>',
         text: 'Іпотерапія — це форма терапії з використанням коней, яка поєднує тілесну взаємодію, психологічні практики та емоційний контакт. Фокус не на верховій їзді, а на присутності в моменті.<br /><br />У програмі Victory Center коні — не “інструменти”,  а партнери у процесі відновлення. Їхня чутливість до стану людини допомагає учасникам/цям відчути та пізнати себе — без пояснень, без оцінки, без тиску.',
     },
     quoteSection: {
@@ -26,13 +26,14 @@ export const hippotherapyMock: HippotherapyAbout = {
         imgAlternativeText: 'Людина і кінь',
     },
     hippoventionSection: {
-        title: 'Що таке іповенція?',
+        title: '<b>Що таке іповенція?</b>',
         text: 'Іповенція — це адаптований підхід, який базується на ідеї відновлення через контакт з конем і тілом, але не є терапією в класичному медичному сенсі.',
     },
     hippoventionCenterSection: {
         title: 'В центрі іповенції:',
-        imgURL: ipoventionImg,
-        props: [
+        imgURL: hippoventionImg,
+        imgAlternativeText: 'Група людей на конях',
+        pros: [
             'Сповільнення',
             'Присутність в моменті',
             'Безпека без примусу',

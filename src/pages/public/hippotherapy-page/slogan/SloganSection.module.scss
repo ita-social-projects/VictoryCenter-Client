@@ -14,18 +14,18 @@ section {
 .slogan {
     @include type.h3-medium-uppercase;
     text-align: center;
-    margin: 16px 16px 138px;
+    margin: 16px 16px 122px;
 
     @media (min-width: 560px) {
         font-size: 48px;
         line-height: $line-height-560;
-        margin: 54px 64px 172px;
+        margin: 54px 64px 156px;
     }
 
     @media (min-width: 768px) {
         font-size: 64px;
         line-height: $line-height-768;
-        margin: 66px 56px 230px;
+        margin: 66px 56px 224px;
     }
 
     @media (min-width: 1440px) {

@@ -9,6 +9,7 @@ import { QuoteSection } from './quote/QuoteSection';
 import quote1DefaultImg from '@/assets/images/public/hippotherapy/quote_1.jpg';
 import quote2DefaultImg from '@/assets/images/public/hippotherapy/quote_2.jpg';
 import { SloganSection } from './slogan/SloganSection';
+import { HippoventionCenter } from './hippovention-center/HippoventionCenter';
 
 export const HippotherapyPage = () => {
     const { t } = useTranslation('hippotherapy');
@@ -31,6 +32,7 @@ export const HippotherapyPage = () => {
                         <TextCard {...data.hippoventionSection} />
                     </section>
                     <SloganSection />
+                    <HippoventionCenter {...data.hippoventionCenterSection} />
                     <QuoteSection
                         {...data.anotherQuoteSection}
                         imgURL={data.anotherQuoteSection.imgURL || quote2DefaultImg}

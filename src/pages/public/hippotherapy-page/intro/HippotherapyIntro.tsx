@@ -7,7 +7,7 @@ export const HippotherapyIntro = ({ imgURL, imgAlternativeText, title, descripti
     return (
         <>
             <section className={styles.root}>
-                <img src={imgURL || introImg} alt={imgAlternativeText} className={styles.image} />
+                <img src={imgURL || introImg} alt={imgAlternativeText ?? 'Людина і кінь'} className={styles.image} />
                 <div className={styles.info}>
                     <SafeHtml as="h1" html={title ?? ''} className={styles.title} />
                     <SafeHtml as="p" html={description ?? ''} className={styles.description} />

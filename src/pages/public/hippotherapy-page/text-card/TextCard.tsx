@@ -5,7 +5,7 @@ import styles from './TextCard.module.scss';
 export const TextCard = ({ title, text }: HippotherapyDefaultSection) => {
     return (
         <div className={styles['text-card']}>
-            <SafeHtml as="h3" html={title} />
+            <SafeHtml as="p" html={title} />
             <SafeHtml as="p" html={text} />
         </div>
     );

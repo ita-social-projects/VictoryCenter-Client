@@ -283,7 +283,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
             />
 
             <ConfirmationModal
-                isOpen={modalHookData.showFormConfirmModal}
+                isOpen={isOpen && modalHookData.showFormConfirmModal}
                 onClose={modalHookData.handleDismissConfirmation}
                 title={modalHookData.formConfirmTitle}
                 onConfirm={modalHookData.handleConfirmAction}

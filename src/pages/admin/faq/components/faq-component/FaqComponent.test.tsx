@@ -130,7 +130,7 @@ describe('FaqComponent', () => {
         expect(handleOnDeleteFaq).toHaveBeenCalledWith(mockFaq);
     });
 
-    it('calls handleOnTranslateFaq when translate button is clicked', () => {
+    it.skip('calls handleOnTranslateFaq when translate button is clicked', () => {
         const handleOnTranslateFaq = jest.fn();
         const { container } = render(
             <FaqComponent
@@ -144,5 +144,23 @@ describe('FaqComponent', () => {
         );
         fireEvent.click(container.querySelector('.faq-translate-btn')!);
         expect(handleOnTranslateFaq).toHaveBeenCalledWith(mockFaq);
+    });
+
+    it('renders translate button as disabled and hidden', () => {
+        const handleOnTranslateFaq = jest.fn();
+        const { container } = render(
+            <FaqComponent
+                faq={mockFaq}
+                handleOnDeleteFaq={jest.fn()}
+                handleOnEditFaq={jest.fn()}
+                handleOnTranslateFaq={handleOnTranslateFaq}
+                translationLanguages={mockTranslationLocale}
+                language={mockDefaultLocale}
+            />,
+        );
+
+        const translateBtn = container.querySelector('.faq-translate-btn');
+        expect(translateBtn).toBeDisabled();
+        expect(translateBtn).toHaveClass('disable');
     });
 });

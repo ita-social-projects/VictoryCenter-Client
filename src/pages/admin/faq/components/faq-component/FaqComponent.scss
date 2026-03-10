@@ -147,6 +147,10 @@
                 &:active {
                     background: url('~@/assets/icons/translate.svg');
                 }
+
+                &.disable {
+                    visibility: hidden;
+                }
             }
         }
     }

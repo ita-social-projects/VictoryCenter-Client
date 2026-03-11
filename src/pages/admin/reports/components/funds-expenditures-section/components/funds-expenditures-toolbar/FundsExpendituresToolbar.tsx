@@ -1,6 +1,8 @@
 import { Select } from '@/components/common/select/Select';
+import { Button } from '@/components/admin/button/Button';
 import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
 import { FundsExpendituresTransactionType, ReportFundsExpendituresCategory } from '@/types/admin/reports';
+import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import styles from './FundsExpendituresToolbar.module.scss';
 
 export type TypeFilterValue = FundsExpendituresTransactionType | undefined;
@@ -11,8 +13,14 @@ interface FundsExpendituresToolbarProps {
     selectedType: TypeFilterValue;
     selectedCategoryId: CategoryFilterValue;
     exchangeRate: string | null;
+    isEditing: boolean;
+    isAddIncomeDisabled: boolean;
+    isAddExpenseDisabled: boolean;
     onTypeChange: (value: TypeFilterValue) => void;
     onCategoryChange: (value: CategoryFilterValue) => void;
+    onExchangeRateChange?: (value: string) => void;
+    onAddIncome: () => void;
+    onAddExpense: () => void;
 }
 
 export const FundsExpendituresToolbar = ({
@@ -20,44 +28,92 @@ export const FundsExpendituresToolbar = ({
     selectedType,
     selectedCategoryId,
     exchangeRate,
+    isEditing,
+    isAddIncomeDisabled,
+    isAddExpenseDisabled,
     onTypeChange,
     onCategoryChange,
+    onExchangeRateChange,
+    onAddIncome,
+    onAddExpense,
 }: FundsExpendituresToolbarProps) => {
     return (
-        <div className={styles.toolbar}>
-            <div className={styles.filters}>
-                <Select<TypeFilterValue>
-                    value={selectedType}
-                    onValueChange={onTypeChange}
-                    placeholder={FUNDS_EXPENDITURES_TEXT.FILTER.TYPE_PLACEHOLDER}
-                    className={styles['filter-select']}
-                    optionClassName={styles['filter-option']}
-                >
-                    <Select.Option value={undefined} name={FUNDS_EXPENDITURES_TEXT.FILTER.ALL_OPTION} />
-                    <Select.Option value="income" name={FUNDS_EXPENDITURES_TEXT.TABLE.TYPE_LABELS.INCOME} />
-                    <Select.Option value="expense" name={FUNDS_EXPENDITURES_TEXT.TABLE.TYPE_LABELS.EXPENSE} />
-                </Select>
+        <div className={styles.toolbar} data-testid="funds-toolbar">
+            <div className={styles['toolbar-row']}>
+                <div className={styles.filters}>
+                    <Select<TypeFilterValue>
+                        value={selectedType}
+                        onValueChange={onTypeChange}
+                        placeholder={FUNDS_EXPENDITURES_TEXT.FILTER.TYPE_PLACEHOLDER}
+                        className={styles['filter-select']}
+                        optionClassName={styles['filter-option']}
+                    >
+                        <Select.Option value={undefined} name={FUNDS_EXPENDITURES_TEXT.FILTER.ALL_OPTION} />
+                        <Select.Option value="income" name={FUNDS_EXPENDITURES_TEXT.TABLE.TYPE_LABELS.INCOME} />
+                        <Select.Option value="expense" name={FUNDS_EXPENDITURES_TEXT.TABLE.TYPE_LABELS.EXPENSE} />
+                    </Select>
 
-                <Select<CategoryFilterValue>
-                    value={selectedCategoryId}
-                    onValueChange={onCategoryChange}
-                    placeholder={FUNDS_EXPENDITURES_TEXT.FILTER.CATEGORY_PLACEHOLDER}
-                    className={styles['filter-select']}
-                    optionClassName={styles['filter-option']}
-                >
-                    <Select.Option value={undefined} name={FUNDS_EXPENDITURES_TEXT.FILTER.ALL_OPTION} />
-                    {categories.map((category) => (
-                        <Select.Option key={category.id} value={category.id} name={category.name} />
-                    ))}
-                </Select>
-            </div>
-
-            {exchangeRate && (
-                <div className={styles['exchange-rate']}>
-                    <span className={styles['exchange-rate-label']}>{FUNDS_EXPENDITURES_TEXT.EXCHANGE_RATE_LABEL}</span>
-                    <span className={styles['exchange-rate-value']}>{exchangeRate}</span>
+                    <Select<CategoryFilterValue>
+                        value={selectedCategoryId}
+                        onValueChange={onCategoryChange}
+                        placeholder={FUNDS_EXPENDITURES_TEXT.FILTER.CATEGORY_PLACEHOLDER}
+                        className={styles['filter-select']}
+                        optionClassName={styles['filter-option']}
+                    >
+                        <Select.Option value={undefined} name={FUNDS_EXPENDITURES_TEXT.FILTER.ALL_OPTION} />
+                        {categories.map((category) => (
+                            <Select.Option key={category.id} value={category.id} name={category.name} />
+                        ))}
+                    </Select>
                 </div>
-            )}
+
+                <div className={styles['toolbar-right']}>
+                    {exchangeRate !== null && (
+                        <div className={styles['exchange-rate']} data-testid="exchange-rate-container">
+                            <span className={styles['exchange-rate-label']}>
+                                {FUNDS_EXPENDITURES_TEXT.EXCHANGE_RATE_LABEL}
+                            </span>
+                            {isEditing ? (
+                                <input
+                                    type="text"
+                                    data-testid="exchange-rate-input"
+                                    className={styles['exchange-rate-input']}
+                                    value={exchangeRate}
+                                    maxLength={FUNDS_EXPENDITURES_TEXT.EXCHANGE_RATE_MAX_LENGTH}
+                                    onChange={(e) => onExchangeRateChange?.(e.target.value)}
+                                />
+                            ) : (
+                                <span className={styles['exchange-rate-value']} data-testid="exchange-rate">
+                                    {exchangeRate}
+                                </span>
+                            )}
+                        </div>
+                    )}
+
+                    {isEditing && (
+                        <div className={styles['editing-actions']} data-testid="editing-actions">
+                            <Button
+                                buttonStyle="primary"
+                                className={styles['add-expense-button']}
+                                onClick={onAddExpense}
+                                disabled={isAddExpenseDisabled}
+                            >
+                                <PlusIcon className={styles['plus-icon']} />
+                                {FUNDS_EXPENDITURES_TEXT.BUTTON.ADD_EXPENSE}
+                            </Button>
+                            <Button
+                                buttonStyle="primary"
+                                className={styles['add-income-button']}
+                                onClick={onAddIncome}
+                                disabled={isAddIncomeDisabled}
+                            >
+                                <PlusIcon className={styles['plus-icon']} />
+                                {FUNDS_EXPENDITURES_TEXT.BUTTON.ADD_INCOME}
+                            </Button>
+                        </div>
+                    )}
+                </div>
+            </div>
         </div>
     );
 };

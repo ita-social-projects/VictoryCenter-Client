@@ -24,13 +24,9 @@ export const HippotherapyPage = () => {
             {data && (
                 <>
                     <HippotherapyIntro {...data.introSection} />
-                    <section>
-                        <TextCard {...data.descriptionSection} />
-                    </section>
+                    <TextCard {...data.descriptionSection} />
                     <QuoteSection {...data.quoteSection} imgURL={data.quoteSection.imgURL || quote1DefaultImg} />
-                    <section>
-                        <TextCard {...data.hippoventionSection} />
-                    </section>
+                    <TextCard {...data.hippoventionSection} />
                     <SloganSection />
                     <HippoventionCenter {...data.hippoventionCenterSection} />
                     <QuoteSection

@@ -4,9 +4,11 @@ import styles from './TextCard.module.scss';
 
 export const TextCard = ({ title, text }: HippotherapyDefaultSection) => {
     return (
-        <div className={styles['text-card']}>
-            <SafeHtml as="p" html={title} />
-            <SafeHtml as="p" html={text} />
-        </div>
+        <section className={styles['text-card-section']}>
+            <div className={styles['text-card']}>
+                <SafeHtml as="p" html={title} />
+                <SafeHtml as="p" html={text} />
+            </div>
+        </section>
     );
 };

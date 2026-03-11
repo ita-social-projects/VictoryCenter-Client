@@ -13,7 +13,6 @@ interface TranslationControlsProps {
 }
 
 export const TranslationControls = ({
-    isSubmitting,
     languages,
     selectedLanguage,
     onLanguageChange,

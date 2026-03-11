@@ -56,7 +56,6 @@ export const ReportsPanelContent = () => {
                     isEditing={isEditing}
                     isPublishDisabled={!isDirty}
                     onEdit={handleEdit}
-                    onEditReportAnalytics={() => {}}
                     onCancel={handleCancel}
                     onPublish={handlePublish}
                 />

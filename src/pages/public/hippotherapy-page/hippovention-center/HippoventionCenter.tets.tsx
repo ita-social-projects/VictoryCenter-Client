@@ -8,10 +8,7 @@ describe('HippoventionCenter', () => {
         const imgAlternativeText = 'Test Image';
         const text = 'Test Text';
         const pros = ['Pro 1', 'Pro 2', 'Pro 3'];
-        render(
-            <HippoventionCenter
-                {...{ title, imgURL, imgAlternativeText, text, pros }} />
-        );
+        render(<HippoventionCenter {...{ title, imgURL, imgAlternativeText, text, pros }} />);
         expect(screen.getByText(title)).toBeInTheDocument();
         expect(screen.getByAltText(imgAlternativeText)).toBeInTheDocument();
         expect(screen.getByText(text)).toBeInTheDocument();

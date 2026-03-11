@@ -8,7 +8,7 @@ describe('QuoteSection', () => {
                 imgURL="/path/test-image.jpg"
                 imgAlternativeText="Test Image"
                 text="<p>Test Quote Text<br/>Test Author</p>"
-            />
+            />,
         );
 
         const image = screen.getByRole('img');

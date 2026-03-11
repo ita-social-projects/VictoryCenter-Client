@@ -6,5 +6,5 @@ describe('TextCard', () => {
         render(<TextCard title="Test Title" text="Test Text" />);
         expect(screen.getByText('Test Title')).toBeInTheDocument();
         expect(screen.getByText('Test Text')).toBeInTheDocument();
-    })
+    });
 });

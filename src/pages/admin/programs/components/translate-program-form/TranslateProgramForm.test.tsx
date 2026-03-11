@@ -3,7 +3,6 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 import { TranslateProgramForm, TranslateProgramFormRef } from './TranslateProgramForm';
-import { PROGRAM_VALIDATION } from '@/const/admin/programs';
 import { VisibilityStatus } from '@/types/admin/common';
 import { CreateHippotherapyProgramSectionLocalizationDto } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';

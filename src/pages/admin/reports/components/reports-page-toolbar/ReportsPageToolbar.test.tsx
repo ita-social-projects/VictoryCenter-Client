@@ -36,7 +36,6 @@ describe('ReportsPageToolbar', () => {
         isEditing: false,
         isPublishDisabled: false,
         onEdit: mockOnEdit,
-        onEditReportAnalytics: jest.fn(),
         onCancel: mockOnCancel,
         onPublish: mockOnPublish,
     };
@@ -182,19 +181,12 @@ describe('ReportsPageToolbar', () => {
     });
 
     describe('Report analytics tab', () => {
-        it('should render only Edit Page button when on report-analytics tab (no Cancel/Publish)', () => {
-            const mockOnEditReportAnalytics = jest.fn();
-            renderComponent({
-                selectedTab: REPORTS_TOOLBAR_TABS[1],
-                onEditReportAnalytics: mockOnEditReportAnalytics,
-            });
+        it('should not render any action buttons on the report-analytics tab', () => {
+            renderComponent({ selectedTab: REPORTS_TOOLBAR_TABS[1] });
 
-            expect(screen.getByText(REPORTS_TEXT.BUTTON.EDIT_PAGE)).toBeInTheDocument();
+            expect(screen.queryByText(REPORTS_TEXT.BUTTON.EDIT_PAGE)).not.toBeInTheDocument();
             expect(screen.queryByText(REPORTS_TEXT.BUTTON.CANCEL)).not.toBeInTheDocument();
             expect(screen.queryByText(REPORTS_TEXT.BUTTON.PUBLISH)).not.toBeInTheDocument();
-
-            fireEvent.click(screen.getByText(REPORTS_TEXT.BUTTON.EDIT_PAGE));
-            expect(mockOnEditReportAnalytics).toHaveBeenCalledTimes(1);
         });
     });
 });

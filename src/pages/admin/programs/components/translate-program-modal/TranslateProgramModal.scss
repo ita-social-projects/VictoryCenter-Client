@@ -1,35 +1,51 @@
 @use '@/assets/sass/variables/colors' as c;
 
 .translate-program-modal {
+    --title-block-width: 22rem;
+
     .modal-header {
-        margin-bottom: 0.5rem;
+        margin-bottom: 0;
 
         .close-icon {
-            margin-bottom: 0;
-            padding-right: 0;
+            display: flex;
+            justify-content: flex-end;
+            width: 100%;
+            margin-bottom: 0.5rem;
+            padding-right: 0.5rem;
 
             button {
-                width: 1.75rem;
-                height: 1.75rem;
-                background-size: 1.25rem 1.25rem;
-                background-position: center;
+                width: 1.5rem;
+                height: 1.5rem;
+                cursor: pointer;
+                border: none;
+                background: url('~@/assets/icons/cross.svg') no-repeat;
+                transition: opacity 0.2s ease;
+                &:hover { opacity: 0.7; }
             }
         }
 
         .modal-title-wrapper {
             text-align: left;
+            padding-top: 0.125rem;
         }
 
         .modal-header-text {
+            display: inline-block;
+            width: var(--title-block-width);
+            max-width: calc(100% - 3rem);
             text-align: left;
-            font-size: 2.75rem;
+            font-size: 2rem;
             line-height: 1.2;
             color: c.$blue-900;
+            white-space: nowrap;
         }
     }
 
     .modal-body {
         margin-bottom: 0;
+        margin-top: -2.35rem;
+        position: relative;
+        z-index: 2;
     }
 
     .modal-footer {
@@ -40,13 +56,16 @@
 .translate-program-modal__top-bar {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     gap: 1rem;
+    padding-left: calc(var(--title-block-width) + 0.35rem);
+    padding-right: 3.1rem;
     margin-bottom: 1rem;
 }
 
 .translate-program-modal__language-select {
-    min-width: 13rem;
+    min-width: 12rem;
+    margin: 0;
 }
 
 .translate-program-modal__language-select-head {
@@ -74,9 +93,65 @@
     display: flex;
     gap: 0.875rem;
     align-items: center;
+    margin-left: auto;
+    margin-top: 0.125rem;
 }
 
 .translate-program-modal__action-button {
     min-width: 13rem;
     height: 3rem;
+}
+
+.translate-program-modal .translate-program-modal__top-actions .btn-secondary.translate-program-modal__action-button {
+    background-color: c.$grey-700;
+    border: 1px solid c.$grey-700;
+    color: c.$grey-50;
+
+    &:hover {
+        background-color: c.$grey-800;
+        border-color: c.$grey-800;
+        color: c.$grey-50;
+    }
+
+    &:active {
+        background-color: c.$grey-900;
+        border-color: c.$grey-900;
+        color: c.$grey-50;
+    }
+
+    &:disabled {
+        background-color: c.$grey-700;
+        border-color: c.$grey-700;
+        color: c.$grey-50;
+        opacity: 0.72;
+    }
+}
+
+@media (max-width: 900px) {
+    .translate-program-modal {
+        --title-block-width: 100%;
+
+        .modal-header {
+            padding-right: 0;
+
+            .modal-header-text {
+                font-size: 1.75rem;
+                white-space: normal;
+            }
+        }
+    }
+
+    .translate-program-modal__top-bar {
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        gap: 0.625rem;
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .translate-program-modal__language-select {
+        margin-left: 0;
+        margin-right: 0;
+        min-width: 11.5rem;
+    }
 }

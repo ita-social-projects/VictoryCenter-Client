@@ -20,7 +20,6 @@ interface ReportsPageToolbarProps {
     isEditing: boolean;
     isPublishDisabled: boolean;
     onEdit: () => void;
-    onEditReportAnalytics?: () => void;
     onCancel: () => void;
     onPublish: () => void;
 }
@@ -31,12 +30,10 @@ export const ReportsPageToolbar = ({
     isEditing,
     isPublishDisabled,
     onEdit,
-    onEditReportAnalytics,
     onCancel,
     onPublish,
 }: ReportsPageToolbarProps) => {
     const isMediaSettingsTab = selectedTab.id === 'media-settings';
-    const handleEditClick = isMediaSettingsTab ? onEdit : (onEditReportAnalytics ?? (() => {}));
 
     return (
         <div className={styles.toolbar}>
@@ -47,26 +44,27 @@ export const ReportsPageToolbar = ({
                 getCategoryKey={(tab) => tab.id}
                 onCategorySelect={onTabSelect}
             />
-            {isMediaSettingsTab && isEditing ? (
-                <div className={styles.actions}>
-                    <Button buttonStyle="secondary" className={styles.button} onClick={onCancel}>
-                        {REPORTS_TEXT.BUTTON.CANCEL}
+            {isMediaSettingsTab &&
+                (isEditing ? (
+                    <div className={styles.actions}>
+                        <Button buttonStyle="secondary" className={styles.button} onClick={onCancel}>
+                            {REPORTS_TEXT.BUTTON.CANCEL}
+                        </Button>
+                        <Button
+                            buttonStyle="primary"
+                            className={styles.button}
+                            onClick={onPublish}
+                            disabled={isPublishDisabled}
+                        >
+                            {REPORTS_TEXT.BUTTON.PUBLISH}
+                        </Button>
+                    </div>
+                ) : (
+                    <Button buttonStyle="primary" className={styles.button} onClick={onEdit}>
+                        <EditIcon />
+                        {REPORTS_TEXT.BUTTON.EDIT_PAGE}
                     </Button>
-                    <Button
-                        buttonStyle="primary"
-                        className={styles.button}
-                        onClick={onPublish}
-                        disabled={isPublishDisabled}
-                    >
-                        {REPORTS_TEXT.BUTTON.PUBLISH}
-                    </Button>
-                </div>
-            ) : (
-                <Button buttonStyle="primary" className={styles.button} onClick={handleEditClick}>
-                    <EditIcon />
-                    {REPORTS_TEXT.BUTTON.EDIT_PAGE}
-                </Button>
-            )}
+                ))}
         </div>
     );
 };

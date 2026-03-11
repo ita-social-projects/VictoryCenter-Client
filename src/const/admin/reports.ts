@@ -106,6 +106,16 @@ export const PDF_FILES_SECTION_TEXT = {
 export const FUNDS_EXPENDITURES_TEXT = {
     DISCLAIMER_LABEL: 'Дісклеймер/ENG',
     EXCHANGE_RATE_LABEL: 'Курс USD/UAH',
+    DISCLAIMER_MAX_LENGTH: 300,
+    EXCHANGE_RATE_MAX_LENGTH: 10,
+    MAX_CATEGORIES_PER_TYPE: 4,
+    BUTTON: {
+        EDIT: 'Редагувати Доходи та витрати',
+        CANCEL: 'Відмінити',
+        PUBLISH: 'Опублікувати',
+        ADD_INCOME: 'Надходження',
+        ADD_EXPENSE: 'Витрати',
+    },
     FILTER: {
         TYPE_PLACEHOLDER: 'Тип',
         CATEGORY_PLACEHOLDER: 'Категорія',

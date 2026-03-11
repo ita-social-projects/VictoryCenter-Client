@@ -1,5 +1,7 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
+import { FUNDS_EXPENDITURES_TEXT, FUNDS_EXPENDITURES_VALIDATION } from '@/const/admin/reports';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { FUNDS_EXPENDITURES_DISCLAIMER_VALIDATION_FUNCTIONS } from '@/validation/admin/reports-schema/funds-expenditures-disclaimer-schema/funds-expenditures-disclaimer-schema';
 import { Button } from '@/components/admin/button/Button';
 import { ReactComponent as EditIcon } from '@/assets/icons/edit-default.svg';
 import { FundsExpendituresApi } from '@/services/api/admin/reports/funds-expenditures-api';
@@ -53,13 +55,28 @@ export const FundsExpenditureSection = () => {
 
     const [isEditing, setIsEditing] = useState(false);
     const [disclaimerValue, setDisclaimerValue] = useState('');
+    const [disclaimerError, setDisclaimerError] = useState<string | undefined>(undefined);
     const [exchangeRateValue, setExchangeRateValue] = useState('');
 
     const [selectedType, setSelectedType] = useState<TypeFilterValue>(undefined);
     const [selectedCategoryId, setSelectedCategoryId] = useState<CategoryFilterValue>(undefined);
 
     const handleEdit = useCallback(() => setIsEditing(true), []);
-    const handleCancel = useCallback(() => setIsEditing(false), []);
+    const handleCancel = useCallback(() => {
+        setIsEditing(false);
+        setDisclaimerError(undefined);
+    }, []);
+
+    const handleDisclaimerChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const normalized = e.target.value.replaceAll(/ {2,}/g, ' ');
+        setDisclaimerValue(normalized);
+    }, []);
+
+    const handleDisclaimerBlur = useCallback(() => {
+        const trimmed = disclaimerValue.replaceAll(/\s+/g, ' ').trim();
+        setDisclaimerValue(trimmed);
+        setDisclaimerError(FUNDS_EXPENDITURES_DISCLAIMER_VALIDATION_FUNCTIONS.validateDisclaimer(trimmed));
+    }, [disclaimerValue]);
 
     const handleTypeChange = useCallback((type: TypeFilterValue) => {
         setSelectedType(type);
@@ -85,10 +102,16 @@ export const FundsExpenditureSection = () => {
         fetchHandler: fetchRecords,
     });
 
+    const isPublishEnabled = useMemo(() => {
+        const normalized = disclaimerValue.replaceAll(/\s+/g, ' ').trim();
+        return normalized.length >= FUNDS_EXPENDITURES_VALIDATION.disclaimer.min && !disclaimerError;
+    }, [disclaimerValue, disclaimerError]);
+
     useEffect(() => {
         if (!isEditing) {
             setDisclaimerValue(settings?.disclaimerTitle ?? '');
             setExchangeRateValue(settings?.exchangeRate ?? '');
+            setDisclaimerError(undefined);
         }
     }, [settings, isEditing]);
 
@@ -131,9 +154,15 @@ export const FundsExpenditureSection = () => {
                         name="disclaimer"
                         label={FUNDS_EXPENDITURES_TEXT.DISCLAIMER_LABEL}
                         value={disclaimerValue}
-                        onChange={(e) => setDisclaimerValue(e.target.value)}
-                        maxLength={FUNDS_EXPENDITURES_TEXT.DISCLAIMER_MAX_LENGTH}
+                        onChange={handleDisclaimerChange}
+                        onBlur={handleDisclaimerBlur}
+                        maxLength={FUNDS_EXPENDITURES_VALIDATION.disclaimer.max}
+                        maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
+                            FUNDS_EXPENDITURES_VALIDATION.disclaimer.max,
+                        )}
+                        error={disclaimerError}
                         rows={3}
+                        isRequired
                         className={styles['disclaimer-textarea-group']}
                     />
                 </div>
@@ -193,7 +222,12 @@ export const FundsExpenditureSection = () => {
                     <Button buttonStyle="secondary" className={styles['footer-button']} onClick={handleCancel}>
                         {FUNDS_EXPENDITURES_TEXT.BUTTON.CANCEL}
                     </Button>
-                    <Button buttonStyle="primary" className={styles['footer-button']} onClick={() => {}} disabled>
+                    <Button
+                        buttonStyle="primary"
+                        className={styles['footer-button']}
+                        onClick={() => {}}
+                        disabled={!isPublishEnabled}
+                    >
                         {FUNDS_EXPENDITURES_TEXT.BUTTON.PUBLISH}
                     </Button>
                 </div>

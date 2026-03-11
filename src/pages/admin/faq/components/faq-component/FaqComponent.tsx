@@ -76,7 +76,7 @@ export const FaqComponent = ({
                     </div>
                 </ButtonTooltip>
                 <div className="faq-actions-buttons">
-                    <button type="button" onClick={handleTranslateFaq} className="faq-translate-btn disable" disabled />
+                    <button type="button" onClick={handleTranslateFaq} className="faq-translate-btn" />
                     <button type="button" onClick={handleEditFaq} className="faq-edit-btn" />
                     <button type="button" onClick={handleDeleteFaq} className="faq-delete-btn" />
                 </div>

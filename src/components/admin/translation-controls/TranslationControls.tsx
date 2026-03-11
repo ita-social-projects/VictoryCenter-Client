@@ -40,9 +40,9 @@ export const TranslationControls = ({
                 )}
             </div>
             <Button
-                className={styles['generate-button']}
+                className={`${styles['generate-button']} disable`}
                 buttonStyle="primary"
-                disabled={isSubmitting || !selectedLanguage}
+                disabled={true}
                 onClick={onGenerate}
                 type="button"
             >

@@ -1,7 +1,8 @@
 ﻿import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { FundsExpenditureSection } from './FundsExpendituresSection';
-import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
+import { FUNDS_EXPENDITURES_TEXT, FUNDS_EXPENDITURES_VALIDATION } from '@/const/admin/reports';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import {
     MOCK_FUNDS_EXPENDITURES_CATEGORIES,
     MOCK_FUNDS_EXPENDITURES_RECORDS,
@@ -40,15 +41,20 @@ jest.mock(
             label,
             value,
             onChange,
+            onBlur,
+            error,
         }: {
             id: string;
             label: string;
             value: string;
             onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+            onBlur?: (e: React.FocusEvent<HTMLTextAreaElement>) => void;
+            error?: string;
         }) => (
             <div data-testid={`textarea-group-${id}`}>
                 <label>{label}</label>
-                <textarea data-testid={`textarea-${id}`} value={value} onChange={onChange} />
+                <textarea data-testid={`textarea-${id}`} value={value} onChange={onChange} onBlur={onBlur} />
+                {error && <span data-testid={`error-${id}`}>{error}</span>}
             </div>
         ),
     }),
@@ -329,6 +335,111 @@ describe('FundsExpenditureSection', () => {
             fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT));
             fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.CANCEL));
             expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT)).toBeInTheDocument();
+        });
+    });
+
+    describe('disclaimer validation', () => {
+        beforeEach(() => {
+            jest.clearAllMocks();
+            setupMockDataFetch();
+        });
+
+        const enterEditMode = () => fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT));
+        const getTextarea = () => screen.getByTestId('textarea-funds-disclaimer');
+        const getPublishButton = () => screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.PUBLISH);
+
+        it('should show required error when blurring an empty disclaimer', () => {
+            render(<FundsExpenditureSection />);
+            enterEditMode();
+            fireEvent.change(getTextarea(), { target: { value: '' } });
+            fireEvent.blur(getTextarea());
+            expect(screen.getByTestId('error-funds-disclaimer')).toHaveTextContent(
+                COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED,
+            );
+        });
+
+        it('should show min-length error when blurring with 1 character', () => {
+            render(<FundsExpenditureSection />);
+            enterEditMode();
+            fireEvent.change(getTextarea(), { target: { value: 'a' } });
+            fireEvent.blur(getTextarea());
+            expect(screen.getByTestId('error-funds-disclaimer')).toHaveTextContent(
+                COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(FUNDS_EXPENDITURES_VALIDATION.disclaimer.min),
+            );
+        });
+
+        it('should clear error when disclaimer is corrected and blurred', () => {
+            render(<FundsExpenditureSection />);
+            enterEditMode();
+            fireEvent.change(getTextarea(), { target: { value: '' } });
+            fireEvent.blur(getTextarea());
+            expect(screen.getByTestId('error-funds-disclaimer')).toBeInTheDocument();
+
+            fireEvent.change(getTextarea(), { target: { value: 'valid disclaimer text' } });
+            fireEvent.blur(getTextarea());
+            expect(screen.queryByTestId('error-funds-disclaimer')).not.toBeInTheDocument();
+        });
+
+        it('should normalize consecutive spaces to a single space when typing', () => {
+            render(<FundsExpenditureSection />);
+            enterEditMode();
+            fireEvent.change(getTextarea(), { target: { value: 'one  two   three' } });
+            expect(getTextarea()).toHaveValue('one two three');
+        });
+
+        it('should trim and normalize spaces on blur', () => {
+            render(<FundsExpenditureSection />);
+            enterEditMode();
+            fireEvent.change(getTextarea(), { target: { value: '  leading and trailing  ' } });
+            fireEvent.blur(getTextarea());
+            expect(getTextarea()).toHaveValue('leading and trailing');
+        });
+
+        it('should disable publish button when disclaimer is empty', () => {
+            setupMockDataFetch({ id: 1, disclaimerTitle: null, exchangeRate: '42' });
+            render(<FundsExpenditureSection />);
+            enterEditMode();
+            expect(getPublishButton()).toBeDisabled();
+        });
+
+        it('should disable publish button when disclaimer has only 1 character', () => {
+            render(<FundsExpenditureSection />);
+            enterEditMode();
+            fireEvent.change(getTextarea(), { target: { value: 'a' } });
+            expect(getPublishButton()).toBeDisabled();
+        });
+
+        it('should enable publish button when disclaimer has at least 2 characters', () => {
+            render(<FundsExpenditureSection />);
+            enterEditMode();
+            fireEvent.change(getTextarea(), { target: { value: 'ok' } });
+            expect(getPublishButton()).not.toBeDisabled();
+        });
+
+        it('should enable publish button when disclaimer already has a valid value from settings', () => {
+            render(<FundsExpenditureSection />);
+            enterEditMode();
+            expect(getPublishButton()).not.toBeDisabled();
+        });
+
+        it('should disable publish button after a blur validation error', () => {
+            render(<FundsExpenditureSection />);
+            enterEditMode();
+            fireEvent.change(getTextarea(), { target: { value: 'a' } });
+            fireEvent.blur(getTextarea());
+            expect(getPublishButton()).toBeDisabled();
+        });
+
+        it('should reset disclaimer error when cancel is clicked', () => {
+            render(<FundsExpenditureSection />);
+            enterEditMode();
+            fireEvent.change(getTextarea(), { target: { value: '' } });
+            fireEvent.blur(getTextarea());
+            expect(screen.getByTestId('error-funds-disclaimer')).toBeInTheDocument();
+
+            fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.CANCEL));
+            fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT));
+            expect(screen.queryByTestId('error-funds-disclaimer')).not.toBeInTheDocument();
         });
     });
 });

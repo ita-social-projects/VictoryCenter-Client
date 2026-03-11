@@ -242,7 +242,9 @@ describe('TranslateProgramModal', () => {
         fireEvent.click(screen.getByLabelText('Close modal'));
 
         await waitFor(() => {
-            expect(screen.getByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE)).toBeInTheDocument();
+            expect(
+                screen.getByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE),
+            ).toBeInTheDocument();
         });
     });
 
@@ -268,7 +270,9 @@ describe('TranslateProgramModal', () => {
         fireEvent.click(screen.getByLabelText('Close modal'));
 
         await waitFor(() => {
-            expect(screen.getByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE)).toBeInTheDocument();
+            expect(
+                screen.getByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE),
+            ).toBeInTheDocument();
         });
 
         fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.NO }));
@@ -276,7 +280,9 @@ describe('TranslateProgramModal', () => {
 
         fireEvent.click(screen.getByLabelText('Close modal'));
         await waitFor(() => {
-            expect(screen.getByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE)).toBeInTheDocument();
+            expect(
+                screen.getByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE),
+            ).toBeInTheDocument();
         });
 
         fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES }));

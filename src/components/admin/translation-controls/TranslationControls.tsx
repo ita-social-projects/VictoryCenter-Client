@@ -40,7 +40,7 @@ export const TranslationControls = ({
                 )}
             </div>
             <Button
-                className={`${styles['generate-button']} disable`}
+                className={`${styles['generate-button']} ${styles.disable}`}
                 buttonStyle="primary"
                 disabled={true}
                 onClick={onGenerate}

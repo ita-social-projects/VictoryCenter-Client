@@ -83,12 +83,10 @@ export const FundsExpenditureSection = ({ isEditing: _isEditing }: FundsExpendit
 
     const enrichedRecords = useMemo(() => enrichRecords(allRecords, categories), [allRecords, categories]);
 
-    const filteredCategories = useMemo((): ReportFundsExpendituresCategory[] => {
-        const relevantRecords =
-            selectedType === undefined ? allRecords : allRecords.filter((r) => r.type === selectedType);
-        const activeCategoryIds = new Set(relevantRecords.map((r) => r.categoryId));
-        return categories.filter((c) => activeCategoryIds.has(c.id)).sort((a, b) => a.name.localeCompare(b.name, 'uk'));
-    }, [allRecords, categories, selectedType]);
+    const filteredCategories = useMemo(
+        (): ReportFundsExpendituresCategory[] => [...categories].sort((a, b) => a.name.localeCompare(b.name, 'uk')),
+        [categories],
+    );
 
     const filteredRecords = useMemo((): EnrichedRecord[] => {
         return enrichedRecords.filter((record) => {

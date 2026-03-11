@@ -4,6 +4,8 @@ import { FundsExpendituresTransactionType, ReportFundsExpendituresRecord } from 
 import { ReactComponent as ChevronUp } from '@/assets/icons/chevron-up.svg';
 import { ReactComponent as ChevronDown } from '@/assets/icons/chevron-down.svg';
 import { ReactComponent as NotFoundIcon } from '@/assets/icons/not-found.svg';
+import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
+import { ReactComponent as DeleteIcon } from '@/assets/icons/delete.svg';
 import cn from 'classnames';
 import styles from './FundsExpendituresTable.module.scss';
 
@@ -21,6 +23,7 @@ interface ColumnSort {
 
 interface FundsExpendituresTableProps {
     records: EnrichedRecord[];
+    isEditing?: boolean;
 }
 
 const TYPE_LABEL_MAP: Record<FundsExpendituresTransactionType, string> = {
@@ -67,7 +70,7 @@ const SortIcon = ({ column, sort }: { column: SortableColumn; sort: ColumnSort }
     );
 };
 
-export const FundsExpendituresTable = ({ records }: FundsExpendituresTableProps) => {
+export const FundsExpendituresTable = ({ records, isEditing = false }: FundsExpendituresTableProps) => {
     const [sort, setSort] = useState<ColumnSort>({ column: null, direction: null });
 
     const handleSort = useCallback((column: SortableColumn) => {
@@ -79,12 +82,14 @@ export const FundsExpendituresTable = ({ records }: FundsExpendituresTableProps)
     }, []);
 
     const sortedRecords = sortRecords(records, sort);
+    const colSpan = isEditing ? 7 : 5;
 
     return (
-        <div className={styles['table-wrapper']}>
+        <div className={styles['table-wrapper']} data-testid="funds-table" data-record-count={records.length}>
             <table className={styles.table}>
                 <thead>
                     <tr>
+                        {isEditing && <th className={cn(styles.th, styles['checkbox-th'])} />}
                         <th className={styles.th}>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.REPORTING_YEAR}</th>
                         <th className={cn(styles.th, styles.sortable)} onClick={() => handleSort('type')}>
                             <span className={styles['th-inner']}>
@@ -110,12 +115,13 @@ export const FundsExpendituresTable = ({ records }: FundsExpendituresTableProps)
                                 <SortIcon column="amountUsd" sort={sort} />
                             </span>
                         </th>
+                        {isEditing && <th className={cn(styles.th, styles['actions-th'])} />}
                     </tr>
                 </thead>
                 <tbody>
                     {sortedRecords.length === 0 ? (
                         <tr>
-                            <td colSpan={5} className={styles['empty-cell']}>
+                            <td colSpan={colSpan} className={styles['empty-cell']} data-testid="funds-table-empty-cell">
                                 <div className={styles['empty-state']}>
                                     <NotFoundIcon className={styles['empty-state-image']} />
                                     <p className={styles['empty-state-message']}>
@@ -127,6 +133,15 @@ export const FundsExpendituresTable = ({ records }: FundsExpendituresTableProps)
                     ) : (
                         sortedRecords.map((record) => (
                             <tr key={record.id} className={styles.tr}>
+                                {isEditing && (
+                                    <td className={cn(styles.td, styles['checkbox-td'])}>
+                                        <input
+                                            type="checkbox"
+                                            className={styles['row-checkbox']}
+                                            aria-label={`Select record ${record.id}`}
+                                        />
+                                    </td>
+                                )}
                                 <td className={styles.td}>{record.reportingYear}</td>
                                 <td className={styles.td}>
                                     <span
@@ -141,6 +156,26 @@ export const FundsExpendituresTable = ({ records }: FundsExpendituresTableProps)
                                 <td className={styles.td}>{record.categoryName}</td>
                                 <td className={styles.td}>{record.amountUah}</td>
                                 <td className={styles.td}>{record.amountUsd}</td>
+                                {isEditing && (
+                                    <td className={cn(styles.td, styles['actions-td'])}>
+                                        <div className={styles['row-actions']}>
+                                            <button
+                                                type="button"
+                                                className={styles['icon-button']}
+                                                aria-label={`Edit record ${record.id}`}
+                                            >
+                                                <EditIcon className={styles['action-icon']} />
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className={styles['icon-button']}
+                                                aria-label={`Delete record ${record.id}`}
+                                            >
+                                                <DeleteIcon className={styles['action-icon']} />
+                                            </button>
+                                        </div>
+                                    </td>
+                                )}
                             </tr>
                         ))
                     )}

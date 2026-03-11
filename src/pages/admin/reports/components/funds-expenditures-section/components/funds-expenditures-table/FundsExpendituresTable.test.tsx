@@ -21,6 +21,14 @@ jest.mock('./FundsExpendituresTable.module.scss', () => ({
     'empty-state': 'empty-state',
     'empty-state-image': 'empty-state-image',
     'empty-state-message': 'empty-state-message',
+    'checkbox-th': 'checkbox-th',
+    'checkbox-td': 'checkbox-td',
+    'row-checkbox': 'row-checkbox',
+    'actions-th': 'actions-th',
+    'actions-td': 'actions-td',
+    'row-actions': 'row-actions',
+    'icon-button': 'icon-button',
+    'action-icon': 'action-icon',
 }));
 
 jest.mock('@/assets/icons/chevron-up.svg', () => ({
@@ -33,6 +41,14 @@ jest.mock('@/assets/icons/chevron-down.svg', () => ({
 
 jest.mock('@/assets/icons/not-found.svg', () => ({
     ReactComponent: ({ className }: { className?: string }) => <svg data-testid="not-found" className={className} />,
+}));
+
+jest.mock('@/assets/icons/edit.svg', () => ({
+    ReactComponent: ({ className }: { className?: string }) => <svg data-testid="edit-icon" className={className} />,
+}));
+
+jest.mock('@/assets/icons/delete.svg', () => ({
+    ReactComponent: ({ className }: { className?: string }) => <svg data-testid="delete-icon" className={className} />,
 }));
 
 const MOCK_RECORDS: EnrichedRecord[] = [
@@ -187,5 +203,42 @@ describe('FundsExpendituresTable', () => {
         render(<FundsExpendituresTable records={MOCK_RECORDS} />);
         expect(screen.getByText('7 265')).toBeInTheDocument();
         expect(screen.getAllByText('4 200')).not.toHaveLength(0);
+    });
+
+    describe('isEditing mode', () => {
+        it('should not show checkboxes when isEditing is false (default)', () => {
+            render(<FundsExpendituresTable records={MOCK_RECORDS} />);
+            expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
+        });
+
+        it('should show a checkbox per row when isEditing is true', () => {
+            render(<FundsExpendituresTable records={MOCK_RECORDS} isEditing={true} />);
+            const checkboxes = screen.getAllByRole('checkbox');
+            expect(checkboxes).toHaveLength(MOCK_RECORDS.length);
+        });
+
+        it('should show edit and delete icons per row when isEditing is true', () => {
+            render(<FundsExpendituresTable records={MOCK_RECORDS} isEditing={true} />);
+            expect(screen.getAllByTestId('edit-icon')).toHaveLength(MOCK_RECORDS.length);
+            expect(screen.getAllByTestId('delete-icon')).toHaveLength(MOCK_RECORDS.length);
+        });
+
+        it('should not show edit and delete icons when isEditing is false', () => {
+            render(<FundsExpendituresTable records={MOCK_RECORDS} isEditing={false} />);
+            expect(screen.queryAllByTestId('edit-icon')).toHaveLength(0);
+            expect(screen.queryAllByTestId('delete-icon')).toHaveLength(0);
+        });
+
+        it('should use colSpan of 7 for empty state when isEditing is true', () => {
+            render(<FundsExpendituresTable records={[]} isEditing={true} />);
+            const emptyCell = screen.getByTestId('funds-table-empty-cell');
+            expect(emptyCell).toHaveAttribute('colspan', '7');
+        });
+
+        it('should use colSpan of 5 for empty state when not editing', () => {
+            render(<FundsExpendituresTable records={[]} isEditing={false} />);
+            const emptyCell = screen.getByTestId('funds-table-empty-cell');
+            expect(emptyCell).toHaveAttribute('colspan', '5');
+        });
     });
 });

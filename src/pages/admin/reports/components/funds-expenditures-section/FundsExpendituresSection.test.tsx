@@ -94,7 +94,6 @@ jest.mock('./components/funds-expenditures-toolbar/FundsExpendituresToolbar', ()
         onCategoryChange,
     }: {
         categories: { id: number; name: string }[];
-        selectedType: unknown;
         selectedCategoryId: number | null | undefined;
         exchangeRate: string | null;
         isEditing: boolean;

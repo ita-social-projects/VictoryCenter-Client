@@ -52,10 +52,8 @@ jest.mock('@/components/common/select/Select', () => {
         onValueChange,
         placeholder,
     }: {
-        children?: React.ReactNode;
         onValueChange: (value: unknown) => void;
         placeholder?: string;
-        value?: unknown;
     }) => {
         return (
             <div data-testid={`select-${placeholder}`}>

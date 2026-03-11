@@ -39,6 +39,10 @@ section {
     display: inline-block;
 }
 
+.break-text {
+    white-space: break-spaces;
+}
+
 .yellow {
     background: colors.$yellow-400;
     

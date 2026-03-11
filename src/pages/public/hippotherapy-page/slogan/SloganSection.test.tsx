@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { SloganSection } from "./SloganSection";
+import { SloganSection } from './SloganSection';
 
 jest.mock('react-i18next', () => {
     const globalUk = require('@/locales/uk/hippotherapy.json');

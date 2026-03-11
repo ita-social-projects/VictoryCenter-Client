@@ -9,9 +9,7 @@ describe('HippotherapyIntro', () => {
             title: 'Test Title',
             description: 'Test Description',
         };
-        render(
-            <HippotherapyIntro {...props} />,
-        );
+        render(<HippotherapyIntro {...props} />);
 
         const image = screen.getByRole('img');
         expect(image).toBeInTheDocument();

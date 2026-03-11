@@ -628,7 +628,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                             cropHeight={PROGRAM_VALIDATION.backgroundImage.cropHeight}
                             minWidth={PROGRAM_VALIDATION.backgroundImage.minWidth}
                             minHeight={PROGRAM_VALIDATION.backgroundImage.minHeight}
-                            imageLabel={COMMON_TEXT_ADMIN.INPUT.DRAG_AND_DROP_FILE_HERE}
+                            imageLabel={COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE}
                             imageSubText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
                                 PROGRAM_VALIDATION.backgroundImage.height,
                                 PROGRAM_VALIDATION.backgroundImage.width,
@@ -736,7 +736,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 cropHeight={PROGRAM_VALIDATION.previewImage.cropHeight}
                                 minWidth={PROGRAM_VALIDATION.previewImage.minWidth}
                                 minHeight={PROGRAM_VALIDATION.previewImage.minHeight}
-                                imageLabel={COMMON_TEXT_ADMIN.INPUT.DRAG_AND_DROP_FILE_HERE}
+                                imageLabel={COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE}
                                 imageSubText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
                                     PROGRAM_VALIDATION.previewImage.height,
                                     PROGRAM_VALIDATION.previewImage.width,

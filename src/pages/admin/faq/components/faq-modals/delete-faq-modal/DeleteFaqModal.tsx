@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { FaqQuestion } from '@/types/admin/faq';
+import { VisibilityStatus } from '@/types/admin/common';
 import './DeleteFaqModal.scss';
 import { FaqApi } from '@/services/api/admin/faq/faq-api';
 import { FAQ_TEXT } from '@/const/admin/faq';
@@ -43,16 +44,21 @@ export const DeleteFaqModal = ({ isOpen, onClose, onDeleteFaq, faqToDelete }: De
         onClose();
     };
 
+    const isPublished = faqToDelete?.status === VisibilityStatus.Published;
+
     return (
         <Modal isOpen={isOpen} onClose={handleClose}>
             <Modal.Title>{FAQ_TEXT.FORM.TITLE.DELETE_FAQ}</Modal.Title>
-            <Modal.Content>{error && <div className="delete-faq-error-container">{error}</div>}</Modal.Content>
+            <Modal.Content>
+                {isPublished && <p>{FAQ_TEXT.QUESTION.DELETE_PUBLISHED_FAQ}</p>}
+                {error && <div className="delete-faq-error-container">{error}</div>}
+            </Modal.Content>
             <Modal.Actions>
                 <Button onClick={handleClose} buttonStyle="secondary" disabled={isSubmitting}>
-                    {COMMON_TEXT_ADMIN.BUTTON.CANCEL}
+                    {COMMON_TEXT_ADMIN.BUTTON.NO}
                 </Button>
                 <Button onClick={handleConfirmDelete} buttonStyle="primary" disabled={isSubmitting}>
-                    {COMMON_TEXT_ADMIN.BUTTON.DELETE}
+                    {COMMON_TEXT_ADMIN.BUTTON.YES}
                 </Button>
             </Modal.Actions>
         </Modal>

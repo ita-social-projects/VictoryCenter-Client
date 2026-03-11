@@ -1,5 +1,7 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
+import { Button } from '@/components/admin/button/Button';
+import { ReactComponent as EditIcon } from '@/assets/icons/edit-default.svg';
 import { FundsExpendituresApi } from '@/services/api/admin/reports/funds-expenditures-api';
 import {
     FundsExpendituresSummary,
@@ -9,6 +11,7 @@ import {
 } from '@/types/admin/reports';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { SummaryCard } from './components/summary-card/SummaryCard';
 import {
     CategoryFilterValue,
@@ -17,10 +20,6 @@ import {
 } from './components/funds-expenditures-toolbar/FundsExpendituresToolbar';
 import { EnrichedRecord, FundsExpendituresTable } from './components/funds-expenditures-table/FundsExpendituresTable';
 import styles from './FundsExpendituresSection.module.scss';
-
-interface FundsExpendituresSectionProps {
-    isEditing: boolean;
-}
 
 const computeSummary = (records: ReportFundsExpendituresRecord[]): FundsExpendituresSummary => {
     const incomeRecords = records.filter((r) => r.type === 'income');
@@ -49,11 +48,18 @@ const enrichRecords = (
     }));
 };
 
-export const FundsExpenditureSection = ({ isEditing: _isEditing }: FundsExpendituresSectionProps) => {
+export const FundsExpenditureSection = () => {
     const adminClient = useAdminClient();
+
+    const [isEditing, setIsEditing] = useState(false);
+    const [disclaimerValue, setDisclaimerValue] = useState('');
+    const [exchangeRateValue, setExchangeRateValue] = useState('');
 
     const [selectedType, setSelectedType] = useState<TypeFilterValue>(undefined);
     const [selectedCategoryId, setSelectedCategoryId] = useState<CategoryFilterValue>(undefined);
+
+    const handleEdit = useCallback(() => setIsEditing(true), []);
+    const handleCancel = useCallback(() => setIsEditing(false), []);
 
     const handleTypeChange = useCallback((type: TypeFilterValue) => {
         setSelectedType(type);
@@ -79,6 +85,13 @@ export const FundsExpenditureSection = ({ isEditing: _isEditing }: FundsExpendit
         fetchHandler: fetchRecords,
     });
 
+    useEffect(() => {
+        if (!isEditing) {
+            setDisclaimerValue(settings?.disclaimerTitle ?? '');
+            setExchangeRateValue(settings?.exchangeRate ?? '');
+        }
+    }, [settings, isEditing]);
+
     const summary = useMemo(() => computeSummary(allRecords), [allRecords]);
 
     const enrichedRecords = useMemo(() => enrichRecords(allRecords, categories), [allRecords, categories]);
@@ -96,15 +109,43 @@ export const FundsExpenditureSection = ({ isEditing: _isEditing }: FundsExpendit
         });
     }, [enrichedRecords, selectedType, selectedCategoryId]);
 
+    const isAddIncomeDisabled = summary.incomeCategories >= FUNDS_EXPENDITURES_TEXT.MAX_CATEGORIES_PER_TYPE;
+    const isAddExpenseDisabled = summary.expenseCategories >= FUNDS_EXPENDITURES_TEXT.MAX_CATEGORIES_PER_TYPE;
+
+    const currentExchangeRate = isEditing ? exchangeRateValue : (settings?.exchangeRate ?? null);
+
     return (
         <div className={styles.section}>
-            {settings?.disclaimerTitle && (
-                <div className={styles.disclaimer}>
-                    <span className={styles['disclaimer-label']}>{FUNDS_EXPENDITURES_TEXT.DISCLAIMER_LABEL}</span>
-                    <div className={styles['disclaimer-text-area']}>
-                        <p className={styles['disclaimer-text']}>{settings.disclaimerTitle}</p>
-                    </div>
+            {!isEditing && (
+                <div className={styles['section-header']}>
+                    <Button buttonStyle="primary" className={styles['edit-btn']} onClick={handleEdit}>
+                        <EditIcon className={styles['edit-icon']} />
+                        {FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT}
+                    </Button>
                 </div>
+            )}
+            {isEditing ? (
+                <div className={styles.disclaimer}>
+                    <TextAreaWithCharacterLimitGroup
+                        id="funds-disclaimer"
+                        name="disclaimer"
+                        label={FUNDS_EXPENDITURES_TEXT.DISCLAIMER_LABEL}
+                        value={disclaimerValue}
+                        onChange={(e) => setDisclaimerValue(e.target.value)}
+                        maxLength={FUNDS_EXPENDITURES_TEXT.DISCLAIMER_MAX_LENGTH}
+                        rows={3}
+                        className={styles['disclaimer-textarea-group']}
+                    />
+                </div>
+            ) : (
+                settings?.disclaimerTitle && (
+                    <div className={styles.disclaimer}>
+                        <span className={styles['disclaimer-label']}>{FUNDS_EXPENDITURES_TEXT.DISCLAIMER_LABEL}</span>
+                        <div className={styles['disclaimer-text-area']}>
+                            <p className={styles['disclaimer-text']}>{settings.disclaimerTitle}</p>
+                        </div>
+                    </div>
+                )
             )}
 
             <div className={styles['summary-cards']}>
@@ -134,12 +175,29 @@ export const FundsExpenditureSection = ({ isEditing: _isEditing }: FundsExpendit
                 categories={filteredCategories}
                 selectedType={selectedType}
                 selectedCategoryId={selectedCategoryId}
-                exchangeRate={settings?.exchangeRate ?? null}
+                exchangeRate={currentExchangeRate}
+                isEditing={isEditing}
+                isAddIncomeDisabled={isAddIncomeDisabled}
+                isAddExpenseDisabled={isAddExpenseDisabled}
                 onTypeChange={handleTypeChange}
                 onCategoryChange={setSelectedCategoryId}
+                onExchangeRateChange={setExchangeRateValue}
+                onAddIncome={() => {}}
+                onAddExpense={() => {}}
             />
 
-            <FundsExpendituresTable records={filteredRecords} />
+            <FundsExpendituresTable records={filteredRecords} isEditing={isEditing} />
+
+            {isEditing && (
+                <div className={styles['section-footer']}>
+                    <Button buttonStyle="secondary" className={styles['footer-button']} onClick={handleCancel}>
+                        {FUNDS_EXPENDITURES_TEXT.BUTTON.CANCEL}
+                    </Button>
+                    <Button buttonStyle="primary" className={styles['footer-button']} onClick={() => {}} disabled>
+                        {FUNDS_EXPENDITURES_TEXT.BUTTON.PUBLISH}
+                    </Button>
+                </div>
+            )}
         </div>
     );
 };

@@ -9,9 +9,7 @@ jest.mock('../pdf-files-section/PdfFilesSection', () => ({
 }));
 
 jest.mock('../funds-expenditures-section/FundsExpendituresSection', () => ({
-    FundsExpenditureSection: () => (
-        <div data-testid="funds-expenditure-section">FundsExpenditureSection</div>
-    ),
+    FundsExpenditureSection: () => <div data-testid="funds-expenditure-section">FundsExpenditureSection</div>,
 }));
 
 describe('ReportAnalytics', () => {

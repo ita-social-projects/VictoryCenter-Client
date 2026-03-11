@@ -719,6 +719,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 maxLength={PROGRAM_VALIDATION.description.max}
                                 error={errors.description}
                                 isWhiteLabel={hasBackgroundImage}
+                                placeholder={PROGRAMS_TEXT.PLACEHOLDER.INSERT_PROGRAM_DESCRIPTION}
                             />
 
                             <PhotoInputGroup

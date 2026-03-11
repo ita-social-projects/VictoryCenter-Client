@@ -131,3 +131,58 @@
     color: #061125;
     margin: 0;
 }
+
+.checkbox-th,
+.checkbox-td {
+    width: 48px;
+    padding: 13px 12px;
+}
+
+.row-checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: c.$blue-500;
+}
+
+.actions-th,
+.actions-td {
+    width: 80px;
+    padding: 13px 12px;
+}
+
+.row-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.icon-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    padding: 4px;
+    transition: background-color 0.15s ease;
+
+    &:hover {
+        background-color: c.$light-blue-50;
+    }
+
+    &:active {
+        background-color: c.$grey-300;
+    }
+}
+
+.action-icon {
+    width: 20px;
+    height: 20px;
+    color: c.$blue-500;
+    fill: c.$blue-500;
+}

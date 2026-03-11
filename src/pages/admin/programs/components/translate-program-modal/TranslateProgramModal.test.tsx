@@ -5,6 +5,9 @@ import { TranslateProgramModal } from './TranslateProgramModal';
 import { HippotherapyProgram } from '@/types/admin/programs';
 import { useTranslateProgram } from '@/hooks/admin/use-translate-program/useTranslateProgram';
 import { LocalizationLanguage } from '@/types/common/language';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { ModalMode } from '@/types/admin/common';
+import { DEFAULT_LOCALE } from '@/const/common/locales';
 
 let mockFormIsValid = true;
 let mockFormIsDirty = true;
@@ -30,8 +33,8 @@ jest.mock('../translate-program-form/TranslateProgramForm', () => {
                 }));
 
                 React.useEffect(() => {
-                    onValidationChange?.(true);
-                    onDirtyChange?.(true);
+                    onValidationChange?.(mockFormIsValid);
+                    onDirtyChange?.(mockFormIsDirty);
                 }, [onValidationChange, onDirtyChange]);
 
                 return (
@@ -185,5 +188,206 @@ describe('TranslateProgramModal', () => {
         await waitFor(() => expect(mockTranslateProgram).toHaveBeenCalled());
         expect(onTranslateProgram).toHaveBeenCalled();
         expect(onClose).toHaveBeenCalled();
+    });
+
+    it('uses add mode and add title when localization is absent', () => {
+        renderModal({
+            programToTranslate: TEST_DATA.program,
+            translatedLanguages: [TEST_DATA.language],
+        });
+
+        expect(screen.getByText(COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION)).toBeInTheDocument();
+        expect(mockUseTranslateProgram).toHaveBeenCalledWith(
+            expect.objectContaining({
+                mode: ModalMode.Add,
+                language: expect.objectContaining({ code: 'en' }),
+            }),
+        );
+    });
+
+    it('uses edit mode and edit title when localization exists', () => {
+        renderModal({
+            programToTranslate: TEST_DATA.programWithLocalization,
+            translatedLanguages: [TEST_DATA.language],
+        });
+
+        expect(screen.getByText(COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.UPDATE_TRANSLATION)).toBeInTheDocument();
+        expect(mockUseTranslateProgram).toHaveBeenCalledWith(
+            expect.objectContaining({
+                mode: ModalMode.Edit,
+                language: expect.objectContaining({ code: 'en' }),
+            }),
+        );
+    });
+
+    it('disables save button when form is invalid', () => {
+        mockFormIsValid = false;
+
+        renderModal();
+
+        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION })).toBeDisabled();
+    });
+
+    it('disables save button when form is not dirty', () => {
+        mockFormIsDirty = false;
+
+        renderModal();
+
+        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION })).toBeDisabled();
+    });
+
+    it('opens exit confirmation on close when form is dirty', async () => {
+        renderModal();
+
+        fireEvent.click(screen.getByLabelText('Close modal'));
+
+        await waitFor(() => {
+            expect(screen.getByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE)).toBeInTheDocument();
+        });
+    });
+
+    it('closes immediately when form is not dirty', () => {
+        const onClose = jest.fn();
+        mockFormIsDirty = false;
+
+        renderModal({ onClose });
+
+        fireEvent.click(screen.getByLabelText('Close modal'));
+
+        expect(onClose).toHaveBeenCalledTimes(1);
+        expect(
+            screen.queryByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE),
+        ).not.toBeInTheDocument();
+    });
+
+    it('handles exit confirmation actions', async () => {
+        const onClose = jest.fn();
+
+        renderModal({ onClose });
+
+        fireEvent.click(screen.getByLabelText('Close modal'));
+
+        await waitFor(() => {
+            expect(screen.getByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE)).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.NO }));
+        expect(onClose).not.toHaveBeenCalled();
+
+        fireEvent.click(screen.getByLabelText('Close modal'));
+        await waitFor(() => {
+            expect(screen.getByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE)).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES }));
+        expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it('selects non-default language when languages arrive after initial empty list', async () => {
+        const english = { id: 2, code: 'en', name: 'English' } as LocalizationLanguage;
+        const ukrainian = { id: 1, code: DEFAULT_LOCALE, name: 'Українська' } as LocalizationLanguage;
+
+        const { rerender } = render(
+            <TranslateProgramModal
+                isOpen={true}
+                onClose={jest.fn()}
+                programToTranslate={TEST_DATA.program}
+                onTranslateProgram={jest.fn()}
+                translatedLanguages={[]}
+            />,
+        );
+
+        rerender(
+            <TranslateProgramModal
+                isOpen={true}
+                onClose={jest.fn()}
+                programToTranslate={TEST_DATA.program}
+                onTranslateProgram={jest.fn()}
+                translatedLanguages={[ukrainian, english]}
+            />,
+        );
+
+        await waitFor(() => {
+            expect(mockUseTranslateProgram).toHaveBeenLastCalledWith(
+                expect.objectContaining({
+                    language: expect.objectContaining({ code: 'en' }),
+                }),
+            );
+        });
+    });
+
+    it('renders error message and disables actions while submitting', () => {
+        mockUseTranslateProgram.mockReturnValue({
+            translateProgram: mockTranslateProgram,
+            isSubmitting: true,
+            error: 'Hook error text',
+            clearError: jest.fn(),
+        });
+
+        renderModal();
+
+        expect(screen.getByText('Hook error text')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION })).toBeDisabled();
+        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.GENERATE_TRANSLATION })).toBeDisabled();
+    });
+
+    it('handles generate button click without submitting form', () => {
+        renderModal();
+
+        fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.GENERATE_TRANSLATION }));
+
+        expect(mockTranslateProgram).not.toHaveBeenCalled();
+    });
+
+    it('maps localized section contents into initialData for selected language', () => {
+        const programWithSections = {
+            ...TEST_DATA.program,
+            previewImage: { url: 'https://example.com/preview.jpg' },
+            backgroundImage: { url: 'https://example.com/bg.jpg' },
+            sections: [
+                {
+                    id: 701,
+                    template: 1,
+                    contents: [
+                        {
+                            id: 801,
+                            localizations: [
+                                {
+                                    localizationInfoDto: { id: 2 },
+                                    title: 'Localized title',
+                                    description: 'Localized description',
+                                    author: 'Localized author',
+                                    question: 'Localized question',
+                                    answer: 'Localized answer',
+                                },
+                            ],
+                        },
+                    ],
+                },
+            ],
+        } as any;
+
+        renderModal({
+            programToTranslate: programWithSections,
+            translatedLanguages: [TEST_DATA.language],
+        });
+
+        const attr = screen.getByTestId('translate-form').getAttribute('data-initial');
+        expect(attr).toBeTruthy();
+
+        const parsed = JSON.parse(attr!);
+        expect(parsed.__previewImage).toMatchObject({ url: 'https://example.com/preview.jpg' });
+        expect(parsed.__backgroundImage).toMatchObject({ url: 'https://example.com/bg.jpg' });
+        expect(parsed.sections).toHaveLength(1);
+        expect(parsed.sections[0]).toMatchObject({ entityId: 701 });
+        expect(parsed.sections[0].contents[0]).toMatchObject({
+            entityId: 801,
+            languageId: 2,
+            title: 'Localized title',
+            description: 'Localized description',
+            author: 'Localized author',
+            question: 'Localized question',
+            answer: 'Localized answer',
+        });
     });
 });

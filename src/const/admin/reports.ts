@@ -103,10 +103,13 @@ export const PDF_FILES_SECTION_TEXT = {
     },
 };
 
+export const FUNDS_EXPENDITURES_VALIDATION = {
+    disclaimer: { min: 2, max: 1000 },
+};
+
 export const FUNDS_EXPENDITURES_TEXT = {
     DISCLAIMER_LABEL: 'Дісклеймер/ENG',
     EXCHANGE_RATE_LABEL: 'Курс USD/UAH',
-    DISCLAIMER_MAX_LENGTH: 300,
     EXCHANGE_RATE_MAX_LENGTH: 10,
     MAX_CATEGORIES_PER_TYPE: 4,
     BUTTON: {

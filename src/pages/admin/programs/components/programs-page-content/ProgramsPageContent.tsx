@@ -44,7 +44,22 @@ export const ProgramsPageContent = () => {
     const [error, setError] = useState<ErrorState>({ message: null, type: null });
     const listContainerRef = useRef<HTMLDivElement>(null);
     const modalsStateControl = useModalsState<HippotherapyProgram>();
-    const openModalActions = modalsStateControl.openModalActions;
+    const { openModalActions, closeModalActions, isAnyModalOpened } = modalsStateControl;
+
+    const handleTranslateProgramModalOpen = useCallback(
+        async (program: HippotherapyProgram) => {
+            if (isAnyModalOpened) return;
+
+            try {
+                const fullDto = await ProgramsApi.fetchProgramById(program.id, client);
+                const fullProgram = fullDto ? mapHippotherapyProgramDtoToModel(fullDto) : program;
+                openModalActions.openTranslateItemModal(fullProgram);
+            } catch (e) {
+                openModalActions.openTranslateItemModal(program);
+            }
+        },
+        [isAnyModalOpened, openModalActions, client],
+    );
 
     const { incrementCategoriesCount, decrementCategoriesCount, updateCategoriesCount } = useCategoriesCounter();
 
@@ -156,6 +171,19 @@ export const ProgramsPageContent = () => {
         pageSize: pageSize,
     });
 
+    const handleTranslateProgramSuccess = useCallback(
+        (updatedProgram: HippotherapyProgram) => {
+            updatePrograms((prev) => prev.map((p) => (p.id === updatedProgram.id ? updatedProgram : p)));
+            closeModalActions.closeTranslateItemModal();
+            addToast(
+                updatedProgram.status === VisibilityStatus.Published
+                    ? COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_PUBLISHED_SUCCESS
+                    : COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS,
+                ToastType.Success,
+            );
+        },
+        [closeModalActions, addToast, updatePrograms],
+    );
     const {
         data: fetchedSearchProgram,
         isLoading: isSearchProgramLoading,
@@ -428,6 +456,7 @@ export const ProgramsPageContent = () => {
                 <ProgramListItem
                     key={program.id}
                     program={program}
+                    handleOnTranslateProgram={handleTranslateProgramModalOpen}
                     handleOnEditProgram={openModalActions.openEditItemModal}
                     handleOnDeleteProgram={openModalActions.openDeleteItemModal}
                     language={selectedLanguage}
@@ -435,7 +464,7 @@ export const ProgramsPageContent = () => {
                 />
             );
         },
-        [openModalActions, selectedLanguage, translationLanguages],
+        [openModalActions, selectedLanguage, translationLanguages, handleTranslateProgramModalOpen],
     );
 
     // Get the items to display
@@ -497,9 +526,11 @@ export const ProgramsPageContent = () => {
             <ProgramsPageModals
                 modalsStateControl={modalsStateControl}
                 categories={categories}
+                translatedLanguages={translationLanguages}
                 onAddProgram={handleAddProgram}
                 onEditProgram={handleEditProgram}
                 onDeleteProgram={handleDeleteProgram}
+                onTranslateProgram={handleTranslateProgramSuccess}
                 onAddCategory={handleAddCategory}
                 onEditCategory={handleEditCategory}
                 onDeleteCategory={handleDeleteCategory}

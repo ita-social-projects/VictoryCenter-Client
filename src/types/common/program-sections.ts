@@ -3,6 +3,15 @@ import { ContentType } from './programs';
 import { FaqQuestion } from '../admin/faq';
 import { EntityLocalizationDto } from './language';
 
+export interface ContentLocalizationDto extends EntityLocalizationDto {
+    entityId: number;
+    title?: string | null;
+    description?: string | null;
+    author?: string | null;
+    question?: string | null;
+    answer?: string | null;
+}
+
 export enum ProgramSectionType {
     Title,
     Description,
@@ -52,6 +61,7 @@ export interface HippotherapyProgramSectionContentDto {
     author?: string | null;
     faqQuestionId?: number | null;
     faqQuestion?: FaqQuestion | null;
+    localizations?: ContentLocalizationDto[];
 }
 export interface HippotherapyProgramSectionContent {
     id?: number;

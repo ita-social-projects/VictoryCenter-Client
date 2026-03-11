@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { FundsExpendituresToolbar, TypeFilterValue, CategoryFilterValue } from './FundsExpendituresToolbar';
 import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
@@ -6,12 +6,43 @@ import { ReportFundsExpendituresCategory } from '@/types/admin/reports';
 
 jest.mock('./FundsExpendituresToolbar.module.scss', () => ({
     toolbar: 'toolbar',
+    'toolbar-row': 'toolbar-row',
+    'toolbar-right': 'toolbar-right',
     filters: 'filters',
     exchangeRate: 'exchangeRate',
     exchangeRateLabel: 'exchangeRateLabel',
     exchangeRateValue: 'exchangeRateValue',
+    'exchange-rate-input': 'exchange-rate-input',
     filterSelect: 'filterSelect',
     filterOption: 'filterOption',
+    'editing-actions': 'editing-actions',
+    'add-income-button': 'add-income-button',
+    'add-expense-button': 'add-expense-button',
+    'cancel-button': 'cancel-button',
+    'publish-button': 'publish-button',
+    'plus-icon': 'plus-icon',
+}));
+
+jest.mock('@/assets/icons/plus.svg', () => ({
+    ReactComponent: ({ className }: { className?: string }) => <svg data-testid="plus-icon" className={className} />,
+}));
+
+jest.mock('@/components/admin/button/Button', () => ({
+    Button: ({
+        children,
+        onClick,
+        disabled,
+        className,
+    }: {
+        children: React.ReactNode;
+        onClick?: () => void;
+        disabled?: boolean;
+        className?: string;
+    }) => (
+        <button onClick={onClick} disabled={disabled} className={className}>
+            {children}
+        </button>
+    ),
 }));
 
 jest.mock('@/components/common/select/Select', () => {
@@ -65,14 +96,23 @@ const MOCK_CATEGORIES: ReportFundsExpendituresCategory[] = [
 describe('FundsExpendituresToolbar', () => {
     const onTypeChange = jest.fn();
     const onCategoryChange = jest.fn();
+    const onAddIncome = jest.fn();
+    const onAddExpense = jest.fn();
+    const onExchangeRateChange = jest.fn();
 
     const defaultProps = {
         categories: MOCK_CATEGORIES,
         selectedType: undefined as TypeFilterValue,
         selectedCategoryId: undefined as CategoryFilterValue,
         exchangeRate: '42.18',
+        isEditing: false,
+        isAddIncomeDisabled: false,
+        isAddExpenseDisabled: false,
         onTypeChange,
         onCategoryChange,
+        onExchangeRateChange,
+        onAddIncome,
+        onAddExpense,
     };
 
     beforeEach(() => {
@@ -116,5 +156,43 @@ describe('FundsExpendituresToolbar', () => {
         const allBtn = screen.getByTestId(`select-${FUNDS_EXPENDITURES_TEXT.FILTER.TYPE_PLACEHOLDER}-all`);
         fireEvent.click(allBtn);
         expect(onTypeChange).toHaveBeenCalledWith(undefined);
+    });
+
+    describe('edit mode', () => {
+        it('should show Add Income button when editing', () => {
+            render(<FundsExpendituresToolbar {...defaultProps} isEditing={true} />);
+            const actions = screen.getByTestId('editing-actions');
+            expect(within(actions).getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.ADD_INCOME)).toBeInTheDocument();
+        });
+
+        it('should show Add Expense button when editing', () => {
+            render(<FundsExpendituresToolbar {...defaultProps} isEditing={true} />);
+            const actions = screen.getByTestId('editing-actions');
+            expect(within(actions).getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.ADD_EXPENSE)).toBeInTheDocument();
+        });
+
+        it('should show exchange rate input when editing', () => {
+            render(<FundsExpendituresToolbar {...defaultProps} isEditing={true} />);
+            expect(screen.getByTestId('exchange-rate-input')).toBeInTheDocument();
+        });
+
+        it('should disable Add Income button when isAddIncomeDisabled is true', () => {
+            render(<FundsExpendituresToolbar {...defaultProps} isEditing={true} isAddIncomeDisabled={true} />);
+            const actions = screen.getByTestId('editing-actions');
+            expect(within(actions).getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.ADD_INCOME)).toBeDisabled();
+        });
+
+        it('should disable Add Expense button when isAddExpenseDisabled is true', () => {
+            render(<FundsExpendituresToolbar {...defaultProps} isEditing={true} isAddExpenseDisabled={true} />);
+            const actions = screen.getByTestId('editing-actions');
+            expect(within(actions).getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.ADD_EXPENSE)).toBeDisabled();
+        });
+
+        it('should call onExchangeRateChange when exchange rate input changes', () => {
+            render(<FundsExpendituresToolbar {...defaultProps} isEditing={true} />);
+            const input = screen.getByTestId('exchange-rate-input');
+            fireEvent.change(input, { target: { value: '50.00' } });
+            expect(onExchangeRateChange).toHaveBeenCalledWith('50.00');
+        });
     });
 });

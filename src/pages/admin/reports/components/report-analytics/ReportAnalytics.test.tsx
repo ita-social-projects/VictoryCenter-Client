@@ -9,8 +9,8 @@ jest.mock('../pdf-files-section/PdfFilesSection', () => ({
 }));
 
 jest.mock('../funds-expenditures-section/FundsExpendituresSection', () => ({
-    FundsExpenditureSection: ({ isEditing }: { isEditing: boolean }) => (
-        <div data-testid="funds-expenditure-section">FundsExpenditureSection - Editing: {String(isEditing)}</div>
+    FundsExpenditureSection: () => (
+        <div data-testid="funds-expenditure-section">FundsExpenditureSection</div>
     ),
 }));
 

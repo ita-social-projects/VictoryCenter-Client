@@ -44,3 +44,61 @@
     gap: 83px;
     flex-wrap: wrap;
 }
+
+.disclaimer-textarea-group {
+    width: 100%;
+}
+
+.section-header {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.edit-btn {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 419px;
+    height: 60px;
+    padding: 16px 24px;
+    gap: 8px;
+    white-space: nowrap;
+    font-family: 'Mulish', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 24px;
+    line-height: 24px;
+    letter-spacing: -0.02em;
+    color: c.$white;
+    background-color: #0F2957;
+    border-radius: 0;
+}
+
+.edit-icon {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+
+    path {
+        fill: c.$white;
+    }
+}
+
+.section-footer {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px 0;
+}
+
+.footer-button {
+    display: flex;
+    align-items: center;
+    font-family: Mulish, sans-serif;
+    gap: 20px;
+    width: 311px;
+    height: 60px;
+    font-size: 24px;
+    padding: 8px 14px;
+}

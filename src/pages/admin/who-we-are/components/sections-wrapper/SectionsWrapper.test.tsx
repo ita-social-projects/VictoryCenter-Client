@@ -30,6 +30,7 @@ jest.mock('../sections/image-block-section/ImageBlockSection', () => ({
 
 const mockProps = {
     onChange: jest.fn(),
+    handleOnTranslateContent: jest.fn(),
     onPublish: jest.fn(),
     isPublishButtonActive: false,
     setIsPublishButtonActive: jest.fn(),

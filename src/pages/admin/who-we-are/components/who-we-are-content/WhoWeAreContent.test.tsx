@@ -44,6 +44,10 @@ jest.mock('../who-we-are-page-toolbar/WhoWeArePageToolbar', () => ({
     ),
 }));
 
+jest.mock('@/pages/admin/who-we-are/components/modals/WhoWeAreModals', () => ({
+    WhoWeAreModals: () => <div data-testid="who-we-are-modals" />,
+}));
+
 jest.mock('@/services/api/admin/who-we-are/who-we-are-api');
 const mockedWhoWeAreApi = WhoWeAreApi as jest.Mocked<typeof WhoWeAreApi>;
 

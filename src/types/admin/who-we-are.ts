@@ -54,7 +54,7 @@ export type ContentLocalization = EntityLocalization & ContentLocalizableFields;
 export type CreateContentLocalizationDto = ContentLocalizableFields & {
     entityId: number;
     languageId: number;
-}
+};
 
 export type ContentLocalizableFields = {
     description: string | null;
@@ -70,6 +70,6 @@ export interface CardImageConfig {
 }
 
 export type TranslateLimits = {
-  descriptionLimit: number;
-  titleLimit?: number;
+    descriptionLimit: number;
+    titleLimit?: number;
 };

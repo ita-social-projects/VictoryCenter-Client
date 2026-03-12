@@ -12,7 +12,10 @@ import { translateTitleAndDescriptionStrategy } from '../strategies/description/
 import { translateDescriptionStrategy } from '../strategies/description/translate-description-strategy';
 import { LIMITS_BY_SECTION } from './translate-modal-config';
 import { translateMultipleDescriptionsStrategy } from '../strategies/description/translate-multiple-descriptions-strategy';
-import { TranslateWhoWeAreSectionFormValues, useTranslateWhoWeAreSection } from '@/hooks/admin/use-translate-who-we-are-section/useTranslateWhoWeAreSection';
+import {
+    TranslateWhoWeAreSectionFormValues,
+    useTranslateWhoWeAreSection,
+} from '@/hooks/admin/use-translate-who-we-are-section/useTranslateWhoWeAreSection';
 
 interface TranslateModalProps {
     isOpen: boolean;
@@ -36,7 +39,8 @@ export const TranslateWhoWeAreModal = ({
 
     useEffect(() => {
         if (translatedLanguages.length > 0 && !language) {
-            const defaultEnglish = translatedLanguages.find((lang) => lang.code !== DEFAULT_LOCALE) || translatedLanguages[0];
+            const defaultEnglish =
+                translatedLanguages.find((lang) => lang.code !== DEFAULT_LOCALE) || translatedLanguages[0];
             setLanguage(defaultEnglish);
         }
     }, [translatedLanguages, language]);
@@ -52,7 +56,7 @@ export const TranslateWhoWeAreModal = ({
     const mode = existingLocalization ? ModalMode.Edit : ModalMode.Add;
     const isEditMode = mode === ModalMode.Edit;
 
-    const { translateSection, isSubmitting, error } = useTranslateWhoWeAreSection({
+    const { translateSection, isSubmitting } = useTranslateWhoWeAreSection({
         section: sectionToTranslate,
         language: language!,
         mode,

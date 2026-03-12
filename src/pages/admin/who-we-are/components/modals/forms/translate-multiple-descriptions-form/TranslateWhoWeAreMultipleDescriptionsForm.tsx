@@ -25,7 +25,7 @@ export interface TranslateWhoWeAreMultipleDescriptionsFormErrorState {
 
 export interface TranslateWhoWeAreMultipleDescriptionsFormRef extends GeneralFormRef {}
 
-export interface TranslateWhoWeAreMultipleDescriptionsFormProps 
+export interface TranslateWhoWeAreMultipleDescriptionsFormProps
     extends GeneralFormProps<TranslateWhoWeAreMultipleDescriptionsFormValues> {}
 
 const validateForm = (
@@ -122,9 +122,7 @@ export const TranslateWhoWeAreMultipleDescriptionsForm = forwardRef<
         const handleDescriptionChange = (rowIndex: number, value: string) => {
             setFormState((prev) => ({
                 ...prev,
-                rows: prev.rows.map((row, index) =>
-                    index === rowIndex ? { ...row, description: value } : row,
-                ),
+                rows: prev.rows.map((row, index) => (index === rowIndex ? { ...row, description: value } : row)),
             }));
             if (isReadyRef.current) {
                 validateAndSetRowDescriptionError(rowIndex, value);
@@ -146,7 +144,6 @@ export const TranslateWhoWeAreMultipleDescriptionsForm = forwardRef<
             >
                 <div className={styles.rows}>
                     {formState.rows.map((row, rowIndex) => {
-                        
                         return (
                             <div key={row.contentId} className={styles.row}>
                                 <div className={styles['image-wrapper']}>

@@ -3,7 +3,12 @@ import { TranslateWhoWeAreMultipleDescriptionsFormValues } from '@/pages/admin/w
 import { TranslateWhoWeAreTitleAndDescriptionFormValues } from '@/pages/admin/who-we-are/components/modals/forms/translate-title-and-description-form/TranslateWhoWeAreTitleAndDescriptionForm';
 import { WhoWeAreLocalizationsApi } from '@/services/api/admin/who-we-are/who-we-are-localizations/who-we-are-localizations-api';
 import { ModalMode } from '@/types/admin/common';
-import { ContentLocalization, ContentLocalizationDto, CreateContentLocalizationDto, WhoWeAreSection } from '@/types/admin/who-we-are';
+import {
+    ContentLocalization,
+    ContentLocalizationDto,
+    CreateContentLocalizationDto,
+    WhoWeAreSection,
+} from '@/types/admin/who-we-are';
 import { LocalizationLanguage } from '@/types/common/language';
 import { useState } from 'react';
 import { useAdminClient } from '../use-admin-client/useAdminClient';
@@ -60,7 +65,12 @@ const mapFormValuesToPayload = (
     }));
 };
 
-export const useTranslateWhoWeAreSection = ({ section, language, onSuccess, mode }: UseTranslateWhoWeAreSectionParams) => {
+export const useTranslateWhoWeAreSection = ({
+    section,
+    language,
+    onSuccess,
+    mode,
+}: UseTranslateWhoWeAreSectionParams) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string>('');
 
@@ -77,16 +87,13 @@ export const useTranslateWhoWeAreSection = ({ section, language, onSuccess, mode
             if (isEditMode) {
                 // const localizationData = mapFormValuesToPayload(data, section, language.id);
                 // const localizationDto = await WhoWeAreLocalizationsApi.create(client, section.sectionType, localizationData);
-
                 // const localization = localizationDto.map((content) => mapLocalizationDtoToModel<ContentLocalizationDto, ContentLocalization>(
                 //     content,
                 // ));
-
                 // const updatedSection: WhoWeAreSection = {
                 //     ...section,
                 //     contents: section.contents.map((content) => {
                 //         const translatedLocalization = localization.find((item) => item.entityId === content.id);
-
                 //         return {
                 //             ...content,
                 //             localizations:
@@ -98,15 +105,18 @@ export const useTranslateWhoWeAreSection = ({ section, language, onSuccess, mode
                 //         };
                 //     }),
                 // };
-
                 // onSuccess(updatedSection);
             } else {
                 const localizationData = mapFormValuesToPayload(data, section, language.id);
-                const localizationDto = await WhoWeAreLocalizationsApi.create(client, section.sectionType, localizationData);
+                const localizationDto = await WhoWeAreLocalizationsApi.create(
+                    client,
+                    section.sectionType,
+                    localizationData,
+                );
 
-                const localization = localizationDto.map((content) => mapLocalizationDtoToModel<ContentLocalizationDto, ContentLocalization>(
-                    content,
-                ));
+                const localization = localizationDto.map((content) =>
+                    mapLocalizationDtoToModel<ContentLocalizationDto, ContentLocalization>(content),
+                );
 
                 const updatedSection: WhoWeAreSection = {
                     ...section,
@@ -117,9 +127,7 @@ export const useTranslateWhoWeAreSection = ({ section, language, onSuccess, mode
                             ...content,
                             localizations:
                                 content.localizations?.map((loc) =>
-                                    loc.language.id === language.id
-                                        ? translatedLocalization ?? loc
-                                        : loc,
+                                    loc.language.id === language.id ? (translatedLocalization ?? loc) : loc,
                                 ) || [],
                         };
                     }),

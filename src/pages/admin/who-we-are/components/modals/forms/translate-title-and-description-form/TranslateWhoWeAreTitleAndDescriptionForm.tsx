@@ -21,7 +21,7 @@ export interface TranslateWhoWeAreTitleAndDescriptionFormErrorState {
 
 export interface TranslateWhoWeAreTitleAndDescriptionFormRef extends GeneralFormRef {}
 
-export interface TranslateWhoWeAreTitleAndDescriptionFormProps 
+export interface TranslateWhoWeAreTitleAndDescriptionFormProps
     extends GeneralFormProps<TranslateWhoWeAreTitleAndDescriptionFormValues> {}
 
 const DEFAULT_FORM_STATE: TranslateWhoWeAreTitleAndDescriptionFormValues = {

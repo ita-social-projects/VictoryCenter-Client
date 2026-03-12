@@ -41,7 +41,7 @@ export const SectionsWrapper = ({
     if (!section) {
         return null;
     }
-    
+
     const commonProps = {
         content: section.contents,
         onChange,

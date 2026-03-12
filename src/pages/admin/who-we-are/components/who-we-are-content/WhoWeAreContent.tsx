@@ -38,7 +38,7 @@ export const WhoWeAreContent = () => {
     const [isPublishButtonActive, setIsPublishButtonActive] = useState<boolean>(false);
     const [languagesError, setLanguagesError] = useState<string | null>(null);
     const modalsStateControl = useModalsState<WhoWeAreSection>();
-    const { isAnyModalOpened, openModalActions, closeModalActions } = modalsStateControl;
+    const { isAnyModalOpened, openModalActions } = modalsStateControl;
 
     const { addToast } = useToast();
 
@@ -94,9 +94,10 @@ export const WhoWeAreContent = () => {
         }
     }, []);
 
-    const { allLanguages, selectedLanguage, translationLanguages, onLanguageChange, retryFetchLanguages } = useLocalizationToolkit({
-        setErrorState,
-    });
+    const { allLanguages, selectedLanguage, translationLanguages, onLanguageChange, retryFetchLanguages } =
+        useLocalizationToolkit({
+            setErrorState,
+        });
 
     const englishLanguage = useMemo(() => allLanguages.find((l) => l.code === 'en'), [allLanguages]);
 
@@ -111,7 +112,7 @@ export const WhoWeAreContent = () => {
 
             const hasTranslation = section.contents
                 .flatMap((content) => content.localizations)
-                .some((l) => l.language?.id === englishLanguage?.id)
+                .some((l) => l.language?.id === englishLanguage?.id);
 
             if (hasTranslation) {
                 openModalActions.openEditTranslationModal(section);

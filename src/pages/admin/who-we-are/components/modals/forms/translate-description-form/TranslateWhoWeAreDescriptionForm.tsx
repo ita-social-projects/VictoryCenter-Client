@@ -17,10 +17,10 @@ export interface TranslateWhoWeAreDescriptionFormErrorState {
     [key: string]: string | undefined;
 }
 
-export interface TranslateWhoWeAreDescriptionFormRef extends GeneralFormRef { }
+export interface TranslateWhoWeAreDescriptionFormRef extends GeneralFormRef {}
 
 export interface TranslateWhoWeAreDescriptionFormProps
-    extends GeneralFormProps<TranslateWhoWeAreDescriptionFormValues> { }
+    extends GeneralFormProps<TranslateWhoWeAreDescriptionFormValues> {}
 
 const DEFAULT_FORM_STATE: TranslateWhoWeAreDescriptionFormValues = {
     description: '<p><br></p>',

@@ -35,7 +35,7 @@ export const useInputWithCharacterLimit = <T extends HTMLInputElement | HTMLText
         const newValue = e.target.value;
         const normalized = getNormalizedInputText(newValue ?? '');
 
-        if (normalized.length > maxLength) {
+        if (normalized.length > maxLength || newValue.length > maxLength) {
             if (maxLimitWarning) {
                 showTemporaryWarning(maxLimitWarning);
             }
@@ -60,6 +60,14 @@ export const useInputWithCharacterLimit = <T extends HTMLInputElement | HTMLText
 
     const handleBlur = (e: React.FocusEvent<T>) => {
         setIsFocused(false);
+
+        const trimmed = (value ?? '').trim();
+        if (trimmed !== value) {
+            onChange({
+                target: { value: trimmed, name, id },
+            } as React.ChangeEvent<T>);
+        }
+
         onBlur?.(e);
     };
 

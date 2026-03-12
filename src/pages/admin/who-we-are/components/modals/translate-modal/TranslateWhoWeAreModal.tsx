@@ -1,6 +1,6 @@
 import { TranslateLimits, WhoWeAreSection } from '@/types/admin/who-we-are';
 import { LocalizationLanguage } from '@/types/common/language';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { DEFAULT_LOCALE } from '@/const/common/locales';
 import { ModalMode } from '@/types/admin/common';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -11,6 +11,8 @@ import { SectionType } from '@/types/common/about-us';
 import { translateTitleAndDescriptionStrategy } from '../strategies/description/translate-title-and-description-strategy';
 import { translateDescriptionStrategy } from '../strategies/description/translate-description-strategy';
 import { LIMITS_BY_SECTION } from './translate-modal-config';
+import { translateMultipleDescriptionsStrategy } from '../strategies/description/translate-multiple-descriptions-strategy';
+import { TranslateWhoWeAreSectionFormValues, useTranslateWhoWeAreSection } from '@/hooks/admin/use-translate-who-we-are-section/useTranslateWhoWeAreSection';
 
 interface TranslateModalProps {
     isOpen: boolean;
@@ -24,29 +26,41 @@ export const TranslateWhoWeAreModal = ({
     isOpen,
     onClose,
     sectionToTranslate,
-    onTranslateSection, // TODO: After localization
+    onTranslateSection,
     translatedLanguages,
 }: TranslateModalProps) => {
     const formRef = useRef<GeneralFormRef>(null);
     const [isFormValid, setIsFormValid] = useState(false);
     const [isDirty, setIsDirty] = useState(false);
-    const [language, setLanguage] = useState<LocalizationLanguage | null>(translatedLanguages?.[0] ?? 'en');
+    const [language, setLanguage] = useState<LocalizationLanguage | null>(translatedLanguages?.[0] ?? null);
 
     useEffect(() => {
         if (translatedLanguages.length > 0 && !language) {
-            const defaultEnglish =
-                translatedLanguages.find((lang) => lang.code !== DEFAULT_LOCALE) || translatedLanguages[0];
+            const defaultEnglish = translatedLanguages.find((lang) => lang.code !== DEFAULT_LOCALE) || translatedLanguages[0];
             setLanguage(defaultEnglish);
         }
     }, [translatedLanguages, language]);
 
-    if (!sectionToTranslate) return null;
+    const existingLocalization = useMemo(() => {
+        if (!sectionToTranslate?.contents || !language) return null;
 
-    // Add logic for localization
-    const existingLocalization = null;
+        return sectionToTranslate.contents
+            .flatMap((content) => content.localizations ?? [])
+            .find((loc) => loc.language.id === language.id);
+    }, [sectionToTranslate, language]);
 
     const mode = existingLocalization ? ModalMode.Edit : ModalMode.Add;
     const isEditMode = mode === ModalMode.Edit;
+
+    const { translateSection, isSubmitting, error } = useTranslateWhoWeAreSection({
+        section: sectionToTranslate,
+        language: language!,
+        mode,
+        onSuccess: (updatedSection) => {
+            onTranslateSection(updatedSection);
+            onClose();
+        },
+    });
 
     const handleSaveClick = () => {
         if (!formRef.current?.isValid()) return;
@@ -57,47 +71,40 @@ export const TranslateWhoWeAreModal = ({
         return formRef.current?.isDirty() ?? false;
     };
 
-    const renderFormWithStrategy = <TValues,>(strategy: WhoWeAreModalStrategy<TValues>, limits: TranslateLimits) => {
-        const FormComponent = strategy.FormComponent;
-        const initialData = strategy.getInitialData(sectionToTranslate, language, isEditMode);
+    const sectionType = sectionToTranslate?.sectionType ?? SectionType.Main;
 
-        const handleFormSubmit = async (data: TValues) => {
-            await strategy.submit(data, sectionToTranslate, language);
+    const activeStrategy = useMemo(() => {
+        const strategiesBySection: Record<SectionType, WhoWeAreModalStrategy<any>> = {
+            [SectionType.Main]: translateTitleAndDescriptionStrategy,
+            [SectionType.WhatWeDo]: translateDescriptionStrategy,
+            [SectionType.WhoWeSupport]: translateMultipleDescriptionsStrategy,
+            [SectionType.Team]: translateDescriptionStrategy,
+            [SectionType.People]: translateMultipleDescriptionsStrategy,
         };
 
-        return (
-            <FormComponent
-                key={language?.id}
-                ref={formRef}
-                onSubmit={handleFormSubmit}
-                initialData={initialData}
-                onValidationChange={setIsFormValid}
-                onDirtyChange={setIsDirty}
-                limits={limits}
-            />
-        );
+        return strategiesBySection[sectionType];
+    }, [sectionType]);
+
+    const activeLimits: TranslateLimits = LIMITS_BY_SECTION[sectionType];
+
+    const initialData = useMemo(() => {
+        if (!activeStrategy || !language || !sectionToTranslate) {
+            return null;
+        }
+
+        return activeStrategy.getInitialData(sectionToTranslate, language, isEditMode);
+    }, [activeStrategy, sectionToTranslate, language, isEditMode]);
+
+    const handleFormSubmit = async (data: TranslateWhoWeAreSectionFormValues) => {
+        if (!activeStrategy || !sectionToTranslate) return;
+        await translateSection(data);
     };
-
-    type SectionRenderer = () => React.ReactNode;
-
-    const renderersBySection: Record<SectionType, SectionRenderer> = {
-      [SectionType.Main]: () =>
-        renderFormWithStrategy(translateTitleAndDescriptionStrategy, LIMITS_BY_SECTION[SectionType.Main]),
-      [SectionType.WhatWeDo]: () =>
-        renderFormWithStrategy(translateDescriptionStrategy, LIMITS_BY_SECTION[SectionType.WhatWeDo]),
-      [SectionType.WhoWeSupport]: () =>
-        renderFormWithStrategy(translateDescriptionStrategy, LIMITS_BY_SECTION[SectionType.WhoWeSupport]),
-      [SectionType.Team]: () =>
-        renderFormWithStrategy(translateDescriptionStrategy, LIMITS_BY_SECTION[SectionType.Team]),
-      [SectionType.People]: () =>
-        renderFormWithStrategy(translateDescriptionStrategy, LIMITS_BY_SECTION[SectionType.People]),
-    };
-
-    const renderSectionForm = () => renderersBySection[sectionToTranslate.sectionType]?.() ?? null;
 
     const modalTitle = isEditMode
         ? COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.UPDATE_TRANSLATION
         : COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION;
+
+    if (!sectionToTranslate) return null;
 
     return (
         <LocalizationModal
@@ -105,19 +112,29 @@ export const TranslateWhoWeAreModal = ({
             onClose={onClose}
             title={modalTitle}
             onSave={handleSaveClick}
-            isSubmitting={false} // TODO: add isSubmitting after localization
+            isSubmitting={isSubmitting}
             isFormValid={isFormValid}
             checkIsDirty={checkIsDirty}
             isDirty={isDirty}
         >
             <TranslationControls
                 selectedLanguage={language}
-                isSubmitting={false} // TODO: add isSubmitting after localization
+                isSubmitting={isSubmitting}
                 languages={translatedLanguages}
                 onLanguageChange={setLanguage}
             />
 
-            {renderSectionForm()}
+            {activeStrategy && (
+                <activeStrategy.FormComponent
+                    key={language?.id}
+                    ref={formRef}
+                    onSubmit={handleFormSubmit}
+                    initialData={initialData}
+                    onValidationChange={setIsFormValid}
+                    onDirtyChange={setIsDirty}
+                    limits={activeLimits}
+                />
+            )}
         </LocalizationModal>
     );
 };

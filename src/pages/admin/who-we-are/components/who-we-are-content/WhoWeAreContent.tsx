@@ -19,7 +19,6 @@ import { WhoWeArePageToolbar } from '../who-we-are-page-toolbar/WhoWeArePageTool
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
 import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
 import { WhoWeAreModals } from '../modals/WhoWeAreModals';
-import { LocalizationLanguage } from '@/types/common/language';
 
 interface ErrorState {
     message: string | null;
@@ -89,6 +88,18 @@ export const WhoWeAreContent = () => {
         }
     }, [fetchedSection]);
 
+    const setErrorState = useCallback((message: string, type: 'categories' | 'entity' | 'languages') => {
+        if (type === 'languages') {
+            setLanguagesError(message);
+        }
+    }, []);
+
+    const { allLanguages, selectedLanguage, translationLanguages, onLanguageChange, retryFetchLanguages } = useLocalizationToolkit({
+        setErrorState,
+    });
+
+    const englishLanguage = useMemo(() => allLanguages.find((l) => l.code === 'en'), [allLanguages]);
+
     const handleCategorySelect = useCallback((category: WhoWeAreCategory) => {
         setSelectedCategory(category);
         setIsPublishButtonActive(false);
@@ -96,21 +107,29 @@ export const WhoWeAreContent = () => {
 
     const handleTranslateContentModalOpen = useCallback(
         (section: WhoWeAreSection) => {
-            console.log('WhoWeAreContent.tsx: isAnyModalOpened ->', isAnyModalOpened);
             if (isAnyModalOpened) return;
 
-            // TODO: uncomment const hasTranslation = member.localizations?.some((l) => l.language?.id === englishLanguage?.id);
-            const hasTranslation = false;
+            const hasTranslation = section.contents
+                .flatMap((content) => content.localizations)
+                .some((l) => l.language?.id === englishLanguage?.id)
 
             if (hasTranslation) {
-                console.log('WhoWeAreContent.tsx: hasTranslation ->', hasTranslation);
                 openModalActions.openEditTranslationModal(section);
             } else {
-                console.log('WhoWeAreContent.tsx: No Translation ->', hasTranslation);
                 openModalActions.openTranslateItemModal(section);
             }
         },
-        [isAnyModalOpened, openModalActions], // TODO: add englishLanguage
+        [isAnyModalOpened, openModalActions, englishLanguage],
+    );
+
+    const handleTranslateWhoWeAreSuccess = useCallback(
+        (updatedSection: WhoWeAreSection) => {
+            setUpdatedSection(updatedSection);
+            refetchCategories();
+
+            addToast(COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_PUBLISHED_SUCCESS, ToastType.Success);
+        },
+        [addToast, refetchCategories],
     );
 
     const handleContentChange = useCallback((updatedContent: Content) => {
@@ -175,16 +194,6 @@ export const WhoWeAreContent = () => {
         return { message: null, type: null };
     }, [categoryError, sectionError, languagesError]);
 
-    const setErrorState = useCallback((message: string, type: 'categories' | 'entity' | 'languages') => {
-        if (type === 'languages') {
-            setLanguagesError(message);
-        }
-    }, []);
-
-    const { allLanguages, selectedLanguage, onLanguageChange, retryFetchLanguages } = useLocalizationToolkit({
-        setErrorState,
-    });
-
     const handleRetry = useCallback(() => {
         if (error.type === 'categories') {
             refetchCategories();
@@ -233,15 +242,6 @@ export const WhoWeAreContent = () => {
         );
     };
 
-    // TODO: DELETE MOCK DATA
-    const languages: LocalizationLanguage[] = [
-        {
-            id: 1,
-            code: 'en',
-            name: 'English',
-        },
-    ];
-
     return (
         <>
             <div className="who-we-are-page-container">
@@ -268,8 +268,8 @@ export const WhoWeAreContent = () => {
             />
             <WhoWeAreModals
                 modalsStateControl={modalsStateControl}
-                translatedLanguages={languages}
-                onTranslateWhoWeAreSection={handleTranslateContentModalOpen}
+                translatedLanguages={translationLanguages}
+                onTranslateWhoWeAreSection={handleTranslateWhoWeAreSuccess}
             />
             <ToastContainer />
         </>

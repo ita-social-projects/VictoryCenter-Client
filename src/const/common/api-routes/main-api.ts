@@ -55,6 +55,9 @@ export const API_ROUTES = {
         PREVIEWS: 'WhoWeAre/previews',
         PUBLIC: 'WhoWeArePage',
     },
+    WHO_WE_ARE_CONTENT_LOCALIZATIONS: {
+        BASE: 'WhoWeAreContentLocalizations',
+    },
     LOCALIZATION_LANGUAGE: {
         BASE: 'LocalizationLanguage',
     },

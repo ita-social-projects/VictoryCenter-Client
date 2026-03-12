@@ -51,6 +51,11 @@ export type ContentLocalizationDto = EntityLocalizationDto &
 
 export type ContentLocalization = EntityLocalization & ContentLocalizableFields;
 
+export type CreateContentLocalizationDto = ContentLocalizableFields & {
+    entityId: number;
+    languageId: number;
+}
+
 export type ContentLocalizableFields = {
     description: string | null;
     title: string | null;

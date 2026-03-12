@@ -41,7 +41,7 @@ export const SectionsWrapper = ({
     if (!section) {
         return null;
     }
-
+    
     const commonProps = {
         content: section.contents,
         onChange,
@@ -82,10 +82,6 @@ export const SectionsWrapper = ({
 
     const { component: Component, additionalProps } = config;
 
-    const handleTranslateContent = () => {
-        handleOnTranslateContent(section); // TODO: hardcode for testing modal window
-    };
-
     return (
         <div className="who-we-are-main-section">
             <div className="who-we-are-section-buttons">
@@ -93,7 +89,7 @@ export const SectionsWrapper = ({
                     type="button"
                     className="who-we-are-translate-btn"
                     aria-label="Translate"
-                    onClick={handleTranslateContent}
+                    onClick={() => handleOnTranslateContent(section)}
                 />
             </div>
             <Component {...commonProps} {...additionalProps} />

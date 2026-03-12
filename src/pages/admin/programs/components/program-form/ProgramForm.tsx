@@ -663,6 +663,9 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 error={errors.name}
                                 placeholder={PROGRAMS_TEXT.PLACEHOLDER.INSERT_PROGRAM_NAME}
                                 isWhiteLabel={hasBackgroundImage}
+                                maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
+                                    PROGRAM_VALIDATION.name.max,
+                                )}
                             />
 
                             <InputWithCharacterLimitGroup
@@ -676,6 +679,9 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 disabled={isSubmitting || isFormDisabled}
                                 error={errors.location}
                                 placeholder={PROGRAMS_TEXT.PLACEHOLDER.INSERT_PROGRAM_LOCATION}
+                                maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
+                                    PROGRAM_VALIDATION.location.max,
+                                )}
                             />
 
                             <InputWithCharacterLimitGroup
@@ -689,6 +695,9 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 disabled={isSubmitting || isFormDisabled}
                                 error={errors.participantsCount}
                                 placeholder={PROGRAMS_TEXT.PLACEHOLDER.INSERT_PROGRAM_PARTICIPANTS_COUNT}
+                                maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
+                                    PROGRAM_VALIDATION.participantsCount.max,
+                                )}
                             />
 
                             <InputWithCharacterLimitGroup
@@ -702,6 +711,9 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 disabled={isSubmitting || isFormDisabled}
                                 error={errors.meetingCount}
                                 placeholder={PROGRAMS_TEXT.PLACEHOLDER.INSERT_PROGRAM_MEETINGS_COUNT}
+                                maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
+                                    PROGRAM_VALIDATION.meetingCount.max,
+                                )}
                             />
                         </div>
 
@@ -720,6 +732,9 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 error={errors.description}
                                 isWhiteLabel={hasBackgroundImage}
                                 placeholder={PROGRAMS_TEXT.PLACEHOLDER.INSERT_PROGRAM_DESCRIPTION}
+                                maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
+                                    PROGRAM_VALIDATION.description.max,
+                                )}
                             />
 
                             <PhotoInputGroup

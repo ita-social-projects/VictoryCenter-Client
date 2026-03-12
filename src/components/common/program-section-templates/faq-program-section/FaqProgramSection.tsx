@@ -5,6 +5,7 @@ import { FaqCard } from '@/components/public/faq-section/faq-card/FaqCard';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { Button } from '@/components/admin/button/Button';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { useProgramSectionValidation } from '@/hooks/admin/use-program-section-validation';
 import { PublishedFaqQuestion } from '@/types/public/faq-section';
 import { FaqSectionQuestionDto, ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
@@ -135,6 +136,7 @@ export const FaqProgramSection = ({
                             error={titleError}
                             currentLength={getTrimmedInputText(title ?? '').length}
                             className={styles['title-input-group']}
+                            maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(titleMaxLength)}
                         />
                     </div>
 

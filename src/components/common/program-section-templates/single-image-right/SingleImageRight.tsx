@@ -84,6 +84,7 @@ export const SingleImageRight = ({
                                 rows={2}
                                 error={titleError}
                                 currentLength={getTrimmedInputText(title).length}
+                                maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(titleMaxLength)}
                             />
                         </div>
                         <div className={baseStyles['description-section']}>
@@ -99,6 +100,7 @@ export const SingleImageRight = ({
                                 rows={8}
                                 error={descriptionError}
                                 currentLength={getTrimmedInputText(description).length}
+                                maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(descriptionMaxLength)}
                             />
                         </div>
                     </div>

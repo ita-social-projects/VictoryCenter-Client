@@ -5,6 +5,7 @@ import { useId } from 'react';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { useProgramSectionValidation } from '@/hooks/admin/use-program-section-validation';
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
 import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
@@ -84,6 +85,7 @@ export const TitleDescriptionSection = ({
                         placeholder={PROGRAMS_TEXT.SECTION.FORM.TITLE.PLACEHOLDER}
                         className={styles['title-input']}
                         error={titleError}
+                        maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(titleMaxLength)}
                     />
                 ) : (
                     <h2 className={cn(baseStyles.title, titleClassName)}>{title}</h2>
@@ -104,6 +106,7 @@ export const TitleDescriptionSection = ({
                         rows={10}
                         error={descriptionError}
                         currentLength={getTrimmedInputText(description).length}
+                        maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(descriptionMaxLength)}
                     />
                 ) : (
                     <p className={cn(baseStyles.description, descriptionClassName)}>{description}</p>

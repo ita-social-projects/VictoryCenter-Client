@@ -16,6 +16,10 @@ export const WHO_WE_ARE_TEXT = {
             ADD_TRANSLATION: 'Додати переклад',
             EDIT_TRANSLATION: 'Редагувати переклад',
         },
+        MESSAGE: {
+            FAIL_TO_TRANSLATE_SECTION: 'Виникла помилка під час додавання перекладу для секції',
+            FAIL_TO_UPDATE_TRANSLATION: 'Виникла помилка під час оновлення перекладу для секції',
+        },
         LABEL: {
             TITLE: 'Заголовок',
             DESCRIPTION: 'Опис',

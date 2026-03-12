@@ -24,5 +24,4 @@ export interface WhoWeAreModalStrategy<TValues> {
         language: LocalizationLanguage | null,
         isEditMode: boolean,
     ) => TValues | null;
-    submit: (data: TValues, section: WhoWeAreSection, language: LocalizationLanguage | null) => Promise<void>;
 }

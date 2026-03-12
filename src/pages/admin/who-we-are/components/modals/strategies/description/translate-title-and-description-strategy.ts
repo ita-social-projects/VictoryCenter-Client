@@ -20,9 +20,4 @@ export const translateTitleAndDescriptionStrategy: WhoWeAreModalStrategy<Transla
                 description: localized?.description ?? '',
             };
         },
-
-        submit: async (data, section, language) => {
-            // TODO: API FOR SUBMIT
-            console.log('save description translation', { data, sectionId: section.id, languageCode: language?.code });
-        },
     };

@@ -1,9 +1,10 @@
 @use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/variables/fonts' as fonts;
 
 .button {
     display: flex;
     align-items: center;
-    font-family: Mulish, sans-serif;
+    font-family: fonts.$mulish-regular-font;
     gap: 20px;
     width: 311px;
     height: 60px;

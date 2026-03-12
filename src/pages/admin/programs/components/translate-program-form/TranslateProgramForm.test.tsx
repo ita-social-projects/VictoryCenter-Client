@@ -9,24 +9,25 @@ import { ContentType } from '@/types/common/programs';
 import { ProgramSectionTemplate } from '@/types/common/program-sections';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 
-jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
-    InputWithCharacterLimitGroup: ({ value, onChange, onBlur, disabled, id, error }: any) => (
-        <div data-testid={`${id}-wrapper`}>
+const makeMockGroup = (element: 'input' | 'textarea') => ({ value, onChange, onBlur, disabled, id, error }: any) => (
+    <div data-testid={`${id}-wrapper`}>
+        {element === 'input' ? (
             <input data-testid={id} value={value} onChange={onChange} onBlur={onBlur} disabled={disabled} />
-            {error && <span data-testid={`${id}-error`}>{error}</span>}
-        </div>
-    ),
+        ) : (
+            <textarea data-testid={id} value={value} onChange={onChange} onBlur={onBlur} disabled={disabled} />
+        )}
+        {error && <span data-testid={`${id}-error`}>{error}</span>}
+    </div>
+);
+
+jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
+    InputWithCharacterLimitGroup: makeMockGroup('input'),
 }));
 
 jest.mock(
     '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
     () => ({
-        TextAreaWithCharacterLimitGroup: ({ value, onChange, onBlur, disabled, id, error }: any) => (
-            <div data-testid={`${id}-wrapper`}>
-                <textarea data-testid={id} value={value} onChange={onChange} onBlur={onBlur} disabled={disabled} />
-                {error && <span data-testid={`${id}-error`}>{error}</span>}
-            </div>
-        ),
+        TextAreaWithCharacterLimitGroup: makeMockGroup('textarea'),
     }),
 );
 

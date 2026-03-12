@@ -182,4 +182,19 @@ describe('useFieldHandlers', () => {
 
         expect(onSubmit).toHaveBeenCalledWith({ name: 'Test', description: 'Desc' }, VisibilityStatus.Published);
     });
+
+    it('returns empty string via fallback when field key is absent from formState', () => {
+        const { result: fieldsResult } = renderHook(() =>
+            useFieldHandlers(
+                {
+                    formState: { name: 'Alice' } as unknown as FormValues,
+                    setFormState: jest.fn(),
+                    setErrors: jest.fn(),
+                },
+                [{ name: 'description' }],
+            ),
+        );
+
+        expect(fieldsResult.current.description.value).toBe('');
+    });
 });

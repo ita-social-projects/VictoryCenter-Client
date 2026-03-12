@@ -17,7 +17,7 @@
 
 .thead {
     tr th {
-        border-bottom: 1px solid #a4a49b;
+        border-bottom: 1px solid c.$grey-700;
     }
 }
 
@@ -128,7 +128,7 @@
 .empty-state-message {
     @include type.subtitle-2-medium;
     line-height: 24px;
-    color: #061125;
+    color: c.$blue-900;
     margin: 0;
 }
 

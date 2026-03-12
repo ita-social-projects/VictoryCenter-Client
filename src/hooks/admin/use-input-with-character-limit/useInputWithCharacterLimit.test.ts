@@ -280,6 +280,16 @@ describe('useInputWithCharacterLimit', () => {
 
             expect(mockOnChange).not.toHaveBeenCalled();
         });
+
+        it('should not call onChange on blur when value is whitespace-only', () => {
+            const { result } = renderHook(() => useInputWithCharacterLimit({ ...defaultProps, value: '   \n   ' }));
+
+            act(() => {
+                result.current.handleBlur({} as React.FocusEvent<HTMLInputElement>);
+            });
+
+            expect(mockOnChange).not.toHaveBeenCalled();
+        });
     });
 
     describe('handleClear', () => {

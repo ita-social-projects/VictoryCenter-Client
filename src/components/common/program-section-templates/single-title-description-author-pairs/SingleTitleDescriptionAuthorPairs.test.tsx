@@ -100,6 +100,12 @@ jest.mock('@/const/admin/programs', () => ({
 jest.mock('@/const/admin/common', () => ({
     COMMON_TEXT_ADMIN: {
         BUTTON: { YES: 'Yes', NO: 'No' },
+        VALIDATION_MESSAGE: {
+            FIELD_REQUIRED: 'Field required',
+            getMinError: jest.fn((min: number) => `Min ${min}`),
+            getMaxError: jest.fn((max: number) => `Max ${max}`),
+            getImageDimensionError: jest.fn(),
+        },
     },
 }));
 

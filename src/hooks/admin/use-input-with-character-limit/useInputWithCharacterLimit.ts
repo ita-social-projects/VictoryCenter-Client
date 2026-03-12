@@ -62,7 +62,7 @@ export const useInputWithCharacterLimit = <T extends HTMLInputElement | HTMLText
         setIsFocused(false);
 
         const trimmed = (value ?? '').trim();
-        if (trimmed !== value) {
+        if (trimmed !== value && trimmed.length > 0) {
             onChange({
                 target: { value: trimmed, name, id },
             } as React.ChangeEvent<T>);

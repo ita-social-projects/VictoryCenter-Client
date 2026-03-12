@@ -8,15 +8,66 @@ import { mapLocalizationDtoToModel } from '@/utils/functions/mappers/common/loca
 import { ContentType } from '@/types/common/programs';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { ModalMode } from '@/types/admin/common';
+import { HippotherapyProgramSectionDto } from '@/types/common/program-sections';
 
 interface UseTranslateProgramParams {
     program: HippotherapyProgram | null;
     language: LocalizationLanguage;
     onSuccess: (updatedProgram: HippotherapyProgram) => void;
     mode: ModalMode;
+    sourceSections?: HippotherapyProgramSectionDto[];
 }
 
-export const useTranslateProgram = ({ program, language, onSuccess, mode }: UseTranslateProgramParams) => {
+export const shouldIncludeContent = (sourceSection: any, content: any): boolean => {
+    const sourceContent = sourceSection?.contents?.find((c: { id?: number }) => c.id === content.entityId);
+
+    if (!sourceContent) return true;
+
+    if (sourceContent.contentType === ContentType.Image || sourceContent.image || sourceContent.imageId) {
+        return false;
+    }
+
+    const hasText = (v: any) => typeof v === 'string' && v.trim().length > 0;
+
+    const hasTitle = hasText(sourceContent.title);
+    const hasDescription = hasText(sourceContent.description);
+    const hasAuthor = hasText(sourceContent.author);
+    const hasFaqQuestion = !!(sourceContent.faqQuestionId || sourceContent.faqQuestion);
+
+    if (!hasTitle && !hasDescription && !hasAuthor && !hasFaqQuestion) {
+        return false;
+    }
+
+    const nonEmptyCount = [hasTitle, hasDescription, hasAuthor, hasFaqQuestion].filter(Boolean).length;
+    if (nonEmptyCount > 1) {
+        switch (sourceContent.contentType) {
+            case ContentType.Title:
+                if (hasDescription || hasAuthor || hasFaqQuestion) return false;
+                break;
+            case ContentType.Description:
+                if (hasTitle || hasAuthor || hasFaqQuestion) return false;
+                break;
+            case ContentType.Author:
+                if (hasTitle || hasDescription || hasFaqQuestion) return false;
+                break;
+            case ContentType.FaqQuestion:
+                if (hasTitle || hasDescription || hasAuthor) return false;
+                break;
+            default:
+                return false;
+        }
+    }
+
+    return true;
+};
+
+export const useTranslateProgram = ({
+    program,
+    language,
+    onSuccess,
+    mode,
+    sourceSections = [],
+}: UseTranslateProgramParams) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string>('');
 
@@ -30,57 +81,16 @@ export const useTranslateProgram = ({ program, language, onSuccess, mode }: UseT
             setIsSubmitting(true);
             setError('');
 
+            const sourceSectionsByEntityId = new Map(
+                sourceSections.filter((section) => section.id !== undefined).map((section) => [section.id!, section]),
+            );
+
             const sanitizedSections = (data.sections || []).map((section) => {
-                const sourceSection = (section as any).__sourceSection;
+                const sourceSection = sourceSectionsByEntityId.get(section.entityId);
 
-                const filteredContents = (section.contents || []).filter((content) => {
-                    const sourceContent = sourceSection?.contents?.find(
-                        (c: { id?: number }) => c.id === content.entityId,
-                    );
-
-                    if (!sourceContent) return true;
-
-                    if (
-                        sourceContent.contentType === ContentType.Image ||
-                        sourceContent.image ||
-                        sourceContent.imageId
-                    ) {
-                        return false;
-                    }
-
-                    const hasText = (v: any) => typeof v === 'string' && v.trim().length > 0;
-
-                    const hasTitle = hasText(sourceContent.title);
-                    const hasDescription = hasText(sourceContent.description);
-                    const hasAuthor = hasText(sourceContent.author);
-                    const hasFaqQuestion = !!(sourceContent.faqQuestionId || sourceContent.faqQuestion);
-
-                    if (!hasTitle && !hasDescription && !hasAuthor && !hasFaqQuestion) {
-                        return false;
-                    }
-
-                    const nonEmptyCount = [hasTitle, hasDescription, hasAuthor, hasFaqQuestion].filter(Boolean).length;
-                    if (nonEmptyCount > 1) {
-                        switch (sourceContent.contentType) {
-                            case ContentType.Title:
-                                if (hasDescription || hasAuthor || hasFaqQuestion) return false;
-                                break;
-                            case ContentType.Description:
-                                if (hasTitle || hasAuthor || hasFaqQuestion) return false;
-                                break;
-                            case ContentType.Author:
-                                if (hasTitle || hasDescription || hasFaqQuestion) return false;
-                                break;
-                            case ContentType.FaqQuestion:
-                                if (hasTitle || hasDescription || hasAuthor) return false;
-                                break;
-                            default:
-                                return false;
-                        }
-                    }
-
-                    return true;
-                });
+                const filteredContents = (section.contents || []).filter((content) =>
+                    shouldIncludeContent(sourceSection, content),
+                );
 
                 return {
                     entityId: section.entityId,

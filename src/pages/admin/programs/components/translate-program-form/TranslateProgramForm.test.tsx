@@ -4,9 +4,8 @@ import '@testing-library/jest-dom';
 
 import { TranslateProgramForm, TranslateProgramFormRef } from './TranslateProgramForm';
 import { VisibilityStatus } from '@/types/admin/common';
-import { CreateHippotherapyProgramSectionLocalizationDto } from '@/types/common/program-sections';
+import { CreateHippotherapyProgramSectionLocalizationDto, ProgramSectionTemplate } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
-import { ProgramSectionTemplate } from '@/types/common/program-sections';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 
 const makeMockGroup =
@@ -123,12 +122,11 @@ const SOURCE_SECTION = {
 
 const SAMPLE_SECTION = {
     entityId: 42,
-    __sourceSection: SOURCE_SECTION,
     contents: [
         { entityId: 100, title: 'Translated title', description: null, languageId: 2 },
         { entityId: 101, title: null, description: 'Translated desc', languageId: 2 },
     ],
-} as CreateHippotherapyProgramSectionLocalizationDto & { __sourceSection: any };
+} as CreateHippotherapyProgramSectionLocalizationDto;
 
 const SOURCE_SECTION_WITH_PAIRS = {
     id: 77,
@@ -188,14 +186,13 @@ const SOURCE_SECTION_WITH_PAIRS = {
 
 const SAMPLE_SECTION_WITH_PAIRS = {
     entityId: 77,
-    __sourceSection: SOURCE_SECTION_WITH_PAIRS,
     contents: [
         { entityId: 200, title: 'Title tr', description: null, languageId: 2 },
         { entityId: 201, title: null, description: 'Desc tr', languageId: 2 },
         { entityId: 202, title: null, author: 'Author tr', languageId: 2 },
         { entityId: 203, title: null, question: 'Question tr', answer: 'Answer tr', languageId: 2 },
     ],
-} as CreateHippotherapyProgramSectionLocalizationDto & { __sourceSection: any };
+} as CreateHippotherapyProgramSectionLocalizationDto;
 
 const TEST_DATA = {
     name: 'Test program',
@@ -223,6 +220,7 @@ describe('TranslateProgramForm', () => {
 
     it('renders basic fields and section form with translated values', () => {
         renderForm({
+            sourceSections: [SOURCE_SECTION],
             initialData: {
                 name: TEST_DATA.name,
                 description: TEST_DATA.description,
@@ -243,6 +241,7 @@ describe('TranslateProgramForm', () => {
         const onSubmit = jest.fn();
         const { ref } = renderForm({
             onSubmit,
+            sourceSections: [SOURCE_SECTION],
             initialData: {
                 name: TEST_DATA.name,
                 description: TEST_DATA.description,
@@ -285,10 +284,11 @@ describe('TranslateProgramForm', () => {
         expect(screen.getByText(PROGRAMS_TEXT.FORM.LABEL.DESCRIPTION)).toBeInTheDocument();
     });
 
-    it('renders media from initialData overrides before props', () => {
+    it('renders media from props', () => {
         renderForm({
             previewImage: { url: 'https://example.com/from-prop-preview.jpg' },
             backgroundImage: { url: 'https://example.com/from-prop-bg.jpg' },
+            sourceSections: [SOURCE_SECTION],
             initialData: {
                 name: TEST_DATA.name,
                 description: TEST_DATA.description,
@@ -296,18 +296,16 @@ describe('TranslateProgramForm', () => {
                 participantsCount: TEST_DATA.participants,
                 meetingCount: TEST_DATA.meetings,
                 sections: [SAMPLE_SECTION],
-                __previewImage: { url: 'https://example.com/from-initial-preview.jpg' },
-                __backgroundImage: { url: 'https://example.com/from-initial-bg.jpg' },
             },
         });
 
         expect(screen.getByAltText(PROGRAMS_TEXT.FORM.LABEL.DESCRIPTION)).toHaveAttribute(
             'src',
-            'https://example.com/from-initial-bg.jpg',
+            'https://example.com/from-prop-bg.jpg',
         );
         expect(screen.getByAltText(PROGRAMS_TEXT.FORM.LABEL.PREVIEW_IMAGE)).toHaveAttribute(
             'src',
-            'https://example.com/from-initial-preview.jpg',
+            'https://example.com/from-prop-preview.jpg',
         );
     });
 
@@ -336,6 +334,7 @@ describe('TranslateProgramForm', () => {
 
         renderForm({
             onDirtyChange,
+            sourceSections: [SOURCE_SECTION],
             initialData: {
                 name: TEST_DATA.name,
                 description: TEST_DATA.description,
@@ -367,7 +366,7 @@ describe('TranslateProgramForm', () => {
         expect(ref.current?.isValid(true)).toBe(false);
     });
 
-    it('skips section editor when __sourceSection is absent', () => {
+    it('skips section editor when sourceSections prop is absent', () => {
         renderForm({
             initialData: {
                 name: TEST_DATA.name,
@@ -391,6 +390,7 @@ describe('TranslateProgramForm', () => {
         const onSubmit = jest.fn();
         const { ref } = renderForm({
             onSubmit,
+            sourceSections: [SOURCE_SECTION_WITH_PAIRS],
             initialData: {
                 name: TEST_DATA.name,
                 description: TEST_DATA.description,
@@ -428,6 +428,7 @@ describe('TranslateProgramForm', () => {
         const onSubmit = jest.fn();
         const { ref } = renderForm({
             onSubmit,
+            sourceSections: [SOURCE_SECTION],
             initialData: {
                 name: TEST_DATA.name,
                 description: TEST_DATA.description,
@@ -471,6 +472,7 @@ describe('TranslateProgramForm', () => {
         const onSubmit = jest.fn();
         const { ref } = renderForm({
             onSubmit,
+            sourceSections: [SOURCE_SECTION],
             initialData: {
                 name: TEST_DATA.name,
                 description: TEST_DATA.description,
@@ -497,6 +499,13 @@ describe('TranslateProgramForm', () => {
 
     it('does not render section editor when source section id is missing', () => {
         renderForm({
+            sourceSections: [
+                {
+                    template: ProgramSectionTemplate.TextOnly,
+                    order: 0,
+                    contents: [],
+                } as any,
+            ],
             initialData: {
                 name: TEST_DATA.name,
                 description: TEST_DATA.description,
@@ -506,10 +515,6 @@ describe('TranslateProgramForm', () => {
                 sections: [
                     {
                         entityId: 55,
-                        __sourceSection: {
-                            template: ProgramSectionTemplate.TextOnly,
-                            contents: [],
-                        },
                         contents: [],
                     } as any,
                 ],

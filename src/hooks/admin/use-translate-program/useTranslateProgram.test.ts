@@ -1,5 +1,6 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useTranslateProgram } from './useTranslateProgram';
+import { shouldIncludeContent } from './useTranslateProgram';
 import { ProgramLocalizationsApi } from '@/services/api/admin/programs/program-localizations/program-localizations-api';
 import { mapLocalizationDtoToModel } from '@/utils/functions/mappers/common/localization/localization-mappers';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
@@ -385,5 +386,38 @@ describe('useTranslateProgram', () => {
             ...programWithoutLocalizations,
             localizations: [localizationModelMock],
         });
+    });
+});
+
+describe('shouldIncludeContent', () => {
+    it('returns true when source content is not found', () => {
+        const sourceSection = { contents: [{ id: 1, contentType: ContentType.Title, title: 'Title' }] };
+        expect(shouldIncludeContent(sourceSection, { entityId: 999 })).toBe(true);
+    });
+
+    it('returns false for image source content', () => {
+        const sourceSection = { contents: [{ id: 2, contentType: ContentType.Image, imageId: 10 }] };
+        expect(shouldIncludeContent(sourceSection, { entityId: 2 })).toBe(false);
+    });
+
+    it('returns false when all translatable fields are empty', () => {
+        const sourceSection = {
+            contents: [{ id: 3, contentType: ContentType.Description, title: '', description: '   ', author: null }],
+        };
+        expect(shouldIncludeContent(sourceSection, { entityId: 3 })).toBe(false);
+    });
+
+    it('returns false when multiple fields exist but do not match contentType rules', () => {
+        const sourceSection = {
+            contents: [{ id: 4, contentType: ContentType.Title, title: 'T', description: 'D' }],
+        };
+        expect(shouldIncludeContent(sourceSection, { entityId: 4 })).toBe(false);
+    });
+
+    it('returns true for valid faq question content', () => {
+        const sourceSection = {
+            contents: [{ id: 5, contentType: ContentType.FaqQuestion, faqQuestionId: 15 }],
+        };
+        expect(shouldIncludeContent(sourceSection, { entityId: 5 })).toBe(true);
     });
 });

@@ -49,14 +49,19 @@ jest.mock('../translate-program-form/TranslateProgramForm', () => {
 });
 
 const mockTranslateProgram = jest.fn();
-jest.mock('@/hooks/admin/use-translate-program/useTranslateProgram', () => ({
-    useTranslateProgram: jest.fn(() => ({
-        translateProgram: mockTranslateProgram,
-        isSubmitting: false,
-        error: '',
-        clearError: jest.fn(),
-    })),
-}));
+jest.mock('@/hooks/admin/use-translate-program/useTranslateProgram', () => {
+    const actual = jest.requireActual('@/hooks/admin/use-translate-program/useTranslateProgram');
+
+    return {
+        ...actual,
+        useTranslateProgram: jest.fn(() => ({
+            translateProgram: mockTranslateProgram,
+            isSubmitting: false,
+            error: '',
+            clearError: jest.fn(),
+        })),
+    };
+});
 
 const mockUseTranslateProgram = jest.mocked(useTranslateProgram);
 
@@ -356,7 +361,15 @@ describe('TranslateProgramModal', () => {
                     template: 1,
                     contents: [
                         {
+                            id: 800,
+                            contentType: 2,
+                            image: { url: 'https://example.com/content-image.jpg' },
+                            localizations: [],
+                        },
+                        {
                             id: 801,
+                            contentType: 0,
+                            title: 'Source title',
                             localizations: [
                                 {
                                     localizationInfoDto: { id: 2 },
@@ -386,6 +399,7 @@ describe('TranslateProgramModal', () => {
         expect(parsed.__backgroundImage).toMatchObject({ url: 'https://example.com/bg.jpg' });
         expect(parsed.sections).toHaveLength(1);
         expect(parsed.sections[0]).toMatchObject({ entityId: 701 });
+        expect(parsed.sections[0].contents).toHaveLength(1);
         expect(parsed.sections[0].contents[0]).toMatchObject({
             entityId: 801,
             languageId: 2,

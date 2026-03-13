@@ -8,7 +8,10 @@ import { mapLocalizationDtoToModel } from '@/utils/functions/mappers/common/loca
 import { ContentType } from '@/types/common/programs';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { ModalMode } from '@/types/admin/common';
-import { HippotherapyProgramSectionDto } from '@/types/common/program-sections';
+import {
+    CreateHippotherapyProgramSectionLocalizationDto,
+    HippotherapyProgramSectionDto,
+} from '@/types/common/program-sections';
 
 interface UseTranslateProgramParams {
     program: HippotherapyProgram | null;
@@ -86,7 +89,11 @@ export const useTranslateProgram = ({
             );
 
             const sanitizedSections = (data.sections || []).map((section) => {
-                const sourceSection = sourceSectionsByEntityId.get(section.entityId);
+                const sourceSection =
+                    sourceSectionsByEntityId.get(section.entityId) ??
+                    (section as CreateHippotherapyProgramSectionLocalizationDto & { __sourceSection?: unknown })
+                        .__sourceSection ??
+                    null;
 
                 const filteredContents = (section.contents || []).filter((content) =>
                     shouldIncludeContent(sourceSection, content),

@@ -358,6 +358,54 @@ describe('useTranslateProgram', () => {
         expect(createPayload.sections[0].contents.map((c) => c.entityId)).toEqual([14]);
     });
 
+    it('sanitizes section contents using sourceSections prop in runtime path', async () => {
+        mockedCreate.mockResolvedValue(localizationDtoMock as any);
+        mockedMapper.mockReturnValue(localizationModelMock);
+
+        const { result } = renderHook(() =>
+            useTranslateProgram({
+                program: programMock,
+                language: languageMock,
+                onSuccess: jest.fn(),
+                mode: ModalMode.Add,
+                sourceSections: [
+                    {
+                        id: 42,
+                        template: 1 as any,
+                        order: 0,
+                        contents: [
+                            { id: 1, contentType: ContentType.Image, order: 0, imageId: 10 },
+                            { id: 2, contentType: ContentType.Title, order: 1, title: 'Only title' },
+                            { id: 3, contentType: ContentType.Title, order: 2, title: 't', description: 'd' },
+                        ],
+                    } as any,
+                ],
+            }),
+        );
+
+        await act(async () => {
+            await result.current.translateProgram({
+                ...formValues,
+                sections: [
+                    {
+                        entityId: 42,
+                        contents: [
+                            { entityId: 1, title: 'drop image' },
+                            { entityId: 2, title: 'keep title' },
+                            { entityId: 3, title: 'drop mixed', description: 'drop mixed' },
+                        ],
+                    },
+                ] as any,
+            });
+        });
+
+        const createPayload = mockedCreate.mock.calls[mockedCreate.mock.calls.length - 1][1] as {
+            sections: Array<{ contents: Array<{ entityId: number }> }>;
+        };
+
+        expect(createPayload.sections[0].contents.map((c) => c.entityId)).toEqual([2]);
+    });
+
     it('uses fallback localization array in edit mode when program has no localizations', async () => {
         const onSuccess = jest.fn();
 

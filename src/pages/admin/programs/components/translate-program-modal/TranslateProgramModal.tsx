@@ -9,7 +9,7 @@ import {
     TranslateProgramFormRef,
     TranslateProgramFormValues,
 } from '../translate-program-form/TranslateProgramForm';
-import { useTranslateProgram } from '@/hooks/admin/use-translate-program/useTranslateProgram';
+import { shouldIncludeContent, useTranslateProgram } from '@/hooks/admin/use-translate-program/useTranslateProgram';
 import { DEFAULT_LOCALE } from '@/const/common/locales';
 import {
     CreateHippotherapyProgramSectionLocalizationDto,
@@ -60,6 +60,7 @@ export const TranslateProgramModal = ({
         program: programToTranslate,
         language: language!,
         mode,
+        sourceSections: programToTranslate?.sections ?? [],
         onSuccess: (updated) => {
             onTranslateProgram(updated);
             onClose();
@@ -76,7 +77,10 @@ export const TranslateProgramModal = ({
                     entityId: section.id!,
                     __sourceSection: section,
                     contents: section.contents
-                        .filter((content) => content.id !== undefined)
+                        .filter(
+                            (content) =>
+                                content.id !== undefined && shouldIncludeContent(section, { entityId: content.id }),
+                        )
                         .map((content) => {
                             const contentLoc = languageId
                                 ? content.localizations?.find((loc) => loc.localizationInfoDto?.id === languageId)

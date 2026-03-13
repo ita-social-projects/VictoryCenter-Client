@@ -138,7 +138,7 @@ export const SingleImageRight = ({
                     </div>
                     <div className={baseStyles['right-section']}>
                         <div className={baseStyles['image-wrapper']}>
-                            {imageSrc && <img src={imageSrc} alt="" className={baseStyles.image} />}
+                            {imageSrc && <img src={imageSrc} alt="" className={baseStyles.image} loading="lazy" />}
                         </div>
                     </div>
                 </>

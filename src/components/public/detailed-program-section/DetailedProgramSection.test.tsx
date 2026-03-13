@@ -58,6 +58,7 @@ describe('DetailedProgramSection', () => {
                 images: [],
                 cards: [{ title: 'Test Title', description: 'Test Description' }],
                 descriptionAuthorPairs: [],
+                faqQuestions: [],
             },
             mode: ProgramSectionMode.View,
         });
@@ -92,6 +93,7 @@ describe('DetailedProgramSection', () => {
                 images: [],
                 cards: [],
                 descriptionAuthorPairs: [],
+                faqQuestions: [],
             },
             mode: ProgramSectionMode.View,
         });
@@ -125,6 +127,7 @@ describe('DetailedProgramSection', () => {
                 images: [],
                 cards: [{ title: 'Test Title', description: '' }],
                 descriptionAuthorPairs: [],
+                faqQuestions: [],
             },
             mode: ProgramSectionMode.View,
         });
@@ -187,6 +190,7 @@ describe('DetailedProgramSection', () => {
                 ],
                 cards: [{ title: 'Title', description: 'Desc' }],
                 descriptionAuthorPairs: [],
+                faqQuestions: [],
             },
             mode: ProgramSectionMode.View,
         });
@@ -222,6 +226,7 @@ describe('DetailedProgramSection', () => {
                 images: [null],
                 cards: [{ title: 'Title', description: 'Desc' }],
                 descriptionAuthorPairs: [],
+                faqQuestions: [],
             },
             mode: ProgramSectionMode.View,
         });
@@ -246,6 +251,7 @@ describe('DetailedProgramSection', () => {
                 images: [],
                 cards: [],
                 descriptionAuthorPairs: [],
+                faqQuestions: [],
             },
             mode: ProgramSectionMode.View,
         });
@@ -320,6 +326,99 @@ describe('DetailedProgramSection', () => {
                 descriptionAuthorPairs: [
                     { description: '', author: 'Author 1' },
                     { description: 'Desc 2', author: 'Author 2' },
+                ],
+                faqQuestions: [],
+            },
+            mode: ProgramSectionMode.View,
+        });
+    });
+
+    it('extracts and sorts faqQuestions from section contents', () => {
+        const section: HippotherapyProgramSectionDto = {
+            id: 1,
+            template: ProgramSectionTemplate.SingleTitleQuestionAnswerPairs,
+            contents: [
+                {
+                    id: 1,
+                    contentType: ContentType.Title,
+                    title: 'FAQ Title',
+                    order: 0,
+                    description: null,
+                    image: null,
+                },
+                {
+                    id: 2,
+                    contentType: ContentType.FaqQuestion,
+                    order: 3,
+                    title: null,
+                    description: null,
+                    image: null,
+                    faqQuestion: {
+                        id: 10,
+                        questionText: 'Question B',
+                        answerText: 'Answer B',
+                        status: 1,
+                        pages: [],
+                        localizations: [],
+                    },
+                },
+                {
+                    id: 3,
+                    contentType: ContentType.FaqQuestion,
+                    order: 1,
+                    title: null,
+                    description: null,
+                    image: null,
+                    faqQuestion: {
+                        id: 11,
+                        questionText: 'Question A',
+                        answerText: 'Answer A',
+                        status: 1,
+                        pages: [],
+                        localizations: [],
+                    },
+                },
+                {
+                    id: 4,
+                    contentType: ContentType.FaqQuestion,
+                    order: 2,
+                    title: null,
+                    description: null,
+                    image: null,
+                    faqQuestion: null,
+                },
+            ],
+            order: 0,
+        };
+
+        render(<DetailedProgramSection section={section} />);
+
+        expect(mockRenderProgramSection).toHaveBeenCalledWith({
+            templateId: ProgramSectionTemplate.SingleTitleQuestionAnswerPairs,
+            data: {
+                title: 'FAQ Title',
+                description: '',
+                descriptions: [],
+                images: [],
+                cards: [{ title: 'FAQ Title', description: '' }],
+                descriptionAuthorPairs: [],
+                faqQuestions: [
+                    {
+                        id: 11,
+                        questionText: 'Question A',
+                        answerText: 'Answer A',
+                        status: 1,
+                        pages: [],
+                        localizations: [],
+                    },
+                    {
+                        id: 10,
+                        questionText: 'Question B',
+                        answerText: 'Answer B',
+                        status: 1,
+                        pages: [],
+                        localizations: [],
+                    },
                 ],
             },
             mode: ProgramSectionMode.View,

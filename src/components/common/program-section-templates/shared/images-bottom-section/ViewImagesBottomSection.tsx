@@ -48,6 +48,7 @@ export const ViewImagesBottomSection = ({
                                         alt={`Program section ${index + 1}`}
                                         className={cn(styles.image, imageClassName)}
                                         data-elevated={config.elevatedIndices.includes(index) ? 'true' : 'false'}
+                                        loading="lazy"
                                     />
                                 )}
                             </div>

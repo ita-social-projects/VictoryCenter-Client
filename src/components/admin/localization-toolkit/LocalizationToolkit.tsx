@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { LOCALIZATION_TEXT } from '@/const/admin/localization';
 import { Select } from '@/components/common/select/Select';
 import { LocalizationLanguage, TranslationStatusFilter } from '@/types/common/language';
@@ -17,24 +17,15 @@ export const LocalizationToolkit = ({
     onLanguageChange,
     onTranslationStatusFilterChange,
 }: LocalizationToolkitProps) => {
-    const [selectedTranslationStatus, setSelectedTranslationStatus] = useState<TranslationStatusFilter>(
-        TranslationStatusFilter.All,
-    );
+    const [selectedTranslationStatus, setSelectedTranslationStatus] = useState<TranslationStatusFilter | undefined>();
 
     const changeTranslationStatus = useCallback(
-        (translationFilter: TranslationStatusFilter) => {
+        (translationFilter: TranslationStatusFilter | undefined) => {
             setSelectedTranslationStatus(translationFilter);
             onTranslationStatusFilterChange(translationFilter);
         },
         [onTranslationStatusFilterChange],
     );
-
-    useEffect(() => {
-        if (!languages.length) {
-            return;
-        }
-        changeTranslationStatus(TranslationStatusFilter.All);
-    }, [languages, changeTranslationStatus]);
 
     return (
         <div className={styles.toolkit} data-testid="localization-toolkit">

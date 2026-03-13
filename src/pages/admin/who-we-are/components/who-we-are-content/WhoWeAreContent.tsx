@@ -18,6 +18,7 @@ import classNames from 'classnames';
 import { WhoWeArePageToolbar } from '../who-we-are-page-toolbar/WhoWeArePageToolbar';
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
 import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
+import { normalizeHtml } from '@/utils/functions/normalize-html/normalize-html';
 
 interface ErrorState {
     message: string | null;
@@ -34,7 +35,6 @@ export const WhoWeAreContent = () => {
     const [selectedSection, setSelectedSection] = useState<WhoWeAreSection | null>(null);
     const [updatedSection, setUpdatedSection] = useState<WhoWeAreSection | null>(null);
     const [isConfirmationModalOpen, setConfirmationModalOpen] = useState<boolean>(false);
-    const [isPublishButtonActive, setIsPublishButtonActive] = useState<boolean>(false);
     const [languagesError, setLanguagesError] = useState<string | null>(null);
 
     const { addToast } = useToast();
@@ -80,14 +80,26 @@ export const WhoWeAreContent = () => {
 
     useEffect(() => {
         if (fetchedSection) {
-            setSelectedSection(fetchedSection);
-            setUpdatedSection(fetchedSection);
+            const normalizedSection = {
+                ...fetchedSection,
+                contents: fetchedSection.contents.map((item) => ({
+                    ...item,
+                    description: item.description ? normalizeHtml(item.description) : item.description,
+                    title: item.title ? normalizeHtml(item.title) : item.title,
+                })),
+            };
+            setSelectedSection(normalizedSection);
+            setUpdatedSection(normalizedSection);
         }
     }, [fetchedSection]);
 
+    const isPublishButtonActive = useMemo(() => {
+        if (!selectedSection || !updatedSection) return false;
+        return JSON.stringify(selectedSection) !== JSON.stringify(updatedSection);
+    }, [selectedSection, updatedSection]);
+
     const handleCategorySelect = useCallback((category: WhoWeAreCategory) => {
         setSelectedCategory(category);
-        setIsPublishButtonActive(false);
     }, []);
 
     const handleContentChange = useCallback((updatedContent: Content) => {
@@ -126,7 +138,6 @@ export const WhoWeAreContent = () => {
 
                 setSelectedSection(result);
                 setUpdatedSection(result);
-                setIsPublishButtonActive(false);
                 addToast(COMMON_TEXT_ADMIN.MESSAGE.SUCCESSFULLY_PUBLISHED, ToastType.Info);
 
                 refetchCategories();
@@ -204,7 +215,6 @@ export const WhoWeAreContent = () => {
                     section={updatedSection}
                     onChange={handleContentChange}
                     onPublish={() => setConfirmationModalOpen(true)}
-                    setIsPublishButtonActive={(value) => setIsPublishButtonActive(value)}
                     isPublishButtonActive={isPublishButtonActive}
                     language={selectedLanguage}
                 />

@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { SectionsWrapper } from './SectionsWrapper';
@@ -11,19 +10,16 @@ import { ImageSectionProps } from '@/pages/admin/who-we-are/components/sections/
 
 jest.mock('../sections/cards-section/CardsSection', () => ({
     CardsSection: (props: CardsSectionProps) => {
-        props.setIsPublishButtonActive(true);
         return <div data-testid="cards-section" data-props={JSON.stringify(props)} />;
     },
 }));
 jest.mock('../sections/description-section/DescriptionSection', () => ({
     DescriptionSection: (props: DescriptionSectionProps) => {
-        props.setIsPublishButtonActive(true);
         return <div data-testid="description-section" data-props={JSON.stringify(props)} />;
     },
 }));
 jest.mock('../sections/image-block-section/ImageBlockSection', () => ({
     ImageSection: (props: ImageSectionProps) => {
-        props.setIsPublishButtonActive(true);
         return <div data-testid="image-section" data-props={JSON.stringify(props)} />;
     },
 }));
@@ -32,7 +28,6 @@ const mockProps = {
     onChange: jest.fn(),
     onPublish: jest.fn(),
     isPublishButtonActive: false,
-    setIsPublishButtonActive: jest.fn(),
     language: { id: 1, code: 'uk', name: 'Ukrainian' },
 };
 
@@ -41,7 +36,7 @@ describe('SectionsWrapper', () => {
         jest.clearAllMocks();
     });
 
-    it('should render DescriptionSection and call setIsPublishButtonActive', () => {
+    it('should render DescriptionSection for WhatWeDo', () => {
         const section = {
             id: 1,
             sectionType: SectionType.WhatWeDo,
@@ -49,12 +44,10 @@ describe('SectionsWrapper', () => {
             contents: [{ id: 10, title: 'What We Do Title' }] as Content[],
         };
         render(<SectionsWrapper {...mockProps} section={section} />);
-
         expect(screen.getByTestId('description-section')).toBeInTheDocument();
-        expect(mockProps.setIsPublishButtonActive).toHaveBeenCalledWith(true);
     });
 
-    it('should render CardsSection and call setIsPublishButtonActive for WhoWeSupport', () => {
+    it('should render CardsSection for WhoWeSupport', () => {
         const section = {
             id: 2,
             sectionType: SectionType.WhoWeSupport,
@@ -62,12 +55,10 @@ describe('SectionsWrapper', () => {
             contents: [{ id: 20, description: 'Who We Support Desc' }] as Content[],
         };
         render(<SectionsWrapper {...mockProps} section={section} />);
-
         expect(screen.getByTestId('cards-section')).toBeInTheDocument();
-        expect(mockProps.setIsPublishButtonActive).toHaveBeenCalledWith(true);
     });
 
-    it('should render CardsSection and call setIsPublishButtonActive for People', () => {
+    it('should render CardsSection for People', () => {
         const section = {
             id: 3,
             sectionType: SectionType.People,
@@ -75,12 +66,10 @@ describe('SectionsWrapper', () => {
             contents: [{ id: 30, contentType: ContentType.Description, description: 'People Desc' }] as Content[],
         };
         render(<SectionsWrapper {...mockProps} section={section} />);
-
         expect(screen.getByTestId('cards-section')).toBeInTheDocument();
-        expect(mockProps.setIsPublishButtonActive).toHaveBeenCalledWith(true);
     });
 
-    it('should render ImageSection and call setIsPublishButtonActive for Main', () => {
+    it('should render ImageSection for Main', () => {
         const section = {
             id: 4,
             sectionType: SectionType.Main,
@@ -88,12 +77,10 @@ describe('SectionsWrapper', () => {
             contents: [{ id: 40, image: { id: 1, url: 'main.jpg', mimeType: 'image/png' } as Image }] as Content[],
         };
         render(<SectionsWrapper {...mockProps} section={section} />);
-
         expect(screen.getByTestId('image-section')).toBeInTheDocument();
-        expect(mockProps.setIsPublishButtonActive).toHaveBeenCalledWith(true);
     });
 
-    it('should render ImageSection and call setIsPublishButtonActive for Team', () => {
+    it('should render ImageSection for Team', () => {
         const section = {
             id: 5,
             sectionType: SectionType.Team,
@@ -101,9 +88,7 @@ describe('SectionsWrapper', () => {
             contents: [{ id: 50, image: { id: 1, url: 'team.jpg', mimeType: 'image/png' } as Image }] as Content[],
         };
         render(<SectionsWrapper {...mockProps} section={section} />);
-
         expect(screen.getByTestId('image-section')).toBeInTheDocument();
-        expect(mockProps.setIsPublishButtonActive).toHaveBeenCalledWith(true);
     });
 
     it('should not render anything if the section prop is null', () => {
@@ -120,6 +105,5 @@ describe('SectionsWrapper', () => {
         };
         const { container } = render(<SectionsWrapper {...mockProps} section={section} />);
         expect(container).toBeEmptyDOMElement();
-        expect(mockProps.setIsPublishButtonActive).not.toHaveBeenCalled();
     });
 });

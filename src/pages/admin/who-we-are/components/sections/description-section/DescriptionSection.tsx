@@ -18,7 +18,6 @@ export interface DescriptionSectionProps {
     onChange: (data: Content) => void;
     onPublish: () => void;
     isPublishButtonActive: boolean;
-    setIsPublishButtonActive: (value: boolean) => void;
     language: LocalizationLanguage;
 }
 
@@ -27,7 +26,6 @@ export const DescriptionSection = ({
     onChange,
     descriptionLimit,
     onPublish,
-    setIsPublishButtonActive,
     isPublishButtonActive,
     language,
 }: DescriptionSectionProps) => {
@@ -54,8 +52,6 @@ export const DescriptionSection = ({
         const plainText = getPlainTextFromHtml(value);
         const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(plainText);
         setDescriptionError(error || null);
-
-        setIsPublishButtonActive(true);
     };
 
     const handleBlur = () => {

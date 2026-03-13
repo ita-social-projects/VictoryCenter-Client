@@ -70,7 +70,7 @@ jest.mock('../sections-wrapper/SectionsWrapper', () => ({
         section,
         onChange,
         onPublish,
-        setIsPublishButtonActive,
+        //setIsPublishButtonActive,
         isPublishButtonActive,
     }: MainSectionProps) => (
         <div>
@@ -83,7 +83,6 @@ jest.mock('../sections-wrapper/SectionsWrapper', () => ({
                         data-testid={`input-${content.id}`}
                         onChange={(e) => {
                             onChange({ ...content, description: e.target.value });
-                            setIsPublishButtonActive(true);
                         }}
                     />
                 </div>

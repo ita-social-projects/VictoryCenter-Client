@@ -15,7 +15,6 @@ jest.mock('../../card-content/CardContent', () => ({
         descriptionError,
         imageError,
         setImageError,
-        setIsPublishButtonActive,
         language,
     }: CardContentProps & { language?: any }) => {
         const disabled = language && language.code !== 'uk';
@@ -27,7 +26,6 @@ jest.mock('../../card-content/CardContent', () => ({
                         if (!disabled) {
                             onChange({ ...content, description: e.target.value });
                             onDescriptionValidate(e.target.value);
-                            setIsPublishButtonActive(true);
                         }
                     }}
                     onBlur={(e) => !disabled && onDescriptionValidate(e.currentTarget.value)}
@@ -41,7 +39,6 @@ jest.mock('../../card-content/CardContent', () => ({
                         if (!disabled) {
                             const newImage = JSON.parse(e.target.value);
                             onChange({ ...content, image: newImage });
-                            setIsPublishButtonActive(true);
                         }
                     }}
                     onBlur={() => !disabled && setImageError('test image error')}
@@ -62,7 +59,6 @@ jest.mock('@/validation/admin/who-we-are-schema/WhoWeAreSchema', () => ({
 describe('CardsSection', () => {
     let mockOnChange: jest.Mock;
     let mockOnPublish: jest.Mock;
-    let mockSetIsPublishButtonActive: jest.Mock;
     const descriptionLimit = 500;
     const cardImageConfigs = [
         { style: { width: '20rem' }, cropWidth: 20, cropHeight: 20, minWidth: 20, minHeight: 20, subText: '200x200' },
@@ -107,7 +103,6 @@ describe('CardsSection', () => {
             cardImageConfigs,
             titleText,
             isPublishButtonActive: false,
-            setIsPublishButtonActive: mockSetIsPublishButtonActive,
             language: { id: 1, code: 'uk', name: 'Ukrainian' },
         };
         return render(<CardsSection {...defaultProps} {...props} />);
@@ -116,7 +111,6 @@ describe('CardsSection', () => {
     beforeEach(() => {
         mockOnChange = jest.fn();
         mockOnPublish = jest.fn();
-        mockSetIsPublishButtonActive = jest.fn();
         (WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText as jest.Mock).mockReturnValue(null);
     });
 
@@ -147,7 +141,7 @@ describe('CardsSection', () => {
         expect(noCardsContainer).toBeEmptyDOMElement();
     });
 
-    it('should call onChange and setIsPublishButtonActive on description change', () => {
+    it('should call onChange on description change', () => {
         renderComponent();
         const textarea = screen.getByTestId('mock-textarea-1');
         const newDescription = 'Updated description for card 1.';
@@ -160,10 +154,9 @@ describe('CardsSection', () => {
                 description: newDescription,
             }),
         );
-        expect(mockSetIsPublishButtonActive).toHaveBeenCalledWith(true);
     });
 
-    it('should call onChange and setIsPublishButtonActive on image change', () => {
+    it('should call onChange on image change', () => {
         renderComponent();
         const imageInput = screen.getByTestId('mock-image-input-1');
         const newImage = { id: 20, base64: 'new-image.png', mimeType: 'image/png' } as ImageValues;
@@ -176,7 +169,6 @@ describe('CardsSection', () => {
                 image: newImage,
             }),
         );
-        expect(mockSetIsPublishButtonActive).toHaveBeenCalledWith(true);
     });
 
     it('should display a description validation error and disable the publish button', async () => {

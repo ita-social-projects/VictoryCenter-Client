@@ -9,24 +9,33 @@ import { CreateHippotherapyProgramSectionLocalizationDto } from '@/types/common/
 import { ContentType } from '@/types/common/programs';
 import { ProgramSectionTemplate } from '@/types/common/program-sections';
 
+const createFormControlMock = (element: 'input' | 'textarea') => {
+    return ({ value, onChange, onBlur, disabled, id, error }: any) => {
+        const FormControlElement = element;
+
+        return (
+            <div data-testid={`${id}-wrapper`}>
+                <FormControlElement
+                    data-testid={id}
+                    value={value}
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    disabled={disabled}
+                />
+                {error && <span data-testid={`${id}-error`}>{error}</span>}
+            </div>
+        );
+    };
+};
+
 jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
-    InputWithCharacterLimitGroup: ({ value, onChange, onBlur, disabled, id, error }: any) => (
-        <div data-testid={`${id}-wrapper`}>
-            <input data-testid={id} value={value} onChange={onChange} onBlur={onBlur} disabled={disabled} />
-            {error && <span data-testid={`${id}-error`}>{error}</span>}
-        </div>
-    ),
+    InputWithCharacterLimitGroup: createFormControlMock('input'),
 }));
 
 jest.mock(
     '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
     () => ({
-        TextAreaWithCharacterLimitGroup: ({ value, onChange, onBlur, disabled, id, error }: any) => (
-            <div data-testid={`${id}-wrapper`}>
-                <textarea data-testid={id} value={value} onChange={onChange} onBlur={onBlur} disabled={disabled} />
-                {error && <span data-testid={`${id}-error`}>{error}</span>}
-            </div>
-        ),
+        TextAreaWithCharacterLimitGroup: createFormControlMock('textarea'),
     }),
 );
 

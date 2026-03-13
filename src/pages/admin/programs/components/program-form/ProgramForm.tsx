@@ -628,7 +628,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                             cropHeight={PROGRAM_VALIDATION.backgroundImage.cropHeight}
                             minWidth={PROGRAM_VALIDATION.backgroundImage.minWidth}
                             minHeight={PROGRAM_VALIDATION.backgroundImage.minHeight}
-                            imageLabel={COMMON_TEXT_ADMIN.INPUT.DRAG_AND_DROP_FILE_HERE}
+                            imageLabel={COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE}
                             imageSubText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
                                 PROGRAM_VALIDATION.backgroundImage.height,
                                 PROGRAM_VALIDATION.backgroundImage.width,
@@ -663,6 +663,9 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 error={errors.name}
                                 placeholder={PROGRAMS_TEXT.PLACEHOLDER.INSERT_PROGRAM_NAME}
                                 isWhiteLabel={hasBackgroundImage}
+                                maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
+                                    PROGRAM_VALIDATION.name.max,
+                                )}
                             />
 
                             <InputWithCharacterLimitGroup
@@ -676,6 +679,9 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 disabled={isSubmitting || isFormDisabled}
                                 error={errors.location}
                                 placeholder={PROGRAMS_TEXT.PLACEHOLDER.INSERT_PROGRAM_LOCATION}
+                                maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
+                                    PROGRAM_VALIDATION.location.max,
+                                )}
                             />
 
                             <InputWithCharacterLimitGroup
@@ -689,6 +695,9 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 disabled={isSubmitting || isFormDisabled}
                                 error={errors.participantsCount}
                                 placeholder={PROGRAMS_TEXT.PLACEHOLDER.INSERT_PROGRAM_PARTICIPANTS_COUNT}
+                                maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
+                                    PROGRAM_VALIDATION.participantsCount.max,
+                                )}
                             />
 
                             <InputWithCharacterLimitGroup
@@ -702,6 +711,9 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 disabled={isSubmitting || isFormDisabled}
                                 error={errors.meetingCount}
                                 placeholder={PROGRAMS_TEXT.PLACEHOLDER.INSERT_PROGRAM_MEETINGS_COUNT}
+                                maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
+                                    PROGRAM_VALIDATION.meetingCount.max,
+                                )}
                             />
                         </div>
 
@@ -719,6 +731,10 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 maxLength={PROGRAM_VALIDATION.description.max}
                                 error={errors.description}
                                 isWhiteLabel={hasBackgroundImage}
+                                placeholder={PROGRAMS_TEXT.PLACEHOLDER.INSERT_PROGRAM_DESCRIPTION}
+                                maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
+                                    PROGRAM_VALIDATION.description.max,
+                                )}
                             />
 
                             <PhotoInputGroup
@@ -735,7 +751,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 cropHeight={PROGRAM_VALIDATION.previewImage.cropHeight}
                                 minWidth={PROGRAM_VALIDATION.previewImage.minWidth}
                                 minHeight={PROGRAM_VALIDATION.previewImage.minHeight}
-                                imageLabel={COMMON_TEXT_ADMIN.INPUT.DRAG_AND_DROP_FILE_HERE}
+                                imageLabel={COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE}
                                 imageSubText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
                                     PROGRAM_VALIDATION.previewImage.height,
                                     PROGRAM_VALIDATION.previewImage.width,

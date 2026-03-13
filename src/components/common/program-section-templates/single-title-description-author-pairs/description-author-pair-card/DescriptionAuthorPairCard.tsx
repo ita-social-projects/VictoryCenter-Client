@@ -3,6 +3,7 @@ import { useCallback, useState } from 'react';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import styles from './DescriptionAuthorPairCard.module.scss';
 import { ReactComponent as DeleteIcon } from '@/assets/icons/delete.svg';
 import { ProgramSectionTemplate } from '@/types/common/program-sections';
@@ -106,6 +107,7 @@ export const DescriptionAuthorPairCard = ({
                         rows={4}
                         placeholder={PROGRAMS_TEXT.SECTION.CARD.FORM.DESCRIPTION.PLACEHOLDER}
                         error={descriptionError}
+                        maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(descriptionMaxLength)}
                     />
                 </div>
 
@@ -122,6 +124,7 @@ export const DescriptionAuthorPairCard = ({
                         maxLength={authorMaxLength}
                         placeholder={PROGRAMS_TEXT.SECTION.CARD.FORM.AUTHOR.PLACEHOLDER}
                         error={authorError}
+                        maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(authorMaxLength)}
                     />
                 </div>
             </div>

@@ -41,7 +41,6 @@ export const SectionsWrapper = ({
         content: section.contents,
         onChange,
         onPublish,
-        //setIsPublishButtonActive,
         isPublishButtonActive,
         language,
     };

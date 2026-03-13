@@ -72,6 +72,17 @@ export const WhoWeAreContent = () => {
         autoFetchDependencies: [getSection],
     });
 
+    const normalizeSection = useCallback((section: WhoWeAreSection): WhoWeAreSection => {
+        return {
+            ...section,
+            contents: section.contents.map((item) => ({
+                ...item,
+                description: item.description ? normalizeHtml(item.description) : item.description,
+                title: item.title ? normalizeHtml(item.title) : item.title,
+            })),
+        };
+    }, []);
+
     useEffect(() => {
         if (categories && categories.length > 0 && !selectedCategory) {
             setSelectedCategory(categories[0]);
@@ -80,18 +91,11 @@ export const WhoWeAreContent = () => {
 
     useEffect(() => {
         if (fetchedSection) {
-            const normalizedSection = {
-                ...fetchedSection,
-                contents: fetchedSection.contents.map((item) => ({
-                    ...item,
-                    description: item.description ? normalizeHtml(item.description) : item.description,
-                    title: item.title ? normalizeHtml(item.title) : item.title,
-                })),
-            };
+            const normalizedSection = normalizeSection(fetchedSection);
             setSelectedSection(normalizedSection);
             setUpdatedSection(normalizedSection);
         }
-    }, [fetchedSection]);
+    }, [fetchedSection, normalizeSection]);
 
     const isPublishButtonActive = useMemo(() => {
         if (!selectedSection || !updatedSection) return false;
@@ -136,8 +140,9 @@ export const WhoWeAreContent = () => {
             try {
                 const result = await WhoWeAreApi.updateContent(client, changedContents, selectedCategory.sectionType);
 
-                setSelectedSection(result);
-                setUpdatedSection(result);
+                const normalizedResult = normalizeSection(result);
+                setSelectedSection(normalizedResult);
+                setUpdatedSection(normalizedResult);
                 addToast(COMMON_TEXT_ADMIN.MESSAGE.SUCCESSFULLY_PUBLISHED, ToastType.Info);
 
                 refetchCategories();
@@ -145,7 +150,7 @@ export const WhoWeAreContent = () => {
                 addToast(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_PUBLISH_CHANGES, ToastType.Error);
             }
         }
-    }, [selectedSection, updatedSection, client, selectedCategory, addToast, refetchCategories]);
+    }, [selectedSection, updatedSection, client, selectedCategory, addToast, refetchCategories, normalizeSection]);
 
     const handleConfirmPublish = useCallback(() => {
         setConfirmationModalOpen(false);

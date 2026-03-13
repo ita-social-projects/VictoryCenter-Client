@@ -159,7 +159,6 @@ describe('useInputWithCharacterLimit', () => {
 
             it('should block a trailing space when normalized length is already at maxLength', () => {
                 const warningMessage = 'Character limit exceeded';
-                // Fill the textarea exactly to the limit (normalized = raw = 10 chars)
                 const atLimitValue = 'a'.repeat(defaultProps.maxLength);
                 const { result } = renderHook(() =>
                     useInputWithCharacterLimit({
@@ -169,7 +168,6 @@ describe('useInputWithCharacterLimit', () => {
                     }),
                 );
 
-                // User adds a trailing space (raw = 11, normalized = 10)
                 triggerChange(result, atLimitValue + ' ');
 
                 expect(mockShowTemporaryWarning).toHaveBeenCalledWith(warningMessage);
@@ -187,7 +185,6 @@ describe('useInputWithCharacterLimit', () => {
                     }),
                 );
 
-                // User adds a leading space (raw = 11, normalized = 10)
                 triggerChange(result, ' ' + atLimitValue);
 
                 expect(mockShowTemporaryWarning).toHaveBeenCalledWith(warningMessage);
@@ -196,7 +193,6 @@ describe('useInputWithCharacterLimit', () => {
 
             it('should block extra spaces when raw length exceeds maxLength even if normalized is below', () => {
                 const warningMessage = 'Character limit exceeded';
-                // 8 meaningful chars + spaces to push raw over 10
                 const inputValue = '  aaaa  aaaa  ';
                 const { result } = renderHook(() =>
                     useInputWithCharacterLimit({

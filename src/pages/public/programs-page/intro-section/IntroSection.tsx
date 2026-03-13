@@ -1,19 +1,19 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import './IntroSection.scss';
+import styles from './IntroSection.module.scss';
 
 export const IntroSection: React.FC = () => {
     const { t } = useTranslation('programsPage');
 
     return (
-        <div className="intro-section">
+        <div className={styles['intro-section']}>
             <h1>
                 <p>{t('MAIN_TITLE.PREFIX')}</p>
                 <span>{t('MAIN_TITLE.FIRST_HIGHLIGHT')}</span>
                 {t('MAIN_TITLE.MIDDLE')}
                 <span>{t('MAIN_TITLE.SECOND_HIGHLIGHT')}</span>
             </h1>
-            <div className="additional-info">
+            <div className={styles['additional-info']}>
                 <p>
                     {t('VICTORY_CENTER_BELIEF.FIRST_LINE')}
                     <br />

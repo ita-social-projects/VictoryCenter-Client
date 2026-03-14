@@ -8,11 +8,10 @@ import { PdfReportDto } from '@/types/admin/pdf-section';
 
 interface PdfFilesTableProps {
     files: PdfReportDto[];
-    isEditing: boolean;
     onViewFile: (file: PdfReportDto) => void;
 }
 
-export const PdfFilesTable: React.FC<PdfFilesTableProps> = ({ files, isEditing }) => {
+export const PdfFilesTable: React.FC<PdfFilesTableProps> = ({ files }) => {
     return (
         <div className={styles['table-container']}>
             <table className={styles.table}>
@@ -61,8 +60,6 @@ export const PdfFilesTable: React.FC<PdfFilesTableProps> = ({ files, isEditing }
                                             className={cn(styles['view-icon'], styles['icon-button'])}
                                             onClick={() => {}}
                                         />
-                                        {/* // TODO: Implement actions for editing mode */}
-                                        {isEditing && <></>}
                                     </div>
                                 </td>
                             </tr>

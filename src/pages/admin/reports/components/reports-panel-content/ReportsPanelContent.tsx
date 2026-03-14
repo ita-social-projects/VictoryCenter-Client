@@ -54,7 +54,7 @@ export const ReportsPanelContent = () => {
                         isActive={isMediaSettingsTab}
                     />
                 ) : (
-                    <ReportAnalytics isEditing={isEditing} />
+                    <ReportAnalytics />
                 )}
             </div>
             <ToastContainer />

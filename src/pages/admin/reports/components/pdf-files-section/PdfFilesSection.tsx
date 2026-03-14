@@ -10,11 +10,7 @@ import { PdfReportsApi } from '@/services/api/admin/reports/pdf-reports/pdf-repo
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 
-interface PdfFilesSectionProps {
-    isEditing: boolean;
-}
-
-export const PdfFilesSection = ({ isEditing }: PdfFilesSectionProps) => {
+export const PdfFilesSection = () => {
     const client = useAdminClient();
 
     const fetchSection = useCallback(async () => {
@@ -51,12 +47,12 @@ export const PdfFilesSection = ({ isEditing }: PdfFilesSectionProps) => {
     return (
         <div className={styles.root}>
             <div className={styles['top-section']}>
-                <PdfSectionContentBlock content={sectionData ?? { title: '', description: '' }} isEditing={isEditing} />
+                <PdfSectionContentBlock content={sectionData ?? { title: '', description: '' }} />
             </div>
             <div className={styles['language-switcher-container']}>
                 <LanguageSwitcherButtons />
             </div>
-            <PdfFilesTable files={pdfFiles} isEditing={isEditing} onViewFile={() => {}} />
+            <PdfFilesTable files={pdfFiles} onViewFile={() => {}} />
         </div>
     );
 };

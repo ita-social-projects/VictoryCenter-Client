@@ -15,12 +15,6 @@
     border-collapse: collapse;
 }
 
-.thead {
-    tr th {
-        border-bottom: 1px solid c.$grey-700;
-    }
-}
-
 .th {
     @include type.subtitle-1-medium;
     padding: 16px 20px;
@@ -135,7 +129,7 @@
 .checkbox-th,
 .checkbox-td {
     width: 48px;
-    padding: 13px 12px;
+    padding: 0 12px;
 }
 
 .row-checkbox {
@@ -148,7 +142,7 @@
 .actions-th,
 .actions-td {
     width: 80px;
-    padding: 13px 12px;
+    padding: 0 8px;
 }
 
 .row-actions {

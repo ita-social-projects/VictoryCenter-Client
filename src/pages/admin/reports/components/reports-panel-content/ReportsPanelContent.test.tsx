@@ -10,17 +10,7 @@ jest.mock('../reports-page-toolbar/ReportsPageToolbar', () => {
         ...actual,
         ReportsPageToolbar: (props: any) => (
             <div data-testid="mock-toolbar">
-                <button data-testid="edit-btn" onClick={props.onEdit}>
-                    Edit
-                </button>
-                <button data-testid="cancel-btn" onClick={props.onCancel}>
-                    Cancel
-                </button>
-                <button data-testid="publish-btn" onClick={props.onPublish} disabled={props.isPublishDisabled}>
-                    Publish
-                </button>
-                <span data-testid="is-editing">{props.isEditing ? 'true' : 'false'}</span>
-                <span data-testid="is-publish-disabled">{props.isPublishDisabled ? 'true' : 'false'}</span>
+                <span data-testid="selected-tab-id">{props.selectedTab.id}</span>
             </div>
         ),
     };
@@ -37,11 +27,19 @@ jest.mock('../media-settings/MediaSettings', () => {
                 <div data-testid="mock-media-settings">
                     <span data-testid="ms-is-editing">{props.isEditing ? 'true' : 'false'}</span>
                     <span data-testid="ms-reset-counter">{props.resetCounter}</span>
+                    <span data-testid="ms-publish-disabled">{props.isPublishDisabled ? 'true' : 'false'}</span>
+                    <span data-testid="ms-cancel-disabled">{props.isCancelDisabled ? 'true' : 'false'}</span>
                     <button data-testid="ms-dirty-true" onClick={() => props.onDirtyChange(true)}>
                         Mark dirty
                     </button>
                     <button data-testid="ms-dirty-false" onClick={() => props.onDirtyChange(false)}>
                         Mark clean
+                    </button>
+                    <button data-testid="ms-cancel" onClick={props.onCancel}>
+                        Cancel
+                    </button>
+                    <button data-testid="ms-publish" onClick={props.onPublish}>
+                        Publish
                     </button>
                 </div>
             );
@@ -61,17 +59,17 @@ jest.mock('./ReportsPanelContent.module.scss', () => ({
 
 const renderComponent = () => render(<ReportsPanelContent />);
 
-const clickEdit = () => fireEvent.click(screen.getByTestId('edit-btn'));
-const clickCancel = () => fireEvent.click(screen.getByTestId('cancel-btn'));
-const clickPublish = () => fireEvent.click(screen.getByTestId('publish-btn'));
+const clickMsCancel = () => fireEvent.click(screen.getByTestId('ms-cancel'));
+const clickMsPublish = () => fireEvent.click(screen.getByTestId('ms-publish'));
 const markDirty = () => fireEvent.click(screen.getByTestId('ms-dirty-true'));
 const markClean = () => fireEvent.click(screen.getByTestId('ms-dirty-false'));
 
-const expectEditing = (value: boolean) => expect(screen.getByTestId('is-editing')).toHaveTextContent(String(value));
 const expectMsEditing = (value: boolean) =>
     expect(screen.getByTestId('ms-is-editing')).toHaveTextContent(String(value));
 const expectPublishDisabled = (value: boolean) =>
-    expect(screen.getByTestId('is-publish-disabled')).toHaveTextContent(String(value));
+    expect(screen.getByTestId('ms-publish-disabled')).toHaveTextContent(String(value));
+const expectCancelDisabled = (value: boolean) =>
+    expect(screen.getByTestId('ms-cancel-disabled')).toHaveTextContent(String(value));
 const expectResetCounter = (value: number) =>
     expect(screen.getByTestId('ms-reset-counter')).toHaveTextContent(String(value));
 
@@ -90,17 +88,17 @@ describe('ReportsPanelContent', () => {
             expect(screen.getByTestId('mock-toast-container')).toBeInTheDocument();
         });
 
-        it('should start in non-editing mode', () => {
+        it('should start in editing mode', () => {
             renderComponent();
 
-            expectEditing(false);
-            expectMsEditing(false);
+            expectMsEditing(true);
         });
 
-        it('should start with publish button disabled (not dirty)', () => {
+        it('should start with publish and cancel buttons disabled (not dirty)', () => {
             renderComponent();
 
             expectPublishDisabled(true);
+            expectCancelDisabled(true);
         });
 
         it('should start with resetCounter at 0', () => {
@@ -110,47 +108,16 @@ describe('ReportsPanelContent', () => {
         });
     });
 
-    describe('Edit mode', () => {
-        it('should enter editing mode when Edit button is clicked', () => {
-            renderComponent();
-
-            clickEdit();
-
-            expectEditing(true);
-            expectMsEditing(true);
-        });
-
-        it('should reset dirty state when entering edit mode', () => {
-            renderComponent();
-
-            markDirty();
-            expectPublishDisabled(false);
-
-            clickEdit();
-            expectPublishDisabled(true);
-        });
-    });
-
     describe('Cancel', () => {
-        it('should exit editing mode when Cancel is clicked', () => {
-            renderComponent();
-
-            clickEdit();
-            expectEditing(true);
-
-            clickCancel();
-            expectEditing(false);
-        });
-
         it('should increment resetCounter when Cancel is clicked', () => {
             renderComponent();
 
             expectResetCounter(0);
 
-            clickCancel();
+            clickMsCancel();
             expectResetCounter(1);
 
-            clickCancel();
+            clickMsCancel();
             expectResetCounter(2);
         });
 
@@ -159,30 +126,36 @@ describe('ReportsPanelContent', () => {
 
             markDirty();
             expectPublishDisabled(false);
+            expectCancelDisabled(false);
 
-            clickCancel();
+            clickMsCancel();
             expectPublishDisabled(true);
+            expectCancelDisabled(true);
         });
     });
 
     describe('Dirty state', () => {
-        it('should enable publish button when dirty', () => {
+        it('should enable publish and cancel buttons when dirty', () => {
             renderComponent();
 
             expectPublishDisabled(true);
+            expectCancelDisabled(true);
 
             markDirty();
             expectPublishDisabled(false);
+            expectCancelDisabled(false);
         });
 
-        it('should disable publish button when marked clean', () => {
+        it('should disable publish and cancel buttons when marked clean', () => {
             renderComponent();
 
             markDirty();
             expectPublishDisabled(false);
+            expectCancelDisabled(false);
 
             markClean();
             expectPublishDisabled(true);
+            expectCancelDisabled(true);
         });
     });
 
@@ -190,26 +163,28 @@ describe('ReportsPanelContent', () => {
         it('should reset dirty state after successful publish', async () => {
             renderComponent();
 
-            clickEdit();
             markDirty();
             expectPublishDisabled(false);
+            expectCancelDisabled(false);
 
-            clickPublish();
+            clickMsPublish();
 
             await waitFor(() => {
                 expectPublishDisabled(true);
+                expectCancelDisabled(true);
             });
         });
 
-        it('should stay in editing mode when publish fails', async () => {
+        it('should keep dirty state when publish fails', async () => {
             mockSubmit.mockResolvedValue(false);
             renderComponent();
 
-            clickEdit();
-            clickPublish();
+            markDirty();
+            clickMsPublish();
 
             await waitFor(() => {
-                expectEditing(true);
+                expectPublishDisabled(false);
+                expectCancelDisabled(false);
             });
         });
     });

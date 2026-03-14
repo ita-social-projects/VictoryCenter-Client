@@ -32,6 +32,11 @@ interface MediaSettingsProps {
     isEditing: boolean;
     resetCounter: number;
     onDirtyChange: (isDirty: boolean) => void;
+    onCancel: () => void;
+    onPublish: () => void;
+    isPublishDisabled: boolean;
+    isCancelDisabled: boolean;
+    isActive: boolean;
 }
 
 export interface MediaSettingsRef {
@@ -63,7 +68,10 @@ const syncValuesFromData = (data: ReportsMediaSettings) => ({
 });
 
 export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
-    ({ isEditing, resetCounter, onDirtyChange }, ref) => {
+    (
+        { isEditing, resetCounter, onDirtyChange, onCancel, onPublish, isPublishDisabled, isCancelDisabled, isActive },
+        ref,
+    ) => {
         const client = useAdminClient();
         const { addToast } = useToast();
 
@@ -185,27 +193,8 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
 
         useImperativeHandle(ref, () => ({ submit: handlePublish }));
 
-        if (isLoading) {
-            return (
-                <div className={styles.loader}>
-                    <InlineLoader size={2} />
-                </div>
-            );
-        }
-
-        if (fetchError) {
-            return (
-                <div className={styles.error}>
-                    <p>{REPORTS_TEXT.MESSAGE.FAIL_TO_FETCH_REPORTS}</p>
-                    <Button onClick={refetch} buttonStyle="primary" className={styles['error-button']}>
-                        {REPORTS_TEXT.BUTTON.TRY_AGAIN}
-                    </Button>
-                </div>
-            );
-        }
-
         return (
-            <div>
+            <div style={{ display: isActive ? 'block' : 'none' }}>
                 {isLoading && (
                     <div className={styles.loader}>
                         <InlineLoader size={2} />
@@ -220,37 +209,59 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
                     </div>
                 )}
                 {!isLoading && !fetchError && mediaSettingsData && (
-                    <div className={styles.blocks}>
-                        <ReportsMediaBlock
-                            values={collectedFundsValues}
-                            errors={collectedFundsErrors}
-                            windowTitle={REPORTS_TEXT.FORM.LABEL.COLLECTED_FUNDS_WINDOW}
-                            windowDescription={REPORTS_TEXT.FORM.LABEL.WINDOW_DESCRIPTION}
-                            descriptionTitle={REPORTS_TEXT.FORM.LABEL.COLLECTED_FUNDS}
-                            totalAmountMaxLength={REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION.collectedAmount.max}
-                            imageWidth={REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION.image.width}
-                            imageHeight={REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION.image.height}
-                            imageUrl={CollectedFundsImage}
-                            isEditing={isEditing}
-                            isValueEditable={false}
-                            validationFunctions={REPORTS_COLLECTED_FUNDS_VALIDATION_FUNCTIONS}
-                            onValuesChange={handleCollectedFundsChange}
-                        />
-                        <ReportsMediaBlock
-                            values={changedLivesValues}
-                            errors={changedLivesErrors}
-                            windowTitle={REPORTS_TEXT.FORM.LABEL.CHANGED_LIVES_WINDOW}
-                            windowDescription={REPORTS_TEXT.FORM.LABEL.WINDOW_DESCRIPTION}
-                            descriptionTitle={REPORTS_TEXT.FORM.LABEL.CHANGED_LIVES}
-                            totalAmountMaxLength={REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.changedLives.max}
-                            imageWidth={REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.image.width}
-                            imageHeight={REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.image.height}
-                            imageUrl={ChangedLivesImage}
-                            isEditing={isEditing}
-                            isValueEditable={true}
-                            validationFunctions={REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS}
-                            onValuesChange={handleChangedLivesChange}
-                        />
+                    <div>
+                        <div className={styles.blocks}>
+                            <ReportsMediaBlock
+                                values={collectedFundsValues}
+                                errors={collectedFundsErrors}
+                                windowTitle={REPORTS_TEXT.FORM.LABEL.COLLECTED_FUNDS_WINDOW}
+                                windowDescription={REPORTS_TEXT.FORM.LABEL.WINDOW_DESCRIPTION}
+                                descriptionTitle={REPORTS_TEXT.FORM.LABEL.COLLECTED_FUNDS}
+                                totalAmountMaxLength={
+                                    REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION.collectedAmount.max
+                                }
+                                imageWidth={REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION.image.width}
+                                imageHeight={REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION.image.height}
+                                imageUrl={CollectedFundsImage}
+                                isEditing={isEditing}
+                                isValueEditable={false}
+                                validationFunctions={REPORTS_COLLECTED_FUNDS_VALIDATION_FUNCTIONS}
+                                onValuesChange={handleCollectedFundsChange}
+                            />
+                            <ReportsMediaBlock
+                                values={changedLivesValues}
+                                errors={changedLivesErrors}
+                                windowTitle={REPORTS_TEXT.FORM.LABEL.CHANGED_LIVES_WINDOW}
+                                windowDescription={REPORTS_TEXT.FORM.LABEL.WINDOW_DESCRIPTION}
+                                descriptionTitle={REPORTS_TEXT.FORM.LABEL.CHANGED_LIVES}
+                                totalAmountMaxLength={REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.changedLives.max}
+                                imageWidth={REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.image.width}
+                                imageHeight={REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.image.height}
+                                imageUrl={ChangedLivesImage}
+                                isEditing={isEditing}
+                                isValueEditable={true}
+                                validationFunctions={REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS}
+                                onValuesChange={handleChangedLivesChange}
+                            />
+                        </div>
+                        <div className={styles.actions}>
+                            <Button
+                                buttonStyle="secondary"
+                                className={styles.button}
+                                onClick={onCancel}
+                                disabled={isCancelDisabled}
+                            >
+                                {REPORTS_TEXT.BUTTON.CANCEL}
+                            </Button>
+                            <Button
+                                buttonStyle="primary"
+                                className={styles.button}
+                                onClick={onPublish}
+                                disabled={isPublishDisabled}
+                            >
+                                {REPORTS_TEXT.BUTTON.PUBLISH}
+                            </Button>
+                        </div>
                     </div>
                 )}
             </div>

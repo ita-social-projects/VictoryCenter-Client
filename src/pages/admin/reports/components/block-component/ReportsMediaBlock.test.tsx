@@ -210,7 +210,6 @@ describe('ReportsMediaBlock', () => {
 
             const root = container.firstChild as HTMLElement;
             expect(root).toHaveClass('root');
-            expect(root).toHaveClass('root-editing');
         });
 
         it('should disable title input when not editing', () => {

@@ -1,5 +1,4 @@
 @use '@/assets/sass/variables/colors' as c;
-@use '@/assets/sass/variables/fonts' as fonts;
 @use '@/assets/sass/mixins/typography.mixins' as type;
 
 .section {
@@ -64,7 +63,7 @@
     padding: 16px 24px;
     gap: 8px;
     white-space: nowrap;
-    font-family: fonts.$mulish-regular-font;
+    @include type.subtitle-1-medium;
     font-style: normal;
     font-weight: 400;
     font-size: 24px;
@@ -96,7 +95,7 @@
 .footer-button {
     display: flex;
     align-items: center;
-    font-family: fonts.$mulish-regular-font;
+    @include type.subtitle-1-medium;
     gap: 20px;
     width: 311px;
     height: 60px;

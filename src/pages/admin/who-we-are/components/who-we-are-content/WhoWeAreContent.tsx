@@ -198,17 +198,6 @@ export const WhoWeAreContent = () => {
         return { message: null, type: null };
     }, [categoryError, sectionError, languagesError]);
 
-    const setErrorState = useCallback((message: string, type: 'categories' | 'entity' | 'languages') => {
-        if (type === 'languages') {
-            setLanguagesError(message);
-        }
-    }, []);
-
-    const { allLanguages, translationLanguages, selectedLanguage, onLanguageChange, retryFetchLanguages } =
-        useLocalizationToolkit({
-            setErrorState,
-        });
-
     const handleRetry = useCallback(() => {
         if (error.type === 'categories') {
             refetchCategories();

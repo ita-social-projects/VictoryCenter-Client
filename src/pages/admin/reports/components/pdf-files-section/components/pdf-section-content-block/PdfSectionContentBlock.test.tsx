@@ -8,8 +8,8 @@ describe('PdfSectionContentBlock', () => {
         description: 'Test Section Description',
     };
 
-    it('should render title and description when isEditing is false', () => {
-        render(<PdfSectionContentBlock content={mockContent} isEditing={false} />);
+    it('should render title and description', () => {
+        render(<PdfSectionContentBlock content={mockContent} />);
 
         expect(screen.getByText(PDF_FILES_SECTION_TEXT.VIEW.TITLE)).toBeInTheDocument();
         expect(screen.getByText(mockContent.title)).toBeInTheDocument();
@@ -17,18 +17,8 @@ describe('PdfSectionContentBlock', () => {
         expect(screen.getByText(mockContent.description)).toBeInTheDocument();
     });
 
-    it('should render empty div when isEditing is true', () => {
-        const { container } = render(<PdfSectionContentBlock content={mockContent} isEditing={true} />);
-
-        expect(screen.queryByText(mockContent.title)).not.toBeInTheDocument();
-        expect(screen.queryByText(mockContent.description)).not.toBeInTheDocument();
-
-        expect(container.firstChild).toBeInTheDocument();
-        expect(container.querySelectorAll('label')).toHaveLength(0);
-    });
-
     it('should apply correct classes for view mode', () => {
-        const { container } = render(<PdfSectionContentBlock content={mockContent} isEditing={false} />);
+        const { container } = render(<PdfSectionContentBlock content={mockContent} />);
 
         const rootDiv = container.firstChild;
         expect(rootDiv).toHaveClass('root', 'view-root');

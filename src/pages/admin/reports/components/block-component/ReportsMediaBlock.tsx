@@ -6,7 +6,6 @@ import { InputError } from '@/components/admin/input-error/InputError';
 import { REPORTS_TEXT } from '@/const/admin/reports';
 import { ImageInput } from '@/components/admin/image-input/ImageInput';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import './ReportsMediaBlock.scss';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 
 export interface ReportsMediaBlockValues {
@@ -108,7 +107,7 @@ export const ReportsMediaBlock = ({
     );
 
     return (
-        <div className={cn(styles.root, { [styles['root-editing']]: isEditing })}>
+        <div className={styles.root}>
             <div className={styles.content}>
                 <div className={styles.inputs}>
                     <div className={styles.header}>
@@ -118,9 +117,8 @@ export const ReportsMediaBlock = ({
                         </div>
                     </div>
 
-                    <div className={cn(styles['title-input'], !isEditing && 'reports-title-input-no-label')}>
+                    <div className={styles['title-input']}>
                         <TextAreaWithCharacterLimitGroup
-                            className={cn(styles['title-textarea-group'], 'reports-title-textarea-group')}
                             label={REPORTS_TEXT.FORM.LABEL.TITLE}
                             id={`${windowTitle}-title`}
                             name={`${windowTitle}-title`}
@@ -135,13 +133,8 @@ export const ReportsMediaBlock = ({
                         />
                     </div>
 
-                    <div
-                        className={cn(styles['total-amount-input'], {
-                            'reports-value-editing-disabled': isEditing && !isValueEditable,
-                        })}
-                    >
+                    <div className={cn(styles['total-amount-input'], isEditing && !isValueEditable)}>
                         <TextAreaWithCharacterLimitGroup
-                            className={cn(styles['total-amount-textarea-group'], 'reports-total-amount-textarea-group')}
                             label={descriptionTitle}
                             id={`${windowTitle}-value`}
                             name={`${windowTitle}-value`}

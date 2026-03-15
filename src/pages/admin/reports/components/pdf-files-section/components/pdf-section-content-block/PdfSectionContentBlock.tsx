@@ -9,14 +9,9 @@ interface PdfSectionContent {
 
 interface PdfSectionContentBlockProps {
     content: PdfSectionContent;
-    isEditing: boolean;
 }
 
-export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({ content, isEditing }) => {
-    if (isEditing) {
-        return <div></div>;
-    }
-
+export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({ content }) => {
     return (
         <div className={cn(styles.root, styles['view-root'])}>
             <div className={styles['view-field']}>

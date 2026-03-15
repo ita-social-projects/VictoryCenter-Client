@@ -17,11 +17,7 @@ const ANALYTICS_TABS: ReportAnalyticsTab[] = [
     { id: 'pdf-files', label: 'PDF Файли' },
 ];
 
-interface ReportAnalyticsProps {
-    isEditing: boolean;
-}
-
-export const ReportAnalytics = ({ isEditing }: ReportAnalyticsProps) => {
+export const ReportAnalytics = () => {
     const [activeTab, setActiveTab] = useState<ReportAnalyticsTab>(ANALYTICS_TABS[0]);
 
     return (
@@ -36,9 +32,9 @@ export const ReportAnalytics = ({ isEditing }: ReportAnalyticsProps) => {
                 onCategorySelect={setActiveTab}
             />
             <div className={styles['tab-content']}>
-                {activeTab.id === 'pdf-files' && <PdfFilesSection isEditing={isEditing} />}
+                {activeTab.id === 'pdf-files' && <PdfFilesSection />}
                 {activeTab.id === 'income-expenses' && <FundsExpenditureSection />}
-                {activeTab.id === 'program-expenses' && <div>Program expenses tab</div>}
+                {activeTab.id === 'program-expenses' && <div></div>}
             </div>
         </div>
     );

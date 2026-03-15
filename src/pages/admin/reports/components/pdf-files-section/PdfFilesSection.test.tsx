@@ -11,16 +11,12 @@ jest.mock('@/services/api/admin/reports/pdf-reports/pdf-reports-api');
 jest.mock('@/hooks/common/use-data-fetch/useDataFetch');
 
 jest.mock('./components/pdf-section-content-block/PdfSectionContentBlock', () => ({
-    PdfSectionContentBlock: ({ isEditing }: { isEditing: boolean }) => (
-        <div data-testid="content-block">ContentBlock - Editing: {String(isEditing)}</div>
-    ),
+    PdfSectionContentBlock: () => <div data-testid="content-block">ContentBlock</div>,
 }));
 
 jest.mock('./components/pdf-files-table/PdfFilesTable', () => ({
-    PdfFilesTable: ({ files, isEditing }: { files: any[]; isEditing: boolean }) => (
-        <div data-testid="files-table">
-            Table - Editing: {String(isEditing)}, Files Count: {files?.length ?? 0}
-        </div>
+    PdfFilesTable: ({ files }: { files: any[] }) => (
+        <div data-testid="files-table">Files Count: {files?.length ?? 0}</div>
     ),
 }));
 
@@ -48,7 +44,7 @@ describe('PdfFilesSection', () => {
             isLoading: true,
         });
 
-        render(<PdfFilesSection isEditing={false} />);
+        render(<PdfFilesSection />);
         expect(screen.getByTestId('loader')).toBeInTheDocument();
     });
 
@@ -57,7 +53,7 @@ describe('PdfFilesSection', () => {
             .mockReturnValueOnce({ data: mockSectionData, isLoading: false })
             .mockReturnValueOnce({ data: mockFilesResponse.items, isLoading: false });
 
-        render(<PdfFilesSection isEditing={false} />);
+        render(<PdfFilesSection />);
 
         expect(screen.getByTestId('content-block')).toBeInTheDocument();
         expect(screen.getByTestId('files-table')).toHaveTextContent('Files Count: 2');
@@ -73,7 +69,7 @@ describe('PdfFilesSection', () => {
             return { data: [], isLoading: false };
         });
 
-        render(<PdfFilesSection isEditing={false} />);
+        render(<PdfFilesSection />);
 
         await capturedFetchSection();
         expect(PdfSectionApi.getPdfSection).toHaveBeenCalledWith(mockClient);
@@ -90,7 +86,7 @@ describe('PdfFilesSection', () => {
             .mockReturnValueOnce({ data: null, isLoading: false })
             .mockReturnValueOnce({ data: [], isLoading: false });
 
-        render(<PdfFilesSection isEditing={false} />);
+        render(<PdfFilesSection />);
 
         expect(screen.getByTestId('content-block')).toBeInTheDocument();
         expect(screen.getByTestId('files-table')).toHaveTextContent('Files Count: 0');

@@ -55,7 +55,7 @@ const sortRecords = (records: EnrichedRecord[], sort: ColumnSort): EnrichedRecor
 };
 
 const SortIcon = ({ column, sort }: { column: SortableColumn; sort: ColumnSort }) => {
-    if (sort.column !== column) {
+    if (sort.column !== column || !sort.direction) {
         return (
             <span className={styles['sort-icons']}>
                 <ChevronUp className={styles['sort-icon']} />
@@ -63,11 +63,10 @@ const SortIcon = ({ column, sort }: { column: SortableColumn; sort: ColumnSort }
             </span>
         );
     }
-    return sort.direction === 'asc' ? (
-        <ChevronUp className={cn(styles['sort-icon'], styles['sort-icon-active'])} />
-    ) : (
-        <ChevronDown className={cn(styles['sort-icon'], styles['sort-icon-active'])} />
-    );
+
+    const Icon = sort.direction === 'asc' ? ChevronUp : ChevronDown;
+
+    return <Icon className={cn(styles['sort-icon'], styles['sort-icon-active'])} />;
 };
 
 export const FundsExpendituresTable = ({ records, isEditing = false }: FundsExpendituresTableProps) => {

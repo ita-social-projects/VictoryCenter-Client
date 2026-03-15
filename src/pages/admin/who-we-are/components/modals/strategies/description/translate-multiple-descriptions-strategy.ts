@@ -19,9 +19,6 @@ export const translateMultipleDescriptionsStrategy: WhoWeAreModalStrategy<Transl
 
         getInitialData: (section, language, isEditMode) => {
             if (!language) return null;
-            const localized = section.contents
-                .flatMap((content) => content.localizations ?? [])
-                .find((loc) => loc.language.code === language.code);
 
             let defaultImagesForSection: string[];
             switch (section.sectionType) {

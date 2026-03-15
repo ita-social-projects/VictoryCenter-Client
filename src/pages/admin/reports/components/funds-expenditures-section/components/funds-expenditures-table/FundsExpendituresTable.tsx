@@ -1,11 +1,10 @@
 import { useState, useCallback } from 'react';
 import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
 import { FundsExpendituresTransactionType, ReportFundsExpendituresRecord } from '@/types/admin/reports';
-import { ReactComponent as ChevronUp } from '@/assets/icons/chevron-up.svg';
-import { ReactComponent as ChevronDown } from '@/assets/icons/chevron-down.svg';
 import { ReactComponent as NotFoundIcon } from '@/assets/icons/not-found.svg';
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as DeleteIcon } from '@/assets/icons/delete.svg';
+import { SortIcon } from '@/pages/admin/reports/components/funds-expenditures-section/components/funds-expenditures-table/components/sort-icon';
 import cn from 'classnames';
 import styles from './FundsExpendituresTable.module.scss';
 
@@ -54,21 +53,6 @@ const sortRecords = (records: EnrichedRecord[], sort: ColumnSort): EnrichedRecor
     });
 };
 
-const SortIcon = ({ column, sort }: { column: SortableColumn; sort: ColumnSort }) => {
-    if (sort.column !== column || !sort.direction) {
-        return (
-            <span className={styles['sort-icons']}>
-                <ChevronUp className={styles['sort-icon']} />
-                <ChevronDown className={styles['sort-icon']} />
-            </span>
-        );
-    }
-
-    const Icon = sort.direction === 'asc' ? ChevronUp : ChevronDown;
-
-    return <Icon className={cn(styles['sort-icon'], styles['sort-icon-active'])} />;
-};
-
 export const FundsExpendituresTable = ({ records, isEditing = false }: FundsExpendituresTableProps) => {
     const [sort, setSort] = useState<ColumnSort>({ column: null, direction: null });
 
@@ -93,25 +77,25 @@ export const FundsExpendituresTable = ({ records, isEditing = false }: FundsExpe
                         <th className={cn(styles.th, styles.sortable)} onClick={() => handleSort('type')}>
                             <span className={styles['th-inner']}>
                                 <span>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.TYPE}</span>
-                                <SortIcon column="type" sort={sort} />
+                                <SortIcon isActive={sort.column === 'type'} direction={sort.direction} />
                             </span>
                         </th>
                         <th className={cn(styles.th, styles.sortable)} onClick={() => handleSort('categoryName')}>
                             <span className={styles['th-inner']}>
                                 <span>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.CATEGORY}</span>
-                                <SortIcon column="categoryName" sort={sort} />
+                                <SortIcon isActive={sort.column === 'categoryName'} direction={sort.direction} />
                             </span>
                         </th>
                         <th className={cn(styles.th, styles.sortable)} onClick={() => handleSort('amountUah')}>
                             <span className={styles['th-inner']}>
                                 <span>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.AMOUNT_UAH}</span>
-                                <SortIcon column="amountUah" sort={sort} />
+                                <SortIcon isActive={sort.column === 'amountUah'} direction={sort.direction} />
                             </span>
                         </th>
                         <th className={cn(styles.th, styles.sortable)} onClick={() => handleSort('amountUsd')}>
                             <span className={styles['th-inner']}>
                                 <span>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.AMOUNT_USD}</span>
-                                <SortIcon column="amountUsd" sort={sort} />
+                                <SortIcon isActive={sort.column === 'amountUsd'} direction={sort.direction} />
                             </span>
                         </th>
                         {isEditing && <th className={cn(styles.th, styles['actions-th'])} />}

@@ -204,7 +204,14 @@ describe('fetchTeamPageData', () => {
 
         const result = await teamPageDataFetch();
 
-        expect(result.teamData[0].members[0].localizations[0]).toEqual(
+        const firstCategory = result.teamData.at(0);
+        const firstMember = firstCategory?.members.at(0);
+        const firstLocalization = firstMember?.localizations?.at(0);
+
+        expect(firstCategory).toBeDefined();
+        expect(firstMember).toBeDefined();
+
+        expect(firstLocalization).toEqual(
             expect.objectContaining({
                 language: { id: 2, code: 'en' },
                 fullName: 'Alice EN',

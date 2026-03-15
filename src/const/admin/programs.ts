@@ -10,6 +10,7 @@ export const PROGRAMS_TEXT = {
         CHOOSE_SECTION: 'Обрати шаблон',
         CANCEL: 'Відмінити',
         SAVE: 'Зберегти',
+        ADD: 'Додати',
     },
     PLACEHOLDER: {
         SEARCH_PROGRAMS: 'Шукати програми...',
@@ -17,6 +18,7 @@ export const PROGRAMS_TEXT = {
         INSERT_PROGRAM_LOCATION: 'Введіть місце проведення',
         INSERT_PROGRAM_PARTICIPANTS_COUNT: 'Введіть кількість учасників',
         INSERT_PROGRAM_MEETINGS_COUNT: 'Введіть кількість зустрічей',
+        INSERT_PROGRAM_DESCRIPTION: 'Детальний опис програми',
     },
 
     MESSAGE: {
@@ -36,6 +38,11 @@ export const PROGRAMS_TEXT = {
             TITLE_PLACEHOLDER: '',
             MODAL: {
                 DELETE_BLOCK_CONFIRMATION: 'Блок буде видалено. Бажаєте продовжити?',
+            },
+        },
+        SINGLE_TITLE_QUESTION_ANSWER_PAIRS: {
+            MODAL: {
+                DELETE_QUESTION_CONFIRMATION: 'Питання буде видалено. Бажаєте продовжити?',
             },
         },
         MODAL: {
@@ -338,7 +345,7 @@ export const PROGRAM_SECTION_TEMPLATE_VALIDATION = {
             [ContentType.Author]: { min: 0, max: 0 },
         },
         lengths: {
-            [ContentType.Title]: { min: 20, max: 60 },
+            [ContentType.Title]: { min: 5, max: 60 },
             [ContentType.Description]: { min: 10, max: 600 },
         },
     },
@@ -477,6 +484,19 @@ export const PROGRAM_SECTION_TEMPLATE_VALIDATION = {
                 [ContentType.Description]: { min: 1, max: 1 },
                 [ContentType.Author]: { min: 1, max: 1 },
             },
+        },
+    },
+
+    [ProgramSectionTemplate.SingleTitleQuestionAnswerPairs]: {
+        counts: {
+            [ContentType.Title]: { min: 1, max: 1 },
+            [ContentType.Description]: { min: 0, max: 0 },
+            [ContentType.Author]: { min: 0, max: 0 },
+            [ContentType.Image]: { min: 0, max: 0 },
+            [ContentType.FaqQuestion]: { min: 1, max: 10 },
+        },
+        lengths: {
+            [ContentType.Title]: { min: 5, max: 50 },
         },
     },
 } as const;

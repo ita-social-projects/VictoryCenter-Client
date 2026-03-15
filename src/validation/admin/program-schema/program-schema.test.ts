@@ -637,7 +637,7 @@ describe('program-schema.ts coverage (templates are bottom-only)', () => {
         ).toBe('min 2');
     });
 
-    it('PROGRAM_SECTION_VALIDATION_FUNCTIONS: does not enforce min in draft', () => {
+    it('PROGRAM_SECTION_VALIDATION_FUNCTIONS: enforces min in draft', () => {
         const m = loadSchema();
         expect(
             m.PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateContentText(
@@ -646,7 +646,7 @@ describe('program-schema.ts coverage (templates are bottom-only)', () => {
                 false,
                 ProgramSectionTemplate.TextOnly,
             ),
-        ).toBeUndefined();
+        ).toBe('min 2');
     });
 
     it('PROGRAM_SECTION_VALIDATION_FUNCTIONS: validateSectionTitle returns required', () => {

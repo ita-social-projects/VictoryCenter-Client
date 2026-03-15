@@ -3,6 +3,7 @@ import { useCallback, useMemo, useState, useEffect } from 'react';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { PROGRAMS_TEXT, SINGLE_TITLE_QUINTUPLE_DESCRIPTION_CONFIG } from '@/const/admin/programs';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
@@ -117,6 +118,7 @@ export const SingleTitleQuintupleDescription = ({
                             placeholder={PROGRAMS_TEXT.SECTION.FORM.TITLE.PLACEHOLDER}
                             error={errors.title}
                             onBlur={handleTitleBlur}
+                            maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(titleMaxLength)}
                         />
                     </div>
 
@@ -134,6 +136,7 @@ export const SingleTitleQuintupleDescription = ({
                                 rows={4}
                                 error={errors.descriptions[index]}
                                 onBlur={() => handleDescriptionBlur(index)}
+                                maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(descriptionMaxLength)}
                             />
                         </div>
                     ))}

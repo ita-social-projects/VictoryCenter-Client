@@ -5,8 +5,8 @@ import { MemoryRouter } from 'react-router-dom';
 import { PUBLIC_ROUTES } from '@/const/public/routes';
 import footerUk from '@/locales/uk/footer.json';
 
-jest.mock('@/assets/icons/arrow-up-right.svg', () => ({
-    ReactComponent: (props: any) => <svg {...props} data-testid="arrow-icon" />,
+jest.mock('@/assets/icons/logo-with-text.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="victory-logo" />,
 }));
 
 jest.mock('@/assets/icons/phone.svg', () => ({
@@ -31,15 +31,9 @@ function escapeRegExp(string: string) {
 }
 
 describe('Footer', () => {
-    it('renders email input and clears on subscribe click', () => {
+    it('renders the logo', () => {
         render(<Footer />, { wrapper: MemoryRouter });
-        const input = screen.getByPlaceholderText(footerUk['ENTER_YOUR_EMAIL']) as HTMLInputElement;
-        fireEvent.change(input, { target: { value: 'user@example.com' } });
-        expect(input.value).toBe('user@example.com');
-
-        const button = screen.getByRole('button', { name: footerUk['SIGN_UP'] });
-        fireEvent.click(button);
-        expect(input.value).toBe('');
+        expect(screen.getByTestId('victory-logo')).toBeInTheDocument();
     });
 
     it('renders the menu section with correct links', () => {
@@ -52,7 +46,7 @@ describe('Footer', () => {
         );
         expect(screen.getByRole('link', { name: footerUk['HOW_TO_SUPPORT'] })).toHaveAttribute(
             'href',
-            PUBLIC_ROUTES.MOCK.FULL,
+            PUBLIC_ROUTES.DONATE.FULL,
         );
         expect(screen.getByRole('link', { name: footerUk['STORIES_OF_VICTORIES'] })).toHaveAttribute(
             'href',
@@ -92,7 +86,7 @@ describe('Footer', () => {
 
         expect(screen.getByRole('link', { name: footerUk['WHAT_IS_HIPPOTHERAPY'] })).toHaveAttribute(
             'href',
-            PUBLIC_ROUTES.MOCK.FULL,
+            PUBLIC_ROUTES.HIPPOTHERAPY.FULL,
         );
         expect(screen.getByRole('link', { name: footerUk['PROGRAMS'] })).toHaveAttribute(
             'href',
@@ -120,7 +114,7 @@ describe('Footer', () => {
 
     it('renders icons correctly', () => {
         render(<Footer />, { wrapper: MemoryRouter });
-        expect(screen.getByTestId('arrow-icon')).toBeInTheDocument();
+        expect(screen.getByTestId('victory-logo')).toBeInTheDocument();
         expect(screen.getByTestId('mail-icon')).toBeInTheDocument();
         expect(screen.getByTestId('phone-icon')).toBeInTheDocument();
     });

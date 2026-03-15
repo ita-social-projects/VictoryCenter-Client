@@ -1,5 +1,6 @@
 import { Image, ImageValues } from '../common/image';
 import { ContentType } from './programs';
+import { FaqQuestion } from '../admin/faq';
 
 export enum ProgramSectionType {
     Title,
@@ -31,7 +32,13 @@ export enum ProgramSectionMode {
     View = 'view',
 }
 
-export interface ProgramSectionContent {
+export interface FaqSectionQuestionDto {
+    id?: number;
+    questionText: string;
+    answerText: string;
+}
+
+export interface HippotherapyProgramSectionContentDto {
     id?: number;
     sectionId?: number;
     contentType: ContentType;
@@ -42,12 +49,56 @@ export interface ProgramSectionContent {
     image?: Image | ImageValues | null;
     imageId?: number | null;
     author?: string | null;
+    faqQuestionId?: number | null;
+    faqQuestion?: FaqQuestion | null;
+}
+export interface HippotherapyProgramSectionContent {
+    id?: number;
+    sectionId?: number;
+    contentType: ContentType;
+    order: number;
+    groupIndex?: number | null;
+    title?: string | null;
+    description?: string | null;
+    image?: Image | ImageValues | null;
+    imageId?: number | null;
+    author?: string | null;
+    faqQuestionId?: number | null;
+    faqQuestion?: FaqQuestion | null;
 }
 
-export interface ProgramSection {
+export interface HippotherapyProgramSectionDto {
     id?: number;
     programId?: number;
     template: ProgramSectionTemplate;
     order: number;
-    contents: ProgramSectionContent[];
+    contents: HippotherapyProgramSectionContentDto[];
+}
+
+export interface CreateFaqQuestionDto {
+    id?: number | null;
+    questionText: string;
+    answerText: string;
+}
+
+export interface CreateProgramSectionContentDto {
+    id?: number;
+    sectionId?: number;
+    contentType: ContentType;
+    order: number;
+    groupIndex?: number | null;
+    title?: string | null;
+    description?: string | null;
+    image?: Image | ImageValues | null;
+    imageId?: number | null;
+    author?: string | null;
+    faqQuestion?: CreateFaqQuestionDto | null;
+}
+
+export interface CreateHippotherapyProgramSectionDto {
+    id?: number;
+    programId?: number;
+    template: ProgramSectionTemplate;
+    order: number;
+    contents: CreateProgramSectionContentDto[];
 }

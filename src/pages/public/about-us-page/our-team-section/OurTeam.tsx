@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import defaultOurTeamImage from '@/assets/images/public/about-us-page/our-team.jpg';
 import { Button } from '@/components/public/ui/button';
 import { SafeHtml } from '@/components/common/safe-html';
+import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
 
 export interface OurTeamProps {
     content?: AboutUsContent[] | null;
@@ -15,7 +16,11 @@ export const OurTeam = ({ content }: OurTeamProps) => {
     const { t } = useTranslation('aboutUsPage');
 
     const imageUrl = content?.find((x) => x.contentType === ContentType.Image)?.image?.url ?? defaultOurTeamImage;
-    const description = content?.find((x) => x.contentType === ContentType.Description)?.description ?? '';
+
+    const descriptionContent = content?.find((x) => x.contentType === ContentType.Description);
+    const { description } = useGetLocalization(descriptionContent?.localizations, {
+        description: descriptionContent?.description,
+    });
 
     return (
         <div className={styles.root}>

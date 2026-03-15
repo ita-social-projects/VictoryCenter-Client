@@ -1,6 +1,7 @@
 import 'i18next';
 import {
     headerUk,
+    hippotherapyUk,
     footerUk,
     aboutUsPageUk,
     programsPageUk,
@@ -15,6 +16,7 @@ declare module 'i18next' {
     interface CustomTypeOptions {
         resources: {
             header: typeof headerUk;
+            hippotherapy: typeof hippotherapyUk;
             footer: typeof footerUk;
             aboutUsPage: typeof aboutUsPageUk;
             programsPage: typeof programsPageUk;

@@ -4,7 +4,7 @@ import '@testing-library/jest-dom';
 
 import { ProgramSectionForm } from './ProgramSectionForm';
 import type { ProgramSectionFormProps } from './ProgramSectionForm';
-import type { ProgramSection } from '@/types/common/program-sections';
+import type { CreateHippotherapyProgramSectionDto } from '@/types/common/program-sections';
 import { ProgramSectionTemplate, ProgramSectionMode } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
@@ -84,7 +84,9 @@ const makePairAuthor = (order: number, groupIndex: number | null | undefined, au
     image: null,
 });
 
-const makeSection = (overrides?: Partial<ProgramSection>): ProgramSection => ({
+const makeSection = (
+    overrides?: Partial<CreateHippotherapyProgramSectionDto>,
+): CreateHippotherapyProgramSectionDto => ({
     template: ProgramSectionTemplate.TextOnly,
     order: 0,
     contents: [
@@ -99,11 +101,12 @@ const makeSection = (overrides?: Partial<ProgramSection>): ProgramSection => ({
 });
 
 const getLastUpdatedSection = (onSectionChange: jest.Mock) =>
-    onSectionChange.mock.calls[onSectionChange.mock.calls.length - 1][0] as ProgramSection;
+    onSectionChange.mock.calls[onSectionChange.mock.calls.length - 1][0] as CreateHippotherapyProgramSectionDto;
 
-const getContentsBy = (s: ProgramSection, type: ContentType) => s.contents.filter((c: any) => c.contentType === type);
+const getContentsBy = (s: CreateHippotherapyProgramSectionDto, type: ContentType) =>
+    s.contents.filter((c: any) => c.contentType === type);
 
-const getContentByGroupAndType = (s: ProgramSection, groupIndex: number, type: ContentType) =>
+const getContentByGroupAndType = (s: CreateHippotherapyProgramSectionDto, groupIndex: number, type: ContentType) =>
     s.contents.find((c: any) => c.groupIndex === groupIndex && c.contentType === type);
 
 const createFocusableTextarea = (id: string) => {
@@ -214,6 +217,34 @@ describe('ProgramSectionForm', () => {
         renderForm({ isNewSection: true });
         fireEvent.click(screen.getByText(PROGRAMS_TEXT.BUTTON.CANCEL));
         expect(baseProps.onCancel).toHaveBeenCalledTimes(1);
+    });
+
+    it('reverts section changes when onAfterDiscard is called for non-new section', () => {
+        const section = makeSection({
+            contents: [makeTitleContent('Original Title', 0), makeDescriptionContent(1, 'Original Description')],
+        });
+
+        const onCancel = jest.fn();
+        const { handlers } = renderWithHandlers({ section, isNewSection: false, onCancel });
+
+        const editButton = screen.getByLabelText('Edit section');
+        fireEvent.click(editButton);
+
+        act(() => {
+            handlers.onTitleChange('Modified Title');
+        });
+        fireEvent.click(screen.getByText(PROGRAMS_TEXT.BUTTON.CANCEL));
+
+        expect(onCancel).toHaveBeenCalledTimes(1);
+
+        const cancelOptions = onCancel.mock.calls[0][0];
+        expect(cancelOptions.shouldRemove).toBe(false);
+        expect(cancelOptions.revertTo.contents[0].title).toBe('Original Title');
+
+        act(() => {
+            cancelOptions.onAfterDiscard();
+        });
+        expect(screen.getByLabelText('Edit section')).toBeInTheDocument();
     });
 
     it('save button is disabled when isSectionValid is false', () => {
@@ -808,5 +839,110 @@ describe('ProgramSectionForm', () => {
 
         expect(screen.queryByLabelText('Move up section')).not.toBeInTheDocument();
         expect(screen.queryByLabelText('Move down section')).not.toBeInTheDocument();
+    });
+
+    describe('FAQ template', () => {
+        const makeFaqPairContent = (order: number, groupIndex: number, questionText: string, answerText: string) => ({
+            contentType: ContentType.FaqQuestion,
+            order,
+            groupIndex,
+            faqQuestion: {
+                questionText,
+                answerText,
+            },
+        });
+
+        const makeFaqSection = (contents: any[]) =>
+            makeSection({
+                template: ProgramSectionTemplate.SingleTitleQuestionAnswerPairs,
+                contents,
+            });
+
+        it('adds FAQ pair with correct structure', () => {
+            const section = makeFaqSection([
+                makeTitleContent('FAQ Title', 0),
+                makeFaqPairContent(1, 0, 'Question 1', 'Answer 1'),
+            ]);
+
+            const { handlers, onSectionChange } = renderWithHandlers({ section });
+
+            act(() => {
+                handlers.onAddFaqPair('Question 2', 'Answer 2');
+            });
+
+            const updated = getLastUpdatedSection(onSectionChange);
+            const faqPairs = updated.contents.filter((c: any) => c.contentType === ContentType.FaqQuestion);
+
+            expect(faqPairs).toHaveLength(2);
+
+            const newPair = faqPairs[1];
+            expect(newPair.groupIndex).toBe(1);
+            expect(newPair.faqQuestion!.questionText).toBe('Question 2');
+            expect(newPair.faqQuestion!.answerText).toBe('Answer 2');
+        });
+
+        it('deletes FAQ pair and normalizes groupIndex', () => {
+            const section = makeFaqSection([
+                makeTitleContent('FAQ Title', 0),
+                makeFaqPairContent(1, 0, 'Q1', 'A1'),
+                makeFaqPairContent(2, 1, 'Q2', 'A2'),
+                makeFaqPairContent(3, 2, 'Q3', 'A3'),
+            ]);
+
+            const { handlers, onSectionChange } = renderWithHandlers({ section });
+
+            act(() => {
+                handlers.onDeleteFaqPair(1);
+            });
+
+            const updated = getLastUpdatedSection(onSectionChange);
+            const faqPairs = updated.contents
+                .filter((c: any) => c.contentType === ContentType.FaqQuestion)
+                .sort((a: any, b: any) => a.order - b.order);
+
+            expect(faqPairs).toHaveLength(2);
+            expect(faqPairs[0]!.faqQuestion!.questionText).toBe('Q1');
+            expect(faqPairs[0].groupIndex).toBe(0);
+            expect(faqPairs[1]!.faqQuestion!.questionText).toBe('Q3');
+            expect(faqPairs[1].groupIndex).toBe(1);
+        });
+
+        it('updates FAQ question text', () => {
+            const section = makeFaqSection([
+                makeTitleContent('FAQ', 0),
+                makeFaqPairContent(1, 0, 'Old Question', 'Answer'),
+            ]);
+
+            const { handlers, onSectionChange } = renderWithHandlers({ section });
+
+            act(() => {
+                handlers.onFaqQuestionChange(0, 'New Question');
+            });
+
+            const updated = getLastUpdatedSection(onSectionChange);
+            const faqPair = updated.contents.find((c: any) => c.contentType === ContentType.FaqQuestion);
+
+            expect(faqPair!.faqQuestion!.questionText).toBe('New Question');
+            expect(faqPair!.faqQuestion!.answerText).toBe('Answer');
+        });
+
+        it('updates FAQ answer text', () => {
+            const section = makeFaqSection([
+                makeTitleContent('FAQ', 0),
+                makeFaqPairContent(1, 0, 'Question', 'Old Answer'),
+            ]);
+
+            const { handlers, onSectionChange } = renderWithHandlers({ section });
+
+            act(() => {
+                handlers.onFaqAnswerChange(0, 'New Answer');
+            });
+
+            const updated = getLastUpdatedSection(onSectionChange);
+            const faqPair = updated.contents.find((c: any) => c.contentType === ContentType.FaqQuestion);
+
+            expect(faqPair!.faqQuestion!.questionText).toBe('Question');
+            expect(faqPair!.faqQuestion!.answerText).toBe('New Answer');
+        });
     });
 });

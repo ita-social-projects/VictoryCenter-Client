@@ -84,6 +84,7 @@ export const SingleImageRight = ({
                                 rows={2}
                                 error={titleError}
                                 currentLength={getTrimmedInputText(title).length}
+                                maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(titleMaxLength)}
                             />
                         </div>
                         <div className={baseStyles['description-section']}>
@@ -99,6 +100,7 @@ export const SingleImageRight = ({
                                 rows={8}
                                 error={descriptionError}
                                 currentLength={getTrimmedInputText(description).length}
+                                maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(descriptionMaxLength)}
                             />
                         </div>
                     </div>
@@ -138,7 +140,7 @@ export const SingleImageRight = ({
                     </div>
                     <div className={baseStyles['right-section']}>
                         <div className={baseStyles['image-wrapper']}>
-                            {imageSrc && <img src={imageSrc} alt="" className={baseStyles.image} />}
+                            {imageSrc && <img src={imageSrc} alt="" className={baseStyles.image} loading="lazy" />}
                         </div>
                     </div>
                 </>

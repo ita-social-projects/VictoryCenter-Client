@@ -25,6 +25,15 @@ export interface EntityWithDtoLocalizations<TLocalization extends EntityLocaliza
     localizations: TLocalization[];
 }
 
+export type EntityWithTranslationStatuses = {
+    translationStatuses: TranslationStatusInfo[];
+};
+
+export type TranslationStatusInfo = {
+    languageId: number;
+    translationStatus: TranslationStatus;
+};
+
 export enum TranslationStatus {
     Outdated,
     Relevant,

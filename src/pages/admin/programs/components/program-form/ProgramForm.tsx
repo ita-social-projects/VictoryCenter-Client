@@ -15,7 +15,7 @@ import { VisibilityStatus } from '@/types/admin/common';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import NotFoundIcon from '@/assets/icons/not-found.svg';
 import styles from './ProgramForm.module.scss';
-import { ProgramSection } from '@/types/common/program-sections';
+import { CreateHippotherapyProgramSectionDto } from '@/types/common/program-sections';
 import { BackgroundMedia } from '@/components/public/background-media';
 import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 import cn from 'classnames';
@@ -31,7 +31,7 @@ export interface ProgramFormValues {
     location: string;
     participantsCount: string;
     meetingCount: string;
-    sections: ProgramSection[];
+    sections: CreateHippotherapyProgramSectionDto[];
 }
 
 export interface ProgramFormErrors {
@@ -51,11 +51,11 @@ export interface ProgramFormRef {
     submit: (status: VisibilityStatus) => Promise<void>;
     isValid: (isPublishing?: boolean) => boolean;
     isDirty: () => boolean;
-    addSection: (section: ProgramSection) => void;
+    addSection: (section: CreateHippotherapyProgramSectionDto) => void;
     removeSection: (sectionIndex: number) => void;
-    getSections: () => ProgramSection[];
+    getSections: () => CreateHippotherapyProgramSectionDto[];
     revertSection: (sectionIndex: number) => void;
-    replaceSection: (sectionIndex: number, newSection: ProgramSection) => void;
+    replaceSection: (sectionIndex: number, newSection: CreateHippotherapyProgramSectionDto) => void;
 }
 
 export interface ProgramFormProps {
@@ -92,7 +92,7 @@ const validateForm = (formState: ProgramFormValues, isPublishing: boolean): Prog
             isPublishing,
         ),
         meetingCount: PROGRAM_VALIDATION_FUNCTIONS.validateMeetingCount(formState.meetingCount, isPublishing),
-        sections: undefined,
+        sections: PROGRAM_VALIDATION_FUNCTIONS.validateSections(formState.sections, isPublishing),
     };
 };
 
@@ -146,7 +146,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             ref: internalRef,
         });
 
-        const sectionsRef = useRef<ProgramSection[]>(formState.sections);
+        const sectionsRef = useRef<CreateHippotherapyProgramSectionDto[]>(formState.sections);
         sectionsRef.current = formState.sections;
 
         const nextSectionKeyRef = useRef(0);
@@ -209,7 +209,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
         const sectionsContainerRef = useRef<HTMLDivElement>(null);
 
         const handleAddSection = useCallback(
-            (section: ProgramSection) => {
+            (section: CreateHippotherapyProgramSectionDto) => {
                 const sectionKey = generateSectionKey();
                 setFormState((prev) => ({
                     ...prev,
@@ -268,7 +268,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
         );
 
         const handleReplaceSection = useCallback(
-            (sectionKey: string, newSection: ProgramSection) => {
+            (sectionKey: string, newSection: CreateHippotherapyProgramSectionDto) => {
                 const idx = sectionStatesRef.current.findIndex((s) => s.sectionKey === sectionKey);
                 if (idx === -1) return;
 
@@ -304,7 +304,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                     const state = sectionStatesRef.current[sectionIndex];
                     if (state) handleRevertSection(state.sectionKey);
                 },
-                replaceSection: (sectionIndex: number, newSection: ProgramSection) => {
+                replaceSection: (sectionIndex: number, newSection: CreateHippotherapyProgramSectionDto) => {
                     const state = sectionStatesRef.current[sectionIndex];
                     if (state) handleReplaceSection(state.sectionKey, newSection);
                 },
@@ -483,7 +483,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
         );
 
         const handleSectionChange = useCallback(
-            (sectionKey: string, updatedSection: ProgramSection) => {
+            (sectionKey: string, updatedSection: CreateHippotherapyProgramSectionDto) => {
                 const idx = sectionStatesRef.current.findIndex((s) => s.sectionKey === sectionKey);
                 if (idx === -1) return;
 
@@ -628,7 +628,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                             cropHeight={PROGRAM_VALIDATION.backgroundImage.cropHeight}
                             minWidth={PROGRAM_VALIDATION.backgroundImage.minWidth}
                             minHeight={PROGRAM_VALIDATION.backgroundImage.minHeight}
-                            imageLabel={COMMON_TEXT_ADMIN.INPUT.DRAG_AND_DROP_FILE_HERE}
+                            imageLabel={COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE}
                             imageSubText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
                                 PROGRAM_VALIDATION.backgroundImage.height,
                                 PROGRAM_VALIDATION.backgroundImage.width,
@@ -663,6 +663,9 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 error={errors.name}
                                 placeholder={PROGRAMS_TEXT.PLACEHOLDER.INSERT_PROGRAM_NAME}
                                 isWhiteLabel={hasBackgroundImage}
+                                maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
+                                    PROGRAM_VALIDATION.name.max,
+                                )}
                             />
 
                             <InputWithCharacterLimitGroup
@@ -676,6 +679,9 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 disabled={isSubmitting || isFormDisabled}
                                 error={errors.location}
                                 placeholder={PROGRAMS_TEXT.PLACEHOLDER.INSERT_PROGRAM_LOCATION}
+                                maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
+                                    PROGRAM_VALIDATION.location.max,
+                                )}
                             />
 
                             <InputWithCharacterLimitGroup
@@ -689,6 +695,9 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 disabled={isSubmitting || isFormDisabled}
                                 error={errors.participantsCount}
                                 placeholder={PROGRAMS_TEXT.PLACEHOLDER.INSERT_PROGRAM_PARTICIPANTS_COUNT}
+                                maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
+                                    PROGRAM_VALIDATION.participantsCount.max,
+                                )}
                             />
 
                             <InputWithCharacterLimitGroup
@@ -702,6 +711,9 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 disabled={isSubmitting || isFormDisabled}
                                 error={errors.meetingCount}
                                 placeholder={PROGRAMS_TEXT.PLACEHOLDER.INSERT_PROGRAM_MEETINGS_COUNT}
+                                maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
+                                    PROGRAM_VALIDATION.meetingCount.max,
+                                )}
                             />
                         </div>
 
@@ -719,6 +731,10 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 maxLength={PROGRAM_VALIDATION.description.max}
                                 error={errors.description}
                                 isWhiteLabel={hasBackgroundImage}
+                                placeholder={PROGRAMS_TEXT.PLACEHOLDER.INSERT_PROGRAM_DESCRIPTION}
+                                maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
+                                    PROGRAM_VALIDATION.description.max,
+                                )}
                             />
 
                             <PhotoInputGroup
@@ -735,7 +751,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 cropHeight={PROGRAM_VALIDATION.previewImage.cropHeight}
                                 minWidth={PROGRAM_VALIDATION.previewImage.minWidth}
                                 minHeight={PROGRAM_VALIDATION.previewImage.minHeight}
-                                imageLabel={COMMON_TEXT_ADMIN.INPUT.DRAG_AND_DROP_FILE_HERE}
+                                imageLabel={COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE}
                                 imageSubText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
                                     PROGRAM_VALIDATION.previewImage.height,
                                     PROGRAM_VALIDATION.previewImage.width,

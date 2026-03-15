@@ -1,0 +1,207 @@
+@use '@/assets/sass/variables/colors';
+@use '@/assets/sass/variables/z-index';
+@use '@/assets/sass/mixins/typography.mixins' as type;
+@use '@/assets/sass/variables/typography' as t;
+
+* {
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.intro-section {
+    padding: 64px 16px 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+    justify-content: center;
+    align-items: center;
+    overflow-x: hidden;
+    font-family: t.$font-family-base;
+
+    @media (min-width: 768px) {
+        padding: 96px 32px 80px;
+        gap: 80px;
+    }
+
+    @media (min-width: 1024px) {
+        padding: 128px 56px 104px;
+        gap: 104px;
+    }
+
+    @media (min-width: 1440px) {
+        padding: 168px 56px 142px;
+        gap: 132px;
+    }
+
+    h1 {
+        max-width: 1102px;
+        width: 100%;
+        height: auto;
+        font-weight: 500;
+        font-size: 40px;
+        line-height: 48px;
+        letter-spacing: -0.02em;
+        text-align: center;
+        text-transform: uppercase;
+
+        @media (min-width: 768px) {
+            font-size: 56px;
+            line-height: 68px;
+        }
+
+        @media (min-width: 1024px) {
+            font-size: 64px;
+            line-height: 76px;
+        }
+
+        @media (min-width: 1280px) {
+            font-size: 80px;
+            line-height: 94px;
+        }
+
+        @media (min-width: 1440px) {
+            font-size: 96px;
+            line-height: 112px;
+        }
+    }
+
+    span {
+        font-weight: 800;
+        font-style: italic;
+        font-size: 40px;
+        line-height: 48px;
+        letter-spacing: -0.02em;
+        text-align: center;
+        text-transform: uppercase;
+        position: relative;
+        display: inline-block;
+        background: antiquewhite;
+
+        @media (min-width: 768px) {
+            font-size: 56px;
+            line-height: 68px;
+        }
+
+        @media (min-width: 1024px) {
+            font-size: 64px;
+            line-height: 76px;
+        }
+
+        @media (min-width: 1280px) {
+            font-size: 80px;
+            line-height: 94px;
+        }
+
+        @media (min-width: 1440px) {
+            font-size: 96px;
+            line-height: 112px;
+        }
+    }
+
+    span:nth-child(2) {
+        background: colors.$yellow-400;
+        position: relative;
+    }
+
+    span:nth-child(2):before {
+        content: '';
+        width: 100vw;
+        height: 48px;
+        background: colors.$yellow-400;
+        position: absolute;
+        transform: translateX(-100%);
+
+        @media (min-width: 768px) {
+            height: 68px;
+        }
+
+        @media (min-width: 1024px) {
+            height: 76px;
+        }
+
+        @media (min-width: 1280px) {
+            height: 94px;
+        }
+
+        @media (min-width: 1440px) {
+            height: 112px;
+        }
+    }
+
+    span:nth-child(3) {
+        background: colors.$light-blue-200;
+        position: relative;
+        z-index: z-index.public(programs-page-intro-section-text);
+    }
+
+    span:nth-child(3):before {
+        content: '';
+        width: 100vw;
+        height: 48px;
+        background: colors.$light-blue-200;
+        position: absolute;
+        z-index: z-index.public(programs-page-intro-section-background);
+
+        @media (min-width: 768px) {
+            height: 68px;
+        }
+
+        @media (min-width: 1024px) {
+            height: 76px;
+        }
+
+        @media (min-width: 1280px) {
+            height: 94px;
+        }
+
+        @media (min-width: 1440px) {
+            height: 112px;
+        }
+    }
+
+    .additional-info {
+        @include type.body-2-medium;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        justify-content: center;
+        align-items: center;
+        vertical-align: middle;
+        width: 100%;
+        max-width: 100%;
+
+        @media (min-width: 768px) {
+            font-size: 18px;
+            line-height: 26px;
+            gap: 16px;
+        }
+
+        @media (min-width: 1024px) {
+            flex-direction: row;
+            font-size: 20px;
+            line-height: 28px;
+        }
+
+        p {
+            width: 100%;
+            max-width: 432px;
+            text-align: center;
+
+            @media (min-width: 1024px) {
+                text-align: left;
+            }
+        }
+
+        p:nth-child(1) {
+            @media (min-width: 1024px) {
+                max-width: 430px;
+            }
+        }
+
+        p:nth-child(2) {
+            @media (min-width: 1024px) {
+                max-width: 432px;
+            }
+        }
+    }
+}

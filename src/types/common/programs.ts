@@ -3,4 +3,5 @@ export enum ContentType {
     Description = 1,
     Image = 2,
     Author = 4,
+    FaqQuestion = 5,
 }

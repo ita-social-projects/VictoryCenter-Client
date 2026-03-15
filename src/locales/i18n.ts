@@ -3,6 +3,7 @@ import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import {
     headerUk,
+    hippotherapyUk,
     footerUk,
     aboutUsPageUk,
     programsPageUk,
@@ -14,6 +15,7 @@ import {
 } from './uk';
 import {
     headerEn,
+    hippotherapyEn,
     footerEn,
     aboutUsPageEn,
     programsPageEn,
@@ -28,6 +30,7 @@ import { DEFAULT_LOCALE, LOCALES } from '../const/common/locales';
 const resources = {
     uk: {
         header: headerUk,
+        hippotherapy: hippotherapyUk,
         footer: footerUk,
         aboutUsPage: aboutUsPageUk,
         programsPage: programsPageUk,
@@ -39,6 +42,7 @@ const resources = {
     },
     en: {
         header: headerEn,
+        hippotherapy: hippotherapyEn,
         footer: footerEn,
         aboutUsPage: aboutUsPageEn,
         programsPage: programsPageEn,
@@ -64,6 +68,7 @@ i18n.use(initReactI18next).init({
         'header',
         'footer',
         'aboutUsPage',
+        'hippotherapy',
         'programsPage',
         'detailedProgramPage',
         'donatePage',

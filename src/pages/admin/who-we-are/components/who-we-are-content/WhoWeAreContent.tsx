@@ -19,6 +19,7 @@ import { WhoWeArePageToolbar } from '../who-we-are-page-toolbar/WhoWeArePageTool
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
 import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
 import { WhoWeAreModals } from '../modals/WhoWeAreModals';
+import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
 
 interface ErrorState {
     message: string | null;
@@ -171,11 +172,13 @@ export const WhoWeAreContent = () => {
                 setUpdatedSection(result);
                 setIsPublishButtonActive(false);
                 addToast(COMMON_TEXT_ADMIN.MESSAGE.SUCCESSFULLY_PUBLISHED, ToastType.Info);
+
+                refetchCategories();
             } catch (error) {
                 addToast(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_PUBLISH_CHANGES, ToastType.Error);
             }
         }
-    }, [selectedSection, updatedSection, client, selectedCategory, addToast]);
+    }, [selectedSection, updatedSection, client, selectedCategory, addToast, refetchCategories]);
 
     const handleConfirmPublish = useCallback(() => {
         setConfirmationModalOpen(false);
@@ -194,6 +197,17 @@ export const WhoWeAreContent = () => {
         }
         return { message: null, type: null };
     }, [categoryError, sectionError, languagesError]);
+
+    const setErrorState = useCallback((message: string, type: 'categories' | 'entity' | 'languages') => {
+        if (type === 'languages') {
+            setLanguagesError(message);
+        }
+    }, []);
+
+    const { allLanguages, translationLanguages, selectedLanguage, onLanguageChange, retryFetchLanguages } =
+        useLocalizationToolkit({
+            setErrorState,
+        });
 
     const handleRetry = useCallback(() => {
         if (error.type === 'categories') {
@@ -256,6 +270,9 @@ export const WhoWeAreContent = () => {
                         getCategoryDisplayName={(category) => category.title}
                         getCategoryKey={(category) => category.id}
                         onCategorySelect={handleCategorySelect}
+                        renderCategoryExtra={(category) => (
+                            <LocalizationStatuses languages={translationLanguages} localizedEntity={category} />
+                        )}
                     />
                     {renderContent()}
                 </div>

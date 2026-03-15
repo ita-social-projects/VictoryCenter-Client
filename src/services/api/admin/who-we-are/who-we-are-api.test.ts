@@ -24,7 +24,9 @@ describe('WhoWeAreApi', () => {
 
     describe('getPreviews', () => {
         it('should call client.get with the correct URL and return data', async () => {
-            const mockData: WhoWeAreCategory[] = [{ id: 1, title: 'Category 1', sectionType: SectionType.Main }];
+            const mockData: WhoWeAreCategory[] = [
+                { id: 1, title: 'Category 1', sectionType: SectionType.Main, translationStatuses: [] },
+            ];
             mockClient.get.mockResolvedValue({ data: mockData });
 
             const result = await WhoWeAreApi.getPreviews(mockClient);

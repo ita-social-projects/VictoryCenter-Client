@@ -2,11 +2,11 @@ import { ContentType, SectionType } from '@/types/common/about-us';
 import { LocalizationLanguage, TranslationStatus } from '@/types/common/language';
 import { WhoWeAreSection } from '@/types/admin/who-we-are';
 
+import { translateDescriptionStrategy } from './translate-description-strategy';
+
 jest.mock('../../forms/translate-description-form/TranslateWhoWeAreDescriptionForm', () => ({
     TranslateWhoWeAreDescriptionForm: jest.fn(() => null),
 }));
-
-import { translateDescriptionStrategy } from './translate-description-strategy';
 
 const english: LocalizationLanguage = { id: 2, code: 'en', name: 'English' };
 const ukrainian: LocalizationLanguage = { id: 1, code: 'uk', name: 'Ukrainian' };

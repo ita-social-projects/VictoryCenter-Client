@@ -332,7 +332,9 @@ describe('useTranslateWhoWeAreSection', () => {
         );
 
         await act(async () => {
-            await expect(result.current.translateSection({ description: 'Will fail' })).rejects.toThrow('create failed');
+            await expect(result.current.translateSection({ description: 'Will fail' })).rejects.toThrow(
+                'create failed',
+            );
         });
 
         await waitFor(() => {

@@ -308,7 +308,9 @@ describe('TranslateWhoWeAreModal', () => {
         expect(mockGetInitialDataTitleAndDescription).not.toHaveBeenCalled();
 
         const strategyForm = screen.getByTestId('strategy-form');
-        expect(strategyForm.getAttribute('data-description-limit')).toBe(String(WhoWeSupportCardsProps.descriptionLimit));
+        expect(strategyForm.getAttribute('data-description-limit')).toBe(
+            String(WhoWeSupportCardsProps.descriptionLimit),
+        );
         expect(strategyForm.getAttribute('data-title-limit')).toBe('');
     });
 

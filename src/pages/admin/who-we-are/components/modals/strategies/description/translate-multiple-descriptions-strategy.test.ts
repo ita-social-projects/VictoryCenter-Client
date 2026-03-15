@@ -3,11 +3,11 @@ import { LocalizationLanguage, TranslationStatus } from '@/types/common/language
 import { WhoWeAreSection } from '@/types/admin/who-we-are';
 import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 
+import { translateMultipleDescriptionsStrategy } from './translate-multiple-descriptions-strategy';
+
 jest.mock('../../forms/translate-multiple-descriptions-form/TranslateWhoWeAreMultipleDescriptionsForm', () => ({
     TranslateWhoWeAreMultipleDescriptionsForm: jest.fn(() => null),
 }));
-
-import { translateMultipleDescriptionsStrategy } from './translate-multiple-descriptions-strategy';
 
 jest.mock('@/utils/functions/image-helper/image-helper', () => ({
     getImageSrc: jest.fn(() => 'mapped-image.jpg'),

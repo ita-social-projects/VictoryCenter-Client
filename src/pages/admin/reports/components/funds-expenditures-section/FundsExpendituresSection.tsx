@@ -14,6 +14,7 @@ import {
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
+import { parseAmount } from '@/utils/functions/parse-amount/parse-amount';
 import { SummaryCard } from './components/summary-card/SummaryCard';
 import {
     CategoryFilterValue,
@@ -26,8 +27,6 @@ import styles from './FundsExpendituresSection.module.scss';
 const computeSummary = (records: ReportFundsExpendituresRecord[]): FundsExpendituresSummary => {
     const incomeRecords = records.filter((r) => r.type === 'income');
     const expenseRecords = records.filter((r) => r.type === 'expense');
-
-    const parseAmount = (val: string) => Number.parseFloat(val.replaceAll(' ', '')) || 0;
 
     return {
         totalCollectedUah: incomeRecords.reduce((sum, r) => sum + parseAmount(r.amountUah), 0),

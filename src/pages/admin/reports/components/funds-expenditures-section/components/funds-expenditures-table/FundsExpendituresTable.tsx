@@ -5,6 +5,7 @@ import { ReactComponent as NotFoundIcon } from '@/assets/icons/not-found.svg';
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as DeleteIcon } from '@/assets/icons/delete.svg';
 import { SortIcon } from '@/pages/admin/reports/components/funds-expenditures-section/components/funds-expenditures-table/components/sort-icon';
+import { parseAmount } from '@/utils/functions/parse-amount/parse-amount';
 import cn from 'classnames';
 import styles from './FundsExpendituresTable.module.scss';
 
@@ -29,8 +30,6 @@ const TYPE_LABEL_MAP: Record<FundsExpendituresTransactionType, string> = {
     income: FUNDS_EXPENDITURES_TEXT.TABLE.TYPE_LABELS.INCOME,
     expense: FUNDS_EXPENDITURES_TEXT.TABLE.TYPE_LABELS.EXPENSE,
 };
-
-const parseAmount = (value: string): number => Number.parseFloat(value.replaceAll(' ', '')) || 0;
 
 const sortRecords = (records: EnrichedRecord[], sort: ColumnSort): EnrichedRecord[] => {
     if (!sort.column || !sort.direction) return records;

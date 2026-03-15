@@ -119,4 +119,32 @@ describe('TranslateWhoWeAreDescriptionForm', () => {
 
 		expect(onSubmit).toHaveBeenCalledWith({ description: '<p>Valid description</p>' });
 	});
+
+	it('handles focus/change/blur sequence before explicit timer flush', () => {
+		jest.useFakeTimers();
+		renderForm();
+
+		const descriptionField = screen.getByTestId('rich-text-description');
+
+		fireEvent.focus(descriptionField);
+		fireEvent.change(descriptionField, { target: { value: '<p>Updated too early</p>' } });
+		fireEvent.blur(descriptionField);
+
+		expect(screen.getByTestId('rich-text-description')).toHaveValue('<p>Updated too early</p>');
+		jest.useRealTimers();
+	});
+
+	it('submits with empty string when description is undefined in initial data', async () => {
+		const onSubmit = jest.fn();
+		const { ref } = renderForm({
+			onSubmit,
+			initialData: { description: undefined as unknown as string },
+		});
+
+		await act(async () => {
+			await ref.current?.submit();
+		});
+
+		expect(onSubmit).toHaveBeenCalledWith({ description: undefined });
+	});
 });

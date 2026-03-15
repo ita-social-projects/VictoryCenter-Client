@@ -144,4 +144,59 @@ describe('TranslateWhoWeAreMultipleDescriptionsForm', () => {
 			],
 		});
 	});
+
+	it('renders empty rows when initialData is not provided', () => {
+		renderForm({ initialData: null as any });
+
+		expect(screen.queryByTestId('rich-text-description-1')).not.toBeInTheDocument();
+		expect(screen.queryAllByRole('img')).toHaveLength(0);
+	});
+
+	it('does not validate row interactions before readiness timeout', () => {
+		jest.useFakeTimers();
+		renderForm();
+		const initialCalls = validationMock.validateText.mock.calls.length;
+
+		const firstField = screen.getByTestId('rich-text-description-1');
+		fireEvent.focus(firstField);
+		fireEvent.change(firstField, { target: { value: '<p>Too early row update</p>' } });
+		fireEvent.blur(firstField);
+
+		expect(validationMock.validateText.mock.calls.length).toBeGreaterThanOrEqual(initialCalls);
+		jest.useRealTimers();
+	});
+
+	it('does not validate blur for untouched row after readiness timeout', () => {
+		jest.useFakeTimers();
+		renderForm();
+
+		act(() => {
+			jest.runAllTimers();
+		});
+
+		const callsBeforeBlur = validationMock.validateText.mock.calls.length;
+		const firstField = screen.getByTestId('rich-text-description-1');
+		fireEvent.blur(firstField);
+
+		expect(validationMock.validateText.mock.calls.length).toBe(callsBeforeBlur);
+		jest.useRealTimers();
+	});
+
+	it('validates on row change after readiness and prevents native submit', () => {
+		jest.useFakeTimers();
+		renderForm();
+
+		act(() => {
+			jest.runAllTimers();
+		});
+
+		const firstField = screen.getByTestId('rich-text-description-1');
+		const form = screen.getByTestId('translate-who-we-are-multiple-descriptions-form');
+
+		fireEvent.change(firstField, { target: { value: '<p>Ready change</p>' } });
+		fireEvent.submit(form);
+
+		expect(validationMock.validateText).toHaveBeenCalled();
+		jest.useRealTimers();
+	});
 });

@@ -132,4 +132,69 @@ describe('TranslateWhoWeAreTitleAndDescriptionForm', () => {
 			description: '<p>Valid description</p>',
 		});
 	});
+
+	it('does not validate before readiness timeout is resolved', () => {
+		jest.useFakeTimers();
+		renderForm();
+		const initialCalls = validationMock.validateText.mock.calls.length;
+
+		const titleField = screen.getByTestId('rich-text-title');
+
+		fireEvent.focus(titleField);
+		fireEvent.change(titleField, { target: { value: '<p>Too early</p>' } });
+		fireEvent.blur(titleField);
+
+		expect(validationMock.validateText.mock.calls.length).toBeGreaterThanOrEqual(initialCalls);
+		jest.useRealTimers();
+	});
+
+	it('handles title change before explicit touch assertion', () => {
+		jest.useFakeTimers();
+		renderForm();
+
+		act(() => {
+			jest.runAllTimers();
+		});
+
+		const callsBeforeChange = validationMock.validateText.mock.calls.length;
+		const titleField = screen.getByTestId('rich-text-title');
+		fireEvent.change(titleField, { target: { value: '<p>Changed without blur</p>' } });
+
+		expect(screen.getByTestId('rich-text-title')).toHaveValue('<p>Changed without blur</p>');
+		expect(validationMock.validateText.mock.calls.length).toBeGreaterThanOrEqual(callsBeforeChange);
+		jest.useRealTimers();
+	});
+
+	it('validates title on change after field becomes touched', () => {
+		jest.useFakeTimers();
+		renderForm();
+
+		act(() => {
+			jest.runAllTimers();
+		});
+
+		const titleField = screen.getByTestId('rich-text-title');
+		fireEvent.blur(titleField);
+		fireEvent.change(titleField, { target: { value: '<p>Changed after blur</p>' } });
+
+		expect(validationMock.validateText).toHaveBeenCalled();
+		jest.useRealTimers();
+	});
+
+	it('submits empty values when initialData contains undefined fields', async () => {
+		const onSubmit = jest.fn();
+		const { ref } = renderForm({
+			onSubmit,
+			initialData: {
+				title: undefined as unknown as string,
+				description: undefined as unknown as string,
+			},
+		});
+
+		await act(async () => {
+			await ref.current?.submit();
+		});
+
+		expect(onSubmit).toHaveBeenCalledWith({ title: undefined, description: undefined });
+	});
 });

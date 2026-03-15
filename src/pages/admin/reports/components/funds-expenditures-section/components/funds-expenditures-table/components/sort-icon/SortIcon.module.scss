@@ -1,0 +1,19 @@
+@use '@/assets/sass/variables/colors' as c;
+
+.sort-icons {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+}
+
+.sort-icon {
+    width: 14px;
+    height: 14px;
+    color: c.$grey-700;
+    flex-shrink: 0;
+}
+
+.sort-icon-active {
+    color: c.$blue-500;
+}

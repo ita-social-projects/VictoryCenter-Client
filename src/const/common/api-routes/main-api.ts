@@ -77,6 +77,11 @@ export const API_ROUTES = {
     REPORTS: {
         MEDIA_SETTINGS: 'Report/report',
         BASE: 'Report',
+        FUNDS_EXPENDITURES: {
+            SETTINGS: 'ReportFundsExpendituresSettings',
+            RECORDS: 'ReportFundsExpendituresRecords',
+            CATEGORIES: 'ReportFundsExpendituresCategories',
+        },
     },
     PDF_SECTION: {
         BASE: 'PdfSection',

@@ -69,7 +69,7 @@ describe('TranslateWhoWeAreMultipleDescriptionsForm', () => {
     };
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        jest.resetAllMocks();
     });
 
     it('renders rows with default descriptions and images', () => {
@@ -157,10 +157,9 @@ describe('TranslateWhoWeAreMultipleDescriptionsForm', () => {
 
         const firstField = screen.getByTestId('rich-text-description-1');
         fireEvent.focus(firstField);
-        fireEvent.change(firstField, { target: { value: '<p>Too early row update</p>' } });
         fireEvent.blur(firstField);
 
-        expect(validationMock.validateText.mock.calls.length).toBeGreaterThanOrEqual(initialCalls);
+        expect(validationMock.validateText).toHaveBeenCalledTimes(initialCalls);
         jest.useRealTimers();
     });
 

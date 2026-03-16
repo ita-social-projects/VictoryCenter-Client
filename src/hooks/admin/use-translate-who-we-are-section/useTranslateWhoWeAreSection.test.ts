@@ -124,6 +124,13 @@ describe('useTranslateWhoWeAreSection', () => {
                 description: 'Mapped row description 2',
                 translationStatus: TranslationStatus.Relevant,
             } as any,
+            {
+                entityId: 4,
+                localizationInfoDto: { id: 2, code: 'en' },
+                title: 'Mapped title 4',
+                description: 'Mapped row description 4',
+                translationStatus: TranslationStatus.Relevant,
+            } as any,
         ]);
 
         mockedMapper.mockImplementation((dto: any) => ({
@@ -188,7 +195,15 @@ describe('useTranslateWhoWeAreSection', () => {
         expect(updatedContent2?.localizations?.find((l) => l.language.id === 2)?.description).toBe(
             'Mapped row description 2',
         );
-        expect(updatedContent4?.localizations).toEqual([]);
+        expect(updatedContent4?.localizations).toEqual(
+            expect.arrayContaining([
+                expect.objectContaining({
+                    language: expect.objectContaining({ id: 2, code: 'en' }),
+                    title: 'Mapped title 4',
+                    description: 'Mapped row description 4',
+                }),
+            ]),
+        );
 
         expect(result.current.isSubmitting).toBe(false);
         expect(result.current.error).toBe('');
@@ -196,7 +211,7 @@ describe('useTranslateWhoWeAreSection', () => {
 
     it('maps title and description form payload for add mode', async () => {
         mockedCreate.mockResolvedValue([] as any);
-        mockedMapper.mockImplementation((dto: any) => dto as any);
+        mockedMapper.mockImplementation((dto: any) => dto);
 
         const { result } = renderHook(() =>
             useTranslateWhoWeAreSection({
@@ -238,7 +253,7 @@ describe('useTranslateWhoWeAreSection', () => {
 
     it('maps description-only form payload for add mode', async () => {
         mockedCreate.mockResolvedValue([] as any);
-        mockedMapper.mockImplementation((dto: any) => dto as any);
+        mockedMapper.mockImplementation((dto: any) => dto);
 
         const { result } = renderHook(() =>
             useTranslateWhoWeAreSection({

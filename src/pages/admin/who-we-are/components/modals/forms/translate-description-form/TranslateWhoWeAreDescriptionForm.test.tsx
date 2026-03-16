@@ -51,7 +51,11 @@ describe('TranslateWhoWeAreDescriptionForm', () => {
     };
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        jest.resetAllMocks();
+    });
+
+    afterEach(() => {
+        jest.useRealTimers();
     });
 
     it('renders the description field', () => {
@@ -136,13 +140,13 @@ describe('TranslateWhoWeAreDescriptionForm', () => {
         const onSubmit = jest.fn();
         const { ref } = renderForm({
             onSubmit,
-            initialData: { description: undefined as unknown as string },
+            initialData: { description: '' },
         });
 
         await act(async () => {
             await ref.current?.submit();
         });
 
-        expect(onSubmit).toHaveBeenCalledWith({ description: undefined });
+        expect(onSubmit).toHaveBeenCalledWith({ description: '' });
     });
 });

@@ -6,6 +6,7 @@ import {
     TranslateWhoWeAreTitleAndDescriptionFormRef,
 } from './TranslateWhoWeAreTitleAndDescriptionForm';
 import { getWhoWeAreValidationMock } from '@/utils/test-mocks/who-we-are-form-mocks';
+import { changeRichTextField, submitFormByRef } from '@/pages/admin/who-we-are/components/modals/forms/shared/form-test-helpers';
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
     RichTextInputGroup: (props: any) => require('@/utils/test-mocks/who-we-are-form-mocks').MockRichTextInputGroup(props),
@@ -61,9 +62,7 @@ describe('TranslateWhoWeAreTitleAndDescriptionForm', () => {
         const onDirtyChange = jest.fn();
         renderForm({ onDirtyChange });
 
-        fireEvent.change(screen.getByTestId('rich-text-title'), {
-            target: { value: '<p>Updated title</p>' },
-        });
+        changeRichTextField('title', '<p>Updated title</p>');
 
         await waitFor(() => {
             expect(onDirtyChange).toHaveBeenCalledWith(true);
@@ -98,16 +97,10 @@ describe('TranslateWhoWeAreTitleAndDescriptionForm', () => {
         const onSubmit = jest.fn();
         const { ref } = renderForm({ onSubmit });
 
-        fireEvent.change(screen.getByTestId('rich-text-title'), {
-            target: { value: '<p>Valid title</p>' },
-        });
-        fireEvent.change(screen.getByTestId('rich-text-description'), {
-            target: { value: '<p>Valid description</p>' },
-        });
+        changeRichTextField('title', '<p>Valid title</p>');
+        changeRichTextField('description', '<p>Valid description</p>');
 
-        await act(async () => {
-            await ref.current?.submit();
-        });
+        await submitFormByRef(ref);
 
         expect(onSubmit).toHaveBeenCalledWith({
             title: '<p>Valid title</p>',
@@ -173,9 +166,7 @@ describe('TranslateWhoWeAreTitleAndDescriptionForm', () => {
             },
         });
 
-        await act(async () => {
-            await ref.current?.submit();
-        });
+        await submitFormByRef(ref);
 
         expect(onSubmit).toHaveBeenCalledWith({ title: undefined, description: undefined });
     });

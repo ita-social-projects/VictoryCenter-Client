@@ -6,6 +6,7 @@ import {
     TranslateWhoWeAreMultipleDescriptionsFormRef,
 } from './TranslateWhoWeAreMultipleDescriptionsForm';
 import { getWhoWeAreValidationMock } from '@/utils/test-mocks/who-we-are-form-mocks';
+import { changeRichTextField, submitFormByRef } from '@/pages/admin/who-we-are/components/modals/forms/shared/form-test-helpers';
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
     RichTextInputGroup: (props: any) => require('@/utils/test-mocks/who-we-are-form-mocks').MockRichTextInputGroup(props),
@@ -73,9 +74,7 @@ describe('TranslateWhoWeAreMultipleDescriptionsForm', () => {
         const onDirtyChange = jest.fn();
         renderForm({ onDirtyChange });
 
-        fireEvent.change(screen.getByTestId('rich-text-description-1'), {
-            target: { value: '<p>Updated row</p>' },
-        });
+        changeRichTextField('description-1', '<p>Updated row</p>');
 
         await waitFor(() => {
             expect(onDirtyChange).toHaveBeenCalledWith(true);
@@ -108,16 +107,10 @@ describe('TranslateWhoWeAreMultipleDescriptionsForm', () => {
         const onSubmit = jest.fn();
         const { ref } = renderForm({ onSubmit });
 
-        fireEvent.change(screen.getByTestId('rich-text-description-1'), {
-            target: { value: '<p>New 1</p>' },
-        });
-        fireEvent.change(screen.getByTestId('rich-text-description-2'), {
-            target: { value: '<p>New 2</p>' },
-        });
+        changeRichTextField('description-1', '<p>New 1</p>');
+        changeRichTextField('description-2', '<p>New 2</p>');
 
-        await act(async () => {
-            await ref.current?.submit();
-        });
+        await submitFormByRef(ref);
 
         expect(onSubmit).toHaveBeenCalledWith({
             rows: [
@@ -174,7 +167,7 @@ describe('TranslateWhoWeAreMultipleDescriptionsForm', () => {
         const firstField = screen.getByTestId('rich-text-description-1');
         const form = screen.getByTestId('translate-who-we-are-multiple-descriptions-form');
 
-        fireEvent.change(firstField, { target: { value: '<p>Ready change</p>' } });
+        changeRichTextField('description-1', '<p>Ready change</p>');
         fireEvent.submit(form);
 
         expect(validationMock.validateText).toHaveBeenCalled();

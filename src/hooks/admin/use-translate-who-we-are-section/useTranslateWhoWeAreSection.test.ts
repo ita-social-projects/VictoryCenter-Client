@@ -17,6 +17,32 @@ jest.mock('../use-admin-client/useAdminClient', () => ({
 const mockedCreate = WhoWeAreLocalizationsApi.create as jest.MockedFunction<typeof WhoWeAreLocalizationsApi.create>;
 const mockedMapper = mapLocalizationDtoToModel as jest.MockedFunction<typeof mapLocalizationDtoToModel>;
 
+interface CreatePayloadOptions {
+    description: string;
+    titles: [string, string, string];
+}
+
+const buildUniformExpectedCreatePayload = ({ description, titles }: CreatePayloadOptions) => [
+    {
+        description,
+        title: titles[0],
+        entityId: 1,
+        languageId: 2,
+    },
+    {
+        description,
+        title: titles[1],
+        entityId: 2,
+        languageId: 2,
+    },
+    {
+        description,
+        title: titles[2],
+        entityId: 4,
+        languageId: 2,
+    },
+];
+
 const englishLanguage: LocalizationLanguage = {
     id: 2,
     code: 'en',
@@ -226,26 +252,14 @@ describe('useTranslateWhoWeAreSection', () => {
             });
         });
 
-        expect(mockedCreate).toHaveBeenCalledWith(expect.anything(), SectionType.Main, [
-            {
+        expect(mockedCreate).toHaveBeenCalledWith(
+            expect.anything(),
+            SectionType.Main,
+            buildUniformExpectedCreatePayload({
                 description: 'Translated description',
-                title: 'Translated title',
-                entityId: 1,
-                languageId: 2,
-            },
-            {
-                description: 'Translated description',
-                title: 'Translated title',
-                entityId: 2,
-                languageId: 2,
-            },
-            {
-                description: 'Translated description',
-                title: 'Translated title',
-                entityId: 4,
-                languageId: 2,
-            },
-        ]);
+                titles: ['Translated title', 'Translated title', 'Translated title'],
+            }),
+        );
     });
 
     it('maps description-only form payload for add mode', async () => {
@@ -260,26 +274,14 @@ describe('useTranslateWhoWeAreSection', () => {
             });
         });
 
-        expect(mockedCreate).toHaveBeenCalledWith(expect.anything(), SectionType.Main, [
-            {
+        expect(mockedCreate).toHaveBeenCalledWith(
+            expect.anything(),
+            SectionType.Main,
+            buildUniformExpectedCreatePayload({
                 description: 'Description only',
-                title: 'Original title 1',
-                entityId: 1,
-                languageId: 2,
-            },
-            {
-                description: 'Description only',
-                title: 'Original title 2',
-                entityId: 2,
-                languageId: 2,
-            },
-            {
-                description: 'Description only',
-                title: 'Original title 4',
-                entityId: 4,
-                languageId: 2,
-            },
-        ]);
+                titles: ['Original title 1', 'Original title 2', 'Original title 4'],
+            }),
+        );
     });
 
     it('does nothing when section is null', async () => {

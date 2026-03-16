@@ -6,6 +6,7 @@ import {
     TranslateWhoWeAreDescriptionFormRef,
 } from './TranslateWhoWeAreDescriptionForm';
 import { getWhoWeAreValidationMock } from '@/utils/test-mocks/who-we-are-form-mocks';
+import { changeRichTextField, submitFormByRef } from '@/pages/admin/who-we-are/components/modals/forms/shared/form-test-helpers';
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
     RichTextInputGroup: (props: any) => require('@/utils/test-mocks/who-we-are-form-mocks').MockRichTextInputGroup(props),
@@ -62,9 +63,7 @@ describe('TranslateWhoWeAreDescriptionForm', () => {
         const onDirtyChange = jest.fn();
         renderForm({ onDirtyChange });
 
-        fireEvent.change(screen.getByTestId('rich-text-description'), {
-            target: { value: '<p>Updated description</p>' },
-        });
+        changeRichTextField('description', '<p>Updated description</p>');
 
         await waitFor(() => {
             expect(onDirtyChange).toHaveBeenCalledWith(true);
@@ -156,13 +155,9 @@ describe('TranslateWhoWeAreDescriptionForm', () => {
         const onSubmit = jest.fn();
         const { ref } = renderForm({ onSubmit });
 
-        fireEvent.change(screen.getByTestId('rich-text-description'), {
-            target: { value: '<p>Valid description</p>' },
-        });
+        changeRichTextField('description', '<p>Valid description</p>');
 
-        await act(async () => {
-            await ref.current?.submit();
-        });
+        await submitFormByRef(ref);
 
         expect(onSubmit).toHaveBeenCalledWith({ description: '<p>Valid description</p>' });
     });
@@ -188,9 +183,7 @@ describe('TranslateWhoWeAreDescriptionForm', () => {
             initialData: { description: '' },
         });
 
-        await act(async () => {
-            await ref.current?.submit();
-        });
+        await submitFormByRef(ref);
 
         expect(onSubmit).toHaveBeenCalledWith({ description: '' });
     });

@@ -12,7 +12,7 @@ import { ContentType } from '@/types/common/programs';
 import { useImageError } from '@/hooks/common/use-image-error/useImageError';
 import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
 import styles from './SingleImageRight.module.scss';
-import publishedStyles from './PublishedSingleImageRight.module.scss';
+import viewStyles from './ViewSingleImageRight.module.scss';
 
 export interface SingleImageRightProps {
     title?: string;
@@ -31,14 +31,14 @@ export const SingleImageRight = ({
     title = '',
     description = '',
     image = null,
-    mode = ProgramSectionMode.Published,
+    mode = ProgramSectionMode.View,
     onTitleChange,
     onDescriptionChange,
     onImageChange,
     validationResetKey,
 }: SingleImageRightProps) => {
     const imageSrc = getImageSrc(image);
-    const baseStyles = mode === ProgramSectionMode.Published ? publishedStyles : styles;
+    const baseStyles = mode === ProgramSectionMode.View ? viewStyles : styles;
 
     const {
         titleError,
@@ -63,10 +63,10 @@ export const SingleImageRight = ({
         <div
             className={cn(baseStyles.container, {
                 [styles.template]: mode === ProgramSectionMode.Template,
-                [styles['form-container']]: mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View,
+                [styles['form-container']]: mode === ProgramSectionMode.Edit,
             })}
         >
-            {mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View ? (
+            {mode === ProgramSectionMode.Edit ? (
                 <>
                     <div className={baseStyles['left-section']}>
                         <div className={baseStyles['title-section']}>
@@ -84,7 +84,7 @@ export const SingleImageRight = ({
                                 rows={2}
                                 error={titleError}
                                 currentLength={getTrimmedInputText(title).length}
-                                disabled={mode === ProgramSectionMode.View}
+                                maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(titleMaxLength)}
                             />
                         </div>
                         <div className={baseStyles['description-section']}>
@@ -100,7 +100,7 @@ export const SingleImageRight = ({
                                 rows={8}
                                 error={descriptionError}
                                 currentLength={getTrimmedInputText(description).length}
-                                disabled={mode === ProgramSectionMode.View}
+                                maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(descriptionMaxLength)}
                             />
                         </div>
                     </div>
@@ -124,7 +124,6 @@ export const SingleImageRight = ({
                                 )}
                                 variant="programSection"
                                 maxSizeMB={PROGRAM_VALIDATION.images.maxSizeMB}
-                                disabled={mode === ProgramSectionMode.View}
                             />
                         </div>
                     </div>
@@ -141,7 +140,7 @@ export const SingleImageRight = ({
                     </div>
                     <div className={baseStyles['right-section']}>
                         <div className={baseStyles['image-wrapper']}>
-                            {imageSrc && <img src={imageSrc} alt="" className={baseStyles.image} />}
+                            {imageSrc && <img src={imageSrc} alt="" className={baseStyles.image} loading="lazy" />}
                         </div>
                     </div>
                 </>

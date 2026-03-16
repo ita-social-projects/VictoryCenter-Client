@@ -5,8 +5,9 @@ import { ProgramListItem } from './ProgramListItem';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { VisibilityStatusLabelProps } from '@/components/admin/visibility-status-label/VisibilityStatusLabel';
 import { VisibilityStatus } from '@/types/admin/common';
-import { Program } from '@/types/admin/programs';
+import { HippotherapyProgram } from '@/types/admin/programs';
 import { ButtonTooltipProps } from '@/components/admin/button-tooltip/ButtonTooltip';
+import { LocalizationLanguage } from '@/types/common/language';
 
 jest.mock('@/assets/icons/blank-image.svg', () => ({
     ReactComponent: ({ className }: { className?: string }) => <svg data-testid="blank-image" className={className} />,
@@ -32,7 +33,7 @@ jest.mock('@/components/admin/visibility-status-label/VisibilityStatusLabel', ()
 });
 
 describe('ProgramListItem', () => {
-    const mockProgram: Program = {
+    const mockProgram: HippotherapyProgram = {
         id: 1,
         name: 'Test Program',
         description: 'Test program description',
@@ -48,13 +49,18 @@ describe('ProgramListItem', () => {
             { id: 2, name: 'Category 2', programsCount: 2 },
         ],
         slug: 'test-program',
+        localizations: [],
     };
 
     const mockHandleOnDeleteProgram = jest.fn();
     const mockHandleOnEditProgram = jest.fn();
+    const mockLanguage: LocalizationLanguage = { id: 1, code: 'uk', name: 'Ukrainian' };
+    const mockTranslationLanguages: LocalizationLanguage[] = [mockLanguage];
 
     const defaultProps = {
         program: mockProgram,
+        language: mockLanguage,
+        translationLanguages: mockTranslationLanguages,
         handleOnDeleteProgram: mockHandleOnDeleteProgram,
         handleOnEditProgram: mockHandleOnEditProgram,
     };
@@ -125,7 +131,7 @@ describe('ProgramListItem', () => {
     });
 
     it('displays drafted tooltip text for drafted program', () => {
-        const draftProgram: Program = { ...mockProgram, status: VisibilityStatus.Draft };
+        const draftProgram: HippotherapyProgram = { ...mockProgram, status: VisibilityStatus.Draft };
         renderProgramListItem({ program: draftProgram });
 
         expect(getDraftedTooltipText()).toBeInTheDocument();
@@ -166,7 +172,7 @@ describe('ProgramListItem', () => {
     });
 
     it('displays image when program has an image and', () => {
-        const programWithImage: Program = {
+        const programWithImage: HippotherapyProgram = {
             ...mockProgram,
             previewImage: {
                 id: 1,

@@ -38,6 +38,7 @@ export interface GenericFormProps<T extends FieldValues> {
     isParentCreating?: boolean;
     isDisabled?: boolean;
     onModeChange?: (mode: GenericFormMode) => void;
+    isPublishDisabled?: boolean;
 }
 
 export enum GenericFormMode {
@@ -80,6 +81,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                 children,
                 isParentCreating = false,
                 onModeChange,
+                isPublishDisabled = false,
             },
             ref,
         ) => {
@@ -245,6 +247,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                             setErrors({});
                             setTouchedFields(new Set());
                             setMode(GenericFormMode.View);
+                            if (isChildForm) setIsExpanded(false);
                         },
                     });
                 } else {
@@ -252,6 +255,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                     setErrors({});
                     setTouchedFields(new Set());
                     setMode(GenericFormMode.View);
+                    if (isChildForm) setIsExpanded(false);
                 }
             };
 
@@ -335,7 +339,8 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                 hasEmptyRequiredFields ||
                 !isChanged() ||
                 Object.values(errors).some((e) => e !== undefined) ||
-                (isDisabled && !isCorrespondentInParentCreation);
+                (isDisabled && !isCorrespondentInParentCreation) ||
+                (isPublishDisabled && !isChildForm);
 
             const handlePublishClick = () => {
                 if (isCorrespondentInParentCreation) {

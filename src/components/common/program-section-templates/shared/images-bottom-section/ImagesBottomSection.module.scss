@@ -1,7 +1,7 @@
 @import '../BaseSectionTemplate.module.scss';
 
 .container {
-    @extend .section-container;
+    @extend %section-container;
     display: flex;
 }
 
@@ -14,7 +14,9 @@
 
 .images-grid {
     display: flex;
-    flex: 1;
+    //flex: 1;
+    height: 100%;
+    max-width: 100%;
     align-items: end;
     justify-content: center;
 }
@@ -31,6 +33,8 @@
 
 .image-wrapper {
     height: 75%;
+    flex: 1 1 0;
+    min-width: 0;
     &[data-elevated='true'] {
         position: relative;
         top: -25%;
@@ -46,16 +50,15 @@
 }
 
 .container.form-container {
-    max-height: 1200px;
     gap: 30px;
 
     .top-section {
-        flex: 40%;
+        height: auto;
+        padding-bottom: 50px;
     }
 
     .bottom-section {
-        flex: 40%;
-        padding-bottom: 100px;
+        margin-bottom: 50px;
     }
 
     .image-wrapper {

@@ -35,7 +35,7 @@ describe('ReportsSection', () => {
         mockReportsData.length = 0;
     });
 
-    describe('without overflow (<= 5 items)', () => {
+    describe('without overflow (<= 2 items)', () => {
         it('renders all items and no toggle button', () => {
             mockReportsData.push({ year: 2024, fileUrl: 'r1.pdf' }, { year: 2023, fileUrl: 'r2.pdf' });
 
@@ -46,7 +46,7 @@ describe('ReportsSection', () => {
         });
     });
 
-    describe('with overflow (> 5 items)', () => {
+    describe('with overflow (> 2 items)', () => {
         beforeEach(() => {
             mockReportsData.push(
                 { year: 2025, fileUrl: 'r1.pdf' },
@@ -58,10 +58,10 @@ describe('ReportsSection', () => {
             );
         });
 
-        it('renders only first 5 items initially and shows toggle button', () => {
+        it('renders only first 2 items initially and shows toggle button', () => {
             render(<ReportsSection />);
 
-            expect(screen.getAllByTestId('report-item-mock')).toHaveLength(5);
+            expect(screen.getAllByTestId('report-item-mock')).toHaveLength(2);
             expect(screen.getByText('reports.showMore')).toBeInTheDocument();
         });
 
@@ -77,7 +77,7 @@ describe('ReportsSection', () => {
 
             await user.click(screen.getByText('reports.showLess'));
 
-            expect(screen.getAllByTestId('report-item-mock')).toHaveLength(5);
+            expect(screen.getAllByTestId('report-item-mock')).toHaveLength(2);
             expect(screen.getByText('reports.showMore')).toBeInTheDocument();
         });
     });

@@ -9,31 +9,41 @@ import { Image } from '@/types/common/image';
 import { RichTextInputGroupProps } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 
 jest.mock('@/components/admin/image-input/ImageInput', () => ({
-    ImageInput: ({ onChange, label, setError }: any) => (
+    ImageInput: ({ onChange, label, setError, disabled }: any) => (
         <div data-testid="mock-image-input">
             <label htmlFor="mock-image-input-id">{label}</label>
             <input
                 data-testid="mock-image-input-file"
                 type="file"
-                onChange={(e) => onChange(e.target.files?.[0])}
                 id="mock-image-input-id"
+                disabled={disabled}
+                onChange={(e) => !disabled && onChange(e.target.files?.[0])}
             />
-            <button onClick={() => setError('image size error')}>Set Error</button>
+            <button onClick={() => !disabled && setError('image size error')}>Set Error</button>
         </div>
     ),
 }));
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
-    RichTextInputGroup: ({ label, onChange, value, maxLength, onBlur, id }: RichTextInputGroupProps) => (
+    RichTextInputGroup: ({
+        label,
+        onChange,
+        value,
+        maxLength,
+        onBlur,
+        id,
+        disabled,
+    }: RichTextInputGroupProps & { disabled?: boolean }) => (
         <div>
             <label htmlFor={id}>{label}</label>
             <input
                 data-testid={`mock-rich-input-${id}`}
-                onChange={(e) => onChange(e.target.value)}
+                onChange={(e) => !disabled && onChange(e.target.value)}
                 value={value}
                 maxLength={maxLength}
                 onBlur={onBlur}
                 id={id}
+                disabled={disabled}
             />
         </div>
     ),
@@ -67,6 +77,7 @@ describe('ImageSection', () => {
                     title: null,
                     imageId: 1,
                     description: null,
+                    localizations: [],
                 },
                 {
                     id: 2,
@@ -75,6 +86,7 @@ describe('ImageSection', () => {
                     image: null,
                     imageId: null,
                     description: null,
+                    localizations: [],
                 },
                 {
                     id: 3,
@@ -83,6 +95,7 @@ describe('ImageSection', () => {
                     title: null,
                     imageId: null,
                     image: null,
+                    localizations: [],
                 },
             ],
             titleLimit,
@@ -92,6 +105,7 @@ describe('ImageSection', () => {
             imageInputProps: { style: { width: '100%' }, subText: '1000x800' },
             isPublishButtonActive: false,
             setIsPublishButtonActive: mockSetIsPublishButtonActive,
+            language: { id: 1, code: 'uk', name: 'Ukrainian' },
         };
 
         return render(<ImageSection {...defaultProps} {...props} />);
@@ -127,8 +141,24 @@ describe('ImageSection', () => {
 
         const { container: noDescriptionContainer } = renderComponent({
             content: [
-                { id: 1, contentType: ContentType.Image, title: null, description: null, imageId: null, image: null },
-                { id: 2, contentType: ContentType.Title, title: null, description: null, imageId: null, image: null },
+                {
+                    id: 1,
+                    contentType: ContentType.Image,
+                    title: null,
+                    description: null,
+                    imageId: null,
+                    image: null,
+                    localizations: [],
+                },
+                {
+                    id: 2,
+                    contentType: ContentType.Title,
+                    title: null,
+                    description: null,
+                    imageId: null,
+                    image: null,
+                    localizations: [],
+                },
             ],
         });
         expect(noDescriptionContainer).toBeEmptyDOMElement();
@@ -188,7 +218,15 @@ describe('ImageSection', () => {
     it('should render correctly without title content', () => {
         renderComponent({
             content: [
-                { id: 1, contentType: ContentType.Image, image: null, title: null, imageId: null, description: null },
+                {
+                    id: 1,
+                    contentType: ContentType.Image,
+                    image: null,
+                    title: null,
+                    imageId: null,
+                    description: null,
+                    localizations: [],
+                },
                 {
                     id: 3,
                     contentType: ContentType.Description,
@@ -196,6 +234,7 @@ describe('ImageSection', () => {
                     title: null,
                     imageId: null,
                     image: null,
+                    localizations: [],
                 },
             ],
         });
@@ -214,6 +253,7 @@ describe('ImageSection', () => {
                     image: null,
                     imageId: null,
                     description: null,
+                    localizations: [],
                 },
                 {
                     id: 3,
@@ -222,6 +262,7 @@ describe('ImageSection', () => {
                     title: null,
                     imageId: null,
                     image: null,
+                    localizations: [],
                 },
             ],
         });
@@ -236,6 +277,7 @@ describe('ImageSection', () => {
             description: null,
             title: null,
             imageId: null,
+            localizations: [],
         });
         expect(mockSetIsPublishButtonActive).toHaveBeenCalledWith(true);
     });
@@ -267,8 +309,24 @@ describe('ImageSection', () => {
     it('should validate empty title on blur when title is null', () => {
         renderComponent({
             content: [
-                { id: 1, contentType: ContentType.Image, image: null, title: null, imageId: null, description: null },
-                { id: 2, contentType: ContentType.Title, title: null, image: null, imageId: null, description: null },
+                {
+                    id: 1,
+                    contentType: ContentType.Image,
+                    image: null,
+                    title: null,
+                    imageId: null,
+                    description: null,
+                    localizations: [],
+                },
+                {
+                    id: 2,
+                    contentType: ContentType.Title,
+                    title: null,
+                    image: null,
+                    imageId: null,
+                    description: null,
+                    localizations: [],
+                },
                 {
                     id: 3,
                     contentType: ContentType.Description,
@@ -276,6 +334,7 @@ describe('ImageSection', () => {
                     title: null,
                     imageId: null,
                     image: null,
+                    localizations: [],
                 },
             ],
         });
@@ -288,7 +347,15 @@ describe('ImageSection', () => {
     it('should validate empty description on blur when description is null', () => {
         renderComponent({
             content: [
-                { id: 1, contentType: ContentType.Image, image: null, title: null, imageId: null, description: null },
+                {
+                    id: 1,
+                    contentType: ContentType.Image,
+                    image: null,
+                    title: null,
+                    imageId: null,
+                    description: null,
+                    localizations: [],
+                },
                 {
                     id: 2,
                     contentType: ContentType.Title,
@@ -296,6 +363,7 @@ describe('ImageSection', () => {
                     image: null,
                     imageId: null,
                     description: null,
+                    localizations: [],
                 },
                 {
                     id: 3,
@@ -304,6 +372,7 @@ describe('ImageSection', () => {
                     title: null,
                     imageId: null,
                     image: null,
+                    localizations: [],
                 },
             ],
         });
@@ -369,5 +438,62 @@ describe('ImageSection', () => {
 
         fireEvent.change(screen.getByTestId('mock-rich-input-3'), { target: { value: 'b' } });
         expect(getPublishButton()).toBeEnabled();
+    });
+
+    it('should prevent edits and hide publish button for non-base language', () => {
+        renderComponent({ language: { id: 2, code: 'en', name: 'English' } });
+
+        const titleInput = screen.getByTestId('mock-rich-input-2');
+        expect(titleInput).toBeDisabled();
+        fireEvent.change(titleInput, { target: { value: 'Attempt title change' } });
+        expect(mockOnChange).not.toHaveBeenCalled();
+
+        const descriptionInput = screen.getByTestId('mock-rich-input-3');
+        expect(descriptionInput).toBeDisabled();
+        fireEvent.change(descriptionInput, { target: { value: 'Attempt desc change' } });
+        expect(mockOnChange).not.toHaveBeenCalled();
+
+        const imageInput = screen.getByTestId('mock-image-input-file');
+        expect(imageInput).toBeDisabled();
+
+        expect(screen.queryByRole('button', { name: 'Опублікувати' })).not.toBeInTheDocument();
+    });
+
+    it('should validate title on blur for base language', () => {
+        renderComponent();
+
+        const titleInput = screen.getByTestId('mock-rich-input-2');
+
+        fireEvent.change(titleInput, { target: { value: 'invalid text' } });
+
+        fireEvent.blur(titleInput);
+
+        expect(WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText).toHaveBeenCalled();
+    });
+
+    it('should validate description on blur for base language', () => {
+        renderComponent();
+
+        const descInput = screen.getByTestId('mock-rich-input-3');
+
+        fireEvent.change(descInput, { target: { value: 'invalid text' } });
+
+        fireEvent.blur(descInput);
+
+        expect(WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText).toHaveBeenCalled();
+    });
+
+    it('should not validate title or description on blur for non-base language', () => {
+        renderComponent({ language: { id: 2, code: 'en', name: 'English' } });
+
+        const titleInput = screen.getByTestId('mock-rich-input-2');
+        const descInput = screen.getByTestId('mock-rich-input-3');
+
+        (WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText as jest.Mock).mockClear();
+
+        fireEvent.blur(titleInput);
+        fireEvent.blur(descInput);
+
+        expect(WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText).not.toHaveBeenCalled();
     });
 });

@@ -1,0 +1,136 @@
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
+@import '../shared/BaseSectionTemplate.module.scss';
+
+.faq-section {
+    @extend %section-container;
+
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: clamp(100px, 1200px, 1200px);
+    min-height: 300px;
+    background-color: c.$white;
+    padding: 0 60px;
+
+    &.template {
+        height: 500px;
+        overflow: hidden;
+        padding: 0 5%;
+    }
+
+    &.editable {
+        height: auto;
+        min-height: 500px;
+        padding: 64px 60px;
+        justify-content: space-between;
+    }
+}
+
+.faq-block {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    border-top: 2px solid c.$light-blue-100;
+    padding-top: 24px;
+    gap: 10px;
+
+    .template & {
+        padding-top: 24px;
+    }
+
+    .editable & {
+        border-top: none;
+        gap: 12%;
+    }
+}
+
+.title {
+    flex: 0 0 41%;
+    @include type.h3-bold-uppercase;
+    text-transform: uppercase;
+    color: c.$blue-900;
+
+    .template & {
+        width: 100%;
+        font-size: clamp(12px, 2vw, 40px);
+        line-height: clamp(14px, 2.4vw, 48px);
+        text-align: center;
+    }
+}
+
+.left-section {
+    flex: 0 0 41%;
+
+    .editable & {
+        flex: 0 0 30%;
+    }
+}
+
+.right-section {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.cards-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.title-input-group {
+    :global(.char-limit-textarea__wrapper) {
+        box-shadow: none;
+    }
+
+    :global(.char-limit-textarea__field) {
+        @include type.h3-bold-uppercase;
+        color: c.$blue-900;
+        text-transform: uppercase;
+    }
+
+    :global(.char-limit-textarea__field::placeholder) {
+        @include type.h3-bold;
+        color: c.$grey-700;
+        opacity: 1;
+    }
+}
+
+.actions-row {
+    display: flex;
+    justify-content: start;
+}
+
+.add-button {
+    width: 95%;
+    height: 61px;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.questions-container {
+    @include type.h3-semibold;
+
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+
+    .template & {
+        gap: clamp(4px, 0.5vw, 8px);
+        max-width: 100%;
+        font-size: clamp(8px, 1vw, 14px);
+        pointer-events: none;
+        -webkit-user-select: none;
+        user-select: none;
+    }
+}
+
+.faq-card-program-section {
+    border-bottom-color: c.$light-blue-100;
+    width: 100%;
+    max-width: 48rem;
+}

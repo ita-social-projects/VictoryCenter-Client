@@ -23,15 +23,15 @@
     @include type.small-text-regular;
 }
 
-.bg-level-0 {
-    background-color: c.$light-blue-300;
+.square[data-level='0'] {
+    background: c.$light-blue-300;
 }
-.bg-level-1 {
-    background-color: c.$light-blue-200;
+.square[data-level='1'] {
+    background: c.$light-blue-200;
 }
-.bg-level-2 {
-    background-color: c.$light-blue-100;
+.square[data-level='2'] {
+    background: c.$light-blue-100;
 }
-.bg-level-3 {
-    background-color: c.$light-blue-50;
+.square[data-level='3'] {
+    background: c.$light-blue-50;
 }

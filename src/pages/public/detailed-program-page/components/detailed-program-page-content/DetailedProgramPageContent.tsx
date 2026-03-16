@@ -10,8 +10,14 @@ import { ReactComponent as CalendarDays } from '@/assets/icons/calendar-days.svg
 import { useProgramBySlug } from '@/hooks/common/use-get-program-by-slug/useGetProgramBySlug';
 import { InfoItem } from '../info-item/InfoItem';
 import { DetailedProgramSection } from '@/components/public/detailed-program-section/DetailedProgramSection';
+import { CtaSection } from '@/components/public/cta';
+import { PUBLIC_ROUTES } from '@/const/public/routes';
+import outroVideo from '@/assets/videos/public/detailed-program-page/support_program_background.mp4';
+import { useTranslation } from 'react-i18next';
 
 export const DetailedProgramPageContent: React.FC = () => {
+    const { t } = useTranslation('detailedProgramPage');
+
     const { slug } = useParams<{ slug: string }>();
 
     const { program, isLoading, error } = useProgramBySlug(slug);
@@ -70,6 +76,15 @@ export const DetailedProgramPageContent: React.FC = () => {
                     ))}
                 </div>
             )}
+            <CtaSection
+                title={t('SUPPORT_PROGRAM_TITLE')}
+                description={t('SUPPORT_PROGRAM_DETAILS')}
+                mediaUrl={outroVideo}
+                buttons={[
+                    { label: t('DONATE'), href: PUBLIC_ROUTES.DONATE.FULL },
+                    { label: t('BECOME_PARTNER'), href: PUBLIC_ROUTES.DONATE.FULL },
+                ]}
+            />
         </div>
     );
 };

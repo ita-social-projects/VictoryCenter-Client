@@ -32,7 +32,7 @@ export const Header = () => {
     ];
 
     const programsLinks: DropdownLink[] = [
-        { text: t('HIPPOTHERAPY'), navigateTo: '', isDisabled: true },
+        { text: t('HIPPOTHERAPY'), navigateTo: PUBLIC_ROUTES.HIPPOTHERAPY.FULL, isDisabled: false },
         { text: t('PROGRAMS'), navigateTo: PUBLIC_ROUTES.PROGRAMS.FULL, isDisabled: false },
         { text: t('PROGRAMS_SESSIONS'), navigateTo: '', isDisabled: true },
     ];

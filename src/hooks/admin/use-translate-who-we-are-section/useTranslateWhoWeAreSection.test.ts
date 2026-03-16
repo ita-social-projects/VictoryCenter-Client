@@ -117,7 +117,7 @@ describe('useTranslateWhoWeAreSection', () => {
     const renderTranslateHook = (options: Partial<Parameters<typeof useTranslateWhoWeAreSection>[0]> = {}) => {
         const onSuccess = options.onSuccess ?? jest.fn();
 
-        const hookResult = renderHook(() =>
+        const utils = renderHook(() =>
             useTranslateWhoWeAreSection({
                 section: baseSection,
                 language: englishLanguage,
@@ -127,7 +127,7 @@ describe('useTranslateWhoWeAreSection', () => {
             }),
         );
 
-        return { ...hookResult, onSuccess };
+        return { ...utils, onSuccess };
     };
 
     beforeEach(() => {

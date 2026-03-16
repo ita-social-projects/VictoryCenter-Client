@@ -9,9 +9,7 @@ jest.mock('@/components/common/select/Select', () => ({
 }));
 
 jest.mock('@/components/admin/language-toolkit/LanguageToolkit', () => ({
-    LanguageToolkit: ({ onLanguageChange, languages }: any) => (
-        <div data-testid="mock-language-toolkit">Mock Language Toolkit</div>
-    ),
+    LanguageToolkit: () => <div data-testid="mock-language-toolkit">Mock Language Toolkit</div>,
 }));
 
 const mockLanguages = [

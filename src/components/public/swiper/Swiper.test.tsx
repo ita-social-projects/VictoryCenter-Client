@@ -13,24 +13,14 @@ jest.mock('@/assets/icons/arrow-left.svg', () => ({
 }));
 
 let mockSwiperInstance: any;
-let mockInitCallback: any;
-let mockSlideChangeCallback: any;
 let mockResizeCallback: any;
-let mockReachBeginningCallback: any;
-let mockReachEndCallback: any;
-let mockFromEdgeCallback: any;
 
 jest.mock('swiper/react', () => {
     const React = require('react');
     return {
         Swiper: ({ children, onInit, onSlideChange, onResize, onReachBeginning, onReachEnd, onFromEdge }: any) => {
             React.useEffect(() => {
-                mockInitCallback = onInit;
-                mockSlideChangeCallback = onSlideChange;
                 mockResizeCallback = onResize;
-                mockReachBeginningCallback = onReachBeginning;
-                mockReachEndCallback = onReachEnd;
-                mockFromEdgeCallback = onFromEdge;
 
                 if (onInit) {
                     mockSwiperInstance = {
@@ -46,7 +36,7 @@ jest.mock('swiper/react', () => {
                     };
                     onInit(mockSwiperInstance);
                 }
-            }, [onInit]);
+            }, [onInit, onSlideChange, onResize, onReachBeginning, onReachEnd, onFromEdge]);
             return <div data-testid="swiper">{children}</div>;
         },
         SwiperSlide: ({ children, className }: any) => (
@@ -73,12 +63,7 @@ describe('Swiper', () => {
 
     beforeEach(() => {
         mockSwiperInstance = null;
-        mockInitCallback = null;
-        mockSlideChangeCallback = null;
         mockResizeCallback = null;
-        mockReachBeginningCallback = null;
-        mockReachEndCallback = null;
-        mockFromEdgeCallback = null;
     });
 
     it('renders slides correctly', () => {

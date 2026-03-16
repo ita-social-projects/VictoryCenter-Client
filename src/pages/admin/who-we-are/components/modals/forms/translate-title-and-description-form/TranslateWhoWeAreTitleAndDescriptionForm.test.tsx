@@ -1,5 +1,5 @@
 import React, { createRef } from 'react';
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import {
     TranslateWhoWeAreTitleAndDescriptionForm,

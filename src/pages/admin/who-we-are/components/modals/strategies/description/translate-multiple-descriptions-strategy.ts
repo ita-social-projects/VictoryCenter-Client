@@ -28,6 +28,9 @@ export const translateMultipleDescriptionsStrategy: WhoWeAreModalStrategy<Transl
                 case SectionType.People:
                     defaultImagesForSection = [ManAndHorse, GirlAndHorse, OldManAndHorse, WomanAndHorse];
                     break;
+                default:
+                    defaultImagesForSection = [];
+                    break;
             }
 
             return {

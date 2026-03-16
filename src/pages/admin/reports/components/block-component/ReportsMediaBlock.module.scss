@@ -76,10 +76,7 @@
 }
 
 .title {
-    font-size: 24px;
-    font-weight: 500;
-    line-height: 24px;
-    letter-spacing: -0.02em;
+    @include t.subtitle-1-medium;
     height: 28px;
     margin-bottom: 5px;
 }

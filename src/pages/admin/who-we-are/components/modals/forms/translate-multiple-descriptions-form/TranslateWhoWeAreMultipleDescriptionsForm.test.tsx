@@ -5,34 +5,18 @@ import {
     TranslateWhoWeAreMultipleDescriptionsForm,
     TranslateWhoWeAreMultipleDescriptionsFormRef,
 } from './TranslateWhoWeAreMultipleDescriptionsForm';
+import { getWhoWeAreValidationMock } from '@/utils/test-mocks/who-we-are-form-mocks';
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
-    RichTextInputGroup: ({ id, value, onChange, onBlur, onFocus, disabled, error }: any) => (
-        <div>
-            <textarea
-                data-testid={`rich-text-${id}`}
-                value={value}
-                onChange={(event) => onChange(event.target.value)}
-                onBlur={onBlur}
-                onFocus={onFocus}
-                disabled={disabled}
-            />
-            {error && <span data-testid={`error-${id}`}>{error}</span>}
-        </div>
-    ),
+    RichTextInputGroup: (props: any) => require('@/utils/test-mocks/who-we-are-form-mocks').MockRichTextInputGroup(props),
 }));
 
-jest.mock('@/validation/admin/who-we-are-schema/WhoWeAreSchema', () => ({
-    WHO_WE_ARE_VALIDATION_FUNCTIONS: {
-        validateText: jest.fn(() => undefined),
-    },
-}));
+jest.mock(
+    '@/validation/admin/who-we-are-schema/WhoWeAreSchema',
+    () => require('@/utils/test-mocks/who-we-are-form-mocks').mockWhoWeAreSchemaModule,
+);
 
-const { WHO_WE_ARE_VALIDATION_FUNCTIONS } = jest.requireMock('@/validation/admin/who-we-are-schema/WhoWeAreSchema') as {
-    WHO_WE_ARE_VALIDATION_FUNCTIONS: { validateText: jest.Mock };
-};
-
-const validationMock = WHO_WE_ARE_VALIDATION_FUNCTIONS;
+const validationMock = getWhoWeAreValidationMock();
 
 const initialData = {
     rows: [

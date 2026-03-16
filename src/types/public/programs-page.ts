@@ -1,3 +1,4 @@
+import { HippotherapyProgramLocalization, HippotherapyProgramLocalizationDto } from '../admin/programs';
 import { Image } from '../common/image';
 import { HippotherapyProgramSectionDto } from '../common/program-sections';
 
@@ -13,6 +14,7 @@ export interface PublishedProgramDto {
     name: string;
     description: string;
     categories: ProgramCategoryDto[];
+    localizations: HippotherapyProgramLocalizationDto[];
 }
 
 export interface ProgramsPageData {
@@ -20,7 +22,7 @@ export interface ProgramsPageData {
     programsData: PublishedProgramDto[];
 }
 
-export interface DetailedProgram {
+export interface DetailedProgramDto {
     id: number;
     name: string;
     description: string;
@@ -29,6 +31,7 @@ export interface DetailedProgram {
     location: string;
     participantsCount: string;
     meetingsCount: string;
+    localizations: HippotherapyProgramLocalizationDto[];
     sections: HippotherapyProgramSectionDto[];
     slug: string;
 }

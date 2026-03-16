@@ -5,8 +5,10 @@ import {
     ProgramSectionMode,
 } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
+import { useLocale } from '@/hooks/common/use-locale/useLocale';
 import { renderProgramSection } from '@/utils/functions/render-program-section';
 import { getDescriptionAuthorPairsByGroup } from '@/utils/functions/mappers/public/program/get-grouped-program-section-content-pairs';
+import { mapLocalizationDtoToModel } from '@/utils/functions/mappers/common/localization/localization-mappers';
 import styles from './DetailedProgramSection.module.scss';
 
 export interface DetailedProgramSectionProps {
@@ -24,22 +26,60 @@ const getDescriptionsInOrder = (contents: HippotherapyProgramSectionContentDto[]
     return contents.filter((c) => c.contentType === ContentType.Description).sort((a, b) => a.order - b.order);
 };
 
-export const DetailedProgramSection: React.FC<DetailedProgramSectionProps> = ({ section }) => {
-    const titleContent = getContentByType(section.contents, ContentType.Title);
-    const descriptionContent = getContentByType(section.contents, ContentType.Description);
+const localizeContent = (
+    content: HippotherapyProgramSectionContentDto,
+    currentLanguage: string,
+): HippotherapyProgramSectionContentDto => {
+    const contentLocalization = (content.localizations ?? [])
+        .map((item) => mapLocalizationDtoToModel(item))
+        .find((item) => item.language.code === currentLanguage);
 
-    const descriptionAuthorPairs = getDescriptionAuthorPairsByGroup(section.contents).map((pair) => ({
+    const faqLocalization = content.faqQuestion?.localizations?.find((loc) => loc.language.code === currentLanguage);
+
+    const {
+        language: _language1,
+        translationStatus: _translationStatus1,
+        entityId: _entityId,
+        ...localizedFields
+    } = contentLocalization ?? {};
+    const {
+        language: _language2,
+        translationStatus: _translationStatus2,
+        ...localizedFaqFields
+    } = faqLocalization ?? {};
+
+    return {
+        ...content,
+        ...localizedFields,
+        faqQuestion: content.faqQuestion
+            ? {
+                  ...content.faqQuestion,
+                  ...localizedFaqFields,
+              }
+            : null,
+    };
+};
+
+export const DetailedProgramSection: React.FC<DetailedProgramSectionProps> = ({ section }) => {
+    const { currentLanguage } = useLocale();
+
+    const localizedContents = section.contents.map((content) => localizeContent(content, currentLanguage));
+
+    const titleContent = getContentByType(localizedContents, ContentType.Title);
+    const descriptionContent = getContentByType(localizedContents, ContentType.Description);
+
+    const descriptionAuthorPairs = getDescriptionAuthorPairsByGroup(localizedContents).map((pair) => ({
         description: pair.description,
         author: pair.author,
     }));
 
-    const orderedTitleContents = section.contents
+    const orderedTitleContents = localizedContents
         .filter((c) => c.contentType === ContentType.Title)
         .sort((a, b) => a.order - b.order);
 
-    const orderedDescriptionContents = getDescriptionsInOrder(section.contents);
+    const orderedDescriptionContents = getDescriptionsInOrder(localizedContents);
 
-    const imageContents = section.contents
+    const imageContents = localizedContents
         .filter((c) => c.contentType === ContentType.Image)
         .sort((a, b) => a.order - b.order)
         .map((c) => c.image || null);
@@ -51,7 +91,7 @@ export const DetailedProgramSection: React.FC<DetailedProgramSectionProps> = ({ 
 
     const descriptions = orderedDescriptionContents.map((d) => d.description || '');
 
-    const faqQuestions = section.contents
+    const faqQuestions = localizedContents
         .filter((c) => c.contentType === ContentType.FaqQuestion && c.faqQuestion != null)
         .sort((a, b) => a.order - b.order)
         .map((c) => c.faqQuestion!);

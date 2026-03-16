@@ -142,7 +142,6 @@ describe('ReportsMediaBlock', () => {
         imageWidth: 600,
         imageHeight: 500,
         imageUrl: 'https://example.com/default.png',
-        isEditing: false,
         isValueEditable: true,
         totalAmountMaxLength: 15,
         validationFunctions: defaultValidationFunctions,
@@ -198,64 +197,29 @@ describe('ReportsMediaBlock', () => {
     });
 
     describe('Editing state', () => {
-        it('should not apply editing class when isEditing is false', () => {
-            const { container } = renderComponent({ isEditing: false });
-
-            const root = container.firstChild as HTMLElement;
-            expect(root).toHaveClass('root');
-            expect(root).not.toHaveClass('root-editing');
-        });
-
-        it('should apply editing class when isEditing is true', () => {
-            const { container } = renderComponent({ isEditing: true });
-
-            const root = container.firstChild as HTMLElement;
-            expect(root).toHaveClass('root');
-        });
-
-        it('should disable title input when not editing', () => {
-            renderComponent({ isEditing: false });
-
-            const titleInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-title');
-            expect(titleInput).toBeDisabled();
-        });
-
-        it('should enable title input when editing', () => {
-            renderComponent({ isEditing: true });
+        it('should always enable title input (editing mode only)', () => {
+            renderComponent();
 
             const titleInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-title');
             expect(titleInput).not.toBeDisabled();
         });
 
-        it('should disable total amount input when not editing', () => {
-            renderComponent({ isEditing: false, isValueEditable: true });
+        it('should disable total amount input when isValueEditable is false', () => {
+            renderComponent({ isValueEditable: false });
 
             const valueInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-value');
             expect(valueInput).toBeDisabled();
         });
 
-        it('should disable total amount input when editing but isValueEditable is false', () => {
-            renderComponent({ isEditing: true, isValueEditable: false });
-
-            const valueInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-value');
-            expect(valueInput).toBeDisabled();
-        });
-
-        it('should enable total amount input when editing and isValueEditable is true', () => {
-            renderComponent({ isEditing: true, isValueEditable: true });
+        it('should enable total amount input when isValueEditable is true', () => {
+            renderComponent({ isValueEditable: true });
 
             const valueInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-value');
             expect(valueInput).not.toBeDisabled();
         });
 
-        it('should disable image input when not editing', () => {
-            renderComponent({ isEditing: false });
-
-            expect(screen.getByTestId('mock-image-disabled')).toHaveTextContent('disabled');
-        });
-
-        it('should enable image input when editing', () => {
-            renderComponent({ isEditing: true });
+        it('should always enable image input (editing mode only)', () => {
+            renderComponent();
 
             expect(screen.getByTestId('mock-image-disabled')).toHaveTextContent('enabled');
         });
@@ -265,7 +229,7 @@ describe('ReportsMediaBlock', () => {
         it('should call onValuesChange with updated title and validation error on change', () => {
             const titleError = 'Title is too short';
             mockValidateTitle.mockReturnValue(titleError);
-            renderComponent({ isEditing: true });
+            renderComponent();
 
             const titleInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-title');
             fireEvent.change(titleInput, { target: { value: 'New' } });
@@ -276,7 +240,7 @@ describe('ReportsMediaBlock', () => {
 
         it('should call onValuesChange with no error when title is valid on change', () => {
             mockValidateTitle.mockReturnValue(undefined);
-            renderComponent({ isEditing: true });
+            renderComponent();
 
             const titleInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-title');
             fireEvent.change(titleInput, { target: { value: 'Valid Title Text' } });
@@ -291,7 +255,7 @@ describe('ReportsMediaBlock', () => {
         it('should validate title on blur', () => {
             const titleError = "Заголовок обов'язковий";
             mockValidateTitle.mockReturnValue(titleError);
-            renderComponent({ isEditing: true });
+            renderComponent();
 
             const titleInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-title');
             fireEvent.blur(titleInput);
@@ -304,7 +268,7 @@ describe('ReportsMediaBlock', () => {
     describe('Total amount handling', () => {
         it('should call onValuesChange with updated numeric value on change', () => {
             mockValidateTotalAmount.mockReturnValue(undefined);
-            renderComponent({ isEditing: true, isValueEditable: true });
+            renderComponent({ isValueEditable: true });
 
             const valueInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-value');
             fireEvent.change(valueInput, { target: { value: '300000' } });
@@ -319,7 +283,7 @@ describe('ReportsMediaBlock', () => {
         it('should call onValuesChange with validation error for invalid value', () => {
             const valueError = 'Значення повинно бути числом';
             mockValidateTotalAmount.mockReturnValue(valueError);
-            renderComponent({ isEditing: true, isValueEditable: true });
+            renderComponent({ isValueEditable: true });
 
             const valueInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-value');
             fireEvent.change(valueInput, { target: { value: 'abc' } });
@@ -332,7 +296,7 @@ describe('ReportsMediaBlock', () => {
 
         it('should validate total amount on blur', () => {
             mockValidateTotalAmount.mockReturnValue(undefined);
-            renderComponent({ isEditing: true, isValueEditable: true });
+            renderComponent({ isValueEditable: true });
 
             const valueInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-value');
             fireEvent.blur(valueInput);
@@ -343,7 +307,6 @@ describe('ReportsMediaBlock', () => {
 
         it('should work without validateTotalAmount function', () => {
             renderComponent({
-                isEditing: true,
                 isValueEditable: true,
                 validationFunctions: { validateTitle: mockValidateTitle },
             });
@@ -367,7 +330,7 @@ describe('ReportsMediaBlock', () => {
 
     describe('Image handling', () => {
         it('should call onValuesChange with new image on upload', () => {
-            renderComponent({ isEditing: true });
+            renderComponent();
 
             fireEvent.click(screen.getByTestId('mock-image-upload'));
 
@@ -387,7 +350,7 @@ describe('ReportsMediaBlock', () => {
                 image: { base64: 'data:image/png;base64,abc123', mimeType: 'image/png' },
                 imageId: 5,
             };
-            renderComponent({ values: valuesWithImage, isEditing: true });
+            renderComponent({ values: valuesWithImage });
 
             fireEvent.click(screen.getByTestId('mock-image-clear'));
 
@@ -402,7 +365,7 @@ describe('ReportsMediaBlock', () => {
                 ...defaultValues,
                 imageId: 10,
             };
-            renderComponent({ values: valuesWithImageId, isEditing: true });
+            renderComponent({ values: valuesWithImageId });
 
             fireEvent.click(screen.getByTestId('mock-image-upload'));
 
@@ -417,7 +380,7 @@ describe('ReportsMediaBlock', () => {
         });
 
         it('should call onValuesChange with image error from setError', () => {
-            renderComponent({ isEditing: true });
+            renderComponent();
 
             fireEvent.click(screen.getByTestId('mock-image-set-error'));
 
@@ -425,7 +388,7 @@ describe('ReportsMediaBlock', () => {
         });
 
         it('should ignore null error from setError', () => {
-            renderComponent({ isEditing: true });
+            renderComponent();
 
             fireEvent.click(screen.getByTestId('mock-image-clear-error'));
 

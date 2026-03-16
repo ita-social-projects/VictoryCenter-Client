@@ -35,7 +35,6 @@ export interface ReportsMediaBlockProps {
     imageWidth: number;
     imageHeight: number;
     imageUrl: string;
-    isEditing: boolean;
     isValueEditable: boolean;
     totalAmountMaxLength: number;
     validationFunctions: ReportsMediaBlockValidationFunctions;
@@ -51,12 +50,12 @@ export const ReportsMediaBlock = ({
     imageWidth,
     imageHeight,
     imageUrl,
-    isEditing,
     isValueEditable,
     totalAmountMaxLength,
     validationFunctions,
     onValuesChange,
 }: ReportsMediaBlockProps) => {
+    const isEditing = true;
     const handleTitleChange = useCallback(
         (e: React.ChangeEvent<HTMLTextAreaElement>) => {
             const value = e.target.value;

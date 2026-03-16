@@ -2,7 +2,6 @@ import { render, waitFor } from '@testing-library/react';
 import { HippotherapyPage } from './HippotherapyPage';
 import { hippotherapyMock as mockHippotherapyData } from '@/utils/mock-data/public/hippotherapy';
 import { LoadableContent } from '@/components/common/loadable-content/LoadableContent';
-import { HippotherapyIntro } from './intro/HippotherapyIntro';
 
 jest.mock('@/components/common/loadable-content/LoadableContent');
 const MockLoadableContent = LoadableContent as jest.Mock;

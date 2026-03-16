@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './TeamPage.scss';
-import horseVideo from '@/assets/videos/quote_background.webm';
+import horseVideo from '@/assets/videos/quote-background.webm';
 import classNames from 'classnames';
 import {
     DOWNLOAD_ERROR,

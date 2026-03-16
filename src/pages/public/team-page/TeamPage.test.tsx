@@ -5,7 +5,7 @@ import { MemberCard, TeamItem } from '@/types/public/team-page';
 import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
 import { EntityLocalization } from '@/types/common/language';
 
-jest.mock('@/assets/videos/quote_background.webm', () => 'mocked-video.webm');
+jest.mock('@/assets/videos/quote-background.webm', () => 'mocked-video.webm');
 jest.mock('@/hooks/common/use-get-localization/useGetLocalization', () => ({
     useGetLocalization: jest.fn(),
 }));

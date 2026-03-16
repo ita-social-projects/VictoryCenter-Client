@@ -12,7 +12,7 @@ import { InfoItem } from '../info-item/InfoItem';
 import { DetailedProgramSection } from '@/components/public/detailed-program-section/DetailedProgramSection';
 import { CtaSection } from '@/components/public/cta';
 import { PUBLIC_ROUTES } from '@/const/public/routes';
-import outroVideo from '@/assets/videos/child_riding_horse.webm';
+import outroVideo from '@/assets/videos/child-riding-horse.webm';
 import { useTranslation } from 'react-i18next';
 
 export const DetailedProgramPageContent: React.FC = () => {

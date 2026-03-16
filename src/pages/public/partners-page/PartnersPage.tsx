@@ -6,7 +6,7 @@ import { DOWNLOAD_ERROR } from '@/const/public/partners-page';
 import { LinearProgress } from '@mui/material';
 import styles from './PartnersPage.module.scss';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
-import outroVideo from '@/assets/videos/child_riding_horse.webm';
+import outroVideo from '@/assets/videos/child-riding-horse.webm';
 import { CTA_DATA } from '@/utils/mock-data/public/partners-page';
 import { CtaSection } from '@/components/public/cta';
 import { PUBLIC_ROUTES } from '@/const/public/routes';

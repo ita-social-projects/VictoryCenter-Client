@@ -13,7 +13,7 @@ jest.mock('@/components/public/cta', () => ({
     CtaSection: (props: any) => <div data-testid="cta-section-mock" data-props={JSON.stringify(props)} />,
 }));
 
-jest.mock('@/assets/videos/child_riding_horse.webm', () => 'mock-outro-video.webm');
+jest.mock('@/assets/videos/child-riding-horse.webm', () => 'mock-outro-video.webm');
 
 jest.mock('react-i18next', () => ({
     useTranslation: () => ({

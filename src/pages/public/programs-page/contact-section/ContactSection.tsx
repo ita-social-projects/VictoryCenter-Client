@@ -1,5 +1,5 @@
 import React from 'react';
-import background from '@/assets/videos/child_riding_horse.webm';
+import background from '@/assets/videos/child-riding-horse.webm';
 import { useTranslation } from 'react-i18next';
 import './ContactSection.scss';
 

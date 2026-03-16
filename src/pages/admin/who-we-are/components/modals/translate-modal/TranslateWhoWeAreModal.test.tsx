@@ -308,10 +308,8 @@ describe('TranslateWhoWeAreModal', () => {
         expect(mockGetInitialDataTitleAndDescription).not.toHaveBeenCalled();
 
         const strategyForm = screen.getByTestId('strategy-form');
-        expect(strategyForm.getAttribute('data-description-limit')).toBe(
-            String(WhoWeSupportCardsProps.descriptionLimit),
-        );
-        expect(strategyForm.getAttribute('data-title-limit')).toBe('');
+        expect(strategyForm.dataset.descriptionLimit).toBe(String(WhoWeSupportCardsProps.descriptionLimit));
+        expect(strategyForm.dataset.titleLimit).toBe('');
     });
 
     it('uses title and description strategy and passes title limit for Main section', () => {
@@ -329,7 +327,7 @@ describe('TranslateWhoWeAreModal', () => {
         expect(mockGetInitialDataDescription).not.toHaveBeenCalled();
 
         const strategyForm = screen.getByTestId('strategy-form');
-        expect(strategyForm.getAttribute('data-description-limit')).toBe(String(MainPageProps.descriptionLimit));
-        expect(strategyForm.getAttribute('data-title-limit')).toBe(String(MainPageProps.titleLimit));
+        expect(strategyForm.dataset.descriptionLimit).toBe(String(MainPageProps.descriptionLimit));
+        expect(strategyForm.dataset.titleLimit).toBe(String(MainPageProps.titleLimit));
     });
 });

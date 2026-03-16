@@ -1,9 +1,13 @@
 @use '@/assets/sass/variables/colors' as c;
 @use '@/assets/sass/mixins/typography.mixins' as type;
+@use '@/assets/sass/variables/z-index';
 
 .table-wrapper {
     width: 100%;
     overflow-x: auto;
+    overflow-y: auto;
+    max-height: 60vh;
+    scroll-behavior: smooth;
     background: #f8fafc;
     border: 1px solid #e2e2e2;
     border-radius: 16px;
@@ -161,4 +165,35 @@
     height: 20px;
     color: c.$blue-500;
     fill: c.$blue-500;
+}
+
+.to-top-button {
+    display: inline-flex;
+    margin-top: 16px;
+    margin-left: auto;
+    margin-right: 16px;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border: none;
+    border-radius: 50%;
+    background-color: c.$blue-500;
+    box-shadow: 0 2px 8px rgba(c.$blue-50, 0.15);
+    cursor: pointer;
+    z-index: z-index.admin(infinite-scroll-list-arrow-up);
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.to-top-button-visible {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.to-top-icon path {
+    stroke: c.$white;
 }

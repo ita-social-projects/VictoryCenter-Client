@@ -122,13 +122,20 @@ export const useTranslateWhoWeAreSection = ({
                     ...section,
                     contents: section.contents.map((content) => {
                         const translatedLocalization = localization.find((item) => item.entityId === content.id);
+                        const existingLocalizations = content.localizations ?? [];
+                        const hasTargetLanguage = existingLocalizations.some((loc) => loc.language.id === language.id);
+
+                        const nextLocalizations = translatedLocalization
+                            ? hasTargetLanguage
+                                ? existingLocalizations.map((loc) =>
+                                      loc.language.id === language.id ? translatedLocalization : loc,
+                                  )
+                                : [...existingLocalizations, translatedLocalization]
+                            : existingLocalizations;
 
                         return {
                             ...content,
-                            localizations:
-                                content.localizations?.map((loc) =>
-                                    loc.language.id === language.id ? (translatedLocalization ?? loc) : loc,
-                                ) || [],
+                            localizations: nextLocalizations,
                         };
                     }),
                 };

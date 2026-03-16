@@ -107,6 +107,67 @@ describe('TranslateWhoWeAreDescriptionForm', () => {
         jest.useRealTimers();
     });
 
+    it('validates on focus when form is ready', async () => {
+        jest.useFakeTimers();
+        renderForm();
+
+        act(() => {
+            jest.runAllTimers();
+        });
+
+        fireEvent.focus(screen.getByTestId('rich-text-description'));
+
+        await waitFor(() => {
+            expect(validationMock.validateText).toHaveBeenCalled();
+        });
+
+        jest.useRealTimers();
+    });
+
+    it('validates on change when form is ready', async () => {
+        jest.useFakeTimers();
+        renderForm();
+
+        act(() => {
+            jest.runAllTimers();
+        });
+
+        fireEvent.change(screen.getByTestId('rich-text-description'), {
+            target: { value: '<p>Ready change</p>' },
+        });
+
+        await waitFor(() => {
+            expect(validationMock.validateText).toHaveBeenCalledWith('Ready change');
+        });
+
+        jest.useRealTimers();
+    });
+
+    it('uses empty description fallback on blur when description is undefined', async () => {
+        jest.useFakeTimers();
+        renderForm({
+            initialData: { description: undefined as unknown as string },
+        });
+
+        act(() => {
+            jest.runAllTimers();
+        });
+
+        fireEvent.blur(screen.getByTestId('rich-text-description'));
+
+        await waitFor(() => {
+            expect(validationMock.validateText).toHaveBeenCalledWith('');
+        });
+
+        jest.useRealTimers();
+    });
+
+    it('disables description input when formDisabled is true', () => {
+        renderForm({ formDisabled: true });
+
+        expect(screen.getByTestId('rich-text-description')).toBeDisabled();
+    });
+
     it('submits form data via ref', async () => {
         const onSubmit = jest.fn();
         const { ref } = renderForm({ onSubmit });

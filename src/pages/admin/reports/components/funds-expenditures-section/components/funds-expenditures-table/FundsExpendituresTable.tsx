@@ -1,7 +1,8 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
 import { FundsExpendituresTransactionType, ReportFundsExpendituresRecord } from '@/types/admin/reports';
 import { ReactComponent as NotFoundIcon } from '@/assets/icons/not-found.svg';
+import { ReactComponent as ArrowUpIcon } from '@/assets/icons/arrow-up.svg';
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as DeleteIcon } from '@/assets/icons/delete.svg';
 import { SortIcon } from '@/pages/admin/reports/components/funds-expenditures-section/components/funds-expenditures-table/components/sort-icon';
@@ -54,6 +55,28 @@ const sortRecords = (records: EnrichedRecord[], sort: ColumnSort): EnrichedRecor
 
 export const FundsExpendituresTable = ({ records, isEditing = false }: FundsExpendituresTableProps) => {
     const [sort, setSort] = useState<ColumnSort>({ column: null, direction: null });
+    const [isMoveToTopVisible, setIsMoveToTopVisible] = useState(false);
+    const tableWrapperRef = useRef<HTMLDivElement>(null);
+
+    const updateMoveToTopVisibility = useCallback(() => {
+        const tableWrapper = tableWrapperRef.current;
+        if (!tableWrapper) return;
+
+        const isScrollable = tableWrapper.scrollHeight > tableWrapper.clientHeight;
+        setIsMoveToTopVisible(isScrollable && tableWrapper.scrollTop > 0);
+    }, []);
+
+    const moveToTop = useCallback(() => {
+        const tableWrapper = tableWrapperRef.current;
+        if (!tableWrapper) return;
+
+        tableWrapper.scrollTop = 0;
+        setIsMoveToTopVisible(false);
+    }, []);
+
+    const handleTableScroll = useCallback(() => {
+        updateMoveToTopVisibility();
+    }, [updateMoveToTopVisibility]);
 
     const handleSort = useCallback((column: SortableColumn) => {
         setSort((prev) => {
@@ -61,108 +84,143 @@ export const FundsExpendituresTable = ({ records, isEditing = false }: FundsExpe
             if (prev.direction === 'asc') return { column, direction: 'desc' };
             return { column: null, direction: null };
         });
+
+        const tableWrapper = tableWrapperRef.current;
+        if (tableWrapper) {
+            tableWrapper.scrollTop = 0;
+            setIsMoveToTopVisible(false);
+        }
     }, []);
+
+    useEffect(() => {
+        updateMoveToTopVisibility();
+    }, [records.length, updateMoveToTopVisibility]);
 
     const sortedRecords = sortRecords(records, sort);
     const colSpan = isEditing ? 7 : 5;
 
     return (
-        <div className={styles['table-wrapper']} data-testid="funds-table" data-record-count={records.length}>
-            <table className={styles.table}>
-                <thead>
-                    <tr>
-                        {isEditing && <th className={cn(styles.th, styles['checkbox-th'])} />}
-                        <th className={styles.th}>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.REPORTING_YEAR}</th>
-                        <th className={cn(styles.th, styles.sortable)} onClick={() => handleSort('type')}>
-                            <span className={styles['th-inner']}>
-                                <span>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.TYPE}</span>
-                                <SortIcon isActive={sort.column === 'type'} direction={sort.direction} />
-                            </span>
-                        </th>
-                        <th className={cn(styles.th, styles.sortable)} onClick={() => handleSort('categoryName')}>
-                            <span className={styles['th-inner']}>
-                                <span>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.CATEGORY}</span>
-                                <SortIcon isActive={sort.column === 'categoryName'} direction={sort.direction} />
-                            </span>
-                        </th>
-                        <th className={cn(styles.th, styles.sortable)} onClick={() => handleSort('amountUah')}>
-                            <span className={styles['th-inner']}>
-                                <span>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.AMOUNT_UAH}</span>
-                                <SortIcon isActive={sort.column === 'amountUah'} direction={sort.direction} />
-                            </span>
-                        </th>
-                        <th className={cn(styles.th, styles.sortable)} onClick={() => handleSort('amountUsd')}>
-                            <span className={styles['th-inner']}>
-                                <span>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.AMOUNT_USD}</span>
-                                <SortIcon isActive={sort.column === 'amountUsd'} direction={sort.direction} />
-                            </span>
-                        </th>
-                        {isEditing && <th className={cn(styles.th, styles['actions-th'])} />}
-                    </tr>
-                </thead>
-                <tbody>
-                    {sortedRecords.length === 0 ? (
+        <>
+            <div
+                ref={tableWrapperRef}
+                className={styles['table-wrapper']}
+                data-testid="funds-table"
+                data-record-count={records.length}
+                onScroll={handleTableScroll}
+            >
+                <table className={styles.table}>
+                    <thead>
                         <tr>
-                            <td colSpan={colSpan} className={styles['empty-cell']} data-testid="funds-table-empty-cell">
-                                <div className={styles['empty-state']}>
-                                    <NotFoundIcon className={styles['empty-state-image']} />
-                                    <p className={styles['empty-state-message']}>
-                                        {FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.MESSAGE}
-                                    </p>
-                                </div>
-                            </td>
+                            {isEditing && <th className={cn(styles.th, styles['checkbox-th'])} />}
+                            <th className={styles.th}>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.REPORTING_YEAR}</th>
+                            <th className={cn(styles.th, styles.sortable)} onClick={() => handleSort('type')}>
+                                <span className={styles['th-inner']}>
+                                    <span>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.TYPE}</span>
+                                    <SortIcon isActive={sort.column === 'type'} direction={sort.direction} />
+                                </span>
+                            </th>
+                            <th className={cn(styles.th, styles.sortable)} onClick={() => handleSort('categoryName')}>
+                                <span className={styles['th-inner']}>
+                                    <span>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.CATEGORY}</span>
+                                    <SortIcon isActive={sort.column === 'categoryName'} direction={sort.direction} />
+                                </span>
+                            </th>
+                            <th className={cn(styles.th, styles.sortable)} onClick={() => handleSort('amountUah')}>
+                                <span className={styles['th-inner']}>
+                                    <span>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.AMOUNT_UAH}</span>
+                                    <SortIcon isActive={sort.column === 'amountUah'} direction={sort.direction} />
+                                </span>
+                            </th>
+                            <th className={cn(styles.th, styles.sortable)} onClick={() => handleSort('amountUsd')}>
+                                <span className={styles['th-inner']}>
+                                    <span>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.AMOUNT_USD}</span>
+                                    <SortIcon isActive={sort.column === 'amountUsd'} direction={sort.direction} />
+                                </span>
+                            </th>
+                            {isEditing && <th className={cn(styles.th, styles['actions-th'])} />}
                         </tr>
-                    ) : (
-                        sortedRecords.map((record) => (
-                            <tr key={record.id} className={styles.tr}>
-                                {isEditing && (
-                                    <td className={cn(styles.td, styles['checkbox-td'])}>
-                                        <input
-                                            type="checkbox"
-                                            className={styles['row-checkbox']}
-                                            aria-label={`Select record ${record.id}`}
-                                        />
-                                    </td>
-                                )}
-                                <td className={styles.td}>{record.reportingYear}</td>
-                                <td className={styles.td}>
-                                    <span
-                                        className={cn(styles['type-chip'], {
-                                            [styles['type-chip-income']]: record.type === 'income',
-                                            [styles['type-chip-expense']]: record.type === 'expense',
-                                        })}
-                                    >
-                                        {TYPE_LABEL_MAP[record.type]}
-                                    </span>
+                    </thead>
+                    <tbody>
+                        {sortedRecords.length === 0 ? (
+                            <tr>
+                                <td
+                                    colSpan={colSpan}
+                                    className={styles['empty-cell']}
+                                    data-testid="funds-table-empty-cell"
+                                >
+                                    <div className={styles['empty-state']}>
+                                        <NotFoundIcon className={styles['empty-state-image']} />
+                                        <p className={styles['empty-state-message']}>
+                                            {FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.MESSAGE}
+                                        </p>
+                                    </div>
                                 </td>
-                                <td className={styles.td}>{record.categoryName}</td>
-                                <td className={styles.td}>{record.amountUah}</td>
-                                <td className={styles.td}>{record.amountUsd}</td>
-                                {isEditing && (
-                                    <td className={cn(styles.td, styles['actions-td'])}>
-                                        <div className={styles['row-actions']}>
-                                            <button
-                                                type="button"
-                                                className={styles['icon-button']}
-                                                aria-label={`Edit record ${record.id}`}
-                                            >
-                                                <EditIcon className={styles['action-icon']} />
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className={styles['icon-button']}
-                                                aria-label={`Delete record ${record.id}`}
-                                            >
-                                                <DeleteIcon className={styles['action-icon']} />
-                                            </button>
-                                        </div>
-                                    </td>
-                                )}
                             </tr>
-                        ))
-                    )}
-                </tbody>
-            </table>
-        </div>
+                        ) : (
+                            sortedRecords.map((record) => (
+                                <tr key={record.id} className={styles.tr}>
+                                    {isEditing && (
+                                        <td className={cn(styles.td, styles['checkbox-td'])}>
+                                            <input
+                                                type="checkbox"
+                                                className={styles['row-checkbox']}
+                                                aria-label={`Select record ${record.id}`}
+                                            />
+                                        </td>
+                                    )}
+                                    <td className={styles.td}>{record.reportingYear}</td>
+                                    <td className={styles.td}>
+                                        <span
+                                            className={cn(styles['type-chip'], {
+                                                [styles['type-chip-income']]: record.type === 'income',
+                                                [styles['type-chip-expense']]: record.type === 'expense',
+                                            })}
+                                        >
+                                            {TYPE_LABEL_MAP[record.type]}
+                                        </span>
+                                    </td>
+                                    <td className={styles.td}>{record.categoryName}</td>
+                                    <td className={styles.td}>{record.amountUah}</td>
+                                    <td className={styles.td}>{record.amountUsd}</td>
+                                    {isEditing && (
+                                        <td className={cn(styles.td, styles['actions-td'])}>
+                                            <div className={styles['row-actions']}>
+                                                <button
+                                                    type="button"
+                                                    className={styles['icon-button']}
+                                                    aria-label={`Edit record ${record.id}`}
+                                                >
+                                                    <EditIcon className={styles['action-icon']} />
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className={styles['icon-button']}
+                                                    aria-label={`Delete record ${record.id}`}
+                                                >
+                                                    <DeleteIcon className={styles['action-icon']} />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    )}
+                                </tr>
+                            ))
+                        )}
+                    </tbody>
+                </table>
+            </div>
+            <button
+                type="button"
+                className={cn(styles['to-top-button'], {
+                    [styles['to-top-button-visible']]: isMoveToTopVisible,
+                })}
+                data-testid="funds-table-to-top"
+                onClick={moveToTop}
+                aria-label="Scroll table to top"
+                aria-hidden={!isMoveToTopVisible}
+                tabIndex={isMoveToTopVisible ? 0 : -1}
+            >
+                <ArrowUpIcon className={styles['to-top-icon']} />
+            </button>
+        </>
     );
 };

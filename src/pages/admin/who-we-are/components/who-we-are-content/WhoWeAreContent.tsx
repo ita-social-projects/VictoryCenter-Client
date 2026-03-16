@@ -111,9 +111,12 @@ export const WhoWeAreContent = () => {
         (section: WhoWeAreSection) => {
             if (isAnyModalOpened) return;
 
-            const hasTranslation = section.contents
-                .flatMap((content) => content.localizations)
-                .some((l) => l.language?.id === englishLanguage?.id);
+            const englishLanguageId = englishLanguage?.id;
+            const hasTranslation = englishLanguageId
+                ? section.contents
+                      .flatMap((content) => content.localizations)
+                      .some((l) => l.language?.id === englishLanguageId)
+                : false;
 
             if (hasTranslation) {
                 openModalActions.openEditTranslationModal(section);

@@ -34,6 +34,7 @@ describe('DetailedProgramSection', () => {
                     order: 0,
                     description: null,
                     image: null,
+                    localizations: [],
                 },
                 {
                     id: 2,
@@ -42,6 +43,7 @@ describe('DetailedProgramSection', () => {
                     order: 1,
                     title: null,
                     image: null,
+                    localizations: [],
                 },
             ],
             order: 0,
@@ -77,6 +79,7 @@ describe('DetailedProgramSection', () => {
                     order: 0,
                     title: null,
                     image: null,
+                    localizations: [],
                 },
             ],
             order: 0,
@@ -111,6 +114,7 @@ describe('DetailedProgramSection', () => {
                     order: 0,
                     description: null,
                     image: null,
+                    localizations: [],
                 },
             ],
             order: 0,
@@ -138,7 +142,15 @@ describe('DetailedProgramSection', () => {
             id: 1,
             template: ProgramSectionTemplate.QuadImagesBottom,
             contents: [
-                { id: 1, contentType: ContentType.Title, title: 'Title', order: 0, description: null, image: null },
+                {
+                    id: 1,
+                    contentType: ContentType.Title,
+                    title: 'Title',
+                    order: 0,
+                    description: null,
+                    image: null,
+                    localizations: [],
+                },
                 {
                     id: 2,
                     contentType: ContentType.Description,
@@ -146,6 +158,7 @@ describe('DetailedProgramSection', () => {
                     order: 1,
                     title: null,
                     image: null,
+                    localizations: [],
                 },
                 {
                     id: 3,
@@ -154,6 +167,7 @@ describe('DetailedProgramSection', () => {
                     order: 5,
                     title: null,
                     description: null,
+                    localizations: [],
                 },
                 {
                     id: 4,
@@ -162,6 +176,7 @@ describe('DetailedProgramSection', () => {
                     order: 2,
                     title: null,
                     description: null,
+                    localizations: [],
                 },
                 {
                     id: 5,
@@ -170,6 +185,7 @@ describe('DetailedProgramSection', () => {
                     order: 3,
                     title: null,
                     description: null,
+                    localizations: [],
                 },
             ],
             order: 0,
@@ -201,7 +217,15 @@ describe('DetailedProgramSection', () => {
             id: 1,
             template: ProgramSectionTemplate.SingleImageTop,
             contents: [
-                { id: 1, contentType: ContentType.Title, title: 'Title', order: 0, description: null, image: null },
+                {
+                    id: 1,
+                    contentType: ContentType.Title,
+                    title: 'Title',
+                    order: 0,
+                    description: null,
+                    image: null,
+                    localizations: [],
+                },
                 {
                     id: 2,
                     contentType: ContentType.Description,
@@ -209,8 +233,17 @@ describe('DetailedProgramSection', () => {
                     order: 1,
                     title: null,
                     image: null,
+                    localizations: [],
                 },
-                { id: 3, contentType: ContentType.Image, image: null, order: 2, title: null, description: null },
+                {
+                    id: 3,
+                    contentType: ContentType.Image,
+                    image: null,
+                    order: 2,
+                    title: null,
+                    description: null,
+                    localizations: [],
+                },
             ],
             order: 0,
         };
@@ -270,6 +303,7 @@ describe('DetailedProgramSection', () => {
                     groupIndex: 2,
                     title: null,
                     image: null,
+                    localizations: [],
                 },
                 {
                     id: 2,
@@ -280,6 +314,7 @@ describe('DetailedProgramSection', () => {
                     title: null,
                     description: null,
                     image: null,
+                    localizations: [],
                 },
                 {
                     id: 3,
@@ -290,6 +325,7 @@ describe('DetailedProgramSection', () => {
                     title: null,
                     description: null,
                     image: null,
+                    localizations: [],
                 },
                 {
                     id: 4,
@@ -299,6 +335,7 @@ describe('DetailedProgramSection', () => {
                     groupIndex: 1,
                     title: null,
                     image: null,
+                    localizations: [],
                 },
                 {
                     id: 5,
@@ -308,6 +345,7 @@ describe('DetailedProgramSection', () => {
                     groupIndex: null,
                     title: null,
                     image: null,
+                    localizations: [],
                 },
             ],
             order: 0,
@@ -345,6 +383,7 @@ describe('DetailedProgramSection', () => {
                     order: 0,
                     description: null,
                     image: null,
+                    localizations: [],
                 },
                 {
                     id: 2,
@@ -361,6 +400,7 @@ describe('DetailedProgramSection', () => {
                         pages: [],
                         localizations: [],
                     },
+                    localizations: [],
                 },
                 {
                     id: 3,
@@ -377,6 +417,7 @@ describe('DetailedProgramSection', () => {
                         pages: [],
                         localizations: [],
                     },
+                    localizations: [],
                 },
                 {
                     id: 4,
@@ -386,6 +427,7 @@ describe('DetailedProgramSection', () => {
                     description: null,
                     image: null,
                     faqQuestion: null,
+                    localizations: [],
                 },
             ],
             order: 0,

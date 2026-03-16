@@ -38,6 +38,7 @@ describe('ProgramCard', () => {
             { id: 2, name: 'Category 2' },
         ],
         slug: 'program-a',
+        localizations: [],
     };
 
     it('renders program name, categories, and description', () => {

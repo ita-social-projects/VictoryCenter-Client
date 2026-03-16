@@ -15,6 +15,8 @@ jest.mock('./chart-legend', () => ({
     ),
 }));
 
+const mockFormatAmount = jest.fn((amount: number) => `${amount} грн`);
+
 describe('ExpensesBreakdownChart', () => {
     const mockItems: ExpenseItem[] = [
         { label: 'Admin Expenses', amount: 500, percent: 0.25 },
@@ -22,13 +24,13 @@ describe('ExpensesBreakdownChart', () => {
     ];
 
     it('renders the chart title', () => {
-        render(<ExpensesBreakdownChart items={mockItems} />);
+        render(<ExpensesBreakdownChart items={mockItems} formatAmount={mockFormatAmount} />);
 
         expect(screen.getByRole('heading', { level: 3, name: /основні витрати/i })).toBeInTheDocument();
     });
 
     it('passes reversed items to child components', () => {
-        render(<ExpensesBreakdownChart items={mockItems} />);
+        render(<ExpensesBreakdownChart items={mockItems} formatAmount={mockFormatAmount} />);
 
         const expectedOrder = 'Operational Expenses,Admin Expenses';
 
@@ -37,7 +39,7 @@ describe('ExpensesBreakdownChart', () => {
     });
 
     it('renders correctly with empty items', () => {
-        render(<ExpensesBreakdownChart items={[]} />);
+        render(<ExpensesBreakdownChart items={[]} formatAmount={mockFormatAmount} />);
 
         expect(screen.getByRole('heading', { level: 3 })).toBeInTheDocument();
         expect(screen.getByTestId('chart-graphic')).toBeEmptyDOMElement();

@@ -14,7 +14,8 @@ import {
 } from '@/pages/admin/who-we-are/components/modals/forms/shared/form-test-helpers';
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
-    RichTextInputGroup: (props: any) => require('@/utils/test-mocks/who-we-are-form-mocks').MockRichTextInputGroup(props),
+    RichTextInputGroup: (props: any) =>
+        require('@/utils/test-mocks/who-we-are-form-mocks').MockRichTextInputGroup(props),
 }));
 
 jest.mock(

@@ -114,9 +114,7 @@ const baseSection: WhoWeAreSection = {
 };
 
 describe('useTranslateWhoWeAreSection', () => {
-    const renderTranslateHook = (
-        options: Partial<Parameters<typeof useTranslateWhoWeAreSection>[0]> = {},
-    ) => {
+    const renderTranslateHook = (options: Partial<Parameters<typeof useTranslateWhoWeAreSection>[0]> = {}) => {
         const onSuccess = options.onSuccess ?? jest.fn();
 
         const hookResult = renderHook(() =>

@@ -88,19 +88,30 @@ const baseSection: WhoWeAreSection = {
 };
 
 describe('useTranslateWhoWeAreSection', () => {
+    const renderTranslateHook = (
+        options: Partial<Parameters<typeof useTranslateWhoWeAreSection>[0]> = {},
+    ) => {
+        const onSuccess = options.onSuccess ?? jest.fn();
+
+        const hookResult = renderHook(() =>
+            useTranslateWhoWeAreSection({
+                section: baseSection,
+                language: englishLanguage,
+                mode: ModalMode.Add,
+                ...options,
+                onSuccess,
+            }),
+        );
+
+        return { ...hookResult, onSuccess };
+    };
+
     beforeEach(() => {
         jest.clearAllMocks();
     });
 
     it('initializes with default state', () => {
-        const { result } = renderHook(() =>
-            useTranslateWhoWeAreSection({
-                section: baseSection,
-                language: englishLanguage,
-                onSuccess: jest.fn(),
-                mode: ModalMode.Add,
-            }),
-        );
+        const { result } = renderTranslateHook();
 
         expect(result.current.isSubmitting).toBe(false);
         expect(result.current.error).toBe('');
@@ -141,14 +152,7 @@ describe('useTranslateWhoWeAreSection', () => {
             translationStatus: dto.translationStatus,
         }));
 
-        const { result } = renderHook(() =>
-            useTranslateWhoWeAreSection({
-                section: baseSection,
-                language: englishLanguage,
-                onSuccess,
-                mode: ModalMode.Add,
-            }),
-        );
+        const { result } = renderTranslateHook({ onSuccess });
 
         await act(async () => {
             await result.current.translateSection({
@@ -213,14 +217,7 @@ describe('useTranslateWhoWeAreSection', () => {
         mockedCreate.mockResolvedValue([] as any);
         mockedMapper.mockImplementation((dto: any) => dto);
 
-        const { result } = renderHook(() =>
-            useTranslateWhoWeAreSection({
-                section: baseSection,
-                language: englishLanguage,
-                onSuccess: jest.fn(),
-                mode: ModalMode.Add,
-            }),
-        );
+        const { result } = renderTranslateHook();
 
         await act(async () => {
             await result.current.translateSection({
@@ -255,14 +252,7 @@ describe('useTranslateWhoWeAreSection', () => {
         mockedCreate.mockResolvedValue([] as any);
         mockedMapper.mockImplementation((dto: any) => dto);
 
-        const { result } = renderHook(() =>
-            useTranslateWhoWeAreSection({
-                section: baseSection,
-                language: englishLanguage,
-                onSuccess: jest.fn(),
-                mode: ModalMode.Add,
-            }),
-        );
+        const { result } = renderTranslateHook();
 
         await act(async () => {
             await result.current.translateSection({
@@ -295,14 +285,7 @@ describe('useTranslateWhoWeAreSection', () => {
     it('does nothing when section is null', async () => {
         const onSuccess = jest.fn();
 
-        const { result } = renderHook(() =>
-            useTranslateWhoWeAreSection({
-                section: null,
-                language: englishLanguage,
-                onSuccess,
-                mode: ModalMode.Add,
-            }),
-        );
+        const { result } = renderTranslateHook({ section: null, onSuccess });
 
         await act(async () => {
             await result.current.translateSection({ description: 'Ignored' });
@@ -315,14 +298,7 @@ describe('useTranslateWhoWeAreSection', () => {
     it('does not call API in edit mode with current implementation', async () => {
         const onSuccess = jest.fn();
 
-        const { result } = renderHook(() =>
-            useTranslateWhoWeAreSection({
-                section: baseSection,
-                language: englishLanguage,
-                onSuccess,
-                mode: ModalMode.Edit,
-            }),
-        );
+        const { result } = renderTranslateHook({ mode: ModalMode.Edit, onSuccess });
 
         await act(async () => {
             await result.current.translateSection({ description: 'Edit flow value' });
@@ -337,14 +313,7 @@ describe('useTranslateWhoWeAreSection', () => {
     it('sets translation error and rethrows on add mode API failure', async () => {
         mockedCreate.mockRejectedValue(new Error('create failed'));
 
-        const { result } = renderHook(() =>
-            useTranslateWhoWeAreSection({
-                section: baseSection,
-                language: englishLanguage,
-                onSuccess: jest.fn(),
-                mode: ModalMode.Add,
-            }),
-        );
+        const { result } = renderTranslateHook();
 
         await act(async () => {
             await expect(result.current.translateSection({ description: 'Will fail' })).rejects.toThrow(
@@ -362,14 +331,7 @@ describe('useTranslateWhoWeAreSection', () => {
     it('clears error state', async () => {
         mockedCreate.mockRejectedValue(new Error('failure'));
 
-        const { result } = renderHook(() =>
-            useTranslateWhoWeAreSection({
-                section: baseSection,
-                language: englishLanguage,
-                onSuccess: jest.fn(),
-                mode: ModalMode.Add,
-            }),
-        );
+        const { result } = renderTranslateHook();
 
         await act(async () => {
             try {

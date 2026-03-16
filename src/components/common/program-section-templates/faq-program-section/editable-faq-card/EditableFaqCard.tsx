@@ -7,8 +7,9 @@ import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
 import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
-import { ReactComponent as ArrowIcon } from '@/assets/icons/arrow-down-right.svg';
+import { ReactComponent as ArrowIcon } from '@/assets/icons/arrow-up-right.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/cross.svg';
+import { ACTION_ICONS } from '@/const/common/action-icons';
 import styles from './EditableFaqCard.module.scss';
 
 const { validateFaqQuestion, validateFaqAnswer } = PROGRAM_SECTION_VALIDATION_FUNCTIONS;
@@ -40,6 +41,7 @@ export const EditableFaqCard = ({
     onDelete,
     onExpandToggle,
 }: EditableFaqCardProps) => {
+    const DeleteFilledIcon = ACTION_ICONS.delete.hover;
     const cardRef = useRef<HTMLDivElement>(null);
     const [questionError, setQuestionError] = useState<string | undefined>(undefined);
     const [answerError, setAnswerError] = useState<string | undefined>(undefined);
@@ -104,7 +106,9 @@ export const EditableFaqCard = ({
                         className={styles['delete-button']}
                         onClick={handleDeleteClick}
                         aria-label="Delete question"
-                    />
+                    >
+                        <DeleteFilledIcon />
+                    </button>
                 )}
             </div>
             <div className={styles['card-header']}>

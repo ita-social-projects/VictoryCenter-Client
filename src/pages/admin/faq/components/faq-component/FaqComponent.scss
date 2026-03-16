@@ -102,50 +102,48 @@
                 height: 1.5rem;
             }
 
-            .faq-edit-btn {
-                background: url('~@/assets/icons/edit-default.svg');
-
-                &:hover:not(:disabled) {
-                    background: url('~@/assets/icons/edit-hover.svg');
-                }
-
-                &:active:not(:disabled) {
-                    background: url('~@/assets/icons/edit-pressed.svg');
-                }
-
-                &:disabled {
-                    background: url('~@/assets/icons/edit-disabled.svg');
-                    cursor: not-allowed;
-                }
-            }
-
+            .faq-edit-btn,
             .faq-delete-btn {
-                background: url('~@/assets/icons/delete-default.svg');
+                background: transparent;
+
+                path {
+                    fill: colors.$blue-500;
+                }
 
                 &:hover:not(:disabled) {
-                    background: url('~@/assets/icons/delete-hover.svg');
+                    path {
+                        fill: colors.$blue-100;
+                    }
                 }
 
                 &:active:not(:disabled) {
-                    background: url('~@/assets/icons/delete-pressed.svg');
+                    path {
+                        fill: colors.$blue-900;
+                    }
                 }
 
                 &:disabled {
-                    background: url('~@/assets/icons/delete-disabled.svg');
+                    path {
+                        fill: colors.$grey-600;
+                    }
                     cursor: not-allowed;
                 }
             }
 
             .faq-translate-btn {
-                background: url('~@/assets/icons/translate.svg');
-
+                background: transparent;
+                
                 &:hover {
                     cursor: pointer;
-                    background: url('~@/assets/icons/translate-grey.svg');
+                    path {
+                        fill: colors.$blue-100;
+                    }
                 }
-
+                
                 &:active {
-                    background: url('~@/assets/icons/translate.svg');
+                    path {
+                        fill: colors.$blue-500;
+                    }
                 }
             }
         }

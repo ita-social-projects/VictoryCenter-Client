@@ -73,45 +73,57 @@
         &-translate {
             width: 1.5rem;
             height: 1.5rem;
-            background: url('~@/assets/icons/translate.svg');
+            background: transparent;
 
             &:hover {
                 cursor: pointer;
-                background: url('~@/assets/icons/translate-grey.svg');
+                path {
+                    fill: colors.$blue-100;
+                }
             }
 
             &:active {
-                background: url('~@/assets/icons/translate.svg');
+                path {
+                    fill: colors.$blue-900;
+                }
             }
         }
 
         &-edit {
             width: 1.5rem;
             height: 1.5rem;
-            background: url('~@/assets/icons/edit.svg');
+            background: transparent;
 
             &:hover {
                 cursor: pointer;
-                background: url('~@/assets/icons/edit-grey.svg');
+                path {
+                    fill: colors.$blue-100;
+                }
             }
 
             &:active {
-                background: url('~@/assets/icons/edit-filled.svg');
+                path {
+                    fill: colors.$blue-900;
+                }
             }
         }
 
         &-delete {
             width: 1.5rem;
             height: 1.5rem;
-            background: url('~@/assets/icons/delete.svg');
+            background: transparent;
 
             &:hover {
                 cursor: pointer;
-                background: url('~@/assets/icons/delete-grey.svg');
+                path {
+                    fill: colors.$blue-100;
+                }
             }
 
             &:active {
-                background: url('~@/assets/icons/delete-filled.svg');
+                path {
+                    fill: colors.$blue-900;
+                }
             }
         }
     }

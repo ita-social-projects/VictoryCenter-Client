@@ -20,21 +20,28 @@
     height: 1.5rem;
     border: none;
     cursor: pointer;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-image: url('~@/assets/icons/delete-default.svg');
+    background: transparent;
+
+    path {
+        fill: c.$blue-500;
+    }
 
     &:hover:not(:disabled) {
-        background-image: url('~@/assets/icons/delete-hover.svg');
+        path {
+            fill: c.$blue-100;
+        }
     }
 
     &:active:not(:disabled) {
-        background-image: url('~@/assets/icons/delete-pressed.svg');
+        path {
+            fill: c.$blue-900;
+        }
     }
 
     &:disabled {
-        background-image: url('~@/assets/icons/delete-disabled.svg');
+        path {
+            fill: c.$grey-600;
+        }
         cursor: not-allowed;
     }
 }

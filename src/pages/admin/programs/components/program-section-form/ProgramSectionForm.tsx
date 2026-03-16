@@ -3,6 +3,7 @@ import { Button } from '@/components/admin/button/Button';
 import { ImageValues } from '@/types/common/image';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { renderProgramSection } from '@/utils/functions/render-program-section';
+import { ReactComponent as ChangeIcon } from '@/assets/icons/change.svg';
 import styles from './ProgramSectionForm.module.scss';
 import {
     FaqSectionQuestionDto,
@@ -679,7 +680,9 @@ export const ProgramSectionForm = ({
                             onClick={handleReplaceClick}
                             className={`${styles['icon-button']} ${styles['change-button']}`}
                             aria-label="Replace section"
-                        />
+                        >
+                            <ChangeIcon />
+                        </button>
                     </div>
                 </div>
             )}

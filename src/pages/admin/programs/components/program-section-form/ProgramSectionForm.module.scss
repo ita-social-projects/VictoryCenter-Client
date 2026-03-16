@@ -62,7 +62,7 @@
 
     &:hover,
     &:active {
-        background-image: url('~@/assets/icons/edit-pressed.svg');
+        background-image: url('~@/assets/icons/edit-filled.svg');
     }
 
     &:hover {
@@ -75,7 +75,7 @@
 
     &:hover,
     &:active {
-        background-image: url('~@/assets/icons/delete-pressed.svg');
+        background-image: url('~@/assets/icons/delete-filled.svg');
     }
 
     &:hover {
@@ -84,11 +84,15 @@
 }
 
 .change-button {
-    background-image: url('~@/assets/icons/change.svg');
-
     &:hover,
     &:active {
-        background-image: url('~@/assets/icons/change-pressed.svg');
+        path:nth-of-type(1) {
+            fill-rule: nonzero;
+            fill: c.$blue-900;
+        }
+        path:nth-of-type(2) {
+            fill: black;
+        }
     }
 
     &:hover {
@@ -107,12 +111,8 @@
 }
 
 .up-button {
-    background-image: url('~@/assets/icons/chevron-up.svg');
-
-    &:hover,
-    &:active {
-        background-image: url('~@/assets/icons/chevron-up.svg');
-    }
+    background-image: url('~@/assets/icons/chevron-right.svg');
+    transform: rotate(270deg);
 
     &:hover {
         opacity: 0.6;
@@ -120,13 +120,9 @@
 }
 
 .down-button {
-    background-image: url('~@/assets/icons/chevron-down.svg');
-
-    &:hover,
-    &:active {
-        background-image: url('~@/assets/icons/chevron-down.svg');
-    }
-
+    background-image: url('~@/assets/icons/chevron-right.svg');
+    transform: rotate(90deg);
+    
     &:hover {
         opacity: 0.6;
     }

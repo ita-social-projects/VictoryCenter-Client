@@ -6,7 +6,7 @@ import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/progr
 import { Swiper } from '@/components/public/swiper/Swiper';
 import { renderProgramSection } from '@/utils/functions/render-program-section';
 import { MockQuestions } from '@/utils/mock-data/public/programs-page';
-import placeholderImage from '@/assets/images/common/section-photo-placeholder.png';
+import placeholderImage from '@/assets/images/section-photo-placeholder.png';
 import styles from './AddSectionModal.module.scss';
 import swiperStyles from './AddSectionSwiper.module.scss';
 import { ReactComponent as ChevronRight } from '@/assets/icons/chevron-right.svg';

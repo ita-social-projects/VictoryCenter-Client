@@ -59,7 +59,7 @@ jest.mock('@/assets/icons/chevron-right.svg', () => ({
     ReactComponent: () => <svg data-testid="chevron-right" />,
 }));
 
-jest.mock('@/assets/images/common/section-photo-placeholder.png', () => 'placeholder.png');
+jest.mock('@/assets/images/section-photo-placeholder.png', () => 'placeholder.png');
 
 jest.mock('@/components/common/modal/Modal', () => {
     const ModalMock = ({

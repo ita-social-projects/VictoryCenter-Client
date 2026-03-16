@@ -1,10 +1,10 @@
-import introImg from '@/assets/images/public/hippotherapy/intro.jpg';
-import quoteImg from '@/assets/images/public/programs-page/first.png';
-import ipoventionImg from '@/assets/images/public/programs-page/first.png';
-import advantageImage0 from '@/assets/images/public/programs-page/first.png';
-import advantageImage1 from '@/assets/images/public/programs-page/first.png';
-import advantageImage2 from '@/assets/images/public/programs-page/first.png';
-import advantageImage3 from '@/assets/images/public/programs-page/first.png';
+import introImg from '@/assets/images/man-touching-white-horse-side.webp';
+import quoteImg from '@/assets/images/man-in-stall-stroking-horse.webp';
+import ipoventionImg from '@/assets/images/man-in-stall-stroking-horse.webp';
+import advantageImage0 from '@/assets/images/man-in-stall-stroking-horse.webp';
+import advantageImage1 from '@/assets/images/man-in-stall-stroking-horse.webp';
+import advantageImage2 from '@/assets/images/man-in-stall-stroking-horse.webp';
+import advantageImage3 from '@/assets/images/man-in-stall-stroking-horse.webp';
 import { HippotherapyAbout } from '@/types/public/hippotherapy-page';
 
 export const hippotherapyMock: HippotherapyAbout = {

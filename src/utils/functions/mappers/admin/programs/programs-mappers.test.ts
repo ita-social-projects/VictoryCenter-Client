@@ -11,7 +11,7 @@ describe('mapHippotherapyProgramDtoToModel', () => {
         categories: [{ id: 1, name: 'Rehabilitation', programsCount: 5 }],
         status: VisibilityStatus.Published,
         previewImage: { id: 11, url: '/preview.jpg', mimeType: 'image/jpeg' },
-        backgroundImage: { id: 12, url: '/background.jpg', mimeType: 'image/jpeg' },
+        backgroundImage: { id: 12, url: '/man-facing-horse-forehead.jpg', mimeType: 'image/jpeg' },
         location: 'Stable A',
         participantsCount: '8',
         meetingsCount: '12',

@@ -55,7 +55,6 @@ export const ReportsMediaBlock = ({
     validationFunctions,
     onValuesChange,
 }: ReportsMediaBlockProps) => {
-    const isEditing = true;
     const handleTitleChange = useCallback(
         (e: React.ChangeEvent<HTMLTextAreaElement>) => {
             const value = e.target.value;
@@ -125,14 +124,13 @@ export const ReportsMediaBlock = ({
                             onChange={handleTitleChange}
                             onBlur={handleTitleBlur}
                             maxLength={REPORTS_TEXT.FORM.MAX_LENGTH.TITLE}
-                            disabled={!isEditing}
                             error={errors.title}
                             rows={1}
-                            isRequired={isEditing}
+                            isRequired={true}
                         />
                     </div>
 
-                    <div className={cn(styles['total-amount-input'], isEditing && !isValueEditable)}>
+                    <div className={cn(styles['total-amount-input'], true && !isValueEditable)}>
                         <TextAreaWithCharacterLimitGroup
                             label={descriptionTitle}
                             id={`${windowTitle}-value`}
@@ -141,10 +139,10 @@ export const ReportsMediaBlock = ({
                             onChange={handleTotalAmountChange}
                             onBlur={handleTotalAmountBlur}
                             maxLength={totalAmountMaxLength}
-                            disabled={!isEditing || !isValueEditable}
+                            disabled={false || !isValueEditable}
                             error={errors.totalAmount}
                             rows={1}
-                            isRequired={isEditing}
+                            isRequired={true}
                         />
                     </div>
                 </div>
@@ -158,7 +156,6 @@ export const ReportsMediaBlock = ({
                             value={values.image && 'base64' in values.image ? values.image : null}
                             onChange={handleImageChange}
                             setError={handleImageError}
-                            disabled={!isEditing}
                             cropWidth={imageWidth}
                             cropHeight={imageHeight}
                             style={{

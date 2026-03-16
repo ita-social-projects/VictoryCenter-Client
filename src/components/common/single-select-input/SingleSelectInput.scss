@@ -99,6 +99,14 @@
         .icon-img {
             width: 20px;
             height: 20px;
+
+            &-open {
+                transform: rotate(270deg);
+            }
+
+            &-closed {
+                transform: rotate(90deg);
+            }
         }
     }
 }

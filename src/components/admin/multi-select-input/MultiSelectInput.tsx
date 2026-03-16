@@ -2,8 +2,7 @@ import React, { useState, useRef, useMemo, useCallback } from 'react';
 import { useOnClickOutside } from '@/hooks/common/use-on-click-outside/useOnClickOutside';
 import { ReactComponent as CheckedBox } from '@/assets/icons/chevron-checked.svg';
 import { ReactComponent as UncheckedBox } from '@/assets/icons/chevron-unchecked.svg';
-import { ReactComponent as ArrowDown } from '@/assets/icons/chevron-down.svg';
-import { ReactComponent as ArrowUp } from '@/assets/icons/chevron-up.svg';
+import { ReactComponent as ArrowRight } from '@/assets/icons/chevron-right.svg';
 import classNames from 'classnames';
 import './MultiSelectInput.scss';
 
@@ -113,7 +112,11 @@ export const MultiSelectInput = <T,>({
                     })}
                 >
                     <div className="multiselect__placeholder-content">{displayLabel}</div>
-                    <div className="multiselect__chevron">{isOpen ? <ArrowUp /> : <ArrowDown />}</div>
+                    <div className="multiselect__chevron">
+                        <ArrowRight
+                            className={isOpen ? 'multiselect__chevron-icon--open' : 'multiselect__chevron-icon--closed'}
+                        />
+                    </div>
                 </div>
             </button>
 

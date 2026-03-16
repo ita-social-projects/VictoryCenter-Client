@@ -3,11 +3,8 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { DropdownMenu, DropdownLink } from './DropdownMenu';
 import { MemoryRouter } from 'react-router-dom';
 
-jest.mock('@/assets/icons/chevron-up.svg', () => ({
-    ReactComponent: () => <span data-testid="arrow-up" />,
-}));
-jest.mock('@/assets/icons/chevron-down.svg', () => ({
-    ReactComponent: () => <span data-testid="arrow-down" />,
+jest.mock('@/assets/icons/chevron-right.svg', () => ({
+    ReactComponent: (props: any) => <span data-testid="arrow-right" {...props} />,
 }));
 
 describe('DropdownMenu', () => {
@@ -27,7 +24,7 @@ describe('DropdownMenu', () => {
         renderDropdown();
 
         expect(screen.getByText('Menu')).toBeInTheDocument();
-        expect(screen.getByTestId('arrow-down')).toBeInTheDocument();
+        expect(screen.getByTestId('arrow-right')).toHaveClass('dropdown-chevron-icon--closed');
         expect(screen.queryByText('Home')).not.toBeInTheDocument();
     });
 
@@ -39,7 +36,7 @@ describe('DropdownMenu', () => {
 
         expect(screen.getByText('Home')).toBeInTheDocument();
         expect(screen.getByText('Profile')).toBeInTheDocument();
-        expect(screen.getByTestId('arrow-up')).toBeInTheDocument();
+        expect(screen.getByTestId('arrow-right')).toHaveClass('dropdown-chevron-icon--open');
     });
 
     it('closes menu on mouse leave', () => {

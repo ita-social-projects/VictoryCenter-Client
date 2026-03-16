@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ContextMenuButton } from '../context-menu-button/ContextMenuButton';
 import { CategoryButton } from '../category-button/CategoryButton';
-import { ReactComponent as ArrowLeftIcon } from '@/assets/icons/arrow-left.svg';
 import { ReactComponent as ArrowRightIcon } from '@/assets/icons/arrow-right.svg';
 import './CategoryBar.scss';
 
@@ -99,7 +98,7 @@ export const CategoryBar = <T,>({
                     onClick={() => handleScroll('left')}
                     type="button"
                 >
-                    <ArrowLeftIcon />
+                    <ArrowRightIcon className="category-bar-arrow-left-icon" />
                 </button>
             )}
             <div ref={categoriesContainerRef} className="category-bar-categories" onScroll={checkScroll}>

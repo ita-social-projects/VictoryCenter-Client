@@ -1,7 +1,6 @@
 import React, { RefObject, useState } from 'react';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { ReactComponent as ArrowDown } from '@/assets/icons/chevron-down.svg';
-import { ReactComponent as ArrowUp } from '@/assets/icons/chevron-up.svg';
+import { ReactComponent as ArrowRight } from '@/assets/icons/chevron-right.svg';
 import classNames from 'classnames';
 import './Select.scss';
 
@@ -95,7 +94,7 @@ export const Select = <TValue,>({
                 >
                     {displayLabel}
                 </span>
-                {isOpen ? <ArrowUp /> : <ArrowDown />}
+                <ArrowRight className={isOpen ? 'select-chevron-icon--open' : 'select-chevron-icon--closed'} />
             </button>
             {isOpen && (
                 <div className={'select-options'}>

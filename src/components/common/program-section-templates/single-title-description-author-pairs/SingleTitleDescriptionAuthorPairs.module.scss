@@ -124,3 +124,7 @@
 .add-card-icon :global(path) {
     stroke: c.$grey-50 !important;
 }
+
+.arrow-left-icon {
+    transform: rotate(180deg);
+}

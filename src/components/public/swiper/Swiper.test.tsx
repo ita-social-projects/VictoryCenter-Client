@@ -2,14 +2,9 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Swiper } from './Swiper';
 import { ReactComponent as ArrowRight } from '@/assets/icons/arrow-right.svg';
-import { ReactComponent as ArrowLeft } from '@/assets/icons/arrow-left.svg';
 
 jest.mock('@/assets/icons/arrow-right.svg', () => ({
     ReactComponent: () => <svg data-testid="arrow-right" />,
-}));
-
-jest.mock('@/assets/icons/arrow-left.svg', () => ({
-    ReactComponent: () => <svg data-testid="arrow-left" />,
 }));
 
 let mockSwiperInstance: any;
@@ -105,7 +100,7 @@ describe('Swiper', () => {
                 slidesPerView={1}
                 navigationButtons={{
                     prev: {
-                        icon: ArrowLeft,
+                        icon: ArrowRight,
                         ariaLabel: 'Previous',
                         variant: 'primary-dark' as const,
                     },
@@ -119,17 +114,17 @@ describe('Swiper', () => {
         );
 
         await waitFor(() => {
-            const leftArrow = screen.getByTestId('arrow-left');
-            const rightArrow = screen.getByTestId('arrow-right');
-            expect(leftArrow).toBeInTheDocument();
-            expect(rightArrow).toBeInTheDocument();
+            const prevButton = screen.getByLabelText('Previous');
+            const nextButton = screen.getByLabelText('Next');
+            expect(prevButton).toBeInTheDocument();
+            expect(nextButton).toBeInTheDocument();
         });
     });
 
     it('does not render navigation buttons when not provided', () => {
         render(<Swiper items={items} renderItem={renderItem} slidesPerView={1} />);
-        expect(screen.queryByTestId('arrow-left')).not.toBeInTheDocument();
-        expect(screen.queryByTestId('arrow-right')).not.toBeInTheDocument();
+        expect(screen.queryByLabelText('Previous')).not.toBeInTheDocument();
+        expect(screen.queryByLabelText('Next')).not.toBeInTheDocument();
     });
 
     it('returns null when items is null or empty', () => {
@@ -173,7 +168,7 @@ describe('Swiper', () => {
                 renderItem={renderItem}
                 navigationButtons={{
                     prev: {
-                        icon: ArrowLeft,
+                        icon: ArrowRight,
                         ariaLabel: 'Previous',
                         variant: 'primary-dark' as const,
                     },

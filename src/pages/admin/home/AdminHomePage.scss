@@ -61,7 +61,8 @@
         .admin-page-action-hint-icon {
             width: 1.5rem;
             height: 1.5rem;
-
+            transform: rotate(180deg);
+            
             path {
                 stroke: white;
             }

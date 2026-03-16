@@ -38,10 +38,6 @@ jest.mock('@/assets/icons/arrow-right.svg', () => ({
     ReactComponent: () => <svg data-testid="arrow-right" />,
 }));
 
-jest.mock('@/assets/icons/arrow-left.svg', () => ({
-    ReactComponent: () => <svg data-testid="arrow-left" />,
-}));
-
 describe('ProgramsSection', () => {
     const createMockProgram = (id: number, name: string) => ({
         id,

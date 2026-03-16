@@ -37,14 +37,15 @@
             .arrow {
                 display: inline-block;
                 margin-left: 0.25rem;
-                background: url('~@/assets/icons/chevron-down.svg') no-repeat center;
+                background: url('~@/assets/icons/chevron-right.svg') no-repeat center;
                 width: 1.5rem;
                 height: 1.5rem;
                 transition: transform 0.2s ease;
+                transform: rotate(90deg);
             }
 
             .arrow.expanded {
-                transform: rotate(180deg);
+                transform: rotate(270deg);
             }
         }
     }

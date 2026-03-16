@@ -53,6 +53,10 @@
             cursor: pointer;
         }
 
+        &-icon {
+            transform: rotate(270deg);
+        }
+
         &-icon path {
             stroke: white;
         }

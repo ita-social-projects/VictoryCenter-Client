@@ -10,7 +10,6 @@ import placeholderImage from '@/assets/images/common/section-photo-placeholder.p
 import styles from './AddSectionModal.module.scss';
 import swiperStyles from './AddSectionSwiper.module.scss';
 import { ReactComponent as ChevronRight } from '@/assets/icons/chevron-right.svg';
-import { ReactComponent as ChevronLeft } from '@/assets/icons/chevron-left.svg';
 
 export interface AddSectionModalProps {
     isOpen: boolean;
@@ -21,7 +20,7 @@ export interface AddSectionModalProps {
 const SWIPER_NAVIGATION_CONFIG = {
     classNamebuttonBlock: swiperStyles.buttonBlock,
     prev: {
-        icon: ChevronLeft,
+        icon: ChevronRight,
         ariaLabel: 'previous',
         variant: 'tertiary' as const,
         className: swiperStyles.left,

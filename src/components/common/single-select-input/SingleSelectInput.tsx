@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ReactComponent as ArrowDown } from '@/assets/icons/chevron-down.svg';
-import { ReactComponent as ArrowUp } from '@/assets/icons/chevron-up.svg';
+import { ReactComponent as ArrowRight } from '@/assets/icons/chevron-right.svg';
 import classNames from 'classnames';
 import './SingleSelectInput.scss';
 
@@ -94,7 +93,12 @@ export const SingleSelectInput = <T extends Record<string, any>>({
                     {displayLabel}
                 </div>
                 <div className="placeholder-arrow">
-                    {isOpen ? <ArrowUp className="icon-img" /> : <ArrowDown className="icon-img" />}
+                    <ArrowRight
+                        className={classNames('icon-img', {
+                            'icon-img-open': isOpen,
+                            'icon-img-closed': !isOpen,
+                        })}
+                    />
                 </div>
             </button>
 

@@ -1,3 +1,4 @@
+import type * as React from 'react';
 import { VisibilityStatus } from '@/types/admin/common';
 import { TranslateLimits, WhoWeAreSection } from '@/types/admin/who-we-are';
 import { LocalizationLanguage } from '@/types/common/language';

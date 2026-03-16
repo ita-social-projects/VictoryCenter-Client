@@ -104,6 +104,8 @@ export const ReportsMediaBlock = ({
         [onValuesChange, values, errors],
     );
 
+    const isDisabled = true;
+
     return (
         <div className={styles.root}>
             <div className={styles.content}>
@@ -130,7 +132,7 @@ export const ReportsMediaBlock = ({
                         />
                     </div>
 
-                    <div className={cn(styles['total-amount-input'], true && !isValueEditable)}>
+                    <div className={cn(styles['total-amount-input'], isDisabled && !isValueEditable)}>
                         <TextAreaWithCharacterLimitGroup
                             label={descriptionTitle}
                             id={`${windowTitle}-value`}
@@ -139,7 +141,7 @@ export const ReportsMediaBlock = ({
                             onChange={handleTotalAmountChange}
                             onBlur={handleTotalAmountBlur}
                             maxLength={totalAmountMaxLength}
-                            disabled={false || !isValueEditable}
+                            disabled={!isDisabled || !isValueEditable}
                             error={errors.totalAmount}
                             rows={1}
                             isRequired={true}

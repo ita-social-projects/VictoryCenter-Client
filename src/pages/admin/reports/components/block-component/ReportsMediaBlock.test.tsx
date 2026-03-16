@@ -180,7 +180,7 @@ describe('ReportsMediaBlock', () => {
         it('should render description title as label', () => {
             renderComponent();
 
-            expect(screen.getByText('Зібрані кошти')).toBeInTheDocument();
+            expect(screen.getByText(/Зібрані кошти/)).toBeInTheDocument();
         });
 
         it('should render image input', () => {

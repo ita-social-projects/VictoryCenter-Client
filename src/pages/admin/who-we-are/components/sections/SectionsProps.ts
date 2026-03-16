@@ -1,6 +1,6 @@
 import { ImageSectionProps } from './image-block-section/ImageBlockSection';
 import { IMAGE_CONFIGS, WHO_WE_ARE_TEXT } from '@/const/admin/who-we-are';
-import MainPageImage from '@/assets/images/man-facing-horse-forehead.jpg';
+import MainPageImage from '@/assets/images/man-facing-horse-forehead.webp';
 import TeamPageImage from '@/assets/images/our-team.webp';
 import SupportVeterans from '@/assets/images/support-veterans.webp';
 import SupportVolunteers from '@/assets/images/support-volunteers.webp';

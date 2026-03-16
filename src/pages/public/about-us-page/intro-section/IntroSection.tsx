@@ -1,4 +1,4 @@
-import background from '@/assets/images/man-facing-horse-forehead.jpg';
+import background from '@/assets/images/man-facing-horse-forehead.webp';
 import styles from './IntroSection.module.scss';
 import { ContentType } from '@/types/common/about-us';
 import { AboutUsContent } from '@/types/public/about-us-page';

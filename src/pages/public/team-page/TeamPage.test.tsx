@@ -5,7 +5,7 @@ import { MemberCard, TeamItem } from '@/types/public/team-page';
 import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
 import { EntityLocalization } from '@/types/common/language';
 
-jest.mock('@/assets/videos/public/team-page/quote_background.mp4', () => 'mocked-video.mp4');
+jest.mock('@/assets/videos/quote_background.webm', () => 'mocked-video.webm');
 jest.mock('@/hooks/common/use-get-localization/useGetLocalization', () => ({
     useGetLocalization: jest.fn(),
 }));
@@ -213,7 +213,7 @@ describe('TeamPage component', () => {
         const videoElement = await waitFor(() => document.querySelector('video'));
 
         expect(videoElement).toBeInTheDocument();
-        expect(videoElement?.querySelector('source')?.getAttribute('src')).toBe('mocked-video.mp4');
+        expect(videoElement?.querySelector('source')?.getAttribute('src')).toBe('mocked-video.webm');
         expect(videoElement?.hasAttribute('autoplay')).toBe(true);
         expect(videoElement?.hasAttribute('loop')).toBe(true);
         expect(videoElement?.hasAttribute('playsinline')).toBe(true);

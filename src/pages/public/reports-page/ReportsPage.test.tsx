@@ -13,7 +13,7 @@ jest.mock('@/components/public/cta', () => ({
     CtaSection: (props: any) => <div data-testid="cta-section-mock" data-props={JSON.stringify(props)} />,
 }));
 
-jest.mock('@/assets/videos/public/partners-page/outro.mp4', () => 'mock-outro-video.mp4');
+jest.mock('@/assets/videos/child_riding_horse.webm', () => 'mock-outro-video.webm');
 
 jest.mock('react-i18next', () => ({
     useTranslation: () => ({
@@ -45,7 +45,7 @@ describe('ReportsPage', () => {
         expect(props).toEqual({
             title: CTA_DATA.title,
             description: CTA_DATA.description,
-            mediaUrl: 'mock-outro-video.mp4',
+            mediaUrl: 'mock-outro-video.webm',
             buttons: [
                 {
                     label: 'cta.buttonLabel',

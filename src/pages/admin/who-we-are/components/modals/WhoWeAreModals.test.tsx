@@ -6,6 +6,34 @@ import { WhoWeAreSection } from '@/types/admin/who-we-are';
 import { LocalizationLanguage } from '@/types/common/language';
 import { UseModalsStateResult } from '@/hooks/admin/use-modals-state/useModalsState';
 
+const createCloseModalActions = (): UseModalsStateResult<WhoWeAreSection>['closeModalActions'] => ({
+    closeAddItemModal: jest.fn(),
+    closeEditItemModal: jest.fn(),
+    closeDeleteItemModal: jest.fn(),
+    closeAddCategoryModal: jest.fn(),
+    closeEditCategoryModal: jest.fn(),
+    closeTranslateItemModal: jest.fn(),
+    closeEditTranslationModal: jest.fn(),
+    closeDeleteCategoryModal: jest.fn(),
+    closeAddSectionModal: jest.fn(),
+    closeTranslateCategoryModal: jest.fn(),
+    closeEditCategoryTranslationModal: jest.fn(),
+});
+
+const createOpenModalActions = (): UseModalsStateResult<WhoWeAreSection>['openModalActions'] => ({
+    openAddItemModal: jest.fn(),
+    openEditItemModal: jest.fn(),
+    openDeleteItemModal: jest.fn(),
+    openTranslateItemModal: jest.fn(),
+    openEditTranslationModal: jest.fn(),
+    openAddCategoryModal: jest.fn(),
+    openEditCategoryModal: jest.fn(),
+    openDeleteCategoryModal: jest.fn(),
+    openTranslateCategoryModal: jest.fn(),
+    openEditCategoryTranslationModal: jest.fn(),
+    openAddSectionModal: jest.fn(),
+});
+
 const mockTranslateWhoWeAreModal = jest.fn();
 
 jest.mock('./translate-modal/TranslateWhoWeAreModal', () => ({
@@ -54,32 +82,8 @@ const buildModalsStateControl = (
         isAddSectionModalOpen: false,
         ...overrides,
     },
-    closeModalActions: {
-        closeAddItemModal: jest.fn(),
-        closeEditItemModal: jest.fn(),
-        closeDeleteItemModal: jest.fn(),
-        closeAddCategoryModal: jest.fn(),
-        closeEditCategoryModal: jest.fn(),
-        closeTranslateItemModal: jest.fn(),
-        closeEditTranslationModal: jest.fn(),
-        closeDeleteCategoryModal: jest.fn(),
-        closeAddSectionModal: jest.fn(),
-        closeTranslateCategoryModal: jest.fn(),
-        closeEditCategoryTranslationModal: jest.fn(),
-    },
-    openModalActions: {
-        openAddItemModal: jest.fn(),
-        openEditItemModal: jest.fn(),
-        openDeleteItemModal: jest.fn(),
-        openTranslateItemModal: jest.fn(),
-        openEditTranslationModal: jest.fn(),
-        openAddCategoryModal: jest.fn(),
-        openEditCategoryModal: jest.fn(),
-        openDeleteCategoryModal: jest.fn(),
-        openTranslateCategoryModal: jest.fn(),
-        openEditCategoryTranslationModal: jest.fn(),
-        openAddSectionModal: jest.fn(),
-    },
+    closeModalActions: createCloseModalActions(),
+    openModalActions: createOpenModalActions(),
     isAnyModalOpened: false,
 });
 

@@ -6,7 +6,12 @@ import {
     TranslateWhoWeAreDescriptionFormRef,
 } from './TranslateWhoWeAreDescriptionForm';
 import { getWhoWeAreValidationMock } from '@/utils/test-mocks/who-we-are-form-mocks';
-import { changeRichTextField, submitFormByRef } from '@/pages/admin/who-we-are/components/modals/forms/shared/form-test-helpers';
+import {
+    blurRichTextField,
+    changeRichTextField,
+    focusRichTextField,
+    submitFormByRef,
+} from '@/pages/admin/who-we-are/components/modals/forms/shared/form-test-helpers';
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
     RichTextInputGroup: (props: any) => require('@/utils/test-mocks/who-we-are-form-mocks').MockRichTextInputGroup(props),
@@ -80,8 +85,7 @@ describe('TranslateWhoWeAreDescriptionForm', () => {
             jest.runAllTimers();
         });
 
-        const descriptionField = screen.getByTestId('rich-text-description');
-        fireEvent.blur(descriptionField);
+        blurRichTextField('description');
 
         await waitFor(() => {
             expect(screen.getByTestId('error-description')).toHaveTextContent('Required');
@@ -98,7 +102,7 @@ describe('TranslateWhoWeAreDescriptionForm', () => {
             jest.runAllTimers();
         });
 
-        fireEvent.focus(screen.getByTestId('rich-text-description'));
+        focusRichTextField('description');
 
         await waitFor(() => {
             expect(validationMock.validateText).toHaveBeenCalled();
@@ -115,9 +119,7 @@ describe('TranslateWhoWeAreDescriptionForm', () => {
             jest.runAllTimers();
         });
 
-        fireEvent.change(screen.getByTestId('rich-text-description'), {
-            target: { value: '<p>Ready change</p>' },
-        });
+        changeRichTextField('description', '<p>Ready change</p>');
 
         await waitFor(() => {
             expect(validationMock.validateText).toHaveBeenCalledWith('Ready change');
@@ -136,7 +138,7 @@ describe('TranslateWhoWeAreDescriptionForm', () => {
             jest.runAllTimers();
         });
 
-        fireEvent.blur(screen.getByTestId('rich-text-description'));
+        blurRichTextField('description');
 
         await waitFor(() => {
             expect(validationMock.validateText).toHaveBeenCalledWith('');
@@ -166,11 +168,9 @@ describe('TranslateWhoWeAreDescriptionForm', () => {
         jest.useFakeTimers();
         renderForm();
 
-        const descriptionField = screen.getByTestId('rich-text-description');
-
-        fireEvent.focus(descriptionField);
-        fireEvent.change(descriptionField, { target: { value: '<p>Updated too early</p>' } });
-        fireEvent.blur(descriptionField);
+        focusRichTextField('description');
+        changeRichTextField('description', '<p>Updated too early</p>');
+        blurRichTextField('description');
 
         expect(screen.getByTestId('rich-text-description')).toHaveValue('<p>Updated too early</p>');
         jest.useRealTimers();

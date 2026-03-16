@@ -6,7 +6,12 @@ import {
     TranslateWhoWeAreMultipleDescriptionsFormRef,
 } from './TranslateWhoWeAreMultipleDescriptionsForm';
 import { getWhoWeAreValidationMock } from '@/utils/test-mocks/who-we-are-form-mocks';
-import { changeRichTextField, submitFormByRef } from '@/pages/admin/who-we-are/components/modals/forms/shared/form-test-helpers';
+import {
+    blurRichTextField,
+    changeRichTextField,
+    focusRichTextField,
+    submitFormByRef,
+} from '@/pages/admin/who-we-are/components/modals/forms/shared/form-test-helpers';
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
     RichTextInputGroup: (props: any) => require('@/utils/test-mocks/who-we-are-form-mocks').MockRichTextInputGroup(props),
@@ -91,10 +96,8 @@ describe('TranslateWhoWeAreMultipleDescriptionsForm', () => {
             jest.runAllTimers();
         });
 
-        const firstField = screen.getByTestId('rich-text-description-1');
-
-        fireEvent.focus(firstField);
-        fireEvent.blur(firstField);
+        focusRichTextField('description-1');
+        blurRichTextField('description-1');
 
         await waitFor(() => {
             expect(screen.getByTestId('error-description-1')).toHaveTextContent('Required');
@@ -132,9 +135,8 @@ describe('TranslateWhoWeAreMultipleDescriptionsForm', () => {
         renderForm();
         const initialCalls = validationMock.validateText.mock.calls.length;
 
-        const firstField = screen.getByTestId('rich-text-description-1');
-        fireEvent.focus(firstField);
-        fireEvent.blur(firstField);
+        focusRichTextField('description-1');
+        blurRichTextField('description-1');
 
         expect(validationMock.validateText).toHaveBeenCalledTimes(initialCalls);
         jest.useRealTimers();
@@ -149,8 +151,7 @@ describe('TranslateWhoWeAreMultipleDescriptionsForm', () => {
         });
 
         const callsBeforeBlur = validationMock.validateText.mock.calls.length;
-        const firstField = screen.getByTestId('rich-text-description-1');
-        fireEvent.blur(firstField);
+        blurRichTextField('description-1');
 
         expect(validationMock.validateText.mock.calls.length).toBe(callsBeforeBlur);
         jest.useRealTimers();
@@ -164,7 +165,6 @@ describe('TranslateWhoWeAreMultipleDescriptionsForm', () => {
             jest.runAllTimers();
         });
 
-        const firstField = screen.getByTestId('rich-text-description-1');
         const form = screen.getByTestId('translate-who-we-are-multiple-descriptions-form');
 
         changeRichTextField('description-1', '<p>Ready change</p>');

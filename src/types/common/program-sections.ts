@@ -1,6 +1,16 @@
 import { Image, ImageValues } from '../common/image';
 import { ContentType } from './programs';
 import { FaqQuestion } from '../admin/faq';
+import { EntityLocalizationDto } from './language';
+
+export interface ContentLocalizationDto extends EntityLocalizationDto {
+    entityId: number;
+    title?: string | null;
+    description?: string | null;
+    author?: string | null;
+    question?: string | null;
+    answer?: string | null;
+}
 
 export enum ProgramSectionType {
     Title,
@@ -51,6 +61,7 @@ export interface HippotherapyProgramSectionContentDto {
     author?: string | null;
     faqQuestionId?: number | null;
     faqQuestion?: FaqQuestion | null;
+    localizations?: ContentLocalizationDto[];
 }
 export interface HippotherapyProgramSectionContent {
     id?: number;
@@ -95,10 +106,25 @@ export interface CreateProgramSectionContentDto {
     faqQuestion?: CreateFaqQuestionDto | null;
 }
 
+export interface CreateProgramSectionContentLocalizationDto {
+    entityId: number;
+    title?: string | null;
+    description?: string | null;
+    author?: string | null;
+    question?: string | null;
+    answer?: string | null;
+    languageId: number;
+}
+
 export interface CreateHippotherapyProgramSectionDto {
     id?: number;
     programId?: number;
     template: ProgramSectionTemplate;
     order: number;
     contents: CreateProgramSectionContentDto[];
+}
+
+export interface CreateHippotherapyProgramSectionLocalizationDto {
+    entityId: number;
+    contents: CreateProgramSectionContentLocalizationDto[];
 }

@@ -895,6 +895,32 @@ describe('ProgramForm', () => {
             });
         });
 
+        it('reverts section to original initialData via ref', async () => {
+            const originalSection = {
+                id: 101,
+                template: 1,
+                order: 0,
+                contents: [],
+            } as CreateHippotherapyProgramSectionDto;
+            const initialData = createInitialData({ sections: [originalSection] });
+
+            const ref = React.createRef<ProgramFormRef>();
+            renderProgramForm({ initialData }, ref);
+
+            await waitFor(() => {
+                expect(screen.getByTestId('program-section-form')).toBeInTheDocument();
+            });
+
+            fireEvent.click(screen.getByTestId('change-section-101'));
+
+            await act(async () => {
+                ref.current?.revertSection(0);
+            });
+
+            const sections = ref.current?.getSections();
+            expect(sections?.[0]).toMatchObject({ id: 101 });
+        });
+
         it('does nothing when section key is not found (covers idx === -1)', async () => {
             const initialData = createInitialData({
                 sections: [{ id: 101, template: 1, order: 0, contents: [] } as CreateHippotherapyProgramSectionDto],

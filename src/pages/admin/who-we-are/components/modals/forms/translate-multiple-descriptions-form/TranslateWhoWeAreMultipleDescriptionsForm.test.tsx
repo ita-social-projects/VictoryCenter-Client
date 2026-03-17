@@ -1,5 +1,5 @@
 import React, { createRef } from 'react';
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import {
     TranslateWhoWeAreMultipleDescriptionsForm,
@@ -7,6 +7,8 @@ import {
 } from './TranslateWhoWeAreMultipleDescriptionsForm';
 import { getWhoWeAreValidationMock } from '@/utils/test-mocks/who-we-are-form-mocks';
 import {
+    assertRichTextChangeMarksFormDirty,
+    assertRichTextErrorOnBlur,
     blurRichTextField,
     changeRichTextField,
     focusRichTextField,
@@ -80,11 +82,7 @@ describe('TranslateWhoWeAreMultipleDescriptionsForm', () => {
         const onDirtyChange = jest.fn();
         renderForm({ onDirtyChange });
 
-        changeRichTextField('description-1', '<p>Updated row</p>');
-
-        await waitFor(() => {
-            expect(onDirtyChange).toHaveBeenCalledWith(true);
-        });
+        await assertRichTextChangeMarksFormDirty('description-1', '<p>Updated row</p>', onDirtyChange);
     });
 
     it('shows validation error on row blur', async () => {
@@ -97,12 +95,7 @@ describe('TranslateWhoWeAreMultipleDescriptionsForm', () => {
             jest.runAllTimers();
         });
 
-        focusRichTextField('description-1');
-        blurRichTextField('description-1');
-
-        await waitFor(() => {
-            expect(screen.getByTestId('error-description-1')).toHaveTextContent('Required');
-        });
+        await assertRichTextErrorOnBlur('description-1', 'error-description-1', 'Required', true);
 
         jest.useRealTimers();
     });

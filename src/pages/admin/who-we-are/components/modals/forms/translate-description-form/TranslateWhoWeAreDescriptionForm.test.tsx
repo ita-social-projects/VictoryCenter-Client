@@ -7,6 +7,8 @@ import {
 } from './TranslateWhoWeAreDescriptionForm';
 import { getWhoWeAreValidationMock } from '@/utils/test-mocks/who-we-are-form-mocks';
 import {
+    assertRichTextChangeMarksFormDirty,
+    assertRichTextErrorOnBlur,
     blurRichTextField,
     changeRichTextField,
     focusRichTextField,
@@ -69,11 +71,7 @@ describe('TranslateWhoWeAreDescriptionForm', () => {
         const onDirtyChange = jest.fn();
         renderForm({ onDirtyChange });
 
-        changeRichTextField('description', '<p>Updated description</p>');
-
-        await waitFor(() => {
-            expect(onDirtyChange).toHaveBeenCalledWith(true);
-        });
+        await assertRichTextChangeMarksFormDirty('description', '<p>Updated description</p>', onDirtyChange);
     });
 
     it('shows validation error on blur', async () => {
@@ -86,11 +84,7 @@ describe('TranslateWhoWeAreDescriptionForm', () => {
             jest.runAllTimers();
         });
 
-        blurRichTextField('description');
-
-        await waitFor(() => {
-            expect(screen.getByTestId('error-description')).toHaveTextContent('Required');
-        });
+        await assertRichTextErrorOnBlur('description', 'error-description', 'Required');
 
         jest.useRealTimers();
     });

@@ -1,4 +1,4 @@
-import { act, fireEvent, screen } from '@testing-library/react';
+import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 import { RefObject } from 'react';
 
 interface SubmittableFormRef {
@@ -22,5 +22,34 @@ export const blurRichTextField = (id: string): void => {
 export const submitFormByRef = async (ref: RefObject<SubmittableFormRef | null>): Promise<void> => {
     await act(async () => {
         await ref.current?.submit();
+    });
+};
+
+export const assertRichTextChangeMarksFormDirty = async (
+    fieldId: string,
+    value: string,
+    onDirtyChange: jest.Mock,
+): Promise<void> => {
+    changeRichTextField(fieldId, value);
+
+    await waitFor(() => {
+        expect(onDirtyChange).toHaveBeenCalledWith(true);
+    });
+};
+
+export const assertRichTextErrorOnBlur = async (
+    fieldId: string,
+    errorTestId: string,
+    errorMessage: string,
+    shouldFocusBeforeBlur = false,
+): Promise<void> => {
+    if (shouldFocusBeforeBlur) {
+        focusRichTextField(fieldId);
+    }
+
+    blurRichTextField(fieldId);
+
+    await waitFor(() => {
+        expect(screen.getByTestId(errorTestId)).toHaveTextContent(errorMessage);
     });
 };

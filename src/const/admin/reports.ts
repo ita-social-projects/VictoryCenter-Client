@@ -150,4 +150,7 @@ export const FUNDS_EXPENDITURES_TEXT = {
             ALT_TEXT: 'Записів не знайдено',
         },
     },
+    VALIDATION: {
+        CATEGORY_UNIQUE: 'Категорія має бути унікальна',
+    },
 };

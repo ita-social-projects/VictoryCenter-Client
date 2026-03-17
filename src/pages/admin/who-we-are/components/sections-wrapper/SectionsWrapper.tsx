@@ -20,7 +20,6 @@ export interface MainSectionProps {
     handleOnTranslateContent: (section: WhoWeAreSection) => void;
     onPublish: () => void;
     isPublishButtonActive: boolean;
-    setIsPublishButtonActive: (value: boolean) => void;
     language: LocalizationLanguage;
 }
 
@@ -34,7 +33,6 @@ export const SectionsWrapper = ({
     onChange,
     handleOnTranslateContent,
     onPublish,
-    setIsPublishButtonActive,
     isPublishButtonActive,
     language,
 }: MainSectionProps) => {
@@ -46,7 +44,6 @@ export const SectionsWrapper = ({
         content: section.contents,
         onChange,
         onPublish,
-        setIsPublishButtonActive,
         isPublishButtonActive,
         language,
     };

@@ -155,16 +155,46 @@ const TEST_DATA = {
     ] as LocalizationLanguage[],
 };
 
+const UKRAINIAN_LANGUAGE = {
+    id: 1,
+    code: DEFAULT_LOCALE,
+    name: 'Українська',
+} as LocalizationLanguage;
+
 describe('TranslateProgramModal', () => {
+    const createModalProps = (overrides: Partial<React.ComponentProps<typeof TranslateProgramModal>> = {}) => ({
+        isOpen: true,
+        onClose: jest.fn(),
+        programToTranslate: TEST_DATA.program,
+        onTranslateProgram: jest.fn(),
+        translatedLanguages: TEST_DATA.translatedLanguages,
+        ...overrides,
+    });
+
     const renderModal = (props: Partial<React.ComponentProps<typeof TranslateProgramModal>> = {}) => {
-        const defaultProps = {
-            isOpen: true,
-            onClose: jest.fn(),
-            programToTranslate: TEST_DATA.program,
-            onTranslateProgram: jest.fn(),
-            translatedLanguages: TEST_DATA.translatedLanguages,
-        };
-        return render(<TranslateProgramModal {...defaultProps} {...props} />);
+        return render(<TranslateProgramModal {...createModalProps(props)} />);
+    };
+
+    const renderModalWithLanguageUpdate = (
+        initialLanguages: LocalizationLanguage[],
+        nextLanguages: LocalizationLanguage[],
+    ) => {
+        const initialProps = createModalProps({ translatedLanguages: initialLanguages });
+        const { rerender } = render(<TranslateProgramModal {...initialProps} />);
+
+        rerender(<TranslateProgramModal {...createModalProps({ translatedLanguages: nextLanguages })} />);
+    };
+
+    const getInitialDataFromForm = () => JSON.parse(screen.getByTestId('translate-form').getAttribute('data-initial')!);
+
+    const expectLastHookLanguageCode = async (code: string) => {
+        await waitFor(() => {
+            expect(mockUseTranslateProgram).toHaveBeenLastCalledWith(
+                expect.objectContaining({
+                    language: expect.objectContaining({ code }),
+                }),
+            );
+        });
     };
 
     beforeEach(() => {
@@ -198,10 +228,8 @@ describe('TranslateProgramModal', () => {
             programToTranslate: TEST_DATA.programWithLocalization,
             translatedLanguages: [TEST_DATA.language],
         });
-        const form = screen.getByTestId('translate-form');
-        const attr = form.getAttribute('data-initial');
-        expect(attr).toBeTruthy();
-        expect(JSON.parse(attr!)).toMatchObject({
+        const parsed = getInitialDataFromForm();
+        expect(parsed).toMatchObject({
             name: 'Existing',
             description: 'X',
             location: '',
@@ -327,35 +355,9 @@ describe('TranslateProgramModal', () => {
 
     it('selects non-default language when languages arrive after initial empty list', async () => {
         const english = { id: 2, code: 'en', name: 'English' } as LocalizationLanguage;
-        const ukrainian = { id: 1, code: DEFAULT_LOCALE, name: 'Українська' } as LocalizationLanguage;
 
-        const { rerender } = render(
-            <TranslateProgramModal
-                isOpen={true}
-                onClose={jest.fn()}
-                programToTranslate={TEST_DATA.program}
-                onTranslateProgram={jest.fn()}
-                translatedLanguages={[]}
-            />,
-        );
-
-        rerender(
-            <TranslateProgramModal
-                isOpen={true}
-                onClose={jest.fn()}
-                programToTranslate={TEST_DATA.program}
-                onTranslateProgram={jest.fn()}
-                translatedLanguages={[ukrainian, english]}
-            />,
-        );
-
-        await waitFor(() => {
-            expect(mockUseTranslateProgram).toHaveBeenLastCalledWith(
-                expect.objectContaining({
-                    language: expect.objectContaining({ code: 'en' }),
-                }),
-            );
-        });
+        renderModalWithLanguageUpdate([], [UKRAINIAN_LANGUAGE, english]);
+        await expectLastHookLanguageCode('en');
     });
 
     it('renders error message and disables actions while submitting', () => {
@@ -422,10 +424,7 @@ describe('TranslateProgramModal', () => {
             translatedLanguages: [TEST_DATA.language],
         });
 
-        const attr = screen.getByTestId('translate-form').getAttribute('data-initial');
-        expect(attr).toBeTruthy();
-
-        const parsed = JSON.parse(attr!);
+        const parsed = getInitialDataFromForm();
         expect(parsed.__previewImage).toMatchObject({ url: 'https://example.com/preview.jpg' });
         expect(parsed.__backgroundImage).toMatchObject({ url: 'https://example.com/bg.jpg' });
         expect(parsed.sections).toHaveLength(1);
@@ -457,33 +456,8 @@ describe('TranslateProgramModal', () => {
     });
 
     it('falls back to first language when only default locale is available', async () => {
-        const ukrainian = { id: 1, code: DEFAULT_LOCALE, name: 'Українська' } as LocalizationLanguage;
-
-        const { rerender } = render(
-            <TranslateProgramModal
-                isOpen={true}
-                onClose={jest.fn()}
-                programToTranslate={TEST_DATA.program}
-                onTranslateProgram={jest.fn()}
-                translatedLanguages={[]}
-            />,
-        );
-
-        rerender(
-            <TranslateProgramModal
-                isOpen={true}
-                onClose={jest.fn()}
-                programToTranslate={TEST_DATA.program}
-                onTranslateProgram={jest.fn()}
-                translatedLanguages={[ukrainian]}
-            />,
-        );
-
-        await waitFor(() => {
-            expect(mockUseTranslateProgram).toHaveBeenLastCalledWith(
-                expect.objectContaining({ language: expect.objectContaining({ code: DEFAULT_LOCALE }) }),
-            );
-        });
+        renderModalWithLanguageUpdate([], [UKRAINIAN_LANGUAGE]);
+        await expectLastHookLanguageCode(DEFAULT_LOCALE);
     });
 
     it('maps faq questionText/answerText into both faq field variants', () => {
@@ -516,7 +490,7 @@ describe('TranslateProgramModal', () => {
             translatedLanguages: [TEST_DATA.language],
         });
 
-        const parsed = JSON.parse(screen.getByTestId('translate-form').getAttribute('data-initial')!);
+        const parsed = getInitialDataFromForm();
         expect(parsed.sections[0].contents[0]).toMatchObject({
             question: 'Localized question text only',
             answer: 'Localized answer text only',
@@ -540,12 +514,7 @@ describe('TranslateProgramModal', () => {
         renderModal();
 
         fireEvent.click(screen.getByTestId('language-select-polish'));
-
-        await waitFor(() => {
-            expect(mockUseTranslateProgram).toHaveBeenLastCalledWith(
-                expect.objectContaining({ language: expect.objectContaining({ code: 'pl' }) }),
-            );
-        });
+        await expectLastHookLanguageCode('pl');
     });
 
     it('maps sections when language is not selected yet', () => {
@@ -574,7 +543,7 @@ describe('TranslateProgramModal', () => {
 
         renderModal({ programToTranslate: programWithSections, translatedLanguages: [] });
 
-        const parsed = JSON.parse(screen.getByTestId('translate-form').getAttribute('data-initial')!);
+        const parsed = getInitialDataFromForm();
         expect(parsed.sections[0].contents[0]).toMatchObject({
             entityId: 16,
             languageId: 0,

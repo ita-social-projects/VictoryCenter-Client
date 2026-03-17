@@ -13,6 +13,7 @@ import { MainPageProps, WhoWeSupportCardsProps } from '../../sections/SectionsPr
 let mockFormIsValid = true;
 const mockFormSubmit = jest.fn().mockResolvedValue(undefined);
 const mockFormIsDirty = jest.fn(() => false);
+const mockStrategyOnSubmit = jest.fn();
 
 const mockGetInitialDataTitleAndDescription = jest.fn(
     (_section: WhoWeAreSection, _language: LocalizationLanguage | null, _isEditMode: boolean) => ({
@@ -48,7 +49,21 @@ function mockBuildStrategyForm() {
                 data-description-limit={String(props.limits.descriptionLimit)}
                 data-title-limit={String(props.limits.titleLimit ?? '')}
                 data-initial-data={JSON.stringify(props.initialData ?? null)}
-            />
+            >
+                <button
+                    data-testid="strategy-submit"
+                    onClick={() => {
+                        const formData = {
+                            title: '<p>Title from form</p>',
+                            description: '<p>Description from form</p>',
+                        };
+                        mockStrategyOnSubmit(formData);
+                        props.onSubmit(formData as unknown);
+                    }}
+                >
+                    Strategy submit
+                </button>
+            </div>
         );
     });
 
@@ -57,7 +72,7 @@ function mockBuildStrategyForm() {
 }
 
 jest.mock('@/components/admin/localization-modal/LocalizationModal', () => ({
-    LocalizationModal: ({ isOpen, onClose, onSave, title, children, isFormValid }: any) =>
+    LocalizationModal: ({ isOpen, onClose, onSave, title, children, isFormValid, checkIsDirty }: any) =>
         isOpen ? (
             <div data-testid="localization-modal">
                 <h2>{title}</h2>
@@ -65,6 +80,10 @@ jest.mock('@/components/admin/localization-modal/LocalizationModal', () => ({
                 <button data-testid="save-button" onClick={onSave}>
                     Save
                 </button>
+                <button data-testid="check-dirty-button" onClick={() => checkIsDirty()}>
+                    Check dirty
+                </button>
+                <div data-testid="is-dirty-result">{String(checkIsDirty())}</div>
                 <button data-testid="close-button" onClick={onClose}>
                     Close
                 </button>
@@ -162,6 +181,7 @@ describe('TranslateWhoWeAreModal', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         mockFormIsValid = true;
+        mockFormIsDirty.mockReturnValue(false);
 
         mockUseTranslateWhoWeAreSection.mockReturnValue({
             translateSection: mockTranslateSection,
@@ -329,5 +349,72 @@ describe('TranslateWhoWeAreModal', () => {
         const strategyForm = screen.getByTestId('strategy-form');
         expect(strategyForm.dataset.descriptionLimit).toBe(String(MainPageProps.descriptionLimit));
         expect(strategyForm.dataset.titleLimit).toBe(String(MainPageProps.titleLimit));
+    });
+
+    it('sets default non-default-locale language when languages appear later and current language is null', async () => {
+        const { rerender } = render(
+            <TranslateWhoWeAreModal
+                isOpen={true}
+                onClose={jest.fn()}
+                sectionToTranslate={buildSection(SectionType.Main)}
+                onTranslateSection={jest.fn()}
+                translatedLanguages={[]}
+            />,
+        );
+
+        expect(screen.getByTestId('selected-language')).toHaveTextContent('none');
+
+        rerender(
+            <TranslateWhoWeAreModal
+                isOpen={true}
+                onClose={jest.fn()}
+                sectionToTranslate={buildSection(SectionType.Main)}
+                onTranslateSection={jest.fn()}
+                translatedLanguages={translatedLanguages}
+            />,
+        );
+
+        await waitFor(() => {
+            expect(screen.getByTestId('selected-language')).toHaveTextContent('en');
+        });
+    });
+
+    it('returns dirty state using checkIsDirty callback from modal', () => {
+        mockFormIsDirty.mockReturnValue(true);
+
+        render(
+            <TranslateWhoWeAreModal
+                isOpen={true}
+                onClose={jest.fn()}
+                sectionToTranslate={buildSection(SectionType.Main)}
+                onTranslateSection={jest.fn()}
+                translatedLanguages={translatedLanguages}
+            />,
+        );
+
+        fireEvent.click(screen.getByTestId('check-dirty-button'));
+
+        expect(mockFormIsDirty).toHaveBeenCalled();
+    });
+
+    it('submits strategy form and calls translateSection from hook', async () => {
+        render(
+            <TranslateWhoWeAreModal
+                isOpen={true}
+                onClose={jest.fn()}
+                sectionToTranslate={buildSection(SectionType.Main)}
+                onTranslateSection={jest.fn()}
+                translatedLanguages={translatedLanguages}
+            />,
+        );
+
+        fireEvent.click(screen.getByTestId('strategy-submit'));
+
+        await waitFor(() => {
+            expect(mockTranslateSection).toHaveBeenCalledWith({
+                title: '<p>Title from form</p>',
+                description: '<p>Description from form</p>',
+            });
+        });
     });
 });

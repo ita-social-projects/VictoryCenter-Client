@@ -1,5 +1,5 @@
 import React, { createRef } from 'react';
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import {
     TranslateWhoWeAreTitleAndDescriptionForm,
@@ -153,6 +153,51 @@ describe('TranslateWhoWeAreTitleAndDescriptionForm', () => {
 
         expect(validationMock.validateText).toHaveBeenCalled();
         jest.useRealTimers();
+    });
+
+    it('validates title on focus after field was touched', () => {
+        jest.useFakeTimers();
+        renderForm();
+
+        act(() => {
+            jest.runAllTimers();
+        });
+
+        blurRichTextField('title');
+        const callsBeforeFocus = validationMock.validateText.mock.calls.length;
+        focusRichTextField('title');
+
+        expect(validationMock.validateText.mock.calls.length).toBeGreaterThan(callsBeforeFocus);
+        jest.useRealTimers();
+    });
+
+    it('validates description on focus and change after field was touched', () => {
+        jest.useFakeTimers();
+        renderForm();
+
+        act(() => {
+            jest.runAllTimers();
+        });
+
+        blurRichTextField('description');
+        const callsBeforeFocus = validationMock.validateText.mock.calls.length;
+
+        focusRichTextField('description');
+        changeRichTextField('description', '<p>Changed after blur</p>');
+
+        expect(validationMock.validateText.mock.calls.length).toBeGreaterThan(callsBeforeFocus);
+        jest.useRealTimers();
+    });
+
+    it('prevents native form submit behavior', () => {
+        renderForm();
+
+        const form = screen.getByTestId('translate-who-we-are-form');
+        const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+
+        fireEvent(form, submitEvent);
+
+        expect(submitEvent.defaultPrevented).toBe(true);
     });
 
     it('submits empty values when initialData contains undefined fields', async () => {

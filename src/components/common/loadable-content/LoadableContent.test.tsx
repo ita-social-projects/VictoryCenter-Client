@@ -47,7 +47,7 @@ describe('LoadableContent', () => {
         expect(error).toHaveTextContent('Custom Error');
     });
 
-    it('should render children when is not loading or has an error', () => {
+    it('should render children when is not loading and has no errors', () => {
         render(
             <LoadableContent isLoading={false} error={false}>
                 Test Content

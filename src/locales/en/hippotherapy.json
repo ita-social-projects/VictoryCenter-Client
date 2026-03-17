@@ -1,3 +1,9 @@
 {
-    "SLOGAN": "Hippovention ≠ treatment. It is a space for interaction."
+    "SLOGAN": {
+        "FIRST_HIGHLIGHT": "Hippovention",
+        "FIRST_TEXT": "≠ treatment.",
+        "SECOND_TEXT": "It is a",
+        "SECOND_HIGHLIGHT": "space for",
+        "THIRD_HIGHLIGHT": "interaction."
+    }
 }

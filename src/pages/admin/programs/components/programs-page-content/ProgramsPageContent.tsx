@@ -139,6 +139,29 @@ export const ProgramsPageContent = () => {
 
     const getProgramId = useCallback((program: HippotherapyProgram) => program.id, []);
 
+    const syncProgramStatusWithServer = useCallback(
+        async (program: HippotherapyProgram): Promise<HippotherapyProgram> => {
+            try {
+                const refreshedDto = await ProgramsApi.fetchProgramById(program.id, client);
+
+                if (!refreshedDto) {
+                    return program;
+                }
+
+                const refreshedProgram = mapHippotherapyProgramDtoToModel(refreshedDto);
+
+                return {
+                    ...program,
+                    status: refreshedProgram.status,
+                    localizations: refreshedProgram.localizations,
+                };
+            } catch {
+                return program;
+            }
+        },
+        [client],
+    );
+
     // Data fetching hooks
     const {
         data: categories,
@@ -173,16 +196,20 @@ export const ProgramsPageContent = () => {
 
     const handleTranslateProgramSuccess = useCallback(
         (updatedProgram: HippotherapyProgram) => {
-            updatePrograms((prev) => prev.map((p) => (p.id === updatedProgram.id ? updatedProgram : p)));
-            closeModalActions.closeTranslateItemModal();
-            addToast(
-                updatedProgram.status === VisibilityStatus.Published
-                    ? COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_PUBLISHED_SUCCESS
-                    : COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS,
-                ToastType.Success,
-            );
+            void (async () => {
+                const syncedProgram = await syncProgramStatusWithServer(updatedProgram);
+
+                updatePrograms((prev) => prev.map((p) => (p.id === syncedProgram.id ? syncedProgram : p)));
+                closeModalActions.closeTranslateItemModal();
+                addToast(
+                    syncedProgram.status === VisibilityStatus.Published
+                        ? COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_PUBLISHED_SUCCESS
+                        : COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS,
+                    ToastType.Success,
+                );
+            })();
         },
-        [closeModalActions, addToast, updatePrograms],
+        [closeModalActions, addToast, updatePrograms, syncProgramStatusWithServer],
     );
     const {
         data: fetchedSearchProgram,
@@ -308,41 +335,46 @@ export const ProgramsPageContent = () => {
 
     const handleEditProgram = useCallback(
         (updatedProgram: HippotherapyProgram) => {
-            if (updatedProgram.status === VisibilityStatus.Draft) {
-                addToast(PROGRAMS_TEXT.FORM.MESSAGE.PROGRAM_SAVED_SUCCESSFULLY, ToastType.Info);
-            } else if (updatedProgram.status === VisibilityStatus.Published) {
-                addToast(PROGRAMS_TEXT.FORM.MESSAGE.PROGRAM_PUBLISHED_SUCCESSFULLY, ToastType.Info);
-            }
-            if (isSearchResultView && fetchedSearchProgram?.id === updatedProgram.id) {
-                updateSearchedProgram(updatedProgram);
-            }
+            void (async () => {
+                const syncedProgram = await syncProgramStatusWithServer(updatedProgram);
 
-            const originalProgram =
-                fetchedPrograms.find((p) => p.id === updatedProgram.id) ??
-                (isSearchResultView && fetchedSearchProgram?.id === updatedProgram.id ? fetchedSearchProgram : null);
-            if (!originalProgram) return;
+                if (syncedProgram.status === VisibilityStatus.Draft) {
+                    addToast(PROGRAMS_TEXT.FORM.MESSAGE.PROGRAM_SAVED_SUCCESSFULLY, ToastType.Info);
+                } else if (syncedProgram.status === VisibilityStatus.Published) {
+                    addToast(PROGRAMS_TEXT.FORM.MESSAGE.PROGRAM_PUBLISHED_SUCCESSFULLY, ToastType.Info);
+                }
+                if (isSearchResultView && fetchedSearchProgram?.id === syncedProgram.id) {
+                    updateSearchedProgram(syncedProgram);
+                }
 
-            // Update program counters in categories
-            updateCategories((prevCategories) =>
-                updateCategoriesCount(prevCategories, originalProgram, updatedProgram),
-            );
+                const originalProgram =
+                    fetchedPrograms.find((p) => p.id === syncedProgram.id) ??
+                    (isSearchResultView && fetchedSearchProgram?.id === syncedProgram.id ? fetchedSearchProgram : null);
+                if (!originalProgram) return;
 
-            // Update program in local programs list
-            const belongsToSelectedCategory =
-                !!selectedCategory && updatedProgram.categories.some((cat) => cat.id === selectedCategory.id);
-            const statusMatches = statusFilter === undefined || updatedProgram.status === statusFilter;
+                // Update program counters in categories
+                updateCategories((prevCategories) =>
+                    updateCategoriesCount(prevCategories, originalProgram, syncedProgram),
+                );
 
-            if (belongsToSelectedCategory && statusMatches) {
-                if (updatedProgram.previewImage && 'url' in updatedProgram.previewImage)
-                    updatedProgram.previewImage.url = `${updatedProgram.previewImage.url}?cb=${Date.now()}`;
-                if (updatedProgram.backgroundImage && 'url' in updatedProgram.backgroundImage)
-                    updatedProgram.backgroundImage.url = `${updatedProgram.backgroundImage.url}?cb=${Date.now()}`;
-                updatePrograms((prev) => prev.map((p) => (p.id === updatedProgram.id ? updatedProgram : p)));
-            } else {
-                updatePrograms((prev) => prev.filter((p) => p.id !== updatedProgram.id));
-            }
+                // Update program in local programs list
+                const belongsToSelectedCategory =
+                    !!selectedCategory && syncedProgram.categories.some((cat) => cat.id === selectedCategory.id);
+                const statusMatches = statusFilter === undefined || syncedProgram.status === statusFilter;
+
+                if (belongsToSelectedCategory && statusMatches) {
+                    if (syncedProgram.previewImage && 'url' in syncedProgram.previewImage)
+                        syncedProgram.previewImage.url = `${syncedProgram.previewImage.url}?cb=${Date.now()}`;
+                    if (syncedProgram.backgroundImage && 'url' in syncedProgram.backgroundImage)
+                        syncedProgram.backgroundImage.url = `${syncedProgram.backgroundImage.url}?cb=${Date.now()}`;
+                    updatePrograms((prev) => prev.map((p) => (p.id === syncedProgram.id ? syncedProgram : p)));
+                } else {
+                    updatePrograms((prev) => prev.filter((p) => p.id !== syncedProgram.id));
+                }
+            })();
         },
         [
+            syncProgramStatusWithServer,
             updateCategories,
             updateSearchedProgram,
             updatePrograms,

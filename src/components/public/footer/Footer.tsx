@@ -36,7 +36,9 @@ export const Footer = () => {
                 <div className="menu">
                     <span className="title">{t('MENU')}</span>
                     <Link to={PUBLIC_ROUTES.REPORTS.FULL}>{t('REPORTING')}</Link>
-                    <Link to={PUBLIC_ROUTES.DONATE.FULL}>{t('HOW_TO_SUPPORT')}</Link>
+                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
+                        {t('HOW_TO_SUPPORT')}
+                    </Link>
                     <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
                         {t('STORIES_OF_VICTORIES')}
                     </Link>

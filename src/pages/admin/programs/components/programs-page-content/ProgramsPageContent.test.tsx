@@ -146,9 +146,10 @@ jest.mock('@/components/admin/infinite-scroll-list/InfiniteScrollList', () => ({
 }));
 
 jest.mock('../program-list-item/ProgramListItem', () => ({
-    ProgramListItem: ({ program, handleOnEditProgram, handleOnDeleteProgram }: ProgramListItemProps) => (
+    ProgramListItem: ({ program, handleOnEditProgram, handleOnDeleteProgram, handleOnTranslateProgram }: any) => (
         <div>
             <span>{program.name}</span>
+            <button data-testid="translate-program" onClick={() => handleOnTranslateProgram(program)} />
             <button data-testid="edit-program" onClick={() => handleOnEditProgram(program)} />
             <button data-testid="delete-program" onClick={() => handleOnDeleteProgram(program)} />
         </div>
@@ -177,6 +178,26 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                             sections: [],
                             categories: [{ id: 1, name: 'Category A', programsCount: 2 }],
                             slug: 'new-program',
+                            localizations: [],
+                        })
+                    }
+                />
+                <button
+                    data-testid="trigger-translate"
+                    onClick={() =>
+                        props.onTranslateProgram({
+                            id: 10,
+                            name: 'To Translate',
+                            description: '',
+                            meetingsCount: '',
+                            participantsCount: '',
+                            location: '',
+                            previewImage: null,
+                            backgroundImage: null,
+                            status: VisibilityStatus.Draft,
+                            sections: [],
+                            categories: [{ id: 1, name: 'Category A', programsCount: 2 }],
+                            slug: 'alpha',
                             localizations: [],
                         })
                     }
@@ -457,6 +478,7 @@ describe('ProgramsPageContent', () => {
             openAddItemModal: jest.fn(),
             openEditItemModal: jest.fn(),
             openDeleteItemModal: jest.fn(),
+            openTranslateItemModal: jest.fn(),
             openAddCategoryModal: jest.fn(),
             openEditCategoryModal: jest.fn(),
             openDeleteCategoryModal: jest.fn(),
@@ -466,6 +488,7 @@ describe('ProgramsPageContent', () => {
             closeAddItemModal: jest.fn(),
             closeEditItemModal: jest.fn(),
             closeDeleteItemModal: jest.fn(),
+            closeTranslateItemModal: jest.fn(),
             closeAddCategoryModal: jest.fn(),
             closeEditCategoryModal: jest.fn(),
             closeDeleteCategoryModal: jest.fn(),
@@ -479,6 +502,7 @@ describe('ProgramsPageContent', () => {
                 isDeleteCategoryModalOpen: false,
                 itemToEdit: null,
                 itemToDelete: null,
+                itemToTranslate: null,
             },
             isAnyModalOpened: false,
             openModalActions: openActions,
@@ -764,6 +788,19 @@ describe('ProgramsPageContent', () => {
         } finally {
             nowSpy.mockRestore();
         }
+    });
+
+    it('opens translate flow and updates list when translation succeeds', async () => {
+        await renderAndWaitForPrograms();
+
+        // click translate button on first item
+        fireEvent.click(screen.getAllByTestId('translate-program')[0]);
+        // modal mock triggers translation via button
+        fireEvent.click(screen.getByTestId('trigger-translate'));
+
+        await waitFor(() => {
+            expect(screen.getByText('To Translate')).toBeInTheDocument();
+        });
     });
 
     it('ignores edit when original program is not found in local lists', async () => {

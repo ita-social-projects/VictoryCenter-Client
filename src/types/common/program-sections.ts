@@ -105,6 +105,16 @@ export interface CreateProgramSectionContentDto {
     faqQuestion?: CreateFaqQuestionDto | null;
 }
 
+export interface CreateProgramSectionContentLocalizationDto {
+    entityId: number;
+    title?: string | null;
+    description?: string | null;
+    author?: string | null;
+    questionText?: string | null;
+    answerText?: string | null;
+    languageId: number;
+}
+
 export interface CreateHippotherapyProgramSectionDto {
     id?: number;
     programId?: number;
@@ -127,4 +137,8 @@ export interface HippotherapyProgramSectionContentLocalizationDto
     extends EntityLocalizationDto,
         ProgramSectionContentLocalizableFields {
     entityId: number;
+}
+export interface CreateHippotherapyProgramSectionLocalizationDto {
+    entityId: number;
+    contents: CreateProgramSectionContentLocalizationDto[];
 }

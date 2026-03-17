@@ -3,16 +3,13 @@ import { render, screen } from '@testing-library/react';
 
 describe('HippotherapyIntro', () => {
     it('should render intro section with provided data', () => {
-        render(
-            <HippotherapyIntro
-                introData={{
-                    imgURL: 'test-image.jpg',
-                    imgAlternativeText: 'Test Image',
-                    title: 'Test Title',
-                    description: 'Test Description',
-                }}
-            />,
-        );
+        const props = {
+            imgURL: 'test-image.jpg',
+            imgAlternativeText: 'Test Image',
+            title: 'Test Title',
+            description: 'Test Description',
+        };
+        render(<HippotherapyIntro {...props} />);
 
         const image = screen.getByRole('img');
         expect(image).toBeInTheDocument();

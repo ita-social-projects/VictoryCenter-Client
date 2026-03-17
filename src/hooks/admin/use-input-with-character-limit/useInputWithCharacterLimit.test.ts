@@ -156,6 +156,56 @@ describe('useInputWithCharacterLimit', () => {
                 expect(mockShowTemporaryWarning).not.toHaveBeenCalled();
                 expect(mockOnChange).not.toHaveBeenCalled();
             });
+
+            it('should block a trailing space when normalized length is already at maxLength', () => {
+                const warningMessage = 'Character limit exceeded';
+                const atLimitValue = 'a'.repeat(defaultProps.maxLength);
+                const { result } = renderHook(() =>
+                    useInputWithCharacterLimit({
+                        ...defaultProps,
+                        value: atLimitValue,
+                        maxLimitWarning: warningMessage,
+                    }),
+                );
+
+                triggerChange(result, atLimitValue + ' ');
+
+                expect(mockShowTemporaryWarning).toHaveBeenCalledWith(warningMessage);
+                expect(mockOnChange).not.toHaveBeenCalled();
+            });
+
+            it('should block a leading space when normalized length is already at maxLength', () => {
+                const warningMessage = 'Character limit exceeded';
+                const atLimitValue = 'a'.repeat(defaultProps.maxLength);
+                const { result } = renderHook(() =>
+                    useInputWithCharacterLimit({
+                        ...defaultProps,
+                        value: atLimitValue,
+                        maxLimitWarning: warningMessage,
+                    }),
+                );
+
+                triggerChange(result, ' ' + atLimitValue);
+
+                expect(mockShowTemporaryWarning).toHaveBeenCalledWith(warningMessage);
+                expect(mockOnChange).not.toHaveBeenCalled();
+            });
+
+            it('should block extra spaces when raw length exceeds maxLength even if normalized is below', () => {
+                const warningMessage = 'Character limit exceeded';
+                const inputValue = '  aaaa  aaaa  ';
+                const { result } = renderHook(() =>
+                    useInputWithCharacterLimit({
+                        ...defaultProps,
+                        maxLimitWarning: warningMessage,
+                    }),
+                );
+
+                triggerChange(result, inputValue);
+
+                expect(mockShowTemporaryWarning).toHaveBeenCalledWith(warningMessage);
+                expect(mockOnChange).not.toHaveBeenCalled();
+            });
         });
     });
 
@@ -200,6 +250,41 @@ describe('useInputWithCharacterLimit', () => {
 
             expect(result.current.isFocused).toBe(false);
             expect(mockOnBlur).toHaveBeenCalledWith(mockEvent);
+        });
+
+        it('should trim value and call onChange on blur when value has leading/trailing spaces', () => {
+            const valueWithSpaces = '  hello  ';
+            const { result } = renderHook(() =>
+                useInputWithCharacterLimit({ ...defaultProps, value: valueWithSpaces }),
+            );
+
+            act(() => {
+                result.current.handleBlur({} as React.FocusEvent<HTMLInputElement>);
+            });
+
+            expect(mockOnChange).toHaveBeenCalledWith({
+                target: { value: 'hello', name: 'testInput', id: 'test-input' },
+            });
+        });
+
+        it('should not call onChange on blur when value has no leading/trailing spaces', () => {
+            const { result } = renderHook(() => useInputWithCharacterLimit({ ...defaultProps, value: 'hello' }));
+
+            act(() => {
+                result.current.handleBlur({} as React.FocusEvent<HTMLInputElement>);
+            });
+
+            expect(mockOnChange).not.toHaveBeenCalled();
+        });
+
+        it('should not call onChange on blur when value is whitespace-only', () => {
+            const { result } = renderHook(() => useInputWithCharacterLimit({ ...defaultProps, value: '   \n   ' }));
+
+            act(() => {
+                result.current.handleBlur({} as React.FocusEvent<HTMLInputElement>);
+            });
+
+            expect(mockOnChange).not.toHaveBeenCalled();
         });
     });
 

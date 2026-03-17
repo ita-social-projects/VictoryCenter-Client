@@ -1,5 +1,6 @@
 @use '@/assets/sass/variables/colors' as c;
 @use '@/assets/sass/variables/typography' as t;
+@use '@/assets/sass/mixins/typography.mixins' as type;
 
 .view-layout {
     height: 100%;
@@ -55,12 +56,9 @@
 
 .view-title-text {
     margin: 0;
-    font-family: t.$font-family-base;
-    font-weight: t.$fw-bold;
+    @include type.h4-bold;
     color: c.$blue-900;
     text-align: left;
-    font-size: 28px;
-    line-height: 36px;
 
     @media (min-width: 768px) {
         font-size: 32px;
@@ -90,12 +88,9 @@
 
 .view-text {
     margin: 0;
-    font-family: t.$font-family-base;
-    font-weight: t.$fw-regular;
+    @include type.body-1-regular;
     color: c.$blue-900;
     white-space: pre-wrap;
-    font-size: 16px;
-    line-height: 20px;
 }
 
 .card-0 {

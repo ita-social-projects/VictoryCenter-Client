@@ -39,7 +39,9 @@ export const ProgramCard = ({ program, variant }: ProgramCardProps) => {
             tabIndex={program.slug ? 0 : -1}
             style={{ cursor: program.slug ? 'pointer' : 'default' }}
         >
-            <img src={program.previewImage?.url} alt={program.name} className={styles.image} />
+            <div className={styles['image-wrapper']}>
+                <img src={program.previewImage?.url} alt={program.name} className={styles.image} />
+            </div>
             <div className={styles.content}>
                 <div className={styles[`subtitle-content`]}>
                     <div className={styles.subtitle}>

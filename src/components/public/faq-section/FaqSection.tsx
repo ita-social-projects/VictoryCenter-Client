@@ -33,10 +33,10 @@ export const FaqSection = ({ slug }: FaqSectionProps) => {
     return (
         <div className={styles['faq-section']}>
             <div className={styles['faq-block']}>
-                <h2>{t('COMMON_QUESTIONS')}</h2>
-                <div>
+                <h2 className={styles['title']}>{t('COMMON_QUESTIONS')}</h2>
+                <div className={styles['questions-container']}>
                     {questions.map((item, _) => (
-                        <FaqCard key={item.id} faq={item} />
+                        <FaqCard key={item.id} faq={item} className={styles['faq-card-faq-section']} />
                     ))}
                 </div>
             </div>

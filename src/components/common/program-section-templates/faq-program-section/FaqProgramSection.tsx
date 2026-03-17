@@ -29,6 +29,7 @@ export interface FaqProgramSectionProps {
     onAddFaqPair?: (questionText: string, answerText: string) => void;
     onDeleteFaqPair?: (index: number) => void;
     validationResetKey?: number;
+    canAddFaqPair?: boolean;
 }
 
 const TEMPLATE = ProgramSectionTemplate.SingleTitleQuestionAnswerPairs;
@@ -44,6 +45,7 @@ export const FaqProgramSection = ({
     onAddFaqPair,
     onDeleteFaqPair,
     validationResetKey,
+    canAddFaqPair = true,
 }: FaqProgramSectionProps) => {
     const { t } = useTranslation('programsPage');
     const idPrefix = useId();
@@ -74,8 +76,9 @@ export const FaqProgramSection = ({
     }, [isEditable, faqPairs.length, onAddFaqPair]);
 
     const isAddDisabled =
-        faqPairs.length > 0 &&
-        faqPairs.some((pair) => !!validateFaqQuestion(pair.questionText) || !!validateFaqAnswer(pair.answerText));
+        !canAddFaqPair ||
+        (faqPairs.length > 0 &&
+            faqPairs.some((pair) => !!validateFaqQuestion(pair.questionText) || !!validateFaqAnswer(pair.answerText)));
 
     const handleAddClick = useCallback(() => {
         onAddFaqPair?.('', '');

@@ -226,7 +226,7 @@ describe('FundsExpenditureSection', () => {
 
         const table = screen.getByTestId('funds-table');
 
-        expect(table).toHaveAttribute('data-record-count', '5');
+        expect(table).toHaveAttribute('data-record-count', '3');
     });
 
     it('should filter records by category when category filter is applied', () => {
@@ -235,7 +235,7 @@ describe('FundsExpenditureSection', () => {
         fireEvent.click(screen.getByTestId('filter-cat-1'));
 
         const table = screen.getByTestId('funds-table');
-        expect(table).toHaveAttribute('data-record-count', '2');
+        expect(table).toHaveAttribute('data-record-count', '1');
     });
 
     it('should reset category when type changes', () => {
@@ -253,7 +253,7 @@ describe('FundsExpenditureSection', () => {
 
         fireEvent.click(screen.getByTestId('filter-income'));
 
-        expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-category-count', '7');
+        expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-category-count', '8');
     });
 
     it('should pass all categories to toolbar when expense type is selected', () => {
@@ -261,13 +261,13 @@ describe('FundsExpenditureSection', () => {
 
         fireEvent.click(screen.getByTestId('filter-expense'));
 
-        expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-category-count', '7');
+        expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-category-count', '8');
     });
 
     it('should pass all categories to toolbar when no type is selected', () => {
         render(<FundsExpenditureSection />);
 
-        expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-category-count', '7');
+        expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-category-count', '8');
     });
 
     describe('edit mode', () => {

@@ -85,27 +85,7 @@ export const useTranslateWhoWeAreSection = ({
             setError('');
 
             if (isEditMode) {
-                // const localizationData = mapFormValuesToPayload(data, section, language.id);
-                // const localizationDto = await WhoWeAreLocalizationsApi.create(client, section.sectionType, localizationData);
-                // const localization = localizationDto.map((content) => mapLocalizationDtoToModel<ContentLocalizationDto, ContentLocalization>(
-                //     content,
-                // ));
-                // const updatedSection: WhoWeAreSection = {
-                //     ...section,
-                //     contents: section.contents.map((content) => {
-                //         const translatedLocalization = localization.find((item) => item.entityId === content.id);
-                //         return {
-                //             ...content,
-                //             localizations:
-                //                 content.localizations?.map((loc) =>
-                //                     loc.language.id === language.id
-                //                         ? translatedLocalization ?? loc
-                //                         : loc,
-                //                 ) || [],
-                //         };
-                //     }),
-                // };
-                // onSuccess(updatedSection);
+                return;
             } else {
                 const localizationData = mapFormValuesToPayload(data, section, language.id);
                 const localizationDto = await WhoWeAreLocalizationsApi.create(

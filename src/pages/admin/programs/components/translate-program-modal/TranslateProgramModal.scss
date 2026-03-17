@@ -102,19 +102,19 @@
 }
 
 .translate-program-modal .translate-program-modal__top-actions .btn-secondary.translate-program-modal__action-button {
-    background-color: c.$grey-700;
-    border: 1px solid c.$grey-700;
+    background-color: c.$blue-500;
+    border: 1px solid c.$blue-500;
     color: c.$grey-50;
 
     &:hover {
-        background-color: c.$grey-800;
-        border-color: c.$grey-800;
-        color: c.$grey-50;
+        background-color: c.$yellow-500;
+        border-color: c.$yellow-500;
+        color: c.$blue-900;
     }
 
     &:active {
-        background-color: c.$grey-900;
-        border-color: c.$grey-900;
+        background-color: c.$blue-900;
+        border-color: c.$blue-900;
         color: c.$grey-50;
     }
 

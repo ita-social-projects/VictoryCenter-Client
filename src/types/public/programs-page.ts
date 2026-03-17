@@ -1,5 +1,6 @@
 import { Image } from '../common/image';
 import { HippotherapyProgramSectionDto } from '../common/program-sections';
+import { HippotherapyProgramLocalization } from '@/types/admin/programs';
 
 export interface ProgramCategoryDto {
     id: number;
@@ -31,4 +32,5 @@ export interface DetailedProgram {
     meetingsCount: string;
     sections: HippotherapyProgramSectionDto[];
     slug: string;
+    localizations: HippotherapyProgramLocalization[];
 }

@@ -20,6 +20,7 @@ const createMockProgram = (): DetailedProgram => ({
     backgroundImage: null,
     previewImage: null,
     sections: [],
+    localizations: [],
 });
 
 describe('useProgramBySlug', () => {

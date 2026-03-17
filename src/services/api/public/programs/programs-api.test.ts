@@ -78,6 +78,7 @@ describe('programs-api', () => {
                 location: '',
                 participantsCount: '0',
                 meetingsCount: '0',
+                localizations: [],
             };
 
             (axiosInstance.get as jest.Mock).mockResolvedValue({ data: mockProgram });
@@ -100,6 +101,7 @@ describe('programs-api', () => {
                 participantsCount: '0',
                 meetingsCount: '0',
                 sections: [],
+                localizations: [],
             };
 
             (axiosInstance.get as jest.Mock).mockResolvedValue({ data: mockProgram });

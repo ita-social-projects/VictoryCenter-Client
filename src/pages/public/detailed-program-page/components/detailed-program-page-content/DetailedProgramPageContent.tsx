@@ -14,9 +14,10 @@ import { CtaSection } from '@/components/public/cta';
 import { PUBLIC_ROUTES } from '@/const/public/routes';
 import outroVideo from '@/assets/videos/public/detailed-program-page/support_program_background.mp4';
 import { useTranslation } from 'react-i18next';
+import { getLocalizedProgram } from '@/utils/functions/localization/public/programs/programs-localization';
 
 export const DetailedProgramPageContent: React.FC = () => {
-    const { t } = useTranslation('detailedProgramPage');
+    const { t, i18n } = useTranslation('detailedProgramPage');
 
     const { slug } = useParams<{ slug: string }>();
 
@@ -34,7 +35,8 @@ export const DetailedProgramPageContent: React.FC = () => {
         return <NotFound />;
     }
 
-    const hasSections = program.sections && program.sections.length > 0;
+    const localizedProgram = getLocalizedProgram(program, i18n.language);
+    const hasSections = localizedProgram.sections && localizedProgram.sections.length > 0;
 
     return (
         <div className={styles['detailed-program-page-content']}>
@@ -48,22 +50,24 @@ export const DetailedProgramPageContent: React.FC = () => {
                         <div className={styles['content-container']}>
                             <div className={styles['left-section']}>
                                 <div>
-                                    <h1 className={styles['program-name']}>{program.name}</h1>
+                                    <h1 className={styles['program-name']}>{localizedProgram.name}</h1>
                                     <div className={styles['program-info']}>
-                                        {program.location && <InfoItem icon={MapPin} text={program.location} />}
-                                        {program.participantsCount && (
-                                            <InfoItem icon={UsersRound} text={program.participantsCount} />
+                                        {localizedProgram.location && (
+                                            <InfoItem icon={MapPin} text={localizedProgram.location} />
+                                        )}
+                                        {localizedProgram.participantsCount && (
+                                            <InfoItem icon={UsersRound} text={localizedProgram.participantsCount} />
                                         )}
                                     </div>
                                     <div className={styles['program-meetings']}>
-                                        {program.meetingsCount && (
-                                            <InfoItem icon={CalendarDays} text={program.meetingsCount} />
+                                        {localizedProgram.meetingsCount && (
+                                            <InfoItem icon={CalendarDays} text={localizedProgram.meetingsCount} />
                                         )}
                                     </div>
                                 </div>
                             </div>
                             <div className={styles['right-section']}>
-                                <p className={styles['description']}>{program.description}</p>
+                                <p className={styles['description']}>{localizedProgram.description}</p>
                             </div>
                         </div>
                     </div>
@@ -71,7 +75,7 @@ export const DetailedProgramPageContent: React.FC = () => {
             </div>
             {hasSections && (
                 <div className={styles['sections-list']}>
-                    {program.sections.map((section, index) => (
+                    {localizedProgram.sections.map((section, index) => (
                         <DetailedProgramSection key={section.id ?? `${section.template}-${index}`} section={section} />
                     ))}
                 </div>

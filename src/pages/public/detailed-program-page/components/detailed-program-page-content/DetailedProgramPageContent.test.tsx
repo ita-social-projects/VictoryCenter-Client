@@ -65,6 +65,17 @@ jest.mock('@/components/public/cta', () => ({
     ),
 }));
 
+jest.mock('react-i18next', () => {
+    const actual = jest.requireActual('react-i18next');
+    return {
+        ...actual,
+        useTranslation: () => ({
+            t: (key: string) => key,
+            i18n: { language: 'en' },
+        }),
+    };
+});
+
 const { useParams } = require('react-router-dom');
 const { useProgramBySlug } = require('@/hooks/common/use-get-program-by-slug/useGetProgramBySlug');
 const mockUseProgramBySlug = useProgramBySlug as jest.MockedFunction<typeof useProgramBySlug>;
@@ -84,7 +95,38 @@ const mockProgram = {
     backgroundImage: {
         url: 'https://example.com/image.jpg',
     },
+    localizations: [],
 } as unknown as DetailedProgram;
+
+const mockProgramWithEnLocalization: DetailedProgram = {
+    ...(mockProgram as DetailedProgram),
+    localizations: [
+        {
+            language: { id: 2, code: 'en' },
+            translationStatus: 1,
+            name: 'Test Program EN',
+            description: 'Test description EN',
+            location: 'Test Location EN',
+            participantsCount: '200',
+            meetingsCount: '20',
+        },
+    ] as any,
+};
+
+const mockProgramWithPartialEnLocalization: DetailedProgram = {
+    ...(mockProgram as DetailedProgram),
+    localizations: [
+        {
+            language: { id: 2, code: 'en' },
+            translationStatus: 1,
+            name: 'Test Program EN',
+            description: null,
+            location: null,
+            participantsCount: '300',
+            meetingsCount: null,
+        },
+    ] as any,
+};
 
 describe('DetailedProgramPageContent', () => {
     beforeEach(() => {
@@ -326,6 +368,60 @@ describe('DetailedProgramPageContent', () => {
 
         await waitFor(() => {
             expect(screen.queryByTestId('background-media')).not.toBeInTheDocument();
+        });
+    });
+
+    it('falls back to UA fields when no localizations are provided for EN', async () => {
+        useParams.mockReturnValue({ slug: 'test-program' });
+        mockUseProgramBySlug.mockReturnValue({
+            program: mockProgram,
+            isLoading: false,
+            error: null,
+        });
+
+        render(<DetailedProgramPageContent />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Test Program')).toBeInTheDocument();
+            expect(screen.getByText('Test description')).toBeInTheDocument();
+            expect(screen.getByText('Test Location')).toBeInTheDocument();
+        });
+    });
+
+    it('uses EN localization when available for EN language', async () => {
+        useParams.mockReturnValue({ slug: 'test-program' });
+        mockUseProgramBySlug.mockReturnValue({
+            program: mockProgramWithEnLocalization,
+            isLoading: false,
+            error: null,
+        });
+
+        render(<DetailedProgramPageContent />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Test Program EN')).toBeInTheDocument();
+            expect(screen.getByText('Test description EN')).toBeInTheDocument();
+            expect(screen.getByText('Test Location EN')).toBeInTheDocument();
+            expect(screen.getByText('200')).toBeInTheDocument();
+            expect(screen.getByText('20')).toBeInTheDocument();
+        });
+    });
+
+    it('falls back to UA for missing fields in EN localization', async () => {
+        useParams.mockReturnValue({ slug: 'test-program' });
+        mockUseProgramBySlug.mockReturnValue({
+            program: mockProgramWithPartialEnLocalization,
+            isLoading: false,
+            error: null,
+        });
+
+        render(<DetailedProgramPageContent />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Test Program EN')).toBeInTheDocument();
+            expect(screen.getByText('Test description')).toBeInTheDocument();
+            expect(screen.getByText('Test Location')).toBeInTheDocument();
+            expect(screen.getByText('300')).toBeInTheDocument();
         });
     });
 });

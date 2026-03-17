@@ -3,6 +3,7 @@ import { Button } from '@/components/admin/button/Button';
 import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
 import { FundsExpendituresTransactionType, ReportFundsExpendituresCategory } from '@/types/admin/reports';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
+import cn from 'classnames';
 import styles from './FundsExpendituresToolbar.module.scss';
 
 export type TypeFilterValue = FundsExpendituresTransactionType | undefined;
@@ -14,6 +15,7 @@ interface FundsExpendituresToolbarProps {
     selectedCategoryId: CategoryFilterValue;
     exchangeRate: string | null;
     isEditing: boolean;
+    controlsDisabled?: boolean;
     isAddIncomeDisabled: boolean;
     isAddExpenseDisabled: boolean;
     onTypeChange: (value: TypeFilterValue) => void;
@@ -29,6 +31,7 @@ export const FundsExpendituresToolbar = ({
     selectedCategoryId,
     exchangeRate,
     isEditing,
+    controlsDisabled = false,
     isAddIncomeDisabled,
     isAddExpenseDisabled,
     onTypeChange,
@@ -38,14 +41,20 @@ export const FundsExpendituresToolbar = ({
     onAddExpense,
 }: FundsExpendituresToolbarProps) => {
     return (
-        <div className={styles.toolbar} data-testid="funds-toolbar">
+        <div className={styles.toolbar} data-testid="funds-toolbar" data-controls-disabled={String(controlsDisabled)}>
             <div className={styles['toolbar-row']}>
                 <div className={styles.filters}>
                     <Select<TypeFilterValue>
                         value={selectedType}
-                        onValueChange={onTypeChange}
+                        onValueChange={(value) => {
+                            if (!controlsDisabled) {
+                                onTypeChange(value);
+                            }
+                        }}
                         placeholder={FUNDS_EXPENDITURES_TEXT.FILTER.TYPE_PLACEHOLDER}
-                        className={styles['filter-select']}
+                        className={cn(styles['filter-select'], {
+                            [styles['filter-select-disabled']]: controlsDisabled,
+                        })}
                         optionClassName={styles['filter-option']}
                     >
                         <Select.Option value={undefined} name={FUNDS_EXPENDITURES_TEXT.FILTER.ALL_OPTION} />
@@ -55,9 +64,15 @@ export const FundsExpendituresToolbar = ({
 
                     <Select<CategoryFilterValue>
                         value={selectedCategoryId}
-                        onValueChange={onCategoryChange}
+                        onValueChange={(value) => {
+                            if (!controlsDisabled) {
+                                onCategoryChange(value);
+                            }
+                        }}
                         placeholder={FUNDS_EXPENDITURES_TEXT.FILTER.CATEGORY_PLACEHOLDER}
-                        className={styles['filter-select']}
+                        className={cn(styles['filter-select'], {
+                            [styles['filter-select-disabled']]: controlsDisabled,
+                        })}
                         optionClassName={styles['filter-option']}
                     >
                         <Select.Option value={undefined} name={FUNDS_EXPENDITURES_TEXT.FILTER.ALL_OPTION} />
@@ -77,9 +92,12 @@ export const FundsExpendituresToolbar = ({
                                 <input
                                     type="text"
                                     data-testid="exchange-rate-input"
-                                    className={styles['exchange-rate-input']}
+                                    className={cn(styles['exchange-rate-input'], {
+                                        [styles['exchange-rate-input-disabled']]: controlsDisabled,
+                                    })}
                                     value={exchangeRate}
                                     maxLength={FUNDS_EXPENDITURES_TEXT.EXCHANGE_RATE_MAX_LENGTH}
+                                    disabled={controlsDisabled}
                                     onChange={(e) => onExchangeRateChange?.(e.target.value)}
                                 />
                             ) : (
@@ -94,18 +112,22 @@ export const FundsExpendituresToolbar = ({
                         <div className={styles['editing-actions']} data-testid="editing-actions">
                             <Button
                                 buttonStyle="primary"
-                                className={styles['add-expense-button']}
+                                className={cn(styles['add-expense-button'], {
+                                    [styles['action-button-disabled-by-row-edit']]: controlsDisabled,
+                                })}
                                 onClick={onAddExpense}
-                                disabled={isAddExpenseDisabled}
+                                disabled={isAddExpenseDisabled || controlsDisabled}
                             >
                                 <PlusIcon className={styles['plus-icon']} />
                                 {FUNDS_EXPENDITURES_TEXT.BUTTON.ADD_EXPENSE}
                             </Button>
                             <Button
                                 buttonStyle="primary"
-                                className={styles['add-income-button']}
+                                className={cn(styles['add-income-button'], {
+                                    [styles['action-button-disabled-by-row-edit']]: controlsDisabled,
+                                })}
                                 onClick={onAddIncome}
-                                disabled={isAddIncomeDisabled}
+                                disabled={isAddIncomeDisabled || controlsDisabled}
                             >
                                 <PlusIcon className={styles['plus-icon']} />
                                 {FUNDS_EXPENDITURES_TEXT.BUTTON.ADD_INCOME}

@@ -87,8 +87,8 @@ jest.mock('@/components/common/select/Select', () => {
 });
 
 const MOCK_CATEGORIES: ReportFundsExpendituresCategory[] = [
-    { id: 1, name: 'Грантові кошти' },
-    { id: 2, name: 'Благодійні внески' },
+    { id: 1, name: 'Грантові кошти', type: 'income' },
+    { id: 2, name: 'Благодійні внески', type: 'income' },
 ];
 
 describe('FundsExpendituresToolbar', () => {

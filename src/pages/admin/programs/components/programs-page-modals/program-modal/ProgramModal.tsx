@@ -137,6 +137,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
                 }
                 return base;
             },
+            closeOnDraftCancel: true,
         }),
         [isEditMode, isOpen, mode, onClose, onSuccess, program, client, initialData],
     );
@@ -258,7 +259,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
                 isSubmitting={modalHookData.isSubmitting}
                 error={modalHookData.error}
                 isExitConfirmationOpen={modalHookData.showCloseConfirmModal}
-                isActionConfirmationOpen={modalHookData.showFormConfirmModal}
+                isActionConfirmationOpen={false}
                 formKey={modalHookData.formKey}
                 actionConfirmationTitle={modalHookData.formConfirmTitle}
                 initialData={initialData}
@@ -280,6 +281,15 @@ export const ProgramModal = (props: ProgramModalProps) => {
                     />
                 )}
             />
+
+            <ConfirmationModal
+                isOpen={isOpen && modalHookData.showFormConfirmModal}
+                onClose={modalHookData.handleDismissConfirmation}
+                title={modalHookData.formConfirmTitle}
+                onConfirm={modalHookData.handleConfirmAction}
+                onCancel={modalHookData.handleCancelConfirmation}
+            />
+
             <AddSectionModal
                 isOpen={modalState.isAddSectionModalOpen}
                 onClose={handleCloseAddSectionModal}

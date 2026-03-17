@@ -334,11 +334,9 @@ describe('useTranslateWhoWeAreSection', () => {
         const { result } = renderTranslateHook();
 
         await act(async () => {
-            try {
-                await result.current.translateSection({ description: 'Will fail first' });
-            } catch {
-                // expected failure for error state setup
-            }
+            await expect(result.current.translateSection({ description: 'Will fail first' })).rejects.toThrow(
+                'failure',
+            );
         });
 
         act(() => {

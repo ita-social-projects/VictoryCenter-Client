@@ -89,6 +89,7 @@ export interface ReportFundsExpendituresSettings {
 export interface ReportFundsExpendituresCategory {
     id: number;
     name: string;
+    type: FundsExpendituresTransactionType;
 }
 
 export interface ReportFundsExpendituresRecord {

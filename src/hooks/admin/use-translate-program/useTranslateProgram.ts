@@ -107,8 +107,8 @@ export const useTranslateProgram = ({
                         title: content.title ?? null,
                         description: content.description ?? null,
                         author: content.author ?? null,
-                        question: content.question ?? null,
-                        answer: content.answer ?? null,
+                        question: content.questionText ?? null,
+                        answer: content.answerText ?? null,
                     })),
                 };
             });

@@ -406,8 +406,8 @@ describe('TranslateProgramModal', () => {
             title: 'Localized title',
             description: 'Localized description',
             author: 'Localized author',
-            question: 'Localized question',
-            answer: 'Localized answer',
+            questionText: 'Localized question',
+            answerText: 'Localized answer',
         });
     });
 });

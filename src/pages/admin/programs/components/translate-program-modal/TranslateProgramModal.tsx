@@ -69,6 +69,10 @@ export const TranslateProgramModal = ({
 
     const initialData = useMemo<TranslateProgramFormValues>(() => {
         const languageId = language?.id;
+        const getLocalizationLanguageId = (localization: { localizationInfoDto?: { id?: number | null } }) => {
+            const legacyLanguage = (localization as { language?: { id?: number | null } }).language;
+            return localization.localizationInfoDto?.id ?? legacyLanguage?.id;
+        };
 
         const sections: CreateHippotherapyProgramSectionLocalizationDto[] =
             programToTranslate?.sections
@@ -83,8 +87,13 @@ export const TranslateProgramModal = ({
                         )
                         .map((content) => {
                             const contentLoc = languageId
-                                ? content.localizations?.find((loc) => loc.localizationInfoDto?.id === languageId)
+                                ? content.localizations?.find(
+                                    (loc) => getLocalizationLanguageId(loc) === languageId,
+                                  )
                                 : undefined;
+
+                            const legacyQuestion = (contentLoc as { question?: string | null } | undefined)?.question;
+                            const legacyAnswer = (contentLoc as { answer?: string | null } | undefined)?.answer;
 
                             return {
                                 entityId: content.id!,
@@ -92,8 +101,8 @@ export const TranslateProgramModal = ({
                                 title: contentLoc?.title ?? null,
                                 description: contentLoc?.description ?? null,
                                 author: contentLoc?.author ?? null,
-                                question: contentLoc?.question ?? null,
-                                answer: contentLoc?.answer ?? null,
+                                questionText: contentLoc?.questionText ?? legacyQuestion ?? null,
+                                answerText: contentLoc?.answerText ?? legacyAnswer ?? null,
                             } satisfies CreateProgramSectionContentLocalizationDto;
                         }),
                 })) ?? [];

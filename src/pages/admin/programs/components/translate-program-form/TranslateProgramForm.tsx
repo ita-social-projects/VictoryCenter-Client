@@ -222,7 +222,7 @@ export const TranslateProgramForm = forwardRef<TranslateProgramFormRef, Translat
         const getLocalizedText = useCallback(
             (
                 sourceContentId: number | undefined,
-                field: 'title' | 'description' | 'author' | 'question' | 'answer',
+                field: 'title' | 'description' | 'author' | 'questionText' | 'answerText',
             ) => {
                 if (!sourceContentId) return '';
                 const translatedContent = formState.sections
@@ -234,6 +234,20 @@ export const TranslateProgramForm = forwardRef<TranslateProgramFormRef, Translat
                     return translatedValue;
                 }
 
+                if (field === 'questionText') {
+                    const legacyQuestion = (translatedContent as { question?: string | null } | undefined)?.question;
+                    if (typeof legacyQuestion === 'string' && legacyQuestion.length > 0) {
+                        return legacyQuestion;
+                    }
+                }
+
+                if (field === 'answerText') {
+                    const legacyAnswer = (translatedContent as { answer?: string | null } | undefined)?.answer;
+                    if (typeof legacyAnswer === 'string' && legacyAnswer.length > 0) {
+                        return legacyAnswer;
+                    }
+                }
+
                 return '';
             },
             [formState.sections],
@@ -243,7 +257,7 @@ export const TranslateProgramForm = forwardRef<TranslateProgramFormRef, Translat
             (
                 sectionEntityId: number,
                 sourceContentId: number | undefined,
-                field: 'title' | 'description' | 'author' | 'question' | 'answer',
+                field: 'title' | 'description' | 'author' | 'questionText' | 'answerText',
                 value: string,
             ) => {
                 if (!sourceContentId) return;
@@ -255,9 +269,27 @@ export const TranslateProgramForm = forwardRef<TranslateProgramFormRef, Translat
 
                         return {
                             ...section,
-                            contents: section.contents.map((content) =>
-                                content.entityId === sourceContentId ? { ...content, [field]: value } : content,
-                            ),
+                            contents: section.contents.map((content) => {
+                                if (content.entityId !== sourceContentId) return content;
+
+                                if (field === 'questionText') {
+                                    return {
+                                        ...content,
+                                        questionText: value,
+                                        question: value,
+                                    };
+                                }
+
+                                if (field === 'answerText') {
+                                    return {
+                                        ...content,
+                                        answerText: value,
+                                        answer: value,
+                                    };
+                                }
+
+                                return { ...content, [field]: value };
+                            }),
                         };
                     }),
                 }));
@@ -313,8 +345,8 @@ export const TranslateProgramForm = forwardRef<TranslateProgramFormRef, Translat
                     .sort((a, b) => (a.groupIndex ?? 0) - (b.groupIndex ?? 0))
                     .map((content) => ({
                         id: content.faqQuestionId ?? undefined,
-                        questionText: getLocalizedText(content.id, 'question'),
-                        answerText: getLocalizedText(content.id, 'answer'),
+                        questionText: getLocalizedText(content.id, 'questionText'),
+                        answerText: getLocalizedText(content.id, 'answerText'),
                     }));
 
                 return renderProgramSection({
@@ -407,14 +439,14 @@ export const TranslateProgramForm = forwardRef<TranslateProgramFormRef, Translat
                                 .filter((content) => content.contentType === ContentType.FaqQuestion)
                                 .sort((a, b) => (a.groupIndex ?? 0) - (b.groupIndex ?? 0))[index];
 
-                            updateSectionContentField(sourceSection.id!, faqSource?.id, 'question', value);
+                            updateSectionContentField(sourceSection.id!, faqSource?.id, 'questionText', value);
                         },
                         onFaqAnswerChange: (index, value) => {
                             const faqSource = sourceSection.contents
                                 .filter((content) => content.contentType === ContentType.FaqQuestion)
                                 .sort((a, b) => (a.groupIndex ?? 0) - (b.groupIndex ?? 0))[index];
 
-                            updateSectionContentField(sourceSection.id!, faqSource?.id, 'answer', value);
+                            updateSectionContentField(sourceSection.id!, faqSource?.id, 'answerText', value);
                         },
                     },
                 });

@@ -17,17 +17,30 @@ jest.mock('@lexical/html', () => ({
     $generateHtmlFromNodes: (...args: any[]) => mockGenerateHtmlFromNodes(...args),
 }));
 
-const testOnChangeCallback = (onChange: jest.Mock, mockHtml: string, expectedOutput: string) => {
-    mockGenerateHtmlFromNodes.mockReturnValue(mockHtml);
-    render(<OnChangePlugin onChange={onChange} />);
-
+const triggerUserChange = (mockHtml: string) => {
     const listenerCallback = mockRegisterUpdateListener.mock.calls[0][0];
     const mockEditorState = {
         read: jest.fn((callback) => callback()),
     };
 
-    listenerCallback({ editorState: mockEditorState });
+    listenerCallback({
+        editorState: mockEditorState,
+        dirtyElements: new Map(),
+        dirtyLeaves: new Set(),
+    });
 
+    mockGenerateHtmlFromNodes.mockReturnValue(mockHtml);
+
+    listenerCallback({
+        editorState: mockEditorState,
+        dirtyElements: new Map([['key', true]]),
+        dirtyLeaves: new Set(),
+    });
+};
+
+const testOnChangeCallback = (onChange: jest.Mock, mockHtml: string, expectedOutput: string) => {
+    render(<OnChangePlugin onChange={onChange} />);
+    triggerUserChange(mockHtml);
     expect(onChange).toHaveBeenCalledWith(expectedOutput);
 };
 
@@ -47,8 +60,37 @@ describe('OnChangePlugin', () => {
     it('registers update listener on mount', () => {
         const onChange = jest.fn();
         render(<OnChangePlugin onChange={onChange} />);
-
         expect(mockRegisterUpdateListener).toHaveBeenCalledWith(expect.any(Function));
+    });
+
+    it('does not call onChange on initial render', () => {
+        const onChange = jest.fn();
+        render(<OnChangePlugin onChange={onChange} />);
+
+        const listenerCallback = mockRegisterUpdateListener.mock.calls[0][0];
+        const mockEditorState = { read: jest.fn((cb) => cb()) };
+
+        listenerCallback({
+            editorState: mockEditorState,
+            dirtyElements: new Map(),
+            dirtyLeaves: new Set(),
+        });
+
+        expect(onChange).not.toHaveBeenCalled();
+    });
+
+    it('does not call onChange when there are no dirty elements or leaves', () => {
+        const onChange = jest.fn();
+        render(<OnChangePlugin onChange={onChange} />);
+
+        const listenerCallback = mockRegisterUpdateListener.mock.calls[0][0];
+        const mockEditorState = { read: jest.fn((cb) => cb()) };
+
+        listenerCallback({ editorState: mockEditorState, dirtyElements: new Map(), dirtyLeaves: new Set() });
+
+        listenerCallback({ editorState: mockEditorState, dirtyElements: new Map(), dirtyLeaves: new Set() });
+
+        expect(onChange).not.toHaveBeenCalled();
     });
 
     it('calls onChange callback when editor updates', () => {
@@ -69,9 +111,7 @@ describe('OnChangePlugin', () => {
         const { unmount } = render(<OnChangePlugin onChange={onChange} />);
 
         expect(unregister).not.toHaveBeenCalled();
-
         unmount();
-
         expect(unregister).toHaveBeenCalled();
     });
 

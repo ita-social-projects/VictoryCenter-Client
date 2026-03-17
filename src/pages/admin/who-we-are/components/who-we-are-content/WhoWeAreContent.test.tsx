@@ -66,13 +66,7 @@ jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
 }));
 
 jest.mock('../sections-wrapper/SectionsWrapper', () => ({
-    SectionsWrapper: ({
-        section,
-        onChange,
-        onPublish,
-        setIsPublishButtonActive,
-        isPublishButtonActive,
-    }: MainSectionProps) => (
+    SectionsWrapper: ({ section, onChange, onPublish, isPublishButtonActive }: MainSectionProps) => (
         <div>
             <h2>{section?.title}</h2>
             {section?.contents.map((content: Content) => (
@@ -83,7 +77,6 @@ jest.mock('../sections-wrapper/SectionsWrapper', () => ({
                         data-testid={`input-${content.id}`}
                         onChange={(e) => {
                             onChange({ ...content, description: e.target.value });
-                            setIsPublishButtonActive(true);
                         }}
                     />
                 </div>

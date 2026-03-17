@@ -18,6 +18,7 @@ import classNames from 'classnames';
 import { WhoWeArePageToolbar } from '../who-we-are-page-toolbar/WhoWeArePageToolbar';
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
 import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
+import { normalizeHtml } from '@/utils/functions/normalize-html/normalize-html';
 
 interface ErrorState {
     message: string | null;
@@ -34,7 +35,6 @@ export const WhoWeAreContent = () => {
     const [selectedSection, setSelectedSection] = useState<WhoWeAreSection | null>(null);
     const [updatedSection, setUpdatedSection] = useState<WhoWeAreSection | null>(null);
     const [isConfirmationModalOpen, setConfirmationModalOpen] = useState<boolean>(false);
-    const [isPublishButtonActive, setIsPublishButtonActive] = useState<boolean>(false);
     const [languagesError, setLanguagesError] = useState<string | null>(null);
 
     const { addToast } = useToast();
@@ -72,6 +72,17 @@ export const WhoWeAreContent = () => {
         autoFetchDependencies: [getSection],
     });
 
+    const normalizeSection = useCallback((section: WhoWeAreSection): WhoWeAreSection => {
+        return {
+            ...section,
+            contents: section.contents.map((item) => ({
+                ...item,
+                description: item.description ? normalizeHtml(item.description) : item.description,
+                title: item.title ? normalizeHtml(item.title) : item.title,
+            })),
+        };
+    }, []);
+
     useEffect(() => {
         if (categories && categories.length > 0 && !selectedCategory) {
             setSelectedCategory(categories[0]);
@@ -80,14 +91,19 @@ export const WhoWeAreContent = () => {
 
     useEffect(() => {
         if (fetchedSection) {
-            setSelectedSection(fetchedSection);
-            setUpdatedSection(fetchedSection);
+            const normalizedSection = normalizeSection(fetchedSection);
+            setSelectedSection(normalizedSection);
+            setUpdatedSection(normalizedSection);
         }
-    }, [fetchedSection]);
+    }, [fetchedSection, normalizeSection]);
+
+    const isPublishButtonActive = useMemo(() => {
+        if (!selectedSection || !updatedSection) return false;
+        return JSON.stringify(selectedSection) !== JSON.stringify(updatedSection);
+    }, [selectedSection, updatedSection]);
 
     const handleCategorySelect = useCallback((category: WhoWeAreCategory) => {
         setSelectedCategory(category);
-        setIsPublishButtonActive(false);
     }, []);
 
     const handleContentChange = useCallback((updatedContent: Content) => {
@@ -124,9 +140,9 @@ export const WhoWeAreContent = () => {
             try {
                 const result = await WhoWeAreApi.updateContent(client, changedContents, selectedCategory.sectionType);
 
-                setSelectedSection(result);
-                setUpdatedSection(result);
-                setIsPublishButtonActive(false);
+                const normalizedResult = normalizeSection(result);
+                setSelectedSection(normalizedResult);
+                setUpdatedSection(normalizedResult);
                 addToast(COMMON_TEXT_ADMIN.MESSAGE.SUCCESSFULLY_PUBLISHED, ToastType.Info);
 
                 refetchCategories();
@@ -134,7 +150,7 @@ export const WhoWeAreContent = () => {
                 addToast(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_PUBLISH_CHANGES, ToastType.Error);
             }
         }
-    }, [selectedSection, updatedSection, client, selectedCategory, addToast, refetchCategories]);
+    }, [selectedSection, updatedSection, client, selectedCategory, addToast, refetchCategories, normalizeSection]);
 
     const handleConfirmPublish = useCallback(() => {
         setConfirmationModalOpen(false);
@@ -204,7 +220,6 @@ export const WhoWeAreContent = () => {
                     section={updatedSection}
                     onChange={handleContentChange}
                     onPublish={() => setConfirmationModalOpen(true)}
-                    setIsPublishButtonActive={(value) => setIsPublishButtonActive(value)}
                     isPublishButtonActive={isPublishButtonActive}
                     language={selectedLanguage}
                 />

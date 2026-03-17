@@ -1,0 +1,48 @@
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
+
+.text-card-section {
+    @media (min-width: 1440px) {
+        display: grid;
+        grid-template-columns: 1fr 4fr 1fr;
+    }
+}
+
+.text-card {
+    background-color: c.$light-blue-50;
+    border-radius: 16px;
+    padding: 16px 24px 24px;
+    margin: 120px 16px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+
+    @media (min-width: 560px) {
+        margin: 120px 64px;
+    }
+    
+    @media (min-width: 768px) {
+        grid-template-columns: 1fr 3fr;
+        margin: 120px 56px;
+    }
+
+    @media (min-width: 1440px) {
+        grid-column-start: 2;
+        grid-column-end: 3;
+        grid-template-columns: 1fr 1fr 2fr;
+        margin: 120px 0;
+    }
+
+    &>p:first-child {
+        @include type.subtitle-2-bold;
+    }
+
+    &>p:last-child {
+        @include type.body-1-regular;
+
+        @media (min-width: 1440px) {
+            grid-column-start: 3;
+            grid-column-end: 4;
+        }
+    }
+}

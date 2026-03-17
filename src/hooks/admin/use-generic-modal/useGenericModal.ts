@@ -44,6 +44,7 @@ export interface UseGenericModalReturn<TFormValues, TFormRef> {
     handleFormValidationChange: (isValid: boolean) => void;
     handleFormSubmit: (data: TFormValues, status: VisibilityStatus) => void;
     handleCancelConfirmation: () => void;
+    handleDismissConfirmation: () => void;
     handleConfirmAction: () => Promise<void>;
     handleClose: () => void;
     handleConfirmClose: () => void;
@@ -187,6 +188,12 @@ export const useGenericModal = <
         }
     }, [isSubmitting, onClose, pendingAction]);
 
+    const handleDismissConfirmation = useCallback(() => {
+        setShowFormConfirmModal(false);
+        resetPendingState();
+        setIsSubmitting(false);
+    }, [resetPendingState]);
+
     const handleCancelClose = useCallback(() => {
         setShowCloseConfirmModal(false);
     }, []);
@@ -222,6 +229,7 @@ export const useGenericModal = <
         handleFormValidationChange,
         handleFormSubmit,
         handleCancelConfirmation,
+        handleDismissConfirmation,
         handleConfirmAction,
         handleClose,
         handleConfirmClose,

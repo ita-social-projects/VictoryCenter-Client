@@ -1,19 +1,27 @@
-interface HippotherapyDefaultSection {
+export interface HippotherapyDefaultSection {
     title: string;
     text: string;
 }
 
-interface Quote {
+export interface Quote {
     text: string;
     imgURL: string;
-    author: string;
+    imgAlternativeText?: string;
 }
 
 export interface HippotherapyIntroData {
     imgURL: string;
-    imgAlternativeText: string;
+    imgAlternativeText?: string;
     title: string;
     description: string;
+}
+
+export interface HippoventionCenterData {
+    title: string;
+    imgURL: string;
+    imgAlternativeText?: string;
+    pros: string[];
+    text: string;
 }
 
 export interface HippotherapyAbout {
@@ -21,12 +29,7 @@ export interface HippotherapyAbout {
     descriptionSection: HippotherapyDefaultSection;
     quoteSection: Quote;
     hippoventionSection: HippotherapyDefaultSection;
-    hippoventionCenterSection: {
-        title: string;
-        imgURL: string;
-        props: string[];
-        text: string;
-    };
+    hippoventionCenterSection: HippoventionCenterData;
     advantagesSection: {
         title: string;
         advantages: { imgURL: string; text: string }[];

@@ -13,14 +13,25 @@ jest.mock('@/assets/icons/arrow-left.svg', () => ({
 }));
 
 let mockSwiperInstance: any;
+let _mockInitCallback: any;
+let _mockSlideChangeCallback: any;
 let mockResizeCallback: any;
+let _mockReachBeginningCallback: any;
+let _mockReachEndCallback: any;
+let _mockFromEdgeCallback: any;
 
 jest.mock('swiper/react', () => {
     const React = require('react');
     return {
         Swiper: ({ children, onInit, onSlideChange, onResize, onReachBeginning, onReachEnd, onFromEdge }: any) => {
+            // eslint-disable-next-line react-hooks/exhaustive-deps
             React.useEffect(() => {
+                _mockInitCallback = onInit;
+                _mockSlideChangeCallback = onSlideChange;
                 mockResizeCallback = onResize;
+                _mockReachBeginningCallback = onReachBeginning;
+                _mockReachEndCallback = onReachEnd;
+                _mockFromEdgeCallback = onFromEdge;
 
                 if (onInit) {
                     mockSwiperInstance = {
@@ -63,7 +74,12 @@ describe('Swiper', () => {
 
     beforeEach(() => {
         mockSwiperInstance = null;
+        _mockInitCallback = null;
+        _mockSlideChangeCallback = null;
         mockResizeCallback = null;
+        _mockReachBeginningCallback = null;
+        _mockReachEndCallback = null;
+        _mockFromEdgeCallback = null;
     });
 
     it('renders slides correctly', () => {

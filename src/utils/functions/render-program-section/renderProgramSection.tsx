@@ -238,6 +238,7 @@ export const renderProgramSection = ({
                 onFaqAnswerChange={handlers?.onFaqAnswerChange}
                 onAddFaqPair={handlers?.onAddFaqPair}
                 onDeleteFaqPair={handlers?.onDeleteFaqPair}
+                canAddFaqPair={handlers?.canAddPair}
                 validationResetKey={validationResetKey}
             />
         );

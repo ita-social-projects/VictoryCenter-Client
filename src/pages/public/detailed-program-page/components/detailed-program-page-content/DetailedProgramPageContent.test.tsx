@@ -121,6 +121,24 @@ const mockProgramWithPartialEnLocalization = createMockProgramWithLocalization({
     meetingsCount: null,
 });
 
+const contentTestCases = [
+    {
+        name: 'renders program details successfully with default UA fields when EN localization is missing',
+        programToMock: mockProgram,
+        expectedTexts: ['Test Program', 'Test description', 'Test Location', '100', '10'],
+    },
+    {
+        name: 'uses EN localization when available for EN language',
+        programToMock: mockProgramWithEnLocalization,
+        expectedTexts: ['Test Program EN', 'Test description EN', 'Test Location EN', '200', '20'],
+    },
+    {
+        name: 'falls back to UA for missing fields in EN localization',
+        programToMock: mockProgramWithPartialEnLocalization,
+        expectedTexts: ['Test Program EN', 'Test description', 'Test Location', '300'],
+    },
+];
+
 describe('DetailedProgramPageContent', () => {
     beforeEach(() => {
         jest.clearAllMocks();
@@ -166,25 +184,6 @@ describe('DetailedProgramPageContent', () => {
 
         await waitFor(() => {
             expect(screen.getByTestId('not-found-message-container')).toBeInTheDocument();
-        });
-    });
-
-    it('renders program details successfully with default UA fields when EN localization is missing', async () => {
-        useParams.mockReturnValue({ slug: 'test-program' });
-        mockUseProgramBySlug.mockReturnValue({
-            program: mockProgram,
-            isLoading: false,
-            error: null,
-        });
-
-        render(<DetailedProgramPageContent />);
-
-        await waitFor(() => {
-            expect(screen.getByText('Test Program')).toBeInTheDocument();
-            expect(screen.getByText('Test description')).toBeInTheDocument();
-            expect(screen.getByText('Test Location')).toBeInTheDocument();
-            expect(screen.getByText('100')).toBeInTheDocument();
-            expect(screen.getByText('10')).toBeInTheDocument();
         });
     });
 
@@ -364,10 +363,10 @@ describe('DetailedProgramPageContent', () => {
         });
     });
 
-    it('uses EN localization when available for EN language', async () => {
+    it.each(contentTestCases)('$name', async ({ programToMock, expectedTexts }) => {
         useParams.mockReturnValue({ slug: 'test-program' });
         mockUseProgramBySlug.mockReturnValue({
-            program: mockProgramWithEnLocalization,
+            program: programToMock as unknown as DetailedProgram,
             isLoading: false,
             error: null,
         });
@@ -375,29 +374,9 @@ describe('DetailedProgramPageContent', () => {
         render(<DetailedProgramPageContent />);
 
         await waitFor(() => {
-            expect(screen.getByText('Test Program EN')).toBeInTheDocument();
-            expect(screen.getByText('Test description EN')).toBeInTheDocument();
-            expect(screen.getByText('Test Location EN')).toBeInTheDocument();
-            expect(screen.getByText('200')).toBeInTheDocument();
-            expect(screen.getByText('20')).toBeInTheDocument();
-        });
-    });
-
-    it('falls back to UA for missing fields in EN localization', async () => {
-        useParams.mockReturnValue({ slug: 'test-program' });
-        mockUseProgramBySlug.mockReturnValue({
-            program: mockProgramWithPartialEnLocalization,
-            isLoading: false,
-            error: null,
-        });
-
-        render(<DetailedProgramPageContent />);
-
-        await waitFor(() => {
-            expect(screen.getByText('Test Program EN')).toBeInTheDocument();
-            expect(screen.getByText('Test description')).toBeInTheDocument();
-            expect(screen.getByText('Test Location')).toBeInTheDocument();
-            expect(screen.getByText('300')).toBeInTheDocument();
+            expectedTexts.forEach((text) => {
+                expect(screen.getByText(text)).toBeInTheDocument();
+            });
         });
     });
 });

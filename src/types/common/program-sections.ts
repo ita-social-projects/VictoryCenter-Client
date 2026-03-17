@@ -116,8 +116,8 @@ export interface ProgramSectionContentLocalizableFields {
     title?: string | null;
     description?: string | null;
     author?: string | null;
-    question?: string | null;
-    answer?: string | null;
+    questionText?: string | null;
+    answerText?: string | null;
 }
 export interface HippotherapyProgramSectionContentLocalization
     extends EntityLocalization,

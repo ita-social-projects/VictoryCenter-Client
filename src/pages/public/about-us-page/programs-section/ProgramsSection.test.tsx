@@ -43,7 +43,7 @@ jest.mock('@/assets/icons/arrow-left.svg', () => ({
 }));
 
 describe('ProgramsSection', () => {
-    const createMockProgram = (id: number, name: string, localizations: any[]) => ({
+    const createMockProgram = (id: number, name: string) => ({
         id,
         name,
         slug: `program-${id}`,
@@ -72,9 +72,9 @@ describe('ProgramsSection', () => {
     it('renders Swiper with program cards when data is provided', () => {
         const mockData: ProgramsPageData = {
             programsData: [
-                createMockProgram(1, 'Program 1', []),
-                createMockProgram(2, 'Program 2', []),
-                createMockProgram(3, 'Program 3', []),
+                createMockProgram(1, 'Program 1'),
+                createMockProgram(2, 'Program 2'),
+                createMockProgram(3, 'Program 3'),
             ],
             programsCategories: [],
         };
@@ -94,7 +94,7 @@ describe('ProgramsSection', () => {
 
     it('renders scrollbar container', () => {
         const mockData: ProgramsPageData = {
-            programsData: [createMockProgram(1, 'Program 1', [])],
+            programsData: [createMockProgram(1, 'Program 1')],
             programsCategories: [],
         };
 

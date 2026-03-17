@@ -24,7 +24,7 @@ export const DetailedProgramPageContent: React.FC = () => {
 
     const { program, isLoading, error } = useProgramBySlug(slug);
 
-    const normalizedLocalizations = program?.localizations.map((localization) =>
+    const normalizedLocalizations = (program?.localizations ?? []).map((localization) =>
         mapLocalizationDtoToModel(localization),
     );
 

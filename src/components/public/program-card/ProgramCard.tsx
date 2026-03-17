@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom';
 import { PUBLIC_ROUTES } from '@/const/public/routes';
 import cn from 'classnames';
 import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
-import { HippotherapyProgramLocalizationDto } from '@/types/admin/programs';
 import { mapLocalizationDtoToModel } from '@/utils/functions/mappers/common/localization/localization-mappers';
 
 interface ProgramCardProps {

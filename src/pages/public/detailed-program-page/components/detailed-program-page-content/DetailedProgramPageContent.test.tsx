@@ -4,6 +4,8 @@ import { DetailedProgramDto } from '@/types/public/programs-page';
 
 jest.mock('react-router-dom', () => ({
     useParams: jest.fn(),
+    useNavigate: jest.fn(),
+    useLocation: jest.fn(() => ({ pathname: '/', search: '' })),
 }));
 
 jest.mock('@/services/api/public/programs/programs-api', () => ({
@@ -66,6 +68,7 @@ jest.mock('@/components/public/cta', () => ({
 }));
 
 const { useParams } = require('react-router-dom');
+const { useLocation } = require('react-router-dom');
 const { useProgramBySlug } = require('@/hooks/common/use-get-program-by-slug/useGetProgramBySlug');
 const mockUseProgramBySlug = useProgramBySlug as jest.MockedFunction<typeof useProgramBySlug>;
 
@@ -89,6 +92,7 @@ const mockProgram = {
 describe('DetailedProgramPageContent', () => {
     beforeEach(() => {
         jest.clearAllMocks();
+        useLocation.mockReturnValue({ pathname: '/', search: '' });
     });
 
     it('renders loading state', () => {

@@ -1,4 +1,4 @@
-import { HippotherapyProgramLocalization, HippotherapyProgramLocalizationDto } from '../admin/programs';
+import { HippotherapyProgramLocalizationDto } from '../admin/programs';
 import { Image } from '../common/image';
 import { HippotherapyProgramSectionDto } from '../common/program-sections';
 

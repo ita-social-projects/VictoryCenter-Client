@@ -10,6 +10,7 @@ jest.mock('@/assets/icons/arrow-up-right.svg', () => ({
 const mockNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({
     useNavigate: () => mockNavigate,
+    useLocation: () => ({ pathname: '/', search: '' }),
 }));
 
 jest.mock('@/const/public/routes', () => ({

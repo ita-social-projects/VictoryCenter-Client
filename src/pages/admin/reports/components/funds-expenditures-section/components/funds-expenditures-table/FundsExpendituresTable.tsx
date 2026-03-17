@@ -100,7 +100,7 @@ export const FundsExpendituresTable = ({ records, isEditing = false }: FundsExpe
     const colSpan = isEditing ? 7 : 5;
 
     return (
-        <>
+        <div className={styles['table-container']}>
             <div
                 ref={tableWrapperRef}
                 className={styles['table-wrapper']}
@@ -221,6 +221,6 @@ export const FundsExpendituresTable = ({ records, isEditing = false }: FundsExpe
             >
                 <ArrowUpIcon className={styles['to-top-icon']} />
             </button>
-        </>
+        </div>
     );
 };

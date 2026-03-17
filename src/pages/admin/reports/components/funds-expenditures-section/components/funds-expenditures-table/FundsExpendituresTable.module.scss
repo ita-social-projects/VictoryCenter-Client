@@ -2,6 +2,11 @@
 @use '@/assets/sass/mixins/typography.mixins' as type;
 @use '@/assets/sass/variables/z-index';
 
+.table-container {
+    display: flex;
+    flex-direction: column;
+}
+
 .table-wrapper {
     width: 100%;
     overflow-x: auto;
@@ -169,9 +174,9 @@
 
 .to-top-button {
     display: inline-flex;
-    margin-top: 16px;
+    margin-top: 20px;
     margin-left: auto;
-    margin-right: 16px;
+    margin-right: 28px;
     align-items: center;
     justify-content: center;
     width: 48px;

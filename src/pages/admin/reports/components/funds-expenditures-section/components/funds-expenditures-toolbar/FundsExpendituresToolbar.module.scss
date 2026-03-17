@@ -127,7 +127,7 @@
     pointer-events: none;
 
     :global(.select-head) {
-        background: rgba(c.$black, 0.04);
+        background-color: rgba(c.$black, 0.04);
         border-color: c.$grey-700;
         color: c.$grey-700;
     }
@@ -149,7 +149,7 @@
     height: auto;
 
     &:global(.select-options-selected) {
-        background: rgba(c.$blue-500, 0.17);
+        background-color: rgba(c.$blue-500, 0.17);
     }
 }
 

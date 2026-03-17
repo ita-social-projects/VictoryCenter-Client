@@ -179,20 +179,20 @@
 
 .accept-icon-button {
     .action-icon {
-        color: #059669;
+        color: c.$green;
 
         path {
-            stroke: #059669;
+            stroke: c.$green;
         }
     }
 }
 
 .close-icon-button {
     .action-icon {
-        color: #f04438;
+        color: c.$error;
 
         path {
-            stroke: #f04438;
+            stroke: c.$error;
         }
     }
 }
@@ -238,6 +238,6 @@
 .category-edit-error {
     @include type.small-text-regular;
     margin: 0;
-    color: #f04438;
+    color: c.$error;
 }
 

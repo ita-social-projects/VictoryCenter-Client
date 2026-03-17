@@ -87,9 +87,7 @@ export const TranslateProgramModal = ({
                         )
                         .map((content) => {
                             const contentLoc = languageId
-                                ? content.localizations?.find(
-                                    (loc) => getLocalizationLanguageId(loc) === languageId,
-                                  )
+                                ? content.localizations?.find((loc) => getLocalizationLanguageId(loc) === languageId)
                                 : undefined;
 
                             const legacyQuestion = (contentLoc as { question?: string | null } | undefined)?.question;

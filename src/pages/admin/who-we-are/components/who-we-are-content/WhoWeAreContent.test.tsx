@@ -10,7 +10,6 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ToastType } from '@/types/admin/toast';
 import { ContentType, SectionType } from '@/types/common/about-us';
 import { WHO_WE_ARE_TEXT } from '@/const/admin/who-we-are';
-import { MainSectionProps } from '@/pages/admin/who-we-are/components/sections-wrapper/SectionsWrapper';
 
 const mockUseLocalizationToolkit = jest.fn();
 const mockUseModalsState = jest.fn();
@@ -73,7 +72,13 @@ jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider');
 const mockedUseToast = useToast as jest.Mock;
 
 jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
-    CategoryBar: ({ categories, onCategorySelect, getCategoryDisplayName, getCategoryKey, renderCategoryExtra }: any) => (
+    CategoryBar: ({
+        categories,
+        onCategorySelect,
+        getCategoryDisplayName,
+        getCategoryKey,
+        renderCategoryExtra,
+    }: any) => (
         <div>
             {categories.map((cat: any) => (
                 <div key={cat.id}>

@@ -10,7 +10,6 @@ import { ProgramsApi, ProgramsCategoriesApi } from '@/services/api/admin/program
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { ProgramsPageModalsProps } from '@/pages/admin/programs/components/programs-page-modals/ProgramsPageModals';
 import { InfiniteScrollListProps } from '@/components/admin/infinite-scroll-list/InfiniteScrollList';
-import { ProgramListItemProps } from '@/pages/admin/programs/components/program-list-item/ProgramListItem';
 import { AdminPanelToolbarProps } from '@/components/admin/admin-panel-toolbar/AdminPageToolbar';
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({

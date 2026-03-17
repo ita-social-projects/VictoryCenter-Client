@@ -127,11 +127,7 @@ $field-width: 366px;
         opacity: 1;
     }
 
-    :global(.char-limit-input__counter),
     :global(output[id$='-character-count']) {
-        position: absolute;
-        right: 0;
-        bottom: -22px;
         color: c.$grey-700;
     }
 }

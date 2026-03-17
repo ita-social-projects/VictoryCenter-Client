@@ -11,8 +11,10 @@ jest.mock('@/utils/functions/program-section-template-validation/programSectionT
 }));
 
 jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
-    InputWithCharacterLimitGroup: ({ value, onChange, id }: any) => (
-        <input data-testid={`input-${id}`} value={value} onChange={onChange} />
+    InputWithCharacterLimitGroup: ({ value, onChange, id, showCounterBelow }: any) => (
+        <div data-testid={`group-${id}`} data-show-counter-below={String(showCounterBelow)}>
+            <input data-testid={`input-${id}`} value={value} onChange={onChange} />
+        </div>
     ),
 }));
 
@@ -102,6 +104,10 @@ describe('SingleTitleQuintupleDescription', () => {
         it('renders title input', () => {
             setup({ mode: ProgramSectionMode.Edit, title: 'Edit' });
             expect(screen.getByTestId('input-single-title-quintuple-title')).toHaveValue('Edit');
+            expect(screen.getByTestId('group-single-title-quintuple-title')).toHaveAttribute(
+                'data-show-counter-below',
+                'true',
+            );
         });
 
         it('renders 5 description inputs', () => {

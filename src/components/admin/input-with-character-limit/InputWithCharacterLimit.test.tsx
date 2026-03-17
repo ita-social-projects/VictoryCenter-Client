@@ -40,6 +40,13 @@ describe('InputWithCharacterLimit', () => {
         expect(getCharacterCounter(4, 50)).toBeInTheDocument();
     });
 
+    it('does not render character counter when showCounter is false', () => {
+        renderInputWithCharacterLimit({ showCounter: false });
+
+        expect(screen.queryByText('0/50')).not.toBeInTheDocument();
+        expect(getInput()).not.toHaveAttribute('aria-describedby');
+    });
+
     it('renders correct placeholder and input type', () => {
         renderInputWithCharacterLimit({ placeholder: 'Enter text', type: 'email' });
 

@@ -86,20 +86,18 @@ const mockProgram = {
     name: 'Test Program',
     description: 'Test description',
     location: 'Test Location',
-    participantsCount: 100,
-    meetingsCount: 10,
+    participantsCount: '100',
+    meetingsCount: '10',
     categories: [],
     status: 'published',
     previewImage: { url: 'https://example.com/preview.jpg' },
     sections: [],
-    backgroundImage: {
-        url: 'https://example.com/image.jpg',
-    },
+    backgroundImage: { url: 'https://example.com/image.jpg' },
     localizations: [],
 } as unknown as DetailedProgram;
 
-const mockProgramWithEnLocalization: DetailedProgram = {
-    ...(mockProgram as DetailedProgram),
+const createMockProgramWithLocalization = (overrides?: Partial<any>): DetailedProgram => ({
+    ...mockProgram,
     localizations: [
         {
             language: { id: 2, code: 'en' },
@@ -109,24 +107,19 @@ const mockProgramWithEnLocalization: DetailedProgram = {
             location: 'Test Location EN',
             participantsCount: '200',
             meetingsCount: '20',
+            ...overrides,
         },
     ] as any,
-};
+});
 
-const mockProgramWithPartialEnLocalization: DetailedProgram = {
-    ...(mockProgram as DetailedProgram),
-    localizations: [
-        {
-            language: { id: 2, code: 'en' },
-            translationStatus: 1,
-            name: 'Test Program EN',
-            description: null,
-            location: null,
-            participantsCount: '300',
-            meetingsCount: null,
-        },
-    ] as any,
-};
+const mockProgramWithEnLocalization = createMockProgramWithLocalization();
+
+const mockProgramWithPartialEnLocalization = createMockProgramWithLocalization({
+    description: null,
+    location: null,
+    participantsCount: '300',
+    meetingsCount: null,
+});
 
 describe('DetailedProgramPageContent', () => {
     beforeEach(() => {
@@ -176,7 +169,7 @@ describe('DetailedProgramPageContent', () => {
         });
     });
 
-    it('renders program details successfully', async () => {
+    it('renders program details successfully with default UA fields when EN localization is missing', async () => {
         useParams.mockReturnValue({ slug: 'test-program' });
         mockUseProgramBySlug.mockReturnValue({
             program: mockProgram,
@@ -368,23 +361,6 @@ describe('DetailedProgramPageContent', () => {
 
         await waitFor(() => {
             expect(screen.queryByTestId('background-media')).not.toBeInTheDocument();
-        });
-    });
-
-    it('falls back to UA fields when no localizations are provided for EN', async () => {
-        useParams.mockReturnValue({ slug: 'test-program' });
-        mockUseProgramBySlug.mockReturnValue({
-            program: mockProgram,
-            isLoading: false,
-            error: null,
-        });
-
-        render(<DetailedProgramPageContent />);
-
-        await waitFor(() => {
-            expect(screen.getByText('Test Program')).toBeInTheDocument();
-            expect(screen.getByText('Test description')).toBeInTheDocument();
-            expect(screen.getByText('Test Location')).toBeInTheDocument();
         });
     });
 

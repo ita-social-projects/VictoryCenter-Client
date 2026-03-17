@@ -127,7 +127,7 @@ describe('PartnerForm', () => {
     };
 
     const renderComponent = (props: Partial<React.ComponentProps<typeof PartnerForm>>) => {
-        const view = render(
+        render(
             <PartnerForm
                 values={defaultValues}
                 errors={defaultErrors}

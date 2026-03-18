@@ -142,9 +142,23 @@ export const FundsExpenditureSection = () => {
 
     const currentExchangeRate = isEditing ? exchangeRateValue : (settings?.exchangeRate ?? null);
 
-    const handleRecordCategorySave = useCallback((recordId: number, categoryId: number) => {
-        setRecordsState((prev) => prev.map((record) => (record.id === recordId ? { ...record, categoryId } : record)));
-    }, []);
+    const handleRecordSave = useCallback(
+        (recordId: number, data: { categoryId: number; amountUah: string; amountUsd: string }) => {
+            setRecordsState((prev) =>
+                prev.map((record) =>
+                    record.id === recordId
+                        ? {
+                              ...record,
+                              categoryId: data.categoryId,
+                              amountUah: data.amountUah,
+                              amountUsd: data.amountUsd,
+                          }
+                        : record,
+                ),
+            );
+        },
+        [],
+    );
 
     return (
         <div className={styles.section}>
@@ -231,7 +245,7 @@ export const FundsExpenditureSection = () => {
                 allRecordsForTypeInference={recordsState}
                 isEditing={isEditing}
                 onRowEditModeChange={setIsRowEditMode}
-                onRecordCategorySave={handleRecordCategorySave}
+                onRecordSave={handleRecordSave}
             />
 
             {isEditing && (

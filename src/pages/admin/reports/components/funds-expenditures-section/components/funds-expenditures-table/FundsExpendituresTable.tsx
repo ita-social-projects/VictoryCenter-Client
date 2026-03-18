@@ -1,5 +1,4 @@
-import { useState, useCallback } from 'react';
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
 import {
     FundsExpendituresTransactionType,
@@ -7,6 +6,7 @@ import {
     ReportFundsExpendituresRecord,
 } from '@/types/admin/reports';
 import { ReactComponent as NotFoundIcon } from '@/assets/icons/not-found.svg';
+import { ReactComponent as ArrowUpIcon } from '@/assets/icons/arrow-up.svg';
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as DeleteIcon } from '@/assets/icons/delete.svg';
 import { ReactComponent as CheckmarkIcon } from '@/assets/icons/checkmark.svg';
@@ -99,6 +99,8 @@ export const FundsExpendituresTable = ({
 }: FundsExpendituresTableProps) => {
     const [sort, setSort] = useState<ColumnSort>({ column: null, direction: null });
     const [rowEditState, setRowEditState] = useState<RowEditState | null>(null);
+    const [isMoveToTopVisible, setIsMoveToTopVisible] = useState(false);
+    const tableWrapperRef = useRef<HTMLDivElement>(null);
 
     const typeInferenceSource = allRecordsForTypeInference ?? records;
 
@@ -106,6 +108,30 @@ export const FundsExpendituresTable = ({
         income: getCategoriesForType(categories, typeInferenceSource, 'income'),
         expense: getCategoriesForType(categories, typeInferenceSource, 'expense'),
     };
+
+    const updateMoveToTopVisibility = useCallback(() => {
+        const tableWrapper = tableWrapperRef.current;
+        if (!tableWrapper) return;
+
+        const isScrollable = tableWrapper.scrollHeight > tableWrapper.clientHeight;
+        setIsMoveToTopVisible(isScrollable && tableWrapper.scrollTop > 0);
+    }, []);
+
+    const moveToTop = useCallback(() => {
+        const tableWrapper = tableWrapperRef.current;
+        if (!tableWrapper) return;
+
+        tableWrapper.scrollTop = 0;
+        setIsMoveToTopVisible(false);
+    }, []);
+
+    const handleTableScroll = useCallback(() => {
+        updateMoveToTopVisibility();
+    }, [updateMoveToTopVisibility]);
+
+    useEffect(() => {
+        updateMoveToTopVisibility();
+    }, [records.length, updateMoveToTopVisibility]);
 
     const setRowEditMode = useCallback(
         (nextState: RowEditState | null) => {
@@ -242,6 +268,12 @@ export const FundsExpendituresTable = ({
 
                 return { column: null, direction: null };
             });
+
+            const tableWrapper = tableWrapperRef.current;
+            if (tableWrapper) {
+                tableWrapper.scrollTop = 0;
+                setIsMoveToTopVisible(false);
+            }
         },
         [rowEditState],
     );
@@ -251,209 +283,240 @@ export const FundsExpendituresTable = ({
     const colSpan = isEditing ? 7 : 5;
 
     return (
-        <div className={styles['table-wrapper']} data-testid="funds-table" data-record-count={records.length}>
-            <table className={styles.table}>
-                <thead>
-                    <tr>
-                        {isEditing && <th className={cn(styles.th, styles['checkbox-th'])} />}
-                        <th className={styles.th}>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.REPORTING_YEAR}</th>
-                        <th
-                            className={cn(styles.th, styles.sortable, {
-                                [styles['sortable-disabled']]: isAnyRowEditing,
-                            })}
-                            onClick={() => handleSort('type')}
-                        >
-                            <span className={styles['th-inner']}>
-                                <span>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.TYPE}</span>
-                                <SortIcon isActive={sort.column === 'type'} direction={sort.direction} />
-                            </span>
-                        </th>
-                        <th
-                            className={cn(styles.th, styles.sortable, {
-                                [styles['sortable-disabled']]: isAnyRowEditing,
-                            })}
-                            onClick={() => handleSort('categoryName')}
-                        >
-                            <span className={styles['th-inner']}>
-                                <span>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.CATEGORY}</span>
-                                <SortIcon isActive={sort.column === 'categoryName'} direction={sort.direction} />
-                            </span>
-                        </th>
-                        <th
-                            className={cn(styles.th, styles.sortable, {
-                                [styles['sortable-disabled']]: isAnyRowEditing,
-                            })}
-                            onClick={() => handleSort('amountUah')}
-                        >
-                            <span className={styles['th-inner']}>
-                                <span>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.AMOUNT_UAH}</span>
-                                <SortIcon isActive={sort.column === 'amountUah'} direction={sort.direction} />
-                            </span>
-                        </th>
-                        <th
-                            className={cn(styles.th, styles.sortable, {
-                                [styles['sortable-disabled']]: isAnyRowEditing,
-                            })}
-                            onClick={() => handleSort('amountUsd')}
-                        >
-                            <span className={styles['th-inner']}>
-                                <span>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.AMOUNT_USD}</span>
-                                <SortIcon isActive={sort.column === 'amountUsd'} direction={sort.direction} />
-                            </span>
-                        </th>
-                        {isEditing && <th className={cn(styles.th, styles['actions-th'])} />}
-                    </tr>
-                </thead>
-                <tbody>
-                    {sortedRecords.length === 0 ? (
+        <div className={styles['table-container']}>
+            <div
+                ref={tableWrapperRef}
+                className={styles['table-wrapper']}
+                data-testid="funds-table"
+                data-record-count={records.length}
+                onScroll={handleTableScroll}
+            >
+                <table className={styles.table}>
+                    <thead>
                         <tr>
-                            <td colSpan={colSpan} className={styles['empty-cell']} data-testid="funds-table-empty-cell">
-                                <div className={styles['empty-state']}>
-                                    <NotFoundIcon className={styles['empty-state-image']} />
-                                    <p className={styles['empty-state-message']}>
-                                        {FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.MESSAGE}
-                                    </p>
-                                </div>
-                            </td>
+                            {isEditing && <th className={cn(styles.th, styles['checkbox-th'])} />}
+                            <th className={styles.th}>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.REPORTING_YEAR}</th>
+                            <th
+                                className={cn(styles.th, styles.sortable, {
+                                    [styles['sortable-disabled']]: isAnyRowEditing,
+                                })}
+                                onClick={() => handleSort('type')}
+                            >
+                                <span className={styles['th-inner']}>
+                                    <span>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.TYPE}</span>
+                                    <SortIcon isActive={sort.column === 'type'} direction={sort.direction} />
+                                </span>
+                            </th>
+                            <th
+                                className={cn(styles.th, styles.sortable, {
+                                    [styles['sortable-disabled']]: isAnyRowEditing,
+                                })}
+                                onClick={() => handleSort('categoryName')}
+                            >
+                                <span className={styles['th-inner']}>
+                                    <span>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.CATEGORY}</span>
+                                    <SortIcon isActive={sort.column === 'categoryName'} direction={sort.direction} />
+                                </span>
+                            </th>
+                            <th
+                                className={cn(styles.th, styles.sortable, {
+                                    [styles['sortable-disabled']]: isAnyRowEditing,
+                                })}
+                                onClick={() => handleSort('amountUah')}
+                            >
+                                <span className={styles['th-inner']}>
+                                    <span>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.AMOUNT_UAH}</span>
+                                    <SortIcon isActive={sort.column === 'amountUah'} direction={sort.direction} />
+                                </span>
+                            </th>
+                            <th
+                                className={cn(styles.th, styles.sortable, {
+                                    [styles['sortable-disabled']]: isAnyRowEditing,
+                                })}
+                                onClick={() => handleSort('amountUsd')}
+                            >
+                                <span className={styles['th-inner']}>
+                                    <span>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.AMOUNT_USD}</span>
+                                    <SortIcon isActive={sort.column === 'amountUsd'} direction={sort.direction} />
+                                </span>
+                            </th>
+                            {isEditing && <th className={cn(styles.th, styles['actions-th'])} />}
                         </tr>
-                    ) : (
-                        sortedRecords.map((record) => {
-                            const isEditedRow = rowEditState?.recordId === record.id;
-                            const isAnotherRowEditing = isAnyRowEditing && !isEditedRow;
-                            const editableCategories = categoriesByType[record.type];
-                            const isAcceptDisabled =
-                                !isEditedRow ||
-                                rowEditState.categoryId === undefined ||
-                                Boolean(rowEditState.error) ||
-                                rowEditState.categoryId === rowEditState.originalCategoryId;
+                    </thead>
+                    <tbody>
+                        {sortedRecords.length === 0 ? (
+                            <tr>
+                                <td
+                                    colSpan={colSpan}
+                                    className={styles['empty-cell']}
+                                    data-testid="funds-table-empty-cell"
+                                >
+                                    <div className={styles['empty-state']}>
+                                        <NotFoundIcon className={styles['empty-state-image']} />
+                                        <p className={styles['empty-state-message']}>
+                                            {FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.MESSAGE}
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                        ) : (
+                            sortedRecords.map((record) => {
+                                const isEditedRow = rowEditState?.recordId === record.id;
+                                const isAnotherRowEditing = isAnyRowEditing && !isEditedRow;
+                                const editableCategories = categoriesByType[record.type];
+                                const isAcceptDisabled =
+                                    !isEditedRow ||
+                                    rowEditState.categoryId === undefined ||
+                                    Boolean(rowEditState.error) ||
+                                    rowEditState.categoryId === rowEditState.originalCategoryId;
 
-                            return (
-                                <tr key={record.id} className={styles.tr}>
-                                    {isEditing && (
-                                        <td className={cn(styles.td, styles['checkbox-td'])}>
-                                            <input
-                                                type="checkbox"
-                                                className={styles['row-checkbox']}
-                                                aria-label={`Select record ${record.id}`}
-                                                disabled={isAnyRowEditing}
-                                            />
-                                        </td>
-                                    )}
-                                    <td className={styles.td}>{record.reportingYear}</td>
-                                    <td className={styles.td}>
-                                        <span
-                                            className={cn(styles['type-chip'], {
-                                                [styles['type-chip-income']]: record.type === 'income',
-                                                [styles['type-chip-expense']]: record.type === 'expense',
-                                            })}
-                                        >
-                                            {TYPE_LABEL_MAP[record.type]}
-                                        </span>
-                                    </td>
-                                    <td className={cn(styles.td, { [styles['category-edit-td']]: isEditedRow })}>
-                                        {isEditedRow ? (
-                                            <div
-                                                className={styles['category-edit-wrapper']}
-                                                onBlurCapture={(event) => {
-                                                    if (
-                                                        !event.currentTarget.contains(
-                                                            event.relatedTarget as Node | null,
-                                                        )
-                                                    ) {
-                                                        handleRowCategoryBlur(record);
-                                                    }
-                                                }}
-                                            >
-                                                <Select<number | undefined>
-                                                    value={rowEditState.categoryId}
-                                                    onValueChange={(value) => handleRowCategoryChange(record, value)}
-                                                    placeholder={FUNDS_EXPENDITURES_TEXT.FILTER.CATEGORY_PLACEHOLDER}
-                                                    className={styles['category-edit-select']}
-                                                    optionClassName={styles['category-edit-option']}
-                                                >
-                                                    <Select.Option
-                                                        value={undefined}
-                                                        name={FUNDS_EXPENDITURES_TEXT.FILTER.CATEGORY_PLACEHOLDER}
-                                                    />
-                                                    {editableCategories.map((category) => (
-                                                        <Select.Option
-                                                            key={category.id}
-                                                            value={category.id}
-                                                            name={category.name}
-                                                        />
-                                                    ))}
-                                                </Select>
-                                                {rowEditState.error && (
-                                                    <p className={styles['category-edit-error']}>
-                                                        {rowEditState.error}
-                                                    </p>
-                                                )}
-                                            </div>
-                                        ) : (
-                                            record.categoryName
+                                return (
+                                    <tr key={record.id} className={styles.tr}>
+                                        {isEditing && (
+                                            <td className={cn(styles.td, styles['checkbox-td'])}>
+                                                <input
+                                                    type="checkbox"
+                                                    className={styles['row-checkbox']}
+                                                    aria-label={`Select record ${record.id}`}
+                                                    disabled={isAnyRowEditing}
+                                                />
+                                            </td>
                                         )}
-                                    </td>
-                                    <td className={styles.td}>{record.amountUah}</td>
-                                    <td className={styles.td}>{record.amountUsd}</td>
-                                    {isEditing && (
-                                        <td className={cn(styles.td, styles['actions-td'])}>
-                                            <div className={styles['row-actions']}>
-                                                {isEditedRow ? (
-                                                    <>
-                                                        <button
-                                                            type="button"
-                                                            className={cn(
-                                                                styles['icon-button'],
-                                                                styles['accept-icon-button'],
-                                                            )}
-                                                            aria-label={`Accept record ${record.id}`}
-                                                            onClick={() => handleAcceptRowEdit(record)}
-                                                            disabled={isAcceptDisabled}
-                                                        >
-                                                            <CheckmarkIcon className={styles['action-icon']} />
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            className={cn(
-                                                                styles['icon-button'],
-                                                                styles['close-icon-button'],
-                                                            )}
-                                                            aria-label={`Close edit for record ${record.id}`}
-                                                            onClick={handleCloseRowEdit}
-                                                        >
-                                                            <CrossIcon className={styles['action-icon']} />
-                                                        </button>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <button
-                                                            type="button"
-                                                            className={styles['icon-button']}
-                                                            aria-label={`Edit record ${record.id}`}
-                                                            onClick={() => handleStartRowEdit(record)}
-                                                            disabled={isAnotherRowEditing}
-                                                        >
-                                                            <EditIcon className={styles['action-icon']} />
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            className={styles['icon-button']}
-                                                            aria-label={`Delete record ${record.id}`}
-                                                            disabled={isAnotherRowEditing}
-                                                        >
-                                                            <DeleteIcon className={styles['action-icon']} />
-                                                        </button>
-                                                    </>
-                                                )}
-                                            </div>
+                                        <td className={styles.td}>{record.reportingYear}</td>
+                                        <td className={styles.td}>
+                                            <span
+                                                className={cn(styles['type-chip'], {
+                                                    [styles['type-chip-income']]: record.type === 'income',
+                                                    [styles['type-chip-expense']]: record.type === 'expense',
+                                                })}
+                                            >
+                                                {TYPE_LABEL_MAP[record.type]}
+                                            </span>
                                         </td>
-                                    )}
-                                </tr>
-                            );
-                        })
-                    )}
-                </tbody>
-            </table>
+                                        <td className={cn(styles.td, { [styles['category-edit-td']]: isEditedRow })}>
+                                            {isEditedRow ? (
+                                                <div
+                                                    className={styles['category-edit-wrapper']}
+                                                    onBlurCapture={(event) => {
+                                                        if (
+                                                            !event.currentTarget.contains(
+                                                                event.relatedTarget as Node | null,
+                                                            )
+                                                        ) {
+                                                            handleRowCategoryBlur(record);
+                                                        }
+                                                    }}
+                                                >
+                                                    <Select<number | undefined>
+                                                        value={rowEditState.categoryId}
+                                                        onValueChange={(value) =>
+                                                            handleRowCategoryChange(record, value)
+                                                        }
+                                                        placeholder={
+                                                            FUNDS_EXPENDITURES_TEXT.FILTER.CATEGORY_PLACEHOLDER
+                                                        }
+                                                        className={styles['category-edit-select']}
+                                                        optionClassName={styles['category-edit-option']}
+                                                    >
+                                                        <Select.Option
+                                                            value={undefined}
+                                                            name={
+                                                                FUNDS_EXPENDITURES_TEXT.FILTER.CATEGORY_PLACEHOLDER
+                                                            }
+                                                        />
+                                                        {editableCategories.map((category) => (
+                                                            <Select.Option
+                                                                key={category.id}
+                                                                value={category.id}
+                                                                name={category.name}
+                                                            />
+                                                        ))}
+                                                    </Select>
+                                                    {rowEditState.error && (
+                                                        <p className={styles['category-edit-error']}>
+                                                            {rowEditState.error}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                record.categoryName
+                                            )}
+                                        </td>
+                                        <td className={styles.td}>{record.amountUah}</td>
+                                        <td className={styles.td}>{record.amountUsd}</td>
+                                        {isEditing && (
+                                            <td className={cn(styles.td, styles['actions-td'])}>
+                                                <div className={styles['row-actions']}>
+                                                    {isEditedRow ? (
+                                                        <>
+                                                            <button
+                                                                type="button"
+                                                                className={cn(
+                                                                    styles['icon-button'],
+                                                                    styles['accept-icon-button'],
+                                                                )}
+                                                                aria-label={`Accept record ${record.id}`}
+                                                                onClick={() => handleAcceptRowEdit(record)}
+                                                                disabled={isAcceptDisabled}
+                                                            >
+                                                                <CheckmarkIcon className={styles['action-icon']} />
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                className={cn(
+                                                                    styles['icon-button'],
+                                                                    styles['close-icon-button'],
+                                                                )}
+                                                                aria-label={`Close edit for record ${record.id}`}
+                                                                onClick={handleCloseRowEdit}
+                                                            >
+                                                                <CrossIcon className={styles['action-icon']} />
+                                                            </button>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <button
+                                                                type="button"
+                                                                className={styles['icon-button']}
+                                                                aria-label={`Edit record ${record.id}`}
+                                                                onClick={() => handleStartRowEdit(record)}
+                                                                disabled={isAnotherRowEditing}
+                                                            >
+                                                                <EditIcon className={styles['action-icon']} />
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                className={styles['icon-button']}
+                                                                aria-label={`Delete record ${record.id}`}
+                                                                disabled={isAnotherRowEditing}
+                                                            >
+                                                                <DeleteIcon className={styles['action-icon']} />
+                                                            </button>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        )}
+                                    </tr>
+                                );
+                            })
+                        )}
+                    </tbody>
+                </table>
+            </div>
+            <button
+                type="button"
+                className={cn(styles['to-top-button'], {
+                    [styles['to-top-button-visible']]: isMoveToTopVisible,
+                })}
+                data-testid="funds-table-to-top"
+                onClick={moveToTop}
+                aria-label="Scroll table to top"
+                aria-hidden={!isMoveToTopVisible}
+                tabIndex={isMoveToTopVisible ? 0 : -1}
+            >
+                <ArrowUpIcon className={styles['to-top-icon']} />
+            </button>
         </div>
     );
 };

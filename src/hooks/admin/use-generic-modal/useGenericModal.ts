@@ -119,11 +119,7 @@ export const useGenericModal = <
 
     const handleCancelConfirmation = useCallback(() => {
         setShowFormConfirmModal(false);
-
-        if (closeOnDraftCancel && pendingAction === PendingAction.Draft) {
-            onClose();
-        }
-
+        onClose();
         resetPendingState();
         setIsSubmitting(false);
     }, [closeOnDraftCancel, pendingAction, onClose, resetPendingState]);

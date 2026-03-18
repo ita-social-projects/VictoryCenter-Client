@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
 import {
     FundsExpendituresTransactionType,
@@ -420,9 +421,7 @@ export const FundsExpendituresTable = ({
                                                     >
                                                         <Select.Option
                                                             value={undefined}
-                                                            name={
-                                                                FUNDS_EXPENDITURES_TEXT.FILTER.CATEGORY_PLACEHOLDER
-                                                            }
+                                                            name={FUNDS_EXPENDITURES_TEXT.FILTER.CATEGORY_PLACEHOLDER}
                                                         />
                                                         {editableCategories.map((category) => (
                                                             <Select.Option

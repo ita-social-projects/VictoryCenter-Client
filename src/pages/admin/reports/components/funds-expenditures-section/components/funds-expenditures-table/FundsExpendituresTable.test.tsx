@@ -211,7 +211,7 @@ describe('FundsExpendituresTable', () => {
 
     describe('scroll to top button', () => {
         it('should show to-top button when content overflows and table is scrolled', () => {
-            render(<FundsExpendituresTable records={MOCK_RECORDS} />);
+            render(<FundsExpendituresTable records={MOCK_RECORDS} categories={MOCK_CATEGORIES} />);
 
             const table = screen.getByTestId('funds-table');
             Object.defineProperty(table, 'scrollHeight', { configurable: true, value: 900 });
@@ -225,7 +225,7 @@ describe('FundsExpendituresTable', () => {
         });
 
         it('should hide to-top button when list is at top', () => {
-            render(<FundsExpendituresTable records={MOCK_RECORDS} />);
+            render(<FundsExpendituresTable records={MOCK_RECORDS} categories={MOCK_CATEGORIES} />);
 
             const table = screen.getByTestId('funds-table');
             Object.defineProperty(table, 'scrollHeight', { configurable: true, value: 900 });
@@ -238,7 +238,7 @@ describe('FundsExpendituresTable', () => {
         });
 
         it('should scroll to top after clicking to-top button', () => {
-            render(<FundsExpendituresTable records={MOCK_RECORDS} />);
+            render(<FundsExpendituresTable records={MOCK_RECORDS} categories={MOCK_CATEGORIES} />);
 
             const table = screen.getByTestId('funds-table');
             Object.defineProperty(table, 'scrollHeight', { configurable: true, value: 900 });
@@ -253,7 +253,7 @@ describe('FundsExpendituresTable', () => {
         });
 
         it('should reset scroll position to top when sorting is changed', () => {
-            render(<FundsExpendituresTable records={MOCK_RECORDS} />);
+            render(<FundsExpendituresTable records={MOCK_RECORDS} categories={MOCK_CATEGORIES} />);
 
             const table = screen.getByTestId('funds-table');
             Object.defineProperty(table, 'scrollHeight', { configurable: true, value: 900 });
@@ -270,7 +270,7 @@ describe('FundsExpendituresTable', () => {
 
     describe('isEditing mode', () => {
         it('should not show checkboxes when isEditing is false (default)', () => {
-            render(<FundsExpendituresTable records={MOCK_RECORDS} />);
+            render(<FundsExpendituresTable records={MOCK_RECORDS} categories={MOCK_CATEGORIES} />);
             expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
         });
     });

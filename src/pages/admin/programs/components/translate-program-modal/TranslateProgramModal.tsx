@@ -69,6 +69,22 @@ export const TranslateProgramModal = ({
 
     const initialData = useMemo<TranslateProgramFormValues>(() => {
         const languageId = language?.id;
+        const normalizeFaqLocalization = (contentLoc?: {
+            question?: string | null;
+            answer?: string | null;
+            questionText?: string | null;
+            answerText?: string | null;
+        }) => {
+            const normalizedQuestion = contentLoc?.question ?? contentLoc?.questionText ?? null;
+            const normalizedAnswer = contentLoc?.answer ?? contentLoc?.answerText ?? null;
+
+            return {
+                question: normalizedQuestion,
+                answer: normalizedAnswer,
+                questionText: normalizedQuestion,
+                answerText: normalizedAnswer,
+            };
+        };
 
         const sections: CreateHippotherapyProgramSectionLocalizationDto[] =
             programToTranslate?.sections
@@ -92,8 +108,7 @@ export const TranslateProgramModal = ({
                                 title: contentLoc?.title ?? null,
                                 description: contentLoc?.description ?? null,
                                 author: contentLoc?.author ?? null,
-                                question: contentLoc?.question ?? null,
-                                answer: contentLoc?.answer ?? null,
+                                ...normalizeFaqLocalization(contentLoc),
                             } satisfies CreateProgramSectionContentLocalizationDto;
                         }),
                 })) ?? [];

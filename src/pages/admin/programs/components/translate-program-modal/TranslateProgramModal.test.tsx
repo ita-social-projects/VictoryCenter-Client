@@ -11,6 +11,7 @@ import { DEFAULT_LOCALE } from '@/const/common/locales';
 
 let mockFormIsValid = true;
 let mockFormIsDirty = true;
+let mockExposeFormRef = true;
 
 jest.mock('../translate-program-form/TranslateProgramForm', () => {
     const React = require('react');
@@ -18,19 +19,25 @@ jest.mock('../translate-program-form/TranslateProgramForm', () => {
     return {
         TranslateProgramForm: React.forwardRef(
             ({ onSubmit, onValidationChange, onDirtyChange, initialData }: any, ref: React.Ref<any>) => {
-                React.useImperativeHandle(ref, () => ({
-                    submit: (_status?: any) =>
-                        onSubmit({
-                            name: 'Translated',
-                            description: '',
-                            location: '',
-                            participantsCount: '',
-                            meetingCount: '',
-                            sections: [],
-                        }),
-                    isValid: () => mockFormIsValid,
-                    isDirty: () => mockFormIsDirty,
-                }));
+                React.useImperativeHandle(ref, () => {
+                    if (!mockExposeFormRef) {
+                        return null;
+                    }
+
+                    return {
+                        submit: (_status?: any) =>
+                            onSubmit({
+                                name: 'Translated',
+                                description: '',
+                                location: '',
+                                participantsCount: '',
+                                meetingCount: '',
+                                sections: [],
+                            }),
+                        isValid: () => mockFormIsValid,
+                        isDirty: () => mockFormIsDirty,
+                    };
+                });
 
                 React.useEffect(() => {
                     onValidationChange?.(mockFormIsValid);
@@ -46,6 +53,29 @@ jest.mock('../translate-program-form/TranslateProgramForm', () => {
             },
         ),
     };
+});
+
+jest.mock('@/components/common/select/Select', () => {
+    const React = require('react');
+
+    const Select = ({ onValueChange, children }: any) => (
+        <div data-testid="language-select-mock">
+            <button type="button" data-testid="language-select-known" onClick={() => onValueChange('en')}>
+                known
+            </button>
+            <button type="button" data-testid="language-select-polish" onClick={() => onValueChange('pl')}>
+                polish
+            </button>
+            <button type="button" data-testid="language-select-unknown" onClick={() => onValueChange('xx')}>
+                unknown
+            </button>
+            {children}
+        </div>
+    );
+
+    Select.Option = ({ name }: any) => <div>{name}</div>;
+
+    return { Select };
 });
 
 const mockTranslateProgram = jest.fn();
@@ -125,22 +155,53 @@ const TEST_DATA = {
     ] as LocalizationLanguage[],
 };
 
+const UKRAINIAN_LANGUAGE = {
+    id: 1,
+    code: DEFAULT_LOCALE,
+    name: 'Українська',
+} as LocalizationLanguage;
+
 describe('TranslateProgramModal', () => {
+    const createModalProps = (overrides: Partial<React.ComponentProps<typeof TranslateProgramModal>> = {}) => ({
+        isOpen: true,
+        onClose: jest.fn(),
+        programToTranslate: TEST_DATA.program,
+        onTranslateProgram: jest.fn(),
+        translatedLanguages: TEST_DATA.translatedLanguages,
+        ...overrides,
+    });
+
     const renderModal = (props: Partial<React.ComponentProps<typeof TranslateProgramModal>> = {}) => {
-        const defaultProps = {
-            isOpen: true,
-            onClose: jest.fn(),
-            programToTranslate: TEST_DATA.program,
-            onTranslateProgram: jest.fn(),
-            translatedLanguages: TEST_DATA.translatedLanguages,
-        };
-        return render(<TranslateProgramModal {...defaultProps} {...props} />);
+        return render(<TranslateProgramModal {...createModalProps(props)} />);
+    };
+
+    const renderModalWithLanguageUpdate = (
+        initialLanguages: LocalizationLanguage[],
+        nextLanguages: LocalizationLanguage[],
+    ) => {
+        const initialProps = createModalProps({ translatedLanguages: initialLanguages });
+        const { rerender } = render(<TranslateProgramModal {...initialProps} />);
+
+        rerender(<TranslateProgramModal {...createModalProps({ translatedLanguages: nextLanguages })} />);
+    };
+
+    const getInitialDataFromForm = () => JSON.parse(screen.getByTestId('translate-form').getAttribute('data-initial')!);
+
+    const expectLastHookLanguageCode = async (code: string) => {
+        await waitFor(() => {
+            expect(mockUseTranslateProgram).toHaveBeenLastCalledWith(
+                expect.objectContaining({
+                    language: expect.objectContaining({ code }),
+                }),
+            );
+        });
     };
 
     beforeEach(() => {
         jest.clearAllMocks();
         mockFormIsValid = true;
         mockFormIsDirty = true;
+        mockExposeFormRef = true;
 
         mockTranslateProgram.mockResolvedValue(undefined);
         mockUseTranslateProgram.mockReturnValue({
@@ -167,10 +228,8 @@ describe('TranslateProgramModal', () => {
             programToTranslate: TEST_DATA.programWithLocalization,
             translatedLanguages: [TEST_DATA.language],
         });
-        const form = screen.getByTestId('translate-form');
-        const attr = form.getAttribute('data-initial');
-        expect(attr).toBeTruthy();
-        expect(JSON.parse(attr!)).toMatchObject({
+        const parsed = getInitialDataFromForm();
+        expect(parsed).toMatchObject({
             name: 'Existing',
             description: 'X',
             location: '',
@@ -296,35 +355,9 @@ describe('TranslateProgramModal', () => {
 
     it('selects non-default language when languages arrive after initial empty list', async () => {
         const english = { id: 2, code: 'en', name: 'English' } as LocalizationLanguage;
-        const ukrainian = { id: 1, code: DEFAULT_LOCALE, name: 'Українська' } as LocalizationLanguage;
 
-        const { rerender } = render(
-            <TranslateProgramModal
-                isOpen={true}
-                onClose={jest.fn()}
-                programToTranslate={TEST_DATA.program}
-                onTranslateProgram={jest.fn()}
-                translatedLanguages={[]}
-            />,
-        );
-
-        rerender(
-            <TranslateProgramModal
-                isOpen={true}
-                onClose={jest.fn()}
-                programToTranslate={TEST_DATA.program}
-                onTranslateProgram={jest.fn()}
-                translatedLanguages={[ukrainian, english]}
-            />,
-        );
-
-        await waitFor(() => {
-            expect(mockUseTranslateProgram).toHaveBeenLastCalledWith(
-                expect.objectContaining({
-                    language: expect.objectContaining({ code: 'en' }),
-                }),
-            );
-        });
+        renderModalWithLanguageUpdate([], [UKRAINIAN_LANGUAGE, english]);
+        await expectLastHookLanguageCode('en');
     });
 
     it('renders error message and disables actions while submitting', () => {
@@ -391,10 +424,7 @@ describe('TranslateProgramModal', () => {
             translatedLanguages: [TEST_DATA.language],
         });
 
-        const attr = screen.getByTestId('translate-form').getAttribute('data-initial');
-        expect(attr).toBeTruthy();
-
-        const parsed = JSON.parse(attr!);
+        const parsed = getInitialDataFromForm();
         expect(parsed.__previewImage).toMatchObject({ url: 'https://example.com/preview.jpg' });
         expect(parsed.__backgroundImage).toMatchObject({ url: 'https://example.com/bg.jpg' });
         expect(parsed.sections).toHaveLength(1);
@@ -409,5 +439,129 @@ describe('TranslateProgramModal', () => {
             question: 'Localized question',
             answer: 'Localized answer',
         });
+    });
+
+    it('keeps language unchanged when unknown code is selected', () => {
+        renderModal({
+            translatedLanguages: [TEST_DATA.language],
+        });
+
+        const beforeCalls = mockUseTranslateProgram.mock.calls.length;
+        fireEvent.click(screen.getByTestId('language-select-unknown'));
+
+        expect(mockUseTranslateProgram.mock.calls.length).toBe(beforeCalls);
+        expect(mockUseTranslateProgram).toHaveBeenLastCalledWith(
+            expect.objectContaining({ language: expect.objectContaining({ code: 'en' }) }),
+        );
+    });
+
+    it('falls back to first language when only default locale is available', async () => {
+        renderModalWithLanguageUpdate([], [UKRAINIAN_LANGUAGE]);
+        await expectLastHookLanguageCode(DEFAULT_LOCALE);
+    });
+
+    it('maps faq questionText/answerText into both faq field variants', () => {
+        const programWithQuestionTextOnly = {
+            ...TEST_DATA.program,
+            sections: [
+                {
+                    id: 900,
+                    template: 1,
+                    contents: [
+                        {
+                            id: 901,
+                            contentType: 0,
+                            title: 'Source title',
+                            localizations: [
+                                {
+                                    localizationInfoDto: { id: 2 },
+                                    questionText: 'Localized question text only',
+                                    answerText: 'Localized answer text only',
+                                },
+                            ],
+                        },
+                    ],
+                },
+            ],
+        } as any;
+
+        renderModal({
+            programToTranslate: programWithQuestionTextOnly,
+            translatedLanguages: [TEST_DATA.language],
+        });
+
+        const parsed = getInitialDataFromForm();
+        expect(parsed.sections[0].contents[0]).toMatchObject({
+            question: 'Localized question text only',
+            answer: 'Localized answer text only',
+            questionText: 'Localized question text only',
+            answerText: 'Localized answer text only',
+        });
+    });
+
+    it('returns early on save click when form imperative validation fails', async () => {
+        renderModal();
+        mockFormIsValid = false;
+
+        fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION }));
+
+        await waitFor(() => {
+            expect(mockTranslateProgram).not.toHaveBeenCalled();
+        });
+    });
+
+    it('changes language when known language code is selected', async () => {
+        renderModal();
+
+        fireEvent.click(screen.getByTestId('language-select-polish'));
+        await expectLastHookLanguageCode('pl');
+    });
+
+    it('maps sections when language is not selected yet', () => {
+        const programWithSections = {
+            ...TEST_DATA.program,
+            sections: [
+                {
+                    id: 15,
+                    template: 1,
+                    contents: [
+                        {
+                            id: 16,
+                            contentType: 0,
+                            title: 'Source title',
+                            localizations: [
+                                {
+                                    localizationInfoDto: { id: 2 },
+                                    title: 'Localized title',
+                                },
+                            ],
+                        },
+                    ],
+                },
+            ],
+        } as any;
+
+        renderModal({ programToTranslate: programWithSections, translatedLanguages: [] });
+
+        const parsed = getInitialDataFromForm();
+        expect(parsed.sections[0].contents[0]).toMatchObject({
+            entityId: 16,
+            languageId: 0,
+            title: null,
+            question: null,
+            answer: null,
+            questionText: null,
+            answerText: null,
+        });
+    });
+
+    it('falls back to false dirty state when form ref is missing', () => {
+        mockExposeFormRef = false;
+        const onClose = jest.fn();
+
+        renderModal({ onClose });
+        fireEvent.click(screen.getByLabelText('Close modal'));
+
+        expect(onClose).toHaveBeenCalledTimes(1);
     });
 });

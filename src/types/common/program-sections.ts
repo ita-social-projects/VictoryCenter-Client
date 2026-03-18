@@ -1,7 +1,12 @@
 import { Image, ImageValues } from '../common/image';
 import { ContentType } from './programs';
 import { FaqQuestion } from '../admin/faq';
-import { EntityLocalizationDto } from './language';
+import {
+    EntityLocalization,
+    EntityLocalizationDto,
+    EntityWithDtoLocalizations,
+    EntityWithLocalizations,
+} from './language';
 
 export interface ContentLocalizationDto extends EntityLocalizationDto {
     entityId: number;
@@ -10,6 +15,8 @@ export interface ContentLocalizationDto extends EntityLocalizationDto {
     author?: string | null;
     question?: string | null;
     answer?: string | null;
+    questionText?: string | null;
+    answerText?: string | null;
 }
 
 export enum ProgramSectionType {
@@ -48,7 +55,9 @@ export interface FaqSectionQuestionDto {
     answerText: string;
 }
 
-export interface HippotherapyProgramSectionContentDto {
+export interface HippotherapyProgramSectionContentDto
+    extends ProgramSectionContentLocalizableFields,
+        EntityWithDtoLocalizations<HippotherapyProgramSectionContentLocalizationDto> {
     id?: number;
     sectionId?: number;
     contentType: ContentType;
@@ -61,9 +70,10 @@ export interface HippotherapyProgramSectionContentDto {
     author?: string | null;
     faqQuestionId?: number | null;
     faqQuestion?: FaqQuestion | null;
-    localizations?: ContentLocalizationDto[];
 }
-export interface HippotherapyProgramSectionContent {
+export interface HippotherapyProgramSectionContent
+    extends ProgramSectionContentLocalizableFields,
+        EntityWithLocalizations<HippotherapyProgramSectionContentLocalization> {
     id?: number;
     sectionId?: number;
     contentType: ContentType;
@@ -113,6 +123,8 @@ export interface CreateProgramSectionContentLocalizationDto {
     author?: string | null;
     question?: string | null;
     answer?: string | null;
+    questionText?: string | null;
+    answerText?: string | null;
     languageId: number;
 }
 
@@ -123,7 +135,24 @@ export interface CreateHippotherapyProgramSectionDto {
     order: number;
     contents: CreateProgramSectionContentDto[];
 }
+export interface ProgramSectionContentLocalizableFields {
+    title?: string | null;
+    description?: string | null;
+    author?: string | null;
+    question?: string | null;
+    answer?: string | null;
+    questionText?: string | null;
+    answerText?: string | null;
+}
+export interface HippotherapyProgramSectionContentLocalization
+    extends EntityLocalization,
+        ProgramSectionContentLocalizableFields {}
 
+export interface HippotherapyProgramSectionContentLocalizationDto
+    extends EntityLocalizationDto,
+        ProgramSectionContentLocalizableFields {
+    entityId: number;
+}
 export interface CreateHippotherapyProgramSectionLocalizationDto {
     entityId: number;
     contents: CreateProgramSectionContentLocalizationDto[];

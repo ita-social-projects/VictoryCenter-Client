@@ -234,6 +234,20 @@ export const TranslateProgramForm = forwardRef<TranslateProgramFormRef, Translat
                     return translatedValue;
                 }
 
+                if (field === 'question') {
+                    const questionText = translatedContent?.questionText;
+                    if (typeof questionText === 'string' && questionText.length > 0) {
+                        return questionText;
+                    }
+                }
+
+                if (field === 'answer') {
+                    const answerText = translatedContent?.answerText;
+                    if (typeof answerText === 'string' && answerText.length > 0) {
+                        return answerText;
+                    }
+                }
+
                 return '';
             },
             [formState.sections],
@@ -255,9 +269,29 @@ export const TranslateProgramForm = forwardRef<TranslateProgramFormRef, Translat
 
                         return {
                             ...section,
-                            contents: section.contents.map((content) =>
-                                content.entityId === sourceContentId ? { ...content, [field]: value } : content,
-                            ),
+                            contents: section.contents.map((content) => {
+                                if (content.entityId !== sourceContentId) {
+                                    return content;
+                                }
+
+                                if (field === 'question') {
+                                    return {
+                                        ...content,
+                                        question: value,
+                                        questionText: value,
+                                    };
+                                }
+
+                                if (field === 'answer') {
+                                    return {
+                                        ...content,
+                                        answer: value,
+                                        answerText: value,
+                                    };
+                                }
+
+                                return { ...content, [field]: value };
+                            }),
                         };
                     }),
                 }));

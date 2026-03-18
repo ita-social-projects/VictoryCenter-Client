@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { useLocation } from 'react-router-dom';
 import { DetailedProgramSection } from './DetailedProgramSection';
 import {
     HippotherapyProgramSectionDto,
@@ -19,6 +20,7 @@ const mockRenderProgramSection = renderProgramSectionModule.renderProgramSection
 describe('DetailedProgramSection', () => {
     beforeEach(() => {
         jest.clearAllMocks();
+        (useLocation as jest.Mock).mockReturnValue({ pathname: '/', search: '' });
         mockRenderProgramSection.mockReturnValue(<div data-testid="rendered-section">Rendered Section</div>);
     });
 
@@ -34,6 +36,7 @@ describe('DetailedProgramSection', () => {
                     order: 0,
                     description: null,
                     image: null,
+                    localizations: [],
                 },
                 {
                     id: 2,
@@ -42,6 +45,7 @@ describe('DetailedProgramSection', () => {
                     order: 1,
                     title: null,
                     image: null,
+                    localizations: [],
                 },
             ],
             order: 0,
@@ -77,6 +81,7 @@ describe('DetailedProgramSection', () => {
                     order: 0,
                     title: null,
                     image: null,
+                    localizations: [],
                 },
             ],
             order: 0,
@@ -111,6 +116,7 @@ describe('DetailedProgramSection', () => {
                     order: 0,
                     description: null,
                     image: null,
+                    localizations: [],
                 },
             ],
             order: 0,
@@ -138,7 +144,15 @@ describe('DetailedProgramSection', () => {
             id: 1,
             template: ProgramSectionTemplate.QuadImagesBottom,
             contents: [
-                { id: 1, contentType: ContentType.Title, title: 'Title', order: 0, description: null, image: null },
+                {
+                    id: 1,
+                    contentType: ContentType.Title,
+                    title: 'Title',
+                    order: 0,
+                    description: null,
+                    image: null,
+                    localizations: [],
+                },
                 {
                     id: 2,
                     contentType: ContentType.Description,
@@ -146,6 +160,7 @@ describe('DetailedProgramSection', () => {
                     order: 1,
                     title: null,
                     image: null,
+                    localizations: [],
                 },
                 {
                     id: 3,
@@ -154,6 +169,7 @@ describe('DetailedProgramSection', () => {
                     order: 5,
                     title: null,
                     description: null,
+                    localizations: [],
                 },
                 {
                     id: 4,
@@ -162,6 +178,7 @@ describe('DetailedProgramSection', () => {
                     order: 2,
                     title: null,
                     description: null,
+                    localizations: [],
                 },
                 {
                     id: 5,
@@ -170,6 +187,7 @@ describe('DetailedProgramSection', () => {
                     order: 3,
                     title: null,
                     description: null,
+                    localizations: [],
                 },
             ],
             order: 0,
@@ -201,7 +219,15 @@ describe('DetailedProgramSection', () => {
             id: 1,
             template: ProgramSectionTemplate.SingleImageTop,
             contents: [
-                { id: 1, contentType: ContentType.Title, title: 'Title', order: 0, description: null, image: null },
+                {
+                    id: 1,
+                    contentType: ContentType.Title,
+                    title: 'Title',
+                    order: 0,
+                    description: null,
+                    image: null,
+                    localizations: [],
+                },
                 {
                     id: 2,
                     contentType: ContentType.Description,
@@ -209,8 +235,17 @@ describe('DetailedProgramSection', () => {
                     order: 1,
                     title: null,
                     image: null,
+                    localizations: [],
                 },
-                { id: 3, contentType: ContentType.Image, image: null, order: 2, title: null, description: null },
+                {
+                    id: 3,
+                    contentType: ContentType.Image,
+                    image: null,
+                    order: 2,
+                    title: null,
+                    description: null,
+                    localizations: [],
+                },
             ],
             order: 0,
         };
@@ -270,6 +305,7 @@ describe('DetailedProgramSection', () => {
                     groupIndex: 2,
                     title: null,
                     image: null,
+                    localizations: [],
                 },
                 {
                     id: 2,
@@ -280,6 +316,7 @@ describe('DetailedProgramSection', () => {
                     title: null,
                     description: null,
                     image: null,
+                    localizations: [],
                 },
                 {
                     id: 3,
@@ -290,6 +327,7 @@ describe('DetailedProgramSection', () => {
                     title: null,
                     description: null,
                     image: null,
+                    localizations: [],
                 },
                 {
                     id: 4,
@@ -299,6 +337,7 @@ describe('DetailedProgramSection', () => {
                     groupIndex: 1,
                     title: null,
                     image: null,
+                    localizations: [],
                 },
                 {
                     id: 5,
@@ -308,6 +347,7 @@ describe('DetailedProgramSection', () => {
                     groupIndex: null,
                     title: null,
                     image: null,
+                    localizations: [],
                 },
             ],
             order: 0,
@@ -345,6 +385,7 @@ describe('DetailedProgramSection', () => {
                     order: 0,
                     description: null,
                     image: null,
+                    localizations: [],
                 },
                 {
                     id: 2,
@@ -361,6 +402,7 @@ describe('DetailedProgramSection', () => {
                         pages: [],
                         localizations: [],
                     },
+                    localizations: [],
                 },
                 {
                     id: 3,
@@ -377,6 +419,7 @@ describe('DetailedProgramSection', () => {
                         pages: [],
                         localizations: [],
                     },
+                    localizations: [],
                 },
                 {
                     id: 4,
@@ -386,6 +429,7 @@ describe('DetailedProgramSection', () => {
                     description: null,
                     image: null,
                     faqQuestion: null,
+                    localizations: [],
                 },
             ],
             order: 0,
@@ -419,6 +463,120 @@ describe('DetailedProgramSection', () => {
                         pages: [],
                         localizations: [],
                     },
+                ],
+            },
+            mode: ProgramSectionMode.View,
+        });
+    });
+
+    it('uses localized faq question and answer when faq localizations are in dto shape', () => {
+        const section: HippotherapyProgramSectionDto = {
+            id: 1,
+            template: ProgramSectionTemplate.SingleTitleQuestionAnswerPairs,
+            contents: [
+                {
+                    id: 1,
+                    contentType: ContentType.FaqQuestion,
+                    order: 1,
+                    title: null,
+                    description: null,
+                    image: null,
+                    faqQuestion: {
+                        id: 11,
+                        questionText: 'Base Question',
+                        answerText: 'Base Answer',
+                        status: 1,
+                        pages: [],
+                        localizations: [
+                            {
+                                localizationInfoDto: { id: 2, code: 'uk' },
+                                translationStatus: 1,
+                                entityId: 11,
+                                questionText: 'Localized Question',
+                                answerText: 'Localized Answer',
+                            },
+                        ],
+                    } as any,
+                    localizations: [],
+                },
+            ],
+            order: 0,
+        };
+
+        render(<DetailedProgramSection section={section} />);
+
+        expect(mockRenderProgramSection).toHaveBeenCalledWith({
+            templateId: ProgramSectionTemplate.SingleTitleQuestionAnswerPairs,
+            data: {
+                title: '',
+                description: '',
+                descriptions: [],
+                images: [],
+                cards: [],
+                descriptionAuthorPairs: [],
+                faqQuestions: [
+                    expect.objectContaining({
+                        id: 11,
+                        questionText: 'Localized Question',
+                        answerText: 'Localized Answer',
+                    }),
+                ],
+            },
+            mode: ProgramSectionMode.View,
+        });
+    });
+
+    it('uses localized faq question and answer from content localizations fallback fields', () => {
+        const section: HippotherapyProgramSectionDto = {
+            id: 1,
+            template: ProgramSectionTemplate.SingleTitleQuestionAnswerPairs,
+            contents: [
+                {
+                    id: 1,
+                    contentType: ContentType.FaqQuestion,
+                    order: 1,
+                    title: null,
+                    description: null,
+                    image: null,
+                    faqQuestion: {
+                        id: 12,
+                        questionText: 'Base Question',
+                        answerText: 'Base Answer',
+                        status: 1,
+                        pages: [],
+                        localizations: [],
+                    },
+                    localizations: [
+                        {
+                            localizationInfoDto: { id: 2, code: 'uk' },
+                            translationStatus: 1,
+                            entityId: 1,
+                            question: 'Localized Fallback Question',
+                            answer: 'Localized Fallback Answer',
+                        } as any,
+                    ],
+                },
+            ],
+            order: 0,
+        };
+
+        render(<DetailedProgramSection section={section} />);
+
+        expect(mockRenderProgramSection).toHaveBeenCalledWith({
+            templateId: ProgramSectionTemplate.SingleTitleQuestionAnswerPairs,
+            data: {
+                title: '',
+                description: '',
+                descriptions: [],
+                images: [],
+                cards: [],
+                descriptionAuthorPairs: [],
+                faqQuestions: [
+                    expect.objectContaining({
+                        id: 12,
+                        questionText: 'Localized Fallback Question',
+                        answerText: 'Localized Fallback Answer',
+                    }),
                 ],
             },
             mode: ProgramSectionMode.View,

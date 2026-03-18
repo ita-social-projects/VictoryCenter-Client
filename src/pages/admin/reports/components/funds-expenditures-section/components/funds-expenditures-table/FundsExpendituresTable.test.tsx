@@ -239,9 +239,9 @@ describe('FundsExpendituresTable', () => {
         });
 
         it('should save category changes when valid and notify parent', () => {
-            const onRecordCategorySave = jest.fn();
+            const onRecordSave = jest.fn();
 
-            renderTable({ isEditing: true, onRecordCategorySave });
+            renderTable({ isEditing: true, onRecordSave });
 
             fireEvent.click(screen.getByLabelText('Edit record 1'));
             fireEvent.click(screen.getByTestId('select-option-Власні надходження-3'));
@@ -251,7 +251,11 @@ describe('FundsExpendituresTable', () => {
 
             fireEvent.click(acceptButton);
 
-            expect(onRecordCategorySave).toHaveBeenCalledWith(1, 3);
+            expect(onRecordSave).toHaveBeenCalledWith(1, {
+                categoryId: 3,
+                amountUah: '7 265',
+                amountUsd: '4 200',
+            });
         });
 
         it('should show unique validation message when duplicate category is selected for the same type', () => {

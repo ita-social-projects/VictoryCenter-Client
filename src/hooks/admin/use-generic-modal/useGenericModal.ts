@@ -68,7 +68,6 @@ export const useGenericModal = <
     getErrorMessage,
     getFormKey,
     transformFormData,
-    closeOnDraftCancel = false,
 }: UseGenericModalConfig<TFormValues, TEntity>): UseGenericModalReturn<TFormValues, TFormRef> => {
     const formRef = useRef<TFormRef>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -122,7 +121,7 @@ export const useGenericModal = <
         onClose();
         resetPendingState();
         setIsSubmitting(false);
-    }, [closeOnDraftCancel, pendingAction, onClose, resetPendingState]);
+    }, [onClose, resetPendingState]);
 
     const handleConfirmAction = useCallback(async () => {
         if (!pendingFormData || pendingAction === null) return;

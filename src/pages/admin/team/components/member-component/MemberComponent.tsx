@@ -7,7 +7,7 @@ import { returnDisplayedLocalization } from '@/utils/functions/localization/loca
 import { LocalizationLanguage } from '@/types/common/language';
 import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
 import './MemberComponent.scss';
-import { HoverIconButton } from '@/components/admin/hover-icon-button/HoverIconButton';
+import { IconButton } from '@/components/admin/icon-button/IconButton';
 import { ACTION_ICONS } from '@/const/common/action-icons';
 
 export interface MemberComponentProps {
@@ -80,28 +80,25 @@ export const MemberComponent = ({
                     <VisibilityStatusLabel status={member.status} />
                 </div>
                 <div className="members-actions">
-                    <HoverIconButton
+                    <IconButton
                         aria-label={TEAM_MEMBERS_TEXT.ACTIONS.TRANSLATE}
                         type="button"
                         onClick={handleTranslateMember}
-                        className="members-actions-translate"
                         DefaultIcon={ACTION_ICONS.translate.default}
                     />
-                    <HoverIconButton
+                    <IconButton
                         aria-label={TEAM_MEMBERS_TEXT.ACTIONS.EDIT}
                         type="button"
                         onClick={handleEditMember}
-                        className="members-actions-edit"
                         DefaultIcon={ACTION_ICONS.edit.default}
-                        HoverIcon={ACTION_ICONS.edit.hover}
+                        FilledIcon={ACTION_ICONS.edit.hover}
                     />
-                    <HoverIconButton
+                    <IconButton
                         aria-label={TEAM_MEMBERS_TEXT.ACTIONS.DELETE}
                         type="button"
                         onClick={handleDeleteMember}
-                        className="members-actions-delete"
                         DefaultIcon={ACTION_ICONS.delete.default}
-                        HoverIcon={ACTION_ICONS.delete.hover}
+                        FilledIcon={ACTION_ICONS.delete.hover}
                     />
                 </div>
             </div>

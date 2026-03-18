@@ -19,31 +19,6 @@
     width: 1.5rem;
     height: 1.5rem;
     border: none;
-    cursor: pointer;
-    background: transparent;
-
-    path {
-        fill: c.$blue-500;
-    }
-
-    &:hover:not(:disabled) {
-        path {
-            fill: c.$blue-100;
-        }
-    }
-
-    &:active:not(:disabled) {
-        path {
-            fill: c.$blue-900;
-        }
-    }
-
-    &:disabled {
-        path {
-            fill: c.$grey-600;
-        }
-        cursor: not-allowed;
-    }
 }
 
 .content {

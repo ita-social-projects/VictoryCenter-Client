@@ -1,7 +1,7 @@
 import React, { memo, useCallback } from 'react';
 import { Image, ImageValues } from '@/types/common/image';
 import { ImageInput } from '@/components/admin/image-input/ImageInput';
-import { HoverIconButton } from '@/components/admin/hover-icon-button/HoverIconButton';
+import { IconButton } from '@/components/admin/icon-button/IconButton';
 import { InputError } from '@/components/admin/input-error/InputError';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { PARTNER_VALIDATION_FUNCTIONS } from '@/validation/admin/partner-schema/partner-schema';
@@ -65,13 +65,13 @@ const PartnerFormComponent = ({ values, errors, disabled, onValuesChange, onDele
     return (
         <div className={styles.root} data-testid={`partner-form-${cardHtmlId}`}>
             <div className={styles.header}>
-                <HoverIconButton
+                <IconButton
                     type="button"
                     className={styles['delete-button']}
                     onClick={handleDelete}
                     data-testid={`partner-form-delete-button-${cardHtmlId}`}
                     DefaultIcon={ACTION_ICONS.delete.default}
-                    HoverIcon={ACTION_ICONS.delete.hover}
+                    FilledIcon={ACTION_ICONS.delete.hover}
                 />
             </div>
             <div className={styles.content}>

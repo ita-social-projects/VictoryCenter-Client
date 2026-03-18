@@ -4,11 +4,12 @@ import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/in
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import styles from './DescriptionAuthorPairCard.module.scss';
-import { ReactComponent as DeleteIcon } from '@/assets/icons/delete.svg';
 import { ProgramSectionTemplate } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
 import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
+import { IconButton } from '@/components/admin/icon-button/IconButton';
+import { ACTION_ICONS } from '@/const/common/action-icons';
 
 export interface DescriptionAuthorPairCardProps {
     description: string;
@@ -86,9 +87,14 @@ export const DescriptionAuthorPairCard = ({
     return (
         <div className={cn(styles.card, styles.editable)}>
             {index > 0 && (
-                <button type="button" className={styles['delete-button']} onClick={handleDelete} aria-label="delete">
-                    <DeleteIcon />
-                </button>
+                <IconButton
+                    type="button"
+                    className={styles['delete-button']}
+                    onClick={handleDelete}
+                    aria-label="delete"
+                    DefaultIcon={ACTION_ICONS.delete.default}
+                    FilledIcon={ACTION_ICONS.delete.hover}
+                />
             )}
 
             <div className={styles.fields}>

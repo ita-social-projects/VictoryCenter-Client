@@ -66,57 +66,27 @@
 }
 
 .edit-btn {
-    cursor: default;
+    cursor: pointer;
     border: none;
     width: 1.5rem;
     height: 1.5rem;
-    background: transparent;
-    
-    path {
-        transition: 0.2s ease;
-    }
 
     &.edit {
-        path {
-            fill: colors.$blue-900;
-        }
+        --icon-btn-hover-color: #{colors.$blue-900};
+        --icon-btn-disabled-color: #{colors.$blue-900};
     }
-
-    &.view {
-        cursor: pointer;
-        &:hover {
-            path {
-                fill: colors.$blue-100;
-            }
-        }
+    
+    &.edit:hover {
+        cursor: not-allowed;
     }
 }
 
 .delete-btn {
-    display: flex;
     justify-self: flex-end;
     cursor: pointer;
     border: none;
     gap: 0.25rem;
     font-size: 1.125rem;
-    background: transparent;
-
-    path {
-        transition: 0.2s ease;
-    }
-    
-    &:hover {
-        path {
-            fill: colors.$blue-100;
-        }
-    }
-
     width: 1.5rem;
     height: 1.5rem;
-
-    &.pressed {
-        path {
-            fill: colors.$blue-900;
-        }
-    }
 }

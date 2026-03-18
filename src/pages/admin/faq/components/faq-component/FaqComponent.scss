@@ -88,63 +88,11 @@
             gap: 0.625rem;
 
             .faq-edit-btn,
-            .faq-delete-btn {
+            .faq-delete-btn,
+            .faq-translate-btn {
                 width: 1.5rem;
                 height: 1.5rem;
                 border: none;
-                cursor: pointer;
-                background-repeat: no-repeat;
-                background-size: cover;
-            }
-            .faq-translate-btn {
-                border: none;
-                width: 1.5rem;
-                height: 1.5rem;
-            }
-
-            .faq-edit-btn,
-            .faq-delete-btn {
-                background: transparent;
-
-                path {
-                    fill: colors.$blue-500;
-                }
-
-                &:hover:not(:disabled) {
-                    path {
-                        fill: colors.$blue-100;
-                    }
-                }
-
-                &:active:not(:disabled) {
-                    path {
-                        fill: colors.$blue-900;
-                    }
-                }
-
-                &:disabled {
-                    path {
-                        fill: colors.$grey-600;
-                    }
-                    cursor: not-allowed;
-                }
-            }
-
-            .faq-translate-btn {
-                background: transparent;
-                
-                &:hover {
-                    cursor: pointer;
-                    path {
-                        fill: colors.$blue-100;
-                    }
-                }
-                
-                &:active {
-                    path {
-                        fill: colors.$blue-500;
-                    }
-                }
             }
         }
     }

@@ -24,6 +24,8 @@ import {
     getFaqPairs,
     ensureTitleContentAndOnePair,
 } from '@/utils/functions/program-section-content/programSectionContent';
+import { IconButton } from '@/components/admin/icon-button/IconButton';
+import { ACTION_ICONS } from '@/const/common/action-icons';
 
 export interface ProgramSectionFormProps {
     section: CreateHippotherapyProgramSectionDto;
@@ -663,17 +665,21 @@ export const ProgramSectionForm = ({
                         </div>
                     </div>
                     <div className={styles['hover-buttons']}>
-                        <button
+                        <IconButton
                             type="button"
                             onClick={handleEditClick}
                             className={`${styles['icon-button']} ${styles['edit-button']}`}
                             aria-label="Edit section"
+                            DefaultIcon={ACTION_ICONS.edit.default}
+                            FilledIcon={ACTION_ICONS.edit.hover}
                         />
-                        <button
+                        <IconButton
                             type="button"
                             onClick={handleDeleteClick}
                             className={`${styles['icon-button']} ${styles['delete-button']}`}
                             aria-label="Delete section"
+                            DefaultIcon={ACTION_ICONS.delete.default}
+                            FilledIcon={ACTION_ICONS.delete.hover}
                         />
                         <button
                             type="button"

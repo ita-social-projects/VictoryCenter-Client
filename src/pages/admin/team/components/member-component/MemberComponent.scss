@@ -68,63 +68,8 @@
 
         button {
             border: none;
-        }
-
-        &-translate {
             width: 1.5rem;
             height: 1.5rem;
-            background: transparent;
-
-            &:hover {
-                cursor: pointer;
-                path {
-                    fill: colors.$blue-100;
-                }
-            }
-
-            &:active {
-                path {
-                    fill: colors.$blue-900;
-                }
-            }
-        }
-
-        &-edit {
-            width: 1.5rem;
-            height: 1.5rem;
-            background: transparent;
-
-            &:hover {
-                cursor: pointer;
-                path {
-                    fill: colors.$blue-100;
-                }
-            }
-
-            &:active {
-                path {
-                    fill: colors.$blue-900;
-                }
-            }
-        }
-
-        &-delete {
-            width: 1.5rem;
-            height: 1.5rem;
-            background: transparent;
-
-            &:hover {
-                cursor: pointer;
-                path {
-                    fill: colors.$blue-100;
-                }
-            }
-
-            &:active {
-                path {
-                    fill: colors.$blue-900;
-                }
-            }
         }
     }
 }

@@ -57,26 +57,9 @@
     cursor: pointer;
 }
 
-.edit-button {
-    background-image: url('~@/assets/icons/edit.svg');
-
-    &:hover,
-    &:active {
-        background-image: url('~@/assets/icons/edit-filled.svg');
-    }
-
-    &:hover {
-        opacity: 0.6;
-    }
-}
-
+.edit-button,
 .delete-button {
-    background-image: url('~@/assets/icons/delete.svg');
-
-    &:hover,
-    &:active {
-        background-image: url('~@/assets/icons/delete-filled.svg');
-    }
+    --icon-btn-hover-color: #{c.$blue-900};
 
     &:hover {
         opacity: 0.6;

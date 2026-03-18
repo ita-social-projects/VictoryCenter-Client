@@ -1,28 +1,28 @@
 import { FC, SVGProps } from 'react';
 import '@testing-library/jest-dom';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { HoverIconButton } from './HoverIconButton';
+import { IconButton } from './IconButton';
 
-jest.mock('./HoverIconButton.module.scss', () => ({
+jest.mock('./IconButton.module.scss', () => ({
     'icon-btn': 'icon-btn',
     'icon-default': 'icon-default',
-    'icon-hover': 'icon-hover',
+    'icon-filled': 'icon-filled',
 }));
 
 const DefaultIcon: FC<SVGProps<SVGSVGElement>> = ({ className, ...props }) => (
     <svg data-testid="default-icon" className={className} {...props} />
 );
 
-const HoverIcon: FC<SVGProps<SVGSVGElement>> = ({ className, ...props }) => (
+const FilledIcon: FC<SVGProps<SVGSVGElement>> = ({ className, ...props }) => (
     <svg data-testid="hover-icon" className={className} {...props} />
 );
 
-describe('HoverIconButton', () => {
+describe('IconButton', () => {
     const renderHoverIconButton = (overrideProps = {}) =>
         render(
-            <HoverIconButton
+            <IconButton
                 DefaultIcon={DefaultIcon}
-                HoverIcon={HoverIcon}
+                FilledIcon={FilledIcon}
                 aria-label="Hover icon button"
                 {...overrideProps}
             />,
@@ -38,25 +38,25 @@ describe('HoverIconButton', () => {
         expect(getDefaultIcon()).toBeInTheDocument();
     });
 
-    it('renders hover icon and applies icon classes when HoverIcon is provided', () => {
+    it('renders hover icon and applies icon classes when FilledIcon is provided', () => {
         renderHoverIconButton();
 
         const defaultIcon = getDefaultIcon();
-        const hoverIcon = screen.getByTestId('hover-icon');
+        const filledIcon = screen.getByTestId('hover-icon');
 
         expect(defaultIcon).toHaveClass('icon-default');
-        expect(hoverIcon).toHaveClass('icon-hover');
+        expect(filledIcon).toHaveClass('icon-filled');
     });
 
-    it('does not render hover icon and does not apply default icon class when HoverIcon is undefined', () => {
-        renderHoverIconButton({ HoverIcon: undefined });
+    it('does not render hover icon and does not apply default icon class when FilledIcon is undefined', () => {
+        renderHoverIconButton({ FilledIcon: undefined });
 
         expect(screen.queryByTestId('hover-icon')).not.toBeInTheDocument();
         expect(getDefaultIcon()).not.toHaveClass('icon-default');
     });
 
-    it('does not render hover icon when HoverIcon is null', () => {
-        renderHoverIconButton({ HoverIcon: null });
+    it('does not render hover icon when FilledIcon is null', () => {
+        renderHoverIconButton({ FilledIcon: null });
 
         expect(screen.queryByTestId('hover-icon')).not.toBeInTheDocument();
         expect(getDefaultIcon()).not.toHaveClass('icon-default');

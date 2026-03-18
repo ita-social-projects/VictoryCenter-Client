@@ -42,6 +42,9 @@ jest.mock('./FundsExpendituresTable.module.scss', () => ({
     'amount-edit-input': 'amount-edit-input',
     'amount-edit-input-error': 'amount-edit-input-error',
     'amount-edit-error': 'amount-edit-error',
+    'to-top-button': 'to-top-button',
+    'to-top-icon': 'to-top-icon',
+    'to-top-button-visible': 'to-top-button-visible',
 }));
 
 jest.mock('@/assets/icons/chevron-up.svg', () => ({
@@ -54,6 +57,10 @@ jest.mock('@/assets/icons/chevron-down.svg', () => ({
 
 jest.mock('@/assets/icons/not-found.svg', () => ({
     ReactComponent: ({ className }: { className?: string }) => <svg data-testid="not-found" className={className} />,
+}));
+
+jest.mock('@/assets/icons/arrow-up.svg', () => ({
+    ReactComponent: ({ className }: { className?: string }) => <svg data-testid="arrow-up" className={className} />,
 }));
 
 jest.mock('@/assets/icons/edit.svg', () => ({
@@ -206,6 +213,72 @@ describe('FundsExpendituresTable', () => {
         const firstRowCells = within(rows[0]).getAllByRole('cell');
 
         expect(firstRowCells[4]).toHaveTextContent('1 000');
+    });
+
+    describe('scroll to top button', () => {
+        it('should show to-top button when content overflows and table is scrolled', () => {
+            render(<FundsExpendituresTable records={MOCK_RECORDS} categories={MOCK_CATEGORIES} />);
+
+            const table = screen.getByTestId('funds-table');
+            Object.defineProperty(table, 'scrollHeight', { configurable: true, value: 900 });
+            Object.defineProperty(table, 'clientHeight', { configurable: true, value: 300 });
+            Object.defineProperty(table, 'scrollTop', { configurable: true, writable: true, value: 120 });
+
+            fireEvent.scroll(table);
+
+            expect(screen.getByTestId('funds-table-to-top')).toHaveClass('to-top-button-visible');
+            expect(screen.getByTestId('arrow-up')).toBeInTheDocument();
+        });
+
+        it('should hide to-top button when list is at top', () => {
+            render(<FundsExpendituresTable records={MOCK_RECORDS} categories={MOCK_CATEGORIES} />);
+
+            const table = screen.getByTestId('funds-table');
+            Object.defineProperty(table, 'scrollHeight', { configurable: true, value: 900 });
+            Object.defineProperty(table, 'clientHeight', { configurable: true, value: 300 });
+            Object.defineProperty(table, 'scrollTop', { configurable: true, writable: true, value: 0 });
+
+            fireEvent.scroll(table);
+
+            expect(screen.getByTestId('funds-table-to-top')).not.toHaveClass('to-top-button-visible');
+        });
+
+        it('should scroll to top after clicking to-top button', () => {
+            render(<FundsExpendituresTable records={MOCK_RECORDS} categories={MOCK_CATEGORIES} />);
+
+            const table = screen.getByTestId('funds-table');
+            Object.defineProperty(table, 'scrollHeight', { configurable: true, value: 900 });
+            Object.defineProperty(table, 'clientHeight', { configurable: true, value: 300 });
+            Object.defineProperty(table, 'scrollTop', { configurable: true, writable: true, value: 220 });
+
+            fireEvent.scroll(table);
+            fireEvent.click(screen.getByTestId('funds-table-to-top'));
+
+            expect((table as HTMLDivElement).scrollTop).toBe(0);
+            expect(screen.getByTestId('funds-table-to-top')).not.toHaveClass('to-top-button-visible');
+        });
+
+        it('should reset scroll position to top when sorting is changed', () => {
+            render(<FundsExpendituresTable records={MOCK_RECORDS} categories={MOCK_CATEGORIES} />);
+
+            const table = screen.getByTestId('funds-table');
+            Object.defineProperty(table, 'scrollHeight', { configurable: true, value: 900 });
+            Object.defineProperty(table, 'clientHeight', { configurable: true, value: 300 });
+            Object.defineProperty(table, 'scrollTop', { configurable: true, writable: true, value: 180 });
+
+            fireEvent.scroll(table);
+            fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.TYPE));
+
+            expect((table as HTMLDivElement).scrollTop).toBe(0);
+            expect(screen.getByTestId('funds-table-to-top')).not.toHaveClass('to-top-button-visible');
+        });
+    });
+
+    describe('isEditing mode', () => {
+        it('should not show checkboxes when isEditing is false (default)', () => {
+            render(<FundsExpendituresTable records={MOCK_RECORDS} categories={MOCK_CATEGORIES} />);
+            expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
+        });
     });
 
     describe('row category editing', () => {

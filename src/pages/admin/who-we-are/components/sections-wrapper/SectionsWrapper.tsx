@@ -12,10 +12,12 @@ import {
 import { SectionType } from '@/types/common/about-us';
 import React from 'react';
 import { LocalizationLanguage } from '@/types/common/language';
+import './SectionsWrapper.scss';
 
 export interface MainSectionProps {
     section: WhoWeAreSection | null;
     onChange: (data: Content) => void;
+    handleOnTranslateContent: (section: WhoWeAreSection) => void;
     onPublish: () => void;
     isPublishButtonActive: boolean;
     language: LocalizationLanguage;
@@ -29,6 +31,7 @@ interface SectionConfig {
 export const SectionsWrapper = ({
     section,
     onChange,
+    handleOnTranslateContent,
     onPublish,
     isPublishButtonActive,
     language,
@@ -78,6 +81,14 @@ export const SectionsWrapper = ({
 
     return (
         <div className="who-we-are-main-section">
+            <div className="who-we-are-section-buttons">
+                <button
+                    type="button"
+                    className="who-we-are-translate-btn"
+                    aria-label="Translate"
+                    onClick={() => handleOnTranslateContent(section)}
+                />
+            </div>
             <Component {...commonProps} {...additionalProps} />
         </div>
     );

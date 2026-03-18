@@ -11,6 +11,21 @@ export const WHO_WE_ARE_TEXT = {
     FAIL_TO_FETCH_PREVIEWS: 'Виникла помилка, не вдалось завантажити назви секцій',
     FAIL_TO_FETCH_SECTION: 'Виникла помилка, не вдалось завантажити секцію',
 
+    FORM: {
+        TITLE: {
+            ADD_TRANSLATION: 'Додати переклад',
+            EDIT_TRANSLATION: 'Редагувати переклад',
+        },
+        MESSAGE: {
+            FAIL_TO_TRANSLATE_SECTION: 'Виникла помилка під час додавання перекладу для секції',
+            FAIL_TO_UPDATE_TRANSLATION: 'Виникла помилка під час оновлення перекладу для секції',
+        },
+        LABEL: {
+            TITLE: 'Заголовок',
+            DESCRIPTION: 'Опис',
+        },
+    },
+
     MIN_LENGTH: 10,
 };
 

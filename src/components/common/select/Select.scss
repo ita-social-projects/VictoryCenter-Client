@@ -36,14 +36,6 @@
         }
     }
 
-    &-chevron-icon--open {
-        transform: rotate(270deg);
-    }
-
-    &-chevron-icon--closed {
-        transform: rotate(90deg);
-    }
-
     &-options {
         display: block;
         position: absolute;

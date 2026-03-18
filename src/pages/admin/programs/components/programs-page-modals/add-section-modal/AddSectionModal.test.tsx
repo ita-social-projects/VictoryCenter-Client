@@ -55,6 +55,10 @@ jest.mock('@/components/public/swiper/Swiper', () => ({
     },
 }));
 
+jest.mock('@/assets/icons/chevron-left.svg', () => ({
+    ReactComponent: () => <svg data-testid="chevron-left" />,
+}));
+
 jest.mock('@/assets/icons/chevron-right.svg', () => ({
     ReactComponent: () => <svg data-testid="chevron-right" />,
 }));

@@ -1,5 +1,4 @@
 import { useRef, useState, useCallback, useMemo } from 'react';
-import cn from 'classnames';
 import { Swiper as SwiperReact, SwiperSlide, SwiperClass } from 'swiper/react';
 import { Navigation, Pagination, Scrollbar } from 'swiper/modules';
 import 'swiper/css';
@@ -7,13 +6,9 @@ import 'swiper/css/navigation';
 import 'swiper/css/scrollbar';
 import { Button, ButtonProps } from '@/components/public/ui/button';
 import { ReactComponent as ArrowRight } from '@/assets/icons/arrow-right.svg';
-import styles from './Swiper.module.scss';
+import { ReactComponent as ArrowLeft } from '@/assets/icons/arrow-left.svg';
 
 export type ShowScrollbar = { isVisible: true; className: string; classNameDrag: string } | { isVisible: false };
-
-const ArrowLeft: React.FunctionComponent<React.SVGProps<SVGSVGElement>> = (props) => (
-    <ArrowRight {...props} className={cn(props.className, styles['arrow-left-icon'])} />
-);
 
 const SWIPER_NAVIGATION_CONFIG = {
     prev: {

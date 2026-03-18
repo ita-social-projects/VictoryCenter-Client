@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ReactComponent as ArrowRightIcon } from '@/assets/icons/arrow-right.svg';
+import { ReactComponent as ArrowUpIcon } from '@/assets/icons/arrow-up.svg';
 import { ReactComponent as NotFoundIcon } from '@/assets/icons/not-found.svg';
 import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import './InfiniteScrollList.scss';
@@ -94,7 +94,7 @@ export const InfiniteScrollList = <T,>({
             </div>
             {isMoveToTopVisible && (
                 <button onClick={moveToTop} className="infinite-scroll-list-to-top">
-                    <ArrowRightIcon className="infinite-scroll-list-to-top-icon" />
+                    <ArrowUpIcon className="infinite-scroll-list-to-top-icon" />
                 </button>
             )}
         </div>

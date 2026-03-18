@@ -4,8 +4,12 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { SingleSelectInput } from './SingleSelectInput';
 
-jest.mock('@/assets/icons/chevron-right.svg', () => ({
-    ReactComponent: (props: any) => <svg {...props} data-testid="arrow-right-icon" />,
+jest.mock('@/assets/icons/chevron-down.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="arrow-down-icon" />,
+}));
+
+jest.mock('@/assets/icons/chevron-up.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="arrow-up-icon" />,
 }));
 
 interface Option {
@@ -190,12 +194,12 @@ describe('SingleSelectInput', () => {
             />,
         );
 
-        expect(screen.getByTestId('arrow-right-icon')).toHaveClass('icon-img-closed');
+        expect(screen.getByTestId('arrow-down-icon')).toBeInTheDocument();
 
         await user.click(screen.getByRole('button'));
-        expect(screen.getByTestId('arrow-right-icon')).toHaveClass('icon-img-open');
+        expect(screen.getByTestId('arrow-up-icon')).toBeInTheDocument();
 
         await user.click(screen.getByRole('button'));
-        expect(screen.getByTestId('arrow-right-icon')).toHaveClass('icon-img-closed');
+        expect(screen.getByTestId('arrow-down-icon')).toBeInTheDocument();
     });
 });

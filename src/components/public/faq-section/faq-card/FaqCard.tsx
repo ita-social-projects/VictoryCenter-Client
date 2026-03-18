@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import { ReactComponent as OpenIcon } from '@/assets/icons/arrow-up-right.svg';
+import { ReactComponent as OpenIcon } from '@/assets/icons/arrow-down-right.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/cross.svg';
 import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
 import { PublishedFaqQuestion } from '@/types/public/faq-section';

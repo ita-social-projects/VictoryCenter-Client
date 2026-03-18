@@ -5,8 +5,8 @@ import { InfiniteScrollList, InfiniteScrollListProps } from './InfiniteScrollLis
 jest.mock('@/assets/icons/not-found.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="not-found-icon" />,
 }));
-jest.mock('@/assets/icons/arrow-right.svg', () => ({
-    ReactComponent: (props: any) => <svg {...props} data-testid="arrow-right-icon" />,
+jest.mock('@/assets/icons/arrow-up.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="arrow-up-icon" />,
 }));
 
 jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
@@ -49,7 +49,7 @@ describe('InfiniteScrollList', () => {
 
     const getScrollContainer = () => screen.getByTestId('infinite-scroll-list');
     const getLoader = () => screen.queryByTestId('loader-icon');
-    const getMoveToTopButton = () => screen.queryByTestId('arrow-right-icon');
+    const getMoveToTopButton = () => screen.queryByTestId('arrow-up-icon');
     const getEmptyState = () => screen.queryByTestId('infinite-scroll-list-not-found');
     const getNotFoundIcon = () => screen.queryByTestId('not-found-icon');
 

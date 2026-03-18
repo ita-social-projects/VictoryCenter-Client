@@ -26,11 +26,6 @@
                 color: colors.$blue-900;
             }
 
-            .faq-open {
-                transform: translate(-100%, 15%) rotate(90deg);
-                transform-origin: 50% 50%;
-            }
-
             .faq-close {
                 display: none;
             }

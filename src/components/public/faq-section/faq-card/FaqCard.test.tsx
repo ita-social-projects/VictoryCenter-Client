@@ -8,7 +8,7 @@ import { EntityLocalization, TranslationStatus } from '@/types/common/language';
 jest.mock('../../../../assets/icons/cross.svg', () => ({
     ReactComponent: () => <div className="faq-close" data-testid="close-icon" />,
 }));
-jest.mock('../../../../assets/icons/arrow-up-right.svg', () => ({
+jest.mock('../../../../assets/icons/arrow-down-right.svg', () => ({
     ReactComponent: () => <div className="faq-open" data-testid="open-icon" />,
 }));
 jest.mock('@/hooks/common/use-get-localization/useGetLocalization', () => ({

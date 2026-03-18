@@ -10,8 +10,12 @@ jest.mock('@/assets/icons/chevron-unchecked.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="chevron-unchecked-icon" />,
 }));
 
-jest.mock('@/assets/icons/chevron-right.svg', () => ({
-    ReactComponent: (props: any) => <svg {...props} data-testid="chevron-right-icon" />,
+jest.mock('@/assets/icons/chevron-down.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="chevron-down-icon" />,
+}));
+
+jest.mock('@/assets/icons/chevron-up.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="chevron-up-icon" />,
 }));
 
 interface TestOption {
@@ -57,7 +61,8 @@ describe('Multiselect Component', () => {
     const getOptionsContainer = () => screen.queryByRole('listbox');
 
     // Icon getters
-    const getChevronIcon = () => screen.getByTestId('chevron-right-icon');
+    const getExpandIcon = () => screen.getByTestId('chevron-down-icon');
+    const getCollapseIcon = () => screen.getByTestId('chevron-up-icon');
     const getUnselectedOptionIcons = () => screen.getAllByTestId('chevron-unchecked-icon');
 
     // DOM element getters with updated class names
@@ -110,12 +115,12 @@ describe('Multiselect Component', () => {
 
     const expectDropdownToBeOpen = () => {
         expect(getOptionsContainer()).toBeInTheDocument();
-        expect(getChevronIcon()).toHaveClass('multiselect__chevron-icon--open');
+        expect(getCollapseIcon()).toBeInTheDocument();
     };
 
     const expectDropdownToBeClosed = () => {
         expect(queryOptionsContainer()).not.toBeInTheDocument();
-        expect(getChevronIcon()).toHaveClass('multiselect__chevron-icon--closed');
+        expect(getExpandIcon()).toBeInTheDocument();
     };
 
     const expectOptionToBeVisible = (name: string) => {

@@ -5,6 +5,7 @@ import { Button } from '@/components/admin/button/Button';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import styles from './SingleTitleDescriptionAuthorPairs.module.scss';
 import { DescriptionAuthorPairCard } from './description-author-pair-card/DescriptionAuthorPairCard';
+import { ReactComponent as ArrowLeft } from '@/assets/icons/arrow-left.svg';
 import { ReactComponent as ArrowRight } from '@/assets/icons/arrow-right.svg';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import { CardCarousel } from './card-carousel/CardCarousel';
@@ -14,10 +15,6 @@ import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-se
 import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-
-const ArrowLeft: React.FunctionComponent<React.SVGProps<SVGSVGElement>> = (props) => (
-    <ArrowRight {...props} className={cn(props.className, styles['arrow-left-icon'])} />
-);
 
 export interface DescriptionAuthorPairData {
     description: string;

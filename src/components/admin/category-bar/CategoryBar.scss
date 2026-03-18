@@ -24,7 +24,6 @@
 
     &-arrow {
         position: absolute;
-        z-index: 1;
         top: 0;
         bottom: 0;
         padding: 0 0.5rem;
@@ -55,10 +54,6 @@
 
         &-left {
             left: 1.5rem;
-
-            &-icon {
-                transform: rotate(180deg);
-            }
         }
 
         &-right {

@@ -6,8 +6,12 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
 jest.mock('./select.scss', () => ({}));
 
-jest.mock('@/assets/icons/chevron-right.svg', () => ({
-    ReactComponent: (props: any) => <svg {...props} data-testid="chevron-right-icon" />,
+jest.mock('@/assets/icons/chevron-down.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="chevron-down-icon" />,
+}));
+
+jest.mock('@/assets/icons/chevron-up.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="chevron-up-icon" />,
 }));
 
 describe('Select Component', () => {
@@ -28,9 +32,8 @@ describe('Select Component', () => {
         render(<Select {...defaultProps} />);
 
         expect(screen.getByText(COMMON_TEXT_ADMIN.STATUS.DEFAULT)).toBeInTheDocument();
-        const icon = screen.getByTestId('chevron-right-icon');
+        const icon = screen.getByTestId('chevron-down-icon');
         expect(icon).toBeInTheDocument();
-        expect(icon).toHaveClass('select-chevron-icon--closed');
     });
 
     it('renders with custom className', () => {
@@ -62,9 +65,8 @@ describe('Select Component', () => {
         fireEvent.click(selectButton);
 
         expect(selectContainer).toHaveClass('select-opened');
-        const icon = screen.getByTestId('chevron-right-icon');
+        const icon = screen.getByTestId('chevron-up-icon');
         expect(icon).toBeInTheDocument();
-        expect(icon).toHaveClass('select-chevron-icon--open');
     });
 
     it('closes select when button is clicked again', () => {
@@ -77,7 +79,7 @@ describe('Select Component', () => {
 
         fireEvent.click(selectButton);
         expect(selectContainer).toHaveClass('select-closed');
-        expect(screen.getByTestId('chevron-right-icon')).toHaveClass('select-chevron-icon--closed');
+        expect(screen.getByTestId('chevron-down-icon')).toBeInTheDocument();
     });
 
     it('opens select when Space or Enter is pressed', () => {
@@ -87,13 +89,13 @@ describe('Select Component', () => {
 
         fireEvent.keyDown(selectButton, { key: ' ', code: 'Space', charCode: 32 });
         expect(selectContainer).toHaveClass('select-opened');
-        expect(screen.getByTestId('chevron-right-icon')).toHaveClass('select-chevron-icon--open');
+        expect(screen.getByTestId('chevron-up-icon')).toBeInTheDocument();
 
         fireEvent.click(selectButton);
 
         fireEvent.keyDown(selectButton, { key: 'Enter', code: 'Enter', charCode: 13 });
         expect(selectContainer).toHaveClass('select-opened');
-        expect(screen.getByTestId('chevron-right-icon')).toHaveClass('select-chevron-icon--open');
+        expect(screen.getByTestId('chevron-up-icon')).toBeInTheDocument();
     });
 
     it('does not open select when a non-Space/Enter key is pressed', () => {
@@ -103,7 +105,7 @@ describe('Select Component', () => {
 
         fireEvent.keyDown(selectButton, { key: 'a', code: 'KeyA', charCode: 65 });
         expect(selectContainer).toHaveClass('select-closed');
-        expect(screen.getByTestId('chevron-right-icon')).toHaveClass('select-chevron-icon--closed');
+        expect(screen.getByTestId('chevron-down-icon')).toBeInTheDocument();
     });
 
     it('closes select when Space or Enter is pressed again', () => {
@@ -116,14 +118,14 @@ describe('Select Component', () => {
 
         fireEvent.keyDown(selectButton, { key: ' ', code: 'Space', charCode: 32 });
         expect(selectContainer).toHaveClass('select-closed');
-        expect(screen.getByTestId('chevron-right-icon')).toHaveClass('select-chevron-icon--closed');
+        expect(screen.getByTestId('chevron-down-icon')).toBeInTheDocument();
 
         fireEvent.keyDown(selectButton, { key: 'Enter', code: 'Enter', charCode: 13 });
         expect(selectContainer).toHaveClass('select-opened');
 
         fireEvent.keyDown(selectButton, { key: 'Enter', code: 'Enter', charCode: 13 });
         expect(selectContainer).toHaveClass('select-closed');
-        expect(screen.getByTestId('chevron-right-icon')).toHaveClass('select-chevron-icon--closed');
+        expect(screen.getByTestId('chevron-down-icon')).toBeInTheDocument();
     });
 
     it('does not close select when a non-Space/Enter key is pressed', () => {
@@ -133,11 +135,11 @@ describe('Select Component', () => {
 
         fireEvent.click(selectButton);
         expect(selectContainer).toHaveClass('select-opened');
-        expect(screen.getByTestId('chevron-right-icon')).toHaveClass('select-chevron-icon--open');
+        expect(screen.getByTestId('chevron-up-icon')).toBeInTheDocument();
 
         fireEvent.keyDown(selectButton, { key: 'a', code: 'KeyA', charCode: 65 });
         expect(selectContainer).toHaveClass('select-opened');
-        expect(screen.getByTestId('chevron-right-icon')).toHaveClass('select-chevron-icon--open');
+        expect(screen.getByTestId('chevron-up-icon')).toBeInTheDocument();
     });
 
     it('toggles select state multiple times', () => {

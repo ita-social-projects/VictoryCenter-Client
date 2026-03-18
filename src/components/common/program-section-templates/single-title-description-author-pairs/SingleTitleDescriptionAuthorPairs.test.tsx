@@ -68,6 +68,10 @@ jest.mock('./description-author-pair-card/DescriptionAuthorPairCard', () => ({
     },
 }));
 
+jest.mock('@/assets/icons/arrow-left.svg', () => ({
+    ReactComponent: () => <svg data-testid="arrow-left" />,
+}));
+
 jest.mock('@/assets/icons/arrow-right.svg', () => ({
     ReactComponent: () => <svg data-testid="arrow-right" />,
 }));

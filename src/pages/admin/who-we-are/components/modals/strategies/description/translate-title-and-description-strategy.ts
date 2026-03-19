@@ -1,3 +1,4 @@
+import { ContentType } from '@/types/common/about-us';
 import {
     TranslateWhoWeAreTitleAndDescriptionForm,
     TranslateWhoWeAreTitleAndDescriptionFormValues,
@@ -11,13 +12,14 @@ export const translateTitleAndDescriptionStrategy: WhoWeAreModalStrategy<Transla
         getInitialData: (section, language, isEditMode) => {
             if (!isEditMode || !language) return null;
 
-            const localized = section.contents
-                .flatMap((content) => content.localizations ?? [])
-                .find((loc) => loc.language.code === language.code);
+            const titleContent = section.contents
+                .find((content) => content.contentType === ContentType.Title);
+            const descriptionContent = section.contents
+                .find((content) => content.contentType === ContentType.Description);
 
             return {
-                title: localized?.title ?? '',
-                description: localized?.description ?? '',
+                title: titleContent?.localizations?.find((loc) => loc.language.code === language.code)?.title ?? '',
+                description: descriptionContent?.localizations?.find((loc) => loc.language.code === language.code)?.description ?? '',
             };
         },
     };

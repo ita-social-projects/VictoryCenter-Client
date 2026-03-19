@@ -83,7 +83,7 @@ export const TranslateWhoWeAreMultipleDescriptionsForm = forwardRef<
             TranslateWhoWeAreMultipleDescriptionsFormValues,
             TranslateWhoWeAreMultipleDescriptionsFormErrorState
         >({
-            defaultFormState: defaultFormStateRef.current,
+            defaultFormState: initialData ?? defaultFormStateRef.current,
             initialData,
             validateForm,
             onValidationChange,

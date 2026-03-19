@@ -186,6 +186,24 @@ describe('PartnerForm', () => {
         );
     });
 
+    it('clears image error on valid image change', () => {
+        renderComponent({
+            errors: { ...defaultErrors, image: 'Invalid image size' },
+        });
+
+        clickImageChange();
+
+        const newImage = {
+            base64: 'new-base64-image',
+            mimeType: 'image/png',
+        };
+
+        expect(onValuesChange).toHaveBeenCalledWith(
+            { ...defaultValues, image: newImage, imageId: defaultValues.imageId },
+            { ...defaultErrors, image: undefined },
+        );
+    });
+
     it('propagates image removal from ImageInput and nullifies imageId', () => {
         renderComponent({});
         clickImageRemove();

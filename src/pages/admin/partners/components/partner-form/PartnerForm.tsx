@@ -42,7 +42,10 @@ const PartnerFormComponent = ({ values, errors, disabled, onValuesChange, onDele
 
     const handleImageChange = useCallback(
         (value: ImageValues | null) => {
-            onValuesChange({ ...values, image: value, imageId: value ? values.imageId : null }, { ...errors });
+            onValuesChange(
+                { ...values, image: value, imageId: value ? values.imageId : null },
+                { ...errors, image: undefined },
+            );
         },
         [onValuesChange, values, errors],
     );

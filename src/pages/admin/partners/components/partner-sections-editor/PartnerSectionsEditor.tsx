@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useImperativeHandle, useState, useEffect } from 'react';
+import React, { forwardRef, useCallback, useImperativeHandle, useState, useEffect, useRef } from 'react';
 import {
     PartnerSectionForm,
     PartnerSectionErrors,
@@ -50,6 +50,7 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [sectionToDeleteId, setSectionToDeleteId] = useState<string | null>(null);
     const [localSections, setLocalSections] = useState<PartnerSectionFormValues[]>([]);
+    const scrollAnchorRef = useRef<HTMLDivElement>(null);
 
     const fetchSectionsHandler = useCallback(
         async (options: RequestOptions): Promise<PartnerSection[]> => {
@@ -267,6 +268,9 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
 
         setLocalSections((current) => [...current, newSection]);
         setErrors((current) => [...current, { partners: [] }]);
+        setTimeout(() => {
+            scrollAnchorRef.current?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
+        }, 0);
     }, [isPublishing, isSectionsLoading, localSections, setLocalSections, setErrors]);
 
     useImperativeHandle(
@@ -309,6 +313,7 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
                     onPublish={handlePublish}
                 />
             ))}
+            <div ref={scrollAnchorRef} />
 
             <ConfirmationModal
                 isOpen={isModalOpen}

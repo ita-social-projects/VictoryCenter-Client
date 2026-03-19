@@ -38,11 +38,13 @@ export const CustomFormGroup = ({
             <div className="custom-form-group__input-wrapper">
                 <InputWithCharacterLimit {...inputProps} id={id} hasError={!!error} />
 
-                {tooltipText && (
-                    <div className="custom-form-group__tooltip">
-                        <ButtonTooltip position="bottom">{tooltipText}</ButtonTooltip>
-                    </div>
-                )}
+                <div className="custom-form-group__tooltip-slot">
+                    {tooltipText && (
+                        <div className="custom-form-group__tooltip">
+                            <ButtonTooltip position="bottom">{tooltipText}</ButtonTooltip>
+                        </div>
+                    )}
+                </div>
             </div>
 
             <InputError error={error} />

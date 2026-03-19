@@ -19,7 +19,7 @@ export const CompanyProfileRequisitesTab = ({ disabled }: CompanyProfileRequisit
                 <h2 className="requisites-tab-title">{COMPANY_PROFILE_TEXT.REQUISITES_TAB.SECTION_TITLE}</h2>
             </div>
 
-            <div className="form-row">
+            <div className="requisites-tab-fields">
                 <Controller
                     name="requisitesUa"
                     control={control}
@@ -36,6 +36,7 @@ export const CompanyProfileRequisitesTab = ({ disabled }: CompanyProfileRequisit
                         />
                     )}
                 />
+
                 <Controller
                     name="requisitesEn"
                     control={control}
@@ -52,6 +53,7 @@ export const CompanyProfileRequisitesTab = ({ disabled }: CompanyProfileRequisit
                         />
                     )}
                 />
+
                 <Controller
                     name="companyRegistrationNumber"
                     control={control}
@@ -68,6 +70,7 @@ export const CompanyProfileRequisitesTab = ({ disabled }: CompanyProfileRequisit
                         />
                     )}
                 />
+
                 <Controller
                     name="addressUa"
                     control={control}
@@ -84,6 +87,7 @@ export const CompanyProfileRequisitesTab = ({ disabled }: CompanyProfileRequisit
                         />
                     )}
                 />
+
                 <Controller
                     name="addressEn"
                     control={control}

@@ -17,6 +17,12 @@
         color: colors.$blue-900;
     }
 
+    .profile-tab-fields {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
     .input-group {
         display: flex;
         flex-direction: column;

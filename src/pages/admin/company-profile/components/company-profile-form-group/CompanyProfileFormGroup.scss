@@ -32,20 +32,28 @@
     }
 
     &__input-wrapper {
-        position: relative;
         display: flex;
+        align-items: center;
+        gap: 10px;
     }
 
     &__input-wrapper .char-limit-input {
         width: 100%;
+        min-width: 0;
+    }
+
+    &__tooltip-slot {
+        flex: 0 0 27px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     &__tooltip {
-        position: absolute;
-        right: 0.75rem;
-        top: 0.75rem;
-        transform: none;
-        display: flex;
+        position: static;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .tooltip-popup {

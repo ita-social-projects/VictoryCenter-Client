@@ -17,6 +17,9 @@ export const CompanyProfileTab = ({ disabled }: ProfileTabProps) => {
         <div className="profile-tab-container">
             <div className="form-row full-width">
                 <h2 className="profile-tab-title">{COMPANY_PROFILE_TEXT.PROFILE_TAB.SECTION_TITLE}</h2>
+            </div>
+
+            <div className="profile-tab-fields">
                 <Controller
                     name="phone"
                     control={control}
@@ -32,9 +35,7 @@ export const CompanyProfileTab = ({ disabled }: ProfileTabProps) => {
                         />
                     )}
                 />
-            </div>
 
-            <div className="form-row">
                 <Controller
                     name="addressUa"
                     control={control}
@@ -51,6 +52,7 @@ export const CompanyProfileTab = ({ disabled }: ProfileTabProps) => {
                         />
                     )}
                 />
+
                 <Controller
                     name="addressEng"
                     control={control}
@@ -67,9 +69,7 @@ export const CompanyProfileTab = ({ disabled }: ProfileTabProps) => {
                         />
                     )}
                 />
-            </div>
 
-            <div className="form-row">
                 <Controller
                     name="email"
                     control={control}
@@ -86,6 +86,7 @@ export const CompanyProfileTab = ({ disabled }: ProfileTabProps) => {
                         />
                     )}
                 />
+
                 <Controller
                     name="correspondenceEmail"
                     control={control}
@@ -102,9 +103,7 @@ export const CompanyProfileTab = ({ disabled }: ProfileTabProps) => {
                         />
                     )}
                 />
-            </div>
 
-            <div className="form-row">
                 <Controller
                     name="mottoUa"
                     control={control}
@@ -119,6 +118,7 @@ export const CompanyProfileTab = ({ disabled }: ProfileTabProps) => {
                         />
                     )}
                 />
+
                 <Controller
                     name="mottoEng"
                     control={control}

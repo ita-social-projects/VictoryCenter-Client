@@ -147,7 +147,9 @@ const PartnerSectionComponent = ({
             const descError = PARTNER_VALIDATION_FUNCTIONS.validateDescription(partner.description);
             const hasImage = !!partner.image;
             const imageError = partnerErrors[index]?.image;
-            return !!descError || !hasImage || !!imageError;
+            const isStoredImage = !!partner.image && 'url' in partner.image;
+            const hasBlockingImageError = !!imageError && !isStoredImage;
+            return !!descError || !hasImage || hasBlockingImageError;
         });
 
         return !hasPartnerErrors;

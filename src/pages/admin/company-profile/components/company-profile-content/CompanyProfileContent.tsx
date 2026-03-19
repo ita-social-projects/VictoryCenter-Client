@@ -63,6 +63,11 @@ export const CompanyProfileContent = () => {
         setIsCancelModalOpen(false);
     };
 
+    const handleTabSelect = (tab: TabItem) => {
+        if (isEditMode) return;
+        setActiveTab(tab.id);
+    };
+
     if (isLoading) return <div>Завантаження...</div>;
 
     const selectedTab = TABS.find((tab) => tab.id === activeTab) || TABS[0];
@@ -72,13 +77,13 @@ export const CompanyProfileContent = () => {
             <div className="toolbar">
                 <div className="toolbar-top" />
                 <div className="toolbar-bottom">
-                    <div className="tabs-wrapper">
+                    <div className={`tabs-wrapper${isEditMode ? ' tabs-wrapper--disabled' : ''}`}>
                         <CategoryBar<TabItem>
                             categories={TABS}
                             selectedCategory={selectedTab}
                             getCategoryDisplayName={(tab) => tab.label}
                             getCategoryKey={(tab) => tab.id}
-                            onCategorySelect={(tab) => setActiveTab(tab.id)}
+                            onCategorySelect={handleTabSelect}
                         />
                     </div>
 

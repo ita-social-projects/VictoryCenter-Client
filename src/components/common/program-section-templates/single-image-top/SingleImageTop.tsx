@@ -65,7 +65,7 @@ export const SingleImageTop = ({
                             maxSizeMB={PROGRAM_VALIDATION.images.maxSizeMB}
                         />
                     ) : (
-                        imageSrc && <img src={imageSrc} alt="" className={baseStyles.image} />
+                        imageSrc && <img src={imageSrc} alt="" className={baseStyles.image} loading="lazy" />
                     )}
                 </div>
             </div>

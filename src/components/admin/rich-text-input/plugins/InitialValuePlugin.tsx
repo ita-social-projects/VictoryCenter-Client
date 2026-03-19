@@ -18,17 +18,6 @@ export const InitialValuePlugin = ({ value }: InitialValuePluginProps) => {
         if (isFirstRender.current) {
             isFirstRender.current = false;
             lastValue.current = value;
-
-            editor.update(() => {
-                const root = $getRoot();
-
-                const parser = new DOMParser();
-                const dom = parser.parseFromString(value || '<p></p>', 'text/html');
-                const nodes = $generateNodesFromDOM(editor, dom);
-
-                root.clear();
-                $insertNodes(nodes);
-            });
             return;
         }
 

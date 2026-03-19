@@ -23,7 +23,6 @@ export interface ImageSectionProps {
     onPublish: () => void;
     imageInputProps: Omit<ImageInputProps, 'className' | 'value' | 'onChange' | 'setError'>;
     isPublishButtonActive: boolean;
-    setIsPublishButtonActive: (value: boolean) => void;
     language: LocalizationLanguage;
 }
 
@@ -35,7 +34,6 @@ export const ImageSection = ({
     onPublish,
     imageInputProps,
     isPublishButtonActive,
-    setIsPublishButtonActive,
     language,
 }: ImageSectionProps) => {
     const [imageError, setImageError] = useState<string | null>(null);
@@ -73,7 +71,6 @@ export const ImageSection = ({
             imageId: null,
             localizations: imageContent?.localizations || [],
         });
-        setIsPublishButtonActive(true);
     };
 
     const handleTitleChange = (value: string) => {
@@ -82,7 +79,6 @@ export const ImageSection = ({
             ...titleContent,
             title: value,
         });
-        setIsPublishButtonActive(true);
 
         const plainText = getPlainTextFromHtml(value);
         const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(plainText);
@@ -95,7 +91,6 @@ export const ImageSection = ({
             ...descriptionContent,
             description: value,
         });
-        setIsPublishButtonActive(true);
 
         const plainText = getPlainTextFromHtml(value);
         const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(plainText);

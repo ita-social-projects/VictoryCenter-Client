@@ -1,6 +1,10 @@
 import { VisibilityStatus } from './common';
 import { Image, ImageValues } from '../common/image';
-import { HippotherapyProgramSectionDto, CreateHippotherapyProgramSectionDto } from '../common/program-sections';
+import {
+    HippotherapyProgramSectionDto,
+    CreateHippotherapyProgramSectionDto,
+    CreateHippotherapyProgramSectionLocalizationDto,
+} from '../common/program-sections';
 import {
     EntityLocalization,
     EntityLocalizationDto,
@@ -81,6 +85,12 @@ export interface CreateHippotherapyProgramDto {
     backgroundImageId?: number | null;
     categoryIds: number[];
     sections: CreateHippotherapyProgramSectionDto[];
+}
+
+export interface CreateHippotherapyProgramLocalizationDto extends HippotherapyProgramLocalizableFields {
+    entityId: number;
+    languageId: number;
+    sections: CreateHippotherapyProgramSectionLocalizationDto[];
 }
 
 export interface UpdateHippotherapyProgramDto extends CreateHippotherapyProgramDto {

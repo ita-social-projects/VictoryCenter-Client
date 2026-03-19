@@ -5,6 +5,7 @@ import { FaqCard } from '@/components/public/faq-section/faq-card/FaqCard';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { Button } from '@/components/admin/button/Button';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { useProgramSectionValidation } from '@/hooks/admin/use-program-section-validation';
 import { PublishedFaqQuestion } from '@/types/public/faq-section';
 import { FaqSectionQuestionDto, ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
@@ -15,6 +16,7 @@ import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import { EditableFaqCard } from './editable-faq-card/EditableFaqCard';
 import styles from './FaqProgramSection.module.scss';
+import viewStyles from './ViewFaqProgramSection.module.scss';
 
 const { validateFaqQuestion, validateFaqAnswer } = PROGRAM_SECTION_VALIDATION_FUNCTIONS;
 
@@ -29,6 +31,7 @@ export interface FaqProgramSectionProps {
     onAddFaqPair?: (questionText: string, answerText: string) => void;
     onDeleteFaqPair?: (index: number) => void;
     validationResetKey?: number;
+    canAddFaqPair?: boolean;
 }
 
 const TEMPLATE = ProgramSectionTemplate.SingleTitleQuestionAnswerPairs;
@@ -44,6 +47,7 @@ export const FaqProgramSection = ({
     onAddFaqPair,
     onDeleteFaqPair,
     validationResetKey,
+    canAddFaqPair = true,
 }: FaqProgramSectionProps) => {
     const { t } = useTranslation('programsPage');
     const idPrefix = useId();
@@ -74,8 +78,9 @@ export const FaqProgramSection = ({
     }, [isEditable, faqPairs.length, onAddFaqPair]);
 
     const isAddDisabled =
-        faqPairs.length > 0 &&
-        faqPairs.some((pair) => !!validateFaqQuestion(pair.questionText) || !!validateFaqAnswer(pair.answerText));
+        !canAddFaqPair ||
+        (faqPairs.length > 0 &&
+            faqPairs.some((pair) => !!validateFaqQuestion(pair.questionText) || !!validateFaqAnswer(pair.answerText)));
 
     const handleAddClick = useCallback(() => {
         onAddFaqPair?.('', '');
@@ -112,7 +117,9 @@ export const FaqProgramSection = ({
         }));
     }, [questions, faqPairs]);
 
-    const rootClassName = cn(styles['faq-section'], {
+    const baseStyles = mode === ProgramSectionMode.View ? viewStyles : styles;
+
+    const rootClassName = cn(baseStyles['faq-section'], {
         [styles['template']]: isTemplate,
         [styles['editable']]: isEditable,
     });
@@ -135,6 +142,7 @@ export const FaqProgramSection = ({
                             error={titleError}
                             currentLength={getTrimmedInputText(title ?? '').length}
                             className={styles['title-input-group']}
+                            maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(titleMaxLength)}
                         />
                     </div>
 
@@ -178,11 +186,11 @@ export const FaqProgramSection = ({
 
     return (
         <div className={rootClassName}>
-            <div className={styles['faq-block']}>
-                <h2 className={styles['title']}>{displayTitle}</h2>
-                <div className={styles['questions-container']}>
+            <div className={baseStyles['faq-block']}>
+                <h2 className={baseStyles['title']}>{displayTitle}</h2>
+                <div className={baseStyles['questions-container']}>
                     {viewQuestions.map((faq, index) => (
-                        <FaqCard key={faq.id || index} faq={faq} className={styles['faq-card-program-section']} />
+                        <FaqCard key={faq.id || index} faq={faq} className={baseStyles['faq-card-program-section']} />
                     ))}
                 </div>
             </div>

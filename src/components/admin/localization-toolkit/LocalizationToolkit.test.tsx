@@ -2,7 +2,6 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { LocalizationToolkit } from './LocalizationToolkit';
 import { DEFAULT_LOCALE } from '@/const/common/locales';
 import { LOCALIZATION_TEXT } from '@/const/admin/localization';
-import { TranslationStatusFilter } from '@/types/common/language';
 import { mapLabelToTranslationStatusFilter } from '@/utils/functions/mappers/admin/localization-status/localization-status-mappers';
 
 jest.mock('@/components/common/select/Select', () => ({
@@ -10,7 +9,7 @@ jest.mock('@/components/common/select/Select', () => ({
 }));
 
 jest.mock('@/components/admin/language-toolkit/LanguageToolkit', () => ({
-    LanguageToolkit: ({ onLanguageChange, languages }: any) => (
+    LanguageToolkit: ({ _onLanguageChange, _languages }: any) => (
         <div data-testid="mock-language-toolkit">Mock Language Toolkit</div>
     ),
 }));
@@ -41,7 +40,7 @@ describe('LocalizationToolkit', () => {
         expect(screen.getByTestId('mock-language-toolkit')).toBeInTheDocument();
     });
 
-    it('automatically selects "All" status on mount', () => {
+    it('does not select translation status on mount', () => {
         render(
             <LocalizationToolkit
                 languages={mockLanguages}
@@ -50,7 +49,7 @@ describe('LocalizationToolkit', () => {
             />,
         );
 
-        expect(mockOnTranslationStatusChange).toHaveBeenCalledWith(TranslationStatusFilter.All);
+        expect(mockOnTranslationStatusChange).not.toHaveBeenCalled();
     });
 
     it('renders all translation status options', () => {

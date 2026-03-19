@@ -121,10 +121,19 @@
             gap: 0.625rem;
 
             .edit-btn,
-            .delete-btn {
+            .delete-btn,
+            .translate-btn {
                 width: 1.5rem;
                 height: 1.5rem;
                 border: none;
+            }
+
+            .translate-btn {
+                background: url('~@/assets/icons/translate.svg');
+
+                &:active {
+                    opacity: 0.8;
+                }
             }
         }
     }

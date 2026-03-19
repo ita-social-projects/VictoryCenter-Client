@@ -48,7 +48,7 @@
 
 .title {
     flex: 0 0 41%;
-    @include type.h3-bold;
+    @include type.h3-bold-uppercase;
     text-transform: uppercase;
     color: c.$blue-900;
 
@@ -86,7 +86,7 @@
     }
 
     :global(.char-limit-textarea__field) {
-        @include type.h3-bold;
+        @include type.h3-bold-uppercase;
         color: c.$blue-900;
         text-transform: uppercase;
     }

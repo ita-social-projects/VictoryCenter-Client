@@ -7,7 +7,13 @@ const mockTargetLocale = 'en';
 
 jest.mock('@/components/admin/button/Button', () => ({
     Button: (props: any) => (
-        <button data-testid="generate-btn" disabled={props.disabled} onClick={props.onClick} type={props.type}>
+        <button
+            data-testid="generate-btn"
+            className={props.className}
+            disabled={props.disabled}
+            onClick={props.onClick}
+            type={props.type}
+        >
             {props.children}
         </button>
     ),
@@ -53,21 +59,29 @@ describe('TranslationControls', () => {
         expect(button).toHaveAttribute('type', 'button');
     });
 
-    it('disables the button when isSubmitting is true', () => {
+    it('renders the generate button as disabled and hidden', () => {
+        render(<TranslationControls {...defaultProps} />);
+
+        const button = screen.getByTestId('generate-btn');
+        expect(button).toBeDisabled();
+        expect(button).toHaveClass('disable');
+    });
+
+    it.skip('disables the button when isSubmitting is true', () => {
         render(<TranslationControls {...defaultProps} isSubmitting={true} />);
 
         const button = screen.getByTestId('generate-btn');
         expect(button).toBeDisabled();
     });
 
-    it('enables the button when isSubmitting is false', () => {
+    it.skip('enables the button when isSubmitting is false', () => {
         render(<TranslationControls {...defaultProps} isSubmitting={false} />);
 
         const button = screen.getByTestId('generate-btn');
         expect(button).toBeEnabled();
     });
 
-    it('calls onGenerate when button is clicked', () => {
+    it.skip('calls onGenerate when button is clicked', () => {
         const onGenerateMock = jest.fn();
         render(<TranslationControls {...defaultProps} onGenerate={onGenerateMock} />);
 
@@ -89,7 +103,7 @@ describe('TranslationControls', () => {
         expect(onLanguageChangeMock).toHaveBeenCalledWith(languages[1]);
     });
 
-    it('does not crash if onGenerate is undefined and button is clicked', () => {
+    it.skip('does not crash if onGenerate is undefined and button is clicked', () => {
         render(<TranslationControls {...defaultProps} onGenerate={undefined} />);
 
         const button = screen.getByTestId('generate-btn');

@@ -18,6 +18,7 @@ export interface ProgramListItemProps {
     translationLanguages: LocalizationLanguage[];
     handleOnDeleteProgram: (program: HippotherapyProgram) => void;
     handleOnEditProgram: (program: HippotherapyProgram) => void;
+    handleOnTranslateProgram: (program: HippotherapyProgram) => void;
 }
 
 export const ProgramListItem = ({
@@ -26,7 +27,8 @@ export const ProgramListItem = ({
     translationLanguages,
     handleOnDeleteProgram,
     handleOnEditProgram,
-}: ProgramListItemProps) => {
+    handleOnTranslateProgram,
+}: ProgramListItemProps & { handleOnTranslateProgram: (program: HippotherapyProgram) => void }) => {
     const [textFields, setTextFields] = useState<Partial<HippotherapyProgramLocalizableFields>>();
     useEffect(() => {
         const displayedLocalization = returnDisplayedLocalization(program, language.code);
@@ -69,6 +71,12 @@ export const ProgramListItem = ({
                 </ButtonTooltip>
                 <div className="program-actions-buttons">
                     <IconButton
+                        type="button"
+                        onClick={() => handleOnTranslateProgram(program)}
+                        className="translate-btn"
+                        aria-label="Translate"
+                    />
+                    <button
                         type="button"
                         onClick={() => handleOnEditProgram(program)}
                         className="edit-btn"

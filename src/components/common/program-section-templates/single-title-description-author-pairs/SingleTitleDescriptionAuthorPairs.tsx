@@ -129,6 +129,7 @@ export const SingleTitleDescriptionAuthorPairs = ({
                         maxLength={titleMaxLength}
                         placeholder={PROGRAMS_TEXT.SECTION.SINGLE_TITLE_DESCRIPTION_AUTHOR_PAIRS.TITLE_PLACEHOLDER}
                         error={titleError}
+                        maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(titleMaxLength)}
                     />
                 ) : (
                     <h2 className={styles.title}>{title}</h2>

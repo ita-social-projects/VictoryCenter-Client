@@ -65,5 +65,42 @@ describe('AboutUsApi', () => {
             await expect(AboutUsApi.get()).rejects.toThrow(errorMessage);
             expect(axiosInstance.get).toHaveBeenCalledWith(API_ROUTES.WHO_WE_ARE.PUBLIC);
         });
+
+        it('should map nested content localization dto to language model', async () => {
+            const dtoResponse = [
+                {
+                    sectionType: SectionType.Main,
+                    contents: [
+                        {
+                            id: 1,
+                            contentType: ContentType.Title,
+                            title: 'Localized title',
+                            description: null,
+                            image: null,
+                            localizations: [
+                                {
+                                    localizationInfoDto: { id: 2, code: 'en' },
+                                    title: 'English title',
+                                    description: 'English description',
+                                    translationStatus: 1,
+                                },
+                            ],
+                        },
+                    ],
+                },
+            ] as any;
+
+            (axiosInstance.get as jest.Mock).mockResolvedValue({ data: dtoResponse });
+
+            const result = await AboutUsApi.get();
+
+            expect(result[0].contents[0].localizations?.[0]).toEqual(
+                expect.objectContaining({
+                    language: { id: 2, code: 'en' },
+                    title: 'English title',
+                    description: 'English description',
+                }),
+            );
+        });
     });
 });

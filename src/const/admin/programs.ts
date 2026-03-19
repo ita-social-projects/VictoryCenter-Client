@@ -18,6 +18,7 @@ export const PROGRAMS_TEXT = {
         INSERT_PROGRAM_LOCATION: 'Введіть місце проведення',
         INSERT_PROGRAM_PARTICIPANTS_COUNT: 'Введіть кількість учасників',
         INSERT_PROGRAM_MEETINGS_COUNT: 'Введіть кількість зустрічей',
+        INSERT_PROGRAM_DESCRIPTION: 'Детальний опис програми',
     },
 
     MESSAGE: {

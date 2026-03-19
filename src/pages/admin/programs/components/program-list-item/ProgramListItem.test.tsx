@@ -57,12 +57,15 @@ describe('ProgramListItem', () => {
     const mockLanguage: LocalizationLanguage = { id: 1, code: 'uk', name: 'Ukrainian' };
     const mockTranslationLanguages: LocalizationLanguage[] = [mockLanguage];
 
+    const mockHandleOnTranslateProgram = jest.fn();
+
     const defaultProps = {
         program: mockProgram,
         language: mockLanguage,
         translationLanguages: mockTranslationLanguages,
         handleOnDeleteProgram: mockHandleOnDeleteProgram,
         handleOnEditProgram: mockHandleOnEditProgram,
+        handleOnTranslateProgram: mockHandleOnTranslateProgram,
     };
 
     const renderProgramListItem = (overrideProps: Partial<typeof defaultProps> = {}) =>

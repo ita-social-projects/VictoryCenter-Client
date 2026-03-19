@@ -3,6 +3,7 @@ import { Button } from '@/components/admin/button/Button';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { LocalizationLanguage } from '@/types/common/language';
 import styles from './TranslationControls.module.scss';
+import cn from 'classnames';
 
 interface TranslationControlsProps {
     isSubmitting: boolean;
@@ -13,7 +14,6 @@ interface TranslationControlsProps {
 }
 
 export const TranslationControls = ({
-    isSubmitting,
     languages,
     selectedLanguage,
     onLanguageChange,
@@ -40,9 +40,9 @@ export const TranslationControls = ({
                 )}
             </div>
             <Button
-                className={styles['generate-button']}
+                className={cn(styles['generate-button'], styles.disable)}
                 buttonStyle="primary"
-                disabled={isSubmitting || !selectedLanguage}
+                disabled={true}
                 onClick={onGenerate}
                 type="button"
             >

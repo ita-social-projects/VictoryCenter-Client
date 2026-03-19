@@ -125,6 +125,7 @@ export const EditableFaqCard = ({
                     currentLength={getTrimmedInputText(questionText).length}
                     className={styles['question-input']}
                     error={questionError}
+                    maxLimitWarning={FAQ_VALIDATION.question.getMaxError()}
                 />
                 <div className={styles['expand-container']}>
                     <button
@@ -153,6 +154,7 @@ export const EditableFaqCard = ({
                         rows={3}
                         currentLength={getTrimmedInputText(answerText).length}
                         error={answerError}
+                        maxLimitWarning={FAQ_VALIDATION.answer.getMaxError()}
                     />
                 </div>
             )}

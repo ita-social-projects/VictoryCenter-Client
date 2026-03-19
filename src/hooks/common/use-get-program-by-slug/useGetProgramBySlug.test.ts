@@ -1,7 +1,7 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { useProgramBySlug } from './useGetProgramBySlug';
 import { fetchProgramBySlug } from '@/services/api/public/programs/programs-api';
-import { DetailedProgram } from '@/types/public/programs-page';
+import { DetailedProgramDto } from '@/types/public/programs-page';
 
 jest.mock('@/services/api/public/programs/programs-api', () => ({
     fetchProgramBySlug: jest.fn(),
@@ -9,7 +9,7 @@ jest.mock('@/services/api/public/programs/programs-api', () => ({
 
 const mockedFetchProgramBySlug = fetchProgramBySlug as jest.MockedFunction<typeof fetchProgramBySlug>;
 
-const createMockProgram = (): DetailedProgram => ({
+const createMockProgram = (): DetailedProgramDto => ({
     id: 1,
     slug: 'test-program',
     name: 'Test Program',
@@ -20,6 +20,7 @@ const createMockProgram = (): DetailedProgram => ({
     backgroundImage: null,
     previewImage: null,
     sections: [],
+    localizations: [],
 });
 
 describe('useProgramBySlug', () => {
@@ -94,10 +95,10 @@ describe('useProgramBySlug', () => {
 
     it('should not update state if component unmounts during fetch', async () => {
         const mockProgram = createMockProgram();
-        let resolvePromise: (value: DetailedProgram) => void;
+        let resolvePromise: (value: DetailedProgramDto) => void;
 
         mockedFetchProgramBySlug.mockReturnValue(
-            new Promise<DetailedProgram>((resolve) => {
+            new Promise<DetailedProgramDto>((resolve) => {
                 resolvePromise = resolve;
             }),
         );

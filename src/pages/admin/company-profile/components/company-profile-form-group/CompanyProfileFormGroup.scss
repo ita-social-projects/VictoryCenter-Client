@@ -1,0 +1,54 @@
+@use '@/assets/sass/variables/colors';
+@use '@/assets/sass/variables/typography';
+
+.custom-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+
+    &__label-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 4px;
+
+        label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            font-family: typography.$font-family-base;
+            font-weight: typography.$fw-regular;
+            font-size: typography.$sub2-size;
+            line-height: typography.$body2-height;
+            letter-spacing: typography.$ls-tight;
+            color: #414651;
+        }
+    }
+
+    &__required {
+        color: colors.$error;
+    }
+
+    &__input-wrapper {
+        position: relative;
+        display: flex;
+    }
+
+    &__input-wrapper .char-limit-input {
+        width: 100%;
+    }
+
+    &__tooltip {
+        position: absolute;
+        right: 0.75rem;
+        top: 0.75rem;
+        transform: none;
+        display: flex;
+    }
+
+    .tooltip-popup {
+        text-align: left;
+    }
+}

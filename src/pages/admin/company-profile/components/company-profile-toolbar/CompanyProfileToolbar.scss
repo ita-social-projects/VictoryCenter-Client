@@ -1,0 +1,16 @@
+@use '@/assets/sass/variables/typography';
+
+.profile-toolbar-actions {
+    display: flex;
+    flex-direction: row !important;
+    justify-content: flex-end;
+
+    button {
+        font-family: typography.$font-family-base;
+        font-weight: typography.$fw-regular;
+        font-size: typography.$sub1-size;
+        line-height: typography.$body2-height;
+        letter-spacing: typography.$ls-tight;
+        padding: 16px 24px;
+    }
+}

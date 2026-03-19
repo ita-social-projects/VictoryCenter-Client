@@ -23,6 +23,7 @@ import { PartnersPage } from '@/pages/public/partners-page/PartnersPage';
 import { WhoWeArePageAdmin } from '@/pages/admin/who-we-are/WhoWeArePageAdmin';
 import { PartnerPanel } from '@/pages/admin/partners/PartnerPanel';
 import { ReportsPage } from '@/pages/public/reports-page';
+import { CompanyProfilePage } from '@/pages/admin/company-profile/CompanyProfilePage';
 import { LanguageSyncWrapper } from '@/components/public/language-sync-wrapper/LanguageSyncWrapper';
 
 export const AppRouter = () => {
@@ -72,6 +73,7 @@ export const AppRouter = () => {
                             <Route path={ADMIN_ROUTES.FAQ.PATH} element={<FaqPanel />} />
                             <Route path={ADMIN_ROUTES.WHO_WE_ARE.PATH} element={<WhoWeArePageAdmin />} />
                             <Route path={ADMIN_ROUTES.PARTNERS.PATH} element={<PartnerPanel />} />
+                            <Route path={ADMIN_ROUTES.PROFILE_COMPANY.PATH} element={<CompanyProfilePage />} />
                         </Route>
                     </Route>
                 </Route>

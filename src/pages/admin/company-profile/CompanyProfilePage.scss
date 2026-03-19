@@ -1,0 +1,66 @@
+@use '@/assets/sass/variables/colors';
+@use '@/assets/sass/variables/typography';
+
+.wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+
+    .toolbar {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        padding: 3.375rem 3.375rem 0 3.375rem;
+        border-bottom: 1px solid colors.$grey-600;
+
+        .toolbar-top {
+            height: 3.375rem;
+        }
+
+        .toolbar-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            width: 100%;
+
+            .tabs-wrapper {
+                margin-bottom: -1px;
+                flex: 1;
+                display: flex;
+                align-items: flex-end;
+            }
+            .toolbar-actions {
+                display: flex;
+                flex-shrink: 0;
+                align-items: stretch;
+                margin-bottom: -1px;
+            }
+        }
+    }
+
+    .main-content {
+        background-color: colors.$white;
+        border-radius: 16px;
+        padding: 20px 32px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+    }
+}
+
+@media (max-width <= 1400px) {
+    .wrapper .toolbar {
+        flex-wrap: wrap;
+        gap: 0.9375rem;
+    }
+}
+
+@media (max-height: 800px) {
+    .wrapper .main-content {
+        margin: 1.5rem 3.375rem;
+        padding: 20px;
+    }
+}

@@ -1,0 +1,50 @@
+@use '@/assets/sass/variables/colors';
+@use '@/assets/sass/variables/typography';
+
+.requisites-tab-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 660px;
+    max-width: 660px;
+
+    .requisites-tab-title {
+        font-family: typography.$font-family-base;
+        font-size: typography.$h4-size;
+        line-height: typography.$h4-height;
+        letter-spacing: typography.$h4-spacing;
+        font-weight: typography.$fw-semibold;
+        color: colors.$blue-900;
+    }
+
+    .input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: typography.$font-family-base;
+            font-size: typography.$small-size;
+            line-height: typography.$small-height;
+            letter-spacing: typography.$small-spacing;
+            font-weight: typography.$fw-medium;
+            color: #374151;
+
+            .required {
+                color: colors.$error;
+            }
+        }
+
+        error {
+            font-family: typography.$font-family-base;
+            font-size: typography.$small-size;
+            line-height: typography.$small-height;
+            letter-spacing: typography.$small-spacing;
+            color: colors.$error;
+            margin-top: 4px;
+        }
+    }
+}

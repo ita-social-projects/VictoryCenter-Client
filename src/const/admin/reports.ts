@@ -101,4 +101,7 @@ export const PDF_FILES_SECTION_TEXT = {
         },
         NO_FILES: 'PDF файли відсутні',
     },
+    ACTIONS: {
+        EDIT: 'Редагувати основну інформацію',
+    },
 };

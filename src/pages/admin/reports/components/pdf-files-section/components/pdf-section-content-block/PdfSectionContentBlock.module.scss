@@ -7,15 +7,18 @@
     width: auto;
     height: 100%;
     margin: 0 15px;
-}
-
-.view-root {
     max-width: 1440px;
-    gap: 1.5rem;
+    gap: 5px;
     border: 1px solid c.$grey-600;
     border-radius: 16px;
-    padding: 63px 40px;
+    padding: 30px 40px 63px 40px;
     box-shadow: 0 11px 18px rgba(c.$bluish-black, 0.19);
+}
+
+.content-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem; 
 }
 
 .field {
@@ -25,7 +28,7 @@
 .view-field {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 5px;
 }
 
 .view-label {
@@ -41,11 +44,11 @@
     border-radius: 5px;
 
     &-title {
-        padding: 22px 25px;
+        padding: 20px 25px;
     }
 
     &-description {
-        padding: 47px 25px;
+        padding: 40px 25px;
     }
 }
 
@@ -55,4 +58,26 @@
 
 .view-text-description {
     @include type.subtitle-1-bold;
+}
+
+.edit-button-container {
+    display: flex;
+    justify-content: end;
+    margin-right: 20px;
+}
+
+.edit-button {
+    border: none;
+    height: 22px;
+    width: 20px;
+    background: url('~@/assets/icons/edit.svg');
+
+    &:hover {
+        cursor: pointer;
+        background: url('~@/assets/icons/edit-grey.svg');
+    }
+
+    &:active {
+        background: url('~@/assets/icons/edit-filled.svg');
+    }
 }

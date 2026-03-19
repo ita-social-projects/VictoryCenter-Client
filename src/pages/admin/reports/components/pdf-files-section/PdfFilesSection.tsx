@@ -42,7 +42,7 @@ export const PdfFilesSection = () => {
         );
     }
 
-    // TODO: Implement handler for viewing file
+    // TODO: Implement handlers for actions with files
 
     return (
         <div className={styles.root}>

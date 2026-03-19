@@ -1,9 +1,13 @@
 @use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
 
 .button {
     display: flex;
     align-items: center;
-    font-family: Mulish, sans-serif;
+    @include type.subtitle-1-medium;
+    font-weight: 400;
+    line-height: 24px;
+    letter-spacing: -0.02em;
     gap: 20px;
     width: 311px;
     height: 60px;

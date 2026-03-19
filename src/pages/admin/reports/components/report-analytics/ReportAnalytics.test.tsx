@@ -6,6 +6,10 @@ jest.mock('../pdf-files-section/PdfFilesSection', () => ({
     PdfFilesSection: () => <div data-testid="pdf-files-section">PdfFilesSection</div>,
 }));
 
+jest.mock('../funds-expenditures-section/FundsExpendituresSection', () => ({
+    FundsExpenditureSection: () => <div data-testid="funds-expenditure-section">FundsExpenditureSection</div>,
+}));
+
 describe('ReportAnalytics', () => {
     it('should render the component with correct title', () => {
         render(<ReportAnalytics />);

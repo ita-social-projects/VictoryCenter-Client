@@ -4,6 +4,7 @@ import { REPORTS_TEXT } from '@/const/admin/reports';
 import styles from './ReportAnalytics.module.scss';
 import './ReportAnalytics.scss';
 import { PdfFilesSection } from '../pdf-files-section/PdfFilesSection';
+import { FundsExpenditureSection } from '../funds-expenditures-section/FundsExpendituresSection';
 
 interface ReportAnalyticsTab {
     id: 'income-expenses' | 'program-expenses' | 'pdf-files';
@@ -32,7 +33,7 @@ export const ReportAnalytics = () => {
             />
             <div className={styles['tab-content']}>
                 {activeTab.id === 'pdf-files' && <PdfFilesSection />}
-                {activeTab.id === 'income-expenses' && <div></div>}
+                {activeTab.id === 'income-expenses' && <FundsExpenditureSection />}
                 {activeTab.id === 'program-expenses' && <div></div>}
             </div>
         </div>

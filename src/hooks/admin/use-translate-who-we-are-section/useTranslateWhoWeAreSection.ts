@@ -84,17 +84,24 @@ export const useTranslateWhoWeAreSection = ({
             setIsSubmitting(true);
             setError('');
 
+            const localizationData = mapFormValuesToPayload(data, section, language.id);
+            let localizationDto: ContentLocalizationDto[];
+
             if (isEditMode) {
-                return;
-            } else {
-                const localizationData = mapFormValuesToPayload(data, section, language.id);
-                const localizationDto = await WhoWeAreLocalizationsApi.create(
+                localizationDto = await WhoWeAreLocalizationsApi.update(
                     client,
                     section.sectionType,
                     localizationData,
                 );
+            } else {
+                localizationDto = await WhoWeAreLocalizationsApi.create(
+                    client,
+                    section.sectionType,
+                    localizationData,
+                );
+            }
 
-                const localization = localizationDto.map((content) =>
+            const localization = localizationDto.map((content) =>
                     mapLocalizationDtoToModel<ContentLocalizationDto, ContentLocalization>(content),
                 );
 
@@ -121,7 +128,6 @@ export const useTranslateWhoWeAreSection = ({
                 };
 
                 onSuccess(updatedSection);
-            }
         } catch (err) {
             const errorMessage = isEditMode
                 ? WHO_WE_ARE_TEXT.FORM?.MESSAGE?.FAIL_TO_UPDATE_TRANSLATION

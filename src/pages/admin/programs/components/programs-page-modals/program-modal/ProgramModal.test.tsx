@@ -660,7 +660,7 @@ describe('ProgramModal', () => {
             expect(getPublishButton()).not.toBeDisabled();
         });
 
-        it('should cancel the submission and not call the API', async () => {
+        it('should cancel the submission, not call the API, and close the modal', async () => {
             render(<ProgramModal {...addModeProps} />);
             simulateFormBecomesValid();
 
@@ -673,8 +673,7 @@ describe('ProgramModal', () => {
 
             expect(mockedProgramsApi.addProgram).not.toHaveBeenCalled();
             expect(mockOnAddProgram).not.toHaveBeenCalled();
-
-            expect(mockOnClose).not.toHaveBeenCalled();
+            expect(mockOnClose).toHaveBeenCalledTimes(1);
         });
     });
 

@@ -117,9 +117,7 @@ describe('translateTitleAndDescriptionStrategy', () => {
     });
 
     it('returns empty title when title content is missing', () => {
-        const section = buildSection([
-            createContent(11, ContentType.Description, descriptionLocalizations),
-        ]);
+        const section = buildSection([createContent(11, ContentType.Description, descriptionLocalizations)]);
 
         const result = translateTitleAndDescriptionStrategy.getInitialData(section, english, true);
 
@@ -130,9 +128,7 @@ describe('translateTitleAndDescriptionStrategy', () => {
     });
 
     it('returns empty description when description content is missing', () => {
-        const section = buildSection([
-            createContent(10, ContentType.Title, titleLocalizations),
-        ]);
+        const section = buildSection([createContent(10, ContentType.Title, titleLocalizations)]);
 
         const result = translateTitleAndDescriptionStrategy.getInitialData(section, english, true);
 

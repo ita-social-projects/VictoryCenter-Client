@@ -12,14 +12,16 @@ export const translateTitleAndDescriptionStrategy: WhoWeAreModalStrategy<Transla
         getInitialData: (section, language, isEditMode) => {
             if (!isEditMode || !language) return null;
 
-            const titleContent = section.contents
-                .find((content) => content.contentType === ContentType.Title);
-            const descriptionContent = section.contents
-                .find((content) => content.contentType === ContentType.Description);
+            const titleContent = section.contents.find((content) => content.contentType === ContentType.Title);
+            const descriptionContent = section.contents.find(
+                (content) => content.contentType === ContentType.Description,
+            );
 
             return {
                 title: titleContent?.localizations?.find((loc) => loc.language.code === language.code)?.title ?? '',
-                description: descriptionContent?.localizations?.find((loc) => loc.language.code === language.code)?.description ?? '',
+                description:
+                    descriptionContent?.localizations?.find((loc) => loc.language.code === language.code)
+                        ?.description ?? '',
             };
         },
     };

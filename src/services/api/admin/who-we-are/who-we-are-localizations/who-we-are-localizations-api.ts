@@ -1,5 +1,9 @@
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
-import { ContentLocalizationDto, CreateContentLocalizationDto, UpdateContentLocalizationDto } from '@/types/admin/who-we-are';
+import {
+    ContentLocalizationDto,
+    CreateContentLocalizationDto,
+    UpdateContentLocalizationDto,
+} from '@/types/admin/who-we-are';
 import { SectionType } from '@/types/common/about-us';
 import { AxiosInstance } from 'axios';
 

@@ -12,6 +12,7 @@ export interface CustomFormGroupProps extends Omit<InputWithCharacterLimitProps,
     tooltipText?: string;
     isRequired?: boolean;
     error?: string;
+    hideLabel?: boolean;
 }
 
 export const CustomFormGroup = ({
@@ -20,16 +21,19 @@ export const CustomFormGroup = ({
     tooltipText,
     isRequired,
     error,
+    hideLabel = false,
     ...inputProps
 }: CustomFormGroupProps) => {
     return (
         <div className="custom-form-group">
-            <div className="custom-form-group__label-wrapper">
-                <label htmlFor={id}>
-                    {isRequired && <span className="custom-form-group__required">*</span>}
-                    {labelText}
-                </label>
-            </div>
+            {!hideLabel && (
+                <div className="custom-form-group__label-wrapper">
+                    <label htmlFor={id}>
+                        {isRequired && <span className="custom-form-group__required">*</span>}
+                        {labelText}
+                    </label>
+                </div>
+            )}
 
             <div className="custom-form-group__input-wrapper">
                 <InputWithCharacterLimit {...inputProps} id={id} hasError={!!error} />

@@ -32,7 +32,9 @@ export const CompanyProfileContent = () => {
 
     const methods = useForm({
         mode: 'onBlur',
-        defaultValues: {},
+        defaultValues: {
+            socialContacts: [],
+        },
     });
 
     useEffect(() => {

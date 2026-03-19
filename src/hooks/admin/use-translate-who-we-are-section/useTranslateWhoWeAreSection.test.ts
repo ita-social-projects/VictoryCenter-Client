@@ -15,6 +15,7 @@ jest.mock('../use-admin-client/useAdminClient', () => ({
 }));
 
 const mockedCreate = WhoWeAreLocalizationsApi.create as jest.MockedFunction<typeof WhoWeAreLocalizationsApi.create>;
+const mockedUpdate = WhoWeAreLocalizationsApi.update as jest.MockedFunction<typeof WhoWeAreLocalizationsApi.update>;
 const mockedMapper = mapLocalizationDtoToModel as jest.MockedFunction<typeof mapLocalizationDtoToModel>;
 
 interface CreatePayloadOptions {
@@ -295,7 +296,10 @@ describe('useTranslateWhoWeAreSection', () => {
         expect(onSuccess).not.toHaveBeenCalled();
     });
 
-    it('does not call API in edit mode with current implementation', async () => {
+    it('calls update API in edit mode and completes successfully', async () => {
+        mockedUpdate.mockResolvedValue([] as any);
+        mockedMapper.mockImplementation((dto: any) => dto);
+
         const onSuccess = jest.fn();
 
         const { result } = renderTranslateHook({ mode: ModalMode.Edit, onSuccess });
@@ -305,8 +309,34 @@ describe('useTranslateWhoWeAreSection', () => {
         });
 
         expect(mockedCreate).not.toHaveBeenCalled();
-        expect(onSuccess).not.toHaveBeenCalled();
+        expect(mockedUpdate).toHaveBeenCalledWith(
+            expect.anything(),
+            SectionType.Main,
+            buildUniformExpectedCreatePayload({
+                description: 'Edit flow value',
+                titles: ['Original title 1', 'Original title 2', 'Original title 4'],
+            }),
+        );
+        expect(onSuccess).toHaveBeenCalledTimes(1);
         expect(result.current.error).toBe('');
+        expect(result.current.isSubmitting).toBe(false);
+    });
+
+    it('sets translation error and rethrows on edit mode API failure', async () => {
+        mockedUpdate.mockRejectedValue(new Error('update failed'));
+
+        const { result } = renderTranslateHook({ mode: ModalMode.Edit });
+
+        await act(async () => {
+            await expect(result.current.translateSection({ description: 'Will fail in edit' })).rejects.toThrow(
+                'update failed',
+            );
+        });
+
+        await waitFor(() => {
+            expect(result.current.error).toBe(WHO_WE_ARE_TEXT.FORM.MESSAGE.FAIL_TO_UPDATE_TRANSLATION);
+        });
+
         expect(result.current.isSubmitting).toBe(false);
     });
 

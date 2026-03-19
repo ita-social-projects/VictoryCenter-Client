@@ -75,8 +75,9 @@ export const ProgramListItem = ({
                         onClick={() => handleOnTranslateProgram(program)}
                         className="translate-btn"
                         aria-label="Translate"
+                        DefaultIcon={ACTION_ICONS.translate.default}
                     />
-                    <button
+                    <IconButton
                         type="button"
                         onClick={() => handleOnEditProgram(program)}
                         className="edit-btn"

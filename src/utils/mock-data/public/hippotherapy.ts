@@ -3,9 +3,9 @@ import advantageImage0 from '@/assets/images/man-in-stall-stroking-horse.webp';
 import advantageImage1 from '@/assets/images/man-in-stall-stroking-horse.webp';
 import advantageImage2 from '@/assets/images/man-in-stall-stroking-horse.webp';
 import advantageImage3 from '@/assets/images/man-in-stall-stroking-horse.webp';
-import quoteImg from '@/assets/images/public/hippotherapy/quote_1.jpg';
-import anotherQuoteImg from '@/assets/images/public/hippotherapy/quote_2.jpg';
-import hippoventionImg from '@/assets/images/public/hippotherapy/hippovention_center.jpg';
+import quoteImg from '@/assets/images/man-holding-horse-cheek-close.webp';
+import anotherQuoteImg from '@/assets/images/man-facing-horse-forehead.webp';
+import hippoventionImg from '@/assets/images/people-on-horses.webp';
 import { HippotherapyAbout } from '@/types/public/hippotherapy-page';
 
 export const hippotherapyMock: HippotherapyAbout = {

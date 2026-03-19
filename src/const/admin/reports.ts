@@ -103,6 +103,11 @@ export const PDF_FILES_SECTION_TEXT = {
     },
     ACTIONS: {
         EDIT: 'Редагувати основну інформацію',
+        FILE: {
+            EDIT: 'Редагувати назву файлу',
+            VIEW: 'Переглянути файл',
+            DELETE: 'Видалити файл',
+        },
     },
 };
 

@@ -1,5 +1,7 @@
 import { ReactComponent as EyeIcon } from '@/assets/icons/eye-opened.svg';
 import { ReactComponent as FileIcon } from '@/assets/icons/file.svg';
+import { ReactComponent as DeleteIcon } from '@/assets/icons/delete.svg';
+import { ReactComponent as EditIcon } from '@/assets/icons/edit-default.svg';
 import { ReactComponent as NotFoundIcon } from '@/assets/icons/not-found.svg';
 import { PDF_FILES_SECTION_TEXT } from '@/const/admin/reports';
 import cn from 'classnames';
@@ -56,9 +58,25 @@ export const PdfFilesTable: React.FC<PdfFilesTableProps> = ({ files }) => {
                                 </td>
                                 <td className={cn(styles.cell, styles['actions-cell'])}>
                                     <div className={styles['action-buttons']}>
-                                        <EyeIcon
-                                            className={cn(styles['view-icon'], styles['icon-button'])}
+                                        <button
+                                            aria-label={PDF_FILES_SECTION_TEXT.ACTIONS.FILE.EDIT}
+                                            type="button"
                                             onClick={() => {}}
+                                            className={cn(styles['icon-button'], styles['edit-button'])}
+                                        />
+                                        <button
+                                            aria-label={PDF_FILES_SECTION_TEXT.ACTIONS.FILE.VIEW}
+                                            type="button"
+                                            onClick={() => {}}
+                                            className={cn(styles['icon-button'], styles['view-button'])}
+                                        >
+                                            <EyeIcon className={styles['eye-icon']} />
+                                        </button>
+                                        <button
+                                            aria-label={PDF_FILES_SECTION_TEXT.ACTIONS.FILE.DELETE}
+                                            type="button"
+                                            onClick={() => {}}
+                                            className={cn(styles['icon-button'], styles['delete-button'])}
                                         />
                                     </div>
                                 </td>

@@ -1,0 +1,127 @@
+@use '@/assets/sass/variables/colors';
+@use '@/assets/sass/mixins/typography.mixins' as type;
+
+.contact-us-block {
+    position: relative;
+    min-height: 80vh;
+    height: auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+
+    @media (min-width: 768px) {
+        min-height: 100vh;
+        height: 100vh;
+    }
+
+    video {
+        height: 100%;
+        min-height: 80vh;
+        width: 100%;
+        position: absolute;
+        object-fit: cover;
+        pointer-events: none;
+
+        @media (min-width: 768px) {
+            min-height: 100vh;
+        }
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(1, 1, 1, 0) 20%, rgba(1, 1, 1, 0.8) 100%);
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    .contact-us-info {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        flex: 1;
+        text-align: center;
+        padding: 48px 16px 32px 16px;
+        gap: 8px;
+
+        @media (min-width: 560px) {
+            padding: 64px;
+        }
+
+        @media (min-width: 768px) {
+            padding: 64px 80px;
+        }
+
+        @media (min-width: 1440px) {
+            gap: 0px;
+            padding: 60px 170px 80px 170px;
+        }
+
+        .contact-title {
+            @include type.h4-bold-uppercase;
+            color: white;
+
+            @media (min-width: 560px) {
+                @include type.h3-semibold-uppercase;
+            }
+
+            @media (min-width: 1440px) {
+                @include type.h2-bold-uppercase;
+            }
+        }
+
+        .contact-button {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 32px;
+
+            @media (min-width: 768px) {
+                max-width: 544px;
+            }
+
+            h4 {
+                @include type.body-2-medium;
+                text-align: center;
+                color: white;
+
+                @media (min-width: 768px) {
+                    @include type.body-1-medium;
+                }
+            }
+
+            button {
+                @include type.body-2-medium;
+                border: none;
+                width: 336px;
+                height: 40px;
+                gap: 8px;
+                padding: 8px 24px;
+                background: colors.$yellow-500;
+                vertical-align: middle;
+                color: colors.$blue-900;
+                cursor: pointer;
+                transition: opacity 0.3s ease;
+
+                &:hover {
+                    opacity: 0.9;
+                }
+
+                @media (min-width: 560px) {
+                    width: 432px;
+                }
+
+                @media (min-width: 768px) {
+                    width: 132px;
+                }
+            }
+        }
+    }
+}

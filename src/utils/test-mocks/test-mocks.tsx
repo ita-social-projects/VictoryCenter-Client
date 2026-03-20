@@ -101,3 +101,29 @@ export const MockLocalizationModal = ({
         </>
     );
 };
+
+export const MockOption = ({ value, name, ...props }: any) => (
+    <option value={typeof value === 'object' ? JSON.stringify(value) : value} {...props}>
+        {name}
+    </option>
+);
+
+export const MockSelect: any = ({ children, onValueChange, ...props }: any) => {
+    const handleChange = (e: any) => {
+        let val: any = e.target.value;
+        try {
+            val = JSON.parse(val);
+        } catch {}
+        if (onValueChange) {
+            onValueChange(val);
+        }
+    };
+
+    return (
+        <select data-testid={props['data-testid'] || 'select'} onChange={handleChange}>
+            {children}
+        </select>
+    );
+};
+
+MockSelect.Option = MockOption;

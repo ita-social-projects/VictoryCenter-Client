@@ -24,7 +24,7 @@ createImagesBottomTestSuite<QuadImagesBottomProps>({
         title: '',
         description: '',
         images: [null, null, null, null],
-        mode: ProgramSectionMode.Published,
+        mode: ProgramSectionMode.View,
     }),
     createImageProps: (images) => ({ images }),
     createImageHandlers: (handlers) => ({

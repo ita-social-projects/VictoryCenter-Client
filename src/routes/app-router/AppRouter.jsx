@@ -18,6 +18,7 @@ import { LoginPage } from '@/pages/admin/login/LoginPage';
 import { AdminHomePage } from '@/pages/admin/home/AdminHomePage';
 import { TeamPage } from '@/pages/public/team-page/TeamPage';
 import { FaqPanel } from '@/pages/admin/faq/FaqPanel';
+import { HippotherapyPage } from '@/pages/public/hippotherapy-page/HippotherapyPage';
 import { PartnersPage } from '@/pages/public/partners-page/PartnersPage';
 import { WhoWeArePageAdmin } from '@/pages/admin/who-we-are/WhoWeArePageAdmin';
 import { PartnerPanel } from '@/pages/admin/partners/PartnerPanel';
@@ -32,6 +33,7 @@ export const AppRouter = () => {
             <Route path={PUBLIC_ROUTES.TEAM.PATH} element={<TeamPage />} />
             <Route path={PUBLIC_ROUTES.PROGRAMS.PATH} element={<ProgramsPage />} />
             <Route path={PUBLIC_ROUTES.PROGRAM_DETAIL.FULL} element={<DetailedProgramPage />} />
+            <Route path={PUBLIC_ROUTES.HIPPOTHERAPY.PATH} element={<HippotherapyPage />} />
             <Route path={PUBLIC_ROUTES.PARTNERS.PATH} element={<PartnersPage />} />
             <Route path={PUBLIC_ROUTES.ABOUT_US.PATH} element={<AboutUsPage />} />
             <Route path={PUBLIC_ROUTES.DONATE.PATH} element={<DonatePage />} />

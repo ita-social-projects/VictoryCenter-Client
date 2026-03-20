@@ -5,6 +5,9 @@ import { ContentType } from '@/types/common/about-us';
 import { AboutUsContent } from '@/types/public/about-us-page';
 import { checkForSubstrings } from '@/utils/functions/test-helpers/test-helpers';
 import { aboutUsPageUk } from '@/locales/uk';
+import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
+import { TranslationStatus } from '@/types/common/language';
+import { setupUseGetLocalizationAboutUsContentMock } from '@/utils/test-mocks/use-get-localization-mock';
 
 jest.mock('@/components/public/swiper/Swiper', () => ({
     Swiper: ({ items, renderItem }: any) => (
@@ -19,7 +22,15 @@ jest.mock('@/components/public/swiper/Swiper', () => ({
     ),
 }));
 
+jest.mock('@/hooks/common/use-get-localization/useGetLocalization');
+
+const mockedUseGetLocalization = jest.mocked(useGetLocalization);
+
 describe('MainValues component', () => {
+    beforeEach(() => {
+        setupUseGetLocalizationAboutUsContentMock(mockedUseGetLocalization);
+    });
+
     const Content: AboutUsContent[] = [
         {
             contentType: ContentType.Card,
@@ -31,6 +42,7 @@ describe('MainValues component', () => {
             },
             id: 1,
             title: null,
+            localizations: [],
         },
         {
             contentType: ContentType.Card,
@@ -42,6 +54,7 @@ describe('MainValues component', () => {
             description: 'Description number 2',
             id: 2,
             title: null,
+            localizations: [],
         },
         {
             contentType: ContentType.Card,
@@ -53,6 +66,7 @@ describe('MainValues component', () => {
             description: 'Description number 3',
             id: 3,
             title: null,
+            localizations: [],
         },
     ];
 
@@ -95,5 +109,25 @@ describe('MainValues component', () => {
     it('should render summary block with correct lines', () => {
         render(<MainValues content={null} />);
         checkForSubstrings(aboutUsPageUk['MAIN_VALUE_DETAILS']);
+    });
+
+    it('should render localized description when localizations are provided', () => {
+        const contentWithLocalization = [
+            {
+                ...Content[0],
+                localizations: [
+                    {
+                        language: { id: 1, code: 'uk' },
+                        translationStatus: TranslationStatus.Relevant,
+                        description: 'Localized description 1',
+                        title: null,
+                    },
+                ],
+            },
+        ];
+
+        render(<MainValues content={contentWithLocalization} />);
+
+        expect(screen.getByText('Localized description 1')).toBeInTheDocument();
     });
 });

@@ -11,6 +11,7 @@ import {
 } from '../sections/SectionsProps';
 import { SectionType } from '@/types/common/about-us';
 import React from 'react';
+import { LocalizationLanguage } from '@/types/common/language';
 
 export interface MainSectionProps {
     section: WhoWeAreSection | null;
@@ -18,6 +19,7 @@ export interface MainSectionProps {
     onPublish: () => void;
     isPublishButtonActive: boolean;
     setIsPublishButtonActive: (value: boolean) => void;
+    language: LocalizationLanguage;
 }
 
 interface SectionConfig {
@@ -31,6 +33,7 @@ export const SectionsWrapper = ({
     onPublish,
     setIsPublishButtonActive,
     isPublishButtonActive,
+    language,
 }: MainSectionProps) => {
     if (!section) {
         return null;
@@ -42,6 +45,7 @@ export const SectionsWrapper = ({
         onPublish,
         setIsPublishButtonActive,
         isPublishButtonActive,
+        language,
     };
 
     const contentConfigs: Record<SectionType, SectionConfig> = {

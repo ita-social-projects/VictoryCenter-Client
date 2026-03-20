@@ -1,8 +1,14 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { ProgramForm, ProgramFormRef, ProgramFormValues } from '../../program-form/ProgramForm';
-import { Program, ProgramCategory, ProgramCreateUpdate, SectionCancelActionType } from '@/types/admin/programs';
+import {
+    HippotherapyProgram,
+    ProgramCategory,
+    CreateHippotherapyProgramDto,
+    UpdateHippotherapyProgramDto,
+    SectionCancelActionType,
+} from '@/types/admin/programs';
 import { VisibilityStatus, PendingAction, ModalMode } from '@/types/admin/common';
-import { ProgramSection, ProgramSectionTemplate } from '@/types/common/program-sections';
+import { CreateHippotherapyProgramSectionDto, ProgramSectionTemplate } from '@/types/common/program-sections';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ProgramsApi } from '@/services/api/admin/programs/programs-api';
@@ -13,6 +19,7 @@ import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
 import { AddSectionModal } from '../add-section-modal/AddSectionModal';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import { getInitialSectionContents } from '@/utils/functions/render-program-section';
+import { mapHippotherapyProgramDtoToModel } from '@/utils/functions/mappers/admin/programs/programs-mappers';
 import './ProgramModal.scss';
 
 export interface BaseProgramModalProps {
@@ -23,13 +30,13 @@ export interface BaseProgramModalProps {
 
 interface AddModalProps extends BaseProgramModalProps {
     mode: ModalMode.Add;
-    onAddProgram: (program: Program) => void;
+    onAddProgram: (program: HippotherapyProgram) => void;
 }
 
 interface EditModalProps extends BaseProgramModalProps {
     mode: ModalMode.Edit;
-    programToEdit: Program;
-    onEditProgram: (program: Program) => void;
+    programToEdit: HippotherapyProgram;
+    onEditProgram: (program: HippotherapyProgram) => void;
 }
 
 export type ProgramModalProps = AddModalProps | EditModalProps;
@@ -73,12 +80,18 @@ export const ProgramModal = (props: ProgramModalProps) => {
             onClose,
             entity: program,
             onSuccess: onSuccess || (() => {}),
-            apiCall: async (data: ProgramCreateUpdate) => {
-                return isEditMode
-                    ? await ProgramsApi.editProgram(data, client)
+            apiCall: async (data: CreateHippotherapyProgramDto) => {
+                const result = isEditMode
+                    ? await ProgramsApi.editProgram(data as UpdateHippotherapyProgramDto, client)
                     : await ProgramsApi.addProgram(client, data);
+
+                return mapHippotherapyProgramDtoToModel(result);
             },
-            getConfirmTitle: (mode: ModalMode, program: Program | undefined, pendingAction: PendingAction | null) => {
+            getConfirmTitle: (
+                mode: ModalMode,
+                program: HippotherapyProgram | undefined,
+                pendingAction: PendingAction | null,
+            ) => {
                 if (mode === ModalMode.Edit && program) {
                     if (program.status === VisibilityStatus.Published)
                         return pendingAction === PendingAction.Draft
@@ -97,33 +110,38 @@ export const ProgramModal = (props: ProgramModalProps) => {
                     ? PROGRAMS_TEXT.FORM.MESSAGE.FAIL_TO_UPDATE_PROGRAM
                     : PROGRAMS_TEXT.FORM.MESSAGE.FAIL_TO_CREATE_PROGRAM;
             },
-            getFormKey: (mode: ModalMode, program?: Program) => {
+            getFormKey: (mode: ModalMode, program?: HippotherapyProgram) => {
                 return mode === ModalMode.Edit && program?.id ? program.id : 'add';
             },
             transformFormData: (
                 formData: ProgramFormValues,
                 status: VisibilityStatus,
-                program?: Program,
-            ): ProgramCreateUpdate => ({
-                id: mode === ModalMode.Edit && program ? program.id : null,
-                name: formData.name,
-                description: formData.description,
-                previewImage: formData.previewImage,
-                backgroundImage: formData.backgroundImage,
-                status: status,
-                categoryIds: formData.categories.map((x) => x.id),
-                previewImageId: initialData?.previewImageId ?? null,
-                backgroundImageId: initialData?.backgroundImageId ?? null,
-                location: formData.location,
-                participantsCount: formData.participantsCount,
-                meetingsCount: formData.meetingCount,
-                sections: formData.sections,
-            }),
+                program?: HippotherapyProgram,
+            ): CreateHippotherapyProgramDto => {
+                const base: CreateHippotherapyProgramDto = {
+                    name: formData.name,
+                    description: formData.description,
+                    previewImage: formData.previewImage,
+                    backgroundImage: formData.backgroundImage,
+                    status: status,
+                    categoryIds: formData.categories.map((x) => x.id),
+                    previewImageId: initialData?.previewImageId ?? null,
+                    backgroundImageId: initialData?.backgroundImageId ?? null,
+                    location: formData.location,
+                    participantsCount: formData.participantsCount,
+                    meetingsCount: formData.meetingCount,
+                    sections: formData.sections,
+                };
+                if (mode === ModalMode.Edit && program) {
+                    return { ...base, id: program.id } as UpdateHippotherapyProgramDto;
+                }
+                return base;
+            },
         }),
         [isEditMode, isOpen, mode, onClose, onSuccess, program, client, initialData],
     );
 
-    const modalHookData = useGenericModal<ProgramFormValues, Program, ProgramFormRef>(modalConfig);
+    const modalHookData = useGenericModal<ProgramFormValues, HippotherapyProgram, ProgramFormRef>(modalConfig);
 
     const handleLanguageChange = useCallback((_: string) => {
         // TODO: Implement language selection
@@ -141,7 +159,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
                     ? modalHookData.formRef.current.getSections()
                     : [];
                 const oldSection = currentSections[sectionToReplace];
-                const newSection: ProgramSection = {
+                const newSection: CreateHippotherapyProgramSectionDto = {
                     template: templateId,
                     order: oldSection?.order ?? 0,
                     contents: getInitialSectionContents(templateId),
@@ -153,7 +171,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
                 ).filter(Boolean);
                 const nextOrder =
                     currentSections.length === 0 ? 0 : Math.max(...currentSections.map((s) => s.order)) + 1;
-                const newSection: ProgramSection = {
+                const newSection: CreateHippotherapyProgramSectionDto = {
                     template: templateId,
                     order: nextOrder,
                     contents: getInitialSectionContents(templateId),

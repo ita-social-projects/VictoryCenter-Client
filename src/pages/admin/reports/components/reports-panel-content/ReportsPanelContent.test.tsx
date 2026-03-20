@@ -88,12 +88,6 @@ describe('ReportsPanelContent', () => {
             expect(screen.getByTestId('mock-toast-container')).toBeInTheDocument();
         });
 
-        it('should start in editing mode', () => {
-            renderComponent();
-
-            expectMsEditing(true);
-        });
-
         it('should start with publish and cancel buttons disabled (not dirty)', () => {
             renderComponent();
 

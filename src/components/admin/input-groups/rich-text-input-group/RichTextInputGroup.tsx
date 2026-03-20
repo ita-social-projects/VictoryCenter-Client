@@ -24,6 +24,7 @@ export const RichTextInputGroup = ({
     onFocus,
     maxLength,
     disabled,
+    hideToolbar,
     placeholder,
     error,
     className,
@@ -40,6 +41,7 @@ export const RichTextInputGroup = ({
                 onFocus={onFocus}
                 maxLength={maxLength}
                 disabled={disabled}
+                hideToolbar={hideToolbar}
                 placeholder={placeholder}
             />
             <InputError error={error} />

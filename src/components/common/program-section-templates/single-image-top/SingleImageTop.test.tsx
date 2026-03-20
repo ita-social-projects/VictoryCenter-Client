@@ -24,7 +24,7 @@ describe('SingleImageTop', () => {
         title: 'Test Title',
         description: 'Test Description',
         image: { id: 1, url: 'test-image.png', mimeType: 'image/png' },
-        mode: ProgramSectionMode.Published,
+        mode: ProgramSectionMode.View,
     };
 
     beforeEach(() => {
@@ -84,7 +84,7 @@ describe('SingleImageTop', () => {
     });
 
     it('renders correctly in non-edit mode', () => {
-        const { container } = render(<SingleImageTop {...baseProps} mode={ProgramSectionMode.Published} />);
+        const { container } = render(<SingleImageTop {...baseProps} mode={ProgramSectionMode.View} />);
 
         const img = container.querySelector('img');
         expect(img).not.toBeNull();
@@ -97,7 +97,7 @@ describe('SingleImageTop', () => {
             expect.objectContaining({
                 title: baseProps.title,
                 description: baseProps.description,
-                mode: ProgramSectionMode.Published,
+                mode: ProgramSectionMode.View,
             }),
         );
     });
@@ -123,7 +123,7 @@ describe('SingleImageTop', () => {
             expect.objectContaining({
                 title: '',
                 description: '',
-                mode: ProgramSectionMode.Published,
+                mode: ProgramSectionMode.View,
             }),
         );
     });

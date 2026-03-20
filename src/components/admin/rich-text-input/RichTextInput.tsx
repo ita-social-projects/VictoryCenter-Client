@@ -26,6 +26,7 @@ export interface RichTextInputProps {
     id: string;
     maxLength: number;
     disabled?: boolean;
+    hideToolbar?: boolean;
     placeholder?: string;
     className?: string;
 }
@@ -46,6 +47,7 @@ export const RichTextInput = ({
     id,
     maxLength,
     disabled = false,
+    hideToolbar = false,
     placeholder = 'Enter text...',
     className,
 }: RichTextInputProps) => {
@@ -88,7 +90,7 @@ export const RichTextInput = ({
             })}
         >
             <LexicalComposer initialConfig={initialConfig}>
-                <ToolbarPlugin disabled={disabled} />
+                <ToolbarPlugin disabled={disabled} hidden={hideToolbar} />
                 <div className={styles['editor-container']}>
                     <RichTextPlugin
                         contentEditable={

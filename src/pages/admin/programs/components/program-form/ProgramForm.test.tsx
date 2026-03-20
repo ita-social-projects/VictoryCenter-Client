@@ -10,7 +10,7 @@ import { TextAreaWithCharacterLimitGroupProps } from '@/components/admin/input-g
 import { MultiSelectInputGroupProps } from '@/components/admin/input-groups/multi-select-input-group/MultiSelectInputGroup';
 import { PhotoInputGroupProps } from '@/components/admin/input-groups/photo-input-group/PhotoInputGroup';
 import { ButtonProps } from '@/components/admin/button/Button';
-import { ProgramSection } from '@/types/common/program-sections';
+import { CreateHippotherapyProgramSectionDto } from '@/types/common/program-sections';
 import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 
 HTMLElement.prototype.scrollIntoView = jest.fn();
@@ -169,20 +169,28 @@ jest.mock('../program-section-form/ProgramSectionForm', () => ({
         onEditStateChange,
         onDelete,
         onRequestReplace,
+        onMoveUpSection,
+        onMoveDownSection,
+        isFirstSection,
+        isLastSection,
         isDisabled,
         isNewSection,
         isReplacingTemplate,
     }: any) => (
         <div
             data-testid="program-section-form"
+            data-section-id={section.id ?? section.template}
             data-section-template={String(section.template)}
             data-disabled={String(isDisabled)}
             data-is-new={String(isNewSection)}
             data-is-replacing={String(isReplacingTemplate)}
+            data-is-first={String(isFirstSection)}
+            data-is-last={String(isLastSection)}
         >
             <button type="button" data-testid={`save-section-${section.id ?? section.template}`} onClick={onSave}>
                 Save
             </button>
+
             <button
                 type="button"
                 data-testid={`cancel-section-${section.id ?? section.template}`}
@@ -197,6 +205,7 @@ jest.mock('../program-section-form/ProgramSectionForm', () => ({
             >
                 Cancel
             </button>
+
             <button
                 type="button"
                 data-testid={`change-section-${section.id ?? section.template}`}
@@ -204,6 +213,7 @@ jest.mock('../program-section-form/ProgramSectionForm', () => ({
             >
                 Change
             </button>
+
             <button
                 type="button"
                 data-testid={`edit-state-${section.id ?? section.template}`}
@@ -211,6 +221,7 @@ jest.mock('../program-section-form/ProgramSectionForm', () => ({
             >
                 Toggle Edit
             </button>
+
             <button
                 type="button"
                 data-testid={`delete-section-${section.id ?? section.template}`}
@@ -218,6 +229,7 @@ jest.mock('../program-section-form/ProgramSectionForm', () => ({
             >
                 Delete
             </button>
+
             <button
                 type="button"
                 data-testid={`replace-section-${section.id ?? section.template}`}
@@ -225,6 +237,26 @@ jest.mock('../program-section-form/ProgramSectionForm', () => ({
             >
                 Replace
             </button>
+
+            {!isFirstSection && (
+                <button
+                    type="button"
+                    data-testid={`move-up-section-${section.id ?? section.template}`}
+                    onClick={() => onMoveUpSection?.()}
+                >
+                    Move Up
+                </button>
+            )}
+
+            {!isLastSection && (
+                <button
+                    type="button"
+                    data-testid={`move-down-section-${section.id ?? section.template}`}
+                    onClick={() => onMoveDownSection?.()}
+                >
+                    Move Down
+                </button>
+            )}
         </div>
     ),
 }));
@@ -585,19 +617,19 @@ describe('ProgramForm', () => {
     });
 
     describe('Sections handling (branches)', () => {
-        const sectionWithId: ProgramSection = {
+        const sectionWithId: CreateHippotherapyProgramSectionDto = {
             id: 101,
             template: 'dual-images-bottom' as any,
             order: 0,
             contents: [],
-        } as ProgramSection;
+        } as CreateHippotherapyProgramSectionDto;
 
-        const sectionWithoutId: ProgramSection = {
+        const sectionWithoutId: CreateHippotherapyProgramSectionDto = {
             id: undefined,
             template: 'images-bottom' as any,
             order: 1,
             contents: [],
-        } as ProgramSection;
+        } as CreateHippotherapyProgramSectionDto;
 
         const initialDataWithSections = createInitialData({
             sections: [sectionWithId, sectionWithoutId],
@@ -634,12 +666,12 @@ describe('ProgramForm', () => {
 
             expect(ref.current?.getSections()).toHaveLength(2);
 
-            const newSection: ProgramSection = {
+            const newSection: CreateHippotherapyProgramSectionDto = {
                 id: 202,
                 template: 'quad-images-bottom' as any,
                 order: 2,
                 contents: [],
-            } as ProgramSection;
+            } as CreateHippotherapyProgramSectionDto;
             await act(async () => {
                 ref.current?.addSection(newSection);
             });
@@ -779,7 +811,7 @@ describe('ProgramForm', () => {
         it('calls onRequestCancelSection when section delete button is clicked', async () => {
             const mockOnRequestCancelSection = jest.fn();
             const initialData = createInitialData({
-                sections: [{ id: 101, template: 1, order: 0, contents: [] } as ProgramSection],
+                sections: [{ id: 101, template: 1, order: 0, contents: [] } as CreateHippotherapyProgramSectionDto],
             });
 
             renderProgramForm({ initialData, onRequestCancelSection: mockOnRequestCancelSection });
@@ -796,7 +828,7 @@ describe('ProgramForm', () => {
         it('calls onReplaceSection with correct index when replace button is clicked', async () => {
             const mockOnReplaceSection = jest.fn();
             const initialData = createInitialData({
-                sections: [{ id: 101, template: 1, order: 0, contents: [] } as ProgramSection],
+                sections: [{ id: 101, template: 1, order: 0, contents: [] } as CreateHippotherapyProgramSectionDto],
             });
 
             renderProgramForm({ initialData, onReplaceSection: mockOnReplaceSection });
@@ -812,7 +844,7 @@ describe('ProgramForm', () => {
 
         it('deletes section directly when onRequestCancelSection is not provided', async () => {
             const initialData = createInitialData({
-                sections: [{ id: 101, template: 1, order: 0, contents: [] } as ProgramSection],
+                sections: [{ id: 101, template: 1, order: 0, contents: [] } as CreateHippotherapyProgramSectionDto],
             });
 
             renderProgramForm({ initialData });
@@ -825,6 +857,59 @@ describe('ProgramForm', () => {
 
             await waitFor(() => {
                 expect(screen.queryByTestId('program-section-form')).not.toBeInTheDocument();
+            });
+        });
+
+        let initialData: ReturnType<typeof createInitialData>;
+
+        beforeEach(() => {
+            initialData = createInitialData({
+                sections: [
+                    { id: 101, template: 1, order: 0, contents: [] } as CreateHippotherapyProgramSectionDto,
+                    { id: 202, template: 1, order: 1, contents: [] } as CreateHippotherapyProgramSectionDto,
+                ],
+            });
+        });
+
+        it('moves section up when Move Up button is clicked', async () => {
+            renderProgramForm({ initialData });
+            await waitFor(() => {
+                expect(screen.getAllByTestId('program-section-form')).toHaveLength(2);
+            });
+            fireEvent.click(screen.getByTestId('move-up-section-202'));
+            await waitFor(() => {
+                const sections = screen.getAllByTestId('program-section-form');
+                expect(sections[0]).toHaveAttribute('data-section-id', '202');
+            });
+        });
+
+        it('moves section down when Move Down button is clicked', async () => {
+            renderProgramForm({ initialData });
+            await waitFor(() => {
+                expect(screen.getAllByTestId('program-section-form')).toHaveLength(2);
+            });
+            fireEvent.click(screen.getByTestId('move-down-section-101'));
+            await waitFor(() => {
+                const sections = screen.getAllByTestId('program-section-form');
+                expect(sections[1]).toHaveAttribute('data-section-id', '101');
+            });
+        });
+
+        it('does nothing when section key is not found (covers idx === -1)', async () => {
+            const initialData = createInitialData({
+                sections: [{ id: 101, template: 1, order: 0, contents: [] } as CreateHippotherapyProgramSectionDto],
+            });
+
+            renderProgramForm({ initialData });
+
+            await waitFor(() => {
+                expect(screen.getByTestId('program-section-form')).toBeInTheDocument();
+            });
+
+            fireEvent.click(screen.queryByTestId('move-up-section-101') || document.createElement('div'));
+
+            await waitFor(() => {
+                expect(screen.getAllByTestId('program-section-form')).toHaveLength(1);
             });
         });
     });

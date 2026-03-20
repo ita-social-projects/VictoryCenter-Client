@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import styles from './OurMission.module.scss';
 import { Button } from '@/components/public/ui/button';
 import { SafeHtml } from '@/components/common/safe-html';
+import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
 
 export interface OurMissionProps {
     content?: AboutUsContent[] | null;
@@ -16,7 +17,11 @@ export interface OurMissionProps {
 export const OurMission = ({ content, description }: OurMissionProps) => {
     const { t } = useTranslation('aboutUsPage');
 
-    const descriptionValue = content?.find((x) => x.contentType === ContentType.Description)?.description ?? '';
+    const descriptionContent = content?.find((x) => x.contentType === ContentType.Description);
+
+    const { description: descriptionValue } = useGetLocalization(descriptionContent?.localizations, {
+        description: descriptionContent?.description ?? '',
+    });
 
     const finalDescription = description ?? descriptionValue;
 

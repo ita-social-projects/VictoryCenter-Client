@@ -373,6 +373,13 @@ export const DonatePageContent = () => {
                             onDelete={handleDeleteBankDetails}
                             isAddButtonDisabled={isChildEditing}
                             isParentAddFormVisible={isCorrespondentBankFormVisible}
+                            isPublishDisabled={isChildEditing || isCorrespondentBankFormVisible}
+                            onAddFormVisibilityChange={(isVisible) => {
+                                if (!isVisible) {
+                                    setIsChildEditing(false);
+                                    setIsCorrespondentBankFormVisible(false);
+                                }
+                            }}
                         >
                             {config.withCorrespondentBanks ? renderCorrespondentBanks : () => null}
                         </GenericDetails>

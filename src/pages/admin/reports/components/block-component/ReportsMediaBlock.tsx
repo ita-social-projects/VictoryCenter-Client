@@ -35,7 +35,6 @@ export interface ReportsMediaBlockProps {
     imageWidth: number;
     imageHeight: number;
     imageUrl: string;
-    isEditing: boolean;
     isValueEditable: boolean;
     totalAmountMaxLength: number;
     validationFunctions: ReportsMediaBlockValidationFunctions;
@@ -51,7 +50,6 @@ export const ReportsMediaBlock = ({
     imageWidth,
     imageHeight,
     imageUrl,
-    isEditing,
     isValueEditable,
     totalAmountMaxLength,
     validationFunctions,
@@ -106,6 +104,8 @@ export const ReportsMediaBlock = ({
         [onValuesChange, values, errors],
     );
 
+    const isDisabled = true;
+
     return (
         <div className={styles.root}>
             <div className={styles.content}>
@@ -126,14 +126,13 @@ export const ReportsMediaBlock = ({
                             onChange={handleTitleChange}
                             onBlur={handleTitleBlur}
                             maxLength={REPORTS_TEXT.FORM.MAX_LENGTH.TITLE}
-                            disabled={!isEditing}
                             error={errors.title}
                             rows={1}
-                            isRequired={isEditing}
+                            isRequired={true}
                         />
                     </div>
 
-                    <div className={cn(styles['total-amount-input'], isEditing && !isValueEditable)}>
+                    <div className={cn(styles['total-amount-input'], isDisabled && !isValueEditable)}>
                         <TextAreaWithCharacterLimitGroup
                             label={descriptionTitle}
                             id={`${windowTitle}-value`}
@@ -142,10 +141,10 @@ export const ReportsMediaBlock = ({
                             onChange={handleTotalAmountChange}
                             onBlur={handleTotalAmountBlur}
                             maxLength={totalAmountMaxLength}
-                            disabled={!isEditing || !isValueEditable}
+                            disabled={!isDisabled || !isValueEditable}
                             error={errors.totalAmount}
                             rows={1}
-                            isRequired={isEditing}
+                            isRequired={true}
                         />
                     </div>
                 </div>
@@ -159,7 +158,6 @@ export const ReportsMediaBlock = ({
                             value={values.image && 'base64' in values.image ? values.image : null}
                             onChange={handleImageChange}
                             setError={handleImageError}
-                            disabled={!isEditing}
                             cropWidth={imageWidth}
                             cropHeight={imageHeight}
                             style={{

@@ -382,6 +382,13 @@ describe('program-schema.ts coverage (templates are bottom-only)', () => {
         ).toBe(false);
     });
 
+    it('counts: draft passes when actual < min but <= max', () => {
+        const m = loadSchema();
+        expect(
+            m.isProgramSectionValid(sec(ProgramSectionTemplate.SingleImageBottom, [t('a', 0), d('b', 1)]), false),
+        ).toBe(true);
+    });
+
     it('counts: publish fails when not in range', () => {
         const m = loadSchema();
         expect(
@@ -582,6 +589,11 @@ describe('program-schema.ts coverage (templates are bottom-only)', () => {
         ).toBe('invalid');
     });
 
+    it('validateProgramSections returns undefined when all sections are valid', () => {
+        const m = loadSchema();
+        expect(m.validateProgramSections([validTextOnly(), validSingleImage({ imageId: 1 })], true)).toBeUndefined();
+    });
+
     it('PROGRAM_SECTION_VALIDATION_FUNCTIONS: validateContentText passes when template is missing', () => {
         const m = loadSchema();
         expect(
@@ -625,7 +637,7 @@ describe('program-schema.ts coverage (templates are bottom-only)', () => {
         ).toBe('min 2');
     });
 
-    it('PROGRAM_SECTION_VALIDATION_FUNCTIONS: does not enforce min in draft', () => {
+    it('PROGRAM_SECTION_VALIDATION_FUNCTIONS: enforces min in draft', () => {
         const m = loadSchema();
         expect(
             m.PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateContentText(
@@ -634,7 +646,7 @@ describe('program-schema.ts coverage (templates are bottom-only)', () => {
                 false,
                 ProgramSectionTemplate.TextOnly,
             ),
-        ).toBeUndefined();
+        ).toBe('min 2');
     });
 
     it('PROGRAM_SECTION_VALIDATION_FUNCTIONS: validateSectionTitle returns required', () => {
@@ -705,5 +717,180 @@ describe('program-schema.ts required-message fallbacks', () => {
                 ProgramSectionTemplate.TextOnly,
             ),
         ).toBe('required');
+    });
+});
+
+describe('PROGRAM_VALIDATION_FUNCTIONS', () => {
+    describe('validateName', () => {
+        it('returns undefined for valid name in draft mode', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateName('Test', false)).toBeUndefined();
+        });
+
+        it('returns undefined for valid name in publish mode', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateName('Test', true)).toBeUndefined();
+        });
+
+        it('returns error for empty name', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateName('', false)).toBe('name required');
+        });
+
+        it('returns error for empty name in publish mode', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateName('', true)).toBe('name required');
+        });
+
+        it('returns error when name exceeds max length', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateName('12345678901', false)).toBe('max 10');
+        });
+    });
+
+    describe('validateCategories', () => {
+        it('returns undefined for valid categories', () => {
+            const m = loadSchema();
+            const categories = [{ id: 1, name: 'Cat1', programsCount: 5 }];
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateCategories(categories, false)).toBeUndefined();
+        });
+
+        it('returns error for empty categories array', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateCategories([], true)).toBe('categories required');
+        });
+    });
+
+    describe('validateDescription', () => {
+        it('returns undefined for valid description in draft mode', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateDescription('Test description', false)).toBeUndefined();
+        });
+
+        it('returns undefined for empty description in draft mode', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateDescription('', false)).toBeUndefined();
+        });
+
+        it('returns undefined for valid description in publish mode', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateDescription('Test description', true)).toBeUndefined();
+        });
+
+        it('returns error for empty description when publishing', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateDescription('', true)).toBe('desc required');
+        });
+
+        it('returns error when description exceeds max length', () => {
+            const m = loadSchema();
+            const longDesc = 'a'.repeat(51);
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateDescription(longDesc, false)).toBe('max 50');
+        });
+    });
+
+    describe('validatePreviewImage', () => {
+        it('returns undefined for valid image in draft mode', () => {
+            const m = loadSchema();
+            const image = { id: 1, path: '/test.jpg', alt: 'Test' };
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validatePreviewImage(image, false)).toBeUndefined();
+        });
+
+        it('returns undefined for null image in draft mode', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validatePreviewImage(null, false)).toBeUndefined();
+        });
+
+        it('returns undefined for valid image in publish mode', () => {
+            const m = loadSchema();
+            const image = { id: 1, path: '/test.jpg', alt: 'Test' };
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validatePreviewImage(image, true)).toBeUndefined();
+        });
+
+        it('returns error for null image when publishing', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validatePreviewImage(null, true)).toBe('preview required');
+        });
+    });
+
+    describe('validateBackgroundImage', () => {
+        it('returns undefined for valid image in draft mode', () => {
+            const m = loadSchema();
+            const image = { id: 2, path: '/bg.jpg', alt: 'Background' };
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateBackgroundImage(image, false)).toBeUndefined();
+        });
+
+        it('returns undefined for null image in draft mode', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateBackgroundImage(null, false)).toBeUndefined();
+        });
+
+        it('returns undefined for valid image in publish mode', () => {
+            const m = loadSchema();
+            const image = { id: 2, path: '/bg.jpg', alt: 'Background' };
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateBackgroundImage(image, true)).toBeUndefined();
+        });
+
+        it('returns error for null image when publishing', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateBackgroundImage(null, true)).toBe('bg required');
+        });
+    });
+
+    describe('validateLocation', () => {
+        it('returns undefined for valid location', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateLocation('Kyiv, Ukraine', false)).toBeUndefined();
+        });
+
+        it('returns undefined for empty location (optional field)', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateLocation('', false)).toBeUndefined();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateLocation('', true)).toBeUndefined();
+        });
+
+        it('returns error when location exceeds max length', () => {
+            const m = loadSchema();
+            const longLocation = 'a'.repeat(21);
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateLocation(longLocation, false)).toBe('max 20');
+        });
+    });
+
+    describe('validateParticipantsCount', () => {
+        it('returns undefined for valid participants count', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateParticipantsCount('10-20', false)).toBeUndefined();
+        });
+
+        it('returns undefined for empty participants count (optional field)', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateParticipantsCount('', false)).toBeUndefined();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateParticipantsCount('', true)).toBeUndefined();
+        });
+
+        it('returns error when participants count exceeds max length', () => {
+            const m = loadSchema();
+            const longCount = 'a'.repeat(21);
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateParticipantsCount(longCount, false)).toBe('max 20');
+        });
+    });
+
+    describe('validateMeetingCount', () => {
+        it('returns undefined for valid meeting count', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateMeetingCount('5-10', false)).toBeUndefined();
+        });
+
+        it('returns undefined for empty meeting count (optional field)', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateMeetingCount('', false)).toBeUndefined();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateMeetingCount('', true)).toBeUndefined();
+        });
+
+        it('returns error when meeting count exceeds max length', () => {
+            const m = loadSchema();
+            const longCount = 'a'.repeat(21);
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateMeetingCount(longCount, false)).toBe('max 20');
+        });
     });
 });

@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react';
 import { useCategoriesCounter } from './useCategoriesCounter';
-import { Program, ProgramCategory } from '@/types/admin/programs';
+import { HippotherapyProgram, ProgramCategory } from '@/types/admin/programs';
 import { VisibilityStatus } from '@/types/admin/common';
 
 // Test helpers
@@ -11,7 +11,7 @@ const createCategory = (props: Partial<ProgramCategory> = {}): ProgramCategory =
     ...props,
 });
 
-const createProgram = (props: Partial<Program> = {}): Program => ({
+const createProgram = (props: Partial<HippotherapyProgram> = {}): HippotherapyProgram => ({
     id: 1,
     name: 'Test Program',
     description: 'Test description',
@@ -24,6 +24,7 @@ const createProgram = (props: Partial<Program> = {}): Program => ({
     participantsCount: '',
     sections: [],
     slug: 'test-program',
+    localizations: [],
     ...props,
 });
 

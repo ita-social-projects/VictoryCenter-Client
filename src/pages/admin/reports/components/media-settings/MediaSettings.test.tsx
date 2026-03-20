@@ -39,7 +39,6 @@ jest.mock('../block-component/ReportsMediaBlock', () => ({
             <div data-testid={`media-block-${props.windowTitle}`}>
                 <span data-testid={`title-${props.windowTitle}`}>{props.values.title}</span>
                 <span data-testid={`amount-${props.windowTitle}`}>{props.values.totalAmount}</span>
-                <span data-testid={`editing-${props.windowTitle}`}>{props.isEditing ? 'editing' : 'viewing'}</span>
                 <span data-testid={`value-editable-${props.windowTitle}`}>
                     {props.isValueEditable ? 'editable' : 'readonly'}
                 </span>
@@ -252,20 +251,6 @@ describe('MediaSettings', () => {
             expect(changedLivesBlockProps!.windowTitle).toBe(REPORTS_TEXT.FORM.LABEL.CHANGED_LIVES_WINDOW);
             expect(changedLivesBlockProps!.descriptionTitle).toBe(REPORTS_TEXT.FORM.LABEL.CHANGED_LIVES);
             expect(changedLivesBlockProps!.isValueEditable).toBe(true);
-        });
-
-        it('should pass isEditing prop to both blocks', () => {
-            renderComponent({ isEditing: true });
-
-            expect(collectedFundsBlockProps!.isEditing).toBe(true);
-            expect(changedLivesBlockProps!.isEditing).toBe(true);
-        });
-
-        it('should pass isEditing=false to both blocks when not editing', () => {
-            renderComponent({ isEditing: false });
-
-            expect(collectedFundsBlockProps!.isEditing).toBe(false);
-            expect(changedLivesBlockProps!.isEditing).toBe(false);
         });
 
         it('should pass correct image dimensions to collected funds block', () => {

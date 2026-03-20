@@ -29,7 +29,6 @@ import {
 import { fetchDefaultImageAsImageValues } from '@/utils/functions/fetch-default-image/fetch-default-image';
 
 interface MediaSettingsProps {
-    isEditing: boolean;
     resetCounter: number;
     onDirtyChange: (isDirty: boolean) => void;
     onCancel: () => void;
@@ -68,10 +67,7 @@ const syncValuesFromData = (data: ReportsMediaSettings) => ({
 });
 
 export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
-    (
-        { isEditing, resetCounter, onDirtyChange, onCancel, onPublish, isPublishDisabled, isCancelDisabled, isActive },
-        ref,
-    ) => {
+    ({ resetCounter, onDirtyChange, onCancel, onPublish, isPublishDisabled, isCancelDisabled, isActive }, ref) => {
         const client = useAdminClient();
         const { addToast } = useToast();
 
@@ -223,7 +219,6 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
                                 imageWidth={REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION.image.width}
                                 imageHeight={REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION.image.height}
                                 imageUrl={CollectedFundsImage}
-                                isEditing={isEditing}
                                 isValueEditable={false}
                                 validationFunctions={REPORTS_COLLECTED_FUNDS_VALIDATION_FUNCTIONS}
                                 onValuesChange={handleCollectedFundsChange}
@@ -238,7 +233,6 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
                                 imageWidth={REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.image.width}
                                 imageHeight={REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.image.height}
                                 imageUrl={ChangedLivesImage}
-                                isEditing={isEditing}
                                 isValueEditable={true}
                                 validationFunctions={REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS}
                                 onValuesChange={handleChangedLivesChange}

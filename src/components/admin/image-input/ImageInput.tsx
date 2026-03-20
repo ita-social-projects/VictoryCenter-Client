@@ -174,12 +174,26 @@ export const ImageInput = ({
     const handleCropCancel = async () => {
         setShowCropperModal(false);
 
-        if (!previewImage) setPreviewImage(rawImage);
+        if (!previewImage && rawImage && 'base64' in rawImage) {
+            setPreviewImage(rawImage);
+            onChange(rawImage);
+
+            const error = await IMAGE_DIMENSION_VALIDATION_FUNCTIONS.validateImage(rawImage, cropWidth, cropHeight);
+            if (error) {
+                setError(error);
+            } else {
+                setError(null);
+            }
+
+            return;
+        }
 
         if (previewImage && 'base64' in previewImage) {
             const error = await IMAGE_DIMENSION_VALIDATION_FUNCTIONS.validateImage(previewImage, cropWidth, cropHeight);
             if (error) {
                 setError(error);
+            } else {
+                setError(null);
             }
         }
     };

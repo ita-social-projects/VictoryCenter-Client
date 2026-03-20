@@ -1,9 +1,9 @@
 import { useCallback } from 'react';
-import { Program, ProgramCategory } from '@/types/admin/programs';
+import { HippotherapyProgram, ProgramCategory } from '@/types/admin/programs';
 
 export const useCategoriesCounter = () => {
     const incrementCategoriesCount = useCallback(
-        (categories: ProgramCategory[], program: Program): ProgramCategory[] => {
+        (categories: ProgramCategory[], program: HippotherapyProgram): ProgramCategory[] => {
             const programCategoryIds = new Set(program.categories.map((c) => c.id));
             return categories.map((cat) =>
                 programCategoryIds.has(cat.id) ? { ...cat, programsCount: cat.programsCount + 1 } : cat,
@@ -13,7 +13,7 @@ export const useCategoriesCounter = () => {
     );
 
     const decrementCategoriesCount = useCallback(
-        (categories: ProgramCategory[], program: Program): ProgramCategory[] => {
+        (categories: ProgramCategory[], program: HippotherapyProgram): ProgramCategory[] => {
             const programCategoryIds = new Set(program.categories.map((c) => c.id));
             return categories.map((cat) =>
                 programCategoryIds.has(cat.id) ? { ...cat, programsCount: Math.max(0, cat.programsCount - 1) } : cat,
@@ -23,7 +23,11 @@ export const useCategoriesCounter = () => {
     );
 
     const updateCategoriesCount = useCallback(
-        (categories: ProgramCategory[], originalProgram: Program, updatedProgram: Program): ProgramCategory[] => {
+        (
+            categories: ProgramCategory[],
+            originalProgram: HippotherapyProgram,
+            updatedProgram: HippotherapyProgram,
+        ): ProgramCategory[] => {
             const originalCategoryIds = new Set(originalProgram.categories.map((c) => c.id));
             const updatedCategoryIds = new Set(updatedProgram.categories.map((c) => c.id));
 

@@ -1,5 +1,5 @@
 @use '@/assets/sass/variables/colors' as c;
-@use '@/assets/sass/variables/typography';
+@use '@/assets/sass/variables/typography' as type;
 
 .container {
     display: flex;
@@ -102,8 +102,10 @@
 }
 
 .sections-list {
+    background-color: c.$white;
     display: flex;
     flex-direction: column;
+    align-items: center;
 }
 
 .sections-divider {
@@ -141,9 +143,9 @@
 
 .empty-sections-text {
     width: 29.375rem;
-    font-size: typography.$h3-size;
-    font-weight: typography.$fw-semibold;
-    line-height: typography.$h3-height;
+    font-size: type.$h3-size;
+    font-weight: type.$fw-semibold;
+    line-height: type.$h3-height;
     color: c.$blue-900;
     margin: 0;
     text-align: center;

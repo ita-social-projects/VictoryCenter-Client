@@ -1,5 +1,10 @@
 import { VisibilityStatus } from '@/types/admin/common';
-import { ProgramCategoryCreateUpdate, ProgramCreateUpdate, Program, ProgramCategory } from '@/types/admin/programs';
+import {
+    ProgramCategoryCreateUpdate,
+    UpdateHippotherapyProgramDto,
+    HippotherapyProgramDto,
+    ProgramCategory,
+} from '@/types/admin/programs';
 import { ProgramsApi, ProgramsCategoriesApi } from './programs-api';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
@@ -18,7 +23,7 @@ const mockCategories: ProgramCategory[] = [
     { id: 3, name: 'Інклюзивні', programsCount: 0 },
 ];
 
-const mockPrograms: Program[] = [
+const mockPrograms: HippotherapyProgramDto[] = [
     {
         id: 1,
         name: 'Коні лікують Літо 2025',
@@ -32,6 +37,7 @@ const mockPrograms: Program[] = [
         meetingsCount: '12 занять',
         sections: [],
         slug: 'koni-likuyut-lito-2025',
+        localizations: [],
     },
     {
         id: 2,
@@ -46,6 +52,7 @@ const mockPrograms: Program[] = [
         meetingsCount: '10 занять',
         sections: [],
         slug: 'kinna-terapiya-dlya-ditey',
+        localizations: [],
     },
     {
         id: 3,
@@ -60,6 +67,7 @@ const mockPrograms: Program[] = [
         meetingsCount: '15 занять',
         sections: [],
         slug: 'reabilitatsiya-pislya-poranen',
+        localizations: [],
     },
 ];
 
@@ -68,8 +76,8 @@ const createMockFile = (): { base64: string; mimeType: string } => ({
     mimeType: 'image/png',
 });
 
-const getValidProgramData = (overrides?: Partial<ProgramCreateUpdate>): ProgramCreateUpdate => ({
-    id: null,
+const getValidProgramData = (overrides?: Partial<UpdateHippotherapyProgramDto>): UpdateHippotherapyProgramDto => ({
+    id: 0,
     name: 'Valid Program Name',
     description: 'This is a valid description with enough characters.',
     categoryIds: [1],
@@ -193,7 +201,7 @@ describe('fetchPrograms', () => {
             data: { items: mockPrograms.filter((p) => p.status === VisibilityStatus.Published), totalItemsCount: 2 },
         });
 
-        const result = await ProgramsApi.fetchPrograms(mockClient, 1, 0, 10, VisibilityStatus.Published);
+        const result = await ProgramsApi.fetchPrograms(mockClient, 1, 0, 10, undefined, VisibilityStatus.Published);
 
         expect(result.items.every((program) => program.status === VisibilityStatus.Published)).toBe(true);
     });
@@ -238,10 +246,10 @@ describe('fetchPrograms', () => {
         const limit = 20;
         const status = VisibilityStatus.Draft;
 
-        await ProgramsApi.fetchPrograms(mockClient, categoryId, offset, limit, status);
+        await ProgramsApi.fetchPrograms(mockClient, categoryId, offset, limit, undefined, status);
 
         expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.PROGRAMS.BASE, {
-            params: { categoryId, offset, limit, status },
+            params: { categoryId, offset, limit, status, translationStatusFilter: undefined },
         });
     });
 
@@ -390,7 +398,7 @@ describe('addProgram', () => {
     });
 
     it('preserves slug when provided and maps categories from categories endpoint', async () => {
-        const programData = getValidProgramData({ slug: 'my-program-slug' });
+        const programData = getValidProgramData();
 
         (ImageApi.post as jest.Mock).mockResolvedValueOnce({ id: 100 }).mockResolvedValueOnce({ id: 101 });
 
@@ -860,7 +868,7 @@ describe('deleteCategory', () => {
 
 describe('fetchProgramSearchItems', () => {
     it('prioritizes direct name matches then sorts alphabetically', async () => {
-        const programWithNameMatch: Program = {
+        const programWithNameMatch: HippotherapyProgramDto = {
             id: 100,
             name: 'Core Pilates Workout',
             description: 'test',
@@ -873,9 +881,10 @@ describe('fetchProgramSearchItems', () => {
             categories: [{ id: 9, name: 'General', programsCount: 1 }],
             sections: [],
             slug: 'core-pilates-workout',
+            localizations: [],
         };
 
-        const programWithCategoryMatch: Program = {
+        const programWithCategoryMatch: HippotherapyProgramDto = {
             id: 101,
             name: 'Advanced Flexibility',
             description: 'test',
@@ -888,6 +897,7 @@ describe('fetchProgramSearchItems', () => {
             categories: [{ id: 10, name: 'Pilates', programsCount: 1 }],
             sections: [],
             slug: 'advanced-flexibility',
+            localizations: [],
         };
 
         mockClient.get.mockResolvedValueOnce({
@@ -1004,7 +1014,7 @@ describe('fetchProgramSearchItems', () => {
         const searchTerm = 'therapy';
         const signal = {} as AbortSignal;
 
-        const apiPrograms: Program[] = [
+        const apiPrograms: HippotherapyProgramDto[] = [
             {
                 id: 501,
                 name: 'Therapy Program',
@@ -1021,6 +1031,7 @@ describe('fetchProgramSearchItems', () => {
                 ],
                 sections: [],
                 slug: 'therapy-program',
+                localizations: [],
             },
         ];
 

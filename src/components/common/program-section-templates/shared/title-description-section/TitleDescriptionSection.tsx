@@ -1,10 +1,11 @@
 import styles from './TitleDescriptionSection.module.scss';
-import publishedStyles from './PublishedTitleDescriptionSection.module.scss';
+import viewStyles from './ViewTitleDescriptionSection.module.scss';
 import cn from 'classnames';
 import { useId } from 'react';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { useProgramSectionValidation } from '@/hooks/admin/use-program-section-validation';
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
 import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
@@ -32,7 +33,7 @@ export const TitleDescriptionSection = ({
     className = '',
     titleClassName = '',
     descriptionClassName = '',
-    mode = ProgramSectionMode.Published,
+    mode = ProgramSectionMode.View,
     isPublishing = false,
     onTitleChange,
     onDescriptionChange,
@@ -54,7 +55,7 @@ export const TitleDescriptionSection = ({
         resetKey: validationResetKey,
     });
 
-    const baseStyles = mode === ProgramSectionMode.Published ? publishedStyles : styles;
+    const baseStyles = mode === ProgramSectionMode.View ? viewStyles : styles;
 
     const titleMaxLength = getProgramSectionTemplateMaxLength(template, ContentType.Title);
     const descriptionMaxLength = getProgramSectionTemplateMaxLength(template, ContentType.Description);
@@ -65,13 +66,13 @@ export const TitleDescriptionSection = ({
                 baseStyles.container,
                 {
                     [styles.template]: mode === ProgramSectionMode.Template,
-                    [styles['form-container']]: mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View,
+                    [styles['form-container']]: mode === ProgramSectionMode.Edit,
                 },
                 className,
             )}
         >
             <div className={baseStyles['title-section']}>
-                {mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View ? (
+                {mode === ProgramSectionMode.Edit ? (
                     <InputWithCharacterLimitGroup
                         label={PROGRAMS_TEXT.SECTION.FORM.TITLE.TEXT}
                         isRequired={true}
@@ -84,7 +85,7 @@ export const TitleDescriptionSection = ({
                         placeholder={PROGRAMS_TEXT.SECTION.FORM.TITLE.PLACEHOLDER}
                         className={styles['title-input']}
                         error={titleError}
-                        disabled={mode === ProgramSectionMode.View}
+                        maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(titleMaxLength)}
                     />
                 ) : (
                     <h2 className={cn(baseStyles.title, titleClassName)}>{title}</h2>
@@ -92,7 +93,7 @@ export const TitleDescriptionSection = ({
             </div>
 
             <div className={baseStyles['description-section']}>
-                {mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View ? (
+                {mode === ProgramSectionMode.Edit ? (
                     <TextAreaWithCharacterLimitGroup
                         label={PROGRAMS_TEXT.SECTION.FORM.DESCRIPTION.TEXT}
                         isRequired={true}
@@ -105,7 +106,7 @@ export const TitleDescriptionSection = ({
                         rows={10}
                         error={descriptionError}
                         currentLength={getTrimmedInputText(description).length}
-                        disabled={mode === ProgramSectionMode.View}
+                        maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(descriptionMaxLength)}
                     />
                 ) : (
                     <p className={cn(baseStyles.description, descriptionClassName)}>{description}</p>

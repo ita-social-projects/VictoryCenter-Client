@@ -15,8 +15,6 @@ export const ReportsPanelContent = () => {
     const [resetCounter, setResetCounter] = useState(0);
     const mediaSettingsRef = useRef<MediaSettingsRef>(null);
 
-    const isEditing = true;
-
     const handleCancel = useCallback(() => {
         setIsDirty(false);
         setResetCounter((prev) => prev + 1);
@@ -44,12 +42,11 @@ export const ReportsPanelContent = () => {
                 {isMediaSettingsTab ? (
                     <MediaSettings
                         ref={mediaSettingsRef}
-                        isEditing={isEditing}
                         resetCounter={resetCounter}
                         onDirtyChange={handleDirtyChange}
                         onCancel={handleCancel}
                         onPublish={handlePublish}
-                        isPublishDisabled={!isEditing || !isDirty}
+                        isPublishDisabled={!isDirty}
                         isCancelDisabled={!isDirty}
                         isActive={isMediaSettingsTab}
                     />

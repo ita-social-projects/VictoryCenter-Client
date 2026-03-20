@@ -5,6 +5,7 @@ import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
 import { Swiper } from '@/components/public/swiper/Swiper';
 import { renderProgramSection } from '@/utils/functions/render-program-section';
+import { MockQuestions } from '@/utils/mock-data/public/programs-page';
 import placeholderImage from '@/assets/images/common/section-photo-placeholder.png';
 import styles from './AddSectionModal.module.scss';
 import swiperStyles from './AddSectionSwiper.module.scss';
@@ -46,6 +47,7 @@ const TEMPLATES = [
     ProgramSectionTemplate.TripleTitleDescriptionPairs,
     ProgramSectionTemplate.QuadTitleDescriptionPairs,
     ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
+    ProgramSectionTemplate.SingleTitleQuestionAnswerPairs,
 ];
 
 export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectionModalProps) => {
@@ -74,6 +76,8 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
             case ProgramSectionTemplate.DualTitleDescriptionPairs:
             case ProgramSectionTemplate.TripleTitleDescriptionPairs:
             case ProgramSectionTemplate.QuadTitleDescriptionPairs:
+            case ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs:
+            case ProgramSectionTemplate.SingleTitleQuestionAnswerPairs:
                 return [];
             default:
                 return [];
@@ -150,6 +154,20 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
 
     const renderSection = (templateId: ProgramSectionTemplate) => {
         const cards = getCardSamples(templateId);
+        if (templateId === ProgramSectionTemplate.SingleTitleQuestionAnswerPairs) {
+            return renderProgramSection({
+                templateId,
+                data: {
+                    faqQuestions: MockQuestions.questions.map((q, index) => ({
+                        id: index,
+                        questionText: q.question,
+                        answerText: q.answer,
+                        localizations: [],
+                    })),
+                },
+                mode: ProgramSectionMode.Template,
+            });
+        }
 
         return renderProgramSection({
             templateId,

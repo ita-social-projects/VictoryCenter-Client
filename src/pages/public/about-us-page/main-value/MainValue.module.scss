@@ -169,40 +169,6 @@
     }
 }
 
-.people-card {
-    &.card-2,
-    &.card-4 {
-        margin-top: 53px;
-    }
-
-    @media (min-width: 560px) {
-        &.card-2,
-        &.card-4 {
-            margin-top: 121px;
-        }
-    }
-
-    @media (min-width: 1440px) {
-        &.card-2,
-        &.card-4 {
-            margin-top: 392px;
-        }
-    }
-}
-
-.people-img {
-    width: 100%;
-    object-fit: cover;
-    display: block;
-    height: 430px;
-}
-
-.people-info {
-    @include type.body-1-medium;
-    color: c.$blue-900;
-    padding: 15px 16px 0;
-}
-
 .summary-block {
     width: 100%;
     padding: 0 17px;

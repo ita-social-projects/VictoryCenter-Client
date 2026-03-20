@@ -251,8 +251,8 @@ describe('SingleImageRight', () => {
             expect(container.firstChild).toHaveClass('form-container');
         });
 
-        it('applies no additional classes when mode is Published', () => {
-            const { container } = render(<SingleImageRight title="Test" mode={ProgramSectionMode.Published} />);
+        it('applies no additional classes when mode is View', () => {
+            const { container } = render(<SingleImageRight title="Test" mode={ProgramSectionMode.View} />);
 
             expect(container.firstChild).toHaveClass('container');
             expect(container.firstChild).not.toHaveClass('template');

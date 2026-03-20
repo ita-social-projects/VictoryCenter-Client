@@ -156,6 +156,33 @@ describe('FundsExpendituresToolbar', () => {
         expect(onTypeChange).toHaveBeenCalledWith(undefined);
     });
 
+    it('should call onCategoryChange when category filter "Всі" is selected', () => {
+        render(<FundsExpendituresToolbar {...defaultProps} />);
+
+        const allBtn = screen.getByTestId(`select-${FUNDS_EXPENDITURES_TEXT.FILTER.CATEGORY_PLACEHOLDER}-all`);
+        fireEvent.click(allBtn);
+
+        expect(onCategoryChange).toHaveBeenCalledWith(undefined);
+    });
+
+    it('should not call onTypeChange when controls are disabled', () => {
+        render(<FundsExpendituresToolbar {...defaultProps} controlsDisabled={true} />);
+
+        const incomeBtn = screen.getByTestId(`select-${FUNDS_EXPENDITURES_TEXT.FILTER.TYPE_PLACEHOLDER}-income`);
+        fireEvent.click(incomeBtn);
+
+        expect(onTypeChange).not.toHaveBeenCalled();
+    });
+
+    it('should not call onCategoryChange when controls are disabled', () => {
+        render(<FundsExpendituresToolbar {...defaultProps} controlsDisabled={true} />);
+
+        const allBtn = screen.getByTestId(`select-${FUNDS_EXPENDITURES_TEXT.FILTER.CATEGORY_PLACEHOLDER}-all`);
+        fireEvent.click(allBtn);
+
+        expect(onCategoryChange).not.toHaveBeenCalled();
+    });
+
     describe('edit mode', () => {
         it('should show Add Income button when editing', () => {
             render(<FundsExpendituresToolbar {...defaultProps} isEditing={true} />);

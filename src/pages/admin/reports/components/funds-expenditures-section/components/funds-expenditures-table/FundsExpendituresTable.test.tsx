@@ -204,6 +204,18 @@ describe('FundsExpendituresTable', () => {
         expect(screen.getByTestId('not-found')).toBeInTheDocument();
     });
 
+    it('should use correct empty-state colSpan in view and edit modes', () => {
+        const { rerender } = render(
+            <FundsExpendituresTable records={[]} categories={MOCK_CATEGORIES} isEditing={false} />,
+        );
+
+        expect(screen.getByTestId('funds-table-empty-cell')).toHaveAttribute('colspan', '5');
+
+        rerender(<FundsExpendituresTable records={[]} categories={MOCK_CATEGORIES} isEditing />);
+
+        expect(screen.getByTestId('funds-table-empty-cell')).toHaveAttribute('colspan', '7');
+    });
+
     it('should sort records by amountUsd ascending', () => {
         renderTable();
 
@@ -213,6 +225,45 @@ describe('FundsExpendituresTable', () => {
         const firstRowCells = within(rows[0]).getAllByRole('cell');
 
         expect(firstRowCells[4]).toHaveTextContent('1 000');
+    });
+
+    it('should render localized type labels for income and expense chips', () => {
+        renderTable();
+
+        expect(screen.getAllByText(FUNDS_EXPENDITURES_TEXT.TABLE.TYPE_LABELS.INCOME)).toHaveLength(2);
+        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.TYPE_LABELS.EXPENSE)).toBeInTheDocument();
+    });
+
+    it('should sort records by category name ascending', () => {
+        renderTable();
+
+        fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.CATEGORY));
+
+        const rows = screen.getAllByRole('row').slice(1);
+        const firstRowCells = within(rows[0]).getAllByRole('cell');
+
+        expect(firstRowCells[2]).toHaveTextContent('Адміністративні витрати');
+    });
+
+    it('should toggle sort direction and reset to default order on third click', () => {
+        renderTable();
+
+        const amountUahHeader = screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.AMOUNT_UAH);
+
+        fireEvent.click(amountUahHeader);
+        let rows = screen.getAllByRole('row').slice(1);
+        let firstRowCells = within(rows[0]).getAllByRole('cell');
+        expect(firstRowCells[3]).toHaveTextContent('1 000');
+
+        fireEvent.click(amountUahHeader);
+        rows = screen.getAllByRole('row').slice(1);
+        firstRowCells = within(rows[0]).getAllByRole('cell');
+        expect(firstRowCells[3]).toHaveTextContent('7 265');
+
+        fireEvent.click(amountUahHeader);
+        rows = screen.getAllByRole('row').slice(1);
+        firstRowCells = within(rows[0]).getAllByRole('cell');
+        expect(firstRowCells[3]).toHaveTextContent('7 265');
     });
 
     describe('scroll to top button', () => {
@@ -271,6 +322,19 @@ describe('FundsExpendituresTable', () => {
 
             expect((table as HTMLDivElement).scrollTop).toBe(0);
             expect(screen.getByTestId('funds-table-to-top')).not.toHaveClass('to-top-button-visible');
+        });
+
+        it('should not sort or reset scroll when a row is being edited', () => {
+            renderTable({ isEditing: true });
+
+            const table = screen.getByTestId('funds-table');
+            Object.defineProperty(table, 'scrollTop', { configurable: true, writable: true, value: 180 });
+
+            fireEvent.click(screen.getByLabelText('Edit record 1'));
+            fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.AMOUNT_UAH));
+
+            expect((table as HTMLDivElement).scrollTop).toBe(180);
+            expect(screen.getByLabelText('Accept record 1')).toBeInTheDocument();
         });
     });
 
@@ -372,6 +436,66 @@ describe('FundsExpendituresTable', () => {
             expect(screen.getByLabelText('Accept record 1')).toBeDisabled();
         });
 
+        it('should show required category validation on blur when category is cleared', () => {
+            renderTable({ isEditing: true });
+
+            fireEvent.click(screen.getByLabelText('Edit record 1'));
+            fireEvent.click(
+                screen.getByTestId(`select-option-${FUNDS_EXPENDITURES_TEXT.FILTER.CATEGORY_PLACEHOLDER}-undefined`),
+            );
+
+            const categoryEditWrapper = document.querySelector('.category-edit-wrapper');
+            expect(categoryEditWrapper).not.toBeNull();
+
+            if (categoryEditWrapper) {
+                fireEvent.blur(categoryEditWrapper, { relatedTarget: null });
+            }
+
+            expect(screen.getByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED)).toBeInTheDocument();
+            expect(screen.getByLabelText('Accept record 1')).toBeDisabled();
+        });
+
+        it('should infer editable categories from allRecordsForTypeInference', () => {
+            const categoryWithoutType = {
+                id: 99,
+                name: 'Категорія без типу',
+            } as unknown as ReportFundsExpendituresCategory;
+
+            const records: EnrichedRecord[] = [
+                {
+                    id: 1,
+                    categoryId: 1,
+                    categoryName: 'Грантові кошти',
+                    type: 'income',
+                    reportingYear: '2025',
+                    amountUah: '7 265',
+                    amountUsd: '4 200',
+                },
+            ];
+
+            const allRecordsForTypeInference = [
+                {
+                    id: 100,
+                    categoryId: 99,
+                    type: 'income' as const,
+                    reportingYear: '2024',
+                    amountUah: '10',
+                    amountUsd: '10',
+                },
+            ];
+
+            renderTable({
+                isEditing: true,
+                records,
+                categories: [...MOCK_CATEGORIES, categoryWithoutType],
+                allRecordsForTypeInference,
+            });
+
+            fireEvent.click(screen.getByLabelText('Edit record 1'));
+
+            expect(screen.getByTestId('select-option-Категорія без типу-99')).toBeInTheDocument();
+        });
+
         it('should notify parent when entering and leaving row edit mode', () => {
             const onRowEditModeChange = jest.fn();
 
@@ -382,6 +506,25 @@ describe('FundsExpendituresTable', () => {
 
             expect(onRowEditModeChange).toHaveBeenNthCalledWith(1, true);
             expect(onRowEditModeChange).toHaveBeenNthCalledWith(2, false);
+        });
+
+        it('should restore row view mode values after closing edit', () => {
+            renderTable({ isEditing: true });
+
+            fireEvent.click(screen.getByLabelText('Edit record 1'));
+            fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '8 888' } });
+            fireEvent.change(screen.getByLabelText('Amount USD record 1'), { target: { value: '9 999' } });
+            fireEvent.click(screen.getByLabelText('Close edit for record 1'));
+
+            expect(screen.queryByLabelText('Amount UAH record 1')).not.toBeInTheDocument();
+            expect(screen.queryByLabelText('Amount USD record 1')).not.toBeInTheDocument();
+
+            const rowOne = screen.getByLabelText('Edit record 1').closest('tr');
+            expect(rowOne).not.toBeNull();
+            const rowOneScope = within(rowOne as HTMLElement);
+
+            expect(rowOneScope.getByText('7 265')).toBeInTheDocument();
+            expect(rowOneScope.getByText('4 200')).toBeInTheDocument();
         });
 
         it('should save category and amounts through unified save callback', () => {
@@ -444,6 +587,17 @@ describe('FundsExpendituresTable', () => {
             fireEvent.change(screen.getByLabelText('Amount USD record 1'), { target: { value: '-500' } });
 
             expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_NOT_NEGATIVE)).toBeInTheDocument();
+            expect(screen.getByLabelText('Accept record 1')).toBeDisabled();
+        });
+
+        it('should show required validation for empty USD amount on blur', () => {
+            renderTable({ isEditing: true });
+
+            fireEvent.click(screen.getByLabelText('Edit record 1'));
+            fireEvent.change(screen.getByLabelText('Amount USD record 1'), { target: { value: '   ' } });
+            fireEvent.blur(screen.getByLabelText('Amount USD record 1'));
+
+            expect(screen.getByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED)).toBeInTheDocument();
             expect(screen.getByLabelText('Accept record 1')).toBeDisabled();
         });
     });

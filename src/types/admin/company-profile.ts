@@ -5,25 +5,25 @@ export type SocialPlatform =
     | 'Instagram'
     | 'Telegram'
     | 'YouTube'
-    | 'Twitter/X'
+    | 'X'
     | 'WhatsApp'
     | 'LinkedIn'
     | 'Viber';
 
-export const SOCIAL_PLATFORMS_ORDER: SocialPlatform[] = [
+export const SOCIAL_PLATFORMS_ORDER: readonly SocialPlatform[] = [
     'Instagram',
     'Facebook',
     'Telegram',
     'YouTube',
-    'Twitter/X',
+    'X',
     'WhatsApp',
     'LinkedIn',
     'Viber',
-] as const;
+];
 
 export interface LocalizationLanguage {
     id: number;
-    code: LocaleCode | string;
+    code: string;
     name?: string;
 }
 

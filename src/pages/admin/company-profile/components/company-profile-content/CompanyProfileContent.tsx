@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { CategoryBar } from '@/components/admin/category-bar/CategoryBar';
 import { CompanyProfileTab } from '../company-profile-tab/CompanyProfileTab';
@@ -36,7 +36,7 @@ export const CompanyProfileContent = () => {
     });
 
     const handlePublish = (_data: CompanyProfileFormValues) => {
-        // TODO (API)
+        // API integrationd pending backend endpoints/DTO
     };
 
     const handleCancelClick = () => {

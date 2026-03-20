@@ -56,7 +56,7 @@
     }
 }
 
-@media (max-width <= 1400px) {
+@media (max-width: 1400px) {
     .wrapper .toolbar {
         flex-wrap: wrap;
         gap: 0.9375rem;

@@ -14,12 +14,7 @@ export interface ProfileToolbarProps {
 export const ProfileToolbar = ({ isEditMode, onEdit, onCancel, onPublish, isPublishDisabled }: ProfileToolbarProps) => {
     return (
         <div className="profile-toolbar-actions" data-testid="profile-page-toolbar">
-            {!isEditMode ? (
-                <Button onClick={onEdit} buttonStyle="primary">
-                    <EditIcon />
-                    {COMPANY_PROFILE_TEXT.TOOLBAR.EDIT_PAGE}
-                </Button>
-            ) : (
+            {isEditMode ? (
                 <>
                     <Button onClick={onCancel} buttonStyle="secondary">
                         {COMPANY_PROFILE_TEXT.TOOLBAR.CANCEL}
@@ -28,6 +23,11 @@ export const ProfileToolbar = ({ isEditMode, onEdit, onCancel, onPublish, isPubl
                         {COMPANY_PROFILE_TEXT.TOOLBAR.PUBLISH}
                     </Button>
                 </>
+            ) : (
+                <Button onClick={onEdit} buttonStyle="primary">
+                    <EditIcon />
+                    {COMPANY_PROFILE_TEXT.TOOLBAR.EDIT_PAGE}
+                </Button>
             )}
         </div>
     );

@@ -50,7 +50,7 @@ export function mapCompanyProfileToFormValues(
         'Facebook',
         'Telegram',
         'YouTube',
-        'Twitter/X',
+        'X',
         'WhatsApp',
         'LinkedIn',
         'Viber',

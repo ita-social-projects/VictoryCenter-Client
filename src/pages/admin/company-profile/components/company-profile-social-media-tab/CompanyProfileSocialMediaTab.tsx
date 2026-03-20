@@ -20,7 +20,7 @@ const PLATFORM_ORDER: SocialPlatform[] = [
     'Facebook',
     'Telegram',
     'YouTube',
-    'Twitter/X',
+    'X',
     'WhatsApp',
     'LinkedIn',
     'Viber',
@@ -38,8 +38,12 @@ export const CompanyProfileSocialMediaTab = ({ disabled }: CompanyProfileSocialM
         name: 'socialContacts',
     });
 
-    const socialContacts = watch('socialContacts') ?? [];
-    const selectedPlatforms = useMemo(() => new Set(socialContacts.map((c) => c.platform)), [socialContacts]);
+    const watchedSocialContacts = watch('socialContacts');
+
+    const selectedPlatforms = useMemo(() => {
+        const contacts = watchedSocialContacts ?? [];
+        return new Set(contacts.map((c) => c.platform));
+    }, [watchedSocialContacts]);
 
     const platformOptions: SelectOption[] = useMemo(() => {
         const labels = COMPANY_PROFILE_TEXT.SOCIAL_MEDIA_TAB.PLATFORMS;
@@ -49,7 +53,7 @@ export const CompanyProfileSocialMediaTab = ({ disabled }: CompanyProfileSocialM
             { id: 'Facebook', name: labels.FACEBOOK },
             { id: 'Telegram', name: labels.TELEGRAM },
             { id: 'YouTube', name: labels.YOUTUBE },
-            { id: 'Twitter/X', name: labels.X },
+            { id: 'X', name: labels.X },
             { id: 'WhatsApp', name: labels.WHATSAPP },
             { id: 'LinkedIn', name: labels.LINKEDIN },
             { id: 'Viber', name: labels.VIBER },
@@ -75,8 +79,6 @@ export const CompanyProfileSocialMediaTab = ({ disabled }: CompanyProfileSocialM
         <div className="social-media-tab-container">
             <div className="form-row full-width social-media-tab-header">
                 <h2 className="social-media-tab-title">{COMPANY_PROFILE_TEXT.SOCIAL_MEDIA_TAB.SECTION_TITLE}</h2>
-
-                {/* TODO (#958): tooltip content should be sourced from AC / mock, not hardcoded */}
                 <ButtonTooltip position="bottom">Опубліковано на: Профайл</ButtonTooltip>
             </div>
 
@@ -112,11 +114,10 @@ export const CompanyProfileSocialMediaTab = ({ disabled }: CompanyProfileSocialM
                             <div className="social-media-contact__actions">
                                 <button
                                     type="button"
-                                    className="social-media-contact__icon-btn"
-                                    onClick={() => {
-                                        // TODO (#920): edit handler
-                                    }}
+                                    className="social-media-contact__icon-btn disabled"
+                                    disabled
                                     aria-label="Edit social contact"
+                                    title="Edit is not available yet"
                                 >
                                     <EditIcon />
                                 </button>

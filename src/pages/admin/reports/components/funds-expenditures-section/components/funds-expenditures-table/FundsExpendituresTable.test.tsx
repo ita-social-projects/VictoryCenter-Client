@@ -3,6 +3,7 @@ import '@testing-library/jest-dom';
 import type React from 'react';
 import { FundsExpendituresTable, EnrichedRecord } from './FundsExpendituresTable';
 import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ReportFundsExpendituresCategory } from '@/types/admin/reports';
 
 jest.mock('./FundsExpendituresTable.module.scss', () => ({
@@ -36,6 +37,11 @@ jest.mock('./FundsExpendituresTable.module.scss', () => ({
     'category-edit-select': 'category-edit-select',
     'category-edit-option': 'category-edit-option',
     'category-edit-error': 'category-edit-error',
+    'amount-edit-td': 'amount-edit-td',
+    'amount-edit-wrapper': 'amount-edit-wrapper',
+    'amount-edit-input': 'amount-edit-input',
+    'amount-edit-input-error': 'amount-edit-input-error',
+    'amount-edit-error': 'amount-edit-error',
     'to-top-button': 'to-top-button',
     'to-top-icon': 'to-top-icon',
     'to-top-button-visible': 'to-top-button-visible',
@@ -306,9 +312,9 @@ describe('FundsExpendituresTable', () => {
         });
 
         it('should save category changes when valid and notify parent', () => {
-            const onRecordCategorySave = jest.fn();
+            const onRecordSave = jest.fn();
 
-            renderTable({ isEditing: true, onRecordCategorySave });
+            renderTable({ isEditing: true, onRecordSave });
 
             fireEvent.click(screen.getByLabelText('Edit record 1'));
             fireEvent.click(screen.getByTestId('select-option-Власні надходження-3'));
@@ -318,7 +324,11 @@ describe('FundsExpendituresTable', () => {
 
             fireEvent.click(acceptButton);
 
-            expect(onRecordCategorySave).toHaveBeenCalledWith(1, 3);
+            expect(onRecordSave).toHaveBeenCalledWith(1, {
+                categoryId: 3,
+                amountUah: '7 265',
+                amountUsd: '4 200',
+            });
         });
 
         it('should show unique validation message when duplicate category is selected for the same type', () => {
@@ -372,6 +382,69 @@ describe('FundsExpendituresTable', () => {
 
             expect(onRowEditModeChange).toHaveBeenNthCalledWith(1, true);
             expect(onRowEditModeChange).toHaveBeenNthCalledWith(2, false);
+        });
+
+        it('should save category and amounts through unified save callback', () => {
+            const onRecordSave = jest.fn();
+
+            renderTable({ isEditing: true, onRecordSave });
+
+            fireEvent.click(screen.getByLabelText('Edit record 1'));
+            fireEvent.click(screen.getByTestId('select-option-Власні надходження-3'));
+            fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '7 300' } });
+            fireEvent.change(screen.getByLabelText('Amount USD record 1'), { target: { value: '4 250' } });
+
+            const acceptButton = screen.getByLabelText('Accept record 1');
+            expect(acceptButton).not.toBeDisabled();
+
+            fireEvent.click(acceptButton);
+
+            expect(onRecordSave).toHaveBeenCalledWith(1, {
+                categoryId: 3,
+                amountUah: '7 300',
+                amountUsd: '4 250',
+            });
+        });
+
+        it('should show required validation for empty amount on blur', () => {
+            renderTable({ isEditing: true });
+
+            fireEvent.click(screen.getByLabelText('Edit record 1'));
+            fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '   ' } });
+            fireEvent.blur(screen.getByLabelText('Amount UAH record 1'));
+
+            expect(screen.getByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED)).toBeInTheDocument();
+            expect(screen.getByLabelText('Accept record 1')).toBeDisabled();
+        });
+
+        it('should show numeric validation for non-number amount', () => {
+            renderTable({ isEditing: true });
+
+            fireEvent.click(screen.getByLabelText('Edit record 1'));
+            fireEvent.change(screen.getByLabelText('Amount USD record 1'), { target: { value: 'abc' } });
+
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER_GT_ZERO)).toBeInTheDocument();
+            expect(screen.getByLabelText('Accept record 1')).toBeDisabled();
+        });
+
+        it('should show max-digits validation for too long amount', () => {
+            renderTable({ isEditing: true });
+
+            fireEvent.click(screen.getByLabelText('Edit record 1'));
+            fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '123456789012' } });
+
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_MAX_DIGITS)).toBeInTheDocument();
+            expect(screen.getByLabelText('Accept record 1')).toBeDisabled();
+        });
+
+        it('should show negative validation for negative amount', () => {
+            renderTable({ isEditing: true });
+
+            fireEvent.click(screen.getByLabelText('Edit record 1'));
+            fireEvent.change(screen.getByLabelText('Amount USD record 1'), { target: { value: '-500' } });
+
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_NOT_NEGATIVE)).toBeInTheDocument();
+            expect(screen.getByLabelText('Accept record 1')).toBeDisabled();
         });
     });
 });

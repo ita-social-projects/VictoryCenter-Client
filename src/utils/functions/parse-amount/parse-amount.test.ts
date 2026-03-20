@@ -9,6 +9,10 @@ describe('parseAmount', () => {
         expect(parseAmount('4 200.50')).toBe(4200.5);
     });
 
+    it('parses decimal values with comma separator', () => {
+        expect(parseAmount('4 200,50')).toBe(4200.5);
+    });
+
     it('returns 0 for invalid numeric input', () => {
         expect(parseAmount('invalid')).toBe(0);
     });

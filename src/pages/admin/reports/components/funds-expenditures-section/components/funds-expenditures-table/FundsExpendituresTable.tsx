@@ -1,5 +1,4 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
 import {
     FundsExpendituresTransactionType,
@@ -14,6 +13,11 @@ import { ReactComponent as CheckmarkIcon } from '@/assets/icons/checkmark.svg';
 import { ReactComponent as CrossIcon } from '@/assets/icons/cross.svg';
 import { Select } from '@/components/common/select/Select';
 import { SortIcon } from '@/pages/admin/reports/components/funds-expenditures-section/components/funds-expenditures-table/components/sort-icon';
+import {
+    normalizeFundsExpendituresAmountInput,
+    validateFundsExpendituresAmount,
+    validateFundsExpendituresCategory,
+} from '@/validation/admin/reports-schema/funds-expenditures-record-schema/funds-expenditures-record-schema';
 import { parseAmount } from '@/utils/functions/parse-amount/parse-amount';
 import cn from 'classnames';
 import styles from './FundsExpendituresTable.module.scss';
@@ -36,14 +40,22 @@ interface FundsExpendituresTableProps {
     allRecordsForTypeInference?: ReportFundsExpendituresRecord[];
     isEditing?: boolean;
     onRowEditModeChange?: (isEditMode: boolean) => void;
-    onRecordCategorySave?: (recordId: number, categoryId: number) => void;
+    onRecordSave?: (recordId: number, data: { categoryId: number; amountUah: string; amountUsd: string }) => void;
 }
 
 interface RowEditState {
     recordId: number;
     originalCategoryId: number;
+    originalAmountUah: string;
+    originalAmountUsd: string;
     categoryId: number | undefined;
-    error: string | undefined;
+    amountUah: string;
+    amountUsd: string;
+    errors: {
+        category?: string;
+        amountUah?: string;
+        amountUsd?: string;
+    };
 }
 
 const TYPE_LABEL_MAP: Record<FundsExpendituresTransactionType, string> = {
@@ -90,13 +102,39 @@ const getCategoriesForType = (
         .sort((a, b) => a.name.localeCompare(b.name, 'uk'));
 };
 
+const isAcceptButtonDisabled = (rowEditState: RowEditState | null): boolean => {
+    if (!rowEditState) {
+        return true;
+    }
+
+    const normalizedAmountUah = normalizeFundsExpendituresAmountInput(rowEditState.amountUah, true);
+    const normalizedAmountUsd = normalizeFundsExpendituresAmountInput(rowEditState.amountUsd, true);
+    const normalizedOriginalUah = normalizeFundsExpendituresAmountInput(rowEditState.originalAmountUah, true);
+    const normalizedOriginalUsd = normalizeFundsExpendituresAmountInput(rowEditState.originalAmountUsd, true);
+
+    const hasErrors =
+        rowEditState.categoryId === undefined ||
+        Boolean(rowEditState.errors.category) ||
+        Boolean(rowEditState.errors.amountUah) ||
+        Boolean(rowEditState.errors.amountUsd);
+
+    const amountsEmpty = normalizedAmountUah === '' || normalizedAmountUsd === '';
+
+    const noChanges =
+        rowEditState.categoryId === rowEditState.originalCategoryId &&
+        normalizedAmountUah === normalizedOriginalUah &&
+        normalizedAmountUsd === normalizedOriginalUsd;
+
+    return hasErrors || amountsEmpty || noChanges;
+};
+
 export const FundsExpendituresTable = ({
     records,
     categories,
     allRecordsForTypeInference,
     isEditing = false,
     onRowEditModeChange,
-    onRecordCategorySave,
+    onRecordSave,
 }: FundsExpendituresTableProps) => {
     const [sort, setSort] = useState<ColumnSort>({ column: null, direction: null });
     const [rowEditState, setRowEditState] = useState<RowEditState | null>(null);
@@ -148,15 +186,13 @@ export const FundsExpendituresTable = ({
             nextCategoryId: number | undefined,
             trigger: 'change' | 'blur' = 'change',
         ): string | undefined => {
-            if (nextCategoryId === undefined) {
-                return trigger === 'blur' ? COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED : undefined;
-            }
-
-            const hasDuplicate = typeInferenceSource.some(
-                (item) => item.id !== record.id && item.type === record.type && item.categoryId === nextCategoryId,
-            );
-
-            return hasDuplicate ? FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE : undefined;
+            return validateFundsExpendituresCategory({
+                recordId: record.id,
+                recordType: record.type,
+                categoryId: nextCategoryId,
+                records: typeInferenceSource,
+                trigger,
+            });
         },
         [typeInferenceSource],
     );
@@ -170,8 +206,12 @@ export const FundsExpendituresTable = ({
             setRowEditMode({
                 recordId: record.id,
                 originalCategoryId: record.categoryId,
+                originalAmountUah: record.amountUah,
+                originalAmountUsd: record.amountUsd,
                 categoryId: record.categoryId,
-                error: undefined,
+                amountUah: record.amountUah,
+                amountUsd: record.amountUsd,
+                errors: {},
             });
         },
         [rowEditState, setRowEditMode],
@@ -193,7 +233,10 @@ export const FundsExpendituresTable = ({
                 return {
                     ...prev,
                     categoryId,
-                    error: nextError,
+                    errors: {
+                        ...prev.errors,
+                        category: nextError,
+                    },
                 };
             });
         },
@@ -209,12 +252,53 @@ export const FundsExpendituresTable = ({
 
                 return {
                     ...prev,
-                    error: getRowEditValidationError(record, prev.categoryId, 'blur'),
+                    errors: {
+                        ...prev.errors,
+                        category: getRowEditValidationError(record, prev.categoryId, 'blur'),
+                    },
                 };
             });
         },
         [getRowEditValidationError],
     );
+
+    const handleAmountChange = useCallback((recordId: number, field: 'amountUah' | 'amountUsd', nextValue: string) => {
+        const normalized = normalizeFundsExpendituresAmountInput(nextValue);
+
+        setRowEditState((prev) => {
+            if (prev?.recordId !== recordId) {
+                return prev;
+            }
+
+            return {
+                ...prev,
+                [field]: normalized,
+                errors: {
+                    ...prev.errors,
+                    [field]: validateFundsExpendituresAmount(normalized, 'change'),
+                },
+            };
+        });
+    }, []);
+
+    const handleAmountBlur = useCallback((recordId: number, field: 'amountUah' | 'amountUsd') => {
+        setRowEditState((prev) => {
+            if (prev?.recordId !== recordId) {
+                return prev;
+            }
+
+            const normalized = normalizeFundsExpendituresAmountInput(prev[field], true);
+
+            return {
+                ...prev,
+                [field]: normalized,
+                errors: {
+                    ...prev.errors,
+                    [field]: validateFundsExpendituresAmount(normalized, 'blur'),
+                },
+            };
+        });
+    }, []);
 
     const handleAcceptRowEdit = useCallback(
         (record: EnrichedRecord) => {
@@ -225,8 +309,21 @@ export const FundsExpendituresTable = ({
             const finalError = getRowEditValidationError(record, rowEditState.categoryId, 'blur');
             const isCategoryUnchanged = rowEditState.categoryId === rowEditState.originalCategoryId;
             const isCategoryMissing = rowEditState.categoryId === undefined;
+            const normalizedAmountUah = normalizeFundsExpendituresAmountInput(rowEditState.amountUah, true);
+            const normalizedAmountUsd = normalizeFundsExpendituresAmountInput(rowEditState.amountUsd, true);
+            const amountUahError = validateFundsExpendituresAmount(normalizedAmountUah, 'save');
+            const amountUsdError = validateFundsExpendituresAmount(normalizedAmountUsd, 'save');
+            const isAmountsUnchanged =
+                normalizeFundsExpendituresAmountInput(rowEditState.originalAmountUah, true) === normalizedAmountUah &&
+                normalizeFundsExpendituresAmountInput(rowEditState.originalAmountUsd, true) === normalizedAmountUsd;
 
-            if (finalError || isCategoryMissing || isCategoryUnchanged) {
+            if (
+                finalError ||
+                isCategoryMissing ||
+                amountUahError ||
+                amountUsdError ||
+                (isCategoryUnchanged && isAmountsUnchanged)
+            ) {
                 setRowEditState((prev) => {
                     if (prev?.recordId !== record.id) {
                         return prev;
@@ -234,7 +331,14 @@ export const FundsExpendituresTable = ({
 
                     return {
                         ...prev,
-                        error: finalError,
+                        amountUah: normalizedAmountUah,
+                        amountUsd: normalizedAmountUsd,
+                        errors: {
+                            ...prev.errors,
+                            category: finalError,
+                            amountUah: amountUahError,
+                            amountUsd: amountUsdError,
+                        },
                     };
                 });
 
@@ -246,10 +350,14 @@ export const FundsExpendituresTable = ({
                 return;
             }
 
-            onRecordCategorySave?.(record.id, nextCategoryId);
+            onRecordSave?.(record.id, {
+                categoryId: nextCategoryId,
+                amountUah: normalizedAmountUah,
+                amountUsd: normalizedAmountUsd,
+            });
             setRowEditMode(null);
         },
-        [getRowEditValidationError, onRecordCategorySave, rowEditState, setRowEditMode],
+        [getRowEditValidationError, onRecordSave, rowEditState, setRowEditMode],
     );
 
     const handleSort = useCallback(
@@ -365,11 +473,7 @@ export const FundsExpendituresTable = ({
                                 const isEditedRow = rowEditState?.recordId === record.id;
                                 const isAnotherRowEditing = isAnyRowEditing && !isEditedRow;
                                 const editableCategories = categoriesByType[record.type];
-                                const isAcceptDisabled =
-                                    !isEditedRow ||
-                                    rowEditState.categoryId === undefined ||
-                                    Boolean(rowEditState.error) ||
-                                    rowEditState.categoryId === rowEditState.originalCategoryId;
+                                const isAcceptDisabled = !isEditedRow || isAcceptButtonDisabled(rowEditState);
 
                                 return (
                                     <tr key={record.id} className={styles.tr}>
@@ -431,9 +535,9 @@ export const FundsExpendituresTable = ({
                                                             />
                                                         ))}
                                                     </Select>
-                                                    {rowEditState.error && (
+                                                    {rowEditState.errors.category && (
                                                         <p className={styles['category-edit-error']}>
-                                                            {rowEditState.error}
+                                                            {rowEditState.errors.category}
                                                         </p>
                                                     )}
                                                 </div>
@@ -441,8 +545,66 @@ export const FundsExpendituresTable = ({
                                                 record.categoryName
                                             )}
                                         </td>
-                                        <td className={styles.td}>{record.amountUah}</td>
-                                        <td className={styles.td}>{record.amountUsd}</td>
+                                        <td className={cn(styles.td, { [styles['amount-edit-td']]: isEditedRow })}>
+                                            {isEditedRow ? (
+                                                <div className={styles['amount-edit-wrapper']}>
+                                                    <input
+                                                        type="text"
+                                                        className={cn(styles['amount-edit-input'], {
+                                                            [styles['amount-edit-input-error']]:
+                                                                rowEditState.errors.amountUah,
+                                                        })}
+                                                        value={rowEditState.amountUah}
+                                                        aria-label={`Amount UAH record ${record.id}`}
+                                                        onChange={(event) =>
+                                                            handleAmountChange(
+                                                                record.id,
+                                                                'amountUah',
+                                                                event.target.value,
+                                                            )
+                                                        }
+                                                        onBlur={() => handleAmountBlur(record.id, 'amountUah')}
+                                                    />
+                                                    {rowEditState.errors.amountUah && (
+                                                        <p className={styles['amount-edit-error']}>
+                                                            {rowEditState.errors.amountUah}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                record.amountUah
+                                            )}
+                                        </td>
+                                        <td className={cn(styles.td, { [styles['amount-edit-td']]: isEditedRow })}>
+                                            {isEditedRow ? (
+                                                <div className={styles['amount-edit-wrapper']}>
+                                                    <input
+                                                        type="text"
+                                                        className={cn(styles['amount-edit-input'], {
+                                                            [styles['amount-edit-input-error']]:
+                                                                rowEditState.errors.amountUsd,
+                                                        })}
+                                                        value={rowEditState.amountUsd}
+                                                        aria-label={`Amount USD record ${record.id}`}
+                                                        onChange={(event) =>
+                                                            handleAmountChange(
+                                                                record.id,
+                                                                'amountUsd',
+                                                                event.target.value,
+                                                            )
+                                                        }
+                                                        onBlur={() => handleAmountBlur(record.id, 'amountUsd')}
+                                                    />
+                                                    {rowEditState.errors.amountUsd && (
+                                                        <p className={styles['amount-edit-error']}>
+                                                            {rowEditState.errors.amountUsd}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                record.amountUsd
+                                            )}
+                                        </td>
                                         {isEditing && (
                                             <td className={cn(styles.td, styles['actions-td'])}>
                                                 <div className={styles['row-actions']}>

@@ -71,7 +71,7 @@
     padding: 13px 20px;
     font-weight: 400;
     line-height: 24px;
-    color: c.$graphite_black;
+    color: c.$graphite-black;
     vertical-align: middle;
     height: 65px;
     box-sizing: border-box;
@@ -194,6 +194,16 @@
             stroke: c.$green;
         }
     }
+
+    &:disabled {
+        .action-icon {
+            color: c.$grey-700;
+
+            path {
+                stroke: c.$grey-700;
+            }
+        }
+    }
 }
 
 .close-icon-button {
@@ -206,31 +216,35 @@
     }
 }
 
-.category-edit-td {
+.category-edit-td,
+.amount-edit-td {
     position: relative;
     overflow: visible;
+    height: auto;
 }
 
-.category-edit-wrapper {
+.category-edit-wrapper,
+.amount-edit-wrapper {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     gap: 6px;
+    min-height: 80px;
 }
 
 .category-edit-select {
-    min-width: 220px;
+    width: 240px;
 
     :global(.select-head) {
-        min-height: 36px;
-        padding: 8px 10px;
+        min-height: 55px;
+        padding: 10px 17px;
         border: 1px solid c.$grey-700;
         border-radius: 8px;
         background-color: c.$white;
     }
 
     :global(.select-options) {
-        min-width: 220px;
+        min-width: 240px;
         border: 1px solid c.$grey-500;
         border-radius: 8px;
         background-color: c.$white;
@@ -244,10 +258,40 @@
     border-radius: 6px;
 }
 
-.category-edit-error {
-    @include type.small-text-regular;
+.category-edit-error,
+.amount-edit-error {
     margin: 0;
     color: c.$error;
+}
+
+.category-edit-error {
+    @include type.small-text-regular;
+}
+
+.amount-edit-error {
+    @include type.subtitle-2-medium;
+}
+
+.amount-edit-input {
+    @include type.subtitle-2-medium;
+    width: 128px;
+    min-height: 55px;
+    padding: 10px 17px;
+    border: 1px solid c.$grey-700;
+    border-radius: 8px;
+    color: c.$graphite-black;
+    background-color: c.$white;
+    box-shadow: 0 1px 2px rgba(c.$bluish-black, 0.05);
+    outline: none;
+
+    &:focus {
+        border-color: c.$blue-500;
+        box-shadow: 0 0 0 2px rgba(c.$blue-500, 0.12);
+    }
+}
+
+.amount-edit-input-error {
+    border-color: c.$error;
 }
 
 .to-top-button {

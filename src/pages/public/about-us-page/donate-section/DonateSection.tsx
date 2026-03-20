@@ -1,4 +1,4 @@
-import background from '@/assets/images/public/about-us-page/donate-background.jpg';
+import background from '@/assets/images/horses.webp';
 import { PUBLIC_ROUTES } from '@/const/public/routes';
 import { useTranslation } from 'react-i18next';
 import styles from './DonateSection.module.scss';

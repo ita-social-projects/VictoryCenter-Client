@@ -13,6 +13,8 @@ import { SectionType } from '@/types/common/about-us';
 import React from 'react';
 import { LocalizationLanguage } from '@/types/common/language';
 import './SectionsWrapper.scss';
+import { IconButton } from '@/components/admin/icon-button/IconButton';
+import { ACTION_ICONS } from '@/const/common/action-icons';
 
 export interface MainSectionProps {
     section: WhoWeAreSection | null;
@@ -82,11 +84,12 @@ export const SectionsWrapper = ({
     return (
         <div className="who-we-are-main-section">
             <div className="who-we-are-section-buttons">
-                <button
+                <IconButton
                     type="button"
                     className="who-we-are-translate-btn"
                     aria-label="Translate"
                     onClick={() => handleOnTranslateContent(section)}
+                    DefaultIcon={ACTION_ICONS.translate.default}
                 />
             </div>
             <Component {...commonProps} {...additionalProps} />

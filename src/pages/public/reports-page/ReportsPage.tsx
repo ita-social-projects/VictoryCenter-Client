@@ -4,7 +4,7 @@ import { ReportsSection, SummarySection } from './components';
 import { CtaSection } from '@/components/public/cta';
 import { CTA_DATA } from '@/utils/mock-data/public/reports-page';
 import { PUBLIC_ROUTES } from '@/const/public/routes';
-import outroVideo from '@/assets/videos/public/partners-page/outro.mp4';
+import outroVideo from '@/assets/videos/child-riding-horse.webm';
 
 export const ReportsPage = () => {
     const { t } = useTranslation('reportsPage');

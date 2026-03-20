@@ -1,5 +1,5 @@
 import { HippoventionCenterData } from '@/types/public/hippotherapy-page';
-import hippoventionCenterImg from '@/assets/images/public/hippotherapy/hippovention_center.jpg';
+import hippoventionCenterImg from '@/assets/images/people-on-horses.webp';
 import styles from './HippoventionCenter.module.scss';
 
 export const HippoventionCenter = ({ title, imgURL, imgAlternativeText, pros, text }: HippoventionCenterData) => {

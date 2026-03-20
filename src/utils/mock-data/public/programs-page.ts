@@ -1,8 +1,8 @@
-import firstImg from '@/assets/images/public/programs-page/first.png';
-import secondImg from '@/assets/images/public/programs-page/second.png';
-import thirdImg from '@/assets/images/public/programs-page/third.png';
-import fourthImg from '@/assets/images/public/programs-page/fourth.png';
-import fifthImg from '@/assets/images/public/programs-page/fifth.png';
+import firstImg from '@/assets/images/man-in-stall-stroking-horse.webp';
+import secondImg from '@/assets/images/girl-stroking-horse-side.webp';
+import thirdImg from '@/assets/images/man-facing-horse-forehead.webp';
+import fourthImg from '@/assets/images/happy-girl-hugging-horse.webp';
+import fifthImg from '@/assets/images/girl-holding-horse-chin.webp';
 export const MockCards = {
     programData: [
         {

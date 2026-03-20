@@ -88,65 +88,11 @@
             gap: 0.625rem;
 
             .faq-edit-btn,
-            .faq-delete-btn {
+            .faq-delete-btn,
+            .faq-translate-btn {
                 width: 1.5rem;
                 height: 1.5rem;
                 border: none;
-                cursor: pointer;
-                background-repeat: no-repeat;
-                background-size: cover;
-            }
-            .faq-translate-btn {
-                border: none;
-                width: 1.5rem;
-                height: 1.5rem;
-            }
-
-            .faq-edit-btn {
-                background: url('~@/assets/icons/edit-default.svg');
-
-                &:hover:not(:disabled) {
-                    background: url('~@/assets/icons/edit-hover.svg');
-                }
-
-                &:active:not(:disabled) {
-                    background: url('~@/assets/icons/edit-pressed.svg');
-                }
-
-                &:disabled {
-                    background: url('~@/assets/icons/edit-disabled.svg');
-                    cursor: not-allowed;
-                }
-            }
-
-            .faq-delete-btn {
-                background: url('~@/assets/icons/delete-default.svg');
-
-                &:hover:not(:disabled) {
-                    background: url('~@/assets/icons/delete-hover.svg');
-                }
-
-                &:active:not(:disabled) {
-                    background: url('~@/assets/icons/delete-pressed.svg');
-                }
-
-                &:disabled {
-                    background: url('~@/assets/icons/delete-disabled.svg');
-                    cursor: not-allowed;
-                }
-            }
-
-            .faq-translate-btn {
-                background: url('~@/assets/icons/translate.svg');
-
-                &:hover {
-                    cursor: pointer;
-                    background: url('~@/assets/icons/translate-grey.svg');
-                }
-
-                &:active {
-                    background: url('~@/assets/icons/translate.svg');
-                }
             }
         }
     }

@@ -33,14 +33,19 @@
     display: flex;
     justify-self: flex-end;
     cursor: pointer;
-    transition: background-image 0.2s ease;
     border: none;
     width: 24px;
     height: 24px;
-    background: url('~@/assets/icons/delete.svg') no-repeat;
+    background: transparent;
 
+    path {
+        transition: 0.2s ease;
+    }
+    
     &:hover {
-        background: url('~@/assets/icons/delete-hover.svg') no-repeat;
+        path {
+            fill: c.$blue-100;
+        }
     }
 }
 
@@ -69,6 +74,7 @@
 
     .arrow-icon {
         display: block;
+        transform: rotate(90deg);
     }
 
     .close-icon {

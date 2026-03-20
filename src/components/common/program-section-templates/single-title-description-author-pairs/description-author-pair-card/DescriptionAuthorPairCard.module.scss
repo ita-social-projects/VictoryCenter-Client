@@ -55,7 +55,7 @@ $field-width: 366px;
     justify-content: center;
     cursor: pointer;
 
-    color: c.$blue-500;
+    --icon-btn-hover-color: #{c.$blue-900};
 
     svg {
         width: 18px;

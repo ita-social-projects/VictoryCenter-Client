@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './TeamPage.scss';
-import horseVideo from '@/assets/videos/public/team-page/quote_background.mp4';
+import horseVideo from '@/assets/videos/quote-background.webm';
 import classNames from 'classnames';
 import {
     DOWNLOAD_ERROR,
@@ -73,7 +73,7 @@ export const TeamPage: React.FC = () => {
 
             <div className="video-background-container">
                 <video autoPlay muted loop playsInline className="background-video">
-                    <source src={horseVideo} type="video/mp4" />
+                    <source src={horseVideo} type="video/webm" />
                 </video>
 
                 <div className="quote-overlay">

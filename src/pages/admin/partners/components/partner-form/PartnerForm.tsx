@@ -1,6 +1,7 @@
 import React, { memo, useCallback } from 'react';
 import { Image, ImageValues } from '@/types/common/image';
 import { ImageInput } from '@/components/admin/image-input/ImageInput';
+import { IconButton } from '@/components/admin/icon-button/IconButton';
 import { InputError } from '@/components/admin/input-error/InputError';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { PARTNER_VALIDATION_FUNCTIONS } from '@/validation/admin/partner-schema/partner-schema';
@@ -8,6 +9,7 @@ import { PARTNER_VALIDATION, PARTNERS_TEXT } from '@/const/admin/partners';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import styles from './PartnerForm.module.scss';
 import './PartnerForm.scss';
+import { ACTION_ICONS } from '@/const/common/action-icons';
 
 export interface PartnerFormValues {
     localId: string;
@@ -63,11 +65,13 @@ const PartnerFormComponent = ({ values, errors, disabled, onValuesChange, onDele
     return (
         <div className={styles.root} data-testid={`partner-form-${cardHtmlId}`}>
             <div className={styles.header}>
-                <button
+                <IconButton
                     type="button"
                     className={styles['delete-button']}
                     onClick={handleDelete}
                     data-testid={`partner-form-delete-button-${cardHtmlId}`}
+                    DefaultIcon={ACTION_ICONS.delete.default}
+                    FilledIcon={ACTION_ICONS.delete.hover}
                 />
             </div>
             <div className={styles.content}>

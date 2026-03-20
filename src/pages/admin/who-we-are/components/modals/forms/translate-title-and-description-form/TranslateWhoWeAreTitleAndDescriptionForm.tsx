@@ -68,7 +68,7 @@ export const TranslateWhoWeAreTitleAndDescriptionForm = forwardRef<
             TranslateWhoWeAreTitleAndDescriptionFormValues,
             TranslateWhoWeAreTitleAndDescriptionFormErrorState
         >({
-            defaultFormState: DEFAULT_FORM_STATE,
+            defaultFormState: initialData ?? DEFAULT_FORM_STATE,
             initialData,
             validateForm,
             onValidationChange,

@@ -52,10 +52,12 @@ export type ContentLocalizationDto = EntityLocalizationDto &
 
 export type ContentLocalization = EntityLocalization & ContentLocalizableFields;
 
-export type CreateContentLocalizationDto = ContentLocalizableFields & {
+export type UpdateContentLocalizationDto = ContentLocalizableFields & {
     entityId: number;
     languageId: number;
 };
+
+export type CreateContentLocalizationDto = UpdateContentLocalizationDto;
 
 export type ContentLocalizableFields = {
     description: string | null;

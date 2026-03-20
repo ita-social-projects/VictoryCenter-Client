@@ -7,7 +7,6 @@ import {
     ReportsMediaBlockErrors,
     ReportsMediaBlockValidationFunctions,
 } from './ReportsMediaBlock';
-import { REPORTS_TEXT } from '@/const/admin/reports';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { Image, ImageValues } from '@/types/common/image';
 

@@ -64,8 +64,6 @@ const clickMsPublish = () => fireEvent.click(screen.getByTestId('ms-publish'));
 const markDirty = () => fireEvent.click(screen.getByTestId('ms-dirty-true'));
 const markClean = () => fireEvent.click(screen.getByTestId('ms-dirty-false'));
 
-const expectMsEditing = (value: boolean) =>
-    expect(screen.getByTestId('ms-is-editing')).toHaveTextContent(String(value));
 const expectPublishDisabled = (value: boolean) =>
     expect(screen.getByTestId('ms-publish-disabled')).toHaveTextContent(String(value));
 const expectCancelDisabled = (value: boolean) =>

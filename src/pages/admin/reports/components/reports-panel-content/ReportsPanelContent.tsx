@@ -49,7 +49,6 @@ export const ReportsPanelContent = () => {
                     isActive={isMediaSettingsTab}
                 />
             </div>
-
             <ToastContainer />
         </div>
     );

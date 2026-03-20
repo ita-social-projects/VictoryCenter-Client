@@ -2,52 +2,36 @@ import { useFormContext, Controller, useFieldArray } from 'react-hook-form';
 import { CustomFormGroup } from '../company-profile-form-group/CompanyProfileFormGroup';
 import { COMPANY_PROFILE_TEXT } from '@/const/admin/company-profile';
 import './CompanyProfileSocialMediaTab.scss';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { SingleSelectInput } from '@/components/common/single-select-input/SingleSelectInput';
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as DeleteIcon } from '@/assets/icons/delete.svg';
 import { ButtonTooltip } from '@/components/admin/button-tooltip/ButtonTooltip';
-
-type SocialPlatform =
-    | 'Instagram'
-    | 'Facebook'
-    | 'Telegram'
-    | 'YouTube'
-    | 'Twitter/X'
-    | 'WhatsApp'
-    | 'LinkedIn'
-    | 'Viber';
-
-type SocialContact = {
-    platform: SocialPlatform;
-    url: string;
-};
-
-type FormValues = {
-    socialContacts: SocialContact[];
-};
-
-const ALL_PLATFORMS: { id: SocialPlatform; name: SocialPlatform }[] = [
-    { id: 'Instagram', name: 'Instagram' },
-    { id: 'Facebook', name: 'Facebook' },
-    { id: 'Telegram', name: 'Telegram' },
-    { id: 'YouTube', name: 'YouTube' },
-    { id: 'Twitter/X', name: 'Twitter/X' },
-    { id: 'WhatsApp', name: 'WhatsApp' },
-    { id: 'LinkedIn', name: 'LinkedIn' },
-    { id: 'Viber', name: 'Viber' },
-];
+import { CompanyProfileFormValues, SocialPlatform } from '@/types/admin/company-profile';
 
 interface CompanyProfileSocialMediaTabProps {
     disabled: boolean;
 }
+
+type SelectOption = { id: SocialPlatform; name: string };
+
+const PLATFORM_ORDER: SocialPlatform[] = [
+    'Instagram',
+    'Facebook',
+    'Telegram',
+    'YouTube',
+    'Twitter/X',
+    'WhatsApp',
+    'LinkedIn',
+    'Viber',
+];
 
 export const CompanyProfileSocialMediaTab = ({ disabled }: CompanyProfileSocialMediaTabProps) => {
     const {
         control,
         formState: { errors },
         watch,
-    } = useFormContext<FormValues>();
+    } = useFormContext<CompanyProfileFormValues>();
 
     const { fields, append, remove } = useFieldArray({
         control,
@@ -57,48 +41,63 @@ export const CompanyProfileSocialMediaTab = ({ disabled }: CompanyProfileSocialM
     const socialContacts = watch('socialContacts') ?? [];
     const selectedPlatforms = useMemo(() => new Set(socialContacts.map((c) => c.platform)), [socialContacts]);
 
+    const platformOptions: SelectOption[] = useMemo(() => {
+        const labels = COMPANY_PROFILE_TEXT.SOCIAL_MEDIA_TAB.PLATFORMS;
+
+        const all: SelectOption[] = [
+            { id: 'Instagram', name: labels.INSTAGRAM },
+            { id: 'Facebook', name: labels.FACEBOOK },
+            { id: 'Telegram', name: labels.TELEGRAM },
+            { id: 'YouTube', name: labels.YOUTUBE },
+            { id: 'Twitter/X', name: labels.X },
+            { id: 'WhatsApp', name: labels.WHATSAPP },
+            { id: 'LinkedIn', name: labels.LINKEDIN },
+            { id: 'Viber', name: labels.VIBER },
+        ];
+
+        const order = new Map(PLATFORM_ORDER.map((p, idx) => [p, idx]));
+        return all.sort((a, b) => (order.get(a.id) ?? 999) - (order.get(b.id) ?? 999));
+    }, []);
+
     const availablePlatforms = useMemo(
-        () => ALL_PLATFORMS.filter((p) => !selectedPlatforms.has(p.id)),
-        [selectedPlatforms],
+        () => platformOptions.filter((p) => !selectedPlatforms.has(p.id)),
+        [platformOptions, selectedPlatforms],
     );
 
     const isLimitReached = fields.length >= 4;
 
-    const [selectedOption, setSelectedOption] = useState<{ id: SocialPlatform; name: SocialPlatform } | undefined>(
-        undefined,
-    );
-
-    const handleAddPlatform = (opt: { id: SocialPlatform; name: SocialPlatform }) => {
-        if (isLimitReached) return;
-
+    const handleAddPlatform = (opt: SelectOption) => {
+        if (disabled || isLimitReached) return;
         append({ platform: opt.id, url: '' });
-        setSelectedOption(undefined);
     };
 
     return (
         <div className="social-media-tab-container">
             <div className="form-row full-width social-media-tab-header">
                 <h2 className="social-media-tab-title">{COMPANY_PROFILE_TEXT.SOCIAL_MEDIA_TAB.SECTION_TITLE}</h2>
-                <ButtonTooltip position="bottom">Опубліковано на: Профайл Дозволено лише 4 контакти</ButtonTooltip>
+
+                {/* TODO (#958): tooltip content should be sourced from AC / mock, not hardcoded */}
+                <ButtonTooltip position="bottom">Опубліковано на: Профайл</ButtonTooltip>
             </div>
 
             {!disabled && (
                 <div className="social-media-tab-add">
                     <SingleSelectInput
                         options={availablePlatforms}
-                        value={selectedOption}
-                        onChange={(opt) => {
-                            setSelectedOption(opt);
-                            handleAddPlatform(opt);
-                        }}
+                        value={undefined}
+                        onChange={handleAddPlatform}
                         getOptionId={(v) => v.id}
                         getOptionName={(v) => v.name}
-                        placeholder="Додати контакт"
+                        placeholder={COMPANY_PROFILE_TEXT.SOCIAL_MEDIA_TAB.ADD_CONTACT_PLACEHOLDER}
                         disabled={isLimitReached}
                         id="socialMediaSelect"
                     />
 
-                    {isLimitReached && <div className="social-media-tab-limit-message">Дозволено лише 4 контакти.</div>}
+                    {isLimitReached && (
+                        <div className="social-media-tab-limit-message">
+                            {COMPANY_PROFILE_TEXT.SOCIAL_MEDIA_TAB.LIMIT_MESSAGE}
+                        </div>
+                    )}
                 </div>
             )}
 
@@ -115,8 +114,7 @@ export const CompanyProfileSocialMediaTab = ({ disabled }: CompanyProfileSocialM
                                     type="button"
                                     className="social-media-contact__icon-btn"
                                     onClick={() => {
-                                        // TODO: edit handler (open modal / enable row edit / etc.)
-                                        console.log('edit social contact', index);
+                                        // TODO (#920): edit handler
                                     }}
                                     aria-label="Edit social contact"
                                 >

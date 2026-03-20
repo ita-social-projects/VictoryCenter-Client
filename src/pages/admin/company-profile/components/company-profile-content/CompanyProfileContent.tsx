@@ -10,6 +10,7 @@ import { CompanyProfileLogoHeader } from '../company-profile-logo-header/Company
 import { CompanyProfileCancelModal } from '../company-profile-cancel-modal/CompanyProfileCancelModal';
 import './CompanyProfileContent.scss';
 import { COMPANY_PROFILE_TEXT } from '@/const/admin/company-profile';
+import { COMPANY_PROFILE_FORM_DEFAULTS, CompanyProfileFormValues } from '@/types/admin/company-profile';
 
 type TabType = 'profile' | 'requisites' | 'socials';
 
@@ -27,26 +28,15 @@ const TABS: TabItem[] = [
 export const CompanyProfileContent = () => {
     const [activeTab, setActiveTab] = useState<TabType>('profile');
     const [isEditMode, setIsEditMode] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
     const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 
-    const methods = useForm({
+    const methods = useForm<CompanyProfileFormValues>({
         mode: 'onBlur',
-        defaultValues: {
-            socialContacts: [],
-        },
+        defaultValues: COMPANY_PROFILE_FORM_DEFAULTS,
     });
 
-    useEffect(() => {
-        const fetchMockData = async () => {
-            setIsLoading(true);
-            setIsLoading(false);
-        };
-        fetchMockData();
-    }, []);
-
-    const onSubmit = (data: any) => {
-        console.log('Дані для відправки на бекенд:', data);
+    const handlePublish = (_data: CompanyProfileFormValues) => {
+        // TODO (API)
     };
 
     const handleCancelClick = () => {
@@ -67,8 +57,6 @@ export const CompanyProfileContent = () => {
         if (isEditMode) return;
         setActiveTab(tab.id);
     };
-
-    if (isLoading) return <div>Завантаження...</div>;
 
     const selectedTab = TABS.find((tab) => tab.id === activeTab) || TABS[0];
 
@@ -92,8 +80,8 @@ export const CompanyProfileContent = () => {
                             isEditMode={isEditMode}
                             onEdit={() => setIsEditMode(true)}
                             onCancel={handleCancelClick}
-                            onPublish={methods.handleSubmit(onSubmit)}
-                            isPublishDisabled={!methods.formState.isValid || !methods.formState.isDirty}
+                            onPublish={methods.handleSubmit(handlePublish)}
+                            isPublishDisabled={!methods.formState.isDirty}
                         />
                     </div>
                 </div>

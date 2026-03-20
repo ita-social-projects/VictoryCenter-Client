@@ -2,6 +2,7 @@ import { useFormContext, Controller } from 'react-hook-form';
 import { CustomFormGroup } from '../company-profile-form-group/CompanyProfileFormGroup';
 import './CompanyProfileRequisitesTab.scss';
 import { COMPANY_PROFILE_TEXT } from '@/const/admin/company-profile';
+import { CompanyProfileFormValues } from '@/types/admin/company-profile';
 
 interface CompanyProfileRequisitesTabProps {
     disabled: boolean;
@@ -11,7 +12,7 @@ export const CompanyProfileRequisitesTab = ({ disabled }: CompanyProfileRequisit
     const {
         control,
         formState: { errors },
-    } = useFormContext();
+    } = useFormContext<CompanyProfileFormValues>();
 
     return (
         <div className="requisites-tab-container">
@@ -72,35 +73,35 @@ export const CompanyProfileRequisitesTab = ({ disabled }: CompanyProfileRequisit
                 />
 
                 <Controller
-                    name="addressUa"
+                    name="addressUa_requisites"
                     control={control}
                     render={({ field }) => (
                         <CustomFormGroup
                             {...field}
-                            id="addressUa"
+                            id="addressUa_requisites"
                             labelText={COMPANY_PROFILE_TEXT.REQUISITES_TAB.REQUISITES_ADDRESS_UA_LABEL}
                             tooltipText={COMPANY_PROFILE_TEXT.REQUISITES_TAB.TOOLTIP_REQUISITES_ADDRESS_UA}
                             isRequired={true}
                             maxLength={100}
                             disabled={disabled}
-                            error={errors.addressUa?.message as string}
+                            error={errors.addressUa_requisites?.message as string}
                         />
                     )}
                 />
 
                 <Controller
-                    name="addressEn"
+                    name="addressEn_requisites"
                     control={control}
                     render={({ field }) => (
                         <CustomFormGroup
                             {...field}
-                            id="addressEn"
+                            id="addressEn_requisites"
                             labelText={COMPANY_PROFILE_TEXT.REQUISITES_TAB.REQUISITES_ADDRESS_EN_LABEL}
                             tooltipText={COMPANY_PROFILE_TEXT.REQUISITES_TAB.TOOLTIP_REQUISITES_ADDRESS_EN}
                             isRequired={true}
                             maxLength={100}
                             disabled={disabled}
-                            error={errors.addressEn?.message as string}
+                            error={errors.addressEn_requisites?.message as string}
                         />
                     )}
                 />

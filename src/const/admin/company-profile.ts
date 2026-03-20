@@ -52,8 +52,17 @@ export const COMPANY_PROFILE_TEXT = {
 
     SOCIAL_MEDIA_TAB: {
         SECTION_TITLE: 'Соціальні мережі',
-        FACEBOOK_LABEL: 'Facebook',
-        INSTAGRAM_LABEL: 'Instagram',
-        TELEGRAM_LABEL: 'Telegram',
+        PLATFORMS: {
+            FACEBOOK: 'Facebook',
+            INSTAGRAM: 'Instagram',
+            TELEGRAM: 'Telegram',
+            YOUTUBE: 'YouTube',
+            X: 'Twitter/X',
+            WHATSAPP: 'WhatsApp',
+            LINKEDIN: 'LinkedIn',
+            VIBER: 'Viber',
+        },
+        ADD_CONTACT_PLACEHOLDER: 'Додати контакт',
+        LIMIT_MESSAGE: 'Дозволено лише 4 контакти.',
     },
 } as const;

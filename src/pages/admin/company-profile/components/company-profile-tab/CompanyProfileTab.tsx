@@ -2,6 +2,7 @@ import { useFormContext, Controller } from 'react-hook-form';
 import { CustomFormGroup } from '../company-profile-form-group/CompanyProfileFormGroup';
 import { COMPANY_PROFILE_TEXT } from '@/const/admin/company-profile';
 import './CompanyProfileTab.scss';
+import { CompanyProfileFormValues } from '@/types/admin/company-profile';
 
 interface ProfileTabProps {
     disabled: boolean;
@@ -11,7 +12,7 @@ export const CompanyProfileTab = ({ disabled }: ProfileTabProps) => {
     const {
         control,
         formState: { errors },
-    } = useFormContext();
+    } = useFormContext<CompanyProfileFormValues>();
 
     return (
         <div className="profile-tab-container">

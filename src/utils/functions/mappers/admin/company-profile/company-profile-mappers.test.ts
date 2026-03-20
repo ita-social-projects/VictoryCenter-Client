@@ -62,7 +62,6 @@ describe('company-profile-mappers', () => {
             addressUa_requisites: 'UA req address',
             addressEn_requisites: 'EN req address',
 
-            // sorted: Instagram should be before Viber
             socialContacts: [
                 { platform: 'Instagram', url: 'https://instagram.com/a' },
                 { platform: 'Viber', url: 'viber://chat' },
@@ -77,14 +76,14 @@ describe('company-profile-mappers', () => {
             email: '  test@mail.com ',
             correspondenceEmail: '  corr@mail.com ',
             addressUa: '  UA address  ',
-            addressEng: '  ', // empty -> fallback to UA
+            addressEng: '  ',
             mottoUa: '  UA motto ',
-            mottoEng: ' ', // empty -> fallback to UA motto
+            mottoEng: ' ',
             requisitesUa: '  UA recipient ',
-            requisitesEn: ' ', // fallback to UA recipient
+            requisitesEn: ' ',
             companyRegistrationNumber: ' 12345678 ',
             addressUa_requisites: ' UA req address ',
-            addressEn_requisites: ' ', // fallback to UA req address
+            addressEn_requisites: ' ',
             socialContacts: [{ platform: 'Instagram', url: ' https://instagram.com/a ' }],
         };
 

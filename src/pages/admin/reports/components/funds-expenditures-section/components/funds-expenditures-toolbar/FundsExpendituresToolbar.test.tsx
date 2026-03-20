@@ -87,8 +87,8 @@ jest.mock('@/components/common/select/Select', () => {
 });
 
 const MOCK_CATEGORIES: ReportFundsExpendituresCategory[] = [
-    { id: 1, name: 'Грантові кошти' },
-    { id: 2, name: 'Благодійні внески' },
+    { id: 1, name: 'Грантові кошти', type: 'income' },
+    { id: 2, name: 'Благодійні внески', type: 'income' },
 ];
 
 describe('FundsExpendituresToolbar', () => {
@@ -154,6 +154,33 @@ describe('FundsExpendituresToolbar', () => {
         const allBtn = screen.getByTestId(`select-${FUNDS_EXPENDITURES_TEXT.FILTER.TYPE_PLACEHOLDER}-all`);
         fireEvent.click(allBtn);
         expect(onTypeChange).toHaveBeenCalledWith(undefined);
+    });
+
+    it('should call onCategoryChange when category filter "Всі" is selected', () => {
+        render(<FundsExpendituresToolbar {...defaultProps} />);
+
+        const allBtn = screen.getByTestId(`select-${FUNDS_EXPENDITURES_TEXT.FILTER.CATEGORY_PLACEHOLDER}-all`);
+        fireEvent.click(allBtn);
+
+        expect(onCategoryChange).toHaveBeenCalledWith(undefined);
+    });
+
+    it('should not call onTypeChange when controls are disabled', () => {
+        render(<FundsExpendituresToolbar {...defaultProps} controlsDisabled={true} />);
+
+        const incomeBtn = screen.getByTestId(`select-${FUNDS_EXPENDITURES_TEXT.FILTER.TYPE_PLACEHOLDER}-income`);
+        fireEvent.click(incomeBtn);
+
+        expect(onTypeChange).not.toHaveBeenCalled();
+    });
+
+    it('should not call onCategoryChange when controls are disabled', () => {
+        render(<FundsExpendituresToolbar {...defaultProps} controlsDisabled={true} />);
+
+        const allBtn = screen.getByTestId(`select-${FUNDS_EXPENDITURES_TEXT.FILTER.CATEGORY_PLACEHOLDER}-all`);
+        fireEvent.click(allBtn);
+
+        expect(onCategoryChange).not.toHaveBeenCalled();
     });
 
     describe('edit mode', () => {

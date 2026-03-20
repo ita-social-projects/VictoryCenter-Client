@@ -59,6 +59,8 @@ export const FundsExpenditureSection = () => {
 
     const [selectedType, setSelectedType] = useState<TypeFilterValue>(undefined);
     const [selectedCategoryId, setSelectedCategoryId] = useState<CategoryFilterValue>(undefined);
+    const [recordsState, setRecordsState] = useState<ReportFundsExpendituresRecord[]>([]);
+    const [isRowEditMode, setIsRowEditMode] = useState(false);
 
     const handleEdit = useCallback(() => setIsEditing(true), []);
     const handleCancel = useCallback(() => {
@@ -101,6 +103,10 @@ export const FundsExpenditureSection = () => {
         fetchHandler: fetchRecords,
     });
 
+    useEffect(() => {
+        setRecordsState(allRecords);
+    }, [allRecords]);
+
     const isPublishEnabled = useMemo(() => {
         const normalized = disclaimerValue.replaceAll(/\s+/g, ' ').trim();
         return normalized.length >= FUNDS_EXPENDITURES_VALIDATION.disclaimer.min && !disclaimerError;
@@ -114,9 +120,9 @@ export const FundsExpenditureSection = () => {
         }
     }, [settings, isEditing]);
 
-    const summary = useMemo(() => computeSummary(allRecords), [allRecords]);
+    const summary = useMemo(() => computeSummary(recordsState), [recordsState]);
 
-    const enrichedRecords = useMemo(() => enrichRecords(allRecords, categories), [allRecords, categories]);
+    const enrichedRecords = useMemo(() => enrichRecords(recordsState, categories), [recordsState, categories]);
 
     const filteredCategories = useMemo(
         (): ReportFundsExpendituresCategory[] => [...categories].sort((a, b) => a.name.localeCompare(b.name, 'uk')),
@@ -135,6 +141,24 @@ export const FundsExpenditureSection = () => {
     const isAddExpenseDisabled = summary.expenseCategories >= FUNDS_EXPENDITURES_TEXT.MAX_CATEGORIES_PER_TYPE;
 
     const currentExchangeRate = isEditing ? exchangeRateValue : (settings?.exchangeRate ?? null);
+
+    const handleRecordSave = useCallback(
+        (recordId: number, data: { categoryId: number; amountUah: string; amountUsd: string }) => {
+            setRecordsState((prev) =>
+                prev.map((record) =>
+                    record.id === recordId
+                        ? {
+                              ...record,
+                              categoryId: data.categoryId,
+                              amountUah: data.amountUah,
+                              amountUsd: data.amountUsd,
+                          }
+                        : record,
+                ),
+            );
+        },
+        [],
+    );
 
     return (
         <div className={styles.section}>
@@ -205,6 +229,7 @@ export const FundsExpenditureSection = () => {
                 selectedCategoryId={selectedCategoryId}
                 exchangeRate={currentExchangeRate}
                 isEditing={isEditing}
+                controlsDisabled={isRowEditMode}
                 isAddIncomeDisabled={isAddIncomeDisabled}
                 isAddExpenseDisabled={isAddExpenseDisabled}
                 onTypeChange={handleTypeChange}
@@ -214,7 +239,14 @@ export const FundsExpenditureSection = () => {
                 onAddExpense={() => {}}
             />
 
-            <FundsExpendituresTable records={filteredRecords} isEditing={isEditing} />
+            <FundsExpendituresTable
+                records={filteredRecords}
+                categories={filteredCategories}
+                allRecordsForTypeInference={recordsState}
+                isEditing={isEditing}
+                onRowEditModeChange={setIsRowEditMode}
+                onRecordSave={handleRecordSave}
+            />
 
             {isEditing && (
                 <div className={styles['section-footer']}>
@@ -225,7 +257,7 @@ export const FundsExpenditureSection = () => {
                         buttonStyle="primary"
                         className={styles['footer-button']}
                         onClick={() => {}}
-                        disabled={!isPublishEnabled}
+                        disabled={!isPublishEnabled || isRowEditMode}
                     >
                         {FUNDS_EXPENDITURES_TEXT.BUTTON.PUBLISH}
                     </Button>

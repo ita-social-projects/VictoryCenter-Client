@@ -165,4 +165,10 @@ export const FUNDS_EXPENDITURES_TEXT = {
             ALT_TEXT: 'Записів не знайдено',
         },
     },
+    VALIDATION: {
+        CATEGORY_UNIQUE: 'Категорія має бути унікальна',
+        AMOUNT_ONLY_NUMBER_GT_ZERO: 'Лише число > 0',
+        AMOUNT_MAX_DIGITS: "Не більше 11 цифр, 2 після ','",
+        AMOUNT_NOT_NEGATIVE: "Сума не може бути від'ємною",
+    },
 };

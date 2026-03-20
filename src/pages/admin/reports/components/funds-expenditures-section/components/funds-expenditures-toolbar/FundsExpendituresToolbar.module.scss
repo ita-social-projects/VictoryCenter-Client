@@ -75,11 +75,30 @@
         border-color: c.$blue-500;
         box-shadow: 0 0 0 2px rgba(c.$blue-500, 0.2);
     }
+
+    &:disabled {
+        background-color: c.$grey-600;
+        border: 1px solid c.$bluish-black;
+        color: c.$blue-900;
+        cursor: not-allowed;
+        box-shadow: none;
+        opacity: 1;
+        -webkit-text-fill-color: c.$blue-900;
+    }
+}
+
+.exchange-rate-input-disabled {
+    background-color: c.$grey-600;
+    border: 1px solid c.$bluish-black;
+    color: c.$blue-900;
+    box-shadow: none;
+    opacity: 1;
+    -webkit-text-fill-color: c.$blue-900;
 }
 
 .filter-select {
     :global(.select-head) {
-        border: 1px solid #e55345;
+        border: 1px solid c.$error;
         border-radius: 12px;
         padding: 8px 10px;
         height: 60px;
@@ -89,7 +108,7 @@
         color: c.$blue-900;
 
         &:hover {
-            background-color: rgba(229, 83, 69, 0.06);
+            background-color: rgba(c.$error, 0.06);
         }
     }
 
@@ -103,6 +122,23 @@
     }
 }
 
+.filter-select-disabled {
+    opacity: 1;
+    pointer-events: none;
+
+    :global(.select-head) {
+        background-color: rgba(c.$black, 0.04);
+        border-color: c.$grey-700;
+        color: c.$grey-700;
+    }
+
+    :global(.select-head svg),
+    :global(.select-head svg path) {
+        fill: c.$grey-700;
+        stroke: c.$grey-700;
+    }
+}
+
 .filter-option {
     @include type.small-text-regular;
     line-height: 17px;
@@ -113,7 +149,7 @@
     height: auto;
 
     &:global(.select-options-selected) {
-        background: rgba(c.$blue-500, 0.17);
+        background-color: rgba(c.$blue-500, 0.17);
     }
 }
 
@@ -124,8 +160,8 @@
     flex-wrap: wrap;
 }
 
-.add-income-button,
-.add-expense-button {
+.editing-actions .add-income-button,
+.editing-actions .add-expense-button {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -142,8 +178,8 @@
         transform 0.15s ease;
 
     &:not(:disabled):hover {
-        background-color: c.$yellow-500 !important;
-        color: c.$blue-900 !important;
+        background-color: c.$yellow-500;
+        color: c.$blue-900;
         box-shadow: 0 4px 14px rgba(c.$yellow-500, 0.5);
         transform: translateY(-1px);
 
@@ -153,26 +189,41 @@
     }
 
     &:not(:disabled):active {
-        background-color: c.$yellow-600 !important;
-        color: c.$blue-900 !important;
+        background-color: c.$yellow-600;
+        color: c.$blue-900;
         box-shadow: 0 2px 6px rgba(c.$yellow-500, 0.35);
         transform: translateY(0);
     }
 
     &:disabled {
-        opacity: 0.5;
+        opacity: 1;
         cursor: not-allowed;
+        background: c.$grey-700;
+        color: c.$white;
+        box-shadow: none;
+
+        svg,
+        svg path {
+            fill: c.$white;
+            stroke: c.$white;
+        }
     }
 }
 
-.add-income-button {
-    width: 170px;
-    background-color: c.$blue-500 !important;
+.editing-actions .add-income-button.action-button-disabled-by-row-edit,
+.editing-actions .add-expense-button.action-button-disabled-by-row-edit {
+    background: c.$grey-700;
+    color: c.$white;
 }
 
-.add-expense-button {
+.editing-actions .add-income-button {
+    width: 170px;
+    background-color: c.$blue-500;
+}
+
+.editing-actions .add-expense-button {
     width: 126px;
-    background-color: #e55345 !important;
+    background-color: c.$error;
 }
 
 .plus-icon {

@@ -1,0 +1,90 @@
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
+import {
+    normalizeFundsExpendituresAmountInput,
+    validateFundsExpendituresAmount,
+    validateFundsExpendituresCategory,
+} from './funds-expenditures-record-schema';
+
+describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
+    describe('normalizeFundsExpendituresAmountInput', () => {
+        it('should trim leading spaces and normalize internal spaces', () => {
+            expect(normalizeFundsExpendituresAmountInput('   1   200   ,5')).toBe('1 200 ,5');
+        });
+
+        it('should trim trailing spaces when trimEnd is true', () => {
+            expect(normalizeFundsExpendituresAmountInput('   1 200   ', true)).toBe('1 200');
+        });
+    });
+
+    describe('validateFundsExpendituresAmount', () => {
+        it('should return required error for empty value on blur', () => {
+            expect(validateFundsExpendituresAmount('   ', 'blur')).toBe(
+                COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED,
+            );
+        });
+
+        it('should return numeric error for non-digit input', () => {
+            expect(validateFundsExpendituresAmount('abc', 'change')).toBe(
+                FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER_GT_ZERO,
+            );
+        });
+
+        it('should return max digits error when integer part is too long', () => {
+            expect(validateFundsExpendituresAmount('123456789012', 'change')).toBe(
+                FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_MAX_DIGITS,
+            );
+        });
+
+        it('should return negative error for negative values', () => {
+            expect(validateFundsExpendituresAmount('-1', 'change')).toBe(
+                FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_NOT_NEGATIVE,
+            );
+        });
+
+        it('should pass valid value with comma decimals', () => {
+            expect(validateFundsExpendituresAmount('1 200,50', 'save')).toBeUndefined();
+        });
+    });
+
+    describe('validateFundsExpendituresCategory', () => {
+        const records = [
+            { id: 1, categoryId: 1, type: 'income' as const, reportingYear: '2025', amountUah: '1', amountUsd: '1' },
+            { id: 2, categoryId: 2, type: 'income' as const, reportingYear: '2024', amountUah: '1', amountUsd: '1' },
+        ];
+
+        it('should return required error for undefined category on blur', () => {
+            expect(
+                validateFundsExpendituresCategory({
+                    recordId: 1,
+                    recordType: 'income',
+                    categoryId: undefined,
+                    records,
+                    trigger: 'blur',
+                }),
+            ).toBe(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED);
+        });
+
+        it('should return unique error for duplicate category in same type', () => {
+            expect(
+                validateFundsExpendituresCategory({
+                    recordId: 1,
+                    recordType: 'income',
+                    categoryId: 2,
+                    records,
+                }),
+            ).toBe(FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE);
+        });
+
+        it('should pass for unique category', () => {
+            expect(
+                validateFundsExpendituresCategory({
+                    recordId: 1,
+                    recordType: 'income',
+                    categoryId: 3,
+                    records,
+                }),
+            ).toBeUndefined();
+        });
+    });
+});

@@ -142,14 +142,10 @@ const PartnerSectionComponent = ({
             return false;
         }
 
-        const partnerErrors = errors.partners || [];
-        const hasPartnerErrors = value.partners.some((partner, index) => {
+        const hasPartnerErrors = value.partners.some((partner) => {
             const descError = PARTNER_VALIDATION_FUNCTIONS.validateDescription(partner.description);
             const hasImage = !!partner.image;
-            const imageError = partnerErrors[index]?.image;
-            const isStoredImage = !!partner.image && 'url' in partner.image;
-            const hasBlockingImageError = !!imageError && !isStoredImage;
-            return !!descError || !hasImage || hasBlockingImageError;
+            return !!descError || !hasImage;
         });
 
         return !hasPartnerErrors;

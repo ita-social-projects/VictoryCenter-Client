@@ -181,7 +181,7 @@ describe('PartnerForm', () => {
         };
 
         expect(onValuesChange).toHaveBeenCalledWith(
-            { ...defaultValues, image: newImage, imageId: defaultValues.imageId },
+            { ...defaultValues, image: newImage, imageId: null },
             { ...defaultErrors },
         );
     });
@@ -199,7 +199,7 @@ describe('PartnerForm', () => {
         };
 
         expect(onValuesChange).toHaveBeenCalledWith(
-            { ...defaultValues, image: newImage, imageId: defaultValues.imageId },
+            { ...defaultValues, image: newImage, imageId: null },
             { ...defaultErrors, image: undefined },
         );
     });

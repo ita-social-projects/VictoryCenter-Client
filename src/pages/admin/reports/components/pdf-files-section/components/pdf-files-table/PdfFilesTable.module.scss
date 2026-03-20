@@ -4,6 +4,7 @@
     overflow-x: auto;
     border-radius: 8px;
     margin-left: 10px;
+    margin-top: 30px;
     max-width: 1440px;
     border: 1px solid c.$grey-600;
 }
@@ -95,7 +96,6 @@
     font-weight: 500;
 }
 
-
 .icon-button {
     cursor: pointer;
     color: c.$blue-500;
@@ -122,7 +122,7 @@
         color: c.$blue-100;
     }
     &:active .eye-icon {
-        color: c.$blue-900; 
+        color: c.$blue-900;
     }
 }
 

@@ -1,5 +1,4 @@
 import { PDF_FILES_SECTION_TEXT } from '@/const/admin/reports';
-import { ReactComponent as EditIcon } from '@/assets/icons/edit-icon.svg';
 import styles from './PdfSectionContentBlock.module.scss';
 import cn from 'classnames';
 

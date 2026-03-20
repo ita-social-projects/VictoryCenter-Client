@@ -101,6 +101,13 @@ export const PDF_FILES_SECTION_TEXT = {
         },
         NO_FILES: 'PDF файли відсутні',
     },
+    DROPZONE: {
+        TITLE: 'Натисніть або перетягніть PDF файл сюди',
+        UPLOADING: 'Завантаження...',
+        SUBTITLE: 'Тільки формат pdf',
+        ERROR_INVALID_FORMAT: 'Дозволено лише PDF формат',
+        ERROR_UPLOAD_FAILED: 'Помилка при завантаженні файлу. Спробуйте ще раз.',
+    },
     ACTIONS: {
         EDIT: 'Редагувати основну інформацію',
         FILE: {

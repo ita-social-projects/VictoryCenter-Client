@@ -4,6 +4,16 @@ import { API_ROUTES } from '@/const/common/api-routes/main-api';
 import { PaginationResult } from '@/types/admin/common';
 
 export const PdfReportsApi = {
+    create: async (client: AxiosInstance, file: File): Promise<PdfReportDto> => {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await client.post<PdfReportDto>(API_ROUTES.PDF_REPORTS.BASE, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        return response.data;
+    },
+
     getAll: async (
         client: AxiosInstance,
         filter: { offset: number; limit: number },

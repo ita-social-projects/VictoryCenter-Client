@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { PdfSectionContentBlock } from './components/pdf-section-content-block/PdfSectionContentBlock';
 import { PdfFilesTable } from './components/pdf-files-table/PdfFilesTable';
 import styles from './PdfFilesSection.module.scss';
@@ -9,9 +9,11 @@ import { PdfReportDto } from '@/types/admin/pdf-section';
 import { PdfReportsApi } from '@/services/api/admin/reports/pdf-reports/pdf-reports-api';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
+import { PdfDropzone } from './components/pdf-dropzone/PdfDropzone';
 
 export const PdfFilesSection = () => {
     const client = useAdminClient();
+    const [uploadedFiles, setUploadedFiles] = useState<PdfReportDto[]>([]);
 
     const fetchSection = useCallback(async () => {
         return PdfSectionApi.getPdfSection(client);
@@ -28,11 +30,15 @@ export const PdfFilesSection = () => {
         autoFetchDependencies: [fetchSection],
     });
 
-    const { data: pdfFiles, isLoading: isFilesLoading } = useDataFetch<PdfReportDto[]>({
+    const { data: fetchedFiles, isLoading: isFilesLoading } = useDataFetch<PdfReportDto[]>({
         initialData: [],
         fetchHandler: fetchFiles,
         autoFetchDependencies: [fetchFiles],
     });
+
+    const handleUploaded = useCallback((newFile: PdfReportDto) => {
+        setUploadedFiles((prev) => [...prev, newFile]);
+    }, []);
 
     if (isSectionLoading || isFilesLoading) {
         return (
@@ -42,8 +48,6 @@ export const PdfFilesSection = () => {
         );
     }
 
-    // TODO: Implement handlers for actions with files
-
     return (
         <div className={styles.root}>
             <div className={styles['top-section']}>
@@ -52,7 +56,8 @@ export const PdfFilesSection = () => {
             <div className={styles['language-switcher-container']}>
                 <LanguageSwitcherButtons />
             </div>
-            <PdfFilesTable files={pdfFiles} onViewFile={() => {}} />
+            <PdfDropzone onUploaded={handleUploaded} />
+            <PdfFilesTable files={[...fetchedFiles, ...uploadedFiles]} onViewFile={() => {}} />
         </div>
     );
 };

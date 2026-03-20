@@ -1,9 +1,9 @@
 import { fetchProgramBySlug } from '@/services/api/public/programs/programs-api';
-import { DetailedProgram } from '@/types/public/programs-page';
+import { DetailedProgramDto } from '@/types/public/programs-page';
 import { useEffect, useState } from 'react';
 
 export const useProgramBySlug = (slug?: string) => {
-    const [program, setProgram] = useState<DetailedProgram | null>(null);
+    const [program, setProgram] = useState<DetailedProgramDto | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
 

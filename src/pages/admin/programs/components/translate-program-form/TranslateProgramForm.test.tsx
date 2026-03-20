@@ -206,9 +206,33 @@ const COMPLEX_SOURCE_SECTION = {
             groupIndex: 0,
         },
         {
+            id: 305,
+            contentType: ContentType.Description,
+            order: 4,
+            title: null,
+            description: 'Pair description 2',
+            image: null,
+            author: null,
+            faqQuestion: null,
+            faqQuestionId: null,
+            groupIndex: 1,
+        },
+        {
+            id: 306,
+            contentType: ContentType.Author,
+            order: 5,
+            title: null,
+            description: null,
+            image: null,
+            author: 'Author 2',
+            faqQuestion: null,
+            faqQuestionId: null,
+            groupIndex: 1,
+        },
+        {
             id: 304,
             contentType: ContentType.FaqQuestion,
-            order: 3,
+            order: 6,
             title: null,
             description: null,
             image: null,
@@ -226,7 +250,9 @@ const COMPLEX_SECTION = {
     contents: [
         { entityId: 301, title: 'Translated pair title', languageId: 2 },
         { entityId: 302, description: 'Translated pair description', languageId: 2 },
+        { entityId: 305, description: 'Translated pair description 2', languageId: 2 },
         { entityId: 303, author: 'Translated author', languageId: 2 },
+        { entityId: 306, author: 'Translated author 2', languageId: 2 },
         { entityId: 304, question: 'Translated question', answer: 'Translated answer', languageId: 2 },
     ],
 } as CreateHippotherapyProgramSectionLocalizationDto & { __sourceSection: any };
@@ -247,6 +273,132 @@ const FIELD_IDS = {
     participantsCount: 'participantsCount',
     meetingCount: 'meetingCount',
 };
+
+const EDGE_SOURCE_SECTION = {
+    id: 77,
+    template: ProgramSectionTemplate.TextOnly,
+    order: 0,
+    contents: [
+        {
+            id: 3,
+            contentType: ContentType.Image,
+            order: 2,
+            image: { url: 'https://example.com/section-image.jpg' },
+            groupIndex: null,
+        },
+        {
+            id: 10,
+            contentType: ContentType.Image,
+            order: 1,
+            image: null,
+            groupIndex: null,
+        },
+        {
+            id: 2,
+            contentType: ContentType.Title,
+            order: 1,
+            title: 'Title B',
+            groupIndex: null,
+        },
+        {
+            id: 1,
+            contentType: ContentType.Title,
+            order: 0,
+            title: 'Title A',
+            groupIndex: null,
+        },
+        {
+            id: 5,
+            contentType: ContentType.Description,
+            order: 4,
+            description: 'Description B',
+            groupIndex: null,
+        },
+        {
+            id: 4,
+            contentType: ContentType.Description,
+            order: 3,
+            description: 'Description A',
+            groupIndex: null,
+        },
+        {
+            id: 6,
+            contentType: ContentType.Author,
+            order: 5,
+            author: 'Author A',
+            groupIndex: 0,
+        },
+        {
+            id: 7,
+            contentType: ContentType.Author,
+            order: 6,
+            author: 'Author B',
+            groupIndex: 1,
+        },
+        {
+            id: 8,
+            contentType: ContentType.FaqQuestion,
+            order: 7,
+            faqQuestionId: 1,
+            groupIndex: null,
+        },
+        {
+            id: 9,
+            contentType: ContentType.FaqQuestion,
+            order: 8,
+            faqQuestionId: 2,
+            groupIndex: 1,
+        },
+    ],
+};
+
+const EDGE_SECTION = {
+    entityId: 77,
+    __sourceSection: EDGE_SOURCE_SECTION,
+    contents: [
+        { entityId: 1, title: 'Localized title A', languageId: 2 },
+        { entityId: 2, title: 'Localized title B', languageId: 2 },
+        { entityId: 4, description: 'Localized description A', languageId: 2 },
+        { entityId: 5, description: 'Localized description B', languageId: 2 },
+        { entityId: 6, author: 'Localized author A', languageId: 2 },
+        { entityId: 7, author: 'Localized author B', languageId: 2 },
+        {
+            entityId: 8,
+            questionText: 'Question from questionText',
+            answerText: 'Answer from answerText',
+            languageId: 2,
+        },
+        { entityId: 9, question: 'Question direct', answer: 'Answer direct', languageId: 2 },
+    ],
+} as CreateHippotherapyProgramSectionLocalizationDto & { __sourceSection: any };
+
+const NOOP_SOURCE_SECTION = {
+    id: 88,
+    template: ProgramSectionTemplate.TextOnly,
+    order: 0,
+    contents: [
+        {
+            id: undefined,
+            contentType: ContentType.Title,
+            order: 0,
+            title: 'No id title',
+            groupIndex: null,
+        },
+        {
+            id: undefined,
+            contentType: ContentType.Description,
+            order: 1,
+            description: 'No id description',
+            groupIndex: null,
+        },
+    ],
+};
+
+const NOOP_SECTION = {
+    entityId: 88,
+    __sourceSection: NOOP_SOURCE_SECTION,
+    contents: [{ entityId: 999, title: 'Keep me', languageId: 2 }],
+} as CreateHippotherapyProgramSectionLocalizationDto & { __sourceSection: any };
 
 describe('TranslateProgramForm', () => {
     const renderForm = (props: any = {}) => {
@@ -453,5 +605,216 @@ describe('TranslateProgramForm', () => {
                 expect.objectContaining({ entityId: 304, answer: 'Localized FAQ answer' }),
             ]),
         );
+    });
+
+    it('uses default initial state when initialData is omitted', () => {
+        const { ref } = renderForm();
+
+        expect(screen.getByTestId(FIELD_IDS.name)).toHaveValue('');
+        expect(screen.getByTestId(FIELD_IDS.description)).toHaveValue('');
+        expect(screen.getByTestId(FIELD_IDS.location)).toHaveValue('');
+        expect(screen.getByTestId(FIELD_IDS.participantsCount)).toHaveValue('');
+        expect(screen.getByTestId(FIELD_IDS.meetingCount)).toHaveValue('');
+        expect(ref.current?.isDirty()).toBe(false);
+    });
+
+    it('updates all top-level fields through change handlers', () => {
+        renderForm({
+            initialData: {
+                name: TEST_DATA.name,
+                description: TEST_DATA.description,
+                location: TEST_DATA.location,
+                participantsCount: TEST_DATA.participants,
+                meetingCount: TEST_DATA.meetings,
+                sections: [],
+            },
+        });
+
+        fireEvent.change(screen.getByTestId(FIELD_IDS.description), { target: { value: 'Updated description' } });
+        fireEvent.change(screen.getByTestId(FIELD_IDS.location), { target: { value: 'Updated location' } });
+        fireEvent.change(screen.getByTestId(FIELD_IDS.participantsCount), { target: { value: '11' } });
+        fireEvent.change(screen.getByTestId(FIELD_IDS.meetingCount), { target: { value: '22' } });
+
+        expect(screen.getByTestId(FIELD_IDS.description)).toHaveValue('Updated description');
+        expect(screen.getByTestId(FIELD_IDS.location)).toHaveValue('Updated location');
+        expect(screen.getByTestId(FIELD_IDS.participantsCount)).toHaveValue('11');
+        expect(screen.getByTestId(FIELD_IDS.meetingCount)).toHaveValue('22');
+    });
+
+    it('renders placeholders when no images are provided', () => {
+        renderForm({
+            initialData: {
+                name: TEST_DATA.name,
+                description: TEST_DATA.description,
+                location: TEST_DATA.location,
+                participantsCount: TEST_DATA.participants,
+                meetingCount: TEST_DATA.meetings,
+                sections: [SAMPLE_SECTION],
+            },
+        });
+
+        expect(screen.queryByTestId('background-media')).not.toBeInTheDocument();
+        expect(screen.getByText(PROGRAMS_TEXT.FORM.LABEL.PREVIEW_IMAGE)).toBeInTheDocument();
+    });
+
+    it('covers non-pair card description path and faq fallbacks', async () => {
+        const onSubmit = jest.fn();
+        const { ref } = renderForm({
+            onSubmit,
+            initialData: {
+                name: TEST_DATA.name,
+                description: TEST_DATA.description,
+                location: TEST_DATA.location,
+                participantsCount: TEST_DATA.participants,
+                meetingCount: TEST_DATA.meetings,
+                sections: [EDGE_SECTION],
+            },
+        });
+
+        fireEvent.change(screen.getByTestId('section-0-description'), {
+            target: { value: 'Single description value' },
+        });
+        fireEvent.click(screen.getByTestId('section-0-card-description-change'));
+        fireEvent.click(screen.getByTestId('section-0-card-author-change'));
+        fireEvent.click(screen.getByTestId('section-0-faq-question-change'));
+        fireEvent.click(screen.getByTestId('section-0-faq-answer-change'));
+
+        await act(async () => {
+            await ref.current?.submit(VisibilityStatus.Draft);
+        });
+
+        const submitted = onSubmit.mock.calls[0][0];
+        expect(submitted.sections[0].contents).toEqual(
+            expect.arrayContaining([
+                expect.objectContaining({ entityId: 4, description: 'Card description value' }),
+                expect.objectContaining({ entityId: 6, author: 'Card author value' }),
+                expect.objectContaining({
+                    entityId: 8,
+                    question: 'Localized FAQ question',
+                    questionText: 'Localized FAQ question',
+                }),
+                expect.objectContaining({
+                    entityId: 8,
+                    answer: 'Localized FAQ answer',
+                    answerText: 'Localized FAQ answer',
+                }),
+            ]),
+        );
+    });
+
+    it('returns null editor when source section has no id and keeps section rendering stable', () => {
+        const sectionWithoutSourceId = {
+            entityId: 999,
+            __sourceSection: {
+                ...SOURCE_SECTION,
+                id: undefined,
+            },
+            contents: [{ entityId: 100, title: 'Translated title', languageId: 2 }],
+        } as CreateHippotherapyProgramSectionLocalizationDto & { __sourceSection: any };
+
+        renderForm({
+            initialData: {
+                name: TEST_DATA.name,
+                description: TEST_DATA.description,
+                location: TEST_DATA.location,
+                participantsCount: TEST_DATA.participants,
+                meetingCount: TEST_DATA.meetings,
+                sections: [sectionWithoutSourceId],
+            },
+        });
+
+        expect(screen.queryByTestId('section-editor')).not.toBeInTheDocument();
+    });
+
+    it('does not mutate contents when handler source ids are missing', async () => {
+        const onSubmit = jest.fn();
+        const { ref } = renderForm({
+            onSubmit,
+            initialData: {
+                name: TEST_DATA.name,
+                description: TEST_DATA.description,
+                location: TEST_DATA.location,
+                participantsCount: TEST_DATA.participants,
+                meetingCount: TEST_DATA.meetings,
+                sections: [NOOP_SECTION],
+            },
+        });
+
+        fireEvent.click(screen.getByTestId('section-0-card-title-change'));
+        fireEvent.click(screen.getByTestId('section-0-card-description-change'));
+        fireEvent.click(screen.getByTestId('section-0-faq-question-change'));
+        fireEvent.click(screen.getByTestId('section-0-faq-answer-change'));
+
+        await act(async () => {
+            await ref.current?.submit(VisibilityStatus.Draft);
+        });
+
+        const submitted = onSubmit.mock.calls[0][0];
+        expect(submitted.sections[0].contents).toEqual([{ entityId: 999, title: 'Keep me', languageId: 2 }]);
+    });
+
+    it('returns empty localized text when translation is missing for source content id', () => {
+        const missingTranslationSection = {
+            entityId: 66,
+            __sourceSection: {
+                id: 66,
+                template: ProgramSectionTemplate.TextOnly,
+                order: 0,
+                contents: [
+                    {
+                        id: 661,
+                        contentType: ContentType.Title,
+                        order: 0,
+                        title: 'Needs translation',
+                        groupIndex: null,
+                    },
+                ],
+            },
+            contents: [],
+        } as CreateHippotherapyProgramSectionLocalizationDto & { __sourceSection: any };
+
+        renderForm({
+            initialData: {
+                name: TEST_DATA.name,
+                description: TEST_DATA.description,
+                location: TEST_DATA.location,
+                participantsCount: TEST_DATA.participants,
+                meetingCount: TEST_DATA.meetings,
+                sections: [missingTranslationSection],
+            },
+        });
+
+        expect(screen.getByTestId('section-0-title')).toHaveValue('');
+    });
+
+    it('updates target section without mutating other sections', async () => {
+        const onSubmit = jest.fn();
+        const untouchedSection = {
+            entityId: 9999,
+            __sourceSection: SOURCE_SECTION,
+            contents: [{ entityId: 100, title: 'Untouched title', languageId: 2 }],
+        } as CreateHippotherapyProgramSectionLocalizationDto & { __sourceSection: any };
+
+        const { ref } = renderForm({
+            onSubmit,
+            initialData: {
+                name: TEST_DATA.name,
+                description: TEST_DATA.description,
+                location: TEST_DATA.location,
+                participantsCount: TEST_DATA.participants,
+                meetingCount: TEST_DATA.meetings,
+                sections: [SAMPLE_SECTION, untouchedSection],
+            },
+        });
+
+        fireEvent.change(screen.getAllByTestId('section-0-title')[0], { target: { value: 'Changed first section' } });
+
+        await act(async () => {
+            await ref.current?.submit(VisibilityStatus.Draft);
+        });
+
+        const submitted = onSubmit.mock.calls[0][0];
+        expect(submitted.sections[0].contents[0]).toMatchObject({ title: 'Changed first section' });
+        expect(submitted.sections[1].contents[0]).toMatchObject({ title: 'Untouched title' });
     });
 });

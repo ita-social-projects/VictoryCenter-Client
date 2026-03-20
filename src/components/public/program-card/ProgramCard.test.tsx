@@ -10,6 +10,7 @@ jest.mock('@/assets/icons/arrow-up-right.svg', () => ({
 const mockNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({
     useNavigate: () => mockNavigate,
+    useLocation: () => ({ pathname: '/', search: '' }),
 }));
 
 jest.mock('@/const/public/routes', () => ({
@@ -38,6 +39,7 @@ describe('ProgramCard', () => {
             { id: 2, name: 'Category 2' },
         ],
         slug: 'program-a',
+        localizations: [],
     };
 
     it('renders program name, categories, and description', () => {

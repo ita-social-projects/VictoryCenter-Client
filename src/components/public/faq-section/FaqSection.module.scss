@@ -29,11 +29,10 @@
 
     @media (min-width: 768px) {
         flex-direction: row;
-        
     }
 
     @media (min-width: 1440px) {
-       justify-content: space-between; 
+        justify-content: space-between;
     }
 }
 
@@ -43,7 +42,7 @@
     color: c.$blue-900;
     word-wrap: break-word;
 
-    @media(min-width: 768px) {
+    @media (min-width: 768px) {
         flex: 0 0 41%;
     }
 

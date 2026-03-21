@@ -125,7 +125,6 @@ export function mapFormValuesToCompanyProfilePatch(
     const ukLanguageId = getLanguageIdByCode(languages, 'uk');
     const enLanguageId = getLanguageIdByCode(languages, 'en');
 
-    // Basic trim (do not remove inner spaces).
     const phone = (formValues.phone ?? '').trim();
     const email = (formValues.email ?? '').trim();
     const correspondenceEmail = (formValues.correspondenceEmail ?? '').trim();
@@ -141,7 +140,6 @@ export function mapFormValuesToCompanyProfilePatch(
 
     const edrpou = (formValues.companyRegistrationNumber ?? '').trim();
 
-    // Prefer using requisites-specific fields if present (to avoid collision).
     const requisitesAddressUk = ((formValues.addressUa_requisites ?? '') || '').trim();
     const requisitesAddressEn = ((formValues.addressEn_requisites ?? '') || '').trim();
 

@@ -18,6 +18,7 @@ const mockCanvas = {
 };
 
 const originalCreateElement = document.createElement;
+let resizeObserverCallback: ResizeObserverCallback | null = null;
 
 beforeAll(() => {
     document.createElement = (tagName: keyof HTMLElementTagNameMap | string) => {
@@ -30,6 +31,18 @@ beforeAll(() => {
 
 afterAll(() => {
     document.createElement = originalCreateElement;
+});
+
+beforeEach(() => {
+    resizeObserverCallback = null;
+    global.ResizeObserver = jest.fn().mockImplementation((callback: ResizeObserverCallback) => {
+        resizeObserverCallback = callback;
+        return {
+            observe: jest.fn(),
+            disconnect: jest.fn(),
+            unobserve: jest.fn(),
+        };
+    }) as typeof ResizeObserver;
 });
 
 jest.mock('react-image-crop', () => {
@@ -128,6 +141,20 @@ const mockImageLoad = (element: HTMLImageElement | null) => {
         naturalHeight: { value: 400, writable: true },
         width: { value: 450, writable: true },
         height: { value: 300, writable: true },
+    });
+    fireEvent.load(element);
+};
+
+const mockImageLoadWithDimensions = (
+    element: HTMLImageElement | null,
+    dimensions: { naturalWidth: number; naturalHeight: number; width: number; height: number },
+) => {
+    if (!element) return;
+    Object.defineProperties(element, {
+        naturalWidth: { value: dimensions.naturalWidth, writable: true },
+        naturalHeight: { value: dimensions.naturalHeight, writable: true },
+        width: { value: dimensions.width, writable: true },
+        height: { value: dimensions.height, writable: true },
     });
     fireEvent.load(element);
 };
@@ -293,6 +320,30 @@ describe('CropModal', () => {
         expect(defaultProps.onCancel).not.toHaveBeenCalled();
     });
 
+    it('Does not initialize crop when image dimensions are missing', async () => {
+        render(<CropModal {...defaultProps} />);
+        const imgElement = screen.getByAltText('Crop target') as HTMLImageElement;
+
+        mockImageLoadWithDimensions(imgElement, {
+            naturalWidth: 0,
+            naturalHeight: 0,
+            width: 0,
+            height: 0,
+        });
+
+        await waitFor(() => {
+            expect(screen.getByTestId('react-crop-mock').dataset.crop).toBeUndefined();
+        });
+    });
+
+    it('Ignores crop changes before crop is initialized', () => {
+        render(<CropModal {...defaultProps} />);
+
+        fireEvent.click(screen.getByTestId('mock-crop-change'));
+
+        expect(screen.getByTestId('react-crop-mock').dataset.crop).toBeUndefined();
+    });
+
     it('Restricts crop movement within image bounds', async () => {
         render(<CropModal {...defaultProps} />);
         const imgElement = screen.getByAltText('Crop target');
@@ -322,6 +373,33 @@ describe('CropModal', () => {
         });
     });
 
+    it('Restricts crop movement to zero when dragged beyond top or left bounds', async () => {
+        render(<CropModal {...defaultProps} />);
+        const imgElement = screen.getByAltText('Crop target');
+        mockImageLoad(imgElement as HTMLImageElement);
+
+        await waitFor(() => {
+            expect(JSON.parse(screen.getByTestId('react-crop-mock').dataset.crop!).x).toBeCloseTo(112.5);
+        });
+
+        const reactCropElement = screen.getByTestId('react-crop-mock');
+        act(() => {
+            (reactCropElement as any).mockOnChange({
+                unit: 'px',
+                x: -50,
+                y: -40,
+                width: 225,
+                height: 150,
+            });
+        });
+
+        await waitFor(() => {
+            const cropData = JSON.parse(screen.getByTestId('react-crop-mock').dataset.crop!);
+            expect(cropData.x).toBe(0);
+            expect(cropData.y).toBe(0);
+        });
+    });
+
     it('Recalculates crop when image dimensions change on window resize', async () => {
         render(<CropModal {...defaultProps} />);
         const imgElement = screen.getByAltText('Crop target');
@@ -345,5 +423,89 @@ describe('CropModal', () => {
             expect(cropData.width).toBeCloseTo(150);
             expect(cropData.x).toBeCloseTo(75);
         });
+    });
+
+    it('Recalculates crop when image dimensions change after load without window resize', async () => {
+        render(<CropModal {...defaultProps} />);
+        const imgElement = screen.getByAltText('Crop target') as HTMLImageElement;
+
+        mockImageLoad(imgElement);
+
+        await waitFor(() => {
+            const cropData = JSON.parse(screen.getByTestId('react-crop-mock').dataset.crop!);
+            expect(cropData.width).toBeCloseTo(225);
+            expect(cropData.height).toBeCloseTo(150);
+        });
+
+        Object.defineProperties(imgElement, {
+            width: { value: 300, writable: true },
+            height: { value: 200, writable: true },
+        });
+
+        resizeObserverCallback?.([] as ResizeObserverEntry[], {} as ResizeObserver);
+
+        await waitFor(() => {
+            const cropData = JSON.parse(screen.getByTestId('react-crop-mock').dataset.crop!);
+            expect(cropData.width).toBeCloseTo(150);
+            expect(cropData.height).toBeCloseTo(100);
+            expect(cropData.x).toBeCloseTo(75);
+            expect(cropData.y).toBeCloseTo(50);
+        });
+    });
+
+    it('Recalculates crop on window resize when ResizeObserver is unavailable', async () => {
+        global.ResizeObserver = undefined as unknown as typeof ResizeObserver;
+
+        render(<CropModal {...defaultProps} />);
+        const imgElement = screen.getByAltText('Crop target') as HTMLImageElement;
+
+        mockImageLoad(imgElement);
+
+        await waitFor(() => {
+            const cropData = JSON.parse(screen.getByTestId('react-crop-mock').dataset.crop!);
+            expect(cropData.width).toBeCloseTo(225);
+        });
+
+        Object.defineProperties(imgElement, {
+            width: { value: 300, writable: true },
+            height: { value: 200, writable: true },
+        });
+
+        fireEvent.resize(window);
+
+        await waitFor(() => {
+            const cropData = JSON.parse(screen.getByTestId('react-crop-mock').dataset.crop!);
+            expect(cropData.width).toBeCloseTo(150);
+            expect(cropData.height).toBeCloseTo(100);
+        });
+    });
+
+    it('Ignores crop changes when image ref is cleared', async () => {
+        const { rerender } = render(<CropModal {...defaultProps} />);
+        const imgElement = screen.getByAltText('Crop target') as HTMLImageElement;
+
+        mockImageLoad(imgElement);
+
+        await waitFor(() => {
+            expect(JSON.parse(screen.getByTestId('react-crop-mock').dataset.crop!).width).toBeCloseTo(225);
+        });
+
+        const reactCropElement = screen.getByTestId('react-crop-mock');
+        const oldOnChange = (reactCropElement as any).mockOnChange;
+
+        rerender(<CropModal {...defaultProps} src={null} />);
+
+        act(() => {
+            oldOnChange({
+                unit: 'px',
+                x: 10,
+                y: 10,
+                width: 225,
+                height: 150,
+            });
+        });
+
+        expect(defaultProps.onChange).not.toHaveBeenCalled();
+        expect(screen.queryByTestId('react-crop-mock')).not.toBeInTheDocument();
     });
 });

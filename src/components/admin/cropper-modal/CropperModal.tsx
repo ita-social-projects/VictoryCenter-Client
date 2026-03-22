@@ -26,7 +26,6 @@ export const CropModal = ({ src, onChange, width, height, onCancel, isOpen }: Cr
     const imgRef = useRef<HTMLImageElement>(null);
     const [rawImage, setRawImage] = useState<ImageValues | Image | null>(null);
     const [naturalWidth, setNaturalWidth] = useState<number | null>(null);
-    const [renderedWidth, setRenderedWidth] = useState(0);
     const aspectRatio = width / height;
 
     useEffect(() => {
@@ -44,13 +43,11 @@ export const CropModal = ({ src, onChange, width, height, onCancel, isOpen }: Cr
 
     const recalculateCrop = useCallback(
         (img: HTMLImageElement) => {
-            if (!img) return;
+            const { naturalWidth: naturalImageWidth, width: currentRenderedWidth, height: currentRenderedHeight } = img;
 
-            const { naturalWidth, width: currentRenderedWidth, height: currentRenderedHeight } = img;
+            if (!currentRenderedWidth || !currentRenderedHeight || !naturalImageWidth) return;
 
-            setRenderedWidth(currentRenderedWidth);
-
-            const scaleX = currentRenderedWidth / naturalWidth;
+            const scaleX = currentRenderedWidth / naturalImageWidth;
 
             const displayCropWidth = width * scaleX;
             const displayCropHeight = height * scaleX;
@@ -83,17 +80,27 @@ export const CropModal = ({ src, onChange, width, height, onCancel, isOpen }: Cr
         if (!img) return;
 
         const handleResize = () => {
-            if (img.width !== renderedWidth) {
-                recalculateCrop(img);
-            }
+            recalculateCrop(img);
         };
 
         window.addEventListener('resize', handleResize);
 
+        let resizeObserver: ResizeObserver | null = null;
+
+        if (typeof ResizeObserver !== 'undefined') {
+            resizeObserver = new ResizeObserver(() => {
+                recalculateCrop(img);
+            });
+
+            resizeObserver.observe(img);
+            recalculateCrop(img);
+        }
+
         return () => {
+            resizeObserver?.disconnect();
             window.removeEventListener('resize', handleResize);
         };
-    }, [renderedWidth, aspectRatio, recalculateCrop]);
+    }, [naturalWidth, recalculateCrop]);
 
     const handleSubmit = () => {
         const cropToUse = completedCrop || crop;

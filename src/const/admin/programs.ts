@@ -262,12 +262,12 @@ export const PROGRAM_VALIDATION = {
         getAtLeastOneRequiredError: () => 'Потрібно обрати хоча б одну категорію',
     },
     previewImage: {
-        width: 440,
-        height: 480,
-        cropWidth: 440,
-        cropHeight: 480,
-        minWidth: 440,
-        minHeight: 480,
+        width: 480,
+        height: 440,
+        cropWidth: 480,
+        cropHeight: 440,
+        minWidth: 480,
+        minHeight: 440,
         getRequiredWhenPublishingError: () => 'Фото обов’язкове при публікації',
     },
     backgroundImage: {

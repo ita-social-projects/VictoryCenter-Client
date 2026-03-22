@@ -81,7 +81,7 @@ export const InputWithCharacterLimit = ({
                 id={id}
                 disabled={disabled}
                 placeholder={placeholder}
-                aria-describedby={showCounter ? countId : undefined}
+                aria-describedby={countId}
                 aria-invalid={hasError || currentLength > maxLength}
             />
             <button

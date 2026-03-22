@@ -40,11 +40,11 @@ describe('InputWithCharacterLimit', () => {
         expect(getCharacterCounter(4, 50)).toBeInTheDocument();
     });
 
-    it('does not render character counter when showCounter is false', () => {
+    it('does not render character counter when showCounter is false and keeps aria-describedby linked to countId', () => {
         renderInputWithCharacterLimit({ showCounter: false });
 
         expect(screen.queryByText('0/50')).not.toBeInTheDocument();
-        expect(getInput()).not.toHaveAttribute('aria-describedby');
+        expect(getInput()).toHaveAttribute('aria-describedby', 'test-id-character-count');
     });
 
     it('renders correct placeholder and input type', () => {

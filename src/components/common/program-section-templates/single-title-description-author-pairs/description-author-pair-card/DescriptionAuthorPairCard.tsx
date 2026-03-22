@@ -131,6 +131,7 @@ export const DescriptionAuthorPairCard = ({
                         placeholder={PROGRAMS_TEXT.SECTION.CARD.FORM.AUTHOR.PLACEHOLDER}
                         error={authorError}
                         maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(authorMaxLength)}
+                        showCounterBelow={true}
                     />
                 </div>
             </div>

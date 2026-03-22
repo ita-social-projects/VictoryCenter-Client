@@ -19,6 +19,7 @@ export interface InputWithCharacterLimitProps {
     hasError?: boolean;
     maxLimitWarning?: string;
     onWarningChange?: (warning: string | null) => void;
+    showCounter?: boolean;
 }
 
 export const InputWithCharacterLimit = ({
@@ -36,6 +37,7 @@ export const InputWithCharacterLimit = ({
     hasError = false,
     maxLimitWarning,
     onWarningChange,
+    showCounter = true,
 }: InputWithCharacterLimitProps) => {
     const {
         isFocused,
@@ -95,9 +97,11 @@ export const InputWithCharacterLimit = ({
             >
                 <RemoveIcon />
             </button>
-            <output id={countId} className="char-limit-input__counter">
-                {currentLength}/{maxLength}
-            </output>
+            {showCounter && (
+                <output id={countId} className="char-limit-input__counter">
+                    {currentLength}/{maxLength}
+                </output>
+            )}
         </div>
     );
 };

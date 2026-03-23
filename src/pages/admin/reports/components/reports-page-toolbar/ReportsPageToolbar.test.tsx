@@ -1,11 +1,17 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { ReportsPageToolbar, REPORTS_TOOLBAR_TABS } from './ReportsPageToolbar';
+import { ReportsPageToolbar, REPORTS_TOOLBAR_TABS, ReportsToolbarTab } from './ReportsPageToolbar';
+import { CategoryBarProps } from '@/components/admin/category-bar/CategoryBar';
 
 jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
-    CategoryBar: ({ categories, selectedCategory, getCategoryDisplayName, onCategorySelect }: any) => (
+    CategoryBar: ({
+        categories,
+        selectedCategory,
+        getCategoryDisplayName,
+        onCategorySelect,
+    }: CategoryBarProps<ReportsToolbarTab>) => (
         <div data-testid="mock-category-bar">
-            {categories.map((cat: any) => (
+            {categories.map((cat: ReportsToolbarTab) => (
                 <button
                     key={cat.id}
                     data-testid={`tab-${cat.id}`}

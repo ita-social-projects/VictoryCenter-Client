@@ -359,7 +359,7 @@ describe('ReportsMediaBlock', () => {
             );
         });
 
-        it('should preserve imageId when new image is uploaded and imageId exists', () => {
+        it('should clear imageId when new image is uploaded (pending upload replaces server image)', () => {
             const valuesWithImageId: ReportsMediaBlockValues = {
                 ...defaultValues,
                 imageId: 10,
@@ -372,7 +372,7 @@ describe('ReportsMediaBlock', () => {
                 {
                     ...valuesWithImageId,
                     image: { base64: 'data:image/png;base64,abc123', mimeType: 'image/png' },
-                    imageId: 10,
+                    imageId: null,
                 },
                 { image: undefined },
             );

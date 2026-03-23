@@ -69,8 +69,8 @@ jest.mock('./MediaSettings.module.scss', () => ({
     'error-button': 'error-button',
 }));
 
-jest.mock('@/assets/images/public/reports-page/collected.jpg', () => 'collected.jpg');
-jest.mock('@/assets/images/public/reports-page/lives-changed.jpg', () => 'lives-changed.jpg');
+jest.mock('@/assets/images/collected.webp', () => 'collected.webp');
+jest.mock('@/assets/images/man-facing-horse-forehead.webp', () => 'man-facing-horse-forehead.webp');
 
 const mockedUseDataFetch = useDataFetch as jest.Mock;
 const mockedReportsApi = ReportsApi as jest.Mocked<typeof ReportsApi>;
@@ -87,7 +87,6 @@ describe('MediaSettings', () => {
     const defaultMediaSettingsData = {
         collectedFunds: {
             title: 'Зібрано коштів',
-            collectedFunds: 250000,
             image: { id: 1, url: 'collected-image.jpg', mimeType: 'image/jpeg' },
             imageId: 1,
         },
@@ -236,7 +235,7 @@ describe('MediaSettings', () => {
 
             expect(collectedFundsBlockProps).not.toBeNull();
             expect(collectedFundsBlockProps!.values.title).toBe('Зібрано коштів');
-            expect(collectedFundsBlockProps!.values.totalAmount).toBe(250000);
+            expect(collectedFundsBlockProps!.values.totalAmount).toBe(0);
             expect(collectedFundsBlockProps!.windowTitle).toBe(REPORTS_TEXT.FORM.LABEL.COLLECTED_FUNDS_WINDOW);
             expect(collectedFundsBlockProps!.descriptionTitle).toBe(REPORTS_TEXT.FORM.LABEL.COLLECTED_FUNDS);
             expect(collectedFundsBlockProps!.isValueEditable).toBe(false);
@@ -422,13 +421,15 @@ describe('MediaSettings', () => {
                 expect.objectContaining({
                     collectedFunds: expect.objectContaining({
                         title: 'Зібрано коштів',
-                        collectedFunds: 250000,
                     }),
                     changedLives: expect.objectContaining({
                         title: 'Змінено життів',
                         changedLives: 56,
                     }),
                 }),
+            );
+            expect(mockedReportsApi.updateMediaSettings.mock.calls[0][1].collectedFunds).not.toHaveProperty(
+                'collectedFunds',
             );
         });
 
@@ -457,7 +458,7 @@ describe('MediaSettings', () => {
                 await ref.current?.submit();
             });
 
-            expect(mockedFetchDefaultImage).toHaveBeenCalledWith('collected.jpg', 600, 500);
+            expect(mockedFetchDefaultImage).toHaveBeenCalledWith('collected.webp', 600, 500);
         });
 
         it('should fetch default image for changed lives when no image and no imageId', async () => {
@@ -485,7 +486,7 @@ describe('MediaSettings', () => {
                 await ref.current?.submit();
             });
 
-            expect(mockedFetchDefaultImage).toHaveBeenCalledWith('lives-changed.jpg', 280, 890);
+            expect(mockedFetchDefaultImage).toHaveBeenCalledWith('man-facing-horse-forehead.webp', 280, 890);
         });
 
         it('should not fetch default image when image exists', async () => {
@@ -526,7 +527,7 @@ describe('MediaSettings', () => {
             });
 
             expect(mockedFetchDefaultImage).not.toHaveBeenCalledWith(
-                'collected.jpg',
+                'collected.webp',
                 expect.any(Number),
                 expect.any(Number),
             );
@@ -536,7 +537,6 @@ describe('MediaSettings', () => {
             const updatedData = {
                 collectedFunds: {
                     title: 'Updated CF Title',
-                    collectedFunds: 500000,
                     image: { id: 3, url: 'new-cf.jpg', mimeType: 'image/jpeg' },
                     imageId: 3,
                 },
@@ -556,7 +556,7 @@ describe('MediaSettings', () => {
             });
 
             expect(collectedFundsBlockProps!.values.title).toBe('Updated CF Title');
-            expect(collectedFundsBlockProps!.values.totalAmount).toBe(500000);
+            expect(collectedFundsBlockProps!.values.totalAmount).toBe(0);
             expect(changedLivesBlockProps!.values.title).toBe('Updated CL Title');
             expect(changedLivesBlockProps!.values.totalAmount).toBe(100);
         });
@@ -580,7 +580,6 @@ describe('MediaSettings', () => {
                     initialData: expect.objectContaining({
                         collectedFunds: expect.objectContaining({
                             title: '',
-                            collectedFunds: 0,
                         }),
                         changedLives: expect.objectContaining({
                             title: '',

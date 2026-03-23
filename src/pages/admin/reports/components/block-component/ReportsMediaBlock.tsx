@@ -1,6 +1,5 @@
 import { Image, ImageValues } from '@/types/common/image';
 import { useCallback } from 'react';
-import cn from 'classnames';
 import styles from './ReportsMediaBlock.module.scss';
 import { InputError } from '@/components/admin/input-error/InputError';
 import { REPORTS_TEXT } from '@/const/admin/reports';
@@ -88,10 +87,7 @@ export const ReportsMediaBlock = ({
 
     const handleImageChange = useCallback(
         (value: ImageValues | null) => {
-            onValuesChange(
-                { ...values, image: value, imageId: value ? values.imageId : null },
-                { ...errors, image: undefined },
-            );
+            onValuesChange({ ...values, image: value, imageId: null }, { ...errors, image: undefined });
         },
         [onValuesChange, values, errors],
     );
@@ -103,8 +99,6 @@ export const ReportsMediaBlock = ({
         },
         [onValuesChange, values, errors],
     );
-
-    const isDisabled = true;
 
     return (
         <div className={styles.root}>
@@ -132,7 +126,7 @@ export const ReportsMediaBlock = ({
                         />
                     </div>
 
-                    <div className={cn(styles['total-amount-input'], isDisabled && !isValueEditable)}>
+                    <div className={styles['total-amount-input']}>
                         <TextAreaWithCharacterLimitGroup
                             label={descriptionTitle}
                             id={`${windowTitle}-value`}
@@ -141,7 +135,7 @@ export const ReportsMediaBlock = ({
                             onChange={handleTotalAmountChange}
                             onBlur={handleTotalAmountBlur}
                             maxLength={totalAmountMaxLength}
-                            disabled={!isDisabled || !isValueEditable}
+                            disabled={!isValueEditable}
                             error={errors.totalAmount}
                             rows={1}
                             isRequired={true}
@@ -160,6 +154,8 @@ export const ReportsMediaBlock = ({
                             setError={handleImageError}
                             cropWidth={imageWidth}
                             cropHeight={imageHeight}
+                            minWidth={imageWidth}
+                            minHeight={imageHeight}
                             style={{
                                 backgroundImage: `
                                     linear-gradient(rgba(245, 245, 245, 0.85), rgba(245, 245, 245, 0.85)),

@@ -19,8 +19,8 @@ import {
     ReportsMediaBlockErrors,
     ReportsMediaBlock,
 } from '../block-component/ReportsMediaBlock';
-import CollectedFundsImage from '@/assets/images/public/reports-page/collected.jpg';
-import ChangedLivesImage from '@/assets/images/public/reports-page/lives-changed.jpg';
+import CollectedFundsImage from '@/assets/images/collected.webp';
+import ChangedLivesImage from '@/assets/images/man-facing-horse-forehead.webp';
 import styles from './MediaSettings.module.scss';
 import {
     REPORTS_COLLECTED_FUNDS_VALIDATION_FUNCTIONS,
@@ -54,7 +54,7 @@ const INITIAL_BLOCK_ERRORS: ReportsMediaBlockErrors = {};
 const syncValuesFromData = (data: ReportsMediaSettings) => ({
     collectedFunds: {
         title: data.collectedFunds.title ?? '',
-        totalAmount: data.collectedFunds.collectedFunds ?? 0,
+        totalAmount: 0,
         image: data.collectedFunds.image ?? null,
         imageId: data.collectedFunds.imageId ?? null,
     } satisfies ReportsMediaBlockValues,
@@ -86,7 +86,7 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
             refetch,
         } = useDataFetch<ReportsMediaSettings>({
             initialData: {
-                collectedFunds: { title: '', collectedFunds: 0, image: null, imageId: null },
+                collectedFunds: { title: '', image: null, imageId: null },
                 changedLives: { title: '', changedLives: 0, image: null, imageId: null },
             },
             fetchHandler: fetchMediaSettingsHandler,
@@ -156,7 +156,6 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
                 const updated = await ReportsApi.updateMediaSettings(client, {
                     collectedFunds: {
                         title: collectedFundsValues.title,
-                        collectedFunds: collectedFundsValues.totalAmount,
                         image: collectedFundsImage,
                         imageId: collectedFundsImageId,
                     },

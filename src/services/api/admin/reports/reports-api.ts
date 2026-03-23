@@ -30,7 +30,6 @@ export const ReportsApi = {
         const dto: UpdateReportsMediaSettingsDto = {
             collectedFundsBlock: {
                 title: request.collectedFunds.title,
-                collectedAmount: request.collectedFunds.collectedFunds,
                 imageId: finalImageIdCollectedFunds ?? null,
             },
             changedLivesBlock: {

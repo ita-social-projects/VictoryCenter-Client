@@ -16,7 +16,6 @@ export const mapReportsMediaSettingsCollectedFundsDtoToCollectedFunds = (
     dto: ReportsMediaSettingsCollectedFundsDto,
 ): ReportsMediaSettingsCollectedFunds => ({
     title: dto.title,
-    collectedFunds: dto.collectedAmount,
     image: dto.image,
     imageId: dto.image?.id ?? null,
 });

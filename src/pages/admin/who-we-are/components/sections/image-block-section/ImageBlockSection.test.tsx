@@ -58,6 +58,7 @@ jest.mock('@/validation/admin/who-we-are-schema/WhoWeAreSchema', () => ({
 describe('ImageSection', () => {
     let mockOnChange: jest.Mock;
     let mockOnPublish: jest.Mock;
+    let mockOnTranslate: jest.Mock;
 
     const titleLimit = 50;
     const descriptionLimit = 500;
@@ -101,6 +102,7 @@ describe('ImageSection', () => {
             descriptionLimit,
             onChange: mockOnChange,
             onPublish: mockOnPublish,
+            onTranslate: mockOnTranslate,
             imageInputProps: { style: { width: '100%' }, subText: '1000x800' },
             isPublishButtonActive: false,
             language: { id: 1, code: 'uk', name: 'Ukrainian' },
@@ -112,6 +114,7 @@ describe('ImageSection', () => {
     beforeEach(() => {
         mockOnChange = jest.fn();
         mockOnPublish = jest.fn();
+        mockOnTranslate = jest.fn();
         validateTextMock().mockReset();
         validateTextMock().mockReturnValue(undefined);
     });

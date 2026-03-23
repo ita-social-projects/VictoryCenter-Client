@@ -16,6 +16,7 @@ type OmittedProps =
     | 'content'
     | 'onChange'
     | 'onPublish'
+    | 'onTranslate'
     | 'setIsPublishButtonActive'
     | 'isPublishButtonActive'
     | 'language';

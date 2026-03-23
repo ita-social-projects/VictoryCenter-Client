@@ -48,6 +48,7 @@ export const SectionsWrapper = ({
         onPublish,
         isPublishButtonActive,
         language,
+        onTranslate: () => handleOnTranslateContent(section),
     };
 
     const contentConfigs: Record<SectionType, SectionConfig> = {
@@ -83,15 +84,6 @@ export const SectionsWrapper = ({
 
     return (
         <div className="who-we-are-main-section">
-            <div className="who-we-are-section-buttons">
-                <IconButton
-                    type="button"
-                    className="who-we-are-translate-btn"
-                    aria-label="Translate"
-                    onClick={() => handleOnTranslateContent(section)}
-                    DefaultIcon={ACTION_ICONS.translate.default}
-                />
-            </div>
             <Component {...commonProps} {...additionalProps} />
         </div>
     );

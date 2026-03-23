@@ -54,6 +54,7 @@ jest.mock('@/validation/admin/who-we-are-schema/WhoWeAreSchema', () => ({
 describe('DescriptionSection', () => {
     let mockOnChange: jest.Mock;
     let mockOnPublish: jest.Mock;
+    let mockOnTranslate: jest.Mock;
     const descriptionLimit = 500;
     const initialDescription = 'This is an initial test description.';
 
@@ -72,6 +73,7 @@ describe('DescriptionSection', () => {
         descriptionLimit,
         onChange: mockOnChange,
         onPublish: mockOnPublish,
+        onTranslate: mockOnTranslate,
         isPublishButtonActive: false,
         language: { id: 1, code: 'uk', name: 'Ukrainian' },
         ...overrides,
@@ -83,6 +85,7 @@ describe('DescriptionSection', () => {
     beforeEach(() => {
         mockOnChange = jest.fn();
         mockOnPublish = jest.fn();
+        mockOnTranslate = jest.fn();
         (WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText as jest.Mock).mockReturnValue(null);
     });
 

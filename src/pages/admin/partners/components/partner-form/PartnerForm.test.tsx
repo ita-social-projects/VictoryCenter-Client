@@ -181,8 +181,26 @@ describe('PartnerForm', () => {
         };
 
         expect(onValuesChange).toHaveBeenCalledWith(
-            { ...defaultValues, image: newImage, imageId: defaultValues.imageId },
+            { ...defaultValues, image: newImage, imageId: null },
             { ...defaultErrors },
+        );
+    });
+
+    it('clears image error on valid image change', () => {
+        renderComponent({
+            errors: { ...defaultErrors, image: 'Invalid image size' },
+        });
+
+        clickImageChange();
+
+        const newImage = {
+            base64: 'new-base64-image',
+            mimeType: 'image/png',
+        };
+
+        expect(onValuesChange).toHaveBeenCalledWith(
+            { ...defaultValues, image: newImage, imageId: null },
+            { ...defaultErrors, image: undefined },
         );
     });
 

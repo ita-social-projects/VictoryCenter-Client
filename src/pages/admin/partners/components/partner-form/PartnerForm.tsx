@@ -44,14 +44,17 @@ const PartnerFormComponent = ({ values, errors, disabled, onValuesChange, onDele
 
     const handleImageChange = useCallback(
         (value: ImageValues | null) => {
-            onValuesChange({ ...values, image: value, imageId: value ? values.imageId : null }, { ...errors });
+            onValuesChange({ ...values, image: value, imageId: null }, { ...errors, image: undefined });
         },
         [onValuesChange, values, errors],
     );
 
     const handleImageError = useCallback(
         (error: string | null) => {
-            onValuesChange({ ...values }, { ...errors, image: error ? error : undefined });
+            if (!error) {
+                return;
+            }
+            onValuesChange({ ...values }, { ...errors, image: error });
         },
         [onValuesChange, values, errors],
     );
@@ -84,7 +87,9 @@ const PartnerFormComponent = ({ values, errors, disabled, onValuesChange, onDele
                         onChange={handleImageChange}
                         setError={handleImageError}
                         disabled={disabled}
-                        enableCrop={false}
+                        enableCrop={true}
+                        cropWidth={PARTNER_VALIDATION.image.width}
+                        cropHeight={PARTNER_VALIDATION.image.height}
                         minWidth={PARTNER_VALIDATION.image.width}
                         minHeight={PARTNER_VALIDATION.image.height}
                         label={PARTNERS_TEXT.PARTNER.IMAGE_LABEL}

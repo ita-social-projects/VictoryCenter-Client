@@ -16,7 +16,7 @@ import { PARTNER_BANNER_VALIDATION_FUNCTIONS } from '@/validation/admin/partner-
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ImageInput } from '@/components/admin/image-input/ImageInput';
 import { InputError } from '@/components/admin/input-error/InputError';
-import BannerImage from '@/assets/images/public/partners-page/horses.png';
+import BannerImage from '@/assets/images/horses.webp';
 import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
 

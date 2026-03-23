@@ -8,16 +8,26 @@ import { Image } from '@/types/common/image';
 import { RichTextInputGroupProps } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
-    RichTextInputGroup: ({ label, onChange, value, maxLength, onBlur, id, error }: RichTextInputGroupProps) => (
+    RichTextInputGroup: ({
+        label,
+        onChange,
+        value,
+        maxLength,
+        onBlur,
+        id,
+        error,
+        disabled,
+    }: RichTextInputGroupProps & { disabled?: boolean }) => (
         <div>
             <label htmlFor={id}>{label}</label>
             <input
                 data-testid={`mock-rich-input-${id}`}
-                onChange={(e) => onChange(e.target.value)}
+                onChange={(e) => !disabled && onChange(e.target.value)}
                 value={value}
                 maxLength={maxLength}
                 onBlur={onBlur}
                 id={id}
+                disabled={disabled}
             />
             {error && <span>{error}</span>}
         </div>
@@ -25,11 +35,16 @@ jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGr
 }));
 
 jest.mock('@/components/admin/image-input/ImageInput', () => ({
-    ImageInput: ({ onChange, label, setError }: any) => (
+    ImageInput: ({ onChange, label, setError, disabled }: any) => (
         <div data-testid="mock-image-input">
             <label>{label}</label>
-            <input data-testid="mock-image-input-file" type="file" onChange={(e) => onChange(e.target.files?.[0])} />
-            <button onClick={() => setError('image size error')}>Set Error</button>
+            <input
+                data-testid="mock-image-input-file"
+                type="file"
+                disabled={disabled}
+                onChange={(e) => !disabled && onChange(e.target.files?.[0])}
+            />
+            <button onClick={() => !disabled && setError('image size error')}>Set Error</button>
         </div>
     ),
 }));
@@ -38,7 +53,6 @@ describe('CardContent', () => {
     let mockOnChange: jest.Mock;
     let mockOnDescriptionValidate: jest.Mock;
     let mockSetImageError: jest.Mock;
-    let mockSetIsPublishButtonActive: jest.Mock;
     const descriptionLimit = 250;
 
     const baseContent = {
@@ -52,6 +66,7 @@ describe('CardContent', () => {
         } as Image,
         title: null,
         imageId: 10,
+        localizations: [],
     };
 
     const renderComponent = (props = {}) => {
@@ -67,7 +82,7 @@ describe('CardContent', () => {
             descriptionError: null,
             imageError: null,
             setImageError: mockSetImageError,
-            setIsPublishButtonActive: mockSetIsPublishButtonActive,
+            language: { id: 1, code: 'uk', name: 'Ukrainian' },
         };
         return render(<CardContent {...baseProps} {...props} />);
     };
@@ -75,7 +90,6 @@ describe('CardContent', () => {
     beforeEach(() => {
         mockOnChange = jest.fn();
         mockSetImageError = jest.fn();
-        mockSetIsPublishButtonActive = jest.fn();
         mockOnDescriptionValidate = jest.fn();
     });
 
@@ -93,7 +107,7 @@ describe('CardContent', () => {
         expect(screen.queryByText('This is an image error message.')).not.toBeInTheDocument();
     });
 
-    it('should call onChange, onDescriptionValidate on change, and onDescriptionValidate on blur', () => {
+    it('should call onChange and onDescriptionValidate on change, and onDescriptionValidate on blur', () => {
         renderComponent();
         const descriptionInput = screen.getByTestId('mock-rich-input-1');
         const newDescription = 'New description text';
@@ -109,7 +123,7 @@ describe('CardContent', () => {
         expect(mockOnDescriptionValidate).toHaveBeenCalled();
     });
 
-    it('should call onChange, setIsPublishButtonActive on image change, and call setImageError', () => {
+    it('should call onChange on image change and setImageError on error', () => {
         renderComponent();
         const imageInputButton = screen.getByText('Set Error');
 
@@ -125,7 +139,6 @@ describe('CardContent', () => {
             ...baseContent,
             image: file,
         });
-        expect(mockSetIsPublishButtonActive).toHaveBeenCalledWith(true);
     });
 
     it('should display description error message when prop is provided', () => {
@@ -168,5 +181,23 @@ describe('CardContent', () => {
 
         const descriptionInput = screen.getByTestId('mock-rich-input-3');
         expect(descriptionInput).toHaveValue('');
+    });
+
+    it('should not allow edits when language is not the base locale', () => {
+        renderComponent({ language: { id: 2, code: 'en', name: 'English' } });
+
+        const descriptionInput = screen.getByTestId('mock-rich-input-1');
+        fireEvent.change(descriptionInput, { target: { value: 'Attempt edit' } });
+
+        expect(mockOnChange).not.toHaveBeenCalled();
+        expect(mockOnDescriptionValidate).not.toHaveBeenCalled();
+
+        const imageInput = screen.getByTestId('mock-image-input-file');
+        expect(imageInput).toBeDisabled();
+
+        const file = new File(['dummy'], 'file.png', { type: 'image/png' });
+        fireEvent.change(imageInput, { target: { files: [file] } });
+
+        expect(mockOnChange).not.toHaveBeenCalledWith(expect.objectContaining({ image: file }));
     });
 });

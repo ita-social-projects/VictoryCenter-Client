@@ -1,4 +1,4 @@
-@use '@/assets/sass/variables/colors';
+@use '@/assets/sass/variables/colors' as c;
 
 .category-extra {
     margin-left: 0.9375rem;
@@ -8,6 +8,7 @@
     align-items: center;
     justify-content: center;
     padding: 0.9375rem;
+    position: relative;
     border: none;
     background: transparent;
     font-size: 24px;
@@ -17,10 +18,20 @@
     transition: background-color 0.2s;
 
     &-selected {
-        border-bottom: 1px solid colors.$blue-900;
+        color: c.$blue-900;
+
+        &::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            width: 100%;
+            bottom: 0;
+            height: 2px;
+            background-color: c.$blue-900;
+        }
     }
 
     &:hover {
-        background-color: colors.$blue-50;
+        background-color: c.$blue-50;
     }
 }

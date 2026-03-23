@@ -18,7 +18,7 @@ interface TitleDescriptionCardsWrapperProps {
 export const TitleDescriptionCardsWrapper = ({
     cards,
     cardsCount,
-    mode = ProgramSectionMode.Published,
+    mode = ProgramSectionMode.View,
     onTitleChange,
     onDescriptionChange,
     validationResetKey,
@@ -26,7 +26,7 @@ export const TitleDescriptionCardsWrapper = ({
     return (
         <div
             className={cn(styles.container, {
-                [styles['container--editable']]: mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View,
+                [styles['container--editable']]: mode === ProgramSectionMode.Edit,
                 [styles['container--template']]: mode === ProgramSectionMode.Template,
                 [styles[`container--cards-${cardsCount}`]]: true,
             })}

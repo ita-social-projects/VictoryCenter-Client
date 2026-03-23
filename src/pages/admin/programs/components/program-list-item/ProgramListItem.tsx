@@ -1,18 +1,42 @@
 import { ButtonTooltip } from '@/components/admin/button-tooltip/ButtonTooltip';
 import { VisibilityStatusLabel } from '@/components/admin/visibility-status-label/VisibilityStatusLabel';
-import { Program } from '@/types/admin/programs';
+import { HippotherapyProgram, HippotherapyProgramLocalizableFields } from '@/types/admin/programs';
 import { VisibilityStatus } from '@/types/admin/common';
 import { ReactComponent as BlankImage } from '@/assets/icons/blank-image.svg';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import './ProgramListItem.scss';
+import { LocalizationLanguage } from '@/types/common/language';
+import { useEffect, useState } from 'react';
+import { returnDisplayedLocalization } from '@/utils/functions/localization/localization';
+import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
+import { IconButton } from '@/components/admin/icon-button/IconButton';
+import { ACTION_ICONS } from '@/const/common/action-icons';
 
 export interface ProgramListItemProps {
-    program: Program;
-    handleOnDeleteProgram: (program: Program) => void;
-    handleOnEditProgram: (program: Program) => void;
+    program: HippotherapyProgram;
+    language: LocalizationLanguage;
+    translationLanguages: LocalizationLanguage[];
+    handleOnDeleteProgram: (program: HippotherapyProgram) => void;
+    handleOnEditProgram: (program: HippotherapyProgram) => void;
+    handleOnTranslateProgram: (program: HippotherapyProgram) => void;
 }
 
-export const ProgramListItem = ({ program, handleOnDeleteProgram, handleOnEditProgram }: ProgramListItemProps) => {
+export const ProgramListItem = ({
+    program,
+    language,
+    translationLanguages,
+    handleOnDeleteProgram,
+    handleOnEditProgram,
+    handleOnTranslateProgram,
+}: ProgramListItemProps & { handleOnTranslateProgram: (program: HippotherapyProgram) => void }) => {
+    const [textFields, setTextFields] = useState<Partial<HippotherapyProgramLocalizableFields>>();
+    useEffect(() => {
+        const displayedLocalization = returnDisplayedLocalization(program, language.code);
+        setTextFields({
+            name: displayedLocalization?.name || program.name,
+            description: displayedLocalization?.description || program.description,
+        });
+    }, [language, program]);
     return (
         <div className="program-item">
             <div className="program-info">
@@ -22,10 +46,11 @@ export const ProgramListItem = ({ program, handleOnDeleteProgram, handleOnEditPr
                     ) : (
                         <BlankImage className="program-info-identity-blank-image" />
                     )}
-                    <p>{program.name}</p>
+                    <p>{textFields?.name || program.name}</p>
+                    <LocalizationStatuses languages={translationLanguages} localizedEntity={program} />
                 </div>
                 <div className="program-info-description">
-                    <p>{program.description}</p>
+                    <p>{textFields?.description || program.description}</p>
                 </div>
                 <div className="program-info-status">
                     <VisibilityStatusLabel status={program.status} />
@@ -45,17 +70,28 @@ export const ProgramListItem = ({ program, handleOnDeleteProgram, handleOnEditPr
                     </div>
                 </ButtonTooltip>
                 <div className="program-actions-buttons">
-                    <button
+                    <IconButton
+                        type="button"
+                        onClick={() => handleOnTranslateProgram(program)}
+                        className="translate-btn"
+                        aria-label="Translate"
+                        DefaultIcon={ACTION_ICONS.translate.default}
+                    />
+                    <IconButton
                         type="button"
                         onClick={() => handleOnEditProgram(program)}
                         className="edit-btn"
                         aria-label={`Edit ${program.name}`}
+                        DefaultIcon={ACTION_ICONS.edit.default}
+                        FilledIcon={ACTION_ICONS.edit.hover}
                     />
-                    <button
+                    <IconButton
                         type="button"
                         onClick={() => handleOnDeleteProgram(program)}
                         className="delete-btn"
                         aria-label={`Delete ${program.name}`}
+                        DefaultIcon={ACTION_ICONS.delete.default}
+                        FilledIcon={ACTION_ICONS.delete.hover}
                     />
                 </div>
             </div>

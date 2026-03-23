@@ -4,6 +4,7 @@ import { AboutUsContent } from '@/types/public/about-us-page';
 import styles from './SupportCard.module.scss';
 import cn from 'classnames';
 import { SafeHtml } from '@/components/common/safe-html';
+import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
 
 interface SupportCardProps {
     card: AboutUsContent;
@@ -16,7 +17,10 @@ export function SupportCard({ card, index }: SupportCardProps) {
 
     const imageUrl = card.image?.url ?? ABOUT_US_DATA.SUPPORT_DATA[index].IMG;
     const altText = supportData[index].ALT;
-    const description = card.description ?? '';
+
+    const { description } = useGetLocalization(card?.localizations, {
+        description: card?.description ?? '',
+    });
 
     return (
         <div className={cn(styles[`people-card`], styles[`card-${index + 1}`])}>

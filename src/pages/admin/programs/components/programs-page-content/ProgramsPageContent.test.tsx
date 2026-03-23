@@ -1,8 +1,8 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ProgramsPageContent } from './ProgramsPageContent';
-import { Program, ProgramCategory } from '@/types/admin/programs';
+import { HippotherapyProgram, HippotherapyProgramDto, ProgramCategory } from '@/types/admin/programs';
 import { VisibilityStatus } from '@/types/admin/common';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
@@ -10,7 +10,6 @@ import { ProgramsApi, ProgramsCategoriesApi } from '@/services/api/admin/program
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { ProgramsPageModalsProps } from '@/pages/admin/programs/components/programs-page-modals/ProgramsPageModals';
 import { InfiniteScrollListProps } from '@/components/admin/infinite-scroll-list/InfiniteScrollList';
-import { ProgramListItemProps } from '@/pages/admin/programs/components/program-list-item/ProgramListItem';
 import { AdminPanelToolbarProps } from '@/components/admin/admin-panel-toolbar/AdminPageToolbar';
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
@@ -23,10 +22,11 @@ jest.mock('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit', () =>
             { id: 1, code: 'uk', name: 'Українська' },
             { id: 2, code: 'en', name: 'Англійська' },
         ],
+        selectedLanguage: { id: 1, code: 'uk', name: 'Українська' },
+        translationStatusFilter: undefined,
         onLanguageChange: jest.fn(),
         onTranslationStatusFilterChange: jest.fn(),
         translationLanguages: [{ id: 1, code: 'en', name: 'Англійська' }],
-        language: { id: 1, code: 'uk', name: 'Українська' },
     }),
 }));
 
@@ -130,7 +130,7 @@ jest.mock('@/components/admin/infinite-scroll-list/InfiniteScrollList', () => ({
         hasMore,
         onLoadMore,
         emptyStateMessage,
-    }: InfiniteScrollListProps<Program>) => (
+    }: InfiniteScrollListProps<HippotherapyProgram>) => (
         <div data-testid="infinite-scroll-list">
             {isLoading && <div data-testid="loader">Loading</div>}
             {!isLoading && items.length === 0 && <div data-testid="empty">{emptyStateMessage}</div>}
@@ -145,9 +145,10 @@ jest.mock('@/components/admin/infinite-scroll-list/InfiniteScrollList', () => ({
 }));
 
 jest.mock('../program-list-item/ProgramListItem', () => ({
-    ProgramListItem: ({ program, handleOnEditProgram, handleOnDeleteProgram }: ProgramListItemProps) => (
+    ProgramListItem: ({ program, handleOnEditProgram, handleOnDeleteProgram, handleOnTranslateProgram }: any) => (
         <div>
             <span>{program.name}</span>
+            <button data-testid="translate-program" onClick={() => handleOnTranslateProgram(program)} />
             <button data-testid="edit-program" onClick={() => handleOnEditProgram(program)} />
             <button data-testid="delete-program" onClick={() => handleOnDeleteProgram(program)} />
         </div>
@@ -176,6 +177,27 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                             sections: [],
                             categories: [{ id: 1, name: 'Category A', programsCount: 2 }],
                             slug: 'new-program',
+                            localizations: [],
+                        })
+                    }
+                />
+                <button
+                    data-testid="trigger-translate"
+                    onClick={() =>
+                        props.onTranslateProgram({
+                            id: 10,
+                            name: 'To Translate',
+                            description: '',
+                            meetingsCount: '',
+                            participantsCount: '',
+                            location: '',
+                            previewImage: null,
+                            backgroundImage: null,
+                            status: VisibilityStatus.Draft,
+                            sections: [],
+                            categories: [{ id: 1, name: 'Category A', programsCount: 2 }],
+                            slug: 'alpha',
+                            localizations: [],
                         })
                     }
                 />
@@ -195,6 +217,7 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                             sections: [],
                             categories: [{ id: 1, name: 'Category A', programsCount: 2 }],
                             slug: 'draft-program',
+                            localizations: [],
                         })
                     }
                 />
@@ -214,6 +237,7 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                             sections: [],
                             categories: [{ id: 2, name: 'Category B', programsCount: 1 }],
                             slug: 'alpha-edited',
+                            localizations: [],
                         })
                     }
                 />
@@ -233,6 +257,7 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                             sections: [],
                             categories: [{ id: 1, name: 'Category A', programsCount: 2 }],
                             slug: 'alpha-edited-with-images',
+                            localizations: [],
                         } as any;
 
                         (globalThis as any).__lastEditedProgram = p;
@@ -255,6 +280,7 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                             sections: [],
                             categories: [{ id: 1, name: 'Category A', programsCount: 2 }],
                             slug: 'alpha-search-edited',
+                            localizations: [],
                         })
                     }
                 />
@@ -274,6 +300,7 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                             sections: [],
                             categories: [{ id: 1, name: 'Category A', programsCount: 2 }],
                             slug: 'alpha-edited',
+                            localizations: [],
                         })
                     }
                 />
@@ -293,6 +320,7 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                             sections: [],
                             categories: [{ id: 1, name: 'Category A', programsCount: 2 }],
                             slug: 'unknown-edited',
+                            localizations: [],
                         })
                     }
                 />
@@ -312,6 +340,7 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                             sections: [],
                             categories: [{ id: 1, name: 'Category A', programsCount: 2 }],
                             slug: 'alpha-draft',
+                            localizations: [],
                         })
                     }
                 />
@@ -331,6 +360,7 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                             sections: [],
                             categories: [{ id: 1, name: 'Category A', programsCount: 2 }],
                             slug: 'alpha',
+                            localizations: [],
                         })
                     }
                 />
@@ -374,7 +404,7 @@ const mockCategories: ProgramCategory[] = [
     { id: 2, name: 'Category B', programsCount: 1 },
 ];
 
-const mockPrograms: Program[] = [
+const mockProgramsDto: HippotherapyProgramDto[] = [
     {
         id: 10,
         name: 'Alpha',
@@ -388,6 +418,7 @@ const mockPrograms: Program[] = [
         sections: [],
         categories: [mockCategories[0]],
         slug: 'alpha',
+        localizations: [],
     },
     {
         id: 11,
@@ -402,6 +433,7 @@ const mockPrograms: Program[] = [
         sections: [],
         categories: [mockCategories[0]],
         slug: 'beta',
+        localizations: [],
     },
 ];
 
@@ -432,6 +464,7 @@ describe('ProgramsPageContent', () => {
                 1,
                 0,
                 5,
+                undefined,
                 VisibilityStatus.Published,
             );
         });
@@ -444,6 +477,7 @@ describe('ProgramsPageContent', () => {
             openAddItemModal: jest.fn(),
             openEditItemModal: jest.fn(),
             openDeleteItemModal: jest.fn(),
+            openTranslateItemModal: jest.fn(),
             openAddCategoryModal: jest.fn(),
             openEditCategoryModal: jest.fn(),
             openDeleteCategoryModal: jest.fn(),
@@ -453,6 +487,7 @@ describe('ProgramsPageContent', () => {
             closeAddItemModal: jest.fn(),
             closeEditItemModal: jest.fn(),
             closeDeleteItemModal: jest.fn(),
+            closeTranslateItemModal: jest.fn(),
             closeAddCategoryModal: jest.fn(),
             closeEditCategoryModal: jest.fn(),
             closeDeleteCategoryModal: jest.fn(),
@@ -466,6 +501,7 @@ describe('ProgramsPageContent', () => {
                 isDeleteCategoryModalOpen: false,
                 itemToEdit: null,
                 itemToDelete: null,
+                itemToTranslate: null,
             },
             isAnyModalOpened: false,
             openModalActions: openActions,
@@ -476,10 +512,10 @@ describe('ProgramsPageContent', () => {
 
         mockProgramsCategoriesApi.fetchProgramCategories.mockResolvedValue(mockCategories);
         mockProgramsApi.fetchPrograms.mockResolvedValue({
-            items: mockPrograms,
-            totalItemsCount: mockPrograms.length,
+            items: mockProgramsDto,
+            totalItemsCount: mockProgramsDto.length,
         });
-        mockProgramsApi.fetchProgramById.mockResolvedValue(mockPrograms[0]);
+        mockProgramsApi.fetchProgramById.mockResolvedValue(mockProgramsDto[0]);
         mockProgramsApi.fetchProgramSearchItems.mockResolvedValue({ items: [], totalItemsCount: 0 });
     });
 
@@ -629,8 +665,8 @@ describe('ProgramsPageContent', () => {
         });
 
         mockProgramsApi.fetchPrograms.mockResolvedValue({
-            items: mockPrograms,
-            totalItemsCount: mockPrograms.length,
+            items: mockProgramsDto,
+            totalItemsCount: mockProgramsDto.length,
         });
 
         fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN));
@@ -667,7 +703,7 @@ describe('ProgramsPageContent', () => {
             expect(screen.getByText(PROGRAMS_TEXT.MESSAGE.FAIL_TO_FETCH_PROGRAM)).toBeInTheDocument();
         });
 
-        mockProgramsApi.fetchProgramById.mockResolvedValue(mockPrograms[0]);
+        mockProgramsApi.fetchProgramById.mockResolvedValue(mockProgramsDto[0]);
         fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN));
 
         await waitFor(() => {
@@ -753,6 +789,19 @@ describe('ProgramsPageContent', () => {
         }
     });
 
+    it('opens translate flow and updates list when translation succeeds', async () => {
+        await renderAndWaitForPrograms();
+
+        // click translate button on first item
+        fireEvent.click(screen.getAllByTestId('translate-program')[0]);
+        // modal mock triggers translation via button
+        fireEvent.click(screen.getByTestId('trigger-translate'));
+
+        await waitFor(() => {
+            expect(screen.getByText('To Translate')).toBeInTheDocument();
+        });
+    });
+
     it('ignores edit when original program is not found in local lists', async () => {
         await renderAndWaitForPrograms();
 
@@ -785,8 +834,8 @@ describe('ProgramsPageContent', () => {
 
     it('deletes program from search view and exits search mode', async () => {
         mockProgramsApi.fetchPrograms
-            .mockResolvedValueOnce({ items: mockPrograms, totalItemsCount: mockPrograms.length })
-            .mockResolvedValueOnce({ items: [mockPrograms[1]], totalItemsCount: 1 });
+            .mockResolvedValueOnce({ items: mockProgramsDto, totalItemsCount: mockProgramsDto.length })
+            .mockResolvedValueOnce({ items: [mockProgramsDto[1]], totalItemsCount: 1 });
 
         render(<ProgramsPageContent />);
 
@@ -860,7 +909,14 @@ describe('ProgramsPageContent', () => {
         fireEvent.click(screen.getByTestId('category-2'));
 
         await waitFor(() => {
-            expect(mockProgramsApi.fetchPrograms).toHaveBeenCalledWith(expect.any(Object), 2, 0, 5, undefined);
+            expect(mockProgramsApi.fetchPrograms).toHaveBeenCalledWith(
+                expect.any(Object),
+                2,
+                0,
+                5,
+                undefined,
+                undefined,
+            );
         });
     });
 
@@ -888,7 +944,9 @@ describe('ProgramsPageContent', () => {
         fireEvent.click(screen.getAllByTestId('delete-program')[0]);
         expect(openActions.openDeleteItemModal).toHaveBeenCalledWith(expect.objectContaining({ id: 10 }));
 
-        global.dispatchEvent(new Event('resize'));
+        act(() => {
+            global.dispatchEvent(new Event('resize'));
+        });
 
         await waitFor(() => {
             expect(screen.getByTestId('programs-page-content')).toBeInTheDocument();
@@ -905,7 +963,7 @@ describe('ProgramsPageContent', () => {
         });
 
         mockProgramsApi.fetchPrograms.mockResolvedValueOnce({
-            items: mockPrograms,
+            items: mockProgramsDto,
             totalItemsCount: 2,
         });
 

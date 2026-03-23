@@ -372,6 +372,23 @@ describe('PartnerSectionForm', () => {
         expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
     });
 
+    it('keeps publish enabled when image error exists but stored image is unchanged', () => {
+        const errorsWithImageIssue = { ...defaultSectionErrors, partners: [{ image: 'Image too large' }] };
+
+        render(
+            <PartnerSectionForm
+                value={defaultSectionValue}
+                errors={errorsWithImageIssue}
+                disabled={false}
+                onChange={jest.fn()}
+                onDelete={jest.fn()}
+                onPublish={jest.fn()}
+            />,
+        );
+
+        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeEnabled();
+    });
+
     it('shows loader and disables actions when form is disabled', () => {
         render(
             <PartnerSectionForm

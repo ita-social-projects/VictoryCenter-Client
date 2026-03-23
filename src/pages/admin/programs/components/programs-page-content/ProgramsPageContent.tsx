@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Program, ProgramCategory, ProgramSearchItemData } from '@/types/admin/programs';
+import { HippotherapyProgram, ProgramCategory, ProgramSearchItemData } from '@/types/admin/programs';
 import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
 import { ProgramsPageModals } from '../programs-page-modals/ProgramsPageModals';
 import { InfiniteScrollList } from '@/components/admin/infinite-scroll-list/InfiniteScrollList';
@@ -23,6 +23,7 @@ import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextPr
 import { ToastType } from '@/types/admin/toast';
 import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
+import { mapHippotherapyProgramDtoToModel } from '@/utils/functions/mappers/admin/programs/programs-mappers';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
@@ -42,10 +43,42 @@ export const ProgramsPageContent = () => {
     const [isSearchResultView, setIsSearchResultView] = useState(false);
     const [error, setError] = useState<ErrorState>({ message: null, type: null });
     const listContainerRef = useRef<HTMLDivElement>(null);
-    const modalsStateControl = useModalsState<Program>();
-    const openModalActions = modalsStateControl.openModalActions;
+    const modalsStateControl = useModalsState<HippotherapyProgram>();
+    const { openModalActions, closeModalActions, isAnyModalOpened } = modalsStateControl;
+
+    const handleTranslateProgramModalOpen = useCallback(
+        async (program: HippotherapyProgram) => {
+            if (isAnyModalOpened) return;
+
+            try {
+                const fullDto = await ProgramsApi.fetchProgramById(program.id, client);
+                const fullProgram = fullDto ? mapHippotherapyProgramDtoToModel(fullDto) : program;
+                openModalActions.openTranslateItemModal(fullProgram);
+            } catch (e) {
+                openModalActions.openTranslateItemModal(program);
+            }
+        },
+        [isAnyModalOpened, openModalActions, client],
+    );
 
     const { incrementCategoriesCount, decrementCategoriesCount, updateCategoriesCount } = useCategoriesCounter();
+
+    const setErrorState = useCallback(
+        (message: string, type: 'categories' | 'programs' | 'search') => setError({ message, type }),
+        [],
+    );
+    const clearError = useCallback(() => setError({ message: null, type: null }), []);
+
+    const {
+        allLanguages,
+        translationLanguages,
+        selectedLanguage,
+        onLanguageChange,
+        translationStatusFilter,
+        onTranslationStatusFilterChange,
+    } = useLocalizationToolkit({
+        setErrorState,
+    });
 
     // Fetch functions
     const getProgramCategories = useCallback(async () => {
@@ -58,27 +91,35 @@ export const ProgramsPageContent = () => {
     }, [client]);
 
     const getFilteredPrograms = useCallback(
-        async (params: PaginationRequestParams): Promise<PaginationResult<Program>> => {
+        async (params: PaginationRequestParams): Promise<PaginationResult<HippotherapyProgram>> => {
             if (!selectedCategory) {
                 return { items: [], totalItemsCount: 0 };
             }
-            return ProgramsApi.fetchPrograms(
+            const response = await ProgramsApi.fetchPrograms(
                 client,
                 selectedCategory.id,
                 params.offset as number,
                 params.limit as number,
+                translationStatusFilter,
                 statusFilter,
             );
+
+            return {
+                ...response,
+                items: response.items.map(mapHippotherapyProgramDtoToModel),
+            };
         },
-        [selectedCategory, statusFilter, client],
+        [selectedCategory, statusFilter, client, translationStatusFilter],
     );
 
-    const getSearchedProgram = useCallback(async (): Promise<Program | null> => {
+    const getSearchedProgram = useCallback(async (): Promise<HippotherapyProgram | null> => {
         if (!searchProgramId) {
             return null;
         }
 
-        return ProgramsApi.fetchProgramById(searchProgramId, client);
+        const response = await ProgramsApi.fetchProgramById(searchProgramId, client);
+
+        return response ? mapHippotherapyProgramDtoToModel(response) : null;
     }, [searchProgramId, client]);
 
     const getProgramSearchItems = useCallback(
@@ -96,7 +137,30 @@ export const ProgramsPageContent = () => {
         [client],
     );
 
-    const getProgramId = useCallback((program: Program) => program.id, []);
+    const getProgramId = useCallback((program: HippotherapyProgram) => program.id, []);
+
+    const syncProgramStatusWithServer = useCallback(
+        async (program: HippotherapyProgram): Promise<HippotherapyProgram> => {
+            try {
+                const refreshedDto = await ProgramsApi.fetchProgramById(program.id, client);
+
+                if (!refreshedDto) {
+                    return program;
+                }
+
+                const refreshedProgram = mapHippotherapyProgramDtoToModel(refreshedDto);
+
+                return {
+                    ...program,
+                    status: refreshedProgram.status,
+                    localizations: refreshedProgram.localizations,
+                };
+            } catch {
+                return program;
+            }
+        },
+        [client],
+    );
 
     // Data fetching hooks
     const {
@@ -121,34 +185,44 @@ export const ProgramsPageContent = () => {
         fetchFromStart: fetchProgramsFromStart,
         resetList: resetProgramsList,
         setData: updatePrograms,
-    } = useDataPaginationFetch<Program>({
+    } = useDataPaginationFetch<HippotherapyProgram>({
         initialData: [],
         getUniqueId: getProgramId,
         fetchHandler: getFilteredPrograms,
-        autoFetchDependencies: [selectedCategory?.id, statusFilter],
+        autoFetchDependencies: [selectedCategory?.id, statusFilter, translationStatusFilter],
         autoFetchDisabled: isSearchResultView,
         pageSize: pageSize,
     });
 
+    const handleTranslateProgramSuccess = useCallback(
+        (updatedProgram: HippotherapyProgram) => {
+            void (async () => {
+                const syncedProgram = await syncProgramStatusWithServer(updatedProgram);
+
+                updatePrograms((prev) => prev.map((p) => (p.id === syncedProgram.id ? syncedProgram : p)));
+                closeModalActions.closeTranslateItemModal();
+                addToast(
+                    syncedProgram.status === VisibilityStatus.Published
+                        ? COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_PUBLISHED_SUCCESS
+                        : COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS,
+                    ToastType.Success,
+                );
+            })();
+        },
+        [closeModalActions, addToast, updatePrograms, syncProgramStatusWithServer],
+    );
     const {
         data: fetchedSearchProgram,
         isLoading: isSearchProgramLoading,
         error: searchProgramError,
         setData: updateSearchedProgram,
         refetch: refetchSearchProgram,
-    } = useDataFetch<Program | null>({
+    } = useDataFetch<HippotherapyProgram | null>({
         initialData: null,
         fetchHandler: getSearchedProgram,
         autoFetchDependencies: [searchProgramId],
         autoFetchDisabled: !isSearchResultView || !searchProgramId,
     });
-
-    // Errors handling
-    const setErrorState = useCallback(
-        (message: string, type: 'categories' | 'programs' | 'search') => setError({ message, type }),
-        [],
-    );
-    const clearError = useCallback(() => setError({ message: null, type: null }), []);
 
     const handleRetry = useCallback(() => {
         clearError();
@@ -161,9 +235,6 @@ export const ProgramsPageContent = () => {
             refetchSearchProgram();
         }
     }, [isSearchResultView, clearError, error.type, refetchCategories, refetchSearchProgram, fetchProgramsFromStart]);
-    const { allLanguages, onLanguageChange, onTranslationStatusFilterChange } = useLocalizationToolkit({
-        setErrorState,
-    });
 
     useEffect(() => {
         if (categoriesError) {
@@ -242,7 +313,7 @@ export const ProgramsPageContent = () => {
 
     // Program handlers
     const handleAddProgram = useCallback(
-        (addedProgram: Program) => {
+        (addedProgram: HippotherapyProgram) => {
             if (addedProgram.status === VisibilityStatus.Draft) {
                 addToast(PROGRAMS_TEXT.FORM.MESSAGE.PROGRAM_SAVED_SUCCESSFULLY, ToastType.Info);
             } else if (addedProgram.status === VisibilityStatus.Published) {
@@ -263,42 +334,47 @@ export const ProgramsPageContent = () => {
     );
 
     const handleEditProgram = useCallback(
-        (updatedProgram: Program) => {
-            if (updatedProgram.status === VisibilityStatus.Draft) {
-                addToast(PROGRAMS_TEXT.FORM.MESSAGE.PROGRAM_SAVED_SUCCESSFULLY, ToastType.Info);
-            } else if (updatedProgram.status === VisibilityStatus.Published) {
-                addToast(PROGRAMS_TEXT.FORM.MESSAGE.PROGRAM_PUBLISHED_SUCCESSFULLY, ToastType.Info);
-            }
-            if (isSearchResultView && fetchedSearchProgram?.id === updatedProgram.id) {
-                updateSearchedProgram(updatedProgram);
-            }
+        (updatedProgram: HippotherapyProgram) => {
+            void (async () => {
+                const syncedProgram = await syncProgramStatusWithServer(updatedProgram);
 
-            const originalProgram =
-                fetchedPrograms.find((p) => p.id === updatedProgram.id) ??
-                (isSearchResultView && fetchedSearchProgram?.id === updatedProgram.id ? fetchedSearchProgram : null);
-            if (!originalProgram) return;
+                if (syncedProgram.status === VisibilityStatus.Draft) {
+                    addToast(PROGRAMS_TEXT.FORM.MESSAGE.PROGRAM_SAVED_SUCCESSFULLY, ToastType.Info);
+                } else if (syncedProgram.status === VisibilityStatus.Published) {
+                    addToast(PROGRAMS_TEXT.FORM.MESSAGE.PROGRAM_PUBLISHED_SUCCESSFULLY, ToastType.Info);
+                }
+                if (isSearchResultView && fetchedSearchProgram?.id === syncedProgram.id) {
+                    updateSearchedProgram(syncedProgram);
+                }
 
-            // Update program counters in categories
-            updateCategories((prevCategories) =>
-                updateCategoriesCount(prevCategories, originalProgram, updatedProgram),
-            );
+                const originalProgram =
+                    fetchedPrograms.find((p) => p.id === syncedProgram.id) ??
+                    (isSearchResultView && fetchedSearchProgram?.id === syncedProgram.id ? fetchedSearchProgram : null);
+                if (!originalProgram) return;
 
-            // Update program in local programs list
-            const belongsToSelectedCategory =
-                !!selectedCategory && updatedProgram.categories.some((cat) => cat.id === selectedCategory.id);
-            const statusMatches = statusFilter === undefined || updatedProgram.status === statusFilter;
+                // Update program counters in categories
+                updateCategories((prevCategories) =>
+                    updateCategoriesCount(prevCategories, originalProgram, syncedProgram),
+                );
 
-            if (belongsToSelectedCategory && statusMatches) {
-                if (updatedProgram.previewImage && 'url' in updatedProgram.previewImage)
-                    updatedProgram.previewImage.url = `${updatedProgram.previewImage.url}?cb=${Date.now()}`;
-                if (updatedProgram.backgroundImage && 'url' in updatedProgram.backgroundImage)
-                    updatedProgram.backgroundImage.url = `${updatedProgram.backgroundImage.url}?cb=${Date.now()}`;
-                updatePrograms((prev) => prev.map((p) => (p.id === updatedProgram.id ? updatedProgram : p)));
-            } else {
-                updatePrograms((prev) => prev.filter((p) => p.id !== updatedProgram.id));
-            }
+                // Update program in local programs list
+                const belongsToSelectedCategory =
+                    !!selectedCategory && syncedProgram.categories.some((cat) => cat.id === selectedCategory.id);
+                const statusMatches = statusFilter === undefined || syncedProgram.status === statusFilter;
+
+                if (belongsToSelectedCategory && statusMatches) {
+                    if (syncedProgram.previewImage && 'url' in syncedProgram.previewImage)
+                        syncedProgram.previewImage.url = `${syncedProgram.previewImage.url}?cb=${Date.now()}`;
+                    if (syncedProgram.backgroundImage && 'url' in syncedProgram.backgroundImage)
+                        syncedProgram.backgroundImage.url = `${syncedProgram.backgroundImage.url}?cb=${Date.now()}`;
+                    updatePrograms((prev) => prev.map((p) => (p.id === syncedProgram.id ? syncedProgram : p)));
+                } else {
+                    updatePrograms((prev) => prev.filter((p) => p.id !== syncedProgram.id));
+                }
+            })();
         },
         [
+            syncProgramStatusWithServer,
             updateCategories,
             updateSearchedProgram,
             updatePrograms,
@@ -313,7 +389,7 @@ export const ProgramsPageContent = () => {
     );
 
     const handleDeleteProgram = useCallback(
-        (program: Program) => {
+        (program: HippotherapyProgram) => {
             // Update program counters in categories
             updateCategories((prevCategories) => decrementCategoriesCount(prevCategories, program));
 
@@ -405,15 +481,22 @@ export const ProgramsPageContent = () => {
 
     // Render helpers
     const renderProgramItem = useCallback(
-        (program: Program) => (
-            <ProgramListItem
-                key={program.id}
-                program={program}
-                handleOnEditProgram={openModalActions.openEditItemModal}
-                handleOnDeleteProgram={openModalActions.openDeleteItemModal}
-            />
-        ),
-        [openModalActions],
+        (program: HippotherapyProgram) => {
+            if (!selectedLanguage) return null;
+
+            return (
+                <ProgramListItem
+                    key={program.id}
+                    program={program}
+                    handleOnTranslateProgram={handleTranslateProgramModalOpen}
+                    handleOnEditProgram={openModalActions.openEditItemModal}
+                    handleOnDeleteProgram={openModalActions.openDeleteItemModal}
+                    language={selectedLanguage}
+                    translationLanguages={translationLanguages}
+                />
+            );
+        },
+        [openModalActions, selectedLanguage, translationLanguages, handleTranslateProgramModalOpen],
     );
 
     // Get the items to display
@@ -462,7 +545,7 @@ export const ProgramsPageContent = () => {
                     </div>
                 )}
 
-                <InfiniteScrollList<Program>
+                <InfiniteScrollList<HippotherapyProgram>
                     items={displayItems}
                     renderItem={renderProgramItem}
                     onLoadMore={fetchMorePrograms}
@@ -475,9 +558,11 @@ export const ProgramsPageContent = () => {
             <ProgramsPageModals
                 modalsStateControl={modalsStateControl}
                 categories={categories}
+                translatedLanguages={translationLanguages}
                 onAddProgram={handleAddProgram}
                 onEditProgram={handleEditProgram}
                 onDeleteProgram={handleDeleteProgram}
+                onTranslateProgram={handleTranslateProgramSuccess}
                 onAddCategory={handleAddCategory}
                 onEditCategory={handleEditCategory}
                 onDeleteCategory={handleDeleteCategory}

@@ -142,12 +142,10 @@ const PartnerSectionComponent = ({
             return false;
         }
 
-        const partnerErrors = errors.partners || [];
-        const hasPartnerErrors = value.partners.some((partner, index) => {
+        const hasPartnerErrors = value.partners.some((partner) => {
             const descError = PARTNER_VALIDATION_FUNCTIONS.validateDescription(partner.description);
             const hasImage = !!partner.image;
-            const imageError = partnerErrors[index]?.image;
-            return !!descError || !hasImage || !!imageError;
+            return !!descError || !hasImage;
         });
 
         return !hasPartnerErrors;

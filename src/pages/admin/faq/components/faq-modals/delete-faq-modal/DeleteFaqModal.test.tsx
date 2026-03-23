@@ -4,6 +4,7 @@ import { DeleteFaqModal } from './DeleteFaqModal';
 import { FaqApi } from '@/services/api/admin/faq/faq-api';
 import { FAQ_TEXT } from '@/const/admin/faq';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { VisibilityStatus } from '@/types/admin/common';
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: () => ({}),
@@ -56,8 +57,8 @@ describe('DeleteFaqModal', () => {
 
         expect(screen.getByTestId('modal')).toBeInTheDocument();
         expect(screen.getByTestId('modal-title')).toHaveTextContent(FAQ_TEXT.FORM.TITLE.DELETE_FAQ);
-        expect(screen.getByTestId(`btn-${COMMON_TEXT_ADMIN.BUTTON.CANCEL}`)).toBeInTheDocument();
-        expect(screen.getByTestId(`btn-${COMMON_TEXT_ADMIN.BUTTON.DELETE}`)).toBeInTheDocument();
+        expect(screen.getByTestId(`btn-${COMMON_TEXT_ADMIN.BUTTON.NO}`)).toBeInTheDocument();
+        expect(screen.getByTestId(`btn-${COMMON_TEXT_ADMIN.BUTTON.YES}`)).toBeInTheDocument();
     });
 
     it('does not render when isOpen is false', () => {
@@ -69,7 +70,7 @@ describe('DeleteFaqModal', () => {
         mockFaqApi.delete.mockResolvedValue(undefined);
         renderModal();
 
-        const deleteBtn = screen.getByTestId(`btn-${COMMON_TEXT_ADMIN.BUTTON.DELETE}`);
+        const deleteBtn = screen.getByTestId(`btn-${COMMON_TEXT_ADMIN.BUTTON.YES}`);
         fireEvent.click(deleteBtn);
 
         await waitFor(() => {
@@ -83,7 +84,7 @@ describe('DeleteFaqModal', () => {
         mockFaqApi.delete.mockRejectedValue(new Error('Network error'));
         renderModal();
 
-        const deleteBtn = screen.getByTestId(`btn-${COMMON_TEXT_ADMIN.BUTTON.DELETE}`);
+        const deleteBtn = screen.getByTestId(`btn-${COMMON_TEXT_ADMIN.BUTTON.YES}`);
         fireEvent.click(deleteBtn);
 
         await waitFor(() => {
@@ -97,8 +98,8 @@ describe('DeleteFaqModal', () => {
         mockFaqApi.delete.mockImplementation(() => new Promise((resolve) => setTimeout(resolve, 100)));
         renderModal();
 
-        const deleteBtn = screen.getByTestId(`btn-${COMMON_TEXT_ADMIN.BUTTON.DELETE}`);
-        const cancelBtn = screen.getByTestId(`btn-${COMMON_TEXT_ADMIN.BUTTON.CANCEL}`);
+        const deleteBtn = screen.getByTestId(`btn-${COMMON_TEXT_ADMIN.BUTTON.YES}`);
+        const cancelBtn = screen.getByTestId(`btn-${COMMON_TEXT_ADMIN.BUTTON.NO}`);
 
         fireEvent.click(deleteBtn);
 
@@ -114,16 +115,16 @@ describe('DeleteFaqModal', () => {
         mockFaqApi.delete.mockImplementation(() => new Promise((resolve) => setTimeout(resolve, 1000)));
         renderModal();
 
-        fireEvent.click(screen.getByTestId(`btn-${COMMON_TEXT_ADMIN.BUTTON.DELETE}`));
+        fireEvent.click(screen.getByTestId(`btn-${COMMON_TEXT_ADMIN.BUTTON.YES}`));
 
-        fireEvent.click(screen.getByTestId(`btn-${COMMON_TEXT_ADMIN.BUTTON.CANCEL}`));
+        fireEvent.click(screen.getByTestId(`btn-${COMMON_TEXT_ADMIN.BUTTON.NO}`));
 
         expect(defaultProps.onClose).not.toHaveBeenCalled();
     });
 
     it('clears error and closes modal when cancelled', () => {
         renderModal();
-        const cancelBtn = screen.getByTestId(`btn-${COMMON_TEXT_ADMIN.BUTTON.CANCEL}`);
+        const cancelBtn = screen.getByTestId(`btn-${COMMON_TEXT_ADMIN.BUTTON.NO}`);
 
         fireEvent.click(cancelBtn);
 
@@ -133,7 +134,7 @@ describe('DeleteFaqModal', () => {
     it('does not attempt to delete if faqToDelete is null', async () => {
         renderModal({ faqToDelete: null });
 
-        const deleteBtn = screen.getByTestId(`btn-${COMMON_TEXT_ADMIN.BUTTON.DELETE}`);
+        const deleteBtn = screen.getByTestId(`btn-${COMMON_TEXT_ADMIN.BUTTON.YES}`);
         fireEvent.click(deleteBtn);
 
         expect(mockFaqApi.delete).not.toHaveBeenCalled();
@@ -144,7 +145,7 @@ describe('DeleteFaqModal', () => {
         mockFaqApi.delete.mockRejectedValueOnce(new Error('Fail'));
         renderModal();
 
-        const deleteBtn = screen.getByTestId(`btn-${COMMON_TEXT_ADMIN.BUTTON.DELETE}`);
+        const deleteBtn = screen.getByTestId(`btn-${COMMON_TEXT_ADMIN.BUTTON.YES}`);
         fireEvent.click(deleteBtn);
 
         await waitFor(() => {
@@ -157,5 +158,19 @@ describe('DeleteFaqModal', () => {
         await waitFor(() => {
             expect(defaultProps.onDeleteFaq).toHaveBeenCalled();
         });
+    });
+
+    it('shows warning message when deleting published FAQ', () => {
+        const publishedFaq = { ...mockFaq, status: VisibilityStatus.Published };
+        render(<DeleteFaqModal {...defaultProps} faqToDelete={publishedFaq} />);
+
+        expect(screen.getByText(FAQ_TEXT.QUESTION.DELETE_PUBLISHED_FAQ)).toBeInTheDocument();
+    });
+
+    it('does not show warning message when deleting draft FAQ', () => {
+        const draftFaq = { ...mockFaq, status: VisibilityStatus.Draft };
+        render(<DeleteFaqModal {...defaultProps} faqToDelete={draftFaq} />);
+
+        expect(screen.queryByText(FAQ_TEXT.QUESTION.DELETE_PUBLISHED_FAQ)).not.toBeInTheDocument();
     });
 });

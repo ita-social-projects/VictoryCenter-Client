@@ -5,6 +5,8 @@ import stylesPrograms from './ProgramCardProgramsPage.module.scss';
 import { useNavigate } from 'react-router-dom';
 import { PUBLIC_ROUTES } from '@/const/public/routes';
 import cn from 'classnames';
+import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
+import { mapLocalizationDtoToModel } from '@/utils/functions/mappers/common/localization/localization-mappers';
 
 interface ProgramCardProps {
     program: PublishedProgramDto;
@@ -14,6 +16,14 @@ interface ProgramCardProps {
 export const ProgramCard = ({ program, variant }: ProgramCardProps) => {
     const navigate = useNavigate();
     const programCategories = program.categories.map((categorie) => categorie.name).join(', ');
+    const normalizedLocalizations = program.localizations.map((localization) =>
+        mapLocalizationDtoToModel(localization),
+    );
+
+    const { name, description } = useGetLocalization(normalizedLocalizations, {
+        name: program.name,
+        description: program.description,
+    });
 
     const handleClick = () => {
         if (program.slug) {
@@ -39,20 +49,22 @@ export const ProgramCard = ({ program, variant }: ProgramCardProps) => {
             tabIndex={program.slug ? 0 : -1}
             style={{ cursor: program.slug ? 'pointer' : 'default' }}
         >
-            <img src={program.previewImage?.url} alt={program.name} className={styles.image} />
+            <div className={styles['image-wrapper']}>
+                <img src={program.previewImage?.url} alt={program.name} className={styles.image} />
+            </div>
             <div className={styles.content}>
                 <div className={styles[`subtitle-content`]}>
                     <div className={styles.subtitle}>
                         <div className={styles.link}>
                             <p className={styles.categories}>{programCategories}</p>
-                            <h2 className={styles.name}>{program.name}</h2>
+                            <h2 className={styles.name}>{name}</h2>
                         </div>
                         <div className={styles.arrow}>
                             <ArrowIcon className={styles.icon} />
                         </div>
                     </div>
                 </div>
-                <p className={styles.description}>{program.description}</p>
+                <p className={styles.description}>{description}</p>
             </div>
         </div>
     );

@@ -3,7 +3,7 @@ $img-width: 1440px;
 $img-height: 680px;
 
 .container {
-    @extend .section-container;
+    @extend %section-container;
     background-color: #fff;
     padding-bottom: 30px;
 }

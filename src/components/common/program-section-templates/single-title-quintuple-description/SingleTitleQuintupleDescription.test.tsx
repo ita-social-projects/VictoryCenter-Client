@@ -11,8 +11,10 @@ jest.mock('@/utils/functions/program-section-template-validation/programSectionT
 }));
 
 jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
-    InputWithCharacterLimitGroup: ({ value, onChange, id }: any) => (
-        <input data-testid={`input-${id}`} value={value} onChange={onChange} />
+    InputWithCharacterLimitGroup: ({ value, onChange, id, showCounterBelow }: any) => (
+        <div data-testid={`group-${id}`} data-show-counter-below={String(showCounterBelow)}>
+            <input data-testid={`input-${id}`} value={value} onChange={onChange} />
+        </div>
     ),
 }));
 
@@ -41,6 +43,13 @@ jest.mock('@/const/admin/programs', () => ({
     },
 }));
 
+jest.mock('@/validation/admin/program-schema/program-schema', () => ({
+    PROGRAM_SECTION_VALIDATION_FUNCTIONS: {
+        validateSectionTitle: jest.fn(() => undefined),
+        validateSectionDescription: jest.fn(() => undefined),
+    },
+}));
+
 const setup = (props: React.ComponentProps<typeof SingleTitleQuintupleDescription> = {}) => {
     mockDescProps.mockClear();
     return render(<SingleTitleQuintupleDescription {...props} />);
@@ -50,7 +59,7 @@ const getRoot = (container: HTMLElement) => container.firstElementChild as HTMLE
 const getPreviewTexts = (container: HTMLElement) =>
     Array.from(container.querySelectorAll('p')).map((p) => p.textContent);
 
-const getDescCallIds = () => mockDescProps.mock.calls.map((call: any[]) => call[0]?.id);
+const getDescCallIds = () => mockDescProps.mock.calls.slice(0, 5).map((call: any[]) => call[0]?.id);
 
 describe('SingleTitleQuintupleDescription', () => {
     describe('Preview', () => {
@@ -95,6 +104,10 @@ describe('SingleTitleQuintupleDescription', () => {
         it('renders title input', () => {
             setup({ mode: ProgramSectionMode.Edit, title: 'Edit' });
             expect(screen.getByTestId('input-single-title-quintuple-title')).toHaveValue('Edit');
+            expect(screen.getByTestId('group-single-title-quintuple-title')).toHaveAttribute(
+                'data-show-counter-below',
+                'true',
+            );
         });
 
         it('renders 5 description inputs', () => {
@@ -146,12 +159,12 @@ describe('SingleTitleQuintupleDescription', () => {
             expect(true).toBe(true);
         });
 
-        it('applies editable class for Edit and View', () => {
+        it('applies editable class for Edit mode only', () => {
             const { container: editContainer } = setup({ mode: ProgramSectionMode.Edit });
             expect(getRoot(editContainer)).toHaveClass('editable');
 
             const { container: viewContainer } = setup({ mode: ProgramSectionMode.View });
-            expect(getRoot(viewContainer)).toHaveClass('editable');
+            expect(getRoot(viewContainer)).not.toHaveClass('editable');
         });
 
         it('does not apply template class when mode is Edit', () => {

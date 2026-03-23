@@ -19,24 +19,6 @@
     width: 1.5rem;
     height: 1.5rem;
     border: none;
-    cursor: pointer;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-image: url('~@/assets/icons/delete-default.svg');
-
-    &:hover:not(:disabled) {
-        background-image: url('~@/assets/icons/delete-hover.svg');
-    }
-
-    &:active:not(:disabled) {
-        background-image: url('~@/assets/icons/delete-pressed.svg');
-    }
-
-    &:disabled {
-        background-image: url('~@/assets/icons/delete-disabled.svg');
-        cursor: not-allowed;
-    }
 }
 
 .content {

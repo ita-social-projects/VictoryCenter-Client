@@ -3,10 +3,11 @@ import { Button } from '@/components/admin/button/Button';
 import { ImageValues } from '@/types/common/image';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { renderProgramSection } from '@/utils/functions/render-program-section';
+import { ReactComponent as ChangeIcon } from '@/assets/icons/change.svg';
 import styles from './ProgramSectionForm.module.scss';
 import {
-    ProgramSection,
-    ProgramSectionContent,
+    FaqSectionQuestionDto,
+    CreateHippotherapyProgramSectionDto,
     ProgramSectionTemplate,
     ProgramSectionMode,
 } from '@/types/common/program-sections';
@@ -15,117 +16,42 @@ import {
     getProgramSectionTemplateMaxGroupCount,
     normalizeGroupedContentsGroupIndexes,
 } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
+import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
+import { getDescriptionAuthorPairsByGroup } from '@/utils/functions/mappers/public/program/get-grouped-program-section-content-pairs';
+import {
+    getContentByType,
+    getDescriptionsInOrder,
+    getFaqPairs,
+    ensureTitleContentAndOnePair,
+} from '@/utils/functions/program-section-content/programSectionContent';
+import { IconButton } from '@/components/admin/icon-button/IconButton';
+import { ACTION_ICONS } from '@/const/common/action-icons';
 
 export interface ProgramSectionFormProps {
-    section: ProgramSection;
+    section: CreateHippotherapyProgramSectionDto;
     onSave: () => void;
     onCancel: (options: SectionCancelOptions) => void;
     isDisabled?: boolean;
-    onSectionChange?: (updatedSection: ProgramSection) => void;
+    onSectionChange?: (updatedSection: CreateHippotherapyProgramSectionDto) => void;
     isNewSection?: boolean;
     isSectionValid?: boolean;
     onEditStateChange?: (isEditing: boolean) => void;
     onDelete?: () => void;
     isReplacingTemplate?: boolean;
     onRequestReplace?: () => void;
+    isFirstSection: boolean;
+    isLastSection: boolean;
+    onMoveUpSection: () => void;
+    onMoveDownSection: () => void;
 }
 
 export interface SectionCancelOptions {
     isDirty: boolean;
     shouldRemove: boolean;
-    revertTo: ProgramSection;
+    revertTo: CreateHippotherapyProgramSectionDto;
     onAfterDiscard: () => void;
     isTemplateReplacement?: boolean;
 }
-
-const getContentByType = (contents: ProgramSectionContent[], type: ContentType): ProgramSectionContent | undefined => {
-    return contents.find((c) => c.contentType === type);
-};
-
-const getDescriptionsInOrder = (contents: ProgramSectionContent[]) => {
-    return contents.filter((c) => c.contentType === ContentType.Description).sort((a, b) => a.order - b.order);
-};
-
-const getDescriptionAuthorPairs = (contents: ProgramSectionContent[]) => {
-    const map = new Map<number, { description: string; author: string }>();
-
-    for (const content of contents) {
-        if (content.groupIndex === null || content.groupIndex === undefined) continue;
-
-        const groupIndex = content.groupIndex;
-
-        if (!map.has(groupIndex)) {
-            map.set(groupIndex, { description: '', author: '' });
-        }
-
-        const entry = map.get(groupIndex)!;
-
-        if (content.contentType === ContentType.Description) {
-            entry.description = (content as any).description || '';
-        }
-
-        if (content.contentType === ContentType.Author) {
-            entry.author = (content as any).author || '';
-        }
-    }
-
-    return Array.from(map.entries())
-        .sort((a, b) => a[0] - b[0])
-        .map(([groupIndex, value]) => ({
-            groupIndex,
-            description: value.description,
-            author: value.author,
-        }));
-};
-
-const ensureTitleContentAndOnePair = (section: ProgramSection): ProgramSection => {
-    if (section.template !== ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs) return section;
-
-    let updatedContents = section.contents;
-    let hasChanges = false;
-
-    const hasTitleContent = updatedContents.some((c) => c.contentType === ContentType.Title);
-
-    if (!hasTitleContent) {
-        const maxOrder = updatedContents.length ? Math.max(...updatedContents.map((c) => c.order)) : -1;
-
-        updatedContents = [
-            ...updatedContents,
-            {
-                contentType: ContentType.Title,
-                order: maxOrder + 1,
-                title: '',
-            } as any,
-        ];
-
-        hasChanges = true;
-    }
-
-    const pairs = getDescriptionAuthorPairs(updatedContents);
-    if (pairs.length > 0) {
-        return hasChanges ? { ...section, contents: updatedContents } : section;
-    }
-
-    const maxOrder = updatedContents.length ? Math.max(...updatedContents.map((c) => c.order)) : -1;
-
-    updatedContents = [
-        ...updatedContents,
-        {
-            contentType: ContentType.Description,
-            order: maxOrder + 1,
-            groupIndex: 0,
-            description: '',
-        } as any,
-        {
-            contentType: ContentType.Author,
-            order: maxOrder + 2,
-            groupIndex: 0,
-            author: '',
-        } as any,
-    ];
-
-    return { ...section, contents: updatedContents };
-};
 
 export const ProgramSectionForm = ({
     section,
@@ -139,9 +65,17 @@ export const ProgramSectionForm = ({
     onDelete,
     isReplacingTemplate = false,
     onRequestReplace,
+    isFirstSection = false,
+    isLastSection = false,
+    onMoveDownSection,
+    onMoveUpSection,
 }: ProgramSectionFormProps) => {
-    const [localSection, setLocalSection] = useState<ProgramSection>(() => ensureTitleContentAndOnePair(section));
-    const [originalSection, setOriginalSection] = useState<ProgramSection>(() => ensureTitleContentAndOnePair(section));
+    const [localSection, setLocalSection] = useState<CreateHippotherapyProgramSectionDto>(() =>
+        ensureTitleContentAndOnePair(section),
+    );
+    const [originalSection, setOriginalSection] = useState<CreateHippotherapyProgramSectionDto>(() =>
+        ensureTitleContentAndOnePair(section),
+    );
     const [isDirty, setIsDirty] = useState(false);
     const [validationResetKey, setValidationResetKey] = useState(0);
     const [sectionMode, setSectionMode] = useState<ProgramSectionMode>(
@@ -150,8 +84,8 @@ export const ProgramSectionForm = ({
 
     const sectionModeRef = useRef(sectionMode);
     const onEditStateChangeRef = useRef(onEditStateChange);
-    const lastEmittedSectionRef = useRef<ProgramSection | null>(null);
-    const localSectionRef = useRef<ProgramSection>(localSection);
+    const lastEmittedSectionRef = useRef<CreateHippotherapyProgramSectionDto | null>(null);
+    const localSectionRef = useRef<CreateHippotherapyProgramSectionDto>(localSection);
     localSectionRef.current = localSection;
 
     useEffect(() => {
@@ -203,11 +137,19 @@ export const ProgramSectionForm = ({
     const isDescriptionAuthorPairsTemplate =
         section.template === ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs;
 
-    const orderedPairs = getDescriptionAuthorPairs(localSection.contents);
+    const isFaqTemplate = section.template === ProgramSectionTemplate.SingleTitleQuestionAnswerPairs;
+
+    const orderedPairs = getDescriptionAuthorPairsByGroup(localSection.contents);
 
     const descriptionAuthorPairs = orderedPairs.map((p) => ({
         description: p.description,
         author: p.author,
+    }));
+
+    const faqPairs: FaqSectionQuestionDto[] = getFaqPairs(localSection.contents).map((p) => ({
+        id: p.id ?? undefined,
+        questionText: p.questionText,
+        answerText: p.answerText,
     }));
 
     const imageContents = localSection.contents
@@ -221,7 +163,7 @@ export const ProgramSectionForm = ({
     }));
 
     const emitSectionChange = useCallback(
-        (updatedSection: ProgramSection) => {
+        (updatedSection: CreateHippotherapyProgramSectionDto) => {
             lastEmittedSectionRef.current = updatedSection;
             setIsDirty(true);
             onSectionChange?.(updatedSection);
@@ -305,7 +247,11 @@ export const ProgramSectionForm = ({
     );
 
     const updateImageContent = useCallback(
-        (order: number, file: ImageValues | null, prev: ProgramSection): ProgramSection => {
+        (
+            order: number,
+            file: ImageValues | null,
+            prev: CreateHippotherapyProgramSectionDto,
+        ): CreateHippotherapyProgramSectionDto => {
             const updatedContents = prev.contents.map((c) =>
                 c.contentType === ContentType.Image && c.order === order ? ({ ...c, image: file } as any) : c,
             );
@@ -334,7 +280,7 @@ export const ProgramSectionForm = ({
     const handlePairFieldChange = useCallback(
         (index: number, value: string, field: ContentType.Description | ContentType.Author) => {
             const prev = localSectionRef.current;
-            const pairs = getDescriptionAuthorPairs(prev.contents);
+            const pairs = getDescriptionAuthorPairsByGroup(prev.contents);
             const target = pairs[index];
             if (!target) return;
 
@@ -375,20 +321,25 @@ export const ProgramSectionForm = ({
         const prev = localSectionRef.current;
         if (prev.template !== ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs) return;
 
-        const pairs = getDescriptionAuthorPairs(prev.contents);
+        const normalizedContents = normalizeGroupedContentsGroupIndexes(prev.contents, [
+            ContentType.Description,
+            ContentType.Author,
+        ]);
+
+        const pairs = getDescriptionAuthorPairsByGroup(normalizedContents);
         const maxGroupCount = getProgramSectionTemplateMaxGroupCount(prev.template);
         if (pairs.length >= maxGroupCount) return;
 
         const nextGroupIndex = pairs.length;
 
-        const maxOrder = prev.contents.length ? Math.max(...prev.contents.map((c) => c.order)) : -1;
+        const maxOrder = normalizedContents.length ? Math.max(...normalizedContents.map((c) => c.order)) : -1;
         const descriptionOrder = maxOrder + 1;
         const authorOrder = maxOrder + 2;
 
-        const newSection: ProgramSection = {
+        const newSection: CreateHippotherapyProgramSectionDto = {
             ...prev,
             contents: [
-                ...prev.contents,
+                ...normalizedContents,
                 {
                     contentType: ContentType.Description,
                     order: descriptionOrder,
@@ -408,9 +359,8 @@ export const ProgramSectionForm = ({
         setLocalSection(newSection);
         emitSectionChange(newSection);
 
-        const nextIndex = pairs.length;
         setTimeout(() => {
-            const element = document.getElementById(`pair-description-${nextIndex}`) as HTMLTextAreaElement | null;
+            const element = document.getElementById(`pair-description-${nextGroupIndex}`) as HTMLTextAreaElement | null;
             element?.focus();
         }, 0);
     }, [emitSectionChange]);
@@ -420,13 +370,13 @@ export const ProgramSectionForm = ({
             const prev = localSectionRef.current;
             if (prev.template !== ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs) return;
 
-            const pairs = getDescriptionAuthorPairs(prev.contents);
+            const pairs = getDescriptionAuthorPairsByGroup(prev.contents);
             if (pairs.length <= 1) return;
 
             const target = pairs[index];
             if (!target) return;
 
-            const filtered: ProgramSection = {
+            const filtered: CreateHippotherapyProgramSectionDto = {
                 ...prev,
                 contents: prev.contents.filter((c) => c.groupIndex !== target.groupIndex),
             };
@@ -435,6 +385,135 @@ export const ProgramSectionForm = ({
                 ContentType.Description,
                 ContentType.Author,
             ]);
+
+            const normalizedSection = { ...filtered, contents: normalizedContents };
+
+            localSectionRef.current = normalizedSection;
+            setLocalSection(normalizedSection);
+            emitSectionChange(normalizedSection);
+        },
+        [emitSectionChange],
+    );
+
+    const isSectionSaveValid =
+        isSectionValid &&
+        (!isFaqTemplate ||
+            (faqPairs.length > 0 &&
+                faqPairs.every(
+                    (pair) =>
+                        !PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateFaqQuestion(pair.questionText) &&
+                        !PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateFaqAnswer(pair.answerText),
+                )));
+
+    const handleFaqQuestionChange = useCallback(
+        (index: number, value: string) => {
+            const prev = localSectionRef.current;
+            const faq = getFaqPairs(prev.contents);
+            const target = faq[index];
+            if (!target) return;
+
+            const updatedContents = prev.contents.map((c) => {
+                if (c.contentType === ContentType.FaqQuestion && c.groupIndex === target.groupIndex) {
+                    return {
+                        ...c,
+                        faqQuestion: { ...c.faqQuestion, questionText: value } as any,
+                    };
+                }
+                return c;
+            });
+
+            const newSection = { ...prev, contents: updatedContents };
+            localSectionRef.current = newSection;
+            setLocalSection(newSection);
+            emitSectionChange(newSection);
+        },
+        [emitSectionChange],
+    );
+
+    const handleFaqAnswerChange = useCallback(
+        (index: number, value: string) => {
+            const prev = localSectionRef.current;
+            const faq = getFaqPairs(prev.contents);
+            const target = faq[index];
+            if (!target) return;
+
+            const updatedContents = prev.contents.map((c) => {
+                if (c.contentType === ContentType.FaqQuestion && c.groupIndex === target.groupIndex) {
+                    return {
+                        ...c,
+                        faqQuestion: { ...c.faqQuestion, answerText: value } as any,
+                    };
+                }
+                return c;
+            });
+
+            const newSection = { ...prev, contents: updatedContents };
+            localSectionRef.current = newSection;
+            setLocalSection(newSection);
+            emitSectionChange(newSection);
+        },
+        [emitSectionChange],
+    );
+
+    const handleAddFaqPair = useCallback(
+        (questionText: string, answerText: string) => {
+            const prev = localSectionRef.current;
+            if (prev.template !== ProgramSectionTemplate.SingleTitleQuestionAnswerPairs) return;
+
+            const faq = getFaqPairs(prev.contents);
+            const nextGroupIndex = faq.length;
+
+            const maxOrder = prev.contents.length ? Math.max(...prev.contents.map((c) => c.order)) : -1;
+
+            const newSection: CreateHippotherapyProgramSectionDto = {
+                ...prev,
+                contents: [
+                    ...prev.contents,
+                    {
+                        contentType: ContentType.FaqQuestion,
+                        order: maxOrder + 1,
+                        groupIndex: nextGroupIndex,
+                        faqQuestion: {
+                            questionText,
+                            answerText,
+                        } as any,
+                    } as any,
+                ],
+            };
+
+            localSectionRef.current = newSection;
+            setLocalSection(newSection);
+            emitSectionChange(newSection);
+        },
+        [emitSectionChange],
+    );
+
+    const handleDeleteFaqPair = useCallback(
+        (index: number) => {
+            const prev = localSectionRef.current;
+            if (prev.template !== ProgramSectionTemplate.SingleTitleQuestionAnswerPairs) return;
+
+            const faq = getFaqPairs(prev.contents);
+            if (faq.length <= 1) return;
+
+            const target = faq[index];
+            if (!target) return;
+
+            const filtered: CreateHippotherapyProgramSectionDto = {
+                ...prev,
+                contents: prev.contents.filter(
+                    (c) => !(c.contentType === ContentType.FaqQuestion && c.groupIndex === target.groupIndex),
+                ),
+            };
+
+            const normalizedContents = filtered.contents.map((c) => {
+                if (c.contentType === ContentType.FaqQuestion && c.groupIndex !== null && c.groupIndex !== undefined) {
+                    if (c.groupIndex > target.groupIndex) {
+                        return { ...c, groupIndex: c.groupIndex - 1 };
+                    }
+                }
+                return c;
+            });
 
             const normalizedSection = { ...filtered, contents: normalizedContents };
 
@@ -457,13 +536,13 @@ export const ProgramSectionForm = ({
     );
 
     const handleSaveClick = useCallback(() => {
-        if (isDisabled || !isSectionValid) return;
+        if (isDisabled || !isSectionSaveValid) return;
         onSave();
         setOriginalSection(localSection);
         setIsDirty(false);
         setSectionMode(ProgramSectionMode.View);
         setValidationResetKey((prev) => prev + 1);
-    }, [isDisabled, isSectionValid, onSave, localSection]);
+    }, [isDisabled, isSectionSaveValid, onSave, localSection]);
 
     const CARD_TEMPLATES = [
         ProgramSectionTemplate.DualTitleDescriptionPairs,
@@ -524,6 +603,7 @@ export const ProgramSectionForm = ({
             images: imageContents,
             ...(isCardTemplate ? { cards } : {}),
             ...(isDescriptionAuthorPairsTemplate ? { descriptionAuthorPairs } : {}),
+            ...(isFaqTemplate ? { faqPairs } : {}),
         },
         mode: sectionMode,
         validationResetKey,
@@ -549,36 +629,69 @@ export const ProgramSectionForm = ({
                       canAddPair,
                   }
                 : {}),
+            ...(isFaqTemplate
+                ? {
+                      onFaqQuestionChange: handleFaqQuestionChange,
+                      onFaqAnswerChange: handleFaqAnswerChange,
+                      onAddFaqPair: handleAddFaqPair,
+                      onDeleteFaqPair: handleDeleteFaqPair,
+                  }
+                : {}),
         },
     });
 
     return (
         <div className={styles.container}>
-            <div className={styles['actions-section']}>
-                {sectionMode === ProgramSectionMode.View && (
+            {sectionMode === ProgramSectionMode.View && (
+                <div className={styles['actions-section']}>
+                    <div className={styles['order-controls']}>
+                        <div className={styles['order-controls']}>
+                            {!isFirstSection && (
+                                <button
+                                    type="button"
+                                    onClick={onMoveUpSection}
+                                    className={`${styles['icon-button']} ${styles['up-button']}`}
+                                    aria-label="Move up section"
+                                />
+                            )}
+                            {!isLastSection && (
+                                <button
+                                    type="button"
+                                    onClick={onMoveDownSection}
+                                    className={`${styles['icon-button']} ${styles['down-button']}`}
+                                    aria-label="Move down section"
+                                />
+                            )}
+                        </div>
+                    </div>
                     <div className={styles['hover-buttons']}>
-                        <button
+                        <IconButton
                             type="button"
                             onClick={handleEditClick}
                             className={`${styles['icon-button']} ${styles['edit-button']}`}
                             aria-label="Edit section"
+                            DefaultIcon={ACTION_ICONS.edit.default}
+                            FilledIcon={ACTION_ICONS.edit.hover}
                         />
-                        <button
+                        <IconButton
                             type="button"
                             onClick={handleDeleteClick}
                             className={`${styles['icon-button']} ${styles['delete-button']}`}
                             aria-label="Delete section"
+                            DefaultIcon={ACTION_ICONS.delete.default}
+                            FilledIcon={ACTION_ICONS.delete.hover}
                         />
                         <button
                             type="button"
                             onClick={handleReplaceClick}
                             className={`${styles['icon-button']} ${styles['change-button']}`}
                             aria-label="Replace section"
-                        />
+                        >
+                            <ChangeIcon />
+                        </button>
                     </div>
-                )}
-            </div>
-
+                </div>
+            )}
             <div className={styles.content}>
                 {editableSection || (
                     <p className={styles['template-info']}>
@@ -586,7 +699,6 @@ export const ProgramSectionForm = ({
                     </p>
                 )}
             </div>
-
             <div className={styles['actions-container']}>
                 {sectionMode !== ProgramSectionMode.View && (
                     <div className={styles.actions}>
@@ -596,7 +708,7 @@ export const ProgramSectionForm = ({
                         <Button
                             buttonStyle="primary"
                             onClick={handleSaveClick}
-                            disabled={isDisabled || !isSectionValid}
+                            disabled={isDisabled || !isSectionSaveValid}
                         >
                             {PROGRAMS_TEXT.BUTTON.SAVE}
                         </Button>

@@ -5,7 +5,7 @@ import { ReportItem } from './report-item';
 import { Button } from '@/components/public/ui/button';
 import styles from './ReportsSection.module.scss';
 
-const INITIAL_VISIBLE_COUNT = 5;
+const INITIAL_VISIBLE_COUNT = 2;
 
 export const ReportsSection = () => {
     const { t } = useTranslation('reportsPage');

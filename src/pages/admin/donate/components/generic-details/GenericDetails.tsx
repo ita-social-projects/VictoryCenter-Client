@@ -39,6 +39,7 @@ export interface GenericDetailsProps<T extends FieldValues> {
     onLocalSubmit?: (data: T) => void;
     onLocalUpdate?: (index: number, data: T) => void;
     onLocalDelete?: (index: number) => void;
+    isPublishDisabled?: boolean;
 }
 
 export function GenericDetails<T extends { id: number } & FieldValues>({
@@ -64,6 +65,7 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
     onLocalSubmit,
     onLocalUpdate,
     onLocalDelete,
+    isPublishDisabled = false,
 }: Readonly<GenericDetailsProps<T>>) {
     const addformRef = useRef<GenericFormRef>(null);
     const [isAddFormVisible, setIsAddFormVisible] = useState(false);
@@ -206,7 +208,10 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
                                         isChildForm={isChildForm}
                                         isParentCreating={isParentCreating}
                                         isDisabled={isDisabled}
-                                        onModeChange={(mode: GenericFormMode) => handleItemModeChange(item.id, mode)}
+                                        isPublishDisabled={isPublishDisabled}
+                                        onModeChange={(mode: GenericFormMode) =>
+                                            handleItemModeChange(item.id || index, mode)
+                                        }
                                     >
                                         {(formProps) => (
                                             <>
@@ -232,6 +237,7 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
                             isChildForm={isChildForm}
                             isParentCreating={isParentCreating}
                             isDisabled={isDisabled}
+                            isPublishDisabled={isPublishDisabled}
                         >
                             {(formProps) => (
                                 <>

@@ -12,8 +12,18 @@ jest.mock('@/components/admin/input-groups/photo-input-group/PhotoInputGroup', (
         photoCalls.push(props);
         return (
             <div data-testid={`photo-${props.id}`}>
-                <button data-testid={`photo-change-${props.id}`} type="button" onClick={() => props.onChange('v')} />
-                <button data-testid={`photo-error-${props.id}`} type="button" onClick={() => props.setError('ERR')} />
+                <button
+                    data-testid={`photo-change-${props.id}`}
+                    type="button"
+                    onClick={() => props.onChange('v')}
+                    aria-label="Change photo"
+                />
+                <button
+                    data-testid={`photo-error-${props.id}`}
+                    type="button"
+                    onClick={() => props.setError('ERR')}
+                    aria-label="Set error"
+                />
             </div>
         );
     },
@@ -122,11 +132,11 @@ describe('EditableImagesBottomSection', () => {
         expect(photoCalls[1].disabled).toBe(true);
     });
 
-    it('renders images with src in non-edit/view mode', () => {
+    it('renders images with src in Template mode', () => {
         (getImageSrc as jest.Mock).mockReturnValueOnce('src-1').mockReturnValueOnce('');
 
         renderComponent({
-            mode: ProgramSectionMode.Published,
+            mode: ProgramSectionMode.Template,
             images: [{ url: 'u', mimeType: 'image/png', id: 1 } as any, null],
             imageKeys: ['a', 'b'],
         });

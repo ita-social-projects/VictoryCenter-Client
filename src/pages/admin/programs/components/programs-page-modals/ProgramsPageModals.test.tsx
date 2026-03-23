@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { ProgramsPageModals } from './ProgramsPageModals';
-import { Program, ProgramCategory } from '@/types/admin/programs';
+import { HippotherapyProgram, ProgramCategory } from '@/types/admin/programs';
 import { BaseModalState, UseModalsStateResult } from '@/hooks/admin/use-modals-state/useModalsState';
 import { VisibilityStatus } from '@/types/admin/common';
 import { ProgramModalProps } from '@/pages/admin/programs/components/programs-page-modals/program-modal/ProgramModal';
@@ -30,8 +30,13 @@ jest.mock('../program-category-modals/DeleteCategoryModal', () => ({
         isOpen ? <div data-testid="delete-category-modal" /> : null,
 }));
 
+jest.mock('../translate-program-modal/TranslateProgramModal', () => ({
+    TranslateProgramModal: ({ isOpen }: { isOpen: boolean }) =>
+        isOpen ? <div data-testid="translate-program-modal" /> : null,
+}));
+
 describe('ProgramsPageModals', () => {
-    const mockProgram: Program = {
+    const mockProgram: HippotherapyProgram = {
         id: 1,
         name: 'Test Program',
         description: 'Test Description',
@@ -44,6 +49,7 @@ describe('ProgramsPageModals', () => {
         participantsCount: '',
         sections: [],
         slug: 'test-program',
+        localizations: [],
     };
 
     const mockCategories: ProgramCategory[] = [
@@ -55,6 +61,7 @@ describe('ProgramsPageModals', () => {
         onAddProgram: jest.fn(),
         onEditProgram: jest.fn(),
         onDeleteProgram: jest.fn(),
+        onTranslateProgram: jest.fn(),
         onAddCategory: jest.fn(),
         onEditCategory: jest.fn(),
         onDeleteCategory: jest.fn(),
@@ -75,8 +82,8 @@ describe('ProgramsPageModals', () => {
     };
 
     const createMockModalsState = (
-        overrides: Partial<BaseModalState<Program>> = {},
-    ): UseModalsStateResult<Program> => ({
+        overrides: Partial<BaseModalState<HippotherapyProgram>> = {},
+    ): UseModalsStateResult<HippotherapyProgram> => ({
         modalState: {
             isAddModalOpen: false,
             itemToDelete: null,
@@ -108,11 +115,12 @@ describe('ProgramsPageModals', () => {
         isAnyModalOpened: false,
     });
 
-    const renderProgramsPageModals = (modalsStateControl: UseModalsStateResult<Program>) =>
+    const renderProgramsPageModals = (modalsStateControl: UseModalsStateResult<HippotherapyProgram>) =>
         render(
             <ProgramsPageModals
                 modalsStateControl={modalsStateControl}
                 categories={mockCategories}
+                translatedLanguages={[]}
                 {...mockCallbacks}
             />,
         );
@@ -124,6 +132,7 @@ describe('ProgramsPageModals', () => {
     const getAddCategoryModal = () => screen.queryByTestId('program-category-modal-add');
     const getEditCategoryModal = () => screen.queryByTestId('program-category-modal-edit');
     const getDeleteCategoryModal = () => screen.queryByTestId('delete-category-modal');
+    const getTranslateProgramModal = () => screen.queryByTestId('translate-program-modal');
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -137,6 +146,8 @@ describe('ProgramsPageModals', () => {
         expect(getEditProgramModal()).not.toBeInTheDocument();
         expect(getDeleteProgramModal()).not.toBeInTheDocument();
         expect(getAddCategoryModal()).not.toBeInTheDocument();
+        // translation modal also closed
+        expect(screen.queryByTestId('translate-program-modal')).not.toBeInTheDocument();
         expect(getEditCategoryModal()).not.toBeInTheDocument();
         expect(getDeleteCategoryModal()).not.toBeInTheDocument();
     });
@@ -166,6 +177,16 @@ describe('ProgramsPageModals', () => {
         expect(getAddProgramModal()).not.toBeInTheDocument();
         expect(getEditProgramModal()).not.toBeInTheDocument();
         expect(getDeleteProgramModal()).toBeInTheDocument();
+    });
+
+    it('should render translate program modal when itemToTranslate is set', () => {
+        const modalsState = createMockModalsState({ itemToTranslate: mockProgram });
+        renderProgramsPageModals(modalsState);
+
+        expect(getTranslateProgramModal()).toBeInTheDocument();
+        expect(getAddProgramModal()).not.toBeInTheDocument();
+        expect(getEditProgramModal()).not.toBeInTheDocument();
+        expect(getDeleteProgramModal()).not.toBeInTheDocument();
     });
 
     it('should render add category modal when isAddCategoryModalOpen is true', () => {

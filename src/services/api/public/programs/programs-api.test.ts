@@ -1,7 +1,7 @@
 import { programPageDataFetch, fetchProgramBySlug } from './programs-api';
 import { axiosInstance } from '@/services/api/axios';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
-import { PublishedProgramDto, DetailedProgram } from '@/types/public/programs-page';
+import { PublishedProgramDto, DetailedProgramDto } from '@/types/public/programs-page';
 
 jest.mock('@/services/api/axios');
 jest.mock('@/utils/mock-data/public/programs-page', () => ({
@@ -26,6 +26,7 @@ describe('programs-api', () => {
                         { id: 2, name: 'Category 2' },
                     ],
                     slug: 'program-a',
+                    localizations: [],
                 },
                 {
                     id: 2,
@@ -34,6 +35,7 @@ describe('programs-api', () => {
                     description: 'Description B',
                     categories: [{ id: 1, name: 'Category 1' }],
                     slug: 'program-b',
+                    localizations: [],
                 },
             ];
 
@@ -67,7 +69,7 @@ describe('programs-api', () => {
 
     describe('fetchProgramBySlug', () => {
         it('should fetch program by slug and return detailed program data', async () => {
-            const mockProgram: DetailedProgram = {
+            const mockProgram: DetailedProgramDto = {
                 id: 1,
                 name: 'Test Program',
                 slug: 'test-program',
@@ -78,6 +80,7 @@ describe('programs-api', () => {
                 location: '',
                 participantsCount: '0',
                 meetingsCount: '0',
+                localizations: [],
             };
 
             (axiosInstance.get as jest.Mock).mockResolvedValue({ data: mockProgram });
@@ -89,7 +92,7 @@ describe('programs-api', () => {
         });
 
         it('should handle different slug formats', async () => {
-            const mockProgram: DetailedProgram = {
+            const mockProgram: DetailedProgramDto = {
                 id: 2,
                 name: 'Another Program',
                 slug: 'another-program-2024',
@@ -100,6 +103,7 @@ describe('programs-api', () => {
                 participantsCount: '0',
                 meetingsCount: '0',
                 sections: [],
+                localizations: [],
             };
 
             (axiosInstance.get as jest.Mock).mockResolvedValue({ data: mockProgram });

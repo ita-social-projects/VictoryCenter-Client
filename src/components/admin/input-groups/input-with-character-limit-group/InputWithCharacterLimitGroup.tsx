@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { InputLabel, InputLabelProps } from '@/components/admin/input-label/InputLabel';
 import { InputError, InputErrorProps } from '@/components/admin/input-error/InputError';
+import { InputErrorWithCharacterCounter } from '@/components/admin/input-error-with-character-counter/InputErrorWithCharacterCounter';
 import {
     InputWithCharacterLimit,
     InputWithCharacterLimitProps,
@@ -14,6 +15,7 @@ export interface InputWithCharacterLimitGroupProps extends InputWithCharacterLim
     error?: InputErrorProps['error'];
     className?: string;
     maxLimitWarning?: string;
+    showCounterBelow?: boolean;
 }
 
 export const InputWithCharacterLimitGroup = ({
@@ -32,8 +34,11 @@ export const InputWithCharacterLimitGroup = ({
     error,
     className,
     maxLimitWarning,
+    showCounterBelow = false,
 }: InputWithCharacterLimitGroupProps) => {
     const [localWarning, setLocalWarning] = useState<string | null>(null);
+    const displayedError = localWarning || error;
+    const counterId = `${id}-character-count`;
 
     return (
         <div className={cn('input-group', className)}>
@@ -49,11 +54,22 @@ export const InputWithCharacterLimitGroup = ({
                 type={type}
                 disabled={disabled}
                 placeholder={placeholder}
-                hasError={!!error}
+                hasError={!!displayedError}
                 maxLimitWarning={maxLimitWarning}
                 onWarningChange={setLocalWarning}
+                showCounter={!showCounterBelow}
             />
-            <InputError error={localWarning || error} />
+            {showCounterBelow ? (
+                <InputErrorWithCharacterCounter
+                    error={displayedError}
+                    maxLength={maxLength}
+                    counterId={counterId}
+                    htmlFor={id}
+                    value={value}
+                />
+            ) : (
+                <InputError error={displayedError} />
+            )}
         </div>
     );
 };

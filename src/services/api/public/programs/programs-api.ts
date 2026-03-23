@@ -1,5 +1,5 @@
 import { axiosInstance } from '@/services/api/axios';
-import { DetailedProgram, ProgramsPageData, PublishedProgramDto } from '@/types/public/programs-page';
+import { DetailedProgramDto, ProgramsPageData, PublishedProgramDto } from '@/types/public/programs-page';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
 
 export const programPageDataFetch = async (): Promise<ProgramsPageData> => {
@@ -15,7 +15,7 @@ export const programPageDataFetch = async (): Promise<ProgramsPageData> => {
     };
 };
 
-export const fetchProgramBySlug = async (slug: string): Promise<DetailedProgram> => {
-    const response = await axiosInstance.get<DetailedProgram>(`${API_ROUTES.PROGRAMS.BY_SLUG}/${slug}`);
+export const fetchProgramBySlug = async (slug: string): Promise<DetailedProgramDto> => {
+    const response = await axiosInstance.get<DetailedProgramDto>(`${API_ROUTES.PROGRAMS.BY_SLUG}/${slug}`);
     return response.data;
 };

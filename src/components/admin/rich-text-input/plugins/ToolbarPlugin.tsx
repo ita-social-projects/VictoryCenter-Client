@@ -13,9 +13,10 @@ import styles from '../RichTextInput.module.scss';
 
 export interface ToolbarPluginProps {
     disabled?: boolean;
+    hidden?: boolean;
 }
 
-export const ToolbarPlugin = ({ disabled = false }: ToolbarPluginProps) => {
+export const ToolbarPlugin = ({ disabled = false, hidden = false }: ToolbarPluginProps) => {
     const [editor] = useLexicalComposerContext();
     const [isBold, setIsBold] = useState(false);
     const [isItalic, setIsItalic] = useState(false);
@@ -63,6 +64,10 @@ export const ToolbarPlugin = ({ disabled = false }: ToolbarPluginProps) => {
             }
         });
     }, [editor]);
+
+    if (hidden) {
+        return null;
+    }
 
     return (
         <div className={styles.toolbar}>

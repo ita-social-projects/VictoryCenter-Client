@@ -1,8 +1,15 @@
 import React from 'react';
 import { ContentType, SectionType } from '../common/about-us';
 import { Image, ImageValues } from '../common/image';
+import {
+    EntityLocalization,
+    EntityLocalizationDto,
+    EntityWithDtoLocalizations,
+    EntityWithLocalizations,
+    EntityWithTranslationStatuses,
+} from '../common/language';
 
-export type WhoWeAreCategory = {
+export type WhoWeAreCategory = EntityWithTranslationStatuses & {
     id: number;
     sectionType: SectionType;
     title: string;
@@ -15,15 +22,47 @@ export type WhoWeAreSection = {
     contents: Content[];
 };
 
-export type Content = {
+export type WhoWeAreSectionDto = {
     id: number;
-    contentType: ContentType;
-    image: Image | ImageValues | null;
-    imageId: number | null;
+    sectionType: SectionType;
+    title: string;
+    contents: ContentDto[];
+};
+
+export type Content = ContentLocalizableFields &
+    EntityWithLocalizations<ContentLocalization> & {
+        id: number;
+        contentType: ContentType;
+        image: Image | ImageValues | null;
+        imageId: number | null;
+    };
+
+export type ContentDto = ContentLocalizableFields &
+    EntityWithDtoLocalizations<ContentLocalizationDto> & {
+        id: number;
+        contentType: ContentType;
+        image: Image | ImageValues | null;
+        imageId: number | null;
+    };
+
+export type ContentLocalizationDto = EntityLocalizationDto &
+    ContentLocalizableFields & {
+        entityId: number;
+    };
+
+export type ContentLocalization = EntityLocalization & ContentLocalizableFields;
+
+export type UpdateContentLocalizationDto = ContentLocalizableFields & {
+    entityId: number;
+    languageId: number;
+};
+
+export type CreateContentLocalizationDto = UpdateContentLocalizationDto;
+
+export type ContentLocalizableFields = {
     description: string | null;
     title: string | null;
 };
-
 export interface CardImageConfig {
     style: React.CSSProperties;
     subText: string;
@@ -32,3 +71,8 @@ export interface CardImageConfig {
     minWidth: number;
     minHeight: number;
 }
+
+export type TranslateLimits = {
+    descriptionLimit: number;
+    titleLimit?: number;
+};

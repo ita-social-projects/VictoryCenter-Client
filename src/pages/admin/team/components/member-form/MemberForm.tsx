@@ -4,7 +4,7 @@ import { TEAM_MEMBER_VALIDATION_FUNCTIONS } from '@/validation/admin/team-member
 import { ImageValues, Image } from '@/types/common/image';
 import { InputLabel } from '@/components/admin/input-label/InputLabel';
 import { SingleSelectInput } from '@/components/common/single-select-input/SingleSelectInput';
-import { TEAM_MEMBER_VALIDATION, TEAM_MEMBERS_TEXT } from '@/const/admin/team';
+import { TEAM_IMAGE_PLACEHOLDER, TEAM_MEMBER_VALIDATION, TEAM_MEMBERS_TEXT } from '@/const/admin/team';
 import { ImageInput } from '@/components/admin/image-input/ImageInput';
 import './MemberForm.scss';
 import { useFormManager } from '@/hooks/admin/use-form-manager/useFormManager';
@@ -154,6 +154,8 @@ export const MemberForm = forwardRef<TeamMemberFormRef, MemberFormProps>(
                         onChange={handleImgChange}
                         id="image"
                         name="image"
+                        label={TEAM_IMAGE_PLACEHOLDER.INPUT}
+                        subText={TEAM_IMAGE_PLACEHOLDER.SIZE}
                         cropWidth={TEAM_MEMBER_VALIDATION.img.croppedWidth}
                         cropHeight={TEAM_MEMBER_VALIDATION.img.croppedHeight}
                         minWidth={TEAM_MEMBER_VALIDATION.img.minWidth}

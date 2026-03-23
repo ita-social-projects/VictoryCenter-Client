@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './TeamPage.scss';
-import horseVideo from '@/assets/videos/public/team-page/quote_background.mp4';
+import horseVideo from '@/assets/videos/quote-background.webm';
 import classNames from 'classnames';
 import {
     DOWNLOAD_ERROR,
@@ -15,6 +15,7 @@ import { teamPageDataFetch } from '@/services/api/public/team/team-api';
 import { TeamItem } from '@/types/public/team-page';
 import { TeamMemberCard } from './team-member-card/TeamMemberCard';
 import { LinearProgress } from '@mui/material';
+import { TeamCategoryDescription } from './team-category-description/TeamCategoryDescription';
 
 export const TeamPage: React.FC = () => {
     const [teamData, setTeamData] = useState<TeamItem[]>([]);
@@ -60,10 +61,7 @@ export const TeamPage: React.FC = () => {
                     >
                         <div className="team_info">
                             <div className="members-grid">
-                                <div className="team_description">
-                                    <h2>{team.title}</h2>
-                                    <p>{team.description}</p>
-                                </div>
+                                <TeamCategoryDescription team={team} />
                                 {team.members.map((member) => (
                                     <TeamMemberCard key={member.id} member={member} />
                                 ))}
@@ -75,7 +73,7 @@ export const TeamPage: React.FC = () => {
 
             <div className="video-background-container">
                 <video autoPlay muted loop playsInline className="background-video">
-                    <source src={horseVideo} type="video/mp4" />
+                    <source src={horseVideo} type="video/webm" />
                 </video>
 
                 <div className="quote-overlay">

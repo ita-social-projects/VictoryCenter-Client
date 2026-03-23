@@ -66,43 +66,27 @@
 }
 
 .edit-btn {
-    cursor: default;
-    transition: background-image 0.2s ease;
+    cursor: pointer;
     border: none;
     width: 1.5rem;
     height: 1.5rem;
-    background: url('~@/assets/icons/edit.svg');
 
     &.edit {
-        background: url('~@/assets/icons/edit-filled.svg');
+        --icon-btn-hover-color: #{colors.$blue-900};
+        --icon-btn-disabled-color: #{colors.$blue-900};
     }
-
-    &.view {
-        cursor: pointer;
-        &:hover {
-            background: url('~@/assets/icons/edit-hover.svg');
-        }
+    
+    &.edit:hover {
+        cursor: not-allowed;
     }
 }
 
 .delete-btn {
-    display: flex;
     justify-self: flex-end;
     cursor: pointer;
-    transition: background-image 0.2s ease;
     border: none;
     gap: 0.25rem;
     font-size: 1.125rem;
-
-    &:hover {
-        background: url('~@/assets/icons/delete-hover.svg') no-repeat;
-    }
-
     width: 1.5rem;
     height: 1.5rem;
-    background: url('~@/assets/icons/delete.svg') no-repeat;
-
-    &.pressed {
-        background: url('~@/assets/icons/delete-filled.svg') no-repeat;
-    }
 }

@@ -1,0 +1,59 @@
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
+
+.root {
+    height: 290px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+
+    @media (min-width: 1440px) {
+        height: 350px;
+    }
+}
+
+.wrapper {
+    width: 343px;
+    max-width: 100%;
+    position: relative;
+}
+
+.chart {
+    margin-block: 12px;
+    width: 245px;
+    overflow: visible;
+    margin-left: 0;
+
+    @media (min-width: 1440px) {
+        width: 300px;
+    }
+}
+
+.chart path {
+    fill: none;
+}
+
+.arc[data-level='0'] {
+    stroke: c.$light-blue-300;
+}
+.arc[data-level='1'] {
+    stroke: c.$light-blue-200;
+}
+.arc[data-level='2'] {
+    stroke: c.$light-blue-100;
+}
+.arc[data-level='3'] {
+    stroke: c.$light-blue-50;
+}
+
+.label {
+    fill: c.$blue-50;
+}
+
+.percent {
+    @include type.body-1-bold;
+}
+
+.amount {
+    @include type.small-text-bold;
+}

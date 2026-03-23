@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { SingleTitleDescriptionAuthorPairs } from './SingleTitleDescriptionAuthorPairs';
 import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
@@ -37,9 +37,10 @@ jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
 }));
 
 jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
-    InputWithCharacterLimitGroup: ({ value, onChange, onBlur, id, error }: any) => (
-        <div>
-            <input data-testid={`input-${id}`} value={value} onChange={onChange} onBlur={onBlur} />
+    InputWithCharacterLimitGroup: ({ value, onChange, onBlur, id, error, showCounterBelow }: any) => (
+        <div data-testid={`group-${id}`} data-show-counter-below={String(showCounterBelow)}>
+            <label htmlFor={`input-${id}`}>{id}</label>
+            <input id={`input-${id}`} data-testid={`input-${id}`} value={value} onChange={onChange} onBlur={onBlur} />
             <div data-testid={`error-${id}`}>{error ?? ''}</div>
         </div>
     ),
@@ -99,6 +100,12 @@ jest.mock('@/const/admin/programs', () => ({
 jest.mock('@/const/admin/common', () => ({
     COMMON_TEXT_ADMIN: {
         BUTTON: { YES: 'Yes', NO: 'No' },
+        VALIDATION_MESSAGE: {
+            FIELD_REQUIRED: 'Field required',
+            getMinError: jest.fn((min: number) => `Min ${min}`),
+            getMaxError: jest.fn((max: number) => `Max ${max}`),
+            getImageDimensionError: jest.fn(),
+        },
     },
 }));
 
@@ -136,7 +143,7 @@ const renderComponent = (overrideProps: Partial<ComponentProps> = {}) => {
     const defaultProps: ComponentProps = {
         title: '',
         pairs: [],
-        mode: ProgramSectionMode.Published,
+        mode: ProgramSectionMode.View,
         canAddPair: true,
     };
 
@@ -153,12 +160,14 @@ const getPairCardProps = (index: number) =>
 const getConfirmationModalProps = () => mockConfirmationModal.mock.calls.at(-1)?.[0];
 
 const openDeleteModal = async (index: number) => {
-    getPairCardProps(index).onDelete(index);
+    act(() => {
+        getPairCardProps(index).onDelete(index);
+    });
     await waitFor(() => expect(screen.getByTestId('confirmation-modal')).toHaveAttribute('data-open', '1'));
 };
 
 describe('SingleTitleDescriptionAuthorPairs', () => {
-    it('renders h2 title in published mode and uses default carousel variant', () => {
+    it('renders h2 title in view mode and uses default carousel variant', () => {
         const { root } = renderComponent({
             title: 'Hello',
             pairs: pairs(pair('D0', 'A0')),
@@ -181,6 +190,10 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
         });
 
         expect(screen.getByTestId('input-single-title-description-author-pairs-title')).toHaveValue('Edit');
+        expect(screen.getByTestId('group-single-title-description-author-pairs-title')).toHaveAttribute(
+            'data-show-counter-below',
+            'true',
+        );
 
         fireEvent.change(screen.getByTestId('input-single-title-description-author-pairs-title'), {
             target: { value: 'ab' },
@@ -194,8 +207,8 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
         expect(root).not.toHaveClass('template');
     });
 
-    it('does not render title input in published mode', () => {
-        renderComponent({ mode: ProgramSectionMode.Published, title: 'X' });
+    it('does not render title input in View mode', () => {
+        renderComponent({ mode: ProgramSectionMode.View, title: 'X' });
 
         expect(screen.queryByTestId('input-single-title-description-author-pairs-title')).not.toBeInTheDocument();
         expect(getValidateContentTextMock().mock.calls.length).toBe(0);
@@ -269,7 +282,7 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
     });
 
     it('renders add button only in edit mode and respects canAddPair', () => {
-        const view = renderComponent({ mode: ProgramSectionMode.Published });
+        const view = renderComponent({ mode: ProgramSectionMode.View });
         expect(screen.queryByRole('button', { name: 'Add card' })).not.toBeInTheDocument();
         view.unmount();
 
@@ -317,12 +330,14 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
 
         {
             const view = renderComponent({
-                mode: ProgramSectionMode.Published,
+                mode: ProgramSectionMode.View,
                 pairs: pairs(pair('D0', 'A0'), pair('D1', 'A1')),
                 onDeletePair,
             });
 
-            getPairCardProps(1).onDelete(1);
+            act(() => {
+                getPairCardProps(1).onDelete(1);
+            });
 
             expect(screen.getByTestId('confirmation-modal')).toHaveAttribute('data-open', '0');
             expect(onDeletePair).not.toHaveBeenCalled();
@@ -336,7 +351,9 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
                 pairs: pairs(pair('D0', 'A0'), pair('D1', 'A1')),
             });
 
-            getPairCardProps(1).onDelete(1);
+            act(() => {
+                getPairCardProps(1).onDelete(1);
+            });
 
             expect(screen.getByTestId('confirmation-modal')).toHaveAttribute('data-open', '0');
 
@@ -350,7 +367,9 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
                 onDeletePair,
             });
 
-            getPairCardProps(0).onDelete(0);
+            act(() => {
+                getPairCardProps(0).onDelete(0);
+            });
 
             expect(screen.getByTestId('confirmation-modal')).toHaveAttribute('data-open', '0');
             expect(onDeletePair).not.toHaveBeenCalled();
@@ -379,7 +398,9 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
 
         await openDeleteModal(1);
 
-        getConfirmationModalProps().onClose();
+        act(() => {
+            getConfirmationModalProps().onClose();
+        });
         await waitFor(() => expect(screen.getByTestId('confirmation-modal')).toHaveAttribute('data-open', '0'));
 
         await openDeleteModal(1);

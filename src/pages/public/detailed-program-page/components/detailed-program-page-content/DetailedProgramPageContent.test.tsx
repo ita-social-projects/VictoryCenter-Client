@@ -1,9 +1,11 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { DetailedProgramPageContent } from './DetailedProgramPageContent';
-import { DetailedProgram } from '@/types/public/programs-page';
+import { DetailedProgramDto } from '@/types/public/programs-page';
 
 jest.mock('react-router-dom', () => ({
     useParams: jest.fn(),
+    useNavigate: jest.fn(),
+    useLocation: jest.fn(() => ({ pathname: '/', search: '' })),
 }));
 
 jest.mock('@/services/api/public/programs/programs-api', () => ({
@@ -56,7 +58,17 @@ jest.mock('@/components/public/detailed-program-section/DetailedProgramSection',
     ),
 }));
 
+jest.mock('@/components/public/cta', () => ({
+    CtaSection: ({ title, description }: any) => (
+        <div data-testid="cta-section">
+            <h2>{title}</h2>
+            <p>{description}</p>
+        </div>
+    ),
+}));
+
 const { useParams } = require('react-router-dom');
+const { useLocation } = require('react-router-dom');
 const { useProgramBySlug } = require('@/hooks/common/use-get-program-by-slug/useGetProgramBySlug');
 const mockUseProgramBySlug = useProgramBySlug as jest.MockedFunction<typeof useProgramBySlug>;
 
@@ -75,11 +87,12 @@ const mockProgram = {
     backgroundImage: {
         url: 'https://example.com/image.jpg',
     },
-} as unknown as DetailedProgram;
+} as unknown as DetailedProgramDto;
 
 describe('DetailedProgramPageContent', () => {
     beforeEach(() => {
         jest.clearAllMocks();
+        useLocation.mockReturnValue({ pathname: '/', search: '' });
     });
 
     it('renders loading state', () => {
@@ -164,7 +177,7 @@ describe('DetailedProgramPageContent', () => {
         const programWithoutLocation = { ...mockProgram, location: undefined };
         useParams.mockReturnValue({ slug: 'test-program' });
         mockUseProgramBySlug.mockReturnValue({
-            program: programWithoutLocation as unknown as DetailedProgram,
+            program: programWithoutLocation as unknown as DetailedProgramDto,
             isLoading: false,
             error: null,
         });
@@ -180,7 +193,7 @@ describe('DetailedProgramPageContent', () => {
         const programWithoutParticipants = { ...mockProgram, participantsCount: undefined };
         useParams.mockReturnValue({ slug: 'test-program' });
         mockUseProgramBySlug.mockReturnValue({
-            program: programWithoutParticipants as unknown as DetailedProgram,
+            program: programWithoutParticipants as unknown as DetailedProgramDto,
             isLoading: false,
             error: null,
         });
@@ -196,7 +209,7 @@ describe('DetailedProgramPageContent', () => {
         const programWithoutMeetings = { ...mockProgram, meetingsCount: undefined };
         useParams.mockReturnValue({ slug: 'test-program' });
         mockUseProgramBySlug.mockReturnValue({
-            program: programWithoutMeetings as unknown as DetailedProgram,
+            program: programWithoutMeetings as unknown as DetailedProgramDto,
             isLoading: false,
             error: null,
         });
@@ -233,7 +246,7 @@ describe('DetailedProgramPageContent', () => {
 
         useParams.mockReturnValue({ slug: 'test-program' });
         mockUseProgramBySlug.mockReturnValue({
-            program: programWithSections as unknown as DetailedProgram,
+            program: programWithSections as unknown as DetailedProgramDto,
             isLoading: false,
             error: null,
         });
@@ -258,7 +271,7 @@ describe('DetailedProgramPageContent', () => {
 
         useParams.mockReturnValue({ slug: 'test-program' });
         mockUseProgramBySlug.mockReturnValue({
-            program: programWithoutSections as unknown as DetailedProgram,
+            program: programWithoutSections as unknown as DetailedProgramDto,
             isLoading: false,
             error: null,
         });
@@ -287,7 +300,7 @@ describe('DetailedProgramPageContent', () => {
 
         useParams.mockReturnValue({ slug: 'test-program' });
         mockUseProgramBySlug.mockReturnValue({
-            program: programWithSectionsNoIds as unknown as DetailedProgram,
+            program: programWithSectionsNoIds as unknown as DetailedProgramDto,
             isLoading: false,
             error: null,
         });
@@ -308,7 +321,7 @@ describe('DetailedProgramPageContent', () => {
 
         useParams.mockReturnValue({ slug: 'test-program' });
         mockUseProgramBySlug.mockReturnValue({
-            program: programWithoutBackground as unknown as DetailedProgram,
+            program: programWithoutBackground as unknown as DetailedProgramDto,
             isLoading: false,
             error: null,
         });

@@ -25,6 +25,10 @@
     @include _text(t.$fw-bold, t.$h2-size, t.$h2-height, t.$h2-spacing, uppercase);
 }
 
+@mixin h3-medium-uppercase {
+    @include _text(t.$fw-medium, t.$h3-size, t.$h3-height, t.$h3-spacing, uppercase);
+}
+
 @mixin h3-semibold {
     @include _text(t.$fw-semibold, t.$h3-size, t.$h3-height, t.$h3-spacing);
 }

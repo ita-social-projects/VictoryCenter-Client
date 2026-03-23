@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { WhoWeAreApi } from '@/services/api/admin/who-we-are/who-we-are-api';
 import { Content, WhoWeAreCategory, WhoWeAreSection } from '@/types/admin/who-we-are';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
@@ -15,10 +15,16 @@ import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { WHO_WE_ARE_TEXT } from '@/const/admin/who-we-are';
 import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import classNames from 'classnames';
+import { WhoWeArePageToolbar } from '../who-we-are-page-toolbar/WhoWeArePageToolbar';
+import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
+import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
+import { WhoWeAreModals } from '../modals/WhoWeAreModals';
+import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
+import { normalizeHtml } from '@/utils/functions/normalize-html/normalize-html';
 
 interface ErrorState {
     message: string | null;
-    type: 'categories' | 'entity' | null;
+    type: 'categories' | 'entity' | 'languages' | null;
 }
 
 function isExistingImage(image: any): image is Image {
@@ -31,7 +37,9 @@ export const WhoWeAreContent = () => {
     const [selectedSection, setSelectedSection] = useState<WhoWeAreSection | null>(null);
     const [updatedSection, setUpdatedSection] = useState<WhoWeAreSection | null>(null);
     const [isConfirmationModalOpen, setConfirmationModalOpen] = useState<boolean>(false);
-    const [isPublishButtonActive, setIsPublishButtonActive] = useState<boolean>(false);
+    const [languagesError, setLanguagesError] = useState<string | null>(null);
+    const modalsStateControl = useModalsState<WhoWeAreSection>();
+    const { isAnyModalOpened, openModalActions } = modalsStateControl;
 
     const { addToast } = useToast();
 
@@ -68,6 +76,17 @@ export const WhoWeAreContent = () => {
         autoFetchDependencies: [getSection],
     });
 
+    const normalizeSection = useCallback((section: WhoWeAreSection): WhoWeAreSection => {
+        return {
+            ...section,
+            contents: section.contents.map((item) => ({
+                ...item,
+                description: item.description ? normalizeHtml(item.description) : item.description,
+                title: item.title ? normalizeHtml(item.title) : item.title,
+            })),
+        };
+    }, []);
+
     useEffect(() => {
         if (categories && categories.length > 0 && !selectedCategory) {
             setSelectedCategory(categories[0]);
@@ -76,15 +95,63 @@ export const WhoWeAreContent = () => {
 
     useEffect(() => {
         if (fetchedSection) {
-            setSelectedSection(fetchedSection);
-            setUpdatedSection(fetchedSection);
+            const normalizedSection = normalizeSection(fetchedSection);
+            setSelectedSection(normalizedSection);
+            setUpdatedSection(normalizedSection);
         }
-    }, [fetchedSection]);
+    }, [fetchedSection, normalizeSection]);
+
+    const isPublishButtonActive = useMemo(() => {
+        if (!selectedSection || !updatedSection) return false;
+        return JSON.stringify(selectedSection) !== JSON.stringify(updatedSection);
+    }, [selectedSection, updatedSection]);
+
+    const setErrorState = useCallback((message: string, type: 'categories' | 'entity' | 'languages') => {
+        if (type === 'languages') {
+            setLanguagesError(message);
+        }
+    }, []);
+
+    const { allLanguages, selectedLanguage, translationLanguages, onLanguageChange, retryFetchLanguages } =
+        useLocalizationToolkit({
+            setErrorState,
+        });
+
+    const englishLanguage = useMemo(() => allLanguages.find((l) => l.code === 'en'), [allLanguages]);
 
     const handleCategorySelect = useCallback((category: WhoWeAreCategory) => {
         setSelectedCategory(category);
-        setIsPublishButtonActive(false);
     }, []);
+
+    const handleTranslateContentModalOpen = useCallback(
+        (section: WhoWeAreSection) => {
+            if (isAnyModalOpened) return;
+
+            const englishLanguageId = englishLanguage?.id;
+            const hasTranslation = englishLanguageId
+                ? section.contents
+                      .flatMap((content) => content.localizations)
+                      .some((l) => l.language?.id === englishLanguageId)
+                : false;
+
+            if (hasTranslation) {
+                openModalActions.openEditTranslationModal(section);
+            } else {
+                openModalActions.openTranslateItemModal(section);
+            }
+        },
+        [isAnyModalOpened, openModalActions, englishLanguage],
+    );
+
+    const handleTranslateWhoWeAreSuccess = useCallback(
+        (updatedSection: WhoWeAreSection) => {
+            setUpdatedSection(updatedSection);
+            refetchCategories();
+
+            addToast(COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_PUBLISHED_SUCCESS, ToastType.Success);
+        },
+        [addToast, refetchCategories],
+    );
 
     const handleContentChange = useCallback((updatedContent: Content) => {
         setUpdatedSection((prevSection) => {
@@ -120,15 +187,17 @@ export const WhoWeAreContent = () => {
             try {
                 const result = await WhoWeAreApi.updateContent(client, changedContents, selectedCategory.sectionType);
 
-                setSelectedSection(result);
-                setUpdatedSection(result);
-                setIsPublishButtonActive(false);
+                const normalizedResult = normalizeSection(result);
+                setSelectedSection(normalizedResult);
+                setUpdatedSection(normalizedResult);
                 addToast(COMMON_TEXT_ADMIN.MESSAGE.SUCCESSFULLY_PUBLISHED, ToastType.Info);
+
+                refetchCategories();
             } catch (error) {
                 addToast(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_PUBLISH_CHANGES, ToastType.Error);
             }
         }
-    }, [selectedSection, updatedSection, client, selectedCategory, addToast]);
+    }, [selectedSection, updatedSection, client, selectedCategory, addToast, refetchCategories, normalizeSection]);
 
     const handleConfirmPublish = useCallback(() => {
         setConfirmationModalOpen(false);
@@ -142,16 +211,21 @@ export const WhoWeAreContent = () => {
         if (sectionError) {
             return { message: WHO_WE_ARE_TEXT.FAIL_TO_FETCH_SECTION, type: 'entity' };
         }
+        if (languagesError) {
+            return { message: languagesError, type: 'languages' };
+        }
         return { message: null, type: null };
-    }, [categoryError, sectionError]);
+    }, [categoryError, sectionError, languagesError]);
 
     const handleRetry = useCallback(() => {
         if (error.type === 'categories') {
             refetchCategories();
         } else if (error.type === 'entity') {
             refetchSection();
+        } else if (error.type === 'languages') {
+            retryFetchLanguages();
         }
-    }, [error.type, refetchCategories, refetchSection]);
+    }, [error.type, refetchCategories, refetchSection, retryFetchLanguages]);
 
     const isLoading = isCategoriesLoading || isSectionLoading;
     const isPending = isLoading || !!error.message;
@@ -177,28 +251,38 @@ export const WhoWeAreContent = () => {
         }
 
         return (
-            <SectionsWrapper
-                section={updatedSection}
-                onChange={handleContentChange}
-                onPublish={() => setConfirmationModalOpen(true)}
-                setIsPublishButtonActive={(value) => setIsPublishButtonActive(value)}
-                isPublishButtonActive={isPublishButtonActive}
-            />
+            selectedLanguage && (
+                <SectionsWrapper
+                    section={updatedSection}
+                    onChange={handleContentChange}
+                    onPublish={() => setConfirmationModalOpen(true)}
+                    handleOnTranslateContent={handleTranslateContentModalOpen}
+                    isPublishButtonActive={isPublishButtonActive}
+                    language={selectedLanguage}
+                />
+            )
         );
     };
 
     return (
         <>
-            <div className={classNames('who-we-are-main-box', { 'who-we-are-main-box--pending': isPending })}>
-                <CategoryBar<WhoWeAreCategory>
-                    categories={categories}
-                    selectedCategory={selectedCategory}
-                    getCategoryDisplayName={(category) => category.title}
-                    getCategoryKey={(category) => category.id}
-                    onCategorySelect={handleCategorySelect}
-                />
-
-                {renderContent()}
+            <div className="who-we-are-page-container">
+                <div className="who-we-are-toolbar-container">
+                    <WhoWeArePageToolbar languages={allLanguages} onLanguageChange={onLanguageChange} />
+                </div>
+                <div className={classNames('who-we-are-main-box', { 'who-we-are-main-box--pending': isPending })}>
+                    <CategoryBar<WhoWeAreCategory>
+                        categories={categories}
+                        selectedCategory={selectedCategory}
+                        getCategoryDisplayName={(category) => category.title}
+                        getCategoryKey={(category) => category.id}
+                        onCategorySelect={handleCategorySelect}
+                        renderCategoryExtra={(category) => (
+                            <LocalizationStatuses languages={translationLanguages} localizedEntity={category} />
+                        )}
+                    />
+                    {renderContent()}
+                </div>
             </div>
             <ConfirmationModal
                 isOpen={isConfirmationModalOpen}
@@ -206,6 +290,11 @@ export const WhoWeAreContent = () => {
                 title={COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES}
                 onConfirm={handleConfirmPublish}
                 onCancel={() => setConfirmationModalOpen(false)}
+            />
+            <WhoWeAreModals
+                modalsStateControl={modalsStateControl}
+                translatedLanguages={translationLanguages}
+                onTranslateWhoWeAreSection={handleTranslateWhoWeAreSuccess}
             />
             <ToastContainer />
         </>

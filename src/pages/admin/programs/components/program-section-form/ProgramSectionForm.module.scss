@@ -3,8 +3,17 @@
 .container {
     background-color: #fff;
     position: relative;
+    width: clamp(200px, 100%, 1440px);
+    display: flex;
+    align-items: center;
+    flex-direction: column;
 
     &:hover .hover-buttons {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    &:hover .order-controls {
         opacity: 1;
         visibility: visible;
     }
@@ -12,9 +21,10 @@
 
 .actions-section {
     display: flex;
-    justify-content: end;
+    justify-content: space-between;
+    width: 100%;
     height: 100px;
-    padding: 30px 30px 0 0;
+    padding: 30px 30px 0 30px;
 }
 
 .hover-buttons {
@@ -47,26 +57,9 @@
     cursor: pointer;
 }
 
-.edit-button {
-    background-image: url('~@/assets/icons/edit.svg');
-
-    &:hover,
-    &:active {
-        background-image: url('~@/assets/icons/edit-pressed.svg');
-    }
-
-    &:hover {
-        opacity: 0.6;
-    }
-}
-
+.edit-button,
 .delete-button {
-    background-image: url('~@/assets/icons/delete.svg');
-
-    &:hover,
-    &:active {
-        background-image: url('~@/assets/icons/delete-pressed.svg');
-    }
+    --icon-btn-hover-color: #{c.$blue-900};
 
     &:hover {
         opacity: 0.6;
@@ -74,11 +67,15 @@
 }
 
 .change-button {
-    background-image: url('~@/assets/icons/change.svg');
-
     &:hover,
     &:active {
-        background-image: url('~@/assets/icons/change-pressed.svg');
+        path:nth-of-type(1) {
+            fill-rule: nonzero;
+            fill: c.$blue-900;
+        }
+        path:nth-of-type(2) {
+            fill: black;
+        }
     }
 
     &:hover {
@@ -86,7 +83,36 @@
     }
 }
 
+.order-controls {
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+        opacity 0.2s ease,
+        visibility 0.2s ease;
+}
+
+.up-button {
+    background-image: url('~@/assets/icons/chevron-right.svg');
+    transform: rotate(270deg);
+
+    &:hover {
+        opacity: 0.6;
+    }
+}
+
+.down-button {
+    background-image: url('~@/assets/icons/chevron-right.svg');
+    transform: rotate(90deg);
+    
+    &:hover {
+        opacity: 0.6;
+    }
+}
+
 .content {
+    max-width: 1440px;
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -108,7 +134,9 @@
 
 .actions-container {
     background-color: #fff;
-    min-height: 100px;
+    min-height: 130px;
+    min-width: 700px;
+    padding-top: 30px;
 }
 
 .actions {

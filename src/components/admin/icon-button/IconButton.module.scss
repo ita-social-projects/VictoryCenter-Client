@@ -1,0 +1,45 @@
+@use '@/assets/sass/variables/colors' as c;
+
+.icon-default,
+.icon-filled {
+    grid-area: 1 / 1;
+    transition: opacity 0.2s ease;
+}
+
+.icon-default {
+    opacity: 1;
+}
+
+.icon-filled {
+    opacity: 0;
+}
+
+.icon-btn {
+    display: inline-grid;
+    place-items: center;
+    background: transparent;
+    color: var(--icon-btn-color, c.$blue-500);
+    cursor: pointer;
+    transition: color 0.2s ease;
+
+    &:hover:not(:disabled) {
+        color: var(--icon-btn-hover-color, c.$blue-100);
+
+        .icon-default {
+            opacity: 0;
+        }
+
+        .icon-filled {
+            opacity: 1;
+        }
+    }
+
+    &:active:not(:disabled) {
+        color: var(--icon-btn-active-color, c.$blue-900);
+    }
+
+    &:disabled {
+        color: var(--icon-btn-disabled-color, c.$grey-600);
+        cursor: not-allowed;
+    }
+}

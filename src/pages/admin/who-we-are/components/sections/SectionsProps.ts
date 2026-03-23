@@ -1,18 +1,24 @@
 import { ImageSectionProps } from './image-block-section/ImageBlockSection';
 import { IMAGE_CONFIGS, WHO_WE_ARE_TEXT } from '@/const/admin/who-we-are';
-import MainPageImage from '@/assets/images/public/about-us-page/background.jpg';
-import TeamPageImage from '@/assets/images/public/about-us-page/our-team.jpg';
-import SupportVeterans from '@/assets/images/public/about-us-page/support-veterans.jpg';
-import SupportVolunteers from '@/assets/images/public/about-us-page/support-volunteers.jpg';
-import SupportChildren from '@/assets/images/public/about-us-page/support-children.jpg';
-import ManAndHorse from '@/assets/images/public/about-us-page/man-horse.jpg';
-import GirlAndHorse from '@/assets/images/public/about-us-page/girl-horse.jpg';
-import OldManAndHorse from '@/assets/images/public/about-us-page/old-man-horse.jpg';
-import WomanAndHorse from '@/assets/images/public/about-us-page/woman-horse.jpg';
+import MainPageImage from '@/assets/images/man-facing-horse-forehead.webp';
+import TeamPageImage from '@/assets/images/our-team.webp';
+import SupportVeterans from '@/assets/images/support-veterans.webp';
+import SupportVolunteers from '@/assets/images/support-volunteers.webp';
+import SupportChildren from '@/assets/images/support-children.webp';
+import ManAndHorse from '@/assets/images/man-horse.webp';
+import GirlAndHorse from '@/assets/images/girl-horse.webp';
+import OldManAndHorse from '@/assets/images/old-man-horse.webp';
+import WomanAndHorse from '@/assets/images/woman-horse.webp';
 import { DescriptionSectionProps } from './description-section/DescriptionSection';
 import { CardsSectionProps } from './cards-section/CardsSection';
 
-type OmittedProps = 'content' | 'onChange' | 'onPublish' | 'setIsPublishButtonActive' | 'isPublishButtonActive';
+type OmittedProps =
+    | 'content'
+    | 'onChange'
+    | 'onPublish'
+    | 'setIsPublishButtonActive'
+    | 'isPublishButtonActive'
+    | 'language';
 
 export type WhoWeAreImageConfigParams = {
     cropWidth: number;

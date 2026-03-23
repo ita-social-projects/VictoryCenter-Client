@@ -3,6 +3,9 @@ import { SupportCard } from './SupportCard';
 import { ContentType } from '@/types/common/about-us';
 import { AboutUsContent } from '@/types/public/about-us-page';
 import { aboutUsPageUk } from '@/locales/uk';
+import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
+import { TranslationStatus } from '@/types/common/language';
+import { setupUseGetLocalizationAboutUsContentMock } from '@/utils/test-mocks/use-get-localization-mock';
 
 jest.mock('./SupportCard.module.scss', () => ({
     'people-card': 'people-card',
@@ -19,7 +22,15 @@ jest.mock('@/const/public/about-us-page', () => ({
     },
 }));
 
+jest.mock('@/hooks/common/use-get-localization/useGetLocalization');
+
+const mockedUseGetLocalization = jest.mocked(useGetLocalization);
+
 describe('SupportCard component', () => {
+    beforeEach(() => {
+        setupUseGetLocalizationAboutUsContentMock(mockedUseGetLocalization);
+    });
+
     const card: AboutUsContent = {
         id: 1,
         contentType: ContentType.Card,
@@ -30,6 +41,7 @@ describe('SupportCard component', () => {
         },
         description: 'This is a support card description.',
         title: null,
+        localizations: [],
     };
 
     const defaultProps = {
@@ -60,5 +72,23 @@ describe('SupportCard component', () => {
         const card3 = screen.getByRole('img').closest('div');
         expect(card3).toHaveClass('people-card');
         expect(card3).toHaveClass('card-3');
+    });
+
+    it('renders localized description when localizations are provided', () => {
+        const cardWithLocalization: AboutUsContent = {
+            ...card,
+            localizations: [
+                {
+                    language: { id: 1, code: 'uk' },
+                    translationStatus: TranslationStatus.Relevant,
+                    description: 'Localized card description.',
+                    title: null,
+                },
+            ],
+        };
+
+        render(<SupportCard card={cardWithLocalization} index={0} />);
+
+        expect(screen.getByText('Localized card description.')).toBeInTheDocument();
     });
 });

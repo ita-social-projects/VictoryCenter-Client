@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { InputLabel } from '@/components/admin/input-label/InputLabel';
 import { InputErrorWithCharacterCounter } from '@/components/admin/input-error-with-character-counter/InputErrorWithCharacterCounter';
 import { TextAreaWithBulletBehavior } from '@/components/admin/textarea-with-bullets/TextAreaWithBulletBehavior';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import styles from './TitleDescriptionCardsSection.module.scss';
 
 interface CardDescriptionFieldProps {
@@ -36,6 +38,7 @@ export const CardDescriptionField = ({
     error,
 }: CardDescriptionFieldProps) => {
     const counterId = `${id}-character-count`;
+    const [localWarning, setLocalWarning] = useState<string | null>(null);
 
     return (
         <div className={styles['input-group']}>
@@ -52,10 +55,12 @@ export const CardDescriptionField = ({
                 disabled={disabled}
                 placeholder={placeholder}
                 rows={rows}
+                maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(maxLength)}
+                onWarningChange={setLocalWarning}
             />
 
             <InputErrorWithCharacterCounter
-                error={error}
+                error={localWarning || error}
                 maxLength={maxLength}
                 counterId={counterId}
                 htmlFor={id}

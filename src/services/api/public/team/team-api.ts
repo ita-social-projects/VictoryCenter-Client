@@ -33,6 +33,7 @@ const mapCategoryDtoToTeamCategory = (dto: PublicCategoryWithTeamMembersDto): Te
     return {
         title: dto.categoryName,
         description: dto.description || '',
+        localizations: dto.localizations?.map((loc) => mapLocalizationDtoToModel(loc)),
         members: validMembers,
     };
 };

@@ -1,6 +1,7 @@
 import React, { memo, useCallback } from 'react';
 import { Image, ImageValues } from '@/types/common/image';
 import { ImageInput } from '@/components/admin/image-input/ImageInput';
+import { IconButton } from '@/components/admin/icon-button/IconButton';
 import { InputError } from '@/components/admin/input-error/InputError';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { PARTNER_VALIDATION_FUNCTIONS } from '@/validation/admin/partner-schema/partner-schema';
@@ -8,6 +9,7 @@ import { PARTNER_VALIDATION, PARTNERS_TEXT } from '@/const/admin/partners';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import styles from './PartnerForm.module.scss';
 import './PartnerForm.scss';
+import { ACTION_ICONS } from '@/const/common/action-icons';
 
 export interface PartnerFormValues {
     localId: string;
@@ -42,14 +44,17 @@ const PartnerFormComponent = ({ values, errors, disabled, onValuesChange, onDele
 
     const handleImageChange = useCallback(
         (value: ImageValues | null) => {
-            onValuesChange({ ...values, image: value, imageId: value ? values.imageId : null }, { ...errors });
+            onValuesChange({ ...values, image: value, imageId: null }, { ...errors, image: undefined });
         },
         [onValuesChange, values, errors],
     );
 
     const handleImageError = useCallback(
         (error: string | null) => {
-            onValuesChange({ ...values }, { ...errors, image: error ? error : undefined });
+            if (!error) {
+                return;
+            }
+            onValuesChange({ ...values }, { ...errors, image: error });
         },
         [onValuesChange, values, errors],
     );
@@ -63,11 +68,13 @@ const PartnerFormComponent = ({ values, errors, disabled, onValuesChange, onDele
     return (
         <div className={styles.root} data-testid={`partner-form-${cardHtmlId}`}>
             <div className={styles.header}>
-                <button
+                <IconButton
                     type="button"
                     className={styles['delete-button']}
                     onClick={handleDelete}
                     data-testid={`partner-form-delete-button-${cardHtmlId}`}
+                    DefaultIcon={ACTION_ICONS.delete.default}
+                    FilledIcon={ACTION_ICONS.delete.hover}
                 />
             </div>
             <div className={styles.content}>
@@ -80,7 +87,9 @@ const PartnerFormComponent = ({ values, errors, disabled, onValuesChange, onDele
                         onChange={handleImageChange}
                         setError={handleImageError}
                         disabled={disabled}
-                        enableCrop={false}
+                        enableCrop={true}
+                        cropWidth={PARTNER_VALIDATION.image.width}
+                        cropHeight={PARTNER_VALIDATION.image.height}
                         minWidth={PARTNER_VALIDATION.image.width}
                         minHeight={PARTNER_VALIDATION.image.height}
                         label={PARTNERS_TEXT.PARTNER.IMAGE_LABEL}

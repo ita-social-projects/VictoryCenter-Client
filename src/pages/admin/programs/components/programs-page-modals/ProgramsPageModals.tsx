@@ -1,17 +1,21 @@
-import { Program, ProgramCategory } from '@/types/admin/programs';
+import { HippotherapyProgram, ProgramCategory } from '@/types/admin/programs';
+import { LocalizationLanguage } from '@/types/common/language';
 import { UseModalsStateResult } from '@/hooks/admin/use-modals-state/useModalsState';
 import { ProgramModal } from './program-modal/ProgramModal';
 import { DeleteProgramModal } from './delete-program-modal/DeleteProgramModal';
 import { ProgramCategoryModal } from '../program-category-modals/ProgramCategoryModal';
 import { DeleteCategoryModal } from '../program-category-modals/DeleteCategoryModal';
+import { TranslateProgramModal } from '../translate-program-modal/TranslateProgramModal';
 import { ModalMode } from '@/types/admin/common';
 
 export interface ProgramsPageModalsProps {
-    modalsStateControl: UseModalsStateResult<Program>;
+    modalsStateControl: UseModalsStateResult<HippotherapyProgram>;
     categories: ProgramCategory[];
-    onAddProgram: (addedProgram: Program) => void;
-    onEditProgram: (updatedProgram: Program) => void;
-    onDeleteProgram: (program: Program) => void;
+    onAddProgram: (addedProgram: HippotherapyProgram) => void;
+    onEditProgram: (updatedProgram: HippotherapyProgram) => void;
+    onDeleteProgram: (program: HippotherapyProgram) => void;
+    onTranslateProgram: (program: HippotherapyProgram) => void;
+    translatedLanguages: LocalizationLanguage[];
     onAddCategory: (newCategory: ProgramCategory) => void;
     onEditCategory: (updatedCategory: ProgramCategory) => void;
     onDeleteCategory: (categoryIdToDelete: number) => void;
@@ -23,6 +27,8 @@ export const ProgramsPageModals = ({
     onAddProgram,
     onEditProgram,
     onDeleteProgram,
+    onTranslateProgram,
+    translatedLanguages,
     onAddCategory,
     onEditCategory,
     onDeleteCategory,
@@ -53,6 +59,14 @@ export const ProgramsPageModals = ({
                 onClose={closeModalActions.closeDeleteItemModal}
                 programToDelete={modalState.itemToDelete!}
                 onDeleteProgram={onDeleteProgram}
+            />
+
+            <TranslateProgramModal
+                isOpen={!!modalState.itemToTranslate}
+                onClose={closeModalActions.closeTranslateItemModal}
+                programToTranslate={modalState.itemToTranslate!}
+                onTranslateProgram={onTranslateProgram}
+                translatedLanguages={translatedLanguages}
             />
 
             {/* Category Modals */}

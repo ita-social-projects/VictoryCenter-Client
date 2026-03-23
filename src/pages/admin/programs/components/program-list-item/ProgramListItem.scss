@@ -121,29 +121,11 @@
             gap: 0.625rem;
 
             .edit-btn,
-            .delete-btn {
+            .delete-btn,
+            .translate-btn {
                 width: 1.5rem;
                 height: 1.5rem;
                 border: none;
-                cursor: pointer;
-                background-repeat: no-repeat;
-                background-size: cover;
-            }
-
-            .edit-btn {
-                background: url('~@/assets/icons/edit.svg');
-
-                &:active {
-                    background: url('~@/assets/icons/edit-filled.svg');
-                }
-            }
-
-            .delete-btn {
-                background: url('~@/assets/icons/delete.svg');
-
-                &:active {
-                    background: url('~@/assets/icons/delete-filled.svg');
-                }
             }
         }
     }

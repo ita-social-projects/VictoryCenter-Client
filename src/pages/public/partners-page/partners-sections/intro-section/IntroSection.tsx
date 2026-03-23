@@ -1,5 +1,5 @@
 import styles from './IntroSection.module.scss';
-import background from '@/assets/images/public/partners-page/horses.png';
+import background from '@/assets/images/horses.webp';
 import { PartnersBanner } from '@/types/public/partners-page';
 import DOMPurify from 'dompurify';
 import { SafeHtml } from '@/components/common/safe-html';

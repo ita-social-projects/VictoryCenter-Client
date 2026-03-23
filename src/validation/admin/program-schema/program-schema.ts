@@ -3,10 +3,11 @@ import {
     PROGRAM_SECTION_VALIDATION,
     PROGRAM_SECTION_TEMPLATE_VALIDATION,
 } from '@/const/admin/programs';
+import { FAQ_VALIDATION } from '@/const/admin/faq';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ProgramCategory } from '@/types/admin/programs';
 import { Image, ImageValues } from '@/types/common/image';
-import { ProgramSection } from '@/types/common/program-sections';
+import { CreateHippotherapyProgramSectionDto } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 import * as Yup from 'yup';
 
@@ -25,8 +26,8 @@ type TemplateRules = {
     };
 };
 
-type SectionTemplate = ProgramSection['template'];
-type SectionContent = NonNullable<ProgramSection['contents']>[number];
+type SectionTemplate = CreateHippotherapyProgramSectionDto['template'];
+type SectionContent = NonNullable<CreateHippotherapyProgramSectionDto['contents']>[number];
 
 const TEMPLATE_RULES = PROGRAM_SECTION_TEMPLATE_VALIDATION as unknown as Partial<
     Record<SectionTemplate, TemplateRules>
@@ -105,7 +106,7 @@ const createTemplateTextSchema = (type: ContentType) =>
                 return this.createError({ message: COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(req.max) });
             }
 
-            if (ctx.isPublishing && t.length < req.min) {
+            if (t.length < req.min) {
                 return this.createError({ message: COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(req.min) });
             }
 
@@ -277,7 +278,7 @@ export const PROGRAM_VALIDATION_FUNCTIONS = {
         }
     },
 
-    validateSections: (sections: ProgramSection[], isPublishing: boolean): string | undefined => {
+    validateSections: (sections: CreateHippotherapyProgramSectionDto[], isPublishing: boolean): string | undefined => {
         const result = validateProgramSections(sections, isPublishing);
         return result;
     },
@@ -330,6 +331,22 @@ export const PROGRAM_SECTION_VALIDATION_FUNCTIONS = {
         } catch (error: any) {
             return error.message;
         }
+    },
+
+    validateFaqQuestion: (value: string): string | undefined => {
+        const trimmed = value.trim();
+        if (!trimmed) return COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED;
+        if (trimmed.length < FAQ_VALIDATION.question.min) return FAQ_VALIDATION.question.getMinError();
+        if (trimmed.length > FAQ_VALIDATION.question.max) return FAQ_VALIDATION.question.getMaxError();
+        return undefined;
+    },
+
+    validateFaqAnswer: (value: string): string | undefined => {
+        const trimmed = value.trim();
+        if (!trimmed) return COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED;
+        if (trimmed.length < FAQ_VALIDATION.answer.min) return FAQ_VALIDATION.answer.getMinError();
+        if (trimmed.length > FAQ_VALIDATION.answer.max) return FAQ_VALIDATION.answer.getMaxError();
+        return undefined;
     },
 };
 
@@ -532,7 +549,7 @@ const validateTemplateImages = (contents: SectionContent[], rules: TemplateRules
     return true;
 };
 
-const validateProgramSection = (section: ProgramSection, isPublishing: boolean): boolean => {
+const validateProgramSection = (section: CreateHippotherapyProgramSectionDto, isPublishing: boolean): boolean => {
     const rules = getTemplateRules(section.template);
     if (!rules) return !isPublishing;
 
@@ -551,7 +568,10 @@ const validateProgramSection = (section: ProgramSection, isPublishing: boolean):
     return true;
 };
 
-export const validateProgramSections = (sections: ProgramSection[], isPublishing: boolean): string | undefined => {
+export const validateProgramSections = (
+    sections: CreateHippotherapyProgramSectionDto[],
+    isPublishing: boolean,
+): string | undefined => {
     if (!sections || sections.length === 0) return undefined;
 
     for (let i = 0; i < sections.length; i++) {
@@ -563,6 +583,6 @@ export const validateProgramSections = (sections: ProgramSection[], isPublishing
     return undefined;
 };
 
-export const isProgramSectionValid = (section: ProgramSection, isPublishing: boolean): boolean => {
+export const isProgramSectionValid = (section: CreateHippotherapyProgramSectionDto, isPublishing: boolean): boolean => {
     return validateProgramSection(section, isPublishing);
 };

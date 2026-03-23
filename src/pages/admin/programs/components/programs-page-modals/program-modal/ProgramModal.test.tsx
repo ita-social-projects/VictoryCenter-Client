@@ -1,7 +1,14 @@
 import React from 'react';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { BaseProgramModalProps, ProgramModal, ProgramModalProps } from './ProgramModal';
-import { Program, ProgramCategory, ProgramCreateUpdate, SectionCancelActionType } from '@/types/admin/programs';
+import {
+    HippotherapyProgram,
+    HippotherapyProgramDto,
+    ProgramCategory,
+    CreateHippotherapyProgramDto,
+    UpdateHippotherapyProgramDto,
+    SectionCancelActionType,
+} from '@/types/admin/programs';
 import { ModalMode } from '@/types/admin/common';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -163,7 +170,7 @@ jest.mock('../../program-form/ProgramForm', () => {
     return { ProgramForm: MockProgramForm };
 });
 
-const mockProgram: Program = {
+const mockProgram: HippotherapyProgram = {
     id: 1,
     name: 'Test Program',
     description: 'Test Description',
@@ -176,6 +183,7 @@ const mockProgram: Program = {
     location: '',
     sections: [],
     slug: 'test-program',
+    localizations: [],
 };
 
 const mockCategories: ProgramCategory[] = [
@@ -183,7 +191,7 @@ const mockCategories: ProgramCategory[] = [
     { id: 2, name: 'Category 2', programsCount: 2 },
 ];
 
-const mockFormData: Partial<Program> = {
+const mockFormData: Partial<HippotherapyProgram> = {
     name: 'Updated Name',
     description: 'Updated Description',
     categories: [mockCategories[0]],
@@ -253,8 +261,16 @@ describe('ProgramModal', () => {
             closeModalActions: { closeAddSectionModal: jest.fn() },
         });
         mockedGetInitialSectionContents.mockReturnValue([]);
-        mockedProgramsApi.addProgram.mockResolvedValue({ ...mockProgram, ...mockFormData });
-        mockedProgramsApi.editProgram.mockResolvedValue({ ...mockProgram, ...mockFormData });
+        mockedProgramsApi.addProgram.mockResolvedValue({
+            ...mockProgram,
+            ...mockFormData,
+            localizations: [],
+        } as HippotherapyProgramDto);
+        mockedProgramsApi.editProgram.mockResolvedValue({
+            ...mockProgram,
+            ...mockFormData,
+            localizations: [],
+        } as HippotherapyProgramDto);
     });
 
     describe('Section template + unsaved-section flows', () => {
@@ -583,14 +599,13 @@ describe('ProgramModal', () => {
             await waitFor(() => {
                 expect(mockedProgramsApi.addProgram).toHaveBeenCalledWith(
                     expect.any(Object),
-                    expect.objectContaining<Partial<ProgramCreateUpdate>>({
+                    expect.objectContaining<Partial<CreateHippotherapyProgramDto>>({
                         name: mockFormData.name,
                         description: mockFormData.description,
                         categoryIds: [1],
                         status: VisibilityStatus.Draft,
                         previewImage: null,
                         previewImageId: null,
-                        id: null,
                     }),
                 );
             });
@@ -615,7 +630,7 @@ describe('ProgramModal', () => {
             await waitFor(() => {
                 expect(mockedProgramsApi.addProgram).toHaveBeenCalledWith(
                     expect.any(Object),
-                    expect.objectContaining<Partial<ProgramCreateUpdate>>({
+                    expect.objectContaining<Partial<CreateHippotherapyProgramDto>>({
                         name: mockFormData.name,
                         description: mockFormData.description,
                         categoryIds: [1],
@@ -645,7 +660,7 @@ describe('ProgramModal', () => {
             expect(getPublishButton()).not.toBeDisabled();
         });
 
-        it('should cancel the submission and not call the API', async () => {
+        it('should cancel the submission, not call the API, and close the modal', async () => {
             render(<ProgramModal {...addModeProps} />);
             simulateFormBecomesValid();
 
@@ -658,8 +673,7 @@ describe('ProgramModal', () => {
 
             expect(mockedProgramsApi.addProgram).not.toHaveBeenCalled();
             expect(mockOnAddProgram).not.toHaveBeenCalled();
-
-            expect(mockOnClose).not.toHaveBeenCalled();
+            expect(mockOnClose).toHaveBeenCalledTimes(1);
         });
     });
 
@@ -676,7 +690,7 @@ describe('ProgramModal', () => {
 
             await waitFor(() => {
                 expect(mockedProgramsApi.editProgram).toHaveBeenCalledWith(
-                    expect.objectContaining<Partial<ProgramCreateUpdate>>({
+                    expect.objectContaining<Partial<UpdateHippotherapyProgramDto>>({
                         id: mockProgram.id,
                         name: mockFormData.name,
                         description: mockFormData.description,

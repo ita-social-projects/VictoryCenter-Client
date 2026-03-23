@@ -4,7 +4,7 @@ import '@testing-library/jest-dom';
 import { IntroSection } from './IntroSection';
 import { PartnersBanner } from '@/types/public/partners-page';
 
-jest.mock('@/assets/images/public/partners-page/horses.png', () => 'fallback-background-image.png');
+jest.mock('@/assets/images/horses.webp', () => 'fallback-background-image.png');
 
 jest.mock('@/const/public/partners-page', () => ({
     PARTNERS_PAGE_TITLE: {

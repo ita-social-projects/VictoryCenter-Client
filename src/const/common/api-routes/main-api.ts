@@ -55,6 +55,9 @@ export const API_ROUTES = {
         PREVIEWS: 'WhoWeAre/previews',
         PUBLIC: 'WhoWeArePage',
     },
+    WHO_WE_ARE_CONTENT_LOCALIZATIONS: {
+        BASE: 'WhoWeAreContentLocalizations',
+    },
     LOCALIZATION_LANGUAGE: {
         BASE: 'LocalizationLanguage',
     },
@@ -67,6 +70,13 @@ export const API_ROUTES = {
     },
     TEAM_CATEGORY_LOCALIZATIONS: {
         BASE: 'TeamCategoryLocalizations',
+    },
+    PROGRAM_LOCALIZATIONS: {
+        BASE: 'HippotherapyProgramLocalizations',
+        PUBLIC: {
+            PROGRAM_ID: 'HippotherapyProgramLocalizations/entityId',
+            LANGUAGE_ID: 'HippotherapyProgramLocalizations/languageId',
+        },
     },
     PARTNERS: {
         BASE: 'Partners',

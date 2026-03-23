@@ -1,0 +1,25 @@
+.container {
+    gap: 16px;
+
+    @media (min-width: 560px) {
+        padding: 0px 16px;
+    }
+}
+
+.top-section {
+    height: auto;
+}
+
+.bottom-section {
+    justify-content: end;
+    height: auto;
+}
+
+.image {
+    aspect-ratio: 730 / 430;
+    max-height: 100%;
+}
+
+.image-wrapper {
+    width: 100%;
+}

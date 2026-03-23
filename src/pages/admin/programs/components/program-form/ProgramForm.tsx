@@ -7,6 +7,7 @@ import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups
 import { MultiSelectInputGroup } from '@/components/admin/input-groups/multi-select-input-group/MultiSelectInputGroup';
 import { PhotoInputGroup } from '@/components/admin/input-groups/photo-input-group/PhotoInputGroup';
 import { useFormManager } from '@/hooks/admin/use-form-manager/useFormManager';
+import { useFieldHandlers } from '@/hooks/admin/use-field-handlers/useFieldHandlers';
 import { Button } from '@/components/admin/button/Button';
 import { ProgramSectionForm, SectionCancelOptions } from '../program-section-form/ProgramSectionForm';
 import { Image, ImageValues } from '@/types/common/image';
@@ -15,7 +16,7 @@ import { VisibilityStatus } from '@/types/admin/common';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import NotFoundIcon from '@/assets/icons/not-found.svg';
 import styles from './ProgramForm.module.scss';
-import { ProgramSection } from '@/types/common/program-sections';
+import { CreateHippotherapyProgramSectionDto } from '@/types/common/program-sections';
 import { BackgroundMedia } from '@/components/public/background-media';
 import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 import cn from 'classnames';
@@ -31,7 +32,7 @@ export interface ProgramFormValues {
     location: string;
     participantsCount: string;
     meetingCount: string;
-    sections: ProgramSection[];
+    sections: CreateHippotherapyProgramSectionDto[];
 }
 
 export interface ProgramFormErrors {
@@ -51,11 +52,11 @@ export interface ProgramFormRef {
     submit: (status: VisibilityStatus) => Promise<void>;
     isValid: (isPublishing?: boolean) => boolean;
     isDirty: () => boolean;
-    addSection: (section: ProgramSection) => void;
+    addSection: (section: CreateHippotherapyProgramSectionDto) => void;
     removeSection: (sectionIndex: number) => void;
-    getSections: () => ProgramSection[];
+    getSections: () => CreateHippotherapyProgramSectionDto[];
     revertSection: (sectionIndex: number) => void;
-    replaceSection: (sectionIndex: number, newSection: ProgramSection) => void;
+    replaceSection: (sectionIndex: number, newSection: CreateHippotherapyProgramSectionDto) => void;
 }
 
 export interface ProgramFormProps {
@@ -92,7 +93,7 @@ const validateForm = (formState: ProgramFormValues, isPublishing: boolean): Prog
             isPublishing,
         ),
         meetingCount: PROGRAM_VALIDATION_FUNCTIONS.validateMeetingCount(formState.meetingCount, isPublishing),
-        sections: undefined,
+        sections: PROGRAM_VALIDATION_FUNCTIONS.validateSections(formState.sections, isPublishing),
     };
 };
 
@@ -146,7 +147,15 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             ref: internalRef,
         });
 
-        const sectionsRef = useRef<ProgramSection[]>(formState.sections);
+        const fields = useFieldHandlers({ formState, setFormState, setErrors }, [
+            { name: 'name', validateFn: PROGRAM_VALIDATION_FUNCTIONS.validateName },
+            { name: 'description', validateFn: PROGRAM_VALIDATION_FUNCTIONS.validateDescription },
+            { name: 'location', validateFn: PROGRAM_VALIDATION_FUNCTIONS.validateLocation },
+            { name: 'participantsCount', validateFn: PROGRAM_VALIDATION_FUNCTIONS.validateParticipantsCount },
+            { name: 'meetingCount', validateFn: PROGRAM_VALIDATION_FUNCTIONS.validateMeetingCount },
+        ]);
+
+        const sectionsRef = useRef<CreateHippotherapyProgramSectionDto[]>(formState.sections);
         sectionsRef.current = formState.sections;
 
         const nextSectionKeyRef = useRef(0);
@@ -209,7 +218,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
         const sectionsContainerRef = useRef<HTMLDivElement>(null);
 
         const handleAddSection = useCallback(
-            (section: ProgramSection) => {
+            (section: CreateHippotherapyProgramSectionDto) => {
                 const sectionKey = generateSectionKey();
                 setFormState((prev) => ({
                     ...prev,
@@ -268,7 +277,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
         );
 
         const handleReplaceSection = useCallback(
-            (sectionKey: string, newSection: ProgramSection) => {
+            (sectionKey: string, newSection: CreateHippotherapyProgramSectionDto) => {
                 const idx = sectionStatesRef.current.findIndex((s) => s.sectionKey === sectionKey);
                 if (idx === -1) return;
 
@@ -304,7 +313,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                     const state = sectionStatesRef.current[sectionIndex];
                     if (state) handleRevertSection(state.sectionKey);
                 },
-                replaceSection: (sectionIndex: number, newSection: ProgramSection) => {
+                replaceSection: (sectionIndex: number, newSection: CreateHippotherapyProgramSectionDto) => {
                     const state = sectionStatesRef.current[sectionIndex];
                     if (state) handleReplaceSection(state.sectionKey, newSection);
                 },
@@ -321,17 +330,59 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             ],
         );
 
-        const handleNameChange = useCallback(
-            (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-                setFormState((prev) => ({ ...prev, name: e.target.value }));
+        const handleMoveUpSection = useCallback(
+            (sectionKey: string) => {
+                const idx = sectionStatesRef.current.findIndex((s) => s.sectionKey === sectionKey);
+                if (idx <= 0) return;
+
+                setFormState((prev) => {
+                    const updatedSections = [...prev.sections];
+                    [updatedSections[idx - 1], updatedSections[idx]] = [updatedSections[idx], updatedSections[idx - 1]];
+                    return { ...prev, sections: updatedSections };
+                });
+
+                setSectionStates((prev) => {
+                    const updated = [...prev];
+                    [updated[idx - 1], updated[idx]] = [updated[idx], updated[idx - 1]];
+                    return updated;
+                });
+
+                setTimeout(() => {
+                    document.querySelector(`[data-section-key="${sectionKey}"]`)?.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start',
+                    });
+                }, 50);
             },
             [setFormState],
         );
 
-        const handleNameBlur = useCallback(() => {
-            const error = PROGRAM_VALIDATION_FUNCTIONS.validateName(formState.name, false);
-            setErrors((prev) => ({ ...prev, name: error }));
-        }, [formState.name, setErrors]);
+        const handleMoveDownSection = useCallback(
+            (sectionKey: string) => {
+                const idx = sectionStatesRef.current.findIndex((s) => s.sectionKey === sectionKey);
+                if (idx === -1 || idx >= sectionStatesRef.current.length - 1) return;
+
+                setFormState((prev) => {
+                    const updatedSections = [...prev.sections];
+                    [updatedSections[idx + 1], updatedSections[idx]] = [updatedSections[idx], updatedSections[idx + 1]];
+                    return { ...prev, sections: updatedSections };
+                });
+
+                setSectionStates((prev) => {
+                    const updated = [...prev];
+                    [updated[idx + 1], updated[idx]] = [updated[idx], updated[idx + 1]];
+                    return updated;
+                });
+
+                setTimeout(() => {
+                    document.querySelector(`[data-section-key="${sectionKey}"]`)?.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start',
+                    });
+                }, 50);
+            },
+            [setFormState],
+        );
 
         const handleCategoriesChange = useCallback(
             (selectedCategories: ProgramCategory[]) => {
@@ -344,54 +395,6 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             const error = PROGRAM_VALIDATION_FUNCTIONS.validateCategories(formState.categories, false);
             setErrors((prev) => ({ ...prev, categories: error }));
         }, [formState.categories, setErrors]);
-
-        const handleLocationChange = useCallback(
-            (e: React.ChangeEvent<HTMLInputElement>) => {
-                setFormState((prev) => ({ ...prev, location: e.target.value }));
-            },
-            [setFormState],
-        );
-
-        const handleLocationBlur = useCallback(() => {
-            const error = PROGRAM_VALIDATION_FUNCTIONS.validateLocation(formState.location, false);
-            setErrors((prev) => ({ ...prev, location: error }));
-        }, [formState.location, setErrors]);
-
-        const handleParticipantsCountChange = useCallback(
-            (e: React.ChangeEvent<HTMLInputElement>) => {
-                setFormState((prev) => ({ ...prev, participantsCount: e.target.value }));
-            },
-            [setFormState],
-        );
-
-        const handleParticipantsCountBlur = useCallback(() => {
-            const error = PROGRAM_VALIDATION_FUNCTIONS.validateParticipantsCount(formState.participantsCount, false);
-            setErrors((prev) => ({ ...prev, participantsCount: error }));
-        }, [formState.participantsCount, setErrors]);
-
-        const handleMeetingCountChange = useCallback(
-            (e: React.ChangeEvent<HTMLInputElement>) => {
-                setFormState((prev) => ({ ...prev, meetingCount: e.target.value }));
-            },
-            [setFormState],
-        );
-
-        const handleMeetingCountBlur = useCallback(() => {
-            const error = PROGRAM_VALIDATION_FUNCTIONS.validateMeetingCount(formState.meetingCount, false);
-            setErrors((prev) => ({ ...prev, meetingCount: error }));
-        }, [formState.meetingCount, setErrors]);
-
-        const handleDescriptionChange = useCallback(
-            (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-                setFormState((prev) => ({ ...prev, description: e.target.value }));
-            },
-            [setFormState],
-        );
-
-        const handleDescriptionBlur = useCallback(() => {
-            const error = PROGRAM_VALIDATION_FUNCTIONS.validateDescription(formState.description, false);
-            setErrors((prev) => ({ ...prev, description: error }));
-        }, [formState.description, setErrors]);
 
         const handlePreviewImageChange = useCallback(
             (file: ImageValues | null) => {
@@ -429,7 +432,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
         );
 
         const handleSectionChange = useCallback(
-            (sectionKey: string, updatedSection: ProgramSection) => {
+            (sectionKey: string, updatedSection: CreateHippotherapyProgramSectionDto) => {
                 const idx = sectionStatesRef.current.findIndex((s) => s.sectionKey === sectionKey);
                 if (idx === -1) return;
 
@@ -574,7 +577,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                             cropHeight={PROGRAM_VALIDATION.backgroundImage.cropHeight}
                             minWidth={PROGRAM_VALIDATION.backgroundImage.minWidth}
                             minHeight={PROGRAM_VALIDATION.backgroundImage.minHeight}
-                            imageLabel={COMMON_TEXT_ADMIN.INPUT.DRAG_AND_DROP_FILE_HERE}
+                            imageLabel={COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE}
                             imageSubText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
                                 PROGRAM_VALIDATION.backgroundImage.height,
                                 PROGRAM_VALIDATION.backgroundImage.width,
@@ -601,53 +604,57 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 isRequired={true}
                                 id="name"
                                 name="name"
-                                value={formState.name}
-                                onChange={handleNameChange}
-                                onBlur={handleNameBlur}
+                                {...fields.name}
                                 maxLength={PROGRAM_VALIDATION.name.max}
                                 disabled={isSubmitting || isFormDisabled}
                                 error={errors.name}
                                 placeholder={PROGRAMS_TEXT.PLACEHOLDER.INSERT_PROGRAM_NAME}
                                 isWhiteLabel={hasBackgroundImage}
+                                maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
+                                    PROGRAM_VALIDATION.name.max,
+                                )}
                             />
 
                             <InputWithCharacterLimitGroup
                                 label={PROGRAMS_TEXT.FORM.LABEL.LOCATION}
                                 id="location"
                                 name="location"
-                                value={formState.location}
-                                onChange={handleLocationChange}
-                                onBlur={handleLocationBlur}
+                                {...fields.location}
                                 maxLength={PROGRAM_VALIDATION.location.max}
                                 disabled={isSubmitting || isFormDisabled}
                                 error={errors.location}
                                 placeholder={PROGRAMS_TEXT.PLACEHOLDER.INSERT_PROGRAM_LOCATION}
+                                maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
+                                    PROGRAM_VALIDATION.location.max,
+                                )}
                             />
 
                             <InputWithCharacterLimitGroup
                                 label={PROGRAMS_TEXT.FORM.LABEL.PARTICIPANTS_COUNT}
                                 id="participantsCount"
                                 name="participantsCount"
-                                value={formState.participantsCount}
-                                onChange={handleParticipantsCountChange}
-                                onBlur={handleParticipantsCountBlur}
+                                {...fields.participantsCount}
                                 maxLength={PROGRAM_VALIDATION.participantsCount.max}
                                 disabled={isSubmitting || isFormDisabled}
                                 error={errors.participantsCount}
                                 placeholder={PROGRAMS_TEXT.PLACEHOLDER.INSERT_PROGRAM_PARTICIPANTS_COUNT}
+                                maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
+                                    PROGRAM_VALIDATION.participantsCount.max,
+                                )}
                             />
 
                             <InputWithCharacterLimitGroup
                                 label={PROGRAMS_TEXT.FORM.LABEL.MEETING_COUNT}
                                 id="meetingCount"
                                 name="meetingCount"
-                                value={formState.meetingCount}
-                                onChange={handleMeetingCountChange}
-                                onBlur={handleMeetingCountBlur}
+                                {...fields.meetingCount}
                                 maxLength={PROGRAM_VALIDATION.meetingCount.max}
                                 disabled={isSubmitting || isFormDisabled}
                                 error={errors.meetingCount}
                                 placeholder={PROGRAMS_TEXT.PLACEHOLDER.INSERT_PROGRAM_MEETINGS_COUNT}
+                                maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
+                                    PROGRAM_VALIDATION.meetingCount.max,
+                                )}
                             />
                         </div>
 
@@ -657,14 +664,16 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 id="description"
                                 isRequired={true}
                                 name="description"
-                                value={formState.description}
-                                onChange={handleDescriptionChange}
-                                onBlur={handleDescriptionBlur}
+                                {...fields.description}
                                 rows={8}
                                 disabled={isSubmitting || isFormDisabled}
                                 maxLength={PROGRAM_VALIDATION.description.max}
                                 error={errors.description}
                                 isWhiteLabel={hasBackgroundImage}
+                                placeholder={PROGRAMS_TEXT.PLACEHOLDER.INSERT_PROGRAM_DESCRIPTION}
+                                maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
+                                    PROGRAM_VALIDATION.description.max,
+                                )}
                             />
 
                             <PhotoInputGroup
@@ -681,7 +690,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 cropHeight={PROGRAM_VALIDATION.previewImage.cropHeight}
                                 minWidth={PROGRAM_VALIDATION.previewImage.minWidth}
                                 minHeight={PROGRAM_VALIDATION.previewImage.minHeight}
-                                imageLabel={COMMON_TEXT_ADMIN.INPUT.DRAG_AND_DROP_FILE_HERE}
+                                imageLabel={COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE}
                                 imageSubText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
                                     PROGRAM_VALIDATION.previewImage.height,
                                     PROGRAM_VALIDATION.previewImage.width,
@@ -741,6 +750,10 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                             onDelete={() => handleDeleteSection(sectionKey)}
                                             isReplacingTemplate={sectionState.isReplacing}
                                             onRequestReplace={() => onReplaceSection?.(index)}
+                                            isFirstSection={index === 0}
+                                            isLastSection={index === formState.sections.length - 1}
+                                            onMoveUpSection={() => handleMoveUpSection(sectionKey)}
+                                            onMoveDownSection={() => handleMoveDownSection(sectionKey)}
                                         />
                                         {index === formState.sections.length - 1 && (
                                             <div className={styles['add-section-wrapper']}>

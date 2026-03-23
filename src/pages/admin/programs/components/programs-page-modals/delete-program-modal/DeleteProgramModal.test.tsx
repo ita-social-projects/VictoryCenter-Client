@@ -5,7 +5,7 @@ import { DeleteProgramModal, DeleteProgramModalProps } from './DeleteProgramModa
 import { ProgramsApi } from '@/services/api/admin/programs/programs-api';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { Program } from '@/types/admin/programs';
+import { HippotherapyProgram } from '@/types/admin/programs';
 import { VisibilityStatus } from '@/types/admin/common';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { ButtonProps } from '@/components/admin/button/Button';
@@ -61,7 +61,7 @@ jest.mock('@/components/admin/button/Button', () => ({
 }));
 
 describe('DeleteProgramModal', () => {
-    const mockProgram: Program = {
+    const mockProgram: HippotherapyProgram = {
         id: 1,
         name: 'Test program',
         description: 'Description',
@@ -74,6 +74,7 @@ describe('DeleteProgramModal', () => {
         participantsCount: '',
         sections: [],
         slug: 'test-program',
+        localizations: [],
     };
 
     const defaultProps: DeleteProgramModalProps = {

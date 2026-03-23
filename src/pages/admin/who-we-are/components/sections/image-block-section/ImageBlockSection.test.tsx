@@ -204,6 +204,14 @@ describe('ImageSection', () => {
         expect(mockOnPublish).toHaveBeenCalled();
     });
 
+    it('should disable translate button when publish button is active', () => {
+        renderComponent({ isPublishButtonActive: true });
+
+        const translateButton = screen.getByRole('button', { name: 'Translate' });
+
+        expect(translateButton).toBeDisabled();
+    });
+
     it('should display an error from ImageInput', async () => {
         renderComponent({ isPublishButtonActive: true });
 

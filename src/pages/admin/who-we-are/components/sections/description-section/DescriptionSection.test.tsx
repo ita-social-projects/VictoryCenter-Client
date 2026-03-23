@@ -163,6 +163,14 @@ describe('DescriptionSection', () => {
         expect(mockOnPublish).toHaveBeenCalled();
     });
 
+    it('should disable translate button when publish button is active', () => {
+        renderComponent({ isPublishButtonActive: true });
+
+        const translateButton = screen.getByRole('button', { name: 'Translate' });
+
+        expect(translateButton).toBeDisabled();
+    });
+
     it('should not allow editing and should hide publish button for non-base language', () => {
         renderComponent({ language: { id: 2, code: 'en', name: 'English' } });
 

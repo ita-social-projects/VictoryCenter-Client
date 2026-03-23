@@ -13,8 +13,6 @@ import { SectionType } from '@/types/common/about-us';
 import React from 'react';
 import { LocalizationLanguage } from '@/types/common/language';
 import './SectionsWrapper.scss';
-import { IconButton } from '@/components/admin/icon-button/IconButton';
-import { ACTION_ICONS } from '@/const/common/action-icons';
 
 export interface MainSectionProps {
     section: WhoWeAreSection | null;

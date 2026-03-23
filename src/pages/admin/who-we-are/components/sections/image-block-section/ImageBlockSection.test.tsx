@@ -195,21 +195,15 @@ describe('ImageSection', () => {
         );
     });
 
-    it('should enable the publish button and call onPublish when clicked', () => {
+    it('should enable publish button, disable translate button and call onPublish when clicked', () => {
         renderComponent({ isPublishButtonActive: true });
 
         expect(getPublishButton()).toBeEnabled();
 
+        expect(screen.getByRole('button', { name: 'Translate' })).toBeDisabled();
+
         fireEvent.click(getPublishButton());
         expect(mockOnPublish).toHaveBeenCalled();
-    });
-
-    it('should disable translate button when publish button is active', () => {
-        renderComponent({ isPublishButtonActive: true });
-
-        const translateButton = screen.getByRole('button', { name: 'Translate' });
-
-        expect(translateButton).toBeDisabled();
     });
 
     it('should display an error from ImageInput', async () => {

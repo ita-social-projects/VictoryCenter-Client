@@ -203,22 +203,16 @@ describe('CardsSection', () => {
         });
     });
 
-    it('should enable the publish button and call onPublish when clicked', () => {
+    it('should enable publish button, disable translate button and call onPublish when clicked', () => {
         renderComponent({ isPublishButtonActive: true });
 
         const publishButton = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED });
         expect(publishButton).toBeEnabled();
 
+        expect(screen.getByRole('button', { name: 'Translate' })).toBeDisabled();
+
         fireEvent.click(publishButton);
         expect(mockOnPublish).toHaveBeenCalled();
-    });
-
-    it('should disable translate button when publish button is active', () => {
-        renderComponent({ isPublishButtonActive: true });
-
-        const translateButton = screen.getByRole('button', { name: 'Translate' });
-
-        expect(translateButton).toBeDisabled();
     });
 
     it('should not allow edits when language is not the base locale', () => {

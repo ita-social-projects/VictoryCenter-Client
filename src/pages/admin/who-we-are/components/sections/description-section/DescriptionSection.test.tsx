@@ -153,22 +153,16 @@ describe('DescriptionSection', () => {
         });
     });
 
-    it('should call onPublish when the publish button is clicked and no error is present', () => {
+    it('should disable translate button and call onPublish when publish button is clicked with no errors', () => {
         renderComponent({ isPublishButtonActive: true });
 
         const publishButton = screen.getByRole('button', { name: 'Опублікувати' });
         expect(publishButton).toBeEnabled();
 
+        expect(screen.getByRole('button', { name: 'Translate' })).toBeDisabled();
+
         fireEvent.click(publishButton);
         expect(mockOnPublish).toHaveBeenCalled();
-    });
-
-    it('should disable translate button when publish button is active', () => {
-        renderComponent({ isPublishButtonActive: true });
-
-        const translateButton = screen.getByRole('button', { name: 'Translate' });
-
-        expect(translateButton).toBeDisabled();
     });
 
     it('should not allow editing and should hide publish button for non-base language', () => {

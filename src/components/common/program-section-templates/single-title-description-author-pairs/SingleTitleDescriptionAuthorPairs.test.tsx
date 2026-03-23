@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { SingleTitleDescriptionAuthorPairs } from './SingleTitleDescriptionAuthorPairs';
 import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
@@ -37,8 +37,8 @@ jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
 }));
 
 jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
-    InputWithCharacterLimitGroup: ({ value, onChange, onBlur, id, error }: any) => (
-        <div>
+    InputWithCharacterLimitGroup: ({ value, onChange, onBlur, id, error, showCounterBelow }: any) => (
+        <div data-testid={`group-${id}`} data-show-counter-below={String(showCounterBelow)}>
             <label htmlFor={`input-${id}`}>{id}</label>
             <input id={`input-${id}`} data-testid={`input-${id}`} value={value} onChange={onChange} onBlur={onBlur} />
             <div data-testid={`error-${id}`}>{error ?? ''}</div>
@@ -160,7 +160,9 @@ const getPairCardProps = (index: number) =>
 const getConfirmationModalProps = () => mockConfirmationModal.mock.calls.at(-1)?.[0];
 
 const openDeleteModal = async (index: number) => {
-    getPairCardProps(index).onDelete(index);
+    act(() => {
+        getPairCardProps(index).onDelete(index);
+    });
     await waitFor(() => expect(screen.getByTestId('confirmation-modal')).toHaveAttribute('data-open', '1'));
 };
 
@@ -188,6 +190,10 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
         });
 
         expect(screen.getByTestId('input-single-title-description-author-pairs-title')).toHaveValue('Edit');
+        expect(screen.getByTestId('group-single-title-description-author-pairs-title')).toHaveAttribute(
+            'data-show-counter-below',
+            'true',
+        );
 
         fireEvent.change(screen.getByTestId('input-single-title-description-author-pairs-title'), {
             target: { value: 'ab' },
@@ -329,7 +335,9 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
                 onDeletePair,
             });
 
-            getPairCardProps(1).onDelete(1);
+            act(() => {
+                getPairCardProps(1).onDelete(1);
+            });
 
             expect(screen.getByTestId('confirmation-modal')).toHaveAttribute('data-open', '0');
             expect(onDeletePair).not.toHaveBeenCalled();
@@ -343,7 +351,9 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
                 pairs: pairs(pair('D0', 'A0'), pair('D1', 'A1')),
             });
 
-            getPairCardProps(1).onDelete(1);
+            act(() => {
+                getPairCardProps(1).onDelete(1);
+            });
 
             expect(screen.getByTestId('confirmation-modal')).toHaveAttribute('data-open', '0');
 
@@ -357,7 +367,9 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
                 onDeletePair,
             });
 
-            getPairCardProps(0).onDelete(0);
+            act(() => {
+                getPairCardProps(0).onDelete(0);
+            });
 
             expect(screen.getByTestId('confirmation-modal')).toHaveAttribute('data-open', '0');
             expect(onDeletePair).not.toHaveBeenCalled();
@@ -386,7 +398,9 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
 
         await openDeleteModal(1);
 
-        getConfirmationModalProps().onClose();
+        act(() => {
+            getConfirmationModalProps().onClose();
+        });
         await waitFor(() => expect(screen.getByTestId('confirmation-modal')).toHaveAttribute('data-open', '0'));
 
         await openDeleteModal(1);

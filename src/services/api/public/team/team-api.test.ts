@@ -175,4 +175,47 @@ describe('fetchTeamPageData', () => {
 
         expect(result).toEqual(expectedResult);
     });
+
+    it('should map member localization dto to language model', async () => {
+        const mockData = [
+            {
+                categoryName: 'Localized Team',
+                description: 'Localized section',
+                localizations: [],
+                teamMembers: [
+                    {
+                        id: 1,
+                        fullName: 'Alice',
+                        description: 'Frontend Dev',
+                        localizations: [
+                            {
+                                localizationInfoDto: { id: 2, code: 'en' },
+                                fullName: 'Alice EN',
+                                description: 'Frontend EN',
+                                translationStatus: 1,
+                            },
+                        ],
+                    },
+                ],
+            },
+        ];
+
+        (axiosInstance.get as jest.Mock).mockResolvedValueOnce({ data: mockData });
+
+        const result = await teamPageDataFetch();
+
+        const firstCategory = result.teamData.at(0);
+        const firstMember = firstCategory?.members.at(0);
+        const firstLocalization = firstMember?.localizations?.at(0);
+
+        expect(firstCategory).toBeDefined();
+        expect(firstMember).toBeDefined();
+
+        expect(firstLocalization).toEqual(
+            expect.objectContaining({
+                language: { id: 2, code: 'en' },
+                fullName: 'Alice EN',
+            }),
+        );
+    });
 });

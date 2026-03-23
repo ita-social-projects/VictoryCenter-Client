@@ -80,10 +80,10 @@ export const TEAM_MEMBER_VALIDATION = {
     },
     img: {
         getRequiredWhenPublishingError: () => "Фото обов'язкове при публікації",
-        croppedWidth: 960,
-        croppedHeight: 1200,
-        minWidth: 960,
-        minHeight: 1200,
+        croppedWidth: 320,
+        croppedHeight: 400,
+        minWidth: 320,
+        minHeight: 400,
     },
 };
 
@@ -100,6 +100,10 @@ export const TEAM_CATEGORY_TEXT = {
                 'Виникла помилка під час оновлення перекладу для категорії учасників',
         },
     },
+};
+export const TEAM_IMAGE_PLACEHOLDER = {
+    INPUT: 'Додайте файл сюди',
+    SIZE: `Розмір: ${TEAM_MEMBER_VALIDATION.img.croppedWidth}x${TEAM_MEMBER_VALIDATION.img.croppedHeight}`,
 };
 
 export const TEAM_CATEGORY_VALIDATION = {

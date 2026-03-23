@@ -68,51 +68,8 @@
 
         button {
             border: none;
-        }
-
-        &-translate {
             width: 1.5rem;
             height: 1.5rem;
-            background: url('~@/assets/icons/translate.svg');
-
-            &:hover {
-                cursor: pointer;
-                background: url('~@/assets/icons/translate-grey.svg');
-            }
-
-            &:active {
-                background: url('~@/assets/icons/translate.svg');
-            }
-        }
-
-        &-edit {
-            width: 1.5rem;
-            height: 1.5rem;
-            background: url('~@/assets/icons/edit.svg');
-
-            &:hover {
-                cursor: pointer;
-                background: url('~@/assets/icons/edit-grey.svg');
-            }
-
-            &:active {
-                background: url('~@/assets/icons/edit-filled.svg');
-            }
-        }
-
-        &-delete {
-            width: 1.5rem;
-            height: 1.5rem;
-            background: url('~@/assets/icons/delete.svg');
-
-            &:hover {
-                cursor: pointer;
-                background: url('~@/assets/icons/delete-grey.svg');
-            }
-
-            &:active {
-                background: url('~@/assets/icons/delete-filled.svg');
-            }
         }
     }
 }

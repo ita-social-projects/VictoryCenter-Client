@@ -8,6 +8,8 @@ import { LocalizationLanguage } from '@/types/common/language';
 import { useEffect, useState } from 'react';
 import { returnDisplayedLocalization } from '@/utils/functions/localization/localization';
 import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
+import { IconButton } from '@/components/admin/icon-button/IconButton';
+import { ACTION_ICONS } from '@/const/common/action-icons';
 
 export interface FaqComponentProps {
     faq: FaqQuestion;
@@ -76,9 +78,26 @@ export const FaqComponent = ({
                     </div>
                 </ButtonTooltip>
                 <div className="faq-actions-buttons">
-                    <button type="button" onClick={handleTranslateFaq} className="faq-translate-btn" />
-                    <button type="button" onClick={handleEditFaq} className="faq-edit-btn" />
-                    <button type="button" onClick={handleDeleteFaq} className="faq-delete-btn" />
+                    <IconButton
+                        type="button"
+                        onClick={handleTranslateFaq}
+                        className="faq-translate-btn"
+                        DefaultIcon={ACTION_ICONS.translate.default}
+                    />
+                    <IconButton
+                        type="button"
+                        onClick={handleEditFaq}
+                        className="faq-edit-btn"
+                        FilledIcon={ACTION_ICONS.edit.hover}
+                        DefaultIcon={ACTION_ICONS.edit.default}
+                    />
+                    <IconButton
+                        type="button"
+                        onClick={handleDeleteFaq}
+                        className="faq-delete-btn"
+                        FilledIcon={ACTION_ICONS.delete.hover}
+                        DefaultIcon={ACTION_ICONS.delete.default}
+                    />
                 </div>
             </div>
         </div>

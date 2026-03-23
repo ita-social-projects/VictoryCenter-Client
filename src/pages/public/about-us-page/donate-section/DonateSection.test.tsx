@@ -12,7 +12,7 @@ jest.mock('@/const/public/routes', () => ({
         },
     },
 }));
-jest.mock('@/assets/images/public/about-us-page/donate-background.jpg', () => 'donate-background.jpg');
+jest.mock('@/assets/images/horses.webp', () => 'horses.webp');
 
 jest.mock('@/components/public/cta', () => ({
     CtaSection: () => <div data-testid="cta-section">CTA Section</div>,

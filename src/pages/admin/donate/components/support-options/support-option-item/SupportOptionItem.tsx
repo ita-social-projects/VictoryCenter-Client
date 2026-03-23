@@ -7,6 +7,8 @@ import { ConfirmationModal } from '@/components/admin/confirmation-modal/Confirm
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { DONATE_TEXT, VALIDATION_PARAMS } from '@/const/admin/donate';
 import { SUPPORT_OPTIONS_VALIDATION_FUNCTIONS } from '@/validation/admin/bank-details-schema/bank-details-schema';
+import { IconButton } from '@/components/admin/icon-button/IconButton';
+import { ACTION_ICONS } from '@/const/common/action-icons';
 
 export enum SupportOptionItemMode {
     Create = 'create',
@@ -153,13 +155,19 @@ export const SupportOptionItem = ({
                 {isViewMode && <div className="support-option-header-title">{data?.name}</div>}
                 {!isCreateMode && (
                     <div className="support-option-header-actions">
-                        <button
+                        <IconButton
                             aria-label="edit-btn"
                             className={`edit-btn ${editable ? 'edit' : 'view'}`}
                             onClick={handleEditClick}
                             disabled={isSubmitting}
+                            DefaultIcon={
+                                mode === SupportOptionItemMode.Edit
+                                    ? ACTION_ICONS.edit.hover
+                                    : ACTION_ICONS.edit.default
+                            }
+                            FilledIcon={mode === SupportOptionItemMode.Edit ? null : ACTION_ICONS.edit.hover}
                         />
-                        <button
+                        <IconButton
                             aria-label="delete-btn"
                             className="delete-btn delete-btn-icon"
                             onClick={() =>
@@ -169,6 +177,8 @@ export const SupportOptionItem = ({
                                 })
                             }
                             disabled={isSubmitting}
+                            DefaultIcon={ACTION_ICONS.delete.default}
+                            FilledIcon={ACTION_ICONS.delete.hover}
                         />
                     </div>
                 )}

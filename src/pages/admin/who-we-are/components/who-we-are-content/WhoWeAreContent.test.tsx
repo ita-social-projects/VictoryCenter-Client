@@ -10,22 +10,20 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ToastType } from '@/types/admin/toast';
 import { ContentType, SectionType } from '@/types/common/about-us';
 import { WHO_WE_ARE_TEXT } from '@/const/admin/who-we-are';
-import { MainSectionProps } from '@/pages/admin/who-we-are/components/sections-wrapper/SectionsWrapper';
+
+const mockUseLocalizationToolkit = jest.fn();
+const mockUseModalsState = jest.fn();
 
 jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
     InlineLoader: () => <div data-testid="inline-loader" />,
 }));
 
 jest.mock('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit', () => ({
-    useLocalizationToolkit: () => ({
-        allLanguages: [{ id: 1, code: 'uk', name: 'Ukrainian' }],
-        translationLanguages: [{ id: 1, code: 'uk', name: 'Ukrainian' }],
-        selectedLanguage: { id: 1, code: 'uk', name: 'Ukrainian' },
-        onLanguageChange: jest.fn(),
-        translationStatusFilter: 0,
-        onTranslationStatusFilterChange: jest.fn(),
-        retryFetchLanguages: jest.fn(),
-    }),
+    useLocalizationToolkit: (...args: unknown[]) => mockUseLocalizationToolkit(...args),
+}));
+
+jest.mock('@/hooks/admin/use-modals-state/useModalsState', () => ({
+    useModalsState: (...args: unknown[]) => mockUseModalsState(...args),
 }));
 
 jest.mock('../who-we-are-page-toolbar/WhoWeArePageToolbar', () => ({
@@ -44,6 +42,26 @@ jest.mock('../who-we-are-page-toolbar/WhoWeArePageToolbar', () => ({
     ),
 }));
 
+jest.mock('@/pages/admin/who-we-are/components/modals/WhoWeAreModals', () => ({
+    WhoWeAreModals: ({ onTranslateWhoWeAreSection }: any) => (
+        <div data-testid="who-we-are-modals">
+            <button
+                data-testid="trigger-translate-success"
+                onClick={() =>
+                    onTranslateWhoWeAreSection({
+                        id: 1,
+                        title: 'Translated section',
+                        sectionType: 0,
+                        contents: [],
+                    })
+                }
+            >
+                Trigger translate success
+            </button>
+        </div>
+    ),
+}));
+
 jest.mock('@/services/api/admin/who-we-are/who-we-are-api');
 const mockedWhoWeAreApi = WhoWeAreApi as jest.Mocked<typeof WhoWeAreApi>;
 
@@ -54,25 +72,31 @@ jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider');
 const mockedUseToast = useToast as jest.Mock;
 
 jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
-    CategoryBar: ({ categories, onCategorySelect, getCategoryDisplayName }: any) => (
+    CategoryBar: ({
+        categories,
+        onCategorySelect,
+        getCategoryDisplayName,
+        getCategoryKey,
+        renderCategoryExtra,
+    }: any) => (
         <div>
             {categories.map((cat: any) => (
-                <button key={cat.id} onClick={() => onCategorySelect(cat)}>
-                    {getCategoryDisplayName(cat)}
-                </button>
+                <div key={cat.id}>
+                    <button onClick={() => onCategorySelect(cat)}>{getCategoryDisplayName(cat)}</button>
+                    <span data-testid={`category-key-${cat.id}`}>{String(getCategoryKey(cat))}</span>
+                    <div data-testid={`category-extra-${cat.id}`}>{renderCategoryExtra(cat)}</div>
+                </div>
             ))}
         </div>
     ),
 }));
 
+jest.mock('@/components/admin/localization-statuses/LocalizationStatuses', () => ({
+    LocalizationStatuses: () => <div data-testid="localization-statuses" />,
+}));
+
 jest.mock('../sections-wrapper/SectionsWrapper', () => ({
-    SectionsWrapper: ({
-        section,
-        onChange,
-        onPublish,
-        setIsPublishButtonActive,
-        isPublishButtonActive,
-    }: MainSectionProps) => (
+    SectionsWrapper: ({ section, onChange, onPublish, isPublishButtonActive, handleOnTranslateContent }: any) => (
         <div>
             <h2>{section?.title}</h2>
             {section?.contents.map((content: Content) => (
@@ -83,7 +107,6 @@ jest.mock('../sections-wrapper/SectionsWrapper', () => ({
                         data-testid={`input-${content.id}`}
                         onChange={(e) => {
                             onChange({ ...content, description: e.target.value });
-                            setIsPublishButtonActive(true);
                         }}
                     />
                 </div>
@@ -92,6 +115,7 @@ jest.mock('../sections-wrapper/SectionsWrapper', () => ({
             <button onClick={onPublish} disabled={!isPublishButtonActive}>
                 Publish
             </button>
+            <button onClick={() => handleOnTranslateContent(section)}>Open translate</button>
         </div>
     ),
 }));
@@ -152,11 +176,43 @@ const mockSection2: WhoWeAreSection = {
 
 describe('WhoWeAreContent Component', () => {
     let mockAddToast: jest.Mock;
+    let mockRetryFetchLanguages: jest.Mock;
+    let mockOpenEditTranslationModal: jest.Mock;
+    let mockOpenTranslateItemModal: jest.Mock;
+
+    const getDefaultLocalizationToolkitValue = () => ({
+        allLanguages: [
+            { id: 1, code: 'uk', name: 'Ukrainian' },
+            { id: 2, code: 'en', name: 'English' },
+        ],
+        translationLanguages: [
+            { id: 1, code: 'uk', name: 'Ukrainian' },
+            { id: 2, code: 'en', name: 'English' },
+        ],
+        selectedLanguage: { id: 1, code: 'uk', name: 'Ukrainian' },
+        onLanguageChange: jest.fn(),
+        translationStatusFilter: 0,
+        onTranslationStatusFilterChange: jest.fn(),
+        retryFetchLanguages: mockRetryFetchLanguages,
+    });
 
     beforeEach(() => {
         jest.clearAllMocks();
         mockedUseAdminClient.mockReturnValue({ client: 'mocked-client' });
         mockAddToast = jest.fn();
+        mockRetryFetchLanguages = jest.fn();
+        mockOpenEditTranslationModal = jest.fn();
+        mockOpenTranslateItemModal = jest.fn();
+
+        mockUseLocalizationToolkit.mockReturnValue(getDefaultLocalizationToolkitValue());
+        mockUseModalsState.mockReturnValue({
+            isAnyModalOpened: false,
+            openModalActions: {
+                openEditTranslationModal: mockOpenEditTranslationModal,
+                openTranslateItemModal: mockOpenTranslateItemModal,
+            },
+        });
+
         mockedUseToast.mockReturnValue({ addToast: mockAddToast });
     });
 
@@ -173,6 +229,8 @@ describe('WhoWeAreContent Component', () => {
         expect(mockedWhoWeAreApi.getPreviews).toHaveBeenCalledTimes(1);
         expect(mockedWhoWeAreApi.getByType).toHaveBeenCalledTimes(1);
         expect(mockedWhoWeAreApi.getByType).toHaveBeenCalledWith({ client: 'mocked-client' }, SectionType.Main);
+        expect(screen.getByTestId('category-key-1')).toHaveTextContent('1');
+        expect(screen.getByTestId('category-extra-1')).toBeInTheDocument();
     });
 
     it('should display an error if fetching categories fails', async () => {
@@ -355,19 +413,17 @@ describe('WhoWeAreContent Component', () => {
 
     it('should set languages error state and allow retrying', async () => {
         let injectedSetErrorState: any = null;
-        let mockRetryFetchLanguages = jest.fn();
 
-        const toolkitSpy = jest
-            .spyOn(require('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit'), 'useLocalizationToolkit')
-            .mockImplementation(({ setErrorState }: any) => {
-                injectedSetErrorState = setErrorState;
-                return {
-                    allLanguages: [],
-                    selectedLanguage: null,
-                    onLanguageChange: jest.fn(),
-                    retryFetchLanguages: mockRetryFetchLanguages,
-                };
-            });
+        mockUseLocalizationToolkit.mockImplementation(({ setErrorState }: any) => {
+            injectedSetErrorState = setErrorState;
+            return {
+                allLanguages: [],
+                translationLanguages: [],
+                selectedLanguage: null,
+                onLanguageChange: jest.fn(),
+                retryFetchLanguages: mockRetryFetchLanguages,
+            };
+        });
 
         mockedWhoWeAreApi.getPreviews.mockResolvedValue(mockCategories);
         mockedWhoWeAreApi.getByType.mockResolvedValue(mockSection1);
@@ -387,8 +443,6 @@ describe('WhoWeAreContent Component', () => {
         fireEvent.click(retryButton);
 
         expect(mockRetryFetchLanguages).toHaveBeenCalled();
-
-        toolkitSpy.mockRestore();
     });
 
     it('should not throw error if categories are loaded but fetch by type returns no contents', async () => {
@@ -402,6 +456,104 @@ describe('WhoWeAreContent Component', () => {
 
         await waitFor(() => {
             expect(screen.queryByTestId('input-1')).not.toBeInTheDocument();
+        });
+    });
+
+    it('opens edit translation modal when english localization already exists', async () => {
+        const sectionWithEnglishLocalization: WhoWeAreSection = {
+            ...mockSection1,
+            contents: [
+                {
+                    ...mockSection1.contents[0],
+                    localizations: [{ language: { id: 2, code: 'en' }, translationStatus: 1 } as any],
+                },
+            ],
+        };
+
+        mockedWhoWeAreApi.getPreviews.mockResolvedValue(mockCategories);
+        mockedWhoWeAreApi.getByType.mockResolvedValue(sectionWithEnglishLocalization);
+
+        render(<WhoWeAreContent />);
+
+        expect(await screen.findByText('What we do')).toBeInTheDocument();
+        fireEvent.click(screen.getByRole('button', { name: 'Open translate' }));
+
+        expect(mockOpenEditTranslationModal).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }));
+        expect(mockOpenTranslateItemModal).not.toHaveBeenCalled();
+    });
+
+    it('opens add translation modal when english localization does not exist', async () => {
+        mockedWhoWeAreApi.getPreviews.mockResolvedValue(mockCategories);
+        mockedWhoWeAreApi.getByType.mockResolvedValue(mockSection1);
+
+        render(<WhoWeAreContent />);
+
+        expect(await screen.findByText('What we do')).toBeInTheDocument();
+        fireEvent.click(screen.getByRole('button', { name: 'Open translate' }));
+
+        expect(mockOpenTranslateItemModal).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }));
+        expect(mockOpenEditTranslationModal).not.toHaveBeenCalled();
+    });
+
+    it('does not open translate modal when any modal is already open', async () => {
+        mockUseModalsState.mockReturnValue({
+            isAnyModalOpened: true,
+            openModalActions: {
+                openEditTranslationModal: mockOpenEditTranslationModal,
+                openTranslateItemModal: mockOpenTranslateItemModal,
+            },
+        });
+
+        mockedWhoWeAreApi.getPreviews.mockResolvedValue(mockCategories);
+        mockedWhoWeAreApi.getByType.mockResolvedValue(mockSection1);
+
+        render(<WhoWeAreContent />);
+
+        expect(await screen.findByText('What we do')).toBeInTheDocument();
+        fireEvent.click(screen.getByRole('button', { name: 'Open translate' }));
+
+        expect(mockOpenEditTranslationModal).not.toHaveBeenCalled();
+        expect(mockOpenTranslateItemModal).not.toHaveBeenCalled();
+    });
+
+    it('handles successful translation callback from modal and refetches categories', async () => {
+        mockedWhoWeAreApi.getPreviews.mockResolvedValue(mockCategories);
+        mockedWhoWeAreApi.getByType.mockResolvedValue(mockSection1);
+
+        render(<WhoWeAreContent />);
+
+        expect(await screen.findByText('What we do')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByTestId('trigger-translate-success'));
+
+        await waitFor(() => {
+            expect(mockAddToast).toHaveBeenCalledWith(
+                COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_PUBLISHED_SUCCESS,
+                ToastType.Success,
+            );
+        });
+
+        await waitFor(() => {
+            expect(mockedWhoWeAreApi.getPreviews).toHaveBeenCalledTimes(2);
+        });
+    });
+
+    it('closes confirmation modal on cancel', async () => {
+        mockedWhoWeAreApi.getPreviews.mockResolvedValue(mockCategories);
+        mockedWhoWeAreApi.getByType.mockResolvedValue(mockSection1);
+
+        render(<WhoWeAreContent />);
+
+        expect(await screen.findByText('What we do')).toBeInTheDocument();
+
+        fireEvent.change(screen.getByTestId('input-1'), { target: { value: 'Updated' } });
+        fireEvent.click(screen.getByRole('button', { name: 'Publish' }));
+
+        expect(await screen.findByText(COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES)).toBeInTheDocument();
+        fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+
+        await waitFor(() => {
+            expect(screen.queryByText(COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES)).not.toBeInTheDocument();
         });
     });
 });

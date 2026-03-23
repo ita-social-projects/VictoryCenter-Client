@@ -20,7 +20,6 @@ export interface CardContentProps {
     descriptionError: string | null;
     imageError: string | null;
     setImageError: (value: string | null) => void;
-    setIsPublishButtonActive: (value: boolean) => void;
     language: LocalizationLanguage;
 }
 
@@ -33,7 +32,6 @@ export const CardContent = ({
     descriptionError,
     imageError,
     setImageError,
-    setIsPublishButtonActive,
     language,
 }: CardContentProps) => {
     const isBaseLanguage = language.code === DEFAULT_LOCALE;
@@ -48,7 +46,6 @@ export const CardContent = ({
             ...content,
             image: value,
         });
-        setIsPublishButtonActive(true);
     };
 
     const handleDescriptionChange = (value: string) => {

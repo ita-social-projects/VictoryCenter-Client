@@ -1,0 +1,49 @@
+@use '@/assets/sass/mixins/typography.mixins' as type;
+
+.root {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    margin: 0 auto;
+    overflow: hidden;
+
+    @media (min-width: 1440px) {
+        height: 420px;
+        display: flex;
+    }
+}
+
+.image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    filter: brightness(50%);
+}
+
+.text {
+    @include type.subtitle-1-medium;
+    position: absolute;
+    left: 0;
+    right: 0;
+    color: white;
+    margin: 136px 16px auto;
+    max-width: 656px;
+    display: flex;
+    flex-direction: column;
+
+    @media (min-width: 560px) {
+        margin: 136px 64px auto;
+    }
+
+    @media (min-width: 768px) {
+        margin: 136px 56px auto;
+    }
+
+    @media (min-width: 1440px) {
+        margin: 136px auto auto;
+        width: 656px;
+    }
+}

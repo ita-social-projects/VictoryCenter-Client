@@ -7,6 +7,8 @@ import './GenericForm.scss';
 import { FieldValues } from 'react-hook-form';
 import { DONATE_TEXT } from '@/const/admin/donate';
 import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
+import { IconButton } from '@/components/admin/icon-button/IconButton';
+import { ACTION_ICONS } from '@/const/common/action-icons';
 
 interface ModalConfig {
     title: string;
@@ -394,17 +396,25 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                         <div className="form-head-container">
                             {!isChildForm && (
                                 <div className="form-header">
-                                    <button
+                                    <IconButton
                                         className={`edit-btn ${mode}`}
                                         aria-label="edit-btn"
                                         onClick={handleEditClick}
                                         disabled={mode === GenericFormMode.Edit}
+                                        DefaultIcon={
+                                            mode === GenericFormMode.Edit
+                                                ? ACTION_ICONS.edit.hover
+                                                : ACTION_ICONS.edit.default
+                                        }
+                                        FilledIcon={mode === GenericFormMode.Edit ? null : ACTION_ICONS.edit.hover}
                                     />
-                                    <button
+                                    <IconButton
                                         className={`delete-btn ${mode}`}
                                         aria-label="delete-btn"
                                         onClick={handleDeleteClick}
-                                    ></button>
+                                        DefaultIcon={ACTION_ICONS.delete.default}
+                                        FilledIcon={ACTION_ICONS.delete.hover}
+                                    />
                                 </div>
                             )}
 
@@ -426,18 +436,22 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                     </div>
                                     {isChildForm && (
                                         <div className="form-name-actions">
-                                            <button
+                                            <IconButton
                                                 className={`edit-btn ${mode}`}
                                                 aria-label="edit-btn"
                                                 type="button"
                                                 onClick={handleEditClick}
-                                            ></button>
-                                            <button
+                                                DefaultIcon={ACTION_ICONS.edit.default}
+                                                FilledIcon={ACTION_ICONS.edit.hover}
+                                            />
+                                            <IconButton
                                                 className={`delete-btn delete-btn-icon ${mode} ${isDeleting ? 'pressed' : ''}`}
                                                 aria-label="delete-btn"
                                                 type="button"
                                                 onClick={handleDeleteClick}
-                                            ></button>
+                                                DefaultIcon={ACTION_ICONS.delete.default}
+                                                FilledIcon={ACTION_ICONS.delete.hover}
+                                            />
                                         </div>
                                     )}
                                 </>
@@ -493,18 +507,22 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                                 mode === GenericFormMode.Edit &&
                                                 !isParentCreating && (
                                                     <div className={`title-actions`}>
-                                                        <button
+                                                        <IconButton
                                                             type="button"
                                                             aria-label="edit-btn"
                                                             className={`edit-btn ${mode}`}
                                                             onClick={handleEditClick}
                                                             disabled
+                                                            DefaultIcon={ACTION_ICONS.edit.default}
+                                                            FilledIcon={ACTION_ICONS.edit.hover}
                                                         />
-                                                        <button
+                                                        <IconButton
                                                             type="button"
                                                             aria-label="delete-btn"
                                                             className={`delete-btn delete-btn-icon ${isDeleting ? 'pressed' : ''}`}
                                                             onClick={handleDeleteClick}
+                                                            DefaultIcon={ACTION_ICONS.delete.default}
+                                                            FilledIcon={ACTION_ICONS.delete.hover}
                                                         />
                                                     </div>
                                                 )}

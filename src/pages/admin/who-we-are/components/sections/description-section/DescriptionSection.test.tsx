@@ -54,7 +54,6 @@ jest.mock('@/validation/admin/who-we-are-schema/WhoWeAreSchema', () => ({
 describe('DescriptionSection', () => {
     let mockOnChange: jest.Mock;
     let mockOnPublish: jest.Mock;
-    let mockSetIsPublishButtonActive: jest.Mock;
     const descriptionLimit = 500;
     const initialDescription = 'This is an initial test description.';
 
@@ -74,7 +73,6 @@ describe('DescriptionSection', () => {
         onChange: mockOnChange,
         onPublish: mockOnPublish,
         isPublishButtonActive: false,
-        setIsPublishButtonActive: mockSetIsPublishButtonActive,
         language: { id: 1, code: 'uk', name: 'Ukrainian' },
         ...overrides,
     });
@@ -85,7 +83,6 @@ describe('DescriptionSection', () => {
     beforeEach(() => {
         mockOnChange = jest.fn();
         mockOnPublish = jest.fn();
-        mockSetIsPublishButtonActive = jest.fn();
         (WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText as jest.Mock).mockReturnValue(null);
     });
 
@@ -123,7 +120,7 @@ describe('DescriptionSection', () => {
         expect(container).toBeEmptyDOMElement();
     });
 
-    it('should call onChange and setIsPublishButtonActive on text area change', () => {
+    it('should call onChange on text area change', () => {
         renderComponent();
         const descriptionInput = screen.getByTestId('mock-rich-input-1');
         const newText = 'This is a new test description.';
@@ -135,7 +132,6 @@ describe('DescriptionSection', () => {
                 contentType: ContentType.Description,
             }),
         );
-        expect(mockSetIsPublishButtonActive).toHaveBeenCalledWith(true);
     });
 
     it('should show an error message and disable the publish button when validation fails', async () => {

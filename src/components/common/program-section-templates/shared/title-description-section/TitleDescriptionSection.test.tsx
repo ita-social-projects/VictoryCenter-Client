@@ -23,6 +23,7 @@ jest.mock('@/components/admin/input-groups/input-with-character-limit-group/Inpu
         className,
         error,
         disabled,
+        showCounterBelow,
     }: {
         label: string;
         value: string;
@@ -34,8 +35,14 @@ jest.mock('@/components/admin/input-groups/input-with-character-limit-group/Inpu
         className?: string;
         error?: string;
         disabled?: boolean;
+        showCounterBelow?: boolean;
     }) => (
-        <div data-testid={`input-group-${id}`} className={className} data-error={error || ''}>
+        <div
+            data-testid={`input-group-${id}`}
+            className={className}
+            data-error={error || ''}
+            data-show-counter-below={String(showCounterBelow)}
+        >
             <label htmlFor={id}>{label}</label>
             <input
                 id={id}
@@ -293,6 +300,13 @@ describe('TitleDescriptionSection', () => {
 
             expect(titleGroup).toHaveAttribute('data-error', 't-err');
             expect(descriptionGroup).toHaveAttribute('data-error', 'd-err');
+        });
+
+        it('passes bottom counter mode to title input group', () => {
+            renderComponent({ mode: ProgramSectionMode.Edit });
+
+            const titleGroup = getTitleInput()!.closest('div');
+            expect(titleGroup).toHaveAttribute('data-show-counter-below', 'true');
         });
 
         it('passes trimmed currentLength to description group', () => {

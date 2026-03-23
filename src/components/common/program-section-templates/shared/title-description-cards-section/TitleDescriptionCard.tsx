@@ -85,6 +85,7 @@ export const TitleDescriptionCard = ({
                         error={titleError}
                         placeholder={PROGRAMS_TEXT.SECTION.CARD.FORM.TITLE.PLACEHOLDER}
                         maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(titleMax)}
+                        showCounterBelow={true}
                     />
                 </div>
 

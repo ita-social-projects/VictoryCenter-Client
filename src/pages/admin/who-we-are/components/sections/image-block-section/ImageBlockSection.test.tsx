@@ -58,7 +58,6 @@ jest.mock('@/validation/admin/who-we-are-schema/WhoWeAreSchema', () => ({
 describe('ImageSection', () => {
     let mockOnChange: jest.Mock;
     let mockOnPublish: jest.Mock;
-    let mockSetIsPublishButtonActive: jest.Mock;
 
     const titleLimit = 50;
     const descriptionLimit = 500;
@@ -104,7 +103,6 @@ describe('ImageSection', () => {
             onPublish: mockOnPublish,
             imageInputProps: { style: { width: '100%' }, subText: '1000x800' },
             isPublishButtonActive: false,
-            setIsPublishButtonActive: mockSetIsPublishButtonActive,
             language: { id: 1, code: 'uk', name: 'Ukrainian' },
         };
 
@@ -114,7 +112,6 @@ describe('ImageSection', () => {
     beforeEach(() => {
         mockOnChange = jest.fn();
         mockOnPublish = jest.fn();
-        mockSetIsPublishButtonActive = jest.fn();
         validateTextMock().mockReset();
         validateTextMock().mockReturnValue(undefined);
     });
@@ -164,7 +161,7 @@ describe('ImageSection', () => {
         expect(noDescriptionContainer).toBeEmptyDOMElement();
     });
 
-    it('should call onChange and setIsPublishButtonActive on image change', () => {
+    it('should call onChange on image change', () => {
         renderComponent();
 
         const file = new File(['dummy content'], 'test.png', { type: 'image/png' });
@@ -173,10 +170,9 @@ describe('ImageSection', () => {
         expect(mockOnChange).toHaveBeenCalledWith(
             expect.objectContaining({ contentType: ContentType.Image, image: file }),
         );
-        expect(mockSetIsPublishButtonActive).toHaveBeenCalledWith(true);
     });
 
-    it('should call onChange and setIsPublishButtonActive on title change', () => {
+    it('should call onChange on title change', () => {
         renderComponent();
 
         fireEvent.change(screen.getByTestId('mock-rich-input-2'), { target: { value: 'New Title' } });
@@ -184,10 +180,9 @@ describe('ImageSection', () => {
         expect(mockOnChange).toHaveBeenCalledWith(
             expect.objectContaining({ contentType: ContentType.Title, title: 'New Title' }),
         );
-        expect(mockSetIsPublishButtonActive).toHaveBeenCalledWith(true);
     });
 
-    it('should call onChange and setIsPublishButtonActive on description change', () => {
+    it('should call onChange on description change', () => {
         renderComponent();
 
         fireEvent.change(screen.getByTestId('mock-rich-input-3'), { target: { value: 'New Description' } });
@@ -195,7 +190,6 @@ describe('ImageSection', () => {
         expect(mockOnChange).toHaveBeenCalledWith(
             expect.objectContaining({ contentType: ContentType.Description, description: 'New Description' }),
         );
-        expect(mockSetIsPublishButtonActive).toHaveBeenCalledWith(true);
     });
 
     it('should enable the publish button and call onPublish when clicked', () => {
@@ -279,7 +273,6 @@ describe('ImageSection', () => {
             imageId: null,
             localizations: [],
         });
-        expect(mockSetIsPublishButtonActive).toHaveBeenCalledWith(true);
     });
 
     it('should disable publish button when image has error', () => {

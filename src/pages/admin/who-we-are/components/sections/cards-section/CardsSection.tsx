@@ -19,7 +19,6 @@ export interface CardsSectionProps {
     titleText?: string;
     onPublish: () => void;
     isPublishButtonActive: boolean;
-    setIsPublishButtonActive: (value: boolean) => void;
     language: LocalizationLanguage;
 }
 
@@ -32,7 +31,6 @@ export const CardsSection = ({
     cardImageConfigs,
     titleText,
     isPublishButtonActive,
-    setIsPublishButtonActive,
     language,
 }: CardsSectionProps) => {
     const [errors, setErrors] = useState<Record<number, { image: string | null; description: string | null }>>({});
@@ -56,8 +54,6 @@ export const CardsSection = ({
                 },
             };
         });
-
-        setIsPublishButtonActive(true);
     };
 
     const handleSetImageError = (id: number, value: string | null) => {
@@ -94,7 +90,6 @@ export const CardsSection = ({
                             descriptionLimit={descriptionLimit}
                             imageInputProps={{ ...(cardImageConfigs[index] || {}) }}
                             rows={rows}
-                            setIsPublishButtonActive={setIsPublishButtonActive}
                             language={language}
                         />
                     ))}

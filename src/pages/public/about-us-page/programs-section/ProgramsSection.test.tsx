@@ -50,6 +50,7 @@ describe('ProgramsSection', () => {
         previewImage: { id: id, url: `image-${id}.jpg`, mimeType: 'image/jpeg' },
         description: `Description ${id}`,
         categories: [],
+        localizations: [],
     });
 
     it('renders nothing when content is null', () => {

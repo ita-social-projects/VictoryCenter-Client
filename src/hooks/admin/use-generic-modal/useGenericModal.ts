@@ -44,6 +44,7 @@ export interface UseGenericModalReturn<TFormValues, TFormRef> {
     handleFormValidationChange: (isValid: boolean) => void;
     handleFormSubmit: (data: TFormValues, status: VisibilityStatus) => void;
     handleCancelConfirmation: () => void;
+    handleDismissConfirmation: () => void;
     handleConfirmAction: () => Promise<void>;
     handleClose: () => void;
     handleConfirmClose: () => void;
@@ -67,7 +68,6 @@ export const useGenericModal = <
     getErrorMessage,
     getFormKey,
     transformFormData,
-    closeOnDraftCancel = false,
 }: UseGenericModalConfig<TFormValues, TEntity>): UseGenericModalReturn<TFormValues, TFormRef> => {
     const formRef = useRef<TFormRef>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -118,14 +118,10 @@ export const useGenericModal = <
 
     const handleCancelConfirmation = useCallback(() => {
         setShowFormConfirmModal(false);
-
-        if (closeOnDraftCancel && pendingAction === PendingAction.Draft) {
-            onClose();
-        }
-
+        onClose();
         resetPendingState();
         setIsSubmitting(false);
-    }, [closeOnDraftCancel, pendingAction, onClose, resetPendingState]);
+    }, [onClose, resetPendingState]);
 
     const handleConfirmAction = useCallback(async () => {
         if (!pendingFormData || pendingAction === null) return;
@@ -187,6 +183,12 @@ export const useGenericModal = <
         }
     }, [isSubmitting, onClose, pendingAction]);
 
+    const handleDismissConfirmation = useCallback(() => {
+        setShowFormConfirmModal(false);
+        resetPendingState();
+        setIsSubmitting(false);
+    }, [resetPendingState]);
+
     const handleCancelClose = useCallback(() => {
         setShowCloseConfirmModal(false);
     }, []);
@@ -222,6 +224,7 @@ export const useGenericModal = <
         handleFormValidationChange,
         handleFormSubmit,
         handleCancelConfirmation,
+        handleDismissConfirmation,
         handleConfirmAction,
         handleClose,
         handleConfirmClose,

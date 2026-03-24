@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
+import cn from 'classnames';
 import { CategoryBar } from '@/components/admin/category-bar/CategoryBar';
 import { CompanyProfileTab } from '../company-profile-tab/CompanyProfileTab';
 import { CompanyProfileRequisitesTab } from '../company-profile-requisites-tab/CompanyProfileRequisitesTab';
@@ -8,7 +9,7 @@ import { ToastContainer } from '@/components/admin/toast/toast-container/ToastCo
 import { ProfileToolbar } from '../company-profile-toolbar/CompanyProfileToolbar';
 import { CompanyProfileLogoHeader } from '../company-profile-logo-header/CompanyProfileLogoHeader';
 import { CompanyProfileCancelModal } from '../company-profile-cancel-modal/CompanyProfileCancelModal';
-import './CompanyProfileContent.scss';
+import styles from './CompanyProfileContent.module.scss';
 import { COMPANY_PROFILE_TEXT } from '@/const/admin/company-profile';
 import { COMPANY_PROFILE_FORM_DEFAULTS, CompanyProfileFormValues } from '@/types/admin/company-profile';
 
@@ -36,7 +37,7 @@ export const CompanyProfileContent = () => {
     });
 
     const handlePublish = (_data: CompanyProfileFormValues) => {
-        // API integrationd pending backend endpoints/DTO
+        // API integration pending backend endpoints/DTO
     };
 
     const handleCancelClick = () => {
@@ -61,11 +62,15 @@ export const CompanyProfileContent = () => {
     const selectedTab = TABS.find((tab) => tab.id === activeTab) || TABS[0];
 
     return (
-        <div className="wrapper">
-            <div className="toolbar">
-                <div className="toolbar-top" />
-                <div className="toolbar-bottom">
-                    <div className={`tabs-wrapper${isEditMode ? ' tabs-wrapper--disabled' : ''}`}>
+        <div className={styles.wrapper}>
+            <div className={styles.toolbar}>
+                <div className={styles['toolbar-top']} />
+                <div className={styles['toolbar-bottom']}>
+                    <div
+                        className={cn(styles['tabs-wrapper'], {
+                            [styles['tabs-wrapper-disabled']]: isEditMode,
+                        })}
+                    >
                         <CategoryBar<TabItem>
                             categories={TABS}
                             selectedCategory={selectedTab}
@@ -75,7 +80,7 @@ export const CompanyProfileContent = () => {
                         />
                     </div>
 
-                    <div className="toolbar-actions">
+                    <div className={styles['toolbar-actions']}>
                         <ProfileToolbar
                             isEditMode={isEditMode}
                             onEdit={() => setIsEditMode(true)}
@@ -87,12 +92,12 @@ export const CompanyProfileContent = () => {
                 </div>
             </div>
 
-            <div className="main-content">
+            <div className={styles['main-content']}>
                 <CompanyProfileLogoHeader isEditMode={isEditMode} />
 
                 <FormProvider {...methods}>
-                    <form className="company-form">
-                        <div className="tab-content">
+                    <form className={styles['company-form']}>
+                        <div className={styles['tab-content']}>
                             {activeTab === 'profile' && <CompanyProfileTab disabled={!isEditMode} />}
                             {activeTab === 'requisites' && <CompanyProfileRequisitesTab disabled={!isEditMode} />}
                             {activeTab === 'socials' && <CompanyProfileSocialMediaTab disabled={!isEditMode} />}

@@ -1,6 +1,6 @@
 import { useFormContext, Controller } from 'react-hook-form';
 import { CustomFormGroup } from '../company-profile-form-group/CompanyProfileFormGroup';
-import './CompanyProfileRequisitesTab.scss';
+import styles from './CompanyProfileRequisitesTab.module.scss';
 import { COMPANY_PROFILE_TEXT } from '@/const/admin/company-profile';
 import { CompanyProfileFormValues } from '@/types/admin/company-profile';
 
@@ -15,12 +15,12 @@ export const CompanyProfileRequisitesTab = ({ disabled }: CompanyProfileRequisit
     } = useFormContext<CompanyProfileFormValues>();
 
     return (
-        <div className="requisites-tab-container">
-            <div className="form-row full-width">
-                <h2 className="requisites-tab-title">{COMPANY_PROFILE_TEXT.REQUISITES_TAB.SECTION_TITLE}</h2>
+        <div className={styles['requisites-tab-container']}>
+            <div className={styles['form-row']}>
+                <h2 className={styles['requisites-tab-title']}>{COMPANY_PROFILE_TEXT.REQUISITES_TAB.SECTION_TITLE}</h2>
             </div>
 
-            <div className="requisites-tab-fields">
+            <div className={styles['requisites-tab-fields']}>
                 <Controller
                     name="requisitesUa"
                     control={control}

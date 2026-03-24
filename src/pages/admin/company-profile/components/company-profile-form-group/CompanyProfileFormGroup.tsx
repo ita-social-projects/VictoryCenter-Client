@@ -1,11 +1,12 @@
 import React from 'react';
+import cn from 'classnames';
 import {
     InputWithCharacterLimit,
     InputWithCharacterLimitProps,
 } from '@/components/admin/input-with-character-limit/InputWithCharacterLimit';
 import { InputError } from '@/components/admin/input-error/InputError';
 import { ButtonTooltip } from '@/components/admin/button-tooltip/ButtonTooltip';
-import './CompanyProfileFormGroup.scss';
+import styles from './CompanyProfileFormGroup.module.scss';
 
 export interface CustomFormGroupProps extends Omit<InputWithCharacterLimitProps, 'hasError'> {
     labelText: string;
@@ -25,22 +26,27 @@ export const CustomFormGroup = ({
     ...inputProps
 }: CustomFormGroupProps) => {
     return (
-        <div className="custom-form-group">
+        <div className={styles['custom-form-group']}>
             {!hideLabel && (
-                <div className="custom-form-group__label-wrapper">
+                <div className={styles['custom-form-group-label-wrapper']}>
                     <label htmlFor={id}>
-                        {isRequired && <span className="custom-form-group__required">*</span>}
+                        {isRequired && <span className={styles['custom-form-group-required']}>*</span>}
                         {labelText}
                     </label>
                 </div>
             )}
 
-            <div className="custom-form-group__input-wrapper">
-                <InputWithCharacterLimit {...inputProps} id={id} hasError={!!error} />
+            <div className={styles['custom-form-group-input-wrapper']}>
+                <InputWithCharacterLimit
+                    {...inputProps}
+                    id={id}
+                    hasError={!!error}
+                    className={cn(styles['char-limit-input'], inputProps.className)}
+                />
 
-                <div className="custom-form-group__tooltip-slot">
+                <div className={styles['custom-form-group-tooltip-slot']}>
                     {tooltipText && (
-                        <div className="custom-form-group__tooltip">
+                        <div className={styles['custom-form-group-tooltip']}>
                             <ButtonTooltip position="bottom">{tooltipText}</ButtonTooltip>
                         </div>
                     )}

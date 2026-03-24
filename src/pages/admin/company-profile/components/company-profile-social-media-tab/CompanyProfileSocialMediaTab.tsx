@@ -1,10 +1,9 @@
 import { useFormContext, Controller, useFieldArray } from 'react-hook-form';
 import { CustomFormGroup } from '../company-profile-form-group/CompanyProfileFormGroup';
 import { COMPANY_PROFILE_TEXT } from '@/const/admin/company-profile';
-import './CompanyProfileSocialMediaTab.scss';
+import styles from './CompanyProfileSocialMediaTab.module.scss';
 import { useMemo } from 'react';
 import { SingleSelectInput } from '@/components/common/single-select-input/SingleSelectInput';
-import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
 import { ReactComponent as DeleteIcon } from '@/assets/icons/delete.svg';
 import { ButtonTooltip } from '@/components/admin/button-tooltip/ButtonTooltip';
 import { CompanyProfileFormValues, SocialPlatform } from '@/types/admin/company-profile';
@@ -76,14 +75,16 @@ export const CompanyProfileSocialMediaTab = ({ disabled }: CompanyProfileSocialM
     };
 
     return (
-        <div className="social-media-tab-container">
-            <div className="form-row full-width social-media-tab-header">
-                <h2 className="social-media-tab-title">{COMPANY_PROFILE_TEXT.SOCIAL_MEDIA_TAB.SECTION_TITLE}</h2>
+        <div className={styles['social-media-tab-container']}>
+            <div className={styles['social-media-tab-header']}>
+                <h2 className={styles['social-media-tab-title']}>
+                    {COMPANY_PROFILE_TEXT.SOCIAL_MEDIA_TAB.SECTION_TITLE}
+                </h2>
                 <ButtonTooltip position="bottom">Опубліковано на: Профайл</ButtonTooltip>
             </div>
 
             {!disabled && (
-                <div className="social-media-tab-add">
+                <div className={styles['social-media-tab-add']}>
                     <SingleSelectInput
                         options={availablePlatforms}
                         value={undefined}
@@ -96,35 +97,25 @@ export const CompanyProfileSocialMediaTab = ({ disabled }: CompanyProfileSocialM
                     />
 
                     {isLimitReached && (
-                        <div className="social-media-tab-limit-message">
+                        <div className={styles['social-media-tab-limit-message']}>
                             {COMPANY_PROFILE_TEXT.SOCIAL_MEDIA_TAB.LIMIT_MESSAGE}
                         </div>
                     )}
                 </div>
             )}
 
-            <div className="form-row social-media-tab-contacts">
+            <div className={styles['social-media-tab-contacts']}>
                 {fields.map((field, index) => (
-                    <div className="social-media-contact" key={field.id}>
-                        <div className="social-media-contact__header">
-                            <div className="social-media-contact__label">
-                                <span className="social-media-contact__label-text">{field.platform}</span>
+                    <div className={styles['social-media-contact']} key={field.id}>
+                        <div className={styles['social-media-contact-header']}>
+                            <div className={styles['social-media-contact-label']}>
+                                <span className={styles['social-media-contact-label-text']}>{field.platform}</span>
                             </div>
 
-                            <div className="social-media-contact__actions">
+                            <div className={styles['social-media-contact-actions']}>
                                 <button
                                     type="button"
-                                    className="social-media-contact__icon-btn disabled"
-                                    disabled
-                                    aria-label="Edit social contact"
-                                    title="Edit is not available yet"
-                                >
-                                    <EditIcon />
-                                </button>
-
-                                <button
-                                    type="button"
-                                    className="social-media-contact__icon-btn"
+                                    className={styles['social-media-contact-icon-btn']}
                                     onClick={() => remove(index)}
                                     aria-label="Delete social contact"
                                     disabled={disabled}

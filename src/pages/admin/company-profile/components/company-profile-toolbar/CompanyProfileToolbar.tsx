@@ -1,7 +1,8 @@
 import { Button } from '@/components/admin/button/Button';
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
+import cn from 'classnames';
 import { COMPANY_PROFILE_TEXT } from '@/const/admin/company-profile';
-import './CompanyProfileToolbar.scss';
+import styles from './CompanyProfileToolbar.module.scss';
 
 export interface ProfileToolbarProps {
     isEditMode: boolean;
@@ -13,7 +14,7 @@ export interface ProfileToolbarProps {
 
 export const ProfileToolbar = ({ isEditMode, onEdit, onCancel, onPublish, isPublishDisabled }: ProfileToolbarProps) => {
     return (
-        <div className="profile-toolbar-actions" data-testid="profile-page-toolbar">
+        <div className={cn(styles.profileToolbarActions)} data-testid="profile-page-toolbar">
             {isEditMode ? (
                 <>
                     <Button onClick={onCancel} buttonStyle="secondary">

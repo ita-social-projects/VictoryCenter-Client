@@ -1,5 +1,5 @@
-@use '@/assets/sass/variables/colors';
-@use '@/assets/sass/variables/typography';
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
 
 .company-header {
     display: flex;
@@ -16,57 +16,49 @@
     flex-direction: column;
     width: 280px;
     flex-shrink: 0;
+}
 
-    .company-logo-wrapper {
-        width: 100%;
-        aspect-ratio: 280 / 250;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 16px;
-        background: colors.$white;
+.company-logo-wrapper {
+    width: 100%;
+    aspect-ratio: 280 / 250;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
+    background: c.$white;
+}
 
-        .company-logo-icon {
-            width: 100%;
-            height: auto;
-            max-height: 100%;
-            fill: colors.$blue-800 !important;
-        }
-    }
+.company-logo-icon {
+    width: 100%;
+    height: auto;
+    max-height: 100%;
+    fill: c.$blue-800;
 }
 
 .company-title {
     margin: 0;
-    font-family: typography.$font-family-base;
-    font-weight: typography.$fw-black;
-    font-size: typography.$h1-size;
-    line-height: typography.$h1-height;
-    letter-spacing: typography.$h1-spacing;
-    color: colors.$blue-800;
+    @include type.h1-black;
+    color: c.$blue-800;
 }
 
 .company-subtitle {
     margin: 0;
-    font-family: typography.$font-family-base;
-    font-weight: typography.$fw-regular;
-    font-size: typography.$h3-size;
-    line-height: typography.$h3-height;
-    letter-spacing: typography.$h3-spacing;
-    color: colors.$grey-700;
+    @include type.h3-semibold;
+    color: c.$grey-700;
 }
 
 .company-header--editing {
-    .company-logo-icon {
-        filter: grayscale(1);
-        opacity: 0.3;
-    }
-
-    .company-title,
-    .company-subtitle {
-        color: colors.$grey-700;
-    }
-
     opacity: 0.6;
+}
+
+.company-header--editing .company-logo-icon {
+    filter: grayscale(1);
+    opacity: 0.3;
+}
+
+.company-header--editing .company-title,
+.company-header--editing .company-subtitle {
+    color: c.$grey-700;
 }
 
 .company-text-block {
@@ -79,12 +71,15 @@
     .company-title {
         font-size: 72px;
     }
+
     .company-subtitle {
         font-size: 32px;
     }
+
     .company-logo-section {
         width: 220px;
     }
+
     .company-header {
         margin-bottom: 24px;
     }
@@ -94,12 +89,15 @@
     .company-title {
         font-size: 52px;
     }
+
     .company-subtitle {
         font-size: 24px;
     }
+
     .company-logo-section {
         width: 180px;
     }
+
     .company-header {
         margin-bottom: 16px;
     }
@@ -109,12 +107,15 @@
     .company-title {
         font-size: 36px;
     }
+
     .company-subtitle {
         font-size: 18px;
     }
+
     .company-logo-section {
         width: 130px;
     }
+
     .company-header {
         margin-bottom: 12px;
     }

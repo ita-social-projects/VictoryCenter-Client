@@ -6,9 +6,6 @@ import { CompanyProfileSocialMediaTab } from './CompanyProfileSocialMediaTab';
 import { COMPANY_PROFILE_FORM_DEFAULTS, CompanyProfileFormValues } from '@/types/admin/company-profile';
 import { COMPANY_PROFILE_TEXT } from '@/const/admin/company-profile';
 
-jest.mock('@/assets/icons/edit.svg', () => ({
-    ReactComponent: (props: any) => <svg {...props} data-testid="edit-icon" />,
-}));
 jest.mock('@/assets/icons/delete.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="delete-icon" />,
 }));
@@ -67,13 +64,6 @@ describe('CompanyProfileSocialMediaTab', () => {
     it('does not show add dropdown when disabled=true (view mode)', () => {
         render(<Wrapper disabled={true} />);
         expect(screen.queryByTestId('add-platform-btn')).not.toBeInTheDocument();
-    });
-
-    it('allows adding social contact when disabled=false', () => {
-        render(<Wrapper disabled={false} />);
-        fireEvent.click(screen.getByTestId('add-platform-btn'));
-        expect(screen.getAllByTestId(/^social-url-socialContacts\./)).toHaveLength(1);
-        expect(screen.getByLabelText('Edit social contact')).toBeDisabled();
     });
 
     it('allows deleting social contact when disabled=false', () => {

@@ -1,7 +1,7 @@
 import { useFormContext, Controller } from 'react-hook-form';
 import { CustomFormGroup } from '../company-profile-form-group/CompanyProfileFormGroup';
 import { COMPANY_PROFILE_TEXT } from '@/const/admin/company-profile';
-import './CompanyProfileTab.scss';
+import styles from './CompanyProfileTab.module.scss';
 import { CompanyProfileFormValues } from '@/types/admin/company-profile';
 
 interface ProfileTabProps {
@@ -15,12 +15,12 @@ export const CompanyProfileTab = ({ disabled }: ProfileTabProps) => {
     } = useFormContext<CompanyProfileFormValues>();
 
     return (
-        <div className="profile-tab-container">
-            <div className="form-row full-width">
-                <h2 className="profile-tab-title">{COMPANY_PROFILE_TEXT.PROFILE_TAB.SECTION_TITLE}</h2>
+        <div className={styles['profile-tab-container']}>
+            <div className={styles['form-row']}>
+                <h2 className={styles['profile-tab-title']}>{COMPANY_PROFILE_TEXT.PROFILE_TAB.SECTION_TITLE}</h2>
             </div>
 
-            <div className="profile-tab-fields">
+            <div className={styles['profile-tab-fields']}>
                 <Controller
                     name="phone"
                     control={control}

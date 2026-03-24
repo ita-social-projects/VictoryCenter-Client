@@ -1,6 +1,7 @@
+import cn from 'classnames';
 import { ReactComponent as Logo } from '@/assets/icons/logo.svg';
 import { COMPANY_PROFILE_TEXT } from '@/const/admin/company-profile';
-import './CompanyProfileLogoHeader.scss';
+import styles from './CompanyProfileLogoHeader.module.scss';
 
 interface CompanyProfileLogoHeaderProps {
     isEditMode: boolean;
@@ -8,15 +9,20 @@ interface CompanyProfileLogoHeaderProps {
 
 export const CompanyProfileLogoHeader = ({ isEditMode }: CompanyProfileLogoHeaderProps) => {
     return (
-        <div className={`company-header${isEditMode ? ' company-header--editing' : ''}`}>
-            <div className="company-logo-section">
-                <div className="company-logo-wrapper">
-                    <Logo className="company-logo-icon" />
+        <div
+            className={cn(styles['company-header'], {
+                [styles['company-header--editing']]: isEditMode,
+            })}
+        >
+            <div className={styles['company-logo-section']}>
+                <div className={styles['company-logo-wrapper']}>
+                    <Logo className={styles['company-logo-icon']} />
                 </div>
             </div>
-            <div className="company-text-block">
-                <h1 className="company-title">{COMPANY_PROFILE_TEXT.HEADER.TITLE}</h1>
-                <p className="company-subtitle">{COMPANY_PROFILE_TEXT.HEADER.SUBTITLE}</p>
+
+            <div className={styles['company-text-block']}>
+                <h1 className={styles['company-title']}>{COMPANY_PROFILE_TEXT.HEADER.TITLE}</h1>
+                <p className={styles['company-subtitle']}>{COMPANY_PROFILE_TEXT.HEADER.SUBTITLE}</p>
             </div>
         </div>
     );

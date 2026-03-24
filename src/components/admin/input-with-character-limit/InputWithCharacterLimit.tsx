@@ -19,6 +19,7 @@ export interface InputWithCharacterLimitProps {
     hasError?: boolean;
     maxLimitWarning?: string;
     onWarningChange?: (warning: string | null) => void;
+    showCounter?: boolean;
     counterPosition?: 'inside' | 'bottom';
 }
 
@@ -37,6 +38,7 @@ export const InputWithCharacterLimit = ({
     hasError = false,
     maxLimitWarning,
     onWarningChange,
+    showCounter = true,
     counterPosition = 'inside',
 }: InputWithCharacterLimitProps) => {
     const {
@@ -66,7 +68,7 @@ export const InputWithCharacterLimit = ({
     return (
         <div
             className={cn('char-limit-input-wrapper', {
-                'char-limit-input-wrapper--bottom': counterPosition === 'bottom',
+                'char-limit-input-wrapper--bottom': showCounter && counterPosition === 'bottom',
             })}
         >
             <div
@@ -86,9 +88,10 @@ export const InputWithCharacterLimit = ({
                     id={id}
                     disabled={disabled}
                     placeholder={placeholder}
-                    aria-describedby={countId}
+                    aria-describedby={showCounter ? countId : undefined}
                     aria-invalid={hasError || currentLength > maxLength}
                 />
+
                 <button
                     type="button"
                     className={cn('char-limit-input__clear-button', {
@@ -103,14 +106,14 @@ export const InputWithCharacterLimit = ({
                     <RemoveIcon />
                 </button>
 
-                {counterPosition === 'inside' && (
+                {showCounter && counterPosition === 'inside' && (
                     <output id={countId} className="char-limit-input__counter">
                         {currentLength}/{maxLength}
                     </output>
                 )}
             </div>
 
-            {counterPosition === 'bottom' && (
+            {showCounter && counterPosition === 'bottom' && (
                 <output id={countId} className="char-limit-input__counter char-limit-input__counter--bottom">
                     {currentLength}/{maxLength}
                 </output>

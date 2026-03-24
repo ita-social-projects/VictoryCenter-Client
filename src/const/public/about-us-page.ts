@@ -1,10 +1,10 @@
-import menAndHorse from '@/assets/images/public/about-us-page/man-horse.jpg';
-import girlAndHorse from '@/assets/images/public/about-us-page/girl-horse.jpg';
-import oldMenAndHorse from '@/assets/images/public/about-us-page/old-man-horse.jpg';
-import womenAndHorse from '@/assets/images/public/about-us-page/woman-horse.jpg';
-import supportVeterans from '@/assets/images/public/about-us-page/support-veterans.jpg';
-import supportVolunteers from '@/assets/images/public/about-us-page/support-volunteers.jpg';
-import supportChildren from '@/assets/images/public/about-us-page/support-children.jpg';
+import menAndHorse from '@/assets/images/man-horse.webp';
+import girlAndHorse from '@/assets/images/girl-horse.webp';
+import oldMenAndHorse from '@/assets/images/old-man-horse.webp';
+import womenAndHorse from '@/assets/images/woman-horse.webp';
+import supportVeterans from '@/assets/images/support-veterans.webp';
+import supportVolunteers from '@/assets/images/support-volunteers.webp';
+import supportChildren from '@/assets/images/support-children.webp';
 
 export const ABOUT_US_DATA = {
     INTRO_TITLE: {

@@ -119,6 +119,7 @@ export const SingleTitleQuintupleDescription = ({
                             error={errors.title}
                             onBlur={handleTitleBlur}
                             maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(titleMaxLength)}
+                            showCounterBelow={true}
                         />
                     </div>
 

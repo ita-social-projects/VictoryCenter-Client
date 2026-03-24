@@ -18,30 +18,6 @@
             border: none;
             width: 1.5rem;
             height: 1.5rem;
-            background: url('~@/assets/icons/translate.svg');
-            background-repeat: no-repeat;
-            background-position: center;
-            background-size: contain;
-
-            &:hover {
-                cursor: pointer;
-                background: url('~@/assets/icons/translate-grey.svg');
-                background-repeat: no-repeat;
-                background-position: center;
-                background-size: contain;
-            }
-
-            &:active {
-                background: url('~@/assets/icons/translate.svg');
-                background-repeat: no-repeat;
-                background-position: center;
-                background-size: contain;
-            }
-
-            &:focus-visible {
-                outline: 2px solid colors.$blue-50;
-                outline-offset: 2px;
-            }
         }
     }
 }

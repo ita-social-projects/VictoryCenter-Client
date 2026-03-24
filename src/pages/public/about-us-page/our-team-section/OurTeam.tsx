@@ -3,7 +3,7 @@ import { PUBLIC_ROUTES } from '@/const/public/routes';
 import { AboutUsContent } from '@/types/public/about-us-page';
 import { ContentType } from '@/types/common/about-us';
 import { useTranslation } from 'react-i18next';
-import defaultOurTeamImage from '@/assets/images/public/about-us-page/our-team.jpg';
+import defaultOurTeamImage from '@/assets/images/our-team.webp';
 import { Button } from '@/components/public/ui/button';
 import { SafeHtml } from '@/components/common/safe-html';
 import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';

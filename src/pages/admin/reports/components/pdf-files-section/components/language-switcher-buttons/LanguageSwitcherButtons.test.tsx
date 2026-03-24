@@ -1,51 +1,48 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { LanguageSwitcherButtons } from './LanguageSwitcherButtons';
 
+const renderComponent = (currentLanguage: 'uk' | 'en' = 'uk', onLanguageChange = jest.fn()) =>
+    render(<LanguageSwitcherButtons currentLanguage={currentLanguage} onLanguageChange={onLanguageChange} />);
+
 describe('LanguageSwitcherButtons', () => {
     it('should render both language buttons', () => {
-        render(<LanguageSwitcherButtons />);
+        renderComponent();
 
         expect(screen.getByText('UA')).toBeInTheDocument();
         expect(screen.getByText('EN')).toBeInTheDocument();
     });
 
     it('should have "uk" (UA) active by default', () => {
-        render(<LanguageSwitcherButtons />);
+        renderComponent('uk');
 
-        const uaButton = screen.getByRole('button', { name: 'UA' });
-        expect(uaButton).toHaveClass('active');
-
-        const enButton = screen.getByRole('button', { name: 'EN' });
-        expect(enButton).not.toHaveClass('active');
+        expect(screen.getByRole('button', { name: 'UA' })).toHaveClass('active');
+        expect(screen.getByRole('button', { name: 'EN' })).not.toHaveClass('active');
     });
 
-    it('should switch active class when a different language is clicked', () => {
-        render(<LanguageSwitcherButtons />);
+    it('should call onLanguageChange when a different language is clicked', () => {
+        const onLanguageChange = jest.fn();
+        renderComponent('uk', onLanguageChange);
 
-        const uaButton = screen.getByRole('button', { name: 'UA' });
-        const enButton = screen.getByRole('button', { name: 'EN' });
+        fireEvent.click(screen.getByRole('button', { name: 'EN' }));
 
-        fireEvent.click(enButton);
-
-        expect(enButton).toHaveClass('active');
-        expect(uaButton).not.toHaveClass('active');
+        expect(onLanguageChange).toHaveBeenCalledWith('en');
     });
 
     it('should apply custom className from props', () => {
-        const customClass = 'test-custom-class';
-        const { container } = render(<LanguageSwitcherButtons className={customClass} />);
+        const { container } = render(
+            <LanguageSwitcherButtons currentLanguage="uk" onLanguageChange={jest.fn()} className="test-custom-class" />,
+        );
 
-        expect(container.firstChild).toHaveClass(customClass);
+        expect(container.firstChild).toHaveClass('test-custom-class');
     });
 
-    it('should maintain state when clicking the already active language', () => {
-        render(<LanguageSwitcherButtons />);
+    it('should maintain active state when clicking the already active language', () => {
+        const onLanguageChange = jest.fn();
+        renderComponent('uk', onLanguageChange);
 
-        const uaButton = screen.getByRole('button', { name: 'UA' });
+        fireEvent.click(screen.getByRole('button', { name: 'UA' }));
 
-        fireEvent.click(uaButton);
-
-        expect(uaButton).toHaveClass('active');
-        expect(screen.getByRole('button', { name: 'EN' })).not.toHaveClass('active');
+        expect(onLanguageChange).toHaveBeenCalledWith('uk');
+        expect(screen.getByRole('button', { name: 'UA' })).toHaveClass('active');
     });
 });

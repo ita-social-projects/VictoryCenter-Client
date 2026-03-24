@@ -1,9 +1,10 @@
 import cn from 'classnames';
 import styles from './LanguageSwitcherButtons.module.scss';
-import { useState } from 'react';
 
 interface LanguageSwitcherButtonsProps {
     className?: string;
+    currentLanguage: 'uk' | 'en';
+    onLanguageChange: (lang: 'uk' | 'en') => void;
 }
 
 const LANGUAGE_LABELS: Record<string, string> = {
@@ -11,19 +12,18 @@ const LANGUAGE_LABELS: Record<string, string> = {
     en: 'EN',
 };
 
-export const LanguageSwitcherButtons = ({ className }: LanguageSwitcherButtonsProps) => {
-    const [currentLanguage, setCurrentLanguage] = useState<'uk' | 'en'>('uk');
-    const handleClick = (lang: 'uk' | 'en') => {
-        setCurrentLanguage(lang);
-    };
-
+export const LanguageSwitcherButtons = ({
+    className,
+    currentLanguage,
+    onLanguageChange,
+}: LanguageSwitcherButtonsProps) => {
     return (
         <div className={cn(styles.root, className)}>
             {Object.keys(LANGUAGE_LABELS).map((lang) => (
                 <button
                     key={lang}
                     className={cn(styles.button, currentLanguage === lang && styles.active)}
-                    onClick={() => handleClick(lang as 'uk' | 'en')}
+                    onClick={() => onLanguageChange(lang as 'uk' | 'en')}
                 >
                     {LANGUAGE_LABELS[lang]}
                 </button>

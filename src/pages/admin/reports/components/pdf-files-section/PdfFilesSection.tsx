@@ -14,6 +14,7 @@ import { PdfDropzone } from './components/pdf-dropzone/PdfDropzone';
 export const PdfFilesSection = () => {
     const client = useAdminClient();
     const [uploadedFiles, setUploadedFiles] = useState<PdfReportDto[]>([]);
+    const [currentLanguage, setCurrentLanguage] = useState<'uk' | 'en'>('uk');
 
     const fetchSection = useCallback(async () => {
         return PdfSectionApi.getPdfSection(client);
@@ -54,7 +55,7 @@ export const PdfFilesSection = () => {
                 <PdfSectionContentBlock content={sectionData ?? { title: '', description: '' }} />
             </div>
             <div className={styles['language-switcher-container']}>
-                <LanguageSwitcherButtons />
+                <LanguageSwitcherButtons currentLanguage={currentLanguage} onLanguageChange={setCurrentLanguage} />
             </div>
             <PdfDropzone onUploaded={handleUploaded} />
             <PdfFilesTable files={[...fetchedFiles, ...uploadedFiles]} onViewFile={() => {}} />

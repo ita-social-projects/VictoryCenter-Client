@@ -18,13 +18,16 @@
 
 .category-bar.report-category-bar .category-bar-button-selected {
     color: c.$blue-700;
-    border-bottom: none;
     font-weight: 500;
 }
 
 .category-bar.report-category-bar .category-bar-button-text {
     position: relative;
     display: inline-block;
+}
+
+.category-bar.report-category-bar .category-bar-button-selected .category-bar-button-text::after {
+    display: none;
 }
 
 .category-bar.report-category-bar .category-bar-button-selected .category-bar-button-text::after {

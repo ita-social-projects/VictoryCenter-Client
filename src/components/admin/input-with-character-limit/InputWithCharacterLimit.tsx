@@ -88,7 +88,7 @@ export const InputWithCharacterLimit = ({
                     id={id}
                     disabled={disabled}
                     placeholder={placeholder}
-                    aria-describedby={showCounter ? countId : undefined}
+                    aria-describedby={countId}
                     aria-invalid={hasError || currentLength > maxLength}
                 />
 
@@ -113,11 +113,17 @@ export const InputWithCharacterLimit = ({
                 )}
             </div>
 
-            {showCounter && counterPosition === 'bottom' && (
-                <output id={countId} className="char-limit-input__counter char-limit-input__counter--bottom">
+            {(showCounter && counterPosition === 'bottom') || !showCounter ? (
+                <output
+                    id={countId}
+                    className={cn('char-limit-input__counter', {
+                        'char-limit-input__counter--bottom': showCounter && counterPosition === 'bottom',
+                        'char-limit-input__counter--visually-hidden': !showCounter,
+                    })}
+                >
                     {currentLength}/{maxLength}
                 </output>
-            )}
+            ) : null}
         </div>
     );
 };

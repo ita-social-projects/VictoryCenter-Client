@@ -11,10 +11,9 @@ import {
 
 describe('reports-mapper', () => {
     describe('mapReportsMediaSettingsCollectedFundsDtoToCollectedFunds', () => {
-        it('should map dto with image correctly', () => {
+        it('should map dto with image correctly (without collected amount from API)', () => {
             const dto: ReportsMediaSettingsCollectedFundsDto = {
                 title: 'Зібрані кошти',
-                collectedAmount: 250000,
                 image: { id: 10, url: 'https://img/cf.png', mimeType: 'image/png' },
                 imageId: 10,
             };
@@ -23,13 +22,12 @@ describe('reports-mapper', () => {
 
             expect(result).toEqual({
                 title: 'Зібрані кошти',
-                collectedFunds: 250000,
                 image: dto.image,
                 imageId: 10,
             });
         });
 
-        it('should map collectedAmount to collectedFunds', () => {
+        it('should ignore legacy collectedAmount when present', () => {
             const dto: ReportsMediaSettingsCollectedFundsDto = {
                 title: 'Title',
                 collectedAmount: 999,
@@ -39,13 +37,16 @@ describe('reports-mapper', () => {
 
             const result = mapReportsMediaSettingsCollectedFundsDtoToCollectedFunds(dto);
 
-            expect(result.collectedFunds).toBe(999);
+            expect(result).toEqual({
+                title: 'Title',
+                image: dto.image,
+                imageId: 5,
+            });
         });
 
         it('should set imageId from image.id when image is present', () => {
             const dto: ReportsMediaSettingsCollectedFundsDto = {
                 title: 'Title',
-                collectedAmount: 100,
                 image: { id: 42, url: 'https://img/42.png', mimeType: 'image/png' },
                 imageId: 99,
             };
@@ -58,7 +59,6 @@ describe('reports-mapper', () => {
         it('should set imageId to null when image is null', () => {
             const dto: ReportsMediaSettingsCollectedFundsDto = {
                 title: 'Title',
-                collectedAmount: 0,
                 image: null,
                 imageId: null,
             };
@@ -122,7 +122,6 @@ describe('reports-mapper', () => {
             const dto: ReportsMediaSettingsDto = {
                 collectedFundsBlock: {
                     title: 'CF Title',
-                    collectedAmount: 300000,
                     image: { id: 1, url: 'https://img/1.png', mimeType: 'image/png' },
                     imageId: 1,
                 },
@@ -139,7 +138,6 @@ describe('reports-mapper', () => {
             expect(result).toEqual({
                 collectedFunds: {
                     title: 'CF Title',
-                    collectedFunds: 300000,
                     image: dto.collectedFundsBlock.image,
                     imageId: 1,
                 },
@@ -156,7 +154,6 @@ describe('reports-mapper', () => {
             const dto: ReportsMediaSettingsDto = {
                 collectedFundsBlock: {
                     title: 'Empty CF',
-                    collectedAmount: 0,
                     image: null,
                     imageId: null,
                 },

@@ -2,7 +2,7 @@ import { Image, ImageValues } from '../common/image';
 
 export interface ReportsMediaSettingsCollectedFundsDto {
     title: string;
-    collectedAmount: number;
+    collectedAmount?: number;
     image: Image | null;
     imageId: number | null;
 }
@@ -21,7 +21,6 @@ export interface ReportsMediaSettingsDto {
 
 export type ReportsMediaSettingsCollectedFunds = {
     title: string;
-    collectedFunds: number;
     image: Image | ImageValues | null;
     imageId: number | null;
 };
@@ -41,7 +40,6 @@ export type ReportsMediaSettings = {
 // Update DTOs
 export interface UpdateReportsMediaSettingsCollectedFundsDto {
     title: string;
-    collectedAmount: number;
     imageId: number | null;
 }
 
@@ -59,7 +57,6 @@ export interface UpdateReportsMediaSettingsDto {
 // Update Request
 export interface ReportsMediaSettingsCollectedFundsUpdateRequest {
     title: string;
-    collectedFunds: number;
     imageId: number | null;
     image: Image | ImageValues | null;
 }

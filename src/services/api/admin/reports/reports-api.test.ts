@@ -12,7 +12,6 @@ jest.mock('../image/image-api');
 
 const createCollectedFundsBlockDto = (overrides: Partial<ReportsMediaSettingsDto['collectedFundsBlock']> = {}) => ({
     title: 'CF Title',
-    collectedAmount: 250000,
     image: { id: 10, url: 'https://img/cf.png', mimeType: 'image/png' } as Image,
     imageId: 10,
     ...overrides,
@@ -60,7 +59,6 @@ describe('ReportsApi', () => {
             const expected: ReportsMediaSettings = {
                 collectedFunds: {
                     title: 'CF Title',
-                    collectedFunds: 250000,
                     image: dto.collectedFundsBlock.image,
                     imageId: 10,
                 },
@@ -76,7 +74,7 @@ describe('ReportsApi', () => {
 
         it('should handle null images in response', async () => {
             const dto = createResponseDto(
-                { title: 'Title', collectedAmount: 0, image: null, imageId: null },
+                { title: 'Title', image: null, imageId: null },
                 { title: 'Title 2', changedLives: 0, image: null, imageId: null },
             );
             mockClient.get.mockResolvedValueOnce({ data: dto });
@@ -84,7 +82,7 @@ describe('ReportsApi', () => {
             const result = await ReportsApi.getMediaSettings(mockClient);
 
             expect(result).toEqual({
-                collectedFunds: { title: 'Title', collectedFunds: 0, image: null, imageId: null },
+                collectedFunds: { title: 'Title', image: null, imageId: null },
                 changedLives: { title: 'Title 2', changedLives: 0, image: null, imageId: null },
             });
         });
@@ -95,7 +93,6 @@ describe('ReportsApi', () => {
             const request: ReportsMediaSettingsUpdateRequest = {
                 collectedFunds: {
                     title: 'New CF Title',
-                    collectedFunds: 300000,
                     image: { base64: 'cf-base64', mimeType: 'image/png' },
                     imageId: 10,
                 },
@@ -114,7 +111,6 @@ describe('ReportsApi', () => {
             const responseDto = createResponseDto(
                 {
                     title: 'New CF Title',
-                    collectedAmount: 300000,
                     image: { id: 11, url: 'https://img/cf-new.png', mimeType: 'image/png' },
                     imageId: 11,
                 },
@@ -142,7 +138,7 @@ describe('ReportsApi', () => {
             );
 
             expect(mockClient.put).toHaveBeenCalledWith(API_ROUTES.REPORTS.MEDIA_SETTINGS, {
-                collectedFundsBlock: { title: 'New CF Title', collectedAmount: 300000, imageId: 11 },
+                collectedFundsBlock: { title: 'New CF Title', imageId: 11 },
                 changedLivesBlock: { title: 'New CL Title', changedLives: 100, imageId: 21 },
             });
 
@@ -152,7 +148,6 @@ describe('ReportsApi', () => {
             expect(result).toEqual({
                 collectedFunds: {
                     title: 'New CF Title',
-                    collectedFunds: 300000,
                     image: responseDto.collectedFundsBlock.image,
                     imageId: 11,
                 },
@@ -167,7 +162,7 @@ describe('ReportsApi', () => {
 
         it('should not delete images when there is nothing to remove', async () => {
             const request: ReportsMediaSettingsUpdateRequest = {
-                collectedFunds: { title: 'Keep Title', collectedFunds: 100, image: null, imageId: null },
+                collectedFunds: { title: 'Keep Title', image: null, imageId: null },
                 changedLives: { title: 'Keep CL', changedLives: 10, image: null, imageId: null },
             };
 
@@ -176,7 +171,7 @@ describe('ReportsApi', () => {
                 .mockResolvedValueOnce({ finalImageId: null, imageIdToDelete: null });
 
             const responseDto = createResponseDto(
-                { title: 'Keep Title', collectedAmount: 100, image: null, imageId: null },
+                { title: 'Keep Title', image: null, imageId: null },
                 { title: 'Keep CL', changedLives: 10, image: null, imageId: null },
             );
             mockClient.put.mockResolvedValueOnce({ data: responseDto });
@@ -190,7 +185,6 @@ describe('ReportsApi', () => {
             const request: ReportsMediaSettingsUpdateRequest = {
                 collectedFunds: {
                     title: 'CF Title',
-                    collectedFunds: 500,
                     image: { base64: 'new-cf', mimeType: 'image/png' },
                     imageId: 5,
                 },
@@ -209,7 +203,6 @@ describe('ReportsApi', () => {
             const responseDto = createResponseDto(
                 {
                     title: 'CF Title',
-                    collectedAmount: 500,
                     image: { id: 6, url: 'https://img/cf-new.png', mimeType: 'image/png' },
                     imageId: 6,
                 },
@@ -225,7 +218,7 @@ describe('ReportsApi', () => {
 
         it('should send null imageId when finalImageId is null', async () => {
             const request: ReportsMediaSettingsUpdateRequest = {
-                collectedFunds: { title: 'Title', collectedFunds: 0, image: null, imageId: 7 },
+                collectedFunds: { title: 'Title', image: null, imageId: 7 },
                 changedLives: { title: 'Title 2', changedLives: 0, image: null, imageId: 8 },
             };
 
@@ -234,7 +227,7 @@ describe('ReportsApi', () => {
                 .mockResolvedValueOnce({ finalImageId: null, imageIdToDelete: 8 });
 
             const responseDto = createResponseDto(
-                { title: 'Title', collectedAmount: 0, image: null, imageId: null },
+                { title: 'Title', image: null, imageId: null },
                 { title: 'Title 2', changedLives: 0, image: null, imageId: null },
             );
             mockClient.put.mockResolvedValueOnce({ data: responseDto });
@@ -242,7 +235,7 @@ describe('ReportsApi', () => {
             await ReportsApi.updateMediaSettings(mockClient, request);
 
             expect(mockClient.put).toHaveBeenCalledWith(API_ROUTES.REPORTS.MEDIA_SETTINGS, {
-                collectedFundsBlock: { title: 'Title', collectedAmount: 0, imageId: null },
+                collectedFundsBlock: { title: 'Title', imageId: null },
                 changedLivesBlock: { title: 'Title 2', changedLives: 0, imageId: null },
             });
         });

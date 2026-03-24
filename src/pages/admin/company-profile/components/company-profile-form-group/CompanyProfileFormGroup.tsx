@@ -41,6 +41,7 @@ export const CustomFormGroup = ({
                     {...inputProps}
                     id={id}
                     hasError={!!error}
+                    counterPosition="bottom"
                     className={cn(styles['char-limit-input'], inputProps.className)}
                 />
 

@@ -107,4 +107,19 @@ describe('InputWithCharacterLimit', () => {
         renderInputWithCharacterLimit({ value: 'abcd', maxLength: 3 });
         expect(getInput()).toHaveAttribute('aria-invalid', 'true');
     });
+
+    it('renders counter below input when counterPosition is bottom', () => {
+        renderInputWithCharacterLimit({ counterPosition: 'bottom', value: 'Hello', maxLength: 20 });
+
+        const counter = screen.getByText('5/20');
+        expect(counter).toBeInTheDocument();
+        expect(counter).toHaveClass('char-limit-input__counter--bottom');
+    });
+
+    it('keeps default inside counter position when prop is not provided', () => {
+        renderInputWithCharacterLimit({ value: 'Hi', maxLength: 20 });
+        const counter = screen.getByText('2/20');
+        expect(counter).toBeInTheDocument();
+        expect(counter).not.toHaveClass('char-limit-input__counter--bottom');
+    });
 });

@@ -32,7 +32,7 @@
 }
 
 .view-label {
-    `@include` type.subtitle-1-bold;
+    @include type.subtitle-1-bold;
 
     color: c.$grey-900;
     text-transform: uppercase;

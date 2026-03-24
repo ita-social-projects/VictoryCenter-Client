@@ -42,6 +42,10 @@
     td {
         padding: 1rem;
     }
+
+    td.empty-cell {
+        padding: 0;
+    }
 }
 
 .name-cell {
@@ -73,7 +77,6 @@
 
 .empty-cell {
     text-align: center;
-    padding: 0;
 }
 
 .empty-container {

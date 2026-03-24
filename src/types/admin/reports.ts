@@ -77,6 +77,69 @@ export interface ReportsMediaSettingsUpdateRequest {
 
 export type FundsExpendituresTransactionType = 'income' | 'expense';
 
+export type ReportFundsExpendituresTypeDto = FundsExpendituresTransactionType | 1 | 2;
+
+export interface ReportFundsExpendituresSettingsDto {
+    id: number;
+    disclaimerTitle: string;
+    exchangeRate: number;
+}
+
+export interface UpdateReportFundsExpendituresSettingsDto {
+    disclaimerTitle: string;
+    exchangeRate: number;
+}
+
+export interface ReportFundsExpendituresCategoryDto {
+    id: number;
+    name: string;
+    type: ReportFundsExpendituresTypeDto;
+}
+
+export interface CreateReportFundsExpendituresCategoryDto {
+    name: string;
+    type: ReportFundsExpendituresTypeDto;
+}
+
+export interface UpdateReportFundsExpendituresCategoryDto {
+    name: string;
+    type: ReportFundsExpendituresTypeDto;
+}
+
+export interface ReportFundsExpendituresRecordDto {
+    id: number;
+    categoryId: number;
+    type: ReportFundsExpendituresTypeDto;
+    reportingYear: number;
+    amountUah: number;
+    amountUsd: number;
+}
+
+export interface CreateReportFundsExpendituresRecordDto {
+    categoryId: number;
+    type: ReportFundsExpendituresTypeDto;
+    reportingYear: number;
+    amountUah: number;
+    amountUsd: number;
+}
+
+export interface UpdateReportFundsExpendituresRecordDto {
+    categoryId: number;
+    type: ReportFundsExpendituresTypeDto;
+    reportingYear: number;
+    amountUah: number;
+    amountUsd: number;
+}
+
+export interface ReportFundsExpendituresSummaryDto {
+    incomeUahTotal: number;
+    incomeUsdTotal: number;
+    expenditureUahTotal: number;
+    expenditureUsdTotal: number;
+    incomeCategoriesCount: number;
+    expenditureCategoriesCount: number;
+}
+
 export interface ReportFundsExpendituresSettings {
     id: number;
     disclaimerTitle: string | null;

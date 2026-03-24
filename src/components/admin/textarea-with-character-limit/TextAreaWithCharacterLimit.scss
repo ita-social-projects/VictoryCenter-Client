@@ -38,6 +38,7 @@
         line-height: 1.75rem;
         letter-spacing: -0.0225rem;
         padding: 0.625rem 2.5rem 0.625rem 0.875rem;
+        overflow: hidden;
 
         &::placeholder {
             color: colors.$grey-700;

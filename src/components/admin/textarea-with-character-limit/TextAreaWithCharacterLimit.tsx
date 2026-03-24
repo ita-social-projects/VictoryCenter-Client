@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import { forwardRef, useEffect, useRef } from 'react';
 import cn from 'classnames';
 import { ReactComponent as RemoveIcon } from '@/assets/icons/remove-query.svg';
 import { useInputWithCharacterLimit } from '@/hooks/admin/use-input-with-character-limit/useInputWithCharacterLimit';
@@ -19,6 +19,10 @@ export interface TextAreaWithCharacterLimitProps {
     hasError?: boolean;
     maxLimitWarning?: string;
     onWarningChange?: (warning: string | null) => void;
+    /** Enable auto-grow behavior: textarea expands as user types up to maxRows limit */
+    autoGrow?: boolean;
+    /** Maximum number of rows to allow when autoGrow is enabled (default: 10) */
+    maxRows?: number;
 }
 
 export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAreaWithCharacterLimitProps>(
@@ -38,9 +42,14 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
             hasError = false,
             maxLimitWarning,
             onWarningChange,
+            autoGrow = false,
+            maxRows = 10,
         },
         ref,
     ) => {
+        const internalRef = useRef<HTMLTextAreaElement>(null);
+        const textareaRef = ref || internalRef;
+
         const { isFocused, localWarning, showClearButton, handleChange, handleFocus, handleBlur, handleClear } =
             useInputWithCharacterLimit<HTMLTextAreaElement>({
                 value,
@@ -55,6 +64,38 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
                 onWarningChange,
             });
 
+        // Auto-grow logic: adjust height based on content
+        useEffect(() => {
+            if (!autoGrow || typeof textareaRef !== 'object' || !textareaRef.current) {
+                return;
+            }
+
+            const textarea = textareaRef.current;
+            const parsedLineHeight = parseInt(window.getComputedStyle(textarea).lineHeight, 10);
+
+            // Prevent NaN errors in environments without CSS rendering like JSDOM
+            if (isNaN(parsedLineHeight)) return;
+
+            const maxHeight = parsedLineHeight * maxRows;
+
+            textarea.style.height = 'auto';
+            textarea.style.height = `${Math.min(textarea.scrollHeight, maxHeight)}px`;
+        }, [value, autoGrow, maxRows, textareaRef]);
+
+        const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+            if (!autoGrow) return;
+
+            const textarea = e.currentTarget;
+            const parsedLineHeight = parseInt(window.getComputedStyle(textarea).lineHeight, 10);
+
+            if (isNaN(parsedLineHeight)) return;
+
+            const maxHeight = parsedLineHeight * maxRows;
+
+            textarea.style.height = 'auto';
+            textarea.style.height = `${Math.min(textarea.scrollHeight, maxHeight)}px`;
+        };
+
         return (
             <div className="char-limit-textarea">
                 <div
@@ -64,10 +105,11 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
                     })}
                 >
                     <textarea
-                        ref={ref}
+                        ref={textareaRef}
                         className="char-limit-textarea__field"
                         value={value ?? ''}
                         onChange={handleChange}
+                        onInput={handleInput}
                         onFocus={handleFocus}
                         onBlur={handleBlur}
                         onKeyDown={onKeyDown}

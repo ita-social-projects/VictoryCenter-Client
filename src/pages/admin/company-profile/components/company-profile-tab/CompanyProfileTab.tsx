@@ -14,6 +14,8 @@ export const CompanyProfileTab = ({ disabled }: ProfileTabProps) => {
         formState: { errors },
     } = useFormContext<CompanyProfileFormValues>();
 
+    const showCounter = !disabled;
+
     return (
         <div className={styles['profile-tab-container']}>
             <div className={styles['form-row']}>
@@ -32,6 +34,7 @@ export const CompanyProfileTab = ({ disabled }: ProfileTabProps) => {
                             isRequired={true}
                             maxLength={20}
                             disabled={disabled}
+                            showCounter={showCounter}
                             error={errors.phone?.message as string}
                         />
                     )}
@@ -49,6 +52,7 @@ export const CompanyProfileTab = ({ disabled }: ProfileTabProps) => {
                             isRequired={true}
                             maxLength={100}
                             disabled={disabled}
+                            showCounter={showCounter}
                             error={errors.addressUa?.message as string}
                         />
                     )}
@@ -66,6 +70,7 @@ export const CompanyProfileTab = ({ disabled }: ProfileTabProps) => {
                             isRequired={true}
                             maxLength={100}
                             disabled={disabled}
+                            showCounter={showCounter}
                             error={errors.addressEng?.message as string}
                         />
                     )}
@@ -83,6 +88,7 @@ export const CompanyProfileTab = ({ disabled }: ProfileTabProps) => {
                             type="email"
                             maxLength={50}
                             disabled={disabled}
+                            showCounter={showCounter}
                             error={errors.email?.message as string}
                         />
                     )}
@@ -100,6 +106,7 @@ export const CompanyProfileTab = ({ disabled }: ProfileTabProps) => {
                             type="email"
                             maxLength={50}
                             disabled={disabled}
+                            showCounter={showCounter}
                             error={errors.correspondenceEmail?.message as string}
                         />
                     )}
@@ -115,6 +122,7 @@ export const CompanyProfileTab = ({ disabled }: ProfileTabProps) => {
                             labelText={COMPANY_PROFILE_TEXT.PROFILE_TAB.MOTTO_UA_LABEL}
                             maxLength={200}
                             disabled={disabled}
+                            showCounter={showCounter}
                             error={errors.mottoUa?.message as string}
                         />
                     )}
@@ -130,6 +138,7 @@ export const CompanyProfileTab = ({ disabled }: ProfileTabProps) => {
                             labelText={COMPANY_PROFILE_TEXT.PROFILE_TAB.MOTTO_EN_LABEL}
                             maxLength={200}
                             disabled={disabled}
+                            showCounter={showCounter}
                             error={errors.mottoEng?.message as string}
                         />
                     )}

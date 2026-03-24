@@ -74,6 +74,8 @@ export const CompanyProfileSocialMediaTab = ({ disabled }: CompanyProfileSocialM
         append({ platform: opt.id, url: '' });
     };
 
+    const showCounter = !disabled;
+
     return (
         <div className={styles['social-media-tab-container']}>
             <div className={styles['social-media-tab-header']}>
@@ -137,6 +139,7 @@ export const CompanyProfileSocialMediaTab = ({ disabled }: CompanyProfileSocialM
                                     isRequired={false}
                                     maxLength={500}
                                     disabled={disabled}
+                                    showCounter={showCounter}
                                     error={(errors.socialContacts?.[index]?.url?.message as string) ?? undefined}
                                 />
                             )}

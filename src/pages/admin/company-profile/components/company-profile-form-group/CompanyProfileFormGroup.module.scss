@@ -4,15 +4,14 @@
 .custom-form-group {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
     width: 100%;
 }
 
 .custom-form-group-label-wrapper label {
     display: flex;
     align-items: center;
-    gap: 4px;
-    cursor: pointer;
+    gap: 6px;
     @include type.subtitle-2-medium;
     color: c.$grey-700;
 }
@@ -22,16 +21,24 @@
 }
 
 .custom-form-group-input-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    position: relative;
     width: 100%;
+}
+
+.custom-form-group-tooltip-inside {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .char-limit-input {
     width: 100%;
     min-width: 0;
-    flex: 1 1 auto;
+    padding-right: 44px;
 }
 
 .custom-form-group-input-wrapper :global(.char-limit-input) {
@@ -45,13 +52,6 @@
     min-width: 0;
 }
 
-.custom-form-group-tooltip-slot {
-    flex: 0 0 27px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
 .custom-form-group-tooltip {
     position: static;
     display: inline-flex;
@@ -60,5 +60,7 @@
 }
 
 .custom-form-group :global(.tooltip-popup) {
+    z-index: 9999;
+    position: absolute;
     text-align: left;
 }

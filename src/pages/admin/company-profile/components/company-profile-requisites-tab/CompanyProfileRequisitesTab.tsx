@@ -14,6 +14,8 @@ export const CompanyProfileRequisitesTab = ({ disabled }: CompanyProfileRequisit
         formState: { errors },
     } = useFormContext<CompanyProfileFormValues>();
 
+    const showCounter = !disabled;
+
     return (
         <div className={styles['requisites-tab-container']}>
             <div className={styles['form-row']}>
@@ -33,6 +35,7 @@ export const CompanyProfileRequisitesTab = ({ disabled }: CompanyProfileRequisit
                             isRequired={true}
                             maxLength={100}
                             disabled={disabled}
+                            showCounter={showCounter}
                             error={errors.requisitesUa?.message as string}
                         />
                     )}
@@ -50,6 +53,7 @@ export const CompanyProfileRequisitesTab = ({ disabled }: CompanyProfileRequisit
                             isRequired={true}
                             maxLength={100}
                             disabled={disabled}
+                            showCounter={showCounter}
                             error={errors.requisitesEn?.message as string}
                         />
                     )}
@@ -67,6 +71,7 @@ export const CompanyProfileRequisitesTab = ({ disabled }: CompanyProfileRequisit
                             isRequired={true}
                             maxLength={8}
                             disabled={disabled}
+                            showCounter={showCounter}
                             error={errors.companyRegistrationNumber?.message as string}
                         />
                     )}
@@ -84,6 +89,7 @@ export const CompanyProfileRequisitesTab = ({ disabled }: CompanyProfileRequisit
                             isRequired={true}
                             maxLength={100}
                             disabled={disabled}
+                            showCounter={showCounter}
                             error={errors.addressUa_requisites?.message as string}
                         />
                     )}
@@ -101,6 +107,7 @@ export const CompanyProfileRequisitesTab = ({ disabled }: CompanyProfileRequisit
                             isRequired={true}
                             maxLength={100}
                             disabled={disabled}
+                            showCounter={showCounter}
                             error={errors.addressEn_requisites?.message as string}
                         />
                     )}

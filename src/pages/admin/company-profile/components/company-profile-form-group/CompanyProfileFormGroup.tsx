@@ -14,6 +14,7 @@ export interface CustomFormGroupProps extends Omit<InputWithCharacterLimitProps,
     isRequired?: boolean;
     error?: string;
     hideLabel?: boolean;
+    showCounter?: boolean;
 }
 
 export const CustomFormGroup = ({
@@ -23,6 +24,7 @@ export const CustomFormGroup = ({
     isRequired,
     error,
     hideLabel = false,
+    showCounter = true,
     ...inputProps
 }: CustomFormGroupProps) => {
     return (
@@ -42,16 +44,17 @@ export const CustomFormGroup = ({
                     id={id}
                     hasError={!!error}
                     counterPosition="bottom"
+                    showCounter={showCounter}
                     className={cn(styles['char-limit-input'], inputProps.className)}
                 />
 
-                <div className={styles['custom-form-group-tooltip-slot']}>
-                    {tooltipText && (
-                        <div className={styles['custom-form-group-tooltip']}>
-                            <ButtonTooltip position="bottom">{tooltipText}</ButtonTooltip>
-                        </div>
-                    )}
-                </div>
+                {tooltipText && inputProps.disabled && (
+                    <div className={styles['custom-form-group-tooltip-inside']}>
+                        <ButtonTooltip position="bottom" isRenderInPortal>
+                            {tooltipText}
+                        </ButtonTooltip>
+                    </div>
+                )}
             </div>
 
             <InputError error={error} />

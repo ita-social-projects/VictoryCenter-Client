@@ -19,8 +19,8 @@ import {
     ReportsMediaBlockErrors,
     ReportsMediaBlock,
 } from '../block-component/ReportsMediaBlock';
-import CollectedFundsImage from '@/assets/images/public/reports-page/collected.jpg';
-import ChangedLivesImage from '@/assets/images/public/reports-page/lives-changed.jpg';
+import CollectedFundsImage from '@/assets/images/collected.webp';
+import ChangedLivesImage from '@/assets/images/man-facing-horse-forehead.webp';
 import styles from './MediaSettings.module.scss';
 import {
     REPORTS_COLLECTED_FUNDS_VALIDATION_FUNCTIONS,

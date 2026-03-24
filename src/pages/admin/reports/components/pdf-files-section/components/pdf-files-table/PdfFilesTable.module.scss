@@ -96,14 +96,6 @@
     font-weight: 500;
 }
 
-.icon-button {
-    cursor: pointer;
-    color: c.$blue-500;
-    &:hover {
-        color: c.$grey-700;
-    }
-}
-
 .file-icon {
     width: 24px;
     height: 24px;
@@ -111,37 +103,10 @@
     vertical-align: top;
 }
 
-.icon-button {
+.edit-button,
+.view-button,
+.delete-button {
     border: none;
-    background-color: transparent;
-    cursor: pointer;
     width: 24px;
     height: 24px;
-
-    &:hover .eye-icon {
-        color: c.$blue-100;
-    }
-    &:active .eye-icon {
-        color: c.$blue-900;
-    }
-}
-
-.edit-button {
-    background-image: url('~@/assets/icons/edit-default.svg');
-    &:hover {
-        background-image: url('~@/assets/icons/edit-hover.svg');
-    }
-    &:active {
-        background-image: url('~@/assets/icons/edit-pressed.svg');
-    }
-}
-
-.delete-button {
-    background-image: url('~@/assets/icons/delete-default.svg');
-    &:hover {
-        background-image: url('~@/assets/icons/delete-hover.svg');
-    }
-    &:active {
-        background-image: url('~@/assets/icons/delete-pressed.svg');
-    }
 }

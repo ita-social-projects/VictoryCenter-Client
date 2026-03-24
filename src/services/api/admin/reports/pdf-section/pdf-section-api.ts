@@ -4,7 +4,7 @@ import { AxiosInstance } from 'axios';
 
 export const PdfSectionApi = {
     getPdfSection: async (client: AxiosInstance): Promise<PdfSection> => {
-        const response = await client.get(API_ROUTES.PDF_SECTION.BASE);
+        const response = await client.get(API_ROUTES.PDF_SECTION.CONTENT);
         return response.data;
     },
 };

@@ -3,7 +3,7 @@ import { FUNDS_EXPENDITURES_TEXT, FUNDS_EXPENDITURES_VALIDATION } from '@/const/
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FUNDS_EXPENDITURES_DISCLAIMER_VALIDATION_FUNCTIONS } from '@/validation/admin/reports-schema/funds-expenditures-disclaimer-schema/funds-expenditures-disclaimer-schema';
 import { Button } from '@/components/admin/button/Button';
-import { ReactComponent as EditIcon } from '@/assets/icons/edit-default.svg';
+import { ACTION_ICONS } from '@/const/common/action-icons';
 import { FundsExpendituresApi } from '@/services/api/admin/reports/funds-expenditures-api';
 import {
     FundsExpendituresSummary,
@@ -159,6 +159,8 @@ export const FundsExpenditureSection = () => {
         },
         [],
     );
+
+    const EditIcon = ACTION_ICONS.edit.default;
 
     return (
         <div className={styles.section}>

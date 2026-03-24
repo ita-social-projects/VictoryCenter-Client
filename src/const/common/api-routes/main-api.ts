@@ -95,6 +95,7 @@ export const API_ROUTES = {
     },
     PDF_SECTION: {
         BASE: 'PdfSection',
+        CONTENT: 'PdfSection/pdf-section',
     },
     PDF_REPORTS: {
         BASE: 'PdfReports',

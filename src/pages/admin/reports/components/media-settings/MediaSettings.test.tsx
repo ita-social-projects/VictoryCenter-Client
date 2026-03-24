@@ -69,8 +69,8 @@ jest.mock('./MediaSettings.module.scss', () => ({
     'error-button': 'error-button',
 }));
 
-jest.mock('@/assets/images/public/reports-page/collected.jpg', () => 'collected.jpg');
-jest.mock('@/assets/images/public/reports-page/lives-changed.jpg', () => 'lives-changed.jpg');
+jest.mock('@/assets/images/collected.webp', () => 'collected.webp');
+jest.mock('@/assets/images/man-facing-horse-forehead.webp', () => 'man-facing-horse-forehead.webp');
 
 const mockedUseDataFetch = useDataFetch as jest.Mock;
 const mockedReportsApi = ReportsApi as jest.Mocked<typeof ReportsApi>;
@@ -457,7 +457,7 @@ describe('MediaSettings', () => {
                 await ref.current?.submit();
             });
 
-            expect(mockedFetchDefaultImage).toHaveBeenCalledWith('collected.jpg', 600, 500);
+            expect(mockedFetchDefaultImage).toHaveBeenCalledWith('collected.webp', 600, 500);
         });
 
         it('should fetch default image for changed lives when no image and no imageId', async () => {
@@ -485,7 +485,7 @@ describe('MediaSettings', () => {
                 await ref.current?.submit();
             });
 
-            expect(mockedFetchDefaultImage).toHaveBeenCalledWith('lives-changed.jpg', 280, 890);
+            expect(mockedFetchDefaultImage).toHaveBeenCalledWith('man-facing-horse-forehead.webp', 280, 890);
         });
 
         it('should not fetch default image when image exists', async () => {
@@ -526,7 +526,7 @@ describe('MediaSettings', () => {
             });
 
             expect(mockedFetchDefaultImage).not.toHaveBeenCalledWith(
-                'collected.jpg',
+                'collected.webp',
                 expect.any(Number),
                 expect.any(Number),
             );

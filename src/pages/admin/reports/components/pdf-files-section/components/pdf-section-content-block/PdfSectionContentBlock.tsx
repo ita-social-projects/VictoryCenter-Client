@@ -1,6 +1,8 @@
 import { PDF_FILES_SECTION_TEXT } from '@/const/admin/reports';
 import styles from './PdfSectionContentBlock.module.scss';
 import cn from 'classnames';
+import { ACTION_ICONS } from '@/const/common/action-icons';
+import { IconButton } from '@/components/admin/icon-button/IconButton';
 
 interface PdfSectionContent {
     title: string;
@@ -15,11 +17,13 @@ export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({ 
     return (
         <div className={cn(styles.root, styles['view-root'])}>
             <div className={styles['edit-button-container']}>
-                <button
+                <IconButton
                     aria-label={PDF_FILES_SECTION_TEXT.ACTIONS.EDIT}
                     type="button"
                     onClick={() => {}}
                     className={styles['edit-button']}
+                    DefaultIcon={ACTION_ICONS.edit.default}
+                    FilledIcon={ACTION_ICONS.edit.hover}
                 />
             </div>
             <div className={styles['content-container']}>

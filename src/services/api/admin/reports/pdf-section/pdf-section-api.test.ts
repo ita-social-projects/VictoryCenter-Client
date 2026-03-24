@@ -26,7 +26,7 @@ describe('PdfSectionApi', () => {
 
             const result = await PdfSectionApi.getPdfSection(mockClient);
 
-            expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.PDF_SECTION.BASE);
+            expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.PDF_SECTION.CONTENT);
             expect(result).toEqual(mockPdfSection);
         });
 
@@ -35,7 +35,7 @@ describe('PdfSectionApi', () => {
 
             await PdfSectionApi.getPdfSection(mockClient);
 
-            expect(mockClient.get).toHaveBeenCalledWith(expect.stringContaining(API_ROUTES.PDF_SECTION.BASE));
+            expect(mockClient.get).toHaveBeenCalledWith(expect.stringContaining(API_ROUTES.PDF_SECTION.CONTENT));
         });
 
         it('should throw an error when the API request fails', async () => {

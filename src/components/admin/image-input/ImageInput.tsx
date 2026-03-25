@@ -83,9 +83,6 @@ export const ImageInput = ({
 
     const handleFile = useCallback(
         async (file: File) => {
-            setError(null);
-            if (!file.type.startsWith('image/')) return;
-
             const error = await IMAGE_VALIDATION_FUNCTIONS.validateImage(file, minWidth, minHeight, maxSizeMB);
             if (error) {
                 setError(error);

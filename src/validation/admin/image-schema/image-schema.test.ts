@@ -77,6 +77,15 @@ describe('ImageValidationSchema', () => {
         await expect(validationSchema.validate(invalidTypeFile)).rejects.toThrow(IMAGE_VALIDATION.getFormatError());
     });
 
+    it('returns file type error first when format is invalid and size is too large', async () => {
+        mockImageDimensions(1920, 1080);
+        const invalidLargeTypeFile = createTestFile(IMAGE_VALIDATION.maxSizeBytes + 1024, 'text/plain');
+
+        await expect(validationSchema.validate(invalidLargeTypeFile)).rejects.toThrow(
+            IMAGE_VALIDATION.getFormatError(),
+        );
+    });
+
     it('rejects null or undefined input', async () => {
         await expect(validationSchema.validate(null)).rejects.toThrow();
         await expect(validationSchema.validate(undefined)).rejects.toThrow();

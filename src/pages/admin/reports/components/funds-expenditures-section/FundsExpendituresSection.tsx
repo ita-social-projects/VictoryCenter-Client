@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import { FUNDS_EXPENDITURES_TEXT, FUNDS_EXPENDITURES_VALIDATION } from '@/const/admin/reports';
+import { FUNDS_EXPENDITURES_TEXT, FUNDS_EXPENDITURES_VALIDATION, REPORTS_TEXT } from '@/const/admin/reports';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FUNDS_EXPENDITURES_DISCLAIMER_VALIDATION_FUNCTIONS } from '@/validation/admin/reports-schema/funds-expenditures-disclaimer-schema/funds-expenditures-disclaimer-schema';
 import { Button } from '@/components/admin/button/Button';
@@ -13,8 +13,10 @@ import {
 } from '@/types/admin/reports';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
-import { parseAmount } from '@/utils/functions/parse-amount/parse-amount';
+import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
+import { ToastType } from '@/types/admin/toast';
 import { SummaryCard } from './components/summary-card/SummaryCard';
 import {
     CategoryFilterValue,
@@ -23,20 +25,6 @@ import {
 } from './components/funds-expenditures-toolbar/FundsExpendituresToolbar';
 import { EnrichedRecord, FundsExpendituresTable } from './components/funds-expenditures-table/FundsExpendituresTable';
 import styles from './FundsExpendituresSection.module.scss';
-
-const computeSummary = (records: ReportFundsExpendituresRecord[]): FundsExpendituresSummary => {
-    const incomeRecords = records.filter((r) => r.type === 'income');
-    const expenseRecords = records.filter((r) => r.type === 'expense');
-
-    return {
-        totalCollectedUah: incomeRecords.reduce((sum, r) => sum + parseAmount(r.amountUah), 0),
-        totalCollectedUsd: incomeRecords.reduce((sum, r) => sum + parseAmount(r.amountUsd), 0),
-        totalSpentUah: expenseRecords.reduce((sum, r) => sum + parseAmount(r.amountUah), 0),
-        totalSpentUsd: expenseRecords.reduce((sum, r) => sum + parseAmount(r.amountUsd), 0),
-        incomeCategories: new Set(incomeRecords.map((r) => r.categoryId)).size,
-        expenseCategories: new Set(expenseRecords.map((r) => r.categoryId)).size,
-    };
-};
 
 const enrichRecords = (
     records: ReportFundsExpendituresRecord[],
@@ -51,6 +39,7 @@ const enrichRecords = (
 
 export const FundsExpenditureSection = () => {
     const adminClient = useAdminClient();
+    const { addToast } = useToast();
 
     const [isEditing, setIsEditing] = useState(false);
     const [disclaimerValue, setDisclaimerValue] = useState('');
@@ -84,24 +73,58 @@ export const FundsExpenditureSection = () => {
         setSelectedCategoryId(undefined);
     }, []);
 
-    const fetchSettings = useCallback(() => FundsExpendituresApi.getSettings(adminClient), [adminClient]);
-    const fetchCategories = useCallback(() => FundsExpendituresApi.getCategories(adminClient), [adminClient]);
-    const fetchRecords = useCallback(() => FundsExpendituresApi.getPublishedRecords(adminClient), [adminClient]);
+    const fetchSettings = useCallback(
+        (options = {}) => FundsExpendituresApi.getSettings(adminClient, options),
+        [adminClient],
+    );
+    const fetchCategories = useCallback(
+        (options = {}) => FundsExpendituresApi.getCategories(adminClient, options),
+        [adminClient],
+    );
+    const fetchRecords = useCallback(
+        (options = {}) => FundsExpendituresApi.getRecords(adminClient, options),
+        [adminClient],
+    );
+    const fetchSummary = useCallback(
+        (options = {}) => FundsExpendituresApi.getSummary(adminClient, options),
+        [adminClient],
+    );
 
-    const { data: settings } = useDataFetch<ReportFundsExpendituresSettings | null>({
+    const { data: settings, isLoading: isSettingsLoading } = useDataFetch<ReportFundsExpendituresSettings | null>({
         initialData: null,
         fetchHandler: fetchSettings,
     });
 
-    const { data: categories } = useDataFetch<ReportFundsExpendituresCategory[]>({
+    const { data: categories, isLoading: isCategoriesLoading } = useDataFetch<ReportFundsExpendituresCategory[]>({
         initialData: [],
         fetchHandler: fetchCategories,
     });
 
-    const { data: allRecords } = useDataFetch<ReportFundsExpendituresRecord[]>({
+    const { data: allRecords, isLoading: isRecordsLoading } = useDataFetch<ReportFundsExpendituresRecord[]>({
         initialData: [],
         fetchHandler: fetchRecords,
     });
+
+    const {
+        data: summary,
+        isLoading: isSummaryLoading,
+        refetch: refetchSummary,
+    } = useDataFetch<FundsExpendituresSummary>({
+        initialData: {
+            totalCollectedUah: 0,
+            totalCollectedUsd: 0,
+            totalSpentUah: 0,
+            totalSpentUsd: 0,
+            incomeCategories: 0,
+            expenseCategories: 0,
+        },
+        fetchHandler: fetchSummary,
+    });
+
+    const isInitialLoading =
+        (isSettingsLoading || isCategoriesLoading || isRecordsLoading || isSummaryLoading) &&
+        categories.length === 0 &&
+        recordsState.length === 0;
 
     useEffect(() => {
         setRecordsState(allRecords);
@@ -119,8 +142,6 @@ export const FundsExpenditureSection = () => {
             setDisclaimerError(undefined);
         }
     }, [settings, isEditing]);
-
-    const summary = useMemo(() => computeSummary(recordsState), [recordsState]);
 
     const enrichedRecords = useMemo(() => enrichRecords(recordsState, categories), [recordsState, categories]);
 
@@ -143,22 +164,61 @@ export const FundsExpenditureSection = () => {
     const currentExchangeRate = isEditing ? exchangeRateValue : (settings?.exchangeRate ?? null);
 
     const handleRecordSave = useCallback(
-        (recordId: number, data: { categoryId: number; amountUah: string; amountUsd: string }) => {
-            setRecordsState((prev) =>
-                prev.map((record) =>
-                    record.id === recordId
-                        ? {
-                              ...record,
-                              categoryId: data.categoryId,
-                              amountUah: data.amountUah,
-                              amountUsd: data.amountUsd,
-                          }
-                        : record,
-                ),
-            );
+        async (
+            recordId: number,
+            data: { categoryId: number; amountUah: string; amountUsd: string },
+        ): Promise<boolean> => {
+            const existingRecord = recordsState.find((record) => record.id === recordId);
+            if (!existingRecord) {
+                return false;
+            }
+
+            try {
+                const updatedRecord = await FundsExpendituresApi.updateRecord(adminClient, recordId, {
+                    categoryId: data.categoryId,
+                    type: existingRecord.type,
+                    reportingYear: existingRecord.reportingYear,
+                    amountUah: data.amountUah,
+                    amountUsd: data.amountUsd,
+                });
+
+                setRecordsState((prev) => prev.map((record) => (record.id === recordId ? updatedRecord : record)));
+                refetchSummary();
+                addToast(REPORTS_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY, ToastType.Success);
+                return true;
+            } catch {
+                addToast(REPORTS_TEXT.MESSAGE.RECORD_UPDATE_FAILED_RETRY, ToastType.Error);
+                return false;
+            }
         },
-        [],
+        [addToast, adminClient, recordsState, refetchSummary],
     );
+
+    const handlePublish = useCallback(async () => {
+        try {
+            const updatedSettings = await FundsExpendituresApi.updateSettings(adminClient, {
+                disclaimerTitle: disclaimerValue,
+                exchangeRate: exchangeRateValue,
+            });
+
+            setDisclaimerValue(updatedSettings.disclaimerTitle ?? '');
+            setExchangeRateValue(updatedSettings.exchangeRate ?? '');
+            setIsEditing(false);
+            addToast(COMMON_TEXT_ADMIN.MESSAGE.SUCCESSFULLY_PUBLISHED, ToastType.Success);
+        } catch {
+            addToast(REPORTS_TEXT.MESSAGE.FAIL_TO_UPDATE_REPORT, ToastType.Error);
+        }
+    }, [addToast, adminClient, disclaimerValue, exchangeRateValue]);
+
+    if (isInitialLoading) {
+        return (
+            <div className={styles.section}>
+                <div className={styles['loader-container']}>
+                    <InlineLoader size={3} />
+                </div>
+            </div>
+        );
+    }
 
     const EditIcon = ACTION_ICONS.edit.default;
 
@@ -244,6 +304,7 @@ export const FundsExpenditureSection = () => {
             <FundsExpendituresTable
                 records={filteredRecords}
                 categories={filteredCategories}
+                exchangeRate={currentExchangeRate}
                 allRecordsForTypeInference={recordsState}
                 isEditing={isEditing}
                 onRowEditModeChange={setIsRowEditMode}
@@ -258,7 +319,7 @@ export const FundsExpenditureSection = () => {
                     <Button
                         buttonStyle="primary"
                         className={styles['footer-button']}
-                        onClick={() => {}}
+                        onClick={handlePublish}
                         disabled={!isPublishEnabled || isRowEditMode}
                     >
                         {FUNDS_EXPENDITURES_TEXT.BUTTON.PUBLISH}

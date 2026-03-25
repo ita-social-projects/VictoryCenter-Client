@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, within } from '@testing-library/react';
+import { render, screen, fireEvent, within, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import type React from 'react';
 import { FundsExpendituresTable, EnrichedRecord } from './FundsExpendituresTable';
@@ -79,6 +79,10 @@ jest.mock('@/assets/icons/checkmark.svg', () => ({
 
 jest.mock('@/assets/icons/cross.svg', () => ({
     ReactComponent: ({ className }: { className?: string }) => <svg data-testid="cross-icon" className={className} />,
+}));
+
+jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
+    InlineLoader: ({ size }: { size?: number }) => <div data-testid="inline-loader">loader-{size ?? 2}</div>,
 }));
 
 jest.mock('@/components/common/select/Select', () => {
@@ -549,6 +553,31 @@ describe('FundsExpendituresTable', () => {
             });
         });
 
+        it('should show saving indicator and lock controls while row save is in progress', async () => {
+            let resolveSave: (() => void) | undefined;
+            const onRecordSave = jest.fn(
+                () =>
+                    new Promise<boolean>((resolve) => {
+                        resolveSave = () => resolve(true);
+                    }),
+            );
+
+            renderTable({ isEditing: true, onRecordSave });
+
+            fireEvent.click(screen.getByLabelText('Edit record 1'));
+            fireEvent.click(screen.getByTestId('select-option-Власні надходження-3'));
+            fireEvent.click(screen.getByLabelText('Accept record 1'));
+
+            expect(screen.getByTestId('inline-loader')).toBeInTheDocument();
+            expect(screen.getByLabelText('Edit record 2')).toBeDisabled();
+
+            resolveSave?.();
+
+            await waitFor(() => {
+                expect(screen.queryByTestId('inline-loader')).not.toBeInTheDocument();
+            });
+        });
+
         it('should show required validation for empty amount on blur', () => {
             renderTable({ isEditing: true });
 
@@ -599,6 +628,78 @@ describe('FundsExpendituresTable', () => {
 
             expect(screen.getByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED)).toBeInTheDocument();
             expect(screen.getByLabelText('Accept record 1')).toBeDisabled();
+        });
+
+        it('should recalculate USD when UAH amount is changed and validated', () => {
+            renderTable({ isEditing: true, exchangeRate: '40' });
+
+            fireEvent.click(screen.getByLabelText('Edit record 1'));
+            fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '8 000' } });
+            fireEvent.blur(screen.getByLabelText('Amount UAH record 1'));
+
+            expect(screen.getByLabelText('Amount USD record 1')).toHaveValue('200');
+        });
+
+        it('should recalculate USD immediately on valid UAH change using current exchange rate', () => {
+            renderTable({ isEditing: true, exchangeRate: '40' });
+
+            fireEvent.click(screen.getByLabelText('Edit record 1'));
+            fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '8 000' } });
+
+            expect(screen.getByLabelText('Amount USD record 1')).toHaveValue('200');
+        });
+
+        it('should recalculate UAH when USD amount is changed and validated', () => {
+            renderTable({ isEditing: true, exchangeRate: '40' });
+
+            fireEvent.click(screen.getByLabelText('Edit record 1'));
+            fireEvent.change(screen.getByLabelText('Amount USD record 1'), { target: { value: '50' } });
+            fireEvent.blur(screen.getByLabelText('Amount USD record 1'));
+
+            expect(screen.getByLabelText('Amount UAH record 1')).toHaveValue('2000');
+        });
+
+        it('should recalculate UAH immediately on valid USD change using current exchange rate', () => {
+            renderTable({ isEditing: true, exchangeRate: '40' });
+
+            fireEvent.click(screen.getByLabelText('Edit record 1'));
+            fireEvent.change(screen.getByLabelText('Amount USD record 1'), { target: { value: '50' } });
+
+            expect(screen.getByLabelText('Amount UAH record 1')).toHaveValue('2000');
+        });
+
+        it('should not recalculate opposite amount when exchange rate is invalid', () => {
+            renderTable({ isEditing: true, exchangeRate: null });
+
+            fireEvent.click(screen.getByLabelText('Edit record 1'));
+            fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '8 000' } });
+            fireEvent.blur(screen.getByLabelText('Amount UAH record 1'));
+
+            expect(screen.getByLabelText('Amount USD record 1')).toHaveValue('4 200');
+        });
+
+        it('should use current exchange rate instead of just adding/removing zeroes', () => {
+            const records: EnrichedRecord[] = [
+                {
+                    id: 1,
+                    categoryId: 1,
+                    categoryName: 'Грантові кошти',
+                    type: 'income',
+                    reportingYear: '2025',
+                    amountUah: '500 000',
+                    amountUsd: '13 500',
+                },
+            ];
+
+            renderTable({ isEditing: true, exchangeRate: '42', records });
+
+            fireEvent.click(screen.getByLabelText('Edit record 1'));
+
+            fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '50 000' } });
+            expect(screen.getByLabelText('Amount USD record 1')).toHaveValue('1190.48');
+
+            fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '500 000' } });
+            expect(screen.getByLabelText('Amount USD record 1')).toHaveValue('11904.76');
         });
     });
 });

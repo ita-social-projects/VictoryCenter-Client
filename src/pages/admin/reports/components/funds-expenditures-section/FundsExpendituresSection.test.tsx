@@ -1,18 +1,50 @@
-﻿import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { FundsExpenditureSection } from './FundsExpendituresSection';
-import { FUNDS_EXPENDITURES_TEXT, FUNDS_EXPENDITURES_VALIDATION } from '@/const/admin/reports';
+import { FUNDS_EXPENDITURES_TEXT, FUNDS_EXPENDITURES_VALIDATION, REPORTS_TEXT } from '@/const/admin/reports';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import {
-    MOCK_FUNDS_EXPENDITURES_CATEGORIES,
-    MOCK_FUNDS_EXPENDITURES_RECORDS,
-    MOCK_FUNDS_EXPENDITURES_SETTINGS,
-} from '@/utils/mock-data/admin/funds-expenditures-mock';
-import {
+    FundsExpendituresSummary,
     ReportFundsExpendituresCategory,
     ReportFundsExpendituresRecord,
     ReportFundsExpendituresSettings,
 } from '@/types/admin/reports';
+
+const MOCK_FUNDS_EXPENDITURES_SETTINGS: ReportFundsExpendituresSettings = {
+    id: 1,
+    disclaimerTitle: 'Фінансовий звіт Victory Center за поточний рік. Ми забезпечуємо прозорість кожної гривні.',
+    exchangeRate: '42.18',
+};
+
+const MOCK_FUNDS_EXPENDITURES_CATEGORIES: ReportFundsExpendituresCategory[] = [
+    { id: 1, name: 'Грантові кошти', type: 'income' },
+    { id: 2, name: 'Благодійні внески', type: 'income' },
+    { id: 3, name: 'Власні надходження', type: 'income' },
+    { id: 4, name: 'Інші надходження', type: 'income' },
+    { id: 5, name: 'Адміністративні витрати', type: 'expense' },
+    { id: 6, name: 'Програмні витрати', type: 'expense' },
+    { id: 7, name: 'Обладнання', type: 'expense' },
+    { id: 8, name: 'Заробітна плата', type: 'expense' },
+];
+
+const MOCK_FUNDS_EXPENDITURES_RECORDS: ReportFundsExpendituresRecord[] = [
+    { id: 1, categoryId: 1, type: 'income', reportingYear: '2025', amountUah: '7265', amountUsd: '4200' },
+    { id: 2, categoryId: 5, type: 'expense', reportingYear: '2025', amountUah: '3100', amountUsd: '1800' },
+    { id: 3, categoryId: 2, type: 'income', reportingYear: '2025', amountUah: '5800', amountUsd: '3360' },
+    { id: 4, categoryId: 6, type: 'expense', reportingYear: '2025', amountUah: '4200', amountUsd: '2430' },
+    { id: 5, categoryId: 3, type: 'income', reportingYear: '2025', amountUah: '2400', amountUsd: '1390' },
+    { id: 6, categoryId: 7, type: 'expense', reportingYear: '2024', amountUah: '1950', amountUsd: '1130' },
+    { id: 7, categoryId: 8, type: 'expense', reportingYear: '2024', amountUah: '5000', amountUsd: '2900' },
+];
+
+const MOCK_FUNDS_EXPENDITURES_SUMMARY: FundsExpendituresSummary = {
+    totalCollectedUah: 15465,
+    totalCollectedUsd: 8950,
+    totalSpentUah: 14250,
+    totalSpentUsd: 8260,
+    incomeCategories: 3,
+    expenseCategories: 4,
+};
 
 jest.mock('./FundsExpendituresSection.module.scss', () => ({
     section: 'section',
@@ -31,6 +63,13 @@ jest.mock('./FundsExpendituresSection.module.scss', () => ({
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: () => ({}),
+}));
+
+const mockAddToast = jest.fn();
+jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider', () => ({
+    useToast: () => ({
+        addToast: mockAddToast,
+    }),
 }));
 
 jest.mock(
@@ -63,6 +102,10 @@ jest.mock(
 const mockUseDataFetch = jest.fn();
 jest.mock('@/hooks/common/use-data-fetch/useDataFetch', () => ({
     useDataFetch: (props: { initialData: unknown }) => mockUseDataFetch(props),
+}));
+
+jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
+    InlineLoader: ({ size }: { size?: number }) => <div data-testid="inline-loader">loader-{size ?? 2}</div>,
 }));
 
 jest.mock('./components/summary-card/SummaryCard', () => ({
@@ -134,23 +177,63 @@ jest.mock('./components/funds-expenditures-toolbar/FundsExpendituresToolbar', ()
 }));
 
 jest.mock('./components/funds-expenditures-table/FundsExpendituresTable', () => ({
-    FundsExpendituresTable: ({ records, isEditing }: { records: unknown[]; isEditing?: boolean }) => (
-        <div data-testid="funds-table" data-record-count={records.length} data-editing={String(isEditing ?? false)} />
+    FundsExpendituresTable: ({
+        records,
+        isEditing,
+        onRecordSave,
+    }: {
+        records: unknown[];
+        isEditing?: boolean;
+        onRecordSave?: (recordId: number, data: { categoryId: number; amountUah: string; amountUsd: string }) => void;
+    }) => (
+        <div data-testid="funds-table" data-record-count={records.length} data-editing={String(isEditing ?? false)}>
+            <button
+                data-testid="trigger-record-save"
+                onClick={() =>
+                    onRecordSave?.(1, {
+                        categoryId: 1,
+                        amountUah: '7300',
+                        amountUsd: '173.81',
+                    })
+                }
+            >
+                Save row
+            </button>
+        </div>
     ),
+}));
+
+const mockUpdateRecord = jest.fn();
+jest.mock('@/services/api/admin/reports/funds-expenditures-api', () => ({
+    FundsExpendituresApi: {
+        getSettings: jest.fn(),
+        getCategories: jest.fn(),
+        getRecords: jest.fn(),
+        getSummary: jest.fn(),
+        updateSettings: jest.fn(),
+        updateRecord: (...args: unknown[]) => mockUpdateRecord(...args),
+    },
 }));
 
 const setupMockDataFetch = (
     settings: ReportFundsExpendituresSettings | null = MOCK_FUNDS_EXPENDITURES_SETTINGS,
     categories: ReportFundsExpendituresCategory[] = MOCK_FUNDS_EXPENDITURES_CATEGORIES,
     records: ReportFundsExpendituresRecord[] = MOCK_FUNDS_EXPENDITURES_RECORDS,
+    summary: FundsExpendituresSummary = MOCK_FUNDS_EXPENDITURES_SUMMARY,
+    loadingBySlot: Partial<Record<number, boolean>> = {},
 ) => {
     let callIndex = 0;
     mockUseDataFetch.mockImplementation(({ initialData }: { initialData: unknown }) => {
         const callOrder = callIndex++;
-        const slot = callOrder % 3;
-        const slotDataMap: Record<number, unknown> = { 0: settings, 1: categories, 2: records };
+        const slot = callOrder % 4;
+        const slotDataMap: Record<number, unknown> = { 0: settings, 1: categories, 2: records, 3: summary };
         const data = slotDataMap[slot];
-        return { data: data ?? initialData, isLoading: false, error: null, refetch: jest.fn() };
+        return {
+            data: data ?? initialData,
+            isLoading: loadingBySlot[slot] ?? false,
+            error: null,
+            refetch: jest.fn(),
+        };
     });
 };
 
@@ -158,6 +241,35 @@ describe('FundsExpenditureSection', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         setupMockDataFetch();
+    });
+
+    it('should show success toast when record is saved from table', async () => {
+        mockUpdateRecord.mockResolvedValueOnce({
+            id: 1,
+            categoryId: 1,
+            type: 'income',
+            reportingYear: '2025',
+            amountUah: '7300',
+            amountUsd: '173.81',
+        });
+
+        render(<FundsExpenditureSection />);
+
+        fireEvent.click(screen.getByTestId('trigger-record-save'));
+
+        await screen.findByTestId('funds-table');
+        expect(mockAddToast).toHaveBeenCalledWith(REPORTS_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY, 'success');
+    });
+
+    it('should show retry error toast when record save fails', async () => {
+        mockUpdateRecord.mockRejectedValueOnce(new Error('save failed'));
+
+        render(<FundsExpenditureSection />);
+
+        fireEvent.click(screen.getByTestId('trigger-record-save'));
+
+        await screen.findByTestId('funds-table');
+        expect(mockAddToast).toHaveBeenCalledWith(REPORTS_TEXT.MESSAGE.RECORD_UPDATE_FAILED_RETRY, 'error');
     });
 
     it('should render the disclaimer text', () => {
@@ -205,6 +317,20 @@ describe('FundsExpenditureSection', () => {
     it('should render the table', () => {
         render(<FundsExpenditureSection />);
         expect(screen.getByTestId('funds-table')).toBeInTheDocument();
+    });
+
+    it('should render loader when funds and expenditures data is loading', () => {
+        setupMockDataFetch(null, [], [], MOCK_FUNDS_EXPENDITURES_SUMMARY, {
+            0: true,
+            1: true,
+            2: true,
+            3: true,
+        });
+
+        render(<FundsExpenditureSection />);
+
+        expect(screen.getByTestId('inline-loader')).toBeInTheDocument();
+        expect(screen.queryByTestId('funds-table')).not.toBeInTheDocument();
     });
 
     it('should pass all enriched records to the table initially', () => {

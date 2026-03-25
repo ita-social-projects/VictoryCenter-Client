@@ -7,6 +7,7 @@ import {
     ReportsToolbarTab,
 } from '../reports-page-toolbar/ReportsPageToolbar';
 import { MediaSettings, MediaSettingsRef } from '../media-settings/MediaSettings';
+import { ReportAnalytics } from '../report-analytics/ReportAnalytics';
 
 export const ReportsPanelContent = () => {
     const [selectedTab, setSelectedTab] = useState<ReportsToolbarTab>(REPORTS_TOOLBAR_TABS[0]);
@@ -38,16 +39,20 @@ export const ReportsPanelContent = () => {
                 <ReportsPageToolbar selectedTab={selectedTab} onTabSelect={handleTabSelect} />
             </div>
             <div className={styles.content}>
-                <MediaSettings
-                    ref={mediaSettingsRef}
-                    resetCounter={resetCounter}
-                    onDirtyChange={handleDirtyChange}
-                    onCancel={handleCancel}
-                    onPublish={handlePublish}
-                    isPublishDisabled={!isDirty}
-                    isCancelDisabled={!isDirty}
-                    isActive={isMediaSettingsTab}
-                />
+                {isMediaSettingsTab ? (
+                    <MediaSettings
+                        ref={mediaSettingsRef}
+                        resetCounter={resetCounter}
+                        onDirtyChange={handleDirtyChange}
+                        onCancel={handleCancel}
+                        onPublish={handlePublish}
+                        isPublishDisabled={!isDirty}
+                        isCancelDisabled={!isDirty}
+                        isActive={isMediaSettingsTab}
+                    />
+                ) : (
+                    <ReportAnalytics />
+                )}
             </div>
             <ToastContainer />
         </div>

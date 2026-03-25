@@ -2,7 +2,7 @@ import { formatSummaryAmount } from '@/utils/functions/format-summary-amount/for
 
 describe('formatSummaryAmount', () => {
     it('should return empty string when value is undefined', () => {
-        expect(formatSummaryAmount(undefined)).toBe('');
+        expect(formatSummaryAmount()).toBe('');
     });
 
     it('should format integer with thousand separators', () => {

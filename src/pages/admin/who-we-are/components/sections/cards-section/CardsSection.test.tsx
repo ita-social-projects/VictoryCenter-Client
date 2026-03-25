@@ -59,6 +59,7 @@ jest.mock('@/validation/admin/who-we-are-schema/WhoWeAreSchema', () => ({
 describe('CardsSection', () => {
     let mockOnChange: jest.Mock;
     let mockOnPublish: jest.Mock;
+    let mockOnTranslate: jest.Mock;
     const descriptionLimit = 500;
     const cardImageConfigs = [
         { style: { width: '20rem' }, cropWidth: 20, cropHeight: 20, minWidth: 20, minHeight: 20, subText: '200x200' },
@@ -100,6 +101,7 @@ describe('CardsSection', () => {
             descriptionLimit,
             onChange: mockOnChange,
             onPublish: mockOnPublish,
+            onTranslate: mockOnTranslate,
             cardImageConfigs,
             titleText,
             isPublishButtonActive: false,
@@ -111,6 +113,7 @@ describe('CardsSection', () => {
     beforeEach(() => {
         mockOnChange = jest.fn();
         mockOnPublish = jest.fn();
+        mockOnTranslate = jest.fn();
         (WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText as jest.Mock).mockReturnValue(null);
     });
 
@@ -200,11 +203,13 @@ describe('CardsSection', () => {
         });
     });
 
-    it('should enable the publish button and call onPublish when clicked', () => {
+    it('should enable publish button, disable translate button and call onPublish when clicked', () => {
         renderComponent({ isPublishButtonActive: true });
 
         const publishButton = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED });
         expect(publishButton).toBeEnabled();
+
+        expect(screen.getByRole('button', { name: 'Translate' })).toBeDisabled();
 
         fireEvent.click(publishButton);
         expect(mockOnPublish).toHaveBeenCalled();

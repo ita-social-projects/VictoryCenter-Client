@@ -11,12 +11,15 @@ import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html
 import { LocalizationLanguage } from '@/types/common/language';
 import { returnDisplayedLocalization } from '@/utils/functions/localization/localization';
 import { DEFAULT_LOCALE } from '@/const/common/locales';
+import { IconButton } from '@/components/admin/icon-button/IconButton';
+import { ACTION_ICONS } from '@/const/common/action-icons';
 
 export interface DescriptionSectionProps {
     content: Content[] | undefined;
     descriptionLimit: number;
     onChange: (data: Content) => void;
     onPublish: () => void;
+    onTranslate: () => void;
     isPublishButtonActive: boolean;
     language: LocalizationLanguage;
 }
@@ -26,6 +29,7 @@ export const DescriptionSection = ({
     onChange,
     descriptionLimit,
     onPublish,
+    onTranslate,
     isPublishButtonActive,
     language,
 }: DescriptionSectionProps) => {
@@ -65,6 +69,16 @@ export const DescriptionSection = ({
         <div className="description-section">
             <OurMission description={displayedDescription ?? ''} className="description-section-show-block" />
             <div className="description-section-textarea">
+                <div className="description-section-textarea-buttons">
+                    <IconButton
+                        type="button"
+                        className="translate-btn"
+                        aria-label="Translate"
+                        onClick={onTranslate}
+                        DefaultIcon={ACTION_ICONS.translate.default}
+                        disabled={isPublishButtonActive}
+                    />
+                </div>
                 <RichTextInputGroup
                     key={`description-${language.code}`}
                     label={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}

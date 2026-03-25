@@ -241,6 +241,7 @@ describe('TeamMemberModal', () => {
             />,
         );
 
+        await userEvent.click(screen.getByTestId('toggle-dirty'));
         await userEvent.click(screen.getByTestId('toggle-valid'));
         await userEvent.click(screen.getByText('Save Published'));
         expect(screen.getByTestId('modal-title')).toHaveTextContent('Publish?');
@@ -280,6 +281,7 @@ describe('TeamMemberModal', () => {
             />,
         );
         const editModal = screen.getByTestId('modal');
+        await userEvent.click(within(editModal).getByTestId('toggle-dirty'));
         await userEvent.click(within(editModal).getByTestId('toggle-valid'));
         await userEvent.click(within(editModal).getByText('Save Draft'));
         const confirmModal4 = await screen.findByTestId('question-modal');

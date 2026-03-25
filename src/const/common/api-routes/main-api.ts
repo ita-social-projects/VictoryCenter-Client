@@ -84,6 +84,23 @@ export const API_ROUTES = {
         SECTIONS: 'Partners/sections',
         PAGE: 'Partners/page',
     },
+    REPORTS: {
+        MEDIA_SETTINGS: 'Report/report',
+        BASE: 'Report',
+        FUNDS_EXPENDITURES: {
+            SETTINGS: 'ReportFundsExpendituresSettings',
+            RECORDS: 'ReportFundsExpendituresRecords',
+            SUMMARY: 'ReportFundsExpendituresRecords/summary',
+            CATEGORIES: 'ReportFundsExpendituresCategories',
+        },
+    },
+    PDF_SECTION: {
+        BASE: 'PdfSection',
+        CONTENT: 'PdfSection/pdf-section',
+    },
+    PDF_REPORTS: {
+        BASE: 'PdfReports',
+    },
     FAQ_LOCALIZATIONS: {
         BASE: 'FaqQuestionLocalizations',
     },

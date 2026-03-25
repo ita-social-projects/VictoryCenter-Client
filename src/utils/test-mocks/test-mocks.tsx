@@ -1,5 +1,20 @@
 import { useState } from 'react';
 
+export const MockCategoryBar = ({ categories, selectedCategory, getCategoryDisplayName, onCategorySelect }: any) => (
+    <div data-testid="mock-category-bar">
+        {categories.map((cat: any) => (
+            <button
+                key={cat.id}
+                data-testid={`tab-${cat.id}`}
+                className={selectedCategory?.id === cat.id ? 'selected' : ''}
+                onClick={() => onCategorySelect(cat)}
+            >
+                {getCategoryDisplayName(cat)}
+            </button>
+        ))}
+    </div>
+);
+
 export const MockButton = (props: any) => (
     <button {...props} data-testid={props['data-testid'] || 'button'}>
         {props.children}

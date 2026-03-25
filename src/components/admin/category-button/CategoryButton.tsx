@@ -33,7 +33,7 @@ function CategoryButtonInner<T>({
                     'category-bar-button-selected': isSelected,
                 })}
             >
-                {name}
+                <span className="category-bar-button-text">{name}</span>
             </button>
         </div>
     );

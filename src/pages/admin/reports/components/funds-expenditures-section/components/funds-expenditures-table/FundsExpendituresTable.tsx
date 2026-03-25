@@ -638,6 +638,7 @@ export const FundsExpendituresTable = ({
                                                             )
                                                         }
                                                         onBlur={() => handleAmountBlur(record.id, 'amountUah')}
+                                                        disabled={isSavingCurrentRow}
                                                     />
                                                     {rowEditState.errors.amountUah && (
                                                         <p className={styles['amount-edit-error']}>
@@ -668,6 +669,7 @@ export const FundsExpendituresTable = ({
                                                             )
                                                         }
                                                         onBlur={() => handleAmountBlur(record.id, 'amountUsd')}
+                                                        disabled={isSavingCurrentRow}
                                                     />
                                                     {rowEditState.errors.amountUsd && (
                                                         <p className={styles['amount-edit-error']}>

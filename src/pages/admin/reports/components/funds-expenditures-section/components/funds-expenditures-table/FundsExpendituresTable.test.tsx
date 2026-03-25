@@ -630,42 +630,52 @@ describe('FundsExpendituresTable', () => {
             expect(screen.getByLabelText('Accept record 1')).toBeDisabled();
         });
 
-        it('should recalculate USD when UAH amount is changed and validated', () => {
+        it.each([
+            {
+                title: 'should recalculate USD when UAH amount is changed and validated',
+                changedFieldLabel: 'Amount UAH record 1',
+                changedValue: '8 000',
+                expectedFieldLabel: 'Amount USD record 1',
+                expectedValue: '200',
+                withBlur: true,
+            },
+            {
+                title: 'should recalculate USD immediately on valid UAH change using current exchange rate',
+                changedFieldLabel: 'Amount UAH record 1',
+                changedValue: '8 000',
+                expectedFieldLabel: 'Amount USD record 1',
+                expectedValue: '200',
+                withBlur: false,
+            },
+            {
+                title: 'should recalculate UAH when USD amount is changed and validated',
+                changedFieldLabel: 'Amount USD record 1',
+                changedValue: '50',
+                expectedFieldLabel: 'Amount UAH record 1',
+                expectedValue: '2000',
+                withBlur: true,
+            },
+            {
+                title: 'should recalculate UAH immediately on valid USD change using current exchange rate',
+                changedFieldLabel: 'Amount USD record 1',
+                changedValue: '50',
+                expectedFieldLabel: 'Amount UAH record 1',
+                expectedValue: '2000',
+                withBlur: false,
+            },
+        ])('$title', ({ changedFieldLabel, changedValue, expectedFieldLabel, expectedValue, withBlur }) => {
             renderTable({ isEditing: true, exchangeRate: '40' });
 
             fireEvent.click(screen.getByLabelText('Edit record 1'));
-            fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '8 000' } });
-            fireEvent.blur(screen.getByLabelText('Amount UAH record 1'));
 
-            expect(screen.getByLabelText('Amount USD record 1')).toHaveValue('200');
-        });
+            const changedField = screen.getByLabelText(changedFieldLabel);
+            fireEvent.change(changedField, { target: { value: changedValue } });
 
-        it('should recalculate USD immediately on valid UAH change using current exchange rate', () => {
-            renderTable({ isEditing: true, exchangeRate: '40' });
+            if (withBlur) {
+                fireEvent.blur(changedField);
+            }
 
-            fireEvent.click(screen.getByLabelText('Edit record 1'));
-            fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '8 000' } });
-
-            expect(screen.getByLabelText('Amount USD record 1')).toHaveValue('200');
-        });
-
-        it('should recalculate UAH when USD amount is changed and validated', () => {
-            renderTable({ isEditing: true, exchangeRate: '40' });
-
-            fireEvent.click(screen.getByLabelText('Edit record 1'));
-            fireEvent.change(screen.getByLabelText('Amount USD record 1'), { target: { value: '50' } });
-            fireEvent.blur(screen.getByLabelText('Amount USD record 1'));
-
-            expect(screen.getByLabelText('Amount UAH record 1')).toHaveValue('2000');
-        });
-
-        it('should recalculate UAH immediately on valid USD change using current exchange rate', () => {
-            renderTable({ isEditing: true, exchangeRate: '40' });
-
-            fireEvent.click(screen.getByLabelText('Edit record 1'));
-            fireEvent.change(screen.getByLabelText('Amount USD record 1'), { target: { value: '50' } });
-
-            expect(screen.getByLabelText('Amount UAH record 1')).toHaveValue('2000');
+            expect(screen.getByLabelText(expectedFieldLabel)).toHaveValue(expectedValue);
         });
 
         it('should not recalculate opposite amount when exchange rate is invalid', () => {

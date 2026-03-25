@@ -8,6 +8,13 @@
     padding: 0 50px;
 }
 
+.loader-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 220px;
+}
+
 .disclaimer {
     padding: 40px;
     background-color: c.$white;

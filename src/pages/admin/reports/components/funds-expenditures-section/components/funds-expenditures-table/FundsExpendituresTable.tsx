@@ -18,7 +18,9 @@ import {
     validateFundsExpendituresAmount,
     validateFundsExpendituresCategory,
 } from '@/validation/admin/reports-schema/funds-expenditures-record-schema/funds-expenditures-record-schema';
+import { getConvertedAmount } from '@/utils/functions/get-converted-amount/get-converted-amount';
 import { parseAmount } from '@/utils/functions/parse-amount/parse-amount';
+import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import cn from 'classnames';
 import styles from './FundsExpendituresTable.module.scss';
 
@@ -37,10 +39,14 @@ interface ColumnSort {
 interface FundsExpendituresTableProps {
     records: EnrichedRecord[];
     categories: ReportFundsExpendituresCategory[];
+    exchangeRate?: string | null;
     allRecordsForTypeInference?: ReportFundsExpendituresRecord[];
     isEditing?: boolean;
     onRowEditModeChange?: (isEditMode: boolean) => void;
-    onRecordSave?: (recordId: number, data: { categoryId: number; amountUah: string; amountUsd: string }) => void;
+    onRecordSave?: (
+        recordId: number,
+        data: { categoryId: number; amountUah: string; amountUsd: string },
+    ) => boolean | Promise<boolean>;
 }
 
 interface RowEditState {
@@ -131,6 +137,7 @@ const isAcceptButtonDisabled = (rowEditState: RowEditState | null): boolean => {
 export const FundsExpendituresTable = ({
     records,
     categories,
+    exchangeRate,
     allRecordsForTypeInference,
     isEditing = false,
     onRowEditModeChange,
@@ -138,6 +145,7 @@ export const FundsExpendituresTable = ({
 }: FundsExpendituresTableProps) => {
     const [sort, setSort] = useState<ColumnSort>({ column: null, direction: null });
     const [rowEditState, setRowEditState] = useState<RowEditState | null>(null);
+    const [savingRecordId, setSavingRecordId] = useState<number | null>(null);
     const [isMoveToTopVisible, setIsMoveToTopVisible] = useState(false);
     const tableWrapperRef = useRef<HTMLDivElement>(null);
 
@@ -262,47 +270,100 @@ export const FundsExpendituresTable = ({
         [getRowEditValidationError],
     );
 
-    const handleAmountChange = useCallback((recordId: number, field: 'amountUah' | 'amountUsd', nextValue: string) => {
-        const normalized = normalizeFundsExpendituresAmountInput(nextValue);
+    const handleAmountChange = useCallback(
+        (recordId: number, field: 'amountUah' | 'amountUsd', nextValue: string) => {
+            const normalized = normalizeFundsExpendituresAmountInput(nextValue);
 
-        setRowEditState((prev) => {
-            if (prev?.recordId !== recordId) {
-                return prev;
-            }
+            setRowEditState((prev) => {
+                if (prev?.recordId !== recordId) {
+                    return prev;
+                }
 
-            return {
-                ...prev,
-                [field]: normalized,
-                errors: {
-                    ...prev.errors,
-                    [field]: validateFundsExpendituresAmount(normalized, 'change'),
-                },
-            };
-        });
-    }, []);
+                const currentFieldError = validateFundsExpendituresAmount(normalized, 'change');
 
-    const handleAmountBlur = useCallback((recordId: number, field: 'amountUah' | 'amountUsd') => {
-        setRowEditState((prev) => {
-            if (prev?.recordId !== recordId) {
-                return prev;
-            }
+                let nextAmountUah = field === 'amountUah' ? normalized : prev.amountUah;
+                let nextAmountUsd = field === 'amountUsd' ? normalized : prev.amountUsd;
+                let nextAmountUahError = field === 'amountUah' ? currentFieldError : prev.errors.amountUah;
+                let nextAmountUsdError = field === 'amountUsd' ? currentFieldError : prev.errors.amountUsd;
 
-            const normalized = normalizeFundsExpendituresAmountInput(prev[field], true);
+                if (!currentFieldError) {
+                    const convertedAmount = getConvertedAmount(normalized, field, exchangeRate);
 
-            return {
-                ...prev,
-                [field]: normalized,
-                errors: {
-                    ...prev.errors,
-                    [field]: validateFundsExpendituresAmount(normalized, 'blur'),
-                },
-            };
-        });
-    }, []);
+                    if (convertedAmount !== null) {
+                        if (field === 'amountUah') {
+                            nextAmountUsd = convertedAmount;
+                            nextAmountUsdError = validateFundsExpendituresAmount(convertedAmount, 'change');
+                        } else {
+                            nextAmountUah = convertedAmount;
+                            nextAmountUahError = validateFundsExpendituresAmount(convertedAmount, 'change');
+                        }
+                    }
+                }
+
+                return {
+                    ...prev,
+                    amountUah: nextAmountUah,
+                    amountUsd: nextAmountUsd,
+                    errors: {
+                        ...prev.errors,
+                        amountUah: nextAmountUahError,
+                        amountUsd: nextAmountUsdError,
+                    },
+                };
+            });
+        },
+        [exchangeRate],
+    );
+
+    const handleAmountBlur = useCallback(
+        (recordId: number, field: 'amountUah' | 'amountUsd') => {
+            setRowEditState((prev) => {
+                if (prev?.recordId !== recordId) {
+                    return prev;
+                }
+
+                const normalized = normalizeFundsExpendituresAmountInput(prev[field], true);
+                const currentFieldError = validateFundsExpendituresAmount(normalized, 'blur');
+
+                let nextAmountUah = field === 'amountUah' ? normalized : prev.amountUah;
+                let nextAmountUsd = field === 'amountUsd' ? normalized : prev.amountUsd;
+                let nextAmountUahError = field === 'amountUah' ? currentFieldError : prev.errors.amountUah;
+                let nextAmountUsdError = field === 'amountUsd' ? currentFieldError : prev.errors.amountUsd;
+
+                if (!currentFieldError) {
+                    const convertedAmountString = getConvertedAmount(normalized, field, exchangeRate);
+
+                    if (convertedAmountString !== null && field === 'amountUah') {
+                        nextAmountUsd = convertedAmountString;
+                        nextAmountUsdError = validateFundsExpendituresAmount(convertedAmountString, 'blur');
+                    } else if (convertedAmountString !== null) {
+                        nextAmountUah = convertedAmountString;
+                        nextAmountUahError = validateFundsExpendituresAmount(convertedAmountString, 'blur');
+                    }
+                }
+
+                return {
+                    ...prev,
+                    amountUah: nextAmountUah,
+                    amountUsd: nextAmountUsd,
+                    errors: {
+                        ...prev.errors,
+                        amountUah: nextAmountUahError,
+                        amountUsd: nextAmountUsdError,
+                    },
+                };
+            });
+        },
+        [exchangeRate],
+    );
 
     const handleAcceptRowEdit = useCallback(
-        (record: EnrichedRecord) => {
+        async (record: EnrichedRecord) => {
             if (rowEditState?.recordId !== record.id) {
+                return;
+            }
+
+            if (savingRecordId !== null) {
                 return;
             }
 
@@ -350,14 +411,25 @@ export const FundsExpendituresTable = ({
                 return;
             }
 
-            onRecordSave?.(record.id, {
-                categoryId: nextCategoryId,
-                amountUah: normalizedAmountUah,
-                amountUsd: normalizedAmountUsd,
-            });
-            setRowEditMode(null);
+            setSavingRecordId(record.id);
+
+            try {
+                const isSaved = await onRecordSave?.(record.id, {
+                    categoryId: nextCategoryId,
+                    amountUah: normalizedAmountUah,
+                    amountUsd: normalizedAmountUsd,
+                });
+
+                if (isSaved === false) {
+                    return;
+                }
+
+                setRowEditMode(null);
+            } finally {
+                setSavingRecordId(null);
+            }
         },
-        [getRowEditValidationError, onRecordSave, rowEditState, setRowEditMode],
+        [getRowEditValidationError, onRecordSave, rowEditState, savingRecordId, setRowEditMode],
     );
 
     const handleSort = useCallback(
@@ -388,6 +460,7 @@ export const FundsExpendituresTable = ({
     );
 
     const isAnyRowEditing = rowEditState !== null;
+    const isSavingInProgress = savingRecordId !== null;
     const sortedRecords = sortRecords(records, sort);
     const colSpan = isEditing ? 7 : 5;
 
@@ -471,7 +544,8 @@ export const FundsExpendituresTable = ({
                         ) : (
                             sortedRecords.map((record) => {
                                 const isEditedRow = rowEditState?.recordId === record.id;
-                                const isAnotherRowEditing = isAnyRowEditing && !isEditedRow;
+                                const isAnotherRowEditing = (isAnyRowEditing && !isEditedRow) || isSavingInProgress;
+                                const isSavingCurrentRow = savingRecordId === record.id;
                                 const editableCategories = categoriesByType[record.type];
                                 const isAcceptDisabled = !isEditedRow || isAcceptButtonDisabled(rowEditState);
 
@@ -564,6 +638,7 @@ export const FundsExpendituresTable = ({
                                                             )
                                                         }
                                                         onBlur={() => handleAmountBlur(record.id, 'amountUah')}
+                                                        disabled={isSavingCurrentRow}
                                                     />
                                                     {rowEditState.errors.amountUah && (
                                                         <p className={styles['amount-edit-error']}>
@@ -594,6 +669,7 @@ export const FundsExpendituresTable = ({
                                                             )
                                                         }
                                                         onBlur={() => handleAmountBlur(record.id, 'amountUsd')}
+                                                        disabled={isSavingCurrentRow}
                                                     />
                                                     {rowEditState.errors.amountUsd && (
                                                         <p className={styles['amount-edit-error']}>
@@ -618,9 +694,13 @@ export const FundsExpendituresTable = ({
                                                                 )}
                                                                 aria-label={`Accept record ${record.id}`}
                                                                 onClick={() => handleAcceptRowEdit(record)}
-                                                                disabled={isAcceptDisabled}
+                                                                disabled={isAcceptDisabled || isSavingCurrentRow}
                                                             >
-                                                                <CheckmarkIcon className={styles['action-icon']} />
+                                                                {isSavingCurrentRow ? (
+                                                                    <InlineLoader size={1.2} />
+                                                                ) : (
+                                                                    <CheckmarkIcon className={styles['action-icon']} />
+                                                                )}
                                                             </button>
                                                             <button
                                                                 type="button"
@@ -630,6 +710,7 @@ export const FundsExpendituresTable = ({
                                                                 )}
                                                                 aria-label={`Close edit for record ${record.id}`}
                                                                 onClick={handleCloseRowEdit}
+                                                                disabled={isSavingCurrentRow}
                                                             >
                                                                 <CrossIcon className={styles['action-icon']} />
                                                             </button>

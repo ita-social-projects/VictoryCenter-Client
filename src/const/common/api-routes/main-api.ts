@@ -90,6 +90,7 @@ export const API_ROUTES = {
         FUNDS_EXPENDITURES: {
             SETTINGS: 'ReportFundsExpendituresSettings',
             RECORDS: 'ReportFundsExpendituresRecords',
+            SUMMARY: 'ReportFundsExpendituresRecords/summary',
             CATEGORIES: 'ReportFundsExpendituresCategories',
         },
     },

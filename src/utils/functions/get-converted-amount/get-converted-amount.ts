@@ -10,6 +10,11 @@ export const getConvertedAmount = (
         return null;
     }
 
+    const normalizedValue = value.replaceAll(' ', '').replace(',', '.').trim();
+    if (!normalizedValue || Number.isNaN(Number.parseFloat(normalizedValue))) {
+        return null;
+    }
+
     const parsedCurrentAmount = parseAmount(value);
     const convertedAmount =
         field === 'amountUah' ? parsedCurrentAmount / parsedExchangeRate : parsedCurrentAmount * parsedExchangeRate;

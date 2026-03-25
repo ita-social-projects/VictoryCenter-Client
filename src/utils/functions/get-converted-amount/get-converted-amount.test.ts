@@ -20,4 +20,10 @@ describe('getConvertedAmount', () => {
     it('returns rounded value to two decimals', () => {
         expect(getConvertedAmount('100', 'amountUah', '3')).toBe('33.33');
     });
+
+    it('should return null for empty or invalid source amount', () => {
+        expect(getConvertedAmount('', 'amountUah', '40')).toBeNull();
+        expect(getConvertedAmount('   ', 'amountUah', '40')).toBeNull();
+        expect(getConvertedAmount('abc', 'amountUsd', '40')).toBeNull();
+    });
 });

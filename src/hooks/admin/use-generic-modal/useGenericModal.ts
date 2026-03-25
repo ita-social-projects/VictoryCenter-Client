@@ -84,14 +84,18 @@ export const useGenericModal = <
 
     const isEditMode = mode === ModalMode.Edit;
 
-    const updateButtonStates = useCallback((currentIsValid: boolean) => {
-        const api = formRef.current;
+    const updateButtonStates = useCallback(
+        (currentIsValid: boolean) => {
+            const api = formRef.current;
+            const isDirtyForSubmit = mode === ModalMode.Edit ? (api?.isDirty?.() ?? false) : true;
 
-        setButtonStates({
-            isDraftValid: api?.isValid?.(false) ?? currentIsValid,
-            isPublishValid: api?.isValid?.(true) ?? currentIsValid,
-        });
-    }, []);
+            setButtonStates({
+                isDraftValid: isDirtyForSubmit && (api?.isValid?.(false) ?? currentIsValid),
+                isPublishValid: isDirtyForSubmit && (api?.isValid?.(true) ?? currentIsValid),
+            });
+        },
+        [mode],
+    );
 
     const handleFormValidationChange = useCallback(
         (isValid: boolean) => {

@@ -554,7 +554,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                             disabled={isSubmitting || isFormDisabled}
                             data-testid="add-program-button"
                         >
-                            {PROGRAMS_TEXT.BUTTON.ADD_NEW_SECTION} <PlusIcon />
+                            {PROGRAMS_TEXT.BUTTON.ADD_SECTION} <PlusIcon />
                         </Button>
                     </div>
                 </div>

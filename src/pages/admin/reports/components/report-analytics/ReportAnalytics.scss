@@ -1,0 +1,41 @@
+/* LEGACY CSS */
+
+@use '@/assets/sass/variables/colors' as c;
+
+.category-bar.report-category-bar {
+    border-bottom: none;
+    margin-bottom: 75px;
+}
+
+.category-bar.report-category-bar .category-bar-button {
+    color: c.$blue-700;
+    padding: 1.875rem 0;
+    font-size: 32px;
+    margin-right: 1.875rem;
+    font-weight: 400;
+    position: relative;
+}
+
+.category-bar.report-category-bar .category-bar-button-selected {
+    color: c.$blue-700;
+    font-weight: 500;
+}
+
+.category-bar.report-category-bar .category-bar-button-text {
+    position: relative;
+    display: inline-block;
+}
+
+.category-bar.report-category-bar .category-bar-button-selected .category-bar-button-text::after {
+    display: none;
+}
+
+.category-bar.report-category-bar .category-bar-button-selected .category-bar-button-text::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -10px;
+    width: 100%;
+    height: 2px;
+    background-color: c.$blue-700;
+}

@@ -1,6 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { convertFileToBase64, ImageInput, getImageSrc } from './ImageInput';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { IMAGE_VALIDATION } from '@/const/admin/image';
 import { Image, ImageValues } from '@/types/common/image';
 import { IMAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/image-schema/image-schema';
 import { IMAGE_DIMENSION_VALIDATION_FUNCTIONS } from '@/validation/admin/image-dimension-schema/image-dimension-schema';
@@ -249,14 +250,20 @@ describe('ImageInput', () => {
         expect(onChangeMock).not.toHaveBeenCalled();
     });
 
-    it('does not call onChange for non-image file', () => {
+    it('shows format error and does not call onChange for invalid file format', async () => {
         const file = new File(['dummy content'], 'example.txt', { type: 'text/plain' });
+        mockImageValidate.mockResolvedValueOnce(IMAGE_VALIDATION.getFormatError());
+
         render(<ImageInput value={null} onChange={onChangeMock} setError={setErrorMock} />);
 
         const fileInput = screen.getByTestId('image-input-hidden');
 
         fireEvent.change(fileInput, {
             target: { files: [file] },
+        });
+
+        await waitFor(() => {
+            expect(setErrorMock).toHaveBeenCalledWith(IMAGE_VALIDATION.getFormatError());
         });
 
         expect(onChangeMock).not.toHaveBeenCalled();

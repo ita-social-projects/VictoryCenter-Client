@@ -13,6 +13,8 @@ import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html
 import { LocalizationLanguage } from '@/types/common/language';
 import { DEFAULT_LOCALE } from '@/const/common/locales';
 import { returnDisplayedLocalization } from '@/utils/functions/localization/localization';
+import { IconButton } from '@/components/admin/icon-button/IconButton';
+import { ACTION_ICONS } from '@/const/common/action-icons';
 
 export interface ImageSectionProps {
     content: Content[] | undefined;
@@ -21,6 +23,7 @@ export interface ImageSectionProps {
     rows?: number;
     onChange: (data: Content) => void;
     onPublish: () => void;
+    onTranslate: () => void;
     imageInputProps: Omit<ImageInputProps, 'className' | 'value' | 'onChange' | 'setError'>;
     isPublishButtonActive: boolean;
     language: LocalizationLanguage;
@@ -32,6 +35,7 @@ export const ImageSection = ({
     descriptionLimit,
     onChange,
     onPublish,
+    onTranslate,
     imageInputProps,
     isPublishButtonActive,
     language,
@@ -131,52 +135,64 @@ export const ImageSection = ({
             </div>
 
             <div className="content-wrapper">
-                {titleContent && (
-                    <div className="content-wrapper-title">
-                        <RichTextInputGroup
-                            key={`title-${language.code}`}
-                            label={COMMON_TEXT_ADMIN.TYPE.TITLE}
-                            value={displayedTitle ?? ''}
-                            onChange={handleTitleChange}
-                            name={COMMON_TEXT_ADMIN.TYPE.TITLE}
-                            id={titleContent.id.toString()}
-                            maxLength={titleLimit}
-                            onBlur={handleTitleBlur}
-                            error={isBaseLanguage ? (titleError ?? undefined) : undefined}
-                            disabled={!isBaseLanguage}
-                            hideToolbar={!isBaseLanguage}
-                        />
-                    </div>
-                )}
+                <div className="content-wrapper-buttons">
+                    <IconButton
+                        type="button"
+                        className="translate-btn"
+                        aria-label="Translate"
+                        onClick={onTranslate}
+                        DefaultIcon={ACTION_ICONS.translate.default}
+                        disabled={isPublishButtonActive}
+                    />
+                </div>
+                <div className="content-wrapper-fields">
+                    {titleContent && (
+                        <div className="content-wrapper-title">
+                            <RichTextInputGroup
+                                key={`title-${language.code}`}
+                                label={COMMON_TEXT_ADMIN.TYPE.TITLE}
+                                value={displayedTitle ?? ''}
+                                onChange={handleTitleChange}
+                                name={COMMON_TEXT_ADMIN.TYPE.TITLE}
+                                id={titleContent.id.toString()}
+                                maxLength={titleLimit}
+                                onBlur={handleTitleBlur}
+                                error={isBaseLanguage ? (titleError ?? undefined) : undefined}
+                                disabled={!isBaseLanguage}
+                                hideToolbar={!isBaseLanguage}
+                            />
+                        </div>
+                    )}
 
-                {descriptionContent && (
-                    <div className="content-wrapper-description">
-                        <RichTextInputGroup
-                            key={`description-${language.code}`}
-                            label={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
-                            onChange={handleDescriptionChange}
-                            value={displayedDescription ?? ''}
-                            maxLength={descriptionLimit}
-                            name={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
-                            id={descriptionContent.id.toString()}
-                            onBlur={handleDescriptionBlur}
-                            error={isBaseLanguage ? (descriptionError ?? undefined) : undefined}
-                            disabled={!isBaseLanguage}
-                            hideToolbar={!isBaseLanguage}
-                        />
-                    </div>
-                )}
-                {isBaseLanguage && (
-                    <Button
-                        className="button"
-                        buttonStyle="primary"
-                        onClick={onPublish}
-                        type="submit"
-                        disabled={!!imageError || !!descriptionError || !!titleError || !isPublishButtonActive}
-                    >
-                        {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
-                    </Button>
-                )}
+                    {descriptionContent && (
+                        <div className="content-wrapper-description">
+                            <RichTextInputGroup
+                                key={`description-${language.code}`}
+                                label={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
+                                onChange={handleDescriptionChange}
+                                value={displayedDescription ?? ''}
+                                maxLength={descriptionLimit}
+                                name={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
+                                id={descriptionContent.id.toString()}
+                                onBlur={handleDescriptionBlur}
+                                error={isBaseLanguage ? (descriptionError ?? undefined) : undefined}
+                                disabled={!isBaseLanguage}
+                                hideToolbar={!isBaseLanguage}
+                            />
+                        </div>
+                    )}
+                    {isBaseLanguage && (
+                        <Button
+                            className="button"
+                            buttonStyle="primary"
+                            onClick={onPublish}
+                            type="submit"
+                            disabled={!!imageError || !!descriptionError || !!titleError || !isPublishButtonActive}
+                        >
+                            {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
+                        </Button>
+                    )}
+                </div>
             </div>
         </div>
     );

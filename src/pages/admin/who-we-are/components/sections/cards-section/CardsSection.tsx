@@ -9,6 +9,8 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
 import { LocalizationLanguage } from '@/types/common/language';
 import { DEFAULT_LOCALE } from '@/const/common/locales';
+import { IconButton } from '@/components/admin/icon-button/IconButton';
+import { ACTION_ICONS } from '@/const/common/action-icons';
 
 export interface CardsSectionProps {
     content: Content[] | undefined;
@@ -18,6 +20,7 @@ export interface CardsSectionProps {
     cardImageConfigs: CardImageConfig[];
     titleText?: string;
     onPublish: () => void;
+    onTranslate: () => void;
     isPublishButtonActive: boolean;
     language: LocalizationLanguage;
 }
@@ -28,6 +31,7 @@ export const CardsSection = ({
     rows,
     onChange,
     onPublish,
+    onTranslate,
     cardImageConfigs,
     titleText,
     isPublishButtonActive,
@@ -77,6 +81,16 @@ export const CardsSection = ({
         <>
             <div className="cards-section-wrapper">
                 {titleText && <span className="cards-section-wrapper-title">{titleText}</span>}
+                <div className="cards-section-wrapper-buttons">
+                    <IconButton
+                        type="button"
+                        className="translate-btn"
+                        aria-label="Translate"
+                        onClick={onTranslate}
+                        DefaultIcon={ACTION_ICONS.translate.default}
+                        disabled={isPublishButtonActive}
+                    />
+                </div>
                 <div className="cards-section-wrapper-cards">
                     {cardContents.map((c: Content, index: number) => (
                         <CardContent

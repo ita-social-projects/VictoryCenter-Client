@@ -14,6 +14,8 @@ jest.mock('./SummaryCard.module.scss', () => ({
 }));
 
 describe('SummaryCard', () => {
+    const normalizeText = (value: string) => value.replaceAll('\u00A0', ' ').replaceAll(/\s+/g, ' ').trim();
+
     describe('when rendering a currency card', () => {
         it('should display the title', () => {
             render(<SummaryCard title="Зібрано коштів" uah={7265} usd={4200} />);
@@ -21,23 +23,19 @@ describe('SummaryCard', () => {
         });
 
         it('should display formatted UAH amount', () => {
-            render(<SummaryCard title="Зібрано коштів" uah={7265} usd={4200} />);
-            const uahElements = screen.getAllByText(
-                (text) =>
-                    text.replaceAll('\u00A0', ' ').includes('7') &&
-                    text.includes(FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.AMOUNT_SUFFIX_UAH),
+            const { container } = render(<SummaryCard title="Зібрано коштів" uah={7265} usd={4200} />);
+            const amountElements = container.querySelectorAll('.amount');
+            expect(normalizeText(amountElements[0]?.textContent ?? '')).toBe(
+                `7 265 ${FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.AMOUNT_SUFFIX_UAH}`,
             );
-            expect(uahElements.length).toBeGreaterThan(0);
         });
 
         it('should display formatted USD amount', () => {
-            render(<SummaryCard title="Зібрано коштів" uah={7265} usd={4200} />);
-            const usdElements = screen.getAllByText(
-                (text) =>
-                    text.replaceAll('\u00A0', ' ').includes('4') &&
-                    text.includes(FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.AMOUNT_SUFFIX_USD),
+            const { container } = render(<SummaryCard title="Зібрано коштів" uah={7265} usd={4200} />);
+            const amountElements = container.querySelectorAll('.amount');
+            expect(normalizeText(amountElements[1]?.textContent ?? '')).toBe(
+                `4 200 ${FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.AMOUNT_SUFFIX_USD}`,
             );
-            expect(usdElements.length).toBeGreaterThan(0);
         });
 
         it('should not apply blueTheme class by default', () => {

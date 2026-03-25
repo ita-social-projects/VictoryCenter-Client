@@ -1,5 +1,6 @@
 import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
 import { getUkrainianPlural } from '@/utils/functions/get-ukrainian-plural/get-ukrainian-plural';
+import { formatSummaryAmount } from '@/utils/functions/format-summary-amount/format-summary-amount';
 import cn from 'classnames';
 import styles from './SummaryCard.module.scss';
 
@@ -25,10 +26,10 @@ export const SummaryCard = ({ title, uah, usd, count, blueThemeCard = false }: S
             ) : (
                 <div className={styles.amounts}>
                     <span className={styles.amount}>
-                        {uah?.toLocaleString('uk-UA')}&nbsp;{FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.AMOUNT_SUFFIX_UAH}
+                        {formatSummaryAmount(uah)}&nbsp;{FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.AMOUNT_SUFFIX_UAH}
                     </span>
                     <span className={styles.amount}>
-                        {usd?.toLocaleString('uk-UA')}&nbsp;{FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.AMOUNT_SUFFIX_USD}
+                        {formatSummaryAmount(usd)}&nbsp;{FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.AMOUNT_SUFFIX_USD}
                     </span>
                 </div>
             )}

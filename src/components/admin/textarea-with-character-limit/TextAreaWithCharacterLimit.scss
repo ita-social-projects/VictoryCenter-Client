@@ -26,7 +26,6 @@
 
     &__field {
         flex: 1;
-        padding: 0;
         border: none;
         outline: none;
         resize: none;
@@ -38,7 +37,7 @@
         line-height: 1.75rem;
         letter-spacing: -0.0225rem;
         padding: 0.625rem 2.5rem 0.625rem 0.875rem;
-        overflow: hidden;
+        overflow-y: auto;
 
         &::placeholder {
             color: colors.$grey-700;

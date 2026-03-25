@@ -80,21 +80,8 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
 
             textarea.style.height = 'auto';
             textarea.style.height = `${Math.min(textarea.scrollHeight, maxHeight)}px`;
+            textarea.style.overflowY = textarea.scrollHeight > maxHeight ? 'auto' : 'hidden';
         }, [value, autoGrow, maxRows, textareaRef]);
-
-        const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-            if (!autoGrow) return;
-
-            const textarea = e.currentTarget;
-            const parsedLineHeight = parseInt(window.getComputedStyle(textarea).lineHeight, 10);
-
-            if (isNaN(parsedLineHeight)) return;
-
-            const maxHeight = parsedLineHeight * maxRows;
-
-            textarea.style.height = 'auto';
-            textarea.style.height = `${Math.min(textarea.scrollHeight, maxHeight)}px`;
-        };
 
         return (
             <div className="char-limit-textarea">
@@ -109,7 +96,6 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
                         className="char-limit-textarea__field"
                         value={value ?? ''}
                         onChange={handleChange}
-                        onInput={handleInput}
                         onFocus={handleFocus}
                         onBlur={handleBlur}
                         onKeyDown={onKeyDown}

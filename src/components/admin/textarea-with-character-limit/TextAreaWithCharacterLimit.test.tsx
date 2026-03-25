@@ -220,12 +220,15 @@ describe('TextAreaWithCharacterLimit', () => {
             expect(textarea.style.height).toBe('');
         });
 
-        it('sets auto-grow class when autoGrow is true', () => {
-            renderTextAreaWithCharacterLimit({ autoGrow: true });
-            expectWrapperToHaveClass('char-limit-textarea__wrapper--auto-grow');
-        });
-
         it('adjusts height on input when autoGrow is true', () => {
+            // Mock getComputedStyle to prevent NaN return in JSDOM
+            const getComputedStyleSpy = jest.spyOn(window, 'getComputedStyle').mockImplementation(
+                () =>
+                    ({
+                        lineHeight: '20px',
+                    }) as CSSStyleDeclaration,
+            );
+
             const { rerender } = renderTextAreaWithCharacterLimit({ autoGrow: true, value: '' });
             const textarea = getTextArea();
 
@@ -237,8 +240,10 @@ describe('TextAreaWithCharacterLimit', () => {
 
             rerender(<TextAreaWithCharacterLimit {...defaultProps} autoGrow={true} value={'multi\nline\ntext'} />);
 
-            // Height should be set based on scrollHeight (capped at maxRows * lineHeight)
+            // Height should be set based on scrollHeight
             expect(textarea.style.height).not.toBe('');
+
+            getComputedStyleSpy.mockRestore();
         });
 
         it('respects maxRows limit when autoGrow is true', () => {

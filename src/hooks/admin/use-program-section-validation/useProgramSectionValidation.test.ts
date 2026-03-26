@@ -3,7 +3,7 @@ import type React from 'react';
 
 import { useProgramSectionValidation } from './useProgramSectionValidation';
 
-import { PROGRAM_SECTION_TEMPLATE_VALIDATION, PROGRAM_SECTION_VALIDATION } from '@/const/admin/programs';
+import { PROGRAM_SECTION_TEMPLATE_VALIDATION } from '@/const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ProgramSectionTemplate } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
@@ -58,7 +58,7 @@ describe('useProgramSectionValidation', () => {
                 result.current.handleTitleBlur(createBlurEvent(value));
             });
 
-            expect(result.current.titleError).toBe(PROGRAM_SECTION_VALIDATION.title.getRequiredError());
+            expect(result.current.titleError).toBe(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED);
         });
 
         it('should not show error when title is valid (draft)', () => {
@@ -181,7 +181,7 @@ describe('useProgramSectionValidation', () => {
                 result.current.handleDescriptionBlur(createTextAreaBlurEvent(value));
             });
 
-            expect(result.current.descriptionError).toBe(PROGRAM_SECTION_VALIDATION.description.getRequiredError());
+            expect(result.current.descriptionError).toBe(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED);
         });
 
         it('should show min error for short but non-empty description in draft mode', () => {

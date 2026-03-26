@@ -1,8 +1,4 @@
-import {
-    PROGRAM_VALIDATION,
-    PROGRAM_SECTION_VALIDATION,
-    PROGRAM_SECTION_TEMPLATE_VALIDATION,
-} from '@/const/admin/programs';
+import { PROGRAM_VALIDATION, PROGRAM_SECTION_TEMPLATE_VALIDATION } from '@/const/admin/programs';
 import { FAQ_VALIDATION } from '@/const/admin/faq';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ProgramCategory } from '@/types/admin/programs';
@@ -66,29 +62,10 @@ const getTextValue = (content: SectionContent): string | undefined => {
     }
 };
 
-const getRequiredMessage = (type: ContentType): string => {
-    const v = PROGRAM_SECTION_VALIDATION as any;
-
-    switch (type) {
-        case ContentType.Title:
-            return v?.title?.getRequiredError?.() ?? COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED;
-        case ContentType.Description:
-            return v?.description?.getRequiredError?.() ?? COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED;
-        case ContentType.Author:
-            return (
-                v?.author?.getRequiredError?.() ??
-                v?.cardAuthor?.getRequiredError?.() ??
-                COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED
-            );
-        default:
-            return COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED;
-    }
-};
-
 const createTemplateTextSchema = (type: ContentType) =>
     Yup.string()
         .trim()
-        .required(getRequiredMessage(type))
+        .required(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED)
         .test('template-length', function (value) {
             const ctx = (this.options.context ?? {}) as ProgramValidationContext & { template?: SectionTemplate };
             const template = ctx.template;

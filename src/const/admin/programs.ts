@@ -310,18 +310,6 @@ export const PROGRAM_CATEGORY_VALIDATION = {
     },
 };
 
-export const PROGRAM_SECTION_VALIDATION = {
-    title: {
-        getRequiredError: () => "Заголовок обов'язковий",
-    },
-    description: {
-        getRequiredError: () => "Опис обов'язковий",
-    },
-    author: {
-        getRequiredError: () => "Ім'я обов'язкове",
-    },
-} as const;
-
 const createSingleImageTemplateValidation = () =>
     ({
         counts: {

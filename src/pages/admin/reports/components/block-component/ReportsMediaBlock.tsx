@@ -6,6 +6,7 @@ import { REPORTS_TEXT } from '@/const/admin/reports';
 import { ImageInput } from '@/components/admin/image-input/ImageInput';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
+import './ReportsMediaBlock.scss';
 
 export interface ReportsMediaBlockValues {
     title: string;
@@ -123,6 +124,7 @@ export const ReportsMediaBlock = ({
                             error={errors.title}
                             rows={1}
                             isRequired={true}
+                            errorCounterContainerClassName={styles['error-counter']}
                         />
                     </div>
 
@@ -139,6 +141,7 @@ export const ReportsMediaBlock = ({
                             error={errors.totalAmount}
                             rows={1}
                             isRequired={true}
+                            errorCounterContainerClassName={styles['error-counter']}
                         />
                     </div>
                 </div>
@@ -166,7 +169,9 @@ export const ReportsMediaBlock = ({
                                 backgroundRepeat: 'no-repeat',
                             }}
                         />
-                        <InputError error={errors.image} />
+                        <div className={styles['image-error']}>
+                            <InputError error={errors.image} />
+                        </div>
                     </div>
                 </div>
             </div>

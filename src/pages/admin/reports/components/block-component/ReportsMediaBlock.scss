@@ -1,0 +1,13 @@
+@use '@/assets/sass/variables/colors' as c;
+
+.char-limit-textarea__field {
+    &:disabled {
+        cursor: not-allowed;
+    }
+}
+
+.char-limit-textarea__wrapper {
+    &--error {
+        border-color: c.$error;
+    }
+}

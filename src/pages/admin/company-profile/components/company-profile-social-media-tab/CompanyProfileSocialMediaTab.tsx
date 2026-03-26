@@ -4,7 +4,8 @@ import { COMPANY_PROFILE_TEXT } from '@/const/admin/company-profile';
 import styles from './CompanyProfileSocialMediaTab.module.scss';
 import { useMemo } from 'react';
 import { SingleSelectInput } from '@/components/common/single-select-input/SingleSelectInput';
-import { ReactComponent as DeleteIcon } from '@/assets/icons/delete.svg';
+import { IconButton } from '@/components/admin/icon-button/IconButton';
+import { ACTION_ICONS } from '@/const/common/action-icons';
 import { ButtonTooltip } from '@/components/admin/button-tooltip/ButtonTooltip';
 import { CompanyProfileFormValues, SocialPlatform } from '@/types/admin/company-profile';
 
@@ -115,15 +116,15 @@ export const CompanyProfileSocialMediaTab = ({ disabled }: CompanyProfileSocialM
                             </div>
 
                             <div className={styles['social-media-contact-actions']}>
-                                <button
+                                <IconButton
                                     type="button"
                                     className={styles['social-media-contact-icon-btn']}
                                     onClick={() => remove(index)}
                                     aria-label="Delete social contact"
                                     disabled={disabled}
-                                >
-                                    <DeleteIcon />
-                                </button>
+                                    DefaultIcon={ACTION_ICONS.delete.default}
+                                    FilledIcon={ACTION_ICONS.delete.hover}
+                                />
                             </div>
                         </div>
 

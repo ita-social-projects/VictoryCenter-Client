@@ -66,23 +66,9 @@
 }
 
 .social-media-contact-icon-btn {
-    width: 24px;
-    height: 24px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: transparent;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-}
-
-.social-media-contact-icon-btn:disabled {
-    cursor: default;
-    opacity: 0.6;
-}
-
-.social-media-contact-icon-btn svg {
-    width: 29px;
-    height: 29px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  background: transparent;
 }

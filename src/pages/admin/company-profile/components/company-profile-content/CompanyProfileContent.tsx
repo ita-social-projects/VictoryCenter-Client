@@ -31,8 +31,8 @@ const TABS: TabItem[] = [
 
 export const CompanyProfileContent = () => {
     const client = useAdminClient();
-    const [isLoading, setIsLoading] = useState(false);
-    const [loadError, setLoadError] = useState<unknown | null>(null);
+    const [_isLoading, setIsLoading] = useState(false);
+    const [_loadError, setLoadError] = useState<unknown | null>(null);
     const [activeTab, setActiveTab] = useState<TabType>('profile');
     const [isEditMode, setIsEditMode] = useState(false);
     const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);

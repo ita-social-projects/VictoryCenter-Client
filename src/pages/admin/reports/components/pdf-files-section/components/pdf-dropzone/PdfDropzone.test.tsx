@@ -2,6 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { PdfDropzone } from './PdfDropzone';
 import { PdfReportsApi } from '@/services/api/admin/reports/pdf-reports/pdf-reports-api';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { AxiosError } from 'axios';
 import { PDF_FILES_SECTION_TEXT } from '@/const/admin/reports';
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient');
@@ -15,7 +16,7 @@ jest.mock('@/assets/icons/add.svg', () => ({
 
 describe('PdfDropzone', () => {
     const mockClient = { get: jest.fn() };
-    const mockOnUploaded = jest.fn();
+    let mockOnUploaded: jest.Mock;
     const mockFile = new File(['content'], 'test.pdf', { type: 'application/pdf' });
     const mockResult = { id: 1, name: 'test.pdf' };
 
@@ -23,6 +24,7 @@ describe('PdfDropzone', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
+        mockOnUploaded = jest.fn();
         (useAdminClient as jest.Mock).mockReturnValue(mockClient);
     });
 
@@ -122,5 +124,71 @@ describe('PdfDropzone', () => {
             expect(screen.queryByText(PDF_FILES_SECTION_TEXT.DROPZONE.UPLOADING)).not.toBeInTheDocument();
             expect(screen.getByText(PDF_FILES_SECTION_TEXT.DROPZONE.TITLE)).toBeInTheDocument();
         });
+    });
+
+    it('should show error for file exceeding 10 MB size', async () => {
+        const largeFile = new File(['x'.repeat(11 * 1024 * 1024)], 'large.pdf', { type: 'application/pdf' });
+
+        const { container } = render(<PdfDropzone onUploaded={mockOnUploaded} />);
+
+        fireEvent.change(getInput(container), { target: { files: [largeFile] } });
+
+        expect(await screen.findByText(PDF_FILES_SECTION_TEXT.DROPZONE.ERROR_FILE_TOO_LARGE)).toBeInTheDocument();
+        expect(PdfReportsApi.create).not.toHaveBeenCalled();
+    });
+
+    it('should extract backend validation error message (array format)', async () => {
+        const backendError = {
+            response: {
+                data: {
+                    errors: ['File size cannot exceed 10 MB'],
+                },
+            },
+        } as unknown as AxiosError;
+
+        (PdfReportsApi.create as jest.Mock).mockRejectedValueOnce(backendError);
+
+        const { container } = render(<PdfDropzone onUploaded={mockOnUploaded} />);
+
+        fireEvent.change(getInput(container), { target: { files: [mockFile] } });
+
+        expect(await screen.findByText('File size cannot exceed 10 MB')).toBeInTheDocument();
+        expect(mockOnUploaded).not.toHaveBeenCalled();
+    });
+
+    it('should extract backend validation error message (string format)', async () => {
+        const backendError = {
+            response: {
+                data: {
+                    errors: 'File size cannot exceed 10 MB',
+                },
+            },
+        } as unknown as AxiosError;
+
+        (PdfReportsApi.create as jest.Mock).mockRejectedValueOnce(backendError);
+
+        const { container } = render(<PdfDropzone onUploaded={mockOnUploaded} />);
+
+        fireEvent.change(getInput(container), { target: { files: [mockFile] } });
+
+        expect(await screen.findByText('File size cannot exceed 10 MB')).toBeInTheDocument();
+        expect(mockOnUploaded).not.toHaveBeenCalled();
+    });
+
+    it('should fallback to generic error message if backend error is not parseable', async () => {
+        const backendError = {
+            response: {
+                data: {},
+            },
+        } as unknown as AxiosError;
+
+        (PdfReportsApi.create as jest.Mock).mockRejectedValueOnce(backendError);
+
+        const { container } = render(<PdfDropzone onUploaded={mockOnUploaded} />);
+
+        fireEvent.change(getInput(container), { target: { files: [mockFile] } });
+
+        expect(await screen.findByText(PDF_FILES_SECTION_TEXT.DROPZONE.ERROR_UPLOAD_FAILED)).toBeInTheDocument();
+        expect(mockOnUploaded).not.toHaveBeenCalled();
     });
 });

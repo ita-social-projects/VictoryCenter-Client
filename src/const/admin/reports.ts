@@ -67,6 +67,7 @@ export const REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION = {
 };
 
 export const PDF_FILES_SECTION_VALIDATION = {
+    max_file_size_bytes: 10 * 1024 * 1024,
     title: {
         min: 2,
         max: 30,
@@ -108,6 +109,7 @@ export const PDF_FILES_SECTION_TEXT = {
         UPLOADING: 'Завантаження...',
         SUBTITLE: 'Тільки формат pdf',
         ERROR_INVALID_FORMAT: 'Дозволено лише PDF формат',
+        ERROR_FILE_TOO_LARGE: 'Розмір файлу не повинен перевищувати 10 МБ',
         ERROR_UPLOAD_FAILED: 'Помилка при завантаженні файлу. Спробуйте ще раз.',
     },
     ACTIONS: {

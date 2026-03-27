@@ -1,0 +1,25 @@
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
+
+.requisites-tab-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 660px;
+    max-width: 660px;
+}
+
+.form-row {
+    width: 100%;
+}
+
+.requisites-tab-title {
+    @include type.h4-semibold;
+    color: c.$blue-900;
+}
+
+.requisites-tab-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}

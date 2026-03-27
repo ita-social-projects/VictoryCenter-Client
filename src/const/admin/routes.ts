@@ -28,6 +28,10 @@ export const ADMIN_ROUTES = {
         PATH: 'partners',
         FULL: '/admin-panel/partners',
     },
+    PROFILE_COMPANY: {
+        PATH: 'company-profile',
+        FULL: '/admin-panel/company-profile',
+    },
     REPORTS: {
         PATH: 'reports',
         FULL: '/admin-panel/reports',

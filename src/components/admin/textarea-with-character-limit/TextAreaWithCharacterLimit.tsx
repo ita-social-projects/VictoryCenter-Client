@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import React, { forwardRef, useCallback, useEffect, useRef } from 'react';
 import cn from 'classnames';
 import { ReactComponent as RemoveIcon } from '@/assets/icons/remove-query.svg';
 import { useInputWithCharacterLimit } from '@/hooks/admin/use-input-with-character-limit/useInputWithCharacterLimit';
@@ -19,6 +19,8 @@ export interface TextAreaWithCharacterLimitProps {
     hasError?: boolean;
     maxLimitWarning?: string;
     onWarningChange?: (warning: string | null) => void;
+    autoGrow?: boolean;
+    maxRows?: number;
 }
 
 export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAreaWithCharacterLimitProps>(
@@ -38,9 +40,25 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
             hasError = false,
             maxLimitWarning,
             onWarningChange,
+            autoGrow = false,
+            maxRows = 10,
         },
         ref,
     ) => {
+        const internalRef = useRef<HTMLTextAreaElement>(null);
+
+        const setTextareaRef = useCallback(
+            (node: HTMLTextAreaElement | null) => {
+                internalRef.current = node;
+                if (typeof ref === 'function') {
+                    ref(node);
+                } else if (ref) {
+                    ref.current = node;
+                }
+            },
+            [ref],
+        );
+
         const { isFocused, localWarning, showClearButton, handleChange, handleFocus, handleBlur, handleClear } =
             useInputWithCharacterLimit<HTMLTextAreaElement>({
                 value,
@@ -55,6 +73,23 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
                 onWarningChange,
             });
 
+        useEffect(() => {
+            const textarea = internalRef.current;
+            if (!autoGrow || !textarea) {
+                return;
+            }
+
+            const parsedLineHeight = Number.parseInt(globalThis.getComputedStyle(textarea).lineHeight, 10);
+
+            if (Number.isNaN(parsedLineHeight)) return;
+
+            const maxHeight = parsedLineHeight * maxRows;
+
+            textarea.style.height = 'auto';
+            textarea.style.height = `${Math.min(textarea.scrollHeight, maxHeight)}px`;
+            textarea.style.overflowY = textarea.scrollHeight > maxHeight ? 'auto' : 'hidden';
+        }, [value, autoGrow, maxRows]);
+
         return (
             <div className="char-limit-textarea">
                 <div
@@ -65,7 +100,7 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
                     })}
                 >
                     <textarea
-                        ref={ref}
+                        ref={setTextareaRef}
                         className="char-limit-textarea__field"
                         value={value ?? ''}
                         onChange={handleChange}

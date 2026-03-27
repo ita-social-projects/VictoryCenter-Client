@@ -613,6 +613,8 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
                                     PROGRAM_VALIDATION.name.max,
                                 )}
+                                autoGrow={true}
+                                maxRows={12}
                             />
 
                             <InputWithCharacterLimitGroup
@@ -674,6 +676,8 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
                                     PROGRAM_VALIDATION.description.max,
                                 )}
+                                autoGrow={true}
+                                maxRows={16}
                             />
 
                             <PhotoInputGroup

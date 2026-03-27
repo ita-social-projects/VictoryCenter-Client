@@ -38,6 +38,8 @@ export const TextAreaWithCharacterLimitGroup = ({
     maxLimitWarning,
     isWhiteLabel,
     errorCounterContainerClassName,
+    autoGrow,
+    maxRows,
 }: TextAreaWithCharacterLimitGroupProps) => {
     const [localWarning, setLocalWarning] = useState<string | null>(null);
     const counterId = `${id}-character-count`;
@@ -59,6 +61,8 @@ export const TextAreaWithCharacterLimitGroup = ({
                 hasError={!!error || !!localWarning}
                 maxLimitWarning={maxLimitWarning}
                 onWarningChange={setLocalWarning}
+                autoGrow={autoGrow}
+                maxRows={maxRows}
             />
             <InputErrorWithCharacterCounter
                 error={localWarning || error}

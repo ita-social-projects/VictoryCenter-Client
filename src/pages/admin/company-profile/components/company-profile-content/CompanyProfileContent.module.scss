@@ -1,0 +1,81 @@
+@use '@/assets/sass/variables/colors' as c;
+
+.wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.toolbar {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 54px 54px 0 54px;
+    border-bottom: 1px solid c.$grey-600;
+}
+
+.toolbar-top {
+    height: 54px;
+}
+
+.toolbar-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    width: 100%;
+}
+
+.tabs-wrapper {
+    margin-bottom: -1px;
+    flex: 1;
+    display: flex;
+    align-items: flex-end;
+}
+
+.tabs-wrapper-disabled {
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.toolbar-actions {
+    display: flex;
+    flex-shrink: 0;
+    align-items: stretch;
+    margin-bottom: -1px;
+}
+
+.main-content {
+    background-color: c.$white;
+    border-radius: 16px;
+    padding: 20px 32px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.company-form {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.tab-content {
+    width: 660px;
+}
+
+@media (max-width: 1400px) {
+    .toolbar {
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+}
+
+@media (max-height: 800px) {
+    .main-content {
+        margin: 24px 54px;
+        padding: 20px;
+    }
+}

@@ -68,16 +68,13 @@ export const CompanyProfileContent = () => {
     useEffect(() => {
         let mounted = true;
 
-        (async () => {
-            try {
-                const { profile, languages } = await CompanyProfileApi.get(client);
-                if (!mounted) return;
+        const loadProfile = async () => {
+            const { profile, languages } = await CompanyProfileApi.get(client);
+            if (!mounted) return;
+            methods.reset(mapCompanyProfileToFormValues(profile, languages));
+        };
 
-                methods.reset(mapCompanyProfileToFormValues(profile, languages));
-            } catch (e) {
-                if (!mounted) return;
-            }
-        })();
+        void loadProfile();
 
         return () => {
             mounted = false;

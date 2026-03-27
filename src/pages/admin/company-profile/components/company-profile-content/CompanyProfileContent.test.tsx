@@ -1,7 +1,9 @@
 import React from 'react';
 import '@testing-library/jest-dom';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { CompanyProfileContent } from './CompanyProfileContent';
+import { CompanyProfileApi } from '@/services/api/admin/company-profile/company-profile-api';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 
 jest.mock('@/components/admin/toast/toast-container/ToastContainer', () => ({
     ToastContainer: () => <div data-testid="toast-container" />,
@@ -25,6 +27,14 @@ jest.mock('../company-profile-social-media-tab/CompanyProfileSocialMediaTab', ()
     CompanyProfileSocialMediaTab: (props: any) => (
         <div data-testid="tab-socials" data-disabled={String(props.disabled)} />
     ),
+}));
+
+jest.mock('@/services/api/admin/company-profile/company-profile-api', () => ({
+    CompanyProfileApi: { get: jest.fn() },
+}));
+
+jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
+    useAdminClient: jest.fn(),
 }));
 
 jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
@@ -76,6 +86,8 @@ jest.mock('../company-profile-toolbar/CompanyProfileToolbar', () => ({
 
 const mockOnConfirm = jest.fn();
 const mockOnCancel = jest.fn();
+const mockedGet = CompanyProfileApi.get as jest.Mock;
+const mockedUseAdminClient = useAdminClient as jest.Mock;
 
 jest.mock('../company-profile-cancel-modal/CompanyProfileCancelModal', () => ({
     CompanyProfileCancelModal: ({ isOpen, onConfirm, onCancel }: any) =>
@@ -106,6 +118,25 @@ jest.mock('../company-profile-cancel-modal/CompanyProfileCancelModal', () => ({
 describe('CompanyProfileContent', () => {
     beforeEach(() => {
         jest.clearAllMocks();
+        mockedUseAdminClient.mockReturnValue({ client: 'mock-client' });
+        mockedGet.mockResolvedValue({
+            profile: {
+                id: 1,
+                contact: {
+                    id: 1,
+                    profileId: 1,
+                    phone: '',
+                    address: '',
+                    email: '',
+                    correspondenceEmail: '',
+                    motto: '',
+                    localizations: [],
+                },
+                requisite: { id: 1, profileId: 1, recipient: '', edrpou: '12345678', address: '', localizations: [] },
+                socialLinks: [],
+            },
+            languages: [],
+        });
     });
 
     it('renders default tab (profile) and allows tab switching in view mode', () => {
@@ -133,5 +164,13 @@ describe('CompanyProfileContent', () => {
         fireEvent.click(screen.getByTestId('edit-btn'));
         fireEvent.click(screen.getByTestId('cancel-btn'));
         expect(screen.getByTestId('edit-btn')).toBeInTheDocument();
+    });
+
+    it('calls CompanyProfileApi.get on mount', async () => {
+        render(<CompanyProfileContent />);
+
+        await waitFor(() => {
+            expect(mockedGet).toHaveBeenCalledTimes(1);
+        });
     });
 });

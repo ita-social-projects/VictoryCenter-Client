@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import cn from 'classnames';
 import { CategoryBar } from '@/components/admin/category-bar/CategoryBar';
@@ -12,6 +12,9 @@ import { CompanyProfileCancelModal } from '../company-profile-cancel-modal/Compa
 import styles from './CompanyProfileContent.module.scss';
 import { COMPANY_PROFILE_TEXT } from '@/const/admin/company-profile';
 import { COMPANY_PROFILE_FORM_DEFAULTS, CompanyProfileFormValues } from '@/types/admin/company-profile';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { CompanyProfileApi } from '@/services/api/admin/company-profile/company-profile-api';
+import { mapCompanyProfileToFormValues } from '@/utils/functions/mappers/admin/company-profile/company-profile-mappers';
 
 type TabType = 'profile' | 'requisites' | 'socials';
 
@@ -27,6 +30,7 @@ const TABS: TabItem[] = [
 ];
 
 export const CompanyProfileContent = () => {
+    const client = useAdminClient();
     const [activeTab, setActiveTab] = useState<TabType>('profile');
     const [isEditMode, setIsEditMode] = useState(false);
     const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
@@ -60,6 +64,22 @@ export const CompanyProfileContent = () => {
     };
 
     const selectedTab = TABS.find((tab) => tab.id === activeTab) || TABS[0];
+
+    useEffect(() => {
+        let mounted = true;
+
+        const loadProfile = async () => {
+            const { profile, languages } = await CompanyProfileApi.get(client);
+            if (!mounted) return;
+            methods.reset(mapCompanyProfileToFormValues(profile, languages));
+        };
+
+        void loadProfile();
+
+        return () => {
+            mounted = false;
+        };
+    }, [client, methods]);
 
     return (
         <div className={styles.wrapper}>

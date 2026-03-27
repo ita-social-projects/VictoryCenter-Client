@@ -17,6 +17,7 @@ export interface TextAreaWithCharacterLimitGroupProps extends TextAreaWithCharac
     currentLength?: number;
     maxLimitWarning?: string;
     isWhiteLabel?: boolean;
+    errorCounterContainerClassName?: string;
 }
 
 export const TextAreaWithCharacterLimitGroup = ({
@@ -36,6 +37,7 @@ export const TextAreaWithCharacterLimitGroup = ({
     className,
     maxLimitWarning,
     isWhiteLabel,
+    errorCounterContainerClassName,
     autoGrow,
     maxRows,
 }: TextAreaWithCharacterLimitGroupProps) => {
@@ -69,6 +71,7 @@ export const TextAreaWithCharacterLimitGroup = ({
                 htmlFor={id}
                 value={value}
                 isWhiteLabel={isWhiteLabel}
+                containerClassName={errorCounterContainerClassName}
             />
         </div>
     );

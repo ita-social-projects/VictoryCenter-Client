@@ -96,6 +96,7 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
                     className={cn('char-limit-textarea__wrapper', {
                         'char-limit-textarea__wrapper--disabled': disabled,
                         'char-limit-textarea__wrapper--focused': isFocused && !disabled,
+                        'char-limit-textarea__wrapper--error': hasError || !!localWarning,
                     })}
                 >
                     <textarea

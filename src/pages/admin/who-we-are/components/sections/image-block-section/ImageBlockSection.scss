@@ -12,7 +12,7 @@
     .content-wrapper {
         width: 38rem;
 
-        &-fields { 
+        &-fields {
             display: flex;
             flex-direction: column;
             gap: 1.5rem;
@@ -57,7 +57,7 @@
             display: flex;
             justify-content: flex-end;
             width: 100%;
-            
+
             .translate-btn {
                 width: 1.5rem;
                 height: 1.5rem;

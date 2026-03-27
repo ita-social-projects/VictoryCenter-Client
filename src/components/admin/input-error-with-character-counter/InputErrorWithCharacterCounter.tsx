@@ -9,6 +9,7 @@ export interface InputErrorWithCharacterCounterProps {
     htmlFor: string;
     value: string;
     isWhiteLabel?: boolean;
+    containerClassName?: string;
 }
 
 export const InputErrorWithCharacterCounter = ({
@@ -18,10 +19,11 @@ export const InputErrorWithCharacterCounter = ({
     htmlFor,
     value,
     isWhiteLabel,
+    containerClassName,
 }: InputErrorWithCharacterCounterProps) => {
     const normalizedLength = getNormalizedInputText(value).length;
     return (
-        <div className={styles.container}>
+        <div className={cn(styles.container, containerClassName)}>
             <div className={styles['error-section']}>{error || ''}</div>
             <div className={cn(styles['counter-section'], { [styles['white-label']]: isWhiteLabel })}>
                 <output id={counterId} htmlFor={htmlFor}>

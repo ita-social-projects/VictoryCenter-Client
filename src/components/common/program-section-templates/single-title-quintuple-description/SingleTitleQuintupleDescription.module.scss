@@ -4,7 +4,6 @@
 @import '../shared/BaseSectionTemplate.module.scss';
 
 $card-width: 432px;
-$card-height: 211px;
 
 $title-input-height: 68px;
 
@@ -186,7 +185,7 @@ $desc-input-height: 115px;
 
 .description-card {
     width: $card-width;
-    height: $card-height;
+    height: auto;
     background-color: c.$light-blue-50;
     border-radius: 20px;
     padding: 14px 24px 12px 24px;

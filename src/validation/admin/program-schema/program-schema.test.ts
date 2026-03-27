@@ -15,7 +15,7 @@ const T_IMG_REQ_UNDEF = 91007 as any;
 const T_LEN_IMAGE = 91008 as any;
 const T_IMG_SORT = 91009 as any;
 
-const loadSchema = (over?: { programValidation?: any; sectionValidation?: any; templateValidation?: any }) => {
+const loadSchema = (over?: { programValidation?: any; templateValidation?: any }) => {
     jest.resetModules();
 
     jest.doMock('@/const/admin/common', () => ({
@@ -40,14 +40,6 @@ const loadSchema = (over?: { programValidation?: any; sectionValidation?: any; t
             meetingCount: { max: 20, getRequiredWhenPublishingError: () => 'mc required' },
             images: { maxSizeMB: 1 },
             ...(over?.programValidation ?? {}),
-        };
-
-        const sv = {
-            title: { getRequiredError: () => 'title required' },
-            description: { getRequiredError: () => 'description required' },
-            author: { getRequiredError: () => 'author required' },
-            cardAuthor: { getRequiredError: () => 'card author required' },
-            ...(over?.sectionValidation ?? {}),
         };
 
         const tv: any = {
@@ -213,7 +205,6 @@ const loadSchema = (over?: { programValidation?: any; sectionValidation?: any; t
 
         return {
             PROGRAM_VALIDATION: pv,
-            PROGRAM_SECTION_VALIDATION: sv,
             PROGRAM_SECTION_TEMPLATE_VALIDATION: tv,
         };
     });
@@ -653,7 +644,7 @@ describe('program-schema.ts coverage (templates are bottom-only)', () => {
         const m = loadSchema();
         expect(
             m.PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateSectionTitle('', true, ProgramSectionTemplate.TextOnly),
-        ).toBe('title required');
+        ).toBe('required');
     });
 
     it('PROGRAM_SECTION_VALIDATION_FUNCTIONS: validateSectionDescription returns max error', () => {
@@ -679,40 +670,12 @@ describe('program-schema.ts coverage (templates are bottom-only)', () => {
 });
 
 describe('program-schema.ts required-message fallbacks', () => {
-    it('author required uses cardAuthor when author is missing', () => {
-        const m = loadSchema({
-            sectionValidation: { author: undefined, cardAuthor: { getRequiredError: () => 'card author required' } },
-        });
+    it('content required uses FIELD_REQUIRED by default', () => {
+        const m = loadSchema();
         expect(
             m.PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateContentText(
                 '',
                 ContentType.Author,
-                true,
-                ProgramSectionTemplate.TextOnly,
-            ),
-        ).toBe('card author required');
-    });
-
-    it('author required falls back to FIELD_REQUIRED when author and cardAuthor are missing', () => {
-        const m = loadSchema({ sectionValidation: { author: undefined, cardAuthor: undefined } });
-        expect(
-            m.PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateContentText(
-                '',
-                ContentType.Author,
-                true,
-                ProgramSectionTemplate.TextOnly,
-            ),
-        ).toBe('required');
-    });
-
-    it('unknown content type required falls back to FIELD_REQUIRED', () => {
-        const m = loadSchema({
-            sectionValidation: { title: undefined, description: undefined, author: undefined, cardAuthor: undefined },
-        });
-        expect(
-            m.PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateContentText(
-                '',
-                999 as any,
                 true,
                 ProgramSectionTemplate.TextOnly,
             ),

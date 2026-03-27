@@ -135,6 +135,8 @@ export const SingleTitleQuintupleDescription = ({
                                 onChange={(e) => onDescriptionsChange?.(index, e.target.value)}
                                 maxLength={descriptionMaxLength}
                                 rows={4}
+                                autoGrow={true}
+                                maxRows={16}
                                 error={errors.descriptions[index]}
                                 onBlur={() => handleDescriptionBlur(index)}
                                 maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(descriptionMaxLength)}

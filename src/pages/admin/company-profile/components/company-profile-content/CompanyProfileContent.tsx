@@ -31,8 +31,6 @@ const TABS: TabItem[] = [
 
 export const CompanyProfileContent = () => {
     const client = useAdminClient();
-    const [_isLoading, setIsLoading] = useState(false);
-    const [_loadError, setLoadError] = useState<unknown | null>(null);
     const [activeTab, setActiveTab] = useState<TabType>('profile');
     const [isEditMode, setIsEditMode] = useState(false);
     const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
@@ -71,9 +69,6 @@ export const CompanyProfileContent = () => {
         let mounted = true;
 
         (async () => {
-            setIsLoading(true);
-            setLoadError(null);
-
             try {
                 const { profile, languages } = await CompanyProfileApi.get(client);
                 if (!mounted) return;
@@ -81,9 +76,6 @@ export const CompanyProfileContent = () => {
                 methods.reset(mapCompanyProfileToFormValues(profile, languages));
             } catch (e) {
                 if (!mounted) return;
-                setLoadError(e);
-            } finally {
-                if (mounted) setIsLoading(false);
             }
         })();
 

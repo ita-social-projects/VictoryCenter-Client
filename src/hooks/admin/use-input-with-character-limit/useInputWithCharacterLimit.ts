@@ -32,14 +32,14 @@ export const useInputWithCharacterLimit = <T extends HTMLInputElement | HTMLText
     const currentLength = getNormalizedInputText(value ?? '').length;
 
     const handleChange = (e: React.ChangeEvent<T>) => {
-        const newValue = e.target.value;
+        let newValue = e.target.value;
         const normalized = getNormalizedInputText(newValue ?? '');
 
         if (normalized.length > maxLength || newValue.length > maxLength) {
             if (maxLimitWarning) {
                 showTemporaryWarning(maxLimitWarning);
             }
-            return;
+            newValue = newValue.slice(0, maxLength);
         } else {
             clearWarning();
         }

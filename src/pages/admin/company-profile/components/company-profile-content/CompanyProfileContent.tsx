@@ -15,6 +15,8 @@ import { COMPANY_PROFILE_FORM_DEFAULTS, CompanyProfileFormValues } from '@/types
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { CompanyProfileApi } from '@/services/api/admin/company-profile/company-profile-api';
 import { mapCompanyProfileToFormValues } from '@/utils/functions/mappers/admin/company-profile/company-profile-mappers';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { CompanyProfileValidationSchema } from '@/validation/admin/company-profile-schema/company-profile-schema';
 
 type TabType = 'profile' | 'requisites' | 'socials';
 
@@ -37,7 +39,10 @@ export const CompanyProfileContent = () => {
 
     const methods = useForm<CompanyProfileFormValues>({
         mode: 'onBlur',
+        reValidateMode: 'onChange',
         defaultValues: COMPANY_PROFILE_FORM_DEFAULTS,
+        resolver: yupResolver(CompanyProfileValidationSchema),
+        shouldFocusError: true,
     });
 
     const handlePublish = (_data: CompanyProfileFormValues) => {
@@ -106,7 +111,7 @@ export const CompanyProfileContent = () => {
                             onEdit={() => setIsEditMode(true)}
                             onCancel={handleCancelClick}
                             onPublish={methods.handleSubmit(handlePublish)}
-                            isPublishDisabled={!methods.formState.isDirty}
+                            isPublishDisabled={!methods.formState.isDirty || !methods.formState.isValid}
                         />
                     </div>
                 </div>

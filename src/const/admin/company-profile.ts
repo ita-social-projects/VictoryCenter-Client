@@ -66,3 +66,43 @@ export const COMPANY_PROFILE_TEXT = {
         LIMIT_MESSAGE: 'Дозволено лише 4 контакти.',
     },
 } as const;
+
+export const COMPANY_PROFILE_VALIDATION = {
+    common: {
+        getRequiredError: () => "Поле обов'язкове",
+        getEmailError: () => 'Введіть e-mail',
+        getDigitsOnlyError: () => 'Мають бути цифри',
+    },
+
+    phone: {
+        max: 20,
+    },
+
+    address: {
+        max: 100,
+    },
+
+    email: {
+        max: 50,
+    },
+
+    motto: {
+        max: 200,
+        getMaxError: () => `Не більше ${COMPANY_PROFILE_VALIDATION.motto.max} символів`,
+    },
+
+    recipient: {
+        max: 100,
+    },
+
+    edrpou: {
+        length: 8,
+        getMinError: () => `Не менше ${COMPANY_PROFILE_VALIDATION.edrpou.length} цифр`,
+        getMaxError: () => `Не більше ${COMPANY_PROFILE_VALIDATION.edrpou.length} цифр`,
+    },
+
+    socialUrl: {
+        max: 500,
+        getMaxError: () => `Не більше ${COMPANY_PROFILE_VALIDATION.socialUrl.max} символів`,
+    },
+} as const;

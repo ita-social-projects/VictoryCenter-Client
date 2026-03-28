@@ -4,6 +4,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { CompanyProfileContent } from './CompanyProfileContent';
 import { CompanyProfileApi } from '@/services/api/admin/company-profile/company-profile-api';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { COMPANY_PROFILE_VALIDATION } from '@/const/admin/company-profile';
 
 jest.mock('@/components/admin/toast/toast-container/ToastContainer', () => ({
     ToastContainer: () => <div data-testid="toast-container" />,
@@ -14,7 +15,32 @@ jest.mock('../company-profile-logo-header/CompanyProfileLogoHeader', () => ({
 }));
 
 jest.mock('../company-profile-tab/CompanyProfileTab', () => ({
-    CompanyProfileTab: (props: any) => <div data-testid="tab-profile" data-disabled={String(props.disabled)} />,
+    CompanyProfileTab: (props: any) => {
+        const React = require('react');
+        const rhf = require('react-hook-form') as typeof import('react-hook-form');
+
+        const { useFormContext, Controller } = rhf;
+        const { control, formState } = useFormContext();
+
+        return (
+            <div data-testid="tab-profile" data-disabled={String(props.disabled)}>
+                <Controller
+                    name="phone"
+                    control={control}
+                    render={({ field }: any) => (
+                        <input
+                            data-testid="input-phone"
+                            disabled={props.disabled}
+                            value={field.value ?? ''}
+                            onChange={(e) => field.onChange(e)}
+                            onBlur={() => field.onBlur()}
+                        />
+                    )}
+                />
+                <div data-testid="debug-dirty">{String(formState.isDirty)}</div>
+            </div>
+        );
+    },
 }));
 
 jest.mock('../company-profile-requisites-tab/CompanyProfileRequisitesTab', () => ({
@@ -172,5 +198,23 @@ describe('CompanyProfileContent', () => {
         await waitFor(() => {
             expect(mockedGet).toHaveBeenCalledTimes(1);
         });
+    });
+
+    it('disables publish when form is dirty but invalid (required phone)', async () => {
+        render(<CompanyProfileContent />);
+
+        fireEvent.click(screen.getByTestId('edit-btn'));
+
+        const publishBtn = screen.getByTestId('publish-btn') as HTMLButtonElement;
+        const phoneInput = screen.getByTestId('input-phone') as HTMLInputElement;
+
+        fireEvent.change(phoneInput, { target: { value: '   ' } });
+        fireEvent.blur(phoneInput);
+
+        await waitFor(() => {
+            expect(publishBtn).toBeDisabled();
+        });
+
+        expect(COMPANY_PROFILE_VALIDATION.common.getRequiredError()).toBe("Поле обов'язкове");
     });
 });

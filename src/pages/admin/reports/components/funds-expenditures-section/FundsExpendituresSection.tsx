@@ -90,7 +90,11 @@ export const FundsExpenditureSection = () => {
         [adminClient],
     );
 
-    const { data: settings, isLoading: isSettingsLoading } = useDataFetch<ReportFundsExpendituresSettings | null>({
+    const {
+        data: settings,
+        isLoading: isSettingsLoading,
+        refetch: refetchSettings,
+    } = useDataFetch<ReportFundsExpendituresSettings | null>({
         initialData: null,
         fetchHandler: fetchSettings,
     });
@@ -204,11 +208,14 @@ export const FundsExpenditureSection = () => {
             setDisclaimerValue(updatedSettings.disclaimerTitle ?? '');
             setExchangeRateValue(updatedSettings.exchangeRate ?? '');
             setIsEditing(false);
+
+            refetchSettings();
+
             addToast(COMMON_TEXT_ADMIN.MESSAGE.SUCCESSFULLY_PUBLISHED, ToastType.Success);
         } catch {
             addToast(REPORTS_TEXT.MESSAGE.FAIL_TO_UPDATE_REPORT, ToastType.Error);
         }
-    }, [addToast, adminClient, disclaimerValue, exchangeRateValue]);
+    }, [addToast, adminClient, disclaimerValue, exchangeRateValue, refetchSettings]);
 
     if (isInitialLoading) {
         return (

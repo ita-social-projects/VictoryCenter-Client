@@ -122,6 +122,10 @@ export const PDF_FILES_SECTION_TEXT = {
 
 export const FUNDS_EXPENDITURES_VALIDATION = {
     disclaimer: { min: 2, max: 1000 },
+    exchangeRate: {
+        maxIntegerDigits: 9,
+        maxDecimalDigits: 6,
+    },
 };
 
 export const FUNDS_EXPENDITURES_TEXT = {
@@ -172,5 +176,8 @@ export const FUNDS_EXPENDITURES_TEXT = {
         AMOUNT_ONLY_NUMBER_GT_ZERO: 'Лише число > 0',
         AMOUNT_MAX_DIGITS: "Не більше 11 цифр, 2 після ','",
         AMOUNT_NOT_NEGATIVE: "Сума не може бути від'ємною",
+        EXCHANGE_RATE_ONLY_NUMERIC: 'Дозволено тільки числові значення десяткові та цілі',
+        EXCHANGE_RATE_GT_ZERO: 'Значення має бути більше 0',
+        EXCHANGE_RATE_MAX_DIGITS: "Не більше 9 цифр, 6 після ','",
     },
 };

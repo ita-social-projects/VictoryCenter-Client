@@ -387,4 +387,58 @@ describe('useInputWithCharacterLimit', () => {
             expect(mockOnChange).toHaveBeenCalled();
         });
     });
+
+    describe('handleChange truncation', () => {
+        it('should truncate "Заголовок" to 60 characters', () => {
+            const { result } = renderHook(() =>
+                useInputWithCharacterLimit({
+                    ...defaultProps,
+                    maxLength: 60,
+                    name: 'title',
+                }),
+            );
+
+            const longText = 'a'.repeat(61);
+            const mockEvent = {
+                target: { value: longText, name: 'title', id: 'title-input' },
+            } as React.ChangeEvent<HTMLInputElement>;
+
+            act(() => {
+                result.current.handleChange(mockEvent);
+            });
+
+            expect(mockOnChange).toHaveBeenCalledWith({
+                target: {
+                    ...mockEvent.target,
+                    value: 'a'.repeat(60),
+                },
+            });
+        });
+
+        it('should truncate "Опис" to 600 characters', () => {
+            const { result } = renderHook(() =>
+                useInputWithCharacterLimit({
+                    ...defaultProps,
+                    maxLength: 600,
+                    name: 'description',
+                }),
+            );
+
+            const longText = 'b'.repeat(601);
+            const mockEvent = {
+                target: { value: longText, name: 'description', id: 'description-input' },
+            } as React.ChangeEvent<HTMLTextAreaElement>;
+
+            act(() => {
+                result.current.handleChange(mockEvent);
+            });
+
+            expect(mockOnChange).toHaveBeenCalledWith({
+                target: {
+                    ...mockEvent.target,
+                    value: 'b'.repeat(600),
+                },
+            });
+        });
+    });
 });

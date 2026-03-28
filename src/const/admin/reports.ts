@@ -126,13 +126,12 @@ export const FUNDS_EXPENDITURES_VALIDATION = {
         maxIntegerDigits: 9,
         maxDecimalDigits: 6,
     },
+    maxCategoriesPerType: 4,
 };
 
 export const FUNDS_EXPENDITURES_TEXT = {
     DISCLAIMER_LABEL: 'Дісклеймер/ENG',
     EXCHANGE_RATE_LABEL: 'Курс USD/UAH',
-    EXCHANGE_RATE_MAX_LENGTH: 10,
-    MAX_CATEGORIES_PER_TYPE: 4,
     BUTTON: {
         EDIT: 'Редагувати Доходи та витрати',
         CANCEL: 'Відмінити',

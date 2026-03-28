@@ -187,8 +187,8 @@ export const FundsExpenditureSection = () => {
         });
     }, [enrichedRecords, selectedType, selectedCategoryId]);
 
-    const isAddIncomeDisabled = summary.incomeCategories >= FUNDS_EXPENDITURES_TEXT.MAX_CATEGORIES_PER_TYPE;
-    const isAddExpenseDisabled = summary.expenseCategories >= FUNDS_EXPENDITURES_TEXT.MAX_CATEGORIES_PER_TYPE;
+    const isAddIncomeDisabled = summary.incomeCategories >= FUNDS_EXPENDITURES_VALIDATION.maxCategoriesPerType;
+    const isAddExpenseDisabled = summary.expenseCategories >= FUNDS_EXPENDITURES_VALIDATION.maxCategoriesPerType;
 
     const currentExchangeRate = isEditing ? exchangeRateValue : (settings?.exchangeRate ?? null);
 

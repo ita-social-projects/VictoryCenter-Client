@@ -102,7 +102,6 @@ export const FundsExpendituresToolbar = ({
                                             [styles['exchange-rate-input-error']]: Boolean(exchangeRateError),
                                         })}
                                         value={exchangeRate}
-                                        maxLength={FUNDS_EXPENDITURES_TEXT.EXCHANGE_RATE_MAX_LENGTH}
                                         disabled={controlsDisabled}
                                         onChange={(e) => onExchangeRateChange?.(e.target.value)}
                                         onBlur={onExchangeRateBlur}

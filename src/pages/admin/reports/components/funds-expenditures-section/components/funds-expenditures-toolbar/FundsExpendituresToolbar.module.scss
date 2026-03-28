@@ -104,7 +104,6 @@
 .exchange-rate-error {
     @include type.small-text-regular;
     color: c.$error;
-    margin: 0;
 }
 
 .exchange-rate-input-disabled {

@@ -212,6 +212,6 @@ describe('CompanyProfileContent', () => {
             expect(publishBtn).toBeDisabled();
         });
 
-        expect(COMPANY_PROFILE_VALIDATION.common.getRequiredError()).toBe("Поле обов'язкове");
+        expect(COMPANY_PROFILE_VALIDATION.common.REQUIRED).toBe("Поле обов'язкове");
     });
 });

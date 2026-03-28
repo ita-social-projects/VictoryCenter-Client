@@ -1,3 +1,5 @@
+import { COMMON_TEXT_ADMIN } from './common';
+
 export const COMPANY_PROFILE_TEXT = {
     TABS: {
         PROFILE: 'Профіль компанії',
@@ -69,7 +71,7 @@ export const COMPANY_PROFILE_TEXT = {
 
 export const COMPANY_PROFILE_VALIDATION = {
     common: {
-        getRequiredError: () => "Поле обов'язкове",
+        REQUIRED: COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED,
         getEmailError: () => 'Введіть e-mail',
         getDigitsOnlyError: () => 'Мають бути цифри',
     },
@@ -88,7 +90,7 @@ export const COMPANY_PROFILE_VALIDATION = {
 
     motto: {
         max: 200,
-        getMaxError: () => `Не більше ${COMPANY_PROFILE_VALIDATION.motto.max} символів`,
+        getMaxError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(200),
     },
 
     recipient: {
@@ -103,6 +105,6 @@ export const COMPANY_PROFILE_VALIDATION = {
 
     socialUrl: {
         max: 500,
-        getMaxError: () => `Не більше ${COMPANY_PROFILE_VALIDATION.socialUrl.max} символів`,
+        getMaxError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(500),
     },
 } as const;

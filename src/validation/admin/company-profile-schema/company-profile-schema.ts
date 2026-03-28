@@ -7,7 +7,7 @@ import {
 } from '@/types/admin/company-profile';
 
 const requiredTrimmed = (max?: number) => {
-    let s = Yup.string().trim().required(COMPANY_PROFILE_VALIDATION.common.getRequiredError());
+    let s = Yup.string().trim().required(COMPANY_PROFILE_VALIDATION.common.REQUIRED);
     if (typeof max === 'number') s = s.max(max);
     return s;
 };
@@ -50,7 +50,7 @@ export const CompanyProfileValidationSchema: Yup.ObjectSchema<CompanyProfileForm
 
     companyRegistrationNumber: Yup.string()
         .trim()
-        .required(COMPANY_PROFILE_VALIDATION.common.getRequiredError())
+        .required(COMPANY_PROFILE_VALIDATION.common.REQUIRED)
         .matches(/^\d*$/, COMPANY_PROFILE_VALIDATION.common.getDigitsOnlyError())
         .min(COMPANY_PROFILE_VALIDATION.edrpou.length, COMPANY_PROFILE_VALIDATION.edrpou.getMinError())
         .max(COMPANY_PROFILE_VALIDATION.edrpou.length, COMPANY_PROFILE_VALIDATION.edrpou.getMaxError()),

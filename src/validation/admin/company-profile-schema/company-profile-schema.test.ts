@@ -9,13 +9,13 @@ describe('COMPANY_PROFILE_VALIDATION_FUNCTIONS', () => {
 
         it('returns required error for empty phone', () => {
             expect(COMPANY_PROFILE_VALIDATION_FUNCTIONS.validatePhone('')).toBe(
-                COMPANY_PROFILE_VALIDATION.common.getRequiredError(),
+                COMPANY_PROFILE_VALIDATION.common.REQUIRED,
             );
         });
 
         it('treats spaces as empty', () => {
             expect(COMPANY_PROFILE_VALIDATION_FUNCTIONS.validatePhone('   ')).toBe(
-                COMPANY_PROFILE_VALIDATION.common.getRequiredError(),
+                COMPANY_PROFILE_VALIDATION.common.REQUIRED,
             );
         });
     });
@@ -27,7 +27,7 @@ describe('COMPANY_PROFILE_VALIDATION_FUNCTIONS', () => {
 
         it('returns required error for empty email', () => {
             expect(COMPANY_PROFILE_VALIDATION_FUNCTIONS.validateEmail('')).toBe(
-                COMPANY_PROFILE_VALIDATION.common.getRequiredError(),
+                COMPANY_PROFILE_VALIDATION.common.REQUIRED,
             );
         });
 
@@ -47,7 +47,7 @@ describe('COMPANY_PROFILE_VALIDATION_FUNCTIONS', () => {
 
         it('returns required error for empty correspondence email', () => {
             expect(COMPANY_PROFILE_VALIDATION_FUNCTIONS.validateCorrespondenceEmail('')).toBe(
-                COMPANY_PROFILE_VALIDATION.common.getRequiredError(),
+                COMPANY_PROFILE_VALIDATION.common.REQUIRED,
             );
         });
 
@@ -65,13 +65,13 @@ describe('COMPANY_PROFILE_VALIDATION_FUNCTIONS', () => {
 
         it('returns required error for empty value', () => {
             expect(COMPANY_PROFILE_VALIDATION_FUNCTIONS.validateCompanyRegistrationNumber('')).toBe(
-                COMPANY_PROFILE_VALIDATION.common.getRequiredError(),
+                COMPANY_PROFILE_VALIDATION.common.REQUIRED,
             );
         });
 
         it('treats spaces as empty', () => {
             expect(COMPANY_PROFILE_VALIDATION_FUNCTIONS.validateCompanyRegistrationNumber('   ')).toBe(
-                COMPANY_PROFILE_VALIDATION.common.getRequiredError(),
+                COMPANY_PROFILE_VALIDATION.common.REQUIRED,
             );
         });
 

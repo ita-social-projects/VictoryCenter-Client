@@ -16,10 +16,7 @@ jest.mock('../company-profile-logo-header/CompanyProfileLogoHeader', () => ({
 
 jest.mock('../company-profile-tab/CompanyProfileTab', () => ({
     CompanyProfileTab: (props: any) => {
-        const React = require('react');
-        const rhf = require('react-hook-form') as typeof import('react-hook-form');
-
-        const { useFormContext, Controller } = rhf;
+        const { useFormContext, Controller } = require('react-hook-form');
         const { control, formState } = useFormContext();
 
         return (

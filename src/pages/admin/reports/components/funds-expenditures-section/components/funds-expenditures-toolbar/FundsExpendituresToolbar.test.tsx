@@ -219,5 +219,12 @@ describe('FundsExpendituresToolbar', () => {
             fireEvent.change(input, { target: { value: '50.00' } });
             expect(onExchangeRateChange).toHaveBeenCalledWith('50.00');
         });
+
+        it('should show exchange rate validation error when provided', () => {
+            const errorMessage = FUNDS_EXPENDITURES_TEXT.VALIDATION.EXCHANGE_RATE_ONLY_NUMERIC;
+            render(<FundsExpendituresToolbar {...defaultProps} isEditing={true} exchangeRateError={errorMessage} />);
+
+            expect(screen.getByTestId('exchange-rate-error')).toHaveTextContent(errorMessage);
+        });
     });
 });

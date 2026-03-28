@@ -21,6 +21,8 @@ interface FundsExpendituresToolbarProps {
     onTypeChange: (value: TypeFilterValue) => void;
     onCategoryChange: (value: CategoryFilterValue) => void;
     onExchangeRateChange?: (value: string) => void;
+    onExchangeRateBlur?: () => void;
+    exchangeRateError?: string;
     onAddIncome: () => void;
     onAddExpense: () => void;
 }
@@ -37,6 +39,8 @@ export const FundsExpendituresToolbar = ({
     onTypeChange,
     onCategoryChange,
     onExchangeRateChange,
+    onExchangeRateBlur,
+    exchangeRateError,
     onAddIncome,
     onAddExpense,
 }: FundsExpendituresToolbarProps) => {
@@ -89,17 +93,26 @@ export const FundsExpendituresToolbar = ({
                                 {FUNDS_EXPENDITURES_TEXT.EXCHANGE_RATE_LABEL}
                             </span>
                             {isEditing ? (
-                                <input
-                                    type="text"
-                                    data-testid="exchange-rate-input"
-                                    className={cn(styles['exchange-rate-input'], {
-                                        [styles['exchange-rate-input-disabled']]: controlsDisabled,
-                                    })}
-                                    value={exchangeRate}
-                                    maxLength={FUNDS_EXPENDITURES_TEXT.EXCHANGE_RATE_MAX_LENGTH}
-                                    disabled={controlsDisabled}
-                                    onChange={(e) => onExchangeRateChange?.(e.target.value)}
-                                />
+                                <div className={styles['exchange-rate-field']}>
+                                    <input
+                                        type="text"
+                                        data-testid="exchange-rate-input"
+                                        className={cn(styles['exchange-rate-input'], {
+                                            [styles['exchange-rate-input-disabled']]: controlsDisabled,
+                                            [styles['exchange-rate-input-error']]: Boolean(exchangeRateError),
+                                        })}
+                                        value={exchangeRate}
+                                        maxLength={FUNDS_EXPENDITURES_TEXT.EXCHANGE_RATE_MAX_LENGTH}
+                                        disabled={controlsDisabled}
+                                        onChange={(e) => onExchangeRateChange?.(e.target.value)}
+                                        onBlur={onExchangeRateBlur}
+                                    />
+                                    {exchangeRateError && (
+                                        <p className={styles['exchange-rate-error']} data-testid="exchange-rate-error">
+                                            {exchangeRateError}
+                                        </p>
+                                    )}
+                                </div>
                             ) : (
                                 <span className={styles['exchange-rate-value']} data-testid="exchange-rate">
                                     {exchangeRate}

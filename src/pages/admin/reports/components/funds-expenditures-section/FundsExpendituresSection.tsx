@@ -2,6 +2,10 @@ import { useState, useMemo, useCallback, useEffect } from 'react';
 import { FUNDS_EXPENDITURES_TEXT, FUNDS_EXPENDITURES_VALIDATION, REPORTS_TEXT } from '@/const/admin/reports';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FUNDS_EXPENDITURES_DISCLAIMER_VALIDATION_FUNCTIONS } from '@/validation/admin/reports-schema/funds-expenditures-disclaimer-schema/funds-expenditures-disclaimer-schema';
+import {
+    normalizeFundsExpendituresExchangeRateInput,
+    validateFundsExpendituresExchangeRate,
+} from '@/validation/admin/reports-schema/funds-expenditures-exchange-rate-schema/funds-expenditures-exchange-rate-schema';
 import { Button } from '@/components/admin/button/Button';
 import { ACTION_ICONS } from '@/const/common/action-icons';
 import { FundsExpendituresApi } from '@/services/api/admin/reports/funds-expenditures-api';
@@ -45,6 +49,7 @@ export const FundsExpenditureSection = () => {
     const [disclaimerValue, setDisclaimerValue] = useState('');
     const [disclaimerError, setDisclaimerError] = useState<string | undefined>(undefined);
     const [exchangeRateValue, setExchangeRateValue] = useState('');
+    const [exchangeRateError, setExchangeRateError] = useState<string | undefined>(undefined);
 
     const [selectedType, setSelectedType] = useState<TypeFilterValue>(undefined);
     const [selectedCategoryId, setSelectedCategoryId] = useState<CategoryFilterValue>(undefined);
@@ -55,6 +60,7 @@ export const FundsExpenditureSection = () => {
     const handleCancel = useCallback(() => {
         setIsEditing(false);
         setDisclaimerError(undefined);
+        setExchangeRateError(undefined);
     }, []);
 
     const handleDisclaimerChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -67,6 +73,18 @@ export const FundsExpenditureSection = () => {
         setDisclaimerValue(trimmed);
         setDisclaimerError(FUNDS_EXPENDITURES_DISCLAIMER_VALIDATION_FUNCTIONS.validateDisclaimer(trimmed));
     }, [disclaimerValue]);
+
+    const handleExchangeRateChange = useCallback((value: string) => {
+        const normalized = normalizeFundsExpendituresExchangeRateInput(value);
+        setExchangeRateValue(normalized);
+        setExchangeRateError(validateFundsExpendituresExchangeRate(normalized, 'change'));
+    }, []);
+
+    const handleExchangeRateBlur = useCallback(() => {
+        const normalized = normalizeFundsExpendituresExchangeRateInput(exchangeRateValue, true);
+        setExchangeRateValue(normalized);
+        setExchangeRateError(validateFundsExpendituresExchangeRate(normalized, 'blur'));
+    }, [exchangeRateValue]);
 
     const handleTypeChange = useCallback((type: TypeFilterValue) => {
         setSelectedType(type);
@@ -136,14 +154,21 @@ export const FundsExpenditureSection = () => {
 
     const isPublishEnabled = useMemo(() => {
         const normalized = disclaimerValue.replaceAll(/\s+/g, ' ').trim();
-        return normalized.length >= FUNDS_EXPENDITURES_VALIDATION.disclaimer.min && !disclaimerError;
-    }, [disclaimerValue, disclaimerError]);
+        const exchangeRateValidationError = validateFundsExpendituresExchangeRate(exchangeRateValue, 'blur');
+
+        return (
+            normalized.length >= FUNDS_EXPENDITURES_VALIDATION.disclaimer.min &&
+            !disclaimerError &&
+            !exchangeRateValidationError
+        );
+    }, [disclaimerValue, disclaimerError, exchangeRateValue]);
 
     useEffect(() => {
         if (!isEditing) {
             setDisclaimerValue(settings?.disclaimerTitle ?? '');
             setExchangeRateValue(settings?.exchangeRate ?? '');
             setDisclaimerError(undefined);
+            setExchangeRateError(undefined);
         }
     }, [settings, isEditing]);
 
@@ -303,7 +328,9 @@ export const FundsExpenditureSection = () => {
                 isAddExpenseDisabled={isAddExpenseDisabled}
                 onTypeChange={handleTypeChange}
                 onCategoryChange={setSelectedCategoryId}
-                onExchangeRateChange={setExchangeRateValue}
+                onExchangeRateChange={handleExchangeRateChange}
+                onExchangeRateBlur={handleExchangeRateBlur}
+                exchangeRateError={exchangeRateError}
                 onAddIncome={() => {}}
                 onAddExpense={() => {}}
             />

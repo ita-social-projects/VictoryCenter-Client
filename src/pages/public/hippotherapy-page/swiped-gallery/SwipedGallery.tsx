@@ -1,5 +1,5 @@
 import { WaveSwiper } from '@/components/public/swiper/wave-swiper/WaveSwiper';
-import { MainValueCard } from '@/pages/public/about-us-page/main-value/main-value-card/MainValueCard';
+import { SwipedCard } from '@/components/public/swiper/swiped-card/SwipedCard';
 import { HIPPOTHERAPY_SWIPED_IMAGES } from '@/const/public/hippotherapy-page';
 import { HippotherapySwipedCard } from '@/types/public/hippotherapy-page';
 import styles from './SwipedGallery.module.scss';
@@ -14,7 +14,7 @@ export const SwipedGallery = ({ title, cards }: SwipedGalleryProps) => {
         const imageUrl = card.imgURL ?? HIPPOTHERAPY_SWIPED_IMAGES[index];
         const altText = card.imgAlternativeText;
 
-        return <MainValueCard description={card.text} index={index} imageUrl={imageUrl} altText={altText} />;
+        return <SwipedCard description={card.text} index={index} imageUrl={imageUrl} altText={altText} />;
     };
 
     return (

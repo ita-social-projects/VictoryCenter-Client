@@ -3,7 +3,7 @@ import { ABOUT_US_DATA } from '@/const/public/about-us-page';
 import styles from './MainValue.module.scss';
 import { WaveSwiper } from '@/components/public/swiper/wave-swiper/WaveSwiper';
 import { AboutUsContent } from '@/types/public/about-us-page';
-import { MainValueCard } from './main-value-card/MainValueCard';
+import { SwipedCard } from '@/components/public/swiper/swiped-card/SwipedCard';
 
 export interface MainValuesProps {
     content: AboutUsContent[] | null;
@@ -31,7 +31,7 @@ export const MainValues = ({ content }: MainValuesProps) => {
                         const imageUrl = person.image?.url ?? ABOUT_US_DATA.PEOPLE_DATA[index].IMG;
                         const altText = peopleData[index].ALT;
                         return (
-                            <MainValueCard
+                            <SwipedCard
                                 description={person.description}
                                 localizations={person.localizations}
                                 index={index}

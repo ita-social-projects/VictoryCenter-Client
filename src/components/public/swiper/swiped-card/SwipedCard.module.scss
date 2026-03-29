@@ -1,7 +1,7 @@
 @use '@/assets/sass/variables/colors' as c;
 @use '@/assets/sass/mixins/typography.mixins' as type;
 
-.people-card {
+.swiped-card {
     &.card-2,
     &.card-4 {
         margin-top: 53px;
@@ -22,14 +22,14 @@
     }
 }
 
-.people-img {
+.swiped-img {
     width: 100%;
     object-fit: cover;
     display: block;
     height: 430px;
 }
 
-.people-info {
+.swiped-info {
     @include type.body-1-medium;
     color: c.$blue-900;
     padding: 15px 16px 0;

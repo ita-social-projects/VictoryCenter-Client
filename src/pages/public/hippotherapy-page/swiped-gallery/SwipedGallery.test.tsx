@@ -1,10 +1,10 @@
 import { render, screen } from '@testing-library/react';
 import { SwipedGallery } from './SwipedGallery';
-import { MainValueCard } from '../../about-us-page/main-value/main-value-card/MainValueCard';
+import { SwipedCard } from '@/components/public/swiper/swiped-card/SwipedCard';
 import { HIPPOTHERAPY_SWIPED_IMAGES } from '@/const/public/hippotherapy-page';
 
-jest.mock('@/pages/public/about-us-page/main-value/main-value-card/MainValueCard');
-const MockMainValueCard = MainValueCard as jest.Mock;
+jest.mock('@/components/public/swiper/swiped-card/SwipedCard');
+const MockSwipedCard = SwipedCard as jest.Mock;
 
 jest.mock('@/hooks/common/use-get-localization/useGetLocalization');
 
@@ -27,12 +27,12 @@ describe('SwipedGallery component', () => {
         expect(screen.getByText('Title')).toBeInTheDocument();
     });
 
-    it('should call MainValueCard component with properties', () => {
+    it('should call SwipedCard component with properties', () => {
         const firstCardIndx = 0;
         const secondCardIndx = 1;
         render(<SwipedGallery title={'Title'} cards={cards} />);
-        expect(MockMainValueCard).toHaveBeenCalledTimes(2);
-        expect(MockMainValueCard).toHaveBeenCalledWith(
+        expect(MockSwipedCard).toHaveBeenCalledTimes(2);
+        expect(MockSwipedCard).toHaveBeenCalledWith(
             expect.objectContaining({
                 description: cards[firstCardIndx].text,
                 index: firstCardIndx,
@@ -41,7 +41,7 @@ describe('SwipedGallery component', () => {
             }),
             undefined,
         );
-        expect(MockMainValueCard).toHaveBeenLastCalledWith(
+        expect(MockSwipedCard).toHaveBeenLastCalledWith(
             expect.objectContaining({
                 description: cards[secondCardIndx].text,
                 index: secondCardIndx,

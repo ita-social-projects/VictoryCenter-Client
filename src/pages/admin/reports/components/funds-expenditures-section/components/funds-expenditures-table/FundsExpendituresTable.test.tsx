@@ -350,6 +350,15 @@ describe('FundsExpendituresTable', () => {
     });
 
     describe('row category editing', () => {
+        it('should disable edit and delete actions when isRowActionsDisabled is true', () => {
+            renderTable({ isEditing: true, isRowActionsDisabled: true });
+
+            expect(screen.getByLabelText('Edit record 1')).toBeDisabled();
+            expect(screen.getByLabelText('Delete record 1')).toBeDisabled();
+            expect(screen.getByLabelText('Edit record 2')).toBeDisabled();
+            expect(screen.getByLabelText('Delete record 2')).toBeDisabled();
+        });
+
         it('should switch row actions to accept and close icons when row enters edit mode', () => {
             renderTable({ isEditing: true });
 

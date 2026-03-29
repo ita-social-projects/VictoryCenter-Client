@@ -31,6 +31,7 @@ export const HippotherapyPage = () => {
                     <SloganSection />
                     <HippoventionCenter {...data.hippoventionCenterSection} />
                     <SwipedGallery title={data.advantagesSection.title} cards={data.advantagesSection.advantages} />
+                    <TextCard {...data.analysisSection} />
                     <QuoteSection
                         {...data.anotherQuoteSection}
                         imgURL={data.anotherQuoteSection.imgURL || quote2DefaultImg}

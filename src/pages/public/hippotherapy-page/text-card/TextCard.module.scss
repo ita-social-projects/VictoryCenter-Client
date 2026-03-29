@@ -29,7 +29,7 @@
     @media (min-width: 1440px) {
         grid-column-start: 2;
         grid-column-end: 3;
-        grid-template-columns: 1fr 1fr 2fr;
+        grid-template-columns: 1fr 1fr;
         margin: 120px 0;
     }
 
@@ -39,10 +39,5 @@
 
     &>p:last-child {
         @include type.body-1-regular;
-
-        @media (min-width: 1440px) {
-            grid-column-start: 3;
-            grid-column-end: 4;
-        }
     }
 }

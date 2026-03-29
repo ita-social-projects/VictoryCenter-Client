@@ -8,7 +8,7 @@ import { TextCard } from './text-card/TextCard';
 import { QuoteSection } from './quote/QuoteSection';
 import { SloganSection } from './slogan/SloganSection';
 import { HippoventionCenter } from './hippovention-center/HippoventionCenter';
-import { Advantages } from './advantages/Advantages';
+import { SwipedGallery } from './swiped-gallery/SwipedGallery';
 import quote1DefaultImg from '@/assets/images/public/hippotherapy/quote_1.jpg';
 import quote2DefaultImg from '@/assets/images/public/hippotherapy/quote_2.jpg';
 
@@ -30,10 +30,14 @@ export const HippotherapyPage = () => {
                     <TextCard {...data.hippoventionSection} />
                     <SloganSection />
                     <HippoventionCenter {...data.hippoventionCenterSection} />
-                    <Advantages {...data.advantagesSection} />
+                    <SwipedGallery title={data.advantagesSection.title} cards={data.advantagesSection.advantages} />
                     <QuoteSection
                         {...data.anotherQuoteSection}
                         imgURL={data.anotherQuoteSection.imgURL || quote2DefaultImg}
+                    />
+                    <SwipedGallery
+                        title={data.participantsSection.title}
+                        cards={data.participantsSection.participants}
                     />
                 </>
             )}

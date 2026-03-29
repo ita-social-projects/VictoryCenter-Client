@@ -46,17 +46,17 @@ export const hippotherapyMock: HippotherapyAbout = {
         advantages: [
             {
                 imgURL: advantageImage0,
-                imgAlternativeText: 'Чоловік притуляється до коня',
+                imgAlternativeText: 'Чоловік обіймає коня',
                 text: 'Тіло пам’ятає те, що слова не можуть передати. Робота з конем — це робота на рівні нервової системи.',
             },
             {
                 imgURL: advantageImage1,
-                imgAlternativeText: 'Чоловік притуляється до сірого коня',
+                imgAlternativeText: 'Чоловік обіймає сірого коня',
                 text: 'Кінь не питає, що з тобою сталося. Але допомагає щиро відповісти на питання “як ти зараз?”.',
             },
             {
                 imgURL: advantageImage2,
-                imgAlternativeText: 'Дівчина притуляється до коня',
+                imgAlternativeText: 'Дівчина обіймає коня',
                 text: 'Нервова система людини й коня синхронізуються — це не метафора, а фізіологічна реальність.',
             },
             {
@@ -106,18 +106,22 @@ export const hippotherapyMock: HippotherapyAbout = {
         participants: [
             {
                 imgURL: advantageImage0,
+                imgAlternativeText: 'Чоловік обіймає коня',
                 text: 'Люди з досвідом війни, втрати, травми, тривалого стресу (військові, ветерани/ки).',
             },
             {
                 imgURL: advantageImage1,
+                imgAlternativeText: 'Чоловік обіймає сірого коня',
                 text: 'Діти з гіперзбудливістю або замкненістю, тривожністю, порушенням контакту.',
             },
             {
                 imgURL: advantageImage2,
+                imgAlternativeText: 'Дівчина обіймає коня',
                 text: 'Родини, які пережили розрив, переміщення, втрату близьких. ',
             },
             {
                 imgURL: advantageImage3,
+                imgAlternativeText: 'Чоловік веде коня за повід',
                 text: 'Фахівці екстрених служб та волонтери. ',
             },
         ],

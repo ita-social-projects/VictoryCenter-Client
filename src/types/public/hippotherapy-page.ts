@@ -24,7 +24,7 @@ export interface HippoventionCenterData {
     text: string;
 }
 
-export interface HippotherapyAdvantage {
+export interface HippotherapySwipedCard {
     imgURL: string;
     imgAlternativeText: string;
     text: string;
@@ -32,9 +32,13 @@ export interface HippotherapyAdvantage {
 
 export interface HippotherapyAdvantagesSection {
     title: string;
-    advantages: HippotherapyAdvantage[];
+    advantages: HippotherapySwipedCard[];
 }
 
+export interface HippotherapyParticipantsSection {
+    title: string;
+    participants: HippotherapySwipedCard[];
+}
 export interface HippotherapyAbout {
     introSection: HippotherapyIntroData;
     descriptionSection: HippotherapyDefaultSection;
@@ -48,10 +52,7 @@ export interface HippotherapyAbout {
         researches: { text: string; url: string }[];
     };
     anotherQuoteSection: Quote;
-    participantsSection: {
-        title: string;
-        participants: { imgURL: string; text: string }[];
-    };
+    participantsSection: HippotherapyParticipantsSection;
     ethicsSection: {
         title: string;
         text: string;

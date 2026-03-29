@@ -71,24 +71,26 @@ export const PDF_FILES_SECTION_VALIDATION = {
     title: {
         min: 2,
         max: 30,
+        getRequiredError: () => "Поле обов'язкове",
+        getMinError: () => 'Не менше 2 символів',
+        getMaxError: () => 'Не більше 30 символів',
     },
     description: {
         min: 2,
         max: 160,
+        getRequiredError: () => "Поле обов'язкове",
+        getMinError: () => 'Не менше 2 символів',
+        getMaxError: () => 'Не більше 160 символів',
     },
     page_size: 4,
 };
 
 export const PDF_FILES_SECTION_TEXT = {
-    VIEW: {
-        TITLE: 'Заголовок розділу PDF',
-        DESCRIPTION: 'Короткий опис для користувачів',
-    },
-    FORM: {
-        LABEL: {
-            TITLE: 'Заголовок',
-            DESCRIPTION: 'Опис',
-        },
+    TITLE: 'Заголовок розділу PDF',
+    DESCRIPTION: 'Короткий опис для користувачів',
+    BUTTON: {
+        PUBLISH: 'Опублікувати',
+        CANCEL: 'Відмінити',
     },
     TABLE: {
         HEADER: {

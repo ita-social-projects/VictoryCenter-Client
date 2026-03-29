@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { MainValueCard } from './MainValueCard';
 import { ContentType } from '@/types/common/about-us';
-import { AboutUsContent } from '@/types/public/about-us-page';
+import { AboutUsContent, AboutUsContentLocalization } from '@/types/public/about-us-page';
 import { TranslationStatus } from '@/types/common/language';
 import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
 import { setupUseGetLocalizationAboutUsContentMock } from '@/utils/test-mocks/use-get-localization-mock';
@@ -25,7 +25,15 @@ describe('MainValueCard component', () => {
     };
 
     it('should render image with correct src and alt', () => {
-        render(<MainValueCard person={person} index={0} imageUrl="test.jpg" altText="Test alt" />);
+        render(
+            <MainValueCard
+                description={person.description}
+                localizations={person.localizations}
+                index={0}
+                imageUrl="test.jpg"
+                altText="Test alt"
+            />,
+        );
 
         const img = screen.getByRole('img');
         expect(img).toBeInTheDocument();
@@ -34,49 +42,83 @@ describe('MainValueCard component', () => {
     });
 
     it('should render fallback description when no localizations', () => {
-        render(<MainValueCard person={person} index={0} imageUrl="test.jpg" altText="Test alt" />);
+        render(
+            <MainValueCard
+                description={person.description}
+                localizations={person.localizations}
+                index={0}
+                imageUrl="test.jpg"
+                altText="Test alt"
+            />,
+        );
 
         expect(screen.getByText('Fallback description')).toBeInTheDocument();
     });
 
     it('should render localized description when localizations are provided', () => {
-        const personWithLocalization: AboutUsContent = {
-            ...person,
-            localizations: [
-                {
-                    language: { id: 1, code: 'uk' },
-                    translationStatus: TranslationStatus.Relevant,
-                    description: 'Localized description',
-                    title: null,
-                },
-            ],
-        };
+        const localizations: AboutUsContentLocalization[] = [
+            {
+                language: { id: 1, code: 'uk' },
+                translationStatus: TranslationStatus.Relevant,
+                description: 'Localized description',
+                title: null,
+            },
+        ];
 
-        render(<MainValueCard person={personWithLocalization} index={0} imageUrl="test.jpg" altText="Test alt" />);
+        render(
+            <MainValueCard
+                description={person.description}
+                localizations={localizations}
+                index={0}
+                imageUrl="test.jpg"
+                altText="Test alt"
+            />,
+        );
 
         expect(screen.getByText('Localized description')).toBeInTheDocument();
     });
 
     it('should not render fallback text when localized description is provided', () => {
-        const personWithLocalization: AboutUsContent = {
-            ...person,
-            localizations: [
-                {
-                    language: { id: 1, code: 'uk' },
-                    translationStatus: TranslationStatus.Relevant,
-                    description: 'Localized description',
-                    title: null,
-                },
-            ],
-        };
+        const localizations: AboutUsContentLocalization[] = [
+            {
+                language: { id: 1, code: 'uk' },
+                translationStatus: TranslationStatus.Relevant,
+                description: 'Localized description',
+                title: null,
+            },
+        ];
 
-        render(<MainValueCard person={personWithLocalization} index={0} imageUrl="test.jpg" altText="Test alt" />);
+        render(
+            <MainValueCard
+                description={person.description}
+                localizations={localizations}
+                index={0}
+                imageUrl="test.jpg"
+                altText="Test alt"
+            />,
+        );
 
         expect(screen.queryByText('Fallback description')).not.toBeInTheDocument();
     });
 
+    it('should not render any text when the description is empty', () => {
+        render(
+            <MainValueCard description={null} localizations={[]} index={0} imageUrl="test.jpg" altText="Test alt" />,
+        );
+        expect(screen.queryByText('Fallback description')).not.toBeInTheDocument();
+        expect(screen.queryByText('Localized description')).not.toBeInTheDocument();
+    });
+
     it('should pass imageUrl to the img element', () => {
-        render(<MainValueCard person={person} index={1} imageUrl="custom-image.jpg" altText="Custom alt" />);
+        render(
+            <MainValueCard
+                description={person.description}
+                localizations={person.localizations}
+                index={1}
+                imageUrl="custom-image.jpg"
+                altText="Custom alt"
+            />,
+        );
 
         const img = screen.getByRole('img');
         expect(img).toHaveAttribute('src', 'custom-image.jpg');
@@ -86,7 +128,13 @@ describe('MainValueCard component', () => {
     it('should render all four card indexes without error', () => {
         for (let i = 0; i < 4; i++) {
             const { unmount } = render(
-                <MainValueCard person={person} index={i} imageUrl="img.jpg" altText={`Card ${i}`} />,
+                <MainValueCard
+                    description={person.description}
+                    localizations={person.localizations}
+                    index={i}
+                    imageUrl="img.jpg"
+                    altText={`Card ${i}`}
+                />,
             );
             expect(screen.getByAltText(`Card ${i}`)).toBeInTheDocument();
             unmount();

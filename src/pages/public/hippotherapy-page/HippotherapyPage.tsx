@@ -6,10 +6,11 @@ import { HippotherapyIntro } from './intro/HippotherapyIntro';
 import { LoadableContent } from '@/components/common/loadable-content/LoadableContent';
 import { TextCard } from './text-card/TextCard';
 import { QuoteSection } from './quote/QuoteSection';
-import quote1DefaultImg from '@/assets/images/public/hippotherapy/quote_1.jpg';
-import quote2DefaultImg from '@/assets/images/public/hippotherapy/quote_2.jpg';
 import { SloganSection } from './slogan/SloganSection';
 import { HippoventionCenter } from './hippovention-center/HippoventionCenter';
+import { Advantages } from './advantages/Advantages';
+import quote1DefaultImg from '@/assets/images/public/hippotherapy/quote_1.jpg';
+import quote2DefaultImg from '@/assets/images/public/hippotherapy/quote_2.jpg';
 
 export const HippotherapyPage = () => {
     const { t } = useTranslation('hippotherapy');
@@ -29,6 +30,7 @@ export const HippotherapyPage = () => {
                     <TextCard {...data.hippoventionSection} />
                     <SloganSection />
                     <HippoventionCenter {...data.hippoventionCenterSection} />
+                    <Advantages {...data.advantagesSection} />
                     <QuoteSection
                         {...data.anotherQuoteSection}
                         imgURL={data.anotherQuoteSection.imgURL || quote2DefaultImg}

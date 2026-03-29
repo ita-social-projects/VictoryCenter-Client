@@ -47,7 +47,7 @@ jest.mock('swiper/react', () => {
                     };
                     onInit(mockSwiperInstance);
                 }
-            }, [onInit]);
+            }, [onInit, onFromEdge, onReachBeginning, onReachEnd, onResize, onSlideChange]);
             return <div data-testid="swiper">{children}</div>;
         },
         SwiperSlide: ({ children, className }: any) => (

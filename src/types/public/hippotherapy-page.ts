@@ -24,16 +24,24 @@ export interface HippoventionCenterData {
     text: string;
 }
 
+export interface HippotherapyAdvantage {
+    imgURL: string;
+    imgAlternativeText: string;
+    text: string;
+}
+
+export interface HippotherapyAdvantagesSection {
+    title: string;
+    advantages: HippotherapyAdvantage[];
+}
+
 export interface HippotherapyAbout {
     introSection: HippotherapyIntroData;
     descriptionSection: HippotherapyDefaultSection;
     quoteSection: Quote;
     hippoventionSection: HippotherapyDefaultSection;
     hippoventionCenterSection: HippoventionCenterData;
-    advantagesSection: {
-        title: string;
-        advantages: { imgURL: string; text: string }[];
-    };
+    advantagesSection: HippotherapyAdvantagesSection;
     analysisSection: HippotherapyDefaultSection;
     researchSection: {
         description: string;

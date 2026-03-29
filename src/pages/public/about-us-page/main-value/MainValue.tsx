@@ -1,22 +1,13 @@
 import { useTranslation } from 'react-i18next';
 import { ABOUT_US_DATA } from '@/const/public/about-us-page';
 import styles from './MainValue.module.scss';
-import { Swiper } from '@/components/public/swiper/Swiper';
+import { WaveSwiper } from '@/components/public/swiper/wave-swiper/WaveSwiper';
 import { AboutUsContent } from '@/types/public/about-us-page';
 import { MainValueCard } from './main-value-card/MainValueCard';
 
 export interface MainValuesProps {
     content: AboutUsContent[] | null;
 }
-
-const SWIPER_NAVIGATION_CONFIG = {
-    prev: {
-        className: styles.left,
-    },
-    next: {
-        className: styles.right,
-    },
-};
 
 export const MainValues = ({ content }: MainValuesProps) => {
     const { t } = useTranslation('aboutUsPage');
@@ -34,16 +25,21 @@ export const MainValues = ({ content }: MainValuesProps) => {
             </div>
 
             <div className={styles[`people-block`]}>
-                <Swiper
+                <WaveSwiper
                     items={content}
-                    renderItem={(person, index) => {
+                    renderItemCallback={(person, index) => {
                         const imageUrl = person.image?.url ?? ABOUT_US_DATA.PEOPLE_DATA[index].IMG;
                         const altText = peopleData[index].ALT;
-
-                        return <MainValueCard person={person} index={index} imageUrl={imageUrl} altText={altText} />;
+                        return (
+                            <MainValueCard
+                                description={person.description}
+                                localizations={person.localizations}
+                                index={index}
+                                imageUrl={imageUrl}
+                                altText={altText}
+                            />
+                        );
                     }}
-                    classNameSwiperSlide={styles[`swiper-slide`]}
-                    navigationButtons={SWIPER_NAVIGATION_CONFIG}
                 />
             </div>
             <div className={styles[`summary-block`]}>

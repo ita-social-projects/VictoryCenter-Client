@@ -2,10 +2,10 @@ import introImg from '@/assets/images/public/hippotherapy/intro.jpg';
 import quoteImg from '@/assets/images/public/hippotherapy/quote_1.jpg';
 import anotherQuoteImg from '@/assets/images/public/hippotherapy/quote_2.jpg';
 import hippoventionImg from '@/assets/images/public/hippotherapy/hippovention_center.jpg';
-import advantageImage0 from '@/assets/images/public/programs-page/first.png';
-import advantageImage1 from '@/assets/images/public/programs-page/first.png';
-import advantageImage2 from '@/assets/images/public/programs-page/first.png';
-import advantageImage3 from '@/assets/images/public/programs-page/first.png';
+import advantageImage0 from '@/assets/images/public/about-us-page/man-horse.jpg';
+import advantageImage1 from '@/assets/images/public/hippotherapy/man_gray_horse.jpg';
+import advantageImage2 from '@/assets/images/public/about-us-page/girl-horse.jpg';
+import advantageImage3 from '@/assets/images/public/hippotherapy/man_leads_horse.jpg';
 import { HippotherapyAbout } from '@/types/public/hippotherapy-page';
 
 export const hippotherapyMock: HippotherapyAbout = {
@@ -46,18 +46,22 @@ export const hippotherapyMock: HippotherapyAbout = {
         advantages: [
             {
                 imgURL: advantageImage0,
+                imgAlternativeText: 'Чоловік притуляється до коня',
                 text: 'Тіло пам’ятає те, що слова не можуть передати. Робота з конем — це робота на рівні нервової системи.',
             },
             {
                 imgURL: advantageImage1,
+                imgAlternativeText: 'Чоловік притуляється до сірого коня',
                 text: 'Кінь не питає, що з тобою сталося. Але допомагає щиро відповісти на питання “як ти зараз?”.',
             },
             {
                 imgURL: advantageImage2,
+                imgAlternativeText: 'Дівчина притуляється до коня',
                 text: 'Нервова система людини й коня синхронізуються — це не метафора, а фізіологічна реальність.',
             },
             {
                 imgURL: advantageImage3,
+                imgAlternativeText: 'Чоловік веде коня за повід',
                 text: 'Людина часто говорить про те, що “мусить сказати”. Кінь відчуває те, що є насправді.',
             },
         ],

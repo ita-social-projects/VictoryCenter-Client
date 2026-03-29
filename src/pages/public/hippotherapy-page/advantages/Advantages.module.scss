@@ -1,0 +1,11 @@
+@use '@/assets/sass/mixins/typography.mixins' as type;
+
+.root {
+    margin: 64px 0;
+}
+
+.title {
+    @include type.h4-bold-uppercase;
+    padding: 16px;
+    margin-bottom: 52px;
+}

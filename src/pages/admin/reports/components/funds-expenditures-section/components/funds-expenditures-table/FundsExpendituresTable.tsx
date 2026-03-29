@@ -42,6 +42,7 @@ interface FundsExpendituresTableProps {
     exchangeRate?: string | null;
     allRecordsForTypeInference?: ReportFundsExpendituresRecord[];
     isEditing?: boolean;
+    isRowActionsDisabled?: boolean;
     onRowEditModeChange?: (isEditMode: boolean) => void;
     onRecordSave?: (
         recordId: number,
@@ -140,6 +141,7 @@ export const FundsExpendituresTable = ({
     exchangeRate,
     allRecordsForTypeInference,
     isEditing = false,
+    isRowActionsDisabled = false,
     onRowEditModeChange,
     onRecordSave,
 }: FundsExpendituresTableProps) => {
@@ -207,7 +209,7 @@ export const FundsExpendituresTable = ({
 
     const handleStartRowEdit = useCallback(
         (record: EnrichedRecord) => {
-            if (rowEditState) {
+            if (rowEditState || isRowActionsDisabled) {
                 return;
             }
 
@@ -222,7 +224,7 @@ export const FundsExpendituresTable = ({
                 errors: {},
             });
         },
-        [rowEditState, setRowEditMode],
+        [isRowActionsDisabled, rowEditState, setRowEditMode],
     );
 
     const handleCloseRowEdit = useCallback(() => {
@@ -544,7 +546,8 @@ export const FundsExpendituresTable = ({
                         ) : (
                             sortedRecords.map((record) => {
                                 const isEditedRow = rowEditState?.recordId === record.id;
-                                const isAnotherRowEditing = (isAnyRowEditing && !isEditedRow) || isSavingInProgress;
+                                const isAnotherRowEditing =
+                                    (isAnyRowEditing && !isEditedRow) || isSavingInProgress || isRowActionsDisabled;
                                 const isSavingCurrentRow = savingRecordId === record.id;
                                 const editableCategories = categoriesByType[record.type];
                                 const isAcceptDisabled = !isEditedRow || isAcceptButtonDisabled(rowEditState);

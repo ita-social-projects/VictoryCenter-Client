@@ -21,7 +21,6 @@ describe('PdfDropzone', () => {
 
     let mockOnUploaded: jest.Mock;
 
-    // 🔹 helper: render
     const setup = () => {
         const utils = render(<PdfDropzone onUploaded={mockOnUploaded} />);
         const input = utils.container.querySelector('input[type="file"]') as HTMLInputElement;
@@ -32,12 +31,10 @@ describe('PdfDropzone', () => {
         };
     };
 
-    // 🔹 helper: upload file через input
     const uploadFile = (input: HTMLInputElement, file: File) => {
         fireEvent.change(input, { target: { files: [file] } });
     };
 
-    // 🔹 helper: drop file
     const dropFile = (file: File) => {
         const label = screen.getByText(PDF_FILES_SECTION_TEXT.DROPZONE.TITLE).closest('label')!;
         fireEvent.drop(label, {
@@ -148,7 +145,6 @@ describe('PdfDropzone', () => {
         expect(mockOnUploaded).not.toHaveBeenCalled();
     });
 
-    // 🔹 helper для backend error
     const mockBackendError = (errors: unknown): AxiosError =>
         ({
             response: {

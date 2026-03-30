@@ -45,12 +45,11 @@ export const CustomFormGroup = ({
                     {...inputProps}
                     id={id}
                     hasError={!!error}
-                    // We render the bottom counter ourselves together with the error message
                     showCounter={false}
                     className={cn(styles['char-limit-input'], inputProps.className)}
                 />
 
-                {tooltipText && inputProps.disabled && (
+                {tooltipText && (
                     <div className={styles['custom-form-group-tooltip-inside']}>
                         <ButtonTooltip position="bottom" isRenderInPortal>
                             {tooltipText}

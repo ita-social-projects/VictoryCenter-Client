@@ -70,7 +70,7 @@ describe('CustomFormGroup', () => {
         expect(screen.queryByText('Label')).not.toBeInTheDocument();
     });
 
-    it('renders tooltip when tooltipText is provided and field is disabled (view mode)', () => {
+    it('renders tooltip when tooltipText is provided in view mode (disabled=true)', () => {
         render(
             <CustomFormGroup
                 id="field1"
@@ -87,7 +87,7 @@ describe('CustomFormGroup', () => {
         expect(screen.getByTestId('button-tooltip')).toHaveTextContent('Tooltip text');
     });
 
-    it('does not render tooltip in edit mode even when tooltipText is provided', () => {
+    it('renders tooltip when tooltipText is provided in edit mode (disabled=false)', () => {
         render(
             <CustomFormGroup
                 id="field1"
@@ -101,7 +101,7 @@ describe('CustomFormGroup', () => {
             />,
         );
 
-        expect(screen.queryByTestId('button-tooltip')).not.toBeInTheDocument();
+        expect(screen.getByTestId('button-tooltip')).toHaveTextContent('Tooltip text');
     });
 
     it('does not render tooltip when tooltipText is not provided', () => {

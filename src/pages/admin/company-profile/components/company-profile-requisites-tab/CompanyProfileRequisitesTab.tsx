@@ -1,3 +1,4 @@
+import React from 'react';
 import { useFormContext, Controller } from 'react-hook-form';
 import { CustomFormGroup } from '../company-profile-form-group/CompanyProfileFormGroup';
 import styles from './CompanyProfileRequisitesTab.module.scss';
@@ -32,7 +33,7 @@ export const CompanyProfileRequisitesTab = ({ disabled }: CompanyProfileRequisit
                             id="requisitesUa"
                             labelText={COMPANY_PROFILE_TEXT.REQUISITES_TAB.REQUISITES_UA_LABEL}
                             tooltipText={COMPANY_PROFILE_TEXT.REQUISITES_TAB.TOOLTIP_REQUISITES_UA}
-                            isRequired={true}
+                            isRequired
                             maxLength={100}
                             disabled={disabled}
                             showCounter={showCounter}
@@ -50,7 +51,7 @@ export const CompanyProfileRequisitesTab = ({ disabled }: CompanyProfileRequisit
                             id="requisitesEn"
                             labelText={COMPANY_PROFILE_TEXT.REQUISITES_TAB.REQUISITES_EN_LABEL}
                             tooltipText={COMPANY_PROFILE_TEXT.REQUISITES_TAB.TOOLTIP_REQUISITES_EN}
-                            isRequired={true}
+                            isRequired
                             maxLength={100}
                             disabled={disabled}
                             showCounter={showCounter}
@@ -66,9 +67,14 @@ export const CompanyProfileRequisitesTab = ({ disabled }: CompanyProfileRequisit
                         <CustomFormGroup
                             {...field}
                             id="companyRegistrationNumber"
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                const raw = e.target.value ?? '';
+                                const digitsOnly = raw.replace(/\D/g, '').slice(0, 8);
+                                field.onChange(digitsOnly);
+                            }}
                             labelText={COMPANY_PROFILE_TEXT.REQUISITES_TAB.COMPANY_REGISTRATION_NUMBER_LABEL}
                             tooltipText={COMPANY_PROFILE_TEXT.REQUISITES_TAB.TOOLTIP_COMPANY_REGISTRATION_NUMBER}
-                            isRequired={true}
+                            isRequired
                             maxLength={8}
                             disabled={disabled}
                             showCounter={showCounter}
@@ -86,7 +92,7 @@ export const CompanyProfileRequisitesTab = ({ disabled }: CompanyProfileRequisit
                             id="addressUa_requisites"
                             labelText={COMPANY_PROFILE_TEXT.REQUISITES_TAB.REQUISITES_ADDRESS_UA_LABEL}
                             tooltipText={COMPANY_PROFILE_TEXT.REQUISITES_TAB.TOOLTIP_REQUISITES_ADDRESS_UA}
-                            isRequired={true}
+                            isRequired
                             maxLength={100}
                             disabled={disabled}
                             showCounter={showCounter}
@@ -104,7 +110,7 @@ export const CompanyProfileRequisitesTab = ({ disabled }: CompanyProfileRequisit
                             id="addressEn_requisites"
                             labelText={COMPANY_PROFILE_TEXT.REQUISITES_TAB.REQUISITES_ADDRESS_EN_LABEL}
                             tooltipText={COMPANY_PROFILE_TEXT.REQUISITES_TAB.TOOLTIP_REQUISITES_ADDRESS_EN}
-                            isRequired={true}
+                            isRequired
                             maxLength={100}
                             disabled={disabled}
                             showCounter={showCounter}

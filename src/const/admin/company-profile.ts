@@ -1,3 +1,5 @@
+import { COMMON_TEXT_ADMIN } from './common';
+
 export const COMPANY_PROFILE_TEXT = {
     TABS: {
         PROFILE: 'Профіль компанії',
@@ -64,5 +66,45 @@ export const COMPANY_PROFILE_TEXT = {
         },
         ADD_CONTACT_PLACEHOLDER: 'Додати контакт',
         LIMIT_MESSAGE: 'Дозволено лише 4 контакти.',
+    },
+} as const;
+
+export const COMPANY_PROFILE_VALIDATION = {
+    common: {
+        REQUIRED: COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED,
+        getEmailError: () => 'Введіть e-mail',
+        getDigitsOnlyError: () => 'Мають бути цифри',
+    },
+
+    phone: {
+        max: 20,
+    },
+
+    address: {
+        max: 100,
+    },
+
+    email: {
+        max: 50,
+    },
+
+    motto: {
+        max: 200,
+        getMaxError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(200),
+    },
+
+    recipient: {
+        max: 100,
+    },
+
+    edrpou: {
+        length: 8,
+        getMinError: () => `Не менше ${COMPANY_PROFILE_VALIDATION.edrpou.length} цифр`,
+        getMaxError: () => `Не більше ${COMPANY_PROFILE_VALIDATION.edrpou.length} цифр`,
+    },
+
+    socialUrl: {
+        max: 500,
+        getMaxError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(500),
     },
 } as const;

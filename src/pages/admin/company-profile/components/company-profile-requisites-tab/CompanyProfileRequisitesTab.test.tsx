@@ -1,16 +1,22 @@
 import React from 'react';
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { CompanyProfileRequisitesTab } from './CompanyProfileRequisitesTab';
 import { COMPANY_PROFILE_FORM_DEFAULTS, CompanyProfileFormValues } from '@/types/admin/company-profile';
 import { COMPANY_PROFILE_TEXT } from '@/const/admin/company-profile';
 
 jest.mock('../company-profile-form-group/CompanyProfileFormGroup', () => ({
-    CustomFormGroup: ({ id, labelText, disabled }: any) => (
+    CustomFormGroup: ({ id, labelText, disabled, value, onChange }: any) => (
         <div data-testid={`group-${id}`}>
             <span data-testid={`label-${id}`}>{labelText}</span>
-            <input data-testid={`input-${id}`} id={id} disabled={disabled} />
+            <input
+                data-testid={`input-${id}`}
+                id={id}
+                disabled={disabled}
+                value={value ?? ''}
+                onChange={(e) => onChange?.(e)}
+            />
         </div>
     ),
 }));
@@ -51,5 +57,17 @@ describe('CompanyProfileRequisitesTab', () => {
         render(<Wrapper disabled={false} />);
         expect(screen.getByTestId('input-requisitesUa')).not.toBeDisabled();
         expect(screen.getByTestId('input-companyRegistrationNumber')).not.toBeDisabled();
+    });
+
+    it('sanitizes companyRegistrationNumber to digits only and max 8 chars', () => {
+        render(<Wrapper disabled={false} />);
+
+        const input = screen.getByTestId('input-companyRegistrationNumber') as HTMLInputElement;
+
+        fireEvent.change(input, { target: { value: '12a45-67' } });
+        expect(input.value).toBe('124567');
+
+        fireEvent.change(input, { target: { value: '123456789999' } });
+        expect(input.value).toBe('12345678');
     });
 });

@@ -11,6 +11,8 @@ import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import { PdfDropzone } from './components/pdf-dropzone/PdfDropzone';
 
+const EMPTY_SECTION = { title: '', description: '' };
+
 export const PdfFilesSection = () => {
     const client = useAdminClient();
     const [uploadedFiles, setUploadedFiles] = useState<PdfReportDto[]>([]);
@@ -46,7 +48,7 @@ export const PdfFilesSection = () => {
     }, []);
 
     const handleSaveSection = useCallback(async () => {
-        refetchSection();
+        await refetchSection();
     }, [refetchSection]);
 
     if (isSectionLoading || isFilesLoading) {
@@ -60,10 +62,7 @@ export const PdfFilesSection = () => {
     return (
         <div className={styles.root}>
             <div className={styles['top-section']}>
-                <PdfSectionContentBlock
-                    content={sectionData ?? { title: '', description: '' }}
-                    onSave={handleSaveSection}
-                />
+                <PdfSectionContentBlock content={sectionData ?? EMPTY_SECTION} onSave={handleSaveSection} />
             </div>
             <div className={styles['language-switcher-container']}>
                 <LanguageSwitcherButtons currentLanguage={currentLanguage} onLanguageChange={setCurrentLanguage} />

@@ -95,12 +95,12 @@ export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({ 
 
             await PdfSectionApi.updatePdfSection(client, normalizedData);
 
-            setIsEditMode(false);
-            addToast(REPORTS_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY, ToastType.Success);
-
             if (onSave) {
                 await onSave(normalizedData);
             }
+
+            setIsEditMode(false);
+            addToast(REPORTS_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY, ToastType.Success);
         } catch {
             addToast(REPORTS_TEXT.MESSAGE.RECORD_UPDATE_FAILED_RETRY, ToastType.Error);
         } finally {

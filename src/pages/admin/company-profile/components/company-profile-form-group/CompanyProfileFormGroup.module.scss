@@ -21,24 +21,32 @@
 }
 
 .custom-form-group-input-wrapper {
-    position: relative;
+    flex: 1;
+    min-width: 0;
+}
+
+.custom-form-group-field-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     width: 100%;
 }
 
-.custom-form-group-tooltip-inside {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    z-index: 2;
-    display: inline-flex;
+.custom-form-group-tooltip-slot {
+    flex-shrink: 0;
+    width: 24px;
+    display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.meta-row-wrapper {
+    padding-right: 32px;
 }
 
 .char-limit-input {
     width: 100%;
     min-width: 0;
-    padding-right: 44px;
 }
 
 .custom-form-group-input-wrapper :global(.char-limit-input),
@@ -51,6 +59,10 @@
     z-index: 9999;
     position: absolute;
     text-align: left;
+}
+
+.custom-form-group > :global(.input-error-with-counter) {
+    padding-right: 32px;
 }
 
 .meta-row--error-only :global(output) {

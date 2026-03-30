@@ -40,41 +40,47 @@ export const CustomFormGroup = ({
                 </div>
             )}
 
-            <div className={styles['custom-form-group-input-wrapper']}>
-                <InputWithCharacterLimit
-                    {...inputProps}
-                    id={id}
-                    hasError={!!error}
-                    showCounter={false}
-                    className={cn(styles['char-limit-input'], inputProps.className)}
-                />
+            <div className={styles['custom-form-group-field-row']}>
+                <div className={styles['custom-form-group-input-wrapper']}>
+                    <InputWithCharacterLimit
+                        {...inputProps}
+                        id={id}
+                        hasError={!!error}
+                        showCounter={false}
+                        className={cn(styles['char-limit-input'], inputProps.className)}
+                    />
+                </div>
 
-                {tooltipText && (
-                    <div className={styles['custom-form-group-tooltip-inside']}>
+                <div className={styles['custom-form-group-tooltip-slot']}>
+                    {tooltipText && (
                         <ButtonTooltip position="bottom" isRenderInPortal>
                             {tooltipText}
                         </ButtonTooltip>
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
 
             {showCounter ? (
-                <InputErrorWithCharacterCounter
-                    error={error}
-                    maxLength={inputProps.maxLength}
-                    value={String(inputProps.value ?? '')}
-                    counterId={counterId}
-                    htmlFor={id}
-                />
+                <div className={styles['meta-row-wrapper']}>
+                    <InputErrorWithCharacterCounter
+                        error={error}
+                        maxLength={inputProps.maxLength}
+                        value={String(inputProps.value ?? '')}
+                        counterId={counterId}
+                        htmlFor={id}
+                    />
+                </div>
             ) : (
-                <InputErrorWithCharacterCounter
-                    error={error}
-                    maxLength={inputProps.maxLength}
-                    value={String(inputProps.value ?? '')}
-                    counterId={counterId}
-                    htmlFor={id}
-                    containerClassName={styles['meta-row--error-only']}
-                />
+                <div className={styles['meta-row-wrapper']}>
+                    <InputErrorWithCharacterCounter
+                        error={error}
+                        maxLength={inputProps.maxLength}
+                        value={String(inputProps.value ?? '')}
+                        counterId={counterId}
+                        htmlFor={id}
+                        containerClassName={styles['meta-row--error-only']}
+                    />
+                </div>
             )}
         </div>
     );

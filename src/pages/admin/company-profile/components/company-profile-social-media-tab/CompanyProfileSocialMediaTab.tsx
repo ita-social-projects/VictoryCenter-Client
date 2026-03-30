@@ -1,4 +1,5 @@
 import { useFormContext, Controller, useFieldArray } from 'react-hook-form';
+import { useState } from 'react';
 import { CustomFormGroup } from '../company-profile-form-group/CompanyProfileFormGroup';
 import { COMPANY_PROFILE_TEXT } from '@/const/admin/company-profile';
 import styles from './CompanyProfileSocialMediaTab.module.scss';
@@ -8,6 +9,7 @@ import { IconButton } from '@/components/admin/icon-button/IconButton';
 import { ACTION_ICONS } from '@/const/common/action-icons';
 import { ButtonTooltip } from '@/components/admin/button-tooltip/ButtonTooltip';
 import { CompanyProfileFormValues, SocialPlatform } from '@/types/admin/company-profile';
+import { CompanyProfileDeleteSocialModal } from '../company-profile-delete-social-modal/CompanyProfileDeleteSocialModal';
 
 interface CompanyProfileSocialMediaTabProps {
     disabled: boolean;
@@ -37,6 +39,8 @@ export const CompanyProfileSocialMediaTab = ({ disabled }: CompanyProfileSocialM
         control,
         name: 'socialContacts',
     });
+
+    const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
 
     const watchedSocialContacts = watch('socialContacts');
 
@@ -73,6 +77,21 @@ export const CompanyProfileSocialMediaTab = ({ disabled }: CompanyProfileSocialM
     const handleAddPlatform = (opt: SelectOption) => {
         if (disabled || isLimitReached) return;
         append({ platform: opt.id, url: '' });
+    };
+
+    const handleDeleteClick = (index: number) => {
+        setDeleteIndex(index);
+    };
+
+    const handleConfirmDelete = () => {
+        if (deleteIndex !== null) {
+            remove(deleteIndex);
+            setDeleteIndex(null);
+        }
+    };
+
+    const handleCancelDelete = () => {
+        setDeleteIndex(null);
     };
 
     const showCounter = !disabled;
@@ -115,17 +134,19 @@ export const CompanyProfileSocialMediaTab = ({ disabled }: CompanyProfileSocialM
                                 <span className={styles['social-media-contact-label-text']}>{field.platform}</span>
                             </div>
 
-                            <div className={styles['social-media-contact-actions']}>
-                                <IconButton
-                                    type="button"
-                                    className={styles['social-media-contact-icon-btn']}
-                                    onClick={() => remove(index)}
-                                    aria-label="Delete social contact"
-                                    disabled={disabled}
-                                    DefaultIcon={ACTION_ICONS.delete.default}
-                                    FilledIcon={ACTION_ICONS.delete.hover}
-                                />
-                            </div>
+                            {fields.length > 1 && (
+                                <div className={styles['social-media-contact-actions']}>
+                                    <IconButton
+                                        type="button"
+                                        className={styles['social-media-contact-icon-btn']}
+                                        onClick={() => handleDeleteClick(index)}
+                                        aria-label="Delete social contact"
+                                        disabled={disabled}
+                                        DefaultIcon={ACTION_ICONS.delete.default}
+                                        FilledIcon={ACTION_ICONS.delete.hover}
+                                    />
+                                </div>
+                            )}
                         </div>
 
                         <Controller
@@ -148,6 +169,12 @@ export const CompanyProfileSocialMediaTab = ({ disabled }: CompanyProfileSocialM
                     </div>
                 ))}
             </div>
+
+            <CompanyProfileDeleteSocialModal
+                isOpen={deleteIndex !== null}
+                onConfirm={handleConfirmDelete}
+                onCancel={handleCancelDelete}
+            />
         </div>
     );
 };

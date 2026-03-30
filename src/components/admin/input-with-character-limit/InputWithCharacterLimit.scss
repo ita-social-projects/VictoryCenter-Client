@@ -1,14 +1,5 @@
 @use '@/assets/sass/variables/colors';
 
-.char-limit-input-wrapper {
-    width: 100%;
-
-    &--bottom {
-        display: flex;
-        flex-direction: column;
-    }
-}
-
 .char-limit-input {
     display: flex;
     align-items: center;
@@ -81,24 +72,5 @@
         white-space: nowrap;
         color: colors.$grey-900;
         flex-shrink: 0;
-
-        &--bottom {
-            display: block;
-            margin-top: 6px;
-            text-align: right;
-            width: 100%;
-        }
-
-        &--visually-hidden {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0 0 0 0);
-            white-space: nowrap;
-            border: 0;
-        }
     }
 }

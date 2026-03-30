@@ -6,7 +6,6 @@
     flex-direction: column;
     gap: 6px;
     width: 100%;
-    position: relative;
 }
 
 .custom-form-group-label-wrapper label {
@@ -24,7 +23,6 @@
 .custom-form-group-input-wrapper {
     position: relative;
     width: 100%;
-    padding-bottom: 20px;
 }
 
 .custom-form-group-tooltip-inside {
@@ -43,12 +41,7 @@
     padding-right: 44px;
 }
 
-.custom-form-group-input-wrapper :global(.char-limit-input) {
-    width: 100%;
-    min-width: 0;
-    flex: 1 1 auto;
-}
-
+.custom-form-group-input-wrapper :global(.char-limit-input),
 .custom-form-group-input-wrapper :global(input) {
     width: 100%;
     min-width: 0;
@@ -60,28 +53,6 @@
     text-align: left;
 }
 
-.custom-form-group :global(.input-error) {
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    margin: 0;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    max-width: calc(100% - 72px);
-    white-space: nowrap;
-    overflow: hidden;
-}
-
-.custom-form-group-input-wrapper :global(.char-limit-input__counter--bottom) {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    margin: 0;
-    height: 20px;
-    display: inline-flex;
-    align-items: center;
-    width: auto;
-    max-width: none;
-    white-space: nowrap;
+.meta-row--error-only :global(output) {
+    display: none;
 }

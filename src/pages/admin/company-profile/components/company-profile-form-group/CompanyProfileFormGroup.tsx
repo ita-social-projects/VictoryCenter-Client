@@ -4,8 +4,8 @@ import {
     InputWithCharacterLimit,
     InputWithCharacterLimitProps,
 } from '@/components/admin/input-with-character-limit/InputWithCharacterLimit';
-import { InputError } from '@/components/admin/input-error/InputError';
 import { ButtonTooltip } from '@/components/admin/button-tooltip/ButtonTooltip';
+import { InputErrorWithCharacterCounter } from '@/components/admin/input-error-with-character-counter/InputErrorWithCharacterCounter';
 import styles from './CompanyProfileFormGroup.module.scss';
 
 export interface CustomFormGroupProps extends Omit<InputWithCharacterLimitProps, 'hasError'> {
@@ -27,6 +27,8 @@ export const CustomFormGroup = ({
     showCounter = true,
     ...inputProps
 }: CustomFormGroupProps) => {
+    const counterId = `${id}-character-count`;
+
     return (
         <div className={styles['custom-form-group']}>
             {!hideLabel && (
@@ -43,8 +45,8 @@ export const CustomFormGroup = ({
                     {...inputProps}
                     id={id}
                     hasError={!!error}
-                    counterPosition="bottom"
-                    showCounter={showCounter}
+                    // We render the bottom counter ourselves together with the error message
+                    showCounter={false}
                     className={cn(styles['char-limit-input'], inputProps.className)}
                 />
 
@@ -57,7 +59,24 @@ export const CustomFormGroup = ({
                 )}
             </div>
 
-            <InputError error={error} />
+            {showCounter ? (
+                <InputErrorWithCharacterCounter
+                    error={error}
+                    maxLength={inputProps.maxLength}
+                    value={String(inputProps.value ?? '')}
+                    counterId={counterId}
+                    htmlFor={id}
+                />
+            ) : (
+                <InputErrorWithCharacterCounter
+                    error={error}
+                    maxLength={inputProps.maxLength}
+                    value={String(inputProps.value ?? '')}
+                    counterId={counterId}
+                    htmlFor={id}
+                    containerClassName={styles['meta-row--error-only']}
+                />
+            )}
         </div>
     );
 };

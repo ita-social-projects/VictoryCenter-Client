@@ -47,6 +47,7 @@ export const CompanyProfileContent = () => {
     const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 
     const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
+    const [isPublishing, setIsPublishing] = useState(false);
     const [pendingPublishData, setPendingPublishData] = useState<CompanyProfileFormValues | null>(null);
 
     const savedValuesRef = useRef<CompanyProfileFormValues>(COMPANY_PROFILE_FORM_DEFAULTS);
@@ -65,27 +66,30 @@ export const CompanyProfileContent = () => {
     };
 
     const handleConfirmPublish = async () => {
-        if (!pendingPublishData) return;
+        if (!pendingPublishData || isPublishing) return;
 
-        const { languages } = await CompanyProfileApi.get(client);
-        const patch = mapFormValuesToCompanyProfilePatch(pendingPublishData, languages);
+        setIsPublishing(true);
+        try {
+            const { languages } = await CompanyProfileApi.get(client);
+            const patch = mapFormValuesToCompanyProfilePatch(pendingPublishData, languages);
 
-        const { profile, languages: updatedLanguages } = await CompanyProfileApi.publish(client, patch);
+            const { profile, languages: updatedLanguages } = await CompanyProfileApi.publish(client, patch);
 
-        const nextValues = mapCompanyProfileToFormValues(profile, updatedLanguages);
-        savedValuesRef.current = nextValues;
+            const nextValues = mapCompanyProfileToFormValues(profile, updatedLanguages);
+            savedValuesRef.current = nextValues;
 
-        methods.reset(nextValues);
-        setIsEditMode(false);
-        setIsPublishModalOpen(false);
-        setPendingPublishData(null);
+            methods.reset(nextValues);
+            setIsEditMode(false);
+            setIsPublishModalOpen(false);
+            setPendingPublishData(null);
 
-        addToast('Зміни успішно опубліковано', ToastType.Success, 3000);
+            addToast('Зміни успішно опубліковано', ToastType.Success, 3000);
+        } finally {
+            setIsPublishing(false);
+        }
     };
 
     const handleCancelPublish = () => {
-        methods.reset(savedValuesRef.current);
-        setIsEditMode(false);
         setIsPublishModalOpen(false);
         setPendingPublishData(null);
     };
@@ -120,7 +124,10 @@ export const CompanyProfileContent = () => {
 
             const values = mapCompanyProfileToFormValues(profile, languages);
             savedValuesRef.current = values;
-            methods.reset(values);
+
+            if (!methods.formState.isDirty) {
+                methods.reset(values);
+            }
         };
 
         void loadProfile();
@@ -185,6 +192,7 @@ export const CompanyProfileContent = () => {
                 isOpen={isPublishModalOpen}
                 onConfirm={handleConfirmPublish}
                 onCancel={handleCancelPublish}
+                isButtonsDisabled={isPublishing}
             />
 
             <ToastContainer />

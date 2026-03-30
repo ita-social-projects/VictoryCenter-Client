@@ -9,13 +9,15 @@ import { ToastType } from '@/types/admin/toast';
 
 const mockAddToast = jest.fn();
 
-jest.mock('@/validation/admin/company-profile-schema/company-profile-schema', () => ({
-    __esModule: true,
-    CompanyProfileValidationSchema: {
-        validate: async (value: any) => value,
-        validateSync: (value: any) => value,
-    },
-}));
+jest.mock('@/validation/admin/company-profile-schema/company-profile-schema', () => {
+    const yup = require('yup');
+    return {
+        __esModule: true,
+        CompanyProfileValidationSchema: yup.object({
+            phone: yup.string().trim().required("Поле обов'язкове"),
+        }),
+    };
+});
 
 jest.mock('@/utils/functions/mappers/admin/company-profile/company-profile-mappers', () => ({
     __esModule: true,
@@ -270,13 +272,15 @@ describe('CompanyProfileContent', () => {
         expect(screen.getByTestId('publish-modal')).toBeInTheDocument();
     });
 
-    it("when publish modal 'No' clicked: does not save, exits to view mode, and does not show toast", async () => {
+    it("when publish modal 'No' clicked: does not save, keeps edit mode, and does not show toast", async () => {
         const phoneInput = await setupEditMode();
         await triggerValidPublishFlow(phoneInput);
 
         fireEvent.click(screen.getByTestId('cancel-publish'));
 
-        expect(await screen.findByTestId('edit-btn')).toBeInTheDocument();
+        expect(screen.getByTestId('publish-btn')).toBeInTheDocument();
+        expect(screen.queryByTestId('edit-btn')).not.toBeInTheDocument();
+
         expect(mockedPublish).not.toHaveBeenCalled();
         expect(mockAddToast).not.toHaveBeenCalled();
     });

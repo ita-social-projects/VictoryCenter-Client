@@ -5,17 +5,17 @@ import { CompanyProfilePublishModal } from './CompanyProfilePublishModal';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
 jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
-    ConfirmationModal: ({ isOpen, title, confirmText, cancelText, onConfirm, onCancel, onClose }: any) =>
+    ConfirmationModal: ({ isOpen, ...p }: any) =>
         isOpen ? (
             <div data-testid="confirmation-modal">
-                <div data-testid="confirmation-title">{title}</div>
-                <button data-testid="confirm-btn" onClick={onConfirm}>
-                    {confirmText}
+                <div data-testid="confirmation-title">{p.title}</div>
+                <button data-testid="confirm-btn" onClick={p.onConfirm}>
+                    {p.confirmText}
                 </button>
-                <button data-testid="cancel-btn" onClick={onCancel}>
-                    {cancelText}
+                <button data-testid="cancel-btn" onClick={p.onCancel}>
+                    {p.cancelText}
                 </button>
-                <button data-testid="close-btn" onClick={onClose}>
+                <button data-testid="close-btn" onClick={p.onClose}>
                     Close
                 </button>
             </div>

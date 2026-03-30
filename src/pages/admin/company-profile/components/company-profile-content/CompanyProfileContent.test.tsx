@@ -198,67 +198,18 @@ describe('CompanyProfileContent', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         mockedUseAdminClient.mockReturnValue({} as any);
-
         mockedGet.mockResolvedValue({ profile: { id: 1 }, languages: [] });
         mockedPublish.mockResolvedValue({ profile: { id: 1 }, languages: [] });
     });
 
-    it('renders default tab (profile) and allows tab switching in view mode', () => {
-        render(<CompanyProfileContent />);
-
-        expect(screen.getByTestId('tab-profile')).toBeInTheDocument();
-        fireEvent.click(screen.getByTestId('tab-btn-requisites'));
-        expect(screen.getByTestId('tab-requisites')).toBeInTheDocument();
-        fireEvent.click(screen.getByTestId('tab-btn-socials'));
-        expect(screen.getByTestId('tab-socials')).toBeInTheDocument();
-    });
-
-    it('enters edit mode and disables tab switching', () => {
-        render(<CompanyProfileContent />);
-
-        fireEvent.click(screen.getByTestId('edit-btn'));
-        expect(screen.getByTestId('tab-profile')).toHaveAttribute('data-disabled', 'false');
-
-        fireEvent.click(screen.getByTestId('tab-btn-requisites'));
-        expect(screen.getByTestId('tab-profile')).toBeInTheDocument();
-    });
-
-    it('exits edit mode on cancel when form is not dirty', () => {
-        render(<CompanyProfileContent />);
-
-        fireEvent.click(screen.getByTestId('edit-btn'));
-        fireEvent.click(screen.getByTestId('cancel-btn'));
-        expect(screen.getByTestId('edit-btn')).toBeInTheDocument();
-    });
-
-    it('calls CompanyProfileApi.get on mount', async () => {
-        render(<CompanyProfileContent />);
-
-        await waitFor(() => expect(mockedGet).toHaveBeenCalledTimes(1));
-    });
-
-    it('disables publish when form is dirty but invalid (required phone)', async () => {
-        render(<CompanyProfileContent />);
-
-        fireEvent.click(screen.getByTestId('edit-btn'));
-
-        const publishBtn = screen.getByTestId('publish-btn') as HTMLButtonElement;
-        const phoneInput = screen.getByTestId('input-phone') as HTMLInputElement;
-
-        fireEvent.change(phoneInput, { target: { value: '   ' } });
-        fireEvent.blur(phoneInput);
-
-        await waitFor(() => expect(publishBtn).toBeDisabled());
-        expect(COMPANY_PROFILE_VALIDATION.common.REQUIRED).toBe("Поле обов'язкове");
-    });
-
-    it('opens publish modal on publish click when form is dirty and valid', async () => {
+    const setupEditMode = async () => {
         render(<CompanyProfileContent />);
         await waitFor(() => expect(mockedGet).toHaveBeenCalledTimes(1));
-
         fireEvent.click(screen.getByTestId('edit-btn'));
+        return screen.getByTestId('input-phone') as HTMLInputElement;
+    };
 
-        const phoneInput = screen.getByTestId('input-phone') as HTMLInputElement;
+    const triggerValidPublishFlow = async (phoneInput: HTMLInputElement) => {
         fireEvent.change(phoneInput, { target: { value: '+380 00 000 00 00' } });
         fireEvent.blur(phoneInput);
 
@@ -266,53 +217,78 @@ describe('CompanyProfileContent', () => {
         await waitFor(() => expect(publishBtn).not.toBeDisabled());
 
         fireEvent.click(publishBtn);
+        await screen.findByTestId('publish-modal');
+    };
 
-        expect(await screen.findByTestId('publish-modal')).toBeInTheDocument();
+    it('renders default tab (profile) and allows tab switching in view mode', () => {
+        render(<CompanyProfileContent />);
+        expect(screen.getByTestId('tab-profile')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByTestId('tab-btn-requisites'));
+        expect(screen.getByTestId('tab-requisites')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByTestId('tab-btn-socials'));
+        expect(screen.getByTestId('tab-socials')).toBeInTheDocument();
+    });
+
+    it('enters edit mode and disables tab switching', () => {
+        render(<CompanyProfileContent />);
+        fireEvent.click(screen.getByTestId('edit-btn'));
+
+        expect(screen.getByTestId('tab-profile')).toHaveAttribute('data-disabled', 'false');
+        fireEvent.click(screen.getByTestId('tab-btn-requisites'));
+        expect(screen.getByTestId('tab-profile')).toBeInTheDocument();
+    });
+
+    it('exits edit mode on cancel when form is not dirty', () => {
+        render(<CompanyProfileContent />);
+        fireEvent.click(screen.getByTestId('edit-btn'));
+        fireEvent.click(screen.getByTestId('cancel-btn'));
+        expect(screen.getByTestId('edit-btn')).toBeInTheDocument();
+    });
+
+    it('calls CompanyProfileApi.get on mount', async () => {
+        render(<CompanyProfileContent />);
+        await waitFor(() => expect(mockedGet).toHaveBeenCalledTimes(1));
+    });
+
+    it('disables publish when form is dirty but invalid (required phone)', async () => {
+        const phoneInput = await setupEditMode();
+
+        fireEvent.change(phoneInput, { target: { value: '   ' } });
+        fireEvent.blur(phoneInput);
+
+        const publishBtn = screen.getByTestId('publish-btn') as HTMLButtonElement;
+        await waitFor(() => expect(publishBtn).toBeDisabled());
+        expect(COMPANY_PROFILE_VALIDATION.common.REQUIRED).toBe("Поле обов'язкове");
+    });
+
+    it('opens publish modal on publish click when form is dirty and valid', async () => {
+        const phoneInput = await setupEditMode();
+        await triggerValidPublishFlow(phoneInput);
+
+        expect(screen.getByTestId('publish-modal')).toBeInTheDocument();
     });
 
     it("when publish modal 'No' clicked: does not save, exits to view mode, and does not show toast", async () => {
-        render(<CompanyProfileContent />);
-        await waitFor(() => expect(mockedGet).toHaveBeenCalledTimes(1));
-
-        fireEvent.click(screen.getByTestId('edit-btn'));
-
-        const phoneInput = screen.getByTestId('input-phone') as HTMLInputElement;
-        fireEvent.change(phoneInput, { target: { value: '+380 00 000 00 00' } });
-        fireEvent.blur(phoneInput);
-
-        await waitFor(() => expect(screen.getByTestId('publish-btn')).not.toBeDisabled());
-
-        fireEvent.click(screen.getByTestId('publish-btn'));
-        await screen.findByTestId('publish-modal');
+        const phoneInput = await setupEditMode();
+        await triggerValidPublishFlow(phoneInput);
 
         fireEvent.click(screen.getByTestId('cancel-publish'));
 
         expect(await screen.findByTestId('edit-btn')).toBeInTheDocument();
-
         expect(mockedPublish).not.toHaveBeenCalled();
         expect(mockAddToast).not.toHaveBeenCalled();
     });
 
     it("when publish modal 'Yes' clicked: saves, exits to view mode, and shows toast", async () => {
-        render(<CompanyProfileContent />);
-        await waitFor(() => expect(mockedGet).toHaveBeenCalledTimes(1));
-
-        fireEvent.click(screen.getByTestId('edit-btn'));
-
-        const phoneInput = screen.getByTestId('input-phone') as HTMLInputElement;
-        fireEvent.change(phoneInput, { target: { value: '+380 00 000 00 00' } });
-        fireEvent.blur(phoneInput);
-
-        await waitFor(() => expect(screen.getByTestId('publish-btn')).not.toBeDisabled());
-
-        fireEvent.click(screen.getByTestId('publish-btn'));
-        await screen.findByTestId('publish-modal');
+        const phoneInput = await setupEditMode();
+        await triggerValidPublishFlow(phoneInput);
 
         fireEvent.click(screen.getByTestId('confirm-publish'));
 
         await waitFor(() => expect(mockedPublish).toHaveBeenCalledTimes(1));
         expect(await screen.findByTestId('edit-btn')).toBeInTheDocument();
-
         expect(mockAddToast).toHaveBeenCalledWith('Зміни успішно опубліковано', ToastType.Success, 3000);
     });
 });

@@ -2,6 +2,30 @@ import { CompanyProfileApi } from './company-profile-api';
 import { mockCompanyProfile, mockCompanyProfileLanguages } from '@/utils/mock-data/admin/company-profile';
 import type { CompanyProfilePatch } from '@/utils/functions/mappers/admin/company-profile/company-profile-mappers';
 
+const createMockPatch = (socialLinks: any[] = []): CompanyProfilePatch => ({
+    contact: {
+        phone: '+380000000000',
+        address: 'New UA address',
+        email: 'new@email.com',
+        correspondenceEmail: 'new-office@email.com',
+        motto: 'New motto',
+        localizations: [
+            { languageCode: 'uk', address: 'New UA address', motto: 'New motto' },
+            { languageCode: 'en', address: 'New EN address', motto: 'New EN motto' },
+        ],
+    },
+    requisite: {
+        recipient: 'New recipient UA',
+        edrpou: '87654321',
+        address: 'New UA req address',
+        localizations: [
+            { languageCode: 'uk', recipient: 'New recipient UA', address: 'New UA req address' },
+            { languageCode: 'en', recipient: 'New recipient EN', address: 'New EN req address' },
+        ],
+    },
+    socialLinks,
+});
+
 describe('CompanyProfileApi', () => {
     beforeEach(() => {
         jest.useFakeTimers();
@@ -26,31 +50,9 @@ describe('CompanyProfileApi', () => {
     });
 
     it('publish should update stored profile and be returned by subsequent get()', async () => {
-        const patch: CompanyProfilePatch = {
-            contact: {
-                phone: '+380000000000',
-                address: 'New UA address',
-                email: 'new@email.com',
-                correspondenceEmail: 'new-office@email.com',
-                motto: 'New motto',
-                localizations: [
-                    { languageCode: 'uk', address: 'New UA address', motto: 'New motto' },
-                    { languageCode: 'en', address: 'New EN address', motto: 'New EN motto' },
-                ],
-            },
-            requisite: {
-                recipient: 'New recipient UA',
-                edrpou: '87654321',
-                address: 'New UA req address',
-                localizations: [
-                    { languageCode: 'uk', recipient: 'New recipient UA', address: 'New UA req address' },
-                    { languageCode: 'en', recipient: 'New recipient EN', address: 'New EN req address' },
-                ],
-            },
-            socialLinks: [{ socialPlatform: 'Instagram', url: 'https://instagram.com/new' }],
-        };
-
+        const patch = createMockPatch([{ socialPlatform: 'Instagram', url: 'https://instagram.com/new' }]);
         const publishPromise = CompanyProfileApi.publish({} as any, patch);
+
         jest.advanceTimersByTime(200);
         const published = await publishPromise;
 
@@ -60,6 +62,7 @@ describe('CompanyProfileApi', () => {
         expect(published.profile.socialLinks[0]?.url).toBe('https://instagram.com/new');
 
         const getPromise = CompanyProfileApi.get({} as any);
+
         jest.advanceTimersByTime(200);
         const afterGet = await getPromise;
 
@@ -69,37 +72,16 @@ describe('CompanyProfileApi', () => {
     });
 
     it('__resetMocks should restore initial mock profile', async () => {
-        const patch: CompanyProfilePatch = {
-            contact: {
-                phone: '+380000000000',
-                address: 'New UA address',
-                email: 'new@email.com',
-                correspondenceEmail: 'new-office@email.com',
-                motto: 'New motto',
-                localizations: [
-                    { languageCode: 'uk', address: 'New UA address', motto: 'New motto' },
-                    { languageCode: 'en', address: 'New EN address', motto: 'New EN motto' },
-                ],
-            },
-            requisite: {
-                recipient: 'New recipient UA',
-                edrpou: '87654321',
-                address: 'New UA req address',
-                localizations: [
-                    { languageCode: 'uk', recipient: 'New recipient UA', address: 'New UA req address' },
-                    { languageCode: 'en', recipient: 'New recipient EN', address: 'New EN req address' },
-                ],
-            },
-            socialLinks: [],
-        };
-
+        const patch = createMockPatch([]);
         const publishPromise = CompanyProfileApi.publish({} as any, patch);
+
         jest.advanceTimersByTime(200);
         await publishPromise;
 
         CompanyProfileApi.__resetMocks();
 
         const getPromise = CompanyProfileApi.get({} as any);
+
         jest.advanceTimersByTime(200);
         const result = await getPromise;
 

@@ -11,6 +11,7 @@ import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/in
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { Button } from '@/components/admin/button/Button';
 import styles from './PdfSectionContentBlock.module.scss';
+import './PdfSectionContentBlock.scss';
 import cn from 'classnames';
 import { ACTION_ICONS } from '@/const/common/action-icons';
 import { IconButton } from '@/components/admin/icon-button/IconButton';
@@ -106,6 +107,7 @@ export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({ 
                     <InputWithCharacterLimitGroup
                         id="pdf-section-title"
                         name="title"
+                        className="pdf-section-input"
                         label={PDF_FILES_SECTION_TEXT.TITLE}
                         value={formData.title}
                         onChange={handleTitleChange}
@@ -118,6 +120,7 @@ export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({ 
                     <TextAreaWithCharacterLimitGroup
                         id="pdf-section-description"
                         name="description"
+                        className="pdf-section-textarea"
                         label={PDF_FILES_SECTION_TEXT.DESCRIPTION}
                         value={formData.description}
                         onChange={handleDescriptionChange}
@@ -126,14 +129,26 @@ export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({ 
                         placeholder="Введіть опис"
                         error={errors.description}
                         isRequired
-                        rows={4}
+                        rows={2}
                     />
                     <div className={styles['edit-actions']}>
-                        <Button buttonStyle="primary" type="button" onClick={handleSave} disabled={isSaveDisabled}>
-                            {PDF_FILES_SECTION_TEXT.BUTTON.PUBLISH}
-                        </Button>
-                        <Button buttonStyle="secondary" type="button" onClick={handleCancel} disabled={isSaving}>
+                        <Button
+                            buttonStyle="secondary"
+                            type="button"
+                            className={cn(styles.button, styles['cancel-button'])}
+                            onClick={handleCancel}
+                            disabled={isSaving}
+                        >
                             {PDF_FILES_SECTION_TEXT.BUTTON.CANCEL}
+                        </Button>
+                        <Button
+                            buttonStyle="primary"
+                            type="button"
+                            className={cn(styles.button, styles['save-button'])}
+                            onClick={handleSave}
+                            disabled={isSaveDisabled}
+                        >
+                            {PDF_FILES_SECTION_TEXT.BUTTON.PUBLISH}
                         </Button>
                     </div>
                 </form>

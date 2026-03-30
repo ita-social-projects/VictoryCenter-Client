@@ -1,6 +1,4 @@
-import {
-    PDF_SECTION_FIELD_VALIDATORS,
-} from './pdf-section-schema';
+import { PDF_SECTION_FIELD_VALIDATORS } from './pdf-section-schema';
 
 import { PDF_FILES_SECTION_VALIDATION } from '@/const/admin/reports';
 

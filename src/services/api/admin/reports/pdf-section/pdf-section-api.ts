@@ -7,4 +7,9 @@ export const PdfSectionApi = {
         const response = await client.get(API_ROUTES.PDF_SECTION.CONTENT);
         return response.data;
     },
+
+    updatePdfSection: async (client: AxiosInstance, data: PdfSection): Promise<PdfSection> => {
+        const response = await client.patch(API_ROUTES.PDF_SECTION.BASE, data);
+        return response.data;
+    },
 };

@@ -6,7 +6,9 @@ import {
 } from '@/validation/admin/reports-schema/pdf-section-schema/pdf-section-schema';
 import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { ToastType } from '@/types/admin/toast';
+import { PdfSectionApi } from '@/services/api/admin/reports/pdf-section/pdf-section-api';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { Button } from '@/components/admin/button/Button';
@@ -27,6 +29,7 @@ interface PdfSectionContentBlockProps {
 }
 
 export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({ content, onSave }) => {
+    const client = useAdminClient();
     const [isEditMode, setIsEditMode] = useState(false);
     const [formData, setFormData] = useState<PdfSectionFormData>({
         title: content.title,
@@ -83,14 +86,21 @@ export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({ 
             return;
         }
 
+        setIsSaving(true);
         try {
             const normalizedData = {
                 title: getNormalizedInputText(formData.title),
                 description: getNormalizedInputText(formData.description),
             };
-            await onSave?.(normalizedData);
+
+            await PdfSectionApi.updatePdfSection(client, normalizedData);
+
             setIsEditMode(false);
             addToast(REPORTS_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY, ToastType.Success);
+
+            if (onSave) {
+                await onSave(normalizedData);
+            }
         } catch {
             addToast(REPORTS_TEXT.MESSAGE.RECORD_UPDATE_FAILED_RETRY, ToastType.Error);
         } finally {

@@ -25,7 +25,11 @@ export const PdfFilesSection = () => {
         return data.items;
     }, [client]);
 
-    const { data: sectionData, isLoading: isSectionLoading } = useDataFetch({
+    const {
+        data: sectionData,
+        isLoading: isSectionLoading,
+        refetch: refetchSection,
+    } = useDataFetch({
         initialData: null,
         fetchHandler: fetchSection,
         autoFetchDependencies: [fetchSection],
@@ -41,6 +45,10 @@ export const PdfFilesSection = () => {
         setUploadedFiles((prev) => [...prev, newFile]);
     }, []);
 
+    const handleSaveSection = useCallback(async () => {
+        refetchSection();
+    }, [refetchSection]);
+
     if (isSectionLoading || isFilesLoading) {
         return (
             <div className={styles.loader}>
@@ -52,7 +60,10 @@ export const PdfFilesSection = () => {
     return (
         <div className={styles.root}>
             <div className={styles['top-section']}>
-                <PdfSectionContentBlock content={sectionData ?? { title: '', description: '' }} />
+                <PdfSectionContentBlock
+                    content={sectionData ?? { title: '', description: '' }}
+                    onSave={handleSaveSection}
+                />
             </div>
             <div className={styles['language-switcher-container']}>
                 <LanguageSwitcherButtons currentLanguage={currentLanguage} onLanguageChange={setCurrentLanguage} />

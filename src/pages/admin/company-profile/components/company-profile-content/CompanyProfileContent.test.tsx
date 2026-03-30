@@ -5,6 +5,17 @@ import { CompanyProfileContent } from './CompanyProfileContent';
 import { CompanyProfileApi } from '@/services/api/admin/company-profile/company-profile-api';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { COMPANY_PROFILE_VALIDATION } from '@/const/admin/company-profile';
+import { ToastType } from '@/types/admin/toast';
+
+const mockAddToast = jest.fn();
+
+jest.mock('@/validation/admin/company-profile-schema/company-profile-schema', () => ({
+    __esModule: true,
+    CompanyProfileValidationSchema: {
+        validate: async (value: any) => value,
+        validateSync: (value: any) => value,
+    },
+}));
 
 jest.mock('@/utils/functions/mappers/admin/company-profile/company-profile-mappers', () => ({
     __esModule: true,
@@ -22,6 +33,25 @@ jest.mock('@/utils/functions/mappers/admin/company-profile/company-profile-mappe
         addressUa_requisites: 'UA requisites address',
         addressEn_requisites: 'EN requisites address',
         socialContacts: [],
+    }),
+    mapFormValuesToCompanyProfilePatch: () => ({ mocked: true }),
+}));
+
+jest.mock('@/services/api/admin/company-profile/company-profile-api', () => ({
+    __esModule: true,
+    CompanyProfileApi: {
+        get: jest.fn(),
+        publish: jest.fn(),
+        __resetMocks: jest.fn(),
+    },
+}));
+
+jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider', () => ({
+    __esModule: true,
+    useToast: () => ({
+        addToast: mockAddToast,
+        toasts: [],
+        removeToast: jest.fn(),
     }),
 }));
 
@@ -74,11 +104,6 @@ jest.mock('../company-profile-social-media-tab/CompanyProfileSocialMediaTab', ()
     CompanyProfileSocialMediaTab: (props: any) => (
         <div data-testid="tab-socials" data-disabled={String(props.disabled)} />
     ),
-}));
-
-jest.mock('@/services/api/admin/company-profile/company-profile-api', () => ({
-    __esModule: true,
-    CompanyProfileApi: { get: jest.fn() },
 }));
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
@@ -135,68 +160,47 @@ jest.mock('../company-profile-toolbar/CompanyProfileToolbar', () => ({
     },
 }));
 
-const mockOnConfirm = jest.fn();
-const mockOnCancel = jest.fn();
-const mockedGet = CompanyProfileApi.get as jest.Mock;
-const mockedUseAdminClient = useAdminClient as jest.Mock;
-
 jest.mock('../company-profile-cancel-modal/CompanyProfileCancelModal', () => ({
     __esModule: true,
     CompanyProfileCancelModal: ({ isOpen, onConfirm, onCancel }: any) =>
         isOpen ? (
             <div data-testid="cancel-modal">
-                <button
-                    data-testid="confirm-cancel"
-                    onClick={() => {
-                        mockOnConfirm();
-                        onConfirm();
-                    }}
-                >
+                <button data-testid="confirm-cancel" onClick={onConfirm}>
                     Confirm
                 </button>
-                <button
-                    data-testid="dismiss-cancel"
-                    onClick={() => {
-                        mockOnCancel();
-                        onCancel();
-                    }}
-                >
+                <button data-testid="dismiss-cancel" onClick={onCancel}>
                     Dismiss
                 </button>
             </div>
         ) : null,
 }));
 
+jest.mock('../company-profile-publish-modal/CompanyProfilePublishModal', () => ({
+    __esModule: true,
+    CompanyProfilePublishModal: ({ isOpen, onConfirm, onCancel }: any) =>
+        isOpen ? (
+            <div data-testid="publish-modal">
+                <button data-testid="confirm-publish" onClick={onConfirm}>
+                    Yes
+                </button>
+                <button data-testid="cancel-publish" onClick={onCancel}>
+                    No
+                </button>
+            </div>
+        ) : null,
+}));
+
+const mockedUseAdminClient = useAdminClient as jest.Mock;
+const mockedGet = CompanyProfileApi.get as jest.Mock;
+const mockedPublish = CompanyProfileApi.publish as jest.Mock;
+
 describe('CompanyProfileContent', () => {
     beforeEach(() => {
         jest.clearAllMocks();
-        mockedUseAdminClient.mockReturnValue({ client: 'mock-client' });
+        mockedUseAdminClient.mockReturnValue({} as any);
 
-        mockedGet.mockResolvedValue({
-            profile: {
-                id: 1,
-                contact: {
-                    id: 1,
-                    profileId: 1,
-                    phone: '',
-                    address: '',
-                    email: '',
-                    correspondenceEmail: '',
-                    motto: '',
-                    localizations: [],
-                },
-                requisite: {
-                    id: 1,
-                    profileId: 1,
-                    recipient: '',
-                    edrpou: '12345678',
-                    address: '',
-                    localizations: [],
-                },
-                socialLinks: [],
-            },
-            languages: [],
-        });
+        mockedGet.mockResolvedValue({ profile: { id: 1 }, languages: [] });
+        mockedPublish.mockResolvedValue({ profile: { id: 1 }, languages: [] });
     });
 
     it('renders default tab (profile) and allows tab switching in view mode', () => {
@@ -230,9 +234,7 @@ describe('CompanyProfileContent', () => {
     it('calls CompanyProfileApi.get on mount', async () => {
         render(<CompanyProfileContent />);
 
-        await waitFor(() => {
-            expect(mockedGet).toHaveBeenCalledTimes(1);
-        });
+        await waitFor(() => expect(mockedGet).toHaveBeenCalledTimes(1));
     });
 
     it('disables publish when form is dirty but invalid (required phone)', async () => {
@@ -246,83 +248,71 @@ describe('CompanyProfileContent', () => {
         fireEvent.change(phoneInput, { target: { value: '   ' } });
         fireEvent.blur(phoneInput);
 
-        await waitFor(() => {
-            expect(publishBtn).toBeDisabled();
-        });
-
+        await waitFor(() => expect(publishBtn).toBeDisabled());
         expect(COMPANY_PROFILE_VALIDATION.common.REQUIRED).toBe("Поле обов'язкове");
     });
 
-    it('enables publish when form is dirty and valid (phone changed)', async () => {
+    it('opens publish modal on publish click when form is dirty and valid', async () => {
         render(<CompanyProfileContent />);
-
-        await waitFor(() => {
-            expect(mockedGet).toHaveBeenCalledTimes(1);
-        });
+        await waitFor(() => expect(mockedGet).toHaveBeenCalledTimes(1));
 
         fireEvent.click(screen.getByTestId('edit-btn'));
 
-        const publishBtn = screen.getByTestId('publish-btn') as HTMLButtonElement;
         const phoneInput = screen.getByTestId('input-phone') as HTMLInputElement;
-
-        fireEvent.change(phoneInput, { target: { value: '+380671234568' } });
+        fireEvent.change(phoneInput, { target: { value: '+380 00 000 00 00' } });
         fireEvent.blur(phoneInput);
 
-        await waitFor(() => {
-            expect(publishBtn).not.toBeDisabled();
-        });
-
-        expect(screen.getByTestId('debug-dirty')).toHaveTextContent('true');
-    });
-
-    it('exits edit mode after publish (mock save)', async () => {
-        render(<CompanyProfileContent />);
-
-        await waitFor(() => {
-            expect(mockedGet).toHaveBeenCalledTimes(1);
-        });
-
-        fireEvent.click(screen.getByTestId('edit-btn'));
-
         const publishBtn = screen.getByTestId('publish-btn') as HTMLButtonElement;
-        const phoneInput = screen.getByTestId('input-phone') as HTMLInputElement;
-
-        fireEvent.change(phoneInput, { target: { value: '+380671234568' } });
-        fireEvent.blur(phoneInput);
-
-        await waitFor(() => {
-            expect(publishBtn).not.toBeDisabled();
-        });
+        await waitFor(() => expect(publishBtn).not.toBeDisabled());
 
         fireEvent.click(publishBtn);
 
-        await waitFor(() => {
-            expect(screen.getByTestId('edit-btn')).toBeInTheDocument();
-        });
+        expect(await screen.findByTestId('publish-modal')).toBeInTheDocument();
     });
 
-    it('opens cancel modal when dirty and exits edit mode after confirm cancel', async () => {
+    it("when publish modal 'No' clicked: does not save, exits to view mode, and does not show toast", async () => {
         render(<CompanyProfileContent />);
-
-        await waitFor(() => {
-            expect(mockedGet).toHaveBeenCalledTimes(1);
-        });
+        await waitFor(() => expect(mockedGet).toHaveBeenCalledTimes(1));
 
         fireEvent.click(screen.getByTestId('edit-btn'));
 
         const phoneInput = screen.getByTestId('input-phone') as HTMLInputElement;
-
-        fireEvent.change(phoneInput, { target: { value: '+380671234568' } });
+        fireEvent.change(phoneInput, { target: { value: '+380 00 000 00 00' } });
         fireEvent.blur(phoneInput);
 
-        fireEvent.click(screen.getByTestId('cancel-btn'));
+        await waitFor(() => expect(screen.getByTestId('publish-btn')).not.toBeDisabled());
 
-        expect(screen.getByTestId('cancel-modal')).toBeInTheDocument();
+        fireEvent.click(screen.getByTestId('publish-btn'));
+        await screen.findByTestId('publish-modal');
 
-        fireEvent.click(screen.getByTestId('confirm-cancel'));
+        fireEvent.click(screen.getByTestId('cancel-publish'));
 
-        await waitFor(() => {
-            expect(screen.getByTestId('edit-btn')).toBeInTheDocument();
-        });
+        expect(await screen.findByTestId('edit-btn')).toBeInTheDocument();
+
+        expect(mockedPublish).not.toHaveBeenCalled();
+        expect(mockAddToast).not.toHaveBeenCalled();
+    });
+
+    it("when publish modal 'Yes' clicked: saves, exits to view mode, and shows toast", async () => {
+        render(<CompanyProfileContent />);
+        await waitFor(() => expect(mockedGet).toHaveBeenCalledTimes(1));
+
+        fireEvent.click(screen.getByTestId('edit-btn'));
+
+        const phoneInput = screen.getByTestId('input-phone') as HTMLInputElement;
+        fireEvent.change(phoneInput, { target: { value: '+380 00 000 00 00' } });
+        fireEvent.blur(phoneInput);
+
+        await waitFor(() => expect(screen.getByTestId('publish-btn')).not.toBeDisabled());
+
+        fireEvent.click(screen.getByTestId('publish-btn'));
+        await screen.findByTestId('publish-modal');
+
+        fireEvent.click(screen.getByTestId('confirm-publish'));
+
+        await waitFor(() => expect(mockedPublish).toHaveBeenCalledTimes(1));
+        expect(await screen.findByTestId('edit-btn')).toBeInTheDocument();
+
+        expect(mockAddToast).toHaveBeenCalledWith('Зміни успішно опубліковано', ToastType.Success, 3000);
     });
 });

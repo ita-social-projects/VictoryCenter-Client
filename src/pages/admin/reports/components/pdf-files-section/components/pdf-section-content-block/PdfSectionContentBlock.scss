@@ -43,6 +43,6 @@
 }
 
 .pdf-section-input .char-limit-input:has([aria-invalid='true']),
-.char-limit-textarea__wrapper:has(textarea[aria-invalid='true']) {
+.pdf-section-textarea .char-limit-textarea__wrapper:has(textarea[aria-invalid='true']) {
     border-color: c.$error;
 }

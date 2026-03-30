@@ -3,8 +3,13 @@ import userEvent from '@testing-library/user-event';
 import { PdfSectionContentBlock } from './PdfSectionContentBlock';
 import { PDF_FILES_SECTION_TEXT } from '@/const/admin/reports';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
+import { PdfSectionApi } from '@/services/api/admin/reports/pdf-section/pdf-section-api';
 
 jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider');
+
+jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
+    useAdminClient: () => ({}),
+}));
 
 const mockUseToast = useToast as jest.MockedFunction<typeof useToast>;
 
@@ -21,6 +26,7 @@ describe('PdfSectionContentBlock', () => {
         mockUseToast.mockReturnValue({
             addToast: mockAddToast,
         } as any);
+        jest.spyOn(PdfSectionApi, 'updatePdfSection').mockResolvedValue({} as any);
     });
 
     describe('View Mode', () => {

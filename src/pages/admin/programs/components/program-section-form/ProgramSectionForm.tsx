@@ -315,7 +315,19 @@ export const ProgramSectionForm = ({
     const pairsMaxCount = isDescriptionAuthorPairsTemplate
         ? getProgramSectionTemplateMaxGroupCount(section.template)
         : 0;
-    const canAddPair = isDescriptionAuthorPairsTemplate ? orderedPairs.length < pairsMaxCount : true;
+
+    const validateDescriptionAuthorPairContent = (value: string, type: ContentType) =>
+        PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateContentText(value, type, true, section.template);
+
+    const canAddPair =
+        !isDescriptionAuthorPairsTemplate ||
+        (orderedPairs.length < pairsMaxCount &&
+            !validateDescriptionAuthorPairContent((titleContent as any)?.title || '', ContentType.Title) &&
+            orderedPairs.every(
+                (pair) =>
+                    !validateDescriptionAuthorPairContent(pair.description, ContentType.Description) &&
+                    !validateDescriptionAuthorPairContent(pair.author, ContentType.Author),
+            ));
 
     const handleAddPair = useCallback(() => {
         const prev = localSectionRef.current;

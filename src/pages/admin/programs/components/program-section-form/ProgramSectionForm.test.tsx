@@ -23,6 +23,14 @@ jest.mock('@/utils/functions/program-section-template-validation/programSectionT
     normalizeGroupedContentsGroupIndexes: jest.fn(),
 }));
 
+jest.mock('@/validation/admin/program-schema/program-schema', () => ({
+    PROGRAM_SECTION_VALIDATION_FUNCTIONS: {
+        validateContentText: jest.fn(),
+        validateFaqQuestion: jest.fn(),
+        validateFaqAnswer: jest.fn(),
+    },
+}));
+
 const renderProgramSectionMock = renderProgramSection as unknown as jest.Mock;
 
 const getTemplateValidationMocks = () => {
@@ -37,6 +45,18 @@ const getTemplateValidationMocks = () => {
         getProgramSectionTemplateMaxGroupCount: mod.getProgramSectionTemplateMaxGroupCount,
         normalizeGroupedContentsGroupIndexes: mod.normalizeGroupedContentsGroupIndexes,
     };
+};
+
+const getProgramValidationMocks = () => {
+    const mod = jest.requireMock('@/validation/admin/program-schema/program-schema') as {
+        PROGRAM_SECTION_VALIDATION_FUNCTIONS: {
+            validateContentText: jest.Mock;
+            validateFaqQuestion: jest.Mock;
+            validateFaqAnswer: jest.Mock;
+        };
+    };
+
+    return mod.PROGRAM_SECTION_VALIDATION_FUNCTIONS;
 };
 
 const makeImage = (id: string, url?: string): any => (url ? { id, url, mimeType: 'image/png' } : { id });
@@ -150,11 +170,18 @@ describe('ProgramSectionForm', () => {
 
         const { getProgramSectionTemplateMaxGroupCount, normalizeGroupedContentsGroupIndexes } =
             getTemplateValidationMocks();
+        const { validateContentText, validateFaqQuestion, validateFaqAnswer } = getProgramValidationMocks();
 
         getProgramSectionTemplateMaxGroupCount.mockReset();
         normalizeGroupedContentsGroupIndexes.mockReset();
+        validateContentText.mockReset();
+        validateFaqQuestion.mockReset();
+        validateFaqAnswer.mockReset();
 
         getProgramSectionTemplateMaxGroupCount.mockReturnValue(10);
+        validateContentText.mockReturnValue(undefined);
+        validateFaqQuestion.mockReturnValue(undefined);
+        validateFaqAnswer.mockReturnValue(undefined);
 
         normalizeGroupedContentsGroupIndexes.mockImplementation((contents: any[], types: ContentType[]) => {
             const allowed = new Set<number>(types as any);
@@ -440,6 +467,117 @@ describe('ProgramSectionForm', () => {
             expect(payload.handlers.onDeletePair).toEqual(expect.any(Function));
             expect(payload.handlers.onCardDescriptionChange).toEqual(expect.any(Function));
             expect(payload.handlers.onCardAuthorChange).toEqual(expect.any(Function));
+        });
+
+        it('passes canAddPair=true when title and pair fields are valid', () => {
+            const section = makePairsSection([
+                makeTitleContent('T', 0),
+                makePairDescription(1, 0, 'D0'),
+                makePairAuthor(2, 0, 'A0'),
+            ]);
+
+            renderForm({ section, isNewSection: true });
+
+            const payload = renderProgramSectionMock.mock.calls[0][0];
+
+            expect(payload.handlers.canAddPair).toBe(true);
+            expect(getProgramValidationMocks().validateContentText).toHaveBeenNthCalledWith(
+                1,
+                'T',
+                ContentType.Title,
+                true,
+                ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
+            );
+            expect(getProgramValidationMocks().validateContentText).toHaveBeenNthCalledWith(
+                2,
+                'D0',
+                ContentType.Description,
+                true,
+                ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
+            );
+            expect(getProgramValidationMocks().validateContentText).toHaveBeenNthCalledWith(
+                3,
+                'A0',
+                ContentType.Author,
+                true,
+                ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
+            );
+        });
+
+        it('passes canAddPair=false when title is invalid', () => {
+            const section = makePairsSection([
+                makeTitleContent('T', 0),
+                makePairDescription(1, 0, 'D0'),
+                makePairAuthor(2, 0, 'A0'),
+            ]);
+
+            getProgramValidationMocks().validateContentText.mockImplementation((value: string, type: ContentType) =>
+                type === ContentType.Title && value === 'T' ? 'TITLE_ERROR' : undefined,
+            );
+
+            renderForm({ section, isNewSection: true });
+
+            const payload = renderProgramSectionMock.mock.calls[0][0];
+
+            expect(payload.handlers.canAddPair).toBe(false);
+            expect(getProgramValidationMocks().validateContentText).toHaveBeenCalledTimes(1);
+        });
+
+        it('passes canAddPair=false when pair description is invalid', () => {
+            const section = makePairsSection([
+                makeTitleContent('T', 0),
+                makePairDescription(1, 0, 'BAD_DESC'),
+                makePairAuthor(2, 0, 'A0'),
+            ]);
+
+            getProgramValidationMocks().validateContentText.mockImplementation((value: string, type: ContentType) =>
+                type === ContentType.Description && value === 'BAD_DESC' ? 'DESCRIPTION_ERROR' : undefined,
+            );
+
+            renderForm({ section, isNewSection: true });
+
+            const payload = renderProgramSectionMock.mock.calls[0][0];
+
+            expect(payload.handlers.canAddPair).toBe(false);
+            expect(getProgramValidationMocks().validateContentText).toHaveBeenCalledTimes(2);
+        });
+
+        it('passes canAddPair=false when pair author is invalid', () => {
+            const section = makePairsSection([
+                makeTitleContent('T', 0),
+                makePairDescription(1, 0, 'D0'),
+                makePairAuthor(2, 0, 'BAD_AUTHOR'),
+            ]);
+
+            getProgramValidationMocks().validateContentText.mockImplementation((value: string, type: ContentType) =>
+                type === ContentType.Author && value === 'BAD_AUTHOR' ? 'AUTHOR_ERROR' : undefined,
+            );
+
+            renderForm({ section, isNewSection: true });
+
+            const payload = renderProgramSectionMock.mock.calls[0][0];
+
+            expect(payload.handlers.canAddPair).toBe(false);
+            expect(getProgramValidationMocks().validateContentText).toHaveBeenCalledTimes(3);
+        });
+
+        it('skips text validation for canAddPair when max pairs count is reached', () => {
+            const section = makePairsSection([
+                makeTitleContent('T', 0),
+                makePairDescription(1, 0, 'D0'),
+                makePairAuthor(2, 0, 'A0'),
+                makePairDescription(3, 1, 'D1'),
+                makePairAuthor(4, 1, 'A1'),
+            ]);
+
+            getTemplateValidationMocks().getProgramSectionTemplateMaxGroupCount.mockReturnValue(2);
+
+            renderForm({ section, isNewSection: true });
+
+            const payload = renderProgramSectionMock.mock.calls[0][0];
+
+            expect(payload.handlers.canAddPair).toBe(false);
+            expect(getProgramValidationMocks().validateContentText).not.toHaveBeenCalled();
         });
 
         it('updates pair description when onCardDescriptionChange is invoked', () => {

@@ -32,3 +32,17 @@
     top: calc(0.5rem + 15px);
     right: calc(0.5rem + 15px);
 }
+
+.pdf-section-input .input-error {
+    font-size: 18px;
+    margin-top: 5px;
+}
+
+.pdf-section-textarea [class*='error-section'] {
+    font-size: 18px;
+}
+
+.pdf-section-input .char-limit-input:has([aria-invalid='true']),
+.char-limit-textarea__wrapper:has(textarea[aria-invalid='true']) {
+    border-color: c.$error;
+}

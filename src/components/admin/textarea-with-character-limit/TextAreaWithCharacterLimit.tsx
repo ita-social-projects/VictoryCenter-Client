@@ -71,6 +71,7 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
                         onFocus={handleFocus}
                         onBlur={handleBlur}
                         onKeyDown={onKeyDown}
+                        aria-invalid={hasError}
                         name={name}
                         id={id}
                         disabled={disabled}

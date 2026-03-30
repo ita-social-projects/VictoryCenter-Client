@@ -750,6 +750,21 @@ describe('PROGRAM_VALIDATION_FUNCTIONS', () => {
             const longDesc = 'a'.repeat(51);
             expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateDescription(longDesc, false)).toBe('max 50');
         });
+
+        it('returns error when description is less than min length in draft mode', () => {
+            const m = loadSchema({ programValidation: { description: { min: 3, max: 50, getRequiredWhenPublishingError: () => 'desc required' } } });
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateDescription('ab', false)).toBe('min 3');
+        });
+
+        it('returns error when description is less than min length when publishing', () => {
+            const m = loadSchema({ programValidation: { description: { min: 3, max: 50, getRequiredWhenPublishingError: () => 'desc required' } } });
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateDescription('ab', true)).toBe('min 3');
+        });
+
+        it('returns undefined for empty description in draft mode (even with min requirement)', () => {
+            const m = loadSchema({ programValidation: { description: { min: 3, max: 50, getRequiredWhenPublishingError: () => 'desc required' } } });
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateDescription('', false)).toBeUndefined();
+        });
     });
 
     describe('validatePreviewImage', () => {

@@ -72,11 +72,19 @@
 }
 
 @media (max-height: 950px) {
-  .company-logo-section { width: 165px; }
-  .company-logo-wrapper { height: 138px; }
+    .company-logo-section {
+        width: 165px;
+    }
+    .company-logo-wrapper {
+        height: 138px;
+    }
 }
 
 @media (max-height: 820px) {
-  .company-logo-section { width: 145px; }
-  .company-logo-wrapper { height: 120px; }
+    .company-logo-section {
+        width: 145px;
+    }
+    .company-logo-wrapper {
+        height: 120px;
+    }
 }

@@ -125,6 +125,7 @@ export const PROGRAMS_TEXT = {
             FAIL_TO_DELETE_PROGRAM: 'Виникла помилка під час видалення програми',
             PROGRAM_SAVED_SUCCESSFULLY: 'Програма успішно збережена',
             PROGRAM_PUBLISHED_SUCCESSFULLY: 'Програма успішно опублікована',
+            PUBLISHED_PROGRAM_EDITED_SUCCESSFULLY: 'Зміни успішно опубліковано',
         },
         LABEL: {
             NAME: 'Назва',

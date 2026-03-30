@@ -341,7 +341,7 @@ export const ProgramsPageContent = () => {
                 if (syncedProgram.status === VisibilityStatus.Draft) {
                     addToast(PROGRAMS_TEXT.FORM.MESSAGE.PROGRAM_SAVED_SUCCESSFULLY, ToastType.Info);
                 } else if (syncedProgram.status === VisibilityStatus.Published) {
-                    addToast(PROGRAMS_TEXT.FORM.MESSAGE.PROGRAM_PUBLISHED_SUCCESSFULLY, ToastType.Info);
+                    addToast(PROGRAMS_TEXT.FORM.MESSAGE.PUBLISHED_PROGRAM_EDITED_SUCCESSFULLY, ToastType.Info);
                 }
                 if (isSearchResultView && fetchedSearchProgram?.id === syncedProgram.id) {
                     updateSearchedProgram(syncedProgram);

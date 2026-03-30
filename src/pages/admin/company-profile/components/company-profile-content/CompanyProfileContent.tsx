@@ -45,8 +45,9 @@ export const CompanyProfileContent = () => {
         shouldFocusError: true,
     });
 
-    const handlePublish = (_data: CompanyProfileFormValues) => {
-        // API integration pending backend endpoints/DTO
+    const handlePublish = (data: CompanyProfileFormValues) => {
+        methods.reset(data);
+        setIsEditMode(false);
     };
 
     const handleCancelClick = () => {

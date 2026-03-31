@@ -1,21 +1,26 @@
 import { render, screen } from '@testing-library/react';
 import { SwipedCard } from './SwipedCard';
 import { ContentType } from '@/types/common/about-us';
-import { AboutUsContent, AboutUsContentLocalization } from '@/types/public/about-us-page';
 import { TranslationStatus } from '@/types/common/language';
 import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
 import { setupUseGetLocalizationAboutUsContentMock } from '@/utils/test-mocks/use-get-localization-mock';
+import { EntityLocalization } from '@/types/common/language';
 
 jest.mock('@/hooks/common/use-get-localization/useGetLocalization');
 
 const mockedUseGetLocalization = jest.mocked(useGetLocalization);
+
+type CardLocalization = EntityLocalization & {
+    description: string | null;
+    title: string | null;
+}
 
 describe('SwipedCard component', () => {
     beforeEach(() => {
         setupUseGetLocalizationAboutUsContentMock(mockedUseGetLocalization);
     });
 
-    const person: AboutUsContent = {
+    const card = {
         id: 1,
         contentType: ContentType.Card,
         image: null,
@@ -27,8 +32,8 @@ describe('SwipedCard component', () => {
     it('should render image with correct src and alt', () => {
         render(
             <SwipedCard
-                description={person.description}
-                localizations={person.localizations}
+                description={card.description}
+                localizations={card.localizations}
                 index={0}
                 imageUrl="test.jpg"
                 altText="Test alt"
@@ -44,8 +49,8 @@ describe('SwipedCard component', () => {
     it('should render fallback description when no localizations', () => {
         render(
             <SwipedCard
-                description={person.description}
-                localizations={person.localizations}
+                description={card.description}
+                localizations={card.localizations}
                 index={0}
                 imageUrl="test.jpg"
                 altText="Test alt"
@@ -55,8 +60,8 @@ describe('SwipedCard component', () => {
         expect(screen.getByText('Fallback description')).toBeInTheDocument();
     });
 
-    it('should render localized description when localizations are provided', () => {
-        const localizations: AboutUsContentLocalization[] = [
+    it('should render localized description when localizations provided', () => {
+        const localizations: CardLocalization[] = [
             {
                 language: { id: 1, code: 'uk' },
                 translationStatus: TranslationStatus.Relevant,
@@ -67,7 +72,7 @@ describe('SwipedCard component', () => {
 
         render(
             <SwipedCard
-                description={person.description}
+                description={card.description}
                 localizations={localizations}
                 index={0}
                 imageUrl="test.jpg"
@@ -78,8 +83,8 @@ describe('SwipedCard component', () => {
         expect(screen.getByText('Localized description')).toBeInTheDocument();
     });
 
-    it('should not render fallback text when localized description is provided', () => {
-        const localizations: AboutUsContentLocalization[] = [
+    it('should not render fallback text when localized description provided', () => {
+        const localizations: CardLocalization[] = [
             {
                 language: { id: 1, code: 'uk' },
                 translationStatus: TranslationStatus.Relevant,
@@ -90,7 +95,7 @@ describe('SwipedCard component', () => {
 
         render(
             <SwipedCard
-                description={person.description}
+                description={card.description}
                 localizations={localizations}
                 index={0}
                 imageUrl="test.jpg"
@@ -110,8 +115,8 @@ describe('SwipedCard component', () => {
     it('should pass imageUrl to the img element', () => {
         render(
             <SwipedCard
-                description={person.description}
-                localizations={person.localizations}
+                description={card.description}
+                localizations={card.localizations}
                 index={1}
                 imageUrl="custom-image.jpg"
                 altText="Custom alt"
@@ -127,8 +132,8 @@ describe('SwipedCard component', () => {
         for (let i = 0; i < 4; i++) {
             const { unmount } = render(
                 <SwipedCard
-                    description={person.description}
-                    localizations={person.localizations}
+                    description={card.description}
+                    localizations={card.localizations}
                     index={i}
                     imageUrl="img.jpg"
                     altText={`Card ${i}`}

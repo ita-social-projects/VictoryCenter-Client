@@ -15,7 +15,7 @@ interface WaveSwiperProps<SwiperItem> {
     renderItemCallback: (item: SwiperItem, index: number) => React.ReactNode;
 }
 
-export function WaveSwiper<SwiperItem>({ items, renderItemCallback }: WaveSwiperProps<SwiperItem>) {
+export function WaveSwiper<SwiperItem>({ items, renderItemCallback }: Readonly<WaveSwiperProps<SwiperItem>>) {
     return (
         <div className={styles.root}>
             <Swiper

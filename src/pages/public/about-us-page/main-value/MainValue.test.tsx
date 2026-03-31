@@ -12,12 +12,11 @@ import { setupUseGetLocalizationAboutUsContentMock } from '@/utils/test-mocks/us
 jest.mock('@/components/public/swiper/wave-swiper/WaveSwiper', () => ({
     WaveSwiper: ({ items, renderItemCallback }: { items: []; renderItemCallback: Function }) => (
         <div data-testid="custom-swiper">
-            {items &&
-                items.map((item: any, index: number) => (
-                    <div key={index} data-testid="swiper-item">
-                        {renderItemCallback(item, index)}
-                    </div>
-                ))}
+            {items?.map((item: any, index: number) => (
+                <div key={index} data-testid="swiper-item">
+                    {renderItemCallback(item, index)}
+                </div>
+            ))}
         </div>
     ),
 }));

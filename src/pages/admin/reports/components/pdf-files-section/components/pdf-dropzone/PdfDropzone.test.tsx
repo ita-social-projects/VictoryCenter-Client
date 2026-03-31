@@ -2,6 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { PdfDropzone } from './PdfDropzone';
 import { PdfReportsApi } from '@/services/api/admin/reports/pdf-reports/pdf-reports-api';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { AxiosError } from 'axios';
 import { PDF_FILES_SECTION_TEXT } from '@/const/admin/reports';
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient');
@@ -15,106 +16,96 @@ jest.mock('@/assets/icons/add.svg', () => ({
 
 describe('PdfDropzone', () => {
     const mockClient = { get: jest.fn() };
-    const mockOnUploaded = jest.fn();
     const mockFile = new File(['content'], 'test.pdf', { type: 'application/pdf' });
     const mockResult = { id: 1, name: 'test.pdf' };
 
-    const getInput = (container: HTMLElement) => container.querySelector('input[type="file"]') as HTMLInputElement;
+    let mockOnUploaded: jest.Mock;
+
+    const setup = () => {
+        const utils = render(<PdfDropzone onUploaded={mockOnUploaded} />);
+        const input = utils.container.querySelector('input[type="file"]') as HTMLInputElement;
+
+        return {
+            ...utils,
+            input,
+        };
+    };
+
+    const uploadFile = (input: HTMLInputElement, file: File) => {
+        fireEvent.change(input, { target: { files: [file] } });
+    };
+
+    const dropFile = (file: File) => {
+        const label = screen.getByText(PDF_FILES_SECTION_TEXT.DROPZONE.TITLE).closest('label')!;
+        fireEvent.drop(label, {
+            dataTransfer: { files: [file] },
+        });
+    };
 
     beforeEach(() => {
         jest.clearAllMocks();
+        mockOnUploaded = jest.fn();
         (useAdminClient as jest.Mock).mockReturnValue(mockClient);
     });
 
-    it('should render dropzone with title and subtitle', () => {
-        render(<PdfDropzone onUploaded={mockOnUploaded} />);
+    it('renders dropzone with title and subtitle', () => {
+        setup();
 
         expect(screen.getByText(PDF_FILES_SECTION_TEXT.DROPZONE.TITLE)).toBeInTheDocument();
         expect(screen.getByText(PDF_FILES_SECTION_TEXT.DROPZONE.SUBTITLE)).toBeInTheDocument();
     });
 
-    it('should show uploading text while file is being uploaded', async () => {
+    it('shows uploading text while uploading', async () => {
         (PdfReportsApi.create as jest.Mock).mockImplementation(
             () => new Promise((resolve) => setTimeout(() => resolve(mockResult), 100)),
         );
 
-        const { container } = render(<PdfDropzone onUploaded={mockOnUploaded} />);
-
-        fireEvent.change(getInput(container), { target: { files: [mockFile] } });
+        const { input } = setup();
+        uploadFile(input, mockFile);
 
         expect(await screen.findByText(PDF_FILES_SECTION_TEXT.DROPZONE.UPLOADING)).toBeInTheDocument();
     });
 
-    it('should call onUploaded with result after successful upload', async () => {
+    it('calls onUploaded after successful upload', async () => {
         (PdfReportsApi.create as jest.Mock).mockResolvedValueOnce(mockResult);
 
-        const { container } = render(<PdfDropzone onUploaded={mockOnUploaded} />);
-
-        fireEvent.change(getInput(container), { target: { files: [mockFile] } });
+        const { input } = setup();
+        uploadFile(input, mockFile);
 
         await waitFor(() => {
             expect(mockOnUploaded).toHaveBeenCalledWith(mockResult);
         });
     });
 
-    it('should show error for non-pdf file', async () => {
-        const nonPdfFile = new File(['content'], 'test.txt', { type: 'text/plain' });
-
-        const { container } = render(<PdfDropzone onUploaded={mockOnUploaded} />);
-
-        fireEvent.change(getInput(container), { target: { files: [nonPdfFile] } });
-
-        expect(await screen.findByText(PDF_FILES_SECTION_TEXT.DROPZONE.ERROR_INVALID_FORMAT)).toBeInTheDocument();
-        expect(PdfReportsApi.create).not.toHaveBeenCalled();
-    });
-
-    it('should show error when upload fails', async () => {
-        (PdfReportsApi.create as jest.Mock).mockRejectedValueOnce(new Error('Upload failed'));
-
-        const { container } = render(<PdfDropzone onUploaded={mockOnUploaded} />);
-
-        fireEvent.change(getInput(container), { target: { files: [mockFile] } });
-
-        expect(await screen.findByText(PDF_FILES_SECTION_TEXT.DROPZONE.ERROR_UPLOAD_FAILED)).toBeInTheDocument();
-        expect(mockOnUploaded).not.toHaveBeenCalled();
-    });
-
-    it('should call PdfReportsApi.create with correct arguments', async () => {
+    it('calls API with correct arguments', async () => {
         (PdfReportsApi.create as jest.Mock).mockResolvedValueOnce(mockResult);
 
-        const { container } = render(<PdfDropzone onUploaded={mockOnUploaded} />);
-
-        fireEvent.change(getInput(container), { target: { files: [mockFile] } });
+        const { input } = setup();
+        uploadFile(input, mockFile);
 
         await waitFor(() => {
             expect(PdfReportsApi.create).toHaveBeenCalledWith(mockClient, mockFile);
         });
     });
 
-    it('should handle file drop', async () => {
+    it('handles file drop', async () => {
         (PdfReportsApi.create as jest.Mock).mockResolvedValueOnce(mockResult);
 
-        render(<PdfDropzone onUploaded={mockOnUploaded} />);
-
-        const label = screen.getByText(PDF_FILES_SECTION_TEXT.DROPZONE.TITLE).closest('label')!;
-
-        fireEvent.drop(label, {
-            dataTransfer: { files: [mockFile] },
-        });
+        setup();
+        dropFile(mockFile);
 
         await waitFor(() => {
             expect(PdfReportsApi.create).toHaveBeenCalledWith(mockClient, mockFile);
         });
     });
 
-    it('should restore title text after successful upload', async () => {
+    it('restores title after upload', async () => {
         (PdfReportsApi.create as jest.Mock).mockImplementation(
             () => new Promise((resolve) => setTimeout(() => resolve(mockResult), 100)),
         );
 
-        const { container } = render(<PdfDropzone onUploaded={mockOnUploaded} />);
-
-        fireEvent.change(getInput(container), { target: { files: [mockFile] } });
+        const { input } = setup();
+        uploadFile(input, mockFile);
 
         expect(await screen.findByText(PDF_FILES_SECTION_TEXT.DROPZONE.UPLOADING)).toBeInTheDocument();
 
@@ -122,5 +113,65 @@ describe('PdfDropzone', () => {
             expect(screen.queryByText(PDF_FILES_SECTION_TEXT.DROPZONE.UPLOADING)).not.toBeInTheDocument();
             expect(screen.getByText(PDF_FILES_SECTION_TEXT.DROPZONE.TITLE)).toBeInTheDocument();
         });
+    });
+
+    it('shows error for non-pdf file', async () => {
+        const { input } = setup();
+        const file = new File(['content'], 'test.txt', { type: 'text/plain' });
+
+        uploadFile(input, file);
+
+        expect(await screen.findByText(PDF_FILES_SECTION_TEXT.DROPZONE.ERROR_INVALID_FORMAT)).toBeInTheDocument();
+        expect(PdfReportsApi.create).not.toHaveBeenCalled();
+    });
+
+    it('shows error for large file', async () => {
+        const { input } = setup();
+        const file = new File(['x'.repeat(11 * 1024 * 1024)], 'large.pdf', { type: 'application/pdf' });
+
+        uploadFile(input, file);
+
+        expect(await screen.findByText(PDF_FILES_SECTION_TEXT.DROPZONE.ERROR_FILE_TOO_LARGE)).toBeInTheDocument();
+        expect(PdfReportsApi.create).not.toHaveBeenCalled();
+    });
+
+    it('shows error when upload fails', async () => {
+        (PdfReportsApi.create as jest.Mock).mockRejectedValueOnce(new Error());
+
+        const { input } = setup();
+        uploadFile(input, mockFile);
+
+        expect(await screen.findByText(PDF_FILES_SECTION_TEXT.DROPZONE.ERROR_UPLOAD_FAILED)).toBeInTheDocument();
+        expect(mockOnUploaded).not.toHaveBeenCalled();
+    });
+
+    const mockBackendError = (errors: unknown): AxiosError =>
+        ({
+            response: {
+                data: { errors },
+            },
+        }) as unknown as AxiosError;
+
+    it.each([[['File size cannot exceed 10 MB']], ['File size cannot exceed 10 MB']])(
+        'extracts backend error message: %p',
+        async (errors) => {
+            (PdfReportsApi.create as jest.Mock).mockRejectedValueOnce(mockBackendError(errors));
+
+            const { input } = setup();
+            uploadFile(input, mockFile);
+
+            expect(await screen.findByText('File size cannot exceed 10 MB')).toBeInTheDocument();
+            expect(mockOnUploaded).not.toHaveBeenCalled();
+        },
+    );
+
+    it('falls back to generic error if backend error is invalid', async () => {
+        (PdfReportsApi.create as jest.Mock).mockRejectedValueOnce(mockBackendError(undefined));
+
+        const { input } = setup();
+        uploadFile(input, mockFile);
+
+        expect(await screen.findByText(PDF_FILES_SECTION_TEXT.DROPZONE.ERROR_UPLOAD_FAILED)).toBeInTheDocument();
+        expect(mockOnUploaded).not.toHaveBeenCalled();
     });
 });

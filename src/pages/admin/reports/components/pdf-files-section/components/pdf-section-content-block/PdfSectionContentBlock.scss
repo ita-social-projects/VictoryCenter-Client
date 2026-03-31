@@ -1,0 +1,48 @@
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
+
+.pdf-section-input .char-limit-input {
+    padding: 20px 25px;
+}
+
+.pdf-section-input .input-label,
+.pdf-section-textarea .input-label {
+    @include type.subtitle-1-bold;
+
+    color: c.$grey-900;
+    font-size: 24px;
+    text-transform: uppercase;
+}
+
+.pdf-section-input .char-limit-input__field {
+    @include type.h4-bold;
+
+    color: c.$black;
+}
+
+.pdf-section-textarea .char-limit-textarea__field {
+    @include type.subtitle-1-bold;
+
+    line-height: 30px;
+    color: c.$black;
+    padding: 45px 25px;
+}
+
+.pdf-section-textarea .char-limit-textarea__clear-button {
+    top: calc(0.5rem + 15px);
+    right: calc(0.5rem + 15px);
+}
+
+.pdf-section-input .input-error {
+    font-size: 18px;
+    margin-top: 5px;
+}
+
+.pdf-section-textarea [class*='error-section'] {
+    font-size: 18px;
+}
+
+.pdf-section-input .char-limit-input:has([aria-invalid='true']),
+.pdf-section-textarea .char-limit-textarea__wrapper:has(textarea[aria-invalid='true']) {
+    border-color: c.$error;
+}

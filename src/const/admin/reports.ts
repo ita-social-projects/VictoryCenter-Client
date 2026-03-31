@@ -1,3 +1,5 @@
+import { COMMON_TEXT_ADMIN } from './common';
+
 export const REPORTS_TEXT = {
     FORM: {
         LABEL: {
@@ -67,28 +69,27 @@ export const REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION = {
 };
 
 export const PDF_FILES_SECTION_VALIDATION = {
+    max_file_size_bytes: 10 * 1024 * 1024,
     title: {
         min: 2,
         max: 30,
+        getRequiredError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED,
+        getMinError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(2),
+        getMaxError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(30),
     },
     description: {
         min: 2,
         max: 160,
+        getRequiredError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED,
+        getMinError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(2),
+        getMaxError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(160),
     },
     page_size: 4,
 };
 
 export const PDF_FILES_SECTION_TEXT = {
-    VIEW: {
-        TITLE: 'Заголовок розділу PDF',
-        DESCRIPTION: 'Короткий опис для користувачів',
-    },
-    FORM: {
-        LABEL: {
-            TITLE: 'Заголовок',
-            DESCRIPTION: 'Опис',
-        },
-    },
+    TITLE: 'Заголовок розділу PDF',
+    DESCRIPTION: 'Короткий опис для користувачів',
     TABLE: {
         HEADER: {
             NAME: 'Назва',
@@ -108,6 +109,7 @@ export const PDF_FILES_SECTION_TEXT = {
         UPLOADING: 'Завантаження...',
         SUBTITLE: 'Тільки формат pdf',
         ERROR_INVALID_FORMAT: 'Дозволено лише PDF формат',
+        ERROR_FILE_TOO_LARGE: 'Розмір файлу не повинен перевищувати 10 МБ',
         ERROR_UPLOAD_FAILED: 'Помилка при завантаженні файлу. Спробуйте ще раз.',
     },
     ACTIONS: {

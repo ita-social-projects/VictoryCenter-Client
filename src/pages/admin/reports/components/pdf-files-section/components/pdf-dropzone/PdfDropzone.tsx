@@ -5,11 +5,27 @@ import { useState, useCallback } from 'react';
 import styles from './PdfDropzone.module.scss';
 import { ReactComponent as FileIcon } from '@/assets/icons/sticky_note.svg';
 import { ReactComponent as AddIcon } from '@/assets/icons/add.svg';
-import { PDF_FILES_SECTION_TEXT } from '@/const/admin/reports';
+import { PDF_FILES_SECTION_TEXT, PDF_FILES_SECTION_VALIDATION } from '@/const/admin/reports';
 
 interface PdfDropzoneProps {
     onUploaded: (file: PdfReportDto) => void;
 }
+
+const extractErrorMessage = (error: unknown): string => {
+    const errorData = (error as any)?.response?.data;
+
+    if (errorData) {
+        if (Array.isArray(errorData.errors) && errorData.errors.length > 0) {
+            return errorData.errors[0];
+        }
+
+        if (typeof errorData.errors === 'string') {
+            return errorData.errors;
+        }
+    }
+
+    return PDF_FILES_SECTION_TEXT.DROPZONE.ERROR_UPLOAD_FAILED;
+};
 
 export const PdfDropzone = ({ onUploaded }: PdfDropzoneProps) => {
     const client = useAdminClient();
@@ -24,13 +40,21 @@ export const PdfDropzone = ({ onUploaded }: PdfDropzoneProps) => {
                 setTimeout(() => setError(null), 5000);
                 return;
             }
+
+            if (file.size > PDF_FILES_SECTION_VALIDATION.max_file_size_bytes) {
+                setError(PDF_FILES_SECTION_TEXT.DROPZONE.ERROR_FILE_TOO_LARGE);
+                setTimeout(() => setError(null), 5000);
+                return;
+            }
+
             setError(null);
             setIsUploading(true);
             try {
                 const result = await PdfReportsApi.create(client, file);
                 onUploaded(result);
-            } catch {
-                setError(PDF_FILES_SECTION_TEXT.DROPZONE.ERROR_UPLOAD_FAILED);
+            } catch (err) {
+                const errorMessage = extractErrorMessage(err);
+                setError(errorMessage);
                 setTimeout(() => setError(null), 5000);
             } finally {
                 setIsUploading(false);

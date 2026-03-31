@@ -18,7 +18,7 @@
 .content-container {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 24px;
 }
 
 .field {
@@ -40,25 +40,21 @@
 
 .view-text {
     color: c.$black;
-    font-weight: 700;
     background-color: c.$light-blue-25;
     border-radius: 5px;
 
     &-title {
+        @include type.h4-bold;
+
         padding: 20px 25px;
     }
 
     &-description {
+        @include type.subtitle-1-bold;
+
         padding: 40px 25px;
+        line-height: 30px;
     }
-}
-
-.view-text-title {
-    @include type.h4-bold;
-}
-
-.view-text-description {
-    @include type.subtitle-1-bold;
 }
 
 .edit-button-container {
@@ -71,4 +67,31 @@
     border: none;
     height: 22px;
     width: 20px;
+}
+
+.view-root {
+    position: relative;
+}
+
+.edit-root {
+    padding: 57px 40px 45px 40px;
+}
+
+.edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.edit-actions {
+    display: flex;
+    gap: 50px;
+    justify-content: center;
+    margin-top: 12px;
+}
+
+.button {
+    @include type.subtitle-1-medium;
+    width: 305px;
+    height: 60px;
 }

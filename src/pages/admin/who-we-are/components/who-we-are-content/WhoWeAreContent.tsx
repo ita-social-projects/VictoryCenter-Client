@@ -217,11 +217,11 @@ export const WhoWeAreContent = () => {
         return { message: null, type: null };
     }, [categoryError, sectionError, languagesError]);
 
-    const handleRetry = useCallback(() => {
+    const handleRetry = useCallback(async () => {
         if (error.type === 'categories') {
-            refetchCategories();
+            await refetchCategories();
         } else if (error.type === 'entity') {
-            refetchSection();
+            await refetchSection();
         } else if (error.type === 'languages') {
             retryFetchLanguages();
         }

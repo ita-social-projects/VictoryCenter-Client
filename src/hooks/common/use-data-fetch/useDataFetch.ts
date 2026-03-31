@@ -6,7 +6,7 @@ export interface UseDataFetchResult<TResult> {
     data: TResult;
     isLoading: boolean;
     error: any | null;
-    refetch: () => void;
+    refetch: () => Promise<void>;
     setData: Dispatch<SetStateAction<TResult>>;
 }
 

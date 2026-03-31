@@ -172,6 +172,9 @@ describe('PdfSectionContentBlock', () => {
                 }),
             );
 
+            const confirmButton = await screen.findByText('ТАК');
+            await user.click(confirmButton);
+
             expect(screen.queryByDisplayValue('New Title')).not.toBeInTheDocument();
             expect(screen.getByText(mockContent.title)).toBeInTheDocument();
         });
@@ -203,7 +206,6 @@ describe('PdfSectionContentBlock', () => {
 
             await user.click(publishButton);
 
-            // Click confirm button in the modal
             const confirmButton = await screen.findByText('ТАК');
             await user.click(confirmButton);
 
@@ -400,6 +402,125 @@ describe('PdfSectionContentBlock', () => {
             await user.click(confirmButton);
 
             resolveSave!();
+        });
+    });
+
+    describe('Cancel Changes Modal', () => {
+        it('should cancel without modal when no changes made', async () => {
+            const user = userEvent.setup();
+            render(<PdfSectionContentBlock content={mockContent} />);
+
+            await user.click(
+                screen.getByRole('button', {
+                    name: PDF_FILES_SECTION_TEXT.ACTIONS.EDIT,
+                }),
+            );
+
+            await user.click(
+                screen.getByRole('button', {
+                    name: COMMON_TEXT_ADMIN.BUTTON.CANCEL,
+                }),
+            );
+
+            expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
+            expect(screen.getByRole('button', { name: PDF_FILES_SECTION_TEXT.ACTIONS.EDIT })).toBeInTheDocument();
+        });
+
+        it('should open cancel confirmation modal when changes made', async () => {
+            const user = userEvent.setup();
+            render(<PdfSectionContentBlock content={mockContent} />);
+
+            await user.click(
+                screen.getByRole('button', {
+                    name: PDF_FILES_SECTION_TEXT.ACTIONS.EDIT,
+                }),
+            );
+
+            const titleInput = screen.getByLabelText(/заголовок/i);
+            await user.clear(titleInput);
+            await user.type(titleInput, 'Updated Title');
+
+            await user.tab();
+
+            await user.click(
+                screen.getByRole('button', {
+                    name: COMMON_TEXT_ADMIN.BUTTON.CANCEL,
+                }),
+            );
+
+            const modal = await screen.findByTestId('confirmation-modal');
+            expect(modal).toBeInTheDocument();
+            expect(
+                screen.getByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE),
+            ).toBeInTheDocument();
+        });
+
+        it('should close modal and keep edit mode when clicking НІ in cancel modal', async () => {
+            const user = userEvent.setup();
+            render(<PdfSectionContentBlock content={mockContent} />);
+
+            await user.click(
+                screen.getByRole('button', {
+                    name: PDF_FILES_SECTION_TEXT.ACTIONS.EDIT,
+                }),
+            );
+
+            const titleInput = screen.getByLabelText(/заголовок/i);
+            await user.clear(titleInput);
+            await user.type(titleInput, 'Updated Title');
+
+            await user.tab();
+
+            await user.click(
+                screen.getByRole('button', {
+                    name: COMMON_TEXT_ADMIN.BUTTON.CANCEL,
+                }),
+            );
+
+            const modal = await screen.findByTestId('confirmation-modal');
+            const cancelButton = screen.getByText('НІ');
+
+            await user.click(cancelButton);
+
+            await waitFor(() => {
+                expect(modal).not.toBeInTheDocument();
+            });
+
+            expect(screen.getByDisplayValue('Updated Title')).toBeInTheDocument();
+        });
+
+        it('should revert changes when clicking ТАК in cancel modal', async () => {
+            const user = userEvent.setup();
+            render(<PdfSectionContentBlock content={mockContent} />);
+
+            await user.click(
+                screen.getByRole('button', {
+                    name: PDF_FILES_SECTION_TEXT.ACTIONS.EDIT,
+                }),
+            );
+
+            const titleInput = screen.getByLabelText(/заголовок/i);
+            await user.clear(titleInput);
+            await user.type(titleInput, 'Updated Title');
+
+            await user.tab();
+
+            await user.click(
+                screen.getByRole('button', {
+                    name: COMMON_TEXT_ADMIN.BUTTON.CANCEL,
+                }),
+            );
+
+            const confirmButton = await screen.findByText('ТАК');
+            await user.click(confirmButton);
+
+            await waitFor(() => {
+                expect(screen.queryByDisplayValue('Updated Title')).not.toBeInTheDocument();
+            });
+
+            expect(screen.getByText(mockContent.title)).toBeInTheDocument();
+            expect(screen.getByText(mockContent.description)).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: PDF_FILES_SECTION_TEXT.ACTIONS.EDIT })).toBeInTheDocument();
         });
     });
 });

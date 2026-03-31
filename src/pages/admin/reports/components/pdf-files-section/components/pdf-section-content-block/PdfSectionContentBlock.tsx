@@ -30,10 +30,13 @@ interface PdfSectionContentBlockProps {
     onSave?: (data: PdfSectionContent) => Promise<void>;
 }
 
+type ConfirmationModalType = 'publish' | 'cancel' | null;
+
 export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({ content, onSave }) => {
     const client = useAdminClient();
     const [isEditMode, setIsEditMode] = useState(false);
     const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
+    const [confirmationModalType, setConfirmationModalType] = useState<ConfirmationModalType>(null);
     const [formData, setFormData] = useState<PdfSectionFormData>({
         title: content.title,
         description: content.description,
@@ -73,7 +76,20 @@ export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({ 
         getNormalizedInputText(formData.title) !== getNormalizedInputText(content.title) ||
         getNormalizedInputText(formData.description) !== getNormalizedInputText(content.description);
 
-    const handleCancel = useCallback(() => {
+    const handleCancelClick = useCallback(() => {
+        if (hasChanges) {
+            setConfirmationModalType('cancel');
+            setIsConfirmationModalOpen(true);
+        } else {
+            setFormData({ title: content.title, description: content.description });
+            setErrors({});
+            setIsEditMode(false);
+        }
+    }, [content, hasChanges]);
+
+    const handleCancelConfirmed = useCallback(() => {
+        setIsConfirmationModalOpen(false);
+        setConfirmationModalType(null);
         setFormData({ title: content.title, description: content.description });
         setErrors({});
         setIsEditMode(false);
@@ -104,6 +120,7 @@ export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({ 
 
     const handleConfirmPublish = useCallback(() => {
         setIsConfirmationModalOpen(false);
+        setConfirmationModalType(null);
         handleSaveConfirmed();
     }, [handleSaveConfirmed]);
 
@@ -117,6 +134,7 @@ export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({ 
             return;
         }
 
+        setConfirmationModalType('publish');
         setIsConfirmationModalOpen(true);
     };
 
@@ -159,7 +177,7 @@ export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({ 
                                 buttonStyle="secondary"
                                 type="button"
                                 className={cn(styles.button, styles['cancel-button'])}
-                                onClick={handleCancel}
+                                onClick={handleCancelClick}
                                 disabled={isSaving}
                             >
                                 {COMMON_TEXT_ADMIN.BUTTON.CANCEL}
@@ -207,15 +225,36 @@ export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({ 
         );
     };
 
+    const getModalConfig = () => {
+        if (confirmationModalType === 'cancel') {
+            return {
+                title: COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE,
+                onConfirm: handleCancelConfirmed,
+            };
+        }
+        return {
+            title: COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES,
+            onConfirm: handleConfirmPublish,
+        };
+    };
+
+    const modalConfig = getModalConfig();
+
     return (
         <>
             {renderContent()}
             <ConfirmationModal
                 isOpen={isConfirmationModalOpen}
-                onClose={() => setIsConfirmationModalOpen(false)}
-                title={COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES}
-                onConfirm={handleConfirmPublish}
-                onCancel={() => setIsConfirmationModalOpen(false)}
+                onClose={() => {
+                    setIsConfirmationModalOpen(false);
+                    setConfirmationModalType(null);
+                }}
+                title={modalConfig.title}
+                onConfirm={modalConfig.onConfirm}
+                onCancel={() => {
+                    setIsConfirmationModalOpen(false);
+                    setConfirmationModalType(null);
+                }}
                 isButtonsDisabled={isSaving}
             />
         </>

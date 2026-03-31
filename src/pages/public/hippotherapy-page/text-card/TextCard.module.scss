@@ -20,7 +20,7 @@
     @media (min-width: 560px) {
         margin: 120px 64px;
     }
-    
+
     @media (min-width: 768px) {
         grid-template-columns: 1fr 3fr;
         margin: 120px 56px;
@@ -33,11 +33,11 @@
         margin: 120px 0;
     }
 
-    &>p:first-child {
+    & > p:first-child {
         @include type.subtitle-2-bold;
     }
 
-    &>p:last-child {
+    & > p:last-child {
         @include type.body-1-regular;
     }
 }

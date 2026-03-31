@@ -212,4 +212,60 @@ describe('TextAreaWithCharacterLimit', () => {
         renderTextAreaWithCharacterLimit({ value: undefined as any });
         expect(getTextArea().value).toBe('');
     });
+
+    describe('auto-grow functionality', () => {
+        it('does not auto-grow when autoGrow is false (default)', () => {
+            renderTextAreaWithCharacterLimit({ autoGrow: false });
+            const textarea = getTextArea();
+            expect(textarea.style.height).toBe('');
+        });
+
+        it('adjusts height on input when autoGrow is true', () => {
+            const getComputedStyleSpy = jest.spyOn(globalThis, 'getComputedStyle').mockImplementation(
+                () =>
+                    ({
+                        lineHeight: '20px',
+                    }) as CSSStyleDeclaration,
+            );
+
+            const { rerender } = renderTextAreaWithCharacterLimit({ autoGrow: true, value: '' });
+            const textarea = getTextArea();
+
+            Object.defineProperty(textarea, 'scrollHeight', {
+                value: 100,
+                configurable: true,
+            });
+
+            rerender(<TextAreaWithCharacterLimit {...defaultProps} autoGrow={true} value={'multi\nline\ntext'} />);
+
+            expect(textarea.style.height).not.toBe('');
+
+            getComputedStyleSpy.mockRestore();
+        });
+
+        it('respects maxRows limit when autoGrow is true', () => {
+            const MOCK_LINE_HEIGHT = 20;
+            const TEST_MAX_ROWS = 3;
+
+            const getComputedStyleSpy = jest.spyOn(globalThis, 'getComputedStyle').mockImplementation(
+                () =>
+                    ({
+                        lineHeight: `${MOCK_LINE_HEIGHT}px`,
+                    }) as CSSStyleDeclaration,
+            );
+
+            renderTextAreaWithCharacterLimit({
+                autoGrow: true,
+                maxRows: TEST_MAX_ROWS,
+                value: 'line1\nline2\nline3\nline4\nline5',
+            });
+
+            const textarea = getTextArea();
+            const heightValue = Number.parseInt(textarea.style.height, 10);
+
+            expect(heightValue).toBeLessThanOrEqual(MOCK_LINE_HEIGHT * TEST_MAX_ROWS);
+
+            getComputedStyleSpy.mockRestore();
+        });
+    });
 });

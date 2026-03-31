@@ -51,6 +51,18 @@
             line-height: 1.75rem;
             letter-spacing: -0.0225rem;
         }
+
+        &-buttons {
+            display: flex;
+            justify-content: flex-end;
+            width: 100%;
+
+            .translate-btn {
+                width: 1.5rem;
+                height: 1.5rem;
+                border: none;
+            }
+        }
     }
 
     &-show-block {

@@ -125,6 +125,7 @@ export const PROGRAMS_TEXT = {
             FAIL_TO_DELETE_PROGRAM: 'Виникла помилка під час видалення програми',
             PROGRAM_SAVED_SUCCESSFULLY: 'Програма успішно збережена',
             PROGRAM_PUBLISHED_SUCCESSFULLY: 'Програма успішно опублікована',
+            PUBLISHED_PROGRAM_EDITED_SUCCESSFULLY: 'Зміни успішно опубліковано',
         },
         LABEL: {
             NAME: 'Назва',
@@ -262,12 +263,12 @@ export const PROGRAM_VALIDATION = {
         getAtLeastOneRequiredError: () => 'Потрібно обрати хоча б одну категорію',
     },
     previewImage: {
-        width: 440,
-        height: 480,
-        cropWidth: 440,
-        cropHeight: 480,
-        minWidth: 440,
-        minHeight: 480,
+        width: 480,
+        height: 440,
+        cropWidth: 480,
+        cropHeight: 440,
+        minWidth: 480,
+        minHeight: 440,
         getRequiredWhenPublishingError: () => 'Фото обов’язкове при публікації',
     },
     backgroundImage: {
@@ -309,18 +310,6 @@ export const PROGRAM_CATEGORY_VALIDATION = {
         getHasProgramsCountError: (count: number) => `Категорія містить ${count} програм`,
     },
 };
-
-export const PROGRAM_SECTION_VALIDATION = {
-    title: {
-        getRequiredError: () => "Заголовок обов'язковий",
-    },
-    description: {
-        getRequiredError: () => "Опис обов'язковий",
-    },
-    author: {
-        getRequiredError: () => "Ім'я обов'язкове",
-    },
-} as const;
 
 const createSingleImageTemplateValidation = () =>
     ({
@@ -401,7 +390,7 @@ export const PROGRAM_SECTION_TEMPLATE_VALIDATION = {
             [ContentType.Author]: { min: 0, max: 0 },
         },
         lengths: {
-            [ContentType.Title]: { min: 5, max: 60 },
+            [ContentType.Title]: { min: 5, max: 25 },
             [ContentType.Description]: { min: 10, max: 300 },
         },
         grouping: {
@@ -421,7 +410,7 @@ export const PROGRAM_SECTION_TEMPLATE_VALIDATION = {
             [ContentType.Author]: { min: 0, max: 0 },
         },
         lengths: {
-            [ContentType.Title]: { min: 5, max: 60 },
+            [ContentType.Title]: { min: 5, max: 25 },
             [ContentType.Description]: { min: 10, max: 300 },
         },
         grouping: {
@@ -441,7 +430,7 @@ export const PROGRAM_SECTION_TEMPLATE_VALIDATION = {
             [ContentType.Author]: { min: 0, max: 0 },
         },
         lengths: {
-            [ContentType.Title]: { min: 5, max: 60 },
+            [ContentType.Title]: { min: 5, max: 25 },
             [ContentType.Description]: { min: 10, max: 300 },
         },
         grouping: {

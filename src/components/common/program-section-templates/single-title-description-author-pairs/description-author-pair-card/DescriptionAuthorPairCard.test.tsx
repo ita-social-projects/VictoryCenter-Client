@@ -36,9 +36,13 @@ jest.mock('@/assets/icons/delete.svg', () => ({
 
 jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
     InputWithCharacterLimitGroup: (props: any) => {
-        const { id, value, onChange, onBlur, error } = props;
+        const { id, value, onChange, onBlur, error, showCounterBelow } = props;
         return (
-            <div data-testid={`input-group-${id}`} data-error={error ?? ''}>
+            <div
+                data-testid={`input-group-${id}`}
+                data-error={error ?? ''}
+                data-show-counter-below={String(showCounterBelow)}
+            >
                 <input data-testid={`input-${id}`} value={value} onChange={onChange} onBlur={onBlur} />
             </div>
         );
@@ -98,6 +102,7 @@ describe('DescriptionAuthorPairCard', () => {
 
         expect(screen.getByTestId('textarea-pair-description-0')).toBeInTheDocument();
         expect(screen.getByTestId('input-pair-author-0')).toBeInTheDocument();
+        expect(screen.getByTestId('input-group-pair-author-0')).toHaveAttribute('data-show-counter-below', 'true');
         expect(screen.queryByLabelText('delete')).not.toBeInTheDocument();
     });
 

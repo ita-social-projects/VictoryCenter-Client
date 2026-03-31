@@ -4,7 +4,7 @@ import { OurTeam } from './OurTeam';
 import { AboutUsContent } from '@/types/public/about-us-page';
 import { ContentType } from '@/types/common/about-us';
 import { aboutUsPageUk } from '@/locales/uk';
-import defaultOurTeamImage from '@/assets/images/public/about-us-page/our-team.jpg';
+import defaultOurTeamImage from '@/assets/images/our-team.webp';
 import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
 import {
     createRelevantAboutUsUkLocalization,

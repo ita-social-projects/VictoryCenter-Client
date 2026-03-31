@@ -9,6 +9,10 @@
     text-transform: $transform;
 }
 
+@mixin h1-black {
+    @include _text(t.$fw-black, t.$h1-size, t.$h1-height, t.$h1-spacing);
+}
+
 @mixin h1-bold {
     @include _text(t.$fw-bold, t.$h1-size, t.$h1-height, t.$h1-spacing);
 }
@@ -59,6 +63,10 @@
 
 @mixin h4-bold-uppercase {
     @include _text(t.$fw-bold, t.$h4-size, t.$h4-height, t.$h4-spacing, uppercase);
+}
+
+@mixin subtitle-1-regular {
+    @include _text(t.$fw-regular, t.$sub1-size, t.$sub1-height, t.$sub1-spacing);
 }
 
 @mixin subtitle-1-medium {

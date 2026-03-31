@@ -40,6 +40,16 @@ describe('InputWithCharacterLimit', () => {
         expect(getCharacterCounter(4, 50)).toBeInTheDocument();
     });
 
+    it('does not render visible character counter when showCounter is false and keeps aria-describedby linked to countId', () => {
+        renderInputWithCharacterLimit({ showCounter: false });
+
+        expect(getInput()).toHaveAttribute('aria-describedby', 'test-id-character-count');
+
+        const counter = screen.getByText('0/50');
+        expect(counter).toBeInTheDocument();
+        expect(counter).toHaveClass('char-limit-input__counter--visually-hidden');
+    });
+
     it('renders correct placeholder and input type', () => {
         renderInputWithCharacterLimit({ placeholder: 'Enter text', type: 'email' });
 
@@ -106,5 +116,20 @@ describe('InputWithCharacterLimit', () => {
     it('sets aria-invalid when current length exceeds maxLength', () => {
         renderInputWithCharacterLimit({ value: 'abcd', maxLength: 3 });
         expect(getInput()).toHaveAttribute('aria-invalid', 'true');
+    });
+
+    it('renders counter below input when counterPosition is bottom', () => {
+        renderInputWithCharacterLimit({ counterPosition: 'bottom', value: 'Hello', maxLength: 20 });
+
+        const counter = screen.getByText('5/20');
+        expect(counter).toBeInTheDocument();
+        expect(counter).toHaveClass('char-limit-input__counter--bottom');
+    });
+
+    it('keeps default inside counter position when prop is not provided', () => {
+        renderInputWithCharacterLimit({ value: 'Hi', maxLength: 20 });
+        const counter = screen.getByText('2/20');
+        expect(counter).toBeInTheDocument();
+        expect(counter).not.toHaveClass('char-limit-input__counter--bottom');
     });
 });

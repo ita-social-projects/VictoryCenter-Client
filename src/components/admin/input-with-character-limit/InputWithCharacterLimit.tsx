@@ -19,6 +19,8 @@ export interface InputWithCharacterLimitProps {
     hasError?: boolean;
     maxLimitWarning?: string;
     onWarningChange?: (warning: string | null) => void;
+    showCounter?: boolean;
+    counterPosition?: 'inside' | 'bottom';
 }
 
 export const InputWithCharacterLimit = ({
@@ -36,6 +38,8 @@ export const InputWithCharacterLimit = ({
     hasError = false,
     maxLimitWarning,
     onWarningChange,
+    showCounter = true,
+    counterPosition = 'inside',
 }: InputWithCharacterLimitProps) => {
     const {
         isFocused,
@@ -63,41 +67,63 @@ export const InputWithCharacterLimit = ({
 
     return (
         <div
-            className={cn('char-limit-input', {
-                'char-limit-input--disabled': disabled,
-                'char-limit-input--focused': isFocused && !disabled,
+            className={cn('char-limit-input-wrapper', {
+                'char-limit-input-wrapper--bottom': showCounter && counterPosition === 'bottom',
             })}
         >
-            <input
-                className={cn('char-limit-input__field', className)}
-                value={value ?? ''}
-                onChange={handleChange}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
-                name={name}
-                type={type}
-                id={id}
-                disabled={disabled}
-                placeholder={placeholder}
-                aria-describedby={countId}
-                aria-invalid={hasError || currentLength > maxLength}
-            />
-            <button
-                type="button"
-                className={cn('char-limit-input__clear-button', {
-                    'char-limit-input__clear-button--visible': showClearButton,
-                    'char-limit-input__clear-button--error': hasError || !!localWarning,
+            <div
+                className={cn('char-limit-input', {
+                    'char-limit-input--disabled': disabled,
+                    'char-limit-input--focused': isFocused && !disabled,
                 })}
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={handleClear}
-                aria-label="Clear input"
-                tabIndex={showClearButton ? 0 : -1}
             >
-                <RemoveIcon />
-            </button>
-            <output id={countId} className="char-limit-input__counter">
-                {currentLength}/{maxLength}
-            </output>
+                <input
+                    className={cn('char-limit-input__field', className)}
+                    value={value ?? ''}
+                    onChange={handleChange}
+                    onFocus={handleFocus}
+                    onBlur={handleBlur}
+                    name={name}
+                    type={type}
+                    id={id}
+                    disabled={disabled}
+                    placeholder={placeholder}
+                    aria-describedby={countId}
+                    aria-invalid={hasError || currentLength > maxLength}
+                />
+
+                <button
+                    type="button"
+                    className={cn('char-limit-input__clear-button', {
+                        'char-limit-input__clear-button--visible': showClearButton,
+                        'char-limit-input__clear-button--error': hasError || !!localWarning,
+                    })}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={handleClear}
+                    aria-label="Clear input"
+                    tabIndex={showClearButton ? 0 : -1}
+                >
+                    <RemoveIcon />
+                </button>
+
+                {showCounter && counterPosition === 'inside' && (
+                    <output id={countId} className="char-limit-input__counter">
+                        {currentLength}/{maxLength}
+                    </output>
+                )}
+            </div>
+
+            {(showCounter && counterPosition === 'bottom') || !showCounter ? (
+                <output
+                    id={countId}
+                    className={cn('char-limit-input__counter', {
+                        'char-limit-input__counter--bottom': showCounter && counterPosition === 'bottom',
+                        'char-limit-input__counter--visually-hidden': !showCounter,
+                    })}
+                >
+                    {currentLength}/{maxLength}
+                </output>
+            ) : null}
         </div>
     );
 };

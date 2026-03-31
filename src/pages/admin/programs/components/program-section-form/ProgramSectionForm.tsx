@@ -3,6 +3,7 @@ import { Button } from '@/components/admin/button/Button';
 import { ImageValues } from '@/types/common/image';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { renderProgramSection } from '@/utils/functions/render-program-section';
+import { ReactComponent as ChangeIcon } from '@/assets/icons/change.svg';
 import styles from './ProgramSectionForm.module.scss';
 import {
     FaqSectionQuestionDto,
@@ -23,6 +24,8 @@ import {
     getFaqPairs,
     ensureTitleContentAndOnePair,
 } from '@/utils/functions/program-section-content/programSectionContent';
+import { IconButton } from '@/components/admin/icon-button/IconButton';
+import { ACTION_ICONS } from '@/const/common/action-icons';
 
 export interface ProgramSectionFormProps {
     section: CreateHippotherapyProgramSectionDto;
@@ -312,7 +315,19 @@ export const ProgramSectionForm = ({
     const pairsMaxCount = isDescriptionAuthorPairsTemplate
         ? getProgramSectionTemplateMaxGroupCount(section.template)
         : 0;
-    const canAddPair = isDescriptionAuthorPairsTemplate ? orderedPairs.length < pairsMaxCount : true;
+
+    const validateDescriptionAuthorPairContent = (value: string, type: ContentType) =>
+        PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateContentText(value, type, true, section.template);
+
+    const canAddPair =
+        !isDescriptionAuthorPairsTemplate ||
+        (orderedPairs.length < pairsMaxCount &&
+            !validateDescriptionAuthorPairContent((titleContent as any)?.title || '', ContentType.Title) &&
+            orderedPairs.every(
+                (pair) =>
+                    !validateDescriptionAuthorPairContent(pair.description, ContentType.Description) &&
+                    !validateDescriptionAuthorPairContent(pair.author, ContentType.Author),
+            ));
 
     const handleAddPair = useCallback(() => {
         const prev = localSectionRef.current;
@@ -662,24 +677,30 @@ export const ProgramSectionForm = ({
                         </div>
                     </div>
                     <div className={styles['hover-buttons']}>
-                        <button
+                        <IconButton
                             type="button"
                             onClick={handleEditClick}
                             className={`${styles['icon-button']} ${styles['edit-button']}`}
                             aria-label="Edit section"
+                            DefaultIcon={ACTION_ICONS.edit.default}
+                            FilledIcon={ACTION_ICONS.edit.hover}
                         />
-                        <button
+                        <IconButton
                             type="button"
                             onClick={handleDeleteClick}
                             className={`${styles['icon-button']} ${styles['delete-button']}`}
                             aria-label="Delete section"
+                            DefaultIcon={ACTION_ICONS.delete.default}
+                            FilledIcon={ACTION_ICONS.delete.hover}
                         />
                         <button
                             type="button"
                             onClick={handleReplaceClick}
                             className={`${styles['icon-button']} ${styles['change-button']}`}
                             aria-label="Replace section"
-                        />
+                        >
+                            <ChangeIcon />
+                        </button>
                     </div>
                 </div>
             )}

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { WhoWeAreApi } from '@/services/api/admin/who-we-are/who-we-are-api';
 import { Content, WhoWeAreCategory, WhoWeAreSection } from '@/types/admin/who-we-are';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
@@ -17,6 +17,8 @@ import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import classNames from 'classnames';
 import { WhoWeArePageToolbar } from '../who-we-are-page-toolbar/WhoWeArePageToolbar';
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
+import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
+import { WhoWeAreModals } from '../modals/WhoWeAreModals';
 import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
 import { normalizeHtml } from '@/utils/functions/normalize-html/normalize-html';
 
@@ -36,6 +38,8 @@ export const WhoWeAreContent = () => {
     const [updatedSection, setUpdatedSection] = useState<WhoWeAreSection | null>(null);
     const [isConfirmationModalOpen, setConfirmationModalOpen] = useState<boolean>(false);
     const [languagesError, setLanguagesError] = useState<string | null>(null);
+    const modalsStateControl = useModalsState<WhoWeAreSection>();
+    const { isAnyModalOpened, openModalActions } = modalsStateControl;
 
     const { addToast } = useToast();
 
@@ -102,9 +106,52 @@ export const WhoWeAreContent = () => {
         return JSON.stringify(selectedSection) !== JSON.stringify(updatedSection);
     }, [selectedSection, updatedSection]);
 
+    const setErrorState = useCallback((message: string, type: 'categories' | 'entity' | 'languages') => {
+        if (type === 'languages') {
+            setLanguagesError(message);
+        }
+    }, []);
+
+    const { allLanguages, selectedLanguage, translationLanguages, onLanguageChange, retryFetchLanguages } =
+        useLocalizationToolkit({
+            setErrorState,
+        });
+
+    const englishLanguage = useMemo(() => allLanguages.find((l) => l.code === 'en'), [allLanguages]);
+
     const handleCategorySelect = useCallback((category: WhoWeAreCategory) => {
         setSelectedCategory(category);
     }, []);
+
+    const handleTranslateContentModalOpen = useCallback(
+        (section: WhoWeAreSection) => {
+            if (isAnyModalOpened) return;
+
+            const englishLanguageId = englishLanguage?.id;
+            const hasTranslation = englishLanguageId
+                ? section.contents
+                      .flatMap((content) => content.localizations)
+                      .some((l) => l.language?.id === englishLanguageId)
+                : false;
+
+            if (hasTranslation) {
+                openModalActions.openEditTranslationModal(section);
+            } else {
+                openModalActions.openTranslateItemModal(section);
+            }
+        },
+        [isAnyModalOpened, openModalActions, englishLanguage],
+    );
+
+    const handleTranslateWhoWeAreSuccess = useCallback(
+        (updatedSection: WhoWeAreSection) => {
+            setUpdatedSection(updatedSection);
+            refetchCategories();
+
+            addToast(COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_PUBLISHED_SUCCESS, ToastType.Success);
+        },
+        [addToast, refetchCategories],
+    );
 
     const handleContentChange = useCallback((updatedContent: Content) => {
         setUpdatedSection((prevSection) => {
@@ -170,22 +217,11 @@ export const WhoWeAreContent = () => {
         return { message: null, type: null };
     }, [categoryError, sectionError, languagesError]);
 
-    const setErrorState = useCallback((message: string, type: 'categories' | 'entity' | 'languages') => {
-        if (type === 'languages') {
-            setLanguagesError(message);
-        }
-    }, []);
-
-    const { allLanguages, translationLanguages, selectedLanguage, onLanguageChange, retryFetchLanguages } =
-        useLocalizationToolkit({
-            setErrorState,
-        });
-
-    const handleRetry = useCallback(() => {
+    const handleRetry = useCallback(async () => {
         if (error.type === 'categories') {
-            refetchCategories();
+            await refetchCategories();
         } else if (error.type === 'entity') {
-            refetchSection();
+            await refetchSection();
         } else if (error.type === 'languages') {
             retryFetchLanguages();
         }
@@ -220,6 +256,7 @@ export const WhoWeAreContent = () => {
                     section={updatedSection}
                     onChange={handleContentChange}
                     onPublish={() => setConfirmationModalOpen(true)}
+                    handleOnTranslateContent={handleTranslateContentModalOpen}
                     isPublishButtonActive={isPublishButtonActive}
                     language={selectedLanguage}
                 />
@@ -253,6 +290,11 @@ export const WhoWeAreContent = () => {
                 title={COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES}
                 onConfirm={handleConfirmPublish}
                 onCancel={() => setConfirmationModalOpen(false)}
+            />
+            <WhoWeAreModals
+                modalsStateControl={modalsStateControl}
+                translatedLanguages={translationLanguages}
+                onTranslateWhoWeAreSection={handleTranslateWhoWeAreSuccess}
             />
             <ToastContainer />
         </>

@@ -17,6 +17,7 @@ export interface TextAreaWithCharacterLimitGroupProps extends TextAreaWithCharac
     currentLength?: number;
     maxLimitWarning?: string;
     isWhiteLabel?: boolean;
+    errorCounterContainerClassName?: string;
 }
 
 export const TextAreaWithCharacterLimitGroup = ({
@@ -36,6 +37,9 @@ export const TextAreaWithCharacterLimitGroup = ({
     className,
     maxLimitWarning,
     isWhiteLabel,
+    errorCounterContainerClassName,
+    autoGrow,
+    maxRows,
 }: TextAreaWithCharacterLimitGroupProps) => {
     const [localWarning, setLocalWarning] = useState<string | null>(null);
     const counterId = `${id}-character-count`;
@@ -57,6 +61,8 @@ export const TextAreaWithCharacterLimitGroup = ({
                 hasError={!!error || !!localWarning}
                 maxLimitWarning={maxLimitWarning}
                 onWarningChange={setLocalWarning}
+                autoGrow={autoGrow}
+                maxRows={maxRows}
             />
             <InputErrorWithCharacterCounter
                 error={localWarning || error}
@@ -65,6 +71,7 @@ export const TextAreaWithCharacterLimitGroup = ({
                 htmlFor={id}
                 value={value}
                 isWhiteLabel={isWhiteLabel}
+                containerClassName={errorCounterContainerClassName}
             />
         </div>
     );

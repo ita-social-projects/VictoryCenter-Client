@@ -4,16 +4,15 @@ import { IMAGE_VALIDATION } from '@/const/admin/image';
 export const getImageValidationSchema = (minWidth: number, minHeight: number, maxSizeMB: number) => {
     return Yup.mixed<File>()
         .test(
-            'fileSize',
-            IMAGE_VALIDATION.getSizeError(maxSizeMB),
-            (file) => !!file && file.size <= maxSizeMB * 1024 * 1024,
-        )
-        .test(
             'fileType',
             IMAGE_VALIDATION.getFormatError,
             (file) => !!file && IMAGE_VALIDATION.allowedFormats.includes(file.type),
         )
-
+        .test(
+            'fileSize',
+            IMAGE_VALIDATION.getSizeError(maxSizeMB),
+            (file) => !!file && file.size <= maxSizeMB * 1024 * 1024,
+        )
         .test(
             'fileDimensions',
             IMAGE_VALIDATION.ImageDimensionsTooSmallError,

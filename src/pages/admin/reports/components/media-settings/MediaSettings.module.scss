@@ -1,0 +1,32 @@
+.blocks {
+    display: flex;
+    gap: 60px;
+}
+
+.error,
+.loader {
+    width: 1440px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.error-button {
+    width: 200px;
+}
+
+.actions {
+    display: flex;
+    gap: 60px;
+    margin-top: 60px;
+    align-items: center;
+    padding-left: 385px;
+
+    .button {
+        width: 305px;
+        height: 60px;
+        font-size: 24px;
+    }
+}

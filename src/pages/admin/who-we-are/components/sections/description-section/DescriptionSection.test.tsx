@@ -54,6 +54,7 @@ jest.mock('@/validation/admin/who-we-are-schema/WhoWeAreSchema', () => ({
 describe('DescriptionSection', () => {
     let mockOnChange: jest.Mock;
     let mockOnPublish: jest.Mock;
+    let mockOnTranslate: jest.Mock;
     const descriptionLimit = 500;
     const initialDescription = 'This is an initial test description.';
 
@@ -72,6 +73,7 @@ describe('DescriptionSection', () => {
         descriptionLimit,
         onChange: mockOnChange,
         onPublish: mockOnPublish,
+        onTranslate: mockOnTranslate,
         isPublishButtonActive: false,
         language: { id: 1, code: 'uk', name: 'Ukrainian' },
         ...overrides,
@@ -83,6 +85,7 @@ describe('DescriptionSection', () => {
     beforeEach(() => {
         mockOnChange = jest.fn();
         mockOnPublish = jest.fn();
+        mockOnTranslate = jest.fn();
         (WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText as jest.Mock).mockReturnValue(null);
     });
 
@@ -150,11 +153,13 @@ describe('DescriptionSection', () => {
         });
     });
 
-    it('should call onPublish when the publish button is clicked and no error is present', () => {
+    it('should disable translate button and call onPublish when publish button is clicked with no errors', () => {
         renderComponent({ isPublishButtonActive: true });
 
         const publishButton = screen.getByRole('button', { name: 'Опублікувати' });
         expect(publishButton).toBeEnabled();
+
+        expect(screen.getByRole('button', { name: 'Translate' })).toBeDisabled();
 
         fireEvent.click(publishButton);
         expect(mockOnPublish).toHaveBeenCalled();

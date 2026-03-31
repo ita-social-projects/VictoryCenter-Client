@@ -1,0 +1,12 @@
+@use '@/assets/sass/mixins/typography.mixins' as type;
+
+.profileToolbarActions {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+}
+
+.profileToolbarActions :global(button) {
+    @include type.subtitle-1-regular;
+    padding: 16px 24px;
+}

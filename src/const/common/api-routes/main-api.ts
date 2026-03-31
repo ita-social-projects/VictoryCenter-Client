@@ -55,6 +55,9 @@ export const API_ROUTES = {
         PREVIEWS: 'WhoWeAre/previews',
         PUBLIC: 'WhoWeArePage',
     },
+    WHO_WE_ARE_CONTENT_LOCALIZATIONS: {
+        BASE: 'WhoWeAreContentLocalizations',
+    },
     LOCALIZATION_LANGUAGE: {
         BASE: 'LocalizationLanguage',
     },
@@ -80,6 +83,23 @@ export const API_ROUTES = {
         BANNER: 'Partners/banner',
         SECTIONS: 'Partners/sections',
         PAGE: 'Partners/page',
+    },
+    REPORTS: {
+        MEDIA_SETTINGS: 'Report/report',
+        BASE: 'Report',
+        FUNDS_EXPENDITURES: {
+            SETTINGS: 'ReportFundsExpendituresSettings',
+            RECORDS: 'ReportFundsExpendituresRecords',
+            SUMMARY: 'ReportFundsExpendituresRecords/summary',
+            CATEGORIES: 'ReportFundsExpendituresCategories',
+        },
+    },
+    PDF_SECTION: {
+        BASE: 'PdfSection',
+        CONTENT: 'PdfSection/pdf-section',
+    },
+    PDF_REPORTS: {
+        BASE: 'PdfReports',
     },
     FAQ_LOCALIZATIONS: {
         BASE: 'FaqQuestionLocalizations',

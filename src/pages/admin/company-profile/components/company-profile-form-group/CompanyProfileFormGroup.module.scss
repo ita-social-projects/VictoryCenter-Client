@@ -1,0 +1,87 @@
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
+
+.custom-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    position: relative;
+}
+
+.custom-form-group-label-wrapper label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    @include type.subtitle-2-medium;
+    color: c.$grey-700;
+}
+
+.custom-form-group-required {
+    color: c.$error;
+}
+
+.custom-form-group-input-wrapper {
+    position: relative;
+    width: 100%;
+    padding-bottom: 20px;
+}
+
+.custom-form-group-tooltip-inside {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.char-limit-input {
+    width: 100%;
+    min-width: 0;
+    padding-right: 44px;
+}
+
+.custom-form-group-input-wrapper :global(.char-limit-input) {
+    width: 100%;
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.custom-form-group-input-wrapper :global(input) {
+    width: 100%;
+    min-width: 0;
+}
+
+.custom-form-group :global(.tooltip-popup) {
+    z-index: 9999;
+    position: absolute;
+    text-align: left;
+}
+
+.custom-form-group :global(.input-error) {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    margin: 0;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    max-width: calc(100% - 72px);
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.custom-form-group-input-wrapper :global(.char-limit-input__counter--bottom) {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    margin: 0;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    width: auto;
+    max-width: none;
+    white-space: nowrap;
+}

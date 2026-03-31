@@ -12,10 +12,12 @@ import {
 import { SectionType } from '@/types/common/about-us';
 import React from 'react';
 import { LocalizationLanguage } from '@/types/common/language';
+import './SectionsWrapper.scss';
 
 export interface MainSectionProps {
     section: WhoWeAreSection | null;
     onChange: (data: Content) => void;
+    handleOnTranslateContent: (section: WhoWeAreSection) => void;
     onPublish: () => void;
     isPublishButtonActive: boolean;
     language: LocalizationLanguage;
@@ -29,6 +31,7 @@ interface SectionConfig {
 export const SectionsWrapper = ({
     section,
     onChange,
+    handleOnTranslateContent,
     onPublish,
     isPublishButtonActive,
     language,
@@ -43,6 +46,7 @@ export const SectionsWrapper = ({
         onPublish,
         isPublishButtonActive,
         language,
+        onTranslate: () => handleOnTranslateContent(section),
     };
 
     const contentConfigs: Record<SectionType, SectionConfig> = {

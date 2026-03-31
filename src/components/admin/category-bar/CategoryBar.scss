@@ -1,7 +1,6 @@
 @use '@/assets/sass/variables/colors';
 
 .category-bar {
-    min-height: 3.75rem;
     display: flex;
     position: relative;
     border-bottom: 1px solid colors.$grey-700;
@@ -24,6 +23,7 @@
 
     &-arrow {
         position: absolute;
+        z-index: 1;
         top: 0;
         bottom: 0;
         padding: 0 0.5rem;

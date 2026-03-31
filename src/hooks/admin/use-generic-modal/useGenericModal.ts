@@ -68,7 +68,6 @@ export const useGenericModal = <
     getErrorMessage,
     getFormKey,
     transformFormData,
-    closeOnDraftCancel = false,
 }: UseGenericModalConfig<TFormValues, TEntity>): UseGenericModalReturn<TFormValues, TFormRef> => {
     const formRef = useRef<TFormRef>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -85,14 +84,18 @@ export const useGenericModal = <
 
     const isEditMode = mode === ModalMode.Edit;
 
-    const updateButtonStates = useCallback((currentIsValid: boolean) => {
-        const api = formRef.current;
+    const updateButtonStates = useCallback(
+        (currentIsValid: boolean) => {
+            const api = formRef.current;
+            const isDirtyForSubmit = mode === ModalMode.Edit ? (api?.isDirty?.() ?? false) : true;
 
-        setButtonStates({
-            isDraftValid: api?.isValid?.(false) ?? currentIsValid,
-            isPublishValid: api?.isValid?.(true) ?? currentIsValid,
-        });
-    }, []);
+            setButtonStates({
+                isDraftValid: isDirtyForSubmit && (api?.isValid?.(false) ?? currentIsValid),
+                isPublishValid: isDirtyForSubmit && (api?.isValid?.(true) ?? currentIsValid),
+            });
+        },
+        [mode],
+    );
 
     const handleFormValidationChange = useCallback(
         (isValid: boolean) => {
@@ -119,14 +122,10 @@ export const useGenericModal = <
 
     const handleCancelConfirmation = useCallback(() => {
         setShowFormConfirmModal(false);
-
-        if (closeOnDraftCancel && pendingAction === PendingAction.Draft) {
-            onClose();
-        }
-
+        onClose();
         resetPendingState();
         setIsSubmitting(false);
-    }, [closeOnDraftCancel, pendingAction, onClose, resetPendingState]);
+    }, [onClose, resetPendingState]);
 
     const handleConfirmAction = useCallback(async () => {
         if (!pendingFormData || pendingAction === null) return;

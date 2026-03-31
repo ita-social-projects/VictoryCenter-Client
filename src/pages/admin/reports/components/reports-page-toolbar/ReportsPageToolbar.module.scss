@@ -1,0 +1,36 @@
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
+
+.button {
+    display: flex;
+    align-items: center;
+    @include type.subtitle-1-medium;
+    font-weight: 400;
+    line-height: 24px;
+    letter-spacing: -0.02em;
+    gap: 20px;
+    width: 311px;
+    height: 60px;
+    font-size: 24px;
+    padding: 8px 14px;
+}
+
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    height: 61px;
+    margin: 130px 0 50px 0;
+    border-bottom: 1px solid c.$grey-700;
+}
+
+.actions {
+    display: flex;
+    flex-direction: row;
+}
+
+.category-bar-button {
+    &-selected {
+        border-bottom: 2px solid c.$blue-900;
+    }
+}

@@ -7,9 +7,10 @@ import './ButtonTooltip.scss';
 export interface ButtonTooltipProps {
     children: React.ReactNode;
     position?: TooltipPosition;
+    isRenderInPortal?: boolean;
 }
 
-export const ButtonTooltip = ({ children, position = 'bottom' }: ButtonTooltipProps) => {
+export const ButtonTooltip = ({ children, position = 'bottom', isRenderInPortal = false }: ButtonTooltipProps) => {
     const [isVisible, setIsVisible] = useState(false);
     const wrapperRef = useRef<HTMLButtonElement>(null);
     const tooltipId = useId();
@@ -42,18 +43,32 @@ export const ButtonTooltip = ({ children, position = 'bottom' }: ButtonTooltipPr
         >
             <InfoIcon className="button-tooltip-icon" />
 
-            {isVisible && (
-                <Tooltip
-                    id={tooltipId}
-                    position={position}
-                    offsetInPixels={8}
-                    customMaxWidthInPixels={400}
-                    allowClickThrough={true}
-                    isCentered={true}
-                >
-                    {children}
-                </Tooltip>
-            )}
+            {isVisible &&
+                (isRenderInPortal && wrapperRef.current ? (
+                    <Tooltip
+                        id={tooltipId}
+                        position={position}
+                        offsetInPixels={8}
+                        customMaxWidthInPixels={400}
+                        allowClickThrough={true}
+                        isCentered={true}
+                        isRenderInPortal={true}
+                        portalPositioner={wrapperRef.current}
+                    >
+                        {children}
+                    </Tooltip>
+                ) : (
+                    <Tooltip
+                        id={tooltipId}
+                        position={position}
+                        offsetInPixels={8}
+                        customMaxWidthInPixels={400}
+                        allowClickThrough={true}
+                        isCentered={true}
+                    >
+                        {children}
+                    </Tooltip>
+                ))}
         </button>
     );
 };

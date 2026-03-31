@@ -124,7 +124,7 @@ describe('PdfSectionContentBlock', () => {
             await user.clear(titleInput);
             await user.type(titleInput, 'New Title Updated');
 
-            await user.tab(); // blur
+            await user.tab();
 
             const publishButton = screen.getByRole('button', {
                 name: PDF_FILES_SECTION_TEXT.BUTTON.PUBLISH,

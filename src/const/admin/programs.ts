@@ -61,7 +61,7 @@ export const PROGRAMS_TEXT = {
         },
         CARD: {
             BUTTON: {
-                ADD_CARD: 'Додати карточку',
+                ADD_CARD: 'Додати блок',
             },
             FORM: {
                 TITLE: {

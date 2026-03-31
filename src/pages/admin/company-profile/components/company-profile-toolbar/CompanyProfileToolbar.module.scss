@@ -1,3 +1,4 @@
+@use '@/assets/sass/variables/colors' as c;
 @use '@/assets/sass/mixins/typography.mixins' as type;
 
 .profileToolbarActions {
@@ -9,4 +10,10 @@
 .profileToolbarActions :global(button) {
     @include type.subtitle-1-regular;
     padding: 16px 24px;
+}
+
+.profileToolbarActions :global(button:disabled) {
+    background-color: c.$blue-100;
+    border-color: c.$blue-100;
+    color: c.$white;
 }

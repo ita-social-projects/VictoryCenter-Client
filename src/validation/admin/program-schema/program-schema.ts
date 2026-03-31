@@ -115,14 +115,16 @@ export const programValidationSchema = Yup.object({
             PROGRAM_VALIDATION.description.max,
             COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PROGRAM_VALIDATION.description.max),
         )
+        .test(
+            'min-length-if-not-empty',
+            COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(PROGRAM_VALIDATION.description.min),
+            (value) => {
+                return !value || value.length >= PROGRAM_VALIDATION.description.min;
+            },
+        )
         .when('$isPublishing', ([isPublishing], schema) =>
             isPublishing
-                ? schema
-                      .required(PROGRAM_VALIDATION.description.getRequiredWhenPublishingError())
-                      .min(
-                          PROGRAM_VALIDATION.description.min,
-                          COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(PROGRAM_VALIDATION.description.min),
-                      )
+                ? schema.required(PROGRAM_VALIDATION.description.getRequiredWhenPublishingError())
                 : schema.notRequired(),
         ),
 

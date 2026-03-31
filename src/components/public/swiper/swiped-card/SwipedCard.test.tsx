@@ -1,10 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import { SwipedCard } from './SwipedCard';
 import { ContentType } from '@/types/common/about-us';
-import { TranslationStatus } from '@/types/common/language';
+import { TranslationStatus, EntityLocalization } from '@/types/common/language';
 import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
 import { setupUseGetLocalizationAboutUsContentMock } from '@/utils/test-mocks/use-get-localization-mock';
-import { EntityLocalization } from '@/types/common/language';
 
 jest.mock('@/hooks/common/use-get-localization/useGetLocalization');
 
@@ -28,15 +27,18 @@ describe('SwipedCard component', () => {
         title: null,
         localizations: [],
     };
+    const defaultProps = {
+        description: card.description,
+        localizations: card.localizations,
+        index: 0,
+        imageUrl: 'test.jpg',
+        altText: 'Test alt',
+    };
 
     it('should render image with correct src and alt', () => {
         render(
             <SwipedCard
-                description={card.description}
-                localizations={card.localizations}
-                index={0}
-                imageUrl="test.jpg"
-                altText="Test alt"
+                {...defaultProps}
             />,
         );
 
@@ -49,11 +51,7 @@ describe('SwipedCard component', () => {
     it('should render fallback description when no localizations', () => {
         render(
             <SwipedCard
-                description={card.description}
-                localizations={card.localizations}
-                index={0}
-                imageUrl="test.jpg"
-                altText="Test alt"
+                {...defaultProps}
             />,
         );
 
@@ -71,12 +69,9 @@ describe('SwipedCard component', () => {
         ];
 
         render(
-            <SwipedCard
-                description={card.description}
+            <SwipedCard 
+                {...defaultProps}
                 localizations={localizations}
-                index={0}
-                imageUrl="test.jpg"
-                altText="Test alt"
             />,
         );
 
@@ -95,11 +90,8 @@ describe('SwipedCard component', () => {
 
         render(
             <SwipedCard
-                description={card.description}
+                {...defaultProps}
                 localizations={localizations}
-                index={0}
-                imageUrl="test.jpg"
-                altText="Test alt"
             />,
         );
 
@@ -107,7 +99,7 @@ describe('SwipedCard component', () => {
     });
 
     it('should not render any text when the description is empty', () => {
-        render(<SwipedCard description={null} localizations={[]} index={0} imageUrl="test.jpg" altText="Test alt" />);
+        render(<SwipedCard {...defaultProps} description={null} localizations={[]} />);
         expect(screen.queryByText('Fallback description')).not.toBeInTheDocument();
         expect(screen.queryByText('Localized description')).not.toBeInTheDocument();
     });
@@ -115,8 +107,7 @@ describe('SwipedCard component', () => {
     it('should pass imageUrl to the img element', () => {
         render(
             <SwipedCard
-                description={card.description}
-                localizations={card.localizations}
+                {...defaultProps}
                 index={1}
                 imageUrl="custom-image.jpg"
                 altText="Custom alt"
@@ -132,8 +123,7 @@ describe('SwipedCard component', () => {
         for (let i = 0; i < 4; i++) {
             const { unmount } = render(
                 <SwipedCard
-                    description={card.description}
-                    localizations={card.localizations}
+                    {...defaultProps}
                     index={i}
                     imageUrl="img.jpg"
                     altText={`Card ${i}`}

@@ -11,8 +11,6 @@ import quote2DefaultImg from '@/assets/images/man-facing-horse-forehead.webp';
 import { SloganSection } from './slogan/SloganSection';
 import { HippoventionCenter } from './hippovention-center/HippoventionCenter';
 import { SwipedGallery } from './swiped-gallery/SwipedGallery';
-import quote1DefaultImg from '@/assets/images/public/hippotherapy/quote_1.jpg';
-import quote2DefaultImg from '@/assets/images/public/hippotherapy/quote_2.jpg';
 
 export const HippotherapyPage = () => {
     const { t } = useTranslation('hippotherapy');

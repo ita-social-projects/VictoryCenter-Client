@@ -13,7 +13,7 @@ const mockedUseGetLocalization = jest.mocked(useGetLocalization);
 type CardLocalization = EntityLocalization & {
     description: string | null;
     title: string | null;
-}
+};
 
 describe('SwipedCard component', () => {
     beforeEach(() => {

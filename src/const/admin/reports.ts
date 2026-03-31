@@ -1,3 +1,5 @@
+import { COMMON_TEXT_ADMIN } from './common';
+
 export const REPORTS_TEXT = {
     FORM: {
         LABEL: {
@@ -71,16 +73,16 @@ export const PDF_FILES_SECTION_VALIDATION = {
     title: {
         min: 2,
         max: 30,
-        getRequiredError: () => "Поле обов'язкове",
-        getMinError: () => 'Не менше 2 символів',
-        getMaxError: () => 'Не більше 30 символів',
+        getRequiredError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED,
+        getMinError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(2),
+        getMaxError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(30),
     },
     description: {
         min: 2,
         max: 160,
-        getRequiredError: () => "Поле обов'язкове",
-        getMinError: () => 'Не менше 2 символів',
-        getMaxError: () => 'Не більше 160 символів',
+        getRequiredError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED,
+        getMinError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(2),
+        getMaxError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(160),
     },
     page_size: 4,
 };
@@ -88,10 +90,6 @@ export const PDF_FILES_SECTION_VALIDATION = {
 export const PDF_FILES_SECTION_TEXT = {
     TITLE: 'Заголовок розділу PDF',
     DESCRIPTION: 'Короткий опис для користувачів',
-    BUTTON: {
-        PUBLISH: 'Опублікувати',
-        CANCEL: 'Відмінити',
-    },
     TABLE: {
         HEADER: {
             NAME: 'Назва',

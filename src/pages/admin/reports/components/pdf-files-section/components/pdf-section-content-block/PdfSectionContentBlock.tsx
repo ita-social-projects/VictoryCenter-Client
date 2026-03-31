@@ -17,6 +17,7 @@ import './PdfSectionContentBlock.scss';
 import cn from 'classnames';
 import { ACTION_ICONS } from '@/const/common/action-icons';
 import { IconButton } from '@/components/admin/icon-button/IconButton';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
 interface PdfSectionContent {
     title: string;
@@ -149,7 +150,7 @@ export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({ 
                             onClick={handleCancel}
                             disabled={isSaving}
                         >
-                            {PDF_FILES_SECTION_TEXT.BUTTON.CANCEL}
+                            {COMMON_TEXT_ADMIN.BUTTON.CANCEL}
                         </Button>
                         <Button
                             buttonStyle="primary"
@@ -158,7 +159,7 @@ export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({ 
                             onClick={handleSave}
                             disabled={isSaveDisabled}
                         >
-                            {PDF_FILES_SECTION_TEXT.BUTTON.PUBLISH}
+                            {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
                         </Button>
                     </div>
                 </form>

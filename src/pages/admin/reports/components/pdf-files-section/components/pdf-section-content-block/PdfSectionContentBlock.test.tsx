@@ -4,6 +4,7 @@ import { PdfSectionContentBlock } from './PdfSectionContentBlock';
 import { PDF_FILES_SECTION_TEXT } from '@/const/admin/reports';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { PdfSectionApi } from '@/services/api/admin/reports/pdf-section/pdf-section-api';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
 jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider');
 
@@ -90,9 +91,11 @@ describe('PdfSectionContentBlock', () => {
 
             await user.click(editButton);
 
-            expect(screen.getByRole('button', { name: PDF_FILES_SECTION_TEXT.BUTTON.PUBLISH })).toBeInTheDocument();
+            expect(
+                screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED }),
+            ).toBeInTheDocument();
 
-            expect(screen.getByRole('button', { name: PDF_FILES_SECTION_TEXT.BUTTON.CANCEL })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.CANCEL })).toBeInTheDocument();
         });
 
         it('should disable publish button when form is unchanged', async () => {
@@ -104,7 +107,7 @@ describe('PdfSectionContentBlock', () => {
             });
             await user.click(editButton);
 
-            const publishButton = screen.getByRole('button', { name: PDF_FILES_SECTION_TEXT.BUTTON.PUBLISH });
+            const publishButton = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED });
             expect(publishButton).toBeDisabled();
         });
 
@@ -127,7 +130,7 @@ describe('PdfSectionContentBlock', () => {
             await user.tab();
 
             const publishButton = screen.getByRole('button', {
-                name: PDF_FILES_SECTION_TEXT.BUTTON.PUBLISH,
+                name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED,
             });
 
             await waitFor(() => {
@@ -153,7 +156,7 @@ describe('PdfSectionContentBlock', () => {
 
             await user.click(
                 screen.getByRole('button', {
-                    name: PDF_FILES_SECTION_TEXT.BUTTON.CANCEL,
+                    name: COMMON_TEXT_ADMIN.BUTTON.CANCEL,
                 }),
             );
 
@@ -181,7 +184,7 @@ describe('PdfSectionContentBlock', () => {
             await user.tab();
 
             const publishButton = screen.getByRole('button', {
-                name: PDF_FILES_SECTION_TEXT.BUTTON.PUBLISH,
+                name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED,
             });
 
             await waitFor(() => expect(publishButton).toBeEnabled());

@@ -5,11 +5,23 @@ import { PDF_FILES_SECTION_TEXT } from '@/const/admin/reports';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { PdfSectionApi } from '@/services/api/admin/reports/pdf-section/pdf-section-api';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { ToastType } from '@/types/admin/toast';
 
 jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider');
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: () => ({}),
+}));
+
+jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
+    ConfirmationModal: ({ isOpen, onConfirm, onCancel, title }: any) =>
+        isOpen ? (
+            <div data-testid="confirmation-modal" role="dialog">
+                <h2>{title}</h2>
+                <button onClick={onCancel}>НІ</button>
+                <button onClick={onConfirm}>ТАК</button>
+            </div>
+        ) : null,
 }));
 
 const mockUseToast = useToast as jest.MockedFunction<typeof useToast>;
@@ -191,6 +203,10 @@ describe('PdfSectionContentBlock', () => {
 
             await user.click(publishButton);
 
+            // Click confirm button in the modal
+            const confirmButton = await screen.findByText('ТАК');
+            await user.click(confirmButton);
+
             await waitFor(() => {
                 expect(mockOnSave).toHaveBeenCalledWith({
                     title: 'Updated Title',
@@ -210,6 +226,180 @@ describe('PdfSectionContentBlock', () => {
 
             const counters = screen.getAllByText(/\//);
             expect(counters.length).toBeGreaterThan(0);
+        });
+    });
+
+    describe('Confirmation Modal', () => {
+        it('should open confirmation modal when publish button is clicked with valid changes', async () => {
+            const user = userEvent.setup();
+            render(<PdfSectionContentBlock content={mockContent} />);
+
+            await user.click(
+                screen.getByRole('button', {
+                    name: PDF_FILES_SECTION_TEXT.ACTIONS.EDIT,
+                }),
+            );
+
+            const titleInput = screen.getByLabelText(/заголовок/i);
+            await user.clear(titleInput);
+            await user.type(titleInput, 'Updated Title');
+
+            await user.tab();
+
+            const publishButton = screen.getByRole('button', {
+                name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED,
+            });
+
+            await user.click(publishButton);
+
+            const modal = await screen.findByTestId('confirmation-modal');
+            expect(modal).toBeInTheDocument();
+            expect(screen.getByText(COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES)).toBeInTheDocument();
+        });
+
+        it('should close modal and not save when clicking НІ button', async () => {
+            const user = userEvent.setup();
+            const mockOnSave = jest.fn();
+
+            render(<PdfSectionContentBlock content={mockContent} onSave={mockOnSave} />);
+
+            await user.click(
+                screen.getByRole('button', {
+                    name: PDF_FILES_SECTION_TEXT.ACTIONS.EDIT,
+                }),
+            );
+
+            const titleInput = screen.getByLabelText(/заголовок/i);
+            await user.clear(titleInput);
+            await user.type(titleInput, 'Updated Title');
+
+            await user.tab();
+
+            const publishButton = screen.getByRole('button', {
+                name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED,
+            });
+
+            await user.click(publishButton);
+
+            const modal = await screen.findByTestId('confirmation-modal');
+            const cancelButton = screen.getByText('НІ');
+
+            await user.click(cancelButton);
+
+            await waitFor(() => {
+                expect(modal).not.toBeInTheDocument();
+            });
+
+            expect(mockOnSave).not.toHaveBeenCalled();
+            expect(mockAddToast).not.toHaveBeenCalled();
+        });
+
+        it('should save and show success toast when clicking ТАК button', async () => {
+            const user = userEvent.setup();
+            const mockOnSave = jest.fn().mockResolvedValue(undefined);
+
+            render(<PdfSectionContentBlock content={mockContent} onSave={mockOnSave} />);
+
+            await user.click(
+                screen.getByRole('button', {
+                    name: PDF_FILES_SECTION_TEXT.ACTIONS.EDIT,
+                }),
+            );
+
+            const titleInput = screen.getByLabelText(/заголовок/i);
+            await user.clear(titleInput);
+            await user.type(titleInput, 'Updated Title');
+
+            await user.tab();
+
+            const publishButton = screen.getByRole('button', {
+                name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED,
+            });
+
+            await user.click(publishButton);
+
+            const confirmButton = await screen.findByText('ТАК');
+            await user.click(confirmButton);
+
+            await waitFor(() => {
+                expect(mockOnSave).toHaveBeenCalledWith({
+                    title: 'Updated Title',
+                    description: mockContent.description,
+                });
+            });
+
+            expect(mockAddToast).toHaveBeenCalledWith('Зміни успішно опубліковані', ToastType.Success);
+        });
+
+        it('should revert to view mode after successful save', async () => {
+            const user = userEvent.setup();
+            const mockOnSave = jest.fn().mockResolvedValue(undefined);
+
+            render(<PdfSectionContentBlock content={mockContent} onSave={mockOnSave} />);
+
+            await user.click(
+                screen.getByRole('button', {
+                    name: PDF_FILES_SECTION_TEXT.ACTIONS.EDIT,
+                }),
+            );
+
+            const titleInput = screen.getByLabelText(/заголовок/i);
+            await user.clear(titleInput);
+            await user.type(titleInput, 'Updated Title');
+
+            await user.tab();
+
+            const publishButton = screen.getByRole('button', {
+                name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED,
+            });
+
+            await user.click(publishButton);
+
+            const confirmButton = await screen.findByText('ТАК');
+            await user.click(confirmButton);
+
+            await waitFor(() => {
+                expect(screen.queryByDisplayValue('Updated Title')).not.toBeInTheDocument();
+            });
+
+            expect(screen.getByRole('button', { name: PDF_FILES_SECTION_TEXT.ACTIONS.EDIT })).toBeInTheDocument();
+        });
+
+        it('should disable modal buttons during save', async () => {
+            const user = userEvent.setup();
+            let resolveSave: () => void;
+            const savePromise = new Promise<void>((resolve) => {
+                resolveSave = resolve;
+            });
+
+            const mockOnSave = jest.fn(() => savePromise);
+
+            jest.spyOn(PdfSectionApi, 'updatePdfSection').mockReturnValue(savePromise as any);
+
+            render(<PdfSectionContentBlock content={mockContent} onSave={mockOnSave} />);
+
+            await user.click(
+                screen.getByRole('button', {
+                    name: PDF_FILES_SECTION_TEXT.ACTIONS.EDIT,
+                }),
+            );
+
+            const titleInput = screen.getByLabelText(/заголовок/i);
+            await user.clear(titleInput);
+            await user.type(titleInput, 'Updated Title');
+
+            await user.tab();
+
+            const publishButton = screen.getByRole('button', {
+                name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED,
+            });
+
+            await user.click(publishButton);
+
+            const confirmButton = await screen.findByText('ТАК');
+            await user.click(confirmButton);
+
+            resolveSave!();
         });
     });
 });

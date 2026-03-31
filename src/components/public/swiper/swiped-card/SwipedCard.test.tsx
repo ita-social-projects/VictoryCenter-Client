@@ -36,11 +36,7 @@ describe('SwipedCard component', () => {
     };
 
     it('should render image with correct src and alt', () => {
-        render(
-            <SwipedCard
-                {...defaultProps}
-            />,
-        );
+        render(<SwipedCard {...defaultProps} />);
 
         const img = screen.getByRole('img');
         expect(img).toBeInTheDocument();
@@ -49,11 +45,7 @@ describe('SwipedCard component', () => {
     });
 
     it('should render fallback description when no localizations', () => {
-        render(
-            <SwipedCard
-                {...defaultProps}
-            />,
-        );
+        render(<SwipedCard {...defaultProps} />);
 
         expect(screen.getByText('Fallback description')).toBeInTheDocument();
     });
@@ -68,12 +60,7 @@ describe('SwipedCard component', () => {
             },
         ];
 
-        render(
-            <SwipedCard 
-                {...defaultProps}
-                localizations={localizations}
-            />,
-        );
+        render(<SwipedCard {...defaultProps} localizations={localizations} />);
 
         expect(screen.getByText('Localized description')).toBeInTheDocument();
     });
@@ -88,12 +75,7 @@ describe('SwipedCard component', () => {
             },
         ];
 
-        render(
-            <SwipedCard
-                {...defaultProps}
-                localizations={localizations}
-            />,
-        );
+        render(<SwipedCard {...defaultProps} localizations={localizations} />);
 
         expect(screen.queryByText('Fallback description')).not.toBeInTheDocument();
     });
@@ -105,14 +87,7 @@ describe('SwipedCard component', () => {
     });
 
     it('should pass imageUrl to the img element', () => {
-        render(
-            <SwipedCard
-                {...defaultProps}
-                index={1}
-                imageUrl="custom-image.jpg"
-                altText="Custom alt"
-            />,
-        );
+        render(<SwipedCard {...defaultProps} index={1} imageUrl="custom-image.jpg" altText="Custom alt" />);
 
         const img = screen.getByRole('img');
         expect(img).toHaveAttribute('src', 'custom-image.jpg');
@@ -122,12 +97,7 @@ describe('SwipedCard component', () => {
     it('should render all four card indexes without error', () => {
         for (let i = 0; i < 4; i++) {
             const { unmount } = render(
-                <SwipedCard
-                    {...defaultProps}
-                    index={i}
-                    imageUrl="img.jpg"
-                    altText={`Card ${i}`}
-                />,
+                <SwipedCard {...defaultProps} index={i} imageUrl="img.jpg" altText={`Card ${i}`} />,
             );
             expect(screen.getByAltText(`Card ${i}`)).toBeInTheDocument();
             unmount();

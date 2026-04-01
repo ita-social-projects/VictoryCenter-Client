@@ -114,4 +114,83 @@ describe('InputWithCharacterLimit', () => {
         renderInputWithCharacterLimit({ value: 'abcd', maxLength: 3 });
         expect(getInput()).toHaveAttribute('aria-invalid', 'true');
     });
+
+    it('adds error class to wrapper when hasError is true', () => {
+        renderInputWithCharacterLimit({ hasError: true });
+        expectWrapperToHaveClass('char-limit-input--error');
+    });
+
+    it('renders counter at bottom when counterPosition is bottom', () => {
+        renderInputWithCharacterLimit({ counterPosition: 'bottom' });
+        const counter = getCharacterCounter(0, 50);
+        expect(counter).toHaveClass('char-limit-input__counter--bottom');
+    });
+
+    it('calls onFocus and onBlur callbacks', () => {
+        const onFocus = jest.fn();
+        const onBlur = jest.fn();
+        renderInputWithCharacterLimit({ onFocus, onBlur });
+
+        focusInput();
+        expect(onFocus).toHaveBeenCalledTimes(1);
+
+        blurInput();
+        expect(onBlur).toHaveBeenCalledTimes(1);
+    });
+
+    it('applies className to input field', () => {
+        renderInputWithCharacterLimit({ className: 'custom-class' });
+        expect(getInput()).toHaveClass('custom-class');
+    });
+
+    it('renders empty string when value is undefined', () => {
+        renderInputWithCharacterLimit({ value: undefined as any });
+        expect((getInput() as HTMLInputElement).value).toBe('');
+    });
+
+    it('adds clear button visible and error classes when hasError and focused with value', () => {
+        renderInputWithCharacterLimit({ value: 'abc', hasError: true });
+        focusInput();
+        const btn = screen.getByRole('button', { name: /clear input/i });
+        expect(btn).toHaveClass('char-limit-input__clear-button--visible');
+        expect(btn).toHaveClass('char-limit-input__clear-button--error');
+    });
+
+    it('clear button tabIndex is 0 when visible and -1 when not', () => {
+        const { rerender } = renderInputWithCharacterLimit({ value: 'abc' });
+        focusInput();
+        expect(screen.getByRole('button', { name: /clear input/i })).toHaveAttribute('tabIndex', '0');
+
+        blurInput();
+        rerender(<InputWithCharacterLimit {...defaultProps} value="" />);
+        expect(screen.getByRole('button', { name: /clear input/i })).toHaveAttribute('tabIndex', '-1');
+    });
+
+    it('renders textarea when rows prop is provided', () => {
+        renderInputWithCharacterLimit({ rows: 3 });
+        expect(screen.getByRole('textbox').tagName).toBe('TEXTAREA');
+        expectWrapperToHaveClass('char-limit-input--textarea');
+    });
+
+    it('renders textarea when autoGrow is true', () => {
+        renderInputWithCharacterLimit({ autoGrow: true });
+        expect(screen.getByRole('textbox').tagName).toBe('TEXTAREA');
+        expectWrapperToHaveClass('char-limit-input--textarea');
+    });
+
+    it('adjusts height when autoGrow is true and value changes', () => {
+        const { rerender } = renderInputWithCharacterLimit({ autoGrow: true, value: '' });
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+
+        Object.defineProperty(textarea, 'scrollHeight', { value: 80, configurable: true });
+
+        rerender(<InputWithCharacterLimit {...defaultProps} autoGrow={true} value="line1\nline2" />);
+
+        expect(textarea.style.height).not.toBe('');
+    });
+
+    it('sets aria-invalid on textarea when rows provided and length exceeds maxLength', () => {
+        renderInputWithCharacterLimit({ rows: 3, value: 'abcd', maxLength: 3 });
+        expect(screen.getByRole('textbox')).toHaveAttribute('aria-invalid', 'true');
+    });
 });

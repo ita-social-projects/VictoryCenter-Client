@@ -10,20 +10,22 @@ import {
     SocialPlatform,
 } from '@/types/admin/company-profile';
 
-type LocalizationWithLanguageCode = { language?: { code?: string } };
+type LocalizationWithLanguageCode = {
+    language?: { code?: string };
+    localizationInfoDto?: { code?: string };
+};
 
 function resolveLocaleCode(
     loc: (CompanyProfileContactLocalization | CompanyProfileRequisiteLocalization) & LocalizationWithLanguageCode,
     languages?: LocalizationLanguage[],
 ): LocaleCode | null {
-    const codeFromLoc = loc.language?.code;
-    if (codeFromLoc === 'uk' || codeFromLoc === 'en') return codeFromLoc;
+    const directCode = loc.language?.code ?? loc.localizationInfoDto?.code;
+    if (directCode === 'uk' || directCode === 'en') return directCode;
 
     if (!languages?.length) return null;
 
-    const lang = languages.find((l) => l.id === loc.languageId);
+    const lang = languages.find((l) => l.id === (loc as any).languageId);
     const code = lang?.code;
-
     return code === 'uk' || code === 'en' ? code : null;
 }
 
@@ -34,12 +36,45 @@ function getLanguageIdByCode(languages: LocalizationLanguage[] | undefined, code
     return lang?.id ?? null;
 }
 
+const SOCIAL_PLATFORM_FROM_BACKEND: Record<number, SocialPlatform> = {
+    0: 'Instagram',
+    1: 'Facebook',
+    2: 'Telegram',
+    3: 'YouTube',
+    4: 'X',
+    5: 'WhatsApp',
+    6: 'LinkedIn',
+    7: 'Viber',
+};
+
+const SOCIAL_PLATFORM_TO_BACKEND: Record<SocialPlatform, number> = {
+    Instagram: 0,
+    Facebook: 1,
+    Telegram: 2,
+    YouTube: 3,
+    X: 4,
+    WhatsApp: 5,
+    LinkedIn: 6,
+    Viber: 7,
+};
+
+function normalizeSocialPlatform(value: SocialPlatform | number): SocialPlatform {
+    if (typeof value === 'number') {
+        return SOCIAL_PLATFORM_FROM_BACKEND[value] ?? 'Instagram';
+    }
+    return value;
+}
+
 function sortSocialLinks(
     platformsOrder: SocialPlatform[],
     links: CompanyProfileSocialLink[],
 ): CompanyProfileSocialLink[] {
     const order = new Map(platformsOrder.map((p, idx) => [p, idx]));
-    return [...links].sort((a, b) => (order.get(a.socialPlatform) ?? 999) - (order.get(b.socialPlatform) ?? 999));
+    return [...links].sort(
+        (a, b) =>
+            (order.get(normalizeSocialPlatform(a.socialPlatform as any)) ?? 999) -
+            (order.get(normalizeSocialPlatform(b.socialPlatform as any)) ?? 999),
+    );
 }
 
 export function mapCompanyProfileToFormValues(
@@ -66,9 +101,7 @@ export function mapCompanyProfileToFormValues(
 
     return {
         ...COMPANY_PROFILE_FORM_DEFAULTS,
-
         phone: contact.phone ?? '',
-
         addressUa: contact.address ?? '',
         addressEng: contactEnLoc?.address ?? contact.address ?? '',
         email: contact.email ?? '',
@@ -83,37 +116,37 @@ export function mapCompanyProfileToFormValues(
         addressEn_requisites: requisiteEnLoc?.address ?? requisite.address ?? '',
 
         socialContacts: sortedLinks.map((l) => ({
-            platform: l.socialPlatform,
+            platform: normalizeSocialPlatform((l as any).socialPlatform),
             url: l.url ?? '',
         })),
     };
 }
 
 export type CompanyProfilePatch = {
-    contact: {
+    contacts: {
         phone: string;
         address: string;
         email: string;
         correspondenceEmail: string;
         motto?: string;
         localizations: Array<{
-            languageCode: LocaleCode;
+            languageId?: number;
             address: string;
             motto?: string;
         }>;
     };
-    requisite: {
+    requisites: {
         recipient: string;
         edrpou: string;
         address: string;
         localizations: Array<{
-            languageCode: LocaleCode;
+            languageId?: number;
             recipient: string;
             address: string;
         }>;
     };
     socialLinks: Array<{
-        socialPlatform: SocialPlatform;
+        socialPlatform: number;
         url: string;
     }>;
 };
@@ -140,11 +173,11 @@ export function mapFormValuesToCompanyProfilePatch(
 
     const edrpou = (formValues.companyRegistrationNumber ?? '').trim();
 
-    const requisitesAddressUk = ((formValues.addressUa_requisites ?? '') || '').trim();
-    const requisitesAddressEn = ((formValues.addressEn_requisites ?? '') || '').trim();
+    const requisitesAddressUk = (formValues.addressUa_requisites ?? '').trim();
+    const requisitesAddressEn = (formValues.addressEn_requisites ?? '').trim();
 
     return {
-        contact: {
+        contacts: {
             phone,
             address: addressUk,
             email,
@@ -152,40 +185,36 @@ export function mapFormValuesToCompanyProfilePatch(
             motto: mottoUk || undefined,
             localizations: [
                 {
-                    languageCode: 'uk',
+                    ...(ukLanguageId ? { languageId: ukLanguageId } : {}),
                     address: addressUk,
                     motto: mottoUk || undefined,
-                    ...(ukLanguageId ? { languageId: ukLanguageId } : {}),
-                } as any,
+                },
                 {
-                    languageCode: 'en',
+                    ...(enLanguageId ? { languageId: enLanguageId } : {}),
                     address: addressEn || addressUk,
                     motto: mottoEn || mottoUk || undefined,
-                    ...(enLanguageId ? { languageId: enLanguageId } : {}),
-                } as any,
+                },
             ],
         },
-        requisite: {
+        requisites: {
             recipient: recipientUk,
             edrpou,
             address: requisitesAddressUk,
             localizations: [
                 {
-                    languageCode: 'uk',
+                    ...(ukLanguageId ? { languageId: ukLanguageId } : {}),
                     recipient: recipientUk,
                     address: requisitesAddressUk,
-                    ...(ukLanguageId ? { languageId: ukLanguageId } : {}),
-                } as any,
+                },
                 {
-                    languageCode: 'en',
+                    ...(enLanguageId ? { languageId: enLanguageId } : {}),
                     recipient: recipientEn || recipientUk,
                     address: requisitesAddressEn || requisitesAddressUk,
-                    ...(enLanguageId ? { languageId: enLanguageId } : {}),
-                } as any,
+                },
             ],
         },
         socialLinks: (formValues.socialContacts ?? []).map((c) => ({
-            socialPlatform: c.platform,
+            socialPlatform: SOCIAL_PLATFORM_TO_BACKEND[c.platform],
             url: (c.url ?? '').trim(),
         })),
     };

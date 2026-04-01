@@ -20,7 +20,7 @@ describe('company-profile-mappers', () => {
                     languageId: 2,
                     address: 'EN address',
                     motto: 'EN motto',
-                    language: { code: 'en' },
+                    localizationInfoDto: { code: 'en' },
                 } as any,
             ],
         } as any,
@@ -33,17 +33,17 @@ describe('company-profile-mappers', () => {
                     languageId: 2,
                     recipient: 'EN recipient',
                     address: 'EN req address',
-                    language: { code: 'en' },
+                    localizationInfoDto: { code: 'en' },
                 } as any,
             ],
         } as any,
         socialLinks: [
-            { socialPlatform: 'Viber', url: 'viber://chat' } as any,
-            { socialPlatform: 'Instagram', url: 'https://instagram.com/a' } as any,
+            { socialPlatform: 7, url: 'viber://chat' } as any, // Viber
+            { socialPlatform: 0, url: 'https://instagram.com/a' } as any, // Instagram
         ],
     } as any;
 
-    it('maps CompanyProfile to form values with EN fallbacks and sorted social links', () => {
+    it('maps CompanyProfile to form values with EN localizations and numeric socialPlatform mapping', () => {
         const result = mapCompanyProfileToFormValues(baseProfile, languages);
 
         expect(result).toEqual({
@@ -69,7 +69,7 @@ describe('company-profile-mappers', () => {
         });
     });
 
-    it('maps form values to patch with trimming and EN fallback', () => {
+    it('maps form values to backend patch with trimming, fallbacks and numeric socialPlatform', () => {
         const formValues: CompanyProfileFormValues = {
             ...COMPANY_PROFILE_FORM_DEFAULTS,
             phone: '  +38050 111 22 33  ',
@@ -89,26 +89,32 @@ describe('company-profile-mappers', () => {
 
         const patch = mapFormValuesToCompanyProfilePatch(formValues, languages);
 
-        expect(patch.contact.phone).toBe('+38050 111 22 33');
-        expect(patch.contact.email).toBe('test@mail.com');
-        expect(patch.contact.correspondenceEmail).toBe('corr@mail.com');
-        expect(patch.contact.address).toBe('UA address');
+        expect(patch.contacts.phone).toBe('+38050 111 22 33');
+        expect(patch.contacts.email).toBe('test@mail.com');
+        expect(patch.contacts.correspondenceEmail).toBe('corr@mail.com');
+        expect(patch.contacts.address).toBe('UA address');
 
-        const enContactLoc = patch.contact.localizations.find((l) => l.languageCode === 'en')!;
+        const [ukContactLoc, enContactLoc] = patch.contacts.localizations;
+        expect(ukContactLoc.languageId).toBe(1);
+        expect(enContactLoc.languageId).toBe(2);
         expect(enContactLoc.address).toBe('UA address');
         expect(enContactLoc.motto).toBe('UA motto');
 
-        const enReqLoc = patch.requisite.localizations.find((l) => l.languageCode === 'en')!;
+        const [ukReqLoc, enReqLoc] = patch.requisites.localizations;
+        expect(ukReqLoc.languageId).toBe(1);
+        expect(enReqLoc.languageId).toBe(2);
         expect(enReqLoc.recipient).toBe('UA recipient');
         expect(enReqLoc.address).toBe('UA req address');
 
-        expect(patch.socialLinks).toEqual([{ socialPlatform: 'Instagram', url: 'https://instagram.com/a' }]);
+        expect(patch.socialLinks).toEqual([{ socialPlatform: 0, url: 'https://instagram.com/a' }]);
     });
 
     it('handles missing languages without throwing', () => {
         const patch = mapFormValuesToCompanyProfilePatch(COMPANY_PROFILE_FORM_DEFAULTS as any, undefined);
+
         expect(patch).toBeDefined();
-        expect(patch.contact.localizations).toHaveLength(2);
-        expect(patch.requisite.localizations).toHaveLength(2);
+        expect(patch.contacts.localizations).toHaveLength(2);
+        expect(patch.requisites.localizations).toHaveLength(2);
+        expect(patch.contacts.localizations[0].languageId).toBeUndefined();
     });
 });

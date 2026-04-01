@@ -13,6 +13,7 @@ import {
 type LocalizationWithLanguageCode = {
     language?: { code?: string };
     localizationInfoDto?: { code?: string };
+    languageId?: number;
 };
 
 function resolveLocaleCode(
@@ -24,8 +25,9 @@ function resolveLocaleCode(
 
     if (!languages?.length) return null;
 
-    const lang = languages.find((l) => l.id === (loc as any).languageId);
+    const lang = languages.find((l) => l.id === loc.languageId);
     const code = lang?.code;
+
     return code === 'uk' || code === 'en' ? code : null;
 }
 
@@ -58,11 +60,30 @@ const SOCIAL_PLATFORM_TO_BACKEND: Record<SocialPlatform, number> = {
     Viber: 7,
 };
 
-function normalizeSocialPlatform(value: SocialPlatform | number): SocialPlatform {
+const isKnownSocialPlatformNumber = (value: number): value is keyof typeof SOCIAL_PLATFORM_FROM_BACKEND =>
+    value in SOCIAL_PLATFORM_FROM_BACKEND;
+
+function normalizeSocialPlatform(value: SocialPlatform | number): SocialPlatform | null {
     if (typeof value === 'number') {
-        return SOCIAL_PLATFORM_FROM_BACKEND[value] ?? 'Instagram';
+        if (isKnownSocialPlatformNumber(value)) {
+            return SOCIAL_PLATFORM_FROM_BACKEND[value];
+        }
+        return null;
     }
+
     return value;
+}
+
+function mapSocialLinkToFormContact(link: CompanyProfileSocialLink): { platform: SocialPlatform; url: string } | null {
+    const rawPlatform = (link as unknown as { socialPlatform: SocialPlatform | number }).socialPlatform;
+    const platform = normalizeSocialPlatform(rawPlatform);
+
+    if (!platform) return null;
+
+    return {
+        platform,
+        url: link.url ?? '',
+    };
 }
 
 function sortSocialLinks(
@@ -70,11 +91,19 @@ function sortSocialLinks(
     links: CompanyProfileSocialLink[],
 ): CompanyProfileSocialLink[] {
     const order = new Map(platformsOrder.map((p, idx) => [p, idx]));
-    return [...links].sort(
-        (a, b) =>
-            (order.get(normalizeSocialPlatform(a.socialPlatform as any)) ?? 999) -
-            (order.get(normalizeSocialPlatform(b.socialPlatform as any)) ?? 999),
-    );
+
+    return [...links].sort((a, b) => {
+        const aRaw = (a as unknown as { socialPlatform: SocialPlatform | number }).socialPlatform;
+        const bRaw = (b as unknown as { socialPlatform: SocialPlatform | number }).socialPlatform;
+
+        const aPlatform = normalizeSocialPlatform(aRaw);
+        const bPlatform = normalizeSocialPlatform(bRaw);
+
+        const aOrder = aPlatform ? (order.get(aPlatform) ?? 999) : 999;
+        const bOrder = bPlatform ? (order.get(bPlatform) ?? 999) : 999;
+
+        return aOrder - bOrder;
+    });
 }
 
 export function mapCompanyProfileToFormValues(
@@ -94,14 +123,22 @@ export function mapCompanyProfileToFormValues(
     const contact = profile.contact;
     const requisite = profile.requisite;
 
-    const contactEnLoc = contact.localizations.find((loc) => resolveLocaleCode(loc as any, languages) === 'en');
-    const requisiteEnLoc = requisite.localizations.find((loc) => resolveLocaleCode(loc as any, languages) === 'en');
+    const contactLocalizations = contact.localizations ?? [];
+    const requisiteLocalizations = requisite.localizations ?? [];
 
-    const sortedLinks = sortSocialLinks(platformsOrder, profile.socialLinks);
+    const contactEnLoc = contactLocalizations.find((loc) => resolveLocaleCode(loc as any, languages) === 'en');
+    const requisiteEnLoc = requisiteLocalizations.find((loc) => resolveLocaleCode(loc as any, languages) === 'en');
+
+    const sortedLinks = sortSocialLinks(platformsOrder, profile.socialLinks ?? []);
+    const socialContacts = sortedLinks
+        .map(mapSocialLinkToFormContact)
+        .filter((item): item is { platform: SocialPlatform; url: string } => item !== null);
 
     return {
         ...COMPANY_PROFILE_FORM_DEFAULTS,
+
         phone: contact.phone ?? '',
+
         addressUa: contact.address ?? '',
         addressEng: contactEnLoc?.address ?? contact.address ?? '',
         email: contact.email ?? '',
@@ -115,10 +152,7 @@ export function mapCompanyProfileToFormValues(
         addressUa_requisites: requisite.address ?? '',
         addressEn_requisites: requisiteEnLoc?.address ?? requisite.address ?? '',
 
-        socialContacts: sortedLinks.map((l) => ({
-            platform: normalizeSocialPlatform((l as any).socialPlatform),
-            url: l.url ?? '',
-        })),
+        socialContacts,
     };
 }
 

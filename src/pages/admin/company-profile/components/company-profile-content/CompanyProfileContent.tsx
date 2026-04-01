@@ -73,7 +73,7 @@ export const CompanyProfileContent = () => {
             const { languages } = await CompanyProfileApi.get(client);
             const patch = mapFormValuesToCompanyProfilePatch(pendingPublishData, languages);
 
-            const { profile, languages: updatedLanguages } = await CompanyProfileApi.publish(client, patch);
+            const { profile, languages: updatedLanguages } = await CompanyProfileApi.publish(client, patch, languages);
 
             const nextValues = mapCompanyProfileToFormValues(profile, updatedLanguages);
             savedValuesRef.current = nextValues;

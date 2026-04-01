@@ -33,9 +33,9 @@ export const normalizeHtml = (html: string): string => {
 
     if (paragraphs.length > 0) {
         paragraphs.forEach(trimTrailingWhitespace);
-    } else {
-        trimTrailingWhitespace(tempDiv);
     }
+
+    trimTrailingWhitespace(tempDiv);
 
     return tempDiv.innerHTML;
 };

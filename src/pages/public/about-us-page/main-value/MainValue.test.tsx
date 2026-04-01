@@ -9,15 +9,14 @@ import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLo
 import { TranslationStatus } from '@/types/common/language';
 import { setupUseGetLocalizationAboutUsContentMock } from '@/utils/test-mocks/use-get-localization-mock';
 
-jest.mock('@/components/public/swiper/Swiper', () => ({
-    Swiper: ({ items, renderItem }: any) => (
+jest.mock('@/components/public/swiper/wave-swiper/WaveSwiper', () => ({
+    WaveSwiper: ({ items, renderItemCallback }: { items: []; renderItemCallback: Function }) => (
         <div data-testid="custom-swiper">
-            {items &&
-                items.map((item: any, index: number) => (
-                    <div key={index} data-testid="swiper-item">
-                        {renderItem(item, index)}
-                    </div>
-                ))}
+            {items?.map((item: any, index: number) => (
+                <div key={index} data-testid="swiper-item">
+                    {renderItemCallback(item, index)}
+                </div>
+            ))}
         </div>
     ),
 }));

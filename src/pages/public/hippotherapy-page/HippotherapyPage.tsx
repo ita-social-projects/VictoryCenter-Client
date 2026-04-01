@@ -10,6 +10,7 @@ import quote1DefaultImg from '@/assets/images/man-holding-horse-cheek-close.webp
 import quote2DefaultImg from '@/assets/images/man-facing-horse-forehead.webp';
 import { SloganSection } from './slogan/SloganSection';
 import { HippoventionCenter } from './hippovention-center/HippoventionCenter';
+import { SwipedGallery } from './swiped-gallery/SwipedGallery';
 
 export const HippotherapyPage = () => {
     const { t } = useTranslation('hippotherapy');
@@ -29,9 +30,15 @@ export const HippotherapyPage = () => {
                     <TextCard {...data.hippoventionSection} />
                     <SloganSection />
                     <HippoventionCenter {...data.hippoventionCenterSection} />
+                    <SwipedGallery title={data.advantagesSection.title} cards={data.advantagesSection.advantages} />
+                    <TextCard {...data.analysisSection} />
                     <QuoteSection
                         {...data.anotherQuoteSection}
                         imgURL={data.anotherQuoteSection.imgURL || quote2DefaultImg}
+                    />
+                    <SwipedGallery
+                        title={data.participantsSection.title}
+                        cards={data.participantsSection.participants}
                     />
                 </>
             )}

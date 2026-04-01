@@ -1,8 +1,8 @@
 import introImg from '@/assets/images/man-touching-white-horse-side.webp';
-import advantageImage0 from '@/assets/images/man-in-stall-stroking-horse.webp';
-import advantageImage1 from '@/assets/images/man-in-stall-stroking-horse.webp';
-import advantageImage2 from '@/assets/images/man-in-stall-stroking-horse.webp';
-import advantageImage3 from '@/assets/images/man-in-stall-stroking-horse.webp';
+import advantageImage0 from '@/assets/images/man-horse.webp';
+import advantageImage1 from '@/assets/images/man-gray-horse.webp';
+import advantageImage2 from '@/assets/images/collected.webp';
+import advantageImage3 from '@/assets/images/man-leads-horse.webp';
 import quoteImg from '@/assets/images/man-holding-horse-cheek-close.webp';
 import anotherQuoteImg from '@/assets/images/man-facing-horse-forehead.webp';
 import hippoventionImg from '@/assets/images/people-on-horses.webp';
@@ -46,18 +46,22 @@ export const hippotherapyMock: HippotherapyAbout = {
         advantages: [
             {
                 imgURL: advantageImage0,
+                imgAlternativeText: 'Чоловік обіймає коня',
                 text: 'Тіло пам’ятає те, що слова не можуть передати. Робота з конем — це робота на рівні нервової системи.',
             },
             {
                 imgURL: advantageImage1,
+                imgAlternativeText: 'Чоловік обіймає сірого коня',
                 text: 'Кінь не питає, що з тобою сталося. Але допомагає щиро відповісти на питання “як ти зараз?”.',
             },
             {
                 imgURL: advantageImage2,
+                imgAlternativeText: 'Дівчина обіймає коня',
                 text: 'Нервова система людини й коня синхронізуються — це не метафора, а фізіологічна реальність.',
             },
             {
                 imgURL: advantageImage3,
+                imgAlternativeText: 'Чоловік веде коня за повід',
                 text: 'Людина часто говорить про те, що “мусить сказати”. Кінь відчуває те, що є насправді.',
             },
         ],
@@ -102,18 +106,22 @@ export const hippotherapyMock: HippotherapyAbout = {
         participants: [
             {
                 imgURL: advantageImage0,
+                imgAlternativeText: 'Чоловік обіймає коня',
                 text: 'Люди з досвідом війни, втрати, травми, тривалого стресу (військові, ветерани/ки).',
             },
             {
                 imgURL: advantageImage1,
+                imgAlternativeText: 'Чоловік обіймає сірого коня',
                 text: 'Діти з гіперзбудливістю або замкненістю, тривожністю, порушенням контакту.',
             },
             {
                 imgURL: advantageImage2,
+                imgAlternativeText: 'Дівчина обіймає коня',
                 text: 'Родини, які пережили розрив, переміщення, втрату близьких. ',
             },
             {
                 imgURL: advantageImage3,
+                imgAlternativeText: 'Чоловік веде коня за повід',
                 text: 'Фахівці екстрених служб та волонтери. ',
             },
         ],

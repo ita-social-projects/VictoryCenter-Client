@@ -144,10 +144,7 @@ export const InputWithCharacterLimit = ({
                 </output>
             )}
             {showCounter && counterPosition === 'bottom' && (
-                <output
-                    id={countId}
-                    className="char-limit-input__counter char-limit-input__counter--bottom"
-                >
+                <output id={countId} className="char-limit-input__counter char-limit-input__counter--bottom">
                     {currentLength}/{maxLength}
                 </output>
             )}

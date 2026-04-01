@@ -113,15 +113,10 @@ export const CompanyProfileApi = {
     ): Promise<{ profile: CompanyProfile; languages?: LocalizationLanguage[] }> => {
         const response = await client.put<CompanyProfileDto>(API_ROUTES.COMPANY_PROFILE.BASE, toUpdateDto(patch));
 
-        let languages: LocalizationLanguage[] | undefined = fallbackLanguages;
-
-        try {
-            const languagesRes = await client.get<LocalizationLanguage[]>(API_ROUTES.LOCALIZATION_LANGUAGE.BASE);
-            languages = languagesRes.data;
-        } catch (error) {
-            // keep publish successful; language refresh is best-effort
-            console.warn('[CompanyProfileApi.publish] Failed to refresh localization languages', error);
-        }
+        const languages = await client
+            .get<LocalizationLanguage[]>(API_ROUTES.LOCALIZATION_LANGUAGE.BASE)
+            .then((res) => res.data)
+            .catch(() => fallbackLanguages);
 
         return {
             profile: toFrontendCompanyProfile(response.data),

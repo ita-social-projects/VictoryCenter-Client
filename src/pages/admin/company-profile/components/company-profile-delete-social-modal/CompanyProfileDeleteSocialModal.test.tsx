@@ -5,62 +5,44 @@ import { CompanyProfileDeleteSocialModal } from './CompanyProfileDeleteSocialMod
 import { COMPANY_PROFILE_TEXT } from '@/const/admin/company-profile';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
-jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
-    ConfirmationModal: ({ isOpen, title, confirmText, cancelText, onConfirm, onCancel, onClose }: any) =>
-        isOpen ? (
-            <div data-testid="confirmation-modal">
-                <div data-testid="confirmation-title">{title}</div>
-                <button data-testid="confirm-btn" onClick={onConfirm}>
-                    {confirmText}
-                </button>
-                <button data-testid="cancel-btn" onClick={onCancel}>
-                    {cancelText}
-                </button>
-                <button data-testid="close-btn" onClick={onClose}>
-                    Close
-                </button>
-            </div>
-        ) : null,
-}));
-
 describe('CompanyProfileDeleteSocialModal', () => {
     it('does not render when isOpen=false', () => {
         render(<CompanyProfileDeleteSocialModal isOpen={false} onConfirm={jest.fn()} onCancel={jest.fn()} />);
-        expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
+        expect(screen.queryByText(COMPANY_PROFILE_TEXT.MODAL.DELETE_SOCIAL_TITLE)).not.toBeInTheDocument();
     });
 
-    it('renders ConfirmationModal with correct texts when open', () => {
+    it('renders modal with correct title and buttons when open', () => {
         render(<CompanyProfileDeleteSocialModal isOpen={true} onConfirm={jest.fn()} onCancel={jest.fn()} />);
 
-        expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
-        expect(screen.getByTestId('confirmation-title')).toHaveTextContent(
-            COMPANY_PROFILE_TEXT.MODAL.DELETE_SOCIAL_TITLE,
-        );
-        expect(screen.getByTestId('confirm-btn')).toHaveTextContent(COMMON_TEXT_ADMIN.BUTTON.YES);
-        expect(screen.getByTestId('cancel-btn')).toHaveTextContent(COMMON_TEXT_ADMIN.BUTTON.NO);
+        expect(screen.getByText(COMPANY_PROFILE_TEXT.MODAL.DELETE_SOCIAL_TITLE)).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.NO })).toBeInTheDocument();
     });
 
-    it('calls onConfirm when confirm clicked', () => {
+    it('calls onConfirm when YES clicked', () => {
         const onConfirm = jest.fn();
+
         render(<CompanyProfileDeleteSocialModal isOpen={true} onConfirm={onConfirm} onCancel={jest.fn()} />);
 
-        fireEvent.click(screen.getByTestId('confirm-btn'));
+        fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES }));
         expect(onConfirm).toHaveBeenCalledTimes(1);
     });
 
-    it('calls onCancel when cancel clicked', () => {
+    it('calls onCancel when NO clicked', () => {
         const onCancel = jest.fn();
+
         render(<CompanyProfileDeleteSocialModal isOpen={true} onConfirm={jest.fn()} onCancel={onCancel} />);
 
-        fireEvent.click(screen.getByTestId('cancel-btn'));
+        fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.NO }));
         expect(onCancel).toHaveBeenCalledTimes(1);
     });
 
-    it('calls onCancel when close clicked', () => {
+    it('calls onCancel when close icon clicked', () => {
         const onCancel = jest.fn();
+
         render(<CompanyProfileDeleteSocialModal isOpen={true} onConfirm={jest.fn()} onCancel={onCancel} />);
 
-        fireEvent.click(screen.getByTestId('close-btn'));
+        fireEvent.click(screen.getByRole('button', { name: /close modal/i }));
         expect(onCancel).toHaveBeenCalledTimes(1);
     });
 });

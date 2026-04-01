@@ -117,4 +117,60 @@ describe('company-profile-mappers', () => {
         expect(patch.requisites.localizations).toHaveLength(2);
         expect(patch.contacts.localizations[0].languageId).toBeUndefined();
     });
+
+    it('resolves EN by languageId when localizationInfoDto/language code is missing', () => {
+        const profile: CompanyProfile = {
+            contact: {
+                phone: '1',
+                address: 'UA',
+                email: 'a@a.com',
+                correspondenceEmail: 'b@b.com',
+                motto: 'UA motto',
+                localizations: [{ languageId: 2, address: 'EN addr', motto: 'EN motto' } as any],
+            } as any,
+            requisite: {
+                recipient: 'UA rec',
+                edrpou: '123',
+                address: 'UA req',
+                localizations: [{ languageId: 2, recipient: 'EN rec', address: 'EN req' } as any],
+            } as any,
+            socialLinks: [],
+        } as any;
+
+        const result = mapCompanyProfileToFormValues(profile, [
+            { id: 1, code: 'uk' },
+            { id: 2, code: 'en' },
+        ]);
+
+        expect(result.addressEng).toBe('EN addr');
+        expect(result.mottoEng).toBe('EN motto');
+        expect(result.requisitesEn).toBe('EN rec');
+        expect(result.addressEn_requisites).toBe('EN req');
+    });
+
+    it('filters out unsupported numeric social platform values', () => {
+        const profile: CompanyProfile = {
+            contact: {
+                phone: '',
+                address: '',
+                email: '',
+                correspondenceEmail: '',
+                motto: '',
+                localizations: [],
+            } as any,
+            requisite: {
+                recipient: '',
+                edrpou: '',
+                address: '',
+                localizations: [],
+            } as any,
+            socialLinks: [
+                { socialPlatform: 999, url: 'https://unknown' } as any,
+                { socialPlatform: 1, url: 'https://facebook.com/a' } as any,
+            ],
+        } as any;
+
+        const result = mapCompanyProfileToFormValues(profile, languages);
+        expect(result.socialContacts).toEqual([{ platform: 'Facebook', url: 'https://facebook.com/a' }]);
+    });
 });

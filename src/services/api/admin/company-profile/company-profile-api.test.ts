@@ -160,4 +160,49 @@ describe('CompanyProfileApi (real http)', () => {
 
         expect(res.languages).toEqual(fallbackLanguages);
     });
+
+    it('publish() maps patch to backend dto shape before PUT', async () => {
+        const client = { put: jest.fn(), get: jest.fn() } as any;
+
+        client.put.mockResolvedValue({ data: { contacts: {}, requisites: {}, socialLinks: [] } });
+        client.get.mockResolvedValue({ data: [] });
+
+        const patch = {
+            contacts: {
+                phone: '+380',
+                address: 'UA',
+                email: 'a@a.com',
+                correspondenceEmail: 'b@b.com',
+                motto: 'motto',
+                localizations: [{ languageId: 1, address: 'UA', motto: 'UA motto' }],
+            },
+            requisites: {
+                recipient: 'VC',
+                edrpou: '12345678',
+                address: 'Req UA',
+                localizations: [{ languageId: 2, recipient: 'VC EN', address: 'Req EN' }],
+            },
+            socialLinks: [{ socialPlatform: 1, url: 'https://facebook.com/vc' }],
+        };
+
+        await CompanyProfileApi.publish(client, patch as any);
+
+        expect(client.put).toHaveBeenCalledWith(API_ROUTES.COMPANY_PROFILE.BASE, {
+            contacts: {
+                phone: '+380',
+                address: 'UA',
+                email: 'a@a.com',
+                correspondenceEmail: 'b@b.com',
+                motto: 'motto',
+                localizations: [{ languageId: 1, address: 'UA', motto: 'UA motto' }],
+            },
+            requisites: {
+                recipient: 'VC',
+                edrpou: '12345678',
+                address: 'Req UA',
+                localizations: [{ languageId: 2, recipient: 'VC EN', address: 'Req EN' }],
+            },
+            socialLinks: [{ socialPlatform: 1, url: 'https://facebook.com/vc' }],
+        });
+    });
 });

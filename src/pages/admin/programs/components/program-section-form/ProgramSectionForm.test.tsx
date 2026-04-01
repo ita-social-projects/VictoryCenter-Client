@@ -9,6 +9,7 @@ import { ProgramSectionTemplate, ProgramSectionMode } from '@/types/common/progr
 import { ContentType } from '@/types/common/programs';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { renderProgramSection } from '@/utils/functions/render-program-section';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
 jest.mock('@/utils/functions/render-program-section', () => ({
     renderProgramSection: jest.fn(() => <div data-testid="editable-section" />),
@@ -254,13 +255,13 @@ describe('ProgramSectionForm', () => {
 
     it('cancel button is disabled when isDisabled is true', () => {
         renderForm({ isDisabled: true, isNewSection: true });
-        expect(screen.getByText(PROGRAMS_TEXT.BUTTON.CANCEL)).toBeDisabled();
+        expect(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL)).toBeDisabled();
     });
 
     it('defaults isDisabled to false when omitted', () => {
         const { isDisabled: _omit, ...propsWithoutIsDisabled } = baseProps as any;
         render(<ProgramSectionForm {...propsWithoutIsDisabled} isNewSection={true} isSectionValid={false} />);
-        expect(screen.getByText(PROGRAMS_TEXT.BUTTON.CANCEL)).not.toBeDisabled();
+        expect(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL)).not.toBeDisabled();
     });
 
     it('passes normalized title/description/descriptions/images into renderProgramSection', () => {
@@ -657,7 +658,7 @@ describe('ProgramSectionForm', () => {
             renderForm({ isNewSection: false });
 
             expect(screen.queryByText(PROGRAMS_TEXT.BUTTON.SAVE)).not.toBeInTheDocument();
-            expect(screen.queryByText(PROGRAMS_TEXT.BUTTON.CANCEL)).not.toBeInTheDocument();
+            expect(screen.queryByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL)).not.toBeInTheDocument();
             expect(screen.getByLabelText('Edit section')).toBeInTheDocument();
             expect(screen.getByLabelText('Delete section')).toBeInTheDocument();
             expect(screen.getByLabelText('Replace section')).toBeInTheDocument();

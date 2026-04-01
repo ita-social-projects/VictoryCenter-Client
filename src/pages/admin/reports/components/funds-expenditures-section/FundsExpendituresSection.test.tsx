@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { FundsExpenditureSection } from './FundsExpendituresSection';
-import { FUNDS_EXPENDITURES_TEXT, FUNDS_EXPENDITURES_VALIDATION, REPORTS_TEXT } from '@/const/admin/reports';
+import { FUNDS_EXPENDITURES_TEXT, FUNDS_EXPENDITURES_VALIDATION } from '@/const/admin/reports';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import {
     FundsExpendituresSummary,
@@ -258,7 +258,10 @@ describe('FundsExpenditureSection', () => {
         fireEvent.click(screen.getByTestId('trigger-record-save'));
 
         await screen.findByTestId('funds-table');
-        expect(mockAddToast).toHaveBeenCalledWith(REPORTS_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY, 'success');
+        expect(mockAddToast).toHaveBeenCalledWith(
+            FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY,
+            'success',
+        );
     });
 
     it('should show retry error toast when record save fails', async () => {
@@ -269,7 +272,7 @@ describe('FundsExpenditureSection', () => {
         fireEvent.click(screen.getByTestId('trigger-record-save'));
 
         await screen.findByTestId('funds-table');
-        expect(mockAddToast).toHaveBeenCalledWith(REPORTS_TEXT.MESSAGE.RECORD_UPDATE_FAILED_RETRY, 'error');
+        expect(mockAddToast).toHaveBeenCalledWith(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_UPDATE_FAILED_RETRY, 'error');
     });
 
     it('should render the disclaimer text', () => {
@@ -452,14 +455,14 @@ describe('FundsExpenditureSection', () => {
         it('should return to non-editing state when cancel is clicked', () => {
             render(<FundsExpenditureSection />);
             fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT));
-            fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.CANCEL));
+            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL));
             expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-editing', 'false');
         });
 
         it('should show edit button again after cancel', () => {
             render(<FundsExpenditureSection />);
             fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT));
-            fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.CANCEL));
+            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL));
             expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT)).toBeInTheDocument();
         });
     });
@@ -472,7 +475,7 @@ describe('FundsExpenditureSection', () => {
 
         const enterEditMode = () => fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT));
         const getTextarea = () => screen.getByTestId('textarea-funds-disclaimer');
-        const getPublishButton = () => screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.PUBLISH);
+        const getPublishButton = () => screen.getByText(COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED);
 
         it('should show required error when blurring an empty disclaimer', () => {
             render(<FundsExpenditureSection />);
@@ -563,7 +566,7 @@ describe('FundsExpenditureSection', () => {
             fireEvent.blur(getTextarea());
             expect(screen.getByTestId('error-funds-disclaimer')).toBeInTheDocument();
 
-            fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.CANCEL));
+            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL));
             fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT));
             expect(screen.queryByTestId('error-funds-disclaimer')).not.toBeInTheDocument();
         });

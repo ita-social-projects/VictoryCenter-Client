@@ -22,8 +22,6 @@ export const REPORTS_TEXT = {
         FAIL_TO_FETCH_REPORTS: 'Виникла помилка, не вдалось завантажити звітність',
         FAIL_TO_UPDATE_REPORT: 'Виникла помилка під час оновлення звітності',
         SUCCESSFULLY_PUBLISHED: 'Успішно опубліковано',
-        RECORD_UPDATED_SUCCESSFULLY: 'Зміни збережено успішно',
-        RECORD_UPDATE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
         INVALID_VALUE: 'Значення повинно бути числом',
     },
     REPORT_AND_ANALYTICS: {
@@ -132,12 +130,19 @@ export const FUNDS_EXPENDITURES_VALIDATION = {
 export const FUNDS_EXPENDITURES_TEXT = {
     DISCLAIMER_LABEL: 'Дісклеймер/ENG',
     EXCHANGE_RATE_LABEL: 'Курс USD/UAH',
+    MESSAGE: {
+        RECORD_CREATED_SUCCESSFULLY: 'Запис додано успішно',
+        RECORD_CREATE_FAILED_RETRY: 'Не вдалося додати запис. Спробуйте ще раз',
+        RECORD_UPDATED_SUCCESSFULLY: 'Зміни збережено успішно',
+        RECORD_UPDATE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
+    },
     MODAL: {
         SHARED: {
             REPORTING_YEAR_LABEL: 'Звітній рік',
             REPORTING_YEAR_PLACEHOLDER: 'Оберіть звітній рік',
             AMOUNT_UAH_LABEL: 'Сума (UAH)',
             AMOUNT_USD_LABEL: 'Сума (USD)',
+            CONFIRM_CLOSE_TITLE: 'Зміни будуть втрачені. Бажаєте продовжити?',
         },
         INCOME: {
             TITLE: 'Додати надходження',
@@ -156,8 +161,6 @@ export const FUNDS_EXPENDITURES_TEXT = {
     },
     BUTTON: {
         EDIT: 'Редагувати Доходи та витрати',
-        CANCEL: 'Відмінити',
-        PUBLISH: 'Опублікувати',
         ADD_INCOME: 'Надходження',
         ADD_EXPENSE: 'Витрати',
     },

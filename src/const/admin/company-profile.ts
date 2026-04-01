@@ -14,6 +14,7 @@ export const COMPANY_PROFILE_TEXT = {
 
     MODAL: {
         CANCEL_TITLE: 'Скасувати редагування?',
+        DELETE_SOCIAL_TITLE: 'Видалити соц мережу?',
     },
 
     PROFILE_TAB: {

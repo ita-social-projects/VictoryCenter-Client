@@ -32,6 +32,9 @@ export const InputWithCharacterLimitGroup = ({
     disabled,
     placeholder,
     error,
+    rows,
+    autoGrow,
+    maxRows,
     className,
     maxLimitWarning,
     showCounterBelow = false,
@@ -58,6 +61,9 @@ export const InputWithCharacterLimitGroup = ({
                 maxLimitWarning={maxLimitWarning}
                 onWarningChange={setLocalWarning}
                 showCounter={!showCounterBelow}
+                rows={rows}
+                autoGrow={autoGrow}
+                maxRows={maxRows}
             />
             {showCounterBelow ? (
                 <InputErrorWithCharacterCounter

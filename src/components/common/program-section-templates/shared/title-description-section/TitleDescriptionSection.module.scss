@@ -33,7 +33,8 @@
     }
 
     .title-input {
-        input {
+        input,
+        textarea {
             @include type.h3-semibold-uppercase;
         }
     }

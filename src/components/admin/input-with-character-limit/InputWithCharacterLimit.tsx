@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import cn from 'classnames';
 import { ReactComponent as RemoveIcon } from '@/assets/icons/remove-query.svg';
 import { useInputWithCharacterLimit } from '@/hooks/admin/use-input-with-character-limit/useInputWithCharacterLimit';
@@ -21,6 +21,9 @@ export interface InputWithCharacterLimitProps {
     onWarningChange?: (warning: string | null) => void;
     showCounter?: boolean;
     counterPosition?: 'inside' | 'bottom';
+    rows?: number;
+    autoGrow?: boolean;
+    maxRows?: number;
 }
 
 export const InputWithCharacterLimit = ({
@@ -40,6 +43,9 @@ export const InputWithCharacterLimit = ({
     onWarningChange,
     showCounter = true,
     counterPosition = 'inside',
+    rows,
+    autoGrow,
+    maxRows,
 }: InputWithCharacterLimitProps) => {
     const {
         isFocused,
@@ -63,6 +69,19 @@ export const InputWithCharacterLimit = ({
         onWarningChange,
     });
 
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+    useEffect(() => {
+        const textarea = textareaRef.current;
+        if (!autoGrow || !textarea) {
+            return;
+        }
+
+        textarea.style.height = 'auto';
+        textarea.style.height = `${textarea.scrollHeight}px`;
+        textarea.style.overflowY = 'hidden';
+    }, [value, autoGrow, maxRows]);
+
     const countId = `${id}-character-count`;
 
     return (
@@ -75,22 +94,42 @@ export const InputWithCharacterLimit = ({
                 className={cn('char-limit-input', {
                     'char-limit-input--disabled': disabled,
                     'char-limit-input--focused': isFocused && !disabled,
+                    'char-limit-input--error': hasError || !!localWarning,
+                    'char-limit-input--textarea': rows !== undefined || autoGrow,
                 })}
             >
-                <input
-                    className={cn('char-limit-input__field', className)}
-                    value={value ?? ''}
-                    onChange={handleChange}
-                    onFocus={handleFocus}
-                    onBlur={handleBlur}
-                    name={name}
-                    type={type}
-                    id={id}
-                    disabled={disabled}
-                    placeholder={placeholder}
-                    aria-describedby={countId}
-                    aria-invalid={hasError || currentLength > maxLength}
-                />
+                {rows !== undefined || autoGrow ? (
+                    <textarea
+                        ref={textareaRef}
+                        className={cn('char-limit-input__field', 'char-limit-input__field--textarea', className)}
+                        value={value ?? ''}
+                        onChange={handleChange as unknown as React.ChangeEventHandler<HTMLTextAreaElement>}
+                        onFocus={handleFocus as unknown as React.FocusEventHandler<HTMLTextAreaElement>}
+                        onBlur={handleBlur as unknown as React.FocusEventHandler<HTMLTextAreaElement>}
+                        name={name}
+                        id={id}
+                        disabled={disabled}
+                        placeholder={placeholder}
+                        rows={rows ?? 1}
+                        aria-describedby={countId}
+                        aria-invalid={hasError || currentLength > maxLength}
+                    />
+                ) : (
+                    <input
+                        className={cn('char-limit-input__field', className)}
+                        value={value ?? ''}
+                        onChange={handleChange}
+                        onFocus={handleFocus}
+                        onBlur={handleBlur}
+                        name={name}
+                        type={type}
+                        id={id}
+                        disabled={disabled}
+                        placeholder={placeholder}
+                        aria-describedby={countId}
+                        aria-invalid={hasError || currentLength > maxLength}
+                    />
+                )}
 
                 <button
                     type="button"

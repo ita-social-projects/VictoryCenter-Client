@@ -7,13 +7,13 @@ const trimTrailingWhitespace = (container: Node): void => {
         if (child.nodeType === Node.TEXT_NODE) {
             child.textContent = child.textContent?.trimEnd() ?? '';
             if (child.textContent.length > 0) return;
-            container.removeChild(child);
+            child.remove();
         } else if (child.nodeType === Node.ELEMENT_NODE) {
             const el = child as HTMLElement;
             trimTrailingWhitespace(el);
 
             if (el.childNodes.length === 0 && el.tagName !== 'BR') {
-                container.removeChild(el);
+                el.remove();
             } else {
                 return;
             }

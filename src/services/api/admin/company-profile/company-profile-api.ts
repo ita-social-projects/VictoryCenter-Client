@@ -1,36 +1,109 @@
 import { AxiosInstance } from 'axios';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
-import { CompanyProfile, LocalizationLanguage } from '@/types/admin/company-profile';
+import {
+    CompanyProfile,
+    CompanyProfileContactLocalization,
+    CompanyProfileDto,
+    CompanyProfileRequisiteLocalization,
+    CompanyProfileSocialLink,
+    LocalizationLanguage,
+    UpdateCompanyProfileDto,
+} from '@/types/admin/company-profile';
 import { CompanyProfilePatch } from '@/utils/functions/mappers/admin/company-profile/company-profile-mappers';
 
-type BackendCompanyProfileDto = {
-    id?: number;
-    contacts?: any;
-    requisites?: any;
-    socialLinks?: any[];
-};
+const toContactLocalizations = (dto: CompanyProfileDto): CompanyProfileContactLocalization[] =>
+    (dto.contacts?.localizations ?? []).map((loc) => ({
+        entityId: loc.entityId,
+        localizationInfoDto: loc.localizationInfoDto,
+        translationStatus: loc.translationStatus,
+        address: loc.address ?? undefined,
+        motto: loc.motto ?? undefined,
+    }));
 
-const toFrontendCompanyProfile = (dto: BackendCompanyProfileDto): CompanyProfile => ({
-    id: dto.id ?? 1,
+const toRequisiteLocalizations = (dto: CompanyProfileDto): CompanyProfileRequisiteLocalization[] =>
+    (dto.requisites?.localizations ?? []).map((loc) => ({
+        entityId: loc.entityId,
+        localizationInfoDto: loc.localizationInfoDto,
+        translationStatus: loc.translationStatus,
+        recipient: loc.recipient ?? undefined,
+        address: loc.address ?? undefined,
+    }));
+
+const toSocialLinks = (dto: CompanyProfileDto): CompanyProfileSocialLink[] =>
+    (dto.socialLinks ?? []).map((link) => ({
+        id: link.id,
+        profileId: link.profileId,
+        socialPlatform: link.socialPlatform,
+        url: link.url ?? '',
+        createdAt: link.createdAt,
+    }));
+
+const toFrontendCompanyProfile = (dto: CompanyProfileDto): CompanyProfile => ({
+    id: undefined, // backend CompanyProfileDto currently has no root id
     contact: {
-        ...(dto.contacts ?? {}),
-        localizations: dto.contacts?.localizations ?? [],
-    } as any,
+        id: undefined,
+        profileId: undefined,
+        phone: dto.contacts?.phone ?? '',
+        address: dto.contacts?.address ?? '',
+        email: dto.contacts?.email ?? '',
+        correspondenceEmail: dto.contacts?.correspondenceEmail ?? '',
+        motto: dto.contacts?.motto ?? undefined,
+        localizations: toContactLocalizations(dto),
+        createdAt: undefined,
+    },
     requisite: {
-        ...(dto.requisites ?? {}),
-        localizations: dto.requisites?.localizations ?? [],
-    } as any,
-    socialLinks: dto.socialLinks ?? [],
+        id: undefined,
+        profileId: undefined,
+        recipient: dto.requisites?.recipient ?? '',
+        edrpou: dto.requisites?.edrpou ?? '',
+        address: dto.requisites?.address ?? '',
+        localizations: toRequisiteLocalizations(dto),
+        createdAt: undefined,
+    },
+    socialLinks: toSocialLinks(dto),
+    createdAt: undefined,
+});
+
+const toUpdateDto = (patch: CompanyProfilePatch): UpdateCompanyProfileDto => ({
+    contacts: {
+        phone: patch.contacts.phone,
+        address: patch.contacts.address,
+        email: patch.contacts.email,
+        correspondenceEmail: patch.contacts.correspondenceEmail,
+        motto: patch.contacts.motto,
+        localizations: patch.contacts.localizations.map((loc) => ({
+            languageId: loc.languageId,
+            address: loc.address,
+            motto: loc.motto,
+        })),
+    },
+    requisites: {
+        recipient: patch.requisites.recipient,
+        edrpou: patch.requisites.edrpou,
+        address: patch.requisites.address,
+        localizations: patch.requisites.localizations.map((loc) => ({
+            languageId: loc.languageId,
+            recipient: loc.recipient,
+            address: loc.address,
+        })),
+    },
+    socialLinks: patch.socialLinks.map((link) => ({
+        socialPlatform: link.socialPlatform,
+        url: link.url,
+    })),
 });
 
 export const CompanyProfileApi = {
     get: async (client: AxiosInstance): Promise<{ profile: CompanyProfile; languages?: LocalizationLanguage[] }> => {
         const [profileRes, languagesRes] = await Promise.all([
-            client.get<BackendCompanyProfileDto>(API_ROUTES.COMPANY_PROFILE.BASE),
+            client.get<CompanyProfileDto>(API_ROUTES.COMPANY_PROFILE.BASE),
             client.get<LocalizationLanguage[]>(API_ROUTES.LOCALIZATION_LANGUAGE.BASE),
         ]);
 
-        return { profile: toFrontendCompanyProfile(profileRes.data), languages: languagesRes.data };
+        return {
+            profile: toFrontendCompanyProfile(profileRes.data),
+            languages: languagesRes.data,
+        };
     },
 
     publish: async (
@@ -38,16 +111,21 @@ export const CompanyProfileApi = {
         patch: CompanyProfilePatch,
         fallbackLanguages?: LocalizationLanguage[],
     ): Promise<{ profile: CompanyProfile; languages?: LocalizationLanguage[] }> => {
-        const profileRes = await client.put<BackendCompanyProfileDto>(API_ROUTES.COMPANY_PROFILE.BASE, patch);
+        const response = await client.put<CompanyProfileDto>(API_ROUTES.COMPANY_PROFILE.BASE, toUpdateDto(patch));
 
         let languages: LocalizationLanguage[] | undefined = fallbackLanguages;
+
         try {
             const languagesRes = await client.get<LocalizationLanguage[]>(API_ROUTES.LOCALIZATION_LANGUAGE.BASE);
             languages = languagesRes.data;
         } catch (error) {
-            // keep publish successful; languages refresh is best-effort
+            // keep publish successful; language refresh is best-effort
+            console.warn('[CompanyProfileApi.publish] Failed to refresh localization languages', error);
         }
 
-        return { profile: toFrontendCompanyProfile(profileRes.data), languages };
+        return {
+            profile: toFrontendCompanyProfile(response.data),
+            languages,
+        };
     },
 };

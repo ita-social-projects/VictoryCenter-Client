@@ -1,6 +1,24 @@
 import { CompanyProfileApi } from './company-profile-api';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
 
+const validPatch = {
+    contacts: {
+        phone: '',
+        address: '',
+        email: '',
+        correspondenceEmail: '',
+        motto: undefined,
+        localizations: [],
+    },
+    requisites: {
+        recipient: '',
+        edrpou: '',
+        address: '',
+        localizations: [],
+    },
+    socialLinks: [],
+};
+
 describe('CompanyProfileApi (real http)', () => {
     it('get() requests profile and languages and normalizes missing localizations', async () => {
         const client = {
@@ -28,9 +46,48 @@ describe('CompanyProfileApi (real http)', () => {
         expect(client.get).toHaveBeenCalledWith(API_ROUTES.COMPANY_PROFILE.BASE);
         expect(client.get).toHaveBeenCalledWith(API_ROUTES.LOCALIZATION_LANGUAGE.BASE);
 
-        expect(res.profile.contact).toEqual({ phone: '+380', localizations: [] });
-        expect(res.profile.requisite).toEqual({ recipient: 'VC', localizations: [] });
+        expect(res.profile.contact).toMatchObject({
+            phone: '+380',
+            localizations: [],
+        });
+
+        expect(res.profile.requisite).toMatchObject({
+            recipient: 'VC',
+            localizations: [],
+        });
+
         expect(res.languages).toEqual([{ id: 1, code: 'uk', name: 'Ukrainian' }]);
+    });
+
+    it('get() normalizes missing dto parts to defaults', async () => {
+        const client = { get: jest.fn() } as any;
+
+        client.get.mockImplementation((url: string) => {
+            if (url === API_ROUTES.COMPANY_PROFILE.BASE) return Promise.resolve({ data: {} });
+            if (url === API_ROUTES.LOCALIZATION_LANGUAGE.BASE) return Promise.resolve({ data: [] });
+            throw new Error(`Unexpected url ${url}`);
+        });
+
+        const res = await CompanyProfileApi.get(client);
+
+        expect(res.profile.id).toBeUndefined();
+
+        expect(res.profile.contact).toMatchObject({
+            phone: '',
+            email: '',
+            address: '',
+            correspondenceEmail: '',
+            localizations: [],
+        });
+
+        expect(res.profile.requisite).toMatchObject({
+            recipient: '',
+            edrpou: '',
+            address: '',
+            localizations: [],
+        });
+
+        expect(res.profile.socialLinks).toEqual([]);
     });
 
     it('publish() PUTs patch, refreshes languages and returns mapped profile', async () => {
@@ -49,24 +106,26 @@ describe('CompanyProfileApi (real http)', () => {
 
         client.get.mockResolvedValue({ data: [{ id: 1, code: 'uk', name: 'Ukrainian' }] });
 
-        const res = await CompanyProfileApi.publish(client, {
-            contacts: {} as any,
-            requisites: {} as any,
-            socialLinks: [],
-        });
+        const res = await CompanyProfileApi.publish(client, validPatch as any);
 
         expect(client.put).toHaveBeenCalledWith(API_ROUTES.COMPANY_PROFILE.BASE, expect.any(Object));
         expect(client.get).toHaveBeenCalledWith(API_ROUTES.LOCALIZATION_LANGUAGE.BASE);
 
-        expect(res.profile.contact.phone).toBe('+380501112233');
-        expect(res.profile.contact.localizations).toEqual([]);
-        expect(res.profile.requisite.recipient).toBe('Victory Center');
-        expect(res.profile.requisite.localizations).toEqual([]);
+        expect(res.profile.contact).toMatchObject({
+            phone: '+380501112233',
+            localizations: [],
+        });
+
+        expect(res.profile.requisite).toMatchObject({
+            recipient: 'Victory Center',
+            localizations: [],
+        });
+
         expect(res.profile.socialLinks[0].socialPlatform).toBe(0);
         expect(res.languages).toEqual([{ id: 1, code: 'uk', name: 'Ukrainian' }]);
     });
 
-    it('publish() does not fail if languages refresh fails (best-effort)', async () => {
+    it('publish() does not fail if languages refresh fails', async () => {
         const client = {
             put: jest.fn(),
             get: jest.fn(),
@@ -84,22 +143,20 @@ describe('CompanyProfileApi (real http)', () => {
 
         client.get.mockRejectedValue(new Error('Localization service unavailable'));
 
-        const res = await CompanyProfileApi.publish(
-            client,
-            {
-                contacts: {} as any,
-                requisites: {} as any,
-                socialLinks: [],
-            },
-            fallbackLanguages as any,
-        );
+        const res = await CompanyProfileApi.publish(client, validPatch as any, fallbackLanguages as any);
 
         expect(client.put).toHaveBeenCalledWith(API_ROUTES.COMPANY_PROFILE.BASE, expect.any(Object));
         expect(client.get).toHaveBeenCalledWith(API_ROUTES.LOCALIZATION_LANGUAGE.BASE);
 
-        expect(res.profile.contact.phone).toBe('+380999999999');
-        expect(res.profile.contact.localizations).toEqual([]);
-        expect(res.profile.requisite.localizations).toEqual([]);
+        expect(res.profile.contact).toMatchObject({
+            phone: '+380999999999',
+            localizations: [],
+        });
+
+        expect(res.profile.requisite).toMatchObject({
+            recipient: 'Victory Center NGO',
+            localizations: [],
+        });
 
         expect(res.languages).toEqual(fallbackLanguages);
     });

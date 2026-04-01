@@ -24,26 +24,35 @@ export interface HippoventionCenterData {
     text: string;
 }
 
+export interface HippotherapySwipedCard {
+    imgURL: string;
+    imgAlternativeText: string;
+    text: string;
+}
+
+export interface HippotherapyAdvantagesSection {
+    title: string;
+    advantages: HippotherapySwipedCard[];
+}
+
+export interface HippotherapyParticipantsSection {
+    title: string;
+    participants: HippotherapySwipedCard[];
+}
 export interface HippotherapyAbout {
     introSection: HippotherapyIntroData;
     descriptionSection: HippotherapyDefaultSection;
     quoteSection: Quote;
     hippoventionSection: HippotherapyDefaultSection;
     hippoventionCenterSection: HippoventionCenterData;
-    advantagesSection: {
-        title: string;
-        advantages: { imgURL: string; text: string }[];
-    };
+    advantagesSection: HippotherapyAdvantagesSection;
     analysisSection: HippotherapyDefaultSection;
     researchSection: {
         description: string;
         researches: { text: string; url: string }[];
     };
     anotherQuoteSection: Quote;
-    participantsSection: {
-        title: string;
-        participants: { imgURL: string; text: string }[];
-    };
+    participantsSection: HippotherapyParticipantsSection;
     ethicsSection: {
         title: string;
         text: string;

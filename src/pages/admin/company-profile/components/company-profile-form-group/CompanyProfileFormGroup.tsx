@@ -4,8 +4,8 @@ import {
     InputWithCharacterLimit,
     InputWithCharacterLimitProps,
 } from '@/components/admin/input-with-character-limit/InputWithCharacterLimit';
-import { InputError } from '@/components/admin/input-error/InputError';
 import { ButtonTooltip } from '@/components/admin/button-tooltip/ButtonTooltip';
+import { InputErrorWithCharacterCounter } from '@/components/admin/input-error-with-character-counter/InputErrorWithCharacterCounter';
 import styles from './CompanyProfileFormGroup.module.scss';
 
 export interface CustomFormGroupProps extends Omit<InputWithCharacterLimitProps, 'hasError'> {
@@ -27,6 +27,8 @@ export const CustomFormGroup = ({
     showCounter = true,
     ...inputProps
 }: CustomFormGroupProps) => {
+    const counterId = `${id}-character-count`;
+
     return (
         <div className={styles['custom-form-group']}>
             {!hideLabel && (
@@ -38,26 +40,48 @@ export const CustomFormGroup = ({
                 </div>
             )}
 
-            <div className={styles['custom-form-group-input-wrapper']}>
-                <InputWithCharacterLimit
-                    {...inputProps}
-                    id={id}
-                    hasError={!!error}
-                    counterPosition="bottom"
-                    showCounter={showCounter}
-                    className={cn(styles['char-limit-input'], inputProps.className)}
-                />
+            <div className={styles['custom-form-group-field-row']}>
+                <div className={styles['custom-form-group-input-wrapper']}>
+                    <InputWithCharacterLimit
+                        {...inputProps}
+                        id={id}
+                        hasError={!!error}
+                        showCounter={false}
+                        className={cn(styles['char-limit-input'], inputProps.className)}
+                    />
+                </div>
 
-                {tooltipText && inputProps.disabled && (
-                    <div className={styles['custom-form-group-tooltip-inside']}>
+                <div className={styles['custom-form-group-tooltip-slot']}>
+                    {tooltipText && (
                         <ButtonTooltip position="bottom" isRenderInPortal>
                             {tooltipText}
                         </ButtonTooltip>
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
 
-            <InputError error={error} />
+            {showCounter ? (
+                <div className={styles['meta-row-wrapper']}>
+                    <InputErrorWithCharacterCounter
+                        error={error}
+                        maxLength={inputProps.maxLength}
+                        value={String(inputProps.value ?? '')}
+                        counterId={counterId}
+                        htmlFor={id}
+                    />
+                </div>
+            ) : (
+                <div className={styles['meta-row-wrapper']}>
+                    <InputErrorWithCharacterCounter
+                        error={error}
+                        maxLength={inputProps.maxLength}
+                        value={String(inputProps.value ?? '')}
+                        counterId={counterId}
+                        htmlFor={id}
+                        containerClassName={styles['meta-row--error-only']}
+                    />
+                </div>
+            )}
         </div>
     );
 };

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import cn from 'classnames';
 import { CategoryBar } from '@/components/admin/category-bar/CategoryBar';
@@ -14,9 +14,15 @@ import { COMPANY_PROFILE_TEXT } from '@/const/admin/company-profile';
 import { COMPANY_PROFILE_FORM_DEFAULTS, CompanyProfileFormValues } from '@/types/admin/company-profile';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { CompanyProfileApi } from '@/services/api/admin/company-profile/company-profile-api';
-import { mapCompanyProfileToFormValues } from '@/utils/functions/mappers/admin/company-profile/company-profile-mappers';
+import {
+    mapCompanyProfileToFormValues,
+    mapFormValuesToCompanyProfilePatch,
+} from '@/utils/functions/mappers/admin/company-profile/company-profile-mappers';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { CompanyProfileValidationSchema } from '@/validation/admin/company-profile-schema/company-profile-schema';
+import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
+import { ToastType } from '@/types/admin/toast';
+import { CompanyProfilePublishModal } from '../company-profile-publish-modal/CompanyProfilePublishModal';
 
 type TabType = 'profile' | 'requisites' | 'socials';
 
@@ -33,9 +39,18 @@ const TABS: TabItem[] = [
 
 export const CompanyProfileContent = () => {
     const client = useAdminClient();
+    const { addToast } = useToast();
+
     const [activeTab, setActiveTab] = useState<TabType>('profile');
     const [isEditMode, setIsEditMode] = useState(false);
+
     const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+
+    const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
+    const [isPublishing, setIsPublishing] = useState(false);
+    const [pendingPublishData, setPendingPublishData] = useState<CompanyProfileFormValues | null>(null);
+
+    const savedValuesRef = useRef<CompanyProfileFormValues>(COMPANY_PROFILE_FORM_DEFAULTS);
 
     const methods = useForm<CompanyProfileFormValues>({
         mode: 'onBlur',
@@ -45,8 +60,38 @@ export const CompanyProfileContent = () => {
         shouldFocusError: true,
     });
 
-    const handlePublish = (_data: CompanyProfileFormValues) => {
-        // API integration pending backend endpoints/DTO
+    const handlePublishSubmit = (data: CompanyProfileFormValues) => {
+        setPendingPublishData(data);
+        setIsPublishModalOpen(true);
+    };
+
+    const handleConfirmPublish = async () => {
+        if (!pendingPublishData || isPublishing) return;
+
+        setIsPublishing(true);
+        try {
+            const { languages } = await CompanyProfileApi.get(client);
+            const patch = mapFormValuesToCompanyProfilePatch(pendingPublishData, languages);
+
+            const { profile, languages: updatedLanguages } = await CompanyProfileApi.publish(client, patch);
+
+            const nextValues = mapCompanyProfileToFormValues(profile, updatedLanguages);
+            savedValuesRef.current = nextValues;
+
+            methods.reset(nextValues);
+            setIsEditMode(false);
+            setIsPublishModalOpen(false);
+            setPendingPublishData(null);
+
+            addToast('Зміни успішно опубліковано', ToastType.Success, 3000);
+        } finally {
+            setIsPublishing(false);
+        }
+    };
+
+    const handleCancelPublish = () => {
+        setIsPublishModalOpen(false);
+        setPendingPublishData(null);
     };
 
     const handleCancelClick = () => {
@@ -58,7 +103,7 @@ export const CompanyProfileContent = () => {
     };
 
     const handleConfirmCancel = () => {
-        methods.reset();
+        methods.reset(savedValuesRef.current);
         setIsEditMode(false);
         setIsCancelModalOpen(false);
     };
@@ -76,7 +121,13 @@ export const CompanyProfileContent = () => {
         const loadProfile = async () => {
             const { profile, languages } = await CompanyProfileApi.get(client);
             if (!mounted) return;
-            methods.reset(mapCompanyProfileToFormValues(profile, languages));
+
+            const values = mapCompanyProfileToFormValues(profile, languages);
+            savedValuesRef.current = values;
+
+            if (!methods.formState.isDirty) {
+                methods.reset(values);
+            }
         };
 
         void loadProfile();
@@ -110,7 +161,7 @@ export const CompanyProfileContent = () => {
                             isEditMode={isEditMode}
                             onEdit={() => setIsEditMode(true)}
                             onCancel={handleCancelClick}
-                            onPublish={methods.handleSubmit(handlePublish)}
+                            onPublish={methods.handleSubmit(handlePublishSubmit)}
                             isPublishDisabled={!methods.formState.isDirty || !methods.formState.isValid}
                         />
                     </div>
@@ -135,6 +186,13 @@ export const CompanyProfileContent = () => {
                 isOpen={isCancelModalOpen}
                 onConfirm={handleConfirmCancel}
                 onCancel={() => setIsCancelModalOpen(false)}
+            />
+
+            <CompanyProfilePublishModal
+                isOpen={isPublishModalOpen}
+                onConfirm={handleConfirmPublish}
+                onCancel={handleCancelPublish}
+                isButtonsDisabled={isPublishing}
             />
 
             <ToastContainer />

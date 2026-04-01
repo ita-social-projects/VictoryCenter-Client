@@ -87,7 +87,7 @@ jest.mock('@/const/admin/programs', () => ({
             FORM: { TITLE: { TEXT: 'Title' } },
             CARD: {
                 FORM: { SAMPLE: { AUTHOR: 'SAMPLE_AUTHOR' } },
-                BUTTON: { ADD_CARD: 'Add card' },
+                BUTTON: { ADD_CARD: 'Add block' },
             },
             SINGLE_TITLE_DESCRIPTION_AUTHOR_PAIRS: {
                 TITLE_PLACEHOLDER: '',
@@ -283,7 +283,7 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
 
     it('renders add button only in edit mode and respects canAddPair', () => {
         const view = renderComponent({ mode: ProgramSectionMode.View });
-        expect(screen.queryByRole('button', { name: 'Add card' })).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'Add block' })).not.toBeInTheDocument();
         view.unmount();
 
         const onAddPair = jest.fn();
@@ -293,11 +293,11 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
             onAddPair,
             canAddPair: false,
         });
-        expect(screen.getByRole('button', { name: 'Add card' })).toBeDisabled();
+        expect(screen.getByRole('button', { name: 'Add block' })).toBeDisabled();
         utils.unmount();
 
         renderComponent({ mode: ProgramSectionMode.Edit, onAddPair, canAddPair: true });
-        fireEvent.click(screen.getByRole('button', { name: 'Add card' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Add block' }));
         expect(onAddPair).toHaveBeenCalledTimes(1);
     });
 

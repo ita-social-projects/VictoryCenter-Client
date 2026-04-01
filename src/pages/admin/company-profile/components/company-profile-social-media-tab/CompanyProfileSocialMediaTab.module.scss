@@ -23,7 +23,7 @@
 }
 
 .social-media-tab-add {
-    width: 280px;
+    width: 248px;
 }
 
 .social-media-tab-limit-message {
@@ -49,6 +49,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 12px;
+    padding-right: 32px;
 }
 
 .social-media-contact-label {
@@ -71,4 +72,69 @@
     padding: 0;
     border: none;
     background: transparent;
+}
+
+.social-media-tab-add :global(.singleselect) {
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    background-color: c.$blue-500;
+}
+
+.social-media-tab-add :global(.singleselect-selected) {
+    background-color: c.$blue-600;
+}
+
+.social-media-tab-add :global(.select-input) {
+    background-color: transparent;
+    border-radius: 0;
+    color: c.$white;
+}
+
+.social-media-tab-add :global(.select-input:not(.select-input-disabled):hover) {
+    background-color: c.$blue-600;
+}
+
+.social-media-tab-add :global(.select-input-disabled),
+.social-media-tab-add :global(.select-input-disabled:hover) {
+    background-color: c.$grey-600;
+    color: c.$grey-400;
+    cursor: not-allowed;
+}
+
+.social-media-tab-add :global(.singleselect-options) {
+    border-radius: 0;
+    border-color: c.$blue-600;
+    background-color: c.$white;
+}
+
+.social-media-tab-add :global(.option) {
+    background-color: c.$white;
+    color: c.$dropdown-text;
+}
+
+.social-media-tab-add :global(.option:hover),
+.social-media-tab-add :global(.option-selected),
+.social-media-tab-add :global(.option-selected:hover) {
+    background-color: c.$dropdown-hover;
+}
+
+.social-media-tab-add :global(.option-selected),
+.social-media-tab-add :global(.option-selected:hover) {
+    background-color: c.$dropdown-hover;
+}
+
+.social-media-tab-add :global(.option-value),
+.social-media-tab-add :global(.option-value-placeholder) {
+    color: inherit;
+}
+
+.social-media-tab-add :global(.placeholder-arrow .icon-img) {
+    fill: currentColor;
+    color: inherit;
+    
+    path {
+        stroke: currentColor;
+        fill: currentColor;
+    }
 }

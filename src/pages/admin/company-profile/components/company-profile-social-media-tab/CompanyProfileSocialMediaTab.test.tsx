@@ -41,12 +41,25 @@ jest.mock('../company-profile-form-group/CompanyProfileFormGroup', () => ({
     ),
 }));
 
+jest.mock('../company-profile-delete-social-modal/CompanyProfileDeleteSocialModal', () => ({
+    CompanyProfileDeleteSocialModal: ({ isOpen, onConfirm, onCancel }: any) =>
+        isOpen ? (
+            <div data-testid="delete-social-modal">
+                <button data-testid="confirm-delete" onClick={onConfirm}>
+                    Так
+                </button>
+                <button data-testid="cancel-delete" onClick={onCancel}>
+                    Ні
+                </button>
+            </div>
+        ) : null,
+}));
+
 const Wrapper = (props: { disabled: boolean; defaultValues?: Partial<CompanyProfileFormValues> }) => {
     const methods = useForm<CompanyProfileFormValues>({
         defaultValues: { ...COMPANY_PROFILE_FORM_DEFAULTS, ...(props.defaultValues ?? {}) },
         mode: 'onBlur',
     });
-
     return (
         <FormProvider {...methods}>
             <CompanyProfileSocialMediaTab disabled={props.disabled} />
@@ -66,7 +79,7 @@ describe('CompanyProfileSocialMediaTab', () => {
         expect(screen.queryByTestId('add-platform-btn')).not.toBeInTheDocument();
     });
 
-    it('allows deleting social contact when disabled=false', () => {
+    it('does not show delete button when only one contact exists', () => {
         render(
             <Wrapper
                 disabled={false}
@@ -75,12 +88,55 @@ describe('CompanyProfileSocialMediaTab', () => {
                 }}
             />,
         );
+        expect(screen.queryByLabelText('Delete social contact')).not.toBeInTheDocument();
+    });
+
+    it('opens confirmation modal on delete click and removes contact on confirm', () => {
+        render(
+            <Wrapper
+                disabled={false}
+                defaultValues={{
+                    socialContacts: [
+                        { platform: 'Instagram', url: 'https://instagram.com/test' },
+                        { platform: 'Facebook', url: 'https://facebook.com/test' },
+                    ],
+                }}
+            />,
+        );
+
+        expect(screen.getAllByTestId(/^social-url-socialContacts\./)).toHaveLength(2);
+        expect(screen.queryByTestId('delete-social-modal')).not.toBeInTheDocument();
+
+        fireEvent.click(screen.getAllByLabelText('Delete social contact')[0]);
+
+        expect(screen.getByTestId('delete-social-modal')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByTestId('confirm-delete'));
 
         expect(screen.getAllByTestId(/^social-url-socialContacts\./)).toHaveLength(1);
+        expect(screen.queryByTestId('delete-social-modal')).not.toBeInTheDocument();
+    });
 
-        fireEvent.click(screen.getByLabelText('Delete social contact'));
+    it('closes modal without deleting on cancel', () => {
+        render(
+            <Wrapper
+                disabled={false}
+                defaultValues={{
+                    socialContacts: [
+                        { platform: 'Instagram', url: 'https://instagram.com/test' },
+                        { platform: 'Facebook', url: 'https://facebook.com/test' },
+                    ],
+                }}
+            />,
+        );
 
-        expect(screen.queryAllByTestId(/^social-url-socialContacts\./)).toHaveLength(0);
+        fireEvent.click(screen.getAllByLabelText('Delete social contact')[0]);
+        expect(screen.getByTestId('delete-social-modal')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByTestId('cancel-delete'));
+
+        expect(screen.queryByTestId('delete-social-modal')).not.toBeInTheDocument();
+        expect(screen.getAllByTestId(/^social-url-socialContacts\./)).toHaveLength(2);
     });
 
     it('disables add button when 4 contacts reached', () => {
@@ -97,7 +153,6 @@ describe('CompanyProfileSocialMediaTab', () => {
                 }}
             />,
         );
-
         expect(screen.getByTestId('add-platform-btn')).toBeDisabled();
         expect(screen.getByText(COMPANY_PROFILE_TEXT.SOCIAL_MEDIA_TAB.LIMIT_MESSAGE)).toBeInTheDocument();
     });

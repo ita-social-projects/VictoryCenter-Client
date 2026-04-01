@@ -1,91 +1,42 @@
 import { CompanyProfileApi } from './company-profile-api';
-import { mockCompanyProfile, mockCompanyProfileLanguages } from '@/utils/mock-data/admin/company-profile';
-import type { CompanyProfilePatch } from '@/utils/functions/mappers/admin/company-profile/company-profile-mappers';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
 
-const createMockPatch = (socialLinks: any[] = []): CompanyProfilePatch => ({
-    contact: {
-        phone: '+380000000000',
-        address: 'New UA address',
-        email: 'new@email.com',
-        correspondenceEmail: 'new-office@email.com',
-        motto: 'New motto',
-        localizations: [
-            { languageCode: 'uk', address: 'New UA address', motto: 'New motto' },
-            { languageCode: 'en', address: 'New EN address', motto: 'New EN motto' },
-        ],
-    },
-    requisite: {
-        recipient: 'New recipient UA',
-        edrpou: '87654321',
-        address: 'New UA req address',
-        localizations: [
-            { languageCode: 'uk', recipient: 'New recipient UA', address: 'New UA req address' },
-            { languageCode: 'en', recipient: 'New recipient EN', address: 'New EN req address' },
-        ],
-    },
-    socialLinks,
-});
+describe('CompanyProfileApi (real http)', () => {
+    it('get() requests profile and languages', async () => {
+        const client = {
+            get: jest.fn(),
+        } as any;
 
-describe('CompanyProfileApi', () => {
-    beforeEach(() => {
-        jest.useFakeTimers();
-        CompanyProfileApi.__resetMocks();
-    });
-
-    afterEach(() => {
-        jest.useRealTimers();
-        jest.clearAllMocks();
-    });
-
-    it('should return mock profile and languages', async () => {
-        const promise = CompanyProfileApi.get({} as any);
-
-        jest.advanceTimersByTime(200);
-        const result = await promise;
-
-        expect(result).toEqual({
-            profile: mockCompanyProfile,
-            languages: mockCompanyProfileLanguages,
+        client.get.mockImplementation((url: string) => {
+            if (url === API_ROUTES.COMPANY_PROFILE.BASE)
+                return Promise.resolve({ data: { contacts: {}, requisites: {}, socialLinks: [] } });
+            if (url === API_ROUTES.LOCALIZATION_LANGUAGE.BASE)
+                return Promise.resolve({ data: [{ id: 1, code: 'uk', name: 'Ukrainian' }] });
+            throw new Error(`Unexpected url ${url}`);
         });
+
+        const res = await CompanyProfileApi.get(client);
+        expect(client.get).toHaveBeenCalledWith(API_ROUTES.COMPANY_PROFILE.BASE);
+        expect(client.get).toHaveBeenCalledWith(API_ROUTES.LOCALIZATION_LANGUAGE.BASE);
+        expect(res.languages?.length).toBe(1);
     });
 
-    it('publish should update stored profile and be returned by subsequent get()', async () => {
-        const patch = createMockPatch([{ socialPlatform: 'Instagram', url: 'https://instagram.com/new' }]);
-        const publishPromise = CompanyProfileApi.publish({} as any, patch);
+    it('publish() PUTs patch and returns updated profile', async () => {
+        const client = {
+            put: jest.fn(),
+            get: jest.fn(),
+        } as any;
 
-        jest.advanceTimersByTime(200);
-        const published = await publishPromise;
+        client.put.mockResolvedValue({ data: { contacts: {}, requisites: {}, socialLinks: [] } });
+        client.get.mockResolvedValue({ data: [{ id: 1, code: 'uk', name: 'Ukrainian' }] });
 
-        expect(published.profile.contact.phone).toBe('+380000000000');
-        expect(published.profile.contact.email).toBe('new@email.com');
-        expect(published.profile.requisite.edrpou).toBe('87654321');
-        expect(published.profile.socialLinks[0]?.url).toBe('https://instagram.com/new');
-
-        const getPromise = CompanyProfileApi.get({} as any);
-
-        jest.advanceTimersByTime(200);
-        const afterGet = await getPromise;
-
-        expect(afterGet.profile.contact.phone).toBe('+380000000000');
-        expect(afterGet.profile.requisite.edrpou).toBe('87654321');
-        expect(afterGet.profile.socialLinks[0]?.url).toBe('https://instagram.com/new');
-    });
-
-    it('__resetMocks should restore initial mock profile', async () => {
-        const patch = createMockPatch([]);
-        const publishPromise = CompanyProfileApi.publish({} as any, patch);
-
-        jest.advanceTimersByTime(200);
-        await publishPromise;
-
-        CompanyProfileApi.__resetMocks();
-
-        const getPromise = CompanyProfileApi.get({} as any);
-
-        jest.advanceTimersByTime(200);
-        const result = await getPromise;
-
-        expect(result.profile).toEqual(mockCompanyProfile);
-        expect(result.languages).toEqual(mockCompanyProfileLanguages);
+        const res = await CompanyProfileApi.publish(client, {
+            contact: {} as any,
+            requisite: {} as any,
+            socialLinks: [],
+        });
+        expect(client.put).toHaveBeenCalledWith(API_ROUTES.COMPANY_PROFILE.BASE, expect.any(Object));
+        expect(client.get).toHaveBeenCalledWith(API_ROUTES.LOCALIZATION_LANGUAGE.BASE);
+        expect(res.profile).toBeTruthy();
     });
 });

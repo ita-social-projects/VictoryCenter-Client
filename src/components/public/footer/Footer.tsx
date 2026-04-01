@@ -32,7 +32,10 @@ export const Footer = () => {
             try {
                 const data = await getPublicCompanyProfile();
                 if (mounted) setProfile(data);
-            } catch {}
+            } catch {
+                // Fallback to i18n footer defaults if Company Profile is unavailable.
+                // Footer should never block page rendering due to API issues.
+            }
         })();
         return () => {
             mounted = false;

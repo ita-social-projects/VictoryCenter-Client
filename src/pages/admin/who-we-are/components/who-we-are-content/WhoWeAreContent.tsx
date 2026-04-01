@@ -173,7 +173,9 @@ export const WhoWeAreContent = () => {
     const handlePublishChange = useCallback(async () => {
         if (!selectedSection || !updatedSection) return;
 
-        const changedContents = updatedSection.contents.filter((updatedItem) => {
+        const normalizedUpdatedSection = normalizeSection(updatedSection);
+
+        const changedContents = normalizedUpdatedSection.contents.filter((updatedItem) => {
             const originalItem = selectedSection.contents.find((sel) => sel.id === updatedItem.id);
 
             if (!originalItem) return true;

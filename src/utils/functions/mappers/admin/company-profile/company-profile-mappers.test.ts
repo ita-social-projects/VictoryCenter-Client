@@ -1,6 +1,7 @@
 import { mapCompanyProfileToFormValues, mapFormValuesToCompanyProfilePatch } from './company-profile-mappers';
 import { COMPANY_PROFILE_FORM_DEFAULTS } from '@/types/admin/company-profile';
-import type { CompanyProfile, CompanyProfileFormValues, LocalizationLanguage } from '@/types/admin/company-profile';
+import type { LocalizationLanguage } from '@/types/common/language';
+import type { CompanyProfile, CompanyProfileFormValues } from '@/types/admin/company-profile';
 
 describe('company-profile-mappers', () => {
     const languages: LocalizationLanguage[] = [
@@ -138,8 +139,8 @@ describe('company-profile-mappers', () => {
         } as any;
 
         const result = mapCompanyProfileToFormValues(profile, [
-            { id: 1, code: 'uk' },
-            { id: 2, code: 'en' },
+            { id: 1, code: 'uk', name: 'Українська' },
+            { id: 2, code: 'en', name: 'English' },
         ]);
 
         expect(result.addressEng).toBe('EN addr');

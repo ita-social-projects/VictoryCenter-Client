@@ -1,12 +1,12 @@
 import { AxiosInstance } from 'axios';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
+import type { LocalizationLanguage } from '@/types/common/language';
 import {
     CompanyProfile,
     CompanyProfileContactLocalization,
     CompanyProfileDto,
     CompanyProfileRequisiteLocalization,
     CompanyProfileSocialLink,
-    LocalizationLanguage,
     UpdateCompanyProfileDto,
 } from '@/types/admin/company-profile';
 import { CompanyProfilePatch } from '@/utils/functions/mappers/admin/company-profile/company-profile-mappers';
@@ -14,7 +14,7 @@ import { CompanyProfilePatch } from '@/utils/functions/mappers/admin/company-pro
 const toContactLocalizations = (dto: CompanyProfileDto): CompanyProfileContactLocalization[] =>
     (dto.contacts?.localizations ?? []).map((loc) => ({
         entityId: loc.entityId,
-        localizationInfoDto: loc.localizationInfoDto,
+        language: loc.localizationInfoDto ?? { id: 0, code: '' },
         translationStatus: loc.translationStatus,
         address: loc.address ?? undefined,
         motto: loc.motto ?? undefined,
@@ -23,7 +23,7 @@ const toContactLocalizations = (dto: CompanyProfileDto): CompanyProfileContactLo
 const toRequisiteLocalizations = (dto: CompanyProfileDto): CompanyProfileRequisiteLocalization[] =>
     (dto.requisites?.localizations ?? []).map((loc) => ({
         entityId: loc.entityId,
-        localizationInfoDto: loc.localizationInfoDto,
+        language: loc.localizationInfoDto ?? { id: 0, code: '' },
         translationStatus: loc.translationStatus,
         recipient: loc.recipient ?? undefined,
         address: loc.address ?? undefined,
@@ -39,7 +39,7 @@ const toSocialLinks = (dto: CompanyProfileDto): CompanyProfileSocialLink[] =>
     }));
 
 const toFrontendCompanyProfile = (dto: CompanyProfileDto): CompanyProfile => ({
-    id: undefined, // backend CompanyProfileDto currently has no root id
+    id: undefined,
     contact: {
         id: undefined,
         profileId: undefined,

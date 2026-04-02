@@ -1,3 +1,10 @@
+import {
+    EntityLocalization,
+    EntityLocalizationDto,
+    EntityWithDtoLocalizations,
+    EntityWithLocalizations,
+} from '@/types/common/language';
+
 export type LocaleCode = 'uk' | 'en';
 
 export type SocialPlatform =
@@ -21,38 +28,37 @@ export const SOCIAL_PLATFORMS_ORDER: readonly SocialPlatform[] = [
     'Viber',
 ];
 
-export interface LocalizationLanguage {
-    id: number;
-    code: string;
-    name?: string;
-}
-
-export interface LocalizationInfoDto {
-    id?: number;
-    code?: string;
-    name?: string;
-}
-
-export interface EntityLocalizationBase {
+// Domain/UI localizations
+export interface CompanyProfileContactLocalization extends EntityLocalization {
     entityId?: number;
     languageId?: number;
-    language?: LocalizationLanguage;
-    localizationInfoDto?: LocalizationInfoDto;
-    translationStatus?: number;
+    address?: string;
+    motto?: string;
     createdAt?: string;
 }
 
-export interface CompanyProfileContactLocalization extends EntityLocalizationBase {
-    address?: string;
-    motto?: string;
-}
-
-export interface CompanyProfileRequisiteLocalization extends EntityLocalizationBase {
+export interface CompanyProfileRequisiteLocalization extends EntityLocalization {
+    entityId?: number;
+    languageId?: number;
     recipient?: string;
     address?: string;
+    createdAt?: string;
 }
 
-// Domain/UI model (used by forms/components)
+// DTO localizations
+export interface CompanyProfileContactLocalizationDto extends EntityLocalizationDto {
+    entityId?: number;
+    address?: string | null;
+    motto?: string | null;
+}
+
+export interface CompanyProfileRequisiteLocalizationDto extends EntityLocalizationDto {
+    entityId?: number;
+    recipient?: string | null;
+    address?: string | null;
+}
+
+// Domain/UI model
 export interface CompanyProfileSocialLink {
     id?: number;
     profileId?: number;
@@ -61,7 +67,7 @@ export interface CompanyProfileSocialLink {
     createdAt?: string;
 }
 
-export interface CompanyProfileContact {
+export interface CompanyProfileContact extends EntityWithLocalizations<CompanyProfileContactLocalization> {
     id?: number;
     profileId?: number;
     phone: string;
@@ -69,17 +75,15 @@ export interface CompanyProfileContact {
     email: string;
     correspondenceEmail: string;
     motto?: string;
-    localizations: CompanyProfileContactLocalization[];
     createdAt?: string;
 }
 
-export interface CompanyProfileRequisite {
+export interface CompanyProfileRequisite extends EntityWithLocalizations<CompanyProfileRequisiteLocalization> {
     id?: number;
     profileId?: number;
     recipient: string;
     edrpou: string;
     address: string;
-    localizations: CompanyProfileRequisiteLocalization[];
     createdAt?: string;
 }
 
@@ -92,36 +96,18 @@ export interface CompanyProfile {
 }
 
 // Backend DTOs (contract)
-export interface CompanyProfileContactLocalizationDto {
-    entityId?: number;
-    localizationInfoDto?: LocalizationInfoDto;
-    translationStatus?: number;
-    address?: string | null;
-    motto?: string | null;
-}
-
-export interface CompanyProfileRequisiteLocalizationDto {
-    entityId?: number;
-    localizationInfoDto?: LocalizationInfoDto;
-    translationStatus?: number;
-    recipient?: string | null;
-    address?: string | null;
-}
-
-export interface CompanyProfileContactsDto {
+export interface CompanyProfileContactsDto extends EntityWithDtoLocalizations<CompanyProfileContactLocalizationDto> {
     phone?: string | null;
     address?: string | null;
     email?: string | null;
     correspondenceEmail?: string | null;
     motto?: string | null;
-    localizations?: CompanyProfileContactLocalizationDto[] | null;
 }
 
-export interface CompanyProfileRequisiteDto {
+export interface CompanyProfileRequisiteDto extends EntityWithDtoLocalizations<CompanyProfileRequisiteLocalizationDto> {
     recipient?: string | null;
     edrpou?: string | null;
     address?: string | null;
-    localizations?: CompanyProfileRequisiteLocalizationDto[] | null;
 }
 
 export interface CompanyProfileSocialLinkDto {

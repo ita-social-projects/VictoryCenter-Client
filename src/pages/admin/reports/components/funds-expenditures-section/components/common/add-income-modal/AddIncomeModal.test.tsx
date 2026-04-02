@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { AddIncomeModal } from './AddIncomeModal';
@@ -46,6 +46,9 @@ jest.mock(
                     <button data-testid="modal-submit" onClick={onSubmit} disabled={isSubmitDisabled}>
                         Submit
                     </button>
+                    <button data-testid="modal-force-submit" onClick={onSubmit}>
+                        Force Submit
+                    </button>
                     <button data-testid="modal-close" onClick={onClose}>
                         Cancel
                     </button>
@@ -85,7 +88,8 @@ jest.mock('@/components/common/select/Select', () => {
             const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
                 const newValue = e.target.value;
                 if (newValue) {
-                    onValueChange(Number(newValue));
+                    const selected = options.find((option: any) => String(option.value) === newValue);
+                    onValueChange(selected ? selected.value : Number(newValue));
                 } else {
                     onValueChange(undefined);
                 }
@@ -109,7 +113,7 @@ jest.mock('@/components/common/select/Select', () => {
                 ),
             );
         },
-        Option: ({ value, name }: any) => null,
+        Option: ({ value: _value, name: _name }: any) => null,
     };
 });
 
@@ -134,6 +138,60 @@ describe('AddIncomeModal', () => {
             onSubmit: mockOnSubmit,
         };
         return render(<AddIncomeModal {...defaultProps} {...props} />);
+    };
+
+    interface FillRequiredFormFieldsOptions {
+        year?: string;
+        category?: string;
+        amountUah?: string;
+        amountUsd?: string;
+        selectionMode?: 'change' | 'select';
+    }
+
+    const getAddIncomeFormFields = () => {
+        const yearSelect = screen.getByTestId('select-Оберіть звітній рік') as HTMLSelectElement;
+        const categorySelect = screen.getByTestId('select-Оберіть категорію надходження') as HTMLSelectElement;
+        const uahInput = screen.getByTestId('input-add-income-amount-uah') as HTMLInputElement;
+        const usdInput = screen.getByTestId('input-add-income-amount-usd') as HTMLInputElement;
+
+        return { yearSelect, categorySelect, uahInput, usdInput };
+    };
+
+    const fillRequiredFormFields = async (
+        user: ReturnType<typeof userEvent.setup>,
+        {
+            year = currentYear,
+            category = '1',
+            amountUah = '400',
+            amountUsd = '10',
+            selectionMode = 'change',
+        }: FillRequiredFormFieldsOptions = {},
+    ) => {
+        const { yearSelect, categorySelect, uahInput, usdInput } = getAddIncomeFormFields();
+
+        if (selectionMode === 'select') {
+            await user.selectOptions(yearSelect, year);
+            await user.selectOptions(categorySelect, category);
+        } else {
+            fireEvent.change(yearSelect, { target: { value: year } });
+            fireEvent.change(categorySelect, { target: { value: category } });
+        }
+        await user.type(uahInput, amountUah);
+        await user.type(usdInput, amountUsd);
+
+        return { uahInput, usdInput };
+    };
+
+    const clickSubmitButton = async (user: ReturnType<typeof userEvent.setup>) => {
+        const submitButton = screen.getByTestId('modal-submit');
+        await user.click(submitButton);
+    };
+
+    const forceSubmitAndWaitForNoSubmitCall = async (user: ReturnType<typeof userEvent.setup>) => {
+        await user.click(screen.getByTestId('modal-force-submit'));
+        await waitFor(() => {
+            expect(mockOnSubmit).not.toHaveBeenCalled();
+        });
     };
 
     describe('Rendering', () => {
@@ -530,7 +588,7 @@ describe('AddIncomeModal', () => {
             mockOnSubmit.mockResolvedValueOnce(true);
             renderAddIncomeModal();
 
-            const submitButton = screen.getByTestId('modal-submit');
+            const submitButton = screen.getByTestId('modal-force-submit');
             await user.click(submitButton);
 
             expect(mockOnSubmit).not.toHaveBeenCalled();
@@ -642,20 +700,10 @@ describe('AddIncomeModal', () => {
             mockOnSubmit.mockResolvedValueOnce(true);
             renderAddIncomeModal();
 
-            const yearSelect = screen.getByTestId('select-Оберіть звітній рік') as HTMLSelectElement;
-            const categorySelect = screen.getByTestId('select-Оберіть категорію надходження') as HTMLSelectElement;
-            const uahInput = screen.getByTestId('input-add-income-amount-uah') as HTMLInputElement;
-            const usdInput = screen.getByTestId('input-add-income-amount-usd') as HTMLInputElement;
+            await fillRequiredFormFields(user, { category: '3', amountUah: '2000', amountUsd: '47.5' });
+            await clickSubmitButton(user);
 
-            fireEvent.change(yearSelect, { target: { value: currentYear } });
-            fireEvent.change(categorySelect, { target: { value: '1' } });
-            await user.type(uahInput, '2000');
-            await user.type(usdInput, '47.5');
-
-            const submitButton = screen.getByTestId('modal-submit');
-            await user.click(submitButton);
-
-            expect(submitButton).toBeInTheDocument();
+            expect(screen.getByTestId('modal-submit')).toBeInTheDocument();
         });
 
         it('should handle form interaction with multiple field updates', async () => {
@@ -673,43 +721,206 @@ describe('AddIncomeModal', () => {
             expect(uahInput.value).toBe('1500');
         });
 
-        it('should maintain form state across modal visibility toggles', () => {
-            const { rerender } = render(
-                <AddIncomeModal
-                    isOpen={true}
-                    onClose={mockOnClose}
-                    categories={MOCK_CATEGORIES}
-                    records={MOCK_RECORDS}
-                    exchangeRate="42.18"
-                    onSubmit={mockOnSubmit}
-                />,
-            );
+        it('should render form with all required input fields', async () => {
+            renderAddIncomeModal();
 
-            expect(screen.getByTestId('funds-record-modal')).toBeInTheDocument();
+            expect(screen.getByTestId('select-Оберіть звітній рік')).toBeInTheDocument();
+            expect(screen.getByTestId('select-Оберіть категорію надходження')).toBeInTheDocument();
+            expect(screen.getByTestId('input-add-income-amount-uah')).toBeInTheDocument();
+            expect(screen.getByTestId('input-add-income-amount-usd')).toBeInTheDocument();
+        });
 
-            rerender(
-                <AddIncomeModal
-                    isOpen={false}
-                    onClose={mockOnClose}
-                    categories={MOCK_CATEGORIES}
-                    records={MOCK_RECORDS}
-                    exchangeRate="42.18"
-                    onSubmit={mockOnSubmit}
-                />,
-            );
+        it('should handle form validation on blur events', async () => {
+            const user = userEvent.setup({ delay: null });
+            renderAddIncomeModal();
 
-            expect(screen.queryByTestId('funds-record-modal')).not.toBeInTheDocument();
+            const uahInput = screen.getByTestId('input-add-income-amount-uah') as HTMLInputElement;
+            await user.type(uahInput, '100');
+            uahInput.blur();
 
-            rerender(
-                <AddIncomeModal
-                    isOpen={true}
-                    onClose={mockOnClose}
-                    categories={MOCK_CATEGORIES}
-                    records={MOCK_RECORDS}
-                    exchangeRate="42.18"
-                    onSubmit={mockOnSubmit}
-                />,
-            );
+            expect(uahInput).toBeInTheDocument();
+        });
+
+        it('should display modal title and structure correctly', () => {
+            renderAddIncomeModal();
+
+            const modal = screen.getByTestId('funds-record-modal');
+            expect(modal).toBeInTheDocument();
+
+            const closeButton = screen.getByTestId('modal-close');
+            expect(closeButton).toBeInTheDocument();
+
+            const submitButton = screen.getByTestId('modal-submit');
+            expect(submitButton).toBeInTheDocument();
+        });
+
+        it('should handle form field interactions and state updates', async () => {
+            const user = userEvent.setup({ delay: null });
+            renderAddIncomeModal();
+
+            const yearSelect = screen.getByTestId('select-Оберіть звітній рік') as HTMLSelectElement;
+            const categorySelect = screen.getByTestId('select-Оберіть категорію надходження') as HTMLSelectElement;
+            const uahInput = screen.getByTestId('input-add-income-amount-uah') as HTMLInputElement;
+            const usdInput = screen.getByTestId('input-add-income-amount-usd') as HTMLInputElement;
+
+            fireEvent.change(yearSelect, { target: { value: currentYear } });
+            expect(yearSelect.value).toBe(currentYear);
+
+            fireEvent.change(categorySelect, { target: { value: '1' } });
+            expect(categorySelect.value).toBe('1');
+
+            await user.type(uahInput, '750');
+            expect(uahInput.value).toBe('750');
+
+            await user.type(usdInput, '18');
+            expect(usdInput.value).not.toBe('');
+        });
+
+        it('should submit normalized data and reset form when creation succeeds', async () => {
+            const user = userEvent.setup({ delay: null });
+            mockOnSubmit.mockResolvedValueOnce(true);
+            renderAddIncomeModal({ records: [], exchangeRate: null });
+
+            const { uahInput, usdInput } = await fillRequiredFormFields(user, {
+                category: '1',
+                amountUah: '500 ',
+                amountUsd: '12.5 ',
+                selectionMode: 'select',
+            });
+            await clickSubmitButton(user);
+
+            await waitFor(() => {
+                expect(mockOnSubmit).toHaveBeenCalledWith({
+                    categoryId: 1,
+                    reportingYear: currentYear,
+                    amountUah: '500',
+                    amountUsd: '12.5',
+                    type: 'income',
+                });
+            });
+
+            expect(uahInput.value).toBe('');
+            expect(usdInput.value).toBe('');
+        });
+
+        it('should keep values after submit when creation fails', async () => {
+            const user = userEvent.setup({ delay: null });
+            mockOnSubmit.mockResolvedValueOnce(false);
+            renderAddIncomeModal({ records: [], exchangeRate: null });
+
+            const { uahInput, usdInput } = await fillRequiredFormFields(user, {
+                category: '1',
+                amountUah: '800 ',
+                amountUsd: '20 ',
+                selectionMode: 'select',
+            });
+            await clickSubmitButton(user);
+
+            await waitFor(() => {
+                expect(mockOnSubmit).toHaveBeenCalledTimes(1);
+            });
+
+            expect(uahInput.value).toBe('800');
+            expect(usdInput.value).toBe('20');
+        });
+
+        it('should stop submit when category id is 0 because required guard treats it as empty', async () => {
+            const user = userEvent.setup({ delay: null });
+
+            renderAddIncomeModal({
+                records: [],
+                exchangeRate: null,
+                categories: [
+                    { id: 0, name: 'Нульова категорія', type: 'income' },
+                    { id: 1, name: 'Грантові кошти', type: 'income' },
+                ],
+            });
+
+            await fillRequiredFormFields(user, {
+                category: '0',
+                amountUah: '1000',
+                amountUsd: '25',
+                selectionMode: 'select',
+            });
+            await forceSubmitAndWaitForNoSubmitCall(user);
+        });
+
+        it('should handle form submission with invalid category', async () => {
+            const user = userEvent.setup({ delay: null });
+            mockOnSubmit.mockResolvedValueOnce(true);
+            renderAddIncomeModal({
+                records: [
+                    {
+                        id: 1,
+                        categoryId: 1,
+                        type: 'income',
+                        reportingYear: currentYear,
+                        amountUah: '100',
+                        amountUsd: '2',
+                    },
+                ],
+            });
+
+            const yearSelect = screen.getByTestId('select-Оберіть звітній рік') as HTMLSelectElement;
+            const categorySelect = screen.getByTestId('select-Оберіть категорію надходження') as HTMLSelectElement;
+            const uahInput = screen.getByTestId('input-add-income-amount-uah') as HTMLInputElement;
+            const usdInput = screen.getByTestId('input-add-income-amount-usd') as HTMLInputElement;
+
+            fireEvent.change(yearSelect, { target: { value: currentYear } });
+            fireEvent.change(categorySelect, { target: { value: '1' } });
+            await user.type(uahInput, '300');
+            await user.type(usdInput, '7');
+
+            const submitButton = screen.getByTestId('modal-submit');
+            await user.click(submitButton);
+
+            expect(mockOnSubmit).not.toHaveBeenCalled();
+        });
+
+        it('should validate that year and category are required', async () => {
+            const user = userEvent.setup({ delay: null });
+            mockOnSubmit.mockResolvedValueOnce(true);
+            renderAddIncomeModal();
+
+            const uahInput = screen.getByTestId('input-add-income-amount-uah') as HTMLInputElement;
+            const usdInput = screen.getByTestId('input-add-income-amount-usd') as HTMLInputElement;
+
+            await user.type(uahInput, '300');
+            await user.type(usdInput, '7');
+
+            const submitButton = screen.getByTestId('modal-submit');
+            await user.click(submitButton);
+
+            expect(mockOnSubmit).not.toHaveBeenCalled();
+        });
+
+        it('should verify form elements are accessible and properly configured', () => {
+            renderAddIncomeModal();
+
+            const yearSelect = screen.getByTestId('select-Оберіть звітній рік') as HTMLSelectElement;
+            expect(yearSelect).toBeInTheDocument();
+            expect(yearSelect).toHaveProperty('disabled', false);
+
+            const categorySelect = screen.getByTestId('select-Оберіть категорію надходження') as HTMLSelectElement;
+            expect(categorySelect).toBeInTheDocument();
+            expect(categorySelect).toHaveProperty('disabled', false);
+
+            const uahInput = screen.getByTestId('input-add-income-amount-uah') as HTMLInputElement;
+            expect(uahInput).toHaveProperty('disabled', false);
+
+            const submitButton = screen.getByTestId('modal-submit') as HTMLButtonElement;
+            expect(submitButton).toHaveProperty('disabled', true);
+        });
+
+        it('should handle submission error and keep modal open', async () => {
+            const user = userEvent.setup({ delay: null });
+            mockOnSubmit.mockRejectedValueOnce(new Error('Submission failed'));
+            renderAddIncomeModal();
+
+            await fillRequiredFormFields(user);
+            await clickSubmitButton(user);
+
+            await new Promise((resolve) => setTimeout(resolve, 100));
 
             expect(screen.getByTestId('funds-record-modal')).toBeInTheDocument();
         });

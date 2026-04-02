@@ -84,7 +84,7 @@ export const AddIncomeModal = ({
     }, [onClose, resetForm]);
 
     const getCategoryError = useCallback(
-        (categoryId: number | undefined, trigger: 'change' | 'blur' = 'change'): string | undefined => {
+        (categoryId: number | undefined, trigger: 'change' | 'blur'): string | undefined => {
             return validateFundsExpendituresCategory({
                 recordId: 0,
                 recordType: 'income',

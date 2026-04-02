@@ -1,7 +1,7 @@
 @use '@/assets/sass/mixins/typography.mixins' as type;
 @import '../shared/BaseSectionTemplate.module.scss';
 
-$img-width: 1440px;
+$img-width: 1330px;
 $img-height: 680px;
 
 .container {
@@ -59,7 +59,7 @@ $img-height: 680px;
 
     .image-wrapper {
         width: 100%;
-        max-width: 1440px;
+        max-width: 1330px;
         max-height: 680px;
 
         display: flex;

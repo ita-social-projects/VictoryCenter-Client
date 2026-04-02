@@ -3,7 +3,6 @@ import { useForm, FormProvider } from 'react-hook-form';
 import cn from 'classnames';
 import { CategoryBar } from '@/components/admin/category-bar/CategoryBar';
 import { CompanyProfileTab } from '../company-profile-tab/CompanyProfileTab';
-import { CompanyProfileRequisitesTab } from '../company-profile-requisites-tab/CompanyProfileRequisitesTab';
 import { CompanyProfileSocialMediaTab } from '../company-profile-social-media-tab/CompanyProfileSocialMediaTab';
 import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
 import { ProfileToolbar } from '../company-profile-toolbar/CompanyProfileToolbar';
@@ -24,7 +23,7 @@ import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextPr
 import { ToastType } from '@/types/admin/toast';
 import { CompanyProfilePublishModal } from '../company-profile-publish-modal/CompanyProfilePublishModal';
 
-type TabType = 'profile' | 'requisites' | 'socials';
+type TabType = 'profile' | 'socials';
 
 type TabItem = {
     id: TabType;
@@ -33,7 +32,6 @@ type TabItem = {
 
 const TABS: TabItem[] = [
     { id: 'profile', label: COMPANY_PROFILE_TEXT.TABS.PROFILE },
-    { id: 'requisites', label: COMPANY_PROFILE_TEXT.TABS.REQUISITES },
     { id: 'socials', label: COMPANY_PROFILE_TEXT.TABS.SOCIALS },
 ];
 
@@ -175,7 +173,6 @@ export const CompanyProfileContent = () => {
                     <form className={styles['company-form']}>
                         <div className={styles['tab-content']}>
                             {activeTab === 'profile' && <CompanyProfileTab disabled={!isEditMode} />}
-                            {activeTab === 'requisites' && <CompanyProfileRequisitesTab disabled={!isEditMode} />}
                             {activeTab === 'socials' && <CompanyProfileSocialMediaTab disabled={!isEditMode} />}
                         </div>
                     </form>

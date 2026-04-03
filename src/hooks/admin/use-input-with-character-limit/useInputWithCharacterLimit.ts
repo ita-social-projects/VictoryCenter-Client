@@ -33,28 +33,14 @@ export const useInputWithCharacterLimit = <T extends HTMLInputElement | HTMLText
     const handleChange = (e: React.ChangeEvent<T>) => {
         let newValue = e.target.value;
 
-        const isTruncatableField = name === 'title' || name === 'description';
-
         if (newValue.length > maxLength) {
-            if (isTruncatableField) {
-                const truncatedValue = newValue.slice(0, maxLength);
-
-                onChange({
-                    ...e,
-                    target: {
-                        ...e.target,
-                        value: truncatedValue,
-                    },
-                });
-            }
-
             if (maxLimitWarning) {
                 showTemporaryWarning(maxLimitWarning);
             }
-            return;
+            newValue = newValue.slice(0, maxLength);
+        } else {
+            clearWarning();
         }
-
-        clearWarning();
 
         onChange({
             ...e,

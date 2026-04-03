@@ -131,7 +131,7 @@ describe('useInputWithCharacterLimit', () => {
 
                 triggerChange(result, inputValue);
 
-                expect(mockOnChange).not.toHaveBeenCalled();
+                expect(mockOnChange).toHaveBeenCalled();
                 expect(mockClearWarning).not.toHaveBeenCalled();
             });
 
@@ -144,7 +144,7 @@ describe('useInputWithCharacterLimit', () => {
                 triggerChange(result, 'this text is too long for the limit');
 
                 expect(mockShowTemporaryWarning).toHaveBeenCalledWith(warningMessage);
-                expect(mockOnChange).not.toHaveBeenCalled();
+                expect(mockOnChange).toHaveBeenCalled();
             });
 
             it('should not show warning when maxLength exceeded but maxLimitWarning is not provided', () => {
@@ -153,7 +153,7 @@ describe('useInputWithCharacterLimit', () => {
                 triggerChange(result, 'this text exceeds limit');
 
                 expect(mockShowTemporaryWarning).not.toHaveBeenCalled();
-                expect(mockOnChange).not.toHaveBeenCalled();
+                expect(mockOnChange).toHaveBeenCalled();
             });
 
             it('should block a trailing space when length exceeds maxLength', () => {
@@ -170,7 +170,7 @@ describe('useInputWithCharacterLimit', () => {
                 triggerChange(result, atLimitValue + ' ');
 
                 expect(mockShowTemporaryWarning).toHaveBeenCalledWith(warningMessage);
-                expect(mockOnChange).not.toHaveBeenCalled();
+                expect(mockOnChange).toHaveBeenCalled();
             });
 
             it('should block a leading space when length exceeds maxLength', () => {
@@ -187,7 +187,7 @@ describe('useInputWithCharacterLimit', () => {
                 triggerChange(result, ' ' + atLimitValue);
 
                 expect(mockShowTemporaryWarning).toHaveBeenCalledWith(warningMessage);
-                expect(mockOnChange).not.toHaveBeenCalled();
+                expect(mockOnChange).toHaveBeenCalled();
             });
 
             it('should block extra spaces when raw length exceeds maxLength even if normalized is below', () => {
@@ -203,7 +203,7 @@ describe('useInputWithCharacterLimit', () => {
                 triggerChange(result, inputValue);
 
                 expect(mockShowTemporaryWarning).toHaveBeenCalledWith(warningMessage);
-                expect(mockOnChange).not.toHaveBeenCalled();
+                expect(mockOnChange).toHaveBeenCalled();
             });
         });
     });

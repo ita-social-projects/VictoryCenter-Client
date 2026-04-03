@@ -22,6 +22,8 @@ export const REPORTS_TEXT = {
         FAIL_TO_FETCH_REPORTS: 'Виникла помилка, не вдалось завантажити звітність',
         FAIL_TO_UPDATE_REPORT: 'Виникла помилка під час оновлення звітності',
         SUCCESSFULLY_PUBLISHED: 'Успішно опубліковано',
+        RECORD_UPDATED_SUCCESSFULLY: 'Зміни збережено успішно',
+        RECORD_UPDATE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
         INVALID_VALUE: 'Значення повинно бути числом',
     },
     REPORT_AND_ANALYTICS: {

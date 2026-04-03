@@ -51,6 +51,14 @@
     align-items: start;
     > div {
         flex: 1;
+        width: 100%;
+
+        textarea {
+            word-wrap: break-word;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            white-space: pre-wrap;
+        }
     }
 }
 

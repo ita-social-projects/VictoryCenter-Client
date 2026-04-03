@@ -57,7 +57,12 @@ async function confirmModal(user: ReturnType<typeof userEvent.setup>) {
     await user.click(confirmButton);
 }
 
-async function openPublishModal(user: ReturnType<typeof userEvent.setup>, title = 'Updated Title') {
+async function openPublishModal(
+    user: ReturnType<typeof userEvent.setup>,
+    title = 'Updated Title',
+    props: Partial<React.ComponentProps<typeof PdfSectionContentBlock>> = {},
+) {
+    render(<PdfSectionContentBlock content={MOCK_CONTENT} {...props} />);
     await enterEditMode(user);
     await changeTitle(user, title);
     await clickPublish(user);
@@ -94,6 +99,7 @@ describe('PdfSectionContentBlock', () => {
     });
 
     async function renderAndEnterEditMode(): Promise<ReturnType<typeof userEvent.setup>> {
+        render(<PdfSectionContentBlock content={MOCK_CONTENT} />);
         const user = userEvent.setup();
         await enterEditMode(user);
         return user;
@@ -101,6 +107,7 @@ describe('PdfSectionContentBlock', () => {
 
     describe('Edit Mode', () => {
         it('should switch to edit mode when edit button is clicked', async () => {
+            render(<PdfSectionContentBlock content={MOCK_CONTENT} />);
             const user = userEvent.setup();
             await enterEditMode(user);
             expect(screen.getByDisplayValue(MOCK_CONTENT.title)).toBeInTheDocument();
@@ -138,7 +145,6 @@ describe('PdfSectionContentBlock', () => {
             const utils = await renderAndEnterEditMode();
             await changeTitle(utils, 'New Title');
             await utils.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.CANCEL }));
-            await utils.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.CANCEL }));
             await confirmModal(utils);
             expect(screen.queryByDisplayValue('New Title')).not.toBeInTheDocument();
             expect(screen.getByText(MOCK_CONTENT.title)).toBeInTheDocument();
@@ -147,7 +153,7 @@ describe('PdfSectionContentBlock', () => {
         it('should call onSave when publish button is clicked with valid data', async () => {
             const mockOnSave = jest.fn().mockResolvedValue(undefined);
             const user = userEvent.setup();
-            await openPublishModal(user);
+            await openPublishModal(user, 'Updated Title', { onSave: mockOnSave });
             await confirmModal(user);
             await waitFor(() =>
                 expect(mockOnSave).toHaveBeenCalledWith({
@@ -172,9 +178,9 @@ describe('PdfSectionContentBlock', () => {
         });
 
         it('should close modal and not save when clicking НІ button', async () => {
-            const mockOnSave = jest.fn();
+            const mockOnSave = jest.fn().mockResolvedValue(undefined);
             const user = userEvent.setup();
-            await openPublishModal(user);
+            await openPublishModal(user, 'Updated Title', { onSave: mockOnSave });
             const modal = await screen.findByTestId('confirmation-modal');
             await user.click(screen.getByText('НІ'));
             await waitFor(() => expect(modal).not.toBeInTheDocument());
@@ -185,7 +191,7 @@ describe('PdfSectionContentBlock', () => {
         it('should save and show success toast when clicking ТАК button', async () => {
             const mockOnSave = jest.fn().mockResolvedValue(undefined);
             const user = userEvent.setup();
-            await openPublishModal(user);
+            await openPublishModal(user, 'Updated Title', { onSave: mockOnSave });
             await confirmModal(user);
             await waitFor(() =>
                 expect(mockOnSave).toHaveBeenCalledWith({
@@ -199,7 +205,7 @@ describe('PdfSectionContentBlock', () => {
         it('should revert to view mode after successful save', async () => {
             const mockOnSave = jest.fn().mockResolvedValue(undefined);
             const user = userEvent.setup();
-            await openPublishModal(user);
+            await openPublishModal(user, 'Updated Title', { onSave: mockOnSave });
             await confirmModal(user);
             await waitFor(() => expect(screen.queryByDisplayValue('Updated Title')).not.toBeInTheDocument());
             expect(screen.getByRole('button', { name: PDF_FILES_SECTION_TEXT.ACTIONS.EDIT })).toBeInTheDocument();
@@ -210,7 +216,6 @@ describe('PdfSectionContentBlock', () => {
             const savePromise = new Promise<void>((resolve) => {
                 resolveSave = resolve;
             });
-            const mockOnSave = jest.fn(() => savePromise);
             jest.spyOn(PdfSectionApi, 'updatePdfSection').mockReturnValue(savePromise as any);
             const user = userEvent.setup();
             await openPublishModal(user);

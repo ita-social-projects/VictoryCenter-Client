@@ -157,6 +157,7 @@ export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({ 
                             placeholder="Введіть заголовок"
                             error={errors.title}
                             isRequired
+                            disabled={isSaving}
                         />
                         <TextAreaWithCharacterLimitGroup
                             id="pdf-section-description"
@@ -171,6 +172,7 @@ export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({ 
                             error={errors.description}
                             isRequired
                             rows={2}
+                            disabled={isSaving}
                         />
                         <div className={styles['edit-actions']}>
                             <Button

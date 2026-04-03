@@ -27,7 +27,7 @@
 
     &__field {
         flex: 1;
-        padding: 0;
+        padding: 0 0.25rem 0 0;
         border: none;
         outline: none;
         background: none;
@@ -51,17 +51,12 @@
         background: none;
         cursor: pointer;
         flex-shrink: 0;
-        opacity: 0;
-        pointer-events: none;
         transition: opacity 0.2s ease;
         display: flex;
         align-items: center;
         justify-content: center;
-
-        &--visible {
-            opacity: 1;
-            pointer-events: auto;
-        }
+        opacity: 1;
+        contain: layout paint;
 
         svg {
             width: 100%;
@@ -76,11 +71,18 @@
         &--error svg {
             filter: invert(41%) sepia(59%) saturate(2297%) hue-rotate(334deg) brightness(90%) contrast(110%);
         }
+
+        &--hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
     }
 
     &__counter {
         white-space: nowrap;
         color: colors.$grey-900;
         flex-shrink: 0;
+        text-align: right;
+        contain: layout paint;
     }
 }

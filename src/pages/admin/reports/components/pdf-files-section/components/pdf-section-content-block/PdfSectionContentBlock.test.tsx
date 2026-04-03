@@ -12,12 +12,16 @@ jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: () => ({}),
 }));
 jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
-    ConfirmationModal: ({ isOpen, onConfirm, onCancel, title }: any) =>
+    ConfirmationModal: ({ isOpen, onConfirm, onCancel, title, isButtonsDisabled }: any) =>
         isOpen ? (
             <div data-testid="confirmation-modal" role="dialog">
                 <h2>{title}</h2>
-                <button onClick={onCancel}>НІ</button>
-                <button onClick={onConfirm}>ТАК</button>
+                <button onClick={onCancel} disabled={isButtonsDisabled}>
+                    НІ
+                </button>
+                <button onClick={onConfirm} disabled={isButtonsDisabled}>
+                    ТАК
+                </button>
             </div>
         ) : null,
 }));
@@ -89,6 +93,13 @@ describe('PdfSectionContentBlock', () => {
         });
     });
 
+    async function renderAndEnterEditMode() {
+        render(<PdfSectionContentBlock content={MOCK_CONTENT} />);
+        const user = userEvent.setup();
+        await enterEditMode(user);
+        return user;
+    }
+
     describe('Edit Mode', () => {
         it('should switch to edit mode when edit button is clicked', async () => {
             const user = userEvent.setup();
@@ -99,17 +110,13 @@ describe('PdfSectionContentBlock', () => {
         });
 
         it('should display form labels in edit mode', async () => {
-            const user = userEvent.setup();
-            render(<PdfSectionContentBlock content={MOCK_CONTENT} />);
-            await enterEditMode(user);
+            await renderAndEnterEditMode();
             expect(screen.getByText(PDF_FILES_SECTION_TEXT.TITLE)).toBeInTheDocument();
             expect(screen.getByText(PDF_FILES_SECTION_TEXT.DESCRIPTION)).toBeInTheDocument();
         });
 
         it('should display publish and cancel buttons', async () => {
-            const user = userEvent.setup();
-            render(<PdfSectionContentBlock content={MOCK_CONTENT} />);
-            await enterEditMode(user);
+            await renderAndEnterEditMode();
             expect(
                 screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED }),
             ).toBeInTheDocument();
@@ -117,16 +124,12 @@ describe('PdfSectionContentBlock', () => {
         });
 
         it('should disable publish button when form is unchanged', async () => {
-            const user = userEvent.setup();
-            render(<PdfSectionContentBlock content={MOCK_CONTENT} />);
-            await enterEditMode(user);
+            await renderAndEnterEditMode();
             expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
         });
 
         it('should enable publish button when form changes are made', async () => {
-            const user = userEvent.setup();
-            render(<PdfSectionContentBlock content={MOCK_CONTENT} />);
-            await enterEditMode(user);
+            const user = await renderAndEnterEditMode();
             await changeTitle(user, 'New Title Updated');
             await waitFor(() =>
                 expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeEnabled(),
@@ -229,18 +232,14 @@ describe('PdfSectionContentBlock', () => {
 
     describe('Cancel Changes Modal', () => {
         it('should cancel without modal when no changes made', async () => {
-            const user = userEvent.setup();
-            render(<PdfSectionContentBlock content={MOCK_CONTENT} />);
-            await enterEditMode(user);
+            const user = await renderAndEnterEditMode();
             await user.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.CANCEL }));
             expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
             expect(screen.getByRole('button', { name: PDF_FILES_SECTION_TEXT.ACTIONS.EDIT })).toBeInTheDocument();
         });
 
         it('should open cancel confirmation modal when changes made', async () => {
-            const user = userEvent.setup();
-            render(<PdfSectionContentBlock content={MOCK_CONTENT} />);
-            await enterEditMode(user);
+            const user = await renderAndEnterEditMode();
             await changeTitle(user, 'Updated Title');
             await user.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.CANCEL }));
             expect(await screen.findByTestId('confirmation-modal')).toBeInTheDocument();
@@ -250,9 +249,7 @@ describe('PdfSectionContentBlock', () => {
         });
 
         it('should close modal and keep edit mode when clicking НІ in cancel modal', async () => {
-            const user = userEvent.setup();
-            render(<PdfSectionContentBlock content={MOCK_CONTENT} />);
-            await enterEditMode(user);
+            const user = await renderAndEnterEditMode();
             await changeTitle(user, 'Updated Title');
             await user.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.CANCEL }));
             const modal = await screen.findByTestId('confirmation-modal');
@@ -262,9 +259,7 @@ describe('PdfSectionContentBlock', () => {
         });
 
         it('should revert changes when clicking ТАК in cancel modal', async () => {
-            const user = userEvent.setup();
-            render(<PdfSectionContentBlock content={MOCK_CONTENT} />);
-            await enterEditMode(user);
+            const user = await renderAndEnterEditMode();
             await changeTitle(user, 'Updated Title');
             await user.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.CANCEL }));
             await confirmModal(user);

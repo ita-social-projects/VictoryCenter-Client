@@ -21,6 +21,10 @@
         border-color: colors.$grey-900;
     }
 
+    &--textarea {
+        align-items: flex-start;
+    }
+
     &__field {
         flex: 1;
         padding: 0;
@@ -31,6 +35,12 @@
         font-size: 16px;
         font-weight: 400;
         line-height: 24px;
+
+        &--textarea {
+            resize: none;
+            overflow-y: hidden;
+            font-family: inherit;
+        }
     }
 
     &__clear-button {

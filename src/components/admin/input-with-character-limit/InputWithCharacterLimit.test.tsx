@@ -119,13 +119,6 @@ describe('InputWithCharacterLimit', () => {
         renderInputWithCharacterLimit({ hasError: true });
         expectWrapperToHaveClass('char-limit-input--error');
     });
-
-    it('renders counter at bottom when counterPosition is bottom', () => {
-        renderInputWithCharacterLimit({ counterPosition: 'bottom' });
-        const counter = getCharacterCounter(0, 50);
-        expect(counter).toHaveClass('char-limit-input__counter--bottom');
-    });
-
     it('calls onFocus and onBlur callbacks', () => {
         const onFocus = jest.fn();
         const onBlur = jest.fn();

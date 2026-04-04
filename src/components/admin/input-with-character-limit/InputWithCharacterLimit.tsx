@@ -20,7 +20,6 @@ export interface InputWithCharacterLimitProps {
     maxLimitWarning?: string;
     onWarningChange?: (warning: string | null) => void;
     showCounter?: boolean;
-    counterPosition?: 'inside' | 'bottom';
     rows?: number;
     autoGrow?: boolean;
     maxRows?: number;
@@ -42,7 +41,6 @@ export const InputWithCharacterLimit = ({
     maxLimitWarning,
     onWarningChange,
     showCounter = true,
-    counterPosition = 'inside',
     rows,
     autoGrow,
     maxRows,
@@ -138,13 +136,8 @@ export const InputWithCharacterLimit = ({
             >
                 <RemoveIcon />
             </button>
-            {showCounter && counterPosition === 'inside' && (
+            {showCounter && (
                 <output id={countId} className="char-limit-input__counter">
-                    {currentLength}/{maxLength}
-                </output>
-            )}
-            {showCounter && counterPosition === 'bottom' && (
-                <output id={countId} className="char-limit-input__counter char-limit-input__counter--bottom">
                     {currentLength}/{maxLength}
                 </output>
             )}

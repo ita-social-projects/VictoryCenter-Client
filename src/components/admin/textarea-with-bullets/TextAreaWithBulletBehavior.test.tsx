@@ -266,12 +266,14 @@ describe('TextAreaWithBulletBehavior', () => {
         expect(handleChange.mock.calls.length).toBe(callCount);
     });
 
-    it('should handle whitespace-only lines correctly on blur', () => {
+    it('should trim whitespace-only lines to empty string on blur', () => {
         renderComponent('   \n   ');
         const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
 
         fireEvent.blur(textarea);
 
-        expect(handleChange).not.toHaveBeenCalled();
+        expect(handleChange).toHaveBeenCalledWith({
+            target: { value: '', name, id },
+        });
     });
 });

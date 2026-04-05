@@ -1,5 +1,4 @@
 import styles from './InputErrorWithCharacterCounter.module.scss';
-import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
 import cn from 'classnames';
 
 export interface InputErrorWithCharacterCounterProps {
@@ -21,7 +20,7 @@ export const InputErrorWithCharacterCounter = ({
     isWhiteLabel,
     containerClassName,
 }: InputErrorWithCharacterCounterProps) => {
-    const normalizedLength = getNormalizedInputText(value).length;
+    const normalizedLength = value.length;
     return (
         <div className={cn(styles.container, containerClassName)}>
             <div className={styles['error-section']}>{error || ''}</div>

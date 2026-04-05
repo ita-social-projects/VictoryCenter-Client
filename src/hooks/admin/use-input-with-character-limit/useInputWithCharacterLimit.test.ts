@@ -1,6 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
 import { useInputWithCharacterLimit } from './useInputWithCharacterLimit';
-import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
 import { useTemporaryWarning } from '@/hooks/admin/use-temporary-warning/useTemporaryWarning';
 
 jest.mock('@/hooks/admin/use-temporary-warning/useTemporaryWarning');
@@ -56,13 +55,13 @@ describe('useInputWithCharacterLimit', () => {
             expect(result.current.showClearButton).toBe(false);
         });
 
-        it('should calculate current length using getNormalizedInputText', () => {
+        it('should calculate current length using raw input length', () => {
             const testValue = '  test  ';
-            const normalizedLength = getNormalizedInputText(testValue).length;
+            const rawLength = testValue.length;
 
             const { result } = renderHook(() => useInputWithCharacterLimit({ ...defaultProps, value: testValue }));
 
-            expect(result.current.currentLength).toBe(normalizedLength);
+            expect(result.current.currentLength).toBe(rawLength);
         });
 
         it('should pass onWarningChange to useTemporaryWarning', () => {
@@ -74,7 +73,7 @@ describe('useInputWithCharacterLimit', () => {
 
     describe('handleChange', () => {
         describe('Valid input (within limit)', () => {
-            it('should call onChange when normalized length is within limit', () => {
+            it('should call onChange when input length is within limit', () => {
                 const inputValue = 'hello';
                 const { result } = renderHook(() => useInputWithCharacterLimit(defaultProps));
 
@@ -91,7 +90,7 @@ describe('useInputWithCharacterLimit', () => {
                 expect(mockShowTemporaryWarning).not.toHaveBeenCalled();
             });
 
-            it('should allow input with spaces when normalized length is within limit', () => {
+            it('should allow input with spaces when raw length is within limit', () => {
                 const inputValue = '  test  ';
                 const { result } = renderHook(() => useInputWithCharacterLimit(defaultProps));
 
@@ -126,7 +125,7 @@ describe('useInputWithCharacterLimit', () => {
         });
 
         describe('Invalid input (exceeds limit)', () => {
-            it('should prevent input when normalized length exceeds maxLength', () => {
+            it('should prevent input when length exceeds maxLength', () => {
                 const inputValue = 'this is a very long text that exceeds the limit';
                 const { result } = renderHook(() => useInputWithCharacterLimit(defaultProps));
 
@@ -157,7 +156,7 @@ describe('useInputWithCharacterLimit', () => {
                 expect(mockOnChange).toHaveBeenCalled();
             });
 
-            it('should block a trailing space when normalized length is already at maxLength', () => {
+            it('should block a trailing space when length exceeds maxLength', () => {
                 const warningMessage = 'Character limit exceeded';
                 const atLimitValue = 'a'.repeat(defaultProps.maxLength);
                 const { result } = renderHook(() =>
@@ -174,7 +173,7 @@ describe('useInputWithCharacterLimit', () => {
                 expect(mockOnChange).toHaveBeenCalled();
             });
 
-            it('should block a leading space when normalized length is already at maxLength', () => {
+            it('should block a leading space when length exceeds maxLength', () => {
                 const warningMessage = 'Character limit exceeded';
                 const atLimitValue = 'a'.repeat(defaultProps.maxLength);
                 const { result } = renderHook(() =>
@@ -277,14 +276,16 @@ describe('useInputWithCharacterLimit', () => {
             expect(mockOnChange).not.toHaveBeenCalled();
         });
 
-        it('should not call onChange on blur when value is whitespace-only', () => {
+        it('should trim whitespace-only value to empty string on blur', () => {
             const { result } = renderHook(() => useInputWithCharacterLimit({ ...defaultProps, value: '   \n   ' }));
 
             act(() => {
                 result.current.handleBlur({} as React.FocusEvent<HTMLInputElement>);
             });
 
-            expect(mockOnChange).not.toHaveBeenCalled();
+            expect(mockOnChange).toHaveBeenCalledWith({
+                target: { value: '', name: 'testInput', id: 'test-input' },
+            });
         });
     });
 
@@ -370,9 +371,9 @@ describe('useInputWithCharacterLimit', () => {
     describe('works with HTMLTextAreaElement', () => {
         it('should work with textarea element', () => {
             const inputValue = 'textarea';
-            const normalizedLength = getNormalizedInputText(inputValue).length;
+            const rawLength = inputValue.length;
 
-            expect(normalizedLength).toBeLessThanOrEqual(defaultProps.maxLength);
+            expect(rawLength).toBeLessThanOrEqual(defaultProps.maxLength);
 
             const { result } = renderHook(() => useInputWithCharacterLimit<HTMLTextAreaElement>(defaultProps as any));
 

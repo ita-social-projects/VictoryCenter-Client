@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
 import { useTemporaryWarning } from '@/hooks/admin/use-temporary-warning/useTemporaryWarning';
 
 interface UseInputWithCharacterLimitProps<T extends HTMLInputElement | HTMLTextAreaElement> {
@@ -29,13 +28,12 @@ export const useInputWithCharacterLimit = <T extends HTMLInputElement | HTMLText
 }: UseInputWithCharacterLimitProps<T>) => {
     const [isFocused, setIsFocused] = useState(false);
     const { localWarning, showTemporaryWarning, clearWarning } = useTemporaryWarning({ onWarningChange });
-    const currentLength = getNormalizedInputText(value ?? '').length;
+    const currentLength = (value ?? '').length;
 
     const handleChange = (e: React.ChangeEvent<T>) => {
         let newValue = e.target.value;
-        const normalized = getNormalizedInputText(newValue ?? '');
 
-        if (normalized.length > maxLength || newValue.length > maxLength) {
+        if (newValue.length > maxLength) {
             if (maxLimitWarning) {
                 showTemporaryWarning(maxLimitWarning);
             }
@@ -62,7 +60,7 @@ export const useInputWithCharacterLimit = <T extends HTMLInputElement | HTMLText
         setIsFocused(false);
 
         const trimmed = (value ?? '').trim();
-        if (trimmed !== value && trimmed.length > 0) {
+        if (trimmed !== value) {
             onChange({
                 target: { value: trimmed, name, id },
             } as React.ChangeEvent<T>);

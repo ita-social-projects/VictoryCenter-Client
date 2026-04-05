@@ -11,6 +11,7 @@ import quote2DefaultImg from '@/assets/images/man-facing-horse-forehead.webp';
 import { SloganSection } from './slogan/SloganSection';
 import { HippoventionCenter } from './hippovention-center/HippoventionCenter';
 import { SwipedGallery } from './swiped-gallery/SwipedGallery';
+import { ContactSection } from '../programs-page/contact-section/ContactSection';
 
 export const HippotherapyPage = () => {
     const { t } = useTranslation('hippotherapy');
@@ -40,6 +41,7 @@ export const HippotherapyPage = () => {
                         title={data.participantsSection.title}
                         cards={data.participantsSection.participants}
                     />
+                    <ContactSection />
                 </>
             )}
         </LoadableContent>

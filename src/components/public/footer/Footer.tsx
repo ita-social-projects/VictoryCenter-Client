@@ -4,24 +4,60 @@ import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
 import { ReactComponent as MailIcon } from '@/assets/icons/mail.svg';
 import { PUBLIC_ROUTES } from '@/const/public/routes';
 import { useTranslation } from 'react-i18next';
+import { useEffect, useMemo, useState } from 'react';
+import {
+    getPublicCompanyProfile,
+    PublicCompanyProfileDto,
+} from '@/services/api/public/company-profile/company-profile-api';
 import './Footer.scss';
 
+const PLATFORM_LABEL: Record<number, string> = {
+    0: 'Instagram',
+    1: 'Facebook',
+    2: 'Telegram',
+    3: 'YouTube',
+    4: 'X',
+    5: 'WhatsApp',
+    6: 'LinkedIn',
+    7: 'Viber',
+};
+
 export const Footer = () => {
-    const { t } = useTranslation('footer');
+    const { t, i18n } = useTranslation('footer');
+    const [profile, setProfile] = useState<PublicCompanyProfileDto | null>(null);
+
+    useEffect(() => {
+        let mounted = true;
+        (async () => {
+            try {
+                const data = await getPublicCompanyProfile();
+                if (mounted) setProfile(data);
+            } catch {
+                // Fallback to i18n footer defaults if Company Profile is unavailable.
+                // Footer should never block page rendering due to API issues.
+            }
+        })();
+        return () => {
+            mounted = false;
+        };
+    }, []);
+
+    const email = profile?.contacts?.email || t('EMAIL');
+    const phone = profile?.contacts?.phone || t('PHONE');
+
+    const motto = useMemo(() => {
+        const locale = i18n.language?.startsWith('en') ? 'en' : 'uk';
+        return (
+            profile?.contacts?.localizations?.find((l) => l.localizationInfoDto?.code === locale)?.motto ||
+            profile?.contacts?.motto ||
+            t('VICTORY_STARTS_WITH_YOU')
+        );
+    }, [profile, i18n.language, t]);
+
+    const socialLinks = profile?.socialLinks ?? [];
 
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text);
-    };
-    const handleFacebookClick = () => {
-        window.open(t('FACEBOOK'), '_blank', 'noopener,noreferrer');
-    };
-
-    const handleTelegramClick = () => {
-        window.open(t('TELEGRAM'), '_blank', 'noopener,noreferrer');
-    };
-
-    const handleInstagramClick = () => {
-        window.open(t('INSTAGRAM'), '_blank', 'noopener,noreferrer');
     };
 
     return (
@@ -69,29 +105,31 @@ export const Footer = () => {
 
             <div className="contact-block">
                 <div className="main-contacts">
-                    <button className="contact-item" onClick={() => copyToClipboard(t('EMAIL'))}>
-                        <MailIcon /> {t('EMAIL')}
+                    <button className="contact-item" onClick={() => copyToClipboard(email)}>
+                        <MailIcon /> {email}
                     </button>
-                    <button className="contact-item" onClick={() => copyToClipboard(t('PHONE'))}>
-                        <PhoneIcon /> {t('PHONE')}
+                    <button className="contact-item" onClick={() => copyToClipboard(phone)}>
+                        <PhoneIcon /> {phone}
                     </button>
                 </div>
+
                 <div className="social-media">
-                    <button className="contact-item" onClick={handleFacebookClick}>
-                        Facebook
-                    </button>
-                    <button className="contact-item" onClick={handleTelegramClick}>
-                        Telegram
-                    </button>
-                    <button className="contact-item" onClick={handleInstagramClick}>
-                        Instagram
-                    </button>
+                    {socialLinks.map((link, idx) => (
+                        <button
+                            key={`${link.socialPlatform}-${idx}`}
+                            className="contact-item"
+                            onClick={() => window.open(link.url, '_blank', 'noopener,noreferrer')}
+                        >
+                            {PLATFORM_LABEL[link.socialPlatform] ?? `Social ${link.socialPlatform}`}
+                        </button>
+                    ))}
                 </div>
             </div>
+
             <div className="scrolling-text-wrapper">
                 <p className="scrolling-text">
-                    <span>{t('VICTORY_STARTS_WITH_YOU')} </span>
-                    <span> {t('VICTORY_STARTS_WITH_YOU')}</span>
+                    <span>{motto} </span>
+                    <span> {motto}</span>
                 </p>
             </div>
         </div>

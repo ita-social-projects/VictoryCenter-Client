@@ -1,91 +1,208 @@
 import { CompanyProfileApi } from './company-profile-api';
-import { mockCompanyProfile, mockCompanyProfileLanguages } from '@/utils/mock-data/admin/company-profile';
-import type { CompanyProfilePatch } from '@/utils/functions/mappers/admin/company-profile/company-profile-mappers';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
 
-const createMockPatch = (socialLinks: any[] = []): CompanyProfilePatch => ({
-    contact: {
-        phone: '+380000000000',
-        address: 'New UA address',
-        email: 'new@email.com',
-        correspondenceEmail: 'new-office@email.com',
-        motto: 'New motto',
-        localizations: [
-            { languageCode: 'uk', address: 'New UA address', motto: 'New motto' },
-            { languageCode: 'en', address: 'New EN address', motto: 'New EN motto' },
-        ],
+const validPatch = {
+    contacts: {
+        phone: '',
+        address: '',
+        email: '',
+        correspondenceEmail: '',
+        motto: undefined,
+        localizations: [],
     },
-    requisite: {
-        recipient: 'New recipient UA',
-        edrpou: '87654321',
-        address: 'New UA req address',
-        localizations: [
-            { languageCode: 'uk', recipient: 'New recipient UA', address: 'New UA req address' },
-            { languageCode: 'en', recipient: 'New recipient EN', address: 'New EN req address' },
-        ],
+    requisites: {
+        recipient: '',
+        edrpou: '',
+        address: '',
+        localizations: [],
     },
-    socialLinks,
-});
+    socialLinks: [],
+};
 
-describe('CompanyProfileApi', () => {
-    beforeEach(() => {
-        jest.useFakeTimers();
-        CompanyProfileApi.__resetMocks();
-    });
+describe('CompanyProfileApi (real http)', () => {
+    it('get() requests profile and languages and normalizes missing localizations', async () => {
+        const client = {
+            get: jest.fn(),
+        } as any;
 
-    afterEach(() => {
-        jest.useRealTimers();
-        jest.clearAllMocks();
-    });
-
-    it('should return mock profile and languages', async () => {
-        const promise = CompanyProfileApi.get({} as any);
-
-        jest.advanceTimersByTime(200);
-        const result = await promise;
-
-        expect(result).toEqual({
-            profile: mockCompanyProfile,
-            languages: mockCompanyProfileLanguages,
+        client.get.mockImplementation((url: string) => {
+            if (url === API_ROUTES.COMPANY_PROFILE.BASE) {
+                return Promise.resolve({
+                    data: {
+                        contacts: { phone: '+380' },
+                        requisites: { recipient: 'VC' },
+                        socialLinks: [],
+                    },
+                });
+            }
+            if (url === API_ROUTES.LOCALIZATION_LANGUAGE.BASE) {
+                return Promise.resolve({ data: [{ id: 1, code: 'uk', name: 'Ukrainian' }] });
+            }
+            throw new Error(`Unexpected url ${url}`);
         });
+
+        const res = await CompanyProfileApi.get(client);
+
+        expect(client.get).toHaveBeenCalledWith(API_ROUTES.COMPANY_PROFILE.BASE);
+        expect(client.get).toHaveBeenCalledWith(API_ROUTES.LOCALIZATION_LANGUAGE.BASE);
+
+        expect(res.profile.contact).toMatchObject({
+            phone: '+380',
+            localizations: [],
+        });
+
+        expect(res.profile.requisite).toMatchObject({
+            recipient: 'VC',
+            localizations: [],
+        });
+
+        expect(res.languages).toEqual([{ id: 1, code: 'uk', name: 'Ukrainian' }]);
     });
 
-    it('publish should update stored profile and be returned by subsequent get()', async () => {
-        const patch = createMockPatch([{ socialPlatform: 'Instagram', url: 'https://instagram.com/new' }]);
-        const publishPromise = CompanyProfileApi.publish({} as any, patch);
+    it('get() normalizes missing dto parts to defaults', async () => {
+        const client = { get: jest.fn() } as any;
 
-        jest.advanceTimersByTime(200);
-        const published = await publishPromise;
+        client.get.mockImplementation((url: string) => {
+            if (url === API_ROUTES.COMPANY_PROFILE.BASE) return Promise.resolve({ data: {} });
+            if (url === API_ROUTES.LOCALIZATION_LANGUAGE.BASE) return Promise.resolve({ data: [] });
+            throw new Error(`Unexpected url ${url}`);
+        });
 
-        expect(published.profile.contact.phone).toBe('+380000000000');
-        expect(published.profile.contact.email).toBe('new@email.com');
-        expect(published.profile.requisite.edrpou).toBe('87654321');
-        expect(published.profile.socialLinks[0]?.url).toBe('https://instagram.com/new');
+        const res = await CompanyProfileApi.get(client);
 
-        const getPromise = CompanyProfileApi.get({} as any);
+        expect(res.profile.id).toBeUndefined();
 
-        jest.advanceTimersByTime(200);
-        const afterGet = await getPromise;
+        expect(res.profile.contact).toMatchObject({
+            phone: '',
+            email: '',
+            address: '',
+            correspondenceEmail: '',
+            localizations: [],
+        });
 
-        expect(afterGet.profile.contact.phone).toBe('+380000000000');
-        expect(afterGet.profile.requisite.edrpou).toBe('87654321');
-        expect(afterGet.profile.socialLinks[0]?.url).toBe('https://instagram.com/new');
+        expect(res.profile.requisite).toMatchObject({
+            recipient: '',
+            edrpou: '',
+            address: '',
+            localizations: [],
+        });
+
+        expect(res.profile.socialLinks).toEqual([]);
     });
 
-    it('__resetMocks should restore initial mock profile', async () => {
-        const patch = createMockPatch([]);
-        const publishPromise = CompanyProfileApi.publish({} as any, patch);
+    it('publish() PUTs patch, refreshes languages and returns mapped profile', async () => {
+        const client = {
+            put: jest.fn(),
+            get: jest.fn(),
+        } as any;
 
-        jest.advanceTimersByTime(200);
-        await publishPromise;
+        client.put.mockResolvedValue({
+            data: {
+                contacts: { phone: '+380501112233' },
+                requisites: { recipient: 'Victory Center' },
+                socialLinks: [{ socialPlatform: 0, url: 'https://instagram.com/a' }],
+            },
+        });
 
-        CompanyProfileApi.__resetMocks();
+        client.get.mockResolvedValue({ data: [{ id: 1, code: 'uk', name: 'Ukrainian' }] });
 
-        const getPromise = CompanyProfileApi.get({} as any);
+        const res = await CompanyProfileApi.publish(client, validPatch as any);
 
-        jest.advanceTimersByTime(200);
-        const result = await getPromise;
+        expect(client.put).toHaveBeenCalledWith(API_ROUTES.COMPANY_PROFILE.BASE, expect.any(Object));
+        expect(client.get).toHaveBeenCalledWith(API_ROUTES.LOCALIZATION_LANGUAGE.BASE);
 
-        expect(result.profile).toEqual(mockCompanyProfile);
-        expect(result.languages).toEqual(mockCompanyProfileLanguages);
+        expect(res.profile.contact).toMatchObject({
+            phone: '+380501112233',
+            localizations: [],
+        });
+
+        expect(res.profile.requisite).toMatchObject({
+            recipient: 'Victory Center',
+            localizations: [],
+        });
+
+        expect(res.profile.socialLinks[0].socialPlatform).toBe(0);
+        expect(res.languages).toEqual([{ id: 1, code: 'uk', name: 'Ukrainian' }]);
+    });
+
+    it('publish() does not fail if languages refresh fails', async () => {
+        const client = {
+            put: jest.fn(),
+            get: jest.fn(),
+        } as any;
+
+        const fallbackLanguages = [{ id: 2, code: 'en', name: 'English' }];
+
+        client.put.mockResolvedValue({
+            data: {
+                contacts: { phone: '+380999999999' },
+                requisites: { recipient: 'Victory Center NGO' },
+                socialLinks: [],
+            },
+        });
+
+        client.get.mockRejectedValue(new Error('Localization service unavailable'));
+
+        const res = await CompanyProfileApi.publish(client, validPatch as any, fallbackLanguages as any);
+
+        expect(client.put).toHaveBeenCalledWith(API_ROUTES.COMPANY_PROFILE.BASE, expect.any(Object));
+        expect(client.get).toHaveBeenCalledWith(API_ROUTES.LOCALIZATION_LANGUAGE.BASE);
+
+        expect(res.profile.contact).toMatchObject({
+            phone: '+380999999999',
+            localizations: [],
+        });
+
+        expect(res.profile.requisite).toMatchObject({
+            recipient: 'Victory Center NGO',
+            localizations: [],
+        });
+
+        expect(res.languages).toEqual(fallbackLanguages);
+    });
+
+    it('publish() maps patch to backend dto shape before PUT', async () => {
+        const client = { put: jest.fn(), get: jest.fn() } as any;
+
+        client.put.mockResolvedValue({ data: { contacts: {}, requisites: {}, socialLinks: [] } });
+        client.get.mockResolvedValue({ data: [] });
+
+        const patch = {
+            contacts: {
+                phone: '+380',
+                address: 'UA',
+                email: 'a@a.com',
+                correspondenceEmail: 'b@b.com',
+                motto: 'motto',
+                localizations: [{ languageId: 1, address: 'UA', motto: 'UA motto' }],
+            },
+            requisites: {
+                recipient: 'VC',
+                edrpou: '12345678',
+                address: 'Req UA',
+                localizations: [{ languageId: 2, recipient: 'VC EN', address: 'Req EN' }],
+            },
+            socialLinks: [{ socialPlatform: 1, url: 'https://facebook.com/vc' }],
+        };
+
+        await CompanyProfileApi.publish(client, patch as any);
+
+        expect(client.put).toHaveBeenCalledWith(API_ROUTES.COMPANY_PROFILE.BASE, {
+            contacts: {
+                phone: '+380',
+                address: 'UA',
+                email: 'a@a.com',
+                correspondenceEmail: 'b@b.com',
+                motto: 'motto',
+                localizations: [{ languageId: 1, address: 'UA', motto: 'UA motto' }],
+            },
+            requisites: {
+                recipient: 'VC',
+                edrpou: '12345678',
+                address: 'Req UA',
+                localizations: [{ languageId: 2, recipient: 'VC EN', address: 'Req EN' }],
+            },
+            socialLinks: [{ socialPlatform: 1, url: 'https://facebook.com/vc' }],
+        });
     });
 });

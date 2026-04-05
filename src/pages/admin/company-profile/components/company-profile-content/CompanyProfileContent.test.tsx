@@ -226,9 +226,6 @@ describe('CompanyProfileContent', () => {
         render(<CompanyProfileContent />);
         expect(screen.getByTestId('tab-profile')).toBeInTheDocument();
 
-        fireEvent.click(screen.getByTestId('tab-btn-requisites'));
-        expect(screen.getByTestId('tab-requisites')).toBeInTheDocument();
-
         fireEvent.click(screen.getByTestId('tab-btn-socials'));
         expect(screen.getByTestId('tab-socials')).toBeInTheDocument();
     });
@@ -238,7 +235,7 @@ describe('CompanyProfileContent', () => {
         fireEvent.click(screen.getByTestId('edit-btn'));
 
         expect(screen.getByTestId('tab-profile')).toHaveAttribute('data-disabled', 'false');
-        fireEvent.click(screen.getByTestId('tab-btn-requisites'));
+        fireEvent.click(screen.getByTestId('tab-btn-socials'));
         expect(screen.getByTestId('tab-profile')).toBeInTheDocument();
     });
 

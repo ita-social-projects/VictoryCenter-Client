@@ -1,3 +1,10 @@
+import {
+    EntityLocalization,
+    EntityLocalizationDto,
+    EntityWithDtoLocalizations,
+    EntityWithLocalizations,
+} from '@/types/common/language';
+
 export type LocaleCode = 'uk' | 'en';
 
 export type SocialPlatform =
@@ -21,66 +28,140 @@ export const SOCIAL_PLATFORMS_ORDER: readonly SocialPlatform[] = [
     'Viber',
 ];
 
-export interface LocalizationLanguage {
-    id: number;
-    code: string;
-    name?: string;
-}
-
-export interface EntityLocalizationBase {
-    entityId: number;
-    languageId: number;
-    language?: LocalizationLanguage;
-    translationStatus?: number;
+// Domain/UI localizations
+export interface CompanyProfileContactLocalization extends EntityLocalization {
+    entityId?: number;
+    languageId?: number;
+    address?: string;
+    motto?: string;
     createdAt?: string;
 }
 
-export interface CompanyProfileContactLocalization extends EntityLocalizationBase {
-    address: string;
-    motto?: string;
+export interface CompanyProfileRequisiteLocalization extends EntityLocalization {
+    entityId?: number;
+    languageId?: number;
+    recipient?: string;
+    address?: string;
+    createdAt?: string;
 }
 
-export interface CompanyProfileRequisiteLocalization extends EntityLocalizationBase {
-    recipient: string;
-    address: string;
+// DTO localizations
+export interface CompanyProfileContactLocalizationDto extends EntityLocalizationDto {
+    entityId?: number;
+    address?: string | null;
+    motto?: string | null;
 }
 
+export interface CompanyProfileRequisiteLocalizationDto extends EntityLocalizationDto {
+    entityId?: number;
+    recipient?: string | null;
+    address?: string | null;
+}
+
+// Domain/UI model
 export interface CompanyProfileSocialLink {
-    id: number;
-    profileId: number;
-    socialPlatform: SocialPlatform;
+    id?: number;
+    profileId?: number;
+    socialPlatform: SocialPlatform | number;
     url: string;
     createdAt?: string;
 }
 
-export interface CompanyProfileContact {
-    id: number;
-    profileId: number;
+export interface CompanyProfileContact extends EntityWithLocalizations<CompanyProfileContactLocalization> {
+    id?: number;
+    profileId?: number;
     phone: string;
     address: string;
     email: string;
     correspondenceEmail: string;
     motto?: string;
-    localizations: CompanyProfileContactLocalization[];
     createdAt?: string;
 }
 
-export interface CompanyProfileRequisite {
-    id: number;
-    profileId: number;
+export interface CompanyProfileRequisite extends EntityWithLocalizations<CompanyProfileRequisiteLocalization> {
+    id?: number;
+    profileId?: number;
     recipient: string;
     edrpou: string;
     address: string;
-    localizations: CompanyProfileRequisiteLocalization[];
     createdAt?: string;
 }
 
 export interface CompanyProfile {
-    id: number;
+    id?: number;
     contact: CompanyProfileContact;
     requisite: CompanyProfileRequisite;
     socialLinks: CompanyProfileSocialLink[];
     createdAt?: string;
+}
+
+// Backend DTOs (contract)
+export interface CompanyProfileContactsDto extends EntityWithDtoLocalizations<CompanyProfileContactLocalizationDto> {
+    phone?: string | null;
+    address?: string | null;
+    email?: string | null;
+    correspondenceEmail?: string | null;
+    motto?: string | null;
+}
+
+export interface CompanyProfileRequisiteDto extends EntityWithDtoLocalizations<CompanyProfileRequisiteLocalizationDto> {
+    recipient?: string | null;
+    edrpou?: string | null;
+    address?: string | null;
+}
+
+export interface CompanyProfileSocialLinkDto {
+    id?: number;
+    profileId?: number;
+    socialPlatform: number | SocialPlatform;
+    url?: string | null;
+    createdAt?: string;
+}
+
+export interface CompanyProfileDto {
+    contacts?: CompanyProfileContactsDto | null;
+    requisites?: CompanyProfileRequisiteDto | null;
+    socialLinks?: CompanyProfileSocialLinkDto[] | null;
+}
+
+// PUT payload DTOs
+export interface UpdateCompanyProfileContactLocalizationDto {
+    languageId?: number;
+    address?: string;
+    motto?: string;
+}
+
+export interface UpdateCompanyProfileRequisiteLocalizationDto {
+    languageId?: number;
+    recipient?: string;
+    address?: string;
+}
+
+export interface UpdateCompanyProfileContactsDto {
+    phone: string;
+    address: string;
+    email: string;
+    correspondenceEmail: string;
+    motto?: string;
+    localizations: UpdateCompanyProfileContactLocalizationDto[];
+}
+
+export interface UpdateCompanyProfileRequisitesDto {
+    recipient: string;
+    edrpou: string;
+    address: string;
+    localizations: UpdateCompanyProfileRequisiteLocalizationDto[];
+}
+
+export interface UpdateCompanyProfileSocialLinkDto {
+    socialPlatform: number;
+    url: string;
+}
+
+export interface UpdateCompanyProfileDto {
+    contacts: UpdateCompanyProfileContactsDto;
+    requisites: UpdateCompanyProfileRequisitesDto;
+    socialLinks: UpdateCompanyProfileSocialLinkDto[];
 }
 
 export type CompanyProfileSocialContactFormValue = {

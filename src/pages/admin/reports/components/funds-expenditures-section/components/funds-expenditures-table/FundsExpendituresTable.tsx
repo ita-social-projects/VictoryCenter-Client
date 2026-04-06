@@ -48,6 +48,7 @@ interface FundsExpendituresTableProps {
         recordId: number,
         data: { categoryId: number; amountUah: string; amountUsd: string },
     ) => boolean | Promise<boolean>;
+    onDeleteRecord?: (record: EnrichedRecord) => void;
 }
 
 interface RowEditState {
@@ -144,6 +145,7 @@ export const FundsExpendituresTable = ({
     isRowActionsDisabled = false,
     onRowEditModeChange,
     onRecordSave,
+    onDeleteRecord,
 }: FundsExpendituresTableProps) => {
     const [sort, setSort] = useState<ColumnSort>({ column: null, direction: null });
     const [rowEditState, setRowEditState] = useState<RowEditState | null>(null);
@@ -733,6 +735,7 @@ export const FundsExpendituresTable = ({
                                                                 type="button"
                                                                 className={styles['icon-button']}
                                                                 aria-label={`Delete record ${record.id}`}
+                                                                onClick={() => onDeleteRecord?.(record)}
                                                                 disabled={isAnotherRowEditing}
                                                             >
                                                                 <DeleteIcon className={styles['action-icon']} />

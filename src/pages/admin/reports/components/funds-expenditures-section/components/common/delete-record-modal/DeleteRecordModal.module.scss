@@ -1,0 +1,14 @@
+.delete-record-modal {
+    max-width: 600px;
+}
+
+.delete-record-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+
+    button {
+        width: 45%;
+    }
+}

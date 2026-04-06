@@ -30,8 +30,8 @@ import {
 } from './components/funds-expenditures-toolbar/FundsExpendituresToolbar';
 import { EnrichedRecord, FundsExpendituresTable } from './components/funds-expenditures-table/FundsExpendituresTable';
 import { AddIncomeModal } from './components/common/add-income-modal/AddIncomeModal';
+import { DeleteRecordModal } from './components/common/delete-record-modal/DeleteRecordModal';
 import styles from './FundsExpendituresSection.module.scss';
-import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 
 const enrichRecords = (
     records: ReportFundsExpendituresRecord[],
@@ -444,15 +444,15 @@ export const FundsExpenditureSection = () => {
                 onSubmit={handleCreateRecord}
             />
 
-            <ConfirmationModal
+            <DeleteRecordModal
                 isOpen={isDeleteModalOpen}
                 title={FUNDS_EXPENDITURES_TEXT.MODAL.DELETE.TITLE}
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
+                isButtonsDisabled={isDeletingRecord}
                 onConfirm={handleConfirmDelete}
                 onCancel={() => setIsDeleteModalOpen(false)}
                 onClose={() => setIsDeleteModalOpen(false)}
-                isButtonsDisabled={isDeletingRecord}
             />
         </div>
     );

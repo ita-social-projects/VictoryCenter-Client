@@ -304,34 +304,6 @@ jest.mock('@/services/api/admin/reports/funds-expenditures-api', () => ({
     },
 }));
 
-jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
-    ConfirmationModal: ({
-        isOpen,
-        onConfirm,
-        onCancel,
-        onClose,
-        isButtonsDisabled,
-    }: {
-        isOpen: boolean;
-        onConfirm: () => void;
-        onCancel: () => void;
-        onClose: () => void;
-        isButtonsDisabled?: boolean;
-    }) => (
-        <div data-testid="delete-confirmation-modal" data-open={String(isOpen)}>
-            <button data-testid="confirm-delete-record" onClick={onConfirm} disabled={isButtonsDisabled}>
-                Confirm delete
-            </button>
-            <button data-testid="cancel-delete-record" onClick={onCancel}>
-                Cancel delete
-            </button>
-            <button data-testid="close-delete-record" onClick={onClose}>
-                Close delete
-            </button>
-        </div>
-    ),
-}));
-
 const setupMockDataFetch = (
     settings: ReportFundsExpendituresSettings | null = MOCK_FUNDS_EXPENDITURES_SETTINGS,
     categories: ReportFundsExpendituresCategory[] = MOCK_FUNDS_EXPENDITURES_CATEGORIES,
@@ -802,9 +774,9 @@ describe('FundsExpenditureSection', () => {
             );
 
             fireEvent.click(screen.getByTestId('trigger-record-delete'));
-            expect(screen.getByTestId('delete-confirmation-modal')).toHaveAttribute('data-open', 'true');
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE.TITLE)).toBeInTheDocument();
 
-            fireEvent.click(screen.getByTestId('confirm-delete-record'));
+            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
 
             await waitFor(() => {
                 expect(mockDeleteRecord).toHaveBeenCalledWith({}, 1);
@@ -816,7 +788,7 @@ describe('FundsExpenditureSection', () => {
                     'data-record-count',
                     String(MOCK_FUNDS_EXPENDITURES_RECORDS.length - 1),
                 );
-                expect(screen.getByTestId('delete-confirmation-modal')).toHaveAttribute('data-open', 'false');
+                expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE.TITLE)).not.toBeInTheDocument();
             });
         });
 
@@ -827,7 +799,7 @@ describe('FundsExpenditureSection', () => {
 
             fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT));
             fireEvent.click(screen.getByTestId('trigger-record-delete'));
-            fireEvent.click(screen.getByTestId('confirm-delete-record'));
+            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
 
             await waitFor(() => {
                 expect(mockDeleteRecord).toHaveBeenCalledWith({}, 1);
@@ -835,7 +807,7 @@ describe('FundsExpenditureSection', () => {
                     FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_DELETE_FAILED_RETRY,
                     'error',
                 );
-                expect(screen.getByTestId('delete-confirmation-modal')).toHaveAttribute('data-open', 'true');
+                expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE.TITLE)).toBeInTheDocument();
                 expect(screen.getByTestId('funds-table')).toHaveAttribute(
                     'data-record-count',
                     String(MOCK_FUNDS_EXPENDITURES_RECORDS.length),
@@ -849,11 +821,11 @@ describe('FundsExpenditureSection', () => {
             fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT));
             fireEvent.click(screen.getByTestId('trigger-record-delete'));
 
-            expect(screen.getByTestId('delete-confirmation-modal')).toHaveAttribute('data-open', 'true');
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE.TITLE)).toBeInTheDocument();
 
-            fireEvent.click(screen.getByTestId('cancel-delete-record'));
+            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.NO));
 
-            expect(screen.getByTestId('delete-confirmation-modal')).toHaveAttribute('data-open', 'false');
+            expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE.TITLE)).not.toBeInTheDocument();
         });
     });
 });

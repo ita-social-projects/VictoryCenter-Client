@@ -7,10 +7,10 @@ import {
 } from '@/types/admin/reports';
 import { ReactComponent as NotFoundIcon } from '@/assets/icons/not-found.svg';
 import { ReactComponent as ArrowUpIcon } from '@/assets/icons/arrow-up.svg';
-import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
-import { ReactComponent as DeleteIcon } from '@/assets/icons/delete.svg';
 import { ReactComponent as CheckmarkIcon } from '@/assets/icons/checkmark.svg';
 import { ReactComponent as CrossIcon } from '@/assets/icons/cross.svg';
+import { IconButton } from '@/components/admin/icon-button/IconButton';
+import { ACTION_ICONS } from '@/const/common/action-icons';
 import { Select } from '@/components/common/select/Select';
 import { SortIcon } from '@/pages/admin/reports/components/funds-expenditures-section/components/funds-expenditures-table/components/sort-icon';
 import {
@@ -722,24 +722,30 @@ export const FundsExpendituresTable = ({
                                                         </>
                                                     ) : (
                                                         <>
-                                                            <button
+                                                            <IconButton
                                                                 type="button"
-                                                                className={styles['icon-button']}
+                                                                className={cn(
+                                                                    styles['icon-button'],
+                                                                    styles['edit-icon-button'],
+                                                                )}
                                                                 aria-label={`Edit record ${record.id}`}
                                                                 onClick={() => handleStartRowEdit(record)}
                                                                 disabled={isAnotherRowEditing}
-                                                            >
-                                                                <EditIcon className={styles['action-icon']} />
-                                                            </button>
-                                                            <button
+                                                                DefaultIcon={ACTION_ICONS.edit.default}
+                                                                FilledIcon={ACTION_ICONS.edit.hover}
+                                                            />
+                                                            <IconButton
                                                                 type="button"
-                                                                className={styles['icon-button']}
+                                                                className={cn(
+                                                                    styles['icon-button'],
+                                                                    styles['delete-icon-button'],
+                                                                )}
                                                                 aria-label={`Delete record ${record.id}`}
                                                                 onClick={() => onDeleteRecord?.(record)}
                                                                 disabled={isAnotherRowEditing}
-                                                            >
-                                                                <DeleteIcon className={styles['action-icon']} />
-                                                            </button>
+                                                                DefaultIcon={ACTION_ICONS.delete.default}
+                                                                FilledIcon={ACTION_ICONS.delete.hover}
+                                                            />
                                                         </>
                                                     )}
                                                 </div>

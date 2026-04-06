@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { PDF_FILES_SECTION_TEXT, PDF_FILES_SECTION_VALIDATION, REPORTS_TEXT } from '@/const/admin/reports';
+import { PDF_FILES_SECTION_TEXT, PDF_FILES_SECTION_VALIDATION } from '@/const/admin/reports';
 import {
     PDF_SECTION_FIELD_VALIDATORS,
     PdfSectionFormData,
@@ -12,6 +12,7 @@ import { PdfSectionApi } from '@/services/api/admin/reports/pdf-section/pdf-sect
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { Button } from '@/components/admin/button/Button';
+import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import styles from './PdfSectionContentBlock.module.scss';
 import './PdfSectionContentBlock.scss';
 import cn from 'classnames';
@@ -29,9 +30,13 @@ interface PdfSectionContentBlockProps {
     onSave?: (data: PdfSectionContent) => Promise<void>;
 }
 
+type ConfirmationModalType = 'publish' | 'cancel' | null;
+
 export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({ content, onSave }) => {
     const client = useAdminClient();
     const [isEditMode, setIsEditMode] = useState(false);
+    const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
+    const [confirmationModalType, setConfirmationModalType] = useState<ConfirmationModalType>(null);
     const [formData, setFormData] = useState<PdfSectionFormData>({
         title: content.title,
         description: content.description,
@@ -71,22 +76,26 @@ export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({ 
         getNormalizedInputText(formData.title) !== getNormalizedInputText(content.title) ||
         getNormalizedInputText(formData.description) !== getNormalizedInputText(content.description);
 
-    const handleCancel = useCallback(() => {
+    const handleCancelClick = useCallback(() => {
+        if (hasChanges) {
+            setConfirmationModalType('cancel');
+            setIsConfirmationModalOpen(true);
+        } else {
+            setFormData({ title: content.title, description: content.description });
+            setErrors({});
+            setIsEditMode(false);
+        }
+    }, [content, hasChanges]);
+
+    const handleCancelConfirmed = useCallback(() => {
+        setIsConfirmationModalOpen(false);
+        setConfirmationModalType(null);
         setFormData({ title: content.title, description: content.description });
         setErrors({});
         setIsEditMode(false);
     }, [content]);
 
-    const handleSave = async () => {
-        const titleError = PDF_SECTION_FIELD_VALIDATORS.validateTitle(formData.title);
-        const descriptionError = PDF_SECTION_FIELD_VALIDATORS.validateDescription(formData.description);
-        const newErrors = { title: titleError, description: descriptionError };
-        setErrors(newErrors);
-
-        if (titleError || descriptionError) {
-            return;
-        }
-
+    const handleSaveConfirmed = useCallback(async () => {
         setIsSaving(true);
         try {
             const normalizedData = {
@@ -101,94 +110,155 @@ export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({ 
             }
 
             setIsEditMode(false);
-            addToast(REPORTS_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY, ToastType.Success);
+            addToast(COMMON_TEXT_ADMIN.MESSAGE.UPDATES_SUCCESSFULLY_PUBLISHED, ToastType.Success);
         } catch {
-            addToast(REPORTS_TEXT.MESSAGE.RECORD_UPDATE_FAILED_RETRY, ToastType.Error);
+            addToast(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_PUBLISH_CHANGES, ToastType.Error);
         } finally {
             setIsSaving(false);
         }
+    }, [formData.title, formData.description, client, onSave, addToast]);
+
+    const handleConfirmPublish = useCallback(() => {
+        setIsConfirmationModalOpen(false);
+        setConfirmationModalType(null);
+        handleSaveConfirmed();
+    }, [handleSaveConfirmed]);
+
+    const handleSave = async () => {
+        const titleError = PDF_SECTION_FIELD_VALIDATORS.validateTitle(formData.title);
+        const descriptionError = PDF_SECTION_FIELD_VALIDATORS.validateDescription(formData.description);
+        const newErrors = { title: titleError, description: descriptionError };
+        setErrors(newErrors);
+
+        if (titleError || descriptionError) {
+            return;
+        }
+
+        setConfirmationModalType('publish');
+        setIsConfirmationModalOpen(true);
     };
 
     const isSaveDisabled = hasErrors || !hasChanges || isSaving;
 
-    if (isEditMode) {
-        return (
-            <div className={cn(styles.root, styles['edit-root'])}>
-                <form className={styles['edit-form']}>
-                    <InputWithCharacterLimitGroup
-                        id="pdf-section-title"
-                        name="title"
-                        className="pdf-section-input"
-                        label={PDF_FILES_SECTION_TEXT.TITLE}
-                        value={formData.title}
-                        onChange={handleTitleChange}
-                        onBlur={handleTitleBlur}
-                        maxLength={PDF_FILES_SECTION_VALIDATION.title.max}
-                        placeholder="Введіть заголовок"
-                        error={errors.title}
-                        isRequired
-                    />
-                    <TextAreaWithCharacterLimitGroup
-                        id="pdf-section-description"
-                        name="description"
-                        className="pdf-section-textarea"
-                        label={PDF_FILES_SECTION_TEXT.DESCRIPTION}
-                        value={formData.description}
-                        onChange={handleDescriptionChange}
-                        onBlur={handleDescriptionBlur}
-                        maxLength={PDF_FILES_SECTION_VALIDATION.description.max}
-                        placeholder="Введіть опис"
-                        error={errors.description}
-                        isRequired
-                        rows={2}
-                    />
-                    <div className={styles['edit-actions']}>
-                        <Button
-                            buttonStyle="secondary"
-                            type="button"
-                            className={cn(styles.button, styles['cancel-button'])}
-                            onClick={handleCancel}
+    const renderContent = () => {
+        if (isEditMode) {
+            return (
+                <div className={cn(styles.root, styles['edit-root'])}>
+                    <form className={styles['edit-form']}>
+                        <InputWithCharacterLimitGroup
+                            id="pdf-section-title"
+                            name="title"
+                            className="pdf-section-input"
+                            label={PDF_FILES_SECTION_TEXT.TITLE}
+                            value={formData.title}
+                            onChange={handleTitleChange}
+                            onBlur={handleTitleBlur}
+                            maxLength={PDF_FILES_SECTION_VALIDATION.title.max}
+                            placeholder="Введіть заголовок"
+                            error={errors.title}
+                            isRequired
                             disabled={isSaving}
-                        >
-                            {COMMON_TEXT_ADMIN.BUTTON.CANCEL}
-                        </Button>
-                        <Button
-                            buttonStyle="primary"
-                            type="button"
-                            className={cn(styles.button, styles['save-button'])}
-                            onClick={handleSave}
-                            disabled={isSaveDisabled}
-                        >
-                            {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
-                        </Button>
+                        />
+                        <TextAreaWithCharacterLimitGroup
+                            id="pdf-section-description"
+                            name="description"
+                            className="pdf-section-textarea"
+                            label={PDF_FILES_SECTION_TEXT.DESCRIPTION}
+                            value={formData.description}
+                            onChange={handleDescriptionChange}
+                            onBlur={handleDescriptionBlur}
+                            maxLength={PDF_FILES_SECTION_VALIDATION.description.max}
+                            placeholder="Введіть опис"
+                            error={errors.description}
+                            isRequired
+                            rows={2}
+                            disabled={isSaving}
+                        />
+                        <div className={styles['edit-actions']}>
+                            <Button
+                                buttonStyle="secondary"
+                                type="button"
+                                className={cn(styles.button, styles['cancel-button'])}
+                                onClick={handleCancelClick}
+                                disabled={isSaving}
+                            >
+                                {COMMON_TEXT_ADMIN.BUTTON.CANCEL}
+                            </Button>
+                            <Button
+                                buttonStyle="primary"
+                                type="button"
+                                className={cn(styles.button, styles['save-button'])}
+                                onClick={handleSave}
+                                disabled={isSaveDisabled}
+                            >
+                                {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
+                            </Button>
+                        </div>
+                    </form>
+                </div>
+            );
+        }
+
+        return (
+            <div className={cn(styles.root, styles['view-root'])}>
+                <div className={styles['edit-button-container']}>
+                    <IconButton
+                        aria-label={PDF_FILES_SECTION_TEXT.ACTIONS.EDIT}
+                        type="button"
+                        onClick={handleEditClick}
+                        className={styles['edit-button']}
+                        DefaultIcon={ACTION_ICONS.edit.default}
+                        FilledIcon={ACTION_ICONS.edit.hover}
+                    />
+                </div>
+                <div className={styles['content-container']}>
+                    <div className={styles['view-field']}>
+                        <label className={styles['view-label']}>{PDF_FILES_SECTION_TEXT.TITLE}</label>
+                        <p className={cn(styles['view-text'], styles['view-text-title'])}>{formData.title}</p>
                     </div>
-                </form>
+                    <div className={styles['view-field']}>
+                        <label className={styles['view-label']}>{PDF_FILES_SECTION_TEXT.DESCRIPTION}</label>
+                        <p className={cn(styles['view-text'], styles['view-text-description'])}>
+                            {formData.description}
+                        </p>
+                    </div>
+                </div>
             </div>
         );
-    }
+    };
+
+    const getModalConfig = () => {
+        if (confirmationModalType === 'cancel') {
+            return {
+                title: COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE,
+                onConfirm: handleCancelConfirmed,
+            };
+        }
+        return {
+            title: COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES,
+            onConfirm: handleConfirmPublish,
+        };
+    };
+
+    const modalConfig = getModalConfig();
 
     return (
-        <div className={cn(styles.root, styles['view-root'])}>
-            <div className={styles['edit-button-container']}>
-                <IconButton
-                    aria-label={PDF_FILES_SECTION_TEXT.ACTIONS.EDIT}
-                    type="button"
-                    onClick={handleEditClick}
-                    className={styles['edit-button']}
-                    DefaultIcon={ACTION_ICONS.edit.default}
-                    FilledIcon={ACTION_ICONS.edit.hover}
-                />
-            </div>
-            <div className={styles['content-container']}>
-                <div className={styles['view-field']}>
-                    <label className={styles['view-label']}>{PDF_FILES_SECTION_TEXT.TITLE}</label>
-                    <p className={cn(styles['view-text'], styles['view-text-title'])}>{formData.title}</p>
-                </div>
-                <div className={styles['view-field']}>
-                    <label className={styles['view-label']}>{PDF_FILES_SECTION_TEXT.DESCRIPTION}</label>
-                    <p className={cn(styles['view-text'], styles['view-text-description'])}>{formData.description}</p>
-                </div>
-            </div>
-        </div>
+        <>
+            {renderContent()}
+            <ConfirmationModal
+                isOpen={isConfirmationModalOpen}
+                onClose={() => {
+                    setIsConfirmationModalOpen(false);
+                    setConfirmationModalType(null);
+                }}
+                title={modalConfig.title}
+                onConfirm={modalConfig.onConfirm}
+                onCancel={() => {
+                    setIsConfirmationModalOpen(false);
+                    setConfirmationModalType(null);
+                }}
+                isButtonsDisabled={isSaving}
+            />
+        </>
     );
 };

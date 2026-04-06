@@ -58,6 +58,24 @@ jest.mock(
     }),
 );
 
+jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
+    ConfirmationModal: ({ isOpen, title, onConfirm, onCancel }: any) => {
+        if (!isOpen) return null;
+
+        return (
+            <div data-testid="add-income-confirmation-modal" data-open={String(isOpen)}>
+                <div data-testid="add-income-confirmation-title">{title}</div>
+                <button data-testid="confirm-add-income" onClick={onConfirm}>
+                    Yes
+                </button>
+                <button data-testid="cancel-add-income" onClick={onCancel}>
+                    No
+                </button>
+            </div>
+        );
+    },
+}));
+
 jest.mock('@/components/admin/input-with-character-limit/InputWithCharacterLimit', () => ({
     InputWithCharacterLimit: ({ id, name, value, onChange, onBlur, maxLength, hasError }: any) => (
         <input
@@ -185,6 +203,10 @@ describe('AddIncomeModal', () => {
     const clickSubmitButton = async (user: ReturnType<typeof userEvent.setup>) => {
         const submitButton = screen.getByTestId('modal-submit');
         await user.click(submitButton);
+        const confirmButton = screen.queryByTestId('confirm-add-income');
+        if (confirmButton) {
+            await user.click(confirmButton);
+        }
     };
 
     const forceSubmitAndWaitForNoSubmitCall = async (user: ReturnType<typeof userEvent.setup>) => {
@@ -567,6 +589,43 @@ describe('AddIncomeModal', () => {
             await user.click(submitButton);
 
             expect(submitButton).toBeInTheDocument();
+        });
+
+        it('should open add confirmation modal when submit button is clicked', async () => {
+            const user = userEvent.setup({ delay: null });
+
+            renderAddIncomeModal({ records: [], exchangeRate: null });
+
+            await fillRequiredFormFields(user, {
+                category: '3',
+                amountUah: '700',
+                amountUsd: '17',
+                selectionMode: 'select',
+            });
+
+            await user.click(screen.getByTestId('modal-submit'));
+
+            expect(screen.getByTestId('add-income-confirmation-modal')).toHaveAttribute('data-open', 'true');
+            expect(screen.getByTestId('add-income-confirmation-title')).toHaveTextContent('Додати нове надходження?');
+        });
+
+        it('should close confirmation without submit when clicking No', async () => {
+            const user = userEvent.setup({ delay: null });
+
+            renderAddIncomeModal({ records: [], exchangeRate: null });
+
+            await fillRequiredFormFields(user, {
+                category: '3',
+                amountUah: '700',
+                amountUsd: '17',
+                selectionMode: 'select',
+            });
+
+            await user.click(screen.getByTestId('modal-submit'));
+            await user.click(screen.getByTestId('cancel-add-income'));
+
+            expect(screen.queryByTestId('add-income-confirmation-modal')).not.toBeInTheDocument();
+            expect(mockOnSubmit).not.toHaveBeenCalled();
         });
     });
 

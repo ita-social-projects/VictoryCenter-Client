@@ -321,7 +321,7 @@ export const AddIncomeModal = ({
                 title={FUNDS_EXPENDITURES_TEXT.MODAL.INCOME.CONFIRM_ADD_TITLE}
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
-                onConfirm={() => void handleConfirmAdd()}
+                onConfirm={() => handleConfirmAdd()}
                 onCancel={() => setIsAddConfirmationOpen(false)}
                 onClose={() => setIsAddConfirmationOpen(false)}
                 isButtonsDisabled={isSubmitting}

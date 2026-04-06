@@ -154,6 +154,7 @@ export const FUNDS_EXPENDITURES_TEXT = {
             CATEGORY_LABEL: 'Категорія надходження',
             CATEGORY_PLACEHOLDER: 'Оберіть категорію надходження',
             SUBMIT_BUTTON: 'Додати надходження',
+            CONFIRM_ADD_TITLE: 'Додати нове надходження?',
         },
         EXPENSE: {
             TITLE: 'Додати витрату',

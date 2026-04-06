@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
 import { InputWithCharacterLimit } from '@/components/admin/input-with-character-limit/InputWithCharacterLimit';
@@ -72,6 +72,21 @@ export const AddIncomeModal = ({
     }, [categories]);
 
     const yearOptions = useMemo(() => getReportingYearOptions(), []);
+
+    const isCategorySelectDisabled = incomeCategories.length === 0;
+
+    useEffect(() => {
+        if (isCategorySelectDisabled) {
+            setFormState((prev) => ({
+                ...prev,
+                categoryId: undefined,
+                errors: {
+                    ...prev.errors,
+                    categoryId: undefined,
+                },
+            }));
+        }
+    }, [isCategorySelectDisabled]);
 
     const resetForm = useCallback(() => {
         setFormState(INITIAL_STATE);
@@ -223,26 +238,35 @@ export const AddIncomeModal = ({
                         <span className={styles.required}>*</span>
                         {FUNDS_EXPENDITURES_TEXT.MODAL.INCOME.CATEGORY_LABEL}
                     </label>
-                    <Select<number>
-                        value={formState.categoryId}
-                        onValueChange={(value) => {
-                            setFormState((prev) => ({
-                                ...prev,
-                                categoryId: value,
-                                errors: {
-                                    ...prev.errors,
-                                    categoryId: getCategoryError(value, 'change'),
-                                },
-                            }));
-                        }}
-                        placeholder={FUNDS_EXPENDITURES_TEXT.MODAL.INCOME.CATEGORY_PLACEHOLDER}
-                        className={styles.select}
-                        optionClassName={styles['select-option']}
-                    >
-                        {incomeCategories.map((category) => (
-                            <Select.Option key={category.id} value={category.id} name={category.name} />
-                        ))}
-                    </Select>
+                    {isCategorySelectDisabled ? (
+                        <div
+                            className={styles['disabled-select-placeholder']}
+                            data-testid="income-category-disabled-placeholder"
+                        >
+                            {FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.CATEGORY_NO_AVAILABLE}
+                        </div>
+                    ) : (
+                        <Select<number>
+                            value={formState.categoryId}
+                            onValueChange={(value) => {
+                                setFormState((prev) => ({
+                                    ...prev,
+                                    categoryId: value,
+                                    errors: {
+                                        ...prev.errors,
+                                        categoryId: getCategoryError(value, 'change'),
+                                    },
+                                }));
+                            }}
+                            placeholder={FUNDS_EXPENDITURES_TEXT.MODAL.INCOME.CATEGORY_PLACEHOLDER}
+                            className={styles.select}
+                            optionClassName={styles['select-option']}
+                        >
+                            {incomeCategories.map((category) => (
+                                <Select.Option key={category.id} value={category.id} name={category.name} />
+                            ))}
+                        </Select>
+                    )}
                     {formState.errors.categoryId && <p className={styles.error}>{formState.errors.categoryId}</p>}
                 </div>
 

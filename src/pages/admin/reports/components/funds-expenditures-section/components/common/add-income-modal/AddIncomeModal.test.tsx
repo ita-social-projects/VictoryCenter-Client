@@ -2,6 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { AddIncomeModal } from './AddIncomeModal';
+import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
 import { ReportFundsExpendituresCategory, ReportFundsExpendituresRecord } from '@/types/admin/reports';
 
 const MOCK_CATEGORIES: ReportFundsExpendituresCategory[] = [
@@ -25,6 +26,7 @@ jest.mock('./AddIncomeModal.module.scss', () => ({
     required: 'required',
     select: 'select',
     'select-option': 'select-option',
+    'disabled-select-placeholder': 'disabled-select-placeholder',
     input: 'input',
     error: 'error',
     'amount-usd-header': 'amount-usd-header',
@@ -283,6 +285,26 @@ describe('AddIncomeModal', () => {
                 />,
             );
             expect(screen.getByTestId('funds-record-modal')).toBeInTheDocument();
+        });
+
+        it('should render placeholder div instead of category select when no income categories are available', () => {
+            renderAddIncomeModal({
+                categories: [{ id: 10, name: 'Адміністративні витрати', type: 'expense' }],
+            });
+
+            expect(screen.getByTestId('income-category-disabled-placeholder')).toBeInTheDocument();
+            expect(screen.queryByTestId('select-Оберіть категорію надходження')).not.toBeInTheDocument();
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.CATEGORY_NO_AVAILABLE)).toBeInTheDocument();
+        });
+
+        it('should keep category field enabled when at least one income category exists', () => {
+            renderAddIncomeModal();
+
+            const categorySelect = screen.getByTestId(
+                `select-${FUNDS_EXPENDITURES_TEXT.MODAL.INCOME.CATEGORY_PLACEHOLDER}`,
+            ) as HTMLSelectElement;
+
+            expect(categorySelect).toBeEnabled();
         });
 
         it('should render with null exchange rate', () => {

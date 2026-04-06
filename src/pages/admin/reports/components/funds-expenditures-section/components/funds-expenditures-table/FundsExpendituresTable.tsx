@@ -537,9 +537,20 @@ export const FundsExpendituresTable = ({
                                 >
                                     <div className={styles['empty-state']}>
                                         <NotFoundIcon className={styles['empty-state-image']} />
-                                        <p className={styles['empty-state-message']}>
-                                            {FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.MESSAGE}
-                                        </p>
+                                        {isEditing ? (
+                                            <p className={styles['empty-state-message']}>
+                                                {FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.MESSAGE}
+                                            </p>
+                                        ) : (
+                                            <>
+                                                <p className={styles['empty-state-title']}>
+                                                    {FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.TITLE}
+                                                </p>
+                                                <p className={styles['empty-state-message']}>
+                                                    {FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.ADD_RECORD}
+                                                </p>
+                                            </>
+                                        )}
                                     </div>
                                 </td>
                             </tr>

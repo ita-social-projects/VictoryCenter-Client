@@ -126,6 +126,13 @@
     margin: 0;
 }
 
+.empty-state-title {
+    @include type.h4-semibold;
+    line-height: 24px;
+    color: c.$blue-900;
+    margin: 0;
+}
+
 .checkbox-th,
 .checkbox-td {
     width: 48px;

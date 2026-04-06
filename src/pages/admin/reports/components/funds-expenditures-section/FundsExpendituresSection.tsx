@@ -10,6 +10,7 @@ import { Button } from '@/components/admin/button/Button';
 import { ACTION_ICONS } from '@/const/common/action-icons';
 import { FundsExpendituresApi } from '@/services/api/admin/reports/funds-expenditures-api';
 import {
+    FundsExpendituresTransactionType,
     FundsExpendituresSummary,
     ReportFundsExpendituresCategory,
     ReportFundsExpendituresRecord,
@@ -28,6 +29,7 @@ import {
     TypeFilterValue,
 } from './components/funds-expenditures-toolbar/FundsExpendituresToolbar';
 import { EnrichedRecord, FundsExpendituresTable } from './components/funds-expenditures-table/FundsExpendituresTable';
+import { AddIncomeModal } from './components/common/add-income-modal/AddIncomeModal';
 import styles from './FundsExpendituresSection.module.scss';
 
 const enrichRecords = (
@@ -55,6 +57,7 @@ export const FundsExpenditureSection = () => {
     const [selectedCategoryId, setSelectedCategoryId] = useState<CategoryFilterValue>(undefined);
     const [recordsState, setRecordsState] = useState<ReportFundsExpendituresRecord[]>([]);
     const [isRowEditMode, setIsRowEditMode] = useState(false);
+    const [isAddIncomeModalOpen, setIsAddIncomeModalOpen] = useState(false);
 
     const handleEdit = useCallback(() => setIsEditing(true), []);
     const handleCancel = useCallback(() => {
@@ -89,6 +92,14 @@ export const FundsExpenditureSection = () => {
     const handleTypeChange = useCallback((type: TypeFilterValue) => {
         setSelectedType(type);
         setSelectedCategoryId(undefined);
+    }, []);
+
+    const handleOpenAddIncomeModal = useCallback(() => {
+        setIsAddIncomeModalOpen(true);
+    }, []);
+
+    const handleCloseAddIncomeModal = useCallback(() => {
+        setIsAddIncomeModalOpen(false);
     }, []);
 
     const fetchSettings = useCallback(
@@ -217,14 +228,44 @@ export const FundsExpenditureSection = () => {
 
                 setRecordsState((prev) => prev.map((record) => (record.id === recordId ? updatedRecord : record)));
                 refetchSummary();
-                addToast(REPORTS_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY, ToastType.Success);
+                addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY, ToastType.Success);
                 return true;
             } catch {
-                addToast(REPORTS_TEXT.MESSAGE.RECORD_UPDATE_FAILED_RETRY, ToastType.Error);
+                addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_UPDATE_FAILED_RETRY, ToastType.Error);
                 return false;
             }
         },
         [addToast, adminClient, recordsState, refetchSummary],
+    );
+
+    const handleCreateRecord = useCallback(
+        async (data: {
+            categoryId: number;
+            reportingYear: string;
+            amountUah: string;
+            amountUsd: string;
+            type: FundsExpendituresTransactionType;
+        }): Promise<boolean> => {
+            try {
+                const createdRecord = await FundsExpendituresApi.createRecord(adminClient, {
+                    categoryId: data.categoryId,
+                    reportingYear: data.reportingYear,
+                    amountUah: data.amountUah,
+                    amountUsd: data.amountUsd,
+                    type: data.type,
+                });
+
+                setRecordsState((prev) => [...prev, createdRecord]);
+                refetchSummary();
+                addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_CREATED_SUCCESSFULLY, ToastType.Success);
+                setIsAddIncomeModalOpen(false);
+                return true;
+            } catch {
+                addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_CREATE_FAILED_RETRY, ToastType.Error);
+                return false;
+            }
+        },
+        [addToast, adminClient, refetchSummary],
     );
 
     const handlePublish = useCallback(async () => {
@@ -335,7 +376,7 @@ export const FundsExpenditureSection = () => {
                 onExchangeRateChange={handleExchangeRateChange}
                 onExchangeRateBlur={handleExchangeRateBlur}
                 exchangeRateError={exchangeRateError}
-                onAddIncome={() => {}}
+                onAddIncome={handleOpenAddIncomeModal}
                 onAddExpense={() => {}}
             />
 
@@ -353,7 +394,7 @@ export const FundsExpenditureSection = () => {
             {isEditing && (
                 <div className={styles['section-footer']}>
                     <Button buttonStyle="secondary" className={styles['footer-button']} onClick={handleCancel}>
-                        {FUNDS_EXPENDITURES_TEXT.BUTTON.CANCEL}
+                        {COMMON_TEXT_ADMIN.BUTTON.CANCEL}
                     </Button>
                     <Button
                         buttonStyle="primary"
@@ -361,10 +402,19 @@ export const FundsExpenditureSection = () => {
                         onClick={handlePublish}
                         disabled={!isPublishEnabled || isRowEditMode}
                     >
-                        {FUNDS_EXPENDITURES_TEXT.BUTTON.PUBLISH}
+                        {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
                     </Button>
                 </div>
             )}
+
+            <AddIncomeModal
+                isOpen={isAddIncomeModalOpen}
+                onClose={handleCloseAddIncomeModal}
+                categories={categories}
+                records={recordsState}
+                exchangeRate={currentExchangeRate}
+                onSubmit={handleCreateRecord}
+            />
         </div>
     );
 };

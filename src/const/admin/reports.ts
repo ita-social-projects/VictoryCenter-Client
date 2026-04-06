@@ -134,10 +134,37 @@ export const FUNDS_EXPENDITURES_VALIDATION = {
 export const FUNDS_EXPENDITURES_TEXT = {
     DISCLAIMER_LABEL: 'Дісклеймер/ENG',
     EXCHANGE_RATE_LABEL: 'Курс USD/UAH',
+    MESSAGE: {
+        RECORD_CREATED_SUCCESSFULLY: 'Запис додано успішно',
+        RECORD_CREATE_FAILED_RETRY: 'Не вдалося додати запис. Спробуйте ще раз',
+        RECORD_UPDATED_SUCCESSFULLY: 'Зміни збережено успішно',
+        RECORD_UPDATE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
+    },
+    MODAL: {
+        SHARED: {
+            REPORTING_YEAR_LABEL: 'Звітній рік',
+            REPORTING_YEAR_PLACEHOLDER: 'Оберіть звітній рік',
+            AMOUNT_UAH_LABEL: 'Сума (UAH)',
+            AMOUNT_USD_LABEL: 'Сума (USD)',
+            CONFIRM_CLOSE_TITLE: 'Зміни будуть втрачені. Бажаєте продовжити?',
+        },
+        INCOME: {
+            TITLE: 'Додати надходження',
+            SUBTITLE: 'Розподіл надходжень за категоріями',
+            CATEGORY_LABEL: 'Категорія надходження',
+            CATEGORY_PLACEHOLDER: 'Оберіть категорію надходження',
+            SUBMIT_BUTTON: 'Додати надходження',
+        },
+        EXPENSE: {
+            TITLE: 'Додати витрату',
+            SUBTITLE: 'Розподіл витрат за статтями',
+            CATEGORY_LABEL: 'Категорія витрат',
+            CATEGORY_PLACEHOLDER: 'Оберіть категорію витрат',
+            SUBMIT_BUTTON: 'Додати витрату',
+        },
+    },
     BUTTON: {
         EDIT: 'Редагувати Доходи та витрати',
-        CANCEL: 'Відмінити',
-        PUBLISH: 'Опублікувати',
         ADD_INCOME: 'Надходження',
         ADD_EXPENSE: 'Витрати',
     },
@@ -151,7 +178,7 @@ export const FUNDS_EXPENDITURES_TEXT = {
         SPENT: 'Витрачено коштів',
         INCOME_CATEGORIES: 'Категорії надходжень',
         EXPENSE_CATEGORIES: 'Категорії витрат',
-        AMOUNT_SUFFIX_UAH: 'UA',
+        AMOUNT_SUFFIX_UAH: 'UAH',
         AMOUNT_SUFFIX_USD: 'USD',
         CATEGORY_SUFFIX_FORMS: ['категорія', 'категорії', 'категорій'],
     },
@@ -160,7 +187,7 @@ export const FUNDS_EXPENDITURES_TEXT = {
             REPORTING_YEAR: 'Звітній рік',
             TYPE: 'Тип',
             CATEGORY: 'Категорія',
-            AMOUNT_UAH: 'Сума UA',
+            AMOUNT_UAH: 'Сума UAH',
             AMOUNT_USD: 'Сума USD',
         },
         TYPE_LABELS: {

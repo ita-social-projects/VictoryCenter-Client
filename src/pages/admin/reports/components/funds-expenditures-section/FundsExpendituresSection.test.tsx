@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { FundsExpenditureSection } from './FundsExpendituresSection';
 import { FUNDS_EXPENDITURES_TEXT, FUNDS_EXPENDITURES_VALIDATION, REPORTS_TEXT } from '@/const/admin/reports';
@@ -141,6 +141,9 @@ jest.mock('./components/funds-expenditures-toolbar/FundsExpendituresToolbar', ()
         isAddExpenseDisabled,
         onTypeChange,
         onCategoryChange,
+        onExchangeRateChange,
+        onExchangeRateBlur,
+        onAddIncome,
     }: {
         categories: { id: number; name: string }[];
         selectedCategoryId: number | null | undefined;
@@ -150,6 +153,9 @@ jest.mock('./components/funds-expenditures-toolbar/FundsExpendituresToolbar', ()
         isAddExpenseDisabled: boolean;
         onTypeChange: (v: unknown) => void;
         onCategoryChange: (v: unknown) => void;
+        onExchangeRateChange: (v: string) => void;
+        onExchangeRateBlur: () => void;
+        onAddIncome: () => void;
     }) => (
         <div
             data-testid="funds-toolbar"
@@ -172,6 +178,15 @@ jest.mock('./components/funds-expenditures-toolbar/FundsExpendituresToolbar', ()
             <button onClick={() => onCategoryChange(1)} data-testid="filter-cat-1">
                 Filter Cat 1
             </button>
+            <button onClick={() => onExchangeRateChange('abc')} data-testid="change-rate-invalid">
+                Invalid rate
+            </button>
+            <button onClick={() => onExchangeRateBlur()} data-testid="blur-rate">
+                Blur rate
+            </button>
+            <button onClick={() => onAddIncome()} data-testid="open-add-income">
+                Open add income
+            </button>
         </div>
     ),
 }));
@@ -181,10 +196,12 @@ jest.mock('./components/funds-expenditures-table/FundsExpendituresTable', () => 
         records,
         isEditing,
         onRecordSave,
+        onRowEditModeChange,
     }: {
         records: unknown[];
         isEditing?: boolean;
         onRecordSave?: (recordId: number, data: { categoryId: number; amountUah: string; amountUsd: string }) => void;
+        onRowEditModeChange?: (isRowEditMode: boolean) => void;
     }) => (
         <div data-testid="funds-table" data-record-count={records.length} data-editing={String(isEditing ?? false)}>
             <button
@@ -199,18 +216,65 @@ jest.mock('./components/funds-expenditures-table/FundsExpendituresTable', () => 
             >
                 Save row
             </button>
+            <button data-testid="row-edit-on" onClick={() => onRowEditModeChange?.(true)}>
+                Row edit on
+            </button>
+            <button data-testid="row-edit-off" onClick={() => onRowEditModeChange?.(false)}>
+                Row edit off
+            </button>
+        </div>
+    ),
+}));
+
+jest.mock('./components/common/add-income-modal/AddIncomeModal', () => ({
+    AddIncomeModal: ({
+        isOpen,
+        onClose,
+        onSubmit,
+    }: {
+        isOpen: boolean;
+        onClose: () => void;
+        onSubmit: (data: {
+            categoryId: number;
+            reportingYear: string;
+            amountUah: string;
+            amountUsd: string;
+            type: 'income' | 'expense';
+        }) => Promise<boolean>;
+    }) => (
+        <div data-testid="add-income-modal" data-open={String(isOpen)}>
+            <button data-testid="add-income-close" onClick={onClose}>
+                Close add income
+            </button>
+            <button
+                data-testid="add-income-submit"
+                onClick={() =>
+                    void onSubmit({
+                        categoryId: 1,
+                        reportingYear: '2026',
+                        amountUah: '1000',
+                        amountUsd: '25',
+                        type: 'income',
+                    })
+                }
+            >
+                Submit add income
+            </button>
         </div>
     ),
 }));
 
 const mockUpdateRecord = jest.fn();
+const mockCreateRecord = jest.fn();
+const mockUpdateSettings = jest.fn();
 jest.mock('@/services/api/admin/reports/funds-expenditures-api', () => ({
     FundsExpendituresApi: {
         getSettings: jest.fn(),
         getCategories: jest.fn(),
         getRecords: jest.fn(),
         getSummary: jest.fn(),
-        updateSettings: jest.fn(),
+        updateSettings: (...args: unknown[]) => mockUpdateSettings(...args),
+        createRecord: (...args: unknown[]) => mockCreateRecord(...args),
         updateRecord: (...args: unknown[]) => mockUpdateRecord(...args),
     },
 }));
@@ -258,7 +322,10 @@ describe('FundsExpenditureSection', () => {
         fireEvent.click(screen.getByTestId('trigger-record-save'));
 
         await screen.findByTestId('funds-table');
-        expect(mockAddToast).toHaveBeenCalledWith(REPORTS_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY, 'success');
+        expect(mockAddToast).toHaveBeenCalledWith(
+            FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY,
+            'success',
+        );
     });
 
     it('should show retry error toast when record save fails', async () => {
@@ -269,7 +336,7 @@ describe('FundsExpenditureSection', () => {
         fireEvent.click(screen.getByTestId('trigger-record-save'));
 
         await screen.findByTestId('funds-table');
-        expect(mockAddToast).toHaveBeenCalledWith(REPORTS_TEXT.MESSAGE.RECORD_UPDATE_FAILED_RETRY, 'error');
+        expect(mockAddToast).toHaveBeenCalledWith(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_UPDATE_FAILED_RETRY, 'error');
     });
 
     it('should render the disclaimer text', () => {
@@ -452,14 +519,14 @@ describe('FundsExpenditureSection', () => {
         it('should return to non-editing state when cancel is clicked', () => {
             render(<FundsExpenditureSection />);
             fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT));
-            fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.CANCEL));
+            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL));
             expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-editing', 'false');
         });
 
         it('should show edit button again after cancel', () => {
             render(<FundsExpenditureSection />);
             fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT));
-            fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.CANCEL));
+            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL));
             expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT)).toBeInTheDocument();
         });
     });
@@ -472,7 +539,7 @@ describe('FundsExpenditureSection', () => {
 
         const enterEditMode = () => fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT));
         const getTextarea = () => screen.getByTestId('textarea-funds-disclaimer');
-        const getPublishButton = () => screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.PUBLISH);
+        const getPublishButton = () => screen.getByText(COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED);
 
         it('should show required error when blurring an empty disclaimer', () => {
             render(<FundsExpenditureSection />);
@@ -563,9 +630,111 @@ describe('FundsExpenditureSection', () => {
             fireEvent.blur(getTextarea());
             expect(screen.getByTestId('error-funds-disclaimer')).toBeInTheDocument();
 
-            fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.CANCEL));
+            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL));
             fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT));
             expect(screen.queryByTestId('error-funds-disclaimer')).not.toBeInTheDocument();
+        });
+
+        it('should disable publish button when table row edit mode is active', () => {
+            render(<FundsExpenditureSection />);
+            enterEditMode();
+
+            fireEvent.click(screen.getByTestId('row-edit-on'));
+            expect(getPublishButton()).toBeDisabled();
+
+            fireEvent.click(screen.getByTestId('row-edit-off'));
+            expect(getPublishButton()).not.toBeDisabled();
+        });
+
+        it('should show exchange-rate error and disable add actions after invalid rate change and blur', () => {
+            render(<FundsExpenditureSection />);
+            enterEditMode();
+
+            fireEvent.click(screen.getByTestId('change-rate-invalid'));
+            fireEvent.click(screen.getByTestId('blur-rate'));
+
+            expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-add-income-disabled', 'true');
+            expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-add-expense-disabled', 'true');
+            expect(getPublishButton()).toBeDisabled();
+        });
+
+        it('should publish successfully and exit edit mode', async () => {
+            mockUpdateSettings.mockResolvedValueOnce({
+                disclaimerTitle: 'Оновлений дисклеймер',
+                exchangeRate: '44.00',
+            });
+
+            render(<FundsExpenditureSection />);
+            enterEditMode();
+
+            fireEvent.click(getPublishButton());
+
+            expect(await screen.findByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT)).toBeInTheDocument();
+            expect(mockAddToast).toHaveBeenCalledWith(COMMON_TEXT_ADMIN.MESSAGE.SUCCESSFULLY_PUBLISHED, 'success');
+        });
+
+        it('should show error toast when publish fails', async () => {
+            mockUpdateSettings.mockRejectedValueOnce(new Error('publish failed'));
+
+            render(<FundsExpenditureSection />);
+            enterEditMode();
+
+            fireEvent.click(getPublishButton());
+
+            expect(await screen.findByTestId('funds-toolbar')).toBeInTheDocument();
+            expect(mockAddToast).toHaveBeenCalledWith(REPORTS_TEXT.MESSAGE.FAIL_TO_UPDATE_REPORT, 'error');
+        });
+
+        it('should open and close add income modal from toolbar controls', () => {
+            render(<FundsExpenditureSection />);
+
+            expect(screen.getByTestId('add-income-modal')).toHaveAttribute('data-open', 'false');
+            fireEvent.click(screen.getByTestId('open-add-income'));
+            expect(screen.getByTestId('add-income-modal')).toHaveAttribute('data-open', 'true');
+
+            fireEvent.click(screen.getByTestId('add-income-close'));
+            expect(screen.getByTestId('add-income-modal')).toHaveAttribute('data-open', 'false');
+        });
+
+        it('should create income record successfully and show success toast', async () => {
+            mockCreateRecord.mockResolvedValueOnce({
+                id: 999,
+                categoryId: 1,
+                type: 'income',
+                reportingYear: '2026',
+                amountUah: '1000',
+                amountUsd: '25',
+            });
+
+            render(<FundsExpenditureSection />);
+
+            fireEvent.click(screen.getByTestId('open-add-income'));
+            fireEvent.click(screen.getByTestId('add-income-submit'));
+
+            expect(await screen.findByTestId('funds-table')).toBeInTheDocument();
+            expect(mockCreateRecord).toHaveBeenCalled();
+            expect(mockAddToast).toHaveBeenCalledWith(
+                FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_CREATED_SUCCESSFULLY,
+                'success',
+            );
+            await waitFor(() => {
+                expect(screen.getByTestId('add-income-modal')).toHaveAttribute('data-open', 'false');
+            });
+        });
+
+        it('should show error toast when income record creation fails', async () => {
+            mockCreateRecord.mockRejectedValueOnce(new Error('create failed'));
+
+            render(<FundsExpenditureSection />);
+
+            fireEvent.click(screen.getByTestId('open-add-income'));
+            fireEvent.click(screen.getByTestId('add-income-submit'));
+
+            expect(await screen.findByTestId('add-income-modal')).toHaveAttribute('data-open', 'true');
+            expect(mockAddToast).toHaveBeenCalledWith(
+                FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_CREATE_FAILED_RETRY,
+                'error',
+            );
         });
     });
 });

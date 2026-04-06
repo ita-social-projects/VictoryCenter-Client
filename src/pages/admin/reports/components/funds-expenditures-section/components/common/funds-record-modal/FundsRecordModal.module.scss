@@ -1,0 +1,143 @@
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
+
+.modal {
+    width: 650px;
+
+    :global(.modal-container) {
+        width: 650px;
+        max-width: 650px;
+        border-radius: 8px;
+        background: c.$white;
+        padding: 0;
+    }
+
+    :global(.modal-header) {
+        margin-bottom: 0;
+        padding: 16px 24px 0;
+    }
+
+    :global(.modal-header .modal-title-wrapper) {
+        text-align: left;
+    }
+
+    :global(.modal-header .modal-header-text) {
+        font-size: inherit;
+        line-height: inherit;
+        text-align: left;
+    }
+
+    :global(.modal-header .close-icon) {
+        margin-bottom: 4px;
+        padding-right: 0;
+    }
+
+    :global(.modal-body) {
+        margin-bottom: 0;
+        padding: 18px 0 0;
+    }
+
+    :global(.modal-footer) {
+        padding: 0 24px 24px;
+        gap: 24px;
+        flex-wrap: nowrap;
+    }
+
+    :global(.modal-footer button) {
+        width: auto;
+    }
+}
+
+.header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+}
+
+.title {
+    @include type.h4-bold;
+    line-height: 36px;
+    margin: 0;
+    color: c.$blue-900;
+}
+
+.subtitle {
+    @include type.body-1-regular;
+    line-height: 36px;
+    margin: 0;
+    color: c.$grey-600;
+}
+
+.content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.panel {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    background: c.$grey-50;
+    border: 1px solid c.$grey-150;
+    padding: 23px 25px;
+    min-height: 559px;
+}
+
+.actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 24px;
+}
+
+.submit,
+.cancel {
+    @include type.subtitle-2-medium;
+    height: 60px;
+}
+
+.submit {
+    width: 391px;
+}
+
+.cancel {
+    width: 185px;
+}
+
+@media (max-width: 768px) {
+    .modal {
+        width: 100%;
+
+        :global(.modal-container) {
+            width: 100%;
+            max-width: 100%;
+        }
+
+        :global(.modal-header) {
+            padding: 12px 16px 0;
+        }
+
+        :global(.modal-footer) {
+            padding: 0 16px 16px;
+            flex-wrap: wrap;
+        }
+    }
+
+    .panel {
+        padding: 16px;
+        min-height: auto;
+    }
+
+    .actions {
+        grid-template-columns: 1fr;
+    }
+
+    .submit,
+    .cancel {
+        width: 100%;
+    }
+}

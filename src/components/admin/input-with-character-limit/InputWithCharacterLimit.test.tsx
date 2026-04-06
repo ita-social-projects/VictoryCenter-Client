@@ -110,26 +110,19 @@ describe('InputWithCharacterLimit', () => {
         );
     });
 
-    it('hides clear button when value becomes empty after clearing', () => {
-        const onChange = jest.fn();
+    it('hides clear button when value is empty', () => {
+        const { rerender } = renderInputWithCharacterLimit({ value: 'Hello' });
 
-        const { rerender } = render(
-            <InputWithCharacterLimit value="Hello" onChange={onChange} name="testName" id="test-id" maxLength={50} />,
+        focusInput();
+        expect(screen.getByRole('button', { name: /clear input/i })).not.toHaveClass(
+            'char-limit-input__clear-button--hidden',
         );
 
-        let btn = screen.getByRole('button', { name: /clear input/i });
+        rerender(<InputWithCharacterLimit {...defaultProps} value="" />);
 
-        fireEvent.focus(screen.getByRole('textbox'));
-
-        // Button should be visible (not have --hidden class) when focused with value
-        expect(btn).not.toHaveClass('char-limit-input__clear-button--hidden');
-
-        // Rerender with empty value (simulating parent updating prop after clear)
-        rerender(<InputWithCharacterLimit value="" onChange={onChange} name="testName" id="test-id" maxLength={50} />);
-
-        // Button should have --hidden class when value is empty
-        btn = screen.getByRole('button', { name: /clear input/i });
-        expect(btn).toHaveClass('char-limit-input__clear-button--hidden');
+        expect(screen.getByRole('button', { name: /clear input/i })).toHaveClass(
+            'char-limit-input__clear-button--hidden',
+        );
     });
 
     it('sets aria-invalid when current length exceeds maxLength', () => {

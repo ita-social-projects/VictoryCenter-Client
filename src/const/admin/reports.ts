@@ -139,6 +139,8 @@ export const FUNDS_EXPENDITURES_TEXT = {
         RECORD_CREATE_FAILED_RETRY: 'Не вдалося додати запис. Спробуйте ще раз',
         RECORD_UPDATED_SUCCESSFULLY: 'Зміни збережено успішно',
         RECORD_UPDATE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
+        RECORD_DELETED_SUCCESSFULLY: 'Запис успішно видалено',
+        RECORD_DELETE_FAILED_RETRY: 'Не вдалося видалити запис. Спробуйте ще раз',
     },
     MODAL: {
         SHARED: {
@@ -147,6 +149,9 @@ export const FUNDS_EXPENDITURES_TEXT = {
             AMOUNT_UAH_LABEL: 'Сума (UAH)',
             AMOUNT_USD_LABEL: 'Сума (USD)',
             CONFIRM_CLOSE_TITLE: 'Зміни будуть втрачені. Бажаєте продовжити?',
+        },
+        DELETE: {
+            TITLE: 'Видалити запис?',
         },
         INCOME: {
             TITLE: 'Додати надходження',

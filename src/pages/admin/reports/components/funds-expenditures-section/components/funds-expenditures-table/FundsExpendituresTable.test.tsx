@@ -201,6 +201,16 @@ describe('FundsExpendituresTable', () => {
         expect(screen.getAllByTestId('delete-icon')).toHaveLength(MOCK_RECORDS.length);
     });
 
+    it('should call onDeleteRecord with the selected row when delete is clicked', () => {
+        const onDeleteRecord = jest.fn();
+
+        renderTable({ isEditing: true, onDeleteRecord });
+
+        fireEvent.click(screen.getByLabelText('Delete record 1'));
+
+        expect(onDeleteRecord).toHaveBeenCalledWith(MOCK_RECORDS[0]);
+    });
+
     it('should render empty state row when records is empty', () => {
         renderTable({ records: [] });
 

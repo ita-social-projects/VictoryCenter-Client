@@ -85,6 +85,48 @@ jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
     InlineLoader: ({ size }: { size?: number }) => <div data-testid="inline-loader">loader-{size ?? 2}</div>,
 }));
 
+jest.mock(
+    '@/pages/admin/reports/components/funds-expenditures-section/components/common/funds-record-actions/FundsRecordActions',
+    () => ({
+        FundsRecordActions: ({
+            onAddIncome,
+            onAddExpense,
+            isAddIncomeDisabled,
+            isAddExpenseDisabled,
+            testId,
+        }: {
+            onAddIncome?: () => void;
+            onAddExpense?: () => void;
+            isAddIncomeDisabled?: boolean;
+            isAddExpenseDisabled?: boolean;
+            testId?: string;
+        }) => {
+            const { FUNDS_EXPENDITURES_TEXT: mockFundsExpendituresText } = require('@/const/admin/reports');
+
+            return (
+                <div data-testid={testId ?? 'editing-actions'}>
+                    <button
+                        type="button"
+                        data-testid="mock-add-expense"
+                        onClick={onAddExpense}
+                        disabled={Boolean(isAddExpenseDisabled)}
+                    >
+                        {mockFundsExpendituresText.BUTTON.ADD_EXPENSE}
+                    </button>
+                    <button
+                        type="button"
+                        data-testid="mock-add-income"
+                        onClick={onAddIncome}
+                        disabled={Boolean(isAddIncomeDisabled)}
+                    >
+                        {mockFundsExpendituresText.BUTTON.ADD_INCOME}
+                    </button>
+                </div>
+            );
+        },
+    }),
+);
+
 jest.mock('@/components/common/select/Select', () => {
     const React = require('react');
 
@@ -204,8 +246,30 @@ describe('FundsExpendituresTable', () => {
     it('should render empty state row when records is empty', () => {
         renderTable({ records: [] });
 
-        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.MESSAGE)).toBeInTheDocument();
+        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.TITLE)).toBeInTheDocument();
+        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.ADD_RECORD)).toBeInTheDocument();
         expect(screen.getByTestId('not-found')).toBeInTheDocument();
+    });
+
+    it('should render add action buttons in empty state for view mode', () => {
+        renderTable({ records: [], isEditing: false });
+
+        expect(screen.getByTestId('empty-state-actions')).toBeInTheDocument();
+        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.ADD_EXPENSE)).toBeEnabled();
+        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.ADD_INCOME)).toBeEnabled();
+    });
+
+    it('should trigger add callbacks from empty state buttons in view mode', () => {
+        const onAddIncome = jest.fn();
+        const onAddExpense = jest.fn();
+
+        renderTable({ records: [], isEditing: false, onAddIncome, onAddExpense });
+
+        fireEvent.click(screen.getByTestId('mock-add-expense'));
+        fireEvent.click(screen.getByTestId('mock-add-income'));
+
+        expect(onAddExpense).toHaveBeenCalledTimes(1);
+        expect(onAddIncome).toHaveBeenCalledTimes(1);
     });
 
     it('should use correct empty-state colSpan in view and edit modes', () => {

@@ -98,6 +98,10 @@ export const FundsExpenditureSection = () => {
         setIsAddIncomeModalOpen(true);
     }, []);
 
+    const handleOpenAddExpenseModal = useCallback(() => {
+        // TODO
+    }, []);
+
     const handleCloseAddIncomeModal = useCallback(() => {
         setIsAddIncomeModalOpen(false);
     }, []);
@@ -377,7 +381,7 @@ export const FundsExpenditureSection = () => {
                 onExchangeRateBlur={handleExchangeRateBlur}
                 exchangeRateError={exchangeRateError}
                 onAddIncome={handleOpenAddIncomeModal}
-                onAddExpense={() => {}}
+                onAddExpense={handleOpenAddExpenseModal}
             />
 
             <FundsExpendituresTable
@@ -387,6 +391,10 @@ export const FundsExpenditureSection = () => {
                 allRecordsForTypeInference={recordsState}
                 isEditing={isEditing}
                 isRowActionsDisabled={hasExchangeRateError}
+                isAddIncomeDisabled={isAddIncomeDisabled}
+                isAddExpenseDisabled={isAddExpenseDisabled}
+                onAddIncome={handleOpenAddIncomeModal}
+                onAddExpense={handleOpenAddExpenseModal}
                 onRowEditModeChange={setIsRowEditMode}
                 onRecordSave={handleRecordSave}
             />

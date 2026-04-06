@@ -21,6 +21,7 @@ import {
 import { getConvertedAmount } from '@/utils/functions/get-converted-amount/get-converted-amount';
 import { parseAmount } from '@/utils/functions/parse-amount/parse-amount';
 import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
+import { FundsRecordActions } from '@/pages/admin/reports/components/funds-expenditures-section/components/common/funds-record-actions/FundsRecordActions';
 import cn from 'classnames';
 import styles from './FundsExpendituresTable.module.scss';
 
@@ -43,6 +44,10 @@ interface FundsExpendituresTableProps {
     allRecordsForTypeInference?: ReportFundsExpendituresRecord[];
     isEditing?: boolean;
     isRowActionsDisabled?: boolean;
+    isAddIncomeDisabled?: boolean;
+    isAddExpenseDisabled?: boolean;
+    onAddIncome?: () => void;
+    onAddExpense?: () => void;
     onRowEditModeChange?: (isEditMode: boolean) => void;
     onRecordSave?: (
         recordId: number,
@@ -142,6 +147,10 @@ export const FundsExpendituresTable = ({
     allRecordsForTypeInference,
     isEditing = false,
     isRowActionsDisabled = false,
+    isAddIncomeDisabled = false,
+    isAddExpenseDisabled = false,
+    onAddIncome,
+    onAddExpense,
     onRowEditModeChange,
     onRecordSave,
 }: FundsExpendituresTableProps) => {
@@ -549,6 +558,14 @@ export const FundsExpendituresTable = ({
                                                 <p className={styles['empty-state-message']}>
                                                     {FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.ADD_RECORD}
                                                 </p>
+                                                <FundsRecordActions
+                                                    className={styles['empty-state-actions']}
+                                                    testId="empty-state-actions"
+                                                    isAddExpenseDisabled={isAddExpenseDisabled}
+                                                    isAddIncomeDisabled={isAddIncomeDisabled}
+                                                    onAddExpense={onAddExpense}
+                                                    onAddIncome={onAddIncome}
+                                                />
                                             </>
                                         )}
                                     </div>

@@ -151,7 +151,7 @@ export const FUNDS_EXPENDITURES_TEXT = {
         SPENT: 'Витрачено коштів',
         INCOME_CATEGORIES: 'Категорії надходжень',
         EXPENSE_CATEGORIES: 'Категорії витрат',
-        AMOUNT_SUFFIX_UAH: 'UA',
+        AMOUNT_SUFFIX_UAH: 'UAH',
         AMOUNT_SUFFIX_USD: 'USD',
         CATEGORY_SUFFIX_FORMS: ['категорія', 'категорії', 'категорій'],
     },

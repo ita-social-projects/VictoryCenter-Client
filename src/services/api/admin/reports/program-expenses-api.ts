@@ -60,11 +60,11 @@ export const ProgramExpensesApi = {
         _client: AxiosInstance,
         _options: RequestOptions = {},
     ): Promise<ProgramExpensesReadOnlyData> => {
-        return Promise.resolve({
+        return {
             exchangeRate: MOCK_PROGRAM_EXPENSES_EXCHANGE_RATE,
             programs: PROGRAM_EXPENSES_PROGRAMS,
             summary: PROGRAM_EXPENSES_SUMMARY,
             records: PUBLISHED_PROGRAM_EXPENSES_RECORDS,
-        });
+        };
     },
 };

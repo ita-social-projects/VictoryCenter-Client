@@ -126,13 +126,14 @@ export const InputWithCharacterLimit = ({
             <button
                 type="button"
                 className={cn('char-limit-input__clear-button', {
-                    'char-limit-input__clear-button--visible': showClearButton,
+                    'char-limit-input__clear-button--hidden': !showClearButton || disabled,
                     'char-limit-input__clear-button--error': hasError || !!localWarning,
                 })}
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={handleClear}
                 aria-label="Clear input"
-                tabIndex={showClearButton ? 0 : -1}
+                tabIndex={showClearButton && !disabled ? 0 : -1}
+                disabled={!showClearButton || disabled}
             >
                 <RemoveIcon />
             </button>

@@ -139,6 +139,8 @@ export const FUNDS_EXPENDITURES_TEXT = {
         RECORD_CREATE_FAILED_RETRY: 'Не вдалося додати запис. Спробуйте ще раз',
         RECORD_UPDATED_SUCCESSFULLY: 'Зміни збережено успішно',
         RECORD_UPDATE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
+        RECORD_DELETED_SUCCESSFULLY: 'Запис успішно видалено',
+        RECORD_DELETE_FAILED_RETRY: 'Не вдалося видалити запис. Спробуйте ще раз',
     },
     MODAL: {
         SHARED: {
@@ -149,12 +151,16 @@ export const FUNDS_EXPENDITURES_TEXT = {
             CONFIRM_CLOSE_TITLE: 'Зміни будуть втрачені. Бажаєте продовжити?',
             CATEGORY_NO_AVAILABLE: 'Немає доступних категорій. Спочатку створіть категорію',
         },
+        DELETE: {
+            TITLE: 'Видалити запис?',
+        },
         INCOME: {
             TITLE: 'Додати надходження',
             SUBTITLE: 'Розподіл надходжень за категоріями',
             CATEGORY_LABEL: 'Категорія надходження',
             CATEGORY_PLACEHOLDER: 'Оберіть категорію надходження',
             SUBMIT_BUTTON: 'Додати надходження',
+            CONFIRM_ADD_TITLE: 'Додати нове надходження?',
         },
         EXPENSE: {
             TITLE: 'Додати витрату',
@@ -198,6 +204,8 @@ export const FUNDS_EXPENDITURES_TEXT = {
         EMPTY_STATE: {
             MESSAGE: 'За вашим запитом нічого не знайдено',
             ALT_TEXT: 'Записів не знайдено',
+            TITLE: 'Немає записів',
+            ADD_RECORD: 'додайте перший запис надходження або витрати',
         },
     },
     VALIDATION: {

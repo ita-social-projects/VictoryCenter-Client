@@ -7,10 +7,10 @@ import {
 } from '@/types/admin/reports';
 import { ReactComponent as NotFoundIcon } from '@/assets/icons/not-found.svg';
 import { ReactComponent as ArrowUpIcon } from '@/assets/icons/arrow-up.svg';
-import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
-import { ReactComponent as DeleteIcon } from '@/assets/icons/delete.svg';
 import { ReactComponent as CheckmarkIcon } from '@/assets/icons/checkmark.svg';
 import { ReactComponent as CrossIcon } from '@/assets/icons/cross.svg';
+import { IconButton } from '@/components/admin/icon-button/IconButton';
+import { ACTION_ICONS } from '@/const/common/action-icons';
 import { Select } from '@/components/common/select/Select';
 import { SortIcon } from '@/pages/admin/reports/components/funds-expenditures-section/components/funds-expenditures-table/components/sort-icon';
 import {
@@ -21,6 +21,7 @@ import {
 import { getConvertedAmount } from '@/utils/functions/get-converted-amount/get-converted-amount';
 import { parseAmount } from '@/utils/functions/parse-amount/parse-amount';
 import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
+import { FundsRecordActions } from '@/pages/admin/reports/components/funds-expenditures-section/components/common/funds-record-actions/FundsRecordActions';
 import cn from 'classnames';
 import styles from './FundsExpendituresTable.module.scss';
 
@@ -43,11 +44,16 @@ interface FundsExpendituresTableProps {
     allRecordsForTypeInference?: ReportFundsExpendituresRecord[];
     isEditing?: boolean;
     isRowActionsDisabled?: boolean;
+    isAddIncomeDisabled?: boolean;
+    isAddExpenseDisabled?: boolean;
+    onAddIncome?: () => void;
+    onAddExpense?: () => void;
     onRowEditModeChange?: (isEditMode: boolean) => void;
     onRecordSave?: (
         recordId: number,
         data: { categoryId: number; amountUah: string; amountUsd: string },
     ) => boolean | Promise<boolean>;
+    onDeleteRecord?: (record: EnrichedRecord) => void;
 }
 
 interface RowEditState {
@@ -142,8 +148,13 @@ export const FundsExpendituresTable = ({
     allRecordsForTypeInference,
     isEditing = false,
     isRowActionsDisabled = false,
+    isAddIncomeDisabled = false,
+    isAddExpenseDisabled = false,
+    onAddIncome,
+    onAddExpense,
     onRowEditModeChange,
     onRecordSave,
+    onDeleteRecord,
 }: FundsExpendituresTableProps) => {
     const [sort, setSort] = useState<ColumnSort>({ column: null, direction: null });
     const [rowEditState, setRowEditState] = useState<RowEditState | null>(null);
@@ -537,9 +548,28 @@ export const FundsExpendituresTable = ({
                                 >
                                     <div className={styles['empty-state']}>
                                         <NotFoundIcon className={styles['empty-state-image']} />
-                                        <p className={styles['empty-state-message']}>
-                                            {FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.MESSAGE}
-                                        </p>
+                                        {isEditing ? (
+                                            <p className={styles['empty-state-message']}>
+                                                {FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.MESSAGE}
+                                            </p>
+                                        ) : (
+                                            <>
+                                                <p className={styles['empty-state-title']}>
+                                                    {FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.TITLE}
+                                                </p>
+                                                <p className={styles['empty-state-message']}>
+                                                    {FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.ADD_RECORD}
+                                                </p>
+                                                <FundsRecordActions
+                                                    className={styles['empty-state-actions']}
+                                                    testId="empty-state-actions"
+                                                    isAddExpenseDisabled={isAddExpenseDisabled}
+                                                    isAddIncomeDisabled={isAddIncomeDisabled}
+                                                    onAddExpense={onAddExpense}
+                                                    onAddIncome={onAddIncome}
+                                                />
+                                            </>
+                                        )}
                                     </div>
                                 </td>
                             </tr>
@@ -720,23 +750,30 @@ export const FundsExpendituresTable = ({
                                                         </>
                                                     ) : (
                                                         <>
-                                                            <button
+                                                            <IconButton
                                                                 type="button"
-                                                                className={styles['icon-button']}
+                                                                className={cn(
+                                                                    styles['icon-button'],
+                                                                    styles['edit-icon-button'],
+                                                                )}
                                                                 aria-label={`Edit record ${record.id}`}
                                                                 onClick={() => handleStartRowEdit(record)}
                                                                 disabled={isAnotherRowEditing}
-                                                            >
-                                                                <EditIcon className={styles['action-icon']} />
-                                                            </button>
-                                                            <button
+                                                                DefaultIcon={ACTION_ICONS.edit.default}
+                                                                FilledIcon={ACTION_ICONS.edit.hover}
+                                                            />
+                                                            <IconButton
                                                                 type="button"
-                                                                className={styles['icon-button']}
+                                                                className={cn(
+                                                                    styles['icon-button'],
+                                                                    styles['delete-icon-button'],
+                                                                )}
                                                                 aria-label={`Delete record ${record.id}`}
+                                                                onClick={() => onDeleteRecord?.(record)}
                                                                 disabled={isAnotherRowEditing}
-                                                            >
-                                                                <DeleteIcon className={styles['action-icon']} />
-                                                            </button>
+                                                                DefaultIcon={ACTION_ICONS.delete.default}
+                                                                FilledIcon={ACTION_ICONS.delete.hover}
+                                                            />
                                                         </>
                                                     )}
                                                 </div>

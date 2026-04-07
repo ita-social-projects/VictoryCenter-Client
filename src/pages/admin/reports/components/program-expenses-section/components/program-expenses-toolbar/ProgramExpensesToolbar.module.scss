@@ -1,0 +1,121 @@
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
+@use '@/assets/sass/variables/typography' as t;
+
+.toolbar-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    width: 100%;
+    min-height: 60px;
+}
+
+.program-select {
+    width: 200px;
+
+    :global(.select-options) {
+        top: 60px;
+        width: 200px;
+        min-width: 200px;
+        border: 1px solid c.$blue-900;
+        border-radius: 12px;
+        box-shadow: 0 24px 48px -12px rgba(c.$bluish-black, 0.2);
+        overflow: hidden;
+    }
+}
+
+.program-select-head {
+    box-sizing: border-box;
+    width: 200px;
+    height: 60px;
+    padding: 8px 10px;
+    border: 1px solid c.$blue-900;
+    border-radius: 12px;
+    background: c.$white;
+    font-family: t.$font-family-base;
+    font-weight: t.$fw-semibold;
+    font-size: t.$sub2-size;
+    color: c.$blue-900;
+    line-height: 30px;
+    letter-spacing: t.$sub2-spacing;
+
+    &:hover {
+        background: c.$white;
+    }
+
+    span {
+        display: inline-flex;
+        align-items: center;
+        width: 94px;
+        text-align: center;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    svg {
+        width: 26px;
+        height: 26px;
+        flex-shrink: 0;
+    }
+}
+
+.program-option {
+    height: 60px;
+    padding: 8px 10px;
+    font-family: t.$font-family-base;
+    font-weight: t.$fw-semibold;
+    font-size: t.$sub2-size;
+    color: c.$blue-900;
+    line-height: 30px;
+    letter-spacing: t.$sub2-spacing;
+
+    &:global(.select-options-selected) {
+        background-color: c.$blue-50;
+    }
+}
+
+.exchange-rate {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.exchange-rate-label {
+    @include type.small-text-medium;
+    display: flex;
+    align-items: center;
+    letter-spacing: 0.1px;
+    color: c.$grey-900;
+}
+
+.exchange-rate-value {
+    @include type.small-text-medium;
+    box-sizing: border-box;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 119px;
+    height: 32px;
+    padding: 6px 12px;
+    border: 1px solid c.$bluish-black;
+    border-radius: 8px;
+    background: c.$grey-600;
+    letter-spacing: 0.1px;
+    color: c.$blue-900;
+}
+
+@media (max-width: 1200px) {
+    .toolbar-row {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .exchange-rate {
+        align-items: flex-start;
+        margin-left: 0;
+    }
+}

@@ -5,6 +5,7 @@ import styles from './ReportAnalytics.module.scss';
 import './ReportAnalytics.scss';
 import { PdfFilesSection } from '../pdf-files-section/PdfFilesSection';
 import { FundsExpenditureSection } from '../funds-expenditures-section/FundsExpendituresSection';
+import { ProgramExpensesSection } from '../program-expenses-section/ProgramExpensesSection';
 
 interface ReportAnalyticsTab {
     id: 'income-expenses' | 'program-expenses' | 'pdf-files';
@@ -12,9 +13,9 @@ interface ReportAnalyticsTab {
 }
 
 const ANALYTICS_TABS: ReportAnalyticsTab[] = [
-    { id: 'income-expenses', label: 'Доходи та витрати' },
-    { id: 'program-expenses', label: 'Програмні витрати' },
-    { id: 'pdf-files', label: 'PDF Файли' },
+    { id: 'income-expenses', label: REPORTS_TEXT.REPORT_AND_ANALYTICS.TAB.INCOME_EXPENSES },
+    { id: 'program-expenses', label: REPORTS_TEXT.REPORT_AND_ANALYTICS.TAB.PROGRAM_EXPENSES },
+    { id: 'pdf-files', label: REPORTS_TEXT.REPORT_AND_ANALYTICS.TAB.PDF_FILES },
 ];
 
 export const ReportAnalytics = () => {
@@ -34,7 +35,7 @@ export const ReportAnalytics = () => {
             <div className={styles['tab-content']}>
                 {activeTab.id === 'pdf-files' && <PdfFilesSection />}
                 {activeTab.id === 'income-expenses' && <FundsExpenditureSection />}
-                {activeTab.id === 'program-expenses' && <div></div>}
+                {activeTab.id === 'program-expenses' && <ProgramExpensesSection />}
             </div>
         </div>
     );

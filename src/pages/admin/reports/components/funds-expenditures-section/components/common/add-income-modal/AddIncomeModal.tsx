@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
+import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import { InputWithCharacterLimit } from '@/components/admin/input-with-character-limit/InputWithCharacterLimit';
 import { Select } from '@/components/common/select/Select';
 import { FundsRecordModal } from '@/pages/admin/reports/components/funds-expenditures-section/components/common/funds-record-modal/FundsRecordModal';
@@ -64,6 +65,7 @@ export const AddIncomeModal = ({
 }: AddIncomeModalProps) => {
     const [formState, setFormState] = useState<AddIncomeFormState>(INITIAL_STATE);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isAddConfirmationOpen, setIsAddConfirmationOpen] = useState(false);
 
     const incomeCategories = useMemo(() => {
         return categories
@@ -79,6 +81,7 @@ export const AddIncomeModal = ({
     }, []);
 
     const handleClose = useCallback(() => {
+        setIsAddConfirmationOpen(false);
         resetForm();
         onClose();
     }, [onClose, resetForm]);
@@ -177,128 +180,152 @@ export const AddIncomeModal = ({
         Boolean(formState.errors.amountUah) ||
         Boolean(formState.errors.amountUsd);
 
+    const handleOpenAddConfirmation = useCallback(() => {
+        setIsAddConfirmationOpen(true);
+    }, []);
+
+    const handleConfirmAdd = useCallback(async () => {
+        setIsAddConfirmationOpen(false);
+        await handleSubmit();
+    }, [handleSubmit]);
+
     return (
-        <FundsRecordModal
-            isOpen={isOpen}
-            title={FUNDS_EXPENDITURES_TEXT.MODAL.INCOME.TITLE}
-            subtitle={FUNDS_EXPENDITURES_TEXT.MODAL.INCOME.SUBTITLE}
-            submitButtonLabel={FUNDS_EXPENDITURES_TEXT.MODAL.INCOME.SUBMIT_BUTTON}
-            isSubmitDisabled={isSubmitDisabled}
-            isDirty={isDirty}
-            onSubmit={handleSubmit}
-            onClose={handleClose}
-            closeConfirmationTitle={FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.CONFIRM_CLOSE_TITLE}
-        >
-            <div className={styles.form}>
-                <div className={styles.field}>
-                    <label className={styles.label}>
-                        <span className={styles.required}>*</span>
-                        {FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_LABEL}
-                    </label>
-                    <Select<string>
-                        value={formState.reportingYear}
-                        onValueChange={(value) => {
-                            setFormState((prev) => ({
-                                ...prev,
-                                reportingYear: value,
-                                errors: {
-                                    ...prev.errors,
-                                    reportingYear: undefined,
-                                },
-                            }));
-                        }}
-                        placeholder={FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_PLACEHOLDER}
-                        className={styles.select}
-                        optionClassName={styles['select-option']}
-                    >
-                        {yearOptions.map((year) => (
-                            <Select.Option key={year} value={year} name={year} />
-                        ))}
-                    </Select>
-                    {formState.errors.reportingYear && <p className={styles.error}>{formState.errors.reportingYear}</p>}
-                </div>
-
-                <div className={styles.field}>
-                    <label className={styles.label}>
-                        <span className={styles.required}>*</span>
-                        {FUNDS_EXPENDITURES_TEXT.MODAL.INCOME.CATEGORY_LABEL}
-                    </label>
-                    <Select<number>
-                        value={formState.categoryId}
-                        onValueChange={(value) => {
-                            setFormState((prev) => ({
-                                ...prev,
-                                categoryId: value,
-                                errors: {
-                                    ...prev.errors,
-                                    categoryId: getCategoryError(value, 'change'),
-                                },
-                            }));
-                        }}
-                        placeholder={FUNDS_EXPENDITURES_TEXT.MODAL.INCOME.CATEGORY_PLACEHOLDER}
-                        className={styles.select}
-                        optionClassName={styles['select-option']}
-                    >
-                        {incomeCategories.map((category) => (
-                            <Select.Option key={category.id} value={category.id} name={category.name} />
-                        ))}
-                    </Select>
-                    {formState.errors.categoryId && <p className={styles.error}>{formState.errors.categoryId}</p>}
-                </div>
-
-                <div className={styles.field}>
-                    <label className={styles.label}>
-                        <span className={styles.required}>*</span>
-                        {FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.AMOUNT_UAH_LABEL}
-                    </label>
-                    <InputWithCharacterLimit
-                        id="add-income-amount-uah"
-                        name="amountUah"
-                        type="text"
-                        value={formState.amountUah}
-                        onChange={(event) => handleAmountChange('amountUah', event.target.value)}
-                        onBlur={() => handleAmountBlur('amountUah')}
-                        maxLength={20}
-                        showCounter={false}
-                        className={styles.input}
-                        hasError={Boolean(formState.errors.amountUah)}
-                    />
-                    {formState.errors.amountUah && <p className={styles.error}>{formState.errors.amountUah}</p>}
-                </div>
-
-                <div className={styles.field}>
-                    <div className={styles['amount-usd-header']}>
+        <>
+            <FundsRecordModal
+                isOpen={isOpen}
+                title={FUNDS_EXPENDITURES_TEXT.MODAL.INCOME.TITLE}
+                subtitle={FUNDS_EXPENDITURES_TEXT.MODAL.INCOME.SUBTITLE}
+                submitButtonLabel={FUNDS_EXPENDITURES_TEXT.MODAL.INCOME.SUBMIT_BUTTON}
+                isSubmitDisabled={isSubmitDisabled}
+                isDirty={isDirty}
+                onSubmit={handleOpenAddConfirmation}
+                onClose={handleClose}
+                closeConfirmationTitle={FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.CONFIRM_CLOSE_TITLE}
+            >
+                <div className={styles.form}>
+                    <div className={styles.field}>
                         <label className={styles.label}>
                             <span className={styles.required}>*</span>
-                            {FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.AMOUNT_USD_LABEL}
+                            {FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_LABEL}
                         </label>
-                        <div className={styles['exchange-rate-chip']}>
-                            <span className={styles['exchange-rate-chip-label']}>
-                                {FUNDS_EXPENDITURES_TEXT.EXCHANGE_RATE_LABEL}
-                            </span>
-                            <input
-                                type="text"
-                                value={exchangeRate ?? ''}
-                                disabled
-                                className={styles['exchange-rate-value']}
-                            />
-                        </div>
+                        <Select<string>
+                            value={formState.reportingYear}
+                            onValueChange={(value) => {
+                                setFormState((prev) => ({
+                                    ...prev,
+                                    reportingYear: value,
+                                    errors: {
+                                        ...prev.errors,
+                                        reportingYear: undefined,
+                                    },
+                                }));
+                            }}
+                            placeholder={FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_PLACEHOLDER}
+                            className={styles.select}
+                            optionClassName={styles['select-option']}
+                        >
+                            {yearOptions.map((year) => (
+                                <Select.Option key={year} value={year} name={year} />
+                            ))}
+                        </Select>
+                        {formState.errors.reportingYear && (
+                            <p className={styles.error}>{formState.errors.reportingYear}</p>
+                        )}
                     </div>
-                    <InputWithCharacterLimit
-                        id="add-income-amount-usd"
-                        name="amountUsd"
-                        type="text"
-                        value={formState.amountUsd}
-                        onChange={(event) => handleAmountChange('amountUsd', event.target.value)}
-                        onBlur={() => handleAmountBlur('amountUsd')}
-                        maxLength={20}
-                        showCounter={false}
-                        className={styles.input}
-                        hasError={Boolean(formState.errors.amountUsd)}
-                    />
-                    {formState.errors.amountUsd && <p className={styles.error}>{formState.errors.amountUsd}</p>}
+
+                    <div className={styles.field}>
+                        <label className={styles.label}>
+                            <span className={styles.required}>*</span>
+                            {FUNDS_EXPENDITURES_TEXT.MODAL.INCOME.CATEGORY_LABEL}
+                        </label>
+                        <Select<number>
+                            value={formState.categoryId}
+                            onValueChange={(value) => {
+                                setFormState((prev) => ({
+                                    ...prev,
+                                    categoryId: value,
+                                    errors: {
+                                        ...prev.errors,
+                                        categoryId: getCategoryError(value, 'change'),
+                                    },
+                                }));
+                            }}
+                            placeholder={FUNDS_EXPENDITURES_TEXT.MODAL.INCOME.CATEGORY_PLACEHOLDER}
+                            className={styles.select}
+                            optionClassName={styles['select-option']}
+                        >
+                            {incomeCategories.map((category) => (
+                                <Select.Option key={category.id} value={category.id} name={category.name} />
+                            ))}
+                        </Select>
+                        {formState.errors.categoryId && <p className={styles.error}>{formState.errors.categoryId}</p>}
+                    </div>
+
+                    <div className={styles.field}>
+                        <label className={styles.label}>
+                            <span className={styles.required}>*</span>
+                            {FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.AMOUNT_UAH_LABEL}
+                        </label>
+                        <InputWithCharacterLimit
+                            id="add-income-amount-uah"
+                            name="amountUah"
+                            type="text"
+                            value={formState.amountUah}
+                            onChange={(event) => handleAmountChange('amountUah', event.target.value)}
+                            onBlur={() => handleAmountBlur('amountUah')}
+                            maxLength={20}
+                            showCounter={false}
+                            className={styles.input}
+                            hasError={Boolean(formState.errors.amountUah)}
+                        />
+                        {formState.errors.amountUah && <p className={styles.error}>{formState.errors.amountUah}</p>}
+                    </div>
+
+                    <div className={styles.field}>
+                        <div className={styles['amount-usd-header']}>
+                            <label className={styles.label}>
+                                <span className={styles.required}>*</span>
+                                {FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.AMOUNT_USD_LABEL}
+                            </label>
+                            <div className={styles['exchange-rate-chip']}>
+                                <span className={styles['exchange-rate-chip-label']}>
+                                    {FUNDS_EXPENDITURES_TEXT.EXCHANGE_RATE_LABEL}
+                                </span>
+                                <input
+                                    type="text"
+                                    value={exchangeRate ?? ''}
+                                    disabled
+                                    className={styles['exchange-rate-value']}
+                                />
+                            </div>
+                        </div>
+                        <InputWithCharacterLimit
+                            id="add-income-amount-usd"
+                            name="amountUsd"
+                            type="text"
+                            value={formState.amountUsd}
+                            onChange={(event) => handleAmountChange('amountUsd', event.target.value)}
+                            onBlur={() => handleAmountBlur('amountUsd')}
+                            maxLength={20}
+                            showCounter={false}
+                            className={styles.input}
+                            hasError={Boolean(formState.errors.amountUsd)}
+                        />
+                        {formState.errors.amountUsd && <p className={styles.error}>{formState.errors.amountUsd}</p>}
+                    </div>
                 </div>
-            </div>
-        </FundsRecordModal>
+            </FundsRecordModal>
+
+            <ConfirmationModal
+                isOpen={isAddConfirmationOpen}
+                title={FUNDS_EXPENDITURES_TEXT.MODAL.INCOME.CONFIRM_ADD_TITLE}
+                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
+                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
+                onConfirm={() => handleConfirmAdd()}
+                onCancel={() => setIsAddConfirmationOpen(false)}
+                onClose={() => setIsAddConfirmationOpen(false)}
+                isButtonsDisabled={isSubmitting}
+            />
+        </>
     );
 };

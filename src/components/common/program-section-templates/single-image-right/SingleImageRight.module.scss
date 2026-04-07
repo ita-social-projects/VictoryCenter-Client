@@ -15,6 +15,7 @@
 .left-section {
     display: flex;
     flex: 0 0 50%;
+    min-width: 0;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -24,6 +25,7 @@
 
 .title-section {
     display: flex;
+    min-width: 0;
     align-items: start;
     width: 100%;
     > div {
@@ -42,12 +44,14 @@
     font-size: 30px;
     font-weight: bold;
     line-height: 1.2;
-    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
 }
 
 .description-section {
     width: 100%;
     display: flex;
+    min-width: 0;
     align-items: start;
     > div {
         flex: 1;
@@ -61,7 +65,7 @@
 }
 
 .description {
-    word-wrap: break-word;
+    overflow-wrap: break-word;
     white-space: pre-wrap;
 }
 

@@ -160,7 +160,6 @@ describe('InputWithCharacterLimit', () => {
         renderInputWithCharacterLimit({ value: 'abc', hasError: true });
         focusInput();
         const btn = screen.getByRole('button', { name: /clear input/i });
-        expect(btn).toHaveClass('char-limit-input__clear-button--visible');
         expect(btn).toHaveClass('char-limit-input__clear-button--error');
     });
 

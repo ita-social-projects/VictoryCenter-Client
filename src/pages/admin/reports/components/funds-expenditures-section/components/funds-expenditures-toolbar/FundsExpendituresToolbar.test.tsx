@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, within } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { FundsExpendituresToolbar, TypeFilterValue, CategoryFilterValue } from './FundsExpendituresToolbar';
 import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
@@ -23,27 +23,40 @@ jest.mock('./FundsExpendituresToolbar.module.scss', () => ({
     'plus-icon': 'plus-icon',
 }));
 
-jest.mock('@/assets/icons/plus.svg', () => ({
-    ReactComponent: ({ className }: { className?: string }) => <svg data-testid="plus-icon" className={className} />,
-}));
-
-jest.mock('@/components/admin/button/Button', () => ({
-    Button: ({
-        children,
-        onClick,
-        disabled,
-        className,
-    }: {
-        children: React.ReactNode;
-        onClick?: () => void;
-        disabled?: boolean;
-        className?: string;
-    }) => (
-        <button onClick={onClick} disabled={disabled} className={className}>
-            {children}
-        </button>
-    ),
-}));
+jest.mock(
+    '@/pages/admin/reports/components/funds-expenditures-section/components/common/funds-record-actions/FundsRecordActions',
+    () => ({
+        FundsRecordActions: ({
+            controlsDisabled,
+            isAddIncomeDisabled,
+            isAddExpenseDisabled,
+            onAddIncome,
+            onAddExpense,
+            testId,
+        }: {
+            controlsDisabled?: boolean;
+            isAddIncomeDisabled?: boolean;
+            isAddExpenseDisabled?: boolean;
+            onAddIncome?: () => void;
+            onAddExpense?: () => void;
+            testId?: string;
+        }) => (
+            <div
+                data-testid={testId ?? 'editing-actions'}
+                data-controls-disabled={String(Boolean(controlsDisabled))}
+                data-add-income-disabled={String(Boolean(isAddIncomeDisabled))}
+                data-add-expense-disabled={String(Boolean(isAddExpenseDisabled))}
+            >
+                <button type="button" data-testid="toolbar-trigger-add-expense" onClick={onAddExpense}>
+                    add-expense
+                </button>
+                <button type="button" data-testid="toolbar-trigger-add-income" onClick={onAddIncome}>
+                    add-income
+                </button>
+            </div>
+        ),
+    }),
+);
 
 jest.mock('@/components/common/select/Select', () => {
     const SelectOption = (_props: { value: unknown; name: string }) => null;
@@ -184,16 +197,14 @@ describe('FundsExpendituresToolbar', () => {
     });
 
     describe('edit mode', () => {
-        it('should show Add Income button when editing', () => {
+        it('should render FundsRecordActions when editing', () => {
             render(<FundsExpendituresToolbar {...defaultProps} isEditing={true} />);
-            const actions = screen.getByTestId('editing-actions');
-            expect(within(actions).getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.ADD_INCOME)).toBeInTheDocument();
+            expect(screen.getByTestId('editing-actions')).toBeInTheDocument();
         });
 
-        it('should show Add Expense button when editing', () => {
-            render(<FundsExpendituresToolbar {...defaultProps} isEditing={true} />);
-            const actions = screen.getByTestId('editing-actions');
-            expect(within(actions).getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.ADD_EXPENSE)).toBeInTheDocument();
+        it('should not render FundsRecordActions when not editing', () => {
+            render(<FundsExpendituresToolbar {...defaultProps} isEditing={false} />);
+            expect(screen.queryByTestId('editing-actions')).not.toBeInTheDocument();
         });
 
         it('should show exchange rate input when editing', () => {
@@ -201,16 +212,34 @@ describe('FundsExpendituresToolbar', () => {
             expect(screen.getByTestId('exchange-rate-input')).toBeInTheDocument();
         });
 
-        it('should disable Add Income button when isAddIncomeDisabled is true', () => {
+        it('should pass add-income disabled flag to FundsRecordActions', () => {
             render(<FundsExpendituresToolbar {...defaultProps} isEditing={true} isAddIncomeDisabled={true} />);
             const actions = screen.getByTestId('editing-actions');
-            expect(within(actions).getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.ADD_INCOME)).toBeDisabled();
+            expect(actions).toHaveAttribute('data-add-income-disabled', 'true');
         });
 
-        it('should disable Add Expense button when isAddExpenseDisabled is true', () => {
+        it('should pass add-expense disabled flag to FundsRecordActions', () => {
             render(<FundsExpendituresToolbar {...defaultProps} isEditing={true} isAddExpenseDisabled={true} />);
             const actions = screen.getByTestId('editing-actions');
-            expect(within(actions).getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.ADD_EXPENSE)).toBeDisabled();
+            expect(actions).toHaveAttribute('data-add-expense-disabled', 'true');
+        });
+
+        it('should pass controlsDisabled flag to FundsRecordActions', () => {
+            render(<FundsExpendituresToolbar {...defaultProps} isEditing={true} controlsDisabled={true} />);
+            const actions = screen.getByTestId('editing-actions');
+            expect(actions).toHaveAttribute('data-controls-disabled', 'true');
+        });
+
+        it('should call onAddIncome through FundsRecordActions', () => {
+            render(<FundsExpendituresToolbar {...defaultProps} isEditing={true} />);
+            fireEvent.click(screen.getByTestId('toolbar-trigger-add-income'));
+            expect(onAddIncome).toHaveBeenCalledTimes(1);
+        });
+
+        it('should call onAddExpense through FundsRecordActions', () => {
+            render(<FundsExpendituresToolbar {...defaultProps} isEditing={true} />);
+            fireEvent.click(screen.getByTestId('toolbar-trigger-add-expense'));
+            expect(onAddExpense).toHaveBeenCalledTimes(1);
         });
 
         it('should call onExchangeRateChange when exchange rate input changes', () => {

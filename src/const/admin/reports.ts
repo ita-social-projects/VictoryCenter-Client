@@ -203,6 +203,8 @@ export const FUNDS_EXPENDITURES_TEXT = {
         EMPTY_STATE: {
             MESSAGE: 'За вашим запитом нічого не знайдено',
             ALT_TEXT: 'Записів не знайдено',
+            TITLE: 'Немає записів',
+            ADD_RECORD: 'додайте перший запис надходження або витрати',
         },
     },
     VALIDATION: {

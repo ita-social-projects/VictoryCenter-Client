@@ -1,8 +1,7 @@
 import { Select } from '@/components/common/select/Select';
-import { Button } from '@/components/admin/button/Button';
 import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
 import { FundsExpendituresTransactionType, ReportFundsExpendituresCategory } from '@/types/admin/reports';
-import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
+import { FundsRecordActions } from '@/pages/admin/reports/components/funds-expenditures-section/components/common/funds-record-actions/FundsRecordActions';
 import cn from 'classnames';
 import styles from './FundsExpendituresToolbar.module.scss';
 
@@ -121,30 +120,14 @@ export const FundsExpendituresToolbar = ({
                     )}
 
                     {isEditing && (
-                        <div className={styles['editing-actions']} data-testid="editing-actions">
-                            <Button
-                                buttonStyle="primary"
-                                className={cn(styles['add-expense-button'], {
-                                    [styles['action-button-disabled-by-row-edit']]: controlsDisabled,
-                                })}
-                                onClick={onAddExpense}
-                                disabled={isAddExpenseDisabled || controlsDisabled}
-                            >
-                                <PlusIcon className={styles['plus-icon']} />
-                                {FUNDS_EXPENDITURES_TEXT.BUTTON.ADD_EXPENSE}
-                            </Button>
-                            <Button
-                                buttonStyle="primary"
-                                className={cn(styles['add-income-button'], {
-                                    [styles['action-button-disabled-by-row-edit']]: controlsDisabled,
-                                })}
-                                onClick={onAddIncome}
-                                disabled={isAddIncomeDisabled || controlsDisabled}
-                            >
-                                <PlusIcon className={styles['plus-icon']} />
-                                {FUNDS_EXPENDITURES_TEXT.BUTTON.ADD_INCOME}
-                            </Button>
-                        </div>
+                        <FundsRecordActions
+                            controlsDisabled={controlsDisabled}
+                            isAddExpenseDisabled={isAddExpenseDisabled}
+                            isAddIncomeDisabled={isAddIncomeDisabled}
+                            onAddExpense={onAddExpense}
+                            onAddIncome={onAddIncome}
+                            testId="editing-actions"
+                        />
                     )}
                 </div>
             </div>

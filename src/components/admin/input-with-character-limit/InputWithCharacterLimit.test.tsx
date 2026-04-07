@@ -19,7 +19,7 @@ describe('InputWithCharacterLimit', () => {
 
     const getInput = () => screen.getByRole('textbox');
     const getCharacterCounter = (current: number, max: number) => screen.getByText(`${current}/${max}`);
-    const getWrapper = () => getInput().parentElement!;
+    const getWrapper = () => getInput().closest('.char-limit-input')!;
 
     const focusInput = () => fireEvent.focus(getInput());
     const blurInput = () => fireEvent.blur(getInput());
@@ -110,6 +110,21 @@ describe('InputWithCharacterLimit', () => {
         );
     });
 
+    it('hides clear button when value is empty', () => {
+        const { rerender } = renderInputWithCharacterLimit({ value: 'Hello' });
+
+        focusInput();
+        expect(screen.getByRole('button', { name: /clear input/i })).not.toHaveClass(
+            'char-limit-input__clear-button--hidden',
+        );
+
+        rerender(<InputWithCharacterLimit {...defaultProps} value="" />);
+
+        expect(screen.getByRole('button', { name: /clear input/i })).toHaveClass(
+            'char-limit-input__clear-button--hidden',
+        );
+    });
+
     it('sets aria-invalid when current length exceeds maxLength', () => {
         renderInputWithCharacterLimit({ value: 'abcd', maxLength: 3 });
         expect(getInput()).toHaveAttribute('aria-invalid', 'true');
@@ -145,7 +160,6 @@ describe('InputWithCharacterLimit', () => {
         renderInputWithCharacterLimit({ value: 'abc', hasError: true });
         focusInput();
         const btn = screen.getByRole('button', { name: /clear input/i });
-        expect(btn).toHaveClass('char-limit-input__clear-button--visible');
         expect(btn).toHaveClass('char-limit-input__clear-button--error');
     });
 

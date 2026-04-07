@@ -33,6 +33,13 @@ jest.mock('./AddIncomeModal.module.scss', () => ({
     'exchange-rate-chip': 'exchange-rate-chip',
     'exchange-rate-chip-label': 'exchange-rate-chip-label',
     'exchange-rate-value': 'exchange-rate-value',
+    info: 'info',
+    'info-icon': 'info-icon',
+    'info-text': 'info-text',
+}));
+
+jest.mock('@/assets/icons/info.svg', () => ({
+    ReactComponent: ({ className }: { className?: string }) => <svg data-testid="info-icon" className={className} />,
 }));
 
 jest.mock(
@@ -591,6 +598,53 @@ describe('AddIncomeModal', () => {
             uahInput.blur();
 
             expect(uahInput.value).toBe('100');
+        });
+
+        it('should keep UAH unchanged when USD is manually edited and blurred', async () => {
+            const user = userEvent.setup({ delay: null });
+            renderAddIncomeModal({ exchangeRate: '42' });
+
+            const uahInput = screen.getByTestId('input-add-income-amount-uah') as HTMLInputElement;
+            const usdInput = screen.getByTestId('input-add-income-amount-usd') as HTMLInputElement;
+
+            await user.type(uahInput, '100');
+            expect(usdInput.value).toBe('2.39');
+
+            await user.clear(usdInput);
+            await user.type(usdInput, '2.35');
+            fireEvent.blur(usdInput);
+
+            expect(uahInput.value).toBe('100');
+        });
+
+        it('should show informative mismatch message when edited USD is not equal to converted value', async () => {
+            const user = userEvent.setup({ delay: null });
+            renderAddIncomeModal({ exchangeRate: '42' });
+
+            const uahInput = screen.getByTestId('input-add-income-amount-uah') as HTMLInputElement;
+            const usdInput = screen.getByTestId('input-add-income-amount-usd') as HTMLInputElement;
+
+            await user.type(uahInput, '100');
+            await user.clear(usdInput);
+            await user.type(usdInput, '2.35');
+            fireEvent.blur(usdInput);
+
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).toBeInTheDocument();
+        });
+
+        it('should not show mismatch message when edited USD equals converted value', async () => {
+            const user = userEvent.setup({ delay: null });
+            renderAddIncomeModal({ exchangeRate: '42' });
+
+            const uahInput = screen.getByTestId('input-add-income-amount-uah') as HTMLInputElement;
+            const usdInput = screen.getByTestId('input-add-income-amount-usd') as HTMLInputElement;
+
+            await user.type(uahInput, '100');
+            await user.clear(usdInput);
+            await user.type(usdInput, '2.39');
+            fireEvent.blur(usdInput);
+
+            expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).not.toBeInTheDocument();
         });
     });
 

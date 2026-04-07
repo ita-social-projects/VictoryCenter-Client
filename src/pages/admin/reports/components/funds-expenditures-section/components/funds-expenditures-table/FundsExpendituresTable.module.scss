@@ -292,6 +292,33 @@
     color: c.$error;
 }
 
+.amount-edit-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    width: 128px;
+    min-width: 0;
+}
+
+.amount-edit-info-icon {
+    width: 18px;
+    height: 18px;
+
+    path {
+        stroke: c.$blue-500;
+    }
+}
+
+.amount-edit-info-text {
+    @include type.small-text-medium;
+    margin: 0;
+    color: c.$blue-500;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    white-space: normal;
+    min-width: 0;
+}
+
 .category-edit-error {
     @include type.small-text-regular;
 }

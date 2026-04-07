@@ -77,7 +77,7 @@ jest.mock('@/assets/icons/not-found.svg', () => ({
 }));
 
 jest.mock('@/components/common/select/Select', () => {
-    const React = require('react') as typeof import('react');
+    const React = require('react');
 
     interface MockSelectProps<TValue> {
         value: TValue;

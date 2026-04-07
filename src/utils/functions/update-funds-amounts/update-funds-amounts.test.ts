@@ -137,7 +137,7 @@ describe('updateFundsAmounts', () => {
 
             expect(result.amountUah).toBe('100');
             expect(result.amountUsd).toBe('3');
-            expect(mockGetConvertedAmount).toHaveBeenCalledWith('100', 'amountUah', '33.5');
+            expect(mockGetConvertedAmount).toHaveBeenCalledWith('100', '33.5');
         });
 
         it('should not convert amountUsd to amountUah when no error', () => {
@@ -198,7 +198,7 @@ describe('updateFundsAmounts', () => {
             const result = updater(initialState);
 
             expect(result.amountUah).toBe('100');
-            expect(mockGetConvertedAmount).toHaveBeenCalledWith('100', 'amountUah', null);
+            expect(mockGetConvertedAmount).toHaveBeenCalledWith('100', null);
         });
     });
 

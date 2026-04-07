@@ -149,6 +149,7 @@ export const FUNDS_EXPENDITURES_TEXT = {
             AMOUNT_UAH_LABEL: 'Сума (UAH)',
             AMOUNT_USD_LABEL: 'Сума (USD)',
             CONFIRM_CLOSE_TITLE: 'Зміни будуть втрачені. Бажаєте продовжити?',
+            CATEGORY_NO_AVAILABLE: 'Немає доступних категорій. Спочатку створіть категорію',
         },
         DELETE: {
             TITLE: 'Видалити запис?',

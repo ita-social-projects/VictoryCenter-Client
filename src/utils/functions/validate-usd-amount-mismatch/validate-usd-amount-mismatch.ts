@@ -1,20 +1,16 @@
 import { getConvertedAmount } from '@/utils/functions/get-converted-amount/get-converted-amount';
 import { parseAmount } from '@/utils/functions/parse-amount/parse-amount';
 
-const hasPositiveAmount = (value: string | null | undefined): boolean => {
-    return parseAmount(value ?? '') > 0;
-};
-
 export const isUsdAmountMismatch = (
     amountUah: string,
     amountUsd: string,
     exchangeRate: string | null | undefined,
 ): boolean => {
-    if (!hasPositiveAmount(amountUah) || !hasPositiveAmount(amountUsd) || !hasPositiveAmount(exchangeRate)) {
+    if (parseAmount(amountUah) <= 0 || parseAmount(amountUsd) <= 0 || parseAmount(exchangeRate ?? '') <= 0) {
         return false;
     }
 
-    const expectedUsd = getConvertedAmount(amountUah, 'amountUah', exchangeRate);
+    const expectedUsd = getConvertedAmount(amountUah, exchangeRate);
     if (expectedUsd === null) {
         return false;
     }

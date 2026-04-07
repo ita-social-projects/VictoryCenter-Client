@@ -2,11 +2,7 @@ import { parseAmount } from '@/utils/functions/parse-amount/parse-amount';
 
 const roundUpToTwoDecimals = (value: number): number => Math.ceil(value * 100) / 100;
 
-export const getConvertedAmount = (
-    value: string,
-    field: 'amountUah',
-    exchangeRate: string | null | undefined,
-): string | null => {
+export const getConvertedAmount = (value: string, exchangeRate: string | null | undefined): string | null => {
     const parsedExchangeRate = parseAmount(exchangeRate ?? '');
     if (parsedExchangeRate <= 0) {
         return null;

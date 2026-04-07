@@ -30,7 +30,7 @@ export const updateFundsAmounts = (
         let nextAmountUsdError = field === 'amountUsd' ? currentFieldError : prev.errors.amountUsd;
 
         if (!currentFieldError && field === 'amountUah') {
-            const convertedAmount = getConvertedAmount(normalized, 'amountUah', exchangeRate);
+            const convertedAmount = getConvertedAmount(normalized, exchangeRate);
 
             if (convertedAmount !== null) {
                 nextAmountUsd = convertedAmount;

@@ -305,7 +305,7 @@ export const FundsExpendituresTable = ({
                 let nextUsdMismatchMessage = prev.usdMismatchMessage;
 
                 if (!currentFieldError && field === 'amountUah') {
-                    const convertedAmount = getConvertedAmount(normalized, 'amountUah', exchangeRate);
+                    const convertedAmount = getConvertedAmount(normalized, exchangeRate);
 
                     if (convertedAmount !== null) {
                         nextAmountUsd = convertedAmount;
@@ -351,7 +351,7 @@ export const FundsExpendituresTable = ({
                 let nextUsdMismatchMessage = prev.usdMismatchMessage;
 
                 if (!currentFieldError && field === 'amountUah') {
-                    const convertedAmountString = getConvertedAmount(normalized, 'amountUah', exchangeRate);
+                    const convertedAmountString = getConvertedAmount(normalized, exchangeRate);
 
                     if (convertedAmountString !== null) {
                         nextAmountUsd = convertedAmountString;

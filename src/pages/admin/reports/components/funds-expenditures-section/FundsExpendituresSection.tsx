@@ -30,6 +30,7 @@ import {
 } from './components/funds-expenditures-toolbar/FundsExpendituresToolbar';
 import { EnrichedRecord, FundsExpendituresTable } from './components/funds-expenditures-table/FundsExpendituresTable';
 import { AddIncomeModal } from './components/common/add-income-modal/AddIncomeModal';
+import { DeleteRecordModal } from './components/common/delete-record-modal/DeleteRecordModal';
 import styles from './FundsExpendituresSection.module.scss';
 
 const enrichRecords = (
@@ -58,6 +59,10 @@ export const FundsExpenditureSection = () => {
     const [recordsState, setRecordsState] = useState<ReportFundsExpendituresRecord[]>([]);
     const [isRowEditMode, setIsRowEditMode] = useState(false);
     const [isAddIncomeModalOpen, setIsAddIncomeModalOpen] = useState(false);
+
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [recordToDelete, setRecordToDelete] = useState<ReportFundsExpendituresRecord | null>(null);
+    const [isDeletingRecord, setIsDeletingRecord] = useState(false);
 
     const handleEdit = useCallback(() => setIsEditing(true), []);
     const handleCancel = useCallback(() => {
@@ -268,6 +273,28 @@ export const FundsExpenditureSection = () => {
         [addToast, adminClient, refetchSummary],
     );
 
+    const handleDeleteClick = (record: ReportFundsExpendituresRecord) => {
+        setRecordToDelete(record);
+        setIsDeleteModalOpen(true);
+    };
+
+    const handleConfirmDelete = useCallback(async () => {
+        if (!recordToDelete) return;
+
+        setIsDeletingRecord(true);
+        try {
+            await FundsExpendituresApi.deleteRecord(adminClient, recordToDelete.id);
+            setRecordsState((prev) => prev.filter((r) => r.id !== recordToDelete.id));
+            refetchSummary();
+            addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_DELETED_SUCCESSFULLY, ToastType.Success);
+            setIsDeleteModalOpen(false);
+        } catch {
+            addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_DELETE_FAILED_RETRY, ToastType.Error);
+        } finally {
+            setIsDeletingRecord(false);
+        }
+    }, [recordToDelete, adminClient, addToast, refetchSummary]);
+
     const handlePublish = useCallback(async () => {
         try {
             const updatedSettings = await FundsExpendituresApi.updateSettings(adminClient, {
@@ -389,6 +416,7 @@ export const FundsExpenditureSection = () => {
                 isRowActionsDisabled={hasExchangeRateError}
                 onRowEditModeChange={setIsRowEditMode}
                 onRecordSave={handleRecordSave}
+                onDeleteRecord={handleDeleteClick}
             />
 
             {isEditing && (
@@ -414,6 +442,17 @@ export const FundsExpenditureSection = () => {
                 records={recordsState}
                 exchangeRate={currentExchangeRate}
                 onSubmit={handleCreateRecord}
+            />
+
+            <DeleteRecordModal
+                isOpen={isDeleteModalOpen}
+                title={FUNDS_EXPENDITURES_TEXT.MODAL.DELETE.TITLE}
+                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
+                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
+                isButtonsDisabled={isDeletingRecord}
+                onConfirm={handleConfirmDelete}
+                onCancel={() => setIsDeleteModalOpen(false)}
+                onClose={() => setIsDeleteModalOpen(false)}
             />
         </div>
     );

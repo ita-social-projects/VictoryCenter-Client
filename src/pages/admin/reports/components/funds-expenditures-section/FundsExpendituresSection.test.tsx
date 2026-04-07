@@ -197,11 +197,27 @@ jest.mock('./components/funds-expenditures-table/FundsExpendituresTable', () => 
         isEditing,
         onRecordSave,
         onRowEditModeChange,
+        onDeleteRecord,
     }: {
-        records: unknown[];
+        records: Array<{
+            id: number;
+            categoryId: number;
+            type: 'income' | 'expense';
+            reportingYear: string;
+            amountUah: string;
+            amountUsd: string;
+        }>;
         isEditing?: boolean;
         onRecordSave?: (recordId: number, data: { categoryId: number; amountUah: string; amountUsd: string }) => void;
         onRowEditModeChange?: (isRowEditMode: boolean) => void;
+        onDeleteRecord?: (record: {
+            id: number;
+            categoryId: number;
+            type: 'income' | 'expense';
+            reportingYear: string;
+            amountUah: string;
+            amountUsd: string;
+        }) => void;
     }) => (
         <div data-testid="funds-table" data-record-count={records.length} data-editing={String(isEditing ?? false)}>
             <button
@@ -221,6 +237,13 @@ jest.mock('./components/funds-expenditures-table/FundsExpendituresTable', () => 
             </button>
             <button data-testid="row-edit-off" onClick={() => onRowEditModeChange?.(false)}>
                 Row edit off
+            </button>
+            <button
+                data-testid="trigger-record-delete"
+                onClick={() => onDeleteRecord?.(records[0])}
+                disabled={!isEditing || records.length === 0}
+            >
+                Delete row
             </button>
         </div>
     ),
@@ -267,6 +290,7 @@ jest.mock('./components/common/add-income-modal/AddIncomeModal', () => ({
 const mockUpdateRecord = jest.fn();
 const mockCreateRecord = jest.fn();
 const mockUpdateSettings = jest.fn();
+const mockDeleteRecord = jest.fn();
 jest.mock('@/services/api/admin/reports/funds-expenditures-api', () => ({
     FundsExpendituresApi: {
         getSettings: jest.fn(),
@@ -276,6 +300,7 @@ jest.mock('@/services/api/admin/reports/funds-expenditures-api', () => ({
         updateSettings: (...args: unknown[]) => mockUpdateSettings(...args),
         createRecord: (...args: unknown[]) => mockCreateRecord(...args),
         updateRecord: (...args: unknown[]) => mockUpdateRecord(...args),
+        deleteRecord: (...args: unknown[]) => mockDeleteRecord(...args),
     },
 }));
 
@@ -735,6 +760,72 @@ describe('FundsExpenditureSection', () => {
                 FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_CREATE_FAILED_RETRY,
                 'error',
             );
+        });
+
+        it('should delete record after confirmation and show success toast', async () => {
+            mockDeleteRecord.mockResolvedValueOnce(undefined);
+
+            render(<FundsExpenditureSection />);
+
+            fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT));
+            expect(screen.getByTestId('funds-table')).toHaveAttribute(
+                'data-record-count',
+                String(MOCK_FUNDS_EXPENDITURES_RECORDS.length),
+            );
+
+            fireEvent.click(screen.getByTestId('trigger-record-delete'));
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE.TITLE)).toBeInTheDocument();
+
+            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
+
+            await waitFor(() => {
+                expect(mockDeleteRecord).toHaveBeenCalledWith({}, 1);
+                expect(mockAddToast).toHaveBeenCalledWith(
+                    FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_DELETED_SUCCESSFULLY,
+                    'success',
+                );
+                expect(screen.getByTestId('funds-table')).toHaveAttribute(
+                    'data-record-count',
+                    String(MOCK_FUNDS_EXPENDITURES_RECORDS.length - 1),
+                );
+                expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE.TITLE)).not.toBeInTheDocument();
+            });
+        });
+
+        it('should show delete error toast and keep modal open when delete fails', async () => {
+            mockDeleteRecord.mockRejectedValueOnce(new Error('delete failed'));
+
+            render(<FundsExpenditureSection />);
+
+            fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT));
+            fireEvent.click(screen.getByTestId('trigger-record-delete'));
+            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
+
+            await waitFor(() => {
+                expect(mockDeleteRecord).toHaveBeenCalledWith({}, 1);
+                expect(mockAddToast).toHaveBeenCalledWith(
+                    FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_DELETE_FAILED_RETRY,
+                    'error',
+                );
+                expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE.TITLE)).toBeInTheDocument();
+                expect(screen.getByTestId('funds-table')).toHaveAttribute(
+                    'data-record-count',
+                    String(MOCK_FUNDS_EXPENDITURES_RECORDS.length),
+                );
+            });
+        });
+
+        it('should close delete confirmation modal on cancel', () => {
+            render(<FundsExpenditureSection />);
+
+            fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT));
+            fireEvent.click(screen.getByTestId('trigger-record-delete'));
+
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE.TITLE)).toBeInTheDocument();
+
+            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.NO));
+
+            expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE.TITLE)).not.toBeInTheDocument();
         });
     });
 });

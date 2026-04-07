@@ -24,9 +24,9 @@ export const ProgramExpensesToolbar = ({
                 className={styles['program-select']}
                 headClassName={styles['program-select-head']}
                 optionClassName={styles['program-option']}
-                placeholder={PROGRAM_EXPENSES_TEXT.FILTER.PLACEHOLDER}
+                placeholder={PROGRAM_EXPENSES_TEXT.TABLE.COLUMNS.PROGRAM}
             >
-                <Select.Option value={undefined} name={PROGRAM_EXPENSES_TEXT.FILTER.ALL_OPTION} />
+                <Select.Option value={undefined} name={FUNDS_EXPENDITURES_TEXT.FILTER.ALL_OPTION} />
                 {programs.map((program) => (
                     <Select.Option key={program.id} value={program.id} name={program.name} />
                 ))}

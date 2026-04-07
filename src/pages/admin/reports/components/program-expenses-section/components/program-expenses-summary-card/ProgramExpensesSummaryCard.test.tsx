@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ProgramExpensesSummaryCard } from './ProgramExpensesSummaryCard';
-import { PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
+import { FUNDS_EXPENDITURES_TEXT, PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
 
 describe('ProgramExpensesSummaryCard', () => {
     const normalizeText = (value: string) => value.replaceAll('\u00A0', ' ').replaceAll(/\s+/g, ' ').trim();
@@ -34,11 +34,11 @@ describe('ProgramExpensesSummaryCard', () => {
             .map((element) => normalizeText(element.textContent ?? ''))
             .filter(
                 (text) =>
-                    text.includes(PROGRAM_EXPENSES_TEXT.SUMMARY_CARD.AMOUNT_SUFFIX_UAH) ||
-                    text.includes(PROGRAM_EXPENSES_TEXT.SUMMARY_CARD.AMOUNT_SUFFIX_USD),
+                    text.includes(FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.AMOUNT_SUFFIX_UAH) ||
+                    text.includes(FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.AMOUNT_SUFFIX_USD),
             );
 
-        expect(amountTexts).toContain(`7 265 ${PROGRAM_EXPENSES_TEXT.SUMMARY_CARD.AMOUNT_SUFFIX_UAH}`);
-        expect(amountTexts).toContain(`4 200 ${PROGRAM_EXPENSES_TEXT.SUMMARY_CARD.AMOUNT_SUFFIX_USD}`);
+        expect(amountTexts).toContain(`7 265 ${FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.AMOUNT_SUFFIX_UAH}`);
+        expect(amountTexts).toContain(`4 200 ${FUNDS_EXPENDITURES_TEXT.SUMMARY_CARDS.AMOUNT_SUFFIX_USD}`);
     });
 });

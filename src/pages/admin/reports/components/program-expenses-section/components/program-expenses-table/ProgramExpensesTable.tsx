@@ -1,3 +1,4 @@
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FUNDS_EXPENDITURES_TEXT, PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
 import { ProgramExpensesRecord } from '@/types/admin/reports';
 import { ReactComponent as NotFoundIcon } from '@/assets/icons/not-found.svg';
@@ -22,11 +23,11 @@ export const ProgramExpensesTable = ({ records }: ProgramExpensesTableProps) => 
                 </colgroup>
                 <thead>
                     <tr>
-                        <th className={styles.th}>{PROGRAM_EXPENSES_TEXT.TABLE.COLUMNS.REPORTING_YEAR}</th>
-                        <th className={styles.th}>{PROGRAM_EXPENSES_TEXT.TABLE.COLUMNS.TYPE}</th>
+                        <th className={styles.th}>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.REPORTING_YEAR}</th>
+                        <th className={styles.th}>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.TYPE}</th>
                         <th className={styles.th}>{PROGRAM_EXPENSES_TEXT.TABLE.COLUMNS.PROGRAM}</th>
-                        <th className={styles.th}>{PROGRAM_EXPENSES_TEXT.TABLE.COLUMNS.AMOUNT_UAH}</th>
-                        <th className={styles.th}>{PROGRAM_EXPENSES_TEXT.TABLE.COLUMNS.AMOUNT_USD}</th>
+                        <th className={styles.th}>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.AMOUNT_UAH}</th>
+                        <th className={styles.th}>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.AMOUNT_USD}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -46,9 +47,7 @@ export const ProgramExpensesTable = ({ records }: ProgramExpensesTableProps) => 
                             <tr key={record.id} className={styles.tr}>
                                 <td className={styles.td}>{record.reportingYear}</td>
                                 <td className={styles.td}>
-                                    <span className={styles['type-chip']}>
-                                        {PROGRAM_EXPENSES_TEXT.TABLE.TYPE_LABEL}
-                                    </span>
+                                    <span className={styles['type-chip']}>{COMMON_TEXT_ADMIN.TAB.PROGRAMS}</span>
                                 </td>
                                 <td className={styles.td}>{record.programName}</td>
                                 <td className={styles.td}>{formatSummaryAmount(parseAmount(record.amountUah))}</td>

@@ -1,5 +1,6 @@
 import { render, screen, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ProgramExpensesTable } from './ProgramExpensesTable';
 import { FUNDS_EXPENDITURES_TEXT, PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
 
@@ -34,11 +35,11 @@ describe('ProgramExpensesTable', () => {
     it('should render table headers', () => {
         render(<ProgramExpensesTable records={records} />);
 
-        expect(screen.getByText(PROGRAM_EXPENSES_TEXT.TABLE.COLUMNS.REPORTING_YEAR)).toBeInTheDocument();
-        expect(screen.getByText(PROGRAM_EXPENSES_TEXT.TABLE.COLUMNS.TYPE)).toBeInTheDocument();
+        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.REPORTING_YEAR)).toBeInTheDocument();
+        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.TYPE)).toBeInTheDocument();
         expect(screen.getByText(PROGRAM_EXPENSES_TEXT.TABLE.COLUMNS.PROGRAM)).toBeInTheDocument();
-        expect(screen.getByText(PROGRAM_EXPENSES_TEXT.TABLE.COLUMNS.AMOUNT_UAH)).toBeInTheDocument();
-        expect(screen.getByText(PROGRAM_EXPENSES_TEXT.TABLE.COLUMNS.AMOUNT_USD)).toBeInTheDocument();
+        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.AMOUNT_UAH)).toBeInTheDocument();
+        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.AMOUNT_USD)).toBeInTheDocument();
     });
 
     it('should render formatted record values', () => {
@@ -47,7 +48,7 @@ describe('ProgramExpensesTable', () => {
 
         expect(within(table).getByText('2025')).toBeInTheDocument();
         expect(within(table).getByText('Program A')).toBeInTheDocument();
-        expect(within(table).getAllByText(PROGRAM_EXPENSES_TEXT.TABLE.TYPE_LABEL)).toHaveLength(2);
+        expect(within(table).getAllByText(COMMON_TEXT_ADMIN.TAB.PROGRAMS)).toHaveLength(2);
 
         const normalizedText = normalizeText(container.textContent ?? '');
         expect(normalizedText).toContain('7 265');

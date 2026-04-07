@@ -160,7 +160,7 @@ export const FUNDS_EXPENDITURES_TEXT = {
             REPORTING_YEAR: 'Звітній рік',
             TYPE: 'Тип',
             CATEGORY: 'Категорія',
-            AMOUNT_UAH: 'Сума UA',
+            AMOUNT_UAH: 'Сума UAH',
             AMOUNT_USD: 'Сума USD',
         },
         TYPE_LABELS: {
@@ -186,21 +186,10 @@ export const FUNDS_EXPENDITURES_TEXT = {
 export const PROGRAM_EXPENSES_TEXT = {
     SUMMARY_CARD: {
         TITLE: 'Всього програмні витрати',
-        AMOUNT_SUFFIX_UAH: 'UAH',
-        AMOUNT_SUFFIX_USD: 'USD',
-    },
-    FILTER: {
-        ALL_OPTION: 'Всі',
-        PLACEHOLDER: 'Програма',
     },
     TABLE: {
-        TYPE_LABEL: 'Програми',
         COLUMNS: {
-            REPORTING_YEAR: 'Звітній рік',
-            TYPE: 'Тип',
             PROGRAM: 'Програма',
-            AMOUNT_UAH: 'Сума UAH',
-            AMOUNT_USD: 'Сума USD',
         },
     },
 };

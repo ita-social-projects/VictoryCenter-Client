@@ -49,7 +49,7 @@ describe('ProgramExpensesToolbar', () => {
     it('should render program filter placeholder', () => {
         render(<ProgramExpensesToolbar {...defaultProps} />);
 
-        expect(screen.getByText(PROGRAM_EXPENSES_TEXT.FILTER.PLACEHOLDER)).toBeInTheDocument();
+        expect(screen.getByText(PROGRAM_EXPENSES_TEXT.TABLE.COLUMNS.PROGRAM)).toBeInTheDocument();
     });
 
     it('should render exchange rate label and value', () => {

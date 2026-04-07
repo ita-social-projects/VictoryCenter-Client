@@ -1,3 +1,60 @@
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
+import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
+import { InputWithCharacterLimit } from '@/components/admin/input-with-character-limit/InputWithCharacterLimit';
+import { Select } from '@/components/common/select/Select';
+import { FundsRecordModal } from '@/pages/admin/reports/components/funds-expenditures-section/components/common/funds-record-modal/FundsRecordModal';
+import {
+    ReportFundsExpendituresCategory,
+    ReportFundsExpendituresRecord,
+    FundsExpendituresTransactionType,
+} from '@/types/admin/reports';
+import { updateFundsAmounts } from '@/utils/functions/update-funds-amounts/update-funds-amounts';
+import { getReportingYearOptions } from '@/utils/functions/get-reporting-year-options/get-reporting-year-options';
+import {
+    normalizeFundsExpendituresAmountInput,
+    validateFundsExpendituresAmount,
+    validateFundsExpendituresCategory,
+} from '@/validation/admin/reports-schema/funds-expenditures-record-schema/funds-expenditures-record-schema';
+import styles from './AddIncomeModal.module.scss';
+
+interface AddIncomeModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    categories: ReportFundsExpendituresCategory[];
+    records: ReportFundsExpendituresRecord[];
+    exchangeRate: string | null;
+    onSubmit: (data: {
+        categoryId: number;
+        reportingYear: string;
+        amountUah: string;
+        amountUsd: string;
+        type: FundsExpendituresTransactionType;
+    }) => Promise<boolean>;
+}
+
+interface AddIncomeFormState {
+    reportingYear: string | undefined;
+    categoryId: number | undefined;
+    amountUah: string;
+    amountUsd: string;
+    errors: {
+        reportingYear?: string;
+        categoryId?: string;
+        amountUah?: string;
+        amountUsd?: string;
+    };
+}
+
+const INITIAL_STATE: AddIncomeFormState = {
+    reportingYear: undefined,
+    categoryId: undefined,
+    amountUah: '',
+    amountUsd: '',
+    errors: {},
+};
+
 export const AddIncomeModal = ({
     isOpen,
     onClose,

@@ -789,4 +789,19 @@ describe('ProgramModal', () => {
         expect(onConfirm).toHaveBeenCalledTimes(1);
         expect(screen.queryByTestId('question-modal')).not.toBeInTheDocument();
     });
+
+    it('hides section-save confirmation when parent ProgramModal closes', () => {
+        const { rerender } = render(<ProgramModal {...addModeProps} isOpen={true} />);
+
+        act(() => {
+            capturedFormProps.onRequestSaveSection({ onConfirm: jest.fn() });
+        });
+
+        expect(screen.getByTestId('question-modal')).toBeInTheDocument();
+        expect(screen.getByTestId('question-title')).toHaveTextContent(COMMON_TEXT_ADMIN.QUESTION.SAVE_CHANGES);
+
+        rerender(<ProgramModal {...addModeProps} isOpen={false} />);
+
+        expect(screen.queryByTestId('question-modal')).not.toBeInTheDocument();
+    });
 });

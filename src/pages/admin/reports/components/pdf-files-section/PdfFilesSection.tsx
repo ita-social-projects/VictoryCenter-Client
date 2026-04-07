@@ -10,13 +10,18 @@ import { PdfReportsApi } from '@/services/api/admin/reports/pdf-reports/pdf-repo
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import { PdfDropzone } from './components/pdf-dropzone/PdfDropzone';
+import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
+import { ToastType } from '@/types/admin/toast';
+import { PDF_FILES_SECTION_TEXT } from '@/const/admin/reports';
 
 const EMPTY_SECTION = { title: '', description: '' };
 
 export const PdfFilesSection = () => {
     const client = useAdminClient();
+    const { addToast } = useToast();
     const [uploadedFiles, setUploadedFiles] = useState<PdfReportDto[]>([]);
     const [currentLanguage, setCurrentLanguage] = useState<'uk' | 'en'>('uk');
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const fetchSection = useCallback(async () => {
         return PdfSectionApi.getPdfSection(client);
@@ -37,7 +42,11 @@ export const PdfFilesSection = () => {
         autoFetchDependencies: [fetchSection],
     });
 
-    const { data: fetchedFiles, isLoading: isFilesLoading } = useDataFetch<PdfReportDto[]>({
+    const {
+        data: fetchedFiles,
+        isLoading: isFilesLoading,
+        refetch: refetchFiles,
+    } = useDataFetch<PdfReportDto[]>({
         initialData: [],
         fetchHandler: fetchFiles,
         autoFetchDependencies: [fetchFiles],
@@ -50,6 +59,23 @@ export const PdfFilesSection = () => {
     const handleSaveSection = useCallback(async () => {
         await refetchSection();
     }, [refetchSection]);
+
+    const handleDeleteFile = useCallback(
+        async (fileId: number) => {
+            setIsDeleting(true);
+            try {
+                await PdfReportsApi.delete(client, fileId);
+                addToast(PDF_FILES_SECTION_TEXT.DELETE_SUCCESS, ToastType.Success);
+                await refetchFiles();
+                setUploadedFiles((prev) => prev.filter((f) => f.id !== fileId));
+            } catch {
+                addToast(PDF_FILES_SECTION_TEXT.DELETE_ERROR, ToastType.Error);
+            } finally {
+                setIsDeleting(false);
+            }
+        },
+        [client, addToast, refetchFiles],
+    );
 
     if (isSectionLoading || isFilesLoading) {
         return (
@@ -68,7 +94,12 @@ export const PdfFilesSection = () => {
                 <LanguageSwitcherButtons currentLanguage={currentLanguage} onLanguageChange={setCurrentLanguage} />
             </div>
             <PdfDropzone onUploaded={handleUploaded} />
-            <PdfFilesTable files={[...fetchedFiles, ...uploadedFiles]} onViewFile={() => {}} />
+            <PdfFilesTable
+                files={[...fetchedFiles, ...uploadedFiles]}
+                onViewFile={() => {}}
+                onDeleteFile={handleDeleteFile}
+                isDeleting={isDeleting}
+            />
         </div>
     );
 };

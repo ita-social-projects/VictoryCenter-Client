@@ -120,6 +120,11 @@ export const PDF_FILES_SECTION_TEXT = {
             DELETE: 'Видалити файл',
         },
     },
+    DELETE_CONFIRMATION: {
+        TITLE: 'Файл буде видалено. Бажаєте продовжити?',
+    },
+    DELETE_SUCCESS: 'Файл успішно видалено',
+    DELETE_ERROR: 'Не вдалося видалити файл. Спробуйте ще раз.',
 };
 
 export const FUNDS_EXPENDITURES_VALIDATION = {

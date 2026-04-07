@@ -1,27 +1,41 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { PdfFilesSection } from './PdfFilesSection';
 import { PdfSectionApi } from '@/services/api/admin/reports/pdf-section/pdf-section-api';
 import { PdfReportsApi } from '@/services/api/admin/reports/pdf-reports/pdf-reports-api';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
+import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
+import { ToastType } from '@/types/admin/toast';
+import { PDF_FILES_SECTION_TEXT } from '@/const/admin/reports';
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient');
 jest.mock('@/services/api/admin/reports/pdf-section/pdf-section-api');
 jest.mock('@/services/api/admin/reports/pdf-reports/pdf-reports-api');
 jest.mock('@/hooks/common/use-data-fetch/useDataFetch');
+jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider');
 
 jest.mock('./components/pdf-section-content-block/PdfSectionContentBlock', () => ({
     PdfSectionContentBlock: () => <div data-testid="content-block">ContentBlock</div>,
 }));
 
 jest.mock('./components/pdf-files-table/PdfFilesTable', () => ({
-    PdfFilesTable: ({ files }: { files: any[] }) => (
-        <div data-testid="files-table">Files Count: {files?.length ?? 0}</div>
+    PdfFilesTable: ({ files, onDeleteFile, isDeleting }: any) => (
+        <div data-testid="files-table">
+            Files Count: {files?.length ?? 0}
+            {isDeleting && <span data-testid="is-deleting">Deleting...</span>}
+            <button onClick={() => onDeleteFile && onDeleteFile(1)} data-testid="delete-btn">
+                Delete
+            </button>
+        </div>
     ),
 }));
 
 jest.mock('./components/language-switcher-buttons/LanguageSwitcherButtons', () => ({
     LanguageSwitcherButtons: () => <div data-testid="lang-switcher">LanguageSwitcher</div>,
+}));
+
+jest.mock('./components/pdf-dropzone/PdfDropzone', () => ({
+    PdfDropzone: () => <div data-testid="dropzone">Dropzone</div>,
 }));
 
 jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
@@ -30,18 +44,22 @@ jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
 
 describe('PdfFilesSection', () => {
     const mockClient = { get: jest.fn() };
+    const mockAddToast = jest.fn();
     const mockSectionData = { title: 'Test Title', description: 'Test Desc' };
     const mockFilesResponse = { items: [{ id: 1 }, { id: 2 }], totalItemsCount: 2 };
+    const mockRefetch = jest.fn();
 
     beforeEach(() => {
         jest.clearAllMocks();
         (useAdminClient as jest.Mock).mockReturnValue(mockClient);
+        (useToast as jest.Mock).mockReturnValue({ addToast: mockAddToast });
     });
 
     it('should show loader when section or files are loading', () => {
         (useDataFetch as jest.Mock).mockReturnValue({
             data: null,
             isLoading: true,
+            refetch: mockRefetch,
         });
 
         render(<PdfFilesSection />);
@@ -50,13 +68,15 @@ describe('PdfFilesSection', () => {
 
     it('should render all components when data is loaded', () => {
         (useDataFetch as jest.Mock)
-            .mockReturnValueOnce({ data: mockSectionData, isLoading: false })
-            .mockReturnValueOnce({ data: mockFilesResponse.items, isLoading: false });
+            .mockReturnValueOnce({ data: mockSectionData, isLoading: false, refetch: mockRefetch })
+            .mockReturnValueOnce({ data: mockFilesResponse.items, isLoading: false, refetch: mockRefetch });
 
         render(<PdfFilesSection />);
 
         expect(screen.getByTestId('content-block')).toBeInTheDocument();
         expect(screen.getByTestId('files-table')).toHaveTextContent('Files Count: 2');
+        expect(screen.getByTestId('lang-switcher')).toBeInTheDocument();
+        expect(screen.getByTestId('dropzone')).toBeInTheDocument();
     });
 
     it('should use correct API calls in fetch handlers', async () => {
@@ -66,7 +86,7 @@ describe('PdfFilesSection', () => {
         (useDataFetch as jest.Mock).mockImplementation(({ fetchHandler }) => {
             if (!capturedFetchSection) capturedFetchSection = fetchHandler;
             else capturedFetchFiles = fetchHandler;
-            return { data: [], isLoading: false };
+            return { data: [], isLoading: false, refetch: mockRefetch };
         });
 
         render(<PdfFilesSection />);
@@ -83,12 +103,62 @@ describe('PdfFilesSection', () => {
 
     it('should provide default empty content if sectionData is null', () => {
         (useDataFetch as jest.Mock)
-            .mockReturnValueOnce({ data: null, isLoading: false })
-            .mockReturnValueOnce({ data: [], isLoading: false });
+            .mockReturnValueOnce({ data: null, isLoading: false, refetch: mockRefetch })
+            .mockReturnValueOnce({ data: [], isLoading: false, refetch: mockRefetch });
 
         render(<PdfFilesSection />);
 
         expect(screen.getByTestId('content-block')).toBeInTheDocument();
         expect(screen.getByTestId('files-table')).toHaveTextContent('Files Count: 0');
+    });
+
+    it('should call delete API and refetch files on file deletion', async () => {
+        let callCount = 0;
+        (useDataFetch as jest.Mock).mockImplementation(() => {
+            callCount++;
+            if (callCount === 1) {
+                return { data: mockSectionData, isLoading: false, refetch: mockRefetch };
+            }
+            return { data: mockFilesResponse.items, isLoading: false, refetch: mockRefetch };
+        });
+
+        (PdfReportsApi.delete as jest.Mock).mockResolvedValueOnce(undefined);
+
+        render(<PdfFilesSection />);
+
+        const deleteBtn = screen.getByTestId('delete-btn');
+        await waitFor(() => {
+            deleteBtn.click();
+        });
+
+        await waitFor(() => {
+            expect(PdfReportsApi.delete).toHaveBeenCalledWith(mockClient, 1);
+            expect(mockAddToast).toHaveBeenCalledWith(PDF_FILES_SECTION_TEXT.DELETE_SUCCESS, ToastType.Success);
+            expect(mockRefetch).toHaveBeenCalled();
+        });
+    });
+
+    it('should show error toast when deletion fails', async () => {
+        let callCount = 0;
+        (useDataFetch as jest.Mock).mockImplementation(() => {
+            callCount++;
+            if (callCount === 1) {
+                return { data: mockSectionData, isLoading: false, refetch: mockRefetch };
+            }
+            return { data: mockFilesResponse.items, isLoading: false, refetch: mockRefetch };
+        });
+
+        (PdfReportsApi.delete as jest.Mock).mockRejectedValueOnce(new Error('Delete failed'));
+
+        render(<PdfFilesSection />);
+
+        const deleteBtn = screen.getByTestId('delete-btn');
+        await waitFor(() => {
+            deleteBtn.click();
+        });
+
+        await waitFor(() => {
+            expect(mockAddToast).toHaveBeenCalledWith(PDF_FILES_SECTION_TEXT.DELETE_ERROR, ToastType.Error);
+        });
     });
 });

@@ -13,6 +13,7 @@ export interface ConfirmationModalProps {
     onConfirm: () => void;
     onCancel: () => void;
     isButtonsDisabled?: boolean;
+    className?: string;
 }
 
 export const ConfirmationModal = ({
@@ -25,9 +26,10 @@ export const ConfirmationModal = ({
     onCancel,
     content = null,
     isButtonsDisabled = false,
+    className,
 }: ConfirmationModalProps) => {
     return (
-        <Modal isOpen={isOpen} onClose={onClose}>
+        <Modal isOpen={isOpen} onClose={onClose} className={className}>
             <Modal.Title>{title}</Modal.Title>
             <Modal.Content>{content && <p>{content}</p>}</Modal.Content>
             <Modal.Actions>

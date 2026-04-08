@@ -39,6 +39,15 @@ export interface HippotherapyParticipantsSection {
     title: string;
     participants: HippotherapySwipedCard[];
 }
+
+export interface HippotherapyEthicsSection {
+    title: string;
+    imgURL: string;
+    imgAlternativeText: string;
+    text: string;
+    principles: string[];
+}
+
 export interface HippotherapyAbout {
     introSection: HippotherapyIntroData;
     descriptionSection: HippotherapyDefaultSection;
@@ -53,9 +62,5 @@ export interface HippotherapyAbout {
     };
     anotherQuoteSection: Quote;
     participantsSection: HippotherapyParticipantsSection;
-    ethicsSection: {
-        title: string;
-        text: string;
-        principles: string[];
-    };
+    ethicsSection: HippotherapyEthicsSection;
 }

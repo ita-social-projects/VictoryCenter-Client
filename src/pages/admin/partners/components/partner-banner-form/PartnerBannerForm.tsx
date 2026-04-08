@@ -217,6 +217,10 @@ export const PartnerBanner = () => {
                                 url(${BannerImage})
                               `,
                             }}
+                            cropWidth={PARTNER_BANNER_VALIDATION.image.width}
+                            cropHeight={PARTNER_BANNER_VALIDATION.image.height}
+                            minWidth={PARTNER_BANNER_VALIDATION.image.width}
+                            minHeight={PARTNER_BANNER_VALIDATION.image.height}
                         />
                         <InputError error={errors.image} />
                     </div>

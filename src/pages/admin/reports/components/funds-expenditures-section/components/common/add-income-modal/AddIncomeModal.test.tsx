@@ -563,6 +563,28 @@ describe('AddIncomeModal', () => {
 
             expect((uahInput as HTMLInputElement).value).toBe('500');
         });
+
+        it('should validate USD on change and disable submit for invalid non-empty value', async () => {
+            const user = userEvent.setup({ delay: null });
+            renderAddIncomeModal({ exchangeRate: '42' });
+
+            const yearSelect = screen.getByTestId('select-Оберіть звітній рік') as HTMLSelectElement;
+            const categorySelect = screen.getByTestId('select-Оберіть категорію надходження') as HTMLSelectElement;
+            const uahInput = screen.getByTestId('input-add-income-amount-uah') as HTMLInputElement;
+            const usdInput = screen.getByTestId('input-add-income-amount-usd') as HTMLInputElement;
+
+            fireEvent.change(yearSelect, { target: { value: currentYear } });
+            fireEvent.change(categorySelect, { target: { value: '3' } });
+            await user.type(uahInput, '100');
+
+            expect(screen.getByTestId('modal-submit')).toBeEnabled();
+
+            await user.clear(usdInput);
+            await user.type(usdInput, 'abc');
+
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER_GT_ZERO)).toBeInTheDocument();
+            expect(screen.getByTestId('modal-submit')).toBeDisabled();
+        });
     });
 
     describe('Amount Input - Blur Event', () => {

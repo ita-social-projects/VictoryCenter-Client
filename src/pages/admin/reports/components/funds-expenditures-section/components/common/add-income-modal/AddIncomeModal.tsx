@@ -168,17 +168,16 @@ export const AddIncomeModal = ({
         [exchangeRate],
     );
 
-    const handleUsdChange = useCallback((value: string) => {
-        setFormState((prev) => ({
-            ...prev,
-            amountUsd: value,
-            errors: {
-                ...prev.errors,
-                amountUsd: undefined,
-            },
-        }));
-        setUsdMismatchMessage(undefined);
-    }, []);
+    const handleUsdChange = useCallback(
+        (value: string) => {
+            setFormState((prev) => ({
+                ...prev,
+                ...updateFundsAmounts('amountUsd', value, exchangeRate, 'change')(prev),
+            }));
+            setUsdMismatchMessage(undefined);
+        },
+        [exchangeRate],
+    );
 
     const handleSubmit = useCallback(async () => {
         const normalizedAmountUah = normalizeFundsExpendituresAmountInput(formState.amountUah, true);

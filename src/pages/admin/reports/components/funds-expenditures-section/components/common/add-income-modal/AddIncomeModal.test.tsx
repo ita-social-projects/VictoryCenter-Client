@@ -646,6 +646,56 @@ describe('AddIncomeModal', () => {
 
             expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).not.toBeInTheDocument();
         });
+
+        it('should clear mismatch message after close and not show it on next open', async () => {
+            const user = userEvent.setup({ delay: null });
+            const { rerender } = render(
+                <AddIncomeModal
+                    isOpen={true}
+                    onClose={mockOnClose}
+                    categories={MOCK_CATEGORIES}
+                    records={MOCK_RECORDS}
+                    exchangeRate="42"
+                    onSubmit={mockOnSubmit}
+                />,
+            );
+
+            const uahInput = screen.getByTestId('input-add-income-amount-uah') as HTMLInputElement;
+            const usdInput = screen.getByTestId('input-add-income-amount-usd') as HTMLInputElement;
+
+            await user.type(uahInput, '100');
+            await user.clear(usdInput);
+            await user.type(usdInput, '2.35');
+            fireEvent.blur(usdInput);
+
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).toBeInTheDocument();
+
+            await user.click(screen.getByTestId('modal-close'));
+
+            rerender(
+                <AddIncomeModal
+                    isOpen={false}
+                    onClose={mockOnClose}
+                    categories={MOCK_CATEGORIES}
+                    records={MOCK_RECORDS}
+                    exchangeRate="42"
+                    onSubmit={mockOnSubmit}
+                />,
+            );
+
+            rerender(
+                <AddIncomeModal
+                    isOpen={true}
+                    onClose={mockOnClose}
+                    categories={MOCK_CATEGORIES}
+                    records={MOCK_RECORDS}
+                    exchangeRate="42"
+                    onSubmit={mockOnSubmit}
+                />,
+            );
+
+            expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).not.toBeInTheDocument();
+        });
     });
 
     describe('Form Submission - Valid State', () => {

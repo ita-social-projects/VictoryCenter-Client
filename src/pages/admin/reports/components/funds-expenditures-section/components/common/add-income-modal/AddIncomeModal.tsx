@@ -96,6 +96,7 @@ export const AddIncomeModal = ({
     const resetForm = useCallback(() => {
         setFormState(INITIAL_STATE);
         setIsSubmitting(false);
+        setUsdMismatchMessage(undefined);
     }, []);
 
     const handleClose = useCallback(() => {

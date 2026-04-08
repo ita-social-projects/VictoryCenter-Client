@@ -19,7 +19,7 @@ import {
     validateFundsExpendituresAmount,
     validateFundsExpendituresCategory,
 } from '@/validation/admin/reports-schema/funds-expenditures-record-schema/funds-expenditures-record-schema';
-import { getConvertedAmount } from '@/utils/functions/get-converted-amount/get-converted-amount';
+import { updateFundsAmounts } from '@/utils/functions/update-funds-amounts/update-funds-amounts';
 import { parseAmount } from '@/utils/functions/parse-amount/parse-amount';
 import { isUsdAmountMismatch } from '@/utils/functions/validate-usd-amount-mismatch/validate-usd-amount-mismatch';
 import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
@@ -287,51 +287,52 @@ export const FundsExpendituresTable = ({
         [getRowEditValidationError],
     );
 
+    const applyAmountUpdate = useCallback(
+        (prev: RowEditState, field: 'amountUah' | 'amountUsd', value: string, trigger: 'change' | 'blur') => {
+            const updatedAmounts = updateFundsAmounts(
+                field,
+                value,
+                exchangeRate ?? null,
+                trigger,
+            )({
+                amountUah: prev.amountUah,
+                amountUsd: prev.amountUsd,
+                errors: {
+                    amountUah: prev.errors.amountUah,
+                    amountUsd: prev.errors.amountUsd,
+                },
+            });
+
+            return {
+                ...prev,
+                amountUah: updatedAmounts.amountUah,
+                amountUsd: updatedAmounts.amountUsd,
+                errors: {
+                    ...prev.errors,
+                    amountUah: updatedAmounts.errors.amountUah,
+                    amountUsd: updatedAmounts.errors.amountUsd,
+                },
+            };
+        },
+        [exchangeRate],
+    );
+
     const handleAmountChange = useCallback(
         (recordId: number, field: 'amountUah' | 'amountUsd', nextValue: string) => {
-            const normalized = normalizeFundsExpendituresAmountInput(nextValue);
-
             setRowEditState((prev) => {
                 if (prev?.recordId !== recordId) {
                     return prev;
                 }
 
-                const currentFieldError = validateFundsExpendituresAmount(normalized, 'change');
-
-                let nextAmountUah = field === 'amountUah' ? normalized : prev.amountUah;
-                let nextAmountUsd = field === 'amountUsd' ? normalized : prev.amountUsd;
-                let nextAmountUahError = field === 'amountUah' ? currentFieldError : prev.errors.amountUah;
-                let nextAmountUsdError = field === 'amountUsd' ? currentFieldError : prev.errors.amountUsd;
-                let nextUsdMismatchMessage = prev.usdMismatchMessage;
-
-                if (!currentFieldError && field === 'amountUah') {
-                    const convertedAmount = getConvertedAmount(normalized, exchangeRate);
-
-                    if (convertedAmount !== null) {
-                        nextAmountUsd = convertedAmount;
-                        nextAmountUsdError = validateFundsExpendituresAmount(convertedAmount, 'change');
-                        nextUsdMismatchMessage = undefined;
-                    }
-                }
-
-                if (field === 'amountUsd') {
-                    nextUsdMismatchMessage = undefined;
-                }
+                const nextState = applyAmountUpdate(prev, field, nextValue, 'change');
 
                 return {
-                    ...prev,
-                    amountUah: nextAmountUah,
-                    amountUsd: nextAmountUsd,
-                    usdMismatchMessage: nextUsdMismatchMessage,
-                    errors: {
-                        ...prev.errors,
-                        amountUah: nextAmountUahError,
-                        amountUsd: nextAmountUsdError,
-                    },
+                    ...nextState,
+                    usdMismatchMessage: field === 'amountUsd' ? undefined : prev.usdMismatchMessage,
                 };
             });
         },
-        [exchangeRate],
+        [applyAmountUpdate],
     );
 
     const handleAmountBlur = useCallback(
@@ -341,46 +342,26 @@ export const FundsExpendituresTable = ({
                     return prev;
                 }
 
-                const normalized = normalizeFundsExpendituresAmountInput(prev[field], true);
-                const currentFieldError = validateFundsExpendituresAmount(normalized, 'blur');
-
-                let nextAmountUah = field === 'amountUah' ? normalized : prev.amountUah;
-                let nextAmountUsd = field === 'amountUsd' ? normalized : prev.amountUsd;
-                let nextAmountUahError = field === 'amountUah' ? currentFieldError : prev.errors.amountUah;
-                let nextAmountUsdError = field === 'amountUsd' ? currentFieldError : prev.errors.amountUsd;
-                let nextUsdMismatchMessage = prev.usdMismatchMessage;
-
-                if (!currentFieldError && field === 'amountUah') {
-                    const convertedAmountString = getConvertedAmount(normalized, exchangeRate);
-
-                    if (convertedAmountString !== null) {
-                        nextAmountUsd = convertedAmountString;
-                        nextAmountUsdError = validateFundsExpendituresAmount(convertedAmountString, 'blur');
-                        nextUsdMismatchMessage = undefined;
-                    }
-                }
+                const nextState = applyAmountUpdate(prev, field, prev[field], 'blur');
 
                 if (field === 'amountUsd') {
-                    const hasMismatch = isUsdAmountMismatch(prev.amountUah, normalized, exchangeRate);
-                    nextUsdMismatchMessage = hasMismatch
-                        ? FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH
-                        : undefined;
+                    const hasMismatch = isUsdAmountMismatch(nextState.amountUah, nextState.amountUsd, exchangeRate);
+
+                    return {
+                        ...nextState,
+                        usdMismatchMessage: hasMismatch
+                            ? FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH
+                            : undefined,
+                    };
                 }
 
                 return {
-                    ...prev,
-                    amountUah: nextAmountUah,
-                    amountUsd: nextAmountUsd,
-                    usdMismatchMessage: nextUsdMismatchMessage,
-                    errors: {
-                        ...prev.errors,
-                        amountUah: nextAmountUahError,
-                        amountUsd: nextAmountUsdError,
-                    },
+                    ...nextState,
+                    usdMismatchMessage: undefined,
                 };
             });
         },
-        [exchangeRate],
+        [applyAmountUpdate, exchangeRate],
     );
 
     const handleAcceptRowEdit = useCallback(

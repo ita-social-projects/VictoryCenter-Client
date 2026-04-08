@@ -17,8 +17,9 @@
 }
 
 .empty-sections-text {
-    width: 29.375rem;
     @include type.h3-semibold;
+    
+    width: 29.375rem;
     color: c.$blue-900;
     margin: 0;
     text-align: center;

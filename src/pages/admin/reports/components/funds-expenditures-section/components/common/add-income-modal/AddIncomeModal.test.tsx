@@ -588,6 +588,18 @@ describe('AddIncomeModal', () => {
     });
 
     describe('Amount Input - Blur Event', () => {
+        const setUsdMismatchState = async (user: ReturnType<typeof userEvent.setup>) => {
+            const uahInput = screen.getByTestId('input-add-income-amount-uah') as HTMLInputElement;
+            const usdInput = screen.getByTestId('input-add-income-amount-usd') as HTMLInputElement;
+
+            await user.type(uahInput, '100');
+            await user.clear(usdInput);
+            await user.type(usdInput, '2.35');
+            fireEvent.blur(usdInput);
+
+            return { uahInput, usdInput };
+        };
+
         it('should trigger blur handler on amount UAH input', async () => {
             const user = userEvent.setup({ delay: null });
             renderAddIncomeModal();
@@ -643,13 +655,7 @@ describe('AddIncomeModal', () => {
             const user = userEvent.setup({ delay: null });
             renderAddIncomeModal({ exchangeRate: '42' });
 
-            const uahInput = screen.getByTestId('input-add-income-amount-uah') as HTMLInputElement;
-            const usdInput = screen.getByTestId('input-add-income-amount-usd') as HTMLInputElement;
-
-            await user.type(uahInput, '100');
-            await user.clear(usdInput);
-            await user.type(usdInput, '2.35');
-            fireEvent.blur(usdInput);
+            await setUsdMismatchState(user);
 
             expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).toBeInTheDocument();
         });
@@ -658,13 +664,7 @@ describe('AddIncomeModal', () => {
             const user = userEvent.setup({ delay: null });
             renderAddIncomeModal({ exchangeRate: '42' });
 
-            const uahInput = screen.getByTestId('input-add-income-amount-uah') as HTMLInputElement;
-            const usdInput = screen.getByTestId('input-add-income-amount-usd') as HTMLInputElement;
-
-            await user.type(uahInput, '100');
-            await user.clear(usdInput);
-            await user.type(usdInput, '2.35');
-            fireEvent.blur(usdInput);
+            const { uahInput } = await setUsdMismatchState(user);
 
             expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).toBeInTheDocument();
 

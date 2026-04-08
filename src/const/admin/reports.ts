@@ -218,3 +218,14 @@ export const FUNDS_EXPENDITURES_TEXT = {
         EXCHANGE_RATE_MAX_DIGITS: "Не більше 9 цифр, 6 після ','",
     },
 };
+
+export const PROGRAM_EXPENSES_TEXT = {
+    SUMMARY_CARD: {
+        TITLE: 'Всього програмні витрати',
+    },
+    TABLE: {
+        COLUMNS: {
+            PROGRAM: 'Програма',
+        },
+    },
+};

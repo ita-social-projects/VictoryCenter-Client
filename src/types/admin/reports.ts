@@ -169,3 +169,30 @@ export interface FundsExpendituresSummary {
     incomeCategories: number;
     expenseCategories: number;
 }
+
+export interface ProgramExpensesProgram {
+    id: number;
+    name: string;
+}
+
+export interface ProgramExpensesRecord {
+    id: number;
+    programId: number;
+    programName: string;
+    type: FundsExpendituresTransactionType;
+    reportingYear: string;
+    amountUah: string;
+    amountUsd: string;
+}
+
+export interface ProgramExpensesSummary {
+    totalAmountUah: number;
+    totalAmountUsd: number;
+}
+
+export interface ProgramExpensesReadOnlyData {
+    exchangeRate: string | null;
+    programs: ProgramExpensesProgram[];
+    summary: ProgramExpensesSummary;
+    records: ProgramExpensesRecord[];
+}

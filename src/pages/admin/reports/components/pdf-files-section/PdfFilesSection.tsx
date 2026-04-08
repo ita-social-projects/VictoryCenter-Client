@@ -77,6 +77,19 @@ export const PdfFilesSection = () => {
         [client, addToast, refetchFiles],
     );
 
+    const handleViewFile = useCallback(
+        async (file: PdfReportDto) => {
+            try {
+                const pdfBlob = await PdfReportsApi.getById(client, file.id);
+                const blobUrl = URL.createObjectURL(pdfBlob);
+                window.open(blobUrl, '_blank');
+            } catch {
+                addToast(PDF_FILES_SECTION_TEXT.VIEW_ERROR, ToastType.Error);
+            }
+        },
+        [client, addToast],
+    );
+
     if (isSectionLoading || isFilesLoading) {
         return (
             <div className={styles.loader}>
@@ -96,7 +109,7 @@ export const PdfFilesSection = () => {
             <PdfDropzone onUploaded={handleUploaded} />
             <PdfFilesTable
                 files={[...fetchedFiles, ...uploadedFiles]}
-                onViewFile={() => {}}
+                onViewFile={handleViewFile}
                 onDeleteFile={handleDeleteFile}
                 isDeleting={isDeleting}
             />

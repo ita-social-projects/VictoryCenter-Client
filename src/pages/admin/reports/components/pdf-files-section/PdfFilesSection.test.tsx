@@ -19,12 +19,15 @@ jest.mock('./components/pdf-section-content-block/PdfSectionContentBlock', () =>
 }));
 
 jest.mock('./components/pdf-files-table/PdfFilesTable', () => ({
-    PdfFilesTable: ({ files, onDeleteFile, isDeleting }: any) => (
+    PdfFilesTable: ({ files, onDeleteFile, onViewFile, isDeleting }: any) => (
         <div data-testid="files-table">
             Files Count: {files?.length ?? 0}
             {isDeleting && <span data-testid="is-deleting">Deleting...</span>}
             <button onClick={() => onDeleteFile && onDeleteFile(1)} data-testid="delete-btn">
                 Delete
+            </button>
+            <button onClick={() => onViewFile && onViewFile(files?.[0])} data-testid="view-btn">
+                View
             </button>
         </div>
     ),
@@ -42,6 +45,22 @@ jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
     InlineLoader: () => <div data-testid="loader">Loading...</div>,
 }));
 
+const mockCreateObjectURL = jest.fn();
+const mockWindowOpen = jest.fn();
+
+// Setup mocks before tests run
+beforeAll(() => {
+    // Mock URL.createObjectURL
+    global.URL.createObjectURL = mockCreateObjectURL as any;
+    // Mock window.open
+    global.window.open = mockWindowOpen as any;
+});
+
+// Restore original functions after tests
+afterAll(() => {
+    jest.restoreAllMocks();
+});
+
 describe('PdfFilesSection', () => {
     const mockClient = { get: jest.fn() };
     const mockAddToast = jest.fn();
@@ -53,6 +72,8 @@ describe('PdfFilesSection', () => {
         jest.clearAllMocks();
         (useAdminClient as jest.Mock).mockReturnValue(mockClient);
         (useToast as jest.Mock).mockReturnValue({ addToast: mockAddToast });
+        // Setup mock to return blob URL when called
+        mockCreateObjectURL.mockReturnValue('blob:http://localhost/mock-blob-url');
     });
 
     it('should show loader when section or files are loading', () => {
@@ -159,6 +180,58 @@ describe('PdfFilesSection', () => {
 
         await waitFor(() => {
             expect(mockAddToast).toHaveBeenCalledWith(PDF_FILES_SECTION_TEXT.DELETE_ERROR, ToastType.Error);
+        });
+    });
+
+    it('should fetch and open PDF file when view button is clicked', async () => {
+        const mockPdfBlob = new Blob(['PDF content'], { type: 'application/pdf' });
+
+        let callCount = 0;
+        (useDataFetch as jest.Mock).mockImplementation(() => {
+            callCount++;
+            if (callCount === 1) {
+                return { data: mockSectionData, isLoading: false, refetch: mockRefetch };
+            }
+            return { data: mockFilesResponse.items, isLoading: false, refetch: mockRefetch };
+        });
+
+        (PdfReportsApi.getById as jest.Mock).mockResolvedValueOnce(mockPdfBlob);
+
+        render(<PdfFilesSection />);
+
+        const viewBtn = screen.getByTestId('view-btn');
+        await waitFor(() => {
+            viewBtn.click();
+        });
+
+        await waitFor(() => {
+            expect(PdfReportsApi.getById).toHaveBeenCalledWith(mockClient, mockFilesResponse.items[0].id);
+            expect(mockCreateObjectURL).toHaveBeenCalledWith(mockPdfBlob);
+            expect(mockWindowOpen).toHaveBeenCalledWith('blob:http://localhost/mock-blob-url', '_blank');
+        });
+    });
+
+    it('should show error toast when PDF download fails', async () => {
+        let callCount = 0;
+        (useDataFetch as jest.Mock).mockImplementation(() => {
+            callCount++;
+            if (callCount === 1) {
+                return { data: mockSectionData, isLoading: false, refetch: mockRefetch };
+            }
+            return { data: mockFilesResponse.items, isLoading: false, refetch: mockRefetch };
+        });
+
+        (PdfReportsApi.getById as jest.Mock).mockRejectedValueOnce(new Error('Download failed'));
+
+        render(<PdfFilesSection />);
+
+        const viewBtn = screen.getByTestId('view-btn');
+        await waitFor(() => {
+            viewBtn.click();
+        });
+
+        await waitFor(() => {
+            expect(mockAddToast).toHaveBeenCalledWith(PDF_FILES_SECTION_TEXT.VIEW_ERROR, ToastType.Error);
         });
     });
 });

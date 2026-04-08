@@ -17,7 +17,12 @@ interface PdfFilesTableProps {
     isDeleting?: boolean;
 }
 
-export const PdfFilesTable: React.FC<PdfFilesTableProps> = ({ files, onDeleteFile, isDeleting = false }) => {
+export const PdfFilesTable: React.FC<PdfFilesTableProps> = ({
+    files,
+    onDeleteFile,
+    onViewFile,
+    isDeleting = false,
+}) => {
     const [deleteConfirmation, setDeleteConfirmation] = useState<{ isOpen: boolean; fileId: number | null }>({
         isOpen: false,
         fileId: null,
@@ -93,7 +98,7 @@ export const PdfFilesTable: React.FC<PdfFilesTableProps> = ({ files, onDeleteFil
                                             <IconButton
                                                 aria-label={PDF_FILES_SECTION_TEXT.ACTIONS.FILE.VIEW}
                                                 type="button"
-                                                onClick={() => {}}
+                                                onClick={() => onViewFile(file)}
                                                 className={styles['view-button']}
                                                 DefaultIcon={ACTION_ICONS.view.default}
                                             />

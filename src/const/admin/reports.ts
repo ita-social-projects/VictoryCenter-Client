@@ -125,6 +125,7 @@ export const PDF_FILES_SECTION_TEXT = {
     },
     DELETE_SUCCESS: 'Файл успішно видалено',
     DELETE_ERROR: 'Не вдалося видалити файл. Спробуйте ще раз.',
+    VIEW_ERROR: 'Не вдалося завантажити файл для перегляду. Спробуйте ще раз.',
 };
 
 export const FUNDS_EXPENDITURES_VALIDATION = {

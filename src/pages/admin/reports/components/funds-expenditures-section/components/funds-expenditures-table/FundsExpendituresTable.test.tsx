@@ -775,6 +775,21 @@ describe('FundsExpendituresTable', () => {
             expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).toBeInTheDocument();
         });
 
+        it('should clear mismatch info message immediately when UAH amount changes', () => {
+            renderTable({ isEditing: true, exchangeRate: '40' });
+
+            fireEvent.click(screen.getByLabelText('Edit record 1'));
+            fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '8 000' } });
+            fireEvent.change(screen.getByLabelText('Amount USD record 1'), { target: { value: '201' } });
+            fireEvent.blur(screen.getByLabelText('Amount USD record 1'));
+
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).toBeInTheDocument();
+
+            fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: 'abc' } });
+
+            expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).not.toBeInTheDocument();
+        });
+
         it('should use current exchange rate instead of just adding/removing zeroes', () => {
             const records: EnrichedRecord[] = [
                 {

@@ -328,7 +328,7 @@ export const FundsExpendituresTable = ({
 
                 return {
                     ...nextState,
-                    usdMismatchMessage: field === 'amountUsd' ? undefined : prev.usdMismatchMessage,
+                    usdMismatchMessage: undefined,
                 };
             });
         },

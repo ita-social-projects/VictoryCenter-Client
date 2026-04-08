@@ -166,27 +166,22 @@ describe('PdfFilesTable', () => {
 
     it('should disable modal buttons when isDeleting is true', async () => {
         const user = userEvent.setup();
-        // First render with isDeleting={false} to open the modal
         const { rerender } = render(<PdfFilesTable {...defaultProps} isDeleting={false} />);
 
         const deleteButtons = screen.getAllByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.DELETE);
         await user.click(deleteButtons[0]);
 
-        // Wait for modal to appear
         await waitFor(() => {
             expect(screen.getByTestId('delete-confirmation-modal')).toBeInTheDocument();
         });
 
-        // Modal is now open, verify buttons are not disabled
         let confirmButton = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES);
         let cancelButton = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.NO);
         expect(confirmButton).not.toBeDisabled();
         expect(cancelButton).not.toBeDisabled();
 
-        // Now re-render with isDeleting={true}
         rerender(<PdfFilesTable {...defaultProps} isDeleting={true} />);
 
-        // Buttons should now be disabled
         confirmButton = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES);
         cancelButton = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.NO);
         expect(confirmButton).toBeDisabled();

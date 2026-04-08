@@ -48,15 +48,11 @@ jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
 const mockCreateObjectURL = jest.fn();
 const mockWindowOpen = jest.fn();
 
-// Setup mocks before tests run
 beforeAll(() => {
-    // Mock URL.createObjectURL
     global.URL.createObjectURL = mockCreateObjectURL as any;
-    // Mock window.open
     global.window.open = mockWindowOpen as any;
 });
 
-// Restore original functions after tests
 afterAll(() => {
     jest.restoreAllMocks();
 });

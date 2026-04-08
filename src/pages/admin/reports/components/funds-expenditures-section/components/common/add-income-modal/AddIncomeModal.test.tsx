@@ -632,6 +632,25 @@ describe('AddIncomeModal', () => {
             expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).toBeInTheDocument();
         });
 
+        it('should clear mismatch message immediately when UAH amount changes', async () => {
+            const user = userEvent.setup({ delay: null });
+            renderAddIncomeModal({ exchangeRate: '42' });
+
+            const uahInput = screen.getByTestId('input-add-income-amount-uah') as HTMLInputElement;
+            const usdInput = screen.getByTestId('input-add-income-amount-usd') as HTMLInputElement;
+
+            await user.type(uahInput, '100');
+            await user.clear(usdInput);
+            await user.type(usdInput, '2.35');
+            fireEvent.blur(usdInput);
+
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).toBeInTheDocument();
+
+            await user.type(uahInput, '1');
+
+            expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).not.toBeInTheDocument();
+        });
+
         it('should not show mismatch message when edited USD equals converted value', async () => {
             const user = userEvent.setup({ delay: null });
             renderAddIncomeModal({ exchangeRate: '42' });

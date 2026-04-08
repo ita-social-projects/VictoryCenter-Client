@@ -124,6 +124,7 @@ export const AddIncomeModal = ({
                 ...prev,
                 ...updateFundsAmounts('amountUah', value, exchangeRate, 'change')(prev),
             }));
+            setUsdMismatchMessage(undefined);
         },
         [exchangeRate],
     );

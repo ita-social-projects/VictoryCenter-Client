@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { PdfFilesSection } from './PdfFilesSection';
 import { PdfSectionApi } from '@/services/api/admin/reports/pdf-section/pdf-section-api';
 import { PdfReportsApi } from '@/services/api/admin/reports/pdf-reports/pdf-reports-api';
@@ -45,7 +45,7 @@ jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
     InlineLoader: () => <div data-testid="loader">Loading...</div>,
 }));
 
-const mockCreateObjectURL = jest.fn();
+const mockCreateObjectURL = jest.fn(() => 'blob:http://localhost/mock-blob-url');
 const mockWindowOpen = jest.fn();
 
 beforeAll(() => {
@@ -68,7 +68,6 @@ describe('PdfFilesSection', () => {
         jest.clearAllMocks();
         (useAdminClient as jest.Mock).mockReturnValue(mockClient);
         (useToast as jest.Mock).mockReturnValue({ addToast: mockAddToast });
-        // Setup mock to return blob URL when called
         mockCreateObjectURL.mockReturnValue('blob:http://localhost/mock-blob-url');
     });
 
@@ -144,9 +143,7 @@ describe('PdfFilesSection', () => {
         render(<PdfFilesSection />);
 
         const deleteBtn = screen.getByTestId('delete-btn');
-        await waitFor(() => {
-            deleteBtn.click();
-        });
+        fireEvent.click(deleteBtn);
 
         await waitFor(() => {
             expect(PdfReportsApi.delete).toHaveBeenCalledWith(mockClient, 1);
@@ -170,9 +167,7 @@ describe('PdfFilesSection', () => {
         render(<PdfFilesSection />);
 
         const deleteBtn = screen.getByTestId('delete-btn');
-        await waitFor(() => {
-            deleteBtn.click();
-        });
+        fireEvent.click(deleteBtn);
 
         await waitFor(() => {
             expect(mockAddToast).toHaveBeenCalledWith(PDF_FILES_SECTION_TEXT.DELETE_ERROR, ToastType.Error);
@@ -196,9 +191,7 @@ describe('PdfFilesSection', () => {
         render(<PdfFilesSection />);
 
         const viewBtn = screen.getByTestId('view-btn');
-        await waitFor(() => {
-            viewBtn.click();
-        });
+        fireEvent.click(viewBtn);
 
         await waitFor(() => {
             expect(PdfReportsApi.fetchById).toHaveBeenCalledWith(mockClient, mockFilesResponse.items[0].id);
@@ -222,9 +215,7 @@ describe('PdfFilesSection', () => {
         render(<PdfFilesSection />);
 
         const viewBtn = screen.getByTestId('view-btn');
-        await waitFor(() => {
-            viewBtn.click();
-        });
+        fireEvent.click(viewBtn);
 
         await waitFor(() => {
             expect(mockAddToast).toHaveBeenCalledWith(PDF_FILES_SECTION_TEXT.VIEW_ERROR, ToastType.Error);

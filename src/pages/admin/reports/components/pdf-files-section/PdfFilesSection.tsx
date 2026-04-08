@@ -82,7 +82,12 @@ export const PdfFilesSection = () => {
             try {
                 const pdfBlob = await PdfReportsApi.fetchById(client, file.id);
                 const blobUrl = URL.createObjectURL(pdfBlob);
-                window.open(blobUrl, '_blank');
+                const openedWindow = window.open(blobUrl, '_blank');
+                if (openedWindow) {
+                    setTimeout(() => {
+                        URL.revokeObjectURL(blobUrl);
+                    }, 1500);
+                }
             } catch {
                 addToast(PDF_FILES_SECTION_TEXT.VIEW_ERROR, ToastType.Error);
             }

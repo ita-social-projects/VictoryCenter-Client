@@ -33,6 +33,13 @@ jest.mock('./AddIncomeModal.module.scss', () => ({
     'exchange-rate-chip': 'exchange-rate-chip',
     'exchange-rate-chip-label': 'exchange-rate-chip-label',
     'exchange-rate-value': 'exchange-rate-value',
+    info: 'info',
+    'info-icon': 'info-icon',
+    'info-text': 'info-text',
+}));
+
+jest.mock('@/assets/icons/info.svg', () => ({
+    ReactComponent: ({ className }: { className?: string }) => <svg data-testid="info-icon" className={className} />,
 }));
 
 jest.mock(
@@ -556,9 +563,43 @@ describe('AddIncomeModal', () => {
 
             expect((uahInput as HTMLInputElement).value).toBe('500');
         });
+
+        it('should validate USD on change and disable submit for invalid non-empty value', async () => {
+            const user = userEvent.setup({ delay: null });
+            renderAddIncomeModal({ exchangeRate: '42' });
+
+            const yearSelect = screen.getByTestId('select-Оберіть звітній рік') as HTMLSelectElement;
+            const categorySelect = screen.getByTestId('select-Оберіть категорію надходження') as HTMLSelectElement;
+            const uahInput = screen.getByTestId('input-add-income-amount-uah') as HTMLInputElement;
+            const usdInput = screen.getByTestId('input-add-income-amount-usd') as HTMLInputElement;
+
+            fireEvent.change(yearSelect, { target: { value: currentYear } });
+            fireEvent.change(categorySelect, { target: { value: '3' } });
+            await user.type(uahInput, '100');
+
+            expect(screen.getByTestId('modal-submit')).toBeEnabled();
+
+            await user.clear(usdInput);
+            await user.type(usdInput, 'abc');
+
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER_GT_ZERO)).toBeInTheDocument();
+            expect(screen.getByTestId('modal-submit')).toBeDisabled();
+        });
     });
 
     describe('Amount Input - Blur Event', () => {
+        const setUsdMismatchState = async (user: ReturnType<typeof userEvent.setup>) => {
+            const uahInput = screen.getByTestId('input-add-income-amount-uah') as HTMLInputElement;
+            const usdInput = screen.getByTestId('input-add-income-amount-usd') as HTMLInputElement;
+
+            await user.type(uahInput, '100');
+            await user.clear(usdInput);
+            await user.type(usdInput, '2.35');
+            fireEvent.blur(usdInput);
+
+            return { uahInput, usdInput };
+        };
+
         it('should trigger blur handler on amount UAH input', async () => {
             const user = userEvent.setup({ delay: null });
             renderAddIncomeModal();
@@ -591,6 +632,110 @@ describe('AddIncomeModal', () => {
             uahInput.blur();
 
             expect(uahInput.value).toBe('100');
+        });
+
+        it('should keep UAH unchanged when USD is manually edited and blurred', async () => {
+            const user = userEvent.setup({ delay: null });
+            renderAddIncomeModal({ exchangeRate: '42' });
+
+            const uahInput = screen.getByTestId('input-add-income-amount-uah') as HTMLInputElement;
+            const usdInput = screen.getByTestId('input-add-income-amount-usd') as HTMLInputElement;
+
+            await user.type(uahInput, '100');
+            expect(usdInput.value).toBe('2.39');
+
+            await user.clear(usdInput);
+            await user.type(usdInput, '2.35');
+            fireEvent.blur(usdInput);
+
+            expect(uahInput.value).toBe('100');
+        });
+
+        it('should show informative mismatch message when edited USD is not equal to converted value', async () => {
+            const user = userEvent.setup({ delay: null });
+            renderAddIncomeModal({ exchangeRate: '42' });
+
+            await setUsdMismatchState(user);
+
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).toBeInTheDocument();
+        });
+
+        it('should clear mismatch message immediately when UAH amount changes', async () => {
+            const user = userEvent.setup({ delay: null });
+            renderAddIncomeModal({ exchangeRate: '42' });
+
+            const { uahInput } = await setUsdMismatchState(user);
+
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).toBeInTheDocument();
+
+            await user.type(uahInput, '1');
+
+            expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).not.toBeInTheDocument();
+        });
+
+        it('should not show mismatch message when edited USD equals converted value', async () => {
+            const user = userEvent.setup({ delay: null });
+            renderAddIncomeModal({ exchangeRate: '42' });
+
+            const uahInput = screen.getByTestId('input-add-income-amount-uah') as HTMLInputElement;
+            const usdInput = screen.getByTestId('input-add-income-amount-usd') as HTMLInputElement;
+
+            await user.type(uahInput, '100');
+            await user.clear(usdInput);
+            await user.type(usdInput, '2.39');
+            fireEvent.blur(usdInput);
+
+            expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).not.toBeInTheDocument();
+        });
+
+        it('should clear mismatch message after close and not show it on next open', async () => {
+            const user = userEvent.setup({ delay: null });
+            const { rerender } = render(
+                <AddIncomeModal
+                    isOpen={true}
+                    onClose={mockOnClose}
+                    categories={MOCK_CATEGORIES}
+                    records={MOCK_RECORDS}
+                    exchangeRate="42"
+                    onSubmit={mockOnSubmit}
+                />,
+            );
+
+            const uahInput = screen.getByTestId('input-add-income-amount-uah') as HTMLInputElement;
+            const usdInput = screen.getByTestId('input-add-income-amount-usd') as HTMLInputElement;
+
+            await user.type(uahInput, '100');
+            await user.clear(usdInput);
+            await user.type(usdInput, '2.35');
+            fireEvent.blur(usdInput);
+
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).toBeInTheDocument();
+
+            await user.click(screen.getByTestId('modal-close'));
+
+            rerender(
+                <AddIncomeModal
+                    isOpen={false}
+                    onClose={mockOnClose}
+                    categories={MOCK_CATEGORIES}
+                    records={MOCK_RECORDS}
+                    exchangeRate="42"
+                    onSubmit={mockOnSubmit}
+                />,
+            );
+
+            rerender(
+                <AddIncomeModal
+                    isOpen={true}
+                    onClose={mockOnClose}
+                    categories={MOCK_CATEGORIES}
+                    records={MOCK_RECORDS}
+                    exchangeRate="42"
+                    onSubmit={mockOnSubmit}
+                />,
+            );
+
+            expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).not.toBeInTheDocument();
         });
     });
 

@@ -42,6 +42,9 @@ jest.mock('./FundsExpendituresTable.module.scss', () => ({
     'amount-edit-input': 'amount-edit-input',
     'amount-edit-input-error': 'amount-edit-input-error',
     'amount-edit-error': 'amount-edit-error',
+    'amount-edit-info': 'amount-edit-info',
+    'amount-edit-info-icon': 'amount-edit-info-icon',
+    'amount-edit-info-text': 'amount-edit-info-text',
     'to-top-button': 'to-top-button',
     'to-top-icon': 'to-top-icon',
     'to-top-button-visible': 'to-top-button-visible',
@@ -79,6 +82,10 @@ jest.mock('@/assets/icons/checkmark.svg', () => ({
 
 jest.mock('@/assets/icons/cross.svg', () => ({
     ReactComponent: ({ className }: { className?: string }) => <svg data-testid="cross-icon" className={className} />,
+}));
+
+jest.mock('@/assets/icons/info.svg', () => ({
+    ReactComponent: ({ className }: { className?: string }) => <svg data-testid="info-icon" className={className} />,
 }));
 
 jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
@@ -732,22 +739,6 @@ describe('FundsExpendituresTable', () => {
                 expectedValue: '200',
                 withBlur: false,
             },
-            {
-                title: 'should recalculate UAH when USD amount is changed and validated',
-                changedFieldLabel: 'Amount USD record 1',
-                changedValue: '50',
-                expectedFieldLabel: 'Amount UAH record 1',
-                expectedValue: '2000',
-                withBlur: true,
-            },
-            {
-                title: 'should recalculate UAH immediately on valid USD change using current exchange rate',
-                changedFieldLabel: 'Amount USD record 1',
-                changedValue: '50',
-                expectedFieldLabel: 'Amount UAH record 1',
-                expectedValue: '2000',
-                withBlur: false,
-            },
         ])('$title', ({ changedFieldLabel, changedValue, expectedFieldLabel, expectedValue, withBlur }) => {
             renderTable({ isEditing: true, exchangeRate: '40' });
 
@@ -773,6 +764,32 @@ describe('FundsExpendituresTable', () => {
             expect(screen.getByLabelText('Amount USD record 1')).toHaveValue('4 200');
         });
 
+        it('should show mismatch info message when edited USD does not match converted UAH amount', () => {
+            renderTable({ isEditing: true, exchangeRate: '40' });
+
+            fireEvent.click(screen.getByLabelText('Edit record 1'));
+            fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '8 000' } });
+            fireEvent.change(screen.getByLabelText('Amount USD record 1'), { target: { value: '201' } });
+            fireEvent.blur(screen.getByLabelText('Amount USD record 1'));
+
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).toBeInTheDocument();
+        });
+
+        it('should clear mismatch info message immediately when UAH amount changes', () => {
+            renderTable({ isEditing: true, exchangeRate: '40' });
+
+            fireEvent.click(screen.getByLabelText('Edit record 1'));
+            fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '8 000' } });
+            fireEvent.change(screen.getByLabelText('Amount USD record 1'), { target: { value: '201' } });
+            fireEvent.blur(screen.getByLabelText('Amount USD record 1'));
+
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).toBeInTheDocument();
+
+            fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: 'abc' } });
+
+            expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).not.toBeInTheDocument();
+        });
+
         it('should use current exchange rate instead of just adding/removing zeroes', () => {
             const records: EnrichedRecord[] = [
                 {
@@ -794,7 +811,7 @@ describe('FundsExpendituresTable', () => {
             expect(screen.getByLabelText('Amount USD record 1')).toHaveValue('1190.48');
 
             fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '500 000' } });
-            expect(screen.getByLabelText('Amount USD record 1')).toHaveValue('11904.76');
+            expect(screen.getByLabelText('Amount USD record 1')).toHaveValue('11904.77');
         });
     });
 });

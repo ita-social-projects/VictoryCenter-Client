@@ -327,7 +327,14 @@ export const ProgramsPageContent = () => {
                 : false;
             const statusMatches = statusFilter === undefined || addedProgram.status === statusFilter;
             if (belongsToSelectedCategory && statusMatches) {
-                updatePrograms((prev) => [addedProgram, ...prev]);
+                updatePrograms((prev) => {
+                    const filteredPrev = prev.filter((p) => p.id !== addedProgram.id);
+                    return [...filteredPrev, addedProgram];
+                });
+            }
+
+            if (selectedCategory) {
+                fetchProgramsFromStart();
             }
         },
         [updatePrograms, updateCategories, incrementCategoriesCount, selectedCategory, statusFilter, addToast],

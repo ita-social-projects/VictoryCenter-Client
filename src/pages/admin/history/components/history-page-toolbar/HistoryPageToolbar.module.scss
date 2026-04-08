@@ -1,0 +1,9 @@
+@use '@/assets/sass/variables/colors' as c;
+
+.history-page-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    padding-bottom: 5rem;
+    border-bottom: 1px solid c.$grey-700;
+}

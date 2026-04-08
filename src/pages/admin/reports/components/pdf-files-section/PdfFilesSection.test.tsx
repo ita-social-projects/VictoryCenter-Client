@@ -191,7 +191,7 @@ describe('PdfFilesSection', () => {
             return { data: mockFilesResponse.items, isLoading: false, refetch: mockRefetch };
         });
 
-        (PdfReportsApi.getById as jest.Mock).mockResolvedValueOnce(mockPdfBlob);
+        (PdfReportsApi.fetchById as jest.Mock).mockResolvedValueOnce(mockPdfBlob);
 
         render(<PdfFilesSection />);
 
@@ -201,7 +201,7 @@ describe('PdfFilesSection', () => {
         });
 
         await waitFor(() => {
-            expect(PdfReportsApi.getById).toHaveBeenCalledWith(mockClient, mockFilesResponse.items[0].id);
+            expect(PdfReportsApi.fetchById).toHaveBeenCalledWith(mockClient, mockFilesResponse.items[0].id);
             expect(mockCreateObjectURL).toHaveBeenCalledWith(mockPdfBlob);
             expect(mockWindowOpen).toHaveBeenCalledWith('blob:http://localhost/mock-blob-url', '_blank');
         });
@@ -217,7 +217,7 @@ describe('PdfFilesSection', () => {
             return { data: mockFilesResponse.items, isLoading: false, refetch: mockRefetch };
         });
 
-        (PdfReportsApi.getById as jest.Mock).mockRejectedValueOnce(new Error('Download failed'));
+        (PdfReportsApi.fetchById as jest.Mock).mockRejectedValueOnce(new Error('Download failed'));
 
         render(<PdfFilesSection />);
 

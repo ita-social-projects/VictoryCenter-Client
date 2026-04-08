@@ -28,7 +28,7 @@ export const PdfReportsApi = {
         return response.data;
     },
 
-    getById: async (client: AxiosInstance, id: number): Promise<Blob> => {
+    fetchById: async (client: AxiosInstance, id: number): Promise<Blob> => {
         const response = await client.get<Blob>(`${API_ROUTES.PDF_REPORTS.BASE}/${id}`, {
             responseType: 'blob',
         });

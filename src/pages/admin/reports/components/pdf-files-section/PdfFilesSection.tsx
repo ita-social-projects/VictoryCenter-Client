@@ -80,7 +80,7 @@ export const PdfFilesSection = () => {
     const handleViewFile = useCallback(
         async (file: PdfReportDto) => {
             try {
-                const pdfBlob = await PdfReportsApi.getById(client, file.id);
+                const pdfBlob = await PdfReportsApi.fetchById(client, file.id);
                 const blobUrl = URL.createObjectURL(pdfBlob);
                 window.open(blobUrl, '_blank');
             } catch {

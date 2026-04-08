@@ -83,12 +83,12 @@ describe('PdfReportsApi', () => {
         });
     });
 
-    describe('getById', () => {
+    describe('fetchById', () => {
         it('should fetch pdf blob by id with correct responseType', async () => {
             const mockBlob = new Blob() as any;
             mockClient.get.mockResolvedValueOnce({ data: mockBlob });
 
-            const result = PdfReportsApi.getById(mockClient, 1);
+            const result = await PdfReportsApi.fetchById(mockClient, 1);
 
             expect(mockClient.get).toHaveBeenCalledWith(`${API_ROUTES.PDF_REPORTS.BASE}/1`, {
                 responseType: 'blob',
@@ -100,7 +100,7 @@ describe('PdfReportsApi', () => {
             const mockBlob = new Blob() as any;
             mockClient.get.mockResolvedValueOnce({ data: mockBlob });
 
-            PdfReportsApi.getById(mockClient, 42);
+            await PdfReportsApi.fetchById(mockClient, 42);
 
             expect(mockClient.get).toHaveBeenCalledWith(`${API_ROUTES.PDF_REPORTS.BASE}/42`, expect.any(Object));
         });
@@ -108,14 +108,14 @@ describe('PdfReportsApi', () => {
         it('should throw error when api request fails', async () => {
             mockClient.get.mockRejectedValueOnce(new Error('Download failed'));
 
-            await expect(PdfReportsApi.getById(mockClient, 1)).rejects.toThrow('Download failed');
+            await expect(PdfReportsApi.fetchById(mockClient, 1)).rejects.toThrow('Download failed');
         });
 
         it('should handle 404 error when file not found', async () => {
             const notFoundError = new Error('Not Found');
             mockClient.get.mockRejectedValueOnce(notFoundError);
 
-            await expect(PdfReportsApi.getById(mockClient, 99)).rejects.toThrow('Not Found');
+            await expect(PdfReportsApi.fetchById(mockClient, 99)).rejects.toThrow('Not Found');
         });
     });
 });

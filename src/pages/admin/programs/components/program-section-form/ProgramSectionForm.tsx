@@ -720,7 +720,7 @@ export const ProgramSectionForm = ({
                         <Button
                             buttonStyle="primary"
                             onClick={handleSaveClick}
-                            disabled={isDisabled || !isSectionSaveValid}
+                            disabled={!isDirty || isDisabled || !isSectionSaveValid}
                         >
                             {PROGRAMS_TEXT.BUTTON.SAVE}
                         </Button>

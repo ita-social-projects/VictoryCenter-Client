@@ -832,8 +832,12 @@ describe('ProgramSectionForm', () => {
             expect(onEditStateChange).toHaveBeenCalledWith(true);
         });
 
-        it('calls onSave and transitions back to View mode when Save button is clicked', () => {
-            renderForm({ isNewSection: true, isSectionValid: true });
+        it('calls onSave and transitions back to View mode when a valid dirty section is saved', () => {
+            const { handlers } = renderWithHandlers({ isNewSection: true, isSectionValid: true });
+
+            act(() => {
+                handlers.onTitleChange('Updated title');
+            });
 
             fireEvent.click(screen.getByText(PROGRAMS_TEXT.BUTTON.SAVE));
 

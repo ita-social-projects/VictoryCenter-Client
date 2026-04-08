@@ -6,20 +6,20 @@
     flex-direction: column;
     height: 100vh;
     width: 100%;
-    padding: 2.5rem;
+    padding: 40px;
     box-sizing: border-box;
     overflow: hidden;
 }
 
 .empty-sections-image {
-    width: 14.375rem;
-    height: 14.375rem;
+    width: 230px;
+    height: 230px;
 }
 
 .empty-sections-text {
     @include type.h3-semibold;
-    
-    width: 29.375rem;
+
+    width: 470px;
     color: c.$blue-900;
     margin: 0;
     text-align: center;
@@ -30,17 +30,17 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 1.5rem;
-    padding: 10rem 2rem;
-    margin: 0 2rem;
-    border-radius: 0.5rem;
+    gap: 24px;
+    padding: 160px 32px;
+    margin: 0 32px;
+    border-radius: 8px;
 }
 
 .btn-add {
     display: flex;
-    gap: 0.5rem;
+    gap: 8px;
     align-items: center;
-    width: 29.375rem;
+    width: 470px;
 }
 
 .plus-icon path {

@@ -15,7 +15,7 @@ import programFormStyles from '../program-form/ProgramForm.module.scss';
 import styles from './TranslateProgramForm.module.scss';
 import { HippotherapyProgramSectionDto } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/section-contents';
-import { SectionMode, SectionTemplate } from '@/types/common/program-sections';
+import { SectionMode, SectionTemplate } from '@/types/common/sections';
 import { renderProgramSection } from '@/utils/functions/render-program-section';
 
 export interface TranslateProgramFormValues {

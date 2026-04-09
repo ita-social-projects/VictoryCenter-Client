@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { TitleDescriptionCard } from './TitleDescriptionCard';
-import { SectionMode, SectionTemplate } from '@/types/common/program-sections';
+import { SectionMode, SectionTemplate } from '@/types/common/sections';
 import { useCardValidation } from '@/hooks/admin/use-section-card-validation/useCardValidation';
 
 jest.mock('@/hooks/admin/use-section-card-validation/useCardValidation', () => ({

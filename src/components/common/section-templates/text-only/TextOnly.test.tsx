@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { TextOnly } from './TextOnly';
-import { SectionMode } from '@/types/common/program-sections';
+import { SectionMode } from '@/types/common/sections';
 
 jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
     InputWithCharacterLimitGroup: ({ value, onChange, id }: any) => (

@@ -1,5 +1,5 @@
 import React from 'react';
-import { SectionMode } from '@/types/common/program-sections';
+import { SectionMode } from '@/types/common/sections';
 
 export const mockTitleDescriptionSection = React.memo(
     ({ title, description, mode }: { title?: string; description?: string; mode?: SectionMode }) => (

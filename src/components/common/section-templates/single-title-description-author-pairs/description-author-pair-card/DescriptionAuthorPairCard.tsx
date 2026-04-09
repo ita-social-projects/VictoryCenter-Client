@@ -5,7 +5,7 @@ import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import styles from './DescriptionAuthorPairCard.module.scss';
-import { SectionTemplate } from '@/types/common/program-sections';
+import { SectionTemplate } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
 import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
 import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';

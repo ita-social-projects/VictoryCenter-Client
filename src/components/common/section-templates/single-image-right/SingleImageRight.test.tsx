@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { SingleImageRight } from './SingleImageRight';
-import { SectionMode } from '@/types/common/program-sections';
+import { SectionMode } from '@/types/common/sections';
 
 const mockPhotoInputGroup = jest.fn();
 

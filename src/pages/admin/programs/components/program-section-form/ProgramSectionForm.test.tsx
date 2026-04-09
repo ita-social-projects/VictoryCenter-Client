@@ -5,7 +5,7 @@ import '@testing-library/jest-dom';
 import { ProgramSectionForm } from './ProgramSectionForm';
 import type { ProgramSectionFormProps } from './ProgramSectionForm';
 import type { CreateHippotherapyProgramSectionDto } from '@/types/common/program-sections';
-import { SectionTemplate, SectionMode } from '@/types/common/program-sections';
+import { SectionTemplate, SectionMode } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { renderProgramSection } from '@/utils/functions/render-program-section';

@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { EditableImagesBottomSection } from './EditableImagesBottomSection';
-import { SectionMode } from '@/types/common/program-sections';
+import { SectionMode } from '@/types/common/sections';
 import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 
 const photoCalls: any[] = [];

@@ -1,10 +1,6 @@
 import React from 'react';
-import {
-    FaqSectionQuestionDto,
-    CreateProgramSectionContentDto,
-    SectionTemplate,
-    SectionMode,
-} from '@/types/common/program-sections';
+import { FaqSectionQuestionDto, CreateProgramSectionContentDto } from '@/types/common/program-sections';
+import { SectionTemplate, SectionMode } from '@/types/common/sections';
 import { ImageValues, Image } from '@/types/common/image';
 import { ContentType } from '@/types/common/section-contents';
 import { QuadImagesBottom } from '@/components/common/section-templates/quad-images-bottom/QuadImagesBottom';

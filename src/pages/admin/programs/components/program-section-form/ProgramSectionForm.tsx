@@ -5,12 +5,8 @@ import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { renderProgramSection } from '@/utils/functions/render-program-section';
 import { ReactComponent as ChangeIcon } from '@/assets/icons/change.svg';
 import styles from './ProgramSectionForm.module.scss';
-import {
-    FaqSectionQuestionDto,
-    CreateHippotherapyProgramSectionDto,
-    SectionTemplate,
-    SectionMode,
-} from '@/types/common/program-sections';
+import { FaqSectionQuestionDto, CreateHippotherapyProgramSectionDto } from '@/types/common/program-sections';
+import { SectionTemplate, SectionMode } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
 import {
     getProgramSectionTemplateMaxGroupCount,

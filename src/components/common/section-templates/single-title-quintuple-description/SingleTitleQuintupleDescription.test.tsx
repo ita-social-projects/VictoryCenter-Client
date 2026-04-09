@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { SingleTitleQuintupleDescription } from './SingleTitleQuintupleDescription';
-import { SectionMode } from '@/types/common/program-sections';
+import { SectionMode } from '@/types/common/sections';
 
 const mockDescProps = jest.fn();
 

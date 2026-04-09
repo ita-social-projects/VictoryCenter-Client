@@ -1,5 +1,5 @@
 import { COMMON_TEXT_ADMIN } from './common';
-import { SectionTemplate } from '@/types/common/program-sections';
+import { SectionTemplate } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
 
 export const PROGRAMS_TEXT = {

@@ -1,5 +1,5 @@
 import { ContentType } from '@/types/common/section-contents';
-import { SectionTemplate } from '@/types/common/program-sections';
+import { SectionTemplate } from '@/types/common/sections';
 
 type Range = { min: number; max: number };
 

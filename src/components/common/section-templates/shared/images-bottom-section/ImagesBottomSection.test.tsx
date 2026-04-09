@@ -3,7 +3,7 @@ import { act, render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import type { ImagesBottomSectionProps } from './ImagesBottomSection';
 import { ImagesBottomSection } from './ImagesBottomSection';
-import { SectionMode, SectionTemplate } from '@/types/common/program-sections';
+import { SectionMode, SectionTemplate } from '@/types/common/sections';
 
 jest.mock('react', () => {
     const actual = jest.requireActual('react');

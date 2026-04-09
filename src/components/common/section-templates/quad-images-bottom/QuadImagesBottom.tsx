@@ -2,7 +2,7 @@ import cn from 'classnames';
 import { ImagesBottomSection } from '../shared/images-bottom-section/ImagesBottomSection';
 import { ImageValues, Image } from '@/types/common/image';
 import { QUAD_IMAGES_CONFIG } from '@/const/admin/programs';
-import { SectionMode, SectionTemplate } from '@/types/common/program-sections';
+import { SectionMode, SectionTemplate } from '@/types/common/sections';
 import styles from './QuadImagesBottom.module.scss';
 import viewStyles from './ViewQuadImagesBottom.module.scss';
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { FaqProgramSection, FaqProgramSectionProps } from './FaqProgramSection';
-import { SectionMode } from '@/types/common/program-sections';
+import { SectionMode } from '@/types/common/sections';
 import { useProgramSectionValidation } from '@/hooks/admin/use-program-section-validation';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FaqQuestion } from '@/types/admin/faq';

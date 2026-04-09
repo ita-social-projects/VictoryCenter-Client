@@ -1,6 +1,6 @@
 import cn from 'classnames';
 import { TitleDescriptionSection } from '@/components/common/section-templates/shared/title-description-section/TitleDescriptionSection';
-import { SectionMode, SectionTemplate } from '@/types/common/program-sections';
+import { SectionMode, SectionTemplate } from '@/types/common/sections';
 import styles from './TextOnly.module.scss';
 
 export interface TextOnlyProps {

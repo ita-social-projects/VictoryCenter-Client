@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { TitleDescriptionCardsWrapper } from './TitleDescriptionCardsWrapper';
 import { TitleDescriptionCardData } from '../shared/title-description-cards-section/TitleDescriptionCardsSection';
-import { SectionMode } from '@/types/common/program-sections';
+import { SectionMode } from '@/types/common/sections';
 
 jest.mock('../shared/title-description-cards-section/TitleDescriptionCardsSection', () => ({
     TitleDescriptionCardsSection: (props: any) => (

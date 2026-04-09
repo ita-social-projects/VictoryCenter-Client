@@ -5,7 +5,7 @@ import {
     getProgramSectionTemplateMinLength,
     normalizeGroupedContentsGroupIndexes,
 } from './programSectionTemplateValidation';
-import { SectionTemplate } from '@/types/common/program-sections';
+import { SectionTemplate } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
 
 jest.mock('@/const/admin/programs', () => {

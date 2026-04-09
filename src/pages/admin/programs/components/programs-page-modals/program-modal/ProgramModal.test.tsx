@@ -18,7 +18,7 @@ import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { ProgramFormProps, ProgramFormRef } from '@/pages/admin/programs/components/program-form/ProgramForm';
 import { ButtonProps } from '@/components/admin/button/Button';
 import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
-import { SectionTemplate } from '@/types/common/program-sections';
+import { SectionTemplate } from '@/types/common/sections';
 import { getInitialSectionContents } from '@/utils/functions/render-program-section';
 
 jest.mock('@/hooks/admin/use-modals-state/useModalsState', () => ({

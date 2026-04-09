@@ -3,7 +3,7 @@ import {
     TitleDescriptionCardsSection,
     TitleDescriptionCardData,
 } from '../shared/title-description-cards-section/TitleDescriptionCardsSection';
-import { SectionMode } from '@/types/common/program-sections';
+import { SectionMode } from '@/types/common/sections';
 import styles from './TitleDescriptionCardsWrapper.module.scss';
 
 interface TitleDescriptionCardsWrapperProps {

@@ -7,7 +7,7 @@ import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { VisibilityStatus } from '@/types/admin/common';
 import { CreateHippotherapyProgramSectionLocalizationDto } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/section-contents';
-import { SectionTemplate } from '@/types/common/program-sections';
+import { SectionTemplate } from '@/types/common/sections';
 
 const createFormControlMock = (element: 'input' | 'textarea') => {
     return ({ value, onChange, onBlur, disabled, id, error }: any) => {

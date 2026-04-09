@@ -4,7 +4,7 @@ import { PhotoInputGroup } from '@/components/admin/input-groups/photo-input-gro
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { PROGRAM_VALIDATION } from '@/const/admin/programs';
 import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
-import { SectionMode } from '@/types/common/program-sections';
+import { SectionMode } from '@/types/common/sections';
 import { ImageHandler, ImagesBottomSectionConfig } from './ImagesBottomSection';
 import baseStyles from './ImagesBottomSection.module.scss';
 

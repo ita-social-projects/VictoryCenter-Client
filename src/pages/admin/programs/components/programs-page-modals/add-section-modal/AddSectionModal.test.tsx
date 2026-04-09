@@ -5,7 +5,7 @@ import '@testing-library/jest-dom';
 import { AddSectionModal } from './AddSectionModal';
 import type { AddSectionModalProps } from './AddSectionModal';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
-import { SectionTemplate, SectionMode } from '@/types/common/program-sections';
+import { SectionTemplate, SectionMode } from '@/types/common/sections';
 import type { ButtonProps } from '@/components/admin/button/Button';
 import type { ModalProps } from '@/components/common/modal/Modal';
 

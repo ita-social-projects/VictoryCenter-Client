@@ -1,7 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import { useLocation } from 'react-router-dom';
 import { DetailedProgramSection } from './DetailedProgramSection';
-import { HippotherapyProgramSectionDto, SectionTemplate, SectionMode } from '@/types/common/program-sections';
+import { HippotherapyProgramSectionDto } from '@/types/common/program-sections';
+import { SectionTemplate, SectionMode } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
 import * as renderProgramSectionModule from '@/utils/functions/render-program-section';
 

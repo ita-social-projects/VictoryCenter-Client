@@ -5,8 +5,8 @@ import {
     HippotherapyProgramSectionContentLocalization,
     HippotherapyProgramSectionContentLocalizationDto,
     ProgramSectionContentLocalizableFields,
-    SectionMode,
 } from '@/types/common/program-sections';
+import { SectionMode } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
 import { FaqLocalization, FaqLocalizationDto } from '@/types/admin/faq';
 import { EntityLocalization, EntityLocalizationDto } from '@/types/common/language';

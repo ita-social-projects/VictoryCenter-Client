@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
-import { SectionTemplate } from '@/types/common/program-sections';
+import { SectionTemplate } from '@/types/common/sections';
 
 export interface UseProgramSectionValidationReturn {
     titleError: string | undefined;

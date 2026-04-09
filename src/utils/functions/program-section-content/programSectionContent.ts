@@ -1,8 +1,5 @@
-import {
-    CreateHippotherapyProgramSectionDto,
-    CreateProgramSectionContentDto,
-    SectionTemplate,
-} from '@/types/common/program-sections';
+import { CreateHippotherapyProgramSectionDto, CreateProgramSectionContentDto } from '@/types/common/program-sections';
+import { SectionTemplate } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
 import { getDescriptionAuthorPairsByGroup } from '@/utils/functions/mappers/public/program/get-grouped-program-section-content-pairs';
 

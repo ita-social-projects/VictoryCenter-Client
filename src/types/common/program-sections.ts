@@ -7,6 +7,7 @@ import {
     EntityWithDtoLocalizations,
     EntityWithLocalizations,
 } from './language';
+import { SectionTemplate } from './sections';
 
 export interface ContentLocalizationDto extends EntityLocalizationDto {
     entityId: number;
@@ -25,28 +26,6 @@ export enum ProgramSectionType {
     Image,
     Card,
     Author,
-}
-
-export enum SectionTemplate {
-    QuadImagesBottom = 1,
-    DualImagesBottom = 2,
-    TextOnly = 3,
-    TripleImagesBottom = 4,
-    SingleImageBottom = 5,
-    SingleImageTop = 6,
-    SingleImageRight = 7,
-    DualTitleDescriptionPairs = 8,
-    TripleTitleDescriptionPairs = 9,
-    QuadTitleDescriptionPairs = 10,
-    SingleTitleQuintupleDescription = 11,
-    SingleTitleDescriptionAuthorPairs = 12,
-    SingleTitleQuestionAnswerPairs = 13,
-}
-
-export enum SectionMode {
-    Template = 'template',
-    Edit = 'edit',
-    View = 'view',
 }
 
 export interface FaqSectionQuestionDto {

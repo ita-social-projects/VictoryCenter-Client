@@ -3,7 +3,7 @@ import cn from 'classnames';
 import { TitleDescriptionSection } from '../title-description-section/TitleDescriptionSection';
 import { ImageValues, Image } from '@/types/common/image';
 import baseStyles from './ImagesBottomSection.module.scss';
-import { SectionMode, SectionTemplate } from '@/types/common/program-sections';
+import { SectionMode, SectionTemplate } from '@/types/common/sections';
 import { ViewImagesBottomSection } from './ViewImagesBottomSection';
 import { EditableImagesBottomSection } from './EditableImagesBottomSection';
 

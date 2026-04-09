@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { SingleImageTop, SingleImageTopProps } from './SingleImageTop';
-import { SectionMode } from '@/types/common/program-sections';
+import { SectionMode } from '@/types/common/sections';
 
 const mockTitleDescriptionSection = jest.fn();
 const mockPhotoInputGroup = jest.fn();

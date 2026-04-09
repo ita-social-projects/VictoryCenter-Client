@@ -18,7 +18,7 @@ jest.mock('./CardDescriptionField', () => ({
     CardDescriptionField: () => <div data-testid="description-field" />,
 }));
 
-jest.mock('@/utils/functions/program-section-template-validation/programSectionTemplateValidation', () => ({
+jest.mock('@/utils/functions/section-template-validation/sectionTemplateValidation', () => ({
     getSectionTemplateMaxLength: jest.fn((_: SectionTemplate, type: number) => (type === 0 ? 30 : 120)),
     getSectionTemplateMinLength: jest.fn(() => 1),
 }));

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+﻿import { useState, useCallback, useEffect, useRef } from 'react';
 import { Button } from '@/components/admin/button/Button';
 import { ImageValues } from '@/types/common/image';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
@@ -11,7 +11,7 @@ import { ContentType } from '@/types/common/section-contents';
 import {
     getSectionTemplateMaxGroupCount,
     normalizeGroupedContentsGroupIndexes,
-} from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
+} from '@/utils/functions/section-template-validation/sectionTemplateValidation';
 import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
 import { getDescriptionAuthorPairsByGroup } from '@/utils/functions/mappers/public/program/get-grouped-program-section-content-pairs';
 import {

@@ -6,7 +6,7 @@ import { PROGRAMS_TEXT, SINGLE_TITLE_QUINTUPLE_DESCRIPTION_CONFIG } from '@/cons
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { SectionMode, SectionTemplate } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
-import { getSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
+import { getSectionTemplateMaxLength } from '@/utils/functions/section-template-validation/sectionTemplateValidation';
 import baseStyles from './SingleTitleQuintupleDescription.module.scss';
 import viewStyles from './ViewSingleTitleQuintupleDescription.module.scss';
 import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';

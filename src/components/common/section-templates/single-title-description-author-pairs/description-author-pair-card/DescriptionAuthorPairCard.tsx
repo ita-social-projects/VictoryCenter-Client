@@ -1,4 +1,4 @@
-import cn from 'classnames';
+﻿import cn from 'classnames';
 import { useCallback, useState } from 'react';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
@@ -7,7 +7,7 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import styles from './DescriptionAuthorPairCard.module.scss';
 import { SectionTemplate } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
-import { getSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
+import { getSectionTemplateMaxLength } from '@/utils/functions/section-template-validation/sectionTemplateValidation';
 import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
 import { IconButton } from '@/components/admin/icon-button/IconButton';
 import { ACTION_ICONS } from '@/const/common/action-icons';

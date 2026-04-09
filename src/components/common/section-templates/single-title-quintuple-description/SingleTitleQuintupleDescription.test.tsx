@@ -6,7 +6,7 @@ import { SectionMode } from '@/types/common/sections';
 
 const mockDescProps = jest.fn();
 
-jest.mock('@/utils/functions/program-section-template-validation/programSectionTemplateValidation', () => ({
+jest.mock('@/utils/functions/section-template-validation/sectionTemplateValidation', () => ({
     getSectionTemplateMaxLength: jest.fn(() => 50),
 }));
 

@@ -13,7 +13,7 @@ import { useCardValidation } from '../../../../../../hooks/admin/use-section-car
 import {
     getSectionTemplateMaxLength,
     getSectionTemplateMinLength,
-} from '../../../../../../utils/functions/program-section-template-validation/programSectionTemplateValidation';
+} from '../../../../../../utils/functions/section-template-validation/sectionTemplateValidation';
 
 jest.mock('@/utils/functions/formatters/text-formatters', () => ({
     parseDescriptionList: jest.fn(),
@@ -23,7 +23,7 @@ jest.mock('@/hooks/admin/use-section-card-validation/useCardValidation', () => (
     useCardValidation: jest.fn(),
 }));
 
-jest.mock('@/utils/functions/program-section-template-validation/programSectionTemplateValidation', () => ({
+jest.mock('@/utils/functions/section-template-validation/sectionTemplateValidation', () => ({
     getSectionTemplateMaxLength: jest.fn(),
     getSectionTemplateMinLength: jest.fn(),
 }));

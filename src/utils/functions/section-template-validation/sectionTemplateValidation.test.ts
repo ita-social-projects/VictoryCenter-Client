@@ -4,7 +4,7 @@ import {
     getSectionTemplateMinGroupCount,
     getSectionTemplateMinLength,
     normalizeGroupedContentsGroupIndexes,
-} from './programSectionTemplateValidation';
+} from './sectionTemplateValidation';
 import { SectionTemplate } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
 
@@ -48,7 +48,7 @@ const buildGappedFixture = () => {
     };
 };
 
-describe('programSectionTemplateValidation', () => {
+describe('sectionTemplateValidation', () => {
     describe('length rules', () => {
         it('returns max length from rules', () => {
             expect(getSectionTemplateMaxLength(TEMPLATE_WITH_RULES, ContentType.Title)).toBe(10);

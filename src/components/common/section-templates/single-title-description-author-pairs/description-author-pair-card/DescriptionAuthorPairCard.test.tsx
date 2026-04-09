@@ -7,7 +7,7 @@ import { SectionTemplate } from '@/types/common/sections';
 import { DescriptionAuthorPairCard } from './DescriptionAuthorPairCard';
 import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
 
-jest.mock('@/utils/functions/program-section-template-validation/programSectionTemplateValidation', () => ({
+jest.mock('@/utils/functions/section-template-validation/sectionTemplateValidation', () => ({
     getSectionTemplateMaxLength: jest.fn(() => 50),
 }));
 

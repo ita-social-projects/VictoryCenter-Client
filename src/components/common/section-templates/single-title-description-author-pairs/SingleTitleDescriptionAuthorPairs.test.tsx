@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { SingleTitleDescriptionAuthorPairs } from './SingleTitleDescriptionAuthorPairs';
@@ -9,7 +9,7 @@ const mockCardCarousel = jest.fn();
 const mockDescriptionAuthorPairCard = jest.fn();
 const mockConfirmationModal = jest.fn();
 
-jest.mock('@/utils/functions/program-section-template-validation/programSectionTemplateValidation', () => ({
+jest.mock('@/utils/functions/section-template-validation/sectionTemplateValidation', () => ({
     getSectionTemplateMaxLength: jest.fn(),
 }));
 
@@ -116,7 +116,7 @@ const pairs = (...items: Array<ReturnType<typeof pair>>) => items;
 
 const getTemplateMaxLengthMock = () => {
     const mod = jest.requireMock(
-        '@/utils/functions/program-section-template-validation/programSectionTemplateValidation',
+        '@/utils/functions/section-template-validation/sectionTemplateValidation',
     );
     return mod.getSectionTemplateMaxLength as jest.Mock;
 };

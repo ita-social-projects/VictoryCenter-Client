@@ -1,4 +1,4 @@
-import { useId } from 'react';
+﻿import { useId } from 'react';
 import cn from 'classnames';
 import { parseDescriptionList } from '@/utils/functions/formatters/text-formatters';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
@@ -13,7 +13,7 @@ import styles from './TitleDescriptionCardsSection.module.scss';
 import {
     getSectionTemplateMaxLength,
     getSectionTemplateMinLength,
-} from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
+} from '@/utils/functions/section-template-validation/sectionTemplateValidation';
 
 interface TitleDescriptionCardProps {
     card: TitleDescriptionCardData;

@@ -19,7 +19,7 @@ jest.mock('@/components/admin/button/Button', () => ({
     Button: ({ buttonStyle: _buttonStyle, ...props }: any) => <button {...props}>{props.children}</button>,
 }));
 
-jest.mock('@/utils/functions/program-section-template-validation/programSectionTemplateValidation', () => ({
+jest.mock('@/utils/functions/section-template-validation/sectionTemplateValidation', () => ({
     getSectionTemplateMaxGroupCount: jest.fn(),
     normalizeGroupedContentsGroupIndexes: jest.fn(),
 }));
@@ -36,7 +36,7 @@ const renderProgramSectionMock = renderProgramSection as unknown as jest.Mock;
 
 const getTemplateValidationMocks = () => {
     const mod = jest.requireMock(
-        '@/utils/functions/program-section-template-validation/programSectionTemplateValidation',
+        '@/utils/functions/section-template-validation/sectionTemplateValidation',
     ) as {
         getSectionTemplateMaxGroupCount: jest.Mock;
         normalizeGroupedContentsGroupIndexes: jest.Mock;

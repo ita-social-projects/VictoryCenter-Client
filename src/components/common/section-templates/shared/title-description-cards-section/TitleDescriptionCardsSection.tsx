@@ -1,7 +1,7 @@
 import cn from 'classnames';
 import { TitleDescriptionCard } from './TitleDescriptionCard';
 import { SectionMode, SectionTemplate } from '@/types/common/sections';
-import { getSectionTemplateMaxGroupCount } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
+import { getSectionTemplateMaxGroupCount } from '@/utils/functions/section-template-validation/sectionTemplateValidation';
 import styles from './TitleDescriptionCardsSection.module.scss';
 
 export interface TitleDescriptionCardData {

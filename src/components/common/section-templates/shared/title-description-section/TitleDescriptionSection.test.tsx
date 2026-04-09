@@ -4,7 +4,7 @@ import { TitleDescriptionSection, TitleDescriptionSectionProps } from './TitleDe
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { SectionMode, SectionTemplate } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
-import { getSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
+import { getSectionTemplateMaxLength } from '@/utils/functions/section-template-validation/sectionTemplateValidation';
 import { useProgramSectionValidation } from '@/hooks/admin/use-program-section-validation';
 
 jest.mock('@/hooks/admin/use-program-section-validation', () => ({

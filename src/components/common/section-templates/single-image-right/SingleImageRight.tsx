@@ -1,4 +1,4 @@
-import cn from 'classnames';
+﻿import cn from 'classnames';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { PhotoInputGroup } from '@/components/admin/input-groups/photo-input-group/PhotoInputGroup';
 import { ImageValues, Image } from '@/types/common/image';
@@ -10,7 +10,7 @@ import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatter
 import { SectionMode, SectionTemplate } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
 import { useImageError } from '@/hooks/common/use-image-error/useImageError';
-import { getSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
+import { getSectionTemplateMaxLength } from '@/utils/functions/section-template-validation/sectionTemplateValidation';
 import styles from './SingleImageRight.module.scss';
 import viewStyles from './ViewSingleImageRight.module.scss';
 

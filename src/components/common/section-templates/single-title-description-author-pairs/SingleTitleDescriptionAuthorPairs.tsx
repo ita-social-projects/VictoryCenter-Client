@@ -1,4 +1,4 @@
-import cn from 'classnames';
+﻿import cn from 'classnames';
 import { useCallback, useMemo, useState } from 'react';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { Button } from '@/components/admin/button/Button';
@@ -11,7 +11,7 @@ import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import { CardCarousel } from './card-carousel/CardCarousel';
 import { SectionMode, SectionTemplate } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
-import { getSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
+import { getSectionTemplateMaxLength } from '@/utils/functions/section-template-validation/sectionTemplateValidation';
 import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';

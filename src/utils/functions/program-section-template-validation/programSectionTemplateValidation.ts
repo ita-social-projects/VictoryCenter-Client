@@ -21,16 +21,16 @@ const getLengthRule = (template: SectionTemplate, type: ContentType): Range | un
     return rules?.lengths?.[type];
 };
 
-export const getProgramSectionTemplateMaxLength = (template: SectionTemplate, type: ContentType): number =>
+export const getSectionTemplateMaxLength = (template: SectionTemplate, type: ContentType): number =>
     getLengthRule(template, type)?.max ?? 0;
 
-export const getProgramSectionTemplateMinLength = (template: SectionTemplate, type: ContentType): number =>
+export const getSectionTemplateMinLength = (template: SectionTemplate, type: ContentType): number =>
     getLengthRule(template, type)?.min ?? 0;
 
-export const getProgramSectionTemplateMaxGroupCount = (template: SectionTemplate): number =>
+export const getSectionTemplateMaxGroupCount = (template: SectionTemplate): number =>
     getTemplateRules(template)?.grouping?.groupCount?.max ?? 0;
 
-export const getProgramSectionTemplateMinGroupCount = (template: SectionTemplate): number =>
+export const getSectionTemplateMinGroupCount = (template: SectionTemplate): number =>
     getTemplateRules(template)?.grouping?.groupCount?.min ?? 0;
 
 export const normalizeGroupedContentsGroupIndexes = (

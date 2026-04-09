@@ -10,7 +10,7 @@ import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatter
 import { SectionMode, SectionTemplate } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
 import { useImageError } from '@/hooks/common/use-image-error/useImageError';
-import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
+import { getSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
 import styles from './SingleImageRight.module.scss';
 import viewStyles from './ViewSingleImageRight.module.scss';
 
@@ -56,8 +56,8 @@ export const SingleImageRight = ({
 
     const { error, handleSetError } = useImageError();
 
-    const titleMaxLength = getProgramSectionTemplateMaxLength(TEMPLATE, ContentType.Title);
-    const descriptionMaxLength = getProgramSectionTemplateMaxLength(TEMPLATE, ContentType.Description);
+    const titleMaxLength = getSectionTemplateMaxLength(TEMPLATE, ContentType.Title);
+    const descriptionMaxLength = getSectionTemplateMaxLength(TEMPLATE, ContentType.Description);
 
     return (
         <div

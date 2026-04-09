@@ -7,7 +7,7 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import styles from './DescriptionAuthorPairCard.module.scss';
 import { SectionTemplate } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
-import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
+import { getSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
 import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
 import { IconButton } from '@/components/admin/icon-button/IconButton';
 import { ACTION_ICONS } from '@/const/common/action-icons';
@@ -39,8 +39,8 @@ export const DescriptionAuthorPairCard = ({
     const [descriptionError, setDescriptionError] = useState<string | undefined>(undefined);
     const [authorError, setAuthorError] = useState<string | undefined>(undefined);
 
-    const descriptionMaxLength = getProgramSectionTemplateMaxLength(TEMPLATE, ContentType.Description);
-    const authorMaxLength = getProgramSectionTemplateMaxLength(TEMPLATE, ContentType.Author);
+    const descriptionMaxLength = getSectionTemplateMaxLength(TEMPLATE, ContentType.Description);
+    const authorMaxLength = getSectionTemplateMaxLength(TEMPLATE, ContentType.Author);
 
     const validate = useCallback((value: string, type: ContentType) => {
         return PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateContentText(value, type, true, TEMPLATE);

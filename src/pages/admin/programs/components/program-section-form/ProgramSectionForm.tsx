@@ -9,7 +9,7 @@ import { FaqSectionQuestionDto, CreateHippotherapyProgramSectionDto } from '@/ty
 import { SectionTemplate, SectionMode } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
 import {
-    getProgramSectionTemplateMaxGroupCount,
+    getSectionTemplateMaxGroupCount,
     normalizeGroupedContentsGroupIndexes,
 } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
 import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
@@ -307,9 +307,7 @@ export const ProgramSectionForm = ({
         [handlePairFieldChange],
     );
 
-    const pairsMaxCount = isDescriptionAuthorPairsTemplate
-        ? getProgramSectionTemplateMaxGroupCount(section.template)
-        : 0;
+    const pairsMaxCount = isDescriptionAuthorPairsTemplate ? getSectionTemplateMaxGroupCount(section.template) : 0;
 
     const validateDescriptionAuthorPairContent = (value: string, type: ContentType) =>
         PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateContentText(value, type, true, section.template);
@@ -334,7 +332,7 @@ export const ProgramSectionForm = ({
         ]);
 
         const pairs = getDescriptionAuthorPairsByGroup(normalizedContents);
-        const maxGroupCount = getProgramSectionTemplateMaxGroupCount(prev.template);
+        const maxGroupCount = getSectionTemplateMaxGroupCount(prev.template);
         if (pairs.length >= maxGroupCount) return;
 
         const nextGroupIndex = pairs.length;

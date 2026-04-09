@@ -8,7 +8,7 @@ import { DescriptionAuthorPairCard } from './DescriptionAuthorPairCard';
 import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
 
 jest.mock('@/utils/functions/program-section-template-validation/programSectionTemplateValidation', () => ({
-    getProgramSectionTemplateMaxLength: jest.fn(() => 50),
+    getSectionTemplateMaxLength: jest.fn(() => 50),
 }));
 
 jest.mock('@/validation/admin/program-schema/program-schema', () => ({

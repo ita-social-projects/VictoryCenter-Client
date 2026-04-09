@@ -11,8 +11,8 @@ import { SectionMode, SectionTemplate } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
 import styles from './TitleDescriptionCardsSection.module.scss';
 import {
-    getProgramSectionTemplateMaxLength,
-    getProgramSectionTemplateMinLength,
+    getSectionTemplateMaxLength,
+    getSectionTemplateMinLength,
 } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
 
 interface TitleDescriptionCardProps {
@@ -34,11 +34,11 @@ export const TitleDescriptionCard = ({
     onDescriptionChange,
     validationResetKey,
 }: TitleDescriptionCardProps) => {
-    const titleMin = getProgramSectionTemplateMinLength(template, ContentType.Title);
-    const titleMax = getProgramSectionTemplateMaxLength(template, ContentType.Title);
+    const titleMin = getSectionTemplateMinLength(template, ContentType.Title);
+    const titleMax = getSectionTemplateMaxLength(template, ContentType.Title);
 
-    const descriptionMin = getProgramSectionTemplateMinLength(template, ContentType.Description);
-    const descriptionMax = getProgramSectionTemplateMaxLength(template, ContentType.Description);
+    const descriptionMin = getSectionTemplateMinLength(template, ContentType.Description);
+    const descriptionMax = getSectionTemplateMaxLength(template, ContentType.Description);
 
     const idPrefix = useId();
     const {

@@ -10,7 +10,7 @@ const mockDescriptionAuthorPairCard = jest.fn();
 const mockConfirmationModal = jest.fn();
 
 jest.mock('@/utils/functions/program-section-template-validation/programSectionTemplateValidation', () => ({
-    getProgramSectionTemplateMaxLength: jest.fn(),
+    getSectionTemplateMaxLength: jest.fn(),
 }));
 
 jest.mock('@/validation/admin/program-schema/program-schema', () => ({
@@ -118,7 +118,7 @@ const getTemplateMaxLengthMock = () => {
     const mod = jest.requireMock(
         '@/utils/functions/program-section-template-validation/programSectionTemplateValidation',
     );
-    return mod.getProgramSectionTemplateMaxLength as jest.Mock;
+    return mod.getSectionTemplateMaxLength as jest.Mock;
 };
 
 const getValidateContentTextMock = () => {
@@ -131,13 +131,13 @@ const renderComponent = (overrideProps: Partial<ComponentProps> = {}) => {
     mockDescriptionAuthorPairCard.mockClear();
     mockConfirmationModal.mockClear();
 
-    const getProgramSectionTemplateMaxLength = getTemplateMaxLengthMock();
+    const getSectionTemplateMaxLength = getTemplateMaxLengthMock();
     const validateContentText = getValidateContentTextMock();
 
-    getProgramSectionTemplateMaxLength.mockReset();
+    getSectionTemplateMaxLength.mockReset();
     validateContentText.mockReset();
 
-    getProgramSectionTemplateMaxLength.mockReturnValue(50);
+    getSectionTemplateMaxLength.mockReturnValue(50);
     validateContentText.mockReturnValue(undefined);
 
     const defaultProps: ComponentProps = {
@@ -410,11 +410,11 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
         await waitFor(() => expect(screen.getByTestId('confirmation-modal')).toHaveAttribute('data-open', '0'));
     });
 
-    it('calls getProgramSectionTemplateMaxLength for title', () => {
+    it('calls getSectionTemplateMaxLength for title', () => {
         renderComponent({ mode: SectionMode.Edit });
 
-        const getProgramSectionTemplateMaxLength = getTemplateMaxLengthMock();
-        expect(getProgramSectionTemplateMaxLength).toHaveBeenCalledWith(
+        const getSectionTemplateMaxLength = getTemplateMaxLengthMock();
+        expect(getSectionTemplateMaxLength).toHaveBeenCalledWith(
             SectionTemplate.SingleTitleDescriptionAuthorPairs,
             ContentType.Title,
         );

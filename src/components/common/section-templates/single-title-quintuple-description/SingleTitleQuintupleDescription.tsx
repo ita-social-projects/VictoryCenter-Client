@@ -6,7 +6,7 @@ import { PROGRAMS_TEXT, SINGLE_TITLE_QUINTUPLE_DESCRIPTION_CONFIG } from '@/cons
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { SectionMode, SectionTemplate } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
-import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
+import { getSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
 import baseStyles from './SingleTitleQuintupleDescription.module.scss';
 import viewStyles from './ViewSingleTitleQuintupleDescription.module.scss';
 import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
@@ -38,8 +38,8 @@ export const SingleTitleQuintupleDescription = ({
 }: SingleTitleQuintupleDescriptionProps) => {
     const descriptionsCount = SINGLE_TITLE_QUINTUPLE_DESCRIPTION_CONFIG.descriptionsCount;
 
-    const titleMaxLength = getProgramSectionTemplateMaxLength(TEMPLATE, ContentType.Title);
-    const descriptionMaxLength = getProgramSectionTemplateMaxLength(TEMPLATE, ContentType.Description);
+    const titleMaxLength = getSectionTemplateMaxLength(TEMPLATE, ContentType.Title);
+    const descriptionMaxLength = getSectionTemplateMaxLength(TEMPLATE, ContentType.Description);
 
     const normalizedDescriptions = useMemo(
         () => Array.from({ length: descriptionsCount }, (_, i) => descriptions[i] ?? ''),

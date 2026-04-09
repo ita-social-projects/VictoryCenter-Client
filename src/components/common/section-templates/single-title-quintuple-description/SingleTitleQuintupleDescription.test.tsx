@@ -7,7 +7,7 @@ import { SectionMode } from '@/types/common/sections';
 const mockDescProps = jest.fn();
 
 jest.mock('@/utils/functions/program-section-template-validation/programSectionTemplateValidation', () => ({
-    getProgramSectionTemplateMaxLength: jest.fn(() => 50),
+    getSectionTemplateMaxLength: jest.fn(() => 50),
 }));
 
 jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({

@@ -19,8 +19,8 @@ jest.mock('./CardDescriptionField', () => ({
 }));
 
 jest.mock('@/utils/functions/program-section-template-validation/programSectionTemplateValidation', () => ({
-    getProgramSectionTemplateMaxLength: jest.fn((_: SectionTemplate, type: number) => (type === 0 ? 30 : 120)),
-    getProgramSectionTemplateMinLength: jest.fn(() => 1),
+    getSectionTemplateMaxLength: jest.fn((_: SectionTemplate, type: number) => (type === 0 ? 30 : 120)),
+    getSectionTemplateMinLength: jest.fn(() => 1),
 }));
 
 const useCardValidationMock = useCardValidation as jest.Mock;

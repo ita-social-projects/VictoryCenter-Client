@@ -1,7 +1,7 @@
 import cn from 'classnames';
 import { TitleDescriptionCard } from './TitleDescriptionCard';
 import { SectionMode, SectionTemplate } from '@/types/common/sections';
-import { getProgramSectionTemplateMaxGroupCount } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
+import { getSectionTemplateMaxGroupCount } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
 import styles from './TitleDescriptionCardsSection.module.scss';
 
 export interface TitleDescriptionCardData {
@@ -25,7 +25,7 @@ const PAIRS_TEMPLATES = [
 ] as const;
 
 const resolvePairsTemplateByCardsCount = (cardsCount: number): SectionTemplate =>
-    PAIRS_TEMPLATES.find((t) => getProgramSectionTemplateMaxGroupCount(t) === cardsCount) ??
+    PAIRS_TEMPLATES.find((t) => getSectionTemplateMaxGroupCount(t) === cardsCount) ??
     SectionTemplate.DualTitleDescriptionPairs;
 
 export const TitleDescriptionCardsSection = ({

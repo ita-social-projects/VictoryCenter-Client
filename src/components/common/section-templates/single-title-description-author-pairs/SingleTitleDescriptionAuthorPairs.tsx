@@ -11,7 +11,7 @@ import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import { CardCarousel } from './card-carousel/CardCarousel';
 import { SectionMode, SectionTemplate } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
-import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
+import { getSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
 import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -53,7 +53,7 @@ export const SingleTitleDescriptionAuthorPairs = ({
     const [titleError, setTitleError] = useState<string | undefined>(undefined);
     const [pendingDeletePairIndex, setPendingDeletePairIndex] = useState<number | null>(null);
 
-    const titleMaxLength = getProgramSectionTemplateMaxLength(TEMPLATE, ContentType.Title);
+    const titleMaxLength = getSectionTemplateMaxLength(TEMPLATE, ContentType.Title);
 
     const validate = useCallback((value: string, type: ContentType) => {
         return PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateContentText(value, type, true, TEMPLATE);

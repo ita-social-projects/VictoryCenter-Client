@@ -20,7 +20,7 @@ jest.mock('@/components/admin/button/Button', () => ({
 }));
 
 jest.mock('@/utils/functions/program-section-template-validation/programSectionTemplateValidation', () => ({
-    getProgramSectionTemplateMaxGroupCount: jest.fn(),
+    getSectionTemplateMaxGroupCount: jest.fn(),
     normalizeGroupedContentsGroupIndexes: jest.fn(),
 }));
 
@@ -38,12 +38,12 @@ const getTemplateValidationMocks = () => {
     const mod = jest.requireMock(
         '@/utils/functions/program-section-template-validation/programSectionTemplateValidation',
     ) as {
-        getProgramSectionTemplateMaxGroupCount: jest.Mock;
+        getSectionTemplateMaxGroupCount: jest.Mock;
         normalizeGroupedContentsGroupIndexes: jest.Mock;
     };
 
     return {
-        getProgramSectionTemplateMaxGroupCount: mod.getProgramSectionTemplateMaxGroupCount,
+        getSectionTemplateMaxGroupCount: mod.getSectionTemplateMaxGroupCount,
         normalizeGroupedContentsGroupIndexes: mod.normalizeGroupedContentsGroupIndexes,
     };
 };
@@ -169,17 +169,16 @@ describe('ProgramSectionForm', () => {
     beforeEach(() => {
         jest.clearAllMocks();
 
-        const { getProgramSectionTemplateMaxGroupCount, normalizeGroupedContentsGroupIndexes } =
-            getTemplateValidationMocks();
+        const { getSectionTemplateMaxGroupCount, normalizeGroupedContentsGroupIndexes } = getTemplateValidationMocks();
         const { validateContentText, validateFaqQuestion, validateFaqAnswer } = getProgramValidationMocks();
 
-        getProgramSectionTemplateMaxGroupCount.mockReset();
+        getSectionTemplateMaxGroupCount.mockReset();
         normalizeGroupedContentsGroupIndexes.mockReset();
         validateContentText.mockReset();
         validateFaqQuestion.mockReset();
         validateFaqAnswer.mockReset();
 
-        getProgramSectionTemplateMaxGroupCount.mockReturnValue(10);
+        getSectionTemplateMaxGroupCount.mockReturnValue(10);
         validateContentText.mockReturnValue(undefined);
         validateFaqQuestion.mockReturnValue(undefined);
         validateFaqAnswer.mockReturnValue(undefined);
@@ -571,7 +570,7 @@ describe('ProgramSectionForm', () => {
                 makePairAuthor(4, 1, 'A1'),
             ]);
 
-            getTemplateValidationMocks().getProgramSectionTemplateMaxGroupCount.mockReturnValue(2);
+            getTemplateValidationMocks().getSectionTemplateMaxGroupCount.mockReturnValue(2);
 
             renderForm({ section, isNewSection: true });
 

@@ -8,7 +8,7 @@ import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { useProgramSectionValidation } from '@/hooks/admin/use-program-section-validation';
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
-import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
+import { getSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
 import { SectionMode, SectionTemplate } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
 
@@ -57,8 +57,8 @@ export const TitleDescriptionSection = ({
 
     const baseStyles = mode === SectionMode.View ? viewStyles : styles;
 
-    const titleMaxLength = getProgramSectionTemplateMaxLength(template, ContentType.Title);
-    const descriptionMaxLength = getProgramSectionTemplateMaxLength(template, ContentType.Description);
+    const titleMaxLength = getSectionTemplateMaxLength(template, ContentType.Title);
+    const descriptionMaxLength = getSectionTemplateMaxLength(template, ContentType.Description);
 
     return (
         <div

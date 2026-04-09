@@ -11,7 +11,7 @@ import { PublishedFaqQuestion } from '@/types/public/faq-section';
 import { FaqSectionQuestionDto } from '@/types/common/program-sections';
 import { SectionTemplate, SectionMode } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
-import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
+import { getSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
 import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
@@ -57,7 +57,7 @@ export const FaqProgramSection = ({
     const isTemplate = mode === SectionMode.Template;
     const isEditable = mode === SectionMode.Edit;
 
-    const titleMaxLength = getProgramSectionTemplateMaxLength(TEMPLATE, ContentType.Title);
+    const titleMaxLength = getSectionTemplateMaxLength(TEMPLATE, ContentType.Title);
 
     const { titleError, handleTitleChange, handleTitleBlur } = useProgramSectionValidation({
         template: TEMPLATE,

@@ -11,8 +11,8 @@ import { ContentType } from '../../../../../../types/common/section-contents';
 import { parseDescriptionList } from '../../../../../../utils/functions/formatters/text-formatters';
 import { useCardValidation } from '../../../../../../hooks/admin/use-section-card-validation/useCardValidation';
 import {
-    getProgramSectionTemplateMaxLength,
-    getProgramSectionTemplateMinLength,
+    getSectionTemplateMaxLength,
+    getSectionTemplateMinLength,
 } from '../../../../../../utils/functions/program-section-template-validation/programSectionTemplateValidation';
 
 jest.mock('@/utils/functions/formatters/text-formatters', () => ({
@@ -24,8 +24,8 @@ jest.mock('@/hooks/admin/use-section-card-validation/useCardValidation', () => (
 }));
 
 jest.mock('@/utils/functions/program-section-template-validation/programSectionTemplateValidation', () => ({
-    getProgramSectionTemplateMaxLength: jest.fn(),
-    getProgramSectionTemplateMinLength: jest.fn(),
+    getSectionTemplateMaxLength: jest.fn(),
+    getSectionTemplateMinLength: jest.fn(),
 }));
 
 jest.mock('@/const/admin/programs', () => ({
@@ -79,8 +79,8 @@ jest.mock('../CardDescriptionField', () => ({
 const parseDescriptionListMock = parseDescriptionList as unknown as jest.Mock;
 const useCardValidationMock = useCardValidation as unknown as jest.Mock;
 
-const minMock = getProgramSectionTemplateMinLength as unknown as jest.Mock;
-const maxMock = getProgramSectionTemplateMaxLength as unknown as jest.Mock;
+const minMock = getSectionTemplateMinLength as unknown as jest.Mock;
+const maxMock = getSectionTemplateMaxLength as unknown as jest.Mock;
 
 const TEMPLATE = SectionTemplate.DualTitleDescriptionPairs;
 

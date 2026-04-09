@@ -1,8 +1,8 @@
 import {
-    getProgramSectionTemplateMaxGroupCount,
-    getProgramSectionTemplateMaxLength,
-    getProgramSectionTemplateMinGroupCount,
-    getProgramSectionTemplateMinLength,
+    getSectionTemplateMaxGroupCount,
+    getSectionTemplateMaxLength,
+    getSectionTemplateMinGroupCount,
+    getSectionTemplateMinLength,
     normalizeGroupedContentsGroupIndexes,
 } from './programSectionTemplateValidation';
 import { SectionTemplate } from '@/types/common/sections';
@@ -51,33 +51,33 @@ const buildGappedFixture = () => {
 describe('programSectionTemplateValidation', () => {
     describe('length rules', () => {
         it('returns max length from rules', () => {
-            expect(getProgramSectionTemplateMaxLength(TEMPLATE_WITH_RULES, ContentType.Title)).toBe(10);
+            expect(getSectionTemplateMaxLength(TEMPLATE_WITH_RULES, ContentType.Title)).toBe(10);
         });
 
         it('returns min length from rules', () => {
-            expect(getProgramSectionTemplateMinLength(TEMPLATE_WITH_RULES, ContentType.Title)).toBe(3);
+            expect(getSectionTemplateMinLength(TEMPLATE_WITH_RULES, ContentType.Title)).toBe(3);
         });
 
         it('returns 0 when type has no rule', () => {
-            expect(getProgramSectionTemplateMaxLength(TEMPLATE_WITH_RULES, MISSING_TYPE)).toBe(0);
+            expect(getSectionTemplateMaxLength(TEMPLATE_WITH_RULES, MISSING_TYPE)).toBe(0);
         });
 
         it('returns 0 when template has no rules', () => {
-            expect(getProgramSectionTemplateMinLength(MISSING_TEMPLATE, ContentType.Title)).toBe(0);
+            expect(getSectionTemplateMinLength(MISSING_TEMPLATE, ContentType.Title)).toBe(0);
         });
     });
 
     describe('group count rules', () => {
         it('returns max group count from rules', () => {
-            expect(getProgramSectionTemplateMaxGroupCount(TEMPLATE_WITH_RULES)).toBe(4);
+            expect(getSectionTemplateMaxGroupCount(TEMPLATE_WITH_RULES)).toBe(4);
         });
 
         it('returns min group count from rules', () => {
-            expect(getProgramSectionTemplateMinGroupCount(TEMPLATE_WITH_RULES)).toBe(1);
+            expect(getSectionTemplateMinGroupCount(TEMPLATE_WITH_RULES)).toBe(1);
         });
 
         it('returns 0 when template has no grouping rules', () => {
-            expect(getProgramSectionTemplateMaxGroupCount(MISSING_TEMPLATE)).toBe(0);
+            expect(getSectionTemplateMaxGroupCount(MISSING_TEMPLATE)).toBe(0);
         });
     });
 

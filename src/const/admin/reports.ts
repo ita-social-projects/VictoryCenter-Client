@@ -221,6 +221,13 @@ export const FUNDS_EXPENDITURES_TEXT = {
 };
 
 export const PROGRAM_EXPENSES_TEXT = {
+    BUTTON: {
+        ADD_PROGRAM_EXPENSE: 'Витрата по програмі',
+    },
+    EMPTY_STATE: {
+        TITLE: 'Немає записів',
+        ADD_RECORD: 'додайте перший запис Програмної витрати',
+    },
     SUMMARY_CARD: {
         TITLE: 'Всього програмні витрати',
     },

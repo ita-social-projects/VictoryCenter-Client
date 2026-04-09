@@ -7,10 +7,10 @@
     width: 100%;
     min-height: 347px;
     overflow-x: auto;
-    background: c.$light-blue-25;
-    border: 1px solid c.$grey-500;
+    background: #f8fafc;
+    border: 1px solid #e2e2e2;
     border-radius: 16px;
-    box-shadow: 0 24px 48px -12px rgba(c.$bluish-black, 0.2);
+    box-shadow: 0 24px 48px -12px rgba(17, 17, 19, 0.2);
 }
 
 .table {
@@ -84,31 +84,6 @@
     line-height: 15px;
     letter-spacing: t.$small-spacing;
     text-align: center;
-}
-
-.empty-cell {
-    padding: 48px 20px;
-    text-align: center;
-}
-
-.empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-}
-
-.empty-state-image {
-    width: 180px;
-    height: auto;
-}
-
-.empty-state-message {
-    @include type.subtitle-2-medium;
-    margin: 0;
-    font-weight: 400;
-    line-height: 24px;
-    color: c.$graphite-black;
 }
 
 @media (max-width: 1200px) {

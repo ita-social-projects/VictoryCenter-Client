@@ -41,7 +41,9 @@ export const ProgramExpensesSection = () => {
         return data.records.filter((record) => record.programId === selectedProgramId);
     }, [data.records, selectedProgramId]);
 
-    const isInitialLoading = isLoading && data.records.length === 0 && data.programs.length === 0;
+    const programExpenseRecordsCount = data.records.length;
+    const hasAnyProgramExpenseRecords = programExpenseRecordsCount > 0;
+    const isInitialLoading = isLoading && programExpenseRecordsCount === 0 && data.programs.length === 0;
 
     if (isInitialLoading) {
         return (
@@ -64,7 +66,10 @@ export const ProgramExpensesSection = () => {
                     exchangeRate={data.exchangeRate}
                     onProgramChange={setSelectedProgramId}
                 />
-                <ProgramExpensesTable records={filteredRecords} />
+                <ProgramExpensesTable
+                    records={filteredRecords}
+                    hasAnyProgramExpenseRecords={hasAnyProgramExpenseRecords}
+                />
             </div>
         </div>
     );

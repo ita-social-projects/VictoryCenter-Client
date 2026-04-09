@@ -2,13 +2,13 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { FaqProgramSection, FaqProgramSectionProps } from './FaqProgramSection';
 import { SectionMode } from '@/types/common/sections';
-import { useProgramSectionValidation } from '@/hooks/admin/use-program-section-validation';
+import { useSectionValidation } from '@/hooks/admin/use-section-validation';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FaqQuestion } from '@/types/admin/faq';
 import { VisibilityStatus } from '@/types/admin/common';
 
-jest.mock('@/hooks/admin/use-program-section-validation', () => ({
-    useProgramSectionValidation: jest.fn(),
+jest.mock('@/hooks/admin/use-section-validation', () => ({
+    useSectionValidation: jest.fn(),
 }));
 
 jest.mock('@/components/public/faq-section/faq-card/FaqCard', () => ({
@@ -158,9 +158,7 @@ jest.mock('@/validation/admin/program-schema/program-schema', () => ({
     },
 }));
 
-const useProgramSectionValidationMock = useProgramSectionValidation as jest.MockedFunction<
-    typeof useProgramSectionValidation
->;
+const useSectionValidationMock = useSectionValidation as jest.MockedFunction<typeof useSectionValidation>;
 
 const createFaqQuestion = (overrides: Partial<FaqQuestion> = {}): FaqQuestion => ({
     id: 1,
@@ -179,8 +177,8 @@ describe('FaqProgramSection', () => {
         faqPairs: [],
     };
 
-    const setupHook = (overrides?: Partial<ReturnType<typeof useProgramSectionValidation>>) => {
-        useProgramSectionValidationMock.mockImplementation(({ onTitleChange }: any) => {
+    const setupHook = (overrides?: Partial<ReturnType<typeof useSectionValidation>>) => {
+        useSectionValidationMock.mockImplementation(({ onTitleChange }: any) => {
             const handleTitleChange = jest.fn((e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) =>
                 onTitleChange?.(e.target.value),
             );

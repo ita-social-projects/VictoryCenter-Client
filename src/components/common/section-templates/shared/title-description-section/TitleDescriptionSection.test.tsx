@@ -5,10 +5,10 @@ import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { SectionMode, SectionTemplate } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
 import { getSectionTemplateMaxLength } from '@/utils/functions/section-template-validation/sectionTemplateValidation';
-import { useProgramSectionValidation } from '@/hooks/admin/use-program-section-validation';
+import { useSectionValidation } from '@/hooks/admin/use-section-validation';
 
-jest.mock('@/hooks/admin/use-program-section-validation', () => ({
-    useProgramSectionValidation: jest.fn(),
+jest.mock('@/hooks/admin/use-section-validation', () => ({
+    useSectionValidation: jest.fn(),
 }));
 
 jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
@@ -103,7 +103,7 @@ jest.mock(
     }),
 );
 
-const useProgramSectionValidationMock = useProgramSectionValidation as unknown as jest.Mock;
+const useSectionValidationMock = useSectionValidation as unknown as jest.Mock;
 
 describe('TitleDescriptionSection', () => {
     const TEMPLATE = SectionTemplate.TextOnly;
@@ -116,8 +116,8 @@ describe('TitleDescriptionSection', () => {
         mode: SectionMode.View,
     };
 
-    const setupHook = (overrides?: Partial<ReturnType<typeof useProgramSectionValidation>>) => {
-        useProgramSectionValidationMock.mockImplementation(
+    const setupHook = (overrides?: Partial<ReturnType<typeof useSectionValidation>>) => {
+        useSectionValidationMock.mockImplementation(
             ({
                 onTitleChange,
                 onDescriptionChange,
@@ -168,14 +168,14 @@ describe('TitleDescriptionSection', () => {
         jest.clearAllMocks();
     });
 
-    it('calls useProgramSectionValidation with callbacks, template, and flags', () => {
+    it('calls useSectionValidation with callbacks, template, and flags', () => {
         const onTitleChange = jest.fn();
         const onDescriptionChange = jest.fn();
 
         renderComponent({ onTitleChange, onDescriptionChange, isPublishing: true, validationResetKey: 7 });
 
-        expect(useProgramSectionValidationMock).toHaveBeenCalledTimes(1);
-        expect(useProgramSectionValidationMock).toHaveBeenCalledWith(
+        expect(useSectionValidationMock).toHaveBeenCalledTimes(1);
+        expect(useSectionValidationMock).toHaveBeenCalledWith(
             expect.objectContaining({
                 onTitleChange,
                 onDescriptionChange,

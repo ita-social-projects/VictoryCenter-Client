@@ -1,11 +1,11 @@
-﻿import cn from 'classnames';
+import cn from 'classnames';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { PhotoInputGroup } from '@/components/admin/input-groups/photo-input-group/PhotoInputGroup';
 import { ImageValues, Image } from '@/types/common/image';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 import { PROGRAMS_TEXT, PROGRAM_SECTION_IMAGE_CONFIGS, PROGRAM_VALIDATION } from '@/const/admin/programs';
-import { useProgramSectionValidation } from '@/hooks/admin/use-program-section-validation';
+import { useSectionValidation } from '@/hooks/admin/use-section-validation';
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
 import { SectionMode, SectionTemplate } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
@@ -47,7 +47,7 @@ export const SingleImageRight = ({
         handleTitleBlur,
         handleDescriptionChange,
         handleDescriptionBlur,
-    } = useProgramSectionValidation({
+    } = useSectionValidation({
         template: TEMPLATE,
         onTitleChange,
         onDescriptionChange,

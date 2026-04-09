@@ -1,4 +1,4 @@
-﻿import { useId } from 'react';
+import { useId } from 'react';
 import cn from 'classnames';
 import { parseDescriptionList } from '@/utils/functions/formatters/text-formatters';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';

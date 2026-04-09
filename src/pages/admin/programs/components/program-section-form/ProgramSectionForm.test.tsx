@@ -35,9 +35,7 @@ jest.mock('@/validation/admin/program-schema/program-schema', () => ({
 const renderProgramSectionMock = renderProgramSection as unknown as jest.Mock;
 
 const getTemplateValidationMocks = () => {
-    const mod = jest.requireMock(
-        '@/utils/functions/section-template-validation/sectionTemplateValidation',
-    ) as {
+    const mod = jest.requireMock('@/utils/functions/section-template-validation/sectionTemplateValidation') as {
         getSectionTemplateMaxGroupCount: jest.Mock;
         normalizeGroupedContentsGroupIndexes: jest.Mock;
     };

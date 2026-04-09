@@ -1,4 +1,4 @@
-﻿import { useId, useState, useCallback, useEffect, useRef, useMemo } from 'react';
+import { useId, useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import cn from 'classnames';
 import { FaqCard } from '@/components/public/faq-section/faq-card/FaqCard';
@@ -6,7 +6,7 @@ import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups
 import { Button } from '@/components/admin/button/Button';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { useProgramSectionValidation } from '@/hooks/admin/use-program-section-validation';
+import { useSectionValidation } from '@/hooks/admin/use-section-validation';
 import { PublishedFaqQuestion } from '@/types/public/faq-section';
 import { FaqSectionQuestionDto } from '@/types/common/program-sections';
 import { SectionTemplate, SectionMode } from '@/types/common/sections';
@@ -59,7 +59,7 @@ export const FaqProgramSection = ({
 
     const titleMaxLength = getSectionTemplateMaxLength(TEMPLATE, ContentType.Title);
 
-    const { titleError, handleTitleChange, handleTitleBlur } = useProgramSectionValidation({
+    const { titleError, handleTitleChange, handleTitleBlur } = useSectionValidation({
         template: TEMPLATE,
         onTitleChange,
         resetKey: validationResetKey,

@@ -1,4 +1,4 @@
-﻿import styles from './TitleDescriptionSection.module.scss';
+import styles from './TitleDescriptionSection.module.scss';
 import viewStyles from './ViewTitleDescriptionSection.module.scss';
 import cn from 'classnames';
 import { useId } from 'react';
@@ -6,7 +6,7 @@ import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/in
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { useProgramSectionValidation } from '@/hooks/admin/use-program-section-validation';
+import { useSectionValidation } from '@/hooks/admin/use-section-validation';
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
 import { getSectionTemplateMaxLength } from '@/utils/functions/section-template-validation/sectionTemplateValidation';
 import { SectionMode, SectionTemplate } from '@/types/common/sections';
@@ -47,7 +47,7 @@ export const TitleDescriptionSection = ({
         handleTitleBlur,
         handleDescriptionChange,
         handleDescriptionBlur,
-    } = useProgramSectionValidation({
+    } = useSectionValidation({
         template,
         isPublishing,
         onTitleChange,

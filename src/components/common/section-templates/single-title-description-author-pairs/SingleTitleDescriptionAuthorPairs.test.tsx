@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { SingleTitleDescriptionAuthorPairs } from './SingleTitleDescriptionAuthorPairs';
@@ -115,9 +115,7 @@ const pair = (description: string, author: string) => ({ description, author });
 const pairs = (...items: Array<ReturnType<typeof pair>>) => items;
 
 const getTemplateMaxLengthMock = () => {
-    const mod = jest.requireMock(
-        '@/utils/functions/section-template-validation/sectionTemplateValidation',
-    );
+    const mod = jest.requireMock('@/utils/functions/section-template-validation/sectionTemplateValidation');
     return mod.getSectionTemplateMaxLength as jest.Mock;
 };
 

@@ -1,7 +1,7 @@
 import { renderHook, act } from '@testing-library/react';
 import type React from 'react';
 
-import { useProgramSectionValidation } from './useProgramSectionValidation';
+import { useSectionValidation } from './useSectionValidation';
 
 import { PROGRAM_SECTION_TEMPLATE_VALIDATION } from '@/const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -41,10 +41,10 @@ const createTextAreaBlurEvent = (value: string) =>
         target: { value },
     }) as React.FocusEvent<HTMLTextAreaElement>;
 
-describe('useProgramSectionValidation', () => {
+describe('useSectionValidation', () => {
     describe('title validation', () => {
         it('should not show error initially', () => {
-            const { result } = renderHook(() => useProgramSectionValidation({ template: TEMPLATE }));
+            const { result } = renderHook(() => useSectionValidation({ template: TEMPLATE }));
             expect(result.current.titleError).toBeUndefined();
         });
 
@@ -52,7 +52,7 @@ describe('useProgramSectionValidation', () => {
             ['empty', ''],
             ['whitespace-only', '     '],
         ])('should show required error on blur when title is %s', (_, value) => {
-            const { result } = renderHook(() => useProgramSectionValidation({ template: TEMPLATE }));
+            const { result } = renderHook(() => useSectionValidation({ template: TEMPLATE }));
 
             act(() => {
                 result.current.handleTitleBlur(createBlurEvent(value));
@@ -62,7 +62,7 @@ describe('useProgramSectionValidation', () => {
         });
 
         it('should not show error when title is valid (draft)', () => {
-            const { result } = renderHook(() => useProgramSectionValidation({ template: TEMPLATE }));
+            const { result } = renderHook(() => useSectionValidation({ template: TEMPLATE }));
             const validTitle = 'a'.repeat(titleReq.min);
 
             act(() => {
@@ -73,7 +73,7 @@ describe('useProgramSectionValidation', () => {
         });
 
         it('should show max error when title exceeds max (draft)', () => {
-            const { result } = renderHook(() => useProgramSectionValidation({ template: TEMPLATE }));
+            const { result } = renderHook(() => useSectionValidation({ template: TEMPLATE }));
             const tooLong = 'a'.repeat(titleReq.max + 1);
 
             act(() => {
@@ -84,9 +84,7 @@ describe('useProgramSectionValidation', () => {
         });
 
         it('should show min error when title is too short in publishing mode', () => {
-            const { result } = renderHook(() =>
-                useProgramSectionValidation({ template: TEMPLATE, isPublishing: true }),
-            );
+            const { result } = renderHook(() => useSectionValidation({ template: TEMPLATE, isPublishing: true }));
 
             const tooShort = 'a'.repeat(Math.max(0, titleReq.min - 1));
 
@@ -99,7 +97,7 @@ describe('useProgramSectionValidation', () => {
 
         it('should trim spaces on blur', () => {
             const onTitleChange = jest.fn();
-            const { result } = renderHook(() => useProgramSectionValidation({ template: TEMPLATE, onTitleChange }));
+            const { result } = renderHook(() => useSectionValidation({ template: TEMPLATE, onTitleChange }));
 
             act(() => {
                 result.current.handleTitleBlur(createBlurEvent('  Valid Title  '));
@@ -111,7 +109,7 @@ describe('useProgramSectionValidation', () => {
         it('should not validate on change when there is no error', () => {
             const spy = jest.spyOn(PROGRAM_SECTION_VALIDATION_FUNCTIONS, 'validateSectionTitle');
 
-            const { result } = renderHook(() => useProgramSectionValidation({ template: TEMPLATE }));
+            const { result } = renderHook(() => useSectionValidation({ template: TEMPLATE }));
 
             act(() => {
                 result.current.handleTitleChange(createChangeEvent('Some Title'));
@@ -126,7 +124,7 @@ describe('useProgramSectionValidation', () => {
         it('should clear error while typing when value becomes valid', () => {
             const spy = jest.spyOn(PROGRAM_SECTION_VALIDATION_FUNCTIONS, 'validateSectionTitle');
 
-            const { result } = renderHook(() => useProgramSectionValidation({ template: TEMPLATE }));
+            const { result } = renderHook(() => useSectionValidation({ template: TEMPLATE }));
 
             act(() => {
                 result.current.handleTitleBlur(createBlurEvent(''));
@@ -146,7 +144,7 @@ describe('useProgramSectionValidation', () => {
         it('should keep error while typing when value is still invalid', () => {
             const spy = jest.spyOn(PROGRAM_SECTION_VALIDATION_FUNCTIONS, 'validateSectionTitle');
 
-            const { result } = renderHook(() => useProgramSectionValidation({ template: TEMPLATE }));
+            const { result } = renderHook(() => useSectionValidation({ template: TEMPLATE }));
 
             act(() => {
                 result.current.handleTitleBlur(createBlurEvent(''));
@@ -167,7 +165,7 @@ describe('useProgramSectionValidation', () => {
 
     describe('description validation', () => {
         it('should not show error initially', () => {
-            const { result } = renderHook(() => useProgramSectionValidation({ template: TEMPLATE }));
+            const { result } = renderHook(() => useSectionValidation({ template: TEMPLATE }));
             expect(result.current.descriptionError).toBeUndefined();
         });
 
@@ -175,7 +173,7 @@ describe('useProgramSectionValidation', () => {
             ['empty', ''],
             ['whitespace-only', '     '],
         ])('should show required error on blur when description is %s', (_, value) => {
-            const { result } = renderHook(() => useProgramSectionValidation({ template: TEMPLATE }));
+            const { result } = renderHook(() => useSectionValidation({ template: TEMPLATE }));
 
             act(() => {
                 result.current.handleDescriptionBlur(createTextAreaBlurEvent(value));
@@ -185,7 +183,7 @@ describe('useProgramSectionValidation', () => {
         });
 
         it('should show min error for short but non-empty description in draft mode', () => {
-            const { result } = renderHook(() => useProgramSectionValidation({ template: TEMPLATE }));
+            const { result } = renderHook(() => useSectionValidation({ template: TEMPLATE }));
             const shortButNotEmpty = 'a'.repeat(Math.max(1, descriptionReq.min - 1));
 
             act(() => {
@@ -198,9 +196,7 @@ describe('useProgramSectionValidation', () => {
         });
 
         it('should show min error when description is too short in publishing mode', () => {
-            const { result } = renderHook(() =>
-                useProgramSectionValidation({ template: TEMPLATE, isPublishing: true }),
-            );
+            const { result } = renderHook(() => useSectionValidation({ template: TEMPLATE, isPublishing: true }));
 
             const tooShort = 'a'.repeat(Math.max(0, descriptionReq.min - 1));
 
@@ -214,7 +210,7 @@ describe('useProgramSectionValidation', () => {
         });
 
         it('should show max error when description exceeds max (draft)', () => {
-            const { result } = renderHook(() => useProgramSectionValidation({ template: TEMPLATE }));
+            const { result } = renderHook(() => useSectionValidation({ template: TEMPLATE }));
             const tooLong = 'a'.repeat(descriptionReq.max + 1);
 
             act(() => {
@@ -228,9 +224,7 @@ describe('useProgramSectionValidation', () => {
 
         it('should trim spaces on blur', () => {
             const onDescriptionChange = jest.fn();
-            const { result } = renderHook(() =>
-                useProgramSectionValidation({ template: TEMPLATE, onDescriptionChange }),
-            );
+            const { result } = renderHook(() => useSectionValidation({ template: TEMPLATE, onDescriptionChange }));
 
             act(() => {
                 result.current.handleDescriptionBlur(createTextAreaBlurEvent('  Valid description here  '));
@@ -242,7 +236,7 @@ describe('useProgramSectionValidation', () => {
         it('should not validate on change when there is no error', () => {
             const spy = jest.spyOn(PROGRAM_SECTION_VALIDATION_FUNCTIONS, 'validateSectionDescription');
 
-            const { result } = renderHook(() => useProgramSectionValidation({ template: TEMPLATE }));
+            const { result } = renderHook(() => useSectionValidation({ template: TEMPLATE }));
 
             act(() => {
                 result.current.handleDescriptionChange(createTextAreaChangeEvent('Some description'));
@@ -257,7 +251,7 @@ describe('useProgramSectionValidation', () => {
         it('should clear error while typing when value becomes valid', () => {
             const spy = jest.spyOn(PROGRAM_SECTION_VALIDATION_FUNCTIONS, 'validateSectionDescription');
 
-            const { result } = renderHook(() => useProgramSectionValidation({ template: TEMPLATE }));
+            const { result } = renderHook(() => useSectionValidation({ template: TEMPLATE }));
             const valid = 'a'.repeat(Math.min(descriptionReq.max, Math.max(1, descriptionReq.min)));
 
             act(() => {
@@ -278,7 +272,7 @@ describe('useProgramSectionValidation', () => {
         it('should keep error while typing when value is still invalid', () => {
             const spy = jest.spyOn(PROGRAM_SECTION_VALIDATION_FUNCTIONS, 'validateSectionDescription');
 
-            const { result } = renderHook(() => useProgramSectionValidation({ template: TEMPLATE }));
+            const { result } = renderHook(() => useSectionValidation({ template: TEMPLATE }));
 
             act(() => {
                 result.current.handleDescriptionBlur(createTextAreaBlurEvent(''));
@@ -300,7 +294,7 @@ describe('useProgramSectionValidation', () => {
     describe('callback props', () => {
         it('should call onTitleChange when title changes', () => {
             const onTitleChange = jest.fn();
-            const { result } = renderHook(() => useProgramSectionValidation({ template: TEMPLATE, onTitleChange }));
+            const { result } = renderHook(() => useSectionValidation({ template: TEMPLATE, onTitleChange }));
 
             act(() => {
                 result.current.handleTitleChange(createChangeEvent('New Title'));
@@ -311,9 +305,7 @@ describe('useProgramSectionValidation', () => {
 
         it('should call onDescriptionChange when description changes', () => {
             const onDescriptionChange = jest.fn();
-            const { result } = renderHook(() =>
-                useProgramSectionValidation({ template: TEMPLATE, onDescriptionChange }),
-            );
+            const { result } = renderHook(() => useSectionValidation({ template: TEMPLATE, onDescriptionChange }));
 
             act(() => {
                 result.current.handleDescriptionChange(createTextAreaChangeEvent('New Description'));
@@ -323,7 +315,7 @@ describe('useProgramSectionValidation', () => {
         });
 
         it('should work without callback props', () => {
-            const { result } = renderHook(() => useProgramSectionValidation({ template: TEMPLATE }));
+            const { result } = renderHook(() => useSectionValidation({ template: TEMPLATE }));
 
             expect(() => {
                 act(() => {

@@ -3,7 +3,7 @@ import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
 import { SectionTemplate } from '@/types/common/sections';
 
-export interface UseProgramSectionValidationReturn {
+export interface UseSectionValidationReturn {
     titleError: string | undefined;
     descriptionError: string | undefined;
     handleTitleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
@@ -12,7 +12,7 @@ export interface UseProgramSectionValidationReturn {
     handleDescriptionBlur: (e: React.FocusEvent<HTMLTextAreaElement>) => void;
 }
 
-export interface UseProgramSectionValidationProps {
+export interface UseSectionValidationProps {
     template: SectionTemplate;
     isPublishing?: boolean;
     onTitleChange?: (value: string) => void;
@@ -20,13 +20,13 @@ export interface UseProgramSectionValidationProps {
     resetKey?: number;
 }
 
-export const useProgramSectionValidation = ({
+export const useSectionValidation = ({
     template,
     isPublishing = false,
     onTitleChange,
     onDescriptionChange,
     resetKey,
-}: UseProgramSectionValidationProps): UseProgramSectionValidationReturn => {
+}: UseSectionValidationProps): UseSectionValidationReturn => {
     const [titleError, setTitleError] = useState<string | undefined>(undefined);
     const [descriptionError, setDescriptionError] = useState<string | undefined>(undefined);
 

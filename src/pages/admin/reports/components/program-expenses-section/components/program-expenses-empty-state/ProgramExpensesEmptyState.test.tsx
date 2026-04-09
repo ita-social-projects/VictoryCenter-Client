@@ -45,7 +45,7 @@ describe('ProgramExpensesEmptyState', () => {
         expect(screen.getByRole('table')).toBeInTheDocument();
         expect(screen.getByRole('cell')).toHaveAttribute('colspan', '5');
         expect(screen.getByTestId('not-found-icon')).toBeInTheDocument();
-        expect(screen.getByText(PROGRAM_EXPENSES_TEXT.EMPTY_STATE.TITLE)).toBeInTheDocument();
+        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.TITLE)).toBeInTheDocument();
         expect(screen.getByText(PROGRAM_EXPENSES_TEXT.EMPTY_STATE.ADD_RECORD)).toBeInTheDocument();
         expect(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE })).toBeEnabled();
     });

@@ -21,7 +21,7 @@ export const ProgramExpensesEmptyState = ({ colSpan, variant }: ProgramExpensesE
                             className={cn(styles['empty-state-image'], styles['empty-state-image-program-expenses'])}
                             focusable="false"
                         />
-                        <p className={styles['empty-state-title']}>{PROGRAM_EXPENSES_TEXT.EMPTY_STATE.TITLE}</p>
+                        <p className={styles['empty-state-title']}>{FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.TITLE}</p>
                         <p className={styles['empty-state-message']}>{PROGRAM_EXPENSES_TEXT.EMPTY_STATE.ADD_RECORD}</p>
                         <div className={styles['empty-state-actions']}>
                             <Button buttonStyle="primary" className={styles['add-program-expense-button']}>

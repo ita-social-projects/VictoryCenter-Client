@@ -198,7 +198,7 @@ export const PartnerBanner = () => {
             {!isLoadingData && !fetchError && values && (
                 <div className={styles.content}>
                     <div className={styles.image}>
-                        <div className={styles.imageInput}>
+                        <div className={styles['image-input']}>
                             <ImageInput
                                 variant="partnerBanner"
                                 label={PARTNERS_TEXT.BANNER.ADD_IMAGE_HERE}
@@ -220,7 +220,7 @@ export const PartnerBanner = () => {
                                 }}
                             />
                         </div>
-                        <div className={styles.imageError}>
+                        <div className={styles['image-error']}>
                             <InputError error={errors.image} />
                         </div>
                     </div>

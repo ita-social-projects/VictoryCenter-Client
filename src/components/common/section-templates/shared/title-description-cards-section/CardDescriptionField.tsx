@@ -18,6 +18,8 @@ interface CardDescriptionFieldProps {
     disabled?: boolean;
     placeholder?: string;
     rows?: number;
+    autoGrow?: boolean;
+    maxRows?: number;
     error?: string | undefined;
     currentLength?: number;
 }
@@ -34,7 +36,9 @@ export const CardDescriptionField = ({
     maxLength,
     disabled,
     placeholder,
-    rows,
+    rows = 6,
+    autoGrow = true,
+    maxRows = 10,
     error,
 }: CardDescriptionFieldProps) => {
     const counterId = `${id}-character-count`;
@@ -55,6 +59,8 @@ export const CardDescriptionField = ({
                 disabled={disabled}
                 placeholder={placeholder}
                 rows={rows}
+                autoGrow={autoGrow}
+                maxRows={maxRows}
                 maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(maxLength)}
                 onWarningChange={setLocalWarning}
             />

@@ -2,7 +2,7 @@ import { ChangeEvent, ReactNode } from 'react';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ProgramExpensesSection } from './ProgramExpensesSection';
-import { PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
+import { FUNDS_EXPENDITURES_TEXT, PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
 import { ProgramExpensesReadOnlyData } from '@/types/admin/reports';
 import { ProgramExpensesApi } from '@/services/api/admin/reports/program-expenses-api';
 
@@ -47,6 +47,16 @@ const MOCK_PROGRAM_EXPENSES_DATA: ProgramExpensesReadOnlyData = {
     ],
 };
 
+const EMPTY_PROGRAM_EXPENSES_DATA: ProgramExpensesReadOnlyData = {
+    exchangeRate: null,
+    programs: [],
+    summary: {
+        totalAmountUah: 0,
+        totalAmountUsd: 0,
+    },
+    records: [],
+};
+
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: () => ({}),
 }));
@@ -74,6 +84,10 @@ jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
 
 jest.mock('@/assets/icons/not-found.svg', () => ({
     ReactComponent: () => <svg data-testid="not-found-icon" />,
+}));
+
+jest.mock('@/assets/icons/plus.svg', () => ({
+    ReactComponent: () => <svg data-testid="plus-icon" />,
 }));
 
 jest.mock('@/components/common/select/Select', () => {
@@ -181,6 +195,19 @@ describe('ProgramExpensesSection', () => {
         expect(rows).toHaveLength(2);
         expect(within(table).getByText('Program B')).toBeInTheDocument();
         expect(within(table).queryByText('2024')).not.toBeInTheDocument();
+    });
+
+    it('should render program expenses empty state when records are missing', () => {
+        mockUseDataFetchResult = {
+            data: EMPTY_PROGRAM_EXPENSES_DATA,
+            isLoading: false,
+        };
+
+        render(<ProgramExpensesSection />);
+
+        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.TITLE)).toBeInTheDocument();
+        expect(screen.getByText(PROGRAM_EXPENSES_TEXT.EMPTY_STATE.ADD_RECORD)).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE })).toBeEnabled();
     });
 
     it('should pass fetch handler that calls ProgramExpensesApi.getReadOnlyData', async () => {

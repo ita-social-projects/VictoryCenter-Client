@@ -1,16 +1,21 @@
+import { ProgramExpensesEmptyState } from '@/pages/admin/reports/components/program-expenses-section/components/program-expenses-empty-state/ProgramExpensesEmptyState';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FUNDS_EXPENDITURES_TEXT, PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
 import { ProgramExpensesRecord } from '@/types/admin/reports';
-import { ReactComponent as NotFoundIcon } from '@/assets/icons/not-found.svg';
 import { formatSummaryAmount } from '@/utils/functions/format-summary-amount/format-summary-amount';
 import { parseAmount } from '@/utils/functions/parse-amount/parse-amount';
 import styles from './ProgramExpensesTable.module.scss';
 
 interface ProgramExpensesTableProps {
     records: ProgramExpensesRecord[];
+    hasAnyProgramExpenseRecords: boolean;
 }
 
-export const ProgramExpensesTable = ({ records }: ProgramExpensesTableProps) => {
+const TABLE_COLUMNS_COUNT = 5;
+
+export const ProgramExpensesTable = ({ records, hasAnyProgramExpenseRecords }: ProgramExpensesTableProps) => {
+    const hasNoRecords = records.length === 0;
+
     return (
         <div className={styles['table-wrapper']}>
             <table className={styles.table}>
@@ -31,17 +36,11 @@ export const ProgramExpensesTable = ({ records }: ProgramExpensesTableProps) => 
                     </tr>
                 </thead>
                 <tbody>
-                    {records.length === 0 ? (
-                        <tr>
-                            <td className={styles['empty-cell']} colSpan={5}>
-                                <div className={styles['empty-state']}>
-                                    <NotFoundIcon className={styles['empty-state-image']} />
-                                    <p className={styles['empty-state-message']}>
-                                        {FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.MESSAGE}
-                                    </p>
-                                </div>
-                            </td>
-                        </tr>
+                    {hasNoRecords ? (
+                        <ProgramExpensesEmptyState
+                            colSpan={TABLE_COLUMNS_COUNT}
+                            variant={hasAnyProgramExpenseRecords ? 'filtered' : 'program-expenses'}
+                        />
                     ) : (
                         records.map((record) => (
                             <tr key={record.id} className={styles.tr}>

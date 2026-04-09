@@ -1,6 +1,5 @@
 @use '@/assets/sass/variables/colors' as c;
 @use '@/assets/sass/mixins/typography.mixins' as type;
-@use '@/assets/sass/variables/typography' as t;
 
 .empty-row-program-expenses {
     height: 510px;
@@ -69,6 +68,8 @@
 }
 
 .empty-state-actions .add-program-expense-button {
+    @include type.body-2-semibold;
+
     display: flex;
     justify-content: center;
     align-items: center;
@@ -78,8 +79,6 @@
     padding: 8px;
     border-radius: 12px;
     background-color: c.$error;
-    font-size: 16px;
-    font-weight: t.$fw-semibold;
     white-space: nowrap;
     transition:
         background-color 0.2s ease,

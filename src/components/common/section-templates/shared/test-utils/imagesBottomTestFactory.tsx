@@ -158,14 +158,14 @@ export function createImagesBottomTestSuite<TProps extends Record<string, any>>(
 
         describe('Props forwarding', () => {
             it('forwards template mode to ImagesBottomSection', () => {
-                const { SectionMode } = require('@/types/common/program-sections');
+                const { SectionMode } = require('@/types/common/sections');
                 renderComponent({ mode: SectionMode.Template } as unknown as Partial<TProps>);
 
                 expect(screen.getByTestId('template-flag')).toBeInTheDocument();
             });
 
             it('forwards edit mode to ImagesBottomSection', () => {
-                const { SectionMode } = require('@/types/common/program-sections');
+                const { SectionMode } = require('@/types/common/sections');
                 renderComponent({ mode: SectionMode.Edit } as unknown as Partial<TProps>);
 
                 expect(screen.getByTestId('editable-flag')).toBeInTheDocument();

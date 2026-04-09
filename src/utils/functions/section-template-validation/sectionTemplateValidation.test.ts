@@ -8,12 +8,12 @@ import {
 import { SectionTemplate } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
 
-jest.mock('@/const/admin/programs', () => {
-    const { SectionTemplate } = require('@/types/common/program-sections');
-    const { ContentType } = require('@/types/common/programs');
+jest.mock('@/const/admin/sections', () => {
+    const { SectionTemplate } = require('@/types/common/sections');
+    const { ContentType } = require('@/types/common/section-contents');
 
     return {
-        PROGRAM_SECTION_TEMPLATE_VALIDATION: {
+        SECTION_TEMPLATE_VALIDATION: {
             [SectionTemplate.SingleTitleDescriptionAuthorPairs]: {
                 lengths: {
                     [ContentType.Title]: { min: 3, max: 10 },

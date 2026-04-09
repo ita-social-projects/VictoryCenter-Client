@@ -36,7 +36,7 @@ const mockedGetInitialSectionContents = getInitialSectionContents as jest.Mock;
 
 jest.mock('../add-section-modal/AddSectionModal', () => {
     const React = require('react');
-    const { SectionTemplate } = require('@/types/common/program-sections');
+    const { SectionTemplate } = require('@/types/common/sections');
 
     return {
         AddSectionModal: (props: any) => {

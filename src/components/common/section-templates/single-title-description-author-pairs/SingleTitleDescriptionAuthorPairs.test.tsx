@@ -97,8 +97,18 @@ jest.mock('@/const/admin/programs', () => ({
     },
 }));
 
+jest.mock('@/const/admin/sections', () => ({
+    SECTIONS_TEXT: {
+        SECTION: {
+            DESCRIPTION_SAMPLE_TEXT_SHORT: 'SAMPLE_DESC',
+            FORM: { TITLE: { TEXT: 'Title' } },
+        },
+    },
+}));
+
 jest.mock('@/const/admin/common', () => ({
     COMMON_TEXT_ADMIN: {
+        INPUT: { ADD_FILE_HERE: 'Add file here' },
         BUTTON: { YES: 'Yes', NO: 'No' },
         VALIDATION_MESSAGE: {
             FIELD_REQUIRED: 'Field required',

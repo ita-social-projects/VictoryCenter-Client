@@ -38,6 +38,16 @@ const loadSchema = (over?: { programValidation?: any; templateValidation?: any }
             location: { max: 20, getRequiredWhenPublishingError: () => 'loc required' },
             participantsCount: { max: 20, getRequiredWhenPublishingError: () => 'pc required' },
             meetingCount: { max: 20, getRequiredWhenPublishingError: () => 'mc required' },
+            ...(over?.programValidation ?? {}),
+        };
+
+        return {
+            PROGRAM_VALIDATION: pv,
+        };
+    });
+
+    jest.doMock('@/const/admin/sections', () => {
+        const pv = {
             images: { maxSizeMB: 1 },
             ...(over?.programValidation ?? {}),
         };
@@ -203,9 +213,10 @@ const loadSchema = (over?: { programValidation?: any; templateValidation?: any }
             ...(over?.templateValidation ?? {}),
         };
 
+
         return {
-            PROGRAM_VALIDATION: pv,
-            PROGRAM_SECTION_TEMPLATE_VALIDATION: tv,
+            SECTION_VALIDATION: pv,
+            SECTION_TEMPLATE_VALIDATION: tv,
         };
     });
 

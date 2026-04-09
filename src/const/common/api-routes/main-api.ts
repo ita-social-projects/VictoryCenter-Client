@@ -108,4 +108,7 @@ export const API_ROUTES = {
     FAQ_LOCALIZATIONS: {
         BASE: 'FaqQuestionLocalizations',
     },
+    HISTORY: {
+        BASE: 'History',
+    },
 };

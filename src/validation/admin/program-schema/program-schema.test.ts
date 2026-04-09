@@ -213,7 +213,6 @@ const loadSchema = (over?: { programValidation?: any; templateValidation?: any }
             ...(over?.templateValidation ?? {}),
         };
 
-
         return {
             SECTION_VALIDATION: pv,
             SECTION_TEMPLATE_VALIDATION: tv,

@@ -4,9 +4,40 @@ import NotFoundIcon from '@/assets/icons/not-found.svg';
 import { HISTORY_TEXT } from '@/const/admin/history';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import { HistoryPageToolbar } from '../history-page-toolbar/HistoryPageToolbar';
+import { useCallback } from 'react';
+import { HistoryApi } from '@/services/api/admin/history/history-api';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { HistorySectionDto } from '@/types/common/history-sections';
+import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
+import { renderHistorySection } from '@/utils/functions/render-history-section';
+import { ContentType } from '@/types/common/section-contents';
+import { SECTIONS_TEXT } from '@/const/admin/sections';
+import { IconButton } from '@/components/admin/icon-button/IconButton';
+import { ACTION_ICONS } from '@/const/common/action-icons';
+import { ReactComponent as ChangeIcon } from '@/assets/icons/change.svg';
+import { SectionMode } from '@/types/common/sections';
 
 export const HistoryPageContent = () => {
-    const hasSections = false;
+    const client = useAdminClient();
+
+    const getHistorySections = useCallback(async () => {
+        const sections = await HistoryApi.fetchSections(client);
+        return sections;
+    }, [client]);
+
+    const {
+        data: sections,
+        error: _sectionsError,
+        isLoading: _isSectionsLoading,
+    } = useDataFetch<HistorySectionDto[]>({
+        initialData: [],
+        fetchHandler: getHistorySections,
+        autoFetchDependencies: [],
+        autoFetchDisabled: false,
+    });
+
+    const hasSections = sections.length > 0;
+
     const handleAddSection = () => {
         // TODO: add section creation flow will be implemented in a dedicated modal.
     };
@@ -28,6 +59,102 @@ export const HistoryPageContent = () => {
                             {HISTORY_TEXT.BUTTON.ADD_SECTION}
                             <PlusIcon className={styles['plus-icon']} />
                         </Button>
+                    </div>
+                )}
+
+                {hasSections && (
+                    <div className={styles['sections-list']}>
+                        {/* //ref={sectionsContainerRef} */}
+                        {sections.map((section, index) => {
+                            if (!section) return null;
+                            const titleContent = section.contents.find((c) => c.contentType === ContentType.Title);
+                            const descriptionContent = section.contents.find(
+                                (c) => c.contentType === ContentType.Description,
+                            );
+                            const imageContents = section.contents
+                                .filter((c) => c.contentType === ContentType.Image)
+                                .map((c) => c.image ?? null);
+
+                            const sectionToRender = renderHistorySection({
+                                templateId: section.template,
+                                data: {
+                                    title: titleContent?.title ?? '',
+                                    description: descriptionContent?.description ?? '',
+                                    images: imageContents,
+                                },
+                            });
+
+                            const isFirstSection = index === 0;
+                            const isLastSection = index === sections.length - 1;
+                            const sectionMode = SectionMode.View; //TODO: replace to dynamic value
+
+                            return (
+                                <>
+                                    <div className={styles['section-container']}>
+                                        {sectionMode === SectionMode.View && (
+                                            <div className={styles['actions-section']}>
+                                                <div className={styles['order-controls']}>
+                                                    <div className={styles['order-controls']}>
+                                                        {!isFirstSection && (
+                                                            <button
+                                                                type="button"
+                                                                className={`${styles['icon-button']} ${styles['up-button']}`}
+                                                                aria-label="Move up section"
+                                                            />
+                                                        )}
+                                                        {!isLastSection && (
+                                                            <button
+                                                                type="button"
+                                                                className={`${styles['icon-button']} ${styles['down-button']}`}
+                                                                aria-label="Move down section"
+                                                            />
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className={styles['hover-buttons']}>
+                                                    <IconButton
+                                                        type="button"
+                                                        className={`${styles['icon-button']} ${styles['edit-button']}`}
+                                                        aria-label="Edit section"
+                                                        DefaultIcon={ACTION_ICONS.edit.default}
+                                                        FilledIcon={ACTION_ICONS.edit.hover}
+                                                    />
+                                                    <IconButton
+                                                        type="button"
+                                                        className={`${styles['icon-button']} ${styles['delete-button']}`}
+                                                        aria-label="Delete section"
+                                                        DefaultIcon={ACTION_ICONS.delete.default}
+                                                        FilledIcon={ACTION_ICONS.delete.hover}
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        className={`${styles['icon-button']} ${styles['change-button']}`}
+                                                        aria-label="Replace section"
+                                                    >
+                                                        <ChangeIcon />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
+                                        <div key={section.id} className={styles.content}>
+                                            {sectionToRender}
+                                        </div>
+                                        <div className={styles['actions-container']}>
+                                            {sectionMode !== SectionMode.View && (
+                                                <div className={styles.actions}>
+                                                    <Button buttonStyle="secondary">
+                                                        {SECTIONS_TEXT.BUTTON.CANCEL}
+                                                    </Button>
+                                                    <Button buttonStyle="primary">{SECTIONS_TEXT.BUTTON.SAVE}</Button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className={styles['sections-divider']} />
+                                </>
+                            );
+                        })}
                     </div>
                 )}
             </div>

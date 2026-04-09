@@ -3,6 +3,14 @@ import { SectionTemplate } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
 
 export const SECTIONS_TEXT = {
+    BUTTON: {
+        ADD_NEW_SECTION: 'Додати нову секцію',
+        ADD_SECTION: 'Додати секцію',
+        CHOOSE_SECTION: 'Обрати шаблон',
+        CANCEL: 'Відмінити',
+        SAVE: 'Зберегти',
+        ADD: 'Додати',
+    },
     SECTION: {
         TITLE_SAMPLE_TEXT: 'ЗАГОЛОВОК',
         DESCRIPTION_SAMPLE_TEXT:

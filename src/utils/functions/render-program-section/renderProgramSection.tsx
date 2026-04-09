@@ -7,18 +7,18 @@ import {
 } from '@/types/common/program-sections';
 import { ImageValues, Image } from '@/types/common/image';
 import { ContentType } from '@/types/common/programs';
-import { QuadImagesBottom } from '@/components/common/program-section-templates/quad-images-bottom/QuadImagesBottom';
-import { TripleImagesBottom } from '@/components/common/program-section-templates/triple-images-bottom/TripleImagesBottom';
-import { DualImagesBottom } from '@/components/common/program-section-templates/dual-images-bottom/DualImagesBottom';
-import { TextOnly } from '@/components/common/program-section-templates/text-only/TextOnly';
-import { SingleImageTop } from '@/components/common/program-section-templates/single-image-top/SingleImageTop';
-import { SingleImageBottom } from '@/components/common/program-section-templates/single-image-bottom/SingleImageBottom';
-import { SingleImageRight } from '@/components/common/program-section-templates/single-image-right/SingleImageRight';
-import { TitleDescriptionCardsWrapper } from '@/components/common/program-section-templates/title-description-cards/TitleDescriptionCardsWrapper';
-import { SingleTitleQuintupleDescription } from '@/components/common/program-section-templates/single-title-quintuple-description/SingleTitleQuintupleDescription';
-import { SingleTitleDescriptionAuthorPairs } from '@/components/common/program-section-templates/single-title-description-author-pairs/SingleTitleDescriptionAuthorPairs';
+import { QuadImagesBottom } from '@/components/common/section-templates/quad-images-bottom/QuadImagesBottom';
+import { TripleImagesBottom } from '@/components/common/section-templates/triple-images-bottom/TripleImagesBottom';
+import { DualImagesBottom } from '@/components/common/section-templates/dual-images-bottom/DualImagesBottom';
+import { TextOnly } from '@/components/common/section-templates/text-only/TextOnly';
+import { SingleImageTop } from '@/components/common/section-templates/single-image-top/SingleImageTop';
+import { SingleImageBottom } from '@/components/common/section-templates/single-image-bottom/SingleImageBottom';
+import { SingleImageRight } from '@/components/common/section-templates/single-image-right/SingleImageRight';
+import { TitleDescriptionCardsWrapper } from '@/components/common/section-templates/title-description-cards/TitleDescriptionCardsWrapper';
+import { SingleTitleQuintupleDescription } from '@/components/common/section-templates/single-title-quintuple-description/SingleTitleQuintupleDescription';
+import { SingleTitleDescriptionAuthorPairs } from '@/components/common/section-templates/single-title-description-author-pairs/SingleTitleDescriptionAuthorPairs';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
-import { FaqProgramSection } from '@/components/common/program-section-templates/faq-program-section';
+import { FaqProgramSection } from '@/components/common/section-templates/faq-program-section';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
 export interface ProgramSectionCardData {

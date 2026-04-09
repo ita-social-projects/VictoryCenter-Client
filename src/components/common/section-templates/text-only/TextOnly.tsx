@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import { TitleDescriptionSection } from '@/components/common/program-section-templates/shared/title-description-section/TitleDescriptionSection';
+import { TitleDescriptionSection } from '@/components/common/section-templates/shared/title-description-section/TitleDescriptionSection';
 import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
 import styles from './TextOnly.module.scss';
 

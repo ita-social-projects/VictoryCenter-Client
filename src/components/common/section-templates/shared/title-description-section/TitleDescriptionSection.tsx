@@ -9,17 +9,17 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { useProgramSectionValidation } from '@/hooks/admin/use-program-section-validation';
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
 import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
-import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
+import { SectionMode, SectionTemplate } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 
 export interface TitleDescriptionSectionProps {
-    template: ProgramSectionTemplate;
+    template: SectionTemplate;
     title?: string;
     description?: string;
     className?: string;
     titleClassName?: string;
     descriptionClassName?: string;
-    mode?: ProgramSectionMode;
+    mode?: SectionMode;
     isPublishing?: boolean;
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
@@ -33,7 +33,7 @@ export const TitleDescriptionSection = ({
     className = '',
     titleClassName = '',
     descriptionClassName = '',
-    mode = ProgramSectionMode.View,
+    mode = SectionMode.View,
     isPublishing = false,
     onTitleChange,
     onDescriptionChange,
@@ -55,7 +55,7 @@ export const TitleDescriptionSection = ({
         resetKey: validationResetKey,
     });
 
-    const baseStyles = mode === ProgramSectionMode.View ? viewStyles : styles;
+    const baseStyles = mode === SectionMode.View ? viewStyles : styles;
 
     const titleMaxLength = getProgramSectionTemplateMaxLength(template, ContentType.Title);
     const descriptionMaxLength = getProgramSectionTemplateMaxLength(template, ContentType.Description);
@@ -65,14 +65,14 @@ export const TitleDescriptionSection = ({
             className={cn(
                 baseStyles.container,
                 {
-                    [styles.template]: mode === ProgramSectionMode.Template,
-                    [styles['form-container']]: mode === ProgramSectionMode.Edit,
+                    [styles.template]: mode === SectionMode.Template,
+                    [styles['form-container']]: mode === SectionMode.Edit,
                 },
                 className,
             )}
         >
             <div className={baseStyles['title-section']}>
-                {mode === ProgramSectionMode.Edit ? (
+                {mode === SectionMode.Edit ? (
                     <InputWithCharacterLimitGroup
                         label={PROGRAMS_TEXT.SECTION.FORM.TITLE.TEXT}
                         isRequired={true}
@@ -97,7 +97,7 @@ export const TitleDescriptionSection = ({
             </div>
 
             <div className={baseStyles['description-section']}>
-                {mode === ProgramSectionMode.Edit ? (
+                {mode === SectionMode.Edit ? (
                     <TextAreaWithCharacterLimitGroup
                         label={PROGRAMS_TEXT.SECTION.FORM.DESCRIPTION.TEXT}
                         isRequired={true}

@@ -8,7 +8,7 @@ import {
     SectionCancelActionType,
 } from '@/types/admin/programs';
 import { VisibilityStatus, PendingAction, ModalMode } from '@/types/admin/common';
-import { CreateHippotherapyProgramSectionDto, ProgramSectionTemplate } from '@/types/common/program-sections';
+import { CreateHippotherapyProgramSectionDto, SectionTemplate } from '@/types/common/program-sections';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ProgramsApi } from '@/services/api/admin/programs/programs-api';
@@ -149,7 +149,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
     }, []);
 
     const handleTemplateSelect = useCallback(
-        (templateId: ProgramSectionTemplate) => {
+        (templateId: SectionTemplate) => {
             if (!modalHookData.formRef?.current) {
                 setSectionToReplace(null);
                 return;

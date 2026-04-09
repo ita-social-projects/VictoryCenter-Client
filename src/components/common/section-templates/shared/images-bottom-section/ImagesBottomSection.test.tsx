@@ -3,7 +3,7 @@ import { act, render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import type { ImagesBottomSectionProps } from './ImagesBottomSection';
 import { ImagesBottomSection } from './ImagesBottomSection';
-import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
+import { SectionMode, SectionTemplate } from '@/types/common/program-sections';
 
 jest.mock('react', () => {
     const actual = jest.requireActual('react');
@@ -56,7 +56,7 @@ const baseConfig: ImagesBottomSectionProps['config'] = {
 };
 
 const makeProps = (override: Partial<ImagesBottomSectionProps> = {}): ImagesBottomSectionProps => ({
-    template: ProgramSectionTemplate.DualImagesBottom,
+    template: SectionTemplate.DualImagesBottom,
     title: 'Section Title',
     description: 'Section Description',
     images: [
@@ -68,7 +68,7 @@ const makeProps = (override: Partial<ImagesBottomSectionProps> = {}): ImagesBott
         { key: '2', value: null, handler: jest.fn() },
     ],
     config: baseConfig,
-    mode: ProgramSectionMode.View,
+    mode: SectionMode.View,
     onTitleChange: jest.fn(),
     onDescriptionChange: jest.fn(),
     validationResetKey: 1,
@@ -101,7 +101,7 @@ describe('ImagesBottomSection', () => {
     });
 
     it('passes template/title/description/mode and handlers to TitleDescriptionSection', () => {
-        const { props } = renderComponent({ mode: ProgramSectionMode.Edit });
+        const { props } = renderComponent({ mode: SectionMode.Edit });
 
         expect(TitleDescriptionSection).toHaveBeenCalledTimes(1);
 
@@ -109,7 +109,7 @@ describe('ImagesBottomSection', () => {
         expect(tdProps.template).toBe(props.template);
         expect(tdProps.title).toBe(props.title);
         expect(tdProps.description).toBe(props.description);
-        expect(tdProps.mode).toBe(ProgramSectionMode.Edit);
+        expect(tdProps.mode).toBe(SectionMode.Edit);
         expect(tdProps.onTitleChange).toBe(props.onTitleChange);
         expect(tdProps.onDescriptionChange).toBe(props.onDescriptionChange);
         expect(tdProps.validationResetKey).toBe(props.validationResetKey);
@@ -133,7 +133,7 @@ describe('ImagesBottomSection', () => {
         const tdProps = TitleDescriptionSection.mock.calls[0][0];
         expect(tdProps.title).toBe('');
         expect(tdProps.description).toBe('');
-        expect(tdProps.mode).toBe(ProgramSectionMode.View);
+        expect(tdProps.mode).toBe(SectionMode.View);
         expect(tdProps.onTitleChange).toBeUndefined();
         expect(tdProps.onDescriptionChange).toBeUndefined();
 
@@ -152,7 +152,7 @@ describe('ImagesBottomSection', () => {
             bottomSectionClassName: 'b',
             imageWrapperClassName: 'w',
             imageClassName: 'i',
-            mode: ProgramSectionMode.View,
+            mode: SectionMode.View,
         });
 
         expect(ViewImagesBottomSection).toHaveBeenCalledTimes(1);
@@ -184,7 +184,7 @@ describe('ImagesBottomSection', () => {
             imageHandlers,
             bottomSectionClassName: 'b',
             imageWrapperClassName: 'w',
-            mode: ProgramSectionMode.Edit,
+            mode: SectionMode.Edit,
         });
 
         expect(EditableImagesBottomSection).toHaveBeenCalledTimes(1);
@@ -196,7 +196,7 @@ describe('ImagesBottomSection', () => {
         expect(first.imageHandlers).toEqual(imageHandlers.slice(0, baseConfig.imageCount));
         expect(first.imageKeys).toEqual(['rid-image-0', 'rid-image-1']);
         expect(first.config).toBe(baseConfig);
-        expect(first.mode).toBe(ProgramSectionMode.Edit);
+        expect(first.mode).toBe(SectionMode.Edit);
         expect(first.bottomSectionClassName).toBe('b');
         expect(first.imageWrapperClassName).toBe('w');
         expect(first.errors).toEqual([]);
@@ -204,17 +204,17 @@ describe('ImagesBottomSection', () => {
     });
 
     it('renders EditableImagesBottomSection in Template mode too and passes template mode through', () => {
-        renderComponent({ mode: ProgramSectionMode.Template });
+        renderComponent({ mode: SectionMode.Template });
 
         expect(EditableImagesBottomSection).toHaveBeenCalledTimes(1);
         expect(ViewImagesBottomSection).not.toHaveBeenCalled();
 
         const p = EditableImagesBottomSection.mock.calls[0][0];
-        expect(p.mode).toBe(ProgramSectionMode.Template);
+        expect(p.mode).toBe(SectionMode.Template);
     });
 
     it('updates errors via onSetError and passes new errors to EditableImagesBottomSection', () => {
-        renderComponent({ mode: ProgramSectionMode.Edit });
+        renderComponent({ mode: SectionMode.Edit });
 
         const first = EditableImagesBottomSection.mock.calls[0][0];
         expect(first.errors).toEqual([]);
@@ -236,19 +236,19 @@ describe('ImagesBottomSection', () => {
 
     it('adds form-container class in Edit mode only', () => {
         {
-            const { root, unmount } = renderComponent({ mode: ProgramSectionMode.Edit });
+            const { root, unmount } = renderComponent({ mode: SectionMode.Edit });
             expect(root).toHaveClass('form-container');
             unmount();
         }
 
         {
-            const { root, unmount } = renderComponent({ mode: ProgramSectionMode.View });
+            const { root, unmount } = renderComponent({ mode: SectionMode.View });
             expect(root).not.toHaveClass('form-container');
             unmount();
         }
 
         {
-            const { root } = renderComponent({ mode: ProgramSectionMode.Template });
+            const { root } = renderComponent({ mode: SectionMode.Template });
             expect(root).not.toHaveClass('form-container');
         }
     });
@@ -268,7 +268,7 @@ describe('ImagesBottomSection', () => {
 
     it('passes template title/description classNames when mode is Template; otherwise empty strings', () => {
         {
-            renderComponent({ mode: ProgramSectionMode.Template });
+            renderComponent({ mode: SectionMode.Template });
 
             const tdProps = TitleDescriptionSection.mock.calls[0][0];
             expect(tdProps.titleClassName).toBe('title-template');
@@ -276,7 +276,7 @@ describe('ImagesBottomSection', () => {
         }
 
         {
-            const { unmount } = renderComponent({ mode: ProgramSectionMode.Edit });
+            const { unmount } = renderComponent({ mode: SectionMode.Edit });
             const tdProps = TitleDescriptionSection.mock.calls[0][0];
             expect(tdProps.titleClassName).toBe('');
             expect(tdProps.descriptionClassName).toBe('');
@@ -286,7 +286,7 @@ describe('ImagesBottomSection', () => {
 
     it('slices images/handlers to imageCount for editable branch and keys length matches displayed images length', () => {
         renderComponent({
-            mode: ProgramSectionMode.Edit,
+            mode: SectionMode.Edit,
             config: { ...baseConfig, imageCount: 1 },
             images: [
                 { id: 1, url: 'img1.jpg', mimeType: 'image/jpeg' } as any,

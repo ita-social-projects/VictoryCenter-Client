@@ -4,7 +4,7 @@ import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/in
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { PROGRAMS_TEXT, SINGLE_TITLE_QUINTUPLE_DESCRIPTION_CONFIG } from '@/const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
+import { SectionMode, SectionTemplate } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
 import baseStyles from './SingleTitleQuintupleDescription.module.scss';
@@ -14,7 +14,7 @@ import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program
 export interface SingleTitleQuintupleDescriptionProps {
     title?: string;
     descriptions?: string[];
-    mode?: ProgramSectionMode;
+    mode?: SectionMode;
     onTitleChange?: (value: string) => void;
     onDescriptionsChange?: (index: number, value: string) => void;
     className?: string;
@@ -25,12 +25,12 @@ const DESCRIPTION_LAYOUT = {
     editable: [0, 1, 2, 3, 4],
 } as const;
 
-const TEMPLATE = ProgramSectionTemplate.SingleTitleQuintupleDescription;
+const TEMPLATE = SectionTemplate.SingleTitleQuintupleDescription;
 
 export const SingleTitleQuintupleDescription = ({
     title = '',
     descriptions = [],
-    mode = ProgramSectionMode.View,
+    mode = SectionMode.View,
     onTitleChange,
     onDescriptionsChange,
     className,
@@ -47,7 +47,7 @@ export const SingleTitleQuintupleDescription = ({
     );
 
     const descriptionOrder = useMemo(() => {
-        if (mode === ProgramSectionMode.Edit) {
+        if (mode === SectionMode.Edit) {
             return DESCRIPTION_LAYOUT.editable;
         }
 
@@ -57,8 +57,8 @@ export const SingleTitleQuintupleDescription = ({
     const rootClassName = cn(
         baseStyles.container,
         {
-            [baseStyles.template]: mode === ProgramSectionMode.Template,
-            [baseStyles.editable]: mode === ProgramSectionMode.Edit,
+            [baseStyles.template]: mode === SectionMode.Template,
+            [baseStyles.editable]: mode === SectionMode.Edit,
         },
         className,
     );
@@ -103,7 +103,7 @@ export const SingleTitleQuintupleDescription = ({
 
     return (
         <div className={rootClassName}>
-            {mode === ProgramSectionMode.Edit ? (
+            {mode === SectionMode.Edit ? (
                 <div className={baseStyles['editable-grid']}>
                     <div className={baseStyles['title-cell']}>
                         <InputWithCharacterLimitGroup
@@ -144,7 +144,7 @@ export const SingleTitleQuintupleDescription = ({
                         </div>
                     ))}
                 </div>
-            ) : mode === ProgramSectionMode.Template ? (
+            ) : mode === SectionMode.Template ? (
                 <div className={baseStyles['template-layout']}>
                     <div className={baseStyles['template-title-block']}>
                         <h2 className={baseStyles['template-title-text']}>{title}</h2>

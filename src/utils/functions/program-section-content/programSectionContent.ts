@@ -1,7 +1,7 @@
 import {
     CreateHippotherapyProgramSectionDto,
     CreateProgramSectionContentDto,
-    ProgramSectionTemplate,
+    SectionTemplate,
 } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 import { getDescriptionAuthorPairsByGroup } from '@/utils/functions/mappers/public/program/get-grouped-program-section-content-pairs';
@@ -92,8 +92,8 @@ export const ensureFaqPair = (contents: CreateProgramSectionContentDto[]): Creat
 };
 
 export const PAIRED_TEMPLATES = new Set([
-    ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
-    ProgramSectionTemplate.SingleTitleQuestionAnswerPairs,
+    SectionTemplate.SingleTitleDescriptionAuthorPairs,
+    SectionTemplate.SingleTitleQuestionAnswerPairs,
 ]);
 
 export const ensureTitleContentAndOnePair = (
@@ -105,7 +105,7 @@ export const ensureTitleContentAndOnePair = (
 
     let contents = ensureTitleContent(section.contents);
 
-    if (section.template === ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs) {
+    if (section.template === SectionTemplate.SingleTitleDescriptionAuthorPairs) {
         contents = ensureDescriptionAuthorPair(contents);
     } else {
         contents = ensureFaqPair(contents);

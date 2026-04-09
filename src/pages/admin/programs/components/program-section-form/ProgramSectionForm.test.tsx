@@ -5,7 +5,7 @@ import '@testing-library/jest-dom';
 import { ProgramSectionForm } from './ProgramSectionForm';
 import type { ProgramSectionFormProps } from './ProgramSectionForm';
 import type { CreateHippotherapyProgramSectionDto } from '@/types/common/program-sections';
-import { ProgramSectionTemplate, ProgramSectionMode } from '@/types/common/program-sections';
+import { SectionTemplate, SectionMode } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { renderProgramSection } from '@/utils/functions/render-program-section';
@@ -108,7 +108,7 @@ const makePairAuthor = (order: number, groupIndex: number | null | undefined, au
 const makeSection = (
     overrides?: Partial<CreateHippotherapyProgramSectionDto>,
 ): CreateHippotherapyProgramSectionDto => ({
-    template: ProgramSectionTemplate.TextOnly,
+    template: SectionTemplate.TextOnly,
     order: 0,
     contents: [
         makeTitleContent('Title', 0),
@@ -308,7 +308,7 @@ describe('ProgramSectionForm', () => {
         const callPayload = renderProgramSectionMock.mock.calls[0][0];
 
         expect(callPayload.templateId).toBe(section.template);
-        expect(callPayload.mode).toBe(ProgramSectionMode.View);
+        expect(callPayload.mode).toBe(SectionMode.View);
 
         expect(callPayload.data).toEqual({
             title: '',
@@ -434,7 +434,7 @@ describe('ProgramSectionForm', () => {
     describe('DescriptionAuthorPairs template', () => {
         const makePairsSection = (contents: any[]) =>
             makeSection({
-                template: ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
+                template: SectionTemplate.SingleTitleDescriptionAuthorPairs,
                 contents,
             });
 
@@ -487,21 +487,21 @@ describe('ProgramSectionForm', () => {
                 'T',
                 ContentType.Title,
                 true,
-                ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
+                SectionTemplate.SingleTitleDescriptionAuthorPairs,
             );
             expect(getProgramValidationMocks().validateContentText).toHaveBeenNthCalledWith(
                 2,
                 'D0',
                 ContentType.Description,
                 true,
-                ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
+                SectionTemplate.SingleTitleDescriptionAuthorPairs,
             );
             expect(getProgramValidationMocks().validateContentText).toHaveBeenNthCalledWith(
                 3,
                 'A0',
                 ContentType.Author,
                 true,
-                ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
+                SectionTemplate.SingleTitleDescriptionAuthorPairs,
             );
         });
 
@@ -707,7 +707,7 @@ describe('ProgramSectionForm', () => {
             jest.useFakeTimers();
 
             const section = makeSection({
-                template: ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
+                template: SectionTemplate.SingleTitleDescriptionAuthorPairs,
                 contents: [],
             });
 
@@ -853,7 +853,7 @@ describe('ProgramSectionForm', () => {
 
     it('updates card title when onCardTitleChange is invoked', () => {
         const section = makeSection({
-            template: ProgramSectionTemplate.DualTitleDescriptionPairs,
+            template: SectionTemplate.DualTitleDescriptionPairs,
             contents: [
                 makeTitleContent('Card 1 Title', 0),
                 makeTitleContent('Card 2 Title', 1),
@@ -879,7 +879,7 @@ describe('ProgramSectionForm', () => {
 
     it('updates card description when onCardDescriptionChange is invoked', () => {
         const section = makeSection({
-            template: ProgramSectionTemplate.TripleTitleDescriptionPairs,
+            template: SectionTemplate.TripleTitleDescriptionPairs,
             contents: [
                 makeTitleContent('Card 1', 0),
                 makeTitleContent('Card 2', 1),
@@ -993,7 +993,7 @@ describe('ProgramSectionForm', () => {
 
         const makeFaqSection = (contents: any[]) =>
             makeSection({
-                template: ProgramSectionTemplate.SingleTitleQuestionAnswerPairs,
+                template: SectionTemplate.SingleTitleQuestionAnswerPairs,
                 contents,
             });
 

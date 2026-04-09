@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { SingleImageRight } from './SingleImageRight';
-import { ProgramSectionMode } from '@/types/common/program-sections';
+import { SectionMode } from '@/types/common/program-sections';
 
 const mockPhotoInputGroup = jest.fn();
 
@@ -76,7 +76,7 @@ describe('SingleImageRight', () => {
         });
 
         it('applies template class when mode is Template', () => {
-            const { container } = render(<SingleImageRight title="Test" mode={ProgramSectionMode.Template} />);
+            const { container } = render(<SingleImageRight title="Test" mode={SectionMode.Template} />);
 
             expect(container.firstChild).toHaveClass('template');
         });
@@ -116,27 +116,27 @@ describe('SingleImageRight', () => {
 
     describe('Editable mode', () => {
         it('renders TextAreaWithCharacterLimitGroup components when mode is Edit', () => {
-            render(<SingleImageRight title="Test" mode={ProgramSectionMode.Edit} />);
+            render(<SingleImageRight title="Test" mode={SectionMode.Edit} />);
 
             expect(screen.getByTestId('textarea-group-section-title')).toBeInTheDocument();
             expect(screen.getByTestId('textarea-group-section-description')).toBeInTheDocument();
         });
 
         it('renders PhotoInputGroup when mode is Edit', () => {
-            render(<SingleImageRight title="Test" mode={ProgramSectionMode.Edit} />);
+            render(<SingleImageRight title="Test" mode={SectionMode.Edit} />);
 
             expect(screen.getByTestId('photo-input-group')).toBeInTheDocument();
         });
 
         it('applies form-container class when mode is Edit', () => {
-            const { container } = render(<SingleImageRight title="Test" mode={ProgramSectionMode.Edit} />);
+            const { container } = render(<SingleImageRight title="Test" mode={SectionMode.Edit} />);
 
             expect(container.firstChild).toHaveClass('form-container');
         });
 
         it('calls onTitleChange when title textarea is changed', () => {
             const onTitleChange = jest.fn();
-            render(<SingleImageRight title="Test" mode={ProgramSectionMode.Edit} onTitleChange={onTitleChange} />);
+            render(<SingleImageRight title="Test" mode={SectionMode.Edit} onTitleChange={onTitleChange} />);
 
             const titleTextarea = screen.getByTestId('textarea-section-title');
             fireEvent.change(titleTextarea, { target: { value: 'New Title' } });
@@ -149,7 +149,7 @@ describe('SingleImageRight', () => {
             render(
                 <SingleImageRight
                     title="Test"
-                    mode={ProgramSectionMode.Edit}
+                    mode={SectionMode.Edit}
                     onDescriptionChange={onDescriptionChange}
                 />,
             );
@@ -162,7 +162,7 @@ describe('SingleImageRight', () => {
 
         it('calls onImageChange when image is changed', () => {
             const onImageChange = jest.fn();
-            render(<SingleImageRight title="Test" mode={ProgramSectionMode.Edit} onImageChange={onImageChange} />);
+            render(<SingleImageRight title="Test" mode={SectionMode.Edit} onImageChange={onImageChange} />);
 
             screen.getByTestId('photo-change').click();
             expect(onImageChange).toHaveBeenCalledWith({
@@ -173,14 +173,14 @@ describe('SingleImageRight', () => {
         });
 
         it('passes title value to title TextAreaWithCharacterLimitGroup', () => {
-            render(<SingleImageRight title="Existing Title" mode={ProgramSectionMode.Edit} />);
+            render(<SingleImageRight title="Existing Title" mode={SectionMode.Edit} />);
 
             const titleTextarea = screen.getByTestId('textarea-section-title');
             expect(titleTextarea).toHaveValue('Existing Title');
         });
 
         it('passes description value to description TextAreaWithCharacterLimitGroup', () => {
-            render(<SingleImageRight description="Existing Description" mode={ProgramSectionMode.Edit} />);
+            render(<SingleImageRight description="Existing Description" mode={SectionMode.Edit} />);
 
             const descriptionTextarea = screen.getByTestId('textarea-section-description');
             expect(descriptionTextarea).toHaveValue('Existing Description');
@@ -190,7 +190,7 @@ describe('SingleImageRight', () => {
             render(
                 <SingleImageRight
                     title="Test"
-                    mode={ProgramSectionMode.Edit}
+                    mode={SectionMode.Edit}
                     image={{ id: 2, url: 'existing-image.jpg', mimeType: 'image/jpeg' }}
                 />,
             );
@@ -200,7 +200,7 @@ describe('SingleImageRight', () => {
 
         it('does not render h2 and p tags in editable mode', () => {
             const { container } = render(
-                <SingleImageRight title="Test" description="Desc" mode={ProgramSectionMode.Edit} />,
+                <SingleImageRight title="Test" description="Desc" mode={SectionMode.Edit} />,
             );
 
             expect(container.querySelector('h2')).not.toBeInTheDocument();
@@ -211,7 +211,7 @@ describe('SingleImageRight', () => {
             const { container } = render(
                 <SingleImageRight
                     title="Test"
-                    mode={ProgramSectionMode.Edit}
+                    mode={SectionMode.Edit}
                     image={{ id: 3, url: 'test.jpg', mimeType: 'image/jpeg' }}
                 />,
             );
@@ -220,7 +220,7 @@ describe('SingleImageRight', () => {
         });
 
         it('handles missing callback props gracefully', () => {
-            render(<SingleImageRight title="Test" mode={ProgramSectionMode.Edit} />);
+            render(<SingleImageRight title="Test" mode={SectionMode.Edit} />);
 
             expect(screen.getByTestId('textarea-group-section-title')).toBeInTheDocument();
             expect(screen.getByTestId('textarea-group-section-description')).toBeInTheDocument();
@@ -228,7 +228,7 @@ describe('SingleImageRight', () => {
         });
 
         it('has correct structure with left and right sections in editable mode', () => {
-            const { container } = render(<SingleImageRight title="Test" mode={ProgramSectionMode.Edit} />);
+            const { container } = render(<SingleImageRight title="Test" mode={SectionMode.Edit} />);
 
             const leftSection = container.querySelector('.left-section');
             const rightSection = container.querySelector('.right-section');
@@ -246,13 +246,13 @@ describe('SingleImageRight', () => {
         });
 
         it('applies form-container class when mode is Edit', () => {
-            const { container } = render(<SingleImageRight title="Test" mode={ProgramSectionMode.Edit} />);
+            const { container } = render(<SingleImageRight title="Test" mode={SectionMode.Edit} />);
 
             expect(container.firstChild).toHaveClass('form-container');
         });
 
         it('applies no additional classes when mode is View', () => {
-            const { container } = render(<SingleImageRight title="Test" mode={ProgramSectionMode.View} />);
+            const { container } = render(<SingleImageRight title="Test" mode={SectionMode.View} />);
 
             expect(container.firstChild).toHaveClass('container');
             expect(container.firstChild).not.toHaveClass('template');
@@ -273,7 +273,7 @@ describe('SingleImageRight', () => {
                     title="Full Title"
                     description="Full Description"
                     image={{ id: 4, url: 'full-image.jpg', mimeType: 'image/jpeg' }}
-                    mode={ProgramSectionMode.Edit}
+                    mode={SectionMode.Edit}
                     {...handlers}
                 />,
             );
@@ -293,7 +293,7 @@ describe('SingleImageRight', () => {
     describe('Event handlers', () => {
         it('handleTitleChange extracts value from event and calls onTitleChange', () => {
             const onTitleChange = jest.fn();
-            render(<SingleImageRight title="Old Title" mode={ProgramSectionMode.Edit} onTitleChange={onTitleChange} />);
+            render(<SingleImageRight title="Old Title" mode={SectionMode.Edit} onTitleChange={onTitleChange} />);
 
             const titleTextarea = screen.getByTestId('textarea-section-title');
             fireEvent.change(titleTextarea, { target: { value: 'New Title' } });
@@ -306,7 +306,7 @@ describe('SingleImageRight', () => {
             render(
                 <SingleImageRight
                     description="Old Description"
-                    mode={ProgramSectionMode.Edit}
+                    mode={SectionMode.Edit}
                     onDescriptionChange={onDescriptionChange}
                 />,
             );

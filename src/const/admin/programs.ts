@@ -1,5 +1,5 @@
 import { COMMON_TEXT_ADMIN } from './common';
-import { ProgramSectionTemplate } from '@/types/common/program-sections';
+import { SectionTemplate } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 
 export const PROGRAMS_TEXT = {
@@ -326,7 +326,7 @@ const createSingleImageTemplateValidation = () =>
     }) as const;
 
 export const PROGRAM_SECTION_TEMPLATE_VALIDATION = {
-    [ProgramSectionTemplate.QuadImagesBottom]: {
+    [SectionTemplate.QuadImagesBottom]: {
         counts: {
             [ContentType.Title]: { min: 1, max: 1 },
             [ContentType.Description]: { min: 1, max: 1 },
@@ -339,7 +339,7 @@ export const PROGRAM_SECTION_TEMPLATE_VALIDATION = {
         },
     },
 
-    [ProgramSectionTemplate.DualImagesBottom]: {
+    [SectionTemplate.DualImagesBottom]: {
         counts: {
             [ContentType.Title]: { min: 1, max: 1 },
             [ContentType.Description]: { min: 1, max: 1 },
@@ -352,7 +352,7 @@ export const PROGRAM_SECTION_TEMPLATE_VALIDATION = {
         },
     },
 
-    [ProgramSectionTemplate.TextOnly]: {
+    [SectionTemplate.TextOnly]: {
         counts: {
             [ContentType.Title]: { min: 1, max: 1 },
             [ContentType.Description]: { min: 1, max: 1 },
@@ -365,7 +365,7 @@ export const PROGRAM_SECTION_TEMPLATE_VALIDATION = {
         },
     },
 
-    [ProgramSectionTemplate.TripleImagesBottom]: {
+    [SectionTemplate.TripleImagesBottom]: {
         counts: {
             [ContentType.Title]: { min: 1, max: 1 },
             [ContentType.Description]: { min: 1, max: 1 },
@@ -378,11 +378,11 @@ export const PROGRAM_SECTION_TEMPLATE_VALIDATION = {
         },
     },
 
-    [ProgramSectionTemplate.SingleImageBottom]: createSingleImageTemplateValidation(),
-    [ProgramSectionTemplate.SingleImageTop]: createSingleImageTemplateValidation(),
-    [ProgramSectionTemplate.SingleImageRight]: createSingleImageTemplateValidation(),
+    [SectionTemplate.SingleImageBottom]: createSingleImageTemplateValidation(),
+    [SectionTemplate.SingleImageTop]: createSingleImageTemplateValidation(),
+    [SectionTemplate.SingleImageRight]: createSingleImageTemplateValidation(),
 
-    [ProgramSectionTemplate.DualTitleDescriptionPairs]: {
+    [SectionTemplate.DualTitleDescriptionPairs]: {
         counts: {
             [ContentType.Title]: { min: 2, max: 2 },
             [ContentType.Description]: { min: 2, max: 2 },
@@ -402,7 +402,7 @@ export const PROGRAM_SECTION_TEMPLATE_VALIDATION = {
         },
     },
 
-    [ProgramSectionTemplate.TripleTitleDescriptionPairs]: {
+    [SectionTemplate.TripleTitleDescriptionPairs]: {
         counts: {
             [ContentType.Title]: { min: 3, max: 3 },
             [ContentType.Description]: { min: 3, max: 3 },
@@ -422,7 +422,7 @@ export const PROGRAM_SECTION_TEMPLATE_VALIDATION = {
         },
     },
 
-    [ProgramSectionTemplate.QuadTitleDescriptionPairs]: {
+    [SectionTemplate.QuadTitleDescriptionPairs]: {
         counts: {
             [ContentType.Title]: { min: 4, max: 4 },
             [ContentType.Description]: { min: 4, max: 4 },
@@ -442,7 +442,7 @@ export const PROGRAM_SECTION_TEMPLATE_VALIDATION = {
         },
     },
 
-    [ProgramSectionTemplate.SingleTitleQuintupleDescription]: {
+    [SectionTemplate.SingleTitleQuintupleDescription]: {
         counts: {
             [ContentType.Title]: { min: 1, max: 1 },
             [ContentType.Description]: { min: 5, max: 5 },
@@ -455,7 +455,7 @@ export const PROGRAM_SECTION_TEMPLATE_VALIDATION = {
         },
     },
 
-    [ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs]: {
+    [SectionTemplate.SingleTitleDescriptionAuthorPairs]: {
         counts: {
             [ContentType.Title]: { min: 1, max: 1 },
             [ContentType.Description]: { min: 1, max: 5 },
@@ -476,7 +476,7 @@ export const PROGRAM_SECTION_TEMPLATE_VALIDATION = {
         },
     },
 
-    [ProgramSectionTemplate.SingleTitleQuestionAnswerPairs]: {
+    [SectionTemplate.SingleTitleQuestionAnswerPairs]: {
         counts: {
             [ContentType.Title]: { min: 1, max: 1 },
             [ContentType.Description]: { min: 0, max: 0 },

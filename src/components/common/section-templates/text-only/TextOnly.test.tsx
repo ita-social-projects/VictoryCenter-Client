@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { TextOnly } from './TextOnly';
-import { ProgramSectionMode } from '@/types/common/program-sections';
+import { SectionMode } from '@/types/common/program-sections';
 
 jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
     InputWithCharacterLimitGroup: ({ value, onChange, id }: any) => (
@@ -39,7 +39,7 @@ describe('TextOnly', () => {
     });
 
     it('should render input fields when mode is Edit', () => {
-        render(<TextOnly mode={ProgramSectionMode.Edit} title="Edit Title" description="Edit Desc" />);
+        render(<TextOnly mode={SectionMode.Edit} title="Edit Title" description="Edit Desc" />);
 
         expect(screen.getByTestId(/input-.*-section-title/)).toHaveValue('Edit Title');
         expect(screen.getByTestId(/input-.*-section-description/)).toHaveValue('Edit Desc');
@@ -51,7 +51,7 @@ describe('TextOnly', () => {
         const onDescriptionChange = jest.fn();
         render(
             <TextOnly
-                mode={ProgramSectionMode.Edit}
+                mode={SectionMode.Edit}
                 onTitleChange={onTitleChange}
                 onDescriptionChange={onDescriptionChange}
             />,
@@ -65,10 +65,10 @@ describe('TextOnly', () => {
     });
 
     it('should apply template and form-container classes correctly', () => {
-        const { container, rerender } = render(<TextOnly mode={ProgramSectionMode.Template} />);
+        const { container, rerender } = render(<TextOnly mode={SectionMode.Template} />);
         expect(container.firstChild).toHaveClass('template');
 
-        rerender(<TextOnly mode={ProgramSectionMode.Edit} />);
+        rerender(<TextOnly mode={SectionMode.Edit} />);
         expect(container.firstChild).toHaveClass('form-container');
     });
 });

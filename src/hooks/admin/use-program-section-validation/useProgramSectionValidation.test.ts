@@ -5,11 +5,11 @@ import { useProgramSectionValidation } from './useProgramSectionValidation';
 
 import { PROGRAM_SECTION_TEMPLATE_VALIDATION } from '@/const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { ProgramSectionTemplate } from '@/types/common/program-sections';
+import { SectionTemplate } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
 
-const TEMPLATE = ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs;
+const TEMPLATE = SectionTemplate.SingleTitleDescriptionAuthorPairs;
 
 const titleReq = (PROGRAM_SECTION_TEMPLATE_VALIDATION as any)[TEMPLATE].lengths[ContentType.Title] as {
     min: number;

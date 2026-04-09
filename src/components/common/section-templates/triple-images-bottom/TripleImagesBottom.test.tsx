@@ -1,6 +1,6 @@
 import { TripleImagesBottom, TripleImagesBottomProps } from './TripleImagesBottom';
 import { createImagesBottomTestSuite } from '../shared/test-utils/imagesBottomTestFactory';
-import { ProgramSectionMode } from '@/types/common/program-sections';
+import { SectionMode } from '@/types/common/program-sections';
 
 jest.mock('../shared/title-description-section/TitleDescriptionSection', () => {
     const { mockTitleDescriptionSection } = require('../shared/test-utils/imagesBottomTestMocks');
@@ -24,7 +24,7 @@ createImagesBottomTestSuite<TripleImagesBottomProps>({
         title: '',
         description: '',
         images: [null, null, null],
-        mode: ProgramSectionMode.View,
+        mode: SectionMode.View,
     }),
     createImageProps: (images) => ({ images }),
     createImageHandlers: (handlers) => ({

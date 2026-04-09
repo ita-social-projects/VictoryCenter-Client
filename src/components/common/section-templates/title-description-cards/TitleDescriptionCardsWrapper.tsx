@@ -3,13 +3,13 @@ import {
     TitleDescriptionCardsSection,
     TitleDescriptionCardData,
 } from '../shared/title-description-cards-section/TitleDescriptionCardsSection';
-import { ProgramSectionMode } from '@/types/common/program-sections';
+import { SectionMode } from '@/types/common/program-sections';
 import styles from './TitleDescriptionCardsWrapper.module.scss';
 
 interface TitleDescriptionCardsWrapperProps {
     cards: TitleDescriptionCardData[];
     cardsCount: number;
-    mode?: ProgramSectionMode;
+    mode?: SectionMode;
     onTitleChange?: (index: number, value: string) => void;
     onDescriptionChange?: (index: number, value: string) => void;
     validationResetKey?: number;
@@ -18,7 +18,7 @@ interface TitleDescriptionCardsWrapperProps {
 export const TitleDescriptionCardsWrapper = ({
     cards,
     cardsCount,
-    mode = ProgramSectionMode.View,
+    mode = SectionMode.View,
     onTitleChange,
     onDescriptionChange,
     validationResetKey,
@@ -26,8 +26,8 @@ export const TitleDescriptionCardsWrapper = ({
     return (
         <div
             className={cn(styles.container, {
-                [styles['container--editable']]: mode === ProgramSectionMode.Edit,
-                [styles['container--template']]: mode === ProgramSectionMode.Template,
+                [styles['container--editable']]: mode === SectionMode.Edit,
+                [styles['container--template']]: mode === SectionMode.Template,
                 [styles[`container--cards-${cardsCount}`]]: true,
             })}
         >

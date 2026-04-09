@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { TitleDescriptionSection, TitleDescriptionSectionProps } from './TitleDescriptionSection';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
-import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
+import { SectionMode, SectionTemplate } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
 import { useProgramSectionValidation } from '@/hooks/admin/use-program-section-validation';
@@ -106,14 +106,14 @@ jest.mock(
 const useProgramSectionValidationMock = useProgramSectionValidation as unknown as jest.Mock;
 
 describe('TitleDescriptionSection', () => {
-    const TEMPLATE = ProgramSectionTemplate.TextOnly;
+    const TEMPLATE = SectionTemplate.TextOnly;
 
     const defaultProps: TitleDescriptionSectionProps = {
         template: TEMPLATE,
         title: '',
         description: '',
         className: '',
-        mode: ProgramSectionMode.View,
+        mode: SectionMode.View,
     };
 
     const setupHook = (overrides?: Partial<ReturnType<typeof useProgramSectionValidation>>) => {
@@ -191,7 +191,7 @@ describe('TitleDescriptionSection', () => {
             const { container } = renderComponent({
                 title: 'Test Title',
                 description: 'Test Description',
-                mode: ProgramSectionMode.View,
+                mode: SectionMode.View,
             });
 
             expect(getTitleHeading()).toBeInTheDocument();
@@ -209,7 +209,7 @@ describe('TitleDescriptionSection', () => {
             renderComponent({
                 title: 'Title',
                 description: 'Desc',
-                mode: ProgramSectionMode.View,
+                mode: SectionMode.View,
                 titleClassName: 't-class',
                 descriptionClassName: 'd-class',
             });
@@ -224,7 +224,7 @@ describe('TitleDescriptionSection', () => {
             renderComponent({
                 title: 'Test Title',
                 description: 'Test Description',
-                mode: ProgramSectionMode.Edit,
+                mode: SectionMode.Edit,
             });
 
             expect(getTitleInput()).toBeInTheDocument();
@@ -243,7 +243,7 @@ describe('TitleDescriptionSection', () => {
             renderComponent({
                 title: 'Initial Title',
                 description: 'Initial Description',
-                mode: ProgramSectionMode.Edit,
+                mode: SectionMode.Edit,
                 onTitleChange,
                 onDescriptionChange,
             });
@@ -260,7 +260,7 @@ describe('TitleDescriptionSection', () => {
             const onDescriptionChange = jest.fn();
 
             renderComponent({
-                mode: ProgramSectionMode.Edit,
+                mode: SectionMode.Edit,
                 onTitleChange,
                 onDescriptionChange,
             });
@@ -277,7 +277,7 @@ describe('TitleDescriptionSection', () => {
             const descriptionMax = getProgramSectionTemplateMaxLength(TEMPLATE, ContentType.Description);
 
             renderComponent({
-                mode: ProgramSectionMode.Edit,
+                mode: SectionMode.Edit,
                 template: TEMPLATE,
             });
 
@@ -293,7 +293,7 @@ describe('TitleDescriptionSection', () => {
         it('passes errors from hook to inputs', () => {
             setupHook({ titleError: 't-err', descriptionError: 'd-err' });
 
-            render(<TitleDescriptionSection {...defaultProps} mode={ProgramSectionMode.Edit} />);
+            render(<TitleDescriptionSection {...defaultProps} mode={SectionMode.Edit} />);
 
             const titleGroup = getTitleInput()!.closest('div');
             const descriptionGroup = getDescriptionTextarea()!.closest('div');
@@ -303,7 +303,7 @@ describe('TitleDescriptionSection', () => {
         });
 
         it('passes bottom counter mode to title input group', () => {
-            renderComponent({ mode: ProgramSectionMode.Edit });
+            renderComponent({ mode: SectionMode.Edit });
 
             const titleGroup = getTitleInput()!.closest('div');
             expect(titleGroup).toHaveAttribute('data-show-counter-below', 'true');
@@ -311,7 +311,7 @@ describe('TitleDescriptionSection', () => {
 
         it('passes trimmed currentLength to description group', () => {
             renderComponent({
-                mode: ProgramSectionMode.Edit,
+                mode: SectionMode.Edit,
                 description: '   Hello world   ',
             });
 
@@ -323,7 +323,7 @@ describe('TitleDescriptionSection', () => {
     describe('View mode', () => {
         it('renders static HTML instead of inputs', () => {
             renderComponent({
-                mode: ProgramSectionMode.View,
+                mode: SectionMode.View,
                 title: 'Title',
                 description: 'Desc',
             });
@@ -338,7 +338,7 @@ describe('TitleDescriptionSection', () => {
     describe('Template mode', () => {
         it('renders as text and applies template class', () => {
             const { container } = renderComponent({
-                mode: ProgramSectionMode.Template,
+                mode: SectionMode.Template,
                 title: 'T',
                 description: 'D',
             });
@@ -360,17 +360,17 @@ describe('TitleDescriptionSection', () => {
         });
 
         it('applies form-container class when mode is Edit', () => {
-            const { container } = renderComponent({ mode: ProgramSectionMode.Edit });
+            const { container } = renderComponent({ mode: SectionMode.Edit });
             expect(container.querySelector('.container')).toHaveClass('form-container');
         });
 
         it('applies form-container class when mode is Edit only', () => {
-            const { container } = renderComponent({ mode: ProgramSectionMode.Edit });
+            const { container } = renderComponent({ mode: SectionMode.Edit });
             expect(container.querySelector('.container')).toHaveClass('form-container');
         });
 
         it('does not apply form-container class when mode is View', () => {
-            const { container } = renderComponent({ mode: ProgramSectionMode.View });
+            const { container } = renderComponent({ mode: SectionMode.View });
             expect(container.querySelector('.container')).not.toHaveClass('form-container');
         });
     });

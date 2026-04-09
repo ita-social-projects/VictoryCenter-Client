@@ -5,7 +5,7 @@ import {
     HippotherapyProgramSectionContentLocalization,
     HippotherapyProgramSectionContentLocalizationDto,
     ProgramSectionContentLocalizableFields,
-    ProgramSectionMode,
+    SectionMode,
 } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 import { FaqLocalization, FaqLocalizationDto } from '@/types/admin/faq';
@@ -178,7 +178,7 @@ export const DetailedProgramSection: React.FC<DetailedProgramSectionProps> = ({ 
             descriptionAuthorPairs,
             faqQuestions,
         },
-        mode: ProgramSectionMode.View,
+        mode: SectionMode.View,
     });
 
     return <div className={styles.container}>{renderedSection}</div>;

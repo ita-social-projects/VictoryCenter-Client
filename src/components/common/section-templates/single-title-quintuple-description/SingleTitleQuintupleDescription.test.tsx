@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { SingleTitleQuintupleDescription } from './SingleTitleQuintupleDescription';
-import { ProgramSectionMode } from '@/types/common/program-sections';
+import { SectionMode } from '@/types/common/program-sections';
 
 const mockDescProps = jest.fn();
 
@@ -85,7 +85,7 @@ describe('SingleTitleQuintupleDescription', () => {
         });
 
         it('applies template class when mode is Template', () => {
-            const { container } = setup({ mode: ProgramSectionMode.Template });
+            const { container } = setup({ mode: SectionMode.Template });
             expect(getRoot(container)).toHaveClass('template');
         });
 
@@ -97,12 +97,12 @@ describe('SingleTitleQuintupleDescription', () => {
 
     describe('Editable', () => {
         it('does not render preview h2', () => {
-            setup({ mode: ProgramSectionMode.Edit });
+            setup({ mode: SectionMode.Edit });
             expect(screen.queryByRole('heading', { level: 2 })).not.toBeInTheDocument();
         });
 
         it('renders title input', () => {
-            setup({ mode: ProgramSectionMode.Edit, title: 'Edit' });
+            setup({ mode: SectionMode.Edit, title: 'Edit' });
             expect(screen.getByTestId('input-single-title-quintuple-title')).toHaveValue('Edit');
             expect(screen.getByTestId('group-single-title-quintuple-title')).toHaveAttribute(
                 'data-show-counter-below',
@@ -111,12 +111,12 @@ describe('SingleTitleQuintupleDescription', () => {
         });
 
         it('renders 5 description inputs', () => {
-            setup({ mode: ProgramSectionMode.Edit });
+            setup({ mode: SectionMode.Edit });
             expect(screen.getAllByTestId(/input-single-title-quintuple-desc-/)).toHaveLength(5);
         });
 
         it('uses editable order (0,1,2,3,4)', () => {
-            setup({ mode: ProgramSectionMode.Edit });
+            setup({ mode: SectionMode.Edit });
             expect(getDescCallIds()).toEqual([
                 'single-title-quintuple-desc-0',
                 'single-title-quintuple-desc-1',
@@ -127,14 +127,14 @@ describe('SingleTitleQuintupleDescription', () => {
         });
 
         it('binds normalized values by index', () => {
-            setup({ mode: ProgramSectionMode.Edit, descriptions: ['A'] });
+            setup({ mode: SectionMode.Edit, descriptions: ['A'] });
             expect(screen.getByTestId('input-single-title-quintuple-desc-0')).toHaveValue('A');
             expect(screen.getByTestId('input-single-title-quintuple-desc-4')).toHaveValue('');
         });
 
         it('calls onTitleChange with value', () => {
             const onTitleChange = jest.fn();
-            setup({ mode: ProgramSectionMode.Edit, onTitleChange });
+            setup({ mode: SectionMode.Edit, onTitleChange });
 
             fireEvent.change(screen.getByTestId('input-single-title-quintuple-title'), { target: { value: 'X' } });
 
@@ -143,7 +143,7 @@ describe('SingleTitleQuintupleDescription', () => {
 
         it('calls onDescriptionsChange with index and value', () => {
             const onDescriptionsChange = jest.fn();
-            setup({ mode: ProgramSectionMode.Edit, onDescriptionsChange });
+            setup({ mode: SectionMode.Edit, onDescriptionsChange });
 
             fireEvent.change(screen.getByTestId('input-single-title-quintuple-desc-3'), { target: { value: 'Y' } });
 
@@ -151,7 +151,7 @@ describe('SingleTitleQuintupleDescription', () => {
         });
 
         it('does not crash without handlers', () => {
-            setup({ mode: ProgramSectionMode.Edit });
+            setup({ mode: SectionMode.Edit });
 
             fireEvent.change(screen.getByTestId('input-single-title-quintuple-title'), { target: { value: 'X' } });
             fireEvent.change(screen.getByTestId('input-single-title-quintuple-desc-0'), { target: { value: 'Y' } });
@@ -160,15 +160,15 @@ describe('SingleTitleQuintupleDescription', () => {
         });
 
         it('applies editable class for Edit mode only', () => {
-            const { container: editContainer } = setup({ mode: ProgramSectionMode.Edit });
+            const { container: editContainer } = setup({ mode: SectionMode.Edit });
             expect(getRoot(editContainer)).toHaveClass('editable');
 
-            const { container: viewContainer } = setup({ mode: ProgramSectionMode.View });
+            const { container: viewContainer } = setup({ mode: SectionMode.View });
             expect(getRoot(viewContainer)).not.toHaveClass('editable');
         });
 
         it('does not apply template class when mode is Edit', () => {
-            const { container } = setup({ mode: ProgramSectionMode.Edit });
+            const { container } = setup({ mode: SectionMode.Edit });
             expect(getRoot(container)).not.toHaveClass('template');
         });
     });

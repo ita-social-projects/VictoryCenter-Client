@@ -5,7 +5,7 @@ import '@testing-library/jest-dom';
 import { AddSectionModal } from './AddSectionModal';
 import type { AddSectionModalProps } from './AddSectionModal';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
-import { ProgramSectionTemplate, ProgramSectionMode } from '@/types/common/program-sections';
+import { SectionTemplate, SectionMode } from '@/types/common/program-sections';
 import type { ButtonProps } from '@/components/admin/button/Button';
 import type { ModalProps } from '@/components/common/modal/Modal';
 
@@ -222,13 +222,13 @@ describe('AddSectionModal', () => {
         renderModal();
 
         expect(mockRenderProgramSection).toHaveBeenCalled();
-        expect(mockRenderProgramSection.mock.calls.every((c) => c[0]?.mode === ProgramSectionMode.Template)).toBe(true);
+        expect(mockRenderProgramSection.mock.calls.every((c) => c[0]?.mode === SectionMode.Template)).toBe(true);
     });
 
     it('passes sample title/description into non-card templates', () => {
         renderModal();
 
-        const call = getCallByTemplate(ProgramSectionTemplate.TextOnly);
+        const call = getCallByTemplate(SectionTemplate.TextOnly);
         expect(call?.data?.title).toBe(PROGRAMS_TEXT.SECTION.TITLE_SAMPLE_TEXT);
         expect(call?.data?.description).toBe(PROGRAMS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT);
     });
@@ -236,7 +236,7 @@ describe('AddSectionModal', () => {
     it('passes sample title/description into SingleTitleDescriptionAuthorPairs template', () => {
         renderModal();
 
-        const call = getCallByTemplate(ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs);
+        const call = getCallByTemplate(SectionTemplate.SingleTitleDescriptionAuthorPairs);
         expect(call?.data?.title).toBe(PROGRAMS_TEXT.SECTION.TITLE_SAMPLE_TEXT);
         expect(call?.data?.description).toBe(PROGRAMS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT);
     });
@@ -244,23 +244,23 @@ describe('AddSectionModal', () => {
     it('provides 5 short descriptions only for SingleTitleQuintupleDescription', () => {
         renderModal();
 
-        expect(getCallByTemplate(ProgramSectionTemplate.SingleTitleQuintupleDescription)?.data?.descriptions).toEqual(
+        expect(getCallByTemplate(SectionTemplate.SingleTitleQuintupleDescription)?.data?.descriptions).toEqual(
             buildFiveShortDescriptions(),
         );
-        expect(getCallByTemplate(ProgramSectionTemplate.TextOnly)?.data?.descriptions).toBeUndefined();
+        expect(getCallByTemplate(SectionTemplate.TextOnly)?.data?.descriptions).toBeUndefined();
     });
 
     it.each([
-        [ProgramSectionTemplate.QuadImagesBottom, 4],
-        [ProgramSectionTemplate.TripleImagesBottom, 3],
-        [ProgramSectionTemplate.DualImagesBottom, 2],
-        [ProgramSectionTemplate.SingleImageBottom, 1],
-        [ProgramSectionTemplate.SingleImageTop, 1],
-        [ProgramSectionTemplate.SingleImageRight, 1],
-        [ProgramSectionTemplate.TextOnly, 0],
-        [ProgramSectionTemplate.SingleTitleQuintupleDescription, 0],
-        [ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs, 0],
-    ] as Array<[ProgramSectionTemplate, number]>)('provides correct placeholder images for %s', (templateId, count) => {
+        [SectionTemplate.QuadImagesBottom, 4],
+        [SectionTemplate.TripleImagesBottom, 3],
+        [SectionTemplate.DualImagesBottom, 2],
+        [SectionTemplate.SingleImageBottom, 1],
+        [SectionTemplate.SingleImageTop, 1],
+        [SectionTemplate.SingleImageRight, 1],
+        [SectionTemplate.TextOnly, 0],
+        [SectionTemplate.SingleTitleQuintupleDescription, 0],
+        [SectionTemplate.SingleTitleDescriptionAuthorPairs, 0],
+    ] as Array<[SectionTemplate, number]>)('provides correct placeholder images for %s', (templateId, count) => {
         renderModal();
 
         const images = getCallByTemplate(templateId)?.data?.images ?? [];
@@ -278,10 +278,10 @@ describe('AddSectionModal', () => {
     });
 
     it.each([
-        [ProgramSectionTemplate.DualTitleDescriptionPairs, 2],
-        [ProgramSectionTemplate.TripleTitleDescriptionPairs, 3],
-        [ProgramSectionTemplate.QuadTitleDescriptionPairs, 4],
-    ] as Array<[ProgramSectionTemplate, number]>)('renders %s with %d cards', (templateId, count) => {
+        [SectionTemplate.DualTitleDescriptionPairs, 2],
+        [SectionTemplate.TripleTitleDescriptionPairs, 3],
+        [SectionTemplate.QuadTitleDescriptionPairs, 4],
+    ] as Array<[SectionTemplate, number]>)('renders %s with %d cards', (templateId, count) => {
         renderModal();
 
         const call = getCallByTemplate(templateId);

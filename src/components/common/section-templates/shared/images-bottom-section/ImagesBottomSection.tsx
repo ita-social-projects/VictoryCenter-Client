@@ -3,7 +3,7 @@ import cn from 'classnames';
 import { TitleDescriptionSection } from '../title-description-section/TitleDescriptionSection';
 import { ImageValues, Image } from '@/types/common/image';
 import baseStyles from './ImagesBottomSection.module.scss';
-import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
+import { SectionMode, SectionTemplate } from '@/types/common/program-sections';
 import { ViewImagesBottomSection } from './ViewImagesBottomSection';
 import { EditableImagesBottomSection } from './EditableImagesBottomSection';
 
@@ -33,13 +33,13 @@ export interface ImageHandler {
 }
 
 export interface ImagesBottomSectionProps {
-    template: ProgramSectionTemplate;
+    template: SectionTemplate;
     title?: string;
     description?: string;
     images: (Image | ImageValues | null)[];
     imageHandlers: ImageHandler[];
     config: ImagesBottomSectionConfig;
-    mode?: ProgramSectionMode;
+    mode?: SectionMode;
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
     validationResetKey?: number;
@@ -57,7 +57,7 @@ export const ImagesBottomSection = ({
     images,
     imageHandlers,
     config,
-    mode = ProgramSectionMode.View,
+    mode = SectionMode.View,
     onTitleChange,
     onDescriptionChange,
     validationResetKey,
@@ -94,7 +94,7 @@ export const ImagesBottomSection = ({
             className={cn(
                 baseStyles.container,
                 {
-                    [baseStyles['form-container']]: mode === ProgramSectionMode.Edit,
+                    [baseStyles['form-container']]: mode === SectionMode.Edit,
                 },
                 className,
             )}
@@ -104,14 +104,14 @@ export const ImagesBottomSection = ({
                 title={title}
                 description={description}
                 className={cn(baseStyles['top-section'], topSectionClassName)}
-                titleClassName={mode === ProgramSectionMode.Template ? baseStyles['title-template'] : ''}
-                descriptionClassName={mode === ProgramSectionMode.Template ? baseStyles['description-template'] : ''}
+                titleClassName={mode === SectionMode.Template ? baseStyles['title-template'] : ''}
+                descriptionClassName={mode === SectionMode.Template ? baseStyles['description-template'] : ''}
                 mode={mode}
                 onTitleChange={onTitleChange}
                 onDescriptionChange={onDescriptionChange}
                 validationResetKey={validationResetKey}
             />
-            {mode === ProgramSectionMode.View ? (
+            {mode === SectionMode.View ? (
                 <ViewImagesBottomSection
                     images={displayedImages}
                     config={config}

@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { SingleImageBottom, SingleImageBottomProps } from './SingleImageBottom';
 import { PROGRAM_SECTION_IMAGE_CONFIGS } from '@/const/admin/programs';
-import { ProgramSectionMode } from '@/types/common/program-sections';
+import { SectionMode } from '@/types/common/program-sections';
 
 const mockTitleDescriptionSection = jest.fn();
 const mockPhotoInputGroup = jest.fn();
@@ -36,7 +36,7 @@ describe('SingleImageBottom', () => {
             title: 'T',
             description: 'D',
             image: { id: 1, url: 'test-image.jpg', mimeType: 'image/jpeg' },
-            mode: ProgramSectionMode.Template,
+            mode: SectionMode.Template,
         });
 
         const img = container.querySelector('img');
@@ -49,7 +49,7 @@ describe('SingleImageBottom', () => {
             expect.objectContaining({
                 title: 'T',
                 description: 'D',
-                mode: ProgramSectionMode.Template,
+                mode: SectionMode.Template,
                 className: 'top-section',
             }),
         );
@@ -64,7 +64,7 @@ describe('SingleImageBottom', () => {
             title: 'T',
             description: 'D',
             image: { base64: 'base64-data', mimeType: 'image/jpeg' },
-            mode: ProgramSectionMode.Edit,
+            mode: SectionMode.Edit,
             onTitleChange,
             onDescriptionChange,
             onImageChange,
@@ -78,7 +78,7 @@ describe('SingleImageBottom', () => {
             expect.objectContaining({
                 title: 'T',
                 description: 'D',
-                mode: ProgramSectionMode.Edit,
+                mode: SectionMode.Edit,
                 onTitleChange,
                 onDescriptionChange,
                 className: 'top-section',
@@ -106,7 +106,7 @@ describe('SingleImageBottom', () => {
     it('uses null value for PhotoInputGroup when image is empty (editable branch)', () => {
         renderSingleImageBottom({
             image: null,
-            mode: ProgramSectionMode.Edit,
+            mode: SectionMode.Edit,
         });
 
         const photoProps = getLastCallProps(mockPhotoInputGroup);
@@ -115,7 +115,7 @@ describe('SingleImageBottom', () => {
 
     it('uses a fallback onChange when onImageChange is not provided', () => {
         renderSingleImageBottom({
-            mode: ProgramSectionMode.Edit,
+            mode: SectionMode.Edit,
         });
 
         const photoProps = getLastCallProps(mockPhotoInputGroup);
@@ -124,12 +124,12 @@ describe('SingleImageBottom', () => {
     });
 
     it('applies template/form-container CSS module class toggles on the container', () => {
-        const { container, rerender } = renderSingleImageBottom({ mode: ProgramSectionMode.Template });
+        const { container, rerender } = renderSingleImageBottom({ mode: SectionMode.Template });
         expect(container.firstChild).toHaveClass('container');
         expect(container.firstChild).toHaveClass('template');
         expect(container.firstChild).not.toHaveClass('form-container');
 
-        rerender(<SingleImageBottom mode={ProgramSectionMode.Edit} />);
+        rerender(<SingleImageBottom mode={SectionMode.Edit} />);
         expect(container.firstChild).toHaveClass('form-container');
         expect(container.firstChild).not.toHaveClass('template');
     });

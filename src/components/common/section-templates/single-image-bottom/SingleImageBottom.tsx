@@ -5,7 +5,7 @@ import { ImageValues, Image } from '@/types/common/image';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { PROGRAM_SECTION_IMAGE_CONFIGS, PROGRAM_VALIDATION } from '@/const/admin/programs';
 import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
-import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
+import { SectionMode, SectionTemplate } from '@/types/common/program-sections';
 import { useImageError } from '@/hooks/common/use-image-error/useImageError';
 import styles from './SingleImageBottom.module.scss';
 import viewStyles from './ViewSingleImageBottom.module.scss';
@@ -14,7 +14,7 @@ export interface SingleImageBottomProps {
     title?: string;
     description?: string;
     image?: Image | ImageValues | null;
-    mode?: ProgramSectionMode;
+    mode?: SectionMode;
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
     onImageChange?: (file: ImageValues | null) => void;
@@ -25,30 +25,30 @@ export const SingleImageBottom = ({
     title = '',
     description = '',
     image = null,
-    mode = ProgramSectionMode.View,
+    mode = SectionMode.View,
     onTitleChange,
     onDescriptionChange,
     onImageChange,
     validationResetKey,
 }: SingleImageBottomProps) => {
     const imageSrc = getImageSrc(image);
-    const baseStyles = mode === ProgramSectionMode.View ? viewStyles : styles;
+    const baseStyles = mode === SectionMode.View ? viewStyles : styles;
     const { error, handleSetError } = useImageError();
 
     return (
         <div
             className={cn(baseStyles.container, {
-                [styles.template]: mode === ProgramSectionMode.Template,
-                [styles['form-container']]: mode === ProgramSectionMode.Edit,
+                [styles.template]: mode === SectionMode.Template,
+                [styles['form-container']]: mode === SectionMode.Edit,
             })}
         >
             <TitleDescriptionSection
-                template={ProgramSectionTemplate.SingleImageBottom}
+                template={SectionTemplate.SingleImageBottom}
                 title={title}
                 description={description}
                 className={baseStyles['top-section']}
-                titleClassName={mode === ProgramSectionMode.Template ? styles['title-template'] : ''}
-                descriptionClassName={mode === ProgramSectionMode.Template ? styles['description-template'] : ''}
+                titleClassName={mode === SectionMode.Template ? styles['title-template'] : ''}
+                descriptionClassName={mode === SectionMode.Template ? styles['description-template'] : ''}
                 mode={mode}
                 onTitleChange={onTitleChange}
                 onDescriptionChange={onDescriptionChange}
@@ -56,7 +56,7 @@ export const SingleImageBottom = ({
             />
             <div className={baseStyles['bottom-section']}>
                 <div className={baseStyles['image-wrapper']}>
-                    {mode === ProgramSectionMode.Edit ? (
+                    {mode === SectionMode.Edit ? (
                         <PhotoInputGroup
                             id="section-image-1"
                             name="section-image-1"

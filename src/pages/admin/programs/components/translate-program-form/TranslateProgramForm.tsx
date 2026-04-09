@@ -15,7 +15,7 @@ import programFormStyles from '../program-form/ProgramForm.module.scss';
 import styles from './TranslateProgramForm.module.scss';
 import { HippotherapyProgramSectionDto } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
-import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
+import { SectionMode, SectionTemplate } from '@/types/common/program-sections';
 import { renderProgramSection } from '@/utils/functions/render-program-section';
 
 export interface TranslateProgramFormValues {
@@ -353,7 +353,7 @@ export const TranslateProgramForm = forwardRef<TranslateProgramFormRef, Translat
 
                 return renderProgramSection({
                     templateId: sourceSection.template,
-                    mode: ProgramSectionMode.Edit,
+                    mode: SectionMode.Edit,
                     data: {
                         title: getLocalizedText(orderedTitles[0]?.id, 'title'),
                         description: getLocalizedText(orderedDescriptions[0]?.id, 'description'),
@@ -383,7 +383,7 @@ export const TranslateProgramForm = forwardRef<TranslateProgramFormRef, Translat
                         onCardTitleChange: (index, value) =>
                             updateSectionContentField(sourceSection.id!, orderedTitles[index]?.id, 'title', value),
                         onCardDescriptionChange: (index, value) => {
-                            if (sourceSection.template === ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs) {
+                            if (sourceSection.template === SectionTemplate.SingleTitleDescriptionAuthorPairs) {
                                 const groupIndexes = Array.from(
                                     new Set(
                                         sourceSection.contents

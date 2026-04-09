@@ -4,7 +4,7 @@ import { PhotoInputGroup } from '@/components/admin/input-groups/photo-input-gro
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { PROGRAM_VALIDATION } from '@/const/admin/programs';
 import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
-import { ProgramSectionMode } from '@/types/common/program-sections';
+import { SectionMode } from '@/types/common/program-sections';
 import { ImageHandler, ImagesBottomSectionConfig } from './ImagesBottomSection';
 import baseStyles from './ImagesBottomSection.module.scss';
 
@@ -13,7 +13,7 @@ interface EditableImagesBottomSectionProps {
     imageHandlers: ImageHandler[];
     imageKeys: string[];
     config: ImagesBottomSectionConfig;
-    mode: ProgramSectionMode;
+    mode: SectionMode;
     bottomSectionClassName?: string;
     imageWrapperClassName?: string;
     errors: string[];
@@ -34,7 +34,7 @@ export const EditableImagesBottomSection = ({
     return (
         <div className={cn(baseStyles['bottom-section'], bottomSectionClassName)}>
             <div className={baseStyles['images-grid']}>
-                {mode === ProgramSectionMode.Edit || mode === ProgramSectionMode.View
+                {mode === SectionMode.Edit || mode === SectionMode.View
                     ? imageHandlers.map(({ handler, key, value }, index) => (
                           <div
                               key={key}
@@ -60,7 +60,7 @@ export const EditableImagesBottomSection = ({
                                   )}
                                   variant="programSection"
                                   maxSizeMB={PROGRAM_VALIDATION.images.maxSizeMB}
-                                  disabled={mode === ProgramSectionMode.View}
+                                  disabled={mode === SectionMode.View}
                               />
                           </div>
                       ))

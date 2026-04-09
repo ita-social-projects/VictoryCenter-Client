@@ -5,7 +5,7 @@ import { TitleDescriptionCard } from '../TitleDescriptionCard';
 import type { TitleDescriptionCardData } from '../TitleDescriptionCardsSection';
 
 import { PROGRAMS_TEXT } from '../../../../../../const/admin/programs';
-import { ProgramSectionMode, ProgramSectionTemplate } from '../../../../../../types/common/program-sections';
+import { SectionMode, SectionTemplate } from '../../../../../../types/common/program-sections';
 import { ContentType } from '../../../../../../types/common/programs';
 
 import { parseDescriptionList } from '../../../../../../utils/functions/formatters/text-formatters';
@@ -82,7 +82,7 @@ const useCardValidationMock = useCardValidation as unknown as jest.Mock;
 const minMock = getProgramSectionTemplateMinLength as unknown as jest.Mock;
 const maxMock = getProgramSectionTemplateMaxLength as unknown as jest.Mock;
 
-const TEMPLATE = ProgramSectionTemplate.DualTitleDescriptionPairs;
+const TEMPLATE = SectionTemplate.DualTitleDescriptionPairs;
 
 const baseCard: TitleDescriptionCardData = {
     title: 'Test Title',
@@ -117,7 +117,7 @@ describe('TitleDescriptionCard', () => {
     });
 
     it('calls min/max length getters for title and description', () => {
-        renderCard({ mode: ProgramSectionMode.Edit, template: TEMPLATE });
+        renderCard({ mode: SectionMode.Edit, template: TEMPLATE });
 
         expect(minMock).toHaveBeenCalledWith(TEMPLATE, ContentType.Title);
         expect(maxMock).toHaveBeenCalledWith(TEMPLATE, ContentType.Title);
@@ -126,7 +126,7 @@ describe('TitleDescriptionCard', () => {
     });
 
     it('passes correct config into useCardValidation (title + description)', () => {
-        renderCard({ mode: ProgramSectionMode.Edit, validationResetKey: 123 });
+        renderCard({ mode: SectionMode.Edit, validationResetKey: 123 });
 
         expect(useCardValidationMock).toHaveBeenCalledTimes(2);
 
@@ -156,7 +156,7 @@ describe('TitleDescriptionCard', () => {
 
     describe('editable mode (Edit/View)', () => {
         it('renders inputs in Edit mode and keeps them enabled', () => {
-            renderCard({ mode: ProgramSectionMode.Edit });
+            renderCard({ mode: SectionMode.Edit });
 
             expect(screen.getByTestId('input-with-limit')).toBeInTheDocument();
             expect(screen.getByTestId('card-description-field')).toBeInTheDocument();
@@ -181,7 +181,7 @@ describe('TitleDescriptionCard', () => {
                     handleBlur: descBlur,
                 }));
 
-            renderCard({ mode: ProgramSectionMode.Edit });
+            renderCard({ mode: SectionMode.Edit });
 
             const titleInput = screen.getByTestId(/input-.*-card-title-0/);
             const descTextarea = screen.getByTestId(/textarea-.*-card-description-0/);
@@ -209,14 +209,14 @@ describe('TitleDescriptionCard', () => {
                     handleBlur: jest.fn(),
                 }));
 
-            renderCard({ mode: ProgramSectionMode.Edit });
+            renderCard({ mode: SectionMode.Edit });
 
             expect(screen.getByTestId(/error-.*-card-title-0/)).toHaveTextContent('TITLE_ERR');
             expect(screen.getByTestId(/error-.*-card-description-0/)).toHaveTextContent('DESC_ERR');
         });
 
         it('calls parseDescriptionList even in Edit mode (it is computed before the branch)', () => {
-            renderCard({ mode: ProgramSectionMode.Edit });
+            renderCard({ mode: SectionMode.Edit });
             expect(parseDescriptionListMock).toHaveBeenCalledWith(baseCard.description);
         });
 
@@ -225,7 +225,7 @@ describe('TitleDescriptionCard', () => {
             const onDescriptionChange = jest.fn();
 
             renderCard({
-                mode: ProgramSectionMode.Edit,
+                mode: SectionMode.Edit,
                 index: 5,
                 onTitleChange,
                 onDescriptionChange,
@@ -243,7 +243,7 @@ describe('TitleDescriptionCard', () => {
         it('does not render inputs and shows title as heading', () => {
             parseDescriptionListMock.mockReturnValueOnce({ intro: 'Intro text', items: [] });
 
-            renderCard({ mode: ProgramSectionMode.View });
+            renderCard({ mode: SectionMode.View });
 
             expect(screen.queryByTestId('input-with-limit')).not.toBeInTheDocument();
             expect(screen.queryByTestId('card-description-field')).not.toBeInTheDocument();
@@ -251,7 +251,7 @@ describe('TitleDescriptionCard', () => {
 
         it('should display title as heading', () => {
             render(
-                <TitleDescriptionCard card={baseCard} index={0} mode={ProgramSectionMode.View} template={TEMPLATE} />,
+                <TitleDescriptionCard card={baseCard} index={0} mode={SectionMode.View} template={TEMPLATE} />,
             );
 
             expect(screen.getByText('Test Title')).toBeInTheDocument();
@@ -262,7 +262,7 @@ describe('TitleDescriptionCard', () => {
                 <TitleDescriptionCard
                     card={{ title: '', description: 'Description' }}
                     index={0}
-                    mode={ProgramSectionMode.View}
+                    mode={SectionMode.View}
                     template={TEMPLATE}
                 />,
             );
@@ -277,7 +277,7 @@ describe('TitleDescriptionCard', () => {
             });
 
             render(
-                <TitleDescriptionCard card={baseCard} index={0} mode={ProgramSectionMode.View} template={TEMPLATE} />,
+                <TitleDescriptionCard card={baseCard} index={0} mode={SectionMode.View} template={TEMPLATE} />,
             );
 
             expect(screen.getByText('Intro text')).toBeInTheDocument();
@@ -285,7 +285,7 @@ describe('TitleDescriptionCard', () => {
 
         it('shows default title when empty', () => {
             renderCard({
-                mode: ProgramSectionMode.View,
+                mode: SectionMode.View,
                 card: { title: '', description: 'Any' },
             });
 
@@ -297,7 +297,7 @@ describe('TitleDescriptionCard', () => {
         it('renders list when parseDescriptionList returns items (no intro)', () => {
             parseDescriptionListMock.mockReturnValueOnce({ intro: null, items: ['Item 1', 'Item 2'] });
 
-            renderCard({ mode: ProgramSectionMode.View });
+            renderCard({ mode: SectionMode.View });
 
             expect(screen.getByText('Item 1')).toBeInTheDocument();
             expect(screen.getByText('Item 2')).toBeInTheDocument();
@@ -306,7 +306,7 @@ describe('TitleDescriptionCard', () => {
         it('renders both intro and items when both are present', () => {
             parseDescriptionListMock.mockReturnValueOnce({ intro: 'Intro X', items: ['I1'] });
 
-            renderCard({ mode: ProgramSectionMode.View });
+            renderCard({ mode: SectionMode.View });
 
             expect(screen.getByText('Intro X')).toBeInTheDocument();
             expect(screen.getByText('I1')).toBeInTheDocument();
@@ -315,7 +315,7 @@ describe('TitleDescriptionCard', () => {
         it('renders default description text when no intro and no items', () => {
             parseDescriptionListMock.mockReturnValueOnce({ intro: null, items: [] });
 
-            renderCard({ mode: ProgramSectionMode.View });
+            renderCard({ mode: SectionMode.View });
 
             expect(screen.getByText(PROGRAMS_TEXT.SECTION.FORM.DESCRIPTION.TEXT)).toBeInTheDocument();
         });

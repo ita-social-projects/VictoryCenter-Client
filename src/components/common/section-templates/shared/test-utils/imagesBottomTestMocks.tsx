@@ -1,11 +1,11 @@
 import React from 'react';
-import { ProgramSectionMode } from '@/types/common/program-sections';
+import { SectionMode } from '@/types/common/program-sections';
 
 export const mockTitleDescriptionSection = React.memo(
-    ({ title, description, mode }: { title?: string; description?: string; mode?: ProgramSectionMode }) => (
+    ({ title, description, mode }: { title?: string; description?: string; mode?: SectionMode }) => (
         <div data-testid="title-description-section" data-title={title} data-description={description}>
-            {mode === ProgramSectionMode.Template && <span data-testid="template-flag">template</span>}
-            {mode === ProgramSectionMode.Edit && <span data-testid="editable-flag">editable</span>}
+            {mode === SectionMode.Template && <span data-testid="template-flag">template</span>}
+            {mode === SectionMode.Edit && <span data-testid="editable-flag">editable</span>}
         </div>
     ),
 );
@@ -36,8 +36,8 @@ export const mockImagesBottomSection = React.memo(
                 <div data-testid="image-config">{JSON.stringify(config)}</div>
                 <div data-testid="has-onTitleChange">{String(typeof onTitleChange === 'function')}</div>
                 <div data-testid="has-onDescriptionChange">{String(typeof onDescriptionChange === 'function')}</div>
-                {mode === ProgramSectionMode.Template && <span data-testid="template-flag">template</span>}
-                {mode === ProgramSectionMode.Edit && <span data-testid="editable-flag">editable</span>}
+                {mode === SectionMode.Template && <span data-testid="template-flag">template</span>}
+                {mode === SectionMode.Edit && <span data-testid="editable-flag">editable</span>}
             </div>
         );
     },

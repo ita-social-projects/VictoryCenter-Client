@@ -1,5 +1,5 @@
 import { PROGRAM_SECTION_TEMPLATE_VALIDATION } from '@/const/admin/programs';
-import { CreateProgramSectionContentDto, ProgramSectionTemplate } from '@/types/common/program-sections';
+import { CreateProgramSectionContentDto, SectionTemplate } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 
 type Range = { min: number; max: number };
@@ -12,24 +12,24 @@ type TemplateRules = {
     };
 };
 
-const getTemplateRules = (template: ProgramSectionTemplate): TemplateRules | undefined =>
+const getTemplateRules = (template: SectionTemplate): TemplateRules | undefined =>
     (PROGRAM_SECTION_TEMPLATE_VALIDATION as any)[template] as TemplateRules | undefined;
 
-const getLengthRule = (template: ProgramSectionTemplate, type: ContentType): Range | undefined => {
+const getLengthRule = (template: SectionTemplate, type: ContentType): Range | undefined => {
     const rules = getTemplateRules(template);
     return rules?.lengths?.[type];
 };
 
-export const getProgramSectionTemplateMaxLength = (template: ProgramSectionTemplate, type: ContentType): number =>
+export const getProgramSectionTemplateMaxLength = (template: SectionTemplate, type: ContentType): number =>
     getLengthRule(template, type)?.max ?? 0;
 
-export const getProgramSectionTemplateMinLength = (template: ProgramSectionTemplate, type: ContentType): number =>
+export const getProgramSectionTemplateMinLength = (template: SectionTemplate, type: ContentType): number =>
     getLengthRule(template, type)?.min ?? 0;
 
-export const getProgramSectionTemplateMaxGroupCount = (template: ProgramSectionTemplate): number =>
+export const getProgramSectionTemplateMaxGroupCount = (template: SectionTemplate): number =>
     getTemplateRules(template)?.grouping?.groupCount?.max ?? 0;
 
-export const getProgramSectionTemplateMinGroupCount = (template: ProgramSectionTemplate): number =>
+export const getProgramSectionTemplateMinGroupCount = (template: SectionTemplate): number =>
     getTemplateRules(template)?.grouping?.groupCount?.min ?? 0;
 
 export const normalizeGroupedContentsGroupIndexes = (

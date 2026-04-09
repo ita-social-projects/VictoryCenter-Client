@@ -8,8 +8,8 @@ import styles from './ProgramSectionForm.module.scss';
 import {
     FaqSectionQuestionDto,
     CreateHippotherapyProgramSectionDto,
-    ProgramSectionTemplate,
-    ProgramSectionMode,
+    SectionTemplate,
+    SectionMode,
 } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 import {
@@ -78,8 +78,8 @@ export const ProgramSectionForm = ({
     );
     const [isDirty, setIsDirty] = useState(false);
     const [validationResetKey, setValidationResetKey] = useState(0);
-    const [sectionMode, setSectionMode] = useState<ProgramSectionMode>(
-        isNewSection || isReplacingTemplate ? ProgramSectionMode.Edit : ProgramSectionMode.View,
+    const [sectionMode, setSectionMode] = useState<SectionMode>(
+        isNewSection || isReplacingTemplate ? SectionMode.Edit : SectionMode.View,
     );
 
     const sectionModeRef = useRef(sectionMode);
@@ -105,12 +105,12 @@ export const ProgramSectionForm = ({
         setLocalSection(prepared);
         localSectionRef.current = prepared;
 
-        if (sectionModeRef.current !== ProgramSectionMode.Edit) {
+        if (sectionModeRef.current !== SectionMode.Edit) {
             if (!isReplacingTemplate) {
                 setOriginalSection(prepared);
             }
             setIsDirty(false);
-            setSectionMode(isNewSection || isReplacingTemplate ? ProgramSectionMode.Edit : ProgramSectionMode.View);
+            setSectionMode(isNewSection || isReplacingTemplate ? SectionMode.Edit : SectionMode.View);
         }
 
         if (prepared !== section) {
@@ -120,7 +120,7 @@ export const ProgramSectionForm = ({
     }, [section, isNewSection, isReplacingTemplate, onSectionChange]);
 
     useEffect(() => {
-        onEditStateChangeRef.current?.(sectionMode === ProgramSectionMode.Edit);
+        onEditStateChangeRef.current?.(sectionMode === SectionMode.Edit);
     }, [sectionMode]);
 
     const titleContent = getContentByType(localSection.contents, ContentType.Title);
@@ -135,9 +135,9 @@ export const ProgramSectionForm = ({
     const description = descriptions[0] || '';
 
     const isDescriptionAuthorPairsTemplate =
-        section.template === ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs;
+        section.template === SectionTemplate.SingleTitleDescriptionAuthorPairs;
 
-    const isFaqTemplate = section.template === ProgramSectionTemplate.SingleTitleQuestionAnswerPairs;
+    const isFaqTemplate = section.template === SectionTemplate.SingleTitleQuestionAnswerPairs;
 
     const orderedPairs = getDescriptionAuthorPairsByGroup(localSection.contents);
 
@@ -331,7 +331,7 @@ export const ProgramSectionForm = ({
 
     const handleAddPair = useCallback(() => {
         const prev = localSectionRef.current;
-        if (prev.template !== ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs) return;
+        if (prev.template !== SectionTemplate.SingleTitleDescriptionAuthorPairs) return;
 
         const normalizedContents = normalizeGroupedContentsGroupIndexes(prev.contents, [
             ContentType.Description,
@@ -380,7 +380,7 @@ export const ProgramSectionForm = ({
     const performDeletePair = useCallback(
         (index: number) => {
             const prev = localSectionRef.current;
-            if (prev.template !== ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs) return;
+            if (prev.template !== SectionTemplate.SingleTitleDescriptionAuthorPairs) return;
 
             const pairs = getDescriptionAuthorPairsByGroup(prev.contents);
             if (pairs.length <= 1) return;
@@ -470,7 +470,7 @@ export const ProgramSectionForm = ({
     const handleAddFaqPair = useCallback(
         (questionText: string, answerText: string) => {
             const prev = localSectionRef.current;
-            if (prev.template !== ProgramSectionTemplate.SingleTitleQuestionAnswerPairs) return;
+            if (prev.template !== SectionTemplate.SingleTitleQuestionAnswerPairs) return;
 
             const faq = getFaqPairs(prev.contents);
             const nextGroupIndex = faq.length;
@@ -503,7 +503,7 @@ export const ProgramSectionForm = ({
     const handleDeleteFaqPair = useCallback(
         (index: number) => {
             const prev = localSectionRef.current;
-            if (prev.template !== ProgramSectionTemplate.SingleTitleQuestionAnswerPairs) return;
+            if (prev.template !== SectionTemplate.SingleTitleQuestionAnswerPairs) return;
 
             const faq = getFaqPairs(prev.contents);
             if (faq.length <= 1) return;
@@ -542,7 +542,7 @@ export const ProgramSectionForm = ({
             e.stopPropagation();
             setOriginalSection(localSection);
             setIsDirty(false);
-            setSectionMode(ProgramSectionMode.Edit);
+            setSectionMode(SectionMode.Edit);
         },
         [localSection],
     );
@@ -552,14 +552,14 @@ export const ProgramSectionForm = ({
         onSave();
         setOriginalSection(localSection);
         setIsDirty(false);
-        setSectionMode(ProgramSectionMode.View);
+        setSectionMode(SectionMode.View);
         setValidationResetKey((prev) => prev + 1);
     }, [isDisabled, isSectionSaveValid, onSave, localSection]);
 
     const CARD_TEMPLATES = [
-        ProgramSectionTemplate.DualTitleDescriptionPairs,
-        ProgramSectionTemplate.TripleTitleDescriptionPairs,
-        ProgramSectionTemplate.QuadTitleDescriptionPairs,
+        SectionTemplate.DualTitleDescriptionPairs,
+        SectionTemplate.TripleTitleDescriptionPairs,
+        SectionTemplate.QuadTitleDescriptionPairs,
     ];
 
     const isCardTemplate = CARD_TEMPLATES.includes(section.template);
@@ -574,7 +574,7 @@ export const ProgramSectionForm = ({
                 localSectionRef.current = revertTo;
                 setLocalSection(revertTo);
                 setIsDirty(false);
-                setSectionMode(ProgramSectionMode.View);
+                setSectionMode(SectionMode.View);
                 setValidationResetKey((prev) => prev + 1);
             }
         };
@@ -654,7 +654,7 @@ export const ProgramSectionForm = ({
 
     return (
         <div className={styles.container}>
-            {sectionMode === ProgramSectionMode.View && (
+            {sectionMode === SectionMode.View && (
                 <div className={styles['actions-section']}>
                     <div className={styles['order-controls']}>
                         <div className={styles['order-controls']}>
@@ -712,7 +712,7 @@ export const ProgramSectionForm = ({
                 )}
             </div>
             <div className={styles['actions-container']}>
-                {sectionMode !== ProgramSectionMode.View && (
+                {sectionMode !== SectionMode.View && (
                     <div className={styles.actions}>
                         <Button buttonStyle="secondary" onClick={handleCancelClick} disabled={isDisabled}>
                             {PROGRAMS_TEXT.BUTTON.CANCEL}

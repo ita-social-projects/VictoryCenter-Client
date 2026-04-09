@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { FaqProgramSection, FaqProgramSectionProps } from './FaqProgramSection';
-import { ProgramSectionMode } from '@/types/common/program-sections';
+import { SectionMode } from '@/types/common/program-sections';
 import { useProgramSectionValidation } from '@/hooks/admin/use-program-section-validation';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FaqQuestion } from '@/types/admin/faq';
@@ -175,7 +175,7 @@ const createFaqQuestion = (overrides: Partial<FaqQuestion> = {}): FaqQuestion =>
 describe('FaqProgramSection', () => {
     const defaultProps: FaqProgramSectionProps = {
         questions: [],
-        mode: ProgramSectionMode.View,
+        mode: SectionMode.View,
         faqPairs: [],
     };
 
@@ -212,7 +212,7 @@ describe('FaqProgramSection', () => {
     describe('View mode', () => {
         it('renders FAQ section with default title and questions', () => {
             const questions = [createFaqQuestion({ id: 1 }), createFaqQuestion({ id: 2 })];
-            renderComponent({ questions, mode: ProgramSectionMode.View });
+            renderComponent({ questions, mode: SectionMode.View });
 
             expect(screen.getByText(COMMON_TEXT_ADMIN.TAB.FAQ)).toBeInTheDocument();
             expect(screen.getByTestId('faq-card-1')).toBeInTheDocument();
@@ -221,7 +221,7 @@ describe('FaqProgramSection', () => {
 
         it('renders faqPairs when no questions provided', () => {
             const faqPairs = [createFaqQuestion({ id: 1, questionText: 'Pair Question', answerText: 'Pair Answer' })];
-            renderComponent({ faqPairs, mode: ProgramSectionMode.View });
+            renderComponent({ faqPairs, mode: SectionMode.View });
 
             expect(screen.getByText('Pair Question')).toBeInTheDocument();
         });
@@ -229,7 +229,7 @@ describe('FaqProgramSection', () => {
 
     describe('Edit mode', () => {
         it('renders editable title input with empty value when no title provided', () => {
-            renderComponent({ mode: ProgramSectionMode.Edit });
+            renderComponent({ mode: SectionMode.Edit });
 
             const textarea = screen.getByRole('textbox', { name: /заголовок/i });
             expect(textarea).toHaveValue('');
@@ -237,7 +237,7 @@ describe('FaqProgramSection', () => {
 
         it('displays title validation error', () => {
             setupHook({ titleError: 'Title is too long' });
-            render(<FaqProgramSection {...defaultProps} mode={ProgramSectionMode.Edit} />);
+            render(<FaqProgramSection {...defaultProps} mode={SectionMode.Edit} />);
 
             const textareaGroup = screen.getByTestId(/textarea-group-.*-faq-title/);
             expect(textareaGroup).toHaveAttribute('data-error', 'Title is too long');
@@ -245,7 +245,7 @@ describe('FaqProgramSection', () => {
 
         it('auto-adds first FAQ pair on mount', async () => {
             const onAddFaqPair = jest.fn();
-            renderComponent({ mode: ProgramSectionMode.Edit, onAddFaqPair, faqPairs: [] });
+            renderComponent({ mode: SectionMode.Edit, onAddFaqPair, faqPairs: [] });
 
             await waitFor(() => {
                 expect(onAddFaqPair).toHaveBeenCalledWith('', '');
@@ -257,7 +257,7 @@ describe('FaqProgramSection', () => {
                 createFaqQuestion({ id: 1, questionText: 'Q1', answerText: 'A1' }),
                 createFaqQuestion({ id: 2, questionText: 'Q2', answerText: 'A2' }),
             ];
-            renderComponent({ mode: ProgramSectionMode.Edit, faqPairs });
+            renderComponent({ mode: SectionMode.Edit, faqPairs });
 
             expect(screen.getByTestId('editable-faq-card-0')).toBeInTheDocument();
             expect(screen.getByTestId('editable-faq-card-1')).toBeInTheDocument();
@@ -268,7 +268,7 @@ describe('FaqProgramSection', () => {
             const onFaqAnswerChange = jest.fn();
             const faqPairs = [createFaqQuestion({ id: 1, questionText: 'Q', answerText: 'A' })];
 
-            renderComponent({ mode: ProgramSectionMode.Edit, faqPairs, onFaqQuestionChange, onFaqAnswerChange });
+            renderComponent({ mode: SectionMode.Edit, faqPairs, onFaqQuestionChange, onFaqAnswerChange });
 
             fireEvent.change(screen.getByTestId('question-input-0'), { target: { value: 'Updated Q' } });
             fireEvent.change(screen.getByTestId('answer-input-0'), { target: { value: 'Updated A' } });
@@ -284,7 +284,7 @@ describe('FaqProgramSection', () => {
                 createFaqQuestion({ id: 2, questionText: 'Q2', answerText: 'A2' }),
             ];
 
-            renderComponent({ mode: ProgramSectionMode.Edit, faqPairs, onDeleteFaqPair });
+            renderComponent({ mode: SectionMode.Edit, faqPairs, onDeleteFaqPair });
 
             fireEvent.click(screen.getByTestId('delete-button-0'));
 
@@ -293,7 +293,7 @@ describe('FaqProgramSection', () => {
 
         it('handles expand/collapse toggle', () => {
             const faqPairs = [createFaqQuestion({ id: 1, questionText: 'Q1', answerText: 'A1' })];
-            renderComponent({ mode: ProgramSectionMode.Edit, faqPairs });
+            renderComponent({ mode: SectionMode.Edit, faqPairs });
 
             const expandButton = screen.getByTestId('expand-button-0');
 
@@ -310,7 +310,7 @@ describe('FaqProgramSection', () => {
             const onAddFaqPair = jest.fn();
             const faqPairs = [createFaqQuestion({ id: 1, questionText: 'Valid Q', answerText: 'Valid A' })];
 
-            renderComponent({ mode: ProgramSectionMode.Edit, faqPairs, onAddFaqPair });
+            renderComponent({ mode: SectionMode.Edit, faqPairs, onAddFaqPair });
 
             fireEvent.click(screen.getByTestId('add-faq-button'));
 
@@ -319,14 +319,14 @@ describe('FaqProgramSection', () => {
 
         it('disables add button when FAQ pairs have validation errors', () => {
             const faqPairs = [createFaqQuestion({ id: 1, questionText: 'Q', answerText: 'A' })];
-            renderComponent({ mode: ProgramSectionMode.Edit, faqPairs });
+            renderComponent({ mode: SectionMode.Edit, faqPairs });
 
             expect(screen.getByTestId('add-faq-button')).toBeDisabled();
         });
 
         it('enables add button when all FAQ pairs are valid', () => {
             const faqPairs = [createFaqQuestion({ id: 1, questionText: 'Valid Question', answerText: 'Valid Answer' })];
-            renderComponent({ mode: ProgramSectionMode.Edit, faqPairs });
+            renderComponent({ mode: SectionMode.Edit, faqPairs });
 
             expect(screen.getByTestId('add-faq-button')).not.toBeDisabled();
         });
@@ -334,10 +334,10 @@ describe('FaqProgramSection', () => {
 
     describe('CSS classes', () => {
         it('applies correct CSS classes for each mode', () => {
-            const { container: viewContainer } = renderComponent({ mode: ProgramSectionMode.View });
+            const { container: viewContainer } = renderComponent({ mode: SectionMode.View });
             expect(viewContainer.querySelector('.faq-section')).toBeInTheDocument();
 
-            const { container: editContainer } = renderComponent({ mode: ProgramSectionMode.Edit });
+            const { container: editContainer } = renderComponent({ mode: SectionMode.Edit });
             expect(editContainer.querySelector('.editable')).toBeInTheDocument();
         });
     });

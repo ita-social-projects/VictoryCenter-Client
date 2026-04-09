@@ -2,8 +2,8 @@ import React from 'react';
 import {
     FaqSectionQuestionDto,
     CreateProgramSectionContentDto,
-    ProgramSectionTemplate,
-    ProgramSectionMode,
+    SectionTemplate,
+    SectionMode,
 } from '@/types/common/program-sections';
 import { ImageValues, Image } from '@/types/common/image';
 import { ContentType } from '@/types/common/programs';
@@ -60,9 +60,9 @@ export interface ProgramSectionHandlers {
 }
 
 export interface RenderProgramSectionParams {
-    templateId: ProgramSectionTemplate;
+    templateId: SectionTemplate;
     data: ProgramSectionData;
-    mode?: ProgramSectionMode;
+    mode?: SectionMode;
     handlers?: ProgramSectionHandlers;
     validationResetKey?: number;
 }
@@ -96,32 +96,32 @@ const createCardContents = (cardCount: number): CreateProgramSectionContentDto[]
         }),
     );
 
-const IMAGE_COUNT_MAP: Partial<Record<ProgramSectionTemplate, number>> = {
-    [ProgramSectionTemplate.TextOnly]: 0,
-    [ProgramSectionTemplate.SingleImageTop]: 1,
-    [ProgramSectionTemplate.SingleImageBottom]: 1,
-    [ProgramSectionTemplate.SingleImageRight]: 1,
-    [ProgramSectionTemplate.DualImagesBottom]: 2,
-    [ProgramSectionTemplate.TripleImagesBottom]: 3,
-    [ProgramSectionTemplate.QuadImagesBottom]: 4,
+const IMAGE_COUNT_MAP: Partial<Record<SectionTemplate, number>> = {
+    [SectionTemplate.TextOnly]: 0,
+    [SectionTemplate.SingleImageTop]: 1,
+    [SectionTemplate.SingleImageBottom]: 1,
+    [SectionTemplate.SingleImageRight]: 1,
+    [SectionTemplate.DualImagesBottom]: 2,
+    [SectionTemplate.TripleImagesBottom]: 3,
+    [SectionTemplate.QuadImagesBottom]: 4,
 };
 
-const CARD_COUNT_MAP: Partial<Record<ProgramSectionTemplate, number>> = {
-    [ProgramSectionTemplate.DualTitleDescriptionPairs]: 2,
-    [ProgramSectionTemplate.TripleTitleDescriptionPairs]: 3,
-    [ProgramSectionTemplate.QuadTitleDescriptionPairs]: 4,
+const CARD_COUNT_MAP: Partial<Record<SectionTemplate, number>> = {
+    [SectionTemplate.DualTitleDescriptionPairs]: 2,
+    [SectionTemplate.TripleTitleDescriptionPairs]: 3,
+    [SectionTemplate.QuadTitleDescriptionPairs]: 4,
 };
 
-const SINGLE_IMAGE_TEMPLATES = new Set<ProgramSectionTemplate>([
-    ProgramSectionTemplate.SingleImageTop,
-    ProgramSectionTemplate.SingleImageBottom,
-    ProgramSectionTemplate.SingleImageRight,
+const SINGLE_IMAGE_TEMPLATES = new Set<SectionTemplate>([
+    SectionTemplate.SingleImageTop,
+    SectionTemplate.SingleImageBottom,
+    SectionTemplate.SingleImageRight,
 ]);
 
 interface StandardTemplateProps {
     title?: string;
     description?: string;
-    mode?: ProgramSectionMode;
+    mode?: SectionMode;
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
     validationResetKey?: number;
@@ -138,19 +138,19 @@ type StandardTemplateComponentProps =
       });
 
 const STANDARD_TEMPLATES_MAP: Partial<
-    Record<ProgramSectionTemplate, React.ComponentType<StandardTemplateComponentProps>>
+    Record<SectionTemplate, React.ComponentType<StandardTemplateComponentProps>>
 > = {
-    [ProgramSectionTemplate.TextOnly]: TextOnly,
-    [ProgramSectionTemplate.SingleImageTop]: SingleImageTop,
-    [ProgramSectionTemplate.SingleImageBottom]: SingleImageBottom,
-    [ProgramSectionTemplate.SingleImageRight]: SingleImageRight,
-    [ProgramSectionTemplate.DualImagesBottom]: DualImagesBottom,
-    [ProgramSectionTemplate.TripleImagesBottom]: TripleImagesBottom,
-    [ProgramSectionTemplate.QuadImagesBottom]: QuadImagesBottom,
+    [SectionTemplate.TextOnly]: TextOnly,
+    [SectionTemplate.SingleImageTop]: SingleImageTop,
+    [SectionTemplate.SingleImageBottom]: SingleImageBottom,
+    [SectionTemplate.SingleImageRight]: SingleImageRight,
+    [SectionTemplate.DualImagesBottom]: DualImagesBottom,
+    [SectionTemplate.TripleImagesBottom]: TripleImagesBottom,
+    [SectionTemplate.QuadImagesBottom]: QuadImagesBottom,
 };
 
-export const getInitialSectionContents = (templateId: ProgramSectionTemplate): CreateProgramSectionContentDto[] => {
-    if (templateId === ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs) {
+export const getInitialSectionContents = (templateId: SectionTemplate): CreateProgramSectionContentDto[] => {
+    if (templateId === SectionTemplate.SingleTitleDescriptionAuthorPairs) {
         return [
             createItem(ContentType.Title, 0, {
                 title: PROGRAMS_TEXT.SECTION.SINGLE_TITLE_DESCRIPTION_AUTHOR_PAIRS.DEFAULT_TITLE,
@@ -160,7 +160,7 @@ export const getInitialSectionContents = (templateId: ProgramSectionTemplate): C
         ];
     }
 
-    if (templateId === ProgramSectionTemplate.SingleTitleQuestionAnswerPairs) {
+    if (templateId === SectionTemplate.SingleTitleQuestionAnswerPairs) {
         return [
             createItem(ContentType.Title, 0, {
                 title: COMMON_TEXT_ADMIN.TAB.FAQ,
@@ -178,7 +178,7 @@ export const getInitialSectionContents = (templateId: ProgramSectionTemplate): C
     const cardCount = CARD_COUNT_MAP[templateId];
     if (cardCount) return createCardContents(cardCount);
 
-    if (templateId === ProgramSectionTemplate.SingleTitleQuintupleDescription) {
+    if (templateId === SectionTemplate.SingleTitleQuintupleDescription) {
         return [
             createItem(ContentType.Title, 0),
             ...Array.from({ length: 5 }, (_, i) => createItem(ContentType.Description, i + 1)),
@@ -192,7 +192,7 @@ export const getInitialSectionContents = (templateId: ProgramSectionTemplate): C
 export const renderProgramSection = ({
     templateId,
     data,
-    mode = ProgramSectionMode.View,
+    mode = SectionMode.View,
     handlers,
     validationResetKey,
 }: RenderProgramSectionParams): React.ReactElement | null => {
@@ -210,7 +210,7 @@ export const renderProgramSection = ({
         );
     }
 
-    if (templateId === ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs) {
+    if (templateId === SectionTemplate.SingleTitleDescriptionAuthorPairs) {
         return (
             <SingleTitleDescriptionAuthorPairs
                 title={data.title}
@@ -226,7 +226,7 @@ export const renderProgramSection = ({
         );
     }
 
-    if (templateId === ProgramSectionTemplate.SingleTitleQuestionAnswerPairs) {
+    if (templateId === SectionTemplate.SingleTitleQuestionAnswerPairs) {
         return (
             <FaqProgramSection
                 questions={data.faqQuestions ?? []}
@@ -244,7 +244,7 @@ export const renderProgramSection = ({
         );
     }
 
-    if (templateId === ProgramSectionTemplate.SingleTitleQuintupleDescription) {
+    if (templateId === SectionTemplate.SingleTitleQuintupleDescription) {
         const descriptions = data.descriptions ?? (data.description ? [data.description] : []);
 
         return (

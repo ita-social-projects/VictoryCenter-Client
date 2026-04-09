@@ -7,7 +7,7 @@ import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { VisibilityStatus } from '@/types/admin/common';
 import { CreateHippotherapyProgramSectionLocalizationDto } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
-import { ProgramSectionTemplate } from '@/types/common/program-sections';
+import { SectionTemplate } from '@/types/common/program-sections';
 
 const createFormControlMock = (element: 'input' | 'textarea') => {
     return ({ value, onChange, onBlur, disabled, id, error }: any) => {
@@ -125,7 +125,7 @@ jest.mock('@/components/public/background-media', () => ({
 
 const SOURCE_SECTION = {
     id: 42,
-    template: ProgramSectionTemplate.TextOnly,
+    template: SectionTemplate.TextOnly,
     order: 0,
     contents: [
         {
@@ -166,7 +166,7 @@ const SAMPLE_SECTION = {
 
 const COMPLEX_SOURCE_SECTION = {
     id: 52,
-    template: ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
+    template: SectionTemplate.SingleTitleDescriptionAuthorPairs,
     order: 0,
     contents: [
         {
@@ -276,7 +276,7 @@ const FIELD_IDS = {
 
 const EDGE_SOURCE_SECTION = {
     id: 77,
-    template: ProgramSectionTemplate.TextOnly,
+    template: SectionTemplate.TextOnly,
     order: 0,
     contents: [
         {
@@ -374,7 +374,7 @@ const EDGE_SECTION = {
 
 const NOOP_SOURCE_SECTION = {
     id: 88,
-    template: ProgramSectionTemplate.TextOnly,
+    template: SectionTemplate.TextOnly,
     order: 0,
     contents: [
         {
@@ -758,7 +758,7 @@ describe('TranslateProgramForm', () => {
             entityId: 66,
             __sourceSection: {
                 id: 66,
-                template: ProgramSectionTemplate.TextOnly,
+                template: SectionTemplate.TextOnly,
                 order: 0,
                 contents: [
                     {

@@ -7,7 +7,7 @@ import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { useCardValidation } from '@/hooks/admin/use-section-card-validation/useCardValidation';
 import { TitleDescriptionCardData } from './TitleDescriptionCardsSection';
-import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
+import { SectionMode, SectionTemplate } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 import styles from './TitleDescriptionCardsSection.module.scss';
 import {
@@ -18,8 +18,8 @@ import {
 interface TitleDescriptionCardProps {
     card: TitleDescriptionCardData;
     index: number;
-    template: ProgramSectionTemplate;
-    mode?: ProgramSectionMode;
+    template: SectionTemplate;
+    mode?: SectionMode;
     onTitleChange?: (index: number, value: string) => void;
     onDescriptionChange?: (index: number, value: string) => void;
     validationResetKey?: number;
@@ -29,7 +29,7 @@ export const TitleDescriptionCard = ({
     card,
     index,
     template,
-    mode = ProgramSectionMode.View,
+    mode = SectionMode.View,
     onTitleChange,
     onDescriptionChange,
     validationResetKey,
@@ -69,7 +69,7 @@ export const TitleDescriptionCard = ({
 
     const { intro, items } = parseDescriptionList(card.description);
 
-    if (mode === ProgramSectionMode.Edit) {
+    if (mode === SectionMode.Edit) {
         return (
             <div className={cn(styles['td-card'], styles['td-card--editable'])}>
                 <div className={styles['title-field']}>
@@ -111,14 +111,14 @@ export const TitleDescriptionCard = ({
         <div className={styles['td-card']}>
             <h3
                 className={cn(styles['title'], {
-                    [styles['title--template']]: mode === ProgramSectionMode.Template,
+                    [styles['title--template']]: mode === SectionMode.Template,
                 })}
             >
                 {card.title || PROGRAMS_TEXT.SECTION.CARD.FORM.TITLE.TEXT}
             </h3>
             <div
                 className={cn(styles['description'], {
-                    [styles['description--template']]: mode === ProgramSectionMode.Template,
+                    [styles['description--template']]: mode === SectionMode.Template,
                 })}
             >
                 {intro && <p>{intro}</p>}

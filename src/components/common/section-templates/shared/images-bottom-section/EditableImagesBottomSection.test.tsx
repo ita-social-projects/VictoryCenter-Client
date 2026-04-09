@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { EditableImagesBottomSection } from './EditableImagesBottomSection';
-import { ProgramSectionMode } from '@/types/common/program-sections';
+import { SectionMode } from '@/types/common/program-sections';
 import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 
 const photoCalls: any[] = [];
@@ -77,7 +77,7 @@ describe('EditableImagesBottomSection', () => {
             ],
             imageKeys: ['i0', 'i1'],
             config,
-            mode: ProgramSectionMode.Edit,
+            mode: SectionMode.Edit,
             errors: ['', 'E1'],
             onSetError: jest.fn(),
             ...override,
@@ -87,14 +87,14 @@ describe('EditableImagesBottomSection', () => {
     };
 
     it('renders PhotoInputGroup list in edit mode', () => {
-        renderComponent({ mode: ProgramSectionMode.Edit });
+        renderComponent({ mode: SectionMode.Edit });
 
         expect(screen.getByTestId('photo-section-image-1')).toBeInTheDocument();
         expect(screen.getByTestId('photo-section-image-2')).toBeInTheDocument();
     });
 
     it('sets data-elevated for elevated indices in edit mode', () => {
-        renderComponent({ mode: ProgramSectionMode.Edit });
+        renderComponent({ mode: SectionMode.Edit });
 
         const wrappers = screen.getAllByTestId('image-wrapper');
         expect(wrappers[1]).toHaveAttribute('data-elevated', 'true');
@@ -104,7 +104,7 @@ describe('EditableImagesBottomSection', () => {
     it('uses handler when provided and no-op when missing', () => {
         const handler0 = jest.fn();
         renderComponent({
-            mode: ProgramSectionMode.Edit,
+            mode: SectionMode.Edit,
             imageHandlers: [
                 { key: 'k0', value: null, handler: handler0 },
                 { key: 'k1', value: null, handler: undefined },
@@ -119,14 +119,14 @@ describe('EditableImagesBottomSection', () => {
 
     it('maps PhotoInputGroup setError into onSetError with index', () => {
         const onSetError = jest.fn();
-        renderComponent({ mode: ProgramSectionMode.Edit, onSetError });
+        renderComponent({ mode: SectionMode.Edit, onSetError });
 
         fireEvent.click(screen.getByTestId('photo-error-section-image-2'));
         expect(onSetError).toHaveBeenCalledWith(1, 'ERR');
     });
 
     it('disables PhotoInputGroup in view mode', () => {
-        renderComponent({ mode: ProgramSectionMode.View });
+        renderComponent({ mode: SectionMode.View });
 
         expect(photoCalls[0].disabled).toBe(true);
         expect(photoCalls[1].disabled).toBe(true);
@@ -136,7 +136,7 @@ describe('EditableImagesBottomSection', () => {
         (getImageSrc as jest.Mock).mockReturnValueOnce('src-1').mockReturnValueOnce('');
 
         renderComponent({
-            mode: ProgramSectionMode.Template,
+            mode: SectionMode.Template,
             images: [{ url: 'u', mimeType: 'image/png', id: 1 } as any, null],
             imageKeys: ['a', 'b'],
         });
@@ -153,7 +153,7 @@ describe('EditableImagesBottomSection', () => {
         const { container } = renderComponent({
             bottomSectionClassName: 'bottom-extra',
             imageWrapperClassName: 'wrap-extra',
-            mode: ProgramSectionMode.Edit,
+            mode: SectionMode.Edit,
         });
 
         expect(container.firstChild).toHaveClass('bottom-extra');

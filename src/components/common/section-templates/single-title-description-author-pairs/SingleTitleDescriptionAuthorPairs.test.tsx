@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { SingleTitleDescriptionAuthorPairs } from './SingleTitleDescriptionAuthorPairs';
-import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
+import { SectionMode, SectionTemplate } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 
 const mockCardCarousel = jest.fn();
@@ -143,7 +143,7 @@ const renderComponent = (overrideProps: Partial<ComponentProps> = {}) => {
     const defaultProps: ComponentProps = {
         title: '',
         pairs: [],
-        mode: ProgramSectionMode.View,
+        mode: SectionMode.View,
         canAddPair: true,
     };
 
@@ -184,7 +184,7 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
     it('renders title input in edit mode, uppercases on change, and does not validate when no error yet', () => {
         const onTitleChange = jest.fn();
         const { root } = renderComponent({
-            mode: ProgramSectionMode.Edit,
+            mode: SectionMode.Edit,
             title: 'Edit',
             onTitleChange,
         });
@@ -208,7 +208,7 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
     });
 
     it('does not render title input in View mode', () => {
-        renderComponent({ mode: ProgramSectionMode.View, title: 'X' });
+        renderComponent({ mode: SectionMode.View, title: 'X' });
 
         expect(screen.queryByTestId('input-single-title-description-author-pairs-title')).not.toBeInTheDocument();
         expect(getValidateContentTextMock().mock.calls.length).toBe(0);
@@ -217,7 +217,7 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
     it('validates title on blur and re-validates on change when error already exists (with correct args)', async () => {
         const onTitleChange = jest.fn();
 
-        renderComponent({ mode: ProgramSectionMode.Edit, title: '', onTitleChange });
+        renderComponent({ mode: SectionMode.Edit, title: '', onTitleChange });
 
         const validateContentText = getValidateContentTextMock();
         validateContentText.mockReturnValueOnce('ERR_TITLE');
@@ -235,7 +235,7 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
             '',
             ContentType.Title,
             true,
-            ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
+            SectionTemplate.SingleTitleDescriptionAuthorPairs,
         ]);
 
         fireEvent.change(screen.getByTestId('input-single-title-description-author-pairs-title'), {
@@ -254,13 +254,13 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
             'ABC',
             ContentType.Title,
             true,
-            ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
+            SectionTemplate.SingleTitleDescriptionAuthorPairs,
         ]);
     });
 
     it('normalizes template pairs to 5 and uses sample values for missing items', () => {
         const { root } = renderComponent({
-            mode: ProgramSectionMode.Template,
+            mode: SectionMode.Template,
             pairs: pairs(pair('D0', 'A0')),
         });
 
@@ -282,21 +282,21 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
     });
 
     it('renders add button only in edit mode and respects canAddPair', () => {
-        const view = renderComponent({ mode: ProgramSectionMode.View });
+        const view = renderComponent({ mode: SectionMode.View });
         expect(screen.queryByRole('button', { name: 'Add block' })).not.toBeInTheDocument();
         view.unmount();
 
         const onAddPair = jest.fn();
 
         const utils = renderComponent({
-            mode: ProgramSectionMode.Edit,
+            mode: SectionMode.Edit,
             onAddPair,
             canAddPair: false,
         });
         expect(screen.getByRole('button', { name: 'Add block' })).toBeDisabled();
         utils.unmount();
 
-        renderComponent({ mode: ProgramSectionMode.Edit, onAddPair, canAddPair: true });
+        renderComponent({ mode: SectionMode.Edit, onAddPair, canAddPair: true });
         fireEvent.click(screen.getByRole('button', { name: 'Add block' }));
         expect(onAddPair).toHaveBeenCalledTimes(1);
     });
@@ -307,7 +307,7 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
         const onDeletePair = jest.fn();
 
         renderComponent({
-            mode: ProgramSectionMode.Edit,
+            mode: SectionMode.Edit,
             pairs: pairs(pair('D0', 'A0'), pair('D1', 'A1')),
             onPairDescriptionChange,
             onPairAuthorChange,
@@ -330,7 +330,7 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
 
         {
             const view = renderComponent({
-                mode: ProgramSectionMode.View,
+                mode: SectionMode.View,
                 pairs: pairs(pair('D0', 'A0'), pair('D1', 'A1')),
                 onDeletePair,
             });
@@ -347,7 +347,7 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
 
         {
             const view = renderComponent({
-                mode: ProgramSectionMode.Edit,
+                mode: SectionMode.Edit,
                 pairs: pairs(pair('D0', 'A0'), pair('D1', 'A1')),
             });
 
@@ -362,7 +362,7 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
 
         {
             const view = renderComponent({
-                mode: ProgramSectionMode.Edit,
+                mode: SectionMode.Edit,
                 pairs: pairs(pair('D0', 'A0')),
                 onDeletePair,
             });
@@ -382,7 +382,7 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
         const onDeletePair = jest.fn();
 
         renderComponent({
-            mode: ProgramSectionMode.Edit,
+            mode: SectionMode.Edit,
             pairs: pairs(pair('D0', 'A0'), pair('D1', 'A1')),
             onDeletePair,
         });
@@ -411,17 +411,17 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
     });
 
     it('calls getProgramSectionTemplateMaxLength for title', () => {
-        renderComponent({ mode: ProgramSectionMode.Edit });
+        renderComponent({ mode: SectionMode.Edit });
 
         const getProgramSectionTemplateMaxLength = getTemplateMaxLengthMock();
         expect(getProgramSectionTemplateMaxLength).toHaveBeenCalledWith(
-            ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
+            SectionTemplate.SingleTitleDescriptionAuthorPairs,
             ContentType.Title,
         );
     });
 
     it('does not crash on title change without onTitleChange', () => {
-        renderComponent({ mode: ProgramSectionMode.Edit });
+        renderComponent({ mode: SectionMode.Edit });
 
         fireEvent.change(screen.getByTestId('input-single-title-description-author-pairs-title'), {
             target: { value: 'x' },

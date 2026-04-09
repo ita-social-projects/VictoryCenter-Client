@@ -2,7 +2,7 @@ import cn from 'classnames';
 import { ImagesBottomSection } from '../shared/images-bottom-section/ImagesBottomSection';
 import { ImageValues, Image } from '@/types/common/image';
 import { QUAD_IMAGES_CONFIG } from '@/const/admin/programs';
-import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
+import { SectionMode, SectionTemplate } from '@/types/common/program-sections';
 import styles from './QuadImagesBottom.module.scss';
 import viewStyles from './ViewQuadImagesBottom.module.scss';
 
@@ -10,7 +10,7 @@ export interface QuadImagesBottomProps {
     title?: string;
     description?: string;
     images?: (Image | ImageValues | null)[];
-    mode?: ProgramSectionMode;
+    mode?: SectionMode;
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
     onImagesChange?: (index: number, file: ImageValues | null) => void;
@@ -21,13 +21,13 @@ export const QuadImagesBottom = ({
     title = '',
     description = '',
     images = [null, null, null, null],
-    mode = ProgramSectionMode.View,
+    mode = SectionMode.View,
     onTitleChange,
     onDescriptionChange,
     onImagesChange,
     validationResetKey,
 }: QuadImagesBottomProps) => {
-    const baseStyles = mode === ProgramSectionMode.View ? viewStyles : styles;
+    const baseStyles = mode === SectionMode.View ? viewStyles : styles;
     const imageHandlers = images.map((image, index) => ({
         handler: onImagesChange ? (file: ImageValues | null) => onImagesChange(index, file) : undefined,
         key: `image${index + 1}`,
@@ -36,7 +36,7 @@ export const QuadImagesBottom = ({
 
     return (
         <ImagesBottomSection
-            template={ProgramSectionTemplate.QuadImagesBottom}
+            template={SectionTemplate.QuadImagesBottom}
             title={title}
             description={description}
             images={images}
@@ -47,8 +47,8 @@ export const QuadImagesBottom = ({
             onDescriptionChange={onDescriptionChange}
             validationResetKey={validationResetKey}
             className={cn(baseStyles.container, {
-                [styles.template]: mode === ProgramSectionMode.Template,
-                [styles['form-container']]: mode === ProgramSectionMode.Edit,
+                [styles.template]: mode === SectionMode.Template,
+                [styles['form-container']]: mode === SectionMode.Edit,
             })}
             bottomSectionClassName={baseStyles['bottom-section']}
             imageWrapperClassName={baseStyles['image-wrapper']}

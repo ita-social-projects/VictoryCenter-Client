@@ -1,34 +1,34 @@
 import cn from 'classnames';
 import { TitleDescriptionSection } from '@/components/common/section-templates/shared/title-description-section/TitleDescriptionSection';
-import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
+import { SectionMode, SectionTemplate } from '@/types/common/program-sections';
 import styles from './TextOnly.module.scss';
 
 export interface TextOnlyProps {
     title?: string;
     description?: string;
     className?: string;
-    mode?: ProgramSectionMode;
+    mode?: SectionMode;
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
     validationResetKey?: number;
 }
 
 export const TextOnly = (props: TextOnlyProps) => {
-    const { className = '', mode = ProgramSectionMode.View } = props;
+    const { className = '', mode = SectionMode.View } = props;
     return (
         <TitleDescriptionSection
             {...props}
-            template={ProgramSectionTemplate.TextOnly}
+            template={SectionTemplate.TextOnly}
             className={cn(
-                mode === ProgramSectionMode.View ? '' : styles.container,
+                mode === SectionMode.View ? '' : styles.container,
                 {
-                    [styles.template]: mode === ProgramSectionMode.Template,
-                    [styles['form-container']]: mode === ProgramSectionMode.Edit,
+                    [styles.template]: mode === SectionMode.Template,
+                    [styles['form-container']]: mode === SectionMode.Edit,
                 },
                 className,
             )}
-            titleClassName={mode === ProgramSectionMode.Template ? styles['title-template'] : ''}
-            descriptionClassName={mode === ProgramSectionMode.Template ? styles['description-template'] : ''}
+            titleClassName={mode === SectionMode.Template ? styles['title-template'] : ''}
+            descriptionClassName={mode === SectionMode.Template ? styles['description-template'] : ''}
         />
     );
 };

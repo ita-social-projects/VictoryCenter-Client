@@ -9,7 +9,7 @@ import { ReactComponent as ArrowLeft } from '@/assets/icons/arrow-left.svg';
 import { ReactComponent as ArrowRight } from '@/assets/icons/arrow-right.svg';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import { CardCarousel } from './card-carousel/CardCarousel';
-import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
+import { SectionMode, SectionTemplate } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
 import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
@@ -24,7 +24,7 @@ export interface DescriptionAuthorPairData {
 export interface SingleTitleDescriptionAuthorPairsProps {
     title?: string;
     pairs?: DescriptionAuthorPairData[];
-    mode?: ProgramSectionMode;
+    mode?: SectionMode;
     onTitleChange?: (value: string) => void;
     onPairDescriptionChange?: (index: number, value: string) => void;
     onPairAuthorChange?: (index: number, value: string) => void;
@@ -34,12 +34,12 @@ export interface SingleTitleDescriptionAuthorPairsProps {
 }
 
 const TEMPLATE_PAIRS_COUNT = 5;
-const TEMPLATE = ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs;
+const TEMPLATE = SectionTemplate.SingleTitleDescriptionAuthorPairs;
 
 export const SingleTitleDescriptionAuthorPairs = ({
     title = '',
     pairs = [],
-    mode = ProgramSectionMode.View,
+    mode = SectionMode.View,
     onTitleChange,
     onPairDescriptionChange,
     onPairAuthorChange,
@@ -47,8 +47,8 @@ export const SingleTitleDescriptionAuthorPairs = ({
     onDeletePair,
     canAddPair = true,
 }: SingleTitleDescriptionAuthorPairsProps) => {
-    const isEditable = mode === ProgramSectionMode.Edit;
-    const isTemplate = mode === ProgramSectionMode.Template;
+    const isEditable = mode === SectionMode.Edit;
+    const isTemplate = mode === SectionMode.Template;
 
     const [titleError, setTitleError] = useState<string | undefined>(undefined);
     const [pendingDeletePairIndex, setPendingDeletePairIndex] = useState<number | null>(null);

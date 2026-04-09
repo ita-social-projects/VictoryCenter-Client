@@ -5,16 +5,16 @@ import {
     getProgramSectionTemplateMinLength,
     normalizeGroupedContentsGroupIndexes,
 } from './programSectionTemplateValidation';
-import { ProgramSectionTemplate } from '@/types/common/program-sections';
+import { SectionTemplate } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 
 jest.mock('@/const/admin/programs', () => {
-    const { ProgramSectionTemplate } = require('@/types/common/program-sections');
+    const { SectionTemplate } = require('@/types/common/program-sections');
     const { ContentType } = require('@/types/common/programs');
 
     return {
         PROGRAM_SECTION_TEMPLATE_VALIDATION: {
-            [ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs]: {
+            [SectionTemplate.SingleTitleDescriptionAuthorPairs]: {
                 lengths: {
                     [ContentType.Title]: { min: 3, max: 10 },
                 },
@@ -26,8 +26,8 @@ jest.mock('@/const/admin/programs', () => {
     };
 });
 
-const TEMPLATE_WITH_RULES = ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs;
-const MISSING_TEMPLATE = 'MISSING_TEMPLATE' as any as ProgramSectionTemplate;
+const TEMPLATE_WITH_RULES = SectionTemplate.SingleTitleDescriptionAuthorPairs;
+const MISSING_TEMPLATE = 'MISSING_TEMPLATE' as any as SectionTemplate;
 const MISSING_TYPE = 'MISSING_TYPE' as any as ContentType;
 
 const content = (contentType: ContentType, groupIndex: number | null | undefined) =>

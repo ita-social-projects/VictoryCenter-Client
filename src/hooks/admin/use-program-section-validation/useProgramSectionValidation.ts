@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
-import { ProgramSectionTemplate } from '@/types/common/program-sections';
+import { SectionTemplate } from '@/types/common/program-sections';
 
 export interface UseProgramSectionValidationReturn {
     titleError: string | undefined;
@@ -13,7 +13,7 @@ export interface UseProgramSectionValidationReturn {
 }
 
 export interface UseProgramSectionValidationProps {
-    template: ProgramSectionTemplate;
+    template: SectionTemplate;
     isPublishing?: boolean;
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;

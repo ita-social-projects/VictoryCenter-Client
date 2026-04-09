@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ContentType } from '@/types/common/programs';
-import { ProgramSectionTemplate } from '@/types/common/program-sections';
+import { SectionTemplate } from '@/types/common/program-sections';
 
 import { DescriptionAuthorPairCard } from './DescriptionAuthorPairCard';
 import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
@@ -151,14 +151,14 @@ describe('DescriptionAuthorPairCard', () => {
             '',
             ContentType.Description,
             true,
-            ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
+            SectionTemplate.SingleTitleDescriptionAuthorPairs,
         );
         expect(validateContentTextMock).toHaveBeenNthCalledWith(
             2,
             '',
             ContentType.Author,
             true,
-            ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
+            SectionTemplate.SingleTitleDescriptionAuthorPairs,
         );
 
         await waitFor(() => {

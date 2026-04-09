@@ -27,7 +27,7 @@ export enum ProgramSectionType {
     Author,
 }
 
-export enum ProgramSectionTemplate {
+export enum SectionTemplate {
     QuadImagesBottom = 1,
     DualImagesBottom = 2,
     TextOnly = 3,
@@ -43,7 +43,7 @@ export enum ProgramSectionTemplate {
     SingleTitleQuestionAnswerPairs = 13,
 }
 
-export enum ProgramSectionMode {
+export enum SectionMode {
     Template = 'template',
     Edit = 'edit',
     View = 'view',
@@ -91,7 +91,7 @@ export interface HippotherapyProgramSectionContent
 export interface HippotherapyProgramSectionDto {
     id?: number;
     programId?: number;
-    template: ProgramSectionTemplate;
+    template: SectionTemplate;
     order: number;
     contents: HippotherapyProgramSectionContentDto[];
 }
@@ -131,7 +131,7 @@ export interface CreateProgramSectionContentLocalizationDto {
 export interface CreateHippotherapyProgramSectionDto {
     id?: number;
     programId?: number;
-    template: ProgramSectionTemplate;
+    template: SectionTemplate;
     order: number;
     contents: CreateProgramSectionContentDto[];
 }

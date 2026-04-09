@@ -7,7 +7,7 @@ import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 import { PROGRAMS_TEXT, PROGRAM_SECTION_IMAGE_CONFIGS, PROGRAM_VALIDATION } from '@/const/admin/programs';
 import { useProgramSectionValidation } from '@/hooks/admin/use-program-section-validation';
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
-import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
+import { SectionMode, SectionTemplate } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 import { useImageError } from '@/hooks/common/use-image-error/useImageError';
 import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
@@ -18,27 +18,27 @@ export interface SingleImageRightProps {
     title?: string;
     description?: string;
     image?: Image | ImageValues | null;
-    mode?: ProgramSectionMode;
+    mode?: SectionMode;
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
     onImageChange?: (file: ImageValues | null) => void;
     validationResetKey?: number;
 }
 
-const TEMPLATE = ProgramSectionTemplate.SingleImageRight;
+const TEMPLATE = SectionTemplate.SingleImageRight;
 
 export const SingleImageRight = ({
     title = '',
     description = '',
     image = null,
-    mode = ProgramSectionMode.View,
+    mode = SectionMode.View,
     onTitleChange,
     onDescriptionChange,
     onImageChange,
     validationResetKey,
 }: SingleImageRightProps) => {
     const imageSrc = getImageSrc(image);
-    const baseStyles = mode === ProgramSectionMode.View ? viewStyles : styles;
+    const baseStyles = mode === SectionMode.View ? viewStyles : styles;
 
     const {
         titleError,
@@ -62,11 +62,11 @@ export const SingleImageRight = ({
     return (
         <div
             className={cn(baseStyles.container, {
-                [styles.template]: mode === ProgramSectionMode.Template,
-                [styles['form-container']]: mode === ProgramSectionMode.Edit,
+                [styles.template]: mode === SectionMode.Template,
+                [styles['form-container']]: mode === SectionMode.Edit,
             })}
         >
-            {mode === ProgramSectionMode.Edit ? (
+            {mode === SectionMode.Edit ? (
                 <>
                     <div className={baseStyles['left-section']}>
                         <div className={baseStyles['title-section']}>

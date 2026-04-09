@@ -1,6 +1,6 @@
 import cn from 'classnames';
 import { TitleDescriptionCard } from './TitleDescriptionCard';
-import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
+import { SectionMode, SectionTemplate } from '@/types/common/program-sections';
 import { getProgramSectionTemplateMaxGroupCount } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
 import styles from './TitleDescriptionCardsSection.module.scss';
 
@@ -12,26 +12,26 @@ export interface TitleDescriptionCardData {
 interface Props {
     cards: TitleDescriptionCardData[];
     cardsCount: number;
-    mode?: ProgramSectionMode;
+    mode?: SectionMode;
     onTitleChange?: (index: number, value: string) => void;
     onDescriptionChange?: (index: number, value: string) => void;
     validationResetKey?: number;
 }
 
 const PAIRS_TEMPLATES = [
-    ProgramSectionTemplate.DualTitleDescriptionPairs,
-    ProgramSectionTemplate.TripleTitleDescriptionPairs,
-    ProgramSectionTemplate.QuadTitleDescriptionPairs,
+    SectionTemplate.DualTitleDescriptionPairs,
+    SectionTemplate.TripleTitleDescriptionPairs,
+    SectionTemplate.QuadTitleDescriptionPairs,
 ] as const;
 
-const resolvePairsTemplateByCardsCount = (cardsCount: number): ProgramSectionTemplate =>
+const resolvePairsTemplateByCardsCount = (cardsCount: number): SectionTemplate =>
     PAIRS_TEMPLATES.find((t) => getProgramSectionTemplateMaxGroupCount(t) === cardsCount) ??
-    ProgramSectionTemplate.DualTitleDescriptionPairs;
+    SectionTemplate.DualTitleDescriptionPairs;
 
 export const TitleDescriptionCardsSection = ({
     cards,
     cardsCount,
-    mode = ProgramSectionMode.View,
+    mode = SectionMode.View,
     onTitleChange,
     onDescriptionChange,
     validationResetKey,
@@ -48,8 +48,8 @@ export const TitleDescriptionCardsSection = ({
                 [styles['td-cards--dual']]: cardsCount === 2,
                 [styles['td-cards--triple']]: cardsCount === 3,
                 [styles['td-cards--quad']]: cardsCount === 4,
-                [styles['td-cards--editable']]: mode === ProgramSectionMode.Edit,
-                [styles['td-cards--template']]: mode === ProgramSectionMode.Template,
+                [styles['td-cards--editable']]: mode === SectionMode.Edit,
+                [styles['td-cards--template']]: mode === SectionMode.Template,
             })}
         >
             {normalizedCards.map((card, index) => (

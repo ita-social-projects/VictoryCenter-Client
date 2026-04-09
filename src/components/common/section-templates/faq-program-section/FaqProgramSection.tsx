@@ -8,7 +8,7 @@ import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { useProgramSectionValidation } from '@/hooks/admin/use-program-section-validation';
 import { PublishedFaqQuestion } from '@/types/public/faq-section';
-import { FaqSectionQuestionDto, ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
+import { FaqSectionQuestionDto, SectionMode, SectionTemplate } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
@@ -22,7 +22,7 @@ const { validateFaqQuestion, validateFaqAnswer } = PROGRAM_SECTION_VALIDATION_FU
 
 export interface FaqProgramSectionProps {
     questions?: PublishedFaqQuestion[];
-    mode?: ProgramSectionMode;
+    mode?: SectionMode;
     title?: string;
     onTitleChange?: (value: string) => void;
     faqPairs?: FaqSectionQuestionDto[];
@@ -34,11 +34,11 @@ export interface FaqProgramSectionProps {
     canAddFaqPair?: boolean;
 }
 
-const TEMPLATE = ProgramSectionTemplate.SingleTitleQuestionAnswerPairs;
+const TEMPLATE = SectionTemplate.SingleTitleQuestionAnswerPairs;
 
 export const FaqProgramSection = ({
     questions = [],
-    mode = ProgramSectionMode.View,
+    mode = SectionMode.View,
     title,
     onTitleChange,
     faqPairs = [],
@@ -53,8 +53,8 @@ export const FaqProgramSection = ({
     const idPrefix = useId();
 
     const displayTitle = title || t('COMMON_QUESTIONS');
-    const isTemplate = mode === ProgramSectionMode.Template;
-    const isEditable = mode === ProgramSectionMode.Edit;
+    const isTemplate = mode === SectionMode.Template;
+    const isEditable = mode === SectionMode.Edit;
 
     const titleMaxLength = getProgramSectionTemplateMaxLength(TEMPLATE, ContentType.Title);
 
@@ -117,7 +117,7 @@ export const FaqProgramSection = ({
         }));
     }, [questions, faqPairs]);
 
-    const baseStyles = mode === ProgramSectionMode.View ? viewStyles : styles;
+    const baseStyles = mode === SectionMode.View ? viewStyles : styles;
 
     const rootClassName = cn(baseStyles['faq-section'], {
         [styles['template']]: isTemplate,

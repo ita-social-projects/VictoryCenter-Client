@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { TitleDescriptionCard } from './TitleDescriptionCard';
-import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
+import { SectionMode, SectionTemplate } from '@/types/common/program-sections';
 import { useCardValidation } from '@/hooks/admin/use-section-card-validation/useCardValidation';
 
 jest.mock('@/hooks/admin/use-section-card-validation/useCardValidation', () => ({
@@ -19,7 +19,7 @@ jest.mock('./CardDescriptionField', () => ({
 }));
 
 jest.mock('@/utils/functions/program-section-template-validation/programSectionTemplateValidation', () => ({
-    getProgramSectionTemplateMaxLength: jest.fn((_: ProgramSectionTemplate, type: number) => (type === 0 ? 30 : 120)),
+    getProgramSectionTemplateMaxLength: jest.fn((_: SectionTemplate, type: number) => (type === 0 ? 30 : 120)),
     getProgramSectionTemplateMinLength: jest.fn(() => 1),
 }));
 
@@ -46,8 +46,8 @@ describe('TitleDescriptionCard', () => {
             <TitleDescriptionCard
                 card={{ title: 'Title', description: 'Description' }}
                 index={0}
-                template={ProgramSectionTemplate.DualTitleDescriptionPairs}
-                mode={ProgramSectionMode.Edit}
+                template={SectionTemplate.DualTitleDescriptionPairs}
+                mode={SectionMode.Edit}
             />,
         );
 

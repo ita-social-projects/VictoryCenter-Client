@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { TitleDescriptionCardsWrapper } from './TitleDescriptionCardsWrapper';
 import { TitleDescriptionCardData } from '../shared/title-description-cards-section/TitleDescriptionCardsSection';
-import { ProgramSectionMode } from '@/types/common/program-sections';
+import { SectionMode } from '@/types/common/program-sections';
 
 jest.mock('../shared/title-description-cards-section/TitleDescriptionCardsSection', () => ({
     TitleDescriptionCardsSection: (props: any) => (
@@ -32,7 +32,7 @@ describe('TitleDescriptionCardsWrapper', () => {
 
     it('should apply editable class when isEditable is true', () => {
         const { container } = render(
-            <TitleDescriptionCardsWrapper cards={mockCards} cardsCount={2} mode={ProgramSectionMode.Edit} />,
+            <TitleDescriptionCardsWrapper cards={mockCards} cardsCount={2} mode={SectionMode.Edit} />,
         );
 
         expect((container.firstChild as HTMLElement).className).toMatch(/editable/);
@@ -63,11 +63,11 @@ describe('TitleDescriptionCardsWrapper', () => {
     });
 
     it('should pass mode to child component', () => {
-        render(<TitleDescriptionCardsWrapper cards={mockCards} cardsCount={2} mode={ProgramSectionMode.Edit} />);
+        render(<TitleDescriptionCardsWrapper cards={mockCards} cardsCount={2} mode={SectionMode.Edit} />);
 
         expect(screen.getByTestId('title-description-cards-section')).toHaveAttribute(
             'data-mode',
-            String(ProgramSectionMode.Edit),
+            String(SectionMode.Edit),
         );
     });
 
@@ -76,7 +76,7 @@ describe('TitleDescriptionCardsWrapper', () => {
 
         expect(screen.getByTestId('title-description-cards-section')).toHaveAttribute(
             'data-mode',
-            String(ProgramSectionMode.View),
+            String(SectionMode.View),
         );
     });
 

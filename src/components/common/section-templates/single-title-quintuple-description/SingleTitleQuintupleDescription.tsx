@@ -2,7 +2,7 @@ import cn from 'classnames';
 import { useCallback, useMemo, useState, useEffect } from 'react';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
-import { PROGRAMS_TEXT, SINGLE_TITLE_QUINTUPLE_DESCRIPTION_CONFIG } from '@/const/admin/programs';
+import { SECTIONS_TEXT, SINGLE_TITLE_QUINTUPLE_DESCRIPTION_CONFIG } from '@/const/admin/sections';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { SectionMode, SectionTemplate } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
@@ -108,14 +108,14 @@ export const SingleTitleQuintupleDescription = ({
                     <div className={baseStyles['title-cell']}>
                         <InputWithCharacterLimitGroup
                             className={baseStyles['title-input-group']}
-                            label={PROGRAMS_TEXT.SECTION.FORM.TITLE.TEXT}
+                            label={SECTIONS_TEXT.SECTION.FORM.TITLE.TEXT}
                             isRequired
                             id="single-title-quintuple-title"
                             name="single-title-quintuple-title"
                             value={title}
                             onChange={(e) => onTitleChange?.(e.target.value)}
                             maxLength={titleMaxLength}
-                            placeholder={PROGRAMS_TEXT.SECTION.FORM.TITLE.PLACEHOLDER}
+                            placeholder={SECTIONS_TEXT.SECTION.FORM.TITLE.PLACEHOLDER}
                             error={errors.title}
                             onBlur={handleTitleBlur}
                             maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(titleMaxLength)}
@@ -127,7 +127,7 @@ export const SingleTitleQuintupleDescription = ({
                         <div key={index} className={baseStyles['description-card']}>
                             <TextAreaWithCharacterLimitGroup
                                 className={baseStyles['description-input-group']}
-                                label={PROGRAMS_TEXT.SECTION.FORM.DESCRIPTION.TEXT}
+                                label={SECTIONS_TEXT.SECTION.FORM.DESCRIPTION.TEXT}
                                 isRequired
                                 id={`single-title-quintuple-desc-${index}`}
                                 name={`single-title-quintuple-desc-${index}`}

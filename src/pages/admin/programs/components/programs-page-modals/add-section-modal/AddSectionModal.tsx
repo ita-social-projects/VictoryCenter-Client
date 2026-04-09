@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Modal } from '@/components/common/modal/Modal';
 import { Button } from '@/components/admin/button/Button';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
+import { SECTIONS_TEXT } from '@/const/admin/sections';
 import { SectionMode, SectionTemplate } from '@/types/common/sections';
 import { Swiper } from '@/components/public/swiper/Swiper';
 import { renderProgramSection } from '@/utils/functions/render-program-section';
@@ -86,7 +87,7 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
 
     const getPlaceholderDescriptions = (templateId: SectionTemplate) => {
         if (templateId === SectionTemplate.SingleTitleQuintupleDescription) {
-            return Array.from({ length: 5 }, () => PROGRAMS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT_SHORT);
+            return Array.from({ length: 5 }, () => SECTIONS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT_SHORT);
         }
         return undefined;
     };
@@ -174,8 +175,8 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
             data: cards
                 ? { cards }
                 : {
-                      title: PROGRAMS_TEXT.SECTION.TITLE_SAMPLE_TEXT,
-                      description: PROGRAMS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT,
+                      title: SECTIONS_TEXT.SECTION.TITLE_SAMPLE_TEXT,
+                      description: SECTIONS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT,
                       descriptions: getPlaceholderDescriptions(templateId),
                       images: getPlaceholderImages(templateId),
                   },

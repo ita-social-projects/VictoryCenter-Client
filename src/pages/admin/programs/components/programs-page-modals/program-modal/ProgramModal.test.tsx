@@ -11,6 +11,7 @@ import {
 } from '@/types/admin/programs';
 import { ModalMode } from '@/types/admin/common';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
+import { SECTIONS_TEXT } from '@/const/admin/sections';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ProgramsApi } from '@/services/api/admin/programs/programs-api';
 import { VisibilityStatus } from '@/types/admin/common';
@@ -327,7 +328,7 @@ describe('ProgramModal', () => {
 
             expect(screen.getByTestId('question-modal')).toBeInTheDocument();
             expect(screen.getByTestId('question-title')).toHaveTextContent(
-                PROGRAMS_TEXT.SECTION.MODAL.UNSAVED_CHANGES_TITLE,
+                SECTIONS_TEXT.SECTION.MODAL.UNSAVED_CHANGES_TITLE,
             );
 
             fireEvent.click(screen.getByTestId('question-cancel'));
@@ -426,7 +427,7 @@ describe('ProgramModal', () => {
             });
 
             expect(screen.getByTestId('question-title')).toHaveTextContent(
-                PROGRAMS_TEXT.SECTION.MODAL.UNSAVED_CHANGES_TITLE,
+                SECTIONS_TEXT.SECTION.MODAL.UNSAVED_CHANGES_TITLE,
             );
 
             fireEvent.click(screen.getByTestId('question-cancel'));

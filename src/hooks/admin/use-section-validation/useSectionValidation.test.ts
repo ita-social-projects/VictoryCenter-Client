@@ -3,7 +3,7 @@ import type React from 'react';
 
 import { useSectionValidation } from './useSectionValidation';
 
-import { PROGRAM_SECTION_TEMPLATE_VALIDATION } from '@/const/admin/programs';
+import { SECTION_TEMPLATE_VALIDATION } from '@/const/admin/sections';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { SectionTemplate } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
@@ -11,12 +11,12 @@ import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program
 
 const TEMPLATE = SectionTemplate.SingleTitleDescriptionAuthorPairs;
 
-const titleReq = (PROGRAM_SECTION_TEMPLATE_VALIDATION as any)[TEMPLATE].lengths[ContentType.Title] as {
+const titleReq = (SECTION_TEMPLATE_VALIDATION as any)[TEMPLATE].lengths[ContentType.Title] as {
     min: number;
     max: number;
 };
 
-const descriptionReq = (PROGRAM_SECTION_TEMPLATE_VALIDATION as any)[TEMPLATE].lengths[ContentType.Description] as {
+const descriptionReq = (SECTION_TEMPLATE_VALIDATION as any)[TEMPLATE].lengths[ContentType.Description] as {
     min: number;
     max: number;
 };

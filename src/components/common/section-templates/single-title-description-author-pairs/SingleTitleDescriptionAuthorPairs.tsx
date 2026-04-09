@@ -3,6 +3,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { Button } from '@/components/admin/button/Button';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
+import { SECTIONS_TEXT } from '@/const/admin/sections';
 import styles from './SingleTitleDescriptionAuthorPairs.module.scss';
 import { DescriptionAuthorPairCard } from './description-author-pair-card/DescriptionAuthorPairCard';
 import { ReactComponent as ArrowLeft } from '@/assets/icons/arrow-left.svg';
@@ -62,7 +63,7 @@ export const SingleTitleDescriptionAuthorPairs = ({
     const normalizedPairs = useMemo(() => {
         if (!isTemplate) return pairs;
 
-        const sampleDescription = PROGRAMS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT_SHORT;
+        const sampleDescription = SECTIONS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT_SHORT;
         const sampleAuthor = PROGRAMS_TEXT.SECTION.CARD.FORM.SAMPLE.AUTHOR;
 
         return Array.from({ length: TEMPLATE_PAIRS_COUNT }, (_, i) => ({
@@ -119,7 +120,7 @@ export const SingleTitleDescriptionAuthorPairs = ({
                 {isEditable ? (
                     <InputWithCharacterLimitGroup
                         className={styles['title-input-group']}
-                        label={PROGRAMS_TEXT.SECTION.FORM.TITLE.TEXT}
+                        label={SECTIONS_TEXT.SECTION.FORM.TITLE.TEXT}
                         isRequired
                         id="single-title-description-author-pairs-title"
                         name="single-title-description-author-pairs-title"

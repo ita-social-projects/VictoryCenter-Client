@@ -1,4 +1,5 @@
-import { PROGRAM_VALIDATION, PROGRAM_SECTION_TEMPLATE_VALIDATION } from '@/const/admin/programs';
+import { SECTION_VALIDATION, SECTION_TEMPLATE_VALIDATION } from '@/const/admin/sections';
+import { PROGRAM_VALIDATION } from '@/const/admin/programs';
 import { FAQ_VALIDATION } from '@/const/admin/faq';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ProgramCategory } from '@/types/admin/programs';
@@ -25,9 +26,7 @@ type TemplateRules = {
 type SectionTemplate = CreateHippotherapyProgramSectionDto['template'];
 type SectionContent = NonNullable<CreateHippotherapyProgramSectionDto['contents']>[number];
 
-const TEMPLATE_RULES = PROGRAM_SECTION_TEMPLATE_VALIDATION as unknown as Partial<
-    Record<SectionTemplate, TemplateRules>
->;
+const TEMPLATE_RULES = SECTION_TEMPLATE_VALIDATION as unknown as Partial<Record<SectionTemplate, TemplateRules>>;
 
 const getTemplateRules = (template: SectionTemplate): TemplateRules | undefined => TEMPLATE_RULES[template];
 
@@ -516,7 +515,7 @@ const validateTemplateImages = (contents: SectionContent[], rules: TemplateRules
         }
     }
 
-    const maxSizeMB = PROGRAM_VALIDATION.images?.maxSizeMB;
+    const maxSizeMB = SECTION_VALIDATION.images?.maxSizeMB;
     if (typeof maxSizeMB === 'number' && maxSizeMB > 0) {
         const maxBytes = maxSizeMB * 1024 * 1024;
         for (const img of images) {

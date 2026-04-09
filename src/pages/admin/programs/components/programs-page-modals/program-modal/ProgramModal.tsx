@@ -11,6 +11,7 @@ import { VisibilityStatus, PendingAction, ModalMode } from '@/types/admin/common
 import { CreateHippotherapyProgramSectionDto } from '@/types/common/program-sections';
 import { SectionTemplate } from '@/types/common/sections';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
+import { SECTIONS_TEXT } from '@/const/admin/sections';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ProgramsApi } from '@/services/api/admin/programs/programs-api';
 import { useGenericModal } from '@/hooks/admin/use-generic-modal/useGenericModal';
@@ -300,7 +301,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
             <ConfirmationModal
                 isOpen={isSectionRemoveModalOpen}
                 onClose={handleCloseSectionRemoveModal}
-                title={PROGRAMS_TEXT.SECTION.MODAL.DELETE_SECTION_TITLE}
+                title={SECTIONS_TEXT.SECTION.MODAL.DELETE_SECTION_TITLE}
                 onConfirm={handleConfirmRemoveSection}
                 onCancel={handleCloseSectionRemoveModal}
             />
@@ -310,9 +311,9 @@ export const ProgramModal = (props: ProgramModalProps) => {
                 onClose={handleCloseSectionRevertModal}
                 title={
                     pendingCancelActionType === SectionCancelActionType.RevertAfterReplace
-                        ? PROGRAMS_TEXT.SECTION.MODAL.REPLACE_TEMPLATE_TITLE
+                        ? SECTIONS_TEXT.SECTION.MODAL.REPLACE_TEMPLATE_TITLE
                         : pendingCancelActionType === SectionCancelActionType.DiscardNewSection
-                          ? PROGRAMS_TEXT.SECTION.MODAL.UNSAVED_CHANGES_TITLE
+                          ? SECTIONS_TEXT.SECTION.MODAL.UNSAVED_CHANGES_TITLE
                           : COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE
                 }
                 onConfirm={handleConfirmRevertSection}

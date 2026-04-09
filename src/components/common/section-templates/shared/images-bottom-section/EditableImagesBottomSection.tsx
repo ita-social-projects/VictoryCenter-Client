@@ -2,7 +2,7 @@ import cn from 'classnames';
 import { ImageValues, Image } from '@/types/common/image';
 import { PhotoInputGroup } from '@/components/admin/input-groups/photo-input-group/PhotoInputGroup';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { PROGRAM_VALIDATION } from '@/const/admin/programs';
+import { SECTION_VALIDATION } from '@/const/admin/sections';
 import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 import { SectionMode } from '@/types/common/sections';
 import { ImageHandler, ImagesBottomSectionConfig } from './ImagesBottomSection';
@@ -59,7 +59,7 @@ export const EditableImagesBottomSection = ({
                                       config.imageConfig.cropWidth,
                                   )}
                                   variant="programSection"
-                                  maxSizeMB={PROGRAM_VALIDATION.images.maxSizeMB}
+                                  maxSizeMB={SECTION_VALIDATION.images.maxSizeMB}
                                   disabled={mode === SectionMode.View}
                               />
                           </div>

@@ -2,12 +2,12 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { TitleDescriptionCardsSection, type TitleDescriptionCardData } from '../TitleDescriptionCardsSection';
-import { SectionMode } from '../../../../../../types/common/program-sections';
+import { SectionMode } from '../../../../../../types/common/sections';
 
 jest.mock('../TitleDescriptionCard', () => ({
     TitleDescriptionCard: ({ card, index, mode, onTitleChange, onDescriptionChange }: any) => {
         const React = require('react');
-        const { SectionMode } = require('@/types/common/program-sections');
+        const { SectionMode } = require('@/types/common/sections');
         const isEditable = mode === SectionMode.Edit;
         const [title, setTitle] = React.useState(card.title);
         const [description, setDescription] = React.useState(card.description);

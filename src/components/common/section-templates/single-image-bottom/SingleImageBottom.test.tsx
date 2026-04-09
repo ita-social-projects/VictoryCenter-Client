@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { SingleImageBottom, SingleImageBottomProps } from './SingleImageBottom';
-import { PROGRAM_SECTION_IMAGE_CONFIGS } from '@/const/admin/programs';
+import { SECTION_IMAGE_CONFIGS } from '@/const/admin/sections';
 import { SectionMode } from '@/types/common/sections';
 
 const mockTitleDescriptionSection = jest.fn();
@@ -90,10 +90,10 @@ describe('SingleImageBottom', () => {
             expect.objectContaining({
                 id: 'section-image-1',
                 name: 'section-image-1',
-                cropWidth: PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.cropWidth,
-                cropHeight: PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.cropHeight,
-                minWidth: PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.minWidth,
-                minHeight: PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.minHeight,
+                cropWidth: SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.cropWidth,
+                cropHeight: SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.cropHeight,
+                minWidth: SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.minWidth,
+                minHeight: SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.minHeight,
                 value: { base64: 'base64-data', mimeType: 'image/jpeg' },
                 onChange: expect.any(Function),
             }),

@@ -1,4 +1,4 @@
-import { PROGRAM_SECTION_TEMPLATE_VALIDATION } from '@/const/admin/programs';
+import { SECTION_TEMPLATE_VALIDATION } from '@/const/admin/sections';
 import { CreateProgramSectionContentDto } from '@/types/common/program-sections';
 import { SectionTemplate } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
@@ -14,7 +14,7 @@ type TemplateRules = {
 };
 
 const getTemplateRules = (template: SectionTemplate): TemplateRules | undefined =>
-    (PROGRAM_SECTION_TEMPLATE_VALIDATION as any)[template] as TemplateRules | undefined;
+    (SECTION_TEMPLATE_VALIDATION as any)[template] as TemplateRules | undefined;
 
 const getLengthRule = (template: SectionTemplate, type: ContentType): Range | undefined => {
     const rules = getTemplateRules(template);

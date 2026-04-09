@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { TitleDescriptionSection, TitleDescriptionSectionProps } from './TitleDescriptionSection';
-import { PROGRAMS_TEXT } from '@/const/admin/programs';
+import { SECTIONS_TEXT } from '@/const/admin/sections';
 import { SectionMode, SectionTemplate } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
 import { getSectionTemplateMaxLength } from '@/utils/functions/section-template-validation/sectionTemplateValidation';
@@ -160,9 +160,9 @@ describe('TitleDescriptionSection', () => {
     const getTitleHeading = () => screen.queryByRole('heading', { level: 2 });
 
     const getTitleInput = () =>
-        screen.queryByLabelText(PROGRAMS_TEXT.SECTION.FORM.TITLE.TEXT) as HTMLInputElement | null;
+        screen.queryByLabelText(SECTIONS_TEXT.SECTION.FORM.TITLE.TEXT) as HTMLInputElement | null;
     const getDescriptionTextarea = () =>
-        screen.queryByLabelText(PROGRAMS_TEXT.SECTION.FORM.DESCRIPTION.TEXT) as HTMLTextAreaElement | null;
+        screen.queryByLabelText(SECTIONS_TEXT.SECTION.FORM.DESCRIPTION.TEXT) as HTMLTextAreaElement | null;
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -283,7 +283,7 @@ describe('TitleDescriptionSection', () => {
 
             const titleInput = getTitleInput()!;
             expect(titleInput).toHaveAttribute('maxLength', String(titleMax));
-            expect(titleInput).toHaveAttribute('placeholder', PROGRAMS_TEXT.SECTION.FORM.TITLE.PLACEHOLDER);
+            expect(titleInput).toHaveAttribute('placeholder', SECTIONS_TEXT.SECTION.FORM.TITLE.PLACEHOLDER);
 
             const descriptionTextarea = getDescriptionTextarea()!;
             expect(descriptionTextarea).toHaveAttribute('maxLength', String(descriptionMax));

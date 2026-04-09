@@ -4,7 +4,7 @@ import cn from 'classnames';
 import { useId } from 'react';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
-import { PROGRAMS_TEXT } from '@/const/admin/programs';
+import { SECTIONS_TEXT } from '@/const/admin/sections';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { useSectionValidation } from '@/hooks/admin/use-section-validation';
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
@@ -74,7 +74,7 @@ export const TitleDescriptionSection = ({
             <div className={baseStyles['title-section']}>
                 {mode === SectionMode.Edit ? (
                     <InputWithCharacterLimitGroup
-                        label={PROGRAMS_TEXT.SECTION.FORM.TITLE.TEXT}
+                        label={SECTIONS_TEXT.SECTION.FORM.TITLE.TEXT}
                         isRequired={true}
                         id={`${idPrefix}-section-title`}
                         name={`${idPrefix}-section-title`}
@@ -85,7 +85,7 @@ export const TitleDescriptionSection = ({
                         rows={1}
                         autoGrow={true}
                         maxRows={3}
-                        placeholder={PROGRAMS_TEXT.SECTION.FORM.TITLE.PLACEHOLDER}
+                        placeholder={SECTIONS_TEXT.SECTION.FORM.TITLE.PLACEHOLDER}
                         className={styles['title-input']}
                         error={titleError}
                         maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(titleMaxLength)}
@@ -99,7 +99,7 @@ export const TitleDescriptionSection = ({
             <div className={baseStyles['description-section']}>
                 {mode === SectionMode.Edit ? (
                     <TextAreaWithCharacterLimitGroup
-                        label={PROGRAMS_TEXT.SECTION.FORM.DESCRIPTION.TEXT}
+                        label={SECTIONS_TEXT.SECTION.FORM.DESCRIPTION.TEXT}
                         isRequired={true}
                         id={`${idPrefix}-section-description`}
                         name={`${idPrefix}-section-description`}

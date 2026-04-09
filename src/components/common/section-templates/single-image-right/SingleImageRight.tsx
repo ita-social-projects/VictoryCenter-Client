@@ -4,7 +4,7 @@ import { PhotoInputGroup } from '@/components/admin/input-groups/photo-input-gro
 import { ImageValues, Image } from '@/types/common/image';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
-import { PROGRAMS_TEXT, PROGRAM_SECTION_IMAGE_CONFIGS, PROGRAM_VALIDATION } from '@/const/admin/programs';
+import { SECTIONS_TEXT, SECTION_IMAGE_CONFIGS, SECTION_VALIDATION } from '@/const/admin/sections';
 import { useSectionValidation } from '@/hooks/admin/use-section-validation';
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
 import { SectionMode, SectionTemplate } from '@/types/common/sections';
@@ -71,7 +71,7 @@ export const SingleImageRight = ({
                     <div className={baseStyles['left-section']}>
                         <div className={baseStyles['title-section']}>
                             <TextAreaWithCharacterLimitGroup
-                                label={PROGRAMS_TEXT.SECTION.FORM.TITLE.TEXT}
+                                label={SECTIONS_TEXT.SECTION.FORM.TITLE.TEXT}
                                 isRequired={true}
                                 id="section-title"
                                 name="section-title"
@@ -79,7 +79,7 @@ export const SingleImageRight = ({
                                 onChange={handleTitleChange}
                                 onBlur={handleTitleBlur}
                                 maxLength={titleMaxLength}
-                                placeholder={PROGRAMS_TEXT.SECTION.FORM.TITLE.PLACEHOLDER}
+                                placeholder={SECTIONS_TEXT.SECTION.FORM.TITLE.PLACEHOLDER}
                                 className={styles['title-input']}
                                 rows={2}
                                 autoGrow={true}
@@ -91,7 +91,7 @@ export const SingleImageRight = ({
                         </div>
                         <div className={baseStyles['description-section']}>
                             <TextAreaWithCharacterLimitGroup
-                                label={PROGRAMS_TEXT.SECTION.FORM.DESCRIPTION.TEXT}
+                                label={SECTIONS_TEXT.SECTION.FORM.DESCRIPTION.TEXT}
                                 isRequired={true}
                                 id="section-description"
                                 name="section-description"
@@ -115,17 +115,17 @@ export const SingleImageRight = ({
                                 onChange={onImageChange || (() => {})}
                                 setError={handleSetError}
                                 error={error}
-                                cropWidth={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_RIGHT.cropWidth}
-                                cropHeight={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_RIGHT.cropHeight}
-                                minWidth={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_RIGHT.minWidth}
-                                minHeight={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_RIGHT.minHeight}
+                                cropWidth={SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_RIGHT.cropWidth}
+                                cropHeight={SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_RIGHT.cropHeight}
+                                minWidth={SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_RIGHT.minWidth}
+                                minHeight={SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_RIGHT.minHeight}
                                 imageLabel={COMMON_TEXT_ADMIN.INPUT.DRAG_AND_DROP_FILE_HERE}
                                 imageSubText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
-                                    PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_RIGHT.cropHeight,
-                                    PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_RIGHT.cropWidth,
+                                    SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_RIGHT.cropHeight,
+                                    SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_RIGHT.cropWidth,
                                 )}
                                 variant="programSection"
-                                maxSizeMB={PROGRAM_VALIDATION.images.maxSizeMB}
+                                maxSizeMB={SECTION_VALIDATION.images.maxSizeMB}
                             />
                         </div>
                     </div>

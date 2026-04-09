@@ -3,7 +3,7 @@ import { TitleDescriptionSection } from '../shared/title-description-section/Tit
 import { PhotoInputGroup } from '@/components/admin/input-groups/photo-input-group/PhotoInputGroup';
 import { ImageValues, Image } from '@/types/common/image';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { PROGRAM_SECTION_IMAGE_CONFIGS, PROGRAM_VALIDATION } from '@/const/admin/programs';
+import { SECTION_IMAGE_CONFIGS, SECTION_VALIDATION } from '@/const/admin/sections';
 import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 import { SectionMode, SectionTemplate } from '@/types/common/sections';
 import { useImageError } from '@/hooks/common/use-image-error/useImageError';
@@ -52,17 +52,17 @@ export const SingleImageTop = ({
                             onChange={onImageChange || (() => {})}
                             setError={handleSetError}
                             error={error}
-                            cropWidth={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_TOP.cropWidth}
-                            cropHeight={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_TOP.cropHeight}
-                            minWidth={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_TOP.minWidth}
-                            minHeight={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_TOP.minHeight}
+                            cropWidth={SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_TOP.cropWidth}
+                            cropHeight={SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_TOP.cropHeight}
+                            minWidth={SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_TOP.minWidth}
+                            minHeight={SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_TOP.minHeight}
                             imageLabel={COMMON_TEXT_ADMIN.INPUT.DRAG_AND_DROP_FILE_HERE}
                             imageSubText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
-                                PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_TOP.cropHeight,
-                                PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_TOP.cropWidth,
+                                SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_TOP.cropHeight,
+                                SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_TOP.cropWidth,
                             )}
                             variant="programSection"
-                            maxSizeMB={PROGRAM_VALIDATION.images.maxSizeMB}
+                            maxSizeMB={SECTION_VALIDATION.images.maxSizeMB}
                         />
                     ) : (
                         imageSrc && <img src={imageSrc} alt="" className={baseStyles.image} loading="lazy" />

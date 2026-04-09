@@ -5,6 +5,7 @@ import '@testing-library/jest-dom';
 import { AddSectionModal } from './AddSectionModal';
 import type { AddSectionModalProps } from './AddSectionModal';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
+import { SECTIONS_TEXT } from '@/const/admin/sections';
 import { SectionTemplate, SectionMode } from '@/types/common/sections';
 import type { ButtonProps } from '@/components/admin/button/Button';
 import type { ModalProps } from '@/components/common/modal/Modal';
@@ -108,7 +109,7 @@ const getCallByTemplate = (templateId: any) => {
 };
 
 const buildFiveShortDescriptions = () =>
-    Array.from({ length: 5 }, () => PROGRAMS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT_SHORT);
+    Array.from({ length: 5 }, () => SECTIONS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT_SHORT);
 
 describe('AddSectionModal', () => {
     const mockOnClose = jest.fn();
@@ -229,16 +230,16 @@ describe('AddSectionModal', () => {
         renderModal();
 
         const call = getCallByTemplate(SectionTemplate.TextOnly);
-        expect(call?.data?.title).toBe(PROGRAMS_TEXT.SECTION.TITLE_SAMPLE_TEXT);
-        expect(call?.data?.description).toBe(PROGRAMS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT);
+        expect(call?.data?.title).toBe(SECTIONS_TEXT.SECTION.TITLE_SAMPLE_TEXT);
+        expect(call?.data?.description).toBe(SECTIONS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT);
     });
 
     it('passes sample title/description into SingleTitleDescriptionAuthorPairs template', () => {
         renderModal();
 
         const call = getCallByTemplate(SectionTemplate.SingleTitleDescriptionAuthorPairs);
-        expect(call?.data?.title).toBe(PROGRAMS_TEXT.SECTION.TITLE_SAMPLE_TEXT);
-        expect(call?.data?.description).toBe(PROGRAMS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT);
+        expect(call?.data?.title).toBe(SECTIONS_TEXT.SECTION.TITLE_SAMPLE_TEXT);
+        expect(call?.data?.description).toBe(SECTIONS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT);
     });
 
     it('provides 5 short descriptions only for SingleTitleQuintupleDescription', () => {

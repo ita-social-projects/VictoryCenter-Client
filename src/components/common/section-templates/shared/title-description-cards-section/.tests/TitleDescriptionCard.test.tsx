@@ -5,7 +5,8 @@ import { TitleDescriptionCard } from '../TitleDescriptionCard';
 import type { TitleDescriptionCardData } from '../TitleDescriptionCardsSection';
 
 import { PROGRAMS_TEXT } from '../../../../../../const/admin/programs';
-import { SectionMode, SectionTemplate } from '../../../../../../types/common/program-sections';
+import { SECTIONS_TEXT } from '../../../../../../const/admin/sections';
+import { SectionMode, SectionTemplate } from '../../../../../../types/common/sections';
 import { ContentType } from '../../../../../../types/common/section-contents';
 
 import { parseDescriptionList } from '../../../../../../utils/functions/formatters/text-formatters';
@@ -317,7 +318,7 @@ describe('TitleDescriptionCard', () => {
 
             renderCard({ mode: SectionMode.View });
 
-            expect(screen.getByText(PROGRAMS_TEXT.SECTION.FORM.DESCRIPTION.TEXT)).toBeInTheDocument();
+            expect(screen.getByText(SECTIONS_TEXT.SECTION.FORM.DESCRIPTION.TEXT)).toBeInTheDocument();
         });
     });
 });

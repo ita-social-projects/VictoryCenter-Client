@@ -5,6 +5,7 @@ import { FaqCard } from '@/components/public/faq-section/faq-card/FaqCard';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { Button } from '@/components/admin/button/Button';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
+import { SECTIONS_TEXT } from '@/const/admin/sections';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { useSectionValidation } from '@/hooks/admin/use-section-validation';
 import { PublishedFaqQuestion } from '@/types/public/faq-section';
@@ -131,7 +132,7 @@ export const FaqProgramSection = ({
                 <div className={styles['faq-block']}>
                     <div className={styles['left-section']}>
                         <TextAreaWithCharacterLimitGroup
-                            label={PROGRAMS_TEXT.SECTION.FORM.TITLE.TEXT}
+                            label={SECTIONS_TEXT.SECTION.FORM.TITLE.TEXT}
                             isRequired
                             id={`${idPrefix}-faq-title`}
                             name={`${idPrefix}-faq-title`}

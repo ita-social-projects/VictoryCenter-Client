@@ -4,6 +4,7 @@ import { parseDescriptionList } from '@/utils/functions/formatters/text-formatte
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { CardDescriptionField } from './CardDescriptionField';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
+import { SECTIONS_TEXT } from '@/const/admin/sections';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { useCardValidation } from '@/hooks/admin/use-section-card-validation/useCardValidation';
 import { TitleDescriptionCardData } from './TitleDescriptionCardsSection';
@@ -131,7 +132,7 @@ export const TitleDescriptionCard = ({
                     </ul>
                 )}
 
-                {!intro && items.length === 0 && <p>{PROGRAMS_TEXT.SECTION.FORM.DESCRIPTION.TEXT}</p>}
+                {!intro && items.length === 0 && <p>{SECTIONS_TEXT.SECTION.FORM.DESCRIPTION.TEXT}</p>}
             </div>
         </div>
     );

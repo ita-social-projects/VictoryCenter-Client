@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { ContentType } from '@/types/common/programs';
+import { ContentType } from '@/types/common/section-contents';
 import { SectionTemplate } from '@/types/common/program-sections';
 
 import { DescriptionAuthorPairCard } from './DescriptionAuthorPairCard';

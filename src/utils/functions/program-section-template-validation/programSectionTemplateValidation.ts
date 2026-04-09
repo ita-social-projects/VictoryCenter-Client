@@ -1,6 +1,6 @@
 import { PROGRAM_SECTION_TEMPLATE_VALIDATION } from '@/const/admin/programs';
 import { CreateProgramSectionContentDto, SectionTemplate } from '@/types/common/program-sections';
-import { ContentType } from '@/types/common/programs';
+import { ContentType } from '@/types/common/section-contents';
 
 type Range = { min: number; max: number };
 

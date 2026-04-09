@@ -3,7 +3,7 @@ import {
     CreateProgramSectionContentDto,
     SectionTemplate,
 } from '@/types/common/program-sections';
-import { ContentType } from '@/types/common/programs';
+import { ContentType } from '@/types/common/section-contents';
 import { getDescriptionAuthorPairsByGroup } from '@/utils/functions/mappers/public/program/get-grouped-program-section-content-pairs';
 
 export const getContentByType = (

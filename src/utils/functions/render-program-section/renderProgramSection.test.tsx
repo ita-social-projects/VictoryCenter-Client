@@ -3,7 +3,7 @@ import '@testing-library/jest-dom';
 
 import { renderProgramSection, RenderProgramSectionParams, getInitialSectionContents } from './renderProgramSection';
 import { SectionTemplate, SectionMode } from '@/types/common/program-sections';
-import { ContentType } from '@/types/common/programs';
+import { ContentType } from '@/types/common/section-contents';
 
 const mockCapturedProps: Record<string, any> = {};
 

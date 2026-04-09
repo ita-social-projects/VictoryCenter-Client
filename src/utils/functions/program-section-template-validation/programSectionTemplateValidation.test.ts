@@ -6,7 +6,7 @@ import {
     normalizeGroupedContentsGroupIndexes,
 } from './programSectionTemplateValidation';
 import { SectionTemplate } from '@/types/common/program-sections';
-import { ContentType } from '@/types/common/programs';
+import { ContentType } from '@/types/common/section-contents';
 
 jest.mock('@/const/admin/programs', () => {
     const { SectionTemplate } = require('@/types/common/program-sections');

@@ -6,7 +6,7 @@ import type { TitleDescriptionCardData } from '../TitleDescriptionCardsSection';
 
 import { PROGRAMS_TEXT } from '../../../../../../const/admin/programs';
 import { SectionMode, SectionTemplate } from '../../../../../../types/common/program-sections';
-import { ContentType } from '../../../../../../types/common/programs';
+import { ContentType } from '../../../../../../types/common/section-contents';
 
 import { parseDescriptionList } from '../../../../../../utils/functions/formatters/text-formatters';
 import { useCardValidation } from '../../../../../../hooks/admin/use-section-card-validation/useCardValidation';

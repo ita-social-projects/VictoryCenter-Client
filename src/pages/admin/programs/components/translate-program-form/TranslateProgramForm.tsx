@@ -14,7 +14,7 @@ import cn from 'classnames';
 import programFormStyles from '../program-form/ProgramForm.module.scss';
 import styles from './TranslateProgramForm.module.scss';
 import { HippotherapyProgramSectionDto } from '@/types/common/program-sections';
-import { ContentType } from '@/types/common/programs';
+import { ContentType } from '@/types/common/section-contents';
 import { SectionMode, SectionTemplate } from '@/types/common/program-sections';
 import { renderProgramSection } from '@/utils/functions/render-program-section';
 

@@ -1,5 +1,5 @@
 import { Image, ImageValues } from '../common/image';
-import { ContentType } from './programs';
+import { ContentType } from './section-contents';
 import { FaqQuestion } from '../admin/faq';
 import {
     EntityLocalization,

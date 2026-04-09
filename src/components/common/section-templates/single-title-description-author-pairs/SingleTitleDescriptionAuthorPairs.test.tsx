@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import '@testing-library/jest-dom';
 import { SingleTitleDescriptionAuthorPairs } from './SingleTitleDescriptionAuthorPairs';
 import { SectionMode, SectionTemplate } from '@/types/common/program-sections';
-import { ContentType } from '@/types/common/programs';
+import { ContentType } from '@/types/common/section-contents';
 
 const mockCardCarousel = jest.fn();
 const mockDescriptionAuthorPairCard = jest.fn();

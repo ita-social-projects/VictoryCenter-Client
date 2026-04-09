@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { TitleDescriptionSection, TitleDescriptionSectionProps } from './TitleDescriptionSection';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { SectionMode, SectionTemplate } from '@/types/common/program-sections';
-import { ContentType } from '@/types/common/programs';
+import { ContentType } from '@/types/common/section-contents';
 import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
 import { useProgramSectionValidation } from '@/hooks/admin/use-program-section-validation';
 

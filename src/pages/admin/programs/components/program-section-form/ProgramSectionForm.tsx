@@ -11,7 +11,7 @@ import {
     SectionTemplate,
     SectionMode,
 } from '@/types/common/program-sections';
-import { ContentType } from '@/types/common/programs';
+import { ContentType } from '@/types/common/section-contents';
 import {
     getProgramSectionTemplateMaxGroupCount,
     normalizeGroupedContentsGroupIndexes,
@@ -134,8 +134,7 @@ export const ProgramSectionForm = ({
     const descriptions = orderedDescriptionContents.map((c) => (c as any).description || '');
     const description = descriptions[0] || '';
 
-    const isDescriptionAuthorPairsTemplate =
-        section.template === SectionTemplate.SingleTitleDescriptionAuthorPairs;
+    const isDescriptionAuthorPairsTemplate = section.template === SectionTemplate.SingleTitleDescriptionAuthorPairs;
 
     const isFaqTemplate = section.template === SectionTemplate.SingleTitleQuestionAnswerPairs;
 

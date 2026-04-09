@@ -6,7 +6,7 @@ import { ProgramSectionForm } from './ProgramSectionForm';
 import type { ProgramSectionFormProps } from './ProgramSectionForm';
 import type { CreateHippotherapyProgramSectionDto } from '@/types/common/program-sections';
 import { SectionTemplate, SectionMode } from '@/types/common/program-sections';
-import { ContentType } from '@/types/common/programs';
+import { ContentType } from '@/types/common/section-contents';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { renderProgramSection } from '@/utils/functions/render-program-section';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';

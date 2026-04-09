@@ -7,7 +7,7 @@ import {
     ProgramSectionContentLocalizableFields,
     SectionMode,
 } from '@/types/common/program-sections';
-import { ContentType } from '@/types/common/programs';
+import { ContentType } from '@/types/common/section-contents';
 import { FaqLocalization, FaqLocalizationDto } from '@/types/admin/faq';
 import { EntityLocalization, EntityLocalizationDto } from '@/types/common/language';
 import { useLocale } from '@/hooks/common/use-locale/useLocale';

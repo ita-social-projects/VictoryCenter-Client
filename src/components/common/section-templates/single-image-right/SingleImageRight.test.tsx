@@ -146,13 +146,7 @@ describe('SingleImageRight', () => {
 
         it('calls onDescriptionChange when description textarea is changed', () => {
             const onDescriptionChange = jest.fn();
-            render(
-                <SingleImageRight
-                    title="Test"
-                    mode={SectionMode.Edit}
-                    onDescriptionChange={onDescriptionChange}
-                />,
-            );
+            render(<SingleImageRight title="Test" mode={SectionMode.Edit} onDescriptionChange={onDescriptionChange} />);
 
             const descriptionTextarea = screen.getByTestId('textarea-section-description');
             fireEvent.change(descriptionTextarea, { target: { value: 'New Description' } });
@@ -199,9 +193,7 @@ describe('SingleImageRight', () => {
         });
 
         it('does not render h2 and p tags in editable mode', () => {
-            const { container } = render(
-                <SingleImageRight title="Test" description="Desc" mode={SectionMode.Edit} />,
-            );
+            const { container } = render(<SingleImageRight title="Test" description="Desc" mode={SectionMode.Edit} />);
 
             expect(container.querySelector('h2')).not.toBeInTheDocument();
             expect(container.querySelector('p')).not.toBeInTheDocument();

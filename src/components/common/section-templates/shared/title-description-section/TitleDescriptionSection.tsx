@@ -10,7 +10,7 @@ import { useProgramSectionValidation } from '@/hooks/admin/use-program-section-v
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
 import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
 import { SectionMode, SectionTemplate } from '@/types/common/program-sections';
-import { ContentType } from '@/types/common/programs';
+import { ContentType } from '@/types/common/section-contents';
 
 export interface TitleDescriptionSectionProps {
     template: SectionTemplate;

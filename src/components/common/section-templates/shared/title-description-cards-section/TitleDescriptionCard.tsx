@@ -8,7 +8,7 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { useCardValidation } from '@/hooks/admin/use-section-card-validation/useCardValidation';
 import { TitleDescriptionCardData } from './TitleDescriptionCardsSection';
 import { SectionMode, SectionTemplate } from '@/types/common/program-sections';
-import { ContentType } from '@/types/common/programs';
+import { ContentType } from '@/types/common/section-contents';
 import styles from './TitleDescriptionCardsSection.module.scss';
 import {
     getProgramSectionTemplateMaxLength,

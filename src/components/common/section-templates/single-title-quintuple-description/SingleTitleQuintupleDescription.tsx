@@ -5,7 +5,7 @@ import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups
 import { PROGRAMS_TEXT, SINGLE_TITLE_QUINTUPLE_DESCRIPTION_CONFIG } from '@/const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { SectionMode, SectionTemplate } from '@/types/common/program-sections';
-import { ContentType } from '@/types/common/programs';
+import { ContentType } from '@/types/common/section-contents';
 import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
 import baseStyles from './SingleTitleQuintupleDescription.module.scss';
 import viewStyles from './ViewSingleTitleQuintupleDescription.module.scss';

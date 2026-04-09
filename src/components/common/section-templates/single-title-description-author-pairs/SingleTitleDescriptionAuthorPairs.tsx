@@ -10,7 +10,7 @@ import { ReactComponent as ArrowRight } from '@/assets/icons/arrow-right.svg';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import { CardCarousel } from './card-carousel/CardCarousel';
 import { SectionMode, SectionTemplate } from '@/types/common/program-sections';
-import { ContentType } from '@/types/common/programs';
+import { ContentType } from '@/types/common/section-contents';
 import { getProgramSectionTemplateMaxLength } from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
 import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';

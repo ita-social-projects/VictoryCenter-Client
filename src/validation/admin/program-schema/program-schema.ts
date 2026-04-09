@@ -4,7 +4,7 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ProgramCategory } from '@/types/admin/programs';
 import { Image, ImageValues } from '@/types/common/image';
 import { CreateHippotherapyProgramSectionDto } from '@/types/common/program-sections';
-import { ContentType } from '@/types/common/programs';
+import { ContentType } from '@/types/common/section-contents';
 import * as Yup from 'yup';
 
 export interface ProgramValidationContext {

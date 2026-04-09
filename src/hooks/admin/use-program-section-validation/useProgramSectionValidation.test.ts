@@ -6,7 +6,7 @@ import { useProgramSectionValidation } from './useProgramSectionValidation';
 import { PROGRAM_SECTION_TEMPLATE_VALIDATION } from '@/const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { SectionTemplate } from '@/types/common/program-sections';
-import { ContentType } from '@/types/common/programs';
+import { ContentType } from '@/types/common/section-contents';
 import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
 
 const TEMPLATE = SectionTemplate.SingleTitleDescriptionAuthorPairs;

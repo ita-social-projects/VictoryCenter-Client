@@ -6,7 +6,7 @@ import {
     SectionMode,
 } from '@/types/common/program-sections';
 import { ImageValues, Image } from '@/types/common/image';
-import { ContentType } from '@/types/common/programs';
+import { ContentType } from '@/types/common/section-contents';
 import { QuadImagesBottom } from '@/components/common/section-templates/quad-images-bottom/QuadImagesBottom';
 import { TripleImagesBottom } from '@/components/common/section-templates/triple-images-bottom/TripleImagesBottom';
 import { DualImagesBottom } from '@/components/common/section-templates/dual-images-bottom/DualImagesBottom';
@@ -137,9 +137,7 @@ type StandardTemplateComponentProps =
           onImagesChange?: (index: number, file: ImageValues | null) => void;
       });
 
-const STANDARD_TEMPLATES_MAP: Partial<
-    Record<SectionTemplate, React.ComponentType<StandardTemplateComponentProps>>
-> = {
+const STANDARD_TEMPLATES_MAP: Partial<Record<SectionTemplate, React.ComponentType<StandardTemplateComponentProps>>> = {
     [SectionTemplate.TextOnly]: TextOnly,
     [SectionTemplate.SingleImageTop]: SingleImageTop,
     [SectionTemplate.SingleImageBottom]: SingleImageBottom,

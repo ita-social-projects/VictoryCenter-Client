@@ -1,6 +1,6 @@
 import { COMMON_TEXT_ADMIN } from './common';
 import { SectionTemplate } from '@/types/common/program-sections';
-import { ContentType } from '@/types/common/programs';
+import { ContentType } from '@/types/common/section-contents';
 
 export const PROGRAMS_TEXT = {
     BUTTON: {

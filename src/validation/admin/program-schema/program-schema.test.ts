@@ -1,4 +1,4 @@
-import { ContentType } from '@/types/common/programs';
+import { ContentType } from '@/types/common/section-contents';
 import { SectionTemplate } from '@/types/common/program-sections';
 
 type Range = { min: number; max: number };
@@ -273,53 +273,46 @@ describe('program-schema.ts coverage (templates are bottom-only)', () => {
 
     it('basic values: non-number contentType fails', () => {
         const m = loadSchema();
-        expect(
-            m.isProgramSectionValid(sec(SectionTemplate.TextOnly, [{ contentType: 'x', order: 0 }]), false),
-        ).toBe(false);
+        expect(m.isProgramSectionValid(sec(SectionTemplate.TextOnly, [{ contentType: 'x', order: 0 }]), false)).toBe(
+            false,
+        );
     });
 
     it('basic values: unknown numeric contentType fails', () => {
         const m = loadSchema();
-        expect(
-            m.isProgramSectionValid(sec(SectionTemplate.TextOnly, [{ contentType: 999, order: 0 }]), false),
-        ).toBe(false);
+        expect(m.isProgramSectionValid(sec(SectionTemplate.TextOnly, [{ contentType: 999, order: 0 }]), false)).toBe(
+            false,
+        );
     });
 
     it('basic values: negative order fails', () => {
         const m = loadSchema();
-        expect(m.isProgramSectionValid(sec(SectionTemplate.TextOnly, [t('aa', -1), d('bbbb', 1)]), false)).toBe(
-            false,
-        );
+        expect(m.isProgramSectionValid(sec(SectionTemplate.TextOnly, [t('aa', -1), d('bbbb', 1)]), false)).toBe(false);
     });
 
     it('basic values: groupIndex wrong type fails', () => {
         const m = loadSchema();
-        expect(
-            m.isProgramSectionValid(sec(SectionTemplate.TextOnly, [t('aa', 0, { groupIndex: '0' })]), false),
-        ).toBe(false);
+        expect(m.isProgramSectionValid(sec(SectionTemplate.TextOnly, [t('aa', 0, { groupIndex: '0' })]), false)).toBe(
+            false,
+        );
     });
 
     it('basic values: negative groupIndex fails', () => {
         const m = loadSchema();
-        expect(
-            m.isProgramSectionValid(sec(SectionTemplate.TextOnly, [t('aa', 0, { groupIndex: -1 })]), false),
-        ).toBe(false);
+        expect(m.isProgramSectionValid(sec(SectionTemplate.TextOnly, [t('aa', 0, { groupIndex: -1 })]), false)).toBe(
+            false,
+        );
     });
 
     it('orders: duplicate numeric orders fail', () => {
         const m = loadSchema();
-        expect(m.isProgramSectionValid(sec(SectionTemplate.TextOnly, [t('aa', 0), d('bbbb', 0)]), false)).toBe(
-            false,
-        );
+        expect(m.isProgramSectionValid(sec(SectionTemplate.TextOnly, [t('aa', 0), d('bbbb', 0)]), false)).toBe(false);
     });
 
     it('orders: non-number orders are ignored', () => {
         const m = loadSchema();
         expect(
-            m.isProgramSectionValid(
-                sec(SectionTemplate.TextOnly, [t('aa', undefined), d('bbbb', undefined)]),
-                true,
-            ),
+            m.isProgramSectionValid(sec(SectionTemplate.TextOnly, [t('aa', undefined), d('bbbb', undefined)]), true),
         ).toBe(true);
     });
 
@@ -375,16 +368,16 @@ describe('program-schema.ts coverage (templates are bottom-only)', () => {
 
     it('counts: draft passes when actual < min but <= max', () => {
         const m = loadSchema();
-        expect(
-            m.isProgramSectionValid(sec(SectionTemplate.SingleImageBottom, [t('a', 0), d('b', 1)]), false),
-        ).toBe(true);
+        expect(m.isProgramSectionValid(sec(SectionTemplate.SingleImageBottom, [t('a', 0), d('b', 1)]), false)).toBe(
+            true,
+        );
     });
 
     it('counts: publish fails when not in range', () => {
         const m = loadSchema();
-        expect(
-            m.isProgramSectionValid(sec(SectionTemplate.SingleImageBottom, [t('a', 0), d('b', 1)]), true),
-        ).toBe(false);
+        expect(m.isProgramSectionValid(sec(SectionTemplate.SingleImageBottom, [t('a', 0), d('b', 1)]), true)).toBe(
+            false,
+        );
     });
 
     it('counts: 0..0 branch fails when author exists', () => {
@@ -396,30 +389,22 @@ describe('program-schema.ts coverage (templates are bottom-only)', () => {
 
     it('lengths: publish fails when text is empty after trim', () => {
         const m = loadSchema();
-        expect(m.isProgramSectionValid(sec(SectionTemplate.TextOnly, [t('   ', 0), d('bbbb', 1)]), true)).toBe(
-            false,
-        );
+        expect(m.isProgramSectionValid(sec(SectionTemplate.TextOnly, [t('   ', 0), d('bbbb', 1)]), true)).toBe(false);
     });
 
     it('lengths: draft allows empty after trim', () => {
         const m = loadSchema();
-        expect(m.isProgramSectionValid(sec(SectionTemplate.TextOnly, [t('   ', 0), d('bbbb', 1)]), false)).toBe(
-            true,
-        );
+        expect(m.isProgramSectionValid(sec(SectionTemplate.TextOnly, [t('   ', 0), d('bbbb', 1)]), false)).toBe(true);
     });
 
     it('lengths: fails when above max', () => {
         const m = loadSchema();
-        expect(m.isProgramSectionValid(sec(SectionTemplate.TextOnly, [t('aaaa', 0), d('bbbb', 1)]), false)).toBe(
-            false,
-        );
+        expect(m.isProgramSectionValid(sec(SectionTemplate.TextOnly, [t('aaaa', 0), d('bbbb', 1)]), false)).toBe(false);
     });
 
     it('lengths: publish fails when below min', () => {
         const m = loadSchema();
-        expect(m.isProgramSectionValid(sec(SectionTemplate.TextOnly, [t('aa', 0), d('x', 1)]), true)).toBe(
-            false,
-        );
+        expect(m.isProgramSectionValid(sec(SectionTemplate.TextOnly, [t('aa', 0), d('x', 1)]), true)).toBe(false);
     });
 
     it('grouping: no grouped items is invalid in publish', () => {
@@ -575,9 +560,9 @@ describe('program-schema.ts coverage (templates are bottom-only)', () => {
 
     it('validateProgramSections returns invalid when any section is invalid', () => {
         const m = loadSchema();
-        expect(
-            m.validateProgramSections([validTextOnly(), sec(SectionTemplate.TextOnly, [t('aa', 0)])], true),
-        ).toBe('invalid');
+        expect(m.validateProgramSections([validTextOnly(), sec(SectionTemplate.TextOnly, [t('aa', 0)])], true)).toBe(
+            'invalid',
+        );
     });
 
     it('validateProgramSections returns undefined when all sections are valid', () => {
@@ -642,9 +627,9 @@ describe('program-schema.ts coverage (templates are bottom-only)', () => {
 
     it('PROGRAM_SECTION_VALIDATION_FUNCTIONS: validateSectionTitle returns required', () => {
         const m = loadSchema();
-        expect(
-            m.PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateSectionTitle('', true, SectionTemplate.TextOnly),
-        ).toBe('required');
+        expect(m.PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateSectionTitle('', true, SectionTemplate.TextOnly)).toBe(
+            'required',
+        );
     });
 
     it('PROGRAM_SECTION_VALIDATION_FUNCTIONS: validateSectionDescription returns max error', () => {

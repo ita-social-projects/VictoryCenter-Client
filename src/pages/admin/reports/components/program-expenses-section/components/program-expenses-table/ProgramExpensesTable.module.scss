@@ -7,10 +7,10 @@
     width: 100%;
     min-height: 347px;
     overflow-x: auto;
-    background: #f8fafc;
-    border: 1px solid #e2e2e2;
+    background: c.$light-blue-25;
+    border: 1px solid c.$grey-500;
     border-radius: 16px;
-    box-shadow: 0 24px 48px -12px rgba(17, 17, 19, 0.2);
+    box-shadow: 0 24px 48px -12px rgba(c.$bluish-black, 0.2);
 }
 
 .table {

@@ -11,56 +11,56 @@ const mockCapture = (key: string, props: any) => {
     mockCapturedProps[key] = props;
 };
 
-jest.mock('@/components/common/program-section-templates/quad-images-bottom/QuadImagesBottom', () => ({
+jest.mock('@/components/common/section-templates/quad-images-bottom/QuadImagesBottom', () => ({
     QuadImagesBottom: (props: any) => {
         mockCapture('QuadImagesBottom', props);
         return <div data-testid="QuadImagesBottom" />;
     },
 }));
 
-jest.mock('@/components/common/program-section-templates/triple-images-bottom/TripleImagesBottom', () => ({
+jest.mock('@/components/common/section-templates/triple-images-bottom/TripleImagesBottom', () => ({
     TripleImagesBottom: (props: any) => {
         mockCapture('TripleImagesBottom', props);
         return <div data-testid="TripleImagesBottom" />;
     },
 }));
 
-jest.mock('@/components/common/program-section-templates/dual-images-bottom/DualImagesBottom', () => ({
+jest.mock('@/components/common/section-templates/dual-images-bottom/DualImagesBottom', () => ({
     DualImagesBottom: (props: any) => {
         mockCapture('DualImagesBottom', props);
         return <div data-testid="DualImagesBottom" />;
     },
 }));
 
-jest.mock('@/components/common/program-section-templates/text-only/TextOnly', () => ({
+jest.mock('@/components/common/section-templates/text-only/TextOnly', () => ({
     TextOnly: (props: any) => {
         mockCapture('TextOnly', props);
         return <div data-testid="TextOnly" />;
     },
 }));
 
-jest.mock('@/components/common/program-section-templates/single-image-top/SingleImageTop', () => ({
+jest.mock('@/components/common/section-templates/single-image-top/SingleImageTop', () => ({
     SingleImageTop: (props: any) => {
         mockCapture('SingleImageTop', props);
         return <div data-testid="SingleImageTop" />;
     },
 }));
 
-jest.mock('@/components/common/program-section-templates/single-image-bottom/SingleImageBottom', () => ({
+jest.mock('@/components/common/section-templates/single-image-bottom/SingleImageBottom', () => ({
     SingleImageBottom: (props: any) => {
         mockCapture('SingleImageBottom', props);
         return <div data-testid="SingleImageBottom" />;
     },
 }));
 
-jest.mock('@/components/common/program-section-templates/single-image-right/SingleImageRight', () => ({
+jest.mock('@/components/common/section-templates/single-image-right/SingleImageRight', () => ({
     SingleImageRight: (props: any) => {
         mockCapture('SingleImageRight', props);
         return <div data-testid="SingleImageRight" />;
     },
 }));
 
-jest.mock('@/components/common/program-section-templates/title-description-cards/TitleDescriptionCardsWrapper', () => ({
+jest.mock('@/components/common/section-templates/title-description-cards/TitleDescriptionCardsWrapper', () => ({
     TitleDescriptionCardsWrapper: (props: any) => {
         mockCapture('TitleDescriptionCardsWrapper', props);
         return <div data-testid="TitleDescriptionCardsWrapper" data-cards-count={String(props.cardsCount)} />;
@@ -68,7 +68,7 @@ jest.mock('@/components/common/program-section-templates/title-description-cards
 }));
 
 jest.mock(
-    '@/components/common/program-section-templates/single-title-quintuple-description/SingleTitleQuintupleDescription',
+    '@/components/common/section-templates/single-title-quintuple-description/SingleTitleQuintupleDescription',
     () => ({
         SingleTitleQuintupleDescription: (props: any) => {
             mockCapture('SingleTitleQuintupleDescription', props);
@@ -78,7 +78,7 @@ jest.mock(
 );
 
 jest.mock(
-    '@/components/common/program-section-templates/single-title-description-author-pairs/SingleTitleDescriptionAuthorPairs',
+    '@/components/common/section-templates/single-title-description-author-pairs/SingleTitleDescriptionAuthorPairs',
     () => ({
         SingleTitleDescriptionAuthorPairs: (props: any) => {
             mockCapture('SingleTitleDescriptionAuthorPairs', props);

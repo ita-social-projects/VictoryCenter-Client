@@ -12,8 +12,8 @@ const createTestFile = (size: number, type: string = 'image/jpeg', name: string 
 };
 
 describe('ImageValidationSchema', () => {
-    const MIN_WIDTH = 1440;
-    const MIN_HEIGHT = 860;
+    const MIN_WIDTH = 1920;
+    const MIN_HEIGHT = 1080;
     const MAX_SIZE_MB = 3;
     const validationSchema = getImageValidationSchema(MIN_WIDTH, MIN_HEIGHT, MAX_SIZE_MB);
 
@@ -92,7 +92,7 @@ describe('ImageValidationSchema', () => {
     });
 
     it('rejects an image with width smaller than minWidth', async () => {
-        mockImageDimensions(1439, 860);
+        mockImageDimensions(1919, 1080);
         const validFile = createTestFile(1000, 'image/jpeg');
 
         await expect(validationSchema.validate(validFile)).rejects.toThrow(
@@ -101,7 +101,7 @@ describe('ImageValidationSchema', () => {
     });
 
     it('rejects an image with height smaller than minHeight', async () => {
-        mockImageDimensions(1440, 859);
+        mockImageDimensions(1920, 1079);
         const validFile = createTestFile(1000, 'image/jpeg');
 
         await expect(validationSchema.validate(validFile)).rejects.toThrow(
@@ -153,7 +153,7 @@ describe('IMAGE_VALIDATION_FUNCTIONS', () => {
     });
 
     it('returns Yup ValidationError message when err instanceof Yup.ValidationError is true', async () => {
-        const validationErrorMessage = 'Image must be at least 1440x860px';
+        const validationErrorMessage = 'Image must be at least 1920x1080px';
         jest.spyOn(Yup.mixed.prototype, 'validate').mockImplementation(() => {
             throw new Yup.ValidationError(validationErrorMessage);
         });

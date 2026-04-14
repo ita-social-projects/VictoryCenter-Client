@@ -4,20 +4,69 @@
 .root {
     margin: 96px 16px 120px;
     border-top: 2px solid c.$light-blue-100;
+    display: grid;
+    grid-template-columns: 1fr;
 
     @media (min-width: 560px) {
         margin: 96px 64px 120px;
+    }
+
+    @media (min-width: 768px) {
+        margin: 96px 56px 120px;
+        grid-template-columns: 2fr 4fr;
+        gap: 16px;
+        padding-top: 16px;
+    }
+
+    @media (min-width: 1440px) {
+        grid-template-columns: 5fr 7fr;
+    }
+
+    ul {
+        list-style: none;
+    }
+}
+
+.research-title {
+    display: none;
+
+    @media (min-width: 1440px) {
+        display: block;
+        @include type.h3-bold-uppercase;
+        margin-bottom: 24px;
     }
 }
 
 .research-description {
     @include type.body-2-regular;
     padding: 16px 0;
-    
+
+    @media (min-width: 768px) {
+        padding: 28px 0 0 0;
+    }
+    @media (min-width: 1440px) {
+        padding: 20px 0 0 0;
+    }
 }
 
 .research {
-    padding: 16px 24px;
-    display: flex;;
+    @include type.subtitle-2-medium;
+    padding: 24px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     gap: 16px;
+    border-bottom: 2px solid c.$light-blue-100;
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.link-icon {
+    min-width: 40px;
+    width: 40px;
+    height: 40px;
+    padding: 8px;
 }

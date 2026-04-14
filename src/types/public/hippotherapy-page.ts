@@ -49,6 +49,7 @@ export interface HippotherapyEthicsSection {
 }
 
 export interface HippotherapyResearchesSection {
+    title: string;
     description: string;
     researches: { text: string; url: string }[];
 }

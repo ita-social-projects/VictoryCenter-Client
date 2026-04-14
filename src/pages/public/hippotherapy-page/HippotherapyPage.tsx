@@ -14,8 +14,6 @@ import { SwipedGallery } from './swiped-gallery/SwipedGallery';
 import { ContactSection } from '../programs-page/contact-section/ContactSection';
 import { EthicalPrinciples } from './ethical-principles/EthicalPrinciples';
 import { ResearchSection } from './research/ResearchSection';
-import quote1DefaultImg from '@/assets/images/public/hippotherapy/quote_1.jpg';
-import quote2DefaultImg from '@/assets/images/public/hippotherapy/quote_2.jpg';
 
 export const HippotherapyPage = () => {
     const { t } = useTranslation('hippotherapy');

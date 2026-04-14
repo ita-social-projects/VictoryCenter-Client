@@ -51,6 +51,7 @@
 
 .research {
     @include type.subtitle-2-medium;
+    color: inherit;
     padding: 24px 16px;
     display: flex;
     align-items: center;

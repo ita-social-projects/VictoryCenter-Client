@@ -12,51 +12,53 @@ export const clearCapturedSectionTemplateProps = () => {
     });
 };
 
+const mockCaptureSectionTemplateProps = captureSectionTemplateProps;
+
 jest.mock('@/components/common/section-templates/quad-images-bottom/QuadImagesBottom', () => ({
     QuadImagesBottom: (props: any) => {
-        captureSectionTemplateProps('QuadImagesBottom', props);
+        mockCaptureSectionTemplateProps('QuadImagesBottom', props);
         return <div data-testid="QuadImagesBottom" />;
     },
 }));
 
 jest.mock('@/components/common/section-templates/triple-images-bottom/TripleImagesBottom', () => ({
     TripleImagesBottom: (props: any) => {
-        captureSectionTemplateProps('TripleImagesBottom', props);
+        mockCaptureSectionTemplateProps('TripleImagesBottom', props);
         return <div data-testid="TripleImagesBottom" />;
     },
 }));
 
 jest.mock('@/components/common/section-templates/dual-images-bottom/DualImagesBottom', () => ({
     DualImagesBottom: (props: any) => {
-        captureSectionTemplateProps('DualImagesBottom', props);
+        mockCaptureSectionTemplateProps('DualImagesBottom', props);
         return <div data-testid="DualImagesBottom" />;
     },
 }));
 
 jest.mock('@/components/common/section-templates/text-only/TextOnly', () => ({
     TextOnly: (props: any) => {
-        captureSectionTemplateProps('TextOnly', props);
+        mockCaptureSectionTemplateProps('TextOnly', props);
         return <div data-testid="TextOnly" />;
     },
 }));
 
 jest.mock('@/components/common/section-templates/single-image-top/SingleImageTop', () => ({
     SingleImageTop: (props: any) => {
-        captureSectionTemplateProps('SingleImageTop', props);
+        mockCaptureSectionTemplateProps('SingleImageTop', props);
         return <div data-testid="SingleImageTop" />;
     },
 }));
 
 jest.mock('@/components/common/section-templates/single-image-bottom/SingleImageBottom', () => ({
     SingleImageBottom: (props: any) => {
-        captureSectionTemplateProps('SingleImageBottom', props);
+        mockCaptureSectionTemplateProps('SingleImageBottom', props);
         return <div data-testid="SingleImageBottom" />;
     },
 }));
 
 jest.mock('@/components/common/section-templates/single-image-right/SingleImageRight', () => ({
     SingleImageRight: (props: any) => {
-        captureSectionTemplateProps('SingleImageRight', props);
+        mockCaptureSectionTemplateProps('SingleImageRight', props);
         return <div data-testid="SingleImageRight" />;
     },
 }));

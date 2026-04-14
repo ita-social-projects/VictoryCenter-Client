@@ -3,19 +3,13 @@ import { FaqSectionQuestionDto, CreateProgramSectionContentDto } from '@/types/c
 import { SectionTemplate, SectionMode } from '@/types/common/sections';
 import { ImageValues, Image } from '@/types/common/image';
 import { ContentType } from '@/types/common/section-contents';
-import { QuadImagesBottom } from '@/components/common/section-templates/quad-images-bottom/QuadImagesBottom';
-import { TripleImagesBottom } from '@/components/common/section-templates/triple-images-bottom/TripleImagesBottom';
-import { DualImagesBottom } from '@/components/common/section-templates/dual-images-bottom/DualImagesBottom';
-import { TextOnly } from '@/components/common/section-templates/text-only/TextOnly';
-import { SingleImageTop } from '@/components/common/section-templates/single-image-top/SingleImageTop';
-import { SingleImageBottom } from '@/components/common/section-templates/single-image-bottom/SingleImageBottom';
-import { SingleImageRight } from '@/components/common/section-templates/single-image-right/SingleImageRight';
 import { TitleDescriptionCardsWrapper } from '@/components/common/section-templates/title-description-cards/TitleDescriptionCardsWrapper';
 import { SingleTitleQuintupleDescription } from '@/components/common/section-templates/single-title-quintuple-description/SingleTitleQuintupleDescription';
 import { SingleTitleDescriptionAuthorPairs } from '@/components/common/section-templates/single-title-description-author-pairs/SingleTitleDescriptionAuthorPairs';
 import { SECTIONS_TEXT } from '@/const/admin/sections';
 import { FaqProgramSection } from '@/components/common/section-templates/faq-program-section';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { renderStandardSectionTemplate } from '@/utils/functions/render-standard-section-template';
 
 export interface ProgramSectionCardData {
     title: string;
@@ -106,41 +100,6 @@ const CARD_COUNT_MAP: Partial<Record<SectionTemplate, number>> = {
     [SectionTemplate.DualTitleDescriptionPairs]: 2,
     [SectionTemplate.TripleTitleDescriptionPairs]: 3,
     [SectionTemplate.QuadTitleDescriptionPairs]: 4,
-};
-
-const SINGLE_IMAGE_TEMPLATES = new Set<SectionTemplate>([
-    SectionTemplate.SingleImageTop,
-    SectionTemplate.SingleImageBottom,
-    SectionTemplate.SingleImageRight,
-]);
-
-interface StandardTemplateProps {
-    title?: string;
-    description?: string;
-    mode?: SectionMode;
-    onTitleChange?: (value: string) => void;
-    onDescriptionChange?: (value: string) => void;
-    validationResetKey?: number;
-}
-
-type StandardTemplateComponentProps =
-    | (StandardTemplateProps & {
-          image?: Image | ImageValues | null;
-          onImageChange?: (file: ImageValues | null) => void;
-      })
-    | (StandardTemplateProps & {
-          images?: (Image | ImageValues | null)[];
-          onImagesChange?: (index: number, file: ImageValues | null) => void;
-      });
-
-const STANDARD_TEMPLATES_MAP: Partial<Record<SectionTemplate, React.ComponentType<StandardTemplateComponentProps>>> = {
-    [SectionTemplate.TextOnly]: TextOnly,
-    [SectionTemplate.SingleImageTop]: SingleImageTop,
-    [SectionTemplate.SingleImageBottom]: SingleImageBottom,
-    [SectionTemplate.SingleImageRight]: SingleImageRight,
-    [SectionTemplate.DualImagesBottom]: DualImagesBottom,
-    [SectionTemplate.TripleImagesBottom]: TripleImagesBottom,
-    [SectionTemplate.QuadImagesBottom]: QuadImagesBottom,
 };
 
 export const getInitialSectionContents = (templateId: SectionTemplate): CreateProgramSectionContentDto[] => {
@@ -252,29 +211,11 @@ export const renderProgramSection = ({
         );
     }
 
-    const Component = STANDARD_TEMPLATES_MAP[templateId];
-    if (!Component) return null;
-
-    const baseProps: StandardTemplateProps = {
-        title: data.title,
-        description: data.description,
+    return renderStandardSectionTemplate({
+        templateId,
+        data,
         mode,
-        onTitleChange: handlers?.onTitleChange,
-        onDescriptionChange: handlers?.onDescriptionChange,
+        handlers,
         validationResetKey,
-    };
-
-    if (SINGLE_IMAGE_TEMPLATES.has(templateId)) {
-        const onImagesChange = handlers?.onImagesChange;
-
-        return (
-            <Component
-                {...baseProps}
-                image={data.images?.[0]}
-                onImageChange={onImagesChange ? (file) => onImagesChange(0, file) : undefined}
-            />
-        );
-    }
-
-    return <Component {...baseProps} images={data.images} onImagesChange={handlers?.onImagesChange} />;
+    });
 };

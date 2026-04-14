@@ -1,4 +1,4 @@
-﻿import { COMMON_TEXT_ADMIN } from './common';
+import { COMMON_TEXT_ADMIN } from './common';
 import { SectionTemplate } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
 

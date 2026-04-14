@@ -1,6 +1,10 @@
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import {
+    clearCapturedSectionTemplateProps,
+    mockCapturedSectionTemplateProps,
+} from '@/utils/functions/test-helpers/section-template-component-mocks';
+import {
     renderHistorySection,
     getInitialHistorySectionContents,
     isHistoryTemplate,
@@ -8,61 +12,6 @@ import {
 } from './renderHistorySection';
 import { SectionTemplate, SectionMode } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
-
-const mockCapturedProps: Record<string, any> = {};
-
-const mockCapture = (key: string, props: any) => {
-    mockCapturedProps[key] = props;
-};
-
-jest.mock('@/components/common/section-templates/quad-images-bottom/QuadImagesBottom', () => ({
-    QuadImagesBottom: (props: any) => {
-        mockCapture('QuadImagesBottom', props);
-        return <div data-testid="QuadImagesBottom" />;
-    },
-}));
-
-jest.mock('@/components/common/section-templates/triple-images-bottom/TripleImagesBottom', () => ({
-    TripleImagesBottom: (props: any) => {
-        mockCapture('TripleImagesBottom', props);
-        return <div data-testid="TripleImagesBottom" />;
-    },
-}));
-
-jest.mock('@/components/common/section-templates/dual-images-bottom/DualImagesBottom', () => ({
-    DualImagesBottom: (props: any) => {
-        mockCapture('DualImagesBottom', props);
-        return <div data-testid="DualImagesBottom" />;
-    },
-}));
-
-jest.mock('@/components/common/section-templates/text-only/TextOnly', () => ({
-    TextOnly: (props: any) => {
-        mockCapture('TextOnly', props);
-        return <div data-testid="TextOnly" />;
-    },
-}));
-
-jest.mock('@/components/common/section-templates/single-image-top/SingleImageTop', () => ({
-    SingleImageTop: (props: any) => {
-        mockCapture('SingleImageTop', props);
-        return <div data-testid="SingleImageTop" />;
-    },
-}));
-
-jest.mock('@/components/common/section-templates/single-image-bottom/SingleImageBottom', () => ({
-    SingleImageBottom: (props: any) => {
-        mockCapture('SingleImageBottom', props);
-        return <div data-testid="SingleImageBottom" />;
-    },
-}));
-
-jest.mock('@/components/common/section-templates/single-image-right/SingleImageRight', () => ({
-    SingleImageRight: (props: any) => {
-        mockCapture('SingleImageRight', props);
-        return <div data-testid="SingleImageRight" />;
-    },
-}));
 
 describe('renderHistorySection', () => {
     const baseData = {
@@ -81,7 +30,7 @@ describe('renderHistorySection', () => {
     };
 
     beforeEach(() => {
-        Object.keys(mockCapturedProps).forEach((k) => delete mockCapturedProps[k]);
+        clearCapturedSectionTemplateProps();
         jest.clearAllMocks();
     });
 
@@ -105,12 +54,12 @@ describe('renderHistorySection', () => {
         );
 
         expect(screen.getByTestId('TextOnly')).toBeInTheDocument();
-        expect(mockCapturedProps.TextOnly.title).toBe('History title');
-        expect(mockCapturedProps.TextOnly.description).toBe('History description');
-        expect(mockCapturedProps.TextOnly.mode).toBe(SectionMode.View);
-        expect(mockCapturedProps.TextOnly.validationResetKey).toBe(7);
-        expect(mockCapturedProps.TextOnly.onTitleChange).toBe(baseHandlers.onTitleChange);
-        expect(mockCapturedProps.TextOnly.onDescriptionChange).toBe(baseHandlers.onDescriptionChange);
+        expect(mockCapturedSectionTemplateProps.TextOnly.title).toBe('History title');
+        expect(mockCapturedSectionTemplateProps.TextOnly.description).toBe('History description');
+        expect(mockCapturedSectionTemplateProps.TextOnly.mode).toBe(SectionMode.View);
+        expect(mockCapturedSectionTemplateProps.TextOnly.validationResetKey).toBe(7);
+        expect(mockCapturedSectionTemplateProps.TextOnly.onTitleChange).toBe(baseHandlers.onTitleChange);
+        expect(mockCapturedSectionTemplateProps.TextOnly.onDescriptionChange).toBe(baseHandlers.onDescriptionChange);
     });
 
     it('maps onImagesChange into onImageChange for single-image templates', () => {
@@ -123,7 +72,7 @@ describe('renderHistorySection', () => {
             }) as React.ReactElement,
         );
 
-        const props = mockCapturedProps.SingleImageTop;
+        const props = mockCapturedSectionTemplateProps.SingleImageTop;
 
         expect(props.image).toEqual(baseData.images[0]);
         expect(props.mode).toBe(SectionMode.Edit);
@@ -147,7 +96,7 @@ describe('renderHistorySection', () => {
             }) as React.ReactElement,
         );
 
-        expect(mockCapturedProps.SingleImageBottom.onImageChange).toBeUndefined();
+        expect(mockCapturedSectionTemplateProps.SingleImageBottom.onImageChange).toBeUndefined();
     });
 
     it('passes images and onImagesChange for multi-image templates', () => {
@@ -160,7 +109,7 @@ describe('renderHistorySection', () => {
             }) as React.ReactElement,
         );
 
-        const props = mockCapturedProps.QuadImagesBottom;
+        const props = mockCapturedSectionTemplateProps.QuadImagesBottom;
         expect(props.images).toEqual(baseData.images);
         expect(props.mode).toBe(SectionMode.Edit);
         expect(props.onImagesChange).toBe(baseHandlers.onImagesChange);

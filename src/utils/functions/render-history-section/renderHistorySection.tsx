@@ -1,27 +1,16 @@
 import React from 'react';
 import { HistorySectionContentDto } from '@/types/common/history-sections';
 import { SectionTemplate, SectionMode } from '@/types/common/sections';
-import { ImageValues, Image } from '@/types/common/image';
 import { ContentType } from '@/types/common/section-contents';
-import { QuadImagesBottom } from '@/components/common/section-templates/quad-images-bottom/QuadImagesBottom';
-import { TripleImagesBottom } from '@/components/common/section-templates/triple-images-bottom/TripleImagesBottom';
-import { DualImagesBottom } from '@/components/common/section-templates/dual-images-bottom/DualImagesBottom';
-import { TextOnly } from '@/components/common/section-templates/text-only/TextOnly';
-import { SingleImageTop } from '@/components/common/section-templates/single-image-top/SingleImageTop';
-import { SingleImageBottom } from '@/components/common/section-templates/single-image-bottom/SingleImageBottom';
-import { SingleImageRight } from '@/components/common/section-templates/single-image-right/SingleImageRight';
+import {
+    renderStandardSectionTemplate,
+    StandardSectionData,
+    StandardSectionHandlers,
+} from '@/utils/functions/render-standard-section-template';
 
-export interface HistorySectionData {
-    title?: string;
-    description?: string;
-    images?: (Image | ImageValues | null)[];
-}
+export interface HistorySectionData extends StandardSectionData {}
 
-export interface HistorySectionHandlers {
-    onTitleChange?: (value: string) => void;
-    onDescriptionChange?: (value: string) => void;
-    onImagesChange?: (index: number, file: ImageValues | null) => void;
-}
+export interface HistorySectionHandlers extends StandardSectionHandlers {}
 
 export interface RenderHistorySectionParams {
     templateId: SectionTemplate;
@@ -84,41 +73,6 @@ const IMAGE_COUNT_MAP: Record<HistorySectionTemplate, number> = {
     [SectionTemplate.QuadImagesBottom]: 4,
 };
 
-const SINGLE_IMAGE_TEMPLATES = new Set<HistorySectionTemplate>([
-    SectionTemplate.SingleImageTop,
-    SectionTemplate.SingleImageBottom,
-    SectionTemplate.SingleImageRight,
-]);
-
-interface StandardTemplateProps {
-    title?: string;
-    description?: string;
-    mode?: SectionMode;
-    onTitleChange?: (value: string) => void;
-    onDescriptionChange?: (value: string) => void;
-    validationResetKey?: number;
-}
-
-type StandardTemplateComponentProps =
-    | (StandardTemplateProps & {
-          image?: Image | ImageValues | null;
-          onImageChange?: (file: ImageValues | null) => void;
-      })
-    | (StandardTemplateProps & {
-          images?: (Image | ImageValues | null)[];
-          onImagesChange?: (index: number, file: ImageValues | null) => void;
-      });
-
-const STANDARD_TEMPLATES_MAP: Record<HistorySectionTemplate, React.ComponentType<StandardTemplateComponentProps>> = {
-    [SectionTemplate.TextOnly]: TextOnly,
-    [SectionTemplate.SingleImageTop]: SingleImageTop,
-    [SectionTemplate.SingleImageBottom]: SingleImageBottom,
-    [SectionTemplate.SingleImageRight]: SingleImageRight,
-    [SectionTemplate.DualImagesBottom]: DualImagesBottom,
-    [SectionTemplate.TripleImagesBottom]: TripleImagesBottom,
-    [SectionTemplate.QuadImagesBottom]: QuadImagesBottom,
-};
-
 export const getInitialHistorySectionContents = (templateId: SectionTemplate): HistorySectionContentDto[] => {
     if (!isHistoryTemplate(templateId)) {
         return [];
@@ -139,28 +93,11 @@ export const renderHistorySection = ({
         return null;
     }
 
-    const Component = STANDARD_TEMPLATES_MAP[templateId];
-
-    const baseProps: StandardTemplateProps = {
-        title: data.title,
-        description: data.description,
+    return renderStandardSectionTemplate({
+        templateId,
+        data,
         mode,
-        onTitleChange: handlers?.onTitleChange,
-        onDescriptionChange: handlers?.onDescriptionChange,
+        handlers,
         validationResetKey,
-    };
-
-    if (SINGLE_IMAGE_TEMPLATES.has(templateId)) {
-        const onImagesChange = handlers?.onImagesChange;
-
-        return (
-            <Component
-                {...baseProps}
-                image={data.images?.[0]}
-                onImageChange={onImagesChange ? (file) => onImagesChange(0, file) : undefined}
-            />
-        );
-    }
-
-    return <Component {...baseProps} images={data.images} onImagesChange={handlers?.onImagesChange} />;
+    });
 };

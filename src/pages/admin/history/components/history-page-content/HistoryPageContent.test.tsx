@@ -1,6 +1,22 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { HistoryPageContent } from './HistoryPageContent';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
+
+jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
+    useAdminClient: jest.fn(),
+}));
+
+jest.mock('@/hooks/common/use-data-fetch/useDataFetch', () => ({
+    useDataFetch: jest.fn(),
+}));
+
+const mockedUseAdminClient = useAdminClient as jest.MockedFunction<typeof useAdminClient>;
+const mockedUseDataFetch = useDataFetch as jest.Mock;
+const mockClient = {
+    get: jest.fn(),
+};
 
 const mockToolbarOnAddSection = jest.fn();
 
@@ -38,6 +54,15 @@ describe('HistoryPageContent', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
+        mockedUseAdminClient.mockReturnValue(mockClient as any);
+        mockClient.get.mockResolvedValue({ data: [] });
+        mockedUseDataFetch.mockReturnValue({
+            data: [],
+            error: null,
+            isLoading: false,
+            refetch: jest.fn(),
+            setData: jest.fn(),
+        });
     });
 
     it('renders empty state when there are no sections', () => {

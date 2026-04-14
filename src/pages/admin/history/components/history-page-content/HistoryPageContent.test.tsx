@@ -3,6 +3,10 @@ import userEvent from '@testing-library/user-event';
 import { HistoryPageContent } from './HistoryPageContent';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
+import { HistoryApi } from '@/services/api/admin/history/history-api';
+import { renderHistorySection } from '@/utils/functions/render-history-section';
+import { ContentType } from '@/types/common/section-contents';
+import { SectionTemplate } from '@/types/common/sections';
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
@@ -12,8 +16,20 @@ jest.mock('@/hooks/common/use-data-fetch/useDataFetch', () => ({
     useDataFetch: jest.fn(),
 }));
 
+jest.mock('@/services/api/admin/history/history-api', () => ({
+    HistoryApi: {
+        fetchSections: jest.fn(),
+    },
+}));
+
+jest.mock('@/utils/functions/render-history-section', () => ({
+    renderHistorySection: jest.fn(() => <div data-testid="rendered-history-section" />),
+}));
+
 const mockedUseAdminClient = useAdminClient as jest.MockedFunction<typeof useAdminClient>;
 const mockedUseDataFetch = useDataFetch as jest.Mock;
+const mockedHistoryApi = HistoryApi as jest.Mocked<typeof HistoryApi>;
+const mockedRenderHistorySection = renderHistorySection as jest.MockedFunction<typeof renderHistorySection>;
 const mockClient = {
     get: jest.fn(),
 };
@@ -56,6 +72,7 @@ describe('HistoryPageContent', () => {
         jest.clearAllMocks();
         mockedUseAdminClient.mockReturnValue(mockClient as any);
         mockClient.get.mockResolvedValue({ data: [] });
+        mockedHistoryApi.fetchSections.mockResolvedValue([]);
         mockedUseDataFetch.mockReturnValue({
             data: [],
             error: null,
@@ -63,6 +80,24 @@ describe('HistoryPageContent', () => {
             refetch: jest.fn(),
             setData: jest.fn(),
         });
+    });
+
+    it('uses history API in fetch handler passed to useDataFetch', async () => {
+        render(<HistoryPageContent />);
+
+        const [{ fetchHandler, initialData, autoFetchDisabled }] = mockedUseDataFetch.mock.calls[0] as [
+            {
+                fetchHandler: (options: any) => Promise<unknown>;
+                initialData: unknown[];
+                autoFetchDisabled: boolean;
+            },
+        ];
+
+        await fetchHandler({});
+
+        expect(initialData).toEqual([]);
+        expect(autoFetchDisabled).toBe(false);
+        expect(mockedHistoryApi.fetchSections).toHaveBeenCalledWith(mockClient);
     });
 
     it('renders empty state when there are no sections', () => {
@@ -113,5 +148,65 @@ describe('HistoryPageContent', () => {
         await user.click(button);
 
         expect(screen.getByTestId('history-page-content')).toBeInTheDocument();
+    });
+
+    it('renders mapped sections and skips null section entries', () => {
+        const sections = [
+            null,
+            {
+                id: 1,
+                template: SectionTemplate.SingleImageTop,
+                order: 0,
+                contents: [
+                    { contentType: ContentType.Title, order: 0, title: 'Section 1 title' },
+                    { contentType: ContentType.Description, order: 1, description: 'Section 1 description' },
+                    { contentType: ContentType.Image, order: 2, image: { url: 'image-1', mimeType: 'image/jpeg' } },
+                ],
+            },
+            {
+                id: 2,
+                template: SectionTemplate.TextOnly,
+                order: 1,
+                contents: [{ contentType: ContentType.Image, order: 0, image: null }],
+            },
+        ];
+
+        mockedUseDataFetch.mockReturnValue({
+            data: sections,
+            error: null,
+            isLoading: false,
+            refetch: jest.fn(),
+            setData: jest.fn(),
+        });
+
+        render(<HistoryPageContent />);
+
+        expect(screen.queryByText('No sections yet')).not.toBeInTheDocument();
+        expect(screen.getAllByLabelText(/edit section/i)).toHaveLength(2);
+        expect(mockedRenderHistorySection).toHaveBeenCalledTimes(2);
+
+        expect(mockedRenderHistorySection).toHaveBeenNthCalledWith(1, {
+            templateId: SectionTemplate.SingleImageTop,
+            data: {
+                title: 'Section 1 title',
+                description: 'Section 1 description',
+                images: [{ url: 'image-1', mimeType: 'image/jpeg' }],
+            },
+        });
+
+        expect(mockedRenderHistorySection).toHaveBeenNthCalledWith(2, {
+            templateId: SectionTemplate.TextOnly,
+            data: {
+                title: '',
+                description: '',
+                images: [null],
+            },
+        });
+
+        expect(screen.getAllByRole('button', { name: /move up section/i })).toHaveLength(2);
+        expect(screen.getAllByRole('button', { name: /move down section/i })).toHaveLength(1);
+        expect(screen.getAllByRole('button', { name: /edit section/i })).toHaveLength(2);
+        expect(screen.getAllByRole('button', { name: /delete section/i })).toHaveLength(2);
+        expect(screen.getAllByRole('button', { name: /replace section/i })).toHaveLength(2);
     });
 });

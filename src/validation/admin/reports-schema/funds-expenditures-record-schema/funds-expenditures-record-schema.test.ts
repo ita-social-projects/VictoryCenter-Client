@@ -31,13 +31,19 @@ describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
         });
 
         it('should return max digits error when integer part is too long', () => {
-            expect(validateFundsExpendituresAmount('123456789012', 'change')).toBe(
+            expect(validateFundsExpendituresAmount('1234567890', 'change')).toBe(
                 FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_MAX_DIGITS,
             );
         });
 
         it('should return negative error for negative values', () => {
             expect(validateFundsExpendituresAmount('-1', 'change')).toBe(
+                FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_NOT_NEGATIVE,
+            );
+        });
+
+        it('should return negative error for zero value', () => {
+            expect(validateFundsExpendituresAmount('0', 'change')).toBe(
                 FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_NOT_NEGATIVE,
             );
         });

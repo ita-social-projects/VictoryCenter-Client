@@ -210,9 +210,9 @@ export const FUNDS_EXPENDITURES_TEXT = {
         },
     },
     VALIDATION: {
-        CATEGORY_UNIQUE: 'Категорія має бути унікальна',
-        AMOUNT_ONLY_NUMBER_GT_ZERO: 'Лише число > 0',
-        AMOUNT_MAX_DIGITS: "Не більше 11 цифр, 2 після ','",
+        CATEGORY_UNIQUE: 'Категорія вже додана до надходжень',
+        AMOUNT_ONLY_NUMBER_GT_ZERO: 'Дозволено лише цифри',
+        AMOUNT_MAX_DIGITS: 'Не більше 9 цифр до коми',
         AMOUNT_NOT_NEGATIVE: "Сума не може бути від'ємною",
         EXCHANGE_RATE_ONLY_NUMERIC: 'Дозволено тільки числові значення десяткові та цілі',
         EXCHANGE_RATE_GT_ZERO: 'Значення має бути більше 0',

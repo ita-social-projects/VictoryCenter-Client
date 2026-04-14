@@ -104,7 +104,7 @@ jest.mock('@/components/admin/input-with-character-limit/InputWithCharacterLimit
 jest.mock('@/components/common/select/Select', () => {
     const React = require('react');
     return {
-        Select: ({ value, onValueChange, children, placeholder }: any) => {
+        Select: ({ value, onValueChange, onBlur, children, placeholder }: any) => {
             const options = React.Children.toArray(children)
                 .filter((child: any) => child?.type?.name === 'Option' || child?.props?.name !== undefined)
                 .map((child: any) => ({
@@ -131,6 +131,7 @@ jest.mock('@/components/common/select/Select', () => {
                         'data-testid': `select-${placeholder}`,
                         value: value || '',
                         onChange: handleChange,
+                        onBlur,
                         'aria-label': placeholder,
                     },
                     React.createElement('option', { value: '' }, placeholder),
@@ -188,7 +189,7 @@ describe('AddIncomeModal', () => {
         user: ReturnType<typeof userEvent.setup>,
         {
             year = currentYear,
-            category = '1',
+            category = '3',
             amountUah = '400',
             amountUsd = '10',
             selectionMode = 'change',
@@ -530,6 +531,23 @@ describe('AddIncomeModal', () => {
             await user.selectOptions(categorySelect, '2');
 
             expect((categorySelect as HTMLSelectElement).value).toBe('2');
+        });
+
+        it('should disable submit button for duplicate income category', async () => {
+            const user = userEvent.setup({ delay: null });
+            renderAddIncomeModal();
+
+            const yearSelect = screen.getByTestId('select-Оберіть звітній рік') as HTMLSelectElement;
+            const categorySelect = screen.getByTestId('select-Оберіть категорію надходження') as HTMLSelectElement;
+            const uahInput = screen.getByTestId('input-add-income-amount-uah') as HTMLInputElement;
+            const usdInput = screen.getByTestId('input-add-income-amount-usd') as HTMLInputElement;
+
+            fireEvent.change(yearSelect, { target: { value: currentYear } });
+            fireEvent.change(categorySelect, { target: { value: '1' } });
+            await user.type(uahInput, '100');
+            await user.type(usdInput, '10');
+
+            expect(screen.getByTestId('modal-submit')).toBeDisabled();
         });
     });
 

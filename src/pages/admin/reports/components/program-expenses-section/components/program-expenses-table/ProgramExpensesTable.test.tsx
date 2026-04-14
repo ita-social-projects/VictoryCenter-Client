@@ -4,9 +4,33 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ProgramExpensesTable } from './ProgramExpensesTable';
 import { FUNDS_EXPENDITURES_TEXT, PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
 
-jest.mock('@/assets/icons/not-found.svg', () => ({
-    ReactComponent: () => <svg data-testid="not-found-icon" />,
-}));
+jest.mock(
+    '@/pages/admin/reports/components/program-expenses-section/components/program-expenses-empty-state/ProgramExpensesEmptyState',
+    () => ({
+        ProgramExpensesEmptyState: ({
+            colSpan = 5,
+            variant = 'filtered',
+        }: {
+            colSpan?: number;
+            variant?: 'filtered' | 'program-expenses';
+        }) => (
+            <tr data-testid="program-expenses-empty-state" data-variant={variant}>
+                <td colSpan={colSpan} data-testid="program-expenses-empty-state-cell" />
+            </tr>
+        ),
+    }),
+);
+
+const getEmptyState = () => screen.getByTestId('program-expenses-empty-state');
+const getEmptyStateCell = () => screen.getByTestId('program-expenses-empty-state-cell');
+
+const expectEmptyState = (variant: 'filtered' | 'program-expenses') => {
+    const emptyState = getEmptyState();
+
+    expect(emptyState).toBeInTheDocument();
+    expect(emptyState).toHaveAttribute('data-variant', variant);
+    expect(getEmptyStateCell()).toHaveAttribute('colspan', '5');
+};
 
 describe('ProgramExpensesTable', () => {
     const records = [
@@ -33,7 +57,7 @@ describe('ProgramExpensesTable', () => {
     const normalizeText = (value: string) => value.replaceAll('\u00A0', ' ').replaceAll(/\s+/g, ' ').trim();
 
     it('should render table headers', () => {
-        render(<ProgramExpensesTable records={records} />);
+        render(<ProgramExpensesTable records={records} hasAnyProgramExpenseRecords />);
 
         expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.REPORTING_YEAR)).toBeInTheDocument();
         expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.TYPE)).toBeInTheDocument();
@@ -43,7 +67,7 @@ describe('ProgramExpensesTable', () => {
     });
 
     it('should render formatted record values', () => {
-        const { container } = render(<ProgramExpensesTable records={records} />);
+        const { container } = render(<ProgramExpensesTable records={records} hasAnyProgramExpenseRecords />);
         const table = screen.getByRole('table');
 
         expect(within(table).getByText('2025')).toBeInTheDocument();
@@ -56,9 +80,16 @@ describe('ProgramExpensesTable', () => {
     });
 
     it('should render empty state when records are missing', () => {
-        render(<ProgramExpensesTable records={[]} />);
+        render(<ProgramExpensesTable records={[]} hasAnyProgramExpenseRecords />);
 
-        expect(screen.getByTestId('not-found-icon')).toBeInTheDocument();
-        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.MESSAGE)).toBeInTheDocument();
+        expectEmptyState('filtered');
+    });
+
+    it('should render program expenses empty state when there are no records in system', () => {
+        render(<ProgramExpensesTable records={[]} hasAnyProgramExpenseRecords={false} />);
+
+        expect(screen.getByRole('table')).toBeInTheDocument();
+        expect(screen.getByText(PROGRAM_EXPENSES_TEXT.TABLE.COLUMNS.PROGRAM)).toBeInTheDocument();
+        expectEmptyState('program-expenses');
     });
 });

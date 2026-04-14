@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState, useEffect } from 'react';
 import { ProgramForm, ProgramFormRef, ProgramFormValues } from '../../program-form/ProgramForm';
 import {
     HippotherapyProgram,
@@ -55,6 +55,15 @@ export const ProgramModal = (props: ProgramModalProps) => {
     const [isSectionRevertModalOpen, setIsSectionRevertModalOpen] = useState(false);
     const [pendingCancelActionType, setPendingCancelActionType] = useState<SectionCancelActionType | null>(null);
     const sectionDiscardActionRef = useRef<(() => void) | null>(null);
+    const [isSectionSaveModalOpen, setIsSectionSaveModalOpen] = useState(false);
+    const sectionSaveActionRef = useRef<(() => void) | null>(null);
+
+    useEffect(() => {
+        if (!isOpen) {
+            setIsSectionSaveModalOpen(false);
+            sectionSaveActionRef.current = null;
+        }
+    }, [isOpen]);
 
     const initialData = useMemo<ProgramFormValues | null>(() => {
         if (!isEditMode || !program) return null;
@@ -243,6 +252,21 @@ export const ProgramModal = (props: ProgramModalProps) => {
         [openModalActions],
     );
 
+    const handleRequestSaveSection = useCallback((request: { onConfirm: () => void }) => {
+        sectionSaveActionRef.current = request.onConfirm;
+        setIsSectionSaveModalOpen(true);
+    }, []);
+
+    const handleCloseSectionSaveModal = useCallback(() => {
+        setIsSectionSaveModalOpen(false);
+        sectionSaveActionRef.current = null;
+    }, []);
+
+    const handleConfirmSaveSection = useCallback(() => {
+        sectionSaveActionRef.current?.();
+        handleCloseSectionSaveModal();
+    }, [handleCloseSectionSaveModal]);
+
     return (
         <div className="program-modal">
             <GenericModalWrapper
@@ -280,6 +304,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
                         onAddSection={openModalActions.openAddSectionModal}
                         onReplaceSection={handleReplaceSection}
                         onRequestCancelSection={handleRequestCancelSection}
+                        onRequestSaveSection={handleRequestSaveSection}
                     />
                 )}
             />
@@ -318,6 +343,14 @@ export const ProgramModal = (props: ProgramModalProps) => {
                 }
                 onConfirm={handleConfirmRevertSection}
                 onCancel={handleCloseSectionRevertModal}
+            />
+
+            <ConfirmationModal
+                isOpen={isOpen && isSectionSaveModalOpen}
+                onClose={handleCloseSectionSaveModal}
+                title={COMMON_TEXT_ADMIN.QUESTION.SAVE_CHANGES}
+                onConfirm={handleConfirmSaveSection}
+                onCancel={handleCloseSectionSaveModal}
             />
         </div>
     );

@@ -71,6 +71,7 @@ export interface ProgramFormProps {
     selectedLanguage?: string;
     onLanguageChange?: (language: string) => void;
     onRequestCancelSection?: (request: { type: SectionCancelActionType; onDiscard: () => void }) => void;
+    onRequestSaveSection?: (request: { onConfirm: () => void }) => void;
 }
 
 interface SectionEditingState {
@@ -109,6 +110,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             onAddSection,
             onReplaceSection,
             onRequestCancelSection,
+            onRequestSaveSection,
         }: ProgramFormProps,
         ref,
     ) => {
@@ -759,6 +761,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                             isLastSection={index === formState.sections.length - 1}
                                             onMoveUpSection={() => handleMoveUpSection(sectionKey)}
                                             onMoveDownSection={() => handleMoveDownSection(sectionKey)}
+                                            onRequestSaveSection={onRequestSaveSection}
                                         />
                                         {index === formState.sections.length - 1 && (
                                             <div className={styles['add-section-wrapper']}>

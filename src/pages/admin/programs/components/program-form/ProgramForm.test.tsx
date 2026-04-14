@@ -176,6 +176,7 @@ jest.mock('../program-section-form/ProgramSectionForm', () => ({
         isDisabled,
         isNewSection,
         isReplacingTemplate,
+        onRequestSaveSection,
     }: any) => (
         <div
             data-testid="program-section-form"
@@ -257,6 +258,14 @@ jest.mock('../program-section-form/ProgramSectionForm', () => ({
                     Move Down
                 </button>
             )}
+
+            <button
+                type="button"
+                data-testid={`request-save-section-${section.id ?? section.template}`}
+                onClick={() => onRequestSaveSection?.({ onConfirm: jest.fn() })}
+            >
+                Request Save
+            </button>
         </div>
     ),
 }));
@@ -937,6 +946,26 @@ describe('ProgramForm', () => {
             await waitFor(() => {
                 expect(screen.getAllByTestId('program-section-form')).toHaveLength(1);
             });
+        });
+    });
+
+    it('calls onRequestSaveSection when ProgramSectionForm requests save confirmation', async () => {
+        const onRequestSaveSection = jest.fn();
+        const initialData = createInitialData({
+            sections: [{ id: 101, template: 1, order: 0, contents: [] } as CreateHippotherapyProgramSectionDto],
+        });
+
+        renderProgramForm({ initialData, onRequestSaveSection });
+
+        await waitFor(() => {
+            expect(screen.getByTestId('program-section-form')).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByTestId('request-save-section-101'));
+
+        expect(onRequestSaveSection).toHaveBeenCalledTimes(1);
+        expect(onRequestSaveSection).toHaveBeenCalledWith({
+            onConfirm: expect.any(Function),
         });
     });
 });

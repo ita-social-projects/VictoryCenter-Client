@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { Button } from '@/components/admin/button/Button';
 import { ImageValues } from '@/types/common/image';
-import { PROGRAMS_TEXT } from '@/const/admin/programs';
+import { SECTIONS_TEXT } from '@/const/admin/sections';
 import { renderProgramSection } from '@/utils/functions/render-program-section';
 import { ReactComponent as ChangeIcon } from '@/assets/icons/change.svg';
 import styles from './ProgramSectionForm.module.scss';
@@ -708,14 +708,14 @@ export const ProgramSectionForm = ({
                 {sectionMode !== SectionMode.View && (
                     <div className={styles.actions}>
                         <Button buttonStyle="secondary" onClick={handleCancelClick} disabled={isDisabled}>
-                            {PROGRAMS_TEXT.BUTTON.CANCEL}
+                            {SECTIONS_TEXT.BUTTON.CANCEL}
                         </Button>
                         <Button
                             buttonStyle="primary"
                             onClick={handleSaveClick}
                             disabled={isDisabled || !isSectionSaveValid}
                         >
-                            {PROGRAMS_TEXT.BUTTON.SAVE}
+                            {SECTIONS_TEXT.BUTTON.SAVE}
                         </Button>
                     </div>
                 )}

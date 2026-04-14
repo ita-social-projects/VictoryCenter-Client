@@ -1101,7 +1101,7 @@ describe('ProgramSectionForm', () => {
             handlers.onTitleChange('Dirty title');
         });
 
-        fireEvent.click(screen.getByText(PROGRAMS_TEXT.BUTTON.SAVE));
+        fireEvent.click(screen.getByText(SECTIONS_TEXT.BUTTON.SAVE));
 
         expect(onRequestSaveSection).toHaveBeenCalledTimes(1);
         expect(onRequestSaveSection).toHaveBeenCalledWith({
@@ -1126,7 +1126,7 @@ describe('ProgramSectionForm', () => {
             handlers.onTitleChange('Dirty title');
         });
 
-        fireEvent.click(screen.getByText(PROGRAMS_TEXT.BUTTON.SAVE));
+        fireEvent.click(screen.getByText(SECTIONS_TEXT.BUTTON.SAVE));
 
         const requestArg = onRequestSaveSection.mock.calls[0][0];
         expect(requestArg.onConfirm).toEqual(expect.any(Function));
@@ -1136,7 +1136,7 @@ describe('ProgramSectionForm', () => {
         });
 
         expect(onSave).toHaveBeenCalledTimes(1);
-        expect(screen.queryByText(PROGRAMS_TEXT.BUTTON.SAVE)).not.toBeInTheDocument();
+        expect(screen.queryByText(SECTIONS_TEXT.BUTTON.SAVE)).not.toBeInTheDocument();
         expect(screen.getByLabelText('Edit section')).toBeInTheDocument();
     });
 });

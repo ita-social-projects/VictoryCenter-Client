@@ -4,5 +4,6 @@ export const HISTORY_TEXT = {
     },
     MESSAGE: {
         NO_SECTIONS_YET: 'Ще немає секцій',
+        FAIL_TO_FETCH_SECTIONS: 'Виникла помилка, не вдалося завантажити секції',
     },
 };

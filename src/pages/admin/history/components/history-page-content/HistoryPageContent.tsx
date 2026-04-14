@@ -1,10 +1,12 @@
 import styles from './HistoryPageContent.module.scss';
 import { Button } from '@/components/admin/button/Button';
+import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import NotFoundIcon from '@/assets/icons/not-found.svg';
 import { HISTORY_TEXT } from '@/const/admin/history';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import { HistoryPageToolbar } from '../history-page-toolbar/HistoryPageToolbar';
-import { useCallback } from 'react';
+import { Fragment, useCallback } from 'react';
 import { HistoryApi } from '@/services/api/admin/history/history-api';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { HistorySectionDto } from '@/types/common/history-sections';
@@ -27,26 +29,53 @@ export const HistoryPageContent = () => {
 
     const {
         data: sections,
-        error: _sectionsError,
-        isLoading: _isSectionsLoading,
-    } = useDataFetch<HistorySectionDto[]>({
-        initialData: [],
+        error: sectionsError,
+        isLoading: isSectionsLoading,
+        refetch: refetchSections,
+    } = useDataFetch<HistorySectionDto[] | null>({
+        initialData: null,
         fetchHandler: getHistorySections,
         autoFetchDependencies: [],
         autoFetchDisabled: false,
     });
 
-    const hasSections = sections.length > 0;
+    const normalizedSections = sections ?? [];
+    const hasSections = normalizedSections.length > 0;
+    const hasSectionsError = Boolean(sectionsError);
 
     const handleAddSection = () => {
         // TODO: add section creation flow will be implemented in a dedicated modal.
     };
 
+    const handleRetrySections = useCallback(() => {
+        void refetchSections();
+    }, [refetchSections]);
+
     return (
         <div className={styles['history-page-wrapper']} data-testid="history-page-content">
             <HistoryPageToolbar onAddSection={handleAddSection} />
             <div className={styles['sections-container']}>
-                {!hasSections && (
+                {isSectionsLoading && (
+                    <div className={styles['sections-loader-state']} data-testid="history-sections-loader">
+                        <InlineLoader size={3} />
+                    </div>
+                )}
+
+                {!isSectionsLoading && hasSectionsError && (
+                    <div className={styles['sections-error-state']} data-testid="history-sections-error">
+                        <p className={styles['sections-error-text']}>{HISTORY_TEXT.MESSAGE.FAIL_TO_FETCH_SECTIONS}</p>
+                        <button
+                            type="button"
+                            className={styles['retry-link']}
+                            onClick={handleRetrySections}
+                            data-testid="history-sections-retry-button"
+                        >
+                            {COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN}
+                        </button>
+                    </div>
+                )}
+
+                {!isSectionsLoading && !hasSectionsError && !hasSections && (
                     <div className={styles['empty-sections-state']}>
                         <img src={NotFoundIcon} alt="No sections" className={styles['empty-sections-image']} />
                         <p className={styles['empty-sections-text']}>{HISTORY_TEXT.MESSAGE.NO_SECTIONS_YET}</p>
@@ -62,10 +91,9 @@ export const HistoryPageContent = () => {
                     </div>
                 )}
 
-                {hasSections && (
+                {!isSectionsLoading && !hasSectionsError && hasSections && (
                     <div className={styles['sections-list']}>
-                        {/* //ref={sectionsContainerRef} */}
-                        {sections.map((section, index) => {
+                        {normalizedSections.map((section, index) => {
                             if (!section) return null;
                             const titleContent = section.contents.find((c) => c.contentType === ContentType.Title);
                             const descriptionContent = section.contents.find(
@@ -85,11 +113,11 @@ export const HistoryPageContent = () => {
                             });
 
                             const isFirstSection = index === 0;
-                            const isLastSection = index === sections.length - 1;
+                            const isLastSection = index === normalizedSections.length - 1;
                             const sectionMode = SectionMode.View; //TODO: replace to dynamic value
 
                             return (
-                                <>
+                                <Fragment key={section.id ?? index}>
                                     <div className={styles['section-container']}>
                                         {sectionMode === SectionMode.View && (
                                             <div className={styles['actions-section']}>
@@ -136,9 +164,7 @@ export const HistoryPageContent = () => {
                                                 </div>
                                             </div>
                                         )}
-                                        <div key={section.id} className={styles.content}>
-                                            {sectionToRender}
-                                        </div>
+                                        <div className={styles.content}>{sectionToRender}</div>
                                         <div className={styles['actions-container']}>
                                             {sectionMode !== SectionMode.View && (
                                                 <div className={styles.actions}>
@@ -152,7 +178,7 @@ export const HistoryPageContent = () => {
                                     </div>
 
                                     <div className={styles['sections-divider']} />
-                                </>
+                                </Fragment>
                             );
                         })}
                     </div>

@@ -35,6 +35,7 @@ const mockClient = {
 };
 
 const mockToolbarOnAddSection = jest.fn();
+const refetchSectionsMock = jest.fn();
 
 jest.mock('@/const/admin/history', () => ({
     HISTORY_TEXT: {
@@ -43,8 +44,13 @@ jest.mock('@/const/admin/history', () => ({
         },
         MESSAGE: {
             NO_SECTIONS_YET: 'No sections yet',
+            FAIL_TO_FETCH_SECTIONS: 'Failed to fetch sections',
         },
     },
+}));
+
+jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
+    InlineLoader: () => <div data-testid="inline-loader" />,
 }));
 
 jest.mock('@/assets/icons/plus.svg', () => ({
@@ -73,11 +79,12 @@ describe('HistoryPageContent', () => {
         mockedUseAdminClient.mockReturnValue(mockClient as any);
         mockClient.get.mockResolvedValue({ data: [] });
         mockedHistoryApi.fetchSections.mockResolvedValue([]);
+        refetchSectionsMock.mockResolvedValue(undefined);
         mockedUseDataFetch.mockReturnValue({
-            data: [],
+            data: null,
             error: null,
             isLoading: false,
-            refetch: jest.fn(),
+            refetch: refetchSectionsMock,
             setData: jest.fn(),
         });
     });
@@ -88,16 +95,52 @@ describe('HistoryPageContent', () => {
         const [{ fetchHandler, initialData, autoFetchDisabled }] = mockedUseDataFetch.mock.calls[0] as [
             {
                 fetchHandler: (options: any) => Promise<unknown>;
-                initialData: unknown[];
+                initialData: unknown;
                 autoFetchDisabled: boolean;
             },
         ];
 
         await fetchHandler({});
 
-        expect(initialData).toEqual([]);
+        expect(initialData).toBeNull();
         expect(autoFetchDisabled).toBe(false);
         expect(mockedHistoryApi.fetchSections).toHaveBeenCalledWith(mockClient);
+    });
+
+    it('renders loader while sections are loading', () => {
+        mockedUseDataFetch.mockReturnValue({
+            data: null,
+            error: null,
+            isLoading: true,
+            refetch: refetchSectionsMock,
+            setData: jest.fn(),
+        });
+
+        render(<HistoryPageContent />);
+
+        expect(screen.getByTestId('history-sections-loader')).toBeInTheDocument();
+        expect(screen.getByTestId('inline-loader')).toBeInTheDocument();
+        expect(screen.queryByText('No sections yet')).not.toBeInTheDocument();
+    });
+
+    it('renders error state and retries fetching sections', async () => {
+        mockedUseDataFetch.mockReturnValue({
+            data: null,
+            error: new Error('Request failed'),
+            isLoading: false,
+            refetch: refetchSectionsMock,
+            setData: jest.fn(),
+        });
+
+        render(<HistoryPageContent />);
+
+        expect(screen.getByTestId('history-sections-error')).toBeInTheDocument();
+        expect(screen.getByText('Failed to fetch sections')).toBeInTheDocument();
+        expect(screen.queryByText('No sections yet')).not.toBeInTheDocument();
+
+        await user.click(screen.getByTestId('history-sections-retry-button'));
+
+        expect(refetchSectionsMock).toHaveBeenCalledTimes(1);
     });
 
     it('renders empty state when there are no sections', () => {
@@ -175,7 +218,7 @@ describe('HistoryPageContent', () => {
             data: sections,
             error: null,
             isLoading: false,
-            refetch: jest.fn(),
+            refetch: refetchSectionsMock,
             setData: jest.fn(),
         });
 

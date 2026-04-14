@@ -48,6 +48,11 @@ export interface HippotherapyEthicsSection {
     principles: string[];
 }
 
+export interface HippotherapyResearchesSection {
+    description: string;
+    researches: { text: string; url: string }[];
+}
+
 export interface HippotherapyAbout {
     introSection: HippotherapyIntroData;
     descriptionSection: HippotherapyDefaultSection;
@@ -56,10 +61,7 @@ export interface HippotherapyAbout {
     hippoventionCenterSection: HippoventionCenterData;
     advantagesSection: HippotherapyAdvantagesSection;
     analysisSection: HippotherapyDefaultSection;
-    researchSection: {
-        description: string;
-        researches: { text: string; url: string }[];
-    };
+    researchSection: HippotherapyResearchesSection;
     anotherQuoteSection: Quote;
     participantsSection: HippotherapyParticipantsSection;
     ethicsSection: HippotherapyEthicsSection;

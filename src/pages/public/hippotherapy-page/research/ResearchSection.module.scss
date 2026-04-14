@@ -1,0 +1,23 @@
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
+
+.root {
+    margin: 96px 16px 120px;
+    border-top: 2px solid c.$light-blue-100;
+
+    @media (min-width: 560px) {
+        margin: 96px 64px 120px;
+    }
+}
+
+.research-description {
+    @include type.body-2-regular;
+    padding: 16px 0;
+    
+}
+
+.research {
+    padding: 16px 24px;
+    display: flex;;
+    gap: 16px;
+}

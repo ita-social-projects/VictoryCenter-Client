@@ -94,7 +94,6 @@ export const HistoryPageContent = () => {
                 {!isSectionsLoading && !hasSectionsError && hasSections && (
                     <div className={styles['sections-list']}>
                         {normalizedSections.map((section, index) => {
-                            if (!section) return null;
                             const titleContent = section.contents.find((c) => c.contentType === ContentType.Title);
                             const descriptionContent = section.contents.find(
                                 (c) => c.contentType === ContentType.Description,
@@ -117,27 +116,25 @@ export const HistoryPageContent = () => {
                             const sectionMode = SectionMode.View; //TODO: replace to dynamic value
 
                             return (
-                                <Fragment key={section.id ?? index}>
+                                <Fragment key={section.id}>
                                     <div className={styles['section-container']}>
                                         {sectionMode === SectionMode.View && (
                                             <div className={styles['actions-section']}>
                                                 <div className={styles['order-controls']}>
-                                                    <div className={styles['order-controls']}>
-                                                        {!isFirstSection && (
-                                                            <button
-                                                                type="button"
-                                                                className={`${styles['icon-button']} ${styles['up-button']}`}
-                                                                aria-label="Move up section"
-                                                            />
-                                                        )}
-                                                        {!isLastSection && (
-                                                            <button
-                                                                type="button"
-                                                                className={`${styles['icon-button']} ${styles['down-button']}`}
-                                                                aria-label="Move down section"
-                                                            />
-                                                        )}
-                                                    </div>
+                                                    {!isFirstSection && (
+                                                        <button
+                                                            type="button"
+                                                            className={`${styles['icon-button']} ${styles['up-button']}`}
+                                                            aria-label="Move up section"
+                                                        />
+                                                    )}
+                                                    {!isLastSection && (
+                                                        <button
+                                                            type="button"
+                                                            className={`${styles['icon-button']} ${styles['down-button']}`}
+                                                            aria-label="Move down section"
+                                                        />
+                                                    )}
                                                 </div>
                                                 <div className={styles['hover-buttons']}>
                                                     <IconButton

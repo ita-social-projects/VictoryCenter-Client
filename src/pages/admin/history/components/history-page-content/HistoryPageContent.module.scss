@@ -137,7 +137,7 @@
 }
 
 .actions-container {
-    background-color: #fff;
+    background-color: c.$white;
     min-height: 130px;
     min-width: 700px;
     padding-top: 30px;
@@ -154,7 +154,7 @@
 }
 
 .section-container {
-    background-color: #fff;
+    background-color: c.$white;
     position: relative;
     width: clamp(200px, 100%, 1440px);
     display: flex;

@@ -193,9 +193,8 @@ describe('HistoryPageContent', () => {
         expect(screen.getByTestId('history-page-content')).toBeInTheDocument();
     });
 
-    it('renders mapped sections and skips null section entries', () => {
+    it('renders mapped sections from fetched data', () => {
         const sections = [
-            null,
             {
                 id: 1,
                 template: SectionTemplate.SingleImageTop,
@@ -246,7 +245,7 @@ describe('HistoryPageContent', () => {
             },
         });
 
-        expect(screen.getAllByRole('button', { name: /move up section/i })).toHaveLength(2);
+        expect(screen.getAllByRole('button', { name: /move up section/i })).toHaveLength(1);
         expect(screen.getAllByRole('button', { name: /move down section/i })).toHaveLength(1);
         expect(screen.getAllByRole('button', { name: /edit section/i })).toHaveLength(2);
         expect(screen.getAllByRole('button', { name: /delete section/i })).toHaveLength(2);

@@ -4,7 +4,6 @@ import '@testing-library/jest-dom';
 
 import { AddSectionModal } from './AddSectionModal';
 import type { AddSectionModalProps } from './AddSectionModal';
-import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { SECTIONS_TEXT } from '@/const/admin/sections';
 import { SectionTemplate, SectionMode } from '@/types/common/sections';
 import type { ButtonProps } from '@/components/admin/button/Button';
@@ -98,7 +97,7 @@ jest.mock('@/components/admin/button/Button', () => ({
     ),
 }));
 
-const clickChoose = () => fireEvent.click(screen.getByRole('button', { name: PROGRAMS_TEXT.BUTTON.CHOOSE_SECTION }));
+const clickChoose = () => fireEvent.click(screen.getByRole('button', { name: SECTIONS_TEXT.BUTTON.CHOOSE_SECTION }));
 const clickPrev = () => fireEvent.click(screen.getByTitle('Previous slide'));
 const clickNext = () => fireEvent.click(screen.getByTitle('Next slide'));
 const clickClose = () => fireEvent.click(screen.getByTestId('modal-close-btn'));
@@ -144,7 +143,7 @@ describe('AddSectionModal', () => {
 
         expect(screen.getByTestId('add-section-modal')).toBeInTheDocument();
         expect(screen.getByTestId('swiper')).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: PROGRAMS_TEXT.BUTTON.CHOOSE_SECTION })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: SECTIONS_TEXT.BUTTON.CHOOSE_SECTION })).toBeInTheDocument();
     });
 
     it('passes maxWidth and className into Modal', () => {

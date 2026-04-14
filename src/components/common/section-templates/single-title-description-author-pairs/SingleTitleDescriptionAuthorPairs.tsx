@@ -2,7 +2,6 @@ import cn from 'classnames';
 import { useCallback, useMemo, useState } from 'react';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { Button } from '@/components/admin/button/Button';
-import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { SECTIONS_TEXT } from '@/const/admin/sections';
 import styles from './SingleTitleDescriptionAuthorPairs.module.scss';
 import { DescriptionAuthorPairCard } from './description-author-pair-card/DescriptionAuthorPairCard';
@@ -64,7 +63,7 @@ export const SingleTitleDescriptionAuthorPairs = ({
         if (!isTemplate) return pairs;
 
         const sampleDescription = SECTIONS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT_SHORT;
-        const sampleAuthor = PROGRAMS_TEXT.SECTION.CARD.FORM.SAMPLE.AUTHOR;
+        const sampleAuthor = SECTIONS_TEXT.SECTION.CARD.FORM.SAMPLE.AUTHOR;
 
         return Array.from({ length: TEMPLATE_PAIRS_COUNT }, (_, i) => ({
             description: pairs[i]?.description ?? sampleDescription,
@@ -128,7 +127,7 @@ export const SingleTitleDescriptionAuthorPairs = ({
                         onChange={(e) => handleTitleChange(e.target.value)}
                         onBlur={handleTitleBlur}
                         maxLength={titleMaxLength}
-                        placeholder={PROGRAMS_TEXT.SECTION.SINGLE_TITLE_DESCRIPTION_AUTHOR_PAIRS.TITLE_PLACEHOLDER}
+                        placeholder={SECTIONS_TEXT.SECTION.SINGLE_TITLE_DESCRIPTION_AUTHOR_PAIRS.TITLE_PLACEHOLDER}
                         error={titleError}
                         maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(titleMaxLength)}
                         showCounterBelow={true}
@@ -167,7 +166,7 @@ export const SingleTitleDescriptionAuthorPairs = ({
                         disabled={!canAddPair}
                         type="button"
                     >
-                        <span className={styles['add-card-text']}>{PROGRAMS_TEXT.SECTION.CARD.BUTTON.ADD_CARD}</span>
+                        <span className={styles['add-card-text']}>{SECTIONS_TEXT.SECTION.CARD.BUTTON.ADD_CARD}</span>
                         <PlusIcon className={styles['add-card-icon']} />
                     </Button>
                 </div>
@@ -175,7 +174,7 @@ export const SingleTitleDescriptionAuthorPairs = ({
 
             <ConfirmationModal
                 isOpen={pendingDeletePairIndex !== null}
-                title={PROGRAMS_TEXT.SECTION.SINGLE_TITLE_DESCRIPTION_AUTHOR_PAIRS.MODAL.DELETE_BLOCK_CONFIRMATION}
+                title={SECTIONS_TEXT.SECTION.SINGLE_TITLE_DESCRIPTION_AUTHOR_PAIRS.MODAL.DELETE_BLOCK_CONFIRMATION}
                 isButtonsDisabled={false}
                 onConfirm={handleConfirmDeletePair}
                 onCancel={handleCancelDeletePair}

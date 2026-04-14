@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Modal } from '@/components/common/modal/Modal';
 import { Button } from '@/components/admin/button/Button';
-import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { SECTIONS_TEXT } from '@/const/admin/sections';
 import { SectionMode, SectionTemplate } from '@/types/common/sections';
 import { Swiper } from '@/components/public/swiper/Swiper';
@@ -93,7 +92,7 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
     };
 
     const getCardSamples = (templateId: SectionTemplate) => {
-        const cardSamples = PROGRAMS_TEXT.SECTION.CARD;
+        const cardSamples = SECTIONS_TEXT.SECTION.CARD;
 
         const CARD_CONFIGS: Partial<Record<SectionTemplate, { title: string; description: string }[]>> = {
             [SectionTemplate.DualTitleDescriptionPairs]: [
@@ -206,7 +205,7 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
             <Modal.Actions>
                 <div className={styles['button-wrapper']}>
                     <Button buttonStyle="primary" onClick={handleSave}>
-                        {PROGRAMS_TEXT.BUTTON.CHOOSE_SECTION}
+                        {SECTIONS_TEXT.BUTTON.CHOOSE_SECTION}
                     </Button>
                 </div>
             </Modal.Actions>

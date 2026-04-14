@@ -3,7 +3,7 @@ import cn from 'classnames';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import { FAQ_TEXT, FAQ_VALIDATION } from '@/const/admin/faq';
-import { PROGRAMS_TEXT } from '@/const/admin/programs';
+import { SECTIONS_TEXT } from '@/const/admin/sections';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
 import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
@@ -165,7 +165,7 @@ export const EditableFaqCard = ({
 
             <ConfirmationModal
                 isOpen={isDeleteModalOpen}
-                title={PROGRAMS_TEXT.SECTION.SINGLE_TITLE_QUESTION_ANSWER_PAIRS.MODAL.DELETE_QUESTION_CONFIRMATION}
+                title={SECTIONS_TEXT.SECTION.SINGLE_TITLE_QUESTION_ANSWER_PAIRS.MODAL.DELETE_QUESTION_CONFIRMATION}
                 isButtonsDisabled={false}
                 onConfirm={handleConfirmDelete}
                 onCancel={handleCancelDelete}

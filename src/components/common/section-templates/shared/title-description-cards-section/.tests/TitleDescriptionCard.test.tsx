@@ -4,7 +4,6 @@ import '@testing-library/jest-dom';
 import { TitleDescriptionCard } from '../TitleDescriptionCard';
 import type { TitleDescriptionCardData } from '../TitleDescriptionCardsSection';
 
-import { PROGRAMS_TEXT } from '../../../../../../const/admin/programs';
 import { SECTIONS_TEXT } from '../../../../../../const/admin/sections';
 import { SectionMode, SectionTemplate } from '../../../../../../types/common/sections';
 import { ContentType } from '../../../../../../types/common/section-contents';
@@ -27,22 +26,6 @@ jest.mock('@/hooks/admin/use-section-card-validation/useCardValidation', () => (
 jest.mock('@/utils/functions/section-template-validation/sectionTemplateValidation', () => ({
     getSectionTemplateMaxLength: jest.fn(),
     getSectionTemplateMinLength: jest.fn(),
-}));
-
-jest.mock('@/const/admin/programs', () => ({
-    PROGRAMS_TEXT: {
-        SECTION: {
-            FORM: {
-                DESCRIPTION: { TEXT: 'DEFAULT_DESC' },
-            },
-            CARD: {
-                FORM: {
-                    TITLE: { TEXT: 'DEFAULT_TITLE', PLACEHOLDER: 'TITLE_PH' },
-                    DESCRIPTION: { TEXT: 'DESC_LABEL', PLACEHOLDER: 'DESC_PH' },
-                },
-            },
-        },
-    },
 }));
 
 jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
@@ -268,7 +251,7 @@ describe('TitleDescriptionCard', () => {
                 />,
             );
 
-            expect(screen.getByText('DEFAULT_TITLE')).toBeInTheDocument();
+            expect(screen.getByText(SECTIONS_TEXT.SECTION.CARD.FORM.TITLE.TEXT)).toBeInTheDocument();
         });
 
         it('should display parsed description intro', () => {
@@ -291,7 +274,7 @@ describe('TitleDescriptionCard', () => {
             });
 
             expect(
-                screen.getByRole('heading', { level: 3, name: PROGRAMS_TEXT.SECTION.CARD.FORM.TITLE.TEXT }),
+                screen.getByRole('heading', { level: 3, name: SECTIONS_TEXT.SECTION.CARD.FORM.TITLE.TEXT }),
             ).toBeInTheDocument();
         });
 

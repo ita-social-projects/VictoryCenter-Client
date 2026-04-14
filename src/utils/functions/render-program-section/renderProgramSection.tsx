@@ -13,7 +13,7 @@ import { SingleImageRight } from '@/components/common/section-templates/single-i
 import { TitleDescriptionCardsWrapper } from '@/components/common/section-templates/title-description-cards/TitleDescriptionCardsWrapper';
 import { SingleTitleQuintupleDescription } from '@/components/common/section-templates/single-title-quintuple-description/SingleTitleQuintupleDescription';
 import { SingleTitleDescriptionAuthorPairs } from '@/components/common/section-templates/single-title-description-author-pairs/SingleTitleDescriptionAuthorPairs';
-import { PROGRAMS_TEXT } from '@/const/admin/programs';
+import { SECTIONS_TEXT } from '@/const/admin/sections';
 import { FaqProgramSection } from '@/components/common/section-templates/faq-program-section';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
@@ -147,7 +147,7 @@ export const getInitialSectionContents = (templateId: SectionTemplate): CreatePr
     if (templateId === SectionTemplate.SingleTitleDescriptionAuthorPairs) {
         return [
             createItem(ContentType.Title, 0, {
-                title: PROGRAMS_TEXT.SECTION.SINGLE_TITLE_DESCRIPTION_AUTHOR_PAIRS.DEFAULT_TITLE,
+                title: SECTIONS_TEXT.SECTION.SINGLE_TITLE_DESCRIPTION_AUTHOR_PAIRS.DEFAULT_TITLE,
             } as any),
             createItem(ContentType.Description, 1, { groupIndex: 0 }),
             createItem(ContentType.Author, 2, { groupIndex: 0 }),

@@ -1,8 +1,8 @@
-import cn from 'classnames';
+﻿import cn from 'classnames';
 import { useCallback, useState } from 'react';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
-import { PROGRAMS_TEXT } from '@/const/admin/programs';
+import { SECTIONS_TEXT } from '@/const/admin/sections';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import styles from './DescriptionAuthorPairCard.module.scss';
 import { SectionTemplate } from '@/types/common/sections';
@@ -102,7 +102,7 @@ export const DescriptionAuthorPairCard = ({
                 <div className={styles['description-field']}>
                     <TextAreaWithCharacterLimitGroup
                         className={styles['description-input-group']}
-                        label={PROGRAMS_TEXT.SECTION.CARD.FORM.DESCRIPTION.TEXT}
+                        label={SECTIONS_TEXT.SECTION.CARD.FORM.DESCRIPTION.TEXT}
                         isRequired
                         id={descriptionId}
                         name={descriptionId}
@@ -111,7 +111,7 @@ export const DescriptionAuthorPairCard = ({
                         onBlur={handleDescriptionBlur}
                         maxLength={descriptionMaxLength}
                         rows={4}
-                        placeholder={PROGRAMS_TEXT.SECTION.CARD.FORM.DESCRIPTION.PLACEHOLDER}
+                        placeholder={SECTIONS_TEXT.SECTION.CARD.FORM.DESCRIPTION.PLACEHOLDER}
                         error={descriptionError}
                         maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(descriptionMaxLength)}
                     />
@@ -120,7 +120,7 @@ export const DescriptionAuthorPairCard = ({
                 <div className={styles['author-field']}>
                     <InputWithCharacterLimitGroup
                         className={styles['author-input-group']}
-                        label={PROGRAMS_TEXT.SECTION.CARD.FORM.AUTHOR.TEXT}
+                        label={SECTIONS_TEXT.SECTION.CARD.FORM.AUTHOR.TEXT}
                         isRequired
                         id={authorId}
                         name={authorId}
@@ -128,7 +128,7 @@ export const DescriptionAuthorPairCard = ({
                         onChange={handleAuthorChange}
                         onBlur={handleAuthorBlur}
                         maxLength={authorMaxLength}
-                        placeholder={PROGRAMS_TEXT.SECTION.CARD.FORM.AUTHOR.PLACEHOLDER}
+                        placeholder={SECTIONS_TEXT.SECTION.CARD.FORM.AUTHOR.PLACEHOLDER}
                         error={authorError}
                         maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(authorMaxLength)}
                         showCounterBelow={true}

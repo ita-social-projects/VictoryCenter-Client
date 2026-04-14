@@ -4,7 +4,6 @@ import cn from 'classnames';
 import { FaqCard } from '@/components/public/faq-section/faq-card/FaqCard';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { Button } from '@/components/admin/button/Button';
-import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { SECTIONS_TEXT } from '@/const/admin/sections';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { useSectionValidation } from '@/hooks/admin/use-section-validation';
@@ -178,7 +177,7 @@ export const FaqProgramSection = ({
                                 type="button"
                                 disabled={isAddDisabled}
                             >
-                                {PROGRAMS_TEXT.BUTTON.ADD}
+                                {SECTIONS_TEXT.BUTTON.ADD}
                                 <PlusIcon />
                             </Button>
                         </div>

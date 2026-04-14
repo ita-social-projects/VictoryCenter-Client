@@ -3,7 +3,6 @@ import cn from 'classnames';
 import { parseDescriptionList } from '@/utils/functions/formatters/text-formatters';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { CardDescriptionField } from './CardDescriptionField';
-import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { SECTIONS_TEXT } from '@/const/admin/sections';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { useCardValidation } from '@/hooks/admin/use-section-card-validation/useCardValidation';
@@ -75,7 +74,7 @@ export const TitleDescriptionCard = ({
             <div className={cn(styles['td-card'], styles['td-card--editable'])}>
                 <div className={styles['title-field']}>
                     <InputWithCharacterLimitGroup
-                        label={PROGRAMS_TEXT.SECTION.CARD.FORM.TITLE.TEXT}
+                        label={SECTIONS_TEXT.SECTION.CARD.FORM.TITLE.TEXT}
                         id={`${idPrefix}-card-title-${index}`}
                         name={`${idPrefix}-card-title-${index}`}
                         value={card.title}
@@ -84,7 +83,7 @@ export const TitleDescriptionCard = ({
                         onBlur={handleTitleBlur}
                         maxLength={titleMax}
                         error={titleError}
-                        placeholder={PROGRAMS_TEXT.SECTION.CARD.FORM.TITLE.PLACEHOLDER}
+                        placeholder={SECTIONS_TEXT.SECTION.CARD.FORM.TITLE.PLACEHOLDER}
                         maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(titleMax)}
                         showCounterBelow={true}
                     />
@@ -92,7 +91,7 @@ export const TitleDescriptionCard = ({
 
                 <div className={styles['description-field']}>
                     <CardDescriptionField
-                        label={PROGRAMS_TEXT.SECTION.CARD.FORM.DESCRIPTION.TEXT}
+                        label={SECTIONS_TEXT.SECTION.CARD.FORM.DESCRIPTION.TEXT}
                         id={`${idPrefix}-card-description-${index}`}
                         name={`${idPrefix}-card-description-${index}`}
                         value={card.description}
@@ -115,7 +114,7 @@ export const TitleDescriptionCard = ({
                     [styles['title--template']]: mode === SectionMode.Template,
                 })}
             >
-                {card.title || PROGRAMS_TEXT.SECTION.CARD.FORM.TITLE.TEXT}
+                {card.title || SECTIONS_TEXT.SECTION.CARD.FORM.TITLE.TEXT}
             </h3>
             <div
                 className={cn(styles['description'], {

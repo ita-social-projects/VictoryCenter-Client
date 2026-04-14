@@ -2,7 +2,6 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { AddSectionModal } from '../AddSectionModal';
 import type { AddSectionModalProps } from '../AddSectionModal';
-import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { SECTIONS_TEXT } from '@/const/admin/sections';
 
 export const renderAddSectionModal = (props: AddSectionModalProps) => {
@@ -13,7 +12,7 @@ export const getModal = () => screen.queryByTestId('add-section-modal');
 
 export const getSwiper = () => screen.getByTestId('swiper');
 
-export const getChooseButton = () => screen.getByRole('button', { name: PROGRAMS_TEXT.BUTTON.CHOOSE_SECTION });
+export const getChooseButton = () => screen.getByRole('button', { name: SECTIONS_TEXT.BUTTON.CHOOSE_SECTION });
 
 export const getPrevButton = () => screen.getByTitle('Previous slide');
 

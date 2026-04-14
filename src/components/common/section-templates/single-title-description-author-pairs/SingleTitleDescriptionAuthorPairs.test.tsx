@@ -80,8 +80,11 @@ jest.mock('@/assets/icons/plus.svg', () => ({
     ReactComponent: (props: any) => <svg data-testid="plus" {...props} />,
 }));
 
-jest.mock('@/const/admin/programs', () => ({
-    PROGRAMS_TEXT: {
+jest.mock('@/const/admin/sections', () => ({
+    SECTIONS_TEXT: {
+        BUTTON: {
+            ADD: 'Add',
+        },
         SECTION: {
             DESCRIPTION_SAMPLE_TEXT_SHORT: 'SAMPLE_DESC',
             FORM: { TITLE: { TEXT: 'Title' } },
@@ -93,15 +96,6 @@ jest.mock('@/const/admin/programs', () => ({
                 TITLE_PLACEHOLDER: '',
                 MODAL: { DELETE_BLOCK_CONFIRMATION: 'Delete block?' },
             },
-        },
-    },
-}));
-
-jest.mock('@/const/admin/sections', () => ({
-    SECTIONS_TEXT: {
-        SECTION: {
-            DESCRIPTION_SAMPLE_TEXT_SHORT: 'SAMPLE_DESC',
-            FORM: { TITLE: { TEXT: 'Title' } },
         },
     },
 }));

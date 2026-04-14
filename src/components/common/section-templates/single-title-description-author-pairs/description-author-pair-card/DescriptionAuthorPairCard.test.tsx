@@ -17,8 +17,8 @@ jest.mock('@/validation/admin/program-schema/program-schema', () => ({
     },
 }));
 
-jest.mock('@/const/admin/programs', () => ({
-    PROGRAMS_TEXT: {
+jest.mock('@/const/admin/sections', () => ({
+    SECTIONS_TEXT: {
         SECTION: {
             CARD: {
                 FORM: {

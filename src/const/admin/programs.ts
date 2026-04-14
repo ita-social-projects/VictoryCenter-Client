@@ -1,14 +1,15 @@
 import { COMMON_TEXT_ADMIN } from './common';
+import { SECTIONS_TEXT } from './sections';
 
 export const PROGRAMS_TEXT = {
     BUTTON: {
         ADD_PROGRAM: 'Додати програму',
-        ADD_NEW_SECTION: 'Додати нову секцію',
-        ADD_SECTION: 'Додати секцію',
-        CHOOSE_SECTION: 'Обрати шаблон',
-        CANCEL: 'Відмінити',
-        SAVE: 'Зберегти',
-        ADD: 'Додати',
+        ADD_NEW_SECTION: SECTIONS_TEXT.BUTTON.ADD_NEW_SECTION,
+        ADD_SECTION: SECTIONS_TEXT.BUTTON.ADD_SECTION,
+        CHOOSE_SECTION: SECTIONS_TEXT.BUTTON.CHOOSE_SECTION,
+        CANCEL: SECTIONS_TEXT.BUTTON.CANCEL,
+        SAVE: SECTIONS_TEXT.BUTTON.SAVE,
+        ADD: SECTIONS_TEXT.BUTTON.ADD,
     },
     PLACEHOLDER: {
         SEARCH_PROGRAMS: 'Шукати програми...',
@@ -26,85 +27,14 @@ export const PROGRAMS_TEXT = {
         NO_SECTIONS_YET: 'Ще немає секцій опису програми',
     },
     SECTION: {
-        TITLE_SAMPLE_TEXT: 'ЗАГОЛОВОК',
-        DESCRIPTION_SAMPLE_TEXT:
-            'Ідея створення Victory Center виникла не як проєкт, а як відповідь на виклик часу - глибокий біль, виснаження, але водночас сильна віра в перемогу.\n\n Розмови з ветеранами/ками та волонтерами/ками, які до останньої краплі віддавали свої сили заради майбутнього країни, висвітлити потребу у просторі, в якому можна знову відчути момент “тут i зараз”.\n\n Так народився задум Victory Center — ініціативи, що допомагає людям, які пройшли крізь жахи війни, зупинитися, відновитися i найголовніше бути почутими. ',
-        DESCRIPTION_SAMPLE_TEXT_SHORT:
-            'Ідея створення Victory Center виникла не як проєкт, а як відповідь на виклик часу - глибокий біль, виснаження, але водночас сильна віра в перемогу. ',
-        SINGLE_TITLE_DESCRIPTION_AUTHOR_PAIRS: {
-            DEFAULT_TITLE: 'ЩО КАЖУТЬ УЧАСНИКИ',
-            TITLE_PLACEHOLDER: '',
-            MODAL: {
-                DELETE_BLOCK_CONFIRMATION: 'Блок буде видалено. Бажаєте продовжити?',
-            },
-        },
-        SINGLE_TITLE_QUESTION_ANSWER_PAIRS: {
-            MODAL: {
-                DELETE_QUESTION_CONFIRMATION: 'Питання буде видалено. Бажаєте продовжити?',
-            },
-        },
-        MODAL: {
-            UNSAVED_CHANGES_TITLE: 'Відмінити додавання секції?',
-            DELETE_SECTION_TITLE: 'Видалити секцію?',
-            REPLACE_TEMPLATE_TITLE: 'Відмінити заміну шаблона?',
-        },
-        FORM: {
-            TITLE: {
-                TEXT: 'Заголовок',
-                PLACEHOLDER: 'ВВЕДІТЬ НАЗВУ',
-            },
-            DESCRIPTION: {
-                TEXT: 'Опис',
-            },
-        },
-        CARD: {
-            BUTTON: {
-                ADD_CARD: 'Додати блок',
-            },
-            FORM: {
-                TITLE: {
-                    TEXT: 'Заголовок',
-                    PLACEHOLDER: 'Введіть назву',
-                },
-                DESCRIPTION: {
-                    TEXT: 'Опис',
-                    PLACEHOLDER: 'Введіть текст',
-                },
-                AUTHOR: {
-                    TEXT: "Ім'я",
-                    PLACEHOLDER: "Введіть ім'я",
-                },
-                SAMPLE: {
-                    AUTHOR: 'Вікторія Яковенко',
-                },
-            },
-            TITLE_SAMPLE_TEXT: {
-                PROGRAM_GOALS: 'Мета програми',
-                MAIN_METHODS: 'Основні методи',
-                PROGRAM_FORMAT: 'Формат програми',
-            },
-            DESCRIPTION_SAMPLE_TEXT: {
-                PROGRAM_GOALS:
-                    'Допомогти військовим:\n' +
-                    'зменшити прояви ПТСР, тривожності та емоційного виснаження;\n' +
-                    'відновити відчуття безпеки та самоцінності;\n' +
-                    'повернутися до мирного життя з підтримкою, спільнотою та внутрішнім ресурсом.',
-
-                MAIN_METHODS:
-                    'Іпотерапія (взаємодія з кіньми в терапевтичному контексті)\n' +
-                    'Майндфулнес-практики та тілесна терапія\n' +
-                    'Групова робота, фасилітовані бесіди\n' +
-                    'Музична та арт-терапія\n' +
-                    'Індивідуальна підтримка від психолога',
-
-                PROGRAM_FORMAT:
-                    'Тривалість: 3–5 днів поспіль\n' +
-                    'Локація: партнерські ранчо Victory Center у природному середовищі\n' +
-                    'Група: до 12 учасників\n' +
-                    'Проживання та харчування: забезпечуються організаторами\n' +
-                    'Підготовка: телефонне інтерв’ю та базовий психоемоційний скринінг',
-            },
-        },
+        TITLE_SAMPLE_TEXT: SECTIONS_TEXT.SECTION.TITLE_SAMPLE_TEXT,
+        DESCRIPTION_SAMPLE_TEXT: SECTIONS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT,
+        DESCRIPTION_SAMPLE_TEXT_SHORT: SECTIONS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT_SHORT,
+        SINGLE_TITLE_DESCRIPTION_AUTHOR_PAIRS: SECTIONS_TEXT.SECTION.SINGLE_TITLE_DESCRIPTION_AUTHOR_PAIRS,
+        SINGLE_TITLE_QUESTION_ANSWER_PAIRS: SECTIONS_TEXT.SECTION.SINGLE_TITLE_QUESTION_ANSWER_PAIRS,
+        MODAL: SECTIONS_TEXT.SECTION.MODAL,
+        FORM: SECTIONS_TEXT.SECTION.FORM,
+        CARD: SECTIONS_TEXT.SECTION.CARD,
     },
     QUESTION: {
         PUBLISH_PROGRAM: 'Опублікувати нову програму?',

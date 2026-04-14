@@ -262,40 +262,7 @@ export const PROGRAM_VALIDATION_FUNCTIONS = {
     },
 };
 
-export const programSectionValidationSchema = Yup.object({
-    sectionTitle: createTemplateTextSchema(ContentType.Title),
-    sectionDescription: createTemplateTextSchema(ContentType.Description),
-});
-
 export const PROGRAM_SECTION_VALIDATION_FUNCTIONS = {
-    validateSectionTitle: (value: string, isPublishing: boolean, template?: SectionTemplate): string | undefined => {
-        const context: ProgramValidationContext & { template?: SectionTemplate } = { isPublishing, template };
-        try {
-            programSectionValidationSchema.validateSyncAt('sectionTitle', { sectionTitle: value }, { context });
-            return undefined;
-        } catch (error: any) {
-            return error.message;
-        }
-    },
-
-    validateSectionDescription: (
-        value: string,
-        isPublishing: boolean,
-        template?: SectionTemplate,
-    ): string | undefined => {
-        const context: ProgramValidationContext & { template?: SectionTemplate } = { isPublishing, template };
-        try {
-            programSectionValidationSchema.validateSyncAt(
-                'sectionDescription',
-                { sectionDescription: value },
-                { context },
-            );
-            return undefined;
-        } catch (error: any) {
-            return error.message;
-        }
-    },
-
     validateContentText: (
         value: string,
         type: ContentType,

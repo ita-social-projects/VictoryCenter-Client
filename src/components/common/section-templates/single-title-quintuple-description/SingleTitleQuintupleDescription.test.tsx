@@ -43,8 +43,8 @@ jest.mock('@/const/admin/programs', () => ({
     },
 }));
 
-jest.mock('@/validation/admin/program-schema/program-schema', () => ({
-    PROGRAM_SECTION_VALIDATION_FUNCTIONS: {
+jest.mock('@/validation/admin/section-schema/section-schema', () => ({
+    SECTION_VALIDATION_FUNCTIONS: {
         validateSectionTitle: jest.fn(() => undefined),
         validateSectionDescription: jest.fn(() => undefined),
     },

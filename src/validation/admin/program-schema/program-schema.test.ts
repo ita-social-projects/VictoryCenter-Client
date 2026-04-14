@@ -634,34 +634,6 @@ describe('program-schema.ts coverage (templates are bottom-only)', () => {
             ),
         ).toBe('min 2');
     });
-
-    it('PROGRAM_SECTION_VALIDATION_FUNCTIONS: validateSectionTitle returns required', () => {
-        const m = loadSchema();
-        expect(m.PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateSectionTitle('', true, SectionTemplate.TextOnly)).toBe(
-            'required',
-        );
-    });
-
-    it('PROGRAM_SECTION_VALIDATION_FUNCTIONS: validateSectionDescription returns max error', () => {
-        const m = loadSchema();
-        expect(
-            m.PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateSectionDescription(
-                'aaaaaaaaaaa',
-                false,
-                SectionTemplate.TextOnly,
-            ),
-        ).toBe('max 4');
-    });
-
-    it('programSectionValidationSchema is executed', async () => {
-        const m = loadSchema();
-        await expect(
-            m.programSectionValidationSchema.validate(
-                { sectionTitle: 'aa', sectionDescription: 'bbbb' },
-                { context: { isPublishing: true, template: SectionTemplate.TextOnly } },
-            ),
-        ).resolves.toBeDefined();
-    });
 });
 
 describe('program-schema.ts required-message fallbacks', () => {

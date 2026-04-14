@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
+import { SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/section-schema/section-schema';
 import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
 import { SectionTemplate } from '@/types/common/sections';
 
@@ -31,13 +31,12 @@ export const useSectionValidation = ({
     const [descriptionError, setDescriptionError] = useState<string | undefined>(undefined);
 
     const validateTitle = useCallback(
-        (value: string) => PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateSectionTitle(value, isPublishing, template),
+        (value: string) => SECTION_VALIDATION_FUNCTIONS.validateSectionTitle(value, isPublishing, template),
         [isPublishing, template],
     );
 
     const validateDescription = useCallback(
-        (value: string) =>
-            PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateSectionDescription(value, isPublishing, template),
+        (value: string) => SECTION_VALIDATION_FUNCTIONS.validateSectionDescription(value, isPublishing, template),
         [isPublishing, template],
     );
 

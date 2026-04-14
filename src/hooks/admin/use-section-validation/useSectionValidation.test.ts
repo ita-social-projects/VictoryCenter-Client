@@ -7,7 +7,7 @@ import { SECTION_TEMPLATE_VALIDATION } from '@/const/admin/sections';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { SectionTemplate } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
-import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
+import { SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/section-schema/section-schema';
 
 const TEMPLATE = SectionTemplate.SingleTitleDescriptionAuthorPairs;
 
@@ -107,7 +107,7 @@ describe('useSectionValidation', () => {
         });
 
         it('should not validate on change when there is no error', () => {
-            const spy = jest.spyOn(PROGRAM_SECTION_VALIDATION_FUNCTIONS, 'validateSectionTitle');
+            const spy = jest.spyOn(SECTION_VALIDATION_FUNCTIONS, 'validateSectionTitle');
 
             const { result } = renderHook(() => useSectionValidation({ template: TEMPLATE }));
 
@@ -122,7 +122,7 @@ describe('useSectionValidation', () => {
         });
 
         it('should clear error while typing when value becomes valid', () => {
-            const spy = jest.spyOn(PROGRAM_SECTION_VALIDATION_FUNCTIONS, 'validateSectionTitle');
+            const spy = jest.spyOn(SECTION_VALIDATION_FUNCTIONS, 'validateSectionTitle');
 
             const { result } = renderHook(() => useSectionValidation({ template: TEMPLATE }));
 
@@ -142,7 +142,7 @@ describe('useSectionValidation', () => {
         });
 
         it('should keep error while typing when value is still invalid', () => {
-            const spy = jest.spyOn(PROGRAM_SECTION_VALIDATION_FUNCTIONS, 'validateSectionTitle');
+            const spy = jest.spyOn(SECTION_VALIDATION_FUNCTIONS, 'validateSectionTitle');
 
             const { result } = renderHook(() => useSectionValidation({ template: TEMPLATE }));
 
@@ -234,7 +234,7 @@ describe('useSectionValidation', () => {
         });
 
         it('should not validate on change when there is no error', () => {
-            const spy = jest.spyOn(PROGRAM_SECTION_VALIDATION_FUNCTIONS, 'validateSectionDescription');
+            const spy = jest.spyOn(SECTION_VALIDATION_FUNCTIONS, 'validateSectionDescription');
 
             const { result } = renderHook(() => useSectionValidation({ template: TEMPLATE }));
 
@@ -249,7 +249,7 @@ describe('useSectionValidation', () => {
         });
 
         it('should clear error while typing when value becomes valid', () => {
-            const spy = jest.spyOn(PROGRAM_SECTION_VALIDATION_FUNCTIONS, 'validateSectionDescription');
+            const spy = jest.spyOn(SECTION_VALIDATION_FUNCTIONS, 'validateSectionDescription');
 
             const { result } = renderHook(() => useSectionValidation({ template: TEMPLATE }));
             const valid = 'a'.repeat(Math.min(descriptionReq.max, Math.max(1, descriptionReq.min)));
@@ -270,7 +270,7 @@ describe('useSectionValidation', () => {
         });
 
         it('should keep error while typing when value is still invalid', () => {
-            const spy = jest.spyOn(PROGRAM_SECTION_VALIDATION_FUNCTIONS, 'validateSectionDescription');
+            const spy = jest.spyOn(SECTION_VALIDATION_FUNCTIONS, 'validateSectionDescription');
 
             const { result } = renderHook(() => useSectionValidation({ template: TEMPLATE }));
 

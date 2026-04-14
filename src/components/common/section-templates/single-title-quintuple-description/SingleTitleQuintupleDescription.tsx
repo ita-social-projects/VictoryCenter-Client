@@ -9,7 +9,7 @@ import { ContentType } from '@/types/common/section-contents';
 import { getSectionTemplateMaxLength } from '@/utils/functions/section-template-validation/sectionTemplateValidation';
 import baseStyles from './SingleTitleQuintupleDescription.module.scss';
 import viewStyles from './ViewSingleTitleQuintupleDescription.module.scss';
-import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
+import { SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/section-schema/section-schema';
 
 export interface SingleTitleQuintupleDescriptionProps {
     title?: string;
@@ -79,13 +79,13 @@ export const SingleTitleQuintupleDescription = ({
     }, [validationResetKey]);
 
     const handleTitleBlur = useCallback(() => {
-        const error = PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateSectionTitle(title, true, TEMPLATE);
+        const error = SECTION_VALIDATION_FUNCTIONS.validateSectionTitle(title, true, TEMPLATE);
         setErrors((prev) => ({ ...prev, title: error }));
     }, [title]);
 
     const handleDescriptionBlur = useCallback(
         (index: number) => {
-            const error = PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateSectionDescription(
+            const error = SECTION_VALIDATION_FUNCTIONS.validateSectionDescription(
                 normalizedDescriptions[index],
                 true,
                 TEMPLATE,

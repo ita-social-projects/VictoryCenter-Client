@@ -53,17 +53,23 @@ describe('PdfFilesSection', () => {
     const mockRefetch = jest.fn();
     const mockCreateObjectURL = jest.fn(() => 'blob:http://localhost/mock-blob-url');
     const mockWindowOpen = jest.fn();
+    let originalCreateObjectURL: any;
+    let originalWindowOpen: any;
 
     beforeEach(() => {
         jest.clearAllMocks();
-        jest.spyOn(URL, 'createObjectURL').mockImplementation(mockCreateObjectURL);
-        jest.spyOn(window, 'open').mockImplementation(mockWindowOpen);
+        originalCreateObjectURL = global.URL.createObjectURL;
+        originalWindowOpen = global.window.open;
+        global.URL.createObjectURL = mockCreateObjectURL as any;
+        global.window.open = mockWindowOpen as any;
         (useAdminClient as jest.Mock).mockReturnValue(mockClient);
         (useToast as jest.Mock).mockReturnValue({ addToast: mockAddToast });
         mockCreateObjectURL.mockReturnValue('blob:http://localhost/mock-blob-url');
     });
 
     afterEach(() => {
+        global.URL.createObjectURL = originalCreateObjectURL;
+        global.window.open = originalWindowOpen;
         jest.restoreAllMocks();
     });
 

@@ -26,7 +26,7 @@ describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
 
         it('should return numeric error for non-digit input', () => {
             expect(validateFundsExpendituresAmount('abc', 'change')).toBe(
-            FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER,
+                FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER,
             );
         });
 

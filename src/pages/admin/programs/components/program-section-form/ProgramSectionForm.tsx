@@ -43,6 +43,7 @@ export interface ProgramSectionFormProps {
     isLastSection: boolean;
     onMoveUpSection: () => void;
     onMoveDownSection: () => void;
+    onRequestSaveSection?: (request: { onConfirm: () => void }) => void;
 }
 
 export interface SectionCancelOptions {
@@ -69,6 +70,7 @@ export const ProgramSectionForm = ({
     isLastSection = false,
     onMoveDownSection,
     onMoveUpSection,
+    onRequestSaveSection,
 }: ProgramSectionFormProps) => {
     const [localSection, setLocalSection] = useState<CreateHippotherapyProgramSectionDto>(() =>
         ensureTitleContentAndOnePair(section),
@@ -549,12 +551,22 @@ export const ProgramSectionForm = ({
 
     const handleSaveClick = useCallback(() => {
         if (isDisabled || !isSectionSaveValid) return;
-        onSave();
-        setOriginalSection(localSection);
-        setIsDirty(false);
-        setSectionMode(ProgramSectionMode.View);
-        setValidationResetKey((prev) => prev + 1);
-    }, [isDisabled, isSectionSaveValid, onSave, localSection]);
+
+        const applySave = () => {
+            onSave();
+            setOriginalSection(localSection);
+            setIsDirty(false);
+            setSectionMode(ProgramSectionMode.View);
+            setValidationResetKey((prev) => prev + 1);
+        };
+
+        if (onRequestSaveSection && isDirty) {
+            onRequestSaveSection({ onConfirm: applySave });
+            return;
+        }
+
+        applySave();
+    }, [isDisabled, isSectionSaveValid, onSave, localSection, onRequestSaveSection, isDirty]);
 
     const CARD_TEMPLATES = [
         ProgramSectionTemplate.DualTitleDescriptionPairs,
@@ -720,7 +732,7 @@ export const ProgramSectionForm = ({
                         <Button
                             buttonStyle="primary"
                             onClick={handleSaveClick}
-                            disabled={isDisabled || !isSectionSaveValid}
+                            disabled={!isDirty || isDisabled || !isSectionSaveValid}
                         >
                             {PROGRAMS_TEXT.BUTTON.SAVE}
                         </Button>

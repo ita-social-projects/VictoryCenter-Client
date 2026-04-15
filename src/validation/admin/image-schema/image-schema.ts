@@ -38,7 +38,12 @@ export const getImageValidationSchema = (minWidth: number, minHeight: number, ma
 };
 
 export const IMAGE_VALIDATION_FUNCTIONS = {
-    validateImage: async (file: File, minWidth = 1440, minHeight = 860, maxSizeMB = 3): Promise<string | undefined> => {
+    validateImage: async (
+        file: File,
+        minWidth = 1920,
+        minHeight = 1080,
+        maxSizeMB = 3,
+    ): Promise<string | undefined> => {
         try {
             const schema = getImageValidationSchema(minWidth, minHeight, maxSizeMB);
             await schema.validate(file, { abortEarly: true });

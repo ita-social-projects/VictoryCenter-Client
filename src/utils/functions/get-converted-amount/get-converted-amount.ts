@@ -1,10 +1,8 @@
 import { parseAmount } from '@/utils/functions/parse-amount/parse-amount';
 
-export const getConvertedAmount = (
-    value: string,
-    field: 'amountUah' | 'amountUsd',
-    exchangeRate: string | null | undefined,
-): string | null => {
+const roundUpToTwoDecimals = (value: number): number => Math.ceil(value * 100) / 100;
+
+export const getConvertedAmount = (value: string, exchangeRate: string | null | undefined): string | null => {
     const parsedExchangeRate = parseAmount(exchangeRate ?? '');
     if (parsedExchangeRate <= 0) {
         return null;
@@ -16,10 +14,9 @@ export const getConvertedAmount = (
     }
 
     const parsedCurrentAmount = parseAmount(value);
-    const convertedAmount =
-        field === 'amountUah' ? parsedCurrentAmount / parsedExchangeRate : parsedCurrentAmount * parsedExchangeRate;
+    const convertedAmount = parsedCurrentAmount / parsedExchangeRate;
 
-    const roundedConvertedAmount = Number.parseFloat(convertedAmount.toFixed(2));
+    const roundedConvertedAmount = roundUpToTwoDecimals(convertedAmount);
 
     return Number.isFinite(roundedConvertedAmount) ? String(roundedConvertedAmount) : null;
 };

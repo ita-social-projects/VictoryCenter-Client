@@ -80,6 +80,18 @@ export const AdminNavigation = () => {
                         </NavLink>
 
                         <NavLink
+                            to={ADMIN_ROUTES.HISTORY.FULL}
+                            end
+                            className={({ isActive }) =>
+                                classNames('admin-page-link', {
+                                    'admin-pages-selected': isActive,
+                                })
+                            }
+                        >
+                            {COMMON_TEXT_ADMIN.TAB.HISTORY}
+                        </NavLink>
+
+                        <NavLink
                             to={ADMIN_ROUTES.FAQ.FULL}
                             end
                             className={({ isActive }) =>

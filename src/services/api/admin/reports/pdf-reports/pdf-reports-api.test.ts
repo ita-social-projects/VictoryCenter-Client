@@ -31,6 +31,8 @@ describe('PdfReportsApi', () => {
         jest.clearAllMocks();
         mockClient = {
             get: jest.fn(),
+            post: jest.fn(),
+            delete: jest.fn(),
         } as any;
     });
 
@@ -78,6 +80,42 @@ describe('PdfReportsApi', () => {
                     params: { offset: 50, limit: 25 },
                 }),
             );
+        });
+    });
+
+    describe('fetchById', () => {
+        it('should fetch pdf blob by id with correct responseType', async () => {
+            const mockBlob = new Blob() as any;
+            mockClient.get.mockResolvedValueOnce({ data: mockBlob });
+
+            const result = await PdfReportsApi.fetchById(mockClient, 1);
+
+            expect(mockClient.get).toHaveBeenCalledWith(`${API_ROUTES.PDF_REPORTS.BASE}/1`, {
+                responseType: 'blob',
+            });
+            expect(result).toEqual(mockBlob);
+        });
+
+        it('should use correct endpoint with file id', async () => {
+            const mockBlob = new Blob() as any;
+            mockClient.get.mockResolvedValueOnce({ data: mockBlob });
+
+            await PdfReportsApi.fetchById(mockClient, 42);
+
+            expect(mockClient.get).toHaveBeenCalledWith(`${API_ROUTES.PDF_REPORTS.BASE}/42`, expect.any(Object));
+        });
+
+        it('should throw error when api request fails', async () => {
+            mockClient.get.mockRejectedValueOnce(new Error('Download failed'));
+
+            await expect(PdfReportsApi.fetchById(mockClient, 1)).rejects.toThrow('Download failed');
+        });
+
+        it('should handle 404 error when file not found', async () => {
+            const notFoundError = new Error('Not Found');
+            mockClient.get.mockRejectedValueOnce(notFoundError);
+
+            await expect(PdfReportsApi.fetchById(mockClient, 99)).rejects.toThrow('Not Found');
         });
     });
 });

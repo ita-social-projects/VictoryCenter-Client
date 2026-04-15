@@ -9,6 +9,7 @@ import { ReactComponent as NotFoundIcon } from '@/assets/icons/not-found.svg';
 import { ReactComponent as ArrowUpIcon } from '@/assets/icons/arrow-up.svg';
 import { ReactComponent as CheckmarkIcon } from '@/assets/icons/checkmark.svg';
 import { ReactComponent as CrossIcon } from '@/assets/icons/cross.svg';
+import { ReactComponent as InfoIcon } from '@/assets/icons/info.svg';
 import { IconButton } from '@/components/admin/icon-button/IconButton';
 import { ACTION_ICONS } from '@/const/common/action-icons';
 import { Select } from '@/components/common/select/Select';
@@ -18,8 +19,9 @@ import {
     validateFundsExpendituresAmount,
     validateFundsExpendituresCategory,
 } from '@/validation/admin/reports-schema/funds-expenditures-record-schema/funds-expenditures-record-schema';
-import { getConvertedAmount } from '@/utils/functions/get-converted-amount/get-converted-amount';
+import { updateFundsAmounts } from '@/utils/functions/update-funds-amounts/update-funds-amounts';
 import { parseAmount } from '@/utils/functions/parse-amount/parse-amount';
+import { isUsdAmountMismatch } from '@/utils/functions/validate-usd-amount-mismatch/validate-usd-amount-mismatch';
 import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import { FundsRecordActions } from '@/pages/admin/reports/components/funds-expenditures-section/components/common/funds-record-actions/FundsRecordActions';
 import cn from 'classnames';
@@ -69,6 +71,7 @@ interface RowEditState {
         amountUah?: string;
         amountUsd?: string;
     };
+    usdMismatchMessage?: string;
 }
 
 const TYPE_LABEL_MAP: Record<FundsExpendituresTransactionType, string> = {
@@ -233,6 +236,7 @@ export const FundsExpendituresTable = ({
                 amountUah: record.amountUah,
                 amountUsd: record.amountUsd,
                 errors: {},
+                usdMismatchMessage: undefined,
             });
         },
         [isRowActionsDisabled, rowEditState, setRowEditMode],
@@ -283,49 +287,52 @@ export const FundsExpendituresTable = ({
         [getRowEditValidationError],
     );
 
+    const applyAmountUpdate = useCallback(
+        (prev: RowEditState, field: 'amountUah' | 'amountUsd', value: string, trigger: 'change' | 'blur') => {
+            const updatedAmounts = updateFundsAmounts(
+                field,
+                value,
+                exchangeRate ?? null,
+                trigger,
+            )({
+                amountUah: prev.amountUah,
+                amountUsd: prev.amountUsd,
+                errors: {
+                    amountUah: prev.errors.amountUah,
+                    amountUsd: prev.errors.amountUsd,
+                },
+            });
+
+            return {
+                ...prev,
+                amountUah: updatedAmounts.amountUah,
+                amountUsd: updatedAmounts.amountUsd,
+                errors: {
+                    ...prev.errors,
+                    amountUah: updatedAmounts.errors.amountUah,
+                    amountUsd: updatedAmounts.errors.amountUsd,
+                },
+            };
+        },
+        [exchangeRate],
+    );
+
     const handleAmountChange = useCallback(
         (recordId: number, field: 'amountUah' | 'amountUsd', nextValue: string) => {
-            const normalized = normalizeFundsExpendituresAmountInput(nextValue);
-
             setRowEditState((prev) => {
                 if (prev?.recordId !== recordId) {
                     return prev;
                 }
 
-                const currentFieldError = validateFundsExpendituresAmount(normalized, 'change');
-
-                let nextAmountUah = field === 'amountUah' ? normalized : prev.amountUah;
-                let nextAmountUsd = field === 'amountUsd' ? normalized : prev.amountUsd;
-                let nextAmountUahError = field === 'amountUah' ? currentFieldError : prev.errors.amountUah;
-                let nextAmountUsdError = field === 'amountUsd' ? currentFieldError : prev.errors.amountUsd;
-
-                if (!currentFieldError) {
-                    const convertedAmount = getConvertedAmount(normalized, field, exchangeRate);
-
-                    if (convertedAmount !== null) {
-                        if (field === 'amountUah') {
-                            nextAmountUsd = convertedAmount;
-                            nextAmountUsdError = validateFundsExpendituresAmount(convertedAmount, 'change');
-                        } else {
-                            nextAmountUah = convertedAmount;
-                            nextAmountUahError = validateFundsExpendituresAmount(convertedAmount, 'change');
-                        }
-                    }
-                }
+                const nextState = applyAmountUpdate(prev, field, nextValue, 'change');
 
                 return {
-                    ...prev,
-                    amountUah: nextAmountUah,
-                    amountUsd: nextAmountUsd,
-                    errors: {
-                        ...prev.errors,
-                        amountUah: nextAmountUahError,
-                        amountUsd: nextAmountUsdError,
-                    },
+                    ...nextState,
+                    usdMismatchMessage: undefined,
                 };
             });
         },
-        [exchangeRate],
+        [applyAmountUpdate],
     );
 
     const handleAmountBlur = useCallback(
@@ -335,39 +342,26 @@ export const FundsExpendituresTable = ({
                     return prev;
                 }
 
-                const normalized = normalizeFundsExpendituresAmountInput(prev[field], true);
-                const currentFieldError = validateFundsExpendituresAmount(normalized, 'blur');
+                const nextState = applyAmountUpdate(prev, field, prev[field], 'blur');
 
-                let nextAmountUah = field === 'amountUah' ? normalized : prev.amountUah;
-                let nextAmountUsd = field === 'amountUsd' ? normalized : prev.amountUsd;
-                let nextAmountUahError = field === 'amountUah' ? currentFieldError : prev.errors.amountUah;
-                let nextAmountUsdError = field === 'amountUsd' ? currentFieldError : prev.errors.amountUsd;
+                if (field === 'amountUsd') {
+                    const hasMismatch = isUsdAmountMismatch(nextState.amountUah, nextState.amountUsd, exchangeRate);
 
-                if (!currentFieldError) {
-                    const convertedAmountString = getConvertedAmount(normalized, field, exchangeRate);
-
-                    if (convertedAmountString !== null && field === 'amountUah') {
-                        nextAmountUsd = convertedAmountString;
-                        nextAmountUsdError = validateFundsExpendituresAmount(convertedAmountString, 'blur');
-                    } else if (convertedAmountString !== null) {
-                        nextAmountUah = convertedAmountString;
-                        nextAmountUahError = validateFundsExpendituresAmount(convertedAmountString, 'blur');
-                    }
+                    return {
+                        ...nextState,
+                        usdMismatchMessage: hasMismatch
+                            ? FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH
+                            : undefined,
+                    };
                 }
 
                 return {
-                    ...prev,
-                    amountUah: nextAmountUah,
-                    amountUsd: nextAmountUsd,
-                    errors: {
-                        ...prev.errors,
-                        amountUah: nextAmountUahError,
-                        amountUsd: nextAmountUsdError,
-                    },
+                    ...nextState,
+                    usdMismatchMessage: undefined,
                 };
             });
         },
-        [exchangeRate],
+        [applyAmountUpdate, exchangeRate],
     );
 
     const handleAcceptRowEdit = useCallback(
@@ -708,6 +702,17 @@ export const FundsExpendituresTable = ({
                                                         <p className={styles['amount-edit-error']}>
                                                             {rowEditState.errors.amountUsd}
                                                         </p>
+                                                    )}
+                                                    {rowEditState.usdMismatchMessage && (
+                                                        <div className={styles['amount-edit-info']}>
+                                                            <InfoIcon
+                                                                className={styles['amount-edit-info-icon']}
+                                                                aria-hidden="true"
+                                                            />
+                                                            <p className={styles['amount-edit-info-text']}>
+                                                                {rowEditState.usdMismatchMessage}
+                                                            </p>
+                                                        </div>
                                                     )}
                                                 </div>
                                             ) : (

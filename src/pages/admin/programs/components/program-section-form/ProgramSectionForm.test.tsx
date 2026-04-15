@@ -832,8 +832,12 @@ describe('ProgramSectionForm', () => {
             expect(onEditStateChange).toHaveBeenCalledWith(true);
         });
 
-        it('calls onSave and transitions back to View mode when Save button is clicked', () => {
-            renderForm({ isNewSection: true, isSectionValid: true });
+        it('calls onSave and transitions back to View mode when a valid dirty section is saved', () => {
+            const { handlers } = renderWithHandlers({ isNewSection: true, isSectionValid: true });
+
+            act(() => {
+                handlers.onTitleChange('Updated title');
+            });
 
             fireEvent.click(screen.getByText(PROGRAMS_TEXT.BUTTON.SAVE));
 
@@ -1083,5 +1087,59 @@ describe('ProgramSectionForm', () => {
             expect(faqPair!.faqQuestion!.questionText).toBe('Question');
             expect(faqPair!.faqQuestion!.answerText).toBe('New Answer');
         });
+    });
+
+    it('requests save confirmation (does not call onSave immediately) when onRequestSaveSection is provided and section is dirty', () => {
+        const onSave = jest.fn();
+        const onRequestSaveSection = jest.fn();
+
+        const { handlers } = renderWithHandlers({
+            isNewSection: true,
+            isSectionValid: true,
+            onSave,
+            onRequestSaveSection,
+        } as any);
+
+        act(() => {
+            handlers.onTitleChange('Dirty title');
+        });
+
+        fireEvent.click(screen.getByText(PROGRAMS_TEXT.BUTTON.SAVE));
+
+        expect(onRequestSaveSection).toHaveBeenCalledTimes(1);
+        expect(onRequestSaveSection).toHaveBeenCalledWith({
+            onConfirm: expect.any(Function),
+        });
+
+        expect(onSave).not.toHaveBeenCalled();
+    });
+
+    it('executes save after external confirmation callback is invoked', () => {
+        const onSave = jest.fn();
+        const onRequestSaveSection = jest.fn();
+
+        const { handlers } = renderWithHandlers({
+            isNewSection: true,
+            isSectionValid: true,
+            onSave,
+            onRequestSaveSection,
+        } as any);
+
+        act(() => {
+            handlers.onTitleChange('Dirty title');
+        });
+
+        fireEvent.click(screen.getByText(PROGRAMS_TEXT.BUTTON.SAVE));
+
+        const requestArg = onRequestSaveSection.mock.calls[0][0];
+        expect(requestArg.onConfirm).toEqual(expect.any(Function));
+
+        act(() => {
+            requestArg.onConfirm();
+        });
+
+        expect(onSave).toHaveBeenCalledTimes(1);
+        expect(screen.queryByText(PROGRAMS_TEXT.BUTTON.SAVE)).not.toBeInTheDocument();
+        expect(screen.getByLabelText('Edit section')).toBeInTheDocument();
     });
 });

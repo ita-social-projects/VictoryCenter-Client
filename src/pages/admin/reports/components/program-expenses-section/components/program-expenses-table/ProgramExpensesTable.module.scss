@@ -1,0 +1,93 @@
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
+@use '@/assets/sass/variables/typography' as t;
+
+.table-wrapper {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 347px;
+    overflow-x: auto;
+    background: c.$light-blue-25;
+    border: 1px solid c.$grey-500;
+    border-radius: 16px;
+    box-shadow: 0 24px 48px -12px rgba(c.$bluish-black, 0.2);
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+
+    thead tr {
+        height: 88px;
+    }
+}
+
+.column-year {
+    width: 19%;
+}
+
+.column-type {
+    width: 18%;
+}
+
+.column-program {
+    width: 24%;
+}
+
+.column-amount {
+    width: 19.5%;
+}
+
+.th {
+    @include type.subtitle-1-medium;
+    padding: 30px 20px;
+    text-align: left;
+    line-height: 24px;
+    color: rgba(c.$graphite-black, 0.88);
+    white-space: nowrap;
+}
+
+.tr {
+    height: 65px;
+    background: c.$white;
+    border-top: 1px solid c.$grey-500;
+}
+
+.td {
+    @include type.subtitle-2-medium;
+    box-sizing: border-box;
+    height: 65px;
+    padding: 13px 20px;
+    vertical-align: middle;
+    font-weight: 400;
+    line-height: 24px;
+    color: c.$graphite-black;
+    white-space: nowrap;
+}
+
+.type-chip {
+    box-sizing: border-box;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 106px;
+    height: 24px;
+    padding: 0 10px;
+    border: 1px solid rgba(c.$error, 0.6);
+    border-radius: 50px;
+    background: rgba(c.$error, 0.5);
+    font-family: t.$font-family-base;
+    font-weight: t.$fw-light;
+    color: c.$white;
+    font-size: 13px;
+    line-height: 15px;
+    letter-spacing: t.$small-spacing;
+    text-align: center;
+}
+
+@media (max-width: 1200px) {
+    .table {
+        min-width: 1200px;
+    }
+}

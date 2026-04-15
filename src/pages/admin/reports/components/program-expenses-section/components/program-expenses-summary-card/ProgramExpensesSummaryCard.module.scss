@@ -1,0 +1,51 @@
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/variables/typography' as t;
+
+.summary-card {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 20px;
+    width: 271px;
+    min-width: 200px;
+    min-height: 163px;
+    padding: 20px;
+    background: c.$white;
+    border-radius: 16px;
+    box-shadow: 0 24px 48px -12px rgba(c.$bluish-black, 0.2);
+}
+
+.summary-title {
+    display: flex;
+    align-items: center;
+    width: 240px;
+    min-height: 56px;
+    font-family: t.$font-family-base;
+    font-weight: t.$fw-semibold;
+    font-size: 22px;
+    line-height: 28px;
+    letter-spacing: t.$sub2-spacing;
+    color: c.$graphite-black;
+    text-transform: uppercase;
+}
+
+.summary-amounts {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 240px;
+}
+
+.summary-amount {
+    display: flex;
+    align-items: center;
+    min-height: 20px;
+    font-family: t.$font-family-base;
+    font-weight: t.$fw-regular;
+    font-size: t.$sub2-size;
+    line-height: 20px;
+    letter-spacing: t.$sub2-spacing;
+    color: c.$graphite-black;
+}

@@ -120,6 +120,12 @@ export const PDF_FILES_SECTION_TEXT = {
             DELETE: 'Видалити файл',
         },
     },
+    DELETE_CONFIRMATION: {
+        TITLE: 'Файл буде видалено. Бажаєте продовжити?',
+    },
+    DELETE_SUCCESS: 'Файл успішно видалено',
+    DELETE_ERROR: 'Не вдалося видалити файл. Спробуйте ще раз.',
+    VIEW_ERROR: 'Не вдалося завантажити файл для перегляду. Спробуйте ще раз.',
 };
 
 export const FUNDS_EXPENDITURES_VALIDATION = {
@@ -141,6 +147,7 @@ export const FUNDS_EXPENDITURES_TEXT = {
         RECORD_UPDATE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
         RECORD_DELETED_SUCCESSFULLY: 'Запис успішно видалено',
         RECORD_DELETE_FAILED_RETRY: 'Не вдалося видалити запис. Спробуйте ще раз',
+        AMOUNT_USD_NOT_MATCH: 'Сума в USD не відповідає сумі в UAH',
     },
     MODAL: {
         SHARED: {
@@ -209,12 +216,30 @@ export const FUNDS_EXPENDITURES_TEXT = {
         },
     },
     VALIDATION: {
-        CATEGORY_UNIQUE: 'Категорія має бути унікальна',
-        AMOUNT_ONLY_NUMBER_GT_ZERO: 'Лише число > 0',
-        AMOUNT_MAX_DIGITS: "Не більше 11 цифр, 2 після ','",
+        CATEGORY_UNIQUE: 'Категорія вже додана до надходжень',
+        AMOUNT_ONLY_NUMBER: 'Дозволено лише цифри',
+        AMOUNT_MAX_DIGITS: 'Не більше 9 цифр до коми',
         AMOUNT_NOT_NEGATIVE: "Сума не може бути від'ємною",
+        AMOUNT_NOT_ZERO: 'Сума не може дорівнювати 0',
         EXCHANGE_RATE_ONLY_NUMERIC: 'Дозволено тільки числові значення десяткові та цілі',
         EXCHANGE_RATE_GT_ZERO: 'Значення має бути більше 0',
         EXCHANGE_RATE_MAX_DIGITS: "Не більше 9 цифр, 6 після ','",
+    },
+};
+
+export const PROGRAM_EXPENSES_TEXT = {
+    BUTTON: {
+        ADD_PROGRAM_EXPENSE: 'Витрата по програмі',
+    },
+    EMPTY_STATE: {
+        ADD_RECORD: 'додайте перший запис Програмної витрати',
+    },
+    SUMMARY_CARD: {
+        TITLE: 'Всього програмні витрати',
+    },
+    TABLE: {
+        COLUMNS: {
+            PROGRAM: 'Програма',
+        },
     },
 };

@@ -753,4 +753,55 @@ describe('ProgramModal', () => {
             expect(mockOnClose).not.toHaveBeenCalled();
         });
     });
+
+    it('opens save-confirmation modal when ProgramForm requests section save confirmation', () => {
+        render(<ProgramModal {...addModeProps} />);
+
+        const onConfirm = jest.fn();
+
+        act(() => {
+            capturedFormProps.onRequestSaveSection({ onConfirm });
+        });
+
+        expect(screen.getByTestId('question-modal')).toBeInTheDocument();
+        expect(screen.getByTestId('question-title')).toHaveTextContent(COMMON_TEXT_ADMIN.QUESTION.SAVE_CHANGES);
+        expect(onConfirm).not.toHaveBeenCalled();
+    });
+
+    it('executes section save confirm callback on confirm and does not execute it on cancel', () => {
+        render(<ProgramModal {...addModeProps} />);
+
+        const onConfirm = jest.fn();
+
+        act(() => {
+            capturedFormProps.onRequestSaveSection({ onConfirm });
+        });
+
+        fireEvent.click(screen.getByTestId('question-cancel'));
+        expect(onConfirm).not.toHaveBeenCalled();
+        expect(screen.queryByTestId('question-modal')).not.toBeInTheDocument();
+
+        act(() => {
+            capturedFormProps.onRequestSaveSection({ onConfirm });
+        });
+
+        fireEvent.click(screen.getByTestId('question-confirm'));
+        expect(onConfirm).toHaveBeenCalledTimes(1);
+        expect(screen.queryByTestId('question-modal')).not.toBeInTheDocument();
+    });
+
+    it('hides section-save confirmation when parent ProgramModal closes', () => {
+        const { rerender } = render(<ProgramModal {...addModeProps} isOpen={true} />);
+
+        act(() => {
+            capturedFormProps.onRequestSaveSection({ onConfirm: jest.fn() });
+        });
+
+        expect(screen.getByTestId('question-modal')).toBeInTheDocument();
+        expect(screen.getByTestId('question-title')).toHaveTextContent(COMMON_TEXT_ADMIN.QUESTION.SAVE_CHANGES);
+
+        rerender(<ProgramModal {...addModeProps} isOpen={false} />);
+
+        expect(screen.queryByTestId('question-modal')).not.toBeInTheDocument();
+    });
 });

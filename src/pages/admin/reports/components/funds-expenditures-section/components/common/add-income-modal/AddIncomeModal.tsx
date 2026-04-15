@@ -10,6 +10,7 @@ import {
     ReportFundsExpendituresRecord,
     FundsExpendituresTransactionType,
 } from '@/types/admin/reports';
+import { ReactComponent as InfoIcon } from '@/assets/icons/info.svg';
 import { updateFundsAmounts } from '@/utils/functions/update-funds-amounts/update-funds-amounts';
 import { getReportingYearOptions } from '@/utils/functions/get-reporting-year-options/get-reporting-year-options';
 import {
@@ -17,6 +18,7 @@ import {
     validateFundsExpendituresAmount,
     validateFundsExpendituresCategory,
 } from '@/validation/admin/reports-schema/funds-expenditures-record-schema/funds-expenditures-record-schema';
+import { isUsdAmountMismatch } from '@/utils/functions/validate-usd-amount-mismatch/validate-usd-amount-mismatch';
 import styles from './AddIncomeModal.module.scss';
 
 interface AddIncomeModalProps {
@@ -66,6 +68,7 @@ export const AddIncomeModal = ({
     const [formState, setFormState] = useState<AddIncomeFormState>(INITIAL_STATE);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isAddConfirmationOpen, setIsAddConfirmationOpen] = useState(false);
+    const [usdMismatchMessage, setUsdMismatchMessage] = useState<string | undefined>();
 
     const incomeCategories = useMemo(() => {
         return categories
@@ -93,6 +96,7 @@ export const AddIncomeModal = ({
     const resetForm = useCallback(() => {
         setFormState(INITIAL_STATE);
         setIsSubmitting(false);
+        setUsdMismatchMessage(undefined);
     }, []);
 
     const handleClose = useCallback(() => {
@@ -115,21 +119,62 @@ export const AddIncomeModal = ({
     );
 
     const handleAmountChange = useCallback(
-        (field: 'amountUah' | 'amountUsd', value: string) => {
+        (value: string) => {
             setFormState((prev) => ({
                 ...prev,
-                ...updateFundsAmounts(field, value, exchangeRate, 'change')(prev),
+                ...updateFundsAmounts('amountUah', value, exchangeRate, 'change')(prev),
             }));
+            setUsdMismatchMessage(undefined);
         },
         [exchangeRate],
     );
 
     const handleAmountBlur = useCallback(
         (field: 'amountUah' | 'amountUsd') => {
+            if (field === 'amountUsd') {
+                setFormState((prev) => {
+                    const normalizedAmountUsd = normalizeFundsExpendituresAmountInput(prev.amountUsd, true);
+                    const amountUsdError = validateFundsExpendituresAmount(normalizedAmountUsd, 'blur');
+
+                    const hasMismatch = isUsdAmountMismatch(prev.amountUah, normalizedAmountUsd, exchangeRate);
+                    setUsdMismatchMessage(
+                        hasMismatch ? FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH : undefined,
+                    );
+
+                    return {
+                        ...prev,
+                        amountUsd: normalizedAmountUsd,
+                        errors: {
+                            ...prev.errors,
+                            amountUsd: amountUsdError,
+                        },
+                    };
+                });
+
+                return;
+            }
+
+            setFormState((prev) => {
+                const updated = {
+                    ...prev,
+                    ...updateFundsAmounts(field, prev[field], exchangeRate, 'blur')(prev),
+                };
+
+                setUsdMismatchMessage(undefined);
+
+                return updated;
+            });
+        },
+        [exchangeRate],
+    );
+
+    const handleUsdChange = useCallback(
+        (value: string) => {
             setFormState((prev) => ({
                 ...prev,
-                ...updateFundsAmounts(field, prev[field], exchangeRate, 'blur')(prev),
+                ...updateFundsAmounts('amountUsd', value, exchangeRate, 'change')(prev),
             }));
+            setUsdMismatchMessage(undefined);
         },
         [exchangeRate],
     );
@@ -168,7 +213,7 @@ export const AddIncomeModal = ({
                 amountUah: normalizedAmountUah,
                 amountUsd: normalizedAmountUsd,
                 type: 'income',
-            });
+            }).catch(() => false);
 
             if (isCreated) {
                 resetForm();
@@ -184,16 +229,17 @@ export const AddIncomeModal = ({
         formState.amountUah.trim() !== '' ||
         formState.amountUsd.trim() !== '';
 
+    const amountUahValidationError = validateFundsExpendituresAmount(formState.amountUah, 'save');
+    const amountUsdValidationError = validateFundsExpendituresAmount(formState.amountUsd, 'save');
+    const categoryValidationError = getCategoryError(formState.categoryId, 'blur');
+
     const isSubmitDisabled =
         isSubmitting ||
         !formState.reportingYear ||
         !formState.categoryId ||
-        !formState.amountUah.trim() ||
-        !formState.amountUsd.trim() ||
-        Boolean(formState.errors.reportingYear) ||
-        Boolean(formState.errors.categoryId) ||
-        Boolean(formState.errors.amountUah) ||
-        Boolean(formState.errors.amountUsd);
+        Boolean(amountUahValidationError) ||
+        Boolean(amountUsdValidationError) ||
+        Boolean(categoryValidationError);
 
     const handleOpenAddConfirmation = useCallback(() => {
         setIsAddConfirmationOpen(true);
@@ -295,7 +341,7 @@ export const AddIncomeModal = ({
                             name="amountUah"
                             type="text"
                             value={formState.amountUah}
-                            onChange={(event) => handleAmountChange('amountUah', event.target.value)}
+                            onChange={(event) => handleAmountChange(event.target.value)}
                             onBlur={() => handleAmountBlur('amountUah')}
                             maxLength={20}
                             showCounter={false}
@@ -328,7 +374,7 @@ export const AddIncomeModal = ({
                             name="amountUsd"
                             type="text"
                             value={formState.amountUsd}
-                            onChange={(event) => handleAmountChange('amountUsd', event.target.value)}
+                            onChange={(event) => handleUsdChange(event.target.value)}
                             onBlur={() => handleAmountBlur('amountUsd')}
                             maxLength={20}
                             showCounter={false}
@@ -336,6 +382,12 @@ export const AddIncomeModal = ({
                             hasError={Boolean(formState.errors.amountUsd)}
                         />
                         {formState.errors.amountUsd && <p className={styles.error}>{formState.errors.amountUsd}</p>}
+                        {usdMismatchMessage && (
+                            <div className={styles.info}>
+                                <InfoIcon className={styles['info-icon']} aria-hidden="true" />
+                                <p className={styles['info-text']}>{usdMismatchMessage}</p>
+                            </div>
+                        )}
                     </div>
                 </div>
             </FundsRecordModal>

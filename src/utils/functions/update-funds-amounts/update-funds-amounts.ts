@@ -29,17 +29,12 @@ export const updateFundsAmounts = (
         let nextAmountUahError = field === 'amountUah' ? currentFieldError : prev.errors.amountUah;
         let nextAmountUsdError = field === 'amountUsd' ? currentFieldError : prev.errors.amountUsd;
 
-        if (!currentFieldError) {
-            const convertedAmount = getConvertedAmount(normalized, field, exchangeRate);
+        if (!currentFieldError && field === 'amountUah') {
+            const convertedAmount = getConvertedAmount(normalized, exchangeRate);
 
             if (convertedAmount !== null) {
-                if (field === 'amountUah') {
-                    nextAmountUsd = convertedAmount;
-                    nextAmountUsdError = validateFundsExpendituresAmount(convertedAmount, trigger);
-                } else {
-                    nextAmountUah = convertedAmount;
-                    nextAmountUahError = validateFundsExpendituresAmount(convertedAmount, trigger);
-                }
+                nextAmountUsd = convertedAmount;
+                nextAmountUsdError = validateFundsExpendituresAmount(convertedAmount, trigger);
             }
         }
 

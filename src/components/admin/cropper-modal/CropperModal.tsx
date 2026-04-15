@@ -165,6 +165,7 @@ export const CropModal = ({ src, onChange, width, height, onCancel, isOpen }: Cr
                             maxHeight={crop?.height}
                             keepSelection
                             aspect={aspectRatio}
+                            locked
                         >
                             <img
                                 ref={imgRef}

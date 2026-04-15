@@ -36,4 +36,8 @@ export const ADMIN_ROUTES = {
         PATH: 'reports',
         FULL: '/admin-panel/reports',
     },
+    HISTORY: {
+        PATH: 'history',
+        FULL: '/admin-panel/history',
+    },
 };

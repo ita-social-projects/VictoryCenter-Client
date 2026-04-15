@@ -111,6 +111,9 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
             setChangedLivesErrors(INITIAL_BLOCK_ERRORS);
         }, [mediaSettingsData, resetCounter]);
 
+        const hasBlockErrors = (errors: ReportsMediaBlockErrors) =>
+            Boolean(Object.values(errors).find((error) => Boolean(error)));
+
         const handleCollectedFundsChange = useCallback(
             (values: ReportsMediaBlockValues, errors: ReportsMediaBlockErrors) => {
                 setCollectedFundsValues(values);
@@ -129,7 +132,40 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
             [onDirtyChange],
         );
 
+        const validateCurrentValues = useCallback((): boolean => {
+            const collectedFundsTitleError = REPORTS_COLLECTED_FUNDS_VALIDATION_FUNCTIONS.validateTitle(
+                collectedFundsValues.title,
+            );
+            const changedLivesTitleError = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateTitle(
+                changedLivesValues.title,
+            );
+            const changedLivesValueError = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateChangedLives(
+                changedLivesValues.totalAmount,
+            );
+
+            const hasValidationErrors = Boolean(
+                collectedFundsTitleError || changedLivesTitleError || changedLivesValueError,
+            );
+
+            if (!hasValidationErrors) {
+                return true;
+            }
+
+            setCollectedFundsErrors((prev) => ({ ...prev, title: collectedFundsTitleError }));
+            setChangedLivesErrors((prev) => ({
+                ...prev,
+                title: changedLivesTitleError,
+                totalAmount: changedLivesValueError,
+            }));
+
+            return false;
+        }, [changedLivesValues.title, changedLivesValues.totalAmount, collectedFundsValues.title]);
+
         const handlePublish = useCallback(async (): Promise<boolean> => {
+            if (!validateCurrentValues()) {
+                return false;
+            }
+
             try {
                 let collectedFundsImage = collectedFundsValues.image;
                 let collectedFundsImageId = collectedFundsValues.imageId;
@@ -250,7 +286,11 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
                                 buttonStyle="primary"
                                 className={styles.button}
                                 onClick={onPublish}
-                                disabled={isPublishDisabled}
+                                disabled={
+                                    isPublishDisabled ||
+                                    hasBlockErrors(collectedFundsErrors) ||
+                                    hasBlockErrors(changedLivesErrors)
+                                }
                             >
                                 {REPORTS_TEXT.BUTTON.PUBLISH}
                             </Button>

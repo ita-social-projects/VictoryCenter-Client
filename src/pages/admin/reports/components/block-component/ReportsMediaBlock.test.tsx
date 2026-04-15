@@ -24,6 +24,7 @@ jest.mock(
             disabled,
             error,
             isRequired,
+            maxLimitWarning,
         }: {
             label: string;
             id: string;
@@ -35,6 +36,7 @@ jest.mock(
             disabled: boolean;
             error?: string;
             isRequired?: boolean;
+            maxLimitWarning?: string;
         }) => (
             <div>
                 <label htmlFor={id}>
@@ -43,6 +45,7 @@ jest.mock(
                 </label>
                 <textarea
                     data-testid={`mock-textarea-${id}`}
+                    data-max-limit-warning={maxLimitWarning}
                     maxLength={maxLength}
                     id={id}
                     name={name}
@@ -167,6 +170,16 @@ describe('ReportsMediaBlock', () => {
 
             const titleInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-title');
             expect(titleInput).toHaveValue('Test Title');
+        });
+
+        it('should pass the title max length warning to the title textarea', () => {
+            renderComponent();
+
+            const titleInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-title');
+            expect(titleInput).toHaveAttribute(
+                'data-max-limit-warning',
+                COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(50),
+            );
         });
 
         it('should render total amount input with correct value', () => {

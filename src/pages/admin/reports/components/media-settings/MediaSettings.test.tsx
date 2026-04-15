@@ -17,8 +17,8 @@ jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
 }));
 
 jest.mock('@/components/admin/button/Button', () => ({
-    Button: ({ children, onClick, className }: any) => (
-        <button onClick={onClick} className={className}>
+    Button: ({ children, onClick, className, disabled }: any) => (
+        <button onClick={onClick} className={className} disabled={disabled}>
             {children}
         </button>
     ),
@@ -299,6 +299,19 @@ describe('MediaSettings', () => {
             });
 
             expect(mockOnDirtyChange).toHaveBeenCalledWith(true);
+        });
+
+        it('should disable publish button while there are validation errors', () => {
+            renderComponent({ isPublishDisabled: false });
+
+            act(() => {
+                changedLivesBlockProps!.onValuesChange(
+                    { ...changedLivesBlockProps!.values, title: '' },
+                    { title: COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED },
+                );
+            });
+
+            expect(screen.getByText(REPORTS_TEXT.BUTTON.PUBLISH)).toBeDisabled();
         });
 
         it('should update collected funds block values after change', () => {

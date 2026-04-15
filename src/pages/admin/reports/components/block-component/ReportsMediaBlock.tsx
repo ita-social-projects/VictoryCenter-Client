@@ -123,6 +123,9 @@ export const ReportsMediaBlock = ({
                             onChange={handleTitleChange}
                             onBlur={handleTitleBlur}
                             maxLength={REPORTS_TEXT.FORM.MAX_LENGTH.TITLE}
+                            maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
+                                REPORTS_TEXT.FORM.MAX_LENGTH.TITLE,
+                            )}
                             error={errors.title}
                             rows={1}
                             isRequired={true}

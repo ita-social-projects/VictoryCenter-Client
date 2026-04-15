@@ -65,14 +65,17 @@ export const PdfFilesSection = () => {
             setIsDeleting(true);
             try {
                 await PdfReportsApi.delete(client, fileId);
-                addToast(PDF_FILES_SECTION_TEXT.DELETE_SUCCESS, ToastType.Success);
-                await refetchFiles();
                 setUploadedFiles((prev) => prev.filter((f) => f.id !== fileId));
+                addToast(PDF_FILES_SECTION_TEXT.DELETE_SUCCESS, ToastType.Success);
             } catch {
                 addToast(PDF_FILES_SECTION_TEXT.DELETE_ERROR, ToastType.Error);
             } finally {
                 setIsDeleting(false);
             }
+
+            try {
+                await refetchFiles();
+            } catch {}
         },
         [client, addToast, refetchFiles],
     );
@@ -103,6 +106,10 @@ export const PdfFilesSection = () => {
         );
     }
 
+    const mergedDedupedFiles = Array.from(
+        new Map([...fetchedFiles, ...uploadedFiles].map((file) => [file.id, file])).values(),
+    );
+
     return (
         <div className={styles.root}>
             <div className={styles['top-section']}>
@@ -113,7 +120,7 @@ export const PdfFilesSection = () => {
             </div>
             <PdfDropzone onUploaded={handleUploaded} />
             <PdfFilesTable
-                files={[...fetchedFiles, ...uploadedFiles]}
+                files={mergedDedupedFiles}
                 onViewFile={handleViewFile}
                 onDeleteFile={handleDeleteFile}
                 isDeleting={isDeleting}

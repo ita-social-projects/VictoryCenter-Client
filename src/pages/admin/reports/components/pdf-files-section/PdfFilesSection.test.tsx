@@ -45,30 +45,26 @@ jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
     InlineLoader: () => <div data-testid="loader">Loading...</div>,
 }));
 
-const mockCreateObjectURL = jest.fn(() => 'blob:http://localhost/mock-blob-url');
-const mockWindowOpen = jest.fn();
-
-beforeAll(() => {
-    global.URL.createObjectURL = mockCreateObjectURL as any;
-    global.window.open = mockWindowOpen as any;
-});
-
-afterAll(() => {
-    jest.restoreAllMocks();
-});
-
 describe('PdfFilesSection', () => {
     const mockClient = { get: jest.fn() };
     const mockAddToast = jest.fn();
     const mockSectionData = { title: 'Test Title', description: 'Test Desc' };
     const mockFilesResponse = { items: [{ id: 1 }, { id: 2 }], totalItemsCount: 2 };
     const mockRefetch = jest.fn();
+    const mockCreateObjectURL = jest.fn(() => 'blob:http://localhost/mock-blob-url');
+    const mockWindowOpen = jest.fn();
 
     beforeEach(() => {
         jest.clearAllMocks();
+        jest.spyOn(URL, 'createObjectURL').mockImplementation(mockCreateObjectURL);
+        jest.spyOn(window, 'open').mockImplementation(mockWindowOpen);
         (useAdminClient as jest.Mock).mockReturnValue(mockClient);
         (useToast as jest.Mock).mockReturnValue({ addToast: mockAddToast });
         mockCreateObjectURL.mockReturnValue('blob:http://localhost/mock-blob-url');
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
     });
 
     it('should show loader when section or files are loading', () => {

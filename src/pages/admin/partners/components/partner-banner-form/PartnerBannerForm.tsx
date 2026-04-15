@@ -198,31 +198,35 @@ export const PartnerBanner = () => {
             {!isLoadingData && !fetchError && values && (
                 <div className={styles.content}>
                     <div className={styles.image}>
-                        <ImageInput
-                            variant="partnerBanner"
-                            label={PARTNERS_TEXT.BANNER.ADD_IMAGE_HERE}
-                            subText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
-                                PARTNER_BANNER_VALIDATION.image.height,
-                                PARTNER_BANNER_VALIDATION.image.width,
-                            )}
-                            value={values.image}
-                            onChange={handleImageChange}
-                            id="banner-image"
-                            name="banner-image"
-                            disabled={isDisabled}
-                            setError={handleImageError}
-                            style={{
-                                backgroundImage: `
+                        <div className={styles['image-input']}>
+                            <ImageInput
+                                variant="partnerBanner"
+                                label={PARTNERS_TEXT.BANNER.ADD_IMAGE_HERE}
+                                subText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
+                                    PARTNER_BANNER_VALIDATION.image.height,
+                                    PARTNER_BANNER_VALIDATION.image.width,
+                                )}
+                                value={values.image}
+                                onChange={handleImageChange}
+                                id="banner-image"
+                                name="banner-image"
+                                disabled={isDisabled}
+                                setError={handleImageError}
+                                style={{
+                                    backgroundImage: `
                                 linear-gradient(rgba(245, 245, 245, 0.85), rgba(245, 245, 245, 0.85)),
                                 url(${BannerImage})
                               `,
-                            }}
-                            cropWidth={PARTNER_BANNER_VALIDATION.image.width}
-                            cropHeight={PARTNER_BANNER_VALIDATION.image.height}
-                            minWidth={PARTNER_BANNER_VALIDATION.image.width}
-                            minHeight={PARTNER_BANNER_VALIDATION.image.height}
-                        />
-                        <InputError error={errors.image} />
+                                }}
+                                cropWidth={PARTNER_BANNER_VALIDATION.image.width}
+                                cropHeight={PARTNER_BANNER_VALIDATION.image.height}
+                                minWidth={PARTNER_BANNER_VALIDATION.image.width}
+                                minHeight={PARTNER_BANNER_VALIDATION.image.height}
+                            />
+                        </div>
+                        <div className={styles['image-error']}>
+                            <InputError error={errors.image} />
+                        </div>
                     </div>
 
                     <div className={styles.main}>

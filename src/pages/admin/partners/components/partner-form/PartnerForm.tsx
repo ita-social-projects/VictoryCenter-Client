@@ -99,7 +99,9 @@ const PartnerFormComponent = ({ values, errors, disabled, onValuesChange, onDele
                         )}
                         style={{ width: '13rem', height: '13rem' }}
                     />
-                    <InputError error={errors.image} />
+                    <div className={styles['image-error']}>
+                        <InputError error={errors.image} />
+                    </div>
                 </div>
 
                 <div className={styles.description}>

@@ -26,7 +26,7 @@ describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
 
         it('should return numeric error for non-digit input', () => {
             expect(validateFundsExpendituresAmount('abc', 'change')).toBe(
-                FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER_GT_ZERO,
+            FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER,
             );
         });
 
@@ -42,9 +42,19 @@ describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
             );
         });
 
-        it('should return negative error for zero value', () => {
-            expect(validateFundsExpendituresAmount('0', 'change')).toBe(
-                FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_NOT_NEGATIVE,
+        it('should not return zero error on change', () => {
+            expect(validateFundsExpendituresAmount('0', 'change')).toBeUndefined();
+        });
+
+        it('should return zero error on blur', () => {
+            expect(validateFundsExpendituresAmount('0', 'blur')).toBe(
+                FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_NOT_ZERO,
+            );
+        });
+
+        it('should return zero error on save', () => {
+            expect(validateFundsExpendituresAmount('0', 'save')).toBe(
+                FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_NOT_ZERO,
             );
         });
 

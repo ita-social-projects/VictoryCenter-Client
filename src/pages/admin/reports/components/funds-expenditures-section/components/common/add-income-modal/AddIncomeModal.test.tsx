@@ -600,7 +600,7 @@ describe('AddIncomeModal', () => {
             await user.clear(usdInput);
             await user.type(usdInput, 'abc');
 
-            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER_GT_ZERO)).toBeInTheDocument();
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER)).toBeInTheDocument();
             expect(screen.getByTestId('modal-submit')).toBeDisabled();
         });
     });
@@ -650,6 +650,25 @@ describe('AddIncomeModal', () => {
             uahInput.blur();
 
             expect(uahInput.value).toBe('100');
+        });
+
+        it('should show zero validation on save for amount UAH', async () => {
+            const user = userEvent.setup({ delay: null });
+            renderAddIncomeModal();
+
+            const yearSelect = screen.getByTestId('select-Оберіть звітній рік') as HTMLSelectElement;
+            const categorySelect = screen.getByTestId('select-Оберіть категорію надходження') as HTMLSelectElement;
+            const uahInput = screen.getByTestId('input-add-income-amount-uah') as HTMLInputElement;
+            const usdInput = screen.getByTestId('input-add-income-amount-usd') as HTMLInputElement;
+
+            fireEvent.change(yearSelect, { target: { value: currentYear } });
+            fireEvent.change(categorySelect, { target: { value: '1' } });
+            await user.type(uahInput, '0');
+            await user.type(usdInput, '1');
+            fireEvent.click(screen.getByTestId('modal-force-submit'));
+
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_NOT_ZERO)).toBeInTheDocument();
+            expect(screen.getByTestId('modal-submit')).toBeDisabled();
         });
 
         it('should keep UAH unchanged when USD is manually edited and blurred', async () => {

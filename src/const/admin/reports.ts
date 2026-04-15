@@ -175,6 +175,7 @@ export const FUNDS_EXPENDITURES_TEXT = {
             CATEGORY_LABEL: 'Категорія витрат',
             CATEGORY_PLACEHOLDER: 'Оберіть категорію витрат',
             SUBMIT_BUTTON: 'Додати витрату',
+            CONFIRM_ADD_TITLE: 'Додати нову витрату?',
         },
     },
     BUTTON: {
@@ -216,7 +217,8 @@ export const FUNDS_EXPENDITURES_TEXT = {
         },
     },
     VALIDATION: {
-        CATEGORY_UNIQUE: 'Категорія вже додана до надходжень',
+        CATEGORY_UNIQUE_INCOME: 'Категорія вже додана до надходжень',
+        CATEGORY_UNIQUE_EXPENSE: 'Категорія вже додана до витрат',
         AMOUNT_ONLY_NUMBER: 'Дозволено лише цифри',
         AMOUNT_MAX_DIGITS: 'Не більше 9 цифр до коми',
         AMOUNT_NOT_NEGATIVE: "Сума не може бути від'ємною",

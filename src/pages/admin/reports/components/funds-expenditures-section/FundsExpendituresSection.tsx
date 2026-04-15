@@ -29,7 +29,7 @@ import {
     TypeFilterValue,
 } from './components/funds-expenditures-toolbar/FundsExpendituresToolbar';
 import { EnrichedRecord, FundsExpendituresTable } from './components/funds-expenditures-table/FundsExpendituresTable';
-import { AddIncomeModal } from './components/common/add-income-modal/AddIncomeModal';
+import { AddFundsExpendituresRecordModal } from './components/common/add-funds-expenditures-record-modal/AddFundsExpendituresRecordModal';
 import { DeleteRecordModal } from './components/common/delete-record-modal/DeleteRecordModal';
 import styles from './FundsExpendituresSection.module.scss';
 
@@ -58,7 +58,7 @@ export const FundsExpenditureSection = () => {
     const [selectedCategoryId, setSelectedCategoryId] = useState<CategoryFilterValue>(undefined);
     const [recordsState, setRecordsState] = useState<ReportFundsExpendituresRecord[]>([]);
     const [isRowEditMode, setIsRowEditMode] = useState(false);
-    const [isAddIncomeModalOpen, setIsAddIncomeModalOpen] = useState(false);
+    const [activeRecordModalType, setActiveRecordModalType] = useState<FundsExpendituresTransactionType | null>(null);
 
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [recordToDelete, setRecordToDelete] = useState<ReportFundsExpendituresRecord | null>(null);
@@ -100,15 +100,15 @@ export const FundsExpenditureSection = () => {
     }, []);
 
     const handleOpenAddIncomeModal = useCallback(() => {
-        setIsAddIncomeModalOpen(true);
+        setActiveRecordModalType('income');
     }, []);
 
     const handleOpenAddExpenseModal = useCallback(() => {
-        // TODO
+        setActiveRecordModalType('expense');
     }, []);
 
     const handleCloseAddIncomeModal = useCallback(() => {
-        setIsAddIncomeModalOpen(false);
+        setActiveRecordModalType(null);
     }, []);
 
     const fetchSettings = useCallback(
@@ -267,7 +267,7 @@ export const FundsExpenditureSection = () => {
                 setRecordsState((prev) => [...prev, createdRecord]);
                 refetchSummary();
                 addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_CREATED_SUCCESSFULLY, ToastType.Success);
-                setIsAddIncomeModalOpen(false);
+                setActiveRecordModalType(null);
                 return true;
             } catch {
                 addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_CREATE_FAILED_RETRY, ToastType.Error);
@@ -443,9 +443,10 @@ export const FundsExpenditureSection = () => {
                 </div>
             )}
 
-            <AddIncomeModal
-                isOpen={isAddIncomeModalOpen}
+            <AddFundsExpendituresRecordModal
+                isOpen={activeRecordModalType !== null}
                 onClose={handleCloseAddIncomeModal}
+                transactionType={activeRecordModalType ?? 'income'}
                 categories={categories}
                 records={recordsState}
                 exchangeRate={currentExchangeRate}

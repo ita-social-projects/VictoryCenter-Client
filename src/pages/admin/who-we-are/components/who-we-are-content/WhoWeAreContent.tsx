@@ -103,8 +103,10 @@ export const WhoWeAreContent = () => {
 
     const isPublishButtonActive = useMemo(() => {
         if (!selectedSection || !updatedSection) return false;
-        return JSON.stringify(selectedSection) !== JSON.stringify(updatedSection);
-    }, [selectedSection, updatedSection]);
+        const normalizedSelectedSectionString = JSON.stringify(normalizeSection(selectedSection));
+        const normalizedUpdatedSectionString = JSON.stringify(normalizeSection(updatedSection));
+        return normalizedSelectedSectionString !== normalizedUpdatedSectionString;
+    }, [selectedSection, updatedSection, normalizeSection]);
 
     const setErrorState = useCallback((message: string, type: 'categories' | 'entity' | 'languages') => {
         if (type === 'languages') {
@@ -171,7 +173,9 @@ export const WhoWeAreContent = () => {
     const handlePublishChange = useCallback(async () => {
         if (!selectedSection || !updatedSection) return;
 
-        const changedContents = updatedSection.contents.filter((updatedItem) => {
+        const normalizedUpdatedSection = normalizeSection(updatedSection);
+
+        const changedContents = normalizedUpdatedSection.contents.filter((updatedItem) => {
             const originalItem = selectedSection.contents.find((sel) => sel.id === updatedItem.id);
 
             if (!originalItem) return true;

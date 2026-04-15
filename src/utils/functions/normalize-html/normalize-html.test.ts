@@ -49,4 +49,16 @@ describe('normalizeHtml', () => {
         const output = '<p>Text <strong>Bold</strong></p>';
         expect(normalizeHtml(input)).toBe(output);
     });
+
+    it('trims nbsp symbols after text', () => {
+        const input = '<p>Text &nbsp;</p>';
+        const output = '<p>Text</p>';
+        expect(normalizeHtml(input)).toBe(output);
+    });
+
+    it('trims whitespace characters wrapped in text formatting elements', () => {
+        const input = '<p>Text <strong>   </strong></p>';
+        const output = '<p>Text</p>';
+        expect(normalizeHtml(input)).toBe(output);
+    });
 });

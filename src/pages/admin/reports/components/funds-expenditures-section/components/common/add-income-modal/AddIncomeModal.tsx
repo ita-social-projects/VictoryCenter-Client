@@ -213,7 +213,7 @@ export const AddIncomeModal = ({
                 amountUah: normalizedAmountUah,
                 amountUsd: normalizedAmountUsd,
                 type: 'income',
-            });
+            }).catch(() => false);
 
             if (isCreated) {
                 resetForm();
@@ -229,16 +229,17 @@ export const AddIncomeModal = ({
         formState.amountUah.trim() !== '' ||
         formState.amountUsd.trim() !== '';
 
+    const amountUahValidationError = validateFundsExpendituresAmount(formState.amountUah, 'save');
+    const amountUsdValidationError = validateFundsExpendituresAmount(formState.amountUsd, 'save');
+    const categoryValidationError = getCategoryError(formState.categoryId, 'blur');
+
     const isSubmitDisabled =
         isSubmitting ||
         !formState.reportingYear ||
         !formState.categoryId ||
-        !formState.amountUah.trim() ||
-        !formState.amountUsd.trim() ||
-        Boolean(formState.errors.reportingYear) ||
-        Boolean(formState.errors.categoryId) ||
-        Boolean(formState.errors.amountUah) ||
-        Boolean(formState.errors.amountUsd);
+        Boolean(amountUahValidationError) ||
+        Boolean(amountUsdValidationError) ||
+        Boolean(categoryValidationError);
 
     const handleOpenAddConfirmation = useCallback(() => {
         setIsAddConfirmationOpen(true);

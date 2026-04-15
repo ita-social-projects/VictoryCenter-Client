@@ -104,7 +104,7 @@ jest.mock('@/components/admin/input-with-character-limit/InputWithCharacterLimit
 jest.mock('@/components/common/select/Select', () => {
     const React = require('react');
     return {
-        Select: ({ value, onValueChange, children, placeholder }: any) => {
+        Select: ({ value, onValueChange, onBlur, children, placeholder }: any) => {
             const options = React.Children.toArray(children)
                 .filter((child: any) => child?.type?.name === 'Option' || child?.props?.name !== undefined)
                 .map((child: any) => ({
@@ -131,6 +131,7 @@ jest.mock('@/components/common/select/Select', () => {
                         'data-testid': `select-${placeholder}`,
                         value: value || '',
                         onChange: handleChange,
+                        onBlur,
                         'aria-label': placeholder,
                     },
                     React.createElement('option', { value: '' }, placeholder),
@@ -188,7 +189,7 @@ describe('AddIncomeModal', () => {
         user: ReturnType<typeof userEvent.setup>,
         {
             year = currentYear,
-            category = '1',
+            category = '3',
             amountUah = '400',
             amountUsd = '10',
             selectionMode = 'change',
@@ -531,6 +532,20 @@ describe('AddIncomeModal', () => {
 
             expect((categorySelect as HTMLSelectElement).value).toBe('2');
         });
+
+        it('should disable submit button for duplicate income category', async () => {
+            const user = userEvent.setup({ delay: null });
+            renderAddIncomeModal();
+
+            await fillRequiredFormFields(user, {
+                year: currentYear,
+                category: '1',
+                amountUah: '100',
+                amountUsd: '10',
+            });
+
+            expect(screen.getByTestId('modal-submit')).toBeDisabled();
+        });
     });
 
     describe('Amount Input - Change Events', () => {
@@ -582,7 +597,7 @@ describe('AddIncomeModal', () => {
             await user.clear(usdInput);
             await user.type(usdInput, 'abc');
 
-            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER_GT_ZERO)).toBeInTheDocument();
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER)).toBeInTheDocument();
             expect(screen.getByTestId('modal-submit')).toBeDisabled();
         });
     });
@@ -632,6 +647,22 @@ describe('AddIncomeModal', () => {
             uahInput.blur();
 
             expect(uahInput.value).toBe('100');
+        });
+
+        it('should show zero validation on save for amount UAH', async () => {
+            const user = userEvent.setup({ delay: null });
+            renderAddIncomeModal();
+
+            await fillRequiredFormFields(user, {
+                year: currentYear,
+                category: '1',
+                amountUah: '0',
+                amountUsd: '1',
+            });
+            fireEvent.click(screen.getByTestId('modal-force-submit'));
+
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_NOT_ZERO)).toBeInTheDocument();
+            expect(screen.getByTestId('modal-submit')).toBeDisabled();
         });
 
         it('should keep UAH unchanged when USD is manually edited and blurred', async () => {

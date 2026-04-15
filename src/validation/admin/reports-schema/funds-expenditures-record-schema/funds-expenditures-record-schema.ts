@@ -35,17 +35,25 @@ export const validateFundsExpendituresAmount = (
     }
 
     if (!/^\d+(?:[.,]\d+)?$/.test(compact)) {
-        return FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER_GT_ZERO;
+        return FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER;
     }
 
-    const [integerPart, decimalPart = ''] = compact.split(/[.,]/);
-    if (integerPart.length > 11 || decimalPart.length > 2) {
+    const [integerPart] = compact.split(/[.,]/);
+    if (integerPart.length > 9) {
         return FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_MAX_DIGITS;
     }
 
     const parsed = Number.parseFloat(compact.replace(',', '.'));
-    if (!Number.isFinite(parsed) || parsed <= 0) {
-        return FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER_GT_ZERO;
+    if (!Number.isFinite(parsed)) {
+        return FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER;
+    }
+
+    if (parsed < 0) {
+        return FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_NOT_NEGATIVE;
+    }
+
+    if (parsed === 0) {
+        return trigger === 'change' ? undefined : FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_NOT_ZERO;
     }
 
     return undefined;

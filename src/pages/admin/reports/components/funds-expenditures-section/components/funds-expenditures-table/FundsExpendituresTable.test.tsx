@@ -687,7 +687,7 @@ describe('FundsExpendituresTable', () => {
             fireEvent.click(screen.getByLabelText('Edit record 1'));
             fireEvent.change(screen.getByLabelText('Amount USD record 1'), { target: { value: 'abc' } });
 
-            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER_GT_ZERO)).toBeInTheDocument();
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER)).toBeInTheDocument();
             expect(screen.getByLabelText('Accept record 1')).toBeDisabled();
         });
 
@@ -708,6 +708,17 @@ describe('FundsExpendituresTable', () => {
             fireEvent.change(screen.getByLabelText('Amount USD record 1'), { target: { value: '-500' } });
 
             expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_NOT_NEGATIVE)).toBeInTheDocument();
+            expect(screen.getByLabelText('Accept record 1')).toBeDisabled();
+        });
+
+        it('should show zero validation for zero amount on blur', () => {
+            renderTable({ isEditing: true });
+
+            fireEvent.click(screen.getByLabelText('Edit record 1'));
+            fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '0' } });
+            fireEvent.blur(screen.getByLabelText('Amount UAH record 1'));
+
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_NOT_ZERO)).toBeInTheDocument();
             expect(screen.getByLabelText('Accept record 1')).toBeDisabled();
         });
 

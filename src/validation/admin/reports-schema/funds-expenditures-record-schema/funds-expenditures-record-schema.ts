@@ -74,5 +74,11 @@ export const validateFundsExpendituresCategory = ({
         (item) => item.id !== recordId && item.type === recordType && item.categoryId === categoryId,
     );
 
-    return hasDuplicate ? FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE : undefined;
+    if (!hasDuplicate) {
+        return undefined;
+    }
+
+    return recordType === 'income'
+        ? FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE_INCOME
+        : FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE_EXPENSE;
 };

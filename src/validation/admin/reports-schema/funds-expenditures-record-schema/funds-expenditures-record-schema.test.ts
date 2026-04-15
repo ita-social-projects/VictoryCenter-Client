@@ -67,6 +67,7 @@ describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
         const records = [
             { id: 1, categoryId: 1, type: 'income' as const, reportingYear: '2025', amountUah: '1', amountUsd: '1' },
             { id: 2, categoryId: 2, type: 'income' as const, reportingYear: '2024', amountUah: '1', amountUsd: '1' },
+            { id: 3, categoryId: 3, type: 'expense' as const, reportingYear: '2024', amountUah: '1', amountUsd: '1' },
         ];
 
         it('should return required error for undefined category on blur', () => {
@@ -89,7 +90,18 @@ describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
                     categoryId: 2,
                     records,
                 }),
-            ).toBe(FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE);
+            ).toBe(FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE_INCOME);
+        });
+
+        it('should return expense-specific unique error for duplicate expense category', () => {
+            expect(
+                validateFundsExpendituresCategory({
+                    recordId: 1,
+                    recordType: 'expense',
+                    categoryId: 3,
+                    records,
+                }),
+            ).toBe(FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE_EXPENSE);
         });
 
         it('should pass for unique category', () => {

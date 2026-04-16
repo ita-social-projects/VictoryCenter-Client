@@ -6,7 +6,6 @@ $field-width: 366px;
 
 .card {
     width: var(--pair-card-width, 432px);
-    height: var(--pair-card-height, 259px);
     background-color: c.$light-blue-50;
     border-radius: $radius;
     box-sizing: border-box;
@@ -15,6 +14,7 @@ $field-width: 366px;
     flex-direction: column;
     gap: 16px;
     position: relative;
+    justify-content: flex-start;
 }
 
 .editable {
@@ -76,7 +76,6 @@ $field-width: 366px;
 }
 
 .author-field {
-    margin-top: auto;
     margin-bottom: 30px;
 }
 
@@ -102,15 +101,14 @@ $field-width: 366px;
 .author-input-group {
     width: $field-width;
 
-    :global(.char-limit-input) {
+    :global(.char-limit-textarea) {
         width: $field-width;
-        height: 48px;
         box-shadow: none;
         position: relative;
         overflow: visible;
     }
 
-    :global(.char-limit-input__field) {
+    :global(.char-limit-textarea__field) {
         font-family: t.$font-family-base;
         font-weight: t.$fw-bold;
         font-size: 20px;
@@ -118,7 +116,7 @@ $field-width: 366px;
         color: c.$blue-900;
     }
 
-    :global(.char-limit-input__field::placeholder) {
+    :global(.char-limit-textarea__field::placeholder) {
         font-family: t.$font-family-base;
         font-weight: t.$fw-bold;
         font-size: 20px;

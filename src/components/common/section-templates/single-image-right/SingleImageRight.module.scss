@@ -101,12 +101,13 @@
 
 .container.form-container {
     aspect-ratio: auto;
-    max-height: 1000px;
+    max-height: none;
+    overflow: visible;
     justify-content: space-between;
 
     .left-section {
         justify-content: space-around;
-        flex: 0 0 30%;
+        flex: 0 0 41%;
     }
 
     .title-section {

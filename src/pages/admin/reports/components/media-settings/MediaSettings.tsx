@@ -132,7 +132,7 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
             [onDirtyChange],
         );
 
-        const validateCurrentValues = useCallback((): boolean => {
+        const validateCurrentValues = (): boolean => {
             const collectedFundsTitleError = REPORTS_COLLECTED_FUNDS_VALIDATION_FUNCTIONS.validateTitle(
                 collectedFundsValues.title,
             );
@@ -159,7 +159,7 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
             }));
 
             return false;
-        }, [changedLivesValues.title, changedLivesValues.totalAmount, collectedFundsValues.title]);
+        };
 
         const handlePublish = useCallback(async (): Promise<boolean> => {
             if (!validateCurrentValues()) {

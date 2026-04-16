@@ -22,15 +22,19 @@ const convertProgramToSuggestion = (program: HippotherapyProgramDto): ProgramSea
 };
 
 const mapProgramEditToProgram = async (
-    program: HippotherapyProgramDto,
+    program: HippotherapyProgramDto & { categoryIds?: number[] },
     client: AxiosInstance,
 ): Promise<HippotherapyProgramDto> => {
     const response = await client.get<ProgramCategory[]>(API_ROUTES.PROGRAMCATEGORY.BASE);
+    const selectedCategoryIds = new Set<number>(
+        program.categoryIds ?? program.categories?.map((category) => category.id) ?? [],
+    );
+
     return {
         id: program.id as number,
         name: program.name,
         description: program.description,
-        categories: response.data,
+        categories: response.data.filter((category) => selectedCategoryIds.has(category.id)),
         status: program.status,
         previewImage: program.previewImage,
         backgroundImage: program.backgroundImage,

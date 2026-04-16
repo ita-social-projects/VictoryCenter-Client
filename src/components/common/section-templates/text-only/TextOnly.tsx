@@ -14,21 +14,29 @@ export interface TextOnlyProps {
 }
 
 export const TextOnly = (props: TextOnlyProps) => {
-    const { className = '', mode = SectionMode.View } = props;
+    const { className, mode = SectionMode.View, ...rest } = props;
+    const isView = mode === SectionMode.View;
+    const isTemplate = mode === SectionMode.Template;
+    const isEdit = mode === SectionMode.Edit;
+    const rootClassName = cn(className, {
+        [styles.container]: !isView,
+        [styles.template]: isTemplate,
+        [styles['form-container']]: isEdit,
+    });
+    const titleClassName = cn({
+        [styles['title-template']]: isTemplate,
+    });
+    const descriptionClassName = cn({
+        [styles['description-template']]: isTemplate,
+    });
     return (
         <TitleDescriptionSection
-            {...props}
+            {...rest}
+            mode={mode}
             template={SectionTemplate.TextOnly}
-            className={cn(
-                mode === SectionMode.View ? '' : styles.container,
-                {
-                    [styles.template]: mode === SectionMode.Template,
-                    [styles['form-container']]: mode === SectionMode.Edit,
-                },
-                className,
-            )}
-            titleClassName={mode === SectionMode.Template ? styles['title-template'] : ''}
-            descriptionClassName={mode === SectionMode.Template ? styles['description-template'] : ''}
+            className={rootClassName}
+            titleClassName={titleClassName}
+            descriptionClassName={descriptionClassName}
         />
     );
 };

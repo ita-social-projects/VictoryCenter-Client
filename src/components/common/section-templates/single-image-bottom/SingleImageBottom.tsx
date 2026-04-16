@@ -1,0 +1,86 @@
+import cn from 'classnames';
+import { TitleDescriptionSection } from '../shared/title-description-section/TitleDescriptionSection';
+import { PhotoInputGroup } from '@/components/admin/input-groups/photo-input-group/PhotoInputGroup';
+import { ImageValues, Image } from '@/types/common/image';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { SECTION_IMAGE_CONFIGS, SECTION_VALIDATION } from '@/const/admin/sections';
+import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
+import { SectionMode, SectionTemplate } from '@/types/common/sections';
+import { useImageError } from '@/hooks/common/use-image-error/useImageError';
+import styles from './SingleImageBottom.module.scss';
+import viewStyles from './ViewSingleImageBottom.module.scss';
+
+export interface SingleImageBottomProps {
+    title?: string;
+    description?: string;
+    image?: Image | ImageValues | null;
+    mode?: SectionMode;
+    onTitleChange?: (value: string) => void;
+    onDescriptionChange?: (value: string) => void;
+    onImageChange?: (file: ImageValues | null) => void;
+    validationResetKey?: number;
+}
+
+export const SingleImageBottom = ({
+    title = '',
+    description = '',
+    image = null,
+    mode = SectionMode.View,
+    onTitleChange,
+    onDescriptionChange,
+    onImageChange,
+    validationResetKey,
+}: SingleImageBottomProps) => {
+    const imageSrc = getImageSrc(image);
+    const baseStyles = mode === SectionMode.View ? viewStyles : styles;
+    const { error, handleSetError } = useImageError();
+
+    return (
+        <div
+            className={cn(baseStyles.container, {
+                [styles.template]: mode === SectionMode.Template,
+                [styles['form-container']]: mode === SectionMode.Edit,
+            })}
+        >
+            <TitleDescriptionSection
+                template={SectionTemplate.SingleImageBottom}
+                title={title}
+                description={description}
+                className={baseStyles['top-section']}
+                titleClassName={mode === SectionMode.Template ? styles['title-template'] : ''}
+                descriptionClassName={mode === SectionMode.Template ? styles['description-template'] : ''}
+                mode={mode}
+                onTitleChange={onTitleChange}
+                onDescriptionChange={onDescriptionChange}
+                validationResetKey={validationResetKey}
+            />
+            <div className={baseStyles['bottom-section']}>
+                <div className={baseStyles['image-wrapper']}>
+                    {mode === SectionMode.Edit ? (
+                        <PhotoInputGroup
+                            id="section-image-1"
+                            name="section-image-1"
+                            value={image}
+                            onChange={onImageChange || (() => {})}
+                            setError={handleSetError}
+                            error={error}
+                            cropWidth={SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.cropWidth}
+                            cropHeight={SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.cropHeight}
+                            minWidth={SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.minWidth}
+                            minHeight={SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.minHeight}
+                            imageLabel={COMMON_TEXT_ADMIN.INPUT.DRAG_AND_DROP_FILE_HERE}
+                            imageSubText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
+                                SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.cropHeight,
+                                SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.cropWidth,
+                            )}
+                            variant="programSection"
+                            maxSizeMB={SECTION_VALIDATION.images.maxSizeMB}
+                        />
+                    ) : (
+                        imageSrc && <img src={imageSrc} alt="" className={baseStyles.image} loading="lazy" />
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};

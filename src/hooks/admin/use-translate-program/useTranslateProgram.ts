@@ -5,7 +5,7 @@ import { ProgramLocalizationsApi } from '@/services/api/admin/programs/program-l
 import { HippotherapyProgram, HippotherapyProgramLocalization } from '@/types/admin/programs';
 import { LocalizationLanguage } from '@/types/common/language';
 import { mapLocalizationDtoToModel } from '@/utils/functions/mappers/common/localization/localization-mappers';
-import { ContentType } from '@/types/common/programs';
+import { ContentType } from '@/types/common/section-contents';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { ModalMode } from '@/types/admin/common';
 import {

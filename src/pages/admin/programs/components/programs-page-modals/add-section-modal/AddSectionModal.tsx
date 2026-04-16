@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Modal } from '@/components/common/modal/Modal';
 import { Button } from '@/components/admin/button/Button';
-import { PROGRAMS_TEXT } from '@/const/admin/programs';
-import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
+import { SECTIONS_TEXT } from '@/const/admin/sections';
+import { SectionMode, SectionTemplate } from '@/types/common/sections';
 import { Swiper } from '@/components/public/swiper/Swiper';
 import { renderProgramSection } from '@/utils/functions/render-program-section';
 import { MockQuestions } from '@/utils/mock-data/public/programs-page';
@@ -15,7 +15,7 @@ import { ReactComponent as ChevronLeft } from '@/assets/icons/chevron-left.svg';
 export interface AddSectionModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSelectTemplate: (templateId: ProgramSectionTemplate) => void;
+    onSelectTemplate: (templateId: SectionTemplate) => void;
 }
 
 const SWIPER_NAVIGATION_CONFIG = {
@@ -35,25 +35,25 @@ const SWIPER_NAVIGATION_CONFIG = {
 };
 
 const TEMPLATES = [
-    ProgramSectionTemplate.QuadImagesBottom,
-    ProgramSectionTemplate.DualImagesBottom,
-    ProgramSectionTemplate.TextOnly,
-    ProgramSectionTemplate.TripleImagesBottom,
-    ProgramSectionTemplate.SingleImageBottom,
-    ProgramSectionTemplate.SingleImageTop,
-    ProgramSectionTemplate.SingleImageRight,
-    ProgramSectionTemplate.SingleTitleQuintupleDescription,
-    ProgramSectionTemplate.DualTitleDescriptionPairs,
-    ProgramSectionTemplate.TripleTitleDescriptionPairs,
-    ProgramSectionTemplate.QuadTitleDescriptionPairs,
-    ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
-    ProgramSectionTemplate.SingleTitleQuestionAnswerPairs,
+    SectionTemplate.QuadImagesBottom,
+    SectionTemplate.DualImagesBottom,
+    SectionTemplate.TextOnly,
+    SectionTemplate.TripleImagesBottom,
+    SectionTemplate.SingleImageBottom,
+    SectionTemplate.SingleImageTop,
+    SectionTemplate.SingleImageRight,
+    SectionTemplate.SingleTitleQuintupleDescription,
+    SectionTemplate.DualTitleDescriptionPairs,
+    SectionTemplate.TripleTitleDescriptionPairs,
+    SectionTemplate.QuadTitleDescriptionPairs,
+    SectionTemplate.SingleTitleDescriptionAuthorPairs,
+    SectionTemplate.SingleTitleQuestionAnswerPairs,
 ];
 
 export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectionModalProps) => {
     const [selectedTemplateIndex, setSelectedTemplateIndex] = useState(0);
 
-    const getPlaceholderImages = (templateId: ProgramSectionTemplate) => {
+    const getPlaceholderImages = (templateId: SectionTemplate) => {
         const placeholderImageObject = {
             id: 0,
             url: placeholderImage,
@@ -61,41 +61,41 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
         };
 
         switch (templateId) {
-            case ProgramSectionTemplate.QuadImagesBottom:
+            case SectionTemplate.QuadImagesBottom:
                 return [placeholderImageObject, placeholderImageObject, placeholderImageObject, placeholderImageObject];
-            case ProgramSectionTemplate.TripleImagesBottom:
+            case SectionTemplate.TripleImagesBottom:
                 return [placeholderImageObject, placeholderImageObject, placeholderImageObject];
-            case ProgramSectionTemplate.DualImagesBottom:
+            case SectionTemplate.DualImagesBottom:
                 return [placeholderImageObject, placeholderImageObject];
-            case ProgramSectionTemplate.SingleImageBottom:
-            case ProgramSectionTemplate.SingleImageTop:
-            case ProgramSectionTemplate.SingleImageRight:
+            case SectionTemplate.SingleImageBottom:
+            case SectionTemplate.SingleImageTop:
+            case SectionTemplate.SingleImageRight:
                 return [placeholderImageObject];
-            case ProgramSectionTemplate.TextOnly:
-            case ProgramSectionTemplate.SingleTitleQuintupleDescription:
-            case ProgramSectionTemplate.DualTitleDescriptionPairs:
-            case ProgramSectionTemplate.TripleTitleDescriptionPairs:
-            case ProgramSectionTemplate.QuadTitleDescriptionPairs:
-            case ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs:
-            case ProgramSectionTemplate.SingleTitleQuestionAnswerPairs:
+            case SectionTemplate.TextOnly:
+            case SectionTemplate.SingleTitleQuintupleDescription:
+            case SectionTemplate.DualTitleDescriptionPairs:
+            case SectionTemplate.TripleTitleDescriptionPairs:
+            case SectionTemplate.QuadTitleDescriptionPairs:
+            case SectionTemplate.SingleTitleDescriptionAuthorPairs:
+            case SectionTemplate.SingleTitleQuestionAnswerPairs:
                 return [];
             default:
                 return [];
         }
     };
 
-    const getPlaceholderDescriptions = (templateId: ProgramSectionTemplate) => {
-        if (templateId === ProgramSectionTemplate.SingleTitleQuintupleDescription) {
-            return Array.from({ length: 5 }, () => PROGRAMS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT_SHORT);
+    const getPlaceholderDescriptions = (templateId: SectionTemplate) => {
+        if (templateId === SectionTemplate.SingleTitleQuintupleDescription) {
+            return Array.from({ length: 5 }, () => SECTIONS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT_SHORT);
         }
         return undefined;
     };
 
-    const getCardSamples = (templateId: ProgramSectionTemplate) => {
-        const cardSamples = PROGRAMS_TEXT.SECTION.CARD;
+    const getCardSamples = (templateId: SectionTemplate) => {
+        const cardSamples = SECTIONS_TEXT.SECTION.CARD;
 
-        const CARD_CONFIGS: Partial<Record<ProgramSectionTemplate, { title: string; description: string }[]>> = {
-            [ProgramSectionTemplate.DualTitleDescriptionPairs]: [
+        const CARD_CONFIGS: Partial<Record<SectionTemplate, { title: string; description: string }[]>> = {
+            [SectionTemplate.DualTitleDescriptionPairs]: [
                 {
                     title: cardSamples.TITLE_SAMPLE_TEXT.PROGRAM_GOALS,
                     description: cardSamples.DESCRIPTION_SAMPLE_TEXT.PROGRAM_GOALS,
@@ -105,7 +105,7 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
                     description: cardSamples.DESCRIPTION_SAMPLE_TEXT.MAIN_METHODS,
                 },
             ],
-            [ProgramSectionTemplate.TripleTitleDescriptionPairs]: [
+            [SectionTemplate.TripleTitleDescriptionPairs]: [
                 {
                     title: cardSamples.TITLE_SAMPLE_TEXT.PROGRAM_GOALS,
                     description: cardSamples.DESCRIPTION_SAMPLE_TEXT.PROGRAM_GOALS,
@@ -119,7 +119,7 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
                     description: cardSamples.DESCRIPTION_SAMPLE_TEXT.PROGRAM_FORMAT,
                 },
             ],
-            [ProgramSectionTemplate.QuadTitleDescriptionPairs]: [
+            [SectionTemplate.QuadTitleDescriptionPairs]: [
                 {
                     title: cardSamples.TITLE_SAMPLE_TEXT.PROGRAM_GOALS,
                     description: cardSamples.DESCRIPTION_SAMPLE_TEXT.PROGRAM_GOALS,
@@ -152,9 +152,9 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
         setSelectedTemplateIndex(activeIndex);
     };
 
-    const renderSection = (templateId: ProgramSectionTemplate) => {
+    const renderSection = (templateId: SectionTemplate) => {
         const cards = getCardSamples(templateId);
-        if (templateId === ProgramSectionTemplate.SingleTitleQuestionAnswerPairs) {
+        if (templateId === SectionTemplate.SingleTitleQuestionAnswerPairs) {
             return renderProgramSection({
                 templateId,
                 data: {
@@ -165,7 +165,7 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
                         localizations: [],
                     })),
                 },
-                mode: ProgramSectionMode.Template,
+                mode: SectionMode.Template,
             });
         }
 
@@ -174,12 +174,12 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
             data: cards
                 ? { cards }
                 : {
-                      title: PROGRAMS_TEXT.SECTION.TITLE_SAMPLE_TEXT,
-                      description: PROGRAMS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT,
+                      title: SECTIONS_TEXT.SECTION.TITLE_SAMPLE_TEXT,
+                      description: SECTIONS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT,
                       descriptions: getPlaceholderDescriptions(templateId),
                       images: getPlaceholderImages(templateId),
                   },
-            mode: ProgramSectionMode.Template,
+            mode: SectionMode.Template,
         });
     };
 
@@ -205,7 +205,7 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
             <Modal.Actions>
                 <div className={styles['button-wrapper']}>
                     <Button buttonStyle="primary" onClick={handleSave}>
-                        {PROGRAMS_TEXT.BUTTON.CHOOSE_SECTION}
+                        {SECTIONS_TEXT.BUTTON.CHOOSE_SECTION}
                     </Button>
                 </div>
             </Modal.Actions>

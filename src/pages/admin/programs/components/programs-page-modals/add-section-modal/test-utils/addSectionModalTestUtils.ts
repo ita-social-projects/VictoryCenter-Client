@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { AddSectionModal } from '../AddSectionModal';
 import type { AddSectionModalProps } from '../AddSectionModal';
-import { PROGRAMS_TEXT } from '@/const/admin/programs';
+import { SECTIONS_TEXT } from '@/const/admin/sections';
 
 export const renderAddSectionModal = (props: AddSectionModalProps) => {
     render(React.createElement(AddSectionModal, props));
@@ -12,7 +12,7 @@ export const getModal = () => screen.queryByTestId('add-section-modal');
 
 export const getSwiper = () => screen.getByTestId('swiper');
 
-export const getChooseButton = () => screen.getByRole('button', { name: PROGRAMS_TEXT.BUTTON.CHOOSE_SECTION });
+export const getChooseButton = () => screen.getByRole('button', { name: SECTIONS_TEXT.BUTTON.CHOOSE_SECTION });
 
 export const getPrevButton = () => screen.getByTitle('Previous slide');
 
@@ -31,7 +31,7 @@ export const clickNextButton = () => fireEvent.click(getNextButton());
 export const clickCloseButton = () => fireEvent.click(getCloseButton());
 
 export const buildFiveShortDescriptions = () =>
-    Array.from({ length: 5 }, () => PROGRAMS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT_SHORT);
+    Array.from({ length: 5 }, () => SECTIONS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT_SHORT);
 
 export const findFirstCallByTemplateId = (mockFn: jest.Mock, templateId: any) => {
     const calls = mockFn.mock.calls.map((call) => call[0]);

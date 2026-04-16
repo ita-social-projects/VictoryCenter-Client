@@ -66,7 +66,7 @@ When this skill is invoked:
    **Common Components** (`src/components/common/`):
    - **Loaders**: inline-loader, page-loader
    - **UI**: modal, tabs, select, single-select-input
-   - **Content**: partners, program-section-templates
+   - **Content**: partners, section-templates
    - **Templates**: single-image-top, single-image-bottom, single-image-right, text-only
 
 3. **For Finding Components**:

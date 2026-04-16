@@ -7,7 +7,7 @@ import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { LocalizationLanguage } from '@/types/common/language';
 import { HippotherapyProgram, HippotherapyProgramLocalization } from '@/types/admin/programs';
 import { ModalMode } from '@/types/admin/common';
-import { ContentType } from '@/types/common/programs';
+import { ContentType } from '@/types/common/section-contents';
 
 jest.mock('@/services/api/admin/programs/program-localizations/program-localizations-api');
 jest.mock('@/utils/functions/mappers/common/localization/localization-mappers');

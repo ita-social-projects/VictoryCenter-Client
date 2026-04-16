@@ -1,6 +1,7 @@
 import React, { forwardRef, useCallback, useEffect, useMemo, useImperativeHandle, useRef, useState } from 'react';
 import { PROGRAM_VALIDATION_FUNCTIONS, isProgramSectionValid } from '@/validation/admin/program-schema/program-schema';
 import { PROGRAM_VALIDATION, PROGRAMS_TEXT } from '@/const/admin/programs';
+import { SECTION_VALIDATION, SECTIONS_TEXT } from '@/const/admin/sections';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
@@ -556,7 +557,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                             disabled={isSubmitting || isFormDisabled}
                             data-testid="add-program-button"
                         >
-                            {PROGRAMS_TEXT.BUTTON.ADD_SECTION} <PlusIcon />
+                            {SECTIONS_TEXT.BUTTON.ADD_SECTION} <PlusIcon />
                         </Button>
                     </div>
                 </div>
@@ -584,7 +585,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 PROGRAM_VALIDATION.backgroundImage.height,
                                 PROGRAM_VALIDATION.backgroundImage.width,
                             )}
-                            maxSizeMB={PROGRAM_VALIDATION.images.maxSizeMB}
+                            maxSizeMB={SECTION_VALIDATION.images.maxSizeMB}
                         />
                     </div>
 
@@ -701,7 +702,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                     PROGRAM_VALIDATION.previewImage.height,
                                     PROGRAM_VALIDATION.previewImage.width,
                                 )}
-                                maxSizeMB={PROGRAM_VALIDATION.images.maxSizeMB}
+                                maxSizeMB={SECTION_VALIDATION.images.maxSizeMB}
                             />
                         </div>
                     </div>
@@ -723,7 +724,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                     disabled={isSubmitting || isFormDisabled}
                                     data-testid="add-section-button-empty"
                                 >
-                                    {PROGRAMS_TEXT.BUTTON.ADD_SECTION}
+                                    {SECTIONS_TEXT.BUTTON.ADD_SECTION}
                                     <PlusIcon className={styles['plus-icon']} />
                                 </Button>
                             </div>
@@ -770,7 +771,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                                     disabled={isSubmitting || isFormDisabled}
                                                     data-testid="add-section-button-bottom"
                                                 >
-                                                    {PROGRAMS_TEXT.BUTTON.ADD_SECTION}
+                                                    {SECTIONS_TEXT.BUTTON.ADD_SECTION}
                                                     <PlusIcon className={styles['plus-icon']} />
                                                 </Button>
                                             </div>

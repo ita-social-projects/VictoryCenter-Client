@@ -1,0 +1,41 @@
+import { QuadImagesBottom, QuadImagesBottomProps } from './QuadImagesBottom';
+import { createImagesBottomTestSuite } from '../shared/test-utils/imagesBottomTestFactory';
+import { SectionMode } from '@/types/common/sections';
+
+jest.mock('../shared/title-description-section/TitleDescriptionSection', () => {
+    const { mockTitleDescriptionSection } = require('../shared/test-utils/imagesBottomTestMocks');
+    return {
+        TitleDescriptionSection: mockTitleDescriptionSection,
+    };
+});
+
+jest.mock('../shared/images-bottom-section/ImagesBottomSection', () => {
+    const { mockImagesBottomSection } = require('../shared/test-utils/imagesBottomTestMocks');
+    return {
+        ImagesBottomSection: mockImagesBottomSection,
+    };
+});
+
+createImagesBottomTestSuite<QuadImagesBottomProps>({
+    componentName: 'QuadImagesBottom',
+    imageCount: 4,
+    Component: QuadImagesBottom,
+    createDefaultProps: () => ({
+        title: '',
+        description: '',
+        images: [null, null, null, null],
+        mode: SectionMode.View,
+    }),
+    createImageProps: (images) => ({ images }),
+    createImageHandlers: (handlers) => ({
+        onImagesChange: (index, file) => handlers[index]?.(file),
+    }),
+    expectedConfig: {
+        imageCount: 4,
+        gridColumns: 4,
+        elevatedIndices: [0, 2],
+        editableGridColumns: 4,
+        editableImageMaxHeight: 390,
+        editableImageMaxWidth: 360,
+    },
+});

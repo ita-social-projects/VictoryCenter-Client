@@ -11,6 +11,7 @@ import {
 } from '@/types/admin/programs';
 import { ModalMode } from '@/types/admin/common';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
+import { SECTIONS_TEXT } from '@/const/admin/sections';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ProgramsApi } from '@/services/api/admin/programs/programs-api';
 import { VisibilityStatus } from '@/types/admin/common';
@@ -18,7 +19,7 @@ import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { ProgramFormProps, ProgramFormRef } from '@/pages/admin/programs/components/program-form/ProgramForm';
 import { ButtonProps } from '@/components/admin/button/Button';
 import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
-import { ProgramSectionTemplate } from '@/types/common/program-sections';
+import { SectionTemplate } from '@/types/common/sections';
 import { getInitialSectionContents } from '@/utils/functions/render-program-section';
 
 jest.mock('@/hooks/admin/use-modals-state/useModalsState', () => ({
@@ -35,7 +36,7 @@ const mockedGetInitialSectionContents = getInitialSectionContents as jest.Mock;
 
 jest.mock('../add-section-modal/AddSectionModal', () => {
     const React = require('react');
-    const { ProgramSectionTemplate } = require('@/types/common/program-sections');
+    const { SectionTemplate } = require('@/types/common/sections');
 
     return {
         AddSectionModal: (props: any) => {
@@ -44,7 +45,7 @@ jest.mock('../add-section-modal/AddSectionModal', () => {
                 <div data-testid="add-section-modal-mock">
                     <button
                         data-testid="add-section-select-template"
-                        onClick={() => props.onSelectTemplate(ProgramSectionTemplate.TextOnly)}
+                        onClick={() => props.onSelectTemplate(SectionTemplate.TextOnly)}
                     >
                         select-template
                     </button>
@@ -287,10 +288,10 @@ describe('ProgramModal', () => {
             expect(screen.getByTestId('add-section-modal-mock')).toBeInTheDocument();
             fireEvent.click(screen.getByTestId('add-section-select-template'));
 
-            expect(mockedGetInitialSectionContents).toHaveBeenCalledWith(ProgramSectionTemplate.TextOnly);
+            expect(mockedGetInitialSectionContents).toHaveBeenCalledWith(SectionTemplate.TextOnly);
             expect(mockFormRef.addSection).toHaveBeenCalledTimes(1);
             expect(mockFormRef.addSection).toHaveBeenCalledWith({
-                template: ProgramSectionTemplate.TextOnly,
+                template: SectionTemplate.TextOnly,
                 order: 0,
                 contents: [{ contentType: 0, order: 0 }],
             });
@@ -309,7 +310,7 @@ describe('ProgramModal', () => {
             fireEvent.click(screen.getByTestId('add-section-select-template'));
 
             expect(mockFormRef.addSection).toHaveBeenCalledWith({
-                template: ProgramSectionTemplate.TextOnly,
+                template: SectionTemplate.TextOnly,
                 order: 6,
                 contents: [],
             });
@@ -327,7 +328,7 @@ describe('ProgramModal', () => {
 
             expect(screen.getByTestId('question-modal')).toBeInTheDocument();
             expect(screen.getByTestId('question-title')).toHaveTextContent(
-                PROGRAMS_TEXT.SECTION.MODAL.UNSAVED_CHANGES_TITLE,
+                SECTIONS_TEXT.SECTION.MODAL.UNSAVED_CHANGES_TITLE,
             );
 
             fireEvent.click(screen.getByTestId('question-cancel'));
@@ -426,7 +427,7 @@ describe('ProgramModal', () => {
             });
 
             expect(screen.getByTestId('question-title')).toHaveTextContent(
-                PROGRAMS_TEXT.SECTION.MODAL.UNSAVED_CHANGES_TITLE,
+                SECTIONS_TEXT.SECTION.MODAL.UNSAVED_CHANGES_TITLE,
             );
 
             fireEvent.click(screen.getByTestId('question-cancel'));
@@ -518,7 +519,7 @@ describe('ProgramModal', () => {
             fireEvent.click(screen.getByTestId('add-section-select-template'));
 
             expect(mockFormRef.replaceSection).toHaveBeenCalledWith(1, {
-                template: ProgramSectionTemplate.TextOnly,
+                template: SectionTemplate.TextOnly,
                 order: 1,
                 contents: [{ contentType: 0, order: 0 }],
             });

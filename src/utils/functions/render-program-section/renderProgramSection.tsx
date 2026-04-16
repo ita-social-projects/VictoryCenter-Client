@@ -1,25 +1,15 @@
 import React from 'react';
-import {
-    FaqSectionQuestionDto,
-    CreateProgramSectionContentDto,
-    ProgramSectionTemplate,
-    ProgramSectionMode,
-} from '@/types/common/program-sections';
+import { FaqSectionQuestionDto, CreateProgramSectionContentDto } from '@/types/common/program-sections';
+import { SectionTemplate, SectionMode } from '@/types/common/sections';
 import { ImageValues, Image } from '@/types/common/image';
-import { ContentType } from '@/types/common/programs';
-import { QuadImagesBottom } from '@/components/common/program-section-templates/quad-images-bottom/QuadImagesBottom';
-import { TripleImagesBottom } from '@/components/common/program-section-templates/triple-images-bottom/TripleImagesBottom';
-import { DualImagesBottom } from '@/components/common/program-section-templates/dual-images-bottom/DualImagesBottom';
-import { TextOnly } from '@/components/common/program-section-templates/text-only/TextOnly';
-import { SingleImageTop } from '@/components/common/program-section-templates/single-image-top/SingleImageTop';
-import { SingleImageBottom } from '@/components/common/program-section-templates/single-image-bottom/SingleImageBottom';
-import { SingleImageRight } from '@/components/common/program-section-templates/single-image-right/SingleImageRight';
-import { TitleDescriptionCardsWrapper } from '@/components/common/program-section-templates/title-description-cards/TitleDescriptionCardsWrapper';
-import { SingleTitleQuintupleDescription } from '@/components/common/program-section-templates/single-title-quintuple-description/SingleTitleQuintupleDescription';
-import { SingleTitleDescriptionAuthorPairs } from '@/components/common/program-section-templates/single-title-description-author-pairs/SingleTitleDescriptionAuthorPairs';
-import { PROGRAMS_TEXT } from '@/const/admin/programs';
-import { FaqProgramSection } from '@/components/common/program-section-templates/faq-program-section';
+import { ContentType } from '@/types/common/section-contents';
+import { TitleDescriptionCardsWrapper } from '@/components/common/section-templates/title-description-cards/TitleDescriptionCardsWrapper';
+import { SingleTitleQuintupleDescription } from '@/components/common/section-templates/single-title-quintuple-description/SingleTitleQuintupleDescription';
+import { SingleTitleDescriptionAuthorPairs } from '@/components/common/section-templates/single-title-description-author-pairs/SingleTitleDescriptionAuthorPairs';
+import { SECTIONS_TEXT } from '@/const/admin/sections';
+import { FaqProgramSection } from '@/components/common/section-templates/faq-program-section';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { renderStandardSectionTemplate } from '@/utils/functions/render-standard-section-template';
 
 export interface ProgramSectionCardData {
     title: string;
@@ -60,9 +50,9 @@ export interface ProgramSectionHandlers {
 }
 
 export interface RenderProgramSectionParams {
-    templateId: ProgramSectionTemplate;
+    templateId: SectionTemplate;
     data: ProgramSectionData;
-    mode?: ProgramSectionMode;
+    mode?: SectionMode;
     handlers?: ProgramSectionHandlers;
     validationResetKey?: number;
 }
@@ -96,71 +86,34 @@ const createCardContents = (cardCount: number): CreateProgramSectionContentDto[]
         }),
     );
 
-const IMAGE_COUNT_MAP: Partial<Record<ProgramSectionTemplate, number>> = {
-    [ProgramSectionTemplate.TextOnly]: 0,
-    [ProgramSectionTemplate.SingleImageTop]: 1,
-    [ProgramSectionTemplate.SingleImageBottom]: 1,
-    [ProgramSectionTemplate.SingleImageRight]: 1,
-    [ProgramSectionTemplate.DualImagesBottom]: 2,
-    [ProgramSectionTemplate.TripleImagesBottom]: 3,
-    [ProgramSectionTemplate.QuadImagesBottom]: 4,
+const IMAGE_COUNT_MAP: Partial<Record<SectionTemplate, number>> = {
+    [SectionTemplate.TextOnly]: 0,
+    [SectionTemplate.SingleImageTop]: 1,
+    [SectionTemplate.SingleImageBottom]: 1,
+    [SectionTemplate.SingleImageRight]: 1,
+    [SectionTemplate.DualImagesBottom]: 2,
+    [SectionTemplate.TripleImagesBottom]: 3,
+    [SectionTemplate.QuadImagesBottom]: 4,
 };
 
-const CARD_COUNT_MAP: Partial<Record<ProgramSectionTemplate, number>> = {
-    [ProgramSectionTemplate.DualTitleDescriptionPairs]: 2,
-    [ProgramSectionTemplate.TripleTitleDescriptionPairs]: 3,
-    [ProgramSectionTemplate.QuadTitleDescriptionPairs]: 4,
+const CARD_COUNT_MAP: Partial<Record<SectionTemplate, number>> = {
+    [SectionTemplate.DualTitleDescriptionPairs]: 2,
+    [SectionTemplate.TripleTitleDescriptionPairs]: 3,
+    [SectionTemplate.QuadTitleDescriptionPairs]: 4,
 };
 
-const SINGLE_IMAGE_TEMPLATES = new Set<ProgramSectionTemplate>([
-    ProgramSectionTemplate.SingleImageTop,
-    ProgramSectionTemplate.SingleImageBottom,
-    ProgramSectionTemplate.SingleImageRight,
-]);
-
-interface StandardTemplateProps {
-    title?: string;
-    description?: string;
-    mode?: ProgramSectionMode;
-    onTitleChange?: (value: string) => void;
-    onDescriptionChange?: (value: string) => void;
-    validationResetKey?: number;
-}
-
-type StandardTemplateComponentProps =
-    | (StandardTemplateProps & {
-          image?: Image | ImageValues | null;
-          onImageChange?: (file: ImageValues | null) => void;
-      })
-    | (StandardTemplateProps & {
-          images?: (Image | ImageValues | null)[];
-          onImagesChange?: (index: number, file: ImageValues | null) => void;
-      });
-
-const STANDARD_TEMPLATES_MAP: Partial<
-    Record<ProgramSectionTemplate, React.ComponentType<StandardTemplateComponentProps>>
-> = {
-    [ProgramSectionTemplate.TextOnly]: TextOnly,
-    [ProgramSectionTemplate.SingleImageTop]: SingleImageTop,
-    [ProgramSectionTemplate.SingleImageBottom]: SingleImageBottom,
-    [ProgramSectionTemplate.SingleImageRight]: SingleImageRight,
-    [ProgramSectionTemplate.DualImagesBottom]: DualImagesBottom,
-    [ProgramSectionTemplate.TripleImagesBottom]: TripleImagesBottom,
-    [ProgramSectionTemplate.QuadImagesBottom]: QuadImagesBottom,
-};
-
-export const getInitialSectionContents = (templateId: ProgramSectionTemplate): CreateProgramSectionContentDto[] => {
-    if (templateId === ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs) {
+export const getInitialSectionContents = (templateId: SectionTemplate): CreateProgramSectionContentDto[] => {
+    if (templateId === SectionTemplate.SingleTitleDescriptionAuthorPairs) {
         return [
             createItem(ContentType.Title, 0, {
-                title: PROGRAMS_TEXT.SECTION.SINGLE_TITLE_DESCRIPTION_AUTHOR_PAIRS.DEFAULT_TITLE,
+                title: SECTIONS_TEXT.SECTION.SINGLE_TITLE_DESCRIPTION_AUTHOR_PAIRS.DEFAULT_TITLE,
             } as any),
             createItem(ContentType.Description, 1, { groupIndex: 0 }),
             createItem(ContentType.Author, 2, { groupIndex: 0 }),
         ];
     }
 
-    if (templateId === ProgramSectionTemplate.SingleTitleQuestionAnswerPairs) {
+    if (templateId === SectionTemplate.SingleTitleQuestionAnswerPairs) {
         return [
             createItem(ContentType.Title, 0, {
                 title: COMMON_TEXT_ADMIN.TAB.FAQ,
@@ -178,7 +131,7 @@ export const getInitialSectionContents = (templateId: ProgramSectionTemplate): C
     const cardCount = CARD_COUNT_MAP[templateId];
     if (cardCount) return createCardContents(cardCount);
 
-    if (templateId === ProgramSectionTemplate.SingleTitleQuintupleDescription) {
+    if (templateId === SectionTemplate.SingleTitleQuintupleDescription) {
         return [
             createItem(ContentType.Title, 0),
             ...Array.from({ length: 5 }, (_, i) => createItem(ContentType.Description, i + 1)),
@@ -192,7 +145,7 @@ export const getInitialSectionContents = (templateId: ProgramSectionTemplate): C
 export const renderProgramSection = ({
     templateId,
     data,
-    mode = ProgramSectionMode.View,
+    mode = SectionMode.View,
     handlers,
     validationResetKey,
 }: RenderProgramSectionParams): React.ReactElement | null => {
@@ -210,7 +163,7 @@ export const renderProgramSection = ({
         );
     }
 
-    if (templateId === ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs) {
+    if (templateId === SectionTemplate.SingleTitleDescriptionAuthorPairs) {
         return (
             <SingleTitleDescriptionAuthorPairs
                 title={data.title}
@@ -226,7 +179,7 @@ export const renderProgramSection = ({
         );
     }
 
-    if (templateId === ProgramSectionTemplate.SingleTitleQuestionAnswerPairs) {
+    if (templateId === SectionTemplate.SingleTitleQuestionAnswerPairs) {
         return (
             <FaqProgramSection
                 questions={data.faqQuestions ?? []}
@@ -244,7 +197,7 @@ export const renderProgramSection = ({
         );
     }
 
-    if (templateId === ProgramSectionTemplate.SingleTitleQuintupleDescription) {
+    if (templateId === SectionTemplate.SingleTitleQuintupleDescription) {
         const descriptions = data.descriptions ?? (data.description ? [data.description] : []);
 
         return (
@@ -258,29 +211,11 @@ export const renderProgramSection = ({
         );
     }
 
-    const Component = STANDARD_TEMPLATES_MAP[templateId];
-    if (!Component) return null;
-
-    const baseProps: StandardTemplateProps = {
-        title: data.title,
-        description: data.description,
+    return renderStandardSectionTemplate({
+        templateId,
+        data,
         mode,
-        onTitleChange: handlers?.onTitleChange,
-        onDescriptionChange: handlers?.onDescriptionChange,
+        handlers,
         validationResetKey,
-    };
-
-    if (SINGLE_IMAGE_TEMPLATES.has(templateId)) {
-        const onImagesChange = handlers?.onImagesChange;
-
-        return (
-            <Component
-                {...baseProps}
-                image={data.images?.[0]}
-                onImageChange={onImagesChange ? (file) => onImagesChange(0, file) : undefined}
-            />
-        );
-    }
-
-    return <Component {...baseProps} images={data.images} onImagesChange={handlers?.onImagesChange} />;
+    });
 };

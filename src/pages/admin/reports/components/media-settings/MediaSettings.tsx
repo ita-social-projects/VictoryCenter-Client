@@ -132,7 +132,7 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
             [onDirtyChange],
         );
 
-        const validateCurrentValues = (): boolean => {
+        const validateCurrentValues = useCallback((): boolean => {
             const collectedFundsTitleError = REPORTS_COLLECTED_FUNDS_VALIDATION_FUNCTIONS.validateTitle(
                 collectedFundsValues.title,
             );
@@ -159,7 +159,7 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
             }));
 
             return false;
-        };
+        }, [collectedFundsValues, changedLivesValues]);
 
         const handlePublish = useCallback(async (): Promise<boolean> => {
             if (!validateCurrentValues()) {
@@ -220,7 +220,7 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
                 addToast(REPORTS_TEXT.MESSAGE.FAIL_TO_UPDATE_REPORT, ToastType.Error);
                 return false;
             }
-        }, [addToast, client, collectedFundsValues, changedLivesValues, refetch]);
+        }, [addToast, client, collectedFundsValues, changedLivesValues, refetch, validateCurrentValues]);
 
         useImperativeHandle(ref, () => ({ submit: handlePublish }));
 

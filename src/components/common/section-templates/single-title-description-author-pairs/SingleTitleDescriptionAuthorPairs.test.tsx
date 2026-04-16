@@ -5,9 +5,7 @@ import { SingleTitleDescriptionAuthorPairs } from './SingleTitleDescriptionAutho
 import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/programs';
 import { ButtonProps } from '@/components/admin/button/Button';
-import {
-    TextAreaWithCharacterLimitGroupProps
-} from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
+import { TextAreaWithCharacterLimitGroupProps } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 
 const mockCardCarousel = jest.fn();
 const mockDescriptionAuthorPairCard = jest.fn();
@@ -43,7 +41,14 @@ jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
 jest.mock(
     '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
     () => ({
-        TextAreaWithCharacterLimitGroup: ({ value, onChange, onBlur, id, error, autoGrow }: TextAreaWithCharacterLimitGroupProps) => (
+        TextAreaWithCharacterLimitGroup: ({
+            value,
+            onChange,
+            onBlur,
+            id,
+            error,
+            autoGrow,
+        }: TextAreaWithCharacterLimitGroupProps) => (
             <div data-testid={`group-${id}`} data-auto-grow={String(autoGrow)}>
                 <label htmlFor={`input-${id}`}>{id}</label>
                 <textarea

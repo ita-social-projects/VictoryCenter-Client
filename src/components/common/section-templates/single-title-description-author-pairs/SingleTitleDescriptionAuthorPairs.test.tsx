@@ -2,10 +2,10 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { SingleTitleDescriptionAuthorPairs } from './SingleTitleDescriptionAuthorPairs';
-import { ProgramSectionMode, ProgramSectionTemplate } from '@/types/common/program-sections';
-import { ContentType } from '@/types/common/programs';
 import { ButtonProps } from '@/components/admin/button/Button';
 import { TextAreaWithCharacterLimitGroupProps } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
+import { SectionMode, SectionTemplate } from '@/types/common/sections';
+import { ContentType } from '@/types/common/about-us';
 
 const mockCardCarousel = jest.fn();
 const mockDescriptionAuthorPairCard = jest.fn();

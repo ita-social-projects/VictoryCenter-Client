@@ -1,13 +1,14 @@
-import { AxiosInstance } from 'axios';
-import { ProgramExpensesRecord } from '@/types/admin/reports';
+import { ProgramExpensesProgram, ProgramExpensesRecord } from '@/types/admin/reports';
 
 const loadProgramExpensesApi = (
     records: Array<ProgramExpensesRecord & { isPublished: boolean }>,
+    programs: ProgramExpensesProgram[] = [],
     exchangeRate = '42.15',
 ) => {
     jest.resetModules();
     jest.doMock('@/utils/mock-data/admin/reports/program-expenses', () => ({
         MOCK_PROGRAM_EXPENSES_EXCHANGE_RATE: exchangeRate,
+        MOCK_PROGRAM_EXPENSES_PROGRAMS: programs,
         MOCK_PROGRAM_EXPENSES_RECORDS: records,
     }));
 
@@ -26,51 +27,57 @@ describe('ProgramExpensesApi', () => {
         jest.dontMock('@/utils/mock-data/admin/reports/program-expenses');
     });
 
-    it('should return only published records with computed programs and summary', async () => {
-        const api = loadProgramExpensesApi([
-            {
-                id: 1,
-                programId: 2,
-                programName: 'Program B',
-                type: 'expense',
-                reportingYear: '2025',
-                amountUah: '1 500',
-                amountUsd: '1000',
-                isPublished: true,
-            },
-            {
-                id: 2,
-                programId: 1,
-                programName: 'Program A',
-                type: 'expense',
-                reportingYear: '2025',
-                amountUah: '250',
-                amountUsd: '100.5',
-                isPublished: true,
-            },
-            {
-                id: 3,
-                programId: 1,
-                programName: 'Program A',
-                type: 'expense',
-                reportingYear: '2024',
-                amountUah: '2000',
-                amountUsd: '800',
-                isPublished: true,
-            },
-            {
-                id: 4,
-                programId: 3,
-                programName: 'Program C',
-                type: 'expense',
-                reportingYear: '2025',
-                amountUah: '999',
-                amountUsd: '999',
-                isPublished: false,
-            },
-        ]);
+    it('should return published records with computed programs and summary', async () => {
+        const api = loadProgramExpensesApi(
+            [
+                {
+                    id: 1,
+                    programId: 2,
+                    programName: 'Program B',
+                    type: 'expense',
+                    reportingYear: '2025',
+                    amountUah: '1 500',
+                    amountUsd: '1000',
+                    isPublished: true,
+                },
+                {
+                    id: 2,
+                    programId: 1,
+                    programName: 'Program A',
+                    type: 'expense',
+                    reportingYear: '2025',
+                    amountUah: '250',
+                    amountUsd: '100.5',
+                    isPublished: true,
+                },
+                {
+                    id: 3,
+                    programId: 1,
+                    programName: 'Program A',
+                    type: 'expense',
+                    reportingYear: '2024',
+                    amountUah: '2000',
+                    amountUsd: '800',
+                    isPublished: true,
+                },
+                {
+                    id: 4,
+                    programId: 3,
+                    programName: 'Program C',
+                    type: 'expense',
+                    reportingYear: '2025',
+                    amountUah: '999',
+                    amountUsd: '999',
+                    isPublished: false,
+                },
+            ],
+            [
+                { id: 1, name: 'Program A from categories' },
+                { id: 4, name: 'Program D' },
+            ],
+        );
 
-        const result = await api.getReadOnlyData({} as AxiosInstance);
+        const result = await api.getReadOnlyData();
 
         expect(result.exchangeRate).toBe('42.15');
         expect(result.records).toEqual([
@@ -103,8 +110,10 @@ describe('ProgramExpensesApi', () => {
             },
         ]);
         expect(result.programs).toEqual([
-            { id: 1, name: 'Program A' },
+            { id: 1, name: 'Program A from categories' },
             { id: 2, name: 'Program B' },
+            { id: 3, name: 'Program C' },
+            { id: 4, name: 'Program D' },
         ]);
         expect(result.summary).toEqual({
             totalAmountUah: 3750,
@@ -126,14 +135,15 @@ describe('ProgramExpensesApi', () => {
                     isPublished: false,
                 },
             ],
+            [],
             '39.00',
         );
 
-        const result = await api.getReadOnlyData({} as AxiosInstance);
+        const result = await api.getReadOnlyData();
 
         expect(result).toEqual({
             exchangeRate: '39.00',
-            programs: [],
+            programs: [{ id: 5, name: 'Hidden Program' }],
             summary: {
                 totalAmountUah: 0,
                 totalAmountUsd: 0,

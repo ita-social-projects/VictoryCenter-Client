@@ -5,7 +5,7 @@ import { SingleTitleDescriptionAuthorPairs } from './SingleTitleDescriptionAutho
 import { ButtonProps } from '@/components/admin/button/Button';
 import { TextAreaWithCharacterLimitGroupProps } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { SectionMode, SectionTemplate } from '@/types/common/sections';
-import { ContentType } from '@/types/common/about-us';
+import { ContentType } from '@/types/common/section-contents';
 
 const mockCardCarousel = jest.fn();
 const mockDescriptionAuthorPairCard = jest.fn();

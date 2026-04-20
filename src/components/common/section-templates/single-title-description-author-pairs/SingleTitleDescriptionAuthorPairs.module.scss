@@ -68,24 +68,23 @@
     margin-left: 50px;
     margin-bottom: 50px;
 
-    :global(.char-limit-input) {
+    :global(.char-limit-textarea) {
         width: 721px;
-        height: 68px;
         box-shadow: none;
     }
 
-    :global(.char-limit-input__field) {
+    :global(.char-limit-textarea__field) {
         @include type.h3-bold;
         color: c.$blue-900;
     }
 
-    :global(.char-limit-input__field::placeholder) {
+    :global(.char-limit-textarea__field::placeholder) {
         @include type.h3-bold;
         color: c.$grey-700;
         opacity: 1;
     }
 
-    :global(.char-limit-input__counter) {
+    :global(.char-limit-textarea__counter) {
         color: c.$grey-700;
     }
 }

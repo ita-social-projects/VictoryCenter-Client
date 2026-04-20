@@ -22,6 +22,8 @@ export const TextAreaWithBulletBehavior = ({
     onFocus,
     onKeyDown,
     maxLimitWarning,
+    autoGrow,
+    maxRows,
     ...rest
 }: TextAreaWithBulletBehaviorProps) => {
     const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -121,6 +123,8 @@ export const TextAreaWithBulletBehavior = ({
             id={id}
             maxLength={maxLength}
             maxLimitWarning={maxLimitWarning}
+            autoGrow={autoGrow}
+            maxRows={maxRows}
         />
     );
 };

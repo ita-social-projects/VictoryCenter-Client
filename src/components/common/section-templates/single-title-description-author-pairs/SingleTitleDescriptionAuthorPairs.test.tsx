@@ -2,6 +2,8 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { SingleTitleDescriptionAuthorPairs } from './SingleTitleDescriptionAuthorPairs';
+import { ButtonProps } from '@/components/admin/button/Button';
+import { TextAreaWithCharacterLimitGroupProps } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { SectionMode, SectionTemplate } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
 
@@ -36,18 +38,34 @@ jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
     },
 }));
 
-jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
-    InputWithCharacterLimitGroup: ({ value, onChange, onBlur, id, error, showCounterBelow }: any) => (
-        <div data-testid={`group-${id}`} data-show-counter-below={String(showCounterBelow)}>
-            <label htmlFor={`input-${id}`}>{id}</label>
-            <input id={`input-${id}`} data-testid={`input-${id}`} value={value} onChange={onChange} onBlur={onBlur} />
-            <div data-testid={`error-${id}`}>{error ?? ''}</div>
-        </div>
-    ),
-}));
+jest.mock(
+    '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
+    () => ({
+        TextAreaWithCharacterLimitGroup: ({
+            value,
+            onChange,
+            onBlur,
+            id,
+            error,
+            autoGrow,
+        }: TextAreaWithCharacterLimitGroupProps) => (
+            <div data-testid={`group-${id}`} data-auto-grow={String(autoGrow)}>
+                <label htmlFor={`input-${id}`}>{id}</label>
+                <textarea
+                    id={`input-${id}`}
+                    data-testid={`input-${id}`}
+                    value={value}
+                    onChange={onChange}
+                    onBlur={onBlur}
+                />
+                <div data-testid={`error-${id}`}>{error ?? ''}</div>
+            </div>
+        ),
+    }),
+);
 
 jest.mock('@/components/admin/button/Button', () => ({
-    Button: ({ children, onClick, disabled, type = 'button' }: any) => (
+    Button: ({ children, onClick, disabled, type = 'button' }: ButtonProps) => (
         <button type={type} onClick={onClick} disabled={disabled}>
             {children}
         </button>
@@ -193,7 +211,7 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
 
         expect(screen.getByTestId('input-single-title-description-author-pairs-title')).toHaveValue('Edit');
         expect(screen.getByTestId('group-single-title-description-author-pairs-title')).toHaveAttribute(
-            'data-show-counter-below',
+            'data-auto-grow',
             'true',
         );
 

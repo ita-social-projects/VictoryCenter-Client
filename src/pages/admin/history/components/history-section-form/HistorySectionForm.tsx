@@ -13,6 +13,7 @@ import {
     isHistoryTemplate,
     renderHistorySection,
 } from '@/utils/functions/render-history-section';
+import { buildSectionCancelOptions } from '@/utils/functions/section-cancel-flow/section-cancel-flow';
 import styles from './HistorySectionForm.module.scss';
 
 const SUPPORTED_CONTENT_TYPES = new Set<ContentType>([ContentType.Title, ContentType.Description, ContentType.Image]);
@@ -341,27 +342,21 @@ export const HistorySectionForm = ({
     }, [isDisabled, isSectionSaveValid, onSave, localSection, onRequestSaveSection, isDirty]);
 
     const handleCancelClick = useCallback(() => {
-        const shouldRemove = isNewSection;
-        const revertTo = originalSection;
-        const isTemplateReplacement = isReplacingTemplate;
-
-        const onAfterDiscard = () => {
-            if (!shouldRemove) {
-                localSectionRef.current = revertTo;
-                setLocalSection(revertTo);
-                setIsDirty(false);
-                setSectionMode(SectionMode.View);
-                setValidationResetKey((prev) => prev + 1);
-            }
-        };
-
-        onCancel({
-            isDirty,
-            shouldRemove,
-            revertTo,
-            onAfterDiscard,
-            isTemplateReplacement,
-        });
+        onCancel(
+            buildSectionCancelOptions({
+                isDirty,
+                isNewSection,
+                originalSection,
+                isReplacingTemplate,
+                onRevert: (sectionToRevert) => {
+                    localSectionRef.current = sectionToRevert;
+                    setLocalSection(sectionToRevert);
+                    setIsDirty(false);
+                    setSectionMode(SectionMode.View);
+                    setValidationResetKey((prev) => prev + 1);
+                },
+            }),
+        );
     }, [isDirty, isNewSection, onCancel, originalSection, isReplacingTemplate]);
 
     const handleDeleteClick = useCallback(

@@ -2,6 +2,11 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { SectionCancelActionType } from '@/types/admin/programs';
 import { HistorySectionDto } from '@/types/common/history-sections';
 import { isHistoryTemplate } from '@/utils/functions/render-history-section';
+import {
+    createSectionDiscardAction,
+    requestSectionCancel,
+    requestSectionDelete,
+} from '@/utils/functions/section-cancel-flow/section-cancel-flow';
 import { HistorySectionForm, SectionCancelOptions } from '../history-section-form/HistorySectionForm';
 import styles from './HistoryForm.module.scss';
 
@@ -142,59 +147,43 @@ export const HistoryForm = ({
 
     const handleCancelSection = useCallback(
         (sectionKey: string, options: SectionCancelOptions) => {
-            const discard = () => {
-                if (options.shouldRemove) {
+            const discard = createSectionDiscardAction({
+                shouldRemove: options.shouldRemove,
+                revertTo: options.revertTo,
+                onRemove: () => {
                     handleRemoveSection(sectionKey);
-                } else {
-                    handleSectionChange(sectionKey, options.revertTo);
+                },
+                onRevert: (sectionToRevert) => {
+                    handleSectionChange(sectionKey, sectionToRevert);
                     updateSectionState(sectionKey, {
                         isSaved: true,
                         isEditing: false,
                         isNew: false,
                         isReplacing: false,
                     });
-                }
+                },
+                onAfterDiscard: options.onAfterDiscard,
+            });
 
-                options.onAfterDiscard();
-            };
-
-            if (options.shouldRemove || options.isDirty || options.isTemplateReplacement) {
-                if (onRequestCancelSection) {
-                    const type = options.shouldRemove
-                        ? SectionCancelActionType.DiscardNewSection
-                        : options.isTemplateReplacement
-                          ? SectionCancelActionType.RevertAfterReplace
-                          : SectionCancelActionType.RevertSection;
-
-                    onRequestCancelSection({
-                        type,
-                        onDiscard: discard,
-                    });
-                } else {
-                    discard();
-                }
-                return;
-            }
-
-            discard();
+            requestSectionCancel({
+                shouldRemove: options.shouldRemove,
+                isDirty: options.isDirty,
+                isTemplateReplacement: options.isTemplateReplacement,
+                onDiscard: discard,
+                onRequestCancelSection,
+            });
         },
         [handleRemoveSection, handleSectionChange, onRequestCancelSection, updateSectionState],
     );
 
     const handleDeleteSection = useCallback(
         (sectionKey: string) => {
-            const confirmDelete = () => {
-                handleRemoveSection(sectionKey);
-            };
-
-            if (onRequestCancelSection) {
-                onRequestCancelSection({
-                    type: SectionCancelActionType.RemoveSection,
-                    onDiscard: confirmDelete,
-                });
-            } else {
-                confirmDelete();
-            }
+            requestSectionDelete({
+                onDiscard: () => {
+                    handleRemoveSection(sectionKey);
+                },
+                onRequestCancelSection,
+            });
         },
         [handleRemoveSection, onRequestCancelSection],
     );

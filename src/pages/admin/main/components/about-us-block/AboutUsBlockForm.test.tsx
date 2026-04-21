@@ -6,28 +6,21 @@ import { MainPage } from '@/types/admin/main-page';
 
 jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
     __esModule: true,
-    InputWithCharacterLimitGroup: ({ id, value, onChange, onBlur }: any) => (
-        <input data-testid={id} value={value ?? ''} onChange={(e) => onChange(e.target.value)} onBlur={onBlur} />
-    ),
+    InputWithCharacterLimitGroup: require('@/utils/test-mocks/main-page-mocks').MockInputWithCharacterLimitGroup,
 }));
 
 jest.mock(
     '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
     () => ({
         __esModule: true,
-        TextAreaWithCharacterLimitGroup: ({ id, value, onChange, onBlur }: any) => (
-            <textarea data-testid={id} value={value ?? ''} onChange={(e) => onChange(e.target.value)} onBlur={onBlur} />
-        ),
+        TextAreaWithCharacterLimitGroup: require('@/utils/test-mocks/main-page-mocks')
+            .MockTextAreaWithCharacterLimitGroup,
     }),
 );
 
 jest.mock('@/components/admin/button/Button', () => ({
     __esModule: true,
-    Button: ({ children, disabled, type }: any) => (
-        <button data-testid="submit-btn" type={type} disabled={disabled}>
-            {children}
-        </button>
-    ),
+    Button: require('@/utils/test-mocks/main-page-mocks').MockSubmitButton,
 }));
 
 const mockInitialData: MainPage = {
@@ -56,7 +49,6 @@ describe('AboutUsBlockForm', () => {
 
         expect(titleInput.value).toBe('');
         expect(descriptionInput.value).toBe('');
-
         expect(screen.getByTestId('submit-btn')).toBeDisabled();
     });
 
@@ -87,7 +79,6 @@ describe('AboutUsBlockForm', () => {
         render(<AboutUsBlockForm initialData={mockInitialData} />);
 
         const titleInput = screen.getByTestId('about-us-block-title');
-
         fireEvent.change(titleInput, { target: { value: 'Новий заголовок Про Нас' } });
 
         await waitFor(() => {
@@ -99,7 +90,6 @@ describe('AboutUsBlockForm', () => {
         render(<AboutUsBlockForm initialData={mockInitialData} />);
 
         const descriptionInput = screen.getByTestId('about-us-block-description');
-
         fireEvent.change(descriptionInput, { target: { value: '   ' } });
         fireEvent.blur(descriptionInput);
 
@@ -115,9 +105,7 @@ describe('AboutUsBlockForm', () => {
         fireEvent.change(descriptionInput, { target: { value: 'Оновлений текст про нашу місію' } });
 
         const submitBtn = screen.getByTestId('submit-btn');
-        await waitFor(() => {
-            expect(submitBtn).not.toBeDisabled();
-        });
+        await waitFor(() => expect(submitBtn).not.toBeDisabled());
 
         expect(() => fireEvent.click(submitBtn)).not.toThrow();
     });

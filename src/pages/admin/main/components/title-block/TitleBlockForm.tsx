@@ -48,17 +48,20 @@ export const TitleBlockForm = ({ initialData }: TitleBlockFormProps) => {
     });
 
     useEffect(() => {
-        if (initialData) {
-            reset({
-                title: initialData.title || '',
-                description: initialData.description || '',
-                image: initialData.image || null,
-            });
-        }
+        setImageError(null);
+        reset(
+            initialData
+                ? {
+                      title: initialData.title || '',
+                      description: initialData.description || '',
+                      image: initialData.image || null,
+                  }
+                : TITLE_BLOCK_FORM_DEFAULTS,
+        );
     }, [initialData, reset]);
 
-    const onSubmit = (data: TitleBlockFormValues) => {
-        // TODO: implement api call
+    const onSubmit = () => {
+        // API integration is intentionally deferred for the display-only phase.
     };
 
     return (

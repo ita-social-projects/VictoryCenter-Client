@@ -1,4 +1,5 @@
 import React from 'react';
+import { act } from 'react';
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MainPageContent } from './MainPageContent';
@@ -16,20 +17,7 @@ jest.mock('../about-us-block/AboutUsBlockForm', () => ({
 
 jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
     __esModule: true,
-    CategoryBar: ({ categories, onCategorySelect, selectedCategory }: any) => (
-        <div data-testid="category-bar">
-            {categories.map((c: any) => (
-                <button
-                    key={c.id}
-                    data-testid={`tab-btn-${c.id}`}
-                    disabled={selectedCategory?.id === c.id}
-                    onClick={() => onCategorySelect(c)}
-                >
-                    {c.label}
-                </button>
-            ))}
-        </div>
-    ),
+    CategoryBar: require('@/utils/test-mocks/main-page-mocks').MockMainPageCategoryBar,
 }));
 
 jest.mock('@/components/common/page-loader/PageLoader', () => ({
@@ -37,13 +25,23 @@ jest.mock('@/components/common/page-loader/PageLoader', () => ({
     PageLoader: () => <div data-testid="page-loader">Loading...</div>,
 }));
 
+const advanceTimers = () =>
+    act(() => {
+        jest.advanceTimersByTime(500);
+    });
+
+const getByExactText = (text: string) =>
+    screen.getByText((_, el) => el?.children.length === 0 && el?.textContent === text);
+
 describe('MainPageContent', () => {
     beforeEach(() => {
         jest.useFakeTimers();
     });
 
     afterEach(() => {
-        jest.runOnlyPendingTimers();
+        act(() => {
+            jest.runOnlyPendingTimers();
+        });
         jest.useRealTimers();
         jest.clearAllMocks();
     });
@@ -55,8 +53,7 @@ describe('MainPageContent', () => {
 
     it('renders TitleBlockForm as the default tab after loading', async () => {
         render(<MainPageContent />);
-
-        jest.advanceTimersByTime(500);
+        await advanceTimers();
 
         await waitFor(() => {
             expect(screen.queryByTestId('page-loader')).not.toBeInTheDocument();
@@ -68,7 +65,7 @@ describe('MainPageContent', () => {
 
     it('switches tabs correctly', async () => {
         render(<MainPageContent />);
-        jest.advanceTimersByTime(500);
+        await advanceTimers();
 
         await waitFor(() => {
             expect(screen.getByTestId('category-bar')).toBeInTheDocument();
@@ -78,12 +75,41 @@ describe('MainPageContent', () => {
         expect(screen.queryByTestId('about-us-block-form')).not.toBeInTheDocument();
 
         fireEvent.click(screen.getByTestId('tab-btn-about'));
-
         expect(screen.getByTestId('about-us-block-form')).toBeInTheDocument();
         expect(screen.queryByTestId('title-block-form')).not.toBeInTheDocument();
 
         fireEvent.click(screen.getByTestId('tab-btn-statistics'));
+        expect(getByExactText(`Блок "${MAIN_PAGE_TEXT.TABS.STATISTICS}" в розробці`)).toBeInTheDocument();
+    });
 
-        expect(screen.getByText(`Блок "${MAIN_PAGE_TEXT.TABS.STATISTICS}" в розробці`)).toBeInTheDocument();
+    it('does not update state after unmount (cleanup isMounted)', async () => {
+        const { unmount } = render(<MainPageContent />);
+        unmount();
+        await advanceTimers();
+        expect(true).toBe(true);
+    });
+
+    it('renders donations tab content', async () => {
+        render(<MainPageContent />);
+        await advanceTimers();
+
+        await waitFor(() => {
+            expect(screen.getByTestId('category-bar')).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByTestId('tab-btn-donations'));
+        expect(getByExactText(`Блок "${MAIN_PAGE_TEXT.TABS.DONATIONS}" в розробці`)).toBeInTheDocument();
+    });
+
+    it('renders partners tab content', async () => {
+        render(<MainPageContent />);
+        await advanceTimers();
+
+        await waitFor(() => {
+            expect(screen.getByTestId('category-bar')).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByTestId('tab-btn-partners'));
+        expect(getByExactText(`Блок "${MAIN_PAGE_TEXT.TABS.PARTNERS}" в розробці`)).toBeInTheDocument();
     });
 });

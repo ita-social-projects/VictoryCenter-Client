@@ -27,16 +27,14 @@ export const AboutUsBlockForm = ({ initialData }: AboutUsBlockFormProps) => {
     });
 
     useEffect(() => {
-        if (initialData?.mainAboutUs) {
-            reset({
-                title: initialData.mainAboutUs.title || '',
-                description: initialData.mainAboutUs.description || '',
-            });
-        }
+        reset({
+            title: initialData?.mainAboutUs?.title || '',
+            description: initialData?.mainAboutUs?.description || '',
+        });
     }, [initialData, reset]);
 
-    const onSubmit = (data: AboutUsBlockFormValues) => {
-        // TODO: Implement API call
+    const onSubmit = () => {
+        // API integration is intentionally deferred for the display-only phase.
     };
 
     return (

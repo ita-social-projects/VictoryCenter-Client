@@ -29,7 +29,6 @@
 
 .error {
     color: c.$error;
-    font-size: 0.875rem;
     margin: 0;
 }
 
@@ -40,7 +39,7 @@
     gap: 24px;
 }
 
-.textarea-custom :global(.textarea) {
+.textarea-custom textarea {
     height: 200px;
     resize: none;
 }

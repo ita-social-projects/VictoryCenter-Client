@@ -6,20 +6,22 @@ import { MainPage } from '@/types/admin/main-page';
 
 jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
     __esModule: true,
-    InputWithCharacterLimitGroup: ({ id, value, onChange, onBlur }: any) => (
-        <input data-testid={id} value={value ?? ''} onChange={(e) => onChange(e.target.value)} onBlur={onBlur} />
-    ),
+    InputWithCharacterLimitGroup: require('@/utils/test-mocks/main-page-mocks').MockInputWithCharacterLimitGroup,
 }));
 
 jest.mock(
     '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
     () => ({
         __esModule: true,
-        TextAreaWithCharacterLimitGroup: ({ id, value, onChange, onBlur }: any) => (
-            <textarea data-testid={id} value={value ?? ''} onChange={(e) => onChange(e.target.value)} onBlur={onBlur} />
-        ),
+        TextAreaWithCharacterLimitGroup: require('@/utils/test-mocks/main-page-mocks')
+            .MockTextAreaWithCharacterLimitGroup,
     }),
 );
+
+jest.mock('@/components/admin/button/Button', () => ({
+    __esModule: true,
+    Button: require('@/utils/test-mocks/main-page-mocks').MockSubmitButton,
+}));
 
 jest.mock('@/components/admin/image-input/ImageInput', () => ({
     __esModule: true,
@@ -35,15 +37,6 @@ jest.mock('@/components/admin/image-input/ImageInput', () => ({
                 Clear Error
             </button>
         </div>
-    ),
-}));
-
-jest.mock('@/components/admin/button/Button', () => ({
-    __esModule: true,
-    Button: ({ children, disabled, type }: any) => (
-        <button data-testid="submit-btn" type={type} disabled={disabled}>
-            {children}
-        </button>
     ),
 }));
 
@@ -90,7 +83,6 @@ describe('TitleBlockForm', () => {
         render(<TitleBlockForm initialData={mockInitialData} />);
 
         const titleInput = screen.getByTestId('title-block-title');
-
         fireEvent.change(titleInput, { target: { value: 'Новий змінений заголовок' } });
 
         await waitFor(() => {
@@ -102,7 +94,6 @@ describe('TitleBlockForm', () => {
         render(<TitleBlockForm initialData={mockInitialData} />);
 
         const titleInput = screen.getByTestId('title-block-title');
-
         fireEvent.change(titleInput, { target: { value: '   ' } });
         fireEvent.blur(titleInput);
 
@@ -115,23 +106,14 @@ describe('TitleBlockForm', () => {
         render(<TitleBlockForm initialData={mockInitialData} />);
 
         const titleInput = screen.getByTestId('title-block-title');
-
         fireEvent.change(titleInput, { target: { value: 'Новий змінений заголовок' } });
-        await waitFor(() => {
-            expect(screen.getByTestId('submit-btn')).not.toBeDisabled();
-        });
+        await waitFor(() => expect(screen.getByTestId('submit-btn')).not.toBeDisabled());
 
         fireEvent.click(screen.getByTestId('trigger-image-error'));
-
-        await waitFor(() => {
-            expect(screen.getByTestId('submit-btn')).toBeDisabled();
-        });
+        await waitFor(() => expect(screen.getByTestId('submit-btn')).toBeDisabled());
 
         fireEvent.click(screen.getByTestId('clear-image-error'));
-
-        await waitFor(() => {
-            expect(screen.getByTestId('submit-btn')).not.toBeDisabled();
-        });
+        await waitFor(() => expect(screen.getByTestId('submit-btn')).not.toBeDisabled());
     });
 
     it('allows submitting the form without throwing errors', async () => {
@@ -141,9 +123,7 @@ describe('TitleBlockForm', () => {
         fireEvent.change(titleInput, { target: { value: 'Фінальний заголовок' } });
 
         const submitBtn = screen.getByTestId('submit-btn');
-        await waitFor(() => {
-            expect(submitBtn).not.toBeDisabled();
-        });
+        await waitFor(() => expect(submitBtn).not.toBeDisabled());
 
         expect(() => fireEvent.click(submitBtn)).not.toThrow();
     });

@@ -22,7 +22,7 @@ const getPublishedProgramExpensesRecords = () =>
 const getRecordPrograms = (): ProgramExpensesProgram[] => {
     const uniqueProgramsMap = new Map<number, ProgramExpensesProgram>();
 
-    MOCK_PROGRAM_EXPENSES_RECORDS.forEach((record) => {
+    getPublishedProgramExpensesRecords().forEach((record) => {
         uniqueProgramsMap.set(record.programId, {
             id: record.programId,
             name: record.programName,

@@ -112,7 +112,6 @@ describe('ProgramExpensesApi', () => {
         expect(result.programs).toEqual([
             { id: 1, name: 'Program A from categories' },
             { id: 2, name: 'Program B' },
-            { id: 3, name: 'Program C' },
             { id: 4, name: 'Program D' },
         ]);
         expect(result.summary).toEqual({
@@ -121,7 +120,7 @@ describe('ProgramExpensesApi', () => {
         });
     });
 
-    it('should return empty collections and zero summary when no records are published', async () => {
+    it('should return configured programs and zero summary when no records are published', async () => {
         const api = loadProgramExpensesApi(
             [
                 {
@@ -135,7 +134,7 @@ describe('ProgramExpensesApi', () => {
                     isPublished: false,
                 },
             ],
-            [],
+            [{ id: 6, name: 'Configured Program' }],
             '39.00',
         );
 
@@ -143,7 +142,7 @@ describe('ProgramExpensesApi', () => {
 
         expect(result).toEqual({
             exchangeRate: '39.00',
-            programs: [{ id: 5, name: 'Hidden Program' }],
+            programs: [{ id: 6, name: 'Configured Program' }],
             summary: {
                 totalAmountUah: 0,
                 totalAmountUsd: 0,

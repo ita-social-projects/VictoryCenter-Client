@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { FocusEvent, useMemo, useRef } from 'react';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
@@ -52,6 +52,7 @@ export const AddFundsExpendituresRecordModal = ({
         isAddConfirmationOpen,
         usdMismatchMessage,
         handleReportingYearChange,
+        handleReportingYearBlur,
         handleCategoryChange,
         handleAmountChange,
         handleAmountBlur,
@@ -71,6 +72,16 @@ export const AddFundsExpendituresRecordModal = ({
     const modalConfig =
         transactionType === 'income' ? FUNDS_EXPENDITURES_TEXT.MODAL.INCOME : FUNDS_EXPENDITURES_TEXT.MODAL.EXPENSE;
 
+    const reportingYearSelectRef = useRef<HTMLDivElement | null>(null);
+
+    const handleReportingYearFieldBlur = (event: FocusEvent<HTMLDivElement>) => {
+        if (reportingYearSelectRef.current?.contains(event.relatedTarget as Node | null)) {
+            return;
+        }
+
+        handleReportingYearBlur();
+    };
+
     return (
         <>
             <FundsExpendituresRecordModal
@@ -85,13 +96,15 @@ export const AddFundsExpendituresRecordModal = ({
                 closeConfirmationTitle={FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.CONFIRM_CLOSE_TITLE}
             >
                 <div className={styles.form}>
-                    <div className={styles.field}>
+                    <div className={styles.field} onBlurCapture={handleReportingYearFieldBlur}>
                         <label className={styles.label}>
+                            <span className={styles.required}>*</span>
                             {FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_LABEL}
                         </label>
                         <Select<string>
                             value={formState.reportingYear}
                             onValueChange={handleReportingYearChange}
+                            selectContainerRef={reportingYearSelectRef}
                             placeholder={FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_PLACEHOLDER}
                             className={styles.select}
                             optionClassName={styles['select-option']}
@@ -100,6 +113,9 @@ export const AddFundsExpendituresRecordModal = ({
                                 <Select.Option key={year} value={year} name={year} />
                             ))}
                         </Select>
+                        {formState.errors.reportingYear && (
+                            <p className={styles.error}>{formState.errors.reportingYear}</p>
+                        )}
                     </div>
 
                     <div className={styles.field}>

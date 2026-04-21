@@ -10,6 +10,7 @@ import {
     normalizeFundsExpendituresAmountInput,
     validateFundsExpendituresAmount,
     validateFundsExpendituresCategory,
+    validateFundsExpendituresReportingYear,
 } from '@/validation/admin/reports-schema/funds-expenditures-record-schema/funds-expenditures-record-schema';
 import { isUsdAmountMismatch } from '@/utils/functions/validate-usd-amount-mismatch/validate-usd-amount-mismatch';
 
@@ -170,6 +171,7 @@ export const useFundsExpendituresRecordForm = ({
         const normalizedAmountUsd = normalizeFundsExpendituresAmountInput(formState.amountUsd, true);
 
         const nextErrors = {
+            reportingYear: validateFundsExpendituresReportingYear(formState.reportingYear, 'save'),
             categoryId: getCategoryError(formState.categoryId, 'blur'),
             amountUah: validateFundsExpendituresAmount(normalizedAmountUah, 'save'),
             amountUsd: validateFundsExpendituresAmount(normalizedAmountUsd, 'save'),
@@ -182,7 +184,7 @@ export const useFundsExpendituresRecordForm = ({
             errors: nextErrors,
         }));
 
-        if (nextErrors.categoryId || nextErrors.amountUah || nextErrors.amountUsd) {
+        if (nextErrors.reportingYear || nextErrors.categoryId || nextErrors.amountUah || nextErrors.amountUsd) {
             return;
         }
 
@@ -218,9 +220,11 @@ export const useFundsExpendituresRecordForm = ({
     const amountUahValidationError = validateFundsExpendituresAmount(formState.amountUah, 'save');
     const amountUsdValidationError = validateFundsExpendituresAmount(formState.amountUsd, 'save');
     const categoryValidationError = getCategoryError(formState.categoryId, 'blur');
+    const reportingYearValidationError = validateFundsExpendituresReportingYear(formState.reportingYear, 'save');
 
     const isSubmitDisabled =
         isSubmitting ||
+        Boolean(reportingYearValidationError) ||
         !formState.categoryId ||
         Boolean(amountUahValidationError) ||
         Boolean(amountUsdValidationError) ||
@@ -245,7 +249,17 @@ export const useFundsExpendituresRecordForm = ({
             reportingYear: value,
             errors: {
                 ...prev.errors,
-                reportingYear: undefined,
+                reportingYear: validateFundsExpendituresReportingYear(value, 'change'),
+            },
+        }));
+    }, []);
+
+    const handleReportingYearBlur = useCallback(() => {
+        setFormState((prev) => ({
+            ...prev,
+            errors: {
+                ...prev.errors,
+                reportingYear: validateFundsExpendituresReportingYear(prev.reportingYear, 'blur'),
             },
         }));
     }, []);
@@ -274,6 +288,7 @@ export const useFundsExpendituresRecordForm = ({
         isAddConfirmationOpen,
         usdMismatchMessage,
         handleReportingYearChange,
+        handleReportingYearBlur,
         handleCategoryChange,
         handleAmountChange,
         handleAmountBlur,

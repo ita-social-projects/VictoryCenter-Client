@@ -1,4 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
 import { ReportFundsExpendituresCategory, ReportFundsExpendituresRecord } from '@/types/admin/reports';
 import * as fundsExpendituresSchema from '@/validation/admin/reports-schema/funds-expenditures-record-schema/funds-expenditures-record-schema';
@@ -147,19 +148,24 @@ describe('useFundsExpendituresRecordForm', () => {
             result.current.handleUsdChange('10');
         });
 
-        expect(result.current.isSubmitDisabled).toBe(false);
+        expect(result.current.isSubmitDisabled).toBe(true);
 
         await act(async () => {
             await result.current.handleConfirmAdd();
         });
 
-        expect(onSubmit).toHaveBeenCalledWith({
-            categoryId: 3,
-            reportingYear: '',
-            amountUah: '100',
-            amountUsd: '10',
-            type: 'income',
+        expect(onSubmit).not.toHaveBeenCalled();
+        expect(result.current.formState.errors.reportingYear).toBe(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED);
+    });
+
+    it('sets reporting year required error on blur', () => {
+        const { result } = renderUseFundsForm();
+
+        act(() => {
+            result.current.handleReportingYearBlur();
         });
+
+        expect(result.current.formState.errors.reportingYear).toBe(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED);
     });
 
     it('does not reset values when submit rejects', async () => {

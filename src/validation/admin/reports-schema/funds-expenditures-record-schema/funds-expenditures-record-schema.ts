@@ -4,6 +4,7 @@ import { FundsExpendituresTransactionType, ReportFundsExpendituresRecord } from 
 
 export type FundsExpendituresAmountValidationTrigger = 'change' | 'blur' | 'save';
 export type FundsExpendituresCategoryValidationTrigger = 'change' | 'blur';
+export type FundsExpendituresReportingYearValidationTrigger = 'change' | 'blur' | 'save';
 
 interface ValidateFundsExpendituresCategoryParams {
     recordId: number;
@@ -57,6 +58,17 @@ export const validateFundsExpendituresAmount = (
     }
 
     return undefined;
+};
+
+export const validateFundsExpendituresReportingYear = (
+    value: string | undefined,
+    trigger: FundsExpendituresReportingYearValidationTrigger = 'change',
+): string | undefined => {
+    if (value !== undefined && value.trim() !== '') {
+        return undefined;
+    }
+
+    return trigger === 'change' ? undefined : COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED;
 };
 
 export const validateFundsExpendituresCategory = ({

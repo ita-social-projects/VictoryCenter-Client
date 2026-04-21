@@ -4,6 +4,7 @@ import {
     normalizeFundsExpendituresAmountInput,
     validateFundsExpendituresAmount,
     validateFundsExpendituresCategory,
+    validateFundsExpendituresReportingYear,
 } from './funds-expenditures-record-schema';
 
 describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
@@ -113,6 +114,28 @@ describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
                     records,
                 }),
             ).toBeUndefined();
+        });
+    });
+
+    describe('validateFundsExpendituresReportingYear', () => {
+        it('should return required error for empty value on blur', () => {
+            expect(validateFundsExpendituresReportingYear(undefined, 'blur')).toBe(
+                COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED,
+            );
+        });
+
+        it('should return required error for empty value on save', () => {
+            expect(validateFundsExpendituresReportingYear('   ', 'save')).toBe(
+                COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED,
+            );
+        });
+
+        it('should not return error for empty value on change', () => {
+            expect(validateFundsExpendituresReportingYear(undefined, 'change')).toBeUndefined();
+        });
+
+        it('should pass for valid reporting year', () => {
+            expect(validateFundsExpendituresReportingYear('2026', 'blur')).toBeUndefined();
         });
     });
 });

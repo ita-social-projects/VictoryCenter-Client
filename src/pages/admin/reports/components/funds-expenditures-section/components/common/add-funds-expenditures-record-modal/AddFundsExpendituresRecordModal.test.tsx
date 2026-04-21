@@ -98,6 +98,7 @@ const baseHookResult = {
     isAddConfirmationOpen: false,
     usdMismatchMessage: undefined,
     handleReportingYearChange: jest.fn(),
+    handleReportingYearBlur: jest.fn(),
     handleCategoryChange: jest.fn(),
     handleAmountChange: jest.fn(),
     handleAmountBlur: jest.fn(),
@@ -168,6 +169,7 @@ describe('AddFundsExpendituresRecordModal', () => {
             formState: {
                 ...baseHookResult.formState,
                 errors: {
+                    reportingYear: 'year error',
                     categoryId: 'category error',
                     amountUah: 'uah error',
                     amountUsd: 'usd error',
@@ -177,6 +179,7 @@ describe('AddFundsExpendituresRecordModal', () => {
 
         renderComponent();
 
+        expect(screen.getByText('year error')).toBeInTheDocument();
         expect(screen.getByText('category error')).toBeInTheDocument();
         expect(screen.getByText('uah error')).toBeInTheDocument();
         expect(screen.getByText('usd error')).toBeInTheDocument();
@@ -189,6 +192,7 @@ describe('AddFundsExpendituresRecordModal', () => {
         fireEvent.change(screen.getByTestId(FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_PLACEHOLDER), {
             target: { value: '2025' },
         });
+        fireEvent.blur(screen.getByTestId(FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_PLACEHOLDER));
         fireEvent.change(screen.getByTestId(FUNDS_EXPENDITURES_TEXT.MODAL.INCOME.CATEGORY_PLACEHOLDER), {
             target: { value: '2' },
         });
@@ -199,6 +203,7 @@ describe('AddFundsExpendituresRecordModal', () => {
         fireEvent.click(screen.getByTestId('record-modal-submit'));
 
         expect(baseHookResult.handleReportingYearChange).toHaveBeenCalled();
+        expect(baseHookResult.handleReportingYearBlur).toHaveBeenCalledTimes(1);
         expect(baseHookResult.handleCategoryChange).toHaveBeenCalled();
         expect(baseHookResult.handleAmountChange).toHaveBeenCalledWith('111');
         expect(baseHookResult.handleAmountBlur).toHaveBeenCalledWith('amountUah');

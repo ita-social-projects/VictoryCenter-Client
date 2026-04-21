@@ -144,6 +144,7 @@ jest.mock('./components/funds-expenditures-toolbar/FundsExpendituresToolbar', ()
         onExchangeRateChange,
         onExchangeRateBlur,
         onAddIncome,
+        onAddExpense,
     }: {
         categories: { id: number; name: string }[];
         selectedCategoryId: number | null | undefined;
@@ -156,6 +157,7 @@ jest.mock('./components/funds-expenditures-toolbar/FundsExpendituresToolbar', ()
         onExchangeRateChange: (v: string) => void;
         onExchangeRateBlur: () => void;
         onAddIncome: () => void;
+        onAddExpense: () => void;
     }) => (
         <div
             data-testid="funds-toolbar"
@@ -186,6 +188,9 @@ jest.mock('./components/funds-expenditures-toolbar/FundsExpendituresToolbar', ()
             </button>
             <button onClick={() => onAddIncome()} data-testid="open-add-income">
                 Open add income
+            </button>
+            <button onClick={() => onAddExpense()} data-testid="open-add-expense">
+                Open add expense
             </button>
         </div>
     ),
@@ -249,14 +254,16 @@ jest.mock('./components/funds-expenditures-table/FundsExpendituresTable', () => 
     ),
 }));
 
-jest.mock('./components/common/add-income-modal/AddIncomeModal', () => ({
-    AddIncomeModal: ({
+jest.mock('./components/common/add-funds-expenditures-record-modal/AddFundsExpendituresRecordModal', () => ({
+    AddFundsExpendituresRecordModal: ({
         isOpen,
         onClose,
+        transactionType,
         onSubmit,
     }: {
         isOpen: boolean;
         onClose: () => void;
+        transactionType: 'income' | 'expense';
         onSubmit: (data: {
             categoryId: number;
             reportingYear: string;
@@ -265,23 +272,23 @@ jest.mock('./components/common/add-income-modal/AddIncomeModal', () => ({
             type: 'income' | 'expense';
         }) => Promise<boolean>;
     }) => (
-        <div data-testid="add-income-modal" data-open={String(isOpen)}>
-            <button data-testid="add-income-close" onClick={onClose}>
-                Close add income
+        <div data-testid="add-record-modal" data-open={String(isOpen)} data-type={transactionType}>
+            <button data-testid="add-record-close" onClick={onClose}>
+                Close add record
             </button>
             <button
-                data-testid="add-income-submit"
+                data-testid="add-record-submit"
                 onClick={() =>
                     void onSubmit({
                         categoryId: 1,
                         reportingYear: '2026',
                         amountUah: '1000',
                         amountUsd: '25',
-                        type: 'income',
+                        type: transactionType,
                     })
                 }
             >
-                Submit add income
+                Submit add record
             </button>
         </div>
     ),
@@ -713,12 +720,21 @@ describe('FundsExpenditureSection', () => {
         it('should open and close add income modal from toolbar controls', () => {
             render(<FundsExpenditureSection />);
 
-            expect(screen.getByTestId('add-income-modal')).toHaveAttribute('data-open', 'false');
+            expect(screen.getByTestId('add-record-modal')).toHaveAttribute('data-open', 'false');
             fireEvent.click(screen.getByTestId('open-add-income'));
-            expect(screen.getByTestId('add-income-modal')).toHaveAttribute('data-open', 'true');
+            expect(screen.getByTestId('add-record-modal')).toHaveAttribute('data-open', 'true');
+            expect(screen.getByTestId('add-record-modal')).toHaveAttribute('data-type', 'income');
 
-            fireEvent.click(screen.getByTestId('add-income-close'));
-            expect(screen.getByTestId('add-income-modal')).toHaveAttribute('data-open', 'false');
+            fireEvent.click(screen.getByTestId('add-record-close'));
+            expect(screen.getByTestId('add-record-modal')).toHaveAttribute('data-open', 'false');
+        });
+
+        it('should open expense record modal from toolbar controls', () => {
+            render(<FundsExpenditureSection />);
+
+            fireEvent.click(screen.getByTestId('open-add-expense'));
+            expect(screen.getByTestId('add-record-modal')).toHaveAttribute('data-open', 'true');
+            expect(screen.getByTestId('add-record-modal')).toHaveAttribute('data-type', 'expense');
         });
 
         it('should create income record successfully and show success toast', async () => {
@@ -734,7 +750,7 @@ describe('FundsExpenditureSection', () => {
             render(<FundsExpenditureSection />);
 
             fireEvent.click(screen.getByTestId('open-add-income'));
-            fireEvent.click(screen.getByTestId('add-income-submit'));
+            fireEvent.click(screen.getByTestId('add-record-submit'));
 
             expect(await screen.findByTestId('funds-table')).toBeInTheDocument();
             expect(mockCreateRecord).toHaveBeenCalled();
@@ -743,7 +759,7 @@ describe('FundsExpenditureSection', () => {
                 'success',
             );
             await waitFor(() => {
-                expect(screen.getByTestId('add-income-modal')).toHaveAttribute('data-open', 'false');
+                expect(screen.getByTestId('add-record-modal')).toHaveAttribute('data-open', 'false');
             });
         });
 
@@ -753,9 +769,9 @@ describe('FundsExpenditureSection', () => {
             render(<FundsExpenditureSection />);
 
             fireEvent.click(screen.getByTestId('open-add-income'));
-            fireEvent.click(screen.getByTestId('add-income-submit'));
+            fireEvent.click(screen.getByTestId('add-record-submit'));
 
-            expect(await screen.findByTestId('add-income-modal')).toHaveAttribute('data-open', 'true');
+            expect(await screen.findByTestId('add-record-modal')).toHaveAttribute('data-open', 'true');
             expect(mockAddToast).toHaveBeenCalledWith(
                 FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_CREATE_FAILED_RETRY,
                 'error',

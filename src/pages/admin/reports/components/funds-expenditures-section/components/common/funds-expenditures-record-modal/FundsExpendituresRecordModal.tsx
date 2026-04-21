@@ -3,9 +3,9 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { Button } from '@/components/admin/button/Button';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import { Modal } from '@/components/common/modal/Modal';
-import styles from './FundsRecordModal.module.scss';
+import styles from './FundsExpendituresRecordModal.module.scss';
 
-interface FundsRecordModalProps {
+interface FundsExpendituresRecordModalProps {
     isOpen: boolean;
     title: string;
     subtitle: string;
@@ -18,7 +18,7 @@ interface FundsRecordModalProps {
     children: ReactNode;
 }
 
-export const FundsRecordModal = ({
+export const FundsExpendituresRecordModal = ({
     isOpen,
     title,
     subtitle,
@@ -29,7 +29,7 @@ export const FundsRecordModal = ({
     onClose,
     closeConfirmationTitle,
     children,
-}: FundsRecordModalProps) => {
+}: FundsExpendituresRecordModalProps) => {
     const [isCloseConfirmOpen, setIsCloseConfirmOpen] = useState(false);
 
     const handleRequestClose = useCallback(() => {

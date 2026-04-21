@@ -138,7 +138,7 @@ describe('useFundsExpendituresRecordForm', () => {
         expect(result.current.formState.amountUsd).toBe('');
     });
 
-    it('submits valid form without reporting year', async () => {
+    it('blocks submit and surfaces required error when reporting year is missing', async () => {
         const onSubmit = jest.fn().mockResolvedValue(true);
         const { result } = renderUseFundsForm({ onSubmit });
 

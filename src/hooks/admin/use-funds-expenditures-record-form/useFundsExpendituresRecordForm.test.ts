@@ -168,6 +168,16 @@ describe('useFundsExpendituresRecordForm', () => {
         expect(result.current.formState.errors.reportingYear).toBe(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED);
     });
 
+    it('sets category required error on blur', () => {
+        const { result } = renderUseFundsForm();
+
+        act(() => {
+            result.current.handleCategoryBlur();
+        });
+
+        expect(result.current.formState.errors.categoryId).toBe(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED);
+    });
+
     it('does not reset values when submit rejects', async () => {
         const onSubmit = jest.fn().mockRejectedValue(new Error('network'));
         const { result } = renderUseFundsForm({ onSubmit });

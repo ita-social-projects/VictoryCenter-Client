@@ -100,6 +100,7 @@ const baseHookResult = {
     handleReportingYearChange: jest.fn(),
     handleReportingYearBlur: jest.fn(),
     handleCategoryChange: jest.fn(),
+    handleCategoryBlur: jest.fn(),
     handleAmountChange: jest.fn(),
     handleAmountBlur: jest.fn(),
     handleUsdChange: jest.fn(),
@@ -196,6 +197,7 @@ describe('AddFundsExpendituresRecordModal', () => {
         fireEvent.change(screen.getByTestId(FUNDS_EXPENDITURES_TEXT.MODAL.INCOME.CATEGORY_PLACEHOLDER), {
             target: { value: '2' },
         });
+        fireEvent.blur(screen.getByTestId(FUNDS_EXPENDITURES_TEXT.MODAL.INCOME.CATEGORY_PLACEHOLDER));
         fireEvent.change(screen.getByTestId('add-record-amount-uah'), { target: { value: '111' } });
         fireEvent.blur(screen.getByTestId('add-record-amount-uah'));
         fireEvent.change(screen.getByTestId('add-record-amount-usd'), { target: { value: '22' } });
@@ -205,6 +207,7 @@ describe('AddFundsExpendituresRecordModal', () => {
         expect(baseHookResult.handleReportingYearChange).toHaveBeenCalled();
         expect(baseHookResult.handleReportingYearBlur).toHaveBeenCalledTimes(1);
         expect(baseHookResult.handleCategoryChange).toHaveBeenCalled();
+        expect(baseHookResult.handleCategoryBlur).toHaveBeenCalledTimes(1);
         expect(baseHookResult.handleAmountChange).toHaveBeenCalledWith('111');
         expect(baseHookResult.handleAmountBlur).toHaveBeenCalledWith('amountUah');
         expect(baseHookResult.handleUsdChange).toHaveBeenCalledWith('22');

@@ -278,6 +278,16 @@ export const useFundsExpendituresRecordForm = ({
         [getCategoryError],
     );
 
+    const handleCategoryBlur = useCallback(() => {
+        setFormState((prev) => ({
+            ...prev,
+            errors: {
+                ...prev.errors,
+                categoryId: getCategoryError(prev.categoryId, 'blur'),
+            },
+        }));
+    }, [getCategoryError]);
+
     return {
         formState,
         filteredCategories,
@@ -290,6 +300,7 @@ export const useFundsExpendituresRecordForm = ({
         handleReportingYearChange,
         handleReportingYearBlur,
         handleCategoryChange,
+        handleCategoryBlur,
         handleAmountChange,
         handleAmountBlur,
         handleUsdChange,

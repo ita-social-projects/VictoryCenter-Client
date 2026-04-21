@@ -54,6 +54,7 @@ export const AddFundsExpendituresRecordModal = ({
         handleReportingYearChange,
         handleReportingYearBlur,
         handleCategoryChange,
+        handleCategoryBlur,
         handleAmountChange,
         handleAmountBlur,
         handleUsdChange,
@@ -73,6 +74,7 @@ export const AddFundsExpendituresRecordModal = ({
         transactionType === 'income' ? FUNDS_EXPENDITURES_TEXT.MODAL.INCOME : FUNDS_EXPENDITURES_TEXT.MODAL.EXPENSE;
 
     const reportingYearSelectRef = useRef<HTMLDivElement | null>(null);
+    const categorySelectRef = useRef<HTMLDivElement | null>(null);
 
     const handleReportingYearFieldBlur = (event: FocusEvent<HTMLDivElement>) => {
         if (reportingYearSelectRef.current?.contains(event.relatedTarget as Node | null)) {
@@ -80,6 +82,14 @@ export const AddFundsExpendituresRecordModal = ({
         }
 
         handleReportingYearBlur();
+    };
+
+    const handleCategoryFieldBlur = (event: FocusEvent<HTMLDivElement>) => {
+        if (categorySelectRef.current?.contains(event.relatedTarget as Node | null)) {
+            return;
+        }
+
+        handleCategoryBlur();
     };
 
     return (
@@ -118,7 +128,7 @@ export const AddFundsExpendituresRecordModal = ({
                         )}
                     </div>
 
-                    <div className={styles.field}>
+                    <div className={styles.field} onBlurCapture={handleCategoryFieldBlur}>
                         <label className={styles.label}>
                             <span className={styles.required}>*</span>
                             {modalConfig.CATEGORY_LABEL}
@@ -134,6 +144,7 @@ export const AddFundsExpendituresRecordModal = ({
                             <Select<number>
                                 value={formState.categoryId}
                                 onValueChange={handleCategoryChange}
+                                selectContainerRef={categorySelectRef}
                                 placeholder={modalConfig.CATEGORY_PLACEHOLDER}
                                 className={styles.select}
                                 optionClassName={styles['select-option']}

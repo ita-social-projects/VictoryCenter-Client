@@ -632,6 +632,8 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
                                     PROGRAM_VALIDATION.location.max,
                                 )}
+                                showCounterBelow={true}
+                                isWhiteLabel={hasBackgroundImage}
                             />
 
                             <InputWithCharacterLimitGroup
@@ -646,6 +648,8 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
                                     PROGRAM_VALIDATION.participantsCount.max,
                                 )}
+                                showCounterBelow={true}
+                                isWhiteLabel={hasBackgroundImage}
                             />
 
                             <InputWithCharacterLimitGroup
@@ -660,6 +664,8 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
                                     PROGRAM_VALIDATION.meetingCount.max,
                                 )}
+                                showCounterBelow={true}
+                                isWhiteLabel={hasBackgroundImage}
                             />
                         </div>
 

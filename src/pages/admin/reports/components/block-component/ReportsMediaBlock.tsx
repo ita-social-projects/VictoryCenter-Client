@@ -58,7 +58,7 @@ export const ReportsMediaBlock = ({
 }: ReportsMediaBlockProps) => {
     const handleTitleChange = useCallback(
         (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-            const value = getNormalizedInputText(e.target.value);
+            const value = e.target.value;
             const error = validationFunctions.validateTitle(value);
             onValuesChange({ ...values, title: value }, { ...errors, title: error });
         },

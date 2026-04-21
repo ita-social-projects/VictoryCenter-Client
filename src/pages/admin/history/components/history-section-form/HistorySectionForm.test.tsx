@@ -46,9 +46,7 @@ jest.mock('@/components/admin/icon-button/IconButton', () => ({
         children?: React.ReactNode;
         DefaultIcon?: React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
         FilledIcon?: React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
-    }) => (
-        <button {...props}>{children}</button>
-    ),
+    }) => <button {...props}>{children}</button>,
 }));
 
 jest.mock('@/const/common/action-icons', () => ({
@@ -150,14 +148,14 @@ describe('HistorySectionForm', () => {
                 mode: SectionMode;
             }) => (
                 <div data-testid="rendered-history-section" data-mode={mode}>
-                    <button type="button" data-testid="change-title" onClick={() => handlers.onTitleChange('Updated title')}>
-                        Change title
-                    </button>
                     <button
                         type="button"
-                        data-testid="remove-image"
-                        onClick={() => handlers.onImagesChange(0, null)}
+                        data-testid="change-title"
+                        onClick={() => handlers.onTitleChange('Updated title')}
                     >
+                        Change title
+                    </button>
+                    <button type="button" data-testid="remove-image" onClick={() => handlers.onImagesChange(0, null)}>
                         Remove image
                     </button>
                 </div>

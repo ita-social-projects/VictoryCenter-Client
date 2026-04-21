@@ -4,6 +4,10 @@ export const ADMIN_ROUTES = {
         PATH: 'login',
         FULL: '/login',
     },
+    MAIN: {
+        PATH: 'main',
+        FULL: '/admin-panel/main',
+    },
     TEAM: {
         PATH: 'team',
         FULL: '/admin-panel/team',

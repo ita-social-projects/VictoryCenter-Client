@@ -8,7 +8,7 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { SECTIONS_TEXT } from '@/const/admin/sections';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import { HistoryPageToolbar } from '../history-page-toolbar/HistoryPageToolbar';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { HistoryApi } from '@/services/api/admin/history/history-api';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { CreateUpdateHistorySectionDto, HistorySectionDto } from '@/types/common/history-sections';
@@ -65,7 +65,7 @@ export const HistoryPageContent = () => {
 
     const TEMPLATES = HISTORY_SUPPORTED_TEMPLATES;
 
-    const normalizedSections = sections ?? [];
+    const normalizedSections = useMemo(() => sections ?? [], [sections]);
     const hasSections = localSectionsCount !== null ? localSectionsCount > 0 : normalizedSections.length > 0;
     const hasSectionsError = Boolean(sectionsError);
 

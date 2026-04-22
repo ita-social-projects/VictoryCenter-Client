@@ -7,7 +7,6 @@ import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { HistoryApi } from '@/services/api/admin/history/history-api';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
-import { SectionCancelActionType } from '@/types/admin/programs';
 import { SectionTemplate } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
 import { ToastType } from '@/types/admin/toast';
@@ -134,11 +133,7 @@ jest.mock('../history-form/HistoryForm', () => {
                 <button type="button" data-testid="request-replace-template" onClick={() => onReplaceSection?.(0)}>
                     Request replace template
                 </button>
-                <button
-                    type="button"
-                    data-testid="request-replace-template-oob"
-                    onClick={() => onReplaceSection?.(99)}
-                >
+                <button type="button" data-testid="request-replace-template-oob" onClick={() => onReplaceSection?.(99)}>
                     Request replace template out of bounds
                 </button>
                 <button type="button" data-testid="mark-saved" onClick={() => onSectionSaved?.()}>
@@ -166,7 +161,11 @@ jest.mock('@/pages/admin/programs/components/programs-page-modals/add-section-mo
 
         return (
             <div data-testid="add-section-modal">
-                <button type="button" data-testid="select-first-template" onClick={() => onSelectTemplate(templates[0])}>
+                <button
+                    type="button"
+                    data-testid="select-first-template"
+                    onClick={() => onSelectTemplate(templates[0])}
+                >
                     Select first template
                 </button>
                 <button type="button" data-testid="close-add-section-modal" onClick={onClose}>
@@ -389,7 +388,10 @@ describe('HistoryPageContent', () => {
     });
 
     it('renders HistoryForm when sections are fetched', () => {
-        const sections = [createSection(1, SectionTemplate.SingleImageTop, 0), createSection(2, SectionTemplate.TextOnly, 1)];
+        const sections = [
+            createSection(1, SectionTemplate.SingleImageTop, 0),
+            createSection(2, SectionTemplate.TextOnly, 1),
+        ];
 
         mockHistoryFormSections = sections;
 
@@ -590,7 +592,10 @@ describe('HistoryPageContent', () => {
     });
 
     it('syncs remaining sections and shows success toast after delete', async () => {
-        const sections = [createSection(1, SectionTemplate.SingleImageTop, 0), createSection(2, SectionTemplate.TextOnly, 1)];
+        const sections = [
+            createSection(1, SectionTemplate.SingleImageTop, 0),
+            createSection(2, SectionTemplate.TextOnly, 1),
+        ];
         mockHistoryFormSections = sections;
 
         mockedUseDataFetch.mockReturnValue({

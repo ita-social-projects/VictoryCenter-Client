@@ -8,7 +8,7 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { SECTIONS_TEXT } from '@/const/admin/sections';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import { HistoryPageToolbar } from '../history-page-toolbar/HistoryPageToolbar';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { HistoryApi } from '@/services/api/admin/history/history-api';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { CreateUpdateHistorySectionDto, HistorySectionDto } from '@/types/common/history-sections';
@@ -29,6 +29,7 @@ export const HistoryPageContent = () => {
     const client = useAdminClient();
     const { addToast } = useToast();
     const historyFormRef = useRef<HistoryFormRef>(null);
+    const pendingSectionRef = useRef<HistorySectionDto | null>(null);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [sectionToReplace, setSectionToReplace] = useState<number | null>(null);
     const [canPublish, setCanPublish] = useState(false);
@@ -99,12 +100,25 @@ export const HistoryPageContent = () => {
                     order: nextOrder,
                     contents: getInitialHistorySectionContents(templateId),
                 };
-                historyFormRef.current?.addSection(newSection);
+                if (historyFormRef.current) {
+                    historyFormRef.current.addSection(newSection);
+                } else {
+                    pendingSectionRef.current = newSection;
+                    setLocalSectionsCount(1);
+                }
             }
             setSectionToReplace(null);
         },
         [sectionToReplace, normalizedSections],
     );
+
+    useEffect(() => {
+        if (pendingSectionRef.current !== null && historyFormRef.current !== null) {
+            const section = pendingSectionRef.current;
+            pendingSectionRef.current = null;
+            historyFormRef.current.addSection(section);
+        }
+    });
 
     const handleRetrySections = useCallback(() => {
         void refetchSections();
@@ -193,7 +207,7 @@ export const HistoryPageContent = () => {
                     </div>
                 )}
 
-                {!isSectionsLoading && !hasSectionsError && (
+                {!isSectionsLoading && !hasSectionsError && hasSections && (
                     <HistoryForm
                         ref={historyFormRef}
                         sections={normalizedSections}

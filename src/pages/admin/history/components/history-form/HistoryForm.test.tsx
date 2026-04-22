@@ -1,5 +1,5 @@
 import React from 'react';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { HistoryForm } from './HistoryForm';
 import { SectionCancelActionType } from '@/types/admin/programs';
@@ -36,6 +36,19 @@ jest.mock('../history-section-form/HistorySectionForm', () => ({
                 </button>
                 <button type="button" data-testid={`move-down-${props.sectionKey}`} onClick={props.onMoveDownSection}>
                     Move down
+                </button>
+                <button type="button" data-testid={`move-up-${props.sectionKey}`} onClick={props.onMoveUpSection}>
+                    Move up
+                </button>
+                <button type="button" data-testid={`save-${props.sectionKey}`} onClick={props.onSave}>
+                    Save section
+                </button>
+                <button
+                    type="button"
+                    data-testid={`edit-state-${props.sectionKey}`}
+                    onClick={() => props.onEditStateChange?.(true)}
+                >
+                    Edit state
                 </button>
                 <button
                     type="button"
@@ -281,5 +294,220 @@ describe('HistoryForm', () => {
         rerender(<HistoryForm sections={nextSections} />);
 
         expect(screen.getByTestId('mock-history-section-history-section-3')).toBeInTheDocument();
+    });
+
+    it('resyncs when incoming sections shrink and removes extra rendered forms', () => {
+        const sections = createSections();
+
+        const { rerender } = render(<HistoryForm sections={sections} />);
+
+        rerender(<HistoryForm sections={[sections[0]]} />);
+
+        expect(screen.getByTestId('mock-history-section-history-section-1')).toBeInTheDocument();
+        expect(screen.queryByTestId('mock-history-section-history-section-2')).not.toBeInTheDocument();
+    });
+
+    it('calls onSectionSaved when a section is saved', () => {
+        const sections = createSections();
+        const onSectionSaved = jest.fn();
+
+        render(<HistoryForm sections={sections} onSectionSaved={onSectionSaved} />);
+
+        fireEvent.click(screen.getByTestId('save-history-section-1'));
+
+        expect(onSectionSaved).toHaveBeenCalledTimes(1);
+    });
+
+    it('updates editing state through onEditStateChange callback path', () => {
+        const sections = createSections();
+
+        render(<HistoryForm sections={sections} />);
+
+        fireEvent.click(screen.getByTestId('edit-state-history-section-1'));
+
+        const latestFirstSectionProps = mockHistorySectionFormProps.mock.calls
+            .map(([props]) => props as HistorySectionFormProps)
+            .filter((props) => props.sectionKey === 'history-section-1')
+            .at(-1);
+
+        expect(latestFirstSectionProps?.isNewSection).toBe(false);
+    });
+
+    it('reorders sections when moving up from second position', () => {
+        const sections = createSections();
+        const onSectionsChange = jest.fn();
+
+        render(<HistoryForm sections={sections} onSectionsChange={onSectionsChange} />);
+
+        fireEvent.click(screen.getByTestId('move-up-history-section-2'));
+
+        expect(onSectionsChange).toHaveBeenLastCalledWith([
+            expect.objectContaining({ id: 2 }),
+            expect.objectContaining({ id: 1 }),
+        ]);
+    });
+
+    it('does nothing when moving up first section or moving down last section', () => {
+        const sections = createSections();
+        const onSectionsChange = jest.fn();
+
+        render(<HistoryForm sections={sections} onSectionsChange={onSectionsChange} />);
+
+        fireEvent.click(screen.getByTestId('move-up-history-section-1'));
+        fireEvent.click(screen.getByTestId('move-down-history-section-2'));
+
+        expect(onSectionsChange).not.toHaveBeenCalled();
+    });
+
+    it('invokes onSectionDeleted with remaining sections after delete discard', () => {
+        const sections = createSections();
+        const onRequestCancelSection = jest.fn();
+        const onSectionDeleted = jest.fn();
+
+        render(
+            <HistoryForm
+                sections={sections}
+                onRequestCancelSection={onRequestCancelSection}
+                onSectionDeleted={onSectionDeleted}
+            />,
+        );
+
+        fireEvent.click(screen.getByTestId('delete-history-section-1'));
+
+        const removeRequest = onRequestCancelSection.mock.calls[0][0] as { onDiscard: () => void };
+        removeRequest.onDiscard();
+
+        expect(onSectionDeleted).toHaveBeenCalledWith([expect.objectContaining({ id: 2 })]);
+    });
+
+    it('supports imperative ref methods addSection, replaceSection and getSections', () => {
+        const sections = createSections();
+        const ref = React.createRef<{ addSection: Function; replaceSection: Function; getSections: Function }>();
+
+        render(<HistoryForm ref={ref as any} sections={sections} />);
+
+        const addedSection = createSection(3, SectionTemplate.TextOnly, 2);
+        act(() => {
+            ref.current?.addSection(addedSection);
+        });
+
+        expect(ref.current?.getSections()).toEqual(
+            expect.arrayContaining([expect.objectContaining({ id: 3 }), expect.objectContaining({ id: 2 })]),
+        );
+
+        const replacement = createSection(20, SectionTemplate.SingleImageTop, 0);
+        act(() => {
+            ref.current?.replaceSection(0, replacement);
+        });
+
+        expect(ref.current?.getSections()).toEqual(
+            expect.arrayContaining([expect.objectContaining({ id: 20 }), expect.objectContaining({ id: 2 })]),
+        );
+    });
+
+    it('ignores imperative replaceSection for out-of-bounds indexes', () => {
+        const sections = createSections();
+        const ref = React.createRef<{ replaceSection: Function; getSections: Function }>();
+
+        render(<HistoryForm ref={ref as any} sections={sections} />);
+
+        const before = ref.current?.getSections();
+        ref.current?.replaceSection(-1, createSection(999, SectionTemplate.TextOnly, 0));
+        ref.current?.replaceSection(100, createSection(1000, SectionTemplate.TextOnly, 1));
+
+        expect(ref.current?.getSections()).toEqual(before);
+    });
+
+    it('does not mutate sections when revert discard runs after the section was removed', async () => {
+        const sections = createSections();
+        const onSectionsChange = jest.fn();
+        const onRequestCancelSection = jest.fn();
+
+        render(
+            <HistoryForm
+                sections={sections}
+                onSectionsChange={onSectionsChange}
+                onRequestCancelSection={onRequestCancelSection}
+            />,
+        );
+
+        fireEvent.click(screen.getByTestId('cancel-dirty-history-section-1'));
+        const revertRequest = onRequestCancelSection.mock.calls[0][0] as { onDiscard: () => void };
+
+        fireEvent.click(screen.getByTestId('delete-history-section-1'));
+        const removeRequest = onRequestCancelSection.mock.calls[1][0] as { onDiscard: () => void };
+        act(() => {
+            removeRequest.onDiscard();
+        });
+
+        await waitFor(() => {
+            expect(screen.queryByTestId('mock-history-section-history-section-1')).not.toBeInTheDocument();
+        });
+
+        const callsBeforeRevert = onSectionsChange.mock.calls.length;
+        act(() => {
+            revertRequest.onDiscard();
+        });
+
+        expect(onSectionsChange.mock.calls.length).toBe(callsBeforeRevert);
+    });
+
+    it('keeps section states when rerendered with same length but different signature', () => {
+        const sections = createSections();
+
+        const { rerender } = render(<HistoryForm sections={sections} />);
+
+        const nextSections = [
+            { ...sections[0], order: 10, contents: sections[0].contents.map((content) => ({ ...content })) },
+            { ...sections[1], contents: sections[1].contents.map((content) => ({ ...content })) },
+        ];
+
+        rerender(<HistoryForm sections={nextSections} />);
+
+        expect(screen.getByTestId('mock-history-section-history-section-1')).toBeInTheDocument();
+        expect(screen.getByTestId('mock-history-section-history-section-2')).toBeInTheDocument();
+    });
+
+    it('ignores repeated remove discard for an already removed section', () => {
+        const sections = createSections();
+        const onSectionsChange = jest.fn();
+        const onRequestCancelSection = jest.fn();
+
+        render(
+            <HistoryForm
+                sections={sections}
+                onSectionsChange={onSectionsChange}
+                onRequestCancelSection={onRequestCancelSection}
+            />,
+        );
+
+        fireEvent.click(screen.getByTestId('delete-history-section-1'));
+
+        const removeRequest = onRequestCancelSection.mock.calls[0][0] as { onDiscard: () => void };
+
+        act(() => {
+            removeRequest.onDiscard();
+        });
+        const callsAfterFirstDiscard = onSectionsChange.mock.calls.length;
+
+        act(() => {
+            removeRequest.onDiscard();
+        });
+
+        expect(onSectionsChange.mock.calls.length).toBe(callsAfterFirstDiscard);
+    });
+
+    it('falls back to false when template validity is undefined', () => {
+        const sections = createSections();
+        mockIsHistoryTemplate.mockImplementation(() => undefined as unknown as boolean);
+
+        render(<HistoryForm sections={sections} />);
+
+        expect(mockHistorySectionFormProps).toHaveBeenNthCalledWith(
+            1,
+            expect.objectContaining({
+                isSectionValid: false,
+            }),
+        );
     });
 });

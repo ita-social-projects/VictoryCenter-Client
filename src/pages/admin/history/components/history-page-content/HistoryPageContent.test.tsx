@@ -247,7 +247,7 @@ jest.mock('../history-page-toolbar/HistoryPageToolbar', () => ({
         mockToolbarOnAddSection(onAddSection);
 
         return (
-            <button type="button" onClick={onAddSection}>
+            <button type="button" data-testid="toolbar-add-section-button" onClick={onAddSection}>
                 Add History Section
             </button>
         );
@@ -523,7 +523,7 @@ describe('HistoryPageContent', () => {
 
         render(<HistoryPageContent />);
 
-        await user.click(screen.getByRole('button', { name: /add history section/i }));
+    await user.click(screen.getByTestId('toolbar-add-section-button'));
         await user.click(screen.getByTestId('select-first-template'));
 
         expect(mockAddSection).toHaveBeenCalledWith(

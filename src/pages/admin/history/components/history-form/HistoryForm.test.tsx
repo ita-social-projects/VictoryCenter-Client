@@ -243,4 +243,43 @@ describe('HistoryForm', () => {
 
         expect(onReplaceSection).toHaveBeenCalledWith(1);
     });
+
+    it('keeps local edits when rerendered with a new sections reference but the same structure', () => {
+        const sections = createSections();
+        const onSectionsChange = jest.fn();
+
+        const { rerender } = render(<HistoryForm sections={sections} onSectionsChange={onSectionsChange} />);
+
+        fireEvent.click(screen.getByTestId('change-history-section-1'));
+
+        expect(onSectionsChange).toHaveBeenLastCalledWith([
+            expect.objectContaining({ id: 1, order: 10 }),
+            expect.objectContaining({ id: 2, order: 1 }),
+        ]);
+
+        const nextSections = sections.map((section) => ({
+            ...section,
+            contents: section.contents.map((content) => ({ ...content })),
+        }));
+
+        rerender(<HistoryForm sections={nextSections} onSectionsChange={onSectionsChange} />);
+
+        const latestFirstSectionProps = mockHistorySectionFormProps.mock.calls
+            .map(([props]) => props as HistorySectionFormProps)
+            .filter((props) => props.sectionKey === 'history-section-1')
+            .at(-1);
+
+        expect(latestFirstSectionProps?.section.order).toBe(10);
+    });
+
+    it('still resyncs when the incoming sections structure changes', () => {
+        const sections = createSections();
+
+        const { rerender } = render(<HistoryForm sections={sections} />);
+
+        const nextSections = [...sections, createSection(3, SectionTemplate.SingleImageTop, 2)];
+        rerender(<HistoryForm sections={nextSections} />);
+
+        expect(screen.getByTestId('mock-history-section-history-section-3')).toBeInTheDocument();
+    });
 });

@@ -35,6 +35,10 @@ const createSectionState = (sectionKey: string): SectionEditingState => ({
     isReplacing: false,
 });
 
+const getSectionsSyncSignature = (sections: HistorySectionDto[]): string => {
+    return sections.map((section) => `${section.id}:${section.order}`).join('|');
+};
+
 export const HistoryForm = ({
     sections,
     isFormDisabled = false,
@@ -51,10 +55,18 @@ export const HistoryForm = ({
     const sectionsContainerRef = useRef<HTMLDivElement>(null);
     const sectionStatesRef = useRef(sectionStates);
     const nextSectionKeyRef = useRef(sections.length);
+    const lastSectionsSyncSignatureRef = useRef(getSectionsSyncSignature(sections));
 
     sectionStatesRef.current = sectionStates;
 
     useEffect(() => {
+        const nextSectionsSyncSignature = getSectionsSyncSignature(sections);
+        if (lastSectionsSyncSignatureRef.current === nextSectionsSyncSignature) {
+            return;
+        }
+
+        lastSectionsSyncSignatureRef.current = nextSectionsSyncSignature;
+
         setLocalSections(sections);
         setSectionStates((prev) => {
             if (prev.length === sections.length) {

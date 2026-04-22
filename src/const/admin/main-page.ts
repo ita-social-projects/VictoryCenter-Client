@@ -11,7 +11,6 @@ export const MAIN_PAGE_TEXT = {
 
     BLOCKS: {
         TITLE: {
-            IMAGE_LABEL: 'Зображення',
             TITLE_LABEL: COMMON_TEXT_ADMIN.TYPE.TITLE,
             DESCRIPTION_LABEL: COMMON_TEXT_ADMIN.TYPE.DESCRIPTION,
         },

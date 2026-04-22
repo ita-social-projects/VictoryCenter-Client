@@ -7,12 +7,13 @@ import { ContentType } from '@/types/common/section-contents';
 import { SectionTemplate } from '@/types/common/sections';
 import type { HistorySectionDto } from '@/types/common/history-sections';
 import type { HistorySectionFormProps } from '../history-section-form/HistorySectionForm';
+import { isProgramSectionValid } from '@/validation/admin/program-schema/program-schema';
 
 const mockHistorySectionFormProps = jest.fn();
-const mockIsHistoryTemplate = jest.fn();
+const mockIsProgramSectionValid = isProgramSectionValid as jest.Mock;
 
-jest.mock('@/utils/functions/render-history-section', () => ({
-    isHistoryTemplate: (...args: unknown[]) => mockIsHistoryTemplate(...args),
+jest.mock('@/validation/admin/program-schema/program-schema', () => ({
+    isProgramSectionValid: jest.fn(),
 }));
 
 jest.mock('../history-section-form/HistorySectionForm', () => ({
@@ -136,7 +137,9 @@ describe('HistoryForm', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
-        mockIsHistoryTemplate.mockImplementation((template: number) => template === SectionTemplate.SingleImageTop);
+        mockIsProgramSectionValid.mockImplementation((section: HistorySectionDto) => {
+            return section.template === SectionTemplate.SingleImageTop;
+        });
     });
 
     it('renders nothing when there are no sections', () => {
@@ -465,7 +468,7 @@ describe('HistoryForm', () => {
 
     it('falls back to false when template validity is undefined', () => {
         const sections = createSections();
-        mockIsHistoryTemplate.mockImplementation(() => undefined as unknown as boolean);
+        mockIsProgramSectionValid.mockImplementation(() => undefined as unknown as boolean);
 
         render(<HistoryForm sections={sections} />);
 

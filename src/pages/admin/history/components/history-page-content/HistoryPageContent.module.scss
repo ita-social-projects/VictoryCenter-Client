@@ -40,9 +40,19 @@
     display: flex;
     gap: 8px;
     align-items: center;
-    width: 470px;
+    width: 427px;
 }
-
+.functional-button-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 27px;
+    gap: 68px;
+}
+.btn-publish {
+    width: 395px;
+    height: 40px;
+}
 .plus-icon path {
     stroke: c.$blue-500;
 }

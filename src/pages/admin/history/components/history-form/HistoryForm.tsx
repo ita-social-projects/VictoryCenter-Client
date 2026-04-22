@@ -1,7 +1,8 @@
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { SectionCancelActionType } from '@/types/admin/programs';
 import { HistorySectionDto } from '@/types/common/history-sections';
-import { isHistoryTemplate } from '@/utils/functions/render-history-section';
+import { CreateHippotherapyProgramSectionDto } from '@/types/common/program-sections';
+import { isProgramSectionValid } from '@/validation/admin/program-schema/program-schema';
 import {
     createSectionDiscardAction,
     requestSectionCancel,
@@ -29,6 +30,7 @@ export interface HistoryFormProps {
     isFormDisabled?: boolean;
     onReplaceSection?: (sectionIndex: number) => void;
     onSectionsChange?: (sections: HistorySectionDto[]) => void;
+    onHasEditingSectionChange?: (hasEditingSection: boolean) => void;
     onSectionSaved?: () => void;
     onSectionDeleted?: (remainingSections: HistorySectionDto[]) => void;
     onRequestCancelSection?: (request: { type: SectionCancelActionType; onDiscard: () => void }) => void;
@@ -53,6 +55,7 @@ export const HistoryForm = forwardRef<HistoryFormRef, HistoryFormProps>(function
         isFormDisabled = false,
         onReplaceSection,
         onSectionsChange,
+        onHasEditingSectionChange,
         onSectionSaved,
         onSectionDeleted,
         onRequestCancelSection,
@@ -105,6 +108,10 @@ export const HistoryForm = forwardRef<HistoryFormRef, HistoryFormProps>(function
         });
     }, [sections]);
 
+    useEffect(() => {
+        onHasEditingSectionChange?.(sectionStates.some((state) => state.isEditing));
+    }, [sectionStates, onHasEditingSectionChange]);
+
     useImperativeHandle(
         ref,
         () => ({
@@ -124,6 +131,12 @@ export const HistoryForm = forwardRef<HistoryFormRef, HistoryFormProps>(function
                         isReplacing: false,
                     },
                 ]);
+
+                setTimeout(() => {
+                    sectionsContainerRef.current
+                        ?.querySelector(`[data-section-key="${sectionKey}"]`)
+                        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 50);
             },
             replaceSection(sectionIndex: number, newSection: HistorySectionDto) {
                 const newSections = [...localSectionsRef.current];
@@ -149,7 +162,16 @@ export const HistoryForm = forwardRef<HistoryFormRef, HistoryFormProps>(function
     );
 
     const sectionValidity = useMemo(
-        () => localSections.map((section) => isHistoryTemplate(section.template)),
+        () =>
+            localSections.map((section) => {
+                try {
+                    return section?.contents
+                        ? isProgramSectionValid(section as CreateHippotherapyProgramSectionDto, true)
+                        : false;
+                } catch {
+                    return false;
+                }
+            }),
         [localSections],
     );
 

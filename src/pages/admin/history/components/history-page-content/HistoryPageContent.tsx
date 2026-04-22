@@ -35,6 +35,7 @@ export const HistoryPageContent = () => {
     const [canPublish, setCanPublish] = useState(false);
     const [isPublishing, setIsPublishing] = useState(false);
     const [localSectionsCount, setLocalSectionsCount] = useState<number | null>(null);
+    const [hasActiveSectionForm, setHasActiveSectionForm] = useState(false);
     const {
         isSectionRemoveModalOpen,
         isSectionRevertModalOpen,
@@ -213,14 +214,33 @@ export const HistoryPageContent = () => {
                         sections={normalizedSections}
                         onReplaceSection={handleReplaceSection}
                         onSectionsChange={(s) => setLocalSectionsCount(s.length)}
+                        onHasEditingSectionChange={setHasActiveSectionForm}
                         onSectionSaved={handleSectionSaved}
                         onSectionDeleted={handleSectionDeleted}
                         onRequestCancelSection={handleRequestCancelSection}
                     />
                 )}
-                <Button onClick={handlePublish} buttonStyle="primary" disabled={!canPublish || isPublishing}>
-                    {HISTORY_TEXT.BUTTON.PUBLISH}
-                </Button>
+                <div className={styles['functional-button-container']}>
+                    {hasSections && !isAddModalOpen && !hasActiveSectionForm && (
+                        <Button
+                            className={styles['btn-add']}
+                            onClick={handleAddSection}
+                            buttonStyle="secondary"
+                            data-testid="add-section-button-empty"
+                        >
+                            {HISTORY_TEXT.BUTTON.ADD_SECTION}
+                            <PlusIcon className={styles['plus-icon']} />
+                        </Button>
+                    )}
+                    <Button
+                        className={styles['btn-publish']}
+                        onClick={handlePublish}
+                        buttonStyle="primary"
+                        disabled={!canPublish || isPublishing}
+                    >
+                        {HISTORY_TEXT.BUTTON.PUBLISH}
+                    </Button>
+                </div>
             </div>
             <AddSectionModal
                 isOpen={isAddModalOpen}

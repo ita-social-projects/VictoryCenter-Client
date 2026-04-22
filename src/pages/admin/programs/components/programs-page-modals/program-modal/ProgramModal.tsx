@@ -15,6 +15,7 @@ import { SECTIONS_TEXT } from '@/const/admin/sections';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ProgramsApi } from '@/services/api/admin/programs/programs-api';
 import { useGenericModal } from '@/hooks/admin/use-generic-modal/useGenericModal';
+import { useSectionCancelConfirmation } from '@/hooks/admin/use-section-cancel-confirmation/useSectionCancelConfirmation';
 import { GenericModalWrapper } from '@/components/admin/generic-modal-wrapper/GenericModalWrapper';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
@@ -50,11 +51,17 @@ export const ProgramModal = (props: ProgramModalProps) => {
     const program = isEditMode ? props.programToEdit : undefined;
     const onSuccess = isEditMode ? props.onEditProgram : props.onAddProgram;
     const { modalState, openModalActions, closeModalActions } = useModalsState();
+    const {
+        isSectionRemoveModalOpen,
+        isSectionRevertModalOpen,
+        pendingCancelActionType,
+        handleRequestCancelSection,
+        handleCloseSectionRemoveModal,
+        handleCloseSectionRevertModal,
+        handleConfirmRemoveSection,
+        handleConfirmRevertSection,
+    } = useSectionCancelConfirmation();
     const [sectionToReplace, setSectionToReplace] = useState<number | null>(null);
-    const [isSectionRemoveModalOpen, setIsSectionRemoveModalOpen] = useState(false);
-    const [isSectionRevertModalOpen, setIsSectionRevertModalOpen] = useState(false);
-    const [pendingCancelActionType, setPendingCancelActionType] = useState<SectionCancelActionType | null>(null);
-    const sectionDiscardActionRef = useRef<(() => void) | null>(null);
     const [isSectionSaveModalOpen, setIsSectionSaveModalOpen] = useState(false);
     const sectionSaveActionRef = useRef<(() => void) | null>(null);
 
@@ -195,49 +202,6 @@ export const ProgramModal = (props: ProgramModalProps) => {
         },
         [modalHookData.formRef, sectionToReplace],
     );
-
-    const handleRequestCancelSection = useCallback(
-        (request: { type: SectionCancelActionType; onDiscard: () => void }) => {
-            sectionDiscardActionRef.current = request.onDiscard;
-            setPendingCancelActionType(request.type);
-
-            switch (request.type) {
-                case SectionCancelActionType.RemoveSection:
-                    setIsSectionRemoveModalOpen(true);
-                    break;
-                case SectionCancelActionType.RevertSection:
-                case SectionCancelActionType.RevertAfterReplace:
-                case SectionCancelActionType.DiscardNewSection:
-                    setIsSectionRevertModalOpen(true);
-                    break;
-                default:
-                    break;
-            }
-        },
-        [],
-    );
-
-    const handleCloseSectionRemoveModal = useCallback(() => {
-        setIsSectionRemoveModalOpen(false);
-        setPendingCancelActionType(null);
-        sectionDiscardActionRef.current = null;
-    }, []);
-
-    const handleCloseSectionRevertModal = useCallback(() => {
-        setIsSectionRevertModalOpen(false);
-        setPendingCancelActionType(null);
-        sectionDiscardActionRef.current = null;
-    }, []);
-
-    const handleConfirmRemoveSection = useCallback(() => {
-        sectionDiscardActionRef.current?.();
-        handleCloseSectionRemoveModal();
-    }, [handleCloseSectionRemoveModal]);
-
-    const handleConfirmRevertSection = useCallback(() => {
-        sectionDiscardActionRef.current?.();
-        handleCloseSectionRevertModal();
-    }, [handleCloseSectionRevertModal]);
 
     const handleCloseAddSectionModal = useCallback(() => {
         closeModalActions.closeAddSectionModal();

@@ -106,6 +106,25 @@ const mockClient = {
 const mockToolbarOnAddSection = jest.fn();
 const refetchSectionsMock = jest.fn();
 
+const mockSingleSectionData = () => {
+    const sections = [
+        {
+            id: 1,
+            template: 6,
+            order: 0,
+            contents: [],
+        },
+    ];
+
+    mockedUseDataFetch.mockReturnValue({
+        data: sections,
+        error: null,
+        isLoading: false,
+        refetch: refetchSectionsMock,
+        setData: jest.fn(),
+    });
+};
+
 jest.mock('@/const/admin/history', () => ({
     HISTORY_TEXT: {
         BUTTON: {
@@ -271,22 +290,7 @@ describe('HistoryPageContent', () => {
     });
 
     it('shows delete section confirmation modal and executes discard on confirm', async () => {
-        const sections = [
-            {
-                id: 1,
-                template: 6,
-                order: 0,
-                contents: [],
-            },
-        ];
-
-        mockedUseDataFetch.mockReturnValue({
-            data: sections,
-            error: null,
-            isLoading: false,
-            refetch: refetchSectionsMock,
-            setData: jest.fn(),
-        });
+        mockSingleSectionData();
 
         render(<HistoryPageContent />);
 
@@ -304,22 +308,7 @@ describe('HistoryPageContent', () => {
     });
 
     it('shows unsaved changes confirmation and does not discard on cancel', async () => {
-        const sections = [
-            {
-                id: 1,
-                template: 6,
-                order: 0,
-                contents: [],
-            },
-        ];
-
-        mockedUseDataFetch.mockReturnValue({
-            data: sections,
-            error: null,
-            isLoading: false,
-            refetch: refetchSectionsMock,
-            setData: jest.fn(),
-        });
+        mockSingleSectionData();
 
         render(<HistoryPageContent />);
 

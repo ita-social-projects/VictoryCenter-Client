@@ -8,9 +8,10 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { SECTIONS_TEXT } from '@/const/admin/sections';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import { HistoryPageToolbar } from '../history-page-toolbar/HistoryPageToolbar';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback } from 'react';
 import { HistoryApi } from '@/services/api/admin/history/history-api';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { useSectionCancelConfirmation } from '@/hooks/admin/use-section-cancel-confirmation/useSectionCancelConfirmation';
 import { SectionCancelActionType } from '@/types/admin/programs';
 import { HistorySectionDto } from '@/types/common/history-sections';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
@@ -18,10 +19,16 @@ import { HistoryForm } from '../history-form/HistoryForm';
 
 export const HistoryPageContent = () => {
     const client = useAdminClient();
-    const sectionDiscardActionRef = useRef<(() => void) | null>(null);
-    const [isSectionRemoveModalOpen, setIsSectionRemoveModalOpen] = useState(false);
-    const [isSectionRevertModalOpen, setIsSectionRevertModalOpen] = useState(false);
-    const [pendingCancelActionType, setPendingCancelActionType] = useState<SectionCancelActionType | null>(null);
+    const {
+        isSectionRemoveModalOpen,
+        isSectionRevertModalOpen,
+        pendingCancelActionType,
+        handleRequestCancelSection,
+        handleCloseSectionRemoveModal,
+        handleCloseSectionRevertModal,
+        handleConfirmRemoveSection,
+        handleConfirmRevertSection,
+    } = useSectionCancelConfirmation();
 
     const getHistorySections = useCallback(async () => {
         const sections = await HistoryApi.fetchSections(client);
@@ -51,49 +58,6 @@ export const HistoryPageContent = () => {
     const handleRetrySections = useCallback(() => {
         void refetchSections();
     }, [refetchSections]);
-
-    const handleRequestCancelSection = useCallback(
-        (request: { type: SectionCancelActionType; onDiscard: () => void }) => {
-            sectionDiscardActionRef.current = request.onDiscard;
-            setPendingCancelActionType(request.type);
-
-            switch (request.type) {
-                case SectionCancelActionType.RemoveSection:
-                    setIsSectionRemoveModalOpen(true);
-                    break;
-                case SectionCancelActionType.RevertSection:
-                case SectionCancelActionType.RevertAfterReplace:
-                case SectionCancelActionType.DiscardNewSection:
-                    setIsSectionRevertModalOpen(true);
-                    break;
-                default:
-                    break;
-            }
-        },
-        [],
-    );
-
-    const handleCloseSectionRemoveModal = useCallback(() => {
-        setIsSectionRemoveModalOpen(false);
-        setPendingCancelActionType(null);
-        sectionDiscardActionRef.current = null;
-    }, []);
-
-    const handleCloseSectionRevertModal = useCallback(() => {
-        setIsSectionRevertModalOpen(false);
-        setPendingCancelActionType(null);
-        sectionDiscardActionRef.current = null;
-    }, []);
-
-    const handleConfirmRemoveSection = useCallback(() => {
-        sectionDiscardActionRef.current?.();
-        handleCloseSectionRemoveModal();
-    }, [handleCloseSectionRemoveModal]);
-
-    const handleConfirmRevertSection = useCallback(() => {
-        sectionDiscardActionRef.current?.();
-        handleCloseSectionRevertModal();
-    }, [handleCloseSectionRevertModal]);
 
     return (
         <div className={styles['history-page-wrapper']} data-testid="history-page-content">

@@ -20,6 +20,7 @@ interface SectionEditingState {
 
 export interface HistoryFormRef {
     addSection: (section: HistorySectionDto) => void;
+    replaceSection: (sectionIndex: number, newSection: HistorySectionDto) => void;
     getSections: () => HistorySectionDto[];
 }
 
@@ -121,6 +122,22 @@ export const HistoryForm = forwardRef<HistoryFormRef, HistoryFormProps>(function
                         isReplacing: false,
                     },
                 ]);
+            },
+            replaceSection(sectionIndex: number, newSection: HistorySectionDto) {
+                const newSections = [...localSectionsRef.current];
+                if (sectionIndex < 0 || sectionIndex >= newSections.length) {
+                    return;
+                }
+                newSections[sectionIndex] = newSection;
+                localSectionsRef.current = newSections;
+                setLocalSections(newSections);
+                setSectionStates((prev) =>
+                    prev.map((state, index) =>
+                        index === sectionIndex
+                            ? { ...state, isSaved: false, isEditing: true, isNew: false, isReplacing: true }
+                            : state,
+                    ),
+                );
             },
             getSections() {
                 return localSections;

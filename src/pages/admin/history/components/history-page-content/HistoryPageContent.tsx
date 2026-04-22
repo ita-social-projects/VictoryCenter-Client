@@ -81,6 +81,13 @@ export const HistoryPageContent = () => {
         (templateId: SectionTemplate) => {
             const currentSections = normalizedSections;
             if (sectionToReplace !== null) {
+                const sectionBeingReplaced = currentSections[sectionToReplace];
+                const newSection: HistorySectionDto = {
+                    template: templateId,
+                    order: sectionBeingReplaced?.order ?? sectionToReplace,
+                    contents: getInitialHistorySectionContents(templateId),
+                };
+                historyFormRef.current?.replaceSection(sectionToReplace, newSection);
             } else {
                 const nextOrder =
                     currentSections.length === 0

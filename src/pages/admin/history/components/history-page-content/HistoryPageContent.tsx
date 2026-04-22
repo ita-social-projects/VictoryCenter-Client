@@ -33,6 +33,7 @@ export const HistoryPageContent = () => {
     const [sectionToReplace, setSectionToReplace] = useState<number | null>(null);
     const [canPublish, setCanPublish] = useState(false);
     const [isPublishing, setIsPublishing] = useState(false);
+    const [localSectionsCount, setLocalSectionsCount] = useState<number | null>(null);
     const {
         isSectionRemoveModalOpen,
         isSectionRevertModalOpen,
@@ -64,7 +65,7 @@ export const HistoryPageContent = () => {
     const TEMPLATES = HISTORY_SUPPORTED_TEMPLATES;
 
     const normalizedSections = sections ?? [];
-    const hasSections = normalizedSections.length > 0;
+    const hasSections = localSectionsCount !== null ? localSectionsCount > 0 : normalizedSections.length > 0;
     const hasSectionsError = Boolean(sectionsError);
 
     const handleAddSection = () => {
@@ -113,6 +114,23 @@ export const HistoryPageContent = () => {
         setCanPublish(true);
     }, []);
 
+    const handleSectionDeleted = useCallback(
+        async (remainingSections: HistorySectionDto[]) => {
+            try {
+                const payload: CreateUpdateHistorySectionDto[] = remainingSections.map((s: HistorySectionDto) => ({
+                    template: s.template,
+                    order: s.order,
+                    contents: s.contents.map((c) => ({ ...c })),
+                }));
+                await HistoryApi.syncSections(client, payload);
+                addToast(HISTORY_TEXT.MESSAGE.PUBLISH_SUCCESS, ToastType.Success);
+            } catch {
+                addToast(HISTORY_TEXT.MESSAGE.PUBLISH_ERROR, ToastType.Error);
+            }
+        },
+        [client, addToast],
+    );
+
     const handlePublish = useCallback(async () => {
         setIsPublishing(true);
         try {
@@ -121,7 +139,7 @@ export const HistoryPageContent = () => {
             const payload: CreateUpdateHistorySectionDto[] = currentSections.map((s: HistorySectionDto) => ({
                 template: s.template,
                 order: s.order,
-                contents: s.contents,
+                contents: s.contents.map((c) => ({ ...c })),
             }));
 
             await HistoryApi.syncSections(client, payload);
@@ -180,7 +198,9 @@ export const HistoryPageContent = () => {
                         ref={historyFormRef}
                         sections={normalizedSections}
                         onReplaceSection={handleReplaceSection}
+                        onSectionsChange={(s) => setLocalSectionsCount(s.length)}
                         onSectionSaved={handleSectionSaved}
+                        onSectionDeleted={handleSectionDeleted}
                         onRequestCancelSection={handleRequestCancelSection}
                     />
                 )}

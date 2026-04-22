@@ -30,6 +30,7 @@ export interface HistoryFormProps {
     onReplaceSection?: (sectionIndex: number) => void;
     onSectionsChange?: (sections: HistorySectionDto[]) => void;
     onSectionSaved?: () => void;
+    onSectionDeleted?: (remainingSections: HistorySectionDto[]) => void;
     onRequestCancelSection?: (request: { type: SectionCancelActionType; onDiscard: () => void }) => void;
     onRequestSaveSection?: (request: { onConfirm: () => void }) => void;
 }
@@ -53,6 +54,7 @@ export const HistoryForm = forwardRef<HistoryFormRef, HistoryFormProps>(function
         onReplaceSection,
         onSectionsChange,
         onSectionSaved,
+        onSectionDeleted,
         onRequestCancelSection,
         onRequestSaveSection,
     },
@@ -140,10 +142,10 @@ export const HistoryForm = forwardRef<HistoryFormRef, HistoryFormProps>(function
                 );
             },
             getSections() {
-                return localSections;
+                return localSectionsRef.current;
             },
         }),
-        [localSections],
+        [],
     );
 
     const sectionValidity = useMemo(
@@ -213,8 +215,9 @@ export const HistoryForm = forwardRef<HistoryFormRef, HistoryFormProps>(function
 
             updateSections((prev) => prev.filter((_, sectionIndex) => sectionIndex !== index));
             setSectionStates((prev) => prev.filter((state) => state.sectionKey !== sectionKey));
+            onSectionDeleted?.(localSectionsRef.current);
         },
-        [getSectionIndex, updateSections],
+        [getSectionIndex, onSectionDeleted, updateSections],
     );
 
     const handleCancelSection = useCallback(

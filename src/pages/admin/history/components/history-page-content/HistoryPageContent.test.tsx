@@ -1,6 +1,8 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { HistoryPageContent } from './HistoryPageContent';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { SECTIONS_TEXT } from '@/const/admin/sections';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { HistoryApi } from '@/services/api/admin/history/history-api';
@@ -20,12 +22,77 @@ jest.mock('@/services/api/admin/history/history-api', () => ({
 }));
 
 const mockHistoryFormProps = jest.fn();
+const mockDeleteDiscardAction = jest.fn();
+const mockRevertDiscardAction = jest.fn();
 
 jest.mock('../history-form/HistoryForm', () => ({
-    HistoryForm: ({ sections }: { sections: unknown[] }) => {
-        mockHistoryFormProps({ sections });
+    HistoryForm: ({
+        sections,
+        onRequestCancelSection,
+    }: {
+        sections: unknown[];
+        onRequestCancelSection?: (request: { type: number; onDiscard: () => void }) => void;
+    }) => {
+        mockHistoryFormProps({ sections, onRequestCancelSection });
 
-        return <div data-testid="history-form" />;
+        return (
+            <div data-testid="history-form">
+                <button
+                    type="button"
+                    data-testid="request-delete-confirmation"
+                    onClick={() =>
+                        onRequestCancelSection?.({
+                            type: 0,
+                            onDiscard: mockDeleteDiscardAction,
+                        })
+                    }
+                >
+                    Request delete confirmation
+                </button>
+                <button
+                    type="button"
+                    data-testid="request-revert-confirmation"
+                    onClick={() =>
+                        onRequestCancelSection?.({
+                            type: 1,
+                            onDiscard: mockRevertDiscardAction,
+                        })
+                    }
+                >
+                    Request revert confirmation
+                </button>
+            </div>
+        );
+    },
+}));
+
+jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
+    ConfirmationModal: ({
+        isOpen,
+        title,
+        onConfirm,
+        onCancel,
+    }: {
+        isOpen: boolean;
+        title: string;
+        onConfirm: () => void;
+        onCancel: () => void;
+    }) => {
+        if (!isOpen) {
+            return null;
+        }
+
+        return (
+            <div data-testid="question-modal">
+                <div data-testid="question-title">{title}</div>
+                <button type="button" data-testid="question-confirm" onClick={onConfirm}>
+                    Confirm
+                </button>
+                <button type="button" data-testid="question-cancel" onClick={onCancel}>
+                    Cancel
+                </button>
+            </div>
+        );
     },
 }));
 
@@ -38,6 +105,25 @@ const mockClient = {
 
 const mockToolbarOnAddSection = jest.fn();
 const refetchSectionsMock = jest.fn();
+
+const mockSingleSectionData = () => {
+    const sections = [
+        {
+            id: 1,
+            template: 6,
+            order: 0,
+            contents: [],
+        },
+    ];
+
+    mockedUseDataFetch.mockReturnValue({
+        data: sections,
+        error: null,
+        isLoading: false,
+        refetch: refetchSectionsMock,
+        setData: jest.fn(),
+    });
+};
 
 jest.mock('@/const/admin/history', () => ({
     HISTORY_TEXT: {
@@ -78,6 +164,8 @@ describe('HistoryPageContent', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
+        mockDeleteDiscardAction.mockClear();
+        mockRevertDiscardAction.mockClear();
         mockedUseAdminClient.mockReturnValue(mockClient as any);
         mockClient.get.mockResolvedValue({ data: [] });
         mockedHistoryApi.fetchSections.mockResolvedValue([]);
@@ -196,7 +284,43 @@ describe('HistoryPageContent', () => {
         expect(mockHistoryFormProps).toHaveBeenCalledWith(
             expect.objectContaining({
                 sections,
+                onRequestCancelSection: expect.any(Function),
             }),
         );
+    });
+
+    it('shows delete section confirmation modal and executes discard on confirm', async () => {
+        mockSingleSectionData();
+
+        render(<HistoryPageContent />);
+
+        await user.click(screen.getByTestId('request-delete-confirmation'));
+
+        expect(screen.getByTestId('question-title')).toHaveTextContent(
+            SECTIONS_TEXT.SECTION.MODAL.DELETE_SECTION_TITLE,
+        );
+        expect(mockDeleteDiscardAction).not.toHaveBeenCalled();
+
+        await user.click(screen.getByTestId('question-confirm'));
+
+        expect(mockDeleteDiscardAction).toHaveBeenCalledTimes(1);
+        expect(screen.queryByTestId('question-modal')).not.toBeInTheDocument();
+    });
+
+    it('shows unsaved changes confirmation and does not discard on cancel', async () => {
+        mockSingleSectionData();
+
+        render(<HistoryPageContent />);
+
+        await user.click(screen.getByTestId('request-revert-confirmation'));
+
+        expect(screen.getByTestId('question-title')).toHaveTextContent(
+            COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE,
+        );
+
+        await user.click(screen.getByTestId('question-cancel'));
+
+        expect(mockRevertDiscardAction).not.toHaveBeenCalled();
+        expect(screen.queryByTestId('question-modal')).not.toBeInTheDocument();
     });
 });

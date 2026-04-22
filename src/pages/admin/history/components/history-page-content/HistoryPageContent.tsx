@@ -1,15 +1,19 @@
 import styles from './HistoryPageContent.module.scss';
 import { Button } from '@/components/admin/button/Button';
+import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import NotFoundIcon from '@/assets/icons/not-found.svg';
 import { HISTORY_TEXT } from '@/const/admin/history';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { SECTIONS_TEXT } from '@/const/admin/sections';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import { HistoryPageToolbar } from '../history-page-toolbar/HistoryPageToolbar';
 import { useCallback, useRef, useState } from 'react';
 import { HistoryApi } from '@/services/api/admin/history/history-api';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { CreateUpdateHistorySectionDto, HistorySectionDto } from '@/types/common/history-sections';
+import { useSectionCancelConfirmation } from '@/hooks/admin/use-section-cancel-confirmation/useSectionCancelConfirmation';
+import { SectionCancelActionType } from '@/types/admin/programs';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { HistoryForm, HistoryFormRef } from '../history-form/HistoryForm';
 import {
@@ -20,7 +24,6 @@ import { SectionTemplate } from '@/types/common/sections';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { ToastType } from '@/types/admin/toast';
 import { AddSectionModal } from '@/pages/admin/programs/components/programs-page-modals/add-section-modal/AddSectionModal';
-import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
 
 export const HistoryPageContent = () => {
     const client = useAdminClient();
@@ -30,6 +33,17 @@ export const HistoryPageContent = () => {
     const [sectionToReplace, setSectionToReplace] = useState<number | null>(null);
     const [canPublish, setCanPublish] = useState(false);
     const [isPublishing, setIsPublishing] = useState(false);
+    const {
+        isSectionRemoveModalOpen,
+        isSectionRevertModalOpen,
+        pendingCancelActionType,
+        handleRequestCancelSection,
+        handleCloseSectionRemoveModal,
+        handleCloseSectionRevertModal,
+        handleConfirmRemoveSection,
+        handleConfirmRevertSection,
+    } = useSectionCancelConfirmation();
+
     const getHistorySections = useCallback(async () => {
         const sections = await HistoryApi.fetchSections(client);
         return sections;
@@ -160,6 +174,7 @@ export const HistoryPageContent = () => {
                         sections={normalizedSections}
                         onReplaceSection={handleReplaceSection}
                         onSectionSaved={handleSectionSaved}
+                        onRequestCancelSection={handleRequestCancelSection}
                     />
                 )}
                 <Button onClick={handlePublish} buttonStyle="primary" disabled={!canPublish || isPublishing}>
@@ -171,6 +186,26 @@ export const HistoryPageContent = () => {
                 onClose={() => setIsAddModalOpen(false)}
                 onSelectTemplate={handleTemplateSelect}
                 templates={TEMPLATES}
+            />
+            <ConfirmationModal
+                isOpen={isSectionRemoveModalOpen}
+                onClose={handleCloseSectionRemoveModal}
+                title={SECTIONS_TEXT.SECTION.MODAL.DELETE_SECTION_TITLE}
+                onConfirm={handleConfirmRemoveSection}
+                onCancel={handleCloseSectionRemoveModal}
+            />
+            <ConfirmationModal
+                isOpen={isSectionRevertModalOpen}
+                onClose={handleCloseSectionRevertModal}
+                title={
+                    pendingCancelActionType === SectionCancelActionType.RevertAfterReplace
+                        ? SECTIONS_TEXT.SECTION.MODAL.REPLACE_TEMPLATE_TITLE
+                        : pendingCancelActionType === SectionCancelActionType.DiscardNewSection
+                          ? SECTIONS_TEXT.SECTION.MODAL.UNSAVED_CHANGES_TITLE
+                          : COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE
+                }
+                onConfirm={handleConfirmRevertSection}
+                onCancel={handleCloseSectionRevertModal}
             />
         </div>
     );

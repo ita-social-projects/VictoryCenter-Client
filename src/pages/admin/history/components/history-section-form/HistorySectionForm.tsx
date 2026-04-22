@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ReactComponent as ChangeIcon } from '@/assets/icons/change.svg';
-import { Button } from '@/components/admin/button/Button';
-import { IconButton } from '@/components/admin/icon-button/IconButton';
-import { SECTIONS_TEXT } from '@/const/admin/sections';
-import { ACTION_ICONS } from '@/const/common/action-icons';
+import {
+    createSectionFormActionsClassNames,
+    SectionFormActions,
+} from '@/components/admin/section-form-actions/SectionFormActions';
 import { ImageValues } from '@/types/common/image';
 import { HistorySectionContentDto, HistorySectionDto } from '@/types/common/history-sections';
 import { ContentType } from '@/types/common/section-contents';
@@ -17,6 +16,7 @@ import { buildSectionCancelOptions } from '@/utils/functions/section-cancel-flow
 import styles from './HistorySectionForm.module.scss';
 
 const SUPPORTED_CONTENT_TYPES = new Set<ContentType>([ContentType.Title, ContentType.Description, ContentType.Image]);
+const sectionFormActionsClassNames = createSectionFormActionsClassNames(styles);
 
 const getOrderedContentsByType = (
     contents: HistorySectionContentDto[],
@@ -169,6 +169,7 @@ export const HistorySectionForm = ({
 
     const sectionModeRef = useRef(sectionMode);
     const onEditStateChangeRef = useRef(onEditStateChange);
+    const onSectionChangeRef = useRef(onSectionChange);
     const lastEmittedSectionRef = useRef<HistorySectionDto | null>(null);
     const localSectionRef = useRef<HistorySectionDto>(localSection);
     localSectionRef.current = localSection;
@@ -180,6 +181,10 @@ export const HistorySectionForm = ({
     useEffect(() => {
         onEditStateChangeRef.current = onEditStateChange;
     }, [onEditStateChange]);
+
+    useEffect(() => {
+        onSectionChangeRef.current = onSectionChange;
+    }, [onSectionChange]);
 
     useEffect(() => {
         if (lastEmittedSectionRef.current === section) {
@@ -201,22 +206,19 @@ export const HistorySectionForm = ({
 
         if (preparedSection !== section) {
             lastEmittedSectionRef.current = preparedSection;
-            onSectionChange?.(preparedSection);
+            onSectionChangeRef.current?.(preparedSection);
         }
-    }, [section, isNewSection, isReplacingTemplate, onSectionChange]);
+    }, [section, isNewSection, isReplacingTemplate]);
 
     useEffect(() => {
         onEditStateChangeRef.current?.(sectionMode === SectionMode.Edit);
     }, [sectionMode]);
 
-    const emitSectionChange = useCallback(
-        (updatedSection: HistorySectionDto) => {
-            lastEmittedSectionRef.current = updatedSection;
-            setIsDirty(true);
-            onSectionChange?.(updatedSection);
-        },
-        [onSectionChange],
-    );
+    const emitSectionChange = useCallback((updatedSection: HistorySectionDto) => {
+        lastEmittedSectionRef.current = updatedSection;
+        setIsDirty(true);
+        onSectionChangeRef.current?.(updatedSection);
+    }, []);
 
     const handleTitleChange = useCallback(
         (value: string) => {
@@ -393,71 +395,24 @@ export const HistorySectionForm = ({
 
     return (
         <div className={styles['section-container']} data-section-key={sectionKey}>
-            {sectionMode === SectionMode.View && (
-                <div className={styles['actions-section']}>
-                    <div className={styles['order-controls']}>
-                        {!isFirstSection && (
-                            <button
-                                type="button"
-                                onClick={onMoveUpSection}
-                                className={`${styles['icon-button']} ${styles['up-button']}`}
-                                aria-label="Move up section"
-                            />
-                        )}
-                        {!isLastSection && (
-                            <button
-                                type="button"
-                                onClick={onMoveDownSection}
-                                className={`${styles['icon-button']} ${styles['down-button']}`}
-                                aria-label="Move down section"
-                            />
-                        )}
-                    </div>
-                    <div className={styles['hover-buttons']}>
-                        <IconButton
-                            type="button"
-                            onClick={handleEditClick}
-                            className={`${styles['icon-button']} ${styles['edit-button']}`}
-                            aria-label="Edit section"
-                            DefaultIcon={ACTION_ICONS.edit.default}
-                            FilledIcon={ACTION_ICONS.edit.hover}
-                        />
-                        <IconButton
-                            type="button"
-                            onClick={handleDeleteClick}
-                            className={`${styles['icon-button']} ${styles['delete-button']}`}
-                            aria-label="Delete section"
-                            DefaultIcon={ACTION_ICONS.delete.default}
-                            FilledIcon={ACTION_ICONS.delete.hover}
-                        />
-                        <button
-                            type="button"
-                            onClick={handleReplaceClick}
-                            className={`${styles['icon-button']} ${styles['change-button']}`}
-                            aria-label="Replace section"
-                        >
-                            <ChangeIcon />
-                        </button>
-                    </div>
-                </div>
-            )}
-            <div className={styles.content}>{sectionToRender}</div>
-            <div className={styles['actions-container']}>
-                {sectionMode !== SectionMode.View && (
-                    <div className={styles.actions}>
-                        <Button buttonStyle="secondary" onClick={handleCancelClick} disabled={isDisabled}>
-                            {SECTIONS_TEXT.BUTTON.CANCEL}
-                        </Button>
-                        <Button
-                            buttonStyle="primary"
-                            onClick={handleSaveClick}
-                            disabled={!isDirty || isDisabled || !isSectionSaveValid}
-                        >
-                            {SECTIONS_TEXT.BUTTON.SAVE}
-                        </Button>
-                    </div>
-                )}
-            </div>
+            <SectionFormActions
+                sectionMode={sectionMode}
+                isFirstSection={isFirstSection}
+                isLastSection={isLastSection}
+                isDisabled={isDisabled}
+                isDirty={isDirty}
+                isSectionSaveValid={isSectionSaveValid}
+                classNames={sectionFormActionsClassNames}
+                onMoveUpSection={onMoveUpSection}
+                onMoveDownSection={onMoveDownSection}
+                onEditClick={handleEditClick}
+                onDeleteClick={handleDeleteClick}
+                onReplaceClick={handleReplaceClick}
+                onCancelClick={handleCancelClick}
+                onSaveClick={handleSaveClick}
+            >
+                {sectionToRender}
+            </SectionFormActions>
         </div>
     );
 };

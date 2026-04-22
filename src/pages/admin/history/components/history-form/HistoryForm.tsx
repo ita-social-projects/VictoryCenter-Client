@@ -41,6 +41,10 @@ const createSectionState = (sectionKey: string): SectionEditingState => ({
     isReplacing: false,
 });
 
+const getSectionsSyncSignature = (sections: HistorySectionDto[]): string => {
+    return sections.map((section) => `${section.id}:${section.order}`).join('|');
+};
+
 export const HistoryForm = forwardRef<HistoryFormRef, HistoryFormProps>(function HistoryForm(
     {
         sections,
@@ -61,11 +65,21 @@ export const HistoryForm = forwardRef<HistoryFormRef, HistoryFormProps>(function
     const sectionsContainerRef = useRef<HTMLDivElement>(null);
     const sectionStatesRef = useRef(sectionStates);
     const nextSectionKeyRef = useRef(sections.length);
+    const lastSectionsSyncSignatureRef = useRef(getSectionsSyncSignature(sections));
 
     sectionStatesRef.current = sectionStates;
+    const localSectionsRef = useRef(localSections);
 
     useEffect(() => {
+        const nextSectionsSyncSignature = getSectionsSyncSignature(sections);
+        if (lastSectionsSyncSignatureRef.current === nextSectionsSyncSignature) {
+            return;
+        }
+
+        lastSectionsSyncSignatureRef.current = nextSectionsSyncSignature;
+
         setLocalSections(sections);
+        localSectionsRef.current = sections;
         setSectionStates((prev) => {
             if (prev.length === sections.length) return prev;
 
@@ -94,7 +108,9 @@ export const HistoryForm = forwardRef<HistoryFormRef, HistoryFormProps>(function
             addSection(section: HistorySectionDto) {
                 nextSectionKeyRef.current += 1;
                 const sectionKey = `history-section-${nextSectionKeyRef.current}`;
-                setLocalSections((prev) => [...prev, section]);
+                const newSections = [...localSectionsRef.current, section];
+                localSectionsRef.current = newSections;
+                setLocalSections(newSections);
                 setSectionStates((prev) => [
                     ...prev,
                     {
@@ -129,11 +145,10 @@ export const HistoryForm = forwardRef<HistoryFormRef, HistoryFormProps>(function
 
     const updateSections = useCallback(
         (updater: (prev: HistorySectionDto[]) => HistorySectionDto[]) => {
-            setLocalSections((prev) => {
-                const updatedSections = updater(prev);
-                onSectionsChange?.(updatedSections);
-                return updatedSections;
-            });
+            const updatedSections = updater(localSectionsRef.current);
+            localSectionsRef.current = updatedSections;
+            setLocalSections(updatedSections);
+            onSectionsChange?.(updatedSections);
         },
         [onSectionsChange],
     );

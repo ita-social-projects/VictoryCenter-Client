@@ -12,17 +12,3 @@
     height: 1px;
     background-color: c.$grey-700;
 }
-
-.add-section-wrapper {
-    display: flex;
-    justify-content: center;
-    margin: 0 0 64px;
-
-    button {
-        min-width: 325px;
-    }
-}
-
-.plus-icon path {
-    stroke: c.$blue-500;
-}

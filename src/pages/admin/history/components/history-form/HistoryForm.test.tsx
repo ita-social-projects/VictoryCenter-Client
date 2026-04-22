@@ -118,6 +118,14 @@ const createSections = (): HistorySectionDto[] => [
     createSection(2, SectionTemplate.TextOnly, 1),
 ];
 
+const triggerDeleteAndDiscard = (testId: string, mockCancelFn: jest.Mock) => {
+    fireEvent.click(screen.getByTestId(testId));
+    const { onDiscard } = mockCancelFn.mock.calls[mockCancelFn.mock.calls.length - 1][0];
+    act(() => {
+        onDiscard();
+    });
+};
+
 describe('HistoryForm', () => {
     beforeAll(() => {
         Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', {
@@ -181,32 +189,24 @@ describe('HistoryForm', () => {
     });
 
     it('requests deletion confirmation and removes section on discard', () => {
-        const sections = createSections();
-        const onSectionsChange = jest.fn();
-        const onRequestCancelSection = jest.fn();
+    const sections = createSections();
+    const onSectionsChange = jest.fn();
+    const onRequestCancelSection = jest.fn();
 
-        render(
-            <HistoryForm
-                sections={sections}
-                onSectionsChange={onSectionsChange}
-                onRequestCancelSection={onRequestCancelSection}
-            />,
-        );
+    render(
+        <HistoryForm
+            sections={sections}
+            onSectionsChange={onSectionsChange}
+            onRequestCancelSection={onRequestCancelSection}
+        />,
+    );
 
-        fireEvent.click(screen.getByTestId('delete-history-section-1'));
+    triggerDeleteAndDiscard('delete-history-section-1', onRequestCancelSection);
 
-        expect(onRequestCancelSection).toHaveBeenCalledWith(
-            expect.objectContaining({
-                type: SectionCancelActionType.RemoveSection,
-                onDiscard: expect.any(Function),
-            }),
-        );
-
-        const removeRequest = onRequestCancelSection.mock.calls[0][0] as { onDiscard: () => void };
-        removeRequest.onDiscard();
-
-        expect(onSectionsChange).toHaveBeenLastCalledWith([expect.objectContaining({ id: 2 })]);
-    });
+    expect(onSectionsChange).toHaveBeenLastCalledWith([
+        expect.objectContaining({ id: 2 })
+    ]);
+});
 
     it('maps cancel requests to expected action types', () => {
         const sections = createSections();
@@ -360,25 +360,24 @@ describe('HistoryForm', () => {
     });
 
     it('invokes onSectionDeleted with remaining sections after delete discard', () => {
-        const sections = createSections();
-        const onRequestCancelSection = jest.fn();
-        const onSectionDeleted = jest.fn();
+    const sections = createSections();
+    const onRequestCancelSection = jest.fn();
+    const onSectionDeleted = jest.fn();
 
-        render(
-            <HistoryForm
-                sections={sections}
-                onRequestCancelSection={onRequestCancelSection}
-                onSectionDeleted={onSectionDeleted}
-            />,
-        );
+    render(
+        <HistoryForm
+            sections={sections}
+            onRequestCancelSection={onRequestCancelSection}
+            onSectionDeleted={onSectionDeleted}
+        />,
+    );
 
-        fireEvent.click(screen.getByTestId('delete-history-section-1'));
+    triggerDeleteAndDiscard('delete-history-section-1', onRequestCancelSection);
 
-        const removeRequest = onRequestCancelSection.mock.calls[0][0] as { onDiscard: () => void };
-        removeRequest.onDiscard();
-
-        expect(onSectionDeleted).toHaveBeenCalledWith([expect.objectContaining({ id: 2 })]);
-    });
+    expect(onSectionDeleted).toHaveBeenCalledWith([
+        expect.objectContaining({ id: 2 })
+    ]);
+});
 
     it('supports imperative ref methods addSection, replaceSection and getSections', () => {
         const sections = createSections();

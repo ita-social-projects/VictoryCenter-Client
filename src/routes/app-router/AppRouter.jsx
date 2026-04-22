@@ -27,6 +27,7 @@ import { CompanyProfileContent } from '@/pages/admin/company-profile/components/
 import { LanguageSyncWrapper } from '@/components/public/language-sync-wrapper/LanguageSyncWrapper';
 import { ReportsPanelContent } from '@/pages/admin/reports/components/reports-panel-content/ReportsPanelContent';
 import { HistoryPageContent } from '@/pages/admin/history/components/history-page-content/HistoryPageContent';
+import { MainPageContent } from '@/pages/admin/main/components/main-page-content/MainPageContent';
 
 export const AppRouter = () => {
     const PublicContent = () => (
@@ -78,6 +79,7 @@ export const AppRouter = () => {
                             <Route path={ADMIN_ROUTES.PROFILE_COMPANY.PATH} element={<CompanyProfileContent />} />
                             <Route path={ADMIN_ROUTES.REPORTS.PATH} element={<ReportsPanelContent />} />
                             <Route path={ADMIN_ROUTES.HISTORY.PATH} element={<HistoryPageContent />} />
+                            <Route path={ADMIN_ROUTES.MAIN.PATH} element={<MainPageContent />} />
                         </Route>
                     </Route>
                 </Route>

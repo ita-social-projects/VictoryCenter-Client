@@ -155,6 +155,22 @@ export const ProgramModal = (props: ProgramModalProps) => {
 
     const modalHookData = useGenericModal<ProgramFormValues, HippotherapyProgram, ProgramFormRef>(modalConfig);
 
+    const TEMPLATES = [
+        SectionTemplate.QuadImagesBottom,
+        SectionTemplate.DualImagesBottom,
+        SectionTemplate.TextOnly,
+        SectionTemplate.TripleImagesBottom,
+        SectionTemplate.SingleImageBottom,
+        SectionTemplate.SingleImageTop,
+        SectionTemplate.SingleImageRight,
+        SectionTemplate.SingleTitleQuintupleDescription,
+        SectionTemplate.DualTitleDescriptionPairs,
+        SectionTemplate.TripleTitleDescriptionPairs,
+        SectionTemplate.QuadTitleDescriptionPairs,
+        SectionTemplate.SingleTitleDescriptionAuthorPairs,
+        SectionTemplate.SingleTitleQuestionAnswerPairs,
+    ];
+
     const handleLanguageChange = useCallback((_: string) => {
         // TODO: Implement language selection
     }, []);
@@ -321,6 +337,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
                 isOpen={modalState.isAddSectionModalOpen}
                 onClose={handleCloseAddSectionModal}
                 onSelectTemplate={handleTemplateSelect}
+                templates={TEMPLATES}
             />
 
             <ConfirmationModal

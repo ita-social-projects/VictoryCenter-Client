@@ -6,16 +6,30 @@ import { HISTORY_TEXT } from '@/const/admin/history';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import { HistoryPageToolbar } from '../history-page-toolbar/HistoryPageToolbar';
-import { useCallback } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { HistoryApi } from '@/services/api/admin/history/history-api';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
-import { HistorySectionDto } from '@/types/common/history-sections';
+import { CreateUpdateHistorySectionDto, HistorySectionDto } from '@/types/common/history-sections';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
-import { HistoryForm } from '../history-form/HistoryForm';
+import { HistoryForm, HistoryFormRef } from '../history-form/HistoryForm';
+import {
+    getInitialHistorySectionContents,
+    HISTORY_SUPPORTED_TEMPLATES,
+} from '@/utils/functions/render-history-section';
+import { SectionTemplate } from '@/types/common/sections';
+import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
+import { ToastType } from '@/types/admin/toast';
+import { AddSectionModal } from '@/pages/admin/programs/components/programs-page-modals/add-section-modal/AddSectionModal';
+import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
 
 export const HistoryPageContent = () => {
     const client = useAdminClient();
-
+    const { addToast } = useToast();
+    const historyFormRef = useRef<HistoryFormRef>(null);
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [sectionToReplace, setSectionToReplace] = useState<number | null>(null);
+    const [canPublish, setCanPublish] = useState(false);
+    const [isPublishing, setIsPublishing] = useState(false);
     const getHistorySections = useCallback(async () => {
         const sections = await HistoryApi.fetchSections(client);
         return sections;
@@ -33,17 +47,72 @@ export const HistoryPageContent = () => {
         autoFetchDisabled: false,
     });
 
+    const TEMPLATES = HISTORY_SUPPORTED_TEMPLATES;
+
     const normalizedSections = sections ?? [];
     const hasSections = normalizedSections.length > 0;
     const hasSectionsError = Boolean(sectionsError);
 
     const handleAddSection = () => {
-        // TODO: add section creation flow will be implemented in a dedicated modal.
+        setSectionToReplace(null);
+        setIsAddModalOpen(true);
     };
+
+    const handleReplaceSection = useCallback((sectionIndex: number) => {
+        setSectionToReplace(sectionIndex);
+        setIsAddModalOpen(true);
+    }, []);
+
+    const handleTemplateSelect = useCallback(
+        (templateId: SectionTemplate) => {
+            const currentSections = normalizedSections;
+            if (sectionToReplace !== null) {
+            } else {
+                const nextOrder =
+                    currentSections.length === 0
+                        ? 0
+                        : Math.max(...currentSections.map((s: HistorySectionDto) => s.order)) + 1;
+                const newSection: HistorySectionDto = {
+                    template: templateId,
+                    order: nextOrder,
+                    contents: getInitialHistorySectionContents(templateId),
+                };
+                historyFormRef.current?.addSection(newSection);
+            }
+            setSectionToReplace(null);
+        },
+        [sectionToReplace, normalizedSections],
+    );
 
     const handleRetrySections = useCallback(() => {
         void refetchSections();
     }, [refetchSections]);
+
+    const handleSectionSaved = useCallback(() => {
+        setCanPublish(true);
+    }, []);
+
+    const handlePublish = useCallback(async () => {
+        setIsPublishing(true);
+        try {
+            const currentSections = historyFormRef.current?.getSections() ?? [];
+
+            const payload: CreateUpdateHistorySectionDto[] = currentSections.map((s: HistorySectionDto) => ({
+                template: s.template,
+                order: s.order,
+                contents: s.contents,
+            }));
+
+            await HistoryApi.syncSections(client, payload);
+            addToast(HISTORY_TEXT.MESSAGE.PUBLISH_SUCCESS, ToastType.Success);
+            setCanPublish(false);
+            void refetchSections();
+        } catch {
+            addToast(HISTORY_TEXT.MESSAGE.PUBLISH_ERROR, ToastType.Error);
+        } finally {
+            setIsPublishing(false);
+        }
+    }, [client, refetchSections, addToast]);
 
     return (
         <div className={styles['history-page-wrapper']} data-testid="history-page-content">
@@ -85,10 +154,24 @@ export const HistoryPageContent = () => {
                     </div>
                 )}
 
-                {!isSectionsLoading && !hasSectionsError && hasSections && (
-                    <HistoryForm sections={normalizedSections} />
+                {!isSectionsLoading && !hasSectionsError && (
+                    <HistoryForm
+                        ref={historyFormRef}
+                        sections={normalizedSections}
+                        onReplaceSection={handleReplaceSection}
+                        onSectionSaved={handleSectionSaved}
+                    />
                 )}
+                <Button onClick={handlePublish} buttonStyle="primary" disabled={!canPublish || isPublishing}>
+                    {HISTORY_TEXT.BUTTON.PUBLISH}
+                </Button>
             </div>
+            <AddSectionModal
+                isOpen={isAddModalOpen}
+                onClose={() => setIsAddModalOpen(false)}
+                onSelectTemplate={handleTemplateSelect}
+                templates={TEMPLATES}
+            />
         </div>
     );
 };

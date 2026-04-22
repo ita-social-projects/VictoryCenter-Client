@@ -21,7 +21,7 @@ export interface HistorySectionDto {
     contents: HistorySectionContentDto[];
 }
 
-export interface CreateUpdateHistorySectionDto{
+export interface CreateUpdateHistorySectionDto {
     template: SectionTemplate;
     order: number;
     contents: CreateHistorySectionContentDto[];

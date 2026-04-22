@@ -234,9 +234,7 @@ describe('TitleDescriptionCard', () => {
         });
 
         it('should display title as heading', () => {
-            render(
-                <TitleDescriptionCard card={baseCard} index={0} mode={SectionMode.View} template={TEMPLATE} />,
-            );
+            render(<TitleDescriptionCard card={baseCard} index={0} mode={SectionMode.View} template={TEMPLATE} />);
 
             expect(screen.getByText('Test Title')).toBeInTheDocument();
         });
@@ -260,9 +258,7 @@ describe('TitleDescriptionCard', () => {
                 items: [],
             });
 
-            render(
-                <TitleDescriptionCard card={baseCard} index={0} mode={SectionMode.View} template={TEMPLATE} />,
-            );
+            render(<TitleDescriptionCard card={baseCard} index={0} mode={SectionMode.View} template={TEMPLATE} />);
 
             expect(screen.getByText('Intro text')).toBeInTheDocument();
         });

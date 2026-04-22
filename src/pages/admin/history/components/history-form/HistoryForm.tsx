@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { SectionCancelActionType } from '@/types/admin/programs';
 import { HistorySectionDto } from '@/types/common/history-sections';
 import { isHistoryTemplate } from '@/utils/functions/render-history-section';
@@ -18,11 +18,17 @@ interface SectionEditingState {
     isReplacing: boolean;
 }
 
+export interface HistoryFormRef {
+    addSection: (section: HistorySectionDto) => void;
+    getSections: () => HistorySectionDto[];
+}
+
 export interface HistoryFormProps {
     sections: HistorySectionDto[];
     isFormDisabled?: boolean;
     onReplaceSection?: (sectionIndex: number) => void;
     onSectionsChange?: (sections: HistorySectionDto[]) => void;
+    onSectionSaved?: () => void;
     onRequestCancelSection?: (request: { type: SectionCancelActionType; onDiscard: () => void }) => void;
     onRequestSaveSection?: (request: { onConfirm: () => void }) => void;
 }
@@ -35,14 +41,18 @@ const createSectionState = (sectionKey: string): SectionEditingState => ({
     isReplacing: false,
 });
 
-export const HistoryForm = ({
-    sections,
-    isFormDisabled = false,
-    onReplaceSection,
-    onSectionsChange,
-    onRequestCancelSection,
-    onRequestSaveSection,
-}: HistoryFormProps) => {
+export const HistoryForm = forwardRef<HistoryFormRef, HistoryFormProps>(function HistoryForm(
+    {
+        sections,
+        isFormDisabled = false,
+        onReplaceSection,
+        onSectionsChange,
+        onSectionSaved,
+        onRequestCancelSection,
+        onRequestSaveSection,
+    },
+    ref,
+) {
     const [localSections, setLocalSections] = useState<HistorySectionDto[]>(sections);
     const [sectionStates, setSectionStates] = useState<SectionEditingState[]>(() => {
         return sections.map((_, index) => createSectionState(`history-section-${index + 1}`));
@@ -57,22 +67,51 @@ export const HistoryForm = ({
     useEffect(() => {
         setLocalSections(sections);
         setSectionStates((prev) => {
-            if (prev.length === sections.length) {
-                return prev;
-            }
+            if (prev.length === sections.length) return prev;
 
             if (prev.length > sections.length) {
                 return prev.slice(0, sections.length);
             }
-
             const additional = Array.from({ length: sections.length - prev.length }, () => {
                 nextSectionKeyRef.current += 1;
-                return createSectionState(`history-section-${nextSectionKeyRef.current}`);
+                const sectionKey = `history-section-${nextSectionKeyRef.current}`;
+                return {
+                    sectionKey,
+                    isSaved: false,
+                    isEditing: true,
+                    isNew: true,
+                    isReplacing: false,
+                };
             });
 
             return [...prev, ...additional];
         });
     }, [sections]);
+
+    useImperativeHandle(
+        ref,
+        () => ({
+            addSection(section: HistorySectionDto) {
+                nextSectionKeyRef.current += 1;
+                const sectionKey = `history-section-${nextSectionKeyRef.current}`;
+                setLocalSections((prev) => [...prev, section]);
+                setSectionStates((prev) => [
+                    ...prev,
+                    {
+                        sectionKey,
+                        isSaved: false,
+                        isEditing: true,
+                        isNew: true,
+                        isReplacing: false,
+                    },
+                ]);
+            },
+            getSections() {
+                return localSections;
+            },
+        }),
+        [localSections],
+    );
 
     const sectionValidity = useMemo(
         () => localSections.map((section) => isHistoryTemplate(section.template)),
@@ -106,8 +145,9 @@ export const HistoryForm = ({
     const handleSaveSection = useCallback(
         (sectionKey: string) => {
             updateSectionState(sectionKey, { isSaved: true, isNew: false, isReplacing: false });
+            onSectionSaved?.();
         },
-        [updateSectionState],
+        [updateSectionState, onSectionSaved],
     );
 
     const handleSectionChange = useCallback(
@@ -292,4 +332,4 @@ export const HistoryForm = ({
             })}
         </div>
     );
-};
+});

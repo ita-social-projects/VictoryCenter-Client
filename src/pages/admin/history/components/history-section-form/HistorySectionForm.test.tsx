@@ -237,6 +237,20 @@ describe('HistorySectionForm', () => {
         });
     });
 
+    it('keeps cancel active and save disabled when section enters edit mode without changes', () => {
+        const props = createProps();
+
+        render(<HistorySectionForm {...props} />);
+
+        fireEvent.click(screen.getByRole('button', { name: 'Edit section' }));
+
+        const cancelButton = screen.getByRole('button', { name: SECTIONS_TEXT.BUTTON.CANCEL });
+        const saveButton = screen.getByRole('button', { name: SECTIONS_TEXT.BUTTON.SAVE });
+
+        expect(cancelButton).toBeEnabled();
+        expect(saveButton).toBeDisabled();
+    });
+
     it('passes remove intent when cancelling a new section', () => {
         const props = createProps({ isNewSection: true });
 

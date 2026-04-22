@@ -523,7 +523,7 @@ describe('HistoryPageContent', () => {
 
         render(<HistoryPageContent />);
 
-    await user.click(screen.getByTestId('toolbar-add-section-button'));
+        await user.click(screen.getByTestId('toolbar-add-section-button'));
         await user.click(screen.getByTestId('select-first-template'));
 
         expect(mockAddSection).toHaveBeenCalledWith(

@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { SectionFormActions } from '@/components/admin/section-form-actions/SectionFormActions';
+import {
+    createSectionFormActionsClassNames,
+    SectionFormActions,
+} from '@/components/admin/section-form-actions/SectionFormActions';
 import { ImageValues } from '@/types/common/image';
 import { HistorySectionContentDto, HistorySectionDto } from '@/types/common/history-sections';
 import { ContentType } from '@/types/common/section-contents';
@@ -13,6 +16,7 @@ import { buildSectionCancelOptions } from '@/utils/functions/section-cancel-flow
 import styles from './HistorySectionForm.module.scss';
 
 const SUPPORTED_CONTENT_TYPES = new Set<ContentType>([ContentType.Title, ContentType.Description, ContentType.Image]);
+const sectionFormActionsClassNames = createSectionFormActionsClassNames(styles);
 
 const getOrderedContentsByType = (
     contents: HistorySectionContentDto[],
@@ -210,14 +214,11 @@ export const HistorySectionForm = ({
         onEditStateChangeRef.current?.(sectionMode === SectionMode.Edit);
     }, [sectionMode]);
 
-    const emitSectionChange = useCallback(
-        (updatedSection: HistorySectionDto) => {
-            lastEmittedSectionRef.current = updatedSection;
-            setIsDirty(true);
-            onSectionChangeRef.current?.(updatedSection);
-        },
-        [],
-    );
+    const emitSectionChange = useCallback((updatedSection: HistorySectionDto) => {
+        lastEmittedSectionRef.current = updatedSection;
+        setIsDirty(true);
+        onSectionChangeRef.current?.(updatedSection);
+    }, []);
 
     const handleTitleChange = useCallback(
         (value: string) => {
@@ -401,20 +402,7 @@ export const HistorySectionForm = ({
                 isDisabled={isDisabled}
                 isDirty={isDirty}
                 isSectionSaveValid={isSectionSaveValid}
-                classNames={{
-                    actionsSection: styles['actions-section'],
-                    orderControls: styles['order-controls'],
-                    iconButton: styles['icon-button'],
-                    upButton: styles['up-button'],
-                    downButton: styles['down-button'],
-                    hoverButtons: styles['hover-buttons'],
-                    editButton: styles['edit-button'],
-                    deleteButton: styles['delete-button'],
-                    changeButton: styles['change-button'],
-                    content: styles.content,
-                    actionsContainer: styles['actions-container'],
-                    actions: styles.actions,
-                }}
+                classNames={sectionFormActionsClassNames}
                 onMoveUpSection={onMoveUpSection}
                 onMoveDownSection={onMoveDownSection}
                 onEditClick={handleEditClick}

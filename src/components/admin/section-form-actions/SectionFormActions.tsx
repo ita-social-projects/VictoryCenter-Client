@@ -6,7 +6,7 @@ import { SECTIONS_TEXT } from '@/const/admin/sections';
 import { ACTION_ICONS } from '@/const/common/action-icons';
 import { SectionMode } from '@/types/common/sections';
 
-interface SectionFormActionsClassNames {
+export interface SectionFormActionsClassNames {
     actionsSection: string;
     orderControls: string;
     iconButton: string;
@@ -20,6 +20,21 @@ interface SectionFormActionsClassNames {
     actionsContainer: string;
     actions: string;
 }
+
+export const createSectionFormActionsClassNames = (styles: Record<string, string>): SectionFormActionsClassNames => ({
+    actionsSection: styles['actions-section'],
+    orderControls: styles['order-controls'],
+    iconButton: styles['icon-button'],
+    upButton: styles['up-button'],
+    downButton: styles['down-button'],
+    hoverButtons: styles['hover-buttons'],
+    editButton: styles['edit-button'],
+    deleteButton: styles['delete-button'],
+    changeButton: styles['change-button'],
+    content: styles.content,
+    actionsContainer: styles['actions-container'],
+    actions: styles.actions,
+});
 
 interface SectionFormActionsProps {
     sectionMode: SectionMode;

@@ -1,5 +1,8 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { SectionFormActions } from '@/components/admin/section-form-actions/SectionFormActions';
+import {
+    createSectionFormActionsClassNames,
+    SectionFormActions,
+} from '@/components/admin/section-form-actions/SectionFormActions';
 import { ImageValues } from '@/types/common/image';
 import { renderProgramSection } from '@/utils/functions/render-program-section';
 import styles from './ProgramSectionForm.module.scss';
@@ -18,6 +21,8 @@ import {
     getFaqPairs,
     ensureTitleContentAndOnePair,
 } from '@/utils/functions/program-section-content/programSectionContent';
+
+const sectionFormActionsClassNames = createSectionFormActionsClassNames(styles);
 
 export interface ProgramSectionFormProps {
     section: CreateHippotherapyProgramSectionDto;
@@ -662,20 +667,7 @@ export const ProgramSectionForm = ({
                 isDisabled={isDisabled}
                 isDirty={isDirty}
                 isSectionSaveValid={isSectionSaveValid}
-                classNames={{
-                    actionsSection: styles['actions-section'],
-                    orderControls: styles['order-controls'],
-                    iconButton: styles['icon-button'],
-                    upButton: styles['up-button'],
-                    downButton: styles['down-button'],
-                    hoverButtons: styles['hover-buttons'],
-                    editButton: styles['edit-button'],
-                    deleteButton: styles['delete-button'],
-                    changeButton: styles['change-button'],
-                    content: styles.content,
-                    actionsContainer: styles['actions-container'],
-                    actions: styles.actions,
-                }}
+                classNames={sectionFormActionsClassNames}
                 onMoveUpSection={onMoveUpSection}
                 onMoveDownSection={onMoveDownSection}
                 onEditClick={handleEditClick}

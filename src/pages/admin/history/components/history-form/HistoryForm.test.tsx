@@ -212,18 +212,35 @@ describe('HistoryForm', () => {
         );
     });
 
-    it('reorders sections when moving down', () => {
+    it('reorders sections when moving up or down', () => {
         const sections = createSections();
         const onSectionsChange = jest.fn();
 
         render(<HistoryForm sections={sections} onSectionsChange={onSectionsChange} />);
 
         fireEvent.click(screen.getByTestId('move-down-history-section-1'));
-
         expect(onSectionsChange).toHaveBeenLastCalledWith([
             expect.objectContaining({ id: 2 }),
             expect.objectContaining({ id: 1 }),
         ]);
+
+        fireEvent.click(screen.getByTestId('move-up-history-section-2'));
+        expect(onSectionsChange).toHaveBeenLastCalledWith([
+            expect.objectContaining({ id: 2 }),
+            expect.objectContaining({ id: 1 }),
+        ]);
+    });
+
+    it('does nothing when moving up first section or moving down last section', () => {
+        const sections = createSections();
+        const onSectionsChange = jest.fn();
+
+        render(<HistoryForm sections={sections} onSectionsChange={onSectionsChange} />);
+
+        fireEvent.click(screen.getByTestId('move-up-history-section-1'));
+        fireEvent.click(screen.getByTestId('move-down-history-section-2'));
+
+        expect(onSectionsChange).not.toHaveBeenCalled();
     });
 
     it('calls onReplaceSection with the matching section index', () => {
@@ -265,26 +282,36 @@ describe('HistoryForm', () => {
         expect(latestFirstSectionProps?.section.order).toBe(10);
     });
 
-    it('still resyncs when the incoming sections structure changes', () => {
+    it('resyncs when incoming sections structure changes (grow or shrink)', () => {
         const sections = createSections();
 
         const { rerender } = render(<HistoryForm sections={sections} />);
 
-        const nextSections = [...sections, createSection(3, SectionTemplate.SingleImageTop, 2)];
-        rerender(<HistoryForm sections={nextSections} />);
-
+        // grow: new section appears
+        const grownSections = [...sections, createSection(3, SectionTemplate.SingleImageTop, 2)];
+        rerender(<HistoryForm sections={grownSections} />);
         expect(screen.getByTestId('mock-history-section-history-section-3')).toBeInTheDocument();
-    });
 
-    it('resyncs when incoming sections shrink and removes extra rendered forms', () => {
-        const sections = createSections();
-
-        const { rerender } = render(<HistoryForm sections={sections} />);
-
+        // shrink: removed section disappears
         rerender(<HistoryForm sections={[sections[0]]} />);
-
         expect(screen.getByTestId('mock-history-section-history-section-1')).toBeInTheDocument();
         expect(screen.queryByTestId('mock-history-section-history-section-2')).not.toBeInTheDocument();
+    });
+
+    it('keeps section states when rerendered with same length but different signature', () => {
+        const sections = createSections();
+
+        const { rerender } = render(<HistoryForm sections={sections} />);
+
+        const nextSections = [
+            { ...sections[0], order: 10, contents: sections[0].contents.map((content) => ({ ...content })) },
+            { ...sections[1], contents: sections[1].contents.map((content) => ({ ...content })) },
+        ];
+
+        rerender(<HistoryForm sections={nextSections} />);
+
+        expect(screen.getByTestId('mock-history-section-history-section-1')).toBeInTheDocument();
+        expect(screen.getByTestId('mock-history-section-history-section-2')).toBeInTheDocument();
     });
 
     it('calls onSectionSaved when a section is saved', () => {
@@ -311,32 +338,6 @@ describe('HistoryForm', () => {
             .at(-1);
 
         expect(latestFirstSectionProps?.isNewSection).toBe(false);
-    });
-
-    it('reorders sections when moving up from second position', () => {
-        const sections = createSections();
-        const onSectionsChange = jest.fn();
-
-        render(<HistoryForm sections={sections} onSectionsChange={onSectionsChange} />);
-
-        fireEvent.click(screen.getByTestId('move-up-history-section-2'));
-
-        expect(onSectionsChange).toHaveBeenLastCalledWith([
-            expect.objectContaining({ id: 2 }),
-            expect.objectContaining({ id: 1 }),
-        ]);
-    });
-
-    it('does nothing when moving up first section or moving down last section', () => {
-        const sections = createSections();
-        const onSectionsChange = jest.fn();
-
-        render(<HistoryForm sections={sections} onSectionsChange={onSectionsChange} />);
-
-        fireEvent.click(screen.getByTestId('move-up-history-section-1'));
-        fireEvent.click(screen.getByTestId('move-down-history-section-2'));
-
-        expect(onSectionsChange).not.toHaveBeenCalled();
     });
 
     it('removes section and fires both onSectionsChange and onSectionDeleted on delete discard', () => {
@@ -431,22 +432,6 @@ describe('HistoryForm', () => {
         });
 
         expect(onSectionsChange.mock.calls.length).toBe(callsBeforeRevert);
-    });
-
-    it('keeps section states when rerendered with same length but different signature', () => {
-        const sections = createSections();
-
-        const { rerender } = render(<HistoryForm sections={sections} />);
-
-        const nextSections = [
-            { ...sections[0], order: 10, contents: sections[0].contents.map((content) => ({ ...content })) },
-            { ...sections[1], contents: sections[1].contents.map((content) => ({ ...content })) },
-        ];
-
-        rerender(<HistoryForm sections={nextSections} />);
-
-        expect(screen.getByTestId('mock-history-section-history-section-1')).toBeInTheDocument();
-        expect(screen.getByTestId('mock-history-section-history-section-2')).toBeInTheDocument();
     });
 
     it('ignores repeated remove discard for an already removed section', () => {

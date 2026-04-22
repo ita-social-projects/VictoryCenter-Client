@@ -601,4 +601,42 @@ describe('HistorySectionForm', () => {
 
         expect(props.onSectionChange).not.toHaveBeenCalled();
     });
+
+    it('does not reset the draft when only the onSectionChange callback identity changes', () => {
+        const props = createProps();
+        const firstOnSectionChange = props.onSectionChange as jest.Mock;
+
+        const { rerender } = render(<HistorySectionForm {...props} />);
+
+        fireEvent.click(screen.getByRole('button', { name: 'Edit section' }));
+        fireEvent.click(screen.getByTestId('change-title'));
+
+        expect(screen.getByTestId('rendered-history-section')).toHaveAttribute('data-mode', SectionMode.Edit);
+        expect(mockRenderHistorySection).toHaveBeenLastCalledWith(
+            expect.objectContaining({
+                data: expect.objectContaining({ title: 'Updated title' }),
+            }),
+        );
+
+        const nextProps = createProps({
+            section: props.section,
+            onSectionChange: jest.fn(),
+        });
+
+        rerender(<HistorySectionForm {...nextProps} />);
+
+        expect(screen.getByTestId('rendered-history-section')).toHaveAttribute('data-mode', SectionMode.Edit);
+        expect(mockRenderHistorySection).toHaveBeenLastCalledWith(
+            expect.objectContaining({
+                data: expect.objectContaining({ title: 'Updated title' }),
+            }),
+        );
+        expect(firstOnSectionChange).toHaveBeenCalledWith(
+            expect.objectContaining({
+                contents: expect.arrayContaining([
+                    expect.objectContaining({ contentType: ContentType.Title, title: 'Updated title' }),
+                ]),
+            }),
+        );
+    });
 });

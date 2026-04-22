@@ -165,6 +165,7 @@ export const HistorySectionForm = ({
 
     const sectionModeRef = useRef(sectionMode);
     const onEditStateChangeRef = useRef(onEditStateChange);
+    const onSectionChangeRef = useRef(onSectionChange);
     const lastEmittedSectionRef = useRef<HistorySectionDto | null>(null);
     const localSectionRef = useRef<HistorySectionDto>(localSection);
     localSectionRef.current = localSection;
@@ -176,6 +177,10 @@ export const HistorySectionForm = ({
     useEffect(() => {
         onEditStateChangeRef.current = onEditStateChange;
     }, [onEditStateChange]);
+
+    useEffect(() => {
+        onSectionChangeRef.current = onSectionChange;
+    }, [onSectionChange]);
 
     useEffect(() => {
         if (lastEmittedSectionRef.current === section) {
@@ -197,9 +202,9 @@ export const HistorySectionForm = ({
 
         if (preparedSection !== section) {
             lastEmittedSectionRef.current = preparedSection;
-            onSectionChange?.(preparedSection);
+            onSectionChangeRef.current?.(preparedSection);
         }
-    }, [section, isNewSection, isReplacingTemplate, onSectionChange]);
+    }, [section, isNewSection, isReplacingTemplate]);
 
     useEffect(() => {
         onEditStateChangeRef.current?.(sectionMode === SectionMode.Edit);
@@ -209,9 +214,9 @@ export const HistorySectionForm = ({
         (updatedSection: HistorySectionDto) => {
             lastEmittedSectionRef.current = updatedSection;
             setIsDirty(true);
-            onSectionChange?.(updatedSection);
+            onSectionChangeRef.current?.(updatedSection);
         },
-        [onSectionChange],
+        [],
     );
 
     const handleTitleChange = useCallback(

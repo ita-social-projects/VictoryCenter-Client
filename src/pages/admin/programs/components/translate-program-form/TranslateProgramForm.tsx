@@ -516,6 +516,8 @@ export const TranslateProgramForm = forwardRef<TranslateProgramFormRef, Translat
                                 disabled={isSubmitting || isFormDisabled}
                                 error={errors.location}
                                 placeholder={PROGRAMS_TEXT.PLACEHOLDER.INSERT_PROGRAM_LOCATION}
+                                showCounterBelow={true}
+                                isWhiteLabel={hasBackgroundImage}
                             />
 
                             <InputWithCharacterLimitGroup
@@ -529,6 +531,8 @@ export const TranslateProgramForm = forwardRef<TranslateProgramFormRef, Translat
                                 disabled={isSubmitting || isFormDisabled}
                                 error={errors.participantsCount}
                                 placeholder={PROGRAMS_TEXT.PLACEHOLDER.INSERT_PROGRAM_PARTICIPANTS_COUNT}
+                                showCounterBelow={true}
+                                isWhiteLabel={hasBackgroundImage}
                             />
 
                             <InputWithCharacterLimitGroup
@@ -542,6 +546,8 @@ export const TranslateProgramForm = forwardRef<TranslateProgramFormRef, Translat
                                 disabled={isSubmitting || isFormDisabled}
                                 error={errors.meetingCount}
                                 placeholder={PROGRAMS_TEXT.PLACEHOLDER.INSERT_PROGRAM_MEETINGS_COUNT}
+                                showCounterBelow={true}
+                                isWhiteLabel={hasBackgroundImage}
                             />
                         </div>
 

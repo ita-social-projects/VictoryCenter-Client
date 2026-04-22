@@ -58,6 +58,7 @@ export const HistoryForm = ({
     const lastSectionsSyncSignatureRef = useRef(getSectionsSyncSignature(sections));
 
     sectionStatesRef.current = sectionStates;
+    const localSectionsRef = useRef(localSections);
 
     useEffect(() => {
         const nextSectionsSyncSignature = getSectionsSyncSignature(sections);
@@ -68,6 +69,7 @@ export const HistoryForm = ({
         lastSectionsSyncSignatureRef.current = nextSectionsSyncSignature;
 
         setLocalSections(sections);
+        localSectionsRef.current = sections;
         setSectionStates((prev) => {
             if (prev.length === sections.length) {
                 return prev;
@@ -102,11 +104,10 @@ export const HistoryForm = ({
 
     const updateSections = useCallback(
         (updater: (prev: HistorySectionDto[]) => HistorySectionDto[]) => {
-            setLocalSections((prev) => {
-                const updatedSections = updater(prev);
-                onSectionsChange?.(updatedSections);
-                return updatedSections;
-            });
+            const updatedSections = updater(localSectionsRef.current);
+            localSectionsRef.current = updatedSections;
+            setLocalSections(updatedSections);
+            onSectionsChange?.(updatedSections);
         },
         [onSectionsChange],
     );

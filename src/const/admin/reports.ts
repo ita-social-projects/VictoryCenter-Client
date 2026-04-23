@@ -3,7 +3,7 @@ import { COMMON_TEXT_ADMIN } from './common';
 export const REPORTS_TEXT = {
     FORM: {
         LABEL: {
-            TITLE: 'Заголовок',
+            TITLE: 'Заголовок/EN',
             COLLECTED_FUNDS_WINDOW: 'Вікно 1: Зібрано коштів',
             CHANGED_LIVES_WINDOW: 'Вікно 2: Змінено життів',
             COLLECTED_FUNDS: 'Зібрані кошти',
@@ -40,7 +40,7 @@ export const REPORTS_TEXT = {
 
 export const REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION = {
     title: {
-        min: 10,
+        min: 2,
         max: 50,
         getRequiredError: () => `Заголовок обов'язковий`,
     },
@@ -55,7 +55,7 @@ export const REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION = {
 
 export const REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION = {
     title: {
-        min: 10,
+        min: 2,
         max: 50,
         getRequiredError: () => `Заголовок обов'язковий`,
     },

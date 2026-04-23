@@ -2,24 +2,24 @@ import * as Yup from 'yup';
 import { MAIN_PAGE_VALIDATION } from '@/const/admin/main-page';
 import { AboutUsBlockFormValues, TitleBlockFormValues } from '@/types/admin/main-page';
 import { Image, ImageValues } from '@/types/common/image';
+import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
 
-const requiredTrimmedTitle = () => {
+const buildStringValidation = (config: {
+    min: number;
+    max: number;
+    getMinError: () => string;
+    getMaxError: () => string;
+}) => {
     return Yup.string()
-        .trim()
+        .transform((value) => (value ? getNormalizedInputText(value) : value))
         .required(MAIN_PAGE_VALIDATION.common.REQUIRED)
-        .max(MAIN_PAGE_VALIDATION.title.max, MAIN_PAGE_VALIDATION.title.getMaxError());
-};
-
-const requiredTrimmedDescription = () => {
-    return Yup.string()
-        .trim()
-        .required(MAIN_PAGE_VALIDATION.common.REQUIRED)
-        .max(MAIN_PAGE_VALIDATION.description.max, MAIN_PAGE_VALIDATION.description.getMaxError());
+        .min(config.min, config.getMinError())
+        .max(config.max, config.getMaxError());
 };
 
 export const TitleBlockValidationSchema: Yup.ObjectSchema<TitleBlockFormValues> = Yup.object({
-    title: requiredTrimmedTitle(),
-    description: requiredTrimmedDescription(),
+    title: buildStringValidation(MAIN_PAGE_VALIDATION.titleBlock.title),
+    description: buildStringValidation(MAIN_PAGE_VALIDATION.titleBlock.description),
     image: Yup.mixed<Image | ImageValues>()
         .transform((value) => {
             if (value === null || typeof value === 'string') return undefined;
@@ -31,8 +31,8 @@ export const TitleBlockValidationSchema: Yup.ObjectSchema<TitleBlockFormValues> 
 });
 
 export const AboutUsBlockValidationSchema: Yup.ObjectSchema<AboutUsBlockFormValues> = Yup.object({
-    title: requiredTrimmedTitle(),
-    description: requiredTrimmedDescription(),
+    title: buildStringValidation(MAIN_PAGE_VALIDATION.aboutUsBlock.title),
+    description: buildStringValidation(MAIN_PAGE_VALIDATION.aboutUsBlock.description),
 });
 
 export const MAIN_PAGE_VALIDATION_FUNCTIONS = {

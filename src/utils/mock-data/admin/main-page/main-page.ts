@@ -7,7 +7,7 @@ export const MOCK_MAIN_PAGE_DATA: MainPage = {
     image: null,
     mainAboutUs: {
         id: 1,
-        title: 'Про нас',
+        title: 'Трохи про нас',
         description: 'Коли тіло та душа відновлюються — народжується справжня сила',
     },
     mainPartners: {

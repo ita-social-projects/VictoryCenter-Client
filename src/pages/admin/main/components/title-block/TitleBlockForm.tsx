@@ -101,7 +101,7 @@ export const TitleBlockForm = ({ initialData }: TitleBlockFormProps) => {
                                 onChange={onChange}
                                 onBlur={onBlur}
                                 error={errors.title?.message}
-                                maxLength={MAIN_PAGE_VALIDATION.title.max}
+                                maxLength={MAIN_PAGE_VALIDATION.titleBlock.title.max}
                                 isRequired={true}
                             />
                         )}
@@ -119,7 +119,7 @@ export const TitleBlockForm = ({ initialData }: TitleBlockFormProps) => {
                                 onChange={onChange}
                                 onBlur={onBlur}
                                 error={errors.description?.message}
-                                maxLength={MAIN_PAGE_VALIDATION.description.max}
+                                maxLength={MAIN_PAGE_VALIDATION.titleBlock.description.max}
                                 isRequired={true}
                                 className={styles['textarea-custom']}
                             />

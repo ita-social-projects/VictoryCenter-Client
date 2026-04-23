@@ -148,6 +148,18 @@ describe('HistoryForm', () => {
         expect(container.firstChild).toBeNull();
     });
 
+    it('shrinks section states when incoming sections length decreases', () => {
+        const sections = createSections();
+        const { rerender } = render(<HistoryForm sections={sections} />);
+
+        const shrunkSections = [sections[0]];
+        rerender(<HistoryForm sections={shrunkSections} />);
+
+        const forms = screen.queryAllByTestId(/mock-history-section-history-section-/);
+        expect(forms).toHaveLength(1);
+        expect(screen.getByTestId('mock-history-section-history-section-1')).toBeInTheDocument();
+    });
+
     it('passes positional and validity props to child section forms', () => {
         const sections = createSections();
         const onRequestSaveSection = jest.fn();
@@ -464,6 +476,23 @@ describe('HistoryForm', () => {
         });
 
         expect(onSectionsChange.mock.calls.length).toBe(callsAfterFirstDiscard);
+    });
+    it('returns false for validity if section has no contents or validator throws', () => {
+        const sectionsWithNoContent = [{ id: 1, template: SectionTemplate.TextOnly, order: 0 } as HistorySectionDto];
+
+        const { rerender } = render(<HistoryForm sections={sectionsWithNoContent} />);
+        expect(mockHistorySectionFormProps).toHaveBeenLastCalledWith(
+            expect.objectContaining({ isSectionValid: false }),
+        );
+
+        mockIsProgramSectionValid.mockImplementationOnce(() => {
+            throw new Error('Validation failed');
+        });
+
+        const normalSections = createSections();
+        rerender(<HistoryForm sections={normalSections} />);
+
+        expect(mockHistorySectionFormProps).toHaveBeenCalledWith(expect.objectContaining({ isSectionValid: false }));
     });
 
     it('falls back to false when template validity is undefined', () => {

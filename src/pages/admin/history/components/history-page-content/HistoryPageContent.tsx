@@ -32,6 +32,7 @@ export const HistoryPageContent = () => {
     const pendingSectionRef = useRef<HistorySectionDto | null>(null);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [sectionToReplace, setSectionToReplace] = useState<number | null>(null);
+    const [canPublish, setCanPublish] = useState(false);
     const [isPublishing, setIsPublishing] = useState(false);
     const [localSectionsCount, setLocalSectionsCount] = useState<number | null>(null);
     const [hasActiveSectionForm, setHasActiveSectionForm] = useState(false);
@@ -124,21 +125,9 @@ export const HistoryPageContent = () => {
         void refetchSections();
     }, [refetchSections]);
 
-    const handleSectionSaved = useCallback(async () => {
-        try {
-            const currentSections = historyFormRef.current?.getSections() ?? [];
-            const payload: CreateUpdateHistorySectionDto[] = currentSections.map((s: HistorySectionDto) => ({
-                template: s.template,
-                order: s.order,
-                contents: s.contents.map((c) => ({ ...c })),
-            }));
-            await HistoryApi.syncSections(client, payload);
-            addToast(HISTORY_TEXT.MESSAGE.PUBLISH_SUCCESS, ToastType.Success);
-            void refetchSections();
-        } catch {
-            addToast(HISTORY_TEXT.MESSAGE.PUBLISH_ERROR, ToastType.Error);
-        }
-    }, [client, addToast, refetchSections]);
+    const handleSectionSaved = useCallback(() => {
+        setCanPublish(true);
+    }, []);
 
     const handleSectionDeleted = useCallback(
         async (remainingSections: HistorySectionDto[]) => {
@@ -171,6 +160,7 @@ export const HistoryPageContent = () => {
 
             await HistoryApi.syncSections(client, payload);
             addToast(HISTORY_TEXT.MESSAGE.PUBLISH_SUCCESS, ToastType.Success);
+            setCanPublish(false);
             void refetchSections();
         } catch {
             addToast(HISTORY_TEXT.MESSAGE.PUBLISH_ERROR, ToastType.Error);
@@ -247,7 +237,7 @@ export const HistoryPageContent = () => {
                         className={styles['btn-publish']}
                         onClick={handlePublish}
                         buttonStyle="primary"
-                        disabled={isPublishing}
+                        disabled={!canPublish || isPublishing}
                     >
                         {HISTORY_TEXT.BUTTON.PUBLISH}
                     </Button>

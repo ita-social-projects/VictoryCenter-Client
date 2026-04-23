@@ -572,8 +572,8 @@ describe('HistoryPageContent', () => {
         });
 
         expect(mockAddToast).toHaveBeenCalledWith('Publish success', ToastType.Success);
-        expect(refetchSectionsMock).toHaveBeenCalledTimes(2);
-        expect(mockGetSections).toHaveBeenCalledTimes(2);
+        expect(refetchSectionsMock).toHaveBeenCalledTimes(1);
+        expect(mockGetSections).toHaveBeenCalledTimes(1);
     });
 
     it('shows error toast when publish fails', async () => {

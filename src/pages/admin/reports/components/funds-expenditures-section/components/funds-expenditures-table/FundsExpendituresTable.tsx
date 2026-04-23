@@ -23,7 +23,6 @@ import { updateFundsAmounts } from '@/utils/functions/update-funds-amounts/updat
 import { parseAmount } from '@/utils/functions/parse-amount/parse-amount';
 import { isUsdAmountMismatch } from '@/utils/functions/validate-usd-amount-mismatch/validate-usd-amount-mismatch';
 import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
-import { FundsRecordActions } from '@/pages/admin/reports/components/funds-expenditures-section/components/common/funds-record-actions/FundsRecordActions';
 import cn from 'classnames';
 import styles from './FundsExpendituresTable.module.scss';
 
@@ -46,10 +45,6 @@ interface FundsExpendituresTableProps {
     allRecordsForTypeInference?: ReportFundsExpendituresRecord[];
     isEditing?: boolean;
     isRowActionsDisabled?: boolean;
-    isAddIncomeDisabled?: boolean;
-    isAddExpenseDisabled?: boolean;
-    onAddIncome?: () => void;
-    onAddExpense?: () => void;
     onRowEditModeChange?: (isEditMode: boolean) => void;
     onRecordSave?: (
         recordId: number,
@@ -151,10 +146,6 @@ export const FundsExpendituresTable = ({
     allRecordsForTypeInference,
     isEditing = false,
     isRowActionsDisabled = false,
-    isAddIncomeDisabled = false,
-    isAddExpenseDisabled = false,
-    onAddIncome,
-    onAddExpense,
     onRowEditModeChange,
     onRecordSave,
     onDeleteRecord,
@@ -535,7 +526,7 @@ export const FundsExpendituresTable = ({
                         </tr>
                     </thead>
                     <tbody>
-                        {sortedRecords.length === 0 ? (
+                        {sortedRecords.length === 0 && isEditing ? (
                             <tr>
                                 <td
                                     colSpan={colSpan}
@@ -544,28 +535,9 @@ export const FundsExpendituresTable = ({
                                 >
                                     <div className={styles['empty-state']}>
                                         <NotFoundIcon className={styles['empty-state-image']} />
-                                        {isEditing ? (
-                                            <p className={styles['empty-state-message']}>
-                                                {FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.MESSAGE}
-                                            </p>
-                                        ) : (
-                                            <>
-                                                <p className={styles['empty-state-title']}>
-                                                    {FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.TITLE}
-                                                </p>
-                                                <p className={styles['empty-state-message']}>
-                                                    {FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.ADD_RECORD}
-                                                </p>
-                                                <FundsRecordActions
-                                                    className={styles['empty-state-actions']}
-                                                    testId="empty-state-actions"
-                                                    isAddExpenseDisabled={isAddExpenseDisabled}
-                                                    isAddIncomeDisabled={isAddIncomeDisabled}
-                                                    onAddExpense={onAddExpense}
-                                                    onAddIncome={onAddIncome}
-                                                />
-                                            </>
-                                        )}
+                                        <p className={styles['empty-state-message']}>
+                                            {FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.MESSAGE}
+                                        </p>
                                     </div>
                                 </td>
                             </tr>

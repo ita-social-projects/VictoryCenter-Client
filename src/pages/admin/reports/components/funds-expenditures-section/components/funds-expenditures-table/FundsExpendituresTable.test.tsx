@@ -260,43 +260,23 @@ describe('FundsExpendituresTable', () => {
         expect(onDeleteRecord).toHaveBeenCalledWith(MOCK_RECORDS[0]);
     });
 
-    it('should render empty state row when records is empty', () => {
-        renderTable({ records: [] });
+    it('should render nothing when records is empty in view mode', () => {
+        renderTable({ records: [], isEditing: false });
 
-        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.TITLE)).toBeInTheDocument();
-        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.ADD_RECORD)).toBeInTheDocument();
+        expect(screen.queryByTestId('funds-table-empty-cell')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('not-found')).not.toBeInTheDocument();
+    });
+
+    it('should render empty state row with message when records is empty in edit mode', () => {
+        renderTable({ records: [], isEditing: true });
+
+        expect(screen.getByTestId('funds-table-empty-cell')).toBeInTheDocument();
+        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.MESSAGE)).toBeInTheDocument();
         expect(screen.getByTestId('not-found')).toBeInTheDocument();
     });
 
-    it('should render add action buttons in empty state for view mode', () => {
-        renderTable({ records: [], isEditing: false });
-
-        expect(screen.getByTestId('empty-state-actions')).toBeInTheDocument();
-        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.ADD_EXPENSE)).toBeEnabled();
-        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.ADD_INCOME)).toBeEnabled();
-    });
-
-    it('should trigger add callbacks from empty state buttons in view mode', () => {
-        const onAddIncome = jest.fn();
-        const onAddExpense = jest.fn();
-
-        renderTable({ records: [], isEditing: false, onAddIncome, onAddExpense });
-
-        fireEvent.click(screen.getByTestId('mock-add-expense'));
-        fireEvent.click(screen.getByTestId('mock-add-income'));
-
-        expect(onAddExpense).toHaveBeenCalledTimes(1);
-        expect(onAddIncome).toHaveBeenCalledTimes(1);
-    });
-
-    it('should use correct empty-state colSpan in view and edit modes', () => {
-        const { rerender } = render(
-            <FundsExpendituresTable records={[]} categories={MOCK_CATEGORIES} isEditing={false} />,
-        );
-
-        expect(screen.getByTestId('funds-table-empty-cell')).toHaveAttribute('colspan', '5');
-
-        rerender(<FundsExpendituresTable records={[]} categories={MOCK_CATEGORIES} isEditing />);
+    it('should use correct empty-state colSpan in edit mode', () => {
+        renderTable({ records: [], isEditing: true });
 
         expect(screen.getByTestId('funds-table-empty-cell')).toHaveAttribute('colspan', '7');
     });

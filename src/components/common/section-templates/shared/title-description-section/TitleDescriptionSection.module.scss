@@ -46,10 +46,12 @@
 
         .title-section {
             flex: 0 0 30%;
+            min-width: 0;
         }
 
         .description-section {
             flex: 0 0 30%;
+            min-width: 0;
         }
     }
 

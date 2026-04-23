@@ -13,6 +13,8 @@ export interface MultiSelectInputProps<T> {
     value?: T[];
     getOptionId: (value: T) => string | number;
     getOptionName: (value: T) => string;
+    getDisplayValue?: (selectedValues: T[]) => string;
+    isOptionSelected?: (option: T, selectedValues: T[]) => boolean;
     onChange?: (selectedValues: T[]) => void;
     onBlur?: () => void;
     placeholder?: string;
@@ -27,6 +29,8 @@ export const MultiSelectInput = <T,>({
     onBlur,
     getOptionId,
     getOptionName,
+    getDisplayValue,
+    isOptionSelected,
     placeholder = 'Select options...',
     disabled,
 }: MultiSelectInputProps<T>) => {
@@ -36,21 +40,23 @@ export const MultiSelectInput = <T,>({
     const selectedIds = useMemo(() => new Set(value.map(getOptionId)), [value, getOptionId]);
 
     const displayLabel = useMemo(() => {
+        if (getDisplayValue) return getDisplayValue(value);
         if (value.length === 0) return placeholder;
         return value.map(getOptionName).join(', ');
-    }, [value, getOptionName, placeholder]);
+    }, [value, getOptionName, getDisplayValue, placeholder]);
 
     const isSelected = useCallback(
         (option: T): boolean => {
+            if (isOptionSelected) return isOptionSelected(option, value);
+
             const optionId = getOptionId(option);
             return optionId != null && selectedIds.has(optionId);
         },
-        [selectedIds, getOptionId],
+        [selectedIds, getOptionId, isOptionSelected, value],
     );
 
     const toggleOption = useCallback(
         (optionValue: T) => {
-            if (disabled) return;
             const optionId = getOptionId(optionValue);
             if (optionId == null) return;
 
@@ -60,13 +66,12 @@ export const MultiSelectInput = <T,>({
                 : [...value, optionValue];
             onChange?.(newSelectedValues);
         },
-        [value, selectedIds, getOptionId, onChange, disabled],
+        [value, selectedIds, getOptionId, onChange],
     );
 
     const toggleDropdown = useCallback(() => {
-        if (disabled) return;
         setIsOpen((prev) => !prev);
-    }, [disabled]);
+    }, []);
 
     const handleOptionKeyDown = useCallback(
         (e: React.KeyboardEvent<HTMLDivElement>, option: T) => {

@@ -2,9 +2,9 @@ import { RequestOptions } from '@/types/common/api';
 import { ProgramExpensesProgram, ProgramExpensesReadOnlyData, ProgramExpensesSummary } from '@/types/admin/reports';
 import {
     MOCK_PROGRAM_EXPENSES_EXCHANGE_RATE,
+    MOCK_PROGRAM_EXPENSES_PROGRAMS,
     MOCK_PROGRAM_EXPENSES_RECORDS,
 } from '@/utils/mock-data/admin/reports/program-expenses';
-import { AxiosInstance } from 'axios';
 import { parseAmount } from '@/utils/functions/parse-amount/parse-amount';
 
 const getPublishedProgramExpensesRecords = () =>
@@ -19,7 +19,7 @@ const getPublishedProgramExpensesRecords = () =>
         return firstRecord.programName.localeCompare(secondRecord.programName, 'uk');
     });
 
-const getPrograms = (): ProgramExpensesProgram[] => {
+const getRecordPrograms = (): ProgramExpensesProgram[] => {
     const uniqueProgramsMap = new Map<number, ProgramExpensesProgram>();
 
     getPublishedProgramExpensesRecords().forEach((record) => {
@@ -29,10 +29,23 @@ const getPrograms = (): ProgramExpensesProgram[] => {
         });
     });
 
+    return Array.from(uniqueProgramsMap.values());
+};
+
+const mergePrograms = (programs: ProgramExpensesProgram[]): ProgramExpensesProgram[] => {
+    const uniqueProgramsMap = new Map<number, ProgramExpensesProgram>();
+
+    programs.forEach((program) => {
+        uniqueProgramsMap.set(program.id, program);
+    });
+
     return Array.from(uniqueProgramsMap.values()).sort((firstProgram, secondProgram) =>
         firstProgram.name.localeCompare(secondProgram.name, 'uk'),
     );
 };
+
+const getPrograms = (): ProgramExpensesProgram[] =>
+    mergePrograms([...getRecordPrograms(), ...MOCK_PROGRAM_EXPENSES_PROGRAMS]);
 
 const getSummary = (): ProgramExpensesSummary => {
     return getPublishedProgramExpensesRecords().reduce<ProgramExpensesSummary>(
@@ -51,18 +64,13 @@ const PUBLISHED_PROGRAM_EXPENSES_RECORDS = getPublishedProgramExpensesRecords().
     ({ isPublished: _isPublished, ...record }) => record,
 );
 
-const PROGRAM_EXPENSES_PROGRAMS = getPrograms();
-
 const PROGRAM_EXPENSES_SUMMARY = getSummary();
 
 export const ProgramExpensesApi = {
-    getReadOnlyData: async (
-        _client: AxiosInstance,
-        _options: RequestOptions = {},
-    ): Promise<ProgramExpensesReadOnlyData> => {
+    getReadOnlyData: async (_options: RequestOptions = {}): Promise<ProgramExpensesReadOnlyData> => {
         return {
             exchangeRate: MOCK_PROGRAM_EXPENSES_EXCHANGE_RATE,
-            programs: PROGRAM_EXPENSES_PROGRAMS,
+            programs: getPrograms(),
             summary: PROGRAM_EXPENSES_SUMMARY,
             records: PUBLISHED_PROGRAM_EXPENSES_RECORDS,
         };

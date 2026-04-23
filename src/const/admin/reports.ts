@@ -233,6 +233,11 @@ export const PROGRAM_EXPENSES_TEXT = {
     BUTTON: {
         ADD_PROGRAM_EXPENSE: 'Витрата по програмі',
     },
+    FILTER: {
+        PROGRAMS_PLACEHOLDER: 'Програми',
+        ALL_OPTION: 'Всі',
+        getProgramsCounterLabel: (count: number) => `Програми (${count})`,
+    },
     EMPTY_STATE: {
         ADD_RECORD: 'додайте перший запис Програмної витрати',
     },

@@ -24,10 +24,12 @@ import { SectionTemplate } from '@/types/common/sections';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { ToastType } from '@/types/admin/toast';
 import { AddSectionModal } from '@/pages/admin/programs/components/programs-page-modals/add-section-modal/AddSectionModal';
+import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
 
 export const HistoryPageContent = () => {
     const client = useAdminClient();
     const { addToast } = useToast();
+    const [isConfirmationModalOpen, setConfirmationModalOpen] = useState<boolean>(false);
     const historyFormRef = useRef<HistoryFormRef>(null);
     const pendingSectionRef = useRef<HistorySectionDto | null>(null);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -148,6 +150,7 @@ export const HistoryPageContent = () => {
     );
 
     const handlePublish = useCallback(async () => {
+        setConfirmationModalOpen(false);
         setIsPublishing(true);
         try {
             const currentSections = historyFormRef.current?.getSections() ?? [];
@@ -235,7 +238,7 @@ export const HistoryPageContent = () => {
                     )}
                     <Button
                         className={styles['btn-publish']}
-                        onClick={handlePublish}
+                        onClick={() => setConfirmationModalOpen(true)}
                         buttonStyle="primary"
                         disabled={!canPublish || isPublishing}
                     >
@@ -269,6 +272,14 @@ export const HistoryPageContent = () => {
                 onConfirm={handleConfirmRevertSection}
                 onCancel={handleCloseSectionRevertModal}
             />
+            <ConfirmationModal
+                isOpen={isConfirmationModalOpen}
+                onClose={() => setConfirmationModalOpen(false)}
+                title={COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES}
+                onConfirm={handlePublish}
+                onCancel={() => setConfirmationModalOpen(false)}
+            />
+            <ToastContainer />
         </div>
     );
 };

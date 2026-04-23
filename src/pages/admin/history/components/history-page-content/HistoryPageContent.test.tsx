@@ -176,6 +176,10 @@ jest.mock('@/pages/admin/programs/components/programs-page-modals/add-section-mo
     },
 }));
 
+jest.mock('@/components/admin/toast/toast-container/ToastContainer', () => ({
+    ToastContainer: () => <div data-testid="toast-container" />,
+}));
+
 jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
     ConfirmationModal: ({
         isOpen,
@@ -557,6 +561,7 @@ describe('HistoryPageContent', () => {
 
         await user.click(screen.getByTestId('mark-saved'));
         await user.click(screen.getByRole('button', { name: 'Publish' }));
+        await user.click(screen.getByTestId('question-confirm'));
 
         await waitFor(() => {
             expect(mockedHistoryApi.syncSections).toHaveBeenCalledWith(
@@ -585,6 +590,7 @@ describe('HistoryPageContent', () => {
 
         await user.click(screen.getByTestId('mark-saved'));
         await user.click(screen.getByRole('button', { name: 'Publish' }));
+        await user.click(screen.getByTestId('question-confirm'));
 
         await waitFor(() => {
             expect(mockAddToast).toHaveBeenCalledWith('Publish error', ToastType.Error);

@@ -47,7 +47,7 @@ $img-height: 680px;
 }
 
 .container.form-container {
-    max-height: 1300px;
+    max-height: none;
     gap: 30px;
     overflow: visible;
 
@@ -56,6 +56,11 @@ $img-height: 680px;
         height: auto;
         justify-content: center;
         padding: 1vw 10vw;
+    }
+
+    .bottom-section {
+        flex: auto;
+        height: auto;
     }
 
     .image-wrapper {

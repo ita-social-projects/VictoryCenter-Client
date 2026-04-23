@@ -46,12 +46,15 @@ export const useInputWithCharacterLimit = <T extends HTMLInputElement | HTMLText
             clearWarning();
         }
 
+        const updatedTarget = {
+            ...target,
+            value: newValue,
+        };
+
         onChange({
             ...e,
-            target: {
-                ...target,
-                value: newValue,
-            },
+            target: updatedTarget,
+            currentTarget: updatedTarget,
         });
 
         globalThis.requestAnimationFrame(() => {

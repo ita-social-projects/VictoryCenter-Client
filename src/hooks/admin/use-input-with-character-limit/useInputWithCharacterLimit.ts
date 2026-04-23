@@ -54,7 +54,7 @@ export const useInputWithCharacterLimit = <T extends HTMLInputElement | HTMLText
             },
         });
 
-        window.requestAnimationFrame(() => {
+        globalThis.requestAnimationFrame(() => {
             if (target && document.activeElement === target) {
                 if (start !== null && end !== null) {
                     target.setSelectionRange(start, end);

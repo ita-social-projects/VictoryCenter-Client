@@ -18,5 +18,5 @@ export const getConvertedAmount = (value: string, exchangeRate: string | null | 
 
     const roundedConvertedAmount = roundUpToTwoDecimals(convertedAmount);
 
-    return Number.isFinite(roundedConvertedAmount) ? String(roundedConvertedAmount) : null;
+    return Number.isFinite(roundedConvertedAmount) ? String(roundedConvertedAmount).replace('.', ',') : null;
 };

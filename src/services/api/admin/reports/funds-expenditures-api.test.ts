@@ -25,7 +25,7 @@ describe('FundsExpendituresApi', () => {
             expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.REPORTS.FUNDS_EXPENDITURES.SETTINGS, {
                 signal: undefined,
             });
-            expect(result).toEqual({ id: 1, disclaimerTitle: 'Disclaimer', exchangeRate: '42.18' });
+            expect(result).toEqual({ id: 1, disclaimerTitle: 'Disclaimer', exchangeRate: '42,18' });
         });
 
         it('should pass cancellation signal', async () => {
@@ -151,8 +151,8 @@ describe('FundsExpendituresApi', () => {
                     categoryId: 1,
                     type: 'income',
                     reportingYear: '2025',
-                    amountUah: '7265.5',
-                    amountUsd: '4200.25',
+                    amountUah: '7265,5',
+                    amountUsd: '4200,25',
                 },
             ]);
         });
@@ -246,7 +246,7 @@ describe('FundsExpendituresApi', () => {
                 type: 2,
                 reportingYear: 2025,
                 amountUah: 350,
-                amountUsd: 9,
+                amountUsd: 9.5,
             });
             expect(result).toEqual({
                 id: 12,
@@ -254,7 +254,7 @@ describe('FundsExpendituresApi', () => {
                 type: 'expense',
                 reportingYear: '2025',
                 amountUah: '350',
-                amountUsd: '9.5',
+                amountUsd: '9,5',
             });
         });
     });

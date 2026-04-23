@@ -377,13 +377,15 @@ export const FundsExpendituresTable = ({
             const finalError = getRowEditValidationError(record, rowEditState.categoryId, 'blur');
             const isCategoryUnchanged = rowEditState.categoryId === rowEditState.originalCategoryId;
             const isCategoryMissing = rowEditState.categoryId === undefined;
-            const normalizedAmountUah = normalizeFundsExpendituresAmountInput(rowEditState.amountUah, true);
-            const normalizedAmountUsd = normalizeFundsExpendituresAmountInput(rowEditState.amountUsd, true);
-            const amountUahError = validateFundsExpendituresAmount(normalizedAmountUah, 'save');
-            const amountUsdError = validateFundsExpendituresAmount(normalizedAmountUsd, 'save');
+            const preparedAmountUah = rowEditState.amountUah.trim();
+            const preparedAmountUsd = rowEditState.amountUsd.trim();
+            const amountUahError = validateFundsExpendituresAmount(preparedAmountUah, 'save');
+            const amountUsdError = validateFundsExpendituresAmount(preparedAmountUsd, 'save');
             const isAmountsUnchanged =
-                normalizeFundsExpendituresAmountInput(rowEditState.originalAmountUah, true) === normalizedAmountUah &&
-                normalizeFundsExpendituresAmountInput(rowEditState.originalAmountUsd, true) === normalizedAmountUsd;
+                normalizeFundsExpendituresAmountInput(rowEditState.originalAmountUah, true) ===
+                    normalizeFundsExpendituresAmountInput(preparedAmountUah, true) &&
+                normalizeFundsExpendituresAmountInput(rowEditState.originalAmountUsd, true) ===
+                    normalizeFundsExpendituresAmountInput(preparedAmountUsd, true);
 
             if (
                 finalError ||
@@ -399,8 +401,8 @@ export const FundsExpendituresTable = ({
 
                     return {
                         ...prev,
-                        amountUah: normalizedAmountUah,
-                        amountUsd: normalizedAmountUsd,
+                        amountUah: preparedAmountUah,
+                        amountUsd: preparedAmountUsd,
                         errors: {
                             ...prev.errors,
                             category: finalError,
@@ -423,8 +425,8 @@ export const FundsExpendituresTable = ({
             try {
                 const isSaved = await onRecordSave?.(record.id, {
                     categoryId: nextCategoryId,
-                    amountUah: normalizedAmountUah,
-                    amountUsd: normalizedAmountUsd,
+                    amountUah: preparedAmountUah,
+                    amountUsd: preparedAmountUsd,
                 });
 
                 if (isSaved === false) {

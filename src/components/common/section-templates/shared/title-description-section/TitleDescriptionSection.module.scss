@@ -45,12 +45,12 @@
         justify-content: center;
 
         .title-section {
-            flex: 0 0 30%;
+            flex: 1 1 auto;
             min-width: 0;
         }
 
         .description-section {
-            flex: 0 0 30%;
+            flex: 1 1 auto;
             min-width: 0;
         }
     }

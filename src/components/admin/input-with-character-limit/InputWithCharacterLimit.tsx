@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import cn from 'classnames';
 import { ReactComponent as RemoveIcon } from '@/assets/icons/remove-query.svg';
 import { useInputWithCharacterLimit } from '@/hooks/admin/use-input-with-character-limit/useInputWithCharacterLimit';
@@ -45,6 +45,12 @@ export const InputWithCharacterLimit = ({
     autoGrow,
     maxRows,
 }: InputWithCharacterLimitProps) => {
+    const [localValue, setLocalValue] = useState(value ?? '');
+
+    useEffect(() => {
+        setLocalValue(value ?? '');
+    }, [value]);
+
     const {
         isFocused,
         currentLength,
@@ -55,7 +61,7 @@ export const InputWithCharacterLimit = ({
         handleBlur,
         handleClear,
     } = useInputWithCharacterLimit<HTMLInputElement>({
-        value,
+        value: localValue,
         maxLength,
         name,
         id,
@@ -66,6 +72,11 @@ export const InputWithCharacterLimit = ({
         onBlur,
         onWarningChange,
     });
+
+    const onInternalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setLocalValue(e.target.value);
+        handleChange(e);
+    };
 
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -78,7 +89,7 @@ export const InputWithCharacterLimit = ({
         textarea.style.height = 'auto';
         textarea.style.height = `${textarea.scrollHeight}px`;
         textarea.style.overflowY = 'hidden';
-    }, [value, autoGrow, maxRows]);
+    }, [localValue, autoGrow, maxRows]);
 
     const countId = `${id}-character-count`;
 
@@ -95,8 +106,8 @@ export const InputWithCharacterLimit = ({
                 <textarea
                     ref={textareaRef}
                     className={cn('char-limit-input__field', 'char-limit-input__field--textarea', className)}
-                    value={value ?? ''}
-                    onChange={handleChange as unknown as React.ChangeEventHandler<HTMLTextAreaElement>}
+                    value={localValue}
+                    onChange={onInternalChange as unknown as React.ChangeEventHandler<HTMLTextAreaElement>}
                     onFocus={handleFocus as unknown as React.FocusEventHandler<HTMLTextAreaElement>}
                     onBlur={handleBlur as unknown as React.FocusEventHandler<HTMLTextAreaElement>}
                     name={name}
@@ -111,8 +122,8 @@ export const InputWithCharacterLimit = ({
             ) : (
                 <input
                     className={cn('char-limit-input__field', className)}
-                    value={value ?? ''}
-                    onChange={handleChange}
+                    value={localValue}
+                    onChange={onInternalChange}
                     onFocus={handleFocus}
                     onBlur={handleBlur}
                     name={name}

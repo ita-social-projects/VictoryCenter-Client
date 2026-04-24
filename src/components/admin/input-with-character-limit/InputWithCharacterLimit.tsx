@@ -104,6 +104,7 @@ export const InputWithCharacterLimit = ({
                     disabled={disabled}
                     placeholder={placeholder}
                     rows={rows ?? 1}
+                    maxLength={maxLength}
                     aria-describedby={countId}
                     aria-invalid={hasError || currentLength > maxLength}
                 />
@@ -119,6 +120,7 @@ export const InputWithCharacterLimit = ({
                     id={id}
                     disabled={disabled}
                     placeholder={placeholder}
+                    maxLength={maxLength}
                     aria-describedby={countId}
                     aria-invalid={hasError || currentLength > maxLength}
                 />

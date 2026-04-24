@@ -35,7 +35,6 @@ describe('useInputWithCharacterLimit', () => {
     const createMockEvent = (value: string) =>
         ({
             target: { value, name: 'testInput', id: 'test-input' },
-            currentTarget: { value, name: 'testInput', id: 'test-input' },
         }) as unknown as React.ChangeEvent<HTMLInputElement>;
 
     const triggerChange = (result: any, value: string) => {
@@ -86,10 +85,6 @@ describe('useInputWithCharacterLimit', () => {
                         ...mockEvent.target,
                         value: inputValue,
                     },
-                    currentTarget: {
-                        ...mockEvent.target,
-                        value: inputValue,
-                    },
                 });
                 expect(mockClearWarning).toHaveBeenCalled();
                 expect(mockShowTemporaryWarning).not.toHaveBeenCalled();
@@ -104,10 +99,6 @@ describe('useInputWithCharacterLimit', () => {
                 expect(mockOnChange).toHaveBeenCalledWith({
                     ...mockEvent,
                     target: {
-                        ...mockEvent.target,
-                        value: inputValue,
-                    },
-                    currentTarget: {
                         ...mockEvent.target,
                         value: inputValue,
                     },
@@ -343,7 +334,6 @@ describe('useInputWithCharacterLimit', () => {
             const { result } = renderHook(() => useInputWithCharacterLimit<HTMLTextAreaElement>(defaultProps as any));
             const mockEvent = {
                 target: { value: inputValue, name: 'testInput', id: 'test-input' },
-                currentTarget: { value: inputValue, name: 'testInput', id: 'test-input' },
             } as unknown as React.ChangeEvent<HTMLTextAreaElement>;
 
             act(() => {
@@ -368,7 +358,6 @@ describe('useInputWithCharacterLimit', () => {
             const truncatedText = 'a'.repeat(60);
             const mockEvent = {
                 target: { value: longText, name: 'title', id: 'title-input' },
-                currentTarget: { value: longText, name: 'title', id: 'title-input' },
             } as unknown as React.ChangeEvent<HTMLInputElement>;
 
             act(() => {
@@ -378,10 +367,6 @@ describe('useInputWithCharacterLimit', () => {
             expect(mockOnChange).toHaveBeenCalledWith({
                 ...mockEvent,
                 target: {
-                    ...mockEvent.target,
-                    value: truncatedText,
-                },
-                currentTarget: {
                     ...mockEvent.target,
                     value: truncatedText,
                 },
@@ -398,11 +383,9 @@ describe('useInputWithCharacterLimit', () => {
             );
 
             const longText = 'b'.repeat(601);
-            const truncatedText = 'b'.repeat(600);
             const mockEvent = {
                 target: { value: longText, name: 'description', id: 'description-input' },
-                currentTarget: { value: longText, name: 'description', id: 'description-input' },
-            } as unknown as React.ChangeEvent<HTMLTextAreaElement>;
+            } as React.ChangeEvent<HTMLTextAreaElement>;
 
             act(() => {
                 result.current.handleChange(mockEvent);
@@ -412,11 +395,7 @@ describe('useInputWithCharacterLimit', () => {
                 ...mockEvent,
                 target: {
                     ...mockEvent.target,
-                    value: truncatedText,
-                },
-                currentTarget: {
-                    ...mockEvent.target,
-                    value: truncatedText,
+                    value: 'b'.repeat(600),
                 },
             });
         });

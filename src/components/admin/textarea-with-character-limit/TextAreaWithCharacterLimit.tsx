@@ -113,6 +113,7 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
                         disabled={disabled}
                         placeholder={placeholder}
                         rows={rows}
+                        maxLength={maxLength}
                     />
                     {showClearButton && (
                         <button

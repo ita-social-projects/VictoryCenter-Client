@@ -106,8 +106,11 @@
     justify-content: space-between;
 
     .left-section {
-        justify-content: space-around;
+        justify-content: flex-start;
         flex: 0 0 41%;
+        padding-top: 30px;
+        padding-bottom: 30px;
+        gap: 5%;
     }
 
     .title-section {

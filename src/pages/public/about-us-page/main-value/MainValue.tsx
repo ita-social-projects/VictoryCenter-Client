@@ -4,6 +4,7 @@ import styles from './MainValue.module.scss';
 import { WaveSwiper } from '@/components/public/swiper/wave-swiper/WaveSwiper';
 import { AboutUsContent } from '@/types/public/about-us-page';
 import { SwipedCard } from '@/components/public/swiper/swiped-card/SwipedCard';
+import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 
 export interface MainValuesProps {
     content: AboutUsContent[] | null;
@@ -28,7 +29,7 @@ export const MainValues = ({ content }: MainValuesProps) => {
                 <WaveSwiper
                     items={content}
                     renderItemCallback={(person, index) => {
-                        const imageUrl = person.image?.url ?? ABOUT_US_DATA.PEOPLE_DATA[index].IMG;
+                        const imageUrl = getImageSrc(person.image) || ABOUT_US_DATA.PEOPLE_DATA[index].IMG;
                         const altText = peopleData[index].ALT;
                         return (
                             <SwipedCard

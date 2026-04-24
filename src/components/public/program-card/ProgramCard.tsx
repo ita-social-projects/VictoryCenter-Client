@@ -2,6 +2,7 @@ import { PublishedProgramDto } from '@/types/public/programs-page';
 import { ReactComponent as ArrowIcon } from '@/assets/icons/arrow-up-right.svg';
 import styleswhoWeAre from './ProgramCardAboutUsPage.module.scss';
 import stylesPrograms from './ProgramCardProgramsPage.module.scss';
+import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 import { useNavigate } from 'react-router-dom';
 import { PUBLIC_ROUTES } from '@/const/public/routes';
 import cn from 'classnames';
@@ -50,7 +51,7 @@ export const ProgramCard = ({ program, variant }: ProgramCardProps) => {
             style={{ cursor: program.slug ? 'pointer' : 'default' }}
         >
             <div className={styles['image-wrapper']}>
-                <img src={program.previewImage?.url} alt={program.name} className={styles.image} />
+                <img src={getImageSrc(program.previewImage)} alt={program.name} className={styles.image} />
             </div>
             <div className={styles.content}>
                 <div className={styles[`subtitle-content`]}>

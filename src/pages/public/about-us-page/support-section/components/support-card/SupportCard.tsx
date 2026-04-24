@@ -5,6 +5,7 @@ import styles from './SupportCard.module.scss';
 import cn from 'classnames';
 import { SafeHtml } from '@/components/common/safe-html';
 import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
+import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 
 interface SupportCardProps {
     card: AboutUsContent;
@@ -15,7 +16,7 @@ export function SupportCard({ card, index }: SupportCardProps) {
     const { t } = useTranslation('aboutUsPage');
     const supportData = t('SUPPORT_DATA', { returnObjects: true });
 
-    const imageUrl = card.image?.url ?? ABOUT_US_DATA.SUPPORT_DATA[index].IMG;
+    const imageUrl = getImageSrc(card.image) || ABOUT_US_DATA.SUPPORT_DATA[index].IMG;
     const altText = supportData[index].ALT;
 
     const { description } = useGetLocalization(card?.localizations, {

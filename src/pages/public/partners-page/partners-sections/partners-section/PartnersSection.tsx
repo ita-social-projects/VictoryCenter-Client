@@ -1,6 +1,7 @@
 import React from 'react';
 import { PartnerSection } from '@/types/public/partners-page';
 import styles from './PartnersSection.module.scss';
+import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 
 interface PartnersSectionProps {
     section: PartnerSection | null;
@@ -22,7 +23,7 @@ export const PartnersSection = ({ section }: PartnersSectionProps) => {
                     {section.partners.map((partner) => (
                         <div key={partner.id} className={styles['partner-item']}>
                             <img
-                                src={partner.image.url}
+                                src={getImageSrc(partner.image)}
                                 alt={`${partner.id} logo`}
                                 className={styles['partner-logo']}
                             />

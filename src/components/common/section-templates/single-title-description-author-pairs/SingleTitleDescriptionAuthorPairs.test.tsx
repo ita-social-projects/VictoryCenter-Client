@@ -201,7 +201,7 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
         expect(root).not.toHaveClass('editable');
     });
 
-    it('renders title input in edit mode, uppercases on change, and does not validate when no error yet', () => {
+    it('renders title input in edit mode and does not validate when no error yet', () => {
         const onTitleChange = jest.fn();
         const { root } = renderComponent({
             mode: SectionMode.Edit,
@@ -219,7 +219,7 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
             target: { value: 'ab' },
         });
 
-        expect(onTitleChange).toHaveBeenCalledWith('AB');
+        expect(onTitleChange).toHaveBeenCalledWith('ab');
         expect(getValidateContentTextMock()).not.toHaveBeenCalled();
 
         expect(getCardCarouselProps().variant).toBe('editable');
@@ -262,7 +262,7 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
             target: { value: 'abc' },
         });
 
-        expect(onTitleChange).toHaveBeenCalledWith('ABC');
+        expect(onTitleChange).toHaveBeenCalledWith('abc');
 
         await waitFor(() =>
             expect(screen.getByTestId('error-single-title-description-author-pairs-title')).toHaveTextContent(
@@ -271,7 +271,7 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
         );
 
         expect(validateContentText.mock.calls[1]).toEqual([
-            'ABC',
+            'abc',
             ContentType.Title,
             true,
             SectionTemplate.SingleTitleDescriptionAuthorPairs,

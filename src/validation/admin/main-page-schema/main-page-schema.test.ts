@@ -3,7 +3,7 @@ import { MAIN_PAGE_VALIDATION_FUNCTIONS } from './main-page-schema';
 
 describe('MAIN_PAGE_VALIDATION_FUNCTIONS', () => {
     describe('validateTitle', () => {
-        it('returns undefined for a valid title', () => {
+        it('returns undefined for a valid title (between 10 and 50 chars)', () => {
             expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateTitle('Коні з досвідом зцілення')).toBeUndefined();
         });
 
@@ -15,10 +15,16 @@ describe('MAIN_PAGE_VALIDATION_FUNCTIONS', () => {
             expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateTitle('   ')).toBe(MAIN_PAGE_VALIDATION.common.REQUIRED);
         });
 
+        it('returns min error for title shorter than 10 chars', () => {
+            expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateTitle('Короткий')).toBe(
+                MAIN_PAGE_VALIDATION.titleBlock.title.getMinError(),
+            );
+        });
+
         it('returns max error for title longer than 50 chars', () => {
-            const longTitle = 'a'.repeat(MAIN_PAGE_VALIDATION.title.max + 1);
+            const longTitle = 'a'.repeat(MAIN_PAGE_VALIDATION.titleBlock.title.max + 1);
             expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateTitle(longTitle)).toBe(
-                MAIN_PAGE_VALIDATION.title.getMaxError(),
+                MAIN_PAGE_VALIDATION.titleBlock.title.getMaxError(),
             );
         });
     });
@@ -38,10 +44,16 @@ describe('MAIN_PAGE_VALIDATION_FUNCTIONS', () => {
             );
         });
 
-        it('returns max error for description longer than 1000 chars', () => {
-            const longDescription = 'a'.repeat(MAIN_PAGE_VALIDATION.description.max + 1);
+        it('returns min error for description shorter than 10 chars', () => {
+            expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateDescription('Короткий')).toBe(
+                MAIN_PAGE_VALIDATION.titleBlock.description.getMinError(),
+            );
+        });
+
+        it('returns max error for description longer than 300 chars', () => {
+            const longDescription = 'a'.repeat(MAIN_PAGE_VALIDATION.titleBlock.description.max + 1);
             expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateDescription(longDescription)).toBe(
-                MAIN_PAGE_VALIDATION.description.getMaxError(),
+                MAIN_PAGE_VALIDATION.titleBlock.description.getMaxError(),
             );
         });
     });

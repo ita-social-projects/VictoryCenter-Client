@@ -53,7 +53,7 @@ export const AboutUsBlockForm = ({ initialData }: AboutUsBlockFormProps) => {
                                 onChange={onChange}
                                 onBlur={onBlur}
                                 error={errors.title?.message}
-                                maxLength={MAIN_PAGE_VALIDATION.title.max}
+                                maxLength={MAIN_PAGE_VALIDATION.aboutUsBlock.title.max}
                                 isRequired={true}
                             />
                         )}
@@ -73,7 +73,7 @@ export const AboutUsBlockForm = ({ initialData }: AboutUsBlockFormProps) => {
                                 onChange={onChange}
                                 onBlur={onBlur}
                                 error={errors.description?.message}
-                                maxLength={MAIN_PAGE_VALIDATION.description.max}
+                                maxLength={MAIN_PAGE_VALIDATION.aboutUsBlock.description.max}
                                 isRequired={true}
                                 rows={14}
                                 className={styles['textarea-custom']}

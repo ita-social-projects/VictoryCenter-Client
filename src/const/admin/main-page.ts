@@ -30,13 +30,33 @@ export const MAIN_PAGE_VALIDATION = {
         REQUIRED: COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED,
     },
 
-    title: {
-        max: 50,
-        getMaxError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(50),
+    titleBlock: {
+        title: {
+            min: 10,
+            max: 50,
+            getMinError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(10),
+            getMaxError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(50),
+        },
+        description: {
+            min: 10,
+            max: 300,
+            getMinError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(10),
+            getMaxError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(300),
+        },
     },
 
-    description: {
-        max: 1000,
-        getMaxError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(1000),
+    aboutUsBlock: {
+        title: {
+            min: 10,
+            max: 50,
+            getMinError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(10),
+            getMaxError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(50),
+        },
+        description: {
+            min: 10,
+            max: 1000,
+            getMinError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(10),
+            getMaxError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(1000),
+        },
     },
 } as const;

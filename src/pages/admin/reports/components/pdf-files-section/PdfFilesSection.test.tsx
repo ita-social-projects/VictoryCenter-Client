@@ -19,21 +19,6 @@ jest.mock('./components/pdf-section-content-block/PdfSectionContentBlock', () =>
 }));
 
 jest.mock('./components/pdf-files-table/PdfFilesTable', () => ({
-    PdfFilesTable: ({ files, onDeleteFile, onViewFile, isDeleting }: any) => (
-        <div data-testid="files-table">
-            Files Count: {files?.length ?? 0}
-            {isDeleting && <span data-testid="is-deleting">Deleting...</span>}
-            <button onClick={() => onDeleteFile && onDeleteFile(1)} data-testid="delete-btn">
-                Delete
-            </button>
-            <button onClick={() => onViewFile && onViewFile(files?.[0])} data-testid="view-btn">
-                View
-            </button>
-        </div>
-    ),
-}));
-
-jest.mock('./components/pdf-files-table/PdfFilesTable', () => ({
     PdfFilesTable: ({ files, onDeleteFile, onViewFile, onRenameFile, isDeleting, isRenaming }: any) => (
         <div data-testid="files-table">
             Files Count: {files?.length ?? 0}

@@ -104,17 +104,23 @@ export const PdfFilesSection = () => {
             setIsRenaming(true);
             try {
                 const updatedFile = await PdfReportsApi.rename(client, fileId, newName);
-                setUploadedFiles((prev) => prev.map((f) => (f.id === fileId ? updatedFile : f)));
+                setUploadedFiles((prev) => {
+                    const exists = prev.some((f) => f.id === fileId);
+                    return exists ? prev.map((f) => (f.id === fileId ? updatedFile : f)) : [...prev, updatedFile];
+                });
                 addToast(PDF_FILES_SECTION_TEXT.RENAME_SUCCESS, ToastType.Success);
             } catch {
                 addToast(PDF_FILES_SECTION_TEXT.RENAME_ERROR, ToastType.Error);
-            } finally {
                 setIsRenaming(false);
+                return;
             }
 
             try {
                 await refetchFiles();
-            } catch {}
+            } catch {
+            } finally {
+                setIsRenaming(false);
+            }
         },
         [client, addToast, refetchFiles],
     );

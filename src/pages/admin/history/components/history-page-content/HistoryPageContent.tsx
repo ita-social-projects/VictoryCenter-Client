@@ -236,14 +236,16 @@ export const HistoryPageContent = () => {
                             <PlusIcon className={styles['plus-icon']} />
                         </Button>
                     )}
-                    <Button
-                        className={styles['btn-publish']}
-                        onClick={() => setConfirmationModalOpen(true)}
-                        buttonStyle="primary"
-                        disabled={!canPublish || isPublishing}
-                    >
-                        {HISTORY_TEXT.BUTTON.PUBLISH}
-                    </Button>
+                    {hasSections && (
+                        <Button
+                            className={styles['btn-publish']}
+                            onClick={() => setConfirmationModalOpen(true)}
+                            buttonStyle="primary"
+                            disabled={!canPublish || isPublishing}
+                        >
+                            {HISTORY_TEXT.BUTTON.PUBLISH}
+                        </Button>
+                    )}
                 </div>
             </div>
             <AddSectionModal

@@ -235,9 +235,14 @@ export const HistoryForm = forwardRef<HistoryFormRef, HistoryFormProps>(function
                 return;
             }
 
+            const isNewSection = sectionStatesRef.current[index]?.isNew ?? false;
+
             updateSections((prev) => prev.filter((_, sectionIndex) => sectionIndex !== index));
             setSectionStates((prev) => prev.filter((state) => state.sectionKey !== sectionKey));
-            onSectionDeleted?.(localSectionsRef.current);
+
+            if (!isNewSection) {
+                onSectionDeleted?.(localSectionsRef.current);
+            }
         },
         [getSectionIndex, onSectionDeleted, updateSections],
     );

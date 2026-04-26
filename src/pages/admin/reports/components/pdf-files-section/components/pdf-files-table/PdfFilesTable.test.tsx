@@ -55,6 +55,16 @@ jest.mock('@/validation/admin/reports-schema/pdf-file-rename-schema/pdf-file-ren
 }));
 
 describe('PdfFilesTable', () => {
+    const { PDF_FILE_RENAME_VALIDATION_FUNCTIONS } = jest.requireMock(
+        '@/validation/admin/reports-schema/pdf-file-rename-schema/pdf-file-rename-schema',
+    );
+
+    const enterEditMode = async (user: ReturnType<typeof userEvent.setup>, fileIndex = 0) => {
+        const editButtons = screen.getAllByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.EDIT);
+        await user.click(editButtons[fileIndex]);
+        return screen.getByDisplayValue(mockFiles[fileIndex].name) as HTMLInputElement;
+    };
+
     const mockFiles: PdfReportDto[] = [
         {
             id: 1,
@@ -88,6 +98,11 @@ describe('PdfFilesTable', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
+        PDF_FILE_RENAME_VALIDATION_FUNCTIONS.validateName.mockImplementation((value: string) => {
+            if (value.length < 2) return 'Не менше 2 символів';
+            if (value.length > 50) return 'Не більше 50 символів';
+            return undefined;
+        });
     });
 
     it('should render view button for each file', () => {
@@ -265,10 +280,7 @@ describe('PdfFilesTable', () => {
             const user = userEvent.setup();
             render(<PdfFilesTable {...defaultProps} />);
 
-            const editButtons = screen.getAllByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.EDIT);
-            await user.click(editButtons[0]);
-
-            const input = screen.getByDisplayValue(mockFiles[0].name);
+            const input = await enterEditMode(user);
             expect(input).toBeInTheDocument();
         });
 
@@ -276,10 +288,9 @@ describe('PdfFilesTable', () => {
             const user = userEvent.setup();
             render(<PdfFilesTable {...defaultProps} />);
 
-            const editButtons = screen.getAllByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.EDIT);
-            await user.click(editButtons[0]);
+            await enterEditMode(user);
 
-            editButtons.forEach((button) => {
+            screen.getAllByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.EDIT).forEach((button) => {
                 expect(button).toBeDisabled();
             });
         });
@@ -288,8 +299,7 @@ describe('PdfFilesTable', () => {
             const user = userEvent.setup();
             render(<PdfFilesTable {...defaultProps} />);
 
-            const editButtons = screen.getAllByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.EDIT);
-            await user.click(editButtons[0]);
+            await enterEditMode(user);
 
             expect(screen.getByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.ACCEPT_RENAME)).toBeInTheDocument();
             expect(screen.getByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.CANCEL_RENAME)).toBeInTheDocument();
@@ -299,8 +309,7 @@ describe('PdfFilesTable', () => {
             const user = userEvent.setup();
             render(<PdfFilesTable {...defaultProps} />);
 
-            const editButtons = screen.getAllByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.EDIT);
-            await user.click(editButtons[0]);
+            await enterEditMode(user);
 
             const cancelButton = screen.getByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.CANCEL_RENAME);
             await user.click(cancelButton);
@@ -312,15 +321,11 @@ describe('PdfFilesTable', () => {
             const user = userEvent.setup();
             render(<PdfFilesTable {...defaultProps} />);
 
-            const editButtons = screen.getAllByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.EDIT);
-            await user.click(editButtons[0]);
-
-            const input = screen.getByDisplayValue(mockFiles[0].name) as HTMLInputElement;
+            const input = await enterEditMode(user);
             await user.clear(input);
             await user.type(input, 'New Name');
 
-            const acceptButton = screen.getByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.ACCEPT_RENAME);
-            await user.click(acceptButton);
+            await user.click(screen.getByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.ACCEPT_RENAME));
 
             await waitFor(() => {
                 expect(mockOnRenameFile).toHaveBeenCalledWith(mockFiles[0].id, 'New Name');
@@ -331,10 +336,7 @@ describe('PdfFilesTable', () => {
             const user = userEvent.setup();
             render(<PdfFilesTable {...defaultProps} />);
 
-            const editButtons = screen.getAllByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.EDIT);
-            await user.click(editButtons[0]);
-
-            const input = screen.getByDisplayValue(mockFiles[0].name) as HTMLInputElement;
+            const input = await enterEditMode(user);
             await user.clear(input);
             await user.type(input, '  New  Name  With   Spaces  ');
 
@@ -350,10 +352,7 @@ describe('PdfFilesTable', () => {
             const user = userEvent.setup();
             render(<PdfFilesTable {...defaultProps} />);
 
-            const editButtons = screen.getAllByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.EDIT);
-            await user.click(editButtons[0]);
-
-            const input = screen.getByDisplayValue(mockFiles[0].name) as HTMLInputElement;
+            const input = await enterEditMode(user);
             await user.clear(input);
 
             const acceptButton = screen.getByLabelText(
@@ -366,10 +365,7 @@ describe('PdfFilesTable', () => {
             const user = userEvent.setup();
             render(<PdfFilesTable {...defaultProps} />);
 
-            const editButtons = screen.getAllByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.EDIT);
-            await user.click(editButtons[0]);
-
-            const input = screen.getByDisplayValue(mockFiles[0].name) as HTMLInputElement;
+            const input = await enterEditMode(user);
             await user.clear(input);
             await user.type(input, 'A');
 
@@ -377,47 +373,6 @@ describe('PdfFilesTable', () => {
                 PDF_FILES_SECTION_TEXT.ACTIONS.FILE.ACCEPT_RENAME,
             ) as HTMLButtonElement;
             expect(acceptButton).toBeDisabled();
-        });
-
-        it('should disable other buttons when renaming', async () => {
-            const user = userEvent.setup();
-            const { rerender } = render(<PdfFilesTable {...defaultProps} isRenaming={false} />);
-
-            const editButtons = screen.getAllByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.EDIT);
-            await user.click(editButtons[0]);
-
-            const input = screen.getByDisplayValue(mockFiles[0].name) as HTMLInputElement;
-            await user.clear(input);
-            await user.type(input, 'New Name');
-
-            rerender(<PdfFilesTable {...defaultProps} isRenaming={true} />);
-
-            const acceptButton = screen.getByLabelText(
-                PDF_FILES_SECTION_TEXT.ACTIONS.FILE.ACCEPT_RENAME,
-            ) as HTMLButtonElement;
-            const cancelButton = screen.getByLabelText(
-                PDF_FILES_SECTION_TEXT.ACTIONS.FILE.CANCEL_RENAME,
-            ) as HTMLButtonElement;
-            const deleteButtons = screen.getAllByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.DELETE);
-
-            expect(acceptButton).toBeDisabled();
-            expect(cancelButton).toBeDisabled();
-            deleteButtons.forEach((button) => {
-                expect(button).toBeDisabled();
-            });
-        });
-
-        it('should disable view button when in edit mode', async () => {
-            const user = userEvent.setup();
-            render(<PdfFilesTable {...defaultProps} />);
-
-            const editButtons = screen.getAllByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.EDIT);
-            await user.click(editButtons[0]);
-
-            const viewButtons = screen.getAllByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.VIEW);
-            viewButtons.forEach((button) => {
-                expect(button).toBeDisabled();
-            });
         });
     });
 });

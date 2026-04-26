@@ -32,10 +32,26 @@ jest.mock('@/assets/icons/file.svg', () => ({
 jest.mock('@/assets/icons/not-found.svg', () => ({
     ReactComponent: () => <svg data-testid="not-found-icon" />,
 }));
+jest.mock('@/assets/icons/checkmark.svg', () => ({
+    ReactComponent: () => <svg data-testid="checkmark-icon" />,
+}));
+jest.mock('@/assets/icons/cross.svg', () => ({
+    ReactComponent: () => <svg data-testid="cross-icon" />,
+}));
 jest.mock('@/components/admin/icon-button/IconButton', () => ({
     IconButton: ({ onClick, disabled, 'aria-label': ariaLabel }: any) => (
         <button onClick={onClick} disabled={disabled} aria-label={ariaLabel} />
     ),
+}));
+
+jest.mock('@/validation/admin/reports-schema/pdf-file-rename-schema/pdf-file-rename-schema', () => ({
+    PDF_FILE_RENAME_VALIDATION_FUNCTIONS: {
+        validateName: jest.fn((value) => {
+            if (value.length < 2) return 'Не менше 2 символів';
+            if (value.length > 50) return 'Не більше 50 символів';
+            return undefined;
+        }),
+    },
 }));
 
 describe('PdfFilesTable', () => {
@@ -59,12 +75,15 @@ describe('PdfFilesTable', () => {
     ];
 
     const mockOnDeleteFile = jest.fn();
+    const mockOnRenameFile = jest.fn();
 
     const defaultProps = {
         files: mockFiles,
         onViewFile: jest.fn(),
         onDeleteFile: mockOnDeleteFile,
+        onRenameFile: mockOnRenameFile,
         isDeleting: false,
+        isRenaming: false,
     };
 
     beforeEach(() => {
@@ -232,5 +251,173 @@ describe('PdfFilesTable', () => {
         });
 
         expect(mockOnViewFile).toHaveBeenCalledTimes(2);
+    });
+
+    describe('rename functionality', () => {
+        it('should render edit button for each file', () => {
+            render(<PdfFilesTable {...defaultProps} />);
+
+            const editButtons = screen.getAllByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.EDIT);
+            expect(editButtons).toHaveLength(mockFiles.length);
+        });
+
+        it('should enter edit mode when edit button is clicked', async () => {
+            const user = userEvent.setup();
+            render(<PdfFilesTable {...defaultProps} />);
+
+            const editButtons = screen.getAllByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.EDIT);
+            await user.click(editButtons[0]);
+
+            const input = screen.getByDisplayValue(mockFiles[0].name);
+            expect(input).toBeInTheDocument();
+        });
+
+        it('should disable all edit buttons when one is in edit mode', async () => {
+            const user = userEvent.setup();
+            render(<PdfFilesTable {...defaultProps} />);
+
+            const editButtons = screen.getAllByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.EDIT);
+            await user.click(editButtons[0]);
+
+            editButtons.forEach((button) => {
+                expect(button).toBeDisabled();
+            });
+        });
+
+        it('should show accept and cancel buttons in edit mode', async () => {
+            const user = userEvent.setup();
+            render(<PdfFilesTable {...defaultProps} />);
+
+            const editButtons = screen.getAllByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.EDIT);
+            await user.click(editButtons[0]);
+
+            expect(screen.getByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.ACCEPT_RENAME)).toBeInTheDocument();
+            expect(screen.getByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.CANCEL_RENAME)).toBeInTheDocument();
+        });
+
+        it('should cancel edit mode when cancel button is clicked', async () => {
+            const user = userEvent.setup();
+            render(<PdfFilesTable {...defaultProps} />);
+
+            const editButtons = screen.getAllByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.EDIT);
+            await user.click(editButtons[0]);
+
+            const cancelButton = screen.getByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.CANCEL_RENAME);
+            await user.click(cancelButton);
+
+            expect(screen.queryByDisplayValue(mockFiles[0].name)).not.toBeInTheDocument();
+        });
+
+        it('should call onRenameFile with correct parameters when accept button is clicked', async () => {
+            const user = userEvent.setup();
+            render(<PdfFilesTable {...defaultProps} />);
+
+            const editButtons = screen.getAllByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.EDIT);
+            await user.click(editButtons[0]);
+
+            const input = screen.getByDisplayValue(mockFiles[0].name) as HTMLInputElement;
+            await user.clear(input);
+            await user.type(input, 'New Name');
+
+            const acceptButton = screen.getByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.ACCEPT_RENAME);
+            await user.click(acceptButton);
+
+            await waitFor(() => {
+                expect(mockOnRenameFile).toHaveBeenCalledWith(mockFiles[0].id, 'New Name');
+            });
+        });
+
+        it('should normalize spaces (trim and collapse) in the input', async () => {
+            const user = userEvent.setup();
+            render(<PdfFilesTable {...defaultProps} />);
+
+            const editButtons = screen.getAllByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.EDIT);
+            await user.click(editButtons[0]);
+
+            const input = screen.getByDisplayValue(mockFiles[0].name) as HTMLInputElement;
+            await user.clear(input);
+            await user.type(input, '  New  Name  With   Spaces  ');
+
+            const acceptButton = screen.getByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.ACCEPT_RENAME);
+            await user.click(acceptButton);
+
+            await waitFor(() => {
+                expect(mockOnRenameFile).toHaveBeenCalledWith(mockFiles[0].id, 'New Name With Spaces');
+            });
+        });
+
+        it('should disable accept button when name is empty', async () => {
+            const user = userEvent.setup();
+            render(<PdfFilesTable {...defaultProps} />);
+
+            const editButtons = screen.getAllByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.EDIT);
+            await user.click(editButtons[0]);
+
+            const input = screen.getByDisplayValue(mockFiles[0].name) as HTMLInputElement;
+            await user.clear(input);
+
+            const acceptButton = screen.getByLabelText(
+                PDF_FILES_SECTION_TEXT.ACTIONS.FILE.ACCEPT_RENAME,
+            ) as HTMLButtonElement;
+            expect(acceptButton).toBeDisabled();
+        });
+
+        it('should disable accept button when validation fails', async () => {
+            const user = userEvent.setup();
+            render(<PdfFilesTable {...defaultProps} />);
+
+            const editButtons = screen.getAllByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.EDIT);
+            await user.click(editButtons[0]);
+
+            const input = screen.getByDisplayValue(mockFiles[0].name) as HTMLInputElement;
+            await user.clear(input);
+            await user.type(input, 'A');
+
+            const acceptButton = screen.getByLabelText(
+                PDF_FILES_SECTION_TEXT.ACTIONS.FILE.ACCEPT_RENAME,
+            ) as HTMLButtonElement;
+            expect(acceptButton).toBeDisabled();
+        });
+
+        it('should disable other buttons when renaming', async () => {
+            const user = userEvent.setup();
+            const { rerender } = render(<PdfFilesTable {...defaultProps} isRenaming={false} />);
+
+            const editButtons = screen.getAllByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.EDIT);
+            await user.click(editButtons[0]);
+
+            const input = screen.getByDisplayValue(mockFiles[0].name) as HTMLInputElement;
+            await user.clear(input);
+            await user.type(input, 'New Name');
+
+            rerender(<PdfFilesTable {...defaultProps} isRenaming={true} />);
+
+            const acceptButton = screen.getByLabelText(
+                PDF_FILES_SECTION_TEXT.ACTIONS.FILE.ACCEPT_RENAME,
+            ) as HTMLButtonElement;
+            const cancelButton = screen.getByLabelText(
+                PDF_FILES_SECTION_TEXT.ACTIONS.FILE.CANCEL_RENAME,
+            ) as HTMLButtonElement;
+            const deleteButtons = screen.getAllByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.DELETE);
+
+            expect(acceptButton).toBeDisabled();
+            expect(cancelButton).toBeDisabled();
+            deleteButtons.forEach((button) => {
+                expect(button).toBeDisabled();
+            });
+        });
+
+        it('should disable view button when in edit mode', async () => {
+            const user = userEvent.setup();
+            render(<PdfFilesTable {...defaultProps} />);
+
+            const editButtons = screen.getAllByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.EDIT);
+            await user.click(editButtons[0]);
+
+            const viewButtons = screen.getAllByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.VIEW);
+            viewButtons.forEach((button) => {
+                expect(button).toBeDisabled();
+            });
+        });
     });
 });

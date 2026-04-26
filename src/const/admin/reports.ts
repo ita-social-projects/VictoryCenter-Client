@@ -84,6 +84,13 @@ export const PDF_FILES_SECTION_VALIDATION = {
         getMinError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(2),
         getMaxError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(160),
     },
+    fileName: {
+        min: 2,
+        max: 50,
+        getRequiredError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED,
+        getMinError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(2),
+        getMaxError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(50),
+    },
     page_size: 4,
 };
 
@@ -118,11 +125,15 @@ export const PDF_FILES_SECTION_TEXT = {
             EDIT: 'Редагувати назву файлу',
             VIEW: 'Переглянути файл',
             DELETE: 'Видалити файл',
+            ACCEPT_RENAME: 'Прийняти',
+            CANCEL_RENAME: 'Скасувати',
         },
     },
     DELETE_CONFIRMATION: {
         TITLE: 'Файл буде видалено. Бажаєте продовжити?',
     },
+    RENAME_SUCCESS: 'Назву файлу успішно змінено',
+    RENAME_ERROR: 'Не вдалося змінити назву файлу. Спробуйте ще раз.',
     DELETE_SUCCESS: 'Файл успішно видалено',
     DELETE_ERROR: 'Не вдалося видалити файл. Спробуйте ще раз.',
     VIEW_ERROR: 'Не вдалося завантажити файл для перегляду. Спробуйте ще раз.',

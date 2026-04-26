@@ -33,6 +33,25 @@ jest.mock('./components/pdf-files-table/PdfFilesTable', () => ({
     ),
 }));
 
+jest.mock('./components/pdf-files-table/PdfFilesTable', () => ({
+    PdfFilesTable: ({ files, onDeleteFile, onViewFile, onRenameFile, isDeleting, isRenaming }: any) => (
+        <div data-testid="files-table">
+            Files Count: {files?.length ?? 0}
+            {isDeleting && <span data-testid="is-deleting">Deleting...</span>}
+            {isRenaming && <span data-testid="is-renaming">Renaming...</span>}
+            <button onClick={() => onDeleteFile && onDeleteFile(1)} data-testid="delete-btn">
+                Delete
+            </button>
+            <button onClick={() => onViewFile && onViewFile(files?.[0])} data-testid="view-btn">
+                View
+            </button>
+            <button onClick={() => onRenameFile && onRenameFile(1, 'New Name')} data-testid="rename-btn">
+                Rename
+            </button>
+        </div>
+    ),
+}));
+
 jest.mock('./components/language-switcher-buttons/LanguageSwitcherButtons', () => ({
     LanguageSwitcherButtons: () => <div data-testid="lang-switcher">LanguageSwitcher</div>,
 }));
@@ -221,6 +240,77 @@ describe('PdfFilesSection', () => {
 
         await waitFor(() => {
             expect(mockAddToast).toHaveBeenCalledWith(PDF_FILES_SECTION_TEXT.VIEW_ERROR, ToastType.Error);
+        });
+    });
+
+    it('should call rename API and refetch files on success', async () => {
+        const updatedFile = { id: 1, name: 'New Name' };
+        let callCount = 0;
+        (useDataFetch as jest.Mock).mockImplementation(() => {
+            callCount++;
+            if (callCount === 1) return { data: mockSectionData, isLoading: false, refetch: mockRefetch };
+            return { data: mockFilesResponse.items, isLoading: false, refetch: mockRefetch };
+        });
+
+        (PdfReportsApi.rename as jest.Mock).mockResolvedValueOnce(updatedFile);
+
+        render(<PdfFilesSection />);
+
+        fireEvent.click(screen.getByTestId('rename-btn'));
+
+        await waitFor(() => {
+            expect(PdfReportsApi.rename).toHaveBeenCalledWith(mockClient, 1, 'New Name');
+            expect(mockAddToast).toHaveBeenCalledWith(PDF_FILES_SECTION_TEXT.RENAME_SUCCESS, ToastType.Success);
+            expect(mockRefetch).toHaveBeenCalled();
+        });
+    });
+
+    it('should show error toast when rename fails', async () => {
+        let callCount = 0;
+        (useDataFetch as jest.Mock).mockImplementation(() => {
+            callCount++;
+            if (callCount === 1) return { data: mockSectionData, isLoading: false, refetch: mockRefetch };
+            return { data: mockFilesResponse.items, isLoading: false, refetch: mockRefetch };
+        });
+
+        (PdfReportsApi.rename as jest.Mock).mockRejectedValueOnce(new Error('Rename failed'));
+
+        render(<PdfFilesSection />);
+
+        fireEvent.click(screen.getByTestId('rename-btn'));
+
+        await waitFor(() => {
+            expect(mockAddToast).toHaveBeenCalledWith(PDF_FILES_SECTION_TEXT.RENAME_ERROR, ToastType.Error);
+        });
+    });
+
+    it('should show isRenaming indicator while rename is in progress', async () => {
+        let callCount = 0;
+        (useDataFetch as jest.Mock).mockImplementation(() => {
+            callCount++;
+            if (callCount === 1) return { data: mockSectionData, isLoading: false, refetch: mockRefetch };
+            return { data: mockFilesResponse.items, isLoading: false, refetch: mockRefetch };
+        });
+
+        let resolveRename: (value: any) => void;
+        (PdfReportsApi.rename as jest.Mock).mockReturnValueOnce(
+            new Promise((resolve) => {
+                resolveRename = resolve;
+            }),
+        );
+
+        render(<PdfFilesSection />);
+
+        fireEvent.click(screen.getByTestId('rename-btn'));
+
+        await waitFor(() => {
+            expect(screen.getByTestId('is-renaming')).toBeInTheDocument();
+        });
+
+        resolveRename!({ id: 1, name: 'New Name' });
+
+        await waitFor(() => {
+            expect(screen.queryByTestId('is-renaming')).not.toBeInTheDocument();
         });
     });
 });

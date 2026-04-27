@@ -95,6 +95,7 @@ export const PROGRAM_VALIDATION = {
     },
     location: {
         max: 55,
+        min: 2,
         getRequiredWhenPublishingError: () => 'Локація обов’язкова при публікації',
     },
     participantsCount: {

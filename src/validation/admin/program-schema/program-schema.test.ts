@@ -35,7 +35,7 @@ const loadSchema = (over?: { programValidation?: any; templateValidation?: any }
             description: { min: 1, max: 50, getRequiredWhenPublishingError: () => 'desc required' },
             previewImage: { getRequiredWhenPublishingError: () => 'preview required' },
             backgroundImage: { getRequiredWhenPublishingError: () => 'bg required' },
-            location: { max: 20, getRequiredWhenPublishingError: () => 'loc required' },
+            location: { min: 2, max: 20, getRequiredWhenPublishingError: () => 'loc required' },
             participantsCount: { max: 20, getRequiredWhenPublishingError: () => 'pc required' },
             meetingCount: { max: 20, getRequiredWhenPublishingError: () => 'mc required' },
             ...(over?.programValidation ?? {}),
@@ -800,10 +800,10 @@ describe('PROGRAM_VALIDATION_FUNCTIONS', () => {
             expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateLocation('Kyiv, Ukraine', false)).toBeUndefined();
         });
 
-        it('returns undefined for empty location (optional field)', () => {
+        it('returns min 2 for location when draft or publishing program', () => {
             const m = loadSchema();
-            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateLocation('', false)).toBeUndefined();
-            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateLocation('', true)).toBeUndefined();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateLocation('', false)).toBe('min 2');
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateLocation('', true)).toBe('min 2');
         });
 
         it('returns error when location exceeds max length', () => {

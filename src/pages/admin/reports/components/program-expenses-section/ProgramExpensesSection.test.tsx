@@ -265,4 +265,44 @@ describe('ProgramExpensesSection', () => {
         expect(ProgramExpensesApi.getReadOnlyData).toBeDefined();
         expect(mockGetReadOnlyData).toHaveBeenCalledWith({ test: true });
     });
+
+    it('should render edit mode controls when edit mode is active', () => {
+        render(<ProgramExpensesSection isEditing />);
+
+        expect(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE })).toBeEnabled();
+        expect(screen.getByRole('checkbox', { name: 'Select all program expense records' })).toBeEnabled();
+        expect(screen.getByText(PROGRAM_EXPENSES_TEXT.TABLE.COLUMNS.ACTIONS)).toBeInTheDocument();
+    });
+
+    it('should display synced exchange rate in edit mode', () => {
+        render(<ProgramExpensesSection isEditing syncedExchangeRate="44.20" />);
+
+        expect(screen.getByText('44.20')).toBeInTheDocument();
+        expect(screen.queryByText('41.25')).not.toBeInTheDocument();
+    });
+
+    it('should disable add program expense button when four records exist', () => {
+        mockUseDataFetchResult = {
+            data: {
+                ...MOCK_PROGRAM_EXPENSES_DATA,
+                records: [
+                    ...MOCK_PROGRAM_EXPENSES_DATA.records,
+                    {
+                        id: 4,
+                        programId: 3,
+                        programName: 'Program C',
+                        type: 'expense',
+                        reportingYear: '2025',
+                        amountUah: '100',
+                        amountUsd: '10',
+                    },
+                ],
+            },
+            isLoading: false,
+        };
+
+        render(<ProgramExpensesSection isEditing />);
+
+        expect(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE })).toBeDisabled();
+    });
 });

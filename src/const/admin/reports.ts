@@ -245,8 +245,10 @@ export const PROGRAM_EXPENSES_TEXT = {
         TITLE: 'Всього програмні витрати',
     },
     TABLE: {
+        TYPE_LABEL: 'Програмні',
         COLUMNS: {
             PROGRAM: 'Програма',
+            ACTIONS: 'Дії',
         },
     },
 };

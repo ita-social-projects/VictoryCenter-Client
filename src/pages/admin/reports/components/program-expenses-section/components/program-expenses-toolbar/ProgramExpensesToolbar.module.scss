@@ -4,7 +4,7 @@
 .toolbar-row {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-end;
     gap: 24px;
     width: 100%;
     min-height: 60px;
@@ -98,12 +98,18 @@
     }
 }
 
+.toolbar-actions {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    margin-left: auto;
+}
+
 .exchange-rate {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     gap: 8px;
-    margin-left: auto;
 }
 
 .exchange-rate-label {
@@ -132,14 +138,77 @@
     color: c.$blue-900;
 }
 
+.add-program-expense-button {
+    @include type.body-2-semibold;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    width: 206px;
+    height: 60px;
+    padding: 8px;
+    border-radius: 12px;
+    background-color: c.$error;
+    white-space: nowrap;
+    transition:
+        background-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.15s ease;
+
+    &:not(:disabled):hover {
+        background-color: c.$yellow-500;
+        color: c.$blue-900;
+        box-shadow: 0 4px 14px rgba(c.$yellow-500, 0.5);
+        transform: translateY(-1px);
+
+        svg path {
+            fill: c.$blue-900;
+            stroke: c.$blue-900;
+        }
+    }
+
+    &:not(:disabled):active {
+        background-color: c.$yellow-600;
+        color: c.$blue-900;
+        box-shadow: 0 2px 6px rgba(c.$yellow-500, 0.35);
+        transform: translateY(0);
+    }
+
+    &:disabled {
+        opacity: 1;
+        cursor: not-allowed;
+        background: c.$grey-700;
+        color: c.$white;
+        box-shadow: none;
+
+        svg,
+        svg path {
+            fill: c.$white;
+            stroke: c.$white;
+        }
+    }
+}
+
+.plus-icon {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
 @media (max-width: 1200px) {
     .toolbar-row {
         align-items: flex-start;
         flex-direction: column;
     }
 
+    .toolbar-actions {
+        align-items: flex-start;
+        flex-direction: column;
+        margin-left: 0;
+    }
+
     .exchange-rate {
         align-items: flex-start;
-        margin-left: 0;
     }
 }

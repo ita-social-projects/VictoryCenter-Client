@@ -18,7 +18,14 @@ const INITIAL_PROGRAM_EXPENSES_DATA: ProgramExpensesReadOnlyData = {
     records: [],
 };
 
-export const ProgramExpensesSection = () => {
+const MAX_PROGRAM_EXPENSE_RECORDS = 4;
+
+interface ProgramExpensesSectionProps {
+    isEditing?: boolean;
+    syncedExchangeRate?: string | null;
+}
+
+export const ProgramExpensesSection = ({ isEditing = false, syncedExchangeRate }: ProgramExpensesSectionProps) => {
     const [selectedProgramIds, setSelectedProgramIds] = useState<number[]>([]);
 
     const fetchReadOnlyData = useCallback((options = {}) => ProgramExpensesApi.getReadOnlyData(options), []);
@@ -39,6 +46,8 @@ export const ProgramExpensesSection = () => {
     const programExpenseRecordsCount = data.records.length;
     const hasAnyProgramExpenseRecords = programExpenseRecordsCount > 0;
     const isInitialLoading = isLoading && programExpenseRecordsCount === 0 && data.programs.length === 0;
+    const exchangeRate = syncedExchangeRate ?? data.exchangeRate;
+    const isAddProgramExpenseDisabled = programExpenseRecordsCount >= MAX_PROGRAM_EXPENSE_RECORDS;
 
     if (isInitialLoading) {
         return (
@@ -58,12 +67,15 @@ export const ProgramExpensesSection = () => {
                 <ProgramExpensesToolbar
                     programs={data.programs}
                     selectedProgramIds={selectedProgramIds}
-                    exchangeRate={data.exchangeRate}
+                    exchangeRate={exchangeRate}
+                    isEditing={isEditing}
+                    isAddProgramExpenseDisabled={isAddProgramExpenseDisabled}
                     onProgramChange={setSelectedProgramIds}
                 />
                 <ProgramExpensesTable
                     records={filteredRecords}
                     hasAnyProgramExpenseRecords={hasAnyProgramExpenseRecords}
+                    isEditing={isEditing}
                 />
             </div>
         </div>

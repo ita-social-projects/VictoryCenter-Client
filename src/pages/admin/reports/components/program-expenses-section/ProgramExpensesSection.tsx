@@ -46,7 +46,7 @@ export const ProgramExpensesSection = ({ isEditing = false, syncedExchangeRate }
     const programExpenseRecordsCount = data.records.length;
     const hasAnyProgramExpenseRecords = programExpenseRecordsCount > 0;
     const isInitialLoading = isLoading && programExpenseRecordsCount === 0 && data.programs.length === 0;
-    const exchangeRate = syncedExchangeRate ?? data.exchangeRate;
+    const exchangeRate = isEditing ? (syncedExchangeRate ?? null) : data.exchangeRate;
     const isAddProgramExpenseDisabled = programExpenseRecordsCount >= MAX_PROGRAM_EXPENSE_RECORDS;
 
     if (isInitialLoading) {

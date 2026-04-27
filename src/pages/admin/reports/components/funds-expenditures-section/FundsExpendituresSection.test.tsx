@@ -542,6 +542,18 @@ describe('FundsExpenditureSection', () => {
             expect(textarea).toHaveValue(MOCK_FUNDS_EXPENDITURES_SETTINGS.disclaimerTitle);
         });
 
+        it('should initialize edit values from settings when mounted in edit mode', () => {
+            render(<FundsExpenditureSection initialIsEditing />);
+
+            expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-editing', 'true');
+            expect(screen.getByTestId('textarea-funds-disclaimer')).toHaveValue(
+                MOCK_FUNDS_EXPENDITURES_SETTINGS.disclaimerTitle,
+            );
+            expect(screen.getByTestId('exchange-rate')).toHaveTextContent(
+                MOCK_FUNDS_EXPENDITURES_SETTINGS.exchangeRate!,
+            );
+        });
+
         it('should hide edit button while editing', () => {
             render(<FundsExpenditureSection />);
             fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT));

@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { FUNDS_EXPENDITURES_TEXT, FUNDS_EXPENDITURES_VALIDATION, REPORTS_TEXT } from '@/const/admin/reports';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FUNDS_EXPENDITURES_DISCLAIMER_VALIDATION_FUNCTIONS } from '@/validation/admin/reports-schema/funds-expenditures-disclaimer-schema/funds-expenditures-disclaimer-schema';
@@ -73,6 +73,7 @@ export const FundsExpenditureSection = ({
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [recordToDelete, setRecordToDelete] = useState<ReportFundsExpendituresRecord | null>(null);
     const [isDeletingRecord, setIsDeletingRecord] = useState(false);
+    const hasSeededEditingValuesRef = useRef(false);
 
     const handleCancel = useCallback(() => {
         setIsEditing(false);
@@ -208,10 +209,18 @@ export const FundsExpenditureSection = ({
 
     useEffect(() => {
         if (!isEditing) {
+            hasSeededEditingValuesRef.current = false;
             setDisclaimerValue(settings?.disclaimerTitle ?? '');
             setExchangeRateValue(settings?.exchangeRate ?? '');
             setDisclaimerError(undefined);
             setExchangeRateError(undefined);
+            return;
+        }
+
+        if (settings && !hasSeededEditingValuesRef.current) {
+            setDisclaimerValue((currentValue) => currentValue || (settings.disclaimerTitle ?? ''));
+            setExchangeRateValue((currentValue) => currentValue || (settings.exchangeRate ?? ''));
+            hasSeededEditingValuesRef.current = true;
         }
     }, [settings, isEditing]);
 

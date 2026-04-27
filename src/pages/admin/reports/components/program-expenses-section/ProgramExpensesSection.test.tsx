@@ -281,6 +281,13 @@ describe('ProgramExpensesSection', () => {
         expect(screen.queryByText('41.25')).not.toBeInTheDocument();
     });
 
+    it('should display empty synced exchange rate in edit mode when the funds value is cleared', () => {
+        render(<ProgramExpensesSection isEditing syncedExchangeRate={null} />);
+
+        expect(screen.getByText('-')).toBeInTheDocument();
+        expect(screen.queryByText('41.25')).not.toBeInTheDocument();
+    });
+
     it('should disable add program expense button when four records exist', () => {
         mockUseDataFetchResult = {
             data: {

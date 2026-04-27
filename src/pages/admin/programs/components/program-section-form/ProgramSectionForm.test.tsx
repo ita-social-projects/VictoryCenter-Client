@@ -1106,6 +1106,7 @@ describe('ProgramSectionForm', () => {
         expect(onRequestSaveSection).toHaveBeenCalledTimes(1);
         expect(onRequestSaveSection).toHaveBeenCalledWith({
             onConfirm: expect.any(Function),
+            onDecline: expect.any(Function),
         });
 
         expect(onSave).not.toHaveBeenCalled();

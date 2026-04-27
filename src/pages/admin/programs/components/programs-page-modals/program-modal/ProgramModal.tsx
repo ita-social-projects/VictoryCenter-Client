@@ -57,11 +57,13 @@ export const ProgramModal = (props: ProgramModalProps) => {
     const sectionDiscardActionRef = useRef<(() => void) | null>(null);
     const [isSectionSaveModalOpen, setIsSectionSaveModalOpen] = useState(false);
     const sectionSaveActionRef = useRef<(() => void) | null>(null);
+    const sectionDeclineActionRef = useRef<(() => void) | null>(null);
 
     useEffect(() => {
         if (!isOpen) {
             setIsSectionSaveModalOpen(false);
             sectionSaveActionRef.current = null;
+            sectionDeclineActionRef.current = null;
         }
     }, [isOpen]);
 
@@ -252,15 +254,25 @@ export const ProgramModal = (props: ProgramModalProps) => {
         [openModalActions],
     );
 
-    const handleRequestSaveSection = useCallback((request: { onConfirm: () => void }) => {
+    const handleRequestSaveSection = useCallback((request: { onConfirm: () => void; onDecline?: () => void }) => {
         sectionSaveActionRef.current = request.onConfirm;
+        sectionDeclineActionRef.current = request.onDecline || null;
         setIsSectionSaveModalOpen(true);
     }, []);
 
     const handleCloseSectionSaveModal = useCallback(() => {
         setIsSectionSaveModalOpen(false);
         sectionSaveActionRef.current = null;
+        sectionDeclineActionRef.current = null;
     }, []);
+
+    const handleDeclineSaveSection = useCallback(() => {
+        const declineAction = sectionDeclineActionRef.current;
+        handleCloseSectionSaveModal();
+        if (declineAction) {
+            declineAction();
+        }
+    }, [handleCloseSectionSaveModal]);
 
     const handleConfirmSaveSection = useCallback(() => {
         sectionSaveActionRef.current?.();
@@ -350,7 +362,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
                 onClose={handleCloseSectionSaveModal}
                 title={COMMON_TEXT_ADMIN.QUESTION.SAVE_CHANGES}
                 onConfirm={handleConfirmSaveSection}
-                onCancel={handleCloseSectionSaveModal}
+                onCancel={handleDeclineSaveSection}
             />
         </div>
     );

@@ -140,7 +140,6 @@ export const HistoryPageContent = () => {
                     contents: s.contents.map((c) => ({ ...c })),
                 }));
                 await HistoryApi.syncSections(client, payload);
-                addToast(HISTORY_TEXT.MESSAGE.PUBLISH_SUCCESS, ToastType.Success);
                 void refetchSections();
             } catch {
                 addToast(HISTORY_TEXT.MESSAGE.PUBLISH_ERROR, ToastType.Error);

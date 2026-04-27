@@ -627,8 +627,6 @@ describe('HistoryPageContent', () => {
                 ]),
             );
         });
-
-        expect(mockAddToast).toHaveBeenCalledWith('Publish success', ToastType.Success);
     });
 
     it('shows error toast when delete sync fails', async () => {

@@ -162,6 +162,22 @@ export const ProgramModal = (props: ProgramModalProps) => {
 
     const modalHookData = useGenericModal<ProgramFormValues, HippotherapyProgram, ProgramFormRef>(modalConfig);
 
+    const TEMPLATES = [
+        SectionTemplate.QuadImagesBottom,
+        SectionTemplate.DualImagesBottom,
+        SectionTemplate.TextOnly,
+        SectionTemplate.TripleImagesBottom,
+        SectionTemplate.SingleImageBottom,
+        SectionTemplate.SingleImageTop,
+        SectionTemplate.SingleImageRight,
+        SectionTemplate.SingleTitleQuintupleDescription,
+        SectionTemplate.DualTitleDescriptionPairs,
+        SectionTemplate.TripleTitleDescriptionPairs,
+        SectionTemplate.QuadTitleDescriptionPairs,
+        SectionTemplate.SingleTitleDescriptionAuthorPairs,
+        SectionTemplate.SingleTitleQuestionAnswerPairs,
+    ];
+
     const handleLanguageChange = useCallback((_: string) => {
         // TODO: Implement language selection
     }, []);
@@ -231,6 +247,26 @@ export const ProgramModal = (props: ProgramModalProps) => {
         handleCloseSectionSaveModal();
     }, [handleCloseSectionSaveModal]);
 
+    const modalConfigs = [
+        {
+            isOpen: isSectionRemoveModalOpen,
+            onClose: handleCloseSectionRemoveModal,
+            onConfirm: handleConfirmRemoveSection,
+            title: SECTIONS_TEXT.SECTION.MODAL.DELETE_SECTION_TITLE,
+        },
+        {
+            isOpen: isSectionRevertModalOpen,
+            onClose: handleCloseSectionRevertModal,
+            onConfirm: handleConfirmRevertSection,
+            title:
+                pendingCancelActionType === SectionCancelActionType.RevertAfterReplace
+                    ? SECTIONS_TEXT.SECTION.MODAL.REPLACE_TEMPLATE_TITLE
+                    : pendingCancelActionType === SectionCancelActionType.DiscardNewSection
+                      ? SECTIONS_TEXT.SECTION.MODAL.UNSAVED_CHANGES_TITLE
+                      : COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE,
+        },
+    ];
+
     return (
         <div className="program-modal">
             <GenericModalWrapper
@@ -285,29 +321,22 @@ export const ProgramModal = (props: ProgramModalProps) => {
                 isOpen={modalState.isAddSectionModalOpen}
                 onClose={handleCloseAddSectionModal}
                 onSelectTemplate={handleTemplateSelect}
+                templates={TEMPLATES}
             />
 
-            <ConfirmationModal
-                isOpen={isSectionRemoveModalOpen}
-                onClose={handleCloseSectionRemoveModal}
-                title={SECTIONS_TEXT.SECTION.MODAL.DELETE_SECTION_TITLE}
-                onConfirm={handleConfirmRemoveSection}
-                onCancel={handleCloseSectionRemoveModal}
-            />
-
-            <ConfirmationModal
-                isOpen={isSectionRevertModalOpen}
-                onClose={handleCloseSectionRevertModal}
-                title={
-                    pendingCancelActionType === SectionCancelActionType.RevertAfterReplace
-                        ? SECTIONS_TEXT.SECTION.MODAL.REPLACE_TEMPLATE_TITLE
-                        : pendingCancelActionType === SectionCancelActionType.DiscardNewSection
-                          ? SECTIONS_TEXT.SECTION.MODAL.UNSAVED_CHANGES_TITLE
-                          : COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE
-                }
-                onConfirm={handleConfirmRevertSection}
-                onCancel={handleCloseSectionRevertModal}
-            />
+            {modalConfigs.map(
+                (config, index) =>
+                    config.isOpen && (
+                        <ConfirmationModal
+                            key={index}
+                            isOpen={config.isOpen}
+                            onClose={config.onClose}
+                            title={config.title}
+                            onConfirm={config.onConfirm}
+                            onCancel={config.onClose}
+                        />
+                    ),
+            )}
 
             <ConfirmationModal
                 isOpen={isOpen && isSectionSaveModalOpen}

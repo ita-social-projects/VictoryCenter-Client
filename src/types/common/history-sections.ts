@@ -20,3 +20,18 @@ export interface HistorySectionDto {
     order: number;
     contents: HistorySectionContentDto[];
 }
+
+export interface CreateUpdateHistorySectionDto {
+    template: SectionTemplate;
+    order: number;
+    contents: CreateHistorySectionContentDto[];
+}
+
+export interface CreateHistorySectionContentDto {
+    contentType: ContentType;
+    order: number;
+    title?: string | null;
+    description?: string | null;
+    image?: Image | ImageValues | null;
+    imageId?: number | null;
+}

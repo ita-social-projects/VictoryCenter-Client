@@ -1,7 +1,8 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { SectionCancelActionType } from '@/types/admin/programs';
 import { HistorySectionDto } from '@/types/common/history-sections';
-import { isHistoryTemplate } from '@/utils/functions/render-history-section';
+import { CreateHippotherapyProgramSectionDto } from '@/types/common/program-sections';
+import { isProgramSectionValid } from '@/validation/admin/program-schema/program-schema';
 import {
     createSectionDiscardAction,
     requestSectionCancel,
@@ -16,6 +17,13 @@ interface SectionEditingState {
     isEditing: boolean;
     isNew: boolean;
     isReplacing: boolean;
+    isPersistedOnBackend: boolean;
+}
+
+export interface HistoryFormRef {
+    addSection: (section: HistorySectionDto) => void;
+    replaceSection: (sectionIndex: number, newSection: HistorySectionDto) => void;
+    getSections: () => HistorySectionDto[];
 }
 
 export interface HistoryFormProps {
@@ -23,6 +31,9 @@ export interface HistoryFormProps {
     isFormDisabled?: boolean;
     onReplaceSection?: (sectionIndex: number) => void;
     onSectionsChange?: (sections: HistorySectionDto[]) => void;
+    onHasEditingSectionChange?: (hasEditingSection: boolean) => void;
+    onSectionSaved?: () => void;
+    onSectionDeleted?: (remainingSections: HistorySectionDto[]) => void;
     onRequestCancelSection?: (request: { type: SectionCancelActionType; onDiscard: () => void }) => void;
     onRequestSaveSection?: (request: { onConfirm: () => void }) => void;
 }
@@ -33,20 +44,27 @@ const createSectionState = (sectionKey: string): SectionEditingState => ({
     isEditing: false,
     isNew: false,
     isReplacing: false,
+    isPersistedOnBackend: true,
 });
 
 const getSectionsSyncSignature = (sections: HistorySectionDto[]): string => {
     return sections.map((section) => `${section.id}:${section.order}`).join('|');
 };
 
-export const HistoryForm = ({
-    sections,
-    isFormDisabled = false,
-    onReplaceSection,
-    onSectionsChange,
-    onRequestCancelSection,
-    onRequestSaveSection,
-}: HistoryFormProps) => {
+export const HistoryForm = forwardRef<HistoryFormRef, HistoryFormProps>(function HistoryForm(
+    {
+        sections,
+        isFormDisabled = false,
+        onReplaceSection,
+        onSectionsChange,
+        onHasEditingSectionChange,
+        onSectionSaved,
+        onSectionDeleted,
+        onRequestCancelSection,
+        onRequestSaveSection,
+    },
+    ref,
+) {
     const [localSections, setLocalSections] = useState<HistorySectionDto[]>(sections);
     const [sectionStates, setSectionStates] = useState<SectionEditingState[]>(() => {
         return sections.map((_, index) => createSectionState(`history-section-${index + 1}`));
@@ -71,25 +89,93 @@ export const HistoryForm = ({
         setLocalSections(sections);
         localSectionsRef.current = sections;
         setSectionStates((prev) => {
-            if (prev.length === sections.length) {
-                return prev;
-            }
+            if (prev.length === sections.length) return prev;
 
             if (prev.length > sections.length) {
                 return prev.slice(0, sections.length);
             }
-
             const additional = Array.from({ length: sections.length - prev.length }, () => {
                 nextSectionKeyRef.current += 1;
-                return createSectionState(`history-section-${nextSectionKeyRef.current}`);
+                const sectionKey = `history-section-${nextSectionKeyRef.current}`;
+                return {
+                    sectionKey,
+                    isSaved: false,
+                    isEditing: true,
+                    isNew: true,
+                    isReplacing: false,
+                    isPersistedOnBackend: false,
+                };
             });
 
             return [...prev, ...additional];
         });
     }, [sections]);
 
+    useEffect(() => {
+        onHasEditingSectionChange?.(sectionStates.some((state) => state.isEditing));
+    }, [sectionStates, onHasEditingSectionChange]);
+
+    useImperativeHandle(
+        ref,
+        () => ({
+            addSection(section: HistorySectionDto) {
+                nextSectionKeyRef.current += 1;
+                const sectionKey = `history-section-${nextSectionKeyRef.current}`;
+                const newSections = [...localSectionsRef.current, section];
+                localSectionsRef.current = newSections;
+                setLocalSections(newSections);
+                setSectionStates((prev) => [
+                    ...prev,
+                    {
+                        sectionKey,
+                        isSaved: false,
+                        isEditing: true,
+                        isNew: true,
+                        isReplacing: false,
+                        isPersistedOnBackend: false,
+                    },
+                ]);
+
+                setTimeout(() => {
+                    sectionsContainerRef.current
+                        ?.querySelector(`[data-section-key="${sectionKey}"]`)
+                        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 50);
+            },
+            replaceSection(sectionIndex: number, newSection: HistorySectionDto) {
+                const newSections = [...localSectionsRef.current];
+                if (sectionIndex < 0 || sectionIndex >= newSections.length) {
+                    return;
+                }
+                newSections[sectionIndex] = newSection;
+                localSectionsRef.current = newSections;
+                setLocalSections(newSections);
+                setSectionStates((prev) =>
+                    prev.map((state, index) =>
+                        index === sectionIndex
+                            ? { ...state, isSaved: false, isEditing: true, isNew: false, isReplacing: true }
+                            : state,
+                    ),
+                );
+            },
+            getSections() {
+                return localSectionsRef.current;
+            },
+        }),
+        [],
+    );
+
     const sectionValidity = useMemo(
-        () => localSections.map((section) => isHistoryTemplate(section.template)),
+        () =>
+            localSections.map((section) => {
+                try {
+                    return section?.contents
+                        ? isProgramSectionValid(section as CreateHippotherapyProgramSectionDto, true)
+                        : false;
+                } catch {
+                    return false;
+                }
+            }),
         [localSections],
     );
 
@@ -119,8 +205,9 @@ export const HistoryForm = ({
     const handleSaveSection = useCallback(
         (sectionKey: string) => {
             updateSectionState(sectionKey, { isSaved: true, isNew: false, isReplacing: false });
+            onSectionSaved?.();
         },
-        [updateSectionState],
+        [updateSectionState, onSectionSaved],
     );
 
     const handleSectionChange = useCallback(
@@ -152,10 +239,16 @@ export const HistoryForm = ({
                 return;
             }
 
+            const isPersistedOnBackend = sectionStatesRef.current[index]?.isPersistedOnBackend ?? false;
+
             updateSections((prev) => prev.filter((_, sectionIndex) => sectionIndex !== index));
             setSectionStates((prev) => prev.filter((state) => state.sectionKey !== sectionKey));
+
+            if (isPersistedOnBackend) {
+                onSectionDeleted?.(localSectionsRef.current);
+            }
         },
-        [getSectionIndex, updateSections],
+        [getSectionIndex, onSectionDeleted, updateSections],
     );
 
     const handleCancelSection = useCallback(
@@ -305,4 +398,4 @@ export const HistoryForm = ({
             })}
         </div>
     );
-};
+});

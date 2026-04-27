@@ -320,7 +320,8 @@ export const HistorySectionForm = ({
         return false;
     }, [localSection.contents, originalSection.contents]);
 
-    const isSectionSaveValid = isSectionValid && isHistoryTemplate(localSection.template) && !hasDeletedExistingImage;
+    const isSectionSaveValid =
+        isSectionValid && isHistoryTemplate(localSection.template) && (isReplacingTemplate || !hasDeletedExistingImage);
 
     const handleSaveClick = useCallback(() => {
         if (isDisabled || !isSectionSaveValid) {

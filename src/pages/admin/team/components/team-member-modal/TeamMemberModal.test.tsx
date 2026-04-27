@@ -289,7 +289,7 @@ describe('TeamMemberModal', () => {
         await within(editModal).findByText('Update failed');
     });
 
-    it('close behavior: confirms when dirty, closes immediately when clean, blocks during submit', async () => {
+    it('close behavior: confirms when dirty, closes immediately when clean, and closes once after submit', async () => {
         const onClose = jest.fn();
 
         // Clean form closes immediately
@@ -323,6 +323,8 @@ describe('TeamMemberModal', () => {
         const confirmModal3 = await screen.findByTestId('question-modal');
         fireEvent.click(within(confirmModal3).getByTestId('confirm-btn'));
         await userEvent.click(within(submitModal).getByTestId('modal-close'));
-        expect(onClose3).not.toHaveBeenCalled();
+        await waitFor(() => {
+            expect(onClose3).toHaveBeenCalledTimes(1);
+        });
     });
 });

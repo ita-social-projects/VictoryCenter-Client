@@ -8,17 +8,36 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { SECTIONS_TEXT } from '@/const/admin/sections';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import { HistoryPageToolbar } from '../history-page-toolbar/HistoryPageToolbar';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { HistoryApi } from '@/services/api/admin/history/history-api';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { CreateUpdateHistorySectionDto, HistorySectionDto } from '@/types/common/history-sections';
 import { useSectionCancelConfirmation } from '@/hooks/admin/use-section-cancel-confirmation/useSectionCancelConfirmation';
 import { SectionCancelActionType } from '@/types/admin/programs';
-import { HistorySectionDto } from '@/types/common/history-sections';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
-import { HistoryForm } from '../history-form/HistoryForm';
+import { HistoryForm, HistoryFormRef } from '../history-form/HistoryForm';
+import {
+    getInitialHistorySectionContents,
+    HISTORY_SUPPORTED_TEMPLATES,
+} from '@/utils/functions/render-history-section';
+import { SectionTemplate } from '@/types/common/sections';
+import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
+import { ToastType } from '@/types/admin/toast';
+import { AddSectionModal } from '@/pages/admin/programs/components/programs-page-modals/add-section-modal/AddSectionModal';
+import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
 
 export const HistoryPageContent = () => {
     const client = useAdminClient();
+    const { addToast } = useToast();
+    const [isConfirmationModalOpen, setConfirmationModalOpen] = useState<boolean>(false);
+    const historyFormRef = useRef<HistoryFormRef>(null);
+    const pendingSectionRef = useRef<HistorySectionDto | null>(null);
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [sectionToReplace, setSectionToReplace] = useState<number | null>(null);
+    const [canPublish, setCanPublish] = useState(false);
+    const [isPublishing, setIsPublishing] = useState(false);
+    const [localSectionsCount, setLocalSectionsCount] = useState<number | null>(null);
+    const [hasActiveSectionForm, setHasActiveSectionForm] = useState(false);
     const {
         isSectionRemoveModalOpen,
         isSectionRevertModalOpen,
@@ -47,17 +66,110 @@ export const HistoryPageContent = () => {
         autoFetchDisabled: false,
     });
 
-    const normalizedSections = sections ?? [];
-    const hasSections = normalizedSections.length > 0;
+    const TEMPLATES = HISTORY_SUPPORTED_TEMPLATES;
+
+    const normalizedSections = useMemo(() => sections ?? [], [sections]);
+    const hasSections = localSectionsCount !== null ? localSectionsCount > 0 : normalizedSections.length > 0;
     const hasSectionsError = Boolean(sectionsError);
 
     const handleAddSection = () => {
-        // TODO: add section creation flow will be implemented in a dedicated modal.
+        setSectionToReplace(null);
+        setIsAddModalOpen(true);
     };
+
+    const handleReplaceSection = useCallback((sectionIndex: number) => {
+        setSectionToReplace(sectionIndex);
+        setIsAddModalOpen(true);
+    }, []);
+
+    const handleTemplateSelect = useCallback(
+        (templateId: SectionTemplate) => {
+            const currentSections = normalizedSections;
+            if (sectionToReplace !== null) {
+                const sectionBeingReplaced = currentSections[sectionToReplace];
+                const newSection: HistorySectionDto = {
+                    template: templateId,
+                    order: sectionBeingReplaced?.order ?? sectionToReplace,
+                    contents: getInitialHistorySectionContents(templateId),
+                };
+                historyFormRef.current?.replaceSection(sectionToReplace, newSection);
+            } else {
+                const nextOrder =
+                    currentSections.length === 0
+                        ? 0
+                        : Math.max(...currentSections.map((s: HistorySectionDto) => s.order)) + 1;
+                const newSection: HistorySectionDto = {
+                    template: templateId,
+                    order: nextOrder,
+                    contents: getInitialHistorySectionContents(templateId),
+                };
+                if (historyFormRef.current) {
+                    historyFormRef.current.addSection(newSection);
+                } else {
+                    pendingSectionRef.current = newSection;
+                    setLocalSectionsCount(1);
+                }
+            }
+            setSectionToReplace(null);
+        },
+        [sectionToReplace, normalizedSections],
+    );
+
+    useEffect(() => {
+        if (pendingSectionRef.current !== null && historyFormRef.current !== null) {
+            const section = pendingSectionRef.current;
+            pendingSectionRef.current = null;
+            historyFormRef.current.addSection(section);
+        }
+    });
 
     const handleRetrySections = useCallback(() => {
         void refetchSections();
     }, [refetchSections]);
+
+    const handleSectionSaved = useCallback(() => {
+        setCanPublish(true);
+    }, []);
+
+    const handleSectionDeleted = useCallback(
+        async (remainingSections: HistorySectionDto[]) => {
+            try {
+                const payload: CreateUpdateHistorySectionDto[] = remainingSections.map((s: HistorySectionDto) => ({
+                    template: s.template,
+                    order: s.order,
+                    contents: s.contents.map((c) => ({ ...c })),
+                }));
+                await HistoryApi.syncSections(client, payload);
+                void refetchSections();
+            } catch {
+                addToast(HISTORY_TEXT.MESSAGE.PUBLISH_ERROR, ToastType.Error);
+            }
+        },
+        [client, addToast, refetchSections],
+    );
+
+    const handlePublish = useCallback(async () => {
+        setConfirmationModalOpen(false);
+        setIsPublishing(true);
+        try {
+            const currentSections = historyFormRef.current?.getSections() ?? [];
+
+            const payload: CreateUpdateHistorySectionDto[] = currentSections.map((s: HistorySectionDto) => ({
+                template: s.template,
+                order: s.order,
+                contents: s.contents.map((c) => ({ ...c })),
+            }));
+
+            await HistoryApi.syncSections(client, payload);
+            addToast(HISTORY_TEXT.MESSAGE.PUBLISH_SUCCESS, ToastType.Success);
+            setCanPublish(false);
+            void refetchSections();
+        } catch {
+            addToast(HISTORY_TEXT.MESSAGE.PUBLISH_ERROR, ToastType.Error);
+        } finally {
+            setIsPublishing(false);
+        }
+    }, [client, refetchSections, addToast]);
 
     return (
         <div className={styles['history-page-wrapper']} data-testid="history-page-content">
@@ -100,10 +212,47 @@ export const HistoryPageContent = () => {
                 )}
 
                 {!isSectionsLoading && !hasSectionsError && hasSections && (
-                    <HistoryForm sections={normalizedSections} onRequestCancelSection={handleRequestCancelSection} />
+                    <HistoryForm
+                        ref={historyFormRef}
+                        sections={normalizedSections}
+                        onReplaceSection={handleReplaceSection}
+                        onSectionsChange={(s) => setLocalSectionsCount(s.length)}
+                        onHasEditingSectionChange={setHasActiveSectionForm}
+                        onSectionSaved={handleSectionSaved}
+                        onSectionDeleted={handleSectionDeleted}
+                        onRequestCancelSection={handleRequestCancelSection}
+                    />
                 )}
+                <div className={styles['functional-button-container']}>
+                    {hasSections && !isAddModalOpen && !hasActiveSectionForm && (
+                        <Button
+                            className={styles['btn-add']}
+                            onClick={handleAddSection}
+                            buttonStyle="secondary"
+                            data-testid="add-section-button-empty"
+                        >
+                            {HISTORY_TEXT.BUTTON.ADD_SECTION}
+                            <PlusIcon className={styles['plus-icon']} />
+                        </Button>
+                    )}
+                    {hasSections && (
+                        <Button
+                            className={styles['btn-publish']}
+                            onClick={() => setConfirmationModalOpen(true)}
+                            buttonStyle="primary"
+                            disabled={!canPublish || isPublishing}
+                        >
+                            {HISTORY_TEXT.BUTTON.PUBLISH}
+                        </Button>
+                    )}
+                </div>
             </div>
-
+            <AddSectionModal
+                isOpen={isAddModalOpen}
+                onClose={() => setIsAddModalOpen(false)}
+                onSelectTemplate={handleTemplateSelect}
+                templates={TEMPLATES}
+            />
             <ConfirmationModal
                 isOpen={isSectionRemoveModalOpen}
                 onClose={handleCloseSectionRemoveModal}
@@ -111,7 +260,6 @@ export const HistoryPageContent = () => {
                 onConfirm={handleConfirmRemoveSection}
                 onCancel={handleCloseSectionRemoveModal}
             />
-
             <ConfirmationModal
                 isOpen={isSectionRevertModalOpen}
                 onClose={handleCloseSectionRevertModal}
@@ -125,6 +273,14 @@ export const HistoryPageContent = () => {
                 onConfirm={handleConfirmRevertSection}
                 onCancel={handleCloseSectionRevertModal}
             />
+            <ConfirmationModal
+                isOpen={isConfirmationModalOpen}
+                onClose={() => setConfirmationModalOpen(false)}
+                title={COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES}
+                onConfirm={handlePublish}
+                onCancel={() => setConfirmationModalOpen(false)}
+            />
+            <ToastContainer />
         </div>
     );
 };

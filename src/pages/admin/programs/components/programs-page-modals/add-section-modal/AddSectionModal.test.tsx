@@ -8,6 +8,22 @@ import { SECTIONS_TEXT } from '@/const/admin/sections';
 import { SectionTemplate, SectionMode } from '@/types/common/sections';
 import type { ButtonProps } from '@/components/admin/button/Button';
 import type { ModalProps } from '@/components/common/modal/Modal';
+import {
+    buildFiveShortDescriptions as utilBuildFiveShortDescriptions,
+    clickChooseButton as utilClickChooseButton,
+    clickCloseButton as utilClickCloseButton,
+    clickNextButton as utilClickNextButton,
+    clickPrevButton as utilClickPrevButton,
+    findFirstCallByTemplateId as utilFindFirstCallByTemplateId,
+    getChooseButton as utilGetChooseButton,
+    getCloseButton as utilGetCloseButton,
+    getContentAreas as utilGetContentAreas,
+    getModal as utilGetModal,
+    getNextButton as utilGetNextButton,
+    getPrevButton as utilGetPrevButton,
+    getSwiper as utilGetSwiper,
+    renderAddSectionModal as utilRenderAddSectionModal,
+} from './test-utils/addSectionModalTestUtils';
 
 const mockRenderProgramSection = jest.fn((_: any) => <div data-testid="rendered-section" />);
 
@@ -114,11 +130,28 @@ describe('AddSectionModal', () => {
     const mockOnClose = jest.fn();
     const mockOnSelectTemplate = jest.fn();
 
+    const defaultTemplates: SectionTemplate[] = [
+        SectionTemplate.QuadImagesBottom,
+        SectionTemplate.DualImagesBottom,
+        SectionTemplate.TextOnly,
+        SectionTemplate.TripleImagesBottom,
+        SectionTemplate.SingleImageBottom,
+        SectionTemplate.SingleImageTop,
+        SectionTemplate.SingleImageRight,
+        SectionTemplate.SingleTitleQuintupleDescription,
+        SectionTemplate.DualTitleDescriptionPairs,
+        SectionTemplate.TripleTitleDescriptionPairs,
+        SectionTemplate.QuadTitleDescriptionPairs,
+        SectionTemplate.SingleTitleDescriptionAuthorPairs,
+        SectionTemplate.SingleTitleQuestionAnswerPairs,
+    ];
+
     const renderModal = (overrides: Partial<AddSectionModalProps> = {}) => {
         const props: AddSectionModalProps = {
             isOpen: true,
             onClose: mockOnClose,
             onSelectTemplate: mockOnSelectTemplate,
+            templates: defaultTemplates,
             ...overrides,
         };
 
@@ -287,5 +320,51 @@ describe('AddSectionModal', () => {
         const call = getCallByTemplate(templateId);
         expect(call).toBeDefined();
         expect(call?.data?.cards).toHaveLength(count);
+    });
+
+    it('covers test-utils helper functions with the existing modal setup', () => {
+        utilRenderAddSectionModal({
+            isOpen: true,
+            onClose: mockOnClose,
+            onSelectTemplate: mockOnSelectTemplate,
+            templates: defaultTemplates,
+        });
+
+        expect(utilGetModal()).toBeInTheDocument();
+        expect(utilGetSwiper()).toBeInTheDocument();
+        expect(utilGetChooseButton()).toBeInTheDocument();
+        expect(utilGetPrevButton()).toBeInTheDocument();
+        expect(utilGetNextButton()).toBeInTheDocument();
+        expect(utilGetCloseButton()).toBeInTheDocument();
+        expect(utilGetContentAreas().length).toBeGreaterThan(0);
+
+        utilClickPrevButton();
+        utilClickNextButton();
+        utilClickChooseButton();
+        utilClickCloseButton();
+
+        expect(mockOnSelectTemplate).toHaveBeenCalled();
+        expect(mockOnClose).toHaveBeenCalled();
+        expect(utilBuildFiveShortDescriptions()).toEqual(buildFiveShortDescriptions());
+
+        const calls = jest.fn();
+        calls({ templateId: SectionTemplate.TextOnly });
+        calls({ templateId: SectionTemplate.SingleImageTop });
+
+        expect(utilFindFirstCallByTemplateId(calls, SectionTemplate.TextOnly)).toEqual({
+            templateId: SectionTemplate.TextOnly,
+        });
+        expect(utilFindFirstCallByTemplateId(calls, SectionTemplate.QuadImagesBottom)).toBeUndefined();
+    });
+
+    it('covers test-utils modal query in closed mode', () => {
+        utilRenderAddSectionModal({
+            isOpen: false,
+            onClose: mockOnClose,
+            onSelectTemplate: mockOnSelectTemplate,
+            templates: defaultTemplates,
+        });
+
+        expect(utilGetModal()).not.toBeInTheDocument();
     });
 });

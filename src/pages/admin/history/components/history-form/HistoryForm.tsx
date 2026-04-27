@@ -17,6 +17,7 @@ interface SectionEditingState {
     isEditing: boolean;
     isNew: boolean;
     isReplacing: boolean;
+    isPersistedOnBackend: boolean;
 }
 
 export interface HistoryFormRef {
@@ -43,6 +44,7 @@ const createSectionState = (sectionKey: string): SectionEditingState => ({
     isEditing: false,
     isNew: false,
     isReplacing: false,
+    isPersistedOnBackend: true,
 });
 
 const getSectionsSyncSignature = (sections: HistorySectionDto[]): string => {
@@ -101,6 +103,7 @@ export const HistoryForm = forwardRef<HistoryFormRef, HistoryFormProps>(function
                     isEditing: true,
                     isNew: true,
                     isReplacing: false,
+                    isPersistedOnBackend: false,
                 };
             });
 
@@ -129,6 +132,7 @@ export const HistoryForm = forwardRef<HistoryFormRef, HistoryFormProps>(function
                         isEditing: true,
                         isNew: true,
                         isReplacing: false,
+                        isPersistedOnBackend: false,
                     },
                 ]);
 
@@ -235,12 +239,12 @@ export const HistoryForm = forwardRef<HistoryFormRef, HistoryFormProps>(function
                 return;
             }
 
-            const isNewSection = sectionStatesRef.current[index]?.isNew ?? false;
+            const isPersistedOnBackend = sectionStatesRef.current[index]?.isPersistedOnBackend ?? false;
 
             updateSections((prev) => prev.filter((_, sectionIndex) => sectionIndex !== index));
             setSectionStates((prev) => prev.filter((state) => state.sectionKey !== sectionKey));
 
-            if (!isNewSection) {
+            if (isPersistedOnBackend) {
                 onSectionDeleted?.(localSectionsRef.current);
             }
         },

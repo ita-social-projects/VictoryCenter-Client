@@ -8,6 +8,7 @@ import donateUk from './donate.json';
 import globalUk from './global.json';
 import reportsPageUk from './reports.json';
 import partnersPageUk from './partners.json';
+import contactUsPageUk from './contact-us.json';
 
 export {
     headerUk,
@@ -20,4 +21,5 @@ export {
     reportsPageUk,
     partnersPageUk,
     globalUk,
+    contactUsPageUk,
 };

@@ -550,53 +550,40 @@ export const ProgramSectionForm = ({
 
     const isCardTemplate = CARD_TEMPLATES.includes(section.template);
 
+    const performCancel = useCallback(
+        (forceCleanState: boolean) => {
+            const shouldRemove = isNewSection;
+            const revertTo = originalSection;
+            const isTemplateReplacement = isReplacingTemplate;
+
+            const onAfterDiscard = () => {
+                if (!shouldRemove) {
+                    localSectionRef.current = revertTo;
+                    setLocalSection(revertTo);
+                    setIsDirty(false);
+                    setSectionMode(SectionMode.View);
+                    setValidationResetKey((prev) => prev + 1);
+                }
+            };
+
+            onCancel({
+                isDirty: forceCleanState ? false : isDirty,
+                shouldRemove,
+                revertTo,
+                onAfterDiscard,
+                isTemplateReplacement,
+            });
+        },
+        [isDirty, isNewSection, onCancel, originalSection, isReplacingTemplate],
+    );
+
     const handleCancelClick = useCallback(() => {
-        const shouldRemove = isNewSection;
-        const revertTo = originalSection;
-        const isTemplateReplacement = isReplacingTemplate;
-
-        const onAfterDiscard = () => {
-            if (!shouldRemove) {
-                localSectionRef.current = revertTo;
-                setLocalSection(revertTo);
-                setIsDirty(false);
-                setSectionMode(SectionMode.View);
-                setValidationResetKey((prev) => prev + 1);
-            }
-        };
-
-        onCancel({
-            isDirty,
-            shouldRemove,
-            revertTo,
-            onAfterDiscard,
-            isTemplateReplacement,
-        });
-    }, [isDirty, isNewSection, onCancel, originalSection, isReplacingTemplate]);
+        performCancel(false);
+    }, [performCancel]);
 
     const handleDeclineSave = useCallback(() => {
-        const shouldRemove = isNewSection;
-        const revertTo = originalSection;
-        const isTemplateReplacement = isReplacingTemplate;
-
-        const onAfterDiscard = () => {
-            if (!shouldRemove) {
-                localSectionRef.current = revertTo;
-                setLocalSection(revertTo);
-                setIsDirty(false);
-                setSectionMode(SectionMode.View);
-                setValidationResetKey((prev) => prev + 1);
-            }
-        };
-
-        onCancel({
-            isDirty: false,
-            shouldRemove,
-            revertTo,
-            onAfterDiscard,
-            isTemplateReplacement,
-        });
-    }, [isNewSection, originalSection, isReplacingTemplate, onCancel]);
+        performCancel(true);
+    }, [performCancel]);
 
     const handleDeleteClick = useCallback(
         (e: React.MouseEvent<HTMLButtonElement>) => {

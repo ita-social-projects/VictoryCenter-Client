@@ -158,6 +158,10 @@ export const programValidationSchema = Yup.object({
             PROGRAM_VALIDATION.location.max,
             COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PROGRAM_VALIDATION.location.max),
         )
+        .min(
+            PROGRAM_VALIDATION.location.min,
+            COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(PROGRAM_VALIDATION.location.min),
+        )
         .notRequired(),
 
     participantsCount: Yup.string()

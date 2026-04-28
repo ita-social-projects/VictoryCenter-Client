@@ -21,7 +21,7 @@ const ANALYTICS_TABS: ReportAnalyticsTab[] = [
 export const ReportAnalytics = () => {
     const [activeTab, setActiveTab] = useState<ReportAnalyticsTab>(ANALYTICS_TABS[0]);
     const [isFundsEditing, setIsFundsEditing] = useState(false);
-    const [programExpensesExchangeRate, setProgramExpensesExchangeRate] = useState<string | null>(null);
+    const [fundsExchangeRateDraft, setFundsExchangeRateDraft] = useState<string | null>();
 
     return (
         <div className={styles['report-analytics']}>
@@ -39,16 +39,12 @@ export const ReportAnalytics = () => {
                 {activeTab.id === 'income-expenses' && (
                     <FundsExpenditureSection
                         initialIsEditing={isFundsEditing}
+                        draftExchangeRate={fundsExchangeRateDraft}
                         onEditModeChange={setIsFundsEditing}
-                        onExchangeRateValueChange={setProgramExpensesExchangeRate}
+                        onExchangeRateValueChange={setFundsExchangeRateDraft}
                     />
                 )}
-                {activeTab.id === 'program-expenses' && (
-                    <ProgramExpensesSection
-                        isEditing={isFundsEditing}
-                        syncedExchangeRate={isFundsEditing ? programExpensesExchangeRate : null}
-                    />
-                )}
+                {activeTab.id === 'program-expenses' && <ProgramExpensesSection />}
             </div>
         </div>
     );

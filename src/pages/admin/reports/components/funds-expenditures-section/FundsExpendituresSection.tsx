@@ -46,12 +46,14 @@ const enrichRecords = (
 
 interface FundsExpenditureSectionProps {
     initialIsEditing?: boolean;
+    draftExchangeRate?: string | null;
     onEditModeChange?: (isEditing: boolean) => void;
     onExchangeRateValueChange?: (exchangeRate: string | null) => void;
 }
 
 export const FundsExpenditureSection = ({
     initialIsEditing = false,
+    draftExchangeRate,
     onEditModeChange,
     onExchangeRateValueChange,
 }: FundsExpenditureSectionProps = {}) => {
@@ -218,11 +220,14 @@ export const FundsExpenditureSection = ({
         }
 
         if (settings && !hasSeededEditingValuesRef.current) {
+            const initialExchangeRateValue =
+                draftExchangeRate !== undefined ? (draftExchangeRate ?? '') : (settings.exchangeRate ?? '');
+
             setDisclaimerValue((currentValue) => currentValue || (settings.disclaimerTitle ?? ''));
-            setExchangeRateValue((currentValue) => currentValue || (settings.exchangeRate ?? ''));
+            setExchangeRateValue((currentValue) => currentValue || initialExchangeRateValue);
             hasSeededEditingValuesRef.current = true;
         }
-    }, [settings, isEditing]);
+    }, [draftExchangeRate, settings, isEditing]);
 
     const enrichedRecords = useMemo(() => enrichRecords(recordsState, categories), [recordsState, categories]);
 

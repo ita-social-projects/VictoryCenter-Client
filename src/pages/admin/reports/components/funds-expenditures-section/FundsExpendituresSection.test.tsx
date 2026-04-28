@@ -554,6 +554,13 @@ describe('FundsExpenditureSection', () => {
             );
         });
 
+        it('should initialize exchange rate from draft value when mounted in edit mode', () => {
+            render(<FundsExpenditureSection initialIsEditing draftExchangeRate="44.20" />);
+
+            expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-editing', 'true');
+            expect(screen.getByTestId('exchange-rate')).toHaveTextContent('44.20');
+        });
+
         it('should hide edit button while editing', () => {
             render(<FundsExpenditureSection />);
             fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT));

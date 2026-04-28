@@ -9,14 +9,20 @@ jest.mock('../pdf-files-section/PdfFilesSection', () => ({
 jest.mock('../funds-expenditures-section/FundsExpendituresSection', () => ({
     FundsExpenditureSection: ({
         initialIsEditing,
+        draftExchangeRate,
         onEditModeChange,
         onExchangeRateValueChange,
     }: {
         initialIsEditing?: boolean;
+        draftExchangeRate?: string | null;
         onEditModeChange?: (isEditing: boolean) => void;
         onExchangeRateValueChange?: (exchangeRate: string | null) => void;
     }) => (
-        <div data-testid="funds-expenditure-section" data-initial-editing={String(initialIsEditing)}>
+        <div
+            data-testid="funds-expenditure-section"
+            data-initial-editing={String(initialIsEditing)}
+            data-draft-exchange-rate={draftExchangeRate ?? ''}
+        >
             FundsExpenditureSection
             <button
                 type="button"
@@ -28,6 +34,13 @@ jest.mock('../funds-expenditures-section/FundsExpendituresSection', () => ({
             >
                 Activate edit
             </button>
+            <button
+                type="button"
+                data-testid="change-funds-exchange-rate"
+                onClick={() => onExchangeRateValueChange?.('44.20')}
+            >
+                Change rate
+            </button>
             <button type="button" data-testid="deactivate-funds-edit" onClick={() => onEditModeChange?.(false)}>
                 Deactivate edit
             </button>
@@ -37,7 +50,7 @@ jest.mock('../funds-expenditures-section/FundsExpendituresSection', () => ({
 
 jest.mock('../program-expenses-section/ProgramExpensesSection', () => ({
     ProgramExpensesSection: ({
-        isEditing,
+        isEditing = false,
         syncedExchangeRate,
     }: {
         isEditing?: boolean;
@@ -89,21 +102,10 @@ describe('ReportAnalytics', () => {
         expect(screen.queryByTestId('pdf-files-section')).not.toBeInTheDocument();
     });
 
-    it('should keep program expenses in edit mode after funds edit is activated', () => {
+    it('should render program expenses mock independently from funds edit mode', () => {
         render(<ReportAnalytics />);
 
         fireEvent.click(screen.getByTestId('activate-funds-edit'));
-        fireEvent.click(screen.getByText(REPORTS_TEXT.REPORT_AND_ANALYTICS.TAB.PROGRAM_EXPENSES));
-
-        expect(screen.getByTestId('program-expenses-section')).toHaveAttribute('data-editing', 'true');
-        expect(screen.getByTestId('program-expenses-section')).toHaveAttribute('data-exchange-rate', '42.15');
-    });
-
-    it('should not pass synced exchange rate when funds edit mode is inactive', () => {
-        render(<ReportAnalytics />);
-
-        fireEvent.click(screen.getByTestId('activate-funds-edit'));
-        fireEvent.click(screen.getByTestId('deactivate-funds-edit'));
         fireEvent.click(screen.getByText(REPORTS_TEXT.REPORT_AND_ANALYTICS.TAB.PROGRAM_EXPENSES));
 
         expect(screen.getByTestId('program-expenses-section')).toHaveAttribute('data-editing', 'false');
@@ -118,5 +120,16 @@ describe('ReportAnalytics', () => {
         fireEvent.click(screen.getByText(REPORTS_TEXT.REPORT_AND_ANALYTICS.TAB.INCOME_EXPENSES));
 
         expect(screen.getByTestId('funds-expenditure-section')).toHaveAttribute('data-initial-editing', 'true');
+    });
+
+    it('should restore funds exchange rate draft after returning from another tab', () => {
+        render(<ReportAnalytics />);
+
+        fireEvent.click(screen.getByTestId('activate-funds-edit'));
+        fireEvent.click(screen.getByTestId('change-funds-exchange-rate'));
+        fireEvent.click(screen.getByText(REPORTS_TEXT.REPORT_AND_ANALYTICS.TAB.PROGRAM_EXPENSES));
+        fireEvent.click(screen.getByText(REPORTS_TEXT.REPORT_AND_ANALYTICS.TAB.INCOME_EXPENSES));
+
+        expect(screen.getByTestId('funds-expenditure-section')).toHaveAttribute('data-draft-exchange-rate', '44.20');
     });
 });

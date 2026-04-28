@@ -40,7 +40,7 @@ export interface ProgramSectionFormProps {
     isLastSection: boolean;
     onMoveUpSection: () => void;
     onMoveDownSection: () => void;
-    onRequestSaveSection?: (request: { onConfirm: () => void }) => void;
+    onRequestSaveSection?: (request: { onConfirm: () => void; onDecline?: () => void }) => void;
 }
 
 export interface SectionCancelOptions {
@@ -543,25 +543,6 @@ export const ProgramSectionForm = ({
         [localSection],
     );
 
-    const handleSaveClick = useCallback(() => {
-        if (isDisabled || !isSectionSaveValid) return;
-
-        const applySave = () => {
-            onSave();
-            setOriginalSection(localSection);
-            setIsDirty(false);
-            setSectionMode(SectionMode.View);
-            setValidationResetKey((prev) => prev + 1);
-        };
-
-        if (onRequestSaveSection && isDirty) {
-            onRequestSaveSection({ onConfirm: applySave });
-            return;
-        }
-
-        applySave();
-    }, [isDisabled, isSectionSaveValid, onSave, localSection, onRequestSaveSection, isDirty]);
-
     const CARD_TEMPLATES = [
         SectionTemplate.DualTitleDescriptionPairs,
         SectionTemplate.TripleTitleDescriptionPairs,
@@ -570,29 +551,40 @@ export const ProgramSectionForm = ({
 
     const isCardTemplate = CARD_TEMPLATES.includes(section.template);
 
+    const performCancel = useCallback(
+        (forceCleanState: boolean) => {
+            const shouldRemove = isNewSection;
+            const revertTo = originalSection;
+            const isTemplateReplacement = isReplacingTemplate;
+
+            const onAfterDiscard = () => {
+                if (!shouldRemove) {
+                    localSectionRef.current = revertTo;
+                    setLocalSection(revertTo);
+                    setIsDirty(false);
+                    setSectionMode(SectionMode.View);
+                    setValidationResetKey((prev) => prev + 1);
+                }
+            };
+
+            onCancel({
+                isDirty: forceCleanState ? false : isDirty,
+                shouldRemove,
+                revertTo,
+                onAfterDiscard,
+                isTemplateReplacement,
+            });
+        },
+        [isDirty, isNewSection, onCancel, originalSection, isReplacingTemplate],
+    );
+
     const handleCancelClick = useCallback(() => {
-        const shouldRemove = isNewSection;
-        const revertTo = originalSection;
-        const isTemplateReplacement = isReplacingTemplate;
+        performCancel(false);
+    }, [performCancel]);
 
-        const onAfterDiscard = () => {
-            if (!shouldRemove) {
-                localSectionRef.current = revertTo;
-                setLocalSection(revertTo);
-                setIsDirty(false);
-                setSectionMode(SectionMode.View);
-                setValidationResetKey((prev) => prev + 1);
-            }
-        };
-
-        onCancel({
-            isDirty,
-            shouldRemove,
-            revertTo,
-            onAfterDiscard,
-            isTemplateReplacement,
-        });
-    }, [isDirty, isNewSection, onCancel, originalSection, isReplacingTemplate]);
+    const handleDeclineSave = useCallback(() => {
+        performCancel(true);
+    }, [performCancel]);
 
     const handleDeleteClick = useCallback(
         (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -611,6 +603,25 @@ export const ProgramSectionForm = ({
         },
         [onRequestReplace],
     );
+
+    const handleSaveClick = useCallback(() => {
+        if (isDisabled || !isSectionSaveValid) return;
+
+        const applySave = () => {
+            onSave();
+            setOriginalSection(localSection);
+            setIsDirty(false);
+            setSectionMode(SectionMode.View);
+            setValidationResetKey((prev) => prev + 1);
+        };
+
+        if (onRequestSaveSection && isDirty) {
+            onRequestSaveSection({ onConfirm: applySave, onDecline: handleDeclineSave });
+            return;
+        }
+
+        applySave();
+    }, [isDisabled, isSectionSaveValid, onSave, localSection, onRequestSaveSection, isDirty, handleDeclineSave]);
 
     const editableSection = renderProgramSection({
         templateId: section.template,

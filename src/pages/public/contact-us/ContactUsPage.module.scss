@@ -1,0 +1,31 @@
+@use '@/assets/sass/variables/colors' as c;
+
+.root {
+    background: c.$light-blue-50;
+    width: 100%;
+    padding: 120px 16px 54px;
+
+    @media (min-width: 560px) {
+        padding: 120px 64px 54px;
+    }
+
+    @media (min-width: 768px) {
+        padding: 120px 56px 96px;
+    }
+
+    @media (min-width: 1440px) {
+        padding: 120px 168px 164px;
+    }
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 64px;
+
+    @media (min-width: 1024px) {
+        flex-direction: row;
+        justify-content: center;
+        gap: 128px;
+    }
+}

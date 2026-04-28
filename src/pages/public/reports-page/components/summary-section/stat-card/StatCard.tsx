@@ -10,19 +10,21 @@ interface StatCardProps {
     label: string;
     color?: ValueColorVariant;
     currency?: string;
+    formattedValue?: string;
     className?: string;
 }
 
-export const StatCard = ({ value, label, color = 'blue', currency, className }: StatCardProps) => {
+export const StatCard = ({ value, label, color = 'blue', currency, formattedValue, className }: StatCardProps) => {
     const { i18n } = useTranslation();
 
-    const formattedValue = useMemo(() => {
+    const displayValue = useMemo(() => {
+        if (formattedValue !== undefined) return formattedValue;
         return new Intl.NumberFormat(i18n.language, {
             style: currency ? 'currency' : 'decimal',
             currency: currency,
             maximumFractionDigits: 0,
         }).format(value);
-    }, [value, currency, i18n.language]);
+    }, [value, currency, formattedValue, i18n.language]);
 
     const rootClasses = cn(styles.card, className);
     const valueClasses = cn(styles.value, styles[`text-${color}`]);
@@ -30,7 +32,7 @@ export const StatCard = ({ value, label, color = 'blue', currency, className }: 
     return (
         <div className={rootClasses}>
             <div className={styles.wrapper}>
-                <div className={valueClasses}>{formattedValue}</div>
+                <div className={valueClasses}>{displayValue}</div>
                 <div className={styles.label}>{label}</div>
             </div>
         </div>

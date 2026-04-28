@@ -16,7 +16,21 @@ interface ValidateFundsExpendituresCategoryParams {
 
 export const normalizeFundsExpendituresAmountInput = (value: string, trimEnd = false): string => {
     const withNormalizedSpaces = value.replaceAll(/\s+/g, ' ').trimStart();
-    return trimEnd ? withNormalizedSpaces.trim() : withNormalizedSpaces;
+    const withCommaSeparator = withNormalizedSpaces.replaceAll('.', ',');
+    const firstCommaIndex = withCommaSeparator.indexOf(',');
+
+    if (firstCommaIndex === -1) {
+        return trimEnd ? withCommaSeparator.trim() : withCommaSeparator;
+    }
+
+    const integerPart = withCommaSeparator.slice(0, firstCommaIndex);
+    const decimalPart = withCommaSeparator
+        .slice(firstCommaIndex + 1)
+        .replaceAll(',', '')
+        .slice(0, 2);
+    const normalized = `${integerPart},${decimalPart}`;
+
+    return trimEnd ? normalized.trim() : normalized;
 };
 
 export const validateFundsExpendituresAmount = (
@@ -35,11 +49,11 @@ export const validateFundsExpendituresAmount = (
         return FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_NOT_NEGATIVE;
     }
 
-    if (!/^\d+(?:[.,]\d+)?$/.test(compact)) {
+    if (!/^\d+(?:,\d{1,2})?$/.test(compact)) {
         return FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER;
     }
 
-    const [integerPart] = compact.split(/[.,]/);
+    const [integerPart] = compact.split(',');
     if (integerPart.length > 9) {
         return FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_MAX_DIGITS;
     }

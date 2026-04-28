@@ -171,7 +171,7 @@ export const HistoryForm = forwardRef<HistoryFormRef, HistoryFormProps>(function
                 return localSectionsRef.current;
             },
         }),
-        [],
+        [onSectionsChange],
     );
 
     const sectionValidity = useMemo(

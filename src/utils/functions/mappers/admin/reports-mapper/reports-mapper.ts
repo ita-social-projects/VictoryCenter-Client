@@ -22,6 +22,8 @@ import {
     UpdateReportFundsExpendituresSettingsDto,
 } from '@/types/admin/reports';
 
+import { formatNumberDecimalComma } from '@/utils/functions/formatters/format-number';
+
 export const mapReportsMediaSettingsDtoToMediaSettings = (dto: ReportsMediaSettingsDto): ReportsMediaSettings => ({
     collectedFunds: mapReportsMediaSettingsCollectedFundsDtoToCollectedFunds(dto.collectedFundsBlock),
     changedLives: mapReportsMediaSettingsChangedLivesDtoToChangedLives(dto.changedLivesBlock),
@@ -67,7 +69,7 @@ export const mapReportFundsExpendituresSettingsDtoToSettings = (
 ): ReportFundsExpendituresSettings => ({
     id: dto.id,
     disclaimerTitle: dto.disclaimerTitle,
-    exchangeRate: String(dto.exchangeRate).replace('.', ','),
+    exchangeRate: formatNumberDecimalComma(dto.exchangeRate),
 });
 
 export const mapReportFundsExpendituresSettingsToUpdateDto = (
@@ -106,8 +108,8 @@ export const mapReportFundsExpendituresRecordDtoToRecord = (
     categoryId: dto.categoryId,
     type: mapFundsExpendituresTypeDtoToTransactionType(dto.type),
     reportingYear: String(dto.reportingYear),
-    amountUah: String(dto.amountUah).replace('.', ','),
-    amountUsd: String(dto.amountUsd).replace('.', ','),
+    amountUah: formatNumberDecimalComma(dto.amountUah),
+    amountUsd: formatNumberDecimalComma(dto.amountUsd),
 });
 
 type ReportFundsExpendituresRecordRequestPayload = Pick<

@@ -146,6 +146,13 @@ jest.mock('../history-form/HistoryForm', () => {
                 >
                     Trigger section deleted
                 </button>
+                <button
+                    type="button"
+                    data-testid="trigger-sections-change"
+                    onClick={() => onSectionsChange?.([...mockHistoryFormSections])}
+                >
+                    Trigger sections change
+                </button>
             </div>
         );
     });
@@ -595,6 +602,19 @@ describe('HistoryPageContent', () => {
         await waitFor(() => {
             expect(mockAddToast).toHaveBeenCalledWith('Publish error', ToastType.Error);
         });
+    });
+
+    it('enables publish button when sections are reordered/changed', async () => {
+        mockSingleSectionData();
+
+        render(<HistoryPageContent />);
+
+        const publishButton = screen.getByRole('button', { name: 'Publish' });
+        expect(publishButton).toBeDisabled();
+
+        await user.click(screen.getByTestId('trigger-sections-change'));
+
+        expect(publishButton).toBeEnabled();
     });
 
     it('syncs remaining sections and shows success toast after delete', async () => {

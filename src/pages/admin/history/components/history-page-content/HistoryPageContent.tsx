@@ -216,7 +216,10 @@ export const HistoryPageContent = () => {
                         ref={historyFormRef}
                         sections={normalizedSections}
                         onReplaceSection={handleReplaceSection}
-                        onSectionsChange={(s) => setLocalSectionsCount(s.length)}
+                        onSectionsChange={(s) => {
+                            setLocalSectionsCount(s.length);
+                            setCanPublish(true);
+                        }}
                         onHasEditingSectionChange={setHasActiveSectionForm}
                         onSectionSaved={handleSectionSaved}
                         onSectionDeleted={handleSectionDeleted}

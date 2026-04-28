@@ -235,14 +235,14 @@ describe('HistoryForm', () => {
 
         fireEvent.click(screen.getByTestId('move-down-history-section-1'));
         expect(onSectionsChange).toHaveBeenLastCalledWith([
-            expect.objectContaining({ id: 2 }),
-            expect.objectContaining({ id: 1 }),
+            expect.objectContaining({ id: 2, order: 0 }),
+            expect.objectContaining({ id: 1, order: 1 }),
         ]);
 
         fireEvent.click(screen.getByTestId('move-up-history-section-2'));
         expect(onSectionsChange).toHaveBeenLastCalledWith([
-            expect.objectContaining({ id: 2 }),
-            expect.objectContaining({ id: 1 }),
+            expect.objectContaining({ id: 2, order: 0 }),
+            expect.objectContaining({ id: 1, order: 1 }),
         ]);
     });
 

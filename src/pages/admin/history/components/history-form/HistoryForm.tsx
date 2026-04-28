@@ -51,6 +51,13 @@ const getSectionsSyncSignature = (sections: HistorySectionDto[]): string => {
     return sections.map((section) => `${section.id}:${section.order}`).join('|');
 };
 
+const reindexSectionsOrder = (sections: HistorySectionDto[]): HistorySectionDto[] => {
+    return sections.map((section, index) => ({
+        ...section,
+        order: index,
+    }));
+};
+
 export const HistoryForm = forwardRef<HistoryFormRef, HistoryFormProps>(function HistoryForm(
     {
         sections,
@@ -124,6 +131,7 @@ export const HistoryForm = forwardRef<HistoryFormRef, HistoryFormProps>(function
                 const newSections = [...localSectionsRef.current, section];
                 localSectionsRef.current = newSections;
                 setLocalSections(newSections);
+                onSectionsChange?.(newSections);
                 setSectionStates((prev) => [
                     ...prev,
                     {
@@ -150,6 +158,7 @@ export const HistoryForm = forwardRef<HistoryFormRef, HistoryFormProps>(function
                 newSections[sectionIndex] = newSection;
                 localSectionsRef.current = newSections;
                 setLocalSections(newSections);
+                onSectionsChange?.(newSections);
                 setSectionStates((prev) =>
                     prev.map((state, index) =>
                         index === sectionIndex
@@ -311,7 +320,7 @@ export const HistoryForm = forwardRef<HistoryFormRef, HistoryFormProps>(function
             updateSections((prev) => {
                 const next = [...prev];
                 [next[index - 1], next[index]] = [next[index], next[index - 1]];
-                return next;
+                return reindexSectionsOrder(next);
             });
 
             setSectionStates((prev) => {
@@ -339,7 +348,7 @@ export const HistoryForm = forwardRef<HistoryFormRef, HistoryFormProps>(function
             updateSections((prev) => {
                 const next = [...prev];
                 [next[index], next[index + 1]] = [next[index + 1], next[index]];
-                return next;
+                return reindexSectionsOrder(next);
             });
 
             setSectionStates((prev) => {

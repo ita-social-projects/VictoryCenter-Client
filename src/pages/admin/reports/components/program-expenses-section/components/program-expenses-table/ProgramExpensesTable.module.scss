@@ -136,7 +136,7 @@
     height: 24px;
     padding: 0;
     border: none;
-    color: c.$blue-500;
+    color: var(--icon-btn-color, c.$blue-500);
 
     svg {
         width: 20px;

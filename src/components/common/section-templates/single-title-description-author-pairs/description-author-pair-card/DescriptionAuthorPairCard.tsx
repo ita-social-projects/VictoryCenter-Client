@@ -1,6 +1,5 @@
 import cn from 'classnames';
 import { useCallback, useState } from 'react';
-import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { SECTIONS_TEXT } from '@/const/admin/sections';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -57,7 +56,7 @@ export const DescriptionAuthorPairCard = ({
         }
     };
 
-    const handleAuthorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleAuthorChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         const v = e.target.value;
         onAuthorChange?.(index, v);
 
@@ -118,7 +117,7 @@ export const DescriptionAuthorPairCard = ({
                 </div>
 
                 <div className={styles['author-field']}>
-                    <InputWithCharacterLimitGroup
+                    <TextAreaWithCharacterLimitGroup
                         className={styles['author-input-group']}
                         label={SECTIONS_TEXT.SECTION.CARD.FORM.AUTHOR.TEXT}
                         isRequired
@@ -131,7 +130,9 @@ export const DescriptionAuthorPairCard = ({
                         placeholder={SECTIONS_TEXT.SECTION.CARD.FORM.AUTHOR.PLACEHOLDER}
                         error={authorError}
                         maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(authorMaxLength)}
-                        showCounterBelow={true}
+                        rows={1}
+                        autoGrow={true}
+                        maxRows={4}
                     />
                 </div>
             </div>

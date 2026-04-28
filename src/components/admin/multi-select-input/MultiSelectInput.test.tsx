@@ -258,6 +258,19 @@ describe('Multiselect Component', () => {
             expectPlaceholderTextToBe('Option 1, Option 2');
         });
 
+        it('uses custom display value when provided', () => {
+            const selectedValues = [mockOptions[0], mockOptions[1]];
+            const getDisplayValue = jest.fn((values: TestOption[]) => `Selected: ${values.length}`);
+
+            renderMultiSelectInput({
+                ...createPropsWithSelectedValues(selectedValues),
+                getDisplayValue,
+            });
+
+            expectPlaceholderTextToBe('Selected: 2');
+            expect(getDisplayValue).toHaveBeenCalledWith(selectedValues);
+        });
+
         it('applies has-value className when items are selected', () => {
             const selectedValues = [mockOptions[0]];
             renderMultiSelectInput(createPropsWithSelectedValues(selectedValues));
@@ -282,6 +295,20 @@ describe('Multiselect Component', () => {
             expectOnChangeToBeCalledWith([mockOptions[1]]);
         });
 
+        it('does not call onChange when option id is missing', () => {
+            renderMultiSelectInput(
+                createPropsWithCallbacks({
+                    getOptionId: (option) =>
+                        option.id === mockOptions[0].id ? (null as unknown as number) : option.id,
+                }),
+            );
+
+            openDropdown();
+            clickOptionByName('Option 1');
+
+            expectOnChangeNotToBeCalled();
+        });
+
         it('applies selected className to selected options', () => {
             const selectedValues = [mockOptions[0]];
             renderMultiSelectInput(createPropsWithSelectedValues(selectedValues));
@@ -294,6 +321,19 @@ describe('Multiselect Component', () => {
             renderMultiSelectInput(createPropsWithSelectedValues(selectedValues));
             openDropdown();
 
+            expectSelectedIconsCount(1);
+            expectUnselectedIconsCount(3);
+        });
+
+        it('uses custom selected state when provided', () => {
+            renderMultiSelectInput({
+                isOptionSelected: (option) => option.id === mockOptions[1].id,
+            });
+
+            openDropdown();
+
+            expect(getOptionByName('Option 1')).toHaveAttribute('aria-selected', 'false');
+            expect(getOptionByName('Option 2')).toHaveAttribute('aria-selected', 'true');
             expectSelectedIconsCount(1);
             expectUnselectedIconsCount(3);
         });

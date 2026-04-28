@@ -1,4 +1,3 @@
-import { ChangeEvent, ReactNode } from 'react';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ProgramExpensesSection } from './ProgramExpensesSection';
@@ -11,6 +10,7 @@ const MOCK_PROGRAM_EXPENSES_DATA: ProgramExpensesReadOnlyData = {
     programs: [
         { id: 1, name: 'Program A' },
         { id: 2, name: 'Program B' },
+        { id: 3, name: 'Program C' },
     ],
     summary: {
         totalAmountUah: 125000,
@@ -57,10 +57,6 @@ const EMPTY_PROGRAM_EXPENSES_DATA: ProgramExpensesReadOnlyData = {
     records: [],
 };
 
-jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
-    useAdminClient: () => ({}),
-}));
-
 const mockGetReadOnlyData = jest.fn();
 jest.mock('@/services/api/admin/reports/program-expenses-api', () => ({
     ProgramExpensesApi: {
@@ -90,53 +86,57 @@ jest.mock('@/assets/icons/plus.svg', () => ({
     ReactComponent: () => <svg data-testid="plus-icon" />,
 }));
 
-jest.mock('@/components/common/select/Select', () => {
-    const React = require('react');
-
-    interface MockSelectProps<TValue> {
-        value: TValue;
-        onValueChange: (value: TValue) => void;
-        children: ReactNode;
+jest.mock('@/components/admin/multi-select-input/MultiSelectInput', () => ({
+    MultiSelectInput: ({
+        options,
+        onChange,
+        placeholder,
+    }: {
+        options: { id: number; name: string }[];
+        onChange: (value: { id: number; name: string }[]) => void;
         placeholder?: string;
-    }
-
-    interface MockSelectOptionProps<TValue> {
-        value: TValue;
-        name: string;
-    }
-
-    const Option = <TValue,>(_props: MockSelectOptionProps<TValue>) => null;
-
-    const Select = <TValue,>({ value, onValueChange, children, placeholder }: MockSelectProps<TValue>) => {
-        const options = React.Children.toArray(children) as React.ReactElement<MockSelectOptionProps<TValue>>[];
-        const normalizedValue = value === undefined ? '' : String(value);
+    }) => {
+        const filteredOptions = options.filter((option) => option.id !== 0);
 
         return (
-            <select
-                data-testid="program-select"
-                aria-label={placeholder}
-                value={normalizedValue}
-                onChange={(event: ChangeEvent<HTMLSelectElement>) => {
-                    const nextValue = event.target.value === '' ? undefined : Number(event.target.value);
-                    onValueChange(nextValue as TValue);
-                }}
-            >
-                {options.map((option) => (
-                    <option
-                        key={String(option.props.value)}
-                        value={option.props.value === undefined ? '' : String(option.props.value)}
-                    >
-                        {option.props.name}
-                    </option>
-                ))}
-            </select>
+            <div>
+                <select
+                    data-testid="program-select"
+                    aria-label={placeholder}
+                    defaultValue=""
+                    onChange={(event) => {
+                        const selectedOption = options.find((option) => option.id === Number(event.target.value));
+                        onChange(selectedOption ? [selectedOption] : []);
+                    }}
+                >
+                    <option value="">{placeholder}</option>
+                    {filteredOptions.map((option) => (
+                        <option key={option.id} value={option.id}>
+                            {option.name}
+                        </option>
+                    ))}
+                </select>
+                <button
+                    type="button"
+                    data-testid="program-select-first-two"
+                    onClick={() => onChange(options.filter((option) => option.id === 1 || option.id === 2))}
+                >
+                    First two programs
+                </button>
+                <button
+                    type="button"
+                    data-testid="program-select-no-records"
+                    onClick={() => onChange([options.find((option) => option.id === 3)!])}
+                >
+                    Program without records
+                </button>
+                <button type="button" data-testid="program-select-clear" onClick={() => onChange([])}>
+                    Clear programs
+                </button>
+            </div>
         );
-    };
-
-    Select.Option = Option;
-
-    return { Select };
-});
+    },
+}));
 
 describe('ProgramExpensesSection', () => {
     beforeEach(() => {
@@ -197,6 +197,45 @@ describe('ProgramExpensesSection', () => {
         expect(within(table).queryByText('2024')).not.toBeInTheDocument();
     });
 
+    it('should filter table records by multiple selected programs', () => {
+        render(<ProgramExpensesSection />);
+
+        fireEvent.click(screen.getByTestId('program-select-first-two'));
+
+        const table = screen.getByRole('table');
+        const rows = within(table).getAllByRole('row');
+
+        expect(rows).toHaveLength(4);
+        expect(within(table).getAllByText('Program A')).toHaveLength(2);
+        expect(within(table).getByText('Program B')).toBeInTheDocument();
+        expect(within(table).queryByText('Program C')).not.toBeInTheDocument();
+    });
+
+    it('should restore all table records when selected programs are cleared', () => {
+        render(<ProgramExpensesSection />);
+
+        fireEvent.change(screen.getByTestId('program-select'), {
+            target: { value: '2' },
+        });
+        fireEvent.click(screen.getByTestId('program-select-clear'));
+
+        const table = screen.getByRole('table');
+        const rows = within(table).getAllByRole('row');
+
+        expect(rows).toHaveLength(4);
+        expect(within(table).getAllByText('Program A')).toHaveLength(2);
+        expect(within(table).getByText('Program B')).toBeInTheDocument();
+    });
+
+    it('should render filtered empty state when selected program has no matching records', () => {
+        render(<ProgramExpensesSection />);
+
+        fireEvent.click(screen.getByTestId('program-select-no-records'));
+
+        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.MESSAGE)).toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE })).toBeNull();
+    });
+
     it('should render program expenses empty state when records are missing', () => {
         mockUseDataFetchResult = {
             data: EMPTY_PROGRAM_EXPENSES_DATA,
@@ -222,8 +261,8 @@ describe('ProgramExpensesSection', () => {
         await useDataFetchProps.fetchHandler();
         await useDataFetchProps.fetchHandler({ test: true });
 
-        expect(mockGetReadOnlyData).toHaveBeenCalledWith({}, {});
+        expect(mockGetReadOnlyData).toHaveBeenCalledWith({});
         expect(ProgramExpensesApi.getReadOnlyData).toBeDefined();
-        expect(mockGetReadOnlyData).toHaveBeenCalledWith({}, { test: true });
+        expect(mockGetReadOnlyData).toHaveBeenCalledWith({ test: true });
     });
 });

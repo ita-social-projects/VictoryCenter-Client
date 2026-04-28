@@ -10,7 +10,8 @@ export const getImageSrc = (image: Image | ImageValues | string | null | undefin
     }
 
     if ('url' in image && image.url) {
-        return image.url;
+        const v = image.updatedAt ? `?v=${new Date(image.updatedAt).getTime()}` : '';
+        return `${image.url}${v}`;
     }
 
     if ('base64' in image && image.base64) {

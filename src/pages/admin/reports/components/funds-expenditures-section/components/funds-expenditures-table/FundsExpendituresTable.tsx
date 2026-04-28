@@ -23,7 +23,6 @@ import { updateFundsAmounts } from '@/utils/functions/update-funds-amounts/updat
 import { parseAmount } from '@/utils/functions/parse-amount/parse-amount';
 import { isUsdAmountMismatch } from '@/utils/functions/validate-usd-amount-mismatch/validate-usd-amount-mismatch';
 import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
-import { FundsRecordActions } from '@/pages/admin/reports/components/funds-expenditures-section/components/common/funds-record-actions/FundsRecordActions';
 import cn from 'classnames';
 import styles from './FundsExpendituresTable.module.scss';
 
@@ -46,10 +45,6 @@ interface FundsExpendituresTableProps {
     allRecordsForTypeInference?: ReportFundsExpendituresRecord[];
     isEditing?: boolean;
     isRowActionsDisabled?: boolean;
-    isAddIncomeDisabled?: boolean;
-    isAddExpenseDisabled?: boolean;
-    onAddIncome?: () => void;
-    onAddExpense?: () => void;
     onRowEditModeChange?: (isEditMode: boolean) => void;
     onRecordSave?: (
         recordId: number,
@@ -151,10 +146,6 @@ export const FundsExpendituresTable = ({
     allRecordsForTypeInference,
     isEditing = false,
     isRowActionsDisabled = false,
-    isAddIncomeDisabled = false,
-    isAddExpenseDisabled = false,
-    onAddIncome,
-    onAddExpense,
     onRowEditModeChange,
     onRecordSave,
     onDeleteRecord,
@@ -377,13 +368,15 @@ export const FundsExpendituresTable = ({
             const finalError = getRowEditValidationError(record, rowEditState.categoryId, 'blur');
             const isCategoryUnchanged = rowEditState.categoryId === rowEditState.originalCategoryId;
             const isCategoryMissing = rowEditState.categoryId === undefined;
-            const normalizedAmountUah = normalizeFundsExpendituresAmountInput(rowEditState.amountUah, true);
-            const normalizedAmountUsd = normalizeFundsExpendituresAmountInput(rowEditState.amountUsd, true);
-            const amountUahError = validateFundsExpendituresAmount(normalizedAmountUah, 'save');
-            const amountUsdError = validateFundsExpendituresAmount(normalizedAmountUsd, 'save');
+            const preparedAmountUah = rowEditState.amountUah.trim();
+            const preparedAmountUsd = rowEditState.amountUsd.trim();
+            const amountUahError = validateFundsExpendituresAmount(preparedAmountUah, 'save');
+            const amountUsdError = validateFundsExpendituresAmount(preparedAmountUsd, 'save');
             const isAmountsUnchanged =
-                normalizeFundsExpendituresAmountInput(rowEditState.originalAmountUah, true) === normalizedAmountUah &&
-                normalizeFundsExpendituresAmountInput(rowEditState.originalAmountUsd, true) === normalizedAmountUsd;
+                normalizeFundsExpendituresAmountInput(rowEditState.originalAmountUah, true) ===
+                    normalizeFundsExpendituresAmountInput(preparedAmountUah, true) &&
+                normalizeFundsExpendituresAmountInput(rowEditState.originalAmountUsd, true) ===
+                    normalizeFundsExpendituresAmountInput(preparedAmountUsd, true);
 
             if (
                 finalError ||
@@ -399,8 +392,8 @@ export const FundsExpendituresTable = ({
 
                     return {
                         ...prev,
-                        amountUah: normalizedAmountUah,
-                        amountUsd: normalizedAmountUsd,
+                        amountUah: preparedAmountUah,
+                        amountUsd: preparedAmountUsd,
                         errors: {
                             ...prev.errors,
                             category: finalError,
@@ -423,8 +416,8 @@ export const FundsExpendituresTable = ({
             try {
                 const isSaved = await onRecordSave?.(record.id, {
                     categoryId: nextCategoryId,
-                    amountUah: normalizedAmountUah,
-                    amountUsd: normalizedAmountUsd,
+                    amountUah: preparedAmountUah,
+                    amountUsd: preparedAmountUsd,
                 });
 
                 if (isSaved === false) {
@@ -533,7 +526,7 @@ export const FundsExpendituresTable = ({
                         </tr>
                     </thead>
                     <tbody>
-                        {sortedRecords.length === 0 ? (
+                        {sortedRecords.length === 0 && isEditing ? (
                             <tr>
                                 <td
                                     colSpan={colSpan}
@@ -542,28 +535,9 @@ export const FundsExpendituresTable = ({
                                 >
                                     <div className={styles['empty-state']}>
                                         <NotFoundIcon className={styles['empty-state-image']} />
-                                        {isEditing ? (
-                                            <p className={styles['empty-state-message']}>
-                                                {FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.MESSAGE}
-                                            </p>
-                                        ) : (
-                                            <>
-                                                <p className={styles['empty-state-title']}>
-                                                    {FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.TITLE}
-                                                </p>
-                                                <p className={styles['empty-state-message']}>
-                                                    {FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.ADD_RECORD}
-                                                </p>
-                                                <FundsRecordActions
-                                                    className={styles['empty-state-actions']}
-                                                    testId="empty-state-actions"
-                                                    isAddExpenseDisabled={isAddExpenseDisabled}
-                                                    isAddIncomeDisabled={isAddIncomeDisabled}
-                                                    onAddExpense={onAddExpense}
-                                                    onAddIncome={onAddIncome}
-                                                />
-                                            </>
-                                        )}
+                                        <p className={styles['empty-state-message']}>
+                                            {FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.MESSAGE}
+                                        </p>
                                     </div>
                                 </td>
                             </tr>

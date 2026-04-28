@@ -1,7 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
-import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { ProgramExpensesApi } from '@/services/api/admin/reports/program-expenses-api';
 import { ProgramExpensesReadOnlyData } from '@/types/admin/reports';
 import { ProgramExpensesToolbar } from './components/program-expenses-toolbar/ProgramExpensesToolbar';
@@ -20,13 +19,9 @@ const INITIAL_PROGRAM_EXPENSES_DATA: ProgramExpensesReadOnlyData = {
 };
 
 export const ProgramExpensesSection = () => {
-    const adminClient = useAdminClient();
-    const [selectedProgramId, setSelectedProgramId] = useState<number | undefined>(undefined);
+    const [selectedProgramIds, setSelectedProgramIds] = useState<number[]>([]);
 
-    const fetchReadOnlyData = useCallback(
-        (options = {}) => ProgramExpensesApi.getReadOnlyData(adminClient, options),
-        [adminClient],
-    );
+    const fetchReadOnlyData = useCallback((options = {}) => ProgramExpensesApi.getReadOnlyData(options), []);
 
     const { data, isLoading } = useDataFetch<ProgramExpensesReadOnlyData>({
         initialData: INITIAL_PROGRAM_EXPENSES_DATA,
@@ -34,12 +29,12 @@ export const ProgramExpensesSection = () => {
     });
 
     const filteredRecords = useMemo(() => {
-        if (!selectedProgramId) {
+        if (selectedProgramIds.length === 0) {
             return data.records;
         }
 
-        return data.records.filter((record) => record.programId === selectedProgramId);
-    }, [data.records, selectedProgramId]);
+        return data.records.filter((record) => selectedProgramIds.includes(record.programId));
+    }, [data.records, selectedProgramIds]);
 
     const programExpenseRecordsCount = data.records.length;
     const hasAnyProgramExpenseRecords = programExpenseRecordsCount > 0;
@@ -62,9 +57,9 @@ export const ProgramExpensesSection = () => {
             <div className={styles.filters}>
                 <ProgramExpensesToolbar
                     programs={data.programs}
-                    selectedProgramId={selectedProgramId}
+                    selectedProgramIds={selectedProgramIds}
                     exchangeRate={data.exchangeRate}
-                    onProgramChange={setSelectedProgramId}
+                    onProgramChange={setSelectedProgramIds}
                 />
                 <ProgramExpensesTable
                     records={filteredRecords}

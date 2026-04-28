@@ -34,21 +34,6 @@ jest.mock('@/assets/icons/delete.svg', () => ({
     ReactComponent: () => <svg data-testid="delete-icon" />,
 }));
 
-jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
-    InputWithCharacterLimitGroup: (props: any) => {
-        const { id, value, onChange, onBlur, error, showCounterBelow } = props;
-        return (
-            <div
-                data-testid={`input-group-${id}`}
-                data-error={error ?? ''}
-                data-show-counter-below={String(showCounterBelow)}
-            >
-                <input data-testid={`input-${id}`} value={value} onChange={onChange} onBlur={onBlur} />
-            </div>
-        );
-    },
-}));
-
 jest.mock(
     '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
     () => ({
@@ -94,15 +79,14 @@ describe('DescriptionAuthorPairCard', () => {
         expect(screen.getByText('Auth')).toBeInTheDocument();
         expect(screen.queryByTestId('delete-icon')).not.toBeInTheDocument();
         expect(screen.queryByTestId('textarea-pair-description-0')).not.toBeInTheDocument();
-        expect(screen.queryByTestId('input-pair-author-0')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('textarea-pair-author-0')).not.toBeInTheDocument();
     });
 
     it('renders editable inputs and hides delete for first card', () => {
         renderCard({ index: 0 });
 
         expect(screen.getByTestId('textarea-pair-description-0')).toBeInTheDocument();
-        expect(screen.getByTestId('input-pair-author-0')).toBeInTheDocument();
-        expect(screen.getByTestId('input-group-pair-author-0')).toHaveAttribute('data-show-counter-below', 'true');
+        expect(screen.getByTestId('textarea-pair-author-0')).toBeInTheDocument();
         expect(screen.queryByLabelText('delete')).not.toBeInTheDocument();
     });
 
@@ -131,7 +115,7 @@ describe('DescriptionAuthorPairCard', () => {
         renderCard({ index: 4, description: '', author: '', onDescriptionChange, onAuthorChange });
 
         fireEvent.change(screen.getByTestId('textarea-pair-description-4'), { target: { value: 'New desc' } });
-        fireEvent.change(screen.getByTestId('input-pair-author-4'), { target: { value: 'New author' } });
+        fireEvent.change(screen.getByTestId('textarea-pair-author-4'), { target: { value: 'New author' } });
 
         expect(onDescriptionChange).toHaveBeenCalledWith(4, 'New desc');
         expect(onAuthorChange).toHaveBeenCalledWith(4, 'New author');
@@ -143,7 +127,7 @@ describe('DescriptionAuthorPairCard', () => {
         renderCard({ index: 3, description: '', author: '' });
 
         fireEvent.blur(screen.getByTestId('textarea-pair-description-3'));
-        fireEvent.blur(screen.getByTestId('input-pair-author-3'));
+        fireEvent.blur(screen.getByTestId('textarea-pair-author-3'));
 
         expect(validateContentTextMock).toHaveBeenCalledTimes(2);
         expect(validateContentTextMock).toHaveBeenNthCalledWith(
@@ -163,19 +147,19 @@ describe('DescriptionAuthorPairCard', () => {
 
         await waitFor(() => {
             expect(screen.getByTestId('textarea-group-pair-description-3')).toHaveAttribute('data-error', 'error');
-            expect(screen.getByTestId('input-group-pair-author-3')).toHaveAttribute('data-error', 'error');
+            expect(screen.getByTestId('textarea-group-pair-author-3')).toHaveAttribute('data-error', 'error');
         });
 
         validateContentTextMock.mockReturnValue(undefined);
 
         fireEvent.change(screen.getByTestId('textarea-pair-description-3'), { target: { value: 'X' } });
-        fireEvent.change(screen.getByTestId('input-pair-author-3'), { target: { value: 'Y' } });
+        fireEvent.change(screen.getByTestId('textarea-pair-author-3'), { target: { value: 'Y' } });
 
         expect(validateContentTextMock).toHaveBeenCalledTimes(4);
 
         await waitFor(() => {
             expect(screen.getByTestId('textarea-group-pair-description-3')).toHaveAttribute('data-error', '');
-            expect(screen.getByTestId('input-group-pair-author-3')).toHaveAttribute('data-error', '');
+            expect(screen.getByTestId('textarea-group-pair-author-3')).toHaveAttribute('data-error', '');
         });
     });
 });

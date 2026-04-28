@@ -3,6 +3,7 @@ import background from '@/assets/images/horses.webp';
 import { PartnersBanner } from '@/types/public/partners-page';
 import DOMPurify from 'dompurify';
 import { SafeHtml } from '@/components/common/safe-html';
+import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 
 export interface IntroSectionProps {
     banner: PartnersBanner | null;
@@ -14,7 +15,7 @@ export const IntroSection = ({ banner }: IntroSectionProps) => {
     }
 
     const { title, description, image } = banner;
-    const imageUrl = image?.url ?? background;
+    const imageUrl = getImageSrc(image) || background;
 
     const sanitizedTitle = DOMPurify.sanitize(title, {
         ALLOWED_TAGS: ['strong', 'em', 'b', 'i', 'br'],

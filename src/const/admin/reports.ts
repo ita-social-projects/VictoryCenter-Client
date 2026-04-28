@@ -3,7 +3,7 @@ import { COMMON_TEXT_ADMIN } from './common';
 export const REPORTS_TEXT = {
     FORM: {
         LABEL: {
-            TITLE: 'Заголовок',
+            TITLE: 'Заголовок/EN',
             COLLECTED_FUNDS_WINDOW: 'Вікно 1: Зібрано коштів',
             CHANGED_LIVES_WINDOW: 'Вікно 2: Змінено життів',
             COLLECTED_FUNDS: 'Зібрані кошти',
@@ -40,7 +40,7 @@ export const REPORTS_TEXT = {
 
 export const REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION = {
     title: {
-        min: 10,
+        min: 2,
         max: 50,
         getRequiredError: () => `Заголовок обов'язковий`,
     },
@@ -55,7 +55,7 @@ export const REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION = {
 
 export const REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION = {
     title: {
-        min: 10,
+        min: 2,
         max: 50,
         getRequiredError: () => `Заголовок обов'язковий`,
     },
@@ -175,6 +175,7 @@ export const FUNDS_EXPENDITURES_TEXT = {
             CATEGORY_LABEL: 'Категорія витрат',
             CATEGORY_PLACEHOLDER: 'Оберіть категорію витрат',
             SUBMIT_BUTTON: 'Додати витрату',
+            CONFIRM_ADD_TITLE: 'Додати нову витрату?',
         },
     },
     BUTTON: {
@@ -216,7 +217,8 @@ export const FUNDS_EXPENDITURES_TEXT = {
         },
     },
     VALIDATION: {
-        CATEGORY_UNIQUE: 'Категорія вже додана до надходжень',
+        CATEGORY_UNIQUE_INCOME: 'Категорія вже додана до надходжень',
+        CATEGORY_UNIQUE_EXPENSE: 'Категорія вже додана до витрат',
         AMOUNT_ONLY_NUMBER: 'Дозволено лише цифри',
         AMOUNT_MAX_DIGITS: 'Не більше 9 цифр до коми',
         AMOUNT_NOT_NEGATIVE: "Сума не може бути від'ємною",
@@ -230,6 +232,11 @@ export const FUNDS_EXPENDITURES_TEXT = {
 export const PROGRAM_EXPENSES_TEXT = {
     BUTTON: {
         ADD_PROGRAM_EXPENSE: 'Витрата по програмі',
+    },
+    FILTER: {
+        PROGRAMS_PLACEHOLDER: 'Програми',
+        ALL_OPTION: 'Всі',
+        getProgramsCounterLabel: (count: number) => `Програми (${count})`,
     },
     EMPTY_STATE: {
         ADD_RECORD: 'додайте перший запис Програмної витрати',

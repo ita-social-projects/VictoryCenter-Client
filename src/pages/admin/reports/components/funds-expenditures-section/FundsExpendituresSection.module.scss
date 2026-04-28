@@ -28,6 +28,7 @@
 
 .disclaimer-label {
     @include type.subtitle-1-medium;
+    font-weight: 700;
     line-height: 24px;
     color: c.$grey-900;
 }

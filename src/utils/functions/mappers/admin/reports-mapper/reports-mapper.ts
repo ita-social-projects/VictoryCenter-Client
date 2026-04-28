@@ -22,6 +22,8 @@ import {
     UpdateReportFundsExpendituresSettingsDto,
 } from '@/types/admin/reports';
 
+import { formatNumberDecimalComma } from '@/utils/functions/formatters/format-number';
+
 export const mapReportsMediaSettingsDtoToMediaSettings = (dto: ReportsMediaSettingsDto): ReportsMediaSettings => ({
     collectedFunds: mapReportsMediaSettingsCollectedFundsDtoToCollectedFunds(dto.collectedFundsBlock),
     changedLives: mapReportsMediaSettingsChangedLivesDtoToChangedLives(dto.changedLivesBlock),
@@ -67,7 +69,7 @@ export const mapReportFundsExpendituresSettingsDtoToSettings = (
 ): ReportFundsExpendituresSettings => ({
     id: dto.id,
     disclaimerTitle: dto.disclaimerTitle,
-    exchangeRate: String(dto.exchangeRate),
+    exchangeRate: formatNumberDecimalComma(dto.exchangeRate),
 });
 
 export const mapReportFundsExpendituresSettingsToUpdateDto = (
@@ -106,8 +108,8 @@ export const mapReportFundsExpendituresRecordDtoToRecord = (
     categoryId: dto.categoryId,
     type: mapFundsExpendituresTypeDtoToTransactionType(dto.type),
     reportingYear: String(dto.reportingYear),
-    amountUah: String(dto.amountUah),
-    amountUsd: String(dto.amountUsd),
+    amountUah: formatNumberDecimalComma(dto.amountUah),
+    amountUsd: formatNumberDecimalComma(dto.amountUsd),
 });
 
 type ReportFundsExpendituresRecordRequestPayload = Pick<
@@ -119,8 +121,8 @@ const mapReportFundsExpendituresRecordToRequestDto = (record: ReportFundsExpendi
     categoryId: record.categoryId,
     type: mapFundsExpendituresTransactionTypeToTypeDto(record.type),
     reportingYear: Number.parseInt(record.reportingYear, 10) || new Date().getFullYear(),
-    amountUah: Math.trunc(Number.parseFloat(record.amountUah.replaceAll(' ', '').replace(',', '.')) || 0),
-    amountUsd: Math.trunc(Number.parseFloat(record.amountUsd.replaceAll(' ', '').replace(',', '.')) || 0),
+    amountUah: Number.parseFloat(record.amountUah.replaceAll(' ', '').replace(',', '.')) || 0,
+    amountUsd: Number.parseFloat(record.amountUsd.replaceAll(' ', '').replace(',', '.')) || 0,
 });
 
 export const mapReportFundsExpendituresRecordToCreateDto = (

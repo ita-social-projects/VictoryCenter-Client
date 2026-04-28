@@ -1,0 +1,55 @@
+@use '@/assets/sass/variables/colors' as c;
+
+.form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+}
+
+.content {
+    display: flex;
+    flex-direction: row;
+    gap: 40px;
+    margin-bottom: 40px;
+    align-items: center;
+}
+
+.image-section {
+    flex: 6;
+    max-width: 60%;
+}
+
+.image-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.error {
+    color: c.$error;
+    margin: 0;
+}
+
+.text-section {
+    flex: 4;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.textarea-custom textarea {
+    height: 200px;
+    resize: none;
+}
+
+.actions {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.publish-button {
+    width: 608px;
+}

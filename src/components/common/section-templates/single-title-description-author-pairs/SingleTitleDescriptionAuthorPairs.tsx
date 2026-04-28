@@ -1,6 +1,6 @@
 import cn from 'classnames';
 import { useCallback, useMemo, useState } from 'react';
-import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
+import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { Button } from '@/components/admin/button/Button';
 import { SECTIONS_TEXT } from '@/const/admin/sections';
 import styles from './SingleTitleDescriptionAuthorPairs.module.scss';
@@ -78,11 +78,10 @@ export const SingleTitleDescriptionAuthorPairs = ({
 
     const handleTitleChange = useCallback(
         (value: string) => {
-            const uppercasedTitle = value.toUpperCase();
-            onTitleChange?.(uppercasedTitle);
+            onTitleChange?.(value);
 
             if (titleError !== undefined) {
-                setTitleError(validate(uppercasedTitle, ContentType.Title));
+                setTitleError(validate(value, ContentType.Title));
             }
         },
         [onTitleChange, titleError, validate],
@@ -117,7 +116,7 @@ export const SingleTitleDescriptionAuthorPairs = ({
         <div className={rootClassName}>
             <div className={styles['title-block']}>
                 {isEditable ? (
-                    <InputWithCharacterLimitGroup
+                    <TextAreaWithCharacterLimitGroup
                         className={styles['title-input-group']}
                         label={SECTIONS_TEXT.SECTION.FORM.TITLE.TEXT}
                         isRequired
@@ -130,7 +129,9 @@ export const SingleTitleDescriptionAuthorPairs = ({
                         placeholder={SECTIONS_TEXT.SECTION.SINGLE_TITLE_DESCRIPTION_AUTHOR_PAIRS.TITLE_PLACEHOLDER}
                         error={titleError}
                         maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(titleMaxLength)}
-                        showCounterBelow={true}
+                        rows={1}
+                        autoGrow={true}
+                        maxRows={4}
                     />
                 ) : (
                     <h2 className={styles.title}>{title}</h2>

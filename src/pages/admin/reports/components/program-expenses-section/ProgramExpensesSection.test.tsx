@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ProgramExpensesSection } from './ProgramExpensesSection';
 import { FUNDS_EXPENDITURES_TEXT, PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
@@ -225,6 +225,32 @@ describe('ProgramExpensesSection', () => {
         expect(rows).toHaveLength(4);
         expect(within(table).getAllByText('Program A')).toHaveLength(2);
         expect(within(table).getByText('Program B')).toBeInTheDocument();
+    });
+
+    it('should drop selected program ids that are no longer present in programs data', async () => {
+        const { rerender } = render(<ProgramExpensesSection />);
+
+        fireEvent.change(screen.getByTestId('program-select'), {
+            target: { value: '2' },
+        });
+
+        expect(within(screen.getByRole('table')).getByText('Program B')).toBeInTheDocument();
+
+        mockUseDataFetchResult = {
+            data: {
+                ...MOCK_PROGRAM_EXPENSES_DATA,
+                programs: MOCK_PROGRAM_EXPENSES_DATA.programs.filter((program) => program.id !== 2),
+                records: MOCK_PROGRAM_EXPENSES_DATA.records.filter((record) => record.programId !== 2),
+            },
+            isLoading: false,
+        };
+
+        rerender(<ProgramExpensesSection />);
+
+        await waitFor(() => {
+            expect(within(screen.getByRole('table')).getAllByText('Program A')).toHaveLength(2);
+        });
+        expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.MESSAGE)).not.toBeInTheDocument();
     });
 
     it('should render filtered empty state when selected program has no matching records', () => {

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { ProgramExpensesApi } from '@/services/api/admin/reports/program-expenses-api';
@@ -34,6 +34,17 @@ export const ProgramExpensesSection = ({ isEditing = false, syncedExchangeRate }
         initialData: INITIAL_PROGRAM_EXPENSES_DATA,
         fetchHandler: fetchReadOnlyData,
     });
+
+    useEffect(() => {
+        setSelectedProgramIds((previousSelectedProgramIds) => {
+            const availableProgramIds = new Set(data.programs.map((program) => program.id));
+            const validSelectedProgramIds = previousSelectedProgramIds.filter((id) => availableProgramIds.has(id));
+
+            return validSelectedProgramIds.length === previousSelectedProgramIds.length
+                ? previousSelectedProgramIds
+                : validSelectedProgramIds;
+        });
+    }, [data.programs]);
 
     const filteredRecords = useMemo(() => {
         if (selectedProgramIds.length === 0) {

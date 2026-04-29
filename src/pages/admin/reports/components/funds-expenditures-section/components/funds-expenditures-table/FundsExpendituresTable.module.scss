@@ -2,6 +2,7 @@
 @use '@/assets/sass/mixins/typography.mixins' as type;
 @use '@/assets/sass/variables/z-index';
 
+
 .table-container {
     display: flex;
     flex-direction: column;
@@ -151,6 +152,13 @@
     accent-color: c.$blue-500;
 }
 
+.header-checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: c.$blue-500;
+}
+
 .actions-th,
 .actions-td {
     width: 80px;
@@ -190,6 +198,49 @@
         opacity: 0.45;
         background-color: transparent;
     }
+}
+
+.selection-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 12px 0;
+}
+
+.selection-row-hidden {
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+}
+
+.selection-pill {
+    background-color: rgba(c.$light-blue-100, 0.63);
+    padding: 10px 14px;
+    border-radius: 24px;
+    font-weight: 600;
+    border: 1px solid c.$light-blue-200;
+    box-shadow: 0px 4px 6px rgba(c.$light-blue-200, 0.25);
+    color: c.$dropdown-text;
+}
+
+.selection-actions {
+    margin-left: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.delete-selected-button {
+    height: 40px;
+    padding: 8px 16px;
+    background-color: c.$red-50;
+    border: 1px solid rgba(c.$error, 0.12);
+    color: c.$error;
+    border-radius: 24px;
+    font-weight: 600;
+    box-shadow: none;
 }
 
 .action-icon {

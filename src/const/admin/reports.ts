@@ -238,6 +238,12 @@ export const FUNDS_EXPENDITURES_TEXT = {
         EXCHANGE_RATE_GT_ZERO: 'Значення має бути більше 0',
         EXCHANGE_RATE_MAX_DIGITS: "Не більше 9 цифр, 6 після ','",
     },
+    BULK: {
+        getSelectedLabel: (selected: number, total: number) => `Вибрано ${selected} з ${total}`,
+        DELETE_BUTTON: 'Видалити вибрані',
+        DELETE_CONFIRM_TITLE: 'Видалити обрані записи?',
+        DELETE_SUCCESS: 'Записи видалені успішно',
+    },
 };
 
 export const PROGRAM_EXPENSES_TEXT = {

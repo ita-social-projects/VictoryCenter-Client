@@ -48,6 +48,11 @@ jest.mock('./FundsExpendituresTable.module.scss', () => ({
     'to-top-button': 'to-top-button',
     'to-top-icon': 'to-top-icon',
     'to-top-button-visible': 'to-top-button-visible',
+    'selection-row': 'selection-row',
+    'selection-row-hidden': 'selection-row-hidden',
+    'selection-pill': 'selection-pill',
+    'selection-actions': 'selection-actions',
+    'delete-selected-button': 'delete-selected-button',
 }));
 
 jest.mock('@/assets/icons/chevron-up.svg', () => ({
@@ -830,6 +835,60 @@ describe('FundsExpendituresTable', () => {
 
             fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '500 000' } });
             expect(screen.getByLabelText('Amount USD record 1')).toHaveValue('11904,77');
+        });
+    });
+
+    describe('Bulk selection and deletion UI', () => {
+        it('should render selection summary and delete button when records are selected', () => {
+            const onOpenBulkDelete = jest.fn();
+
+            renderTable({ isEditing: true, selectedRecordIds: [1, 2], onOpenBulkDelete });
+
+            const summary = screen.getByTestId('table-selection-summary');
+            expect(summary).toBeInTheDocument();
+            expect(summary).toHaveAttribute('aria-hidden', 'false');
+
+            const selectedLabel = FUNDS_EXPENDITURES_TEXT.BULK.getSelectedLabel(2, MOCK_RECORDS.length);
+            expect(screen.getByText(selectedLabel)).toBeInTheDocument();
+
+            const deleteButton = screen.getByText(FUNDS_EXPENDITURES_TEXT.BULK.DELETE_BUTTON);
+            expect(deleteButton).toBeInTheDocument();
+            expect(deleteButton).not.toBeDisabled();
+
+            fireEvent.click(deleteButton);
+            expect(onOpenBulkDelete).toHaveBeenCalled();
+        });
+
+        it('should hide selection summary when nothing is selected', () => {
+            renderTable({ isEditing: true, selectedRecordIds: [] });
+
+            const summary = screen.getByTestId('table-selection-summary');
+            expect(summary).toBeInTheDocument();
+            expect(summary).toHaveAttribute('aria-hidden', 'true');
+        });
+
+        it('should call onSelectAllToggle when header checkbox is clicked', () => {
+            const onSelectAllToggle = jest.fn();
+
+            renderTable({ isEditing: true, eligibleRecordIds: [1, 2, 3], onSelectAllToggle });
+
+            const headerCheckbox = screen.getByLabelText('Select all records');
+            expect(headerCheckbox).toBeInTheDocument();
+
+            fireEvent.click(headerCheckbox);
+            expect(onSelectAllToggle).toHaveBeenCalledWith(true);
+        });
+
+        it('should call onToggleRecordSelection when an individual row checkbox is clicked', () => {
+            const onToggleRecordSelection = jest.fn();
+
+            renderTable({ isEditing: true, onToggleRecordSelection });
+
+            const rowCheckbox = screen.getByLabelText('Select record 1');
+            expect(rowCheckbox).toBeInTheDocument();
+
+            fireEvent.click(rowCheckbox);
+            expect(onToggleRecordSelection).toHaveBeenCalledWith(1);
         });
     });
 });

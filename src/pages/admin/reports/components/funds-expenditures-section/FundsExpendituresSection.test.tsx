@@ -254,6 +254,16 @@ jest.mock('./components/funds-expenditures-table/FundsExpendituresTable', () => 
     ),
 }));
 
+jest.mock('./components/common/add-funds-expenditures-category-modal/AddFundsExpendituresCategoryModal', () => ({
+    AddFundsExpendituresCategoryModal: ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => (
+        <div data-testid="add-category-modal" data-open={String(isOpen)}>
+            <button data-testid="add-category-modal-close" onClick={onClose}>
+                Close
+            </button>
+        </div>
+    ),
+}));
+
 jest.mock('./components/common/add-funds-expenditures-record-modal/AddFundsExpendituresRecordModal', () => ({
     AddFundsExpendituresRecordModal: ({
         isOpen,
@@ -861,6 +871,29 @@ describe('FundsExpenditureSection', () => {
             fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.NO));
 
             expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE.TITLE)).not.toBeInTheDocument();
+        });
+    });
+
+    describe('add category modal', () => {
+        it('should render add category modal as closed by default', () => {
+            render(<FundsExpenditureSection />);
+
+            expect(screen.getByTestId('add-category-modal')).toHaveAttribute('data-open', 'false');
+        });
+
+        it('should render add category modal as open when isAddCategoryModalOpen is true', () => {
+            render(<FundsExpenditureSection isAddCategoryModalOpen onAddCategoryModalClose={jest.fn()} />);
+
+            expect(screen.getByTestId('add-category-modal')).toHaveAttribute('data-open', 'true');
+        });
+
+        it('should call onAddCategoryModalClose when modal close is triggered', () => {
+            const mockClose = jest.fn();
+            render(<FundsExpenditureSection isAddCategoryModalOpen onAddCategoryModalClose={mockClose} />);
+
+            fireEvent.click(screen.getByTestId('add-category-modal-close'));
+
+            expect(mockClose).toHaveBeenCalledTimes(1);
         });
     });
 });

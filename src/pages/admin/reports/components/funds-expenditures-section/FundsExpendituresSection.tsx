@@ -30,6 +30,7 @@ import {
 } from './components/funds-expenditures-toolbar/FundsExpendituresToolbar';
 import { EnrichedRecord, FundsExpendituresTable } from './components/funds-expenditures-table/FundsExpendituresTable';
 import { AddFundsExpendituresRecordModal } from './components/common/add-funds-expenditures-record-modal/AddFundsExpendituresRecordModal';
+import { AddFundsExpendituresCategoryModal } from './components/common/add-funds-expenditures-category-modal/AddFundsExpendituresCategoryModal';
 import { DeleteRecordModal } from './components/common/delete-record-modal/DeleteRecordModal';
 import styles from './FundsExpendituresSection.module.scss';
 
@@ -49,6 +50,8 @@ interface FundsExpenditureSectionProps {
     draftExchangeRate?: string | null;
     onEditModeChange?: (isEditing: boolean) => void;
     onExchangeRateValueChange?: (exchangeRate: string | null) => void;
+    isAddCategoryModalOpen?: boolean;
+    onAddCategoryModalClose?: () => void;
 }
 
 export const FundsExpenditureSection = ({
@@ -56,6 +59,8 @@ export const FundsExpenditureSection = ({
     draftExchangeRate,
     onEditModeChange,
     onExchangeRateValueChange,
+    isAddCategoryModalOpen = false,
+    onAddCategoryModalClose,
 }: FundsExpenditureSectionProps = {}) => {
     const adminClient = useAdminClient();
     const { addToast } = useToast();
@@ -492,6 +497,11 @@ export const FundsExpenditureSection = ({
                 records={recordsState}
                 exchangeRate={currentExchangeRate}
                 onSubmit={handleCreateRecord}
+            />
+
+            <AddFundsExpendituresCategoryModal
+                isOpen={isAddCategoryModalOpen}
+                onClose={onAddCategoryModalClose ?? (() => {})}
             />
 
             <DeleteRecordModal

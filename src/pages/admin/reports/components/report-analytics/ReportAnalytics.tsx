@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { CategoryBar } from '@/components/admin/category-bar/CategoryBar';
-import { REPORTS_TEXT } from '@/const/admin/reports';
+import { FUNDS_EXPENDITURES_TEXT, REPORTS_TEXT } from '@/const/admin/reports';
 import styles from './ReportAnalytics.module.scss';
 import './ReportAnalytics.scss';
 import { PdfFilesSection } from '../pdf-files-section/PdfFilesSection';
@@ -22,6 +22,7 @@ export const ReportAnalytics = () => {
     const [activeTab, setActiveTab] = useState<ReportAnalyticsTab>(ANALYTICS_TABS[0]);
     const [isFundsEditing, setIsFundsEditing] = useState(false);
     const [fundsExchangeRateDraft, setFundsExchangeRateDraft] = useState<string | null>();
+    const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState(false);
 
     return (
         <div className={styles['report-analytics']}>
@@ -33,6 +34,13 @@ export const ReportAnalytics = () => {
                 getCategoryDisplayName={(tab) => tab.label}
                 getCategoryKey={(tab) => tab.id}
                 onCategorySelect={setActiveTab}
+                displayContextMenuButton={activeTab.id === 'income-expenses'}
+                contextMenuOptions={[{ id: 'add-category', name: FUNDS_EXPENDITURES_TEXT.BUTTON.ADD_CATEGORY }]}
+                onContextMenuOptionSelected={(id: string) => {
+                    if (id === 'add-category') {
+                        setIsAddCategoryModalOpen(true);
+                    }
+                }}
             />
             <div className={styles['tab-content']}>
                 {activeTab.id === 'pdf-files' && <PdfFilesSection />}
@@ -42,6 +50,8 @@ export const ReportAnalytics = () => {
                         draftExchangeRate={fundsExchangeRateDraft}
                         onEditModeChange={setIsFundsEditing}
                         onExchangeRateValueChange={setFundsExchangeRateDraft}
+                        isAddCategoryModalOpen={isAddCategoryModalOpen}
+                        onAddCategoryModalClose={() => setIsAddCategoryModalOpen(false)}
                     />
                 )}
                 {activeTab.id === 'program-expenses' && <ProgramExpensesSection />}

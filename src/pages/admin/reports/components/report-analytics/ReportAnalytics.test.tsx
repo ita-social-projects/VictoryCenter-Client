@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ReportAnalytics } from './ReportAnalytics';
-import { REPORTS_TEXT } from '@/const/admin/reports';
+import { FUNDS_EXPENDITURES_TEXT, REPORTS_TEXT } from '@/const/admin/reports';
 
 jest.mock('../pdf-files-section/PdfFilesSection', () => ({
     PdfFilesSection: () => <div data-testid="pdf-files-section">PdfFilesSection</div>,
@@ -12,16 +12,21 @@ jest.mock('../funds-expenditures-section/FundsExpendituresSection', () => ({
         draftExchangeRate,
         onEditModeChange,
         onExchangeRateValueChange,
+        isAddCategoryModalOpen,
+        onAddCategoryModalClose,
     }: {
         initialIsEditing?: boolean;
         draftExchangeRate?: string | null;
         onEditModeChange?: (isEditing: boolean) => void;
         onExchangeRateValueChange?: (exchangeRate: string | null) => void;
+        isAddCategoryModalOpen?: boolean;
+        onAddCategoryModalClose?: () => void;
     }) => (
         <div
             data-testid="funds-expenditure-section"
             data-initial-editing={String(initialIsEditing)}
             data-draft-exchange-rate={draftExchangeRate ?? ''}
+            data-category-modal-open={String(isAddCategoryModalOpen ?? false)}
         >
             FundsExpenditureSection
             <button
@@ -43,6 +48,9 @@ jest.mock('../funds-expenditures-section/FundsExpendituresSection', () => ({
             </button>
             <button type="button" data-testid="deactivate-funds-edit" onClick={() => onEditModeChange?.(false)}>
                 Deactivate edit
+            </button>
+            <button type="button" data-testid="close-category-modal" onClick={() => onAddCategoryModalClose?.()}>
+                Close category modal
             </button>
         </div>
     ),
@@ -131,5 +139,51 @@ describe('ReportAnalytics', () => {
         fireEvent.click(screen.getByText(REPORTS_TEXT.REPORT_AND_ANALYTICS.TAB.INCOME_EXPENSES));
 
         expect(screen.getByTestId('funds-expenditure-section')).toHaveAttribute('data-draft-exchange-rate', '44.20');
+    });
+
+    describe('add category modal', () => {
+        it('should show context menu button on income-expenses tab', () => {
+            render(<ReportAnalytics />);
+
+            expect(screen.getByTestId('context-menu')).toBeInTheDocument();
+        });
+
+        it('should not show context menu button on pdf-files tab', () => {
+            render(<ReportAnalytics />);
+
+            fireEvent.click(screen.getByText(REPORTS_TEXT.REPORT_AND_ANALYTICS.TAB.PDF_FILES));
+
+            expect(screen.queryByTestId('context-menu')).not.toBeInTheDocument();
+        });
+
+        it('should not show context menu button on program-expenses tab', () => {
+            render(<ReportAnalytics />);
+
+            fireEvent.click(screen.getByText(REPORTS_TEXT.REPORT_AND_ANALYTICS.TAB.PROGRAM_EXPENSES));
+
+            expect(screen.queryByTestId('context-menu')).not.toBeInTheDocument();
+        });
+
+        it('should open add category modal when "Додати категорію" option is selected', () => {
+            render(<ReportAnalytics />);
+
+            fireEvent.click(screen.getByTestId('context-menu'));
+            fireEvent.click(screen.getByRole('menuitem', { name: FUNDS_EXPENDITURES_TEXT.BUTTON.ADD_CATEGORY }));
+
+            expect(screen.getByTestId('funds-expenditure-section')).toHaveAttribute('data-category-modal-open', 'true');
+        });
+
+        it('should close add category modal when onAddCategoryModalClose is called', () => {
+            render(<ReportAnalytics />);
+
+            fireEvent.click(screen.getByTestId('context-menu'));
+            fireEvent.click(screen.getByRole('menuitem', { name: FUNDS_EXPENDITURES_TEXT.BUTTON.ADD_CATEGORY }));
+            fireEvent.click(screen.getByTestId('close-category-modal'));
+
+            expect(screen.getByTestId('funds-expenditure-section')).toHaveAttribute(
+                'data-category-modal-open',
+                'false',
+            );
+        });
     });
 });

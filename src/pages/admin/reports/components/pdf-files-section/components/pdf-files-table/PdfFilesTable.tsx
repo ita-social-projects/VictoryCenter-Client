@@ -227,7 +227,7 @@ export const PdfFilesTable: React.FC<PdfFilesTableProps> = ({
                                                 className={styles['delete-button']}
                                                 DefaultIcon={ACTION_ICONS.delete.default}
                                                 FilledIcon={ACTION_ICONS.delete.hover}
-                                                disabled={isDeleting}
+                                                disabled={isDeleting || editingFileId !== null || isRenaming}
                                             />
                                         </div>
                                     </td>

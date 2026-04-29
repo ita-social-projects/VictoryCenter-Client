@@ -198,6 +198,17 @@ describe('PdfFilesTable', () => {
         });
     });
 
+    it('should disable all delete buttons when a file is being renamed', async () => {
+        const user = userEvent.setup();
+        render(<PdfFilesTable {...defaultProps} />);
+
+        await enterEditMode(user);
+
+        screen.getAllByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.DELETE).forEach((button) => {
+            expect(button).toBeDisabled();
+        });
+    });
+
     it('should disable modal buttons when isDeleting is true', async () => {
         const user = userEvent.setup();
         const { rerender } = render(<PdfFilesTable {...defaultProps} isDeleting={false} />);

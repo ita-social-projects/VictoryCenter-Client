@@ -34,8 +34,8 @@
             p {
                 margin: 0.25rem 0 0 0;
                 font-size: 18px;
-                overflow-wrap: break-word;
-                word-break: break-word;
+                overflow-wrap: anywhere;
+                word-break: normal;
             }
         }
     }
@@ -47,8 +47,8 @@
         p {
             font-size: 18px;
             padding-right: 2.5rem;
-            overflow-wrap: break-word;
-            word-break: break-word;
+            overflow-wrap: anywhere;
+            word-break: normal;
         }
     }
 

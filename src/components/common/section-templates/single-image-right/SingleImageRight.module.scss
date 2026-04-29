@@ -44,7 +44,8 @@
     font-size: 30px;
     font-weight: bold;
     line-height: 1.2;
-    overflow-wrap: break-word;
+    overflow-wrap: anywhere;
+    word-break: normal;
     white-space: pre-wrap;
 }
 
@@ -58,14 +59,16 @@
         width: 100%;
 
         textarea {
-            overflow-wrap: break-word;
+            overflow-wrap: anywhere;
+            word-break: normal;
             white-space: pre-wrap;
         }
     }
 }
 
 .description {
-    overflow-wrap: break-word;
+    overflow-wrap: anywhere;
+    word-break: normal;
     white-space: pre-wrap;
 }
 

@@ -42,34 +42,10 @@ jest.mock('@/components/admin/input-with-character-limit/InputWithCharacterLimit
 }));
 
 jest.mock('@/components/common/select/Select', () => {
-    const React = require('react');
-
-    const Select = ({ value, onValueChange, placeholder, children }: any) => {
-        const options = React.Children.toArray(children)
-            .filter((child: any) => child?.props)
-            .map((child: any) => ({ value: child.props.value, name: child.props.name }));
-
-        return (
-            <select
-                data-testid={placeholder}
-                value={value ?? ''}
-                onChange={(e) => {
-                    const selected = options.find((item: any) => item.value === e.target.value);
-                    onValueChange(selected?.value);
-                }}
-            >
-                <option value="">placeholder</option>
-                {options.map((option: any) => (
-                    <option key={option.value} value={option.value}>
-                        {option.name}
-                    </option>
-                ))}
-            </select>
-        );
-    };
-
+    const Select = ({ value, onValueChange, placeholder }: any) => (
+        <input data-testid={placeholder} value={value ?? ''} onChange={(e) => onValueChange(e.target.value)} />
+    );
     Select.Option = (_props: any) => null;
-
     return { Select };
 });
 
@@ -82,6 +58,11 @@ describe('AddFundsExpendituresCategoryModal', () => {
         render(<AddFundsExpendituresCategoryModal isOpen={true} onClose={onClose} />);
 
     const getSubmitButton = () => screen.getByRole('button', { name: SUBMIT_BUTTON_NAME });
+
+    const fillForm = (type = 'expense', name = 'Category A') => {
+        fireEvent.change(screen.getByTestId(TYPE_SELECT), { target: { value: type } });
+        fireEvent.change(screen.getByTestId(NAME_INPUT), { target: { value: name } });
+    };
 
     it('renders nothing when isOpen is false', () => {
         render(<AddFundsExpendituresCategoryModal isOpen={false} onClose={jest.fn()} />);
@@ -119,23 +100,20 @@ describe('AddFundsExpendituresCategoryModal', () => {
 
         it('is disabled when name contains only whitespace', () => {
             renderOpen();
-            fireEvent.change(screen.getByTestId(TYPE_SELECT), { target: { value: 'income' } });
-            fireEvent.change(screen.getByTestId(NAME_INPUT), { target: { value: '   ' } });
+            fillForm('income', '   ');
             expect(getSubmitButton()).toBeDisabled();
         });
 
         it('is enabled when both type and non-empty name are set', () => {
             renderOpen();
-            fireEvent.change(screen.getByTestId(TYPE_SELECT), { target: { value: 'expense' } });
-            fireEvent.change(screen.getByTestId(NAME_INPUT), { target: { value: 'Category A' } });
+            fillForm();
             expect(getSubmitButton()).not.toBeDisabled();
         });
     });
 
     it('clicking submit does not throw when enabled', () => {
         renderOpen();
-        fireEvent.change(screen.getByTestId(TYPE_SELECT), { target: { value: 'income' } });
-        fireEvent.change(screen.getByTestId(NAME_INPUT), { target: { value: 'Valid name' } });
+        fillForm('income', 'Valid name');
         expect(() => fireEvent.click(getSubmitButton())).not.toThrow();
     });
 
@@ -148,6 +126,13 @@ describe('AddFundsExpendituresCategoryModal', () => {
     });
 
     describe('close behavior', () => {
+        const triggerDirtyClose = (onClose = jest.fn()) => {
+            renderOpen(onClose);
+            fireEvent.change(screen.getByTestId(NAME_INPUT), { target: { value: 'dirty' } });
+            fireEvent.click(screen.getByTestId('modal-close'));
+            return onClose;
+        };
+
         it('calls onClose directly when form is clean', () => {
             const onClose = jest.fn();
             renderOpen(onClose);
@@ -166,26 +151,18 @@ describe('AddFundsExpendituresCategoryModal', () => {
         });
 
         it('opens confirmation modal when name is dirty on close request', () => {
-            const onClose = jest.fn();
-            renderOpen(onClose);
-            fireEvent.change(screen.getByTestId(NAME_INPUT), { target: { value: 'Some text' } });
-            fireEvent.click(screen.getByTestId('modal-close'));
+            const onClose = triggerDirtyClose();
             expect(onClose).not.toHaveBeenCalled();
             expect(screen.getByTestId('confirm-modal')).toHaveAttribute('data-open', 'true');
         });
 
         it('shows correct title in confirmation modal', () => {
-            renderOpen();
-            fireEvent.change(screen.getByTestId(NAME_INPUT), { target: { value: 'dirty' } });
-            fireEvent.click(screen.getByTestId('modal-close'));
+            triggerDirtyClose();
             expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.CONFIRM_CLOSE_TITLE)).toBeInTheDocument();
         });
 
         it('dismisses confirmation and keeps modal open on cancel via onCancel', () => {
-            const onClose = jest.fn();
-            renderOpen(onClose);
-            fireEvent.change(screen.getByTestId(NAME_INPUT), { target: { value: 'dirty' } });
-            fireEvent.click(screen.getByTestId('modal-close'));
+            const onClose = triggerDirtyClose();
             fireEvent.click(screen.getByTestId('confirm-no'));
             expect(onClose).not.toHaveBeenCalled();
             expect(screen.getByTestId('confirm-modal')).toHaveAttribute('data-open', 'false');
@@ -193,10 +170,7 @@ describe('AddFundsExpendituresCategoryModal', () => {
         });
 
         it('dismisses confirmation and keeps modal open on cancel via onClose', () => {
-            const onClose = jest.fn();
-            renderOpen(onClose);
-            fireEvent.change(screen.getByTestId(NAME_INPUT), { target: { value: 'dirty' } });
-            fireEvent.click(screen.getByTestId('modal-close'));
+            const onClose = triggerDirtyClose();
             fireEvent.click(screen.getByTestId('confirm-close'));
             expect(onClose).not.toHaveBeenCalled();
             expect(screen.getByTestId('confirm-modal')).toHaveAttribute('data-open', 'false');
@@ -205,8 +179,7 @@ describe('AddFundsExpendituresCategoryModal', () => {
         it('calls onClose and resets form on confirm close', () => {
             const onClose = jest.fn();
             renderOpen(onClose);
-            fireEvent.change(screen.getByTestId(TYPE_SELECT), { target: { value: 'expense' } });
-            fireEvent.change(screen.getByTestId(NAME_INPUT), { target: { value: 'Category A' } });
+            fillForm();
             expect(getSubmitButton()).not.toBeDisabled();
 
             fireEvent.click(screen.getByTestId('modal-close'));

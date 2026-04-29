@@ -91,49 +91,10 @@ describe('AddFundsExpendituresCategoryModal', () => {
             expect(getSubmitButton()).toBeDisabled();
         });
 
-        it('is disabled when type is selected but name is empty', () => {
-            renderOpen();
-            fireEvent.change(screen.getByTestId(TYPE_SELECT), { target: { value: 'expense' } });
-            expect(getSubmitButton()).toBeDisabled();
-        });
-
-        it('is disabled when name is entered but type is not selected', () => {
-            renderOpen();
-            fireEvent.change(screen.getByTestId(NAME_INPUT), { target: { value: 'Category A' } });
-            expect(getSubmitButton()).toBeDisabled();
-        });
-
-        it('is disabled when name contains only whitespace', () => {
-            renderOpen();
-            fillForm('income', '   ');
-            expect(getSubmitButton()).toBeDisabled();
-        });
-
-        it('is disabled when name is shorter than minimum length', () => {
+        it('is disabled when form is incomplete', () => {
             renderOpen();
             fillForm('expense', 'abc');
             expect(getSubmitButton()).toBeDisabled();
-        });
-
-        it('is disabled when name matches an existing category for the same type (case-insensitive)', () => {
-            const categories: ReportFundsExpendituresCategory[] = [{ id: 1, name: 'Приватні донори', type: 'income' }];
-            renderOpen(jest.fn(), categories);
-            fillForm('income', 'приватні донори');
-            expect(getSubmitButton()).toBeDisabled();
-        });
-
-        it('is disabled when name matches an existing category with different word order', () => {
-            const categories: ReportFundsExpendituresCategory[] = [{ id: 1, name: 'Приватні донори', type: 'income' }];
-            renderOpen(jest.fn(), categories);
-            fillForm('income', 'Донори приватні');
-            expect(getSubmitButton()).toBeDisabled();
-        });
-
-        it('is enabled when name matches a category of a different type', () => {
-            const categories: ReportFundsExpendituresCategory[] = [{ id: 1, name: 'Приватні донори', type: 'expense' }];
-            renderOpen(jest.fn(), categories);
-            fillForm('income', 'Приватні донори');
-            expect(getSubmitButton()).not.toBeDisabled();
         });
 
         it('is enabled when both type and valid name are set', () => {

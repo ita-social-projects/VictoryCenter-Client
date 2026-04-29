@@ -31,11 +31,7 @@ export const useInputWithCharacterLimit = <T extends HTMLInputElement | HTMLText
     const currentLength = (value ?? '').length;
 
     const handleChange = (e: React.ChangeEvent<T>) => {
-        const target = e.target;
-        const start = target.selectionStart;
-        const end = target.selectionEnd;
-
-        let newValue = target.value;
+        let newValue = e.target.value;
 
         if (newValue.length > maxLength) {
             if (maxLimitWarning) {
@@ -46,23 +42,12 @@ export const useInputWithCharacterLimit = <T extends HTMLInputElement | HTMLText
             clearWarning();
         }
 
-        const updatedTarget = {
-            ...target,
-            value: newValue,
-        };
-
         onChange({
             ...e,
-            target: updatedTarget,
-            currentTarget: updatedTarget,
-        });
-
-        globalThis.requestAnimationFrame(() => {
-            if (target && document.activeElement === target) {
-                if (start !== null && end !== null) {
-                    target.setSelectionRange(start, end);
-                }
-            }
+            target: {
+                ...e.target,
+                value: newValue,
+            },
         });
     };
 

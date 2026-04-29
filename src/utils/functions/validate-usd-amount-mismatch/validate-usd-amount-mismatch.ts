@@ -17,5 +17,5 @@ export const isUsdAmountMismatch = (
 
     const normalizedUsd = Number.parseFloat(parseAmount(amountUsd).toFixed(2));
 
-    return Math.abs(normalizedUsd - Number.parseFloat(expectedUsd)) > 0.000001;
+    return Math.abs(normalizedUsd - parseAmount(expectedUsd)) > 0.000001;
 };

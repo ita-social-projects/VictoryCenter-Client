@@ -1,9 +1,10 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { Button } from '@/components/admin/button/Button';
+import {
+    createSectionFormActionsClassNames,
+    SectionFormActions,
+} from '@/components/admin/section-form-actions/SectionFormActions';
 import { ImageValues } from '@/types/common/image';
-import { SECTIONS_TEXT } from '@/const/admin/sections';
 import { renderProgramSection } from '@/utils/functions/render-program-section';
-import { ReactComponent as ChangeIcon } from '@/assets/icons/change.svg';
 import styles from './ProgramSectionForm.module.scss';
 import { FaqSectionQuestionDto, CreateHippotherapyProgramSectionDto } from '@/types/common/program-sections';
 import { SectionTemplate, SectionMode } from '@/types/common/sections';
@@ -20,8 +21,8 @@ import {
     getFaqPairs,
     ensureTitleContentAndOnePair,
 } from '@/utils/functions/program-section-content/programSectionContent';
-import { IconButton } from '@/components/admin/icon-button/IconButton';
-import { ACTION_ICONS } from '@/const/common/action-icons';
+
+const sectionFormActionsClassNames = createSectionFormActionsClassNames(styles);
 
 export interface ProgramSectionFormProps {
     section: CreateHippotherapyProgramSectionDto;
@@ -39,7 +40,7 @@ export interface ProgramSectionFormProps {
     isLastSection: boolean;
     onMoveUpSection: () => void;
     onMoveDownSection: () => void;
-    onRequestSaveSection?: (request: { onConfirm: () => void }) => void;
+    onRequestSaveSection?: (request: { onConfirm: () => void; onDecline?: () => void }) => void;
 }
 
 export interface SectionCancelOptions {
@@ -542,25 +543,6 @@ export const ProgramSectionForm = ({
         [localSection],
     );
 
-    const handleSaveClick = useCallback(() => {
-        if (isDisabled || !isSectionSaveValid) return;
-
-        const applySave = () => {
-            onSave();
-            setOriginalSection(localSection);
-            setIsDirty(false);
-            setSectionMode(SectionMode.View);
-            setValidationResetKey((prev) => prev + 1);
-        };
-
-        if (onRequestSaveSection && isDirty) {
-            onRequestSaveSection({ onConfirm: applySave });
-            return;
-        }
-
-        applySave();
-    }, [isDisabled, isSectionSaveValid, onSave, localSection, onRequestSaveSection, isDirty]);
-
     const CARD_TEMPLATES = [
         SectionTemplate.DualTitleDescriptionPairs,
         SectionTemplate.TripleTitleDescriptionPairs,
@@ -569,29 +551,40 @@ export const ProgramSectionForm = ({
 
     const isCardTemplate = CARD_TEMPLATES.includes(section.template);
 
+    const performCancel = useCallback(
+        (forceCleanState: boolean) => {
+            const shouldRemove = isNewSection;
+            const revertTo = originalSection;
+            const isTemplateReplacement = isReplacingTemplate;
+
+            const onAfterDiscard = () => {
+                if (!shouldRemove) {
+                    localSectionRef.current = revertTo;
+                    setLocalSection(revertTo);
+                    setIsDirty(false);
+                    setSectionMode(SectionMode.View);
+                    setValidationResetKey((prev) => prev + 1);
+                }
+            };
+
+            onCancel({
+                isDirty: forceCleanState ? false : isDirty,
+                shouldRemove,
+                revertTo,
+                onAfterDiscard,
+                isTemplateReplacement,
+            });
+        },
+        [isDirty, isNewSection, onCancel, originalSection, isReplacingTemplate],
+    );
+
     const handleCancelClick = useCallback(() => {
-        const shouldRemove = isNewSection;
-        const revertTo = originalSection;
-        const isTemplateReplacement = isReplacingTemplate;
+        performCancel(false);
+    }, [performCancel]);
 
-        const onAfterDiscard = () => {
-            if (!shouldRemove) {
-                localSectionRef.current = revertTo;
-                setLocalSection(revertTo);
-                setIsDirty(false);
-                setSectionMode(SectionMode.View);
-                setValidationResetKey((prev) => prev + 1);
-            }
-        };
-
-        onCancel({
-            isDirty,
-            shouldRemove,
-            revertTo,
-            onAfterDiscard,
-            isTemplateReplacement,
-        });
-    }, [isDirty, isNewSection, onCancel, originalSection, isReplacingTemplate]);
+    const handleDeclineSave = useCallback(() => {
+        performCancel(true);
+    }, [performCancel]);
 
     const handleDeleteClick = useCallback(
         (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -610,6 +603,25 @@ export const ProgramSectionForm = ({
         },
         [onRequestReplace],
     );
+
+    const handleSaveClick = useCallback(() => {
+        if (isDisabled || !isSectionSaveValid) return;
+
+        const applySave = () => {
+            onSave();
+            setOriginalSection(localSection);
+            setIsDirty(false);
+            setSectionMode(SectionMode.View);
+            setValidationResetKey((prev) => prev + 1);
+        };
+
+        if (onRequestSaveSection && isDirty) {
+            onRequestSaveSection({ onConfirm: applySave, onDecline: handleDeclineSave });
+            return;
+        }
+
+        applySave();
+    }, [isDisabled, isSectionSaveValid, onSave, localSection, onRequestSaveSection, isDirty, handleDeclineSave]);
 
     const editableSection = renderProgramSection({
         templateId: section.template,
@@ -659,79 +671,28 @@ export const ProgramSectionForm = ({
 
     return (
         <div className={styles.container}>
-            {sectionMode === SectionMode.View && (
-                <div className={styles['actions-section']}>
-                    <div className={styles['order-controls']}>
-                        <div className={styles['order-controls']}>
-                            {!isFirstSection && (
-                                <button
-                                    type="button"
-                                    onClick={onMoveUpSection}
-                                    className={`${styles['icon-button']} ${styles['up-button']}`}
-                                    aria-label="Move up section"
-                                />
-                            )}
-                            {!isLastSection && (
-                                <button
-                                    type="button"
-                                    onClick={onMoveDownSection}
-                                    className={`${styles['icon-button']} ${styles['down-button']}`}
-                                    aria-label="Move down section"
-                                />
-                            )}
-                        </div>
-                    </div>
-                    <div className={styles['hover-buttons']}>
-                        <IconButton
-                            type="button"
-                            onClick={handleEditClick}
-                            className={`${styles['icon-button']} ${styles['edit-button']}`}
-                            aria-label="Edit section"
-                            DefaultIcon={ACTION_ICONS.edit.default}
-                            FilledIcon={ACTION_ICONS.edit.hover}
-                        />
-                        <IconButton
-                            type="button"
-                            onClick={handleDeleteClick}
-                            className={`${styles['icon-button']} ${styles['delete-button']}`}
-                            aria-label="Delete section"
-                            DefaultIcon={ACTION_ICONS.delete.default}
-                            FilledIcon={ACTION_ICONS.delete.hover}
-                        />
-                        <button
-                            type="button"
-                            onClick={handleReplaceClick}
-                            className={`${styles['icon-button']} ${styles['change-button']}`}
-                            aria-label="Replace section"
-                        >
-                            <ChangeIcon />
-                        </button>
-                    </div>
-                </div>
-            )}
-            <div className={styles.content}>
+            <SectionFormActions
+                sectionMode={sectionMode}
+                isFirstSection={isFirstSection}
+                isLastSection={isLastSection}
+                isDisabled={isDisabled}
+                isDirty={isDirty}
+                isSectionSaveValid={isSectionSaveValid}
+                classNames={sectionFormActionsClassNames}
+                onMoveUpSection={onMoveUpSection}
+                onMoveDownSection={onMoveDownSection}
+                onEditClick={handleEditClick}
+                onDeleteClick={handleDeleteClick}
+                onReplaceClick={handleReplaceClick}
+                onCancelClick={handleCancelClick}
+                onSaveClick={handleSaveClick}
+            >
                 {editableSection || (
                     <p className={styles['template-info']}>
                         Template ID: <strong>{section.template}</strong> (not found in renderer)
                     </p>
                 )}
-            </div>
-            <div className={styles['actions-container']}>
-                {sectionMode !== SectionMode.View && (
-                    <div className={styles.actions}>
-                        <Button buttonStyle="secondary" onClick={handleCancelClick} disabled={isDisabled}>
-                            {SECTIONS_TEXT.BUTTON.CANCEL}
-                        </Button>
-                        <Button
-                            buttonStyle="primary"
-                            onClick={handleSaveClick}
-                            disabled={!isDirty || isDisabled || !isSectionSaveValid}
-                        >
-                            {SECTIONS_TEXT.BUTTON.SAVE}
-                        </Button>
-                    </div>
-                )}
-            </div>
+            </SectionFormActions>
         </div>
     );
 };

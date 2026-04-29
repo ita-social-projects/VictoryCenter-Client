@@ -1,41 +1,68 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useLocale } from '@/hooks/common/use-locale/useLocale';
 import {
     EXPENSES_DATA,
     FUNDING_DATA,
     PROGRAMS_ALLOCATION_DATA,
     SUMMARY_DATA,
 } from '@/utils/mock-data/public/reports-page';
+import { formatAllocationAmount, formatCollectedAmount } from '@/utils/functions/formatters/report-amount-formatters';
 import { StatCard } from './stat-card';
 import { ExpensesBreakdownChart } from './expenses-breakdown-chart';
 import { FundingSourcesChart } from './funding-sources-chart';
 import { ProgramsAllocationChart } from './programs-allocation-chart';
 import styles from './SummarySection.module.scss';
 
-export const SummarySection = () => {
-    const { t, i18n } = useTranslation('reportsPage');
+const UAH_LABEL = 'грн';
+const USD_LABEL = 'USD';
 
-    const isUa = i18n.language === 'uk';
-    const collectedValue = isUa ? SUMMARY_DATA.collected.uah : SUMMARY_DATA.collected.usd;
-    const currencyCode = isUa ? 'UAH' : 'USD';
+export const SummarySection = () => {
+    const { t } = useTranslation('reportsPage');
+    const { isEn } = useLocale();
+
+    const currencyKey: 'uah' | 'usd' = isEn ? 'usd' : 'uah';
+    const currencyLabel = isEn ? USD_LABEL : UAH_LABEL;
+
+    const formatItemAmount = (amount: number) => {
+        return `${formatAllocationAmount(amount, isEn)} ${currencyLabel}`;
+    };
+
+    const collectedAmount = SUMMARY_DATA.collected[currencyKey];
+    const formattedCollectedValue = `${formatCollectedAmount(collectedAmount)} ${currencyLabel}`;
+
+    const expensesItems = EXPENSES_DATA.items.map((item) => ({
+        ...item,
+        amount: item.amount[currencyKey],
+    }));
+
+    const fundingItems = FUNDING_DATA.items.map((item) => ({
+        ...item,
+        amount: item.amount[currencyKey],
+    }));
+
+    const programsItems = PROGRAMS_ALLOCATION_DATA.items.map((item) => ({
+        ...item,
+        amount: item.amount[currencyKey],
+    }));
 
     return (
         <section className={styles.root}>
             <StatCard
                 className={styles.collected}
-                value={collectedValue}
-                currency={currencyCode}
+                value={collectedAmount}
+                formattedValue={formattedCollectedValue}
                 label={t('summary.collected')}
                 color="blue"
             />
             <div className={styles.expenses}>
-                <ExpensesBreakdownChart items={EXPENSES_DATA.items} />
+                <ExpensesBreakdownChart items={expensesItems} formatAmount={formatItemAmount} />
             </div>
             <div className={styles.income}>
-                <FundingSourcesChart items={FUNDING_DATA.items} />
+                <FundingSourcesChart items={fundingItems} formatAmount={formatItemAmount} />
             </div>
             <div className={styles.programs}>
-                <ProgramsAllocationChart items={PROGRAMS_ALLOCATION_DATA.items} />
+                <ProgramsAllocationChart items={programsItems} formatAmount={formatItemAmount} />
             </div>
             <StatCard
                 className={styles.lives}
@@ -43,6 +70,7 @@ export const SummarySection = () => {
                 label={t('summary.lives')}
                 color="yellow"
             />
+            {isEn && SUMMARY_DATA.disclaimer && <p className={styles.disclaimer}>{SUMMARY_DATA.disclaimer}</p>}
         </section>
     );
 };

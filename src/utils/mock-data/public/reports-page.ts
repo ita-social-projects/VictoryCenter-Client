@@ -1,9 +1,11 @@
 export const SUMMARY_DATA = {
     collected: {
         uah: 1249854.09,
-        usd: 32890.9,
+        usd: 29408.33,
     },
     livesChanged: 205,
+    disclaimer:
+        'Amounts shown in USD are approximate and provided for informational purposes only. They are converted from UAH using the official NBU exchange rate applicable for the reporting period. The organization\u2019s official accounting and financial records are maintained in UAH.',
 };
 
 export const REPORTS_DATA = [
@@ -26,20 +28,20 @@ export const CTA_DATA = {
 
 export const EXPENSES_DATA = {
     items: [
-        { label: 'Інші', amount: 2270, percent: 0.2 },
-        { label: 'Комунікація та партнерства', amount: 103485, percent: 9.3 },
-        { label: 'Операційні', amount: 290955, percent: 26.2 },
-        { label: 'Програмні', amount: 443042, percent: 64.3 },
+        { label: 'Інші', amount: { uah: 2270, usd: 53.41 }, percent: 0.2 },
+        { label: 'Комунікація та партнерства', amount: { uah: 103485, usd: 2434.94 }, percent: 9.3 },
+        { label: 'Операційні', amount: { uah: 290955, usd: 6846 }, percent: 26.2 },
+        { label: 'Програмні', amount: { uah: 443042, usd: 10424.52 }, percent: 64.3 },
     ],
 };
 
 export const FUNDING_DATA = {
     items: [
-        { amount: 100000, label: 'Підтримка від бізнесу' },
-        { amount: 371964.52, label: 'Грантові кошти' },
-        { amount: 267889.57, label: 'Благодійні внески' },
+        { amount: { uah: 100000, usd: 2352.94 }, label: 'Підтримка від бізнесу' },
+        { amount: { uah: 371964.52, usd: 8752.11 }, label: 'Грантові кошти' },
+        { amount: { uah: 267889.57, usd: 6303.28 }, label: 'Благодійні внески' },
         {
-            amount: 700000,
+            amount: { uah: 700000, usd: 16470.59 },
             label: 'Дуууже дооовга наааааааааааааааааааааааааааааааааааааааазва',
         },
     ],
@@ -49,19 +51,19 @@ export const PROGRAMS_ALLOCATION_DATA = {
     items: [
         {
             label: 'для ветеранів',
-            amount: 356052,
+            amount: { uah: 356052, usd: 8377.69 },
         },
         {
             label: 'для жінок',
-            amount: 152737,
+            amount: { uah: 152737, usd: 3593.81 },
         },
         {
             label: 'для дітей',
-            amount: 205000,
+            amount: { uah: 205000, usd: 4823.53 },
         },
         {
             label: 'інші',
-            amount: 35000,
+            amount: { uah: 35000, usd: 823.53 },
         },
     ],
 };

@@ -1,0 +1,18 @@
+{
+    "title": "We are always open for you",
+    "description": "If you have questions, suggestions, or are looking for support, our team is always ready to help.",
+    "contactsTitle": "Our contacts:",
+    "socialsTitle": "Social media:",
+    "email": "victorycenter@gmail.com",
+    "phone": "+380 50 334 4448",
+    "addressLine1": "20/22 Shuliavska St., apt. 41.",
+    "addressLine2": "Ukraine, 04116. (legal address)",
+    "copyEmailAria": "Copy email",
+    "copyPhoneAria": "Copy phone number",
+    "namePlaceholder": "Your name",
+    "emailPlaceholder": "E-mail",
+    "subjectPlaceholder": "Subject",
+    "messagePlaceholder": "Write your message",
+    "formLabel": "Contact form",
+    "submitButton": "Send"
+}

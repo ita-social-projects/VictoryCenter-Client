@@ -418,10 +418,6 @@ export const FundsExpenditureSection = () => {
                 allRecordsForTypeInference={recordsState}
                 isEditing={isEditing}
                 isRowActionsDisabled={hasExchangeRateError}
-                isAddIncomeDisabled={isAddIncomeDisabled}
-                isAddExpenseDisabled={isAddExpenseDisabled}
-                onAddIncome={handleOpenAddIncomeModal}
-                onAddExpense={handleOpenAddExpenseModal}
                 onRowEditModeChange={setIsRowEditMode}
                 onRecordSave={handleRecordSave}
                 onDeleteRecord={handleDeleteClick}

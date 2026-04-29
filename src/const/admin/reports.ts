@@ -146,6 +146,7 @@ export const FUNDS_EXPENDITURES_VALIDATION = {
         maxDecimalDigits: 6,
     },
     maxCategoriesPerType: 4,
+    categoryNameMin: 5,
     categoryNameMax: 200,
 };
 
@@ -197,6 +198,9 @@ export const FUNDS_EXPENDITURES_TEXT = {
             NAME_LABEL: 'Назва',
             NAME_PLACEHOLDER: 'Введіть назву категорії',
             SUBMIT_BUTTON: 'Зберегти',
+            ERROR: {
+                NAME_DUPLICATE: 'Категорія з такою назвою вже існує',
+            },
         },
     },
     BUTTON: {

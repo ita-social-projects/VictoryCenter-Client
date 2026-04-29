@@ -15,7 +15,11 @@ jest.mock('@/hooks/common/use-data-fetch/useDataFetch');
 jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider');
 
 jest.mock('./components/pdf-section-content-block/PdfSectionContentBlock', () => ({
-    PdfSectionContentBlock: () => <div data-testid="content-block">ContentBlock</div>,
+    PdfSectionContentBlock: ({ onSave }: any) => (
+        <button data-testid="content-block" onClick={onSave}>
+            ContentBlock
+        </button>
+    ),
 }));
 
 jest.mock('./components/pdf-files-table/PdfFilesTable', () => ({
@@ -42,7 +46,16 @@ jest.mock('./components/language-switcher-buttons/LanguageSwitcherButtons', () =
 }));
 
 jest.mock('./components/pdf-dropzone/PdfDropzone', () => ({
-    PdfDropzone: () => <div data-testid="dropzone">Dropzone</div>,
+    PdfDropzone: ({ onUploaded }: any) => (
+        <button
+            data-testid="dropzone"
+            onClick={() =>
+                onUploaded({ id: 99, name: 'Uploaded.pdf', createdAt: '', fileSizeBytes: 0, blobName: '', priority: 0 })
+            }
+        >
+            Dropzone
+        </button>
+    ),
 }));
 
 jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
@@ -75,6 +88,7 @@ describe('PdfFilesSection', () => {
         global.URL.createObjectURL = originalCreateObjectURL;
         global.window.open = originalWindowOpen;
         jest.restoreAllMocks();
+        jest.useRealTimers();
     });
 
     it('should show loader when section or files are loading', () => {
@@ -297,5 +311,63 @@ describe('PdfFilesSection', () => {
         await waitFor(() => {
             expect(screen.queryByTestId('is-renaming')).not.toBeInTheDocument();
         });
+    });
+
+    it('should add uploaded file to the list', async () => {
+        let callCount = 0;
+        (useDataFetch as jest.Mock).mockImplementation(() => {
+            callCount++;
+            if (callCount === 1) return { data: mockSectionData, isLoading: false, refetch: mockRefetch };
+            return { data: [], isLoading: false, refetch: mockRefetch };
+        });
+
+        render(<PdfFilesSection />);
+
+        expect(screen.getByTestId('files-table')).toHaveTextContent('Files Count: 0');
+        fireEvent.click(screen.getByTestId('dropzone'));
+        expect(screen.getByTestId('files-table')).toHaveTextContent('Files Count: 1');
+    });
+
+    it('should refetch section on save', async () => {
+        let callCount = 0;
+        (useDataFetch as jest.Mock).mockImplementation(() => {
+            callCount++;
+            if (callCount === 1) return { data: mockSectionData, isLoading: false, refetch: mockRefetch };
+            return { data: [], isLoading: false, refetch: mockRefetch };
+        });
+
+        render(<PdfFilesSection />);
+        fireEvent.click(screen.getByTestId('content-block'));
+
+        await waitFor(() => {
+            expect(mockRefetch).toHaveBeenCalled();
+        });
+    });
+
+    it('should revoke object URL after opening PDF', async () => {
+        jest.useFakeTimers();
+        const mockPdfBlob = new Blob(['PDF content'], { type: 'application/pdf' });
+        mockWindowOpen.mockReturnValueOnce({}); // openedWindow є об'єктом (truthy)
+
+        let callCount = 0;
+        (useDataFetch as jest.Mock).mockImplementation(() => {
+            callCount++;
+            if (callCount === 1) return { data: mockSectionData, isLoading: false, refetch: mockRefetch };
+            return { data: mockFilesResponse.items, isLoading: false, refetch: mockRefetch };
+        });
+
+        (PdfReportsApi.fetchById as jest.Mock).mockResolvedValueOnce(mockPdfBlob);
+        const mockRevokeObjectURL = jest.fn();
+        global.URL.revokeObjectURL = mockRevokeObjectURL;
+
+        render(<PdfFilesSection />);
+        fireEvent.click(screen.getByTestId('view-btn'));
+
+        await waitFor(() => {
+            expect(mockWindowOpen).toHaveBeenCalled();
+        });
+
+        jest.advanceTimersByTime(1500);
+        expect(mockRevokeObjectURL).toHaveBeenCalledWith('blob:http://localhost/mock-blob-url');
     });
 });

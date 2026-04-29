@@ -41,12 +41,20 @@
     background: c.$white;
 }
 
+.selectHeadError {
+    border-color: c.$error;
+}
+
 .input {
     width: 100%;
 }
 
 .panel :global(.char-limit-input) {
     width: 100%;
+}
+
+.inputError :global(.char-limit-input) {
+    border-color: c.$error;
 }
 
 .panel :global(.select-options) {
@@ -138,6 +146,18 @@
     border: 1px solid c.$grey-150;
     padding: 20px 22px;
     min-height: 180px;
+}
+
+.error {
+    @include type.small-text-regular;
+    margin: 4px 0 0;
+    min-height: 20px;
+    color: c.$error;
+    visibility: visible;
+}
+
+.errorHidden {
+    visibility: hidden;
 }
 
 .actions {

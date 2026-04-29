@@ -502,6 +502,7 @@ export const FundsExpenditureSection = ({
             <AddFundsExpendituresCategoryModal
                 isOpen={isAddCategoryModalOpen}
                 onClose={onAddCategoryModalClose ?? (() => {})}
+                categories={categories}
             />
 
             <DeleteRecordModal

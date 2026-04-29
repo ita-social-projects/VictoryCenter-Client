@@ -1,46 +1,92 @@
-import { useCallback, useMemo, useState } from 'react';
+import { FocusEvent, useCallback, useMemo, useRef, useState } from 'react';
+import cn from 'classnames';
 import { FUNDS_EXPENDITURES_TEXT, FUNDS_EXPENDITURES_VALIDATION } from '@/const/admin/reports';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { InputWithCharacterLimit } from '@/components/admin/input-with-character-limit/InputWithCharacterLimit';
 import { Select } from '@/components/common/select/Select';
 import { Modal } from '@/components/common/modal/Modal';
 import { Button } from '@/components/admin/button/Button';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
-import { FundsExpendituresTransactionType } from '@/types/admin/reports';
+import { FundsExpendituresTransactionType, ReportFundsExpendituresCategory } from '@/types/admin/reports';
+import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
+import {
+    validateFundsExpendituresCategoryName,
+    validateFundsExpendituresCategoryType,
+} from '@/validation/admin/reports-schema/funds-expenditures-category-schema/funds-expenditures-category-schema';
 import styles from './AddFundsExpendituresCategoryModal.module.scss';
 
 interface AddFundsExpendituresCategoryModalProps {
     isOpen: boolean;
     onClose: () => void;
+    categories?: ReportFundsExpendituresCategory[];
 }
 
-const normalizeForSave = (value: string) => value.replaceAll(/\s+/g, ' ').trim();
-
-export const AddFundsExpendituresCategoryModal = ({ isOpen, onClose }: AddFundsExpendituresCategoryModalProps) => {
+export const AddFundsExpendituresCategoryModal = ({
+    isOpen,
+    onClose,
+    categories = [],
+}: AddFundsExpendituresCategoryModalProps) => {
     const [type, setType] = useState<FundsExpendituresTransactionType | undefined>(undefined);
     const [name, setName] = useState('');
+    const [nameError, setNameError] = useState<string | undefined>(undefined);
+    const [typeError, setTypeError] = useState<string | undefined>(undefined);
+    const [hasNameBeenBlurred, setHasNameBeenBlurred] = useState(false);
     const [isCloseConfirmOpen, setIsCloseConfirmOpen] = useState(false);
 
-    const nameMax = FUNDS_EXPENDITURES_VALIDATION.categoryNameMax;
+    const typeSelectRef = useRef<HTMLDivElement | null>(null);
+
     const isDirty = type !== undefined || name.trim().length > 0;
 
-    const isSubmitDisabled = useMemo(() => {
-        return !type || normalizeForSave(name).length === 0;
-    }, [type, name]);
+    const isSubmitDisabled = useMemo(
+        () =>
+            validateFundsExpendituresCategoryType(type) !== undefined ||
+            validateFundsExpendituresCategoryName(name, type, categories) !== undefined,
+        [type, name, categories],
+    );
 
     const resetForm = useCallback(() => {
         setName('');
         setType(undefined);
+        setNameError(undefined);
+        setTypeError(undefined);
+        setHasNameBeenBlurred(false);
     }, []);
 
     const handleSubmit = () => {};
+
+    const handleTypeChange = useCallback(
+        (newType: FundsExpendituresTransactionType) => {
+            setType(newType);
+            setTypeError(undefined);
+            if (hasNameBeenBlurred) {
+                setNameError(validateFundsExpendituresCategoryName(name, newType, categories));
+            }
+        },
+        [hasNameBeenBlurred, name, categories],
+    );
+
+    const handleTypeFieldBlur = useCallback(
+        (event: FocusEvent<HTMLDivElement>) => {
+            if (typeSelectRef.current?.contains(event.relatedTarget as Node | null)) return;
+            setTypeError(validateFundsExpendituresCategoryType(type));
+        },
+        [type],
+    );
+
+    const handleNameBlur = useCallback(() => {
+        setHasNameBeenBlurred(true);
+        setName(getNormalizedInputText(name));
+        setNameError(validateFundsExpendituresCategoryName(name, type, categories));
+    }, [name, type, categories]);
 
     const handleRequestClose = useCallback(() => {
         if (isDirty) {
             setIsCloseConfirmOpen(true);
             return;
         }
+        resetForm();
         onClose();
-    }, [isDirty, onClose]);
+    }, [isDirty, onClose, resetForm]);
 
     const handleConfirmClose = useCallback(() => {
         setIsCloseConfirmOpen(false);
@@ -66,17 +112,20 @@ export const AddFundsExpendituresCategoryModal = ({ isOpen, onClose }: AddFundsE
                     <div className={styles.content}>
                         <div className={styles.panel}>
                             <div className={styles.form}>
-                                <div className={styles.field}>
+                                <div className={styles.field} onBlurCapture={handleTypeFieldBlur}>
                                     <label className={styles.label}>
                                         <span className={styles.required}>*</span>
                                         {FUNDS_EXPENDITURES_TEXT.MODAL.CATEGORY.TYPE_LABEL}
                                     </label>
                                     <Select<FundsExpendituresTransactionType>
                                         value={type}
-                                        onValueChange={(v) => setType(v)}
+                                        onValueChange={handleTypeChange}
+                                        selectContainerRef={typeSelectRef}
                                         placeholder={FUNDS_EXPENDITURES_TEXT.MODAL.CATEGORY.TYPE_PLACEHOLDER}
                                         className={styles.selectContainer}
-                                        headClassName={styles.selectHead}
+                                        headClassName={cn(styles.selectHead, {
+                                            [styles.selectHeadError]: Boolean(typeError),
+                                        })}
                                     >
                                         <Select.Option
                                             value="expense"
@@ -87,6 +136,9 @@ export const AddFundsExpendituresCategoryModal = ({ isOpen, onClose }: AddFundsE
                                             name={FUNDS_EXPENDITURES_TEXT.TABLE.TYPE_LABELS.INCOME}
                                         />
                                     </Select>
+                                    <p className={cn(styles.error, { [styles.errorHidden]: !typeError })}>
+                                        {typeError ?? ' '}
+                                    </p>
                                 </div>
 
                                 <div className={styles.field}>
@@ -94,17 +146,26 @@ export const AddFundsExpendituresCategoryModal = ({ isOpen, onClose }: AddFundsE
                                         <span className={styles.required}>*</span>
                                         {FUNDS_EXPENDITURES_TEXT.MODAL.CATEGORY.NAME_LABEL}
                                     </label>
-                                    <InputWithCharacterLimit
-                                        id="category-name"
-                                        name="categoryName"
-                                        value={name}
-                                        onChange={(e) => setName(e.target.value)}
-                                        onBlur={() => setName((s) => s.replaceAll(/\s+/g, ' ').trim())}
-                                        maxLength={nameMax}
-                                        placeholder={FUNDS_EXPENDITURES_TEXT.MODAL.CATEGORY.NAME_PLACEHOLDER}
-                                        showCounter={true}
-                                        className={styles.input}
-                                    />
+                                    <div className={cn({ [styles.inputError]: Boolean(nameError) })}>
+                                        <InputWithCharacterLimit
+                                            id="category-name"
+                                            name="categoryName"
+                                            value={name}
+                                            onChange={(e) => setName(e.target.value)}
+                                            onBlur={handleNameBlur}
+                                            maxLength={FUNDS_EXPENDITURES_VALIDATION.categoryNameMax}
+                                            maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
+                                                FUNDS_EXPENDITURES_VALIDATION.categoryNameMax,
+                                            )}
+                                            placeholder={FUNDS_EXPENDITURES_TEXT.MODAL.CATEGORY.NAME_PLACEHOLDER}
+                                            showCounter={true}
+                                            hasError={Boolean(nameError)}
+                                            className={styles.input}
+                                        />
+                                    </div>
+                                    <p className={cn(styles.error, { [styles.errorHidden]: !nameError })}>
+                                        {nameError ?? ' '}
+                                    </p>
                                 </div>
                             </div>
                         </div>

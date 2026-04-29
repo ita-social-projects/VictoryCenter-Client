@@ -1,5 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { FUNDS_EXPENDITURES_TEXT, FUNDS_EXPENDITURES_VALIDATION } from '@/const/admin/reports';
+import { ReportFundsExpendituresCategory } from '@/types/admin/reports';
 import { AddFundsExpendituresCategoryModal } from './AddFundsExpendituresCategoryModal';
 
 jest.mock('@/components/common/modal/Modal', () => {
@@ -53,9 +55,12 @@ describe('AddFundsExpendituresCategoryModal', () => {
     const TYPE_SELECT = FUNDS_EXPENDITURES_TEXT.MODAL.CATEGORY.TYPE_PLACEHOLDER;
     const NAME_INPUT = 'category-name';
     const SUBMIT_BUTTON_NAME = FUNDS_EXPENDITURES_TEXT.MODAL.CATEGORY.SUBMIT_BUTTON;
+    const REQUIRED_ERROR = COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED;
+    const MIN_ERROR = COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(FUNDS_EXPENDITURES_VALIDATION.categoryNameMin);
+    const DUPLICATE_ERROR = FUNDS_EXPENDITURES_TEXT.MODAL.CATEGORY.ERROR.NAME_DUPLICATE;
 
-    const renderOpen = (onClose = jest.fn()) =>
-        render(<AddFundsExpendituresCategoryModal isOpen={true} onClose={onClose} />);
+    const renderOpen = (onClose = jest.fn(), categories: ReportFundsExpendituresCategory[] = []) =>
+        render(<AddFundsExpendituresCategoryModal isOpen={true} onClose={onClose} categories={categories} />);
 
     const getSubmitButton = () => screen.getByRole('button', { name: SUBMIT_BUTTON_NAME });
 
@@ -104,10 +109,131 @@ describe('AddFundsExpendituresCategoryModal', () => {
             expect(getSubmitButton()).toBeDisabled();
         });
 
-        it('is enabled when both type and non-empty name are set', () => {
+        it('is disabled when name is shorter than minimum length', () => {
+            renderOpen();
+            fillForm('expense', 'abc');
+            expect(getSubmitButton()).toBeDisabled();
+        });
+
+        it('is disabled when name matches an existing category for the same type (case-insensitive)', () => {
+            const categories: ReportFundsExpendituresCategory[] = [{ id: 1, name: 'Приватні донори', type: 'income' }];
+            renderOpen(jest.fn(), categories);
+            fillForm('income', 'приватні донори');
+            expect(getSubmitButton()).toBeDisabled();
+        });
+
+        it('is disabled when name matches an existing category with different word order', () => {
+            const categories: ReportFundsExpendituresCategory[] = [{ id: 1, name: 'Приватні донори', type: 'income' }];
+            renderOpen(jest.fn(), categories);
+            fillForm('income', 'Донори приватні');
+            expect(getSubmitButton()).toBeDisabled();
+        });
+
+        it('is enabled when name matches a category of a different type', () => {
+            const categories: ReportFundsExpendituresCategory[] = [{ id: 1, name: 'Приватні донори', type: 'expense' }];
+            renderOpen(jest.fn(), categories);
+            fillForm('income', 'Приватні донори');
+            expect(getSubmitButton()).not.toBeDisabled();
+        });
+
+        it('is enabled when both type and valid name are set', () => {
             renderOpen();
             fillForm();
             expect(getSubmitButton()).not.toBeDisabled();
+        });
+    });
+
+    describe('name field validation', () => {
+        it('shows required error on blur when name is empty', () => {
+            renderOpen();
+            fireEvent.blur(screen.getByTestId(NAME_INPUT));
+            expect(screen.getByText(REQUIRED_ERROR)).toBeInTheDocument();
+        });
+
+        it('shows min length error on blur when name is too short', () => {
+            renderOpen();
+            fireEvent.change(screen.getByTestId(NAME_INPUT), { target: { value: 'abc' } });
+            fireEvent.blur(screen.getByTestId(NAME_INPUT));
+            expect(screen.getByText(MIN_ERROR)).toBeInTheDocument();
+        });
+
+        it('shows duplicate error on blur when name matches existing category for same type', () => {
+            const categories: ReportFundsExpendituresCategory[] = [{ id: 1, name: 'Приватні донори', type: 'income' }];
+            renderOpen(jest.fn(), categories);
+            fireEvent.change(screen.getByTestId(TYPE_SELECT), { target: { value: 'income' } });
+            fireEvent.change(screen.getByTestId(NAME_INPUT), { target: { value: 'Донори приватні' } });
+            fireEvent.blur(screen.getByTestId(NAME_INPUT));
+            expect(screen.getByText(DUPLICATE_ERROR)).toBeInTheDocument();
+        });
+
+        it('does not show duplicate error when type differs from existing category', () => {
+            const categories: ReportFundsExpendituresCategory[] = [{ id: 1, name: 'Приватні донори', type: 'expense' }];
+            renderOpen(jest.fn(), categories);
+            fireEvent.change(screen.getByTestId(TYPE_SELECT), { target: { value: 'income' } });
+            fireEvent.change(screen.getByTestId(NAME_INPUT), { target: { value: 'Приватні донори' } });
+            fireEvent.blur(screen.getByTestId(NAME_INPUT));
+            expect(screen.queryByText(DUPLICATE_ERROR)).not.toBeInTheDocument();
+        });
+
+        it('clears name error when name becomes valid on re-blur', () => {
+            renderOpen();
+            fireEvent.change(screen.getByTestId(NAME_INPUT), { target: { value: 'ab' } });
+            fireEvent.blur(screen.getByTestId(NAME_INPUT));
+            expect(screen.getByText(MIN_ERROR)).toBeInTheDocument();
+
+            fireEvent.change(screen.getByTestId(NAME_INPUT), { target: { value: 'Valid name' } });
+            fireEvent.blur(screen.getByTestId(NAME_INPUT));
+            expect(screen.queryByText(MIN_ERROR)).not.toBeInTheDocument();
+        });
+    });
+
+    describe('name re-validation on type change', () => {
+        it('shows duplicate error when type changes to one that has the same name', () => {
+            const categories: ReportFundsExpendituresCategory[] = [{ id: 1, name: 'Category A', type: 'expense' }];
+            renderOpen(jest.fn(), categories);
+            fireEvent.change(screen.getByTestId(NAME_INPUT), { target: { value: 'Category A' } });
+            fireEvent.blur(screen.getByTestId(NAME_INPUT));
+            expect(screen.queryByText(DUPLICATE_ERROR)).not.toBeInTheDocument();
+
+            fireEvent.change(screen.getByTestId(TYPE_SELECT), { target: { value: 'expense' } });
+            expect(screen.getByText(DUPLICATE_ERROR)).toBeInTheDocument();
+        });
+
+        it('clears duplicate error when type changes to one without the same name', () => {
+            const categories: ReportFundsExpendituresCategory[] = [{ id: 1, name: 'Category A', type: 'income' }];
+            renderOpen(jest.fn(), categories);
+            fillForm('income', 'Category A');
+            fireEvent.blur(screen.getByTestId(NAME_INPUT));
+            expect(screen.getByText(DUPLICATE_ERROR)).toBeInTheDocument();
+
+            fireEvent.change(screen.getByTestId(TYPE_SELECT), { target: { value: 'expense' } });
+            expect(screen.queryByText(DUPLICATE_ERROR)).not.toBeInTheDocument();
+        });
+
+        it('does not show name error on type change before name has been blurred', () => {
+            const categories: ReportFundsExpendituresCategory[] = [{ id: 1, name: 'Category A', type: 'expense' }];
+            renderOpen(jest.fn(), categories);
+            fireEvent.change(screen.getByTestId(NAME_INPUT), { target: { value: 'Category A' } });
+
+            fireEvent.change(screen.getByTestId(TYPE_SELECT), { target: { value: 'expense' } });
+            expect(screen.queryByText(DUPLICATE_ERROR)).not.toBeInTheDocument();
+        });
+    });
+
+    describe('type field validation', () => {
+        it('shows required error when type field loses focus without selection', () => {
+            renderOpen();
+            fireEvent.blur(screen.getByTestId(TYPE_SELECT));
+            expect(screen.getByText(REQUIRED_ERROR)).toBeInTheDocument();
+        });
+
+        it('clears type error when type is selected', () => {
+            renderOpen();
+            fireEvent.blur(screen.getByTestId(TYPE_SELECT));
+            expect(screen.getByText(REQUIRED_ERROR)).toBeInTheDocument();
+
+            fireEvent.change(screen.getByTestId(TYPE_SELECT), { target: { value: 'income' } });
+            expect(screen.queryByText(REQUIRED_ERROR)).not.toBeInTheDocument();
         });
     });
 
@@ -139,6 +265,15 @@ describe('AddFundsExpendituresCategoryModal', () => {
             fireEvent.click(screen.getByTestId('modal-close'));
             expect(onClose).toHaveBeenCalledTimes(1);
             expect(screen.getByTestId('confirm-modal')).toHaveAttribute('data-open', 'false');
+        });
+
+        it('resets errors when closing a clean form', () => {
+            renderOpen();
+            fireEvent.blur(screen.getByTestId(NAME_INPUT));
+            expect(screen.getByText(REQUIRED_ERROR)).toBeInTheDocument();
+
+            fireEvent.click(screen.getByTestId('modal-close'));
+            expect(screen.queryByText(REQUIRED_ERROR)).not.toBeInTheDocument();
         });
 
         it('opens confirmation modal when type is dirty on close request', () => {

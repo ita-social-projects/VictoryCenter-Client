@@ -56,7 +56,8 @@ $desc-input-height: 115px;
     text-align: left;
     font-size: clamp(12px, 2.1vw, 34px);
     line-height: clamp(14px, 2.5vw, 42px);
-    word-break: break-word;
+    overflow-wrap: anywhere;
+    word-break: normal;
 }
 
 .template-card {
@@ -80,7 +81,8 @@ $desc-input-height: 115px;
     white-space: pre-wrap;
     font-size: clamp(10px, 1vw, 16px);
     line-height: clamp(12px, 1.25vw, 20px);
-    word-break: break-word;
+    overflow-wrap: anywhere;
+    word-break: normal;
 }
 
 .card-0 {
@@ -165,7 +167,8 @@ $desc-input-height: 115px;
         width: 100%;
         max-width: 100%;
         overflow: hidden;
-        word-break: break-word;
+        overflow-wrap: anywhere;
+        word-break: normal;
         padding: 10px 0;
     }
 

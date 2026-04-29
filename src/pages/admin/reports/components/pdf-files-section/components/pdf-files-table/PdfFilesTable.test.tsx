@@ -343,6 +343,51 @@ describe('PdfFilesTable', () => {
             });
         });
 
+        it('should show error when validation fails on accept', async () => {
+            const user = userEvent.setup();
+            render(<PdfFilesTable {...defaultProps} />);
+
+            const input = await enterEditMode(user);
+            await user.clear(input);
+            await user.type(input, 'AB');
+
+            PDF_FILE_RENAME_VALIDATION_FUNCTIONS.validateName.mockReturnValueOnce('Помилка валідації');
+
+            await user.click(screen.getByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.ACCEPT_RENAME));
+
+            await waitFor(() => {
+                expect(screen.getByText('Помилка валідації')).toBeInTheDocument();
+            });
+        });
+
+        it('should show error message when rename request fails', async () => {
+            mockOnRenameFile.mockRejectedValueOnce(new Error('Server error'));
+            const user = userEvent.setup();
+            render(<PdfFilesTable {...defaultProps} />);
+
+            const input = await enterEditMode(user);
+            await user.clear(input);
+            await user.type(input, 'Valid Name');
+
+            await user.click(screen.getByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.ACCEPT_RENAME));
+
+            await waitFor(() => {
+                expect(screen.getByText('Помилка при збереженні')).toBeInTheDocument();
+            });
+        });
+
+        it('should disable accept and cancel buttons when isRenaming is true', async () => {
+            const user = userEvent.setup();
+            const { rerender } = render(<PdfFilesTable {...defaultProps} isRenaming={false} />);
+
+            await enterEditMode(user);
+
+            rerender(<PdfFilesTable {...defaultProps} isRenaming={true} />);
+
+            expect(screen.getByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.ACCEPT_RENAME)).toBeDisabled();
+            expect(screen.getByLabelText(PDF_FILES_SECTION_TEXT.ACTIONS.FILE.CANCEL_RENAME)).toBeDisabled();
+        });
+
         it('should normalize spaces (trim and collapse) in the input', async () => {
             const user = userEvent.setup();
             render(<PdfFilesTable {...defaultProps} />);

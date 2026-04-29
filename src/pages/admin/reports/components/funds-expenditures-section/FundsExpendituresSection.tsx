@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { FUNDS_EXPENDITURES_TEXT, FUNDS_EXPENDITURES_VALIDATION, REPORTS_TEXT } from '@/const/admin/reports';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FUNDS_EXPENDITURES_DISCLAIMER_VALIDATION_FUNCTIONS } from '@/validation/admin/reports-schema/funds-expenditures-disclaimer-schema/funds-expenditures-disclaimer-schema';
@@ -44,11 +44,23 @@ const enrichRecords = (
     }));
 };
 
-export const FundsExpenditureSection = () => {
+interface FundsExpenditureSectionProps {
+    initialIsEditing?: boolean;
+    draftExchangeRate?: string | null;
+    onEditModeChange?: (isEditing: boolean) => void;
+    onExchangeRateValueChange?: (exchangeRate: string | null) => void;
+}
+
+export const FundsExpenditureSection = ({
+    initialIsEditing = false,
+    draftExchangeRate,
+    onEditModeChange,
+    onExchangeRateValueChange,
+}: FundsExpenditureSectionProps = {}) => {
     const adminClient = useAdminClient();
     const { addToast } = useToast();
 
-    const [isEditing, setIsEditing] = useState(false);
+    const [isEditing, setIsEditing] = useState(initialIsEditing);
     const [disclaimerValue, setDisclaimerValue] = useState('');
     const [disclaimerError, setDisclaimerError] = useState<string | undefined>(undefined);
     const [exchangeRateValue, setExchangeRateValue] = useState('');
@@ -63,13 +75,14 @@ export const FundsExpenditureSection = () => {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [recordToDelete, setRecordToDelete] = useState<ReportFundsExpendituresRecord | null>(null);
     const [isDeletingRecord, setIsDeletingRecord] = useState(false);
+    const hasSeededEditingValuesRef = useRef(false);
 
-    const handleEdit = useCallback(() => setIsEditing(true), []);
     const handleCancel = useCallback(() => {
         setIsEditing(false);
+        onEditModeChange?.(false);
         setDisclaimerError(undefined);
         setExchangeRateError(undefined);
-    }, []);
+    }, [onEditModeChange]);
 
     const handleDisclaimerChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
         const normalized = e.target.value.replaceAll(/ {2,}/g, ' ');
@@ -82,17 +95,22 @@ export const FundsExpenditureSection = () => {
         setDisclaimerError(FUNDS_EXPENDITURES_DISCLAIMER_VALIDATION_FUNCTIONS.validateDisclaimer(trimmed));
     }, [disclaimerValue]);
 
-    const handleExchangeRateChange = useCallback((value: string) => {
-        const normalized = normalizeFundsExpendituresExchangeRateInput(value);
-        setExchangeRateValue(normalized);
-        setExchangeRateError(validateFundsExpendituresExchangeRate(normalized, 'change'));
-    }, []);
+    const handleExchangeRateChange = useCallback(
+        (value: string) => {
+            const normalized = normalizeFundsExpendituresExchangeRateInput(value);
+            setExchangeRateValue(normalized);
+            onExchangeRateValueChange?.(normalized);
+            setExchangeRateError(validateFundsExpendituresExchangeRate(normalized, 'change'));
+        },
+        [onExchangeRateValueChange],
+    );
 
     const handleExchangeRateBlur = useCallback(() => {
         const normalized = normalizeFundsExpendituresExchangeRateInput(exchangeRateValue, true);
         setExchangeRateValue(normalized);
+        onExchangeRateValueChange?.(normalized || null);
         setExchangeRateError(validateFundsExpendituresExchangeRate(normalized, 'blur'));
-    }, [exchangeRateValue]);
+    }, [exchangeRateValue, onExchangeRateValueChange]);
 
     const handleTypeChange = useCallback((type: TypeFilterValue) => {
         setSelectedType(type);
@@ -136,6 +154,12 @@ export const FundsExpenditureSection = () => {
         initialData: null,
         fetchHandler: fetchSettings,
     });
+
+    const handleEdit = useCallback(() => {
+        setIsEditing(true);
+        onEditModeChange?.(true);
+        onExchangeRateValueChange?.(settings?.exchangeRate ?? null);
+    }, [onEditModeChange, onExchangeRateValueChange, settings?.exchangeRate]);
 
     const { data: categories, isLoading: isCategoriesLoading } = useDataFetch<ReportFundsExpendituresCategory[]>({
         initialData: [],
@@ -187,12 +211,23 @@ export const FundsExpenditureSection = () => {
 
     useEffect(() => {
         if (!isEditing) {
+            hasSeededEditingValuesRef.current = false;
             setDisclaimerValue(settings?.disclaimerTitle ?? '');
             setExchangeRateValue(settings?.exchangeRate ?? '');
             setDisclaimerError(undefined);
             setExchangeRateError(undefined);
+            return;
         }
-    }, [settings, isEditing]);
+
+        if (settings && !hasSeededEditingValuesRef.current) {
+            const initialExchangeRateValue =
+                draftExchangeRate !== undefined ? (draftExchangeRate ?? '') : (settings.exchangeRate ?? '');
+
+            setDisclaimerValue((currentValue) => currentValue || (settings.disclaimerTitle ?? ''));
+            setExchangeRateValue((currentValue) => currentValue || initialExchangeRateValue);
+            hasSeededEditingValuesRef.current = true;
+        }
+    }, [draftExchangeRate, settings, isEditing]);
 
     const enrichedRecords = useMemo(() => enrichRecords(recordsState, categories), [recordsState, categories]);
 
@@ -308,7 +343,9 @@ export const FundsExpenditureSection = () => {
 
             setDisclaimerValue(updatedSettings.disclaimerTitle ?? '');
             setExchangeRateValue(updatedSettings.exchangeRate ?? '');
+            onExchangeRateValueChange?.(updatedSettings.exchangeRate ?? null);
             setIsEditing(false);
+            onEditModeChange?.(false);
 
             refetchSettings();
 
@@ -316,7 +353,15 @@ export const FundsExpenditureSection = () => {
         } catch {
             addToast(REPORTS_TEXT.MESSAGE.FAIL_TO_UPDATE_REPORT, ToastType.Error);
         }
-    }, [addToast, adminClient, disclaimerValue, exchangeRateValue, refetchSettings]);
+    }, [
+        addToast,
+        adminClient,
+        disclaimerValue,
+        exchangeRateValue,
+        onEditModeChange,
+        onExchangeRateValueChange,
+        refetchSettings,
+    ]);
 
     if (isInitialLoading) {
         return (

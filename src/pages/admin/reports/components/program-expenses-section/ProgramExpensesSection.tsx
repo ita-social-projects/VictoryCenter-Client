@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { ProgramExpensesApi } from '@/services/api/admin/reports/program-expenses-api';
@@ -18,7 +18,14 @@ const INITIAL_PROGRAM_EXPENSES_DATA: ProgramExpensesReadOnlyData = {
     records: [],
 };
 
-export const ProgramExpensesSection = () => {
+const MAX_PROGRAM_EXPENSE_RECORDS = 4;
+
+interface ProgramExpensesSectionProps {
+    isEditing?: boolean;
+    syncedExchangeRate?: string | null;
+}
+
+export const ProgramExpensesSection = ({ isEditing = false, syncedExchangeRate }: ProgramExpensesSectionProps) => {
     const [selectedProgramIds, setSelectedProgramIds] = useState<number[]>([]);
 
     const fetchReadOnlyData = useCallback((options = {}) => ProgramExpensesApi.getReadOnlyData(options), []);
@@ -27,6 +34,17 @@ export const ProgramExpensesSection = () => {
         initialData: INITIAL_PROGRAM_EXPENSES_DATA,
         fetchHandler: fetchReadOnlyData,
     });
+
+    useEffect(() => {
+        setSelectedProgramIds((previousSelectedProgramIds) => {
+            const availableProgramIds = new Set(data.programs.map((program) => program.id));
+            const validSelectedProgramIds = previousSelectedProgramIds.filter((id) => availableProgramIds.has(id));
+
+            return validSelectedProgramIds.length === previousSelectedProgramIds.length
+                ? previousSelectedProgramIds
+                : validSelectedProgramIds;
+        });
+    }, [data.programs]);
 
     const filteredRecords = useMemo(() => {
         if (selectedProgramIds.length === 0) {
@@ -39,6 +57,8 @@ export const ProgramExpensesSection = () => {
     const programExpenseRecordsCount = data.records.length;
     const hasAnyProgramExpenseRecords = programExpenseRecordsCount > 0;
     const isInitialLoading = isLoading && programExpenseRecordsCount === 0 && data.programs.length === 0;
+    const exchangeRate = isEditing ? (syncedExchangeRate ?? null) : data.exchangeRate;
+    const isAddProgramExpenseDisabled = programExpenseRecordsCount >= MAX_PROGRAM_EXPENSE_RECORDS;
 
     if (isInitialLoading) {
         return (
@@ -58,12 +78,15 @@ export const ProgramExpensesSection = () => {
                 <ProgramExpensesToolbar
                     programs={data.programs}
                     selectedProgramIds={selectedProgramIds}
-                    exchangeRate={data.exchangeRate}
+                    exchangeRate={exchangeRate}
+                    isEditing={isEditing}
+                    isAddProgramExpenseDisabled={isAddProgramExpenseDisabled}
                     onProgramChange={setSelectedProgramIds}
                 />
                 <ProgramExpensesTable
                     records={filteredRecords}
                     hasAnyProgramExpenseRecords={hasAnyProgramExpenseRecords}
+                    isEditing={isEditing}
                 />
             </div>
         </div>

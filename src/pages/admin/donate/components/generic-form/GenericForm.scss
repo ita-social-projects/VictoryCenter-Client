@@ -30,7 +30,8 @@
             font-weight: 700;
             display: inline;
             cursor: pointer;
-            word-break: break-word;
+            overflow-wrap: anywhere;
+            word-break: normal;
             white-space: pre-wrap;
             overflow-wrap: anywhere;
 

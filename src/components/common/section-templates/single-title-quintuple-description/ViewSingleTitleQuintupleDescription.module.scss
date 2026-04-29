@@ -59,7 +59,8 @@
     @include type.h4-bold;
     color: c.$blue-900;
     text-align: left;
-    word-break: break-word;
+    overflow-wrap: anywhere;
+    word-break: normal;
 
     @media (min-width: 768px) {
         font-size: 32px;
@@ -92,7 +93,8 @@
     @include type.body-1-regular;
     color: c.$blue-900;
     white-space: pre-wrap;
-    word-break: break-word;
+    overflow-wrap: anywhere;
+    word-break: normal;
 }
 
 .card-0 {

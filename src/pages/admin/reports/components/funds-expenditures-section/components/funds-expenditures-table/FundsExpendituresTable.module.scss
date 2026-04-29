@@ -314,7 +314,8 @@
     margin: 0;
     color: c.$blue-500;
     overflow-wrap: anywhere;
-    word-break: break-word;
+    overflow-wrap: anywhere;
+    word-break: normal;
     white-space: normal;
     min-width: 0;
 }

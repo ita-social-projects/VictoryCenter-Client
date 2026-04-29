@@ -35,12 +35,14 @@
 
 .title {
     @include type.h3-bold-uppercase;
+    
     overflow-wrap: anywhere;
     word-break: normal;
 }
 
 .description {
     @include type.body-1-medium;
+
     overflow-wrap: anywhere;
     word-break: normal;
     white-space: pre-wrap;

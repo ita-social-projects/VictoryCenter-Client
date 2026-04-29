@@ -22,6 +22,7 @@ export const PdfFilesSection = () => {
     const [uploadedFiles, setUploadedFiles] = useState<PdfReportDto[]>([]);
     const [currentLanguage, setCurrentLanguage] = useState<'uk' | 'en'>('uk');
     const [isDeleting, setIsDeleting] = useState(false);
+    const [isRenaming, setIsRenaming] = useState(false);
 
     const fetchSection = useCallback(async () => {
         return PdfSectionApi.getPdfSection(client);
@@ -98,6 +99,32 @@ export const PdfFilesSection = () => {
         [client, addToast],
     );
 
+    const handleRenameFile = useCallback(
+        async (fileId: number, newName: string) => {
+            setIsRenaming(true);
+            try {
+                const updatedFile = await PdfReportsApi.rename(client, fileId, newName);
+                setUploadedFiles((prev) => {
+                    const exists = prev.some((f) => f.id === fileId);
+                    return exists ? prev.map((f) => (f.id === fileId ? updatedFile : f)) : [...prev, updatedFile];
+                });
+                addToast(PDF_FILES_SECTION_TEXT.RENAME_SUCCESS, ToastType.Success);
+            } catch {
+                addToast(PDF_FILES_SECTION_TEXT.RENAME_ERROR, ToastType.Error);
+                setIsRenaming(false);
+                return;
+            }
+
+            try {
+                await refetchFiles();
+            } catch {
+            } finally {
+                setIsRenaming(false);
+            }
+        },
+        [client, addToast, refetchFiles],
+    );
+
     if (isSectionLoading || isFilesLoading) {
         return (
             <div className={styles.loader}>
@@ -123,7 +150,9 @@ export const PdfFilesSection = () => {
                 files={mergedDedupedFiles}
                 onViewFile={handleViewFile}
                 onDeleteFile={handleDeleteFile}
+                onRenameFile={handleRenameFile}
                 isDeleting={isDeleting}
+                isRenaming={isRenaming}
             />
         </div>
     );

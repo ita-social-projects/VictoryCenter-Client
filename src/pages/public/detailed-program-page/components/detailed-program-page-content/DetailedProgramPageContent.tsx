@@ -8,6 +8,7 @@ import { ReactComponent as MapPin } from '@/assets/icons/map-pin.svg';
 import { ReactComponent as UsersRound } from '@/assets/icons/users-round.svg';
 import { ReactComponent as CalendarDays } from '@/assets/icons/calendar-days.svg';
 import { useProgramBySlug } from '@/hooks/common/use-get-program-by-slug/useGetProgramBySlug';
+import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 import { InfoItem } from '../info-item/InfoItem';
 import { DetailedProgramSection } from '@/components/public/detailed-program-section/DetailedProgramSection';
 import { CtaSection } from '@/components/public/cta';
@@ -56,7 +57,7 @@ export const DetailedProgramPageContent: React.FC = () => {
                 {program.backgroundImage && (
                     <div className={styles['background-media-wrapper']}>
                         <BackgroundMedia
-                            mediaUrl={program.backgroundImage.url}
+                            mediaUrl={getImageSrc(program.backgroundImage)}
                             className={styles['background-gradient']}
                         />
                         <div className={styles['content-container']}>

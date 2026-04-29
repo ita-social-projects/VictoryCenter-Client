@@ -3,12 +3,12 @@
 
 .rightSection {
     width: 33.1rem;
-    word-break: break-word;
-    overflow-wrap: break-word;
+    overflow-wrap: anywhere;
+    word-break: normal;
 
     .label {
-        word-break: break-word;
-        overflow-wrap: break-word;
+        overflow-wrap: anywhere;
+        word-break: normal;
         max-width: 100%;
     }
 }

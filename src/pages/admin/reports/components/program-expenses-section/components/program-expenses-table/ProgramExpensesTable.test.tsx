@@ -1,6 +1,5 @@
-import { render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ProgramExpensesTable } from './ProgramExpensesTable';
 import { FUNDS_EXPENDITURES_TEXT, PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
 
@@ -21,15 +20,23 @@ jest.mock(
     }),
 );
 
+jest.mock('@/components/admin/icon-button/IconButton', () => ({
+    IconButton: ({ 'aria-label': ariaLabel, onClick }: { 'aria-label': string; onClick?: () => void }) => (
+        <button type="button" aria-label={ariaLabel} onClick={onClick}>
+            {ariaLabel}
+        </button>
+    ),
+}));
+
 const getEmptyState = () => screen.getByTestId('program-expenses-empty-state');
 const getEmptyStateCell = () => screen.getByTestId('program-expenses-empty-state-cell');
 
-const expectEmptyState = (variant: 'filtered' | 'program-expenses') => {
+const expectEmptyState = (variant: 'filtered' | 'program-expenses', colSpan = '5') => {
     const emptyState = getEmptyState();
 
     expect(emptyState).toBeInTheDocument();
     expect(emptyState).toHaveAttribute('data-variant', variant);
-    expect(getEmptyStateCell()).toHaveAttribute('colspan', '5');
+    expect(getEmptyStateCell()).toHaveAttribute('colspan', colSpan);
 };
 
 describe('ProgramExpensesTable', () => {
@@ -72,7 +79,7 @@ describe('ProgramExpensesTable', () => {
 
         expect(within(table).getByText('2025')).toBeInTheDocument();
         expect(within(table).getByText('Program A')).toBeInTheDocument();
-        expect(within(table).getAllByText(COMMON_TEXT_ADMIN.TAB.PROGRAMS)).toHaveLength(2);
+        expect(within(table).getAllByText(PROGRAM_EXPENSES_TEXT.TABLE.TYPE_LABEL)).toHaveLength(2);
 
         const normalizedText = normalizeText(container.textContent ?? '');
         expect(normalizedText).toContain('7 265');
@@ -91,5 +98,59 @@ describe('ProgramExpensesTable', () => {
         expect(screen.getByRole('table')).toBeInTheDocument();
         expect(screen.getByText(PROGRAM_EXPENSES_TEXT.TABLE.COLUMNS.PROGRAM)).toBeInTheDocument();
         expectEmptyState('program-expenses');
+    });
+
+    it('should render checkboxes and action column in edit mode', () => {
+        render(<ProgramExpensesTable records={records} hasAnyProgramExpenseRecords isEditing />);
+
+        expect(screen.getByText(PROGRAM_EXPENSES_TEXT.TABLE.COLUMNS.ACTIONS)).toBeInTheDocument();
+        expect(screen.getAllByRole('checkbox')).toHaveLength(3);
+        expect(screen.getByRole('button', { name: 'Edit record 1' })).toBeEnabled();
+        expect(screen.getByRole('button', { name: 'Delete record 1' })).toBeEnabled();
+    });
+
+    it('should select all visible records from the header checkbox', () => {
+        render(<ProgramExpensesTable records={records} hasAnyProgramExpenseRecords isEditing />);
+
+        fireEvent.click(screen.getByRole('checkbox', { name: 'Select all program expense records' }));
+
+        expect(screen.getByRole('checkbox', { name: 'Select record 1' })).toBeChecked();
+        expect(screen.getByRole('checkbox', { name: 'Select record 2' })).toBeChecked();
+    });
+
+    it('should toggle a single record checkbox in edit mode', () => {
+        render(<ProgramExpensesTable records={records} hasAnyProgramExpenseRecords isEditing />);
+
+        fireEvent.click(screen.getByRole('checkbox', { name: 'Select record 1' }));
+
+        expect(screen.getByRole('checkbox', { name: 'Select record 1' })).toBeChecked();
+        expect(screen.getByRole('checkbox', { name: 'Select record 2' })).not.toBeChecked();
+    });
+
+    it('should call edit and delete callbacks from row action icons', () => {
+        const onEditRecord = jest.fn();
+        const onDeleteRecord = jest.fn();
+
+        render(
+            <ProgramExpensesTable
+                records={records}
+                hasAnyProgramExpenseRecords
+                isEditing
+                onEditRecord={onEditRecord}
+                onDeleteRecord={onDeleteRecord}
+            />,
+        );
+
+        fireEvent.click(screen.getByRole('button', { name: 'Edit record 1' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Delete record 1' }));
+
+        expect(onEditRecord).toHaveBeenCalledWith(records[0]);
+        expect(onDeleteRecord).toHaveBeenCalledWith(records[0]);
+    });
+
+    it('should use edit-mode colSpan for empty state', () => {
+        render(<ProgramExpensesTable records={[]} hasAnyProgramExpenseRecords={false} isEditing />);
+
+        expectEmptyState('program-expenses', '7');
     });
 });

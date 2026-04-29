@@ -6,8 +6,11 @@ import {
     REPORTS_TEXT,
 } from '@/const/admin/reports';
 
+const normalizeTextInput = (value: string): string => value.trim().replace(/\s+/g, ' ');
+
 const collectedFundsSchema = Yup.object({
     title: Yup.string()
+        .transform((value) => (typeof value === 'string' ? normalizeTextInput(value) : value))
         .required(REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION.title.getRequiredError())
         .min(
             REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION.title.min,
@@ -36,6 +39,7 @@ export const REPORTS_COLLECTED_FUNDS_VALIDATION_FUNCTIONS = {
 
 const changedLivesSchema = Yup.object({
     title: Yup.string()
+        .transform((value) => (typeof value === 'string' ? normalizeTextInput(value) : value))
         .required(REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.title.getRequiredError())
         .min(
             REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.title.min,

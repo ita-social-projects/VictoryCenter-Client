@@ -6,6 +6,7 @@ import advantageImage3 from '@/assets/images/man-leads-horse.webp';
 import quoteImg from '@/assets/images/man-holding-horse-cheek-close.webp';
 import anotherQuoteImg from '@/assets/images/man-facing-horse-forehead.webp';
 import hippoventionImg from '@/assets/images/people-on-horses.webp';
+import ethicImg from '@/assets/images/ethic.webp';
 import { HippotherapyAbout } from '@/types/public/hippotherapy-page';
 
 export const hippotherapyMock: HippotherapyAbout = {
@@ -71,6 +72,7 @@ export const hippotherapyMock: HippotherapyAbout = {
         text: 'Іпотерапія визнана формою допоміжної терапії при ПТСР, тривожних розладах, порушеннях регуляції емоцій. \r\n Взаємодія з конем допомагає повертатися до контролю над власним тілом, відновлювати регулювання дихання і ритму, знижувати тривожність, будувати безпечну прив’язаність до оточення.',
     },
     researchSection: {
+        title: 'Наукові дослідження',
         description:
             'Наукові дослідження, що підтверджують ефективність терапії за допомогою коней у роботі з ветеранами та людьми з посттравматичним стресовим розладом.',
         researches: [
@@ -128,6 +130,8 @@ export const hippotherapyMock: HippotherapyAbout = {
     },
     ethicsSection: {
         title: 'Етичні принципи Victory Center',
+        imgURL: ethicImg,
+        imgAlternativeText: 'Літній чоловік тримає коня за повід',
         text: 'Ми не змушуємо до дії, а дозволяємо кожному рухатися у власному темпі.',
         principles: [
             'Дбаємо про психологічний комфорт учасників/ць: створюємо безпечний простір для взаємодії, де немає місця тиску чи засудженню.',

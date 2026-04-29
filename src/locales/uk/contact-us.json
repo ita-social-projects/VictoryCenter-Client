@@ -1,0 +1,18 @@
+{
+    "title": "Ми завжди відкриті для вас",
+    "description": "Якщо у вас є запитання, пропозиції чи ви шукаєте підтримку — наша команда завжди готова допомогти.",
+    "contactsTitle": "Наші контакти:",
+    "socialsTitle": "Соцмережі:",
+    "email": "victorycenter@gmail.com",
+    "phone": "+380 50 334 4448",
+    "addressLine1": "вул. Шулявська, буд. 20/22, кв. 41.",
+    "addressLine2": "Україна, 04116. (юридична адреса)",
+    "copyEmailAria": "Скопіювати email",
+    "copyPhoneAria": "Скопіювати номер телефону",
+    "namePlaceholder": "Ваше ім'я",
+    "emailPlaceholder": "E-mail",
+    "subjectPlaceholder": "Тема звернення",
+    "messagePlaceholder": "Напишіть ваше повідомлення",
+    "formLabel": "Форма зворотного зв'язку",
+    "submitButton": "Надіслати"
+}

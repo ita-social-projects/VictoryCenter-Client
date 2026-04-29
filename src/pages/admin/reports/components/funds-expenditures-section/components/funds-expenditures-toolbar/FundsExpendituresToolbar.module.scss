@@ -40,10 +40,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    inline-size: 150px;
-    overflow-wrap: break-word;
-    text-align: center;
-    gap: 4px;
+    position: relative;
 }
 
 .exchange-rate-label {
@@ -103,7 +100,14 @@
 
 .exchange-rate-error {
     @include type.small-text-regular;
+    position: absolute;
+    top: calc(100% + 15px);
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
     color: c.$error;
+    margin: 0;
+    text-align: center;
 }
 
 .exchange-rate-input-disabled {
@@ -117,7 +121,7 @@
 
 .filter-select {
     :global(.select-head) {
-        border: 1px solid c.$error;
+        border: 1px solid c.$blue-900;
         border-radius: 12px;
         padding: 8px 10px;
         height: 60px;
@@ -127,14 +131,14 @@
         color: c.$blue-900;
 
         &:hover {
-            background-color: rgba(c.$error, 0.06);
+            background-color: rgba(c.$dropdown-hover, 0.3);
         }
     }
 
     :global(.select-options) {
         top: 42px;
         min-width: 204px;
-        border: 1px solid #c6c2de;
+        border: 1px solid c.$dropdown-hover;
         border-radius: 6px;
         box-shadow: 0 5px 8px rgba(c.$black, 0.2);
         padding: 6px 10px;
@@ -162,7 +166,7 @@
     @include type.small-text-regular;
     line-height: 17px;
     letter-spacing: 0.05em;
-    color: #25213b;
+    color: c.$dropdown-text;
     border-radius: 4px;
     padding: 5px 10px;
     height: auto;

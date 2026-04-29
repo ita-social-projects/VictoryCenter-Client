@@ -6,6 +6,7 @@ import { REPORTS_TEXT } from '@/const/admin/reports';
 import { ImageInput } from '@/components/admin/image-input/ImageInput';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
+import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
 import './ReportsMediaBlock.scss';
 
 export interface ReportsMediaBlockValues {
@@ -66,8 +67,9 @@ export const ReportsMediaBlock = ({
 
     const handleTitleBlur = useCallback(
         (_e: React.FocusEvent<HTMLTextAreaElement>) => {
-            const error = validationFunctions.validateTitle(values.title);
-            onValuesChange({ ...values }, { ...errors, title: error });
+            const normalizedTitle = getNormalizedInputText(values.title);
+            const error = validationFunctions.validateTitle(normalizedTitle);
+            onValuesChange({ ...values, title: normalizedTitle }, { ...errors, title: error });
         },
         [onValuesChange, values, errors, validationFunctions],
     );
@@ -121,6 +123,9 @@ export const ReportsMediaBlock = ({
                             onChange={handleTitleChange}
                             onBlur={handleTitleBlur}
                             maxLength={REPORTS_TEXT.FORM.MAX_LENGTH.TITLE}
+                            maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
+                                REPORTS_TEXT.FORM.MAX_LENGTH.TITLE,
+                            )}
                             error={errors.title}
                             rows={1}
                             isRequired={true}

@@ -21,6 +21,8 @@ export const MultiSelectInputGroup = <T,>({
     onBlur,
     getOptionId,
     getOptionName,
+    getDisplayValue,
+    isOptionSelected,
     placeholder,
     disabled,
     error,
@@ -37,6 +39,8 @@ export const MultiSelectInputGroup = <T,>({
                 onBlur={onBlur}
                 getOptionId={getOptionId}
                 getOptionName={getOptionName}
+                getDisplayValue={getDisplayValue}
+                isOptionSelected={isOptionSelected}
                 placeholder={placeholder}
                 disabled={disabled}
             />

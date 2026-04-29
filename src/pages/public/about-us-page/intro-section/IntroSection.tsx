@@ -4,6 +4,7 @@ import { ContentType } from '@/types/common/about-us';
 import { AboutUsContent } from '@/types/public/about-us-page';
 import { SafeHtml } from '@/components/common/safe-html';
 import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
+import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 
 export interface AboutUsIntroProps {
     content?: AboutUsContent[] | null;
@@ -20,7 +21,7 @@ export const AboutUsIntro = ({ content }: AboutUsIntroProps) => {
         description: descriptionContent?.description,
     });
 
-    const imageUrl = content?.find((x) => x.contentType === ContentType.Image)?.image?.url ?? background;
+    const imageUrl = getImageSrc(content?.find((x) => x.contentType === ContentType.Image)?.image) || background;
 
     return (
         <section className={styles.root}>

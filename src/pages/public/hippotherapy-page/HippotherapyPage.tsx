@@ -11,6 +11,11 @@ import quote2DefaultImg from '@/assets/images/man-facing-horse-forehead.webp';
 import { SloganSection } from './slogan/SloganSection';
 import { HippoventionCenter } from './hippovention-center/HippoventionCenter';
 import { SwipedGallery } from './swiped-gallery/SwipedGallery';
+import { ContactSection } from '../programs-page/contact-section/ContactSection';
+import { EthicalPrinciples } from './ethical-principles/EthicalPrinciples';
+import { ResearchSection } from './research/ResearchSection';
+import { FaqSection } from '@/components/public/faq-section/FaqSection';
+import { PAGE_SLUGS } from '@/const/public/faq';
 
 export const HippotherapyPage = () => {
     const { t } = useTranslation('hippotherapy');
@@ -36,10 +41,14 @@ export const HippotherapyPage = () => {
                         {...data.anotherQuoteSection}
                         imgURL={data.anotherQuoteSection.imgURL || quote2DefaultImg}
                     />
+                    <ResearchSection {...data.researchSection} />
                     <SwipedGallery
                         title={data.participantsSection.title}
                         cards={data.participantsSection.participants}
                     />
+                    <EthicalPrinciples {...data.ethicsSection} />
+                    <FaqSection slug={PAGE_SLUGS.ABOUT_HYPPOTHERAPY} />
+                    <ContactSection />
                 </>
             )}
         </LoadableContent>

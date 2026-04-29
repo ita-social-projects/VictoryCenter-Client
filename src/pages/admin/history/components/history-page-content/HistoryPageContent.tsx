@@ -1,26 +1,53 @@
 import styles from './HistoryPageContent.module.scss';
 import { Button } from '@/components/admin/button/Button';
+import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import NotFoundIcon from '@/assets/icons/not-found.svg';
 import { HISTORY_TEXT } from '@/const/admin/history';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { SECTIONS_TEXT } from '@/const/admin/sections';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import { HistoryPageToolbar } from '../history-page-toolbar/HistoryPageToolbar';
-import { Fragment, useCallback } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { HistoryApi } from '@/services/api/admin/history/history-api';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
-import { HistorySectionDto } from '@/types/common/history-sections';
+import { CreateUpdateHistorySectionDto, HistorySectionDto } from '@/types/common/history-sections';
+import { useSectionCancelConfirmation } from '@/hooks/admin/use-section-cancel-confirmation/useSectionCancelConfirmation';
+import { SectionCancelActionType } from '@/types/admin/programs';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
-import { renderHistorySection } from '@/utils/functions/render-history-section';
-import { ContentType } from '@/types/common/section-contents';
-import { SECTIONS_TEXT } from '@/const/admin/sections';
-import { IconButton } from '@/components/admin/icon-button/IconButton';
-import { ACTION_ICONS } from '@/const/common/action-icons';
-import { ReactComponent as ChangeIcon } from '@/assets/icons/change.svg';
-import { SectionMode } from '@/types/common/sections';
+import { HistoryForm, HistoryFormRef } from '../history-form/HistoryForm';
+import {
+    getInitialHistorySectionContents,
+    HISTORY_SUPPORTED_TEMPLATES,
+} from '@/utils/functions/render-history-section';
+import { SectionTemplate } from '@/types/common/sections';
+import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
+import { ToastType } from '@/types/admin/toast';
+import { AddSectionModal } from '@/pages/admin/programs/components/programs-page-modals/add-section-modal/AddSectionModal';
+import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
 
 export const HistoryPageContent = () => {
     const client = useAdminClient();
+    const { addToast } = useToast();
+    const [isConfirmationModalOpen, setConfirmationModalOpen] = useState<boolean>(false);
+    const historyFormRef = useRef<HistoryFormRef>(null);
+    const pendingSectionRef = useRef<HistorySectionDto | null>(null);
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [sectionToReplace, setSectionToReplace] = useState<number | null>(null);
+    const [canPublish, setCanPublish] = useState(false);
+    const [isPublishing, setIsPublishing] = useState(false);
+    const [localSectionsCount, setLocalSectionsCount] = useState<number | null>(null);
+    const [hasActiveSectionForm, setHasActiveSectionForm] = useState(false);
+    const {
+        isSectionRemoveModalOpen,
+        isSectionRevertModalOpen,
+        pendingCancelActionType,
+        handleRequestCancelSection,
+        handleCloseSectionRemoveModal,
+        handleCloseSectionRevertModal,
+        handleConfirmRemoveSection,
+        handleConfirmRevertSection,
+    } = useSectionCancelConfirmation();
 
     const getHistorySections = useCallback(async () => {
         const sections = await HistoryApi.fetchSections(client);
@@ -39,17 +66,110 @@ export const HistoryPageContent = () => {
         autoFetchDisabled: false,
     });
 
-    const normalizedSections = sections ?? [];
-    const hasSections = normalizedSections.length > 0;
+    const TEMPLATES = HISTORY_SUPPORTED_TEMPLATES;
+
+    const normalizedSections = useMemo(() => sections ?? [], [sections]);
+    const hasSections = localSectionsCount !== null ? localSectionsCount > 0 : normalizedSections.length > 0;
     const hasSectionsError = Boolean(sectionsError);
 
     const handleAddSection = () => {
-        // TODO: add section creation flow will be implemented in a dedicated modal.
+        setSectionToReplace(null);
+        setIsAddModalOpen(true);
     };
+
+    const handleReplaceSection = useCallback((sectionIndex: number) => {
+        setSectionToReplace(sectionIndex);
+        setIsAddModalOpen(true);
+    }, []);
+
+    const handleTemplateSelect = useCallback(
+        (templateId: SectionTemplate) => {
+            const currentSections = normalizedSections;
+            if (sectionToReplace !== null) {
+                const sectionBeingReplaced = currentSections[sectionToReplace];
+                const newSection: HistorySectionDto = {
+                    template: templateId,
+                    order: sectionBeingReplaced?.order ?? sectionToReplace,
+                    contents: getInitialHistorySectionContents(templateId),
+                };
+                historyFormRef.current?.replaceSection(sectionToReplace, newSection);
+            } else {
+                const nextOrder =
+                    currentSections.length === 0
+                        ? 0
+                        : Math.max(...currentSections.map((s: HistorySectionDto) => s.order)) + 1;
+                const newSection: HistorySectionDto = {
+                    template: templateId,
+                    order: nextOrder,
+                    contents: getInitialHistorySectionContents(templateId),
+                };
+                if (historyFormRef.current) {
+                    historyFormRef.current.addSection(newSection);
+                } else {
+                    pendingSectionRef.current = newSection;
+                    setLocalSectionsCount(1);
+                }
+            }
+            setSectionToReplace(null);
+        },
+        [sectionToReplace, normalizedSections],
+    );
+
+    useEffect(() => {
+        if (pendingSectionRef.current !== null && historyFormRef.current !== null) {
+            const section = pendingSectionRef.current;
+            pendingSectionRef.current = null;
+            historyFormRef.current.addSection(section);
+        }
+    });
 
     const handleRetrySections = useCallback(() => {
         void refetchSections();
     }, [refetchSections]);
+
+    const handleSectionSaved = useCallback(() => {
+        setCanPublish(true);
+    }, []);
+
+    const handleSectionDeleted = useCallback(
+        async (remainingSections: HistorySectionDto[]) => {
+            try {
+                const payload: CreateUpdateHistorySectionDto[] = remainingSections.map((s: HistorySectionDto) => ({
+                    template: s.template,
+                    order: s.order,
+                    contents: s.contents.map((c) => ({ ...c })),
+                }));
+                await HistoryApi.syncSections(client, payload);
+                void refetchSections();
+            } catch {
+                addToast(HISTORY_TEXT.MESSAGE.PUBLISH_ERROR, ToastType.Error);
+            }
+        },
+        [client, addToast, refetchSections],
+    );
+
+    const handlePublish = useCallback(async () => {
+        setConfirmationModalOpen(false);
+        setIsPublishing(true);
+        try {
+            const currentSections = historyFormRef.current?.getSections() ?? [];
+
+            const payload: CreateUpdateHistorySectionDto[] = currentSections.map((s: HistorySectionDto) => ({
+                template: s.template,
+                order: s.order,
+                contents: s.contents.map((c) => ({ ...c })),
+            }));
+
+            await HistoryApi.syncSections(client, payload);
+            addToast(HISTORY_TEXT.MESSAGE.PUBLISH_SUCCESS, ToastType.Success);
+            setCanPublish(false);
+            void refetchSections();
+        } catch {
+            addToast(HISTORY_TEXT.MESSAGE.PUBLISH_ERROR, ToastType.Error);
+        } finally {
+            setIsPublishing(false);
+        }
+    }, [client, refetchSections, addToast]);
 
     return (
         <div className={styles['history-page-wrapper']} data-testid="history-page-content">
@@ -92,95 +212,78 @@ export const HistoryPageContent = () => {
                 )}
 
                 {!isSectionsLoading && !hasSectionsError && hasSections && (
-                    <div className={styles['sections-list']}>
-                        {normalizedSections.map((section, index) => {
-                            const titleContent = section.contents.find((c) => c.contentType === ContentType.Title);
-                            const descriptionContent = section.contents.find(
-                                (c) => c.contentType === ContentType.Description,
-                            );
-                            const imageContents = section.contents
-                                .filter((c) => c.contentType === ContentType.Image)
-                                .map((c) => c.image ?? null);
-
-                            const sectionToRender = renderHistorySection({
-                                templateId: section.template,
-                                data: {
-                                    title: titleContent?.title ?? '',
-                                    description: descriptionContent?.description ?? '',
-                                    images: imageContents,
-                                },
-                            });
-
-                            const isFirstSection = index === 0;
-                            const isLastSection = index === normalizedSections.length - 1;
-                            const sectionMode = SectionMode.View; //TODO: replace to dynamic value
-
-                            return (
-                                <Fragment key={section.id}>
-                                    <div className={styles['section-container']}>
-                                        {sectionMode === SectionMode.View && (
-                                            <div className={styles['actions-section']}>
-                                                <div className={styles['order-controls']}>
-                                                    {!isFirstSection && (
-                                                        <button
-                                                            type="button"
-                                                            className={`${styles['icon-button']} ${styles['up-button']}`}
-                                                            aria-label="Move up section"
-                                                        />
-                                                    )}
-                                                    {!isLastSection && (
-                                                        <button
-                                                            type="button"
-                                                            className={`${styles['icon-button']} ${styles['down-button']}`}
-                                                            aria-label="Move down section"
-                                                        />
-                                                    )}
-                                                </div>
-                                                <div className={styles['hover-buttons']}>
-                                                    <IconButton
-                                                        type="button"
-                                                        className={`${styles['icon-button']} ${styles['edit-button']}`}
-                                                        aria-label="Edit section"
-                                                        DefaultIcon={ACTION_ICONS.edit.default}
-                                                        FilledIcon={ACTION_ICONS.edit.hover}
-                                                    />
-                                                    <IconButton
-                                                        type="button"
-                                                        className={`${styles['icon-button']} ${styles['delete-button']}`}
-                                                        aria-label="Delete section"
-                                                        DefaultIcon={ACTION_ICONS.delete.default}
-                                                        FilledIcon={ACTION_ICONS.delete.hover}
-                                                    />
-                                                    <button
-                                                        type="button"
-                                                        className={`${styles['icon-button']} ${styles['change-button']}`}
-                                                        aria-label="Replace section"
-                                                    >
-                                                        <ChangeIcon />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        )}
-                                        <div className={styles.content}>{sectionToRender}</div>
-                                        <div className={styles['actions-container']}>
-                                            {sectionMode !== SectionMode.View && (
-                                                <div className={styles.actions}>
-                                                    <Button buttonStyle="secondary">
-                                                        {SECTIONS_TEXT.BUTTON.CANCEL}
-                                                    </Button>
-                                                    <Button buttonStyle="primary">{SECTIONS_TEXT.BUTTON.SAVE}</Button>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    <div className={styles['sections-divider']} />
-                                </Fragment>
-                            );
-                        })}
-                    </div>
+                    <HistoryForm
+                        ref={historyFormRef}
+                        sections={normalizedSections}
+                        onReplaceSection={handleReplaceSection}
+                        onSectionsChange={(s) => {
+                            setLocalSectionsCount(s.length);
+                            setCanPublish(true);
+                        }}
+                        onHasEditingSectionChange={setHasActiveSectionForm}
+                        onSectionSaved={handleSectionSaved}
+                        onSectionDeleted={handleSectionDeleted}
+                        onRequestCancelSection={handleRequestCancelSection}
+                    />
                 )}
+                <div className={styles['functional-button-container']}>
+                    {hasSections && !isAddModalOpen && !hasActiveSectionForm && (
+                        <Button
+                            className={styles['btn-add']}
+                            onClick={handleAddSection}
+                            buttonStyle="secondary"
+                            data-testid="add-section-button-empty"
+                        >
+                            {HISTORY_TEXT.BUTTON.ADD_SECTION}
+                            <PlusIcon className={styles['plus-icon']} />
+                        </Button>
+                    )}
+                    {hasSections && (
+                        <Button
+                            className={styles['btn-publish']}
+                            onClick={() => setConfirmationModalOpen(true)}
+                            buttonStyle="primary"
+                            disabled={!canPublish || isPublishing}
+                        >
+                            {HISTORY_TEXT.BUTTON.PUBLISH}
+                        </Button>
+                    )}
+                </div>
             </div>
+            <AddSectionModal
+                isOpen={isAddModalOpen}
+                onClose={() => setIsAddModalOpen(false)}
+                onSelectTemplate={handleTemplateSelect}
+                templates={TEMPLATES}
+            />
+            <ConfirmationModal
+                isOpen={isSectionRemoveModalOpen}
+                onClose={handleCloseSectionRemoveModal}
+                title={SECTIONS_TEXT.SECTION.MODAL.DELETE_SECTION_TITLE}
+                onConfirm={handleConfirmRemoveSection}
+                onCancel={handleCloseSectionRemoveModal}
+            />
+            <ConfirmationModal
+                isOpen={isSectionRevertModalOpen}
+                onClose={handleCloseSectionRevertModal}
+                title={
+                    pendingCancelActionType === SectionCancelActionType.RevertAfterReplace
+                        ? SECTIONS_TEXT.SECTION.MODAL.REPLACE_TEMPLATE_TITLE
+                        : pendingCancelActionType === SectionCancelActionType.DiscardNewSection
+                          ? SECTIONS_TEXT.SECTION.MODAL.UNSAVED_CHANGES_TITLE
+                          : COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE
+                }
+                onConfirm={handleConfirmRevertSection}
+                onCancel={handleCloseSectionRevertModal}
+            />
+            <ConfirmationModal
+                isOpen={isConfirmationModalOpen}
+                onClose={() => setConfirmationModalOpen(false)}
+                title={COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES}
+                onConfirm={handlePublish}
+                onCancel={() => setConfirmationModalOpen(false)}
+            />
+            <ToastContainer />
         </div>
     );
 };

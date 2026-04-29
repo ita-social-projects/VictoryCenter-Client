@@ -53,6 +53,16 @@ describe('reports-media-settings-schema', () => {
                 const result = REPORTS_COLLECTED_FUNDS_VALIDATION_FUNCTIONS.validateTitle(maxTitle);
                 expect(result).toBeUndefined();
             });
+
+            it('should return required error for a whitespace-only title', () => {
+                const result = REPORTS_COLLECTED_FUNDS_VALIDATION_FUNCTIONS.validateTitle('     ');
+                expect(result).toBe(REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION.title.getRequiredError());
+            });
+
+            it('should normalize consecutive spaces and validate successfully', () => {
+                const result = REPORTS_COLLECTED_FUNDS_VALIDATION_FUNCTIONS.validateTitle('Valid   title   text');
+                expect(result).toBeUndefined();
+            });
         });
     });
 
@@ -97,6 +107,16 @@ describe('reports-media-settings-schema', () => {
             it('should return undefined for title at max length', () => {
                 const maxTitle = 'a'.repeat(REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.title.max);
                 const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateTitle(maxTitle);
+                expect(result).toBeUndefined();
+            });
+
+            it('should return required error for a whitespace-only title', () => {
+                const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateTitle('     ');
+                expect(result).toBe(REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.title.getRequiredError());
+            });
+
+            it('should normalize consecutive spaces and validate successfully', () => {
+                const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateTitle('Valid   title   text');
                 expect(result).toBeUndefined();
             });
         });

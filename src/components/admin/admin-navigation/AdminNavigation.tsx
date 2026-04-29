@@ -20,6 +20,18 @@ export const AdminNavigation = () => {
                 <div className="admin-pages">
                     <nav>
                         <NavLink
+                            to={ADMIN_ROUTES.MAIN.FULL}
+                            end
+                            className={({ isActive }) =>
+                                classNames('admin-page-link', {
+                                    'admin-pages-selected': isActive,
+                                })
+                            }
+                        >
+                            {COMMON_TEXT_ADMIN.TAB.MAIN}
+                        </NavLink>
+
+                        <NavLink
                             to={ADMIN_ROUTES.PROFILE_COMPANY.FULL}
                             end
                             className={({ isActive }) =>

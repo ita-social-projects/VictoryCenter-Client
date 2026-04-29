@@ -1,4 +1,5 @@
 {
     "COPIED_GLOBAL_MESSAGE": "Copied",
-    "LOADING_ERROR": "Failed to load data"
+    "LOADING_ERROR": "Failed to load data",
+    "RETRY": "Try again"
 }

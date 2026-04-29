@@ -146,6 +146,7 @@ export const FUNDS_EXPENDITURES_VALIDATION = {
         maxDecimalDigits: 6,
     },
     maxCategoriesPerType: 4,
+    categoryNameMax: 200,
 };
 
 export const FUNDS_EXPENDITURES_TEXT = {
@@ -188,11 +189,21 @@ export const FUNDS_EXPENDITURES_TEXT = {
             SUBMIT_BUTTON: 'Додати витрату',
             CONFIRM_ADD_TITLE: 'Додати нову витрату?',
         },
+        CATEGORY: {
+            TITLE: 'Додати категорію',
+            SUBTITLE: 'Додавання категорії витрат/надходжень для формування звітності',
+            TYPE_LABEL: 'Витрата/Надходження',
+            TYPE_PLACEHOLDER: 'Витрата/Надходження',
+            NAME_LABEL: 'Назва',
+            NAME_PLACEHOLDER: 'Введіть назву категорії',
+            SUBMIT_BUTTON: 'Зберегти',
+        },
     },
     BUTTON: {
         EDIT: 'Редагувати Доходи та витрати',
         ADD_INCOME: 'Надходження',
         ADD_EXPENSE: 'Витрати',
+        ADD_CATEGORY: 'Додати категорію',
     },
     FILTER: {
         TYPE_PLACEHOLDER: 'Тип',

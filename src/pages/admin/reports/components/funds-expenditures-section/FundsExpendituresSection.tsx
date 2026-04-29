@@ -226,7 +226,7 @@ export const FundsExpenditureSection = ({
 
         if (settings && !hasSeededEditingValuesRef.current) {
             const initialExchangeRateValue =
-                draftExchangeRate !== undefined ? (draftExchangeRate ?? '') : (settings.exchangeRate ?? '');
+                draftExchangeRate === undefined ? (settings.exchangeRate ?? '') : (draftExchangeRate ?? '');
 
             setDisclaimerValue((currentValue) => currentValue || (settings.disclaimerTitle ?? ''));
             setExchangeRateValue((currentValue) => currentValue || initialExchangeRateValue);

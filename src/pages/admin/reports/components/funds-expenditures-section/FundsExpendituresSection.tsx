@@ -1,5 +1,10 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
-import { FUNDS_EXPENDITURES_TEXT, FUNDS_EXPENDITURES_VALIDATION, REPORTS_TEXT } from '@/const/admin/reports';
+import {
+    FUNDS_EXPENDITURES_TEXT,
+    FUNDS_EXPENDITURES_VALIDATION,
+    REPORTS_TEXT,
+    PROGRAM_EXPENSES_TEXT,
+} from '@/const/admin/reports';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FUNDS_EXPENDITURES_DISCLAIMER_VALIDATION_FUNCTIONS } from '@/validation/admin/reports-schema/funds-expenditures-disclaimer-schema/funds-expenditures-disclaimer-schema';
 import {
@@ -75,6 +80,9 @@ export const FundsExpenditureSection = ({
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [recordToDelete, setRecordToDelete] = useState<ReportFundsExpendituresRecord | null>(null);
     const [isDeletingRecord, setIsDeletingRecord] = useState(false);
+    const [selectedRecordIds, setSelectedRecordIds] = useState<number[]>([]);
+    const [isBulkDeleteModalOpen, setIsBulkDeleteModalOpen] = useState(false);
+    const [isBulkDeleting, setIsBulkDeleting] = useState(false);
     const hasSeededEditingValuesRef = useRef(false);
 
     const handleCancel = useCallback(() => {
@@ -221,7 +229,7 @@ export const FundsExpenditureSection = ({
 
         if (settings && !hasSeededEditingValuesRef.current) {
             const initialExchangeRateValue =
-                draftExchangeRate !== undefined ? (draftExchangeRate ?? '') : (settings.exchangeRate ?? '');
+                draftExchangeRate === undefined ? (settings.exchangeRate ?? '') : (draftExchangeRate ?? '');
 
             setDisclaimerValue((currentValue) => currentValue || (settings.disclaimerTitle ?? ''));
             setExchangeRateValue((currentValue) => currentValue || initialExchangeRateValue);
@@ -243,6 +251,13 @@ export const FundsExpenditureSection = ({
             return typeMatch && categoryMatch;
         });
     }, [enrichedRecords, selectedType, selectedCategoryId]);
+
+    const programCategoryLabel = PROGRAM_EXPENSES_TEXT.TABLE.TYPE_LABEL;
+    const eligibleRecordIds = useMemo(() => {
+        return filteredRecords
+            .filter((r) => !(r.categoryName === programCategoryLabel && r.type === 'expense'))
+            .map((r) => r.id);
+    }, [filteredRecords, programCategoryLabel]);
 
     const isAddIncomeDisabled =
         summary.incomeCategories >= FUNDS_EXPENDITURES_VALIDATION.maxCategoriesPerType || hasExchangeRateError;
@@ -316,6 +331,49 @@ export const FundsExpenditureSection = ({
         setRecordToDelete(record);
         setIsDeleteModalOpen(true);
     };
+
+    const toggleRecordSelection = useCallback((id: number) => {
+        setSelectedRecordIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+    }, []);
+
+    const handleSelectAllToggle = useCallback(
+        (checked: boolean) => {
+            if (checked) {
+                setSelectedRecordIds(eligibleRecordIds);
+            } else {
+                setSelectedRecordIds([]);
+            }
+        },
+        [eligibleRecordIds],
+    );
+
+    const handleOpenBulkDeleteModal = useCallback(() => setIsBulkDeleteModalOpen(true), []);
+
+    const handleBulkDeleteCancel = useCallback(() => {
+        setIsBulkDeleteModalOpen(false);
+        setSelectedRecordIds([]);
+    }, []);
+
+    const handleConfirmBulkDelete = useCallback(async () => {
+        if (selectedRecordIds.length === 0) {
+            setIsBulkDeleteModalOpen(false);
+            return;
+        }
+
+        setIsBulkDeleting(true);
+        try {
+            await FundsExpendituresApi.bulkDeleteRecords(adminClient, selectedRecordIds);
+            setRecordsState((prev) => prev.filter((r) => !selectedRecordIds.includes(r.id)));
+            setSelectedRecordIds([]);
+            setIsBulkDeleteModalOpen(false);
+            refetchSummary();
+            addToast(FUNDS_EXPENDITURES_TEXT.BULK.DELETE_SUCCESS, ToastType.Success);
+        } catch {
+            addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_DELETE_FAILED_RETRY, ToastType.Error);
+        } finally {
+            setIsBulkDeleting(false);
+        }
+    }, [adminClient, selectedRecordIds, refetchSummary, addToast]);
 
     const handleConfirmDelete = useCallback(async () => {
         if (!recordToDelete) return;
@@ -466,6 +524,11 @@ export const FundsExpenditureSection = ({
                 onRowEditModeChange={setIsRowEditMode}
                 onRecordSave={handleRecordSave}
                 onDeleteRecord={handleDeleteClick}
+                selectedRecordIds={selectedRecordIds}
+                eligibleRecordIds={eligibleRecordIds}
+                onToggleRecordSelection={toggleRecordSelection}
+                onSelectAllToggle={handleSelectAllToggle}
+                onOpenBulkDelete={handleOpenBulkDeleteModal}
             />
 
             {isEditing && (
@@ -503,6 +566,17 @@ export const FundsExpenditureSection = ({
                 onConfirm={handleConfirmDelete}
                 onCancel={() => setIsDeleteModalOpen(false)}
                 onClose={() => setIsDeleteModalOpen(false)}
+            />
+
+            <DeleteRecordModal
+                isOpen={isBulkDeleteModalOpen}
+                title={FUNDS_EXPENDITURES_TEXT.BULK.DELETE_CONFIRM_TITLE}
+                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
+                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
+                isButtonsDisabled={isBulkDeleting}
+                onConfirm={handleConfirmBulkDelete}
+                onCancel={handleBulkDeleteCancel}
+                onClose={handleBulkDeleteCancel}
             />
         </div>
     );

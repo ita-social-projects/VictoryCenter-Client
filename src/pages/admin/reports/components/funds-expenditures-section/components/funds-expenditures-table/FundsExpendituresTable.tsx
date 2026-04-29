@@ -25,6 +25,7 @@ import { isUsdAmountMismatch } from '@/utils/functions/validate-usd-amount-misma
 import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import cn from 'classnames';
 import styles from './FundsExpendituresTable.module.scss';
+import { Button } from '@/components/admin/button/Button';
 
 export interface EnrichedRecord extends ReportFundsExpendituresRecord {
     categoryName: string;
@@ -51,6 +52,11 @@ interface FundsExpendituresTableProps {
         data: { categoryId: number; amountUah: string; amountUsd: string },
     ) => boolean | Promise<boolean>;
     onDeleteRecord?: (record: EnrichedRecord) => void;
+    selectedRecordIds?: number[];
+    eligibleRecordIds?: number[];
+    onToggleRecordSelection?: (id: number) => void;
+    onSelectAllToggle?: (checked: boolean) => void;
+    onOpenBulkDelete?: () => void;
 }
 
 interface RowEditState {
@@ -149,12 +155,18 @@ export const FundsExpendituresTable = ({
     onRowEditModeChange,
     onRecordSave,
     onDeleteRecord,
+    selectedRecordIds,
+    eligibleRecordIds,
+    onToggleRecordSelection,
+    onSelectAllToggle,
+    onOpenBulkDelete,
 }: FundsExpendituresTableProps) => {
     const [sort, setSort] = useState<ColumnSort>({ column: null, direction: null });
     const [rowEditState, setRowEditState] = useState<RowEditState | null>(null);
     const [savingRecordId, setSavingRecordId] = useState<number | null>(null);
     const [isMoveToTopVisible, setIsMoveToTopVisible] = useState(false);
     const tableWrapperRef = useRef<HTMLDivElement>(null);
+    const headerCheckboxRef = useRef<HTMLInputElement | null>(null);
 
     const typeInferenceSource = allRecordsForTypeInference ?? records;
 
@@ -464,8 +476,38 @@ export const FundsExpendituresTable = ({
     const sortedRecords = sortRecords(records, sort);
     const colSpan = isEditing ? 7 : 5;
 
+    const eligibleIds = eligibleRecordIds ?? [];
+    const selectedIds = selectedRecordIds ?? [];
+    const allEligibleSelected = eligibleIds.length > 0 && eligibleIds.every((id) => selectedIds.includes(id));
+    const someEligibleSelected = eligibleIds.some((id) => selectedIds.includes(id));
+
+    useEffect(() => {
+        if (!headerCheckboxRef.current) return;
+        headerCheckboxRef.current.indeterminate = !allEligibleSelected && someEligibleSelected;
+    }, [allEligibleSelected, someEligibleSelected]);
+
     return (
         <div className={styles['table-container']}>
+            <div
+                className={cn(styles['selection-row'], {
+                    [styles['selection-row-hidden']]: selectedIds.length === 0,
+                })}
+                data-testid="table-selection-summary"
+                aria-hidden={selectedIds.length === 0}
+            >
+                <div className={styles['selection-pill']}>
+                    {FUNDS_EXPENDITURES_TEXT.BULK.getSelectedLabel(selectedIds.length, records.length)}
+                </div>
+                <div className={styles['selection-actions']}>
+                    <Button
+                        buttonStyle="secondary"
+                        className={styles['delete-selected-button']}
+                        onClick={() => onOpenBulkDelete?.()}
+                    >
+                        {FUNDS_EXPENDITURES_TEXT.BULK.DELETE_BUTTON}
+                    </Button>
+                </div>
+            </div>
             <div
                 ref={tableWrapperRef}
                 className={styles['table-wrapper']}
@@ -476,7 +518,18 @@ export const FundsExpendituresTable = ({
                 <table className={styles.table}>
                     <thead>
                         <tr>
-                            {isEditing && <th className={cn(styles.th, styles['checkbox-th'])} />}
+                            {isEditing && (
+                                <th className={cn(styles.th, styles['checkbox-th'])}>
+                                    <input
+                                        type="checkbox"
+                                        ref={headerCheckboxRef}
+                                        className={styles['header-checkbox']}
+                                        aria-label="Select all records"
+                                        checked={allEligibleSelected}
+                                        onChange={(e) => onSelectAllToggle?.(e.target.checked)}
+                                    />
+                                </th>
+                            )}
                             <th className={styles.th}>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.REPORTING_YEAR}</th>
                             <th
                                 className={cn(styles.th, styles.sortable, {
@@ -559,6 +612,8 @@ export const FundsExpendituresTable = ({
                                                     className={styles['row-checkbox']}
                                                     aria-label={`Select record ${record.id}`}
                                                     disabled={isAnyRowEditing}
+                                                    checked={selectedIds.includes(record.id)}
+                                                    onChange={() => onToggleRecordSelection?.(record.id)}
                                                 />
                                             </td>
                                         )}

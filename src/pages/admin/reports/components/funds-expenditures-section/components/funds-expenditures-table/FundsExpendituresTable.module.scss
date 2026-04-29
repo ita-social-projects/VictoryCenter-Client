@@ -2,6 +2,29 @@
 @use '@/assets/sass/mixins/typography.mixins' as type;
 @use '@/assets/sass/variables/z-index';
 
+// Local color aliases (use `-color` suffix for background-related variables)
+$bg-light-blue-color: c.$light-blue-25;
+$bg-light-blue-50-color: c.$light-blue-50;
+$bg-light-blue-100-color: c.$light-blue-100;
+$bg-light-blue-200-color: c.$light-blue-200;
+$bg-white-color: c.$white;
+$bg-blue-500-color: c.$blue-500;
+
+$bg-grey-300-color: c.$grey-300;
+
+$selection-pill-bg-color: rgba(c.$light-blue-100, 0.63);
+$selection-pill-border-color: c.$light-blue-200;
+$selection-pill-text-color: c.$dropdown-text;
+$selection-pill-box-shadow-color: rgba(c.$light-blue-200, 0.25);
+
+$delete-selected-bg-color: c.$red-50;
+$delete-selected-border-color: rgba(c.$error, 0.12);
+$delete-selected-text-color: c.$error;
+
+$type-chip-income-bg-color: c.$blue-400;
+$type-chip-expense-bg-color: #8b4459; // no close project var — keep hardcoded
+$type-chip-expense-border-color: #5e1e2f; // keep hardcoded as nearest match
+
 .table-container {
     display: flex;
     flex-direction: column;
@@ -13,7 +36,7 @@
     overflow-y: auto;
     max-height: 60vh;
     scroll-behavior: smooth;
-    background-color: c.$light-blue-25;
+    background-color: $bg-light-blue-color;
     border: 1px solid c.$grey-400;
     border-radius: 16px;
     box-shadow: 0 24px 48px -12px rgba(c.$bluish-black, 0.2);
@@ -37,7 +60,7 @@
         user-select: none;
 
         &:hover {
-            background-color: c.$grey-300;
+            background-color: $bg-grey-300-color;
         }
     }
 
@@ -58,11 +81,11 @@
 }
 
 .tr {
-    background-color: c.$white;
+    background-color: $bg-white-color;
     border: 1px solid c.$grey-400;
 
     &:hover {
-        background-color: c.$light-blue-50;
+        background-color: $bg-light-blue-50-color;
     }
 }
 
@@ -90,14 +113,14 @@
 }
 
 .type-chip-income {
-    background-color: c.$blue-400;
+    background-color: $type-chip-income-bg-color;
     border: 1px solid c.$blue-500;
     color: c.$white;
 }
 
 .type-chip-expense {
-    background-color: #8b4459;
-    border: 1px solid #5e1e2f;
+    background-color: $type-chip-expense-bg-color;
+    border: 1px solid $type-chip-expense-border-color;
     color: c.$white;
 }
 
@@ -151,6 +174,13 @@
     accent-color: c.$blue-500;
 }
 
+.header-checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: c.$blue-500;
+}
+
 .actions-th,
 .actions-td {
     width: 80px;
@@ -178,11 +208,11 @@
     transition: background-color 0.15s ease;
 
     &:hover {
-        background-color: c.$light-blue-50;
+        background-color: $bg-light-blue-50-color;
     }
 
     &:active {
-        background-color: c.$grey-300;
+        background-color: $bg-grey-300-color;
     }
 
     &:disabled {
@@ -190,6 +220,49 @@
         opacity: 0.45;
         background-color: transparent;
     }
+}
+
+.selection-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 12px 0;
+}
+
+.selection-row-hidden {
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+}
+
+.selection-pill {
+    background-color: $selection-pill-bg-color;
+    padding: 10px 14px;
+    border-radius: 24px;
+    font-weight: 600;
+    border: 1px solid $selection-pill-border-color;
+    box-shadow: 0px 4px 6px $selection-pill-box-shadow-color;
+    color: $selection-pill-text-color;
+}
+
+.selection-actions {
+    margin-left: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.delete-selected-button {
+    height: 40px;
+    padding: 8px 16px;
+    background-color: $delete-selected-bg-color;
+    border: 1px solid $delete-selected-border-color;
+    color: $delete-selected-text-color;
+    border-radius: 24px;
+    font-weight: 600;
+    box-shadow: none;
 }
 
 .action-icon {
@@ -280,14 +353,14 @@
         padding: 10px 17px;
         border: 1px solid c.$grey-700;
         border-radius: 8px;
-        background-color: c.$white;
+        background-color: $bg-white-color;
     }
 
     :global(.select-options) {
         min-width: 240px;
         border: 1px solid c.$grey-500;
         border-radius: 8px;
-        background-color: c.$white;
+        background-color: $bg-white-color;
         box-shadow: 0 6px 18px rgba(c.$black, 0.14);
     }
 }
@@ -352,7 +425,7 @@
     border: 1px solid c.$grey-700;
     border-radius: 8px;
     color: c.$graphite-black;
-    background-color: c.$white;
+    background-color: $bg-white-color;
     box-shadow: 0 1px 2px rgba(c.$bluish-black, 0.05);
     outline: none;
 
@@ -377,7 +450,7 @@
     height: 60px;
     border: none;
     border-radius: 50%;
-    background-color: c.$blue-500;
+    background-color: $bg-blue-500-color;
     box-shadow: 0 2px 8px rgba(c.$blue-50, 0.15);
     cursor: pointer;
     z-index: z-index.admin(infinite-scroll-list-arrow-up);

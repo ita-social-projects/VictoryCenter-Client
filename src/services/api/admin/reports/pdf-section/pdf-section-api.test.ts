@@ -85,7 +85,10 @@ describe('PdfSectionApi', () => {
         it('should return updated data from response', async () => {
             const updatedSection: PdfSection = { ...mockPdfSection, title: 'Updated Title' };
             mockClient.put.mockResolvedValueOnce({ data: updatedSection });
-            const result = await PdfSectionApi.updatePdfSection(mockClient, { ...mockUpdateData, title: 'Updated Title' });
+            const result = await PdfSectionApi.updatePdfSection(mockClient, {
+                ...mockUpdateData,
+                title: 'Updated Title',
+            });
             expect(result).toEqual(updatedSection);
         });
     });

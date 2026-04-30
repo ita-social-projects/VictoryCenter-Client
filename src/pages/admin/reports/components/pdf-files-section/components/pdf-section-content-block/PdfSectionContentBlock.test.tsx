@@ -71,10 +71,6 @@ async function openPublishModal(
     title = 'Updated Title',
     props: Partial<React.ComponentProps<typeof PdfSectionContentBlock>> = {},
 ) {
-    const defaultProps = {
-        content: MOCK_CONTENT,
-        translationLanguages: [],
-    };
     render(<PdfSectionContentBlock {...DEFAULT_PROPS} {...props} />);
     await enterEditMode(user);
     await changeTitle(user, title);

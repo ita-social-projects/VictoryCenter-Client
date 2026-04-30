@@ -13,8 +13,9 @@ import { PdfDropzone } from './components/pdf-dropzone/PdfDropzone';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { ToastType } from '@/types/admin/toast';
 import { PDF_FILES_SECTION_TEXT } from '@/const/admin/reports';
+import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
 
-const EMPTY_SECTION = { title: '', description: '' };
+const EMPTY_SECTION = { title: '', description: '', localizations: [] };
 
 export const PdfFilesSection = () => {
     const client = useAdminClient();
@@ -23,6 +24,10 @@ export const PdfFilesSection = () => {
     const [currentLanguage, setCurrentLanguage] = useState<'uk' | 'en'>('uk');
     const [isDeleting, setIsDeleting] = useState(false);
     const [isRenaming, setIsRenaming] = useState(false);
+
+    const { translationLanguages } = useLocalizationToolkit({
+        setErrorState: useCallback(() => {}, []),
+    });
 
     const fetchSection = useCallback(async () => {
         return PdfSectionApi.getPdfSection(client);
@@ -140,7 +145,11 @@ export const PdfFilesSection = () => {
     return (
         <div className={styles.root}>
             <div className={styles['top-section']}>
-                <PdfSectionContentBlock content={sectionData ?? EMPTY_SECTION} onSave={handleSaveSection} />
+                <PdfSectionContentBlock
+                    content={sectionData ?? EMPTY_SECTION}
+                    onSave={handleSaveSection}
+                    translationLanguages={translationLanguages}
+                />{' '}
             </div>
             <div className={styles['language-switcher-container']}>
                 <LanguageSwitcherButtons currentLanguage={currentLanguage} onLanguageChange={setCurrentLanguage} />

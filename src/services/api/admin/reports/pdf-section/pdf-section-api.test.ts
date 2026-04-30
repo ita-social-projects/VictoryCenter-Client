@@ -1,17 +1,21 @@
 import { AxiosInstance } from 'axios';
 import { PdfSectionApi } from './pdf-section-api';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
-import { PdfSection } from '@/types/admin/pdf-section';
+import { PdfSection, PdfSectionLocalizableFields } from '@/types/admin/pdf-section';
 
 describe('PdfSectionApi', () => {
     let mockClient: jest.Mocked<AxiosInstance>;
 
     const mockPdfSection: PdfSection = {
-        id: 1,
         title: 'Test PDF Section',
         description: 'Test Description',
-        isActive: true,
-    } as any;
+        localizations: [],
+    };
+
+    const mockUpdateData: PdfSectionLocalizableFields = {
+        title: 'Test PDF Section',
+        description: 'Test Description',
+    };
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -58,37 +62,30 @@ describe('PdfSectionApi', () => {
     describe('updatePdfSection', () => {
         it('should update pdf section successfully', async () => {
             mockClient.put.mockResolvedValueOnce({ data: mockPdfSection });
-
-            const result = await PdfSectionApi.updatePdfSection(mockClient, mockPdfSection);
-
-            expect(mockClient.put).toHaveBeenCalledWith(API_ROUTES.PDF_SECTION.BASE, mockPdfSection);
+            const result = await PdfSectionApi.updatePdfSection(mockClient, mockUpdateData);
+            expect(mockClient.put).toHaveBeenCalledWith(API_ROUTES.PDF_SECTION.BASE, mockUpdateData);
             expect(result).toEqual(mockPdfSection);
         });
 
         it('should call the correct API endpoint', async () => {
             mockClient.put.mockResolvedValueOnce({ data: mockPdfSection });
-
-            await PdfSectionApi.updatePdfSection(mockClient, mockPdfSection);
-
+            await PdfSectionApi.updatePdfSection(mockClient, mockUpdateData);
             expect(mockClient.put).toHaveBeenCalledWith(
                 expect.stringContaining(API_ROUTES.PDF_SECTION.BASE),
-                mockPdfSection,
+                mockUpdateData,
             );
         });
 
         it('should throw an error when the API request fails', async () => {
             const errorMessage = 'Internal Server Error';
             mockClient.put.mockRejectedValueOnce(new Error(errorMessage));
-
-            await expect(PdfSectionApi.updatePdfSection(mockClient, mockPdfSection)).rejects.toThrow(errorMessage);
+            await expect(PdfSectionApi.updatePdfSection(mockClient, mockUpdateData)).rejects.toThrow(errorMessage);
         });
 
         it('should return updated data from response', async () => {
-            const updatedSection = { ...mockPdfSection, title: 'Updated Title' };
+            const updatedSection: PdfSection = { ...mockPdfSection, title: 'Updated Title' };
             mockClient.put.mockResolvedValueOnce({ data: updatedSection });
-
-            const result = await PdfSectionApi.updatePdfSection(mockClient, updatedSection);
-
+            const result = await PdfSectionApi.updatePdfSection(mockClient, { ...mockUpdateData, title: 'Updated Title' });
             expect(result).toEqual(updatedSection);
         });
     });

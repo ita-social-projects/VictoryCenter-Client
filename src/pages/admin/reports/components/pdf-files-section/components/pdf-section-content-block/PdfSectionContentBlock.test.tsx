@@ -11,6 +11,9 @@ jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider');
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: () => ({}),
 }));
+jest.mock('@/components/admin/localization-statuses/LocalizationStatuses', () => ({
+    LocalizationStatuses: () => <div data-testid="localization-statuses" />,
+}));
 jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
     ConfirmationModal: ({ isOpen, onConfirm, onCancel, title, isButtonsDisabled }: any) =>
         isOpen ? (
@@ -31,6 +34,12 @@ const mockUseToast = useToast as jest.MockedFunction<typeof useToast>;
 const MOCK_CONTENT = {
     title: 'Test Section Title',
     description: 'Test Section Description',
+    localizations: [],
+};
+
+const DEFAULT_PROPS = {
+    content: MOCK_CONTENT,
+    translationLanguages: [],
 };
 
 async function enterEditMode(user: ReturnType<typeof userEvent.setup>) {
@@ -62,7 +71,11 @@ async function openPublishModal(
     title = 'Updated Title',
     props: Partial<React.ComponentProps<typeof PdfSectionContentBlock>> = {},
 ) {
-    render(<PdfSectionContentBlock content={MOCK_CONTENT} {...props} />);
+    const defaultProps = {
+        content: MOCK_CONTENT,
+        translationLanguages: [],
+    };
+    render(<PdfSectionContentBlock {...DEFAULT_PROPS} {...props} />);
     await enterEditMode(user);
     await changeTitle(user, title);
     await clickPublish(user);
@@ -79,7 +92,7 @@ describe('PdfSectionContentBlock', () => {
 
     describe('View Mode', () => {
         it('should render title and description in view mode', () => {
-            render(<PdfSectionContentBlock content={MOCK_CONTENT} />);
+            render(<PdfSectionContentBlock {...DEFAULT_PROPS} />);
             expect(screen.getByText(PDF_FILES_SECTION_TEXT.TITLE)).toBeInTheDocument();
             expect(screen.getByText(MOCK_CONTENT.title)).toBeInTheDocument();
             expect(screen.getByText(PDF_FILES_SECTION_TEXT.DESCRIPTION)).toBeInTheDocument();
@@ -87,19 +100,19 @@ describe('PdfSectionContentBlock', () => {
         });
 
         it('should apply correct classes for view mode', () => {
-            const { container } = render(<PdfSectionContentBlock content={MOCK_CONTENT} />);
+            const { container } = render(<PdfSectionContentBlock {...DEFAULT_PROPS} />);
             expect(container.firstChild).toHaveClass('root', 'view-root');
             expect(screen.getByText(MOCK_CONTENT.title)).toHaveClass('view-text', 'view-text-title');
         });
 
         it('should render edit button', () => {
-            render(<PdfSectionContentBlock content={MOCK_CONTENT} />);
+            render(<PdfSectionContentBlock {...DEFAULT_PROPS} />);
             expect(screen.getByRole('button', { name: PDF_FILES_SECTION_TEXT.ACTIONS.EDIT })).toBeInTheDocument();
         });
     });
 
-    async function renderAndEnterEditMode(): Promise<ReturnType<typeof userEvent.setup>> {
-        render(<PdfSectionContentBlock content={MOCK_CONTENT} />);
+    async function renderAndEnterEditMode() {
+        render(<PdfSectionContentBlock {...DEFAULT_PROPS} />);
         const user = userEvent.setup();
         await enterEditMode(user);
         return user;
@@ -107,7 +120,7 @@ describe('PdfSectionContentBlock', () => {
 
     describe('Edit Mode', () => {
         it('should switch to edit mode when edit button is clicked', async () => {
-            render(<PdfSectionContentBlock content={MOCK_CONTENT} />);
+            render(<PdfSectionContentBlock {...DEFAULT_PROPS} />);
             const user = userEvent.setup();
             await enterEditMode(user);
             expect(screen.getByDisplayValue(MOCK_CONTENT.title)).toBeInTheDocument();
@@ -155,12 +168,7 @@ describe('PdfSectionContentBlock', () => {
             const user = userEvent.setup();
             await openPublishModal(user, 'Updated Title', { onSave: mockOnSave });
             await confirmModal(user);
-            await waitFor(() =>
-                expect(mockOnSave).toHaveBeenCalledWith({
-                    title: 'Updated Title',
-                    description: MOCK_CONTENT.description,
-                }),
-            );
+            await waitFor(() => expect(mockOnSave).toHaveBeenCalledWith());
         });
 
         it('should have character counters for both fields', async () => {
@@ -193,12 +201,7 @@ describe('PdfSectionContentBlock', () => {
             const user = userEvent.setup();
             await openPublishModal(user, 'Updated Title', { onSave: mockOnSave });
             await confirmModal(user);
-            await waitFor(() =>
-                expect(mockOnSave).toHaveBeenCalledWith({
-                    title: 'Updated Title',
-                    description: MOCK_CONTENT.description,
-                }),
-            );
+            await waitFor(() => expect(mockOnSave).toHaveBeenCalledWith());
             expect(mockAddToast).toHaveBeenCalledWith('Зміни успішно опубліковані', ToastType.Success);
         });
 

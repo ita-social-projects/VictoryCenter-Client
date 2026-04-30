@@ -19,20 +19,29 @@ import cn from 'classnames';
 import { ACTION_ICONS } from '@/const/common/action-icons';
 import { IconButton } from '@/components/admin/icon-button/IconButton';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { LocalizationLanguage } from '@/types/common/language';
+import { PdfSectionLocalizationDto } from '@/types/admin/pdf-section';
+import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
 
 interface PdfSectionContent {
     title: string;
     description: string;
+    localizations: PdfSectionLocalizationDto[];
 }
 
 interface PdfSectionContentBlockProps {
     content: PdfSectionContent;
-    onSave?: (data: PdfSectionContent) => Promise<void>;
+    onSave?: () => Promise<void>;
+    translationLanguages: LocalizationLanguage[];
 }
 
 type ConfirmationModalType = 'publish' | 'cancel' | null;
 
-export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({ content, onSave }) => {
+export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({
+    content,
+    onSave,
+    translationLanguages,
+}) => {
     const client = useAdminClient();
     const [isEditMode, setIsEditMode] = useState(false);
     const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
@@ -106,7 +115,7 @@ export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({ 
             await PdfSectionApi.updatePdfSection(client, normalizedData);
 
             if (onSave) {
-                await onSave(normalizedData);
+                await onSave();
             }
 
             setIsEditMode(false);
@@ -201,7 +210,16 @@ export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({ 
 
         return (
             <div className={cn(styles.root, styles['view-root'])}>
-                <div className={styles['edit-button-container']}>
+                <div className={styles['buttons-container']}>
+                    <LocalizationStatuses
+                        languages={translationLanguages}
+                        localizedEntity={{
+                            translationStatuses: (content.localizations ?? []).map((l) => ({
+                                languageId: l.languageId,
+                                translationStatus: l.translationStatus,
+                            })),
+                        }}
+                    />
                     <IconButton
                         aria-label={PDF_FILES_SECTION_TEXT.ACTIONS.EDIT}
                         type="button"

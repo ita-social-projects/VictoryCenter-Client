@@ -161,6 +161,8 @@ export const FUNDS_EXPENDITURES_TEXT = {
         RECORD_DELETED_SUCCESSFULLY: 'Запис успішно видалено',
         RECORD_DELETE_FAILED_RETRY: 'Не вдалося видалити запис. Спробуйте ще раз',
         AMOUNT_USD_NOT_MATCH: 'Сума в USD не відповідає сумі в UAH',
+        CATEGORY_CREATED_SUCCESSFULLY: 'Категорію додано успішно',
+        CATEGORY_CREATE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
     },
     MODAL: {
         SHARED: {

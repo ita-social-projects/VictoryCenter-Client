@@ -13,6 +13,8 @@ interface ProgramExpensesTableProps {
     records: ProgramExpensesRecord[];
     hasAnyProgramExpenseRecords: boolean;
     isEditing?: boolean;
+    isAddProgramExpenseDisabled?: boolean;
+    onAddProgramExpense?: () => void;
     onEditRecord?: (record: ProgramExpensesRecord) => void;
     onDeleteRecord?: (record: ProgramExpensesRecord) => void;
 }
@@ -24,6 +26,8 @@ export const ProgramExpensesTable = ({
     records,
     hasAnyProgramExpenseRecords,
     isEditing = false,
+    isAddProgramExpenseDisabled = false,
+    onAddProgramExpense,
     onEditRecord,
     onDeleteRecord,
 }: ProgramExpensesTableProps) => {
@@ -112,6 +116,8 @@ export const ProgramExpensesTable = ({
                         <ProgramExpensesEmptyState
                             colSpan={tableColumnsCount}
                             variant={hasAnyProgramExpenseRecords ? 'filtered' : 'program-expenses'}
+                            isAddProgramExpenseDisabled={isAddProgramExpenseDisabled}
+                            onAddProgramExpense={onAddProgramExpense}
                         />
                     ) : (
                         records.map((record) => (

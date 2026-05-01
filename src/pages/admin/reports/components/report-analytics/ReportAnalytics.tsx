@@ -44,7 +44,7 @@ export const ReportAnalytics = () => {
                         onExchangeRateValueChange={setFundsExchangeRateDraft}
                     />
                 )}
-                {activeTab.id === 'program-expenses' && <ProgramExpensesSection />}
+                {activeTab.id === 'program-expenses' && <ProgramExpensesSection isEditing={isFundsEditing} />}
             </div>
         </div>
     );

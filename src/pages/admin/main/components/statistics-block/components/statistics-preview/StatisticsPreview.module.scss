@@ -16,7 +16,7 @@
 }
 
 .title {
-	@include type.small-text-medium;
+    @include type.small-text-medium;
     color: c.$grey-900;
     margin: 0;
 }
@@ -27,7 +27,7 @@
 }
 
 .tab {
-		@include type.small-text-medium;
+    @include type.small-text-medium;
     background: transparent;
     border: none;
     padding: 4px 10px;
@@ -65,7 +65,7 @@
 }
 
 .label {
-		@include type.small-text-regular;
+    @include type.small-text-regular;
     margin: 0;
     opacity: 0.9;
     color: c.$black;

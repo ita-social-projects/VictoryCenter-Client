@@ -15,6 +15,11 @@ jest.mock('../about-us-block/AboutUsBlockForm', () => ({
     AboutUsBlockForm: () => <div data-testid="about-us-block-form">About Us Form</div>,
 }));
 
+jest.mock('../statistics-block/StatisticsBlockForm', () => ({
+    __esModule: true,
+    StatisticsBlockForm: () => <div data-testid="statistics-block-form">Statistics Form</div>,
+}));
+
 jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
     __esModule: true,
     CategoryBar: require('@/utils/test-mocks/main-page-mocks').MockMainPageCategoryBar,
@@ -36,6 +41,14 @@ const getByExactText = (text: string) =>
 describe('MainPageContent', () => {
     beforeEach(() => {
         jest.useFakeTimers();
+
+        if (!(global as any).crypto) {
+            Object.defineProperty(global, 'crypto', { value: {}, configurable: true });
+        }
+
+        if (!(global as any).crypto.randomUUID) {
+            (global as any).crypto.randomUUID = jest.fn(() => 'test-uuid');
+        }
     });
 
     afterEach(() => {
@@ -79,7 +92,7 @@ describe('MainPageContent', () => {
         expect(screen.queryByTestId('title-block-form')).not.toBeInTheDocument();
 
         fireEvent.click(screen.getByTestId('tab-btn-statistics'));
-        expect(getByExactText(`Блок "${MAIN_PAGE_TEXT.TABS.STATISTICS}" в розробці`)).toBeInTheDocument();
+        expect(screen.getByTestId('statistics-block-form')).toBeInTheDocument();
     });
 
     it('does not update state after unmount (cleanup isMounted)', async () => {

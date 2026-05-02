@@ -14,6 +14,20 @@ export const MockSubmitButton = ({ children, disabled, type }: any) => (
     </button>
 );
 
+export const MockImageInput = ({ setError, onChange }: any) => (
+    <div data-testid="image-input-mock">
+        <button data-testid="trigger-image-change" type="button" onClick={() => onChange({ file: 'fake.jpg' })}>
+            Change Image
+        </button>
+        <button data-testid="trigger-image-error" type="button" onClick={() => setError('Image size error')}>
+            Set Error
+        </button>
+        <button data-testid="clear-image-error" type="button" onClick={() => setError(null)}>
+            Clear Error
+        </button>
+    </div>
+);
+
 export const MockMainPageCategoryBar = ({ categories, onCategorySelect, selectedCategory }: any) => (
     <div data-testid="category-bar">
         {categories.map((c: any) => (

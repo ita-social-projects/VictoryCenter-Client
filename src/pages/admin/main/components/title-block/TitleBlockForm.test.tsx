@@ -47,6 +47,7 @@ const mockInitialData: MainPage = {
     image: null,
     mainAboutUs: null,
     mainPartners: null,
+    impactStatistics: null,
 };
 
 describe('TitleBlockForm', () => {

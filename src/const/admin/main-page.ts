@@ -18,6 +18,16 @@ export const MAIN_PAGE_TEXT = {
             TITLE_LABEL: COMMON_TEXT_ADMIN.TYPE.TITLE,
             DESCRIPTION_LABEL: COMMON_TEXT_ADMIN.TYPE.DESCRIPTION,
         },
+        STATISTICS: {
+            TITLE_UA_LABEL: 'Заголовок (UA)',
+            TITLE_EN_LABEL: 'Заголовок (ENG)',
+            PREVIEW_TITLE: 'PREVIEW МЕТРИК',
+            METRICS_TITLE: 'МЕТРИКИ',
+            LANG: {
+                UKR: 'UKR',
+                ENG: 'ENG',
+            },
+        },
     },
 
     BUTTONS: {
@@ -57,6 +67,15 @@ export const MAIN_PAGE_VALIDATION = {
             max: 1000,
             getMinError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(10),
             getMaxError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(1000),
+        },
+    },
+
+    statisticsBlock: {
+        title: {
+            min: 5,
+            max: 100,
+            getMinError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(5),
+            getMaxError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(100),
         },
     },
 } as const;

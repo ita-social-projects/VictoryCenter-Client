@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Button } from '@/components/admin/button/Button';
-import { ImageInput } from '@/components/admin/image-input/ImageInput';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { MAIN_PAGE_TEXT, MAIN_PAGE_VALIDATION } from '@/const/admin/main-page';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -10,6 +9,7 @@ import { MOCK_MAIN_PAGE_DATA } from '@/utils/mock-data/admin/main-page/main-page
 import { StatisticsBlockValidationSchema } from '@/validation/admin/main-page-schema/main-page-schema';
 import { StatisticsBlockFormValues, STATISTICS_BLOCK_FORM_DEFAULTS, Metric } from '@/types/admin/main-page';
 import DefaultPlaceholder from '@/assets/images/man-facing-horse-forehead.webp';
+import { ImageUploadForm } from '@/pages/admin/main/components/common/image-upload-form/ImageUploadForm';
 
 import { StatisticsPreview } from './components/statistics-preview/StatisticsPreview';
 import { StatisticsMetricsList } from './components/statistics-metrics-list/StatisticsMetricsList';
@@ -74,26 +74,14 @@ export const StatisticsBlockForm = () => {
     return (
         <div className={styles.form}>
             <div className={styles.content}>
-                <div className={styles['image-section']}>
-                    <Controller
-                        name="image"
-                        control={control}
-                        render={({ field: { onChange, value } }) => (
-                            <div className={styles['image-wrapper']}>
-                                <ImageInput
-                                    value={value}
-                                    onChange={onChange}
-                                    setError={setImageError}
-                                    variant="whoWeAre"
-                                    {...IMAGE_CONFIG}
-                                />
-                                {(imageError || errors.image?.message) && (
-                                    <p className={styles.error}>{imageError || errors.image?.message}</p>
-                                )}
-                            </div>
-                        )}
-                    />
-                </div>
+                <ImageUploadForm
+                    control={control}
+                    errors={errors}
+                    imageError={imageError}
+                    setImageError={setImageError}
+                    imageConfig={IMAGE_CONFIG}
+                    variant="whoWeAre"
+                />
 
                 <div className={styles['right-section']}>
                     <StatisticsPreview

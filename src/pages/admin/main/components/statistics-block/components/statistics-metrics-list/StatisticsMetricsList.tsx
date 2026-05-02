@@ -51,6 +51,7 @@ export const StatisticsMetricsList = ({
                     <IconButton type="button" DefaultIcon={EditIcon} className={styles.iconButton} />
                     <IconButton
                         type="button"
+                        aria-label={isHidden ? 'Show metric' : 'Hide metric'}
                         onClick={() => metric.id && onToggleVisibility(metric.id)}
                         DefaultIcon={isHidden ? EyeClosedIcon : EyeOpenedIcon}
                         className={styles.iconButton}

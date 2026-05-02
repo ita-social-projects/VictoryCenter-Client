@@ -13,17 +13,28 @@ jest.mock('@/components/admin/button/Button', () => ({
     Button: require('@/utils/test-mocks/main-page-mocks').MockSubmitButton,
 }));
 
-jest.mock('@/components/admin/image-input/ImageInput', () => ({
+jest.mock('@/pages/admin/main/components/common/image-upload-form/ImageUploadForm', () => ({
     __esModule: true,
-    ImageInput: require('@/utils/test-mocks/main-page-mocks').MockImageInput,
+    ImageUploadForm: require('@/utils/test-mocks/main-page-mocks').MockImageUploadForm,
 }));
 
 jest.mock('./components/statistics-preview/StatisticsPreview', () => ({
-    StatisticsPreview: ({ language }: any) => <div data-testid="statistics-preview">{language}</div>,
+    StatisticsPreview: ({ metrics, hiddenMetricIds }: any) => (
+        <div data-testid="statistics-preview" data-metrics={metrics.length} data-hidden={hiddenMetricIds.join(',')} />
+    ),
 }));
 
 jest.mock('./components/statistics-metrics-list/StatisticsMetricsList', () => ({
-    StatisticsMetricsList: () => <div data-testid="metrics-list" />,
+    StatisticsMetricsList: ({ metrics, onToggleVisibility, onReorder }: any) => (
+        <div data-testid="metrics-list">
+            <button
+                data-testid="toggle-first-metric"
+                onClick={() => onToggleVisibility(metrics[0]?.id ?? 0)}
+                type="button"
+            />
+            <button data-testid="reorder-metrics" onClick={() => onReorder([])} type="button" />
+        </div>
+    ),
 }));
 
 describe('StatisticsBlockForm', () => {
@@ -60,5 +71,30 @@ describe('StatisticsBlockForm', () => {
 
         fireEvent.click(screen.getByTestId('trigger-image-error'));
         await waitFor(() => expect(screen.getByTestId('submit-btn')).toBeDisabled());
+    });
+
+    it('updates hidden metrics state when toggling visibility', async () => {
+        render(<StatisticsBlockForm />);
+
+        const firstMetricId = MOCK_MAIN_PAGE_DATA.impactStatistics?.metrics?.[0]?.id ?? 0;
+
+        fireEvent.click(screen.getByTestId('toggle-first-metric'));
+
+        await waitFor(() => {
+            expect(screen.getByTestId('statistics-preview')).toHaveAttribute(
+                'data-hidden',
+                firstMetricId ? String(firstMetricId) : '0',
+            );
+        });
+    });
+
+    it('updates metrics order when reorder is triggered', async () => {
+        render(<StatisticsBlockForm />);
+
+        fireEvent.click(screen.getByTestId('reorder-metrics'));
+
+        await waitFor(() => {
+            expect(screen.getByTestId('statistics-preview')).toHaveAttribute('data-metrics', '0');
+        });
     });
 });

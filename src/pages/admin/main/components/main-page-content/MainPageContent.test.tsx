@@ -57,9 +57,23 @@ describe('MainPageContent', () => {
         });
         jest.useRealTimers();
         jest.clearAllMocks();
+        jest.restoreAllMocks();
     });
 
     it('renders loader initially while data is "fetching"', () => {
+        render(<MainPageContent />);
+        expect(screen.getByTestId('page-loader')).toBeInTheDocument();
+    });
+
+    it('renders loader when data is null and isLoading is false', () => {
+        const useStateSpy = jest.spyOn(React, 'useState');
+        useStateSpy
+            .mockImplementationOnce(() => ['title', jest.fn()])
+            .mockImplementationOnce(() => [null, jest.fn()])
+            .mockImplementationOnce(() => [false, jest.fn()]);
+
+        jest.spyOn(React, 'useEffect').mockImplementation(() => undefined);
+
         render(<MainPageContent />);
         expect(screen.getByTestId('page-loader')).toBeInTheDocument();
     });

@@ -23,21 +23,9 @@ jest.mock('@/components/admin/button/Button', () => ({
     Button: require('@/utils/test-mocks/main-page-mocks').MockSubmitButton,
 }));
 
-jest.mock('@/components/admin/image-input/ImageInput', () => ({
+jest.mock('@/pages/admin/main/components/common/image-upload-form/ImageUploadForm', () => ({
     __esModule: true,
-    ImageInput: ({ setError, onChange }: any) => (
-        <div data-testid="image-input-mock">
-            <button data-testid="trigger-image-change" type="button" onClick={() => onChange({ file: 'fake.jpg' })}>
-                Change Image
-            </button>
-            <button data-testid="trigger-image-error" type="button" onClick={() => setError('Image size error')}>
-                Set Error
-            </button>
-            <button data-testid="clear-image-error" type="button" onClick={() => setError(null)}>
-                Clear Error
-            </button>
-        </div>
-    ),
+    ImageUploadForm: require('@/utils/test-mocks/main-page-mocks').MockImageUploadForm,
 }));
 
 const mockInitialData: MainPage = {
@@ -103,7 +91,7 @@ describe('TitleBlockForm', () => {
         });
     });
 
-    it('disables submit button when ImageInput sets an error', async () => {
+    it('disables submit button when ImageUploadForm sets an error', async () => {
         render(<TitleBlockForm initialData={mockInitialData} />);
 
         const titleInput = screen.getByTestId('title-block-title');

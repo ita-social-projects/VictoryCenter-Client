@@ -4,22 +4,6 @@ import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
 import { ReportFundsExpendituresCategory, ReportFundsExpendituresRecord } from '@/types/admin/reports';
 import { DeleteFundsExpendituresCategoryModal } from './DeleteFundsExpendituresCategoryModal';
 
-jest.mock('@/components/common/modal/Modal', () => {
-    const Modal = ({ isOpen, onClose, children }: any) => {
-        if (!isOpen) return null;
-        return (
-            <div data-testid="modal">
-                <button data-testid="modal-close" onClick={onClose} />
-                {children}
-            </div>
-        );
-    };
-    Modal.Title = ({ children }: any) => <>{children}</>;
-    Modal.Content = ({ children }: any) => <>{children}</>;
-    Modal.Actions = ({ children }: any) => <>{children}</>;
-    return { Modal };
-});
-
 jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
     ConfirmationModal: ({ isOpen, title, onConfirm, onCancel, onClose, isButtonsDisabled }: any) => (
         <div data-testid="confirm-modal" data-open={String(isOpen)}>
@@ -54,10 +38,6 @@ jest.mock('@/components/common/select/Select', () => {
     Select.Option = ({ value, name }: any) => <option value={value}>{name}</option>;
     return { Select };
 });
-
-jest.mock('@/components/admin/hint-box/HintBox', () => ({
-    HintBox: ({ title }: any) => <div data-testid="hint-box">{title}</div>,
-}));
 
 const CATEGORY_SELECT = FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.CATEGORY_PLACEHOLDER;
 const DELETE_BUTTON_NAME = COMMON_TEXT_ADMIN.BUTTON.DELETE;
@@ -114,7 +94,7 @@ const selectCategory = (id: number) => {
 describe('DeleteFundsExpendituresCategoryModal', () => {
     it('renders nothing when isOpen is false', () => {
         renderModal({ isOpen: false });
-        expect(screen.queryByTestId('modal')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('modal-overlay')).not.toBeInTheDocument();
     });
 
     it('renders modal title when open', () => {
@@ -178,28 +158,32 @@ describe('DeleteFundsExpendituresCategoryModal', () => {
         it('shows income record error when selected income category has a record', () => {
             renderModal({ records: [incomeRecord] });
             selectCategory(incomeCategory.id);
-            expect(screen.getByTestId('hint-box')).toHaveTextContent(
-                FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.ERROR.HAS_INCOME_RECORD,
-            );
+            expect(
+                screen.getByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.ERROR.HAS_INCOME_RECORD),
+            ).toBeInTheDocument();
         });
 
         it('shows expense record error when selected expense category has a record', () => {
             renderModal({ records: [expenseRecord] });
             selectCategory(expenseCategory.id);
-            expect(screen.getByTestId('hint-box')).toHaveTextContent(
-                FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.ERROR.HAS_EXPENSE_RECORD,
-            );
+            expect(
+                screen.getByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.ERROR.HAS_EXPENSE_RECORD),
+            ).toBeInTheDocument();
         });
 
         it('does not show hint box when selected category has no record', () => {
             renderModal({ records: [] });
             selectCategory(incomeCategory.id);
-            expect(screen.queryByTestId('hint-box')).not.toBeInTheDocument();
+            expect(
+                screen.queryByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.ERROR.HAS_INCOME_RECORD),
+            ).not.toBeInTheDocument();
         });
 
         it('does not show hint box when no category is selected', () => {
             renderModal({ records: [incomeRecord] });
-            expect(screen.queryByTestId('hint-box')).not.toBeInTheDocument();
+            expect(
+                screen.queryByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.ERROR.HAS_INCOME_RECORD),
+            ).not.toBeInTheDocument();
         });
     });
 
@@ -224,7 +208,7 @@ describe('DeleteFundsExpendituresCategoryModal', () => {
             fireEvent.click(getDeleteButton());
             fireEvent.click(screen.getByTestId('confirm-no'));
             expect(screen.getByTestId('confirm-modal')).toHaveAttribute('data-open', 'false');
-            expect(screen.getByTestId('modal')).toBeInTheDocument();
+            expect(screen.getByTestId('modal-overlay')).toBeInTheDocument();
         });
 
         it('closes confirmation modal when close is triggered inside confirm', () => {
@@ -267,7 +251,7 @@ describe('DeleteFundsExpendituresCategoryModal', () => {
             fireEvent.click(screen.getByTestId('confirm-yes'));
             await waitFor(() => expect(screen.getByTestId('confirm-modal')).toHaveAttribute('data-open', 'false'));
             expect(onClose).not.toHaveBeenCalled();
-            expect(screen.getByTestId('modal')).toBeInTheDocument();
+            expect(screen.getByTestId('modal-overlay')).toBeInTheDocument();
         });
 
         it('disables confirm buttons while submitting', async () => {
@@ -298,11 +282,11 @@ describe('DeleteFundsExpendituresCategoryModal', () => {
             expect(onClose).toHaveBeenCalledTimes(1);
         });
 
-        it('resets selection when modal-close button is clicked', () => {
+        it('resets selection when modal close button is clicked', () => {
             const onClose = jest.fn();
             renderModal({ onClose });
             selectCategory(incomeCategory.id);
-            fireEvent.click(screen.getByTestId('modal-close'));
+            fireEvent.click(screen.getByRole('button', { name: 'Close modal' }));
             expect(onClose).toHaveBeenCalledTimes(1);
         });
 

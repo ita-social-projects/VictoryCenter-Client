@@ -166,7 +166,11 @@ export const FundsExpenditureSection = ({
         onExchangeRateValueChange?.(settings?.exchangeRate ?? null);
     }, [onEditModeChange, onExchangeRateValueChange, settings?.exchangeRate]);
 
-    const { data: categories, isLoading: isCategoriesLoading } = useDataFetch<ReportFundsExpendituresCategory[]>({
+    const {
+        data: categories,
+        isLoading: isCategoriesLoading,
+        refetch: refetchCategories,
+    } = useDataFetch<ReportFundsExpendituresCategory[]>({
         initialData: [],
         fetchHandler: fetchCategories,
     });
@@ -315,6 +319,21 @@ export const FundsExpenditureSection = ({
             }
         },
         [addToast, adminClient, refetchSummary],
+    );
+
+    const handleCreateCategory = useCallback(
+        async (data: { name: string; type: FundsExpendituresTransactionType }): Promise<boolean> => {
+            try {
+                await FundsExpendituresApi.createCategory(adminClient, data);
+                refetchCategories();
+                addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_CREATED_SUCCESSFULLY, ToastType.Success);
+                return true;
+            } catch {
+                addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_CREATE_FAILED_RETRY, ToastType.Error);
+                return false;
+            }
+        },
+        [addToast, adminClient, refetchCategories],
     );
 
     const handleDeleteClick = (record: ReportFundsExpendituresRecord) => {
@@ -503,6 +522,7 @@ export const FundsExpenditureSection = ({
                 isOpen={isAddCategoryModalOpen}
                 onClose={onAddCategoryModalClose ?? (() => {})}
                 categories={categories}
+                onSubmit={handleCreateCategory}
             />
 
             <DeleteRecordModal

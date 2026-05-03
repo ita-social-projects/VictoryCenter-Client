@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FUNDS_EXPENDITURES_TEXT, FUNDS_EXPENDITURES_VALIDATION } from '@/const/admin/reports';
 import { ReportFundsExpendituresCategory } from '@/types/admin/reports';
@@ -198,10 +198,55 @@ describe('AddFundsExpendituresCategoryModal', () => {
         });
     });
 
-    it('clicking submit does not throw when enabled', () => {
-        renderOpen();
-        fillForm('income', 'Valid name');
-        expect(() => fireEvent.click(getSubmitButton())).not.toThrow();
+    describe('submit behaviour', () => {
+        const renderWithSubmit = (onSubmit: jest.Mock, onClose = jest.fn()) =>
+            render(<AddFundsExpendituresCategoryModal isOpen={true} onClose={onClose} onSubmit={onSubmit} />);
+
+        it('calls onSubmit with normalized name and type on click', async () => {
+            const onSubmit = jest.fn().mockResolvedValue(true);
+            renderWithSubmit(onSubmit);
+            fillForm('income', '  Valid name  ');
+            fireEvent.click(getSubmitButton());
+            await waitFor(() => expect(onSubmit).toHaveBeenCalledWith({ name: 'Valid name', type: 'income' }));
+        });
+
+        it('resets form and calls onClose when onSubmit resolves true', async () => {
+            const onClose = jest.fn();
+            const onSubmit = jest.fn().mockResolvedValue(true);
+            renderWithSubmit(onSubmit, onClose);
+            fillForm('expense', 'Valid name');
+            fireEvent.click(getSubmitButton());
+            await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
+            expect(screen.getByTestId('category-name')).toHaveValue('');
+            expect(getSubmitButton()).toBeDisabled();
+        });
+
+        it('keeps modal open when onSubmit resolves false', async () => {
+            const onClose = jest.fn();
+            const onSubmit = jest.fn().mockResolvedValue(false);
+            renderWithSubmit(onSubmit, onClose);
+            fillForm('income', 'Valid name');
+            fireEvent.click(getSubmitButton());
+            await waitFor(() => expect(onSubmit).toHaveBeenCalled());
+            expect(onClose).not.toHaveBeenCalled();
+            expect(screen.getByTestId('modal')).toBeInTheDocument();
+        });
+
+        it('disables submit button while submitting', async () => {
+            let resolve!: (v: boolean) => void;
+            const onSubmit = jest.fn().mockReturnValue(
+                new Promise<boolean>((r) => {
+                    resolve = r;
+                }),
+            );
+            renderWithSubmit(onSubmit);
+            fillForm('income', 'Valid name');
+            fireEvent.click(getSubmitButton());
+            expect(getSubmitButton()).toBeDisabled();
+            await act(async () => {
+                resolve(true);
+            });
+        });
     });
 
     it('normalizes whitespace in name input on blur', () => {

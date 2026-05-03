@@ -19,12 +19,14 @@ interface AddFundsExpendituresCategoryModalProps {
     isOpen: boolean;
     onClose: () => void;
     categories?: ReportFundsExpendituresCategory[];
+    onSubmit?: (data: { name: string; type: FundsExpendituresTransactionType }) => Promise<boolean>;
 }
 
 export const AddFundsExpendituresCategoryModal = ({
     isOpen,
     onClose,
     categories = [],
+    onSubmit,
 }: AddFundsExpendituresCategoryModalProps) => {
     const [type, setType] = useState<FundsExpendituresTransactionType | undefined>(undefined);
     const [name, setName] = useState('');
@@ -32,6 +34,7 @@ export const AddFundsExpendituresCategoryModal = ({
     const [typeError, setTypeError] = useState<string | undefined>(undefined);
     const [hasNameBeenBlurred, setHasNameBeenBlurred] = useState(false);
     const [isCloseConfirmOpen, setIsCloseConfirmOpen] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const typeSelectRef = useRef<HTMLDivElement | null>(null);
 
@@ -50,9 +53,20 @@ export const AddFundsExpendituresCategoryModal = ({
         setNameError(undefined);
         setTypeError(undefined);
         setHasNameBeenBlurred(false);
+        setIsSubmitting(false);
     }, []);
 
-    const handleSubmit = () => {};
+    const handleSubmit = useCallback(async () => {
+        if (!type || !onSubmit) return;
+        setIsSubmitting(true);
+        const success = await onSubmit({ name: getNormalizedInputText(name), type });
+        if (success) {
+            resetForm();
+            onClose();
+        } else {
+            setIsSubmitting(false);
+        }
+    }, [type, name, onSubmit, resetForm, onClose]);
 
     const handleTypeChange = useCallback(
         (newType: FundsExpendituresTransactionType) => {
@@ -177,7 +191,7 @@ export const AddFundsExpendituresCategoryModal = ({
                         <Button
                             buttonStyle="primary"
                             onClick={handleSubmit}
-                            disabled={isSubmitDisabled}
+                            disabled={isSubmitDisabled || isSubmitting}
                             className={styles.submit}
                         >
                             {FUNDS_EXPENDITURES_TEXT.MODAL.CATEGORY.SUBMIT_BUTTON}

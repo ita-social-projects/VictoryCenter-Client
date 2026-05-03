@@ -163,6 +163,8 @@ export const FUNDS_EXPENDITURES_TEXT = {
         AMOUNT_USD_NOT_MATCH: 'Сума в USD не відповідає сумі в UAH',
         CATEGORY_CREATED_SUCCESSFULLY: 'Категорію додано успішно',
         CATEGORY_CREATE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
+        CATEGORY_DELETED_SUCCESSFULLY: 'Категорію видалено успішно',
+        CATEGORY_DELETE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
     },
     MODAL: {
         SHARED: {
@@ -192,6 +194,16 @@ export const FUNDS_EXPENDITURES_TEXT = {
             SUBMIT_BUTTON: 'Додати витрату',
             CONFIRM_ADD_TITLE: 'Додати нову витрату?',
         },
+        DELETE_CATEGORY: {
+            TITLE: 'Видалити категорію',
+            CATEGORY_LABEL: 'Категорія',
+            CATEGORY_PLACEHOLDER: 'Оберіть категорію',
+            CONFIRM_TITLE: 'Видалити категорію?',
+            ERROR: {
+                HAS_INCOME_RECORD: 'Категорія використовується в надходженнях, 1 запис. Видаліть або змініть його',
+                HAS_EXPENSE_RECORD: 'Категорія використовується у витратах, 1 запис. Видаліть або змініть його',
+            },
+        },
         CATEGORY: {
             TITLE: 'Додати категорію',
             SUBTITLE: 'Додавання категорії витрат/надходжень для формування звітності',
@@ -210,6 +222,7 @@ export const FUNDS_EXPENDITURES_TEXT = {
         ADD_INCOME: 'Надходження',
         ADD_EXPENSE: 'Витрати',
         ADD_CATEGORY: 'Додати категорію',
+        DELETE_CATEGORY: 'Видалити',
     },
     FILTER: {
         TYPE_PLACEHOLDER: 'Тип',

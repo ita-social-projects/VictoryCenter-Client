@@ -32,6 +32,7 @@ import { EnrichedRecord, FundsExpendituresTable } from './components/funds-expen
 import { AddFundsExpendituresRecordModal } from './components/common/add-funds-expenditures-record-modal/AddFundsExpendituresRecordModal';
 import { AddFundsExpendituresCategoryModal } from './components/common/add-funds-expenditures-category-modal/AddFundsExpendituresCategoryModal';
 import { DeleteRecordModal } from './components/common/delete-record-modal/DeleteRecordModal';
+import { DeleteFundsExpendituresCategoryModal } from './components/common/delete-funds-expenditures-category-modal/DeleteFundsExpendituresCategoryModal';
 import styles from './FundsExpendituresSection.module.scss';
 
 const enrichRecords = (
@@ -52,6 +53,8 @@ interface FundsExpenditureSectionProps {
     onExchangeRateValueChange?: (exchangeRate: string | null) => void;
     isAddCategoryModalOpen?: boolean;
     onAddCategoryModalClose?: () => void;
+    isDeleteCategoryModalOpen?: boolean;
+    onDeleteCategoryModalClose?: () => void;
 }
 
 export const FundsExpenditureSection = ({
@@ -61,6 +64,8 @@ export const FundsExpenditureSection = ({
     onExchangeRateValueChange,
     isAddCategoryModalOpen = false,
     onAddCategoryModalClose,
+    isDeleteCategoryModalOpen = false,
+    onDeleteCategoryModalClose,
 }: FundsExpenditureSectionProps = {}) => {
     const adminClient = useAdminClient();
     const { addToast } = useToast();
@@ -336,6 +341,21 @@ export const FundsExpenditureSection = ({
         [addToast, adminClient, refetchCategories],
     );
 
+    const handleDeleteCategory = useCallback(
+        async (categoryId: number): Promise<boolean> => {
+            try {
+                await FundsExpendituresApi.deleteCategory(adminClient, categoryId);
+                refetchCategories();
+                addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_DELETED_SUCCESSFULLY, ToastType.Success);
+                return true;
+            } catch {
+                addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_DELETE_FAILED_RETRY, ToastType.Error);
+                return false;
+            }
+        },
+        [addToast, adminClient, refetchCategories],
+    );
+
     const handleDeleteClick = (record: ReportFundsExpendituresRecord) => {
         setRecordToDelete(record);
         setIsDeleteModalOpen(true);
@@ -523,6 +543,14 @@ export const FundsExpenditureSection = ({
                 onClose={onAddCategoryModalClose ?? (() => {})}
                 categories={categories}
                 onSubmit={handleCreateCategory}
+            />
+
+            <DeleteFundsExpendituresCategoryModal
+                isOpen={isDeleteCategoryModalOpen}
+                onClose={onDeleteCategoryModalClose ?? (() => {})}
+                categories={categories}
+                records={recordsState}
+                onSubmit={handleDeleteCategory}
             />
 
             <DeleteRecordModal

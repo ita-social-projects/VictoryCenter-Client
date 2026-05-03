@@ -28,7 +28,7 @@ export const Header = () => {
         { text: t('HISTORY'), navigateTo: '', isDisabled: true },
         { text: t('TEAM'), navigateTo: PUBLIC_ROUTES.TEAM.FULL, isDisabled: false },
         { text: t('PARTNERS'), navigateTo: PUBLIC_ROUTES.PARTNERS.FULL, isDisabled: false },
-        { text: t('EVENTS_AND_NEWS'), navigateTo: '', isDisabled: true },
+        { text: t('EVENTS_AND_NEWS'), navigateTo: PUBLIC_ROUTES.EVENTS_AND_NEWS.FULL, isDisabled: false },
     ];
 
     const programsLinks: DropdownLink[] = [

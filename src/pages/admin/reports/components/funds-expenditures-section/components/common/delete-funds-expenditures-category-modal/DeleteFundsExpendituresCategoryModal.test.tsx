@@ -265,9 +265,7 @@ describe('DeleteFundsExpendituresCategoryModal', () => {
             selectCategory(incomeCategory.id);
             fireEvent.click(getDeleteButton());
             fireEvent.click(screen.getByTestId('confirm-yes'));
-            await waitFor(() =>
-                expect(screen.getByTestId('confirm-modal')).toHaveAttribute('data-open', 'false'),
-            );
+            await waitFor(() => expect(screen.getByTestId('confirm-modal')).toHaveAttribute('data-open', 'false'));
             expect(onClose).not.toHaveBeenCalled();
             expect(screen.getByTestId('modal')).toBeInTheDocument();
         });

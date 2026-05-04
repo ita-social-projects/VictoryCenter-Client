@@ -43,11 +43,13 @@ export const StatisticsMetricsList = ({
         return (
             <div className={styles.row}>
                 <div className={styles.labels}>
-                    <p className={styles.ua}>{getMetricName(metric)}</p>
+                    <p className={`${styles.ua} ${isHidden ? styles.hiddenText : ''}`}>{getMetricName(metric)}</p>
                 </div>
 
                 <div className={styles.values}>
-                    <p className={styles.value}>{formatMetricValue(metric, 'uk-UA')}</p>
+                    <p className={`${styles.value} ${isHidden ? styles.hiddenText : ''}`}>
+                        {formatMetricValue(metric, 'uk-UA')}
+                    </p>
                 </div>
 
                 <div className={styles.actions}>
@@ -61,7 +63,7 @@ export const StatisticsMetricsList = ({
                         }}
                         disabled={isLastVisible}
                         DefaultIcon={isHidden ? EyeClosedIcon : EyeOpenedIcon}
-                        className={styles.iconButton}
+                        className={`${styles.iconButton} ${isLastVisible ? styles.disabled : ''}`}
                     />
                 </div>
             </div>

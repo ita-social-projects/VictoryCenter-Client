@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/admin/button/Button';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import { InputWithCharacterLimit } from '@/components/admin/input-with-character-limit/InputWithCharacterLimit';
@@ -6,6 +6,7 @@ import { Select } from '@/components/common/select/Select';
 import { Modal } from '@/components/common/modal/Modal';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FUNDS_EXPENDITURES_TEXT, PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
+import { useDirtyModalCloseConfirmation } from '@/hooks/admin/use-dirty-modal-close-confirmation/useDirtyModalCloseConfirmation';
 import { ProgramExpensesProgram } from '@/types/admin/reports';
 import { getReportingYearOptions } from '@/utils/functions/get-reporting-year-options/get-reporting-year-options';
 import styles from './AddProgramExpenseRecordModal.module.scss';
@@ -71,20 +72,25 @@ export const AddProgramExpenseRecordModal = ({
     );
 
     const [formState, setFormState] = useState<ProgramExpenseFormState>(INITIAL_FORM_STATE);
-    const [isCloseConfirmOpen, setIsCloseConfirmOpen] = useState(false);
-
-    useEffect(() => {
-        if (!isOpen) {
-            setFormState(INITIAL_FORM_STATE);
-            setIsCloseConfirmOpen(false);
-        }
-    }, [isOpen]);
 
     const isDirty =
         Boolean(formState.reportingYear) ||
         Boolean(formState.programId) ||
         formState.amountUah.trim() !== '' ||
         formState.amountUsd.trim() !== '';
+
+    const { isCloseConfirmOpen, handleRequestClose, handleConfirmClose, handleCancelClose } =
+        useDirtyModalCloseConfirmation({
+            isDirty,
+            onClose,
+        });
+
+    useEffect(() => {
+        if (!isOpen) {
+            setFormState(INITIAL_FORM_STATE);
+            handleCancelClose();
+        }
+    }, [handleCancelClose, isOpen]);
 
     const handleAmountChange = (field: 'amountUah' | 'amountUsd', value: string) => {
         const normalizedValue = normalizeProgramExpenseAmountInput(value);
@@ -94,24 +100,6 @@ export const AddProgramExpenseRecordModal = ({
             [field]: normalizedValue,
         }));
     };
-
-    const handleRequestClose = useCallback(() => {
-        if (isDirty) {
-            setIsCloseConfirmOpen(true);
-            return;
-        }
-
-        onClose();
-    }, [isDirty, onClose]);
-
-    const handleConfirmClose = useCallback(() => {
-        setIsCloseConfirmOpen(false);
-        onClose();
-    }, [onClose]);
-
-    const handleCancelClose = useCallback(() => {
-        setIsCloseConfirmOpen(false);
-    }, []);
 
     return (
         <>

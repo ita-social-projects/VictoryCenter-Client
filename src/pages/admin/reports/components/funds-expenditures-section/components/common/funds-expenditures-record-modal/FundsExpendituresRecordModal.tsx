@@ -1,8 +1,9 @@
-import { ReactNode, useCallback, useState } from 'react';
+import { ReactNode } from 'react';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { Button } from '@/components/admin/button/Button';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import { Modal } from '@/components/common/modal/Modal';
+import { useDirtyModalCloseConfirmation } from '@/hooks/admin/use-dirty-modal-close-confirmation/useDirtyModalCloseConfirmation';
 import styles from './FundsExpendituresRecordModal.module.scss';
 
 interface FundsExpendituresRecordModalProps {
@@ -30,25 +31,11 @@ export const FundsExpendituresRecordModal = ({
     closeConfirmationTitle,
     children,
 }: FundsExpendituresRecordModalProps) => {
-    const [isCloseConfirmOpen, setIsCloseConfirmOpen] = useState(false);
-
-    const handleRequestClose = useCallback(() => {
-        if (isDirty) {
-            setIsCloseConfirmOpen(true);
-            return;
-        }
-
-        onClose();
-    }, [isDirty, onClose]);
-
-    const handleConfirmClose = useCallback(() => {
-        setIsCloseConfirmOpen(false);
-        onClose();
-    }, [onClose]);
-
-    const handleCancelClose = useCallback(() => {
-        setIsCloseConfirmOpen(false);
-    }, []);
+    const { isCloseConfirmOpen, handleRequestClose, handleConfirmClose, handleCancelClose } =
+        useDirtyModalCloseConfirmation({
+            isDirty,
+            onClose,
+        });
 
     return (
         <>

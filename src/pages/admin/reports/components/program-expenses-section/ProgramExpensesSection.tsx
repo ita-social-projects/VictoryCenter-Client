@@ -23,7 +23,6 @@ const MAX_PROGRAM_EXPENSE_RECORDS = 4;
 
 interface ProgramExpensesSectionProps {
     isEditing?: boolean;
-    syncedExchangeRate?: string | null;
 }
 
 export const ProgramExpensesSection = ({ isEditing = false }: ProgramExpensesSectionProps) => {
@@ -104,7 +103,7 @@ export const ProgramExpensesSection = ({ isEditing = false }: ProgramExpensesSec
                     records={filteredRecords}
                     hasAnyProgramExpenseRecords={hasAnyProgramExpenseRecords}
                     isEditing={isEditing}
-                    isAddProgramExpenseDisabled={isAddProgramExpenseDisabled}
+                    isAddProgramExpenseDisabled={isAddProgramExpenseDisabled || !isEditing}
                     onAddProgramExpense={isEditing ? handleOpenAddProgramExpenseModal : undefined}
                 />
             </div>

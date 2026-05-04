@@ -49,18 +49,8 @@ jest.mock('../funds-expenditures-section/FundsExpendituresSection', () => ({
 }));
 
 jest.mock('../program-expenses-section/ProgramExpensesSection', () => ({
-    ProgramExpensesSection: ({
-        isEditing = false,
-        syncedExchangeRate,
-    }: {
-        isEditing?: boolean;
-        syncedExchangeRate?: string | null;
-    }) => (
-        <div
-            data-testid="program-expenses-section"
-            data-editing={String(isEditing)}
-            data-exchange-rate={syncedExchangeRate ?? ''}
-        >
+    ProgramExpensesSection: ({ isEditing = false }: { isEditing?: boolean }) => (
+        <div data-testid="program-expenses-section" data-editing={String(isEditing)}>
             ProgramExpensesSection
         </div>
     ),
@@ -102,14 +92,13 @@ describe('ReportAnalytics', () => {
         expect(screen.queryByTestId('pdf-files-section')).not.toBeInTheDocument();
     });
 
-    it('should render program expenses mock independently from funds edit mode', () => {
+    it('should not pass funds exchange rate draft to program expenses mock', () => {
         render(<ReportAnalytics />);
 
         fireEvent.click(screen.getByTestId('activate-funds-edit'));
         fireEvent.click(screen.getByText(REPORTS_TEXT.REPORT_AND_ANALYTICS.TAB.PROGRAM_EXPENSES));
 
-        expect(screen.getByTestId('program-expenses-section')).toHaveAttribute('data-editing', 'false');
-        expect(screen.getByTestId('program-expenses-section')).toHaveAttribute('data-exchange-rate', '');
+        expect(screen.getByTestId('program-expenses-section')).toHaveAttribute('data-editing', 'true');
     });
 
     it('should restore funds edit mode after returning from another tab', () => {

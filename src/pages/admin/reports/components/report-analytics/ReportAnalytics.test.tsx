@@ -92,7 +92,7 @@ describe('ReportAnalytics', () => {
         expect(screen.queryByTestId('pdf-files-section')).not.toBeInTheDocument();
     });
 
-    it('should not pass funds exchange rate draft to program expenses mock', () => {
+    it('sets program expenses section to editing mode when funds edit is activated', () => {
         render(<ReportAnalytics />);
 
         fireEvent.click(screen.getByTestId('activate-funds-edit'));

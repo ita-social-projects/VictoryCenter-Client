@@ -1,5 +1,5 @@
 import { ChangeEvent, ComponentProps, ReactNode } from 'react';
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FUNDS_EXPENDITURES_TEXT, PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
@@ -58,38 +58,6 @@ jest.mock('@/components/admin/input-with-character-limit/InputWithCharacterLimit
     }) => <input data-testid={id} value={value} onChange={onChange} />,
 }));
 
-jest.mock('@/components/common/select/Select', () => {
-    const React = require('react');
-
-    const Select = ({ value, onValueChange, placeholder, children }: any) => {
-        const options = React.Children.toArray(children)
-            .filter((child: any) => child?.props)
-            .map((child: any) => ({ value: child.props.value, name: child.props.name }));
-
-        return (
-            <select
-                data-testid={placeholder}
-                value={value ?? ''}
-                onChange={(event) => {
-                    const selectedOption = options.find((option: any) => String(option.value) === event.target.value);
-                    onValueChange(selectedOption?.value);
-                }}
-            >
-                <option value="">placeholder</option>
-                {options.map((option: any) => (
-                    <option key={String(option.value)} value={option.value}>
-                        {option.name}
-                    </option>
-                ))}
-            </select>
-        );
-    };
-
-    Select.Option = (_props: any) => null;
-
-    return { Select };
-});
-
 jest.mock('@/utils/functions/get-reporting-year-options/get-reporting-year-options', () => ({
     getReportingYearOptions: () => ['2026', '2025'],
 }));
@@ -104,6 +72,21 @@ const renderModal = (props: Partial<ComponentProps<typeof AddProgramExpenseRecor
         <AddProgramExpenseRecordModal isOpen programs={PROGRAMS} exchangeRate="42.15" onClose={jest.fn()} {...props} />,
     );
 
+const getSelectToggle = (displayValue: string): HTMLButtonElement => {
+    const button = screen.getByText(displayValue).closest('button');
+
+    if (!(button instanceof HTMLButtonElement)) {
+        throw new Error(`Select toggle for "${displayValue}" was not found`);
+    }
+
+    return button;
+};
+
+const selectOption = (currentDisplayValue: string, nextDisplayValue: string) => {
+    fireEvent.click(getSelectToggle(currentDisplayValue));
+    fireEvent.click(screen.getByRole('button', { name: nextDisplayValue }));
+};
+
 describe('AddProgramExpenseRecordModal', () => {
     it('renders modal content, disabled submit button and sorted programs', () => {
         renderModal();
@@ -113,19 +96,19 @@ describe('AddProgramExpenseRecordModal', () => {
         expect(screen.getByLabelText(FUNDS_EXPENDITURES_TEXT.EXCHANGE_RATE_LABEL)).toHaveValue('42.15');
         expect(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.MODAL.ADD.SUBMIT_BUTTON })).toBeDisabled();
 
-        const programSelect = screen.getByTestId(PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_PLACEHOLDER);
-        const programOptions = within(programSelect)
-            .getAllByRole('option')
+        fireEvent.click(getSelectToggle(PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_PLACEHOLDER));
+        const programOptions = screen
+            .getAllByRole('button', { name: /^Program [AB]$/ })
             .map((option) => option.textContent);
 
-        expect(programOptions).toEqual(['placeholder', 'Program A', 'Program B']);
+        expect(programOptions).toEqual(['Program A', 'Program B']);
     });
 
     it('renders disabled program placeholder when programs are unavailable', () => {
         renderModal({ programs: [] });
 
         expect(screen.getByText(PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_NO_AVAILABLE)).toBeInTheDocument();
-        expect(screen.queryByTestId(PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_PLACEHOLDER)).not.toBeInTheDocument();
+        expect(screen.queryByText(PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_PLACEHOLDER)).not.toBeInTheDocument();
     });
 
     it('normalizes program expense amount inputs', () => {
@@ -148,11 +131,9 @@ describe('AddProgramExpenseRecordModal', () => {
     it('updates selected program value', () => {
         renderModal();
 
-        const programSelect = screen.getByTestId(PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_PLACEHOLDER);
+        selectOption(PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_PLACEHOLDER, 'Program A');
 
-        fireEvent.change(programSelect, { target: { value: '1' } });
-
-        expect(programSelect).toHaveValue('1');
+        expect(getSelectToggle('Program A')).toBeInTheDocument();
     });
 
     it('closes immediately when the form is clean', () => {
@@ -169,9 +150,7 @@ describe('AddProgramExpenseRecordModal', () => {
         const onClose = jest.fn();
         renderModal({ onClose });
 
-        fireEvent.change(screen.getByTestId(FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_PLACEHOLDER), {
-            target: { value: '2025' },
-        });
+        selectOption(FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_PLACEHOLDER, '2025');
         fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.CANCEL }));
 
         expect(screen.getByTestId('close-confirmation')).toHaveTextContent(

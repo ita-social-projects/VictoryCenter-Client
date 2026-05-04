@@ -167,7 +167,7 @@ describe('PdfFilesSection', () => {
 
         await waitFor(() => {
             expect(PdfReportsApi.delete).toHaveBeenCalledWith(mockClient, 1);
-            expect(mockAddToast).toHaveBeenCalledWith(PDF_FILES_SECTION_TEXT.DELETE_SUCCESS, ToastType.Success);
+            expect(mockAddToast).toHaveBeenCalledWith(PDF_FILES_SECTION_TEXT.MESSAGE.DELETE_SUCCESS, ToastType.Success);
             expect(mockRefetch).toHaveBeenCalled();
         });
     });
@@ -190,7 +190,7 @@ describe('PdfFilesSection', () => {
         fireEvent.click(deleteBtn);
 
         await waitFor(() => {
-            expect(mockAddToast).toHaveBeenCalledWith(PDF_FILES_SECTION_TEXT.DELETE_ERROR, ToastType.Error);
+            expect(mockAddToast).toHaveBeenCalledWith(PDF_FILES_SECTION_TEXT.MESSAGE.DELETE_ERROR, ToastType.Error);
         });
     });
 
@@ -238,7 +238,7 @@ describe('PdfFilesSection', () => {
         fireEvent.click(viewBtn);
 
         await waitFor(() => {
-            expect(mockAddToast).toHaveBeenCalledWith(PDF_FILES_SECTION_TEXT.VIEW_ERROR, ToastType.Error);
+            expect(mockAddToast).toHaveBeenCalledWith(PDF_FILES_SECTION_TEXT.MESSAGE.VIEW_ERROR, ToastType.Error);
         });
     });
 
@@ -259,7 +259,7 @@ describe('PdfFilesSection', () => {
 
         await waitFor(() => {
             expect(PdfReportsApi.rename).toHaveBeenCalledWith(mockClient, 1, 'New Name');
-            expect(mockAddToast).toHaveBeenCalledWith(PDF_FILES_SECTION_TEXT.RENAME_SUCCESS, ToastType.Success);
+            expect(mockAddToast).toHaveBeenCalledWith(PDF_FILES_SECTION_TEXT.MESSAGE.RENAME_SUCCESS, ToastType.Success);
             expect(mockRefetch).toHaveBeenCalled();
         });
     });
@@ -279,7 +279,7 @@ describe('PdfFilesSection', () => {
         fireEvent.click(screen.getByTestId('rename-btn'));
 
         await waitFor(() => {
-            expect(mockAddToast).toHaveBeenCalledWith(PDF_FILES_SECTION_TEXT.RENAME_ERROR, ToastType.Error);
+            expect(mockAddToast).toHaveBeenCalledWith(PDF_FILES_SECTION_TEXT.MESSAGE.RENAME_ERROR, ToastType.Error);
         });
     });
 

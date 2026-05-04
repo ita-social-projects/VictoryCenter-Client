@@ -102,6 +102,9 @@ export const API_ROUTES = {
         BASE: 'PdfSection',
         CONTENT: 'PdfSection/pdf-section',
     },
+    PDF_SECTION_LOCALIZATIONS: {
+        BASE: 'PdfSectionLocalizations',
+    },
     PDF_REPORTS: {
         BASE: 'PdfReports',
     },

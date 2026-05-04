@@ -27,12 +27,19 @@ interface PdfSectionContent {
 
 interface PdfSectionContentBlockProps {
     content: PdfSectionContent;
-    onSave?: (data: PdfSectionContent) => Promise<void>;
+    onSave?: () => Promise<void>;
+    translationLanguages: LocalizationLanguage[];
+    onTranslateClick?: () => void;
 }
 
 type ConfirmationModalType = 'publish' | 'cancel' | null;
 
-export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({ content, onSave }) => {
+export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({
+    content,
+    onSave,
+    translationLanguages,
+    onTranslateClick,
+}) => {
     const client = useAdminClient();
     const [isEditMode, setIsEditMode] = useState(false);
     const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
@@ -201,15 +208,33 @@ export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({ 
 
         return (
             <div className={cn(styles.root, styles['view-root'])}>
-                <div className={styles['edit-button-container']}>
-                    <IconButton
-                        aria-label={PDF_FILES_SECTION_TEXT.ACTIONS.EDIT}
-                        type="button"
-                        onClick={handleEditClick}
-                        className={styles['edit-button']}
-                        DefaultIcon={ACTION_ICONS.edit.default}
-                        FilledIcon={ACTION_ICONS.edit.hover}
+                <div className={styles['buttons-container']}>
+                    <LocalizationStatuses
+                        languages={translationLanguages}
+                        localizedEntity={{
+                            translationStatuses: (content.localizations ?? []).map((l) => ({
+                                languageId: l.languageId,
+                                translationStatus: l.translationStatus,
+                            })),
+                        }}
                     />
+                    <div className={styles['action-buttons']}>
+                        <IconButton
+                            aria-label={PDF_FILES_SECTION_TEXT.ACTIONS.TRANSLATE}
+                            type="button"
+                            className={styles['translate-button']}
+                            onClick={onTranslateClick}
+                            DefaultIcon={ACTION_ICONS.translate.default}
+                        />
+                        <IconButton
+                            aria-label={PDF_FILES_SECTION_TEXT.ACTIONS.EDIT}
+                            type="button"
+                            onClick={handleEditClick}
+                            className={styles['edit-button']}
+                            DefaultIcon={ACTION_ICONS.edit.default}
+                            FilledIcon={ACTION_ICONS.edit.hover}
+                        />
+                    </div>
                 </div>
                 <div className={styles['content-container']}>
                     <div className={styles['view-field']}>

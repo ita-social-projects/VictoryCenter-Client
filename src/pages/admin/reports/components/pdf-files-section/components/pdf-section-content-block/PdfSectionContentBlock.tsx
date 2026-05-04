@@ -31,7 +31,7 @@ interface PdfSectionContent {
 
 interface PdfSectionContentBlockProps {
     content: PdfSectionContent;
-    onSave?: () => Promise<void>;
+    onAfterSave?: () => Promise<void>;
     translationLanguages: LocalizationLanguage[];
 }
 
@@ -39,7 +39,7 @@ type ConfirmationModalType = 'publish' | 'cancel' | null;
 
 export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({
     content,
-    onSave,
+    onAfterSave,
     translationLanguages,
 }) => {
     const client = useAdminClient();
@@ -114,8 +114,8 @@ export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({
 
             await PdfSectionApi.updatePdfSection(client, normalizedData);
 
-            if (onSave) {
-                await onSave();
+            if (onAfterSave) {
+                await onAfterSave();
             }
 
             setIsEditMode(false);
@@ -125,7 +125,7 @@ export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({
         } finally {
             setIsSaving(false);
         }
-    }, [formData.title, formData.description, client, onSave, addToast]);
+    }, [formData.title, formData.description, client, onAfterSave, addToast]);
 
     const handleConfirmPublish = useCallback(() => {
         setIsConfirmationModalOpen(false);

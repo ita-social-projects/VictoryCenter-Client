@@ -147,7 +147,7 @@ export const PdfFilesSection = () => {
             <div className={styles['top-section']}>
                 <PdfSectionContentBlock
                     content={sectionData ?? EMPTY_SECTION}
-                    onSave={handleSaveSection}
+                    onAfterSave={handleSaveSection}
                     translationLanguages={translationLanguages}
                 />{' '}
             </div>

@@ -35,8 +35,11 @@ export const StatisticsMetricsList = ({
     onToggleVisibility,
     onReorder,
 }: StatisticsMetricsListProps) => {
+    const visibleMetricsCount = metrics.length - hiddenMetricIds.length;
     const renderRow = (metric: Metric) => {
         const isHidden = hiddenMetricIds.includes(metric.id ?? 0);
+        const isLastVisible = !isHidden && visibleMetricsCount <= 1;
+
         return (
             <div className={styles.row}>
                 <div className={styles.labels}>
@@ -52,7 +55,11 @@ export const StatisticsMetricsList = ({
                     <IconButton
                         type="button"
                         aria-label={isHidden ? 'Show metric' : 'Hide metric'}
-                        onClick={() => metric.id && onToggleVisibility(metric.id)}
+                        onClick={() => {
+                            if (isLastVisible) return;
+                            metric.id && onToggleVisibility(metric.id);
+                        }}
+                        disabled={isLastVisible}
                         DefaultIcon={isHidden ? EyeClosedIcon : EyeOpenedIcon}
                         className={styles.iconButton}
                     />

@@ -97,3 +97,9 @@
     width: 24px;
     height: 24px;
 }
+
+.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+}

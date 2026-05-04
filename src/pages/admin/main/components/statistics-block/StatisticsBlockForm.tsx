@@ -64,7 +64,13 @@ export const StatisticsBlockForm = () => {
     }, [impactStatistics, reset]);
 
     const handleToggleVisibility = (id: number) => {
-        setHiddenMetricIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+        setHiddenMetricIds((prev) => {
+            const isCurrentlyHidden = prev.includes(id);
+            if (!isCurrentlyHidden && metrics.length - prev.length <= 1) {
+                return prev;
+            }
+            return isCurrentlyHidden ? prev.filter((x) => x !== id) : [...prev, id];
+        });
     };
 
     const handleReorderMetrics = (items: Metric[]) => {

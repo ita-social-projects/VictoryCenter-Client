@@ -1,6 +1,5 @@
 @use '@/assets/sass/variables/colors' as c;
 @use '@/assets/sass/mixins/typography.mixins' as type;
-@use '@/assets/sass/variables/typography' as t;
 
 .modal {
     display: flex;
@@ -91,7 +90,7 @@
     width: 100%;
     margin: 0;
     line-height: 36px;
-    color: #b3b7be;
+    color: c.$grey-700;
 }
 
 .panel {
@@ -102,7 +101,7 @@
     width: 100%;
     min-height: 0;
     padding: 23px 25px;
-    border: 1px solid #f3f4f6;
+    border: 1px solid c.$grey-150;
     background: c.$grey-50;
 }
 
@@ -229,12 +228,7 @@
 }
 
 .exchange-rate-chip-label {
-    font-family: 'Roboto', sans-serif;
-    font-weight: 500;
-    font-size: 14px;
-    line-height: 20px;
-    letter-spacing: 0.1px;
-
+    @include type.small-text-medium;
     color: c.$grey-900;
 }
 
@@ -262,12 +256,9 @@
 
 .submit,
 .cancel {
+    @include type.body-2-regular;
+
     height: 60px;
-    font-family: t.$font-family-base;
-    font-weight: t.$fw-regular;
-    font-size: 20px;
-    line-height: 24px;
-    letter-spacing: t.$ls-tight;
 }
 
 .submit {

@@ -16,8 +16,8 @@ jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider');
 jest.mock('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit');
 
 jest.mock('./components/pdf-section-content-block/PdfSectionContentBlock', () => ({
-    PdfSectionContentBlock: ({ onSave }: any) => (
-        <button data-testid="content-block" onClick={onSave}>
+    PdfSectionContentBlock: ({ onAfterSave }: any) => (
+        <button data-testid="content-block" onClick={onAfterSave}>
             ContentBlock
         </button>
     ),

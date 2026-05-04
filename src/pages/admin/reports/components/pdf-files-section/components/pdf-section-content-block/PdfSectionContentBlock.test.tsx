@@ -159,12 +159,12 @@ describe('PdfSectionContentBlock', () => {
             expect(screen.getByText(MOCK_CONTENT.title)).toBeInTheDocument();
         });
 
-        it('should call onSave when publish button is clicked with valid data', async () => {
-            const mockOnSave = jest.fn().mockResolvedValue(undefined);
+        it('should call onAfterSave when publish button is clicked with valid data', async () => {
+            const mockOnAfterSave = jest.fn().mockResolvedValue(undefined);
             const user = userEvent.setup();
-            await openPublishModal(user, 'Updated Title', { onSave: mockOnSave });
+            await openPublishModal(user, 'Updated Title', { onAfterSave: mockOnAfterSave });
             await confirmModal(user);
-            await waitFor(() => expect(mockOnSave).toHaveBeenCalledWith());
+            await waitFor(() => expect(mockOnAfterSave).toHaveBeenCalledWith());
         });
 
         it('should have character counters for both fields', async () => {
@@ -182,29 +182,29 @@ describe('PdfSectionContentBlock', () => {
         });
 
         it('should close modal and not save when clicking НІ button', async () => {
-            const mockOnSave = jest.fn().mockResolvedValue(undefined);
+            const mockOnAfterSave = jest.fn().mockResolvedValue(undefined);
             const user = userEvent.setup();
-            await openPublishModal(user, 'Updated Title', { onSave: mockOnSave });
+            await openPublishModal(user, 'Updated Title', { onAfterSave: mockOnAfterSave });
             const modal = await screen.findByTestId('confirmation-modal');
             await user.click(screen.getByText('НІ'));
             await waitFor(() => expect(modal).not.toBeInTheDocument());
-            expect(mockOnSave).not.toHaveBeenCalled();
+            expect(mockOnAfterSave).not.toHaveBeenCalled();
             expect(mockAddToast).not.toHaveBeenCalled();
         });
 
         it('should save and show success toast when clicking ТАК button', async () => {
-            const mockOnSave = jest.fn().mockResolvedValue(undefined);
+            const mockOnAfterSave = jest.fn().mockResolvedValue(undefined);
             const user = userEvent.setup();
-            await openPublishModal(user, 'Updated Title', { onSave: mockOnSave });
+            await openPublishModal(user, 'Updated Title', { onAfterSave: mockOnAfterSave });
             await confirmModal(user);
-            await waitFor(() => expect(mockOnSave).toHaveBeenCalledWith());
+            await waitFor(() => expect(mockOnAfterSave).toHaveBeenCalledWith());
             expect(mockAddToast).toHaveBeenCalledWith('Зміни успішно опубліковані', ToastType.Success);
         });
 
         it('should revert to view mode after successful save', async () => {
-            const mockOnSave = jest.fn().mockResolvedValue(undefined);
+            const mockOnAfterSave = jest.fn().mockResolvedValue(undefined);
             const user = userEvent.setup();
-            await openPublishModal(user, 'Updated Title', { onSave: mockOnSave });
+            await openPublishModal(user, 'Updated Title', { onAfterSave: mockOnAfterSave });
             await confirmModal(user);
             await waitFor(() => expect(screen.queryByDisplayValue('Updated Title')).not.toBeInTheDocument());
             expect(screen.getByRole('button', { name: PDF_FILES_SECTION_TEXT.ACTIONS.EDIT })).toBeInTheDocument();

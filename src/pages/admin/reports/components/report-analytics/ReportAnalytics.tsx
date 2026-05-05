@@ -24,10 +24,12 @@ export const ReportAnalytics = () => {
     const [fundsExchangeRateDraft, setFundsExchangeRateDraft] = useState<string | null>();
     const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState(false);
     const [isDeleteCategoryModalOpen, setIsDeleteCategoryModalOpen] = useState(false);
+    const [isEditCategoryModalOpen, setIsEditCategoryModalOpen] = useState(false);
 
     const categoryContextMenuOptions: ContextMenuOption[] = useMemo(
         () => [
             { id: 'add-category', name: FUNDS_EXPENDITURES_TEXT.BUTTON.ADD_CATEGORY },
+            { id: 'edit-category', name: FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT_CATEGORY },
             { id: 'delete-category', name: FUNDS_EXPENDITURES_TEXT.BUTTON.DELETE_CATEGORY },
         ],
         [],
@@ -36,6 +38,8 @@ export const ReportAnalytics = () => {
     const handleCategoryContextMenuOption = useCallback((id: string) => {
         if (id === 'add-category') {
             setIsAddCategoryModalOpen(true);
+        } else if (id === 'edit-category') {
+            setIsEditCategoryModalOpen(true);
         } else if (id === 'delete-category') {
             setIsDeleteCategoryModalOpen(true);
         }
@@ -65,6 +69,8 @@ export const ReportAnalytics = () => {
                         onExchangeRateValueChange={setFundsExchangeRateDraft}
                         isAddCategoryModalOpen={isAddCategoryModalOpen}
                         onAddCategoryModalClose={() => setIsAddCategoryModalOpen(false)}
+                        isEditCategoryModalOpen={isEditCategoryModalOpen}
+                        onEditCategoryModalClose={() => setIsEditCategoryModalOpen(false)}
                         isDeleteCategoryModalOpen={isDeleteCategoryModalOpen}
                         onDeleteCategoryModalClose={() => setIsDeleteCategoryModalOpen(false)}
                     />

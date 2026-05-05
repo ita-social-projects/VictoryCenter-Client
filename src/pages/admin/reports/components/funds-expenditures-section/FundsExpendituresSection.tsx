@@ -33,6 +33,7 @@ import { AddFundsExpendituresRecordModal } from './components/common/add-funds-e
 import { AddFundsExpendituresCategoryModal } from './components/common/add-funds-expenditures-category-modal/AddFundsExpendituresCategoryModal';
 import { DeleteRecordModal } from './components/common/delete-record-modal/DeleteRecordModal';
 import { DeleteFundsExpendituresCategoryModal } from './components/common/delete-funds-expenditures-category-modal/DeleteFundsExpendituresCategoryModal';
+import { EditFundsExpendituresCategoryModal } from './components/common/edit-funds-expenditures-category-modal/EditFundsExpendituresCategoryModal';
 import styles from './FundsExpendituresSection.module.scss';
 
 const enrichRecords = (
@@ -55,6 +56,8 @@ interface FundsExpenditureSectionProps {
     onAddCategoryModalClose?: () => void;
     isDeleteCategoryModalOpen?: boolean;
     onDeleteCategoryModalClose?: () => void;
+    isEditCategoryModalOpen?: boolean;
+    onEditCategoryModalClose?: () => void;
 }
 
 export const FundsExpenditureSection = ({
@@ -66,6 +69,8 @@ export const FundsExpenditureSection = ({
     onAddCategoryModalClose,
     isDeleteCategoryModalOpen = false,
     onDeleteCategoryModalClose,
+    isEditCategoryModalOpen = false,
+    onEditCategoryModalClose,
 }: FundsExpenditureSectionProps = {}) => {
     const adminClient = useAdminClient();
     const { addToast } = useToast();
@@ -341,6 +346,23 @@ export const FundsExpenditureSection = ({
         [addToast, adminClient, refetchCategories],
     );
 
+    const handleEditCategory = useCallback(
+        async (categoryId: number, name: string): Promise<boolean> => {
+            const category = categories.find((c) => c.id === categoryId);
+            if (!category) return false;
+            try {
+                await FundsExpendituresApi.updateCategory(adminClient, categoryId, { name, type: category.type });
+                refetchCategories();
+                addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_UPDATED_SUCCESSFULLY, ToastType.Success);
+                return true;
+            } catch {
+                addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_UPDATE_FAILED_RETRY, ToastType.Error);
+                return false;
+            }
+        },
+        [addToast, adminClient, categories, refetchCategories],
+    );
+
     const handleDeleteCategory = useCallback(
         async (categoryId: number): Promise<boolean> => {
             try {
@@ -543,6 +565,13 @@ export const FundsExpenditureSection = ({
                 onClose={onAddCategoryModalClose ?? (() => {})}
                 categories={categories}
                 onSubmit={handleCreateCategory}
+            />
+
+            <EditFundsExpendituresCategoryModal
+                isOpen={isEditCategoryModalOpen}
+                onClose={onEditCategoryModalClose ?? (() => {})}
+                categories={categories}
+                onSubmit={handleEditCategory}
             />
 
             <DeleteFundsExpendituresCategoryModal

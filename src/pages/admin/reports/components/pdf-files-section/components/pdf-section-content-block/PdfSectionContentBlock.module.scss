@@ -63,6 +63,11 @@
     margin-right: 20px;
 }
 
+.buttons-container{
+    display: flex;
+    justify-content: space-between;
+}
+
 .action-buttons {
     display: flex;
     gap: 40px;

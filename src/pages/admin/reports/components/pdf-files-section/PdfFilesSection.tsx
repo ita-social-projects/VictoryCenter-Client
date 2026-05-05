@@ -17,7 +17,7 @@ import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/u
 import { TranslatePdfSectionModal } from '../translate-pdf-section-modal/TranslatePdfSectionModal';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
-const EMPTY_SECTION = { title: '', description: '' };
+const EMPTY_SECTION = { title: '', description: '', localizations: [] };
 
 export const PdfFilesSection = () => {
     const client = useAdminClient();
@@ -27,6 +27,15 @@ export const PdfFilesSection = () => {
     const [isDeleting, setIsDeleting] = useState(false);
     const [isRenaming, setIsRenaming] = useState(false);
     const [isTranslateModalOpen, setIsTranslateModalOpen] = useState(false);
+
+    const { translationLanguages } = useLocalizationToolkit({
+        setErrorState: useCallback(
+            (message: string) => {
+                addToast(message, ToastType.Error);
+            },
+            [addToast],
+        ),
+    });
 
     const fetchSection = useCallback(async () => {
         return PdfSectionApi.getPdfSection(client);
@@ -155,7 +164,7 @@ export const PdfFilesSection = () => {
             <div className={styles['top-section']}>
                 <PdfSectionContentBlock
                     content={sectionData ?? EMPTY_SECTION}
-                    onSave={handleSaveSection}
+                    onAfterSave={handleSaveSection}
                     translationLanguages={translationLanguages}
                     onTranslateClick={() => setIsTranslateModalOpen(true)}
                 />{' '}

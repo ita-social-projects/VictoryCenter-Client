@@ -14,9 +14,8 @@ export interface PdfSectionLocalizationDto extends PdfSectionLocalizableFields, 
     translationStatus: TranslationStatus;
 }
 
-export interface PdfSectionLocalization extends PdfSectionLocalizableFields {
+export interface PdfSectionLocalization extends PdfSectionLocalizableFields, EntityLocalizationDto {
     language: LocalizationLanguage;
-    translationStatus: TranslationStatus;
 }
 
 export interface CreatePdfSectionLocalizationDto extends PdfSectionLocalizableFields {

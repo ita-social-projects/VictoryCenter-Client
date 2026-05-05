@@ -15,10 +15,15 @@ jest.mock('@/hooks/common/use-data-fetch/useDataFetch');
 jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider');
 
 jest.mock('./components/pdf-section-content-block/PdfSectionContentBlock', () => ({
-    PdfSectionContentBlock: ({ onSave }: any) => (
-        <button data-testid="content-block" onClick={onSave}>
-            ContentBlock
-        </button>
+    PdfSectionContentBlock: ({ onSave, onTranslateClick }: any) => (
+        <div data-testid="content-block">
+            <button onClick={onSave} data-testid="content-block-save">
+                Save
+            </button>
+            <button onClick={onTranslateClick} data-testid="content-block-translate">
+                Translate
+            </button>
+        </div>
     ),
 }));
 
@@ -60,6 +65,20 @@ jest.mock('./components/pdf-dropzone/PdfDropzone', () => ({
 
 jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
     InlineLoader: () => <div data-testid="loader">Loading...</div>,
+}));
+
+jest.mock('../translate-pdf-section-modal/TranslatePdfSectionModal', () => ({
+    TranslatePdfSectionModal: ({ isOpen, onClose, pdfSection, onTranslatePdfSection }: any) =>
+        isOpen ? (
+            <div data-testid="translate-modal" onClick={onClose}>
+                <button
+                    data-testid="confirm-translate-btn"
+                    onClick={() => onTranslatePdfSection({ ...pdfSection, translated: true })}
+                >
+                    Confirm Translation
+                </button>
+            </div>
+        ) : null,
 }));
 
 describe('PdfFilesSection', () => {
@@ -326,6 +345,103 @@ describe('PdfFilesSection', () => {
         expect(screen.getByTestId('files-table')).toHaveTextContent('Files Count: 0');
         fireEvent.click(screen.getByTestId('dropzone'));
         expect(screen.getByTestId('files-table')).toHaveTextContent('Files Count: 1');
+    });
+
+    describe('Translation Modal', () => {
+        it('should open translation modal when translate button is clicked', async () => {
+            let callCount = 0;
+            (useDataFetch as jest.Mock).mockImplementation(() => {
+                callCount++;
+                if (callCount === 1) return { data: mockSectionData, isLoading: false, refetch: mockRefetch };
+                return { data: mockFilesResponse.items, isLoading: false, refetch: mockRefetch };
+            });
+
+            render(<PdfFilesSection />);
+
+            fireEvent.click(screen.getByTestId('content-block-translate'));
+
+            await waitFor(() => {
+                expect(screen.getByTestId('translate-modal')).toBeInTheDocument();
+            });
+        });
+
+        it('should close translation modal when onClose is called', async () => {
+            let callCount = 0;
+            (useDataFetch as jest.Mock).mockImplementation(() => {
+                callCount++;
+                if (callCount === 1) return { data: mockSectionData, isLoading: false, refetch: mockRefetch };
+                return { data: mockFilesResponse.items, isLoading: false, refetch: mockRefetch };
+            });
+
+            render(<PdfFilesSection />);
+
+            fireEvent.click(screen.getByTestId('content-block-translate'));
+
+            await waitFor(() => {
+                expect(screen.getByTestId('translate-modal')).toBeInTheDocument();
+            });
+
+            fireEvent.click(screen.getByTestId('translate-modal'));
+
+            await waitFor(() => {
+                expect(screen.queryByTestId('translate-modal')).not.toBeInTheDocument();
+            });
+        });
+
+        it('should show success toast when translation is saved', async () => {
+            let callCount = 0;
+            (useDataFetch as jest.Mock).mockImplementation(() => {
+                callCount++;
+                if (callCount === 1) return { data: mockSectionData, isLoading: false, refetch: mockRefetch };
+                return { data: mockFilesResponse.items, isLoading: false, refetch: mockRefetch };
+            });
+
+            render(<PdfFilesSection />);
+
+            fireEvent.click(screen.getByTestId('content-block-translate'));
+
+            await waitFor(() => {
+                expect(screen.getByTestId('translate-modal')).toBeInTheDocument();
+            });
+
+            fireEvent.click(screen.getByTestId('confirm-translate-btn'));
+
+            await waitFor(() => {
+                expect(mockAddToast).toHaveBeenCalledWith(
+                    expect.stringContaining('TRANSLATION_SAVED_SUCCESS'),
+                    ToastType.Success,
+                );
+            });
+        });
+
+        it('should update section data after successful translation', async () => {
+            const updatedSectionData = {
+                ...mockSectionData,
+                translated: true,
+            };
+
+            let callCount = 0;
+            (useDataFetch as jest.Mock).mockImplementation(() => {
+                callCount++;
+                if (callCount === 1)
+                    return { data: mockSectionData, isLoading: false, refetch: mockRefetch, setData: jest.fn() };
+                return { data: mockFilesResponse.items, isLoading: false, refetch: mockRefetch };
+            });
+
+            render(<PdfFilesSection />);
+
+            fireEvent.click(screen.getByTestId('content-block-translate'));
+
+            await waitFor(() => {
+                expect(screen.getByTestId('translate-modal')).toBeInTheDocument();
+            });
+
+            fireEvent.click(screen.getByTestId('confirm-translate-btn'));
+
+            await waitFor(() => {
+                expect(screen.queryByTestId('translate-modal')).not.toBeInTheDocument();
+            });
+        });
     });
 
     it('should refetch section on save', async () => {

@@ -19,15 +19,19 @@ import cn from 'classnames';
 import { ACTION_ICONS } from '@/const/common/action-icons';
 import { IconButton } from '@/components/admin/icon-button/IconButton';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
+import { LocalizationLanguage } from '@/types/common/language';
+import { PdfSectionLocalizationDto } from '@/types/admin/pdf-section';
 
 interface PdfSectionContent {
     title: string;
     description: string;
+    localizations: PdfSectionLocalizationDto[];
 }
 
 interface PdfSectionContentBlockProps {
     content: PdfSectionContent;
-    onSave?: () => Promise<void>;
+    onAfterSave?: () => Promise<void>;
     translationLanguages: LocalizationLanguage[];
     onTranslateClick?: () => void;
 }
@@ -36,7 +40,7 @@ type ConfirmationModalType = 'publish' | 'cancel' | null;
 
 export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({
     content,
-    onSave,
+    onAfterSave,
     translationLanguages,
     onTranslateClick,
 }) => {
@@ -112,8 +116,8 @@ export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({
 
             await PdfSectionApi.updatePdfSection(client, normalizedData);
 
-            if (onSave) {
-                await onSave(normalizedData);
+            if (onAfterSave) {
+                await onAfterSave();
             }
 
             setIsEditMode(false);
@@ -123,7 +127,7 @@ export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({
         } finally {
             setIsSaving(false);
         }
-    }, [formData.title, formData.description, client, onSave, addToast]);
+    }, [formData.title, formData.description, client, onAfterSave, addToast]);
 
     const handleConfirmPublish = useCallback(() => {
         setIsConfirmationModalOpen(false);

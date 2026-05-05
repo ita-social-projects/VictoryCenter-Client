@@ -5,6 +5,21 @@ import { TranslatePdfSectionModal } from './TranslatePdfSectionModal';
 import { PdfSection, PdfSectionLocalizationDto } from '@/types/admin/pdf-section';
 import { useTranslatePdfSection } from '@/hooks/admin/use-translate-pdf-section/useTranslatePdfSection';
 
+const mockDialog = (testId: string, onClose: () => void, children: React.ReactNode) => (
+    <div
+        data-testid={testId}
+        onClick={onClose}
+        role="dialog"
+        aria-modal="true"
+        tabIndex={0}
+        onKeyDown={(e) => {
+            if (e.key === 'Escape') onClose();
+        }}
+    >
+        {children}
+    </div>
+);
+
 jest.mock('@/components/admin/button/Button', () => ({
     Button: (props: any) => require('@/utils/test-mocks/test-mocks').MockButton(props),
 }));
@@ -14,21 +29,7 @@ jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
 }));
 
 jest.mock('@/components/common/modal/Modal', () => {
-    const Modal = ({ isOpen, children, onClose }: any) =>
-        isOpen ? (
-            <div
-                data-testid="modal"
-                onClick={onClose}
-                role="dialog"
-                aria-modal="true"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                    if (e.key === 'Escape') onClose();
-                }}
-            >
-                {children}
-            </div>
-        ) : null;
+    const Modal = ({ isOpen, children, onClose }: any) => (isOpen ? mockDialog('modal', onClose, children) : null);
 
     Modal.Title = ({ children }: any) => <div data-testid="modal-title">{children}</div>;
     Modal.Content = ({ children }: any) => <div data-testid="modal-content">{children}</div>;
@@ -38,22 +39,25 @@ jest.mock('@/components/common/modal/Modal', () => {
 });
 
 jest.mock('@/components/admin/localization-modal/LocalizationModal', () => ({
-    LocalizationModal: ({ onClose, title, onSave, isSubmitting, isFormValid, children }: any) => (
-        <div data-testid="localization-modal" onClick={onClose} role="dialog" aria-modal="true">
-            <div data-testid="modal-title">{title}</div>
-            <div data-testid="modal-content">{children}</div>
-            <button
-                data-testid="save-localization-btn"
-                onClick={(e) => {
-                    e.stopPropagation();
-                    onSave();
-                }}
-                disabled={!isFormValid || isSubmitting}
-            >
-                Save
-            </button>
-        </div>
-    ),
+    LocalizationModal: ({ onClose, title, onSave, isSubmitting, isFormValid, children }: any) =>
+        mockDialog(
+            'localization-modal',
+            onClose,
+            <>
+                <div data-testid="modal-title">{title}</div>
+                <div data-testid="modal-content">{children}</div>
+                <button
+                    data-testid="save-localization-btn"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onSave();
+                    }}
+                    disabled={!isFormValid || isSubmitting}
+                >
+                    Save
+                </button>
+            </>,
+        ),
 }));
 
 jest.mock('@/components/admin/translation-controls/TranslationControls', () => ({

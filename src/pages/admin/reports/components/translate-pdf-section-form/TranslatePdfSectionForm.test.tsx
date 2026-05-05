@@ -73,6 +73,13 @@ const makeAsyncSubmit = () => {
     return { onSubmit, resolve: () => resolveFn() };
 };
 
+const expectErrorOnBlur = async (testId: string, errorTestId: string) => {
+    fireEvent.blur(screen.getByTestId(testId));
+    await waitFor(() => {
+        expect(screen.getByTestId(errorTestId)).toBeInTheDocument();
+    });
+};
+
 describe('TranslatePdfSectionForm', () => {
     afterEach(() => {
         jest.clearAllMocks();
@@ -164,31 +171,19 @@ describe('TranslatePdfSectionForm', () => {
         it('should show error when title is empty on blur', async () => {
             renderForm();
 
-            fireEvent.blur(screen.getByTestId('input-title'));
-
-            await waitFor(() => {
-                expect(screen.getByTestId('error-title')).toBeInTheDocument();
-            });
+            await expectErrorOnBlur('input-title', 'error-title');
         });
 
         it('should show error when description is empty on blur', async () => {
             renderForm();
 
-            fireEvent.blur(screen.getByTestId('textarea-description'));
-
-            await waitFor(() => {
-                expect(screen.getByTestId('error-description')).toBeInTheDocument();
-            });
+            await expectErrorOnBlur('textarea-description', 'error-description');
         });
 
         it('should clear error when field is filled', async () => {
             renderForm();
 
-            fireEvent.blur(screen.getByTestId('input-title'));
-
-            await waitFor(() => {
-                expect(screen.getByTestId('error-title')).toBeInTheDocument();
-            });
+            await expectErrorOnBlur('input-title', 'error-title');
 
             fireEvent.change(screen.getByTestId('input-title'), {
                 target: { value: 'Valid Title' },
@@ -334,13 +329,7 @@ describe('TranslatePdfSectionForm', () => {
 
             const { ref } = renderForm({ onSubmit });
 
-            fireEvent.change(screen.getByTestId('input-title'), {
-                target: { value: 'Title' },
-            });
-
-            fireEvent.change(screen.getByTestId('textarea-description'), {
-                target: { value: 'Description' },
-            });
+            fillForm();
 
             const submitPromise2 = act(async () => {
                 await ref.current?.submit();
@@ -386,13 +375,7 @@ describe('TranslatePdfSectionForm', () => {
             const { onSubmit, resolve } = makeAsyncSubmit();
             const { ref } = renderForm({ onSubmit });
 
-            fireEvent.change(screen.getByTestId('input-title'), {
-                target: { value: 'Title' },
-            });
-
-            fireEvent.change(screen.getByTestId('textarea-description'), {
-                target: { value: 'Description' },
-            });
+            fillForm();
 
             const submitCall = act(async () => {
                 await ref.current?.submit();

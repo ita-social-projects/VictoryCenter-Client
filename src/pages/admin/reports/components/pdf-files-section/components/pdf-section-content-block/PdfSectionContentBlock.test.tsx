@@ -31,6 +31,7 @@ const mockUseToast = useToast as jest.MockedFunction<typeof useToast>;
 const MOCK_CONTENT = {
     title: 'Test Section Title',
     description: 'Test Section Description',
+    localizations: [],
 };
 
 async function enterEditMode(user: ReturnType<typeof userEvent.setup>) {
@@ -62,7 +63,7 @@ async function openPublishModal(
     title = 'Updated Title',
     props: Partial<React.ComponentProps<typeof PdfSectionContentBlock>> = {},
 ) {
-    render(<PdfSectionContentBlock content={MOCK_CONTENT} {...props} />);
+    render(<PdfSectionContentBlock content={MOCK_CONTENT} {...props} translationLanguages={[]} />);
     await enterEditMode(user);
     await changeTitle(user, title);
     await clickPublish(user);
@@ -79,7 +80,7 @@ describe('PdfSectionContentBlock', () => {
 
     describe('View Mode', () => {
         it('should render title and description in view mode', () => {
-            render(<PdfSectionContentBlock content={MOCK_CONTENT} />);
+            render(<PdfSectionContentBlock content={MOCK_CONTENT} translationLanguages={[]} />);
             expect(screen.getByText(PDF_FILES_SECTION_TEXT.TITLE)).toBeInTheDocument();
             expect(screen.getByText(MOCK_CONTENT.title)).toBeInTheDocument();
             expect(screen.getByText(PDF_FILES_SECTION_TEXT.DESCRIPTION)).toBeInTheDocument();
@@ -87,19 +88,19 @@ describe('PdfSectionContentBlock', () => {
         });
 
         it('should apply correct classes for view mode', () => {
-            const { container } = render(<PdfSectionContentBlock content={MOCK_CONTENT} />);
+            const { container } = render(<PdfSectionContentBlock content={MOCK_CONTENT} translationLanguages={[]} />);
             expect(container.firstChild).toHaveClass('root', 'view-root');
             expect(screen.getByText(MOCK_CONTENT.title)).toHaveClass('view-text', 'view-text-title');
         });
 
         it('should render edit button', () => {
-            render(<PdfSectionContentBlock content={MOCK_CONTENT} />);
+            render(<PdfSectionContentBlock content={MOCK_CONTENT} translationLanguages={[]} />);
             expect(screen.getByRole('button', { name: PDF_FILES_SECTION_TEXT.ACTIONS.EDIT })).toBeInTheDocument();
         });
     });
 
     async function renderAndEnterEditMode(): Promise<ReturnType<typeof userEvent.setup>> {
-        render(<PdfSectionContentBlock content={MOCK_CONTENT} />);
+        render(<PdfSectionContentBlock content={MOCK_CONTENT} translationLanguages={[]} />);
         const user = userEvent.setup();
         await enterEditMode(user);
         return user;
@@ -107,7 +108,7 @@ describe('PdfSectionContentBlock', () => {
 
     describe('Edit Mode', () => {
         it('should switch to edit mode when edit button is clicked', async () => {
-            render(<PdfSectionContentBlock content={MOCK_CONTENT} />);
+            render(<PdfSectionContentBlock content={MOCK_CONTENT} translationLanguages={[]} />);
             const user = userEvent.setup();
             await enterEditMode(user);
             expect(screen.getByDisplayValue(MOCK_CONTENT.title)).toBeInTheDocument();
@@ -150,17 +151,12 @@ describe('PdfSectionContentBlock', () => {
             expect(screen.getByText(MOCK_CONTENT.title)).toBeInTheDocument();
         });
 
-        it('should call onSave when publish button is clicked with valid data', async () => {
-            const mockOnSave = jest.fn().mockResolvedValue(undefined);
+        it('should call onAfterSave when publish button is clicked with valid data', async () => {
+            const mockOnAfterSave = jest.fn().mockResolvedValue(undefined);
             const user = userEvent.setup();
-            await openPublishModal(user, 'Updated Title', { onSave: mockOnSave });
+            await openPublishModal(user, 'Updated Title', { onAfterSave: mockOnAfterSave });
             await confirmModal(user);
-            await waitFor(() =>
-                expect(mockOnSave).toHaveBeenCalledWith({
-                    title: 'Updated Title',
-                    description: MOCK_CONTENT.description,
-                }),
-            );
+            await waitFor(() => expect(mockOnAfterSave).toHaveBeenCalled());
         });
 
         it('should have character counters for both fields', async () => {
@@ -178,34 +174,29 @@ describe('PdfSectionContentBlock', () => {
         });
 
         it('should close modal and not save when clicking НІ button', async () => {
-            const mockOnSave = jest.fn().mockResolvedValue(undefined);
+            const mockOnAfterSave = jest.fn().mockResolvedValue(undefined);
             const user = userEvent.setup();
-            await openPublishModal(user, 'Updated Title', { onSave: mockOnSave });
+            await openPublishModal(user, 'Updated Title', { onAfterSave: mockOnAfterSave });
             const modal = await screen.findByTestId('confirmation-modal');
             await user.click(screen.getByText('НІ'));
             await waitFor(() => expect(modal).not.toBeInTheDocument());
-            expect(mockOnSave).not.toHaveBeenCalled();
+            expect(mockOnAfterSave).not.toHaveBeenCalled();
             expect(mockAddToast).not.toHaveBeenCalled();
         });
 
         it('should save and show success toast when clicking ТАК button', async () => {
-            const mockOnSave = jest.fn().mockResolvedValue(undefined);
+            const mockOnAfterSave = jest.fn().mockResolvedValue(undefined);
             const user = userEvent.setup();
-            await openPublishModal(user, 'Updated Title', { onSave: mockOnSave });
+            await openPublishModal(user, 'Updated Title', { onAfterSave: mockOnAfterSave });
             await confirmModal(user);
-            await waitFor(() =>
-                expect(mockOnSave).toHaveBeenCalledWith({
-                    title: 'Updated Title',
-                    description: MOCK_CONTENT.description,
-                }),
-            );
+            await waitFor(() => expect(mockOnAfterSave).toHaveBeenCalled());
             expect(mockAddToast).toHaveBeenCalledWith('Зміни успішно опубліковані', ToastType.Success);
         });
 
         it('should revert to view mode after successful save', async () => {
-            const mockOnSave = jest.fn().mockResolvedValue(undefined);
+            const mockOnAfterSave = jest.fn().mockResolvedValue(undefined);
             const user = userEvent.setup();
-            await openPublishModal(user, 'Updated Title', { onSave: mockOnSave });
+            await openPublishModal(user, 'Updated Title', { onAfterSave: mockOnAfterSave });
             await confirmModal(user);
             await waitFor(() => expect(screen.queryByDisplayValue('Updated Title')).not.toBeInTheDocument());
             expect(screen.getByRole('button', { name: PDF_FILES_SECTION_TEXT.ACTIONS.EDIT })).toBeInTheDocument();
@@ -264,13 +255,19 @@ describe('PdfSectionContentBlock', () => {
 
     describe('Translation Features', () => {
         it('should render translate button in view mode', () => {
-            render(<PdfSectionContentBlock content={MOCK_CONTENT} />);
+            render(<PdfSectionContentBlock content={MOCK_CONTENT} translationLanguages={[]} />);
             expect(screen.getByRole('button', { name: PDF_FILES_SECTION_TEXT.ACTIONS.TRANSLATE })).toBeInTheDocument();
         });
 
         it('should call onTranslateClick when translate button is clicked', async () => {
             const onTranslateClick = jest.fn();
-            render(<PdfSectionContentBlock content={MOCK_CONTENT} onTranslateClick={onTranslateClick} />);
+            render(
+                <PdfSectionContentBlock
+                    content={MOCK_CONTENT}
+                    onTranslateClick={onTranslateClick}
+                    translationLanguages={[]}
+                />,
+            );
 
             const user = userEvent.setup();
             await user.click(screen.getByRole('button', { name: PDF_FILES_SECTION_TEXT.ACTIONS.TRANSLATE }));
@@ -294,12 +291,10 @@ describe('PdfSectionContentBlock', () => {
         });
 
         it('should not call onTranslateClick if prop is not provided', async () => {
-            render(<PdfSectionContentBlock content={MOCK_CONTENT} />);
+            render(<PdfSectionContentBlock content={MOCK_CONTENT} translationLanguages={[]} />);
 
             const user = userEvent.setup();
             await user.click(screen.getByRole('button', { name: PDF_FILES_SECTION_TEXT.ACTIONS.TRANSLATE }));
-
-            // No error should occur
         });
     });
 });

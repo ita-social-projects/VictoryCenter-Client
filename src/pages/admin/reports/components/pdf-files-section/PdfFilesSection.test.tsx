@@ -7,6 +7,8 @@ import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { ToastType } from '@/types/admin/toast';
 import { PDF_FILES_SECTION_TEXT } from '@/const/admin/reports';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient');
 jest.mock('@/services/api/admin/reports/pdf-section/pdf-section-api');
@@ -15,9 +17,9 @@ jest.mock('@/hooks/common/use-data-fetch/useDataFetch');
 jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider');
 
 jest.mock('./components/pdf-section-content-block/PdfSectionContentBlock', () => ({
-    PdfSectionContentBlock: ({ onSave, onTranslateClick }: any) => (
+    PdfSectionContentBlock: ({ onAfterSave, onTranslateClick }: any) => (
         <div data-testid="content-block">
-            <button onClick={onSave} data-testid="content-block-save">
+            <button onClick={onAfterSave} data-testid="content-block-save">
                 Save
             </button>
             <button onClick={onTranslateClick} data-testid="content-block-translate">
@@ -81,6 +83,10 @@ jest.mock('../translate-pdf-section-modal/TranslatePdfSectionModal', () => ({
         ) : null,
 }));
 
+jest.mock('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit', () => ({
+    useLocalizationToolkit: jest.fn(),
+}));
+
 describe('PdfFilesSection', () => {
     const mockClient = { get: jest.fn() };
     const mockAddToast = jest.fn();
@@ -101,6 +107,7 @@ describe('PdfFilesSection', () => {
         (useAdminClient as jest.Mock).mockReturnValue(mockClient);
         (useToast as jest.Mock).mockReturnValue({ addToast: mockAddToast });
         mockCreateObjectURL.mockReturnValue('blob:http://localhost/mock-blob-url');
+        (useLocalizationToolkit as jest.Mock).mockReturnValue({ translationLanguages: [] }); // ← додати цей рядок
     });
 
     afterEach(() => {
@@ -352,10 +359,11 @@ describe('PdfFilesSection', () => {
             let callCount = 0;
             (useDataFetch as jest.Mock).mockImplementation(() => {
                 callCount++;
-                if (callCount === 1) return { data: mockSectionData, isLoading: false, refetch: mockRefetch };
+                if (callCount % 2 === 1) {
+                    return { data: mockSectionData, isLoading: false, refetch: mockRefetch, setData: jest.fn() };
+                }
                 return { data: mockFilesResponse.items, isLoading: false, refetch: mockRefetch };
             });
-
             render(<PdfFilesSection />);
 
             fireEvent.click(screen.getByTestId('content-block-translate'));
@@ -369,10 +377,11 @@ describe('PdfFilesSection', () => {
             let callCount = 0;
             (useDataFetch as jest.Mock).mockImplementation(() => {
                 callCount++;
-                if (callCount === 1) return { data: mockSectionData, isLoading: false, refetch: mockRefetch };
+                if (callCount % 2 === 1) {
+                    return { data: mockSectionData, isLoading: false, refetch: mockRefetch, setData: jest.fn() };
+                }
                 return { data: mockFilesResponse.items, isLoading: false, refetch: mockRefetch };
             });
-
             render(<PdfFilesSection />);
 
             fireEvent.click(screen.getByTestId('content-block-translate'));
@@ -392,10 +401,11 @@ describe('PdfFilesSection', () => {
             let callCount = 0;
             (useDataFetch as jest.Mock).mockImplementation(() => {
                 callCount++;
-                if (callCount === 1) return { data: mockSectionData, isLoading: false, refetch: mockRefetch };
+                if (callCount % 2 === 1) {
+                    return { data: mockSectionData, isLoading: false, refetch: mockRefetch, setData: jest.fn() };
+                }
                 return { data: mockFilesResponse.items, isLoading: false, refetch: mockRefetch };
             });
-
             render(<PdfFilesSection />);
 
             fireEvent.click(screen.getByTestId('content-block-translate'));
@@ -408,23 +418,19 @@ describe('PdfFilesSection', () => {
 
             await waitFor(() => {
                 expect(mockAddToast).toHaveBeenCalledWith(
-                    expect.stringContaining('TRANSLATION_SAVED_SUCCESS'),
+                    COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS,
                     ToastType.Success,
                 );
             });
         });
 
         it('should update section data after successful translation', async () => {
-            const updatedSectionData = {
-                ...mockSectionData,
-                translated: true,
-            };
+            const mockSetData = jest.fn();
 
-            let callCount = 0;
-            (useDataFetch as jest.Mock).mockImplementation(() => {
-                callCount++;
-                if (callCount === 1)
-                    return { data: mockSectionData, isLoading: false, refetch: mockRefetch, setData: jest.fn() };
+            (useDataFetch as jest.Mock).mockImplementation(({ initialData }) => {
+                if (initialData === null) {
+                    return { data: mockSectionData, isLoading: false, refetch: mockRefetch, setData: mockSetData };
+                }
                 return { data: mockFilesResponse.items, isLoading: false, refetch: mockRefetch };
             });
 
@@ -437,6 +443,10 @@ describe('PdfFilesSection', () => {
             });
 
             fireEvent.click(screen.getByTestId('confirm-translate-btn'));
+
+            await waitFor(() => {
+                expect(mockSetData).toHaveBeenCalledWith(expect.objectContaining({ translated: true }));
+            });
 
             await waitFor(() => {
                 expect(screen.queryByTestId('translate-modal')).not.toBeInTheDocument();
@@ -453,7 +463,7 @@ describe('PdfFilesSection', () => {
         });
 
         render(<PdfFilesSection />);
-        fireEvent.click(screen.getByTestId('content-block'));
+        fireEvent.click(screen.getByTestId('content-block-save'));
 
         await waitFor(() => {
             expect(mockRefetch).toHaveBeenCalled();
@@ -463,7 +473,7 @@ describe('PdfFilesSection', () => {
     it('should revoke object URL after opening PDF', async () => {
         jest.useFakeTimers();
         const mockPdfBlob = new Blob(['PDF content'], { type: 'application/pdf' });
-        mockWindowOpen.mockReturnValueOnce({}); // openedWindow є об'єктом (truthy)
+        mockWindowOpen.mockReturnValueOnce({});
 
         let callCount = 0;
         (useDataFetch as jest.Mock).mockImplementation(() => {

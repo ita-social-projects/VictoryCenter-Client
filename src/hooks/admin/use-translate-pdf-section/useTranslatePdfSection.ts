@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PDF_FILES_SECTION_TEXT, REPORTS_TEXT } from '@/const/admin/reports';
+import { PDF_FILES_SECTION_TEXT } from '@/const/admin/reports';
 import { PdfSection } from '@/types/admin/pdf-section';
 import { LocalizationLanguage } from '@/types/common/language';
 import { useAdminClient } from '../use-admin-client/useAdminClient';

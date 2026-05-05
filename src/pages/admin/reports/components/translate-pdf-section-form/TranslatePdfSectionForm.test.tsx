@@ -1,6 +1,5 @@
-import React, { createRef } from 'react';
+import { createRef } from 'react';
 import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { TranslatePdfSectionForm, TranslatePdfSectionFormRef } from './TranslatePdfSectionForm';
 
@@ -167,7 +166,7 @@ describe('TranslatePdfSectionForm', () => {
 
             await waitFor(() => {
                 expect(screen.getByTestId('textarea-description')).toHaveValue('Updated description');
-                expect(screen.getByTestId('counter-description')).toHaveTextContent('18 / 200');
+                expect(screen.getByTestId('counter-description')).toHaveTextContent('19 / 200');
             });
         });
 

@@ -1,4 +1,4 @@
-import { TranslationStatus, LocalizationLanguage, EntityLocalizationDto } from '@/types/common/language';
+import { LocalizationLanguage, EntityLocalizationDto } from '@/types/common/language';
 
 export interface PdfSectionLocalizableFields {
     title: string;
@@ -11,7 +11,6 @@ export interface PdfSection extends PdfSectionLocalizableFields {
 
 export interface PdfSectionLocalizationDto extends PdfSectionLocalizableFields, EntityLocalizationDto {
     languageId: number;
-    translationStatus: TranslationStatus;
 }
 
 export interface PdfSectionLocalization extends PdfSectionLocalizableFields, EntityLocalizationDto {

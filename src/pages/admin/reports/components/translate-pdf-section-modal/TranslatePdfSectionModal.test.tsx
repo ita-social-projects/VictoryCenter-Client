@@ -1,11 +1,9 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { TranslatePdfSectionModal } from './TranslatePdfSectionModal';
 import { PdfSection } from '@/types/admin/pdf-section';
 import { useTranslatePdfSection } from '@/hooks/admin/use-translate-pdf-section/useTranslatePdfSection';
-import { ModalMode } from '@/types/admin/common';
 
 jest.mock('@/components/admin/button/Button', () => ({
     Button: (props: any) => require('@/utils/test-mocks/test-mocks').MockButton(props),
@@ -40,7 +38,7 @@ jest.mock('@/components/common/modal/Modal', () => {
 });
 
 jest.mock('@/components/admin/localization-modal/LocalizationModal', () => ({
-    LocalizationModal: ({ isOpen, onClose, title, onSave, isSubmitting, isFormValid, children }: any) => (
+    LocalizationModal: ({ onClose, title, onSave, isSubmitting, isFormValid, children }: any) => (
         <div data-testid="localization-modal" onClick={onClose} role="dialog" aria-modal="true">
             <div data-testid="modal-title">{title}</div>
             <div data-testid="modal-content">{children}</div>
@@ -192,7 +190,7 @@ describe('TranslatePdfSectionModal', () => {
             renderModal();
 
             const select = screen.getByTestId('language-select');
-            expect(select).toHaveValue('2'); // English id
+            expect(select).toHaveValue('2');
         });
 
         it('should allow language change', async () => {
@@ -202,7 +200,7 @@ describe('TranslatePdfSectionModal', () => {
             const select = screen.getByTestId('language-select');
             await user.selectOptions(select, '1');
 
-            expect(select).toHaveValue('1'); // Ukrainian
+            expect(select).toHaveValue('1');
         });
     });
 
@@ -326,7 +324,6 @@ describe('TranslatePdfSectionModal', () => {
                 />,
             );
 
-            // Simulate form becoming invalid
             rerender(
                 <TranslatePdfSectionModal
                     isOpen={true}

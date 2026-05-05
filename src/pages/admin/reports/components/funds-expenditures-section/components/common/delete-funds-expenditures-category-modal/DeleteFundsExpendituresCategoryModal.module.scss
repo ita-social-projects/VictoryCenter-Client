@@ -81,10 +81,16 @@
     width: 100%;
 }
 
+.labelRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
 .label {
     @include type.small-text-medium;
     color: c.$bluish-black;
-    margin-bottom: 8px;
 }
 
 .selectContainer {
@@ -110,7 +116,7 @@
 .type {
     @include type.small-text-regular;
     margin: 0;
-    color: c.$grey-900;
+    color: c.$blue-900;
 }
 
 .actions {
@@ -118,6 +124,14 @@
     display: flex;
     gap: 24px;
     justify-content: center;
+}
+
+.deleteButton {
+    background-color: c.$blue-900;
+
+    &:disabled {
+        background-color: c.$grey-700;
+    }
 }
 
 @media (max-width: 768px) {

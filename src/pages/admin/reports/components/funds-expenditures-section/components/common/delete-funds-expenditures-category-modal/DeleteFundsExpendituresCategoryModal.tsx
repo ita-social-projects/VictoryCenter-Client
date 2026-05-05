@@ -84,9 +84,18 @@ export const DeleteFundsExpendituresCategoryModal = ({
                     <div className={styles.content}>
                         <div className={styles.panel}>
                             <div className={styles.field}>
-                                <label className={styles.label}>
-                                    {FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.CATEGORY_LABEL}
-                                </label>
+                                <div className={styles.labelRow}>
+                                    <label className={styles.label}>
+                                        {FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.CATEGORY_LABEL}
+                                    </label>
+                                    {selectedCategory && (
+                                        <span className={styles.type}>
+                                            {selectedCategory.type === 'income'
+                                                ? FUNDS_EXPENDITURES_TEXT.TABLE.TYPE_LABELS.INCOME
+                                                : FUNDS_EXPENDITURES_TEXT.TABLE.TYPE_LABELS.EXPENSE}
+                                        </span>
+                                    )}
+                                </div>
                                 <Select<number | undefined>
                                     value={selectedCategoryId}
                                     onValueChange={(val) => setSelectedCategoryId(val as number)}
@@ -100,14 +109,6 @@ export const DeleteFundsExpendituresCategoryModal = ({
                                 </Select>
                             </div>
 
-                            {selectedCategory && (
-                                <p className={styles.type}>
-                                    {selectedCategory.type === 'income'
-                                        ? FUNDS_EXPENDITURES_TEXT.TABLE.TYPE_LABELS.INCOME
-                                        : FUNDS_EXPENDITURES_TEXT.TABLE.TYPE_LABELS.EXPENSE}
-                                </p>
-                            )}
-
                             {recordError && <HintBox title={recordError} />}
                         </div>
                     </div>
@@ -118,7 +119,12 @@ export const DeleteFundsExpendituresCategoryModal = ({
                         <Button buttonStyle="secondary" onClick={handleClose} disabled={isSubmitting}>
                             {COMMON_TEXT_ADMIN.BUTTON.CANCEL}
                         </Button>
-                        <Button buttonStyle="primary" onClick={handleDeleteClick} disabled={isDeleteDisabled}>
+                        <Button
+                            buttonStyle="primary"
+                            onClick={handleDeleteClick}
+                            disabled={isDeleteDisabled}
+                            className={styles.deleteButton}
+                        >
                             {COMMON_TEXT_ADMIN.BUTTON.DELETE}
                         </Button>
                     </div>

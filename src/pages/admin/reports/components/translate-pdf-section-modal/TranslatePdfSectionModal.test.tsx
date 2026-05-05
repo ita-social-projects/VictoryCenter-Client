@@ -2,7 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { TranslatePdfSectionModal } from './TranslatePdfSectionModal';
-import { PdfSection } from '@/types/admin/pdf-section';
+import { PdfSection, PdfSectionLocalizationDto } from '@/types/admin/pdf-section';
 import { useTranslatePdfSection } from '@/hooks/admin/use-translate-pdf-section/useTranslatePdfSection';
 
 jest.mock('@/components/admin/button/Button', () => ({
@@ -153,6 +153,7 @@ describe('TranslatePdfSectionModal', () => {
             translatePdfSection: mockTranslatePdfSection,
             isSubmitting: false,
             error: '',
+            clearError: jest.fn(),
         });
     });
 
@@ -232,6 +233,7 @@ describe('TranslatePdfSectionModal', () => {
                 translatePdfSection: mockTranslatePdfSection,
                 isSubmitting: true,
                 error: '',
+                clearError: jest.fn(),
             });
 
             renderModal();
@@ -245,6 +247,7 @@ describe('TranslatePdfSectionModal', () => {
                 translatePdfSection: mockTranslatePdfSection,
                 isSubmitting: true,
                 error: '',
+                clearError: jest.fn(),
             });
 
             renderModal();
@@ -275,7 +278,8 @@ describe('TranslatePdfSectionModal', () => {
                         title: 'Existing Translation',
                         description: 'Existing Description',
                         translationStatus: 1,
-                    },
+                        localizationInfoDto: {} as any,
+                    } as PdfSectionLocalizationDto,
                 ],
             };
 
@@ -283,6 +287,7 @@ describe('TranslatePdfSectionModal', () => {
                 translatePdfSection: mockTranslatePdfSection,
                 isSubmitting: false,
                 error: '',
+                clearError: jest.fn(),
             });
 
             renderModal({ pdfSection: pdfSectionWithLocalization });
@@ -298,6 +303,7 @@ describe('TranslatePdfSectionModal', () => {
                 translatePdfSection: mockTranslatePdfSection,
                 isSubmitting: false,
                 error: 'Failed to translate',
+                clearError: jest.fn(),
             });
 
             renderModal();
@@ -312,6 +318,7 @@ describe('TranslatePdfSectionModal', () => {
                 translatePdfSection: mockTranslatePdfSection,
                 isSubmitting: false,
                 error: '',
+                clearError: jest.fn(),
             });
 
             const { rerender } = render(

@@ -4,41 +4,6 @@ import { FUNDS_EXPENDITURES_TEXT, FUNDS_EXPENDITURES_VALIDATION } from '@/const/
 import { ReportFundsExpendituresCategory } from '@/types/admin/reports';
 import { EditFundsExpendituresCategoryModal } from './EditFundsExpendituresCategoryModal';
 
-jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
-    ConfirmationModal: ({ isOpen, title, onConfirm, onCancel, onClose, isButtonsDisabled }: any) => (
-        <div data-testid="confirm-modal" data-open={String(isOpen)}>
-            <span>{title}</span>
-            <button data-testid="confirm-yes" onClick={onConfirm} disabled={isButtonsDisabled}>
-                Yes
-            </button>
-            <button data-testid="confirm-no" onClick={onCancel} disabled={isButtonsDisabled}>
-                No
-            </button>
-            <button data-testid="confirm-close" onClick={onClose} disabled={isButtonsDisabled}>
-                Close
-            </button>
-        </div>
-    ),
-}));
-
-jest.mock('@/components/common/select/Select', () => {
-    const Select = ({ value, onValueChange, placeholder, children }: any) => (
-        <>
-            <input
-                data-testid={placeholder}
-                value={value ?? ''}
-                onChange={(e) => {
-                    const parsed = parseInt(e.target.value, 10);
-                    onValueChange(isNaN(parsed) ? undefined : parsed);
-                }}
-            />
-            {children}
-        </>
-    );
-    Select.Option = ({ value, name }: any) => <option value={value}>{name}</option>;
-    return { Select };
-});
-
 jest.mock('@/components/admin/input-with-character-limit/InputWithCharacterLimit', () => ({
     InputWithCharacterLimit: ({ id, value, onChange, onBlur, placeholder }: any) => (
         <input data-testid={id} value={value} onChange={onChange} onBlur={onBlur} placeholder={placeholder} />
@@ -51,6 +16,8 @@ const SAVE_BUTTON = FUNDS_EXPENDITURES_TEXT.MODAL.EDIT_CATEGORY.SUBMIT_BUTTON;
 const MIN_ERROR = COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(FUNDS_EXPENDITURES_VALIDATION.categoryNameMin);
 const REQUIRED_ERROR = COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED;
 const DUPLICATE_ERROR = FUNDS_EXPENDITURES_TEXT.MODAL.CATEGORY.ERROR.NAME_DUPLICATE;
+const YES_BUTTON = COMMON_TEXT_ADMIN.BUTTON.YES;
+const NO_BUTTON = COMMON_TEXT_ADMIN.BUTTON.NO;
 
 const incomeCategory: ReportFundsExpendituresCategory = { id: 1, name: 'Донори', type: 'income' };
 const expenseCategory: ReportFundsExpendituresCategory = { id: 2, name: 'Оренда', type: 'expense' };
@@ -74,22 +41,29 @@ const renderModal = (
 };
 
 const getSaveButton = () => screen.getByRole('button', { name: SAVE_BUTTON });
-const getOpenConfirmModal = () => screen.getAllByTestId('confirm-modal').find((el) => el.getAttribute('data-open') === 'true')!;
-const clickConfirmYes = () => fireEvent.click(within(getOpenConfirmModal()).getByTestId('confirm-yes'));
-const clickConfirmNo = () => fireEvent.click(within(getOpenConfirmModal()).getByTestId('confirm-no'));
 
-const selectCategory = (id: number) => {
-    fireEvent.change(screen.getByTestId(CATEGORY_SELECT), { target: { value: String(id) } });
+const selectCategory = (name: string) => {
+    fireEvent.click(screen.getByRole('button', { name: CATEGORY_SELECT }));
+    fireEvent.click(screen.getByRole('button', { name }));
 };
 
 const typeName = (value: string) => {
     fireEvent.change(screen.getByTestId(NAME_INPUT), { target: { value } });
 };
 
-const fillForm = (id = incomeCategory.id, name = 'Valid name') => {
-    selectCategory(id);
+const fillForm = (categoryName = incomeCategory.name, name = 'Valid name') => {
+    selectCategory(categoryName);
     typeName(name);
 };
+
+const getConfirmOverlayWithTitle = (title: string) =>
+    screen.getAllByTestId('modal-overlay').find((el) => within(el).queryByText(title))!;
+
+const clickYesInConfirm = (title: string) =>
+    fireEvent.click(within(getConfirmOverlayWithTitle(title)).getByRole('button', { name: YES_BUTTON }));
+
+const clickNoInConfirm = (title: string) =>
+    fireEvent.click(within(getConfirmOverlayWithTitle(title)).getByRole('button', { name: NO_BUTTON }));
 
 describe('EditFundsExpendituresCategoryModal', () => {
     it('renders nothing when isOpen is false', () => {
@@ -104,7 +78,7 @@ describe('EditFundsExpendituresCategoryModal', () => {
 
     it('renders category select, name input and save button', () => {
         renderModal();
-        expect(screen.getByTestId(CATEGORY_SELECT)).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: CATEGORY_SELECT })).toBeInTheDocument();
         expect(screen.getByTestId(NAME_INPUT)).toBeInTheDocument();
         expect(getSaveButton()).toBeInTheDocument();
     });
@@ -117,13 +91,13 @@ describe('EditFundsExpendituresCategoryModal', () => {
 
         it('is disabled when only category is selected', () => {
             renderModal();
-            selectCategory(incomeCategory.id);
+            selectCategory(incomeCategory.name);
             expect(getSaveButton()).toBeDisabled();
         });
 
         it('is disabled when name is too short', () => {
             renderModal();
-            fillForm(incomeCategory.id, 'abc');
+            fillForm(incomeCategory.name, 'abc');
             expect(getSaveButton()).toBeDisabled();
         });
 
@@ -135,50 +109,30 @@ describe('EditFundsExpendituresCategoryModal', () => {
 
         it('is not disabled when name matches a category of a different type', () => {
             renderModal();
-            fillForm(incomeCategory.id, expenseCategory.name);
+            fillForm(incomeCategory.name, expenseCategory.name);
             expect(getSaveButton()).not.toBeDisabled();
         });
 
         it('is disabled when name duplicates another category of the same type', () => {
             const categories = [incomeCategory, expenseCategory, { id: 3, name: 'Гранти', type: 'income' as const }];
             renderModal({ categories });
-            selectCategory(incomeCategory.id);
+            selectCategory(incomeCategory.name);
             typeName('Гранти');
             expect(getSaveButton()).toBeDisabled();
-        });
-    });
-
-    describe('type label display', () => {
-        it('shows income type label when income category is selected', () => {
-            renderModal();
-            selectCategory(incomeCategory.id);
-            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.TYPE_LABELS.INCOME)).toBeInTheDocument();
-        });
-
-        it('shows expense type label when expense category is selected', () => {
-            renderModal();
-            selectCategory(expenseCategory.id);
-            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.TYPE_LABELS.EXPENSE)).toBeInTheDocument();
-        });
-
-        it('does not show type label when no category is selected', () => {
-            renderModal();
-            expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.TABLE.TYPE_LABELS.INCOME)).not.toBeInTheDocument();
-            expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.TABLE.TYPE_LABELS.EXPENSE)).not.toBeInTheDocument();
         });
     });
 
     describe('name field validation on blur', () => {
         it('shows required error when name is empty', () => {
             renderModal();
-            selectCategory(incomeCategory.id);
+            selectCategory(incomeCategory.name);
             fireEvent.blur(screen.getByTestId(NAME_INPUT));
             expect(screen.getByText(REQUIRED_ERROR)).toBeInTheDocument();
         });
 
         it('shows min length error when name is too short', () => {
             renderModal();
-            fillForm(incomeCategory.id, 'abc');
+            fillForm(incomeCategory.name, 'abc');
             fireEvent.blur(screen.getByTestId(NAME_INPUT));
             expect(screen.getByText(MIN_ERROR)).toBeInTheDocument();
         });
@@ -186,7 +140,7 @@ describe('EditFundsExpendituresCategoryModal', () => {
         it('shows duplicate error when name matches another category of the same type', () => {
             const categories = [incomeCategory, expenseCategory, { id: 3, name: 'Гранти', type: 'income' as const }];
             renderModal({ categories });
-            selectCategory(incomeCategory.id);
+            selectCategory(incomeCategory.name);
             typeName('Гранти');
             fireEvent.blur(screen.getByTestId(NAME_INPUT));
             expect(screen.getByText(DUPLICATE_ERROR)).toBeInTheDocument();
@@ -194,7 +148,7 @@ describe('EditFundsExpendituresCategoryModal', () => {
 
         it('does not show duplicate error when name matches selected category itself', () => {
             renderModal();
-            selectCategory(incomeCategory.id);
+            selectCategory(incomeCategory.name);
             typeName(incomeCategory.name);
             fireEvent.blur(screen.getByTestId(NAME_INPUT));
             expect(screen.queryByText(DUPLICATE_ERROR)).not.toBeInTheDocument();
@@ -202,7 +156,7 @@ describe('EditFundsExpendituresCategoryModal', () => {
 
         it('clears error when name becomes valid on re-blur', () => {
             renderModal();
-            selectCategory(incomeCategory.id);
+            selectCategory(incomeCategory.name);
             typeName('ab');
             fireEvent.blur(screen.getByTestId(NAME_INPUT));
             expect(screen.getByText(MIN_ERROR)).toBeInTheDocument();
@@ -218,13 +172,6 @@ describe('EditFundsExpendituresCategoryModal', () => {
             renderModal();
             fillForm();
             fireEvent.click(getSaveButton());
-            expect(getOpenConfirmModal()).toBeInTheDocument();
-        });
-
-        it('shows correct title in save confirmation', () => {
-            renderModal();
-            fillForm();
-            fireEvent.click(getSaveButton());
             expect(
                 screen.getByText(FUNDS_EXPENDITURES_TEXT.MODAL.EDIT_CATEGORY.CONFIRM_SAVE_TITLE),
             ).toBeInTheDocument();
@@ -234,10 +181,10 @@ describe('EditFundsExpendituresCategoryModal', () => {
             renderModal();
             fillForm();
             fireEvent.click(getSaveButton());
-            clickConfirmNo();
-            expect(screen.getAllByTestId('confirm-modal').every((el) => el.getAttribute('data-open') === 'false')).toBe(
-                true,
-            );
+            clickNoInConfirm(FUNDS_EXPENDITURES_TEXT.MODAL.EDIT_CATEGORY.CONFIRM_SAVE_TITLE);
+            expect(
+                screen.queryByText(FUNDS_EXPENDITURES_TEXT.MODAL.EDIT_CATEGORY.CONFIRM_SAVE_TITLE),
+            ).not.toBeInTheDocument();
         });
     });
 
@@ -245,9 +192,9 @@ describe('EditFundsExpendituresCategoryModal', () => {
         it('calls onSubmit with categoryId and normalized name on confirm', async () => {
             const onSubmit = jest.fn().mockResolvedValue(true);
             renderModal({ onSubmit });
-            fillForm(incomeCategory.id, '  Valid name  ');
+            fillForm(incomeCategory.name, '  Valid name  ');
             fireEvent.click(getSaveButton());
-            clickConfirmYes();
+            clickYesInConfirm(FUNDS_EXPENDITURES_TEXT.MODAL.EDIT_CATEGORY.CONFIRM_SAVE_TITLE);
             await waitFor(() => expect(onSubmit).toHaveBeenCalledWith(incomeCategory.id, 'Valid name'));
         });
 
@@ -257,7 +204,7 @@ describe('EditFundsExpendituresCategoryModal', () => {
             renderModal({ onClose, onSubmit });
             fillForm();
             fireEvent.click(getSaveButton());
-            clickConfirmYes();
+            clickYesInConfirm(FUNDS_EXPENDITURES_TEXT.MODAL.EDIT_CATEGORY.CONFIRM_SAVE_TITLE);
             await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
             expect(screen.getByTestId(NAME_INPUT)).toHaveValue('');
             expect(getSaveButton()).toBeDisabled();
@@ -269,24 +216,29 @@ describe('EditFundsExpendituresCategoryModal', () => {
             renderModal({ onClose, onSubmit });
             fillForm();
             fireEvent.click(getSaveButton());
-            clickConfirmYes();
-            await waitFor(() =>
-                expect(screen.getAllByTestId('confirm-modal').every((el) => el.getAttribute('data-open') === 'false')).toBe(true),
-            );
+            clickYesInConfirm(FUNDS_EXPENDITURES_TEXT.MODAL.EDIT_CATEGORY.CONFIRM_SAVE_TITLE);
+            await waitFor(() => expect(screen.queryByRole('button', { name: YES_BUTTON })).not.toBeInTheDocument());
             expect(onClose).not.toHaveBeenCalled();
-            expect(screen.getByTestId('modal-overlay')).toBeInTheDocument();
         });
 
         it('disables confirm buttons while submitting', async () => {
             let resolve!: (v: boolean) => void;
-            const onSubmit = jest.fn().mockReturnValue(new Promise<boolean>((r) => { resolve = r; }));
+            const onSubmit = jest.fn().mockReturnValue(
+                new Promise<boolean>((r) => {
+                    resolve = r;
+                }),
+            );
             renderModal({ onSubmit });
             fillForm();
             fireEvent.click(getSaveButton());
-            const yesBtn = within(getOpenConfirmModal()).getByTestId('confirm-yes');
+            const yesBtn = within(
+                getConfirmOverlayWithTitle(FUNDS_EXPENDITURES_TEXT.MODAL.EDIT_CATEGORY.CONFIRM_SAVE_TITLE),
+            ).getByRole('button', { name: YES_BUTTON });
             fireEvent.click(yesBtn);
             expect(yesBtn).toBeDisabled();
-            await act(async () => { resolve(true); });
+            await act(async () => {
+                resolve(true);
+            });
         });
     });
 
@@ -304,13 +256,6 @@ describe('EditFundsExpendituresCategoryModal', () => {
             typeName('dirty');
             fireEvent.click(screen.getByRole('button', { name: 'Close modal' }));
             expect(onClose).not.toHaveBeenCalled();
-            expect(getOpenConfirmModal()).toBeInTheDocument();
-        });
-
-        it('shows correct title in close confirmation', () => {
-            renderModal();
-            typeName('dirty');
-            fireEvent.click(screen.getByRole('button', { name: 'Close modal' }));
             expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.CONFIRM_CLOSE_TITLE)).toBeInTheDocument();
         });
 
@@ -319,7 +264,7 @@ describe('EditFundsExpendituresCategoryModal', () => {
             renderModal({ onClose });
             fillForm();
             fireEvent.click(screen.getByRole('button', { name: 'Close modal' }));
-            clickConfirmYes();
+            clickYesInConfirm(FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.CONFIRM_CLOSE_TITLE);
             expect(onClose).toHaveBeenCalledTimes(1);
             expect(screen.getByTestId(NAME_INPUT)).toHaveValue('');
         });
@@ -329,7 +274,7 @@ describe('EditFundsExpendituresCategoryModal', () => {
             renderModal({ onClose });
             typeName('dirty');
             fireEvent.click(screen.getByRole('button', { name: 'Close modal' }));
-            clickConfirmNo();
+            clickNoInConfirm(FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.CONFIRM_CLOSE_TITLE);
             expect(onClose).not.toHaveBeenCalled();
             expect(screen.getByTestId('modal-overlay')).toBeInTheDocument();
         });

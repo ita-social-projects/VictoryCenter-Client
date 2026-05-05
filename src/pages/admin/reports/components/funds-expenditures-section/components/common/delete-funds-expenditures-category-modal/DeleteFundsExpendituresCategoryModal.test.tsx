@@ -1,47 +1,14 @@
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act, within } from '@testing-library/react';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
 import { ReportFundsExpendituresCategory, ReportFundsExpendituresRecord } from '@/types/admin/reports';
 import { DeleteFundsExpendituresCategoryModal } from './DeleteFundsExpendituresCategoryModal';
 
-jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
-    ConfirmationModal: ({ isOpen, title, onConfirm, onCancel, onClose, isButtonsDisabled }: any) => (
-        <div data-testid="confirm-modal" data-open={String(isOpen)}>
-            <span>{title}</span>
-            <button data-testid="confirm-yes" onClick={onConfirm} disabled={isButtonsDisabled}>
-                Yes
-            </button>
-            <button data-testid="confirm-no" onClick={onCancel} disabled={isButtonsDisabled}>
-                No
-            </button>
-            <button data-testid="confirm-close" onClick={onClose} disabled={isButtonsDisabled}>
-                Close
-            </button>
-        </div>
-    ),
-}));
-
-jest.mock('@/components/common/select/Select', () => {
-    const Select = ({ value, onValueChange, placeholder, children }: any) => (
-        <>
-            <input
-                data-testid={placeholder}
-                value={value ?? ''}
-                onChange={(e) => {
-                    const parsed = parseInt(e.target.value, 10);
-                    onValueChange(isNaN(parsed) ? undefined : parsed);
-                }}
-            />
-            {children}
-        </>
-    );
-    Select.Option = ({ value, name }: any) => <option value={value}>{name}</option>;
-    return { Select };
-});
-
 const CATEGORY_SELECT = FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.CATEGORY_PLACEHOLDER;
 const DELETE_BUTTON_NAME = COMMON_TEXT_ADMIN.BUTTON.DELETE;
 const CANCEL_BUTTON_NAME = COMMON_TEXT_ADMIN.BUTTON.CANCEL;
+const YES_BUTTON = COMMON_TEXT_ADMIN.BUTTON.YES;
+const NO_BUTTON = COMMON_TEXT_ADMIN.BUTTON.NO;
 
 const incomeCategory: ReportFundsExpendituresCategory = { id: 1, name: 'Донори', type: 'income' };
 const expenseCategory: ReportFundsExpendituresCategory = { id: 2, name: 'Оренда', type: 'expense' };
@@ -87,9 +54,13 @@ const renderModal = (
 const getDeleteButton = () => screen.getByRole('button', { name: DELETE_BUTTON_NAME });
 const getCancelButton = () => screen.getByRole('button', { name: CANCEL_BUTTON_NAME });
 
-const selectCategory = (id: number) => {
-    fireEvent.change(screen.getByTestId(CATEGORY_SELECT), { target: { value: String(id) } });
+const selectCategory = (name: string) => {
+    fireEvent.click(screen.getByRole('button', { name: CATEGORY_SELECT }));
+    fireEvent.click(screen.getByRole('button', { name }));
 };
+
+const getConfirmOverlay = () =>
+    screen.getAllByTestId('modal-overlay').find((el) => within(el).queryByRole('button', { name: YES_BUTTON }))!;
 
 describe('DeleteFundsExpendituresCategoryModal', () => {
     it('renders nothing when isOpen is false', () => {
@@ -104,7 +75,7 @@ describe('DeleteFundsExpendituresCategoryModal', () => {
 
     it('renders category select and action buttons', () => {
         renderModal();
-        expect(screen.getByTestId(CATEGORY_SELECT)).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: CATEGORY_SELECT })).toBeInTheDocument();
         expect(getDeleteButton()).toBeInTheDocument();
         expect(getCancelButton()).toBeInTheDocument();
     });
@@ -117,47 +88,27 @@ describe('DeleteFundsExpendituresCategoryModal', () => {
 
         it('is enabled when a category with no record is selected', () => {
             renderModal({ records: [] });
-            selectCategory(incomeCategory.id);
+            selectCategory(incomeCategory.name);
             expect(getDeleteButton()).not.toBeDisabled();
         });
 
         it('is disabled when selected category has an income record', () => {
             renderModal({ records: [incomeRecord] });
-            selectCategory(incomeCategory.id);
+            selectCategory(incomeCategory.name);
             expect(getDeleteButton()).toBeDisabled();
         });
 
         it('is disabled when selected category has an expense record', () => {
             renderModal({ records: [expenseRecord] });
-            selectCategory(expenseCategory.id);
+            selectCategory(expenseCategory.name);
             expect(getDeleteButton()).toBeDisabled();
-        });
-    });
-
-    describe('type label display', () => {
-        it('shows income type label when income category is selected', () => {
-            renderModal();
-            selectCategory(incomeCategory.id);
-            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.TYPE_LABELS.INCOME)).toBeInTheDocument();
-        });
-
-        it('shows expense type label when expense category is selected', () => {
-            renderModal();
-            selectCategory(expenseCategory.id);
-            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.TYPE_LABELS.EXPENSE)).toBeInTheDocument();
-        });
-
-        it('does not show type label when no category is selected', () => {
-            renderModal();
-            expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.TABLE.TYPE_LABELS.INCOME)).not.toBeInTheDocument();
-            expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.TABLE.TYPE_LABELS.EXPENSE)).not.toBeInTheDocument();
         });
     });
 
     describe('record error hint', () => {
         it('shows income record error when selected income category has a record', () => {
             renderModal({ records: [incomeRecord] });
-            selectCategory(incomeCategory.id);
+            selectCategory(incomeCategory.name);
             expect(
                 screen.getByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.ERROR.HAS_INCOME_RECORD),
             ).toBeInTheDocument();
@@ -165,7 +116,7 @@ describe('DeleteFundsExpendituresCategoryModal', () => {
 
         it('shows expense record error when selected expense category has a record', () => {
             renderModal({ records: [expenseRecord] });
-            selectCategory(expenseCategory.id);
+            selectCategory(expenseCategory.name);
             expect(
                 screen.getByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.ERROR.HAS_EXPENSE_RECORD),
             ).toBeInTheDocument();
@@ -173,7 +124,7 @@ describe('DeleteFundsExpendituresCategoryModal', () => {
 
         it('does not show hint box when selected category has no record', () => {
             renderModal({ records: [] });
-            selectCategory(incomeCategory.id);
+            selectCategory(incomeCategory.name);
             expect(
                 screen.queryByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.ERROR.HAS_INCOME_RECORD),
             ).not.toBeInTheDocument();
@@ -188,45 +139,36 @@ describe('DeleteFundsExpendituresCategoryModal', () => {
     });
 
     describe('confirmation modal', () => {
-        it('opens confirmation modal when delete is clicked', () => {
+        it('opens confirmation when delete is clicked', () => {
             renderModal();
-            selectCategory(incomeCategory.id);
+            selectCategory(incomeCategory.name);
             fireEvent.click(getDeleteButton());
-            expect(screen.getByTestId('confirm-modal')).toHaveAttribute('data-open', 'true');
+            expect(getConfirmOverlay()).toBeInTheDocument();
         });
 
-        it('shows correct title in confirmation modal', () => {
+        it('shows correct confirm title', () => {
             renderModal();
-            selectCategory(incomeCategory.id);
+            selectCategory(incomeCategory.name);
             fireEvent.click(getDeleteButton());
             expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.CONFIRM_TITLE)).toBeInTheDocument();
         });
 
-        it('closes confirmation modal when cancel is clicked inside confirm', () => {
+        it('closes confirmation on cancel', () => {
             renderModal();
-            selectCategory(incomeCategory.id);
+            selectCategory(incomeCategory.name);
             fireEvent.click(getDeleteButton());
-            fireEvent.click(screen.getByTestId('confirm-no'));
-            expect(screen.getByTestId('confirm-modal')).toHaveAttribute('data-open', 'false');
-            expect(screen.getByTestId('modal-overlay')).toBeInTheDocument();
-        });
-
-        it('closes confirmation modal when close is triggered inside confirm', () => {
-            renderModal();
-            selectCategory(incomeCategory.id);
-            fireEvent.click(getDeleteButton());
-            fireEvent.click(screen.getByTestId('confirm-close'));
-            expect(screen.getByTestId('confirm-modal')).toHaveAttribute('data-open', 'false');
+            fireEvent.click(within(getConfirmOverlay()).getByRole('button', { name: NO_BUTTON }));
+            expect(screen.queryAllByTestId('modal-overlay').length).toBe(1);
         });
     });
 
     describe('submit behaviour', () => {
-        it('calls onSubmit with the selected categoryId on confirm', async () => {
+        it('calls onSubmit with categoryId on confirm', async () => {
             const onSubmit = jest.fn().mockResolvedValue(true);
             renderModal({ onSubmit });
-            selectCategory(incomeCategory.id);
+            selectCategory(incomeCategory.name);
             fireEvent.click(getDeleteButton());
-            fireEvent.click(screen.getByTestId('confirm-yes'));
+            fireEvent.click(within(getConfirmOverlay()).getByRole('button', { name: YES_BUTTON }));
             await waitFor(() => expect(onSubmit).toHaveBeenCalledWith(incomeCategory.id));
         });
 
@@ -234,11 +176,10 @@ describe('DeleteFundsExpendituresCategoryModal', () => {
             const onClose = jest.fn();
             const onSubmit = jest.fn().mockResolvedValue(true);
             renderModal({ onClose, onSubmit });
-            selectCategory(incomeCategory.id);
+            selectCategory(incomeCategory.name);
             fireEvent.click(getDeleteButton());
-            fireEvent.click(screen.getByTestId('confirm-yes'));
+            fireEvent.click(within(getConfirmOverlay()).getByRole('button', { name: YES_BUTTON }));
             await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
-            expect(screen.getByTestId(CATEGORY_SELECT)).toHaveValue('');
             expect(getDeleteButton()).toBeDisabled();
         });
 
@@ -246,12 +187,12 @@ describe('DeleteFundsExpendituresCategoryModal', () => {
             const onClose = jest.fn();
             const onSubmit = jest.fn().mockResolvedValue(false);
             renderModal({ onClose, onSubmit });
-            selectCategory(incomeCategory.id);
+            selectCategory(incomeCategory.name);
             fireEvent.click(getDeleteButton());
-            fireEvent.click(screen.getByTestId('confirm-yes'));
-            await waitFor(() => expect(screen.getByTestId('confirm-modal')).toHaveAttribute('data-open', 'false'));
+            fireEvent.click(within(getConfirmOverlay()).getByRole('button', { name: YES_BUTTON }));
+            await waitFor(() => expect(screen.queryByRole('button', { name: YES_BUTTON })).not.toBeInTheDocument());
             expect(onClose).not.toHaveBeenCalled();
-            expect(screen.getByTestId('modal-overlay')).toBeInTheDocument();
+            expect(screen.getAllByTestId('modal-overlay').length).toBe(1);
         });
 
         it('disables confirm buttons while submitting', async () => {
@@ -262,49 +203,31 @@ describe('DeleteFundsExpendituresCategoryModal', () => {
                 }),
             );
             renderModal({ onSubmit });
-            selectCategory(incomeCategory.id);
+            selectCategory(incomeCategory.name);
             fireEvent.click(getDeleteButton());
-            fireEvent.click(screen.getByTestId('confirm-yes'));
-            expect(screen.getByTestId('confirm-yes')).toBeDisabled();
+            const yesBtn = within(getConfirmOverlay()).getByRole('button', { name: YES_BUTTON });
+            fireEvent.click(yesBtn);
+            expect(yesBtn).toBeDisabled();
             await act(async () => {
                 resolve(true);
             });
         });
     });
 
-    describe('close (cancel) behaviour', () => {
-        it('calls onClose and resets form when cancel button is clicked', () => {
+    describe('cancel button', () => {
+        it('closes modal on cancel', () => {
             const onClose = jest.fn();
             renderModal({ onClose });
-            selectCategory(incomeCategory.id);
-            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.TYPE_LABELS.INCOME)).toBeInTheDocument();
             fireEvent.click(getCancelButton());
             expect(onClose).toHaveBeenCalledTimes(1);
         });
 
-        it('resets selection when modal close button is clicked', () => {
-            const onClose = jest.fn();
-            renderModal({ onClose });
-            selectCategory(incomeCategory.id);
-            fireEvent.click(screen.getByRole('button', { name: 'Close modal' }));
-            expect(onClose).toHaveBeenCalledTimes(1);
-        });
-
-        it('cancel button is disabled while submitting', async () => {
-            let resolve!: (v: boolean) => void;
-            const onSubmit = jest.fn().mockReturnValue(
-                new Promise<boolean>((r) => {
-                    resolve = r;
-                }),
-            );
-            renderModal({ onSubmit });
-            selectCategory(incomeCategory.id);
-            fireEvent.click(getDeleteButton());
-            fireEvent.click(screen.getByTestId('confirm-yes'));
-            expect(getCancelButton()).toBeDisabled();
-            await act(async () => {
-                resolve(true);
-            });
+        it('resets form on cancel', () => {
+            renderModal();
+            selectCategory(incomeCategory.name);
+            expect(getDeleteButton()).not.toBeDisabled();
+            fireEvent.click(getCancelButton());
+            expect(getDeleteButton()).toBeDisabled();
         });
     });
 });

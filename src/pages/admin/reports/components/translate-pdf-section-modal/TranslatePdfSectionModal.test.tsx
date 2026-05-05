@@ -152,17 +152,16 @@ const TEST_DATA = {
 };
 
 describe('TranslatePdfSectionModal', () => {
-    const renderModal = (props: Partial<React.ComponentProps<typeof TranslatePdfSectionModal>> = {}) => {
-        const defaultProps = {
-            isOpen: true,
-            onClose: jest.fn(),
-            pdfSection: TEST_DATA.pdfSection,
-            onTranslatePdfSection: jest.fn(),
-            translatedLanguages: TEST_DATA.translatedLanguages,
-        };
-
-        return render(<TranslatePdfSectionModal {...defaultProps} {...props} />);
+    const defaultProps = {
+        isOpen: true,
+        onClose: jest.fn(),
+        pdfSection: TEST_DATA.pdfSection,
+        onTranslatePdfSection: jest.fn(),
+        translatedLanguages: TEST_DATA.translatedLanguages,
     };
+
+    const renderModal = (props: Partial<React.ComponentProps<typeof TranslatePdfSectionModal>> = {}) =>
+        render(<TranslatePdfSectionModal {...defaultProps} {...props} />);
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -306,15 +305,7 @@ describe('TranslatePdfSectionModal', () => {
         it('should disable save button when form is invalid', () => {
             mockFormIsValid = false;
 
-            render(
-                <TranslatePdfSectionModal
-                    isOpen={true}
-                    onClose={jest.fn()}
-                    pdfSection={TEST_DATA.pdfSection}
-                    onTranslatePdfSection={jest.fn()}
-                    translatedLanguages={TEST_DATA.translatedLanguages}
-                />,
-            );
+            renderModal();
 
             expect(screen.getByTestId('save-localization-btn')).toBeDisabled();
         });

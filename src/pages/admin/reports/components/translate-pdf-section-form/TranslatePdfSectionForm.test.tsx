@@ -3,56 +3,23 @@ import { render, screen, fireEvent, act, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom';
 import { TranslatePdfSectionForm, TranslatePdfSectionFormRef } from './TranslatePdfSectionForm';
 
-jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
-    InputWithCharacterLimitGroup: ({
-        id,
-        name,
-        value,
-        onChange,
-        onBlur,
-        disabled,
-        maxLength,
-        label,
-        error,
-        isRequired,
-    }: any) => (
-        <div data-testid={`input-group-${name}`}>
+const makeMockInputGroup =
+    (tag: 'input' | 'textarea') =>
+    ({ id, name, value, onChange, onBlur, disabled, maxLength, label, error, isRequired }: any) => (
+        <div data-testid={`${tag}-group-${name}`}>
             <label htmlFor={id}>{label}</label>
-            <input
-                id={id}
-                data-testid={`input-${name}`}
-                value={value}
-                onChange={onChange}
-                onBlur={onBlur}
-                disabled={disabled}
-                maxLength={maxLength}
-                required={isRequired}
-            />
-            {error && <span data-testid={`error-${name}`}>{error}</span>}
-            <span data-testid={`counter-${name}`}>
-                {value.length} / {maxLength}
-            </span>
-        </div>
-    ),
-}));
-
-jest.mock(
-    '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
-    () => ({
-        TextAreaWithCharacterLimitGroup: ({
-            id,
-            name,
-            value,
-            onChange,
-            onBlur,
-            disabled,
-            maxLength,
-            label,
-            error,
-            isRequired,
-        }: any) => (
-            <div data-testid={`textarea-group-${name}`}>
-                <label htmlFor={id}>{label}</label>
+            {tag === 'input' ? (
+                <input
+                    id={id}
+                    data-testid={`input-${name}`}
+                    value={value}
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    disabled={disabled}
+                    maxLength={maxLength}
+                    required={isRequired}
+                />
+            ) : (
                 <textarea
                     id={id}
                     data-testid={`textarea-${name}`}
@@ -63,12 +30,22 @@ jest.mock(
                     maxLength={maxLength}
                     required={isRequired}
                 />
-                {error && <span data-testid={`error-${name}`}>{error}</span>}
-                <span data-testid={`counter-${name}`}>
-                    {value.length} / {maxLength}
-                </span>
-            </div>
-        ),
+            )}
+            {error && <span data-testid={`error-${name}`}>{error}</span>}
+            <span data-testid={`counter-${name}`}>
+                {value.length} / {maxLength}
+            </span>
+        </div>
+    );
+
+jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
+    InputWithCharacterLimitGroup: makeMockInputGroup('input'),
+}));
+
+jest.mock(
+    '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
+    () => ({
+        TextAreaWithCharacterLimitGroup: makeMockInputGroup('textarea'),
     }),
 );
 
@@ -80,6 +57,20 @@ const renderForm = (props: any = {}) => {
 
     render(<TranslatePdfSectionForm ref={ref} {...defaultProps} {...props} />);
     return { ref, ...defaultProps, ...props };
+};
+
+const fillForm = (title = 'Title', description = 'Description') => {
+    fireEvent.change(screen.getByTestId('input-title'), { target: { value: title } });
+    fireEvent.change(screen.getByTestId('textarea-description'), { target: { value: description } });
+};
+
+const makeAsyncSubmit = () => {
+    let resolveFn: (value?: unknown) => void;
+    const submitPromise = new Promise((resolve) => {
+        resolveFn = resolve;
+    });
+    const onSubmit = jest.fn(() => submitPromise);
+    return { onSubmit, resolve: () => resolveFn() };
 };
 
 describe('TranslatePdfSectionForm', () => {
@@ -216,13 +207,7 @@ describe('TranslatePdfSectionForm', () => {
             const onSubmit = jest.fn();
             const { ref } = renderForm({ onSubmit });
 
-            fireEvent.change(screen.getByTestId('input-title'), {
-                target: { value: 'Test Title' },
-            });
-
-            fireEvent.change(screen.getByTestId('textarea-description'), {
-                target: { value: 'Test Description' },
-            });
+            fillForm('Test Title', 'Test Description');
 
             await act(async () => {
                 await ref.current?.submit();
@@ -253,13 +238,7 @@ describe('TranslatePdfSectionForm', () => {
 
             expect(ref.current?.isValid()).toBe(false);
 
-            fireEvent.change(screen.getByTestId('input-title'), {
-                target: { value: 'Title' },
-            });
-
-            fireEvent.change(screen.getByTestId('textarea-description'), {
-                target: { value: 'Description' },
-            });
+            fillForm();
 
             expect(ref.current?.isValid()).toBe(true);
         });
@@ -351,12 +330,8 @@ describe('TranslatePdfSectionForm', () => {
 
     describe('Form Submission Disabled State', () => {
         it('should disable submit during form submission', async () => {
-            let resolveSubmit: any;
-            const submitPromise = new Promise((resolve) => {
-                resolveSubmit = resolve;
-            });
+            const { onSubmit, resolve } = makeAsyncSubmit();
 
-            const onSubmit = jest.fn(() => submitPromise);
             const { ref } = renderForm({ onSubmit });
 
             fireEvent.change(screen.getByTestId('input-title'), {
@@ -373,7 +348,7 @@ describe('TranslatePdfSectionForm', () => {
 
             await new Promise((resolve) => setTimeout(resolve, 10));
 
-            resolveSubmit();
+            resolve();
 
             await submitPromise2;
 
@@ -408,11 +383,7 @@ describe('TranslatePdfSectionForm', () => {
         });
 
         it('should call onSubmit async handler and wait for completion', async () => {
-            let resolveFn: any;
-            const submitPromise = new Promise((resolve) => {
-                resolveFn = resolve;
-            });
-            const onSubmit = jest.fn(() => submitPromise);
+            const { onSubmit, resolve } = makeAsyncSubmit();
             const { ref } = renderForm({ onSubmit });
 
             fireEvent.change(screen.getByTestId('input-title'), {
@@ -429,7 +400,7 @@ describe('TranslatePdfSectionForm', () => {
 
             await new Promise((resolve) => setTimeout(resolve, 50));
 
-            resolveFn();
+            resolve();
 
             await submitCall;
 

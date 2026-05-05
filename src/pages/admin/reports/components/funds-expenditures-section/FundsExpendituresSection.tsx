@@ -369,7 +369,8 @@ export const FundsExpenditureSection = ({
             refetchSummary();
             addToast(FUNDS_EXPENDITURES_TEXT.BULK.DELETE_SUCCESS, ToastType.Success);
         } catch {
-            addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_DELETE_FAILED_RETRY, ToastType.Error);
+            setIsBulkDeleteModalOpen(false);
+            addToast(FUNDS_EXPENDITURES_TEXT.BULK.DELETE_FAILED, ToastType.Error, 5000);
         } finally {
             setIsBulkDeleting(false);
         }

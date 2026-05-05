@@ -243,6 +243,7 @@ export const FUNDS_EXPENDITURES_TEXT = {
         DELETE_BUTTON: 'Видалити вибрані',
         DELETE_CONFIRM_TITLE: 'Видалити обрані записи?',
         DELETE_SUCCESS: 'Записи видалені успішно',
+        DELETE_FAILED: 'Помилка при видаленні записів. Спробуйте ще раз.',
     },
 };
 

@@ -75,7 +75,11 @@ jest.mock('../translate-pdf-section-modal/TranslatePdfSectionModal', () => ({
             <div data-testid="translate-modal" onClick={onClose}>
                 <button
                     data-testid="confirm-translate-btn"
-                    onClick={() => onTranslatePdfSection({ ...pdfSection, translated: true })}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onTranslatePdfSection({ ...pdfSection, translated: true });
+                        onClose();
+                    }}
                 >
                     Confirm Translation
                 </button>
@@ -98,6 +102,20 @@ describe('PdfFilesSection', () => {
     let originalCreateObjectURL: any;
     let originalWindowOpen: any;
 
+    const setupDataFetchMock = (options: { setData?: jest.Mock; filesData?: any[] } = {}) => {
+        (useDataFetch as jest.Mock).mockImplementation(({ initialData }) => {
+            if (initialData === null) {
+                return {
+                    data: mockSectionData,
+                    isLoading: false,
+                    refetch: mockRefetch,
+                    setData: options.setData ?? jest.fn(),
+                };
+            }
+            return { data: options.filesData ?? mockFilesResponse.items, isLoading: false, refetch: mockRefetch };
+        });
+    };
+
     beforeEach(() => {
         jest.clearAllMocks();
         originalCreateObjectURL = global.URL.createObjectURL;
@@ -107,7 +125,7 @@ describe('PdfFilesSection', () => {
         (useAdminClient as jest.Mock).mockReturnValue(mockClient);
         (useToast as jest.Mock).mockReturnValue({ addToast: mockAddToast });
         mockCreateObjectURL.mockReturnValue('blob:http://localhost/mock-blob-url');
-        (useLocalizationToolkit as jest.Mock).mockReturnValue({ translationLanguages: [] }); // ← додати цей рядок
+        (useLocalizationToolkit as jest.Mock).mockReturnValue({ translationLanguages: [] });
     });
 
     afterEach(() => {
@@ -175,14 +193,7 @@ describe('PdfFilesSection', () => {
     });
 
     it('should call delete API and refetch files on file deletion', async () => {
-        let callCount = 0;
-        (useDataFetch as jest.Mock).mockImplementation(() => {
-            callCount++;
-            if (callCount === 1) {
-                return { data: mockSectionData, isLoading: false, refetch: mockRefetch };
-            }
-            return { data: mockFilesResponse.items, isLoading: false, refetch: mockRefetch };
-        });
+        setupDataFetchMock();
 
         (PdfReportsApi.delete as jest.Mock).mockResolvedValueOnce(undefined);
 
@@ -199,14 +210,7 @@ describe('PdfFilesSection', () => {
     });
 
     it('should show error toast when deletion fails', async () => {
-        let callCount = 0;
-        (useDataFetch as jest.Mock).mockImplementation(() => {
-            callCount++;
-            if (callCount === 1) {
-                return { data: mockSectionData, isLoading: false, refetch: mockRefetch };
-            }
-            return { data: mockFilesResponse.items, isLoading: false, refetch: mockRefetch };
-        });
+        setupDataFetchMock();
 
         (PdfReportsApi.delete as jest.Mock).mockRejectedValueOnce(new Error('Delete failed'));
 
@@ -223,14 +227,7 @@ describe('PdfFilesSection', () => {
     it('should fetch and open PDF file when view button is clicked', async () => {
         const mockPdfBlob = new Blob(['PDF content'], { type: 'application/pdf' });
 
-        let callCount = 0;
-        (useDataFetch as jest.Mock).mockImplementation(() => {
-            callCount++;
-            if (callCount === 1) {
-                return { data: mockSectionData, isLoading: false, refetch: mockRefetch };
-            }
-            return { data: mockFilesResponse.items, isLoading: false, refetch: mockRefetch };
-        });
+        setupDataFetchMock();
 
         (PdfReportsApi.fetchById as jest.Mock).mockResolvedValueOnce(mockPdfBlob);
 
@@ -247,14 +244,7 @@ describe('PdfFilesSection', () => {
     });
 
     it('should show error toast when PDF download fails', async () => {
-        let callCount = 0;
-        (useDataFetch as jest.Mock).mockImplementation(() => {
-            callCount++;
-            if (callCount === 1) {
-                return { data: mockSectionData, isLoading: false, refetch: mockRefetch };
-            }
-            return { data: mockFilesResponse.items, isLoading: false, refetch: mockRefetch };
-        });
+        setupDataFetchMock();
 
         (PdfReportsApi.fetchById as jest.Mock).mockRejectedValueOnce(new Error('Download failed'));
 
@@ -270,12 +260,7 @@ describe('PdfFilesSection', () => {
 
     it('should call rename API and refetch files on success', async () => {
         const updatedFile = { id: 1, name: 'New Name' };
-        let callCount = 0;
-        (useDataFetch as jest.Mock).mockImplementation(() => {
-            callCount++;
-            if (callCount === 1) return { data: mockSectionData, isLoading: false, refetch: mockRefetch };
-            return { data: mockFilesResponse.items, isLoading: false, refetch: mockRefetch };
-        });
+        setupDataFetchMock();
 
         (PdfReportsApi.rename as jest.Mock).mockResolvedValueOnce(updatedFile);
 
@@ -291,12 +276,7 @@ describe('PdfFilesSection', () => {
     });
 
     it('should show error toast when rename fails', async () => {
-        let callCount = 0;
-        (useDataFetch as jest.Mock).mockImplementation(() => {
-            callCount++;
-            if (callCount === 1) return { data: mockSectionData, isLoading: false, refetch: mockRefetch };
-            return { data: mockFilesResponse.items, isLoading: false, refetch: mockRefetch };
-        });
+        setupDataFetchMock();
 
         (PdfReportsApi.rename as jest.Mock).mockRejectedValueOnce(new Error('Rename failed'));
 
@@ -310,12 +290,7 @@ describe('PdfFilesSection', () => {
     });
 
     it('should show isRenaming indicator while rename is in progress', async () => {
-        let callCount = 0;
-        (useDataFetch as jest.Mock).mockImplementation(() => {
-            callCount++;
-            if (callCount === 1) return { data: mockSectionData, isLoading: false, refetch: mockRefetch };
-            return { data: mockFilesResponse.items, isLoading: false, refetch: mockRefetch };
-        });
+        setupDataFetchMock();
 
         let resolveRename: (value: any) => void;
         (PdfReportsApi.rename as jest.Mock).mockReturnValueOnce(
@@ -340,12 +315,7 @@ describe('PdfFilesSection', () => {
     });
 
     it('should add uploaded file to the list', async () => {
-        let callCount = 0;
-        (useDataFetch as jest.Mock).mockImplementation(() => {
-            callCount++;
-            if (callCount === 1) return { data: mockSectionData, isLoading: false, refetch: mockRefetch };
-            return { data: [], isLoading: false, refetch: mockRefetch };
-        });
+        setupDataFetchMock({ filesData: [] });
 
         render(<PdfFilesSection />);
 
@@ -356,14 +326,8 @@ describe('PdfFilesSection', () => {
 
     describe('Translation Modal', () => {
         it('should open translation modal when translate button is clicked', async () => {
-            let callCount = 0;
-            (useDataFetch as jest.Mock).mockImplementation(() => {
-                callCount++;
-                if (callCount % 2 === 1) {
-                    return { data: mockSectionData, isLoading: false, refetch: mockRefetch, setData: jest.fn() };
-                }
-                return { data: mockFilesResponse.items, isLoading: false, refetch: mockRefetch };
-            });
+            setupDataFetchMock();
+
             render(<PdfFilesSection />);
 
             fireEvent.click(screen.getByTestId('content-block-translate'));
@@ -374,14 +338,8 @@ describe('PdfFilesSection', () => {
         });
 
         it('should close translation modal when onClose is called', async () => {
-            let callCount = 0;
-            (useDataFetch as jest.Mock).mockImplementation(() => {
-                callCount++;
-                if (callCount % 2 === 1) {
-                    return { data: mockSectionData, isLoading: false, refetch: mockRefetch, setData: jest.fn() };
-                }
-                return { data: mockFilesResponse.items, isLoading: false, refetch: mockRefetch };
-            });
+            setupDataFetchMock();
+
             render(<PdfFilesSection />);
 
             fireEvent.click(screen.getByTestId('content-block-translate'));
@@ -398,14 +356,8 @@ describe('PdfFilesSection', () => {
         });
 
         it('should show success toast when translation is saved', async () => {
-            let callCount = 0;
-            (useDataFetch as jest.Mock).mockImplementation(() => {
-                callCount++;
-                if (callCount % 2 === 1) {
-                    return { data: mockSectionData, isLoading: false, refetch: mockRefetch, setData: jest.fn() };
-                }
-                return { data: mockFilesResponse.items, isLoading: false, refetch: mockRefetch };
-            });
+            setupDataFetchMock();
+
             render(<PdfFilesSection />);
 
             fireEvent.click(screen.getByTestId('content-block-translate'));
@@ -455,12 +407,7 @@ describe('PdfFilesSection', () => {
     });
 
     it('should refetch section on save', async () => {
-        let callCount = 0;
-        (useDataFetch as jest.Mock).mockImplementation(() => {
-            callCount++;
-            if (callCount === 1) return { data: mockSectionData, isLoading: false, refetch: mockRefetch };
-            return { data: [], isLoading: false, refetch: mockRefetch };
-        });
+        setupDataFetchMock();
 
         render(<PdfFilesSection />);
         fireEvent.click(screen.getByTestId('content-block-save'));
@@ -475,12 +422,7 @@ describe('PdfFilesSection', () => {
         const mockPdfBlob = new Blob(['PDF content'], { type: 'application/pdf' });
         mockWindowOpen.mockReturnValueOnce({});
 
-        let callCount = 0;
-        (useDataFetch as jest.Mock).mockImplementation(() => {
-            callCount++;
-            if (callCount === 1) return { data: mockSectionData, isLoading: false, refetch: mockRefetch };
-            return { data: mockFilesResponse.items, isLoading: false, refetch: mockRefetch };
-        });
+        setupDataFetchMock();
 
         (PdfReportsApi.fetchById as jest.Mock).mockResolvedValueOnce(mockPdfBlob);
         const mockRevokeObjectURL = jest.fn();

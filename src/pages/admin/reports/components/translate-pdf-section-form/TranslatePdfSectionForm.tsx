@@ -40,11 +40,19 @@ const validateForm = (
     formState: TranslatePdfSectionFormValues,
     _isPublishing: boolean,
 ): TranslatePdfSectionFormErrors => {
+    const titleTrimmed = formState.title?.trim();
+    const descriptionTrimmed = formState.description?.trim();
     return {
-        title: formState.title?.trim() ? undefined : PDF_SECTION_LOCALIZATION_VALIDATION.title.getRequiredError(),
-        description: formState.description?.trim()
-            ? undefined
-            : PDF_SECTION_LOCALIZATION_VALIDATION.description.getRequiredError(),
+        title: !titleTrimmed
+            ? PDF_SECTION_LOCALIZATION_VALIDATION.title.getRequiredError()
+            : titleTrimmed.length < PDF_SECTION_LOCALIZATION_VALIDATION.title.min
+              ? PDF_SECTION_LOCALIZATION_VALIDATION.title.getMinError()
+              : undefined,
+        description: !descriptionTrimmed
+            ? PDF_SECTION_LOCALIZATION_VALIDATION.description.getRequiredError()
+            : descriptionTrimmed.length < PDF_SECTION_LOCALIZATION_VALIDATION.description.min
+              ? PDF_SECTION_LOCALIZATION_VALIDATION.description.getMinError()
+              : undefined,
     };
 };
 
@@ -107,9 +115,12 @@ export const TranslatePdfSectionForm = forwardRef<TranslatePdfSectionFormRef, Tr
         }, []);
 
         const handleTitleBlur = useCallback(() => {
-            const error = formState.title?.trim()
-                ? undefined
-                : PDF_SECTION_LOCALIZATION_VALIDATION.title.getRequiredError();
+            const trimmed = formState.title?.trim();
+            const error = !trimmed
+                ? PDF_SECTION_LOCALIZATION_VALIDATION.title.getRequiredError()
+                : trimmed.length < PDF_SECTION_LOCALIZATION_VALIDATION.title.min
+                  ? PDF_SECTION_LOCALIZATION_VALIDATION.title.getMinError()
+                  : undefined;
             setErrors((prev) => ({ ...prev, title: error }));
         }, [formState.title]);
 
@@ -118,12 +129,14 @@ export const TranslatePdfSectionForm = forwardRef<TranslatePdfSectionFormRef, Tr
         }, []);
 
         const handleDescriptionBlur = useCallback(() => {
-            const error = formState.description?.trim()
-                ? undefined
-                : PDF_SECTION_LOCALIZATION_VALIDATION.description.getRequiredError();
+            const trimmed = formState.description?.trim();
+            const error = !trimmed
+                ? PDF_SECTION_LOCALIZATION_VALIDATION.description.getRequiredError()
+                : trimmed.length < PDF_SECTION_LOCALIZATION_VALIDATION.description.min
+                  ? PDF_SECTION_LOCALIZATION_VALIDATION.description.getMinError()
+                  : undefined;
             setErrors((prev) => ({ ...prev, description: error }));
         }, [formState.description]);
-
         return (
             <form
                 onSubmit={(e) => e.preventDefault()}

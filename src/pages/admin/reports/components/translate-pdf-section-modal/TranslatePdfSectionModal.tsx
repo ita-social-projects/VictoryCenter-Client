@@ -63,7 +63,7 @@ export const TranslatePdfSectionModal = ({
 
     const { translatePdfSection, isSubmitting, error } = useTranslatePdfSection({
         pdfSection,
-        language: language!,
+        language,
         mode,
         onSuccess: (updatedSection) => {
             onTranslatePdfSection(updatedSection);

@@ -108,24 +108,26 @@ export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({
 
     const handleSaveConfirmed = useCallback(async () => {
         setIsSaving(true);
+        let apiSucceeded = false;
         try {
             const normalizedData = {
                 title: getNormalizedInputText(formData.title),
                 description: getNormalizedInputText(formData.description),
             };
-
             await PdfSectionApi.updatePdfSection(client, normalizedData);
-
-            if (onAfterSave) {
-                await onAfterSave();
-            }
-
+            apiSucceeded = true;
             setIsEditMode(false);
             addToast(COMMON_TEXT_ADMIN.MESSAGE.UPDATES_SUCCESSFULLY_PUBLISHED, ToastType.Success);
         } catch {
             addToast(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_PUBLISH_CHANGES, ToastType.Error);
         } finally {
             setIsSaving(false);
+        }
+
+        if (apiSucceeded && onAfterSave) {
+            try {
+                await onAfterSave();
+            } catch {}
         }
     }, [formData.title, formData.description, client, onAfterSave, addToast]);
 

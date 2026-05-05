@@ -42,7 +42,14 @@ jest.mock('@/components/admin/localization-modal/LocalizationModal', () => ({
         <div data-testid="localization-modal" onClick={onClose} role="dialog" aria-modal="true">
             <div data-testid="modal-title">{title}</div>
             <div data-testid="modal-content">{children}</div>
-            <button data-testid="save-localization-btn" onClick={onSave} disabled={!isFormValid || isSubmitting}>
+            <button
+                data-testid="save-localization-btn"
+                onClick={(e) => {
+                    e.stopPropagation();
+                    onSave();
+                }}
+                disabled={!isFormValid || isSubmitting}
+            >
                 Save
             </button>
         </div>
@@ -71,6 +78,8 @@ jest.mock('@/components/admin/translation-controls/TranslationControls', () => (
     ),
 }));
 
+let mockFormIsValid = true;
+
 jest.mock('../translate-pdf-section-form/TranslatePdfSectionForm', () => {
     const React = require('react');
 
@@ -83,12 +92,12 @@ jest.mock('../translate-pdf-section-form/TranslatePdfSectionForm', () => {
                             title: 'Translated Title',
                             description: 'Translated Description',
                         }),
-                    isValid: () => true,
+                    isValid: () => mockFormIsValid,
                     isDirty: () => true,
                 }));
 
                 React.useEffect(() => {
-                    onValidationChange?.(true);
+                    onValidationChange?.(mockFormIsValid);
                     onDirtyChange?.(true);
                 }, [onValidationChange, onDirtyChange]);
 
@@ -108,6 +117,15 @@ jest.mock('@/hooks/admin/use-translate-pdf-section/useTranslatePdfSection', () =
 }));
 
 const mockUseTranslatePdfSection = jest.mocked(useTranslatePdfSection);
+
+const mockHookReturn = (overrides = {}) =>
+    mockUseTranslatePdfSection.mockReturnValue({
+        translatePdfSection: mockTranslatePdfSection,
+        isSubmitting: false,
+        error: '',
+        clearError: jest.fn(),
+        ...overrides,
+    });
 
 const TEST_DATA = {
     pdfSection: {
@@ -149,12 +167,8 @@ describe('TranslatePdfSectionModal', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         mockTranslatePdfSection.mockResolvedValue(undefined);
-        mockUseTranslatePdfSection.mockReturnValue({
-            translatePdfSection: mockTranslatePdfSection,
-            isSubmitting: false,
-            error: '',
-            clearError: jest.fn(),
-        });
+        mockHookReturn();
+        mockFormIsValid = true;
     });
 
     describe('Rendering', () => {
@@ -229,12 +243,7 @@ describe('TranslatePdfSectionModal', () => {
         });
 
         it('should disable button while submitting', () => {
-            mockUseTranslatePdfSection.mockReturnValue({
-                translatePdfSection: mockTranslatePdfSection,
-                isSubmitting: true,
-                error: '',
-                clearError: jest.fn(),
-            });
+            mockHookReturn({ isSubmitting: true });
 
             renderModal();
 
@@ -243,12 +252,7 @@ describe('TranslatePdfSectionModal', () => {
         });
 
         it('should disable language selector while submitting', () => {
-            mockUseTranslatePdfSection.mockReturnValue({
-                translatePdfSection: mockTranslatePdfSection,
-                isSubmitting: true,
-                error: '',
-                clearError: jest.fn(),
-            });
+            mockHookReturn({ isSubmitting: true });
 
             renderModal();
 
@@ -283,13 +287,6 @@ describe('TranslatePdfSectionModal', () => {
                 ],
             };
 
-            mockUseTranslatePdfSection.mockReturnValue({
-                translatePdfSection: mockTranslatePdfSection,
-                isSubmitting: false,
-                error: '',
-                clearError: jest.fn(),
-            });
-
             renderModal({ pdfSection: pdfSectionWithLocalization });
 
             expect(screen.getByTestId('modal-title')).toBeInTheDocument();
@@ -299,29 +296,17 @@ describe('TranslatePdfSectionModal', () => {
 
     describe('Error Handling', () => {
         it('should display error message when API call fails', () => {
-            mockUseTranslatePdfSection.mockReturnValue({
-                translatePdfSection: mockTranslatePdfSection,
-                isSubmitting: false,
-                error: 'Failed to translate',
-                clearError: jest.fn(),
-            });
-
+            mockHookReturn({ error: 'Failed to translate' });
             renderModal();
-
             expect(screen.getByText('Failed to translate')).toBeInTheDocument();
         });
     });
 
     describe('Form Validation', () => {
         it('should disable save button when form is invalid', () => {
-            mockUseTranslatePdfSection.mockReturnValue({
-                translatePdfSection: mockTranslatePdfSection,
-                isSubmitting: false,
-                error: '',
-                clearError: jest.fn(),
-            });
+            mockFormIsValid = false;
 
-            const { rerender } = render(
+            render(
                 <TranslatePdfSectionModal
                     isOpen={true}
                     onClose={jest.fn()}
@@ -331,17 +316,7 @@ describe('TranslatePdfSectionModal', () => {
                 />,
             );
 
-            rerender(
-                <TranslatePdfSectionModal
-                    isOpen={true}
-                    onClose={jest.fn()}
-                    pdfSection={TEST_DATA.pdfSection}
-                    onTranslatePdfSection={jest.fn()}
-                    translatedLanguages={TEST_DATA.translatedLanguages}
-                />,
-            );
-
-            expect(screen.getByTestId('save-localization-btn')).toBeEnabled();
+            expect(screen.getByTestId('save-localization-btn')).toBeDisabled();
         });
     });
 });

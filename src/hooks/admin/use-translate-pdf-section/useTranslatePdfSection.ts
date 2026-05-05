@@ -8,7 +8,7 @@ import { PdfSectionLocalizationsApi } from '@/services/api/admin/reports/pdf-sec
 
 interface UseTranslatePdfSectionParams {
     pdfSection: PdfSection | null;
-    language: LocalizationLanguage;
+    language: LocalizationLanguage | null | undefined;
     onSuccess: (updatedSection: PdfSection) => void;
     mode: ModalMode;
 }
@@ -26,7 +26,7 @@ export const useTranslatePdfSection = ({ pdfSection, language, onSuccess, mode }
     const isEditMode = mode === ModalMode.Edit;
 
     const translatePdfSection = async (data: TranslatePdfSectionFormData) => {
-        if (!pdfSection) return;
+        if (!pdfSection || !language) return;
 
         try {
             setIsSubmitting(true);

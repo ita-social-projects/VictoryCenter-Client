@@ -250,6 +250,17 @@ export const PROGRAM_EXPENSES_TEXT = {
     BUTTON: {
         ADD_PROGRAM_EXPENSE: 'Витрата по програмі',
     },
+    MODAL: {
+        ADD: {
+            TITLE: 'Додати витрату по програмі',
+            SUBTITLE: 'Розподіл програмних витрат по програмах',
+            PROGRAM_LABEL: 'Категорія програми',
+            PROGRAM_PLACEHOLDER: 'Оберіть програму',
+            SUBMIT_BUTTON: 'Додати витрату',
+            CONFIRM_CLOSE_TITLE: 'Дані буде втрачено. Бажаєте продовжити?',
+            PROGRAM_NO_AVAILABLE: 'Немає доступних програм',
+        },
+    },
     FILTER: {
         PROGRAMS_PLACEHOLDER: 'Програми',
         ALL_OPTION: 'Всі',

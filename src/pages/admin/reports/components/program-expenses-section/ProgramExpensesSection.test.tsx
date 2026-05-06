@@ -86,6 +86,14 @@ jest.mock('@/assets/icons/plus.svg', () => ({
     ReactComponent: () => <svg data-testid="plus-icon" />,
 }));
 
+jest.mock('./components/common/add-program-expense-record-modal/AddProgramExpenseRecordModal', () => ({
+    AddProgramExpenseRecordModal: ({ isOpen, exchangeRate }: { isOpen: boolean; exchangeRate: string | null }) => (
+        <div data-testid="add-program-expense-modal" data-open={String(isOpen)} data-exchange-rate={exchangeRate ?? ''}>
+            AddProgramExpenseRecordModal
+        </div>
+    ),
+}));
+
 jest.mock('@/components/admin/multi-select-input/MultiSelectInput', () => ({
     MultiSelectInput: ({
         options,
@@ -272,7 +280,7 @@ describe('ProgramExpensesSection', () => {
 
         expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.TITLE)).toBeInTheDocument();
         expect(screen.getByText(PROGRAM_EXPENSES_TEXT.EMPTY_STATE.ADD_RECORD)).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE })).toBeEnabled();
+        expect(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE })).toBeDisabled();
     });
 
     it('should pass fetch handler that calls ProgramExpensesApi.getReadOnlyData', async () => {
@@ -300,18 +308,11 @@ describe('ProgramExpensesSection', () => {
         expect(screen.getByText(PROGRAM_EXPENSES_TEXT.TABLE.COLUMNS.ACTIONS)).toBeInTheDocument();
     });
 
-    it('should display synced exchange rate in edit mode', () => {
-        render(<ProgramExpensesSection isEditing syncedExchangeRate="44.20" />);
+    it('should display mock exchange rate in edit mode', () => {
+        render(<ProgramExpensesSection isEditing />);
 
-        expect(screen.getByText('44.20')).toBeInTheDocument();
-        expect(screen.queryByText('41.25')).not.toBeInTheDocument();
-    });
-
-    it('should display empty synced exchange rate in edit mode when the funds value is cleared', () => {
-        render(<ProgramExpensesSection isEditing syncedExchangeRate={null} />);
-
-        expect(screen.getByText('-')).toBeInTheDocument();
-        expect(screen.queryByText('41.25')).not.toBeInTheDocument();
+        expect(screen.getByText('41.25')).toBeInTheDocument();
+        expect(screen.getByTestId('add-program-expense-modal')).toHaveAttribute('data-exchange-rate', '41.25');
     });
 
     it('should disable add program expense button when four records exist', () => {

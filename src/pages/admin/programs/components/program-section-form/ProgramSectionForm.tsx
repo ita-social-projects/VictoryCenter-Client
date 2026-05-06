@@ -369,10 +369,6 @@ export const ProgramSectionForm = ({
 
         setTimeout(() => {
             const element = document.getElementById(`pair-description-${nextGroupIndex}`) as HTMLTextAreaElement | null;
-            // When adding a new pair inside the horizontal carousel, focusing the textarea
-            // does not always scroll the card fully into view (notably around the 4th card
-            // when overflow/navigation first appears). Explicitly scroll the focused element
-            // into view horizontally, then focus without triggering an additional scroll.
             element?.scrollIntoView({
                 behavior: 'smooth',
                 block: 'nearest',

@@ -1,15 +1,15 @@
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
-import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
-import { ProgramSectionForm } from './ProgramSectionForm';
-import type { ProgramSectionFormProps } from './ProgramSectionForm';
-import type { CreateHippotherapyProgramSectionDto } from '@/types/common/program-sections';
-import { SectionTemplate, SectionMode } from '@/types/common/sections';
-import { ContentType } from '@/types/common/section-contents';
-import { SECTIONS_TEXT } from '@/const/admin/sections';
-import { renderProgramSection } from '@/utils/functions/render-program-section';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { SECTIONS_TEXT } from '@/const/admin/sections';
+import type { CreateHippotherapyProgramSectionDto } from '@/types/common/program-sections';
+import { ContentType } from '@/types/common/section-contents';
+import { SectionMode, SectionTemplate } from '@/types/common/sections';
+import { renderProgramSection } from '@/utils/functions/render-program-section';
+import type { ProgramSectionFormProps } from './ProgramSectionForm';
+import { ProgramSectionForm } from './ProgramSectionForm';
 
 jest.mock('@/utils/functions/render-program-section', () => ({
     renderProgramSection: jest.fn(() => <div data-testid="editable-section" />),
@@ -131,10 +131,13 @@ const getContentByGroupAndType = (s: CreateHippotherapyProgramSectionDto, groupI
 const createFocusableTextarea = (id: string) => {
     const el = document.createElement('textarea');
     el.id = id;
-    const focusMock = jest.fn();
-    (el as any).focus = focusMock;
+    const focusMock = jest.fn<void, [FocusOptions?]>();
+    el.focus = focusMock as unknown as typeof el.focus;
+
+    const scrollIntoViewMock = jest.fn<void, [ScrollIntoViewOptions?]>();
+    el.scrollIntoView = scrollIntoViewMock as unknown as typeof el.scrollIntoView;
     document.body.appendChild(el);
-    return { el, focusMock };
+    return { el, focusMock, scrollIntoViewMock };
 };
 
 describe('ProgramSectionForm', () => {
@@ -250,7 +253,11 @@ describe('ProgramSectionForm', () => {
         });
 
         const onCancel = jest.fn();
-        const { handlers } = renderWithHandlers({ section, isNewSection: false, onCancel });
+        const { handlers } = renderWithHandlers({
+            section,
+            isNewSection: false,
+            onCancel,
+        });
 
         const editButton = screen.getByLabelText('Edit section');
         fireEvent.click(editButton);
@@ -642,7 +649,7 @@ describe('ProgramSectionForm', () => {
 
             const maxOrder = Math.max(...section.contents.map((c: any) => c.order));
             const nextIndex = 2;
-            const { focusMock } = createFocusableTextarea(`pair-description-${nextIndex}`);
+            const { focusMock, scrollIntoViewMock } = createFocusableTextarea(`pair-description-${nextIndex}`);
 
             act(() => {
                 handlers.onAddPair();
@@ -683,7 +690,15 @@ describe('ProgramSectionForm', () => {
             expect((getContentByGroupAndType(updated, 1, ContentType.Description) as any)?.description).toBe('D2');
             expect((getContentByGroupAndType(updated, 1, ContentType.Author) as any)?.author).toBe('A2');
 
+            expect(scrollIntoViewMock).toHaveBeenCalledTimes(1);
+            expect(scrollIntoViewMock).toHaveBeenCalledWith({
+                behavior: 'smooth',
+                block: 'nearest',
+                inline: 'center',
+            });
+
             expect(focusMock).toHaveBeenCalledTimes(1);
+            expect(focusMock).toHaveBeenCalledWith({ preventScroll: true });
 
             jest.useRealTimers();
         });
@@ -830,7 +845,10 @@ describe('ProgramSectionForm', () => {
         });
 
         it('calls onSave and transitions back to View mode when a valid dirty section is saved', () => {
-            const { handlers } = renderWithHandlers({ isNewSection: true, isSectionValid: true });
+            const { handlers } = renderWithHandlers({
+                isNewSection: true,
+                isSectionValid: true,
+            });
 
             act(() => {
                 handlers.onTitleChange('Updated title');

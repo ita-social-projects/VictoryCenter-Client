@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 import { MAIN_PAGE_VALIDATION } from '@/const/admin/main-page';
-import { AboutUsBlockFormValues, TitleBlockFormValues } from '@/types/admin/main-page';
+import { AboutUsBlockFormValues, TitleBlockFormValues, PartnersBlockFormValues } from '@/types/admin/main-page';
 import { Image, ImageValues } from '@/types/common/image';
 import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
 
@@ -35,6 +35,11 @@ export const AboutUsBlockValidationSchema: Yup.ObjectSchema<AboutUsBlockFormValu
     description: buildStringValidation(MAIN_PAGE_VALIDATION.aboutUsBlock.description),
 });
 
+export const PartnersBlockValidationSchema: Yup.ObjectSchema<PartnersBlockFormValues> = Yup.object({
+    title: buildStringValidation(MAIN_PAGE_VALIDATION.partnersBlock.title),
+    description: buildStringValidation(MAIN_PAGE_VALIDATION.partnersBlock.description),
+});
+
 export const MAIN_PAGE_VALIDATION_FUNCTIONS = {
     validateTitle: (value: string): string | undefined => {
         try {
@@ -57,6 +62,24 @@ export const MAIN_PAGE_VALIDATION_FUNCTIONS = {
     validateImage: (value: Image | ImageValues | null): string | undefined => {
         try {
             TitleBlockValidationSchema.validateSyncAt('image', { image: value });
+            return undefined;
+        } catch (error: any) {
+            return error.message;
+        }
+    },
+
+    validatePartnersTitle: (value: string): string | undefined => {
+        try {
+            PartnersBlockValidationSchema.validateSyncAt('title', { title: value });
+            return undefined;
+        } catch (error: any) {
+            return error.message;
+        }
+    },
+
+    validatePartnersDescription: (value: string): string | undefined => {
+        try {
+            PartnersBlockValidationSchema.validateSyncAt('description', { description: value });
             return undefined;
         } catch (error: any) {
             return error.message;

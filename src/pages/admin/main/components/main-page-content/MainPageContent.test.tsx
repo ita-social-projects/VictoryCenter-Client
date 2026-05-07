@@ -15,6 +15,11 @@ jest.mock('../about-us-block/AboutUsBlockForm', () => ({
     AboutUsBlockForm: () => <div data-testid="about-us-block-form">About Us Form</div>,
 }));
 
+jest.mock('../partners-block/PartnersBlockForm', () => ({
+    __esModule: true,
+    PartnersBlockForm: () => <div data-testid="partners-block-form">Partners Form</div>,
+}));
+
 jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
     __esModule: true,
     CategoryBar: require('@/utils/test-mocks/main-page-mocks').MockMainPageCategoryBar,
@@ -110,6 +115,7 @@ describe('MainPageContent', () => {
         });
 
         fireEvent.click(screen.getByTestId('tab-btn-partners'));
-        expect(getByExactText(`Блок "${MAIN_PAGE_TEXT.TABS.PARTNERS}" в розробці`)).toBeInTheDocument();
+        expect(screen.getByTestId('partners-block-form')).toBeInTheDocument();
+        expect(screen.queryByTestId('title-block-form')).not.toBeInTheDocument();
     });
 });

@@ -57,8 +57,9 @@ export const EditFundsExpendituresCategoryModal = ({
     const isSubmitDisabled = useMemo(
         () =>
             !selectedCategoryId ||
+            name.trim() === selectedCategory?.name.trim() ||
             validateFundsExpendituresCategoryName(name, selectedCategory?.type, otherCategories) !== undefined,
-        [selectedCategoryId, name, selectedCategory?.type, otherCategories],
+        [selectedCategoryId, name, selectedCategory?.name, selectedCategory?.type, otherCategories],
     );
 
     const resetForm = useCallback(() => {

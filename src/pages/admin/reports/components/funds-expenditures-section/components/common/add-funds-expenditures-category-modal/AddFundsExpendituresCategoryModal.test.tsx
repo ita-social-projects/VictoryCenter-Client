@@ -4,22 +4,6 @@ import { FUNDS_EXPENDITURES_TEXT, FUNDS_EXPENDITURES_VALIDATION } from '@/const/
 import { ReportFundsExpendituresCategory } from '@/types/admin/reports';
 import { AddFundsExpendituresCategoryModal } from './AddFundsExpendituresCategoryModal';
 
-jest.mock('@/components/common/modal/Modal', () => {
-    const Modal = ({ isOpen, onClose, children }: any) => {
-        if (!isOpen) return null;
-        return (
-            <div data-testid="modal">
-                <button data-testid="modal-close" onClick={onClose} />
-                {children}
-            </div>
-        );
-    };
-    Modal.Title = ({ children }: any) => <>{children}</>;
-    Modal.Content = ({ children }: any) => <>{children}</>;
-    Modal.Actions = ({ children }: any) => <>{children}</>;
-    return { Modal };
-});
-
 jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
     ConfirmationModal: ({ isOpen, title, onConfirm, onCancel, onClose }: any) => (
         <div data-testid="confirm-modal" data-open={String(isOpen)}>
@@ -71,7 +55,7 @@ describe('AddFundsExpendituresCategoryModal', () => {
 
     it('renders nothing when isOpen is false', () => {
         render(<AddFundsExpendituresCategoryModal isOpen={false} onClose={jest.fn()} />);
-        expect(screen.queryByTestId('modal')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('modal-overlay')).not.toBeInTheDocument();
     });
 
     it('renders title and subtitle when open', () => {
@@ -229,7 +213,7 @@ describe('AddFundsExpendituresCategoryModal', () => {
             fireEvent.click(getSubmitButton());
             await waitFor(() => expect(onSubmit).toHaveBeenCalled());
             expect(onClose).not.toHaveBeenCalled();
-            expect(screen.getByTestId('modal')).toBeInTheDocument();
+            expect(screen.getByTestId('modal-overlay')).toBeInTheDocument();
         });
 
         it('disables submit button while submitting', async () => {
@@ -261,14 +245,14 @@ describe('AddFundsExpendituresCategoryModal', () => {
         const triggerDirtyClose = (onClose = jest.fn()) => {
             renderOpen(onClose);
             fireEvent.change(screen.getByTestId(NAME_INPUT), { target: { value: 'dirty' } });
-            fireEvent.click(screen.getByTestId('modal-close'));
+            fireEvent.click(screen.getByRole('button', { name: 'Close modal' }));
             return onClose;
         };
 
         it('calls onClose directly when form is clean', () => {
             const onClose = jest.fn();
             renderOpen(onClose);
-            fireEvent.click(screen.getByTestId('modal-close'));
+            fireEvent.click(screen.getByRole('button', { name: 'Close modal' }));
             expect(onClose).toHaveBeenCalledTimes(1);
             expect(screen.getByTestId('confirm-modal')).toHaveAttribute('data-open', 'false');
         });
@@ -278,7 +262,7 @@ describe('AddFundsExpendituresCategoryModal', () => {
             fireEvent.blur(screen.getByTestId(NAME_INPUT));
             expect(screen.getByText(REQUIRED_ERROR)).toBeInTheDocument();
 
-            fireEvent.click(screen.getByTestId('modal-close'));
+            fireEvent.click(screen.getByRole('button', { name: 'Close modal' }));
             expect(screen.queryByText(REQUIRED_ERROR)).not.toBeInTheDocument();
         });
 
@@ -286,7 +270,7 @@ describe('AddFundsExpendituresCategoryModal', () => {
             const onClose = jest.fn();
             renderOpen(onClose);
             fireEvent.change(screen.getByTestId(TYPE_SELECT), { target: { value: 'expense' } });
-            fireEvent.click(screen.getByTestId('modal-close'));
+            fireEvent.click(screen.getByRole('button', { name: 'Close modal' }));
             expect(onClose).not.toHaveBeenCalled();
             expect(screen.getByTestId('confirm-modal')).toHaveAttribute('data-open', 'true');
         });
@@ -307,7 +291,7 @@ describe('AddFundsExpendituresCategoryModal', () => {
             fireEvent.click(screen.getByTestId('confirm-no'));
             expect(onClose).not.toHaveBeenCalled();
             expect(screen.getByTestId('confirm-modal')).toHaveAttribute('data-open', 'false');
-            expect(screen.getByTestId('modal')).toBeInTheDocument();
+            expect(screen.getByTestId('modal-overlay')).toBeInTheDocument();
         });
 
         it('dismisses confirmation and keeps modal open on cancel via onClose', () => {
@@ -323,7 +307,7 @@ describe('AddFundsExpendituresCategoryModal', () => {
             fillForm();
             expect(getSubmitButton()).not.toBeDisabled();
 
-            fireEvent.click(screen.getByTestId('modal-close'));
+            fireEvent.click(screen.getByRole('button', { name: 'Close modal' }));
             fireEvent.click(screen.getByTestId('confirm-yes'));
 
             expect(onClose).toHaveBeenCalledTimes(1);

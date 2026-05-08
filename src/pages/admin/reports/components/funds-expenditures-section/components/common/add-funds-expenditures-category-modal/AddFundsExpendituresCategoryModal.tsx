@@ -15,6 +15,18 @@ import {
 } from '@/validation/admin/reports-schema/funds-expenditures-category-schema/funds-expenditures-category-schema';
 import styles from './AddFundsExpendituresCategoryModal.module.scss';
 
+const renderInputWithError = (
+    input: React.ReactNode,
+    error?: string,
+    inputErrorClass?: string,
+    errorClass?: string,
+) => (
+    <>
+        <div className={cn({ [inputErrorClass || '']: Boolean(error) })}>{input}</div>
+        <p className={cn(errorClass, { [styles.errorHidden]: !error })}>{error ?? ' '}</p>
+    </>
+);
+
 interface AddFundsExpendituresCategoryModalProps {
     isOpen: boolean;
     onClose: () => void;
@@ -160,7 +172,7 @@ export const AddFundsExpendituresCategoryModal = ({
                                         <span className={styles.required}>*</span>
                                         {FUNDS_EXPENDITURES_TEXT.MODAL.CATEGORY.NAME_LABEL}
                                     </label>
-                                    <div className={cn({ [styles.inputError]: Boolean(nameError) })}>
+                                    {renderInputWithError(
                                         <InputWithCharacterLimit
                                             id="category-name"
                                             name="categoryName"
@@ -175,11 +187,11 @@ export const AddFundsExpendituresCategoryModal = ({
                                             showCounter={true}
                                             hasError={Boolean(nameError)}
                                             className={styles.input}
-                                        />
-                                    </div>
-                                    <p className={cn(styles.error, { [styles.errorHidden]: !nameError })}>
-                                        {nameError ?? ' '}
-                                    </p>
+                                        />,
+                                        nameError,
+                                        styles.inputError,
+                                        styles.error,
+                                    )}
                                 </div>
                             </div>
                         </div>

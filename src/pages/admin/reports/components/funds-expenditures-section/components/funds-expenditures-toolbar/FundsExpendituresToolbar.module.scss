@@ -175,3 +175,53 @@
         background-color: rgba(c.$blue-500, 0.17);
     }
 }
+
+.category-menu {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.menu-button {
+    background: transparent;
+    border: none;
+    padding: 8px;
+    margin-left: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    :global(svg) {
+        width: 20px;
+        height: 20px;
+        fill: c.$blue-900;
+    }
+}
+
+.menu-popover {
+    position: absolute;
+    top: 40px;
+    right: 0;
+    background: c.$white;
+    border: 1px solid rgba(c.$black, 0.06);
+    box-shadow: 0 6px 16px rgba(c.$black, 0.08);
+    border-radius: 8px;
+    z-index: 20;
+    padding: 6px 8px;
+}
+
+.menu-item {
+    background: transparent;
+    border: none;
+    padding: 8px 12px;
+    width: 100%;
+    text-align: left;
+    @include type.small-text-regular;
+    color: c.$blue-900;
+    cursor: pointer;
+
+    &:hover {
+        background-color: rgba(c.$dropdown-hover, 0.1);
+    }
+}

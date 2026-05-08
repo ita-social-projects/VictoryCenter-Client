@@ -93,6 +93,11 @@
     color: c.$bluish-black;
 }
 
+.required {
+    color: c.$error;
+    margin-right: 6px;
+}
+
 .selectContainer {
     width: 100%;
 }

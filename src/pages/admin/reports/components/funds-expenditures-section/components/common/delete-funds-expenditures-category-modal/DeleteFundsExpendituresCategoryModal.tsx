@@ -86,6 +86,7 @@ export const DeleteFundsExpendituresCategoryModal = ({
                             <div className={styles.field}>
                                 <div className={styles.labelRow}>
                                     <label className={styles.label}>
+                                        <span className={styles.required}>*</span>
                                         {FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.CATEGORY_LABEL}
                                     </label>
                                     {selectedCategory && (

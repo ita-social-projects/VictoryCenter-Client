@@ -213,9 +213,9 @@ export const FUNDS_EXPENDITURES_TEXT = {
             CONFIRM_TITLE: 'Видалити категорію?',
             ERROR: {
                 getHasIncomeRecordTitle: (count: number) =>
-                    `Категорія використовується в надходженнях, ${count} ${count === 1 ? 'запис' : 'записи'}`,
+                    `Категорія використовується в надходженнях, ${count} ${count === 1 ? 'запис' : count < 5 ? 'записи' : 'записів'}`,
                 getHasExpenseRecordTitle: (count: number) =>
-                    `Категорія використовується у витратах, ${count} ${count === 1 ? 'запис' : 'записи'}`,
+                    `Категорія використовується у витратах, ${count} ${count === 1 ? 'запис' : count < 5 ? 'записи' : 'записів'}`,
                 HAS_RECORD_TEXT: 'Видаліть або змініть їх',
             },
         },

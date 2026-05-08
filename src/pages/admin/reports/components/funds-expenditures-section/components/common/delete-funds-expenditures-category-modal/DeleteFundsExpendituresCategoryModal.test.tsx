@@ -22,6 +22,15 @@ const incomeRecord: ReportFundsExpendituresRecord = {
     amountUsd: '25',
 };
 
+const incomeRecord2: ReportFundsExpendituresRecord = {
+    id: 11,
+    categoryId: 1,
+    type: 'income',
+    reportingYear: '2023',
+    amountUah: '2000',
+    amountUsd: '50',
+};
+
 const expenseRecord: ReportFundsExpendituresRecord = {
     id: 20,
     categoryId: 2,
@@ -147,6 +156,14 @@ describe('DeleteFundsExpendituresCategoryModal', () => {
             expect(
                 screen.queryByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.ERROR.HAS_RECORD_TEXT),
             ).not.toBeInTheDocument();
+        });
+
+        it('shows correct plural form when category has multiple records', () => {
+            renderModal({ records: [incomeRecord, incomeRecord2] });
+            selectCategory(incomeCategory.name);
+            expect(
+                screen.getByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.ERROR.getHasIncomeRecordTitle(2)),
+            ).toBeInTheDocument();
         });
     });
 

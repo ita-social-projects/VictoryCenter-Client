@@ -8,6 +8,7 @@ import {
 
 const REQUIRED = COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED;
 const MIN_ERROR = COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(FUNDS_EXPENDITURES_VALIDATION.categoryNameMin);
+const MAX_ERROR = COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(FUNDS_EXPENDITURES_VALIDATION.categoryNameMax);
 const DUPLICATE_ERROR = FUNDS_EXPENDITURES_TEXT.MODAL.CATEGORY.ERROR.NAME_DUPLICATE;
 
 const category = (name: string, type: 'income' | 'expense'): ReportFundsExpendituresCategory => ({
@@ -27,6 +28,11 @@ describe('validateFundsExpendituresCategoryName', () => {
 
     it('returns min length error when name is shorter than minimum', () => {
         expect(validateFundsExpendituresCategoryName('abc', undefined, [])).toBe(MIN_ERROR);
+    });
+
+    it('returns max length error when name exceeds maximum', () => {
+        const longName = 'а'.repeat(FUNDS_EXPENDITURES_VALIDATION.categoryNameMax + 1);
+        expect(validateFundsExpendituresCategoryName(longName, undefined, [])).toBe(MAX_ERROR);
     });
 
     it('returns duplicate error when name matches existing category for same type', () => {

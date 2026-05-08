@@ -212,8 +212,11 @@ export const FUNDS_EXPENDITURES_TEXT = {
             CATEGORY_PLACEHOLDER: 'Оберіть категорію',
             CONFIRM_TITLE: 'Видалити категорію?',
             ERROR: {
-                HAS_INCOME_RECORD: 'Категорія використовується в надходженнях, 1 запис. Видаліть або змініть його',
-                HAS_EXPENSE_RECORD: 'Категорія використовується у витратах, 1 запис. Видаліть або змініть його',
+                getHasIncomeRecordTitle: (count: number) =>
+                    `Категорія використовується в надходженнях, ${count} ${count === 1 ? 'запис' : 'записи'}`,
+                getHasExpenseRecordTitle: (count: number) =>
+                    `Категорія використовується у витратах, ${count} ${count === 1 ? 'запис' : 'записи'}`,
+                HAS_RECORD_TEXT: 'Видаліть або змініть їх',
             },
         },
         CATEGORY: {

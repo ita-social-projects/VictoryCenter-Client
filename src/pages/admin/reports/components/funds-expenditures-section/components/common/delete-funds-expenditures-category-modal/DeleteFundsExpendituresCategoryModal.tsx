@@ -29,13 +29,14 @@ export const DeleteFundsExpendituresCategoryModal = ({
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const selectedCategory = categories.find((c) => c.id === selectedCategoryId);
-    const hasRecord = records.some((r) => r.categoryId === selectedCategoryId);
+    const recordCount = records.filter((r) => r.categoryId === selectedCategoryId).length;
+    const hasRecord = recordCount > 0;
 
-    const recordError =
+    const recordErrorTitle =
         selectedCategory && hasRecord
             ? selectedCategory.type === 'income'
-                ? FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.ERROR.HAS_INCOME_RECORD
-                : FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.ERROR.HAS_EXPENSE_RECORD
+                ? FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.ERROR.getHasIncomeRecordTitle(recordCount)
+                : FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.ERROR.getHasExpenseRecordTitle(recordCount)
             : undefined;
 
     const resetForm = useCallback(() => {
@@ -110,7 +111,12 @@ export const DeleteFundsExpendituresCategoryModal = ({
                                 </Select>
                             </div>
 
-                            {recordError && <HintBox title={recordError} />}
+                            {recordErrorTitle && (
+                                <HintBox
+                                    title={recordErrorTitle}
+                                    text={FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.ERROR.HAS_RECORD_TEXT}
+                                />
+                            )}
                         </div>
                     </div>
                 </Modal.Content>

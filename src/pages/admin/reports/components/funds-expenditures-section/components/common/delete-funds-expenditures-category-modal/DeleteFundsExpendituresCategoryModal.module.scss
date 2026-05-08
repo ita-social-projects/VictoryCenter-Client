@@ -51,8 +51,11 @@
 }
 
 .title {
-    @include type.h4-bold;
-    line-height: 36px;
+    font-size: 32px;
+    font-weight: 400;
+    line-height: 24px;
+    letter-spacing: -0.02em;
+    text-align: center;
     margin: 0;
     color: c.$blue-900;
 }
@@ -117,6 +120,10 @@
 
 .panel :global(.select-options) {
     width: 100%;
+}
+
+.panel :global(.hint-box) {
+    color: c.$blue-900;
 }
 
 .type {

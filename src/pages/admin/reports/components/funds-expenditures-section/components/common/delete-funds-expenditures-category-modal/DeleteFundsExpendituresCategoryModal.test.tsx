@@ -110,7 +110,10 @@ describe('DeleteFundsExpendituresCategoryModal', () => {
             renderModal({ records: [incomeRecord] });
             selectCategory(incomeCategory.name);
             expect(
-                screen.getByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.ERROR.HAS_INCOME_RECORD),
+                screen.getByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.ERROR.getHasIncomeRecordTitle(1)),
+            ).toBeInTheDocument();
+            expect(
+                screen.getByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.ERROR.HAS_RECORD_TEXT),
             ).toBeInTheDocument();
         });
 
@@ -118,7 +121,10 @@ describe('DeleteFundsExpendituresCategoryModal', () => {
             renderModal({ records: [expenseRecord] });
             selectCategory(expenseCategory.name);
             expect(
-                screen.getByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.ERROR.HAS_EXPENSE_RECORD),
+                screen.getByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.ERROR.getHasExpenseRecordTitle(1)),
+            ).toBeInTheDocument();
+            expect(
+                screen.getByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.ERROR.HAS_RECORD_TEXT),
             ).toBeInTheDocument();
         });
 
@@ -126,14 +132,20 @@ describe('DeleteFundsExpendituresCategoryModal', () => {
             renderModal({ records: [] });
             selectCategory(incomeCategory.name);
             expect(
-                screen.queryByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.ERROR.HAS_INCOME_RECORD),
+                screen.queryByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.ERROR.getHasIncomeRecordTitle(1)),
+            ).not.toBeInTheDocument();
+            expect(
+                screen.queryByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.ERROR.HAS_RECORD_TEXT),
             ).not.toBeInTheDocument();
         });
 
         it('does not show hint box when no category is selected', () => {
             renderModal({ records: [incomeRecord] });
             expect(
-                screen.queryByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.ERROR.HAS_INCOME_RECORD),
+                screen.queryByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.ERROR.getHasIncomeRecordTitle(1)),
+            ).not.toBeInTheDocument();
+            expect(
+                screen.queryByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.ERROR.HAS_RECORD_TEXT),
             ).not.toBeInTheDocument();
         });
     });

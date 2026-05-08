@@ -90,7 +90,9 @@ describe('MAIN_PAGE_VALIDATION_FUNCTIONS', () => {
         });
 
         it('treats spaces as empty and returns required error', () => {
-            expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validatePartnersTitle('   ')).toBe(MAIN_PAGE_VALIDATION.common.REQUIRED);
+            expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validatePartnersTitle('   ')).toBe(
+                MAIN_PAGE_VALIDATION.common.REQUIRED,
+            );
         });
 
         it('returns min error for title shorter than 10 chars', () => {

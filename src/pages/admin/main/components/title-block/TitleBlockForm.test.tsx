@@ -1,8 +1,7 @@
-import React from 'react';
+import { MainPage } from '@/types/admin/main-page';
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { TitleBlockForm } from './TitleBlockForm';
-import { MainPage } from '@/types/admin/main-page';
 
 jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
     __esModule: true,

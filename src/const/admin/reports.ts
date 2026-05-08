@@ -165,6 +165,8 @@ export const FUNDS_EXPENDITURES_TEXT = {
         CATEGORY_CREATE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
         CATEGORY_DELETED_SUCCESSFULLY: 'Категорію видалено успішно',
         CATEGORY_DELETE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
+        CATEGORY_UPDATED_SUCCESSFULLY: 'Категорію оновлено успішно',
+        CATEGORY_UPDATE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
     },
     MODAL: {
         SHARED: {
@@ -194,14 +196,27 @@ export const FUNDS_EXPENDITURES_TEXT = {
             SUBMIT_BUTTON: 'Додати витрату',
             CONFIRM_ADD_TITLE: 'Додати нову витрату?',
         },
+        EDIT_CATEGORY: {
+            TITLE: 'Редагувати категорію',
+            SUBTITLE: 'Редагування категорії витрат/надходжень для формування звітності',
+            CATEGORY_LABEL: 'Категорія',
+            CATEGORY_PLACEHOLDER: 'Оберіть категорію',
+            NAME_LABEL: 'Редагувати назву',
+            NAME_PLACEHOLDER: 'Введіть назву категорії',
+            SUBMIT_BUTTON: 'Зберегти',
+            CONFIRM_SAVE_TITLE: 'Зберегти зміни?',
+        },
         DELETE_CATEGORY: {
             TITLE: 'Видалити категорію',
             CATEGORY_LABEL: 'Категорія',
             CATEGORY_PLACEHOLDER: 'Оберіть категорію',
             CONFIRM_TITLE: 'Видалити категорію?',
             ERROR: {
-                HAS_INCOME_RECORD: 'Категорія використовується в надходженнях, 1 запис. Видаліть або змініть його',
-                HAS_EXPENSE_RECORD: 'Категорія використовується у витратах, 1 запис. Видаліть або змініть його',
+                getHasIncomeRecordTitle: (count: number) =>
+                    `Категорія використовується в надходженнях, ${count} ${count === 1 ? 'запис' : count < 5 ? 'записи' : 'записів'}`,
+                getHasExpenseRecordTitle: (count: number) =>
+                    `Категорія використовується у витратах, ${count} ${count === 1 ? 'запис' : count < 5 ? 'записи' : 'записів'}`,
+                HAS_RECORD_TEXT: 'Видаліть або змініть їх',
             },
         },
         CATEGORY: {
@@ -223,6 +238,7 @@ export const FUNDS_EXPENDITURES_TEXT = {
         ADD_EXPENSE: 'Витрати',
         ADD_CATEGORY: 'Додати категорію',
         DELETE_CATEGORY: 'Видалити',
+        EDIT_CATEGORY: 'Редагувати',
     },
     FILTER: {
         TYPE_PLACEHOLDER: 'Тип',

@@ -19,6 +19,8 @@ export const validateFundsExpendituresCategoryName = (
     if (!normalized) return COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED;
     if (normalized.length < FUNDS_EXPENDITURES_VALIDATION.categoryNameMin)
         return COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(FUNDS_EXPENDITURES_VALIDATION.categoryNameMin);
+    if (normalized.length > FUNDS_EXPENDITURES_VALIDATION.categoryNameMax)
+        return COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(FUNDS_EXPENDITURES_VALIDATION.categoryNameMax);
     if (type && isNameDuplicate(normalized, type, categories))
         return FUNDS_EXPENDITURES_TEXT.MODAL.CATEGORY.ERROR.NAME_DUPLICATE;
     return undefined;

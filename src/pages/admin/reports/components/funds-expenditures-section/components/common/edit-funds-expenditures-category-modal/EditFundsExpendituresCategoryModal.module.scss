@@ -1,6 +1,73 @@
 @use '@/assets/sass/variables/colors' as c;
 @use '@/assets/sass/mixins/typography.mixins' as type;
 
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    width: 100%;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.labelRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.label {
+    @include type.small-text-medium;
+    color: c.$bluish-black;
+    margin-bottom: 8px;
+}
+
+.labelRow .label {
+    margin-bottom: 0;
+}
+
+.required {
+    color: c.$error;
+    margin-right: 6px;
+}
+
+.selectContainer {
+    width: 100%;
+}
+
+.selectHead {
+    width: 100%;
+    height: 48px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid c.$grey-700;
+    border-radius: 8px;
+    background-color: c.$white;
+}
+
+.input {
+    width: 100%;
+}
+
+.panel :global(.char-limit-input) {
+    width: 100%;
+}
+
+.inputError :global(.char-limit-input) {
+    border-color: c.$error;
+}
+
+.panel :global(.select-options) {
+    width: 100%;
+}
+
 .modal {
     width: 650px;
 
@@ -34,7 +101,7 @@
 
     :global(.modal-body) {
         margin-bottom: 0;
-        padding: 18px 0 0;
+        padding: 8px 0 0;
     }
 
     :global(.modal-footer) {
@@ -46,8 +113,14 @@
 
     :global(.modal-footer button) {
         width: 100%;
-        height: 40px;
     }
+}
+
+.header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
 }
 
 .title {
@@ -55,9 +128,15 @@
     font-weight: 400;
     line-height: 24px;
     letter-spacing: -0.02em;
-    text-align: center;
+    text-align: left;
     margin: 0;
     color: c.$blue-900;
+}
+
+.subtitle {
+    @include type.small-text-regular;
+    margin: 0;
+    color: c.$grey-900;
 }
 
 .content {
@@ -76,54 +155,6 @@
     border: 1px solid c.$grey-150;
     padding: 20px 22px;
     min-height: 180px;
-    gap: 12px;
-}
-
-.field {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-}
-
-.labelRow {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
-}
-
-.label {
-    @include type.small-text-medium;
-    color: c.$bluish-black;
-}
-
-.required {
-    color: c.$error;
-    margin-right: 6px;
-}
-
-.selectContainer {
-    width: 100%;
-}
-
-.selectHead {
-    width: 100%;
-    height: 48px;
-    padding: 0 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border: 1px solid c.$grey-700;
-    border-radius: 8px;
-    background-color: c.$white;
-}
-
-.panel :global(.select-options) {
-    width: 100%;
-}
-
-.panel :global(.hint-box) {
-    color: c.$blue-900;
 }
 
 .type {
@@ -132,19 +163,28 @@
     color: c.$blue-900;
 }
 
+.error {
+    @include type.small-text-regular;
+    margin: 4px 0 0;
+    min-height: 20px;
+    color: c.$error;
+    visibility: visible;
+}
+
+.errorHidden {
+    visibility: hidden;
+}
+
 .actions {
     width: 100%;
     display: flex;
-    gap: 24px;
     justify-content: center;
 }
 
-.deleteButton {
-    background-color: c.$blue-900;
-
-    &:disabled {
-        background-color: c.$grey-700;
-    }
+.submit {
+    @include type.subtitle-2-medium;
+    height: 60px;
+    width: 100%;
 }
 
 @media (max-width: 768px) {

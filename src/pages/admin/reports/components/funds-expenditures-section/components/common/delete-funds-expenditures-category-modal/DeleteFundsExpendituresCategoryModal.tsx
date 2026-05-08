@@ -29,13 +29,14 @@ export const DeleteFundsExpendituresCategoryModal = ({
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const selectedCategory = categories.find((c) => c.id === selectedCategoryId);
-    const hasRecord = records.some((r) => r.categoryId === selectedCategoryId);
+    const recordCount = records.filter((r) => r.categoryId === selectedCategoryId).length;
+    const hasRecord = recordCount > 0;
 
-    const recordError =
+    const recordErrorTitle =
         selectedCategory && hasRecord
             ? selectedCategory.type === 'income'
-                ? FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.ERROR.HAS_INCOME_RECORD
-                : FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.ERROR.HAS_EXPENSE_RECORD
+                ? FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.ERROR.getHasIncomeRecordTitle(recordCount)
+                : FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.ERROR.getHasExpenseRecordTitle(recordCount)
             : undefined;
 
     const resetForm = useCallback(() => {
@@ -84,9 +85,19 @@ export const DeleteFundsExpendituresCategoryModal = ({
                     <div className={styles.content}>
                         <div className={styles.panel}>
                             <div className={styles.field}>
-                                <label className={styles.label}>
-                                    {FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.CATEGORY_LABEL}
-                                </label>
+                                <div className={styles.labelRow}>
+                                    <label className={styles.label}>
+                                        <span className={styles.required}>*</span>
+                                        {FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.CATEGORY_LABEL}
+                                    </label>
+                                    {selectedCategory && (
+                                        <span className={styles.type}>
+                                            {selectedCategory.type === 'income'
+                                                ? FUNDS_EXPENDITURES_TEXT.TABLE.TYPE_LABELS.INCOME
+                                                : FUNDS_EXPENDITURES_TEXT.TABLE.TYPE_LABELS.EXPENSE}
+                                        </span>
+                                    )}
+                                </div>
                                 <Select<number | undefined>
                                     value={selectedCategoryId}
                                     onValueChange={(val) => setSelectedCategoryId(val as number)}
@@ -100,15 +111,12 @@ export const DeleteFundsExpendituresCategoryModal = ({
                                 </Select>
                             </div>
 
-                            {selectedCategory && (
-                                <p className={styles.type}>
-                                    {selectedCategory.type === 'income'
-                                        ? FUNDS_EXPENDITURES_TEXT.TABLE.TYPE_LABELS.INCOME
-                                        : FUNDS_EXPENDITURES_TEXT.TABLE.TYPE_LABELS.EXPENSE}
-                                </p>
+                            {recordErrorTitle && (
+                                <HintBox
+                                    title={recordErrorTitle}
+                                    text={FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.ERROR.HAS_RECORD_TEXT}
+                                />
                             )}
-
-                            {recordError && <HintBox title={recordError} />}
                         </div>
                     </div>
                 </Modal.Content>
@@ -118,7 +126,12 @@ export const DeleteFundsExpendituresCategoryModal = ({
                         <Button buttonStyle="secondary" onClick={handleClose} disabled={isSubmitting}>
                             {COMMON_TEXT_ADMIN.BUTTON.CANCEL}
                         </Button>
-                        <Button buttonStyle="primary" onClick={handleDeleteClick} disabled={isDeleteDisabled}>
+                        <Button
+                            buttonStyle="primary"
+                            onClick={handleDeleteClick}
+                            disabled={isDeleteDisabled}
+                            className={styles.deleteButton}
+                        >
                             {COMMON_TEXT_ADMIN.BUTTON.DELETE}
                         </Button>
                     </div>

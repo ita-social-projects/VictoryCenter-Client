@@ -1,22 +1,8 @@
-import { render, screen, fireEvent } from '@testing-library/react';
-import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { FUNDS_EXPENDITURES_TEXT, FUNDS_EXPENDITURES_VALIDATION } from '@/const/admin/reports';
+import { ReportFundsExpendituresCategory } from '@/types/admin/reports';
 import { AddFundsExpendituresCategoryModal } from './AddFundsExpendituresCategoryModal';
-
-jest.mock('@/components/common/modal/Modal', () => {
-    const Modal = ({ isOpen, onClose, children }: any) => {
-        if (!isOpen) return null;
-        return (
-            <div data-testid="modal">
-                <button data-testid="modal-close" onClick={onClose} />
-                {children}
-            </div>
-        );
-    };
-    Modal.Title = ({ children }: any) => <>{children}</>;
-    Modal.Content = ({ children }: any) => <>{children}</>;
-    Modal.Actions = ({ children }: any) => <>{children}</>;
-    return { Modal };
-});
 
 jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
     ConfirmationModal: ({ isOpen, title, onConfirm, onCancel, onClose }: any) => (
@@ -53,9 +39,12 @@ describe('AddFundsExpendituresCategoryModal', () => {
     const TYPE_SELECT = FUNDS_EXPENDITURES_TEXT.MODAL.CATEGORY.TYPE_PLACEHOLDER;
     const NAME_INPUT = 'category-name';
     const SUBMIT_BUTTON_NAME = FUNDS_EXPENDITURES_TEXT.MODAL.CATEGORY.SUBMIT_BUTTON;
+    const REQUIRED_ERROR = COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED;
+    const MIN_ERROR = COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(FUNDS_EXPENDITURES_VALIDATION.categoryNameMin);
+    const DUPLICATE_ERROR = FUNDS_EXPENDITURES_TEXT.MODAL.CATEGORY.ERROR.NAME_DUPLICATE;
 
-    const renderOpen = (onClose = jest.fn()) =>
-        render(<AddFundsExpendituresCategoryModal isOpen={true} onClose={onClose} />);
+    const renderOpen = (onClose = jest.fn(), categories: ReportFundsExpendituresCategory[] = []) =>
+        render(<AddFundsExpendituresCategoryModal isOpen={true} onClose={onClose} categories={categories} />);
 
     const getSubmitButton = () => screen.getByRole('button', { name: SUBMIT_BUTTON_NAME });
 
@@ -66,7 +55,7 @@ describe('AddFundsExpendituresCategoryModal', () => {
 
     it('renders nothing when isOpen is false', () => {
         render(<AddFundsExpendituresCategoryModal isOpen={false} onClose={jest.fn()} />);
-        expect(screen.queryByTestId('modal')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('modal-overlay')).not.toBeInTheDocument();
     });
 
     it('renders title and subtitle when open', () => {
@@ -86,35 +75,162 @@ describe('AddFundsExpendituresCategoryModal', () => {
             expect(getSubmitButton()).toBeDisabled();
         });
 
-        it('is disabled when type is selected but name is empty', () => {
+        it('is disabled when form is incomplete', () => {
             renderOpen();
-            fireEvent.change(screen.getByTestId(TYPE_SELECT), { target: { value: 'expense' } });
+            fillForm('expense', 'abc');
             expect(getSubmitButton()).toBeDisabled();
         });
 
-        it('is disabled when name is entered but type is not selected', () => {
-            renderOpen();
-            fireEvent.change(screen.getByTestId(NAME_INPUT), { target: { value: 'Category A' } });
-            expect(getSubmitButton()).toBeDisabled();
-        });
-
-        it('is disabled when name contains only whitespace', () => {
-            renderOpen();
-            fillForm('income', '   ');
-            expect(getSubmitButton()).toBeDisabled();
-        });
-
-        it('is enabled when both type and non-empty name are set', () => {
+        it('is enabled when both type and valid name are set', () => {
             renderOpen();
             fillForm();
             expect(getSubmitButton()).not.toBeDisabled();
         });
     });
 
-    it('clicking submit does not throw when enabled', () => {
-        renderOpen();
-        fillForm('income', 'Valid name');
-        expect(() => fireEvent.click(getSubmitButton())).not.toThrow();
+    describe('name field validation', () => {
+        it('shows required error on blur when name is empty', () => {
+            renderOpen();
+            fireEvent.blur(screen.getByTestId(NAME_INPUT));
+            expect(screen.getByText(REQUIRED_ERROR)).toBeInTheDocument();
+        });
+
+        it('shows min length error on blur when name is too short', () => {
+            renderOpen();
+            fireEvent.change(screen.getByTestId(NAME_INPUT), { target: { value: 'abc' } });
+            fireEvent.blur(screen.getByTestId(NAME_INPUT));
+            expect(screen.getByText(MIN_ERROR)).toBeInTheDocument();
+        });
+
+        it('shows duplicate error on blur when name matches existing category for same type', () => {
+            const categories: ReportFundsExpendituresCategory[] = [{ id: 1, name: 'Приватні донори', type: 'income' }];
+            renderOpen(jest.fn(), categories);
+            fireEvent.change(screen.getByTestId(TYPE_SELECT), { target: { value: 'income' } });
+            fireEvent.change(screen.getByTestId(NAME_INPUT), { target: { value: 'Донори приватні' } });
+            fireEvent.blur(screen.getByTestId(NAME_INPUT));
+            expect(screen.getByText(DUPLICATE_ERROR)).toBeInTheDocument();
+        });
+
+        it('does not show duplicate error when type differs from existing category', () => {
+            const categories: ReportFundsExpendituresCategory[] = [{ id: 1, name: 'Приватні донори', type: 'expense' }];
+            renderOpen(jest.fn(), categories);
+            fireEvent.change(screen.getByTestId(TYPE_SELECT), { target: { value: 'income' } });
+            fireEvent.change(screen.getByTestId(NAME_INPUT), { target: { value: 'Приватні донори' } });
+            fireEvent.blur(screen.getByTestId(NAME_INPUT));
+            expect(screen.queryByText(DUPLICATE_ERROR)).not.toBeInTheDocument();
+        });
+
+        it('clears name error when name becomes valid on re-blur', () => {
+            renderOpen();
+            fireEvent.change(screen.getByTestId(NAME_INPUT), { target: { value: 'ab' } });
+            fireEvent.blur(screen.getByTestId(NAME_INPUT));
+            expect(screen.getByText(MIN_ERROR)).toBeInTheDocument();
+
+            fireEvent.change(screen.getByTestId(NAME_INPUT), { target: { value: 'Valid name' } });
+            fireEvent.blur(screen.getByTestId(NAME_INPUT));
+            expect(screen.queryByText(MIN_ERROR)).not.toBeInTheDocument();
+        });
+    });
+
+    describe('name re-validation on type change', () => {
+        it('shows duplicate error when type changes to one that has the same name', () => {
+            const categories: ReportFundsExpendituresCategory[] = [{ id: 1, name: 'Category A', type: 'expense' }];
+            renderOpen(jest.fn(), categories);
+            fireEvent.change(screen.getByTestId(NAME_INPUT), { target: { value: 'Category A' } });
+            fireEvent.blur(screen.getByTestId(NAME_INPUT));
+            expect(screen.queryByText(DUPLICATE_ERROR)).not.toBeInTheDocument();
+
+            fireEvent.change(screen.getByTestId(TYPE_SELECT), { target: { value: 'expense' } });
+            expect(screen.getByText(DUPLICATE_ERROR)).toBeInTheDocument();
+        });
+
+        it('clears duplicate error when type changes to one without the same name', () => {
+            const categories: ReportFundsExpendituresCategory[] = [{ id: 1, name: 'Category A', type: 'income' }];
+            renderOpen(jest.fn(), categories);
+            fillForm('income', 'Category A');
+            fireEvent.blur(screen.getByTestId(NAME_INPUT));
+            expect(screen.getByText(DUPLICATE_ERROR)).toBeInTheDocument();
+
+            fireEvent.change(screen.getByTestId(TYPE_SELECT), { target: { value: 'expense' } });
+            expect(screen.queryByText(DUPLICATE_ERROR)).not.toBeInTheDocument();
+        });
+
+        it('does not show name error on type change before name has been blurred', () => {
+            const categories: ReportFundsExpendituresCategory[] = [{ id: 1, name: 'Category A', type: 'expense' }];
+            renderOpen(jest.fn(), categories);
+            fireEvent.change(screen.getByTestId(NAME_INPUT), { target: { value: 'Category A' } });
+
+            fireEvent.change(screen.getByTestId(TYPE_SELECT), { target: { value: 'expense' } });
+            expect(screen.queryByText(DUPLICATE_ERROR)).not.toBeInTheDocument();
+        });
+    });
+
+    describe('type field validation', () => {
+        it('shows required error when type field loses focus without selection', () => {
+            renderOpen();
+            fireEvent.blur(screen.getByTestId(TYPE_SELECT));
+            expect(screen.getByText(REQUIRED_ERROR)).toBeInTheDocument();
+        });
+
+        it('clears type error when type is selected', () => {
+            renderOpen();
+            fireEvent.blur(screen.getByTestId(TYPE_SELECT));
+            expect(screen.getByText(REQUIRED_ERROR)).toBeInTheDocument();
+
+            fireEvent.change(screen.getByTestId(TYPE_SELECT), { target: { value: 'income' } });
+            expect(screen.queryByText(REQUIRED_ERROR)).not.toBeInTheDocument();
+        });
+    });
+
+    describe('submit behaviour', () => {
+        const renderWithSubmit = (onSubmit: jest.Mock, onClose = jest.fn()) =>
+            render(<AddFundsExpendituresCategoryModal isOpen={true} onClose={onClose} onSubmit={onSubmit} />);
+
+        it('calls onSubmit with normalized name and type on click', async () => {
+            const onSubmit = jest.fn().mockResolvedValue(true);
+            renderWithSubmit(onSubmit);
+            fillForm('income', '  Valid name  ');
+            fireEvent.click(getSubmitButton());
+            await waitFor(() => expect(onSubmit).toHaveBeenCalledWith({ name: 'Valid name', type: 'income' }));
+        });
+
+        it('resets form and calls onClose when onSubmit resolves true', async () => {
+            const onClose = jest.fn();
+            const onSubmit = jest.fn().mockResolvedValue(true);
+            renderWithSubmit(onSubmit, onClose);
+            fillForm('expense', 'Valid name');
+            fireEvent.click(getSubmitButton());
+            await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
+            expect(screen.getByTestId('category-name')).toHaveValue('');
+            expect(getSubmitButton()).toBeDisabled();
+        });
+
+        it('keeps modal open when onSubmit resolves false', async () => {
+            const onClose = jest.fn();
+            const onSubmit = jest.fn().mockResolvedValue(false);
+            renderWithSubmit(onSubmit, onClose);
+            fillForm('income', 'Valid name');
+            fireEvent.click(getSubmitButton());
+            await waitFor(() => expect(onSubmit).toHaveBeenCalled());
+            expect(onClose).not.toHaveBeenCalled();
+            expect(screen.getByTestId('modal-overlay')).toBeInTheDocument();
+        });
+
+        it('disables submit button while submitting', async () => {
+            let resolve!: (v: boolean) => void;
+            const onSubmit = jest.fn().mockReturnValue(
+                new Promise<boolean>((r) => {
+                    resolve = r;
+                }),
+            );
+            renderWithSubmit(onSubmit);
+            fillForm('income', 'Valid name');
+            fireEvent.click(getSubmitButton());
+            expect(getSubmitButton()).toBeDisabled();
+            await act(async () => {
+                resolve(true);
+            });
+        });
     });
 
     it('normalizes whitespace in name input on blur', () => {
@@ -129,23 +245,32 @@ describe('AddFundsExpendituresCategoryModal', () => {
         const triggerDirtyClose = (onClose = jest.fn()) => {
             renderOpen(onClose);
             fireEvent.change(screen.getByTestId(NAME_INPUT), { target: { value: 'dirty' } });
-            fireEvent.click(screen.getByTestId('modal-close'));
+            fireEvent.click(screen.getByRole('button', { name: 'Close modal' }));
             return onClose;
         };
 
         it('calls onClose directly when form is clean', () => {
             const onClose = jest.fn();
             renderOpen(onClose);
-            fireEvent.click(screen.getByTestId('modal-close'));
+            fireEvent.click(screen.getByRole('button', { name: 'Close modal' }));
             expect(onClose).toHaveBeenCalledTimes(1);
             expect(screen.getByTestId('confirm-modal')).toHaveAttribute('data-open', 'false');
+        });
+
+        it('resets errors when closing a clean form', () => {
+            renderOpen();
+            fireEvent.blur(screen.getByTestId(NAME_INPUT));
+            expect(screen.getByText(REQUIRED_ERROR)).toBeInTheDocument();
+
+            fireEvent.click(screen.getByRole('button', { name: 'Close modal' }));
+            expect(screen.queryByText(REQUIRED_ERROR)).not.toBeInTheDocument();
         });
 
         it('opens confirmation modal when type is dirty on close request', () => {
             const onClose = jest.fn();
             renderOpen(onClose);
             fireEvent.change(screen.getByTestId(TYPE_SELECT), { target: { value: 'expense' } });
-            fireEvent.click(screen.getByTestId('modal-close'));
+            fireEvent.click(screen.getByRole('button', { name: 'Close modal' }));
             expect(onClose).not.toHaveBeenCalled();
             expect(screen.getByTestId('confirm-modal')).toHaveAttribute('data-open', 'true');
         });
@@ -166,7 +291,7 @@ describe('AddFundsExpendituresCategoryModal', () => {
             fireEvent.click(screen.getByTestId('confirm-no'));
             expect(onClose).not.toHaveBeenCalled();
             expect(screen.getByTestId('confirm-modal')).toHaveAttribute('data-open', 'false');
-            expect(screen.getByTestId('modal')).toBeInTheDocument();
+            expect(screen.getByTestId('modal-overlay')).toBeInTheDocument();
         });
 
         it('dismisses confirmation and keeps modal open on cancel via onClose', () => {
@@ -182,7 +307,7 @@ describe('AddFundsExpendituresCategoryModal', () => {
             fillForm();
             expect(getSubmitButton()).not.toBeDisabled();
 
-            fireEvent.click(screen.getByTestId('modal-close'));
+            fireEvent.click(screen.getByRole('button', { name: 'Close modal' }));
             fireEvent.click(screen.getByTestId('confirm-yes'));
 
             expect(onClose).toHaveBeenCalledTimes(1);

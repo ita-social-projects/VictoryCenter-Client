@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { CategoryBar } from '@/components/admin/category-bar/CategoryBar';
+import { useCallback, useMemo, useState } from 'react';
+import { CategoryBar, ContextMenuOption } from '@/components/admin/category-bar/CategoryBar';
 import { FUNDS_EXPENDITURES_TEXT, REPORTS_TEXT } from '@/const/admin/reports';
 import styles from './ReportAnalytics.module.scss';
 import './ReportAnalytics.scss';
@@ -23,6 +23,27 @@ export const ReportAnalytics = () => {
     const [isFundsEditing, setIsFundsEditing] = useState(false);
     const [fundsExchangeRateDraft, setFundsExchangeRateDraft] = useState<string | null>();
     const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState(false);
+    const [isDeleteCategoryModalOpen, setIsDeleteCategoryModalOpen] = useState(false);
+    const [isEditCategoryModalOpen, setIsEditCategoryModalOpen] = useState(false);
+
+    const categoryContextMenuOptions: ContextMenuOption[] = useMemo(
+        () => [
+            { id: 'add-category', name: FUNDS_EXPENDITURES_TEXT.BUTTON.ADD_CATEGORY },
+            { id: 'edit-category', name: FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT_CATEGORY },
+            { id: 'delete-category', name: FUNDS_EXPENDITURES_TEXT.BUTTON.DELETE_CATEGORY },
+        ],
+        [],
+    );
+
+    const handleCategoryContextMenuOption = useCallback((id: string) => {
+        if (id === 'add-category') {
+            setIsAddCategoryModalOpen(true);
+        } else if (id === 'edit-category') {
+            setIsEditCategoryModalOpen(true);
+        } else if (id === 'delete-category') {
+            setIsDeleteCategoryModalOpen(true);
+        }
+    }, []);
 
     return (
         <div className={styles['report-analytics']}>
@@ -35,12 +56,8 @@ export const ReportAnalytics = () => {
                 getCategoryKey={(tab) => tab.id}
                 onCategorySelect={setActiveTab}
                 displayContextMenuButton={activeTab.id === 'income-expenses'}
-                contextMenuOptions={[{ id: 'add-category', name: FUNDS_EXPENDITURES_TEXT.BUTTON.ADD_CATEGORY }]}
-                onContextMenuOptionSelected={(id: string) => {
-                    if (id === 'add-category') {
-                        setIsAddCategoryModalOpen(true);
-                    }
-                }}
+                contextMenuOptions={categoryContextMenuOptions}
+                onContextMenuOptionSelected={handleCategoryContextMenuOption}
             />
             <div className={styles['tab-content']}>
                 {activeTab.id === 'pdf-files' && <PdfFilesSection />}
@@ -52,6 +69,10 @@ export const ReportAnalytics = () => {
                         onExchangeRateValueChange={setFundsExchangeRateDraft}
                         isAddCategoryModalOpen={isAddCategoryModalOpen}
                         onAddCategoryModalClose={() => setIsAddCategoryModalOpen(false)}
+                        isEditCategoryModalOpen={isEditCategoryModalOpen}
+                        onEditCategoryModalClose={() => setIsEditCategoryModalOpen(false)}
+                        isDeleteCategoryModalOpen={isDeleteCategoryModalOpen}
+                        onDeleteCategoryModalClose={() => setIsDeleteCategoryModalOpen(false)}
                     />
                 )}
                 {activeTab.id === 'program-expenses' && <ProgramExpensesSection />}

@@ -14,10 +14,21 @@
     width: 100%;
 }
 
+.labelRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
 .label {
     @include type.small-text-medium;
     color: c.$bluish-black;
     margin-bottom: 8px;
+}
+
+.labelRow .label {
+    margin-bottom: 0;
 }
 
 .required {
@@ -38,11 +49,7 @@
     justify-content: space-between;
     border: 1px solid c.$grey-700;
     border-radius: 8px;
-    background: c.$white;
-}
-
-.selectHeadError {
-    border-color: c.$error;
+    background-color: c.$white;
 }
 
 .input {
@@ -68,7 +75,7 @@
         width: 650px;
         max-width: 650px;
         border-radius: 8px;
-        background: c.$white;
+        background-color: c.$white;
         padding: 0;
     }
 
@@ -94,7 +101,7 @@
 
     :global(.modal-body) {
         margin-bottom: 0;
-        padding: 18px 0 0;
+        padding: 8px 0 0;
     }
 
     :global(.modal-footer) {
@@ -127,8 +134,7 @@
 }
 
 .subtitle {
-    @include type.body-1-regular;
-    line-height: 20px;
+    @include type.small-text-regular;
     margin: 0;
     color: c.$grey-900;
 }
@@ -145,10 +151,16 @@
     flex-direction: column;
     align-items: stretch;
     width: 100%;
-    background: c.$grey-50;
+    background-color: c.$grey-50;
     border: 1px solid c.$grey-150;
     padding: 20px 22px;
     min-height: 180px;
+}
+
+.type {
+    @include type.small-text-regular;
+    margin: 0;
+    color: c.$blue-900;
 }
 
 .error {

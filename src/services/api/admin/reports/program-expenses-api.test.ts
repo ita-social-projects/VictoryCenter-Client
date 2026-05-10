@@ -1,4 +1,5 @@
 import { ProgramExpensesProgram, ProgramExpensesRecord } from '@/types/admin/reports';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
 
 const loadProgramExpensesApi = (
     records: Array<ProgramExpensesRecord & { isPublished: boolean }>,
@@ -148,6 +149,75 @@ describe('ProgramExpensesApi', () => {
                 totalAmountUsd: 0,
             },
             records: [],
+        });
+    });
+
+    describe('ProgramExpensesApi CRUD methods', () => {
+        const mockClient = {
+            get: jest.fn(),
+            post: jest.fn(),
+            put: jest.fn(),
+            delete: jest.fn(),
+        } as any;
+
+        let originalApi: typeof import('./program-expenses-api').ProgramExpensesApi;
+
+        beforeAll(() => {
+            jest.resetModules();
+            jest.dontMock('@/utils/mock-data/admin/reports/program-expenses');
+            originalApi = require('./program-expenses-api').ProgramExpensesApi;
+        });
+
+        afterEach(() => {
+            jest.clearAllMocks();
+        });
+
+        it('getAll should call GET and return data', async () => {
+            const mockData = [{ id: 1, amountUah: 100 }];
+            mockClient.get.mockResolvedValueOnce({ data: mockData });
+
+            const result = await originalApi.getAll(mockClient);
+
+            expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.REPORTS.PROGRAM_EXPENDITURES_RECORDS);
+            expect(result).toEqual(mockData);
+        });
+
+        it('post should call POST with correct payload and return data', async () => {
+            const record = { reportingYear: 2025, hippotherapyProgramCategoryId: 1, amountUah: 100, amountUsd: 10 };
+            const mockData = { id: 1, ...record };
+            mockClient.post.mockResolvedValueOnce({ data: mockData });
+
+            const result = await originalApi.post(mockClient, record);
+
+            expect(mockClient.post).toHaveBeenCalledWith(API_ROUTES.REPORTS.PROGRAM_EXPENDITURES_RECORDS, record);
+            expect(result).toEqual(mockData);
+        });
+
+        it('update should call PUT with correct payload and return data', async () => {
+            const record = { hippotherapyProgramCategoryId: 1, amountUah: 200, amountUsd: 20 };
+            const mockData = { id: 5, reportingYear: 2025, ...record };
+            mockClient.put.mockResolvedValueOnce({ data: mockData });
+
+            const result = await originalApi.update(mockClient, 5, record);
+
+            expect(mockClient.put).toHaveBeenCalledWith(`${API_ROUTES.REPORTS.PROGRAM_EXPENDITURES_RECORDS}/5`, record);
+            expect(result).toEqual(mockData);
+        });
+
+        it('delete should call DELETE with correct id', async () => {
+            mockClient.delete.mockResolvedValueOnce({});
+
+            await originalApi.delete(mockClient, 10);
+
+            expect(mockClient.delete).toHaveBeenCalledWith(`${API_ROUTES.REPORTS.PROGRAM_EXPENDITURES_RECORDS}/10`);
+        });
+
+        it('bulkDelete should call POST with correct payload', async () => {
+            mockClient.post.mockResolvedValueOnce({});
+
+            await originalApi.bulkDelete(mockClient, [1, 2, 3]);
+
+            expect(mockClient.post).toHaveBeenCalledWith(`${API_ROUTES.REPORTS.PROGRAM_EXPENDITURES_RECORDS}/bulk-delete`, [1, 2, 3]);
         });
     });
 });

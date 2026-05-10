@@ -217,7 +217,10 @@ describe('ProgramExpensesApi', () => {
 
             await originalApi.bulkDelete(mockClient, [1, 2, 3]);
 
-            expect(mockClient.post).toHaveBeenCalledWith(`${API_ROUTES.REPORTS.PROGRAM_EXPENDITURES_RECORDS}/bulk-delete`, [1, 2, 3]);
+            expect(mockClient.post).toHaveBeenCalledWith(
+                `${API_ROUTES.REPORTS.PROGRAM_EXPENDITURES_RECORDS}/bulk-delete`,
+                [1, 2, 3],
+            );
         });
     });
 });

@@ -1,0 +1,24 @@
+.grid {
+    display: flex;
+    align-items: flex-start;
+    width: 100%;
+    overflow: hidden;
+}
+
+.cell {
+    flex: 1;
+    overflow: hidden;
+}
+
+.cell.elevated {
+    @media (min-width: 768px) {
+        margin-top: 99px;
+    }
+}
+
+.image {
+    width: 100%;
+    aspect-ratio: 720 / 492;
+    object-fit: cover;
+    display: block;
+}

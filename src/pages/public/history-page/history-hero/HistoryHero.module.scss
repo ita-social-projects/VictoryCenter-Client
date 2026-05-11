@@ -1,0 +1,69 @@
+@use '@/assets/sass/mixins/typography.mixins' as type;
+@use '@/assets/sass/variables/typography' as t;
+@use '@/assets/sass/variables/colors' as c;
+
+.hero-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+    padding: 80px 16px 60px;
+
+    @media (min-width: 768px) {
+        padding: 96px 32px 80px;
+        gap: 40px;
+    }
+
+    @media (min-width: 1024px) {
+        padding: 120px 56px 96px;
+        gap: 48px;
+    }
+
+    @media (min-width: 1440px) {
+        padding: 168px 56px 120px;
+        gap: 56px;
+    }
+}
+
+.title {
+    font-family: t.$font-family-base;
+    font-weight: t.$fw-medium;
+    font-size: 40px;
+    line-height: 48px;
+    letter-spacing: t.$ls-tight;
+    text-transform: uppercase;
+    text-align: center;
+    max-width: 1102px;
+
+    @media (min-width: 768px) {
+        font-size: 56px;
+        line-height: 68px;
+    }
+
+    @media (min-width: 1024px) {
+        font-size: 64px;
+        line-height: 76px;
+    }
+
+    @media (min-width: 1280px) {
+        font-size: 80px;
+        line-height: 96px;
+    }
+
+    @media (min-width: 1440px) {
+        font-size: 96px;
+        line-height: 112px;
+    }
+}
+
+.title-italic {
+    font-weight: t.$fw-bold;
+    font-style: italic;
+}
+
+.description {
+    @include type.body-2-medium;
+    text-align: center;
+    max-width: 640px;
+    color: c.$grey-800;
+}

@@ -19,7 +19,7 @@ export const Header = () => {
 
     const aboutUsLinks: DropdownLink[] = [
         { text: t('WHO_WE_ARE'), navigateTo: PUBLIC_ROUTES.ABOUT_US.FULL, isDisabled: false },
-        { text: t('HISTORY'), navigateTo: '', isDisabled: true },
+        { text: t('HISTORY'), navigateTo: PUBLIC_ROUTES.HISTORY.FULL, isDisabled: false },
         { text: t('TEAM'), navigateTo: PUBLIC_ROUTES.TEAM.FULL, isDisabled: false },
         { text: t('PARTNERS'), navigateTo: PUBLIC_ROUTES.PARTNERS.FULL, isDisabled: false },
         { text: t('EVENTS_AND_NEWS'), navigateTo: '', isDisabled: true },

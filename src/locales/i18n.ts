@@ -13,6 +13,7 @@ import {
     partnersPageUk,
     globalUk,
     contactUsPageUk,
+    historyPageUk,
 } from './uk';
 import {
     headerEn,
@@ -26,6 +27,7 @@ import {
     partnersPageEn,
     globalEn,
     contactUsPageEn,
+    historyPageEn,
 } from './en';
 import { DEFAULT_LOCALE, LOCALES } from '../const/common/locales';
 
@@ -42,6 +44,7 @@ const resources = {
         partnersPage: partnersPageUk,
         global: globalUk,
         contactUsPage: contactUsPageUk,
+        historyPage: historyPageUk,
     },
     en: {
         header: headerEn,
@@ -55,6 +58,7 @@ const resources = {
         partnersPage: partnersPageEn,
         global: globalEn,
         contactUsPage: contactUsPageEn,
+        historyPage: historyPageEn,
     },
 };
 
@@ -80,6 +84,7 @@ i18n.use(initReactI18next).init({
         'partnersPage',
         'global',
         'contactUsPage',
+        'historyPage',
     ], // namespaces
     defaultNS: 'aboutUsPage',
     interpolation: {

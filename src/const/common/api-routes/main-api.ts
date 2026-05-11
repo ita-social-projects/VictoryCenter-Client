@@ -97,6 +97,7 @@ export const API_ROUTES = {
             SUMMARY: 'ReportFundsExpendituresRecords/summary',
             CATEGORIES: 'ReportFundsExpendituresCategories',
         },
+        PROGRAM_EXPENDITURES_RECORDS: 'ReportProgramExpendituresRecords',
     },
     PDF_SECTION: {
         BASE: 'PdfSection',

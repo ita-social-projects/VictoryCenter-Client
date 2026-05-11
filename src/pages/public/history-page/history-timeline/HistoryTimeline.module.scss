@@ -1,0 +1,41 @@
+@use '@/assets/sass/mixins/typography.mixins' as type;
+@use '@/assets/sass/variables/colors' as c;
+
+.timeline {
+    width: 100%;
+    border-top: 1px solid c.$grey-300;
+    border-bottom: 1px solid c.$grey-300;
+    padding: 12px 16px;
+    overflow-x: auto;
+
+    @media (min-width: 560px) {
+        padding: 12px 64px;
+    }
+
+    @media (min-width: 1440px) {
+        padding: 12px 56px;
+    }
+}
+
+.dates-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    white-space: nowrap;
+
+    @media (min-width: 768px) {
+        gap: 24px;
+    }
+}
+
+.date {
+    @include type.small-text-regular;
+    color: c.$grey-700;
+    cursor: default;
+    flex-shrink: 0;
+}
+
+.date--active {
+    @include type.small-text-bold;
+    color: c.$blue-500;
+}

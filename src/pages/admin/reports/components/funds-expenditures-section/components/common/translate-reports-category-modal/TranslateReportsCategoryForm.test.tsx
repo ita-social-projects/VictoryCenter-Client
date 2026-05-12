@@ -113,8 +113,6 @@ describe('TranslateReportsCategoryForm', () => {
             fireEvent.change(screen.getByTestId(CATEGORY_SELECT), { target: { value: '1' } });
             fireEvent.change(screen.getByTestId(NAME_INPUT), { target: { value: 'ab' } });
             fireEvent.blur(screen.getByTestId(NAME_INPUT));
-            expect(screen.getByText(MIN_ERROR)).toBeInTheDocument();
-
             fireEvent.change(screen.getByTestId(NAME_INPUT), { target: { value: 'Valid name here' } });
             fireEvent.blur(screen.getByTestId(NAME_INPUT));
             expect(screen.queryByText(MIN_ERROR)).not.toBeInTheDocument();

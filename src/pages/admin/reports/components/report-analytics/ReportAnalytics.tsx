@@ -39,10 +39,14 @@ export const ReportAnalytics = () => {
     const [categories, setCategories] = useState<ReportFundsExpendituresCategory[]>([]);
 
     useEffect(() => {
-        localizationLanguagesDataFetch().then((langs) => {
-            setTranslationLanguages(langs.filter((l) => l.code !== DEFAULT_LOCALE));
-        });
-    }, []);
+        localizationLanguagesDataFetch()
+            .then((langs) => {
+                setTranslationLanguages(langs.filter((l) => l.code !== DEFAULT_LOCALE));
+            })
+            .catch(() => {
+                addToast(COMMON_TEXT_ADMIN.LOCALIZATION.LANGUAGES.MESSAGE.FAILED_TO_FETCH_LANGUAGES, ToastType.Error);
+            });
+    }, [addToast]);
 
     const categoryContextMenuOptions: ContextMenuOption[] = useMemo(
         () => [

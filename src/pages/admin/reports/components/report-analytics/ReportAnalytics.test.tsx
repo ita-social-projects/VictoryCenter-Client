@@ -1,7 +1,8 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { localizationLanguagesDataFetch } from '@/services/api/public/localization/languages/languages-api';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { ReportAnalytics } from './ReportAnalytics';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FUNDS_EXPENDITURES_TEXT, REPORTS_TEXT } from '@/const/admin/reports';
 
 jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider', () => ({
@@ -142,19 +143,26 @@ jest.mock('../program-expenses-section/ProgramExpensesSection', () => ({
 describe('ReportAnalytics', () => {
     beforeEach(() => {
         mockLocalizationLanguagesDataFetch.mockResolvedValue([]);
-        mockedUseToast.mockReturnValue({
-            addToast: mockAddToast,
-            toasts: [],
-            removeToast: function (id: number): void {
-                throw new Error('Function not implemented.');
-            },
-        });
+        mockedUseToast.mockReturnValue({ addToast: mockAddToast } as any);
     });
 
     it('should render the component with correct title', () => {
         render(<ReportAnalytics />);
 
         expect(screen.getByText(REPORTS_TEXT.REPORT_AND_ANALYTICS.TITLE)).toBeInTheDocument();
+    });
+
+    it('should show error toast when language fetch fails', async () => {
+        mockLocalizationLanguagesDataFetch.mockRejectedValue(new Error('Network error'));
+
+        render(<ReportAnalytics />);
+
+        await waitFor(() => {
+            expect(mockAddToast).toHaveBeenCalledWith(
+                COMMON_TEXT_ADMIN.LOCALIZATION.LANGUAGES.MESSAGE.FAILED_TO_FETCH_LANGUAGES,
+                'error',
+            );
+        });
     });
 
     it('should show first tab as active by default', () => {

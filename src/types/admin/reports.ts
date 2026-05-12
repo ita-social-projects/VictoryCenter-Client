@@ -1,3 +1,4 @@
+import { EntityLocalization, EntityLocalizationDto, EntityWithLocalizations } from '../common/language';
 import { Image, ImageValues } from '../common/image';
 
 export interface ReportsMediaSettingsCollectedFundsDto {
@@ -146,7 +147,32 @@ export interface ReportFundsExpendituresSettings {
     exchangeRate: string | null;
 }
 
-export interface ReportFundsExpendituresCategory {
+export interface ReportFundsExpendituresCategoryLocalizableFields {
+    name: string;
+}
+
+export interface ReportFundsExpendituresCategoryLocalizationDto
+    extends EntityLocalizationDto,
+        ReportFundsExpendituresCategoryLocalizableFields {
+    entityId: number;
+}
+
+export interface ReportFundsExpendituresCategoryLocalization
+    extends EntityLocalization,
+        ReportFundsExpendituresCategoryLocalizableFields {}
+
+export interface CreateReportFundsExpendituresCategoryLocalizationDto {
+    entityId: number;
+    languageId: number;
+    name: string;
+}
+
+export interface UpdateReportFundsExpendituresCategoryLocalizationDto {
+    name: string;
+}
+
+export interface ReportFundsExpendituresCategory
+    extends EntityWithLocalizations<ReportFundsExpendituresCategoryLocalization> {
     id: number;
     name: string;
     type: FundsExpendituresTransactionType;

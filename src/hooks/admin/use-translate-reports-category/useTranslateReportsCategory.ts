@@ -72,13 +72,12 @@ export const useTranslateReportsCategory = ({
                 };
                 onSuccess(updatedCategory);
             }
-        } catch (err) {
+        } catch {
             setError(
                 isEditMode
                     ? FUNDS_EXPENDITURES_TEXT.MESSAGE.FAIL_TO_UPDATE_CATEGORY_TRANSLATION
                     : FUNDS_EXPENDITURES_TEXT.MESSAGE.FAIL_TO_TRANSLATE_CATEGORY,
             );
-            throw err;
         } finally {
             setIsSubmitting(false);
         }

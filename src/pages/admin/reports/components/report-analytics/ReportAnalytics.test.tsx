@@ -1,11 +1,15 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { localizationLanguagesDataFetch } from '@/services/api/public/localization/languages/languages-api';
+import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { ReportAnalytics } from './ReportAnalytics';
 import { FUNDS_EXPENDITURES_TEXT, REPORTS_TEXT } from '@/const/admin/reports';
 
 jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider', () => ({
-    useToast: () => ({ addToast: jest.fn() }),
+    useToast: jest.fn(),
 }));
+
+const mockAddToast = jest.fn();
+const mockedUseToast = useToast as jest.MockedFunction<typeof useToast>;
 
 jest.mock('@/services/api/public/localization/languages/languages-api', () => ({
     localizationLanguagesDataFetch: jest.fn(),
@@ -138,6 +142,13 @@ jest.mock('../program-expenses-section/ProgramExpensesSection', () => ({
 describe('ReportAnalytics', () => {
     beforeEach(() => {
         mockLocalizationLanguagesDataFetch.mockResolvedValue([]);
+        mockedUseToast.mockReturnValue({
+            addToast: mockAddToast,
+            toasts: [],
+            removeToast: function (id: number): void {
+                throw new Error('Function not implemented.');
+            },
+        });
     });
 
     it('should render the component with correct title', () => {
@@ -340,6 +351,7 @@ describe('ReportAnalytics', () => {
             fireEvent.click(screen.getByTestId('translate-modal-submit'));
 
             expect(screen.getByTestId('translate-modal-categories-count')).toHaveTextContent('1');
+            expect(mockAddToast).toHaveBeenCalled();
         });
     });
 });

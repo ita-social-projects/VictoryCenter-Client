@@ -164,6 +164,7 @@ describe('TranslateReportsCategoryForm', () => {
                 />,
             );
 
+            fireEvent.change(screen.getByTestId(CATEGORY_SELECT), { target: { value: '1' } });
             fireEvent.change(screen.getByTestId(NAME_INPUT), { target: { value: 'some text' } });
             expect(onDirtyChange).toHaveBeenLastCalledWith(true);
         });
@@ -179,6 +180,7 @@ describe('TranslateReportsCategoryForm', () => {
                 />,
             );
 
+            fireEvent.change(screen.getByTestId(CATEGORY_SELECT), { target: { value: '1' } });
             fireEvent.change(screen.getByTestId(NAME_INPUT), { target: { value: 'existing name' } });
             expect(onDirtyChange).toHaveBeenLastCalledWith(false);
         });

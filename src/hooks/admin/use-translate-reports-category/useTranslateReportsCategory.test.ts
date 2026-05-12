@@ -149,9 +149,7 @@ describe('useTranslateReportsCategory', () => {
         );
 
         await act(async () => {
-            try {
-                await result.current.translateCategory(formValues);
-            } catch {}
+            await result.current.translateCategory(formValues);
         });
 
         await waitFor(() => {
@@ -175,9 +173,7 @@ describe('useTranslateReportsCategory', () => {
         );
 
         await act(async () => {
-            try {
-                await result.current.translateCategory(formValues);
-            } catch {}
+            await result.current.translateCategory(formValues);
         });
 
         await waitFor(() => {

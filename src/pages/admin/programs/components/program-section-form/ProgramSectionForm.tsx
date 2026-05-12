@@ -1,26 +1,26 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
     createSectionFormActionsClassNames,
     SectionFormActions,
 } from '@/components/admin/section-form-actions/SectionFormActions';
-import { ImageValues } from '@/types/common/image';
-import { renderProgramSection } from '@/utils/functions/render-program-section';
-import styles from './ProgramSectionForm.module.scss';
-import { FaqSectionQuestionDto, CreateHippotherapyProgramSectionDto } from '@/types/common/program-sections';
-import { SectionTemplate, SectionMode } from '@/types/common/sections';
+import type { ImageValues } from '@/types/common/image';
+import type { CreateHippotherapyProgramSectionDto, FaqSectionQuestionDto } from '@/types/common/program-sections';
 import { ContentType } from '@/types/common/section-contents';
+import { SectionMode, SectionTemplate } from '@/types/common/sections';
+import { getDescriptionAuthorPairsByGroup } from '@/utils/functions/mappers/public/program/get-grouped-program-section-content-pairs';
+import {
+    ensureTitleContentAndOnePair,
+    getContentByType,
+    getDescriptionsInOrder,
+    getFaqPairs,
+} from '@/utils/functions/program-section-content/programSectionContent';
+import { renderProgramSection } from '@/utils/functions/render-program-section';
 import {
     getSectionTemplateMaxGroupCount,
     normalizeGroupedContentsGroupIndexes,
 } from '@/utils/functions/section-template-validation/sectionTemplateValidation';
 import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
-import { getDescriptionAuthorPairsByGroup } from '@/utils/functions/mappers/public/program/get-grouped-program-section-content-pairs';
-import {
-    getContentByType,
-    getDescriptionsInOrder,
-    getFaqPairs,
-    ensureTitleContentAndOnePair,
-} from '@/utils/functions/program-section-content/programSectionContent';
+import styles from './ProgramSectionForm.module.scss';
 
 const sectionFormActionsClassNames = createSectionFormActionsClassNames(styles);
 
@@ -369,7 +369,12 @@ export const ProgramSectionForm = ({
 
         setTimeout(() => {
             const element = document.getElementById(`pair-description-${nextGroupIndex}`) as HTMLTextAreaElement | null;
-            element?.focus();
+            element?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+                inline: 'center',
+            });
+            element?.focus({ preventScroll: true });
         }, 0);
     }, [emitSectionChange]);
 
@@ -616,7 +621,10 @@ export const ProgramSectionForm = ({
         };
 
         if (onRequestSaveSection && isDirty) {
-            onRequestSaveSection({ onConfirm: applySave, onDecline: handleDeclineSave });
+            onRequestSaveSection({
+                onConfirm: applySave,
+                onDecline: handleDeclineSave,
+            });
             return;
         }
 

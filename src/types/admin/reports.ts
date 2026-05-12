@@ -196,3 +196,24 @@ export interface ProgramExpensesReadOnlyData {
     summary: ProgramExpensesSummary;
     records: ProgramExpensesRecord[];
 }
+
+export interface ReportProgramExpendituresRecordDto {
+    id: number;
+    reportingYear: number;
+    hippotherapyProgramCategoryId: number;
+    amountUah: number;
+    amountUsd: number;
+}
+
+export interface CreateReportProgramExpendituresRecordDto {
+    reportingYear: number;
+    hippotherapyProgramCategoryId: number;
+    amountUah: number;
+    amountUsd: number;
+}
+
+export interface UpdateReportProgramExpendituresRecordDto {
+    hippotherapyProgramCategoryId: number;
+    amountUah: number;
+    amountUsd: number;
+}

@@ -1,0 +1,54 @@
+import { Controller, Control, FieldErrors, FieldValues } from 'react-hook-form';
+import { ImageInput, ImageInputVariant } from '@/components/admin/image-input/ImageInput';
+import styles from './ImageUploadForm.module.scss';
+
+type ImageUploadConfig = {
+    cropWidth: number;
+    cropHeight: number;
+    minWidth: number;
+    minHeight: number;
+    label: string;
+    subText: string;
+    style: React.CSSProperties;
+};
+
+interface ImageUploadFormProps<TFormValues extends FieldValues> {
+    control: Control<TFormValues>;
+    errors: FieldErrors<TFormValues>;
+    imageError: string | null;
+    setImageError: (error: string | null) => void;
+    imageConfig: ImageUploadConfig;
+    variant?: ImageInputVariant;
+    name?: string;
+}
+
+export const ImageUploadForm = <TFormValues extends FieldValues>({
+    control,
+    errors,
+    imageError,
+    setImageError,
+    imageConfig,
+    variant = 'whoWeAre',
+    name = 'image',
+}: ImageUploadFormProps<TFormValues>) => (
+    <div className={styles.imageSection}>
+        <Controller
+            name={name as never}
+            control={control}
+            render={({ field: { onChange, value } }) => (
+                <div className={styles.imageWrapper}>
+                    <ImageInput
+                        value={value}
+                        onChange={onChange}
+                        setError={setImageError}
+                        variant={variant}
+                        {...imageConfig}
+                    />
+                    {(imageError || errors?.image?.message) && (
+                        <p className={styles.error}>{imageError || (errors as any)?.image?.message}</p>
+                    )}
+                </div>
+            )}
+        />
+    </div>
+);

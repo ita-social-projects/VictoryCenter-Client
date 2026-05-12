@@ -20,6 +20,11 @@ jest.mock('../partners-block/PartnersBlockForm', () => ({
     PartnersBlockForm: () => <div data-testid="partners-block-form">Partners Form</div>,
 }));
 
+jest.mock('../statistics-block/StatisticsBlockForm', () => ({
+    __esModule: true,
+    StatisticsBlockForm: () => <div data-testid="statistics-block-form">Statistics Form</div>,
+}));
+
 jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
     __esModule: true,
     CategoryBar: require('@/utils/test-mocks/main-page-mocks').MockMainPageCategoryBar,
@@ -41,6 +46,14 @@ const getByExactText = (text: string) =>
 describe('MainPageContent', () => {
     beforeEach(() => {
         jest.useFakeTimers();
+
+        if (!(global as any).crypto) {
+            Object.defineProperty(global, 'crypto', { value: {}, configurable: true });
+        }
+
+        if (!(global as any).crypto.randomUUID) {
+            (global as any).crypto.randomUUID = jest.fn(() => 'test-uuid');
+        }
     });
 
     afterEach(() => {
@@ -49,9 +62,23 @@ describe('MainPageContent', () => {
         });
         jest.useRealTimers();
         jest.clearAllMocks();
+        jest.restoreAllMocks();
     });
 
     it('renders loader initially while data is "fetching"', () => {
+        render(<MainPageContent />);
+        expect(screen.getByTestId('page-loader')).toBeInTheDocument();
+    });
+
+    it('renders loader when data is null and isLoading is false', () => {
+        const useStateSpy = jest.spyOn(React, 'useState');
+        useStateSpy
+            .mockImplementationOnce(() => ['title', jest.fn()])
+            .mockImplementationOnce(() => [null, jest.fn()])
+            .mockImplementationOnce(() => [false, jest.fn()]);
+
+        jest.spyOn(React, 'useEffect').mockImplementation(() => undefined);
+
         render(<MainPageContent />);
         expect(screen.getByTestId('page-loader')).toBeInTheDocument();
     });
@@ -84,7 +111,7 @@ describe('MainPageContent', () => {
         expect(screen.queryByTestId('title-block-form')).not.toBeInTheDocument();
 
         fireEvent.click(screen.getByTestId('tab-btn-statistics'));
-        expect(getByExactText(`Блок "${MAIN_PAGE_TEXT.TABS.STATISTICS}" в розробці`)).toBeInTheDocument();
+        expect(screen.getByTestId('statistics-block-form')).toBeInTheDocument();
     });
 
     it('does not update state after unmount (cleanup isMounted)', async () => {

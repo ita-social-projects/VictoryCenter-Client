@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 import { MAIN_PAGE_VALIDATION } from '@/const/admin/main-page';
-import { AboutUsBlockFormValues, TitleBlockFormValues, PartnersBlockFormValues } from '@/types/admin/main-page';
+import { AboutUsBlockFormValues, TitleBlockFormValues, PartnersBlockFormValues, StatisticsBlockFormValues } from '@/types/admin/main-page';
 import { Image, ImageValues } from '@/types/common/image';
 import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
 
@@ -17,17 +17,19 @@ const buildStringValidation = (config: {
         .max(config.max, config.getMaxError());
 };
 
+const imageSchema = Yup.mixed<Image | ImageValues>()
+    .transform((value) => {
+        if (value === null || typeof value === 'string') return undefined;
+        return value;
+    })
+    .nullable()
+    .notRequired()
+    .default(null);
+
 export const TitleBlockValidationSchema: Yup.ObjectSchema<TitleBlockFormValues> = Yup.object({
     title: buildStringValidation(MAIN_PAGE_VALIDATION.titleBlock.title),
     description: buildStringValidation(MAIN_PAGE_VALIDATION.titleBlock.description),
-    image: Yup.mixed<Image | ImageValues>()
-        .transform((value) => {
-            if (value === null || typeof value === 'string') return undefined;
-            return value;
-        })
-        .nullable()
-        .notRequired()
-        .default(null),
+    image: imageSchema,
 });
 
 export const AboutUsBlockValidationSchema: Yup.ObjectSchema<AboutUsBlockFormValues> = Yup.object({
@@ -38,6 +40,12 @@ export const AboutUsBlockValidationSchema: Yup.ObjectSchema<AboutUsBlockFormValu
 export const PartnersBlockValidationSchema: Yup.ObjectSchema<PartnersBlockFormValues> = Yup.object({
     title: buildStringValidation(MAIN_PAGE_VALIDATION.partnersBlock.title),
     description: buildStringValidation(MAIN_PAGE_VALIDATION.partnersBlock.description),
+});
+
+export const StatisticsBlockValidationSchema: Yup.ObjectSchema<StatisticsBlockFormValues> = Yup.object({
+    titleUa: buildStringValidation(MAIN_PAGE_VALIDATION.statisticsBlock.title),
+    titleEn: buildStringValidation(MAIN_PAGE_VALIDATION.statisticsBlock.title),
+    image: imageSchema,
 });
 
 export const MAIN_PAGE_VALIDATION_FUNCTIONS = {
@@ -80,6 +88,24 @@ export const MAIN_PAGE_VALIDATION_FUNCTIONS = {
     validatePartnersDescription: (value: string): string | undefined => {
         try {
             PartnersBlockValidationSchema.validateSyncAt('description', { description: value });
+            return undefined;
+        } catch (error: any) {
+            return error.message;
+        }
+    },
+
+    validateStatisticsTitleUa: (value: string): string | undefined => {
+        try {
+            StatisticsBlockValidationSchema.validateSyncAt('titleUa', { titleUa: value });
+            return undefined;
+        } catch (error: any) {
+            return error.message;
+        }
+    },
+
+    validateStatisticsTitleEn: (value: string): string | undefined => {
+        try {
+            StatisticsBlockValidationSchema.validateSyncAt('titleEn', { titleEn: value });
             return undefined;
         } catch (error: any) {
             return error.message;

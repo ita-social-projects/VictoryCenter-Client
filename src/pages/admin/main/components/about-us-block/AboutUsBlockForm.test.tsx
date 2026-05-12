@@ -15,6 +15,7 @@ const mockInitialData: MainPage = {
         description: 'Про нас опис',
     },
     mainPartners: null,
+    impactStatistics: null,
 };
 
 describe('AboutUsBlockForm', () => {

@@ -141,4 +141,68 @@ describe('MAIN_PAGE_VALIDATION_FUNCTIONS', () => {
             );
         });
     });
+
+    describe('validateStatisticsTitleUa', () => {
+        it('returns undefined for valid UA title', () => {
+            expect(
+                MAIN_PAGE_VALIDATION_FUNCTIONS.validateStatisticsTitleUa('Зміни, які можна виміряти'),
+            ).toBeUndefined();
+        });
+
+        it('returns required error for empty UA title', () => {
+            expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateStatisticsTitleUa('')).toBe(
+                MAIN_PAGE_VALIDATION.common.REQUIRED,
+            );
+        });
+
+        it('treats spaces as empty and returns required error for UA title', () => {
+            expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateStatisticsTitleUa('   ')).toBe(
+                MAIN_PAGE_VALIDATION.common.REQUIRED,
+            );
+        });
+
+        it('returns min error for UA title shorter than min', () => {
+            expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateStatisticsTitleUa('Коро')).toBe(
+                MAIN_PAGE_VALIDATION.statisticsBlock.title.getMinError(),
+            );
+        });
+
+        it('returns max error for UA title longer than max', () => {
+            const longTitle = 'a'.repeat(MAIN_PAGE_VALIDATION.statisticsBlock.title.max + 1);
+            expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateStatisticsTitleUa(longTitle)).toBe(
+                MAIN_PAGE_VALIDATION.statisticsBlock.title.getMaxError(),
+            );
+        });
+    });
+
+    describe('validateStatisticsTitleEn', () => {
+        it('returns undefined for valid EN title', () => {
+            expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateStatisticsTitleEn('Changes you can measure')).toBeUndefined();
+        });
+
+        it('returns required error for empty EN title', () => {
+            expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateStatisticsTitleEn('')).toBe(
+                MAIN_PAGE_VALIDATION.common.REQUIRED,
+            );
+        });
+
+        it('treats spaces as empty and returns required error for EN title', () => {
+            expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateStatisticsTitleEn('   ')).toBe(
+                MAIN_PAGE_VALIDATION.common.REQUIRED,
+            );
+        });
+
+        it('returns min error for EN title shorter than min', () => {
+            expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateStatisticsTitleEn('Shor')).toBe(
+                MAIN_PAGE_VALIDATION.statisticsBlock.title.getMinError(),
+            );
+        });
+
+        it('returns max error for EN title longer than max', () => {
+            const longTitle = 'a'.repeat(MAIN_PAGE_VALIDATION.statisticsBlock.title.max + 1);
+            expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateStatisticsTitleEn(longTitle)).toBe(
+                MAIN_PAGE_VALIDATION.statisticsBlock.title.getMaxError(),
+            );
+        });
+    });
 });

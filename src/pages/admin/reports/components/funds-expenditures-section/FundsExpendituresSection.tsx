@@ -35,7 +35,10 @@ import {
 } from './components/funds-expenditures-toolbar/FundsExpendituresToolbar';
 import { EnrichedRecord, FundsExpendituresTable } from './components/funds-expenditures-table/FundsExpendituresTable';
 import { AddFundsExpendituresRecordModal } from './components/common/add-funds-expenditures-record-modal/AddFundsExpendituresRecordModal';
+import { AddFundsExpendituresCategoryModal } from './components/common/add-funds-expenditures-category-modal/AddFundsExpendituresCategoryModal';
 import { DeleteRecordModal } from './components/common/delete-record-modal/DeleteRecordModal';
+import { DeleteFundsExpendituresCategoryModal } from './components/common/delete-funds-expenditures-category-modal/DeleteFundsExpendituresCategoryModal';
+import { EditFundsExpendituresCategoryModal } from './components/common/edit-funds-expenditures-category-modal/EditFundsExpendituresCategoryModal';
 import styles from './FundsExpendituresSection.module.scss';
 
 const enrichRecords = (
@@ -54,6 +57,12 @@ interface FundsExpenditureSectionProps {
     draftExchangeRate?: string | null;
     onEditModeChange?: (isEditing: boolean) => void;
     onExchangeRateValueChange?: (exchangeRate: string | null) => void;
+    isAddCategoryModalOpen?: boolean;
+    onAddCategoryModalClose?: () => void;
+    isDeleteCategoryModalOpen?: boolean;
+    onDeleteCategoryModalClose?: () => void;
+    isEditCategoryModalOpen?: boolean;
+    onEditCategoryModalClose?: () => void;
 }
 
 export const FundsExpenditureSection = ({
@@ -61,6 +70,12 @@ export const FundsExpenditureSection = ({
     draftExchangeRate,
     onEditModeChange,
     onExchangeRateValueChange,
+    isAddCategoryModalOpen = false,
+    onAddCategoryModalClose,
+    isDeleteCategoryModalOpen = false,
+    onDeleteCategoryModalClose,
+    isEditCategoryModalOpen = false,
+    onEditCategoryModalClose,
 }: FundsExpenditureSectionProps = {}) => {
     const adminClient = useAdminClient();
     const { addToast } = useToast();
@@ -169,7 +184,11 @@ export const FundsExpenditureSection = ({
         onExchangeRateValueChange?.(settings?.exchangeRate ?? null);
     }, [onEditModeChange, onExchangeRateValueChange, settings?.exchangeRate]);
 
-    const { data: categories, isLoading: isCategoriesLoading } = useDataFetch<ReportFundsExpendituresCategory[]>({
+    const {
+        data: categories,
+        isLoading: isCategoriesLoading,
+        refetch: refetchCategories,
+    } = useDataFetch<ReportFundsExpendituresCategory[]>({
         initialData: [],
         fetchHandler: fetchCategories,
     });
@@ -327,6 +346,53 @@ export const FundsExpenditureSection = ({
         [addToast, adminClient, refetchSummary],
     );
 
+    const handleCreateCategory = useCallback(
+        async (data: { name: string; type: FundsExpendituresTransactionType }): Promise<boolean> => {
+            try {
+                await FundsExpendituresApi.createCategory(adminClient, data);
+                refetchCategories();
+                addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_CREATED_SUCCESSFULLY, ToastType.Success);
+                return true;
+            } catch {
+                addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_CREATE_FAILED_RETRY, ToastType.Error);
+                return false;
+            }
+        },
+        [addToast, adminClient, refetchCategories],
+    );
+
+    const handleEditCategory = useCallback(
+        async (categoryId: number, name: string): Promise<boolean> => {
+            const category = categories.find((c) => c.id === categoryId);
+            if (!category) return false;
+            try {
+                await FundsExpendituresApi.updateCategory(adminClient, categoryId, { name, type: category.type });
+                refetchCategories();
+                addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_UPDATED_SUCCESSFULLY, ToastType.Success);
+                return true;
+            } catch {
+                addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_UPDATE_FAILED_RETRY, ToastType.Error);
+                return false;
+            }
+        },
+        [addToast, adminClient, categories, refetchCategories],
+    );
+
+    const handleDeleteCategory = useCallback(
+        async (categoryId: number): Promise<boolean> => {
+            try {
+                await FundsExpendituresApi.deleteCategory(adminClient, categoryId);
+                refetchCategories();
+                addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_DELETED_SUCCESSFULLY, ToastType.Success);
+                return true;
+            } catch {
+                addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_DELETE_FAILED_RETRY, ToastType.Error);
+                return false;
+            }
+        },
+        [addToast, adminClient, refetchCategories],
+    );
+
     const handleDeleteClick = (record: ReportFundsExpendituresRecord) => {
         setRecordToDelete(record);
         setIsDeleteModalOpen(true);
@@ -369,7 +435,8 @@ export const FundsExpenditureSection = ({
             refetchSummary();
             addToast(FUNDS_EXPENDITURES_TEXT.BULK.DELETE_SUCCESS, ToastType.Success);
         } catch {
-            addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_DELETE_FAILED_RETRY, ToastType.Error);
+            setIsBulkDeleteModalOpen(false);
+            addToast(FUNDS_EXPENDITURES_TEXT.BULK.DELETE_FAILED, ToastType.Error, 5000);
         } finally {
             setIsBulkDeleting(false);
         }
@@ -555,6 +622,28 @@ export const FundsExpenditureSection = ({
                 records={recordsState}
                 exchangeRate={currentExchangeRate}
                 onSubmit={handleCreateRecord}
+            />
+
+            <AddFundsExpendituresCategoryModal
+                isOpen={isAddCategoryModalOpen}
+                onClose={onAddCategoryModalClose ?? (() => {})}
+                categories={categories}
+                onSubmit={handleCreateCategory}
+            />
+
+            <EditFundsExpendituresCategoryModal
+                isOpen={isEditCategoryModalOpen}
+                onClose={onEditCategoryModalClose ?? (() => {})}
+                categories={categories}
+                onSubmit={handleEditCategory}
+            />
+
+            <DeleteFundsExpendituresCategoryModal
+                isOpen={isDeleteCategoryModalOpen}
+                onClose={onDeleteCategoryModalClose ?? (() => {})}
+                categories={categories}
+                records={recordsState}
+                onSubmit={handleDeleteCategory}
             />
 
             <DeleteRecordModal

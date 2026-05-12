@@ -146,6 +146,8 @@ export const FUNDS_EXPENDITURES_VALIDATION = {
         maxDecimalDigits: 6,
     },
     maxCategoriesPerType: 4,
+    categoryNameMin: 5,
+    categoryNameMax: 200,
 };
 
 export const FUNDS_EXPENDITURES_TEXT = {
@@ -159,6 +161,12 @@ export const FUNDS_EXPENDITURES_TEXT = {
         RECORD_DELETED_SUCCESSFULLY: 'Запис успішно видалено',
         RECORD_DELETE_FAILED_RETRY: 'Не вдалося видалити запис. Спробуйте ще раз',
         AMOUNT_USD_NOT_MATCH: 'Сума в USD не відповідає сумі в UAH',
+        CATEGORY_CREATED_SUCCESSFULLY: 'Категорію додано успішно',
+        CATEGORY_CREATE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
+        CATEGORY_DELETED_SUCCESSFULLY: 'Категорію видалено успішно',
+        CATEGORY_DELETE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
+        CATEGORY_UPDATED_SUCCESSFULLY: 'Категорію оновлено успішно',
+        CATEGORY_UPDATE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
     },
     MODAL: {
         SHARED: {
@@ -188,11 +196,49 @@ export const FUNDS_EXPENDITURES_TEXT = {
             SUBMIT_BUTTON: 'Додати витрату',
             CONFIRM_ADD_TITLE: 'Додати нову витрату?',
         },
+        EDIT_CATEGORY: {
+            TITLE: 'Редагувати категорію',
+            SUBTITLE: 'Редагування категорії витрат/надходжень для формування звітності',
+            CATEGORY_LABEL: 'Категорія',
+            CATEGORY_PLACEHOLDER: 'Оберіть категорію',
+            NAME_LABEL: 'Редагувати назву',
+            NAME_PLACEHOLDER: 'Введіть назву категорії',
+            SUBMIT_BUTTON: 'Зберегти',
+            CONFIRM_SAVE_TITLE: 'Зберегти зміни?',
+        },
+        DELETE_CATEGORY: {
+            TITLE: 'Видалити категорію',
+            CATEGORY_LABEL: 'Категорія',
+            CATEGORY_PLACEHOLDER: 'Оберіть категорію',
+            CONFIRM_TITLE: 'Видалити категорію?',
+            ERROR: {
+                getHasIncomeRecordTitle: (count: number) =>
+                    `Категорія використовується в надходженнях, ${count} ${count === 1 ? 'запис' : count < 5 ? 'записи' : 'записів'}`,
+                getHasExpenseRecordTitle: (count: number) =>
+                    `Категорія використовується у витратах, ${count} ${count === 1 ? 'запис' : count < 5 ? 'записи' : 'записів'}`,
+                HAS_RECORD_TEXT: 'Видаліть або змініть їх',
+            },
+        },
+        CATEGORY: {
+            TITLE: 'Додати категорію',
+            SUBTITLE: 'Додавання категорії витрат/надходжень для формування звітності',
+            TYPE_LABEL: 'Витрата/Надходження',
+            TYPE_PLACEHOLDER: 'Витрата/Надходження',
+            NAME_LABEL: 'Назва',
+            NAME_PLACEHOLDER: 'Введіть назву категорії',
+            SUBMIT_BUTTON: 'Зберегти',
+            ERROR: {
+                NAME_DUPLICATE: 'Категорія з такою назвою вже існує',
+            },
+        },
     },
     BUTTON: {
         EDIT: 'Редагувати Доходи та витрати',
         ADD_INCOME: 'Надходження',
         ADD_EXPENSE: 'Витрати',
+        ADD_CATEGORY: 'Додати категорію',
+        DELETE_CATEGORY: 'Видалити',
+        EDIT_CATEGORY: 'Редагувати',
     },
     FILTER: {
         TYPE_PLACEHOLDER: 'Тип',
@@ -243,6 +289,7 @@ export const FUNDS_EXPENDITURES_TEXT = {
         DELETE_BUTTON: 'Видалити вибрані',
         DELETE_CONFIRM_TITLE: 'Видалити обрані записи?',
         DELETE_SUCCESS: 'Записи видалені успішно',
+        DELETE_FAILED: 'Помилка при видаленні записів. Спробуйте ще раз.',
     },
 };
 

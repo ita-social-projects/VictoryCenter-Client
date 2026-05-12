@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Button } from '@/components/admin/button/Button';
-import { ImageInput } from '@/components/admin/image-input/ImageInput';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { TitleBlockValidationSchema } from '@/validation/admin/main-page-schema/main-page-schema';
@@ -10,6 +9,7 @@ import { MainPage, TitleBlockFormValues, TITLE_BLOCK_FORM_DEFAULTS } from '@/typ
 import { MAIN_PAGE_TEXT, MAIN_PAGE_VALIDATION } from '@/const/admin/main-page';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import DefaultPlaceholder from '@/assets/images/man-facing-horse-forehead.webp';
+import { ImageUploadForm } from '@/pages/admin/main/components/common/image-upload-form/ImageUploadForm';
 
 import styles from './TitleBlockForm.module.scss';
 
@@ -67,26 +67,14 @@ export const TitleBlockForm = ({ initialData }: TitleBlockFormProps) => {
     return (
         <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
             <div className={styles.content}>
-                <div className={styles['image-section']}>
-                    <Controller
-                        name="image"
-                        control={control}
-                        render={({ field: { onChange, value } }) => (
-                            <div className={styles['image-wrapper']}>
-                                <ImageInput
-                                    value={value}
-                                    onChange={onChange}
-                                    setError={setImageError}
-                                    variant="whoWeAre"
-                                    {...IMAGE_CONFIG}
-                                />
-                                {(imageError || errors.image?.message) && (
-                                    <p className={styles.error}> {imageError || errors.image?.message}</p>
-                                )}
-                            </div>
-                        )}
-                    />
-                </div>
+                <ImageUploadForm
+                    control={control}
+                    errors={errors}
+                    imageError={imageError}
+                    setImageError={setImageError}
+                    imageConfig={IMAGE_CONFIG}
+                    variant="whoWeAre"
+                />
 
                 <div className={styles['text-section']}>
                     <Controller

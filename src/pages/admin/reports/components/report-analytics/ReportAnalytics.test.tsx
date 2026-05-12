@@ -1,6 +1,17 @@
 import { render, screen, fireEvent } from '@testing-library/react';
+import { localizationLanguagesDataFetch } from '@/services/api/public/localization/languages/languages-api';
 import { ReportAnalytics } from './ReportAnalytics';
 import { FUNDS_EXPENDITURES_TEXT, REPORTS_TEXT } from '@/const/admin/reports';
+
+jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider', () => ({
+    useToast: () => ({ addToast: jest.fn() }),
+}));
+
+jest.mock('@/services/api/public/localization/languages/languages-api', () => ({
+    localizationLanguagesDataFetch: jest.fn(),
+}));
+
+const mockLocalizationLanguagesDataFetch = localizationLanguagesDataFetch as jest.Mock;
 
 jest.mock('../pdf-files-section/PdfFilesSection', () => ({
     PdfFilesSection: () => <div data-testid="pdf-files-section">PdfFilesSection</div>,
@@ -56,6 +67,13 @@ jest.mock('../funds-expenditures-section/FundsExpendituresSection', () => ({
     ),
 }));
 
+jest.mock(
+    '../funds-expenditures-section/components/common/translate-reports-category-modal/TranslateReportsCategoryModal',
+    () => ({
+        TranslateReportsCategoryModal: () => null,
+    }),
+);
+
 jest.mock('../program-expenses-section/ProgramExpensesSection', () => ({
     ProgramExpensesSection: ({ isEditing = false }: { isEditing?: boolean }) => (
         <div data-testid="program-expenses-section" data-editing={String(isEditing)}>
@@ -65,6 +83,10 @@ jest.mock('../program-expenses-section/ProgramExpensesSection', () => ({
 }));
 
 describe('ReportAnalytics', () => {
+    beforeEach(() => {
+        mockLocalizationLanguagesDataFetch.mockResolvedValue([]);
+    });
+
     it('should render the component with correct title', () => {
         render(<ReportAnalytics />);
 

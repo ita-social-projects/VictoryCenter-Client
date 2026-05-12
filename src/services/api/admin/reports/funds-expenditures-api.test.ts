@@ -74,8 +74,8 @@ describe('FundsExpendituresApi', () => {
                 signal: undefined,
             });
             expect(result).toEqual([
-                { id: 1, name: 'Income category', type: 'income' },
-                { id: 2, name: 'Expense category', type: 'expense' },
+                { id: 1, name: 'Income category', type: 'income', localizations: [] },
+                { id: 2, name: 'Expense category', type: 'expense', localizations: [] },
             ]);
         });
     });
@@ -93,7 +93,7 @@ describe('FundsExpendituresApi', () => {
                 name: 'New income',
                 type: 1,
             });
-            expect(result).toEqual({ id: 3, name: 'New income', type: 'income' });
+            expect(result).toEqual({ id: 3, name: 'New income', type: 'income', localizations: [] });
         });
     });
 
@@ -110,7 +110,7 @@ describe('FundsExpendituresApi', () => {
                 name: 'Updated expense',
                 type: 2,
             });
-            expect(result).toEqual({ id: 2, name: 'Updated expense', type: 'expense' });
+            expect(result).toEqual({ id: 2, name: 'Updated expense', type: 'expense', localizations: [] });
         });
     });
 

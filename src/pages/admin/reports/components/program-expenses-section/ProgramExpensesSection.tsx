@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { ProgramExpensesApi } from '@/services/api/admin/reports/program-expenses-api';
 import { ProgramExpensesReadOnlyData } from '@/types/admin/reports';
 import { ProgramExpensesToolbar } from './components/program-expenses-toolbar/ProgramExpensesToolbar';
@@ -26,10 +27,14 @@ interface ProgramExpensesSectionProps {
 }
 
 export const ProgramExpensesSection = ({ isEditing = false }: ProgramExpensesSectionProps) => {
+    const adminClient = useAdminClient();
     const [selectedProgramIds, setSelectedProgramIds] = useState<number[]>([]);
     const [isAddProgramExpenseModalOpen, setIsAddProgramExpenseModalOpen] = useState(false);
 
-    const fetchReadOnlyData = useCallback((options = {}) => ProgramExpensesApi.getReadOnlyData(options), []);
+    const fetchReadOnlyData = useCallback(
+        (options = {}) => ProgramExpensesApi.getReadOnlyData(adminClient, options),
+        [adminClient],
+    );
 
     const { data, isLoading } = useDataFetch<ProgramExpensesReadOnlyData>({
         initialData: INITIAL_PROGRAM_EXPENSES_DATA,

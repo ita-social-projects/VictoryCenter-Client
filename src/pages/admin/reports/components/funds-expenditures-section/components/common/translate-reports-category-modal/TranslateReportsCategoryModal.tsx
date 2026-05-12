@@ -94,7 +94,6 @@ export const TranslateReportsCategoryModal = ({
             isFormValid={isFormValid}
             checkIsDirty={checkIsDirty}
             isDirty={isDirty}
-            className={styles.modal}
         >
             <div className={styles.content}>
                 <TranslationControls

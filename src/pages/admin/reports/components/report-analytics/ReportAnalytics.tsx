@@ -1,9 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { CategoryBar, ContextMenuOption } from '@/components/admin/category-bar/CategoryBar';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FUNDS_EXPENDITURES_TEXT, REPORTS_TEXT } from '@/const/admin/reports';
 import { DEFAULT_LOCALE } from '@/const/common/locales';
+import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { localizationLanguagesDataFetch } from '@/services/api/public/localization/languages/languages-api';
 import { ReportFundsExpendituresCategory } from '@/types/admin/reports';
+import { ToastType } from '@/types/admin/toast';
 import { LocalizationLanguage } from '@/types/common/language';
 import styles from './ReportAnalytics.module.scss';
 import './ReportAnalytics.scss';
@@ -24,6 +27,7 @@ const ANALYTICS_TABS: ReportAnalyticsTab[] = [
 ];
 
 export const ReportAnalytics = () => {
+    const { addToast } = useToast();
     const [activeTab, setActiveTab] = useState<ReportAnalyticsTab>(ANALYTICS_TABS[0]);
     const [isFundsEditing, setIsFundsEditing] = useState(false);
     const [fundsExchangeRateDraft, setFundsExchangeRateDraft] = useState<string | null>();
@@ -62,9 +66,13 @@ export const ReportAnalytics = () => {
         }
     }, []);
 
-    const handleTranslateCategory = useCallback((updatedCategory: ReportFundsExpendituresCategory) => {
-        setCategories((prev) => prev.map((c) => (c.id === updatedCategory.id ? updatedCategory : c)));
-    }, []);
+    const handleTranslateCategory = useCallback(
+        (updatedCategory: ReportFundsExpendituresCategory) => {
+            setCategories((prev) => prev.map((c) => (c.id === updatedCategory.id ? updatedCategory : c)));
+            addToast(COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS, ToastType.Success);
+        },
+        [addToast],
+    );
 
     return (
         <div className={styles['report-analytics']}>

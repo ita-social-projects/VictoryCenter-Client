@@ -1,4 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
 import { ReportFundsExpendituresCategory } from '@/types/admin/reports';
 import { LocalizationLanguage, TranslationStatus } from '@/types/common/language';
@@ -97,6 +98,15 @@ const categoriesMock: ReportFundsExpendituresCategory[] = [
     { id: 2, name: 'Category Two', type: 'expense', localizations: [] },
 ];
 
+const categoryWithEnTranslation: ReportFundsExpendituresCategory = {
+    id: 3,
+    name: 'Category Three',
+    type: 'income',
+    localizations: [
+        { language: { id: 2, code: 'en' }, translationStatus: TranslationStatus.Relevant, name: 'Translated Three' },
+    ],
+};
+
 const defaultProps = {
     isOpen: true,
     onClose: jest.fn(),
@@ -120,10 +130,20 @@ describe('TranslateReportsCategoryModal', () => {
         expect(screen.queryByTestId('localization-modal')).not.toBeInTheDocument();
     });
 
-    it('renders the fixed modal title', () => {
+    it('shows add-mode title when selected category has no translation for selected language', () => {
         render(<TranslateReportsCategoryModal {...defaultProps} />);
         expect(screen.getByTestId('modal-title')).toHaveTextContent(
             FUNDS_EXPENDITURES_TEXT.MODAL.TRANSLATE_CATEGORY.TITLE,
+        );
+    });
+
+    it('shows edit-mode title when selected category has an existing translation for selected language', () => {
+        render(<TranslateReportsCategoryModal {...defaultProps} categories={[categoryWithEnTranslation]} />);
+
+        fireEvent.change(screen.getByTestId('category-select'), { target: { value: '3' } });
+
+        expect(screen.getByTestId('modal-title')).toHaveTextContent(
+            COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.UPDATE_TRANSLATION,
         );
     });
 

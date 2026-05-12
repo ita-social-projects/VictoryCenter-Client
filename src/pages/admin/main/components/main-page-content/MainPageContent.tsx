@@ -1,14 +1,12 @@
 import { useState, useEffect } from 'react';
 import { CategoryBar } from '@/components/admin/category-bar/CategoryBar';
 import { PageLoader } from '@/components/common/page-loader/PageLoader';
-import { TitleBlockForm } from '../title-block/TitleBlockForm';
-import { AboutUsBlockForm } from '../about-us-block/AboutUsBlockForm';
-import { StatisticsBlockForm } from '../statistics-block/StatisticsBlockForm';
 import { MAIN_PAGE_TEXT } from '@/const/admin/main-page';
 import { MainPage } from '@/types/admin/main-page';
 import { MOCK_MAIN_PAGE_DATA } from '@/utils/mock-data/admin/main-page/main-page';
 import { AboutUsBlockForm } from '../about-us-block/AboutUsBlockForm';
 import { PartnersBlockForm } from '../partners-block/PartnersBlockForm';
+import { StatisticsBlockForm } from '../statistics-block/StatisticsBlockForm';
 import { TitleBlockForm } from '../title-block/TitleBlockForm';
 import styles from './MainPageContent.module.scss';
 

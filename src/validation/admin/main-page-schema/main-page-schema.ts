@@ -1,8 +1,13 @@
-import * as Yup from 'yup';
 import { MAIN_PAGE_VALIDATION } from '@/const/admin/main-page';
-import { AboutUsBlockFormValues, TitleBlockFormValues, PartnersBlockFormValues, StatisticsBlockFormValues } from '@/types/admin/main-page';
+import {
+    AboutUsBlockFormValues,
+    PartnersBlockFormValues,
+    StatisticsBlockFormValues,
+    TitleBlockFormValues,
+} from '@/types/admin/main-page';
 import { Image, ImageValues } from '@/types/common/image';
 import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
+import * as Yup from 'yup';
 
 const buildStringValidation = (config: {
     min: number;

@@ -10,6 +10,7 @@ const mockInitialData: MainPage = {
     description: 'Титульний опис',
     image: null,
     mainAboutUs: null,
+    impactStatistics: null,
     mainPartners: {
         id: 1,
         title: 'Наші надійні партнери',

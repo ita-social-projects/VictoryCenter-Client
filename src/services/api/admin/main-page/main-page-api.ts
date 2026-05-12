@@ -60,10 +60,10 @@ export const MainPageApi = {
         id: number,
         dto: UpdateMetricVisibilityDto,
     ): Promise<void> => {
-        await client.put(`${API_ROUTES.MAIN_PAGE.BASE}/${id}/visibility`, dto);
+        await client.put(`${API_ROUTES.MAIN_PAGE.BASE}/metrics/${id}/visibility`, dto);
     },
 
     reorderMetrics: async (client: AxiosInstance, dto: ReorderMetricsDto): Promise<void> => {
-        await client.put(`${API_ROUTES.MAIN_PAGE.BASE}/reorder`, dto);
+        await client.put(`${API_ROUTES.MAIN_PAGE.BASE}/metrics/reorder`, dto);
     },
 };

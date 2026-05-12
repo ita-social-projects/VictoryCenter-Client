@@ -55,37 +55,39 @@ jest.mock('@/components/admin/localization-modal/LocalizationModal', () => ({
         ) : null,
 }));
 
-jest.mock('./TranslateReportsCategoryForm', () => ({
-    TranslateReportsCategoryForm: ({
-        categories,
-        onCategoryChange,
-        onValidationChange,
-        onSubmit,
-        onDirtyChange,
-    }: any) => (
-        <div data-testid="translate-form">
-            <select
-                data-testid="category-select"
-                onChange={(e) => {
-                    const cat = categories.find((c: any) => String(c.id) === e.target.value) ?? null;
-                    onCategoryChange?.(cat);
-                    onValidationChange?.(!!cat);
-                    onDirtyChange?.(!!cat);
-                }}
-            >
-                <option value="">-- select --</option>
-                {categories.map((c: any) => (
-                    <option key={c.id} value={c.id}>
-                        {c.name}
-                    </option>
-                ))}
-            </select>
-            <button data-testid="form-submit" onClick={() => onSubmit({ name: 'Translated name' })}>
-                Submit
-            </button>
-        </div>
-    ),
-}));
+jest.mock('./TranslateReportsCategoryForm', () => {
+    const { forwardRef, useImperativeHandle } = jest.requireActual('react');
+    const TranslateReportsCategoryForm = forwardRef(
+        ({ categories, onCategoryChange, onValidationChange, onSubmit, onDirtyChange }: any, ref: any) => {
+            useImperativeHandle(ref, () => ({
+                isValid: () => true,
+                isDirty: () => true,
+                submit: () => onSubmit({ name: 'Translated name' }),
+            }));
+            return (
+                <div data-testid="translate-form">
+                    <select
+                        data-testid="category-select"
+                        onChange={(e) => {
+                            const cat = categories.find((c: any) => String(c.id) === e.target.value) ?? null;
+                            onCategoryChange?.(cat);
+                            onValidationChange?.(!!cat);
+                            onDirtyChange?.(!!cat);
+                        }}
+                    >
+                        <option value="">-- select --</option>
+                        {categories.map((c: any) => (
+                            <option key={c.id} value={c.id}>
+                                {c.name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            );
+        },
+    );
+    return { TranslateReportsCategoryForm };
+});
 
 const languageEn: LocalizationLanguage = { id: 2, code: 'en', name: 'English' };
 const languageUk: LocalizationLanguage = { id: 1, code: 'uk', name: 'Українська' };
@@ -207,7 +209,7 @@ describe('TranslateReportsCategoryModal', () => {
 
         fireEvent.change(screen.getByTestId('category-select'), { target: { value: '1' } });
 
-        fireEvent.click(screen.getByTestId('form-submit'));
+        fireEvent.click(screen.getByTestId('modal-save'));
 
         await waitFor(() => expect(onTranslateCategory).toHaveBeenCalled());
         await waitFor(() => expect(onClose).toHaveBeenCalled());

@@ -88,9 +88,7 @@ jest.mock('../funds-expenditures-section/FundsExpendituresSection', () => ({
             <button
                 type="button"
                 data-testid="trigger-categories-loaded"
-                onClick={() =>
-                    onCategoriesLoaded?.([{ id: 1, name: 'Cat', type: 'income', localizations: [] }])
-                }
+                onClick={() => onCategoriesLoaded?.([{ id: 1, name: 'Cat', type: 'income', localizations: [] }])}
             >
                 Load categories
             </button>
@@ -312,9 +310,7 @@ describe('ReportAnalytics', () => {
             render(<ReportAnalytics />);
 
             fireEvent.click(screen.getByTestId('context-menu'));
-            fireEvent.click(
-                screen.getByRole('menuitem', { name: FUNDS_EXPENDITURES_TEXT.BUTTON.TRANSLATE_CATEGORY }),
-            );
+            fireEvent.click(screen.getByRole('menuitem', { name: FUNDS_EXPENDITURES_TEXT.BUTTON.TRANSLATE_CATEGORY }));
 
             expect(screen.getByTestId('translate-category-modal')).toHaveAttribute('data-open', 'true');
         });
@@ -323,9 +319,7 @@ describe('ReportAnalytics', () => {
             render(<ReportAnalytics />);
 
             fireEvent.click(screen.getByTestId('context-menu'));
-            fireEvent.click(
-                screen.getByRole('menuitem', { name: FUNDS_EXPENDITURES_TEXT.BUTTON.TRANSLATE_CATEGORY }),
-            );
+            fireEvent.click(screen.getByRole('menuitem', { name: FUNDS_EXPENDITURES_TEXT.BUTTON.TRANSLATE_CATEGORY }));
             fireEvent.click(screen.getByTestId('translate-modal-close'));
 
             expect(screen.getByTestId('translate-category-modal')).toHaveAttribute('data-open', 'false');

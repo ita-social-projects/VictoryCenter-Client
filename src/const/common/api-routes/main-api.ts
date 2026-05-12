@@ -109,6 +109,9 @@ export const API_ROUTES = {
     FAQ_LOCALIZATIONS: {
         BASE: 'FaqQuestionLocalizations',
     },
+    REPORT_FUNDS_EXPENDITURES_CATEGORY_LOCALIZATIONS: {
+        BASE: 'ReportFundsExpendituresCategoryLocalizations',
+    },
     HISTORY: {
         BASE: 'History',
     },

@@ -41,6 +41,13 @@ describe('ProgramExpensesApi', () => {
                                 amountUah: 2000,
                                 amountUsd: 800,
                             },
+                            {
+                                id: 4,
+                                reportingYear: 2024,
+                                hippotherapyProgramCategoryId: 20,
+                                amountUah: 0,
+                                amountUsd: 0,
+                            },
                         ],
                     });
                 }
@@ -88,6 +95,15 @@ describe('ProgramExpensesApi', () => {
                     reportingYear: '2024',
                     amountUah: '2000',
                     amountUsd: '800',
+                },
+                {
+                    id: 4,
+                    programId: 20,
+                    programName: 'Program B',
+                    type: 'expense',
+                    reportingYear: '2024',
+                    amountUah: '0',
+                    amountUsd: '0',
                 },
             ]);
             expect(result.programs).toEqual([

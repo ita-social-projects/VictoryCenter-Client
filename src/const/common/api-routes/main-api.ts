@@ -7,6 +7,10 @@ export const API_ROUTES = {
         LOGOUT: 'auth/logout',
         REFRESH_TOKEN: 'auth/refresh-token',
     },
+    MAIN_PAGE: {
+        BASE: 'MainPage',
+        PUBLIC: 'MainPage',
+    },
     COMPANY_PROFILE: {
         BASE: 'CompanyProfile',
         PUBLIC: 'CompanyProfile',

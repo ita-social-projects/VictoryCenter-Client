@@ -103,7 +103,9 @@ describe('AddFundsExpendituresCategoryModal', () => {
         });
 
         it('shows duplicate error on blur when name matches existing category for same type', () => {
-            const categories: ReportFundsExpendituresCategory[] = [{ id: 1, name: 'Приватні донори', type: 'income', localizations: [] }];
+            const categories: ReportFundsExpendituresCategory[] = [
+                { id: 1, name: 'Приватні донори', type: 'income', localizations: [] },
+            ];
             renderOpen(jest.fn(), categories);
             fireEvent.change(screen.getByTestId(TYPE_SELECT), { target: { value: 'income' } });
             fireEvent.change(screen.getByTestId(NAME_INPUT), { target: { value: 'Донори приватні' } });
@@ -112,7 +114,9 @@ describe('AddFundsExpendituresCategoryModal', () => {
         });
 
         it('does not show duplicate error when type differs from existing category', () => {
-            const categories: ReportFundsExpendituresCategory[] = [{ id: 1, name: 'Приватні донори', type: 'expense', localizations: [] }];
+            const categories: ReportFundsExpendituresCategory[] = [
+                { id: 1, name: 'Приватні донори', type: 'expense', localizations: [] },
+            ];
             renderOpen(jest.fn(), categories);
             fireEvent.change(screen.getByTestId(TYPE_SELECT), { target: { value: 'income' } });
             fireEvent.change(screen.getByTestId(NAME_INPUT), { target: { value: 'Приватні донори' } });
@@ -134,7 +138,9 @@ describe('AddFundsExpendituresCategoryModal', () => {
 
     describe('name re-validation on type change', () => {
         it('shows duplicate error when type changes to one that has the same name', () => {
-            const categories: ReportFundsExpendituresCategory[] = [{ id: 1, name: 'Category A', type: 'expense', localizations: [] }];
+            const categories: ReportFundsExpendituresCategory[] = [
+                { id: 1, name: 'Category A', type: 'expense', localizations: [] },
+            ];
             renderOpen(jest.fn(), categories);
             fireEvent.change(screen.getByTestId(NAME_INPUT), { target: { value: 'Category A' } });
             fireEvent.blur(screen.getByTestId(NAME_INPUT));
@@ -145,7 +151,9 @@ describe('AddFundsExpendituresCategoryModal', () => {
         });
 
         it('clears duplicate error when type changes to one without the same name', () => {
-            const categories: ReportFundsExpendituresCategory[] = [{ id: 1, name: 'Category A', type: 'income', localizations: [] }];
+            const categories: ReportFundsExpendituresCategory[] = [
+                { id: 1, name: 'Category A', type: 'income', localizations: [] },
+            ];
             renderOpen(jest.fn(), categories);
             fillForm('income', 'Category A');
             fireEvent.blur(screen.getByTestId(NAME_INPUT));
@@ -156,7 +164,9 @@ describe('AddFundsExpendituresCategoryModal', () => {
         });
 
         it('does not show name error on type change before name has been blurred', () => {
-            const categories: ReportFundsExpendituresCategory[] = [{ id: 1, name: 'Category A', type: 'expense', localizations: [] }];
+            const categories: ReportFundsExpendituresCategory[] = [
+                { id: 1, name: 'Category A', type: 'expense', localizations: [] },
+            ];
             renderOpen(jest.fn(), categories);
             fireEvent.change(screen.getByTestId(NAME_INPUT), { target: { value: 'Category A' } });
 

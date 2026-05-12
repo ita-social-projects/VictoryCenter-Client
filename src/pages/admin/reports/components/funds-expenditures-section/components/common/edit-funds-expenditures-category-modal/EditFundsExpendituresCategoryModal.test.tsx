@@ -114,7 +114,11 @@ describe('EditFundsExpendituresCategoryModal', () => {
         });
 
         it('is disabled when name duplicates another category of the same type', () => {
-            const categories = [incomeCategory, expenseCategory, { id: 3, name: 'Гранти', type: 'income' as const, localizations: [] }];
+            const categories = [
+                incomeCategory,
+                expenseCategory,
+                { id: 3, name: 'Гранти', type: 'income' as const, localizations: [] },
+            ];
             renderModal({ categories });
             selectCategory(incomeCategory.name);
             typeName('Гранти');
@@ -138,7 +142,11 @@ describe('EditFundsExpendituresCategoryModal', () => {
         });
 
         it('shows duplicate error when name matches another category of the same type', () => {
-            const categories = [incomeCategory, expenseCategory, { id: 3, name: 'Гранти', type: 'income' as const, localizations: [] }];
+            const categories = [
+                incomeCategory,
+                expenseCategory,
+                { id: 3, name: 'Гранти', type: 'income' as const, localizations: [] },
+            ];
             renderModal({ categories });
             selectCategory(incomeCategory.name);
             typeName('Гранти');

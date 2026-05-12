@@ -16,6 +16,7 @@ interface LocalizationModalProps {
     saveButtonText?: string;
     checkIsDirty?: () => boolean;
     isDirty?: boolean;
+    className?: string;
     children: React.ReactNode;
 }
 
@@ -29,6 +30,7 @@ export const LocalizationModal = ({
     saveButtonText = COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION,
     checkIsDirty,
     isDirty,
+    className,
     children,
 }: LocalizationModalProps) => {
     const [showCloseConfirm, setShowCloseConfirm] = useState(false);
@@ -52,7 +54,7 @@ export const LocalizationModal = ({
 
     return (
         <>
-            <Modal isOpen={isOpen} onClose={handleRequestClose}>
+            <Modal isOpen={isOpen} onClose={handleRequestClose} className={className}>
                 <Modal.Title>{title}</Modal.Title>
                 <Modal.Content>{children}</Modal.Content>
                 <Modal.Actions>

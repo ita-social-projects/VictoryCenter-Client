@@ -1,4 +1,4 @@
-import { FocusEvent, useEffect, useMemo, useRef } from 'react';
+import { ChangeEvent, FocusEvent, ReactNode, useEffect, useMemo, useRef } from 'react';
 import { Button } from '@/components/admin/button/Button';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import { InputWithCharacterLimit } from '@/components/admin/input-with-character-limit/InputWithCharacterLimit';
@@ -21,6 +21,88 @@ interface AddProgramExpenseRecordModalProps {
 }
 
 const PROGRAM_EXPENSE_AMOUNT_MAX_LENGTH = 12;
+
+interface RequiredFieldLabelProps {
+    children: ReactNode;
+}
+
+const RequiredFieldLabel = ({ children }: RequiredFieldLabelProps) => (
+    <label className={styles.label}>
+        <span className={styles.required}>*</span>
+        {children}
+    </label>
+);
+
+interface FieldErrorProps {
+    message?: string;
+}
+
+const FieldError = ({ message }: FieldErrorProps) => (message ? <p className={styles.error}>{message}</p> : null);
+
+interface SelectFieldProps {
+    label: string;
+    error?: string;
+    onBlurCapture: (event: FocusEvent<HTMLDivElement>) => void;
+    children: ReactNode;
+}
+
+const SelectField = ({ label, error, onBlurCapture, children }: SelectFieldProps) => (
+    <div className={styles.field} onBlurCapture={onBlurCapture}>
+        <RequiredFieldLabel>{label}</RequiredFieldLabel>
+        {children}
+        <FieldError message={error} />
+    </div>
+);
+
+interface ExchangeRateChipProps {
+    exchangeRate: string | null;
+}
+
+const ExchangeRateChip = ({ exchangeRate }: ExchangeRateChipProps) => (
+    <div className={styles['exchange-rate-chip']}>
+        <span className={styles['exchange-rate-chip-label']}>{FUNDS_EXPENDITURES_TEXT.EXCHANGE_RATE_LABEL}</span>
+        <input
+            type="text"
+            value={exchangeRate ?? ''}
+            disabled
+            className={styles['exchange-rate-value']}
+            aria-label={FUNDS_EXPENDITURES_TEXT.EXCHANGE_RATE_LABEL}
+        />
+    </div>
+);
+
+interface AmountFieldProps {
+    id: string;
+    name: 'amountUah' | 'amountUsd';
+    label: string;
+    value: string;
+    error?: string;
+    headerAddon?: ReactNode;
+    onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+    onBlur: () => void;
+}
+
+const AmountField = ({ id, name, label, value, error, headerAddon, onChange, onBlur }: AmountFieldProps) => (
+    <div className={styles.field}>
+        <div className={headerAddon ? styles['amount-usd-header'] : undefined}>
+            <RequiredFieldLabel>{label}</RequiredFieldLabel>
+            {headerAddon}
+        </div>
+        <InputWithCharacterLimit
+            id={id}
+            name={name}
+            type="text"
+            value={value}
+            onChange={onChange}
+            onBlur={onBlur}
+            maxLength={PROGRAM_EXPENSE_AMOUNT_MAX_LENGTH}
+            showCounter={false}
+            className={styles.input}
+            hasError={Boolean(error)}
+        />
+        <FieldError message={error} />
+    </div>
+);
 
 export const AddProgramExpenseRecordModal = ({
     isOpen,
@@ -90,11 +172,11 @@ export const AddProgramExpenseRecordModal = ({
                 <Modal.Content>
                     <div className={styles.panel}>
                         <div className={styles.form}>
-                            <div className={styles.field} onBlurCapture={handleReportingYearFieldBlur}>
-                                <label className={styles.label}>
-                                    <span className={styles.required}>*</span>
-                                    {FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_LABEL}
-                                </label>
+                            <SelectField
+                                label={FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_LABEL}
+                                error={formState.errors.reportingYear}
+                                onBlurCapture={handleReportingYearFieldBlur}
+                            >
                                 <Select<string>
                                     value={formState.reportingYear}
                                     onValueChange={handleReportingYearChange}
@@ -107,16 +189,13 @@ export const AddProgramExpenseRecordModal = ({
                                         <Select.Option key={year} value={year} name={year} />
                                     ))}
                                 </Select>
-                                {formState.errors.reportingYear && (
-                                    <p className={styles.error}>{formState.errors.reportingYear}</p>
-                                )}
-                            </div>
+                            </SelectField>
 
-                            <div className={styles.field} onBlurCapture={handleProgramFieldBlur}>
-                                <label className={styles.label}>
-                                    <span className={styles.required}>*</span>
-                                    {PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_LABEL}
-                                </label>
+                            <SelectField
+                                label={PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_LABEL}
+                                error={formState.errors.programId}
+                                onBlurCapture={handleProgramFieldBlur}
+                            >
                                 {isProgramSelectDisabled ? (
                                     <div className={styles['disabled-select-placeholder']}>
                                         {PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_NO_AVAILABLE}
@@ -135,68 +214,28 @@ export const AddProgramExpenseRecordModal = ({
                                         ))}
                                     </Select>
                                 )}
-                                {formState.errors.programId && (
-                                    <p className={styles.error}>{formState.errors.programId}</p>
-                                )}
-                            </div>
+                            </SelectField>
 
-                            <div className={styles.field}>
-                                <label className={styles.label}>
-                                    <span className={styles.required}>*</span>
-                                    {FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.AMOUNT_UAH_LABEL}
-                                </label>
-                                <InputWithCharacterLimit
-                                    id="add-program-expense-amount-uah"
-                                    name="amountUah"
-                                    type="text"
-                                    value={formState.amountUah}
-                                    onChange={(event) => handleAmountChange('amountUah', event.target.value)}
-                                    onBlur={() => handleAmountBlur('amountUah')}
-                                    maxLength={PROGRAM_EXPENSE_AMOUNT_MAX_LENGTH}
-                                    showCounter={false}
-                                    className={styles.input}
-                                    hasError={Boolean(formState.errors.amountUah)}
-                                />
-                                {formState.errors.amountUah && (
-                                    <p className={styles.error}>{formState.errors.amountUah}</p>
-                                )}
-                            </div>
+                            <AmountField
+                                id="add-program-expense-amount-uah"
+                                name="amountUah"
+                                label={FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.AMOUNT_UAH_LABEL}
+                                value={formState.amountUah}
+                                error={formState.errors.amountUah}
+                                onChange={(event) => handleAmountChange('amountUah', event.target.value)}
+                                onBlur={() => handleAmountBlur('amountUah')}
+                            />
 
-                            <div className={styles.field}>
-                                <div className={styles['amount-usd-header']}>
-                                    <label className={styles.label}>
-                                        <span className={styles.required}>*</span>
-                                        {FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.AMOUNT_USD_LABEL}
-                                    </label>
-                                    <div className={styles['exchange-rate-chip']}>
-                                        <span className={styles['exchange-rate-chip-label']}>
-                                            {FUNDS_EXPENDITURES_TEXT.EXCHANGE_RATE_LABEL}
-                                        </span>
-                                        <input
-                                            type="text"
-                                            value={exchangeRate ?? ''}
-                                            disabled
-                                            className={styles['exchange-rate-value']}
-                                            aria-label={FUNDS_EXPENDITURES_TEXT.EXCHANGE_RATE_LABEL}
-                                        />
-                                    </div>
-                                </div>
-                                <InputWithCharacterLimit
-                                    id="add-program-expense-amount-usd"
-                                    name="amountUsd"
-                                    type="text"
-                                    value={formState.amountUsd}
-                                    onChange={(event) => handleAmountChange('amountUsd', event.target.value)}
-                                    onBlur={() => handleAmountBlur('amountUsd')}
-                                    maxLength={PROGRAM_EXPENSE_AMOUNT_MAX_LENGTH}
-                                    showCounter={false}
-                                    className={styles.input}
-                                    hasError={Boolean(formState.errors.amountUsd)}
-                                />
-                                {formState.errors.amountUsd && (
-                                    <p className={styles.error}>{formState.errors.amountUsd}</p>
-                                )}
-                            </div>
+                            <AmountField
+                                id="add-program-expense-amount-usd"
+                                name="amountUsd"
+                                label={FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.AMOUNT_USD_LABEL}
+                                value={formState.amountUsd}
+                                error={formState.errors.amountUsd}
+                                headerAddon={<ExchangeRateChip exchangeRate={exchangeRate} />}
+                                onChange={(event) => handleAmountChange('amountUsd', event.target.value)}
+                                onBlur={() => handleAmountBlur('amountUsd')}
+                            />
                         </div>
 
                         <div className={styles.actions}>

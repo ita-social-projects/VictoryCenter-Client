@@ -148,9 +148,22 @@ describe('AddProgramExpenseRecordModal', () => {
 
         expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_NOT_ZERO)).not.toBeInTheDocument();
 
+        fireEvent.change(amountUahInput, { target: { value: '0' } });
+        fireEvent.blur(amountUahInput);
         fireEvent.blur(amountUsdInput);
 
-        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_NOT_ZERO)).toBeInTheDocument();
+        expect(screen.getAllByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_NOT_ZERO)).toHaveLength(2);
+    });
+
+    it('normalizes UAH amount on blur', () => {
+        renderModal();
+
+        const amountUahInput = screen.getByTestId('add-program-expense-amount-uah');
+
+        fireEvent.change(amountUahInput, { target: { value: ' 100.50 ' } });
+        fireEvent.blur(amountUahInput);
+
+        expect(amountUahInput).toHaveValue('100,50');
     });
 
     it('updates selected program value', () => {
@@ -168,6 +181,18 @@ describe('AddProgramExpenseRecordModal', () => {
         fireEvent.blur(getSelectToggle(PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_PLACEHOLDER));
 
         expect(screen.getAllByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED)).toHaveLength(2);
+    });
+
+    it('does not validate selects when focus stays inside the select field', () => {
+        renderModal();
+
+        const reportingYearToggle = getSelectToggle(FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_PLACEHOLDER);
+        const programToggle = getSelectToggle(PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_PLACEHOLDER);
+
+        fireEvent.blur(reportingYearToggle, { relatedTarget: reportingYearToggle });
+        fireEvent.blur(programToggle, { relatedTarget: programToggle });
+
+        expect(screen.queryByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED)).not.toBeInTheDocument();
     });
 
     it('shows duplicate program category error and keeps submit disabled', () => {

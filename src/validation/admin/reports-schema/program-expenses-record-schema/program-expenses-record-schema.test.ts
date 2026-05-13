@@ -36,11 +36,13 @@ describe('PROGRAM_EXPENSES_RECORD_VALIDATION_FUNCTIONS', () => {
             FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_MAX_DIGITS,
         );
         expect(validateProgramExpenseAmount('0', 'save')).toBe(FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_NOT_ZERO);
+        expect(validateProgramExpenseAmount('1200')).toBeUndefined();
         expect(validateProgramExpenseAmount('1200,50', 'save')).toBeUndefined();
     });
 
     it('reuses reporting year required validation', () => {
         expect(validateProgramExpenseReportingYear(undefined, 'change')).toBeUndefined();
+        expect(validateProgramExpenseReportingYear(undefined)).toBeUndefined();
         expect(validateProgramExpenseReportingYear(undefined, 'blur')).toBe(
             COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED,
         );
@@ -48,6 +50,13 @@ describe('PROGRAM_EXPENSES_RECORD_VALIDATION_FUNCTIONS', () => {
     });
 
     it('validates required program category on blur', () => {
+        expect(
+            validateProgramExpenseProgram({
+                recordId: 0,
+                programId: undefined,
+                records,
+            }),
+        ).toBeUndefined();
         expect(
             validateProgramExpenseProgram({
                 recordId: 0,

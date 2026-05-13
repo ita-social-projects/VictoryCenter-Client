@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { FocusEvent, useEffect, useMemo, useRef } from 'react';
 import { Button } from '@/components/admin/button/Button';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import { InputWithCharacterLimit } from '@/components/admin/input-with-character-limit/InputWithCharacterLimit';
@@ -7,77 +7,48 @@ import { Modal } from '@/components/common/modal/Modal';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FUNDS_EXPENDITURES_TEXT, PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
 import { useDirtyModalCloseConfirmation } from '@/hooks/admin/use-dirty-modal-close-confirmation/useDirtyModalCloseConfirmation';
-import { ProgramExpensesProgram } from '@/types/admin/reports';
+import { useProgramExpenseRecordForm } from '@/hooks/admin/use-program-expense-record-form/useProgramExpenseRecordForm';
+import { ProgramExpensesProgram, ProgramExpensesRecord } from '@/types/admin/reports';
 import { getReportingYearOptions } from '@/utils/functions/get-reporting-year-options/get-reporting-year-options';
 import styles from './AddProgramExpenseRecordModal.module.scss';
 
 interface AddProgramExpenseRecordModalProps {
     isOpen: boolean;
     programs: ProgramExpensesProgram[];
+    records: ProgramExpensesRecord[];
     exchangeRate: string | null;
     onClose: () => void;
 }
 
-interface ProgramExpenseFormState {
-    reportingYear: string | undefined;
-    programId: number | undefined;
-    amountUah: string;
-    amountUsd: string;
-}
-
-const INITIAL_FORM_STATE: ProgramExpenseFormState = {
-    reportingYear: undefined,
-    programId: undefined,
-    amountUah: '',
-    amountUsd: '',
-};
-
 const PROGRAM_EXPENSE_AMOUNT_MAX_LENGTH = 12;
-
-const normalizeProgramExpenseAmountInput = (value: string): string => {
-    const withCommaSeparator = value.replaceAll('.', ',').replaceAll(/\s/g, '');
-    const firstCommaIndex = withCommaSeparator.indexOf(',');
-    const integerSource = firstCommaIndex === -1 ? withCommaSeparator : withCommaSeparator.slice(0, firstCommaIndex);
-    const integerPart = integerSource.replaceAll(/\D/g, '').slice(0, 9);
-
-    if (firstCommaIndex === -1) {
-        return integerPart;
-    }
-
-    if (!integerPart) {
-        return '';
-    }
-
-    const decimalPart = withCommaSeparator
-        .slice(firstCommaIndex + 1)
-        .replaceAll(/\D/g, '')
-        .slice(0, 2);
-
-    return `${integerPart},${decimalPart}`;
-};
 
 export const AddProgramExpenseRecordModal = ({
     isOpen,
     programs,
+    records,
     exchangeRate,
     onClose,
 }: AddProgramExpenseRecordModalProps) => {
     const yearOptions = useMemo(() => getReportingYearOptions(), []);
-    const programOptions = useMemo(
-        () =>
-            [...programs].sort((firstProgram, secondProgram) =>
-                firstProgram.name.localeCompare(secondProgram.name, 'uk'),
-            ),
-        [programs],
-    );
-
-    const [formState, setFormState] = useState<ProgramExpenseFormState>(INITIAL_FORM_STATE);
-
-    const isDirty =
-        Boolean(formState.reportingYear) ||
-        Boolean(formState.programId) ||
-        formState.amountUah.trim() !== '' ||
-        formState.amountUsd.trim() !== '';
+    const reportingYearSelectRef = useRef<HTMLDivElement | null>(null);
+    const programSelectRef = useRef<HTMLDivElement | null>(null);
+    const {
+        formState,
+        programOptions,
+        isProgramSelectDisabled,
+        isDirty,
+        isSubmitDisabled,
+        handleReportingYearChange,
+        handleReportingYearBlur,
+        handleProgramChange,
+        handleProgramBlur,
+        handleAmountChange,
+        handleAmountBlur,
+    } = useProgramExpenseRecordForm({
+        isOpen,
+        programs,
+        records,
+    });
 
     const { isCloseConfirmOpen, handleRequestClose, handleConfirmClose, handleCancelClose } =
         useDirtyModalCloseConfirmation({
@@ -87,18 +58,24 @@ export const AddProgramExpenseRecordModal = ({
 
     useEffect(() => {
         if (!isOpen) {
-            setFormState(INITIAL_FORM_STATE);
             handleCancelClose();
         }
     }, [handleCancelClose, isOpen]);
 
-    const handleAmountChange = (field: 'amountUah' | 'amountUsd', value: string) => {
-        const normalizedValue = normalizeProgramExpenseAmountInput(value);
+    const handleReportingYearFieldBlur = (event: FocusEvent<HTMLDivElement>) => {
+        if (reportingYearSelectRef.current?.contains(event.relatedTarget as Node | null)) {
+            return;
+        }
 
-        setFormState((previousState) => ({
-            ...previousState,
-            [field]: normalizedValue,
-        }));
+        handleReportingYearBlur();
+    };
+
+    const handleProgramFieldBlur = (event: FocusEvent<HTMLDivElement>) => {
+        if (programSelectRef.current?.contains(event.relatedTarget as Node | null)) {
+            return;
+        }
+
+        handleProgramBlur();
     };
 
     return (
@@ -113,18 +90,15 @@ export const AddProgramExpenseRecordModal = ({
                 <Modal.Content>
                     <div className={styles.panel}>
                         <div className={styles.form}>
-                            <div className={styles.field}>
+                            <div className={styles.field} onBlurCapture={handleReportingYearFieldBlur}>
                                 <label className={styles.label}>
+                                    <span className={styles.required}>*</span>
                                     {FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_LABEL}
                                 </label>
                                 <Select<string>
                                     value={formState.reportingYear}
-                                    onValueChange={(reportingYear) =>
-                                        setFormState((previousState) => ({
-                                            ...previousState,
-                                            reportingYear,
-                                        }))
-                                    }
+                                    onValueChange={handleReportingYearChange}
+                                    selectContainerRef={reportingYearSelectRef}
                                     placeholder={FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_PLACEHOLDER}
                                     className={styles.select}
                                     optionClassName={styles['select-option']}
@@ -133,23 +107,25 @@ export const AddProgramExpenseRecordModal = ({
                                         <Select.Option key={year} value={year} name={year} />
                                     ))}
                                 </Select>
+                                {formState.errors.reportingYear && (
+                                    <p className={styles.error}>{formState.errors.reportingYear}</p>
+                                )}
                             </div>
 
-                            <div className={styles.field}>
-                                <label className={styles.label}>{PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_LABEL}</label>
-                                {programOptions.length === 0 ? (
+                            <div className={styles.field} onBlurCapture={handleProgramFieldBlur}>
+                                <label className={styles.label}>
+                                    <span className={styles.required}>*</span>
+                                    {PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_LABEL}
+                                </label>
+                                {isProgramSelectDisabled ? (
                                     <div className={styles['disabled-select-placeholder']}>
                                         {PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_NO_AVAILABLE}
                                     </div>
                                 ) : (
                                     <Select<number>
                                         value={formState.programId}
-                                        onValueChange={(programId) =>
-                                            setFormState((previousState) => ({
-                                                ...previousState,
-                                                programId,
-                                            }))
-                                        }
+                                        onValueChange={handleProgramChange}
+                                        selectContainerRef={programSelectRef}
                                         placeholder={PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_PLACEHOLDER}
                                         className={styles.select}
                                         optionClassName={styles['select-option']}
@@ -159,10 +135,14 @@ export const AddProgramExpenseRecordModal = ({
                                         ))}
                                     </Select>
                                 )}
+                                {formState.errors.programId && (
+                                    <p className={styles.error}>{formState.errors.programId}</p>
+                                )}
                             </div>
 
                             <div className={styles.field}>
                                 <label className={styles.label}>
+                                    <span className={styles.required}>*</span>
                                     {FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.AMOUNT_UAH_LABEL}
                                 </label>
                                 <InputWithCharacterLimit
@@ -171,15 +151,21 @@ export const AddProgramExpenseRecordModal = ({
                                     type="text"
                                     value={formState.amountUah}
                                     onChange={(event) => handleAmountChange('amountUah', event.target.value)}
+                                    onBlur={() => handleAmountBlur('amountUah')}
                                     maxLength={PROGRAM_EXPENSE_AMOUNT_MAX_LENGTH}
                                     showCounter={false}
                                     className={styles.input}
+                                    hasError={Boolean(formState.errors.amountUah)}
                                 />
+                                {formState.errors.amountUah && (
+                                    <p className={styles.error}>{formState.errors.amountUah}</p>
+                                )}
                             </div>
 
                             <div className={styles.field}>
                                 <div className={styles['amount-usd-header']}>
                                     <label className={styles.label}>
+                                        <span className={styles.required}>*</span>
                                         {FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.AMOUNT_USD_LABEL}
                                     </label>
                                     <div className={styles['exchange-rate-chip']}>
@@ -201,15 +187,20 @@ export const AddProgramExpenseRecordModal = ({
                                     type="text"
                                     value={formState.amountUsd}
                                     onChange={(event) => handleAmountChange('amountUsd', event.target.value)}
+                                    onBlur={() => handleAmountBlur('amountUsd')}
                                     maxLength={PROGRAM_EXPENSE_AMOUNT_MAX_LENGTH}
                                     showCounter={false}
                                     className={styles.input}
+                                    hasError={Boolean(formState.errors.amountUsd)}
                                 />
+                                {formState.errors.amountUsd && (
+                                    <p className={styles.error}>{formState.errors.amountUsd}</p>
+                                )}
                             </div>
                         </div>
 
                         <div className={styles.actions}>
-                            <Button buttonStyle="primary" disabled className={styles.submit}>
+                            <Button buttonStyle="primary" disabled={isSubmitDisabled} className={styles.submit}>
                                 {PROGRAM_EXPENSES_TEXT.MODAL.ADD.SUBMIT_BUTTON}
                             </Button>
                             <Button buttonStyle="secondary" onClick={handleRequestClose} className={styles.cancel}>

@@ -308,6 +308,9 @@ export const PROGRAM_EXPENSES_TEXT = {
             PROGRAM_NO_AVAILABLE: 'Немає доступних програм',
         },
     },
+    VALIDATION: {
+        PROGRAM_UNIQUE: 'Така категорія вже додана, Оберіть іншу категорію',
+    },
     FILTER: {
         PROGRAMS_PLACEHOLDER: 'Програми',
         ALL_OPTION: 'Всі',

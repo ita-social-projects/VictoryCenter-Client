@@ -11,7 +11,10 @@ interface StatisticsPreviewProps {
 
 const getMetricName = (metric: Metric, language: 'UA' | 'EN') => {
     const code = language === 'UA' ? 'uk' : 'en';
-    return metric.localizations?.find((l) => l.language.code === code)?.name ?? metric.name;
+    return (
+        metric.localizations?.find((l: any) => l?.language?.code === code || l?.localizationInfoDto?.code === code)
+            ?.name ?? metric.name
+    );
 };
 
 const formatMetricValue = (metric: Metric, language: 'UA' | 'EN') => {

@@ -1,8 +1,8 @@
-import { IconButton } from '@/components/admin/icon-button/IconButton';
 import { ReactComponent as EditIcon } from '@/assets/icons/edit.svg';
-import { ReactComponent as EyeOpenedIcon } from '@/assets/icons/eye-opened.svg';
 import { ReactComponent as EyeClosedIcon } from '@/assets/icons/eye-closed.svg';
+import { ReactComponent as EyeOpenedIcon } from '@/assets/icons/eye-opened.svg';
 import { DraggableListItem } from '@/components/admin/draggable-list-item/DraggableListItem';
+import { IconButton } from '@/components/admin/icon-button/IconButton';
 import { MAIN_PAGE_TEXT } from '@/const/admin/main-page';
 import { Metric, MetricPrefix } from '@/types/admin/main-page';
 import styles from './StatisticsMetricsList.module.scss';
@@ -15,7 +15,8 @@ interface StatisticsMetricsListProps {
 }
 
 const getMetricName = (metric: Metric) =>
-    metric.localizations?.find((l) => l.language.code === 'uk')?.name ?? metric.name;
+    metric.localizations?.find((l: any) => l?.language?.code === 'uk' || l?.localizationInfoDto?.code === 'uk')?.name ??
+    metric.name;
 
 const formatMetricValue = (metric: Metric, locale: 'uk-UA' | 'en-US') => {
     const value = metric.value.toLocaleString(locale);

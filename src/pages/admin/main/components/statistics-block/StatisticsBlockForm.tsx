@@ -1,18 +1,14 @@
-import { useEffect, useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
+import DefaultPlaceholder from '@/assets/images/man-facing-horse-forehead.webp';
 import { Button } from '@/components/admin/button/Button';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
-import { MAIN_PAGE_TEXT, MAIN_PAGE_VALIDATION } from '@/const/admin/main-page';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { MOCK_MAIN_PAGE_DATA } from '@/utils/mock-data/admin/main-page/main-page';
-import { StatisticsBlockValidationSchema } from '@/validation/admin/main-page-schema/main-page-schema';
-import { StatisticsBlockFormValues, STATISTICS_BLOCK_FORM_DEFAULTS, Metric } from '@/types/admin/main-page';
-import DefaultPlaceholder from '@/assets/images/man-facing-horse-forehead.webp';
+import { MAIN_PAGE_TEXT, MAIN_PAGE_VALIDATION } from '@/const/admin/main-page';
 import { ImageUploadForm } from '@/pages/admin/main/components/common/image-upload-form/ImageUploadForm';
-
-import { StatisticsPreview } from './components/statistics-preview/StatisticsPreview';
+import { MainPage, MainPageFormValues, Metric } from '@/types/admin/main-page';
+import { useEffect, useState } from 'react';
+import { Controller, useFormContext } from 'react-hook-form';
 import { StatisticsMetricsList } from './components/statistics-metrics-list/StatisticsMetricsList';
+import { StatisticsPreview } from './components/statistics-preview/StatisticsPreview';
 
 import styles from './StatisticsBlockForm.module.scss';
 
@@ -32,36 +28,32 @@ const IMAGE_CONFIG = {
     },
 };
 
-export const StatisticsBlockForm = () => {
+interface StatisticsBlockFormProps {
+    initialData: MainPage | null;
+    isPublishDisabled: boolean;
+    onPublish: () => void;
+}
+
+export const StatisticsBlockForm = ({ initialData, isPublishDisabled, onPublish }: StatisticsBlockFormProps) => {
     const [imageError, setImageError] = useState<string | null>(null);
     const [previewLang, setPreviewLang] = useState<'UA' | 'EN'>('UA');
 
-    const impactStatistics = MOCK_MAIN_PAGE_DATA.impactStatistics;
-    const [metrics, setMetrics] = useState<Metric[]>(() => impactStatistics?.metrics ?? []);
+    const [metrics, setMetrics] = useState<Metric[]>([]);
     const [hiddenMetricIds, setHiddenMetricIds] = useState<number[]>([]);
 
     const {
         control,
-        reset,
-        formState: { errors, isDirty, isValid },
-    } = useForm<StatisticsBlockFormValues>({
-        mode: 'onChange',
-        resolver: yupResolver(StatisticsBlockValidationSchema),
-        defaultValues: STATISTICS_BLOCK_FORM_DEFAULTS,
-    });
+        formState: { errors },
+    } = useFormContext<MainPageFormValues>();
 
     useEffect(() => {
-        const getTitle = (code: 'uk' | 'en') =>
-            impactStatistics?.localizations?.find((l) => l.language.code === code)?.title ??
-            impactStatistics?.title ??
-            '';
+        if (initialData?.impactStatistics?.metrics) {
+            setMetrics(initialData.impactStatistics.metrics);
 
-        reset({
-            titleUa: getTitle('uk'),
-            titleEn: getTitle('en'),
-            image: impactStatistics?.image ?? null,
-        });
-    }, [impactStatistics, reset]);
+            const hiddenIds = initialData.impactStatistics.metrics.filter((m) => m.isHidden).map((m) => m.id as number);
+            setHiddenMetricIds(hiddenIds);
+        }
+    }, [initialData]);
 
     const handleToggleVisibility = (id: number) => {
         setHiddenMetricIds((prev) => {
@@ -81,7 +73,7 @@ export const StatisticsBlockForm = () => {
         <div className={styles.form}>
             <div className={styles.content}>
                 <ImageUploadForm
-                    control={control}
+                    control={control as any}
                     errors={errors}
                     imageError={imageError}
                     setImageError={setImageError}
@@ -99,7 +91,7 @@ export const StatisticsBlockForm = () => {
 
                     <div className={styles['title-section']}>
                         <Controller
-                            name="titleUa"
+                            name="statisticsTitleUa"
                             control={control}
                             render={({ field: { onChange, value, onBlur } }) => (
                                 <InputWithCharacterLimitGroup
@@ -109,7 +101,7 @@ export const StatisticsBlockForm = () => {
                                     value={value}
                                     onChange={onChange}
                                     onBlur={onBlur}
-                                    error={errors.titleUa?.message}
+                                    error={errors.statisticsTitleUa?.message}
                                     maxLength={MAIN_PAGE_VALIDATION.statisticsBlock.title.max}
                                     isRequired
                                 />
@@ -117,7 +109,7 @@ export const StatisticsBlockForm = () => {
                         />
 
                         <Controller
-                            name="titleEn"
+                            name="statisticsTitleEn"
                             control={control}
                             render={({ field: { onChange, value, onBlur } }) => (
                                 <InputWithCharacterLimitGroup
@@ -127,7 +119,7 @@ export const StatisticsBlockForm = () => {
                                     value={value}
                                     onChange={onChange}
                                     onBlur={onBlur}
-                                    error={errors.titleEn?.message}
+                                    error={errors.statisticsTitleEn?.message}
                                     maxLength={MAIN_PAGE_VALIDATION.statisticsBlock.title.max}
                                     isRequired
                                 />
@@ -148,8 +140,9 @@ export const StatisticsBlockForm = () => {
                 <Button
                     type="button"
                     buttonStyle="primary"
-                    disabled={!isDirty || !isValid || !!imageError}
+                    disabled={isPublishDisabled || !!imageError}
                     className={styles['publish-button']}
+                    onClick={onPublish}
                 >
                     {MAIN_PAGE_TEXT.BUTTONS.PUBLISH}
                 </Button>

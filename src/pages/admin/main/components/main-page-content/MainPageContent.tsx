@@ -129,7 +129,7 @@ export const MainPageContent = () => {
     };
 
     const handleCancelPublish = () => {
-        setIsPublishModalOpen(false); // 1.1. closes a pop-up
+        setIsPublishModalOpen(false);
         setPendingPublishData(null);
     };
 
@@ -140,6 +140,7 @@ export const MainPageContent = () => {
     }
 
     const isPublishDisabled = !methods.formState.isDirty || !methods.formState.isValid || isPublishing;
+    const onPublish = methods.handleSubmit(handlePublishClick);
 
     return (
         <div className={styles.wrapper}>
@@ -159,13 +160,25 @@ export const MainPageContent = () => {
 
             <div className={styles['main-content']}>
                 <FormProvider {...methods}>
-                    <form className={styles['main-page-form']}>
-                        {activeTab === 'title' && <TitleBlockForm initialData={originalData} />}
-                        {activeTab === 'about' && <AboutUsBlockForm initialData={originalData} />}
-                        {activeTab === 'statistics' && <StatisticsBlockForm />}
+                    <div className={styles['main-page-form']}>
+                        {activeTab === 'title' && (
+                            <TitleBlockForm isPublishDisabled={isPublishDisabled} onPublish={onPublish} />
+                        )}
+                        {activeTab === 'about' && (
+                            <AboutUsBlockForm isPublishDisabled={isPublishDisabled} onPublish={onPublish} />
+                        )}
+                        {activeTab === 'statistics' && (
+                            <StatisticsBlockForm
+                                initialData={originalData}
+                                isPublishDisabled={isPublishDisabled}
+                                onPublish={onPublish}
+                            />
+                        )}
                         {activeTab === 'donations' && <div>Блок "{MAIN_PAGE_TEXT.TABS.DONATIONS}" в розробці</div>}
-                        {activeTab === 'partners' && <PartnersBlockForm initialData={originalData} />}
-                    </form>
+                        {activeTab === 'partners' && (
+                            <PartnersBlockForm isPublishDisabled={isPublishDisabled} onPublish={onPublish} />
+                        )}
+                    </div>
                 </FormProvider>
             </div>
 
@@ -173,6 +186,7 @@ export const MainPageContent = () => {
                 isOpen={isPublishModalOpen}
                 onConfirm={handleConfirmPublish}
                 onCancel={handleCancelPublish}
+                isButtonsDisabled={isPublishing}
             />
 
             <ToastContainer />

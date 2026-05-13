@@ -1,21 +1,15 @@
-import { useEffect, useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
+import DefaultPlaceholder from '@/assets/images/man-facing-horse-forehead.webp';
 import { Button } from '@/components/admin/button/Button';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
-import { TitleBlockValidationSchema } from '@/validation/admin/main-page-schema/main-page-schema';
-import { MainPage, TitleBlockFormValues, TITLE_BLOCK_FORM_DEFAULTS } from '@/types/admin/main-page';
-import { MAIN_PAGE_TEXT, MAIN_PAGE_VALIDATION } from '@/const/admin/main-page';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import DefaultPlaceholder from '@/assets/images/man-facing-horse-forehead.webp';
+import { MAIN_PAGE_TEXT, MAIN_PAGE_VALIDATION } from '@/const/admin/main-page';
 import { ImageUploadForm } from '@/pages/admin/main/components/common/image-upload-form/ImageUploadForm';
+import { MainPageFormValues } from '@/types/admin/main-page';
+import { useState } from 'react';
+import { Controller, useFormContext } from 'react-hook-form';
 
 import styles from './TitleBlockForm.module.scss';
-
-interface TitleBlockFormProps {
-    initialData: MainPage | null;
-}
 
 const IMAGE_CONFIG = {
     cropWidth: 1440,
@@ -33,42 +27,24 @@ const IMAGE_CONFIG = {
     },
 };
 
-export const TitleBlockForm = ({ initialData }: TitleBlockFormProps) => {
+interface TitleBlockFormProps {
+    isPublishDisabled: boolean;
+    onPublish: () => void;
+}
+
+export const TitleBlockForm = ({ isPublishDisabled, onPublish }: TitleBlockFormProps) => {
     const [imageError, setImageError] = useState<string | null>(null);
 
     const {
         control,
-        handleSubmit,
-        reset,
-        formState: { isDirty, isValid, errors },
-    } = useForm<TitleBlockFormValues>({
-        mode: 'onChange',
-        resolver: yupResolver(TitleBlockValidationSchema),
-        defaultValues: TITLE_BLOCK_FORM_DEFAULTS,
-    });
-
-    useEffect(() => {
-        setImageError(null);
-        reset(
-            initialData
-                ? {
-                      title: initialData.title || '',
-                      description: initialData.description || '',
-                      image: initialData.image || null,
-                  }
-                : TITLE_BLOCK_FORM_DEFAULTS,
-        );
-    }, [initialData, reset]);
-
-    const onSubmit = () => {
-        // API integration is intentionally deferred for the display-only phase.
-    };
+        formState: { errors },
+    } = useFormContext<MainPageFormValues>();
 
     return (
-        <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
+        <div className={styles.form}>
             <div className={styles.content}>
                 <ImageUploadForm
-                    control={control}
+                    control={control as any}
                     errors={errors}
                     imageError={imageError}
                     setImageError={setImageError}
@@ -78,7 +54,7 @@ export const TitleBlockForm = ({ initialData }: TitleBlockFormProps) => {
 
                 <div className={styles['text-section']}>
                     <Controller
-                        name="title"
+                        name="titleUa"
                         control={control}
                         render={({ field: { onChange, value, onBlur } }) => (
                             <InputWithCharacterLimitGroup
@@ -88,7 +64,7 @@ export const TitleBlockForm = ({ initialData }: TitleBlockFormProps) => {
                                 value={value}
                                 onChange={onChange}
                                 onBlur={onBlur}
-                                error={errors.title?.message}
+                                error={errors.titleUa?.message}
                                 maxLength={MAIN_PAGE_VALIDATION.titleBlock.title.max}
                                 isRequired={true}
                             />
@@ -96,7 +72,7 @@ export const TitleBlockForm = ({ initialData }: TitleBlockFormProps) => {
                     />
 
                     <Controller
-                        name="description"
+                        name="descriptionUa"
                         control={control}
                         render={({ field: { onChange, value, onBlur } }) => (
                             <TextAreaWithCharacterLimitGroup
@@ -106,7 +82,7 @@ export const TitleBlockForm = ({ initialData }: TitleBlockFormProps) => {
                                 value={value}
                                 onChange={onChange}
                                 onBlur={onBlur}
-                                error={errors.description?.message}
+                                error={errors.descriptionUa?.message}
                                 maxLength={MAIN_PAGE_VALIDATION.titleBlock.description.max}
                                 isRequired={true}
                                 className={styles['textarea-custom']}
@@ -118,14 +94,15 @@ export const TitleBlockForm = ({ initialData }: TitleBlockFormProps) => {
 
             <div className={styles.actions}>
                 <Button
-                    type="submit"
+                    type="button"
                     buttonStyle="primary"
-                    disabled={!isDirty || !isValid || !!imageError}
+                    disabled={isPublishDisabled || !!imageError}
                     className={styles['publish-button']}
+                    onClick={onPublish}
                 >
                     {MAIN_PAGE_TEXT.BUTTONS.PUBLISH}
                 </Button>
             </div>
-        </form>
+        </div>
     );
 };

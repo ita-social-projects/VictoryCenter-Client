@@ -12,6 +12,9 @@ export const CONTACT_FORM_LIMITS = {
 } as const;
 
 export const CONTACT_FORM_MESSAGES = {
+    EMAIL: {
+        INVALID: 'Не вірний E-mail',
+    },
     SUBJECT: {
         MIN_ERROR: 'Мін 5 символів',
         LIMIT_REACHED: 'Ліміт символів вичерпано',

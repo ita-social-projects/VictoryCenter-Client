@@ -80,14 +80,23 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
                 />
             </label>
 
-            <label className={styles['contact-form-field']}>
-                <input
-                    type="email"
-                    placeholder={emailPlaceholder}
-                    className={styles['contact-form-input']}
-                    {...register('email')}
-                />
-            </label>
+            <div className={styles['contact-form-field-wrapper']}>
+                <label
+                    className={`${styles['contact-form-field']}${errors.email ? ` ${styles['contact-form-field--error']}` : ''}`}
+                >
+                    <input
+                        type="email"
+                        placeholder={emailPlaceholder}
+                        className={styles['contact-form-input']}
+                        {...register('email')}
+                    />
+                </label>
+                {errors.email && (
+                    <span className={styles['contact-form-message--error']} role="alert">
+                        {errors.email.message}
+                    </span>
+                )}
+            </div>
 
             <div className={styles['contact-form-field-wrapper']}>
                 <label className={styles['contact-form-field']}>

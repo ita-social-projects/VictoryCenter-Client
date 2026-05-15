@@ -66,7 +66,7 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
 
     const onSubmit = (data: ContactFormData) => {
         // TODO: wire to API
-        console.log(data);
+        return data;
     };
 
     return (

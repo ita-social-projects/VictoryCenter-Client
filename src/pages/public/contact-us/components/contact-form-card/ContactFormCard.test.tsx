@@ -42,9 +42,8 @@ describe('ContactFormCard', () => {
         it('shows warn hint when subject reaches WARN_AT characters', async () => {
             renderForm();
             const subjectInput = screen.getByPlaceholderText('Тема звернення');
-            const warnText = 'a'.repeat(CONTACT_FORM_LIMITS.SUBJECT.WARN_AT);
 
-            await userEvent.type(subjectInput, warnText);
+            await userEvent.type(subjectInput, 'a'.repeat(CONTACT_FORM_LIMITS.SUBJECT.WARN_AT));
 
             const remaining = CONTACT_FORM_LIMITS.SUBJECT.MAX - CONTACT_FORM_LIMITS.SUBJECT.WARN_AT;
             expect(screen.getByText(CONTACT_FORM_MESSAGES.SUBJECT.getWarnMessage(remaining))).toBeInTheDocument();
@@ -63,7 +62,7 @@ describe('ContactFormCard', () => {
             renderForm();
             const subjectInput = screen.getByPlaceholderText('Тема звернення');
 
-            await userEvent.type(subjectInput, 'ab');
+            fireEvent.change(subjectInput, { target: { value: 'ab' } });
             fireEvent.blur(subjectInput);
 
             expect(await screen.findByText(CONTACT_FORM_MESSAGES.SUBJECT.MIN_ERROR)).toBeInTheDocument();
@@ -87,21 +86,21 @@ describe('ContactFormCard', () => {
     });
 
     describe('Message field', () => {
-        it('shows warn hint when message reaches WARN_AT characters', async () => {
+        it('shows warn hint when message reaches WARN_AT characters', () => {
             renderForm();
             const messageTextarea = screen.getByPlaceholderText('Напишіть ваше повідомлення');
 
-            await userEvent.type(messageTextarea, 'a'.repeat(CONTACT_FORM_LIMITS.MESSAGE.WARN_AT));
+            fireEvent.change(messageTextarea, { target: { value: 'a'.repeat(CONTACT_FORM_LIMITS.MESSAGE.WARN_AT) } });
 
             const remaining = CONTACT_FORM_LIMITS.MESSAGE.MAX - CONTACT_FORM_LIMITS.MESSAGE.WARN_AT;
             expect(screen.getByText(CONTACT_FORM_MESSAGES.MESSAGE.getWarnMessage(remaining))).toBeInTheDocument();
         });
 
-        it('shows limit-reached message when message hits MAX characters', async () => {
+        it('shows limit-reached message when message hits MAX characters', () => {
             renderForm();
             const messageTextarea = screen.getByPlaceholderText('Напишіть ваше повідомлення');
 
-            await userEvent.type(messageTextarea, 'a'.repeat(CONTACT_FORM_LIMITS.MESSAGE.MAX));
+            fireEvent.change(messageTextarea, { target: { value: 'a'.repeat(CONTACT_FORM_LIMITS.MESSAGE.MAX) } });
 
             expect(screen.getByText(CONTACT_FORM_MESSAGES.MESSAGE.LIMIT_REACHED)).toBeInTheDocument();
         });
@@ -110,7 +109,7 @@ describe('ContactFormCard', () => {
             renderForm();
             const messageTextarea = screen.getByPlaceholderText('Напишіть ваше повідомлення');
 
-            await userEvent.type(messageTextarea, 'short');
+            fireEvent.change(messageTextarea, { target: { value: 'short' } });
             fireEvent.blur(messageTextarea);
 
             expect(await screen.findByText(CONTACT_FORM_MESSAGES.MESSAGE.MIN_ERROR)).toBeInTheDocument();

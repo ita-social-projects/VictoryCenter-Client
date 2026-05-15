@@ -19,12 +19,7 @@
     }
 
     :global(.modal-header-text) {
-        font-family: 'Mulish', sans-serif;
-        font-style: normal;
-        font-weight: 400;
-        font-size: 32px;
-        line-height: 40px;
-        letter-spacing: -0.64px;
+        @include type.h4-regular;
         color: c.$blue-900;
         text-align: left;
     }
@@ -47,13 +42,9 @@
         justify-content: center;
 
         button {
+            @include type.body-2-regular;
             width: 100%;
             height: 40px;
-            font-family: 'Mulish', sans-serif;
-            font-size: 16px;
-            font-weight: 400;
-            line-height: 24px;
-            letter-spacing: -0.64px;
             border-radius: 8px;
         }
     }

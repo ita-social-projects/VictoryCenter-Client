@@ -49,6 +49,10 @@
     @include _text(t.$fw-bold, t.$h3-size, t.$h3-height, t.$h3-spacing, uppercase);
 }
 
+@mixin h4-regular {
+    @include _text(t.$fw-regular, t.$h4-size, t.$h4-height, t.$h4-spacing);
+}
+
 @mixin h4-semibold {
     @include _text(t.$fw-semibold, t.$h4-size, t.$h4-height, t.$h4-spacing);
 }

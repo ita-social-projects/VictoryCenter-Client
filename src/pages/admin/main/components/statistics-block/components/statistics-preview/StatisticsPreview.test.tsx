@@ -11,6 +11,8 @@ const metrics: Metric[] = [
         value: 20,
         type: MetricType.Partners,
         prefix: MetricPrefix.Plus,
+        isHidden: false,
+        priority: 1,
         localizations: [
             { language: { id: 1, code: 'uk' }, translationStatus: TranslationStatus.Relevant, name: 'Партнерів' },
             { language: { id: 2, code: 'en' }, translationStatus: TranslationStatus.Relevant, name: 'Partners' },
@@ -22,8 +24,10 @@ const metrics: Metric[] = [
         value: 50,
         type: MetricType.Programs,
         prefix: MetricPrefix.Percent,
+        isHidden: false,
+        priority: 2,
         localizations: [],
-    } as Metric,
+    },
 ];
 
 describe('StatisticsPreview', () => {

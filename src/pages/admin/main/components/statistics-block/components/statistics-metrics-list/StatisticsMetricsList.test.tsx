@@ -1,8 +1,8 @@
-import '@testing-library/jest-dom';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { StatisticsMetricsList } from './StatisticsMetricsList';
 import { Metric, MetricPrefix, MetricType } from '@/types/admin/main-page';
 import { TranslationStatus } from '@/types/common/language';
+import '@testing-library/jest-dom';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { StatisticsMetricsList } from './StatisticsMetricsList';
 
 jest.mock('@/components/admin/draggable-list-item/DraggableListItem', () => ({
     DraggableListItem: ({ renderEntityComponent, entity }: any) => (
@@ -17,6 +17,8 @@ const metrics: Metric[] = [
         value: 20,
         type: MetricType.Partners,
         prefix: MetricPrefix.Plus,
+        isHidden: false,
+        priority: 1,
         localizations: [
             { language: { id: 1, code: 'uk' }, translationStatus: TranslationStatus.Relevant, name: 'Партнерів' },
         ],
@@ -27,8 +29,10 @@ const metrics: Metric[] = [
         value: 50,
         type: MetricType.Partners,
         prefix: MetricPrefix.Percent,
+        isHidden: false,
+        priority: 2,
         localizations: [],
-    } as Metric,
+    },
 ];
 
 describe('StatisticsMetricsList', () => {

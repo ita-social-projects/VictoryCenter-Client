@@ -1,5 +1,5 @@
-import { Controller, Control, FieldErrors, FieldValues } from 'react-hook-form';
 import { ImageInput, ImageInputVariant } from '@/components/admin/image-input/ImageInput';
+import { Control, Controller, FieldErrors, FieldValues, useFormContext } from 'react-hook-form';
 import styles from './ImageUploadForm.module.scss';
 
 type ImageUploadConfig = {
@@ -30,25 +30,35 @@ export const ImageUploadForm = <TFormValues extends FieldValues>({
     imageConfig,
     variant = 'whoWeAre',
     name = 'image',
-}: ImageUploadFormProps<TFormValues>) => (
-    <div className={styles.imageSection}>
-        <Controller
-            name={name as never}
-            control={control}
-            render={({ field: { onChange, value } }) => (
-                <div className={styles.imageWrapper}>
-                    <ImageInput
-                        value={value}
-                        onChange={onChange}
-                        setError={setImageError}
-                        variant={variant}
-                        {...imageConfig}
-                    />
-                    {(imageError || errors?.image?.message) && (
-                        <p className={styles.error}>{imageError || (errors as any)?.image?.message}</p>
-                    )}
-                </div>
-            )}
-        />
-    </div>
-);
+}: ImageUploadFormProps<TFormValues>) => {
+    const { setValue } = useFormContext();
+
+    return (
+        <div className={styles.imageSection}>
+            <Controller
+                name={name as never}
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                    <div className={styles.imageWrapper}>
+                        <ImageInput
+                            value={value}
+                            onChange={(newValue) => {
+                                onChange(newValue);
+                                setValue(name, newValue, {
+                                    shouldDirty: true,
+                                    shouldValidate: true,
+                                });
+                            }}
+                            setError={setImageError}
+                            variant={variant}
+                            {...imageConfig}
+                        />
+                        {(imageError || errors[name]?.message) && (
+                            <p className={styles.error}>{imageError || (errors[name] as any)?.message}</p>
+                        )}
+                    </div>
+                )}
+            />
+        </div>
+    );
+};

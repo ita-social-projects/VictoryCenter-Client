@@ -79,6 +79,7 @@ export const StatisticsBlockForm = ({ initialData, isPublishDisabled, onPublish 
                     setImageError={setImageError}
                     imageConfig={IMAGE_CONFIG}
                     variant="whoWeAre"
+                    name="statisticsImage"
                 />
 
                 <div className={styles['right-section']}>

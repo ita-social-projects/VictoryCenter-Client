@@ -9,15 +9,16 @@ import { PageLoader } from '@/components/common/page-loader/PageLoader';
 import { MAIN_PAGE_TEXT } from '@/const/admin/main-page';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { ImageApi } from '@/services/api/admin/image/image-api';
 import { MainPageApi } from '@/services/api/admin/main-page/main-page-api';
 import { MAIN_PAGE_FORM_DEFAULTS, MainPage, MainPageFormValues } from '@/types/admin/main-page';
 import { ToastType } from '@/types/admin/toast';
+import { ImageValues } from '@/types/common/image';
 import {
     mapFormValuesToMainPagePatch,
     mapMainPageToFormValues,
 } from '@/utils/functions/mappers/admin/main-page/main-page-mappers';
 import { MainPageValidationSchema } from '@/validation/admin/main-page-schema/main-page-schema';
-
 import { AboutUsBlockForm } from '../about-us-block/AboutUsBlockForm';
 import { MainPagePublishModal } from '../main-page-publish-modal/MainPagePublishModal';
 import { PartnersBlockForm } from '../partners-block/PartnersBlockForm';
@@ -109,7 +110,19 @@ export const MainPageContent = () => {
 
         try {
             const { languages } = await MainPageApi.get(client);
-            const patch = mapFormValuesToMainPagePatch(pendingPublishData, originalData, languages);
+            let dataToPublish = { ...pendingPublishData };
+
+            if (dataToPublish.image && !('id' in dataToPublish.image)) {
+                const uploaded = await ImageApi.post(client, dataToPublish.image as ImageValues);
+                dataToPublish.image = uploaded;
+            }
+
+            if (dataToPublish.statisticsImage && !('id' in dataToPublish.statisticsImage)) {
+                const uploaded = await ImageApi.post(client, dataToPublish.statisticsImage as ImageValues);
+                dataToPublish.statisticsImage = uploaded;
+            }
+
+            const patch = mapFormValuesToMainPagePatch(dataToPublish, originalData, languages);
 
             const { page, languages: updatedLanguages } = await MainPageApi.publish(client, patch, languages);
 

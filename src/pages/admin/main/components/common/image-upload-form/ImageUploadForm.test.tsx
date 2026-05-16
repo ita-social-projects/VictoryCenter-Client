@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { useForm } from 'react-hook-form';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { FormProvider, useForm } from 'react-hook-form';
 import { ImageUploadForm } from './ImageUploadForm';
 
 jest.mock('@/components/admin/image-input/ImageInput', () => ({
@@ -34,16 +34,18 @@ const Wrapper = ({
     errors?: any;
     setImageError?: (val: string | null) => void;
 }) => {
-    const { control } = useForm<FormValues>({ defaultValues: { image: null } });
+    const methods = useForm<FormValues>({ defaultValues: { image: null } });
 
     return (
-        <ImageUploadForm<FormValues>
-            control={control}
-            errors={errors}
-            imageError={imageError}
-            setImageError={setImageError}
-            imageConfig={IMAGE_CONFIG}
-        />
+        <FormProvider {...methods}>
+            <ImageUploadForm<FormValues>
+                control={methods.control}
+                errors={errors}
+                imageError={imageError}
+                setImageError={setImageError}
+                imageConfig={IMAGE_CONFIG}
+            />
+        </FormProvider>
     );
 };
 

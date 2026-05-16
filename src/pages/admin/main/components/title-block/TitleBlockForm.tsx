@@ -50,6 +50,7 @@ export const TitleBlockForm = ({ isPublishDisabled, onPublish }: TitleBlockFormP
                     setImageError={setImageError}
                     imageConfig={IMAGE_CONFIG}
                     variant="whoWeAre"
+                    name="image"
                 />
 
                 <div className={styles['text-section']}>

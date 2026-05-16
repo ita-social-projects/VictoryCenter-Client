@@ -44,6 +44,7 @@ $line-height-1440: 116px;
 
 @mixin yellow-blue-text {
     @include type.h3-medium-uppercase;
+
     text-align: center;
     margin: 16px 16px 122px;
 
@@ -129,6 +130,7 @@ $line-height-1440: 116px;
 // Buttons
 @mixin tagged-button {
     @include type.body-2-regular;
+
     border-radius: 24px;
     padding: 6px 14px;
     font-size: 14px;
@@ -145,6 +147,7 @@ $line-height-1440: 116px;
 }
 @mixin white-button {
     @include tagged-button;
+
     border: 1px solid colors.$blue-100;
     background: none;
     transition: 0.3s ease;
@@ -157,6 +160,7 @@ $line-height-1440: 116px;
 
 @mixin black-button {
     @include tagged-button;
+    
     background: colors.$blue-900;
     border: 1px solid colors.$blue-900;
     color: colors.$grey-50;

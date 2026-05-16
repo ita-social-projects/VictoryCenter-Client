@@ -15,7 +15,6 @@ export const eventsNewsPageMock: EventsNewsPageData = {
         description:
             'Кожна з них — не просто дата в календарі. Це — ще один доказ: відновлення можливе. Слідкуй за анонсами, читай історії, або стань частиною наступної події.',
         imgURL: chooseProgrammImg,
-        imgAlternativeText: 'Дівчина обіймає шию коня',
     },
     eventsData: {
         title: 'Що відбувалось',

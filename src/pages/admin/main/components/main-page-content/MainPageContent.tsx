@@ -48,6 +48,7 @@ export const MainPageContent = () => {
     const [activeTab, setActiveTab] = useState<TabType>('title');
     const [originalData, setOriginalData] = useState<MainPage | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [hasLoadError, setHasLoadError] = useState(false);
 
     const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
     const [isPublishing, setIsPublishing] = useState(false);
@@ -75,15 +76,15 @@ export const MainPageContent = () => {
             try {
                 const { page, languages } = await MainPageApi.get(client);
                 if (!isMounted) return;
-
+                setHasLoadError(false);
                 setOriginalData(page);
                 const values = mapMainPageToFormValues(page, languages);
                 savedValuesRef.current = values;
-
                 if (!methods.formState.isDirty) {
                     methods.reset(values);
                 }
             } catch (error) {
+                setHasLoadError(true);
                 addToast('Помилка завантаження даних', ToastType.Error, 3000);
             } finally {
                 if (isMounted) setIsLoading(false);
@@ -148,8 +149,12 @@ export const MainPageContent = () => {
 
     const selectedTab = TABS.find((tab) => tab.id === activeTab) || TABS[0];
 
-    if (isLoading || !originalData) {
+    if (isLoading) {
         return <PageLoader />;
+    }
+
+    if (!originalData) {
+        return hasLoadError ? <div>{MAIN_PAGE_TEXT.ERRORS.LOAD_FAILED}</div> : <PageLoader />;
     }
 
     const isPublishDisabled = !methods.formState.isDirty || !methods.formState.isValid || isPublishing;

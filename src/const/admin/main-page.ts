@@ -37,6 +37,10 @@ export const MAIN_PAGE_TEXT = {
     BUTTONS: {
         PUBLISH: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED,
     },
+
+    ERRORS: {
+        LOAD_FAILED: 'Виникла помилка, не вдалося завантажити дані сторінки',
+    },
 } as const;
 
 export const MAIN_PAGE_VALIDATION = {

@@ -99,16 +99,13 @@ describe('MainPageContent', () => {
         expect(screen.getByTestId('page-loader')).toBeInTheDocument();
     });
 
-    it('renders loader when data is null and API throws error', async () => {
+    it('renders error message when API throws error', async () => {
         (MainPageApi.get as jest.Mock).mockRejectedValue(new Error('Network error'));
-
         render(<MainPageContent />);
-
         await waitFor(() => {
             expect(MainPageApi.get).toHaveBeenCalled();
         });
-
-        expect(screen.getByTestId('page-loader')).toBeInTheDocument();
+        expect(screen.getByText(MAIN_PAGE_TEXT.ERRORS.LOAD_FAILED)).toBeInTheDocument();
     });
 
     it('renders TitleBlockForm as the default tab after loading', async () => {

@@ -39,7 +39,7 @@ export const ImageUploadForm = <TFormValues extends FieldValues>({
                 name={name as never}
                 control={control}
                 render={({ field: { onChange, value } }) => (
-                    <div className={styles.imageWrapper}>
+                    <div className={styles.imageWrapper} style={{ width: imageConfig.style?.width }}>
                         <ImageInput
                             value={value}
                             onChange={(newValue) => {
@@ -52,6 +52,7 @@ export const ImageUploadForm = <TFormValues extends FieldValues>({
                             setError={setImageError}
                             variant={variant}
                             {...imageConfig}
+                            style={{ ...imageConfig.style, width: '100%' }}
                         />
                         {(imageError || errors[name]?.message) && (
                             <p className={styles.error}>{imageError || (errors[name] as any)?.message}</p>

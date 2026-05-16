@@ -20,7 +20,7 @@ const IMAGE_CONFIG = {
     label: 'Додайте файл сюди',
     subText: 'Розмір: 1440x860',
     style: {
-        width: '100%',
+        width: '640px',
         aspectRatio: '1440 / 860',
         backgroundImage: `linear-gradient(rgba(245, 245, 245, 0.85), rgba(245, 245, 245, 0.85)), url(${DefaultPlaceholder})`,
         backgroundSize: 'cover',

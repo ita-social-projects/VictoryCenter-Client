@@ -198,7 +198,7 @@ describe('main-page-mappers', () => {
                 name: 'UA Metric',
                 type: MetricType.Partners,
                 prefix: MetricPrefix.Plus,
-                localization: [{ languageId: 2, name: 'EN Metric' }],
+                localizations: [{ languageId: 2, name: 'EN Metric' }],
             });
 
             expect(metrics?.[1].localizations).toBeUndefined();

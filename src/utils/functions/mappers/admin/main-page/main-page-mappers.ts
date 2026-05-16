@@ -3,7 +3,6 @@ import {
     MAIN_PAGE_FORM_DEFAULTS,
     MainPage,
     MainPageFormValues,
-    MetricType,
     UpdateMainPageDto,
     UpdateMetricDto,
 } from '@/types/admin/main-page';
@@ -142,7 +141,7 @@ export function mapFormValuesToMainPagePatch(
     const existingMetrics = originalPage?.impactStatistics?.metrics ?? [];
     const safeMetricsPayload: UpdateMetricDto[] = existingMetrics.map((m) => {
         const enLoc = m.localizations?.find((l) => resolveLocaleCode(l as any, languages) === 'en');
-        const canHaveLocalization = m.type === MetricType.Raised;
+        const canHaveLocalization = true;
 
         return {
             id: m.id,

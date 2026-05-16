@@ -3,5 +3,12 @@
         "MOMENTS": "Moments",
         "AND": "and",
         "CHANGES": "and Changes"
-    }
+    },
+    "CHOOSE_PROGRAM": "Choose a program",
+    "SUPPORT": "Support",
+    "ALL_MATERIALS": "All materials",
+    "NO_RESULTS_FOUND": "No results found",
+    "SHOW_MORE": "Load more",
+    "LINK_TO_ARTICLE": "Navigate to article",
+    "FAILED_TO_LOAD_THE_EVENTS_NEWS": "Failed to load events and news"
 }

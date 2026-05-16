@@ -125,3 +125,39 @@ $line-height-1440: 116px;
         }
     }
 }
+
+// Buttons
+@mixin tagged-button {
+    @include type.body-2-regular;
+    border-radius: 24px;
+    padding: 6px 14px;
+    font-size: 14px;
+    line-height: 24px;
+    letter-spacing: -0.32px;
+    vertical-align: middle;
+    transition: 0.3s ease;
+    cursor: pointer;
+
+    @media (min-width: 768px) {
+        padding: 8px 16px;
+        font-size: 16px;
+    }
+}
+@mixin white-button {
+    @include tagged-button;
+    border: 1px solid colors.$blue-100;
+    background: none;
+    transition: 0.3s ease;
+
+    &:hover {
+        background: colors.$blue-50;
+        transition: 0.3s ease;
+    }
+}
+
+@mixin black-button {
+    @include tagged-button;
+    background: colors.$blue-900;
+    border: 1px solid colors.$blue-900;
+    color: colors.$grey-50;
+}

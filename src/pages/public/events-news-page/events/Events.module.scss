@@ -1,0 +1,85 @@
+@use '@/assets/sass/mixins/utilits.mixins' as utils;
+@use '@/assets/sass/mixins/typography.mixins' as type;
+
+.events {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 16px 64px;
+
+    @media (min-width: 560px) {
+        padding: 0 64px 64px;
+    }
+
+    @media (min-width: 768px) {
+        padding: 0 56px 64px;
+    }
+
+    @media (min-width: 1440px) {
+        padding: 0 56px;
+    }
+
+    .menu-block {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        align-items: flex-start;
+
+        @media (min-width: 768px) {
+            flex-direction: row;
+            justify-content: space-between;
+        }
+
+        @media (min-width: 1440px) {
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0;
+        }
+
+        h2.header-title {
+            @include type.subtitle-1-semibold;
+
+            @media (min-width: 1440px) {
+                @include type.h4-semibold;
+            }
+        }
+
+        .button-block {
+            width: 100%;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+
+            @media (min-width: 768px) {
+                width: auto;
+                justify-content: center;
+            }
+        }
+    }
+
+    .cards-block {
+        display: grid;
+        gap: 64px;
+        grid-template-columns: 1fr;
+        width: 100%;
+
+        @media (min-width: 1440px) {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+}
+
+.white-button {
+    @include utils.white-button;
+}
+
+.black-button {
+    @include utils.black-button;
+}

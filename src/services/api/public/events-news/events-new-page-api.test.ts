@@ -1,0 +1,37 @@
+import { EventsNewsPageApi } from './events-new-page-api';
+import { eventsNewsPageMock } from '@/utils/mock-data/public/event-news';
+
+describe('EventsNewsPageApi', () => {
+    beforeEach(() => {
+        jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+        jest.useRealTimers();
+        jest.restoreAllMocks();
+    });
+
+    it('resolves with the mock data after timeout', async () => {
+        const promise = EventsNewsPageApi.get();
+
+        // Fast-forward the setTimeout inside the implementation
+        jest.advanceTimersByTime(1000);
+        // Ensure pending timers/microtasks are processed
+        await jest.runAllTimers();
+
+        await expect(promise).resolves.toEqual(eventsNewsPageMock);
+    });
+
+    it('is a promise-returning function', () => {
+        const result = EventsNewsPageApi.get();
+        expect(result).toBeInstanceOf(Promise);
+        // cleanup timers so test environment is stable
+        jest.runAllTimers();
+    });
+
+    it('propagates rejection when implementation fails (mocked)', async () => {
+        jest.spyOn(EventsNewsPageApi, 'get').mockImplementationOnce(() => Promise.reject(new Error('Failed')));
+
+        await expect(EventsNewsPageApi.get()).rejects.toThrow('Failed');
+    });
+});

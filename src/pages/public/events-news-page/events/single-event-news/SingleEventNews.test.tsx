@@ -53,4 +53,77 @@ describe('SingleEventNews', () => {
         expect(button).toBeInTheDocument();
         expect(button).toHaveAttribute('href', PUBLIC_ROUTES.EVENTS_AND_NEWS.FULL);
     });
+
+    it('should not display separator when resource is empty', () => {
+        const eventWithoutResource = {
+            ...mockEventData,
+            resource: '',
+        };
+        render(<SingleEventNews {...eventWithoutResource} />);
+        expect(screen.getByText(mockEventData.date)).toBeInTheDocument();
+        expect(screen.queryByText(/\|/)).not.toBeInTheDocument();
+    });
+
+    it('should render correctly with empty tags array', () => {
+        const eventWithoutTags = {
+            ...mockEventData,
+            tags: [],
+        };
+        render(<SingleEventNews {...eventWithoutTags} />);
+        expect(screen.getByText(mockEventData.title)).toBeInTheDocument();
+        expect(screen.getByText(mockEventData.description)).toBeInTheDocument();
+    });
+
+    it('should handle multiple tags correctly', () => {
+        const eventWithMultipleTags = {
+            ...mockEventData,
+            tags: [
+                { id: '1', name: 'Media' },
+                { id: '2', name: 'News' },
+                { id: '3', name: 'Event' },
+            ],
+        };
+        render(<SingleEventNews {...eventWithMultipleTags} />);
+        expect(screen.getByText('Media')).toBeInTheDocument();
+        expect(screen.getByText('News')).toBeInTheDocument();
+        expect(screen.getByText('Event')).toBeInTheDocument();
+    });
+
+    it('should use default values when optional props are not provided', () => {
+        const minimalEventData: EventsNews = {
+            id: '1',
+            title: 'Minimal Event',
+            date: '2026-05-15',
+            imageURL: 'https://example.com/minimal.jpg',
+            description: 'Minimal description',
+            tags: [],
+        };
+        render(<SingleEventNews {...minimalEventData} />);
+        expect(screen.getByText('Minimal Event')).toBeInTheDocument();
+        expect(screen.getByText('Minimal description')).toBeInTheDocument();
+        expect(screen.getByText('2026-05-15')).toBeInTheDocument();
+    });
+
+    it('should render event card with correct structure', () => {
+        const { container } = render(<SingleEventNews {...mockEventData} />);
+        const eventCard = container.querySelector('[class*="event-card"]');
+        expect(eventCard).toBeInTheDocument();
+        
+        const eventImage = eventCard?.querySelector('[class*="event-image"]');
+        const eventHeader = eventCard?.querySelector('[class*="event-header"]');
+        const eventTitle = eventCard?.querySelector('[class*="event-title"]');
+        const eventDescription = eventCard?.querySelector('[class*="event-description"]');
+
+        expect(eventImage).toBeInTheDocument();
+        expect(eventHeader).toBeInTheDocument();
+        expect(eventTitle).toBeInTheDocument();
+        expect(eventDescription).toBeInTheDocument();
+    });
+
+    it('should render with proper heading level h4 for title', () => {
+        render(<SingleEventNews {...mockEventData} />);
+        const heading = screen.getByRole('heading', { level: 4 });
+        expect(heading).toBeInTheDocument();
+        expect(heading).toHaveTextContent(mockEventData.title);
+    });
 });

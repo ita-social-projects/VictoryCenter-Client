@@ -1,4 +1,4 @@
-import DefaultPlaceholder from '@/assets/images/man-facing-horse-forehead.webp';
+import DefaultPlaceholder from '@/assets/images/two-horses-gray.webp';
 import { Button } from '@/components/admin/button/Button';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';

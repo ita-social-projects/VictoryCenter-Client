@@ -12,6 +12,10 @@ jest.mock('@/hooks/public/use-turnstile', () => ({
     }),
 }));
 
+jest.mock('@/services/api/public/contact-us/contact-us-api', () => ({
+    submitContactUsForm: jest.fn(),
+}));
+
 jest.mock(
     './contact-form-card.module.scss',
     () =>

@@ -112,4 +112,5 @@ export const API_ROUTES = {
     HISTORY: {
         BASE: 'History',
     },
+    CONTACT_US: 'ContactUs',
 };

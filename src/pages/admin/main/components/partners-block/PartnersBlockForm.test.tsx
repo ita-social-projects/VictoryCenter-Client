@@ -1,95 +1,132 @@
-import { MainPage } from '@/types/admin/main-page';
-import '@/utils/test-mocks/setup-form-mocks';
+import { MAIN_PAGE_FORM_DEFAULTS, MainPageFormValues } from '@/types/admin/main-page';
+import { MainPageValidationSchema } from '@/validation/admin/main-page-schema/main-page-schema';
+import { yupResolver } from '@hookform/resolvers/yup';
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import React from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
 import { PartnersBlockForm } from './PartnersBlockForm';
 
-const mockInitialData: MainPage = {
-    id: 1,
-    title: 'Титульний заголовок',
-    description: 'Титульний опис',
-    image: null,
-    mainAboutUs: null,
-    impactStatistics: null,
-    mainPartners: {
-        id: 1,
-        title: 'Наші надійні партнери',
-        description: 'Опис партнерів нашого фонду',
-    },
+const TestWrapper = ({
+    children,
+    defaultValues,
+}: {
+    children: React.ReactNode;
+    defaultValues?: Partial<MainPageFormValues>;
+}) => {
+    const methods = useForm<MainPageFormValues>({
+        defaultValues: { ...MAIN_PAGE_FORM_DEFAULTS, ...defaultValues },
+        resolver: yupResolver(MainPageValidationSchema),
+        mode: 'onChange',
+    });
+
+    React.useEffect(() => {
+        if (defaultValues?.partnersTitleUa === 'Новий заголовок Партнерів') {
+            methods.setValue('partnersTitleUa', 'Новий заголовок Партнерів', {
+                shouldDirty: true,
+                shouldValidate: true,
+            });
+        }
+    }, [methods, defaultValues]);
+
+    return <FormProvider {...methods}>{children}</FormProvider>;
 };
 
 describe('PartnersBlockForm', () => {
+    const mockOnPublish = jest.fn();
+
     beforeEach(() => {
         jest.clearAllMocks();
     });
 
-    it('renders with empty default values when initialData is null', () => {
-        render(<PartnersBlockForm initialData={null} />);
+    it('renders with default empty values', () => {
+        const { container } = render(
+            <TestWrapper>
+                <PartnersBlockForm isPublishDisabled={true} onPublish={mockOnPublish} />
+            </TestWrapper>,
+        );
 
-        const titleInput = screen.getByTestId('partners-block-title') as HTMLInputElement;
-        const descriptionInput = screen.getByTestId('partners-block-description') as HTMLTextAreaElement;
+        const titleInput = container.querySelector('#partners-block-title') as HTMLInputElement;
+        const descriptionInput = container.querySelector('#partners-block-description') as HTMLTextAreaElement;
 
         expect(titleInput.value).toBe('');
         expect(descriptionInput.value).toBe('');
-        expect(screen.getByTestId('submit-btn')).toBeDisabled();
     });
 
-    it('renders with empty default values when initialData.mainPartners is null', () => {
-        render(<PartnersBlockForm initialData={{ ...mockInitialData, mainPartners: null }} />);
+    it('populates fields correctly from form context defaultValues', () => {
+        const { container } = render(
+            <TestWrapper
+                defaultValues={{
+                    partnersTitleUa: 'Наші надійні партнери',
+                    partnersDescriptionUa: 'Опис партнерів нашого фонду',
+                }}
+            >
+                <PartnersBlockForm isPublishDisabled={true} onPublish={mockOnPublish} />
+            </TestWrapper>,
+        );
 
-        const titleInput = screen.getByTestId('partners-block-title') as HTMLInputElement;
+        const titleInput = container.querySelector('#partners-block-title') as HTMLInputElement;
+        const descriptionInput = container.querySelector('#partners-block-description') as HTMLTextAreaElement;
 
-        expect(titleInput.value).toBe('');
-        expect(screen.getByTestId('submit-btn')).toBeDisabled();
+        expect(titleInput.value).toBe('Наші надійні партнери');
+        expect(descriptionInput.value).toBe('Опис партнерів нашого фонду');
     });
 
-    it('populates fields correctly from initialData.mainPartners', async () => {
-        render(<PartnersBlockForm initialData={mockInitialData} />);
+    it('disables the publish button based on the isPublishDisabled prop', () => {
+        render(
+            <TestWrapper>
+                <PartnersBlockForm isPublishDisabled={true} onPublish={mockOnPublish} />
+            </TestWrapper>,
+        );
 
-        const titleInput = screen.getByTestId('partners-block-title') as HTMLInputElement;
-        const descriptionInput = screen.getByTestId('partners-block-description') as HTMLTextAreaElement;
+        const publishBtn = screen.getByRole('button', { name: /опублікувати/i });
+        expect(publishBtn).toBeDisabled();
+    });
+
+    it('enables the publish button when isPublishDisabled is false', () => {
+        render(
+            <TestWrapper>
+                <PartnersBlockForm isPublishDisabled={false} onPublish={mockOnPublish} />
+            </TestWrapper>,
+        );
+
+        const publishBtn = screen.getByRole('button', { name: /опублікувати/i });
+        expect(publishBtn).not.toBeDisabled();
+    });
+
+    it('calls onPublish when the button is clicked', () => {
+        render(
+            <TestWrapper>
+                <PartnersBlockForm isPublishDisabled={false} onPublish={mockOnPublish} />
+            </TestWrapper>,
+        );
+
+        const publishBtn = screen.getByRole('button', { name: /опублікувати/i });
+        fireEvent.click(publishBtn);
+
+        expect(mockOnPublish).toHaveBeenCalledTimes(1);
+    });
+
+    it('shows validation error when required field is cleared', async () => {
+        const { container } = render(
+            <TestWrapper
+                defaultValues={{
+                    partnersTitleUa: 'Наші надійні партнери',
+                    partnersDescriptionUa: 'Опис партнерів нашого фонду',
+                }}
+            >
+                <PartnersBlockForm isPublishDisabled={true} onPublish={mockOnPublish} />
+            </TestWrapper>,
+        );
+
+        const titleInput = container.querySelector('#partners-block-title') as HTMLInputElement;
+
+        fireEvent.change(titleInput, { target: { value: '' } });
+        fireEvent.blur(titleInput);
 
         await waitFor(() => {
-            expect(titleInput.value).toBe('Наші надійні партнери');
-            expect(descriptionInput.value).toBe('Опис партнерів нашого фонду');
+            const errorMessage = screen.getByText(/Поле обов'язкове/i);
+            expect(errorMessage).toBeInTheDocument();
         });
-
-        expect(screen.getByTestId('submit-btn')).toBeDisabled();
-    });
-
-    it('enables submit button when form becomes dirty and is valid', async () => {
-        render(<PartnersBlockForm initialData={mockInitialData} />);
-
-        const titleInput = screen.getByTestId('partners-block-title');
-        fireEvent.change(titleInput, { target: { value: 'Новий заголовок Партнерів' } });
-
-        await waitFor(() => {
-            expect(screen.getByTestId('submit-btn')).not.toBeDisabled();
-        });
-    });
-
-    it('disables submit button when a required field is cleared', async () => {
-        render(<PartnersBlockForm initialData={mockInitialData} />);
-
-        const descriptionInput = screen.getByTestId('partners-block-description');
-
-        fireEvent.change(descriptionInput, { target: { value: '   ' } });
-        fireEvent.blur(descriptionInput);
-
-        await waitFor(() => {
-            expect(screen.getByTestId('submit-btn')).toBeDisabled();
-        });
-    });
-
-    it('allows submitting the form without throwing errors', async () => {
-        render(<PartnersBlockForm initialData={mockInitialData} />);
-
-        const descriptionInput = screen.getByTestId('partners-block-description');
-        fireEvent.change(descriptionInput, { target: { value: 'Оновлений текст про наших нових партнерів' } });
-
-        const submitBtn = screen.getByTestId('submit-btn');
-        await waitFor(() => expect(submitBtn).not.toBeDisabled());
-
-        expect(() => fireEvent.click(submitBtn)).not.toThrow();
     });
 });

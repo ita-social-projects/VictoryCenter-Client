@@ -1,9 +1,8 @@
-import React from 'react';
-import { act } from 'react';
+import { MAIN_PAGE_TEXT } from '@/const/admin/main-page';
+import { MainPageApi } from '@/services/api/admin/main-page/main-page-api';
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MainPageContent } from './MainPageContent';
-import { MAIN_PAGE_TEXT } from '@/const/admin/main-page';
 
 jest.mock('../title-block/TitleBlockForm', () => ({
     __esModule: true,
@@ -35,17 +34,45 @@ jest.mock('@/components/common/page-loader/PageLoader', () => ({
     PageLoader: () => <div data-testid="page-loader">Loading...</div>,
 }));
 
-const advanceTimers = () =>
-    act(() => {
-        jest.advanceTimersByTime(500);
-    });
+jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => {
+    const mockClient = {};
+    return {
+        useAdminClient: () => mockClient,
+    };
+});
+
+jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider', () => {
+    const mockAddToast = jest.fn();
+    const mockToasts: any[] = [];
+    return {
+        useToast: () => ({
+            addToast: mockAddToast,
+            toasts: mockToasts,
+        }),
+    };
+});
+
+jest.mock('@/services/api/admin/main-page/main-page-api', () => ({
+    MainPageApi: {
+        get: jest.fn(),
+        publish: jest.fn(),
+    },
+}));
 
 const getByExactText = (text: string) =>
     screen.getByText((_, el) => el?.children.length === 0 && el?.textContent === text);
 
 describe('MainPageContent', () => {
     beforeEach(() => {
-        jest.useFakeTimers();
+        (MainPageApi.get as jest.Mock).mockResolvedValue({
+            page: {
+                id: 1,
+                title: 'Test Title',
+                description: 'Test Description',
+                impactStatistics: { metrics: [] },
+            },
+            languages: [{ id: 1, code: 'uk', name: 'UA' }],
+        });
 
         if (!(global as any).crypto) {
             Object.defineProperty(global, 'crypto', { value: {}, configurable: true });
@@ -57,51 +84,45 @@ describe('MainPageContent', () => {
     });
 
     afterEach(() => {
-        act(() => {
-            jest.runOnlyPendingTimers();
-        });
-        jest.useRealTimers();
         jest.clearAllMocks();
         jest.restoreAllMocks();
     });
+
+    const waitForContentToLoad = async () => {
+        await waitFor(() => {
+            expect(screen.getByTestId('category-bar')).toBeInTheDocument();
+        });
+    };
 
     it('renders loader initially while data is "fetching"', () => {
         render(<MainPageContent />);
         expect(screen.getByTestId('page-loader')).toBeInTheDocument();
     });
 
-    it('renders loader when data is null and isLoading is false', () => {
-        const useStateSpy = jest.spyOn(React, 'useState');
-        useStateSpy
-            .mockImplementationOnce(() => ['title', jest.fn()])
-            .mockImplementationOnce(() => [null, jest.fn()])
-            .mockImplementationOnce(() => [false, jest.fn()]);
-
-        jest.spyOn(React, 'useEffect').mockImplementation(() => undefined);
+    it('renders loader when data is null and API throws error', async () => {
+        (MainPageApi.get as jest.Mock).mockRejectedValue(new Error('Network error'));
 
         render(<MainPageContent />);
+
+        await waitFor(() => {
+            expect(MainPageApi.get).toHaveBeenCalled();
+        });
+
         expect(screen.getByTestId('page-loader')).toBeInTheDocument();
     });
 
     it('renders TitleBlockForm as the default tab after loading', async () => {
         render(<MainPageContent />);
-        await advanceTimers();
 
-        await waitFor(() => {
-            expect(screen.queryByTestId('page-loader')).not.toBeInTheDocument();
-        });
+        await waitForContentToLoad();
 
-        expect(screen.getByTestId('category-bar')).toBeInTheDocument();
         expect(screen.getByTestId('title-block-form')).toBeInTheDocument();
     });
 
     it('switches tabs correctly', async () => {
         render(<MainPageContent />);
-        await advanceTimers();
 
-        await waitFor(() => {
-            expect(screen.getByTestId('category-bar')).toBeInTheDocument();
-        });
+        await waitForContentToLoad();
 
         expect(screen.getByTestId('title-block-form')).toBeInTheDocument();
         expect(screen.queryByTestId('about-us-block-form')).not.toBeInTheDocument();
@@ -114,20 +135,16 @@ describe('MainPageContent', () => {
         expect(screen.getByTestId('statistics-block-form')).toBeInTheDocument();
     });
 
-    it('does not update state after unmount (cleanup isMounted)', async () => {
+    it('does not update state after unmount (cleanup isMounted)', () => {
         const { unmount } = render(<MainPageContent />);
         unmount();
-        await advanceTimers();
         expect(true).toBe(true);
     });
 
     it('renders donations tab content', async () => {
         render(<MainPageContent />);
-        await advanceTimers();
 
-        await waitFor(() => {
-            expect(screen.getByTestId('category-bar')).toBeInTheDocument();
-        });
+        await waitForContentToLoad();
 
         fireEvent.click(screen.getByTestId('tab-btn-donations'));
         expect(getByExactText(`Блок "${MAIN_PAGE_TEXT.TABS.DONATIONS}" в розробці`)).toBeInTheDocument();
@@ -135,11 +152,8 @@ describe('MainPageContent', () => {
 
     it('renders partners tab content', async () => {
         render(<MainPageContent />);
-        await advanceTimers();
 
-        await waitFor(() => {
-            expect(screen.getByTestId('category-bar')).toBeInTheDocument();
-        });
+        await waitForContentToLoad();
 
         fireEvent.click(screen.getByTestId('tab-btn-partners'));
         expect(screen.getByTestId('partners-block-form')).toBeInTheDocument();

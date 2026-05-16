@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 import { CONTACT_FORM_LIMITS, CONTACT_FORM_MESSAGES } from '@/const/public/contact-form';
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@.]+\.[^\s@.]{2,}$/;
 
 export const contactFormSchema = yup.object({
     name: yup.string().required(),

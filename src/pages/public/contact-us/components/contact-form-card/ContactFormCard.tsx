@@ -3,7 +3,10 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { contactFormSchema, ContactFormData } from '@/validation/public/contact-form-schema';
 import { CONTACT_FORM_LIMITS, CONTACT_FORM_MESSAGES } from '@/const/public/contact-form';
+import { useTurnstile } from '@/hooks/public/use-turnstile';
 import styles from './ContactFormCard.module.scss';
+
+const CF_TURNSTILE_SITE_KEY = process.env.REACT_APP_CF_TURNSTILE_SITE_KEY ?? '';
 
 interface ContactFormCardProps {
     title: string;
@@ -58,6 +61,12 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
         mode: 'onBlur',
     });
 
+    const {
+        token: turnstileToken,
+        containerRef: turnstileRef,
+        reset: resetTurnstile,
+    } = useTurnstile(CF_TURNSTILE_SITE_KEY);
+
     const subjectValue = watch('subject') ?? '';
     const messageValue = watch('message') ?? '';
 
@@ -65,7 +74,7 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
     const messageHint = getMessageHint(messageValue.length);
 
     const onSubmit = (data: ContactFormData) => {
-        // TODO: wire to API
+        resetTurnstile();
         return data;
     };
 
@@ -158,7 +167,9 @@ export const ContactFormCard: React.FC<ContactFormCardProps> = ({
                 )}
             </div>
 
-            <button type="submit" className={styles['contact-form-submit']}>
+            <div ref={turnstileRef} />
+
+            <button type="submit" className={styles['contact-form-submit']} disabled={!turnstileToken}>
                 {submitLabel}
             </button>
         </form>

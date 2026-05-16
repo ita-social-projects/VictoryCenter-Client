@@ -18,6 +18,13 @@ export const PdfReportsApi = {
         await client.delete(`${API_ROUTES.PDF_REPORTS.BASE}/${id}`);
     },
 
+    rename: async (client: AxiosInstance, id: number, newName: string): Promise<PdfReportDto> => {
+        const response = await client.put<PdfReportDto>(`${API_ROUTES.PDF_REPORTS.BASE}/${id}`, {
+            name: newName,
+        });
+        return response.data;
+    },
+
     getAll: async (
         client: AxiosInstance,
         filter: { offset: number; limit: number },

@@ -41,8 +41,8 @@
             color: colors.$blue-900;
             font-family: fonts.$mulish-regular-font;
             padding-bottom: 0.125rem;
-            word-break: break-word;
-            overflow-wrap: break-word;
+            overflow-wrap: anywhere;
+            word-break: normal;
         }
 
         .label {
@@ -62,7 +62,7 @@
             font-weight: 700;
             color: colors.$blue-900;
             font-size: 1.125rem;
-            word-break: break-word;
+            word-break: normal;
             overflow-wrap: break-word;
         }
 

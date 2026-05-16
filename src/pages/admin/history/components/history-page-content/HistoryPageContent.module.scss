@@ -40,9 +40,19 @@
     display: flex;
     gap: 8px;
     align-items: center;
-    width: 470px;
+    width: 427px;
 }
-
+.functional-button-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 27px;
+    gap: 68px;
+}
+.btn-publish {
+    width: 395px;
+    height: 40px;
+}
 .plus-icon path {
     stroke: c.$blue-500;
 }
@@ -92,157 +102,5 @@
 
     &:hover {
         font-weight: 600;
-    }
-}
-
-.sections-list {
-    background-color: c.$white;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.sections-divider {
-    width: 100%;
-    height: 1px;
-    background-color: c.$grey-700;
-}
-
-.order-controls {
-    display: flex;
-    flex-direction: column;
-    opacity: 0;
-    visibility: hidden;
-    transition:
-        opacity 0.2s ease,
-        visibility 0.2s ease;
-}
-
-.up-button {
-    background-image: url('~@/assets/icons/chevron-right.svg');
-    transform: rotate(270deg);
-
-    &:hover {
-        opacity: 0.6;
-    }
-}
-
-.down-button {
-    background-image: url('~@/assets/icons/chevron-right.svg');
-    transform: rotate(90deg);
-
-    &:hover {
-        opacity: 0.6;
-    }
-}
-
-.actions-container {
-    background-color: c.$white;
-    min-height: 130px;
-    min-width: 700px;
-    padding-top: 30px;
-}
-
-.actions {
-    display: flex;
-    justify-content: center;
-    gap: 32px;
-
-    button {
-        width: 325px;
-    }
-}
-
-.section-container {
-    background-color: c.$white;
-    position: relative;
-    width: clamp(200px, 100%, 1440px);
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-
-    &:hover .hover-buttons {
-        opacity: 1;
-        visibility: visible;
-    }
-
-    &:hover .order-controls {
-        opacity: 1;
-        visibility: visible;
-    }
-}
-
-.actions-section {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    height: 100px;
-    padding: 30px 30px 0 30px;
-}
-
-.hover-buttons {
-    display: flex;
-    height: 56px;
-    width: 152px;
-    gap: 16px;
-    align-items: center;
-    justify-content: center;
-    padding: 16px 24px;
-    border-radius: 8px;
-    background-color: c.$light-blue-100;
-    opacity: 0;
-    visibility: hidden;
-    transition:
-        opacity 0.2s ease,
-        visibility 0.2s ease;
-}
-
-.icon-button {
-    width: 24px;
-    height: 24px;
-    border: none;
-    border-radius: 0;
-    background-color: transparent;
-    background-repeat: no-repeat;
-    background-position: center;
-    transition: opacity 0.2s ease;
-    background-size: 24px 24px;
-    cursor: pointer;
-}
-
-.edit-button,
-.delete-button {
-    --icon-btn-hover-color: #{c.$blue-900};
-
-    &:hover {
-        opacity: 0.6;
-    }
-}
-
-.change-button {
-    &:hover,
-    &:active {
-        path:nth-of-type(1) {
-            fill-rule: nonzero;
-            fill: c.$blue-900;
-        }
-        path:nth-of-type(2) {
-            fill: black;
-        }
-    }
-
-    &:hover {
-        opacity: 0.6;
-    }
-}
-
-.content {
-    max-width: 1440px;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-
-    > div {
-        width: 100%;
     }
 }

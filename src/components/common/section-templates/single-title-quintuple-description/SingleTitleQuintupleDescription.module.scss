@@ -56,6 +56,8 @@ $desc-input-height: 115px;
     text-align: left;
     font-size: clamp(12px, 2.1vw, 34px);
     line-height: clamp(14px, 2.5vw, 42px);
+    overflow-wrap: anywhere;
+    word-break: normal;
 }
 
 .template-card {
@@ -79,6 +81,8 @@ $desc-input-height: 115px;
     white-space: pre-wrap;
     font-size: clamp(10px, 1vw, 16px);
     line-height: clamp(12px, 1.25vw, 20px);
+    overflow-wrap: anywhere;
+    word-break: normal;
 }
 
 .card-0 {
@@ -142,9 +146,9 @@ $desc-input-height: 115px;
         color: c.$grey-700;
     }
 
-    :global(.char-limit-input) {
+    :global(.char-limit-textarea__wrapper) {
         width: $card-width;
-        height: $title-input-height;
+        min-height: $title-input-height;
         padding: 0 16px;
         gap: 8px;
         box-shadow: none;
@@ -153,7 +157,7 @@ $desc-input-height: 115px;
         overflow: visible;
     }
 
-    :global(.char-limit-input__field) {
+    :global(.char-limit-textarea__field) {
         font-family: t.$font-family-base;
         font-weight: t.$fw-bold;
         font-size: 40px;
@@ -163,10 +167,12 @@ $desc-input-height: 115px;
         width: 100%;
         max-width: 100%;
         overflow: hidden;
-        text-overflow: clip;
+        overflow-wrap: anywhere;
+        word-break: normal;
+        padding: 10px 0;
     }
 
-    :global(.char-limit-input__field::placeholder) {
+    :global(.char-limit-textarea__field::placeholder) {
         font-family: t.$font-family-base;
         font-weight: t.$fw-bold;
         font-size: 40px;

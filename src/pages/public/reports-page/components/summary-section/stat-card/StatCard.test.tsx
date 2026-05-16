@@ -35,6 +35,12 @@ describe('StatCard', () => {
         expect(screen.getByText('$20,000')).toBeInTheDocument();
     });
 
+    it('renders formattedValue without Intl formatting when provided', () => {
+        render(<StatCard value={20000} label="Revenue" formattedValue="Custom amount" currency="USD" />);
+
+        expect(screen.getByText('Custom amount')).toBeInTheDocument();
+    });
+
     it('applies default blue color class', () => {
         const { container } = render(<StatCard value={10} label="Test" />);
         const valueElement = container.querySelector('.value-class');

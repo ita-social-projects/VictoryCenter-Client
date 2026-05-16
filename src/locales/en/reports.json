@@ -1,10 +1,10 @@
 {
     "summary": {
-        "collected": "Collected",
+        "collected": "Total raised",
         "expenses": "Main Expenses",
-        "income": "Where Funds Came From",
-        "programs": "Funds Distribution by Program",
-        "lives": "Lives Changed"
+        "income": "Sources of funds",
+        "programs": "Allocation of funds by program",
+        "lives": "Lives impacted"
     },
     "reports": {
         "title": "Results in Reports",

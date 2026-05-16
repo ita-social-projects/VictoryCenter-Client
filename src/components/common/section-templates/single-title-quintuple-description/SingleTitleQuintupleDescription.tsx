@@ -1,6 +1,6 @@
 import cn from 'classnames';
 import { useCallback, useMemo, useState, useEffect } from 'react';
-import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
+
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { SECTIONS_TEXT, SINGLE_TITLE_QUINTUPLE_DESCRIPTION_CONFIG } from '@/const/admin/sections';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -106,7 +106,7 @@ export const SingleTitleQuintupleDescription = ({
             {mode === SectionMode.Edit ? (
                 <div className={baseStyles['editable-grid']}>
                     <div className={baseStyles['title-cell']}>
-                        <InputWithCharacterLimitGroup
+                        <TextAreaWithCharacterLimitGroup
                             className={baseStyles['title-input-group']}
                             label={SECTIONS_TEXT.SECTION.FORM.TITLE.TEXT}
                             isRequired
@@ -115,11 +115,13 @@ export const SingleTitleQuintupleDescription = ({
                             value={title}
                             onChange={(e) => onTitleChange?.(e.target.value)}
                             maxLength={titleMaxLength}
+                            rows={1}
+                            autoGrow={true}
+                            maxRows={3}
                             placeholder={SECTIONS_TEXT.SECTION.FORM.TITLE.PLACEHOLDER}
                             error={errors.title}
                             onBlur={handleTitleBlur}
                             maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(titleMaxLength)}
-                            showCounterBelow={true}
                         />
                     </div>
 

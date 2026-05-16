@@ -16,6 +16,7 @@ export interface AddSectionModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSelectTemplate: (templateId: SectionTemplate) => void;
+    templates: SectionTemplate[];
 }
 
 const SWIPER_NAVIGATION_CONFIG = {
@@ -34,23 +35,7 @@ const SWIPER_NAVIGATION_CONFIG = {
     },
 };
 
-const TEMPLATES = [
-    SectionTemplate.QuadImagesBottom,
-    SectionTemplate.DualImagesBottom,
-    SectionTemplate.TextOnly,
-    SectionTemplate.TripleImagesBottom,
-    SectionTemplate.SingleImageBottom,
-    SectionTemplate.SingleImageTop,
-    SectionTemplate.SingleImageRight,
-    SectionTemplate.SingleTitleQuintupleDescription,
-    SectionTemplate.DualTitleDescriptionPairs,
-    SectionTemplate.TripleTitleDescriptionPairs,
-    SectionTemplate.QuadTitleDescriptionPairs,
-    SectionTemplate.SingleTitleDescriptionAuthorPairs,
-    SectionTemplate.SingleTitleQuestionAnswerPairs,
-];
-
-export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectionModalProps) => {
+export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate, templates }: AddSectionModalProps) => {
     const [selectedTemplateIndex, setSelectedTemplateIndex] = useState(0);
 
     const getPlaceholderImages = (templateId: SectionTemplate) => {
@@ -143,7 +128,7 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
     };
 
     const handleSave = () => {
-        const selectedTemplateId = TEMPLATES[selectedTemplateIndex];
+        const selectedTemplateId = templates[selectedTemplateIndex];
         onSelectTemplate(selectedTemplateId);
         onClose();
     };
@@ -188,7 +173,7 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
             <Modal.Content>
                 <div className={styles.container}>
                     <Swiper
-                        items={TEMPLATES}
+                        items={templates}
                         renderItem={(templateId) => (
                             <div className={styles['middle-section']}>
                                 <div className={styles['template-content']} data-testid="add-section-modal-content">

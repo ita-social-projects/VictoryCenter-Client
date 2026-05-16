@@ -75,6 +75,7 @@ describe('ProgramExpensesToolbar', () => {
         selectedProgramIds: [],
         exchangeRate: '42.15',
         onProgramChange: jest.fn(),
+        onAddProgramExpense: jest.fn(),
     };
 
     beforeEach(() => {
@@ -159,5 +160,26 @@ describe('ProgramExpensesToolbar', () => {
         fireEvent.click(screen.getByTestId('program-filter-clear'));
 
         expect(defaultProps.onProgramChange).toHaveBeenCalledWith([]);
+    });
+
+    it('should render singular program placeholder and add button in edit mode', () => {
+        render(<ProgramExpensesToolbar {...defaultProps} isEditing />);
+
+        expect(screen.getAllByText(PROGRAM_EXPENSES_TEXT.TABLE.COLUMNS.PROGRAM)).not.toHaveLength(0);
+        expect(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE })).toBeEnabled();
+    });
+
+    it('should call onAddProgramExpense when edit mode add button is clicked', () => {
+        render(<ProgramExpensesToolbar {...defaultProps} isEditing />);
+
+        fireEvent.click(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE }));
+
+        expect(defaultProps.onAddProgramExpense).toHaveBeenCalledTimes(1);
+    });
+
+    it('should disable edit mode add button when the limit is reached', () => {
+        render(<ProgramExpensesToolbar {...defaultProps} isEditing isAddProgramExpenseDisabled />);
+
+        expect(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE })).toBeDisabled();
     });
 });

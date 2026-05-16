@@ -1,5 +1,6 @@
 @use '@/assets/sass/variables/colors' as c;
 @use '@/assets/sass/mixins/effects.mixins' as effects;
+@use '@/assets/sass/mixins/typography.mixins' as type;
 
 .root {
     display: grid;
@@ -71,4 +72,14 @@
 .programs {
     grid-area: programs;
     background-color: c.$yellow-300;
+}
+
+.disclaimer {
+    grid-column: 1 / -1;
+    padding: 16px;
+    text-align: center;
+    text-wrap: balance;
+    background-color: c.$light-blue-100;
+    color: c.$blue-900;
+    @include type.body-2-bold;
 }

@@ -1,7 +1,12 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { FundsExpenditureSection } from './FundsExpendituresSection';
-import { FUNDS_EXPENDITURES_TEXT, FUNDS_EXPENDITURES_VALIDATION, REPORTS_TEXT } from '@/const/admin/reports';
+import {
+    FUNDS_EXPENDITURES_TEXT,
+    FUNDS_EXPENDITURES_VALIDATION,
+    PROGRAM_EXPENSES_TEXT,
+    REPORTS_TEXT,
+} from '@/const/admin/reports';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import {
     FundsExpendituresSummary,
@@ -200,55 +205,59 @@ jest.mock('./components/funds-expenditures-table/FundsExpendituresTable', () => 
     FundsExpendituresTable: ({
         records,
         isEditing,
+        selectedRecordIds = [],
+        eligibleRecordIds = [],
         onRecordSave,
         onRowEditModeChange,
         onDeleteRecord,
-    }: {
-        records: Array<{
-            id: number;
-            categoryId: number;
-            type: 'income' | 'expense';
-            reportingYear: string;
-            amountUah: string;
-            amountUsd: string;
-        }>;
-        isEditing?: boolean;
-        onRecordSave?: (recordId: number, data: { categoryId: number; amountUah: string; amountUsd: string }) => void;
-        onRowEditModeChange?: (isRowEditMode: boolean) => void;
-        onDeleteRecord?: (record: {
-            id: number;
-            categoryId: number;
-            type: 'income' | 'expense';
-            reportingYear: string;
-            amountUah: string;
-            amountUsd: string;
-        }) => void;
-    }) => (
-        <div data-testid="funds-table" data-record-count={records.length} data-editing={String(isEditing ?? false)}>
-            <button
-                data-testid="trigger-record-save"
-                onClick={() =>
-                    onRecordSave?.(1, {
-                        categoryId: 1,
-                        amountUah: '7300',
-                        amountUsd: '173.81',
-                    })
-                }
-            >
-                Save row
-            </button>
-            <button data-testid="row-edit-on" onClick={() => onRowEditModeChange?.(true)}>
-                Row edit on
-            </button>
-            <button data-testid="row-edit-off" onClick={() => onRowEditModeChange?.(false)}>
-                Row edit off
-            </button>
-            <button
-                data-testid="trigger-record-delete"
-                onClick={() => onDeleteRecord?.(records[0])}
-                disabled={!isEditing || records.length === 0}
-            >
-                Delete row
+        onSelectAllToggle,
+        onToggleRecordSelection,
+        onOpenBulkDelete,
+    }: any) => {
+        const { FUNDS_EXPENDITURES_TEXT: FET } = require('@/const/admin/reports');
+        return (
+            <div data-testid="funds-table" data-record-count={records.length} data-editing={String(isEditing ?? false)}>
+                <input type="checkbox" aria-label="Select all records" onClick={() => onSelectAllToggle?.(true)} />
+                <button
+                    data-testid="select-row-1"
+                    aria-label="Select record 1"
+                    onClick={() => onToggleRecordSelection?.(1)}
+                />
+                <div data-testid="table-selection-summary" aria-hidden={selectedRecordIds.length === 0}>
+                    <div>{FET.BULK.getSelectedLabel(selectedRecordIds.length, eligibleRecordIds.length)}</div>
+                    <button data-testid="delete-selected" onClick={() => onOpenBulkDelete?.()}>
+                        {FET.BULK.DELETE_BUTTON}
+                    </button>
+                </div>
+                <button
+                    data-testid="trigger-record-save"
+                    onClick={() => onRecordSave?.(1, { categoryId: 1, amountUah: '7300', amountUsd: '173.81' })}
+                >
+                    Save row
+                </button>
+                <button data-testid="row-edit-on" onClick={() => onRowEditModeChange?.(true)}>
+                    Row edit on
+                </button>
+                <button data-testid="row-edit-off" onClick={() => onRowEditModeChange?.(false)}>
+                    Row edit off
+                </button>
+                <button
+                    data-testid="trigger-record-delete"
+                    onClick={() => onDeleteRecord?.(records[0])}
+                    disabled={!isEditing || records.length === 0}
+                >
+                    Delete row
+                </button>
+            </div>
+        );
+    },
+}));
+
+jest.mock('./components/common/add-funds-expenditures-category-modal/AddFundsExpendituresCategoryModal', () => ({
+    AddFundsExpendituresCategoryModal: ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => (
+        <div data-testid="add-category-modal" data-open={String(isOpen)}>
+            <button data-testid="add-category-modal-close" onClick={onClose}>
+                Close
             </button>
         </div>
     ),
@@ -298,6 +307,7 @@ const mockUpdateRecord = jest.fn();
 const mockCreateRecord = jest.fn();
 const mockUpdateSettings = jest.fn();
 const mockDeleteRecord = jest.fn();
+const mockBulkDelete = jest.fn();
 jest.mock('@/services/api/admin/reports/funds-expenditures-api', () => ({
     FundsExpendituresApi: {
         getSettings: jest.fn(),
@@ -308,6 +318,7 @@ jest.mock('@/services/api/admin/reports/funds-expenditures-api', () => ({
         createRecord: (...args: unknown[]) => mockCreateRecord(...args),
         updateRecord: (...args: unknown[]) => mockUpdateRecord(...args),
         deleteRecord: (...args: unknown[]) => mockDeleteRecord(...args),
+        bulkDeleteRecords: (...args: unknown[]) => mockBulkDelete(...args),
     },
 }));
 
@@ -540,6 +551,25 @@ describe('FundsExpenditureSection', () => {
             fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT));
             const textarea = screen.getByTestId('textarea-funds-disclaimer');
             expect(textarea).toHaveValue(MOCK_FUNDS_EXPENDITURES_SETTINGS.disclaimerTitle);
+        });
+
+        it('should initialize edit values from settings when mounted in edit mode', () => {
+            render(<FundsExpenditureSection initialIsEditing />);
+
+            expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-editing', 'true');
+            expect(screen.getByTestId('textarea-funds-disclaimer')).toHaveValue(
+                MOCK_FUNDS_EXPENDITURES_SETTINGS.disclaimerTitle,
+            );
+            expect(screen.getByTestId('exchange-rate')).toHaveTextContent(
+                MOCK_FUNDS_EXPENDITURES_SETTINGS.exchangeRate!,
+            );
+        });
+
+        it('should initialize exchange rate from draft value when mounted in edit mode', () => {
+            render(<FundsExpenditureSection initialIsEditing draftExchangeRate="44.20" />);
+
+            expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-editing', 'true');
+            expect(screen.getByTestId('exchange-rate')).toHaveTextContent('44.20');
         });
 
         it('should hide edit button while editing', () => {
@@ -842,6 +872,97 @@ describe('FundsExpenditureSection', () => {
             fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.NO));
 
             expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE.TITLE)).not.toBeInTheDocument();
+        });
+    });
+
+    describe('add category modal', () => {
+        it('should render add category modal as closed by default', () => {
+            render(<FundsExpenditureSection />);
+
+            expect(screen.getByTestId('add-category-modal')).toHaveAttribute('data-open', 'false');
+        });
+
+        it('should render add category modal as open when isAddCategoryModalOpen is true', () => {
+            render(<FundsExpenditureSection isAddCategoryModalOpen onAddCategoryModalClose={jest.fn()} />);
+
+            expect(screen.getByTestId('add-category-modal')).toHaveAttribute('data-open', 'true');
+        });
+
+        it('should call onAddCategoryModalClose when modal close is triggered', () => {
+            const mockClose = jest.fn();
+            render(<FundsExpenditureSection isAddCategoryModalOpen onAddCategoryModalClose={mockClose} />);
+
+            fireEvent.click(screen.getByTestId('add-category-modal-close'));
+
+            expect(mockClose).toHaveBeenCalledTimes(1);
+        });
+    });
+});
+
+describe('FundsExpenditureSection bulk delete flow', () => {
+    const settingsMock = { id: 1, exchangeRate: '40', disclaimerTitle: 'Disclaimer' };
+    const categoriesMock: ReportFundsExpendituresCategory[] = [
+        { id: 1, name: 'A', type: 'income' },
+        { id: 2, name: 'B', type: 'income' },
+        { id: 3, name: PROGRAM_EXPENSES_TEXT.TABLE.TYPE_LABEL, type: 'expense' },
+    ];
+    const recordsMock: ReportFundsExpendituresRecord[] = [
+        { id: 1, categoryId: 1, type: 'income', reportingYear: '2025', amountUah: '100', amountUsd: '10' },
+        { id: 2, categoryId: 2, type: 'income', reportingYear: '2025', amountUah: '200', amountUsd: '20' },
+        { id: 3, categoryId: 3, type: 'expense', reportingYear: '2025', amountUah: '300', amountUsd: '30' },
+    ];
+    const summaryMock: FundsExpendituresSummary = {
+        totalCollectedUah: 0,
+        totalCollectedUsd: 0,
+        totalSpentUah: 0,
+        totalSpentUsd: 0,
+        incomeCategories: 1,
+        expenseCategories: 1,
+    };
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+        setupMockDataFetch(settingsMock, categoriesMock, recordsMock, summaryMock);
+    });
+
+    it('select all via header checkbox and cancel bulk delete clears selection', async () => {
+        render(<FundsExpenditureSection initialIsEditing={true} />);
+
+        fireEvent.click(screen.getByLabelText('Select all records'));
+
+        await waitFor(() => {
+            expect(screen.getByTestId('table-selection-summary')).toHaveAttribute('aria-hidden', 'false');
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.BULK.getSelectedLabel(2, 2))).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByTestId('delete-selected'));
+        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.BULK.DELETE_CONFIRM_TITLE)).toBeInTheDocument();
+
+        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.NO));
+
+        await waitFor(() => {
+            expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.BULK.DELETE_CONFIRM_TITLE)).not.toBeInTheDocument();
+            expect(screen.getByTestId('table-selection-summary')).toHaveAttribute('aria-hidden', 'true');
+        });
+    });
+
+    it('confirms bulk delete calls API and shows success toast', async () => {
+        mockBulkDelete.mockResolvedValue(undefined);
+
+        render(<FundsExpenditureSection initialIsEditing={true} />);
+
+        fireEvent.click(screen.getByLabelText('Select all records'));
+
+        await waitFor(() => {
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.BULK.getSelectedLabel(2, 2))).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByTestId('delete-selected'));
+        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
+
+        await waitFor(() => {
+            expect(mockBulkDelete).toHaveBeenCalledWith(expect.anything(), [1, 2]);
+            expect(mockAddToast).toHaveBeenCalledWith(FUNDS_EXPENDITURES_TEXT.BULK.DELETE_SUCCESS, 'success');
         });
     });
 });

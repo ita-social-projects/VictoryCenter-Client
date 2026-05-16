@@ -27,16 +27,6 @@ export const MOCK_PROGRAM_EXPENSES_PROGRAMS: ProgramExpensesProgram[] = [
 
 export const MOCK_PROGRAM_EXPENSES_RECORDS: MockProgramExpensesRecord[] = [
     {
-        id: 1,
-        programId: 101,
-        programName: 'Дитяча реабілітація',
-        type: 'expense',
-        reportingYear: '2025',
-        amountUah: '1500',
-        amountUsd: '1000',
-        isPublished: true,
-    },
-    {
         id: 2,
         programId: 101,
         programName: 'Дитяча реабілітація',

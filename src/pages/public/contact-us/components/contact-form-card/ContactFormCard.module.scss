@@ -1,0 +1,75 @@
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
+
+.contact-form-card {
+    background: c.$grey-50;
+    box-shadow: 0 17px 23px -16px c.$donate-box-shadow;
+    width: 100%;
+    border-bottom: 1px solid c.$grey-500;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    padding: 48px 24px 24px;
+
+    @media (min-width: 560px) {
+        padding: 48px 32px 32px;
+    }
+
+    @media (min-width: 768px) {
+        max-width: 550px;
+        margin-inline: auto;
+        padding: 56px 48px 48px;
+    }
+
+    @media (min-width: 1024px) {
+        padding: 64px 48px 48px;
+        margin-inline: 0;
+    }
+}
+
+.contact-form-field {
+    border-bottom: 1px solid c.$blue-100;
+    padding: 8px;
+}
+
+.contact-form-input,
+.contact-form-textarea {
+    @include type.body-2-regular;
+    color: c.$blue-900;
+    width: 100%;
+    border: none;
+    background: transparent;
+
+    &::placeholder {
+        color: c.$grey-800;
+    }
+
+    &:focus {
+        outline: none;
+    }
+}
+
+.contact-form-textarea-field {
+    border: 1px solid c.$blue-100;
+    padding: 8px;
+    margin-block: 32px;
+}
+
+.contact-form-textarea {
+    resize: vertical;
+}
+
+.contact-form-submit {
+    @include type.body-2-semibold;
+    background: c.$blue-900;
+    color: c.$grey-50;
+    border: none;
+    padding: 12px 24px;
+    align-self: flex-end;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+
+    &:hover {
+        opacity: 0.9;
+    }
+}

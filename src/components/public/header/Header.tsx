@@ -17,12 +17,6 @@ export const Header = () => {
         setIsMenuOpen((prev: boolean) => !prev);
     };
 
-    const onContactUsClick = () => {
-        //TODO: remove this log after implementing an actual logic
-        //eslint-disable-next-line no-console
-        console.log('CONTACT USED!');
-    };
-
     const aboutUsLinks: DropdownLink[] = [
         { text: t('WHO_WE_ARE'), navigateTo: PUBLIC_ROUTES.ABOUT_US.FULL, isDisabled: false },
         { text: t('HISTORY'), navigateTo: '', isDisabled: true },
@@ -68,7 +62,11 @@ export const Header = () => {
                     <div className="button-container">
                         <LanguageSwitcher className="language-switcher" openOnHover={true} />
 
-                        <Button variant="secondary-dark" onClick={onContactUsClick} className="contact-us-button">
+                        <Button
+                            variant="secondary-dark"
+                            href={PUBLIC_ROUTES.CONTACT_US.FULL}
+                            className="contact-us-button"
+                        >
                             {t('CONTACT_US')}
                         </Button>
 

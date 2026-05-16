@@ -174,4 +174,26 @@ describe('PdfDropzone', () => {
         expect(await screen.findByText(PDF_FILES_SECTION_TEXT.DROPZONE.ERROR_UPLOAD_FAILED)).toBeInTheDocument();
         expect(mockOnUploaded).not.toHaveBeenCalled();
     });
+
+    it('should set dragging state on dragOver and remove on dragLeave', () => {
+        setup();
+        const label = screen.getByText(PDF_FILES_SECTION_TEXT.DROPZONE.TITLE).closest('label')!;
+
+        fireEvent.dragOver(label);
+        expect(label.className).toContain('dragging');
+
+        fireEvent.dragLeave(label);
+        expect(label.className).not.toContain('dragging');
+    });
+
+    it('should not handle drop when no file is present', async () => {
+        setup();
+        const label = screen.getByText(PDF_FILES_SECTION_TEXT.DROPZONE.TITLE).closest('label')!;
+
+        fireEvent.drop(label, { dataTransfer: { files: [] } });
+
+        await waitFor(() => {
+            expect(PdfReportsApi.create).not.toHaveBeenCalled();
+        });
+    });
 });

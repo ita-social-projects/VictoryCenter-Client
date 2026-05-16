@@ -23,9 +23,9 @@ import { updateFundsAmounts } from '@/utils/functions/update-funds-amounts/updat
 import { parseAmount } from '@/utils/functions/parse-amount/parse-amount';
 import { isUsdAmountMismatch } from '@/utils/functions/validate-usd-amount-mismatch/validate-usd-amount-mismatch';
 import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
-import { FundsRecordActions } from '@/pages/admin/reports/components/funds-expenditures-section/components/common/funds-record-actions/FundsRecordActions';
 import cn from 'classnames';
 import styles from './FundsExpendituresTable.module.scss';
+import { Button } from '@/components/admin/button/Button';
 
 export interface EnrichedRecord extends ReportFundsExpendituresRecord {
     categoryName: string;
@@ -46,16 +46,17 @@ interface FundsExpendituresTableProps {
     allRecordsForTypeInference?: ReportFundsExpendituresRecord[];
     isEditing?: boolean;
     isRowActionsDisabled?: boolean;
-    isAddIncomeDisabled?: boolean;
-    isAddExpenseDisabled?: boolean;
-    onAddIncome?: () => void;
-    onAddExpense?: () => void;
     onRowEditModeChange?: (isEditMode: boolean) => void;
     onRecordSave?: (
         recordId: number,
         data: { categoryId: number; amountUah: string; amountUsd: string },
     ) => boolean | Promise<boolean>;
     onDeleteRecord?: (record: EnrichedRecord) => void;
+    selectedRecordIds?: number[];
+    eligibleRecordIds?: number[];
+    onToggleRecordSelection?: (id: number) => void;
+    onSelectAllToggle?: (checked: boolean) => void;
+    onOpenBulkDelete?: () => void;
 }
 
 interface RowEditState {
@@ -151,19 +152,21 @@ export const FundsExpendituresTable = ({
     allRecordsForTypeInference,
     isEditing = false,
     isRowActionsDisabled = false,
-    isAddIncomeDisabled = false,
-    isAddExpenseDisabled = false,
-    onAddIncome,
-    onAddExpense,
     onRowEditModeChange,
     onRecordSave,
     onDeleteRecord,
+    selectedRecordIds,
+    eligibleRecordIds,
+    onToggleRecordSelection,
+    onSelectAllToggle,
+    onOpenBulkDelete,
 }: FundsExpendituresTableProps) => {
     const [sort, setSort] = useState<ColumnSort>({ column: null, direction: null });
     const [rowEditState, setRowEditState] = useState<RowEditState | null>(null);
     const [savingRecordId, setSavingRecordId] = useState<number | null>(null);
     const [isMoveToTopVisible, setIsMoveToTopVisible] = useState(false);
     const tableWrapperRef = useRef<HTMLDivElement>(null);
+    const headerCheckboxRef = useRef<HTMLInputElement | null>(null);
 
     const typeInferenceSource = allRecordsForTypeInference ?? records;
 
@@ -377,13 +380,15 @@ export const FundsExpendituresTable = ({
             const finalError = getRowEditValidationError(record, rowEditState.categoryId, 'blur');
             const isCategoryUnchanged = rowEditState.categoryId === rowEditState.originalCategoryId;
             const isCategoryMissing = rowEditState.categoryId === undefined;
-            const normalizedAmountUah = normalizeFundsExpendituresAmountInput(rowEditState.amountUah, true);
-            const normalizedAmountUsd = normalizeFundsExpendituresAmountInput(rowEditState.amountUsd, true);
-            const amountUahError = validateFundsExpendituresAmount(normalizedAmountUah, 'save');
-            const amountUsdError = validateFundsExpendituresAmount(normalizedAmountUsd, 'save');
+            const preparedAmountUah = rowEditState.amountUah.trim();
+            const preparedAmountUsd = rowEditState.amountUsd.trim();
+            const amountUahError = validateFundsExpendituresAmount(preparedAmountUah, 'save');
+            const amountUsdError = validateFundsExpendituresAmount(preparedAmountUsd, 'save');
             const isAmountsUnchanged =
-                normalizeFundsExpendituresAmountInput(rowEditState.originalAmountUah, true) === normalizedAmountUah &&
-                normalizeFundsExpendituresAmountInput(rowEditState.originalAmountUsd, true) === normalizedAmountUsd;
+                normalizeFundsExpendituresAmountInput(rowEditState.originalAmountUah, true) ===
+                    normalizeFundsExpendituresAmountInput(preparedAmountUah, true) &&
+                normalizeFundsExpendituresAmountInput(rowEditState.originalAmountUsd, true) ===
+                    normalizeFundsExpendituresAmountInput(preparedAmountUsd, true);
 
             if (
                 finalError ||
@@ -399,8 +404,8 @@ export const FundsExpendituresTable = ({
 
                     return {
                         ...prev,
-                        amountUah: normalizedAmountUah,
-                        amountUsd: normalizedAmountUsd,
+                        amountUah: preparedAmountUah,
+                        amountUsd: preparedAmountUsd,
                         errors: {
                             ...prev.errors,
                             category: finalError,
@@ -423,8 +428,8 @@ export const FundsExpendituresTable = ({
             try {
                 const isSaved = await onRecordSave?.(record.id, {
                     categoryId: nextCategoryId,
-                    amountUah: normalizedAmountUah,
-                    amountUsd: normalizedAmountUsd,
+                    amountUah: preparedAmountUah,
+                    amountUsd: preparedAmountUsd,
                 });
 
                 if (isSaved === false) {
@@ -471,8 +476,38 @@ export const FundsExpendituresTable = ({
     const sortedRecords = sortRecords(records, sort);
     const colSpan = isEditing ? 7 : 5;
 
+    const eligibleIds = eligibleRecordIds ?? [];
+    const selectedIds = selectedRecordIds ?? [];
+    const allEligibleSelected = eligibleIds.length > 0 && eligibleIds.every((id) => selectedIds.includes(id));
+    const someEligibleSelected = eligibleIds.some((id) => selectedIds.includes(id));
+
+    useEffect(() => {
+        if (!headerCheckboxRef.current) return;
+        headerCheckboxRef.current.indeterminate = !allEligibleSelected && someEligibleSelected;
+    }, [allEligibleSelected, someEligibleSelected]);
+
     return (
         <div className={styles['table-container']}>
+            <div
+                className={cn(styles['selection-row'], {
+                    [styles['selection-row-hidden']]: selectedIds.length === 0,
+                })}
+                data-testid="table-selection-summary"
+                aria-hidden={selectedIds.length === 0}
+            >
+                <div className={styles['selection-pill']}>
+                    {FUNDS_EXPENDITURES_TEXT.BULK.getSelectedLabel(selectedIds.length, records.length)}
+                </div>
+                <div className={styles['selection-actions']}>
+                    <Button
+                        buttonStyle="secondary"
+                        className={styles['delete-selected-button']}
+                        onClick={() => onOpenBulkDelete?.()}
+                    >
+                        {FUNDS_EXPENDITURES_TEXT.BULK.DELETE_BUTTON}
+                    </Button>
+                </div>
+            </div>
             <div
                 ref={tableWrapperRef}
                 className={styles['table-wrapper']}
@@ -483,7 +518,18 @@ export const FundsExpendituresTable = ({
                 <table className={styles.table}>
                     <thead>
                         <tr>
-                            {isEditing && <th className={cn(styles.th, styles['checkbox-th'])} />}
+                            {isEditing && (
+                                <th className={cn(styles.th, styles['checkbox-th'])}>
+                                    <input
+                                        type="checkbox"
+                                        ref={headerCheckboxRef}
+                                        className={styles['header-checkbox']}
+                                        aria-label="Select all records"
+                                        checked={allEligibleSelected}
+                                        onChange={(e) => onSelectAllToggle?.(e.target.checked)}
+                                    />
+                                </th>
+                            )}
                             <th className={styles.th}>{FUNDS_EXPENDITURES_TEXT.TABLE.COLUMNS.REPORTING_YEAR}</th>
                             <th
                                 className={cn(styles.th, styles.sortable, {
@@ -533,7 +579,7 @@ export const FundsExpendituresTable = ({
                         </tr>
                     </thead>
                     <tbody>
-                        {sortedRecords.length === 0 ? (
+                        {sortedRecords.length === 0 && isEditing ? (
                             <tr>
                                 <td
                                     colSpan={colSpan}
@@ -542,28 +588,9 @@ export const FundsExpendituresTable = ({
                                 >
                                     <div className={styles['empty-state']}>
                                         <NotFoundIcon className={styles['empty-state-image']} />
-                                        {isEditing ? (
-                                            <p className={styles['empty-state-message']}>
-                                                {FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.MESSAGE}
-                                            </p>
-                                        ) : (
-                                            <>
-                                                <p className={styles['empty-state-title']}>
-                                                    {FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.TITLE}
-                                                </p>
-                                                <p className={styles['empty-state-message']}>
-                                                    {FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.ADD_RECORD}
-                                                </p>
-                                                <FundsRecordActions
-                                                    className={styles['empty-state-actions']}
-                                                    testId="empty-state-actions"
-                                                    isAddExpenseDisabled={isAddExpenseDisabled}
-                                                    isAddIncomeDisabled={isAddIncomeDisabled}
-                                                    onAddExpense={onAddExpense}
-                                                    onAddIncome={onAddIncome}
-                                                />
-                                            </>
-                                        )}
+                                        <p className={styles['empty-state-message']}>
+                                            {FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.MESSAGE}
+                                        </p>
                                     </div>
                                 </td>
                             </tr>
@@ -585,6 +612,8 @@ export const FundsExpendituresTable = ({
                                                     className={styles['row-checkbox']}
                                                     aria-label={`Select record ${record.id}`}
                                                     disabled={isAnyRowEditing}
+                                                    checked={selectedIds.includes(record.id)}
+                                                    onChange={() => onToggleRecordSelection?.(record.id)}
                                                 />
                                             </td>
                                         )}

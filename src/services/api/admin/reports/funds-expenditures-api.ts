@@ -163,4 +163,12 @@ export const FundsExpendituresApi = {
 
         return response.data;
     },
+    bulkDeleteRecords: async (client: AxiosInstance, ids: number[]): Promise<number[]> => {
+        const response = await client.post<number[]>(
+            `${API_ROUTES.REPORTS.FUNDS_EXPENDITURES.RECORDS}/bulk-delete`,
+            ids,
+        );
+
+        return response.data;
+    },
 };

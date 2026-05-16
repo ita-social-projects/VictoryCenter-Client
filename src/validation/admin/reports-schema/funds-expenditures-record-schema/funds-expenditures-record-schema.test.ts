@@ -16,6 +16,14 @@ describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
         it('should trim trailing spaces when trimEnd is true', () => {
             expect(normalizeFundsExpendituresAmountInput('   1 200   ', true)).toBe('1 200');
         });
+
+        it('should convert dot separator to comma', () => {
+            expect(normalizeFundsExpendituresAmountInput('1200.5')).toBe('1200,5');
+        });
+
+        it('should keep only first two digits after comma', () => {
+            expect(normalizeFundsExpendituresAmountInput('1200,5678')).toBe('1200,56');
+        });
     });
 
     describe('validateFundsExpendituresAmount', () => {
@@ -61,6 +69,14 @@ describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
 
         it('should pass valid value with comma decimals', () => {
             expect(validateFundsExpendituresAmount('1 200,50', 'save')).toBeUndefined();
+        });
+
+        it('should not return an error when user types more than two decimal digits', () => {
+            expect(validateFundsExpendituresAmount('1 200,123', 'change')).toBeUndefined();
+        });
+
+        it('should support dot input by normalizing it to comma', () => {
+            expect(validateFundsExpendituresAmount('1 200.50', 'save')).toBeUndefined();
         });
     });
 

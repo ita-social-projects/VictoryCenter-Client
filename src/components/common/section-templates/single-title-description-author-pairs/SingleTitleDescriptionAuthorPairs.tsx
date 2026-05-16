@@ -78,11 +78,10 @@ export const SingleTitleDescriptionAuthorPairs = ({
 
     const handleTitleChange = useCallback(
         (value: string) => {
-            const uppercasedTitle = value.toUpperCase();
-            onTitleChange?.(uppercasedTitle);
+            onTitleChange?.(value);
 
             if (titleError !== undefined) {
-                setTitleError(validate(uppercasedTitle, ContentType.Title));
+                setTitleError(validate(value, ContentType.Title));
             }
         },
         [onTitleChange, titleError, validate],

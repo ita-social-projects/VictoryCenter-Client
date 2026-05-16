@@ -8,11 +8,23 @@ import {
 describe('funds-expenditures-exchange-rate-schema', () => {
     describe('normalizeFundsExpendituresExchangeRateInput', () => {
         it('removes spaces from input', () => {
-            expect(normalizeFundsExpendituresExchangeRateInput(' 4 2. 1 2 ')).toBe('42.12');
+            expect(normalizeFundsExpendituresExchangeRateInput(' 4 2. 1 2 ')).toBe('42,12');
         });
 
         it('trims value when trimEnd is true', () => {
-            expect(normalizeFundsExpendituresExchangeRateInput(' 42.12 ', true)).toBe('42.12');
+            expect(normalizeFundsExpendituresExchangeRateInput(' 42.12 ', true)).toBe('42,12');
+        });
+
+        it('converts dot decimal separator to comma', () => {
+            expect(normalizeFundsExpendituresExchangeRateInput('42.123456')).toBe('42,123456');
+        });
+
+        it('passes through comma decimal separator unchanged', () => {
+            expect(normalizeFundsExpendituresExchangeRateInput('42,123456')).toBe('42,123456');
+        });
+
+        it('collapses multiple commas keeping only the first', () => {
+            expect(normalizeFundsExpendituresExchangeRateInput('42,12,34')).toBe('42,1234');
         });
     });
 

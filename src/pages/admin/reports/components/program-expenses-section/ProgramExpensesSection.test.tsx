@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ProgramExpensesSection } from './ProgramExpensesSection';
 import { FUNDS_EXPENDITURES_TEXT, PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
@@ -84,6 +84,14 @@ jest.mock('@/assets/icons/not-found.svg', () => ({
 
 jest.mock('@/assets/icons/plus.svg', () => ({
     ReactComponent: () => <svg data-testid="plus-icon" />,
+}));
+
+jest.mock('./components/common/add-program-expense-record-modal/AddProgramExpenseRecordModal', () => ({
+    AddProgramExpenseRecordModal: ({ isOpen, exchangeRate }: { isOpen: boolean; exchangeRate: string | null }) => (
+        <div data-testid="add-program-expense-modal" data-open={String(isOpen)} data-exchange-rate={exchangeRate ?? ''}>
+            AddProgramExpenseRecordModal
+        </div>
+    ),
 }));
 
 jest.mock('@/components/admin/multi-select-input/MultiSelectInput', () => ({
@@ -227,6 +235,32 @@ describe('ProgramExpensesSection', () => {
         expect(within(table).getByText('Program B')).toBeInTheDocument();
     });
 
+    it('should drop selected program ids that are no longer present in programs data', async () => {
+        const { rerender } = render(<ProgramExpensesSection />);
+
+        fireEvent.change(screen.getByTestId('program-select'), {
+            target: { value: '2' },
+        });
+
+        expect(within(screen.getByRole('table')).getByText('Program B')).toBeInTheDocument();
+
+        mockUseDataFetchResult = {
+            data: {
+                ...MOCK_PROGRAM_EXPENSES_DATA,
+                programs: MOCK_PROGRAM_EXPENSES_DATA.programs.filter((program) => program.id !== 2),
+                records: MOCK_PROGRAM_EXPENSES_DATA.records.filter((record) => record.programId !== 2),
+            },
+            isLoading: false,
+        };
+
+        rerender(<ProgramExpensesSection />);
+
+        await waitFor(() => {
+            expect(within(screen.getByRole('table')).getAllByText('Program A')).toHaveLength(2);
+        });
+        expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.MESSAGE)).not.toBeInTheDocument();
+    });
+
     it('should render filtered empty state when selected program has no matching records', () => {
         render(<ProgramExpensesSection />);
 
@@ -246,7 +280,7 @@ describe('ProgramExpensesSection', () => {
 
         expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.TITLE)).toBeInTheDocument();
         expect(screen.getByText(PROGRAM_EXPENSES_TEXT.EMPTY_STATE.ADD_RECORD)).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE })).toBeEnabled();
+        expect(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE })).toBeDisabled();
     });
 
     it('should pass fetch handler that calls ProgramExpensesApi.getReadOnlyData', async () => {
@@ -264,5 +298,45 @@ describe('ProgramExpensesSection', () => {
         expect(mockGetReadOnlyData).toHaveBeenCalledWith({});
         expect(ProgramExpensesApi.getReadOnlyData).toBeDefined();
         expect(mockGetReadOnlyData).toHaveBeenCalledWith({ test: true });
+    });
+
+    it('should render edit mode controls when edit mode is active', () => {
+        render(<ProgramExpensesSection isEditing />);
+
+        expect(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE })).toBeEnabled();
+        expect(screen.getByRole('checkbox', { name: 'Select all program expense records' })).toBeEnabled();
+        expect(screen.getByText(PROGRAM_EXPENSES_TEXT.TABLE.COLUMNS.ACTIONS)).toBeInTheDocument();
+    });
+
+    it('should display mock exchange rate in edit mode', () => {
+        render(<ProgramExpensesSection isEditing />);
+
+        expect(screen.getByText('41.25')).toBeInTheDocument();
+        expect(screen.getByTestId('add-program-expense-modal')).toHaveAttribute('data-exchange-rate', '41.25');
+    });
+
+    it('should disable add program expense button when four records exist', () => {
+        mockUseDataFetchResult = {
+            data: {
+                ...MOCK_PROGRAM_EXPENSES_DATA,
+                records: [
+                    ...MOCK_PROGRAM_EXPENSES_DATA.records,
+                    {
+                        id: 4,
+                        programId: 3,
+                        programName: 'Program C',
+                        type: 'expense',
+                        reportingYear: '2025',
+                        amountUah: '100',
+                        amountUsd: '10',
+                    },
+                ],
+            },
+            isLoading: false,
+        };
+
+        render(<ProgramExpensesSection isEditing />);
+
+        expect(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE })).toBeDisabled();
     });
 });

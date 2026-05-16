@@ -2,6 +2,8 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { FundingSourcesChart } from './FundingSourcesChart';
 
+const defaultFormatAmount = (amount: number) => `${amount.toLocaleString('uk-UA')} грн`;
+
 describe('FundingSourcesChart', () => {
     const mockItems = [
         { label: 'Source A', amount: 100 },
@@ -10,7 +12,7 @@ describe('FundingSourcesChart', () => {
     ];
 
     it('renders title', () => {
-        render(<FundingSourcesChart items={mockItems} />);
+        render(<FundingSourcesChart items={mockItems} formatAmount={defaultFormatAmount} />);
         expect(screen.getByText('Звідки прийшли кошти')).toBeInTheDocument();
     });
 
@@ -19,7 +21,7 @@ describe('FundingSourcesChart', () => {
             { label: 'Grant', amount: 20000 },
             { label: 'Donation', amount: 5000 },
         ];
-        render(<FundingSourcesChart items={items} />);
+        render(<FundingSourcesChart items={items} formatAmount={defaultFormatAmount} />);
 
         expect(screen.getByText('Grant')).toBeInTheDocument();
         expect(screen.getByText(/20\s+000\s+грн/)).toBeInTheDocument();
@@ -29,7 +31,7 @@ describe('FundingSourcesChart', () => {
     });
 
     it('calculates ratios correctly based on max amount', () => {
-        render(<FundingSourcesChart items={mockItems} />);
+        render(<FundingSourcesChart items={mockItems} formatAmount={defaultFormatAmount} />);
 
         const barA = screen.getByText('Source A').closest('.row')?.querySelector('.bar');
         const barB = screen.getByText('Source B').closest('.row')?.querySelector('.bar');
@@ -48,7 +50,7 @@ describe('FundingSourcesChart', () => {
             { label: '4', amount: 10 },
             { label: '5', amount: 10 },
         ];
-        render(<FundingSourcesChart items={items} />);
+        render(<FundingSourcesChart items={items} formatAmount={defaultFormatAmount} />);
 
         const getBar = (label: string) => screen.getByText(label).closest('.row')?.querySelector('.bar');
 
@@ -61,7 +63,7 @@ describe('FundingSourcesChart', () => {
 
     it('handles zero amounts gracefully', () => {
         const items = [{ label: 'Zero', amount: 0 }];
-        render(<FundingSourcesChart items={items} />);
+        render(<FundingSourcesChart items={items} formatAmount={defaultFormatAmount} />);
 
         expect(screen.getByText('Zero')).toBeInTheDocument();
         expect(screen.getByText(/0\s+грн/)).toBeInTheDocument();

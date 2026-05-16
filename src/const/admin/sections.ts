@@ -372,7 +372,7 @@ export const SECTION_TEMPLATE_VALIDATION = {
             [ContentType.FaqQuestion]: { min: 1, max: 10 },
         },
         lengths: {
-            [ContentType.Title]: { min: 5, max: 50 },
+            [ContentType.Title]: { min: 5, max: 60 },
         },
     },
 } as const;

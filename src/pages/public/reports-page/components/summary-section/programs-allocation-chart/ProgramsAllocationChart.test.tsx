@@ -2,6 +2,8 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { ProgramsAllocationChart } from './ProgramsAllocationChart';
 
+const defaultFormatAmount = (amount: number) => `${amount.toLocaleString('uk-UA')} грн`;
+
 describe('ProgramsAllocationChart', () => {
     const defaultItems = [
         { label: 'Program A', amount: 1000 },
@@ -9,18 +11,18 @@ describe('ProgramsAllocationChart', () => {
     ];
 
     it('renders title', () => {
-        render(<ProgramsAllocationChart items={defaultItems} />);
+        render(<ProgramsAllocationChart items={defaultItems} formatAmount={defaultFormatAmount} />);
         expect(screen.getByText('Розподіл коштів по програмах')).toBeInTheDocument();
     });
 
     it('renders labels and formatted amounts for 2 items', () => {
-        render(<ProgramsAllocationChart items={defaultItems} />);
+        render(<ProgramsAllocationChart items={defaultItems} formatAmount={defaultFormatAmount} />);
 
         expect(screen.getByText('Program A')).toBeInTheDocument();
         expect(screen.getByText(/1\s+000/)).toBeInTheDocument();
         expect(screen.getByText('Program B')).toBeInTheDocument();
         expect(screen.getByText(/3\s+000/)).toBeInTheDocument();
-        expect(screen.getAllByText('грн')).toHaveLength(2);
+        expect(screen.getAllByText(/ грн$/)).toHaveLength(2);
     });
 
     it('renders correctly for 3 items structure', () => {
@@ -29,7 +31,7 @@ describe('ProgramsAllocationChart', () => {
             { label: 'B', amount: 200 },
             { label: 'C', amount: 300 },
         ];
-        render(<ProgramsAllocationChart items={items} />);
+        render(<ProgramsAllocationChart items={items} formatAmount={defaultFormatAmount} />);
 
         expect(screen.getByText('A')).toBeInTheDocument();
         expect(screen.getByText('B')).toBeInTheDocument();
@@ -41,13 +43,13 @@ describe('ProgramsAllocationChart', () => {
             { label: 'Large', amount: 1234567 },
             { label: 'Small', amount: 1 },
         ];
-        render(<ProgramsAllocationChart items={items} />);
+        render(<ProgramsAllocationChart items={items} formatAmount={defaultFormatAmount} />);
 
         expect(screen.getByText(/1\s+234\s+567/)).toBeInTheDocument();
     });
 
     it('renders correctly for 1 item structure', () => {
-        render(<ProgramsAllocationChart items={[{ label: 'Solo', amount: 100 }]} />);
+        render(<ProgramsAllocationChart items={[{ label: 'Solo', amount: 100 }]} formatAmount={defaultFormatAmount} />);
 
         expect(screen.getByText('Розподіл коштів по програмах')).toBeInTheDocument();
 
@@ -64,7 +66,7 @@ describe('ProgramsAllocationChart', () => {
             { label: 'E', amount: 1 },
         ];
 
-        render(<ProgramsAllocationChart items={items} />);
+        render(<ProgramsAllocationChart items={items} formatAmount={defaultFormatAmount} />);
 
         expect(screen.getByText('Розподіл коштів по програмах')).toBeInTheDocument();
 

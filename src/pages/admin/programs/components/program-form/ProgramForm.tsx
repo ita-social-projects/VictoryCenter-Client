@@ -71,7 +71,7 @@ export interface ProgramFormProps {
     selectedLanguage?: string;
     onLanguageChange?: (language: string) => void;
     onRequestCancelSection?: (request: { type: SectionCancelActionType; onDiscard: () => void }) => void;
-    onRequestSaveSection?: (request: { onConfirm: () => void }) => void;
+    onRequestSaveSection?: (request: { onConfirm: () => void; onDecline?: () => void }) => void;
 }
 
 interface SectionEditingState {
@@ -341,7 +341,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                 setFormState((prev) => {
                     const updatedSections = [...prev.sections];
                     [updatedSections[idx - 1], updatedSections[idx]] = [updatedSections[idx], updatedSections[idx - 1]];
-                    return { ...prev, sections: updatedSections };
+                    return { ...prev, sections: updatedSections.map((s, i) => ({ ...s, order: i })) };
                 });
 
                 setSectionStates((prev) => {
@@ -368,7 +368,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                 setFormState((prev) => {
                     const updatedSections = [...prev.sections];
                     [updatedSections[idx + 1], updatedSections[idx]] = [updatedSections[idx], updatedSections[idx + 1]];
-                    return { ...prev, sections: updatedSections };
+                    return { ...prev, sections: updatedSections.map((s, i) => ({ ...s, order: i })) };
                 });
 
                 setSectionStates((prev) => {

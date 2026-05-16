@@ -9,6 +9,7 @@
     &__tooltip {
         display: inline-block;
         white-space: normal;
-        word-break: break-word;
+        overflow-wrap: anywhere;
+        word-break: normal;
     }
 }

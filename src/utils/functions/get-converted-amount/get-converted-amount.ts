@@ -1,4 +1,5 @@
 import { parseAmount } from '@/utils/functions/parse-amount/parse-amount';
+import { formatNumberDecimalComma } from '@/utils/functions/formatters/format-number';
 
 const roundUpToTwoDecimals = (value: number): number => Math.ceil(value * 100) / 100;
 
@@ -18,5 +19,5 @@ export const getConvertedAmount = (value: string, exchangeRate: string | null | 
 
     const roundedConvertedAmount = roundUpToTwoDecimals(convertedAmount);
 
-    return Number.isFinite(roundedConvertedAmount) ? String(roundedConvertedAmount) : null;
+    return Number.isFinite(roundedConvertedAmount) ? formatNumberDecimalComma(roundedConvertedAmount) : null;
 };

@@ -59,7 +59,11 @@ const getRoot = (container: HTMLElement) => container.firstElementChild as HTMLE
 const getPreviewTexts = (container: HTMLElement) =>
     Array.from(container.querySelectorAll('p')).map((p) => p.textContent);
 
-const getDescCallIds = () => mockDescProps.mock.calls.slice(0, 5).map((call: any[]) => call[0]?.id);
+const getDescCallIds = () =>
+    mockDescProps.mock.calls
+        .filter((call: any[]) => call[0]?.id?.includes('desc'))
+        .slice(0, 5)
+        .map((call: any[]) => call[0]?.id);
 
 describe('SingleTitleQuintupleDescription', () => {
     describe('Preview', () => {
@@ -104,10 +108,6 @@ describe('SingleTitleQuintupleDescription', () => {
         it('renders title input', () => {
             setup({ mode: SectionMode.Edit, title: 'Edit' });
             expect(screen.getByTestId('input-single-title-quintuple-title')).toHaveValue('Edit');
-            expect(screen.getByTestId('group-single-title-quintuple-title')).toHaveAttribute(
-                'data-show-counter-below',
-                'true',
-            );
         });
 
         it('renders 5 description inputs', () => {

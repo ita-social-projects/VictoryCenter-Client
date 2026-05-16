@@ -3,6 +3,7 @@ import { CategoryBar } from '@/components/admin/category-bar/CategoryBar';
 import { PageLoader } from '@/components/common/page-loader/PageLoader';
 import { TitleBlockForm } from '../title-block/TitleBlockForm';
 import { AboutUsBlockForm } from '../about-us-block/AboutUsBlockForm';
+import { StatisticsBlockForm } from '../statistics-block/StatisticsBlockForm';
 import { MAIN_PAGE_TEXT } from '@/const/admin/main-page';
 import { MainPage } from '@/types/admin/main-page';
 import { MOCK_MAIN_PAGE_DATA } from '@/utils/mock-data/admin/main-page/main-page';
@@ -77,7 +78,7 @@ export const MainPageContent = () => {
             <div className={styles['main-content']}>
                 {activeTab === 'title' && <TitleBlockForm initialData={data} />}
                 {activeTab === 'about' && <AboutUsBlockForm initialData={data} />}
-                {activeTab === 'statistics' && <div>Блок "{MAIN_PAGE_TEXT.TABS.STATISTICS}" в розробці</div>}
+                {activeTab === 'statistics' && <StatisticsBlockForm />}
                 {activeTab === 'donations' && <div>Блок "{MAIN_PAGE_TEXT.TABS.DONATIONS}" в розробці</div>}
                 {activeTab === 'partners' && <div>Блок "{MAIN_PAGE_TEXT.TABS.PARTNERS}" в розробці</div>}
             </div>

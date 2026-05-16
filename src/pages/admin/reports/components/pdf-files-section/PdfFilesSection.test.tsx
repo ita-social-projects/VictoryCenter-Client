@@ -13,21 +13,30 @@ jest.mock('@/services/api/admin/reports/pdf-section/pdf-section-api');
 jest.mock('@/services/api/admin/reports/pdf-reports/pdf-reports-api');
 jest.mock('@/hooks/common/use-data-fetch/useDataFetch');
 jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider');
+jest.mock('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit');
 
 jest.mock('./components/pdf-section-content-block/PdfSectionContentBlock', () => ({
-    PdfSectionContentBlock: () => <div data-testid="content-block">ContentBlock</div>,
+    PdfSectionContentBlock: ({ onAfterSave }: any) => (
+        <button data-testid="content-block" onClick={onAfterSave}>
+            ContentBlock
+        </button>
+    ),
 }));
 
 jest.mock('./components/pdf-files-table/PdfFilesTable', () => ({
-    PdfFilesTable: ({ files, onDeleteFile, onViewFile, isDeleting }: any) => (
+    PdfFilesTable: ({ files, onDeleteFile, onViewFile, onRenameFile, isDeleting, isRenaming }: any) => (
         <div data-testid="files-table">
             Files Count: {files?.length ?? 0}
             {isDeleting && <span data-testid="is-deleting">Deleting...</span>}
+            {isRenaming && <span data-testid="is-renaming">Renaming...</span>}
             <button onClick={() => onDeleteFile && onDeleteFile(1)} data-testid="delete-btn">
                 Delete
             </button>
             <button onClick={() => onViewFile && onViewFile(files?.[0])} data-testid="view-btn">
                 View
+            </button>
+            <button onClick={() => onRenameFile && onRenameFile(1, 'New Name')} data-testid="rename-btn">
+                Rename
             </button>
         </div>
     ),
@@ -38,7 +47,16 @@ jest.mock('./components/language-switcher-buttons/LanguageSwitcherButtons', () =
 }));
 
 jest.mock('./components/pdf-dropzone/PdfDropzone', () => ({
-    PdfDropzone: () => <div data-testid="dropzone">Dropzone</div>,
+    PdfDropzone: ({ onUploaded }: any) => (
+        <button
+            data-testid="dropzone"
+            onClick={() =>
+                onUploaded({ id: 99, name: 'Uploaded.pdf', createdAt: '', fileSizeBytes: 0, blobName: '', priority: 0 })
+            }
+        >
+            Dropzone
+        </button>
+    ),
 }));
 
 jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
@@ -48,7 +66,7 @@ jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
 describe('PdfFilesSection', () => {
     const mockClient = { get: jest.fn() };
     const mockAddToast = jest.fn();
-    const mockSectionData = { title: 'Test Title', description: 'Test Desc' };
+    const mockSectionData = { title: 'Test Title', description: 'Test Desc', localizations: [] };
     const mockFilesResponse = { items: [{ id: 1 }, { id: 2 }], totalItemsCount: 2 };
     const mockRefetch = jest.fn();
     const mockCreateObjectURL = jest.fn(() => 'blob:http://localhost/mock-blob-url');
@@ -64,6 +82,8 @@ describe('PdfFilesSection', () => {
         global.window.open = mockWindowOpen as any;
         (useAdminClient as jest.Mock).mockReturnValue(mockClient);
         (useToast as jest.Mock).mockReturnValue({ addToast: mockAddToast });
+        const { useLocalizationToolkit } = require('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit');
+        (useLocalizationToolkit as jest.Mock).mockReturnValue({ translationLanguages: [] });
         mockCreateObjectURL.mockReturnValue('blob:http://localhost/mock-blob-url');
     });
 
@@ -71,6 +91,7 @@ describe('PdfFilesSection', () => {
         global.URL.createObjectURL = originalCreateObjectURL;
         global.window.open = originalWindowOpen;
         jest.restoreAllMocks();
+        jest.useRealTimers();
     });
 
     it('should show loader when section or files are loading', () => {
@@ -222,5 +243,134 @@ describe('PdfFilesSection', () => {
         await waitFor(() => {
             expect(mockAddToast).toHaveBeenCalledWith(PDF_FILES_SECTION_TEXT.VIEW_ERROR, ToastType.Error);
         });
+    });
+
+    it('should call rename API and refetch files on success', async () => {
+        const updatedFile = { id: 1, name: 'New Name' };
+        let callCount = 0;
+        (useDataFetch as jest.Mock).mockImplementation(() => {
+            callCount++;
+            if (callCount === 1) return { data: mockSectionData, isLoading: false, refetch: mockRefetch };
+            return { data: mockFilesResponse.items, isLoading: false, refetch: mockRefetch };
+        });
+
+        (PdfReportsApi.rename as jest.Mock).mockResolvedValueOnce(updatedFile);
+
+        render(<PdfFilesSection />);
+
+        fireEvent.click(screen.getByTestId('rename-btn'));
+
+        await waitFor(() => {
+            expect(PdfReportsApi.rename).toHaveBeenCalledWith(mockClient, 1, 'New Name');
+            expect(mockAddToast).toHaveBeenCalledWith(PDF_FILES_SECTION_TEXT.RENAME_SUCCESS, ToastType.Success);
+            expect(mockRefetch).toHaveBeenCalled();
+        });
+    });
+
+    it('should show error toast when rename fails', async () => {
+        let callCount = 0;
+        (useDataFetch as jest.Mock).mockImplementation(() => {
+            callCount++;
+            if (callCount === 1) return { data: mockSectionData, isLoading: false, refetch: mockRefetch };
+            return { data: mockFilesResponse.items, isLoading: false, refetch: mockRefetch };
+        });
+
+        (PdfReportsApi.rename as jest.Mock).mockRejectedValueOnce(new Error('Rename failed'));
+
+        render(<PdfFilesSection />);
+
+        fireEvent.click(screen.getByTestId('rename-btn'));
+
+        await waitFor(() => {
+            expect(mockAddToast).toHaveBeenCalledWith(PDF_FILES_SECTION_TEXT.RENAME_ERROR, ToastType.Error);
+        });
+    });
+
+    it('should show isRenaming indicator while rename is in progress', async () => {
+        let callCount = 0;
+        (useDataFetch as jest.Mock).mockImplementation(() => {
+            callCount++;
+            if (callCount === 1) return { data: mockSectionData, isLoading: false, refetch: mockRefetch };
+            return { data: mockFilesResponse.items, isLoading: false, refetch: mockRefetch };
+        });
+
+        let resolveRename: (value: any) => void;
+        (PdfReportsApi.rename as jest.Mock).mockReturnValueOnce(
+            new Promise((resolve) => {
+                resolveRename = resolve;
+            }),
+        );
+
+        render(<PdfFilesSection />);
+
+        fireEvent.click(screen.getByTestId('rename-btn'));
+
+        await waitFor(() => {
+            expect(screen.getByTestId('is-renaming')).toBeInTheDocument();
+        });
+
+        resolveRename!({ id: 1, name: 'New Name' });
+
+        await waitFor(() => {
+            expect(screen.queryByTestId('is-renaming')).not.toBeInTheDocument();
+        });
+    });
+
+    it('should add uploaded file to the list', async () => {
+        let callCount = 0;
+        (useDataFetch as jest.Mock).mockImplementation(() => {
+            callCount++;
+            if (callCount === 1) return { data: mockSectionData, isLoading: false, refetch: mockRefetch };
+            return { data: [], isLoading: false, refetch: mockRefetch };
+        });
+
+        render(<PdfFilesSection />);
+
+        expect(screen.getByTestId('files-table')).toHaveTextContent('Files Count: 0');
+        fireEvent.click(screen.getByTestId('dropzone'));
+        expect(screen.getByTestId('files-table')).toHaveTextContent('Files Count: 1');
+    });
+
+    it('should refetch section on save', async () => {
+        let callCount = 0;
+        (useDataFetch as jest.Mock).mockImplementation(() => {
+            callCount++;
+            if (callCount === 1) return { data: mockSectionData, isLoading: false, refetch: mockRefetch };
+            return { data: [], isLoading: false, refetch: mockRefetch };
+        });
+
+        render(<PdfFilesSection />);
+        fireEvent.click(screen.getByTestId('content-block'));
+
+        await waitFor(() => {
+            expect(mockRefetch).toHaveBeenCalled();
+        });
+    });
+
+    it('should revoke object URL after opening PDF', async () => {
+        jest.useFakeTimers();
+        const mockPdfBlob = new Blob(['PDF content'], { type: 'application/pdf' });
+        mockWindowOpen.mockReturnValueOnce({}); // openedWindow є об'єктом (truthy)
+
+        let callCount = 0;
+        (useDataFetch as jest.Mock).mockImplementation(() => {
+            callCount++;
+            if (callCount === 1) return { data: mockSectionData, isLoading: false, refetch: mockRefetch };
+            return { data: mockFilesResponse.items, isLoading: false, refetch: mockRefetch };
+        });
+
+        (PdfReportsApi.fetchById as jest.Mock).mockResolvedValueOnce(mockPdfBlob);
+        const mockRevokeObjectURL = jest.fn();
+        global.URL.revokeObjectURL = mockRevokeObjectURL;
+
+        render(<PdfFilesSection />);
+        fireEvent.click(screen.getByTestId('view-btn'));
+
+        await waitFor(() => {
+            expect(mockWindowOpen).toHaveBeenCalled();
+        });
+
+        jest.advanceTimersByTime(1500);
+        expect(mockRevokeObjectURL).toHaveBeenCalledWith('blob:http://localhost/mock-blob-url');
     });
 });

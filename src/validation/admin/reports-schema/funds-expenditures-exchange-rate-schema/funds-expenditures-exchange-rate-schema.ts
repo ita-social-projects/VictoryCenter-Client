@@ -5,7 +5,18 @@ export type ExchangeRateValidationTrigger = 'change' | 'blur';
 
 export const normalizeFundsExpendituresExchangeRateInput = (value: string, trimEnd = false): string => {
     const withoutSpaces = value.replaceAll(/\s+/g, '').trimStart();
-    return trimEnd ? withoutSpaces.trim() : withoutSpaces;
+    const withCommaSeparator = withoutSpaces.replaceAll('.', ',');
+    const firstCommaIndex = withCommaSeparator.indexOf(',');
+
+    if (firstCommaIndex === -1) {
+        return trimEnd ? withCommaSeparator.trim() : withCommaSeparator;
+    }
+
+    const integerPart = withCommaSeparator.slice(0, firstCommaIndex);
+    const decimalPart = withCommaSeparator.slice(firstCommaIndex + 1).replaceAll(',', '');
+    const normalized = `${integerPart},${decimalPart}`;
+
+    return trimEnd ? normalized.trim() : normalized;
 };
 
 export const validateFundsExpendituresExchangeRate = (
@@ -18,11 +29,11 @@ export const validateFundsExpendituresExchangeRate = (
         return trigger === 'blur' ? COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED : undefined;
     }
 
-    if (!/^\d+(?:[.,]\d+)?$/.test(normalized)) {
+    if (!/^\d+(?:,\d+)?$/.test(normalized)) {
         return FUNDS_EXPENDITURES_TEXT.VALIDATION.EXCHANGE_RATE_ONLY_NUMERIC;
     }
 
-    const [integerPart, decimalPart = ''] = normalized.split(/[.,]/);
+    const [integerPart, decimalPart = ''] = normalized.split(',');
     if (
         integerPart.length > FUNDS_EXPENDITURES_VALIDATION.exchangeRate.maxIntegerDigits ||
         decimalPart.length > FUNDS_EXPENDITURES_VALIDATION.exchangeRate.maxDecimalDigits

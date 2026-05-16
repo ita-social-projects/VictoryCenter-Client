@@ -8,10 +8,9 @@ import {
 import type { LocalizationLanguage } from '@/types/common/language';
 import {
     mapEntityWithLocalizations,
-    mapFormValuesToMainPagePatch,
     mapLocalizationDtoToModel,
-    mapMainPageToFormValues,
-} from './main-page-mappers';
+} from '@/utils/functions/mappers/common/localization/localization-mappers';
+import { mapFormValuesToMainPagePatch, mapMainPageToFormValues } from './main-page-mappers';
 
 describe('main-page-mappers', () => {
     const languages: LocalizationLanguage[] = [

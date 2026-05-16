@@ -26,7 +26,7 @@ export function mapEntityWithLocalizations<
 } {
     return {
         ...dto,
-        localizations: dto.localizations.map((loc) =>
+        localizations: (dto.localizations ?? []).map((loc) =>
             mapLocalizationDtoToModel<TLocalizationDto, TLocalizationModel>(loc),
         ),
     };

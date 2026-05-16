@@ -7,7 +7,7 @@ import {
     UpdateMetricVisibilityDto,
 } from '@/types/admin/main-page';
 import type { LocalizationLanguage } from '@/types/common/language';
-import { mapEntityWithLocalizations } from '@/utils/functions/mappers/admin/main-page/main-page-mappers';
+import { mapEntityWithLocalizations } from '@/utils/functions/mappers/common/localization/localization-mappers';
 import { AxiosInstance } from 'axios';
 
 const toDomainMainPage = (dto: MainPageDto): MainPage => {

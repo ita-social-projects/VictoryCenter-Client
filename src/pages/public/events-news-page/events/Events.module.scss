@@ -76,6 +76,12 @@
     }
 }
 
+.show-more-button {
+    @media (min-width: 1440px) {
+        margin-top: 32px;
+    }
+}
+
 .white-button {
     @include utils.white-button;
 }

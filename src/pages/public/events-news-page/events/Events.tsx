@@ -93,7 +93,13 @@ export const Events = ({ title, tags }: EventsData) => {
                 {isLoading && <LinearProgress />}
             </div>
             {hasMore && (
-                <Button onClick={loadMore} variant="secondary-dark" iconPosition="right" icon={ArrowDownIcon}>
+                <Button
+                    onClick={loadMore}
+                    variant="secondary-dark"
+                    iconPosition="right"
+                    icon={ArrowDownIcon}
+                    className={styles['show-more-button']}
+                >
                     {t('SHOW_MORE')}
                 </Button>
             )}

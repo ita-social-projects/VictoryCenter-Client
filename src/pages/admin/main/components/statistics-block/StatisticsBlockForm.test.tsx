@@ -43,6 +43,21 @@ jest.mock('./components/statistics-metrics-list/StatisticsMetricsList', () => ({
     ),
 }));
 
+jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
+    useAdminClient: jest.fn(() => ({})),
+}));
+
+jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider', () => ({
+    useToast: () => ({ addToast: jest.fn() }),
+}));
+
+jest.mock('@/services/api/admin/main-page/main-page-api', () => ({
+    MainPageApi: {
+        updateMetricVisibility: jest.fn().mockResolvedValue(undefined),
+        reorderMetrics: jest.fn().mockResolvedValue(undefined),
+    },
+}));
+
 const mockInitialData: MainPage = {
     id: 1,
     title: 'Тест',

@@ -4,7 +4,8 @@ import { ReactComponent as EyeOpenedIcon } from '@/assets/icons/eye-opened.svg';
 import { DraggableListItem } from '@/components/admin/draggable-list-item/DraggableListItem';
 import { IconButton } from '@/components/admin/icon-button/IconButton';
 import { MAIN_PAGE_TEXT } from '@/const/admin/main-page';
-import { Metric, MetricPrefix } from '@/types/admin/main-page';
+import { Metric } from '@/types/admin/main-page';
+import { formatMetricValue, getMetricName } from '@/utils/functions/formatters/metric-formatters';
 import styles from './StatisticsMetricsList.module.scss';
 
 interface StatisticsMetricsListProps {
@@ -13,22 +14,6 @@ interface StatisticsMetricsListProps {
     onToggleVisibility: (id: number) => void;
     onReorder: (items: Metric[]) => void;
 }
-
-const getMetricName = (metric: Metric) =>
-    metric.localizations?.find((l: any) => l?.language?.code === 'uk' || l?.localizationInfoDto?.code === 'uk')?.name ??
-    metric.name;
-
-const formatMetricValue = (metric: Metric, locale: 'uk-UA' | 'en-US') => {
-    const value = metric.value.toLocaleString(locale);
-    switch (metric.prefix) {
-        case MetricPrefix.Plus:
-            return `${value}+`;
-        case MetricPrefix.Percent:
-            return `${value}%`;
-        default:
-            return value;
-    }
-};
 
 export const StatisticsMetricsList = ({
     metrics,
@@ -49,7 +34,7 @@ export const StatisticsMetricsList = ({
 
                 <div className={styles.values}>
                     <p className={`${styles.value} ${isHidden ? styles.hiddenText : ''}`}>
-                        {formatMetricValue(metric, 'uk-UA')}
+                        {formatMetricValue(metric)}
                     </p>
                 </div>
 

@@ -101,6 +101,19 @@ const FormWrapper = ({
 describe('StatisticsBlockForm', () => {
     const mockOnPublish = jest.fn();
 
+    const renderComponent = (props: Partial<React.ComponentProps<typeof StatisticsBlockForm>> = {}) => {
+        return render(
+            <FormWrapper>
+                <StatisticsBlockForm
+                    initialData={mockInitialData}
+                    isPublishDisabled={false}
+                    onPublish={mockOnPublish}
+                    {...props}
+                />
+            </FormWrapper>,
+        );
+    };
+
     beforeEach(() => {
         jest.clearAllMocks();
     });
@@ -120,30 +133,14 @@ describe('StatisticsBlockForm', () => {
     });
 
     it('enables publish button when isPublishDisabled prop is false', () => {
-        render(
-            <FormWrapper>
-                <StatisticsBlockForm
-                    initialData={mockInitialData}
-                    isPublishDisabled={false}
-                    onPublish={mockOnPublish}
-                />
-            </FormWrapper>,
-        );
+        renderComponent();
 
         const submitBtn = screen.getByTestId('submit-btn');
         expect(submitBtn).not.toBeDisabled();
     });
 
     it('disables publish when image error is set via local state', () => {
-        render(
-            <FormWrapper>
-                <StatisticsBlockForm
-                    initialData={mockInitialData}
-                    isPublishDisabled={false}
-                    onPublish={mockOnPublish}
-                />
-            </FormWrapper>,
-        );
+        renderComponent();
 
         const submitBtn = screen.getByTestId('submit-btn');
         expect(submitBtn).not.toBeDisabled();
@@ -153,15 +150,7 @@ describe('StatisticsBlockForm', () => {
     });
 
     it('updates hidden metrics state when toggling visibility', async () => {
-        render(
-            <FormWrapper>
-                <StatisticsBlockForm
-                    initialData={mockInitialData}
-                    isPublishDisabled={false}
-                    onPublish={mockOnPublish}
-                />
-            </FormWrapper>,
-        );
+        renderComponent();
 
         fireEvent.click(screen.getByTestId('toggle-first-metric'));
 
@@ -171,15 +160,7 @@ describe('StatisticsBlockForm', () => {
     });
 
     it('updates metrics order when reorder is triggered', async () => {
-        render(
-            <FormWrapper>
-                <StatisticsBlockForm
-                    initialData={mockInitialData}
-                    isPublishDisabled={false}
-                    onPublish={mockOnPublish}
-                />
-            </FormWrapper>,
-        );
+        renderComponent();
 
         fireEvent.click(screen.getByTestId('reorder-metrics'));
 
@@ -189,15 +170,7 @@ describe('StatisticsBlockForm', () => {
     });
 
     it('does not hide the last visible metric', async () => {
-        render(
-            <FormWrapper>
-                <StatisticsBlockForm
-                    initialData={mockInitialData}
-                    isPublishDisabled={false}
-                    onPublish={mockOnPublish}
-                />
-            </FormWrapper>,
-        );
+        renderComponent();
 
         fireEvent.click(screen.getByTestId('toggle-first-metric'));
         await waitFor(() => {
@@ -212,15 +185,8 @@ describe('StatisticsBlockForm', () => {
     });
 
     it('re-enables publish button after clearing image error', () => {
-        render(
-            <FormWrapper>
-                <StatisticsBlockForm
-                    initialData={mockInitialData}
-                    isPublishDisabled={false}
-                    onPublish={mockOnPublish}
-                />
-            </FormWrapper>,
-        );
+        renderComponent();
+
         fireEvent.click(screen.getByTestId('trigger-image-error'));
         expect(screen.getByTestId('submit-btn')).toBeDisabled();
         fireEvent.click(screen.getByTestId('clear-image-error'));

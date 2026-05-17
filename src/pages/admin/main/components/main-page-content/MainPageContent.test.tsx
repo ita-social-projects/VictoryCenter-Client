@@ -156,8 +156,26 @@ describe('MainPageContent', () => {
         }
     });
 
-    const waitForContentToLoad = async () => {
+    const renderAndLoadContent = async () => {
+        render(<MainPageContent />);
         expect(await screen.findByTestId('category-bar')).toBeInTheDocument();
+    };
+
+    const triggerFormDirtyAndOpenModal = async (btnPrefix = 'publish-btn') => {
+        fireEvent.click(screen.getByTestId(`${btnPrefix}-dirty`));
+        const publishBtn = screen.getByTestId(btnPrefix);
+
+        await waitFor(() => expect(publishBtn).not.toBeDisabled());
+        fireEvent.click(publishBtn);
+
+        expect(await screen.findByTestId('publish-modal')).toBeInTheDocument();
+        return publishBtn;
+    };
+
+    const confirmPublishDialog = async () => {
+        await renderAndLoadContent();
+        await triggerFormDirtyAndOpenModal();
+        fireEvent.click(screen.getByTestId('confirm-publish'));
     };
 
     it('renders loader initially while data is "fetching"', () => {
@@ -168,6 +186,7 @@ describe('MainPageContent', () => {
     it('renders error message when API throws error', async () => {
         (MainPageApi.get as jest.Mock).mockRejectedValue(new Error('Network error'));
         render(<MainPageContent />);
+
         await waitFor(() => {
             expect(MainPageApi.get).toHaveBeenCalled();
         });
@@ -175,14 +194,12 @@ describe('MainPageContent', () => {
     });
 
     it('renders TitleBlockForm as the default tab after loading', async () => {
-        render(<MainPageContent />);
-        await waitForContentToLoad();
+        await renderAndLoadContent();
         expect(screen.getByTestId('title-block-form')).toBeInTheDocument();
     });
 
     it('switches tabs correctly', async () => {
-        render(<MainPageContent />);
-        await waitForContentToLoad();
+        await renderAndLoadContent();
 
         expect(screen.getByTestId('title-block-form')).toBeInTheDocument();
         expect(screen.queryByTestId('about-us-block-form')).not.toBeInTheDocument();
@@ -202,16 +219,14 @@ describe('MainPageContent', () => {
     });
 
     it('renders donations tab content', async () => {
-        render(<MainPageContent />);
-        await waitForContentToLoad();
+        await renderAndLoadContent();
 
         fireEvent.click(screen.getByTestId('tab-btn-donations'));
         expect(getByExactText(`Блок "${MAIN_PAGE_TEXT.TABS.DONATIONS}" в розробці`)).toBeInTheDocument();
     });
 
     it('renders partners tab content', async () => {
-        render(<MainPageContent />);
-        await waitForContentToLoad();
+        await renderAndLoadContent();
 
         fireEvent.click(screen.getByTestId('tab-btn-partners'));
         expect(screen.getByTestId('partners-block-form')).toBeInTheDocument();
@@ -219,30 +234,15 @@ describe('MainPageContent', () => {
     });
 
     it('opens publish modal when publish button is clicked', async () => {
-        render(<MainPageContent />);
-        await waitForContentToLoad();
-
+        await renderAndLoadContent();
         expect(screen.queryByTestId('publish-modal')).not.toBeInTheDocument();
 
-        fireEvent.click(screen.getByTestId('publish-btn-dirty'));
-        const publishBtn = screen.getByTestId('publish-btn');
-        await waitFor(() => expect(publishBtn).not.toBeDisabled());
-
-        fireEvent.click(publishBtn);
-
-        expect(await screen.findByTestId('publish-modal')).toBeInTheDocument();
+        await triggerFormDirtyAndOpenModal();
     });
 
     it('closes publish modal on cancel', async () => {
-        render(<MainPageContent />);
-        await waitForContentToLoad();
-
-        fireEvent.click(screen.getByTestId('publish-btn-dirty'));
-        const publishBtn = screen.getByTestId('publish-btn');
-        await waitFor(() => expect(publishBtn).not.toBeDisabled());
-
-        fireEvent.click(publishBtn);
-        expect(await screen.findByTestId('publish-modal')).toBeInTheDocument();
+        await renderAndLoadContent();
+        await triggerFormDirtyAndOpenModal();
 
         fireEvent.click(screen.getByTestId('cancel-publish'));
 
@@ -252,17 +252,7 @@ describe('MainPageContent', () => {
     });
 
     it('handles successful publish flow', async () => {
-        render(<MainPageContent />);
-        await waitForContentToLoad();
-
-        fireEvent.click(screen.getByTestId('publish-btn-dirty'));
-        const publishBtn = screen.getByTestId('publish-btn');
-        await waitFor(() => expect(publishBtn).not.toBeDisabled());
-
-        fireEvent.click(publishBtn);
-        expect(await screen.findByTestId('publish-modal')).toBeInTheDocument();
-
-        fireEvent.click(screen.getByTestId('confirm-publish'));
+        await confirmPublishDialog();
 
         await waitFor(() => {
             expect(screen.queryByTestId('publish-modal')).not.toBeInTheDocument();
@@ -278,17 +268,7 @@ describe('MainPageContent', () => {
     it('handles publish error', async () => {
         (MainPageApi.publish as jest.Mock).mockRejectedValue(new Error('Publish failed'));
 
-        render(<MainPageContent />);
-        await waitForContentToLoad();
-
-        fireEvent.click(screen.getByTestId('publish-btn-dirty'));
-        const publishBtn = screen.getByTestId('publish-btn');
-        await waitFor(() => expect(publishBtn).not.toBeDisabled());
-
-        fireEvent.click(publishBtn);
-        expect(await screen.findByTestId('publish-modal')).toBeInTheDocument();
-
-        fireEvent.click(screen.getByTestId('confirm-publish'));
+        await confirmPublishDialog();
 
         await waitFor(() => {
             expect(mockAddToast).toHaveBeenCalledWith('Помилка під час публікації змін', 'error', 3000);
@@ -296,17 +276,7 @@ describe('MainPageContent', () => {
     });
 
     it('uploads new images during publish when image has no id', async () => {
-        render(<MainPageContent />);
-        await waitForContentToLoad();
-
-        fireEvent.click(screen.getByTestId('publish-btn-dirty'));
-        const publishBtn = screen.getByTestId('publish-btn');
-        await waitFor(() => expect(publishBtn).not.toBeDisabled());
-
-        fireEvent.click(publishBtn);
-        expect(await screen.findByTestId('publish-modal')).toBeInTheDocument();
-
-        fireEvent.click(screen.getByTestId('confirm-publish'));
+        await confirmPublishDialog();
 
         await waitFor(() => {
             expect(ImageApi.post).toHaveBeenCalled();
@@ -316,49 +286,17 @@ describe('MainPageContent', () => {
         expect(mockAddToast).toHaveBeenCalledWith('Зміни успішно опубліковано', 'success', 3000);
     });
 
-    it('handles publish from about tab', async () => {
-        render(<MainPageContent />);
-        await waitForContentToLoad();
+    it.each([
+        ['about', 'about-us-block-form', 'publish-btn-about'],
+        ['partners', 'partners-block-form', 'publish-btn-partners'],
+        ['statistics', 'statistics-block-form', 'publish-btn-statistics'],
+    ])('handles publish from %s tab', async (tabId, formTestId, btnTestId) => {
+        await renderAndLoadContent();
 
-        fireEvent.click(screen.getByTestId('tab-btn-about'));
-        expect(screen.getByTestId('about-us-block-form')).toBeInTheDocument();
+        fireEvent.click(screen.getByTestId(`tab-btn-${tabId}`));
+        expect(screen.getByTestId(formTestId)).toBeInTheDocument();
 
-        fireEvent.click(screen.getByTestId('publish-btn-about-dirty'));
-        const publishBtn = screen.getByTestId('publish-btn-about');
-        await waitFor(() => expect(publishBtn).not.toBeDisabled());
-
-        fireEvent.click(publishBtn);
-        expect(await screen.findByTestId('publish-modal')).toBeInTheDocument();
-    });
-
-    it('handles publish from partners tab', async () => {
-        render(<MainPageContent />);
-        await waitForContentToLoad();
-
-        fireEvent.click(screen.getByTestId('tab-btn-partners'));
-        expect(screen.getByTestId('partners-block-form')).toBeInTheDocument();
-
-        fireEvent.click(screen.getByTestId('publish-btn-partners-dirty'));
-        const publishBtn = screen.getByTestId('publish-btn-partners');
-        await waitFor(() => expect(publishBtn).not.toBeDisabled());
-
-        fireEvent.click(publishBtn);
-        expect(await screen.findByTestId('publish-modal')).toBeInTheDocument();
-    });
-
-    it('handles publish from statistics tab', async () => {
-        render(<MainPageContent />);
-        await waitForContentToLoad();
-
-        fireEvent.click(screen.getByTestId('tab-btn-statistics'));
-        expect(screen.getByTestId('statistics-block-form')).toBeInTheDocument();
-
-        fireEvent.click(screen.getByTestId('publish-btn-statistics-dirty'));
-        const publishBtn = screen.getByTestId('publish-btn-statistics');
-        await waitFor(() => expect(publishBtn).not.toBeDisabled());
-
-        fireEvent.click(publishBtn);
-        expect(await screen.findByTestId('publish-modal')).toBeInTheDocument();
+        await triggerFormDirtyAndOpenModal(btnTestId);
     });
 
     it('does not publish when already publishing', async () => {
@@ -368,15 +306,8 @@ describe('MainPageContent', () => {
         });
         (MainPageApi.publish as jest.Mock).mockReturnValue(publishPromise);
 
-        render(<MainPageContent />);
-        await waitForContentToLoad();
-
-        fireEvent.click(screen.getByTestId('publish-btn-dirty'));
-        const publishBtn = screen.getByTestId('publish-btn');
-        await waitFor(() => expect(publishBtn).not.toBeDisabled());
-
-        fireEvent.click(publishBtn);
-        expect(await screen.findByTestId('publish-modal')).toBeInTheDocument();
+        await renderAndLoadContent();
+        const publishBtn = await triggerFormDirtyAndOpenModal();
 
         fireEvent.click(screen.getByTestId('confirm-publish'));
 

@@ -1,8 +1,8 @@
-import '@testing-library/jest-dom';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { StatisticsPreview } from './StatisticsPreview';
 import { Metric, MetricPrefix, MetricType } from '@/types/admin/main-page';
 import { TranslationStatus } from '@/types/common/language';
+import '@testing-library/jest-dom';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { StatisticsPreview } from './StatisticsPreview';
 
 const metrics: Metric[] = [
     {
@@ -71,5 +71,25 @@ describe('StatisticsPreview', () => {
 
         expect(screen.getByText('Партнерів')).toBeInTheDocument();
         expect(screen.queryByText('Engagement')).not.toBeInTheDocument();
+    });
+
+    it('shows EN localization name when language is EN', () => {
+        render(<StatisticsPreview language="EN" onLanguageChange={() => {}} metrics={metrics} hiddenMetricIds={[]} />);
+        expect(screen.getByText('Partners')).toBeInTheDocument();
+    });
+
+    it('formats value with no prefix (default case)', () => {
+        const noPrefix: Metric = {
+            ...metrics[0],
+            id: 3,
+            value: 999,
+            prefix: undefined,
+            name: 'NoPrefix',
+            localizations: [],
+        };
+        render(
+            <StatisticsPreview language="UA" onLanguageChange={() => {}} metrics={[noPrefix]} hiddenMetricIds={[]} />,
+        );
+        expect(screen.getByText('999')).toBeInTheDocument();
     });
 });

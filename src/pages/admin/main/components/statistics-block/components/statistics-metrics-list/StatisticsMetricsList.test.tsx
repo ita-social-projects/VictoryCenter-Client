@@ -120,4 +120,38 @@ describe('StatisticsMetricsList', () => {
         fireEvent.click(buttons[1]);
         expect(onToggleVisibility).not.toHaveBeenCalled();
     });
+
+    it('formats value with no prefix (default case)', () => {
+        const noPrefix: Metric = {
+            ...metrics[0],
+            id: 3,
+            value: 100,
+            prefix: undefined,
+            localizations: [],
+            name: 'NoPrefix',
+        };
+        render(
+            <StatisticsMetricsList
+                metrics={[noPrefix]}
+                hiddenMetricIds={[]}
+                onToggleVisibility={jest.fn()}
+                onReorder={jest.fn()}
+            />,
+        );
+        expect(screen.getByText('100')).toBeInTheDocument();
+    });
+
+    it('disables toggle button for last visible metric', () => {
+        render(
+            <StatisticsMetricsList
+                metrics={[metrics[0]]}
+                hiddenMetricIds={[]}
+                onToggleVisibility={jest.fn()}
+                onReorder={jest.fn()}
+            />,
+        );
+        const buttons = screen.getAllByRole('button');
+        const eyeButton = buttons[1];
+        expect(eyeButton).toBeDisabled();
+    });
 });

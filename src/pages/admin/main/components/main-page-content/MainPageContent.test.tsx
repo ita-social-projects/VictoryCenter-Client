@@ -1,27 +1,83 @@
 import { MAIN_PAGE_TEXT } from '@/const/admin/main-page';
+import { ImageApi } from '@/services/api/admin/image/image-api';
 import { MainPageApi } from '@/services/api/admin/main-page/main-page-api';
 import '@testing-library/jest-dom';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MainPageContent } from './MainPageContent';
+
+jest.mock('@hookform/resolvers/yup', () => ({
+    yupResolver: () => async (data: any) => ({
+        values: data,
+        errors: {},
+    }),
+}));
+
+jest.mock('@/services/api/admin/image/image-api', () => ({
+    ImageApi: {
+        post: jest.fn(),
+    },
+}));
+
+const MockFormBlock = ({ testId, btnTestId, onPublish, isPublishDisabled }: any) => {
+    const { useFormContext } = require('react-hook-form');
+    const { setValue } = useFormContext();
+    return (
+        <div data-testid={testId}>
+            <button
+                data-testid={`${btnTestId}-dirty`}
+                onClick={() => {
+                    setValue('titleUa', 'dirty', { shouldDirty: true, shouldValidate: true });
+                    setValue('image', { url: 'blob:no-id' }, { shouldDirty: true, shouldValidate: true });
+                }}
+            >
+                Make Dirty
+            </button>
+            <button data-testid={btnTestId} onClick={onPublish} disabled={isPublishDisabled}>
+                Publish
+            </button>
+        </div>
+    );
+};
 
 jest.mock('../title-block/TitleBlockForm', () => ({
     __esModule: true,
-    TitleBlockForm: () => <div data-testid="title-block-form">Title Form</div>,
+    TitleBlockForm: (props: any) => <MockFormBlock testId="title-block-form" btnTestId="publish-btn" {...props} />,
 }));
 
 jest.mock('../about-us-block/AboutUsBlockForm', () => ({
     __esModule: true,
-    AboutUsBlockForm: () => <div data-testid="about-us-block-form">About Us Form</div>,
+    AboutUsBlockForm: (props: any) => (
+        <MockFormBlock testId="about-us-block-form" btnTestId="publish-btn-about" {...props} />
+    ),
 }));
 
 jest.mock('../partners-block/PartnersBlockForm', () => ({
     __esModule: true,
-    PartnersBlockForm: () => <div data-testid="partners-block-form">Partners Form</div>,
+    PartnersBlockForm: (props: any) => (
+        <MockFormBlock testId="partners-block-form" btnTestId="publish-btn-partners" {...props} />
+    ),
 }));
 
 jest.mock('../statistics-block/StatisticsBlockForm', () => ({
     __esModule: true,
-    StatisticsBlockForm: () => <div data-testid="statistics-block-form">Statistics Form</div>,
+    StatisticsBlockForm: (props: any) => (
+        <MockFormBlock testId="statistics-block-form" btnTestId="publish-btn-statistics" {...props} />
+    ),
+}));
+
+jest.mock('../main-page-publish-modal/MainPagePublishModal', () => ({
+    __esModule: true,
+    MainPagePublishModal: ({ isOpen, onConfirm, onCancel, isButtonsDisabled }: any) =>
+        isOpen ? (
+            <div data-testid="publish-modal">
+                <button data-testid="confirm-publish" onClick={onConfirm} disabled={isButtonsDisabled}>
+                    Confirm
+                </button>
+                <button data-testid="cancel-publish" onClick={onCancel}>
+                    Cancel
+                </button>
+            </div>
+        ) : null,
 }));
 
 jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
@@ -41,8 +97,9 @@ jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => {
     };
 });
 
+const mockAddToast = jest.fn();
+
 jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider', () => {
-    const mockAddToast = jest.fn();
     const mockToasts: any[] = [];
     return {
         useToast: () => ({
@@ -63,16 +120,32 @@ const getByExactText = (text: string) =>
     screen.getByText((_, el) => el?.children.length === 0 && el?.textContent === text);
 
 describe('MainPageContent', () => {
+    const mockPageData = {
+        page: {
+            id: 1,
+            title: 'Test Title',
+            description: 'Test Description',
+            impactStatistics: { metrics: [] },
+        },
+        languages: [{ id: 1, code: 'uk', name: 'UA' }],
+    };
+
+    const mockPublishedData = {
+        page: {
+            id: 1,
+            title: 'Updated Title',
+            description: 'Updated Description',
+            impactStatistics: { metrics: [] },
+        },
+        languages: [{ id: 1, code: 'uk', name: 'UA' }],
+    };
+
     beforeEach(() => {
-        (MainPageApi.get as jest.Mock).mockResolvedValue({
-            page: {
-                id: 1,
-                title: 'Test Title',
-                description: 'Test Description',
-                impactStatistics: { metrics: [] },
-            },
-            languages: [{ id: 1, code: 'uk', name: 'UA' }],
-        });
+        jest.clearAllMocks();
+
+        (MainPageApi.get as jest.Mock).mockResolvedValue(mockPageData);
+        (MainPageApi.publish as jest.Mock).mockResolvedValue(mockPublishedData);
+        (ImageApi.post as jest.Mock).mockResolvedValue({ id: 2, url: 'uploaded.jpg' });
 
         if (!(global as any).crypto) {
             Object.defineProperty(global, 'crypto', { value: {}, configurable: true });
@@ -83,15 +156,8 @@ describe('MainPageContent', () => {
         }
     });
 
-    afterEach(() => {
-        jest.clearAllMocks();
-        jest.restoreAllMocks();
-    });
-
     const waitForContentToLoad = async () => {
-        await waitFor(() => {
-            expect(screen.getByTestId('category-bar')).toBeInTheDocument();
-        });
+        expect(await screen.findByTestId('category-bar')).toBeInTheDocument();
     };
 
     it('renders loader initially while data is "fetching"', () => {
@@ -110,15 +176,12 @@ describe('MainPageContent', () => {
 
     it('renders TitleBlockForm as the default tab after loading', async () => {
         render(<MainPageContent />);
-
         await waitForContentToLoad();
-
         expect(screen.getByTestId('title-block-form')).toBeInTheDocument();
     });
 
     it('switches tabs correctly', async () => {
         render(<MainPageContent />);
-
         await waitForContentToLoad();
 
         expect(screen.getByTestId('title-block-form')).toBeInTheDocument();
@@ -140,7 +203,6 @@ describe('MainPageContent', () => {
 
     it('renders donations tab content', async () => {
         render(<MainPageContent />);
-
         await waitForContentToLoad();
 
         fireEvent.click(screen.getByTestId('tab-btn-donations'));
@@ -149,11 +211,185 @@ describe('MainPageContent', () => {
 
     it('renders partners tab content', async () => {
         render(<MainPageContent />);
-
         await waitForContentToLoad();
 
         fireEvent.click(screen.getByTestId('tab-btn-partners'));
         expect(screen.getByTestId('partners-block-form')).toBeInTheDocument();
         expect(screen.queryByTestId('title-block-form')).not.toBeInTheDocument();
+    });
+
+    it('opens publish modal when publish button is clicked', async () => {
+        render(<MainPageContent />);
+        await waitForContentToLoad();
+
+        expect(screen.queryByTestId('publish-modal')).not.toBeInTheDocument();
+
+        fireEvent.click(screen.getByTestId('publish-btn-dirty'));
+        const publishBtn = screen.getByTestId('publish-btn');
+        await waitFor(() => expect(publishBtn).not.toBeDisabled());
+
+        fireEvent.click(publishBtn);
+
+        expect(await screen.findByTestId('publish-modal')).toBeInTheDocument();
+    });
+
+    it('closes publish modal on cancel', async () => {
+        render(<MainPageContent />);
+        await waitForContentToLoad();
+
+        fireEvent.click(screen.getByTestId('publish-btn-dirty'));
+        const publishBtn = screen.getByTestId('publish-btn');
+        await waitFor(() => expect(publishBtn).not.toBeDisabled());
+
+        fireEvent.click(publishBtn);
+        expect(await screen.findByTestId('publish-modal')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByTestId('cancel-publish'));
+
+        await waitFor(() => {
+            expect(screen.queryByTestId('publish-modal')).not.toBeInTheDocument();
+        });
+    });
+
+    it('handles successful publish flow', async () => {
+        render(<MainPageContent />);
+        await waitForContentToLoad();
+
+        fireEvent.click(screen.getByTestId('publish-btn-dirty'));
+        const publishBtn = screen.getByTestId('publish-btn');
+        await waitFor(() => expect(publishBtn).not.toBeDisabled());
+
+        fireEvent.click(publishBtn);
+        expect(await screen.findByTestId('publish-modal')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByTestId('confirm-publish'));
+
+        await waitFor(() => {
+            expect(screen.queryByTestId('publish-modal')).not.toBeInTheDocument();
+        });
+
+        await waitFor(() => {
+            expect(MainPageApi.publish).toHaveBeenCalled();
+        });
+
+        expect(mockAddToast).toHaveBeenCalledWith('Зміни успішно опубліковано', 'success', 3000);
+    });
+
+    it('handles publish error', async () => {
+        (MainPageApi.publish as jest.Mock).mockRejectedValue(new Error('Publish failed'));
+
+        render(<MainPageContent />);
+        await waitForContentToLoad();
+
+        fireEvent.click(screen.getByTestId('publish-btn-dirty'));
+        const publishBtn = screen.getByTestId('publish-btn');
+        await waitFor(() => expect(publishBtn).not.toBeDisabled());
+
+        fireEvent.click(publishBtn);
+        expect(await screen.findByTestId('publish-modal')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByTestId('confirm-publish'));
+
+        await waitFor(() => {
+            expect(mockAddToast).toHaveBeenCalledWith('Помилка під час публікації змін', 'error', 3000);
+        });
+    });
+
+    it('uploads new images during publish when image has no id', async () => {
+        render(<MainPageContent />);
+        await waitForContentToLoad();
+
+        fireEvent.click(screen.getByTestId('publish-btn-dirty'));
+        const publishBtn = screen.getByTestId('publish-btn');
+        await waitFor(() => expect(publishBtn).not.toBeDisabled());
+
+        fireEvent.click(publishBtn);
+        expect(await screen.findByTestId('publish-modal')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByTestId('confirm-publish'));
+
+        await waitFor(() => {
+            expect(ImageApi.post).toHaveBeenCalled();
+            expect(MainPageApi.publish).toHaveBeenCalled();
+        });
+
+        expect(mockAddToast).toHaveBeenCalledWith('Зміни успішно опубліковано', 'success', 3000);
+    });
+
+    it('handles publish from about tab', async () => {
+        render(<MainPageContent />);
+        await waitForContentToLoad();
+
+        fireEvent.click(screen.getByTestId('tab-btn-about'));
+        expect(screen.getByTestId('about-us-block-form')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByTestId('publish-btn-about-dirty'));
+        const publishBtn = screen.getByTestId('publish-btn-about');
+        await waitFor(() => expect(publishBtn).not.toBeDisabled());
+
+        fireEvent.click(publishBtn);
+        expect(await screen.findByTestId('publish-modal')).toBeInTheDocument();
+    });
+
+    it('handles publish from partners tab', async () => {
+        render(<MainPageContent />);
+        await waitForContentToLoad();
+
+        fireEvent.click(screen.getByTestId('tab-btn-partners'));
+        expect(screen.getByTestId('partners-block-form')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByTestId('publish-btn-partners-dirty'));
+        const publishBtn = screen.getByTestId('publish-btn-partners');
+        await waitFor(() => expect(publishBtn).not.toBeDisabled());
+
+        fireEvent.click(publishBtn);
+        expect(await screen.findByTestId('publish-modal')).toBeInTheDocument();
+    });
+
+    it('handles publish from statistics tab', async () => {
+        render(<MainPageContent />);
+        await waitForContentToLoad();
+
+        fireEvent.click(screen.getByTestId('tab-btn-statistics'));
+        expect(screen.getByTestId('statistics-block-form')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByTestId('publish-btn-statistics-dirty'));
+        const publishBtn = screen.getByTestId('publish-btn-statistics');
+        await waitFor(() => expect(publishBtn).not.toBeDisabled());
+
+        fireEvent.click(publishBtn);
+        expect(await screen.findByTestId('publish-modal')).toBeInTheDocument();
+    });
+
+    it('does not publish when already publishing', async () => {
+        let resolvePublish: (value: any) => void;
+        const publishPromise = new Promise((resolve) => {
+            resolvePublish = resolve;
+        });
+        (MainPageApi.publish as jest.Mock).mockReturnValue(publishPromise);
+
+        render(<MainPageContent />);
+        await waitForContentToLoad();
+
+        fireEvent.click(screen.getByTestId('publish-btn-dirty'));
+        const publishBtn = screen.getByTestId('publish-btn');
+        await waitFor(() => expect(publishBtn).not.toBeDisabled());
+
+        fireEvent.click(publishBtn);
+        expect(await screen.findByTestId('publish-modal')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByTestId('confirm-publish'));
+
+        await waitFor(() => {
+            expect(publishBtn).toBeDisabled();
+        });
+
+        await act(async () => {
+            resolvePublish!(mockPublishedData);
+        });
+
+        await waitFor(() => {
+            expect(mockAddToast).toHaveBeenCalledWith('Зміни успішно опубліковано', 'success', 3000);
+        });
     });
 });

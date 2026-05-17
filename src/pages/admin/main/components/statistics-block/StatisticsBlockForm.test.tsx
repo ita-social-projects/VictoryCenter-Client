@@ -33,6 +33,11 @@ jest.mock('./components/statistics-metrics-list/StatisticsMetricsList', () => ({
                 onClick={() => onToggleVisibility(metrics[0]?.id ?? 0)}
                 type="button"
             />
+            <button
+                data-testid="toggle-second-metric"
+                onClick={() => onToggleVisibility(metrics[1]?.id ?? 0)}
+                type="button"
+            />
             <button data-testid="reorder-metrics" onClick={() => onReorder([])} type="button" />
         </div>
     ),
@@ -181,5 +186,44 @@ describe('StatisticsBlockForm', () => {
         await waitFor(() => {
             expect(screen.getByTestId('statistics-preview')).toHaveAttribute('data-metrics', '0');
         });
+    });
+
+    it('does not hide the last visible metric', async () => {
+        render(
+            <FormWrapper>
+                <StatisticsBlockForm
+                    initialData={mockInitialData}
+                    isPublishDisabled={false}
+                    onPublish={mockOnPublish}
+                />
+            </FormWrapper>,
+        );
+
+        fireEvent.click(screen.getByTestId('toggle-first-metric'));
+        await waitFor(() => {
+            expect(screen.getByTestId('statistics-preview')).toHaveAttribute('data-hidden', '101');
+        });
+
+        fireEvent.click(screen.getByTestId('toggle-second-metric'));
+
+        await waitFor(() => {
+            expect(screen.getByTestId('statistics-preview')).toHaveAttribute('data-hidden', '101');
+        });
+    });
+
+    it('re-enables publish button after clearing image error', () => {
+        render(
+            <FormWrapper>
+                <StatisticsBlockForm
+                    initialData={mockInitialData}
+                    isPublishDisabled={false}
+                    onPublish={mockOnPublish}
+                />
+            </FormWrapper>,
+        );
+        fireEvent.click(screen.getByTestId('trigger-image-error'));
+        expect(screen.getByTestId('submit-btn')).toBeDisabled();
+        fireEvent.click(screen.getByTestId('clear-image-error'));
+        expect(screen.getByTestId('submit-btn')).not.toBeDisabled();
     });
 });

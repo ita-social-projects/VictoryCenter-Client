@@ -40,6 +40,8 @@ export const MAIN_PAGE_TEXT = {
 
     ERRORS: {
         LOAD_FAILED: 'Виникла помилка, не вдалося завантажити дані сторінки',
+        TOGGLE_VISIBILITY_FAILED: 'Не вдалося змінити видимість',
+        REORDER_FAILED: 'Не вдалося зберегти порядок',
     },
 } as const;
 

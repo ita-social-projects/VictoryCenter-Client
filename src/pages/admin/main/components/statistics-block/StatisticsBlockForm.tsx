@@ -3,8 +3,12 @@ import { Button } from '@/components/admin/button/Button';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { MAIN_PAGE_TEXT, MAIN_PAGE_VALIDATION } from '@/const/admin/main-page';
+import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { ImageUploadForm } from '@/pages/admin/main/components/common/image-upload-form/ImageUploadForm';
+import { MainPageApi } from '@/services/api/admin/main-page/main-page-api';
 import { MainPage, MainPageFormValues, Metric } from '@/types/admin/main-page';
+import { ToastType } from '@/types/admin/toast';
 import { useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { StatisticsMetricsList } from './components/statistics-metrics-list/StatisticsMetricsList';
@@ -35,6 +39,9 @@ interface StatisticsBlockFormProps {
 }
 
 export const StatisticsBlockForm = ({ initialData, isPublishDisabled, onPublish }: StatisticsBlockFormProps) => {
+    const client = useAdminClient();
+    const { addToast } = useToast();
+
     const [imageError, setImageError] = useState<string | null>(null);
     const [previewLang, setPreviewLang] = useState<'UA' | 'EN'>('UA');
 
@@ -55,18 +62,41 @@ export const StatisticsBlockForm = ({ initialData, isPublishDisabled, onPublish 
         }
     }, [initialData]);
 
-    const handleToggleVisibility = (id: number) => {
-        setHiddenMetricIds((prev) => {
-            const isCurrentlyHidden = prev.includes(id);
-            if (!isCurrentlyHidden && metrics.length - prev.length <= 1) {
-                return prev;
-            }
-            return isCurrentlyHidden ? prev.filter((x) => x !== id) : [...prev, id];
-        });
+    const handleToggleVisibility = async (id: number) => {
+        const isCurrentlyHidden = hiddenMetricIds.includes(id);
+        const willBeHidden = !isCurrentlyHidden;
+
+        if (willBeHidden && metrics.length - hiddenMetricIds.length <= 1) {
+            return;
+        }
+
+        setHiddenMetricIds((prev) => (willBeHidden ? [...prev, id] : prev.filter((x) => x !== id)));
+
+        try {
+            await MainPageApi.updateMetricVisibility(client, id, { isHidden: willBeHidden });
+        } catch (error) {
+            addToast(MAIN_PAGE_TEXT.ERRORS.TOGGLE_VISIBILITY_FAILED, ToastType.Error, 3000);
+            setHiddenMetricIds((prev) => (isCurrentlyHidden ? [...prev, id] : prev.filter((x) => x !== id)));
+        }
     };
 
-    const handleReorderMetrics = (items: Metric[]) => {
+    const handleReorderMetrics = async (items: Metric[]) => {
         setMetrics(items);
+
+        const statisticId = initialData?.impactStatistics?.id;
+
+        if (!statisticId) return;
+
+        const orderedIds = items.map((item) => item.id as number).filter(Boolean);
+
+        try {
+            await MainPageApi.reorderMetrics(client, { statisticId, orderedIds });
+        } catch (error) {
+            addToast(MAIN_PAGE_TEXT.ERRORS.REORDER_FAILED, ToastType.Error, 3000);
+            if (initialData?.impactStatistics?.metrics) {
+                setMetrics(initialData.impactStatistics.metrics);
+            }
+        }
     };
 
     return (

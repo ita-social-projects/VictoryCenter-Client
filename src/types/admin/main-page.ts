@@ -6,8 +6,6 @@ import {
 } from '@/types/common/language';
 import { Image, ImageValues } from '../common/image';
 
-export type LocaleCode = 'uk' | 'en';
-
 export enum MetricPrefix {
     None = 'None',
     Plus = 'Plus',

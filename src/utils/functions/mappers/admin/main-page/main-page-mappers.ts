@@ -1,12 +1,11 @@
 import {
-    LocaleCode,
     MAIN_PAGE_FORM_DEFAULTS,
     MainPage,
     MainPageFormValues,
     UpdateMainPageDto,
     UpdateMetricDto,
 } from '@/types/admin/main-page';
-import type { LocalizationLanguage } from '@/types/common/language';
+import type { LocaleCode, LocalizationLanguage } from '@/types/common/language';
 
 type LocalizationWithLanguageCode = {
     language?: { code?: string };

@@ -1,4 +1,3 @@
-import type { LocalizationLanguage } from '@/types/common/language';
 import {
     COMPANY_PROFILE_FORM_DEFAULTS,
     CompanyProfile,
@@ -6,9 +5,9 @@ import {
     CompanyProfileFormValues,
     CompanyProfileRequisiteLocalization,
     CompanyProfileSocialLink,
-    LocaleCode,
     SocialPlatform,
 } from '@/types/admin/company-profile';
+import type { LocaleCode, LocalizationLanguage } from '@/types/common/language';
 
 type LocalizationWithLanguageCode = {
     language?: { code?: string };

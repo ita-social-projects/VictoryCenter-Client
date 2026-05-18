@@ -246,9 +246,7 @@ describe('HistoryApi', () => {
                     id: 2,
                     template: SectionTemplate.TextOnly,
                     order: 1,
-                    contents: [
-                        { contentType: ContentType.Title, order: 0, title: 'Title 2', imageId: 103 },
-                    ],
+                    contents: [{ contentType: ContentType.Title, order: 0, title: 'Title 2', imageId: 103 }],
                 },
             ];
 

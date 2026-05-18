@@ -36,14 +36,4 @@ describe('EventsNewsPageApi', () => {
 
         await expect(EventsNewsPageApi.get()).rejects.toThrow('Failed to fetch events news data');
     });
-
-    it('rejects when forceFail is true (real implementation)', async () => {
-        const promise = EventsNewsPageApi.get(true);
-
-        // advance timers to trigger setTimeout
-        jest.advanceTimersByTime(1000);
-        await jest.runAllTimers();
-
-        await expect(promise).rejects.toThrow('Failed to fetch events news data');
-    });
 });

@@ -29,9 +29,21 @@ describe('EventsNewsPageApi', () => {
         jest.runAllTimers();
     });
 
-    it('propagates rejection when implementation fails (mocked)', async () => {
-        jest.spyOn(EventsNewsPageApi, 'get').mockImplementationOnce(() => Promise.reject(new Error('Failed')));
+    it('propagates rejection when implementation fails (mocked) with specific message', async () => {
+        jest
+            .spyOn(EventsNewsPageApi, 'get')
+            .mockImplementationOnce(() => Promise.reject(new Error('Failed to fetch events news data')));
 
-        await expect(EventsNewsPageApi.get()).rejects.toThrow('Failed');
+        await expect(EventsNewsPageApi.get()).rejects.toThrow('Failed to fetch events news data');
+    });
+
+    it('rejects when forceFail is true (real implementation)', async () => {
+        const promise = EventsNewsPageApi.get(true);
+
+        // advance timers to trigger setTimeout
+        jest.advanceTimersByTime(1000);
+        await jest.runAllTimers();
+
+        await expect(promise).rejects.toThrow('Failed to fetch events news data');
     });
 });

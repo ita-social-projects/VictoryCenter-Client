@@ -61,4 +61,29 @@ describe('EventsNewsApi.get', () => {
         jest.spyOn(EventsNewsApi, 'get').mockImplementationOnce(() => Promise.reject(new Error('Network')));
         await expect(EventsNewsApi.get('', 0, 5)).rejects.toThrow('Network');
     });
+
+    it('returns empty items and totalItemsCount 0 when tagId has no matches', async () => {
+        const tagId = 'non-existent';
+        const promise = EventsNewsApi.get(tagId, 0, 5);
+
+        jest.advanceTimersByTime(500);
+        await jest.runAllTimers();
+
+        await expect(promise).resolves.toEqual({
+            items: [],
+            totalItemsCount: 0,
+        });
+    });
+
+    it('handles limit = 0 by returning empty items and totalItemsCount equal to items.length', async () => {
+        const promise = EventsNewsApi.get('', 0, 0);
+
+        jest.advanceTimersByTime(500);
+        await jest.runAllTimers();
+
+        await expect(promise).resolves.toEqual({
+            items: eventsNewsMock.slice(0, 0),
+            totalItemsCount: eventsNewsMock.length,
+        });
+    });
 });

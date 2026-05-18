@@ -2,11 +2,12 @@ import { eventsNewsPageMock } from '@/utils/mock-data/public/event-news';
 import { EventsNewsPageData } from '@/types/public/events-news';
 
 export const EventsNewsPageApi = {
-    get: async (): Promise<EventsNewsPageData> => {
+    // `forceFail` is a test-only parameter to exercise the rejection branch in tests.
+    get: async (forceFail: boolean = false): Promise<EventsNewsPageData> => {
         // const response = await axiosInstance.get(`${API_ROUTES. .PUBLIC}`);
         return new Promise((resolve, reject) => {
             setTimeout(() => {
-                const success = true;
+                const success = !forceFail;
 
                 if (success) {
                     resolve(eventsNewsPageMock);

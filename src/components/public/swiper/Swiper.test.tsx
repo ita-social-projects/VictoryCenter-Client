@@ -28,7 +28,15 @@ jest.mock('swiper/react', () => {
             // eslint-disable-next-line react-hooks/exhaustive-deps
             React.useEffect(() => {
                 // capture props for assertions
-                mockReceivedProps = { children, onInit, onSlideChange, onResize, onReachBeginning, onReachEnd, onFromEdge };
+                mockReceivedProps = {
+                    children,
+                    onInit,
+                    onSlideChange,
+                    onResize,
+                    onReachBeginning,
+                    onReachEnd,
+                    onFromEdge,
+                };
                 _mockInitCallback = onInit;
                 _mockSlideChangeCallback = onSlideChange;
                 mockResizeCallback = onResize;
@@ -174,7 +182,12 @@ describe('Swiper', () => {
         const onSlideChange = jest.fn();
 
         render(
-            <Swiper items={items} renderItem={renderItem} onSlideChange={onSlideChange} navigationButtons={{ next: { icon: ArrowRight, ariaLabel: 'Next', variant: 'primary-dark' as const } }} />,
+            <Swiper
+                items={items}
+                renderItem={renderItem}
+                onSlideChange={onSlideChange}
+                navigationButtons={{ next: { icon: ArrowRight, ariaLabel: 'Next', variant: 'primary-dark' as const } }}
+            />,
         );
 
         await waitFor(() => expect(_mockInitCallback).toBeTruthy());

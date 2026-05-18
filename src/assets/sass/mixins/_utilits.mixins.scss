@@ -160,7 +160,7 @@ $line-height-1440: 116px;
 
 @mixin black-button {
     @include tagged-button;
-    
+
     background: colors.$blue-900;
     border: 1px solid colors.$blue-900;
     color: colors.$grey-50;

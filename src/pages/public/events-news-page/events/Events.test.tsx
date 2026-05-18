@@ -243,8 +243,8 @@ describe('Events component', () => {
 
         beforeEach(() => {
             jest.clearAllMocks();
-            useDataPaginationFetch = require('@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch')
-                .useDataPaginationFetch;
+            useDataPaginationFetch =
+                require('@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch').useDataPaginationFetch;
         });
 
         it('should replace events when offset is 0 (initial load)', async () => {

@@ -108,7 +108,7 @@ describe('SingleEventNews', () => {
         const { container } = render(<SingleEventNews {...mockEventData} />);
         const eventCard = container.querySelector('[class*="event-card"]');
         expect(eventCard).toBeInTheDocument();
-        
+
         const eventImage = eventCard?.querySelector('[class*="event-image"]');
         const eventHeader = eventCard?.querySelector('[class*="event-header"]');
         const eventTitle = eventCard?.querySelector('[class*="event-title"]');

@@ -30,9 +30,9 @@ describe('EventsNewsPageApi', () => {
     });
 
     it('propagates rejection when implementation fails (mocked) with specific message', async () => {
-        jest
-            .spyOn(EventsNewsPageApi, 'get')
-            .mockImplementationOnce(() => Promise.reject(new Error('Failed to fetch events news data')));
+        jest.spyOn(EventsNewsPageApi, 'get').mockImplementationOnce(() =>
+            Promise.reject(new Error('Failed to fetch events news data')),
+        );
 
         await expect(EventsNewsPageApi.get()).rejects.toThrow('Failed to fetch events news data');
     });

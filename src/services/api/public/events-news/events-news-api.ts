@@ -7,14 +7,8 @@ const delay = (milliseconds: number): Promise<void> =>
         setTimeout(resolve, milliseconds);
     });
 
-const getPaginatedEvents = (
-    tagId: string,
-    offset: number,
-    limit: number,
-): PaginationResult<EventsNews> => {
-    const items = tagId
-        ? eventsNewsMock.filter((event) => event.tags.some((tag) => tag.id === tagId))
-        : eventsNewsMock;
+const getPaginatedEvents = (tagId: string, offset: number, limit: number): PaginationResult<EventsNews> => {
+    const items = tagId ? eventsNewsMock.filter((event) => event.tags.some((tag) => tag.id === tagId)) : eventsNewsMock;
 
     const totalItemsCount = offset + limit >= items.length ? 0 : items.length;
 

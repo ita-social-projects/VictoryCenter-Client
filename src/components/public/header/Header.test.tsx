@@ -268,7 +268,7 @@ describe('Header', () => {
         expect(partnersLink).toHaveAttribute('data-disabled', 'false');
 
         const eventsLink = within(aboutUsDropdown as HTMLElement).getByText(headerUk['EVENTS_AND_NEWS']);
-        expect(eventsLink).toHaveAttribute('data-disabled', 'true');
+        expect(eventsLink).toHaveAttribute('data-disabled', 'false');
     });
 
     it('renders header spacer element', () => {

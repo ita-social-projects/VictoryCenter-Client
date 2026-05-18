@@ -20,6 +20,7 @@ declare module 'i18next' {
             hippotherapy: typeof hippotherapyUk;
             footer: typeof footerUk;
             aboutUsPage: typeof aboutUsPageUk;
+            eventsNewsPage: typeof eventsNewsUk;
             programsPage: typeof programsPageUk;
             detailedProgramPage: typeof detailedProgramPageUk;
             donatePage: typeof donateUk;

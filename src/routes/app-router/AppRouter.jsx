@@ -13,6 +13,7 @@ import { ADMIN_ROUTES } from '@/const/admin/routes';
 import { PrivateRoute } from '@/components/admin/private-route/PrivateRoute';
 import { PublicRoute } from '@/components/admin/public-route/PublicRoute';
 import { AboutUsPage } from '@/pages/public/about-us-page/AboutUsPage';
+import { EventsNewsPage } from '@/pages/public/events-news-page/EventsNewsPage';
 import { DonatePage } from '@/pages/public/donate-page/DonatePage';
 import { LoginPage } from '@/pages/admin/login/LoginPage';
 import { AdminHomePage } from '@/pages/admin/home/AdminHomePage';
@@ -40,6 +41,7 @@ export const AppRouter = () => {
             <Route path={PUBLIC_ROUTES.HIPPOTHERAPY.PATH} element={<HippotherapyPage />} />
             <Route path={PUBLIC_ROUTES.PARTNERS.PATH} element={<PartnersPage />} />
             <Route path={PUBLIC_ROUTES.ABOUT_US.PATH} element={<AboutUsPage />} />
+            <Route path={PUBLIC_ROUTES.EVENTS_AND_NEWS.PATH} element={<EventsNewsPage />} />
             <Route path={PUBLIC_ROUTES.DONATE.PATH} element={<DonatePage />} />
             <Route path={PUBLIC_ROUTES.REPORTS.PATH} element={<ReportsPage />} />
             <Route path={PUBLIC_ROUTES.CONTACT_US.PATH} element={<ContactUsPage />} />

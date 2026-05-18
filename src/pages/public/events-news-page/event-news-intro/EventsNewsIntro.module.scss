@@ -1,0 +1,67 @@
+@use '@/assets/sass/mixins/utilits.mixins' as utils;
+@use '@/assets/sass/mixins/typography.mixins' as type;
+
+section {
+    overflow: hidden;
+}
+
+.events-news-intro {
+    margin: 120px 16px 64px;
+    gap: 196px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+
+    @media (min-width: 560px) {
+        margin: 120px 64px 64px;
+        gap: 236px;
+    }
+
+    @media (min-width: 768px) {
+        margin: 120px 36px 128px;
+    }
+
+    @media (min-width: 1440px) {
+        margin: 156px 36px 156px;
+    }
+}
+
+.slogan {
+    @include utils.yellow-blue-text;
+
+    @media (min-width: 1440px) {
+        max-width: 886px;
+    }
+}
+
+.highlight {
+    @include utils.text-highlight;
+}
+
+.yellow {
+    @include utils.yellow-bg-text;
+}
+
+.blue {
+    @include utils.blue-bg-text;
+}
+
+.break-text {
+    white-space: break-spaces;
+}
+
+.description {
+    @include type.body-2-regular;
+    text-align: center;
+
+    @media (min-width: 768px) {
+        @include type.body-1-medium;
+        max-width: 432px;
+    }
+
+    @media (min-width: 1440px) {
+        @include type.subtitle-2-semibold;
+        max-width: 656px;
+    }
+}

@@ -9,6 +9,7 @@ import { MultiSelectInput } from '@/components/admin/multi-select-input/MultiSel
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { MAIN_PAGE_TEXT, MAIN_PAGE_VALIDATION } from '@/const/admin/main-page';
 import { Metric, MetricPrefix } from '@/types/admin/main-page';
+import { resolvePrefix } from '@/utils/functions/mappers/admin/main-page/main-page-mappers';
 import {
     MetricFormValues,
     metricEditSchema,
@@ -39,10 +40,10 @@ export const StatisticsMetricEditPanel = ({ metric, onSave, onCancel }: Statisti
         mode: 'onBlur',
         resolver: yupResolver(metricEditSchema),
         defaultValues: {
-            nameUa: metric.localizations?.find((l) => l.languageId === 1)?.name || '',
+            nameUa: metric.name || '',
             nameEn: metric.localizations?.find((l) => l.languageId === 2)?.name || '',
             value: String(metric.value).replace(/\B(?=(\d{3})+(?!\d))/g, ' '),
-            prefix: metric.prefix || MetricPrefix.None,
+            prefix: resolvePrefix(metric.prefix),
         },
     });
 
@@ -56,6 +57,7 @@ export const StatisticsMetricEditPanel = ({ metric, onSave, onCancel }: Statisti
 
         const updatedMetric: Metric = {
             ...metric,
+            name: data.nameUa.trim(),
             value: parseInt(data.value.replace(/\s/g, ''), 10),
             prefix: data.prefix,
             localizations: updatedLocalizations,
@@ -134,10 +136,13 @@ export const StatisticsMetricEditPanel = ({ metric, onSave, onCancel }: Statisti
                             <MultiSelectInput
                                 id={`metric-prefix-${metric.id}`}
                                 options={PREFIX_OPTIONS}
-                                value={[PREFIX_OPTIONS.find((p) => p.id === value) || PREFIX_OPTIONS[0]]}
+                                value={[PREFIX_OPTIONS.find((p) => p.id === value) ?? PREFIX_OPTIONS[0]]}
                                 getOptionId={(opt) => opt.id}
                                 getOptionName={(opt) => opt.name}
-                                onChange={(selected) => onChange(selected[0]?.id || MetricPrefix.None)}
+                                onChange={(selected) => {
+                                    const next = selected.find((opt) => opt.id !== value);
+                                    onChange(next?.id ?? value ?? MetricPrefix.None);
+                                }}
                             />
                         )}
                     />

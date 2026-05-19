@@ -2,6 +2,7 @@ import {
     MAIN_PAGE_FORM_DEFAULTS,
     MainPage,
     MainPageFormValues,
+    MetricPrefix,
     UpdateMainPageDto,
     UpdateMetricDto,
 } from '@/types/admin/main-page';
@@ -10,6 +11,18 @@ import {
     getLanguageIdByCode,
     resolveLocaleCode,
 } from '@/utils/functions/mappers/common/localization/localization-mappers';
+
+const NUMERIC_TO_PREFIX: Record<number, MetricPrefix> = {
+    0: MetricPrefix.None,
+    1: MetricPrefix.Plus,
+    2: MetricPrefix.Percent,
+};
+
+export const resolvePrefix = (prefix: MetricPrefix | null | undefined): MetricPrefix => {
+    if (prefix == null) return MetricPrefix.None;
+    if (Object.values(MetricPrefix).includes(prefix as MetricPrefix)) return prefix as MetricPrefix;
+    return NUMERIC_TO_PREFIX[Number(prefix)] ?? MetricPrefix.None;
+};
 
 export function mapMainPageToFormValues(page: MainPage, languages?: LocalizationLanguage[]): MainPageFormValues {
     const pageLocalizations = page.localizations ?? [];
@@ -55,6 +68,9 @@ export function mapFormValuesToMainPagePatch(
     formValues: MainPageFormValues,
     originalPage: MainPage | null,
     languages?: LocalizationLanguage[],
+    currentMetrics?: MainPage['impactStatistics'] extends null | undefined
+        ? never
+        : NonNullable<MainPage['impactStatistics']>['metrics'],
 ): UpdateMainPageDto {
     const ukLanguageId = getLanguageIdByCode(languages, 'uk');
     const enLanguageId = getLanguageIdByCode(languages, 'en');
@@ -83,19 +99,19 @@ export function mapFormValuesToMainPagePatch(
     const statTitleUk = str(formValues.statisticsTitleUa);
     const statTitleEn = str(formValues.statisticsTitleEn);
 
-    const existingMetrics = originalPage?.impactStatistics?.metrics ?? [];
+    const existingMetrics = currentMetrics ?? originalPage?.impactStatistics?.metrics ?? [];
+
     const safeMetricsPayload: UpdateMetricDto[] = existingMetrics.map((m) => {
         const enLoc = m.localizations?.find((l) => resolveLocaleCode(l as any, languages) === 'en');
-        const canHaveLocalization = true;
 
         return {
             id: m.id,
             value: m.value,
             name: m.name,
             type: m.type,
-            prefix: m.prefix,
+            prefix: resolvePrefix(m.prefix),
             localizations:
-                canHaveLocalization && enLanguageId && enLoc
+                enLanguageId && enLoc
                     ? [
                           {
                               languageId: enLanguageId,

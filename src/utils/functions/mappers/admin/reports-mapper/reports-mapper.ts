@@ -5,6 +5,7 @@ import {
     FundsExpendituresTransactionType,
     ReportFundsExpendituresCategory,
     ReportFundsExpendituresCategoryDto,
+    ReportFundsExpendituresCategoryLocalization,
     ReportFundsExpendituresRecord,
     ReportFundsExpendituresRecordDto,
     ReportFundsExpendituresSettings,
@@ -22,6 +23,7 @@ import {
     UpdateReportFundsExpendituresSettingsDto,
 } from '@/types/admin/reports';
 
+import { mapLocalizationDtoToModel } from '@/utils/functions/mappers/common/localization/localization-mappers';
 import { formatNumberDecimalComma } from '@/utils/functions/formatters/format-number';
 
 export const mapReportsMediaSettingsDtoToMediaSettings = (dto: ReportsMediaSettingsDto): ReportsMediaSettings => ({
@@ -85,7 +87,9 @@ export const mapReportFundsExpendituresCategoryDtoToCategory = (
     id: dto.id,
     name: dto.name,
     type: mapFundsExpendituresTypeDtoToTransactionType(dto.type),
-    localizations: [],
+    localizations: dto.localizations.map((loc) =>
+        mapLocalizationDtoToModel<typeof loc, ReportFundsExpendituresCategoryLocalization>(loc),
+    ),
 });
 
 export const mapReportFundsExpendituresCategoryToCreateDto = (

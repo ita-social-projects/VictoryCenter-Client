@@ -1,4 +1,9 @@
-import { EntityLocalization, EntityLocalizationDto, EntityWithLocalizations } from '../common/language';
+import {
+    EntityLocalization,
+    EntityLocalizationDto,
+    EntityWithDtoLocalizations,
+    EntityWithLocalizations,
+} from '../common/language';
 import { Image, ImageValues } from '../common/image';
 
 export interface ReportsMediaSettingsCollectedFundsDto {
@@ -91,7 +96,8 @@ export interface UpdateReportFundsExpendituresSettingsDto {
     exchangeRate: number;
 }
 
-export interface ReportFundsExpendituresCategoryDto {
+export interface ReportFundsExpendituresCategoryDto
+    extends EntityWithDtoLocalizations<ReportFundsExpendituresCategoryLocalizationDto> {
     id: number;
     name: string;
     type: ReportFundsExpendituresTypeDto;

@@ -246,7 +246,7 @@ export interface UpdateMetricDto {
     name: string;
     type: MetricType;
     prefix?: MetricPrefix | null;
-    localizations?: UpdateMetricLocalizationDto[];
+    localization?: UpdateMetricLocalizationDto | null;
 }
 
 export interface UpdateImpactStatisticDto {
@@ -316,6 +316,7 @@ export interface MainPageFormValues {
     statisticsTitleUa: string;
     statisticsTitleEn: string;
     statisticsImage: Image | ImageValues | null;
+    metrics?: Metric[];
 }
 
 export const MAIN_PAGE_FORM_DEFAULTS: MainPageFormValues = {
@@ -338,4 +339,5 @@ export const MAIN_PAGE_FORM_DEFAULTS: MainPageFormValues = {
     statisticsTitleUa: '',
     statisticsTitleEn: '',
     statisticsImage: null,
+    metrics: [],
 };

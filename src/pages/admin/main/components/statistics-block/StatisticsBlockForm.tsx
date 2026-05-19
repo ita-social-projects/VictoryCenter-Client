@@ -36,9 +36,15 @@ interface StatisticsBlockFormProps {
     initialData: MainPage | null;
     isPublishDisabled: boolean;
     onPublish: () => void;
+    onMetricsChange?: (metrics: Metric[]) => void;
 }
 
-export const StatisticsBlockForm = ({ initialData, isPublishDisabled, onPublish }: StatisticsBlockFormProps) => {
+export const StatisticsBlockForm = ({
+    initialData,
+    isPublishDisabled,
+    onPublish,
+    onMetricsChange,
+}: StatisticsBlockFormProps) => {
     const client = useAdminClient();
     const { addToast } = useToast();
 
@@ -102,10 +108,12 @@ export const StatisticsBlockForm = ({ initialData, isPublishDisabled, onPublish 
 
     const handleMetricUpdate = (updatedMetrics: Metric[]) => {
         setMetrics(updatedMetrics);
+        onMetricsChange?.(updatedMetrics);
 
-        setValue('metrics' as keyof MainPageFormValues, updatedMetrics as any, {
+        setValue('metrics', updatedMetrics, {
             shouldDirty: true,
             shouldTouch: true,
+            shouldValidate: true,
         });
     };
 

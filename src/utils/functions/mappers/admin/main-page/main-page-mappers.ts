@@ -18,10 +18,22 @@ const NUMERIC_TO_PREFIX: Record<number, MetricPrefix> = {
     2: MetricPrefix.Percent,
 };
 
+const PREFIX_TO_NUMERIC: Record<MetricPrefix, number> = {
+    [MetricPrefix.None]: 0,
+    [MetricPrefix.Plus]: 1,
+    [MetricPrefix.Percent]: 2,
+};
+
 export const resolvePrefix = (prefix: MetricPrefix | null | undefined): MetricPrefix => {
     if (prefix == null) return MetricPrefix.None;
     if (Object.values(MetricPrefix).includes(prefix as MetricPrefix)) return prefix as MetricPrefix;
     return NUMERIC_TO_PREFIX[Number(prefix)] ?? MetricPrefix.None;
+};
+
+export const serializePrefix = (prefix: MetricPrefix | null | undefined): number | null => {
+    if (prefix == null) return null;
+    const resolved = resolvePrefix(prefix);
+    return PREFIX_TO_NUMERIC[resolved] ?? 0;
 };
 
 export function mapMainPageToFormValues(page: MainPage, languages?: LocalizationLanguage[]): MainPageFormValues {
@@ -99,26 +111,20 @@ export function mapFormValuesToMainPagePatch(
     const statTitleUk = str(formValues.statisticsTitleUa);
     const statTitleEn = str(formValues.statisticsTitleEn);
 
-    const existingMetrics = currentMetrics ?? originalPage?.impactStatistics?.metrics ?? [];
+    const existingMetrics = currentMetrics?.length ? currentMetrics : (originalPage?.impactStatistics?.metrics ?? []);
 
     const safeMetricsPayload: UpdateMetricDto[] = existingMetrics.map((m) => {
-        const enLoc = m.localizations?.find((l) => resolveLocaleCode(l as any, languages) === 'en');
+        const enLoc = m.localizations?.find((l) =>
+            enLanguageId ? l.languageId === enLanguageId : resolveLocaleCode(l as any, languages) === 'en',
+        );
 
         return {
             id: m.id,
             value: m.value,
             name: m.name,
             type: m.type,
-            prefix: resolvePrefix(m.prefix),
-            localizations:
-                enLanguageId && enLoc
-                    ? [
-                          {
-                              languageId: enLanguageId,
-                              name: enLoc.name,
-                          },
-                      ]
-                    : undefined,
+            prefix: serializePrefix(m.prefix) as any,
+            localization: enLanguageId && enLoc ? { languageId: enLanguageId, name: enLoc.name } : undefined,
         } as UpdateMetricDto;
     });
 

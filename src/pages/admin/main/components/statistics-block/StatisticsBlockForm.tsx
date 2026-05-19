@@ -9,7 +9,11 @@ import { ImageUploadForm } from '@/pages/admin/main/components/common/image-uplo
 import { MainPageApi } from '@/services/api/admin/main-page/main-page-api';
 import { MainPage, MainPageFormValues, Metric } from '@/types/admin/main-page';
 import { ToastType } from '@/types/admin/toast';
-import { useEffect, useState } from 'react';
+import {
+    mapMetricsWithResolvedPrefix,
+    resolvePrefix,
+} from '@/utils/functions/mappers/admin/main-page/main-page-mappers';
+import { useEffect, useRef, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { StatisticsMetricsList } from './components/statistics-metrics-list/StatisticsMetricsList';
 import { StatisticsPreview } from './components/statistics-preview/StatisticsPreview';
@@ -53,6 +57,7 @@ export const StatisticsBlockForm = ({
 
     const [metrics, setMetrics] = useState<Metric[]>([]);
     const [hiddenMetricIds, setHiddenMetricIds] = useState<number[]>([]);
+    const initialMetricsRef = useRef<Metric[]>([]);
 
     const {
         control,
@@ -60,14 +65,42 @@ export const StatisticsBlockForm = ({
         formState: { errors },
     } = useFormContext<MainPageFormValues>();
 
+    const toComparableMetrics = (items: Metric[]) =>
+        items.map((metric) => ({
+            id: metric.id ?? null,
+            value: metric.value,
+            name: metric.name ?? '',
+            type: metric.type,
+            prefix: resolvePrefix(metric.prefix),
+            isHidden: metric.isHidden,
+            priority: metric.priority,
+            localizations: (metric.localizations ?? [])
+                .map((loc) => ({
+                    languageId: loc.languageId ?? null,
+                    name: (loc.name ?? '').trim(),
+                }))
+                .sort((a, b) => (a.languageId ?? 0) - (b.languageId ?? 0)),
+        }));
+
+    const areMetricsEqual = (left: Metric[], right: Metric[]) =>
+        JSON.stringify(toComparableMetrics(left)) === JSON.stringify(toComparableMetrics(right));
+
     useEffect(() => {
         if (initialData?.impactStatistics?.metrics) {
-            setMetrics(initialData.impactStatistics.metrics);
+            const normalizedMetrics = mapMetricsWithResolvedPrefix(initialData.impactStatistics.metrics);
 
-            const hiddenIds = initialData.impactStatistics.metrics.filter((m) => m.isHidden).map((m) => m.id as number);
+            setMetrics(normalizedMetrics);
+            initialMetricsRef.current = normalizedMetrics;
+            setValue('metrics', normalizedMetrics, {
+                shouldDirty: false,
+                shouldTouch: false,
+                shouldValidate: false,
+            });
+
+            const hiddenIds = normalizedMetrics.filter((m) => m.isHidden).map((m) => m.id as number);
             setHiddenMetricIds(hiddenIds);
         }
-    }, [initialData]);
+    }, [initialData, setValue]);
 
     const handleToggleVisibility = async (id: number) => {
         const isCurrentlyHidden = hiddenMetricIds.includes(id);
@@ -88,7 +121,8 @@ export const StatisticsBlockForm = ({
     };
 
     const handleReorderMetrics = async (items: Metric[]) => {
-        setMetrics(items);
+        const normalizedMetrics = mapMetricsWithResolvedPrefix(items);
+        setMetrics(normalizedMetrics);
 
         const statisticId = initialData?.impactStatistics?.id;
 
@@ -101,17 +135,21 @@ export const StatisticsBlockForm = ({
         } catch (error) {
             addToast(MAIN_PAGE_TEXT.ERRORS.REORDER_FAILED, ToastType.Error, 3000);
             if (initialData?.impactStatistics?.metrics) {
-                setMetrics(initialData.impactStatistics.metrics);
+                const normalizedMetrics = mapMetricsWithResolvedPrefix(initialData.impactStatistics.metrics);
+                setMetrics(normalizedMetrics);
             }
         }
     };
 
     const handleMetricUpdate = (updatedMetrics: Metric[]) => {
-        setMetrics(updatedMetrics);
-        onMetricsChange?.(updatedMetrics);
+        const normalizedMetrics = mapMetricsWithResolvedPrefix(updatedMetrics);
+        const hasChanges = !areMetricsEqual(normalizedMetrics, initialMetricsRef.current);
 
-        setValue('metrics', updatedMetrics, {
-            shouldDirty: true,
+        setMetrics(normalizedMetrics);
+        onMetricsChange?.(normalizedMetrics);
+
+        setValue('metrics', normalizedMetrics, {
+            shouldDirty: hasChanges,
             shouldTouch: true,
             shouldValidate: true,
         });

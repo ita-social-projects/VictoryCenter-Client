@@ -2,6 +2,7 @@ import {
     MAIN_PAGE_FORM_DEFAULTS,
     MainPage,
     MainPageFormValues,
+    Metric,
     MetricPrefix,
     UpdateMainPageDto,
     UpdateMetricDto,
@@ -34,6 +35,13 @@ export const serializePrefix = (prefix: MetricPrefix | null | undefined): number
     if (prefix == null) return null;
     const resolved = resolvePrefix(prefix);
     return PREFIX_TO_NUMERIC[resolved] ?? 0;
+};
+
+export const mapMetricsWithResolvedPrefix = (metrics: Metric[] = []): Metric[] => {
+    return metrics.map((metric) => ({
+        ...metric,
+        prefix: resolvePrefix(metric.prefix),
+    }));
 };
 
 export function mapMainPageToFormValues(page: MainPage, languages?: LocalizationLanguage[]): MainPageFormValues {

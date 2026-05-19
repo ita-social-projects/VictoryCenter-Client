@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen, waitFor, within, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { HistoryPageContent } from './HistoryPageContent';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -11,6 +11,8 @@ import { SectionTemplate } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
 import { ToastType } from '@/types/admin/toast';
 import type { HistorySectionDto } from '@/types/common/history-sections';
+import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
+import { mapHistorySectionDtoToModel } from '@/utils/functions/mappers/admin/history/history-mappers';
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
@@ -28,9 +30,21 @@ jest.mock('@/services/api/admin/history/history-api', () => ({
 }));
 
 jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider');
+
+jest.mock('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit', () => ({
+    useLocalizationToolkit: jest.fn(),
+}));
+const mockedUseLocalizationToolkit = useLocalizationToolkit as jest.Mock;
+
+jest.mock('@/utils/functions/mappers/admin/history/history-mappers', () => ({
+    mapHistorySectionDtoToModel: jest.fn(),
+}));
+const mockedMapHistorySectionDtoToModel = mapHistorySectionDtoToModel as jest.Mock;
+
 const mockedUseToast = useToast as jest.Mock;
 
 const mockHistoryFormProps = jest.fn();
+const mockToolbarProps = jest.fn();
 const mockDeleteDiscardAction = jest.fn();
 const mockRevertDiscardAction = jest.fn();
 const mockAddSection = jest.fn();
@@ -50,6 +64,7 @@ jest.mock('../history-form/HistoryForm', () => {
             onSectionDeleted,
             onReplaceSection,
             onSectionsChange,
+            language,
         } = props;
 
         mockHistoryFormSections = sections;
@@ -60,6 +75,7 @@ jest.mock('../history-form/HistoryForm', () => {
             onSectionDeleted,
             onReplaceSection,
             onSectionsChange,
+            language,
         });
 
         React.useImperativeHandle(ref, () => ({
@@ -254,11 +270,12 @@ jest.mock('@/assets/icons/plus.svg', () => ({
 jest.mock('@/assets/icons/not-found.svg', () => 'not-found.svg');
 
 jest.mock('../history-page-toolbar/HistoryPageToolbar', () => ({
-    HistoryPageToolbar: ({ onAddSection }: { onAddSection: () => void }) => {
-        mockToolbarOnAddSection(onAddSection);
+    HistoryPageToolbar: (props: any) => {
+        mockToolbarOnAddSection(props.onAddSection);
+        mockToolbarProps(props);
 
         return (
-            <button type="button" data-testid="toolbar-add-section-button" onClick={onAddSection}>
+            <button type="button" data-testid="toolbar-add-section-button" onClick={props.onAddSection}>
                 Add History Section
             </button>
         );
@@ -276,6 +293,7 @@ const createSection = (id: number, template: SectionTemplate, order: number): Hi
             contentType: ContentType.Title,
             order: 0,
             title: `Title ${id}`,
+            localizations: [],
         },
     ],
 });
@@ -314,6 +332,7 @@ describe('HistoryPageContent', () => {
         mockedHistoryApi.syncSections.mockResolvedValue([] as never);
         refetchSectionsMock.mockResolvedValue(undefined);
         mockedUseToast.mockReturnValue({ addToast: mockAddToast });
+        mockedMapHistorySectionDtoToModel.mockReturnValue({ contents: [] });
         mockedUseDataFetch.mockReturnValue({
             data: null,
             error: null,
@@ -321,6 +340,64 @@ describe('HistoryPageContent', () => {
             refetch: refetchSectionsMock,
             setData: jest.fn(),
         });
+        mockedUseLocalizationToolkit.mockReturnValue({
+            allLanguages: [{ id: 'en', code: 'en' }],
+            translationLanguages: [{ id: 'uk', code: 'uk' }],
+            selectedLanguage: { id: 'en', code: 'en' },
+            onLanguageChange: jest.fn(),
+            translationStatusFilter: undefined,
+            onTranslationStatusFilterChange: jest.fn(),
+        });
+    });
+    it('passes correct localization props to HistoryPageToolbar', () => {
+        render(<HistoryPageContent />);
+
+        expect(mockToolbarProps).toHaveBeenCalledWith(
+            expect.objectContaining({
+                languages: [{ id: 'en', code: 'en' }],
+                translationLanguages: [{ id: 'uk', code: 'uk' }],
+                onLanguageChange: expect.any(Function),
+                onTranslationStatusFilterChange: expect.any(Function),
+            }),
+        );
+    });
+
+    it('calculates localizedEntity correctly, skipping Image content type', () => {
+        const sections = mockSingleSectionData();
+
+        // Мокаємо результат мапінгу з різними типами контенту
+        const mappedModel = {
+            contents: [
+                { id: 'content-1', contentType: ContentType.Image }, // Should be skipped
+                { id: 'content-2', contentType: ContentType.Title }, // Should be selected
+                { id: 'content-3', contentType: ContentType.Description },
+            ],
+        };
+        mockedMapHistorySectionDtoToModel.mockReturnValue(mappedModel);
+
+        render(<HistoryPageContent />);
+
+        // Перевіряємо, чи викликався мапер
+        expect(mockedMapHistorySectionDtoToModel).toHaveBeenCalledWith(sections[0]);
+
+        // Перевіряємо, чи отримав тулбар правильний localizedEntity (перший не-Image контент)
+        expect(mockToolbarProps).toHaveBeenCalledWith(
+            expect.objectContaining({
+                localizedEntity: { id: 'content-2', contentType: ContentType.Title },
+            }),
+        );
+    });
+
+    it('passes selectedLanguage to HistoryForm', () => {
+        mockSingleSectionData();
+
+        render(<HistoryPageContent />);
+
+        expect(mockHistoryFormProps).toHaveBeenCalledWith(
+            expect.objectContaining({
+                language: { id: 'en', code: 'en' },
+            }),
+        );
     });
 
     it('uses history API in fetch handler passed to useDataFetch', async () => {
@@ -660,6 +737,57 @@ describe('HistoryPageContent', () => {
 
         await waitFor(() => {
             expect(mockAddToast).toHaveBeenCalledWith('Publish error', ToastType.Error);
+        });
+    });
+
+    it('closes add-section modal when onClose is triggered', async () => {
+        render(<HistoryPageContent />);
+
+        await user.click(screen.getByTestId('toolbar-add-section-button'));
+        expect(screen.getByTestId('add-section-modal')).toBeInTheDocument();
+
+        await user.click(screen.getByTestId('close-add-section-modal'));
+        expect(screen.queryByTestId('add-section-modal')).not.toBeInTheDocument();
+    });
+
+    it('cancels publish confirmation modal without publishing', async () => {
+        mockSingleSectionData();
+
+        render(<HistoryPageContent />);
+
+        await user.click(screen.getByTestId('mark-saved'));
+        await user.click(screen.getByRole('button', { name: 'Publish' }));
+
+        expect(screen.getByTestId('question-modal')).toBeInTheDocument();
+
+        await user.click(screen.getByTestId('question-cancel'));
+
+        expect(screen.queryByTestId('question-modal')).not.toBeInTheDocument();
+        expect(mockedHistoryApi.syncSections).not.toHaveBeenCalled();
+    });
+
+    it('calls setErrorState when useLocalizationToolkit reports an error', () => {
+        let capturedSetErrorState: ((message: string, type: string) => void) | undefined;
+
+        mockedUseLocalizationToolkit.mockImplementation(
+            ({ setErrorState }: { setErrorState?: (message: string, type: string) => void }) => {
+                capturedSetErrorState = setErrorState;
+
+                return {
+                    allLanguages: [{ id: 'en', code: 'en' }],
+                    translationLanguages: [{ id: 'uk', code: 'uk' }],
+                    selectedLanguage: { id: 'en', code: 'en' },
+                    onLanguageChange: jest.fn(),
+                    translationStatusFilter: undefined,
+                    onTranslationStatusFilterChange: jest.fn(),
+                };
+            },
+        );
+
+        render(<HistoryPageContent />);
+
+        act(() => {
+            capturedSetErrorState?.('Language loading failed', 'languages');
         });
     });
 });

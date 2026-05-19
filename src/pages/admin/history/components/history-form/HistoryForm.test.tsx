@@ -8,6 +8,7 @@ import { SectionTemplate } from '@/types/common/sections';
 import type { HistorySectionDto } from '@/types/common/history-sections';
 import type { HistorySectionFormProps } from '../history-section-form/HistorySectionForm';
 import { isProgramSectionValid } from '@/validation/admin/program-schema/program-schema';
+import type { LocalizationLanguage } from '@/types/common/language';
 
 const mockHistorySectionFormProps = jest.fn();
 const mockIsProgramSectionValid = isProgramSectionValid as jest.Mock;
@@ -507,5 +508,14 @@ describe('HistoryForm', () => {
                 isSectionValid: false,
             }),
         );
+    });
+
+    it('forwards language prop to each child HistorySectionForm', () => {
+        const sections = createSections();
+        const language: LocalizationLanguage = { id: 1, code: 'en', name: 'English' };
+
+        render(<HistoryForm sections={sections} language={language} />);
+
+        expect(mockHistorySectionFormProps).toHaveBeenCalledWith(expect.objectContaining({ language }));
     });
 });

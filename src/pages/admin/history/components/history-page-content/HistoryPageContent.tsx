@@ -196,7 +196,6 @@ export const HistoryPageContent = () => {
         translationLanguages,
         selectedLanguage,
         onLanguageChange,
-        translationStatusFilter,
         onTranslationStatusFilterChange,
     } = useLocalizationToolkit({ setErrorState });
 

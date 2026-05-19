@@ -99,7 +99,9 @@ describe('FundsExpendituresApi', () => {
 
     describe('updateCategory', () => {
         it('should put category and map response', async () => {
-            mockClient.put.mockResolvedValueOnce({ data: { id: 2, name: 'Updated expense', type: 2, localizations: [] } });
+            mockClient.put.mockResolvedValueOnce({
+                data: { id: 2, name: 'Updated expense', type: 2, localizations: [] },
+            });
 
             const result = await FundsExpendituresApi.updateCategory(mockClient, 2, {
                 name: 'Updated expense',

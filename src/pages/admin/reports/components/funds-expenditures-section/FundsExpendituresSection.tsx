@@ -20,6 +20,7 @@ import {
     ReportFundsExpendituresCategory,
     ReportFundsExpendituresRecord,
     ReportFundsExpendituresSettings,
+    ReportFundsExpendituresSettingsLocalization,
 } from '@/types/admin/reports';
 import { LocalizationLanguage } from '@/types/common/language';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
@@ -99,6 +100,8 @@ export const FundsExpenditureSection = ({
     const [activeRecordModalType, setActiveRecordModalType] = useState<FundsExpendituresTransactionType | null>(null);
 
     const [isTranslateDisclaimerModalOpen, setIsTranslateDisclaimerModalOpen] = useState(false);
+    const [disclaimerLocalization, setDisclaimerLocalization] =
+        useState<ReportFundsExpendituresSettingsLocalization | null>(null);
 
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [recordToDelete, setRecordToDelete] = useState<ReportFundsExpendituresRecord | null>(null);
@@ -696,7 +699,14 @@ export const FundsExpenditureSection = ({
             <TranslateDisclaimerModal
                 isOpen={isTranslateDisclaimerModalOpen}
                 onClose={() => setIsTranslateDisclaimerModalOpen(false)}
+                settings={settings}
                 translationLanguages={translationLanguages}
+                existingLocalization={disclaimerLocalization}
+                onTranslateSuccess={(localization) => {
+                    setDisclaimerLocalization(localization);
+                    setIsTranslateDisclaimerModalOpen(false);
+                    addToast(COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS, ToastType.Success);
+                }}
             />
         </div>
     );

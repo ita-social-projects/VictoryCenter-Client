@@ -240,6 +240,10 @@ export const FUNDS_EXPENDITURES_TEXT = {
             NAME_LABEL: 'Назва',
             NAME_PLACEHOLDER: 'Введіть назву категорії',
         },
+        TRANSLATE_DISCLAIMER: {
+            TITLE: 'Додати переклад',
+            DESCRIPTION_LABEL: 'Опис',
+        },
     },
     BUTTON: {
         EDIT: 'Редагувати Доходи та витрати',

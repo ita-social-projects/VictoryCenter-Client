@@ -63,8 +63,8 @@ describe('FundsExpendituresApi', () => {
         it('should request categories and map enum dto', async () => {
             mockClient.get.mockResolvedValueOnce({
                 data: [
-                    { id: 1, name: 'Income category', type: 1 },
-                    { id: 2, name: 'Expense category', type: 2 },
+                    { id: 1, name: 'Income category', type: 1, localizations: [] },
+                    { id: 2, name: 'Expense category', type: 2, localizations: [] },
                 ],
             });
 
@@ -82,7 +82,7 @@ describe('FundsExpendituresApi', () => {
 
     describe('createCategory', () => {
         it('should post category and map response', async () => {
-            mockClient.post.mockResolvedValueOnce({ data: { id: 3, name: 'New income', type: 1 } });
+            mockClient.post.mockResolvedValueOnce({ data: { id: 3, name: 'New income', type: 1, localizations: [] } });
 
             const result = await FundsExpendituresApi.createCategory(mockClient, {
                 name: 'New income',
@@ -99,7 +99,7 @@ describe('FundsExpendituresApi', () => {
 
     describe('updateCategory', () => {
         it('should put category and map response', async () => {
-            mockClient.put.mockResolvedValueOnce({ data: { id: 2, name: 'Updated expense', type: 2 } });
+            mockClient.put.mockResolvedValueOnce({ data: { id: 2, name: 'Updated expense', type: 2, localizations: [] } });
 
             const result = await FundsExpendituresApi.updateCategory(mockClient, 2, {
                 name: 'Updated expense',

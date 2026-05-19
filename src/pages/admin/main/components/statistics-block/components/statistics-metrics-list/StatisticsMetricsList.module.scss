@@ -27,7 +27,8 @@
 
 .table :global(.draggable-item),
 .table :global(.drag-preview-wrapper) {
-    height: 40px;
+    height: auto;
+    min-height: 40px;
     align-items: stretch;
     box-shadow: none;
     border-bottom: none;
@@ -36,7 +37,8 @@
 .table :global(.draggable-item .item-data),
 .table :global(.drag-preview .item-data) {
     padding: 0 10px;
-    height: 40px;
+    height: auto;
+    min-height: 40px;
     display: flex;
     align-items: center;
     width: 100%;
@@ -44,6 +46,7 @@
 
 .table :global(.dragger) {
     width: 32px;
+    height: 40px;
 }
 
 .row {

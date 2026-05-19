@@ -6,6 +6,8 @@ import { IconButton } from '@/components/admin/icon-button/IconButton';
 import { MAIN_PAGE_TEXT } from '@/const/admin/main-page';
 import { Metric } from '@/types/admin/main-page';
 import { formatMetricValue, getMetricName } from '@/utils/functions/formatters/metric-formatters';
+import { useState } from 'react';
+import { StatisticsMetricEditPanel } from '../statistics-metric-edit-panel/StatisticsMetricEditPanel';
 import styles from './StatisticsMetricsList.module.scss';
 
 interface StatisticsMetricsListProps {
@@ -13,6 +15,7 @@ interface StatisticsMetricsListProps {
     hiddenMetricIds: number[];
     onToggleVisibility: (id: number) => void;
     onReorder: (items: Metric[]) => void;
+    onMetricUpdate: (updatedMetrics: Metric[]) => void;
 }
 
 export const StatisticsMetricsList = ({
@@ -20,9 +23,28 @@ export const StatisticsMetricsList = ({
     hiddenMetricIds,
     onToggleVisibility,
     onReorder,
+    onMetricUpdate,
 }: StatisticsMetricsListProps) => {
+    const [editingMetricId, setEditingMetricId] = useState<number | null>(null);
     const visibleMetricsCount = metrics.length - hiddenMetricIds.length;
+
+    const handleSaveMetric = (updatedMetric: Metric) => {
+        const newMetrics = metrics.map((m) => (m.id === updatedMetric.id ? updatedMetric : m));
+        onMetricUpdate(newMetrics);
+        setEditingMetricId(null);
+    };
+
     const renderRow = (metric: Metric) => {
+        if (editingMetricId === metric.id) {
+            return (
+                <StatisticsMetricEditPanel
+                    metric={metric}
+                    onSave={handleSaveMetric}
+                    onCancel={() => setEditingMetricId(null)}
+                />
+            );
+        }
+
         const isHidden = hiddenMetricIds.includes(metric.id ?? 0);
         const isLastVisible = !isHidden && visibleMetricsCount <= 1;
 
@@ -39,7 +61,12 @@ export const StatisticsMetricsList = ({
                 </div>
 
                 <div className={styles.actions}>
-                    <IconButton type="button" DefaultIcon={EditIcon} className={styles.iconButton} />
+                    <IconButton
+                        type="button"
+                        DefaultIcon={EditIcon}
+                        className={styles.iconButton}
+                        onClick={() => setEditingMetricId(metric.id ?? null)}
+                    />
                     <IconButton
                         type="button"
                         aria-label={isHidden ? 'Show metric' : 'Hide metric'}
@@ -59,7 +86,6 @@ export const StatisticsMetricsList = ({
     return (
         <div className={styles.list}>
             <div className={styles.header}>{MAIN_PAGE_TEXT.BLOCKS.STATISTICS.METRICS_TITLE}</div>
-
             <div className={styles.table}>
                 {metrics.map((metric) => (
                     <DraggableListItem

@@ -50,6 +50,7 @@ export const StatisticsBlockForm = ({ initialData, isPublishDisabled, onPublish 
 
     const {
         control,
+        setValue,
         formState: { errors },
     } = useFormContext<MainPageFormValues>();
 
@@ -99,18 +100,29 @@ export const StatisticsBlockForm = ({ initialData, isPublishDisabled, onPublish 
         }
     };
 
+    const handleMetricUpdate = (updatedMetrics: Metric[]) => {
+        setMetrics(updatedMetrics);
+
+        setValue('metrics' as keyof MainPageFormValues, updatedMetrics as any, {
+            shouldDirty: true,
+            shouldTouch: true,
+        });
+    };
+
     return (
         <div className={styles.form}>
             <div className={styles.content}>
-                <ImageUploadForm
-                    control={control as any}
-                    errors={errors}
-                    imageError={imageError}
-                    setImageError={setImageError}
-                    imageConfig={IMAGE_CONFIG}
-                    variant="whoWeAre"
-                    name="statisticsImage"
-                />
+                <div className={styles['image-section']}>
+                    <ImageUploadForm
+                        control={control as any}
+                        errors={errors}
+                        imageError={imageError}
+                        setImageError={setImageError}
+                        imageConfig={IMAGE_CONFIG}
+                        variant="whoWeAre"
+                        name="statisticsImage"
+                    />
+                </div>
 
                 <div className={styles['right-section']}>
                     <StatisticsPreview
@@ -163,6 +175,7 @@ export const StatisticsBlockForm = ({ initialData, isPublishDisabled, onPublish 
                         hiddenMetricIds={hiddenMetricIds}
                         onToggleVisibility={handleToggleVisibility}
                         onReorder={handleReorderMetrics}
+                        onMetricUpdate={handleMetricUpdate}
                     />
                 </div>
             </div>

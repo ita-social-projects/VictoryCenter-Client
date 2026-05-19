@@ -10,7 +10,7 @@ import { TranslationStatus } from '@/types/common/language';
 const mockLocalizationDto: ReportFundsExpendituresSettingsLocalizationDto = {
     entityId: 1,
     disclaimerTitle: 'Translated disclaimer',
-    localizationInfoDto: { id: 2, code: 'en', name: 'English' },
+    localizationInfoDto: { id: 2, code: 'en' },
     translationStatus: TranslationStatus.Relevant,
 };
 

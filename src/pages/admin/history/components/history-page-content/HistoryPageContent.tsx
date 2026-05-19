@@ -11,7 +11,11 @@ import { HistoryPageToolbar } from '../history-page-toolbar/HistoryPageToolbar';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { HistoryApi } from '@/services/api/admin/history/history-api';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
-import { CreateUpdateHistorySectionDto, HistorySectionDto } from '@/types/common/history-sections';
+import {
+    CreateUpdateHistorySectionDto,
+    HistorySectionContent,
+    HistorySectionDto,
+} from '@/types/common/history-sections';
 import { useSectionCancelConfirmation } from '@/hooks/admin/use-section-cancel-confirmation/useSectionCancelConfirmation';
 import { SectionCancelActionType } from '@/types/admin/programs';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
@@ -25,6 +29,16 @@ import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextPr
 import { ToastType } from '@/types/admin/toast';
 import { AddSectionModal } from '@/pages/admin/programs/components/programs-page-modals/add-section-modal/AddSectionModal';
 import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
+import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
+import { mapHistorySectionDtoToModel } from '@/utils/functions/mappers/admin/history/history-mappers';
+import { ContentType } from '@/types/common/section-contents';
+
+type HistoryErrorType = 'languages';
+
+interface HistoryErrorState {
+    message: string | null;
+    type: HistoryErrorType | null;
+}
 
 export const HistoryPageContent = () => {
     const client = useAdminClient();
@@ -171,9 +185,38 @@ export const HistoryPageContent = () => {
         }
     }, [client, refetchSections, addToast]);
 
+    const [localizationError, setLocalizationError] = useState<HistoryErrorState>({ message: null, type: null });
+
+    const setErrorState = useCallback((message: string, type: HistoryErrorType) => {
+        setLocalizationError({ message, type });
+    }, []);
+
+    const {
+        allLanguages,
+        translationLanguages,
+        selectedLanguage,
+        onLanguageChange,
+        translationStatusFilter,
+        onTranslationStatusFilterChange,
+    } = useLocalizationToolkit({ setErrorState });
+
+    const localizedEntity = useMemo((): HistorySectionContent | undefined => {
+        const firstSection = normalizedSections[0];
+        if (!firstSection) return undefined;
+        const mappedSection = mapHistorySectionDtoToModel(firstSection);
+        return mappedSection.contents.find((c) => c.contentType !== ContentType.Image);
+    }, [normalizedSections]);
+
     return (
         <div className={styles['history-page-wrapper']} data-testid="history-page-content">
-            <HistoryPageToolbar onAddSection={handleAddSection} />
+            <HistoryPageToolbar
+                onAddSection={handleAddSection}
+                translationLanguages={translationLanguages}
+                languages={allLanguages}
+                localizedEntity={localizedEntity}
+                onLanguageChange={onLanguageChange}
+                onTranslationStatusFilterChange={onTranslationStatusFilterChange}
+            />
             <div className={styles['sections-container']}>
                 {isSectionsLoading && (
                     <div className={styles['sections-loader-state']} data-testid="history-sections-loader">
@@ -224,6 +267,7 @@ export const HistoryPageContent = () => {
                         onSectionSaved={handleSectionSaved}
                         onSectionDeleted={handleSectionDeleted}
                         onRequestCancelSection={handleRequestCancelSection}
+                        language={selectedLanguage}
                     />
                 )}
                 <div className={styles['functional-button-container']}>

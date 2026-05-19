@@ -4,7 +4,7 @@ import {
     SectionFormActions,
 } from '@/components/admin/section-form-actions/SectionFormActions';
 import { ImageValues } from '@/types/common/image';
-import { HistorySectionContentDto, HistorySectionDto } from '@/types/common/history-sections';
+import { HistoryLocalizableFields, HistorySectionContentDto, HistorySectionDto } from '@/types/common/history-sections';
 import { ContentType } from '@/types/common/section-contents';
 import { SectionMode } from '@/types/common/sections';
 import {
@@ -14,6 +14,9 @@ import {
 } from '@/utils/functions/render-history-section';
 import { buildSectionCancelOptions } from '@/utils/functions/section-cancel-flow/section-cancel-flow';
 import styles from './HistorySectionForm.module.scss';
+import { LocalizationLanguage } from '@/types/common/language';
+import { returnDisplayedLocalization } from '@/utils/functions/localization/localization';
+import { mapHistorySectionContentDtoToModel } from '@/utils/functions/mappers/admin/history/history-mappers';
 
 const SUPPORTED_CONTENT_TYPES = new Set<ContentType>([ContentType.Title, ContentType.Description, ContentType.Image]);
 const sectionFormActionsClassNames = createSectionFormActionsClassNames(styles);
@@ -128,6 +131,7 @@ export interface HistorySectionFormProps {
     onMoveUpSection: () => void;
     onMoveDownSection: () => void;
     onRequestSaveSection?: (request: { onConfirm: () => void }) => void;
+    language?: LocalizationLanguage;
 }
 
 export interface SectionCancelOptions {
@@ -156,11 +160,13 @@ export const HistorySectionForm = ({
     onMoveDownSection,
     onMoveUpSection,
     onRequestSaveSection,
+    language,
 }: HistorySectionFormProps) => {
     const [localSection, setLocalSection] = useState<HistorySectionDto>(() => normalizeHistorySectionContents(section));
     const [originalSection, setOriginalSection] = useState<HistorySectionDto>(() =>
         normalizeHistorySectionContents(section),
     );
+    const [textFields, setTextFields] = useState<HistoryLocalizableFields>();
     const [isDirty, setIsDirty] = useState(false);
     const [validationResetKey, setValidationResetKey] = useState(0);
     const [sectionMode, setSectionMode] = useState<SectionMode>(
@@ -177,6 +183,29 @@ export const HistorySectionForm = ({
     useEffect(() => {
         sectionModeRef.current = sectionMode;
     }, [sectionMode]);
+
+    useEffect(() => {
+        const titleContent = getOrderedContentsByType(localSection.contents, ContentType.Title)[0];
+        const descriptionContent = getOrderedContentsByType(localSection.contents, ContentType.Description)[0];
+
+        let title = titleContent?.title ?? '';
+        let description = descriptionContent?.description ?? '';
+
+        if (language) {
+            if (titleContent) {
+                const mapped = mapHistorySectionContentDtoToModel(titleContent);
+                const loc = returnDisplayedLocalization(mapped, language.code);
+                title = loc?.title || title;
+            }
+            if (descriptionContent) {
+                const mapped = mapHistorySectionContentDtoToModel(descriptionContent);
+                const loc = returnDisplayedLocalization(mapped, language.code);
+                description = loc?.description || description;
+            }
+        }
+
+        setTextFields({ title, description });
+    }, [language, localSection]);
 
     useEffect(() => {
         onEditStateChangeRef.current = onEditStateChange;
@@ -380,7 +409,15 @@ export const HistorySectionForm = ({
         [onRequestReplace],
     );
 
-    const sectionData = getHistorySectionData(localSection);
+    const rawSectionData = getHistorySectionData(localSection);
+    const sectionData =
+        sectionMode === SectionMode.View
+            ? {
+                  ...rawSectionData,
+                  title: textFields?.title ?? rawSectionData.title,
+                  description: textFields?.description ?? rawSectionData.description,
+              }
+            : rawSectionData;
 
     const sectionToRender = renderHistorySection({
         templateId: localSection.template,

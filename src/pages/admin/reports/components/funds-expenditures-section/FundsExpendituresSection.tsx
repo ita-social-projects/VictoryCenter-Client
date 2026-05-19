@@ -21,6 +21,7 @@ import {
     ReportFundsExpendituresRecord,
     ReportFundsExpendituresSettings,
 } from '@/types/admin/reports';
+import { LocalizationLanguage } from '@/types/common/language';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
@@ -39,6 +40,7 @@ import { AddFundsExpendituresCategoryModal } from './components/common/add-funds
 import { DeleteRecordModal } from './components/common/delete-record-modal/DeleteRecordModal';
 import { DeleteFundsExpendituresCategoryModal } from './components/common/delete-funds-expenditures-category-modal/DeleteFundsExpendituresCategoryModal';
 import { EditFundsExpendituresCategoryModal } from './components/common/edit-funds-expenditures-category-modal/EditFundsExpendituresCategoryModal';
+import { TranslateDisclaimerModal } from './components/common/translate-disclaimer-modal/TranslateDisclaimerModal';
 import styles from './FundsExpendituresSection.module.scss';
 
 const enrichRecords = (
@@ -64,6 +66,7 @@ interface FundsExpenditureSectionProps {
     isEditCategoryModalOpen?: boolean;
     onEditCategoryModalClose?: () => void;
     onCategoriesLoaded?: (categories: ReportFundsExpendituresCategory[]) => void;
+    translationLanguages?: LocalizationLanguage[];
 }
 
 export const FundsExpenditureSection = ({
@@ -78,6 +81,7 @@ export const FundsExpenditureSection = ({
     isEditCategoryModalOpen = false,
     onEditCategoryModalClose,
     onCategoriesLoaded,
+    translationLanguages = [],
 }: FundsExpenditureSectionProps = {}) => {
     const adminClient = useAdminClient();
     const { addToast } = useToast();
@@ -93,6 +97,8 @@ export const FundsExpenditureSection = ({
     const [recordsState, setRecordsState] = useState<ReportFundsExpendituresRecord[]>([]);
     const [isRowEditMode, setIsRowEditMode] = useState(false);
     const [activeRecordModalType, setActiveRecordModalType] = useState<FundsExpendituresTransactionType | null>(null);
+
+    const [isTranslateDisclaimerModalOpen, setIsTranslateDisclaimerModalOpen] = useState(false);
 
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [recordToDelete, setRecordToDelete] = useState<ReportFundsExpendituresRecord | null>(null);
@@ -505,6 +511,7 @@ export const FundsExpenditureSection = ({
     }
 
     const EditIcon = ACTION_ICONS.edit.default;
+    const TranslateIcon = ACTION_ICONS.translate.default;
 
     return (
         <div className={styles.section}>
@@ -538,7 +545,19 @@ export const FundsExpenditureSection = ({
             ) : (
                 settings?.disclaimerTitle && (
                     <div className={styles.disclaimer}>
-                        <span className={styles['disclaimer-label']}>{FUNDS_EXPENDITURES_TEXT.DISCLAIMER_LABEL}</span>
+                        <div className={styles['disclaimer-header']}>
+                            <span className={styles['disclaimer-label']}>
+                                {FUNDS_EXPENDITURES_TEXT.DISCLAIMER_LABEL}
+                            </span>
+                            <button
+                                type="button"
+                                className={styles['translate-btn']}
+                                onClick={() => setIsTranslateDisclaimerModalOpen(true)}
+                                aria-label="Перекласти дісклеймер"
+                            >
+                                <TranslateIcon />
+                            </button>
+                        </div>
                         <div className={styles['disclaimer-text-area']}>
                             <p className={styles['disclaimer-text']}>{settings.disclaimerTitle}</p>
                         </div>
@@ -672,6 +691,12 @@ export const FundsExpenditureSection = ({
                 onConfirm={handleConfirmBulkDelete}
                 onCancel={handleBulkDeleteCancel}
                 onClose={handleBulkDeleteCancel}
+            />
+
+            <TranslateDisclaimerModal
+                isOpen={isTranslateDisclaimerModalOpen}
+                onClose={() => setIsTranslateDisclaimerModalOpen(false)}
+                translationLanguages={translationLanguages}
             />
         </div>
     );

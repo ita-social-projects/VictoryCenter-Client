@@ -28,6 +28,15 @@ export const MAIN_PAGE_TEXT = {
                 ENG: 'ENG',
             },
         },
+        EDIT_PANEL: {
+            TITLE: 'Редагування',
+            UKR_NAME_LABEL: 'UKR Назва',
+            ENG_NAME_LABEL: 'ENG Назва',
+            VALUE_LABEL: 'Значення',
+            PREFIX_LABEL: 'Префікс',
+            CANCEL_MODAL_TITLE: 'Відмінити зміни?',
+            PREFIX_NONE: 'None',
+        },
         PARTNERS: {
             TITLE_LABEL: COMMON_TEXT_ADMIN.TYPE.TITLE,
             DESCRIPTION_LABEL: COMMON_TEXT_ADMIN.TYPE.DESCRIPTION,
@@ -36,6 +45,8 @@ export const MAIN_PAGE_TEXT = {
 
     BUTTONS: {
         PUBLISH: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED,
+        CANCEL: COMMON_TEXT_ADMIN.BUTTON.CANCEL,
+        SAVE: COMMON_TEXT_ADMIN.BUTTON.SAVE,
     },
 
     ERRORS: {

@@ -3,6 +3,7 @@ import { ConfirmationModal } from '@/components/admin/confirmation-modal/Confirm
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { MultiSelectInput } from '@/components/admin/multi-select-input/MultiSelectInput';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { MAIN_PAGE_TEXT } from '@/const/admin/main-page';
 import { Metric, MetricPrefix } from '@/types/admin/main-page';
 import { useState } from 'react';
 import styles from './StatisticsMetricEditPanel.module.scss';
@@ -14,7 +15,7 @@ interface StatisticsMetricEditPanelProps {
 }
 
 const PREFIX_OPTIONS = [
-    { id: MetricPrefix.None, name: 'None' },
+    { id: MetricPrefix.None, name: MAIN_PAGE_TEXT.BLOCKS.EDIT_PANEL.PREFIX_NONE },
     { id: MetricPrefix.Plus, name: '+' },
     { id: MetricPrefix.Percent, name: '%' },
 ];
@@ -85,12 +86,12 @@ export const StatisticsMetricEditPanel = ({ metric, onSave, onCancel }: Statisti
 
     return (
         <div className={styles.panel}>
-            <div className={styles.header}>Редагування</div>
+            <div className={styles.header}>{MAIN_PAGE_TEXT.BLOCKS.EDIT_PANEL.TITLE}</div>
             <div className={styles.formGrid}>
                 <InputWithCharacterLimitGroup
                     id={`metric-ua-${metric.id}`}
                     name="nameUa"
-                    label="UKR Назва"
+                    label={MAIN_PAGE_TEXT.BLOCKS.EDIT_PANEL.UKR_NAME_LABEL}
                     value={nameUa}
                     onChange={(e) => setNameUa(e.target.value)}
                     maxLength={20}
@@ -99,7 +100,7 @@ export const StatisticsMetricEditPanel = ({ metric, onSave, onCancel }: Statisti
                 <InputWithCharacterLimitGroup
                     id={`metric-en-${metric.id}`}
                     name="nameEn"
-                    label="ENG Назва"
+                    label={MAIN_PAGE_TEXT.BLOCKS.EDIT_PANEL.ENG_NAME_LABEL}
                     value={nameEn}
                     onChange={(e) => setNameEn(e.target.value)}
                     maxLength={20}
@@ -108,14 +109,14 @@ export const StatisticsMetricEditPanel = ({ metric, onSave, onCancel }: Statisti
                 <InputWithCharacterLimitGroup
                     id={`metric-val-${metric.id}`}
                     name="value"
-                    label="Значення"
+                    label={MAIN_PAGE_TEXT.BLOCKS.EDIT_PANEL.VALUE_LABEL}
                     value={value}
                     onChange={handleValueChange}
                     maxLength={15}
                     isRequired
                 />
                 <div className={styles.prefixGroup}>
-                    <label className={styles.prefixLabel}>Префікс</label>
+                    <label className={styles.prefixLabel}>{MAIN_PAGE_TEXT.BLOCKS.EDIT_PANEL.PREFIX_LABEL}</label>
                     <MultiSelectInput
                         id={`metric-prefix-${metric.id}`}
                         options={PREFIX_OPTIONS}
@@ -130,17 +131,17 @@ export const StatisticsMetricEditPanel = ({ metric, onSave, onCancel }: Statisti
             </div>
             <div className={styles.actions}>
                 <Button buttonStyle="secondary" onClick={handleCancelClick}>
-                    Відмінити
+                    {MAIN_PAGE_TEXT.BUTTONS.CANCEL}
                 </Button>
                 <Button buttonStyle="primary" onClick={handleSave} disabled={isSaveDisabled}>
-                    Зберегти
+                    {MAIN_PAGE_TEXT.BUTTONS.SAVE}
                 </Button>
             </div>
 
             <ConfirmationModal
                 isOpen={isCancelModalOpen}
                 onClose={() => setIsCancelModalOpen(false)}
-                title="Відмінити зміни?"
+                title={MAIN_PAGE_TEXT.BLOCKS.EDIT_PANEL.CANCEL_MODAL_TITLE}
                 onConfirm={handleConfirmCancel}
                 onCancel={() => setIsCancelModalOpen(false)}
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}

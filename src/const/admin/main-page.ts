@@ -114,4 +114,13 @@ export const MAIN_PAGE_VALIDATION = {
             getMaxError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(100),
         },
     },
+
+    editPanel: {
+        name: {
+            min: 2,
+            max: 20,
+            getMinError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(2),
+            getMaxError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(20),
+        },
+    },
 } as const;

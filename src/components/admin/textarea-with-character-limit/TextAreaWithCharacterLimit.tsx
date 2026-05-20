@@ -101,7 +101,9 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
             const borderTop = Number.parseFloat(computedStyle.borderTopWidth) || 0;
             const borderBottom = Number.parseFloat(computedStyle.borderBottomWidth) || 0;
 
-            const maxHeight = maxRows ? parsedLineHeight * maxRows + paddingTop + paddingBottom + borderTop + borderBottom : Infinity;
+            const maxHeight = maxRows
+                ? parsedLineHeight * maxRows + paddingTop + paddingBottom + borderTop + borderBottom
+                : Infinity;
 
             const finalTargetHeight = textarea.scrollHeight + borderTop + borderBottom;
 

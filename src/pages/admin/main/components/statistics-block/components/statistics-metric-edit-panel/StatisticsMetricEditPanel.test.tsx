@@ -43,16 +43,16 @@ jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
 
 jest.mock('@/components/admin/multi-select-input/MultiSelectInput', () => ({
     __esModule: true,
-    MultiSelectInput: ({ id, options, value, onChange }: any) => (
+    MultiSelectInput: ({ id, options, value, onChange, getOptionId, getOptionName }: any) => (
         <div data-testid={id} data-selected={value?.[0]?.id ?? ''}>
             {options.map((option: any) => (
                 <button
-                    key={option.id}
+                    key={getOptionId(option)}
                     type="button"
-                    data-testid={`${id}-${option.id}`}
+                    data-testid={`${id}-${getOptionId(option)}`}
                     onClick={() => onChange([option])}
                 >
-                    {option.name}
+                    {getOptionName(option)}
                 </button>
             ))}
         </div>
@@ -154,6 +154,28 @@ describe('StatisticsMetricEditPanel', () => {
         ]);
     });
 
+    it('keeps prefix when selecting the same option', async () => {
+        const onSave = jest.fn();
+        render(<StatisticsMetricEditPanel metric={createMetric()} onSave={onSave} onCancel={jest.fn()} />);
+
+        fireEvent.click(screen.getByTestId('metric-prefix-1-Plus'));
+        fireEvent.change(screen.getByTestId('metric-ua-1'), { target: { value: 'Оновлена UA' } });
+        fireEvent.blur(screen.getByTestId('metric-ua-1'));
+        fireEvent.blur(screen.getByTestId('metric-en-1'));
+        fireEvent.blur(screen.getByTestId('metric-val-1'));
+
+        const saveButton = screen.getByRole('button', { name: MAIN_PAGE_TEXT.BUTTONS.SAVE });
+        await waitFor(() => expect(saveButton).not.toBeDisabled());
+        fireEvent.click(saveButton);
+
+        await waitFor(() => {
+            expect(onSave).toHaveBeenCalledTimes(1);
+        });
+
+        const updatedMetric = onSave.mock.calls[0][0];
+        expect(updatedMetric.prefix).toBe(MetricPrefix.Plus);
+    });
+
     it('opens cancel modal when form is dirty and confirms cancel', async () => {
         const onCancel = jest.fn();
         render(<StatisticsMetricEditPanel metric={createMetric()} onSave={jest.fn()} onCancel={onCancel} />);
@@ -201,5 +223,49 @@ describe('StatisticsMetricEditPanel', () => {
 
         expect(onCancel).toHaveBeenCalledTimes(1);
         expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument();
+    });
+
+    it('handles saving when localizations are undefined', async () => {
+        const onSave = jest.fn();
+        const metric = createMetric({ localizations: undefined as any });
+
+        render(<StatisticsMetricEditPanel metric={metric} onSave={onSave} onCancel={jest.fn()} />);
+
+        fireEvent.change(screen.getByTestId('metric-ua-1'), { target: { value: 'UA Update' } });
+        fireEvent.change(screen.getByTestId('metric-en-1'), { target: { value: 'EN Update' } });
+        fireEvent.blur(screen.getByTestId('metric-ua-1'));
+        fireEvent.blur(screen.getByTestId('metric-en-1'));
+
+        const saveButton = screen.getByRole('button', { name: MAIN_PAGE_TEXT.BUTTONS.SAVE });
+        await waitFor(() => expect(saveButton).not.toBeDisabled());
+        fireEvent.click(saveButton);
+
+        await waitFor(() => {
+            const updatedMetric = onSave.mock.calls[0][0];
+            expect(updatedMetric.localizations).toEqual([]);
+        });
+    });
+
+    it('uses default prefix option when provided prefix is invalid', () => {
+        render(
+            <StatisticsMetricEditPanel
+                metric={createMetric({ prefix: 999 as any })}
+                onSave={jest.fn()}
+                onCancel={jest.fn()}
+            />,
+        );
+
+        expect(screen.getByTestId('metric-prefix-1')).toHaveAttribute('data-selected', 'None');
+    });
+
+    it('handles prefix selection fallbacks in onChange', async () => {
+        render(<StatisticsMetricEditPanel metric={createMetric()} onSave={jest.fn()} onCancel={jest.fn()} />);
+
+        const noneOption = screen.getByTestId('metric-prefix-1-None');
+        fireEvent.click(noneOption);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('metric-prefix-1')).toBeInTheDocument();
+        });
     });
 });

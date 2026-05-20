@@ -121,6 +121,6 @@ export const API_ROUTES = {
     },
     HISTORY: {
         BASE: 'History',
-        PUBLIC: 'History/published',
+        PUBLIC: 'History',
     },
 };

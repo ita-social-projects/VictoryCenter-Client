@@ -5,54 +5,66 @@
 .hero-section {
     display: flex;
     flex-direction: column;
+    position: relative;
+}
+
+.hero-content {
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 32px;
-    padding: 80px 16px 60px;
+    gap: 16px;
+    padding: 100px 16px 80px;
+    position: relative;
+    z-index: 1;
 
     @media (min-width: 768px) {
-        padding: 96px 32px 80px;
-        gap: 40px;
+        padding: 130px 32px 110px;
+        gap: 20px;
     }
 
     @media (min-width: 1024px) {
-        padding: 120px 56px 96px;
-        gap: 48px;
+        padding: 160px 56px 140px;
+        gap: 24px;
     }
 
     @media (min-width: 1440px) {
-        padding: 168px 56px 120px;
-        gap: 56px;
+        padding: 120px 56px 220px;
+        gap: 28px;
     }
 }
 
 .title {
     font-family: t.$font-family-base;
     font-weight: t.$fw-medium;
-    font-size: 40px;
-    line-height: 48px;
+    font-size: 24px;
+    line-height: 32px;
     letter-spacing: t.$ls-tight;
     text-transform: uppercase;
     text-align: center;
-    max-width: 1102px;
+    max-width: 280px;
 
     @media (min-width: 768px) {
-        font-size: 56px;
-        line-height: 68px;
+        font-size: 30px;
+        line-height: 38px;
+        max-width: 380px;
     }
 
     @media (min-width: 1024px) {
-        font-size: 64px;
-        line-height: 76px;
+        font-size: 36px;
+        line-height: 44px;
+        max-width: 460px;
     }
 
     @media (min-width: 1280px) {
-        font-size: 80px;
-        line-height: 96px;
+        font-size: 42px;
+        line-height: 50px;
+        max-width: 540px;
     }
 
     @media (min-width: 1440px) {
-        font-size: 96px;
-        line-height: 112px;
+        font-size: 64px;
+        line-height: 72px;
+        max-width: 640px;
     }
 }
 
@@ -62,8 +74,14 @@
 }
 
 .description {
-    @include type.body-2-medium;
+    @include type.small-text-regular;
     text-align: center;
-    max-width: 640px;
-    color: c.$grey-800;
+    max-width: 480px;
+    color: c.$graphite-black;
+
+    @media (min-width: 1440px) {
+        font-size: 18px;
+        line-height: 28px;
+        max-width: 543px;
+    }
 }

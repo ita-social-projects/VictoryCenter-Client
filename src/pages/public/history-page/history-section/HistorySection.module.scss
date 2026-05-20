@@ -25,17 +25,19 @@
 .year-label {
     font-size: 14px;
     line-height: 20px;
-    font-weight: t.$fw-bold;
+    font-weight: t.$fw-semibold;
     font-style: italic;
     letter-spacing: t.$ls-tight;
     display: inline-flex;
     align-items: center;
+    justify-content: flex-end;
     flex-shrink: 0;
     white-space: nowrap;
-    padding: 8px 16px;
+    min-width: 120px;
+    padding: 8px 16px 8px 48px;
     background: c.$light-blue-100;
     color: c.$blue-900;
-    border-radius: 4px;
+    border-radius: 0;
     margin: 16px 16px 0;
 
     @media (min-width: 560px) {

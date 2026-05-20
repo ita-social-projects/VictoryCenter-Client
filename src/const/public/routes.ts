@@ -33,6 +33,10 @@ export const PUBLIC_ROUTES = {
         PATH: 'reports',
         FULL: '/reports',
     },
+    STORIES_OF_VICTORIES: {
+        PATH: 'stories',
+        FULL: '/stories',
+    },
     MOCK: {
         PATH: 'about-us',
         FULL: '/about-us',

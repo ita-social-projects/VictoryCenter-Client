@@ -26,6 +26,7 @@ import { ReportsPage } from '@/pages/public/reports-page';
 import { CompanyProfileContent } from '@/pages/admin/company-profile/components/company-profile-content/CompanyProfileContent';
 import { LanguageSyncWrapper } from '@/components/public/language-sync-wrapper/LanguageSyncWrapper';
 import { ReportsPanelContent } from '@/pages/admin/reports/components/reports-panel-content/ReportsPanelContent';
+import { StoriesOfVictoryPage } from '@/pages/public/stories-of-victory-page';
 
 export const AppRouter = () => {
     const PublicContent = () => (
@@ -39,6 +40,7 @@ export const AppRouter = () => {
             <Route path={PUBLIC_ROUTES.ABOUT_US.PATH} element={<AboutUsPage />} />
             <Route path={PUBLIC_ROUTES.DONATE.PATH} element={<DonatePage />} />
             <Route path={PUBLIC_ROUTES.REPORTS.PATH} element={<ReportsPage />} />
+            <Route path={PUBLIC_ROUTES.STORIES_OF_VICTORIES.PATH} element={<StoriesOfVictoryPage />} />
             <Route path="*" element={<NotFound />} />
         </Routes>
     );

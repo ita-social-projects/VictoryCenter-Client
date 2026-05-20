@@ -8,6 +8,7 @@ import donateEn from './donate.json';
 import reportsPageEn from './reports.json';
 import globalEn from './global.json';
 import partnersPageEn from './partners.json';
+import successPageEn from './success.json';
 
 export {
     headerEn,
@@ -19,5 +20,6 @@ export {
     donateEn,
     reportsPageEn,
     partnersPageEn,
+    successPageEn,
     globalEn,
 };

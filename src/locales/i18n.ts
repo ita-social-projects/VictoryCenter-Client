@@ -11,6 +11,7 @@ import {
     donateUk,
     reportsPageUk,
     partnersPageUk,
+    successPageUk,
     globalUk,
 } from './uk';
 import {
@@ -23,6 +24,7 @@ import {
     donateEn,
     reportsPageEn,
     partnersPageEn,
+    successPageEn,
     globalEn,
 } from './en';
 import { DEFAULT_LOCALE, LOCALES } from '../const/common/locales';
@@ -38,6 +40,7 @@ const resources = {
         donatePage: donateUk,
         reportsPage: reportsPageUk,
         partnersPage: partnersPageUk,
+        successPage: successPageUk,
         global: globalUk,
     },
     en: {
@@ -50,6 +53,7 @@ const resources = {
         donatePage: donateEn,
         reportsPage: reportsPageEn,
         partnersPage: partnersPageEn,
+        successPage: successPageEn,
         global: globalEn,
     },
 };
@@ -74,6 +78,7 @@ i18n.use(initReactI18next).init({
         'donatePage',
         'reportsPage',
         'partnersPage',
+        'successPage',
         'global',
     ], // namespaces
     defaultNS: 'aboutUsPage',

@@ -2,8 +2,6 @@ import {
     MAIN_PAGE_FORM_DEFAULTS,
     MainPage,
     MainPageFormValues,
-    Metric,
-    MetricPrefix,
     UpdateMainPageDto,
     UpdateMetricDto,
 } from '@/types/admin/main-page';
@@ -12,37 +10,6 @@ import {
     getLanguageIdByCode,
     resolveLocaleCode,
 } from '@/utils/functions/mappers/common/localization/localization-mappers';
-
-const NUMERIC_TO_PREFIX: Record<number, MetricPrefix> = {
-    0: MetricPrefix.None,
-    1: MetricPrefix.Plus,
-    2: MetricPrefix.Percent,
-};
-
-const PREFIX_TO_NUMERIC: Record<MetricPrefix, number> = {
-    [MetricPrefix.None]: 0,
-    [MetricPrefix.Plus]: 1,
-    [MetricPrefix.Percent]: 2,
-};
-
-export const resolvePrefix = (prefix: MetricPrefix | null | undefined): MetricPrefix => {
-    if (prefix == null) return MetricPrefix.None;
-    if (Object.values(MetricPrefix).includes(prefix as MetricPrefix)) return prefix as MetricPrefix;
-    return NUMERIC_TO_PREFIX[Number(prefix)] ?? MetricPrefix.None;
-};
-
-export const serializePrefix = (prefix: MetricPrefix | null | undefined): number | null => {
-    if (prefix == null) return null;
-    const resolved = resolvePrefix(prefix);
-    return PREFIX_TO_NUMERIC[resolved] ?? 0;
-};
-
-export const mapMetricsWithResolvedPrefix = (metrics: Metric[] = []): Metric[] => {
-    return metrics.map((metric) => ({
-        ...metric,
-        prefix: resolvePrefix(metric.prefix),
-    }));
-};
 
 export function mapMainPageToFormValues(page: MainPage, languages?: LocalizationLanguage[]): MainPageFormValues {
     const pageLocalizations = page.localizations ?? [];
@@ -131,7 +98,7 @@ export function mapFormValuesToMainPagePatch(
             value: m.value,
             name: m.name,
             type: m.type,
-            prefix: serializePrefix(m.prefix) as any,
+            prefix: m.prefix,
             localization: enLanguageId && enLoc ? { languageId: enLanguageId, name: enLoc.name } : undefined,
         } as UpdateMetricDto;
     });

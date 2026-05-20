@@ -9,7 +9,6 @@ import { MultiSelectInput } from '@/components/admin/multi-select-input/MultiSel
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { MAIN_PAGE_TEXT, MAIN_PAGE_VALIDATION } from '@/const/admin/main-page';
 import { Metric, MetricPrefix } from '@/types/admin/main-page';
-import { resolvePrefix } from '@/utils/functions/mappers/admin/main-page/main-page-mappers';
 import {
     MetricFormValues,
     metricEditSchema,
@@ -43,7 +42,7 @@ export const StatisticsMetricEditPanel = ({ metric, onSave, onCancel }: Statisti
             nameUa: metric.name || '',
             nameEn: metric.localizations?.find((l) => l.languageId === 2)?.name || '',
             value: String(metric.value).replace(/\B(?=(\d{3})+(?!\d))/g, ' '),
-            prefix: resolvePrefix(metric.prefix),
+            prefix: metric.prefix ?? MetricPrefix.None,
         },
     });
 

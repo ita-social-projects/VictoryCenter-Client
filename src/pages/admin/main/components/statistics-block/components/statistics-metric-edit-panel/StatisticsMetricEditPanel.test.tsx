@@ -78,7 +78,7 @@ describe('StatisticsMetricEditPanel', () => {
         expect(screen.getByTestId('metric-ua-1')).toHaveValue('Назва UA');
         expect(screen.getByTestId('metric-en-1')).toHaveValue('Name EN');
         expect(screen.getByTestId('metric-val-1')).toHaveValue('1 200');
-        expect(screen.getByTestId('metric-prefix-1')).toHaveAttribute('data-selected', 'Plus');
+        expect(screen.getByTestId('metric-prefix-1')).toHaveAttribute('data-selected', String(MetricPrefix.Plus));
     });
 
     it('submits trimmed values and parsed number', async () => {
@@ -88,7 +88,7 @@ describe('StatisticsMetricEditPanel', () => {
         fireEvent.change(screen.getByTestId('metric-ua-1'), { target: { value: '  Нова UA  ' } });
         fireEvent.change(screen.getByTestId('metric-en-1'), { target: { value: '  New EN  ' } });
         fireEvent.change(screen.getByTestId('metric-val-1'), { target: { value: '2 345' } });
-        fireEvent.click(screen.getByTestId('metric-prefix-1-Percent'));
+        fireEvent.click(screen.getByTestId(`metric-prefix-1-${MetricPrefix.Percent}`));
 
         const saveButton = screen.getByRole('button', { name: MAIN_PAGE_TEXT.BUTTONS.SAVE });
         await waitFor(() => expect(saveButton).not.toBeDisabled());
@@ -111,7 +111,7 @@ describe('StatisticsMetricEditPanel', () => {
     it('uses fallback defaults when name and localizations are missing', () => {
         render(
             <StatisticsMetricEditPanel
-                metric={createMetric({ name: '', localizations: undefined, prefix: 2 as any })}
+                metric={createMetric({ name: '', localizations: undefined, prefix: MetricPrefix.Percent })}
                 onSave={jest.fn()}
                 onCancel={jest.fn()}
             />,
@@ -119,7 +119,7 @@ describe('StatisticsMetricEditPanel', () => {
 
         expect(screen.getByTestId('metric-ua-1')).toHaveValue('');
         expect(screen.getByTestId('metric-en-1')).toHaveValue('');
-        expect(screen.getByTestId('metric-prefix-1')).toHaveAttribute('data-selected', 'Percent');
+        expect(screen.getByTestId('metric-prefix-1')).toHaveAttribute('data-selected', String(MetricPrefix.Percent));
     });
 
     it('preserves non-target localizations when saving', async () => {
@@ -158,7 +158,7 @@ describe('StatisticsMetricEditPanel', () => {
         const onSave = jest.fn();
         render(<StatisticsMetricEditPanel metric={createMetric()} onSave={onSave} onCancel={jest.fn()} />);
 
-        fireEvent.click(screen.getByTestId('metric-prefix-1-Plus'));
+        fireEvent.click(screen.getByTestId(`metric-prefix-1-${MetricPrefix.Plus}`));
         fireEvent.change(screen.getByTestId('metric-ua-1'), { target: { value: 'Оновлена UA' } });
         fireEvent.blur(screen.getByTestId('metric-ua-1'));
         fireEvent.blur(screen.getByTestId('metric-en-1'));
@@ -255,13 +255,13 @@ describe('StatisticsMetricEditPanel', () => {
             />,
         );
 
-        expect(screen.getByTestId('metric-prefix-1')).toHaveAttribute('data-selected', 'None');
+        expect(screen.getByTestId('metric-prefix-1')).toHaveAttribute('data-selected', String(MetricPrefix.None));
     });
 
     it('handles prefix selection fallbacks in onChange', async () => {
         render(<StatisticsMetricEditPanel metric={createMetric()} onSave={jest.fn()} onCancel={jest.fn()} />);
 
-        const noneOption = screen.getByTestId('metric-prefix-1-None');
+        const noneOption = screen.getByTestId(`metric-prefix-1-${MetricPrefix.None}`);
         fireEvent.click(noneOption);
 
         await waitFor(() => {

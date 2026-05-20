@@ -317,14 +317,14 @@ describe('StatisticsBlockForm', () => {
         });
     });
 
-    it('normalizes backend prefixes before rendering preview', async () => {
+    it('passes prefix values correctly to preview', async () => {
         const rawPrefixData: MainPage = {
             ...mockInitialData,
             impactStatistics: {
                 ...mockInitialData.impactStatistics!,
                 metrics: [
-                    { ...mockInitialData.impactStatistics!.metrics[0], prefix: 1 as any },
-                    { ...mockInitialData.impactStatistics!.metrics[1], prefix: 2 as any },
+                    { ...mockInitialData.impactStatistics!.metrics[0], prefix: MetricPrefix.Plus },
+                    { ...mockInitialData.impactStatistics!.metrics[1], prefix: MetricPrefix.Percent },
                 ],
             },
         };
@@ -332,7 +332,7 @@ describe('StatisticsBlockForm', () => {
         renderComponent({ initialData: rawPrefixData });
 
         await waitFor(() => {
-            expect(screen.getByTestId('statistics-preview')).toHaveAttribute('data-prefixes', 'Plus,Percent');
+            expect(screen.getByTestId('statistics-preview')).toHaveAttribute('data-prefixes', '1,2');
         });
     });
 

@@ -9,10 +9,6 @@ import { ImageUploadForm } from '@/pages/admin/main/components/common/image-uplo
 import { MainPageApi } from '@/services/api/admin/main-page/main-page-api';
 import { MainPage, MainPageFormValues, Metric } from '@/types/admin/main-page';
 import { ToastType } from '@/types/admin/toast';
-import {
-    mapMetricsWithResolvedPrefix,
-    resolvePrefix,
-} from '@/utils/functions/mappers/admin/main-page/main-page-mappers';
 import { useEffect, useRef, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { StatisticsMetricsList } from './components/statistics-metrics-list/StatisticsMetricsList';
@@ -71,7 +67,7 @@ export const StatisticsBlockForm = ({
             value: metric.value,
             name: metric.name ?? '',
             type: metric.type,
-            prefix: resolvePrefix(metric.prefix),
+            prefix: metric.prefix,
             isHidden: metric.isHidden,
             priority: metric.priority,
             localizations: (metric.localizations ?? [])
@@ -87,17 +83,17 @@ export const StatisticsBlockForm = ({
 
     useEffect(() => {
         if (initialData?.impactStatistics?.metrics) {
-            const normalizedMetrics = mapMetricsWithResolvedPrefix(initialData.impactStatistics.metrics);
+            const apiMetrics = initialData.impactStatistics.metrics;
 
-            setMetrics(normalizedMetrics);
-            initialMetricsRef.current = normalizedMetrics;
-            setValue('metrics', normalizedMetrics, {
+            setMetrics(apiMetrics);
+            initialMetricsRef.current = apiMetrics;
+            setValue('metrics', apiMetrics, {
                 shouldDirty: false,
                 shouldTouch: false,
                 shouldValidate: false,
             });
 
-            const hiddenIds = normalizedMetrics.filter((m) => m.isHidden).map((m) => m.id as number);
+            const hiddenIds = apiMetrics.filter((m) => m.isHidden).map((m) => m.id as number);
             setHiddenMetricIds(hiddenIds);
         }
     }, [initialData, setValue]);
@@ -121,11 +117,9 @@ export const StatisticsBlockForm = ({
     };
 
     const handleReorderMetrics = async (items: Metric[]) => {
-        const normalizedMetrics = mapMetricsWithResolvedPrefix(items);
-        setMetrics(normalizedMetrics);
+        setMetrics(items);
 
         const statisticId = initialData?.impactStatistics?.id;
-
         if (!statisticId) return;
 
         const orderedIds = items.map((item) => item.id as number).filter(Boolean);
@@ -135,20 +129,18 @@ export const StatisticsBlockForm = ({
         } catch (error) {
             addToast(MAIN_PAGE_TEXT.ERRORS.REORDER_FAILED, ToastType.Error, 3000);
             if (initialData?.impactStatistics?.metrics) {
-                const normalizedMetrics = mapMetricsWithResolvedPrefix(initialData.impactStatistics.metrics);
-                setMetrics(normalizedMetrics);
+                setMetrics(initialData.impactStatistics.metrics);
             }
         }
     };
 
     const handleMetricUpdate = (updatedMetrics: Metric[]) => {
-        const normalizedMetrics = mapMetricsWithResolvedPrefix(updatedMetrics);
-        const hasChanges = !areMetricsEqual(normalizedMetrics, initialMetricsRef.current);
+        const hasChanges = !areMetricsEqual(updatedMetrics, initialMetricsRef.current);
 
-        setMetrics(normalizedMetrics);
-        onMetricsChange?.(normalizedMetrics);
+        setMetrics(updatedMetrics);
+        onMetricsChange?.(updatedMetrics);
 
-        setValue('metrics', normalizedMetrics, {
+        setValue('metrics', updatedMetrics, {
             shouldDirty: hasChanges,
             shouldTouch: true,
             shouldValidate: true,

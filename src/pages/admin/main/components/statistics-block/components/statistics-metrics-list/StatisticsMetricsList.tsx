@@ -4,9 +4,10 @@ import { ReactComponent as EyeOpenedIcon } from '@/assets/icons/eye-opened.svg';
 import { DraggableListItem } from '@/components/admin/draggable-list-item/DraggableListItem';
 import { IconButton } from '@/components/admin/icon-button/IconButton';
 import { MAIN_PAGE_TEXT } from '@/const/admin/main-page';
-import { Metric } from '@/types/admin/main-page';
+import { Metric, MetricType } from '@/types/admin/main-page';
 import { formatMetricValue, getMetricName } from '@/utils/functions/formatters/metric-formatters';
 import { useState } from 'react';
+import { RaisedMetricEditPanel } from '../raised-metric-edit-panel/RaisedMetricEditPanel';
 import { StatisticsMetricEditPanel } from '../statistics-metric-edit-panel/StatisticsMetricEditPanel';
 import styles from './StatisticsMetricsList.module.scss';
 
@@ -36,6 +37,10 @@ export const StatisticsMetricsList = ({
 
     const renderRow = (metric: Metric) => {
         if (editingMetricId === metric.id) {
+            if (metric.type === MetricType.Raised) {
+                return <RaisedMetricEditPanel metric={metric} onCancel={() => setEditingMetricId(null)} />;
+            }
+
             return (
                 <StatisticsMetricEditPanel
                     metric={metric}

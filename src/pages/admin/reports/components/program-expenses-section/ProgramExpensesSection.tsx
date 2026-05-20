@@ -116,6 +116,7 @@ export const ProgramExpensesSection = ({ isEditing = false }: ProgramExpensesSec
             <AddProgramExpenseRecordModal
                 isOpen={isAddProgramExpenseModalOpen}
                 programs={data.programs}
+                records={data.records}
                 exchangeRate={exchangeRate}
                 onClose={handleCloseAddProgramExpenseModal}
             />

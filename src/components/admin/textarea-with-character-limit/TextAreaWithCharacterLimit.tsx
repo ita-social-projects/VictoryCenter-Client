@@ -86,6 +86,7 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
         useEffect(() => {
             const textarea = internalRef.current;
             if (!autoGrow || !textarea) return;
+
             textarea.style.height = 'auto';
             const computedStyle = globalThis.getComputedStyle(textarea);
 
@@ -95,14 +96,15 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
                 parsedLineHeight = parsedFontSize * 1.2;
             }
 
-            const borderTop = Number.parseFloat(computedStyle.borderTopWidth) || 0;
-            const borderBottom = Number.parseFloat(computedStyle.borderBottomWidth) || 0;
             const paddingTop = Number.parseFloat(computedStyle.paddingTop) || 0;
             const paddingBottom = Number.parseFloat(computedStyle.paddingBottom) || 0;
+            const borderTop = Number.parseFloat(computedStyle.borderTopWidth) || 0;
+            const borderBottom = Number.parseFloat(computedStyle.borderBottomWidth) || 0;
 
-            const maxHeight = maxRows ? parsedLineHeight * maxRows + paddingTop + paddingBottom : Infinity;
+            const maxHeight = maxRows ? parsedLineHeight * maxRows + paddingTop + paddingBottom + borderTop + borderBottom : Infinity;
 
             const finalTargetHeight = textarea.scrollHeight + borderTop + borderBottom;
+
             textarea.style.height = `${Math.min(finalTargetHeight, maxHeight)}px`;
             textarea.style.overflowY = finalTargetHeight > maxHeight ? 'auto' : 'hidden';
         }, [value, autoGrow, maxRows]);

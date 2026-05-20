@@ -1,7 +1,9 @@
+import { MAIN_PAGE_TEXT } from '@/const/admin/main-page';
 import { MainPage, MainPageFormValues, MetricPrefix, MetricType } from '@/types/admin/main-page';
+import { ToastType } from '@/types/admin/toast';
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { FormProvider, useForm } from 'react-hook-form';
+import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 import { StatisticsBlockForm } from './StatisticsBlockForm';
 
 jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
@@ -21,34 +23,66 @@ jest.mock('@/pages/admin/main/components/common/image-upload-form/ImageUploadFor
 
 jest.mock('./components/statistics-preview/StatisticsPreview', () => ({
     StatisticsPreview: ({ metrics, hiddenMetricIds }: any) => (
-        <div data-testid="statistics-preview" data-metrics={metrics.length} data-hidden={hiddenMetricIds.join(',')} />
+        <div
+            data-testid="statistics-preview"
+            data-metrics={metrics.length}
+            data-hidden={hiddenMetricIds.join(',')}
+            data-prefixes={metrics.map((metric: any) => metric.prefix).join(',')}
+        />
     ),
 }));
 
 jest.mock('./components/statistics-metrics-list/StatisticsMetricsList', () => ({
-    StatisticsMetricsList: ({ metrics, onToggleVisibility, onReorder }: any) => (
-        <div data-testid="metrics-list">
-            <button
-                data-testid="toggle-first-metric"
-                onClick={() => onToggleVisibility(metrics[0]?.id ?? 0)}
-                type="button"
-            />
-            <button
-                data-testid="toggle-second-metric"
-                onClick={() => onToggleVisibility(metrics[1]?.id ?? 0)}
-                type="button"
-            />
-            <button data-testid="reorder-metrics" onClick={() => onReorder([])} type="button" />
-        </div>
-    ),
+    StatisticsMetricsList: ({ metrics, onToggleVisibility, onReorder, onMetricUpdate }: any) => {
+        const { MetricPrefix } = require('@/types/admin/main-page');
+        return (
+            <div data-testid="metrics-list">
+                <button
+                    data-testid="toggle-first-metric"
+                    onClick={() => onToggleVisibility(metrics[0]?.id ?? 0)}
+                    type="button"
+                />
+                <button
+                    data-testid="toggle-second-metric"
+                    onClick={() => onToggleVisibility(metrics[1]?.id ?? 0)}
+                    type="button"
+                />
+                <button data-testid="reorder-metrics" onClick={() => onReorder([])} type="button" />
+                <button
+                    data-testid="update-first-to-percent"
+                    onClick={() =>
+                        onMetricUpdate?.(
+                            metrics.map((metric: any, index: number) =>
+                                index === 0 ? { ...metric, prefix: MetricPrefix.Percent } : metric,
+                            ),
+                        )
+                    }
+                    type="button"
+                />
+                <button
+                    data-testid="update-first-to-plus"
+                    onClick={() =>
+                        onMetricUpdate?.(
+                            metrics.map((metric: any, index: number) =>
+                                index === 0 ? { ...metric, prefix: MetricPrefix.Plus } : metric,
+                            ),
+                        )
+                    }
+                    type="button"
+                />
+            </div>
+        );
+    },
 }));
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(() => ({})),
 }));
 
+const mockAddToast = jest.fn();
+
 jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider', () => ({
-    useToast: () => ({ addToast: jest.fn() }),
+    useToast: () => ({ addToast: mockAddToast }),
 }));
 
 jest.mock('@/services/api/admin/main-page/main-page-api', () => ({
@@ -99,18 +133,41 @@ const mockInitialData: MainPage = {
 const FormWrapper = ({
     children,
     defaultValues,
+    onSetValue,
 }: {
     children: React.ReactNode;
     defaultValues?: Partial<MainPageFormValues>;
+    onSetValue?: jest.Mock;
 }) => {
     const methods = useForm<MainPageFormValues>({
         defaultValues: {
             statisticsTitleUa: '',
             statisticsTitleEn: '',
+            metrics: [],
             ...defaultValues,
         } as MainPageFormValues,
     });
-    return <FormProvider {...methods}>{children}</FormProvider>;
+
+    const setValueSpy = (...args: Parameters<typeof methods.setValue>) => {
+        onSetValue?.(...args);
+        return methods.setValue(...args);
+    };
+
+    const formMethods = {
+        ...methods,
+        setValue: setValueSpy,
+    };
+    const DirtyIndicator = () => {
+        const { formState } = useFormContext<MainPageFormValues>();
+        return <div data-testid="dirty-flag" data-dirty={formState.isDirty ? 'true' : 'false'} />;
+    };
+
+    return (
+        <FormProvider {...formMethods}>
+            <DirtyIndicator />
+            {children}
+        </FormProvider>
+    );
 };
 
 describe('StatisticsBlockForm', () => {
@@ -131,6 +188,7 @@ describe('StatisticsBlockForm', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
+        mockAddToast.mockClear();
     });
 
     it('renders and pre-fills titles from form context', async () => {
@@ -206,5 +264,124 @@ describe('StatisticsBlockForm', () => {
         expect(screen.getByTestId('submit-btn')).toBeDisabled();
         fireEvent.click(screen.getByTestId('clear-image-error'));
         expect(screen.getByTestId('submit-btn')).not.toBeDisabled();
+    });
+
+    it('does not toggle visibility when only one metric is visible', async () => {
+        const { MainPageApi } = require('@/services/api/admin/main-page/main-page-api');
+        const singleMetricData: MainPage = {
+            ...mockInitialData,
+            impactStatistics: {
+                ...mockInitialData.impactStatistics!,
+                metrics: [mockInitialData.impactStatistics!.metrics[0]],
+            },
+        };
+
+        renderComponent({ initialData: singleMetricData });
+
+        fireEvent.click(screen.getByTestId('toggle-first-metric'));
+
+        await waitFor(() => {
+            expect(MainPageApi.updateMetricVisibility).not.toHaveBeenCalled();
+        });
+    });
+
+    it('reverts hidden state and shows toast when toggle visibility fails', async () => {
+        const { MainPageApi } = require('@/services/api/admin/main-page/main-page-api');
+        MainPageApi.updateMetricVisibility.mockRejectedValueOnce(new Error('fail'));
+
+        renderComponent();
+
+        fireEvent.click(screen.getByTestId('toggle-first-metric'));
+
+        await waitFor(() => {
+            expect(screen.getByTestId('statistics-preview')).toHaveAttribute('data-hidden', '');
+            expect(mockAddToast).toHaveBeenCalledWith(
+                MAIN_PAGE_TEXT.ERRORS.TOGGLE_VISIBILITY_FAILED,
+                ToastType.Error,
+                3000,
+            );
+        });
+    });
+
+    it('normalizes backend prefixes before rendering preview', async () => {
+        const rawPrefixData: MainPage = {
+            ...mockInitialData,
+            impactStatistics: {
+                ...mockInitialData.impactStatistics!,
+                metrics: [
+                    { ...mockInitialData.impactStatistics!.metrics[0], prefix: 1 as any },
+                    { ...mockInitialData.impactStatistics!.metrics[1], prefix: 2 as any },
+                ],
+            },
+        };
+
+        renderComponent({ initialData: rawPrefixData });
+
+        await waitFor(() => {
+            expect(screen.getByTestId('statistics-preview')).toHaveAttribute('data-prefixes', 'Plus,Percent');
+        });
+    });
+
+    it('skips reorder when statistic id is missing', async () => {
+        const { MainPageApi } = require('@/services/api/admin/main-page/main-page-api');
+        const missingIdData: MainPage = {
+            ...mockInitialData,
+            impactStatistics: {
+                ...mockInitialData.impactStatistics!,
+                id: undefined,
+            },
+        };
+
+        renderComponent({ initialData: missingIdData });
+
+        fireEvent.click(screen.getByTestId('reorder-metrics'));
+
+        await waitFor(() => {
+            expect(MainPageApi.reorderMetrics).not.toHaveBeenCalled();
+        });
+    });
+
+    it('reverts metrics when reorder fails', async () => {
+        const { MainPageApi } = require('@/services/api/admin/main-page/main-page-api');
+        MainPageApi.reorderMetrics.mockRejectedValueOnce(new Error('fail'));
+
+        renderComponent();
+
+        fireEvent.click(screen.getByTestId('reorder-metrics'));
+
+        await waitFor(() => {
+            expect(screen.getByTestId('statistics-preview')).toHaveAttribute('data-metrics', '2');
+            expect(mockAddToast).toHaveBeenCalledWith(MAIN_PAGE_TEXT.ERRORS.REORDER_FAILED, ToastType.Error, 3000);
+        });
+    });
+
+    it('does not keep form dirty when prefix is reverted to initial value', async () => {
+        const setValueSpy = jest.fn();
+        render(
+            <FormWrapper
+                defaultValues={{ metrics: mockInitialData.impactStatistics?.metrics ?? [] }}
+                onSetValue={setValueSpy}
+            >
+                <StatisticsBlockForm
+                    initialData={mockInitialData}
+                    isPublishDisabled={false}
+                    onPublish={mockOnPublish}
+                />
+            </FormWrapper>,
+        );
+
+        fireEvent.click(screen.getByTestId('update-first-to-percent'));
+
+        await waitFor(() => {
+            expect(setValueSpy).toHaveBeenCalled();
+        });
+
+        fireEvent.click(screen.getByTestId('update-first-to-plus'));
+
+        await waitFor(() => {
+            const lastCall = setValueSpy.mock.calls[setValueSpy.mock.calls.length - 1];
+            const options = lastCall?.[2];
+            expect(options?.shouldDirty).toBe(false);
+        });
     });
 });

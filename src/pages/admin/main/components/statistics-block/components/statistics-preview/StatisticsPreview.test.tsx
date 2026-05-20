@@ -66,6 +66,21 @@ describe('StatisticsPreview', () => {
         expect(onLanguageChange).toHaveBeenCalledWith('EN');
     });
 
+    it('switches to UA language when UA tab is clicked', () => {
+        const onLanguageChange = jest.fn();
+        render(
+            <StatisticsPreview
+                language="EN"
+                onLanguageChange={onLanguageChange}
+                metrics={metrics}
+                hiddenMetricIds={[]}
+            />,
+        );
+
+        fireEvent.click(screen.getByText('UKR'));
+        expect(onLanguageChange).toHaveBeenCalledWith('UA');
+    });
+
     it('hides metrics by hiddenMetricIds', () => {
         render(<StatisticsPreview language="UA" onLanguageChange={() => {}} metrics={metrics} hiddenMetricIds={[2]} />);
 
@@ -91,5 +106,25 @@ describe('StatisticsPreview', () => {
             <StatisticsPreview language="UA" onLanguageChange={() => {}} metrics={[noPrefix]} hiddenMetricIds={[]} />,
         );
         expect(screen.getByText('999')).toBeInTheDocument();
+    });
+
+    it('hides metrics when id is undefined and hiddenMetricIds includes fallback 0', () => {
+        const noIdMetric: Metric = {
+            ...metrics[0],
+            id: undefined,
+            name: 'NoIdMetric',
+            localizations: [],
+        };
+
+        render(
+            <StatisticsPreview
+                language="UA"
+                onLanguageChange={() => {}}
+                metrics={[noIdMetric]}
+                hiddenMetricIds={[0]}
+            />,
+        );
+
+        expect(screen.queryByText('NoIdMetric')).not.toBeInTheDocument();
     });
 });

@@ -5,8 +5,38 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { StatisticsMetricsList } from './StatisticsMetricsList';
 
 jest.mock('@/components/admin/draggable-list-item/DraggableListItem', () => ({
-    DraggableListItem: ({ renderEntityComponent, entity }: any) => (
-        <div data-testid="draggable-row">{renderEntityComponent(entity)}</div>
+    DraggableListItem: ({ renderEntityComponent, entity, idSelector }: any) => {
+        const id = idSelector?.(entity);
+        return (
+            <div data-testid="draggable-row" data-entity-id={id}>
+                {renderEntityComponent(entity)}
+            </div>
+        );
+    },
+}));
+
+jest.mock('@/components/admin/icon-button/IconButton', () => ({
+    IconButton: ({ onClick, disabled, 'aria-label': ariaLabel }: any) => (
+        <button
+            type="button"
+            data-testid={ariaLabel ? `icon-${ariaLabel}` : 'icon-edit'}
+            aria-label={ariaLabel}
+            onClick={onClick}
+            disabled={disabled}
+        />
+    ),
+}));
+
+jest.mock('../statistics-metric-edit-panel/StatisticsMetricEditPanel', () => ({
+    StatisticsMetricEditPanel: ({ metric, onSave, onCancel }: any) => (
+        <div data-testid="metric-edit-panel">
+            <button
+                type="button"
+                data-testid="save-edit"
+                onClick={() => onSave({ ...metric, name: 'Updated Metric' })}
+            />
+            <button type="button" data-testid="cancel-edit" onClick={onCancel} />
+        </div>
     ),
 }));
 
@@ -43,6 +73,7 @@ describe('StatisticsMetricsList', () => {
                 hiddenMetricIds={[]}
                 onToggleVisibility={jest.fn()}
                 onReorder={jest.fn()}
+                onMetricUpdate={jest.fn()}
             />,
         );
 
@@ -57,6 +88,7 @@ describe('StatisticsMetricsList', () => {
                 hiddenMetricIds={[]}
                 onToggleVisibility={jest.fn()}
                 onReorder={jest.fn()}
+                onMetricUpdate={jest.fn()}
             />,
         );
 
@@ -70,6 +102,7 @@ describe('StatisticsMetricsList', () => {
                 hiddenMetricIds={[]}
                 onToggleVisibility={jest.fn()}
                 onReorder={jest.fn()}
+                onMetricUpdate={jest.fn()}
             />,
         );
 
@@ -83,6 +116,7 @@ describe('StatisticsMetricsList', () => {
                 hiddenMetricIds={[2]}
                 onToggleVisibility={jest.fn()}
                 onReorder={jest.fn()}
+                onMetricUpdate={jest.fn()}
             />,
         );
 
@@ -97,11 +131,11 @@ describe('StatisticsMetricsList', () => {
                 hiddenMetricIds={[]}
                 onToggleVisibility={onToggleVisibility}
                 onReorder={jest.fn()}
+                onMetricUpdate={jest.fn()}
             />,
         );
 
-        const buttons = screen.getAllByRole('button');
-        fireEvent.click(buttons[1]); // eye button
+        fireEvent.click(screen.getAllByTestId('icon-Hide metric')[0]);
         expect(onToggleVisibility).toHaveBeenCalledWith(1);
     });
 
@@ -113,11 +147,11 @@ describe('StatisticsMetricsList', () => {
                 hiddenMetricIds={[]}
                 onToggleVisibility={onToggleVisibility}
                 onReorder={jest.fn()}
+                onMetricUpdate={jest.fn()}
             />,
         );
 
-        const buttons = screen.getAllByRole('button');
-        fireEvent.click(buttons[1]);
+        fireEvent.click(screen.getByTestId('icon-Hide metric'));
         expect(onToggleVisibility).not.toHaveBeenCalled();
     });
 
@@ -136,6 +170,7 @@ describe('StatisticsMetricsList', () => {
                 hiddenMetricIds={[]}
                 onToggleVisibility={jest.fn()}
                 onReorder={jest.fn()}
+                onMetricUpdate={jest.fn()}
             />,
         );
         expect(screen.getByText('100')).toBeInTheDocument();
@@ -148,10 +183,63 @@ describe('StatisticsMetricsList', () => {
                 hiddenMetricIds={[]}
                 onToggleVisibility={jest.fn()}
                 onReorder={jest.fn()}
+                onMetricUpdate={jest.fn()}
             />,
         );
-        const buttons = screen.getAllByRole('button');
-        const eyeButton = buttons[1];
+        const eyeButton = screen.getByTestId('icon-Hide metric');
         expect(eyeButton).toBeDisabled();
+    });
+
+    it('does not toggle visibility when last metric is visible', () => {
+        const onToggleVisibility = jest.fn();
+        render(
+            <StatisticsMetricsList
+                metrics={[metrics[0]]}
+                hiddenMetricIds={[]}
+                onToggleVisibility={onToggleVisibility}
+                onReorder={jest.fn()}
+                onMetricUpdate={jest.fn()}
+            />,
+        );
+
+        fireEvent.click(screen.getByTestId('icon-Hide metric'));
+        expect(onToggleVisibility).not.toHaveBeenCalled();
+    });
+
+    it('renders edit panel and saves updated metric', () => {
+        const onMetricUpdate = jest.fn();
+        render(
+            <StatisticsMetricsList
+                metrics={metrics}
+                hiddenMetricIds={[]}
+                onToggleVisibility={jest.fn()}
+                onReorder={jest.fn()}
+                onMetricUpdate={onMetricUpdate}
+            />,
+        );
+
+        fireEvent.click(screen.getAllByTestId('icon-edit')[0]);
+        expect(screen.getByTestId('metric-edit-panel')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByTestId('save-edit'));
+        expect(onMetricUpdate).toHaveBeenCalledWith([{ ...metrics[0], name: 'Updated Metric' }, metrics[1]]);
+    });
+
+    it('closes edit panel on cancel', () => {
+        render(
+            <StatisticsMetricsList
+                metrics={metrics}
+                hiddenMetricIds={[]}
+                onToggleVisibility={jest.fn()}
+                onReorder={jest.fn()}
+                onMetricUpdate={jest.fn()}
+            />,
+        );
+
+        fireEvent.click(screen.getAllByTestId('icon-edit')[0]);
+        expect(screen.getByTestId('metric-edit-panel')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByTestId('cancel-edit'));
+        expect(screen.queryByTestId('metric-edit-panel')).not.toBeInTheDocument();
     });
 });

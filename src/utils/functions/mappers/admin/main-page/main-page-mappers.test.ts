@@ -2,6 +2,7 @@ import {
     MAIN_PAGE_FORM_DEFAULTS,
     MainPage,
     MainPageFormValues,
+    Metric,
     MetricPrefix,
     MetricType,
 } from '@/types/admin/main-page';
@@ -10,7 +11,13 @@ import {
     mapEntityWithLocalizations,
     mapLocalizationDtoToModel,
 } from '@/utils/functions/mappers/common/localization/localization-mappers';
-import { mapFormValuesToMainPagePatch, mapMainPageToFormValues } from './main-page-mappers';
+import {
+    mapFormValuesToMainPagePatch,
+    mapMainPageToFormValues,
+    mapMetricsWithResolvedPrefix,
+    resolvePrefix,
+    serializePrefix,
+} from './main-page-mappers';
 
 describe('main-page-mappers', () => {
     const languages: LocalizationLanguage[] = [
@@ -196,11 +203,11 @@ describe('main-page-mappers', () => {
                 value: 100,
                 name: 'UA Metric',
                 type: MetricType.Partners,
-                prefix: MetricPrefix.Plus,
-                localizations: [{ languageId: 2, name: 'EN Metric' }],
+                prefix: 1,
+                localization: undefined,
             });
 
-            expect(metrics?.[1].localizations).toBeUndefined();
+            expect(metrics?.[1].localization).toBeUndefined();
         });
 
         it('handles missing languages array and null originalPage', () => {
@@ -215,6 +222,55 @@ describe('main-page-mappers', () => {
 
             expect(patch.impactStatistics?.metrics).toEqual([]);
             expect(patch.impactStatistics?.id).toBeUndefined();
+        });
+    });
+
+    describe('prefix helpers', () => {
+        it('resolvePrefix normalizes numeric and enum values', () => {
+            expect(resolvePrefix(MetricPrefix.Plus)).toBe(MetricPrefix.Plus);
+            expect(resolvePrefix(1 as any)).toBe(MetricPrefix.Plus);
+            expect(resolvePrefix(2 as any)).toBe(MetricPrefix.Percent);
+            expect(resolvePrefix(null)).toBe(MetricPrefix.None);
+            expect(resolvePrefix(undefined)).toBe(MetricPrefix.None);
+            expect(resolvePrefix(99 as any)).toBe(MetricPrefix.None);
+        });
+
+        it('serializePrefix maps enum and numeric values to backend codes', () => {
+            expect(serializePrefix(null)).toBeNull();
+            expect(serializePrefix(MetricPrefix.None)).toBe(0);
+            expect(serializePrefix(MetricPrefix.Plus)).toBe(1);
+            expect(serializePrefix(MetricPrefix.Percent)).toBe(2);
+            expect(serializePrefix(1 as any)).toBe(1);
+        });
+
+        it('mapMetricsWithResolvedPrefix normalizes metric prefixes', () => {
+            const metrics: Metric[] = [
+                {
+                    id: 1,
+                    name: 'Metric 1',
+                    value: 10,
+                    type: MetricType.Partners,
+                    prefix: 1 as any,
+                    isHidden: false,
+                    priority: 1,
+                    localizations: [],
+                },
+                {
+                    id: 2,
+                    name: 'Metric 2',
+                    value: 20,
+                    type: MetricType.Programs,
+                    prefix: null,
+                    isHidden: false,
+                    priority: 2,
+                    localizations: [],
+                },
+            ];
+
+            const result = mapMetricsWithResolvedPrefix(metrics);
+
+            expect(result[0].prefix).toBe(MetricPrefix.Plus);
+            expect(result[1].prefix).toBe(MetricPrefix.None);
         });
     });
 });

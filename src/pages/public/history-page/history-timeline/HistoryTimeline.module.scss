@@ -8,10 +8,6 @@
     padding: 12px 16px;
     position: relative;
 
-    @media (min-width: 560px) {
-        padding: 12px 64px;
-    }
-
     @media (min-width: 1440px) {
         padding: 12px 56px;
     }
@@ -22,6 +18,30 @@
     align-items: center;
     gap: 16px;
     white-space: nowrap;
+
+    @media (max-width: 559px) {
+        justify-content: space-between;
+
+        .date:nth-child(n + 5) {
+            display: none;
+        }
+    }
+
+    @media (min-width: 560px) and (max-width: 767px) {
+        justify-content: space-between;
+
+        .date:nth-child(n + 8) {
+            display: none;
+        }
+    }
+
+    @media (min-width: 768px) and (max-width: 1439px) {
+        justify-content: space-between;
+
+        .date:nth-child(n + 11) {
+            display: none;
+        }
+    }
 
     @media (min-width: 768px) {
         gap: 19px;
@@ -49,11 +69,7 @@
 }
 
 .date--line-all .photo-card {
-    display: none;
-
-    @media (min-width: 1440px) {
-        display: flex;
-    }
+    display: flex;
 }
 
 // Line + photo visible only from tablet (≥ 768px)
@@ -68,7 +84,7 @@
 .date--line-tablet .photo-card {
     display: none;
 
-    @media (min-width: 1440px) {
+    @media (min-width: 768px) {
         display: flex;
     }
 }
@@ -99,37 +115,58 @@
     transform: translateX(-50%);
     width: 1px;
     background-color: c.$light-blue-500;
-    // CSS vars set on parent .date span — inherited here
-    height: var(--line-mobile, 0px);
+    height: var(--line-h1, 0px);                                    // < 700px
 
-    @media (min-width: 768px) {
-        height: var(--line-tablet, var(--line-mobile, 0px));
+    @media (min-height: 700px) {
+        height: var(--line-h2, var(--line-h1, 0px));               // 700–799px
+    }
+
+    @media (min-height: 800px) {
+        height: var(--line-h3, var(--line-h2, 0px));               // 800–899px
+    }
+
+    @media (min-height: 900px) {
+        height: var(--line-h4, var(--line-h3, 0px));               // 900–999px
+    }
+
+    @media (min-height: 1000px) {
+        height: var(--line-h5, var(--line-h4, 0px));               // ≥ 1000px
     }
 
     @media (min-width: 1440px) {
-        height: var(--line-desktop, var(--line-tablet, 0px));
+        height: var(--line-xl);                                     // десктоп
     }
-
-    // dot now lives inside the photo-card caption row — no pseudo-element needed
 }
 
 // ── Photo card ────────────────────────────────────────────────────────────────
 
 .photo-card {
     position: absolute;
-    bottom: calc(100% + 12px + var(--line-mobile, 0px) - 10px);
+    bottom: calc(100% + 12px + var(--line-h1, 0px) - 10px);
     left: 50%;
     flex-direction: column;
     gap: 4px;
     // hidden by default — shown via .date--line-* parent class
     display: none;
 
-    @media (min-width: 768px) {
-        bottom: calc(100% + 12px + var(--line-tablet, var(--line-mobile, 0px)) - 10px);
+    @media (min-height: 700px) {
+        bottom: calc(100% + 12px + var(--line-h2, var(--line-h1, 0px)) - 10px);
+    }
+
+    @media (min-height: 800px) {
+        bottom: calc(100% + 12px + var(--line-h3, var(--line-h2, 0px)) - 10px);
+    }
+
+    @media (min-height: 900px) {
+        bottom: calc(100% + 12px + var(--line-h4, var(--line-h3, 0px)) - 10px);
+    }
+
+    @media (min-height: 1000px) {
+        bottom: calc(100% + 12px + var(--line-h5, var(--line-h4, 0px)) - 10px);
     }
 
     @media (min-width: 1440px) {
-        bottom: calc(100% + 12px + var(--line-desktop, var(--line-tablet, 0px)) - 10px);
+        bottom: calc(100% + 12px + var(--line-xl) - 10px);
     }
 }
 
@@ -149,6 +186,19 @@
     display: block;
     filter: grayscale(100%);
     object-fit: cover;
+    width: var(--photo-w-mobile, 170px);
+    height: var(--photo-h-mobile, 113px);
+
+    @media (min-width: 768px) {
+        width: var(--photo-w-tablet, var(--photo-w-mobile, 195px));
+        height: var(--photo-h-tablet, var(--photo-h-mobile, 130px));
+    }
+
+    @media (min-width: 1440px) {
+        width: var(--photo-w-desktop);
+        height: var(--photo-h-desktop);
+        transform: translateX(var(--img-offset-desktop, 0px));
+    }
 }
 
 .photo-caption-row {

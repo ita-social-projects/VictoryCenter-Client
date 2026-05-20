@@ -1,31 +1,38 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { HistorySectionDto } from '@/types/common/history-sections';
+import { HistorySection as HistorySectionModel } from '@/types/public/history-page';
 import { ContentType } from '@/types/common/section-contents';
 import { SectionTemplate } from '@/types/common/sections';
 import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
+import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
 import { useScrollAnimation } from '@/hooks/common/use-scroll-animation/useScrollAnimation';
 import { HistoryQuadImages } from './HistoryQuadImages';
 import { HistoryDualImages } from './HistoryDualImages';
 import styles from './HistorySection.module.scss';
 
 interface HistorySectionProps {
-    section: HistorySectionDto;
+    section: HistorySectionModel;
     showYearLabel?: boolean;
 }
 
-// Matches "2016 — …" or "2024–2025 — …" at the start of a title
-const YEAR_PATTERN = /^(\d{4}(?:[–-]\d{4})?)\s*—\s*/;
-// Matches a standalone year title like "2025" with nothing after it
-const YEAR_ONLY_PATTERN = /^(\d{4}(?:[–-]\d{4})?)$/;
+const YEAR_PATTERN = /^(\d{4}(?:[–—-]\d{4})?)\s*[—–-]\s*/;
+const YEAR_ONLY_PATTERN = /^(\d{4}(?:[–—-]\d{4})?)$/;
 
 export const HistorySection = ({ section, showYearLabel = true }: HistorySectionProps) => {
     const { t } = useTranslation('historyPage');
     const { ref, isVisible } = useScrollAnimation();
 
-    const rawTitle = section.contents.find((c) => c.contentType === ContentType.Title)?.title ?? '';
-    const description =
-        section.contents.find((c) => c.contentType === ContentType.Description)?.description ?? undefined;
+    const titleContent = section.contents.find((c) => c.contentType === ContentType.Title);
+    const descContent = section.contents.find((c) => c.contentType === ContentType.Description);
+
+    const { title: localizedTitle } = useGetLocalization(titleContent?.localizations, {
+        title: titleContent?.title,
+    });
+    const { description } = useGetLocalization(descContent?.localizations, {
+        description: descContent?.description,
+    });
+
+    const rawTitle = localizedTitle ?? '';
     const images = section.contents
         .filter((c) => c.contentType === ContentType.Image)
         .sort((a, b) => a.order - b.order)
@@ -42,7 +49,6 @@ export const HistorySection = ({ section, showYearLabel = true }: HistorySection
 
     const yearBadge = yearLabel && showYearLabel ? <span className={styles['year-label']}>{yearLabel}</span> : null;
 
-    // SingleImageRight: title + description stacked on left, image on right
     if (section.template === SectionTemplate.SingleImageRight) {
         const imageSrc = hasRealImages ? getImageSrc(images[0]) : null;
         return (

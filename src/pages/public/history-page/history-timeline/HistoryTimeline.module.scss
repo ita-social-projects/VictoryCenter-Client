@@ -1,12 +1,12 @@
 @use '@/assets/sass/mixins/typography.mixins' as type;
 @use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/variables/typography' as t;
 
 .timeline {
     width: 100%;
-    border-top: 1px solid c.$grey-300;
-    border-bottom: 1px solid c.$grey-300;
+    background: c.$light-blue-50;
     padding: 12px 16px;
-    overflow-x: auto;
+    position: relative;
 
     @media (min-width: 560px) {
         padding: 12px 64px;
@@ -24,18 +24,160 @@
     white-space: nowrap;
 
     @media (min-width: 768px) {
-        gap: 24px;
+        gap: 19px;
     }
 }
 
 .date {
     @include type.small-text-regular;
-    color: c.$grey-700;
-    cursor: default;
+    color: c.$light-blue-700;
     flex-shrink: 0;
+    position: relative;
 }
 
 .date--active {
     @include type.small-text-bold;
-    color: c.$blue-500;
+    font-style: italic;
+    color: c.$light-blue-900;
+}
+
+// ── Visibility helpers ────────────────────────────────────────────────────────
+
+// Line + photo visible on all breakpoints (mobile ≥ 375px)
+.date--line-all .date-line {
+    display: block;
+}
+
+.date--line-all .photo-card {
+    display: none;
+
+    @media (min-width: 1440px) {
+        display: flex;
+    }
+}
+
+// Line + photo visible only from tablet (≥ 768px)
+.date--line-tablet .date-line {
+    display: none;
+
+    @media (min-width: 768px) {
+        display: block;
+    }
+}
+
+.date--line-tablet .photo-card {
+    display: none;
+
+    @media (min-width: 1440px) {
+        display: flex;
+    }
+}
+
+// Line + photo visible only on desktop (≥ 1440px)
+.date--line-desktop .date-line {
+    display: none;
+
+    @media (min-width: 1440px) {
+        display: block;
+    }
+}
+
+.date--line-desktop .photo-card {
+    display: none;
+
+    @media (min-width: 1440px) {
+        display: flex;
+    }
+}
+
+// ── Vertical line ─────────────────────────────────────────────────────────────
+
+.date-line {
+    position: absolute;
+    bottom: calc(100% + 12px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    background-color: c.$light-blue-500;
+    // CSS vars set on parent .date span — inherited here
+    height: var(--line-mobile, 0px);
+
+    @media (min-width: 768px) {
+        height: var(--line-tablet, var(--line-mobile, 0px));
+    }
+
+    @media (min-width: 1440px) {
+        height: var(--line-desktop, var(--line-tablet, 0px));
+    }
+
+    // dot now lives inside the photo-card caption row — no pseudo-element needed
+}
+
+// ── Photo card ────────────────────────────────────────────────────────────────
+
+.photo-card {
+    position: absolute;
+    bottom: calc(100% + 12px + var(--line-mobile, 0px) - 10px);
+    left: 50%;
+    flex-direction: column;
+    gap: 4px;
+    // hidden by default — shown via .date--line-* parent class
+    display: none;
+
+    @media (min-width: 768px) {
+        bottom: calc(100% + 12px + var(--line-tablet, var(--line-mobile, 0px)) - 10px);
+    }
+
+    @media (min-width: 1440px) {
+        bottom: calc(100% + 12px + var(--line-desktop, var(--line-tablet, 0px)) - 10px);
+    }
+}
+
+// Dot on the LEFT — photo card extends to the right; shift left by half dot width (4px) so dot centre hits the line
+.photo-card--left {
+    transform: translateX(-4px);
+    align-items: flex-start;
+}
+
+// Dot on the RIGHT — photo card extends to the left; shift right by half dot width (4px) so dot centre hits the line
+.photo-card--right {
+    transform: translateX(calc(-100% + 4px));
+    align-items: flex-end;
+}
+
+.photo-img {
+    display: block;
+    filter: grayscale(100%);
+    object-fit: cover;
+}
+
+.photo-caption-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.photo-dot {
+    flex-shrink: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: c.$light-blue-500;
+}
+
+.photo-caption {
+    @include type.small-text-regular;
+    font-style: italic;
+    font-weight: t.$fw-semibold;
+    color: c.$light-blue-700;
+    white-space: nowrap;
+    margin: 0;
+}
+
+// ── Ellipsis ──────────────────────────────────────────────────────────────────
+
+.dates-ellipsis {
+    @include type.small-text-regular;
+    color: c.$grey-700;
+    flex-shrink: 0;
 }

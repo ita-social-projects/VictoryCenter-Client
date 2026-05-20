@@ -191,7 +191,7 @@ describe('Header', () => {
         expect(teamLink).toHaveAttribute('data-disabled', 'false');
 
         const historyLink = within(aboutUsDropdown as HTMLElement).getByText(headerUk['HISTORY']);
-        expect(historyLink).toHaveAttribute('data-disabled', 'true');
+        expect(historyLink).toHaveAttribute('data-disabled', 'false');
 
         const programsDropdown = dropdowns.find((d) => d.textContent?.includes(headerUk['HIPPOTHERAPY']));
         expect(programsDropdown).toBeInTheDocument();

@@ -80,6 +80,68 @@ describe('MAIN_PAGE_VALIDATION_FUNCTIONS', () => {
         });
     });
 
+    describe('validatePartnersTitle', () => {
+        it('returns undefined for a valid title (between 10 and 50 chars)', () => {
+            expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validatePartnersTitle('Надійні партнери фонду')).toBeUndefined();
+        });
+
+        it('returns required error for an empty title', () => {
+            expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validatePartnersTitle('')).toBe(MAIN_PAGE_VALIDATION.common.REQUIRED);
+        });
+
+        it('treats spaces as empty and returns required error', () => {
+            expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validatePartnersTitle('   ')).toBe(
+                MAIN_PAGE_VALIDATION.common.REQUIRED,
+            );
+        });
+
+        it('returns min error for title shorter than 10 chars', () => {
+            expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validatePartnersTitle('Коротко')).toBe(
+                MAIN_PAGE_VALIDATION.partnersBlock.title.getMinError(),
+            );
+        });
+
+        it('returns max error for title longer than 50 chars', () => {
+            const longTitle = 'a'.repeat(MAIN_PAGE_VALIDATION.partnersBlock.title.max + 1);
+            expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validatePartnersTitle(longTitle)).toBe(
+                MAIN_PAGE_VALIDATION.partnersBlock.title.getMaxError(),
+            );
+        });
+    });
+
+    describe('validatePartnersDescription', () => {
+        it('returns undefined for a valid description', () => {
+            expect(
+                MAIN_PAGE_VALIDATION_FUNCTIONS.validatePartnersDescription('Детальний опис для блоку наших партнерів.'),
+            ).toBeUndefined();
+        });
+
+        it('returns required error for an empty description', () => {
+            expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validatePartnersDescription('')).toBe(
+                MAIN_PAGE_VALIDATION.common.REQUIRED,
+            );
+        });
+
+        it('treats spaces as empty and returns required error', () => {
+            expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validatePartnersDescription('      ')).toBe(
+                MAIN_PAGE_VALIDATION.common.REQUIRED,
+            );
+        });
+
+        it('returns min error for description shorter than 10 chars', () => {
+            expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validatePartnersDescription('Замало')).toBe(
+                MAIN_PAGE_VALIDATION.partnersBlock.description.getMinError(),
+            );
+        });
+
+        it('returns max error for description longer than 1000 chars', () => {
+            const longDescription = 'a'.repeat(MAIN_PAGE_VALIDATION.partnersBlock.description.max + 1);
+            expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validatePartnersDescription(longDescription)).toBe(
+                MAIN_PAGE_VALIDATION.partnersBlock.description.getMaxError(),
+            );
+        });
+    });
+
     describe('validateStatisticsTitleUa', () => {
         it('returns undefined for valid UA title', () => {
             expect(

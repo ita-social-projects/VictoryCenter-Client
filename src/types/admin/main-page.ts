@@ -64,10 +64,18 @@ export interface MainAboutUs {
     description: string;
 }
 
+export interface MainPartnersLocalization {
+    id?: number;
+    languageCode?: string;
+    title: string;
+    description: string;
+}
+
 export interface MainPartners {
     id: number;
     title: string;
     description: string;
+    localizations?: MainPartnersLocalization[];
 }
 
 export interface MainPage {
@@ -78,6 +86,16 @@ export interface MainPage {
     mainAboutUs: MainAboutUs | null;
     mainPartners: MainPartners | null;
     impactStatistics: ImpactStatistic | null;
+}
+
+export interface CreateMainPartnersDto {
+    title: string;
+    description: string;
+}
+
+export interface UpdateMainPartnersDto {
+    title: string;
+    description: string;
 }
 
 export interface MetricDto extends EntityWithDtoLocalizations<MetricLocalizationDto> {
@@ -175,6 +193,16 @@ export interface AboutUsBlockFormValues {
 }
 
 export const ABOUT_US_BLOCK_FORM_DEFAULTS: AboutUsBlockFormValues = {
+    title: '',
+    description: '',
+};
+
+export interface PartnersBlockFormValues {
+    title: string;
+    description: string;
+}
+
+export const PARTNERS_BLOCK_FORM_DEFAULTS: PartnersBlockFormValues = {
     title: '',
     description: '',
 };

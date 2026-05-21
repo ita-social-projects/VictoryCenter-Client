@@ -28,6 +28,10 @@ export const MAIN_PAGE_TEXT = {
                 ENG: 'ENG',
             },
         },
+        PARTNERS: {
+            TITLE_LABEL: COMMON_TEXT_ADMIN.TYPE.TITLE,
+            DESCRIPTION_LABEL: COMMON_TEXT_ADMIN.TYPE.DESCRIPTION,
+        },
     },
 
     BUTTONS: {
@@ -56,6 +60,21 @@ export const MAIN_PAGE_VALIDATION = {
     },
 
     aboutUsBlock: {
+        title: {
+            min: 10,
+            max: 50,
+            getMinError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(10),
+            getMaxError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(50),
+        },
+        description: {
+            min: 10,
+            max: 1000,
+            getMinError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(10),
+            getMaxError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(1000),
+        },
+    },
+
+    partnersBlock: {
         title: {
             min: 10,
             max: 50,

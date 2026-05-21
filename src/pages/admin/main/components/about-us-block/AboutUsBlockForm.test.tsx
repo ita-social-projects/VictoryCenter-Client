@@ -1,27 +1,8 @@
-import React from 'react';
+import { MainPage } from '@/types/admin/main-page';
+import '@/utils/test-mocks/setup-form-mocks';
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { AboutUsBlockForm } from './AboutUsBlockForm';
-import { MainPage } from '@/types/admin/main-page';
-
-jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
-    __esModule: true,
-    InputWithCharacterLimitGroup: require('@/utils/test-mocks/main-page-mocks').MockInputWithCharacterLimitGroup,
-}));
-
-jest.mock(
-    '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
-    () => ({
-        __esModule: true,
-        TextAreaWithCharacterLimitGroup: require('@/utils/test-mocks/main-page-mocks')
-            .MockTextAreaWithCharacterLimitGroup,
-    }),
-);
-
-jest.mock('@/components/admin/button/Button', () => ({
-    __esModule: true,
-    Button: require('@/utils/test-mocks/main-page-mocks').MockSubmitButton,
-}));
 
 const mockInitialData: MainPage = {
     id: 1,

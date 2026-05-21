@@ -1,8 +1,13 @@
-import * as Yup from 'yup';
 import { MAIN_PAGE_VALIDATION } from '@/const/admin/main-page';
-import { AboutUsBlockFormValues, TitleBlockFormValues, StatisticsBlockFormValues } from '@/types/admin/main-page';
+import {
+    AboutUsBlockFormValues,
+    PartnersBlockFormValues,
+    StatisticsBlockFormValues,
+    TitleBlockFormValues,
+} from '@/types/admin/main-page';
 import { Image, ImageValues } from '@/types/common/image';
 import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
+import * as Yup from 'yup';
 
 const buildStringValidation = (config: {
     min: number;
@@ -37,6 +42,11 @@ export const AboutUsBlockValidationSchema: Yup.ObjectSchema<AboutUsBlockFormValu
     description: buildStringValidation(MAIN_PAGE_VALIDATION.aboutUsBlock.description),
 });
 
+export const PartnersBlockValidationSchema: Yup.ObjectSchema<PartnersBlockFormValues> = Yup.object({
+    title: buildStringValidation(MAIN_PAGE_VALIDATION.partnersBlock.title),
+    description: buildStringValidation(MAIN_PAGE_VALIDATION.partnersBlock.description),
+});
+
 export const StatisticsBlockValidationSchema: Yup.ObjectSchema<StatisticsBlockFormValues> = Yup.object({
     titleUa: buildStringValidation(MAIN_PAGE_VALIDATION.statisticsBlock.title),
     titleEn: buildStringValidation(MAIN_PAGE_VALIDATION.statisticsBlock.title),
@@ -65,6 +75,24 @@ export const MAIN_PAGE_VALIDATION_FUNCTIONS = {
     validateImage: (value: Image | ImageValues | null): string | undefined => {
         try {
             TitleBlockValidationSchema.validateSyncAt('image', { image: value });
+            return undefined;
+        } catch (error: any) {
+            return error.message;
+        }
+    },
+
+    validatePartnersTitle: (value: string): string | undefined => {
+        try {
+            PartnersBlockValidationSchema.validateSyncAt('title', { title: value });
+            return undefined;
+        } catch (error: any) {
+            return error.message;
+        }
+    },
+
+    validatePartnersDescription: (value: string): string | undefined => {
+        try {
+            PartnersBlockValidationSchema.validateSyncAt('description', { description: value });
             return undefined;
         } catch (error: any) {
             return error.message;

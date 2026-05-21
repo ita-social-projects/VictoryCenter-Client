@@ -20,8 +20,6 @@
     }
 }
 
-// ── Year badge (floating in left gutter at desktop) ────────────────────────
-
 .year-label {
     font-size: 14px;
     line-height: 20px;
@@ -124,8 +122,6 @@
     }
 }
 
-// ── SingleImageRight: text column (left) + image (right) ──────────────────
-
 .single-image-right {
     display: flex;
     flex-direction: column;
@@ -177,8 +173,6 @@
         max-width: 712px;
     }
 }
-
-// ── SingleImageTop: full-bleed image above header ─────────────────────────
 
 .full-width-image {
     width: 100%;

@@ -139,6 +139,7 @@ export const MainPageContent = () => {
             savedValuesRef.current = nextValues;
 
             methods.reset(nextValues);
+            setCurrentMetrics([]);
 
             addToast('Зміни успішно опубліковано', ToastType.Success, 3000);
         } catch (error) {

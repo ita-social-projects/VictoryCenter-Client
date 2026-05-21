@@ -18,7 +18,7 @@ export const metricEditSchema = Yup.object({
     value: Yup.string()
         .required(MAIN_PAGE_VALIDATION.common.REQUIRED)
         .test('is-positive', MAIN_PAGE_VALIDATION.common.REQUIRED, (val) => parseThousands(val || '') > 0),
-    prefix: Yup.mixed<MetricPrefix>().required(),
+    prefix: Yup.mixed<MetricPrefix>().required(MAIN_PAGE_VALIDATION.common.REQUIRED),
 });
 
 export type MetricFormValues = Yup.InferType<typeof metricEditSchema>;

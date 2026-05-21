@@ -35,7 +35,7 @@ export const MAIN_PAGE_TEXT = {
             VALUE_LABEL: 'Значення',
             PREFIX_LABEL: 'Префікс',
             CANCEL_MODAL_TITLE: 'Відмінити зміни?',
-            PREFIX_NONE: 'None',
+            PREFIX_NONE: 'Без префікса',
         },
         PARTNERS: {
             TITLE_LABEL: COMMON_TEXT_ADMIN.TYPE.TITLE,

@@ -69,8 +69,13 @@ export const StatisticsMetricsList = ({
                     <IconButton
                         type="button"
                         DefaultIcon={EditIcon}
+                        aria-label="Edit metric"
                         className={styles.iconButton}
-                        onClick={() => setEditingMetricId(metric.id ?? null)}
+                        onClick={() => {
+                            if (editingMetricId !== null && editingMetricId !== metric.id) return;
+                            setEditingMetricId(metric.id ?? null);
+                        }}
+                        disabled={editingMetricId !== null && editingMetricId !== metric.id}
                     />
                     <IconButton
                         type="button"

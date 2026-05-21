@@ -144,7 +144,7 @@ describe('StatisticsMetricsList', () => {
 
     it('renders edit panel and saves updated metric', () => {
         const { onMetricUpdate } = setup();
-        fireEvent.click(screen.getAllByTestId('icon-edit')[0]);
+        fireEvent.click(screen.getAllByTestId('icon-Edit metric')[0]);
         expect(screen.getByTestId('metric-edit-panel')).toBeInTheDocument();
 
         fireEvent.click(screen.getByTestId('save-edit'));
@@ -153,7 +153,7 @@ describe('StatisticsMetricsList', () => {
 
     it('closes edit panel on cancel', () => {
         setup();
-        fireEvent.click(screen.getAllByTestId('icon-edit')[0]);
+        fireEvent.click(screen.getAllByTestId('icon-Edit metric')[0]);
         expect(screen.getByTestId('metric-edit-panel')).toBeInTheDocument();
 
         fireEvent.click(screen.getByTestId('cancel-edit'));

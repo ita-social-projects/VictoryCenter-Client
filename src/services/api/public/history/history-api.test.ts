@@ -4,6 +4,7 @@ import { API_ROUTES } from '@/const/common/api-routes/main-api';
 import { HistorySectionDto } from '@/types/common/history-sections';
 import { SectionTemplate } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
+import { RequestOptions } from '@/types/common/api';
 
 jest.mock('@/services/api/axios');
 
@@ -33,11 +34,14 @@ describe('PublicHistoryApi', () => {
                 },
             ];
 
+            const options: RequestOptions = { cancellationSignal: new AbortController().signal };
             (axiosInstance.get as jest.Mock).mockResolvedValue({ data: mockDto });
 
-            const result = await PublicHistoryApi.getSections();
+            const result = await PublicHistoryApi.getSections(options);
 
-            expect(axiosInstance.get).toHaveBeenCalledWith(API_ROUTES.HISTORY.PUBLIC);
+            expect(axiosInstance.get).toHaveBeenCalledWith(API_ROUTES.HISTORY.PUBLIC, {
+                signal: options.cancellationSignal,
+            });
             expect(axiosInstance.get).toHaveBeenCalledTimes(1);
             expect(result).toHaveLength(1);
             expect(result[0].id).toBe(1);
@@ -45,20 +49,26 @@ describe('PublicHistoryApi', () => {
         });
 
         it('should return an empty array if API returns no data', async () => {
+            const options: RequestOptions = { cancellationSignal: new AbortController().signal };
             (axiosInstance.get as jest.Mock).mockResolvedValue({ data: [] });
 
-            const result = await PublicHistoryApi.getSections();
+            const result = await PublicHistoryApi.getSections(options);
 
-            expect(axiosInstance.get).toHaveBeenCalledWith(API_ROUTES.HISTORY.PUBLIC);
+            expect(axiosInstance.get).toHaveBeenCalledWith(API_ROUTES.HISTORY.PUBLIC, {
+                signal: options.cancellationSignal,
+            });
             expect(result).toEqual([]);
         });
 
         it('should throw an error if the API call fails', async () => {
             const errorMessage = 'Network Request Failed';
+            const options: RequestOptions = { cancellationSignal: new AbortController().signal };
             (axiosInstance.get as jest.Mock).mockRejectedValue(new Error(errorMessage));
 
-            await expect(PublicHistoryApi.getSections()).rejects.toThrow(errorMessage);
-            expect(axiosInstance.get).toHaveBeenCalledWith(API_ROUTES.HISTORY.PUBLIC);
+            await expect(PublicHistoryApi.getSections(options)).rejects.toThrow(errorMessage);
+            expect(axiosInstance.get).toHaveBeenCalledWith(API_ROUTES.HISTORY.PUBLIC, {
+                signal: options.cancellationSignal,
+            });
         });
 
         it('should map content localization dto to language model', async () => {
@@ -90,9 +100,10 @@ describe('PublicHistoryApi', () => {
                 },
             ];
 
+            const options: RequestOptions = { cancellationSignal: new AbortController().signal };
             (axiosInstance.get as jest.Mock).mockResolvedValue({ data: dtoResponse });
 
-            const result = await PublicHistoryApi.getSections();
+            const result = await PublicHistoryApi.getSections(options);
 
             expect(result[0].contents[0].localizations?.[0]).toEqual(
                 expect.objectContaining({
@@ -102,6 +113,34 @@ describe('PublicHistoryApi', () => {
                 }),
             );
             expect(result[0].contents[0].localizations?.[0]).not.toHaveProperty('localizationInfoDto');
+        });
+
+        it('should produce undefined localizations when content DTO has no localizations field', async () => {
+            const dtoResponse: HistorySectionDto[] = [
+                {
+                    id: 1,
+                    template: SectionTemplate.TextOnly,
+                    order: 0,
+                    contents: [
+                        {
+                            id: 10,
+                            contentType: ContentType.Title,
+                            order: 0,
+                            title: 'Заголовок',
+                            description: null,
+                            image: null,
+                            localizations: undefined as any,
+                        },
+                    ],
+                },
+            ];
+
+            const options: RequestOptions = { cancellationSignal: new AbortController().signal };
+            (axiosInstance.get as jest.Mock).mockResolvedValue({ data: dtoResponse });
+
+            const result = await PublicHistoryApi.getSections(options);
+
+            expect(result[0].contents[0].localizations).toBeUndefined();
         });
 
         it('should preserve section and content fields after mapping', async () => {
@@ -124,9 +163,10 @@ describe('PublicHistoryApi', () => {
                 },
             ];
 
+            const options: RequestOptions = { cancellationSignal: new AbortController().signal };
             (axiosInstance.get as jest.Mock).mockResolvedValue({ data: dtoResponse });
 
-            const result = await PublicHistoryApi.getSections();
+            const result = await PublicHistoryApi.getSections(options);
 
             expect(result[0]).toEqual(
                 expect.objectContaining({

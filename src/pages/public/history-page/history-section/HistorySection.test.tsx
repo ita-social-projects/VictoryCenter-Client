@@ -162,6 +162,33 @@ describe('HistorySection', () => {
 
             expect(screen.queryByText(/2024 рік/)).not.toBeInTheDocument();
         });
+
+        it('should extract year from a standalone year-only title (YEAR_ONLY_PATTERN)', () => {
+            const section = makeSection(SectionTemplate.TextOnly, {
+                contents: [
+                    makeContent(10, ContentType.Title, 0, { title: '2024' }),
+                    makeContent(11, ContentType.Description, 1, { description: 'Опис' }),
+                ],
+            });
+
+            render(<HistorySection section={section} showYearLabel={true} />);
+
+            // Year badge renders "<year><YEAR_SUFFIX>"; UK suffix is " рік"
+            expect(screen.getByText('2024 рік')).toBeInTheDocument();
+        });
+
+        it('should extract year from a year-range title (e.g. 2024–2025 — Text)', () => {
+            const section = makeSection(SectionTemplate.TextOnly, {
+                contents: [
+                    makeContent(10, ContentType.Title, 0, { title: '2024–2025 — Огляд' }),
+                    makeContent(11, ContentType.Description, 1, { description: 'Опис' }),
+                ],
+            });
+
+            render(<HistorySection section={section} showYearLabel={true} />);
+
+            expect(screen.getByText('2024–2025 рік')).toBeInTheDocument();
+        });
     });
 
     describe('localization', () => {

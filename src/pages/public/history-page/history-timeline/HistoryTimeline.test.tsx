@@ -31,4 +31,20 @@ describe('HistoryTimeline', () => {
         expect(container.querySelectorAll('[class*="photo-card--left"]').length).toBeGreaterThan(0);
         expect(container.querySelectorAll('[class*="photo-card--right"]').length).toBeGreaterThan(0);
     });
+
+    it('should render photo captions with translated name and role', () => {
+        render(<HistoryTimeline />);
+
+        // UK translations: PHOTO_NASTYA_DIRECTOR_NAME = "Настя", PHOTO_NASTYA_DIRECTOR_ROLE = "виконавчий директор"
+        expect(screen.getAllByText(/Настя/).length).toBeGreaterThan(0);
+        expect(screen.getByText(/виконавчий директор/)).toBeInTheDocument();
+    });
+
+    it('should render photo img elements with alt text containing name and role', () => {
+        render(<HistoryTimeline />);
+
+        // alt text format: "<name>, <role>"
+        const directorPhoto = screen.getByAltText('Настя, виконавчий директор');
+        expect(directorPhoto).toBeInTheDocument();
+    });
 });

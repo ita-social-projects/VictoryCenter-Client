@@ -72,6 +72,23 @@ const createMetric = (overrides: Partial<Metric> = {}): Metric => ({
 });
 
 describe('StatisticsMetricEditPanel', () => {
+    // Хелпер для усунення дублювання логіки сабміту в тестах
+    const submitForm = async (onSaveMock: jest.Mock) => {
+        fireEvent.blur(screen.getByTestId('metric-ua-1'));
+        fireEvent.blur(screen.getByTestId('metric-en-1'));
+        fireEvent.blur(screen.getByTestId('metric-val-1'));
+
+        const saveButton = screen.getByRole('button', { name: MAIN_PAGE_TEXT.BUTTONS.SAVE });
+        await waitFor(() => expect(saveButton).not.toBeDisabled());
+        fireEvent.click(saveButton);
+
+        await waitFor(() => {
+            expect(onSaveMock).toHaveBeenCalledTimes(1);
+        });
+
+        return onSaveMock.mock.calls[0][0];
+    };
+
     it('renders default values and resolved prefix', () => {
         render(<StatisticsMetricEditPanel metric={createMetric()} onSave={jest.fn()} onCancel={jest.fn()} />);
 
@@ -90,15 +107,8 @@ describe('StatisticsMetricEditPanel', () => {
         fireEvent.change(screen.getByTestId('metric-val-1'), { target: { value: '2 345' } });
         fireEvent.click(screen.getByTestId(`metric-prefix-1-${MetricPrefix.Percent}`));
 
-        const saveButton = screen.getByRole('button', { name: MAIN_PAGE_TEXT.BUTTONS.SAVE });
-        await waitFor(() => expect(saveButton).not.toBeDisabled());
-        fireEvent.click(saveButton);
+        const updatedMetric = await submitForm(onSave);
 
-        await waitFor(() => {
-            expect(onSave).toHaveBeenCalledTimes(1);
-        });
-
-        const updatedMetric = onSave.mock.calls[0][0];
         expect(updatedMetric.name).toBe('Нова UA');
         expect(updatedMetric.value).toBe(2345);
         expect(updatedMetric.prefix).toBe(MetricPrefix.Percent);
@@ -135,19 +145,9 @@ describe('StatisticsMetricEditPanel', () => {
 
         fireEvent.change(screen.getByTestId('metric-ua-1'), { target: { value: 'Нова UA' } });
         fireEvent.change(screen.getByTestId('metric-en-1'), { target: { value: 'Name EN' } });
-        fireEvent.blur(screen.getByTestId('metric-ua-1'));
-        fireEvent.blur(screen.getByTestId('metric-en-1'));
-        fireEvent.blur(screen.getByTestId('metric-val-1'));
 
-        const saveButton = screen.getByRole('button', { name: MAIN_PAGE_TEXT.BUTTONS.SAVE });
-        await waitFor(() => expect(saveButton).not.toBeDisabled());
-        fireEvent.click(saveButton);
+        const updatedMetric = await submitForm(onSave);
 
-        await waitFor(() => {
-            expect(onSave).toHaveBeenCalledTimes(1);
-        });
-
-        const updatedMetric = onSave.mock.calls[0][0];
         expect(updatedMetric.localizations).toEqual([
             { languageId: 1, name: 'Нова UA' },
             { languageId: 3, name: 'Third Language' },
@@ -160,19 +160,9 @@ describe('StatisticsMetricEditPanel', () => {
 
         fireEvent.click(screen.getByTestId(`metric-prefix-1-${MetricPrefix.Plus}`));
         fireEvent.change(screen.getByTestId('metric-ua-1'), { target: { value: 'Оновлена UA' } });
-        fireEvent.blur(screen.getByTestId('metric-ua-1'));
-        fireEvent.blur(screen.getByTestId('metric-en-1'));
-        fireEvent.blur(screen.getByTestId('metric-val-1'));
 
-        const saveButton = screen.getByRole('button', { name: MAIN_PAGE_TEXT.BUTTONS.SAVE });
-        await waitFor(() => expect(saveButton).not.toBeDisabled());
-        fireEvent.click(saveButton);
+        const updatedMetric = await submitForm(onSave);
 
-        await waitFor(() => {
-            expect(onSave).toHaveBeenCalledTimes(1);
-        });
-
-        const updatedMetric = onSave.mock.calls[0][0];
         expect(updatedMetric.prefix).toBe(MetricPrefix.Plus);
     });
 
@@ -233,17 +223,9 @@ describe('StatisticsMetricEditPanel', () => {
 
         fireEvent.change(screen.getByTestId('metric-ua-1'), { target: { value: 'UA Update' } });
         fireEvent.change(screen.getByTestId('metric-en-1'), { target: { value: 'EN Update' } });
-        fireEvent.blur(screen.getByTestId('metric-ua-1'));
-        fireEvent.blur(screen.getByTestId('metric-en-1'));
 
-        const saveButton = screen.getByRole('button', { name: MAIN_PAGE_TEXT.BUTTONS.SAVE });
-        await waitFor(() => expect(saveButton).not.toBeDisabled());
-        fireEvent.click(saveButton);
-
-        await waitFor(() => {
-            const updatedMetric = onSave.mock.calls[0][0];
-            expect(updatedMetric.localizations).toEqual([]);
-        });
+        const updatedMetric = await submitForm(onSave);
+        expect(updatedMetric.localizations).toEqual([]);
     });
 
     it('uses default prefix option when provided prefix is invalid', () => {

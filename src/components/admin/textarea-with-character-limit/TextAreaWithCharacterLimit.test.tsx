@@ -272,7 +272,14 @@ describe('TextAreaWithCharacterLimit', () => {
     describe('auto-grow useEffect logic', () => {
         const mockComputedStyle = (overrides: Partial<CSSStyleDeclaration>) =>
             jest.spyOn(globalThis, 'getComputedStyle').mockImplementation(
-                () => ({ lineHeight: '20px', fontSize: '16px', paddingTop: '0px', paddingBottom: '0px', ...overrides }) as CSSStyleDeclaration,
+                () =>
+                    ({
+                        lineHeight: '20px',
+                        fontSize: '16px',
+                        paddingTop: '0px',
+                        paddingBottom: '0px',
+                        ...overrides,
+                    }) as CSSStyleDeclaration,
             );
 
         afterEach(() => {
@@ -302,7 +309,12 @@ describe('TextAreaWithCharacterLimit', () => {
         it('falls back to fontSize * 1.2 when lineHeight is NaN (e.g. "normal")', () => {
             const FONT_SIZE = 20;
             const MAX_ROWS = 2;
-            mockComputedStyle({ lineHeight: 'normal', fontSize: `${FONT_SIZE}px`, paddingTop: '0px', paddingBottom: '0px' });
+            mockComputedStyle({
+                lineHeight: 'normal',
+                fontSize: `${FONT_SIZE}px`,
+                paddingTop: '0px',
+                paddingBottom: '0px',
+            });
 
             renderTextAreaWithCharacterLimit({ autoGrow: true, maxRows: MAX_ROWS, value: 'text' });
 
@@ -365,7 +377,14 @@ describe('TextAreaWithCharacterLimit', () => {
 
             Object.defineProperty(textarea, 'scrollHeight', { value: SCROLL_HEIGHT, configurable: true });
 
-            rerender(<TextAreaWithCharacterLimit {...defaultProps} autoGrow={true} maxRows={MAX_ROWS} value={'a lot of text'} />);
+            rerender(
+                <TextAreaWithCharacterLimit
+                    {...defaultProps}
+                    autoGrow={true}
+                    maxRows={MAX_ROWS}
+                    value={'a lot of text'}
+                />,
+            );
 
             expect(textarea.style.overflowY).toBe('auto');
             expect(Number.parseFloat(textarea.style.height)).toBe(LINE_HEIGHT * MAX_ROWS);
@@ -389,7 +408,9 @@ describe('TextAreaWithCharacterLimit', () => {
             const firstHeight = textarea.style.height;
 
             Object.defineProperty(textarea, 'scrollHeight', { value: 80, configurable: true });
-            rerender(<TextAreaWithCharacterLimit {...defaultProps} autoGrow={true} maxRows={5} value={'updated value'} />);
+            rerender(
+                <TextAreaWithCharacterLimit {...defaultProps} autoGrow={true} maxRows={5} value={'updated value'} />,
+            );
 
             expect(textarea.style.height).toBe('80px');
             expect(textarea.style.height).not.toBe(firstHeight);

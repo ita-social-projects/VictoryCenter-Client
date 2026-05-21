@@ -85,6 +85,7 @@ export const mapReportFundsExpendituresCategoryDtoToCategory = (
     id: dto.id,
     name: dto.name,
     type: mapFundsExpendituresTypeDtoToTransactionType(dto.type),
+    localizations: [],
 });
 
 export const mapReportFundsExpendituresCategoryToCreateDto = (

@@ -6,9 +6,9 @@ import * as fundsExpendituresSchema from '@/validation/admin/reports-schema/fund
 import { useFundsExpendituresRecordForm } from './useFundsExpendituresRecordForm';
 
 const categories: ReportFundsExpendituresCategory[] = [
-    { id: 3, name: 'C income', type: 'income' },
-    { id: 1, name: 'A income', type: 'income' },
-    { id: 2, name: 'B expense', type: 'expense' },
+    { id: 3, name: 'C income', type: 'income', localizations: [] },
+    { id: 1, name: 'A income', type: 'income', localizations: [] },
+    { id: 2, name: 'B expense', type: 'expense', localizations: [] },
 ];
 
 const records: ReportFundsExpendituresRecord[] = [

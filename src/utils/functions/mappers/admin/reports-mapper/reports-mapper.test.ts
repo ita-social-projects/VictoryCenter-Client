@@ -224,6 +224,7 @@ describe('reports-mapper', () => {
                 id: 2,
                 name: 'Category',
                 type: 'expense',
+                localizations: [],
             });
         });
 

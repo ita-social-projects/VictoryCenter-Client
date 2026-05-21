@@ -189,11 +189,11 @@ jest.mock('@/components/common/select/Select', () => {
 });
 
 const MOCK_CATEGORIES: ReportFundsExpendituresCategory[] = [
-    { id: 1, name: 'Грантові кошти', type: 'income' },
-    { id: 2, name: 'Благодійні внески', type: 'income' },
-    { id: 3, name: 'Власні надходження', type: 'income' },
-    { id: 4, name: 'Адміністративні витрати', type: 'expense' },
-    { id: 5, name: 'Програмні витрати', type: 'expense' },
+    { id: 1, name: 'Грантові кошти', type: 'income', localizations: [] },
+    { id: 2, name: 'Благодійні внески', type: 'income', localizations: [] },
+    { id: 3, name: 'Власні надходження', type: 'income', localizations: [] },
+    { id: 4, name: 'Адміністративні витрати', type: 'expense', localizations: [] },
+    { id: 5, name: 'Програмні витрати', type: 'expense', localizations: [] },
 ];
 
 const MOCK_RECORDS: EnrichedRecord[] = [

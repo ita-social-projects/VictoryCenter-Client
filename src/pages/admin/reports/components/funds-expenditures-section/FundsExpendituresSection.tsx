@@ -63,6 +63,7 @@ interface FundsExpenditureSectionProps {
     onDeleteCategoryModalClose?: () => void;
     isEditCategoryModalOpen?: boolean;
     onEditCategoryModalClose?: () => void;
+    onCategoriesLoaded?: (categories: ReportFundsExpendituresCategory[]) => void;
 }
 
 export const FundsExpenditureSection = ({
@@ -76,6 +77,7 @@ export const FundsExpenditureSection = ({
     onDeleteCategoryModalClose,
     isEditCategoryModalOpen = false,
     onEditCategoryModalClose,
+    onCategoriesLoaded,
 }: FundsExpenditureSectionProps = {}) => {
     const adminClient = useAdminClient();
     const { addToast } = useToast();
@@ -222,6 +224,10 @@ export const FundsExpenditureSection = ({
     useEffect(() => {
         setRecordsState(allRecords);
     }, [allRecords]);
+
+    useEffect(() => {
+        onCategoriesLoaded?.(categories);
+    }, [categories, onCategoriesLoaded]);
 
     const isPublishEnabled = useMemo(() => {
         const normalized = disclaimerValue.replaceAll(/\s+/g, ' ').trim();

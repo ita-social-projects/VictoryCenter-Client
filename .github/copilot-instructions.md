@@ -218,6 +218,7 @@ try {
 ## When to Use Agent Skills
 
 For complex, specialized tasks, use these slash commands:
+- `/victory-center-pr-review` - Full PR review workflow (smells, lint, tests, commits)
 - `/victory-center-docs` - Project documentation
 - `/victory-center-structure` - Find files/navigate codebase
 - `/victory-center-api` - API endpoints and data fetching

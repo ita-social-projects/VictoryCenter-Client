@@ -56,25 +56,21 @@ interface PhotoConfig {
 }
 
 interface LineConfig {
-    xl: number; // 1440px+ (ширина)
-    h5: number; // висота ≥ 1000px  (iPad portrait, великі планшети)
-    h4: number; // висота 900–999px  (iPhone Plus, Pro Max)
-    h3: number; // висота 800–899px  (iPhone 12/13/14, 844px)
-    h2: number; // висота 700–799px  (iPhone mini, старі Plus)
-    h1: number; // висота < 700px    (iPhone SE, 667px)
-    showFrom: 'all' | 'tablet' | 'desktop'; // з якої ширини показувати
+    xl: number; // desktop 1440px+ (px, фіксована)
+    mobile: number; // mobile/tablet (px, CSS автоматично обрізає за доступним місцем)
+    topAnchor?: boolean; // фото фіксується вгорі секції, лінія тягнеться знизу вгору
+    showFrom: 'all' | 'tablet' | 'desktop';
     photo?: PhotoConfig;
     side: 'left' | 'right';
 }
 
+// mobile — бажана висота лінії. CSS обріже її так, щоб фото не виходило за текст.
+// Задавай мобільне значення орієнтуючись на великі телефони (900px+).
+// На маленьких екранах лінія автоматично зменшиться.
 const HIGHLIGHTED_DATES: Record<string, LineConfig> = {
     '09/2023': {
         xl: 158,
-        h5: 158,
-        h4: 150,
-        h3: 130,
-        h2: 80,
-        h1: 50,
+        mobile: 158,
         showFrom: 'all',
         side: 'left',
         photo: {
@@ -92,11 +88,8 @@ const HIGHLIGHTED_DATES: Record<string, LineConfig> = {
     },
     '12/2023': {
         xl: 480,
-        h5: 740,
-        h4: 660,
-        h3: 670,
-        h2: 500,
-        h1: 430,
+        mobile: 700,
+        topAnchor: true,
         showFrom: 'all',
         side: 'right',
         photo: {
@@ -114,11 +107,7 @@ const HIGHLIGHTED_DATES: Record<string, LineConfig> = {
     },
     '03/2024': {
         xl: 44,
-        h5: 44,
-        h4: 44,
-        h3: 44,
-        h2: 44,
-        h1: 44,
+        mobile: 44,
         showFrom: 'tablet',
         side: 'left',
         photo: {
@@ -134,11 +123,7 @@ const HIGHLIGHTED_DATES: Record<string, LineConfig> = {
     },
     '06/2024': {
         xl: 550,
-        h5: 668,
-        h4: 668,
-        h3: 668,
-        h2: 668,
-        h1: 668,
+        mobile: 700,
         showFrom: 'tablet',
         side: 'left',
         photo: {
@@ -154,11 +139,7 @@ const HIGHLIGHTED_DATES: Record<string, LineConfig> = {
     },
     '09/2024': {
         xl: 40,
-        h5: 0,
-        h4: 0,
-        h3: 0,
-        h2: 0,
-        h1: 0,
+        mobile: 0,
         showFrom: 'desktop',
         side: 'left',
         photo: {
@@ -172,11 +153,7 @@ const HIGHLIGHTED_DATES: Record<string, LineConfig> = {
     },
     '12/2024': {
         xl: 450,
-        h5: 0,
-        h4: 0,
-        h3: 0,
-        h2: 0,
-        h1: 0,
+        mobile: 0,
         showFrom: 'desktop',
         side: 'left',
         photo: {
@@ -191,9 +168,13 @@ const HIGHLIGHTED_DATES: Record<string, LineConfig> = {
 };
 
 const getLineClass = (config: LineConfig): string => {
-    if (config.showFrom === 'all') return styles['date--line-all'];
-    if (config.showFrom === 'tablet') return styles['date--line-tablet'];
-    return styles['date--line-desktop'];
+    const visClass =
+        config.showFrom === 'all'
+            ? styles['date--line-all']
+            : config.showFrom === 'tablet'
+              ? styles['date--line-tablet']
+              : styles['date--line-desktop'];
+    return config.topAnchor ? `${visClass} ${styles['date--line-top-anchor']}` : visClass;
 };
 
 export const HistoryTimeline = () => {
@@ -212,11 +193,7 @@ export const HistoryTimeline = () => {
                             style={
                                 isActive
                                     ? ({
-                                          '--line-h1': `${config.h1}px`,
-                                          '--line-h2': `${config.h2}px`,
-                                          '--line-h3': `${config.h3}px`,
-                                          '--line-h4': `${config.h4}px`,
-                                          '--line-h5': `${config.h5}px`,
+                                          '--line-mobile': `${config.mobile}px`,
                                           '--line-xl': `${config.xl}px`,
                                       } as React.CSSProperties)
                                     : undefined

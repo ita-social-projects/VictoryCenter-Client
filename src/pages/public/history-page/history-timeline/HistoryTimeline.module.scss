@@ -7,6 +7,7 @@
     background: c.$light-blue-50;
     padding: 12px 16px;
     position: relative;
+    flex-shrink: 0;
 
     @media (min-width: 1440px) {
         padding: 12px 56px;
@@ -61,9 +62,6 @@
     color: c.$light-blue-900;
 }
 
-// ── Visibility helpers ────────────────────────────────────────────────────────
-
-// Line + photo visible on all breakpoints (mobile ≥ 375px)
 .date--line-all .date-line {
     display: block;
 }
@@ -72,7 +70,6 @@
     display: flex;
 }
 
-// Line + photo visible only from tablet (≥ 768px)
 .date--line-tablet .date-line {
     display: none;
 
@@ -89,7 +86,6 @@
     }
 }
 
-// Line + photo visible only on desktop (≥ 1440px)
 .date--line-desktop .date-line {
     display: none;
 
@@ -106,7 +102,29 @@
     }
 }
 
-// ── Vertical line ─────────────────────────────────────────────────────────────
+.date--line-top-anchor .date-line {
+    height: calc(100svh - 178px);
+
+    @media (min-width: 768px) and (max-width: 1439px) {
+        height: calc(100svh - 188px);
+    }
+
+    @media (min-width: 1440px) {
+        height: var(--line-xl);
+    }
+}
+
+.date--line-top-anchor .photo-card {
+    bottom: calc(100% + 2px + (100svh - 178px));
+
+    @media (min-width: 768px) and (max-width: 1439px) {
+        bottom: calc(100% + 2px + (100svh - 188px));
+    }
+
+    @media (min-width: 1440px) {
+        bottom: calc(100% + 2px + var(--line-xl));
+    }
+}
 
 .date-line {
     position: absolute;
@@ -115,68 +133,39 @@
     transform: translateX(-50%);
     width: 1px;
     background-color: c.$light-blue-500;
-    height: var(--line-h1, 0px);                                    // < 700px
+    height: min(var(--line-mobile, 0px), max(97px, calc(100svh - 645px)));
 
-    @media (min-height: 700px) {
-        height: var(--line-h2, var(--line-h1, 0px));               // 700–799px
-    }
-
-    @media (min-height: 800px) {
-        height: var(--line-h3, var(--line-h2, 0px));               // 800–899px
-    }
-
-    @media (min-height: 900px) {
-        height: var(--line-h4, var(--line-h3, 0px));               // 900–999px
-    }
-
-    @media (min-height: 1000px) {
-        height: var(--line-h5, var(--line-h4, 0px));               // ≥ 1000px
+    @media (min-width: 768px) and (max-width: 1439px) {
+        height: min(var(--line-mobile, 0px), max(150px, calc(100svh - 760px)));
     }
 
     @media (min-width: 1440px) {
-        height: var(--line-xl);                                     // десктоп
+        height: var(--line-xl);
     }
 }
-
-// ── Photo card ────────────────────────────────────────────────────────────────
 
 .photo-card {
     position: absolute;
-    bottom: calc(100% + 12px + var(--line-h1, 0px) - 10px);
+    bottom: calc(100% + 2px + min(var(--line-mobile, 0px), max(97px, calc(100svh - 645px))));
     left: 50%;
     flex-direction: column;
     gap: 4px;
-    // hidden by default — shown via .date--line-* parent class
     display: none;
 
-    @media (min-height: 700px) {
-        bottom: calc(100% + 12px + var(--line-h2, var(--line-h1, 0px)) - 10px);
-    }
-
-    @media (min-height: 800px) {
-        bottom: calc(100% + 12px + var(--line-h3, var(--line-h2, 0px)) - 10px);
-    }
-
-    @media (min-height: 900px) {
-        bottom: calc(100% + 12px + var(--line-h4, var(--line-h3, 0px)) - 10px);
-    }
-
-    @media (min-height: 1000px) {
-        bottom: calc(100% + 12px + var(--line-h5, var(--line-h4, 0px)) - 10px);
+    @media (min-width: 768px) and (max-width: 1439px) {
+        bottom: calc(100% + 2px + min(var(--line-mobile, 0px), max(150px, calc(100svh - 760px))));
     }
 
     @media (min-width: 1440px) {
-        bottom: calc(100% + 12px + var(--line-xl) - 10px);
+        bottom: calc(100% + 2px + var(--line-xl));
     }
 }
 
-// Dot on the LEFT — photo card extends to the right; shift left by half dot width (4px) so dot centre hits the line
 .photo-card--left {
     transform: translateX(-4px);
     align-items: flex-start;
 }
 
-// Dot on the RIGHT — photo card extends to the left; shift right by half dot width (4px) so dot centre hits the line
 .photo-card--right {
     transform: translateX(calc(-100% + 4px));
     align-items: flex-end;
@@ -223,8 +212,6 @@
     white-space: nowrap;
     margin: 0;
 }
-
-// ── Ellipsis ──────────────────────────────────────────────────────────────────
 
 .dates-ellipsis {
     @include type.small-text-regular;

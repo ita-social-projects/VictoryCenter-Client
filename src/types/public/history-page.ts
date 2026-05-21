@@ -4,9 +4,7 @@ import { SectionTemplate } from '../common/sections';
 import { EntityLocalization } from '../common/language';
 import { HistorySectionContentLocalizableFields } from '../common/history-sections';
 
-export interface HistorySectionContentLocalization
-    extends EntityLocalization,
-        HistorySectionContentLocalizableFields {}
+export interface HistorySectionContentLocalization extends EntityLocalization, HistorySectionContentLocalizableFields {}
 
 export interface HistorySectionContent extends HistorySectionContentLocalizableFields {
     id?: number;

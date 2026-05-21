@@ -18,16 +18,29 @@ jest.mock('./HistoryDualImages', () => ({
 const mockedUseGetLocalization = jest.mocked(useGetLocalization);
 const mockedUseScrollAnimation = jest.mocked(useScrollAnimation);
 
-const makeSection = (
-    template: SectionTemplate,
-    overrides: Partial<HistorySectionModel> = {},
-): HistorySectionModel => ({
+const makeSection = (template: SectionTemplate, overrides: Partial<HistorySectionModel> = {}): HistorySectionModel => ({
     id: 1,
     template,
     order: 0,
     contents: [
-        { id: 10, contentType: ContentType.Title, order: 0, title: '2024 — Весна', description: null, image: null, localizations: [] },
-        { id: 11, contentType: ContentType.Description, order: 1, title: null, description: 'Опис події', image: null, localizations: [] },
+        {
+            id: 10,
+            contentType: ContentType.Title,
+            order: 0,
+            title: '2024 — Весна',
+            description: null,
+            image: null,
+            localizations: [],
+        },
+        {
+            id: 11,
+            contentType: ContentType.Description,
+            order: 1,
+            title: null,
+            description: 'Опис події',
+            image: null,
+            localizations: [],
+        },
     ],
     ...overrides,
 });
@@ -59,9 +72,33 @@ describe('HistorySection', () => {
     describe('SingleImageRight template', () => {
         const sectionWithImage = makeSection(SectionTemplate.SingleImageRight, {
             contents: [
-                { id: 10, contentType: ContentType.Title, order: 0, title: '2024 — Березень', description: null, image: null, localizations: [] },
-                { id: 11, contentType: ContentType.Description, order: 1, title: null, description: 'Опис', image: null, localizations: [] },
-                { id: 12, contentType: ContentType.Image, order: 2, title: null, description: null, image: { id: 1, url: 'https://example.com/img.jpg', mimeType: 'image/jpeg' }, localizations: [] },
+                {
+                    id: 10,
+                    contentType: ContentType.Title,
+                    order: 0,
+                    title: '2024 — Березень',
+                    description: null,
+                    image: null,
+                    localizations: [],
+                },
+                {
+                    id: 11,
+                    contentType: ContentType.Description,
+                    order: 1,
+                    title: null,
+                    description: 'Опис',
+                    image: null,
+                    localizations: [],
+                },
+                {
+                    id: 12,
+                    contentType: ContentType.Image,
+                    order: 2,
+                    title: null,
+                    description: null,
+                    image: { id: 1, url: 'https://example.com/img.jpg', mimeType: 'image/jpeg' },
+                    localizations: [],
+                },
             ],
         });
 
@@ -77,9 +114,33 @@ describe('HistorySection', () => {
         it('should render HistoryQuadImages component', () => {
             const section = makeSection(SectionTemplate.QuadImagesBottom, {
                 contents: [
-                    { id: 10, contentType: ContentType.Title, order: 0, title: '2024', description: null, image: null, localizations: [] },
-                    { id: 11, contentType: ContentType.Description, order: 1, title: null, description: 'Текст', image: null, localizations: [] },
-                    { id: 12, contentType: ContentType.Image, order: 2, title: null, description: null, image: { id: 1, url: 'https://example.com/a.jpg', mimeType: 'image/jpeg' }, localizations: [] },
+                    {
+                        id: 10,
+                        contentType: ContentType.Title,
+                        order: 0,
+                        title: '2024',
+                        description: null,
+                        image: null,
+                        localizations: [],
+                    },
+                    {
+                        id: 11,
+                        contentType: ContentType.Description,
+                        order: 1,
+                        title: null,
+                        description: 'Текст',
+                        image: null,
+                        localizations: [],
+                    },
+                    {
+                        id: 12,
+                        contentType: ContentType.Image,
+                        order: 2,
+                        title: null,
+                        description: null,
+                        image: { id: 1, url: 'https://example.com/a.jpg', mimeType: 'image/jpeg' },
+                        localizations: [],
+                    },
                 ],
             });
 
@@ -93,9 +154,33 @@ describe('HistorySection', () => {
         it('should render HistoryDualImages component', () => {
             const section = makeSection(SectionTemplate.DualImagesBottom, {
                 contents: [
-                    { id: 10, contentType: ContentType.Title, order: 0, title: null, description: null, image: null, localizations: [] },
-                    { id: 11, contentType: ContentType.Description, order: 1, title: null, description: null, image: null, localizations: [] },
-                    { id: 12, contentType: ContentType.Image, order: 2, title: null, description: null, image: { id: 1, url: 'https://example.com/a.jpg', mimeType: 'image/jpeg' }, localizations: [] },
+                    {
+                        id: 10,
+                        contentType: ContentType.Title,
+                        order: 0,
+                        title: null,
+                        description: null,
+                        image: null,
+                        localizations: [],
+                    },
+                    {
+                        id: 11,
+                        contentType: ContentType.Description,
+                        order: 1,
+                        title: null,
+                        description: null,
+                        image: null,
+                        localizations: [],
+                    },
+                    {
+                        id: 12,
+                        contentType: ContentType.Image,
+                        order: 2,
+                        title: null,
+                        description: null,
+                        image: { id: 1, url: 'https://example.com/a.jpg', mimeType: 'image/jpeg' },
+                        localizations: [],
+                    },
                 ],
             });
 
@@ -123,7 +208,9 @@ describe('HistorySection', () => {
         it('should display localized title and description when useGetLocalization returns a translation', () => {
             mockedUseGetLocalization
                 .mockImplementationOnce(() => ({ title: '2024 — Spring' }) as ReturnType<typeof useGetLocalization>)
-                .mockImplementationOnce(() => ({ description: 'Event description' }) as ReturnType<typeof useGetLocalization>);
+                .mockImplementationOnce(
+                    () => ({ description: 'Event description' }) as ReturnType<typeof useGetLocalization>,
+                );
 
             render(<HistorySection section={makeSection(SectionTemplate.TextOnly)} />);
 
@@ -134,8 +221,24 @@ describe('HistorySection', () => {
         it('should not render heading when localization and base title are both null', () => {
             const sectionNoTitle = makeSection(SectionTemplate.TextOnly, {
                 contents: [
-                    { id: 10, contentType: ContentType.Title, order: 0, title: null, description: null, image: null, localizations: [] },
-                    { id: 11, contentType: ContentType.Description, order: 1, title: null, description: 'Опис', image: null, localizations: [] },
+                    {
+                        id: 10,
+                        contentType: ContentType.Title,
+                        order: 0,
+                        title: null,
+                        description: null,
+                        image: null,
+                        localizations: [],
+                    },
+                    {
+                        id: 11,
+                        contentType: ContentType.Description,
+                        order: 1,
+                        title: null,
+                        description: 'Опис',
+                        image: null,
+                        localizations: [],
+                    },
                 ],
             });
 

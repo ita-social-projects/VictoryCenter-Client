@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { LocalizationModal } from '@/components/admin/localization-modal/LocalizationModal';
 import { TranslationControls } from '@/components/admin/translation-controls/TranslationControls';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
 import { DEFAULT_LOCALE } from '@/const/common/locales';
 import { useTranslateReportsCategory } from '@/hooks/admin/use-translate-reports-category/useTranslateReportsCategory';
@@ -88,7 +89,11 @@ export const TranslateReportsCategoryModal = ({
         <LocalizationModal
             isOpen={isOpen}
             onClose={handleClose}
-            title={FUNDS_EXPENDITURES_TEXT.MODAL.TRANSLATE_CATEGORY.TITLE}
+            title={
+                mode === ModalMode.Edit
+                    ? COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.UPDATE_TRANSLATION
+                    : FUNDS_EXPENDITURES_TEXT.MODAL.TRANSLATE_CATEGORY.TITLE
+            }
             onSave={handleSaveClick}
             isSubmitting={isSubmitting}
             isFormValid={isFormValid}

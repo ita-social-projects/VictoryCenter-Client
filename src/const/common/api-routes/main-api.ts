@@ -116,6 +116,9 @@ export const API_ROUTES = {
     REPORT_FUNDS_EXPENDITURES_CATEGORY_LOCALIZATIONS: {
         BASE: 'ReportFundsExpendituresCategoryLocalizations',
     },
+    REPORT_FUNDS_EXPENDITURES_SETTINGS_LOCALIZATIONS: {
+        BASE: 'ReportFundsExpendituresSettingsLocalizations',
+    },
     HISTORY: {
         BASE: 'History',
     },

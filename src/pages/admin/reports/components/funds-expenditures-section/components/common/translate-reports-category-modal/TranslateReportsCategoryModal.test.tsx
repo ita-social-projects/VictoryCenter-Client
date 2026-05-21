@@ -1,4 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
 import { ReportFundsExpendituresCategory } from '@/types/admin/reports';
 import { LocalizationLanguage, TranslationStatus } from '@/types/common/language';
@@ -25,34 +26,30 @@ jest.mock('@/utils/functions/mappers/common/localization/localization-mappers', 
 jest.mock('@/components/admin/translation-controls/TranslationControls', () => ({
     TranslationControls: ({ languages, selectedLanguage, onLanguageChange }: any) => (
         <div data-testid="translation-controls">
-            {languages.map((lang: any) => (
+            {(languages ?? []).map((lang: any) => (
                 <button
                     key={lang.id}
                     data-testid={`lang-${lang.code}`}
-                    onClick={() => onLanguageChange(lang)}
-                    data-selected={selectedLanguage?.id === lang.id}
-                >
-                    {lang.name}
-                </button>
+                    data-selected={String(selectedLanguage?.id === lang.id)}
+                    onClick={() => onLanguageChange?.(lang)}
+                />
             ))}
         </div>
     ),
 }));
 
 jest.mock('@/components/admin/localization-modal/LocalizationModal', () => ({
-    LocalizationModal: ({ isOpen, onClose, title, onSave, isSubmitting, isFormValid, isDirty, children }: any) =>
-        isOpen ? (
+    LocalizationModal: ({ isOpen, onClose, onSave, title, children }: any) => {
+        if (!isOpen) return null;
+        return (
             <div data-testid="localization-modal">
                 <div data-testid="modal-title">{title}</div>
-                <button data-testid="modal-close" onClick={onClose}>
-                    Close
-                </button>
-                <button data-testid="modal-save" onClick={onSave} disabled={!isFormValid || isSubmitting || !isDirty}>
-                    Save
-                </button>
-                <div data-testid="modal-content">{children}</div>
+                <div>{children}</div>
+                <button data-testid="modal-close" onClick={onClose} />
+                <button data-testid="modal-save" onClick={onSave} />
             </div>
-        ) : null,
+        );
+    },
 }));
 
 jest.mock('./TranslateReportsCategoryForm', () => {
@@ -97,6 +94,15 @@ const categoriesMock: ReportFundsExpendituresCategory[] = [
     { id: 2, name: 'Category Two', type: 'expense', localizations: [] },
 ];
 
+const categoryWithEnTranslation: ReportFundsExpendituresCategory = {
+    id: 3,
+    name: 'Category Three',
+    type: 'income',
+    localizations: [
+        { language: { id: 2, code: 'en' }, translationStatus: TranslationStatus.Relevant, name: 'Translated Three' },
+    ],
+};
+
 const defaultProps = {
     isOpen: true,
     onClose: jest.fn(),
@@ -120,10 +126,20 @@ describe('TranslateReportsCategoryModal', () => {
         expect(screen.queryByTestId('localization-modal')).not.toBeInTheDocument();
     });
 
-    it('renders the fixed modal title', () => {
+    it('shows add-mode title when selected category has no translation for selected language', () => {
         render(<TranslateReportsCategoryModal {...defaultProps} />);
         expect(screen.getByTestId('modal-title')).toHaveTextContent(
             FUNDS_EXPENDITURES_TEXT.MODAL.TRANSLATE_CATEGORY.TITLE,
+        );
+    });
+
+    it('shows edit-mode title when selected category has an existing translation for selected language', () => {
+        render(<TranslateReportsCategoryModal {...defaultProps} categories={[categoryWithEnTranslation]} />);
+
+        fireEvent.change(screen.getByTestId('category-select'), { target: { value: '3' } });
+
+        expect(screen.getByTestId('modal-title')).toHaveTextContent(
+            COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.UPDATE_TRANSLATION,
         );
     });
 

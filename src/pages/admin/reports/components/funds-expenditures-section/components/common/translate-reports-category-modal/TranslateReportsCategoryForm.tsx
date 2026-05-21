@@ -81,6 +81,8 @@ export const TranslateReportsCategoryForm = forwardRef<
 
         const handleCategoryChange = (category: ReportFundsExpendituresCategory | null) => {
             setSelectedCategory(category);
+            setFormState(DEFAULT_FORM_STATE);
+            setErrors({} as TranslateReportsCategoryFormErrorState);
             onCategoryChange?.(category);
         };
 

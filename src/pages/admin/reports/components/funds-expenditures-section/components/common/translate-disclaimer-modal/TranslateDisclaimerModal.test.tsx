@@ -3,6 +3,24 @@ import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
 import { LocalizationLanguage } from '@/types/common/language';
 import { TranslateDisclaimerModal } from './TranslateDisclaimerModal';
 
+jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
+    useAdminClient: () => ({ post: jest.fn(), put: jest.fn() }),
+}));
+
+jest.mock(
+    '@/services/api/admin/reports/report-funds-expenditures-settings-localizations/report-funds-expenditures-settings-localizations-api',
+    () => ({
+        ReportFundsExpendituresSettingsLocalizationsApi: {
+            create: jest.fn(),
+            update: jest.fn(),
+        },
+    }),
+);
+
+jest.mock('@/utils/functions/mappers/common/localization/localization-mappers', () => ({
+    mapLocalizationDtoToModel: jest.fn(),
+}));
+
 jest.mock('@/components/admin/translation-controls/TranslationControls', () => ({
     TranslationControls: ({ languages, selectedLanguage, onLanguageChange }: any) => (
         <div data-testid="translation-controls">
@@ -11,7 +29,7 @@ jest.mock('@/components/admin/translation-controls/TranslationControls', () => (
                     key={lang.id}
                     data-testid={`lang-${lang.code}`}
                     onClick={() => onLanguageChange(lang)}
-                    data-selected={selectedLanguage?.id === lang.id}
+                    data-selected={String(selectedLanguage?.id === lang.id)}
                 >
                     {lang.name}
                 </button>
@@ -71,6 +89,9 @@ const defaultProps = {
     isOpen: true,
     onClose: jest.fn(),
     translationLanguages: [languageEn],
+    settings: null,
+    existingLocalization: null,
+    onTranslateSuccess: jest.fn(),
 };
 
 describe('TranslateDisclaimerModal', () => {

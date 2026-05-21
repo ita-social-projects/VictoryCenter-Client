@@ -20,6 +20,7 @@ export const HistoryHero = () => {
                 </h1>
                 <p className={styles.description}>{t('HERO_DESCRIPTION')}</p>
             </div>
+            <div className={styles['photo-space']} />
             <HistoryTimeline />
         </section>
     );

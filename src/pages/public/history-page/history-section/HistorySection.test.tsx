@@ -18,38 +18,41 @@ jest.mock('./HistoryDualImages', () => ({
 const mockedUseGetLocalization = jest.mocked(useGetLocalization);
 const mockedUseScrollAnimation = jest.mocked(useScrollAnimation);
 
+type SectionContent = HistorySectionModel['contents'][number];
+
+const makeContent = (
+    id: number,
+    contentType: ContentType,
+    order: number,
+    overrides: Partial<SectionContent> = {},
+): SectionContent => ({
+    id,
+    contentType,
+    order,
+    title: null,
+    description: null,
+    image: null,
+    localizations: [],
+    ...overrides,
+});
+
 const makeSection = (template: SectionTemplate, overrides: Partial<HistorySectionModel> = {}): HistorySectionModel => ({
     id: 1,
     template,
     order: 0,
     contents: [
-        {
-            id: 10,
-            contentType: ContentType.Title,
-            order: 0,
-            title: '2024 — Весна',
-            description: null,
-            image: null,
-            localizations: [],
-        },
-        {
-            id: 11,
-            contentType: ContentType.Description,
-            order: 1,
-            title: null,
-            description: 'Опис події',
-            image: null,
-            localizations: [],
-        },
+        makeContent(10, ContentType.Title, 0, { title: '2024 — Весна' }),
+        makeContent(11, ContentType.Description, 1, { description: 'Опис події' }),
     ],
     ...overrides,
 });
+
+const TEST_IMAGE = { id: 1, url: 'https://example.com/img.jpg', mimeType: 'image/jpeg' };
 
 describe('HistorySection', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         mockedUseScrollAnimation.mockReturnValue({ ref: { current: null }, isVisible: true });
-        // Default: pass-through to fallback — individual tests override when needed
         mockedUseGetLocalization.mockImplementation((_, fallback) => fallback as ReturnType<typeof useGetLocalization>);
     });
 
@@ -70,43 +73,48 @@ describe('HistorySection', () => {
     });
 
     describe('SingleImageRight template', () => {
-        const sectionWithImage = makeSection(SectionTemplate.SingleImageRight, {
-            contents: [
-                {
-                    id: 10,
-                    contentType: ContentType.Title,
-                    order: 0,
-                    title: '2024 — Березень',
-                    description: null,
-                    image: null,
-                    localizations: [],
-                },
-                {
-                    id: 11,
-                    contentType: ContentType.Description,
-                    order: 1,
-                    title: null,
-                    description: 'Опис',
-                    image: null,
-                    localizations: [],
-                },
-                {
-                    id: 12,
-                    contentType: ContentType.Image,
-                    order: 2,
-                    title: null,
-                    description: null,
-                    image: { id: 1, url: 'https://example.com/img.jpg', mimeType: 'image/jpeg' },
-                    localizations: [],
-                },
-            ],
+        it('should render an image when image is provided', () => {
+            const section = makeSection(SectionTemplate.SingleImageRight, {
+                contents: [
+                    makeContent(10, ContentType.Title, 0, { title: '2024 — Березень' }),
+                    makeContent(11, ContentType.Description, 1, { description: 'Опис' }),
+                    makeContent(12, ContentType.Image, 2, { image: TEST_IMAGE }),
+                ],
+            });
+
+            render(<HistorySection section={section} />);
+
+            expect(screen.getByRole('presentation')).toBeInTheDocument();
         });
 
-        it('should render an image element', () => {
-            render(<HistorySection section={sectionWithImage} />);
+        it('should not render image when no image is provided', () => {
+            render(<HistorySection section={makeSection(SectionTemplate.SingleImageRight)} />);
 
-            // Images with alt="" have role="presentation" per ARIA spec
+            expect(screen.queryByRole('presentation')).not.toBeInTheDocument();
+        });
+    });
+
+    describe('SingleImageTop template', () => {
+        it('should render image above header when image is provided', () => {
+            const section = makeSection(SectionTemplate.SingleImageTop, {
+                contents: [
+                    makeContent(10, ContentType.Title, 0, { title: '2024 — Квітень' }),
+                    makeContent(11, ContentType.Description, 1, { description: 'Опис' }),
+                    makeContent(12, ContentType.Image, 2, { image: TEST_IMAGE }),
+                ],
+            });
+
+            render(<HistorySection section={section} />);
+
             expect(screen.getByRole('presentation')).toBeInTheDocument();
+            expect(screen.getByText('КВІТЕНЬ')).toBeInTheDocument();
+        });
+
+        it('should fall back to default layout when no image is provided', () => {
+            render(<HistorySection section={makeSection(SectionTemplate.SingleImageTop)} />);
+
+            expect(screen.queryByRole('presentation')).not.toBeInTheDocument();
+            expect(screen.getByText('ВЕСНА')).toBeInTheDocument();
         });
     });
 
@@ -114,33 +122,9 @@ describe('HistorySection', () => {
         it('should render HistoryQuadImages component', () => {
             const section = makeSection(SectionTemplate.QuadImagesBottom, {
                 contents: [
-                    {
-                        id: 10,
-                        contentType: ContentType.Title,
-                        order: 0,
-                        title: '2024',
-                        description: null,
-                        image: null,
-                        localizations: [],
-                    },
-                    {
-                        id: 11,
-                        contentType: ContentType.Description,
-                        order: 1,
-                        title: null,
-                        description: 'Текст',
-                        image: null,
-                        localizations: [],
-                    },
-                    {
-                        id: 12,
-                        contentType: ContentType.Image,
-                        order: 2,
-                        title: null,
-                        description: null,
-                        image: { id: 1, url: 'https://example.com/a.jpg', mimeType: 'image/jpeg' },
-                        localizations: [],
-                    },
+                    makeContent(10, ContentType.Title, 0, { title: '2024' }),
+                    makeContent(11, ContentType.Description, 1, { description: 'Текст' }),
+                    makeContent(12, ContentType.Image, 2, { image: TEST_IMAGE }),
                 ],
             });
 
@@ -154,33 +138,9 @@ describe('HistorySection', () => {
         it('should render HistoryDualImages component', () => {
             const section = makeSection(SectionTemplate.DualImagesBottom, {
                 contents: [
-                    {
-                        id: 10,
-                        contentType: ContentType.Title,
-                        order: 0,
-                        title: null,
-                        description: null,
-                        image: null,
-                        localizations: [],
-                    },
-                    {
-                        id: 11,
-                        contentType: ContentType.Description,
-                        order: 1,
-                        title: null,
-                        description: null,
-                        image: null,
-                        localizations: [],
-                    },
-                    {
-                        id: 12,
-                        contentType: ContentType.Image,
-                        order: 2,
-                        title: null,
-                        description: null,
-                        image: { id: 1, url: 'https://example.com/a.jpg', mimeType: 'image/jpeg' },
-                        localizations: [],
-                    },
+                    makeContent(10, ContentType.Title, 0),
+                    makeContent(11, ContentType.Description, 1),
+                    makeContent(12, ContentType.Image, 2, { image: TEST_IMAGE }),
                 ],
             });
 
@@ -221,24 +181,8 @@ describe('HistorySection', () => {
         it('should not render heading when localization and base title are both null', () => {
             const sectionNoTitle = makeSection(SectionTemplate.TextOnly, {
                 contents: [
-                    {
-                        id: 10,
-                        contentType: ContentType.Title,
-                        order: 0,
-                        title: null,
-                        description: null,
-                        image: null,
-                        localizations: [],
-                    },
-                    {
-                        id: 11,
-                        contentType: ContentType.Description,
-                        order: 1,
-                        title: null,
-                        description: 'Опис',
-                        image: null,
-                        localizations: [],
-                    },
+                    makeContent(10, ContentType.Title, 0),
+                    makeContent(11, ContentType.Description, 1, { description: 'Опис' }),
                 ],
             });
 

@@ -10,9 +10,6 @@ jest.mock('@/services/api/public/history/history-api');
 jest.mock('./history-hero/HistoryHero', () => ({
     HistoryHero: () => <div data-testid="history-hero" />,
 }));
-jest.mock('./history-timeline/HistoryTimeline', () => ({
-    HistoryTimeline: () => <div data-testid="history-timeline" />,
-}));
 jest.mock('./history-section/HistorySection');
 jest.mock('./history-quote/HistoryQuote', () => ({
     HistoryQuote: () => <div data-testid="history-quote" />,
@@ -40,9 +37,7 @@ const makeSection = (id: number, order: number, year: string | null = null): His
 describe('HistoryPage', () => {
     beforeEach(() => {
         jest.clearAllMocks();
-        MockedHistorySection.mockImplementation(({ section }) => (
-            <div data-testid={`section-${section.id}`} />
-        ));
+        MockedHistorySection.mockImplementation(({ section }) => <div data-testid={`section-${section.id}`} />);
     });
 
     it('should show loader while data is loading', () => {
@@ -70,7 +65,6 @@ describe('HistoryPage', () => {
 
         await waitFor(() => {
             expect(screen.getByTestId('history-hero')).toBeInTheDocument();
-            expect(screen.getByTestId('history-timeline')).toBeInTheDocument();
             expect(screen.getByTestId('section-1')).toBeInTheDocument();
             expect(screen.getByTestId('history-quote')).toBeInTheDocument();
         });

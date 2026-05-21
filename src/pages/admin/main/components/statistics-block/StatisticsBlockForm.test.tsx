@@ -1,7 +1,8 @@
+import { MainPage, MainPageFormValues, MetricPrefix, MetricType } from '@/types/admin/main-page';
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { FormProvider, useForm } from 'react-hook-form';
 import { StatisticsBlockForm } from './StatisticsBlockForm';
-import { MOCK_MAIN_PAGE_DATA } from '@/utils/mock-data/admin/main-page/main-page';
 
 jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
     __esModule: true,
@@ -32,69 +33,178 @@ jest.mock('./components/statistics-metrics-list/StatisticsMetricsList', () => ({
                 onClick={() => onToggleVisibility(metrics[0]?.id ?? 0)}
                 type="button"
             />
+            <button
+                data-testid="toggle-second-metric"
+                onClick={() => onToggleVisibility(metrics[1]?.id ?? 0)}
+                type="button"
+            />
             <button data-testid="reorder-metrics" onClick={() => onReorder([])} type="button" />
         </div>
     ),
 }));
 
+jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
+    useAdminClient: jest.fn(() => ({})),
+}));
+
+jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider', () => ({
+    useToast: () => ({ addToast: jest.fn() }),
+}));
+
+jest.mock('@/services/api/admin/main-page/main-page-api', () => ({
+    MainPageApi: {
+        updateMetricVisibility: jest.fn().mockResolvedValue(undefined),
+        reorderMetrics: jest.fn().mockResolvedValue(undefined),
+    },
+}));
+
+const mockInitialData: MainPage = {
+    id: 1,
+    title: 'Тест',
+    description: 'Тест',
+    image: null,
+    mainAboutUs: null,
+    mainPartners: null,
+    impactStatistics: {
+        id: 1,
+        title: 'Початковий заголовок статистики',
+        image: null,
+        metrics: [
+            {
+                id: 101,
+                name: 'Метрика 1',
+                value: 15,
+                type: MetricType.Partners,
+                prefix: MetricPrefix.Plus,
+                isHidden: false,
+                priority: 1,
+                localizations: [],
+            },
+            {
+                id: 102,
+                name: 'Метрика 2',
+                value: 42,
+                type: MetricType.Partners,
+                prefix: MetricPrefix.Percent,
+                isHidden: false,
+                priority: 2,
+                localizations: [],
+            },
+        ],
+        localizations: [],
+    },
+    localizations: [],
+};
+
+const FormWrapper = ({
+    children,
+    defaultValues,
+}: {
+    children: React.ReactNode;
+    defaultValues?: Partial<MainPageFormValues>;
+}) => {
+    const methods = useForm<MainPageFormValues>({
+        defaultValues: {
+            statisticsTitleUa: '',
+            statisticsTitleEn: '',
+            ...defaultValues,
+        } as MainPageFormValues,
+    });
+    return <FormProvider {...methods}>{children}</FormProvider>;
+};
+
 describe('StatisticsBlockForm', () => {
-    it('renders and pre-fills titles from mock data', async () => {
-        render(<StatisticsBlockForm />);
+    const mockOnPublish = jest.fn();
+
+    const renderComponent = (props: Partial<React.ComponentProps<typeof StatisticsBlockForm>> = {}) => {
+        return render(
+            <FormWrapper>
+                <StatisticsBlockForm
+                    initialData={mockInitialData}
+                    isPublishDisabled={false}
+                    onPublish={mockOnPublish}
+                    {...props}
+                />
+            </FormWrapper>,
+        );
+    };
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    it('renders and pre-fills titles from form context', async () => {
+        render(
+            <FormWrapper defaultValues={{ statisticsTitleUa: 'Заголовок UA', statisticsTitleEn: 'Заголовок EN' }}>
+                <StatisticsBlockForm initialData={mockInitialData} isPublishDisabled={true} onPublish={mockOnPublish} />
+            </FormWrapper>,
+        );
 
         const uaTitle = screen.getByTestId('statistics-title-ua') as HTMLInputElement;
         const enTitle = screen.getByTestId('statistics-title-en') as HTMLInputElement;
 
-        await waitFor(() => {
-            expect(uaTitle.value).toBe(MOCK_MAIN_PAGE_DATA.impactStatistics?.title);
-            expect(enTitle.value).toBe(MOCK_MAIN_PAGE_DATA.impactStatistics?.title);
-        });
+        expect(uaTitle.value).toBe('Заголовок UA');
+        expect(enTitle.value).toBe('Заголовок EN');
     });
 
-    it('enables publish when form is valid and dirty', async () => {
-        render(<StatisticsBlockForm />);
+    it('enables publish button when isPublishDisabled prop is false', () => {
+        renderComponent();
 
-        const uaTitle = screen.getByTestId('statistics-title-ua');
-        fireEvent.change(uaTitle, { target: { value: 'Новий заголовок' } });
-
-        await waitFor(() => {
-            expect(screen.getByTestId('submit-btn')).not.toBeDisabled();
-        });
+        const submitBtn = screen.getByTestId('submit-btn');
+        expect(submitBtn).not.toBeDisabled();
     });
 
-    it('disables publish when image error is set', async () => {
-        render(<StatisticsBlockForm />);
+    it('disables publish when image error is set via local state', () => {
+        renderComponent();
 
-        const uaTitle = screen.getByTestId('statistics-title-ua');
-        fireEvent.change(uaTitle, { target: { value: 'Новий заголовок' } });
-
-        await waitFor(() => expect(screen.getByTestId('submit-btn')).not.toBeDisabled());
+        const submitBtn = screen.getByTestId('submit-btn');
+        expect(submitBtn).not.toBeDisabled();
 
         fireEvent.click(screen.getByTestId('trigger-image-error'));
-        await waitFor(() => expect(screen.getByTestId('submit-btn')).toBeDisabled());
+        expect(submitBtn).toBeDisabled();
     });
 
     it('updates hidden metrics state when toggling visibility', async () => {
-        render(<StatisticsBlockForm />);
-
-        const firstMetricId = MOCK_MAIN_PAGE_DATA.impactStatistics?.metrics?.[0]?.id ?? 0;
+        renderComponent();
 
         fireEvent.click(screen.getByTestId('toggle-first-metric'));
 
         await waitFor(() => {
-            expect(screen.getByTestId('statistics-preview')).toHaveAttribute(
-                'data-hidden',
-                firstMetricId ? String(firstMetricId) : '0',
-            );
+            expect(screen.getByTestId('statistics-preview')).toHaveAttribute('data-hidden', '101');
         });
     });
 
     it('updates metrics order when reorder is triggered', async () => {
-        render(<StatisticsBlockForm />);
+        renderComponent();
 
         fireEvent.click(screen.getByTestId('reorder-metrics'));
 
         await waitFor(() => {
             expect(screen.getByTestId('statistics-preview')).toHaveAttribute('data-metrics', '0');
         });
+    });
+
+    it('does not hide the last visible metric', async () => {
+        renderComponent();
+
+        fireEvent.click(screen.getByTestId('toggle-first-metric'));
+        await waitFor(() => {
+            expect(screen.getByTestId('statistics-preview')).toHaveAttribute('data-hidden', '101');
+        });
+
+        fireEvent.click(screen.getByTestId('toggle-second-metric'));
+
+        await waitFor(() => {
+            expect(screen.getByTestId('statistics-preview')).toHaveAttribute('data-hidden', '101');
+        });
+    });
+
+    it('re-enables publish button after clearing image error', () => {
+        renderComponent();
+
+        fireEvent.click(screen.getByTestId('trigger-image-error'));
+        expect(screen.getByTestId('submit-btn')).toBeDisabled();
+        fireEvent.click(screen.getByTestId('clear-image-error'));
+        expect(screen.getByTestId('submit-btn')).not.toBeDisabled();
     });
 });

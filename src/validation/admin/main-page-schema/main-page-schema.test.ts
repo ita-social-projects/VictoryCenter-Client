@@ -3,7 +3,7 @@ import { MAIN_PAGE_VALIDATION_FUNCTIONS } from './main-page-schema';
 
 describe('MAIN_PAGE_VALIDATION_FUNCTIONS', () => {
     describe('validateTitle', () => {
-        it('returns undefined for a valid title (between 10 and 50 chars)', () => {
+        it('returns undefined for a valid title', () => {
             expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateTitle('Коні з досвідом зцілення')).toBeUndefined();
         });
 
@@ -15,13 +15,13 @@ describe('MAIN_PAGE_VALIDATION_FUNCTIONS', () => {
             expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateTitle('   ')).toBe(MAIN_PAGE_VALIDATION.common.REQUIRED);
         });
 
-        it('returns min error for title shorter than 10 chars', () => {
-            expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateTitle('Короткий')).toBe(
+        it('returns min error for title shorter than minimum characters', () => {
+            expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateTitle('Коротко')).toBe(
                 MAIN_PAGE_VALIDATION.titleBlock.title.getMinError(),
             );
         });
 
-        it('returns max error for title longer than 50 chars', () => {
+        it('returns max error for title longer than maximum characters', () => {
             const longTitle = 'a'.repeat(MAIN_PAGE_VALIDATION.titleBlock.title.max + 1);
             expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateTitle(longTitle)).toBe(
                 MAIN_PAGE_VALIDATION.titleBlock.title.getMaxError(),
@@ -44,13 +44,13 @@ describe('MAIN_PAGE_VALIDATION_FUNCTIONS', () => {
             );
         });
 
-        it('returns min error for description shorter than 10 chars', () => {
-            expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateDescription('Короткий')).toBe(
+        it('returns min error for description shorter than minimum characters', () => {
+            expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateDescription('Мало')).toBe(
                 MAIN_PAGE_VALIDATION.titleBlock.description.getMinError(),
             );
         });
 
-        it('returns max error for description longer than 300 chars', () => {
+        it('returns max error for description longer than maximum characters', () => {
             const longDescription = 'a'.repeat(MAIN_PAGE_VALIDATION.titleBlock.description.max + 1);
             expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateDescription(longDescription)).toBe(
                 MAIN_PAGE_VALIDATION.titleBlock.description.getMaxError(),
@@ -81,7 +81,7 @@ describe('MAIN_PAGE_VALIDATION_FUNCTIONS', () => {
     });
 
     describe('validatePartnersTitle', () => {
-        it('returns undefined for a valid title (between 10 and 50 chars)', () => {
+        it('returns undefined for a valid title', () => {
             expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validatePartnersTitle('Надійні партнери фонду')).toBeUndefined();
         });
 
@@ -95,13 +95,13 @@ describe('MAIN_PAGE_VALIDATION_FUNCTIONS', () => {
             );
         });
 
-        it('returns min error for title shorter than 10 chars', () => {
+        it('returns min error for title shorter than minimum characters', () => {
             expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validatePartnersTitle('Коротко')).toBe(
                 MAIN_PAGE_VALIDATION.partnersBlock.title.getMinError(),
             );
         });
 
-        it('returns max error for title longer than 50 chars', () => {
+        it('returns max error for title longer than maximum characters', () => {
             const longTitle = 'a'.repeat(MAIN_PAGE_VALIDATION.partnersBlock.title.max + 1);
             expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validatePartnersTitle(longTitle)).toBe(
                 MAIN_PAGE_VALIDATION.partnersBlock.title.getMaxError(),
@@ -128,13 +128,13 @@ describe('MAIN_PAGE_VALIDATION_FUNCTIONS', () => {
             );
         });
 
-        it('returns min error for description shorter than 10 chars', () => {
+        it('returns min error for description shorter than minimum characters', () => {
             expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validatePartnersDescription('Замало')).toBe(
                 MAIN_PAGE_VALIDATION.partnersBlock.description.getMinError(),
             );
         });
 
-        it('returns max error for description longer than 1000 chars', () => {
+        it('returns max error for description longer than maximum characters', () => {
             const longDescription = 'a'.repeat(MAIN_PAGE_VALIDATION.partnersBlock.description.max + 1);
             expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validatePartnersDescription(longDescription)).toBe(
                 MAIN_PAGE_VALIDATION.partnersBlock.description.getMaxError(),

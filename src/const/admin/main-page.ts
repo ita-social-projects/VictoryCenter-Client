@@ -37,6 +37,12 @@ export const MAIN_PAGE_TEXT = {
     BUTTONS: {
         PUBLISH: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED,
     },
+
+    ERRORS: {
+        LOAD_FAILED: 'Виникла помилка, не вдалося завантажити дані сторінки',
+        TOGGLE_VISIBILITY_FAILED: 'Не вдалося змінити видимість',
+        REORDER_FAILED: 'Не вдалося зберегти порядок',
+    },
 } as const;
 
 export const MAIN_PAGE_VALIDATION = {

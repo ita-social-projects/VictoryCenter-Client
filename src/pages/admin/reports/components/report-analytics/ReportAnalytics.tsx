@@ -107,6 +107,7 @@ export const ReportAnalytics = () => {
                         isDeleteCategoryModalOpen={isDeleteCategoryModalOpen}
                         onDeleteCategoryModalClose={() => setIsDeleteCategoryModalOpen(false)}
                         onCategoriesLoaded={setCategories}
+                        translationLanguages={translationLanguages}
                     />
                 )}
                 {activeTab.id === 'program-expenses' && <ProgramExpensesSection isEditing={isFundsEditing} />}

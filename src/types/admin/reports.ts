@@ -177,6 +177,30 @@ export interface UpdateReportFundsExpendituresCategoryLocalizationDto {
     name: string;
 }
 
+export interface ReportFundsExpendituresSettingsLocalizableFields {
+    disclaimerTitle: string;
+}
+
+export interface ReportFundsExpendituresSettingsLocalizationDto
+    extends EntityLocalizationDto,
+        ReportFundsExpendituresSettingsLocalizableFields {
+    entityId: number;
+}
+
+export interface ReportFundsExpendituresSettingsLocalization
+    extends EntityLocalization,
+        ReportFundsExpendituresSettingsLocalizableFields {}
+
+export interface CreateReportFundsExpendituresSettingsLocalizationDto {
+    entityId: number;
+    languageId: number;
+    disclaimerTitle: string;
+}
+
+export interface UpdateReportFundsExpendituresSettingsLocalizationDto {
+    disclaimerTitle: string;
+}
+
 export interface ReportFundsExpendituresCategory
     extends EntityWithLocalizations<ReportFundsExpendituresCategoryLocalization> {
     id: number;

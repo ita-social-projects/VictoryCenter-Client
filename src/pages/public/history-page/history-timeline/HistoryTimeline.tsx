@@ -56,17 +56,14 @@ interface PhotoConfig {
 }
 
 interface LineConfig {
-    xl: number; // desktop 1440px+ (px, фіксована)
-    mobile: number; // mobile/tablet (px, CSS автоматично обрізає за доступним місцем)
-    topAnchor?: boolean; // фото фіксується вгорі секції, лінія тягнеться знизу вгору
+    xl: number;
+    mobile: number;
+    topAnchor?: boolean;
     showFrom: 'all' | 'tablet' | 'desktop';
     photo?: PhotoConfig;
     side: 'left' | 'right';
 }
 
-// mobile — бажана висота лінії. CSS обріже її так, щоб фото не виходило за текст.
-// Задавай мобільне значення орієнтуючись на великі телефони (900px+).
-// На маленьких екранах лінія автоматично зменшиться.
 const HIGHLIGHTED_DATES: Record<string, LineConfig> = {
     '09/2023': {
         xl: 158,

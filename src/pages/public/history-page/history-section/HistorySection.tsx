@@ -69,7 +69,6 @@ export const HistorySection = ({ section, showYearLabel = true }: HistorySection
         );
     }
 
-    // SingleImageTop: full-width image above header row
     if (section.template === SectionTemplate.SingleImageTop && hasRealImages) {
         const imageSrc = getImageSrc(images[0]);
         return (
@@ -86,7 +85,6 @@ export const HistorySection = ({ section, showYearLabel = true }: HistorySection
         );
     }
 
-    // Default: standard header row + images grid below
     return (
         <section ref={ref as React.RefObject<HTMLElement>} className={wrapperClass}>
             {yearBadge}

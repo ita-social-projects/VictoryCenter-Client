@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { Button } from '@/components/public/ui/button';
 import { ReactComponent as MailIcon } from '@/assets/icons/mail.svg';
 import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
 import { ReactComponent as MapPinIcon } from '@/assets/icons/map-pin.svg';
@@ -61,14 +62,13 @@ export const ContactDetailsSection: React.FC<ContactDetailsSectionProps> = ({
                         <MailIcon className={styles['contact-details-icon']} aria-hidden="true" />
                         <p className={styles['contact-details-text']}>{email}</p>
                         <div className={styles['copy-wrapper']}>
-                            <button
-                                type="button"
+                            <Button
+                                variant="tertiary"
                                 className={styles['contact-details-copy']}
                                 onClick={() => handleCopy('email', onCopyEmail)}
-                                aria-label={copyEmailLabel}
-                            >
-                                <CopyIcon className={styles['contact-details-icon']} aria-hidden="true" />
-                            </button>
+                                ariaLabel={copyEmailLabel}
+                                icon={CopyIcon}
+                            />
                             {copiedItem === 'email' && (
                                 <span className={styles['copy-snackbar']} role="status" aria-live="polite">
                                     Скопійовано
@@ -81,14 +81,13 @@ export const ContactDetailsSection: React.FC<ContactDetailsSectionProps> = ({
                         <PhoneIcon className={styles['contact-details-icon']} aria-hidden="true" />
                         <p className={styles['contact-details-text']}>{phone}</p>
                         <div className={styles['copy-wrapper']}>
-                            <button
-                                type="button"
+                            <Button
+                                variant="tertiary"
                                 className={styles['contact-details-copy']}
                                 onClick={() => handleCopy('phone', onCopyPhone)}
-                                aria-label={copyPhoneLabel}
-                            >
-                                <CopyIcon className={styles['contact-details-icon']} aria-hidden="true" />
-                            </button>
+                                ariaLabel={copyPhoneLabel}
+                                icon={CopyIcon}
+                            />
                             {copiedItem === 'phone' && (
                                 <span className={styles['copy-snackbar']} role="status" aria-live="polite">
                                     Скопійовано

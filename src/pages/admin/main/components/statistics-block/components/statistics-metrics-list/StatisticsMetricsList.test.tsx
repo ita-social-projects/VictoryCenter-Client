@@ -51,6 +51,7 @@ const metrics: Metric[] = [
         priority: 1,
         localizations: [
             { language: { id: 1, code: 'uk' }, translationStatus: TranslationStatus.Relevant, name: 'Партнерів' },
+            { language: { id: 2, code: 'en' }, translationStatus: TranslationStatus.Relevant, name: 'Partners' },
         ],
     },
     {
@@ -87,12 +88,23 @@ describe('StatisticsMetricsList', () => {
     it('renders metrics list', () => {
         setup();
         expect(screen.getByText('Партнерів')).toBeInTheDocument();
+        expect(screen.getByText('Partners')).toBeInTheDocument();
         expect(screen.getByText('20+')).toBeInTheDocument();
     });
 
     it('falls back to metric name when localization is missing', () => {
-        setup();
-        expect(screen.getByText('Engagement')).toBeInTheDocument();
+        render(
+            <StatisticsMetricsList
+                metrics={metrics}
+                hiddenMetricIds={[]}
+                onToggleVisibility={jest.fn()}
+                onReorder={jest.fn()}
+            />,
+        );
+
+        const elements = screen.getAllByText('Engagement');
+        expect(elements).toHaveLength(2);
+        expect(elements[0]).toBeInTheDocument();
     });
 
     it('formats percent values', () => {

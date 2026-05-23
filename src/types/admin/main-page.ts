@@ -52,6 +52,7 @@ export interface MetricLocalization extends EntityLocalization {
     entityId?: number;
     languageId?: number;
     name?: string;
+    value?: string | null;
 }
 
 // Domain/UI Models
@@ -123,6 +124,7 @@ export interface ImpactStatisticLocalizationDto extends EntityLocalizationDto {
 export interface MetricLocalizationDto extends EntityLocalizationDto {
     entityId?: number;
     name?: string | null;
+    value?: string | null;
 }
 
 export interface MetricDto extends EntityWithDtoLocalizations<MetricLocalizationDto> {
@@ -169,6 +171,7 @@ export interface MainPageDto extends EntityWithDtoLocalizations<MainPageLocaliza
 export interface CreateMetricLocalizationDto {
     languageId?: number;
     name?: string;
+    value?: string | null;
 }
 
 export interface CreateMetricDto {
@@ -215,6 +218,7 @@ export interface CreateMainPageDto {
 export interface UpdateMetricLocalizationDto {
     languageId?: number;
     name?: string;
+    value?: string | null;
 }
 
 export interface UpdateImpactStatisticLocalizationDto {

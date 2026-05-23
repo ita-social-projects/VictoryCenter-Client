@@ -33,9 +33,13 @@ export const MAIN_PAGE_TEXT = {
             UKR_NAME_LABEL: 'UKR Назва',
             ENG_NAME_LABEL: 'ENG Назва',
             VALUE_LABEL: 'Значення',
+            UAH_VALUE_LABEL: 'UAH Сума коштів',
+            USD_VALUE_LABEL: 'USD Сума коштів',
             PREFIX_LABEL: 'Префікс',
             CANCEL_MODAL_TITLE: 'Відмінити зміни?',
             PREFIX_NONE: 'Без префікса',
+            SYNC_ON_TEXT: 'Суми зібраних коштів підтягуються автоматично з вашої системи звітності.',
+            SYNC_OFF_TEXT: 'Коли перемикач вимкнено, дані не синхронізуються автоматично і задаються вручну.',
         },
         PARTNERS: {
             TITLE_LABEL: COMMON_TEXT_ADMIN.TYPE.TITLE,

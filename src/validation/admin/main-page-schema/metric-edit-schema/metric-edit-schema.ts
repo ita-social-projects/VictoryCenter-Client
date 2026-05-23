@@ -21,4 +21,23 @@ export const metricEditSchema = Yup.object({
     prefix: Yup.mixed<MetricPrefix>().required(MAIN_PAGE_VALIDATION.common.REQUIRED),
 });
 
+export const raisedMetricEditSchema = Yup.object({
+    nameUa: Yup.string()
+        .required(MAIN_PAGE_VALIDATION.common.REQUIRED)
+        .min(MAIN_PAGE_VALIDATION.editPanel.name.min, MAIN_PAGE_VALIDATION.editPanel.name.getMinError())
+        .max(MAIN_PAGE_VALIDATION.editPanel.name.max, MAIN_PAGE_VALIDATION.editPanel.name.getMaxError()),
+    nameEn: Yup.string()
+        .required(MAIN_PAGE_VALIDATION.common.REQUIRED)
+        .min(MAIN_PAGE_VALIDATION.editPanel.name.min, MAIN_PAGE_VALIDATION.editPanel.name.getMinError())
+        .max(MAIN_PAGE_VALIDATION.editPanel.name.max, MAIN_PAGE_VALIDATION.editPanel.name.getMaxError()),
+    isAutoSynced: Yup.boolean().required(MAIN_PAGE_VALIDATION.common.REQUIRED),
+    valueUah: Yup.string()
+        .required(MAIN_PAGE_VALIDATION.common.REQUIRED)
+        .test('is-positive', MAIN_PAGE_VALIDATION.common.REQUIRED, (val) => parseThousands(val || '') > 0),
+    valueUsd: Yup.string()
+        .required(MAIN_PAGE_VALIDATION.common.REQUIRED)
+        .test('is-positive', MAIN_PAGE_VALIDATION.common.REQUIRED, (val) => parseThousands(val || '') > 0),
+});
+
 export type MetricFormValues = Yup.InferType<typeof metricEditSchema>;
+export type RaisedMetricFormValues = Yup.InferType<typeof raisedMetricEditSchema>;

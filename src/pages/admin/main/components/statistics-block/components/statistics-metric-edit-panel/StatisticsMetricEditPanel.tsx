@@ -1,4 +1,3 @@
-import { yupResolver } from '@hookform/resolvers/yup';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
@@ -10,10 +9,7 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { MAIN_PAGE_TEXT, MAIN_PAGE_VALIDATION } from '@/const/admin/main-page';
 import { Metric, MetricPrefix } from '@/types/admin/main-page';
 import { formatNumberInput, formatWithSpaces } from '@/utils/functions/formatters/format-number';
-import {
-    MetricFormValues,
-    metricEditSchema,
-} from '@/validation/admin/main-page-schema/metric-edit-schema/metric-edit-schema';
+import { MetricFormValues } from '@/validation/admin/main-page-schema/metric-edit-schema/metric-edit-schema';
 
 import styles from './StatisticsMetricEditPanel.module.scss';
 
@@ -32,20 +28,36 @@ const PREFIX_OPTIONS = [
 export const StatisticsMetricEditPanel = ({ metric, onSave, onCancel }: StatisticsMetricEditPanelProps) => {
     const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 
+    const defaultNameUa = metric.name || '';
+    const defaultNameEn = metric.localizations?.find((l) => l.languageId === 2)?.name || '';
+    const defaultValueStr = formatWithSpaces(metric.value ?? 0);
+    const defaultPrefix = metric.prefix ?? MetricPrefix.None;
+
     const {
         control,
         handleSubmit,
-        formState: { errors, isDirty, isValid },
+        watch,
+        formState: { errors, isValid },
     } = useForm<MetricFormValues>({
         mode: 'onBlur',
-        resolver: yupResolver(metricEditSchema),
         defaultValues: {
-            nameUa: metric.name || '',
-            nameEn: metric.localizations?.find((l) => l.languageId === 2)?.name || '',
-            value: formatWithSpaces(metric.value ?? 0),
-            prefix: metric.prefix ?? MetricPrefix.None,
+            nameUa: defaultNameUa,
+            nameEn: defaultNameEn,
+            value: defaultValueStr,
+            prefix: defaultPrefix,
         },
     });
+
+    const currentNameUa = watch('nameUa');
+    const currentNameEn = watch('nameEn');
+    const currentValue = watch('value');
+    const currentPrefix = watch('prefix');
+
+    const isFormDirty =
+        currentNameUa.trim() !== defaultNameUa.trim() ||
+        currentNameEn.trim() !== defaultNameEn.trim() ||
+        currentValue !== defaultValueStr ||
+        currentPrefix !== defaultPrefix;
 
     const onValidSubmit = (data: MetricFormValues) => {
         const updatedLocalizations =
@@ -148,10 +160,10 @@ export const StatisticsMetricEditPanel = ({ metric, onSave, onCancel }: Statisti
             </div>
 
             <div className={styles.actions}>
-                <Button buttonStyle="secondary" onClick={() => (isDirty ? setIsCancelModalOpen(true) : onCancel())}>
+                <Button buttonStyle="secondary" onClick={() => (isFormDirty ? setIsCancelModalOpen(true) : onCancel())}>
                     {MAIN_PAGE_TEXT.BUTTONS.CANCEL}
                 </Button>
-                <Button buttonStyle="primary" onClick={handleSubmit(onValidSubmit)} disabled={!isDirty || !isValid}>
+                <Button buttonStyle="primary" onClick={handleSubmit(onValidSubmit)} disabled={!isFormDirty || !isValid}>
                     {MAIN_PAGE_TEXT.BUTTONS.SAVE}
                 </Button>
             </div>

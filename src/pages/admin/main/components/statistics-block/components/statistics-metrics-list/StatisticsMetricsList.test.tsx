@@ -99,6 +99,7 @@ describe('StatisticsMetricsList', () => {
                 hiddenMetricIds={[]}
                 onToggleVisibility={jest.fn()}
                 onReorder={jest.fn()}
+                onMetricUpdate={jest.fn()}
             />,
         );
 

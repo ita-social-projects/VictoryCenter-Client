@@ -58,7 +58,7 @@ export const StatisticsBlockForm = ({
     const {
         control,
         setValue,
-        formState: { errors },
+        formState: { errors, defaultValues },
     } = useFormContext<MainPageFormValues>();
 
     const toComparableMetrics = (items: Metric[]) =>
@@ -84,19 +84,13 @@ export const StatisticsBlockForm = ({
     useEffect(() => {
         if (initialData?.impactStatistics?.metrics) {
             const apiMetrics = initialData.impactStatistics.metrics;
-
             setMetrics(apiMetrics);
             initialMetricsRef.current = apiMetrics;
-            setValue('metrics', apiMetrics, {
-                shouldDirty: false,
-                shouldTouch: false,
-                shouldValidate: false,
-            });
 
             const hiddenIds = apiMetrics.filter((m) => m.isHidden).map((m) => m.id as number);
             setHiddenMetricIds(hiddenIds);
         }
-    }, [initialData, setValue]);
+    }, [initialData]);
 
     const handleToggleVisibility = async (id: number) => {
         const isCurrentlyHidden = hiddenMetricIds.includes(id);
@@ -140,11 +134,21 @@ export const StatisticsBlockForm = ({
         setMetrics(updatedMetrics);
         onMetricsChange?.(updatedMetrics);
 
-        setValue('metrics', updatedMetrics, {
-            shouldDirty: hasChanges,
-            shouldTouch: true,
-            shouldValidate: true,
-        });
+        if (!hasChanges) {
+            const originalFormMetrics = defaultValues?.metrics || [];
+
+            setValue('metrics', originalFormMetrics as Metric[], {
+                shouldDirty: true,
+                shouldTouch: true,
+                shouldValidate: true,
+            });
+        } else {
+            setValue('metrics', updatedMetrics, {
+                shouldDirty: true,
+                shouldTouch: true,
+                shouldValidate: true,
+            });
+        }
     };
 
     return (

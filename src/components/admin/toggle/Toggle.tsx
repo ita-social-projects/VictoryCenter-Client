@@ -12,6 +12,8 @@ interface ToggleProps {
 
 export const Toggle = ({ checked, onChange, disabled = false, id, name, className = '' }: ToggleProps) => {
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+        if (disabled) return;
+
         onChange(e.target.checked);
     };
 

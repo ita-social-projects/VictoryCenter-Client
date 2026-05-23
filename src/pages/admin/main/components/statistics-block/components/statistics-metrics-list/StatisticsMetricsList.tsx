@@ -52,6 +52,7 @@ export const StatisticsMetricsList = ({
 
         const isHidden = hiddenMetricIds.includes(metric.id ?? 0);
         const isLastVisible = !isHidden && visibleMetricsCount <= 1;
+        const usdValue = metric.localizations?.find((l) => l.languageId === 2)?.value;
 
         return (
             <div className={styles.row}>
@@ -60,9 +61,20 @@ export const StatisticsMetricsList = ({
                 <p className={`${styles.en} ${isHidden ? styles.hiddenText : ''}`}>{getMetricName(metric, 'EN')}</p>
 
                 <div className={styles.values}>
-                    <p className={`${styles.value} ${isHidden ? styles.hiddenText : ''}`}>
-                        {formatMetricValue(metric)}
-                    </p>
+                    {metric.type === MetricType.Raised ? (
+                        <div className={styles.raisedValues}>
+                            <p className={`${styles.value} ${isHidden ? styles.hiddenText : ''}`}>
+                                ₴{formatMetricValue(metric)}
+                            </p>
+                            <p className={`${styles.value} ${isHidden ? styles.hiddenText : ''}`}>
+                                ${usdValue ? formatMetricValue({ ...metric, value: parseInt(usdValue, 10) }) : '0'}
+                            </p>
+                        </div>
+                    ) : (
+                        <p className={`${styles.value} ${isHidden ? styles.hiddenText : ''}`}>
+                            {formatMetricValue(metric)}
+                        </p>
+                    )}
                 </div>
 
                 <div className={styles.actions}>

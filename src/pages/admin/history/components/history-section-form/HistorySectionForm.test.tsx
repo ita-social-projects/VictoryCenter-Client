@@ -82,6 +82,7 @@ const createSection = (): HistorySectionDto => ({
             contentType: ContentType.Title,
             order: 0,
             title: 'Original title',
+            localizations: [],
         },
         {
             id: 2,
@@ -89,6 +90,7 @@ const createSection = (): HistorySectionDto => ({
             contentType: ContentType.Description,
             order: 1,
             description: 'Original description',
+            localizations: [],
         },
         {
             id: 3,
@@ -96,6 +98,7 @@ const createSection = (): HistorySectionDto => ({
             contentType: ContentType.Image,
             order: 2,
             image: { id: 3, url: 'image.jpg', mimeType: 'image/jpeg' },
+            localizations: [],
         },
     ],
 });
@@ -396,6 +399,7 @@ describe('HistorySectionForm', () => {
                     contentType: ContentType.Image,
                     order: 0,
                     image: { id: 3, url: 'image.jpg', mimeType: 'image/jpeg' },
+                    localizations: [],
                 },
                 {
                     id: 1,
@@ -403,6 +407,7 @@ describe('HistorySectionForm', () => {
                     contentType: ContentType.Title,
                     order: 1,
                     title: 'Original title',
+                    localizations: [],
                 },
                 {
                     id: 2,
@@ -410,6 +415,7 @@ describe('HistorySectionForm', () => {
                     contentType: ContentType.Description,
                     order: 2,
                     description: 'Original description',
+                    localizations: [],
                 },
             ],
         };
@@ -552,6 +558,7 @@ describe('HistorySectionForm', () => {
                     contentType: ContentType.Title,
                     order: 0,
                     title: 'Original title',
+                    localizations: [],
                 },
             ],
         };
@@ -598,6 +605,7 @@ describe('HistorySectionForm', () => {
                     contentType: ContentType.Image,
                     order: 0,
                     image: { id: 3, url: 'image.jpg', mimeType: 'image/jpeg' },
+                    localizations: [],
                 },
                 {
                     id: 1,
@@ -605,6 +613,7 @@ describe('HistorySectionForm', () => {
                     contentType: ContentType.Title,
                     order: 1,
                     title: 'Original title',
+                    localizations: [],
                 },
                 {
                     id: 2,
@@ -612,6 +621,7 @@ describe('HistorySectionForm', () => {
                     contentType: ContentType.Description,
                     order: 2,
                     description: 'Original description',
+                    localizations: [],
                 },
             ],
         };

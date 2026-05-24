@@ -191,13 +191,8 @@ export const HistoryPageContent = () => {
         setLocalizationError({ message, type });
     }, []);
 
-    const {
-        allLanguages,
-        translationLanguages,
-        selectedLanguage,
-        onLanguageChange,
-        onTranslationStatusFilterChange,
-    } = useLocalizationToolkit({ setErrorState });
+    const { allLanguages, translationLanguages, selectedLanguage, onLanguageChange, onTranslationStatusFilterChange } =
+        useLocalizationToolkit({ setErrorState });
 
     const localizedEntity = useMemo((): HistorySectionContent | undefined => {
         const firstSection = normalizedSections[0];

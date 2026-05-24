@@ -251,14 +251,22 @@ describe('HistoryApi', () => {
                     order: 0,
                     contents: [
                         { contentType: ContentType.Title, order: 0, title: 'Title 1', imageId: 101, localizations: [] },
-                        { contentType: ContentType.Description, order: 1, description: 'Desc', imageId: 102, localizations: [] },
+                        {
+                            contentType: ContentType.Description,
+                            order: 1,
+                            description: 'Desc',
+                            imageId: 102,
+                            localizations: [],
+                        },
                     ],
                 },
                 {
                     id: 2,
                     template: SectionTemplate.TextOnly,
                     order: 1,
-                    contents: [{ contentType: ContentType.Title, order: 0, title: 'Title 2', imageId: 103, localizations: [] }],
+                    contents: [
+                        { contentType: ContentType.Title, order: 0, title: 'Title 2', imageId: 103, localizations: [] },
+                    ],
                 },
             ];
 
@@ -315,7 +323,7 @@ describe('HistoryApi', () => {
         });
     });
 
-    describe('syncSections', () => {
+    describe('syncSections - image handling', () => {
         const mockResult: HistorySectionDto[] = [{ id: 1, template: SectionTemplate.TextOnly, order: 0, contents: [] }];
 
         it('syncs sections with no image contents and returns data', async () => {

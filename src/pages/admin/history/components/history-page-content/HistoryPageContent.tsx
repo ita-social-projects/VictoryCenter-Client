@@ -185,7 +185,7 @@ export const HistoryPageContent = () => {
         }
     }, [client, refetchSections, addToast]);
 
-    const [localizationError, setLocalizationError] = useState<HistoryErrorState>({ message: null, type: null });
+    const [, setLocalizationError] = useState<HistoryErrorState>({ message: null, type: null });
 
     const setErrorState = useCallback((message: string, type: HistoryErrorType) => {
         setLocalizationError({ message, type });

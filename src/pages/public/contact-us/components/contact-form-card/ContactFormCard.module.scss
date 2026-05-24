@@ -59,6 +59,22 @@
     resize: vertical;
 }
 
+.contact-form-field-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.contact-form-message--info {
+    @include type.small-text-regular;
+    color: c.$grey-800;
+}
+
+.contact-form-message--error {
+    @include type.small-text-regular;
+    color: c.$error;
+}
+
 .contact-form-submit {
     @include type.body-2-semibold;
     background: c.$blue-900;

@@ -1,48 +1,29 @@
-import { useEffect } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
 import { Button } from '@/components/admin/button/Button';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
-import { AboutUsBlockValidationSchema } from '@/validation/admin/main-page-schema/main-page-schema';
-import { MainPage, AboutUsBlockFormValues, ABOUT_US_BLOCK_FORM_DEFAULTS } from '@/types/admin/main-page';
 import { MAIN_PAGE_TEXT, MAIN_PAGE_VALIDATION } from '@/const/admin/main-page';
+import { MainPageFormValues } from '@/types/admin/main-page';
+import { Controller, useFormContext } from 'react-hook-form';
 
 import styles from './AboutUsBlockForm.module.scss';
 
 interface AboutUsBlockFormProps {
-    initialData: MainPage | null;
+    isPublishDisabled: boolean;
+    onPublish: () => void;
 }
 
-export const AboutUsBlockForm = ({ initialData }: AboutUsBlockFormProps) => {
+export const AboutUsBlockForm = ({ isPublishDisabled, onPublish }: AboutUsBlockFormProps) => {
     const {
         control,
-        handleSubmit,
-        reset,
-        formState: { isDirty, isValid, errors },
-    } = useForm<AboutUsBlockFormValues>({
-        mode: 'onChange',
-        resolver: yupResolver(AboutUsBlockValidationSchema),
-        defaultValues: ABOUT_US_BLOCK_FORM_DEFAULTS,
-    });
-
-    useEffect(() => {
-        reset({
-            title: initialData?.mainAboutUs?.title || '',
-            description: initialData?.mainAboutUs?.description || '',
-        });
-    }, [initialData, reset]);
-
-    const onSubmit = () => {
-        // API integration is intentionally deferred for the display-only phase.
-    };
+        formState: { errors },
+    } = useFormContext<MainPageFormValues>();
 
     return (
-        <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
+        <div className={styles.form}>
             <div className={styles.content}>
                 <div className={styles.column}>
                     <Controller
-                        name="title"
+                        name="aboutUsTitleUa"
                         control={control}
                         render={({ field: { onChange, value, onBlur, name } }) => (
                             <InputWithCharacterLimitGroup
@@ -52,7 +33,7 @@ export const AboutUsBlockForm = ({ initialData }: AboutUsBlockFormProps) => {
                                 value={value}
                                 onChange={onChange}
                                 onBlur={onBlur}
-                                error={errors.title?.message}
+                                error={errors.aboutUsTitleUa?.message}
                                 maxLength={MAIN_PAGE_VALIDATION.aboutUsBlock.title.max}
                                 isRequired={true}
                             />
@@ -62,7 +43,7 @@ export const AboutUsBlockForm = ({ initialData }: AboutUsBlockFormProps) => {
 
                 <div className={styles.column}>
                     <Controller
-                        name="description"
+                        name="aboutUsDescriptionUa"
                         control={control}
                         render={({ field: { onChange, value, onBlur, name } }) => (
                             <TextAreaWithCharacterLimitGroup
@@ -72,7 +53,7 @@ export const AboutUsBlockForm = ({ initialData }: AboutUsBlockFormProps) => {
                                 value={value}
                                 onChange={onChange}
                                 onBlur={onBlur}
-                                error={errors.description?.message}
+                                error={errors.aboutUsDescriptionUa?.message}
                                 maxLength={MAIN_PAGE_VALIDATION.aboutUsBlock.description.max}
                                 isRequired={true}
                                 rows={14}
@@ -85,14 +66,15 @@ export const AboutUsBlockForm = ({ initialData }: AboutUsBlockFormProps) => {
 
             <div className={styles.actions}>
                 <Button
-                    type="submit"
+                    type="button"
                     buttonStyle="primary"
-                    disabled={!isDirty || !isValid}
+                    disabled={isPublishDisabled}
                     className={styles['publish-button']}
+                    onClick={onPublish}
                 >
                     {MAIN_PAGE_TEXT.BUTTONS.PUBLISH}
                 </Button>
             </div>
-        </form>
+        </div>
     );
 };

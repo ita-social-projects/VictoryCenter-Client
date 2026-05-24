@@ -1,4 +1,8 @@
 @use '../variables/fonts';
+@use '../variables/typography' as t;
+@use '../variables/colors';
+@use './typography.mixins' as type;
+@use '../variables/z-index';
 
 @mixin font-face($font-family, $file-name, $font-weight: normal, $font-style: normal) {
     @font-face {
@@ -31,4 +35,133 @@
 @mixin link-disabled() {
     opacity: 0.3;
     pointer-events: none;
+}
+
+// Yellow-blue text highlight mixins
+$line-height-560: 54px;
+$line-height-768: 76px;
+$line-height-1440: 116px;
+
+@mixin yellow-blue-text {
+    @include type.h3-medium-uppercase;
+
+    text-align: center;
+    margin: 16px 16px 122px;
+
+    span {
+        position: relative;
+        display: inline-block;
+    }
+
+    @media (min-width: 560px) {
+        font-size: 48px;
+        line-height: $line-height-560;
+        margin: 54px 64px 156px;
+    }
+
+    @media (min-width: 768px) {
+        font-size: 64px;
+        line-height: $line-height-768;
+        margin: 66px 56px 224px;
+    }
+
+    @media (min-width: 1440px) {
+        font-size: 96px;
+        line-height: $line-height-1440;
+        margin: 120px 0;
+    }
+}
+
+@mixin text-highlight {
+    font-weight: t.$fw-bold;
+}
+
+@mixin yellow-bg-text {
+    background: colors.$yellow-400;
+
+    &:before {
+        background: colors.$yellow-400;
+        content: '';
+        width: 100vw;
+        height: t.$h3-height;
+        position: absolute;
+        transform: translateX(-100%);
+
+        @media (min-width: 560px) {
+            height: $line-height-560;
+        }
+
+        @media (min-width: 768px) {
+            height: $line-height-768;
+        }
+
+        @media (min-width: 1440px) {
+            height: $line-height-1440;
+        }
+    }
+}
+
+@mixin blue-bg-text {
+    background: colors.$light-blue-200;
+    z-index: 1;
+
+    &:before {
+        background: colors.$light-blue-200;
+        content: '';
+        width: 100vw;
+        height: t.$h3-height;
+        position: absolute;
+        z-index: z-index.public(programs-page-intro-section-background);
+
+        @media (min-width: 560px) {
+            height: $line-height-560;
+        }
+
+        @media (min-width: 768px) {
+            height: $line-height-768;
+        }
+
+        @media (min-width: 1440px) {
+            height: $line-height-1440;
+        }
+    }
+}
+
+// Buttons
+@mixin tagged-button {
+    @include type.body-2-regular;
+
+    border-radius: 24px;
+    padding: 6px 14px;
+    font-size: 14px;
+    line-height: 24px;
+    letter-spacing: -0.32px;
+    vertical-align: middle;
+    transition: 0.3s ease;
+    cursor: pointer;
+
+    @media (min-width: 768px) {
+        padding: 8px 16px;
+        font-size: 16px;
+    }
+}
+@mixin white-button {
+    @include tagged-button;
+
+    border: 1px solid colors.$blue-100;
+    background: none;
+    transition: 0.3s ease;
+
+    &:hover {
+        background: colors.$blue-50;
+        transition: 0.3s ease;
+    }
+}
+
+@mixin black-button {
+    @include tagged-button;
+
+    background: colors.$blue-900;
+    border: 1px solid colors.$blue-900;
+    color: colors.$grey-50;
 }

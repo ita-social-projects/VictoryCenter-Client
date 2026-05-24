@@ -1,12 +1,10 @@
-import { Image, ImageValues } from '../common/image';
 import {
     EntityLocalization,
     EntityLocalizationDto,
     EntityWithDtoLocalizations,
     EntityWithLocalizations,
 } from '@/types/common/language';
-
-export type LocaleCode = 'uk' | 'en';
+import { Image, ImageValues } from '../common/image';
 
 export enum MetricPrefix {
     None = 'None',
@@ -21,6 +19,29 @@ export enum MetricType {
     TherapyHours = 'TherapyHours',
 }
 
+// Domain/UI Localizations
+
+export interface MainPageLocalization extends EntityLocalization {
+    entityId?: number;
+    languageId?: number;
+    title?: string;
+    description?: string;
+}
+
+export interface MainAboutUsLocalization extends EntityLocalization {
+    entityId?: number;
+    languageId?: number;
+    title?: string;
+    description?: string;
+}
+
+export interface MainPartnersLocalization extends EntityLocalization {
+    entityId?: number;
+    languageId?: number;
+    title?: string;
+    description?: string;
+}
+
 export interface ImpactStatisticLocalization extends EntityLocalization {
     entityId?: number;
     languageId?: number;
@@ -33,6 +54,67 @@ export interface MetricLocalization extends EntityLocalization {
     name?: string;
 }
 
+// Domain/UI Models
+
+export interface Metric extends EntityWithLocalizations<MetricLocalization> {
+    id?: number;
+    value: number;
+    name: string;
+    type: MetricType;
+    prefix?: MetricPrefix | null;
+    isHidden: boolean;
+    priority: number;
+}
+
+export interface ImpactStatistic extends EntityWithLocalizations<ImpactStatisticLocalization> {
+    id?: number;
+    title: string;
+    image?: Image | ImageValues | null;
+    metrics: Metric[];
+}
+
+export interface MainAboutUs extends EntityWithLocalizations<MainAboutUsLocalization> {
+    id?: number;
+    title: string;
+    description: string;
+}
+
+export interface MainPartners extends EntityWithLocalizations<MainPartnersLocalization> {
+    id?: number;
+    title: string;
+    description: string;
+}
+
+export interface MainPage extends EntityWithLocalizations<MainPageLocalization> {
+    id?: number;
+    title: string;
+    description: string;
+    image: Image | ImageValues | null;
+    mainAboutUs: MainAboutUs | null;
+    mainPartners: MainPartners | null;
+    impactStatistics: ImpactStatistic | null;
+}
+
+// GET DTOs
+
+export interface MainPageLocalizationDto extends EntityLocalizationDto {
+    entityId?: number;
+    title?: string | null;
+    description?: string | null;
+}
+
+export interface MainAboutUsLocalizationDto extends EntityLocalizationDto {
+    entityId?: number;
+    title?: string | null;
+    description?: string | null;
+}
+
+export interface MainPartnersLocalizationDto extends EntityLocalizationDto {
+    entityId?: number;
+    title?: string | null;
+    description?: string | null;
+}
+
 export interface ImpactStatisticLocalizationDto extends EntityLocalizationDto {
     entityId?: number;
     title?: string | null;
@@ -43,49 +125,14 @@ export interface MetricLocalizationDto extends EntityLocalizationDto {
     name?: string | null;
 }
 
-export interface Metric extends EntityWithLocalizations<MetricLocalization> {
-    id?: number;
-    value: number;
-    name: string;
-    type: MetricType;
-    prefix?: MetricPrefix | null;
-}
-
-export interface ImpactStatistic extends EntityWithLocalizations<ImpactStatisticLocalization> {
-    id?: number;
-    title: string;
-    image?: Image | ImageValues | null;
-    metrics: Metric[];
-}
-
-export interface MainAboutUs {
-    id: number;
-    title: string;
-    description: string;
-}
-
-export interface MainPartners {
-    id: number;
-    title: string;
-    description: string;
-}
-
-export interface MainPage {
-    id: number;
-    title: string;
-    description: string;
-    image: Image | ImageValues | null;
-    mainAboutUs: MainAboutUs | null;
-    mainPartners: MainPartners | null;
-    impactStatistics: ImpactStatistic | null;
-}
-
 export interface MetricDto extends EntityWithDtoLocalizations<MetricLocalizationDto> {
     id?: number;
-    value?: number | null;
+    value?: number;
     name?: string | null;
-    type?: MetricType | null;
+    type?: MetricType;
     prefix?: MetricPrefix | null;
+    isHidden?: boolean;
+    priority?: number;
 }
 
 export interface ImpactStatisticDto extends EntityWithDtoLocalizations<ImpactStatisticLocalizationDto> {
@@ -95,22 +142,31 @@ export interface ImpactStatisticDto extends EntityWithDtoLocalizations<ImpactSta
     metrics?: MetricDto[] | null;
 }
 
-export interface MainPageDto {
+export interface MainAboutUsDto extends EntityWithDtoLocalizations<MainAboutUsLocalizationDto> {
+    id?: number;
+    title?: string | null;
+    description?: string | null;
+}
+
+export interface MainPartnersDto extends EntityWithDtoLocalizations<MainPartnersLocalizationDto> {
+    id?: number;
+    title?: string | null;
+    description?: string | null;
+}
+
+export interface MainPageDto extends EntityWithDtoLocalizations<MainPageLocalizationDto> {
     id?: number;
     title?: string | null;
     description?: string | null;
     image?: Image | ImageValues | null;
-    mainAboutUs?: MainAboutUs | null;
-    mainPartners?: MainPartners | null;
+    mainAboutUs?: MainAboutUsDto | null;
+    mainPartners?: MainPartnersDto | null;
     impactStatistics?: ImpactStatisticDto | null;
 }
 
-export interface CreateMetricLocalizationDto {
-    languageId?: number;
-    name?: string;
-}
+// POST DTOs
 
-export interface UpdateMetricLocalizationDto {
+export interface CreateMetricLocalizationDto {
     languageId?: number;
     name?: string;
 }
@@ -123,21 +179,7 @@ export interface CreateMetricDto {
     localization?: CreateMetricLocalizationDto | null;
 }
 
-export interface UpdateMetricDto {
-    id?: number;
-    value: number;
-    name: string;
-    type: MetricType;
-    prefix?: MetricPrefix | null;
-    localization?: UpdateMetricLocalizationDto | null;
-}
-
 export interface CreateImpactStatisticLocalizationDto {
-    languageId?: number;
-    title?: string;
-}
-
-export interface UpdateImpactStatisticLocalizationDto {
     languageId?: number;
     title?: string;
 }
@@ -149,44 +191,151 @@ export interface CreateImpactStatisticDto {
     localization?: CreateImpactStatisticLocalizationDto | null;
 }
 
+export interface CreateMainAboutUsDto {
+    title: string;
+    description: string;
+}
+
+export interface CreateMainPartnersDto {
+    title: string;
+    description: string;
+}
+
+export interface CreateMainPageDto {
+    title: string;
+    description: string;
+    imageId?: number | null;
+    mainAboutUs?: CreateMainAboutUsDto | null;
+    mainPartners?: CreateMainPartnersDto | null;
+    impactStatistics?: CreateImpactStatisticDto | null;
+}
+
+// PUT DTOs
+
+export interface UpdateMetricLocalizationDto {
+    languageId?: number;
+    name?: string;
+}
+
+export interface UpdateImpactStatisticLocalizationDto {
+    languageId?: number;
+    title?: string;
+}
+
+export interface UpdateMainAboutUsLocalizationDto {
+    languageId?: number;
+    title?: string;
+    description?: string;
+}
+
+export interface UpdateMainPartnersLocalizationDto {
+    languageId?: number;
+    title?: string;
+    description?: string;
+}
+
+export interface UpdateMainPageLocalizationDto {
+    languageId?: number;
+    title?: string;
+    description?: string;
+}
+
+export interface UpdateMetricDto {
+    id?: number;
+    value: number;
+    name: string;
+    type: MetricType;
+    prefix?: MetricPrefix | null;
+    localizations?: UpdateMetricLocalizationDto[];
+}
+
 export interface UpdateImpactStatisticDto {
     id?: number;
     title: string;
     imageId?: number | null;
     metrics: UpdateMetricDto[];
-    localization?: UpdateImpactStatisticLocalizationDto | null;
+    localizations?: UpdateImpactStatisticLocalizationDto[];
 }
 
-export interface TitleBlockFormValues {
+export interface UpdateMainAboutUsDto {
     title: string;
     description: string;
-    image: Image | ImageValues | null;
+    localizations?: UpdateMainAboutUsLocalizationDto[];
 }
 
-export const TITLE_BLOCK_FORM_DEFAULTS: TitleBlockFormValues = {
-    title: '',
-    description: '',
-    image: null,
-};
-
-export interface AboutUsBlockFormValues {
+export interface UpdateMainPartnersDto {
     title: string;
     description: string;
+    localizations?: UpdateMainPartnersLocalizationDto[];
 }
 
-export const ABOUT_US_BLOCK_FORM_DEFAULTS: AboutUsBlockFormValues = {
-    title: '',
-    description: '',
-};
+export interface UpdateMainPageDto {
+    title: string;
+    description: string;
+    imageId?: number | null;
+    localizations?: UpdateMainPageLocalizationDto[];
+    mainAboutUs?: UpdateMainAboutUsDto | null;
+    mainPartners?: UpdateMainPartnersDto | null;
+    impactStatistics?: UpdateImpactStatisticDto | null;
+}
 
-export interface StatisticsBlockFormValues {
+// METRIC SPECIFIC OPERATIONS DTOs
+
+export interface ReorderMetricsDto {
+    statisticId: number;
+    orderedIds: number[];
+}
+
+export interface UpdateMetricVisibilityDto {
+    isHidden: boolean;
+}
+
+// Form Values & Defaults
+
+export interface MainPageFormValues {
+    // Title Block
     titleUa: string;
     titleEn: string;
+    descriptionUa: string;
+    descriptionEn: string;
     image: Image | ImageValues | null;
+
+    // About Us Block
+    aboutUsTitleUa: string;
+    aboutUsTitleEn: string;
+    aboutUsDescriptionUa: string;
+    aboutUsDescriptionEn: string;
+
+    // Partners Block
+    partnersTitleUa: string;
+    partnersTitleEn: string;
+    partnersDescriptionUa: string;
+    partnersDescriptionEn: string;
+
+    // Impact Statistics Block
+    statisticsTitleUa: string;
+    statisticsTitleEn: string;
+    statisticsImage: Image | ImageValues | null;
 }
 
-export const STATISTICS_BLOCK_FORM_DEFAULTS: StatisticsBlockFormValues = {
+export const MAIN_PAGE_FORM_DEFAULTS: MainPageFormValues = {
     titleUa: '',
     titleEn: '',
+    descriptionUa: '',
+    descriptionEn: '',
     image: null,
+
+    aboutUsTitleUa: '',
+    aboutUsTitleEn: '',
+    aboutUsDescriptionUa: '',
+    aboutUsDescriptionEn: '',
+
+    partnersTitleUa: '',
+    partnersTitleEn: '',
+    partnersDescriptionUa: '',
+    partnersDescriptionEn: '',
+
+    statisticsTitleUa: '',
+    statisticsTitleEn: '',
+    statisticsImage: null,
 };

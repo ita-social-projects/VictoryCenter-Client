@@ -167,6 +167,8 @@ export const FUNDS_EXPENDITURES_TEXT = {
         CATEGORY_DELETE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
         CATEGORY_UPDATED_SUCCESSFULLY: 'Категорію оновлено успішно',
         CATEGORY_UPDATE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
+        FAIL_TO_TRANSLATE_CATEGORY: 'Не вдалося зберегти переклад категорії. Спробуйте ще раз',
+        FAIL_TO_UPDATE_CATEGORY_TRANSLATION: 'Не вдалося оновити переклад категорії. Спробуйте ще раз',
     },
     MODAL: {
         SHARED: {
@@ -231,6 +233,19 @@ export const FUNDS_EXPENDITURES_TEXT = {
                 NAME_DUPLICATE: 'Категорія з такою назвою вже існує',
             },
         },
+        TRANSLATE_CATEGORY: {
+            TITLE: 'Переклад категорії',
+            CATEGORY_LABEL: 'Категорія',
+            CATEGORY_PLACEHOLDER: 'Оберіть категорію',
+            NAME_LABEL: 'Назва',
+            NAME_PLACEHOLDER: 'Введіть назву категорії',
+        },
+        TRANSLATE_DISCLAIMER: {
+            TITLE: 'Додати переклад',
+            DESCRIPTION_LABEL: 'Опис',
+            FAIL_TO_TRANSLATE: 'Не вдалося зберегти переклад дісклеймера. Спробуйте ще раз',
+            FAIL_TO_UPDATE_TRANSLATION: 'Не вдалося оновити переклад дісклеймера. Спробуйте ще раз',
+        },
     },
     BUTTON: {
         EDIT: 'Редагувати Доходи та витрати',
@@ -239,6 +254,7 @@ export const FUNDS_EXPENDITURES_TEXT = {
         ADD_CATEGORY: 'Додати категорію',
         DELETE_CATEGORY: 'Видалити',
         EDIT_CATEGORY: 'Редагувати',
+        TRANSLATE_CATEGORY: 'Перекласти',
     },
     FILTER: {
         TYPE_PLACEHOLDER: 'Тип',
@@ -307,6 +323,9 @@ export const PROGRAM_EXPENSES_TEXT = {
             CONFIRM_CLOSE_TITLE: 'Дані буде втрачено. Бажаєте продовжити?',
             PROGRAM_NO_AVAILABLE: 'Немає доступних програм',
         },
+    },
+    VALIDATION: {
+        PROGRAM_UNIQUE: 'Така категорія вже додана, Оберіть іншу категорію',
     },
     FILTER: {
         PROGRAMS_PLACEHOLDER: 'Програми',

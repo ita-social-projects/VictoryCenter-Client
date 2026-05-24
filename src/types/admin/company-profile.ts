@@ -5,8 +5,6 @@ import {
     EntityWithLocalizations,
 } from '@/types/common/language';
 
-export type LocaleCode = 'uk' | 'en';
-
 export type SocialPlatform =
     | 'Facebook'
     | 'Instagram'

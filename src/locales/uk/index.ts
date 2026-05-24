@@ -2,6 +2,7 @@ import headerUk from './header.json';
 import hippotherapyUk from './hippotherapy.json';
 import footerUk from './footer.json';
 import aboutUsPageUk from './about-us.json';
+import eventsNewsUk from './events-news.json';
 import programsPageUk from './programs.json';
 import detailedProgramPageUk from './detailed-program.json';
 import donateUk from './donate.json';
@@ -14,6 +15,7 @@ export {
     headerUk,
     footerUk,
     aboutUsPageUk,
+    eventsNewsUk,
     hippotherapyUk,
     programsPageUk,
     detailedProgramPageUk,

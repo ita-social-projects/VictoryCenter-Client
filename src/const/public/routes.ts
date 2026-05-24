@@ -12,6 +12,10 @@ export const PUBLIC_ROUTES = {
         PATH: 'about-us',
         FULL: '/about-us',
     },
+    EVENTS_AND_NEWS: {
+        PATH: 'events-and-news',
+        FULL: '/events-and-news',
+    },
     HIPPOTHERAPY: {
         PATH: 'hippotherapy',
         FULL: '/hippotherapy',

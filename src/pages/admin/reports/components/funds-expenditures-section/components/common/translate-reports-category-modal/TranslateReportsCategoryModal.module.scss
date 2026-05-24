@@ -1,0 +1,72 @@
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
+
+.modal {
+    width: 594px;
+    max-width: 594px;
+    background: c.$grey-50;
+    border-radius: 8px;
+    padding: 40px 30px;
+    box-sizing: border-box;
+
+    :global(.modal-header) {
+        margin-bottom: 0;
+        padding: 0;
+    }
+
+    :global(.modal-header .modal-title-wrapper) {
+        text-align: left;
+    }
+
+    :global(.modal-header-text) {
+        @include type.h4-regular;
+        color: c.$blue-900;
+        text-align: left;
+    }
+
+    :global(.modal-header .close-icon) {
+        padding-right: 0;
+        margin-bottom: 4px;
+    }
+
+    :global(.modal-body) {
+        margin-bottom: 0;
+        padding: 0;
+    }
+
+    :global(.modal-footer) {
+        padding: 0;
+        margin-top: 0;
+        gap: 0;
+        flex-wrap: nowrap;
+        justify-content: center;
+
+        button {
+            @include type.body-2-regular;
+            width: 100%;
+            height: 40px;
+            border-radius: 8px;
+        }
+    }
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 10px;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    width: 100%;
+}
+
+.error {
+    @include type.small-text-regular;
+    color: c.$error;
+    min-height: 20px;
+    margin: 2px 0 0;
+}

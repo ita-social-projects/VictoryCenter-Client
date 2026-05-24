@@ -1,5 +1,3 @@
-import React from 'react';
-
 export const MockInputWithCharacterLimitGroup = ({ id, value, onChange, onBlur }: any) => (
     <input data-testid={id} value={value ?? ''} onChange={(e) => onChange(e.target.value)} onBlur={onBlur} />
 );
@@ -8,8 +6,8 @@ export const MockTextAreaWithCharacterLimitGroup = ({ id, value, onChange, onBlu
     <textarea data-testid={id} value={value ?? ''} onChange={(e) => onChange(e.target.value)} onBlur={onBlur} />
 );
 
-export const MockSubmitButton = ({ children, disabled, type }: any) => (
-    <button data-testid="submit-btn" type={type} disabled={disabled}>
+export const MockSubmitButton = ({ children, ...props }: any) => (
+    <button data-testid="submit-btn" {...props}>
         {children}
     </button>
 );

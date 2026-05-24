@@ -4,6 +4,7 @@ import { ProgramExpensesSection } from './ProgramExpensesSection';
 import { FUNDS_EXPENDITURES_TEXT, PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
 import { ProgramExpensesReadOnlyData } from '@/types/admin/reports';
 import { ProgramExpensesApi } from '@/services/api/admin/reports/program-expenses-api';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 
 const MOCK_PROGRAM_EXPENSES_DATA: ProgramExpensesReadOnlyData = {
     exchangeRate: '41.25',
@@ -62,6 +63,10 @@ jest.mock('@/services/api/admin/reports/program-expenses-api', () => ({
     ProgramExpensesApi: {
         getReadOnlyData: (...args: unknown[]) => mockGetReadOnlyData(...args),
     },
+}));
+
+jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
+    useAdminClient: () => 'mock-client',
 }));
 
 let mockUseDataFetchResult = {
@@ -283,7 +288,7 @@ describe('ProgramExpensesSection', () => {
         expect(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE })).toBeDisabled();
     });
 
-    it('should pass fetch handler that calls ProgramExpensesApi.getReadOnlyData', async () => {
+    it('should pass fetch handler that calls ProgramExpensesApi.getReadOnlyData with client', async () => {
         mockGetReadOnlyData.mockResolvedValue(MOCK_PROGRAM_EXPENSES_DATA);
 
         render(<ProgramExpensesSection />);
@@ -295,9 +300,9 @@ describe('ProgramExpensesSection', () => {
         await useDataFetchProps.fetchHandler();
         await useDataFetchProps.fetchHandler({ test: true });
 
-        expect(mockGetReadOnlyData).toHaveBeenCalledWith({});
+        expect(mockGetReadOnlyData).toHaveBeenCalledWith('mock-client', {});
         expect(ProgramExpensesApi.getReadOnlyData).toBeDefined();
-        expect(mockGetReadOnlyData).toHaveBeenCalledWith({ test: true });
+        expect(mockGetReadOnlyData).toHaveBeenCalledWith('mock-client', { test: true });
     });
 
     it('should render edit mode controls when edit mode is active', () => {

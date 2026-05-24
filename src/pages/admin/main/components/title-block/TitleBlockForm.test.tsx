@@ -1,8 +1,8 @@
-import React from 'react';
+import { MainPageFormValues } from '@/types/admin/main-page';
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { FormProvider, useForm } from 'react-hook-form';
 import { TitleBlockForm } from './TitleBlockForm';
-import { MainPage } from '@/types/admin/main-page';
 
 jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
     __esModule: true,
@@ -28,92 +28,112 @@ jest.mock('@/pages/admin/main/components/common/image-upload-form/ImageUploadFor
     ImageUploadForm: require('@/utils/test-mocks/main-page-mocks').MockImageUploadForm,
 }));
 
-const mockInitialData: MainPage = {
-    id: 1,
-    title: 'Початковий заголовок',
-    description: 'Початковий опис',
-    image: null,
-    mainAboutUs: null,
-    mainPartners: null,
-    impactStatistics: null,
+const FormWrapper = ({
+    children,
+    defaultValues,
+}: {
+    children: React.ReactNode;
+    defaultValues?: Partial<MainPageFormValues>;
+}) => {
+    const methods = useForm<MainPageFormValues>({
+        defaultValues: {
+            titleUa: '',
+            descriptionUa: '',
+            ...defaultValues,
+        } as MainPageFormValues,
+    });
+    return <FormProvider {...methods}>{children}</FormProvider>;
 };
 
 describe('TitleBlockForm', () => {
+    const mockOnPublish = jest.fn();
+
     beforeEach(() => {
         jest.clearAllMocks();
     });
 
-    it('renders with empty default values when initialData is null', () => {
-        render(<TitleBlockForm initialData={null} />);
+    it('renders with correct initial values from form context', () => {
+        render(
+            <FormWrapper defaultValues={{ titleUa: 'Початковий заголовок', descriptionUa: 'Початковий опис' }}>
+                <TitleBlockForm isPublishDisabled={true} onPublish={mockOnPublish} />
+            </FormWrapper>,
+        );
 
         const titleInput = screen.getByTestId('title-block-title') as HTMLInputElement;
         const descriptionInput = screen.getByTestId('title-block-description') as HTMLTextAreaElement;
 
-        expect(titleInput.value).toBe('');
-        expect(descriptionInput.value).toBe('');
-        expect(screen.getByTestId('submit-btn')).toBeDisabled();
+        expect(titleInput.value).toBe('Початковий заголовок');
+        expect(descriptionInput.value).toBe('Початковий опис');
     });
 
-    it('populates fields with initialData', async () => {
-        render(<TitleBlockForm initialData={mockInitialData} />);
-
-        const titleInput = screen.getByTestId('title-block-title') as HTMLInputElement;
-        const descriptionInput = screen.getByTestId('title-block-description') as HTMLTextAreaElement;
-
-        await waitFor(() => {
-            expect(titleInput.value).toBe('Початковий заголовок');
-            expect(descriptionInput.value).toBe('Початковий опис');
-        });
-
-        expect(screen.getByTestId('submit-btn')).toBeDisabled();
-    });
-
-    it('enables submit button when form is dirty and valid', async () => {
-        render(<TitleBlockForm initialData={mockInitialData} />);
-
-        const titleInput = screen.getByTestId('title-block-title');
-        fireEvent.change(titleInput, { target: { value: 'Новий змінений заголовок' } });
-
-        await waitFor(() => {
-            expect(screen.getByTestId('submit-btn')).not.toBeDisabled();
-        });
-    });
-
-    it('disables submit button when required fields are cleared', async () => {
-        render(<TitleBlockForm initialData={mockInitialData} />);
-
-        const titleInput = screen.getByTestId('title-block-title');
-        fireEvent.change(titleInput, { target: { value: '   ' } });
-        fireEvent.blur(titleInput);
-
-        await waitFor(() => {
-            expect(screen.getByTestId('submit-btn')).toBeDisabled();
-        });
-    });
-
-    it('disables submit button when ImageUploadForm sets an error', async () => {
-        render(<TitleBlockForm initialData={mockInitialData} />);
-
-        const titleInput = screen.getByTestId('title-block-title');
-        fireEvent.change(titleInput, { target: { value: 'Новий змінений заголовок' } });
-        await waitFor(() => expect(screen.getByTestId('submit-btn')).not.toBeDisabled());
-
-        fireEvent.click(screen.getByTestId('trigger-image-error'));
-        await waitFor(() => expect(screen.getByTestId('submit-btn')).toBeDisabled());
-
-        fireEvent.click(screen.getByTestId('clear-image-error'));
-        await waitFor(() => expect(screen.getByTestId('submit-btn')).not.toBeDisabled());
-    });
-
-    it('allows submitting the form without throwing errors', async () => {
-        render(<TitleBlockForm initialData={mockInitialData} />);
-
-        const titleInput = screen.getByTestId('title-block-title');
-        fireEvent.change(titleInput, { target: { value: 'Фінальний заголовок' } });
+    it('disables submit button when isPublishDisabled is true', () => {
+        render(
+            <FormWrapper>
+                <TitleBlockForm isPublishDisabled={true} onPublish={mockOnPublish} />
+            </FormWrapper>,
+        );
 
         const submitBtn = screen.getByTestId('submit-btn');
-        await waitFor(() => expect(submitBtn).not.toBeDisabled());
+        expect(submitBtn).toBeDisabled();
+    });
 
-        expect(() => fireEvent.click(submitBtn)).not.toThrow();
+    it('enables submit button when isPublishDisabled is false and no image error', () => {
+        render(
+            <FormWrapper>
+                <TitleBlockForm isPublishDisabled={false} onPublish={mockOnPublish} />
+            </FormWrapper>,
+        );
+
+        const submitBtn = screen.getByTestId('submit-btn');
+        expect(submitBtn).not.toBeDisabled();
+    });
+
+    it('disables submit button when ImageUploadForm sets an error (local state check)', () => {
+        render(
+            <FormWrapper>
+                <TitleBlockForm isPublishDisabled={false} onPublish={mockOnPublish} />
+            </FormWrapper>,
+        );
+
+        const submitBtn = screen.getByTestId('submit-btn');
+        expect(submitBtn).not.toBeDisabled();
+
+        fireEvent.click(screen.getByTestId('trigger-image-error'));
+        expect(submitBtn).toBeDisabled();
+
+        fireEvent.click(screen.getByTestId('clear-image-error'));
+        expect(submitBtn).not.toBeDisabled();
+    });
+
+    it('calls onPublish callback when the publish button is clicked', async () => {
+        render(
+            <FormWrapper>
+                <TitleBlockForm isPublishDisabled={false} onPublish={mockOnPublish} />
+            </FormWrapper>,
+        );
+
+        const submitBtn = screen.getByTestId('submit-btn');
+
+        expect(submitBtn).not.toBeDisabled();
+
+        fireEvent.click(submitBtn);
+
+        await waitFor(() => {
+            expect(mockOnPublish).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    it('updates input values when typed into', () => {
+        render(
+            <FormWrapper>
+                <TitleBlockForm isPublishDisabled={false} onPublish={mockOnPublish} />
+            </FormWrapper>,
+        );
+
+        const titleInput = screen.getByTestId('title-block-title') as HTMLInputElement;
+
+        fireEvent.change(titleInput, { target: { value: 'Новий змінений заголовок' } });
+
+        expect(titleInput.value).toBe('Новий змінений заголовок');
     });
 });

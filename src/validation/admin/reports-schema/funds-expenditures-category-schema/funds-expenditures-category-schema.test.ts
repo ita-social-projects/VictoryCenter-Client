@@ -15,6 +15,7 @@ const category = (name: string, type: 'income' | 'expense'): ReportFundsExpendit
     id: 1,
     name,
     type,
+    localizations: [],
 });
 
 describe('validateFundsExpendituresCategoryName', () => {

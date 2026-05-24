@@ -300,5 +300,36 @@ describe('HistoryApi', () => {
             expect(ImageApi.delete).not.toHaveBeenCalled();
             expect(result).toEqual(mockResponseData);
         });
+
+        it('should rollback first uploaded image when second image upload fails', async () => {
+            const mockSections: CreateUpdateHistorySectionDto[] = [
+                {
+                    template: SectionTemplate.TextOnly,
+                    order: 0,
+                    contents: [
+                        {
+                            contentType: ContentType.Image,
+                            order: 0,
+                            image: { base64: 'data:image/jpeg;base64,aaa', mimeType: 'image/jpeg' },
+                            imageId: null,
+                        },
+                        {
+                            contentType: ContentType.Image,
+                            order: 1,
+                            image: { base64: 'data:image/jpeg;base64,bbb', mimeType: 'image/jpeg' },
+                            imageId: null,
+                        },
+                    ],
+                },
+            ];
+
+            (ImageApi.getUpdateImageId as jest.Mock)
+                .mockResolvedValueOnce({ finalImageId: 101, imageIdToDelete: null })
+                .mockRejectedValueOnce(new Error('second upload failed'));
+            (ImageApi.delete as jest.Mock).mockResolvedValue(undefined);
+
+            await expect(HistoryApi.syncSections(mockClient, mockSections)).rejects.toThrow('second upload failed');
+            expect(ImageApi.delete).toHaveBeenCalledWith(mockClient, 101);
+        });
     });
 });

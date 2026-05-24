@@ -120,6 +120,36 @@ const createProps = (
     ...overrides,
 });
 
+const createDenormalizedSection = (): HistorySectionDto => ({
+    ...createSection(),
+    contents: [
+        {
+            id: 3,
+            sectionId: 1,
+            contentType: ContentType.Image,
+            order: 0,
+            image: { id: 3, url: 'image.jpg', mimeType: 'image/jpeg' },
+            localizations: [],
+        },
+        {
+            id: 1,
+            sectionId: 1,
+            contentType: ContentType.Title,
+            order: 1,
+            title: 'Original title',
+            localizations: [],
+        },
+        {
+            id: 2,
+            sectionId: 1,
+            contentType: ContentType.Description,
+            order: 2,
+            description: 'Original description',
+            localizations: [],
+        },
+    ],
+});
+
 describe('HistorySectionForm', () => {
     beforeEach(() => {
         jest.clearAllMocks();
@@ -390,35 +420,7 @@ describe('HistorySectionForm', () => {
     });
 
     it('emits a normalized section via onSectionChange when the incoming section needs normalization', () => {
-        const denormalizedSection: HistorySectionDto = {
-            ...createSection(),
-            contents: [
-                {
-                    id: 3,
-                    sectionId: 1,
-                    contentType: ContentType.Image,
-                    order: 0,
-                    image: { id: 3, url: 'image.jpg', mimeType: 'image/jpeg' },
-                    localizations: [],
-                },
-                {
-                    id: 1,
-                    sectionId: 1,
-                    contentType: ContentType.Title,
-                    order: 1,
-                    title: 'Original title',
-                    localizations: [],
-                },
-                {
-                    id: 2,
-                    sectionId: 1,
-                    contentType: ContentType.Description,
-                    order: 2,
-                    description: 'Original description',
-                    localizations: [],
-                },
-            ],
-        };
+        const denormalizedSection = createDenormalizedSection();
 
         const props = createProps({ section: denormalizedSection });
 
@@ -596,35 +598,7 @@ describe('HistorySectionForm', () => {
     });
 
     it('skips processing when rerendered with previously emitted section object', () => {
-        const sectionNeedingNormalization: HistorySectionDto = {
-            ...createSection(),
-            contents: [
-                {
-                    id: 3,
-                    sectionId: 1,
-                    contentType: ContentType.Image,
-                    order: 0,
-                    image: { id: 3, url: 'image.jpg', mimeType: 'image/jpeg' },
-                    localizations: [],
-                },
-                {
-                    id: 1,
-                    sectionId: 1,
-                    contentType: ContentType.Title,
-                    order: 1,
-                    title: 'Original title',
-                    localizations: [],
-                },
-                {
-                    id: 2,
-                    sectionId: 1,
-                    contentType: ContentType.Description,
-                    order: 2,
-                    description: 'Original description',
-                    localizations: [],
-                },
-            ],
-        };
+        const sectionNeedingNormalization = createDenormalizedSection();
 
         const props = createProps({ section: sectionNeedingNormalization });
 

@@ -662,4 +662,29 @@ describe('HistoryPageContent', () => {
             expect(mockAddToast).toHaveBeenCalledWith('Publish error', ToastType.Error);
         });
     });
+
+    it('closes add-section modal when onClose is called', async () => {
+        mockSingleSectionData();
+
+        render(<HistoryPageContent />);
+
+        await user.click(screen.getByTestId('toolbar-add-section-button'));
+        expect(screen.getByTestId('add-section-modal')).toBeInTheDocument();
+
+        await user.click(screen.getByTestId('close-add-section-modal'));
+        expect(screen.queryByTestId('add-section-modal')).not.toBeInTheDocument();
+    });
+
+    it('closes publish confirmation modal when cancel is clicked', async () => {
+        mockSingleSectionData();
+
+        render(<HistoryPageContent />);
+
+        await user.click(screen.getByTestId('mark-saved'));
+        await user.click(screen.getByRole('button', { name: 'Publish' }));
+        expect(screen.getByTestId('question-modal')).toBeInTheDocument();
+
+        await user.click(screen.getByTestId('question-cancel'));
+        expect(screen.queryByTestId('question-modal')).not.toBeInTheDocument();
+    });
 });

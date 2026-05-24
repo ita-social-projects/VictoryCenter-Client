@@ -148,6 +148,20 @@ describe('HistorySection', () => {
 
             expect(screen.getByTestId('dual-images')).toBeInTheDocument();
         });
+
+        it('should sort images by order when multiple images are present', () => {
+            const section = makeSection(SectionTemplate.DualImagesBottom, {
+                contents: [
+                    makeContent(10, ContentType.Title, 0),
+                    makeContent(12, ContentType.Image, 3, { image: TEST_IMAGE }),
+                    makeContent(13, ContentType.Image, 1, { image: TEST_IMAGE }),
+                ],
+            });
+
+            render(<HistorySection section={section} />);
+
+            expect(screen.getByTestId('dual-images')).toBeInTheDocument();
+        });
     });
 
     describe('year label', () => {

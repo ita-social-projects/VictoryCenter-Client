@@ -327,7 +327,7 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
         expect(onAddPair).toHaveBeenCalledTimes(1);
     });
 
-    it('passes editability and change handlers into cards (delete is wrapped by index)', async () => {
+    it('passes editability and change handlers into cards (canDelete is length-based)', async () => {
         const onPairDescriptionChange = jest.fn();
         const onPairAuthorChange = jest.fn();
         const onDeletePair = jest.fn();

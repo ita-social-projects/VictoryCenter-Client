@@ -13,7 +13,7 @@ export const HistoryQuadImages = ({ images }: HistoryQuadImagesProps) => {
                 const src = getImageSrc(image);
                 if (!src) return null;
                 return (
-                    <div key={index} className={`${styles.cell} ${index % 2 === 1 ? styles.elevated : ''}`}>
+                    <div key={src} className={`${styles.cell} ${index % 2 === 1 ? styles.elevated : ''}`}>
                         <img src={src} alt="" className={styles.image} loading="lazy" />
                     </div>
                 );

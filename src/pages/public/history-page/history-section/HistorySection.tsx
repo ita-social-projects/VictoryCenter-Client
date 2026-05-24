@@ -1,9 +1,10 @@
-import React from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HistorySection as HistorySectionModel } from '@/types/public/history-page';
 import { ContentType } from '@/types/common/section-contents';
 import { SectionTemplate } from '@/types/common/sections';
 import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
+import { YEAR_PATTERN, YEAR_ONLY_PATTERN } from '@/const/public/history-page';
 import { useGetLocalization } from '@/hooks/common/use-get-localization/useGetLocalization';
 import { useScrollAnimation } from '@/hooks/common/use-scroll-animation/useScrollAnimation';
 import { HistoryQuadImages } from './HistoryQuadImages';
@@ -15,9 +16,6 @@ interface HistorySectionProps {
     showYearLabel?: boolean;
 }
 
-const YEAR_PATTERN = /^(\d{4}(?:[–—-]\d{4})?)\s*[—–-]\s*/;
-const YEAR_ONLY_PATTERN = /^(\d{4}(?:[–—-]\d{4})?)$/;
-
 export const HistorySection = ({ section, showYearLabel = true }: HistorySectionProps) => {
     const { t } = useTranslation('historyPage');
     const { ref, isVisible } = useScrollAnimation();
@@ -25,12 +23,11 @@ export const HistorySection = ({ section, showYearLabel = true }: HistorySection
     const titleContent = section.contents.find((c) => c.contentType === ContentType.Title);
     const descContent = section.contents.find((c) => c.contentType === ContentType.Description);
 
-    const { title: localizedTitle } = useGetLocalization(titleContent?.localizations, {
-        title: titleContent?.title,
-    });
-    const { description } = useGetLocalization(descContent?.localizations, {
-        description: descContent?.description,
-    });
+    const titleFallback = useMemo(() => ({ title: titleContent?.title }), [titleContent?.title]);
+    const descFallback = useMemo(() => ({ description: descContent?.description }), [descContent?.description]);
+
+    const { title: localizedTitle } = useGetLocalization(titleContent?.localizations, titleFallback);
+    const { description } = useGetLocalization(descContent?.localizations, descFallback);
 
     const rawTitle = localizedTitle ?? '';
     const images = section.contents
@@ -52,7 +49,7 @@ export const HistorySection = ({ section, showYearLabel = true }: HistorySection
     if (section.template === SectionTemplate.SingleImageRight) {
         const imageSrc = hasRealImages ? getImageSrc(images[0]) : null;
         return (
-            <section ref={ref as React.RefObject<HTMLElement>} className={wrapperClass}>
+            <section ref={ref} className={wrapperClass}>
                 {yearBadge}
                 <div className={styles['single-image-right']}>
                     <div className={styles['text-column']}>
@@ -72,7 +69,7 @@ export const HistorySection = ({ section, showYearLabel = true }: HistorySection
     if (section.template === SectionTemplate.SingleImageTop && hasRealImages) {
         const imageSrc = getImageSrc(images[0]);
         return (
-            <section ref={ref as React.RefObject<HTMLElement>} className={wrapperClass}>
+            <section ref={ref} className={wrapperClass}>
                 {yearBadge}
                 {imageSrc && <img src={imageSrc} alt="" className={styles['full-width-image']} loading="lazy" />}
                 <div className={styles['section-header']}>
@@ -86,7 +83,7 @@ export const HistorySection = ({ section, showYearLabel = true }: HistorySection
     }
 
     return (
-        <section ref={ref as React.RefObject<HTMLElement>} className={wrapperClass}>
+        <section ref={ref} className={wrapperClass}>
             {yearBadge}
             {(displayTitle || description) && (
                 <div className={styles['section-header']}>

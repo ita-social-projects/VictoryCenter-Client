@@ -108,4 +108,16 @@ describe('HistoryPage', () => {
             expect(screen.getByTestId('history-hero')).toBeInTheDocument();
         });
     });
+
+    it('should use array index as key when section id is undefined', async () => {
+        const sectionWithoutId = { ...makeSection(1, 0), id: undefined as unknown as number };
+        (PublicHistoryApi.getSections as jest.Mock).mockResolvedValue([sectionWithoutId]);
+
+        render(<HistoryPage />);
+
+        await waitFor(() => {
+            expect(MockedHistorySection).toHaveBeenCalledTimes(1);
+            expect(screen.getByTestId('section-undefined')).toBeInTheDocument();
+        });
+    });
 });

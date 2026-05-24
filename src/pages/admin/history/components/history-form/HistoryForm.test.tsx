@@ -111,6 +111,7 @@ const createSection = (id: number, template: SectionTemplate, order: number): Hi
             contentType: ContentType.Title,
             order: 0,
             title: `Title ${id}`,
+            localizations: [],
         },
     ],
 });

@@ -16,6 +16,7 @@ export interface DescriptionAuthorPairCardProps {
     author: string;
     index: number;
     isEditable: boolean;
+    canDelete?: boolean;
     onDescriptionChange?: (index: number, value: string) => void;
     onAuthorChange?: (index: number, value: string) => void;
     onDelete?: (index: number) => void;
@@ -28,6 +29,7 @@ export const DescriptionAuthorPairCard = ({
     author,
     index,
     isEditable,
+    canDelete = false,
     onDescriptionChange,
     onAuthorChange,
     onDelete,
@@ -66,12 +68,10 @@ export const DescriptionAuthorPairCard = ({
     };
 
     const handleDescriptionBlur = () => {
-        if (!isEditable) return;
         setDescriptionError(validate(description, ContentType.Description));
     };
 
     const handleAuthorBlur = () => {
-        if (!isEditable) return;
         setAuthorError(validate(author, ContentType.Author));
     };
 
@@ -86,7 +86,7 @@ export const DescriptionAuthorPairCard = ({
 
     return (
         <div className={cn(styles.card, styles.editable)}>
-            {index > 0 && (
+            {canDelete && (
                 <IconButton
                     type="button"
                     className={styles['delete-button']}

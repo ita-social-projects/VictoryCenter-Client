@@ -1,7 +1,6 @@
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
-import { MAIN_PAGE_TEXT } from '@/const/admin/main-page';
 import { Metric, MetricPrefix, MetricType } from '@/types/admin/main-page';
 
 import { StatisticsMetricEditPanel } from './StatisticsMetricEditPanel';
@@ -11,34 +10,6 @@ jest.mock('@/components/admin/input-groups/input-with-character-limit-group/Inpu
     InputWithCharacterLimitGroup: ({ id, value, onChange, onBlur }: any) => (
         <input data-testid={id} value={value ?? ''} onChange={onChange} onBlur={onBlur} />
     ),
-}));
-
-jest.mock('@/components/admin/button/Button', () => ({
-    __esModule: true,
-    Button: ({ children, buttonStyle: _buttonStyle, ...props }: any) => (
-        <button type="button" {...props}>
-            {children}
-        </button>
-    ),
-}));
-
-jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
-    __esModule: true,
-    ConfirmationModal: ({ isOpen, onConfirm, onCancel, onClose, title }: any) =>
-        isOpen ? (
-            <div data-testid="confirm-modal">
-                <div>{title}</div>
-                <button type="button" data-testid="confirm-action" onClick={onConfirm}>
-                    Confirm
-                </button>
-                <button type="button" data-testid="cancel-action" onClick={onCancel}>
-                    Cancel
-                </button>
-                <button type="button" data-testid="close-action" onClick={onClose}>
-                    Close
-                </button>
-            </div>
-        ) : null,
 }));
 
 jest.mock('@/components/admin/multi-select-input/MultiSelectInput', () => ({
@@ -59,6 +30,19 @@ jest.mock('@/components/admin/multi-select-input/MultiSelectInput', () => ({
     ),
 }));
 
+jest.mock('../common/metric-edit-actions/MetricEditActions', () => ({
+    MetricEditActions: ({ isFormDirty, isValid, onCancel, onSave }: any) => (
+        <div data-testid="metric-actions">
+            <button type="button" data-testid="mock-cancel" onClick={onCancel}>
+                Cancel
+            </button>
+            <button type="button" data-testid="mock-save" onClick={onSave} disabled={!isFormDirty || !isValid}>
+                Save
+            </button>
+        </div>
+    ),
+}));
+
 const createMetric = (overrides: Partial<Metric> = {}): Metric => ({
     id: 1,
     name: 'Назва UA',
@@ -72,13 +56,12 @@ const createMetric = (overrides: Partial<Metric> = {}): Metric => ({
 });
 
 describe('StatisticsMetricEditPanel', () => {
-    // Хелпер для усунення дублювання логіки сабміту в тестах
     const submitForm = async (onSaveMock: jest.Mock) => {
         fireEvent.blur(screen.getByTestId('metric-ua-1'));
         fireEvent.blur(screen.getByTestId('metric-en-1'));
         fireEvent.blur(screen.getByTestId('metric-val-1'));
 
-        const saveButton = screen.getByRole('button', { name: MAIN_PAGE_TEXT.BUTTONS.SAVE });
+        const saveButton = screen.getByTestId('mock-save');
         await waitFor(() => expect(saveButton).not.toBeDisabled());
         fireEvent.click(saveButton);
 
@@ -166,55 +149,6 @@ describe('StatisticsMetricEditPanel', () => {
         expect(updatedMetric.prefix).toBe(MetricPrefix.Plus);
     });
 
-    it('opens cancel modal when form is dirty and confirms cancel', async () => {
-        const onCancel = jest.fn();
-        render(<StatisticsMetricEditPanel metric={createMetric()} onSave={jest.fn()} onCancel={onCancel} />);
-
-        fireEvent.change(screen.getByTestId('metric-ua-1'), { target: { value: 'Зміна' } });
-
-        fireEvent.click(screen.getByRole('button', { name: MAIN_PAGE_TEXT.BUTTONS.CANCEL }));
-
-        expect(await screen.findByTestId('confirm-modal')).toBeInTheDocument();
-        fireEvent.click(screen.getByTestId('confirm-action'));
-
-        expect(onCancel).toHaveBeenCalledTimes(1);
-    });
-
-    it('closes cancel modal without triggering onCancel', async () => {
-        const onCancel = jest.fn();
-        render(<StatisticsMetricEditPanel metric={createMetric()} onSave={jest.fn()} onCancel={onCancel} />);
-
-        fireEvent.change(screen.getByTestId('metric-ua-1'), { target: { value: 'Зміна' } });
-        fireEvent.click(screen.getByRole('button', { name: MAIN_PAGE_TEXT.BUTTONS.CANCEL }));
-
-        expect(await screen.findByTestId('confirm-modal')).toBeInTheDocument();
-
-        fireEvent.click(screen.getByTestId('cancel-action'));
-        await waitFor(() => {
-            expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument();
-        });
-
-        fireEvent.click(screen.getByRole('button', { name: MAIN_PAGE_TEXT.BUTTONS.CANCEL }));
-        expect(await screen.findByTestId('confirm-modal')).toBeInTheDocument();
-
-        fireEvent.click(screen.getByTestId('close-action'));
-        await waitFor(() => {
-            expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument();
-        });
-
-        expect(onCancel).not.toHaveBeenCalled();
-    });
-
-    it('cancels immediately when form is not dirty', () => {
-        const onCancel = jest.fn();
-        render(<StatisticsMetricEditPanel metric={createMetric()} onSave={jest.fn()} onCancel={onCancel} />);
-
-        fireEvent.click(screen.getByRole('button', { name: MAIN_PAGE_TEXT.BUTTONS.CANCEL }));
-
-        expect(onCancel).toHaveBeenCalledTimes(1);
-        expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument();
-    });
-
     it('handles saving when localizations are undefined', async () => {
         const onSave = jest.fn();
         const metric = createMetric({ localizations: undefined as any });
@@ -249,5 +183,14 @@ describe('StatisticsMetricEditPanel', () => {
         await waitFor(() => {
             expect(screen.getByTestId('metric-prefix-1')).toBeInTheDocument();
         });
+    });
+
+    it('calls onCancel when cancel action is triggered', () => {
+        const onCancelMock = jest.fn();
+        render(<StatisticsMetricEditPanel metric={createMetric()} onSave={jest.fn()} onCancel={onCancelMock} />);
+
+        fireEvent.click(screen.getByTestId('mock-cancel'));
+
+        expect(onCancelMock).toHaveBeenCalledTimes(1);
     });
 });

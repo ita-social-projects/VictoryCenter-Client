@@ -1,31 +1,22 @@
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
-import { MAIN_PAGE_TEXT } from '@/const/admin/main-page';
+import { MAIN_PAGE_TEXT, MAIN_PAGE_VALIDATION } from '@/const/admin/main-page';
 import { Metric, MetricLocalization, MetricPrefix, MetricType } from '@/types/admin/main-page';
 
 import { RaisedMetricEditPanel } from './RaisedMetricEditPanel';
 
-jest.mock('@/components/admin/button/Button', () => ({
-    __esModule: true,
-    Button: ({ children, disabled, onClick }: any) => (
-        <button type="button" disabled={disabled} onClick={onClick}>
-            {children}
-        </button>
+jest.mock('../common/metric-edit-actions/MetricEditActions', () => ({
+    MetricEditActions: ({ isFormDirty, isValid, onCancel, onSave }: any) => (
+        <div data-testid="metric-actions">
+            <button type="button" data-testid="mock-cancel" onClick={onCancel}>
+                Cancel
+            </button>
+            <button type="button" data-testid="mock-save" onClick={onSave} disabled={!isFormDirty || !isValid}>
+                Save
+            </button>
+        </div>
     ),
-}));
-
-jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
-    ConfirmationModal: ({ isOpen, onConfirm, onCancel, title }: any) => {
-        if (!isOpen) return null;
-        return (
-            <div data-testid="mock-modal">
-                <p>{title}</p>
-                <button onClick={onConfirm}>Yes</button>
-                <button onClick={onCancel}>No</button>
-            </div>
-        );
-    },
 }));
 
 const createMetric = (overrides: Partial<Metric> = {}): Metric => ({
@@ -67,7 +58,7 @@ describe('RaisedMetricEditPanel', () => {
     it('enables Save button when form values are changed', async () => {
         render(<RaisedMetricEditPanel metric={createMetric()} onCancel={jest.fn()} />);
 
-        const saveButton = screen.getByRole('button', { name: MAIN_PAGE_TEXT.BUTTONS.SAVE });
+        const saveButton = screen.getByTestId('mock-save');
         expect(saveButton).toBeDisabled();
 
         const uaNameInput = screen.getByLabelText(MAIN_PAGE_TEXT.BLOCKS.EDIT_PANEL.UKR_NAME_LABEL, { exact: false });
@@ -103,7 +94,7 @@ describe('RaisedMetricEditPanel', () => {
         const usdInput = screen.getByLabelText(MAIN_PAGE_TEXT.BLOCKS.EDIT_PANEL.USD_VALUE_LABEL, { exact: false });
         fireEvent.change(usdInput, { target: { value: '30000' } });
 
-        const saveButton = screen.getByRole('button', { name: MAIN_PAGE_TEXT.BUTTONS.SAVE });
+        const saveButton = screen.getByTestId('mock-save');
 
         await waitFor(() => {
             expect(saveButton).not.toBeDisabled();
@@ -120,33 +111,77 @@ describe('RaisedMetricEditPanel', () => {
         });
     });
 
-    it('calls onCancel directly if form is untouched', () => {
+    it('calls onCancel when cancel action is triggered', () => {
         const onCancelMock = jest.fn();
         render(<RaisedMetricEditPanel metric={createMetric()} onCancel={onCancelMock} />);
 
-        const cancelButton = screen.getByRole('button', { name: MAIN_PAGE_TEXT.BUTTONS.CANCEL });
-        fireEvent.click(cancelButton);
+        fireEvent.click(screen.getByTestId('mock-cancel'));
 
         expect(onCancelMock).toHaveBeenCalledTimes(1);
     });
 
-    it('opens confirmation modal when canceling with dirty form', async () => {
-        const onCancelMock = jest.fn();
-        render(<RaisedMetricEditPanel metric={createMetric()} onCancel={onCancelMock} />);
+    describe('Validation and editing manually', () => {
+        it('shows inline error when input is emptied and removes it when corrected', async () => {
+            render(<RaisedMetricEditPanel metric={createMetric()} onCancel={jest.fn()} />);
 
-        const uaNameInput = screen.getByLabelText(MAIN_PAGE_TEXT.BLOCKS.EDIT_PANEL.UKR_NAME_LABEL, { exact: false });
-        fireEvent.change(uaNameInput, { target: { value: 'Modified' } });
+            const syncToggle = screen.getByRole('switch');
+            fireEvent.click(syncToggle);
 
-        const cancelButton = screen.getByRole('button', { name: MAIN_PAGE_TEXT.BUTTONS.CANCEL });
-        fireEvent.click(cancelButton);
+            const uahInput = await screen.findByLabelText(MAIN_PAGE_TEXT.BLOCKS.EDIT_PANEL.UAH_VALUE_LABEL, {
+                exact: false,
+            });
 
-        expect(onCancelMock).not.toHaveBeenCalled();
+            fireEvent.change(uahInput, { target: { value: '' } });
+            fireEvent.blur(uahInput);
 
-        await waitFor(() => {
-            expect(screen.getByTestId('mock-modal')).toBeInTheDocument();
+            await waitFor(() => {
+                expect(screen.getByText(MAIN_PAGE_VALIDATION.raisedFunds.REQUIRED)).toBeInTheDocument();
+            });
+
+            const saveButton = screen.getByTestId('mock-save');
+            expect(saveButton).toBeDisabled();
+
+            fireEvent.change(uahInput, { target: { value: '500' } });
+            fireEvent.blur(uahInput);
+
+            await waitFor(() => {
+                expect(screen.queryByText(MAIN_PAGE_VALIDATION.raisedFunds.REQUIRED)).not.toBeInTheDocument();
+                expect(saveButton).not.toBeDisabled();
+            });
         });
 
-        fireEvent.click(screen.getByText('Yes'));
-        expect(onCancelMock).toHaveBeenCalledTimes(1);
+        it('shows inline error for negative numbers', async () => {
+            render(<RaisedMetricEditPanel metric={createMetric()} onCancel={jest.fn()} />);
+
+            fireEvent.click(screen.getByRole('switch'));
+
+            const usdInput = await screen.findByLabelText(MAIN_PAGE_TEXT.BLOCKS.EDIT_PANEL.USD_VALUE_LABEL, {
+                exact: false,
+            });
+
+            fireEvent.change(usdInput, { target: { value: '-10' } });
+            fireEvent.blur(usdInput);
+
+            await waitFor(() => {
+                expect(screen.getByText(MAIN_PAGE_VALIDATION.raisedFunds.NEGATIVE)).toBeInTheDocument();
+            });
+        });
+
+        it('shows inline error for zero', async () => {
+            render(<RaisedMetricEditPanel metric={createMetric()} onCancel={jest.fn()} />);
+
+            fireEvent.click(screen.getByRole('switch'));
+
+            const uahInput = await screen.findByLabelText(MAIN_PAGE_TEXT.BLOCKS.EDIT_PANEL.UAH_VALUE_LABEL, {
+                exact: false,
+            });
+
+            fireEvent.change(uahInput, { target: { value: '0' } });
+            fireEvent.blur(uahInput);
+
+            await waitFor(() => {
+                expect(screen.getByText(MAIN_PAGE_VALIDATION.raisedFunds.ZERO)).toBeInTheDocument();
+            });
+        });
     });
 });

@@ -25,6 +25,7 @@ import { WhoWeArePageAdmin } from '@/pages/admin/who-we-are/WhoWeArePageAdmin';
 import { PartnerPanel } from '@/pages/admin/partners/PartnerPanel';
 import { ReportsPage } from '@/pages/public/reports-page';
 import { ContactUsPage } from '@/pages/public/contact-us';
+import { SupportUsPage } from '@/pages/public/support-us-page';
 import { CompanyProfileContent } from '@/pages/admin/company-profile/components/company-profile-content/CompanyProfileContent';
 import { LanguageSyncWrapper } from '@/components/public/language-sync-wrapper/LanguageSyncWrapper';
 import { ReportsPanelContent } from '@/pages/admin/reports/components/reports-panel-content/ReportsPanelContent';
@@ -45,6 +46,7 @@ export const AppRouter = () => {
             <Route path={PUBLIC_ROUTES.DONATE.PATH} element={<DonatePage />} />
             <Route path={PUBLIC_ROUTES.REPORTS.PATH} element={<ReportsPage />} />
             <Route path={PUBLIC_ROUTES.CONTACT_US.PATH} element={<ContactUsPage />} />
+            <Route path={PUBLIC_ROUTES.SUPPORT_US.PATH} element={<SupportUsPage />} />
             <Route path="*" element={<NotFound />} />
         </Routes>
     );

@@ -53,9 +53,7 @@ export const Header = () => {
                                 {t('STORIES_OF_VICTORIES')}
                             </Link>
 
-                            <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
-                                {t('HOW_TO_SUPPORT')}
-                            </Link>
+                            <Link to={PUBLIC_ROUTES.SUPPORT_US.FULL}>{t('HOW_TO_SUPPORT')}</Link>
                         </nav>
                     </div>
 
@@ -103,7 +101,7 @@ export const Header = () => {
                             {t('STORIES_OF_VICTORIES')}
                         </Link>
 
-                        <Link to={PUBLIC_ROUTES.MOCK.FULL} onClick={toggleMenu} className="disable">
+                        <Link to={PUBLIC_ROUTES.SUPPORT_US.FULL} onClick={toggleMenu}>
                             {t('HOW_TO_SUPPORT')}
                         </Link>
 

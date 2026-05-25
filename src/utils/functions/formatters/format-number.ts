@@ -29,6 +29,6 @@ export const formatCurrencyInput = (raw: string): string => {
         cleaned = parts[0] + '.' + parts.slice(1).join('');
     }
     const [intPart, fracPart] = cleaned.split('.');
-    const formattedInt = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    const formattedInt = intPart.replace(/(\d)(?=(\d{3})+$)/g, '$1 ');
     return fracPart !== undefined ? `${formattedInt}.${fracPart.slice(0, 2)}` : formattedInt;
 };

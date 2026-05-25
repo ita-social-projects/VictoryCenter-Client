@@ -17,7 +17,7 @@
     }
 
     @media (min-width: 1440px) {
-        height: 810px;
+        height: 748px;
     }
 }
 
@@ -59,7 +59,7 @@
 
 .description {
     @include type.body-2-medium;
-    margin: auto 0 32px;
+    margin: auto auto 32px;
 
     @media (min-width: 768px) {
         @include type.body-1-medium;
@@ -67,7 +67,7 @@
 
     @media (min-width: 1440px) {
         margin-bottom: 16px;
-        text-wrap: balance;
+        max-width: 656px;
     }
 }
 

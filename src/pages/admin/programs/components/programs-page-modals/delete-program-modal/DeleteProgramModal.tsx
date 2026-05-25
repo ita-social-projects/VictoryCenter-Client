@@ -49,10 +49,10 @@ export const DeleteProgramModal = ({ isOpen, onClose, onDeleteProgram, programTo
             <Modal.Content>{error && <div className="delete-program-error-container">{error}</div>}</Modal.Content>
             <Modal.Actions>
                 <Button onClick={handleClose} buttonStyle="secondary" disabled={isSubmitting}>
-                    {COMMON_TEXT_ADMIN.BUTTON.CANCEL}
+                    {COMMON_TEXT_ADMIN.BUTTON.NO}
                 </Button>
                 <Button onClick={handleConfirmDelete} buttonStyle="primary" disabled={isSubmitting}>
-                    {COMMON_TEXT_ADMIN.BUTTON.DELETE}
+                    {COMMON_TEXT_ADMIN.BUTTON.YES}
                 </Button>
             </Modal.Actions>
         </Modal>

@@ -1,35 +1,46 @@
+import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
+import { ReviewsSection } from './ReviewsSection';
+import { StoriesOfVictoryReview } from '@/types/public/stories-of-victory';
+
 // Mock react-i18next FIRST, before importing components
 jest.mock('react-i18next', () => ({
-    useTranslation: () => ({
-        t: (key, fallback) => fallback || key,
-        i18n: { changeLanguage: jest.fn() },
-    }),
+    useTranslation: jest.fn(),
 }));
 
 // Mock Swiper component
 jest.mock('@/components/public/swiper/Swiper', () => ({
-    Swiper: ({ items, renderItem, classNameSwiperSlide, navigationButtons }: any) => (
-        <div data-testid="swiper-component" data-items-length={items?.length || 0}>
-            <div data-testid="swiper-nav-config" data-nav-config={JSON.stringify(navigationButtons)} />
-            <div data-testid="swiper-slide-class" data-class={classNameSwiperSlide} />
-            {items &&
-                items.map((item: any) => (
-                    <div key={item.id} data-testid={`review-item-${item.id}`}>
-                        {renderItem(item)}
-                    </div>
-                ))}
-        </div>
-    ),
-}));
-
-import { ReviewsSection } from './ReviewsSection';
-import { StoriesOfVictoryReview } from '@/types/public/stories-of-victory';
+    Swiper: jest.fn(),
 }));
 
 describe('ReviewsSection', () => {
+    beforeEach(() => {
+        const { useTranslation } = require('react-i18next');
+        (useTranslation as jest.Mock).mockReturnValue({
+            t: (key: string, fallback?: string) => fallback || key,
+            i18n: { changeLanguage: jest.fn() },
+        });
+
+        const { Swiper } = require('@/components/public/swiper/Swiper');
+        (Swiper as jest.Mock).mockImplementation(
+            ({ items, renderItem, classNameSwiperSlide, navigationButtons }: any) => (
+                <div data-testid="swiper-component" data-items-length={items?.length || 0}>
+                    <div data-testid="swiper-nav-config" data-nav-config={JSON.stringify(navigationButtons)} />
+                    <div data-testid="swiper-slide-class" data-class={classNameSwiperSlide} />
+                    {items &&
+                        items.map((item: any) => (
+                            <div key={item.id} data-testid={`review-item-${item.id}`}>
+                                {/* eslint-disable-next-line testing-library/no-render-in-setup */}
+                                {renderItem(item)}
+                            </div>
+                        ))}
+                </div>
+            ),
+        );
+    });
+
     it('should render section element', () => {
         const { container } = render(<ReviewsSection content={null} />);
         expect(container.querySelector('section')).toBeInTheDocument();
@@ -37,7 +48,7 @@ describe('ReviewsSection', () => {
 
     it('should render title with correct translation', () => {
         render(<ReviewsSection content={null} />);
-        expect(screen.getByText('Our Reviews')).toBeInTheDocument();
+        expect(screen.getByText('REVIEWS.TITLE')).toBeInTheDocument();
         expect(screen.getByRole('heading', { level: 3 })).toBeInTheDocument();
     });
 
@@ -56,7 +67,7 @@ describe('ReviewsSection', () => {
     it('should pass null items to Swiper when content is null', () => {
         const { Swiper } = require('@/components/public/swiper/Swiper');
         render(<ReviewsSection content={null} />);
-        const calls = Swiper.mock.calls;
+        const calls = (Swiper as jest.Mock).mock.calls;
         expect(calls[0][0].items).toBeNull();
     });
 

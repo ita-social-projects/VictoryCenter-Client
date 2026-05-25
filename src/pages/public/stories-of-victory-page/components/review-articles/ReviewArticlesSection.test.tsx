@@ -2,6 +2,9 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
+import { ReviewArticlesSection } from './ReviewArticlesSection';
+import { StoriesOfVictoryReviewArticle } from '@/types/public/stories-of-victory';
+
 // Mock SVG icon FIRST
 jest.mock('@/assets/icons/square-arrow-out-up-right.svg', () => ({
     ReactComponent: () => <svg data-testid="arrow-icon" />,
@@ -9,19 +12,18 @@ jest.mock('@/assets/icons/square-arrow-out-up-right.svg', () => ({
 
 // Mock react-i18next BEFORE importing components
 jest.mock('react-i18next', () => ({
-    useTranslation: () => ({
-        t: (key) => {
-            if (key === 'ARTICLES.READ_STORY') return 'Read Story';
-            return key;
-        },
-        i18n: { changeLanguage: jest.fn() },
-    }),
+    useTranslation: jest.fn(),
 }));
 
-import { ReviewArticlesSection } from './ReviewArticlesSection';
-import { StoriesOfVictoryReviewArticle } from '@/types/public/stories-of-victory';
-
 describe('ReviewArticlesSection', () => {
+    beforeEach(() => {
+        const { useTranslation } = require('react-i18next');
+        (useTranslation as jest.Mock).mockReturnValue({
+            t: (key: string) => (key === 'ARTICLES.READ_STORY' ? 'Read Story' : key),
+            i18n: { changeLanguage: jest.fn() },
+        });
+    });
+
     it('should render section when content is null', () => {
         const { container } = render(<ReviewArticlesSection content={null} />);
         expect(container.querySelector('section')).toBeInTheDocument();
@@ -42,7 +44,7 @@ describe('ReviewArticlesSection', () => {
             },
         ];
         render(<ReviewArticlesSection content={content} />);
-        expect(screen.getByText('Article 1')).toBeInTheDocument();
+        expect(screen.getByText('"Article 1"')).toBeInTheDocument();
     });
 
     it('should render all articles from content array', () => {
@@ -67,9 +69,9 @@ describe('ReviewArticlesSection', () => {
             },
         ];
         render(<ReviewArticlesSection content={content} />);
-        expect(screen.getByText('Article 1')).toBeInTheDocument();
-        expect(screen.getByText('Article 2')).toBeInTheDocument();
-        expect(screen.getByText('Article 3')).toBeInTheDocument();
+        expect(screen.getByText('"Article 1"')).toBeInTheDocument();
+        expect(screen.getByText('"Article 2"')).toBeInTheDocument();
+        expect(screen.getByText('"Article 3"')).toBeInTheDocument();
     });
 
     it('should render article image when image is provided', () => {

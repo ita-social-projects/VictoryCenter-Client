@@ -128,7 +128,7 @@ describe('Header', () => {
         );
         expect(screen.getByRole('link', { name: headerUk['STORIES_OF_VICTORIES'] })).toHaveAttribute(
             'href',
-            PUBLIC_ROUTES.MOCK.FULL,
+            PUBLIC_ROUTES.STORIES_OF_VICTORIES.FULL,
         );
     });
 

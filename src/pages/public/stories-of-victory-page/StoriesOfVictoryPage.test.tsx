@@ -2,6 +2,8 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
+import { StoriesOfVictoryPage } from './StoriesOfVictoryPage';
+
 // Mock react-i18next
 jest.mock('react-i18next', () => ({
     useTranslation: () => ({
@@ -11,17 +13,15 @@ jest.mock('react-i18next', () => ({
 }));
 
 // Mock LoadableContent to simplify testing
-jest.mock('@/components/common/loadable-content/LoadableContent', () => {
-    return function MockLoadableContent({ isLoading, error, children }: any) {
+jest.mock('@/components/common/loadable-content/LoadableContent', () => ({
+    LoadableContent: function MockLoadableContent({ isLoading, error, children }: any) {
         return (
             <div data-testid="loadable-content" data-loading={isLoading} data-error={error}>
                 {children}
             </div>
         );
-    };
-});
-
-import { StoriesOfVictoryPage } from './StoriesOfVictoryPage';
+    },
+}));
 
 describe('StoriesOfVictoryPage', () => {
     it('should render without crashing', () => {

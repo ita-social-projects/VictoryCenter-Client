@@ -22,14 +22,14 @@ const MOCK_FUNDS_EXPENDITURES_SETTINGS: ReportFundsExpendituresSettings = {
 };
 
 const MOCK_FUNDS_EXPENDITURES_CATEGORIES: ReportFundsExpendituresCategory[] = [
-    { id: 1, name: 'Грантові кошти', type: 'income' },
-    { id: 2, name: 'Благодійні внески', type: 'income' },
-    { id: 3, name: 'Власні надходження', type: 'income' },
-    { id: 4, name: 'Інші надходження', type: 'income' },
-    { id: 5, name: 'Адміністративні витрати', type: 'expense' },
-    { id: 6, name: 'Програмні витрати', type: 'expense' },
-    { id: 7, name: 'Обладнання', type: 'expense' },
-    { id: 8, name: 'Заробітна плата', type: 'expense' },
+    { id: 1, name: 'Грантові кошти', type: 'income', localizations: [] },
+    { id: 2, name: 'Благодійні внески', type: 'income', localizations: [] },
+    { id: 3, name: 'Власні надходження', type: 'income', localizations: [] },
+    { id: 4, name: 'Інші надходження', type: 'income', localizations: [] },
+    { id: 5, name: 'Адміністративні витрати', type: 'expense', localizations: [] },
+    { id: 6, name: 'Програмні витрати', type: 'expense', localizations: [] },
+    { id: 7, name: 'Обладнання', type: 'expense', localizations: [] },
+    { id: 8, name: 'Заробітна плата', type: 'expense', localizations: [] },
 ];
 
 const MOCK_FUNDS_EXPENDITURES_RECORDS: ReportFundsExpendituresRecord[] = [
@@ -251,6 +251,16 @@ jest.mock('./components/funds-expenditures-table/FundsExpendituresTable', () => 
             </div>
         );
     },
+}));
+
+jest.mock('./components/common/add-funds-expenditures-category-modal/AddFundsExpendituresCategoryModal', () => ({
+    AddFundsExpendituresCategoryModal: ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => (
+        <div data-testid="add-category-modal" data-open={String(isOpen)}>
+            <button data-testid="add-category-modal-close" onClick={onClose}>
+                Close
+            </button>
+        </div>
+    ),
 }));
 
 jest.mock('./components/common/add-funds-expenditures-record-modal/AddFundsExpendituresRecordModal', () => ({
@@ -864,14 +874,37 @@ describe('FundsExpenditureSection', () => {
             expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE.TITLE)).not.toBeInTheDocument();
         });
     });
+
+    describe('add category modal', () => {
+        it('should render add category modal as closed by default', () => {
+            render(<FundsExpenditureSection />);
+
+            expect(screen.getByTestId('add-category-modal')).toHaveAttribute('data-open', 'false');
+        });
+
+        it('should render add category modal as open when isAddCategoryModalOpen is true', () => {
+            render(<FundsExpenditureSection isAddCategoryModalOpen onAddCategoryModalClose={jest.fn()} />);
+
+            expect(screen.getByTestId('add-category-modal')).toHaveAttribute('data-open', 'true');
+        });
+
+        it('should call onAddCategoryModalClose when modal close is triggered', () => {
+            const mockClose = jest.fn();
+            render(<FundsExpenditureSection isAddCategoryModalOpen onAddCategoryModalClose={mockClose} />);
+
+            fireEvent.click(screen.getByTestId('add-category-modal-close'));
+
+            expect(mockClose).toHaveBeenCalledTimes(1);
+        });
+    });
 });
 
 describe('FundsExpenditureSection bulk delete flow', () => {
     const settingsMock = { id: 1, exchangeRate: '40', disclaimerTitle: 'Disclaimer' };
     const categoriesMock: ReportFundsExpendituresCategory[] = [
-        { id: 1, name: 'A', type: 'income' },
-        { id: 2, name: 'B', type: 'income' },
-        { id: 3, name: PROGRAM_EXPENSES_TEXT.TABLE.TYPE_LABEL, type: 'expense' },
+        { id: 1, name: 'A', type: 'income', localizations: [] },
+        { id: 2, name: 'B', type: 'income', localizations: [] },
+        { id: 3, name: PROGRAM_EXPENSES_TEXT.TABLE.TYPE_LABEL, type: 'expense', localizations: [] },
     ];
     const recordsMock: ReportFundsExpendituresRecord[] = [
         { id: 1, categoryId: 1, type: 'income', reportingYear: '2025', amountUah: '100', amountUsd: '10' },

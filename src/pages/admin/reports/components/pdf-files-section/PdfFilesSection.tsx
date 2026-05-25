@@ -37,6 +37,10 @@ export const PdfFilesSection = () => {
         ),
     });
 
+    const { translationLanguages } = useLocalizationToolkit({
+        setErrorState: useCallback(() => {}, []),
+    });
+
     const fetchSection = useCallback(async () => {
         return PdfSectionApi.getPdfSection(client);
     }, [client]);
@@ -167,7 +171,7 @@ export const PdfFilesSection = () => {
                     onAfterSave={handleSaveSection}
                     translationLanguages={translationLanguages}
                     onTranslateClick={() => setIsTranslateModalOpen(true)}
-                />{' '}
+                />
             </div>
             <div className={styles['language-switcher-container']}>
                 <LanguageSwitcherButtons currentLanguage={currentLanguage} onLanguageChange={setCurrentLanguage} />

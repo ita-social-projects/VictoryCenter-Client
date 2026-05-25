@@ -88,9 +88,7 @@ export const Footer = () => {
                     </Link>
                     <Link to={PUBLIC_ROUTES.TEAM.FULL}>{t('OUR_TEAM')}</Link>
                     <Link to={PUBLIC_ROUTES.PARTNERS.FULL}>{t('PARTNERS')}</Link>
-                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
-                        {t('EVENTS_AND_NEWS')}
-                    </Link>
+                    <Link to={PUBLIC_ROUTES.EVENTS_AND_NEWS.FULL}>{t('EVENTS_AND_NEWS')}</Link>
                 </div>
 
                 <div className="hippotherapy">

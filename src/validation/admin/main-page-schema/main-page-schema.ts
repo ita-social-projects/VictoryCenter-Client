@@ -1,8 +1,8 @@
-import * as Yup from 'yup';
 import { MAIN_PAGE_VALIDATION } from '@/const/admin/main-page';
-import { AboutUsBlockFormValues, TitleBlockFormValues } from '@/types/admin/main-page';
+import { MainPageFormValues } from '@/types/admin/main-page';
 import { Image, ImageValues } from '@/types/common/image';
 import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
+import * as Yup from 'yup';
 
 const buildStringValidation = (config: {
     min: number;
@@ -17,49 +17,61 @@ const buildStringValidation = (config: {
         .max(config.max, config.getMaxError());
 };
 
-export const TitleBlockValidationSchema: Yup.ObjectSchema<TitleBlockFormValues> = Yup.object({
-    title: buildStringValidation(MAIN_PAGE_VALIDATION.titleBlock.title),
-    description: buildStringValidation(MAIN_PAGE_VALIDATION.titleBlock.description),
-    image: Yup.mixed<Image | ImageValues>()
-        .transform((value) => {
-            if (value === null || typeof value === 'string') return undefined;
-            return value;
-        })
-        .nullable()
-        .notRequired()
-        .default(null),
-});
+const imageSchema = Yup.mixed<Image | ImageValues>()
+    .transform((value) => {
+        if (value === null || typeof value === 'string') return undefined;
+        return value;
+    })
+    .nullable()
+    .notRequired()
+    .default(null);
 
-export const AboutUsBlockValidationSchema: Yup.ObjectSchema<AboutUsBlockFormValues> = Yup.object({
-    title: buildStringValidation(MAIN_PAGE_VALIDATION.aboutUsBlock.title),
-    description: buildStringValidation(MAIN_PAGE_VALIDATION.aboutUsBlock.description),
+export const MainPageValidationSchema: Yup.ObjectSchema<MainPageFormValues> = Yup.object({
+    // Title Block
+    titleUa: buildStringValidation(MAIN_PAGE_VALIDATION.titleBlock.title),
+    titleEn: buildStringValidation(MAIN_PAGE_VALIDATION.titleBlock.title),
+    descriptionUa: buildStringValidation(MAIN_PAGE_VALIDATION.titleBlock.description),
+    descriptionEn: buildStringValidation(MAIN_PAGE_VALIDATION.titleBlock.description),
+    image: imageSchema,
+
+    // About Us Block
+    aboutUsTitleUa: buildStringValidation(MAIN_PAGE_VALIDATION.aboutUsBlock.title),
+    aboutUsTitleEn: buildStringValidation(MAIN_PAGE_VALIDATION.aboutUsBlock.title),
+    aboutUsDescriptionUa: buildStringValidation(MAIN_PAGE_VALIDATION.aboutUsBlock.description),
+    aboutUsDescriptionEn: buildStringValidation(MAIN_PAGE_VALIDATION.aboutUsBlock.description),
+
+    // Partners Block
+    partnersTitleUa: buildStringValidation(MAIN_PAGE_VALIDATION.partnersBlock.title),
+    partnersTitleEn: buildStringValidation(MAIN_PAGE_VALIDATION.partnersBlock.title),
+    partnersDescriptionUa: buildStringValidation(MAIN_PAGE_VALIDATION.partnersBlock.description),
+    partnersDescriptionEn: buildStringValidation(MAIN_PAGE_VALIDATION.partnersBlock.description),
+
+    // Impact Statistics Block
+    statisticsTitleUa: buildStringValidation(MAIN_PAGE_VALIDATION.statisticsBlock.title),
+    statisticsTitleEn: buildStringValidation(MAIN_PAGE_VALIDATION.statisticsBlock.title),
+    statisticsImage: imageSchema,
 });
 
 export const MAIN_PAGE_VALIDATION_FUNCTIONS = {
-    validateTitle: (value: string): string | undefined => {
+    validateField: (field: keyof MainPageFormValues, value: any): string | undefined => {
         try {
-            TitleBlockValidationSchema.validateSyncAt('title', { title: value });
+            MainPageValidationSchema.validateSyncAt(field, { [field]: value });
             return undefined;
         } catch (error: any) {
             return error.message;
         }
     },
 
-    validateDescription: (value: string): string | undefined => {
-        try {
-            TitleBlockValidationSchema.validateSyncAt('description', { description: value });
-            return undefined;
-        } catch (error: any) {
-            return error.message;
-        }
-    },
+    validateTitle: (value: string) => MAIN_PAGE_VALIDATION_FUNCTIONS.validateField('titleUa', value),
+    validateDescription: (value: string) => MAIN_PAGE_VALIDATION_FUNCTIONS.validateField('descriptionUa', value),
+    validateImage: (value: Image | ImageValues | null) => MAIN_PAGE_VALIDATION_FUNCTIONS.validateField('image', value),
 
-    validateImage: (value: Image | ImageValues | null): string | undefined => {
-        try {
-            TitleBlockValidationSchema.validateSyncAt('image', { image: value });
-            return undefined;
-        } catch (error: any) {
-            return error.message;
-        }
-    },
+    validatePartnersTitle: (value: string) => MAIN_PAGE_VALIDATION_FUNCTIONS.validateField('partnersTitleUa', value),
+    validatePartnersDescription: (value: string) =>
+        MAIN_PAGE_VALIDATION_FUNCTIONS.validateField('partnersDescriptionUa', value),
+
+    validateStatisticsTitleUa: (value: string) =>
+        MAIN_PAGE_VALIDATION_FUNCTIONS.validateField('statisticsTitleUa', value),
+    validateStatisticsTitleEn: (value: string) =>
+        MAIN_PAGE_VALIDATION_FUNCTIONS.validateField('statisticsTitleEn', value),
 };

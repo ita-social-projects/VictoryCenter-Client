@@ -4,6 +4,7 @@ import { ProgramExpensesSection } from './ProgramExpensesSection';
 import { FUNDS_EXPENDITURES_TEXT, PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
 import { ProgramExpensesReadOnlyData } from '@/types/admin/reports';
 import { ProgramExpensesApi } from '@/services/api/admin/reports/program-expenses-api';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 
 const MOCK_PROGRAM_EXPENSES_DATA: ProgramExpensesReadOnlyData = {
     exchangeRate: '41.25',
@@ -64,6 +65,10 @@ jest.mock('@/services/api/admin/reports/program-expenses-api', () => ({
     },
 }));
 
+jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
+    useAdminClient: () => 'mock-client',
+}));
+
 let mockUseDataFetchResult = {
     data: MOCK_PROGRAM_EXPENSES_DATA,
     isLoading: false,
@@ -84,6 +89,14 @@ jest.mock('@/assets/icons/not-found.svg', () => ({
 
 jest.mock('@/assets/icons/plus.svg', () => ({
     ReactComponent: () => <svg data-testid="plus-icon" />,
+}));
+
+jest.mock('./components/common/add-program-expense-record-modal/AddProgramExpenseRecordModal', () => ({
+    AddProgramExpenseRecordModal: ({ isOpen, exchangeRate }: { isOpen: boolean; exchangeRate: string | null }) => (
+        <div data-testid="add-program-expense-modal" data-open={String(isOpen)} data-exchange-rate={exchangeRate ?? ''}>
+            AddProgramExpenseRecordModal
+        </div>
+    ),
 }));
 
 jest.mock('@/components/admin/multi-select-input/MultiSelectInput', () => ({
@@ -272,10 +285,10 @@ describe('ProgramExpensesSection', () => {
 
         expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.TITLE)).toBeInTheDocument();
         expect(screen.getByText(PROGRAM_EXPENSES_TEXT.EMPTY_STATE.ADD_RECORD)).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE })).toBeEnabled();
+        expect(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE })).toBeDisabled();
     });
 
-    it('should pass fetch handler that calls ProgramExpensesApi.getReadOnlyData', async () => {
+    it('should pass fetch handler that calls ProgramExpensesApi.getReadOnlyData with client', async () => {
         mockGetReadOnlyData.mockResolvedValue(MOCK_PROGRAM_EXPENSES_DATA);
 
         render(<ProgramExpensesSection />);
@@ -287,9 +300,9 @@ describe('ProgramExpensesSection', () => {
         await useDataFetchProps.fetchHandler();
         await useDataFetchProps.fetchHandler({ test: true });
 
-        expect(mockGetReadOnlyData).toHaveBeenCalledWith({});
+        expect(mockGetReadOnlyData).toHaveBeenCalledWith('mock-client', {});
         expect(ProgramExpensesApi.getReadOnlyData).toBeDefined();
-        expect(mockGetReadOnlyData).toHaveBeenCalledWith({ test: true });
+        expect(mockGetReadOnlyData).toHaveBeenCalledWith('mock-client', { test: true });
     });
 
     it('should render edit mode controls when edit mode is active', () => {
@@ -300,18 +313,11 @@ describe('ProgramExpensesSection', () => {
         expect(screen.getByText(PROGRAM_EXPENSES_TEXT.TABLE.COLUMNS.ACTIONS)).toBeInTheDocument();
     });
 
-    it('should display synced exchange rate in edit mode', () => {
-        render(<ProgramExpensesSection isEditing syncedExchangeRate="44.20" />);
+    it('should display mock exchange rate in edit mode', () => {
+        render(<ProgramExpensesSection isEditing />);
 
-        expect(screen.getByText('44.20')).toBeInTheDocument();
-        expect(screen.queryByText('41.25')).not.toBeInTheDocument();
-    });
-
-    it('should display empty synced exchange rate in edit mode when the funds value is cleared', () => {
-        render(<ProgramExpensesSection isEditing syncedExchangeRate={null} />);
-
-        expect(screen.getByText('-')).toBeInTheDocument();
-        expect(screen.queryByText('41.25')).not.toBeInTheDocument();
+        expect(screen.getByText('41.25')).toBeInTheDocument();
+        expect(screen.getByTestId('add-program-expense-modal')).toHaveAttribute('data-exchange-rate', '41.25');
     });
 
     it('should disable add program expense button when four records exist', () => {

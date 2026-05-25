@@ -44,3 +44,5 @@ export enum TranslationStatusFilter {
     Outdated,
     Missing,
 }
+
+export type LocaleCode = 'uk' | 'en';

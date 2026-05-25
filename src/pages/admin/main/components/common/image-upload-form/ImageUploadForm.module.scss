@@ -1,0 +1,18 @@
+@use '@/assets/sass/variables/colors' as c;
+
+.imageSection {
+    flex: 6;
+    width: 60%;
+}
+
+.imageWrapper {
+    //width: 640px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.error {
+    color: c.$error;
+    margin: 0;
+}

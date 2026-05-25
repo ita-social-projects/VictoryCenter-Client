@@ -95,7 +95,7 @@ describe('Footer', () => {
         );
         expect(screen.getByRole('link', { name: footerUk['EVENTS_AND_NEWS'] })).toHaveAttribute(
             'href',
-            PUBLIC_ROUTES.MOCK.FULL,
+            PUBLIC_ROUTES.EVENTS_AND_NEWS.FULL,
         );
     });
 

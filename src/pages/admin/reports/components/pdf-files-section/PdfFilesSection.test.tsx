@@ -15,6 +15,7 @@ jest.mock('@/services/api/admin/reports/pdf-section/pdf-section-api');
 jest.mock('@/services/api/admin/reports/pdf-reports/pdf-reports-api');
 jest.mock('@/hooks/common/use-data-fetch/useDataFetch');
 jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider');
+jest.mock('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit');
 
 jest.mock('./components/pdf-section-content-block/PdfSectionContentBlock', () => ({
     PdfSectionContentBlock: ({ onAfterSave, onTranslateClick }: any) => (
@@ -22,6 +23,7 @@ jest.mock('./components/pdf-section-content-block/PdfSectionContentBlock', () =>
             <button onClick={onAfterSave} data-testid="content-block-save">
                 Save
             </button>
+
             <button onClick={onTranslateClick} data-testid="content-block-translate">
                 Translate
             </button>
@@ -94,7 +96,7 @@ jest.mock('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit', () =>
 describe('PdfFilesSection', () => {
     const mockClient = { get: jest.fn() };
     const mockAddToast = jest.fn();
-    const mockSectionData = { title: 'Test Title', description: 'Test Desc' };
+    const mockSectionData = { title: 'Test Title', description: 'Test Desc', localizations: [] };
     const mockFilesResponse = { items: [{ id: 1 }, { id: 2 }], totalItemsCount: 2 };
     const mockRefetch = jest.fn();
     const mockCreateObjectURL = jest.fn(() => 'blob:http://localhost/mock-blob-url');
@@ -124,6 +126,8 @@ describe('PdfFilesSection', () => {
         global.window.open = mockWindowOpen as any;
         (useAdminClient as jest.Mock).mockReturnValue(mockClient);
         (useToast as jest.Mock).mockReturnValue({ addToast: mockAddToast });
+        const { useLocalizationToolkit } = require('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit');
+        (useLocalizationToolkit as jest.Mock).mockReturnValue({ translationLanguages: [] });
         mockCreateObjectURL.mockReturnValue('blob:http://localhost/mock-blob-url');
         (useLocalizationToolkit as jest.Mock).mockReturnValue({ translationLanguages: [] });
     });

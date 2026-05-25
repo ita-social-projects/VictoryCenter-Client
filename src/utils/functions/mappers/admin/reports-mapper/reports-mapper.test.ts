@@ -213,17 +213,49 @@ describe('reports-mapper', () => {
             });
         });
 
-        it('should map category dto to category', () => {
+        it('should map category dto to category with empty localizations', () => {
             const dto: ReportFundsExpendituresCategoryDto = {
                 id: 2,
                 name: 'Category',
                 type: 2,
+                localizations: [],
             };
 
             expect(mapReportFundsExpendituresCategoryDtoToCategory(dto)).toEqual({
                 id: 2,
                 name: 'Category',
                 type: 'expense',
+                localizations: [],
+            });
+        });
+
+        it('should map category dto to category with localizations', () => {
+            const dto: ReportFundsExpendituresCategoryDto = {
+                id: 2,
+                name: 'Category',
+                type: 2,
+                localizations: [
+                    {
+                        entityId: 2,
+                        localizationInfoDto: { id: 1, code: 'en' },
+                        translationStatus: 1,
+                        name: 'Category EN',
+                    },
+                ],
+            };
+
+            expect(mapReportFundsExpendituresCategoryDtoToCategory(dto)).toEqual({
+                id: 2,
+                name: 'Category',
+                type: 'expense',
+                localizations: [
+                    {
+                        entityId: 2,
+                        language: { id: 1, code: 'en' },
+                        translationStatus: 1,
+                        name: 'Category EN',
+                    },
+                ],
             });
         });
 

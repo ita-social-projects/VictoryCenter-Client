@@ -113,6 +113,7 @@ export const DescriptionAuthorPairCard = ({
                         placeholder={SECTIONS_TEXT.SECTION.CARD.FORM.DESCRIPTION.PLACEHOLDER}
                         error={descriptionError}
                         maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(descriptionMaxLength)}
+                        autoGrow={true}
                     />
                 </div>
 

@@ -1,15 +1,12 @@
-import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
-import { Button } from '@/components/admin/button/Button';
-import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { MultiSelectInput } from '@/components/admin/multi-select-input/MultiSelectInput';
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { MAIN_PAGE_TEXT, MAIN_PAGE_VALIDATION } from '@/const/admin/main-page';
 import { Metric, MetricPrefix } from '@/types/admin/main-page';
 import { formatNumberInput, formatWithSpaces } from '@/utils/functions/formatters/format-number';
 import { MetricFormValues } from '@/validation/admin/main-page-schema/metric-edit-schema/metric-edit-schema';
+import { MetricEditActions } from '../common/metric-edit-actions/MetricEditActions';
 
 import styles from './StatisticsMetricEditPanel.module.scss';
 
@@ -26,8 +23,6 @@ const PREFIX_OPTIONS = [
 ];
 
 export const StatisticsMetricEditPanel = ({ metric, onSave, onCancel }: StatisticsMetricEditPanelProps) => {
-    const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
-
     const defaultNameUa = metric.name || '';
     const defaultNameEn = metric.localizations?.find((l) => l.languageId === 2)?.name || '';
     const defaultValueStr = formatWithSpaces(metric.value ?? 0);
@@ -159,26 +154,11 @@ export const StatisticsMetricEditPanel = ({ metric, onSave, onCancel }: Statisti
                 </div>
             </div>
 
-            <div className={styles.actions}>
-                <Button buttonStyle="secondary" onClick={() => (isFormDirty ? setIsCancelModalOpen(true) : onCancel())}>
-                    {MAIN_PAGE_TEXT.BUTTONS.CANCEL}
-                </Button>
-                <Button buttonStyle="primary" onClick={handleSubmit(onValidSubmit)} disabled={!isFormDirty || !isValid}>
-                    {MAIN_PAGE_TEXT.BUTTONS.SAVE}
-                </Button>
-            </div>
-
-            <ConfirmationModal
-                isOpen={isCancelModalOpen}
-                onClose={() => setIsCancelModalOpen(false)}
-                title={MAIN_PAGE_TEXT.BLOCKS.EDIT_PANEL.CANCEL_MODAL_TITLE}
-                onConfirm={() => {
-                    setIsCancelModalOpen(false);
-                    onCancel();
-                }}
-                onCancel={() => setIsCancelModalOpen(false)}
-                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
-                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
+            <MetricEditActions
+                isFormDirty={isFormDirty}
+                isValid={isValid}
+                onCancel={onCancel}
+                onSave={handleSubmit(onValidSubmit)}
             />
         </div>
     );

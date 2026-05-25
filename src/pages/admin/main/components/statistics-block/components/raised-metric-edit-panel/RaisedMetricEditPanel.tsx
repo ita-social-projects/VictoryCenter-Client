@@ -1,12 +1,8 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
-import { Button } from '@/components/admin/button/Button';
-import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { Toggle } from '@/components/admin/toggle/Toggle';
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { MAIN_PAGE_TEXT, MAIN_PAGE_VALIDATION } from '@/const/admin/main-page';
 import { Metric, MetricLocalization, MetricPrefix } from '@/types/admin/main-page';
 import { formatNumberInput, formatWithSpaces } from '@/utils/functions/formatters/format-number';
@@ -14,6 +10,7 @@ import {
     RaisedMetricFormValues,
     raisedMetricEditSchema,
 } from '@/validation/admin/main-page-schema/metric-edit-schema/metric-edit-schema';
+import { MetricEditActions } from '../common/metric-edit-actions/MetricEditActions';
 
 import styles from './RaisedMetricEditPanel.module.scss';
 
@@ -24,8 +21,6 @@ interface RaisedMetricEditPanelProps {
 }
 
 export const RaisedMetricEditPanel = ({ metric, onSave, onCancel }: RaisedMetricEditPanelProps) => {
-    const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
-
     const defaultNameUa = metric.name || '';
     const usdLocalization = metric.localizations?.find((l) => l.languageId === 2);
     const defaultNameEn = usdLocalization?.name || '';
@@ -200,26 +195,11 @@ export const RaisedMetricEditPanel = ({ metric, onSave, onCancel }: RaisedMetric
                 />
             </div>
 
-            <div className={styles.actions}>
-                <Button buttonStyle="secondary" onClick={() => (isFormDirty ? setIsCancelModalOpen(true) : onCancel())}>
-                    {MAIN_PAGE_TEXT.BUTTONS.CANCEL}
-                </Button>
-                <Button buttonStyle="primary" onClick={handleSubmit(onValidSubmit)} disabled={!isFormDirty || !isValid}>
-                    {MAIN_PAGE_TEXT.BUTTONS.SAVE}
-                </Button>
-            </div>
-
-            <ConfirmationModal
-                isOpen={isCancelModalOpen}
-                onClose={() => setIsCancelModalOpen(false)}
-                title={MAIN_PAGE_TEXT.BLOCKS.EDIT_PANEL.CANCEL_MODAL_TITLE}
-                onConfirm={() => {
-                    setIsCancelModalOpen(false);
-                    onCancel();
-                }}
-                onCancel={() => setIsCancelModalOpen(false)}
-                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
-                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
+            <MetricEditActions
+                isFormDirty={isFormDirty}
+                isValid={isValid}
+                onCancel={onCancel}
+                onSave={handleSubmit(onValidSubmit)}
             />
         </div>
     );

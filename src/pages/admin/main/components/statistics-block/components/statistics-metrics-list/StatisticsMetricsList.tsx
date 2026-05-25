@@ -58,7 +58,6 @@ export const StatisticsMetricsList = ({
 
         const isHidden = hiddenMetricIds.includes(metric.id ?? 0);
         const isLastVisible = !isHidden && visibleMetricsCount <= 1;
-        const usdValue = metric.localizations?.find((l) => l.languageId === 2)?.value;
 
         return (
             <div className={styles.row}>

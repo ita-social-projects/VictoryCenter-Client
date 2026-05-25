@@ -73,7 +73,17 @@ jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
 jest.mock('../translate-pdf-section-modal/TranslatePdfSectionModal', () => ({
     TranslatePdfSectionModal: ({ isOpen, onClose, pdfSection, onTranslatePdfSection }: any) =>
         isOpen ? (
-            <div data-testid="translate-modal" onClick={onClose}>
+            <div
+                data-testid="translate-modal"
+                role="button"
+                tabIndex={0}
+                onClick={onClose}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        onClose();
+                    }
+                }}
+            >
                 <button
                     data-testid="confirm-translate-btn"
                     onClick={(e) => {

@@ -30,6 +30,10 @@
 .contact-form-field {
     border-bottom: 1px solid c.$blue-100;
     padding: 8px;
+
+    &--error {
+        border-bottom-color: c.$error;
+    }
 }
 
 .contact-form-input,

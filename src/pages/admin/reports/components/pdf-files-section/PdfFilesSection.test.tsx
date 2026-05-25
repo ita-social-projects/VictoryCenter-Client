@@ -8,7 +8,6 @@ import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextPr
 import { ToastType } from '@/types/admin/toast';
 import { PDF_FILES_SECTION_TEXT } from '@/const/admin/reports';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient');
 jest.mock('@/services/api/admin/reports/pdf-section/pdf-section-api');

@@ -38,9 +38,12 @@ jest.mock('@/components/common/modal/Modal', () => {
     return { Modal };
 });
 
+let capturedCheckIsDirty: (() => boolean) | null = null;
+
 jest.mock('@/components/admin/localization-modal/LocalizationModal', () => ({
-    LocalizationModal: ({ onClose, title, onSave, isSubmitting, isFormValid, children }: any) =>
-        mockDialog(
+    LocalizationModal: ({ onClose, title, onSave, isSubmitting, isFormValid, checkIsDirty, children }: any) => {
+        capturedCheckIsDirty = checkIsDirty;
+        return mockDialog(
             'localization-modal',
             onClose,
             <>
@@ -56,8 +59,12 @@ jest.mock('@/components/admin/localization-modal/LocalizationModal', () => ({
                 >
                     Save
                 </button>
+                <button data-testid="check-dirty-btn" onClick={() => checkIsDirty?.()}>
+                    Check Dirty
+                </button>
             </>,
-        ),
+        );
+    },
 }));
 
 jest.mock('@/components/admin/translation-controls/TranslationControls', () => ({
@@ -312,6 +319,15 @@ describe('TranslatePdfSectionModal', () => {
             renderModal();
 
             expect(screen.getByTestId('save-localization-btn')).toBeDisabled();
+        });
+    });
+
+    describe('checkIsDirty', () => {
+        it('should return true when form is dirty', () => {
+            renderModal();
+
+            fireEvent.click(screen.getByTestId('check-dirty-btn'));
+            expect(capturedCheckIsDirty?.()).toBe(true);
         });
     });
 });

@@ -37,10 +37,6 @@ export const PdfFilesSection = () => {
         ),
     });
 
-    const { translationLanguages } = useLocalizationToolkit({
-        setErrorState: useCallback(() => {}, []),
-    });
-
     const fetchSection = useCallback(async () => {
         return PdfSectionApi.getPdfSection(client);
     }, [client]);

@@ -9,25 +9,19 @@ export interface PdfSection extends PdfSectionLocalizableFields {
     localizations: PdfSectionLocalizationDto[];
 }
 
-export interface PdfSectionLocalizationDto
-    extends PdfSectionLocalizableFields,
-        EntityLocalizationDto {
+export interface PdfSectionLocalizationDto extends PdfSectionLocalizableFields, EntityLocalizationDto {
     languageId: number;
 }
 
-export interface PdfSectionLocalization
-    extends PdfSectionLocalizableFields,
-        EntityLocalizationDto {
+export interface PdfSectionLocalization extends PdfSectionLocalizableFields, EntityLocalizationDto {
     language: LocalizationLanguage;
 }
 
-export interface CreatePdfSectionLocalizationDto
-    extends PdfSectionLocalizableFields {
+export interface CreatePdfSectionLocalizationDto extends PdfSectionLocalizableFields {
     languageId: number;
 }
 
-export type UpdatePdfSectionLocalizationDto =
-    PdfSectionLocalizableFields;
+export type UpdatePdfSectionLocalizationDto = PdfSectionLocalizableFields;
 
 export interface PdfReportDto {
     id: number;

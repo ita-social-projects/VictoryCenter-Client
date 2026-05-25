@@ -94,6 +94,7 @@ export const RaisedMetricEditPanel = ({ metric, onSave, onCancel }: RaisedMetric
             value: parseInt(data.valueUah.replace(/\s/g, ''), 10),
             prefix: metric.prefix ?? MetricPrefix.None,
             localizations: updatedLocalizations,
+            ...({ isAutoSynced: data.isAutoSynced } as any),
         };
 
         if (onSave) onSave(updatedMetric);

@@ -127,4 +127,12 @@ export const MAIN_PAGE_VALIDATION = {
             getMaxError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(20),
         },
     },
+
+    raisedFunds: {
+        REQUIRED: "Поле обов'язкове",
+        ONLY_NUMBERS: 'Дозволено лише цифри',
+        MAX_DIGITS: 'Не більше 9 цифр до коми',
+        NEGATIVE: "Сума не може бути від'ємною",
+        ZERO: 'Сума не може дорівнювати 0',
+    },
 } as const;

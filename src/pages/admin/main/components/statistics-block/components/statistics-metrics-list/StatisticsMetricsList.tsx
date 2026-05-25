@@ -38,7 +38,13 @@ export const StatisticsMetricsList = ({
     const renderRow = (metric: Metric) => {
         if (editingMetricId === metric.id) {
             if (metric.type === MetricType.Raised) {
-                return <RaisedMetricEditPanel metric={metric} onCancel={() => setEditingMetricId(null)} />;
+                return (
+                    <RaisedMetricEditPanel
+                        metric={metric}
+                        onSave={handleSaveMetric}
+                        onCancel={() => setEditingMetricId(null)}
+                    />
+                );
             }
 
             return (
@@ -64,10 +70,10 @@ export const StatisticsMetricsList = ({
                     {metric.type === MetricType.Raised ? (
                         <div className={styles.raisedValues}>
                             <p className={`${styles.value} ${isHidden ? styles.hiddenText : ''}`}>
-                                ₴{formatMetricValue(metric)}
+                                ₴{formatMetricValue(metric, 'UA')}
                             </p>
                             <p className={`${styles.value} ${isHidden ? styles.hiddenText : ''}`}>
-                                ${usdValue ? formatMetricValue({ ...metric, value: parseInt(usdValue, 10) }) : '0'}
+                                ${formatMetricValue(metric, 'EN')}
                             </p>
                         </div>
                     ) : (

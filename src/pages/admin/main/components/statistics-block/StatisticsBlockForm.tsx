@@ -70,10 +70,12 @@ export const StatisticsBlockForm = ({
             prefix: metric.prefix,
             isHidden: metric.isHidden,
             priority: metric.priority,
+            isAutoSynced: (metric as any).isAutoSynced ?? false,
             localizations: (metric.localizations ?? [])
                 .map((loc) => ({
                     languageId: loc.languageId ?? null,
                     name: (loc.name ?? '').trim(),
+                    value: loc.value ? String(loc.value).trim() : '',
                 }))
                 .sort((a, b) => (a.languageId ?? 0) - (b.languageId ?? 0)),
         }));

@@ -102,7 +102,7 @@ describe('metric-formatters', () => {
         });
 
         it('should not append any suffix for MetricPrefix.None/default', () => {
-            const metric = createMetric(42); // Without prefix
+            const metric = createMetric(42);
             expect(formatMetricValue(metric, 'UA')).toBe('42');
         });
 
@@ -110,6 +110,29 @@ describe('metric-formatters', () => {
             const metric = createMetric(1000.5);
             expect(normalizeSpaces(formatMetricValue(metric, 'UA'))).toBe('1 000,5');
             expect(formatMetricValue(metric, 'EN')).toBe('1,000.5');
+        });
+
+        describe('Raised metric type behavior', () => {
+            const createRaisedMetric = (uahValue: number, usdValueStr: string): Metric => ({
+                ...createMetric(uahValue),
+                type: MetricType.Raised,
+                localizations: [{ languageId: 2, value: usdValueStr } as any],
+            });
+
+            it('should use base UAH value for UA locale', () => {
+                const metric = createRaisedMetric(5000000, '120000');
+                expect(normalizeSpaces(formatMetricValue(metric, 'UA'))).toBe('5 000 000');
+            });
+
+            it('should extract and format USD value from localization for EN locale', () => {
+                const metric = createRaisedMetric(5000000, '120000');
+                expect(formatMetricValue(metric, 'EN')).toBe('120,000');
+            });
+
+            it('should fall back to UAH value for EN locale if localization value is missing or invalid', () => {
+                const metric = createRaisedMetric(5000000, 'invalid-string');
+                expect(formatMetricValue(metric, 'EN')).toBe('5,000,000');
+            });
         });
     });
 });

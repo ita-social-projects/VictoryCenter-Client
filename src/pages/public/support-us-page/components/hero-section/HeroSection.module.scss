@@ -1,0 +1,54 @@
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
+
+.hero {
+    background-color: c.$yellow-500;
+    padding: 48px 24px;
+
+    @media (min-width: 768px) {
+        padding: 64px 48px;
+    }
+
+    @media (min-width: 1024px) {
+        padding: 80px 168px;
+    }
+}
+
+.content {
+    max-width: 1104px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 48px;
+
+    @media (max-width: 767px) {
+        flex-direction: column;
+        gap: 24px;
+    }
+}
+
+.title {
+    @include type.h1-bold-uppercase;
+    color: c.$blue-900;
+    margin: 0;
+    flex: 0 1 60%;
+    word-break: break-word;
+
+    @media (max-width: 767px) {
+        font-size: 40px;
+        line-height: 48px;
+        flex: none;
+    }
+
+    @media (min-width: 768px) and (max-width: 1023px) {
+        font-size: 64px;
+        line-height: 72px;
+    }
+}
+
+.description {
+    @include type.body-1-medium;
+    color: c.$blue-900;
+    margin: 0;
+    flex: 1;
+}

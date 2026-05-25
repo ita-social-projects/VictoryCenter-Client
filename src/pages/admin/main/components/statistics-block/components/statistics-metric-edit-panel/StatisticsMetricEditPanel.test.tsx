@@ -2,7 +2,7 @@ import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
 import { Metric, MetricPrefix, MetricType } from '@/types/admin/main-page';
-
+import { MockMetricEditActions } from '@/utils/test-mocks/main-page-mocks';
 import { StatisticsMetricEditPanel } from './StatisticsMetricEditPanel';
 
 jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
@@ -31,16 +31,7 @@ jest.mock('@/components/admin/multi-select-input/MultiSelectInput', () => ({
 }));
 
 jest.mock('../common/metric-edit-actions/MetricEditActions', () => ({
-    MetricEditActions: ({ isFormDirty, isValid, onCancel, onSave }: any) => (
-        <div data-testid="metric-actions">
-            <button type="button" data-testid="mock-cancel" onClick={onCancel}>
-                Cancel
-            </button>
-            <button type="button" data-testid="mock-save" onClick={onSave} disabled={!isFormDirty || !isValid}>
-                Save
-            </button>
-        </div>
-    ),
+    MetricEditActions: (props: any) => <MockMetricEditActions {...props} />,
 }));
 
 const createMetric = (overrides: Partial<Metric> = {}): Metric => ({

@@ -3,20 +3,11 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
 import { MAIN_PAGE_TEXT, MAIN_PAGE_VALIDATION } from '@/const/admin/main-page';
 import { Metric, MetricLocalization, MetricPrefix, MetricType } from '@/types/admin/main-page';
-
+import { MockMetricEditActions } from '@/utils/test-mocks/main-page-mocks';
 import { RaisedMetricEditPanel } from './RaisedMetricEditPanel';
 
 jest.mock('../common/metric-edit-actions/MetricEditActions', () => ({
-    MetricEditActions: ({ isFormDirty, isValid, onCancel, onSave }: any) => (
-        <div data-testid="metric-actions">
-            <button type="button" data-testid="mock-cancel" onClick={onCancel}>
-                Cancel
-            </button>
-            <button type="button" data-testid="mock-save" onClick={onSave} disabled={!isFormDirty || !isValid}>
-                Save
-            </button>
-        </div>
-    ),
+    MetricEditActions: (props: any) => <MockMetricEditActions {...props} />,
 }));
 
 const createMetric = (overrides: Partial<Metric> = {}): Metric => ({

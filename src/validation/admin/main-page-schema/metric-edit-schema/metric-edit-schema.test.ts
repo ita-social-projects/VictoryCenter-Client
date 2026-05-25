@@ -81,13 +81,13 @@ describe('raisedMetricEditSchema', () => {
 
     it('requires positive UAH value', async () => {
         await expect(raisedMetricEditSchema.validate({ ...validRaisedPayload, valueUah: '0' })).rejects.toThrow(
-            MAIN_PAGE_VALIDATION.common.REQUIRED,
+            MAIN_PAGE_VALIDATION.raisedFunds.ZERO,
         );
     });
 
     it('requires positive USD value', async () => {
         await expect(raisedMetricEditSchema.validate({ ...validRaisedPayload, valueUsd: '-100' })).rejects.toThrow(
-            MAIN_PAGE_VALIDATION.common.REQUIRED,
+            MAIN_PAGE_VALIDATION.raisedFunds.ONLY_NUMBERS,
         );
     });
 });

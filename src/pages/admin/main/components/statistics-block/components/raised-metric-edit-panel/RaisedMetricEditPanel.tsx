@@ -3,7 +3,7 @@ import { Controller, useForm } from 'react-hook-form';
 
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { Toggle } from '@/components/admin/toggle/Toggle';
-import { MAIN_PAGE_TEXT, MAIN_PAGE_VALIDATION } from '@/const/admin/main-page';
+import { MAIN_PAGE_TEXT } from '@/const/admin/main-page';
 import { Metric, MetricLocalization, MetricPrefix } from '@/types/admin/main-page';
 import { formatCurrencyInput, formatWithSpaces } from '@/utils/functions/formatters/format-number';
 import {
@@ -11,7 +11,7 @@ import {
     raisedMetricEditSchema,
 } from '@/validation/admin/main-page-schema/metric-edit-schema/metric-edit-schema';
 import { MetricEditActions } from '../common/metric-edit-actions/MetricEditActions';
-
+import { MetricNameFields } from '../common/metric-name-fields/MetricNameFields';
 import styles from './RaisedMetricEditPanel.module.scss';
 
 interface RaisedMetricEditPanelProps {
@@ -100,41 +100,7 @@ export const RaisedMetricEditPanel = ({ metric, onSave, onCancel }: RaisedMetric
             <div className={styles.header}>{MAIN_PAGE_TEXT.BLOCKS.EDIT_PANEL.TITLE}</div>
 
             <div className={styles.formGrid}>
-                <Controller
-                    name="nameUa"
-                    control={control}
-                    render={({ field: { onChange, onBlur, value, name } }) => (
-                        <InputWithCharacterLimitGroup
-                            id={`raised-metric-ua-${metric.id}`}
-                            name={name}
-                            label={MAIN_PAGE_TEXT.BLOCKS.EDIT_PANEL.UKR_NAME_LABEL}
-                            value={value}
-                            onChange={onChange}
-                            onBlur={onBlur}
-                            error={errors.nameUa?.message}
-                            maxLength={MAIN_PAGE_VALIDATION.editPanel.name.max}
-                            isRequired
-                        />
-                    )}
-                />
-
-                <Controller
-                    name="nameEn"
-                    control={control}
-                    render={({ field: { onChange, onBlur, value, name } }) => (
-                        <InputWithCharacterLimitGroup
-                            id={`raised-metric-en-${metric.id}`}
-                            name={name}
-                            label={MAIN_PAGE_TEXT.BLOCKS.EDIT_PANEL.ENG_NAME_LABEL}
-                            value={value}
-                            onChange={onChange}
-                            onBlur={onBlur}
-                            error={errors.nameEn?.message}
-                            maxLength={MAIN_PAGE_VALIDATION.editPanel.name.max}
-                            isRequired
-                        />
-                    )}
-                />
+                <MetricNameFields metricId={metric.id} control={control} errors={errors} idPrefix="raised-metric" />
             </div>
 
             <div className={styles.divider} />

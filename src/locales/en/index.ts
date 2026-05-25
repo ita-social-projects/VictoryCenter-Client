@@ -10,6 +10,7 @@ import reportsPageEn from './reports.json';
 import globalEn from './global.json';
 import partnersPageEn from './partners.json';
 import contactUsPageEn from './contact-us.json';
+import supportUsEn from './support-us.json';
 
 export {
     headerEn,
@@ -24,4 +25,5 @@ export {
     partnersPageEn,
     globalEn,
     contactUsPageEn,
+    supportUsEn,
 };

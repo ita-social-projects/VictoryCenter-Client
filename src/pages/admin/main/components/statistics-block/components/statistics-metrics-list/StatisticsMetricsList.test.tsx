@@ -1,5 +1,5 @@
-import { Metric, MetricPrefix, MetricType } from '@/types/admin/main-page';
-import { TranslationStatus } from '@/types/common/language';
+import { Metric } from '@/types/admin/main-page';
+import { metricPartners, metricRaised } from '@/utils/test-mocks/statistics-block-mocks';
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { StatisticsMetricsList } from './StatisticsMetricsList';
@@ -55,31 +55,7 @@ jest.mock('../raised-metric-edit-panel/RaisedMetricEditPanel', () => ({
     ),
 }));
 
-const metrics: Metric[] = [
-    {
-        id: 1,
-        name: 'Партнерів',
-        value: 20,
-        type: MetricType.Partners,
-        prefix: MetricPrefix.Plus,
-        isHidden: false,
-        priority: 1,
-        localizations: [
-            { language: { id: 1, code: 'uk' }, translationStatus: TranslationStatus.Relevant, name: 'Партнерів' },
-            { language: { id: 2, code: 'en' }, translationStatus: TranslationStatus.Relevant, name: 'Partners' },
-        ],
-    },
-    {
-        id: 2,
-        name: 'Зібрано',
-        value: 5000000,
-        type: MetricType.Raised,
-        prefix: MetricPrefix.None,
-        isHidden: false,
-        priority: 2,
-        localizations: [{ languageId: 2, name: 'Raised', value: '125000' } as any],
-    },
-];
+const metrics: Metric[] = [metricPartners, metricRaised];
 
 describe('StatisticsMetricsList', () => {
     const setup = (propsOverrides: Partial<React.ComponentProps<typeof StatisticsMetricsList>> = {}) => {

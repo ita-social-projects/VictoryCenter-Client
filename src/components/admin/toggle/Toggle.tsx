@@ -8,9 +8,20 @@ interface ToggleProps {
     id?: string;
     name?: string;
     className?: string;
+    ariaLabel?: string;
+    ariaLabelledBy?: string;
 }
 
-export const Toggle = ({ checked, onChange, disabled = false, id, name, className = '' }: ToggleProps) => {
+export const Toggle = ({
+    checked,
+    onChange,
+    disabled = false,
+    id,
+    name,
+    className = '',
+    ariaLabel,
+    ariaLabelledBy,
+}: ToggleProps) => {
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         if (disabled) return;
 
@@ -29,6 +40,8 @@ export const Toggle = ({ checked, onChange, disabled = false, id, name, classNam
                 disabled={disabled}
                 role="switch"
                 aria-checked={checked}
+                aria-label={ariaLabel}
+                aria-labelledby={ariaLabelledBy}
             />
             <span className={`${styles.track} ${checked ? styles.checked : ''}`}>
                 <span className={styles.thumb} />

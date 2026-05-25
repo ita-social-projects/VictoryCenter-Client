@@ -1,11 +1,15 @@
+import { yupResolver } from '@hookform/resolvers/yup';
 import { Controller, useForm } from 'react-hook-form';
 
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { MultiSelectInput } from '@/components/admin/multi-select-input/MultiSelectInput';
 import { MAIN_PAGE_TEXT, MAIN_PAGE_VALIDATION } from '@/const/admin/main-page';
 import { Metric, MetricPrefix } from '@/types/admin/main-page';
-import { formatNumberInput, formatWithSpaces } from '@/utils/functions/formatters/format-number';
-import { MetricFormValues } from '@/validation/admin/main-page-schema/metric-edit-schema/metric-edit-schema';
+import { formatCurrencyInput, formatWithSpaces } from '@/utils/functions/formatters/format-number';
+import {
+    MetricFormValues,
+    metricEditSchema,
+} from '@/validation/admin/main-page-schema/metric-edit-schema/metric-edit-schema';
 import { MetricEditActions } from '../common/metric-edit-actions/MetricEditActions';
 
 import styles from './StatisticsMetricEditPanel.module.scss';
@@ -35,6 +39,7 @@ export const StatisticsMetricEditPanel = ({ metric, onSave, onCancel }: Statisti
         formState: { errors, isValid },
     } = useForm<MetricFormValues>({
         mode: 'onBlur',
+        resolver: yupResolver(metricEditSchema),
         defaultValues: {
             nameUa: defaultNameUa,
             nameEn: defaultNameEn,
@@ -123,7 +128,7 @@ export const StatisticsMetricEditPanel = ({ metric, onSave, onCancel }: Statisti
                             name={name}
                             label={MAIN_PAGE_TEXT.BLOCKS.EDIT_PANEL.VALUE_LABEL}
                             value={value}
-                            onChange={(e) => onChange(formatNumberInput(e.target.value))}
+                            onChange={(e) => onChange(formatCurrencyInput(e.target.value))}
                             onBlur={onBlur}
                             error={errors.value?.message}
                             maxLength={15}

@@ -99,8 +99,13 @@ export function mapFormValuesToMainPagePatch(
             name: m.name,
             type: m.type,
             prefix: m.prefix,
-            localization:
-                enLanguageId && enLoc ? { languageId: enLanguageId, name: enLoc.name, value: enLoc.value } : undefined,
+            localization: enLoc
+                ? {
+                      ...(enLanguageId ? { languageId: enLanguageId } : {}),
+                      name: enLoc.name,
+                      value: enLoc.value,
+                  }
+                : undefined,
         } as UpdateMetricDto;
     });
 

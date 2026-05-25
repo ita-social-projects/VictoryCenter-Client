@@ -5,7 +5,7 @@ import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/in
 import { Toggle } from '@/components/admin/toggle/Toggle';
 import { MAIN_PAGE_TEXT, MAIN_PAGE_VALIDATION } from '@/const/admin/main-page';
 import { Metric, MetricLocalization, MetricPrefix } from '@/types/admin/main-page';
-import { formatNumberInput, formatWithSpaces } from '@/utils/functions/formatters/format-number';
+import { formatCurrencyInput, formatWithSpaces } from '@/utils/functions/formatters/format-number';
 import {
     RaisedMetricFormValues,
     raisedMetricEditSchema,
@@ -150,7 +150,12 @@ export const RaisedMetricEditPanel = ({ metric, onSave, onCancel }: RaisedMetric
                     name="isAutoSynced"
                     control={control}
                     render={({ field: { onChange, value } }) => (
-                        <Toggle id={`sync-toggle-${metric.id}`} checked={value} onChange={onChange} />
+                        <Toggle
+                            id={`sync-toggle-${metric.id}`}
+                            checked={value}
+                            onChange={onChange}
+                            ariaLabel="Автоматична синхронізація"
+                        />
                     )}
                 />
             </div>
@@ -165,7 +170,7 @@ export const RaisedMetricEditPanel = ({ metric, onSave, onCancel }: RaisedMetric
                             name={name}
                             label={MAIN_PAGE_TEXT.BLOCKS.EDIT_PANEL.UAH_VALUE_LABEL}
                             value={value}
-                            onChange={(e) => onChange(formatNumberInput(e.target.value))}
+                            onChange={(e) => onChange(formatCurrencyInput(e.target.value))}
                             onBlur={onBlur}
                             error={errors.valueUah?.message}
                             maxLength={15}
@@ -184,7 +189,7 @@ export const RaisedMetricEditPanel = ({ metric, onSave, onCancel }: RaisedMetric
                             name={name}
                             label={MAIN_PAGE_TEXT.BLOCKS.EDIT_PANEL.USD_VALUE_LABEL}
                             value={value}
-                            onChange={(e) => onChange(formatNumberInput(e.target.value))}
+                            onChange={(e) => onChange(formatCurrencyInput(e.target.value))}
                             onBlur={onBlur}
                             error={errors.valueUsd?.message}
                             maxLength={15}

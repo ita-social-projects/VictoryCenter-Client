@@ -1,4 +1,5 @@
 import {
+    formatCurrencyInput,
     formatNumberDecimalComma,
     formatNumberInput,
     formatWithSpaces,
@@ -64,6 +65,41 @@ describe('format-number formatters', () => {
             expect(formatNumberInput('')).toBe('');
             expect(formatNumberInput('abc')).toBe('');
             expect(formatNumberInput('!@#$')).toBe('');
+        });
+    });
+
+    describe('formatCurrencyInput', () => {
+        it('returns the string unchanged if it contains letters', () => {
+            expect(formatCurrencyInput('abc')).toBe('abc');
+            expect(formatCurrencyInput('12abc')).toBe('12abc');
+            expect(formatCurrencyInput('1a2')).toBe('1a2');
+        });
+
+        it('formats integers with spaces as thousands separators', () => {
+            expect(formatCurrencyInput('1000')).toBe('1 000');
+            expect(formatCurrencyInput('1234567')).toBe('1 234 567');
+        });
+
+        it('replaces comma with dot before formatting', () => {
+            expect(formatCurrencyInput('1000,50')).toBe('1 000.50');
+            expect(formatCurrencyInput('999,9')).toBe('999.9');
+        });
+
+        it('truncates the decimal part to 2 decimal places', () => {
+            expect(formatCurrencyInput('100.999')).toBe('100.99');
+            expect(formatCurrencyInput('1.1234')).toBe('1.12');
+        });
+
+        it('ignores extra periods (more than one)', () => {
+            expect(formatCurrencyInput('1.2.3')).toBe('1.23');
+        });
+
+        it('returns empty string for empty input', () => {
+            expect(formatCurrencyInput('')).toBe('');
+        });
+
+        it('correctly handles spaces in the input (considered valid)', () => {
+            expect(formatCurrencyInput('1 000')).toBe('1 000');
         });
     });
 });

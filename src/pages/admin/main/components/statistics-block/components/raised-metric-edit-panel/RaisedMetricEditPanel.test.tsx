@@ -150,7 +150,7 @@ describe('RaisedMetricEditPanel', () => {
             });
         });
 
-        it('shows inline error for negative numbers', async () => {
+        it('shows inline error for non-numeric input (e.g. minus sign)', async () => {
             render(<RaisedMetricEditPanel metric={createMetric()} onCancel={jest.fn()} />);
 
             fireEvent.click(screen.getByRole('switch'));
@@ -163,7 +163,7 @@ describe('RaisedMetricEditPanel', () => {
             fireEvent.blur(usdInput);
 
             await waitFor(() => {
-                expect(screen.getByText(MAIN_PAGE_VALIDATION.raisedFunds.NEGATIVE)).toBeInTheDocument();
+                expect(screen.getByText(MAIN_PAGE_VALIDATION.raisedFunds.ONLY_NUMBERS)).toBeInTheDocument();
             });
         });
 

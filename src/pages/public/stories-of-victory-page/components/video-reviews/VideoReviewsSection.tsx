@@ -38,7 +38,7 @@ export const VideoReviewsSection: React.FC<VideoReviewsSectionProps> = ({ conten
         }
     };
 
-    const handleVideoEnd = (videoId: number) => {
+    const handleVideoEnd = (_videoId: number) => {
         setPlayingVideoId(null);
     };
 

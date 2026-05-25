@@ -1,8 +1,8 @@
 export enum ContentType {
     Review,
-    Name
+    Name,
 }
 
 export enum SectionType {
-    Reviews
+    Reviews,
 }

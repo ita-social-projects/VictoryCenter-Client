@@ -1,5 +1,4 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import { SloganSection } from './components/slogan/SloganSection';
 import { LoadableContent } from '@/components/common/loadable-content/LoadableContent';
 import { ReviewsSection } from './components/reviews/ReviewsSection';
@@ -79,8 +78,6 @@ const reviewVideos: StoriesOfVictoryReviewVideo[] = [
 ];
 
 export const StoriesOfVictoryPage: React.FC<StoriesOfVictoryPageProps> = () => {
-    const { t } = useTranslation('successPage');
-
     return (
         <LoadableContent isLoading={false} error={false}>
             {

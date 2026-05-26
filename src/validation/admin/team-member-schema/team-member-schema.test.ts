@@ -86,6 +86,13 @@ describe('teamMemberValidationSchema', () => {
             expect(TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription(validDescription, true)).toBeUndefined();
         });
 
+        it('accepts description with multiple spaces when publishing', () => {
+            const descriptionWithMultipleSpaces = 'Valid  text with multiple spaces';
+            expect(
+                TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription(descriptionWithMultipleSpaces, true),
+            ).toBeUndefined();
+        });
+
         it('accepts valid image object with id property', () => {
             const imageWithId = { id: 123 };
             expect(TEAM_MEMBER_VALIDATION_FUNCTIONS.validateImage(imageWithId as any, true)).toBeUndefined();

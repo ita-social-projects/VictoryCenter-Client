@@ -4,7 +4,6 @@ import { ProgramExpensesSection } from './ProgramExpensesSection';
 import { FUNDS_EXPENDITURES_TEXT, PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
 import { ProgramExpensesReadOnlyData } from '@/types/admin/reports';
 import { ProgramExpensesApi } from '@/services/api/admin/reports/program-expenses-api';
-import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 
 const MOCK_PROGRAM_EXPENSES_DATA: ProgramExpensesReadOnlyData = {
     exchangeRate: '41.25',

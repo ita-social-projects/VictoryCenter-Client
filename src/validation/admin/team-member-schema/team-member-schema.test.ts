@@ -54,7 +54,9 @@ describe('teamMemberValidationSchema', () => {
 
         it('accepts description with multiple spaces', () => {
             const descriptionWithMultipleSpaces = 'Valid  text with multiple spaces';
-            expect(TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription(descriptionWithMultipleSpaces, false)).toBeUndefined();
+            expect(
+                TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription(descriptionWithMultipleSpaces, false),
+            ).toBeUndefined();
         });
         it('rejects empty description when not publishing', () => {
             expect(TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription('', false)).toBe(

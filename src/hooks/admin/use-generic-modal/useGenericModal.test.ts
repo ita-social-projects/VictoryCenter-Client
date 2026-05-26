@@ -127,6 +127,24 @@ describe('useGenericModal', () => {
         expect(onClose).not.toHaveBeenCalled();
     });
 
+    it('handleDismissConfirmation hides the action confirmation and resets pending state without closing the modal', () => {
+        const { result } = renderHook(() => useGenericModal(defaultConfig));
+
+        result.current.formRef.current = makeFormRef({ isValid: () => true });
+        act(() => {
+            result.current.handleFormSubmit({ field: 'value' }, VisibilityStatus.Published);
+        });
+        expect(result.current.showFormConfirmModal).toBe(true);
+
+        act(() => {
+            result.current.handleDismissConfirmation();
+        });
+
+        expect(result.current.showFormConfirmModal).toBe(false);
+        expect(result.current.isSubmitting).toBe(false);
+        expect(onClose).not.toHaveBeenCalled();
+    });
+
     it('handleConfirmAction does nothing if no pending data', async () => {
         const { result } = renderHook(() => useGenericModal(defaultConfig));
         await act(async () => {

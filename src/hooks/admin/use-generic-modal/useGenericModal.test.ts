@@ -114,11 +114,17 @@ describe('useGenericModal', () => {
         expect(result.current.showFormConfirmModal).toBe(true);
     });
 
-    it('handleCancelConfirmation resets pending state', () => {
+    it('handleCancelConfirmation hides the action confirmation and resets pending state', () => {
         const { result } = renderHook(() => useGenericModal(defaultConfig));
         act(() => result.current.handleCancelConfirmation());
         expect(result.current.showFormConfirmModal).toBe(false);
         expect(result.current.isSubmitting).toBe(false);
+    });
+
+    it('handleCancelConfirmation does NOT close the parent modal (regression: "НІ" must keep edit modal open)', () => {
+        const { result } = renderHook(() => useGenericModal(defaultConfig));
+        act(() => result.current.handleCancelConfirmation());
+        expect(onClose).not.toHaveBeenCalled();
     });
 
     it('handleConfirmAction does nothing if no pending data', async () => {

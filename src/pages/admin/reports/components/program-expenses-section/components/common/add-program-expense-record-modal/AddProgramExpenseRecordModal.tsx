@@ -11,6 +11,7 @@ import { useProgramExpenseRecordForm } from '@/hooks/admin/use-program-expense-r
 import { ProgramExpensesProgram, ProgramExpensesRecord } from '@/types/admin/reports';
 import { getReportingYearOptions } from '@/utils/functions/get-reporting-year-options/get-reporting-year-options';
 import styles from './AddProgramExpenseRecordModal.module.scss';
+import { ReactComponent as InfoIcon } from '@/assets/icons/info.svg';
 
 interface AddProgramExpenseRecordModalProps {
     isOpen: boolean;
@@ -120,16 +121,19 @@ export const AddProgramExpenseRecordModal = ({
         isProgramSelectDisabled,
         isDirty,
         isSubmitDisabled,
+        usdMismatchMessage,
         handleReportingYearChange,
         handleReportingYearBlur,
         handleProgramChange,
         handleProgramBlur,
         handleAmountChange,
+        handleUsdChange,
         handleAmountBlur,
     } = useProgramExpenseRecordForm({
         isOpen,
         programs,
         records,
+        exchangeRate,
     });
 
     const { isCloseConfirmOpen, handleRequestClose, handleConfirmClose, handleCancelClose } =
@@ -222,7 +226,7 @@ export const AddProgramExpenseRecordModal = ({
                                 label={FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.AMOUNT_UAH_LABEL}
                                 value={formState.amountUah}
                                 error={formState.errors.amountUah}
-                                onChange={(event) => handleAmountChange('amountUah', event.target.value)}
+                                onChange={(event) => handleAmountChange(event.target.value)}
                                 onBlur={() => handleAmountBlur('amountUah')}
                             />
 
@@ -233,9 +237,15 @@ export const AddProgramExpenseRecordModal = ({
                                 value={formState.amountUsd}
                                 error={formState.errors.amountUsd}
                                 headerAddon={<ExchangeRateChip exchangeRate={exchangeRate} />}
-                                onChange={(event) => handleAmountChange('amountUsd', event.target.value)}
+                                onChange={(event) => handleUsdChange(event.target.value)}
                                 onBlur={() => handleAmountBlur('amountUsd')}
                             />
+                            {usdMismatchMessage && (
+                                <div className={styles.info}>
+                                    <InfoIcon className={styles['info-icon']} aria-hidden="true" />
+                                    <p className={styles['info-text']}>{usdMismatchMessage}</p>
+                                </div>
+                            )}
                         </div>
 
                         <div className={styles.actions}>

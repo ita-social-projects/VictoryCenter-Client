@@ -45,12 +45,7 @@
 }
 
 .title {
-    font-family: t.$font-family-base;
-    font-weight: t.$fw-medium;
-    font-size: 36px;
-    line-height: 44px;
-    letter-spacing: t.$ls-tight;
-    text-transform: uppercase;
+    @include type.hero-title-medium-uppercase;
     text-align: center;
     max-width: 340px;
 

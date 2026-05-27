@@ -12,6 +12,8 @@ const TestComponent = ({ threshold }: { threshold?: number }) => {
 };
 
 describe('useScrollAnimation', () => {
+    const originalIO = (global as any).IntersectionObserver;
+
     beforeEach(() => {
         mockObserve.mockReset();
         mockDisconnect.mockReset();
@@ -19,6 +21,10 @@ describe('useScrollAnimation', () => {
             ioCallback = cb;
             return { observe: mockObserve, disconnect: mockDisconnect };
         });
+    });
+
+    afterEach(() => {
+        (global as any).IntersectionObserver = originalIO;
     });
 
     it('should start as not visible', () => {

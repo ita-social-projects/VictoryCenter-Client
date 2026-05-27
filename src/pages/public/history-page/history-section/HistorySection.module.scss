@@ -21,11 +21,8 @@
 }
 
 .year-label {
-    font-size: 14px;
-    line-height: 20px;
-    font-weight: t.$fw-semibold;
+    @include type.small-text-semibold;
     font-style: italic;
-    letter-spacing: t.$ls-tight;
     display: inline-flex;
     align-items: center;
     justify-content: flex-end;

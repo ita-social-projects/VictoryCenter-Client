@@ -87,7 +87,7 @@ export const HIGHLIGHTED_DATES: Record<string, LineConfig> = {
     '06/2024': {
         xl: 550,
         mobile: 700,
-        showFrom: 'tablet',
+        showFrom: 'desktop',
         side: 'left',
         photo: {
             src: paramedicPhoto,

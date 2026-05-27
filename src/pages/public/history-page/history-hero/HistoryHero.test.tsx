@@ -5,6 +5,12 @@ jest.mock('react-i18next', () => ({
     useTranslation: () => ({ t: (key: string) => key }),
 }));
 
+global.ResizeObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+};
+
 jest.mock('../history-timeline/HistoryTimeline', () => ({
     HistoryTimeline: () => <div data-testid="history-timeline" />,
 }));

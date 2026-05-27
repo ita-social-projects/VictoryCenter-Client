@@ -103,10 +103,10 @@
 }
 
 .date--line-top-anchor .date-line {
-    height: calc(100svh - 178px);
+    height: var(--safe-topanchor-line, min(var(--line-mobile, 0px), max(97px, calc(100svh - 645px))));
 
     @media (min-width: 768px) and (max-width: 1439px) {
-        height: calc(100svh - 188px);
+        height: var(--safe-topanchor-line, min(var(--line-mobile, 0px), max(150px, calc(100svh - 760px))));
     }
 
     @media (min-width: 1440px) {
@@ -115,10 +115,10 @@
 }
 
 .date--line-top-anchor .photo-card {
-    bottom: calc(100% + 2px + (100svh - 178px));
+    bottom: calc(100% + 2px + var(--safe-topanchor-line, min(var(--line-mobile, 0px), max(97px, calc(100svh - 645px)))));
 
     @media (min-width: 768px) and (max-width: 1439px) {
-        bottom: calc(100% + 2px + (100svh - 188px));
+        bottom: calc(100% + 2px + var(--safe-topanchor-line, min(var(--line-mobile, 0px), max(150px, calc(100svh - 760px)))));
     }
 
     @media (min-width: 1440px) {
@@ -133,10 +133,10 @@
     transform: translateX(-50%);
     width: 1px;
     background-color: c.$light-blue-500;
-    height: min(var(--line-mobile, 0px), max(97px, calc(100svh - 645px)));
+    height: min(var(--safe-director-line, var(--line-mobile, 0px)), min(var(--line-mobile, 0px), max(97px, calc(100svh - 645px))));
 
     @media (min-width: 768px) and (max-width: 1439px) {
-        height: min(var(--line-mobile, 0px), max(150px, calc(100svh - 760px)));
+        height: min(var(--safe-director-line, var(--line-mobile, 0px)), min(var(--line-mobile, 0px), max(150px, calc(100svh - 760px))));
     }
 
     @media (min-width: 1440px) {
@@ -146,14 +146,14 @@
 
 .photo-card {
     position: absolute;
-    bottom: calc(100% + 2px + min(var(--line-mobile, 0px), max(97px, calc(100svh - 645px))));
+    bottom: calc(100% + 2px + min(var(--safe-director-line, var(--line-mobile, 0px)), min(var(--line-mobile, 0px), max(97px, calc(100svh - 645px)))));
     left: 50%;
     flex-direction: column;
     gap: 4px;
     display: none;
 
     @media (min-width: 768px) and (max-width: 1439px) {
-        bottom: calc(100% + 2px + min(var(--line-mobile, 0px), max(150px, calc(100svh - 760px))));
+        bottom: calc(100% + 2px + min(var(--safe-director-line, var(--line-mobile, 0px)), min(var(--line-mobile, 0px), max(150px, calc(100svh - 760px)))));
     }
 
     @media (min-width: 1440px) {
@@ -217,4 +217,14 @@
     @include type.small-text-regular;
     color: c.$grey-700;
     flex-shrink: 0;
+}
+
+@media (max-height: 644px) {
+    .date-line {
+        display: none !important;
+    }
+
+    .photo-card {
+        display: none !important;
+    }
 }

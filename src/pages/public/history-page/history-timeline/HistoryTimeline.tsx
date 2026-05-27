@@ -14,7 +14,12 @@ const getLineClass = (config: LineConfig): string => {
     return config.topAnchor ? `${visClass} ${styles['date--line-top-anchor']}` : visClass;
 };
 
-export const HistoryTimeline = () => {
+interface HistoryTimelineProps {
+    safeTopAnchorLine?: number;
+    safeDirectorLine?: number;
+}
+
+export const HistoryTimeline = ({ safeTopAnchorLine, safeDirectorLine }: HistoryTimelineProps) => {
     const { t } = useTranslation('historyPage');
 
     return (
@@ -36,6 +41,12 @@ export const HistoryTimeline = () => {
                                     ? ({
                                           '--line-mobile': `${config.mobile}px`,
                                           '--line-xl': `${config.xl}px`,
+                                          ...(config.topAnchor && safeTopAnchorLine !== undefined
+                                              ? { '--safe-topanchor-line': `${safeTopAnchorLine}px` }
+                                              : {}),
+                                          ...(!config.topAnchor && config.photo && safeDirectorLine !== undefined
+                                              ? { '--safe-director-line': `${safeDirectorLine}px` }
+                                              : {}),
                                       } as React.CSSProperties)
                                     : undefined
                             }

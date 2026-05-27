@@ -63,6 +63,7 @@ export interface Metric extends EntityWithLocalizations<MetricLocalization> {
     name: string;
     type: MetricType;
     prefix?: MetricPrefix | null;
+    isAutoSynced?: boolean;
     isHidden: boolean;
     priority: number;
 }
@@ -133,6 +134,7 @@ export interface MetricDto extends EntityWithDtoLocalizations<MetricLocalization
     name?: string | null;
     type?: MetricType;
     prefix?: MetricPrefix | null;
+    isAutoSynced?: boolean;
     isHidden?: boolean;
     priority?: number;
 }
@@ -250,6 +252,7 @@ export interface UpdateMetricDto {
     name: string;
     type: MetricType;
     prefix?: MetricPrefix | null;
+    isAutoSynced?: boolean;
     localization?: UpdateMetricLocalizationDto | null;
 }
 

@@ -78,6 +78,57 @@ describe('RaisedMetricEditPanel', () => {
         });
     });
 
+    it('uses saved auto-sync state and makes values editable immediately after switching it off', async () => {
+        render(<RaisedMetricEditPanel metric={createMetric({ isAutoSynced: true })} onCancel={jest.fn()} />);
+
+        const uahInput = screen.getByLabelText(MAIN_PAGE_TEXT.BLOCKS.EDIT_PANEL.UAH_VALUE_LABEL, { exact: false });
+        const usdInput = screen.getByLabelText(MAIN_PAGE_TEXT.BLOCKS.EDIT_PANEL.USD_VALUE_LABEL, { exact: false });
+
+        expect(screen.getByRole('switch')).toBeChecked();
+        expect(uahInput).toBeDisabled();
+        expect(usdInput).toBeDisabled();
+        expect(uahInput).toHaveValue('1 000 000');
+        expect(usdInput).toHaveValue('25 000');
+
+        fireEvent.click(screen.getByRole('switch'));
+
+        await waitFor(() => {
+            expect(uahInput).not.toBeDisabled();
+            expect(usdInput).not.toBeDisabled();
+            expect(uahInput).toHaveValue('1 000 000');
+            expect(usdInput).toHaveValue('25 000');
+        });
+    });
+
+    it('preserves decimal raised values on save', async () => {
+        const onSaveMock = jest.fn();
+        render(<RaisedMetricEditPanel metric={createMetric()} onSave={onSaveMock} onCancel={jest.fn()} />);
+
+        const uahInput = screen.getByLabelText(MAIN_PAGE_TEXT.BLOCKS.EDIT_PANEL.UAH_VALUE_LABEL, { exact: false });
+        const usdInput = screen.getByLabelText(MAIN_PAGE_TEXT.BLOCKS.EDIT_PANEL.USD_VALUE_LABEL, { exact: false });
+
+        fireEvent.change(uahInput, { target: { value: '1234567,89' } });
+        fireEvent.change(usdInput, { target: { value: '30000.75' } });
+        fireEvent.blur(uahInput);
+        fireEvent.blur(usdInput);
+
+        const saveButton = screen.getByTestId('mock-save');
+
+        await waitFor(() => {
+            expect(saveButton).not.toBeDisabled();
+        });
+
+        fireEvent.click(saveButton);
+
+        await waitFor(() => {
+            const savedMetric = onSaveMock.mock.calls[0][0];
+            const engLocalization = savedMetric.localizations.find((l: any) => l.languageId === 2);
+
+            expect(savedMetric.value).toBe(1234567.89);
+            expect(engLocalization.value).toBe('30000.75');
+        });
+    });
+
     it('calls onSave with updated values mapped correctly', async () => {
         const onSaveMock = jest.fn();
         render(<RaisedMetricEditPanel metric={createMetric()} onSave={onSaveMock} onCancel={jest.fn()} />);
@@ -115,9 +166,6 @@ describe('RaisedMetricEditPanel', () => {
         it('shows inline error when input is emptied and removes it when corrected', async () => {
             render(<RaisedMetricEditPanel metric={createMetric()} onCancel={jest.fn()} />);
 
-            const syncToggle = screen.getByRole('switch');
-            fireEvent.click(syncToggle);
-
             const uahInput = await screen.findByLabelText(MAIN_PAGE_TEXT.BLOCKS.EDIT_PANEL.UAH_VALUE_LABEL, {
                 exact: false,
             });
@@ -141,10 +189,8 @@ describe('RaisedMetricEditPanel', () => {
             });
         });
 
-        it('shows inline error for non-numeric input (e.g. minus sign)', async () => {
+        it('shows inline error for negative input', async () => {
             render(<RaisedMetricEditPanel metric={createMetric()} onCancel={jest.fn()} />);
-
-            fireEvent.click(screen.getByRole('switch'));
 
             const usdInput = await screen.findByLabelText(MAIN_PAGE_TEXT.BLOCKS.EDIT_PANEL.USD_VALUE_LABEL, {
                 exact: false,
@@ -154,14 +200,12 @@ describe('RaisedMetricEditPanel', () => {
             fireEvent.blur(usdInput);
 
             await waitFor(() => {
-                expect(screen.getByText(MAIN_PAGE_VALIDATION.raisedFunds.ONLY_NUMBERS)).toBeInTheDocument();
+                expect(screen.getByText(MAIN_PAGE_VALIDATION.raisedFunds.NEGATIVE)).toBeInTheDocument();
             });
         });
 
         it('shows inline error for zero', async () => {
             render(<RaisedMetricEditPanel metric={createMetric()} onCancel={jest.fn()} />);
-
-            fireEvent.click(screen.getByRole('switch'));
 
             const uahInput = await screen.findByLabelText(MAIN_PAGE_TEXT.BLOCKS.EDIT_PANEL.UAH_VALUE_LABEL, {
                 exact: false,

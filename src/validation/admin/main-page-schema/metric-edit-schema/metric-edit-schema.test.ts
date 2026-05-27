@@ -64,6 +64,12 @@ describe('raisedMetricEditSchema', () => {
         await expect(raisedMetricEditSchema.validate(validRaisedPayload)).resolves.toEqual(validRaisedPayload);
     });
 
+    it('accepts decimal payload values with dot or comma separators', async () => {
+        const payload = { ...validRaisedPayload, valueUah: '1 000,50', valueUsd: '25 000.75' };
+
+        await expect(raisedMetricEditSchema.validate(payload)).resolves.toEqual(payload);
+    });
+
     it('requires nameUa and nameEn', async () => {
         await expect(raisedMetricEditSchema.validate({ ...validRaisedPayload, nameUa: '' })).rejects.toThrow(
             MAIN_PAGE_VALIDATION.common.REQUIRED,
@@ -79,15 +85,27 @@ describe('raisedMetricEditSchema', () => {
         ).rejects.toThrow(MAIN_PAGE_VALIDATION.common.REQUIRED);
     });
 
-    it('requires positive UAH value', async () => {
+    it('rejects zero UAH value with zero-specific message', async () => {
         await expect(raisedMetricEditSchema.validate({ ...validRaisedPayload, valueUah: '0' })).rejects.toThrow(
             MAIN_PAGE_VALIDATION.raisedFunds.ZERO,
         );
     });
 
-    it('requires positive USD value', async () => {
+    it('rejects negative USD value with negative-specific message', async () => {
         await expect(raisedMetricEditSchema.validate({ ...validRaisedPayload, valueUsd: '-100' })).rejects.toThrow(
+            MAIN_PAGE_VALIDATION.raisedFunds.NEGATIVE,
+        );
+    });
+
+    it('rejects non-numeric value', async () => {
+        await expect(raisedMetricEditSchema.validate({ ...validRaisedPayload, valueUsd: 'abc' })).rejects.toThrow(
             MAIN_PAGE_VALIDATION.raisedFunds.ONLY_NUMBERS,
         );
+    });
+
+    it('rejects values with more than 9 digits before decimal separator', async () => {
+        await expect(
+            raisedMetricEditSchema.validate({ ...validRaisedPayload, valueUah: '1 000 000 000,50' }),
+        ).rejects.toThrow(MAIN_PAGE_VALIDATION.raisedFunds.MAX_DIGITS);
     });
 });

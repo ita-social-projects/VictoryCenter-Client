@@ -1,4 +1,5 @@
 import { Metric, MetricPrefix, MetricType } from '@/types/admin/main-page';
+import { parseFormattedNumber } from '@/utils/functions/formatters/format-number';
 
 export const getMetricName = (metric: Metric, language: 'UA' | 'EN' = 'UA') => {
     const code = language === 'UA' ? 'uk' : 'en';
@@ -25,8 +26,8 @@ export const formatMetricValue = (metric: Metric, language: 'UA' | 'EN' = 'UA') 
         );
 
         if (enLoc && enLoc.value) {
-            const parsedValue = parseInt(enLoc.value, 10);
-            if (!isNaN(parsedValue)) {
+            const parsedValue = parseFormattedNumber(enLoc.value);
+            if (parsedValue !== null) {
                 numValue = parsedValue;
             }
         }

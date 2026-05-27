@@ -5,7 +5,12 @@ import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/in
 import { Toggle } from '@/components/admin/toggle/Toggle';
 import { MAIN_PAGE_TEXT } from '@/const/admin/main-page';
 import { Metric, MetricLocalization, MetricPrefix } from '@/types/admin/main-page';
-import { formatCurrencyInput, formatWithSpaces } from '@/utils/functions/formatters/format-number';
+import {
+    formatCurrencyInput,
+    formatWithSpaces,
+    normalizeFormattedNumber,
+    parseFormattedNumber,
+} from '@/utils/functions/formatters/format-number';
 import {
     RaisedMetricFormValues,
     raisedMetricEditSchema,
@@ -25,10 +30,10 @@ export const RaisedMetricEditPanel = ({ metric, onSave, onCancel }: RaisedMetric
     const usdLocalization = metric.localizations?.find((l) => l.languageId === 2);
     const defaultNameEn = usdLocalization?.name || '';
 
-    const defaultIsAutoSynced = false;
+    const defaultIsAutoSynced = metric.isAutoSynced ?? false;
 
     const defaultValueUah = formatWithSpaces(metric.value ?? 0);
-    const defaultValueUsd = formatWithSpaces(usdLocalization?.value ? parseInt(usdLocalization.value, 10) : 0);
+    const defaultValueUsd = formatWithSpaces(usdLocalization?.value ?? 0);
 
     const {
         control,
@@ -61,7 +66,8 @@ export const RaisedMetricEditPanel = ({ metric, onSave, onCancel }: RaisedMetric
         currentValueUsd !== defaultValueUsd;
 
     const onValidSubmit = (data: RaisedMetricFormValues) => {
-        const cleanUsdValue = data.valueUsd.replace(/\s/g, '');
+        const cleanUsdValue = normalizeFormattedNumber(data.valueUsd);
+        const cleanUahValue = parseFormattedNumber(data.valueUah) ?? 0;
 
         let updatedLocalizations =
             metric.localizations?.map((loc) => {
@@ -86,10 +92,10 @@ export const RaisedMetricEditPanel = ({ metric, onSave, onCancel }: RaisedMetric
         const updatedMetric: Metric = {
             ...metric,
             name: data.nameUa.trim(),
-            value: parseInt(data.valueUah.replace(/\s/g, ''), 10),
+            value: cleanUahValue,
             prefix: metric.prefix ?? MetricPrefix.None,
             localizations: updatedLocalizations,
-            ...({ isAutoSynced: data.isAutoSynced } as any),
+            isAutoSynced: data.isAutoSynced,
         };
 
         if (onSave) onSave(updatedMetric);

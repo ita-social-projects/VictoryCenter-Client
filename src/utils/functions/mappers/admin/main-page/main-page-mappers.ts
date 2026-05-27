@@ -99,6 +99,7 @@ export function mapFormValuesToMainPagePatch(
             name: m.name,
             type: m.type,
             prefix: m.prefix,
+            isAutoSynced: m.isAutoSynced,
             localization: enLoc
                 ? {
                       ...(enLanguageId ? { languageId: enLanguageId } : {}),

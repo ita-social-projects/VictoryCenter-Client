@@ -3,6 +3,8 @@ import {
     formatNumberDecimalComma,
     formatNumberInput,
     formatWithSpaces,
+    normalizeFormattedNumber,
+    parseFormattedNumber,
 } from '@/utils/functions/formatters/format-number';
 
 describe('format-number formatters', () => {
@@ -16,8 +18,7 @@ describe('format-number formatters', () => {
             expect(formatNumberDecimalComma(123)).toBe('123');
             expect(formatNumberDecimalComma(123.45)).toBe('123,45');
             expect(formatNumberDecimalComma('1000.5')).toBe('1000,5');
-            // only the first dot is replaced (keeps previous behaviour)
-            expect(formatNumberDecimalComma('1.2.3')).toBe('1,2.3');
+            expect(formatNumberDecimalComma('1.2.3')).toBe('1,2,3');
         });
 
         it('leaves strings without dot unchanged', () => {
@@ -69,10 +70,10 @@ describe('format-number formatters', () => {
     });
 
     describe('formatCurrencyInput', () => {
-        it('returns the string unchanged if it contains letters', () => {
-            expect(formatCurrencyInput('abc')).toBe('abc');
-            expect(formatCurrencyInput('12abc')).toBe('12abc');
-            expect(formatCurrencyInput('1a2')).toBe('1a2');
+        it('removes invalid characters before formatting', () => {
+            expect(formatCurrencyInput('abc')).toBe('');
+            expect(formatCurrencyInput('12abc')).toBe('12');
+            expect(formatCurrencyInput('1a2')).toBe('12');
         });
 
         it('formats integers with spaces as thousands separators', () => {
@@ -83,6 +84,7 @@ describe('format-number formatters', () => {
         it('replaces comma with dot before formatting', () => {
             expect(formatCurrencyInput('1000,50')).toBe('1 000.50');
             expect(formatCurrencyInput('999,9')).toBe('999.9');
+            expect(formatCurrencyInput('1,2,3')).toBe('1.23');
         });
 
         it('truncates the decimal part to 2 decimal places', () => {
@@ -100,6 +102,28 @@ describe('format-number formatters', () => {
 
         it('correctly handles spaces in the input (considered valid)', () => {
             expect(formatCurrencyInput('1 000')).toBe('1 000');
+        });
+
+        it('preserves a leading minus for validation', () => {
+            expect(formatCurrencyInput('-1000.50')).toBe('-1 000.50');
+            expect(formatCurrencyInput('10-00')).toBe('1 000');
+        });
+    });
+
+    describe('formatted number parsing', () => {
+        it('normalizes spaces and comma separators', () => {
+            expect(normalizeFormattedNumber('1 234,50')).toBe('1234.50');
+        });
+
+        it('parses valid formatted decimal numbers', () => {
+            expect(parseFormattedNumber('1 234,50')).toBe(1234.5);
+            expect(parseFormattedNumber('1 234.50')).toBe(1234.5);
+            expect(parseFormattedNumber('-1 234.50')).toBe(-1234.5);
+        });
+
+        it('returns null for malformed values', () => {
+            expect(parseFormattedNumber('1.2.3')).toBeNull();
+            expect(parseFormattedNumber('abc')).toBeNull();
         });
     });
 });

@@ -129,6 +129,16 @@ describe('metric-formatters', () => {
                 expect(formatMetricValue(metric, 'EN')).toBe('120,000');
             });
 
+            it('should preserve decimal USD values from localization for EN locale', () => {
+                const metric = createRaisedMetric(5000000, '120000.75');
+                expect(formatMetricValue(metric, 'EN')).toBe('120,000.75');
+            });
+
+            it('should normalize formatted USD localization values before formatting', () => {
+                const metric = createRaisedMetric(5000000, '120 000,75');
+                expect(formatMetricValue(metric, 'EN')).toBe('120,000.75');
+            });
+
             it('should fall back to UAH value for EN locale if localization value is missing or invalid', () => {
                 const metric = createRaisedMetric(5000000, 'invalid-string');
                 expect(formatMetricValue(metric, 'EN')).toBe('5,000,000');

@@ -28,7 +28,7 @@ const Wrapper = ({
     defaultValues = { nameUa: '', nameEn: '' },
     errors = {},
 }: {
-    metricId?: number | undefined;
+    metricId?: number;
     idPrefix?: string;
     defaultValues?: { nameUa: string; nameEn: string };
     errors?: FieldErrors<{ nameUa: string; nameEn: string }>;

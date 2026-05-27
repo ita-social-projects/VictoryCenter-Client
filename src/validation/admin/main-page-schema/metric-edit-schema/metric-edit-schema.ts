@@ -1,9 +1,10 @@
 import { MAIN_PAGE_VALIDATION } from '@/const/admin/main-page';
 import { MetricPrefix } from '@/types/admin/main-page';
+import { normalizeFormattedNumber, parseFormattedNumber } from '@/utils/functions/formatters/format-number';
 import * as Yup from 'yup';
 
 const parseThousands = (value: string): number => {
-    return parseInt((value || '').replace(/\s/g, ''), 10) || 0;
+    return parseFormattedNumber(value || '') ?? 0;
 };
 
 const raisedFundsValidator = Yup.string()
@@ -14,23 +15,23 @@ const raisedFundsValidator = Yup.string()
     })
     .test('only-numbers', MAIN_PAGE_VALIDATION.raisedFunds.ONLY_NUMBERS, (val) => {
         if (!val) return false;
-        const stripped = val.replace(/\s/g, '').replace(',', '.');
-        return !isNaN(Number(stripped)) && /^[0-9.,]+$/.test(stripped);
+        const stripped = normalizeFormattedNumber(val);
+        return /^-?\d+(\.\d*)?$/.test(stripped) && parseFormattedNumber(val) !== null;
     })
     .test('not-negative', MAIN_PAGE_VALIDATION.raisedFunds.NEGATIVE, (val) => {
         if (!val) return false;
-        const stripped = val.replace(/\s/g, '').replace(',', '.');
-        return Number(stripped) >= 0;
+        const parsedValue = parseFormattedNumber(val);
+        return parsedValue !== null && parsedValue >= 0;
     })
     .test('not-zero', MAIN_PAGE_VALIDATION.raisedFunds.ZERO, (val) => {
         if (!val) return false;
-        const stripped = val.replace(/\s/g, '').replace(',', '.');
-        return Number(stripped) !== 0;
+        const parsedValue = parseFormattedNumber(val);
+        return parsedValue !== null && parsedValue !== 0;
     })
     .test('max-digits', MAIN_PAGE_VALIDATION.raisedFunds.MAX_DIGITS, (val) => {
         if (!val) return false;
-        const stripped = val.replace(/\s/g, '');
-        const beforeDecimal = stripped.split(/[.,]/)[0];
+        const stripped = normalizeFormattedNumber(val);
+        const beforeDecimal = stripped.split('.')[0].replace('-', '');
         return beforeDecimal.length <= 9;
     });
 

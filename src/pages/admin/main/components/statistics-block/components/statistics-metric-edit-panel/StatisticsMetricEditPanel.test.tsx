@@ -92,6 +92,18 @@ describe('StatisticsMetricEditPanel', () => {
         ]);
     });
 
+    it('preserves decimal value when saving', async () => {
+        const onSave = jest.fn();
+        render(<StatisticsMetricEditPanel metric={createMetric()} onSave={onSave} onCancel={jest.fn()} />);
+
+        fireEvent.change(screen.getByTestId('metric-val-1'), { target: { value: '2 345.75' } });
+        fireEvent.change(screen.getByTestId('metric-ua-1'), { target: { value: 'Нова UA' } });
+
+        const updatedMetric = await submitForm(onSave);
+
+        expect(updatedMetric.value).toBe(2345.75);
+    });
+
     it('uses fallback defaults when name and localizations are missing', () => {
         render(
             <StatisticsMetricEditPanel

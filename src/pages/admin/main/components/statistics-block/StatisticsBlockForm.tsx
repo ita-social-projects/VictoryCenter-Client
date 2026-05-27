@@ -70,7 +70,7 @@ export const StatisticsBlockForm = ({
             prefix: metric.prefix,
             isHidden: metric.isHidden,
             priority: metric.priority,
-            isAutoSynced: (metric as any).isAutoSynced ?? false,
+            isAutoSynced: metric.isAutoSynced ?? false,
             localizations: (metric.localizations ?? [])
                 .map((loc) => ({
                     languageId: loc.languageId ?? null,

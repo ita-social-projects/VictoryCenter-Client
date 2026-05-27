@@ -5,7 +5,11 @@ import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/in
 import { MultiSelectInput } from '@/components/admin/multi-select-input/MultiSelectInput';
 import { MAIN_PAGE_TEXT } from '@/const/admin/main-page';
 import { Metric, MetricPrefix } from '@/types/admin/main-page';
-import { formatCurrencyInput, formatWithSpaces } from '@/utils/functions/formatters/format-number';
+import {
+    formatCurrencyInput,
+    formatWithSpaces,
+    parseFormattedNumber,
+} from '@/utils/functions/formatters/format-number';
 import {
     MetricFormValues,
     metricEditSchema,
@@ -71,7 +75,7 @@ export const StatisticsMetricEditPanel = ({ metric, onSave, onCancel }: Statisti
         const updatedMetric: Metric = {
             ...metric,
             name: data.nameUa.trim(),
-            value: parseInt(data.value.replace(/\s/g, ''), 10),
+            value: parseFormattedNumber(data.value) ?? 0,
             prefix: data.prefix,
             localizations: updatedLocalizations,
         };

@@ -46,6 +46,21 @@ describe('RaisedMetricEditPanel', () => {
         expect(screen.getByRole('switch')).not.toBeChecked();
     });
 
+    it('renders formatted saved USD localization without blanking the field', () => {
+        const metric = createMetric({
+            localizations: [
+                { languageId: 1, name: 'Залучених коштів' },
+                { languageId: 2, name: 'Funds raised', value: '120 000' },
+            ] as MetricLocalization[],
+        });
+
+        render(<RaisedMetricEditPanel metric={metric} onCancel={jest.fn()} />);
+
+        expect(screen.getByLabelText(MAIN_PAGE_TEXT.BLOCKS.EDIT_PANEL.USD_VALUE_LABEL, { exact: false })).toHaveValue(
+            '120 000',
+        );
+    });
+
     it('enables Save button when form values are changed', async () => {
         render(<RaisedMetricEditPanel metric={createMetric()} onCancel={jest.fn()} />);
 

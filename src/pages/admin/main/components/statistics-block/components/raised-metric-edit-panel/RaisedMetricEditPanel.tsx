@@ -33,7 +33,8 @@ export const RaisedMetricEditPanel = ({ metric, onSave, onCancel }: RaisedMetric
     const defaultIsAutoSynced = metric.isAutoSynced ?? false;
 
     const defaultValueUah = formatWithSpaces(metric.value ?? 0);
-    const defaultValueUsd = formatWithSpaces(usdLocalization?.value ?? 0);
+    const parsedDefaultValueUsd = usdLocalization?.value ? parseFormattedNumber(usdLocalization.value) : null;
+    const defaultValueUsd = formatWithSpaces(parsedDefaultValueUsd ?? usdLocalization?.value ?? 0);
 
     const {
         control,

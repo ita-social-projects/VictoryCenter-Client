@@ -7,6 +7,12 @@ import {
     parseFormattedNumber,
 } from '@/utils/functions/formatters/format-number';
 
+const expectFormatCases = (formatter: (value: string) => string, cases: Array<[string, string]>) => {
+    cases.forEach(([input, expected]) => {
+        expect(formatter(input)).toBe(expected);
+    });
+};
+
 describe('format-number formatters', () => {
     describe('formatNumberDecimalComma', () => {
         it('returns empty string for null and undefined', () => {
@@ -71,25 +77,33 @@ describe('format-number formatters', () => {
 
     describe('formatCurrencyInput', () => {
         it('removes invalid characters before formatting', () => {
-            expect(formatCurrencyInput('abc')).toBe('');
-            expect(formatCurrencyInput('12abc')).toBe('12');
-            expect(formatCurrencyInput('1a2')).toBe('12');
+            expectFormatCases(formatCurrencyInput, [
+                ['abc', ''],
+                ['12abc', '12'],
+                ['1a2', '12'],
+            ]);
         });
 
         it('formats integers with spaces as thousands separators', () => {
-            expect(formatCurrencyInput('1000')).toBe('1 000');
-            expect(formatCurrencyInput('1234567')).toBe('1 234 567');
+            expectFormatCases(formatCurrencyInput, [
+                ['1000', '1 000'],
+                ['1234567', '1 234 567'],
+            ]);
         });
 
         it('replaces comma with dot before formatting', () => {
-            expect(formatCurrencyInput('1000,50')).toBe('1 000.50');
-            expect(formatCurrencyInput('999,9')).toBe('999.9');
-            expect(formatCurrencyInput('1,2,3')).toBe('1.23');
+            expectFormatCases(formatCurrencyInput, [
+                ['1000,50', '1 000.50'],
+                ['999,9', '999.9'],
+                ['1,2,3', '1.23'],
+            ]);
         });
 
         it('truncates the decimal part to 2 decimal places', () => {
-            expect(formatCurrencyInput('100.999')).toBe('100.99');
-            expect(formatCurrencyInput('1.1234')).toBe('1.12');
+            expectFormatCases(formatCurrencyInput, [
+                ['100.999', '100.99'],
+                ['1.1234', '1.12'],
+            ]);
         });
 
         it('ignores extra periods (more than one)', () => {
@@ -105,8 +119,10 @@ describe('format-number formatters', () => {
         });
 
         it('preserves a leading minus for validation', () => {
-            expect(formatCurrencyInput('-1000.50')).toBe('-1 000.50');
-            expect(formatCurrencyInput('10-00')).toBe('1 000');
+            expectFormatCases(formatCurrencyInput, [
+                ['-1000.50', '-1 000.50'],
+                ['10-00', '1 000'],
+            ]);
         });
     });
 

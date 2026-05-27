@@ -58,7 +58,14 @@ describe('StatisticsPreview', () => {
     });
 
     it('hides metrics by hiddenMetricIds', () => {
-        render(<StatisticsPreview language="UA" onLanguageChange={() => {}} metrics={metrics} hiddenMetricIds={[2]} />);
+        render(
+            <StatisticsPreview
+                language="UA"
+                onLanguageChange={() => {}}
+                metrics={metrics}
+                hiddenMetricIds={[metricEngagement.id ?? 0]}
+            />,
+        );
 
         expect(screen.getByText('Партнерів')).toBeInTheDocument();
         expect(screen.queryByText('Engagement')).not.toBeInTheDocument();

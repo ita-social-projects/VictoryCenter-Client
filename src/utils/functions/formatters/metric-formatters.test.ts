@@ -124,24 +124,14 @@ describe('metric-formatters', () => {
                 expect(normalizeSpaces(formatMetricValue(metric, 'UA'))).toBe('5 000 000');
             });
 
-            it('should extract and format USD value from localization for EN locale', () => {
-                const metric = createRaisedMetric(5000000, '120000');
-                expect(formatMetricValue(metric, 'EN')).toBe('120,000');
-            });
-
-            it('should preserve decimal USD values from localization for EN locale', () => {
-                const metric = createRaisedMetric(5000000, '120000.75');
-                expect(formatMetricValue(metric, 'EN')).toBe('120,000.75');
-            });
-
-            it('should normalize formatted USD localization values before formatting', () => {
-                const metric = createRaisedMetric(5000000, '120 000,75');
-                expect(formatMetricValue(metric, 'EN')).toBe('120,000.75');
-            });
-
-            it('should fall back to UAH value for EN locale if localization value is missing or invalid', () => {
-                const metric = createRaisedMetric(5000000, 'invalid-string');
-                expect(formatMetricValue(metric, 'EN')).toBe('5,000,000');
+            it.each([
+                ['extract and format USD value from localization', '120000', '120,000'],
+                ['preserve decimal USD values from localization', '120000.75', '120,000.75'],
+                ['normalize formatted USD localization values', '120 000,75', '120,000.75'],
+                ['fall back to UAH value when localization value is invalid', 'invalid-string', '5,000,000'],
+            ])('should %s for EN locale', (_caseName, usdValue, expectedValue) => {
+                const metric = createRaisedMetric(5000000, usdValue);
+                expect(formatMetricValue(metric, 'EN')).toBe(expectedValue);
             });
         });
     });

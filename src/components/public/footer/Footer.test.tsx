@@ -83,7 +83,7 @@ describe('Footer', () => {
         );
         expect(screen.getByRole('link', { name: footerUk['OUR_HISTORY'] })).toHaveAttribute(
             'href',
-            PUBLIC_ROUTES.MOCK.FULL,
+            PUBLIC_ROUTES.HISTORY.FULL,
         );
         expect(screen.getByRole('link', { name: footerUk['OUR_TEAM'] })).toHaveAttribute(
             'href',

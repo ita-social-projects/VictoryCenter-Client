@@ -30,6 +30,7 @@ import { LanguageSyncWrapper } from '@/components/public/language-sync-wrapper/L
 import { ReportsPanelContent } from '@/pages/admin/reports/components/reports-panel-content/ReportsPanelContent';
 import { HistoryPageContent } from '@/pages/admin/history/components/history-page-content/HistoryPageContent';
 import { MainPageContent } from '@/pages/admin/main/components/main-page-content/MainPageContent';
+import { HistoryPage } from '@/pages/public/history-page/HistoryPage';
 
 export const AppRouter = () => {
     const PublicContent = () => (
@@ -45,6 +46,7 @@ export const AppRouter = () => {
             <Route path={PUBLIC_ROUTES.DONATE.PATH} element={<DonatePage />} />
             <Route path={PUBLIC_ROUTES.REPORTS.PATH} element={<ReportsPage />} />
             <Route path={PUBLIC_ROUTES.CONTACT_US.PATH} element={<ContactUsPage />} />
+            <Route path={PUBLIC_ROUTES.HISTORY.PATH} element={<HistoryPage />} />
             <Route path="*" element={<NotFound />} />
         </Routes>
     );

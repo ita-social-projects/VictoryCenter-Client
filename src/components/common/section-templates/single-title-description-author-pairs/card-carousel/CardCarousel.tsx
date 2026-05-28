@@ -58,12 +58,12 @@ export const CardCarousel = ({ children, itemsCount, LeftIcon, RightIcon, varian
             const cardWidth = firstCard.getBoundingClientRect().width;
 
             const trackStyle = getComputedStyle(track);
-            const gap = parseFloat(trackStyle.gap) || 0;
+            const gap = Number.parseFloat(trackStyle.gap) || 0;
 
             const step = cardWidth + gap;
 
             const maxScroll = el.scrollWidth - el.clientWidth;
-            const currentScroll = targetScroll.current !== null ? targetScroll.current : el.scrollLeft;
+            const currentScroll = targetScroll.current ?? el.scrollLeft;
 
             const currentIndex = Math.round(currentScroll / step);
             let nextScroll = (currentIndex + dir) * step;

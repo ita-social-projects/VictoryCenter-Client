@@ -145,7 +145,7 @@ describe('CardCarousel', () => {
         const { viewport } = setup();
 
         const scrollToMock = jest.fn();
-        (viewport as any).scrollTo = scrollToMock;
+        viewport.scrollTo = scrollToMock;
 
         const firstCard = viewport.querySelector('.track > *');
         if (firstCard) {
@@ -154,7 +154,7 @@ describe('CardCarousel', () => {
 
         const track = viewport.querySelector('.track');
         if (track) {
-            jest.spyOn(window, 'getComputedStyle').mockImplementation((elem) => {
+            jest.spyOn(globalThis, 'getComputedStyle').mockImplementation((elem) => {
                 if (elem === track) return { gap: '5px' } as CSSStyleDeclaration;
                 return {} as CSSStyleDeclaration;
             });
@@ -170,7 +170,7 @@ describe('CardCarousel', () => {
         const { viewport } = setup();
 
         const scrollToMock = jest.fn();
-        (viewport as any).scrollTo = scrollToMock;
+        viewport.scrollTo = scrollToMock;
 
         const firstCard = viewport.querySelector('.track > *');
         if (firstCard) {
@@ -179,7 +179,7 @@ describe('CardCarousel', () => {
 
         const track = viewport.querySelector('.track');
         if (track) {
-            jest.spyOn(window, 'getComputedStyle').mockImplementation((elem) => {
+            jest.spyOn(globalThis, 'getComputedStyle').mockImplementation((elem) => {
                 if (elem === track) return { gap: '5px' } as CSSStyleDeclaration;
                 return {} as CSSStyleDeclaration;
             });
@@ -197,7 +197,7 @@ describe('CardCarousel', () => {
         const { viewport } = setup();
 
         const scrollToMock = jest.fn();
-        (viewport as any).scrollTo = scrollToMock;
+        viewport.scrollTo = scrollToMock;
 
         const firstCard = viewport.querySelector('.track > *');
         if (firstCard) {
@@ -206,7 +206,7 @@ describe('CardCarousel', () => {
 
         const track = viewport.querySelector('.track');
         if (track) {
-            jest.spyOn(window, 'getComputedStyle').mockImplementation((elem) => {
+            jest.spyOn(globalThis, 'getComputedStyle').mockImplementation((elem) => {
                 if (elem === track) return { gap: 'nope' } as CSSStyleDeclaration;
                 return {} as CSSStyleDeclaration;
             });

@@ -48,6 +48,30 @@ const mockCssVars = (vars: Record<string, string>) => {
         }) as any) as any;
 };
 
+const setupScrollMock = (gapValue: string, initialScrollLeft: number) => {
+    const { viewport } = setup();
+
+    const scrollToMock = jest.fn();
+    viewport.scrollTo = scrollToMock;
+
+    const firstCard = viewport.querySelector('.track > *');
+    if (firstCard) {
+        firstCard.getBoundingClientRect = jest.fn(() => ({ width: 10 }) as DOMRect);
+    }
+
+    const track = viewport.querySelector('.track');
+    if (track) {
+        jest.spyOn(globalThis, 'getComputedStyle').mockImplementation((elem) => {
+            if (elem === track) return { gap: gapValue } as CSSStyleDeclaration;
+            return {} as CSSStyleDeclaration;
+        });
+    }
+
+    sync(viewport, { scrollLeft: initialScrollLeft, clientWidth: 100, scrollWidth: 200 });
+
+    return { scrollToMock };
+};
+
 const setup = (props: Partial<React.ComponentProps<typeof CardCarousel>> = {}) => {
     mockNavButton.mockClear();
 
@@ -93,6 +117,7 @@ describe('CardCarousel', () => {
         window.getComputedStyle = originalGetComputedStyle;
         window.requestAnimationFrame = originalRaf;
         mockNavButton.mockClear();
+        jest.restoreAllMocks();
     });
 
     it('renders children', () => {
@@ -142,82 +167,27 @@ describe('CardCarousel', () => {
     });
 
     it('scrolls forward on right click', () => {
-        const { viewport } = setup();
+        const { scrollToMock } = setupScrollMock('5px', 0);
 
-        const scrollToMock = jest.fn();
-        viewport.scrollTo = scrollToMock;
-
-        const firstCard = viewport.querySelector('.track > *');
-        if (firstCard) {
-            firstCard.getBoundingClientRect = jest.fn(() => ({ width: 10 }) as DOMRect);
-        }
-
-        const track = viewport.querySelector('.track');
-        if (track) {
-            jest.spyOn(globalThis, 'getComputedStyle').mockImplementation((elem) => {
-                if (elem === track) return { gap: '5px' } as CSSStyleDeclaration;
-                return {} as CSSStyleDeclaration;
-            });
-        }
-
-        sync(viewport, { scrollLeft: 0, clientWidth: 100, scrollWidth: 200 });
         fireEvent.click(screen.getByTestId('nav-right'));
 
         expect(scrollToMock).toHaveBeenCalledWith({ left: 15, behavior: 'smooth' });
     });
 
     it('scrolls backward on left click', () => {
-        const { viewport } = setup();
+        const { scrollToMock } = setupScrollMock('5px', 50);
 
-        const scrollToMock = jest.fn();
-        viewport.scrollTo = scrollToMock;
-
-        const firstCard = viewport.querySelector('.track > *');
-        if (firstCard) {
-            firstCard.getBoundingClientRect = jest.fn(() => ({ width: 10 }) as DOMRect);
-        }
-
-        const track = viewport.querySelector('.track');
-        if (track) {
-            jest.spyOn(globalThis, 'getComputedStyle').mockImplementation((elem) => {
-                if (elem === track) return { gap: '5px' } as CSSStyleDeclaration;
-                return {} as CSSStyleDeclaration;
-            });
-        }
-
-        sync(viewport, { scrollLeft: 50, clientWidth: 100, scrollWidth: 200 });
         fireEvent.click(screen.getByTestId('nav-left'));
 
         expect(scrollToMock).toHaveBeenCalledWith({ left: 30, behavior: 'smooth' });
-
-        jest.restoreAllMocks();
     });
 
     it('uses 0 for gap when css gap is invalid or missing', () => {
-        const { viewport } = setup();
+        const { scrollToMock } = setupScrollMock('nope', 0);
 
-        const scrollToMock = jest.fn();
-        viewport.scrollTo = scrollToMock;
-
-        const firstCard = viewport.querySelector('.track > *');
-        if (firstCard) {
-            firstCard.getBoundingClientRect = jest.fn(() => ({ width: 10 }) as DOMRect);
-        }
-
-        const track = viewport.querySelector('.track');
-        if (track) {
-            jest.spyOn(globalThis, 'getComputedStyle').mockImplementation((elem) => {
-                if (elem === track) return { gap: 'nope' } as CSSStyleDeclaration;
-                return {} as CSSStyleDeclaration;
-            });
-        }
-
-        sync(viewport, { scrollLeft: 0, clientWidth: 100, scrollWidth: 200 });
         fireEvent.click(screen.getByTestId('nav-right'));
 
         expect(scrollToMock).toHaveBeenCalledWith({ left: 10, behavior: 'smooth' });
-
-        jest.restoreAllMocks();
     });
 
     it('updates nav on window resize', () => {

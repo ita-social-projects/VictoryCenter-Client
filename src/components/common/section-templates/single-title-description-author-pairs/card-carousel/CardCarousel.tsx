@@ -16,7 +16,7 @@ export interface CardCarouselProps {
 export const CardCarousel = ({ children, itemsCount, LeftIcon, RightIcon, variant = 'default' }: CardCarouselProps) => {
     const viewportRef = useRef<HTMLDivElement | null>(null);
     const targetScroll = useRef<number | null>(null);
-    const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
+    const scrollTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
     const [canLeft, setCanLeft] = useState(false);
     const [canRight, setCanRight] = useState(false);
 
@@ -24,7 +24,7 @@ export const CardCarousel = ({ children, itemsCount, LeftIcon, RightIcon, varian
         const el = viewportRef.current;
         if (!el) return;
 
-        const left = Math.floor(el.scrollLeft) > 56;
+        const left = Math.floor(el.scrollLeft) > 0;
         const right = Math.ceil(el.scrollLeft + el.clientWidth) < Math.ceil(el.scrollWidth);
 
         setCanLeft((p) => (p === left ? p : left));
@@ -38,7 +38,10 @@ export const CardCarousel = ({ children, itemsCount, LeftIcon, RightIcon, varian
     useEffect(() => {
         const onResize = () => syncNav();
         window.addEventListener('resize', onResize);
-        return () => window.removeEventListener('resize', onResize);
+        return () => {
+            window.removeEventListener('resize', onResize);
+            if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+        };
     }, [syncNav]);
 
     const scrollByCard = useCallback(

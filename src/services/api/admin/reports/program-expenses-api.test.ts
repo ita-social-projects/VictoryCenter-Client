@@ -1,4 +1,3 @@
-import { ProgramExpensesReadOnlyData } from '@/types/admin/reports';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
 import { ProgramExpensesApi } from './program-expenses-api';
 

@@ -320,7 +320,7 @@ export const PROGRAM_EXPENSES_TEXT = {
             PROGRAM_LABEL: 'Категорія програми',
             PROGRAM_PLACEHOLDER: 'Оберіть програму',
             SUBMIT_BUTTON: 'Додати витрату',
-            CONFIRM_CLOSE_TITLE: 'Дані буде втрачено. Бажаєте продовжити?',
+            CONFIRM_CLOSE_TITLE: 'Зміни будуть втрачені. Бажаєте продовжити?',
             PROGRAM_NO_AVAILABLE: 'Немає доступних програм',
         },
     },

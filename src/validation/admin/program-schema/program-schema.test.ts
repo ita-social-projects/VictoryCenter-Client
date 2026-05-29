@@ -800,10 +800,15 @@ describe('PROGRAM_VALIDATION_FUNCTIONS', () => {
             expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateLocation('Kyiv, Ukraine', false)).toBeUndefined();
         });
 
-        it('returns min 2 for location when draft or publishing program', () => {
+        it('allows empty location in draft mode', () => {
             const m = loadSchema();
-            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateLocation('', false)).toBe('min 2');
-            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateLocation('', true)).toBe('min 2');
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateLocation('', false)).toBeUndefined();
+        });
+
+        it('returns min 2 for short non-empty location', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateLocation('A', false)).toBe('min 2');
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateLocation('A', true)).toBe('min 2');
         });
 
         it('returns error when location exceeds max length', () => {

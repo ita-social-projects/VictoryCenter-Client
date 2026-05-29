@@ -19,6 +19,43 @@ describe('ReportFundsExpendituresSettingsLocalizationsApi', () => {
         jest.clearAllMocks();
     });
 
+    describe('getByEntityId', () => {
+        it('should call client.get with correct url and return response data', async () => {
+            const mockClient = { get: jest.fn().mockResolvedValueOnce({ data: [mockLocalizationDto] }) };
+
+            const result = await ReportFundsExpendituresSettingsLocalizationsApi.getByEntityId(mockClient as any, 1);
+
+            expect(mockClient.get).toHaveBeenCalledTimes(1);
+            expect(mockClient.get).toHaveBeenCalledWith(
+                `${API_ROUTES.REPORT_FUNDS_EXPENDITURES_SETTINGS_LOCALIZATIONS.BASE}/1`,
+                { signal: undefined },
+            );
+            expect(result).toEqual([mockLocalizationDto]);
+        });
+
+        it('should forward the cancellation signal when provided', async () => {
+            const controller = new AbortController();
+            const mockClient = { get: jest.fn().mockResolvedValueOnce({ data: [] }) };
+
+            await ReportFundsExpendituresSettingsLocalizationsApi.getByEntityId(mockClient as any, 2, {
+                cancellationSignal: controller.signal,
+            });
+
+            expect(mockClient.get).toHaveBeenCalledWith(
+                `${API_ROUTES.REPORT_FUNDS_EXPENDITURES_SETTINGS_LOCALIZATIONS.BASE}/2`,
+                { signal: controller.signal },
+            );
+        });
+
+        it('should return an empty array when the server returns no localizations', async () => {
+            const mockClient = { get: jest.fn().mockResolvedValueOnce({ data: [] }) };
+
+            const result = await ReportFundsExpendituresSettingsLocalizationsApi.getByEntityId(mockClient as any, 1);
+
+            expect(result).toEqual([]);
+        });
+    });
+
     describe('create', () => {
         it('should call client.post with correct url and payload and return response data', async () => {
             const mockClient = { post: jest.fn().mockResolvedValueOnce({ data: mockLocalizationDto }) };

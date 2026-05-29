@@ -28,6 +28,15 @@ export const MAIN_PAGE_TEXT = {
                 ENG: 'ENG',
             },
         },
+        EDIT_PANEL: {
+            TITLE: 'Редагування',
+            UKR_NAME_LABEL: 'UKR Назва',
+            ENG_NAME_LABEL: 'ENG Назва',
+            VALUE_LABEL: 'Значення',
+            PREFIX_LABEL: 'Префікс',
+            CANCEL_MODAL_TITLE: 'Відмінити зміни?',
+            PREFIX_NONE: 'Без префікса',
+        },
         PARTNERS: {
             TITLE_LABEL: COMMON_TEXT_ADMIN.TYPE.TITLE,
             DESCRIPTION_LABEL: COMMON_TEXT_ADMIN.TYPE.DESCRIPTION,
@@ -36,6 +45,8 @@ export const MAIN_PAGE_TEXT = {
 
     BUTTONS: {
         PUBLISH: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED,
+        CANCEL: COMMON_TEXT_ADMIN.BUTTON.CANCEL,
+        SAVE: COMMON_TEXT_ADMIN.BUTTON.SAVE,
     },
 
     ERRORS: {
@@ -101,6 +112,15 @@ export const MAIN_PAGE_VALIDATION = {
             max: 100,
             getMinError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(5),
             getMaxError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(100),
+        },
+    },
+
+    editPanel: {
+        name: {
+            min: 2,
+            max: 20,
+            getMinError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(2),
+            getMaxError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(20),
         },
     },
 } as const;

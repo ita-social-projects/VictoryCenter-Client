@@ -107,9 +107,7 @@ describe('main-page-mappers', () => {
 
         it('handles null/empty MainPage fields gracefully with defaults', () => {
             const emptyPage: MainPage = {} as any;
-
             const result = mapMainPageToFormValues(emptyPage, languages);
-
             expect(result).toEqual(MAIN_PAGE_FORM_DEFAULTS);
         });
 
@@ -120,7 +118,6 @@ describe('main-page-mappers', () => {
             } as any;
 
             const result = mapMainPageToFormValues(page, []);
-
             expect(result.titleEn).toBe('UA Title');
         });
     });
@@ -196,11 +193,11 @@ describe('main-page-mappers', () => {
                 value: 100,
                 name: 'UA Metric',
                 type: MetricType.Partners,
-                prefix: MetricPrefix.Plus,
-                localizations: [{ languageId: 2, name: 'EN Metric' }],
+                prefix: 1, // MetricPrefix.Plus is 1
+                localization: undefined,
             });
 
-            expect(metrics?.[1].localizations).toBeUndefined();
+            expect(metrics?.[1].localization).toBeUndefined();
         });
 
         it('handles missing languages array and null originalPage', () => {

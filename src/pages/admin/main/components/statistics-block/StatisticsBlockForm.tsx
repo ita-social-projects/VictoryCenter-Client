@@ -9,7 +9,7 @@ import { ImageUploadForm } from '@/pages/admin/main/components/common/image-uplo
 import { MainPageApi } from '@/services/api/admin/main-page/main-page-api';
 import { MainPage, MainPageFormValues, Metric } from '@/types/admin/main-page';
 import { ToastType } from '@/types/admin/toast';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { StatisticsMetricsList } from './components/statistics-metrics-list/StatisticsMetricsList';
 import { StatisticsPreview } from './components/statistics-preview/StatisticsPreview';
@@ -36,9 +36,15 @@ interface StatisticsBlockFormProps {
     initialData: MainPage | null;
     isPublishDisabled: boolean;
     onPublish: () => void;
+    onMetricsChange?: (metrics: Metric[]) => void;
 }
 
-export const StatisticsBlockForm = ({ initialData, isPublishDisabled, onPublish }: StatisticsBlockFormProps) => {
+export const StatisticsBlockForm = ({
+    initialData,
+    isPublishDisabled,
+    onPublish,
+    onMetricsChange,
+}: StatisticsBlockFormProps) => {
     const client = useAdminClient();
     const { addToast } = useToast();
 
@@ -47,20 +53,50 @@ export const StatisticsBlockForm = ({ initialData, isPublishDisabled, onPublish 
 
     const [metrics, setMetrics] = useState<Metric[]>([]);
     const [hiddenMetricIds, setHiddenMetricIds] = useState<number[]>([]);
+    const initialMetricsRef = useRef<Metric[]>([]);
 
     const {
         control,
+        setValue,
         formState: { errors },
     } = useFormContext<MainPageFormValues>();
 
+    const toComparableMetrics = (items: Metric[]) =>
+        items.map((metric) => ({
+            id: metric.id ?? null,
+            value: metric.value,
+            name: metric.name ?? '',
+            type: metric.type,
+            prefix: metric.prefix,
+            isHidden: metric.isHidden,
+            priority: metric.priority,
+            localizations: (metric.localizations ?? [])
+                .map((loc) => ({
+                    languageId: loc.languageId ?? null,
+                    name: (loc.name ?? '').trim(),
+                }))
+                .sort((a, b) => (a.languageId ?? 0) - (b.languageId ?? 0)),
+        }));
+
+    const areMetricsEqual = (left: Metric[], right: Metric[]) =>
+        JSON.stringify(toComparableMetrics(left)) === JSON.stringify(toComparableMetrics(right));
+
     useEffect(() => {
         if (initialData?.impactStatistics?.metrics) {
-            setMetrics(initialData.impactStatistics.metrics);
+            const apiMetrics = initialData.impactStatistics.metrics;
 
-            const hiddenIds = initialData.impactStatistics.metrics.filter((m) => m.isHidden).map((m) => m.id as number);
+            setMetrics(apiMetrics);
+            initialMetricsRef.current = apiMetrics;
+            setValue('metrics', apiMetrics, {
+                shouldDirty: false,
+                shouldTouch: false,
+                shouldValidate: false,
+            });
+
+            const hiddenIds = apiMetrics.filter((m) => m.isHidden).map((m) => m.id as number);
             setHiddenMetricIds(hiddenIds);
         }
-    }, [initialData]);
+    }, [initialData, setValue]);
 
     const handleToggleVisibility = async (id: number) => {
         const isCurrentlyHidden = hiddenMetricIds.includes(id);
@@ -84,7 +120,6 @@ export const StatisticsBlockForm = ({ initialData, isPublishDisabled, onPublish 
         setMetrics(items);
 
         const statisticId = initialData?.impactStatistics?.id;
-
         if (!statisticId) return;
 
         const orderedIds = items.map((item) => item.id as number).filter(Boolean);
@@ -99,18 +134,33 @@ export const StatisticsBlockForm = ({ initialData, isPublishDisabled, onPublish 
         }
     };
 
+    const handleMetricUpdate = (updatedMetrics: Metric[]) => {
+        const hasChanges = !areMetricsEqual(updatedMetrics, initialMetricsRef.current);
+
+        setMetrics(updatedMetrics);
+        onMetricsChange?.(updatedMetrics);
+
+        setValue('metrics', updatedMetrics, {
+            shouldDirty: hasChanges,
+            shouldTouch: true,
+            shouldValidate: true,
+        });
+    };
+
     return (
         <div className={styles.form}>
             <div className={styles.content}>
-                <ImageUploadForm
-                    control={control as any}
-                    errors={errors}
-                    imageError={imageError}
-                    setImageError={setImageError}
-                    imageConfig={IMAGE_CONFIG}
-                    variant="whoWeAre"
-                    name="statisticsImage"
-                />
+                <div className={styles['image-section']}>
+                    <ImageUploadForm
+                        control={control as any}
+                        errors={errors}
+                        imageError={imageError}
+                        setImageError={setImageError}
+                        imageConfig={IMAGE_CONFIG}
+                        variant="whoWeAre"
+                        name="statisticsImage"
+                    />
+                </div>
 
                 <div className={styles['right-section']}>
                     <StatisticsPreview
@@ -163,6 +213,7 @@ export const StatisticsBlockForm = ({ initialData, isPublishDisabled, onPublish 
                         hiddenMetricIds={hiddenMetricIds}
                         onToggleVisibility={handleToggleVisibility}
                         onReorder={handleReorderMetrics}
+                        onMetricUpdate={handleMetricUpdate}
                     />
                 </div>
             </div>

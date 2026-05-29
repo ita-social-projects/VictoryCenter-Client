@@ -11,7 +11,7 @@ import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextPr
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { ImageApi } from '@/services/api/admin/image/image-api';
 import { MainPageApi } from '@/services/api/admin/main-page/main-page-api';
-import { MAIN_PAGE_FORM_DEFAULTS, MainPage, MainPageFormValues } from '@/types/admin/main-page';
+import { MAIN_PAGE_FORM_DEFAULTS, MainPage, MainPageFormValues, Metric } from '@/types/admin/main-page';
 import { ToastType } from '@/types/admin/toast';
 import { ImageValues } from '@/types/common/image';
 import {
@@ -53,6 +53,8 @@ export const MainPageContent = () => {
     const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
     const [isPublishing, setIsPublishing] = useState(false);
     const [pendingPublishData, setPendingPublishData] = useState<MainPageFormValues | null>(null);
+
+    const [currentMetrics, setCurrentMetrics] = useState<Metric[]>([]);
 
     const savedValuesRef = useRef<MainPageFormValues>(MAIN_PAGE_FORM_DEFAULTS);
 
@@ -123,7 +125,12 @@ export const MainPageContent = () => {
                 dataToPublish.statisticsImage = uploaded;
             }
 
-            const patch = mapFormValuesToMainPagePatch(dataToPublish, originalData, languages);
+            const patch = mapFormValuesToMainPagePatch(
+                dataToPublish,
+                originalData,
+                languages,
+                currentMetrics.length ? currentMetrics : undefined,
+            );
 
             const { page, languages: updatedLanguages } = await MainPageApi.publish(client, patch, languages);
 
@@ -132,6 +139,7 @@ export const MainPageContent = () => {
             savedValuesRef.current = nextValues;
 
             methods.reset(nextValues);
+            setCurrentMetrics([]);
 
             addToast('Зміни успішно опубліковано', ToastType.Success, 3000);
         } catch (error) {
@@ -190,6 +198,7 @@ export const MainPageContent = () => {
                                 initialData={originalData}
                                 isPublishDisabled={isPublishDisabled}
                                 onPublish={onPublish}
+                                onMetricsChange={setCurrentMetrics}
                             />
                         )}
                         {activeTab === 'donations' && <div>Блок "{MAIN_PAGE_TEXT.TABS.DONATIONS}" в розробці</div>}

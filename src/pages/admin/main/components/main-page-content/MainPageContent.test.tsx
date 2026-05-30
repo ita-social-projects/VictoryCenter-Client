@@ -1,6 +1,7 @@
 import { MAIN_PAGE_TEXT } from '@/const/admin/main-page';
 import { ImageApi } from '@/services/api/admin/image/image-api';
 import { MainPageApi } from '@/services/api/admin/main-page/main-page-api';
+import { MetricType } from '@/types/admin/main-page';
 import '@testing-library/jest-dom';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MainPageContent } from './MainPageContent';
@@ -60,9 +61,43 @@ jest.mock('../partners-block/PartnersBlockForm', () => ({
 
 jest.mock('../statistics-block/StatisticsBlockForm', () => ({
     __esModule: true,
-    StatisticsBlockForm: (props: any) => (
-        <MockFormBlock testId="statistics-block-form" btnTestId="publish-btn-statistics" {...props} />
-    ),
+    StatisticsBlockForm: ({ onMetricsChange, ...props }: any) => {
+        const { useFormContext } = require('react-hook-form');
+        const { MetricPrefix, MetricType } = require('@/types/admin/main-page');
+        const { setValue } = useFormContext();
+        const syncedMetric = {
+            id: 3,
+            name: 'Залучених коштів',
+            value: 7654321,
+            type: MetricType.Raised,
+            prefix: MetricPrefix.None,
+            isHidden: false,
+            priority: 3,
+            isAutoSynced: true,
+            localizations: [{ languageId: 2, name: 'Funds raised', value: '182500.5' }],
+        };
+
+        return (
+            <div data-testid="statistics-block-form">
+                <button
+                    data-testid="publish-btn-statistics-dirty"
+                    onClick={() => {
+                        onMetricsChange?.([syncedMetric]);
+                        setValue('metrics', [syncedMetric], { shouldDirty: true, shouldValidate: true });
+                    }}
+                >
+                    Make Dirty
+                </button>
+                <button
+                    data-testid="publish-btn-statistics"
+                    onClick={props.onPublish}
+                    disabled={props.isPublishDisabled}
+                >
+                    Publish
+                </button>
+            </div>
+        );
+    },
 }));
 
 jest.mock('../main-page-publish-modal/MainPagePublishModal', () => ({
@@ -127,7 +162,10 @@ describe('MainPageContent', () => {
             description: 'Test Description',
             impactStatistics: { metrics: [] },
         },
-        languages: [{ id: 1, code: 'uk', name: 'UA' }],
+        languages: [
+            { id: 1, code: 'uk', name: 'UA' },
+            { id: 2, code: 'en', name: 'EN' },
+        ],
     };
 
     const mockPublishedData = {
@@ -137,7 +175,10 @@ describe('MainPageContent', () => {
             description: 'Updated Description',
             impactStatistics: { metrics: [] },
         },
-        languages: [{ id: 1, code: 'uk', name: 'UA' }],
+        languages: [
+            { id: 1, code: 'uk', name: 'UA' },
+            { id: 2, code: 'en', name: 'EN' },
+        ],
     };
 
     beforeEach(() => {
@@ -297,6 +338,33 @@ describe('MainPageContent', () => {
         expect(screen.getByTestId(formTestId)).toBeInTheDocument();
 
         await triggerFormDirtyAndOpenModal(btnTestId);
+    });
+
+    it('publishes raised funds metric with isAutoSynced=true after statistics save flow', async () => {
+        await renderAndLoadContent();
+
+        fireEvent.click(screen.getByTestId('tab-btn-statistics'));
+        await triggerFormDirtyAndOpenModal('publish-btn-statistics');
+        fireEvent.click(screen.getByTestId('confirm-publish'));
+
+        await waitFor(() => {
+            expect(MainPageApi.publish).toHaveBeenCalled();
+        });
+
+        const patch = (MainPageApi.publish as jest.Mock).mock.calls[0][1];
+        expect(patch.impactStatistics.metrics).toEqual(
+            expect.arrayContaining([
+                expect.objectContaining({
+                    id: 3,
+                    value: 7654321,
+                    type: MetricType.Raised,
+                    isAutoSynced: true,
+                    localization: expect.objectContaining({
+                        value: '182500.5',
+                    }),
+                }),
+            ]),
+        );
     });
 
     it('does not publish when already publishing', async () => {

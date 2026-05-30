@@ -310,6 +310,10 @@ export const FUNDS_EXPENDITURES_TEXT = {
 };
 
 export const PROGRAM_EXPENSES_TEXT = {
+    MESSAGE: {
+        RECORD_DELETED_SUCCESSFULLY: 'Запис успішно видалено',
+        RECORD_DELETE_FAILED_RETRY: 'Не вдалося видалити запис. Спробуйте ще раз',
+    },
     BUTTON: {
         ADD_PROGRAM_EXPENSE: 'Витрата по програмі',
     },
@@ -322,6 +326,9 @@ export const PROGRAM_EXPENSES_TEXT = {
             SUBMIT_BUTTON: 'Додати витрату',
             CONFIRM_CLOSE_TITLE: 'Дані буде втрачено. Бажаєте продовжити?',
             PROGRAM_NO_AVAILABLE: 'Немає доступних програм',
+        },
+        DELETE: {
+            TITLE: 'Видалити запис?',
         },
     },
     VALIDATION: {

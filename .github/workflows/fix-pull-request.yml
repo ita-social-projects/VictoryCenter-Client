@@ -39,6 +39,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}.${{ github.run_number }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            REACT_APP_CF_TURNSTILE_SITE_KEY=${{ secrets.REACT_APP_CF_TURNSTILE_SITE_KEY }}
   manual_approval_deploy:
     needs: docker 
     environment: stage 

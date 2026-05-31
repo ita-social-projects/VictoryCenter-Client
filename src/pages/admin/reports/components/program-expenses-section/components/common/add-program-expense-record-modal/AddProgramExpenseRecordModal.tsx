@@ -79,11 +79,12 @@ interface AmountFieldProps {
     value: string;
     error?: string;
     headerAddon?: ReactNode;
+    footer?: ReactNode;
     onChange: (event: ChangeEvent<HTMLInputElement>) => void;
     onBlur: () => void;
 }
 
-const AmountField = ({ id, name, label, value, error, headerAddon, onChange, onBlur }: AmountFieldProps) => (
+const AmountField = ({ id, name, label, value, error, headerAddon, footer, onChange, onBlur }: AmountFieldProps) => (
     <div className={styles.field}>
         <div className={headerAddon ? styles['amount-usd-header'] : undefined}>
             <RequiredFieldLabel>{label}</RequiredFieldLabel>
@@ -102,6 +103,7 @@ const AmountField = ({ id, name, label, value, error, headerAddon, onChange, onB
             hasError={Boolean(error)}
         />
         <FieldError message={error} />
+        {footer}
     </div>
 );
 
@@ -239,13 +241,15 @@ export const AddProgramExpenseRecordModal = ({
                                 headerAddon={<ExchangeRateChip exchangeRate={exchangeRate} />}
                                 onChange={(event) => handleUsdChange(event.target.value)}
                                 onBlur={() => handleAmountBlur('amountUsd')}
+                                footer={
+                                    usdMismatchMessage && (
+                                        <div className={styles.info}>
+                                            <InfoIcon className={styles['info-icon']} aria-hidden="true" />
+                                            <p className={styles['info-text']}>{usdMismatchMessage}</p>
+                                        </div>
+                                    )
+                                }
                             />
-                            {usdMismatchMessage && (
-                                <div className={styles.info}>
-                                    <InfoIcon className={styles['info-icon']} aria-hidden="true" />
-                                    <p className={styles['info-text']}>{usdMismatchMessage}</p>
-                                </div>
-                            )}
                         </div>
 
                         <div className={styles.actions}>

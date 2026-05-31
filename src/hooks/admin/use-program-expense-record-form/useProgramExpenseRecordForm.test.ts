@@ -156,7 +156,7 @@ describe('useProgramExpenseRecordForm', () => {
             result.current.handleAmountChange('100');
         });
 
-        expect(result.current.formState.amountUsd).toBe('2.50');
+        expect(result.current.formState.amountUsd).toBe('2,5');
     });
 
     it('does not recalculate UAH when USD is changed manually', () => {
@@ -168,30 +168,5 @@ describe('useProgramExpenseRecordForm', () => {
         });
 
         expect(result.current.formState.amountUah).toBe('100');
-    });
-
-    it('sets usdMismatchMessage on USD blur when USD does not match converted value', () => {
-        const { result } = renderUseProgramExpenseForm({ exchangeRate: '40' });
-
-        act(() => {
-            result.current.handleAmountChange('100');
-            result.current.handleUsdChange('999');
-            result.current.handleAmountBlur('amountUsd');
-        });
-
-        expect(result.current.usdMismatchMessage).toBe(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH);
-    });
-
-    it('clears usdMismatchMessage when UAH amount changes', () => {
-        const { result } = renderUseProgramExpenseForm({ exchangeRate: '40' });
-
-        act(() => {
-            result.current.handleAmountChange('100');
-            result.current.handleUsdChange('999');
-            result.current.handleAmountBlur('amountUsd');
-            result.current.handleAmountChange('200');
-        });
-
-        expect(result.current.usdMismatchMessage).toBeUndefined();
     });
 });

@@ -72,10 +72,10 @@ export const Footer = () => {
                 <div className="menu">
                     <span className="title">{t('MENU')}</span>
                     <Link to={PUBLIC_ROUTES.REPORTS.FULL}>{t('REPORTING')}</Link>
-                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
+                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable" style={{ visibility: 'hidden' }}>
                         {t('HOW_TO_SUPPORT')}
                     </Link>
-                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
+                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable" style={{ visibility: 'hidden' }}>
                         {t('STORIES_OF_VICTORIES')}
                     </Link>
                 </div>
@@ -93,9 +93,6 @@ export const Footer = () => {
                     <span className="title">{t('HIPPOTHERAPY')}</span>
                     <Link to={PUBLIC_ROUTES.HIPPOTHERAPY.FULL}>{t('WHAT_IS_HIPPOTHERAPY')}</Link>
                     <Link to={PUBLIC_ROUTES.PROGRAMS.FULL}>{t('PROGRAMS')}</Link>
-                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
-                        {t('PROGRAMS_SESSIONS')}
-                    </Link>
                 </div>
             </div>
 

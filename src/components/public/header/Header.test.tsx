@@ -197,7 +197,6 @@ describe('Header', () => {
             name: headerUk['HIPPOTHERAPY'],
         });
         expect(hippotherapyLink).toHaveAttribute('data-disabled', 'false');
-
     });
 
     it('toggles mobile menu open and closed', () => {

@@ -2,6 +2,9 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
+import { ToastType } from '@/types/admin/toast';
+import { PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
 import { ProgramExpensesApi } from '@/services/api/admin/reports/program-expenses-api';
 import { ProgramExpensesReadOnlyData } from '@/types/admin/reports';
 import { ProgramExpensesToolbar } from './components/program-expenses-toolbar/ProgramExpensesToolbar';
@@ -28,6 +31,7 @@ interface ProgramExpensesSectionProps {
 
 export const ProgramExpensesSection = ({ isEditing = false }: ProgramExpensesSectionProps) => {
     const adminClient = useAdminClient();
+    const { addToast } = useToast();
     const [selectedProgramIds, setSelectedProgramIds] = useState<number[]>([]);
     const [isAddProgramExpenseModalOpen, setIsAddProgramExpenseModalOpen] = useState(false);
 
@@ -36,7 +40,7 @@ export const ProgramExpensesSection = ({ isEditing = false }: ProgramExpensesSec
         [adminClient],
     );
 
-    const { data, isLoading } = useDataFetch<ProgramExpensesReadOnlyData>({
+    const { data, isLoading, refetch } = useDataFetch<ProgramExpensesReadOnlyData>({
         initialData: INITIAL_PROGRAM_EXPENSES_DATA,
         fetchHandler: fetchReadOnlyData,
     });
@@ -80,6 +84,28 @@ export const ProgramExpensesSection = ({ isEditing = false }: ProgramExpensesSec
         setIsAddProgramExpenseModalOpen(false);
     }, []);
 
+    const handleSubmitAddProgramExpense = useCallback(
+        async (submitData: { programId: number; reportingYear: string; amountUah: string; amountUsd: string }) => {
+            try {
+                const payload = {
+                    reportingYear: parseInt(submitData.reportingYear, 10),
+                    hippotherapyProgramCategoryId: submitData.programId,
+                    amountUah: parseFloat(submitData.amountUah.replace(',', '.')),
+                    amountUsd: parseFloat(submitData.amountUsd.replace(',', '.')),
+                };
+                await ProgramExpensesApi.post(adminClient, payload);
+                refetch();
+                setIsAddProgramExpenseModalOpen(false);
+                addToast(PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_CREATED_SUCCESSFULLY, ToastType.Success);
+                return true;
+            } catch {
+                addToast(PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_CREATE_FAILED_RETRY, ToastType.Error);
+                return false;
+            }
+        },
+        [adminClient, refetch, addToast],
+    );
+
     if (isInitialLoading) {
         return (
             <div className={styles.section}>
@@ -119,6 +145,7 @@ export const ProgramExpensesSection = ({ isEditing = false }: ProgramExpensesSec
                 records={data.records}
                 exchangeRate={exchangeRate}
                 onClose={handleCloseAddProgramExpenseModal}
+                onSubmit={handleSubmitAddProgramExpense}
             />
         </div>
     );

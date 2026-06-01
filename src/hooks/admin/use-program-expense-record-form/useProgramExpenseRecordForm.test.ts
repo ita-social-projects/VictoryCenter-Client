@@ -23,12 +23,16 @@ const records: ProgramExpensesRecord[] = [
 
 const createHookParams = (
     overrides: Partial<Parameters<typeof useProgramExpenseRecordForm>[0]> = {},
-): Parameters<typeof useProgramExpenseRecordForm>[0] => ({
-    isOpen: true,
-    programs,
-    records,
-    ...overrides,
-});
+): Parameters<typeof useProgramExpenseRecordForm>[0] => {
+    return {
+        isOpen: true,
+        programs,
+        records,
+        exchangeRate: '40',
+        onSubmit: jest.fn().mockResolvedValue(true),
+        ...overrides,
+    } as Parameters<typeof useProgramExpenseRecordForm>[0];
+};
 
 const renderUseProgramExpenseForm = (overrides: Partial<Parameters<typeof useProgramExpenseRecordForm>[0]> = {}) =>
     renderHook(() => useProgramExpenseRecordForm(createHookParams(overrides)));
@@ -97,13 +101,15 @@ describe('useProgramExpenseRecordForm', () => {
         expect(result.current.formState.errors.amountUsd).toBe(FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_NOT_ZERO);
     });
 
-    it('resets values when modal closes', () => {
+    it('resets form state when modal closes', () => {
         const { result, rerender } = renderHook(
             ({ isOpen }) =>
                 useProgramExpenseRecordForm({
                     isOpen,
                     programs,
                     records,
+                    exchangeRate: '40',
+                    onSubmit: jest.fn().mockResolvedValue(true),
                 }),
             { initialProps: { isOpen: true } },
         );
@@ -131,6 +137,8 @@ describe('useProgramExpenseRecordForm', () => {
                     isOpen: true,
                     programs: nextPrograms,
                     records,
+                    exchangeRate: '40',
+                    onSubmit: jest.fn().mockResolvedValue(true),
                 }),
             { initialProps: { nextPrograms: programs } },
         );

@@ -68,6 +68,10 @@ jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: () => 'mock-client',
 }));
 
+jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider', () => ({
+    useToast: () => ({ addToast: jest.fn() }),
+}));
+
 let mockUseDataFetchResult = {
     data: MOCK_PROGRAM_EXPENSES_DATA,
     isLoading: false,

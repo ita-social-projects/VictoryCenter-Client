@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ProgramExpensesProgram, ProgramExpensesRecord } from '@/types/admin/reports';
+import { updateFundsAmounts } from '@/utils/functions/update-funds-amounts/update-funds-amounts';
+import { isUsdAmountMismatch } from '@/utils/functions/validate-usd-amount-mismatch/validate-usd-amount-mismatch';
+import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
 import {
     normalizeProgramExpenseAmountInput,
     validateProgramExpenseAmount,
@@ -24,6 +27,13 @@ interface UseProgramExpenseRecordFormParams {
     isOpen: boolean;
     programs: ProgramExpensesProgram[];
     records: ProgramExpensesRecord[];
+    exchangeRate: string | null;
+    onSubmit: (data: {
+        programId: number;
+        reportingYear: string;
+        amountUah: string;
+        amountUsd: string;
+    }) => Promise<boolean>;
 }
 
 const INITIAL_STATE: ProgramExpenseFormState = {
@@ -34,8 +44,17 @@ const INITIAL_STATE: ProgramExpenseFormState = {
     errors: {},
 };
 
-export const useProgramExpenseRecordForm = ({ isOpen, programs, records }: UseProgramExpenseRecordFormParams) => {
+export const useProgramExpenseRecordForm = ({
+    isOpen,
+    programs,
+    records,
+    exchangeRate,
+    onSubmit,
+}: UseProgramExpenseRecordFormParams) => {
     const [formState, setFormState] = useState<ProgramExpenseFormState>(INITIAL_STATE);
+    const [usdMismatchMessage, setUsdMismatchMessage] = useState<string | undefined>();
+    const [isAddConfirmationOpen, setIsAddConfirmationOpen] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const programOptions = useMemo(
         () =>
@@ -79,33 +98,53 @@ export const useProgramExpenseRecordForm = ({ isOpen, programs, records }: UsePr
         }
     }, [formState.programId, isOpen, isProgramSelectDisabled, programOptions]);
 
-    const handleAmountChange = useCallback((field: 'amountUah' | 'amountUsd', value: string) => {
-        const normalizedValue = normalizeProgramExpenseAmountInput(value);
-
-        setFormState((previousState) => ({
-            ...previousState,
-            [field]: normalizedValue,
-            errors: {
-                ...previousState.errors,
-                [field]: validateProgramExpenseAmount(normalizedValue, 'change'),
-            },
-        }));
-    }, []);
-
-    const handleAmountBlur = useCallback((field: 'amountUah' | 'amountUsd') => {
-        setFormState((previousState) => {
-            const normalizedValue = normalizeProgramExpenseAmountInput(previousState[field], true);
-
-            return {
+    const handleAmountChange = useCallback(
+        (field: 'amountUah' | 'amountUsd', value: string) => {
+            setFormState((previousState) => ({
                 ...previousState,
-                [field]: normalizedValue,
-                errors: {
-                    ...previousState.errors,
-                    [field]: validateProgramExpenseAmount(normalizedValue, 'blur'),
-                },
-            };
-        });
-    }, []);
+                ...updateFundsAmounts(field, value, exchangeRate, 'change')(previousState),
+            }));
+            setUsdMismatchMessage(undefined);
+        },
+        [exchangeRate],
+    );
+
+    const handleAmountBlur = useCallback(
+        (field: 'amountUah' | 'amountUsd') => {
+            if (field === 'amountUsd') {
+                setFormState((prev) => {
+                    const normalizedAmountUsd = normalizeProgramExpenseAmountInput(prev.amountUsd, true);
+                    const amountUsdError = validateProgramExpenseAmount(normalizedAmountUsd, 'blur');
+
+                    const hasMismatch = isUsdAmountMismatch(prev.amountUah, normalizedAmountUsd, exchangeRate);
+                    setUsdMismatchMessage(
+                        hasMismatch ? FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH : undefined,
+                    );
+
+                    return {
+                        ...prev,
+                        amountUsd: normalizedAmountUsd,
+                        errors: {
+                            ...prev.errors,
+                            amountUsd: amountUsdError,
+                        },
+                    };
+                });
+
+                return;
+            }
+
+            setFormState((previousState) => {
+                const updated = {
+                    ...previousState,
+                    ...updateFundsAmounts(field, previousState[field], exchangeRate, 'blur')(previousState),
+                };
+                setUsdMismatchMessage(undefined);
+                return updated;
+            });
+        },
+        [exchangeRate],
+    );
 
     const handleReportingYearChange = useCallback((reportingYear: string | undefined) => {
         setFormState((previousState) => ({
@@ -162,7 +201,34 @@ export const useProgramExpenseRecordForm = ({ isOpen, programs, records }: UsePr
         Boolean(validateProgramExpenseReportingYear(formState.reportingYear, 'save')) ||
         Boolean(getProgramError(formState.programId, 'blur')) ||
         Boolean(validateProgramExpenseAmount(formState.amountUah, 'save')) ||
-        Boolean(validateProgramExpenseAmount(formState.amountUsd, 'save'));
+        Boolean(validateProgramExpenseAmount(formState.amountUsd, 'save')) ||
+        isSubmitting;
+
+    const handleOpenAddConfirmation = useCallback(() => {
+        setIsAddConfirmationOpen(true);
+    }, []);
+
+    const handleCloseConfirmation = useCallback(() => {
+        setIsAddConfirmationOpen(false);
+    }, []);
+
+    const handleConfirmAdd = useCallback(async () => {
+        if (!formState.programId || !formState.reportingYear || isSubmitting) return;
+
+        setIsSubmitting(true);
+        const success = await onSubmit({
+            programId: formState.programId,
+            reportingYear: formState.reportingYear,
+            amountUah: formState.amountUah,
+            amountUsd: formState.amountUsd,
+        });
+        setIsSubmitting(false);
+
+        if (success) {
+            setIsAddConfirmationOpen(false);
+            setFormState(INITIAL_STATE);
+        }
+    }, [formState, isSubmitting, onSubmit]);
 
     return {
         formState,
@@ -170,11 +236,17 @@ export const useProgramExpenseRecordForm = ({ isOpen, programs, records }: UsePr
         isProgramSelectDisabled,
         isDirty,
         isSubmitDisabled,
+        isSubmitting,
+        isAddConfirmationOpen,
+        usdMismatchMessage,
         handleReportingYearChange,
         handleReportingYearBlur,
         handleProgramChange,
         handleProgramBlur,
         handleAmountChange,
         handleAmountBlur,
+        handleOpenAddConfirmation,
+        handleCloseConfirmation,
+        handleConfirmAdd,
     };
 };

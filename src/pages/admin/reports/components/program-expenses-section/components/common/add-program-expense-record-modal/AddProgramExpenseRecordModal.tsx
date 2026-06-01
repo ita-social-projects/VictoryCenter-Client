@@ -18,6 +18,12 @@ interface AddProgramExpenseRecordModalProps {
     records: ProgramExpensesRecord[];
     exchangeRate: string | null;
     onClose: () => void;
+    onSubmit: (data: {
+        programId: number;
+        reportingYear: string;
+        amountUah: string;
+        amountUsd: string;
+    }) => Promise<boolean>;
 }
 
 const PROGRAM_EXPENSE_AMOUNT_MAX_LENGTH = 12;
@@ -110,6 +116,7 @@ export const AddProgramExpenseRecordModal = ({
     records,
     exchangeRate,
     onClose,
+    onSubmit,
 }: AddProgramExpenseRecordModalProps) => {
     const yearOptions = useMemo(() => getReportingYearOptions(), []);
     const reportingYearSelectRef = useRef<HTMLDivElement | null>(null);
@@ -120,16 +127,24 @@ export const AddProgramExpenseRecordModal = ({
         isProgramSelectDisabled,
         isDirty,
         isSubmitDisabled,
+        isSubmitting,
+        isAddConfirmationOpen,
+        usdMismatchMessage,
         handleReportingYearChange,
         handleReportingYearBlur,
         handleProgramChange,
         handleProgramBlur,
         handleAmountChange,
         handleAmountBlur,
+        handleOpenAddConfirmation,
+        handleCloseConfirmation,
+        handleConfirmAdd,
     } = useProgramExpenseRecordForm({
         isOpen,
         programs,
         records,
+        exchangeRate,
+        onSubmit,
     });
 
     const { isCloseConfirmOpen, handleRequestClose, handleConfirmClose, handleCancelClose } =
@@ -236,10 +251,17 @@ export const AddProgramExpenseRecordModal = ({
                                 onChange={(event) => handleAmountChange('amountUsd', event.target.value)}
                                 onBlur={() => handleAmountBlur('amountUsd')}
                             />
+
+                            {usdMismatchMessage && <p className={styles['info-text']}>{usdMismatchMessage}</p>}
                         </div>
 
                         <div className={styles.actions}>
-                            <Button buttonStyle="primary" disabled={isSubmitDisabled} className={styles.submit}>
+                            <Button
+                                buttonStyle="primary"
+                                disabled={isSubmitDisabled}
+                                className={styles.submit}
+                                onClick={handleOpenAddConfirmation}
+                            >
                                 {PROGRAM_EXPENSES_TEXT.MODAL.ADD.SUBMIT_BUTTON}
                             </Button>
                             <Button buttonStyle="secondary" onClick={handleRequestClose} className={styles.cancel}>
@@ -257,6 +279,17 @@ export const AddProgramExpenseRecordModal = ({
                 onConfirm={handleConfirmClose}
                 onCancel={handleCancelClose}
                 onClose={handleCancelClose}
+            />
+
+            <ConfirmationModal
+                isOpen={isAddConfirmationOpen}
+                title={PROGRAM_EXPENSES_TEXT.MODAL.ADD.CONFIRM_ADD_TITLE}
+                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
+                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
+                onConfirm={handleConfirmAdd}
+                onCancel={handleCloseConfirmation}
+                onClose={handleCloseConfirmation}
+                isButtonsDisabled={isSubmitting}
             />
         </>
     );

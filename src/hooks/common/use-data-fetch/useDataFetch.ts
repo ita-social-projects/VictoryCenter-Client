@@ -6,7 +6,7 @@ export interface UseDataFetchResult<TResult> {
     data: TResult;
     isLoading: boolean;
     error: any | null;
-    refetch: () => Promise<void>;
+    refetch: (shouldRethrow?: boolean) => Promise<void>;
     setData: Dispatch<SetStateAction<TResult>>;
 }
 
@@ -28,43 +28,46 @@ export const useDataFetch = <TResult>({
     const [error, setError] = useState<any | null>(null);
     const abortControllerRef = useRef<AbortController | null>(null);
 
-    const fetchData = useCallback(async () => {
-        abortControllerRef.current?.abort();
-        const newAbortController = new AbortController();
-        abortControllerRef.current = newAbortController;
+    const fetchData = useCallback(
+        async (shouldRethrow = false) => {
+            abortControllerRef.current?.abort();
+            const newAbortController = new AbortController();
+            abortControllerRef.current = newAbortController;
 
-        setIsLoading(true);
-        setError(null);
+            setIsLoading(true);
+            setError(null);
 
-        const apiOptions: RequestOptions = { cancellationSignal: newAbortController.signal };
+            const apiOptions: RequestOptions = { cancellationSignal: newAbortController.signal };
 
-        try {
-            const result = await fetchHandler(apiOptions);
+            try {
+                const result = await fetchHandler(apiOptions);
 
-            if (newAbortController.signal.aborted) return;
+                if (newAbortController.signal.aborted) return;
 
-            setFetchedData(result);
-        } catch (error: any) {
-            if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {
-                return;
+                setFetchedData(result);
+            } catch (error: any) {
+                if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {
+                    return;
+                }
+                setError(error);
+                if (shouldRethrow) {
+                    throw error;
+                }
+            } finally {
+                if (!newAbortController.signal.aborted) {
+                    setIsLoading(false);
+                }
             }
-            setError(error);
-            throw error;
-        } finally {
-            if (!newAbortController.signal.aborted) {
-                setIsLoading(false);
-            }
-        }
-    }, [fetchHandler]);
+        },
+        [fetchHandler],
+    );
 
     useEffect(() => {
         if (autoFetchDisabled) {
             return;
         }
 
-        fetchData().catch(() => {
-            // Error is handled inside fetchData (setError)
-        });
+        fetchData();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [autoFetchDisabled, fetchData, ...autoFetchDependencies]);
 

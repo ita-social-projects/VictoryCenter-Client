@@ -209,7 +209,7 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
                 setChangedLivesValues(changedLives);
                 setChangedLivesErrors(INITIAL_BLOCK_ERRORS);
 
-                await refetch();
+                await refetch(true);
 
                 addToast(COMMON_TEXT_ADMIN.MESSAGE.SUCCESSFULLY_PUBLISHED, ToastType.Success);
                 return true;

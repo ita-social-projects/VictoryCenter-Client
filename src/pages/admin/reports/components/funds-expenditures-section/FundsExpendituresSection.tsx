@@ -320,8 +320,15 @@ export const FundsExpenditureSection = ({
                 });
 
                 setRecordsState((prev) => prev.map((record) => (record.id === recordId ? updatedRecord : record)));
-                await refetchSummary();
                 addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY, ToastType.Success);
+
+                try {
+                    await refetchSummary(true);
+                } catch {
+                    // Refetch error is already handled by useDataFetch (setError),
+                    // but we can optionally show a refresh failure toast here.
+                }
+
                 return true;
             } catch {
                 addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_UPDATE_FAILED_RETRY, ToastType.Error);
@@ -349,9 +356,15 @@ export const FundsExpenditureSection = ({
                 });
 
                 setRecordsState((prev) => [...prev, createdRecord]);
-                await refetchSummary();
                 addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_CREATED_SUCCESSFULLY, ToastType.Success);
                 setActiveRecordModalType(null);
+
+                try {
+                    await refetchSummary(true);
+                } catch {
+                    // Refetch error handled by useDataFetch
+                }
+
                 return true;
             } catch {
                 addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_CREATE_FAILED_RETRY, ToastType.Error);
@@ -365,15 +378,22 @@ export const FundsExpenditureSection = ({
         async (data: { name: string; type: FundsExpendituresTransactionType }): Promise<boolean> => {
             try {
                 await FundsExpendituresApi.createCategory(adminClient, data);
-                await refetchCategories();
                 addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_CREATED_SUCCESSFULLY, ToastType.Success);
+
+                try {
+                    await refetchCategories(true);
+                    await refetchSummary(true);
+                } catch {
+                    // Refetch error handled by useDataFetch
+                }
+
                 return true;
             } catch {
                 addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_CREATE_FAILED_RETRY, ToastType.Error);
                 return false;
             }
         },
-        [addToast, adminClient, refetchCategories],
+        [addToast, adminClient, refetchCategories, refetchSummary],
     );
 
     const handleEditCategory = useCallback(
@@ -382,30 +402,44 @@ export const FundsExpenditureSection = ({
             if (!category) return false;
             try {
                 await FundsExpendituresApi.updateCategory(adminClient, categoryId, { name, type: category.type });
-                await refetchCategories();
                 addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_UPDATED_SUCCESSFULLY, ToastType.Success);
+
+                try {
+                    await refetchCategories(true);
+                    await refetchSummary(true);
+                } catch {
+                    // Refetch error handled by useDataFetch
+                }
+
                 return true;
             } catch {
                 addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_UPDATE_FAILED_RETRY, ToastType.Error);
                 return false;
             }
         },
-        [addToast, adminClient, categories, refetchCategories],
+        [addToast, adminClient, categories, refetchCategories, refetchSummary],
     );
 
     const handleDeleteCategory = useCallback(
         async (categoryId: number): Promise<boolean> => {
             try {
                 await FundsExpendituresApi.deleteCategory(adminClient, categoryId);
-                await refetchCategories();
                 addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_DELETED_SUCCESSFULLY, ToastType.Success);
+
+                try {
+                    await refetchCategories(true);
+                    await refetchSummary(true);
+                } catch {
+                    // Refetch error handled by useDataFetch
+                }
+
                 return true;
             } catch {
                 addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_DELETE_FAILED_RETRY, ToastType.Error);
                 return false;
             }
         },
-        [addToast, adminClient, refetchCategories],
+        [addToast, adminClient, refetchCategories, refetchSummary],
     );
 
     const handleDeleteClick = (record: ReportFundsExpendituresRecord) => {
@@ -487,9 +521,13 @@ export const FundsExpenditureSection = ({
             setIsEditing(false);
             onEditModeChange?.(false);
 
-            await refetchSettings();
-
             addToast(COMMON_TEXT_ADMIN.MESSAGE.SUCCESSFULLY_PUBLISHED, ToastType.Success);
+
+            try {
+                await refetchSettings(true);
+            } catch {
+                // Refetch error handled by useDataFetch
+            }
         } catch {
             addToast(REPORTS_TEXT.MESSAGE.FAIL_TO_UPDATE_REPORT, ToastType.Error);
         }

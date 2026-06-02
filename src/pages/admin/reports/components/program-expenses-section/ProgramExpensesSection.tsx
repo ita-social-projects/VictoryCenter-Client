@@ -102,9 +102,15 @@ export const ProgramExpensesSection = ({ isEditing = false }: ProgramExpensesSec
                     amountUsd,
                 };
                 await ProgramExpensesApi.post(adminClient, payload);
-                await refetch();
                 setIsAddProgramExpenseModalOpen(false);
                 addToast(PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_CREATED_SUCCESSFULLY, ToastType.Success);
+
+                try {
+                    await refetch(true);
+                } catch {
+                    // Refetch error handled by useDataFetch
+                }
+
                 return true;
             } catch {
                 addToast(PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_CREATE_FAILED_RETRY, ToastType.Error);

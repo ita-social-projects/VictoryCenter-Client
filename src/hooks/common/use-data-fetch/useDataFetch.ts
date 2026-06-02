@@ -62,7 +62,9 @@ export const useDataFetch = <TResult>({
             return;
         }
 
-        fetchData();
+        fetchData().catch(() => {
+            // Error is handled inside fetchData (setError)
+        });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [autoFetchDisabled, fetchData, ...autoFetchDependencies]);
 

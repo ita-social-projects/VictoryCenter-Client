@@ -94,7 +94,7 @@ describe('useDataFetch', () => {
         );
 
         await act(async () => {
-            await expect(result.current.refetch()).rejects.toThrow('Failed');
+            await expect(result.current.refetch(true)).rejects.toThrow('Failed');
         });
 
         expect(result.current.error).toEqual(new Error('Failed'));

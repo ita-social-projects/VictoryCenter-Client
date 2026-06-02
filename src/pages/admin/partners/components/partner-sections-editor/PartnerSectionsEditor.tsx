@@ -293,7 +293,7 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
         return (
             <div className={styles.error}>
                 <p className={styles['error-text']}>{PARTNERS_TEXT.MESSAGE.FAIL_TO_LOAD_PARTNERS}</p>
-                <button onClick={refetchSections} className={styles['error-text-button']}>
+                <button onClick={() => refetchSections()} className={styles['error-text-button']}>
                     {PARTNERS_TEXT.BUTTON.TRY_AGAIN}
                 </button>
             </div>

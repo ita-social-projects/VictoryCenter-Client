@@ -234,7 +234,7 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
                 {fetchError && !isLoading && (
                     <div className={styles.error}>
                         <p>{REPORTS_TEXT.MESSAGE.FAIL_TO_FETCH_REPORTS}</p>
-                        <Button onClick={refetch} buttonStyle="primary" className={styles['error-button']}>
+                        <Button onClick={() => refetch()} buttonStyle="primary" className={styles['error-button']}>
                             {REPORTS_TEXT.BUTTON.TRY_AGAIN}
                         </Button>
                     </div>

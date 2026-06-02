@@ -6,15 +6,8 @@ export interface UseDataFetchResult<TResult> {
     data: TResult;
     isLoading: boolean;
     error: any | null;
-    refetch: (shouldRethrow?: boolean) => Promise<void>;
+    refetch: (shouldRethrow?: boolean | unknown) => Promise<void>;
     setData: Dispatch<SetStateAction<TResult>>;
-}
-
-export interface useDataFetchProps<TResult> {
-    initialData: TResult;
-    fetchHandler: (options: RequestOptions) => Promise<TResult>;
-    autoFetchDependencies?: any[];
-    autoFetchDisabled?: boolean;
 }
 
 export const useDataFetch = <TResult>({
@@ -22,14 +15,15 @@ export const useDataFetch = <TResult>({
     fetchHandler,
     autoFetchDependencies = [],
     autoFetchDisabled = false,
-}: useDataFetchProps<TResult>): UseDataFetchResult<TResult> => {
+}: UseDataFetchParams<TResult>): UseDataFetchResult<TResult> => {
     const [fetchedData, setFetchedData] = useState<TResult>(initialData);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState<boolean>(!autoFetchDisabled);
     const [error, setError] = useState<any | null>(null);
     const abortControllerRef = useRef<AbortController | null>(null);
 
     const fetchData = useCallback(
-        async (shouldRethrow = false) => {
+        async (shouldRethrow: boolean | unknown = false) => {
+            const effectiveShouldRethrow = shouldRethrow === true;
             abortControllerRef.current?.abort();
             const newAbortController = new AbortController();
             abortControllerRef.current = newAbortController;
@@ -50,7 +44,7 @@ export const useDataFetch = <TResult>({
                     return;
                 }
                 setError(error);
-                if (shouldRethrow) {
+                if (effectiveShouldRethrow) {
                     throw error;
                 }
             } finally {

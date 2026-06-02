@@ -320,7 +320,7 @@ export const FundsExpenditureSection = ({
                 });
 
                 setRecordsState((prev) => prev.map((record) => (record.id === recordId ? updatedRecord : record)));
-                refetchSummary();
+                await refetchSummary();
                 addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY, ToastType.Success);
                 return true;
             } catch {
@@ -349,7 +349,7 @@ export const FundsExpenditureSection = ({
                 });
 
                 setRecordsState((prev) => [...prev, createdRecord]);
-                refetchSummary();
+                await refetchSummary();
                 addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_CREATED_SUCCESSFULLY, ToastType.Success);
                 setActiveRecordModalType(null);
                 return true;
@@ -365,7 +365,7 @@ export const FundsExpenditureSection = ({
         async (data: { name: string; type: FundsExpendituresTransactionType }): Promise<boolean> => {
             try {
                 await FundsExpendituresApi.createCategory(adminClient, data);
-                refetchCategories();
+                await refetchCategories();
                 addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_CREATED_SUCCESSFULLY, ToastType.Success);
                 return true;
             } catch {
@@ -382,7 +382,7 @@ export const FundsExpenditureSection = ({
             if (!category) return false;
             try {
                 await FundsExpendituresApi.updateCategory(adminClient, categoryId, { name, type: category.type });
-                refetchCategories();
+                await refetchCategories();
                 addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_UPDATED_SUCCESSFULLY, ToastType.Success);
                 return true;
             } catch {
@@ -397,7 +397,7 @@ export const FundsExpenditureSection = ({
         async (categoryId: number): Promise<boolean> => {
             try {
                 await FundsExpendituresApi.deleteCategory(adminClient, categoryId);
-                refetchCategories();
+                await refetchCategories();
                 addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_DELETED_SUCCESSFULLY, ToastType.Success);
                 return true;
             } catch {
@@ -447,7 +447,7 @@ export const FundsExpenditureSection = ({
             setRecordsState((prev) => prev.filter((r) => !selectedRecordIds.includes(r.id)));
             setSelectedRecordIds([]);
             setIsBulkDeleteModalOpen(false);
-            refetchSummary();
+            await refetchSummary();
             addToast(FUNDS_EXPENDITURES_TEXT.BULK.DELETE_SUCCESS, ToastType.Success);
         } catch {
             setIsBulkDeleteModalOpen(false);
@@ -464,7 +464,7 @@ export const FundsExpenditureSection = ({
         try {
             await FundsExpendituresApi.deleteRecord(adminClient, recordToDelete.id);
             setRecordsState((prev) => prev.filter((r) => r.id !== recordToDelete.id));
-            refetchSummary();
+            await refetchSummary();
             addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_DELETED_SUCCESSFULLY, ToastType.Success);
             setIsDeleteModalOpen(false);
         } catch {
@@ -487,7 +487,7 @@ export const FundsExpenditureSection = ({
             setIsEditing(false);
             onEditModeChange?.(false);
 
-            refetchSettings();
+            await refetchSettings();
 
             addToast(COMMON_TEXT_ADMIN.MESSAGE.SUCCESSFULLY_PUBLISHED, ToastType.Success);
         } catch {

@@ -49,6 +49,7 @@ export const useDataFetch = <TResult>({
                 return;
             }
             setError(error);
+            throw error;
         } finally {
             if (!newAbortController.signal.aborted) {
                 setIsLoading(false);

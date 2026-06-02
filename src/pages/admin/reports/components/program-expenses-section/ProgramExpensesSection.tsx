@@ -86,15 +86,23 @@ export const ProgramExpensesSection = ({ isEditing = false }: ProgramExpensesSec
 
     const handleSubmitAddProgramExpense = useCallback(
         async (submitData: { programId: number; reportingYear: string; amountUah: string; amountUsd: string }) => {
+            const reportingYear = Number.parseInt(submitData.reportingYear, 10);
+            const amountUah = Number.parseFloat(submitData.amountUah.replace(',', '.'));
+            const amountUsd = Number.parseFloat(submitData.amountUsd.replace(',', '.'));
+
+            if (!Number.isFinite(reportingYear) || !Number.isFinite(amountUah) || !Number.isFinite(amountUsd)) {
+                return false;
+            }
+
             try {
                 const payload = {
-                    reportingYear: parseInt(submitData.reportingYear, 10),
+                    reportingYear,
                     hippotherapyProgramCategoryId: submitData.programId,
-                    amountUah: parseFloat(submitData.amountUah.replace(',', '.')),
-                    amountUsd: parseFloat(submitData.amountUsd.replace(',', '.')),
+                    amountUah,
+                    amountUsd,
                 };
                 await ProgramExpensesApi.post(adminClient, payload);
-                refetch();
+                await refetch();
                 setIsAddProgramExpenseModalOpen(false);
                 addToast(PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_CREATED_SUCCESSFULLY, ToastType.Success);
                 return true;

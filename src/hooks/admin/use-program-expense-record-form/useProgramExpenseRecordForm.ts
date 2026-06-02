@@ -216,17 +216,20 @@ export const useProgramExpenseRecordForm = ({
         if (!formState.programId || !formState.reportingYear || isSubmitting) return;
 
         setIsSubmitting(true);
-        const success = await onSubmit({
-            programId: formState.programId,
-            reportingYear: formState.reportingYear,
-            amountUah: formState.amountUah,
-            amountUsd: formState.amountUsd,
-        });
-        setIsSubmitting(false);
+        try {
+            const success = await onSubmit({
+                programId: formState.programId,
+                reportingYear: formState.reportingYear,
+                amountUah: formState.amountUah,
+                amountUsd: formState.amountUsd,
+            });
 
-        if (success) {
-            setIsAddConfirmationOpen(false);
-            setFormState(INITIAL_STATE);
+            if (success) {
+                setIsAddConfirmationOpen(false);
+                setFormState(INITIAL_STATE);
+            }
+        } finally {
+            setIsSubmitting(false);
         }
     }, [formState, isSubmitting, onSubmit]);
 

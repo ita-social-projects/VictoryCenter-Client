@@ -10,6 +10,13 @@ export interface UseDataFetchResult<TResult> {
     setData: Dispatch<SetStateAction<TResult>>;
 }
 
+export interface UseDataFetchParams<TResult> {
+    initialData: TResult;
+    fetchHandler: (options: RequestOptions) => Promise<TResult>;
+    autoFetchDependencies?: any[];
+    autoFetchDisabled?: boolean;
+}
+
 export const useDataFetch = <TResult>({
     initialData,
     fetchHandler,

@@ -17,24 +17,17 @@ export const Header = () => {
         setIsMenuOpen((prev: boolean) => !prev);
     };
 
-    const onContactUsClick = () => {
-        //TODO: remove this log after implementing an actual logic
-        //eslint-disable-next-line no-console
-        console.log('CONTACT USED!');
-    };
-
     const aboutUsLinks: DropdownLink[] = [
         { text: t('WHO_WE_ARE'), navigateTo: PUBLIC_ROUTES.ABOUT_US.FULL, isDisabled: false },
-        { text: t('HISTORY'), navigateTo: '', isDisabled: true },
+        { text: t('HISTORY'), navigateTo: PUBLIC_ROUTES.HISTORY.FULL, isDisabled: false },
         { text: t('TEAM'), navigateTo: PUBLIC_ROUTES.TEAM.FULL, isDisabled: false },
         { text: t('PARTNERS'), navigateTo: PUBLIC_ROUTES.PARTNERS.FULL, isDisabled: false },
-        { text: t('EVENTS_AND_NEWS'), navigateTo: '', isDisabled: true },
+        { text: t('EVENTS_AND_NEWS'), navigateTo: PUBLIC_ROUTES.EVENTS_AND_NEWS.FULL, isDisabled: false },
     ];
 
     const programsLinks: DropdownLink[] = [
         { text: t('HIPPOTHERAPY'), navigateTo: PUBLIC_ROUTES.HIPPOTHERAPY.FULL, isDisabled: false },
         { text: t('PROGRAMS'), navigateTo: PUBLIC_ROUTES.PROGRAMS.FULL, isDisabled: false },
-        { text: t('PROGRAMS_SESSIONS'), navigateTo: '', isDisabled: true },
     ];
 
     return (
@@ -57,7 +50,7 @@ export const Header = () => {
 
                             <Link to={PUBLIC_ROUTES.STORIES_OF_VICTORIES.FULL}>{t('STORIES_OF_VICTORIES')}</Link>
 
-                            <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
+                            <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable" style={{ visibility: 'hidden' }}>
                                 {t('HOW_TO_SUPPORT')}
                             </Link>
                         </nav>
@@ -66,7 +59,11 @@ export const Header = () => {
                     <div className="button-container">
                         <LanguageSwitcher className="language-switcher" openOnHover={true} />
 
-                        <Button variant="secondary-dark" onClick={onContactUsClick} className="contact-us-button">
+                        <Button
+                            variant="secondary-dark"
+                            href={PUBLIC_ROUTES.CONTACT_US.FULL}
+                            className="contact-us-button"
+                        >
                             {t('CONTACT_US')}
                         </Button>
 
@@ -103,7 +100,12 @@ export const Header = () => {
                             {t('STORIES_OF_VICTORIES')}
                         </Link>
 
-                        <Link to={PUBLIC_ROUTES.MOCK.FULL} onClick={toggleMenu} className="disable">
+                        <Link
+                            to={PUBLIC_ROUTES.MOCK.FULL}
+                            onClick={toggleMenu}
+                            className="disable"
+                            style={{ display: 'none' }}
+                        >
                             {t('HOW_TO_SUPPORT')}
                         </Link>
 

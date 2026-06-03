@@ -34,7 +34,8 @@
     display: block;
     width: 100%;
     white-space: normal;
-    word-wrap: break-word;
+    overflow-wrap: anywhere;
+    word-break: normal;
 }
 
 .program-search-item-tooltip__name {

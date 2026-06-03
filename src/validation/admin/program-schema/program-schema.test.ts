@@ -1,5 +1,5 @@
-import { ContentType } from '@/types/common/programs';
-import { ProgramSectionTemplate } from '@/types/common/program-sections';
+import { ContentType } from '@/types/common/section-contents';
+import { SectionTemplate } from '@/types/common/sections';
 
 type Range = { min: number; max: number };
 
@@ -35,15 +35,25 @@ const loadSchema = (over?: { programValidation?: any; templateValidation?: any }
             description: { min: 1, max: 50, getRequiredWhenPublishingError: () => 'desc required' },
             previewImage: { getRequiredWhenPublishingError: () => 'preview required' },
             backgroundImage: { getRequiredWhenPublishingError: () => 'bg required' },
-            location: { max: 20, getRequiredWhenPublishingError: () => 'loc required' },
+            location: { min: 2, max: 20, getRequiredWhenPublishingError: () => 'loc required' },
             participantsCount: { max: 20, getRequiredWhenPublishingError: () => 'pc required' },
             meetingCount: { max: 20, getRequiredWhenPublishingError: () => 'mc required' },
+            ...(over?.programValidation ?? {}),
+        };
+
+        return {
+            PROGRAM_VALIDATION: pv,
+        };
+    });
+
+    jest.doMock('@/const/admin/sections', () => {
+        const pv = {
             images: { maxSizeMB: 1 },
             ...(over?.programValidation ?? {}),
         };
 
         const tv: any = {
-            [ProgramSectionTemplate.TextOnly]: {
+            [SectionTemplate.TextOnly]: {
                 counts: {
                     [ContentType.Title]: R(1, 1),
                     [ContentType.Description]: R(1, 1),
@@ -56,7 +66,7 @@ const loadSchema = (over?: { programValidation?: any; templateValidation?: any }
                 },
             },
 
-            [ProgramSectionTemplate.SingleImageBottom]: {
+            [SectionTemplate.SingleImageBottom]: {
                 counts: {
                     [ContentType.Title]: R(1, 1),
                     [ContentType.Description]: R(1, 1),
@@ -69,7 +79,7 @@ const loadSchema = (over?: { programValidation?: any; templateValidation?: any }
                 },
             },
 
-            [ProgramSectionTemplate.DualTitleDescriptionPairs]: {
+            [SectionTemplate.DualTitleDescriptionPairs]: {
                 counts: {
                     [ContentType.Title]: R(2, 2),
                     [ContentType.Description]: R(2, 2),
@@ -89,7 +99,7 @@ const loadSchema = (over?: { programValidation?: any; templateValidation?: any }
                 },
             },
 
-            [ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs]: {
+            [SectionTemplate.SingleTitleDescriptionAuthorPairs]: {
                 counts: {
                     [ContentType.Title]: R(1, 1),
                     [ContentType.Description]: R(1, 5),
@@ -204,8 +214,8 @@ const loadSchema = (over?: { programValidation?: any; templateValidation?: any }
         };
 
         return {
-            PROGRAM_VALIDATION: pv,
-            PROGRAM_SECTION_TEMPLATE_VALIDATION: tv,
+            SECTION_VALIDATION: pv,
+            SECTION_TEMPLATE_VALIDATION: tv,
         };
     });
 
@@ -245,10 +255,10 @@ const im = (order: any = 2, extra?: any) => ({
     ...(extra ?? {}),
 });
 
-const validTextOnly = () => sec(ProgramSectionTemplate.TextOnly, [t('aa', 0), d('bbbb', 1)]);
+const validTextOnly = () => sec(SectionTemplate.TextOnly, [t('aa', 0), d('bbbb', 1)]);
 
 const validSingleImage = (imgExtra?: any) =>
-    sec(ProgramSectionTemplate.SingleImageBottom, [t('a', 0), d('b', 1), im(2, imgExtra)]);
+    sec(SectionTemplate.SingleImageBottom, [t('a', 0), d('b', 1), im(2, imgExtra)]);
 
 describe('program-schema.ts coverage (templates are bottom-only)', () => {
     it('validateProgramSections returns undefined for undefined', () => {
@@ -273,53 +283,46 @@ describe('program-schema.ts coverage (templates are bottom-only)', () => {
 
     it('basic values: non-number contentType fails', () => {
         const m = loadSchema();
-        expect(
-            m.isProgramSectionValid(sec(ProgramSectionTemplate.TextOnly, [{ contentType: 'x', order: 0 }]), false),
-        ).toBe(false);
+        expect(m.isProgramSectionValid(sec(SectionTemplate.TextOnly, [{ contentType: 'x', order: 0 }]), false)).toBe(
+            false,
+        );
     });
 
     it('basic values: unknown numeric contentType fails', () => {
         const m = loadSchema();
-        expect(
-            m.isProgramSectionValid(sec(ProgramSectionTemplate.TextOnly, [{ contentType: 999, order: 0 }]), false),
-        ).toBe(false);
+        expect(m.isProgramSectionValid(sec(SectionTemplate.TextOnly, [{ contentType: 999, order: 0 }]), false)).toBe(
+            false,
+        );
     });
 
     it('basic values: negative order fails', () => {
         const m = loadSchema();
-        expect(m.isProgramSectionValid(sec(ProgramSectionTemplate.TextOnly, [t('aa', -1), d('bbbb', 1)]), false)).toBe(
-            false,
-        );
+        expect(m.isProgramSectionValid(sec(SectionTemplate.TextOnly, [t('aa', -1), d('bbbb', 1)]), false)).toBe(false);
     });
 
     it('basic values: groupIndex wrong type fails', () => {
         const m = loadSchema();
-        expect(
-            m.isProgramSectionValid(sec(ProgramSectionTemplate.TextOnly, [t('aa', 0, { groupIndex: '0' })]), false),
-        ).toBe(false);
+        expect(m.isProgramSectionValid(sec(SectionTemplate.TextOnly, [t('aa', 0, { groupIndex: '0' })]), false)).toBe(
+            false,
+        );
     });
 
     it('basic values: negative groupIndex fails', () => {
         const m = loadSchema();
-        expect(
-            m.isProgramSectionValid(sec(ProgramSectionTemplate.TextOnly, [t('aa', 0, { groupIndex: -1 })]), false),
-        ).toBe(false);
+        expect(m.isProgramSectionValid(sec(SectionTemplate.TextOnly, [t('aa', 0, { groupIndex: -1 })]), false)).toBe(
+            false,
+        );
     });
 
     it('orders: duplicate numeric orders fail', () => {
         const m = loadSchema();
-        expect(m.isProgramSectionValid(sec(ProgramSectionTemplate.TextOnly, [t('aa', 0), d('bbbb', 0)]), false)).toBe(
-            false,
-        );
+        expect(m.isProgramSectionValid(sec(SectionTemplate.TextOnly, [t('aa', 0), d('bbbb', 0)]), false)).toBe(false);
     });
 
     it('orders: non-number orders are ignored', () => {
         const m = loadSchema();
         expect(
-            m.isProgramSectionValid(
-                sec(ProgramSectionTemplate.TextOnly, [t('aa', undefined), d('bbbb', undefined)]),
-                true,
-            ),
+            m.isProgramSectionValid(sec(SectionTemplate.TextOnly, [t('aa', undefined), d('bbbb', undefined)]), true),
         ).toBe(true);
     });
 
@@ -327,7 +330,7 @@ describe('program-schema.ts coverage (templates are bottom-only)', () => {
         const m = loadSchema();
         expect(
             m.isProgramSectionValid(
-                sec(ProgramSectionTemplate.SingleImageBottom, [
+                sec(SectionTemplate.SingleImageBottom, [
                     t('a', 0),
                     d('b', 1),
                     im(2, { imageId: 1 }),
@@ -342,7 +345,7 @@ describe('program-schema.ts coverage (templates are bottom-only)', () => {
         const m = loadSchema();
         expect(
             m.isProgramSectionValid(
-                sec(ProgramSectionTemplate.SingleImageBottom, [
+                sec(SectionTemplate.SingleImageBottom, [
                     t('a', 0),
                     d('b', 1),
                     im(2, { image: { imageId: 2 } }),
@@ -362,7 +365,7 @@ describe('program-schema.ts coverage (templates are bottom-only)', () => {
         const m = loadSchema();
         expect(
             m.isProgramSectionValid(
-                sec(ProgramSectionTemplate.SingleImageBottom, [
+                sec(SectionTemplate.SingleImageBottom, [
                     t('a', 0),
                     d('b', 1),
                     im(2, { imageId: 1 }),
@@ -375,51 +378,43 @@ describe('program-schema.ts coverage (templates are bottom-only)', () => {
 
     it('counts: draft passes when actual < min but <= max', () => {
         const m = loadSchema();
-        expect(
-            m.isProgramSectionValid(sec(ProgramSectionTemplate.SingleImageBottom, [t('a', 0), d('b', 1)]), false),
-        ).toBe(true);
+        expect(m.isProgramSectionValid(sec(SectionTemplate.SingleImageBottom, [t('a', 0), d('b', 1)]), false)).toBe(
+            true,
+        );
     });
 
     it('counts: publish fails when not in range', () => {
         const m = loadSchema();
-        expect(
-            m.isProgramSectionValid(sec(ProgramSectionTemplate.SingleImageBottom, [t('a', 0), d('b', 1)]), true),
-        ).toBe(false);
+        expect(m.isProgramSectionValid(sec(SectionTemplate.SingleImageBottom, [t('a', 0), d('b', 1)]), true)).toBe(
+            false,
+        );
     });
 
     it('counts: 0..0 branch fails when author exists', () => {
         const m = loadSchema();
         expect(
-            m.isProgramSectionValid(sec(ProgramSectionTemplate.TextOnly, [t('aa', 0), d('bbbb', 1), a('x', 2)]), true),
+            m.isProgramSectionValid(sec(SectionTemplate.TextOnly, [t('aa', 0), d('bbbb', 1), a('x', 2)]), true),
         ).toBe(false);
     });
 
     it('lengths: publish fails when text is empty after trim', () => {
         const m = loadSchema();
-        expect(m.isProgramSectionValid(sec(ProgramSectionTemplate.TextOnly, [t('   ', 0), d('bbbb', 1)]), true)).toBe(
-            false,
-        );
+        expect(m.isProgramSectionValid(sec(SectionTemplate.TextOnly, [t('   ', 0), d('bbbb', 1)]), true)).toBe(false);
     });
 
     it('lengths: draft allows empty after trim', () => {
         const m = loadSchema();
-        expect(m.isProgramSectionValid(sec(ProgramSectionTemplate.TextOnly, [t('   ', 0), d('bbbb', 1)]), false)).toBe(
-            true,
-        );
+        expect(m.isProgramSectionValid(sec(SectionTemplate.TextOnly, [t('   ', 0), d('bbbb', 1)]), false)).toBe(true);
     });
 
     it('lengths: fails when above max', () => {
         const m = loadSchema();
-        expect(m.isProgramSectionValid(sec(ProgramSectionTemplate.TextOnly, [t('aaaa', 0), d('bbbb', 1)]), false)).toBe(
-            false,
-        );
+        expect(m.isProgramSectionValid(sec(SectionTemplate.TextOnly, [t('aaaa', 0), d('bbbb', 1)]), false)).toBe(false);
     });
 
     it('lengths: publish fails when below min', () => {
         const m = loadSchema();
-        expect(m.isProgramSectionValid(sec(ProgramSectionTemplate.TextOnly, [t('aa', 0), d('x', 1)]), true)).toBe(
-            false,
-        );
+        expect(m.isProgramSectionValid(sec(SectionTemplate.TextOnly, [t('aa', 0), d('x', 1)]), true)).toBe(false);
     });
 
     it('grouping: no grouped items is invalid in publish', () => {
@@ -436,7 +431,7 @@ describe('program-schema.ts coverage (templates are bottom-only)', () => {
         const m = loadSchema();
         expect(
             m.isProgramSectionValid(
-                sec(ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs, [
+                sec(SectionTemplate.SingleTitleDescriptionAuthorPairs, [
                     t('a', 0),
                     d('b', 1, { groupIndex: null }),
                     a('c', 2, { groupIndex: 0 }),
@@ -575,9 +570,9 @@ describe('program-schema.ts coverage (templates are bottom-only)', () => {
 
     it('validateProgramSections returns invalid when any section is invalid', () => {
         const m = loadSchema();
-        expect(
-            m.validateProgramSections([validTextOnly(), sec(ProgramSectionTemplate.TextOnly, [t('aa', 0)])], true),
-        ).toBe('invalid');
+        expect(m.validateProgramSections([validTextOnly(), sec(SectionTemplate.TextOnly, [t('aa', 0)])], true)).toBe(
+            'invalid',
+        );
     });
 
     it('validateProgramSections returns undefined when all sections are valid', () => {
@@ -599,7 +594,7 @@ describe('program-schema.ts coverage (templates are bottom-only)', () => {
                 'x',
                 ContentType.Image as any,
                 true,
-                ProgramSectionTemplate.TextOnly,
+                SectionTemplate.TextOnly,
             ),
         ).toBeUndefined();
     });
@@ -611,7 +606,7 @@ describe('program-schema.ts coverage (templates are bottom-only)', () => {
                 'aaaa',
                 ContentType.Title,
                 false,
-                ProgramSectionTemplate.TextOnly,
+                SectionTemplate.TextOnly,
             ),
         ).toBe('max 3');
     });
@@ -623,7 +618,7 @@ describe('program-schema.ts coverage (templates are bottom-only)', () => {
                 'a',
                 ContentType.Title,
                 true,
-                ProgramSectionTemplate.TextOnly,
+                SectionTemplate.TextOnly,
             ),
         ).toBe('min 2');
     });
@@ -635,37 +630,9 @@ describe('program-schema.ts coverage (templates are bottom-only)', () => {
                 'a',
                 ContentType.Title,
                 false,
-                ProgramSectionTemplate.TextOnly,
+                SectionTemplate.TextOnly,
             ),
         ).toBe('min 2');
-    });
-
-    it('PROGRAM_SECTION_VALIDATION_FUNCTIONS: validateSectionTitle returns required', () => {
-        const m = loadSchema();
-        expect(
-            m.PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateSectionTitle('', true, ProgramSectionTemplate.TextOnly),
-        ).toBe('required');
-    });
-
-    it('PROGRAM_SECTION_VALIDATION_FUNCTIONS: validateSectionDescription returns max error', () => {
-        const m = loadSchema();
-        expect(
-            m.PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateSectionDescription(
-                'aaaaaaaaaaa',
-                false,
-                ProgramSectionTemplate.TextOnly,
-            ),
-        ).toBe('max 4');
-    });
-
-    it('programSectionValidationSchema is executed', async () => {
-        const m = loadSchema();
-        await expect(
-            m.programSectionValidationSchema.validate(
-                { sectionTitle: 'aa', sectionDescription: 'bbbb' },
-                { context: { isPublishing: true, template: ProgramSectionTemplate.TextOnly } },
-            ),
-        ).resolves.toBeDefined();
     });
 });
 
@@ -677,7 +644,7 @@ describe('program-schema.ts required-message fallbacks', () => {
                 '',
                 ContentType.Author,
                 true,
-                ProgramSectionTemplate.TextOnly,
+                SectionTemplate.TextOnly,
             ),
         ).toBe('required');
     });
@@ -833,10 +800,10 @@ describe('PROGRAM_VALIDATION_FUNCTIONS', () => {
             expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateLocation('Kyiv, Ukraine', false)).toBeUndefined();
         });
 
-        it('returns undefined for empty location (optional field)', () => {
+        it('returns min 2 for location when draft or publishing program', () => {
             const m = loadSchema();
-            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateLocation('', false)).toBeUndefined();
-            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateLocation('', true)).toBeUndefined();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateLocation('', false)).toBe('min 2');
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateLocation('', true)).toBe('min 2');
         });
 
         it('returns error when location exceeds max length', () => {

@@ -12,6 +12,10 @@ export const PUBLIC_ROUTES = {
         PATH: 'about-us',
         FULL: '/about-us',
     },
+    EVENTS_AND_NEWS: {
+        PATH: 'events-and-news',
+        FULL: '/events-and-news',
+    },
     HIPPOTHERAPY: {
         PATH: 'hippotherapy',
         FULL: '/hippotherapy',
@@ -36,6 +40,13 @@ export const PUBLIC_ROUTES = {
     STORIES_OF_VICTORIES: {
         PATH: 'stories',
         FULL: '/stories',
+    CONTACT_US: {
+        PATH: 'contact-us',
+        FULL: '/contact-us',
+    },
+    HISTORY: {
+        PATH: 'history',
+        FULL: '/history',
     },
     MOCK: {
         PATH: 'about-us',

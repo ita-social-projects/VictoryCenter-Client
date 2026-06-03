@@ -417,7 +417,7 @@ describe('addProgram', () => {
         const result = await ProgramsApi.addProgram(mockClient, programData);
 
         expect(result.slug).toBe('my-program-slug');
-        expect(result.categories).toEqual(mockCategories);
+        expect(result.categories).toEqual([mockCategories[0]]);
     });
 
     it('adds program with section images', async () => {

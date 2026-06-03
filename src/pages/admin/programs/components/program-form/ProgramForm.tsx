@@ -1,6 +1,7 @@
 import React, { forwardRef, useCallback, useEffect, useMemo, useImperativeHandle, useRef, useState } from 'react';
 import { PROGRAM_VALIDATION_FUNCTIONS, isProgramSectionValid } from '@/validation/admin/program-schema/program-schema';
 import { PROGRAM_VALIDATION, PROGRAMS_TEXT } from '@/const/admin/programs';
+import { SECTION_VALIDATION, SECTIONS_TEXT } from '@/const/admin/sections';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
@@ -70,6 +71,7 @@ export interface ProgramFormProps {
     selectedLanguage?: string;
     onLanguageChange?: (language: string) => void;
     onRequestCancelSection?: (request: { type: SectionCancelActionType; onDiscard: () => void }) => void;
+    onRequestSaveSection?: (request: { onConfirm: () => void; onDecline?: () => void }) => void;
 }
 
 interface SectionEditingState {
@@ -108,6 +110,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             onAddSection,
             onReplaceSection,
             onRequestCancelSection,
+            onRequestSaveSection,
         }: ProgramFormProps,
         ref,
     ) => {
@@ -338,7 +341,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                 setFormState((prev) => {
                     const updatedSections = [...prev.sections];
                     [updatedSections[idx - 1], updatedSections[idx]] = [updatedSections[idx], updatedSections[idx - 1]];
-                    return { ...prev, sections: updatedSections };
+                    return { ...prev, sections: updatedSections.map((s, i) => ({ ...s, order: i })) };
                 });
 
                 setSectionStates((prev) => {
@@ -365,7 +368,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                 setFormState((prev) => {
                     const updatedSections = [...prev.sections];
                     [updatedSections[idx + 1], updatedSections[idx]] = [updatedSections[idx], updatedSections[idx + 1]];
-                    return { ...prev, sections: updatedSections };
+                    return { ...prev, sections: updatedSections.map((s, i) => ({ ...s, order: i })) };
                 });
 
                 setSectionStates((prev) => {
@@ -554,7 +557,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                             disabled={isSubmitting || isFormDisabled}
                             data-testid="add-program-button"
                         >
-                            {PROGRAMS_TEXT.BUTTON.ADD_SECTION} <PlusIcon />
+                            {SECTIONS_TEXT.BUTTON.ADD_SECTION} <PlusIcon />
                         </Button>
                     </div>
                 </div>
@@ -582,7 +585,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 PROGRAM_VALIDATION.backgroundImage.height,
                                 PROGRAM_VALIDATION.backgroundImage.width,
                             )}
-                            maxSizeMB={PROGRAM_VALIDATION.images.maxSizeMB}
+                            maxSizeMB={SECTION_VALIDATION.images.maxSizeMB}
                         />
                     </div>
 
@@ -629,6 +632,8 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
                                     PROGRAM_VALIDATION.location.max,
                                 )}
+                                showCounterBelow={true}
+                                isWhiteLabel={hasBackgroundImage}
                             />
 
                             <InputWithCharacterLimitGroup
@@ -643,6 +648,8 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
                                     PROGRAM_VALIDATION.participantsCount.max,
                                 )}
+                                showCounterBelow={true}
+                                isWhiteLabel={hasBackgroundImage}
                             />
 
                             <InputWithCharacterLimitGroup
@@ -657,6 +664,8 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
                                     PROGRAM_VALIDATION.meetingCount.max,
                                 )}
+                                showCounterBelow={true}
+                                isWhiteLabel={hasBackgroundImage}
                             />
                         </div>
 
@@ -699,7 +708,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                     PROGRAM_VALIDATION.previewImage.height,
                                     PROGRAM_VALIDATION.previewImage.width,
                                 )}
-                                maxSizeMB={PROGRAM_VALIDATION.images.maxSizeMB}
+                                maxSizeMB={SECTION_VALIDATION.images.maxSizeMB}
                             />
                         </div>
                     </div>
@@ -721,7 +730,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                     disabled={isSubmitting || isFormDisabled}
                                     data-testid="add-section-button-empty"
                                 >
-                                    {PROGRAMS_TEXT.BUTTON.ADD_SECTION}
+                                    {SECTIONS_TEXT.BUTTON.ADD_SECTION}
                                     <PlusIcon className={styles['plus-icon']} />
                                 </Button>
                             </div>
@@ -758,6 +767,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                             isLastSection={index === formState.sections.length - 1}
                                             onMoveUpSection={() => handleMoveUpSection(sectionKey)}
                                             onMoveDownSection={() => handleMoveDownSection(sectionKey)}
+                                            onRequestSaveSection={onRequestSaveSection}
                                         />
                                         {index === formState.sections.length - 1 && (
                                             <div className={styles['add-section-wrapper']}>
@@ -767,7 +777,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                                     disabled={isSubmitting || isFormDisabled}
                                                     data-testid="add-section-button-bottom"
                                                 >
-                                                    {PROGRAMS_TEXT.BUTTON.ADD_SECTION}
+                                                    {SECTIONS_TEXT.BUTTON.ADD_SECTION}
                                                     <PlusIcon className={styles['plus-icon']} />
                                                 </Button>
                                             </div>

@@ -25,7 +25,7 @@ describe('FundsExpendituresApi', () => {
             expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.REPORTS.FUNDS_EXPENDITURES.SETTINGS, {
                 signal: undefined,
             });
-            expect(result).toEqual({ id: 1, disclaimerTitle: 'Disclaimer', exchangeRate: '42.18' });
+            expect(result).toEqual({ id: 1, disclaimerTitle: 'Disclaimer', exchangeRate: '42,18' });
         });
 
         it('should pass cancellation signal', async () => {
@@ -63,8 +63,8 @@ describe('FundsExpendituresApi', () => {
         it('should request categories and map enum dto', async () => {
             mockClient.get.mockResolvedValueOnce({
                 data: [
-                    { id: 1, name: 'Income category', type: 1 },
-                    { id: 2, name: 'Expense category', type: 2 },
+                    { id: 1, name: 'Income category', type: 1, localizations: [] },
+                    { id: 2, name: 'Expense category', type: 2, localizations: [] },
                 ],
             });
 
@@ -74,15 +74,15 @@ describe('FundsExpendituresApi', () => {
                 signal: undefined,
             });
             expect(result).toEqual([
-                { id: 1, name: 'Income category', type: 'income' },
-                { id: 2, name: 'Expense category', type: 'expense' },
+                { id: 1, name: 'Income category', type: 'income', localizations: [] },
+                { id: 2, name: 'Expense category', type: 'expense', localizations: [] },
             ]);
         });
     });
 
     describe('createCategory', () => {
         it('should post category and map response', async () => {
-            mockClient.post.mockResolvedValueOnce({ data: { id: 3, name: 'New income', type: 1 } });
+            mockClient.post.mockResolvedValueOnce({ data: { id: 3, name: 'New income', type: 1, localizations: [] } });
 
             const result = await FundsExpendituresApi.createCategory(mockClient, {
                 name: 'New income',
@@ -93,13 +93,15 @@ describe('FundsExpendituresApi', () => {
                 name: 'New income',
                 type: 1,
             });
-            expect(result).toEqual({ id: 3, name: 'New income', type: 'income' });
+            expect(result).toEqual({ id: 3, name: 'New income', type: 'income', localizations: [] });
         });
     });
 
     describe('updateCategory', () => {
         it('should put category and map response', async () => {
-            mockClient.put.mockResolvedValueOnce({ data: { id: 2, name: 'Updated expense', type: 2 } });
+            mockClient.put.mockResolvedValueOnce({
+                data: { id: 2, name: 'Updated expense', type: 2, localizations: [] },
+            });
 
             const result = await FundsExpendituresApi.updateCategory(mockClient, 2, {
                 name: 'Updated expense',
@@ -110,7 +112,7 @@ describe('FundsExpendituresApi', () => {
                 name: 'Updated expense',
                 type: 2,
             });
-            expect(result).toEqual({ id: 2, name: 'Updated expense', type: 'expense' });
+            expect(result).toEqual({ id: 2, name: 'Updated expense', type: 'expense', localizations: [] });
         });
     });
 
@@ -151,8 +153,8 @@ describe('FundsExpendituresApi', () => {
                     categoryId: 1,
                     type: 'income',
                     reportingYear: '2025',
-                    amountUah: '7265.5',
-                    amountUsd: '4200.25',
+                    amountUah: '7265,5',
+                    amountUsd: '4200,25',
                 },
             ]);
         });
@@ -246,7 +248,7 @@ describe('FundsExpendituresApi', () => {
                 type: 2,
                 reportingYear: 2025,
                 amountUah: 350,
-                amountUsd: 9,
+                amountUsd: 9.5,
             });
             expect(result).toEqual({
                 id: 12,
@@ -254,7 +256,7 @@ describe('FundsExpendituresApi', () => {
                 type: 'expense',
                 reportingYear: '2025',
                 amountUah: '350',
-                amountUsd: '9.5',
+                amountUsd: '9,5',
             });
         });
     });

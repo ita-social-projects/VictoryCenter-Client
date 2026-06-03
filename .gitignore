@@ -34,3 +34,5 @@ yarn-error.log*
 .vs/
 *.css
 *.map
+
+swagger.json

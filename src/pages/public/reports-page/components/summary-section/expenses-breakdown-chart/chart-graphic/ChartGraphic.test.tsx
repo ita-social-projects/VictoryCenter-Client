@@ -36,6 +36,8 @@ jest.mock('./chart.config', () => ({
 const mockedUseMediaQuery = useMediaQuery as jest.Mock;
 const mockedUseChartGeometry = useChartGeometry as jest.Mock;
 
+const defaultFormatAmount = (amount: number) => `${amount.toLocaleString('uk-UA')} грн`;
+
 describe('ChartGraphic', () => {
     const items = [
         { label: 'A', percent: 25, amount: 1000 },
@@ -59,7 +61,7 @@ describe('ChartGraphic', () => {
     it('renders desktop config when media query matches', () => {
         mockedUseMediaQuery.mockReturnValue(true);
 
-        render(<ChartGraphic items={items} />);
+        render(<ChartGraphic items={items} formatAmount={defaultFormatAmount} />);
 
         const svg = document.querySelector('svg');
 
@@ -69,7 +71,7 @@ describe('ChartGraphic', () => {
     it('renders mobile config when media query does not match', () => {
         mockedUseMediaQuery.mockReturnValue(false);
 
-        render(<ChartGraphic items={items} />);
+        render(<ChartGraphic items={items} formatAmount={defaultFormatAmount} />);
 
         const svg = document.querySelector('svg');
 
@@ -79,7 +81,7 @@ describe('ChartGraphic', () => {
     it('renders correct number of paths', () => {
         mockedUseMediaQuery.mockReturnValue(true);
 
-        render(<ChartGraphic items={items} />);
+        render(<ChartGraphic items={items} formatAmount={defaultFormatAmount} />);
 
         const paths = document.querySelectorAll('path');
 
@@ -89,13 +91,15 @@ describe('ChartGraphic', () => {
     it('renders labels with formatted percent and amount', () => {
         mockedUseMediaQuery.mockReturnValue(true);
 
-        render(<ChartGraphic items={items} />);
+        const spyFormatAmount = jest.fn(defaultFormatAmount);
+
+        render(<ChartGraphic items={items} formatAmount={spyFormatAmount} />);
 
         expect(screen.getByText('25.0%')).toBeInTheDocument();
         expect(screen.getByText('75.0%')).toBeInTheDocument();
 
-        expect(screen.getByText('1 000 грн')).toBeInTheDocument();
-        expect(screen.getByText('3 000 грн')).toBeInTheDocument();
+        expect(spyFormatAmount).toHaveBeenCalledWith(1000);
+        expect(spyFormatAmount).toHaveBeenCalledWith(3000);
     });
 
     it('does not render label if position is missing', () => {
@@ -106,7 +110,7 @@ describe('ChartGraphic', () => {
             positions: [undefined, { x: 200, y: 200 }],
         });
 
-        render(<ChartGraphic items={items} />);
+        render(<ChartGraphic items={items} formatAmount={defaultFormatAmount} />);
 
         expect(screen.queryByText('25.0%')).not.toBeInTheDocument();
         expect(screen.getByText('75.0%')).toBeInTheDocument();
@@ -115,7 +119,7 @@ describe('ChartGraphic', () => {
     it('calls useChartGeometry with correct arguments', () => {
         mockedUseMediaQuery.mockReturnValue(true);
 
-        render(<ChartGraphic items={items} />);
+        render(<ChartGraphic items={items} formatAmount={defaultFormatAmount} />);
 
         expect(mockedUseChartGeometry).toHaveBeenCalledWith(items.length, true);
     });

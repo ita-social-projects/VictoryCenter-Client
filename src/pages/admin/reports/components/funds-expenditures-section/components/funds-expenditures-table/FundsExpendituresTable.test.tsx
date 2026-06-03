@@ -42,9 +42,17 @@ jest.mock('./FundsExpendituresTable.module.scss', () => ({
     'amount-edit-input': 'amount-edit-input',
     'amount-edit-input-error': 'amount-edit-input-error',
     'amount-edit-error': 'amount-edit-error',
+    'amount-edit-info': 'amount-edit-info',
+    'amount-edit-info-icon': 'amount-edit-info-icon',
+    'amount-edit-info-text': 'amount-edit-info-text',
     'to-top-button': 'to-top-button',
     'to-top-icon': 'to-top-icon',
     'to-top-button-visible': 'to-top-button-visible',
+    'selection-row': 'selection-row',
+    'selection-row-hidden': 'selection-row-hidden',
+    'selection-pill': 'selection-pill',
+    'selection-actions': 'selection-actions',
+    'delete-selected-button': 'delete-selected-button',
 }));
 
 jest.mock('@/assets/icons/chevron-up.svg', () => ({
@@ -79,6 +87,10 @@ jest.mock('@/assets/icons/checkmark.svg', () => ({
 
 jest.mock('@/assets/icons/cross.svg', () => ({
     ReactComponent: ({ className }: { className?: string }) => <svg data-testid="cross-icon" className={className} />,
+}));
+
+jest.mock('@/assets/icons/info.svg', () => ({
+    ReactComponent: ({ className }: { className?: string }) => <svg data-testid="info-icon" className={className} />,
 }));
 
 jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
@@ -177,11 +189,11 @@ jest.mock('@/components/common/select/Select', () => {
 });
 
 const MOCK_CATEGORIES: ReportFundsExpendituresCategory[] = [
-    { id: 1, name: 'Грантові кошти', type: 'income' },
-    { id: 2, name: 'Благодійні внески', type: 'income' },
-    { id: 3, name: 'Власні надходження', type: 'income' },
-    { id: 4, name: 'Адміністративні витрати', type: 'expense' },
-    { id: 5, name: 'Програмні витрати', type: 'expense' },
+    { id: 1, name: 'Грантові кошти', type: 'income', localizations: [] },
+    { id: 2, name: 'Благодійні внески', type: 'income', localizations: [] },
+    { id: 3, name: 'Власні надходження', type: 'income', localizations: [] },
+    { id: 4, name: 'Адміністративні витрати', type: 'expense', localizations: [] },
+    { id: 5, name: 'Програмні витрати', type: 'expense', localizations: [] },
 ];
 
 const MOCK_RECORDS: EnrichedRecord[] = [
@@ -253,43 +265,23 @@ describe('FundsExpendituresTable', () => {
         expect(onDeleteRecord).toHaveBeenCalledWith(MOCK_RECORDS[0]);
     });
 
-    it('should render empty state row when records is empty', () => {
-        renderTable({ records: [] });
+    it('should render nothing when records is empty in view mode', () => {
+        renderTable({ records: [], isEditing: false });
 
-        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.TITLE)).toBeInTheDocument();
-        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.ADD_RECORD)).toBeInTheDocument();
+        expect(screen.queryByTestId('funds-table-empty-cell')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('not-found')).not.toBeInTheDocument();
+    });
+
+    it('should render empty state row with message when records is empty in edit mode', () => {
+        renderTable({ records: [], isEditing: true });
+
+        expect(screen.getByTestId('funds-table-empty-cell')).toBeInTheDocument();
+        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.MESSAGE)).toBeInTheDocument();
         expect(screen.getByTestId('not-found')).toBeInTheDocument();
     });
 
-    it('should render add action buttons in empty state for view mode', () => {
-        renderTable({ records: [], isEditing: false });
-
-        expect(screen.getByTestId('empty-state-actions')).toBeInTheDocument();
-        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.ADD_EXPENSE)).toBeEnabled();
-        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.ADD_INCOME)).toBeEnabled();
-    });
-
-    it('should trigger add callbacks from empty state buttons in view mode', () => {
-        const onAddIncome = jest.fn();
-        const onAddExpense = jest.fn();
-
-        renderTable({ records: [], isEditing: false, onAddIncome, onAddExpense });
-
-        fireEvent.click(screen.getByTestId('mock-add-expense'));
-        fireEvent.click(screen.getByTestId('mock-add-income'));
-
-        expect(onAddExpense).toHaveBeenCalledTimes(1);
-        expect(onAddIncome).toHaveBeenCalledTimes(1);
-    });
-
-    it('should use correct empty-state colSpan in view and edit modes', () => {
-        const { rerender } = render(
-            <FundsExpendituresTable records={[]} categories={MOCK_CATEGORIES} isEditing={false} />,
-        );
-
-        expect(screen.getByTestId('funds-table-empty-cell')).toHaveAttribute('colspan', '5');
-
-        rerender(<FundsExpendituresTable records={[]} categories={MOCK_CATEGORIES} isEditing />);
+    it('should use correct empty-state colSpan in edit mode', () => {
+        renderTable({ records: [], isEditing: true });
 
         expect(screen.getByTestId('funds-table-empty-cell')).toHaveAttribute('colspan', '7');
     });
@@ -488,7 +480,7 @@ describe('FundsExpendituresTable', () => {
             fireEvent.click(screen.getByLabelText('Edit record 1'));
             fireEvent.click(screen.getByTestId('select-option-Благодійні внески-2'));
 
-            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE)).toBeInTheDocument();
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE_INCOME)).toBeInTheDocument();
             expect(screen.getByLabelText('Accept record 1')).toBeDisabled();
         });
 
@@ -519,7 +511,7 @@ describe('FundsExpendituresTable', () => {
             fireEvent.click(screen.getByLabelText('Edit record 1'));
             fireEvent.click(screen.getByTestId('select-option-Власні надходження-3'));
 
-            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE)).toBeInTheDocument();
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE_INCOME)).toBeInTheDocument();
             expect(screen.getByLabelText('Accept record 1')).toBeDisabled();
         });
 
@@ -636,6 +628,33 @@ describe('FundsExpendituresTable', () => {
             });
         });
 
+        it('should preserve amount decimal text when saving table row', () => {
+            const onRecordSave = jest.fn();
+            const recordsWithDecimals: EnrichedRecord[] = [
+                {
+                    id: 1,
+                    categoryId: 1,
+                    categoryName: 'Грантові кошти',
+                    type: 'income',
+                    reportingYear: '2025',
+                    amountUah: '7 265,123',
+                    amountUsd: '173,221',
+                },
+            ];
+
+            renderTable({ isEditing: true, onRecordSave, records: recordsWithDecimals });
+
+            fireEvent.click(screen.getByLabelText('Edit record 1'));
+            fireEvent.click(screen.getByTestId('select-option-Благодійні внески-2'));
+            fireEvent.click(screen.getByLabelText('Accept record 1'));
+
+            expect(onRecordSave).toHaveBeenCalledWith(1, {
+                categoryId: 2,
+                amountUah: '7 265,123',
+                amountUsd: '173,221',
+            });
+        });
+
         it('should show saving indicator, lock controls and disable inputs while row save is in progress', async () => {
             let resolveSave: (() => void) | undefined;
             const onRecordSave = jest.fn(
@@ -680,7 +699,7 @@ describe('FundsExpendituresTable', () => {
             fireEvent.click(screen.getByLabelText('Edit record 1'));
             fireEvent.change(screen.getByLabelText('Amount USD record 1'), { target: { value: 'abc' } });
 
-            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER_GT_ZERO)).toBeInTheDocument();
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER)).toBeInTheDocument();
             expect(screen.getByLabelText('Accept record 1')).toBeDisabled();
         });
 
@@ -701,6 +720,17 @@ describe('FundsExpendituresTable', () => {
             fireEvent.change(screen.getByLabelText('Amount USD record 1'), { target: { value: '-500' } });
 
             expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_NOT_NEGATIVE)).toBeInTheDocument();
+            expect(screen.getByLabelText('Accept record 1')).toBeDisabled();
+        });
+
+        it('should show zero validation for zero amount on blur', () => {
+            renderTable({ isEditing: true });
+
+            fireEvent.click(screen.getByLabelText('Edit record 1'));
+            fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '0' } });
+            fireEvent.blur(screen.getByLabelText('Amount UAH record 1'));
+
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_NOT_ZERO)).toBeInTheDocument();
             expect(screen.getByLabelText('Accept record 1')).toBeDisabled();
         });
 
@@ -732,22 +762,6 @@ describe('FundsExpendituresTable', () => {
                 expectedValue: '200',
                 withBlur: false,
             },
-            {
-                title: 'should recalculate UAH when USD amount is changed and validated',
-                changedFieldLabel: 'Amount USD record 1',
-                changedValue: '50',
-                expectedFieldLabel: 'Amount UAH record 1',
-                expectedValue: '2000',
-                withBlur: true,
-            },
-            {
-                title: 'should recalculate UAH immediately on valid USD change using current exchange rate',
-                changedFieldLabel: 'Amount USD record 1',
-                changedValue: '50',
-                expectedFieldLabel: 'Amount UAH record 1',
-                expectedValue: '2000',
-                withBlur: false,
-            },
         ])('$title', ({ changedFieldLabel, changedValue, expectedFieldLabel, expectedValue, withBlur }) => {
             renderTable({ isEditing: true, exchangeRate: '40' });
 
@@ -773,6 +787,32 @@ describe('FundsExpendituresTable', () => {
             expect(screen.getByLabelText('Amount USD record 1')).toHaveValue('4 200');
         });
 
+        it('should show mismatch info message when edited USD does not match converted UAH amount', () => {
+            renderTable({ isEditing: true, exchangeRate: '40' });
+
+            fireEvent.click(screen.getByLabelText('Edit record 1'));
+            fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '8 000' } });
+            fireEvent.change(screen.getByLabelText('Amount USD record 1'), { target: { value: '201' } });
+            fireEvent.blur(screen.getByLabelText('Amount USD record 1'));
+
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).toBeInTheDocument();
+        });
+
+        it('should clear mismatch info message immediately when UAH amount changes', () => {
+            renderTable({ isEditing: true, exchangeRate: '40' });
+
+            fireEvent.click(screen.getByLabelText('Edit record 1'));
+            fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '8 000' } });
+            fireEvent.change(screen.getByLabelText('Amount USD record 1'), { target: { value: '201' } });
+            fireEvent.blur(screen.getByLabelText('Amount USD record 1'));
+
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).toBeInTheDocument();
+
+            fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: 'abc' } });
+
+            expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).not.toBeInTheDocument();
+        });
+
         it('should use current exchange rate instead of just adding/removing zeroes', () => {
             const records: EnrichedRecord[] = [
                 {
@@ -791,10 +831,64 @@ describe('FundsExpendituresTable', () => {
             fireEvent.click(screen.getByLabelText('Edit record 1'));
 
             fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '50 000' } });
-            expect(screen.getByLabelText('Amount USD record 1')).toHaveValue('1190.48');
+            expect(screen.getByLabelText('Amount USD record 1')).toHaveValue('1190,48');
 
             fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '500 000' } });
-            expect(screen.getByLabelText('Amount USD record 1')).toHaveValue('11904.76');
+            expect(screen.getByLabelText('Amount USD record 1')).toHaveValue('11904,77');
+        });
+    });
+
+    describe('Bulk selection and deletion UI', () => {
+        it('should render selection summary and delete button when records are selected', () => {
+            const onOpenBulkDelete = jest.fn();
+
+            renderTable({ isEditing: true, selectedRecordIds: [1, 2], onOpenBulkDelete });
+
+            const summary = screen.getByTestId('table-selection-summary');
+            expect(summary).toBeInTheDocument();
+            expect(summary).toHaveAttribute('aria-hidden', 'false');
+
+            const selectedLabel = FUNDS_EXPENDITURES_TEXT.BULK.getSelectedLabel(2, MOCK_RECORDS.length);
+            expect(screen.getByText(selectedLabel)).toBeInTheDocument();
+
+            const deleteButton = screen.getByText(FUNDS_EXPENDITURES_TEXT.BULK.DELETE_BUTTON);
+            expect(deleteButton).toBeInTheDocument();
+            expect(deleteButton).not.toBeDisabled();
+
+            fireEvent.click(deleteButton);
+            expect(onOpenBulkDelete).toHaveBeenCalled();
+        });
+
+        it('should hide selection summary when nothing is selected', () => {
+            renderTable({ isEditing: true, selectedRecordIds: [] });
+
+            const summary = screen.getByTestId('table-selection-summary');
+            expect(summary).toBeInTheDocument();
+            expect(summary).toHaveAttribute('aria-hidden', 'true');
+        });
+
+        it('should call onSelectAllToggle when header checkbox is clicked', () => {
+            const onSelectAllToggle = jest.fn();
+
+            renderTable({ isEditing: true, eligibleRecordIds: [1, 2, 3], onSelectAllToggle });
+
+            const headerCheckbox = screen.getByLabelText('Select all records');
+            expect(headerCheckbox).toBeInTheDocument();
+
+            fireEvent.click(headerCheckbox);
+            expect(onSelectAllToggle).toHaveBeenCalledWith(true);
+        });
+
+        it('should call onToggleRecordSelection when an individual row checkbox is clicked', () => {
+            const onToggleRecordSelection = jest.fn();
+
+            renderTable({ isEditing: true, onToggleRecordSelection });
+
+            const rowCheckbox = screen.getByLabelText('Select record 1');
+            expect(rowCheckbox).toBeInTheDocument();
+
+            fireEvent.click(rowCheckbox);
+            expect(onToggleRecordSelection).toHaveBeenCalledWith(1);
         });
     });
 });

@@ -1,10 +1,11 @@
-import { PROGRAM_VALIDATION, PROGRAM_SECTION_TEMPLATE_VALIDATION } from '@/const/admin/programs';
+import { SECTION_VALIDATION, SECTION_TEMPLATE_VALIDATION } from '@/const/admin/sections';
+import { PROGRAM_VALIDATION } from '@/const/admin/programs';
 import { FAQ_VALIDATION } from '@/const/admin/faq';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ProgramCategory } from '@/types/admin/programs';
 import { Image, ImageValues } from '@/types/common/image';
 import { CreateHippotherapyProgramSectionDto } from '@/types/common/program-sections';
-import { ContentType } from '@/types/common/programs';
+import { ContentType } from '@/types/common/section-contents';
 import * as Yup from 'yup';
 
 export interface ProgramValidationContext {
@@ -25,9 +26,7 @@ type TemplateRules = {
 type SectionTemplate = CreateHippotherapyProgramSectionDto['template'];
 type SectionContent = NonNullable<CreateHippotherapyProgramSectionDto['contents']>[number];
 
-const TEMPLATE_RULES = PROGRAM_SECTION_TEMPLATE_VALIDATION as unknown as Partial<
-    Record<SectionTemplate, TemplateRules>
->;
+const TEMPLATE_RULES = SECTION_TEMPLATE_VALIDATION as unknown as Partial<Record<SectionTemplate, TemplateRules>>;
 
 const getTemplateRules = (template: SectionTemplate): TemplateRules | undefined => TEMPLATE_RULES[template];
 
@@ -159,6 +158,10 @@ export const programValidationSchema = Yup.object({
             PROGRAM_VALIDATION.location.max,
             COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PROGRAM_VALIDATION.location.max),
         )
+        .min(
+            PROGRAM_VALIDATION.location.min,
+            COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(PROGRAM_VALIDATION.location.min),
+        )
         .notRequired(),
 
     participantsCount: Yup.string()
@@ -263,40 +266,7 @@ export const PROGRAM_VALIDATION_FUNCTIONS = {
     },
 };
 
-export const programSectionValidationSchema = Yup.object({
-    sectionTitle: createTemplateTextSchema(ContentType.Title),
-    sectionDescription: createTemplateTextSchema(ContentType.Description),
-});
-
 export const PROGRAM_SECTION_VALIDATION_FUNCTIONS = {
-    validateSectionTitle: (value: string, isPublishing: boolean, template?: SectionTemplate): string | undefined => {
-        const context: ProgramValidationContext & { template?: SectionTemplate } = { isPublishing, template };
-        try {
-            programSectionValidationSchema.validateSyncAt('sectionTitle', { sectionTitle: value }, { context });
-            return undefined;
-        } catch (error: any) {
-            return error.message;
-        }
-    },
-
-    validateSectionDescription: (
-        value: string,
-        isPublishing: boolean,
-        template?: SectionTemplate,
-    ): string | undefined => {
-        const context: ProgramValidationContext & { template?: SectionTemplate } = { isPublishing, template };
-        try {
-            programSectionValidationSchema.validateSyncAt(
-                'sectionDescription',
-                { sectionDescription: value },
-                { context },
-            );
-            return undefined;
-        } catch (error: any) {
-            return error.message;
-        }
-    },
-
     validateContentText: (
         value: string,
         type: ContentType,
@@ -516,7 +486,7 @@ const validateTemplateImages = (contents: SectionContent[], rules: TemplateRules
         }
     }
 
-    const maxSizeMB = PROGRAM_VALIDATION.images?.maxSizeMB;
+    const maxSizeMB = SECTION_VALIDATION.images?.maxSizeMB;
     if (typeof maxSizeMB === 'number' && maxSizeMB > 0) {
         const maxBytes = maxSizeMB * 1024 * 1024;
         for (const img of images) {

@@ -19,20 +19,31 @@ import cn from 'classnames';
 import { ACTION_ICONS } from '@/const/common/action-icons';
 import { IconButton } from '@/components/admin/icon-button/IconButton';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
+import { LocalizationLanguage } from '@/types/common/language';
+import { PdfSectionLocalizationDto } from '@/types/admin/pdf-section';
 
 interface PdfSectionContent {
     title: string;
     description: string;
+    localizations: PdfSectionLocalizationDto[];
 }
 
 interface PdfSectionContentBlockProps {
     content: PdfSectionContent;
-    onSave?: (data: PdfSectionContent) => Promise<void>;
+    onAfterSave?: () => Promise<void>;
+    translationLanguages: LocalizationLanguage[];
+    onTranslateClick?: () => void;
 }
 
 type ConfirmationModalType = 'publish' | 'cancel' | null;
 
-export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({ content, onSave }) => {
+export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({
+    content,
+    onAfterSave,
+    translationLanguages,
+    onTranslateClick,
+}) => {
     const client = useAdminClient();
     const [isEditMode, setIsEditMode] = useState(false);
     const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
@@ -97,18 +108,14 @@ export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({ 
 
     const handleSaveConfirmed = useCallback(async () => {
         setIsSaving(true);
+        let apiSucceeded = false;
         try {
             const normalizedData = {
                 title: getNormalizedInputText(formData.title),
                 description: getNormalizedInputText(formData.description),
             };
-
             await PdfSectionApi.updatePdfSection(client, normalizedData);
-
-            if (onSave) {
-                await onSave(normalizedData);
-            }
-
+            apiSucceeded = true;
             setIsEditMode(false);
             addToast(COMMON_TEXT_ADMIN.MESSAGE.UPDATES_SUCCESSFULLY_PUBLISHED, ToastType.Success);
         } catch {
@@ -116,7 +123,13 @@ export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({ 
         } finally {
             setIsSaving(false);
         }
-    }, [formData.title, formData.description, client, onSave, addToast]);
+
+        if (apiSucceeded && onAfterSave) {
+            try {
+                await onAfterSave();
+            } catch {}
+        }
+    }, [formData.title, formData.description, client, onAfterSave, addToast]);
 
     const handleConfirmPublish = useCallback(() => {
         setIsConfirmationModalOpen(false);
@@ -201,15 +214,33 @@ export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({ 
 
         return (
             <div className={cn(styles.root, styles['view-root'])}>
-                <div className={styles['edit-button-container']}>
-                    <IconButton
-                        aria-label={PDF_FILES_SECTION_TEXT.ACTIONS.EDIT}
-                        type="button"
-                        onClick={handleEditClick}
-                        className={styles['edit-button']}
-                        DefaultIcon={ACTION_ICONS.edit.default}
-                        FilledIcon={ACTION_ICONS.edit.hover}
+                <div className={styles['buttons-container']}>
+                    <LocalizationStatuses
+                        languages={translationLanguages}
+                        localizedEntity={{
+                            translationStatuses: (content.localizations ?? []).map((l) => ({
+                                languageId: l.languageId,
+                                translationStatus: l.translationStatus,
+                            })),
+                        }}
                     />
+                    <div className={styles['action-buttons']}>
+                        <IconButton
+                            aria-label={PDF_FILES_SECTION_TEXT.ACTIONS.TRANSLATE}
+                            type="button"
+                            className={styles['translate-button']}
+                            onClick={onTranslateClick}
+                            DefaultIcon={ACTION_ICONS.translate.default}
+                        />
+                        <IconButton
+                            aria-label={PDF_FILES_SECTION_TEXT.ACTIONS.EDIT}
+                            type="button"
+                            onClick={handleEditClick}
+                            className={styles['edit-button']}
+                            DefaultIcon={ACTION_ICONS.edit.default}
+                            FilledIcon={ACTION_ICONS.edit.hover}
+                        />
+                    </div>
                 </div>
                 <div className={styles['content-container']}>
                     <div className={styles['view-field']}>

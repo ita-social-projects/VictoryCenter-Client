@@ -3,7 +3,7 @@ import { COMMON_TEXT_ADMIN } from './common';
 export const REPORTS_TEXT = {
     FORM: {
         LABEL: {
-            TITLE: 'Заголовок',
+            TITLE: 'Заголовок/EN',
             COLLECTED_FUNDS_WINDOW: 'Вікно 1: Зібрано коштів',
             CHANGED_LIVES_WINDOW: 'Вікно 2: Змінено життів',
             COLLECTED_FUNDS: 'Зібрані кошти',
@@ -40,7 +40,7 @@ export const REPORTS_TEXT = {
 
 export const REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION = {
     title: {
-        min: 10,
+        min: 2,
         max: 50,
         getRequiredError: () => `Заголовок обов'язковий`,
     },
@@ -55,7 +55,7 @@ export const REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION = {
 
 export const REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION = {
     title: {
-        min: 10,
+        min: 2,
         max: 50,
         getRequiredError: () => `Заголовок обов'язковий`,
     },
@@ -83,6 +83,13 @@ export const PDF_FILES_SECTION_VALIDATION = {
         getRequiredError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED,
         getMinError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(2),
         getMaxError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(160),
+    },
+    fileName: {
+        min: 2,
+        max: 50,
+        getRequiredError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED,
+        getMinError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(2),
+        getMaxError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(50),
     },
     page_size: 4,
 };
@@ -114,11 +121,26 @@ export const PDF_FILES_SECTION_TEXT = {
     },
     ACTIONS: {
         EDIT: 'Редагувати основну інформацію',
+        TRANSLATE: 'Перекласти',
         FILE: {
             EDIT: 'Редагувати назву файлу',
             VIEW: 'Переглянути файл',
             DELETE: 'Видалити файл',
+            ACCEPT_RENAME: 'Прийняти',
+            CANCEL_RENAME: 'Скасувати',
         },
+    },
+    MESSAGE: {
+        RENAME_SUCCESS: 'Назву файлу успішно змінено',
+        RENAME_ERROR: 'Не вдалося змінити назву файлу. Спробуйте ще раз.',
+        DELETE_SUCCESS: 'Файл успішно видалено',
+        DELETE_ERROR: 'Не вдалося видалити файл. Спробуйте ще раз.',
+        VIEW_ERROR: 'Не вдалося завантажити файл для перегляду. Спробуйте ще раз.',
+        FAIL_TO_CREATE_TRANSLATION: 'Виникла помилка під час додавання перекладу для PDF секції',
+        FAIL_TO_UPDATE_TRANSLATION: 'Виникла помилка під час оновлення перекладу для PDF секції',
+    },
+    DELETE_CONFIRMATION: {
+        TITLE: 'Файл буде видалено. Бажаєте продовжити?',
     },
 };
 
@@ -129,6 +151,25 @@ export const FUNDS_EXPENDITURES_VALIDATION = {
         maxDecimalDigits: 6,
     },
     maxCategoriesPerType: 4,
+    categoryNameMin: 5,
+    categoryNameMax: 200,
+};
+
+export const PDF_SECTION_LOCALIZATION_VALIDATION = {
+    title: {
+        min: 2,
+        max: 200,
+        getRequiredError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED,
+        getMinError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(2),
+        getMaxError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(200),
+    },
+    description: {
+        min: 2,
+        max: 200,
+        getRequiredError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED,
+        getMinError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(2),
+        getMaxError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(200),
+    },
 };
 
 export const FUNDS_EXPENDITURES_TEXT = {
@@ -141,6 +182,15 @@ export const FUNDS_EXPENDITURES_TEXT = {
         RECORD_UPDATE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
         RECORD_DELETED_SUCCESSFULLY: 'Запис успішно видалено',
         RECORD_DELETE_FAILED_RETRY: 'Не вдалося видалити запис. Спробуйте ще раз',
+        AMOUNT_USD_NOT_MATCH: 'Сума в USD не відповідає сумі в UAH',
+        CATEGORY_CREATED_SUCCESSFULLY: 'Категорію додано успішно',
+        CATEGORY_CREATE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
+        CATEGORY_DELETED_SUCCESSFULLY: 'Категорію видалено успішно',
+        CATEGORY_DELETE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
+        CATEGORY_UPDATED_SUCCESSFULLY: 'Категорію оновлено успішно',
+        CATEGORY_UPDATE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
+        FAIL_TO_TRANSLATE_CATEGORY: 'Не вдалося зберегти переклад категорії. Спробуйте ще раз',
+        FAIL_TO_UPDATE_CATEGORY_TRANSLATION: 'Не вдалося оновити переклад категорії. Спробуйте ще раз',
     },
     MODAL: {
         SHARED: {
@@ -168,12 +218,65 @@ export const FUNDS_EXPENDITURES_TEXT = {
             CATEGORY_LABEL: 'Категорія витрат',
             CATEGORY_PLACEHOLDER: 'Оберіть категорію витрат',
             SUBMIT_BUTTON: 'Додати витрату',
+            CONFIRM_ADD_TITLE: 'Додати нову витрату?',
+        },
+        EDIT_CATEGORY: {
+            TITLE: 'Редагувати категорію',
+            SUBTITLE: 'Редагування категорії витрат/надходжень для формування звітності',
+            CATEGORY_LABEL: 'Категорія',
+            CATEGORY_PLACEHOLDER: 'Оберіть категорію',
+            NAME_LABEL: 'Редагувати назву',
+            NAME_PLACEHOLDER: 'Введіть назву категорії',
+            SUBMIT_BUTTON: 'Зберегти',
+            CONFIRM_SAVE_TITLE: 'Зберегти зміни?',
+        },
+        DELETE_CATEGORY: {
+            TITLE: 'Видалити категорію',
+            CATEGORY_LABEL: 'Категорія',
+            CATEGORY_PLACEHOLDER: 'Оберіть категорію',
+            CONFIRM_TITLE: 'Видалити категорію?',
+            ERROR: {
+                getHasIncomeRecordTitle: (count: number) =>
+                    `Категорія використовується в надходженнях, ${count} ${count === 1 ? 'запис' : count < 5 ? 'записи' : 'записів'}`,
+                getHasExpenseRecordTitle: (count: number) =>
+                    `Категорія використовується у витратах, ${count} ${count === 1 ? 'запис' : count < 5 ? 'записи' : 'записів'}`,
+                HAS_RECORD_TEXT: 'Видаліть або змініть їх',
+            },
+        },
+        CATEGORY: {
+            TITLE: 'Додати категорію',
+            SUBTITLE: 'Додавання категорії витрат/надходжень для формування звітності',
+            TYPE_LABEL: 'Витрата/Надходження',
+            TYPE_PLACEHOLDER: 'Витрата/Надходження',
+            NAME_LABEL: 'Назва',
+            NAME_PLACEHOLDER: 'Введіть назву категорії',
+            SUBMIT_BUTTON: 'Зберегти',
+            ERROR: {
+                NAME_DUPLICATE: 'Категорія з такою назвою вже існує',
+            },
+        },
+        TRANSLATE_CATEGORY: {
+            TITLE: 'Переклад категорії',
+            CATEGORY_LABEL: 'Категорія',
+            CATEGORY_PLACEHOLDER: 'Оберіть категорію',
+            NAME_LABEL: 'Назва',
+            NAME_PLACEHOLDER: 'Введіть назву категорії',
+        },
+        TRANSLATE_DISCLAIMER: {
+            TITLE: 'Додати переклад',
+            DESCRIPTION_LABEL: 'Опис',
+            FAIL_TO_TRANSLATE: 'Не вдалося зберегти переклад дісклеймера. Спробуйте ще раз',
+            FAIL_TO_UPDATE_TRANSLATION: 'Не вдалося оновити переклад дісклеймера. Спробуйте ще раз',
         },
     },
     BUTTON: {
         EDIT: 'Редагувати Доходи та витрати',
         ADD_INCOME: 'Надходження',
         ADD_EXPENSE: 'Витрати',
+        ADD_CATEGORY: 'Додати категорію',
+        DELETE_CATEGORY: 'Видалити',
+        EDIT_CATEGORY: 'Редагувати',
+        TRANSLATE_CATEGORY: 'Перекласти',
     },
     FILTER: {
         TYPE_PLACEHOLDER: 'Тип',
@@ -209,12 +312,59 @@ export const FUNDS_EXPENDITURES_TEXT = {
         },
     },
     VALIDATION: {
-        CATEGORY_UNIQUE: 'Категорія має бути унікальна',
-        AMOUNT_ONLY_NUMBER_GT_ZERO: 'Лише число > 0',
-        AMOUNT_MAX_DIGITS: "Не більше 11 цифр, 2 після ','",
+        CATEGORY_UNIQUE_INCOME: 'Категорія вже додана до надходжень',
+        CATEGORY_UNIQUE_EXPENSE: 'Категорія вже додана до витрат',
+        AMOUNT_ONLY_NUMBER: 'Дозволено лише цифри',
+        AMOUNT_MAX_DIGITS: 'Не більше 9 цифр до коми',
         AMOUNT_NOT_NEGATIVE: "Сума не може бути від'ємною",
+        AMOUNT_NOT_ZERO: 'Сума не може дорівнювати 0',
         EXCHANGE_RATE_ONLY_NUMERIC: 'Дозволено тільки числові значення десяткові та цілі',
         EXCHANGE_RATE_GT_ZERO: 'Значення має бути більше 0',
         EXCHANGE_RATE_MAX_DIGITS: "Не більше 9 цифр, 6 після ','",
+    },
+    BULK: {
+        getSelectedLabel: (selected: number, total: number) => `Вибрано ${selected} з ${total}`,
+        DELETE_BUTTON: 'Видалити вибрані',
+        DELETE_CONFIRM_TITLE: 'Видалити обрані записи?',
+        DELETE_SUCCESS: 'Записи видалені успішно',
+        DELETE_FAILED: 'Помилка при видаленні записів. Спробуйте ще раз.',
+    },
+};
+
+export const PROGRAM_EXPENSES_TEXT = {
+    BUTTON: {
+        ADD_PROGRAM_EXPENSE: 'Витрата по програмі',
+    },
+    MODAL: {
+        ADD: {
+            TITLE: 'Додати витрату по програмі',
+            SUBTITLE: 'Розподіл програмних витрат по програмах',
+            PROGRAM_LABEL: 'Категорія програми',
+            PROGRAM_PLACEHOLDER: 'Оберіть програму',
+            SUBMIT_BUTTON: 'Додати витрату',
+            CONFIRM_CLOSE_TITLE: 'Зміни будуть втрачені. Бажаєте продовжити?',
+            PROGRAM_NO_AVAILABLE: 'Немає доступних програм',
+        },
+    },
+    VALIDATION: {
+        PROGRAM_UNIQUE: 'Така категорія вже додана, Оберіть іншу категорію',
+    },
+    FILTER: {
+        PROGRAMS_PLACEHOLDER: 'Програми',
+        ALL_OPTION: 'Всі',
+        getProgramsCounterLabel: (count: number) => `Програми (${count})`,
+    },
+    EMPTY_STATE: {
+        ADD_RECORD: 'додайте перший запис Програмної витрати',
+    },
+    SUMMARY_CARD: {
+        TITLE: 'Всього програмні витрати',
+    },
+    TABLE: {
+        TYPE_LABEL: 'Програмні',
+        COLUMNS: {
+            PROGRAM: 'Програма',
+            ACTIONS: 'Дії',
+        },
     },
 };

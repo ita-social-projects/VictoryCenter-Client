@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useEffect, useRef } from 'react';
+import React, { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 import cn from 'classnames';
 import { ReactComponent as RemoveIcon } from '@/assets/icons/remove-query.svg';
 import { useInputWithCharacterLimit } from '@/hooks/admin/use-input-with-character-limit/useInputWithCharacterLimit';
@@ -45,6 +45,11 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
         },
         ref,
     ) => {
+        const [localValue, setLocalValue] = useState(value ?? '');
+
+        useEffect(() => {
+            setLocalValue(value ?? '');
+        }, [value]);
         const internalRef = useRef<HTMLTextAreaElement>(null);
 
         const setTextareaRef = useCallback(
@@ -61,7 +66,7 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
 
         const { isFocused, localWarning, showClearButton, handleChange, handleFocus, handleBlur, handleClear } =
             useInputWithCharacterLimit<HTMLTextAreaElement>({
-                value,
+                value: localValue,
                 maxLength,
                 name,
                 id,
@@ -73,21 +78,37 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
                 onWarningChange,
             });
 
+        const onInternalChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+            setLocalValue(e.target.value);
+            handleChange(e);
+        };
+
         useEffect(() => {
             const textarea = internalRef.current;
-            if (!autoGrow || !textarea) {
-                return;
-            }
-
-            const parsedLineHeight = Number.parseInt(globalThis.getComputedStyle(textarea).lineHeight, 10);
-
-            if (Number.isNaN(parsedLineHeight)) return;
-
-            const maxHeight = parsedLineHeight * maxRows;
+            if (!autoGrow || !textarea) return;
 
             textarea.style.height = 'auto';
-            textarea.style.height = `${Math.min(textarea.scrollHeight, maxHeight)}px`;
-            textarea.style.overflowY = textarea.scrollHeight > maxHeight ? 'auto' : 'hidden';
+            const computedStyle = globalThis.getComputedStyle(textarea);
+
+            let parsedLineHeight = Number.parseFloat(computedStyle.lineHeight);
+            if (Number.isNaN(parsedLineHeight)) {
+                const parsedFontSize = Number.parseFloat(computedStyle.fontSize) || 16;
+                parsedLineHeight = parsedFontSize * 1.2;
+            }
+
+            const paddingTop = Number.parseFloat(computedStyle.paddingTop) || 0;
+            const paddingBottom = Number.parseFloat(computedStyle.paddingBottom) || 0;
+            const borderTop = Number.parseFloat(computedStyle.borderTopWidth) || 0;
+            const borderBottom = Number.parseFloat(computedStyle.borderBottomWidth) || 0;
+
+            const maxHeight = maxRows
+                ? parsedLineHeight * maxRows + paddingTop + paddingBottom + borderTop + borderBottom
+                : Infinity;
+
+            const finalTargetHeight = textarea.scrollHeight + borderTop + borderBottom;
+
+            textarea.style.height = `${Math.min(finalTargetHeight, maxHeight)}px`;
+            textarea.style.overflowY = finalTargetHeight > maxHeight ? 'auto' : 'hidden';
         }, [value, autoGrow, maxRows]);
 
         return (
@@ -102,8 +123,8 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
                     <textarea
                         ref={setTextareaRef}
                         className="char-limit-textarea__field"
-                        value={value ?? ''}
-                        onChange={handleChange}
+                        value={localValue}
+                        onChange={onInternalChange}
                         onFocus={handleFocus}
                         onBlur={handleBlur}
                         onKeyDown={onKeyDown}
@@ -113,6 +134,7 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
                         disabled={disabled}
                         placeholder={placeholder}
                         rows={rows}
+                        maxLength={maxLength}
                     />
                     {showClearButton && (
                         <button

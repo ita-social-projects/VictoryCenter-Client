@@ -1,5 +1,5 @@
 import { HippotherapyProgramSectionContentDto } from '@/types/common/program-sections';
-import { ContentType } from '@/types/common/programs';
+import { ContentType } from '@/types/common/section-contents';
 
 type ContentTextData = Pick<
     HippotherapyProgramSectionContentDto,

@@ -7,9 +7,10 @@ import styles from './ChartGraphic.module.scss';
 
 interface ChartGraphicProps {
     items: ExpenseItem[];
+    formatAmount: (uahAmount: number) => string;
 }
 
-export const ChartGraphic = ({ items }: ChartGraphicProps) => {
+export const ChartGraphic = ({ items, formatAmount }: ChartGraphicProps) => {
     const isDesktop = useMediaQuery('(min-width: 1440px)');
     const { pathRefs, positions } = useChartGeometry(items.length, isDesktop);
     const config = isDesktop ? CHART_CONFIG.desktop : CHART_CONFIG.mobile;
@@ -39,7 +40,7 @@ export const ChartGraphic = ({ items }: ChartGraphicProps) => {
                                 <text x={positions[index].x} y={positions[index].y} className={styles.label}>
                                     <tspan className={styles.percent}>{item.percent.toFixed(1)}%</tspan>
                                     <tspan x={positions[index].x} dy="1.2em" className={styles.amount}>
-                                        {item.amount.toLocaleString('uk-UA')} грн
+                                        {formatAmount(item.amount)}
                                     </tspan>
                                 </text>
                             )}

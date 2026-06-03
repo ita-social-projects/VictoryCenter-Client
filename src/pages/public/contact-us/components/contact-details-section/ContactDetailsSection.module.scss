@@ -1,0 +1,128 @@
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
+
+.contact-details-section {
+    display: flex;
+    flex-direction: column;
+
+    @media (min-width: 768px) {
+        padding-right: 120px;
+    }
+
+    @media (min-width: 1024px) {
+        padding-right: 0;
+    }
+}
+
+.contact-details-title-block {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 64px;
+
+    @media (min-width: 1024px) {
+        margin-bottom: 120px;
+    }
+}
+
+.contact-details-title {
+    @include type.h4-bold-uppercase;
+    color: c.$blue-900;
+
+    @media (min-width: 560px) {
+        @include type.h3-bold-uppercase;
+    }
+}
+
+.contact-details-description {
+    @include type.body-2-semibold;
+    color: c.$blue-900;
+}
+
+.contact-details-block {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.social-links-block {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.contact-details-block {
+    padding-bottom: 32px;
+    margin-bottom: 32px;
+    border-bottom: 1px solid c.$light-blue-100;
+}
+
+.contact-details-block-title {
+    @include type.body-2-bold;
+    color: c.$blue-900;
+}
+
+.contact-details-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.contact-details-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 4px;
+}
+
+.contact-details-text,
+.contact-details-address {
+    @include type.body-2-semibold;
+    color: c.$blue-900;
+}
+
+.contact-details-address {
+    white-space: pre-line;
+}
+
+.contact-details-icon {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.contact-details-copy {
+    border: none;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s ease;
+
+    &:hover {
+        opacity: 0.8;
+    }
+}
+
+.social-links-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+
+    @media (min-width: 768px) {
+        gap: 32px;
+    }
+}
+
+.social-links-item {
+    @include type.body-2-semibold;
+    color: c.$blue-900;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+
+    &:hover {
+        opacity: 0.75;
+    }
+}

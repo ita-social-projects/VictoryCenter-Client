@@ -57,10 +57,26 @@
     }
 }
 
-.edit-button-container {
+.buttons-container {
     display: flex;
-    justify-content: end;
+    justify-content: space-between;
+    align-items: center;
     margin-right: 20px;
+    margin-bottom: 7px;
+}
+
+.buttons-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 40px;
+}
+
+.translate-button {
+    border: none;
 }
 
 .edit-button {

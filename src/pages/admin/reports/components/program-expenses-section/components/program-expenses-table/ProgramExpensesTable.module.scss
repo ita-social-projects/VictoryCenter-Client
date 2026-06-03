@@ -1,0 +1,161 @@
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
+@use '@/assets/sass/variables/typography' as t;
+
+.table-wrapper {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 347px;
+    overflow-x: auto;
+    background: c.$light-blue-25;
+    border: 1px solid c.$grey-500;
+    border-radius: 16px;
+    box-shadow: 0 24px 48px -12px rgba(c.$bluish-black, 0.2);
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+
+    thead tr {
+        height: 88px;
+    }
+}
+
+.column-checkbox {
+    width: 52px;
+}
+
+.column-year {
+    width: 16%;
+}
+
+.column-type {
+    width: 16%;
+}
+
+.column-program {
+    width: 26%;
+}
+
+.column-amount {
+    width: 18.5%;
+}
+
+.column-actions {
+    width: 88px;
+}
+
+.th {
+    @include type.subtitle-1-medium;
+    padding: 30px 20px;
+    text-align: left;
+    line-height: 24px;
+    color: rgba(c.$graphite-black, 0.88);
+    white-space: nowrap;
+}
+
+.checkbox-th,
+.checkbox-td {
+    width: 52px;
+    padding-right: 0;
+    text-align: center;
+}
+
+.actions-th,
+.actions-td {
+    padding-left: 16px;
+    padding-right: 16px;
+    text-align: center;
+}
+
+.tr {
+    height: 65px;
+    background: c.$white;
+    border-top: 1px solid c.$grey-500;
+
+    &:hover {
+        background: c.$light-blue-50;
+    }
+}
+
+.td {
+    @include type.subtitle-2-medium;
+    box-sizing: border-box;
+    height: 65px;
+    padding: 13px 20px;
+    vertical-align: middle;
+    font-weight: 400;
+    line-height: 24px;
+    color: c.$graphite-black;
+    white-space: nowrap;
+}
+
+.type-chip {
+    box-sizing: border-box;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 106px;
+    height: 24px;
+    padding: 0 10px;
+    border: 1px solid rgba(c.$error, 0.6);
+    border-radius: 50px;
+    background: rgba(c.$error, 0.5);
+    font-family: t.$font-family-base;
+    font-weight: t.$fw-light;
+    color: c.$white;
+    font-size: 13px;
+    line-height: 15px;
+    letter-spacing: t.$small-spacing;
+    text-align: center;
+}
+
+.row-checkbox {
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    cursor: pointer;
+    accent-color: c.$blue-500;
+
+    &:disabled {
+        cursor: not-allowed;
+    }
+}
+
+.row-actions {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.icon-button {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    color: var(--icon-btn-color, c.$blue-500);
+
+    svg {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+.edit-icon-button {
+    --icon-btn-color: #{c.$blue-500};
+    --icon-btn-hover-color: #{c.$blue-900};
+}
+
+.delete-icon-button {
+    --icon-btn-color: #{c.$blue-500};
+    --icon-btn-hover-color: #{c.$error};
+}
+
+@media (max-width: 1200px) {
+    .table {
+        min-width: 1200px;
+    }
+}

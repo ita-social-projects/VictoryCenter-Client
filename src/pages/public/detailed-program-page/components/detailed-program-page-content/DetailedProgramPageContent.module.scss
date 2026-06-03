@@ -82,7 +82,8 @@
 .program-name {
     @include type.h4-bold-uppercase;
     margin-bottom: 20px;
-    word-wrap: break-word;
+    overflow-wrap: anywhere;
+    word-break: normal;
 
     @media (min-width: 1440px) {
         @include type.h4-bold-uppercase;
@@ -104,7 +105,8 @@
     }
 
     span {
-        word-wrap: break-word;
+        overflow-wrap: anywhere;
+        word-break: normal;
     }
 }
 
@@ -113,7 +115,8 @@
     min-height: 24px;
 
     span {
-        word-wrap: break-word;
+        overflow-wrap: anywhere;
+        word-break: normal;
     }
 }
 

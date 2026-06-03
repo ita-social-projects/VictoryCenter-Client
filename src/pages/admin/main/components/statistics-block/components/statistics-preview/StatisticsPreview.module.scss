@@ -1,0 +1,72 @@
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
+
+.preview {
+    background: c.$white;
+    border: 1px solid c.$grey-500;
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.title {
+    @include type.small-text-medium;
+    color: c.$grey-900;
+    margin: 0;
+}
+
+.toggle {
+    display: flex;
+    gap: 4px;
+}
+
+.tab {
+    @include type.small-text-medium;
+    background: transparent;
+    border: none;
+    padding: 4px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: c.$grey-900;
+}
+
+.active {
+    background: c.$white;
+    border: 1px solid c.$grey-500;
+    color: c.$black;
+}
+
+.panel {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background: c.$light-blue-500;
+    border-radius: 6px;
+    padding: 16px;
+    color: c.$white;
+}
+
+.metric {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.value {
+    @include type.subtitle-2-semibold;
+    margin: 0;
+    color: c.$black;
+}
+
+.label {
+    @include type.small-text-regular;
+    margin: 0;
+    opacity: 0.9;
+    color: c.$black;
+}

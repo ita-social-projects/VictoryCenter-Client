@@ -5,6 +5,8 @@ export const FAQ_TEXT = {
 
     PLACEHOLDER: {
         SEARCH_FAQ: 'Введіть назву',
+        QUESTION: 'Введіть питання',
+        ANSWER: 'Введіть відповідь',
     },
 
     TOOLTIP: {

@@ -1,42 +1,15 @@
-import type { LocalizationLanguage } from '@/types/common/language';
 import {
     COMPANY_PROFILE_FORM_DEFAULTS,
     CompanyProfile,
-    CompanyProfileContactLocalization,
     CompanyProfileFormValues,
-    CompanyProfileRequisiteLocalization,
     CompanyProfileSocialLink,
-    LocaleCode,
     SocialPlatform,
 } from '@/types/admin/company-profile';
-
-type LocalizationWithLanguageCode = {
-    language?: { code?: string };
-    localizationInfoDto?: { code?: string };
-    languageId?: number;
-};
-
-function resolveLocaleCode(
-    loc: (CompanyProfileContactLocalization | CompanyProfileRequisiteLocalization) & LocalizationWithLanguageCode,
-    languages?: LocalizationLanguage[],
-): LocaleCode | null {
-    const directCode = loc.language?.code ?? loc.localizationInfoDto?.code;
-    if (directCode === 'uk' || directCode === 'en') return directCode;
-
-    if (!languages?.length) return null;
-
-    const lang = languages.find((l) => l.id === loc.languageId);
-    const code = lang?.code;
-
-    return code === 'uk' || code === 'en' ? code : null;
-}
-
-function getLanguageIdByCode(languages: LocalizationLanguage[] | undefined, code: LocaleCode): number | null {
-    if (!languages?.length) return null;
-
-    const lang = languages.find((l) => l.code === code);
-    return lang?.id ?? null;
-}
+import type { LocalizationLanguage } from '@/types/common/language';
+import {
+    getLanguageIdByCode,
+    resolveLocaleCode,
+} from '@/utils/functions/mappers/common/localization/localization-mappers';
 
 const SOCIAL_PLATFORM_FROM_BACKEND: Record<number, SocialPlatform> = {
     0: 'Instagram',

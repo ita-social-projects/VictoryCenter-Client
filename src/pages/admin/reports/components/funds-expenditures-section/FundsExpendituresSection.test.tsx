@@ -1,14 +1,21 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { FundsExpenditureSection } from './FundsExpendituresSection';
-import { FUNDS_EXPENDITURES_TEXT, FUNDS_EXPENDITURES_VALIDATION, REPORTS_TEXT } from '@/const/admin/reports';
+import {
+    FUNDS_EXPENDITURES_TEXT,
+    FUNDS_EXPENDITURES_VALIDATION,
+    PROGRAM_EXPENSES_TEXT,
+    REPORTS_TEXT,
+} from '@/const/admin/reports';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import {
     FundsExpendituresSummary,
     ReportFundsExpendituresCategory,
     ReportFundsExpendituresRecord,
     ReportFundsExpendituresSettings,
+    ReportFundsExpendituresSettingsLocalizationDto,
 } from '@/types/admin/reports';
+import { LocalizationLanguage, TranslationStatus } from '@/types/common/language';
 
 const MOCK_FUNDS_EXPENDITURES_SETTINGS: ReportFundsExpendituresSettings = {
     id: 1,
@@ -17,14 +24,14 @@ const MOCK_FUNDS_EXPENDITURES_SETTINGS: ReportFundsExpendituresSettings = {
 };
 
 const MOCK_FUNDS_EXPENDITURES_CATEGORIES: ReportFundsExpendituresCategory[] = [
-    { id: 1, name: 'Грантові кошти', type: 'income' },
-    { id: 2, name: 'Благодійні внески', type: 'income' },
-    { id: 3, name: 'Власні надходження', type: 'income' },
-    { id: 4, name: 'Інші надходження', type: 'income' },
-    { id: 5, name: 'Адміністративні витрати', type: 'expense' },
-    { id: 6, name: 'Програмні витрати', type: 'expense' },
-    { id: 7, name: 'Обладнання', type: 'expense' },
-    { id: 8, name: 'Заробітна плата', type: 'expense' },
+    { id: 1, name: 'Грантові кошти', type: 'income', localizations: [] },
+    { id: 2, name: 'Благодійні внески', type: 'income', localizations: [] },
+    { id: 3, name: 'Власні надходження', type: 'income', localizations: [] },
+    { id: 4, name: 'Інші надходження', type: 'income', localizations: [] },
+    { id: 5, name: 'Адміністративні витрати', type: 'expense', localizations: [] },
+    { id: 6, name: 'Програмні витрати', type: 'expense', localizations: [] },
+    { id: 7, name: 'Обладнання', type: 'expense', localizations: [] },
+    { id: 8, name: 'Заробітна плата', type: 'expense', localizations: [] },
 ];
 
 const MOCK_FUNDS_EXPENDITURES_RECORDS: ReportFundsExpendituresRecord[] = [
@@ -49,6 +56,7 @@ const MOCK_FUNDS_EXPENDITURES_SUMMARY: FundsExpendituresSummary = {
 jest.mock('./FundsExpendituresSection.module.scss', () => ({
     section: 'section',
     disclaimer: 'disclaimer',
+    'disclaimer-top-row': 'disclaimer-top-row',
     'disclaimer-label': 'disclaimer-label',
     'disclaimer-text-area': 'disclaimer-text-area',
     'disclaimer-text': 'disclaimer-text',
@@ -59,10 +67,12 @@ jest.mock('./FundsExpendituresSection.module.scss', () => ({
     'edit-icon': 'edit-icon',
     'section-footer': 'section-footer',
     'footer-button': 'footer-button',
+    'translate-btn': 'translate-btn',
 }));
 
+const stableAdminClient = {};
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
-    useAdminClient: () => ({}),
+    useAdminClient: () => stableAdminClient,
 }));
 
 const mockAddToast = jest.fn();
@@ -144,6 +154,7 @@ jest.mock('./components/funds-expenditures-toolbar/FundsExpendituresToolbar', ()
         onExchangeRateChange,
         onExchangeRateBlur,
         onAddIncome,
+        onAddExpense,
     }: {
         categories: { id: number; name: string }[];
         selectedCategoryId: number | null | undefined;
@@ -156,6 +167,7 @@ jest.mock('./components/funds-expenditures-toolbar/FundsExpendituresToolbar', ()
         onExchangeRateChange: (v: string) => void;
         onExchangeRateBlur: () => void;
         onAddIncome: () => void;
+        onAddExpense: () => void;
     }) => (
         <div
             data-testid="funds-toolbar"
@@ -187,6 +199,9 @@ jest.mock('./components/funds-expenditures-toolbar/FundsExpendituresToolbar', ()
             <button onClick={() => onAddIncome()} data-testid="open-add-income">
                 Open add income
             </button>
+            <button onClick={() => onAddExpense()} data-testid="open-add-expense">
+                Open add expense
+            </button>
         </div>
     ),
 }));
@@ -195,68 +210,74 @@ jest.mock('./components/funds-expenditures-table/FundsExpendituresTable', () => 
     FundsExpendituresTable: ({
         records,
         isEditing,
+        selectedRecordIds = [],
+        eligibleRecordIds = [],
         onRecordSave,
         onRowEditModeChange,
         onDeleteRecord,
-    }: {
-        records: Array<{
-            id: number;
-            categoryId: number;
-            type: 'income' | 'expense';
-            reportingYear: string;
-            amountUah: string;
-            amountUsd: string;
-        }>;
-        isEditing?: boolean;
-        onRecordSave?: (recordId: number, data: { categoryId: number; amountUah: string; amountUsd: string }) => void;
-        onRowEditModeChange?: (isRowEditMode: boolean) => void;
-        onDeleteRecord?: (record: {
-            id: number;
-            categoryId: number;
-            type: 'income' | 'expense';
-            reportingYear: string;
-            amountUah: string;
-            amountUsd: string;
-        }) => void;
-    }) => (
-        <div data-testid="funds-table" data-record-count={records.length} data-editing={String(isEditing ?? false)}>
-            <button
-                data-testid="trigger-record-save"
-                onClick={() =>
-                    onRecordSave?.(1, {
-                        categoryId: 1,
-                        amountUah: '7300',
-                        amountUsd: '173.81',
-                    })
-                }
-            >
-                Save row
-            </button>
-            <button data-testid="row-edit-on" onClick={() => onRowEditModeChange?.(true)}>
-                Row edit on
-            </button>
-            <button data-testid="row-edit-off" onClick={() => onRowEditModeChange?.(false)}>
-                Row edit off
-            </button>
-            <button
-                data-testid="trigger-record-delete"
-                onClick={() => onDeleteRecord?.(records[0])}
-                disabled={!isEditing || records.length === 0}
-            >
-                Delete row
+        onSelectAllToggle,
+        onToggleRecordSelection,
+        onOpenBulkDelete,
+    }: any) => {
+        const { FUNDS_EXPENDITURES_TEXT: FET } = require('@/const/admin/reports');
+        return (
+            <div data-testid="funds-table" data-record-count={records.length} data-editing={String(isEditing ?? false)}>
+                <input type="checkbox" aria-label="Select all records" onClick={() => onSelectAllToggle?.(true)} />
+                <button
+                    data-testid="select-row-1"
+                    aria-label="Select record 1"
+                    onClick={() => onToggleRecordSelection?.(1)}
+                />
+                <div data-testid="table-selection-summary" aria-hidden={selectedRecordIds.length === 0}>
+                    <div>{FET.BULK.getSelectedLabel(selectedRecordIds.length, eligibleRecordIds.length)}</div>
+                    <button data-testid="delete-selected" onClick={() => onOpenBulkDelete?.()}>
+                        {FET.BULK.DELETE_BUTTON}
+                    </button>
+                </div>
+                <button
+                    data-testid="trigger-record-save"
+                    onClick={() => onRecordSave?.(1, { categoryId: 1, amountUah: '7300', amountUsd: '173.81' })}
+                >
+                    Save row
+                </button>
+                <button data-testid="row-edit-on" onClick={() => onRowEditModeChange?.(true)}>
+                    Row edit on
+                </button>
+                <button data-testid="row-edit-off" onClick={() => onRowEditModeChange?.(false)}>
+                    Row edit off
+                </button>
+                <button
+                    data-testid="trigger-record-delete"
+                    onClick={() => onDeleteRecord?.(records[0])}
+                    disabled={!isEditing || records.length === 0}
+                >
+                    Delete row
+                </button>
+            </div>
+        );
+    },
+}));
+
+jest.mock('./components/common/add-funds-expenditures-category-modal/AddFundsExpendituresCategoryModal', () => ({
+    AddFundsExpendituresCategoryModal: ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => (
+        <div data-testid="add-category-modal" data-open={String(isOpen)}>
+            <button data-testid="add-category-modal-close" onClick={onClose}>
+                Close
             </button>
         </div>
     ),
 }));
 
-jest.mock('./components/common/add-income-modal/AddIncomeModal', () => ({
-    AddIncomeModal: ({
+jest.mock('./components/common/add-funds-expenditures-record-modal/AddFundsExpendituresRecordModal', () => ({
+    AddFundsExpendituresRecordModal: ({
         isOpen,
         onClose,
+        transactionType,
         onSubmit,
     }: {
         isOpen: boolean;
         onClose: () => void;
+        transactionType: 'income' | 'expense';
         onSubmit: (data: {
             categoryId: number;
             reportingYear: string;
@@ -265,23 +286,23 @@ jest.mock('./components/common/add-income-modal/AddIncomeModal', () => ({
             type: 'income' | 'expense';
         }) => Promise<boolean>;
     }) => (
-        <div data-testid="add-income-modal" data-open={String(isOpen)}>
-            <button data-testid="add-income-close" onClick={onClose}>
-                Close add income
+        <div data-testid="add-record-modal" data-open={String(isOpen)} data-type={transactionType}>
+            <button data-testid="add-record-close" onClick={onClose}>
+                Close add record
             </button>
             <button
-                data-testid="add-income-submit"
+                data-testid="add-record-submit"
                 onClick={() =>
                     void onSubmit({
                         categoryId: 1,
                         reportingYear: '2026',
                         amountUah: '1000',
                         amountUsd: '25',
-                        type: 'income',
+                        type: transactionType,
                     })
                 }
             >
-                Submit add income
+                Submit add record
             </button>
         </div>
     ),
@@ -291,6 +312,7 @@ const mockUpdateRecord = jest.fn();
 const mockCreateRecord = jest.fn();
 const mockUpdateSettings = jest.fn();
 const mockDeleteRecord = jest.fn();
+const mockBulkDelete = jest.fn();
 jest.mock('@/services/api/admin/reports/funds-expenditures-api', () => ({
     FundsExpendituresApi: {
         getSettings: jest.fn(),
@@ -301,6 +323,58 @@ jest.mock('@/services/api/admin/reports/funds-expenditures-api', () => ({
         createRecord: (...args: unknown[]) => mockCreateRecord(...args),
         updateRecord: (...args: unknown[]) => mockUpdateRecord(...args),
         deleteRecord: (...args: unknown[]) => mockDeleteRecord(...args),
+        bulkDeleteRecords: (...args: unknown[]) => mockBulkDelete(...args),
+    },
+}));
+
+const mockGetByEntityId = jest.fn();
+jest.mock(
+    '@/services/api/admin/reports/report-funds-expenditures-settings-localizations/report-funds-expenditures-settings-localizations-api',
+    () => ({
+        ReportFundsExpendituresSettingsLocalizationsApi: {
+            getByEntityId: (...args: unknown[]) => mockGetByEntityId(...args),
+        },
+    }),
+);
+
+jest.mock('@/utils/functions/mappers/common/localization/localization-mappers', () => ({
+    mapLocalizationDtoToModel: (dto: ReportFundsExpendituresSettingsLocalizationDto) => ({
+        ...dto,
+        language: dto.localizationInfoDto,
+    }),
+}));
+
+jest.mock('@/components/admin/localization-statuses/LocalizationStatuses', () => ({
+    LocalizationStatuses: ({ localizedEntity }: { localizedEntity: { translationStatuses: unknown[] } }) => (
+        <div data-testid="localization-statuses" data-status-count={localizedEntity.translationStatuses.length} />
+    ),
+}));
+
+const mockTranslateDisclaimerModalOnTranslateSuccess = jest.fn();
+jest.mock('./components/common/translate-disclaimer-modal/TranslateDisclaimerModal', () => ({
+    TranslateDisclaimerModal: ({
+        isOpen,
+        onClose,
+        existingLocalizations,
+        onTranslateSuccess,
+    }: {
+        isOpen: boolean;
+        onClose: () => void;
+        existingLocalizations: unknown[];
+        onTranslateSuccess: (loc: unknown) => void;
+    }) => {
+        mockTranslateDisclaimerModalOnTranslateSuccess.mockImplementation(onTranslateSuccess);
+        return (
+            <div
+                data-testid="translate-disclaimer-modal"
+                data-open={String(isOpen)}
+                data-existing-count={existingLocalizations.length}
+            >
+                <button data-testid="translate-modal-close" onClick={onClose}>
+                    Close
+                </button>
+            </div>
+        );
     },
 }));
 
@@ -330,6 +404,7 @@ describe('FundsExpenditureSection', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         setupMockDataFetch();
+        mockGetByEntityId.mockResolvedValue([]);
     });
 
     it('should show success toast when record is saved from table', async () => {
@@ -535,6 +610,25 @@ describe('FundsExpenditureSection', () => {
             expect(textarea).toHaveValue(MOCK_FUNDS_EXPENDITURES_SETTINGS.disclaimerTitle);
         });
 
+        it('should initialize edit values from settings when mounted in edit mode', () => {
+            render(<FundsExpenditureSection initialIsEditing />);
+
+            expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-editing', 'true');
+            expect(screen.getByTestId('textarea-funds-disclaimer')).toHaveValue(
+                MOCK_FUNDS_EXPENDITURES_SETTINGS.disclaimerTitle,
+            );
+            expect(screen.getByTestId('exchange-rate')).toHaveTextContent(
+                MOCK_FUNDS_EXPENDITURES_SETTINGS.exchangeRate!,
+            );
+        });
+
+        it('should initialize exchange rate from draft value when mounted in edit mode', () => {
+            render(<FundsExpenditureSection initialIsEditing draftExchangeRate="44.20" />);
+
+            expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-editing', 'true');
+            expect(screen.getByTestId('exchange-rate')).toHaveTextContent('44.20');
+        });
+
         it('should hide edit button while editing', () => {
             render(<FundsExpenditureSection />);
             fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT));
@@ -713,12 +807,21 @@ describe('FundsExpenditureSection', () => {
         it('should open and close add income modal from toolbar controls', () => {
             render(<FundsExpenditureSection />);
 
-            expect(screen.getByTestId('add-income-modal')).toHaveAttribute('data-open', 'false');
+            expect(screen.getByTestId('add-record-modal')).toHaveAttribute('data-open', 'false');
             fireEvent.click(screen.getByTestId('open-add-income'));
-            expect(screen.getByTestId('add-income-modal')).toHaveAttribute('data-open', 'true');
+            expect(screen.getByTestId('add-record-modal')).toHaveAttribute('data-open', 'true');
+            expect(screen.getByTestId('add-record-modal')).toHaveAttribute('data-type', 'income');
 
-            fireEvent.click(screen.getByTestId('add-income-close'));
-            expect(screen.getByTestId('add-income-modal')).toHaveAttribute('data-open', 'false');
+            fireEvent.click(screen.getByTestId('add-record-close'));
+            expect(screen.getByTestId('add-record-modal')).toHaveAttribute('data-open', 'false');
+        });
+
+        it('should open expense record modal from toolbar controls', () => {
+            render(<FundsExpenditureSection />);
+
+            fireEvent.click(screen.getByTestId('open-add-expense'));
+            expect(screen.getByTestId('add-record-modal')).toHaveAttribute('data-open', 'true');
+            expect(screen.getByTestId('add-record-modal')).toHaveAttribute('data-type', 'expense');
         });
 
         it('should create income record successfully and show success toast', async () => {
@@ -734,7 +837,7 @@ describe('FundsExpenditureSection', () => {
             render(<FundsExpenditureSection />);
 
             fireEvent.click(screen.getByTestId('open-add-income'));
-            fireEvent.click(screen.getByTestId('add-income-submit'));
+            fireEvent.click(screen.getByTestId('add-record-submit'));
 
             expect(await screen.findByTestId('funds-table')).toBeInTheDocument();
             expect(mockCreateRecord).toHaveBeenCalled();
@@ -743,7 +846,7 @@ describe('FundsExpenditureSection', () => {
                 'success',
             );
             await waitFor(() => {
-                expect(screen.getByTestId('add-income-modal')).toHaveAttribute('data-open', 'false');
+                expect(screen.getByTestId('add-record-modal')).toHaveAttribute('data-open', 'false');
             });
         });
 
@@ -753,9 +856,9 @@ describe('FundsExpenditureSection', () => {
             render(<FundsExpenditureSection />);
 
             fireEvent.click(screen.getByTestId('open-add-income'));
-            fireEvent.click(screen.getByTestId('add-income-submit'));
+            fireEvent.click(screen.getByTestId('add-record-submit'));
 
-            expect(await screen.findByTestId('add-income-modal')).toHaveAttribute('data-open', 'true');
+            expect(await screen.findByTestId('add-record-modal')).toHaveAttribute('data-open', 'true');
             expect(mockAddToast).toHaveBeenCalledWith(
                 FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_CREATE_FAILED_RETRY,
                 'error',
@@ -827,5 +930,250 @@ describe('FundsExpenditureSection', () => {
 
             expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.MODAL.DELETE.TITLE)).not.toBeInTheDocument();
         });
+    });
+
+    describe('add category modal', () => {
+        it('should render add category modal as closed by default', () => {
+            render(<FundsExpenditureSection />);
+
+            expect(screen.getByTestId('add-category-modal')).toHaveAttribute('data-open', 'false');
+        });
+
+        it('should render add category modal as open when isAddCategoryModalOpen is true', () => {
+            render(<FundsExpenditureSection isAddCategoryModalOpen onAddCategoryModalClose={jest.fn()} />);
+
+            expect(screen.getByTestId('add-category-modal')).toHaveAttribute('data-open', 'true');
+        });
+
+        it('should call onAddCategoryModalClose when modal close is triggered', () => {
+            const mockClose = jest.fn();
+            render(<FundsExpenditureSection isAddCategoryModalOpen onAddCategoryModalClose={mockClose} />);
+
+            fireEvent.click(screen.getByTestId('add-category-modal-close'));
+
+            expect(mockClose).toHaveBeenCalledTimes(1);
+        });
+    });
+});
+
+describe('FundsExpenditureSection bulk delete flow', () => {
+    const settingsMock = { id: 1, exchangeRate: '40', disclaimerTitle: 'Disclaimer' };
+    const categoriesMock: ReportFundsExpendituresCategory[] = [
+        { id: 1, name: 'A', type: 'income', localizations: [] },
+        { id: 2, name: 'B', type: 'income', localizations: [] },
+        { id: 3, name: PROGRAM_EXPENSES_TEXT.TABLE.TYPE_LABEL, type: 'expense', localizations: [] },
+    ];
+    const recordsMock: ReportFundsExpendituresRecord[] = [
+        { id: 1, categoryId: 1, type: 'income', reportingYear: '2025', amountUah: '100', amountUsd: '10' },
+        { id: 2, categoryId: 2, type: 'income', reportingYear: '2025', amountUah: '200', amountUsd: '20' },
+        { id: 3, categoryId: 3, type: 'expense', reportingYear: '2025', amountUah: '300', amountUsd: '30' },
+    ];
+    const summaryMock: FundsExpendituresSummary = {
+        totalCollectedUah: 0,
+        totalCollectedUsd: 0,
+        totalSpentUah: 0,
+        totalSpentUsd: 0,
+        incomeCategories: 1,
+        expenseCategories: 1,
+    };
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+        setupMockDataFetch(settingsMock, categoriesMock, recordsMock, summaryMock);
+        mockGetByEntityId.mockResolvedValue([]);
+    });
+
+    it('select all via header checkbox and cancel bulk delete clears selection', async () => {
+        render(<FundsExpenditureSection initialIsEditing={true} />);
+
+        fireEvent.click(screen.getByLabelText('Select all records'));
+
+        await waitFor(() => {
+            expect(screen.getByTestId('table-selection-summary')).toHaveAttribute('aria-hidden', 'false');
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.BULK.getSelectedLabel(2, 2))).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByTestId('delete-selected'));
+        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.BULK.DELETE_CONFIRM_TITLE)).toBeInTheDocument();
+
+        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.NO));
+
+        await waitFor(() => {
+            expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.BULK.DELETE_CONFIRM_TITLE)).not.toBeInTheDocument();
+            expect(screen.getByTestId('table-selection-summary')).toHaveAttribute('aria-hidden', 'true');
+        });
+    });
+
+    it('confirms bulk delete calls API and shows success toast', async () => {
+        mockBulkDelete.mockResolvedValue(undefined);
+
+        render(<FundsExpenditureSection initialIsEditing={true} />);
+
+        fireEvent.click(screen.getByLabelText('Select all records'));
+
+        await waitFor(() => {
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.BULK.getSelectedLabel(2, 2))).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByTestId('delete-selected'));
+        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
+
+        await waitFor(() => {
+            expect(mockBulkDelete).toHaveBeenCalledWith(expect.anything(), [1, 2]);
+            expect(mockAddToast).toHaveBeenCalledWith(FUNDS_EXPENDITURES_TEXT.BULK.DELETE_SUCCESS, 'success');
+        });
+    });
+});
+
+const MOCK_LANG_EN: LocalizationLanguage = { id: 2, code: 'en', name: 'Англійська' };
+
+const MOCK_LOCALIZATION_DTO: ReportFundsExpendituresSettingsLocalizationDto = {
+    entityId: 1,
+    disclaimerTitle: 'Financial report',
+    localizationInfoDto: { id: 2, code: 'en' },
+    translationStatus: TranslationStatus.Relevant,
+};
+
+describe('FundsExpenditureSection disclaimer localizations', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+        setupMockDataFetch();
+        mockGetByEntityId.mockResolvedValue([]);
+    });
+
+    it('fetches disclaimer localizations on mount when settings are loaded', async () => {
+        render(<FundsExpenditureSection />);
+
+        await waitFor(() => {
+            expect(mockGetByEntityId).toHaveBeenCalledWith(expect.anything(), MOCK_FUNDS_EXPENDITURES_SETTINGS.id);
+        });
+    });
+
+    it('does not fetch disclaimer localizations when settings have no id', async () => {
+        setupMockDataFetch(null);
+        render(<FundsExpenditureSection />);
+
+        await waitFor(() => {
+            expect(mockGetByEntityId).not.toHaveBeenCalled();
+        });
+    });
+
+    it('renders localization-statuses indicator when disclaimer is visible', async () => {
+        render(<FundsExpenditureSection />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('localization-statuses')).toBeInTheDocument();
+        });
+    });
+
+    it('passes fetched localizations to the indicator', async () => {
+        mockGetByEntityId.mockResolvedValue([MOCK_LOCALIZATION_DTO]);
+
+        render(<FundsExpenditureSection translationLanguages={[MOCK_LANG_EN]} />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('localization-statuses')).toHaveAttribute('data-status-count', '1');
+        });
+    });
+
+    it('renders translate disclaimer modal closed by default', () => {
+        render(<FundsExpenditureSection />);
+
+        expect(screen.getByTestId('translate-disclaimer-modal')).toHaveAttribute('data-open', 'false');
+    });
+
+    it('passes existing localizations to the translate modal', async () => {
+        mockGetByEntityId.mockResolvedValue([MOCK_LOCALIZATION_DTO]);
+
+        render(<FundsExpenditureSection translationLanguages={[MOCK_LANG_EN]} />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('translate-disclaimer-modal')).toHaveAttribute('data-existing-count', '1');
+        });
+    });
+
+    it('updates localization indicator when translate success fires', async () => {
+        mockGetByEntityId.mockResolvedValue([]);
+
+        render(<FundsExpenditureSection translationLanguages={[MOCK_LANG_EN]} />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('localization-statuses')).toHaveAttribute('data-status-count', '0');
+        });
+
+        const newLocalization = {
+            disclaimerTitle: 'Financial report',
+            language: { id: 2, code: 'en' },
+            translationStatus: TranslationStatus.Relevant,
+        };
+        mockTranslateDisclaimerModalOnTranslateSuccess(newLocalization);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('localization-statuses')).toHaveAttribute('data-status-count', '1');
+        });
+    });
+
+    it('replaces localization in indicator when same language is re-translated', async () => {
+        const outdatedDto: ReportFundsExpendituresSettingsLocalizationDto = {
+            ...MOCK_LOCALIZATION_DTO,
+            translationStatus: TranslationStatus.Outdated,
+        };
+        mockGetByEntityId.mockResolvedValue([outdatedDto]);
+
+        render(<FundsExpenditureSection translationLanguages={[MOCK_LANG_EN]} />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('localization-statuses')).toHaveAttribute('data-status-count', '1');
+        });
+
+        const updatedLocalization = {
+            disclaimerTitle: 'Updated report',
+            language: { id: 2, code: 'en' },
+            translationStatus: TranslationStatus.Relevant,
+        };
+        mockTranslateDisclaimerModalOnTranslateSuccess(updatedLocalization);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('localization-statuses')).toHaveAttribute('data-status-count', '1');
+        });
+    });
+
+    it('refetches disclaimer localizations after successful publish', async () => {
+        mockUpdateSettings.mockResolvedValueOnce({
+            id: 1,
+            disclaimerTitle: 'Updated disclaimer',
+            exchangeRate: '44.00',
+        });
+
+        render(<FundsExpenditureSection />);
+
+        await waitFor(() => {
+            expect(mockGetByEntityId).toHaveBeenCalled();
+        });
+        const callsAfterMount = mockGetByEntityId.mock.calls.length;
+
+        fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT));
+        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED));
+
+        await waitFor(() => {
+            expect(mockGetByEntityId.mock.calls.length).toBeGreaterThan(callsAfterMount);
+        });
+    });
+
+    it('does not refetch disclaimer localizations when publish fails', async () => {
+        mockUpdateSettings.mockRejectedValueOnce(new Error('publish failed'));
+
+        render(<FundsExpenditureSection />);
+
+        fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT));
+
+        mockGetByEntityId.mockClear();
+        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED));
+
+        await waitFor(() => {
+            expect(mockAddToast).toHaveBeenCalledWith(REPORTS_TEXT.MESSAGE.FAIL_TO_UPDATE_REPORT, 'error');
+        });
+
+        expect(mockGetByEntityId).not.toHaveBeenCalled();
     });
 });

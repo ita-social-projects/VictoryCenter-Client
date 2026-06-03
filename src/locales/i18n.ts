@@ -6,6 +6,7 @@ import {
     hippotherapyUk,
     footerUk,
     aboutUsPageUk,
+    eventsNewsUk,
     programsPageUk,
     detailedProgramPageUk,
     donateUk,
@@ -13,12 +14,15 @@ import {
     partnersPageUk,
     successPageUk,
     globalUk,
+    contactUsPageUk,
+    historyPageUk,
 } from './uk';
 import {
     headerEn,
     hippotherapyEn,
     footerEn,
     aboutUsPageEn,
+    eventsNewsEn,
     programsPageEn,
     detailedProgramPageEn,
     donateEn,
@@ -26,6 +30,8 @@ import {
     partnersPageEn,
     successPageEn,
     globalEn,
+    contactUsPageEn,
+    historyPageEn,
 } from './en';
 import { DEFAULT_LOCALE, LOCALES } from '../const/common/locales';
 
@@ -35,6 +41,7 @@ const resources = {
         hippotherapy: hippotherapyUk,
         footer: footerUk,
         aboutUsPage: aboutUsPageUk,
+        eventsNewsPage: eventsNewsUk,
         programsPage: programsPageUk,
         detailedProgramPage: detailedProgramPageUk,
         donatePage: donateUk,
@@ -42,12 +49,15 @@ const resources = {
         partnersPage: partnersPageUk,
         successPage: successPageUk,
         global: globalUk,
+        contactUsPage: contactUsPageUk,
+        historyPage: historyPageUk,
     },
     en: {
         header: headerEn,
         hippotherapy: hippotherapyEn,
         footer: footerEn,
         aboutUsPage: aboutUsPageEn,
+        eventsNewsPage: eventsNewsEn,
         programsPage: programsPageEn,
         detailedProgramPage: detailedProgramPageEn,
         donatePage: donateEn,
@@ -55,6 +65,8 @@ const resources = {
         partnersPage: partnersPageEn,
         successPage: successPageEn,
         global: globalEn,
+        contactUsPage: contactUsPageEn,
+        historyPage: historyPageEn,
     },
 };
 
@@ -72,6 +84,7 @@ i18n.use(initReactI18next).init({
         'header',
         'footer',
         'aboutUsPage',
+        'eventsNewsPage',
         'hippotherapy',
         'programsPage',
         'detailedProgramPage',
@@ -80,6 +93,8 @@ i18n.use(initReactI18next).init({
         'partnersPage',
         'successPage',
         'global',
+        'contactUsPage',
+        'historyPage',
     ], // namespaces
     defaultNS: 'aboutUsPage',
     interpolation: {

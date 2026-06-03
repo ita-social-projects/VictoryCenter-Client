@@ -4,6 +4,7 @@ import {
     normalizeFundsExpendituresAmountInput,
     validateFundsExpendituresAmount,
     validateFundsExpendituresCategory,
+    validateFundsExpendituresReportingYear,
 } from './funds-expenditures-record-schema';
 
 describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
@@ -14,6 +15,14 @@ describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
 
         it('should trim trailing spaces when trimEnd is true', () => {
             expect(normalizeFundsExpendituresAmountInput('   1 200   ', true)).toBe('1 200');
+        });
+
+        it('should convert dot separator to comma', () => {
+            expect(normalizeFundsExpendituresAmountInput('1200.5')).toBe('1200,5');
+        });
+
+        it('should keep only first two digits after comma', () => {
+            expect(normalizeFundsExpendituresAmountInput('1200,5678')).toBe('1200,56');
         });
     });
 
@@ -26,12 +35,12 @@ describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
 
         it('should return numeric error for non-digit input', () => {
             expect(validateFundsExpendituresAmount('abc', 'change')).toBe(
-                FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER_GT_ZERO,
+                FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER,
             );
         });
 
         it('should return max digits error when integer part is too long', () => {
-            expect(validateFundsExpendituresAmount('123456789012', 'change')).toBe(
+            expect(validateFundsExpendituresAmount('1234567890', 'change')).toBe(
                 FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_MAX_DIGITS,
             );
         });
@@ -42,8 +51,32 @@ describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
             );
         });
 
+        it('should not return zero error on change', () => {
+            expect(validateFundsExpendituresAmount('0', 'change')).toBeUndefined();
+        });
+
+        it('should return zero error on blur', () => {
+            expect(validateFundsExpendituresAmount('0', 'blur')).toBe(
+                FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_NOT_ZERO,
+            );
+        });
+
+        it('should return zero error on save', () => {
+            expect(validateFundsExpendituresAmount('0', 'save')).toBe(
+                FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_NOT_ZERO,
+            );
+        });
+
         it('should pass valid value with comma decimals', () => {
             expect(validateFundsExpendituresAmount('1 200,50', 'save')).toBeUndefined();
+        });
+
+        it('should not return an error when user types more than two decimal digits', () => {
+            expect(validateFundsExpendituresAmount('1 200,123', 'change')).toBeUndefined();
+        });
+
+        it('should support dot input by normalizing it to comma', () => {
+            expect(validateFundsExpendituresAmount('1 200.50', 'save')).toBeUndefined();
         });
     });
 
@@ -51,6 +84,7 @@ describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
         const records = [
             { id: 1, categoryId: 1, type: 'income' as const, reportingYear: '2025', amountUah: '1', amountUsd: '1' },
             { id: 2, categoryId: 2, type: 'income' as const, reportingYear: '2024', amountUah: '1', amountUsd: '1' },
+            { id: 3, categoryId: 3, type: 'expense' as const, reportingYear: '2024', amountUah: '1', amountUsd: '1' },
         ];
 
         it('should return required error for undefined category on blur', () => {
@@ -73,7 +107,18 @@ describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
                     categoryId: 2,
                     records,
                 }),
-            ).toBe(FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE);
+            ).toBe(FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE_INCOME);
+        });
+
+        it('should return expense-specific unique error for duplicate expense category', () => {
+            expect(
+                validateFundsExpendituresCategory({
+                    recordId: 1,
+                    recordType: 'expense',
+                    categoryId: 3,
+                    records,
+                }),
+            ).toBe(FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE_EXPENSE);
         });
 
         it('should pass for unique category', () => {
@@ -85,6 +130,28 @@ describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
                     records,
                 }),
             ).toBeUndefined();
+        });
+    });
+
+    describe('validateFundsExpendituresReportingYear', () => {
+        it('should return required error for empty value on blur', () => {
+            expect(validateFundsExpendituresReportingYear(undefined, 'blur')).toBe(
+                COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED,
+            );
+        });
+
+        it('should return required error for empty value on save', () => {
+            expect(validateFundsExpendituresReportingYear('   ', 'save')).toBe(
+                COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED,
+            );
+        });
+
+        it('should not return error for empty value on change', () => {
+            expect(validateFundsExpendituresReportingYear(undefined, 'change')).toBeUndefined();
+        });
+
+        it('should pass for valid reporting year', () => {
+            expect(validateFundsExpendituresReportingYear('2026', 'blur')).toBeUndefined();
         });
     });
 });

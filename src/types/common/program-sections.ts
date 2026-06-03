@@ -1,5 +1,5 @@
 import { Image, ImageValues } from '../common/image';
-import { ContentType } from './programs';
+import { ContentType } from './section-contents';
 import { FaqQuestion } from '../admin/faq';
 import {
     EntityLocalization,
@@ -7,6 +7,7 @@ import {
     EntityWithDtoLocalizations,
     EntityWithLocalizations,
 } from './language';
+import { SectionTemplate } from './sections';
 
 export interface ContentLocalizationDto extends EntityLocalizationDto {
     entityId: number;
@@ -25,28 +26,6 @@ export enum ProgramSectionType {
     Image,
     Card,
     Author,
-}
-
-export enum ProgramSectionTemplate {
-    QuadImagesBottom = 1,
-    DualImagesBottom = 2,
-    TextOnly = 3,
-    TripleImagesBottom = 4,
-    SingleImageBottom = 5,
-    SingleImageTop = 6,
-    SingleImageRight = 7,
-    DualTitleDescriptionPairs = 8,
-    TripleTitleDescriptionPairs = 9,
-    QuadTitleDescriptionPairs = 10,
-    SingleTitleQuintupleDescription = 11,
-    SingleTitleDescriptionAuthorPairs = 12,
-    SingleTitleQuestionAnswerPairs = 13,
-}
-
-export enum ProgramSectionMode {
-    Template = 'template',
-    Edit = 'edit',
-    View = 'view',
 }
 
 export interface FaqSectionQuestionDto {
@@ -91,7 +70,7 @@ export interface HippotherapyProgramSectionContent
 export interface HippotherapyProgramSectionDto {
     id?: number;
     programId?: number;
-    template: ProgramSectionTemplate;
+    template: SectionTemplate;
     order: number;
     contents: HippotherapyProgramSectionContentDto[];
 }
@@ -131,7 +110,7 @@ export interface CreateProgramSectionContentLocalizationDto {
 export interface CreateHippotherapyProgramSectionDto {
     id?: number;
     programId?: number;
-    template: ProgramSectionTemplate;
+    template: SectionTemplate;
     order: number;
     contents: CreateProgramSectionContentDto[];
 }

@@ -15,11 +15,10 @@ export const BackgroundMedia: React.FC<BackgroundMediaProps> = memo(
     ({ mediaUrl, overlay = {}, className, mediaType }) => {
         const type = useMemo(() => mediaType ?? getMediaType(mediaUrl), [mediaUrl, mediaType]);
 
-        const style = useMemo(
-            () =>
-                ({
-                    '--bg-url': `url(${mediaUrl})`,
-                }) as React.CSSProperties,
+        const style = useMemo<React.CSSProperties>(
+            () => ({
+                backgroundImage: `url("${mediaUrl}")`,
+            }),
             [mediaUrl],
         );
 

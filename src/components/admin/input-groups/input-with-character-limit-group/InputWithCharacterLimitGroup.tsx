@@ -16,6 +16,7 @@ export interface InputWithCharacterLimitGroupProps extends InputWithCharacterLim
     className?: string;
     maxLimitWarning?: string;
     showCounterBelow?: boolean;
+    isWhiteLabel?: boolean;
 }
 
 export const InputWithCharacterLimitGroup = ({
@@ -38,6 +39,7 @@ export const InputWithCharacterLimitGroup = ({
     className,
     maxLimitWarning,
     showCounterBelow = false,
+    isWhiteLabel,
 }: InputWithCharacterLimitGroupProps) => {
     const [localWarning, setLocalWarning] = useState<string | null>(null);
     const displayedError = localWarning || error;
@@ -72,6 +74,7 @@ export const InputWithCharacterLimitGroup = ({
                     counterId={counterId}
                     htmlFor={id}
                     value={value}
+                    isWhiteLabel={isWhiteLabel}
                 />
             ) : (
                 <InputError error={displayedError} />

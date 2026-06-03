@@ -14,12 +14,30 @@ export const PdfReportsApi = {
         return response.data;
     },
 
+    delete: async (client: AxiosInstance, id: number): Promise<void> => {
+        await client.delete(`${API_ROUTES.PDF_REPORTS.BASE}/${id}`);
+    },
+
+    rename: async (client: AxiosInstance, id: number, newName: string): Promise<PdfReportDto> => {
+        const response = await client.put<PdfReportDto>(`${API_ROUTES.PDF_REPORTS.BASE}/${id}`, {
+            name: newName,
+        });
+        return response.data;
+    },
+
     getAll: async (
         client: AxiosInstance,
         filter: { offset: number; limit: number },
     ): Promise<PaginationResult<PdfReportDto>> => {
         const response = await client.get<PaginationResult<PdfReportDto>>(API_ROUTES.PDF_REPORTS.BASE, {
             params: filter,
+        });
+        return response.data;
+    },
+
+    fetchById: async (client: AxiosInstance, id: number): Promise<Blob> => {
+        const response = await client.get<Blob>(`${API_ROUTES.PDF_REPORTS.BASE}/${id}`, {
+            responseType: 'blob',
         });
         return response.data;
     },

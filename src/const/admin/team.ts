@@ -58,7 +58,7 @@ export const TEAM_MEMBER_VALIDATION = {
     fullName: {
         min: 2,
         max: 50,
-        allowedCharsPattern: /^[A-Za-zА-Яа-яҐґЄєІіЇї''\-\s0-9]+$/,
+        allowedCharsPattern: /^[A-Za-zА-Яа-яҐґЄєІіЇї'’ʼ`\-\s0-9]+$/,
         digitsPattern: /\d/,
         getInvalidCharsError: () => 'Поле може містити лише літери, пробіли, ’ -',
         getDigitsError: () => 'Поле не може містити цифри',
@@ -73,7 +73,6 @@ export const TEAM_MEMBER_VALIDATION = {
         getRequiredWhenPublishingError: () => "Опис обов'язковий при публікації",
         getMinError: () => `Не менше ${TEAM_MEMBER_VALIDATION.description.min} символів`,
         getMaxError: () => `Не більше ${TEAM_MEMBER_VALIDATION.description.max} символів`,
-        getMultipleSpacesError: () => `Не можна використовувати більше одного пробіла`,
     },
     category: {
         getRequiredError: () => "Поле обов'язкове",

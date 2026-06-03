@@ -1,31 +1,28 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
-import { Button } from '@/components/admin/button/Button';
-import { ImageValues } from '@/types/common/image';
-import { PROGRAMS_TEXT } from '@/const/admin/programs';
-import { renderProgramSection } from '@/utils/functions/render-program-section';
-import { ReactComponent as ChangeIcon } from '@/assets/icons/change.svg';
-import styles from './ProgramSectionForm.module.scss';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
-    FaqSectionQuestionDto,
-    CreateHippotherapyProgramSectionDto,
-    ProgramSectionTemplate,
-    ProgramSectionMode,
-} from '@/types/common/program-sections';
-import { ContentType } from '@/types/common/programs';
-import {
-    getProgramSectionTemplateMaxGroupCount,
-    normalizeGroupedContentsGroupIndexes,
-} from '@/utils/functions/program-section-template-validation/programSectionTemplateValidation';
-import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
+    createSectionFormActionsClassNames,
+    SectionFormActions,
+} from '@/components/admin/section-form-actions/SectionFormActions';
+import type { ImageValues } from '@/types/common/image';
+import type { CreateHippotherapyProgramSectionDto, FaqSectionQuestionDto } from '@/types/common/program-sections';
+import { ContentType } from '@/types/common/section-contents';
+import { SectionMode, SectionTemplate } from '@/types/common/sections';
 import { getDescriptionAuthorPairsByGroup } from '@/utils/functions/mappers/public/program/get-grouped-program-section-content-pairs';
 import {
+    ensureTitleContentAndOnePair,
     getContentByType,
     getDescriptionsInOrder,
     getFaqPairs,
-    ensureTitleContentAndOnePair,
 } from '@/utils/functions/program-section-content/programSectionContent';
-import { IconButton } from '@/components/admin/icon-button/IconButton';
-import { ACTION_ICONS } from '@/const/common/action-icons';
+import { renderProgramSection } from '@/utils/functions/render-program-section';
+import {
+    getSectionTemplateMaxGroupCount,
+    normalizeGroupedContentsGroupIndexes,
+} from '@/utils/functions/section-template-validation/sectionTemplateValidation';
+import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
+import styles from './ProgramSectionForm.module.scss';
+
+const sectionFormActionsClassNames = createSectionFormActionsClassNames(styles);
 
 export interface ProgramSectionFormProps {
     section: CreateHippotherapyProgramSectionDto;
@@ -43,6 +40,7 @@ export interface ProgramSectionFormProps {
     isLastSection: boolean;
     onMoveUpSection: () => void;
     onMoveDownSection: () => void;
+    onRequestSaveSection?: (request: { onConfirm: () => void; onDecline?: () => void }) => void;
 }
 
 export interface SectionCancelOptions {
@@ -69,6 +67,7 @@ export const ProgramSectionForm = ({
     isLastSection = false,
     onMoveDownSection,
     onMoveUpSection,
+    onRequestSaveSection,
 }: ProgramSectionFormProps) => {
     const [localSection, setLocalSection] = useState<CreateHippotherapyProgramSectionDto>(() =>
         ensureTitleContentAndOnePair(section),
@@ -78,8 +77,8 @@ export const ProgramSectionForm = ({
     );
     const [isDirty, setIsDirty] = useState(false);
     const [validationResetKey, setValidationResetKey] = useState(0);
-    const [sectionMode, setSectionMode] = useState<ProgramSectionMode>(
-        isNewSection || isReplacingTemplate ? ProgramSectionMode.Edit : ProgramSectionMode.View,
+    const [sectionMode, setSectionMode] = useState<SectionMode>(
+        isNewSection || isReplacingTemplate ? SectionMode.Edit : SectionMode.View,
     );
 
     const sectionModeRef = useRef(sectionMode);
@@ -105,12 +104,12 @@ export const ProgramSectionForm = ({
         setLocalSection(prepared);
         localSectionRef.current = prepared;
 
-        if (sectionModeRef.current !== ProgramSectionMode.Edit) {
+        if (sectionModeRef.current !== SectionMode.Edit) {
             if (!isReplacingTemplate) {
                 setOriginalSection(prepared);
             }
             setIsDirty(false);
-            setSectionMode(isNewSection || isReplacingTemplate ? ProgramSectionMode.Edit : ProgramSectionMode.View);
+            setSectionMode(isNewSection || isReplacingTemplate ? SectionMode.Edit : SectionMode.View);
         }
 
         if (prepared !== section) {
@@ -120,7 +119,7 @@ export const ProgramSectionForm = ({
     }, [section, isNewSection, isReplacingTemplate, onSectionChange]);
 
     useEffect(() => {
-        onEditStateChangeRef.current?.(sectionMode === ProgramSectionMode.Edit);
+        onEditStateChangeRef.current?.(sectionMode === SectionMode.Edit);
     }, [sectionMode]);
 
     const titleContent = getContentByType(localSection.contents, ContentType.Title);
@@ -134,10 +133,9 @@ export const ProgramSectionForm = ({
     const descriptions = orderedDescriptionContents.map((c) => (c as any).description || '');
     const description = descriptions[0] || '';
 
-    const isDescriptionAuthorPairsTemplate =
-        section.template === ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs;
+    const isDescriptionAuthorPairsTemplate = section.template === SectionTemplate.SingleTitleDescriptionAuthorPairs;
 
-    const isFaqTemplate = section.template === ProgramSectionTemplate.SingleTitleQuestionAnswerPairs;
+    const isFaqTemplate = section.template === SectionTemplate.SingleTitleQuestionAnswerPairs;
 
     const orderedPairs = getDescriptionAuthorPairsByGroup(localSection.contents);
 
@@ -312,9 +310,7 @@ export const ProgramSectionForm = ({
         [handlePairFieldChange],
     );
 
-    const pairsMaxCount = isDescriptionAuthorPairsTemplate
-        ? getProgramSectionTemplateMaxGroupCount(section.template)
-        : 0;
+    const pairsMaxCount = isDescriptionAuthorPairsTemplate ? getSectionTemplateMaxGroupCount(section.template) : 0;
 
     const validateDescriptionAuthorPairContent = (value: string, type: ContentType) =>
         PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateContentText(value, type, true, section.template);
@@ -331,7 +327,7 @@ export const ProgramSectionForm = ({
 
     const handleAddPair = useCallback(() => {
         const prev = localSectionRef.current;
-        if (prev.template !== ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs) return;
+        if (prev.template !== SectionTemplate.SingleTitleDescriptionAuthorPairs) return;
 
         const normalizedContents = normalizeGroupedContentsGroupIndexes(prev.contents, [
             ContentType.Description,
@@ -339,7 +335,7 @@ export const ProgramSectionForm = ({
         ]);
 
         const pairs = getDescriptionAuthorPairsByGroup(normalizedContents);
-        const maxGroupCount = getProgramSectionTemplateMaxGroupCount(prev.template);
+        const maxGroupCount = getSectionTemplateMaxGroupCount(prev.template);
         if (pairs.length >= maxGroupCount) return;
 
         const nextGroupIndex = pairs.length;
@@ -373,14 +369,19 @@ export const ProgramSectionForm = ({
 
         setTimeout(() => {
             const element = document.getElementById(`pair-description-${nextGroupIndex}`) as HTMLTextAreaElement | null;
-            element?.focus();
+            element?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+                inline: 'center',
+            });
+            element?.focus({ preventScroll: true });
         }, 0);
     }, [emitSectionChange]);
 
     const performDeletePair = useCallback(
         (index: number) => {
             const prev = localSectionRef.current;
-            if (prev.template !== ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs) return;
+            if (prev.template !== SectionTemplate.SingleTitleDescriptionAuthorPairs) return;
 
             const pairs = getDescriptionAuthorPairsByGroup(prev.contents);
             if (pairs.length <= 1) return;
@@ -470,7 +471,7 @@ export const ProgramSectionForm = ({
     const handleAddFaqPair = useCallback(
         (questionText: string, answerText: string) => {
             const prev = localSectionRef.current;
-            if (prev.template !== ProgramSectionTemplate.SingleTitleQuestionAnswerPairs) return;
+            if (prev.template !== SectionTemplate.SingleTitleQuestionAnswerPairs) return;
 
             const faq = getFaqPairs(prev.contents);
             const nextGroupIndex = faq.length;
@@ -503,7 +504,7 @@ export const ProgramSectionForm = ({
     const handleDeleteFaqPair = useCallback(
         (index: number) => {
             const prev = localSectionRef.current;
-            if (prev.template !== ProgramSectionTemplate.SingleTitleQuestionAnswerPairs) return;
+            if (prev.template !== SectionTemplate.SingleTitleQuestionAnswerPairs) return;
 
             const faq = getFaqPairs(prev.contents);
             if (faq.length <= 1) return;
@@ -542,51 +543,53 @@ export const ProgramSectionForm = ({
             e.stopPropagation();
             setOriginalSection(localSection);
             setIsDirty(false);
-            setSectionMode(ProgramSectionMode.Edit);
+            setSectionMode(SectionMode.Edit);
         },
         [localSection],
     );
 
-    const handleSaveClick = useCallback(() => {
-        if (isDisabled || !isSectionSaveValid) return;
-        onSave();
-        setOriginalSection(localSection);
-        setIsDirty(false);
-        setSectionMode(ProgramSectionMode.View);
-        setValidationResetKey((prev) => prev + 1);
-    }, [isDisabled, isSectionSaveValid, onSave, localSection]);
-
     const CARD_TEMPLATES = [
-        ProgramSectionTemplate.DualTitleDescriptionPairs,
-        ProgramSectionTemplate.TripleTitleDescriptionPairs,
-        ProgramSectionTemplate.QuadTitleDescriptionPairs,
+        SectionTemplate.DualTitleDescriptionPairs,
+        SectionTemplate.TripleTitleDescriptionPairs,
+        SectionTemplate.QuadTitleDescriptionPairs,
     ];
 
     const isCardTemplate = CARD_TEMPLATES.includes(section.template);
 
+    const performCancel = useCallback(
+        (forceCleanState: boolean) => {
+            const shouldRemove = isNewSection;
+            const revertTo = originalSection;
+            const isTemplateReplacement = isReplacingTemplate;
+
+            const onAfterDiscard = () => {
+                if (!shouldRemove) {
+                    localSectionRef.current = revertTo;
+                    setLocalSection(revertTo);
+                    setIsDirty(false);
+                    setSectionMode(SectionMode.View);
+                    setValidationResetKey((prev) => prev + 1);
+                }
+            };
+
+            onCancel({
+                isDirty: forceCleanState ? false : isDirty,
+                shouldRemove,
+                revertTo,
+                onAfterDiscard,
+                isTemplateReplacement,
+            });
+        },
+        [isDirty, isNewSection, onCancel, originalSection, isReplacingTemplate],
+    );
+
     const handleCancelClick = useCallback(() => {
-        const shouldRemove = isNewSection;
-        const revertTo = originalSection;
-        const isTemplateReplacement = isReplacingTemplate;
+        performCancel(false);
+    }, [performCancel]);
 
-        const onAfterDiscard = () => {
-            if (!shouldRemove) {
-                localSectionRef.current = revertTo;
-                setLocalSection(revertTo);
-                setIsDirty(false);
-                setSectionMode(ProgramSectionMode.View);
-                setValidationResetKey((prev) => prev + 1);
-            }
-        };
-
-        onCancel({
-            isDirty,
-            shouldRemove,
-            revertTo,
-            onAfterDiscard,
-            isTemplateReplacement,
-        });
-    }, [isDirty, isNewSection, onCancel, originalSection, isReplacingTemplate]);
+    const handleDeclineSave = useCallback(() => {
+        performCancel(true);
+    }, [performCancel]);
 
     const handleDeleteClick = useCallback(
         (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -605,6 +608,28 @@ export const ProgramSectionForm = ({
         },
         [onRequestReplace],
     );
+
+    const handleSaveClick = useCallback(() => {
+        if (isDisabled || !isSectionSaveValid) return;
+
+        const applySave = () => {
+            onSave();
+            setOriginalSection(localSection);
+            setIsDirty(false);
+            setSectionMode(SectionMode.View);
+            setValidationResetKey((prev) => prev + 1);
+        };
+
+        if (onRequestSaveSection && isDirty) {
+            onRequestSaveSection({
+                onConfirm: applySave,
+                onDecline: handleDeclineSave,
+            });
+            return;
+        }
+
+        applySave();
+    }, [isDisabled, isSectionSaveValid, onSave, localSection, onRequestSaveSection, isDirty, handleDeclineSave]);
 
     const editableSection = renderProgramSection({
         templateId: section.template,
@@ -654,79 +679,28 @@ export const ProgramSectionForm = ({
 
     return (
         <div className={styles.container}>
-            {sectionMode === ProgramSectionMode.View && (
-                <div className={styles['actions-section']}>
-                    <div className={styles['order-controls']}>
-                        <div className={styles['order-controls']}>
-                            {!isFirstSection && (
-                                <button
-                                    type="button"
-                                    onClick={onMoveUpSection}
-                                    className={`${styles['icon-button']} ${styles['up-button']}`}
-                                    aria-label="Move up section"
-                                />
-                            )}
-                            {!isLastSection && (
-                                <button
-                                    type="button"
-                                    onClick={onMoveDownSection}
-                                    className={`${styles['icon-button']} ${styles['down-button']}`}
-                                    aria-label="Move down section"
-                                />
-                            )}
-                        </div>
-                    </div>
-                    <div className={styles['hover-buttons']}>
-                        <IconButton
-                            type="button"
-                            onClick={handleEditClick}
-                            className={`${styles['icon-button']} ${styles['edit-button']}`}
-                            aria-label="Edit section"
-                            DefaultIcon={ACTION_ICONS.edit.default}
-                            FilledIcon={ACTION_ICONS.edit.hover}
-                        />
-                        <IconButton
-                            type="button"
-                            onClick={handleDeleteClick}
-                            className={`${styles['icon-button']} ${styles['delete-button']}`}
-                            aria-label="Delete section"
-                            DefaultIcon={ACTION_ICONS.delete.default}
-                            FilledIcon={ACTION_ICONS.delete.hover}
-                        />
-                        <button
-                            type="button"
-                            onClick={handleReplaceClick}
-                            className={`${styles['icon-button']} ${styles['change-button']}`}
-                            aria-label="Replace section"
-                        >
-                            <ChangeIcon />
-                        </button>
-                    </div>
-                </div>
-            )}
-            <div className={styles.content}>
+            <SectionFormActions
+                sectionMode={sectionMode}
+                isFirstSection={isFirstSection}
+                isLastSection={isLastSection}
+                isDisabled={isDisabled}
+                isDirty={isDirty}
+                isSectionSaveValid={isSectionSaveValid}
+                classNames={sectionFormActionsClassNames}
+                onMoveUpSection={onMoveUpSection}
+                onMoveDownSection={onMoveDownSection}
+                onEditClick={handleEditClick}
+                onDeleteClick={handleDeleteClick}
+                onReplaceClick={handleReplaceClick}
+                onCancelClick={handleCancelClick}
+                onSaveClick={handleSaveClick}
+            >
                 {editableSection || (
                     <p className={styles['template-info']}>
                         Template ID: <strong>{section.template}</strong> (not found in renderer)
                     </p>
                 )}
-            </div>
-            <div className={styles['actions-container']}>
-                {sectionMode !== ProgramSectionMode.View && (
-                    <div className={styles.actions}>
-                        <Button buttonStyle="secondary" onClick={handleCancelClick} disabled={isDisabled}>
-                            {PROGRAMS_TEXT.BUTTON.CANCEL}
-                        </Button>
-                        <Button
-                            buttonStyle="primary"
-                            onClick={handleSaveClick}
-                            disabled={isDisabled || !isSectionSaveValid}
-                        >
-                            {PROGRAMS_TEXT.BUTTON.SAVE}
-                        </Button>
-                    </div>
-                )}
-            </div>
+            </SectionFormActions>
         </div>
     );
 };

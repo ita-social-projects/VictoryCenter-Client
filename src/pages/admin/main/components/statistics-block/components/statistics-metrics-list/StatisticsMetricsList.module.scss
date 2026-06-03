@@ -1,0 +1,121 @@
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
+
+.list {
+    background: c.$white;
+    border: 1px solid c.$grey-500;
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.header {
+    @include type.small-text-medium;
+    color: c.$grey-900;
+    margin-bottom: 8px;
+}
+
+.table {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.table :global(.draggable-item-wrapper),
+.table :global(.draggable-item) {
+    width: 100%;
+}
+
+.table :global(.draggable-item),
+.table :global(.drag-preview-wrapper) {
+    height: auto;
+    min-height: 40px;
+    align-items: stretch;
+    box-shadow: none;
+    border-bottom: none;
+}
+
+.table :global(.draggable-item .item-data),
+.table :global(.drag-preview .item-data) {
+    padding: 0 10px;
+    height: auto;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.table :global(.dragger) {
+    width: 32px;
+    height: 40px;
+}
+
+.row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 140px 64px;
+    width: 100%;
+    align-items: center;
+    gap: 16px;
+    min-height: 40px;
+    padding: 8px 0;
+    border: none;
+    border-radius: 8px;
+}
+
+.raisedValues {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+}
+
+.ua,
+.en {
+    @include type.body-2-medium;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.values {
+    margin: 0;
+    text-align: left;
+    justify-self: start;
+}
+
+.value {
+    @include type.body-2-medium;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.actions {
+    display: flex;
+    gap: 6px;
+    justify-content: flex-end;
+}
+
+.iconButton {
+    border: none;
+    background: transparent;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    color: c.$blue-500;
+}
+
+.iconButton :global(svg),
+.iconButton :global(.icon-img) {
+    width: 24px;
+    height: 24px;
+}
+
+.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.hiddenText {
+    color: c.$grey-700;
+}

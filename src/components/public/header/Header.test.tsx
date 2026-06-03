@@ -102,14 +102,6 @@ jest.mock('@/hooks/common/use-locale/useLocale', () => ({
 }));
 
 describe('Header', () => {
-    beforeEach(() => {
-        jest.spyOn(console, 'log').mockImplementation(() => {});
-    });
-
-    afterEach(() => {
-        jest.restoreAllMocks();
-    });
-
     it('renders the logo inside a link to "/"', () => {
         render(<Header />, { wrapper: MemoryRouter });
         expect(screen.getByRole('link', { name: '' })).toHaveAttribute('href', '/');
@@ -122,33 +114,20 @@ describe('Header', () => {
             'href',
             PUBLIC_ROUTES.REPORTS.FULL,
         );
-        expect(screen.getByRole('link', { name: headerUk['HOW_TO_SUPPORT'] })).toHaveAttribute(
-            'href',
-            PUBLIC_ROUTES.MOCK.FULL,
-        );
-        expect(screen.getByRole('link', { name: headerUk['STORIES_OF_VICTORIES'] })).toHaveAttribute(
-            'href',
-            PUBLIC_ROUTES.MOCK.FULL,
-        );
+        expect(screen.getByText(headerUk['HOW_TO_SUPPORT'])).not.toBeVisible();
+        expect(screen.getByText(headerUk['STORIES_OF_VICTORIES'])).not.toBeVisible();
     });
 
     it('renders Contact Us and Donate buttons', () => {
         render(<Header />, { wrapper: MemoryRouter });
 
-        expect(screen.getByRole('button', { name: headerUk['CONTACT_US'] })).toBeInTheDocument();
+        const contactUsLink = screen.getByRole('link', { name: headerUk['CONTACT_US'] });
+        expect(contactUsLink).toBeInTheDocument();
+        expect(contactUsLink).toHaveAttribute('href', PUBLIC_ROUTES.CONTACT_US.FULL);
+
         const donateLink = screen.getByRole('link', { name: headerUk['DONATE'] });
         expect(donateLink).toBeInTheDocument();
         expect(donateLink).toHaveAttribute('href', PUBLIC_ROUTES.DONATE.FULL);
-    });
-
-    it('check if Contact Us button is clicked', () => {
-        render(<Header />, { wrapper: MemoryRouter });
-
-        const contactUsBtn = screen.getByRole('button', { name: headerUk['CONTACT_US'] });
-        fireEvent.click(contactUsBtn);
-
-        // eslint-disable-next-line no-console
-        expect(console.log).toHaveBeenCalledWith('CONTACT USED!');
     });
 
     it('renders burger menu correctly', () => {
@@ -206,7 +185,7 @@ describe('Header', () => {
         expect(teamLink).toHaveAttribute('data-disabled', 'false');
 
         const historyLink = within(aboutUsDropdown as HTMLElement).getByText(headerUk['HISTORY']);
-        expect(historyLink).toHaveAttribute('data-disabled', 'true');
+        expect(historyLink).toHaveAttribute('data-disabled', 'false');
 
         const programsDropdown = dropdowns.find((d) => d.textContent?.includes(headerUk['HIPPOTHERAPY']));
         expect(programsDropdown).toBeInTheDocument();
@@ -218,9 +197,6 @@ describe('Header', () => {
             name: headerUk['HIPPOTHERAPY'],
         });
         expect(hippotherapyLink).toHaveAttribute('data-disabled', 'false');
-
-        const prorgamsSessionsLink = within(programsDropdown as HTMLElement).getByText(headerUk['PROGRAMS_SESSIONS']);
-        expect(prorgamsSessionsLink).toHaveAttribute('data-disabled', 'true');
     });
 
     it('toggles mobile menu open and closed', () => {
@@ -283,7 +259,7 @@ describe('Header', () => {
         expect(partnersLink).toHaveAttribute('data-disabled', 'false');
 
         const eventsLink = within(aboutUsDropdown as HTMLElement).getByText(headerUk['EVENTS_AND_NEWS']);
-        expect(eventsLink).toHaveAttribute('data-disabled', 'true');
+        expect(eventsLink).toHaveAttribute('data-disabled', 'false');
     });
 
     it('renders header spacer element', () => {

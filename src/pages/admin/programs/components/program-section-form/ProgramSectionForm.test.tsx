@@ -1,15 +1,15 @@
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
-import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
-import { ProgramSectionForm } from './ProgramSectionForm';
-import type { ProgramSectionFormProps } from './ProgramSectionForm';
-import type { CreateHippotherapyProgramSectionDto } from '@/types/common/program-sections';
-import { ProgramSectionTemplate, ProgramSectionMode } from '@/types/common/program-sections';
-import { ContentType } from '@/types/common/programs';
-import { PROGRAMS_TEXT } from '@/const/admin/programs';
-import { renderProgramSection } from '@/utils/functions/render-program-section';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { SECTIONS_TEXT } from '@/const/admin/sections';
+import type { CreateHippotherapyProgramSectionDto } from '@/types/common/program-sections';
+import { ContentType } from '@/types/common/section-contents';
+import { SectionMode, SectionTemplate } from '@/types/common/sections';
+import { renderProgramSection } from '@/utils/functions/render-program-section';
+import type { ProgramSectionFormProps } from './ProgramSectionForm';
+import { ProgramSectionForm } from './ProgramSectionForm';
 
 jest.mock('@/utils/functions/render-program-section', () => ({
     renderProgramSection: jest.fn(() => <div data-testid="editable-section" />),
@@ -19,8 +19,8 @@ jest.mock('@/components/admin/button/Button', () => ({
     Button: ({ buttonStyle: _buttonStyle, ...props }: any) => <button {...props}>{props.children}</button>,
 }));
 
-jest.mock('@/utils/functions/program-section-template-validation/programSectionTemplateValidation', () => ({
-    getProgramSectionTemplateMaxGroupCount: jest.fn(),
+jest.mock('@/utils/functions/section-template-validation/sectionTemplateValidation', () => ({
+    getSectionTemplateMaxGroupCount: jest.fn(),
     normalizeGroupedContentsGroupIndexes: jest.fn(),
 }));
 
@@ -35,15 +35,13 @@ jest.mock('@/validation/admin/program-schema/program-schema', () => ({
 const renderProgramSectionMock = renderProgramSection as unknown as jest.Mock;
 
 const getTemplateValidationMocks = () => {
-    const mod = jest.requireMock(
-        '@/utils/functions/program-section-template-validation/programSectionTemplateValidation',
-    ) as {
-        getProgramSectionTemplateMaxGroupCount: jest.Mock;
+    const mod = jest.requireMock('@/utils/functions/section-template-validation/sectionTemplateValidation') as {
+        getSectionTemplateMaxGroupCount: jest.Mock;
         normalizeGroupedContentsGroupIndexes: jest.Mock;
     };
 
     return {
-        getProgramSectionTemplateMaxGroupCount: mod.getProgramSectionTemplateMaxGroupCount,
+        getSectionTemplateMaxGroupCount: mod.getSectionTemplateMaxGroupCount,
         normalizeGroupedContentsGroupIndexes: mod.normalizeGroupedContentsGroupIndexes,
     };
 };
@@ -108,7 +106,7 @@ const makePairAuthor = (order: number, groupIndex: number | null | undefined, au
 const makeSection = (
     overrides?: Partial<CreateHippotherapyProgramSectionDto>,
 ): CreateHippotherapyProgramSectionDto => ({
-    template: ProgramSectionTemplate.TextOnly,
+    template: SectionTemplate.TextOnly,
     order: 0,
     contents: [
         makeTitleContent('Title', 0),
@@ -133,10 +131,13 @@ const getContentByGroupAndType = (s: CreateHippotherapyProgramSectionDto, groupI
 const createFocusableTextarea = (id: string) => {
     const el = document.createElement('textarea');
     el.id = id;
-    const focusMock = jest.fn();
-    (el as any).focus = focusMock;
+    const focusMock = jest.fn<void, [FocusOptions?]>();
+    el.focus = focusMock as unknown as typeof el.focus;
+
+    const scrollIntoViewMock = jest.fn<void, [ScrollIntoViewOptions?]>();
+    el.scrollIntoView = scrollIntoViewMock as unknown as typeof el.scrollIntoView;
     document.body.appendChild(el);
-    return { el, focusMock };
+    return { el, focusMock, scrollIntoViewMock };
 };
 
 describe('ProgramSectionForm', () => {
@@ -169,17 +170,16 @@ describe('ProgramSectionForm', () => {
     beforeEach(() => {
         jest.clearAllMocks();
 
-        const { getProgramSectionTemplateMaxGroupCount, normalizeGroupedContentsGroupIndexes } =
-            getTemplateValidationMocks();
+        const { getSectionTemplateMaxGroupCount, normalizeGroupedContentsGroupIndexes } = getTemplateValidationMocks();
         const { validateContentText, validateFaqQuestion, validateFaqAnswer } = getProgramValidationMocks();
 
-        getProgramSectionTemplateMaxGroupCount.mockReset();
+        getSectionTemplateMaxGroupCount.mockReset();
         normalizeGroupedContentsGroupIndexes.mockReset();
         validateContentText.mockReset();
         validateFaqQuestion.mockReset();
         validateFaqAnswer.mockReset();
 
-        getProgramSectionTemplateMaxGroupCount.mockReturnValue(10);
+        getSectionTemplateMaxGroupCount.mockReturnValue(10);
         validateContentText.mockReturnValue(undefined);
         validateFaqQuestion.mockReturnValue(undefined);
         validateFaqAnswer.mockReturnValue(undefined);
@@ -243,7 +243,7 @@ describe('ProgramSectionForm', () => {
 
     it('calls onCancel when cancel button is clicked', () => {
         renderForm({ isNewSection: true });
-        fireEvent.click(screen.getByText(PROGRAMS_TEXT.BUTTON.CANCEL));
+        fireEvent.click(screen.getByText(SECTIONS_TEXT.BUTTON.CANCEL));
         expect(baseProps.onCancel).toHaveBeenCalledTimes(1);
     });
 
@@ -253,7 +253,11 @@ describe('ProgramSectionForm', () => {
         });
 
         const onCancel = jest.fn();
-        const { handlers } = renderWithHandlers({ section, isNewSection: false, onCancel });
+        const { handlers } = renderWithHandlers({
+            section,
+            isNewSection: false,
+            onCancel,
+        });
 
         const editButton = screen.getByLabelText('Edit section');
         fireEvent.click(editButton);
@@ -261,7 +265,7 @@ describe('ProgramSectionForm', () => {
         act(() => {
             handlers.onTitleChange('Modified Title');
         });
-        fireEvent.click(screen.getByText(PROGRAMS_TEXT.BUTTON.CANCEL));
+        fireEvent.click(screen.getByText(SECTIONS_TEXT.BUTTON.CANCEL));
 
         expect(onCancel).toHaveBeenCalledTimes(1);
 
@@ -277,7 +281,7 @@ describe('ProgramSectionForm', () => {
 
     it('save button is disabled when isSectionValid is false', () => {
         renderForm({ isNewSection: true, isSectionValid: false });
-        expect(screen.getByText(PROGRAMS_TEXT.BUTTON.SAVE)).toBeDisabled();
+        expect(screen.getByText(SECTIONS_TEXT.BUTTON.SAVE)).toBeDisabled();
     });
 
     it('cancel button is disabled when isDisabled is true', () => {
@@ -308,7 +312,7 @@ describe('ProgramSectionForm', () => {
         const callPayload = renderProgramSectionMock.mock.calls[0][0];
 
         expect(callPayload.templateId).toBe(section.template);
-        expect(callPayload.mode).toBe(ProgramSectionMode.View);
+        expect(callPayload.mode).toBe(SectionMode.View);
 
         expect(callPayload.data).toEqual({
             title: '',
@@ -434,7 +438,7 @@ describe('ProgramSectionForm', () => {
     describe('DescriptionAuthorPairs template', () => {
         const makePairsSection = (contents: any[]) =>
             makeSection({
-                template: ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
+                template: SectionTemplate.SingleTitleDescriptionAuthorPairs,
                 contents,
             });
 
@@ -487,21 +491,21 @@ describe('ProgramSectionForm', () => {
                 'T',
                 ContentType.Title,
                 true,
-                ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
+                SectionTemplate.SingleTitleDescriptionAuthorPairs,
             );
             expect(getProgramValidationMocks().validateContentText).toHaveBeenNthCalledWith(
                 2,
                 'D0',
                 ContentType.Description,
                 true,
-                ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
+                SectionTemplate.SingleTitleDescriptionAuthorPairs,
             );
             expect(getProgramValidationMocks().validateContentText).toHaveBeenNthCalledWith(
                 3,
                 'A0',
                 ContentType.Author,
                 true,
-                ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
+                SectionTemplate.SingleTitleDescriptionAuthorPairs,
             );
         });
 
@@ -571,7 +575,7 @@ describe('ProgramSectionForm', () => {
                 makePairAuthor(4, 1, 'A1'),
             ]);
 
-            getTemplateValidationMocks().getProgramSectionTemplateMaxGroupCount.mockReturnValue(2);
+            getTemplateValidationMocks().getSectionTemplateMaxGroupCount.mockReturnValue(2);
 
             renderForm({ section, isNewSection: true });
 
@@ -645,7 +649,7 @@ describe('ProgramSectionForm', () => {
 
             const maxOrder = Math.max(...section.contents.map((c: any) => c.order));
             const nextIndex = 2;
-            const { focusMock } = createFocusableTextarea(`pair-description-${nextIndex}`);
+            const { focusMock, scrollIntoViewMock } = createFocusableTextarea(`pair-description-${nextIndex}`);
 
             act(() => {
                 handlers.onAddPair();
@@ -686,7 +690,15 @@ describe('ProgramSectionForm', () => {
             expect((getContentByGroupAndType(updated, 1, ContentType.Description) as any)?.description).toBe('D2');
             expect((getContentByGroupAndType(updated, 1, ContentType.Author) as any)?.author).toBe('A2');
 
+            expect(scrollIntoViewMock).toHaveBeenCalledTimes(1);
+            expect(scrollIntoViewMock).toHaveBeenCalledWith({
+                behavior: 'smooth',
+                block: 'nearest',
+                inline: 'center',
+            });
+
             expect(focusMock).toHaveBeenCalledTimes(1);
+            expect(focusMock).toHaveBeenCalledWith({ preventScroll: true });
 
             jest.useRealTimers();
         });
@@ -707,7 +719,7 @@ describe('ProgramSectionForm', () => {
             jest.useFakeTimers();
 
             const section = makeSection({
-                template: ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
+                template: SectionTemplate.SingleTitleDescriptionAuthorPairs,
                 contents: [],
             });
 
@@ -795,7 +807,7 @@ describe('ProgramSectionForm', () => {
         it('starts in View mode for saved sections and shows Edit/Delete/Replace buttons', () => {
             renderForm({ isNewSection: false });
 
-            expect(screen.queryByText(PROGRAMS_TEXT.BUTTON.SAVE)).not.toBeInTheDocument();
+            expect(screen.queryByText(SECTIONS_TEXT.BUTTON.SAVE)).not.toBeInTheDocument();
             expect(screen.queryByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL)).not.toBeInTheDocument();
             expect(screen.getByLabelText('Edit section')).toBeInTheDocument();
             expect(screen.getByLabelText('Delete section')).toBeInTheDocument();
@@ -805,20 +817,20 @@ describe('ProgramSectionForm', () => {
         it('starts in Edit mode for new sections and shows Save/Cancel buttons', () => {
             renderForm({ isNewSection: true });
 
-            expect(screen.getByText(PROGRAMS_TEXT.BUTTON.SAVE)).toBeInTheDocument();
-            expect(screen.getByText(PROGRAMS_TEXT.BUTTON.CANCEL)).toBeInTheDocument();
+            expect(screen.getByText(SECTIONS_TEXT.BUTTON.SAVE)).toBeInTheDocument();
+            expect(screen.getByText(SECTIONS_TEXT.BUTTON.CANCEL)).toBeInTheDocument();
             expect(screen.queryByLabelText('Edit section')).not.toBeInTheDocument();
         });
 
         it('transitions from View to Edit mode when Edit button is clicked', () => {
             renderForm({ isNewSection: false });
 
-            expect(screen.queryByText(PROGRAMS_TEXT.BUTTON.SAVE)).not.toBeInTheDocument();
+            expect(screen.queryByText(SECTIONS_TEXT.BUTTON.SAVE)).not.toBeInTheDocument();
 
             fireEvent.click(screen.getByLabelText('Edit section'));
 
-            expect(screen.getByText(PROGRAMS_TEXT.BUTTON.SAVE)).toBeInTheDocument();
-            expect(screen.getByText(PROGRAMS_TEXT.BUTTON.CANCEL)).toBeInTheDocument();
+            expect(screen.getByText(SECTIONS_TEXT.BUTTON.SAVE)).toBeInTheDocument();
+            expect(screen.getByText(SECTIONS_TEXT.BUTTON.CANCEL)).toBeInTheDocument();
         });
 
         it('calls onEditStateChange when transitioning to Edit mode', () => {
@@ -832,20 +844,27 @@ describe('ProgramSectionForm', () => {
             expect(onEditStateChange).toHaveBeenCalledWith(true);
         });
 
-        it('calls onSave and transitions back to View mode when Save button is clicked', () => {
-            renderForm({ isNewSection: true, isSectionValid: true });
+        it('calls onSave and transitions back to View mode when a valid dirty section is saved', () => {
+            const { handlers } = renderWithHandlers({
+                isNewSection: true,
+                isSectionValid: true,
+            });
 
-            fireEvent.click(screen.getByText(PROGRAMS_TEXT.BUTTON.SAVE));
+            act(() => {
+                handlers.onTitleChange('Updated title');
+            });
+
+            fireEvent.click(screen.getByText(SECTIONS_TEXT.BUTTON.SAVE));
 
             expect(baseProps.onSave).toHaveBeenCalledTimes(1);
-            expect(screen.queryByText(PROGRAMS_TEXT.BUTTON.SAVE)).not.toBeInTheDocument();
+            expect(screen.queryByText(SECTIONS_TEXT.BUTTON.SAVE)).not.toBeInTheDocument();
             expect(screen.getByLabelText('Edit section')).toBeInTheDocument();
         });
 
         it('does not call onSave when Save button is clicked but section is invalid', () => {
             renderForm({ isNewSection: true, isSectionValid: false });
 
-            fireEvent.click(screen.getByText(PROGRAMS_TEXT.BUTTON.SAVE));
+            fireEvent.click(screen.getByText(SECTIONS_TEXT.BUTTON.SAVE));
 
             expect(baseProps.onSave).not.toHaveBeenCalled();
         });
@@ -853,7 +872,7 @@ describe('ProgramSectionForm', () => {
 
     it('updates card title when onCardTitleChange is invoked', () => {
         const section = makeSection({
-            template: ProgramSectionTemplate.DualTitleDescriptionPairs,
+            template: SectionTemplate.DualTitleDescriptionPairs,
             contents: [
                 makeTitleContent('Card 1 Title', 0),
                 makeTitleContent('Card 2 Title', 1),
@@ -879,7 +898,7 @@ describe('ProgramSectionForm', () => {
 
     it('updates card description when onCardDescriptionChange is invoked', () => {
         const section = makeSection({
-            template: ProgramSectionTemplate.TripleTitleDescriptionPairs,
+            template: SectionTemplate.TripleTitleDescriptionPairs,
             contents: [
                 makeTitleContent('Card 1', 0),
                 makeTitleContent('Card 2', 1),
@@ -993,7 +1012,7 @@ describe('ProgramSectionForm', () => {
 
         const makeFaqSection = (contents: any[]) =>
             makeSection({
-                template: ProgramSectionTemplate.SingleTitleQuestionAnswerPairs,
+                template: SectionTemplate.SingleTitleQuestionAnswerPairs,
                 contents,
             });
 
@@ -1083,5 +1102,60 @@ describe('ProgramSectionForm', () => {
             expect(faqPair!.faqQuestion!.questionText).toBe('Question');
             expect(faqPair!.faqQuestion!.answerText).toBe('New Answer');
         });
+    });
+
+    it('requests save confirmation (does not call onSave immediately) when onRequestSaveSection is provided and section is dirty', () => {
+        const onSave = jest.fn();
+        const onRequestSaveSection = jest.fn();
+
+        const { handlers } = renderWithHandlers({
+            isNewSection: true,
+            isSectionValid: true,
+            onSave,
+            onRequestSaveSection,
+        } as any);
+
+        act(() => {
+            handlers.onTitleChange('Dirty title');
+        });
+
+        fireEvent.click(screen.getByText(SECTIONS_TEXT.BUTTON.SAVE));
+
+        expect(onRequestSaveSection).toHaveBeenCalledTimes(1);
+        expect(onRequestSaveSection).toHaveBeenCalledWith({
+            onConfirm: expect.any(Function),
+            onDecline: expect.any(Function),
+        });
+
+        expect(onSave).not.toHaveBeenCalled();
+    });
+
+    it('executes save after external confirmation callback is invoked', () => {
+        const onSave = jest.fn();
+        const onRequestSaveSection = jest.fn();
+
+        const { handlers } = renderWithHandlers({
+            isNewSection: true,
+            isSectionValid: true,
+            onSave,
+            onRequestSaveSection,
+        } as any);
+
+        act(() => {
+            handlers.onTitleChange('Dirty title');
+        });
+
+        fireEvent.click(screen.getByText(SECTIONS_TEXT.BUTTON.SAVE));
+
+        const requestArg = onRequestSaveSection.mock.calls[0][0];
+        expect(requestArg.onConfirm).toEqual(expect.any(Function));
+
+        act(() => {
+            requestArg.onConfirm();
+        });
+
+        expect(onSave).toHaveBeenCalledTimes(1);
+        expect(screen.queryByText(SECTIONS_TEXT.BUTTON.SAVE)).not.toBeInTheDocument();
+        expect(screen.getByLabelText('Edit section')).toBeInTheDocument();
     });
 });

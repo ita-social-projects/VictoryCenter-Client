@@ -1,10 +1,12 @@
 export const COMMON_TEXT_ADMIN = {
     TAB: {
+        MAIN: 'Головна',
         PROFILE_COMPANY: 'Профіль',
         REPORTS: 'Звітність',
         TEAM_MEMBERS: 'Команда',
         PROGRAMS: 'Програми',
         DONATE: 'Донати',
+        HISTORY: 'Історія',
         FAQ: 'Часті питання',
         WHO_WE_ARE: 'Хто ми',
         PARTNERS: 'Партнери',

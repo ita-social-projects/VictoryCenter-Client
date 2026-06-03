@@ -5,9 +5,9 @@ import {
     HippotherapyProgramSectionContentLocalization,
     HippotherapyProgramSectionContentLocalizationDto,
     ProgramSectionContentLocalizableFields,
-    ProgramSectionMode,
 } from '@/types/common/program-sections';
-import { ContentType } from '@/types/common/programs';
+import { SectionMode } from '@/types/common/sections';
+import { ContentType } from '@/types/common/section-contents';
 import { FaqLocalization, FaqLocalizationDto } from '@/types/admin/faq';
 import { EntityLocalization, EntityLocalizationDto } from '@/types/common/language';
 import { useLocale } from '@/hooks/common/use-locale/useLocale';
@@ -178,7 +178,7 @@ export const DetailedProgramSection: React.FC<DetailedProgramSectionProps> = ({ 
             descriptionAuthorPairs,
             faqQuestions,
         },
-        mode: ProgramSectionMode.View,
+        mode: SectionMode.View,
     });
 
     return <div className={styles.container}>{renderedSection}</div>;

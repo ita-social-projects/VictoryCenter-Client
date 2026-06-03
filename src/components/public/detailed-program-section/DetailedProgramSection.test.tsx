@@ -1,12 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import { useLocation } from 'react-router-dom';
 import { DetailedProgramSection } from './DetailedProgramSection';
-import {
-    HippotherapyProgramSectionDto,
-    ProgramSectionTemplate,
-    ProgramSectionMode,
-} from '@/types/common/program-sections';
-import { ContentType } from '@/types/common/programs';
+import { HippotherapyProgramSectionDto } from '@/types/common/program-sections';
+import { SectionTemplate, SectionMode } from '@/types/common/sections';
+import { ContentType } from '@/types/common/section-contents';
 import * as renderProgramSectionModule from '@/utils/functions/render-program-section';
 
 jest.mock('@/utils/functions/render-program-section', () => ({
@@ -27,7 +24,7 @@ describe('DetailedProgramSection', () => {
     it('renders with title and description content', () => {
         const section: HippotherapyProgramSectionDto = {
             id: 1,
-            template: ProgramSectionTemplate.TextOnly,
+            template: SectionTemplate.TextOnly,
             contents: [
                 {
                     id: 1,
@@ -54,7 +51,7 @@ describe('DetailedProgramSection', () => {
         render(<DetailedProgramSection section={section} />);
 
         expect(mockRenderProgramSection).toHaveBeenCalledWith({
-            templateId: ProgramSectionTemplate.TextOnly,
+            templateId: SectionTemplate.TextOnly,
             data: {
                 title: 'Test Title',
                 description: 'Test Description',
@@ -64,7 +61,7 @@ describe('DetailedProgramSection', () => {
                 descriptionAuthorPairs: [],
                 faqQuestions: [],
             },
-            mode: ProgramSectionMode.View,
+            mode: SectionMode.View,
         });
         expect(screen.getByTestId('rendered-section')).toBeInTheDocument();
     });
@@ -72,7 +69,7 @@ describe('DetailedProgramSection', () => {
     it('handles missing title content', () => {
         const section: HippotherapyProgramSectionDto = {
             id: 1,
-            template: ProgramSectionTemplate.TextOnly,
+            template: SectionTemplate.TextOnly,
             contents: [
                 {
                     id: 1,
@@ -90,7 +87,7 @@ describe('DetailedProgramSection', () => {
         render(<DetailedProgramSection section={section} />);
 
         expect(mockRenderProgramSection).toHaveBeenCalledWith({
-            templateId: ProgramSectionTemplate.TextOnly,
+            templateId: SectionTemplate.TextOnly,
             data: {
                 title: '',
                 description: 'Test Description',
@@ -100,14 +97,14 @@ describe('DetailedProgramSection', () => {
                 descriptionAuthorPairs: [],
                 faqQuestions: [],
             },
-            mode: ProgramSectionMode.View,
+            mode: SectionMode.View,
         });
     });
 
     it('handles missing description content', () => {
         const section: HippotherapyProgramSectionDto = {
             id: 1,
-            template: ProgramSectionTemplate.TextOnly,
+            template: SectionTemplate.TextOnly,
             contents: [
                 {
                     id: 1,
@@ -125,7 +122,7 @@ describe('DetailedProgramSection', () => {
         render(<DetailedProgramSection section={section} />);
 
         expect(mockRenderProgramSection).toHaveBeenCalledWith({
-            templateId: ProgramSectionTemplate.TextOnly,
+            templateId: SectionTemplate.TextOnly,
             data: {
                 title: 'Test Title',
                 description: '',
@@ -135,14 +132,14 @@ describe('DetailedProgramSection', () => {
                 descriptionAuthorPairs: [],
                 faqQuestions: [],
             },
-            mode: ProgramSectionMode.View,
+            mode: SectionMode.View,
         });
     });
 
     it('extracts and sorts images by order', () => {
         const section: HippotherapyProgramSectionDto = {
             id: 1,
-            template: ProgramSectionTemplate.QuadImagesBottom,
+            template: SectionTemplate.QuadImagesBottom,
             contents: [
                 {
                     id: 1,
@@ -196,7 +193,7 @@ describe('DetailedProgramSection', () => {
         render(<DetailedProgramSection section={section} />);
 
         expect(mockRenderProgramSection).toHaveBeenCalledWith({
-            templateId: ProgramSectionTemplate.QuadImagesBottom,
+            templateId: SectionTemplate.QuadImagesBottom,
             data: {
                 title: 'Title',
                 description: 'Desc',
@@ -210,14 +207,14 @@ describe('DetailedProgramSection', () => {
                 descriptionAuthorPairs: [],
                 faqQuestions: [],
             },
-            mode: ProgramSectionMode.View,
+            mode: SectionMode.View,
         });
     });
 
     it('handles image content with null image value', () => {
         const section: HippotherapyProgramSectionDto = {
             id: 1,
-            template: ProgramSectionTemplate.SingleImageTop,
+            template: SectionTemplate.SingleImageTop,
             contents: [
                 {
                     id: 1,
@@ -253,7 +250,7 @@ describe('DetailedProgramSection', () => {
         render(<DetailedProgramSection section={section} />);
 
         expect(mockRenderProgramSection).toHaveBeenCalledWith({
-            templateId: ProgramSectionTemplate.SingleImageTop,
+            templateId: SectionTemplate.SingleImageTop,
             data: {
                 title: 'Title',
                 description: 'Desc',
@@ -263,14 +260,14 @@ describe('DetailedProgramSection', () => {
                 descriptionAuthorPairs: [],
                 faqQuestions: [],
             },
-            mode: ProgramSectionMode.View,
+            mode: SectionMode.View,
         });
     });
 
     it('passes correct template to renderProgramSection', () => {
         const section: HippotherapyProgramSectionDto = {
             id: 1,
-            template: ProgramSectionTemplate.DualImagesBottom,
+            template: SectionTemplate.DualImagesBottom,
             contents: [],
             order: 0,
         };
@@ -278,7 +275,7 @@ describe('DetailedProgramSection', () => {
         render(<DetailedProgramSection section={section} />);
 
         expect(mockRenderProgramSection).toHaveBeenCalledWith({
-            templateId: ProgramSectionTemplate.DualImagesBottom,
+            templateId: SectionTemplate.DualImagesBottom,
             data: {
                 title: '',
                 description: '',
@@ -288,14 +285,14 @@ describe('DetailedProgramSection', () => {
                 descriptionAuthorPairs: [],
                 faqQuestions: [],
             },
-            mode: ProgramSectionMode.View,
+            mode: SectionMode.View,
         });
     });
 
     it('extracts description-author pairs by group index and passes them sorted', () => {
         const section: HippotherapyProgramSectionDto = {
             id: 1,
-            template: ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
+            template: SectionTemplate.SingleTitleDescriptionAuthorPairs,
             contents: [
                 {
                     id: 1,
@@ -356,7 +353,7 @@ describe('DetailedProgramSection', () => {
         render(<DetailedProgramSection section={section} />);
 
         expect(mockRenderProgramSection).toHaveBeenCalledWith({
-            templateId: ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs,
+            templateId: SectionTemplate.SingleTitleDescriptionAuthorPairs,
             data: {
                 title: '',
                 description: 'Desc 2',
@@ -369,14 +366,14 @@ describe('DetailedProgramSection', () => {
                 ],
                 faqQuestions: [],
             },
-            mode: ProgramSectionMode.View,
+            mode: SectionMode.View,
         });
     });
 
     it('extracts and sorts faqQuestions from section contents', () => {
         const section: HippotherapyProgramSectionDto = {
             id: 1,
-            template: ProgramSectionTemplate.SingleTitleQuestionAnswerPairs,
+            template: SectionTemplate.SingleTitleQuestionAnswerPairs,
             contents: [
                 {
                     id: 1,
@@ -438,7 +435,7 @@ describe('DetailedProgramSection', () => {
         render(<DetailedProgramSection section={section} />);
 
         expect(mockRenderProgramSection).toHaveBeenCalledWith({
-            templateId: ProgramSectionTemplate.SingleTitleQuestionAnswerPairs,
+            templateId: SectionTemplate.SingleTitleQuestionAnswerPairs,
             data: {
                 title: 'FAQ Title',
                 description: '',
@@ -465,14 +462,14 @@ describe('DetailedProgramSection', () => {
                     },
                 ],
             },
-            mode: ProgramSectionMode.View,
+            mode: SectionMode.View,
         });
     });
 
     it('uses localized faq question and answer when faq localizations are in dto shape', () => {
         const section: HippotherapyProgramSectionDto = {
             id: 1,
-            template: ProgramSectionTemplate.SingleTitleQuestionAnswerPairs,
+            template: SectionTemplate.SingleTitleQuestionAnswerPairs,
             contents: [
                 {
                     id: 1,
@@ -506,7 +503,7 @@ describe('DetailedProgramSection', () => {
         render(<DetailedProgramSection section={section} />);
 
         expect(mockRenderProgramSection).toHaveBeenCalledWith({
-            templateId: ProgramSectionTemplate.SingleTitleQuestionAnswerPairs,
+            templateId: SectionTemplate.SingleTitleQuestionAnswerPairs,
             data: {
                 title: '',
                 description: '',
@@ -522,14 +519,14 @@ describe('DetailedProgramSection', () => {
                     }),
                 ],
             },
-            mode: ProgramSectionMode.View,
+            mode: SectionMode.View,
         });
     });
 
     it('uses localized faq question and answer from content localizations fallback fields', () => {
         const section: HippotherapyProgramSectionDto = {
             id: 1,
-            template: ProgramSectionTemplate.SingleTitleQuestionAnswerPairs,
+            template: SectionTemplate.SingleTitleQuestionAnswerPairs,
             contents: [
                 {
                     id: 1,
@@ -563,7 +560,7 @@ describe('DetailedProgramSection', () => {
         render(<DetailedProgramSection section={section} />);
 
         expect(mockRenderProgramSection).toHaveBeenCalledWith({
-            templateId: ProgramSectionTemplate.SingleTitleQuestionAnswerPairs,
+            templateId: SectionTemplate.SingleTitleQuestionAnswerPairs,
             data: {
                 title: '',
                 description: '',
@@ -579,14 +576,14 @@ describe('DetailedProgramSection', () => {
                     }),
                 ],
             },
-            mode: ProgramSectionMode.View,
+            mode: SectionMode.View,
         });
     });
 
     it('always passes Published mode to renderProgramSection', () => {
         const section: HippotherapyProgramSectionDto = {
             id: 1,
-            template: ProgramSectionTemplate.TextOnly,
+            template: SectionTemplate.TextOnly,
             contents: [],
             order: 0,
         };
@@ -594,6 +591,6 @@ describe('DetailedProgramSection', () => {
         render(<DetailedProgramSection section={section} />);
 
         const callArgs = mockRenderProgramSection.mock.calls[0][0];
-        expect(callArgs.mode).toBe(ProgramSectionMode.View);
+        expect(callArgs.mode).toBe(SectionMode.View);
     });
 });

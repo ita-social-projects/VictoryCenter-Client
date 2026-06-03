@@ -4,10 +4,26 @@ import '@testing-library/jest-dom';
 
 import { AddSectionModal } from './AddSectionModal';
 import type { AddSectionModalProps } from './AddSectionModal';
-import { PROGRAMS_TEXT } from '@/const/admin/programs';
-import { ProgramSectionTemplate, ProgramSectionMode } from '@/types/common/program-sections';
+import { SECTIONS_TEXT } from '@/const/admin/sections';
+import { SectionTemplate, SectionMode } from '@/types/common/sections';
 import type { ButtonProps } from '@/components/admin/button/Button';
 import type { ModalProps } from '@/components/common/modal/Modal';
+import {
+    buildFiveShortDescriptions as utilBuildFiveShortDescriptions,
+    clickChooseButton as utilClickChooseButton,
+    clickCloseButton as utilClickCloseButton,
+    clickNextButton as utilClickNextButton,
+    clickPrevButton as utilClickPrevButton,
+    findFirstCallByTemplateId as utilFindFirstCallByTemplateId,
+    getChooseButton as utilGetChooseButton,
+    getCloseButton as utilGetCloseButton,
+    getContentAreas as utilGetContentAreas,
+    getModal as utilGetModal,
+    getNextButton as utilGetNextButton,
+    getPrevButton as utilGetPrevButton,
+    getSwiper as utilGetSwiper,
+    renderAddSectionModal as utilRenderAddSectionModal,
+} from './test-utils/addSectionModalTestUtils';
 
 const mockRenderProgramSection = jest.fn((_: any) => <div data-testid="rendered-section" />);
 
@@ -97,7 +113,7 @@ jest.mock('@/components/admin/button/Button', () => ({
     ),
 }));
 
-const clickChoose = () => fireEvent.click(screen.getByRole('button', { name: PROGRAMS_TEXT.BUTTON.CHOOSE_SECTION }));
+const clickChoose = () => fireEvent.click(screen.getByRole('button', { name: SECTIONS_TEXT.BUTTON.CHOOSE_SECTION }));
 const clickPrev = () => fireEvent.click(screen.getByTitle('Previous slide'));
 const clickNext = () => fireEvent.click(screen.getByTitle('Next slide'));
 const clickClose = () => fireEvent.click(screen.getByTestId('modal-close-btn'));
@@ -108,17 +124,34 @@ const getCallByTemplate = (templateId: any) => {
 };
 
 const buildFiveShortDescriptions = () =>
-    Array.from({ length: 5 }, () => PROGRAMS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT_SHORT);
+    Array.from({ length: 5 }, () => SECTIONS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT_SHORT);
 
 describe('AddSectionModal', () => {
     const mockOnClose = jest.fn();
     const mockOnSelectTemplate = jest.fn();
+
+    const defaultTemplates: SectionTemplate[] = [
+        SectionTemplate.QuadImagesBottom,
+        SectionTemplate.DualImagesBottom,
+        SectionTemplate.TextOnly,
+        SectionTemplate.TripleImagesBottom,
+        SectionTemplate.SingleImageBottom,
+        SectionTemplate.SingleImageTop,
+        SectionTemplate.SingleImageRight,
+        SectionTemplate.SingleTitleQuintupleDescription,
+        SectionTemplate.DualTitleDescriptionPairs,
+        SectionTemplate.TripleTitleDescriptionPairs,
+        SectionTemplate.QuadTitleDescriptionPairs,
+        SectionTemplate.SingleTitleDescriptionAuthorPairs,
+        SectionTemplate.SingleTitleQuestionAnswerPairs,
+    ];
 
     const renderModal = (overrides: Partial<AddSectionModalProps> = {}) => {
         const props: AddSectionModalProps = {
             isOpen: true,
             onClose: mockOnClose,
             onSelectTemplate: mockOnSelectTemplate,
+            templates: defaultTemplates,
             ...overrides,
         };
 
@@ -143,7 +176,7 @@ describe('AddSectionModal', () => {
 
         expect(screen.getByTestId('add-section-modal')).toBeInTheDocument();
         expect(screen.getByTestId('swiper')).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: PROGRAMS_TEXT.BUTTON.CHOOSE_SECTION })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: SECTIONS_TEXT.BUTTON.CHOOSE_SECTION })).toBeInTheDocument();
     });
 
     it('passes maxWidth and className into Modal', () => {
@@ -222,45 +255,45 @@ describe('AddSectionModal', () => {
         renderModal();
 
         expect(mockRenderProgramSection).toHaveBeenCalled();
-        expect(mockRenderProgramSection.mock.calls.every((c) => c[0]?.mode === ProgramSectionMode.Template)).toBe(true);
+        expect(mockRenderProgramSection.mock.calls.every((c) => c[0]?.mode === SectionMode.Template)).toBe(true);
     });
 
     it('passes sample title/description into non-card templates', () => {
         renderModal();
 
-        const call = getCallByTemplate(ProgramSectionTemplate.TextOnly);
-        expect(call?.data?.title).toBe(PROGRAMS_TEXT.SECTION.TITLE_SAMPLE_TEXT);
-        expect(call?.data?.description).toBe(PROGRAMS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT);
+        const call = getCallByTemplate(SectionTemplate.TextOnly);
+        expect(call?.data?.title).toBe(SECTIONS_TEXT.SECTION.TITLE_SAMPLE_TEXT);
+        expect(call?.data?.description).toBe(SECTIONS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT);
     });
 
     it('passes sample title/description into SingleTitleDescriptionAuthorPairs template', () => {
         renderModal();
 
-        const call = getCallByTemplate(ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs);
-        expect(call?.data?.title).toBe(PROGRAMS_TEXT.SECTION.TITLE_SAMPLE_TEXT);
-        expect(call?.data?.description).toBe(PROGRAMS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT);
+        const call = getCallByTemplate(SectionTemplate.SingleTitleDescriptionAuthorPairs);
+        expect(call?.data?.title).toBe(SECTIONS_TEXT.SECTION.TITLE_SAMPLE_TEXT);
+        expect(call?.data?.description).toBe(SECTIONS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT);
     });
 
     it('provides 5 short descriptions only for SingleTitleQuintupleDescription', () => {
         renderModal();
 
-        expect(getCallByTemplate(ProgramSectionTemplate.SingleTitleQuintupleDescription)?.data?.descriptions).toEqual(
+        expect(getCallByTemplate(SectionTemplate.SingleTitleQuintupleDescription)?.data?.descriptions).toEqual(
             buildFiveShortDescriptions(),
         );
-        expect(getCallByTemplate(ProgramSectionTemplate.TextOnly)?.data?.descriptions).toBeUndefined();
+        expect(getCallByTemplate(SectionTemplate.TextOnly)?.data?.descriptions).toBeUndefined();
     });
 
     it.each([
-        [ProgramSectionTemplate.QuadImagesBottom, 4],
-        [ProgramSectionTemplate.TripleImagesBottom, 3],
-        [ProgramSectionTemplate.DualImagesBottom, 2],
-        [ProgramSectionTemplate.SingleImageBottom, 1],
-        [ProgramSectionTemplate.SingleImageTop, 1],
-        [ProgramSectionTemplate.SingleImageRight, 1],
-        [ProgramSectionTemplate.TextOnly, 0],
-        [ProgramSectionTemplate.SingleTitleQuintupleDescription, 0],
-        [ProgramSectionTemplate.SingleTitleDescriptionAuthorPairs, 0],
-    ] as Array<[ProgramSectionTemplate, number]>)('provides correct placeholder images for %s', (templateId, count) => {
+        [SectionTemplate.QuadImagesBottom, 4],
+        [SectionTemplate.TripleImagesBottom, 3],
+        [SectionTemplate.DualImagesBottom, 2],
+        [SectionTemplate.SingleImageBottom, 1],
+        [SectionTemplate.SingleImageTop, 1],
+        [SectionTemplate.SingleImageRight, 1],
+        [SectionTemplate.TextOnly, 0],
+        [SectionTemplate.SingleTitleQuintupleDescription, 0],
+        [SectionTemplate.SingleTitleDescriptionAuthorPairs, 0],
+    ] as Array<[SectionTemplate, number]>)('provides correct placeholder images for %s', (templateId, count) => {
         renderModal();
 
         const images = getCallByTemplate(templateId)?.data?.images ?? [];
@@ -278,14 +311,60 @@ describe('AddSectionModal', () => {
     });
 
     it.each([
-        [ProgramSectionTemplate.DualTitleDescriptionPairs, 2],
-        [ProgramSectionTemplate.TripleTitleDescriptionPairs, 3],
-        [ProgramSectionTemplate.QuadTitleDescriptionPairs, 4],
-    ] as Array<[ProgramSectionTemplate, number]>)('renders %s with %d cards', (templateId, count) => {
+        [SectionTemplate.DualTitleDescriptionPairs, 2],
+        [SectionTemplate.TripleTitleDescriptionPairs, 3],
+        [SectionTemplate.QuadTitleDescriptionPairs, 4],
+    ] as Array<[SectionTemplate, number]>)('renders %s with %d cards', (templateId, count) => {
         renderModal();
 
         const call = getCallByTemplate(templateId);
         expect(call).toBeDefined();
         expect(call?.data?.cards).toHaveLength(count);
+    });
+
+    it('covers test-utils helper functions with the existing modal setup', () => {
+        utilRenderAddSectionModal({
+            isOpen: true,
+            onClose: mockOnClose,
+            onSelectTemplate: mockOnSelectTemplate,
+            templates: defaultTemplates,
+        });
+
+        expect(utilGetModal()).toBeInTheDocument();
+        expect(utilGetSwiper()).toBeInTheDocument();
+        expect(utilGetChooseButton()).toBeInTheDocument();
+        expect(utilGetPrevButton()).toBeInTheDocument();
+        expect(utilGetNextButton()).toBeInTheDocument();
+        expect(utilGetCloseButton()).toBeInTheDocument();
+        expect(utilGetContentAreas().length).toBeGreaterThan(0);
+
+        utilClickPrevButton();
+        utilClickNextButton();
+        utilClickChooseButton();
+        utilClickCloseButton();
+
+        expect(mockOnSelectTemplate).toHaveBeenCalled();
+        expect(mockOnClose).toHaveBeenCalled();
+        expect(utilBuildFiveShortDescriptions()).toEqual(buildFiveShortDescriptions());
+
+        const calls = jest.fn();
+        calls({ templateId: SectionTemplate.TextOnly });
+        calls({ templateId: SectionTemplate.SingleImageTop });
+
+        expect(utilFindFirstCallByTemplateId(calls, SectionTemplate.TextOnly)).toEqual({
+            templateId: SectionTemplate.TextOnly,
+        });
+        expect(utilFindFirstCallByTemplateId(calls, SectionTemplate.QuadImagesBottom)).toBeUndefined();
+    });
+
+    it('covers test-utils modal query in closed mode', () => {
+        utilRenderAddSectionModal({
+            isOpen: false,
+            onClose: mockOnClose,
+            onSelectTemplate: mockOnSelectTemplate,
+            templates: defaultTemplates,
+        });
+
+        expect(utilGetModal()).not.toBeInTheDocument();
     });
 });

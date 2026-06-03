@@ -209,21 +209,53 @@ describe('reports-mapper', () => {
             expect(mapReportFundsExpendituresSettingsDtoToSettings(dto)).toEqual({
                 id: 1,
                 disclaimerTitle: 'Disclaimer',
-                exchangeRate: '42.18',
+                exchangeRate: '42,18',
             });
         });
 
-        it('should map category dto to category', () => {
+        it('should map category dto to category with empty localizations', () => {
             const dto: ReportFundsExpendituresCategoryDto = {
                 id: 2,
                 name: 'Category',
                 type: 2,
+                localizations: [],
             };
 
             expect(mapReportFundsExpendituresCategoryDtoToCategory(dto)).toEqual({
                 id: 2,
                 name: 'Category',
                 type: 'expense',
+                localizations: [],
+            });
+        });
+
+        it('should map category dto to category with localizations', () => {
+            const dto: ReportFundsExpendituresCategoryDto = {
+                id: 2,
+                name: 'Category',
+                type: 2,
+                localizations: [
+                    {
+                        entityId: 2,
+                        localizationInfoDto: { id: 1, code: 'en' },
+                        translationStatus: 1,
+                        name: 'Category EN',
+                    },
+                ],
+            };
+
+            expect(mapReportFundsExpendituresCategoryDtoToCategory(dto)).toEqual({
+                id: 2,
+                name: 'Category',
+                type: 'expense',
+                localizations: [
+                    {
+                        entityId: 2,
+                        language: { id: 1, code: 'en' },
+                        translationStatus: 1,
+                        name: 'Category EN',
+                    },
+                ],
             });
         });
 
@@ -242,8 +274,8 @@ describe('reports-mapper', () => {
                 categoryId: 2,
                 type: 'income',
                 reportingYear: '2026',
-                amountUah: '125.5',
-                amountUsd: '3.75',
+                amountUah: '125,5',
+                amountUsd: '3,75',
             });
         });
 
@@ -267,7 +299,7 @@ describe('reports-mapper', () => {
             });
         });
 
-        it('should truncate decimal amounts when mapping record to create dto', () => {
+        it('should preserve decimal amounts when mapping record to create dto', () => {
             const result = mapReportFundsExpendituresRecordToCreateDto({
                 categoryId: 2,
                 type: 'expense',
@@ -280,12 +312,12 @@ describe('reports-mapper', () => {
                 categoryId: 2,
                 type: 2,
                 reportingYear: 2026,
-                amountUah: 1249854,
-                amountUsd: 1234,
+                amountUah: 1249854.99,
+                amountUsd: 1234.56,
             });
         });
 
-        it('should truncate decimal amounts when mapping record to update dto', () => {
+        it('should preserve decimal amounts when mapping record to update dto', () => {
             const result = mapReportFundsExpendituresRecordToUpdateDto({
                 categoryId: 1,
                 type: 'income',
@@ -298,8 +330,8 @@ describe('reports-mapper', () => {
                 categoryId: 1,
                 type: 1,
                 reportingYear: 2025,
-                amountUah: 350,
-                amountUsd: 9,
+                amountUah: 350.99,
+                amountUsd: 9.5,
             });
         });
     });

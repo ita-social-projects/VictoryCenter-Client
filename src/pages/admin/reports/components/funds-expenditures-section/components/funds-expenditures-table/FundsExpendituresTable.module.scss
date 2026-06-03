@@ -13,10 +13,10 @@
     overflow-y: auto;
     max-height: 60vh;
     scroll-behavior: smooth;
-    background: #f8fafc;
-    border: 1px solid #e2e2e2;
+    background-color: c.$light-blue-25;
+    border: 1px solid c.$grey-400;
     border-radius: 16px;
-    box-shadow: 0 24px 48px -12px rgba(17, 17, 19, 0.2);
+    box-shadow: 0 24px 48px -12px rgba(c.$bluish-black, 0.2);
 }
 
 .table {
@@ -29,7 +29,7 @@
     padding: 16px 20px;
     text-align: left;
     line-height: 24px;
-    color: rgba(29, 27, 32, 0.88);
+    color: rgba(c.$graphite-black, 0.88);
     white-space: nowrap;
 
     &.sortable {
@@ -59,7 +59,7 @@
 
 .tr {
     background-color: c.$white;
-    border: 1px solid #e2e2e2;
+    border: 1px solid c.$grey-400;
 
     &:hover {
         background-color: c.$light-blue-50;
@@ -73,7 +73,7 @@
     line-height: 24px;
     color: c.$graphite-black;
     vertical-align: middle;
-    height: 65px;
+    height: 72px;
     box-sizing: border-box;
 }
 
@@ -90,8 +90,8 @@
 }
 
 .type-chip-income {
-    background-color: #4e6183;
-    border: 1px solid #123288;
+    background-color: c.$blue-400;
+    border: 1px solid c.$blue-500;
     color: c.$white;
 }
 
@@ -151,6 +151,13 @@
     accent-color: c.$blue-500;
 }
 
+.header-checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: c.$blue-500;
+}
+
 .actions-th,
 .actions-td {
     width: 80px;
@@ -171,7 +178,7 @@
     width: 28px;
     height: 28px;
     border: none;
-    background: transparent;
+    background-color: transparent;
     border-radius: 6px;
     cursor: pointer;
     padding: 4px;
@@ -190,6 +197,49 @@
         opacity: 0.45;
         background-color: transparent;
     }
+}
+
+.selection-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 12px 0;
+}
+
+.selection-row-hidden {
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+}
+
+.selection-pill {
+    background-color: rgba(c.$light-blue-100, 0.63);
+    padding: 10px 14px;
+    border-radius: 24px;
+    font-weight: 600;
+    border: 1px solid c.$light-blue-200;
+    box-shadow: 0px 4px 6px rgba(c.$light-blue-200, 0.25);
+    color: c.$dropdown-text;
+}
+
+.selection-actions {
+    margin-left: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.delete-selected-button {
+    height: 40px;
+    padding: 8px 16px;
+    background-color: c.$red-50;
+    border: 1px solid rgba(c.$error, 0.12);
+    color: c.$error;
+    border-radius: 24px;
+    font-weight: 600;
+    box-shadow: none;
 }
 
 .action-icon {
@@ -251,13 +301,25 @@
     height: auto;
 }
 
-.category-edit-wrapper,
+.category-edit-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    height: 80px;
+    overflow: visible;
+    position: relative;
+}
+
 .amount-edit-wrapper {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 6px;
-    min-height: 80px;
+    justify-content: center;
+    height: 72px;
+    overflow: visible;
+    position: relative;
+    width: 128px;
 }
 
 .category-edit-select {
@@ -286,24 +348,56 @@
     border-radius: 6px;
 }
 
-.category-edit-error,
-.amount-edit-error {
+.amount-edit-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    position: absolute;
+    top: 64px;
+    left: 0;
+}
+
+.amount-edit-info-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+
+    path {
+        stroke: c.$blue-500;
+    }
+}
+
+.amount-edit-info-text {
+    @include type.small-text-regular;
     margin: 0;
-    color: c.$error;
+    color: c.$blue-500;
+    white-space: nowrap;
 }
 
 .category-edit-error {
     @include type.small-text-regular;
+    position: absolute;
+    top: 66px;
+    left: 0;
+    margin: 0;
+    color: c.$error;
+    white-space: nowrap;
 }
 
 .amount-edit-error {
-    @include type.subtitle-2-medium;
+    @include type.small-text-regular;
+    position: absolute;
+    top: 64px;
+    left: 0;
+    margin: 0;
+    color: c.$error;
+    white-space: nowrap;
 }
 
 .amount-edit-input {
     @include type.subtitle-2-medium;
     width: 128px;
-    min-height: 55px;
+    min-height: 48px;
     padding: 10px 17px;
     border: 1px solid c.$grey-700;
     border-radius: 8px;

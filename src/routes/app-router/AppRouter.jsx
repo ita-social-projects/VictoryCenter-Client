@@ -13,6 +13,7 @@ import { ADMIN_ROUTES } from '@/const/admin/routes';
 import { PrivateRoute } from '@/components/admin/private-route/PrivateRoute';
 import { PublicRoute } from '@/components/admin/public-route/PublicRoute';
 import { AboutUsPage } from '@/pages/public/about-us-page/AboutUsPage';
+import { EventsNewsPage } from '@/pages/public/events-news-page/EventsNewsPage';
 import { DonatePage } from '@/pages/public/donate-page/DonatePage';
 import { LoginPage } from '@/pages/admin/login/LoginPage';
 import { AdminHomePage } from '@/pages/admin/home/AdminHomePage';
@@ -23,10 +24,14 @@ import { PartnersPage } from '@/pages/public/partners-page/PartnersPage';
 import { WhoWeArePageAdmin } from '@/pages/admin/who-we-are/WhoWeArePageAdmin';
 import { PartnerPanel } from '@/pages/admin/partners/PartnerPanel';
 import { ReportsPage } from '@/pages/public/reports-page';
+import { ContactUsPage } from '@/pages/public/contact-us';
 import { CompanyProfileContent } from '@/pages/admin/company-profile/components/company-profile-content/CompanyProfileContent';
 import { LanguageSyncWrapper } from '@/components/public/language-sync-wrapper/LanguageSyncWrapper';
 import { ReportsPanelContent } from '@/pages/admin/reports/components/reports-panel-content/ReportsPanelContent';
 import { StoriesOfVictoryPage } from '@/pages/public/stories-of-victory-page';
+import { HistoryPageContent } from '@/pages/admin/history/components/history-page-content/HistoryPageContent';
+import { MainPageContent } from '@/pages/admin/main/components/main-page-content/MainPageContent';
+import { HistoryPage } from '@/pages/public/history-page/HistoryPage';
 
 export const AppRouter = () => {
     const PublicContent = () => (
@@ -38,9 +43,12 @@ export const AppRouter = () => {
             <Route path={PUBLIC_ROUTES.HIPPOTHERAPY.PATH} element={<HippotherapyPage />} />
             <Route path={PUBLIC_ROUTES.PARTNERS.PATH} element={<PartnersPage />} />
             <Route path={PUBLIC_ROUTES.ABOUT_US.PATH} element={<AboutUsPage />} />
+            <Route path={PUBLIC_ROUTES.EVENTS_AND_NEWS.PATH} element={<EventsNewsPage />} />
             <Route path={PUBLIC_ROUTES.DONATE.PATH} element={<DonatePage />} />
             <Route path={PUBLIC_ROUTES.REPORTS.PATH} element={<ReportsPage />} />
             <Route path={PUBLIC_ROUTES.STORIES_OF_VICTORIES.PATH} element={<StoriesOfVictoryPage />} />
+            <Route path={PUBLIC_ROUTES.CONTACT_US.PATH} element={<ContactUsPage />} />
+            <Route path={PUBLIC_ROUTES.HISTORY.PATH} element={<HistoryPage />} />
             <Route path="*" element={<NotFound />} />
         </Routes>
     );
@@ -78,6 +86,8 @@ export const AppRouter = () => {
                             <Route path={ADMIN_ROUTES.PARTNERS.PATH} element={<PartnerPanel />} />
                             <Route path={ADMIN_ROUTES.PROFILE_COMPANY.PATH} element={<CompanyProfileContent />} />
                             <Route path={ADMIN_ROUTES.REPORTS.PATH} element={<ReportsPanelContent />} />
+                            <Route path={ADMIN_ROUTES.HISTORY.PATH} element={<HistoryPageContent />} />
+                            <Route path={ADMIN_ROUTES.MAIN.PATH} element={<MainPageContent />} />
                         </Route>
                     </Route>
                 </Route>

@@ -4,6 +4,7 @@ import { FundsExpendituresTransactionType, ReportFundsExpendituresRecord } from 
 
 export type FundsExpendituresAmountValidationTrigger = 'change' | 'blur' | 'save';
 export type FundsExpendituresCategoryValidationTrigger = 'change' | 'blur';
+export type FundsExpendituresReportingYearValidationTrigger = 'change' | 'blur' | 'save';
 
 interface ValidateFundsExpendituresCategoryParams {
     recordId: number;
@@ -15,7 +16,21 @@ interface ValidateFundsExpendituresCategoryParams {
 
 export const normalizeFundsExpendituresAmountInput = (value: string, trimEnd = false): string => {
     const withNormalizedSpaces = value.replaceAll(/\s+/g, ' ').trimStart();
-    return trimEnd ? withNormalizedSpaces.trim() : withNormalizedSpaces;
+    const withCommaSeparator = withNormalizedSpaces.replaceAll('.', ',');
+    const firstCommaIndex = withCommaSeparator.indexOf(',');
+
+    if (firstCommaIndex === -1) {
+        return trimEnd ? withCommaSeparator.trim() : withCommaSeparator;
+    }
+
+    const integerPart = withCommaSeparator.slice(0, firstCommaIndex);
+    const decimalPart = withCommaSeparator
+        .slice(firstCommaIndex + 1)
+        .replaceAll(',', '')
+        .slice(0, 2);
+    const normalized = `${integerPart},${decimalPart}`;
+
+    return trimEnd ? normalized.trim() : normalized;
 };
 
 export const validateFundsExpendituresAmount = (
@@ -34,21 +49,40 @@ export const validateFundsExpendituresAmount = (
         return FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_NOT_NEGATIVE;
     }
 
-    if (!/^\d+(?:[.,]\d+)?$/.test(compact)) {
-        return FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER_GT_ZERO;
+    if (!/^\d+(?:,\d{1,2})?$/.test(compact)) {
+        return FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER;
     }
 
-    const [integerPart, decimalPart = ''] = compact.split(/[.,]/);
-    if (integerPart.length > 11 || decimalPart.length > 2) {
+    const [integerPart] = compact.split(',');
+    if (integerPart.length > 9) {
         return FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_MAX_DIGITS;
     }
 
     const parsed = Number.parseFloat(compact.replace(',', '.'));
-    if (!Number.isFinite(parsed) || parsed <= 0) {
-        return FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER_GT_ZERO;
+    if (!Number.isFinite(parsed)) {
+        return FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER;
+    }
+
+    if (parsed < 0) {
+        return FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_NOT_NEGATIVE;
+    }
+
+    if (parsed === 0) {
+        return trigger === 'change' ? undefined : FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_NOT_ZERO;
     }
 
     return undefined;
+};
+
+export const validateFundsExpendituresReportingYear = (
+    value: string | undefined,
+    trigger: FundsExpendituresReportingYearValidationTrigger = 'change',
+): string | undefined => {
+    if (value !== undefined && value.trim() !== '') {
+        return undefined;
+    }
+
+    return trigger === 'change' ? undefined : COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED;
 };
 
 export const validateFundsExpendituresCategory = ({
@@ -66,5 +100,11 @@ export const validateFundsExpendituresCategory = ({
         (item) => item.id !== recordId && item.type === recordType && item.categoryId === categoryId,
     );
 
-    return hasDuplicate ? FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE : undefined;
+    if (!hasDuplicate) {
+        return undefined;
+    }
+
+    return recordType === 'income'
+        ? FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE_INCOME
+        : FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE_EXPENSE;
 };

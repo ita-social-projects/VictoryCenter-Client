@@ -7,6 +7,10 @@ export const API_ROUTES = {
         LOGOUT: 'auth/logout',
         REFRESH_TOKEN: 'auth/refresh-token',
     },
+    MAIN_PAGE: {
+        BASE: 'MainPage',
+        PUBLIC: 'MainPage',
+    },
     COMPANY_PROFILE: {
         BASE: 'CompanyProfile',
         PUBLIC: 'CompanyProfile',
@@ -97,15 +101,29 @@ export const API_ROUTES = {
             SUMMARY: 'ReportFundsExpendituresRecords/summary',
             CATEGORIES: 'ReportFundsExpendituresCategories',
         },
+        PROGRAM_EXPENDITURES_RECORDS: 'ReportProgramExpendituresRecords',
     },
     PDF_SECTION: {
         BASE: 'PdfSection',
         CONTENT: 'PdfSection/pdf-section',
+    },
+    PDF_SECTION_LOCALIZATIONS: {
+        BASE: 'PdfSectionLocalizations',
     },
     PDF_REPORTS: {
         BASE: 'PdfReports',
     },
     FAQ_LOCALIZATIONS: {
         BASE: 'FaqQuestionLocalizations',
+    },
+    REPORT_FUNDS_EXPENDITURES_CATEGORY_LOCALIZATIONS: {
+        BASE: 'ReportFundsExpendituresCategoryLocalizations',
+    },
+    REPORT_FUNDS_EXPENDITURES_SETTINGS_LOCALIZATIONS: {
+        BASE: 'ReportFundsExpendituresSettingsLocalizations',
+    },
+    HISTORY: {
+        BASE: 'History',
+        PUBLIC: 'History',
     },
 };

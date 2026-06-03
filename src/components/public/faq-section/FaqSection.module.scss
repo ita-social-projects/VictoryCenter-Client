@@ -40,7 +40,8 @@
     @include type.h4-bold-uppercase;
     text-transform: uppercase;
     color: c.$blue-900;
-    word-wrap: break-word;
+    overflow-wrap: anywhere;
+    word-break: normal;
 
     @media (min-width: 768px) {
         flex: 0 0 41%;

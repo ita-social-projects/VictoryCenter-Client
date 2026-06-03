@@ -1,0 +1,106 @@
+﻿@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
+
+.history-page-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
+    padding: 40px;
+    box-sizing: border-box;
+    overflow-y: scroll;
+}
+
+.empty-sections-image {
+    width: 230px;
+    height: 230px;
+}
+
+.empty-sections-text {
+    @include type.h3-semibold;
+
+    width: 470px;
+    color: c.$blue-900;
+    margin: 0;
+    text-align: center;
+}
+
+.empty-sections-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    padding: 160px 32px;
+    margin: 0 32px;
+    border-radius: 8px;
+}
+
+.btn-add {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    width: 427px;
+}
+.functional-button-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 27px;
+    gap: 68px;
+}
+.btn-publish {
+    width: 395px;
+    height: 40px;
+}
+.plus-icon path {
+    stroke: c.$blue-500;
+}
+
+.sections-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.sections-loader-state {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 320px;
+}
+
+.sections-error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    min-height: 320px;
+}
+
+.sections-error-text {
+    @include type.body-2-regular;
+
+    color: c.$error;
+    line-height: 20px;
+    margin: 0;
+    text-align: center;
+}
+
+.retry-link {
+    @include type.body-2-regular;
+
+    background: none;
+    border: none;
+    padding: 0;
+    line-height: 20px;
+    color: c.$blue-900;
+    text-decoration: underline;
+    text-decoration-color: c.$blue-900;
+    cursor: pointer;
+
+    &:hover {
+        font-weight: 600;
+    }
+}

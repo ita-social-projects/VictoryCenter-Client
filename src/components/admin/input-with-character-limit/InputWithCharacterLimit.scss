@@ -73,7 +73,7 @@
         }
 
         &--error svg {
-            filter: invert(41%) sepia(59%) saturate(2297%) hue-rotate(334deg) brightness(90%) contrast(110%);
+            fill: colors.$error;
         }
 
         &--hidden {

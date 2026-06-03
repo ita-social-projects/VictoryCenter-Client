@@ -209,9 +209,14 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
                 setChangedLivesValues(changedLives);
                 setChangedLivesErrors(INITIAL_BLOCK_ERRORS);
 
-                await refetch(true);
-
                 addToast(COMMON_TEXT_ADMIN.MESSAGE.SUCCESSFULLY_PUBLISHED, ToastType.Success);
+
+                try {
+                    await refetch(true);
+                } catch {
+                    // Refetch error handled by useDataFetch
+                }
+
                 return true;
             } catch (error: any) {
                 if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {

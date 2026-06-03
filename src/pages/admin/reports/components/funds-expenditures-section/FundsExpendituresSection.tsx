@@ -12,8 +12,10 @@ import {
     validateFundsExpendituresExchangeRate,
 } from '@/validation/admin/reports-schema/funds-expenditures-exchange-rate-schema/funds-expenditures-exchange-rate-schema';
 import { Button } from '@/components/admin/button/Button';
+import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
 import { ACTION_ICONS } from '@/const/common/action-icons';
 import { FundsExpendituresApi } from '@/services/api/admin/reports/funds-expenditures-api';
+import { ReportFundsExpendituresSettingsLocalizationsApi } from '@/services/api/admin/reports/report-funds-expenditures-settings-localizations/report-funds-expenditures-settings-localizations-api';
 import {
     FundsExpendituresTransactionType,
     FundsExpendituresSummary,
@@ -23,6 +25,7 @@ import {
     ReportFundsExpendituresSettingsLocalization,
 } from '@/types/admin/reports';
 import { LocalizationLanguage } from '@/types/common/language';
+import { mapLocalizationDtoToModel } from '@/utils/functions/mappers/common/localization/localization-mappers';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
@@ -100,8 +103,9 @@ export const FundsExpenditureSection = ({
     const [activeRecordModalType, setActiveRecordModalType] = useState<FundsExpendituresTransactionType | null>(null);
 
     const [isTranslateDisclaimerModalOpen, setIsTranslateDisclaimerModalOpen] = useState(false);
-    const [disclaimerLocalization, setDisclaimerLocalization] =
-        useState<ReportFundsExpendituresSettingsLocalization | null>(null);
+    const [disclaimerLocalizations, setDisclaimerLocalizations] = useState<
+        ReportFundsExpendituresSettingsLocalization[]
+    >([]);
 
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [recordToDelete, setRecordToDelete] = useState<ReportFundsExpendituresRecord | null>(null);
@@ -229,6 +233,26 @@ export const FundsExpenditureSection = ({
         (isSettingsLoading || isCategoriesLoading || isRecordsLoading || isSummaryLoading) &&
         categories.length === 0 &&
         recordsState.length === 0;
+
+    const fetchDisclaimerLocalizations = useCallback(
+        (settingsId: number) => {
+            ReportFundsExpendituresSettingsLocalizationsApi.getByEntityId(adminClient, settingsId)
+                .then((dtos) => {
+                    setDisclaimerLocalizations(
+                        dtos.map((dto) =>
+                            mapLocalizationDtoToModel<typeof dto, ReportFundsExpendituresSettingsLocalization>(dto),
+                        ),
+                    );
+                })
+                .catch(() => {});
+        },
+        [adminClient],
+    );
+
+    useEffect(() => {
+        if (!settings?.id) return;
+        fetchDisclaimerLocalizations(settings.id);
+    }, [fetchDisclaimerLocalizations, settings?.id]);
 
     useEffect(() => {
         setRecordsState(allRecords);
@@ -508,6 +532,20 @@ export const FundsExpenditureSection = ({
         }
     }, [recordToDelete, adminClient, addToast, refetchSummary]);
 
+    const handleTranslateDisclaimerSuccess = useCallback(
+        (localization: ReportFundsExpendituresSettingsLocalization) => {
+            setDisclaimerLocalizations((prev) => {
+                const exists = prev.some((l) => l.language.id === localization.language.id);
+                return exists
+                    ? prev.map((l) => (l.language.id === localization.language.id ? localization : l))
+                    : [...prev, localization];
+            });
+            setIsTranslateDisclaimerModalOpen(false);
+            addToast(COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS, ToastType.Success);
+        },
+        [addToast],
+    );
+
     const handlePublish = useCallback(async () => {
         try {
             const updatedSettings = await FundsExpendituresApi.updateSettings(adminClient, {
@@ -520,6 +558,8 @@ export const FundsExpenditureSection = ({
             onExchangeRateValueChange?.(updatedSettings.exchangeRate ?? null);
             setIsEditing(false);
             onEditModeChange?.(false);
+
+            fetchDisclaimerLocalizations(updatedSettings.id);
 
             addToast(COMMON_TEXT_ADMIN.MESSAGE.SUCCESSFULLY_PUBLISHED, ToastType.Success);
 
@@ -536,6 +576,7 @@ export const FundsExpenditureSection = ({
         adminClient,
         disclaimerValue,
         exchangeRateValue,
+        fetchDisclaimerLocalizations,
         onEditModeChange,
         onExchangeRateValueChange,
         refetchSettings,
@@ -586,10 +627,16 @@ export const FundsExpenditureSection = ({
             ) : (
                 settings?.disclaimerTitle && (
                     <div className={styles.disclaimer}>
-                        <div className={styles['disclaimer-header']}>
-                            <span className={styles['disclaimer-label']}>
-                                {FUNDS_EXPENDITURES_TEXT.DISCLAIMER_LABEL}
-                            </span>
+                        <div className={styles['disclaimer-top-row']}>
+                            <LocalizationStatuses
+                                languages={translationLanguages}
+                                localizedEntity={{
+                                    translationStatuses: disclaimerLocalizations.map((l) => ({
+                                        languageId: l.language.id,
+                                        translationStatus: l.translationStatus,
+                                    })),
+                                }}
+                            />
                             <button
                                 type="button"
                                 className={styles['translate-btn']}
@@ -599,6 +646,7 @@ export const FundsExpenditureSection = ({
                                 <TranslateIcon />
                             </button>
                         </div>
+                        <span className={styles['disclaimer-label']}>{FUNDS_EXPENDITURES_TEXT.DISCLAIMER_LABEL}</span>
                         <div className={styles['disclaimer-text-area']}>
                             <p className={styles['disclaimer-text']}>{settings.disclaimerTitle}</p>
                         </div>
@@ -739,12 +787,8 @@ export const FundsExpenditureSection = ({
                 onClose={() => setIsTranslateDisclaimerModalOpen(false)}
                 settings={settings}
                 translationLanguages={translationLanguages}
-                existingLocalization={disclaimerLocalization}
-                onTranslateSuccess={(localization) => {
-                    setDisclaimerLocalization(localization);
-                    setIsTranslateDisclaimerModalOpen(false);
-                    addToast(COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS, ToastType.Success);
-                }}
+                existingLocalizations={disclaimerLocalizations}
+                onTranslateSuccess={handleTranslateDisclaimerSuccess}
             />
         </div>
     );

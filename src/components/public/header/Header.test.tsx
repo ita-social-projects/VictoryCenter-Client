@@ -114,14 +114,8 @@ describe('Header', () => {
             'href',
             PUBLIC_ROUTES.REPORTS.FULL,
         );
-        expect(screen.getByRole('link', { name: headerUk['HOW_TO_SUPPORT'] })).toHaveAttribute(
-            'href',
-            PUBLIC_ROUTES.MOCK.FULL,
-        );
-        expect(screen.getByRole('link', { name: headerUk['STORIES_OF_VICTORIES'] })).toHaveAttribute(
-            'href',
-            PUBLIC_ROUTES.MOCK.FULL,
-        );
+        expect(screen.getByText(headerUk['HOW_TO_SUPPORT'])).not.toBeVisible();
+        expect(screen.getByText(headerUk['STORIES_OF_VICTORIES'])).not.toBeVisible();
     });
 
     it('renders Contact Us and Donate buttons', () => {
@@ -203,9 +197,6 @@ describe('Header', () => {
             name: headerUk['HIPPOTHERAPY'],
         });
         expect(hippotherapyLink).toHaveAttribute('data-disabled', 'false');
-
-        const prorgamsSessionsLink = within(programsDropdown as HTMLElement).getByText(headerUk['PROGRAMS_SESSIONS']);
-        expect(prorgamsSessionsLink).toHaveAttribute('data-disabled', 'true');
     });
 
     it('toggles mobile menu open and closed', () => {

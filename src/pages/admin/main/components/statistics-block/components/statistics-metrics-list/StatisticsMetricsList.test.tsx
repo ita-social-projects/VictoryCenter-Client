@@ -1,8 +1,10 @@
-import { Metric, MetricPrefix, MetricType } from '@/types/admin/main-page';
-import { TranslationStatus } from '@/types/common/language';
+import { Metric } from '@/types/admin/main-page';
+import { metricPartners, metricRaised } from '@/utils/test-mocks/statistics-block-mocks';
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { StatisticsMetricsList } from './StatisticsMetricsList';
+
+const normalizeSpaces = (value: string) => value.replace(/\u00a0/g, ' ');
 
 jest.mock('@/components/admin/draggable-list-item/DraggableListItem', () => ({
     DraggableListItem: ({ renderEntityComponent, entity, idSelector }: any) => {
@@ -40,30 +42,20 @@ jest.mock('../statistics-metric-edit-panel/StatisticsMetricEditPanel', () => ({
     ),
 }));
 
-const metrics: Metric[] = [
-    {
-        id: 1,
-        name: 'Партнерів',
-        value: 20,
-        type: MetricType.Partners,
-        prefix: MetricPrefix.Plus,
-        isHidden: false,
-        priority: 1,
-        localizations: [
-            { language: { id: 1, code: 'uk' }, translationStatus: TranslationStatus.Relevant, name: 'Партнерів' },
-        ],
-    },
-    {
-        id: 2,
-        name: 'Engagement',
-        value: 50,
-        type: MetricType.Partners,
-        prefix: MetricPrefix.Percent,
-        isHidden: false,
-        priority: 2,
-        localizations: [],
-    },
-];
+jest.mock('../raised-metric-edit-panel/RaisedMetricEditPanel', () => ({
+    RaisedMetricEditPanel: ({ metric, onSave, onCancel }: any) => (
+        <div data-testid="raised-edit-panel">
+            <button
+                type="button"
+                data-testid="save-raised-edit"
+                onClick={() => onSave({ ...metric, name: 'Updated Raised' })}
+            />
+            <button type="button" data-testid="cancel-raised-edit" onClick={onCancel} />
+        </div>
+    ),
+}));
+
+const metrics: Metric[] = [metricPartners, metricRaised];
 
 describe('StatisticsMetricsList', () => {
     const setup = (propsOverrides: Partial<React.ComponentProps<typeof StatisticsMetricsList>> = {}) => {
@@ -84,20 +76,33 @@ describe('StatisticsMetricsList', () => {
         };
     };
 
-    it('renders metrics list', () => {
+    it('renders metrics list correctly', () => {
         setup();
         expect(screen.getByText('Партнерів')).toBeInTheDocument();
+        expect(screen.getByText('Partners')).toBeInTheDocument();
         expect(screen.getByText('20+')).toBeInTheDocument();
     });
 
-    it('falls back to metric name when localization is missing', () => {
+    it('renders both UAH and USD values with symbols for Raised metric type', () => {
         setup();
-        expect(screen.getByText('Engagement')).toBeInTheDocument();
+        const raisedUahEl = screen.getByText((content) => normalizeSpaces(content).includes('₴5 000 000'));
+        expect(raisedUahEl).toBeInTheDocument();
+
+        const raisedUsdEl = screen.getByText('$125,000');
+        expect(raisedUsdEl).toBeInTheDocument();
     });
 
-    it('formats percent values', () => {
-        setup();
-        expect(screen.getByText('50%')).toBeInTheDocument();
+    it('falls back to metric name when localization is missing', () => {
+        const metricWithoutLoc: Metric = {
+            ...metrics[0],
+            id: 99,
+            name: 'NoLocName',
+            localizations: [],
+        };
+        setup({ metrics: [metricWithoutLoc] });
+
+        const elements = screen.getAllByText('NoLocName');
+        expect(elements).toHaveLength(2);
     });
 
     it('uses "Show metric" label when metric is hidden', () => {
@@ -117,19 +122,6 @@ describe('StatisticsMetricsList', () => {
         expect(onToggleVisibility).not.toHaveBeenCalled();
     });
 
-    it('formats value with no prefix (default case)', () => {
-        const noPrefix: Metric = {
-            ...metrics[0],
-            id: 3,
-            value: 100,
-            prefix: undefined,
-            localizations: [],
-            name: 'NoPrefix',
-        };
-        setup({ metrics: [noPrefix] });
-        expect(screen.getByText('100')).toBeInTheDocument();
-    });
-
     it('disables toggle button for last visible metric', () => {
         setup({ metrics: [metrics[0]] });
         const eyeButton = screen.getByTestId('icon-Hide metric');
@@ -142,8 +134,9 @@ describe('StatisticsMetricsList', () => {
         expect(onToggleVisibility).not.toHaveBeenCalled();
     });
 
-    it('renders edit panel and saves updated metric', () => {
+    it('renders standard edit panel and saves updated metric', () => {
         const { onMetricUpdate } = setup();
+
         fireEvent.click(screen.getAllByTestId('icon-Edit metric')[0]);
         expect(screen.getByTestId('metric-edit-panel')).toBeInTheDocument();
 
@@ -151,12 +144,27 @@ describe('StatisticsMetricsList', () => {
         expect(onMetricUpdate).toHaveBeenCalledWith([{ ...metrics[0], name: 'Updated Metric' }, metrics[1]]);
     });
 
-    it('closes edit panel on cancel', () => {
+    it('renders raised edit panel and saves updated metric', () => {
+        const { onMetricUpdate } = setup();
+
+        fireEvent.click(screen.getAllByTestId('icon-Edit metric')[1]);
+        expect(screen.getByTestId('raised-edit-panel')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByTestId('save-raised-edit'));
+        expect(onMetricUpdate).toHaveBeenCalledWith([metrics[0], { ...metrics[1], name: 'Updated Raised' }]);
+    });
+
+    it('closes edit panels on cancel', () => {
         setup();
+
         fireEvent.click(screen.getAllByTestId('icon-Edit metric')[0]);
         expect(screen.getByTestId('metric-edit-panel')).toBeInTheDocument();
-
         fireEvent.click(screen.getByTestId('cancel-edit'));
         expect(screen.queryByTestId('metric-edit-panel')).not.toBeInTheDocument();
+
+        fireEvent.click(screen.getAllByTestId('icon-Edit metric')[1]);
+        expect(screen.getByTestId('raised-edit-panel')).toBeInTheDocument();
+        fireEvent.click(screen.getByTestId('cancel-raised-edit'));
+        expect(screen.queryByTestId('raised-edit-panel')).not.toBeInTheDocument();
     });
 });

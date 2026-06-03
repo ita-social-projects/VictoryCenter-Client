@@ -61,14 +61,8 @@ describe('Footer', () => {
             PUBLIC_ROUTES.REPORTS.FULL,
         );
 
-        const howToSupportLink = screen.getByRole('link', { name: footerUk['HOW_TO_SUPPORT'] });
-        expect(howToSupportLink).toHaveAttribute('href', PUBLIC_ROUTES.MOCK.FULL);
-        expect(howToSupportLink).toHaveClass('disable');
-
-        expect(screen.getByRole('link', { name: footerUk['STORIES_OF_VICTORIES'] })).toHaveAttribute(
-            'href',
-            PUBLIC_ROUTES.MOCK.FULL,
-        );
+        expect(screen.getByText(footerUk['HOW_TO_SUPPORT'])).not.toBeVisible();
+        expect(screen.getByText(footerUk['STORIES_OF_VICTORIES'])).not.toBeVisible();
     });
 
     it('renders the about us section with correct links', () => {
@@ -112,10 +106,6 @@ describe('Footer', () => {
         expect(screen.getByRole('link', { name: footerUk['PROGRAMS'] })).toHaveAttribute(
             'href',
             PUBLIC_ROUTES.PROGRAMS.FULL,
-        );
-        expect(screen.getByRole('link', { name: footerUk['PROGRAMS_SESSIONS'] })).toHaveAttribute(
-            'href',
-            PUBLIC_ROUTES.MOCK.FULL,
         );
     });
 

@@ -37,3 +37,14 @@ export const MockMainPageCategoryBar = ({ categories, onCategorySelect, selected
         ))}
     </div>
 );
+
+export const MockMetricEditActions = ({ isFormDirty, isValid, onCancel, onSave }: any) => (
+    <div data-testid="metric-actions">
+        <button type="button" data-testid="mock-cancel" onClick={onCancel}>
+            Cancel
+        </button>
+        <button type="button" data-testid="mock-save" onClick={onSave} disabled={!isFormDirty || !isValid}>
+            Save
+        </button>
+    </div>
+);

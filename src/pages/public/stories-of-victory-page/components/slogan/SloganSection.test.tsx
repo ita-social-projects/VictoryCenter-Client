@@ -2,27 +2,31 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
-// Mock react-i18next BEFORE importing the component
-jest.mock('react-i18next', () => ({
-    useTranslation: () => ({
-        t: (key) => {
-            const translations: Record<string, string> = {
-                'SLOGAN.FIRST_TEXT': 'First Text',
-                'SLOGAN.SECOND_TEXT': 'Second Text',
-                'SLOGAN.THIRD_TEXT': 'Third Text',
-                'SLOGAN.FOURTH_TEXT': 'Fourth Text',
-                'SLOGAN.FIFTH_TEXT': 'Fifth Text',
-                'SLOGAN.SIXTH_TEXT': 'Sixth Text',
-            };
-            return translations[key] || key;
-        },
-        i18n: { changeLanguage: jest.fn() },
-    }),
-}));
-
 import { SloganSection } from './SloganSection';
 
+// Mock react-i18next BEFORE importing the component
+jest.mock('react-i18next', () => ({
+    useTranslation: jest.fn(),
+}));
+
+const TRANSLATIONS: Record<string, string> = {
+    'SLOGAN.FIRST_TEXT': 'First Text',
+    'SLOGAN.SECOND_TEXT': 'Second Text',
+    'SLOGAN.THIRD_TEXT': 'Third Text',
+    'SLOGAN.FOURTH_TEXT': 'Fourth Text',
+    'SLOGAN.FIFTH_TEXT': 'Fifth Text',
+    'SLOGAN.SIXTH_TEXT': 'Sixth Text',
+};
+
 describe('SloganSection', () => {
+    beforeEach(() => {
+        const { useTranslation } = require('react-i18next');
+        (useTranslation as jest.Mock).mockReturnValue({
+            t: (key: string) => TRANSLATIONS[key] || key,
+            i18n: { changeLanguage: jest.fn() },
+        });
+    });
+
     it('should render without crashing', () => {
         const { container } = render(<SloganSection />);
         expect(container).toBeInTheDocument();

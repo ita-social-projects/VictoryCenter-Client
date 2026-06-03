@@ -114,8 +114,14 @@ describe('Header', () => {
             'href',
             PUBLIC_ROUTES.REPORTS.FULL,
         );
-        expect(screen.getByText(headerUk['HOW_TO_SUPPORT'])).not.toBeVisible();
-        expect(screen.getByText(headerUk['STORIES_OF_VICTORIES'])).not.toBeVisible();
+        expect(screen.getByRole('link', { name: headerUk['HOW_TO_SUPPORT'] })).toHaveAttribute(
+            'href',
+            PUBLIC_ROUTES.MOCK.FULL,
+        );
+        expect(screen.getByRole('link', { name: headerUk['STORIES_OF_VICTORIES'] })).toHaveAttribute(
+            'href',
+            PUBLIC_ROUTES.STORIES_OF_VICTORIES.FULL,
+        );
     });
 
     it('renders Contact Us and Donate buttons', () => {

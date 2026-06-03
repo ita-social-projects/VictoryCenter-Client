@@ -1,6 +1,4 @@
-import { Image } from '../common/image';
-import { EntityLocalization, EntityLocalizationDto, EntityWithDtoLocalizations } from '../common/language';
-import { ContentType, SectionType } from '../common/stories-of-victory';
+import { SectionType } from '../common/stories-of-victory';
 
 export type StoriesOfVictorySection = {
     sectionType: SectionType;
@@ -25,4 +23,3 @@ export type StoriesOfVictoryReviewArticle = {
     text: string[] | null;
     image: string | null;
 };
-

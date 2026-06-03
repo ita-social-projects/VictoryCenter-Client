@@ -1,6 +1,5 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { VideoReviewsSection } from './VideoReviewsSection';
 import { StoriesOfVictoryReviewVideo } from '@/types/public/stories-of-victory';
@@ -27,7 +26,13 @@ HTMLMediaElement.prototype.pause = jest.fn();
 
 describe('VideoReviewsSection', () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        const { useTranslation } = require('react-i18next');
+        (useTranslation as jest.Mock).mockReturnValue({
+            t: jest.fn((key: string, fallback?: string) => fallback || key),
+            i18n: { changeLanguage: jest.fn() },
+        });
+        (HTMLMediaElement.prototype.play as jest.Mock).mockResolvedValue(undefined);
+        (HTMLMediaElement.prototype.pause as jest.Mock).mockImplementation(() => {});
     });
 
     it('should render section element', () => {

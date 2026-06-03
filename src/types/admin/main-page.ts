@@ -52,6 +52,7 @@ export interface MetricLocalization extends EntityLocalization {
     entityId?: number;
     languageId?: number;
     name?: string;
+    value?: string | null;
 }
 
 // Domain/UI Models
@@ -62,6 +63,7 @@ export interface Metric extends EntityWithLocalizations<MetricLocalization> {
     name: string;
     type: MetricType;
     prefix?: MetricPrefix | null;
+    isAutoSynced?: boolean;
     isHidden: boolean;
     priority: number;
 }
@@ -123,6 +125,7 @@ export interface ImpactStatisticLocalizationDto extends EntityLocalizationDto {
 export interface MetricLocalizationDto extends EntityLocalizationDto {
     entityId?: number;
     name?: string | null;
+    value?: string | null;
 }
 
 export interface MetricDto extends EntityWithDtoLocalizations<MetricLocalizationDto> {
@@ -131,6 +134,7 @@ export interface MetricDto extends EntityWithDtoLocalizations<MetricLocalization
     name?: string | null;
     type?: MetricType;
     prefix?: MetricPrefix | null;
+    isAutoSynced?: boolean;
     isHidden?: boolean;
     priority?: number;
 }
@@ -169,6 +173,7 @@ export interface MainPageDto extends EntityWithDtoLocalizations<MainPageLocaliza
 export interface CreateMetricLocalizationDto {
     languageId?: number;
     name?: string;
+    value?: string | null;
 }
 
 export interface CreateMetricDto {
@@ -215,6 +220,7 @@ export interface CreateMainPageDto {
 export interface UpdateMetricLocalizationDto {
     languageId?: number;
     name?: string;
+    value?: string | null;
 }
 
 export interface UpdateImpactStatisticLocalizationDto {
@@ -246,6 +252,7 @@ export interface UpdateMetricDto {
     name: string;
     type: MetricType;
     prefix?: MetricPrefix | null;
+    isAutoSynced?: boolean;
     localization?: UpdateMetricLocalizationDto | null;
 }
 

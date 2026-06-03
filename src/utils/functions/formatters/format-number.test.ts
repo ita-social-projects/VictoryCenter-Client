@@ -1,8 +1,17 @@
 import {
+    formatCurrencyInput,
     formatNumberDecimalComma,
     formatNumberInput,
     formatWithSpaces,
+    normalizeFormattedNumber,
+    parseFormattedNumber,
 } from '@/utils/functions/formatters/format-number';
+
+const expectFormatCases = (formatter: (value: string) => string, cases: Array<[string, string]>) => {
+    cases.forEach(([input, expected]) => {
+        expect(formatter(input)).toBe(expected);
+    });
+};
 
 describe('format-number formatters', () => {
     describe('formatNumberDecimalComma', () => {
@@ -15,8 +24,7 @@ describe('format-number formatters', () => {
             expect(formatNumberDecimalComma(123)).toBe('123');
             expect(formatNumberDecimalComma(123.45)).toBe('123,45');
             expect(formatNumberDecimalComma('1000.5')).toBe('1000,5');
-            // only the first dot is replaced (keeps previous behaviour)
-            expect(formatNumberDecimalComma('1.2.3')).toBe('1,2.3');
+            expect(formatNumberDecimalComma('1.2.3')).toBe('1,2,3');
         });
 
         it('leaves strings without dot unchanged', () => {
@@ -64,6 +72,69 @@ describe('format-number formatters', () => {
             expect(formatNumberInput('')).toBe('');
             expect(formatNumberInput('abc')).toBe('');
             expect(formatNumberInput('!@#$')).toBe('');
+        });
+    });
+
+    describe('formatCurrencyInput', () => {
+        const formatCurrencyInputCases: Array<{
+            description: string;
+            cases: Array<[input: string, expected: string]>;
+        }> = [
+            {
+                description: 'removes invalid characters before formatting',
+                cases: [
+                    ['abc', ''],
+                    ['12abc', '12'],
+                    ['1a2', '12'],
+                ],
+            },
+            {
+                description: 'formats integers with spaces as thousands separators',
+                cases: [
+                    ['1000', '1 000'],
+                    ['1234567', '1 234 567'],
+                ],
+            },
+            {
+                description: 'replaces comma with dot before formatting',
+                cases: [
+                    ['1000,50', '1 000.50'],
+                    ['999,9', '999.9'],
+                    ['1,2,3', '1.23'],
+                ],
+            },
+            {
+                description: 'truncates the decimal part to 2 decimal places',
+                cases: [
+                    ['100.999', '100.99'],
+                    ['1.1234', '1.12'],
+                ],
+            },
+            {
+                description: 'ignores extra periods more than one',
+                cases: [['1.2.3', '1.23']],
+            },
+        ];
+
+        it.each(formatCurrencyInputCases)('$description', ({ cases }) => {
+            expectFormatCases(formatCurrencyInput, cases);
+        });
+    });
+
+    describe('formatted number parsing', () => {
+        it('normalizes spaces and comma separators', () => {
+            expect(normalizeFormattedNumber('1 234,50')).toBe('1234.50');
+        });
+
+        it('parses valid formatted decimal numbers', () => {
+            expect(parseFormattedNumber('1 234,50')).toBe(1234.5);
+            expect(parseFormattedNumber('1 234.50')).toBe(1234.5);
+            expect(parseFormattedNumber('-1 234.50')).toBe(-1234.5);
+        });
+
+        it('returns null for malformed values', () => {
+            expect(parseFormattedNumber('1.2.3')).toBeNull();
+            expect(parseFormattedNumber('abc')).toBeNull();
         });
     });
 });

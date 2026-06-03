@@ -371,11 +371,10 @@ describe('StatisticsBlockForm', () => {
 
     it('does not keep form dirty when prefix is reverted to initial value', async () => {
         const setValueSpy = jest.fn();
+        const initialMetrics = mockInitialData.impactStatistics?.metrics ?? [];
+
         render(
-            <FormWrapper
-                defaultValues={{ metrics: mockInitialData.impactStatistics?.metrics ?? [] }}
-                onSetValue={setValueSpy}
-            >
+            <FormWrapper defaultValues={{ metrics: initialMetrics }} onSetValue={setValueSpy}>
                 <StatisticsBlockForm
                     initialData={mockInitialData}
                     isPublishDisabled={false}
@@ -394,8 +393,12 @@ describe('StatisticsBlockForm', () => {
 
         await waitFor(() => {
             const lastCall = setValueSpy.mock.calls[setValueSpy.mock.calls.length - 1];
-            const options = lastCall?.[2];
-            expect(options?.shouldDirty).toBe(false);
+            const passedMetrics = lastCall[1];
+            const options = lastCall[2];
+
+            expect(options?.shouldDirty).toBe(true);
+
+            expect(passedMetrics).toEqual(initialMetrics);
         });
     });
 

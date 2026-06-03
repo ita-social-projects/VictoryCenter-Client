@@ -38,7 +38,13 @@ export const StatisticsMetricsList = ({
     const renderRow = (metric: Metric) => {
         if (editingMetricId === metric.id) {
             if (metric.type === MetricType.Raised) {
-                return <RaisedMetricEditPanel metric={metric} onCancel={() => setEditingMetricId(null)} />;
+                return (
+                    <RaisedMetricEditPanel
+                        metric={metric}
+                        onSave={handleSaveMetric}
+                        onCancel={() => setEditingMetricId(null)}
+                    />
+                );
             }
 
             return (
@@ -55,14 +61,25 @@ export const StatisticsMetricsList = ({
 
         return (
             <div className={styles.row}>
-                <div className={styles.labels}>
-                    <p className={`${styles.ua} ${isHidden ? styles.hiddenText : ''}`}>{getMetricName(metric)}</p>
-                </div>
+                <p className={`${styles.ua} ${isHidden ? styles.hiddenText : ''}`}>{getMetricName(metric, 'UA')}</p>
+
+                <p className={`${styles.en} ${isHidden ? styles.hiddenText : ''}`}>{getMetricName(metric, 'EN')}</p>
 
                 <div className={styles.values}>
-                    <p className={`${styles.value} ${isHidden ? styles.hiddenText : ''}`}>
-                        {formatMetricValue(metric)}
-                    </p>
+                    {metric.type === MetricType.Raised ? (
+                        <div className={styles.raisedValues}>
+                            <p className={`${styles.value} ${isHidden ? styles.hiddenText : ''}`}>
+                                ₴{formatMetricValue(metric, 'UA')}
+                            </p>
+                            <p className={`${styles.value} ${isHidden ? styles.hiddenText : ''}`}>
+                                ${formatMetricValue(metric, 'EN')}
+                            </p>
+                        </div>
+                    ) : (
+                        <p className={`${styles.value} ${isHidden ? styles.hiddenText : ''}`}>
+                            {formatMetricValue(metric)}
+                        </p>
+                    )}
                 </div>
 
                 <div className={styles.actions}>

@@ -80,11 +80,18 @@ export const MainPageContent = () => {
                 if (!isMounted) return;
                 setHasLoadError(false);
                 setOriginalData(page);
+
                 const values = mapMainPageToFormValues(page, languages);
-                savedValuesRef.current = values;
-                if (!methods.formState.isDirty) {
-                    methods.reset(values);
-                }
+
+                const sanitizedValues = {
+                    ...values,
+                    statisticsTitleUa: values.statisticsTitleUa ?? '',
+                    statisticsTitleEn: values.statisticsTitleEn ?? '',
+                };
+
+                savedValuesRef.current = sanitizedValues;
+
+                methods.reset(sanitizedValues, { keepDefaultValues: false });
             } catch (error) {
                 setHasLoadError(true);
                 addToast('Помилка завантаження даних', ToastType.Error, 3000);
@@ -136,9 +143,16 @@ export const MainPageContent = () => {
 
             setOriginalData(page);
             const nextValues = mapMainPageToFormValues(page, updatedLanguages);
-            savedValuesRef.current = nextValues;
 
-            methods.reset(nextValues);
+            const sanitizedNextValues = {
+                ...nextValues,
+                statisticsTitleUa: nextValues.statisticsTitleUa ?? '',
+                statisticsTitleEn: nextValues.statisticsTitleEn ?? '',
+            };
+
+            savedValuesRef.current = sanitizedNextValues;
+
+            methods.reset(sanitizedNextValues, { keepDefaultValues: false });
             setCurrentMetrics([]);
 
             addToast('Зміни успішно опубліковано', ToastType.Success, 3000);

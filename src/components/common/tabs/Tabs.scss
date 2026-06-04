@@ -15,7 +15,8 @@
         font-size: 1.125rem;
         font-weight: 600;
         color: colors.$tab-color;
-        min-width: 12rem;
+        flex: 1;
+        min-width: 0;
         min-height: 2.68rem;
         border: none;
         cursor: pointer;
@@ -30,5 +31,27 @@
     .tab.active {
         border-bottom: 0.125rem solid colors.$light-blue-500;
         color: black;
+    }
+
+    .tooltip-container {
+        flex: 1;
+        display: flex;
+
+        .tab {
+            flex: 1;
+            width: 100%;
+        }
+    }
+}
+
+@media (max-width: 900px) {
+    .tabsContainer {
+        overflow: hidden;
+        padding-left: 0;
+        padding-right: 0;
+
+        .tab {
+            font-size: 0.9rem;
+        }
     }
 }

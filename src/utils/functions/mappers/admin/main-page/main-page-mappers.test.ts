@@ -64,6 +64,18 @@ describe('main-page-mappers', () => {
                     description: 'UA About Desc',
                     localizations: [{ languageId: 2, title: 'EN About', description: 'EN About Desc' } as any],
                 } as any,
+                mainDonations: {
+                    title: 'UA Donations',
+                    description: 'UA Donations Desc',
+                    image: { id: 15, url: 'img-donations.png' } as any,
+                    localizations: [
+                        {
+                            localizationInfoDto: { code: 'en' },
+                            title: 'EN Donations',
+                            description: 'EN Donations Desc',
+                        } as any,
+                    ],
+                } as any,
                 mainPartners: {
                     title: 'UA Partners',
                     description: 'UA Partners Desc',
@@ -93,6 +105,12 @@ describe('main-page-mappers', () => {
                 aboutUsTitleEn: 'EN About',
                 aboutUsDescriptionUa: 'UA About Desc',
                 aboutUsDescriptionEn: 'EN About Desc',
+
+                donationsTitleUa: 'UA Donations',
+                donationsTitleEn: 'EN Donations',
+                donationsDescriptionUa: 'UA Donations Desc',
+                donationsDescriptionEn: 'EN Donations Desc',
+                donationsImage: { id: 15, url: 'img-donations.png' },
 
                 partnersTitleUa: 'UA Partners',
                 partnersTitleEn: 'EN Partners',
@@ -135,6 +153,12 @@ describe('main-page-mappers', () => {
                 aboutUsTitleEn: '',
                 aboutUsDescriptionUa: 'UA About Desc',
                 aboutUsDescriptionEn: 'EN About Desc',
+
+                donationsTitleUa: 'UA Donations',
+                donationsTitleEn: 'EN Donations',
+                donationsDescriptionUa: 'UA Donations Desc',
+                donationsDescriptionEn: 'EN Donations Desc',
+                donationsImage: { id: 16, mimeType: 'image/png' } as any,
 
                 partnersTitleUa: 'UA Partners',
                 partnersTitleEn: 'EN Partners',

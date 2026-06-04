@@ -114,6 +114,7 @@ const mockInitialData: MainPage = {
     description: 'Тест',
     image: null,
     mainAboutUs: null,
+    mainDonations: null,
     mainPartners: null,
     impactStatistics: {
         id: 1,

@@ -20,6 +20,7 @@ import {
 } from '@/utils/functions/mappers/admin/main-page/main-page-mappers';
 import { MainPageValidationSchema } from '@/validation/admin/main-page-schema/main-page-schema';
 import { AboutUsBlockForm } from '../about-us-block/AboutUsBlockForm';
+import { DonationsBlockForm } from '../donations-block/DonationsBlockForm';
 import { MainPagePublishModal } from '../main-page-publish-modal/MainPagePublishModal';
 import { PartnersBlockForm } from '../partners-block/PartnersBlockForm';
 import { StatisticsBlockForm } from '../statistics-block/StatisticsBlockForm';
@@ -125,6 +126,11 @@ export const MainPageContent = () => {
                 dataToPublish.statisticsImage = uploaded;
             }
 
+            if (dataToPublish.donationsImage && !('id' in dataToPublish.donationsImage)) {
+                const uploaded = await ImageApi.post(client, dataToPublish.donationsImage as ImageValues);
+                dataToPublish.donationsImage = uploaded;
+            }
+
             const patch = mapFormValuesToMainPagePatch(
                 dataToPublish,
                 originalData,
@@ -201,7 +207,9 @@ export const MainPageContent = () => {
                                 onMetricsChange={setCurrentMetrics}
                             />
                         )}
-                        {activeTab === 'donations' && <div>Блок "{MAIN_PAGE_TEXT.TABS.DONATIONS}" в розробці</div>}
+                        {activeTab === 'donations' && (
+                            <DonationsBlockForm isPublishDisabled={isPublishDisabled} onPublish={onPublish} />
+                        )}
                         {activeTab === 'partners' && (
                             <PartnersBlockForm isPublishDisabled={isPublishDisabled} onPublish={onPublish} />
                         )}

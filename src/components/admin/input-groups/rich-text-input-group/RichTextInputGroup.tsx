@@ -5,7 +5,7 @@ import { RichTextInput, RichTextInputProps } from '@/components/admin/rich-text-
 import '../input-group.scss';
 import cn from 'classnames';
 
-export interface RichTextInputGroupProps extends Omit<RichTextInputProps, 'onChange'> {
+export interface RichTextInputGroupProps extends Omit<RichTextInputProps, 'onChange' | 'hasError'> {
     label: InputLabelProps['text'];
     isRequired?: InputLabelProps['isRequired'];
     error?: InputErrorProps['error'];
@@ -43,6 +43,7 @@ export const RichTextInputGroup = ({
                 disabled={disabled}
                 hideToolbar={hideToolbar}
                 placeholder={placeholder}
+                hasError={!!error}
             />
             <InputError error={error} />
         </div>

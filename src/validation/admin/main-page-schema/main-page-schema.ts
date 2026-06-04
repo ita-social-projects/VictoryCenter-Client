@@ -1,7 +1,6 @@
 import { MAIN_PAGE_VALIDATION } from '@/const/admin/main-page';
 import { MainPageFormValues } from '@/types/admin/main-page';
 import { Image, ImageValues } from '@/types/common/image';
-import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
 import * as Yup from 'yup';
 
 const buildStringValidation = (config: {
@@ -11,10 +10,23 @@ const buildStringValidation = (config: {
     getMaxError: () => string;
 }) => {
     return Yup.string()
-        .transform((value) => (value ? getNormalizedInputText(value) : value))
         .required(MAIN_PAGE_VALIDATION.common.REQUIRED)
-        .min(config.min, config.getMinError())
-        .max(config.max, config.getMaxError());
+        .test('min-length', config.getMinError(), (value) => {
+            if (!value || value === '<p><br></p>') return false;
+            const plainText = value
+                .replace(/<[^>]*>/g, '')
+                .replace(/&nbsp;/g, ' ')
+                .trim();
+            return plainText.length >= config.min;
+        })
+        .test('max-length', config.getMaxError(), (value) => {
+            if (!value) return true;
+            const plainText = value
+                .replace(/<[^>]*>/g, '')
+                .replace(/&nbsp;/g, ' ')
+                .trim();
+            return plainText.length <= config.max;
+        });
 };
 
 const imageSchema = Yup.mixed<Image | ImageValues>()
@@ -29,26 +41,33 @@ const imageSchema = Yup.mixed<Image | ImageValues>()
 export const MainPageValidationSchema: Yup.ObjectSchema<MainPageFormValues> = Yup.object({
     // Title Block
     titleUa: buildStringValidation(MAIN_PAGE_VALIDATION.titleBlock.title),
-    titleEn: buildStringValidation(MAIN_PAGE_VALIDATION.titleBlock.title),
+    titleEn: Yup.string().optional().default(''),
     descriptionUa: buildStringValidation(MAIN_PAGE_VALIDATION.titleBlock.description),
-    descriptionEn: buildStringValidation(MAIN_PAGE_VALIDATION.titleBlock.description),
+    descriptionEn: Yup.string().optional().default(''),
     image: imageSchema,
 
     // About Us Block
     aboutUsTitleUa: buildStringValidation(MAIN_PAGE_VALIDATION.aboutUsBlock.title),
-    aboutUsTitleEn: buildStringValidation(MAIN_PAGE_VALIDATION.aboutUsBlock.title),
+    aboutUsTitleEn: Yup.string().optional().default(''),
     aboutUsDescriptionUa: buildStringValidation(MAIN_PAGE_VALIDATION.aboutUsBlock.description),
-    aboutUsDescriptionEn: buildStringValidation(MAIN_PAGE_VALIDATION.aboutUsBlock.description),
+    aboutUsDescriptionEn: Yup.string().optional().default(''),
+
+    // Donations Block
+    donationsTitleUa: buildStringValidation(MAIN_PAGE_VALIDATION.donationsBlock.title),
+    donationsTitleEn: Yup.string().optional().default(''),
+    donationsDescriptionUa: buildStringValidation(MAIN_PAGE_VALIDATION.donationsBlock.description),
+    donationsDescriptionEn: Yup.string().optional().default(''),
+    donationsImage: imageSchema,
 
     // Partners Block
     partnersTitleUa: buildStringValidation(MAIN_PAGE_VALIDATION.partnersBlock.title),
-    partnersTitleEn: buildStringValidation(MAIN_PAGE_VALIDATION.partnersBlock.title),
+    partnersTitleEn: Yup.string().optional().default(''),
     partnersDescriptionUa: buildStringValidation(MAIN_PAGE_VALIDATION.partnersBlock.description),
-    partnersDescriptionEn: buildStringValidation(MAIN_PAGE_VALIDATION.partnersBlock.description),
+    partnersDescriptionEn: Yup.string().optional().default(''),
 
     // Impact Statistics Block
     statisticsTitleUa: buildStringValidation(MAIN_PAGE_VALIDATION.statisticsBlock.title),
-    statisticsTitleEn: buildStringValidation(MAIN_PAGE_VALIDATION.statisticsBlock.title),
+    statisticsTitleEn: Yup.string().optional().default(''),
     statisticsImage: imageSchema,
     metrics: Yup.array().optional(),
 });

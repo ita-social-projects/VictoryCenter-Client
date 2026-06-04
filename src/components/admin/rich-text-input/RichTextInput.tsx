@@ -7,6 +7,7 @@ import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { $generateNodesFromDOM } from '@lexical/html';
 import { $getRoot, $insertNodes, LexicalEditor } from 'lexical';
+import { ReactComponent as RemoveIcon } from '@/assets/icons/remove-query.svg';
 import styles from './RichTextInput.module.scss';
 import {
     MaxLengthPlugin,
@@ -29,6 +30,7 @@ export interface RichTextInputProps {
     hideToolbar?: boolean;
     placeholder?: string;
     className?: string;
+    hasError?: boolean;
 }
 
 const theme = {
@@ -38,6 +40,10 @@ const theme = {
         italic: styles['text-italic'],
     },
 };
+
+const EMPTY_HTML = '<p><br></p>';
+
+const isEditorEmpty = (value: string) => !value || value === EMPTY_HTML;
 
 export const RichTextInput = ({
     value,
@@ -50,6 +56,7 @@ export const RichTextInput = ({
     hideToolbar = false,
     placeholder = 'Enter text...',
     className,
+    hasError = false,
 }: RichTextInputProps) => {
     const [isFocused, setIsFocused] = useState(false);
     const [currentLength, setCurrentLength] = useState(0);
@@ -62,11 +69,13 @@ export const RichTextInput = ({
         setCurrentLength(length);
     }, []);
 
+    const showClearButton = isFocused && !isEditorEmpty(value) && !disabled;
+
     const initialConfig = useMemo(
         () => ({
             namespace: 'RichTextInput-' + id,
             theme,
-            onError: () => {},
+            onError: () => { },
             editable: !disabled,
             editorState: (editor: LexicalEditor) => {
                 if (value) {
@@ -79,7 +88,7 @@ export const RichTextInput = ({
                 }
             },
         }),
-        [id, disabled, value],
+        [id, disabled],
     );
 
     return (
@@ -111,9 +120,25 @@ export const RichTextInput = ({
                 <InitialValuePlugin value={value} />
                 <EnterKeyPlugin />
             </LexicalComposer>
-            <output className={styles.counter}>
-                {currentLength}/{maxLength}
-            </output>
+            <div className={styles.footer}>
+                <button
+                    type="button"
+                    className={cn(styles['clear-button'], {
+                        [styles['clear-button--hidden']]: !showClearButton,
+                        [styles['clear-button--error']]: hasError,
+                    })}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => onChange(EMPTY_HTML)}
+                    aria-label="Clear input"
+                    tabIndex={showClearButton ? 0 : -1}
+                    disabled={!showClearButton}
+                >
+                    <RemoveIcon />
+                </button>
+                <output className={styles.counter}>
+                    {currentLength}/{maxLength}
+                </output>
+            </div>
         </div>
     );
 };

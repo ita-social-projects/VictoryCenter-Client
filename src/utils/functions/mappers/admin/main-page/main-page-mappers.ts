@@ -14,11 +14,13 @@ import {
 export function mapMainPageToFormValues(page: MainPage, languages?: LocalizationLanguage[]): MainPageFormValues {
     const pageLocalizations = page.localizations ?? [];
     const aboutUsLocalizations = page.mainAboutUs?.localizations ?? [];
+    const donationsLocalizations = page.mainDonations?.localizations ?? [];
     const partnersLocalizations = page.mainPartners?.localizations ?? [];
     const statLocalizations = page.impactStatistics?.localizations ?? [];
 
     const pageEnLoc = pageLocalizations.find((loc) => resolveLocaleCode(loc as any, languages) === 'en');
     const aboutUsEnLoc = aboutUsLocalizations.find((loc) => resolveLocaleCode(loc as any, languages) === 'en');
+    const donationsEnLoc = donationsLocalizations.find((loc) => resolveLocaleCode(loc as any, languages) === 'en');
     const partnersEnLoc = partnersLocalizations.find((loc) => resolveLocaleCode(loc as any, languages) === 'en');
     const statEnLoc = statLocalizations.find((loc) => resolveLocaleCode(loc as any, languages) === 'en');
 
@@ -37,6 +39,13 @@ export function mapMainPageToFormValues(page: MainPage, languages?: Localization
         aboutUsTitleEn: aboutUsEnLoc?.title ?? page.mainAboutUs?.title ?? '',
         aboutUsDescriptionUa: page.mainAboutUs?.description ?? '',
         aboutUsDescriptionEn: aboutUsEnLoc?.description ?? page.mainAboutUs?.description ?? '',
+
+        // Donations Block
+        donationsTitleUa: page.mainDonations?.title ?? '',
+        donationsTitleEn: donationsEnLoc?.title ?? page.mainDonations?.title ?? '',
+        donationsDescriptionUa: page.mainDonations?.description ?? '',
+        donationsDescriptionEn: donationsEnLoc?.description ?? page.mainDonations?.description ?? '',
+        donationsImage: page.mainDonations?.image ?? null,
 
         // Partners Block
         partnersTitleUa: page.mainPartners?.title ?? '',
@@ -75,6 +84,12 @@ export function mapFormValuesToMainPagePatch(
     const aboutTitleEn = str(formValues.aboutUsTitleEn);
     const aboutDescUk = str(formValues.aboutUsDescriptionUa);
     const aboutDescEn = str(formValues.aboutUsDescriptionEn);
+
+    // Donations Block
+    const donationsTitleUk = str(formValues.donationsTitleUa);
+    const donationsTitleEn = str(formValues.donationsTitleEn);
+    const donationsDescUk = str(formValues.donationsDescriptionUa);
+    const donationsDescEn = str(formValues.donationsDescriptionEn);
 
     // Partners Block
     const partnersTitleUk = str(formValues.partnersTitleUa);
@@ -129,6 +144,27 @@ export function mapFormValuesToMainPagePatch(
                     ...(enLanguageId ? { languageId: enLanguageId } : {}),
                     title: aboutTitleEn || aboutTitleUk,
                     description: aboutDescEn || aboutDescUk,
+                },
+            ],
+        },
+
+        mainDonations: {
+            title: donationsTitleUk,
+            description: donationsDescUk,
+            imageId:
+                formValues.donationsImage && 'id' in formValues.donationsImage
+                    ? (formValues.donationsImage.id as number)
+                    : null,
+            localizations: [
+                {
+                    ...(ukLanguageId ? { languageId: ukLanguageId } : {}),
+                    title: donationsTitleUk,
+                    description: donationsDescUk,
+                },
+                {
+                    ...(enLanguageId ? { languageId: enLanguageId } : {}),
+                    title: donationsTitleEn || donationsTitleUk,
+                    description: donationsDescEn || donationsDescUk,
                 },
             ],
         },

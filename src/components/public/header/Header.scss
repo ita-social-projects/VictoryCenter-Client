@@ -57,6 +57,7 @@ $header-height: 4rem;
                 margin-right: 1rem;
             }
         }
+
     }
 }
 
@@ -143,30 +144,22 @@ $header-height: 4rem;
 @media (max-width: 568px) {
     .header-block {
         .header-content-container {
-            padding-left: 1rem;
-            padding-right: 0.5rem;
+            padding-left: 0.75rem;
+            padding-right: 0.25rem;
 
             .button-container {
-                .contact-us-button {
-                    display: none;
+                gap: 0.25rem;
+
+                .language-switcher {
+                    margin-right: 0.25rem;
                 }
             }
         }
     }
 
-    .header-block .header-content-container .button-container {
-        .language-switcher {
-            display: none;
-        }
-    }
-
     .mobile-menu {
         .mobile-language-switcher {
-            display: flex;
-            font-weight: 600;
-            text-decoration: none;
-            padding: 1rem 1rem;
-            color: black;
+            display: none;
         }
     }
 }

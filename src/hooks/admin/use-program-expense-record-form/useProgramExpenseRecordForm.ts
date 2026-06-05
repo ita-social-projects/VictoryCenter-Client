@@ -84,6 +84,7 @@ export const useProgramExpenseRecordForm = ({
         if (!isOpen) {
             setFormState(INITIAL_STATE);
             setUsdMismatchMessage(undefined);
+            setIsAddConfirmationOpen(false);
             return;
         }
 

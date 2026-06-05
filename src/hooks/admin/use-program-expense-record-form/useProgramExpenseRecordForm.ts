@@ -103,10 +103,21 @@ export const useProgramExpenseRecordForm = ({
     }, [formState.programId, isOpen, isProgramSelectDisabled, programOptions, setUsdMismatchMessage]);
 
     const handleAmountChange = useCallback(
-        (field: 'amountUah' | 'amountUsd', value: string) => {
+        (value: string) => {
             setFormState((previousState) => ({
                 ...previousState,
-                ...updateFundsAmounts(field, value, exchangeRate, 'change')(previousState),
+                ...updateFundsAmounts('amountUah', value, exchangeRate, 'change')(previousState),
+            }));
+            setUsdMismatchMessage(undefined);
+        },
+        [exchangeRate, setUsdMismatchMessage],
+    );
+
+    const handleUsdChange = useCallback(
+        (value: string) => {
+            setFormState((previousState) => ({
+                ...previousState,
+                ...updateFundsAmounts('amountUsd', value, exchangeRate, 'change')(previousState),
             }));
             setUsdMismatchMessage(undefined);
         },
@@ -219,6 +230,7 @@ export const useProgramExpenseRecordForm = ({
         handleProgramChange,
         handleProgramBlur,
         handleAmountChange,
+        handleUsdChange,
         handleAmountBlur,
         handleOpenAddConfirmation,
         handleCloseConfirmation,

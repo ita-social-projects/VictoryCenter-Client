@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
 import {
     FundsExpendituresTransactionType,
     ReportFundsExpendituresCategory,
@@ -12,7 +11,7 @@ import {
     validateFundsExpendituresCategory,
     validateFundsExpendituresReportingYear,
 } from '@/validation/admin/reports-schema/funds-expenditures-record-schema/funds-expenditures-record-schema';
-import { isUsdAmountMismatch } from '@/utils/functions/validate-usd-amount-mismatch/validate-usd-amount-mismatch';
+import { useAmountBlur } from '@/hooks/admin/use-amount-blur/useAmountBlur';
 
 interface FundsExpendituresRecordFormState {
     reportingYear: string | undefined;
@@ -61,7 +60,11 @@ export const useFundsExpendituresRecordForm = ({
     const [formState, setFormState] = useState<FundsExpendituresRecordFormState>(INITIAL_STATE);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isAddConfirmationOpen, setIsAddConfirmationOpen] = useState(false);
-    const [usdMismatchMessage, setUsdMismatchMessage] = useState<string | undefined>();
+    const {
+        usdMismatchMessage,
+        setUsdMismatchMessage,
+        handleAmountBlur: handleAmountBlurBase,
+    } = useAmountBlur(exchangeRate);
 
     const filteredCategories = useMemo(() => {
         return categories
@@ -90,7 +93,7 @@ export const useFundsExpendituresRecordForm = ({
                 },
             }));
         }
-    }, [isCategorySelectDisabled, isOpen]);
+    }, [isCategorySelectDisabled, isOpen, setUsdMismatchMessage]);
 
     const getCategoryError = useCallback(
         (categoryId: number | undefined, trigger: 'change' | 'blur'): string | undefined => {
@@ -113,46 +116,12 @@ export const useFundsExpendituresRecordForm = ({
             }));
             setUsdMismatchMessage(undefined);
         },
-        [exchangeRate],
+        [exchangeRate, setUsdMismatchMessage],
     );
 
     const handleAmountBlur = useCallback(
-        (field: 'amountUah' | 'amountUsd') => {
-            if (field === 'amountUsd') {
-                setFormState((prev) => {
-                    const normalizedAmountUsd = normalizeFundsExpendituresAmountInput(prev.amountUsd, true);
-                    const amountUsdError = validateFundsExpendituresAmount(normalizedAmountUsd, 'blur');
-
-                    const hasMismatch = isUsdAmountMismatch(prev.amountUah, normalizedAmountUsd, exchangeRate);
-                    setUsdMismatchMessage(
-                        hasMismatch ? FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH : undefined,
-                    );
-
-                    return {
-                        ...prev,
-                        amountUsd: normalizedAmountUsd,
-                        errors: {
-                            ...prev.errors,
-                            amountUsd: amountUsdError,
-                        },
-                    };
-                });
-
-                return;
-            }
-
-            setFormState((prev) => {
-                const updated = {
-                    ...prev,
-                    ...updateFundsAmounts(field, prev[field], exchangeRate, 'blur')(prev),
-                };
-
-                setUsdMismatchMessage(undefined);
-
-                return updated;
-            });
-        },
-        [exchangeRate],
+        (field: 'amountUah' | 'amountUsd') => handleAmountBlurBase(field, setFormState),
+        [handleAmountBlurBase],
     );
 
     const handleUsdChange = useCallback(
@@ -163,7 +132,7 @@ export const useFundsExpendituresRecordForm = ({
             }));
             setUsdMismatchMessage(undefined);
         },
-        [exchangeRate],
+        [exchangeRate, setUsdMismatchMessage],
     );
 
     const handleSubmit = useCallback(async () => {
@@ -209,7 +178,7 @@ export const useFundsExpendituresRecordForm = ({
         } finally {
             setIsSubmitting(false);
         }
-    }, [formState, getCategoryError, onSubmit, transactionType]);
+    }, [formState, getCategoryError, onSubmit, transactionType, setUsdMismatchMessage]);
 
     const isDirty =
         Boolean(formState.reportingYear) ||

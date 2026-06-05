@@ -57,12 +57,12 @@ jest.mock('@/components/admin/button/Button', () => ({
 jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
     ConfirmationModal: ({ isOpen, onConfirm, onCancel, title }: any) =>
         isOpen ? (
-            <div data-testid="confirmation-modal">
+            <div data-testid="confirmation-modal" data-title={title}>
                 <p>{title}</p>
-                <button onClick={onConfirm} data-testid="confirm-delete">
+                <button onClick={onConfirm} data-testid={`confirm-${title}`}>
                     Confirm
                 </button>
-                <button onClick={onCancel} data-testid="cancel-delete">
+                <button onClick={onCancel} data-testid={`cancel-${title}`}>
                     Cancel
                 </button>
             </div>
@@ -316,8 +316,12 @@ describe('PartnerSectionsEditor', () => {
             mockPartnerSectionFormRender.mock.calls[mockPartnerSectionFormRender.mock.calls.length - 1][0];
 
         await act(async () => {
-            await latestProps.onPublish(populatedSection.localId);
+            latestProps.onPublish(populatedSection.localId);
         });
+
+        expect(screen.getByTestId(`confirm-${PARTNERS_TEXT.FORM.TITLE.PUBLISH_SECTION}`)).toBeInTheDocument();
+
+        fireEvent.click(screen.getByTestId(`confirm-${PARTNERS_TEXT.FORM.TITLE.PUBLISH_SECTION}`));
 
         expect(mockedPartnersApi.postSection).toHaveBeenCalledWith('mock-client', {
             title: 'New title',
@@ -373,8 +377,12 @@ describe('PartnerSectionsEditor', () => {
         const props = mockPartnerSectionFormRender.mock.calls[0][0];
 
         await act(async () => {
-            await props.onPublish(props.value.localId);
+            props.onPublish(props.value.localId);
         });
+
+        expect(screen.getByTestId(`confirm-${PARTNERS_TEXT.FORM.TITLE.PUBLISH_SECTION}`)).toBeInTheDocument();
+
+        fireEvent.click(screen.getByTestId(`confirm-${PARTNERS_TEXT.FORM.TITLE.PUBLISH_SECTION}`));
 
         expect(mockedPartnersApi.updateSection).toHaveBeenCalledWith('mock-client', props.value.sectionId, {
             title: props.value.title,
@@ -414,8 +422,12 @@ describe('PartnerSectionsEditor', () => {
             const props = mockPartnerSectionFormRender.mock.calls[0][0];
 
             await act(async () => {
-                await props.onPublish(props.value.localId);
+                props.onPublish(props.value.localId);
             });
+
+            expect(screen.getByTestId(`confirm-${PARTNERS_TEXT.FORM.TITLE.PUBLISH_SECTION}`)).toBeInTheDocument();
+
+            fireEvent.click(screen.getByTestId(`confirm-${PARTNERS_TEXT.FORM.TITLE.PUBLISH_SECTION}`));
         };
 
         // Test error toast on regular failure
@@ -432,6 +444,40 @@ describe('PartnerSectionsEditor', () => {
         // Test no toast on cancellation (AbortError)
         await setupAndPublish({ name: 'AbortError' } as any);
         expect(addToastMock).not.toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.FAIL_TO_PUBLISH_SECTION, ToastType.Error);
+    });
+
+    it('closes the publish modal without calling API when cancel is clicked', async () => {
+        mockedUseDataFetch.mockReturnValue({
+            data: [
+                {
+                    id: 3,
+                    title: 'Cancelable publish',
+                    description: 'Desc',
+                    partners: [],
+                },
+            ],
+            isLoading: false,
+            error: null,
+            refetch: jest.fn(),
+            setData: jest.fn(),
+        });
+
+        render(<PartnerSectionsEditor />);
+
+        await waitFor(() => expect(mockPartnerSectionFormRender).toHaveBeenCalled());
+        const props = mockPartnerSectionFormRender.mock.calls[0][0];
+
+        await act(async () => {
+            props.onPublish(props.value.localId);
+        });
+
+        expect(screen.getByTestId(`confirm-${PARTNERS_TEXT.FORM.TITLE.PUBLISH_SECTION}`)).toBeInTheDocument();
+
+        fireEvent.click(screen.getByTestId(`cancel-${PARTNERS_TEXT.FORM.TITLE.PUBLISH_SECTION}`));
+
+        expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
+        expect(mockedPartnersApi.postSection).not.toHaveBeenCalled();
+        expect(mockedPartnersApi.updateSection).not.toHaveBeenCalled();
     });
 
     it('deletes a persisted section after confirmation', async () => {
@@ -463,9 +509,9 @@ describe('PartnerSectionsEditor', () => {
             latestProps.onDelete(latestProps.value.localId);
         });
 
-        expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
+        expect(screen.getByTestId(`confirm-${PARTNERS_TEXT.FORM.TITLE.DELETE_SECTION}`)).toBeInTheDocument();
 
-        fireEvent.click(screen.getByTestId('confirm-delete'));
+        fireEvent.click(screen.getByTestId(`confirm-${PARTNERS_TEXT.FORM.TITLE.DELETE_SECTION}`));
 
         await waitFor(() => {
             expect(mockedPartnersApi.deleteSection).toHaveBeenCalledWith('mock-client', 5);
@@ -500,7 +546,7 @@ describe('PartnerSectionsEditor', () => {
         await act(async () => {
             latestProps.onDelete(latestProps.value.localId);
         });
-        fireEvent.click(screen.getByTestId('confirm-delete'));
+        fireEvent.click(screen.getByTestId(`confirm-${PARTNERS_TEXT.FORM.TITLE.DELETE_SECTION}`));
 
         expect(mockedPartnersApi.deleteSection).not.toHaveBeenCalled();
         expect(addToastMock).toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.SECTION_DELETED, ToastType.Success);
@@ -573,9 +619,9 @@ describe('PartnerSectionsEditor', () => {
             props.onDelete(props.value.localId);
         });
 
-        expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
+        expect(screen.getByTestId(`confirm-${PARTNERS_TEXT.FORM.TITLE.DELETE_SECTION}`)).toBeInTheDocument();
 
-        fireEvent.click(screen.getByTestId('cancel-delete'));
+        fireEvent.click(screen.getByTestId(`cancel-${PARTNERS_TEXT.FORM.TITLE.DELETE_SECTION}`));
 
         expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
         expect(mockedPartnersApi.deleteSection).not.toHaveBeenCalled();
@@ -607,7 +653,7 @@ describe('PartnerSectionsEditor', () => {
             props.onDelete(props.value.localId);
         });
 
-        fireEvent.click(screen.getByTestId('confirm-delete'));
+        fireEvent.click(screen.getByTestId(`confirm-${PARTNERS_TEXT.FORM.TITLE.DELETE_SECTION}`));
 
         await waitFor(() => {
             expect(addToastMock).toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.FAIL_TO_DELETE_SECTION, ToastType.Error);

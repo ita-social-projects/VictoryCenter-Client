@@ -2,6 +2,7 @@ import { fireEvent, render, screen, waitFor, within } from '@testing-library/rea
 import '@testing-library/jest-dom';
 import { ProgramExpensesSection } from './ProgramExpensesSection';
 import { FUNDS_EXPENDITURES_TEXT, PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ProgramExpensesReadOnlyData } from '@/types/admin/reports';
 import { ProgramExpensesApi } from '@/services/api/admin/reports/program-expenses-api';
 
@@ -61,6 +62,7 @@ const mockGetReadOnlyData = jest.fn();
 jest.mock('@/services/api/admin/reports/program-expenses-api', () => ({
     ProgramExpensesApi: {
         getReadOnlyData: (...args: unknown[]) => mockGetReadOnlyData(...args),
+        delete: jest.fn(),
     },
 }));
 
@@ -68,9 +70,16 @@ jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: () => 'mock-client',
 }));
 
+const mockAddToast = jest.fn();
+jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider', () => ({
+    useToast: () => ({ addToast: mockAddToast }),
+}));
+
+const mockRefetch = jest.fn();
 let mockUseDataFetchResult = {
     data: MOCK_PROGRAM_EXPENSES_DATA,
     isLoading: false,
+    refetch: mockRefetch,
 };
 
 const mockUseDataFetch = jest.fn();
@@ -96,6 +105,39 @@ jest.mock('./components/common/add-program-expense-record-modal/AddProgramExpens
             AddProgramExpenseRecordModal
         </div>
     ),
+}));
+
+jest.mock('../funds-expenditures-section/components/common/delete-record-modal/DeleteRecordModal', () => ({
+    DeleteRecordModal: ({
+        isOpen,
+        title,
+        confirmText,
+        cancelText,
+        isButtonsDisabled,
+        onConfirm,
+        onCancel,
+    }: {
+        isOpen: boolean;
+        title: string;
+        confirmText: string;
+        cancelText: string;
+        isButtonsDisabled?: boolean;
+        onConfirm: () => void;
+        onCancel: () => void;
+    }) => {
+        if (!isOpen) return null;
+        return (
+            <div data-testid="delete-record-modal">
+                <span>{title}</span>
+                <button onClick={onConfirm} disabled={isButtonsDisabled}>
+                    {confirmText}
+                </button>
+                <button onClick={onCancel} disabled={isButtonsDisabled}>
+                    {cancelText}
+                </button>
+            </div>
+        );
+    },
 }));
 
 jest.mock('@/components/admin/multi-select-input/MultiSelectInput', () => ({
@@ -156,6 +198,7 @@ describe('ProgramExpensesSection', () => {
         mockUseDataFetchResult = {
             data: MOCK_PROGRAM_EXPENSES_DATA,
             isLoading: false,
+            refetch: mockRefetch,
         };
         mockUseDataFetch.mockImplementation(() => mockUseDataFetchResult);
     });
@@ -172,6 +215,7 @@ describe('ProgramExpensesSection', () => {
                 records: [],
             },
             isLoading: true,
+            refetch: mockRefetch,
         };
 
         render(<ProgramExpensesSection />);
@@ -255,6 +299,7 @@ describe('ProgramExpensesSection', () => {
                 records: MOCK_PROGRAM_EXPENSES_DATA.records.filter((record) => record.programId !== 2),
             },
             isLoading: false,
+            refetch: mockRefetch,
         };
 
         rerender(<ProgramExpensesSection />);
@@ -278,6 +323,7 @@ describe('ProgramExpensesSection', () => {
         mockUseDataFetchResult = {
             data: EMPTY_PROGRAM_EXPENSES_DATA,
             isLoading: false,
+            refetch: mockRefetch,
         };
 
         render(<ProgramExpensesSection />);
@@ -337,10 +383,99 @@ describe('ProgramExpensesSection', () => {
                 ],
             },
             isLoading: false,
+            refetch: mockRefetch,
         };
 
         render(<ProgramExpensesSection isEditing />);
 
         expect(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE })).toBeDisabled();
+    });
+
+    it('should open delete confirmation modal when delete icon is clicked', () => {
+        render(<ProgramExpensesSection isEditing />);
+
+        fireEvent.click(screen.getByLabelText('Delete record 1'));
+
+        expect(screen.getByTestId('delete-record-modal')).toBeInTheDocument();
+        expect(screen.getByText(PROGRAM_EXPENSES_TEXT.MODAL.DELETE.TITLE)).toBeInTheDocument();
+    });
+
+    it('should not show delete icons when not in edit mode', () => {
+        render(<ProgramExpensesSection />);
+
+        expect(screen.queryByLabelText('Delete record 1')).not.toBeInTheDocument();
+    });
+
+    it('should close delete modal when Cancel is clicked without calling API', () => {
+        render(<ProgramExpensesSection isEditing />);
+
+        fireEvent.click(screen.getByLabelText('Delete record 1'));
+        expect(screen.getByTestId('delete-record-modal')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.NO));
+
+        expect(screen.queryByTestId('delete-record-modal')).not.toBeInTheDocument();
+        expect(ProgramExpensesApi.delete).not.toHaveBeenCalled();
+    });
+
+    it('should delete record after confirmation and show success toast', async () => {
+        (ProgramExpensesApi.delete as jest.Mock).mockResolvedValueOnce(undefined);
+
+        render(<ProgramExpensesSection isEditing />);
+
+        fireEvent.click(screen.getByLabelText('Delete record 1'));
+        expect(screen.getByText(PROGRAM_EXPENSES_TEXT.MODAL.DELETE.TITLE)).toBeInTheDocument();
+
+        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
+
+        await waitFor(() => {
+            expect(ProgramExpensesApi.delete).toHaveBeenCalledWith('mock-client', 1);
+            expect(mockAddToast).toHaveBeenCalledWith(
+                PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_DELETED_SUCCESSFULLY,
+                'success',
+            );
+            expect(mockRefetch).toHaveBeenCalled();
+            expect(screen.queryByTestId('delete-record-modal')).not.toBeInTheDocument();
+        });
+    });
+
+    it('should show error toast and keep modal open when delete fails', async () => {
+        (ProgramExpensesApi.delete as jest.Mock).mockRejectedValueOnce(new Error('delete failed'));
+
+        render(<ProgramExpensesSection isEditing />);
+
+        fireEvent.click(screen.getByLabelText('Delete record 1'));
+        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
+
+        await waitFor(() => {
+            expect(ProgramExpensesApi.delete).toHaveBeenCalledWith('mock-client', 1);
+            expect(mockAddToast).toHaveBeenCalledWith(
+                PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_DELETE_FAILED_RETRY,
+                'error',
+            );
+            expect(screen.getByTestId('delete-record-modal')).toBeInTheDocument();
+        });
+    });
+
+    it('should disable modal buttons while delete request is in flight', async () => {
+        let resolveDelete!: () => void;
+        (ProgramExpensesApi.delete as jest.Mock).mockImplementationOnce(
+            () =>
+                new Promise<void>((resolve) => {
+                    resolveDelete = resolve;
+                }),
+        );
+
+        render(<ProgramExpensesSection isEditing />);
+
+        fireEvent.click(screen.getByLabelText('Delete record 1'));
+        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
+
+        await waitFor(() => {
+            expect(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES)).toBeDisabled();
+            expect(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.NO)).toBeDisabled();
+        });
+
+        resolveDelete();
     });
 });

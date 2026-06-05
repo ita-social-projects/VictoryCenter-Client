@@ -507,11 +507,11 @@ describe('PartnerSectionsEditor', () => {
             latestProps.onDelete(latestProps.value.localId);
         });
         fireEvent.click(screen.getByTestId('confirm-delete'));
-        
+
         await waitFor(() => {
             expect(screen.getByText(PARTNERS_TEXT.FORM.MESSAGE.DELETE_SECTION_WARNING)).toBeInTheDocument();
         });
-        
+
         fireEvent.click(screen.getByTestId('confirm-delete'));
 
         expect(mockedPartnersApi.deleteSection).not.toHaveBeenCalled();

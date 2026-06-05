@@ -468,6 +468,12 @@ describe('PartnerSectionsEditor', () => {
         fireEvent.click(screen.getByTestId('confirm-delete'));
 
         await waitFor(() => {
+            expect(screen.getByText(PARTNERS_TEXT.FORM.MESSAGE.DELETE_SECTION_WARNING)).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByTestId('confirm-delete'));
+
+        await waitFor(() => {
             expect(mockedPartnersApi.deleteSection).toHaveBeenCalledWith('mock-client', 5);
         });
 
@@ -500,6 +506,12 @@ describe('PartnerSectionsEditor', () => {
         await act(async () => {
             latestProps.onDelete(latestProps.value.localId);
         });
+        fireEvent.click(screen.getByTestId('confirm-delete'));
+        
+        await waitFor(() => {
+            expect(screen.getByText(PARTNERS_TEXT.FORM.MESSAGE.DELETE_SECTION_WARNING)).toBeInTheDocument();
+        });
+        
         fireEvent.click(screen.getByTestId('confirm-delete'));
 
         expect(mockedPartnersApi.deleteSection).not.toHaveBeenCalled();
@@ -581,6 +593,45 @@ describe('PartnerSectionsEditor', () => {
         expect(mockedPartnersApi.deleteSection).not.toHaveBeenCalled();
     });
 
+    it('closes the second delete modal when cancel is clicked', async () => {
+        mockedUseDataFetch.mockReturnValue({
+            data: [
+                {
+                    id: 7,
+                    title: 'Cancelable Second',
+                    description: 'Desc',
+                    partners: [],
+                },
+            ],
+            isLoading: false,
+            error: null,
+            refetch: jest.fn(),
+            setData: jest.fn(),
+        });
+
+        render(<PartnerSectionsEditor />);
+
+        await waitFor(() => expect(mockPartnerSectionFormRender).toHaveBeenCalled());
+        const props = mockPartnerSectionFormRender.mock.calls[0][0];
+
+        await act(async () => {
+            props.onDelete(props.value.localId);
+        });
+
+        expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByTestId('confirm-delete'));
+
+        await waitFor(() => {
+            expect(screen.getByText(PARTNERS_TEXT.FORM.MESSAGE.DELETE_SECTION_WARNING)).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByTestId('cancel-delete'));
+
+        expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
+        expect(mockedPartnersApi.deleteSection).not.toHaveBeenCalled();
+    });
+
     it('shows error toast when deleting section fails', async () => {
         mockedPartnersApi.deleteSection.mockRejectedValueOnce(new Error('delete fail'));
 
@@ -605,6 +656,12 @@ describe('PartnerSectionsEditor', () => {
 
         await act(async () => {
             props.onDelete(props.value.localId);
+        });
+
+        fireEvent.click(screen.getByTestId('confirm-delete'));
+
+        await waitFor(() => {
+            expect(screen.getByText(PARTNERS_TEXT.FORM.MESSAGE.DELETE_SECTION_WARNING)).toBeInTheDocument();
         });
 
         fireEvent.click(screen.getByTestId('confirm-delete'));

@@ -202,7 +202,6 @@ describe('AddProgramExpenseRecordModal', () => {
         selectOption(FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_PLACEHOLDER, '2026');
         selectOption(PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_PLACEHOLDER, 'Program A');
         fireEvent.change(screen.getByTestId('add-program-expense-amount-uah'), { target: { value: '100' } });
-        fireEvent.change(screen.getByTestId('add-program-expense-amount-usd'), { target: { value: '10' } });
 
         expect(screen.getByText(PROGRAM_EXPENSES_TEXT.VALIDATION.PROGRAM_UNIQUE)).toBeInTheDocument();
         expect(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.MODAL.ADD.SUBMIT_BUTTON })).toBeDisabled();
@@ -214,7 +213,6 @@ describe('AddProgramExpenseRecordModal', () => {
         selectOption(FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_PLACEHOLDER, '2026');
         selectOption(PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_PLACEHOLDER, 'Program B');
         fireEvent.change(screen.getByTestId('add-program-expense-amount-uah'), { target: { value: '100' } });
-        fireEvent.change(screen.getByTestId('add-program-expense-amount-usd'), { target: { value: '10' } });
 
         expect(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.MODAL.ADD.SUBMIT_BUTTON })).toBeEnabled();
     });
@@ -294,5 +292,18 @@ describe('AddProgramExpenseRecordModal', () => {
         expect(screen.getByTestId('add-program-expense-amount-uah')).toHaveValue('');
         expect(screen.queryByTestId('close-confirmation')).not.toBeInTheDocument();
         expect(screen.getByLabelText(FUNDS_EXPENDITURES_TEXT.EXCHANGE_RATE_LABEL)).toHaveValue('');
+    });
+
+    it('auto-fills USD when UAH is entered and shows mismatch message on manual USD change', () => {
+        renderModal({ exchangeRate: '40' });
+
+        fireEvent.change(screen.getByTestId('add-program-expense-amount-uah'), { target: { value: '100' } });
+
+        expect(screen.getByTestId('add-program-expense-amount-usd')).not.toHaveValue('');
+
+        fireEvent.change(screen.getByTestId('add-program-expense-amount-usd'), { target: { value: '999' } });
+        fireEvent.blur(screen.getByTestId('add-program-expense-amount-usd'));
+
+        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).toBeInTheDocument();
     });
 });

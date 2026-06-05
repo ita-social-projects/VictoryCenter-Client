@@ -1,10 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ProgramExpensesProgram, ProgramExpensesRecord } from '@/types/admin/reports';
 import { updateFundsAmounts } from '@/utils/functions/update-funds-amounts/update-funds-amounts';
-import { isUsdAmountMismatch } from '@/utils/functions/validate-usd-amount-mismatch/validate-usd-amount-mismatch';
-import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
+import { useAmountBlur } from '@/hooks/admin/use-amount-blur/useAmountBlur';
 import {
-    normalizeProgramExpenseAmountInput,
     validateProgramExpenseAmount,
     validateProgramExpenseProgram,
     validateProgramExpenseReportingYear,
@@ -52,9 +50,14 @@ export const useProgramExpenseRecordForm = ({
     onSubmit,
 }: UseProgramExpenseRecordFormParams) => {
     const [formState, setFormState] = useState<ProgramExpenseFormState>(INITIAL_STATE);
-    const [usdMismatchMessage, setUsdMismatchMessage] = useState<string | undefined>();
     const [isAddConfirmationOpen, setIsAddConfirmationOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const {
+        usdMismatchMessage,
+        setUsdMismatchMessage,
+        handleAmountBlur: handleAmountBlurBase,
+    } = useAmountBlur(exchangeRate);
 
     const programOptions = useMemo(
         () =>
@@ -80,6 +83,7 @@ export const useProgramExpenseRecordForm = ({
     useEffect(() => {
         if (!isOpen) {
             setFormState(INITIAL_STATE);
+            setUsdMismatchMessage(undefined);
             return;
         }
 
@@ -96,7 +100,7 @@ export const useProgramExpenseRecordForm = ({
                 },
             }));
         }
-    }, [formState.programId, isOpen, isProgramSelectDisabled, programOptions]);
+    }, [formState.programId, isOpen, isProgramSelectDisabled, programOptions, setUsdMismatchMessage]);
 
     const handleAmountChange = useCallback(
         (field: 'amountUah' | 'amountUsd', value: string) => {
@@ -106,44 +110,12 @@ export const useProgramExpenseRecordForm = ({
             }));
             setUsdMismatchMessage(undefined);
         },
-        [exchangeRate],
+        [exchangeRate, setUsdMismatchMessage],
     );
 
     const handleAmountBlur = useCallback(
-        (field: 'amountUah' | 'amountUsd') => {
-            if (field === 'amountUsd') {
-                setFormState((prev) => {
-                    const normalizedAmountUsd = normalizeProgramExpenseAmountInput(prev.amountUsd, true);
-                    const amountUsdError = validateProgramExpenseAmount(normalizedAmountUsd, 'blur');
-
-                    const hasMismatch = isUsdAmountMismatch(prev.amountUah, normalizedAmountUsd, exchangeRate);
-                    setUsdMismatchMessage(
-                        hasMismatch ? FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH : undefined,
-                    );
-
-                    return {
-                        ...prev,
-                        amountUsd: normalizedAmountUsd,
-                        errors: {
-                            ...prev.errors,
-                            amountUsd: amountUsdError,
-                        },
-                    };
-                });
-
-                return;
-            }
-
-            setFormState((previousState) => {
-                const updated = {
-                    ...previousState,
-                    ...updateFundsAmounts(field, previousState[field], exchangeRate, 'blur')(previousState),
-                };
-                setUsdMismatchMessage(undefined);
-                return updated;
-            });
-        },
-        [exchangeRate],
+        (field: 'amountUah' | 'amountUsd') => handleAmountBlurBase(field, setFormState),
+        [handleAmountBlurBase],
     );
 
     const handleReportingYearChange = useCallback((reportingYear: string | undefined) => {

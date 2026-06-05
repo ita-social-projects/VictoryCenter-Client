@@ -50,48 +50,6 @@ describe('useFundsExpendituresRecordForm', () => {
         );
     });
 
-    it('updates amount values and sets usd mismatch on blur', () => {
-        const { result } = renderUseFundsForm();
-
-        act(() => {
-            result.current.handleAmountChange('100');
-            result.current.handleUsdChange('1');
-            result.current.handleAmountBlur('amountUsd');
-        });
-
-        expect(result.current.usdMismatchMessage).toBe(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH);
-    });
-
-    it('keeps usd mismatch message undefined when amounts match on blur', () => {
-        const { result } = renderUseFundsForm();
-
-        act(() => {
-            result.current.handleAmountChange('100');
-            result.current.handleUsdChange('10');
-            result.current.handleAmountBlur('amountUsd');
-        });
-
-        expect(result.current.usdMismatchMessage).toBeUndefined();
-    });
-
-    it('clears usd mismatch after amount uah blur recalculation', () => {
-        const { result } = renderUseFundsForm();
-
-        act(() => {
-            result.current.handleAmountChange('100');
-            result.current.handleUsdChange('1');
-            result.current.handleAmountBlur('amountUsd');
-        });
-
-        expect(result.current.usdMismatchMessage).toBe(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH);
-
-        act(() => {
-            result.current.handleAmountBlur('amountUah');
-        });
-
-        expect(result.current.usdMismatchMessage).toBeUndefined();
-    });
-
     it('does not submit invalid form and closes confirmation state', async () => {
         const onSubmit = jest.fn().mockResolvedValue(true);
         const { result } = renderUseFundsForm({ onSubmit });

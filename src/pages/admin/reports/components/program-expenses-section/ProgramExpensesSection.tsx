@@ -39,6 +39,9 @@ export const ProgramExpensesSection = ({ isEditing = false }: ProgramExpensesSec
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [recordToDelete, setRecordToDelete] = useState<ProgramExpensesRecord | null>(null);
     const [isDeletingRecord, setIsDeletingRecord] = useState(false);
+    const [selectedRecordIds, setSelectedRecordIds] = useState<number[]>([]);
+    const [isBulkDeleteModalOpen, setIsBulkDeleteModalOpen] = useState(false);
+    const [isBulkDeleting, setIsBulkDeleting] = useState(false);
 
     const fetchReadOnlyData = useCallback(
         (options = {}) => ProgramExpensesApi.getReadOnlyData(adminClient, options),
@@ -68,6 +71,7 @@ export const ProgramExpensesSection = ({ isEditing = false }: ProgramExpensesSec
     useEffect(() => {
         if (!isEditing) {
             setIsAddProgramExpenseModalOpen(false);
+            setSelectedRecordIds([]);
         }
     }, [isEditing]);
 
@@ -121,6 +125,49 @@ export const ProgramExpensesSection = ({ isEditing = false }: ProgramExpensesSec
         setRecordToDelete(null);
     }, []);
 
+    const toggleRecordSelection = useCallback((id: number) => {
+        setSelectedRecordIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+    }, []);
+
+    const handleSelectAllToggle = useCallback(
+        (checked: boolean) => {
+            if (checked) {
+                setSelectedRecordIds(filteredRecords.map((record) => record.id));
+            } else {
+                setSelectedRecordIds([]);
+            }
+        },
+        [filteredRecords],
+    );
+
+    const handleOpenBulkDeleteModal = useCallback(() => setIsBulkDeleteModalOpen(true), []);
+
+    const handleBulkDeleteCancel = useCallback(() => {
+        setIsBulkDeleteModalOpen(false);
+        setSelectedRecordIds([]);
+    }, []);
+
+    const handleConfirmBulkDelete = useCallback(async () => {
+        if (selectedRecordIds.length === 0) {
+            setIsBulkDeleteModalOpen(false);
+            return;
+        }
+        setIsBulkDeleting(true);
+
+        try {
+            await ProgramExpensesApi.bulkDelete(adminClient, selectedRecordIds);
+            setSelectedRecordIds([]);
+            setIsBulkDeleteModalOpen(false);
+            refetchReadOnlyData();
+            addToast(PROGRAM_EXPENSES_TEXT.BULK.DELETE_SUCCESS, ToastType.Success);
+        } catch {
+            setIsBulkDeleteModalOpen(false);
+            addToast(PROGRAM_EXPENSES_TEXT.BULK.DELETE_FAILED, ToastType.Error, 5000);
+        } finally {
+            setIsBulkDeleting(false);
+        }
+    }, [adminClient, selectedRecordIds, refetchReadOnlyData, addToast]);
+
     if (isInitialLoading) {
         return (
             <div className={styles.section}>
@@ -152,6 +199,10 @@ export const ProgramExpensesSection = ({ isEditing = false }: ProgramExpensesSec
                     isAddProgramExpenseDisabled={isAddProgramExpenseDisabled || !isEditing}
                     onAddProgramExpense={isEditing ? handleOpenAddProgramExpenseModal : undefined}
                     onDeleteRecord={isEditing ? handleDeleteClick : undefined}
+                    selectedRecordIds={selectedRecordIds}
+                    onToggleRecordSelection={toggleRecordSelection}
+                    onSelectAllToggle={handleSelectAllToggle}
+                    onOpenBulkDelete={handleOpenBulkDeleteModal}
                 />
             </div>
 
@@ -172,6 +223,17 @@ export const ProgramExpensesSection = ({ isEditing = false }: ProgramExpensesSec
                 onConfirm={handleConfirmDelete}
                 onCancel={handleCancelDelete}
                 onClose={handleCancelDelete}
+            />
+
+            <DeleteRecordModal
+                isOpen={isBulkDeleteModalOpen}
+                title={PROGRAM_EXPENSES_TEXT.BULK.DELETE_CONFIRM_TITLE}
+                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
+                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
+                isButtonsDisabled={isBulkDeleting}
+                onConfirm={handleConfirmBulkDelete}
+                onCancel={handleBulkDeleteCancel}
+                onClose={handleBulkDeleteCancel}
             />
         </div>
     );

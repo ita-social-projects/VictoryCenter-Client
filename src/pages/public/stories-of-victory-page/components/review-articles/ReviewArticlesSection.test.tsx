@@ -15,9 +15,24 @@ jest.mock('react-i18next', () => ({
     useTranslation: jest.fn(),
 }));
 
-const article1: StoriesOfVictoryReviewArticle = { id: 1, title: 'Article 1', text: ['Paragraph 1'], image: 'image1.jpg' };
-const article2: StoriesOfVictoryReviewArticle = { id: 2, title: 'Article 2', text: ['Paragraph 2'], image: 'image2.jpg' };
-const article3: StoriesOfVictoryReviewArticle = { id: 3, title: 'Article 3', text: ['Paragraph 3'], image: 'image3.jpg' };
+const article1: StoriesOfVictoryReviewArticle = {
+    id: 1,
+    title: 'Article 1',
+    text: ['Paragraph 1'],
+    image: 'image1.jpg',
+};
+const article2: StoriesOfVictoryReviewArticle = {
+    id: 2,
+    title: 'Article 2',
+    text: ['Paragraph 2'],
+    image: 'image2.jpg',
+};
+const article3: StoriesOfVictoryReviewArticle = {
+    id: 3,
+    title: 'Article 3',
+    text: ['Paragraph 3'],
+    image: 'image3.jpg',
+};
 
 describe('ReviewArticlesSection', () => {
     beforeEach(() => {

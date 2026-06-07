@@ -203,14 +203,14 @@ describe('VideoReviewsSection', () => {
     });
 
     it('should skip rendering videoWrapper when video link is missing', () => {
-        const content: StoriesOfVictoryReviewVideo[] = [{ id: 1, title: 'Video 1', link: undefined }];
+        const content: StoriesOfVictoryReviewVideo[] = [{ id: 1, title: 'Video 1', link: null }];
         const { container } = render(<VideoReviewsSection content={content} />);
         const wrapper = container.querySelector('.videoWrapper');
         expect(wrapper).not.toBeInTheDocument();
     });
 
     it('should render video title for video without link', () => {
-        const content: StoriesOfVictoryReviewVideo[] = [{ id: 1, title: 'Video Without Link', link: undefined }];
+        const content: StoriesOfVictoryReviewVideo[] = [{ id: 1, title: 'Video Without Link', link: null }];
         render(<VideoReviewsSection content={content} />);
         expect(screen.getByText('Video Without Link')).toBeInTheDocument();
     });

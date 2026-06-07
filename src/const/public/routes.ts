@@ -40,6 +40,7 @@ export const PUBLIC_ROUTES = {
     STORIES_OF_VICTORIES: {
         PATH: 'stories',
         FULL: '/stories',
+    },
     CONTACT_US: {
         PATH: 'contact-us',
         FULL: '/contact-us',

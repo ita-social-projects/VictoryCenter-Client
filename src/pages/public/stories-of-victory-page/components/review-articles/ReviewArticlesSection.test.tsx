@@ -95,7 +95,7 @@ describe('ReviewArticlesSection', () => {
                 id: 1,
                 title: 'Article 1',
                 text: ['Paragraph 1'],
-                image: undefined,
+                image: null,
             },
         ];
         render(<ReviewArticlesSection content={content} />);

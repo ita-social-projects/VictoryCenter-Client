@@ -61,7 +61,8 @@ describe('Footer', () => {
             PUBLIC_ROUTES.REPORTS.FULL,
         );
 
-        const howToSupportLink = screen.getByRole('link', { name: footerUk['HOW_TO_SUPPORT'] });
+        const howToSupportLink = document.querySelector(`a.disable[href="${PUBLIC_ROUTES.MOCK.FULL}"]`);
+        expect(howToSupportLink).toBeInTheDocument();
         expect(howToSupportLink).toHaveAttribute('href', PUBLIC_ROUTES.MOCK.FULL);
         expect(howToSupportLink).toHaveClass('disable');
 

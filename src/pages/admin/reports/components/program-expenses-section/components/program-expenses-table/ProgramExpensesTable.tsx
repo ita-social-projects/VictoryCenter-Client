@@ -10,7 +10,7 @@ import { Button } from '@/components/admin/button/Button';
 import cn from 'classnames';
 import styles from './ProgramExpensesTable.module.scss';
 
-interface ProgramExpensesTableProps {
+export interface ProgramExpensesTableProps {
     records: ProgramExpensesRecord[];
     hasAnyProgramExpenseRecords: boolean;
     isEditing?: boolean;

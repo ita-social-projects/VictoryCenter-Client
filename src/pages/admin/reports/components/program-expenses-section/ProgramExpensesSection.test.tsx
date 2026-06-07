@@ -63,6 +63,7 @@ jest.mock('@/services/api/admin/reports/program-expenses-api', () => ({
     ProgramExpensesApi: {
         getReadOnlyData: (...args: unknown[]) => mockGetReadOnlyData(...args),
         delete: jest.fn(),
+        bulkDelete: jest.fn(),
     },
 }));
 
@@ -477,5 +478,58 @@ describe('ProgramExpensesSection', () => {
         });
 
         resolveDelete();
+    });
+
+    it('should open bulk delete modal when delete selected button is clicked', () => {
+        render(<ProgramExpensesSection isEditing />);
+
+        fireEvent.click(screen.getByRole('checkbox', { name: 'Select record 1' }));
+        fireEvent.click(screen.getByText(PROGRAM_EXPENSES_TEXT.BULK.DELETE_BUTTON));
+
+        expect(screen.getByTestId('delete-record-modal')).toBeInTheDocument();
+        expect(screen.getByText(PROGRAM_EXPENSES_TEXT.BULK.DELETE_CONFIRM_TITLE)).toBeInTheDocument();
+    });
+
+    it('should close bulk delete modal and clear selection when cancel is clicked', () => {
+        render(<ProgramExpensesSection isEditing />);
+
+        fireEvent.click(screen.getByRole('checkbox', { name: 'Select record 1' }));
+        fireEvent.click(screen.getByText(PROGRAM_EXPENSES_TEXT.BULK.DELETE_BUTTON));
+        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.NO));
+
+        expect(screen.queryByTestId('delete-record-modal')).not.toBeInTheDocument();
+        expect(ProgramExpensesApi.bulkDelete).not.toHaveBeenCalled();
+    });
+
+    it('should bulk delete selected records and show success toast', async () => {
+        (ProgramExpensesApi.bulkDelete as jest.Mock).mockResolvedValueOnce(undefined);
+
+        render(<ProgramExpensesSection isEditing />);
+
+        fireEvent.click(screen.getByRole('checkbox', { name: 'Select record 1' }));
+        fireEvent.click(screen.getByText(PROGRAM_EXPENSES_TEXT.BULK.DELETE_BUTTON));
+        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
+
+        await waitFor(() => {
+            expect(ProgramExpensesApi.bulkDelete).toHaveBeenCalledWith('mock-client', [1]);
+            expect(mockAddToast).toHaveBeenCalledWith(PROGRAM_EXPENSES_TEXT.BULK.DELETE_SUCCESS, 'success');
+            expect(mockRefetch).toHaveBeenCalled();
+            expect(screen.queryByTestId('delete-record-modal')).not.toBeInTheDocument();
+        });
+    });
+
+    it('should show error toast when bulk delete fails', async () => {
+        (ProgramExpensesApi.bulkDelete as jest.Mock).mockRejectedValueOnce(new Error('failed'));
+
+        render(<ProgramExpensesSection isEditing />);
+
+        fireEvent.click(screen.getByRole('checkbox', { name: 'Select record 1' }));
+        fireEvent.click(screen.getByText(PROGRAM_EXPENSES_TEXT.BULK.DELETE_BUTTON));
+        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
+
+        await waitFor(() => {
+            expect(mockAddToast).toHaveBeenCalledWith(PROGRAM_EXPENSES_TEXT.BULK.DELETE_FAILED, 'error', 5000);
+            expect(screen.queryByTestId('delete-record-modal')).not.toBeInTheDocument();
+        });
     });
 });

@@ -1,19 +1,33 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useEffect, useRef, useState } from 'react';
+import axios from 'axios';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import { CategoryBar } from '@/components/admin/category-bar/CategoryBar';
+import { LanguageToolkit } from '@/components/admin/language-toolkit/LanguageToolkit';
+import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
 import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
 import { PageLoader } from '@/components/common/page-loader/PageLoader';
 
 import { MAIN_PAGE_TEXT } from '@/const/admin/main-page';
+import { DEFAULT_LOCALE } from '@/const/common/locales';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
 import { ImageApi } from '@/services/api/admin/image/image-api';
 import { MainPageApi } from '@/services/api/admin/main-page/main-page-api';
-import { MAIN_PAGE_FORM_DEFAULTS, MainPage, MainPageFormValues, Metric } from '@/types/admin/main-page';
+import { MainPageLocalizationsApi } from '@/services/api/admin/main-page/main-page-localizations-api';
+import {
+    MAIN_PAGE_FORM_DEFAULTS,
+    MainPage,
+    MainPageFormValues,
+    MainPageLocalizationBlock,
+    MainPageTranslationStatusDto,
+    Metric,
+} from '@/types/admin/main-page';
 import { ToastType } from '@/types/admin/toast';
 import { ImageValues } from '@/types/common/image';
+import { EntityWithTranslationStatuses } from '@/types/common/language';
 import {
     mapFormValuesToMainPagePatch,
     mapMainPageToFormValues,
@@ -31,15 +45,28 @@ type TabType = 'title' | 'about' | 'statistics' | 'donations' | 'partners';
 type TabItem = {
     id: TabType;
     label: string;
+    localizationBlock?: MainPageLocalizationBlock;
 };
 
+type ErrorStateType = 'languages';
+
 const TABS: TabItem[] = [
-    { id: 'title', label: MAIN_PAGE_TEXT.TABS.TITLE },
-    { id: 'about', label: MAIN_PAGE_TEXT.TABS.ABOUT_US },
-    { id: 'statistics', label: MAIN_PAGE_TEXT.TABS.STATISTICS },
+    { id: 'title', label: MAIN_PAGE_TEXT.TABS.TITLE, localizationBlock: MainPageLocalizationBlock.Title },
+    { id: 'about', label: MAIN_PAGE_TEXT.TABS.ABOUT_US, localizationBlock: MainPageLocalizationBlock.AboutUs },
+    {
+        id: 'statistics',
+        label: MAIN_PAGE_TEXT.TABS.STATISTICS,
+        localizationBlock: MainPageLocalizationBlock.ImpactStatistics,
+    },
     { id: 'donations', label: MAIN_PAGE_TEXT.TABS.DONATIONS },
-    { id: 'partners', label: MAIN_PAGE_TEXT.TABS.PARTNERS },
+    { id: 'partners', label: MAIN_PAGE_TEXT.TABS.PARTNERS, localizationBlock: MainPageLocalizationBlock.Partners },
 ];
+
+const sanitizeMainPageFormValues = (values: MainPageFormValues): MainPageFormValues => ({
+    ...values,
+    statisticsTitleUa: values.statisticsTitleUa ?? '',
+    statisticsTitleEn: values.statisticsTitleEn ?? '',
+});
 
 export const MainPageContent = () => {
     const client = useAdminClient();
@@ -55,6 +82,7 @@ export const MainPageContent = () => {
     const [pendingPublishData, setPendingPublishData] = useState<MainPageFormValues | null>(null);
 
     const [currentMetrics, setCurrentMetrics] = useState<Metric[]>([]);
+    const [translationStatuses, setTranslationStatuses] = useState<MainPageTranslationStatusDto[]>([]);
 
     const savedValuesRef = useRef<MainPageFormValues>(MAIN_PAGE_FORM_DEFAULTS);
 
@@ -70,6 +98,17 @@ export const MainPageContent = () => {
         setActiveTab(tab.id);
     };
 
+    const setErrorState = useCallback(
+        (message: string, _type: ErrorStateType) => {
+            addToast(message, ToastType.Error, 3000);
+        },
+        [addToast],
+    );
+
+    const { allLanguages, translationLanguages, selectedLanguage, onLanguageChange } = useLocalizationToolkit({
+        setErrorState,
+    });
+
     useEffect(() => {
         let isMounted = true;
 
@@ -83,11 +122,7 @@ export const MainPageContent = () => {
 
                 const values = mapMainPageToFormValues(page, languages);
 
-                const sanitizedValues = {
-                    ...values,
-                    statisticsTitleUa: values.statisticsTitleUa ?? '',
-                    statisticsTitleEn: values.statisticsTitleEn ?? '',
-                };
+                const sanitizedValues = sanitizeMainPageFormValues(values);
 
                 savedValuesRef.current = sanitizedValues;
 
@@ -106,6 +141,91 @@ export const MainPageContent = () => {
             isMounted = false;
         };
     }, [client, methods, addToast]);
+
+    useEffect(() => {
+        if (!originalData?.id || !selectedLanguage || !translationLanguages.length) {
+            return;
+        }
+
+        let isMounted = true;
+        const isDefaultLanguage = selectedLanguage.code === DEFAULT_LOCALE;
+        const statusLanguageId = isDefaultLanguage ? translationLanguages[0].id : selectedLanguage.id;
+
+        const loadLocalizationData = async () => {
+            try {
+                const statuses = await MainPageLocalizationsApi.getStatuses(client, originalData.id!, statusLanguageId);
+                if (isMounted) {
+                    setTranslationStatuses(statuses);
+                }
+            } catch (error) {
+                if (axios.isAxiosError(error) && error.response?.status === 404) {
+                    if (isMounted) setTranslationStatuses([]);
+                } else {
+                    addToast('Помилка завантаження статусів перекладу', ToastType.Error, 3000);
+                }
+            }
+
+            const baseValues = sanitizeMainPageFormValues(mapMainPageToFormValues(originalData, allLanguages));
+
+            if (isDefaultLanguage) {
+                if (isMounted) {
+                    savedValuesRef.current = baseValues;
+                    methods.reset(baseValues, { keepDefaultValues: false });
+                }
+                return;
+            }
+
+            try {
+                const localization = await MainPageLocalizationsApi.getByLanguageId(
+                    client,
+                    originalData.id!,
+                    selectedLanguage.id,
+                );
+
+                if (!isMounted) return;
+
+                const localizedValues = sanitizeMainPageFormValues({
+                    ...baseValues,
+                    titleEn: localization.title ?? originalData.title ?? '',
+                    descriptionEn: localization.description ?? originalData.description ?? '',
+                    aboutUsTitleEn: localization.mainAboutUs?.title ?? originalData.mainAboutUs?.title ?? '',
+                    aboutUsDescriptionEn:
+                        localization.mainAboutUs?.description ?? originalData.mainAboutUs?.description ?? '',
+                    partnersTitleEn: localization.mainPartners?.title ?? originalData.mainPartners?.title ?? '',
+                    partnersDescriptionEn:
+                        localization.mainPartners?.description ?? originalData.mainPartners?.description ?? '',
+                });
+
+                savedValuesRef.current = localizedValues;
+                methods.reset(localizedValues, { keepDefaultValues: false });
+            } catch (error) {
+                if (axios.isAxiosError(error) && error.response?.status === 404) {
+                    if (!isMounted) return;
+
+                    const fallbackValues = sanitizeMainPageFormValues({
+                        ...baseValues,
+                        titleEn: originalData.title ?? '',
+                        descriptionEn: originalData.description ?? '',
+                        aboutUsTitleEn: originalData.mainAboutUs?.title ?? '',
+                        aboutUsDescriptionEn: originalData.mainAboutUs?.description ?? '',
+                        partnersTitleEn: originalData.mainPartners?.title ?? '',
+                        partnersDescriptionEn: originalData.mainPartners?.description ?? '',
+                    });
+
+                    savedValuesRef.current = fallbackValues;
+                    methods.reset(fallbackValues, { keepDefaultValues: false });
+                } else {
+                    addToast('Помилка завантаження перекладу', ToastType.Error, 3000);
+                }
+            }
+        };
+
+        void loadLocalizationData();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [client, originalData, selectedLanguage, translationLanguages, allLanguages, methods, addToast]);
 
     const handlePublishClick = (data: MainPageFormValues) => {
         setPendingPublishData(data);
@@ -144,11 +264,7 @@ export const MainPageContent = () => {
             setOriginalData(page);
             const nextValues = mapMainPageToFormValues(page, updatedLanguages);
 
-            const sanitizedNextValues = {
-                ...nextValues,
-                statisticsTitleUa: nextValues.statisticsTitleUa ?? '',
-                statisticsTitleEn: nextValues.statisticsTitleEn ?? '',
-            };
+            const sanitizedNextValues = sanitizeMainPageFormValues(nextValues);
 
             savedValuesRef.current = sanitizedNextValues;
 
@@ -170,6 +286,26 @@ export const MainPageContent = () => {
     };
 
     const selectedTab = TABS.find((tab) => tab.id === activeTab) || TABS[0];
+    const isReadOnlyLanguage = selectedLanguage ? selectedLanguage.code !== DEFAULT_LOCALE : false;
+    const getBlockTranslationStatus = (block: MainPageLocalizationBlock) =>
+        translationStatuses.find((status) => status.block === block)?.translationStatus;
+    const getTabTranslationStatusEntity = (tab: TabItem): EntityWithTranslationStatuses => {
+        if (!tab.localizationBlock) {
+            return { translationStatuses: [] };
+        }
+
+        const translationStatus = getBlockTranslationStatus(tab.localizationBlock);
+
+        return {
+            translationStatuses:
+                translationStatus == null
+                    ? []
+                    : translationLanguages.map((language) => ({
+                          languageId: language.id,
+                          translationStatus,
+                      })),
+        };
+    };
 
     if (isLoading) {
         return <PageLoader />;
@@ -185,6 +321,9 @@ export const MainPageContent = () => {
     return (
         <div className={styles.wrapper}>
             <div className={styles.toolbar}>
+                <div className={styles['toolbar-top']}>
+                    <LanguageToolkit languages={allLanguages} onLanguageChange={onLanguageChange} />
+                </div>
                 <div className={styles['toolbar-bottom']}>
                     <div className={styles['tabs-wrapper']}>
                         <CategoryBar<TabItem>
@@ -193,6 +332,13 @@ export const MainPageContent = () => {
                             getCategoryDisplayName={(tab) => tab.label}
                             getCategoryKey={(tab) => tab.id}
                             onCategorySelect={handleTabSelect}
+                            renderCategoryExtra={(tab) => {
+                                const localizedEntity = getTabTranslationStatusEntity(tab);
+
+                                return (
+                                    <LocalizationStatuses languages={translationLanguages} localizedEntity={localizedEntity} />
+                                );
+                            }}
                         />
                     </div>
                 </div>
@@ -202,10 +348,18 @@ export const MainPageContent = () => {
                 <FormProvider {...methods}>
                     <div className={styles['main-page-form']}>
                         {activeTab === 'title' && (
-                            <TitleBlockForm isPublishDisabled={isPublishDisabled} onPublish={onPublish} />
+                            <TitleBlockForm
+                                isPublishDisabled={isPublishDisabled}
+                                onPublish={onPublish}
+                                isReadOnly={isReadOnlyLanguage}
+                            />
                         )}
                         {activeTab === 'about' && (
-                            <AboutUsBlockForm isPublishDisabled={isPublishDisabled} onPublish={onPublish} />
+                            <AboutUsBlockForm
+                                isPublishDisabled={isPublishDisabled}
+                                onPublish={onPublish}
+                                isReadOnly={isReadOnlyLanguage}
+                            />
                         )}
                         {activeTab === 'statistics' && (
                             <StatisticsBlockForm
@@ -217,7 +371,11 @@ export const MainPageContent = () => {
                         )}
                         {activeTab === 'donations' && <div>Блок "{MAIN_PAGE_TEXT.TABS.DONATIONS}" в розробці</div>}
                         {activeTab === 'partners' && (
-                            <PartnersBlockForm isPublishDisabled={isPublishDisabled} onPublish={onPublish} />
+                            <PartnersBlockForm
+                                isPublishDisabled={isPublishDisabled}
+                                onPublish={onPublish}
+                                isReadOnly={isReadOnlyLanguage}
+                            />
                         )}
                     </div>
                 </FormProvider>

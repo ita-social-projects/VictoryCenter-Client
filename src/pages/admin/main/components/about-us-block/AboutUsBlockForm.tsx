@@ -10,20 +10,28 @@ import styles from './AboutUsBlockForm.module.scss';
 interface AboutUsBlockFormProps {
     isPublishDisabled: boolean;
     onPublish: () => void;
+    isReadOnly?: boolean;
 }
 
-export const AboutUsBlockForm = ({ isPublishDisabled, onPublish }: AboutUsBlockFormProps) => {
+export const AboutUsBlockForm = ({
+    isPublishDisabled,
+    onPublish,
+    isReadOnly = false,
+}: AboutUsBlockFormProps) => {
     const {
         control,
         formState: { errors },
     } = useFormContext<MainPageFormValues>();
+
+    const titleName = isReadOnly ? 'aboutUsTitleEn' : 'aboutUsTitleUa';
+    const descriptionName = isReadOnly ? 'aboutUsDescriptionEn' : 'aboutUsDescriptionUa';
 
     return (
         <div className={styles.form}>
             <div className={styles.content}>
                 <div className={styles.column}>
                     <Controller
-                        name="aboutUsTitleUa"
+                        name={titleName}
                         control={control}
                         render={({ field: { onChange, value, onBlur, name } }) => (
                             <InputWithCharacterLimitGroup
@@ -33,9 +41,10 @@ export const AboutUsBlockForm = ({ isPublishDisabled, onPublish }: AboutUsBlockF
                                 value={value}
                                 onChange={onChange}
                                 onBlur={onBlur}
-                                error={errors.aboutUsTitleUa?.message}
+                                error={isReadOnly ? undefined : errors.aboutUsTitleUa?.message}
                                 maxLength={MAIN_PAGE_VALIDATION.aboutUsBlock.title.max}
                                 isRequired={true}
+                                disabled={isReadOnly}
                             />
                         )}
                     />
@@ -43,7 +52,7 @@ export const AboutUsBlockForm = ({ isPublishDisabled, onPublish }: AboutUsBlockF
 
                 <div className={styles.column}>
                     <Controller
-                        name="aboutUsDescriptionUa"
+                        name={descriptionName}
                         control={control}
                         render={({ field: { onChange, value, onBlur, name } }) => (
                             <TextAreaWithCharacterLimitGroup
@@ -53,28 +62,31 @@ export const AboutUsBlockForm = ({ isPublishDisabled, onPublish }: AboutUsBlockF
                                 value={value}
                                 onChange={onChange}
                                 onBlur={onBlur}
-                                error={errors.aboutUsDescriptionUa?.message}
+                                error={isReadOnly ? undefined : errors.aboutUsDescriptionUa?.message}
                                 maxLength={MAIN_PAGE_VALIDATION.aboutUsBlock.description.max}
                                 isRequired={true}
                                 rows={14}
                                 className={styles['textarea-custom']}
+                                disabled={isReadOnly}
                             />
                         )}
                     />
                 </div>
             </div>
 
-            <div className={styles.actions}>
-                <Button
-                    type="button"
-                    buttonStyle="primary"
-                    disabled={isPublishDisabled}
-                    className={styles['publish-button']}
-                    onClick={onPublish}
-                >
-                    {MAIN_PAGE_TEXT.BUTTONS.PUBLISH}
-                </Button>
-            </div>
+            {!isReadOnly && (
+                <div className={styles.actions}>
+                    <Button
+                        type="button"
+                        buttonStyle="primary"
+                        disabled={isPublishDisabled}
+                        className={styles['publish-button']}
+                        onClick={onPublish}
+                    >
+                        {MAIN_PAGE_TEXT.BUTTONS.PUBLISH}
+                    </Button>
+                </div>
+            )}
         </div>
     );
 };

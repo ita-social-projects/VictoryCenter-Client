@@ -10,20 +10,28 @@ import styles from './PartnersBlockForm.module.scss';
 interface PartnersBlockFormProps {
     isPublishDisabled: boolean;
     onPublish: () => void;
+    isReadOnly?: boolean;
 }
 
-export const PartnersBlockForm = ({ isPublishDisabled, onPublish }: PartnersBlockFormProps) => {
+export const PartnersBlockForm = ({
+    isPublishDisabled,
+    onPublish,
+    isReadOnly = false,
+}: PartnersBlockFormProps) => {
     const {
         control,
         formState: { errors },
     } = useFormContext<MainPageFormValues>();
+
+    const titleName = isReadOnly ? 'partnersTitleEn' : 'partnersTitleUa';
+    const descriptionName = isReadOnly ? 'partnersDescriptionEn' : 'partnersDescriptionUa';
 
     return (
         <div className={styles.form}>
             <div className={styles.content}>
                 <div className={styles.column}>
                     <Controller
-                        name="partnersTitleUa"
+                        name={titleName}
                         control={control}
                         render={({ field: { onChange, value, onBlur, name } }) => (
                             <InputWithCharacterLimitGroup
@@ -33,9 +41,10 @@ export const PartnersBlockForm = ({ isPublishDisabled, onPublish }: PartnersBloc
                                 value={value}
                                 onChange={onChange}
                                 onBlur={onBlur}
-                                error={errors.partnersTitleUa?.message}
+                                error={isReadOnly ? undefined : errors.partnersTitleUa?.message}
                                 maxLength={MAIN_PAGE_VALIDATION.partnersBlock.title.max}
                                 isRequired={true}
+                                disabled={isReadOnly}
                             />
                         )}
                     />
@@ -43,7 +52,7 @@ export const PartnersBlockForm = ({ isPublishDisabled, onPublish }: PartnersBloc
 
                 <div className={styles.column}>
                     <Controller
-                        name="partnersDescriptionUa"
+                        name={descriptionName}
                         control={control}
                         render={({ field: { onChange, value, onBlur, name } }) => (
                             <TextAreaWithCharacterLimitGroup
@@ -53,28 +62,31 @@ export const PartnersBlockForm = ({ isPublishDisabled, onPublish }: PartnersBloc
                                 value={value}
                                 onChange={onChange}
                                 onBlur={onBlur}
-                                error={errors.partnersDescriptionUa?.message}
+                                error={isReadOnly ? undefined : errors.partnersDescriptionUa?.message}
                                 maxLength={MAIN_PAGE_VALIDATION.partnersBlock.description.max}
                                 isRequired={true}
                                 rows={14}
                                 className={styles['textarea-custom']}
+                                disabled={isReadOnly}
                             />
                         )}
                     />
                 </div>
             </div>
 
-            <div className={styles.actions}>
-                <Button
-                    type="button"
-                    buttonStyle="primary"
-                    disabled={isPublishDisabled}
-                    className={styles['publish-button']}
-                    onClick={onPublish}
-                >
-                    {MAIN_PAGE_TEXT.BUTTONS.PUBLISH}
-                </Button>
-            </div>
+            {!isReadOnly && (
+                <div className={styles.actions}>
+                    <Button
+                        type="button"
+                        buttonStyle="primary"
+                        disabled={isPublishDisabled}
+                        className={styles['publish-button']}
+                        onClick={onPublish}
+                    >
+                        {MAIN_PAGE_TEXT.BUTTONS.PUBLISH}
+                    </Button>
+                </div>
+            )}
         </div>
     );
 };

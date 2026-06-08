@@ -16,6 +16,12 @@
     display: flex;
     flex-direction: column;
     align-items: stretch;
+    gap: 20px;
+}
+
+.toolbar-top {
+    display: flex;
+    justify-content: flex-end;
 }
 
 .toolbar-bottom {

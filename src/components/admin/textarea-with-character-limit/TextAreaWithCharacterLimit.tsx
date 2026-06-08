@@ -105,11 +105,13 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
                 ? parsedLineHeight * maxRows + paddingTop + paddingBottom + borderTop + borderBottom
                 : Infinity;
 
-            const finalTargetHeight = textarea.scrollHeight + borderTop + borderBottom;
-
-            textarea.style.height = `${Math.min(finalTargetHeight, maxHeight)}px`;
-            textarea.style.overflowY = finalTargetHeight > maxHeight ? 'auto' : 'hidden';
-        }, [value, autoGrow, maxRows]);
+            // Use requestAnimationFrame to ensure browser has calculated layout with word-wrap
+            requestAnimationFrame(() => {
+                const finalTargetHeight = textarea.scrollHeight + borderTop + borderBottom;
+                textarea.style.height = `${Math.min(finalTargetHeight, maxHeight)}px`;
+                textarea.style.overflowY = finalTargetHeight > maxHeight ? 'auto' : 'hidden';
+            });
+        }, [localValue, autoGrow, maxRows]);
 
         return (
             <div className="char-limit-textarea">

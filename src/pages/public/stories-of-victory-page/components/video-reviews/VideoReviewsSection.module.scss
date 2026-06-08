@@ -1,0 +1,83 @@
+@use '@/assets/sass/mixins/typography.mixins' as type;
+@use '@/assets/sass/variables/colors' as colors;
+
+.container {
+    display: none;
+
+    @media (min-width: 1440px) {
+        display: block;
+        padding-bottom: 156px;
+        margin-right: 56px;
+        margin-left: 56px;
+    }
+}
+
+.title {
+    @include type.h4-semibold;
+    color: colors.$blue-900;
+    text-align: left;
+    margin-bottom: 24px;
+}
+
+.videos {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    padding-bottom: 12px;
+    scroll-behavior: smooth;
+
+    &::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: colors.$blue-200;
+        border-radius: 4px;
+
+        &:hover {
+            background: colors.$blue-300;
+        }
+    }
+}
+
+.video {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.videoTitle {
+    @include type.subtitle-2-bold;
+    color: colors.$blue-900;
+    text-align: left;
+}
+
+.videoWrapper {
+    position: relative;
+    width: 321px;
+    height: 488px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    video {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+}
+
+.playIcon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    z-index: 10;
+}

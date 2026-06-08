@@ -72,10 +72,6 @@
         &:hover svg {
             fill: colors.$blue-500;
         }
-
-        &--error svg {
-            fill: colors.$error;
-        }
     }
 
     &__counter-container {

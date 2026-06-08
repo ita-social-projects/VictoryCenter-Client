@@ -305,6 +305,40 @@ jest.mock('../team-page-modals/TeamPageModals', () => ({
                 Simulate Edit Member
             </button>
             <button
+                data-testid="simulate-edit-draft-to-published"
+                onClick={() => {
+                    const updatedMember = {
+                        id: 2,
+                        fullName: 'Jane Smith Published',
+                        description: 'Updated description.',
+                        status: 1,
+                        categoryId: 1,
+                        image: null,
+                        localizations: [],
+                    };
+                    onEditTeamMember(updatedMember);
+                }}
+            >
+                Simulate Edit Draft To Published
+            </button>
+            <button
+                data-testid="simulate-edit-published-to-published"
+                onClick={() => {
+                    const updatedMember = {
+                        id: 1,
+                        fullName: 'John Doe Updated',
+                        description: 'Updated description.',
+                        status: 1,
+                        categoryId: 1,
+                        image: null,
+                        localizations: [],
+                    };
+                    onEditTeamMember(updatedMember);
+                }}
+            >
+                Simulate Edit Published To Published
+            </button>
+            <button
                 data-testid="simulate-translate-member"
                 onClick={() => {
                     const translatedMember = {
@@ -1232,6 +1266,44 @@ describe('TeamPageContent', () => {
                 // Test delete member
                 fireEvent.click(screen.getByTestId('simulate-delete-member'));
                 expect(mockCloseModalActions.closeDeleteItemModal).toHaveBeenCalled();
+            });
+
+            it('shows DONT_FORGET_TO_ORDER toast when editing a Draft member and publishing it', async () => {
+                // Simulate the member being edited was previously a Draft
+                mockModalState.itemToEdit = mockMembers[1]; // status: Draft
+
+                render(<TeamPageContent />);
+
+                await waitFor(() => {
+                    expect(screen.getByTestId('simulate-edit-draft-to-published')).toBeInTheDocument();
+                });
+
+                fireEvent.click(screen.getByTestId('simulate-edit-draft-to-published'));
+
+                expect(mockAddToast).toHaveBeenCalledWith(
+                    TEAM_MEMBERS_TEXT.MESSAGE.DONT_FORGET_TO_ORDER,
+                    ToastType.Info,
+                );
+                expect(mockCloseModalActions.closeEditItemModal).toHaveBeenCalled();
+            });
+
+            it('does NOT show DONT_FORGET_TO_ORDER toast when re-saving an already Published member', async () => {
+                // Simulate the member being edited was already Published
+                mockModalState.itemToEdit = mockMembers[0]; // status: Published
+
+                render(<TeamPageContent />);
+
+                await waitFor(() => {
+                    expect(screen.getByTestId('simulate-edit-published-to-published')).toBeInTheDocument();
+                });
+
+                fireEvent.click(screen.getByTestId('simulate-edit-published-to-published'));
+
+                expect(mockAddToast).not.toHaveBeenCalledWith(
+                    TEAM_MEMBERS_TEXT.MESSAGE.DONT_FORGET_TO_ORDER,
+                    ToastType.Info,
+                );
+                expect(mockCloseModalActions.closeEditItemModal).toHaveBeenCalled();
             });
 
             it('handles category operations through modals', async () => {

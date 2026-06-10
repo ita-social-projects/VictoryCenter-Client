@@ -72,6 +72,10 @@
             fill: colors.$blue-500;
         }
 
+        &--error svg {
+            fill: colors.$error;
+        }
+
         &--hidden {
             opacity: 0;
             pointer-events: none;

@@ -16,7 +16,7 @@ import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
 import { ImageApi } from '@/services/api/admin/image/image-api';
 import { MainPageApi } from '@/services/api/admin/main-page/main-page-api';
-import { MainPageLocalizationsApi } from '@/services/api/admin/main-page/main-page-localizations-api';
+import { MainPageLocalizationsApi } from '@/services/api/admin/main-page/main-page-localizations-api/main-page-localizations-api';
 import {
     MAIN_PAGE_FORM_DEFAULTS,
     MainPage,

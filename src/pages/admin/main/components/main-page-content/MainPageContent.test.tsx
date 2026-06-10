@@ -1,9 +1,12 @@
 import { MAIN_PAGE_TEXT } from '@/const/admin/main-page';
 import { ImageApi } from '@/services/api/admin/image/image-api';
 import { MainPageApi } from '@/services/api/admin/main-page/main-page-api';
-import { MetricType } from '@/types/admin/main-page';
+import { MainPageLocalizationsApi } from '@/services/api/admin/main-page/main-page-localizations-api/main-page-localizations-api';
+import { MainPageLocalizationBlock, MetricType } from '@/types/admin/main-page';
+import { TranslationStatus } from '@/types/common/language';
 import '@testing-library/jest-dom';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import axios from 'axios';
 import { MainPageContent } from './MainPageContent';
 
 jest.mock('@hookform/resolvers/yup', () => ({
@@ -17,6 +20,50 @@ jest.mock('@/services/api/admin/image/image-api', () => ({
     ImageApi: {
         post: jest.fn(),
     },
+}));
+
+const mockLocalizationToolkitState = {
+    allLanguages: [
+        { id: 1, code: 'uk', name: 'UA' },
+        { id: 2, code: 'en', name: 'EN' },
+    ],
+    translationLanguages: [{ id: 2, code: 'en', name: 'EN' }],
+    selectedLanguage: { id: 1, code: 'uk', name: 'UA' },
+    onLanguageChange: jest.fn(),
+};
+
+jest.mock('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit', () => ({
+    useLocalizationToolkit: () => mockLocalizationToolkitState,
+}));
+
+jest.mock('@/components/admin/language-toolkit/LanguageToolkit', () => ({
+    __esModule: true,
+    LanguageToolkit: ({ languages, onLanguageChange }: any) => (
+        <div data-testid="language-toolkit">
+            {languages.map((language: any) => (
+                <button
+                    key={language.id}
+                    data-testid={`language-${language.code}`}
+                    onClick={() => onLanguageChange(language)}
+                >
+                    {language.name}
+                </button>
+            ))}
+        </div>
+    ),
+}));
+
+jest.mock('@/components/admin/localization-statuses/LocalizationStatuses', () => ({
+    __esModule: true,
+    LocalizationStatuses: ({ localizedEntity }: any) => (
+        <div data-testid="localization-statuses">
+            {localizedEntity.translationStatuses.map((status: any) => (
+                <span key={`${status.languageId}-${status.translationStatus}`}>
+                    {status.languageId}:{status.translationStatus}
+                </span>
+            ))}
+        </div>
+    ),
 }));
 
 const MockFormBlock = ({ testId, btnTestId, onPublish, isPublishDisabled }: any) => {
@@ -42,20 +89,31 @@ const MockFormBlock = ({ testId, btnTestId, onPublish, isPublishDisabled }: any)
 
 jest.mock('../title-block/TitleBlockForm', () => ({
     __esModule: true,
-    TitleBlockForm: (props: any) => <MockFormBlock testId="title-block-form" btnTestId="publish-btn" {...props} />,
+    TitleBlockForm: (props: any) => (
+        <div>
+            <MockFormBlock testId="title-block-form" btnTestId="publish-btn" {...props} />
+            <span data-testid="title-block-form-read-only">{String(props.isReadOnly)}</span>
+        </div>
+    ),
 }));
 
 jest.mock('../about-us-block/AboutUsBlockForm', () => ({
     __esModule: true,
     AboutUsBlockForm: (props: any) => (
-        <MockFormBlock testId="about-us-block-form" btnTestId="publish-btn-about" {...props} />
+        <div>
+            <MockFormBlock testId="about-us-block-form" btnTestId="publish-btn-about" {...props} />
+            <span data-testid="about-us-block-form-read-only">{String(props.isReadOnly)}</span>
+        </div>
     ),
 }));
 
 jest.mock('../partners-block/PartnersBlockForm', () => ({
     __esModule: true,
     PartnersBlockForm: (props: any) => (
-        <MockFormBlock testId="partners-block-form" btnTestId="publish-btn-partners" {...props} />
+        <div>
+            <MockFormBlock testId="partners-block-form" btnTestId="publish-btn-partners" {...props} />
+            <span data-testid="partners-block-form-read-only">{String(props.isReadOnly)}</span>
+        </div>
     ),
 }));
 
@@ -151,6 +209,13 @@ jest.mock('@/services/api/admin/main-page/main-page-api', () => ({
     },
 }));
 
+jest.mock('@/services/api/admin/main-page/main-page-localizations-api/main-page-localizations-api', () => ({
+    MainPageLocalizationsApi: {
+        getByLanguageId: jest.fn(),
+        getStatuses: jest.fn(),
+    },
+}));
+
 const getByExactText = (text: string) =>
     screen.getByText((_, el) => el?.children.length === 0 && el?.textContent === text);
 
@@ -183,9 +248,37 @@ describe('MainPageContent', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
+        (MainPageApi.get as jest.Mock).mockReset();
+        (MainPageApi.publish as jest.Mock).mockReset();
+        (MainPageLocalizationsApi.getStatuses as jest.Mock).mockReset();
+        (MainPageLocalizationsApi.getByLanguageId as jest.Mock).mockReset();
+        (ImageApi.post as jest.Mock).mockReset();
+
+        mockLocalizationToolkitState.allLanguages = [
+            { id: 1, code: 'uk', name: 'UA' },
+            { id: 2, code: 'en', name: 'EN' },
+        ];
+        mockLocalizationToolkitState.translationLanguages = [{ id: 2, code: 'en', name: 'EN' }];
+        mockLocalizationToolkitState.selectedLanguage = { id: 1, code: 'uk', name: 'UA' };
 
         (MainPageApi.get as jest.Mock).mockResolvedValue(mockPageData);
         (MainPageApi.publish as jest.Mock).mockResolvedValue(mockPublishedData);
+        (MainPageLocalizationsApi.getStatuses as jest.Mock).mockResolvedValue([]);
+        (MainPageLocalizationsApi.getByLanguageId as jest.Mock).mockResolvedValue({
+            entityId: 1,
+            title: 'Localized title',
+            description: 'Localized description',
+            mainAboutUs: {
+                entityId: 1,
+                title: 'Localized about title',
+                description: 'Localized about description',
+            },
+            mainPartners: {
+                entityId: 1,
+                title: 'Localized partners title',
+                description: 'Localized partners description',
+            },
+        });
         (ImageApi.post as jest.Mock).mockResolvedValue({ id: 2, url: 'uploaded.jpg' });
 
         if (!(global as any).crypto) {
@@ -195,6 +288,10 @@ describe('MainPageContent', () => {
         if (!(global as any).crypto.randomUUID) {
             (global as any).crypto.randomUUID = jest.fn(() => 'test-uuid');
         }
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
     });
 
     const renderAndLoadContent = async () => {
@@ -220,6 +317,8 @@ describe('MainPageContent', () => {
     };
 
     it('renders loader initially while data is "fetching"', () => {
+        (MainPageApi.get as jest.Mock).mockReturnValueOnce(new Promise(() => undefined));
+
         render(<MainPageContent />);
         expect(screen.getByTestId('page-loader')).toBeInTheDocument();
     });
@@ -231,12 +330,74 @@ describe('MainPageContent', () => {
         await waitFor(() => {
             expect(MainPageApi.get).toHaveBeenCalled();
         });
-        expect(screen.getByText(MAIN_PAGE_TEXT.ERRORS.LOAD_FAILED)).toBeInTheDocument();
+        expect(await screen.findByText(MAIN_PAGE_TEXT.ERRORS.LOAD_FAILED)).toBeInTheDocument();
     });
 
     it('renders TitleBlockForm as the default tab after loading', async () => {
         await renderAndLoadContent();
         expect(screen.getByTestId('title-block-form')).toBeInTheDocument();
+    });
+
+    it('renders language toolkit and loads default-language statuses using translation language id', async () => {
+        await renderAndLoadContent();
+
+        expect(screen.getByTestId('language-toolkit')).toBeInTheDocument();
+
+        await waitFor(() => {
+            expect(MainPageLocalizationsApi.getStatuses).toHaveBeenCalledWith(expect.any(Object), 1, 2);
+        });
+
+        expect(MainPageLocalizationsApi.getByLanguageId).not.toHaveBeenCalled();
+        expect(screen.getByTestId('title-block-form-read-only')).toHaveTextContent('false');
+    });
+
+    it('loads selected translation and renders localized tabs as read-only for non-default language', async () => {
+        mockLocalizationToolkitState.selectedLanguage = { id: 2, code: 'en', name: 'EN' };
+        (MainPageLocalizationsApi.getStatuses as jest.Mock).mockResolvedValue([
+            {
+                block: MainPageLocalizationBlock.Title,
+                entityId: 1,
+                languageId: 2,
+                translationStatus: TranslationStatus.Outdated,
+            },
+        ]);
+
+        await renderAndLoadContent();
+
+        await waitFor(() => {
+            expect(MainPageLocalizationsApi.getStatuses).toHaveBeenCalledWith(expect.any(Object), 1, 2);
+            expect(MainPageLocalizationsApi.getByLanguageId).toHaveBeenCalledWith(expect.any(Object), 1, 2);
+        });
+
+        expect(screen.getByTestId('title-block-form-read-only')).toHaveTextContent('true');
+    });
+
+    it('uses original content as fallback when selected translation is missing', async () => {
+        mockLocalizationToolkitState.selectedLanguage = { id: 2, code: 'en', name: 'EN' };
+        jest.spyOn(axios, 'isAxiosError').mockReturnValue(true);
+        (MainPageLocalizationsApi.getByLanguageId as jest.Mock).mockRejectedValue({ response: { status: 404 } });
+
+        await renderAndLoadContent();
+
+        await waitFor(() => {
+            expect(MainPageLocalizationsApi.getByLanguageId).toHaveBeenCalledWith(expect.any(Object), 1, 2);
+        });
+
+        expect(mockAddToast).not.toHaveBeenCalledWith('Помилка завантаження перекладу', 'error', 3000);
+        expect(screen.getByTestId('title-block-form-read-only')).toHaveTextContent('true');
+    });
+
+    it('skips localization status loading when translation languages are absent', async () => {
+        mockLocalizationToolkitState.translationLanguages = [];
+
+        await renderAndLoadContent();
+
+        await waitFor(() => {
+            expect(MainPageApi.get).toHaveBeenCalled();
+        });
+
+        expect(MainPageLocalizationsApi.getStatuses).not.toHaveBeenCalled();
+        expect(MainPageLocalizationsApi.getByLanguageId).not.toHaveBeenCalled();
     });
 
     it('switches tabs correctly', async () => {

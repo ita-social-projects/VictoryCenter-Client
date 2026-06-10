@@ -7,7 +7,7 @@ import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextPr
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { ImageUploadForm } from '@/pages/admin/main/components/common/image-upload-form/ImageUploadForm';
 import { MainPageApi } from '@/services/api/admin/main-page/main-page-api';
-import { MainPage, MainPageFormValues, Metric } from '@/types/admin/main-page';
+import { MainPage, MainPageFormValues, Metric, MetricType } from '@/types/admin/main-page';
 import { ToastType } from '@/types/admin/toast';
 import { useEffect, useRef, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
@@ -53,6 +53,7 @@ export const StatisticsBlockForm = ({
 
     const [metrics, setMetrics] = useState<Metric[]>([]);
     const [hiddenMetricIds, setHiddenMetricIds] = useState<number[]>([]);
+    const [hasRaisedFundsSyncError, setHasRaisedFundsSyncError] = useState(false);
     const initialMetricsRef = useRef<Metric[]>([]);
 
     const {
@@ -83,11 +84,16 @@ export const StatisticsBlockForm = ({
     const areMetricsEqual = (left: Metric[], right: Metric[]) =>
         JSON.stringify(toComparableMetrics(left)) === JSON.stringify(toComparableMetrics(right));
 
+    const hasMetricSyncError = (metric: Metric) =>
+        metric.type === MetricType.Raised &&
+        Boolean(metric.isAutoSyncFailed || metric.autoSyncError || metric.syncError);
+
     useEffect(() => {
         if (initialData?.impactStatistics?.metrics) {
             const apiMetrics = initialData.impactStatistics.metrics;
             setMetrics(apiMetrics);
             initialMetricsRef.current = apiMetrics;
+            setHasRaisedFundsSyncError(apiMetrics.some(hasMetricSyncError));
 
             const hiddenIds = apiMetrics.filter((m) => m.isHidden).map((m) => m.id as number);
             setHiddenMetricIds(hiddenIds);
@@ -220,7 +226,12 @@ export const StatisticsBlockForm = ({
                         onToggleVisibility={handleToggleVisibility}
                         onReorder={handleReorderMetrics}
                         onMetricUpdate={handleMetricUpdate}
+                        onRaisedFundsSyncErrorChange={setHasRaisedFundsSyncError}
                     />
+
+                    {hasRaisedFundsSyncError && (
+                        <p className={styles.error}>{MAIN_PAGE_TEXT.ERRORS.RAISED_FUNDS_SYNC_FAILED}</p>
+                    )}
                 </div>
             </div>
 

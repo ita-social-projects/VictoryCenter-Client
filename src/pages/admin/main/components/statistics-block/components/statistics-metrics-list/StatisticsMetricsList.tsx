@@ -17,6 +17,7 @@ interface StatisticsMetricsListProps {
     onToggleVisibility: (id: number) => void;
     onReorder: (items: Metric[]) => void;
     onMetricUpdate: (updatedMetrics: Metric[]) => void;
+    onRaisedFundsSyncErrorChange?: (hasError: boolean) => void;
 }
 
 export const StatisticsMetricsList = ({
@@ -25,6 +26,7 @@ export const StatisticsMetricsList = ({
     onToggleVisibility,
     onReorder,
     onMetricUpdate,
+    onRaisedFundsSyncErrorChange,
 }: StatisticsMetricsListProps) => {
     const [editingMetricId, setEditingMetricId] = useState<number | null>(null);
     const visibleMetricsCount = metrics.length - hiddenMetricIds.length;
@@ -43,6 +45,7 @@ export const StatisticsMetricsList = ({
                         metric={metric}
                         onSave={handleSaveMetric}
                         onCancel={() => setEditingMetricId(null)}
+                        onSyncErrorChange={onRaisedFundsSyncErrorChange}
                     />
                 );
             }

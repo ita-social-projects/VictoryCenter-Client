@@ -40,6 +40,7 @@ export const MAIN_PAGE_TEXT = {
             PREFIX_NONE: 'Без префікса',
             SYNC_ON_TEXT: 'Суми зібраних коштів підтягуються автоматично з вашої системи звітності.',
             SYNC_OFF_TEXT: 'Коли перемикач вимкнено, дані не синхронізуються автоматично і задаються вручну.',
+            SYNC_CONFIRM_TITLE: 'Оновити суми зібраних коштів відповідно до сторінки "Звітність"?',
         },
         PARTNERS: {
             TITLE_LABEL: COMMON_TEXT_ADMIN.TYPE.TITLE,
@@ -57,6 +58,7 @@ export const MAIN_PAGE_TEXT = {
         LOAD_FAILED: 'Виникла помилка, не вдалося завантажити дані сторінки',
         TOGGLE_VISIBILITY_FAILED: 'Не вдалося змінити видимість',
         REORDER_FAILED: 'Не вдалося зберегти порядок',
+        RAISED_FUNDS_SYNC_FAILED: 'Не вдалося оновити суми зібраних коштів.',
     },
 } as const;
 

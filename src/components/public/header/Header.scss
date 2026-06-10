@@ -15,6 +15,7 @@ $header-height: 4rem;
     backdrop-filter: blur(10.375rem);
     box-sizing: border-box;
     max-width: 1440px;
+    overflow: visible;
 
     .header-content-container {
         display: flex;
@@ -69,11 +70,13 @@ $header-height: 4rem;
     display: none;
     align-self: center;
     color: black;
+
     &.button {
         width: 3.5rem !important;
         height: 3.5rem !important;
         padding: 0 !important;
     }
+
     svg {
         width: 2.5rem !important;
         height: 2.5rem !important;

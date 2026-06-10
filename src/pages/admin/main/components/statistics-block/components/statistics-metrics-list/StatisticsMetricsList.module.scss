@@ -27,7 +27,8 @@
 
 .table :global(.draggable-item),
 .table :global(.drag-preview-wrapper) {
-    height: 40px;
+    height: auto;
+    min-height: 40px;
     align-items: stretch;
     box-shadow: none;
     border-bottom: none;
@@ -36,7 +37,8 @@
 .table :global(.draggable-item .item-data),
 .table :global(.drag-preview .item-data) {
     padding: 0 10px;
-    height: 40px;
+    height: auto;
+    min-height: 40px;
     display: flex;
     align-items: center;
     width: 100%;
@@ -44,30 +46,39 @@
 
 .table :global(.dragger) {
     width: 32px;
+    height: 40px;
 }
 
 .row {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 140px 64px;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 140px 64px;
     width: 100%;
     align-items: center;
     gap: 16px;
-    height: 40px;
-    padding: 0;
+    min-height: 40px;
+    padding: 8px 0;
     border: none;
     border-radius: 8px;
 }
 
-.labels {
-    min-width: 0;
+.raisedValues {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
 }
 
-.ua {
+.ua,
+.en {
     @include type.body-2-medium;
     margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .values {
+    margin: 0;
     text-align: left;
     justify-self: start;
 }
@@ -75,6 +86,7 @@
 .value {
     @include type.body-2-medium;
     margin: 0;
+    line-height: 1.2;
 }
 
 .actions {

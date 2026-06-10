@@ -28,8 +28,10 @@ import { ContactUsPage } from '@/pages/public/contact-us';
 import { CompanyProfileContent } from '@/pages/admin/company-profile/components/company-profile-content/CompanyProfileContent';
 import { LanguageSyncWrapper } from '@/components/public/language-sync-wrapper/LanguageSyncWrapper';
 import { ReportsPanelContent } from '@/pages/admin/reports/components/reports-panel-content/ReportsPanelContent';
+import { StoriesOfVictoryPage } from '@/pages/public/stories-of-victory-page';
 import { HistoryPageContent } from '@/pages/admin/history/components/history-page-content/HistoryPageContent';
 import { MainPageContent } from '@/pages/admin/main/components/main-page-content/MainPageContent';
+import { HistoryPage } from '@/pages/public/history-page/HistoryPage';
 
 export const AppRouter = () => {
     const PublicContent = () => (
@@ -44,7 +46,9 @@ export const AppRouter = () => {
             <Route path={PUBLIC_ROUTES.EVENTS_AND_NEWS.PATH} element={<EventsNewsPage />} />
             <Route path={PUBLIC_ROUTES.DONATE.PATH} element={<DonatePage />} />
             <Route path={PUBLIC_ROUTES.REPORTS.PATH} element={<ReportsPage />} />
+            <Route path={PUBLIC_ROUTES.STORIES_OF_VICTORIES.PATH} element={<StoriesOfVictoryPage />} />
             <Route path={PUBLIC_ROUTES.CONTACT_US.PATH} element={<ContactUsPage />} />
+            <Route path={PUBLIC_ROUTES.HISTORY.PATH} element={<HistoryPage />} />
             <Route path="*" element={<NotFound />} />
         </Routes>
     );

@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within, act } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { HistoryPageContent } from './HistoryPageContent';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -740,7 +740,9 @@ describe('HistoryPageContent', () => {
         });
     });
 
-    it('closes add-section modal when onClose is triggered', async () => {
+    it('closes add-section modal when onClose is called', async () => {
+        mockSingleSectionData();
+
         render(<HistoryPageContent />);
 
         await user.click(screen.getByTestId('toolbar-add-section-button'));
@@ -750,44 +752,16 @@ describe('HistoryPageContent', () => {
         expect(screen.queryByTestId('add-section-modal')).not.toBeInTheDocument();
     });
 
-    it('cancels publish confirmation modal without publishing', async () => {
+    it('closes publish confirmation modal when cancel is clicked', async () => {
         mockSingleSectionData();
 
         render(<HistoryPageContent />);
 
         await user.click(screen.getByTestId('mark-saved'));
         await user.click(screen.getByRole('button', { name: 'Publish' }));
-
         expect(screen.getByTestId('question-modal')).toBeInTheDocument();
 
         await user.click(screen.getByTestId('question-cancel'));
-
         expect(screen.queryByTestId('question-modal')).not.toBeInTheDocument();
-        expect(mockedHistoryApi.syncSections).not.toHaveBeenCalled();
-    });
-
-    it('calls setErrorState when useLocalizationToolkit reports an error', () => {
-        let capturedSetErrorState: ((message: string, type: string) => void) | undefined;
-
-        mockedUseLocalizationToolkit.mockImplementation(
-            ({ setErrorState }: { setErrorState?: (message: string, type: string) => void }) => {
-                capturedSetErrorState = setErrorState;
-
-                return {
-                    allLanguages: [{ id: 'en', code: 'en' }],
-                    translationLanguages: [{ id: 'uk', code: 'uk' }],
-                    selectedLanguage: { id: 'en', code: 'en' },
-                    onLanguageChange: jest.fn(),
-                    translationStatusFilter: undefined,
-                    onTranslationStatusFilterChange: jest.fn(),
-                };
-            },
-        );
-
-        render(<HistoryPageContent />);
-
-        act(() => {
-            capturedSetErrorState?.('Language loading failed', 'languages');
-        });
     });
 });

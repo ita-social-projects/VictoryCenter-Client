@@ -1,0 +1,51 @@
+@use '@/assets/sass/variables/colors' as c;
+
+.panel {
+    background-color: c.$grey-150;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.header {
+    font-size: 14px;
+    font-weight: 500;
+    color: c.$grey-800;
+}
+
+.formGrid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 16px;
+
+    @media (max-width: 1800px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.divider {
+    height: 1px;
+    background-color: c.$grey-300;
+    width: 100%;
+    margin: 4px 0;
+}
+
+.syncRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 4px;
+}
+
+.syncText {
+    font-size: 14px;
+    color: c.$grey-900;
+    line-height: 1.4;
+    flex: 1;
+}

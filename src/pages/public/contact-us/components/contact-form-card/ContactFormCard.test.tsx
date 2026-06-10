@@ -115,4 +115,30 @@ describe('ContactFormCard', () => {
             expect(await screen.findByText(CONTACT_FORM_MESSAGES.MESSAGE.MIN_ERROR)).toBeInTheDocument();
         });
     });
+
+    describe('Email field', () => {
+        const submitForm = () => fireEvent.click(screen.getByRole('button', { name: 'Надіслати' }));
+
+        it.each([
+            ['missing @', 'userexample.com'],
+            ['domain without dot', 'user@localhost'],
+            ['spaces', 'us er@mail.com'],
+            ['empty local part', '@mail.com'],
+            ['TLD shorter than 2 chars', 'user@mail.c'],
+        ])('shows error for invalid email: %s', async (_, invalidEmail) => {
+            renderForm();
+            fireEvent.change(screen.getByPlaceholderText('E-mail'), { target: { value: invalidEmail } });
+            submitForm();
+
+            expect(await screen.findByText(CONTACT_FORM_MESSAGES.EMAIL.INVALID)).toBeInTheDocument();
+        });
+
+        it('does not show error for valid email', async () => {
+            renderForm();
+            fireEvent.change(screen.getByPlaceholderText('E-mail'), { target: { value: 'user@mail.com' } });
+            submitForm();
+
+            expect(screen.queryByText(CONTACT_FORM_MESSAGES.EMAIL.INVALID)).not.toBeInTheDocument();
+        });
+    });
 });

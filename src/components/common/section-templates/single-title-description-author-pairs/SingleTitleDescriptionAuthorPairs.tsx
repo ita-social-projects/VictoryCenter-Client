@@ -72,9 +72,8 @@ export const SingleTitleDescriptionAuthorPairs = ({
     }, [isTemplate, pairs]);
 
     const handleTitleBlur = useCallback(() => {
-        if (!isEditable) return;
         setTitleError(validate(title, ContentType.Title));
-    }, [isEditable, title, validate]);
+    }, [title, validate]);
 
     const handleTitleChange = useCallback(
         (value: string) => {
@@ -151,6 +150,7 @@ export const SingleTitleDescriptionAuthorPairs = ({
                         description={pair.description}
                         author={pair.author}
                         isEditable={isEditable}
+                        canDelete={normalizedPairs.length > 1}
                         onDescriptionChange={onPairDescriptionChange}
                         onAuthorChange={onPairAuthorChange}
                         onDelete={requestDeletePair}

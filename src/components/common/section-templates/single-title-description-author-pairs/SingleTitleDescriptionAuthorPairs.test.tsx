@@ -187,6 +187,12 @@ const openDeleteModal = async (index: number) => {
 };
 
 describe('SingleTitleDescriptionAuthorPairs', () => {
+    it('renders with default props (fallback assignment)', () => {
+        getTemplateMaxLengthMock().mockReturnValue(50);
+        const { container } = render(<SingleTitleDescriptionAuthorPairs />);
+        expect(container.firstElementChild).toBeInTheDocument();
+    });
+
     it('renders h2 title in view mode and uses default carousel variant', () => {
         const { root } = renderComponent({
             title: 'Hello',
@@ -321,7 +327,7 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
         expect(onAddPair).toHaveBeenCalledTimes(1);
     });
 
-    it('passes editability and change handlers into cards (delete is wrapped by index)', async () => {
+    it('passes editability and change handlers into cards (canDelete is length-based)', async () => {
         const onPairDescriptionChange = jest.fn();
         const onPairAuthorChange = jest.fn();
         const onDeletePair = jest.fn();
@@ -337,6 +343,7 @@ describe('SingleTitleDescriptionAuthorPairs', () => {
         const p0 = getPairCardProps(0);
         expect(p0.isEditable).toBe(true);
         expect(p0.index).toBe(0);
+        expect(p0.canDelete).toBe(true);
         expect(p0.onDescriptionChange).toBe(onPairDescriptionChange);
         expect(p0.onAuthorChange).toBe(onPairAuthorChange);
         expect(typeof p0.onDelete).toBe('function');

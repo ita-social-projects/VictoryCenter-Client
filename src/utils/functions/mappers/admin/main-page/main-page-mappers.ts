@@ -55,6 +55,9 @@ export function mapFormValuesToMainPagePatch(
     formValues: MainPageFormValues,
     originalPage: MainPage | null,
     languages?: LocalizationLanguage[],
+    currentMetrics?: MainPage['impactStatistics'] extends null | undefined
+        ? never
+        : NonNullable<MainPage['impactStatistics']>['metrics'],
 ): UpdateMainPageDto {
     const ukLanguageId = getLanguageIdByCode(languages, 'uk');
     const enLanguageId = getLanguageIdByCode(languages, 'en');
@@ -83,10 +86,12 @@ export function mapFormValuesToMainPagePatch(
     const statTitleUk = str(formValues.statisticsTitleUa);
     const statTitleEn = str(formValues.statisticsTitleEn);
 
-    const existingMetrics = originalPage?.impactStatistics?.metrics ?? [];
+    const existingMetrics = currentMetrics?.length ? currentMetrics : (originalPage?.impactStatistics?.metrics ?? []);
+
     const safeMetricsPayload: UpdateMetricDto[] = existingMetrics.map((m) => {
-        const enLoc = m.localizations?.find((l) => resolveLocaleCode(l as any, languages) === 'en');
-        const canHaveLocalization = true;
+        const enLoc = m.localizations?.find((l) =>
+            enLanguageId ? l.languageId === enLanguageId : resolveLocaleCode(l as any, languages) === 'en',
+        );
 
         return {
             id: m.id,
@@ -94,15 +99,14 @@ export function mapFormValuesToMainPagePatch(
             name: m.name,
             type: m.type,
             prefix: m.prefix,
-            localizations:
-                canHaveLocalization && enLanguageId && enLoc
-                    ? [
-                          {
-                              languageId: enLanguageId,
-                              name: enLoc.name,
-                          },
-                      ]
-                    : undefined,
+            isAutoSynced: m.isAutoSynced,
+            localization: enLoc
+                ? {
+                      ...(enLanguageId ? { languageId: enLanguageId } : {}),
+                      name: enLoc.name,
+                      value: enLoc.value,
+                  }
+                : undefined,
         } as UpdateMetricDto;
     });
 

@@ -73,7 +73,6 @@ export const TEAM_MEMBER_VALIDATION = {
         getRequiredWhenPublishingError: () => "Опис обов'язковий при публікації",
         getMinError: () => `Не менше ${TEAM_MEMBER_VALIDATION.description.min} символів`,
         getMaxError: () => `Не більше ${TEAM_MEMBER_VALIDATION.description.max} символів`,
-        getMultipleSpacesError: () => `Не можна використовувати більше одного пробіла`,
     },
     category: {
         getRequiredError: () => "Поле обов'язкове",

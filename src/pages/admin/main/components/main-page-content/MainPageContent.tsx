@@ -11,7 +11,7 @@ import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextPr
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { ImageApi } from '@/services/api/admin/image/image-api';
 import { MainPageApi } from '@/services/api/admin/main-page/main-page-api';
-import { MAIN_PAGE_FORM_DEFAULTS, MainPage, MainPageFormValues } from '@/types/admin/main-page';
+import { MAIN_PAGE_FORM_DEFAULTS, MainPage, MainPageFormValues, Metric } from '@/types/admin/main-page';
 import { ToastType } from '@/types/admin/toast';
 import { ImageValues } from '@/types/common/image';
 import {
@@ -54,6 +54,8 @@ export const MainPageContent = () => {
     const [isPublishing, setIsPublishing] = useState(false);
     const [pendingPublishData, setPendingPublishData] = useState<MainPageFormValues | null>(null);
 
+    const [currentMetrics, setCurrentMetrics] = useState<Metric[]>([]);
+
     const savedValuesRef = useRef<MainPageFormValues>(MAIN_PAGE_FORM_DEFAULTS);
 
     const methods = useForm<MainPageFormValues>({
@@ -78,11 +80,18 @@ export const MainPageContent = () => {
                 if (!isMounted) return;
                 setHasLoadError(false);
                 setOriginalData(page);
+
                 const values = mapMainPageToFormValues(page, languages);
-                savedValuesRef.current = values;
-                if (!methods.formState.isDirty) {
-                    methods.reset(values);
-                }
+
+                const sanitizedValues = {
+                    ...values,
+                    statisticsTitleUa: values.statisticsTitleUa ?? '',
+                    statisticsTitleEn: values.statisticsTitleEn ?? '',
+                };
+
+                savedValuesRef.current = sanitizedValues;
+
+                methods.reset(sanitizedValues, { keepDefaultValues: false });
             } catch (error) {
                 setHasLoadError(true);
                 addToast('Помилка завантаження даних', ToastType.Error, 3000);
@@ -123,15 +132,28 @@ export const MainPageContent = () => {
                 dataToPublish.statisticsImage = uploaded;
             }
 
-            const patch = mapFormValuesToMainPagePatch(dataToPublish, originalData, languages);
+            const patch = mapFormValuesToMainPagePatch(
+                dataToPublish,
+                originalData,
+                languages,
+                currentMetrics.length ? currentMetrics : undefined,
+            );
 
             const { page, languages: updatedLanguages } = await MainPageApi.publish(client, patch, languages);
 
             setOriginalData(page);
             const nextValues = mapMainPageToFormValues(page, updatedLanguages);
-            savedValuesRef.current = nextValues;
 
-            methods.reset(nextValues);
+            const sanitizedNextValues = {
+                ...nextValues,
+                statisticsTitleUa: nextValues.statisticsTitleUa ?? '',
+                statisticsTitleEn: nextValues.statisticsTitleEn ?? '',
+            };
+
+            savedValuesRef.current = sanitizedNextValues;
+
+            methods.reset(sanitizedNextValues, { keepDefaultValues: false });
+            setCurrentMetrics([]);
 
             addToast('Зміни успішно опубліковано', ToastType.Success, 3000);
         } catch (error) {
@@ -190,6 +212,7 @@ export const MainPageContent = () => {
                                 initialData={originalData}
                                 isPublishDisabled={isPublishDisabled}
                                 onPublish={onPublish}
+                                onMetricsChange={setCurrentMetrics}
                             />
                         )}
                         {activeTab === 'donations' && <div>Блок "{MAIN_PAGE_TEXT.TABS.DONATIONS}" в розробці</div>}

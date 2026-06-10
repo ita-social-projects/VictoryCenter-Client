@@ -1,6 +1,8 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
-import { LocalizationLanguage } from '@/types/common/language';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { LocalizationLanguage, TranslationStatus } from '@/types/common/language';
+import { ReportFundsExpendituresSettingsLocalization } from '@/types/admin/reports';
 import { TranslateDisclaimerModal } from './TranslateDisclaimerModal';
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
@@ -90,7 +92,7 @@ const defaultProps = {
     onClose: jest.fn(),
     translationLanguages: [languageEn],
     settings: null,
-    existingLocalization: null,
+    existingLocalizations: [],
     onTranslateSuccess: jest.fn(),
 };
 
@@ -197,5 +199,77 @@ describe('TranslateDisclaimerModal', () => {
         render(<TranslateDisclaimerModal {...defaultProps} />);
 
         expect(screen.getByTestId('form-disabled')).toHaveTextContent('false');
+    });
+
+    describe('existingLocalizations mode detection', () => {
+        const existingLocalization: ReportFundsExpendituresSettingsLocalization = {
+            disclaimerTitle: 'Financial report',
+            language: { id: 2, code: 'en' },
+            translationStatus: TranslationStatus.Relevant,
+        };
+
+        it('uses add-mode title when existingLocalizations is empty', () => {
+            render(<TranslateDisclaimerModal {...defaultProps} existingLocalizations={[]} />);
+
+            expect(screen.getByTestId('modal-title')).toHaveTextContent(
+                FUNDS_EXPENDITURES_TEXT.MODAL.TRANSLATE_DISCLAIMER.TITLE,
+            );
+        });
+
+        it('uses edit-mode title when selected language has an existing localization', () => {
+            render(
+                <TranslateDisclaimerModal
+                    {...defaultProps}
+                    translationLanguages={[languageEn]}
+                    existingLocalizations={[existingLocalization]}
+                />,
+            );
+
+            expect(screen.getByTestId('modal-title')).toHaveTextContent(
+                COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.UPDATE_TRANSLATION,
+            );
+        });
+
+        it('uses add-mode title when selected language has no localization but another language does', () => {
+            render(
+                <TranslateDisclaimerModal
+                    {...defaultProps}
+                    translationLanguages={[languageEn, languageUk]}
+                    existingLocalizations={[existingLocalization]}
+                />,
+            );
+
+            // EN is selected by default and has a localization → edit mode title
+            expect(screen.getByTestId('modal-title')).toHaveTextContent(
+                COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.UPDATE_TRANSLATION,
+            );
+
+            // Switch to UK which has no localization → add mode title
+            fireEvent.click(screen.getByTestId('lang-uk'));
+
+            expect(screen.getByTestId('modal-title')).toHaveTextContent(
+                FUNDS_EXPENDITURES_TEXT.MODAL.TRANSLATE_DISCLAIMER.TITLE,
+            );
+        });
+
+        it('switches from add to edit mode title when language with localization is selected', () => {
+            render(
+                <TranslateDisclaimerModal
+                    {...defaultProps}
+                    translationLanguages={[languageEn, languageUk]}
+                    existingLocalizations={[existingLocalization]}
+                />,
+            );
+
+            fireEvent.click(screen.getByTestId('lang-uk'));
+            expect(screen.getByTestId('modal-title')).toHaveTextContent(
+                FUNDS_EXPENDITURES_TEXT.MODAL.TRANSLATE_DISCLAIMER.TITLE,
+            );
+
+            fireEvent.click(screen.getByTestId('lang-en'));
+            expect(screen.getByTestId('modal-title')).toHaveTextContent(
+                COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.UPDATE_TRANSLATION,
+            );
+        });
     });
 });

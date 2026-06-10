@@ -3,6 +3,7 @@
 
 .rightSection {
     width: 33.1rem;
+    max-width: 33.1rem;
     overflow-wrap: anywhere;
     word-break: normal;
 
@@ -51,15 +52,15 @@
     border-radius: 50%;
 }
 
-.switch input:checked + .slider {
+.switch input:checked+.slider {
     background-color: colors.$light-blue-500;
 }
 
-.switch input:checked + .slider::before {
+.switch input:checked+.slider::before {
     transform: translateX(1.375rem);
 }
 
-.switch input:focus + .slider {
+.switch input:focus+.slider {
     box-shadow: 0 0 1px colors.$slider-blue;
 }
 
@@ -80,4 +81,21 @@
 
 .donate-error-message {
     color: colors.$error;
+}
+
+@media (max-width: 900px) {
+    .rightSection {
+        width: 100%;
+        max-width: none;
+    }
+
+    .locationToggleContainer {
+        width: 100%;
+    }
+
+    .switch {
+        margin-left: 0;
+        display: block;
+        width: 100%;
+    }
 }

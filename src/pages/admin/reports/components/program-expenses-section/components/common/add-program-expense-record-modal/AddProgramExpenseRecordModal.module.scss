@@ -316,3 +316,25 @@
         width: 100%;
     }
 }
+
+.info {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.info-icon {
+    width: 18px;
+    height: 18px;
+
+    path {
+        stroke: c.$blue-500;
+    }
+}
+
+.info-text {
+    @include type.small-text-medium;
+    margin: 0;
+    color: c.$blue-500;
+    white-space: nowrap;
+}

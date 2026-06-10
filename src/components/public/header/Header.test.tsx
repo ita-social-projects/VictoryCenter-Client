@@ -114,13 +114,12 @@ describe('Header', () => {
             'href',
             PUBLIC_ROUTES.REPORTS.FULL,
         );
-        expect(screen.getByRole('link', { name: headerUk['HOW_TO_SUPPORT'] })).toHaveAttribute(
-            'href',
-            PUBLIC_ROUTES.MOCK.FULL,
-        );
+        const howToSupportLink = document.querySelector(`a.disable[href="${PUBLIC_ROUTES.MOCK.FULL}"]`);
+        expect(howToSupportLink).toBeInTheDocument();
+        expect(howToSupportLink).toHaveAttribute('href', PUBLIC_ROUTES.MOCK.FULL);
         expect(screen.getByRole('link', { name: headerUk['STORIES_OF_VICTORIES'] })).toHaveAttribute(
             'href',
-            PUBLIC_ROUTES.MOCK.FULL,
+            PUBLIC_ROUTES.STORIES_OF_VICTORIES.FULL,
         );
     });
 
@@ -191,7 +190,7 @@ describe('Header', () => {
         expect(teamLink).toHaveAttribute('data-disabled', 'false');
 
         const historyLink = within(aboutUsDropdown as HTMLElement).getByText(headerUk['HISTORY']);
-        expect(historyLink).toHaveAttribute('data-disabled', 'true');
+        expect(historyLink).toHaveAttribute('data-disabled', 'false');
 
         const programsDropdown = dropdowns.find((d) => d.textContent?.includes(headerUk['HIPPOTHERAPY']));
         expect(programsDropdown).toBeInTheDocument();
@@ -203,9 +202,6 @@ describe('Header', () => {
             name: headerUk['HIPPOTHERAPY'],
         });
         expect(hippotherapyLink).toHaveAttribute('data-disabled', 'false');
-
-        const prorgamsSessionsLink = within(programsDropdown as HTMLElement).getByText(headerUk['PROGRAMS_SESSIONS']);
-        expect(prorgamsSessionsLink).toHaveAttribute('data-disabled', 'true');
     });
 
     it('toggles mobile menu open and closed', () => {

@@ -28,6 +28,19 @@ export const MAIN_PAGE_TEXT = {
                 ENG: 'ENG',
             },
         },
+        EDIT_PANEL: {
+            TITLE: 'Редагування',
+            UKR_NAME_LABEL: 'UKR Назва',
+            ENG_NAME_LABEL: 'ENG Назва',
+            VALUE_LABEL: 'Значення',
+            UAH_VALUE_LABEL: 'UAH Сума коштів',
+            USD_VALUE_LABEL: 'USD Сума коштів',
+            PREFIX_LABEL: 'Префікс',
+            CANCEL_MODAL_TITLE: 'Відмінити зміни?',
+            PREFIX_NONE: 'Без префікса',
+            SYNC_ON_TEXT: 'Суми зібраних коштів підтягуються автоматично з вашої системи звітності.',
+            SYNC_OFF_TEXT: 'Коли перемикач вимкнено, дані не синхронізуються автоматично і задаються вручну.',
+        },
         PARTNERS: {
             TITLE_LABEL: COMMON_TEXT_ADMIN.TYPE.TITLE,
             DESCRIPTION_LABEL: COMMON_TEXT_ADMIN.TYPE.DESCRIPTION,
@@ -36,6 +49,8 @@ export const MAIN_PAGE_TEXT = {
 
     BUTTONS: {
         PUBLISH: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED,
+        CANCEL: COMMON_TEXT_ADMIN.BUTTON.CANCEL,
+        SAVE: COMMON_TEXT_ADMIN.BUTTON.SAVE,
     },
 
     ERRORS: {
@@ -102,5 +117,22 @@ export const MAIN_PAGE_VALIDATION = {
             getMinError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(5),
             getMaxError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(100),
         },
+    },
+
+    editPanel: {
+        name: {
+            min: 2,
+            max: 20,
+            getMinError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(2),
+            getMaxError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(20),
+        },
+    },
+
+    raisedFunds: {
+        REQUIRED: "Поле обов'язкове",
+        ONLY_NUMBERS: 'Дозволено лише цифри',
+        MAX_DIGITS: 'Не більше 9 цифр до коми',
+        NEGATIVE: "Сума не може бути від'ємною",
+        ZERO: 'Сума не може дорівнювати 0',
     },
 } as const;

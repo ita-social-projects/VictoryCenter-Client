@@ -1,34 +1,10 @@
-import { Metric, MetricPrefix, MetricType } from '@/types/admin/main-page';
-import { TranslationStatus } from '@/types/common/language';
+import { Metric } from '@/types/admin/main-page';
+import { metricEngagement, metricPartners } from '@/utils/test-mocks/statistics-block-mocks';
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { StatisticsPreview } from './StatisticsPreview';
 
-const metrics: Metric[] = [
-    {
-        id: 1,
-        name: 'Партнерів',
-        value: 20,
-        type: MetricType.Partners,
-        prefix: MetricPrefix.Plus,
-        isHidden: false,
-        priority: 1,
-        localizations: [
-            { language: { id: 1, code: 'uk' }, translationStatus: TranslationStatus.Relevant, name: 'Партнерів' },
-            { language: { id: 2, code: 'en' }, translationStatus: TranslationStatus.Relevant, name: 'Partners' },
-        ],
-    },
-    {
-        id: 2,
-        name: 'Engagement',
-        value: 50,
-        type: MetricType.Programs,
-        prefix: MetricPrefix.Percent,
-        isHidden: false,
-        priority: 2,
-        localizations: [],
-    },
-];
+const metrics: Metric[] = [metricPartners, metricEngagement];
 
 describe('StatisticsPreview', () => {
     it('renders preview title and metrics', () => {
@@ -66,8 +42,30 @@ describe('StatisticsPreview', () => {
         expect(onLanguageChange).toHaveBeenCalledWith('EN');
     });
 
+    it('switches to UA language when UA tab is clicked', () => {
+        const onLanguageChange = jest.fn();
+        render(
+            <StatisticsPreview
+                language="EN"
+                onLanguageChange={onLanguageChange}
+                metrics={metrics}
+                hiddenMetricIds={[]}
+            />,
+        );
+
+        fireEvent.click(screen.getByText('UKR'));
+        expect(onLanguageChange).toHaveBeenCalledWith('UA');
+    });
+
     it('hides metrics by hiddenMetricIds', () => {
-        render(<StatisticsPreview language="UA" onLanguageChange={() => {}} metrics={metrics} hiddenMetricIds={[2]} />);
+        render(
+            <StatisticsPreview
+                language="UA"
+                onLanguageChange={() => {}}
+                metrics={metrics}
+                hiddenMetricIds={[metricEngagement.id ?? 0]}
+            />,
+        );
 
         expect(screen.getByText('Партнерів')).toBeInTheDocument();
         expect(screen.queryByText('Engagement')).not.toBeInTheDocument();
@@ -91,5 +89,25 @@ describe('StatisticsPreview', () => {
             <StatisticsPreview language="UA" onLanguageChange={() => {}} metrics={[noPrefix]} hiddenMetricIds={[]} />,
         );
         expect(screen.getByText('999')).toBeInTheDocument();
+    });
+
+    it('hides metrics when id is undefined and hiddenMetricIds includes fallback 0', () => {
+        const noIdMetric: Metric = {
+            ...metrics[0],
+            id: undefined,
+            name: 'NoIdMetric',
+            localizations: [],
+        };
+
+        render(
+            <StatisticsPreview
+                language="UA"
+                onLanguageChange={() => {}}
+                metrics={[noIdMetric]}
+                hiddenMetricIds={[0]}
+            />,
+        );
+
+        expect(screen.queryByText('NoIdMetric')).not.toBeInTheDocument();
     });
 });

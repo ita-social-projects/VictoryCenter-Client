@@ -4,7 +4,11 @@ import {
     SectionFormActions,
 } from '@/components/admin/section-form-actions/SectionFormActions';
 import { ImageValues } from '@/types/common/image';
-import { HistoryLocalizableFields, HistorySectionContentDto, HistorySectionDto } from '@/types/common/history-sections';
+import {
+    HistorySectionContentLocalizableFields,
+    HistorySectionContentDto,
+    HistorySectionDto,
+} from '@/types/common/history-sections';
 import { ContentType } from '@/types/common/section-contents';
 import { SectionMode } from '@/types/common/sections';
 import {
@@ -166,7 +170,7 @@ export const HistorySectionForm = ({
     const [originalSection, setOriginalSection] = useState<HistorySectionDto>(() =>
         normalizeHistorySectionContents(section),
     );
-    const [textFields, setTextFields] = useState<HistoryLocalizableFields>();
+    const [textFields, setTextFields] = useState<HistorySectionContentLocalizableFields>();
     const [isDirty, setIsDirty] = useState(false);
     const [validationResetKey, setValidationResetKey] = useState(0);
     const [sectionMode, setSectionMode] = useState<SectionMode>(

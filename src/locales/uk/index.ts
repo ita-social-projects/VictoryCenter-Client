@@ -9,7 +9,9 @@ import donateUk from './donate.json';
 import globalUk from './global.json';
 import reportsPageUk from './reports.json';
 import partnersPageUk from './partners.json';
+import successPageUk from './success.json';
 import contactUsPageUk from './contact-us.json';
+import historyPageUk from './history.json';
 
 export {
     headerUk,
@@ -22,6 +24,8 @@ export {
     donateUk,
     reportsPageUk,
     partnersPageUk,
+    successPageUk,
     globalUk,
     contactUsPageUk,
+    historyPageUk,
 };

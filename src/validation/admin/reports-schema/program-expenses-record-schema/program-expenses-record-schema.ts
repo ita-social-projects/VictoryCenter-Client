@@ -1,13 +1,6 @@
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
 import { ProgramExpensesRecord } from '@/types/admin/reports';
-import {
-    FundsExpendituresAmountValidationTrigger,
-    FundsExpendituresReportingYearValidationTrigger,
-    normalizeFundsExpendituresAmountInput,
-    validateFundsExpendituresAmount,
-    validateFundsExpendituresReportingYear,
-} from '@/validation/admin/reports-schema/funds-expenditures-record-schema/funds-expenditures-record-schema';
 
 export type ProgramExpenseProgramValidationTrigger = 'change' | 'blur';
 
@@ -17,18 +10,6 @@ interface ValidateProgramExpenseProgramParams {
     records: ProgramExpensesRecord[];
     trigger?: ProgramExpenseProgramValidationTrigger;
 }
-
-export const normalizeProgramExpenseAmountInput = normalizeFundsExpendituresAmountInput;
-
-export const validateProgramExpenseAmount = (
-    value: string,
-    trigger: FundsExpendituresAmountValidationTrigger = 'change',
-): string | undefined => validateFundsExpendituresAmount(value, trigger);
-
-export const validateProgramExpenseReportingYear = (
-    value: string | undefined,
-    trigger: FundsExpendituresReportingYearValidationTrigger = 'change',
-): string | undefined => validateFundsExpendituresReportingYear(value, trigger);
 
 export const validateProgramExpenseProgram = ({
     recordId,

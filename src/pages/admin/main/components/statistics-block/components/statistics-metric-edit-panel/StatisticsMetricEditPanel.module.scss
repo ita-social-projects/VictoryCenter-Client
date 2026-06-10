@@ -1,0 +1,40 @@
+@use '@/assets/sass/variables/colors' as c;
+
+.panel {
+    background-color: c.$grey-150;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.header {
+    font-size: 14px;
+    font-weight: 500;
+    color: c.$grey-800;
+}
+
+.formGrid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 16px;
+
+    @media (max-width: 1800px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.prefixGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.prefixLabel {
+    font-size: 14px;
+    color: c.$donate-tooltip-color;
+}

@@ -1,9 +1,14 @@
 import * as yup from 'yup';
 import { CONTACT_FORM_LIMITS, CONTACT_FORM_MESSAGES } from '@/const/public/contact-form';
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@.]+\.[^\s@.]{2,}$/;
+
 export const contactFormSchema = yup.object({
     name: yup.string().required(),
-    email: yup.string().email().required(),
+    email: yup
+        .string()
+        .matches(EMAIL_REGEX, CONTACT_FORM_MESSAGES.EMAIL.INVALID)
+        .required(CONTACT_FORM_MESSAGES.EMAIL.INVALID),
     subject: yup
         .string()
         .min(CONTACT_FORM_LIMITS.SUBJECT.MIN, CONTACT_FORM_MESSAGES.SUBJECT.MIN_ERROR)

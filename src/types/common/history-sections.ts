@@ -9,7 +9,7 @@ import { ContentType } from './section-contents';
 import { SectionTemplate } from './sections';
 
 export interface HistorySectionContentDto
-    extends HistoryLocalizableFields,
+    extends HistorySectionContentLocalizableFields,
         EntityWithDtoLocalizations<HistorySectionContentLocalizationDto> {
     id?: number;
     sectionId?: number;
@@ -21,7 +21,7 @@ export interface HistorySectionContentDto
     imageId?: number | null;
 }
 export interface HistorySectionContent
-    extends HistoryLocalizableFields,
+    extends HistorySectionContentLocalizableFields,
         EntityWithLocalizations<HistorySectionContentLocalization> {
     id?: number;
     sectionId?: number;
@@ -32,7 +32,7 @@ export interface HistorySectionContent
     image?: Image | ImageValues | null;
     imageId?: number | null;
 }
-export interface HistoryLocalizableFields {
+export interface HistorySectionContentLocalizableFields {
     title?: string | null;
     description?: string | null;
 }
@@ -52,10 +52,12 @@ export interface HistorySection {
     contents: HistorySectionContent[];
 }
 
-export interface HistorySectionContentLocalizationDto extends EntityLocalizationDto, HistoryLocalizableFields {
+export interface HistorySectionContentLocalizationDto
+    extends EntityLocalizationDto,
+        HistorySectionContentLocalizableFields {
     entityId: number;
 }
-export interface HistorySectionContentLocalization extends EntityLocalization, HistoryLocalizableFields {}
+export interface HistorySectionContentLocalization extends EntityLocalization, HistorySectionContentLocalizableFields {}
 
 export interface CreateUpdateHistorySectionDto {
     template: SectionTemplate;

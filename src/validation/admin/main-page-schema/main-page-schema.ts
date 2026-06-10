@@ -50,6 +50,7 @@ export const MainPageValidationSchema: Yup.ObjectSchema<MainPageFormValues> = Yu
     statisticsTitleUa: buildStringValidation(MAIN_PAGE_VALIDATION.statisticsBlock.title),
     statisticsTitleEn: buildStringValidation(MAIN_PAGE_VALIDATION.statisticsBlock.title),
     statisticsImage: imageSchema,
+    metrics: Yup.array().optional(),
 });
 
 export const MAIN_PAGE_VALIDATION_FUNCTIONS = {

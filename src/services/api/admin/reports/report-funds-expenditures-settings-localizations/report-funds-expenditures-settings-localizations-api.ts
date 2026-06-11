@@ -4,9 +4,22 @@ import {
     ReportFundsExpendituresSettingsLocalizationDto,
     UpdateReportFundsExpendituresSettingsLocalizationDto,
 } from '@/types/admin/reports';
+import { RequestOptions } from '@/types/common/api';
 import { AxiosInstance } from 'axios';
 
 export const ReportFundsExpendituresSettingsLocalizationsApi = {
+    getByEntityId: async (
+        client: AxiosInstance,
+        entityId: number,
+        options: RequestOptions = {},
+    ): Promise<ReportFundsExpendituresSettingsLocalizationDto[]> => {
+        const response = await client.get<ReportFundsExpendituresSettingsLocalizationDto[]>(
+            `${API_ROUTES.REPORT_FUNDS_EXPENDITURES_SETTINGS_LOCALIZATIONS.BASE}/${entityId}`,
+            { signal: options.cancellationSignal },
+        );
+        return response.data;
+    },
+
     create: async (
         client: AxiosInstance,
         data: CreateReportFundsExpendituresSettingsLocalizationDto,

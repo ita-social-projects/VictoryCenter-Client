@@ -72,6 +72,7 @@ async function openPublishModal(
     props: Partial<React.ComponentProps<typeof PdfSectionContentBlock>> = {},
 ) {
     render(<PdfSectionContentBlock {...DEFAULT_PROPS} {...props} />);
+
     await enterEditMode(user);
     await changeTitle(user, title);
     await clickPublish(user);
@@ -258,6 +259,51 @@ describe('PdfSectionContentBlock', () => {
             await confirmModal(utils);
             expect(screen.queryByDisplayValue('Updated Title')).not.toBeInTheDocument();
             expect(screen.getByText(MOCK_CONTENT.title)).toBeInTheDocument();
+        });
+    });
+
+    describe('Translation Features', () => {
+        it('should render translate button in view mode', () => {
+            render(<PdfSectionContentBlock content={MOCK_CONTENT} translationLanguages={[]} />);
+            expect(screen.getByRole('button', { name: PDF_FILES_SECTION_TEXT.ACTIONS.TRANSLATE })).toBeInTheDocument();
+        });
+
+        it('should call onTranslateClick when translate button is clicked', async () => {
+            const onTranslateClick = jest.fn();
+            render(
+                <PdfSectionContentBlock
+                    content={MOCK_CONTENT}
+                    onTranslateClick={onTranslateClick}
+                    translationLanguages={[]}
+                />,
+            );
+
+            const user = userEvent.setup();
+            await user.click(screen.getByRole('button', { name: PDF_FILES_SECTION_TEXT.ACTIONS.TRANSLATE }));
+
+            expect(onTranslateClick).toHaveBeenCalledTimes(1);
+        });
+
+        it('should render translation statuses in view mode', () => {
+            render(
+                <PdfSectionContentBlock
+                    content={MOCK_CONTENT}
+                    translationLanguages={[
+                        { id: 1, code: 'uk', name: 'Ukrainian' },
+                        { id: 2, code: 'en', name: 'English' },
+                    ]}
+                />,
+            );
+
+            expect(screen.getByRole('button', { name: PDF_FILES_SECTION_TEXT.ACTIONS.EDIT })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: PDF_FILES_SECTION_TEXT.ACTIONS.TRANSLATE })).toBeInTheDocument();
+        });
+
+        it('should not call onTranslateClick if prop is not provided', async () => {
+            render(<PdfSectionContentBlock content={MOCK_CONTENT} translationLanguages={[]} />);
+
+            const user = userEvent.setup();
+            await user.click(screen.getByRole('button', { name: PDF_FILES_SECTION_TEXT.ACTIONS.TRANSLATE }));
         });
     });
 });

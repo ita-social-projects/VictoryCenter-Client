@@ -365,11 +365,10 @@ describe('HistoryPageContent', () => {
     it('calculates localizedEntity correctly, skipping Image content type', () => {
         const sections = mockSingleSectionData();
 
-        // Мокаємо результат мапінгу з різними типами контенту
         const mappedModel = {
             contents: [
-                { id: 'content-1', contentType: ContentType.Image }, // Should be skipped
-                { id: 'content-2', contentType: ContentType.Title }, // Should be selected
+                { id: 'content-1', contentType: ContentType.Image },
+                { id: 'content-2', contentType: ContentType.Title },
                 { id: 'content-3', contentType: ContentType.Description },
             ],
         };
@@ -377,10 +376,8 @@ describe('HistoryPageContent', () => {
 
         render(<HistoryPageContent />);
 
-        // Перевіряємо, чи викликався мапер
         expect(mockedMapHistorySectionDtoToModel).toHaveBeenCalledWith(sections[0]);
 
-        // Перевіряємо, чи отримав тулбар правильний localizedEntity (перший не-Image контент)
         expect(mockToolbarProps).toHaveBeenCalledWith(
             expect.objectContaining({
                 localizedEntity: { id: 'content-2', contentType: ContentType.Title },

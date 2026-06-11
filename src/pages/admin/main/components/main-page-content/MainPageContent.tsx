@@ -18,8 +18,10 @@ import { ImageApi } from '@/services/api/admin/image/image-api';
 import { MainPageApi } from '@/services/api/admin/main-page/main-page-api';
 import { MainPageLocalizationsApi } from '@/services/api/admin/main-page/main-page-localizations-api/main-page-localizations-api';
 import {
+    ImpactStatistic,
     MAIN_PAGE_FORM_DEFAULTS,
     MainPage,
+    MainPageLocalization,
     MainPageFormValues,
     MainPageLocalizationBlock,
     MainPageTranslationStatusDto,
@@ -27,7 +29,12 @@ import {
 } from '@/types/admin/main-page';
 import { ToastType } from '@/types/admin/toast';
 import { ImageValues } from '@/types/common/image';
-import { EntityWithTranslationStatuses } from '@/types/common/language';
+import {
+    EntityLocalization,
+    EntityWithTranslationStatuses,
+    LocalizationLanguage,
+    TranslationStatus,
+} from '@/types/common/language';
 import {
     mapFormValuesToMainPagePatch,
     mapMainPageToFormValues,
@@ -67,6 +74,48 @@ const sanitizeMainPageFormValues = (values: MainPageFormValues): MainPageFormVal
     statisticsTitleUa: values.statisticsTitleUa ?? '',
     statisticsTitleEn: values.statisticsTitleEn ?? '',
 });
+
+const getLocalizationLanguageCode = (localization: EntityLocalization): string | undefined =>
+    localization.language?.code ?? (localization as EntityLocalization & { code?: string }).code;
+
+const getLocalizationLanguageId = (localization: EntityLocalization): number | undefined =>
+    localization.language?.id ?? (localization as EntityLocalization & { languageId?: number }).languageId;
+
+const isLocalizationForLanguage = (localization: EntityLocalization, language: LocalizationLanguage) =>
+    getLocalizationLanguageId(localization) === language.id ||
+    getLocalizationLanguageCode(localization) === language.code;
+
+const getLocalizationStatus = <TLocalization extends EntityLocalization>(
+    localizations: TLocalization[] | undefined,
+    language: LocalizationLanguage,
+) => localizations?.find((localization) => isLocalizationForLanguage(localization, language))?.translationStatus;
+
+const getStatisticsLocalizationStatus = (
+    impactStatistics: ImpactStatistic | null | undefined,
+    language: LocalizationLanguage,
+) => {
+    if (!impactStatistics) {
+        return undefined;
+    }
+
+    const statisticStatus = getLocalizationStatus(impactStatistics.localizations, language);
+    const metricStatuses = (impactStatistics.metrics ?? [])
+        .map((metric) => getLocalizationStatus(metric.localizations, language))
+        .filter((status): status is TranslationStatus => status != null);
+
+    if (!metricStatuses.length) {
+        return statisticStatus;
+    }
+
+    if (statisticStatus === TranslationStatus.Outdated || metricStatuses.includes(TranslationStatus.Outdated)) {
+        return TranslationStatus.Outdated;
+    }
+
+    return statisticStatus === TranslationStatus.Relevant &&
+        metricStatuses.every((status) => status === TranslationStatus.Relevant)
+        ? TranslationStatus.Relevant
+        : undefined;
+};
 
 export const MainPageContent = () => {
     const client = useAdminClient();
@@ -289,21 +338,42 @@ export const MainPageContent = () => {
     const isReadOnlyLanguage = selectedLanguage ? selectedLanguage.code !== DEFAULT_LOCALE : false;
     const getBlockTranslationStatus = (block: MainPageLocalizationBlock) =>
         translationStatuses.find((status) => status.block === block)?.translationStatus;
+    const getBlockLocalizationStatus = (block: MainPageLocalizationBlock, language: LocalizationLanguage) => {
+        switch (block) {
+            case MainPageLocalizationBlock.Title:
+                return getLocalizationStatus<MainPageLocalization>(originalData?.localizations, language);
+            case MainPageLocalizationBlock.AboutUs:
+                return getLocalizationStatus(originalData?.mainAboutUs?.localizations, language);
+            case MainPageLocalizationBlock.Partners:
+                return getLocalizationStatus(originalData?.mainPartners?.localizations, language);
+            case MainPageLocalizationBlock.ImpactStatistics:
+                return getStatisticsLocalizationStatus(originalData?.impactStatistics, language);
+            default:
+                return undefined;
+        }
+    };
     const getTabTranslationStatusEntity = (tab: TabItem): EntityWithTranslationStatuses => {
-        if (!tab.localizationBlock) {
+        if (tab.localizationBlock == null) {
             return { translationStatuses: [] };
         }
 
-        const translationStatus = getBlockTranslationStatus(tab.localizationBlock);
+        const fallbackTranslationStatus = getBlockTranslationStatus(tab.localizationBlock);
+        const translationStatusesByLanguage = translationLanguages
+            .map((language) => {
+                const translationStatus =
+                    getBlockLocalizationStatus(tab.localizationBlock!, language) ?? fallbackTranslationStatus;
 
-        return {
-            translationStatuses:
-                translationStatus == null
-                    ? []
-                    : translationLanguages.map((language) => ({
+                return translationStatus == null
+                    ? null
+                    : {
                           languageId: language.id,
                           translationStatus,
-                      })),
+                      };
+            })
+            .filter((status): status is NonNullable<typeof status> => status != null);
+
+        return {
+            translationStatuses: translationStatusesByLanguage,
         };
     };
 

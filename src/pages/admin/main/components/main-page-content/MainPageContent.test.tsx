@@ -372,6 +372,40 @@ describe('MainPageContent', () => {
         expect(screen.getByTestId('title-block-form-read-only')).toHaveTextContent('true');
     });
 
+    it('uses title block localization status without treating nested null blocks as missing title translation', async () => {
+        (MainPageApi.get as jest.Mock).mockResolvedValue({
+            ...mockPageData,
+            page: {
+                ...mockPageData.page,
+                localizations: [
+                    {
+                        code: 'en',
+                        translationStatus: TranslationStatus.Relevant,
+                        title: 'Victory Center - Rehabilitation and Support Centre',
+                        description: 'Official website of Victory Center.',
+                        mainAboutUs: null,
+                        mainPartners: null,
+                        mainDonations: null,
+                    },
+                ],
+            },
+        });
+        (MainPageLocalizationsApi.getStatuses as jest.Mock).mockResolvedValue([
+            {
+                block: MainPageLocalizationBlock.Title,
+                entityId: 1,
+                languageId: 2,
+                translationStatus: TranslationStatus.Outdated,
+            },
+        ]);
+
+        await renderAndLoadContent();
+
+        await waitFor(() => {
+            expect(screen.getAllByText('2:1').length).toBeGreaterThan(0);
+        });
+    });
+
     it('uses original content as fallback when selected translation is missing', async () => {
         mockLocalizationToolkitState.selectedLanguage = { id: 2, code: 'en', name: 'EN' };
         jest.spyOn(axios, 'isAxiosError').mockReturnValue(true);

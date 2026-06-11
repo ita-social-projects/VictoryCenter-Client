@@ -33,11 +33,7 @@ interface TitleBlockFormProps {
     isReadOnly?: boolean;
 }
 
-export const TitleBlockForm = ({
-    isPublishDisabled,
-    onPublish,
-    isReadOnly = false,
-}: TitleBlockFormProps) => {
+export const TitleBlockForm = ({ isPublishDisabled, onPublish, isReadOnly = false }: TitleBlockFormProps) => {
     const [imageError, setImageError] = useState<string | null>(null);
 
     const {

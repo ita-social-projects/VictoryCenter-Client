@@ -30,7 +30,8 @@ describe('MainPageLocalizationsApi', () => {
             get: jest.fn().mockResolvedValueOnce({ data: responseData }),
         };
 
-        const result = await MainPageLocalizationsApi.getByLanguageId(mockClient as any, entityId, languageId);
+        const localizationPromise = MainPageLocalizationsApi.getByLanguageId(mockClient as any, entityId, languageId);
+        const result = await localizationPromise;
 
         expect(mockClient.get).toHaveBeenCalledWith(
             `${API_ROUTES.MAIN_PAGE_LOCALIZATIONS.BASE}/${entityId}/${languageId}`,

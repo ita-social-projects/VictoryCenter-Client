@@ -336,7 +336,10 @@ export const MainPageContent = () => {
                                 const localizedEntity = getTabTranslationStatusEntity(tab);
 
                                 return (
-                                    <LocalizationStatuses languages={translationLanguages} localizedEntity={localizedEntity} />
+                                    <LocalizationStatuses
+                                        languages={translationLanguages}
+                                        localizedEntity={localizedEntity}
+                                    />
                                 );
                             }}
                         />

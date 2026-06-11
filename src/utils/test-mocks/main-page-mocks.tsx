@@ -37,19 +37,21 @@ export const MockImageUploadForm = ({ setImageError, disabled }: any) => (
 
 export const MockMainPageCategoryBar = ({
     categories,
+    getCategoryDisplayName,
+    getCategoryKey,
     onCategorySelect,
     selectedCategory,
     renderCategoryExtra,
 }: any) => (
     <div data-testid="category-bar">
-        {categories.map((c: any) => (
-            <div key={c.id}>
+        {[...categories, ...((globalThis as any).__MAIN_PAGE_EXTRA_TABS__ ?? [])].map((c: any) => (
+            <div key={getCategoryKey?.(c) ?? c.id}>
                 <button
                     data-testid={`tab-btn-${c.id}`}
                     disabled={selectedCategory?.id === c.id}
                     onClick={() => onCategorySelect(c)}
                 >
-                    {c.label}
+                    {getCategoryDisplayName?.(c) ?? c.label}
                 </button>
                 {renderCategoryExtra?.(c)}
             </div>

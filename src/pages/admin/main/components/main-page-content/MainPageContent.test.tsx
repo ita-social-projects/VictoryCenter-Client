@@ -30,10 +30,17 @@ const mockLocalizationToolkitState = {
     translationLanguages: [{ id: 2, code: 'en', name: 'EN' }],
     selectedLanguage: { id: 1, code: 'uk', name: 'UA' },
     onLanguageChange: jest.fn(),
+    errorStateMessage: null as string | null,
 };
 
 jest.mock('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit', () => ({
-    useLocalizationToolkit: () => mockLocalizationToolkitState,
+    useLocalizationToolkit: ({ setErrorState }: any) => {
+        if (mockLocalizationToolkitState.errorStateMessage) {
+            setErrorState(mockLocalizationToolkitState.errorStateMessage, 'languages');
+        }
+
+        return mockLocalizationToolkitState;
+    },
 }));
 
 jest.mock('@/components/admin/language-toolkit/LanguageToolkit', () => ({
@@ -142,6 +149,7 @@ jest.mock('../statistics-block/StatisticsBlockForm', () => ({
                     onClick={() => {
                         onMetricsChange?.([syncedMetric]);
                         setValue('metrics', [syncedMetric], { shouldDirty: true, shouldValidate: true });
+                        setValue('statisticsImage', { url: 'blob:statistics-no-id' }, { shouldDirty: true });
                     }}
                 >
                     Make Dirty
@@ -161,7 +169,7 @@ jest.mock('../statistics-block/StatisticsBlockForm', () => ({
 jest.mock('../main-page-publish-modal/MainPagePublishModal', () => ({
     __esModule: true,
     MainPagePublishModal: ({ isOpen, onConfirm, onCancel, isButtonsDisabled }: any) =>
-        isOpen ? (
+        isOpen || (globalThis as any).__MAIN_PAGE_FORCE_MODAL__ ? (
             <div data-testid="publish-modal">
                 <button data-testid="confirm-publish" onClick={onConfirm} disabled={isButtonsDisabled}>
                     Confirm
@@ -260,6 +268,9 @@ describe('MainPageContent', () => {
         ];
         mockLocalizationToolkitState.translationLanguages = [{ id: 2, code: 'en', name: 'EN' }];
         mockLocalizationToolkitState.selectedLanguage = { id: 1, code: 'uk', name: 'UA' };
+        mockLocalizationToolkitState.errorStateMessage = null;
+        (globalThis as any).__MAIN_PAGE_EXTRA_TABS__ = [];
+        (globalThis as any).__MAIN_PAGE_FORCE_MODAL__ = false;
 
         (MainPageApi.get as jest.Mock).mockResolvedValue(mockPageData);
         (MainPageApi.publish as jest.Mock).mockResolvedValue(mockPublishedData);
@@ -291,6 +302,8 @@ describe('MainPageContent', () => {
     });
 
     afterEach(() => {
+        delete (globalThis as any).__MAIN_PAGE_EXTRA_TABS__;
+        delete (globalThis as any).__MAIN_PAGE_FORCE_MODAL__;
         jest.restoreAllMocks();
     });
 
@@ -351,6 +364,14 @@ describe('MainPageContent', () => {
         expect(screen.getByTestId('title-block-form-read-only')).toHaveTextContent('false');
     });
 
+    it('shows localization toolkit errors through toast callback', async () => {
+        mockLocalizationToolkitState.errorStateMessage = 'Language loading failed';
+
+        await renderAndLoadContent();
+
+        expect(mockAddToast).toHaveBeenCalledWith('Language loading failed', 'error', 3000);
+    });
+
     it('loads selected translation and renders localized tabs as read-only for non-default language', async () => {
         mockLocalizationToolkitState.selectedLanguage = { id: 2, code: 'en', name: 'EN' };
         (MainPageLocalizationsApi.getStatuses as jest.Mock).mockResolvedValue([
@@ -370,6 +391,66 @@ describe('MainPageContent', () => {
         });
 
         expect(screen.getByTestId('title-block-form-read-only')).toHaveTextContent('true');
+    });
+
+    it('uses original and empty-string fallbacks when selected translation fields are missing', async () => {
+        mockLocalizationToolkitState.selectedLanguage = { id: 2, code: 'en', name: 'EN' };
+        (MainPageApi.get as jest.Mock).mockResolvedValue({
+            ...mockPageData,
+            page: {
+                id: 1,
+                title: null,
+                description: null,
+                mainAboutUs: null,
+                mainPartners: null,
+                impactStatistics: { metrics: [] },
+            },
+        });
+        (MainPageLocalizationsApi.getByLanguageId as jest.Mock).mockResolvedValue({
+            entityId: 1,
+            title: null,
+            description: null,
+            mainAboutUs: null,
+            mainPartners: null,
+        });
+
+        await renderAndLoadContent();
+
+        await waitFor(() => {
+            expect(MainPageLocalizationsApi.getByLanguageId).toHaveBeenCalledWith(expect.any(Object), 1, 2);
+        });
+
+        expect(screen.getByTestId('title-block-form-read-only')).toHaveTextContent('true');
+    });
+
+    it('does not update selected translation state after unmount', async () => {
+        mockLocalizationToolkitState.selectedLanguage = { id: 2, code: 'en', name: 'EN' };
+        let resolveLocalization: (value: any) => void;
+        (MainPageLocalizationsApi.getByLanguageId as jest.Mock).mockReturnValue(
+            new Promise((resolve) => {
+                resolveLocalization = resolve;
+            }),
+        );
+
+        const { unmount } = render(<MainPageContent />);
+
+        await waitFor(() => {
+            expect(MainPageLocalizationsApi.getByLanguageId).toHaveBeenCalledWith(expect.any(Object), 1, 2);
+        });
+
+        unmount();
+
+        await act(async () => {
+            resolveLocalization!({
+                entityId: 1,
+                title: 'Late title',
+                description: 'Late description',
+                mainAboutUs: null,
+                mainPartners: null,
+            });
+        });
+
+        expect(MainPageLocalizationsApi.getByLanguageId).toHaveBeenCalledTimes(1);
     });
 
     it('uses title block localization status without treating nested null blocks as missing title translation', async () => {
@@ -406,6 +487,219 @@ describe('MainPageContent', () => {
         });
     });
 
+    it('uses block-specific statuses for about, partners and relevant statistics metrics', async () => {
+        (MainPageApi.get as jest.Mock).mockResolvedValue({
+            ...mockPageData,
+            page: {
+                ...mockPageData.page,
+                mainAboutUs: {
+                    title: 'About',
+                    description: 'About description',
+                    localizations: [{ languageId: 2, translationStatus: TranslationStatus.Relevant }],
+                },
+                mainPartners: {
+                    title: 'Partners',
+                    description: 'Partners description',
+                    localizations: [{ languageId: 2, translationStatus: TranslationStatus.Outdated }],
+                },
+                impactStatistics: {
+                    title: 'Stats',
+                    localizations: [{ languageId: 2, translationStatus: TranslationStatus.Relevant }],
+                    metrics: [
+                        {
+                            id: 1,
+                            name: 'Metric',
+                            value: 10,
+                            type: MetricType.Partners,
+                            isHidden: false,
+                            priority: 1,
+                            localizations: [{ languageId: 2, translationStatus: TranslationStatus.Relevant }],
+                        },
+                    ],
+                },
+            },
+        });
+
+        await renderAndLoadContent();
+
+        await waitFor(() => {
+            expect(screen.getAllByText('2:1').length).toBeGreaterThanOrEqual(2);
+            expect(screen.getAllByText('2:0').length).toBeGreaterThanOrEqual(1);
+        });
+    });
+
+    it('marks statistics translation outdated when a metric localization is outdated', async () => {
+        (MainPageApi.get as jest.Mock).mockResolvedValue({
+            ...mockPageData,
+            page: {
+                ...mockPageData.page,
+                impactStatistics: {
+                    title: 'Stats',
+                    localizations: [{ languageId: 2, translationStatus: TranslationStatus.Relevant }],
+                    metrics: [
+                        {
+                            id: 1,
+                            name: 'Metric',
+                            value: 10,
+                            type: MetricType.Partners,
+                            isHidden: false,
+                            priority: 1,
+                            localizations: [{ languageId: 2, translationStatus: TranslationStatus.Outdated }],
+                        },
+                    ],
+                },
+            },
+        });
+
+        await renderAndLoadContent();
+
+        await waitFor(() => {
+            expect(screen.getAllByText('2:0').length).toBeGreaterThan(0);
+        });
+    });
+
+    it('falls back to API status when statistics data is missing', async () => {
+        (MainPageApi.get as jest.Mock).mockResolvedValue({
+            ...mockPageData,
+            page: {
+                ...mockPageData.page,
+                impactStatistics: null,
+            },
+        });
+        (MainPageLocalizationsApi.getStatuses as jest.Mock).mockResolvedValue([
+            {
+                block: MainPageLocalizationBlock.ImpactStatistics,
+                entityId: 1,
+                languageId: 2,
+                translationStatus: TranslationStatus.Outdated,
+            },
+        ]);
+
+        await renderAndLoadContent();
+
+        await waitFor(() => {
+            expect(screen.getAllByText('2:0').length).toBeGreaterThan(0);
+        });
+    });
+
+    it('handles statistics localization when metrics array is absent', async () => {
+        (MainPageApi.get as jest.Mock).mockResolvedValue({
+            ...mockPageData,
+            page: {
+                ...mockPageData.page,
+                impactStatistics: {
+                    title: 'Stats',
+                    localizations: [{ languageId: 2, translationStatus: TranslationStatus.Relevant }],
+                },
+            },
+        });
+
+        await renderAndLoadContent();
+
+        await waitFor(() => {
+            expect(screen.getAllByText('2:1').length).toBeGreaterThan(0);
+        });
+    });
+
+    it('does not mark statistics relevant when metric is relevant but statistic status is missing', async () => {
+        (MainPageApi.get as jest.Mock).mockResolvedValue({
+            ...mockPageData,
+            page: {
+                ...mockPageData.page,
+                impactStatistics: {
+                    title: 'Stats',
+                    localizations: [],
+                    metrics: [
+                        {
+                            id: 1,
+                            name: 'Metric',
+                            value: 10,
+                            type: MetricType.Partners,
+                            isHidden: false,
+                            priority: 1,
+                            localizations: [{ languageId: 2, translationStatus: TranslationStatus.Relevant }],
+                        },
+                    ],
+                },
+            },
+        });
+
+        await renderAndLoadContent();
+
+        await waitFor(() => {
+            expect(MainPageLocalizationsApi.getStatuses).toHaveBeenCalled();
+        });
+
+        expect(screen.queryByText('2:1')).not.toBeInTheDocument();
+    });
+
+    it('falls back to API status for unsupported tab localization blocks', async () => {
+        (globalThis as any).__MAIN_PAGE_EXTRA_TABS__ = [
+            {
+                id: 'custom',
+                label: 'Custom',
+                localizationBlock: 999,
+            },
+        ];
+        (MainPageLocalizationsApi.getStatuses as jest.Mock).mockResolvedValue([
+            {
+                block: 999,
+                entityId: 1,
+                languageId: 2,
+                translationStatus: TranslationStatus.Outdated,
+            },
+        ]);
+
+        await renderAndLoadContent();
+
+        await waitFor(() => {
+            expect(screen.getAllByText('2:0').length).toBeGreaterThan(0);
+        });
+    });
+
+    it('falls back to the first configured tab after selecting an unsupported tab id', async () => {
+        (globalThis as any).__MAIN_PAGE_EXTRA_TABS__ = [
+            {
+                id: 'custom',
+                label: 'Custom',
+                localizationBlock: 999,
+            },
+        ];
+
+        await renderAndLoadContent();
+
+        fireEvent.click(screen.getByTestId('tab-btn-custom'));
+
+        expect(screen.queryByTestId('title-block-form')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('about-us-block-form')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('partners-block-form')).not.toBeInTheDocument();
+    });
+
+    it('shows a toast when translation status loading fails with non-404 error', async () => {
+        jest.spyOn(axios, 'isAxiosError').mockReturnValue(false);
+        (MainPageLocalizationsApi.getStatuses as jest.Mock).mockRejectedValue(new Error('Status failed'));
+
+        await renderAndLoadContent();
+
+        await waitFor(() => {
+            expect(mockAddToast).toHaveBeenCalledWith('Помилка завантаження статусів перекладу', 'error', 3000);
+        });
+    });
+
+    it('clears translation statuses when status loading returns 404', async () => {
+        jest.spyOn(axios, 'isAxiosError').mockReturnValue(true);
+        (MainPageLocalizationsApi.getStatuses as jest.Mock).mockRejectedValue({ response: { status: 404 } });
+
+        await renderAndLoadContent();
+
+        await waitFor(() => {
+            expect(MainPageLocalizationsApi.getStatuses).toHaveBeenCalled();
+        });
+
+        expect(screen.queryByText('2:0')).not.toBeInTheDocument();
+        expect(screen.queryByText('2:1')).not.toBeInTheDocument();
+    });
+
     it('uses original content as fallback when selected translation is missing', async () => {
         mockLocalizationToolkitState.selectedLanguage = { id: 2, code: 'en', name: 'EN' };
         jest.spyOn(axios, 'isAxiosError').mockReturnValue(true);
@@ -419,6 +713,54 @@ describe('MainPageContent', () => {
 
         expect(mockAddToast).not.toHaveBeenCalledWith('Помилка завантаження перекладу', 'error', 3000);
         expect(screen.getByTestId('title-block-form-read-only')).toHaveTextContent('true');
+    });
+
+    it('shows a toast when selected translation loading fails with non-404 error', async () => {
+        mockLocalizationToolkitState.selectedLanguage = { id: 2, code: 'en', name: 'EN' };
+        jest.spyOn(axios, 'isAxiosError').mockReturnValue(false);
+        (MainPageLocalizationsApi.getByLanguageId as jest.Mock).mockRejectedValue(new Error('Translation failed'));
+
+        await renderAndLoadContent();
+
+        await waitFor(() => {
+            expect(mockAddToast).toHaveBeenCalledWith('Помилка завантаження перекладу', 'error', 3000);
+        });
+    });
+
+    it('keeps forms editable and skips localization effect when no language is selected', async () => {
+        mockLocalizationToolkitState.selectedLanguage = null as any;
+
+        await renderAndLoadContent();
+
+        expect(MainPageLocalizationsApi.getStatuses).not.toHaveBeenCalled();
+        expect(MainPageLocalizationsApi.getByLanguageId).not.toHaveBeenCalled();
+        expect(screen.getByTestId('title-block-form-read-only')).toHaveTextContent('false');
+    });
+
+    it('renders loader fallback when loaded page is null without load error', async () => {
+        (MainPageApi.get as jest.Mock).mockResolvedValue({
+            page: null,
+            languages: mockPageData.languages,
+        });
+
+        render(<MainPageContent />);
+
+        await waitFor(() => {
+            expect(MainPageApi.get).toHaveBeenCalled();
+        });
+
+        expect(screen.getByTestId('page-loader')).toBeInTheDocument();
+        expect(screen.queryByText(MAIN_PAGE_TEXT.ERRORS.LOAD_FAILED)).not.toBeInTheDocument();
+    });
+
+    it('ignores confirm publish when no pending publish data exists', async () => {
+        (globalThis as any).__MAIN_PAGE_FORCE_MODAL__ = true;
+
+        await renderAndLoadContent();
+
+        fireEvent.click(screen.getByTestId('confirm-publish'));
+
+        expect(MainPageApi.publish).not.toHaveBeenCalled();
     });
 
     it('skips localization status loading when translation languages are absent', async () => {

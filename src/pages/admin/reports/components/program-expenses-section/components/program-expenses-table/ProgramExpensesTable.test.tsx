@@ -1,7 +1,8 @@
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { FUNDS_EXPENDITURES_TEXT, PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
 import { ProgramExpensesTable, ProgramExpensesTableProps } from './ProgramExpensesTable';
+import { isUsdAmountMismatch } from '@/utils/functions/validate-usd-amount-mismatch/validate-usd-amount-mismatch';
 
 jest.mock(
     '@/pages/admin/reports/components/program-expenses-section/components/program-expenses-empty-state/ProgramExpensesEmptyState',
@@ -21,11 +22,41 @@ jest.mock(
 );
 
 jest.mock('@/components/admin/icon-button/IconButton', () => ({
-    IconButton: ({ 'aria-label': ariaLabel, onClick }: { 'aria-label': string; onClick?: () => void }) => (
-        <button type="button" aria-label={ariaLabel} onClick={onClick}>
+    IconButton: ({
+        'aria-label': ariaLabel,
+        onClick,
+        disabled,
+    }: {
+        'aria-label': string;
+        onClick?: () => void;
+        disabled?: boolean;
+    }) => (
+        <button type="button" aria-label={ariaLabel} onClick={onClick} disabled={disabled}>
             {ariaLabel}
         </button>
     ),
+}));
+
+jest.mock(
+    '@/validation/admin/reports-schema/funds-expenditures-record-schema/funds-expenditures-record-schema',
+    () => ({
+        normalizeFundsExpendituresAmountInput: (value: string) => value.trim(),
+        validateFundsExpendituresAmount: (value: string) => (value === 'invalid' ? 'Invalid amount' : undefined),
+    }),
+);
+
+jest.mock('@/utils/functions/update-funds-amounts/update-funds-amounts', () => ({
+    updateFundsAmounts:
+        (field: 'amountUah' | 'amountUsd', value: string) =>
+        (state: { amountUah: string; amountUsd: string; errors: Record<string, string | undefined> }) => ({
+            amountUah: field === 'amountUah' ? value : state.amountUah,
+            amountUsd: field === 'amountUsd' ? value : state.amountUsd,
+            errors: { amountUah: undefined, amountUsd: undefined },
+        }),
+}));
+
+jest.mock('@/utils/functions/validate-usd-amount-mismatch/validate-usd-amount-mismatch', () => ({
+    isUsdAmountMismatch: jest.fn(() => false),
 }));
 
 const getEmptyState = () => screen.getByTestId('program-expenses-empty-state');
@@ -67,6 +98,10 @@ describe('ProgramExpensesTable', () => {
         return render(<ProgramExpensesTable records={records} hasAnyProgramExpenseRecords isEditing {...props} />);
     };
 
+    beforeEach(() => {
+        jest.mocked(isUsdAmountMismatch).mockReturnValue(false);
+    });
+
     it('should render table headers', () => {
         render(<ProgramExpensesTable records={records} hasAnyProgramExpenseRecords />);
 
@@ -104,6 +139,12 @@ describe('ProgramExpensesTable', () => {
         expectEmptyState('program-expenses');
     });
 
+    it('should use edit-mode colSpan for empty state', () => {
+        render(<ProgramExpensesTable records={[]} hasAnyProgramExpenseRecords={false} isEditing />);
+
+        expectEmptyState('program-expenses', '7');
+    });
+
     it('should render checkboxes and action column in edit mode', () => {
         renderTable();
 
@@ -133,25 +174,6 @@ describe('ProgramExpensesTable', () => {
         expect(onToggleRecordSelection).toHaveBeenCalledWith(1);
     });
 
-    it('should call edit and delete callbacks from row action icons', () => {
-        const onEditRecord = jest.fn();
-        const onDeleteRecord = jest.fn();
-
-        renderTable({ onEditRecord, onDeleteRecord });
-
-        fireEvent.click(screen.getByRole('button', { name: 'Edit record 1' }));
-        fireEvent.click(screen.getByRole('button', { name: 'Delete record 1' }));
-
-        expect(onEditRecord).toHaveBeenCalledWith(records[0]);
-        expect(onDeleteRecord).toHaveBeenCalledWith(records[0]);
-    });
-
-    it('should use edit-mode colSpan for empty state', () => {
-        render(<ProgramExpensesTable records={[]} hasAnyProgramExpenseRecords={false} isEditing />);
-
-        expectEmptyState('program-expenses', '7');
-    });
-
     it('should show selection bar with count and delete button when records are selected', () => {
         const onOpenBulkDelete = jest.fn();
 
@@ -162,5 +184,156 @@ describe('ProgramExpensesTable', () => {
         fireEvent.click(screen.getByText(PROGRAM_EXPENSES_TEXT.BULK.DELETE_BUTTON));
 
         expect(onOpenBulkDelete).toHaveBeenCalled();
+    });
+
+    it('should set header checkbox indeterminate state when some but not all records are selected', () => {
+        renderTable({ selectedRecordIds: [1] });
+
+        const headerCheckbox = screen.getByRole('checkbox', {
+            name: 'Select all program expense records',
+        }) as HTMLInputElement;
+
+        expect(headerCheckbox.indeterminate).toBe(true);
+    });
+
+    it('should call onDeleteRecord when delete icon is clicked', () => {
+        const onDeleteRecord = jest.fn();
+
+        renderTable({ onDeleteRecord });
+
+        fireEvent.click(screen.getByRole('button', { name: 'Delete record 1' }));
+
+        expect(onDeleteRecord).toHaveBeenCalledWith(records[0]);
+    });
+
+    it('should enter row edit mode with amount inputs and accept/close buttons when edit icon is clicked', () => {
+        const onRowEditModeChange = jest.fn();
+
+        renderTable({ onRowEditModeChange });
+
+        fireEvent.click(screen.getByRole('button', { name: 'Edit record 1' }));
+
+        expect(onRowEditModeChange).toHaveBeenCalledWith(true);
+        expect(screen.getByLabelText('Amount UAH record 1')).toHaveValue('7 265');
+        expect(screen.getByLabelText('Amount USD record 1')).toHaveValue('4 200.5');
+        expect(screen.getByRole('button', { name: 'Accept record 1' })).toBeDisabled();
+        expect(screen.getByRole('button', { name: 'Close edit for record 1' })).toBeEnabled();
+        expect(screen.queryByRole('button', { name: 'Edit record 1' })).not.toBeInTheDocument();
+    });
+
+    it('should close row edit mode without saving when close icon is clicked', () => {
+        const onRowEditModeChange = jest.fn();
+        const onRecordSave = jest.fn();
+
+        renderTable({ onRowEditModeChange, onRecordSave });
+
+        fireEvent.click(screen.getByRole('button', { name: 'Edit record 1' }));
+        fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '8000' } });
+        fireEvent.click(screen.getByRole('button', { name: 'Close edit for record 1' }));
+
+        expect(onRowEditModeChange).toHaveBeenLastCalledWith(false);
+        expect(onRecordSave).not.toHaveBeenCalled();
+        expect(screen.queryByLabelText('Amount UAH record 1')).not.toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Edit record 1' })).toBeInTheDocument();
+    });
+
+    it('should enable accept button only after an amount value changes', () => {
+        renderTable();
+
+        fireEvent.click(screen.getByRole('button', { name: 'Edit record 1' }));
+        expect(screen.getByRole('button', { name: 'Accept record 1' })).toBeDisabled();
+
+        fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '8000' } });
+        expect(screen.getByRole('button', { name: 'Accept record 1' })).toBeEnabled();
+    });
+
+    it('should call onRecordSave with trimmed amounts and close edit mode on success', async () => {
+        const onRecordSave = jest.fn().mockResolvedValue(true);
+
+        renderTable({ onRecordSave });
+
+        fireEvent.click(screen.getByRole('button', { name: 'Edit record 1' }));
+        fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '8000' } });
+        fireEvent.click(screen.getByRole('button', { name: 'Accept record 1' }));
+
+        await waitFor(() => {
+            expect(onRecordSave).toHaveBeenCalledWith(1, { amountUah: '8000', amountUsd: '4 200.5' });
+        });
+
+        await waitFor(() => {
+            expect(screen.queryByLabelText('Amount UAH record 1')).not.toBeInTheDocument();
+        });
+        expect(screen.getByRole('button', { name: 'Edit record 1' })).toBeInTheDocument();
+    });
+
+    it('should keep row in edit mode when onRecordSave resolves false', async () => {
+        const onRecordSave = jest.fn().mockResolvedValue(false);
+
+        renderTable({ onRecordSave });
+
+        fireEvent.click(screen.getByRole('button', { name: 'Edit record 1' }));
+        fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '8000' } });
+        fireEvent.click(screen.getByRole('button', { name: 'Accept record 1' }));
+
+        await waitFor(() => {
+            expect(onRecordSave).toHaveBeenCalled();
+        });
+
+        expect(screen.getByLabelText('Amount UAH record 1')).toBeInTheDocument();
+    });
+
+    it('should show validation error and disable accept button for an invalid amount', () => {
+        const onRecordSave = jest.fn();
+
+        renderTable({ onRecordSave });
+
+        fireEvent.click(screen.getByRole('button', { name: 'Edit record 1' }));
+        fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: 'invalid' } });
+        fireEvent.click(screen.getByRole('button', { name: 'Accept record 1' }));
+
+        expect(screen.getByText('Invalid amount')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Accept record 1' })).toBeDisabled();
+        expect(onRecordSave).not.toHaveBeenCalled();
+    });
+
+    it('should show USD mismatch message when isUsdAmountMismatch returns true on blur', () => {
+        jest.mocked(isUsdAmountMismatch).mockReturnValue(true);
+
+        renderTable();
+
+        fireEvent.click(screen.getByRole('button', { name: 'Edit record 1' }));
+        fireEvent.change(screen.getByLabelText('Amount USD record 1'), { target: { value: '5000' } });
+        fireEvent.blur(screen.getByLabelText('Amount USD record 1'));
+
+        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).toBeInTheDocument();
+    });
+
+    it('should disable edit, delete and checkbox controls for other rows while a row is being edited', () => {
+        renderTable();
+
+        fireEvent.click(screen.getByRole('button', { name: 'Edit record 1' }));
+
+        expect(screen.getByRole('button', { name: 'Edit record 2' })).toBeDisabled();
+        expect(screen.getByRole('button', { name: 'Delete record 2' })).toBeDisabled();
+        expect(screen.getByRole('checkbox', { name: 'Select record 1' })).toBeDisabled();
+        expect(screen.getByRole('checkbox', { name: 'Select record 2' })).toBeDisabled();
+    });
+
+    it('should disable all edit and delete buttons when isRowActionsDisabled is true', () => {
+        renderTable({ isRowActionsDisabled: true });
+
+        expect(screen.getByRole('button', { name: 'Edit record 1' })).toBeDisabled();
+        expect(screen.getByRole('button', { name: 'Delete record 1' })).toBeDisabled();
+        expect(screen.getByRole('button', { name: 'Edit record 2' })).toBeDisabled();
+        expect(screen.getByRole('button', { name: 'Delete record 2' })).toBeDisabled();
+    });
+
+    it('should render the scroll-to-top button hidden by default', () => {
+        renderTable();
+
+        const toTopButton = screen.getByTestId('program-expenses-table-to-top');
+
+        expect(toTopButton).toHaveAttribute('aria-hidden', 'true');
+        expect(toTopButton).toHaveAttribute('tabIndex', '-1');
     });
 });

@@ -204,7 +204,7 @@ export const ProgramExpensesTable = ({
                     return {
                         ...nextState,
                         usdMismatchMessage: hasMismatch
-                            ? FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH
+                            ? PROGRAM_EXPENSES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH
                             : undefined,
                     };
                 }
@@ -532,7 +532,7 @@ export const ProgramExpensesTable = ({
                 className={cn(styles['to-top-button'], {
                     [styles['to-top-button-visible']]: isMoveToTopVisible,
                 })}
-                data-testid="funds-table-to-top"
+                data-testid="program-expenses-table-to-top"
                 onClick={moveToTop}
                 aria-label="Scroll table to top"
                 aria-hidden={!isMoveToTopVisible}

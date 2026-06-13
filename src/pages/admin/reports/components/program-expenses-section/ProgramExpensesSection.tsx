@@ -13,6 +13,7 @@ import { ProgramExpensesTable } from './components/program-expenses-table/Progra
 import { AddProgramExpenseRecordModal } from './components/common/add-program-expense-record-modal/AddProgramExpenseRecordModal';
 import { DeleteRecordModal } from '../funds-expenditures-section/components/common/delete-record-modal/DeleteRecordModal';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
+import { parseAmount } from '@/utils/functions/parse-amount/parse-amount';
 import styles from './ProgramExpensesSection.module.scss';
 
 const INITIAL_PROGRAM_EXPENSES_DATA: ProgramExpensesReadOnlyData = {
@@ -168,6 +169,31 @@ export const ProgramExpensesSection = ({ isEditing = false }: ProgramExpensesSec
         }
     }, [adminClient, selectedRecordIds, refetchReadOnlyData, addToast]);
 
+    const handleRecordSave = useCallback(
+        async (recordId: number, updateData: { amountUah: string; amountUsd: string }): Promise<boolean> => {
+            const record = data.records.find((r) => r.id === recordId);
+
+            if (!record) {
+                addToast(PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_UPDATE_FAILED_RETRY, ToastType.Error);
+                return false;
+            }
+            try {
+                await ProgramExpensesApi.update(adminClient, recordId, {
+                    amountUah: parseAmount(updateData.amountUah),
+                    amountUsd: parseAmount(updateData.amountUsd),
+                    hippotherapyProgramCategoryId: record.programId,
+                });
+                refetchReadOnlyData();
+                addToast(PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY, ToastType.Success);
+                return true;
+            } catch {
+                addToast(PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_UPDATE_FAILED_RETRY, ToastType.Error);
+                return false;
+            }
+        },
+        [adminClient, data.records, refetchReadOnlyData, addToast],
+    );
+
     if (isInitialLoading) {
         return (
             <div className={styles.section}>
@@ -203,6 +229,8 @@ export const ProgramExpensesSection = ({ isEditing = false }: ProgramExpensesSec
                     onToggleRecordSelection={toggleRecordSelection}
                     onSelectAllToggle={handleSelectAllToggle}
                     onOpenBulkDelete={handleOpenBulkDeleteModal}
+                    exchangeRate={exchangeRate}
+                    onRecordSave={handleRecordSave}
                 />
             </div>
 

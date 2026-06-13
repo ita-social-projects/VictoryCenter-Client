@@ -335,6 +335,8 @@ export const PROGRAM_EXPENSES_TEXT = {
     MESSAGE: {
         RECORD_DELETED_SUCCESSFULLY: 'Запис успішно видалено',
         RECORD_DELETE_FAILED_RETRY: 'Не вдалося видалити запис. Спробуйте ще раз',
+        RECORD_UPDATED_SUCCESSFULLY: 'Зміни збережено успішно',
+        RECORD_UPDATE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
     },
     BUTTON: {
         ADD_PROGRAM_EXPENSE: 'Витрата по програмі',

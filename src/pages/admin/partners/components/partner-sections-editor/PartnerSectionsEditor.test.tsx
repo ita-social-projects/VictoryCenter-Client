@@ -160,9 +160,7 @@ function openPublishModal(props: any) {
 }
 
 function confirmPublish() {
-    act(() => {
-        fireEvent.click(screen.getByTestId(`confirm-${PARTNERS_TEXT.FORM.TITLE.PUBLISH_SECTION}`));
-    });
+    fireEvent.click(screen.getByTestId(`confirm-${PARTNERS_TEXT.FORM.TITLE.PUBLISH_SECTION}`));
 }
 
 function openDeleteModal(props: any) {

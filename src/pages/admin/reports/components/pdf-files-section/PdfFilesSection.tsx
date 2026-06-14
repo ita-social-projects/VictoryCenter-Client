@@ -28,7 +28,7 @@ export const PdfFilesSection = () => {
     const [isRenaming, setIsRenaming] = useState(false);
     const [isTranslateModalOpen, setIsTranslateModalOpen] = useState(false);
 
-    const { translationLanguages } = useLocalizationToolkit({
+    const { translationLanguages, allLanguages } = useLocalizationToolkit({
         setErrorState: useCallback(
             (message: string) => {
                 addToast(message, ToastType.Error);
@@ -37,14 +37,17 @@ export const PdfFilesSection = () => {
         ),
     });
 
+    const activeLanguageId = allLanguages.find((l) => l.code === currentLanguage)?.id;
+
     const fetchSection = useCallback(async () => {
         return PdfSectionApi.getPdfSection(client);
     }, [client]);
 
     const fetchFiles = useCallback(async () => {
-        const data = await PdfReportsApi.getAll(client, { offset: 0, limit: 1000 });
+        if (!activeLanguageId) return [];
+        const data = await PdfReportsApi.getAll(client, { offset: 0, limit: 1000, languageId: activeLanguageId });
         return data.items;
-    }, [client]);
+    }, [client, activeLanguageId]);
 
     const {
         data: sectionData,
@@ -147,7 +150,7 @@ export const PdfFilesSection = () => {
         [client, addToast, refetchFiles],
     );
 
-    if (isSectionLoading || isFilesLoading) {
+    if (isSectionLoading || isFilesLoading || !activeLanguageId) {
         return (
             <div className={styles.loader}>
                 <InlineLoader size={3} />
@@ -172,7 +175,7 @@ export const PdfFilesSection = () => {
             <div className={styles['language-switcher-container']}>
                 <LanguageSwitcherButtons currentLanguage={currentLanguage} onLanguageChange={setCurrentLanguage} />
             </div>
-            <PdfDropzone onUploaded={handleUploaded} />
+            <PdfDropzone onUploaded={handleUploaded} languageId={activeLanguageId} />
             <PdfFilesTable
                 files={mergedDedupedFiles}
                 onViewFile={handleViewFile}

@@ -30,4 +30,6 @@ export interface PdfReportDto {
     fileSizeBytes: number;
     createdAt: string;
     priority: number;
+    languageId?: number;
+    languageCode?: string;
 }

@@ -9,6 +9,7 @@ import { PDF_FILES_SECTION_TEXT, PDF_FILES_SECTION_VALIDATION } from '@/const/ad
 
 interface PdfDropzoneProps {
     onUploaded: (file: PdfReportDto) => void;
+    languageId: number;
 }
 
 const extractErrorMessage = (error: unknown): string => {
@@ -27,7 +28,7 @@ const extractErrorMessage = (error: unknown): string => {
     return PDF_FILES_SECTION_TEXT.DROPZONE.ERROR_UPLOAD_FAILED;
 };
 
-export const PdfDropzone = ({ onUploaded }: PdfDropzoneProps) => {
+export const PdfDropzone = ({ onUploaded, languageId }: PdfDropzoneProps) => {
     const client = useAdminClient();
     const [isDragging, setIsDragging] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
@@ -50,7 +51,7 @@ export const PdfDropzone = ({ onUploaded }: PdfDropzoneProps) => {
             setError(null);
             setIsUploading(true);
             try {
-                const result = await PdfReportsApi.create(client, file);
+                const result = await PdfReportsApi.create(client, file, languageId);
                 onUploaded(result);
             } catch (err) {
                 const errorMessage = extractErrorMessage(err);

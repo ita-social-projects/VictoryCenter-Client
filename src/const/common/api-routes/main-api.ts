@@ -112,6 +112,7 @@ export const API_ROUTES = {
     },
     PDF_REPORTS: {
         BASE: 'PdfReports',
+        BY_LANGUAGE_ID: 'PdfReports/languageId',
     },
     FAQ_LOCALIZATIONS: {
         BASE: 'FaqQuestionLocalizations',

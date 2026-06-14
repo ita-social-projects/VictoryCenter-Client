@@ -1,21 +1,17 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { ProgramExpensesEmptyState } from '@/pages/admin/reports/components/program-expenses-section/components/program-expenses-empty-state/ProgramExpensesEmptyState';
 import { FUNDS_EXPENDITURES_TEXT, PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
-import { ReactComponent as CheckmarkIcon } from '@/assets/icons/checkmark.svg';
-import { ReactComponent as CrossIcon } from '@/assets/icons/cross.svg';
 import { ReactComponent as ArrowUpIcon } from '@/assets/icons/arrow-up.svg';
-import { ReactComponent as InfoIcon } from '@/assets/icons/info.svg';
+import { AmountEditCell } from '../../../amount-edit-cell/AmountEditCell';
+import { RowEditActions } from '../../../row-edit-actions/RowEditActions';
 import {
     normalizeFundsExpendituresAmountInput,
     validateFundsExpendituresAmount,
 } from '@/validation/admin/reports-schema/funds-expenditures-record-schema/funds-expenditures-record-schema';
 import { ProgramExpensesRecord } from '@/types/admin/reports';
-import { IconButton } from '@/components/admin/icon-button/IconButton';
-import { ACTION_ICONS } from '@/const/common/action-icons';
 import { Button } from '@/components/admin/button/Button';
 import { updateFundsAmounts } from '@/utils/functions/update-funds-amounts/update-funds-amounts';
 import { isUsdAmountMismatch } from '@/utils/functions/validate-usd-amount-mismatch/validate-usd-amount-mismatch';
-import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import cn from 'classnames';
 import styles from './ProgramExpensesTable.module.scss';
 
@@ -392,132 +388,48 @@ export const ProgramExpensesTable = ({
                                         <td className={styles.td}>{record.programName}</td>
                                         <td className={cn(styles.td, { [styles['amount-edit-td']]: isEditedRow })}>
                                             {isEditedRow ? (
-                                                <div className={styles['amount-edit-wrapper']}>
-                                                    <input
-                                                        type="text"
-                                                        className={cn(styles['amount-edit-input'], {
-                                                            [styles['amount-edit-input-error']]:
-                                                                rowEditState.errors.amountUah,
-                                                        })}
-                                                        value={rowEditState.amountUah}
-                                                        aria-label={`Amount UAH record ${record.id}`}
-                                                        onChange={(e) =>
-                                                            handleAmountChange(record.id, 'amountUah', e.target.value)
-                                                        }
-                                                        onBlur={() => handleAmountBlur(record.id, 'amountUah')}
-                                                        disabled={isSavingCurrentRow}
-                                                    />
-                                                    {rowEditState.errors.amountUah && (
-                                                        <p className={styles['amount-edit-error']}>
-                                                            {rowEditState.errors.amountUah}
-                                                        </p>
-                                                    )}
-                                                </div>
+                                                <AmountEditCell
+                                                    recordId={record.id}
+                                                    field="amountUah"
+                                                    value={rowEditState.amountUah}
+                                                    error={rowEditState.errors.amountUah}
+                                                    isDisabled={isSavingCurrentRow}
+                                                    onChange={handleAmountChange}
+                                                    onBlur={handleAmountBlur}
+                                                />
                                             ) : (
                                                 record.amountUah
                                             )}
                                         </td>
                                         <td className={cn(styles.td, { [styles['amount-edit-td']]: isEditedRow })}>
                                             {isEditedRow ? (
-                                                <div className={styles['amount-edit-wrapper']}>
-                                                    <input
-                                                        type="text"
-                                                        className={cn(styles['amount-edit-input'], {
-                                                            [styles['amount-edit-input-error']]:
-                                                                rowEditState.errors.amountUsd,
-                                                        })}
-                                                        value={rowEditState.amountUsd}
-                                                        aria-label={`Amount USD record ${record.id}`}
-                                                        onChange={(e) =>
-                                                            handleAmountChange(record.id, 'amountUsd', e.target.value)
-                                                        }
-                                                        onBlur={() => handleAmountBlur(record.id, 'amountUsd')}
-                                                        disabled={isSavingCurrentRow}
-                                                    />
-                                                    {rowEditState.errors.amountUsd && (
-                                                        <p className={styles['amount-edit-error']}>
-                                                            {rowEditState.errors.amountUsd}
-                                                        </p>
-                                                    )}
-                                                    {rowEditState.usdMismatchMessage && (
-                                                        <div className={styles['amount-edit-info']}>
-                                                            <InfoIcon
-                                                                className={styles['amount-edit-info-icon']}
-                                                                aria-hidden="true"
-                                                            />
-                                                            <p className={styles['amount-edit-info-text']}>
-                                                                {rowEditState.usdMismatchMessage}
-                                                            </p>
-                                                        </div>
-                                                    )}
-                                                </div>
+                                                <AmountEditCell
+                                                    recordId={record.id}
+                                                    field="amountUsd"
+                                                    value={rowEditState.amountUsd}
+                                                    error={rowEditState.errors.amountUsd}
+                                                    mismatchMessage={rowEditState.usdMismatchMessage}
+                                                    isDisabled={isSavingCurrentRow}
+                                                    onChange={handleAmountChange}
+                                                    onBlur={handleAmountBlur}
+                                                />
                                             ) : (
                                                 record.amountUsd
                                             )}
                                         </td>
                                         {isEditing && (
                                             <td className={cn(styles.td, styles['actions-td'])}>
-                                                <div className={styles['row-actions']}>
-                                                    {isEditedRow ? (
-                                                        <>
-                                                            <button
-                                                                type="button"
-                                                                className={cn(
-                                                                    styles['icon-button'],
-                                                                    styles['accept-icon-button'],
-                                                                )}
-                                                                aria-label={`Accept record ${record.id}`}
-                                                                onClick={() => handleAcceptRowEdit(record)}
-                                                                disabled={isAcceptDisabled || isSavingCurrentRow}
-                                                            >
-                                                                {isSavingCurrentRow ? (
-                                                                    <InlineLoader size={1.2} />
-                                                                ) : (
-                                                                    <CheckmarkIcon className={styles['action-icon']} />
-                                                                )}
-                                                            </button>
-                                                            <button
-                                                                type="button"
-                                                                className={cn(
-                                                                    styles['icon-button'],
-                                                                    styles['close-icon-button'],
-                                                                )}
-                                                                aria-label={`Close edit for record ${record.id}`}
-                                                                onClick={handleCloseRowEdit}
-                                                                disabled={isSavingCurrentRow}
-                                                            >
-                                                                <CrossIcon className={styles['action-icon']} />
-                                                            </button>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <IconButton
-                                                                type="button"
-                                                                className={cn(
-                                                                    styles['icon-button'],
-                                                                    styles['edit-icon-button'],
-                                                                )}
-                                                                aria-label={`Edit record ${record.id}`}
-                                                                onClick={() => handleStartRowEdit(record)}
-                                                                disabled={isAnotherRowEditing}
-                                                                DefaultIcon={ACTION_ICONS.edit.default}
-                                                                FilledIcon={ACTION_ICONS.edit.hover}
-                                                            />
-                                                            <IconButton
-                                                                type="button"
-                                                                className={cn(
-                                                                    styles['icon-button'],
-                                                                    styles['delete-icon-button'],
-                                                                )}
-                                                                aria-label={`Delete record ${record.id}`}
-                                                                onClick={() => onDeleteRecord?.(record)}
-                                                                disabled={isAnotherRowEditing}
-                                                                DefaultIcon={ACTION_ICONS.delete.default}
-                                                                FilledIcon={ACTION_ICONS.delete.hover}
-                                                            />
-                                                        </>
-                                                    )}
-                                                </div>
+                                                <RowEditActions
+                                                    recordId={record.id}
+                                                    isEditMode={isEditedRow}
+                                                    isAcceptDisabled={isAcceptDisabled}
+                                                    isSaving={isSavingCurrentRow}
+                                                    isActionsDisabled={isAnotherRowEditing}
+                                                    onAccept={() => handleAcceptRowEdit(record)}
+                                                    onClose={handleCloseRowEdit}
+                                                    onEdit={() => handleStartRowEdit(record)}
+                                                    onDelete={() => onDeleteRecord?.(record)}
+                                                />
                                             </td>
                                         )}
                                     </tr>

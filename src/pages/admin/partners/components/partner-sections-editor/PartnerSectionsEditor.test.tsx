@@ -107,9 +107,7 @@ const performTwoStepDelete = async (props: any) => {
         props.onDelete(props.value.localId);
     });
     fireEvent.click(screen.getByTestId('confirm-delete'));
-    await waitFor(() =>
-        expect(screen.getByText(PARTNERS_TEXT.FORM.MESSAGE.DELETE_SECTION_WARNING)).toBeInTheDocument(),
-    );
+    await screen.findByText(PARTNERS_TEXT.FORM.MESSAGE.DELETE_SECTION_WARNING);
     fireEvent.click(screen.getByTestId('confirm-delete'));
 };
 
@@ -325,7 +323,7 @@ describe('PartnerSectionsEditor', () => {
     });
 
     it('publishes an existing section and handles success toast', async () => {
-        const props = await renderWithSection({
+        const view = await renderWithSection({
             id: 1,
             title: 'Existing title',
             description: 'Existing description',
@@ -340,19 +338,19 @@ describe('PartnerSectionsEditor', () => {
         });
 
         await act(async () => {
-            await props.onPublish(props.value.localId);
+            await view.onPublish(view.value.localId);
         });
 
-        expect(mockedPartnersApi.updateSection).toHaveBeenCalledWith('mock-client', props.value.sectionId, {
-            title: props.value.title,
-            description: props.value.description,
-            partnersToUpdate: props.value.partners.map((partner: any) => ({
+        expect(mockedPartnersApi.updateSection).toHaveBeenCalledWith('mock-client', view.value.sectionId, {
+            title: view.value.title,
+            description: view.value.description,
+            partnersToUpdate: view.value.partners.map((partner: any) => ({
                 id: partner.partnerId,
                 description: partner.description,
                 image: partner.image,
                 imageId: partner.imageId,
             })),
-            partnerIdsToDelete: props.value.deletedPartnerIds || [],
+            partnerIdsToDelete: view.value.deletedPartnerIds || [],
         });
 
         expect(addToastMock).toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.SECTION_PUBLISHED, ToastType.Success);
@@ -361,10 +359,10 @@ describe('PartnerSectionsEditor', () => {
     it('handles publish errors: shows toast on failure, no toast on cancellation', async () => {
         const setupAndPublish = async (rejectValue: Error | { name: string }) => {
             mockedPartnersApi.updateSection.mockRejectedValueOnce(rejectValue);
-            const props = await renderWithSection({ id: 2, title: 'Test section', description: 'Test description' });
+            const view = await renderWithSection({ id: 2, title: 'Test section', description: 'Test description' });
 
             await act(async () => {
-                await props.onPublish(props.value.localId);
+                await view.onPublish(view.value.localId);
             });
         };
 
@@ -383,9 +381,9 @@ describe('PartnerSectionsEditor', () => {
     });
 
     it('deletes a persisted section after confirmation', async () => {
-        const props = await renderWithSection({ id: 5, title: 'Deletable', description: 'To delete' });
+        const view = await renderWithSection({ id: 5, title: 'Deletable', description: 'To delete' });
 
-        await performTwoStepDelete(props);
+        await performTwoStepDelete(view);
 
         await waitFor(() => {
             expect(mockedPartnersApi.deleteSection).toHaveBeenCalledWith('mock-client', 5);
@@ -444,10 +442,10 @@ describe('PartnerSectionsEditor', () => {
     });
 
     it('closes the delete modal when cancel is clicked', async () => {
-        const props = await renderWithSection({ id: 6, title: 'Cancelable', description: 'Desc' });
+        const view = await renderWithSection({ id: 6, title: 'Cancelable', description: 'Desc' });
 
         await act(async () => {
-            props.onDelete(props.value.localId);
+            view.onDelete(view.value.localId);
         });
 
         expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
@@ -459,10 +457,10 @@ describe('PartnerSectionsEditor', () => {
     });
 
     it('closes the second delete modal when cancel is clicked', async () => {
-        const props = await renderWithSection({ id: 7, title: 'Cancelable Second', description: 'Desc' });
+        const view = await renderWithSection({ id: 7, title: 'Cancelable Second', description: 'Desc' });
 
         await act(async () => {
-            props.onDelete(props.value.localId);
+            view.onDelete(view.value.localId);
         });
 
         expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
@@ -482,9 +480,9 @@ describe('PartnerSectionsEditor', () => {
     it('shows error toast when deleting section fails', async () => {
         mockedPartnersApi.deleteSection.mockRejectedValueOnce(new Error('delete fail'));
 
-        const props = await renderWithSection({ id: 7, title: 'Delete me', description: 'Desc' });
+        const view = await renderWithSection({ id: 7, title: 'Delete me', description: 'Desc' });
 
-        await performTwoStepDelete(props);
+        await performTwoStepDelete(view);
 
         await waitFor(() => {
             expect(addToastMock).toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.FAIL_TO_DELETE_SECTION, ToastType.Error);

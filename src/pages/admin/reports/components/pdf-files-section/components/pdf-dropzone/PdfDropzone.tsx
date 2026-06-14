@@ -61,7 +61,7 @@ export const PdfDropzone = ({ onUploaded, languageId }: PdfDropzoneProps) => {
                 setIsUploading(false);
             }
         },
-        [client, onUploaded],
+        [client, onUploaded, languageId],
     );
 
     const handleDrop = useCallback(

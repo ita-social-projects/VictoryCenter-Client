@@ -82,6 +82,37 @@ const mockedUseToast = useToast as jest.Mock;
 const addToastMock = jest.fn();
 const uuidMock = jest.fn();
 
+const mockDataFetch = (data: any[], isLoading = false, error: any = null) => {
+    mockedUseDataFetch.mockReturnValue({
+        data,
+        isLoading,
+        error,
+        refetch: jest.fn(),
+        setData: jest.fn(),
+    });
+};
+
+const getLatestProps = () =>
+    mockPartnerSectionFormRender.mock.calls[mockPartnerSectionFormRender.mock.calls.length - 1][0];
+
+const renderWithSection = async (sectionData: Record<string, any> = {}) => {
+    mockDataFetch([{ id: 1, title: 'Test', description: 'Desc', partners: [], ...sectionData }]);
+    render(<PartnerSectionsEditor />);
+    await waitFor(() => expect(mockPartnerSectionFormRender).toHaveBeenCalled());
+    return getLatestProps();
+};
+
+const performTwoStepDelete = async (props: any) => {
+    await act(async () => {
+        props.onDelete(props.value.localId);
+    });
+    fireEvent.click(screen.getByTestId('confirm-delete'));
+    await waitFor(() =>
+        expect(screen.getByText(PARTNERS_TEXT.FORM.MESSAGE.DELETE_SECTION_WARNING)).toBeInTheDocument(),
+    );
+    fireEvent.click(screen.getByTestId('confirm-delete'));
+};
+
 beforeAll(() => {
     Object.defineProperty(globalThis, 'crypto', {
         value: {
@@ -134,13 +165,7 @@ beforeEach(() => {
 
 describe('PartnerSectionsEditor', () => {
     it('shows loader when sections are loading and none are rendered yet', () => {
-        mockedUseDataFetch.mockReturnValue({
-            data: [],
-            isLoading: true,
-            error: null,
-            refetch: jest.fn(),
-            setData: jest.fn(),
-        });
+        mockDataFetch([], true);
 
         render(<PartnerSectionsEditor />);
 
@@ -167,30 +192,21 @@ describe('PartnerSectionsEditor', () => {
     });
 
     it('renders partner sections returned from the API', async () => {
-        let counter = 0;
-        uuidMock.mockImplementation(() => `uuid-${++counter}`);
-
-        mockedUseDataFetch.mockReturnValue({
-            data: [
-                {
-                    id: 1,
-                    title: 'API section',
-                    description: 'API description',
-                    partners: [
-                        {
-                            id: 11,
-                            description: 'API partner',
-                            image: { id: 21, url: 'api.jpg', mimeType: 'image/png' },
-                            imageId: 21,
-                        },
-                    ],
-                },
-            ],
-            isLoading: false,
-            error: null,
-            refetch: jest.fn(),
-            setData: jest.fn(),
-        });
+        mockDataFetch([
+            {
+                id: 1,
+                title: 'API section',
+                description: 'API description',
+                partners: [
+                    {
+                        id: 11,
+                        description: 'API partner',
+                        image: { id: 21, url: 'api.jpg', mimeType: 'image/png' },
+                        imageId: 21,
+                    },
+                ],
+            },
+        ]);
 
         render(<PartnerSectionsEditor />);
 
@@ -205,23 +221,7 @@ describe('PartnerSectionsEditor', () => {
     });
 
     it('updates local section state via onChange', async () => {
-        let counter = 0;
-        uuidMock.mockImplementation(() => `uuid-${++counter}`);
-
-        mockedUseDataFetch.mockReturnValue({
-            data: [
-                {
-                    id: 2,
-                    title: 'Initial section',
-                    description: 'Initial description',
-                    partners: [],
-                },
-            ],
-            isLoading: false,
-            error: null,
-            refetch: jest.fn(),
-            setData: jest.fn(),
-        });
+        mockDataFetch([{ id: 2, title: 'Initial section', description: 'Initial description', partners: [] }]);
 
         render(<PartnerSectionsEditor />);
 
@@ -239,21 +239,14 @@ describe('PartnerSectionsEditor', () => {
         });
 
         await waitFor(() => {
-            const lastCall =
-                mockPartnerSectionFormRender.mock.calls[mockPartnerSectionFormRender.mock.calls.length - 1][0];
+            const lastCall = getLatestProps();
             expect(lastCall.value.title).toBe('Changed title');
             expect(lastCall.errors.title).toBe('title error');
         });
     });
 
     it('exposes addSection via ref and prevents duplicate empty sections', async () => {
-        mockedUseDataFetch.mockReturnValue({
-            data: [],
-            isLoading: false,
-            error: null,
-            refetch: jest.fn(),
-            setData: jest.fn(),
-        });
+        mockDataFetch([]);
 
         const ref = createRef<PartnerSectionsEditorRef>();
         render(<PartnerSectionsEditor ref={ref} />);
@@ -272,13 +265,7 @@ describe('PartnerSectionsEditor', () => {
     });
 
     it('publishes a newly created section and refreshes state', async () => {
-        mockedUseDataFetch.mockReturnValue({
-            data: [],
-            isLoading: false,
-            error: null,
-            refetch: jest.fn(),
-            setData: jest.fn(),
-        });
+        mockDataFetch([]);
 
         const ref = createRef<PartnerSectionsEditorRef>();
         render(<PartnerSectionsEditor ref={ref} />);
@@ -312,11 +299,8 @@ describe('PartnerSectionsEditor', () => {
             expect(mockPartnerSectionFormRender).toHaveBeenCalledTimes(2);
         });
 
-        const latestProps =
-            mockPartnerSectionFormRender.mock.calls[mockPartnerSectionFormRender.mock.calls.length - 1][0];
-
         await act(async () => {
-            await latestProps.onPublish(populatedSection.localId);
+            await getLatestProps().onPublish(populatedSection.localId);
         });
 
         expect(mockedPartnersApi.postSection).toHaveBeenCalledWith('mock-client', {
@@ -334,43 +318,26 @@ describe('PartnerSectionsEditor', () => {
         expect(addToastMock).toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.SECTION_CREATED, ToastType.Success);
 
         await waitFor(() => {
-            const latestCall =
-                mockPartnerSectionFormRender.mock.calls[mockPartnerSectionFormRender.mock.calls.length - 1][0];
+            const latestCall = getLatestProps();
             expect(latestCall.value.sectionId).toBe(101);
             expect(latestCall.value.partners[0].partnerId).toBe(201);
         });
     });
 
     it('publishes an existing section and handles success toast', async () => {
-        mockedUseDataFetch.mockReturnValue({
-            data: [
+        const props = await renderWithSection({
+            id: 1,
+            title: 'Existing title',
+            description: 'Existing description',
+            partners: [
                 {
-                    id: 1,
-                    title: 'Existing title',
-                    description: 'Existing description',
-                    partners: [
-                        {
-                            id: 10,
-                            description: 'Existing partner',
-                            image: { id: 20, url: 'existing.jpg', mimeType: 'image/png' },
-                            imageId: 20,
-                        },
-                    ],
+                    id: 10,
+                    description: 'Existing partner',
+                    image: { id: 20, url: 'existing.jpg', mimeType: 'image/png' },
+                    imageId: 20,
                 },
             ],
-            isLoading: false,
-            error: null,
-            refetch: jest.fn(),
-            setData: jest.fn(),
         });
-
-        render(<PartnerSectionsEditor />);
-
-        await waitFor(() => {
-            expect(mockPartnerSectionFormRender).toHaveBeenCalled();
-        });
-
-        const props = mockPartnerSectionFormRender.mock.calls[0][0];
 
         await act(async () => {
             await props.onPublish(props.value.localId);
@@ -394,24 +361,7 @@ describe('PartnerSectionsEditor', () => {
     it('handles publish errors: shows toast on failure, no toast on cancellation', async () => {
         const setupAndPublish = async (rejectValue: Error | { name: string }) => {
             mockedPartnersApi.updateSection.mockRejectedValueOnce(rejectValue);
-            mockedUseDataFetch.mockReturnValue({
-                data: [
-                    {
-                        id: 2,
-                        title: 'Test section',
-                        description: 'Test description',
-                        partners: [],
-                    },
-                ],
-                isLoading: false,
-                error: null,
-                refetch: jest.fn(),
-                setData: jest.fn(),
-            });
-
-            render(<PartnerSectionsEditor />);
-            await waitFor(() => expect(mockPartnerSectionFormRender).toHaveBeenCalled());
-            const props = mockPartnerSectionFormRender.mock.calls[0][0];
+            const props = await renderWithSection({ id: 2, title: 'Test section', description: 'Test description' });
 
             await act(async () => {
                 await props.onPublish(props.value.localId);
@@ -421,11 +371,9 @@ describe('PartnerSectionsEditor', () => {
         // Test error toast on regular failure
         await setupAndPublish(new Error('publish failed'));
         expect(addToastMock).toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.FAIL_TO_PUBLISH_SECTION, ToastType.Error);
-        const latestCallAfterError =
-            mockPartnerSectionFormRender.mock.calls[mockPartnerSectionFormRender.mock.calls.length - 1][0];
-        expect(latestCallAfterError.disabled).toBe(false);
+        expect(getLatestProps().disabled).toBe(false);
 
-        // Clear mocks for next test
+        // Clear mocks for next sub-test
         jest.clearAllMocks();
         mockPartnerSectionFormRender.mockClear();
 
@@ -435,43 +383,9 @@ describe('PartnerSectionsEditor', () => {
     });
 
     it('deletes a persisted section after confirmation', async () => {
-        mockedUseDataFetch.mockReturnValue({
-            data: [
-                {
-                    id: 5,
-                    title: 'Deletable',
-                    description: 'To delete',
-                    partners: [],
-                },
-            ],
-            isLoading: false,
-            error: null,
-            refetch: jest.fn(),
-            setData: jest.fn(),
-        });
+        const props = await renderWithSection({ id: 5, title: 'Deletable', description: 'To delete' });
 
-        render(<PartnerSectionsEditor />);
-
-        await waitFor(() => {
-            expect(mockPartnerSectionFormRender).toHaveBeenCalled();
-        });
-
-        const latestProps =
-            mockPartnerSectionFormRender.mock.calls[mockPartnerSectionFormRender.mock.calls.length - 1][0];
-
-        await act(async () => {
-            latestProps.onDelete(latestProps.value.localId);
-        });
-
-        expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
-
-        fireEvent.click(screen.getByTestId('confirm-delete'));
-
-        await waitFor(() => {
-            expect(screen.getByText(PARTNERS_TEXT.FORM.MESSAGE.DELETE_SECTION_WARNING)).toBeInTheDocument();
-        });
-
-        fireEvent.click(screen.getByTestId('confirm-delete'));
+        await performTwoStepDelete(props);
 
         await waitFor(() => {
             expect(mockedPartnersApi.deleteSection).toHaveBeenCalledWith('mock-client', 5);
@@ -481,13 +395,7 @@ describe('PartnerSectionsEditor', () => {
     });
 
     it('deletes an unsaved section without calling API', async () => {
-        mockedUseDataFetch.mockReturnValue({
-            data: [],
-            isLoading: false,
-            error: null,
-            refetch: jest.fn(),
-            setData: jest.fn(),
-        });
+        mockDataFetch([]);
 
         const ref = createRef<PartnerSectionsEditorRef>();
         render(<PartnerSectionsEditor ref={ref} />);
@@ -500,19 +408,7 @@ describe('PartnerSectionsEditor', () => {
             expect(mockPartnerSectionFormRender).toHaveBeenCalled();
         });
 
-        const latestProps =
-            mockPartnerSectionFormRender.mock.calls[mockPartnerSectionFormRender.mock.calls.length - 1][0];
-
-        await act(async () => {
-            latestProps.onDelete(latestProps.value.localId);
-        });
-        fireEvent.click(screen.getByTestId('confirm-delete'));
-
-        await waitFor(() => {
-            expect(screen.getByText(PARTNERS_TEXT.FORM.MESSAGE.DELETE_SECTION_WARNING)).toBeInTheDocument();
-        });
-
-        fireEvent.click(screen.getByTestId('confirm-delete'));
+        await performTwoStepDelete(getLatestProps());
 
         expect(mockedPartnersApi.deleteSection).not.toHaveBeenCalled();
         expect(addToastMock).toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.SECTION_DELETED, ToastType.Success);
@@ -533,20 +429,7 @@ describe('PartnerSectionsEditor', () => {
     });
 
     it('prevents adding a new section when last section has no partners', async () => {
-        mockedUseDataFetch.mockReturnValue({
-            data: [
-                {
-                    id: 1,
-                    title: '',
-                    description: '',
-                    partners: [],
-                },
-            ],
-            isLoading: false,
-            error: null,
-            refetch: jest.fn(),
-            setData: jest.fn(),
-        });
+        mockDataFetch([{ id: 1, title: '', description: '', partners: [] }]);
 
         const ref = createRef<PartnerSectionsEditorRef>();
         render(<PartnerSectionsEditor ref={ref} />);
@@ -561,25 +444,7 @@ describe('PartnerSectionsEditor', () => {
     });
 
     it('closes the delete modal when cancel is clicked', async () => {
-        mockedUseDataFetch.mockReturnValue({
-            data: [
-                {
-                    id: 6,
-                    title: 'Cancelable',
-                    description: 'Desc',
-                    partners: [],
-                },
-            ],
-            isLoading: false,
-            error: null,
-            refetch: jest.fn(),
-            setData: jest.fn(),
-        });
-
-        render(<PartnerSectionsEditor />);
-
-        await waitFor(() => expect(mockPartnerSectionFormRender).toHaveBeenCalled());
-        const props = mockPartnerSectionFormRender.mock.calls[0][0];
+        const props = await renderWithSection({ id: 6, title: 'Cancelable', description: 'Desc' });
 
         await act(async () => {
             props.onDelete(props.value.localId);
@@ -594,25 +459,7 @@ describe('PartnerSectionsEditor', () => {
     });
 
     it('closes the second delete modal when cancel is clicked', async () => {
-        mockedUseDataFetch.mockReturnValue({
-            data: [
-                {
-                    id: 7,
-                    title: 'Cancelable Second',
-                    description: 'Desc',
-                    partners: [],
-                },
-            ],
-            isLoading: false,
-            error: null,
-            refetch: jest.fn(),
-            setData: jest.fn(),
-        });
-
-        render(<PartnerSectionsEditor />);
-
-        await waitFor(() => expect(mockPartnerSectionFormRender).toHaveBeenCalled());
-        const props = mockPartnerSectionFormRender.mock.calls[0][0];
+        const props = await renderWithSection({ id: 7, title: 'Cancelable Second', description: 'Desc' });
 
         await act(async () => {
             props.onDelete(props.value.localId);
@@ -635,36 +482,9 @@ describe('PartnerSectionsEditor', () => {
     it('shows error toast when deleting section fails', async () => {
         mockedPartnersApi.deleteSection.mockRejectedValueOnce(new Error('delete fail'));
 
-        mockedUseDataFetch.mockReturnValue({
-            data: [
-                {
-                    id: 7,
-                    title: 'Delete me',
-                    description: 'Desc',
-                    partners: [],
-                },
-            ],
-            isLoading: false,
-            error: null,
-            refetch: jest.fn(),
-            setData: jest.fn(),
-        });
+        const props = await renderWithSection({ id: 7, title: 'Delete me', description: 'Desc' });
 
-        render(<PartnerSectionsEditor />);
-
-        const props = mockPartnerSectionFormRender.mock.calls[0][0];
-
-        await act(async () => {
-            props.onDelete(props.value.localId);
-        });
-
-        fireEvent.click(screen.getByTestId('confirm-delete'));
-
-        await waitFor(() => {
-            expect(screen.getByText(PARTNERS_TEXT.FORM.MESSAGE.DELETE_SECTION_WARNING)).toBeInTheDocument();
-        });
-
-        fireEvent.click(screen.getByTestId('confirm-delete'));
+        await performTwoStepDelete(props);
 
         await waitFor(() => {
             expect(addToastMock).toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.FAIL_TO_DELETE_SECTION, ToastType.Error);
@@ -672,20 +492,7 @@ describe('PartnerSectionsEditor', () => {
     });
 
     it('does not add section while sections are loading', async () => {
-        mockedUseDataFetch.mockReturnValue({
-            data: [
-                {
-                    id: 8,
-                    title: 'Loading title',
-                    description: 'Desc',
-                    partners: [],
-                },
-            ],
-            isLoading: true,
-            error: null,
-            refetch: jest.fn(),
-            setData: jest.fn(),
-        });
+        mockDataFetch([{ id: 8, title: 'Loading title', description: 'Desc', partners: [] }], true);
 
         const ref = createRef<PartnerSectionsEditorRef>();
         render(<PartnerSectionsEditor ref={ref} />);

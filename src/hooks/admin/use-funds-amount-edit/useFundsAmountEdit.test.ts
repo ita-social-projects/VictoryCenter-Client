@@ -6,22 +6,28 @@ jest.mock('@/utils/functions/validate-usd-amount-mismatch/validate-usd-amount-mi
     isUsdAmountMismatch: jest.fn(() => false),
 }));
 
+const toNumber = (value: string) => Number.parseFloat(value.replace(/\s/g, '').replace(',', '.'));
+
+const convertUahToUsd = (uah: number, rate: number) => {
+    const converted = uah / rate;
+    const rounded = Number.parseFloat(converted.toFixed(2));
+    return rounded % 1 === 0 ? String(rounded) : String(rounded).replace('.', ',');
+};
+
 jest.mock('@/utils/functions/update-funds-amounts/update-funds-amounts', () => ({
     updateFundsAmounts:
         (field: 'amountUah' | 'amountUsd', value: string, exchangeRate: string | null, trigger: 'change' | 'blur') =>
         (state: { amountUah: string; amountUsd: string; errors: Record<string, string | undefined> }) => {
-            const numericValue = parseFloat(value.replace(/\s/g, '').replace(',', '.'));
-            const rate = exchangeRate ? parseFloat(exchangeRate) : null;
+            const numericValue = toNumber(value);
+            const rate = exchangeRate ? Number.parseFloat(exchangeRate) : null;
 
             let nextAmountUah = field === 'amountUah' ? value : state.amountUah;
             let nextAmountUsd = field === 'amountUsd' ? value : state.amountUsd;
 
-            if (rate && !isNaN(numericValue)) {
-                if (field === 'amountUah') {
-                    const converted = numericValue / rate;
-                    const rounded = parseFloat(converted.toFixed(2));
-                    nextAmountUsd = rounded % 1 === 0 ? String(rounded) : String(rounded).replace('.', ',');
-                }
+            const canConvert = field === 'amountUah' && rate !== null && !Number.isNaN(numericValue);
+
+            if (canConvert) {
+                nextAmountUsd = convertUahToUsd(numericValue, rate);
             }
 
             const errors: Record<string, string | undefined> = {
@@ -29,7 +35,7 @@ jest.mock('@/utils/functions/update-funds-amounts/update-funds-amounts', () => (
                 amountUsd: undefined,
             };
 
-            if (trigger === 'blur' && (value === '' || value.trim() === '')) {
+            if (trigger === 'blur' && value.trim() === '') {
                 if (field === 'amountUah') errors.amountUah = 'Field is required';
                 if (field === 'amountUsd') errors.amountUsd = 'Field is required';
             }
@@ -63,7 +69,7 @@ const makeState = (overrides: Partial<TestState> = {}): TestState => ({
 });
 
 const applyUpdater = (setEditState: jest.Mock, prevState: TestState): TestState => {
-    const updater = setEditState.mock.calls[setEditState.mock.calls.length - 1][0];
+    const updater = setEditState.mock.calls.at(-1)[0];
     return updater(prevState);
 };
 
@@ -137,7 +143,7 @@ describe('useFundsAmountEdit', () => {
             expect(next.amountUsd).toBe('4 200');
         });
 
-        it('should use the actual exchange rate for conversion, not just shift decimal', () => {
+        it('should use the actual exchange rate for conversion', () => {
             const setEditState = jest.fn();
             const { result } = renderHook(() =>
                 useFundsAmountEdit({ exchangeRate: '42', mismatchMessage: MISMATCH_MESSAGE, setEditState }),
@@ -170,7 +176,7 @@ describe('useFundsAmountEdit', () => {
             expect(next).toBe(prev);
         });
 
-        it('should set usdMismatchMessage when isUsdAmountMismatch returns true on USD blur', () => {
+        it('should set usdMismatchMessage when mismatch is true', () => {
             jest.mocked(isUsdAmountMismatch).mockReturnValue(true);
             const setEditState = jest.fn();
             const { result } = renderHook(() =>
@@ -186,7 +192,7 @@ describe('useFundsAmountEdit', () => {
             expect(next.usdMismatchMessage).toBe(MISMATCH_MESSAGE);
         });
 
-        it('should not set usdMismatchMessage when isUsdAmountMismatch returns false on USD blur', () => {
+        it('should not set usdMismatchMessage when mismatch is false', () => {
             jest.mocked(isUsdAmountMismatch).mockReturnValue(false);
             const setEditState = jest.fn();
             const { result } = renderHook(() =>
@@ -202,7 +208,7 @@ describe('useFundsAmountEdit', () => {
             expect(next.usdMismatchMessage).toBeUndefined();
         });
 
-        it('should clear usdMismatchMessage on UAH blur regardless of mismatch', () => {
+        it('should clear usdMismatchMessage on UAH blur', () => {
             jest.mocked(isUsdAmountMismatch).mockReturnValue(true);
             const setEditState = jest.fn();
             const { result } = renderHook(() =>

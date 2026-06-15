@@ -1,0 +1,6 @@
+@use '@/assets/sass/variables/colors' as c;
+
+.error {
+    color: c.$error;
+    margin-bottom: 12px;
+}

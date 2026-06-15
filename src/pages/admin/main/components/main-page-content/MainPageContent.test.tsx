@@ -221,11 +221,18 @@ jest.mock('@/services/api/admin/main-page/main-page-localizations-api/main-page-
     MainPageLocalizationsApi: {
         getByLanguageId: jest.fn(),
         getStatuses: jest.fn(),
+        create: jest.fn(),
+        update: jest.fn(),
     },
 }));
 
 const getByExactText = (text: string) =>
     screen.getByText((_, el) => el?.children.length === 0 && el?.textContent === text);
+
+const getTranslationTitleInput = () => document.getElementById('main-page-translation-title') as HTMLInputElement;
+const getTranslationDescriptionInput = () =>
+    document.getElementById('main-page-translation-description') as HTMLTextAreaElement;
+const getSaveTranslationButton = () => screen.getByText('Зберегти переклад').closest('button') as HTMLButtonElement;
 
 describe('MainPageContent', () => {
     const mockPageData = {
@@ -260,6 +267,8 @@ describe('MainPageContent', () => {
         (MainPageApi.publish as jest.Mock).mockReset();
         (MainPageLocalizationsApi.getStatuses as jest.Mock).mockReset();
         (MainPageLocalizationsApi.getByLanguageId as jest.Mock).mockReset();
+        (MainPageLocalizationsApi.create as jest.Mock).mockReset();
+        (MainPageLocalizationsApi.update as jest.Mock).mockReset();
         (ImageApi.post as jest.Mock).mockReset();
 
         mockLocalizationToolkitState.allLanguages = [
@@ -289,6 +298,20 @@ describe('MainPageContent', () => {
                 title: 'Localized partners title',
                 description: 'Localized partners description',
             },
+        });
+        (MainPageLocalizationsApi.create as jest.Mock).mockResolvedValue({
+            entityId: 1,
+            title: 'Translated title',
+            description: 'Translated description',
+            mainAboutUs: null,
+            mainPartners: null,
+        });
+        (MainPageLocalizationsApi.update as jest.Mock).mockResolvedValue({
+            entityId: 1,
+            title: 'Translated title',
+            description: 'Translated description',
+            mainAboutUs: null,
+            mainPartners: null,
         });
         (ImageApi.post as jest.Mock).mockResolvedValue({ id: 2, url: 'uploaded.jpg' });
 
@@ -809,6 +832,164 @@ describe('MainPageContent', () => {
         fireEvent.click(screen.getByTestId('tab-btn-partners'));
         expect(screen.getByTestId('partners-block-form')).toBeInTheDocument();
         expect(screen.queryByTestId('title-block-form')).not.toBeInTheDocument();
+    });
+
+    it.each([
+        ['title', 'title-block-form'],
+        ['about', 'about-us-block-form'],
+        ['partners', 'partners-block-form'],
+    ])('shows translation action in the content top-right for %s block', async (tabId, formTestId) => {
+        mockLocalizationToolkitState.translationLanguages = [{ id: 2, code: 'en', name: 'Англійська' }];
+
+        await renderAndLoadContent();
+
+        fireEvent.click(screen.getByTestId(`tab-btn-${tabId}`));
+        expect(screen.getByTestId(formTestId)).toBeInTheDocument();
+        expect(screen.getByLabelText('Додати переклад')).toBeInTheDocument();
+    });
+
+    it.each(['statistics', 'donations'])('does not show translation action for %s block', async (tabId) => {
+        await renderAndLoadContent();
+
+        fireEvent.click(screen.getByTestId(`tab-btn-${tabId}`));
+
+        expect(screen.queryByLabelText('Додати переклад')).not.toBeInTheDocument();
+    });
+
+    it('opens add translation modal with empty fields and no generate button', async () => {
+        mockLocalizationToolkitState.translationLanguages = [{ id: 2, code: 'en', name: 'Англійська' }];
+
+        await renderAndLoadContent();
+
+        fireEvent.click(screen.getByLabelText('Додати переклад'));
+
+        expect(await screen.findByText('Додати переклад')).toBeInTheDocument();
+        expect(screen.getByText('Англійська')).toBeInTheDocument();
+
+        const titleInput = getTranslationTitleInput();
+        const descriptionInput = getTranslationDescriptionInput();
+
+        expect(titleInput.value).toBe('');
+        expect(descriptionInput.value).toBe('');
+        expect(titleInput).toHaveAttribute('maxlength', '50');
+        expect(descriptionInput).toHaveAttribute('maxlength', '300');
+        expect(getSaveTranslationButton()).toBeDisabled();
+    });
+
+    it('opens edit translation modal with existing English localization', async () => {
+        mockLocalizationToolkitState.translationLanguages = [{ id: 2, code: 'en', name: 'Англійська' }];
+        (MainPageApi.get as jest.Mock).mockResolvedValue({
+            ...mockPageData,
+            page: {
+                ...mockPageData.page,
+                localizations: [
+                    {
+                        languageId: 2,
+                        title: 'Existing English title',
+                        description: 'Existing English description',
+                        translationStatus: TranslationStatus.Relevant,
+                    },
+                ],
+            },
+        });
+
+        await renderAndLoadContent();
+
+        fireEvent.click(screen.getByLabelText('Додати переклад'));
+
+        expect(await screen.findByText('Редагувати переклад')).toBeInTheDocument();
+        expect(getTranslationTitleInput()).toHaveValue('Existing English title');
+        expect(getTranslationDescriptionInput()).toHaveValue('Existing English description');
+        expect(getSaveTranslationButton()).toBeDisabled();
+    });
+
+    it('enables save only after valid translation changes and shows validation while typing', async () => {
+        mockLocalizationToolkitState.translationLanguages = [{ id: 2, code: 'en', name: 'Англійська' }];
+
+        await renderAndLoadContent();
+
+        fireEvent.click(screen.getByLabelText('Додати переклад'));
+
+        await screen.findByText('Додати переклад');
+        const titleInput = getTranslationTitleInput();
+        const descriptionInput = getTranslationDescriptionInput();
+        const saveButton = getSaveTranslationButton();
+
+        fireEvent.change(titleInput, { target: { value: 'Short' } });
+
+        expect(await screen.findByText('Не менше 10 символів')).toBeInTheDocument();
+        expect(saveButton).toBeDisabled();
+
+        fireEvent.change(titleInput, { target: { value: 'Valid title text' } });
+        fireEvent.change(descriptionInput, { target: { value: 'Valid description text' } });
+
+        await waitFor(() => expect(saveButton).not.toBeDisabled());
+    });
+
+    it('keeps existing localized blocks when saving one block translation', async () => {
+        mockLocalizationToolkitState.translationLanguages = [{ id: 2, code: 'en', name: 'Англійська' }];
+        (MainPageApi.get as jest.Mock).mockResolvedValue({
+            ...mockPageData,
+            page: {
+                ...mockPageData.page,
+                mainAboutUs: {
+                    id: 10,
+                    title: 'Про нас',
+                    description: 'Опис про нас',
+                    localizations: [],
+                },
+                mainPartners: {
+                    id: 20,
+                    title: 'Партнери',
+                    description: 'Опис партнерів',
+                    localizations: [],
+                },
+            },
+        });
+        (MainPageLocalizationsApi.getByLanguageId as jest.Mock).mockResolvedValue({
+            entityId: 1,
+            title: null,
+            description: null,
+            mainAboutUs: {
+                entityId: 10,
+                title: 'Existing about title',
+                description: 'Existing about description',
+            },
+            mainPartners: {
+                entityId: 20,
+                title: 'Existing partners title',
+                description: 'Existing partners description',
+            },
+        });
+
+        await renderAndLoadContent();
+
+        fireEvent.click(screen.getByLabelText('Додати переклад'));
+        await screen.findByText('Додати переклад');
+        fireEvent.change(getTranslationTitleInput(), { target: { value: 'Valid title text' } });
+        fireEvent.change(getTranslationDescriptionInput(), { target: { value: 'Valid description text' } });
+
+        await waitFor(() => expect(getSaveTranslationButton()).not.toBeDisabled());
+        fireEvent.click(getSaveTranslationButton());
+
+        await waitFor(() => {
+            expect(MainPageLocalizationsApi.update).toHaveBeenCalled();
+        });
+
+        expect((MainPageLocalizationsApi.update as jest.Mock).mock.calls[0][3]).toEqual(
+            expect.objectContaining({
+                title: 'Valid title text',
+                description: 'Valid description text',
+                mainAboutUs: {
+                    title: 'Existing about title',
+                    description: 'Existing about description',
+                },
+                mainPartners: {
+                    title: 'Existing partners title',
+                    description: 'Existing partners description',
+                },
+            }),
+        );
     });
 
     it('opens publish modal when publish button is clicked', async () => {

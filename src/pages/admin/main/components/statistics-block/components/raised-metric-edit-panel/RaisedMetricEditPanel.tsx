@@ -1,9 +1,13 @@
 import { yupResolver } from '@hookform/resolvers/yup';
+import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
+import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { Toggle } from '@/components/admin/toggle/Toggle';
 import { MAIN_PAGE_TEXT } from '@/const/admin/main-page';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { FundsExpendituresApi } from '@/services/api/admin/reports/funds-expenditures-api';
 import { Metric, MetricLocalization, MetricPrefix } from '@/types/admin/main-page';
 import {
     formatCurrencyInput,
@@ -23,9 +27,14 @@ interface RaisedMetricEditPanelProps {
     metric: Metric;
     onSave?: (updatedMetric: Metric) => void;
     onCancel: () => void;
+    onSyncErrorChange?: (hasError: boolean) => void;
 }
 
-export const RaisedMetricEditPanel = ({ metric, onSave, onCancel }: RaisedMetricEditPanelProps) => {
+export const RaisedMetricEditPanel = ({ metric, onSave, onCancel, onSyncErrorChange }: RaisedMetricEditPanelProps) => {
+    const client = useAdminClient();
+    const [isSyncConfirmOpen, setIsSyncConfirmOpen] = useState(false);
+    const [isFetchingSyncPreview, setIsFetchingSyncPreview] = useState(false);
+
     const defaultNameUa = metric.name || '';
     const usdLocalization = metric.localizations?.find((l) => l.languageId === 2);
     const defaultNameEn = usdLocalization?.name || '';
@@ -40,9 +49,10 @@ export const RaisedMetricEditPanel = ({ metric, onSave, onCancel }: RaisedMetric
         control,
         handleSubmit,
         watch,
+        setValue,
         formState: { errors, isValid },
     } = useForm<RaisedMetricFormValues>({
-        mode: 'onBlur',
+        mode: 'onChange',
         resolver: yupResolver(raisedMetricEditSchema),
         defaultValues: {
             nameUa: defaultNameUa,
@@ -102,6 +112,69 @@ export const RaisedMetricEditPanel = ({ metric, onSave, onCancel }: RaisedMetric
         if (onSave) onSave(updatedMetric);
     };
 
+    const closeSyncConfirm = () => {
+        setIsSyncConfirmOpen(false);
+    };
+
+    const handleSyncToggleChange = (checked: boolean) => {
+        if (!checked) {
+            setValue('isAutoSynced', false, {
+                shouldDirty: true,
+                shouldTouch: true,
+                shouldValidate: true,
+            });
+            onSyncErrorChange?.(false);
+            return;
+        }
+
+        setIsSyncConfirmOpen(true);
+    };
+
+    const handleSyncCancel = () => {
+        setValue('isAutoSynced', false, {
+            shouldDirty: true,
+            shouldTouch: true,
+            shouldValidate: true,
+        });
+        closeSyncConfirm();
+    };
+
+    const handleSyncConfirm = async () => {
+        setIsFetchingSyncPreview(true);
+
+        try {
+            const summary = await FundsExpendituresApi.getSummary(client);
+
+            setValue('isAutoSynced', true, {
+                shouldDirty: true,
+                shouldTouch: true,
+                shouldValidate: true,
+            });
+            setValue('valueUah', formatWithSpaces(summary.totalCollectedUah), {
+                shouldDirty: true,
+                shouldTouch: true,
+                shouldValidate: true,
+            });
+            setValue('valueUsd', formatWithSpaces(summary.totalCollectedUsd), {
+                shouldDirty: true,
+                shouldTouch: true,
+                shouldValidate: true,
+            });
+            onSyncErrorChange?.(false);
+            closeSyncConfirm();
+        } catch (error) {
+            setValue('isAutoSynced', false, {
+                shouldDirty: true,
+                shouldTouch: true,
+                shouldValidate: true,
+            });
+            onSyncErrorChange?.(true);
+            closeSyncConfirm();
+        } finally {
+            setIsFetchingSyncPreview(false);
+        }
+    };
+
     return (
         <div className={styles.panel}>
             <div className={styles.header}>{MAIN_PAGE_TEXT.BLOCKS.EDIT_PANEL.TITLE}</div>
@@ -122,11 +195,11 @@ export const RaisedMetricEditPanel = ({ metric, onSave, onCancel }: RaisedMetric
                 <Controller
                     name="isAutoSynced"
                     control={control}
-                    render={({ field: { onChange, value } }) => (
+                    render={({ field: { value } }) => (
                         <Toggle
                             id={`sync-toggle-${metric.id}`}
                             checked={value}
-                            onChange={onChange}
+                            onChange={handleSyncToggleChange}
                             ariaLabel="Автоматична синхронізація"
                         />
                     )}
@@ -178,6 +251,15 @@ export const RaisedMetricEditPanel = ({ metric, onSave, onCancel }: RaisedMetric
                 isValid={isValid}
                 onCancel={onCancel}
                 onSave={handleSubmit(onValidSubmit)}
+            />
+
+            <ConfirmationModal
+                isOpen={isSyncConfirmOpen}
+                title={MAIN_PAGE_TEXT.BLOCKS.EDIT_PANEL.SYNC_CONFIRM_TITLE}
+                onConfirm={handleSyncConfirm}
+                onCancel={handleSyncCancel}
+                onClose={handleSyncCancel}
+                isButtonsDisabled={isFetchingSyncPreview}
             />
         </div>
     );

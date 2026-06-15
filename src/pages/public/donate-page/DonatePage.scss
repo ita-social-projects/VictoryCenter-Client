@@ -2,6 +2,8 @@
 
 .donatePage {
     background-color: colors.$light-blue-50;
+    width: 100%;
+    min-height: 100vh;
     padding-top: 1rem;
 
     &-loader {
@@ -30,5 +32,30 @@
         position: sticky;
         top: 21rem;
         height: fit-content;
+    }
+}
+
+@media (max-width: 900px) {
+    .donatePageContent {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 3rem;
+        padding: 4rem 2rem;
+
+        .stickyBlock {
+            position: static;
+            width: 100%;
+        }
+
+        .rightSectionContainer {
+            width: 100%;
+        }
+    }
+}
+
+@media (max-width: 568px) {
+    .donatePageContent {
+        padding: 3rem 1rem;
+        gap: 2rem;
     }
 }

@@ -64,6 +64,9 @@ export interface Metric extends EntityWithLocalizations<MetricLocalization> {
     type: MetricType;
     prefix?: MetricPrefix | null;
     isAutoSynced?: boolean;
+    isAutoSyncFailed?: boolean;
+    autoSyncError?: string | null;
+    syncError?: string | null;
     isHidden: boolean;
     priority: number;
 }
@@ -135,6 +138,9 @@ export interface MetricDto extends EntityWithDtoLocalizations<MetricLocalization
     type?: MetricType;
     prefix?: MetricPrefix | null;
     isAutoSynced?: boolean;
+    isAutoSyncFailed?: boolean;
+    autoSyncError?: string | null;
+    syncError?: string | null;
     isHidden?: boolean;
     priority?: number;
 }
@@ -181,6 +187,7 @@ export interface CreateMetricDto {
     name: string;
     type: MetricType;
     prefix?: MetricPrefix | null;
+    isAutoSynced?: boolean;
     localization?: CreateMetricLocalizationDto | null;
 }
 

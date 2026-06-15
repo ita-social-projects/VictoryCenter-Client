@@ -16,6 +16,7 @@
     justify-content: center;
     align-items: center;
     overflow-x: hidden;
+    position: relative;
     font-family: t.$font-family-base;
 
     @media (min-width: 768px) {
@@ -43,6 +44,9 @@
         letter-spacing: -0.02em;
         text-align: center;
         text-transform: uppercase;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
 
         @media (min-width: 768px) {
             font-size: 56px;
@@ -52,6 +56,7 @@
         @media (min-width: 1024px) {
             font-size: 64px;
             line-height: 76px;
+            display: block;
         }
 
         @media (min-width: 1280px) {
@@ -63,99 +68,62 @@
             font-size: 96px;
             line-height: 112px;
         }
+
+        span {
+            display: block;
+            max-width: 100%;
+
+            @media (min-width: 1024px) {
+                display: inline;
+            }
+        }
+
+        span:first-child {
+            @media (min-width: 1024px) {
+                display: block;
+            }
+        }
     }
 
-    span {
+    .highlight-yellow,
+    .highlight-blue {
         font-weight: 800;
         font-style: italic;
-        font-size: 40px;
-        line-height: 48px;
-        letter-spacing: -0.02em;
-        text-align: center;
-        text-transform: uppercase;
-        position: relative;
-        display: inline-block;
-        background: antiquewhite;
-
-        @media (min-width: 768px) {
-            font-size: 56px;
-            line-height: 68px;
-        }
 
         @media (min-width: 1024px) {
-            font-size: 64px;
-            line-height: 76px;
-        }
-
-        @media (min-width: 1280px) {
-            font-size: 80px;
-            line-height: 94px;
-        }
-
-        @media (min-width: 1440px) {
-            font-size: 96px;
-            line-height: 112px;
+            display: inline-block;
         }
     }
 
-    span:nth-child(2) {
-        background: colors.$yellow-400;
+    .highlight-yellow {
+        background-color: colors.$yellow-400;
         position: relative;
-    }
-
-    span:nth-child(2):before {
-        content: '';
-        width: 100vw;
-        height: 48px;
-        background: colors.$yellow-400;
-        position: absolute;
-        transform: translateX(-100%);
-
-        @media (min-width: 768px) {
-            height: 68px;
-        }
-
-        @media (min-width: 1024px) {
-            height: 76px;
-        }
-
-        @media (min-width: 1280px) {
-            height: 94px;
-        }
-
-        @media (min-width: 1440px) {
-            height: 112px;
+        
+        &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 100%;
+            width: 100vw;
+            background-color: colors.$yellow-400;
         }
     }
 
-    span:nth-child(3) {
-        background: colors.$light-blue-200;
+    .highlight-blue {
+        background-color: colors.$light-blue-200;
         position: relative;
         z-index: z-index.public(programs-page-intro-section-text);
-    }
-
-    span:nth-child(3):before {
-        content: '';
-        width: 100vw;
-        height: 48px;
-        background: colors.$light-blue-200;
-        position: absolute;
-        z-index: z-index.public(programs-page-intro-section-background);
-
-        @media (min-width: 768px) {
-            height: 68px;
-        }
-
-        @media (min-width: 1024px) {
-            height: 76px;
-        }
-
-        @media (min-width: 1280px) {
-            height: 94px;
-        }
-
-        @media (min-width: 1440px) {
-            height: 112px;
+        
+        &::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 100%;
+            width: 100vw;
+            background-color: colors.$light-blue-200;
+            z-index: z-index.public(programs-page-intro-section-background);
         }
     }
 
@@ -180,19 +148,23 @@
             flex-direction: row;
             font-size: 20px;
             line-height: 28px;
+            align-items: flex-start;
         }
 
         p {
             width: 100%;
             max-width: 432px;
-            text-align: center;
+            text-align: left;
 
             @media (min-width: 1024px) {
+                max-width: 432px;
                 text-align: left;
             }
         }
 
         p:nth-child(1) {
+            margin-bottom: 0;
+
             @media (min-width: 1024px) {
                 max-width: 430px;
             }

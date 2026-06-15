@@ -43,13 +43,23 @@ jest.mock('../statistics-metric-edit-panel/StatisticsMetricEditPanel', () => ({
 }));
 
 jest.mock('../raised-metric-edit-panel/RaisedMetricEditPanel', () => ({
-    RaisedMetricEditPanel: ({ metric, onSave, onCancel }: any) => (
+    RaisedMetricEditPanel: ({ metric, onSave, onCancel, onSyncErrorChange }: any) => (
         <div data-testid="raised-edit-panel">
             <button
                 type="button"
                 data-testid="save-raised-edit"
-                onClick={() => onSave({ ...metric, name: 'Updated Raised' })}
+                onClick={() =>
+                    onSave({
+                        ...metric,
+                        name: 'Updated Raised',
+                        isAutoSynced: true,
+                        localizations: metric.localizations?.map((loc: any) =>
+                            loc.languageId === 1 ? { ...loc, name: 'Updated Raised' } : loc,
+                        ),
+                    })
+                }
             />
+            <button type="button" data-testid="trigger-raised-sync-error" onClick={() => onSyncErrorChange?.(true)} />
             <button type="button" data-testid="cancel-raised-edit" onClick={onCancel} />
         </div>
     ),
@@ -73,6 +83,7 @@ describe('StatisticsMetricsList', () => {
         return {
             onToggleVisibility: finalProps.onToggleVisibility,
             onMetricUpdate: finalProps.onMetricUpdate,
+            onRaisedFundsSyncErrorChange: finalProps.onRaisedFundsSyncErrorChange,
         };
     };
 
@@ -151,7 +162,28 @@ describe('StatisticsMetricsList', () => {
         expect(screen.getByTestId('raised-edit-panel')).toBeInTheDocument();
 
         fireEvent.click(screen.getByTestId('save-raised-edit'));
-        expect(onMetricUpdate).toHaveBeenCalledWith([metrics[0], { ...metrics[1], name: 'Updated Raised' }]);
+        expect(screen.queryByTestId('raised-edit-panel')).not.toBeInTheDocument();
+        expect(onMetricUpdate).toHaveBeenCalledWith([
+            metrics[0],
+            {
+                ...metrics[1],
+                name: 'Updated Raised',
+                isAutoSynced: true,
+                localizations: metrics[1].localizations?.map((loc: any) =>
+                    loc.languageId === 1 ? { ...loc, name: 'Updated Raised' } : loc,
+                ),
+            },
+        ]);
+    });
+
+    it('passes raised funds sync error state changes from edit panel to parent', () => {
+        const onRaisedFundsSyncErrorChange = jest.fn();
+        setup({ onRaisedFundsSyncErrorChange });
+
+        fireEvent.click(screen.getAllByTestId('icon-Edit metric')[1]);
+        fireEvent.click(screen.getByTestId('trigger-raised-sync-error'));
+
+        expect(onRaisedFundsSyncErrorChange).toHaveBeenCalledWith(true);
     });
 
     it('closes edit panels on cancel', () => {

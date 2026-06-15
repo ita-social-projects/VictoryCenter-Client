@@ -376,5 +376,11 @@ export const PROGRAM_EXPENSES_TEXT = {
         RECORD_CREATE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
         RECORD_DELETED_SUCCESSFULLY: 'Запис успішно видалено',
         RECORD_DELETE_FAILED_RETRY: 'Не вдалося видалити запис. Спробуйте ще раз',
+    BULK: {
+        getSelectedLabel: (selected: number, total: number) => `Вибрано ${selected} з ${total}`,
+        DELETE_BUTTON: 'Видалити вибрані',
+        DELETE_CONFIRM_TITLE: 'Видалити обрані записи?',
+        DELETE_SUCCESS: 'Записи видалені успішно',
+        DELETE_FAILED: 'Помилка при видаленні записів. Спробуйте ще раз.',
     },
 };

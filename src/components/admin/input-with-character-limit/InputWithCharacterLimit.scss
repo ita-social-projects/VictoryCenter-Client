@@ -65,15 +65,14 @@
         svg {
             width: 100%;
             height: 100%;
-            fill: colors.$grey-900;
         }
 
-        &:hover svg {
+        &:hover svg path {
             fill: colors.$blue-500;
         }
 
-        &--error svg {
-            filter: invert(41%) sepia(59%) saturate(2297%) hue-rotate(334deg) brightness(90%) contrast(110%);
+        &--error svg path {
+            fill: colors.$error;
         }
 
         &--hidden {

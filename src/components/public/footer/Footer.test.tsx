@@ -61,8 +61,15 @@ describe('Footer', () => {
             PUBLIC_ROUTES.REPORTS.FULL,
         );
 
-        expect(screen.getByText(footerUk['HOW_TO_SUPPORT'])).not.toBeVisible();
-        expect(screen.getByText(footerUk['STORIES_OF_VICTORIES'])).not.toBeVisible();
+        const howToSupportLink = document.querySelector(`a.disable[href="${PUBLIC_ROUTES.MOCK.FULL}"]`);
+        expect(howToSupportLink).toBeInTheDocument();
+        expect(howToSupportLink).toHaveAttribute('href', PUBLIC_ROUTES.MOCK.FULL);
+        expect(howToSupportLink).toHaveClass('disable');
+
+        expect(screen.getByRole('link', { name: footerUk['STORIES_OF_VICTORIES'] })).toHaveAttribute(
+            'href',
+            PUBLIC_ROUTES.STORIES_OF_VICTORIES.FULL,
+        );
     });
 
     it('renders the about us section with correct links', () => {

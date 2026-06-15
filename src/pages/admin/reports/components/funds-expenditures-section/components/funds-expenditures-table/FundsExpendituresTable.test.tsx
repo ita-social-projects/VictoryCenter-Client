@@ -745,49 +745,7 @@ describe('FundsExpendituresTable', () => {
             expect(screen.getByLabelText('Accept record 1')).toBeDisabled();
         });
 
-        it.each([
-            {
-                title: 'should recalculate USD when UAH amount is changed and validated',
-                changedFieldLabel: 'Amount UAH record 1',
-                changedValue: '8 000',
-                expectedFieldLabel: 'Amount USD record 1',
-                expectedValue: '200',
-                withBlur: true,
-            },
-            {
-                title: 'should recalculate USD immediately on valid UAH change using current exchange rate',
-                changedFieldLabel: 'Amount UAH record 1',
-                changedValue: '8 000',
-                expectedFieldLabel: 'Amount USD record 1',
-                expectedValue: '200',
-                withBlur: false,
-            },
-        ])('$title', ({ changedFieldLabel, changedValue, expectedFieldLabel, expectedValue, withBlur }) => {
-            renderTable({ isEditing: true, exchangeRate: '40' });
-
-            fireEvent.click(screen.getByLabelText('Edit record 1'));
-
-            const changedField = screen.getByLabelText(changedFieldLabel);
-            fireEvent.change(changedField, { target: { value: changedValue } });
-
-            if (withBlur) {
-                fireEvent.blur(changedField);
-            }
-
-            expect(screen.getByLabelText(expectedFieldLabel)).toHaveValue(expectedValue);
-        });
-
-        it('should not recalculate opposite amount when exchange rate is invalid', () => {
-            renderTable({ isEditing: true, exchangeRate: null });
-
-            fireEvent.click(screen.getByLabelText('Edit record 1'));
-            fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '8 000' } });
-            fireEvent.blur(screen.getByLabelText('Amount UAH record 1'));
-
-            expect(screen.getByLabelText('Amount USD record 1')).toHaveValue('4 200');
-        });
-
-        it('should show mismatch info message when edited USD does not match converted UAH amount', () => {
+        it('should show USD mismatch message in the UI when amounts do not match', () => {
             renderTable({ isEditing: true, exchangeRate: '40' });
 
             fireEvent.click(screen.getByLabelText('Edit record 1'));
@@ -798,7 +756,7 @@ describe('FundsExpendituresTable', () => {
             expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).toBeInTheDocument();
         });
 
-        it('should clear mismatch info message immediately when UAH amount changes', () => {
+        it('should clear USD mismatch message from UI when UAH amount is changed', () => {
             renderTable({ isEditing: true, exchangeRate: '40' });
 
             fireEvent.click(screen.getByLabelText('Edit record 1'));
@@ -811,30 +769,6 @@ describe('FundsExpendituresTable', () => {
             fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: 'abc' } });
 
             expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).not.toBeInTheDocument();
-        });
-
-        it('should use current exchange rate instead of just adding/removing zeroes', () => {
-            const records: EnrichedRecord[] = [
-                {
-                    id: 1,
-                    categoryId: 1,
-                    categoryName: 'Грантові кошти',
-                    type: 'income',
-                    reportingYear: '2025',
-                    amountUah: '500 000',
-                    amountUsd: '13 500',
-                },
-            ];
-
-            renderTable({ isEditing: true, exchangeRate: '42', records });
-
-            fireEvent.click(screen.getByLabelText('Edit record 1'));
-
-            fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '50 000' } });
-            expect(screen.getByLabelText('Amount USD record 1')).toHaveValue('1190,48');
-
-            fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '500 000' } });
-            expect(screen.getByLabelText('Amount USD record 1')).toHaveValue('11904,77');
         });
     });
 

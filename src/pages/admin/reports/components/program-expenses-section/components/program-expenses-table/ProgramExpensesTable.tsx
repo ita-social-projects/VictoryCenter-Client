@@ -10,8 +10,7 @@ import {
 } from '@/validation/admin/reports-schema/funds-expenditures-record-schema/funds-expenditures-record-schema';
 import { ProgramExpensesRecord } from '@/types/admin/reports';
 import { Button } from '@/components/admin/button/Button';
-import { updateFundsAmounts } from '@/utils/functions/update-funds-amounts/update-funds-amounts';
-import { isUsdAmountMismatch } from '@/utils/functions/validate-usd-amount-mismatch/validate-usd-amount-mismatch';
+import { useFundsAmountEdit } from '@/hooks/admin/use-funds-amount-edit/useFundsAmountEdit';
 import cn from 'classnames';
 import styles from './ProgramExpensesTable.module.scss';
 
@@ -140,79 +139,11 @@ export const ProgramExpensesTable = ({
         setRowEditMode(null);
     }, [setRowEditMode]);
 
-    const applyAmountUpdate = useCallback(
-        (prev: RowEditState, field: 'amountUah' | 'amountUsd', value: string, trigger: 'change' | 'blur') => {
-            const updatedAmounts = updateFundsAmounts(
-                field,
-                value,
-                exchangeRate ?? null,
-                trigger,
-            )({
-                amountUah: prev.amountUah,
-                amountUsd: prev.amountUsd,
-                errors: { amountUah: prev.errors.amountUah, amountUsd: prev.errors.amountUsd },
-            });
-
-            return {
-                ...prev,
-                amountUah: updatedAmounts.amountUah,
-                amountUsd: updatedAmounts.amountUsd,
-                errors: {
-                    ...prev.errors,
-                    amountUah: updatedAmounts.errors.amountUah,
-                    amountUsd: updatedAmounts.errors.amountUsd,
-                },
-            };
-        },
-        [exchangeRate],
-    );
-
-    const handleAmountChange = useCallback(
-        (recordId: number, field: 'amountUah' | 'amountUsd', nextValue: string) => {
-            setRowEditState((prev) => {
-                if (prev?.recordId !== recordId) {
-                    return prev;
-                }
-
-                const nextState = applyAmountUpdate(prev, field, nextValue, 'change');
-
-                return {
-                    ...nextState,
-                    usdMismatchMessage: undefined,
-                };
-            });
-        },
-        [applyAmountUpdate],
-    );
-
-    const handleAmountBlur = useCallback(
-        (recordId: number, field: 'amountUah' | 'amountUsd') => {
-            setRowEditState((prev) => {
-                if (prev?.recordId !== recordId) {
-                    return prev;
-                }
-
-                const nextState = applyAmountUpdate(prev, field, prev[field], 'blur');
-
-                if (field === 'amountUsd') {
-                    const hasMismatch = isUsdAmountMismatch(nextState.amountUah, nextState.amountUsd, exchangeRate);
-
-                    return {
-                        ...nextState,
-                        usdMismatchMessage: hasMismatch
-                            ? PROGRAM_EXPENSES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH
-                            : undefined,
-                    };
-                }
-
-                return {
-                    ...nextState,
-                    usdMismatchMessage: undefined,
-                };
-            });
-        },
-        [applyAmountUpdate, exchangeRate],
-    );
+    const { handleAmountChange, handleAmountBlur } = useFundsAmountEdit({
+        exchangeRate,
+        mismatchMessage: PROGRAM_EXPENSES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH,
+        setEditState: setRowEditState,
+    });
 
     const handleAcceptRowEdit = useCallback(
         async (record: ProgramExpensesRecord) => {

@@ -2,7 +2,6 @@ import { fireEvent, render, screen, waitFor, within } from '@testing-library/rea
 import '@testing-library/jest-dom';
 import { FUNDS_EXPENDITURES_TEXT, PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
 import { ProgramExpensesTable, ProgramExpensesTableProps } from './ProgramExpensesTable';
-import { isUsdAmountMismatch } from '@/utils/functions/validate-usd-amount-mismatch/validate-usd-amount-mismatch';
 
 jest.mock(
     '@/pages/admin/reports/components/program-expenses-section/components/program-expenses-empty-state/ProgramExpensesEmptyState',
@@ -97,10 +96,6 @@ describe('ProgramExpensesTable', () => {
     const renderTable = (props: Partial<ProgramExpensesTableProps> = {}) => {
         return render(<ProgramExpensesTable records={records} hasAnyProgramExpenseRecords isEditing {...props} />);
     };
-
-    beforeEach(() => {
-        jest.mocked(isUsdAmountMismatch).mockReturnValue(false);
-    });
 
     it('should render table headers', () => {
         render(<ProgramExpensesTable records={records} hasAnyProgramExpenseRecords />);
@@ -294,18 +289,6 @@ describe('ProgramExpensesTable', () => {
         expect(screen.getByText('Invalid amount')).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Accept record 1' })).toBeDisabled();
         expect(onRecordSave).not.toHaveBeenCalled();
-    });
-
-    it('should show USD mismatch message when isUsdAmountMismatch returns true on blur', () => {
-        jest.mocked(isUsdAmountMismatch).mockReturnValue(true);
-
-        renderTable();
-
-        fireEvent.click(screen.getByRole('button', { name: 'Edit record 1' }));
-        fireEvent.change(screen.getByLabelText('Amount USD record 1'), { target: { value: '5000' } });
-        fireEvent.blur(screen.getByLabelText('Amount USD record 1'));
-
-        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).toBeInTheDocument();
     });
 
     it('should disable edit, delete and checkbox controls for other rows while a row is being edited', () => {

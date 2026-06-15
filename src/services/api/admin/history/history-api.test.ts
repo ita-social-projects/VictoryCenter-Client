@@ -14,7 +14,6 @@ jest.mock('@/services/api/admin/image/image-api', () => ({
 
 const mockGetUpdateImageId = ImageApi.getUpdateImageId as jest.Mock;
 const mockImageDelete = ImageApi.delete as jest.Mock;
-jest.mock('@/services/api/admin/image/image-api');
 
 describe('HistoryApi', () => {
     const mockClient = {

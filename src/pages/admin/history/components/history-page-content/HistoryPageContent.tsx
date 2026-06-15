@@ -11,11 +11,7 @@ import { HistoryPageToolbar } from '../history-page-toolbar/HistoryPageToolbar';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { HistoryApi } from '@/services/api/admin/history/history-api';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
-import {
-    CreateUpdateHistorySectionDto,
-    HistorySectionContent,
-    HistorySectionDto,
-} from '@/types/common/history-sections';
+import { CreateUpdateHistorySectionDto, HistorySectionDto } from '@/types/common/history-sections';
 import { useSectionCancelConfirmation } from '@/hooks/admin/use-section-cancel-confirmation/useSectionCancelConfirmation';
 import { SectionCancelActionType } from '@/types/admin/programs';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
@@ -32,7 +28,12 @@ import { ToastContainer } from '@/components/admin/toast/toast-container/ToastCo
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
 import { mapHistorySectionDtoToModel } from '@/utils/functions/mappers/admin/history/history-mappers';
 import { ContentType } from '@/types/common/section-contents';
-import { EntityWithTranslationStatuses, TranslationStatus, TranslationStatusInfo } from '@/types/common/language';
+import {
+    EntityWithTranslationStatuses,
+    TranslationStatus,
+    TranslationStatusFilter,
+    TranslationStatusInfo,
+} from '@/types/common/language';
 
 type HistoryErrorType = 'languages';
 
@@ -206,8 +207,14 @@ export const HistoryPageContent = () => {
         setLocalizationError({ message, type });
     }, []);
 
-    const { allLanguages, translationLanguages, selectedLanguage, onLanguageChange, onTranslationStatusFilterChange } =
-        useLocalizationToolkit({ setErrorState });
+    const {
+        allLanguages,
+        translationLanguages,
+        selectedLanguage,
+        onLanguageChange,
+        translationStatusFilter,
+        onTranslationStatusFilterChange,
+    } = useLocalizationToolkit({ setErrorState });
 
     const localizedEntity = useMemo((): EntityWithTranslationStatuses | undefined => {
         const translationStatuses: TranslationStatusInfo[] = [];
@@ -242,6 +249,34 @@ export const HistoryPageContent = () => {
 
         return { translationStatuses };
     }, [normalizedSections, translationLanguages]);
+
+    const filteredSections = useMemo(() => {
+        if (!translationStatusFilter || translationLanguages.length === 0) return normalizedSections;
+
+        return normalizedSections.filter((section) => {
+            const mappedSection = mapHistorySectionDtoToModel(section);
+            const localizableContents = mappedSection.contents.filter((c) => c.contentType !== ContentType.Image);
+
+            if (localizableContents.length === 0) return false;
+
+            return localizableContents.some((content) => {
+                for (const lang of translationLanguages) {
+                    const loc = content.localizations?.find((l) => l.language.id === lang.id);
+
+                    if (translationStatusFilter === TranslationStatusFilter.Missing && !loc) {
+                        return true;
+                    }
+                    if (
+                        translationStatusFilter === TranslationStatusFilter.Outdated &&
+                        loc?.translationStatus === TranslationStatus.Outdated
+                    ) {
+                        return true;
+                    }
+                }
+                return false;
+            });
+        });
+    }, [normalizedSections, translationStatusFilter, translationLanguages]);
 
     return (
         <div className={styles['history-page-wrapper']} data-testid="history-page-content">
@@ -293,7 +328,7 @@ export const HistoryPageContent = () => {
                 {!isSectionsLoading && !hasSectionsError && hasSections && (
                     <HistoryForm
                         ref={historyFormRef}
-                        sections={normalizedSections}
+                        sections={filteredSections}
                         onReplaceSection={handleReplaceSection}
                         onSectionsChange={(s) => {
                             setLocalSectionsCount(s.length);

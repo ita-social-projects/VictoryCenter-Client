@@ -362,14 +362,22 @@ describe('HistoryPageContent', () => {
         );
     });
 
-    it('calculates localizedEntity correctly, skipping Image content type', () => {
+    it('calculates localizedEntity correctly by aggregating translation statuses', () => {
         const sections = mockSingleSectionData();
 
         const mappedModel = {
             contents: [
                 { id: 'content-1', contentType: ContentType.Image },
-                { id: 'content-2', contentType: ContentType.Title },
-                { id: 'content-3', contentType: ContentType.Description },
+                {
+                    id: 'content-2',
+                    contentType: ContentType.Title,
+                    localizations: [{ language: { id: 'uk', code: 'uk' }, translationStatus: 1 }],
+                },
+                {
+                    id: 'content-3',
+                    contentType: ContentType.Description,
+                    localizations: [{ language: { id: 'uk', code: 'uk' }, translationStatus: 1 }],
+                },
             ],
         };
         mockedMapHistorySectionDtoToModel.mockReturnValue(mappedModel);
@@ -380,7 +388,7 @@ describe('HistoryPageContent', () => {
 
         expect(mockToolbarProps).toHaveBeenCalledWith(
             expect.objectContaining({
-                localizedEntity: { id: 'content-2', contentType: ContentType.Title },
+                localizedEntity: { translationStatuses: [{ languageId: 'uk', translationStatus: 1 }] },
             }),
         );
     });

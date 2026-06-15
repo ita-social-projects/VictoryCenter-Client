@@ -361,10 +361,16 @@ export const MainPageContent = () => {
 
     const selectedTab = TABS.find((tab) => tab.id === activeTab) || TABS[0];
     const canTranslateActiveBlock =
-        selectedTab.localizationBlock != null && TRANSLATABLE_BLOCKS.has(selectedTab.localizationBlock);
+        translationLanguages.length > 0 &&
+        selectedTab.localizationBlock != null &&
+        TRANSLATABLE_BLOCKS.has(selectedTab.localizationBlock);
 
     const handleOpenTranslationModal = () => {
-        if (selectedTab.localizationBlock == null || !TRANSLATABLE_BLOCKS.has(selectedTab.localizationBlock)) {
+        if (
+            translationLanguages.length === 0 ||
+            selectedTab.localizationBlock == null ||
+            !TRANSLATABLE_BLOCKS.has(selectedTab.localizationBlock)
+        ) {
             return;
         }
 
@@ -378,7 +384,7 @@ export const MainPageContent = () => {
     const handleTranslationSuccess = async () => {
         await loadMainPageData(false);
         setTranslationBlock(null);
-        addToast(COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS, ToastType.Success, 3000);
+        addToast(COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_PUBLISHED_SUCCESS, ToastType.Success, 3000);
     };
 
     const isReadOnlyLanguage = selectedLanguage ? selectedLanguage.code !== DEFAULT_LOCALE : false;

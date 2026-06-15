@@ -139,6 +139,41 @@ describe('useTranslateMainPageBlock', () => {
         expect(onSuccess).toHaveBeenCalled();
     });
 
+    it('treats zero entity ids as valid ids', async () => {
+        jest.spyOn(axios, 'isAxiosError').mockReturnValue(true);
+        (MainPageLocalizationsApi.getByLanguageId as jest.Mock).mockRejectedValue({ response: { status: 404 } });
+        const { result } = renderTranslateHook({
+            page: {
+                ...page,
+                id: 0,
+                mainAboutUs: {
+                    ...page.mainAboutUs!,
+                    id: 0,
+                },
+            },
+            block: MainPageLocalizationBlock.AboutUs,
+        });
+
+        await act(async () => {
+            await result.current.translateMainPageBlock({
+                title: 'New about title',
+                description: 'New about description',
+            });
+        });
+
+        expect(MainPageLocalizationsApi.create).toHaveBeenCalledWith(
+            expect.any(Object),
+            expect.objectContaining({
+                entityId: 0,
+                mainAboutUs: {
+                    entityId: 0,
+                    title: 'New about title',
+                    description: 'New about description',
+                },
+            }),
+        );
+    });
+
     it('sets error and rethrows when loading current localization fails with non-404', async () => {
         (MainPageLocalizationsApi.getByLanguageId as jest.Mock).mockRejectedValue(new Error('failed'));
         const { result } = renderTranslateHook();

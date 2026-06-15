@@ -76,13 +76,14 @@ describe('TranslateMainPageBlockForm', () => {
         expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
     });
 
-    it('validates max length while typing', async () => {
+    it('prevents entering more than the max length while typing', async () => {
         render(<Harness config={{ ...validationConfig, titleMaxLength: 50 }} />);
 
         fireEvent.change(titleInput(), { target: { value: 'x'.repeat(51) } });
 
-        expect(await screen.findByText('Не більше 50 символів')).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
+        await waitFor(() => expect(titleInput()).toHaveValue('x'.repeat(50)));
+        expect(screen.getByText('50/50')).toBeInTheDocument();
+        expect(screen.queryByText('Не більше 50 символів')).not.toBeInTheDocument();
     });
 
     it('enables save after valid changes and submits values', async () => {

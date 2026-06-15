@@ -797,6 +797,7 @@ describe('MainPageContent', () => {
 
         expect(MainPageLocalizationsApi.getStatuses).not.toHaveBeenCalled();
         expect(MainPageLocalizationsApi.getByLanguageId).not.toHaveBeenCalled();
+        expect(screen.queryByLabelText('Додати переклад')).not.toBeInTheDocument();
     });
 
     it('switches tabs correctly', async () => {
@@ -974,6 +975,10 @@ describe('MainPageContent', () => {
 
         await waitFor(() => {
             expect(MainPageLocalizationsApi.update).toHaveBeenCalled();
+        });
+
+        await waitFor(() => {
+            expect(mockAddToast).toHaveBeenCalledWith('Переклад опубліковано успішно', 'success', 3000);
         });
 
         expect((MainPageLocalizationsApi.update as jest.Mock).mock.calls[0][3]).toEqual(

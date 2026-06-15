@@ -159,7 +159,7 @@ const buildCreatePayload = (
         title: titleValues.title,
         description: titleValues.description,
         mainAboutUs:
-            aboutUsValues && page.mainAboutUs?.id
+            aboutUsValues && page.mainAboutUs?.id != null
                 ? {
                       entityId: page.mainAboutUs.id,
                       title: aboutUsValues.title,
@@ -167,7 +167,7 @@ const buildCreatePayload = (
                   }
                 : null,
         mainPartners:
-            partnersValues && page.mainPartners?.id
+            partnersValues && page.mainPartners?.id != null
                 ? {
                       entityId: page.mainPartners.id,
                       title: partnersValues.title,
@@ -226,13 +226,13 @@ export const useTranslateMainPageBlock = ({ page, block, language, onSuccess }: 
     const [error, setError] = useState('');
 
     const translateMainPageBlock = async (data: TranslateMainPageBlockFormValues) => {
-        if (!page?.id || block == null || !language) {
+        if (page?.id == null || block == null || !language) {
             return;
         }
 
         const entityId = getBlockEntityId(page, block);
 
-        if (!entityId) {
+        if (entityId == null) {
             setError(MAIN_PAGE_TEXT.ERRORS.TRANSLATION_SAVE_FAILED);
             return;
         }

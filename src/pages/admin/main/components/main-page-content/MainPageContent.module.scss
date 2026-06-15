@@ -53,6 +53,10 @@
 
     button {
         border: none;
-        outline: none;
+
+        &:focus-visible {
+            outline: 2px solid c.$blue-500;
+            outline-offset: 2px;
+        }
     }
 }

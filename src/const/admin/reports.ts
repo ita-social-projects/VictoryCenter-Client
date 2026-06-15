@@ -376,6 +376,7 @@ export const PROGRAM_EXPENSES_TEXT = {
         RECORD_CREATE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
         RECORD_DELETED_SUCCESSFULLY: 'Запис успішно видалено',
         RECORD_DELETE_FAILED_RETRY: 'Не вдалося видалити запис. Спробуйте ще раз',
+    },
     BULK: {
         getSelectedLabel: (selected: number, total: number) => `Вибрано ${selected} з ${total}`,
         DELETE_BUTTON: 'Видалити вибрані',

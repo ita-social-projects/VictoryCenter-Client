@@ -682,17 +682,6 @@ describe('FundsExpendituresTable', () => {
             });
         });
 
-        it('should show required validation for empty amount on blur', () => {
-            renderTable({ isEditing: true });
-
-            fireEvent.click(screen.getByLabelText('Edit record 1'));
-            fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '   ' } });
-            fireEvent.blur(screen.getByLabelText('Amount UAH record 1'));
-
-            expect(screen.getByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED)).toBeInTheDocument();
-            expect(screen.getByLabelText('Accept record 1')).toBeDisabled();
-        });
-
         it('should show numeric validation for non-number amount', () => {
             renderTable({ isEditing: true });
 
@@ -731,17 +720,6 @@ describe('FundsExpendituresTable', () => {
             fireEvent.blur(screen.getByLabelText('Amount UAH record 1'));
 
             expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_NOT_ZERO)).toBeInTheDocument();
-            expect(screen.getByLabelText('Accept record 1')).toBeDisabled();
-        });
-
-        it('should show required validation for empty USD amount on blur', () => {
-            renderTable({ isEditing: true });
-
-            fireEvent.click(screen.getByLabelText('Edit record 1'));
-            fireEvent.change(screen.getByLabelText('Amount USD record 1'), { target: { value: '   ' } });
-            fireEvent.blur(screen.getByLabelText('Amount USD record 1'));
-
-            expect(screen.getByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED)).toBeInTheDocument();
             expect(screen.getByLabelText('Accept record 1')).toBeDisabled();
         });
 

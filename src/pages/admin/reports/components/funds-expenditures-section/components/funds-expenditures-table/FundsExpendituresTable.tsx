@@ -7,8 +7,7 @@ import {
 } from '@/types/admin/reports';
 import { ReactComponent as NotFoundIcon } from '@/assets/icons/not-found.svg';
 import { ReactComponent as ArrowUpIcon } from '@/assets/icons/arrow-up.svg';
-import { AmountEditCell } from '../../../amount-edit-cell/AmountEditCell';
-import { RowEditActions } from '../../../row-edit-actions/RowEditActions';
+import { AmountEditRow } from '../../../amount-edit-row/AmountEditRow';
 import { Select } from '@/components/common/select/Select';
 import { SortIcon } from '@/pages/admin/reports/components/funds-expenditures-section/components/funds-expenditures-table/components/sort-icon';
 import {
@@ -599,52 +598,25 @@ export const FundsExpendituresTable = ({
                                                 record.categoryName
                                             )}
                                         </td>
-                                        <td className={cn(styles.td, { [styles['amount-edit-td']]: isEditedRow })}>
-                                            {isEditedRow ? (
-                                                <AmountEditCell
-                                                    recordId={record.id}
-                                                    field="amountUah"
-                                                    value={rowEditState.amountUah}
-                                                    error={rowEditState.errors.amountUah}
-                                                    isDisabled={isSavingCurrentRow}
-                                                    onChange={handleAmountChange}
-                                                    onBlur={handleAmountBlur}
-                                                />
-                                            ) : (
-                                                record.amountUah
-                                            )}
-                                        </td>
-                                        <td className={cn(styles.td, { [styles['amount-edit-td']]: isEditedRow })}>
-                                            {isEditedRow ? (
-                                                <AmountEditCell
-                                                    recordId={record.id}
-                                                    field="amountUsd"
-                                                    value={rowEditState.amountUsd}
-                                                    error={rowEditState.errors.amountUsd}
-                                                    mismatchMessage={rowEditState.usdMismatchMessage}
-                                                    isDisabled={isSavingCurrentRow}
-                                                    onChange={handleAmountChange}
-                                                    onBlur={handleAmountBlur}
-                                                />
-                                            ) : (
-                                                record.amountUsd
-                                            )}
-                                        </td>
-                                        {isEditing && (
-                                            <td className={cn(styles.td, styles['actions-td'])}>
-                                                <RowEditActions
-                                                    recordId={record.id}
-                                                    isEditMode={isEditedRow}
-                                                    isAcceptDisabled={isAcceptDisabled}
-                                                    isSaving={isSavingCurrentRow}
-                                                    isActionsDisabled={isAnotherRowEditing}
-                                                    onAccept={() => handleAcceptRowEdit(record)}
-                                                    onClose={handleCloseRowEdit}
-                                                    onEdit={() => handleStartRowEdit(record)}
-                                                    onDelete={() => onDeleteRecord?.(record)}
-                                                />
-                                            </td>
-                                        )}
+                                        <AmountEditRow
+                                            record={record}
+                                            isEditing={isEditing}
+                                            isEditedRow={isEditedRow}
+                                            amountUah={isEditedRow ? rowEditState.amountUah : record.amountUah}
+                                            amountUsd={isEditedRow ? rowEditState.amountUsd : record.amountUsd}
+                                            amountUahError={rowEditState?.errors.amountUah}
+                                            amountUsdError={rowEditState?.errors.amountUsd}
+                                            usdMismatchMessage={rowEditState?.usdMismatchMessage}
+                                            isSavingCurrentRow={isSavingCurrentRow}
+                                            isAcceptDisabled={isAcceptDisabled}
+                                            isAnotherRowEditing={isAnotherRowEditing}
+                                            onAmountChange={handleAmountChange}
+                                            onAmountBlur={handleAmountBlur}
+                                            onAccept={() => handleAcceptRowEdit(record)}
+                                            onClose={handleCloseRowEdit}
+                                            onEdit={() => handleStartRowEdit(record)}
+                                            onDelete={() => onDeleteRecord?.(record)}
+                                        />
                                     </tr>
                                 );
                             })

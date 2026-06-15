@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { LocalizationModal } from '@/components/admin/localization-modal/LocalizationModal';
-import { TranslationControls } from '@/components/admin/translation-controls/TranslationControls';
+import { Select } from '@/components/common/select/Select';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { MAIN_PAGE_VALIDATION } from '@/const/admin/main-page';
 import { DEFAULT_LOCALE } from '@/const/common/locales';
@@ -153,7 +153,11 @@ export const TranslateMainPageBlockModal = ({
     const checkIsDirty = () => formRef.current?.isDirty() ?? false;
 
     const handleSubmit = async (data: TranslateMainPageBlockFormValues) => {
-        await translateMainPageBlock(data);
+        try {
+            await translateMainPageBlock(data);
+        } catch {
+            // Error text is provided by useTranslateMainPageBlock and rendered in this modal.
+        }
     };
 
     if (!page || !validationConfig || !isOpen) {
@@ -175,12 +179,24 @@ export const TranslateMainPageBlockModal = ({
             checkIsDirty={checkIsDirty}
             isDirty={isDirty}
         >
-            <TranslationControls
-                selectedLanguage={language}
-                isSubmitting={isSubmitting}
-                languages={translatedLanguages}
-                onLanguageChange={setLanguage}
-            />
+            <div className={styles['language-select']}>
+                {language && (
+                    <Select<string>
+                        className="language-select"
+                        headClassName={styles['language-select-head']}
+                        value={language.code}
+                        onValueChange={(code) => {
+                            const newLang = translatedLanguages.find((lang) => lang.code === code);
+                            if (newLang) setLanguage(newLang);
+                        }}
+                        placeholder="Англійська"
+                    >
+                        {translatedLanguages.map((lang) => (
+                            <Select.Option key={lang.id} value={lang.code} name={lang.name} />
+                        ))}
+                    </Select>
+                )}
+            </div>
 
             {error && <div className={styles.error}>{error}</div>}
 

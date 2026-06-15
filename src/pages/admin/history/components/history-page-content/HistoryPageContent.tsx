@@ -32,6 +32,7 @@ import { ToastContainer } from '@/components/admin/toast/toast-container/ToastCo
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
 import { mapHistorySectionDtoToModel } from '@/utils/functions/mappers/admin/history/history-mappers';
 import { ContentType } from '@/types/common/section-contents';
+import { EntityWithTranslationStatuses, TranslationStatus, TranslationStatusInfo } from '@/types/common/language';
 
 type HistoryErrorType = 'languages';
 
@@ -151,7 +152,14 @@ export const HistoryPageContent = () => {
                 const payload: CreateUpdateHistorySectionDto[] = remainingSections.map((s: HistorySectionDto) => ({
                     template: s.template,
                     order: s.order,
-                    contents: s.contents.map((c) => ({ ...c })),
+                    contents: s.contents.map((c) => ({
+                        contentType: c.contentType,
+                        order: c.order,
+                        title: c.title,
+                        description: c.description,
+                        image: c.image,
+                        imageId: c.imageId,
+                    })),
                 }));
                 await HistoryApi.syncSections(client, payload);
                 void refetchSections();
@@ -171,7 +179,14 @@ export const HistoryPageContent = () => {
             const payload: CreateUpdateHistorySectionDto[] = currentSections.map((s: HistorySectionDto) => ({
                 template: s.template,
                 order: s.order,
-                contents: s.contents.map((c) => ({ ...c })),
+                contents: s.contents.map((c) => ({
+                    contentType: c.contentType,
+                    order: c.order,
+                    title: c.title,
+                    description: c.description,
+                    image: c.image,
+                    imageId: c.imageId,
+                })),
             }));
 
             await HistoryApi.syncSections(client, payload);
@@ -194,12 +209,39 @@ export const HistoryPageContent = () => {
     const { allLanguages, translationLanguages, selectedLanguage, onLanguageChange, onTranslationStatusFilterChange } =
         useLocalizationToolkit({ setErrorState });
 
-    const localizedEntity = useMemo((): HistorySectionContent | undefined => {
-        const firstSection = normalizedSections[0];
-        if (!firstSection) return undefined;
-        const mappedSection = mapHistorySectionDtoToModel(firstSection);
-        return mappedSection.contents.find((c) => c.contentType !== ContentType.Image);
-    }, [normalizedSections]);
+    const localizedEntity = useMemo((): EntityWithTranslationStatuses | undefined => {
+        const translationStatuses: TranslationStatusInfo[] = [];
+
+        for (const lang of translationLanguages) {
+            let hasMissing = false;
+            let hasOutdated = false;
+            let hasLocalizableContent = false;
+
+            for (const section of normalizedSections) {
+                const mappedSection = mapHistorySectionDtoToModel(section);
+                for (const content of mappedSection.contents) {
+                    if (content.contentType !== ContentType.Image) {
+                        hasLocalizableContent = true;
+                        const loc = content.localizations?.find((l) => l.language.id === lang.id);
+                        if (!loc) {
+                            hasMissing = true;
+                        } else if (loc.translationStatus === TranslationStatus.Outdated) {
+                            hasOutdated = true;
+                        }
+                    }
+                }
+            }
+
+            if (hasLocalizableContent && !hasMissing) {
+                translationStatuses.push({
+                    languageId: lang.id,
+                    translationStatus: hasOutdated ? TranslationStatus.Outdated : TranslationStatus.Relevant,
+                });
+            }
+        }
+
+        return { translationStatuses };
+    }, [normalizedSections, translationLanguages]);
 
     return (
         <div className={styles['history-page-wrapper']} data-testid="history-page-content">

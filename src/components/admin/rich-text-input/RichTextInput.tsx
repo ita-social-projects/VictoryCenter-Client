@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import cn from 'classnames';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
@@ -71,6 +71,8 @@ export const RichTextInput = ({
 
     const showClearButton = isFocused && !isEditorEmpty(value) && !disabled;
 
+    const initialValueRef = useRef(value);
+
     const initialConfig = useMemo(
         () => ({
             namespace: 'RichTextInput-' + id,
@@ -78,9 +80,9 @@ export const RichTextInput = ({
             onError: () => {},
             editable: !disabled,
             editorState: (editor: LexicalEditor) => {
-                if (value) {
+                if (initialValueRef.current) {
                     const parser = new DOMParser();
-                    const dom = parser.parseFromString(value, 'text/html');
+                    const dom = parser.parseFromString(initialValueRef.current, 'text/html');
                     const nodes = $generateNodesFromDOM(editor, dom);
                     const root = $getRoot();
                     root.clear();

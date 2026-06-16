@@ -5,6 +5,7 @@ import { FocusPlugin } from './FocusPlugin';
 const mockRegisterCommand = jest.fn();
 const mockEditor = {
     registerCommand: mockRegisterCommand,
+    update: jest.fn((cb: () => void) => cb()),
 };
 
 jest.mock('@lexical/react/LexicalComposerContext', () => ({

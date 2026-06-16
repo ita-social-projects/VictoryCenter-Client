@@ -11,12 +11,15 @@ const buildStringValidation = (config: {
 }) => {
     return Yup.string()
         .required(MAIN_PAGE_VALIDATION.common.REQUIRED)
-        .test('min-length', config.getMinError(), (value) => {
+        .test('min-length', config.getMinError(), function (value) {
             if (!value || value === '<p><br></p>') return false;
             const plainText = value
                 .replace(/<[^>]*>/g, '')
                 .replace(/&nbsp;/g, ' ')
                 .trim();
+            if (plainText.length === 0) {
+                return this.createError({ message: MAIN_PAGE_VALIDATION.common.REQUIRED });
+            }
             return plainText.length >= config.min;
         })
         .test('max-length', config.getMaxError(), (value) => {
@@ -28,6 +31,8 @@ const buildStringValidation = (config: {
             return plainText.length <= config.max;
         });
 };
+
+const statisticsTitleValidation = buildStringValidation(MAIN_PAGE_VALIDATION.statisticsBlock.title);
 
 const imageSchema = Yup.mixed<Image | ImageValues>()
     .transform((value) => {
@@ -92,6 +97,12 @@ export const MAIN_PAGE_VALIDATION_FUNCTIONS = {
 
     validateStatisticsTitleUa: (value: string) =>
         MAIN_PAGE_VALIDATION_FUNCTIONS.validateField('statisticsTitleUa', value),
-    validateStatisticsTitleEn: (value: string) =>
-        MAIN_PAGE_VALIDATION_FUNCTIONS.validateField('statisticsTitleEn', value),
+    validateStatisticsTitleEn: (value: string) => {
+        try {
+            statisticsTitleValidation.validateSync(value);
+            return undefined;
+        } catch (error: any) {
+            return error.message;
+        }
+    },
 };

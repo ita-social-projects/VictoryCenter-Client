@@ -65,6 +65,13 @@ jest.mock('../statistics-block/StatisticsBlockForm', () => ({
     ),
 }));
 
+jest.mock('../donations-block/DonationsBlockForm', () => ({
+    __esModule: true,
+    DonationsBlockForm: (props: any) => (
+        <MockFormBlock testId="donations-block-form" btnTestId="publish-btn-donations" {...props} />
+    ),
+}));
+
 jest.mock('../main-page-publish-modal/MainPagePublishModal', () => ({
     __esModule: true,
     MainPagePublishModal: ({ isOpen, onConfirm, onCancel, isButtonsDisabled }: any) =>
@@ -222,7 +229,8 @@ describe('MainPageContent', () => {
         await renderAndLoadContent();
 
         fireEvent.click(screen.getByTestId('tab-btn-donations'));
-        expect(getByExactText(`Блок "${MAIN_PAGE_TEXT.TABS.DONATIONS}" в розробці`)).toBeInTheDocument();
+        expect(screen.getByTestId('donations-block-form')).toBeInTheDocument();
+        expect(screen.queryByTestId('title-block-form')).not.toBeInTheDocument();
     });
 
     it('renders partners tab content', async () => {

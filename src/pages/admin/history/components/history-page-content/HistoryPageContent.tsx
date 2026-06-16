@@ -25,6 +25,22 @@ import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextPr
 import { ToastType } from '@/types/admin/toast';
 import { AddSectionModal } from '@/pages/admin/programs/components/programs-page-modals/add-section-modal/AddSectionModal';
 import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
+import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
+import { mapHistorySectionDtoToModel } from '@/utils/functions/mappers/admin/history/history-mappers';
+import { ContentType } from '@/types/common/section-contents';
+import {
+    EntityWithTranslationStatuses,
+    TranslationStatus,
+    TranslationStatusFilter,
+    TranslationStatusInfo,
+} from '@/types/common/language';
+
+type HistoryErrorType = 'languages';
+
+interface HistoryErrorState {
+    message: string | null;
+    type: HistoryErrorType | null;
+}
 
 export const HistoryPageContent = () => {
     const client = useAdminClient();
@@ -137,7 +153,14 @@ export const HistoryPageContent = () => {
                 const payload: CreateUpdateHistorySectionDto[] = remainingSections.map((s: HistorySectionDto) => ({
                     template: s.template,
                     order: s.order,
-                    contents: s.contents.map((c) => ({ ...c })),
+                    contents: s.contents.map((c) => ({
+                        contentType: c.contentType,
+                        order: c.order,
+                        title: c.title,
+                        description: c.description,
+                        image: c.image,
+                        imageId: c.imageId,
+                    })),
                 }));
                 await HistoryApi.syncSections(client, payload);
                 void refetchSections();
@@ -157,7 +180,14 @@ export const HistoryPageContent = () => {
             const payload: CreateUpdateHistorySectionDto[] = currentSections.map((s: HistorySectionDto) => ({
                 template: s.template,
                 order: s.order,
-                contents: s.contents.map((c) => ({ ...c })),
+                contents: s.contents.map((c) => ({
+                    contentType: c.contentType,
+                    order: c.order,
+                    title: c.title,
+                    description: c.description,
+                    image: c.image,
+                    imageId: c.imageId,
+                })),
             }));
 
             await HistoryApi.syncSections(client, payload);
@@ -171,9 +201,93 @@ export const HistoryPageContent = () => {
         }
     }, [client, refetchSections, addToast]);
 
+    const [, setLocalizationError] = useState<HistoryErrorState>({ message: null, type: null });
+
+    const setErrorState = useCallback((message: string, type: HistoryErrorType) => {
+        setLocalizationError({ message, type });
+    }, []);
+
+    const {
+        allLanguages,
+        translationLanguages,
+        selectedLanguage,
+        onLanguageChange,
+        translationStatusFilter,
+        onTranslationStatusFilterChange,
+    } = useLocalizationToolkit({ setErrorState });
+
+    const localizedEntity = useMemo((): EntityWithTranslationStatuses | undefined => {
+        const translationStatuses: TranslationStatusInfo[] = [];
+
+        for (const lang of translationLanguages) {
+            let hasMissing = false;
+            let hasOutdated = false;
+            let hasLocalizableContent = false;
+
+            for (const section of normalizedSections) {
+                const mappedSection = mapHistorySectionDtoToModel(section);
+                for (const content of mappedSection.contents) {
+                    if (content.contentType !== ContentType.Image) {
+                        hasLocalizableContent = true;
+                        const loc = content.localizations?.find((l) => l.language.id === lang.id);
+                        if (!loc) {
+                            hasMissing = true;
+                        } else if (loc.translationStatus === TranslationStatus.Outdated) {
+                            hasOutdated = true;
+                        }
+                    }
+                }
+            }
+
+            if (hasLocalizableContent && !hasMissing) {
+                translationStatuses.push({
+                    languageId: lang.id,
+                    translationStatus: hasOutdated ? TranslationStatus.Outdated : TranslationStatus.Relevant,
+                });
+            }
+        }
+
+        return { translationStatuses };
+    }, [normalizedSections, translationLanguages]);
+
+    const filteredSections = useMemo(() => {
+        if (!translationStatusFilter || translationLanguages.length === 0) return normalizedSections;
+
+        return normalizedSections.filter((section) => {
+            const mappedSection = mapHistorySectionDtoToModel(section);
+            const localizableContents = mappedSection.contents.filter((c) => c.contentType !== ContentType.Image);
+
+            if (localizableContents.length === 0) return false;
+
+            return localizableContents.some((content) => {
+                for (const lang of translationLanguages) {
+                    const loc = content.localizations?.find((l) => l.language.id === lang.id);
+
+                    if (translationStatusFilter === TranslationStatusFilter.Missing && !loc) {
+                        return true;
+                    }
+                    if (
+                        translationStatusFilter === TranslationStatusFilter.Outdated &&
+                        loc?.translationStatus === TranslationStatus.Outdated
+                    ) {
+                        return true;
+                    }
+                }
+                return false;
+            });
+        });
+    }, [normalizedSections, translationStatusFilter, translationLanguages]);
+
     return (
         <div className={styles['history-page-wrapper']} data-testid="history-page-content">
-            <HistoryPageToolbar onAddSection={handleAddSection} />
+            <HistoryPageToolbar
+                onAddSection={handleAddSection}
+                translationLanguages={translationLanguages}
+                languages={allLanguages}
+                localizedEntity={localizedEntity}
+                onLanguageChange={onLanguageChange}
+                onTranslationStatusFilterChange={onTranslationStatusFilterChange}
+            />
             <div className={styles['sections-container']}>
                 {isSectionsLoading && (
                     <div className={styles['sections-loader-state']} data-testid="history-sections-loader">
@@ -214,7 +328,7 @@ export const HistoryPageContent = () => {
                 {!isSectionsLoading && !hasSectionsError && hasSections && (
                     <HistoryForm
                         ref={historyFormRef}
-                        sections={normalizedSections}
+                        sections={filteredSections}
                         onReplaceSection={handleReplaceSection}
                         onSectionsChange={(s) => {
                             setLocalSectionsCount(s.length);
@@ -224,6 +338,7 @@ export const HistoryPageContent = () => {
                         onSectionSaved={handleSectionSaved}
                         onSectionDeleted={handleSectionDeleted}
                         onRequestCancelSection={handleRequestCancelSection}
+                        language={selectedLanguage}
                     />
                 )}
                 <div className={styles['functional-button-container']}>

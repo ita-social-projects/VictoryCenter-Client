@@ -11,6 +11,7 @@ import {
     partnersPageUk,
     globalUk,
     contactUsPageUk,
+    mainPageUk,
 } from '../../locales/uk';
 
 declare module 'i18next' {
@@ -27,6 +28,7 @@ declare module 'i18next' {
             partnersPage: typeof partnersPageUk;
             global: typeof globalUk;
             contactUsPage: typeof contactUsPageUk;
+            mainPage: typeof mainPageUk;
         };
     }
 }

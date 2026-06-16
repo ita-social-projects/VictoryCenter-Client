@@ -9,6 +9,7 @@ import globalUk from './global.json';
 import reportsPageUk from './reports.json';
 import partnersPageUk from './partners.json';
 import contactUsPageUk from './contact-us.json';
+import mainPageUk from './main-page.json';
 
 export {
     headerUk,
@@ -22,4 +23,5 @@ export {
     partnersPageUk,
     globalUk,
     contactUsPageUk,
+    mainPageUk,
 };

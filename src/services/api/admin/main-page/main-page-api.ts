@@ -43,22 +43,15 @@ export const MainPageApi = {
         patch: UpdateMainPageDto,
         fallbackLanguages?: LocalizationLanguage[],
     ): Promise<{ page: MainPage; languages?: LocalizationLanguage[] }> => {
-        const response = await client.put<MainPageDto | string>(API_ROUTES.MAIN_PAGE.BASE, patch);
+        const response = await client.put<MainPageDto>(API_ROUTES.MAIN_PAGE.BASE, patch);
 
         const languages = await client
             .get<LocalizationLanguage[]>(API_ROUTES.LOCALIZATION_LANGUAGE.BASE)
             .then((res) => res.data)
             .catch(() => fallbackLanguages);
-        if (!response.data || typeof response.data === 'string') {
-            const pageRes = await client.get<MainPageDto>(API_ROUTES.MAIN_PAGE.BASE);
-            return {
-                page: toDomainMainPage(pageRes.data),
-                languages,
-            };
-        }
 
         return {
-            page: toDomainMainPage(response.data as MainPageDto),
+            page: toDomainMainPage(response.data),
             languages,
         };
     },

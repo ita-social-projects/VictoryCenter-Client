@@ -75,7 +75,7 @@ export const RichTextInput = ({
         () => ({
             namespace: 'RichTextInput-' + id,
             theme,
-            onError: () => { },
+            onError: () => {},
             editable: !disabled,
             editorState: (editor: LexicalEditor) => {
                 if (value) {

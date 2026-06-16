@@ -27,10 +27,7 @@ export const MainPage = () => {
     const { t } = useTranslation('mainPage');
     const { currentLanguage } = useLocale();
 
-    const {
-        data: mainPageData,
-        isLoading,
-    } = useDataFetch<PublicMainPageDto | null>({
+    const { data: mainPageData, isLoading } = useDataFetch<PublicMainPageDto | null>({
         initialData: null,
         fetchHandler: PublicMainPageApi.get,
         autoFetchDependencies: [currentLanguage],

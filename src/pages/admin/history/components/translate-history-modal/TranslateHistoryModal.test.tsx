@@ -50,6 +50,7 @@ const mockSections: HistorySectionDto[] = [
                 contentType: ContentType.Title,
                 title: 'UA Title',
                 order: 0,
+                localizations: [],
             },
             {
                 id: 11,
@@ -57,6 +58,7 @@ const mockSections: HistorySectionDto[] = [
                 contentType: ContentType.Description,
                 description: 'UA Desc',
                 order: 1,
+                localizations: [],
             },
         ],
     },

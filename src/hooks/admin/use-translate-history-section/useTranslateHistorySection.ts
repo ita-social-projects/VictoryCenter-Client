@@ -58,10 +58,21 @@ export const useTranslateHistorySection = ({ section, language, onSuccess }: Use
             }
 
             if (contentDtos.length > 0) {
-                await HistoryLocalizationsApi.create(client, {
+                const payload = {
                     entityId: section.id,
+                    languageId: language.id,
                     contents: contentDtos,
-                });
+                };
+
+                const hasExistingLocalization = section.contents.some((c) =>
+                    c.localizations?.some((l) => l.localizationInfoDto.id === language.id),
+                );
+
+                if (hasExistingLocalization) {
+                    await HistoryLocalizationsApi.update(client, section.id, language.id, payload);
+                } else {
+                    await HistoryLocalizationsApi.create(client, payload);
+                }
             }
 
             const updatedSection: HistorySectionDto = {

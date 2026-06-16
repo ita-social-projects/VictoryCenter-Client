@@ -100,22 +100,22 @@ export const TranslateHistoryModal = ({
 
                     const sectionPreview = hasImage
                         ? renderHistorySection({
-                            templateId: section.template,
-                            data: {
-                                title: '',
-                                description: '',
-                                images: section.contents
-                                    .filter((c) => c.contentType === ContentType.Image)
-                                    .map((c) => c.image ?? null),
-                            },
-                            mode: SectionMode.View,
-                            validationResetKey: 0,
-                            handlers: {
-                                onTitleChange: () => undefined,
-                                onDescriptionChange: () => undefined,
-                                onImagesChange: () => undefined,
-                            },
-                        })
+                              templateId: section.template,
+                              data: {
+                                  title: '',
+                                  description: '',
+                                  images: section.contents
+                                      .filter((c) => c.contentType === ContentType.Image)
+                                      .map((c) => c.image ?? null),
+                              },
+                              mode: SectionMode.View,
+                              validationResetKey: 0,
+                              handlers: {
+                                  onTitleChange: () => undefined,
+                                  onDescriptionChange: () => undefined,
+                                  onImagesChange: () => undefined,
+                              },
+                          })
                         : null;
 
                     return (

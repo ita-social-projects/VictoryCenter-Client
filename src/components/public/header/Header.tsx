@@ -28,7 +28,6 @@ export const Header = () => {
     const programsLinks: DropdownLink[] = [
         { text: t('HIPPOTHERAPY'), navigateTo: PUBLIC_ROUTES.HIPPOTHERAPY.FULL, isDisabled: false },
         { text: t('PROGRAMS'), navigateTo: PUBLIC_ROUTES.PROGRAMS.FULL, isDisabled: false },
-        { text: t('PROGRAMS_SESSIONS'), navigateTo: '', isDisabled: true },
     ];
 
     return (
@@ -49,11 +48,9 @@ export const Header = () => {
 
                             <Link to={PUBLIC_ROUTES.REPORTS.FULL}>{t('REPORTING')}</Link>
 
-                            <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
-                                {t('STORIES_OF_VICTORIES')}
-                            </Link>
+                            <Link to={PUBLIC_ROUTES.STORIES_OF_VICTORIES.FULL}>{t('STORIES_OF_VICTORIES')}</Link>
 
-                            <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
+                            <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable" style={{ visibility: 'hidden' }}>
                                 {t('HOW_TO_SUPPORT')}
                             </Link>
                         </nav>
@@ -99,11 +96,16 @@ export const Header = () => {
                             {t('REPORTING')}
                         </Link>
 
-                        <Link to={PUBLIC_ROUTES.MOCK.FULL} onClick={toggleMenu} className="disable">
+                        <Link to={PUBLIC_ROUTES.STORIES_OF_VICTORIES.FULL} onClick={toggleMenu}>
                             {t('STORIES_OF_VICTORIES')}
                         </Link>
 
-                        <Link to={PUBLIC_ROUTES.MOCK.FULL} onClick={toggleMenu} className="disable">
+                        <Link
+                            to={PUBLIC_ROUTES.MOCK.FULL}
+                            onClick={toggleMenu}
+                            className="disable"
+                            style={{ display: 'none' }}
+                        >
                             {t('HOW_TO_SUPPORT')}
                         </Link>
 

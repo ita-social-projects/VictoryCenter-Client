@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { ProgramExpensesTable } from './ProgramExpensesTable';
 import { FUNDS_EXPENDITURES_TEXT, PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
+import { ProgramExpensesTable, ProgramExpensesTableProps } from './ProgramExpensesTable';
 
 jest.mock(
     '@/pages/admin/reports/components/program-expenses-section/components/program-expenses-empty-state/ProgramExpensesEmptyState',
@@ -63,6 +63,10 @@ describe('ProgramExpensesTable', () => {
 
     const normalizeText = (value: string) => value.replaceAll('\u00A0', ' ').replaceAll(/\s+/g, ' ').trim();
 
+    const renderTable = (props: Partial<ProgramExpensesTableProps> = {}) => {
+        return render(<ProgramExpensesTable records={records} hasAnyProgramExpenseRecords isEditing {...props} />);
+    };
+
     it('should render table headers', () => {
         render(<ProgramExpensesTable records={records} hasAnyProgramExpenseRecords />);
 
@@ -101,7 +105,7 @@ describe('ProgramExpensesTable', () => {
     });
 
     it('should render checkboxes and action column in edit mode', () => {
-        render(<ProgramExpensesTable records={records} hasAnyProgramExpenseRecords isEditing />);
+        renderTable();
 
         expect(screen.getByText(PROGRAM_EXPENSES_TEXT.TABLE.COLUMNS.ACTIONS)).toBeInTheDocument();
         expect(screen.getAllByRole('checkbox')).toHaveLength(3);
@@ -109,37 +113,31 @@ describe('ProgramExpensesTable', () => {
         expect(screen.getByRole('button', { name: 'Delete record 1' })).toBeEnabled();
     });
 
-    it('should select all visible records from the header checkbox', () => {
-        render(<ProgramExpensesTable records={records} hasAnyProgramExpenseRecords isEditing />);
+    it('should call onSelectAllToggle when header checkbox is clicked', () => {
+        const onSelectAllToggle = jest.fn();
+
+        renderTable({ onSelectAllToggle });
 
         fireEvent.click(screen.getByRole('checkbox', { name: 'Select all program expense records' }));
 
-        expect(screen.getByRole('checkbox', { name: 'Select record 1' })).toBeChecked();
-        expect(screen.getByRole('checkbox', { name: 'Select record 2' })).toBeChecked();
+        expect(onSelectAllToggle).toHaveBeenCalledWith(true);
     });
 
-    it('should toggle a single record checkbox in edit mode', () => {
-        render(<ProgramExpensesTable records={records} hasAnyProgramExpenseRecords isEditing />);
+    it('should call onToggleRecordSelection when row checkbox is clicked', () => {
+        const onToggleRecordSelection = jest.fn();
+
+        renderTable({ onToggleRecordSelection });
 
         fireEvent.click(screen.getByRole('checkbox', { name: 'Select record 1' }));
 
-        expect(screen.getByRole('checkbox', { name: 'Select record 1' })).toBeChecked();
-        expect(screen.getByRole('checkbox', { name: 'Select record 2' })).not.toBeChecked();
+        expect(onToggleRecordSelection).toHaveBeenCalledWith(1);
     });
 
     it('should call edit and delete callbacks from row action icons', () => {
         const onEditRecord = jest.fn();
         const onDeleteRecord = jest.fn();
 
-        render(
-            <ProgramExpensesTable
-                records={records}
-                hasAnyProgramExpenseRecords
-                isEditing
-                onEditRecord={onEditRecord}
-                onDeleteRecord={onDeleteRecord}
-            />,
-        );
+        renderTable({ onEditRecord, onDeleteRecord });
 
         fireEvent.click(screen.getByRole('button', { name: 'Edit record 1' }));
         fireEvent.click(screen.getByRole('button', { name: 'Delete record 1' }));
@@ -152,5 +150,17 @@ describe('ProgramExpensesTable', () => {
         render(<ProgramExpensesTable records={[]} hasAnyProgramExpenseRecords={false} isEditing />);
 
         expectEmptyState('program-expenses', '7');
+    });
+
+    it('should show selection bar with count and delete button when records are selected', () => {
+        const onOpenBulkDelete = jest.fn();
+
+        renderTable({ selectedRecordIds: [1], onOpenBulkDelete });
+
+        expect(screen.getByText(PROGRAM_EXPENSES_TEXT.BULK.getSelectedLabel(1, 2))).toBeInTheDocument();
+
+        fireEvent.click(screen.getByText(PROGRAM_EXPENSES_TEXT.BULK.DELETE_BUTTON));
+
+        expect(onOpenBulkDelete).toHaveBeenCalled();
     });
 });

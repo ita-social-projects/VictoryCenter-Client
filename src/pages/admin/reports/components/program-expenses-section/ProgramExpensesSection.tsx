@@ -1,13 +1,18 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { ProgramExpensesApi } from '@/services/api/admin/reports/program-expenses-api';
-import { ProgramExpensesReadOnlyData } from '@/types/admin/reports';
+import { ProgramExpensesReadOnlyData, ProgramExpensesRecord } from '@/types/admin/reports';
+import { ToastType } from '@/types/admin/toast';
 import { ProgramExpensesToolbar } from './components/program-expenses-toolbar/ProgramExpensesToolbar';
 import { ProgramExpensesSummaryCard } from './components/program-expenses-summary-card/ProgramExpensesSummaryCard';
 import { ProgramExpensesTable } from './components/program-expenses-table/ProgramExpensesTable';
 import { AddProgramExpenseRecordModal } from './components/common/add-program-expense-record-modal/AddProgramExpenseRecordModal';
+import { DeleteRecordModal } from '../funds-expenditures-section/components/common/delete-record-modal/DeleteRecordModal';
+import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import styles from './ProgramExpensesSection.module.scss';
 
 const INITIAL_PROGRAM_EXPENSES_DATA: ProgramExpensesReadOnlyData = {
@@ -28,15 +33,26 @@ interface ProgramExpensesSectionProps {
 
 export const ProgramExpensesSection = ({ isEditing = false }: ProgramExpensesSectionProps) => {
     const adminClient = useAdminClient();
+    const { addToast } = useToast();
     const [selectedProgramIds, setSelectedProgramIds] = useState<number[]>([]);
     const [isAddProgramExpenseModalOpen, setIsAddProgramExpenseModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [recordToDelete, setRecordToDelete] = useState<ProgramExpensesRecord | null>(null);
+    const [isDeletingRecord, setIsDeletingRecord] = useState(false);
+    const [selectedRecordIds, setSelectedRecordIds] = useState<number[]>([]);
+    const [isBulkDeleteModalOpen, setIsBulkDeleteModalOpen] = useState(false);
+    const [isBulkDeleting, setIsBulkDeleting] = useState(false);
 
     const fetchReadOnlyData = useCallback(
         (options = {}) => ProgramExpensesApi.getReadOnlyData(adminClient, options),
         [adminClient],
     );
 
-    const { data, isLoading } = useDataFetch<ProgramExpensesReadOnlyData>({
+    const {
+        data,
+        isLoading,
+        refetch: refetchReadOnlyData,
+    } = useDataFetch<ProgramExpensesReadOnlyData>({
         initialData: INITIAL_PROGRAM_EXPENSES_DATA,
         fetchHandler: fetchReadOnlyData,
     });
@@ -55,6 +71,7 @@ export const ProgramExpensesSection = ({ isEditing = false }: ProgramExpensesSec
     useEffect(() => {
         if (!isEditing) {
             setIsAddProgramExpenseModalOpen(false);
+            setSelectedRecordIds([]);
         }
     }, [isEditing]);
 
@@ -79,6 +96,77 @@ export const ProgramExpensesSection = ({ isEditing = false }: ProgramExpensesSec
     const handleCloseAddProgramExpenseModal = useCallback(() => {
         setIsAddProgramExpenseModalOpen(false);
     }, []);
+
+    const handleDeleteClick = useCallback((record: ProgramExpensesRecord) => {
+        setRecordToDelete(record);
+        setIsDeleteModalOpen(true);
+    }, []);
+
+    const handleConfirmDelete = useCallback(async () => {
+        if (!recordToDelete) return;
+
+        setIsDeletingRecord(true);
+
+        try {
+            await ProgramExpensesApi.delete(adminClient, recordToDelete.id);
+            refetchReadOnlyData();
+            addToast(PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_DELETED_SUCCESSFULLY, ToastType.Success);
+            setIsDeleteModalOpen(false);
+        } catch {
+            addToast(PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_DELETE_FAILED_RETRY, ToastType.Error);
+        } finally {
+            setIsDeletingRecord(false);
+            setRecordToDelete(null);
+        }
+    }, [recordToDelete, adminClient, addToast, refetchReadOnlyData]);
+
+    const handleCancelDelete = useCallback(() => {
+        setIsDeleteModalOpen(false);
+        setRecordToDelete(null);
+    }, []);
+
+    const toggleRecordSelection = useCallback((id: number) => {
+        setSelectedRecordIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+    }, []);
+
+    const handleSelectAllToggle = useCallback(
+        (checked: boolean) => {
+            if (checked) {
+                setSelectedRecordIds(filteredRecords.map((record) => record.id));
+            } else {
+                setSelectedRecordIds([]);
+            }
+        },
+        [filteredRecords],
+    );
+
+    const handleOpenBulkDeleteModal = useCallback(() => setIsBulkDeleteModalOpen(true), []);
+
+    const handleBulkDeleteCancel = useCallback(() => {
+        setIsBulkDeleteModalOpen(false);
+        setSelectedRecordIds([]);
+    }, []);
+
+    const handleConfirmBulkDelete = useCallback(async () => {
+        if (selectedRecordIds.length === 0) {
+            setIsBulkDeleteModalOpen(false);
+            return;
+        }
+        setIsBulkDeleting(true);
+
+        try {
+            await ProgramExpensesApi.bulkDelete(adminClient, selectedRecordIds);
+            setSelectedRecordIds([]);
+            setIsBulkDeleteModalOpen(false);
+            refetchReadOnlyData();
+            addToast(PROGRAM_EXPENSES_TEXT.BULK.DELETE_SUCCESS, ToastType.Success);
+        } catch {
+            setIsBulkDeleteModalOpen(false);
+            addToast(PROGRAM_EXPENSES_TEXT.BULK.DELETE_FAILED, ToastType.Error, 5000);
+        } finally {
+            setIsBulkDeleting(false);
+        }
+    }, [adminClient, selectedRecordIds, refetchReadOnlyData, addToast]);
 
     if (isInitialLoading) {
         return (
@@ -110,6 +198,11 @@ export const ProgramExpensesSection = ({ isEditing = false }: ProgramExpensesSec
                     isEditing={isEditing}
                     isAddProgramExpenseDisabled={isAddProgramExpenseDisabled || !isEditing}
                     onAddProgramExpense={isEditing ? handleOpenAddProgramExpenseModal : undefined}
+                    onDeleteRecord={isEditing ? handleDeleteClick : undefined}
+                    selectedRecordIds={selectedRecordIds}
+                    onToggleRecordSelection={toggleRecordSelection}
+                    onSelectAllToggle={handleSelectAllToggle}
+                    onOpenBulkDelete={handleOpenBulkDeleteModal}
                 />
             </div>
 
@@ -119,6 +212,28 @@ export const ProgramExpensesSection = ({ isEditing = false }: ProgramExpensesSec
                 records={data.records}
                 exchangeRate={exchangeRate}
                 onClose={handleCloseAddProgramExpenseModal}
+            />
+
+            <DeleteRecordModal
+                isOpen={isDeleteModalOpen}
+                title={PROGRAM_EXPENSES_TEXT.MODAL.DELETE.TITLE}
+                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
+                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
+                isButtonsDisabled={isDeletingRecord}
+                onConfirm={handleConfirmDelete}
+                onCancel={handleCancelDelete}
+                onClose={handleCancelDelete}
+            />
+
+            <DeleteRecordModal
+                isOpen={isBulkDeleteModalOpen}
+                title={PROGRAM_EXPENSES_TEXT.BULK.DELETE_CONFIRM_TITLE}
+                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
+                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
+                isButtonsDisabled={isBulkDeleting}
+                onConfirm={handleConfirmBulkDelete}
+                onCancel={handleBulkDeleteCancel}
+                onClose={handleBulkDeleteCancel}
             />
         </div>
     );

@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { ContactDetailsSection } from './ContactDetailsSection';
 
 jest.mock(
@@ -29,25 +29,25 @@ jest.mock('@/assets/icons/copy.svg', () => ({
     ReactComponent: () => <svg data-testid="copy-icon" />,
 }));
 
+const DEFAULT_PROPS = {
+    title: 'We are always open for you',
+    description: 'Victory starts with you',
+    contactsTitle: 'Our contacts',
+    socialLinksTitle: 'Social links',
+    email: 'victorycenter@gmail.com',
+    phone: '+380 50 334 4448',
+    address: 'Kyiv, Khreshchatyk str., 2',
+    motto: 'VICTORY STARTS WITH YOU',
+    socialLinks: [{ label: 'Instagram', url: 'https://instagram.com/victorycenterua' }],
+    copyEmailLabel: 'Copy email',
+    copyPhoneLabel: 'Copy phone',
+    onCopyEmail: jest.fn(),
+    onCopyPhone: jest.fn(),
+};
+
 describe('ContactDetailsSection', () => {
     it('renders contact, requisites and social information', () => {
-        render(
-            <ContactDetailsSection
-                title="We are always open for you"
-                description="Victory starts with you"
-                contactsTitle="Our contacts"
-                socialLinksTitle="Social links"
-                email="victorycenter@gmail.com"
-                phone="+380 50 334 4448"
-                address="Kyiv, Khreshchatyk str., 2"
-                motto="VICTORY STARTS WITH YOU"
-                socialLinks={[{ label: 'Instagram', url: 'https://instagram.com/victorycenterua' }]}
-                copyEmailLabel="Copy email"
-                copyPhoneLabel="Copy phone"
-                onCopyEmail={jest.fn()}
-                onCopyPhone={jest.fn()}
-            />,
-        );
+        render(<ContactDetailsSection {...DEFAULT_PROPS} />);
 
         expect(screen.getByRole('heading', { name: 'We are always open for you' })).toBeInTheDocument();
         expect(screen.getByText('Victory starts with you')).toBeInTheDocument();
@@ -59,5 +59,50 @@ describe('ContactDetailsSection', () => {
         );
         expect(screen.getByRole('button', { name: 'Copy email' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Copy phone' })).toBeInTheDocument();
+    });
+
+    describe('copy snackbar', () => {
+        beforeEach(() => jest.useFakeTimers());
+        afterEach(() => jest.useRealTimers());
+
+        it('shows snackbar and calls callback on email copy click', () => {
+            const onCopyEmail = jest.fn();
+            render(<ContactDetailsSection {...DEFAULT_PROPS} onCopyEmail={onCopyEmail} />);
+
+            fireEvent.click(screen.getByRole('button', { name: 'Copy email' }));
+
+            expect(onCopyEmail).toHaveBeenCalledTimes(1);
+            expect(screen.getByRole('status')).toHaveTextContent('Скопійовано');
+        });
+
+        it('shows snackbar and calls callback on phone copy click', () => {
+            const onCopyPhone = jest.fn();
+            render(<ContactDetailsSection {...DEFAULT_PROPS} onCopyPhone={onCopyPhone} />);
+
+            fireEvent.click(screen.getByRole('button', { name: 'Copy phone' }));
+
+            expect(onCopyPhone).toHaveBeenCalledTimes(1);
+            expect(screen.getByRole('status')).toHaveTextContent('Скопійовано');
+        });
+
+        it('hides snackbar after 2 seconds', () => {
+            render(<ContactDetailsSection {...DEFAULT_PROPS} />);
+
+            fireEvent.click(screen.getByRole('button', { name: 'Copy email' }));
+            expect(screen.getByRole('status')).toBeInTheDocument();
+
+            act(() => jest.advanceTimersByTime(2000));
+
+            expect(screen.queryByRole('status')).not.toBeInTheDocument();
+        });
+
+        it('shows only one snackbar on rapid clicks of different buttons', () => {
+            render(<ContactDetailsSection {...DEFAULT_PROPS} />);
+
+            fireEvent.click(screen.getByRole('button', { name: 'Copy email' }));
+            fireEvent.click(screen.getByRole('button', { name: 'Copy phone' }));
+
+            expect(screen.getAllByRole('status')).toHaveLength(1);
+        });
     });
 });

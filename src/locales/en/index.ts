@@ -9,6 +9,7 @@ import donateEn from './donate.json';
 import reportsPageEn from './reports.json';
 import globalEn from './global.json';
 import partnersPageEn from './partners.json';
+import successPageEn from './success.json';
 import contactUsPageEn from './contact-us.json';
 import historyPageEn from './history.json';
 
@@ -23,6 +24,7 @@ export {
     donateEn,
     reportsPageEn,
     partnersPageEn,
+    successPageEn,
     globalEn,
     contactUsPageEn,
     historyPageEn,

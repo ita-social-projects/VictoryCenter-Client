@@ -13,13 +13,24 @@ jest.mock('@/const/admin/history', () => ({
 jest.mock('@/assets/icons/plus.svg', () => ({
     ReactComponent: () => <svg data-testid="plus-icon" />,
 }));
+jest.mock('@/components/admin/localization-statuses/LocalizationStatuses', () => ({
+    LocalizationStatuses: () => <div data-testid="localization-statuses" />,
+}));
+
+jest.mock('@/components/admin/localization-toolkit/LocalizationToolkit', () => ({
+    LocalizationToolkit: () => <div data-testid="localization-toolkit" />,
+}));
 
 describe('HistoryPageToolbar', () => {
     const user = userEvent.setup();
 
     const mockProps: HistoryPageToolbarProps = {
         onAddSection: jest.fn(),
+        translationLanguages: [],
+        languages: [],
+        onLanguageChange: jest.fn(),
         onTranslate: jest.fn(),
+        onTranslationStatusFilterChange: jest.fn(),
     };
 
     beforeEach(() => {
@@ -44,5 +55,23 @@ describe('HistoryPageToolbar', () => {
     it('should not call onAddSection on initial render', () => {
         render(<HistoryPageToolbar {...mockProps} />);
         expect(mockProps.onAddSection).not.toHaveBeenCalled();
+    });
+
+    it('should render LocalizationToolkit', () => {
+        render(<HistoryPageToolbar {...mockProps} />);
+        expect(screen.getByTestId('localization-toolkit')).toBeInTheDocument();
+    });
+
+    it('should render LocalizationStatuses when localizedEntity is provided', () => {
+        const mockLocalizedEntity = { id: 'test-entity' } as any;
+
+        render(<HistoryPageToolbar {...mockProps} localizedEntity={mockLocalizedEntity} />);
+
+        expect(screen.getByTestId('localization-statuses')).toBeInTheDocument();
+    });
+
+    it('should not render LocalizationStatuses when localizedEntity is NOT provided', () => {
+        render(<HistoryPageToolbar {...mockProps} />);
+        expect(screen.queryByTestId('localization-statuses')).not.toBeInTheDocument();
     });
 });

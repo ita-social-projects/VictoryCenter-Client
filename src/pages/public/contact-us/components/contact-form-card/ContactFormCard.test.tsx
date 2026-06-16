@@ -4,6 +4,18 @@ import userEvent from '@testing-library/user-event';
 import { ContactFormCard } from './ContactFormCard';
 import { CONTACT_FORM_LIMITS, CONTACT_FORM_MESSAGES } from '@/const/public/contact-form';
 
+jest.mock('@/hooks/public/use-turnstile', () => ({
+    useTurnstile: () => ({
+        token: 'mock-token',
+        containerRef: { current: null },
+        reset: jest.fn(),
+    }),
+}));
+
+jest.mock('@/services/api/public/contact-us/contact-us-api', () => ({
+    submitContactUsForm: jest.fn(),
+}));
+
 jest.mock(
     './contact-form-card.module.scss',
     () =>

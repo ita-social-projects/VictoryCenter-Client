@@ -16,7 +16,6 @@ export const HISTORY_TRANSLATION_VALIDATION = {
     },
 };
 
-
 const validateOptionalField = (
     value: string,
     min: number,

@@ -11,6 +11,8 @@ import { SectionTemplate } from '@/types/common/sections';
 import { ContentType } from '@/types/common/section-contents';
 import { ToastType } from '@/types/admin/toast';
 import type { HistorySectionDto } from '@/types/common/history-sections';
+import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
+import { mapHistorySectionDtoToModel } from '@/utils/functions/mappers/admin/history/history-mappers';
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
@@ -28,9 +30,21 @@ jest.mock('@/services/api/admin/history/history-api', () => ({
 }));
 
 jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider');
+
+jest.mock('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit', () => ({
+    useLocalizationToolkit: jest.fn(),
+}));
+const mockedUseLocalizationToolkit = useLocalizationToolkit as jest.Mock;
+
+jest.mock('@/utils/functions/mappers/admin/history/history-mappers', () => ({
+    mapHistorySectionDtoToModel: jest.fn(),
+}));
+const mockedMapHistorySectionDtoToModel = mapHistorySectionDtoToModel as jest.Mock;
+
 const mockedUseToast = useToast as jest.Mock;
 
 const mockHistoryFormProps = jest.fn();
+const mockToolbarProps = jest.fn();
 const mockDeleteDiscardAction = jest.fn();
 const mockRevertDiscardAction = jest.fn();
 const mockAddSection = jest.fn();
@@ -50,6 +64,7 @@ jest.mock('../history-form/HistoryForm', () => {
             onSectionDeleted,
             onReplaceSection,
             onSectionsChange,
+            language,
         } = props;
 
         mockHistoryFormSections = sections;
@@ -60,6 +75,7 @@ jest.mock('../history-form/HistoryForm', () => {
             onSectionDeleted,
             onReplaceSection,
             onSectionsChange,
+            language,
         });
 
         React.useImperativeHandle(ref, () => ({
@@ -254,15 +270,16 @@ jest.mock('@/assets/icons/plus.svg', () => ({
 jest.mock('@/assets/icons/not-found.svg', () => 'not-found.svg');
 
 jest.mock('../history-page-toolbar/HistoryPageToolbar', () => ({
-    HistoryPageToolbar: ({ onAddSection, onTranslate }: { onAddSection: () => void; onTranslate: () => void }) => {
-        mockToolbarOnAddSection(onAddSection);
+    HistoryPageToolbar: (props: any) => {
+        mockToolbarOnAddSection(props.onAddSection);
+        mockToolbarProps(props);
 
         return (
             <div>
-                <button type="button" data-testid="toolbar-add-section-button" onClick={onAddSection}>
+                <button type="button" data-testid="toolbar-add-section-button" onClick={props.onAddSection}>
                     Add History Section
                 </button>
-                <button type="button" data-testid="toolbar-translate-button" onClick={onTranslate}>
+                <button type="button" data-testid="toolbar-translate-button" onClick={props.onTranslate}>
                     Translate History
                 </button>
             </div>
@@ -281,6 +298,7 @@ const createSection = (id: number, template: SectionTemplate, order: number): Hi
             contentType: ContentType.Title,
             order: 0,
             title: `Title ${id}`,
+            localizations: [],
         },
     ],
 });
@@ -319,6 +337,7 @@ describe('HistoryPageContent', () => {
         mockedHistoryApi.syncSections.mockResolvedValue([] as never);
         refetchSectionsMock.mockResolvedValue(undefined);
         mockedUseToast.mockReturnValue({ addToast: mockAddToast });
+        mockedMapHistorySectionDtoToModel.mockReturnValue({ contents: [] });
         mockedUseDataFetch.mockReturnValue({
             data: null,
             error: null,
@@ -326,6 +345,69 @@ describe('HistoryPageContent', () => {
             refetch: refetchSectionsMock,
             setData: jest.fn(),
         });
+        mockedUseLocalizationToolkit.mockReturnValue({
+            allLanguages: [{ id: 'en', code: 'en' }],
+            translationLanguages: [{ id: 'uk', code: 'uk' }],
+            selectedLanguage: { id: 'en', code: 'en' },
+            onLanguageChange: jest.fn(),
+            translationStatusFilter: undefined,
+            onTranslationStatusFilterChange: jest.fn(),
+        });
+    });
+    it('passes correct localization props to HistoryPageToolbar', () => {
+        render(<HistoryPageContent />);
+
+        expect(mockToolbarProps).toHaveBeenCalledWith(
+            expect.objectContaining({
+                languages: [{ id: 'en', code: 'en' }],
+                translationLanguages: [{ id: 'uk', code: 'uk' }],
+                onLanguageChange: expect.any(Function),
+                onTranslationStatusFilterChange: expect.any(Function),
+            }),
+        );
+    });
+
+    it('calculates localizedEntity correctly by aggregating translation statuses', () => {
+        const sections = mockSingleSectionData();
+
+        const mappedModel = {
+            contents: [
+                { id: 'content-1', contentType: ContentType.Image },
+                {
+                    id: 'content-2',
+                    contentType: ContentType.Title,
+                    localizations: [{ language: { id: 'uk', code: 'uk' }, translationStatus: 1 }],
+                },
+                {
+                    id: 'content-3',
+                    contentType: ContentType.Description,
+                    localizations: [{ language: { id: 'uk', code: 'uk' }, translationStatus: 1 }],
+                },
+            ],
+        };
+        mockedMapHistorySectionDtoToModel.mockReturnValue(mappedModel);
+
+        render(<HistoryPageContent />);
+
+        expect(mockedMapHistorySectionDtoToModel).toHaveBeenCalledWith(sections[0]);
+
+        expect(mockToolbarProps).toHaveBeenCalledWith(
+            expect.objectContaining({
+                localizedEntity: { translationStatuses: [{ languageId: 'uk', translationStatus: 1 }] },
+            }),
+        );
+    });
+
+    it('passes selectedLanguage to HistoryForm', () => {
+        mockSingleSectionData();
+
+        render(<HistoryPageContent />);
+
+        expect(mockHistoryFormProps).toHaveBeenCalledWith(
+            expect.objectContaining({
+                language: { id: 'en', code: 'en' },
+            }),
+        );
     });
 
     it('uses history API in fetch handler passed to useDataFetch', async () => {

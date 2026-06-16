@@ -8,6 +8,24 @@ Agent Skills are specialized capabilities that GitHub Copilot can load when rele
 
 ## Available Skills
 
+### 6. `/victory-center-pr-review`
+**Purpose**: Full PR review workflow — analyze changed files, fix issues, run typecheck/lint, manage tests and code smells.
+
+**Use when**:
+- Reviewing a branch before raising a PR
+- Addressing code review feedback
+- Checking for code smells, render-safety bugs, or test gaps
+- Running the complete quality gate (lint → tests → coverage)
+
+**Examples**:
+```
+/victory-center-pr-review main
+/victory-center-pr-review release/1.0.0
+/victory-center-pr-review issue-123
+```
+
+---
+
 ### 1. `/victory-center-docs`
 **Purpose**: Search and retrieve documentation about the Victory Center project.
 

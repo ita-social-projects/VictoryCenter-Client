@@ -30,6 +30,7 @@ describe('useTranslateHistorySection', () => {
                 contentType: ContentType.Title,
                 title: 'UA Title',
                 order: 0,
+                localizations: [],
             },
             {
                 id: 101,
@@ -37,6 +38,7 @@ describe('useTranslateHistorySection', () => {
                 contentType: ContentType.Description,
                 description: 'UA Description',
                 order: 1,
+                localizations: [],
             },
         ],
     };
@@ -45,6 +47,7 @@ describe('useTranslateHistorySection', () => {
         jest.clearAllMocks();
         (useAdminClient as jest.Mock).mockReturnValue(mockClient);
         (HistoryLocalizationsApi.create as jest.Mock).mockResolvedValue({});
+        (HistoryLocalizationsApi.update as jest.Mock).mockResolvedValue({});
     });
 
     it('translates title and description fields and calls onSuccess with updated section', async () => {
@@ -67,6 +70,7 @@ describe('useTranslateHistorySection', () => {
 
         expect(HistoryLocalizationsApi.create).toHaveBeenCalledWith(mockClient, {
             entityId: 10,
+            languageId: 1,
             contents: [
                 {
                     entityId: 100,
@@ -143,5 +147,63 @@ describe('useTranslateHistorySection', () => {
         });
 
         expect(result.current.error).toBe('');
+    });
+
+    it('calls update instead of create if localizations already exist', async () => {
+        const mockSectionWithLocalizations: HistorySectionDto = {
+            ...mockSection,
+            contents: [
+                {
+                    ...mockSection.contents[0],
+                    localizations: [
+                        {
+                            entityId: 100,
+                            localizationInfoDto: { id: 1, code: 'en' },
+                            translationStatus: 0,
+                            title: 'Old Title',
+                            description: null,
+                        },
+                    ],
+                },
+                mockSection.contents[1],
+            ],
+        };
+
+        const { result } = renderHook(() =>
+            useTranslateHistorySection({
+                section: mockSectionWithLocalizations,
+                language: mockLanguage,
+                onSuccess: mockOnSuccess,
+            }),
+        );
+
+        await act(async () => {
+            await result.current.translateSection({
+                title: 'New EN Title',
+                description: 'New EN Description',
+            });
+        });
+
+        expect(HistoryLocalizationsApi.update).toHaveBeenCalledTimes(1);
+        expect(HistoryLocalizationsApi.create).not.toHaveBeenCalled();
+
+        expect(HistoryLocalizationsApi.update).toHaveBeenCalledWith(mockClient, 10, 1, {
+            entityId: 10,
+            languageId: 1,
+            contents: [
+                {
+                    entityId: 100,
+                    languageId: 1,
+                    title: 'New EN Title',
+                    description: null,
+                },
+                {
+                    entityId: 101,
+                    languageId: 1,
+                    title: null,
+                    description: 'New EN Description',
+                },
+            ],
+        });
     });
 });

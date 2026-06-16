@@ -18,7 +18,13 @@ export const IntroSection = ({ introData, buttonHref }: IntroSectionProps) => {
                 <SafeHtml as="h1" className={styles.title} html={introData.title} />
                 <div className={styles.bottomContent}>
                     <SafeHtml as="p" className={styles.description} html={introData.description} />
-                    <Button href={buttonHref} variant="secondary-dark" className={styles.button}>
+                    <Button
+                        href={buttonHref}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        variant="secondary-dark"
+                        className={styles.button}
+                    >
                         {introData.buttonText}
                     </Button>
                 </div>

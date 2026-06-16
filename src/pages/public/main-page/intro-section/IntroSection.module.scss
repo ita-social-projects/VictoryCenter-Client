@@ -43,12 +43,12 @@
     position: absolute;
     inset: 0;
     background:
-        linear-gradient(90deg, rgba(c.$black, 0.54) 0%, rgba(c.$black, 0.22) 48%, rgba(c.$black, 0.1) 100%),
+        linear-gradient(90deg, rgba(c.$black, 0.54) 0%, rgba(c.$black, 0.22) 3%, rgba(c.$black, 0.1) 100%),
         linear-gradient(180deg, rgba(c.$black, 0.08) 0%, rgba(c.$black, 0.14) 55%, rgba(c.$black, 0.34) 100%);
 
     @media (max-width: 767px) {
         background:
-            linear-gradient(90deg, rgba(c.$black, 0.44) 0%, rgba(c.$black, 0.16) 62%, rgba(c.$black, 0.08) 100%),
+            linear-gradient(90deg, rgba(c.$black, 0.44) 0%, rgba(c.$black, 0.16) 5%, rgba(c.$black, 0.08) 100%),
             linear-gradient(180deg, rgba(c.$black, 0.04) 0%, rgba(c.$black, 0.08) 48%, rgba(c.$black, 0.42) 100%);
     }
 }

@@ -7,3 +7,9 @@
     padding-bottom: 80px;
     border-bottom: 1px solid c.$grey-700;
 }
+
+.actions-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}

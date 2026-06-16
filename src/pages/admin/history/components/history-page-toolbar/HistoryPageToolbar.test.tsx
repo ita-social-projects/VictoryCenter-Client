@@ -19,6 +19,7 @@ describe('HistoryPageToolbar', () => {
 
     const mockProps: HistoryPageToolbarProps = {
         onAddSection: jest.fn(),
+        onTranslate: jest.fn(),
     };
 
     beforeEach(() => {

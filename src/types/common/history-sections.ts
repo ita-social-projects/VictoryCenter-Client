@@ -47,3 +47,15 @@ export interface CreateHistorySectionContentDto {
     image?: Image | ImageValues | null;
     imageId?: number | null;
 }
+
+export interface CreateHistorySectionContentLocalizationDto {
+    entityId: number;
+    languageId: number;
+    title?: string | null;
+    description?: string | null;
+}
+
+export interface CreateHistorySectionLocalizationDto {
+    entityId: number;
+    contents: CreateHistorySectionContentLocalizationDto[];
+}

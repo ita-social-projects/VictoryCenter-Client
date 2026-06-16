@@ -254,13 +254,18 @@ jest.mock('@/assets/icons/plus.svg', () => ({
 jest.mock('@/assets/icons/not-found.svg', () => 'not-found.svg');
 
 jest.mock('../history-page-toolbar/HistoryPageToolbar', () => ({
-    HistoryPageToolbar: ({ onAddSection }: { onAddSection: () => void }) => {
+    HistoryPageToolbar: ({ onAddSection, onTranslate }: { onAddSection: () => void; onTranslate: () => void }) => {
         mockToolbarOnAddSection(onAddSection);
 
         return (
-            <button type="button" data-testid="toolbar-add-section-button" onClick={onAddSection}>
-                Add History Section
-            </button>
+            <div>
+                <button type="button" data-testid="toolbar-add-section-button" onClick={onAddSection}>
+                    Add History Section
+                </button>
+                <button type="button" data-testid="toolbar-translate-button" onClick={onTranslate}>
+                    Translate History
+                </button>
+            </div>
         );
     },
 }));

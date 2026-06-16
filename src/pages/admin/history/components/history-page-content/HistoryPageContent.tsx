@@ -25,6 +25,8 @@ import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextPr
 import { ToastType } from '@/types/admin/toast';
 import { AddSectionModal } from '@/pages/admin/programs/components/programs-page-modals/add-section-modal/AddSectionModal';
 import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
+import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
+import { TranslateHistoryModal } from '../translate-history-modal/TranslateHistoryModal';
 
 export const HistoryPageContent = () => {
     const client = useAdminClient();
@@ -38,6 +40,10 @@ export const HistoryPageContent = () => {
     const [isPublishing, setIsPublishing] = useState(false);
     const [localSectionsCount, setLocalSectionsCount] = useState<number | null>(null);
     const [hasActiveSectionForm, setHasActiveSectionForm] = useState(false);
+    const [isTranslateModalOpen, setIsTranslateModalOpen] = useState(false);
+    const { translationLanguages } = useLocalizationToolkit({
+        setErrorState: useCallback(() => undefined, []),
+    });
     const {
         isSectionRemoveModalOpen,
         isSectionRevertModalOpen,
@@ -173,7 +179,7 @@ export const HistoryPageContent = () => {
 
     return (
         <div className={styles['history-page-wrapper']} data-testid="history-page-content">
-            <HistoryPageToolbar onAddSection={handleAddSection} />
+            <HistoryPageToolbar onAddSection={handleAddSection} onTranslate={() => setIsTranslateModalOpen(true)} />
             <div className={styles['sections-container']}>
                 {isSectionsLoading && (
                     <div className={styles['sections-loader-state']} data-testid="history-sections-loader">
@@ -270,8 +276,8 @@ export const HistoryPageContent = () => {
                     pendingCancelActionType === SectionCancelActionType.RevertAfterReplace
                         ? SECTIONS_TEXT.SECTION.MODAL.REPLACE_TEMPLATE_TITLE
                         : pendingCancelActionType === SectionCancelActionType.DiscardNewSection
-                          ? SECTIONS_TEXT.SECTION.MODAL.UNSAVED_CHANGES_TITLE
-                          : COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE
+                            ? SECTIONS_TEXT.SECTION.MODAL.UNSAVED_CHANGES_TITLE
+                            : COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE
                 }
                 onConfirm={handleConfirmRevertSection}
                 onCancel={handleCloseSectionRevertModal}
@@ -283,6 +289,23 @@ export const HistoryPageContent = () => {
                 onConfirm={handlePublish}
                 onCancel={() => setConfirmationModalOpen(false)}
             />
+            {isTranslateModalOpen && (
+                <TranslateHistoryModal
+                    isOpen={isTranslateModalOpen}
+                    onClose={() => setIsTranslateModalOpen(false)}
+                    sections={normalizedSections}
+                    languages={translationLanguages}
+                    onSaved={(updatedSections) => {
+                        if (historyFormRef.current) {
+                            historyFormRef.current.getSections().forEach((_, idx) => {
+                                historyFormRef.current?.replaceSection(idx, updatedSections[idx]);
+                            });
+                        }
+                        setCanPublish(true);
+                        addToast(HISTORY_TEXT.MESSAGE.TRANSLATE_SUCCESS, ToastType.Success);
+                    }}
+                />
+            )}
             <ToastContainer />
         </div>
     );

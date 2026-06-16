@@ -123,4 +123,7 @@ export const API_ROUTES = {
         BASE: 'History',
         PUBLIC: 'History',
     },
+    HISTORY_LOCALIZATIONS: {
+        BASE: 'HistoryLocalizations',
+    },
 };

@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
+import { Button } from '@/components/public/ui/button';
 import { ReactComponent as MailIcon } from '@/assets/icons/mail.svg';
 import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
 import { ReactComponent as MapPinIcon } from '@/assets/icons/map-pin.svg';
@@ -37,6 +38,15 @@ export const ContactDetailsSection: React.FC<ContactDetailsSectionProps> = ({
     onCopyEmail,
     onCopyPhone,
 }) => {
+    const [copiedItem, setCopiedItem] = useState<'email' | 'phone' | null>(null);
+    const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    const handleCopy = (type: 'email' | 'phone', callback: () => void) => {
+        callback();
+        if (timerRef.current) clearTimeout(timerRef.current);
+        setCopiedItem(type);
+        timerRef.current = setTimeout(() => setCopiedItem(null), 2000);
+    };
     return (
         <section className={styles['contact-details-section']} aria-label={title}>
             <div className={styles['contact-details-title-block']}>
@@ -51,27 +61,39 @@ export const ContactDetailsSection: React.FC<ContactDetailsSectionProps> = ({
                     <div className={styles['contact-details-item']}>
                         <MailIcon className={styles['contact-details-icon']} aria-hidden="true" />
                         <p className={styles['contact-details-text']}>{email}</p>
-                        <button
-                            type="button"
-                            className={styles['contact-details-copy']}
-                            onClick={onCopyEmail}
-                            aria-label={copyEmailLabel}
-                        >
-                            <CopyIcon className={styles['contact-details-icon']} aria-hidden="true" />
-                        </button>
+                        <div className={styles['copy-wrapper']}>
+                            <Button
+                                variant="tertiary"
+                                className={styles['contact-details-copy']}
+                                onClick={() => handleCopy('email', onCopyEmail)}
+                                ariaLabel={copyEmailLabel}
+                                icon={CopyIcon}
+                            />
+                            {copiedItem === 'email' && (
+                                <span className={styles['copy-snackbar']} role="status" aria-live="polite">
+                                    Скопійовано
+                                </span>
+                            )}
+                        </div>
                     </div>
 
                     <div className={styles['contact-details-item']}>
                         <PhoneIcon className={styles['contact-details-icon']} aria-hidden="true" />
                         <p className={styles['contact-details-text']}>{phone}</p>
-                        <button
-                            type="button"
-                            className={styles['contact-details-copy']}
-                            onClick={onCopyPhone}
-                            aria-label={copyPhoneLabel}
-                        >
-                            <CopyIcon className={styles['contact-details-icon']} aria-hidden="true" />
-                        </button>
+                        <div className={styles['copy-wrapper']}>
+                            <Button
+                                variant="tertiary"
+                                className={styles['contact-details-copy']}
+                                onClick={() => handleCopy('phone', onCopyPhone)}
+                                ariaLabel={copyPhoneLabel}
+                                icon={CopyIcon}
+                            />
+                            {copiedItem === 'phone' && (
+                                <span className={styles['copy-snackbar']} role="status" aria-live="polite">
+                                    Скопійовано
+                                </span>
+                            )}
+                        </div>
                     </div>
 
                     <div className={styles['contact-details-item']}>

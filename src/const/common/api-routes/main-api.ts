@@ -126,4 +126,5 @@ export const API_ROUTES = {
         BASE: 'History',
         PUBLIC: 'History',
     },
+    CONTACT_US: 'ContactUs',
 };

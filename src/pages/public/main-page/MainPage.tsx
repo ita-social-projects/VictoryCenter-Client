@@ -1,7 +1,7 @@
 import { LinearProgress } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
-import fallbackImage from '@/assets/images/group-riding-horse.webp';
+import fallbackImage from '@/assets/images/group-riding-horses.webp';
 import { PUBLIC_ROUTES } from '@/const/public/routes';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { useLocale } from '@/hooks/common/use-locale/useLocale';

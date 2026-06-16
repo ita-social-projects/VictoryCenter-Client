@@ -16,10 +16,6 @@
     @media (min-width: 768px) {
         height: 816px;
     }
-
-    @media (min-width: 1440px) {
-        height: 608px;
-    }
 }
 
 .image {
@@ -65,37 +61,32 @@
     flex-direction: column;
     justify-content: space-between;
     align-items: flex-start;
-    padding: 100px 18px 98px;
+    padding: 106px 14px 92px;
     color: c.$white;
 
     @media (min-width: 560px) {
-        padding: 128px 64px 88px;
+        padding: 128px 66px 96px;
     }
 
     @media (min-width: 768px) {
-        padding: 104px 44px 212px;
+        padding: 128px 58px 96px;
     }
 
     @media (min-width: 1440px) {
-        padding: 94px 56px 188px;
+        padding: 120px 52px 188px;
     }
 }
 
 .title {
+    @include type.h3-semibold-uppercase;
+
     margin: 0;
     max-width: 340px;
-    font-family: f.$font-family-base;
-    font-weight: f.$fw-bold;
-    font-size: 40px;
-    line-height: 48px;
-    letter-spacing: f.$ls-tight;
-    text-transform: uppercase;
 
     @media (min-width: 560px) {
+        @include type.h2-bold-uppercase;
+
         max-width: 650px;
-        font-size: 64px;
-        line-height: 72px;
-        letter-spacing: f.$ls-normal;
     }
 
     @media (min-width: 768px) {
@@ -103,8 +94,9 @@
     }
 
     @media (min-width: 1440px) {
-        max-width: 560px;
         @include type.h1-bold-uppercase;
+
+        max-width: 560px;
     }
 }
 
@@ -120,16 +112,17 @@
     }
 
     @media (min-width: 768px) {
-        gap: 36px;
+        gap: 40px;
     }
 
     @media (min-width: 1440px) {
-        gap: 24px;
+        gap: 32px;
     }
 }
 
 .description {
     @include type.body-1-medium;
+
     max-width: 348px;
     margin: 0;
     color: c.$white;
@@ -139,27 +132,21 @@
     }
 
     @media (min-width: 1440px) {
-        max-width: 320px;
+        max-width: 300px;
     }
 }
 
 .button {
-    height: 44px;
-    padding: 14px 36px;
+    @include type.body-2-semibold;
+
     background-color: c.$white;
     color: c.$blue-900;
-    box-shadow: none;
-    font-weight: f.$fw-semibold;
-    font-size: 16px;
-    line-height: 16px;
-    letter-spacing: -0.32px;
 
     &:hover,
     &:focus-visible,
     &:active {
         background-color: c.$grey-100;
         color: c.$blue-900;
-        box-shadow: none;
     }
 
     @media (max-width: 559px) {

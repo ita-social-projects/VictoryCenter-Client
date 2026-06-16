@@ -10,7 +10,7 @@ module.exports = {
     devServer: {
         proxy: {
             '/api': {
-                target: 'https://172.18.18.46:7001',
+                target: 'https://backend.victorycenter.online',
                 changeOrigin: true,
                 secure: false,
             },

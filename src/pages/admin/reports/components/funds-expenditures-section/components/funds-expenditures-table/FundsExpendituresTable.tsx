@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { useTableScrollToTop } from '@/hooks/admin/use-table-scroll-to-top/useTableScrollToTop';
 import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
 import {
     FundsExpendituresTransactionType,
@@ -158,9 +159,8 @@ export const FundsExpendituresTable = ({
     const [sort, setSort] = useState<ColumnSort>({ column: null, direction: null });
     const [rowEditState, setRowEditState] = useState<RowEditState | null>(null);
     const [savingRecordId, setSavingRecordId] = useState<number | null>(null);
-    const [isMoveToTopVisible, setIsMoveToTopVisible] = useState(false);
-    const tableWrapperRef = useRef<HTMLDivElement>(null);
     const headerCheckboxRef = useRef<HTMLInputElement | null>(null);
+    const { tableWrapperRef, isMoveToTopVisible, handleTableScroll, moveToTop } = useTableScrollToTop(records.length);
 
     const typeInferenceSource = allRecordsForTypeInference ?? records;
 
@@ -168,30 +168,6 @@ export const FundsExpendituresTable = ({
         income: getCategoriesForType(categories, typeInferenceSource, 'income'),
         expense: getCategoriesForType(categories, typeInferenceSource, 'expense'),
     };
-
-    const updateMoveToTopVisibility = useCallback(() => {
-        const tableWrapper = tableWrapperRef.current;
-        if (!tableWrapper) return;
-
-        const isScrollable = tableWrapper.scrollHeight > tableWrapper.clientHeight;
-        setIsMoveToTopVisible(isScrollable && tableWrapper.scrollTop > 0);
-    }, []);
-
-    const moveToTop = useCallback(() => {
-        const tableWrapper = tableWrapperRef.current;
-        if (!tableWrapper) return;
-
-        tableWrapper.scrollTop = 0;
-        setIsMoveToTopVisible(false);
-    }, []);
-
-    const handleTableScroll = useCallback(() => {
-        updateMoveToTopVisibility();
-    }, [updateMoveToTopVisibility]);
-
-    useEffect(() => {
-        updateMoveToTopVisibility();
-    }, [records.length, updateMoveToTopVisibility]);
 
     const setRowEditMode = useCallback(
         (nextState: RowEditState | null) => {
@@ -385,13 +361,9 @@ export const FundsExpendituresTable = ({
                 return { column: null, direction: null };
             });
 
-            const tableWrapper = tableWrapperRef.current;
-            if (tableWrapper) {
-                tableWrapper.scrollTop = 0;
-                setIsMoveToTopVisible(false);
-            }
+            moveToTop();
         },
-        [rowEditState],
+        [moveToTop, rowEditState],
     );
 
     const isAnyRowEditing = rowEditState !== null;

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { useTableScrollToTop } from '@/hooks/admin/use-table-scroll-to-top/useTableScrollToTop';
 import { ProgramExpensesEmptyState } from '@/pages/admin/reports/components/program-expenses-section/components/program-expenses-empty-state/ProgramExpensesEmptyState';
 import { FUNDS_EXPENDITURES_TEXT, PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
 import { ReactComponent as ArrowUpIcon } from '@/assets/icons/arrow-up.svg';
@@ -78,7 +79,6 @@ export const ProgramExpensesTable = ({
     onRecordSave,
 }: ProgramExpensesTableProps) => {
     const headerCheckboxRef = useRef<HTMLInputElement>(null);
-    const tableWrapperRef = useRef<HTMLDivElement>(null);
     const hasNoRecords = records.length === 0;
     const visibleRecordIds = records.map((record) => record.id);
     const selectedVisibleRecordIds = visibleRecordIds.filter((id) => selectedRecordIds.includes(id));
@@ -87,27 +87,9 @@ export const ProgramExpensesTable = ({
     const tableColumnsCount = isEditing ? EDITING_TABLE_COLUMNS_COUNT : READ_ONLY_TABLE_COLUMNS_COUNT;
     const [rowEditState, setRowEditState] = useState<RowEditState | null>(null);
     const [savingRecordId, setSavingRecordId] = useState<number | null>(null);
-    const [isMoveToTopVisible, setIsMoveToTopVisible] = useState(false);
+    const { tableWrapperRef, isMoveToTopVisible, handleTableScroll, moveToTop } = useTableScrollToTop(records.length);
     const isAnyRowEditing = rowEditState !== null;
     const isSavingInProgress = savingRecordId !== null;
-
-    const updateMoveToTopVisibility = useCallback(() => {
-        const wrapper = tableWrapperRef.current;
-        if (!wrapper) return;
-        const isScrollable = wrapper.scrollHeight > wrapper.clientHeight;
-        setIsMoveToTopVisible(isScrollable && wrapper.scrollTop > 0);
-    }, []);
-
-    const handleTableScroll = useCallback(() => {
-        updateMoveToTopVisibility();
-    }, [updateMoveToTopVisibility]);
-
-    const moveToTop = useCallback(() => {
-        const wrapper = tableWrapperRef.current;
-        if (!wrapper) return;
-        wrapper.scrollTop = 0;
-        setIsMoveToTopVisible(false);
-    }, []);
 
     const setRowEditMode = useCallback(
         (nextState: RowEditState | null) => {
@@ -209,10 +191,6 @@ export const ProgramExpensesTable = ({
         if (!headerCheckboxRef.current) return;
         headerCheckboxRef.current.indeterminate = hasSelectedVisibleRecords && !areAllVisibleRecordsSelected;
     }, [areAllVisibleRecordsSelected, hasSelectedVisibleRecords]);
-
-    useEffect(() => {
-        updateMoveToTopVisibility();
-    }, [records.length, updateMoveToTopVisibility]);
 
     return (
         <div className={styles['table-container']}>

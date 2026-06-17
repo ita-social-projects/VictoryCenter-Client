@@ -161,7 +161,7 @@ describe('PdfReportsApi', () => {
             const createdReport = mockPdfReports[0];
             mockClient.post = jest.fn().mockResolvedValueOnce({ data: createdReport });
 
-            const result = await PdfReportsApi.create(mockClient, mockFile);
+            const result = await PdfReportsApi.create(mockClient, mockFile, 1);
 
             expect(mockClient.post).toHaveBeenCalledWith(API_ROUTES.PDF_REPORTS.BASE, expect.any(FormData), {
                 headers: { 'Content-Type': 'multipart/form-data' },
@@ -173,17 +173,17 @@ describe('PdfReportsApi', () => {
             const mockFile = new File(['content'], 'test.pdf', { type: 'application/pdf' });
             mockClient.post = jest.fn().mockResolvedValueOnce({ data: mockPdfReports[0] });
 
-            await PdfReportsApi.create(mockClient, mockFile);
+            await PdfReportsApi.create(mockClient, mockFile, 1);
 
             const formData = (mockClient.post as jest.Mock).mock.calls[0][1] as FormData;
-            expect(formData.get('file')).toEqual(mockFile);
+            expect(formData.get('File')).toEqual(mockFile);
         });
 
         it('should return created dto', async () => {
             const mockFile = new File(['content'], 'test.pdf', { type: 'application/pdf' });
             mockClient.post = jest.fn().mockResolvedValueOnce({ data: mockPdfReports[0] });
 
-            const result = await PdfReportsApi.create(mockClient, mockFile);
+            const result = await PdfReportsApi.create(mockClient, mockFile, 1);
 
             expect(result.id).toBe(mockPdfReports[0].id);
             expect(result.name).toBe(mockPdfReports[0].name);
@@ -193,7 +193,7 @@ describe('PdfReportsApi', () => {
             const mockFile = new File(['content'], 'test.pdf', { type: 'application/pdf' });
             mockClient.post = jest.fn().mockRejectedValueOnce(new Error('Upload failed'));
 
-            await expect(PdfReportsApi.create(mockClient, mockFile)).rejects.toThrow('Upload failed');
+            await expect(PdfReportsApi.create(mockClient, mockFile, 1)).rejects.toThrow('Upload failed');
         });
     });
 

@@ -22,7 +22,7 @@ describe('PdfDropzone', () => {
     let mockOnUploaded: jest.Mock;
 
     const setup = () => {
-        const utils = render(<PdfDropzone onUploaded={mockOnUploaded} />);
+        const utils = render(<PdfDropzone onUploaded={mockOnUploaded} languageId={1} />);
         const input = utils.container.querySelector('input[type="file"]') as HTMLInputElement;
 
         return {
@@ -84,7 +84,7 @@ describe('PdfDropzone', () => {
         uploadFile(input, mockFile);
 
         await waitFor(() => {
-            expect(PdfReportsApi.create).toHaveBeenCalledWith(mockClient, mockFile);
+            expect(PdfReportsApi.create).toHaveBeenCalledWith(mockClient, mockFile, 1);
         });
     });
 
@@ -95,7 +95,7 @@ describe('PdfDropzone', () => {
         dropFile(mockFile);
 
         await waitFor(() => {
-            expect(PdfReportsApi.create).toHaveBeenCalledWith(mockClient, mockFile);
+            expect(PdfReportsApi.create).toHaveBeenCalledWith(mockClient, mockFile, 1);
         });
     });
 

@@ -1,16 +1,15 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { useTableScrollToTop } from '@/hooks/admin/use-table-scroll-to-top/useTableScrollToTop';
+import { useTableRowAmountEdit } from '@/hooks/admin/use-table-row-amount-edit/useTableRowAmountEdit';
 import { ProgramExpensesEmptyState } from '@/pages/admin/reports/components/program-expenses-section/components/program-expenses-empty-state/ProgramExpensesEmptyState';
 import { FUNDS_EXPENDITURES_TEXT, PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
 import { ReactComponent as ArrowUpIcon } from '@/assets/icons/arrow-up.svg';
-import { AmountEditRow } from '../../../amount-edit-row/AmountEditRow';
 import {
     normalizeFundsExpendituresAmountInput,
     validateFundsExpendituresAmount,
 } from '@/validation/admin/reports-schema/funds-expenditures-record-schema/funds-expenditures-record-schema';
 import { ProgramExpensesRecord } from '@/types/admin/reports';
 import { Button } from '@/components/admin/button/Button';
-import { useFundsAmountEdit } from '@/hooks/admin/use-funds-amount-edit/useFundsAmountEdit';
 import cn from 'classnames';
 import styles from './ProgramExpensesTable.module.scss';
 
@@ -85,19 +84,23 @@ export const ProgramExpensesTable = ({
     const areAllVisibleRecordsSelected = records.length > 0 && selectedVisibleRecordIds.length === records.length;
     const hasSelectedVisibleRecords = selectedVisibleRecordIds.length > 0;
     const tableColumnsCount = isEditing ? EDITING_TABLE_COLUMNS_COUNT : READ_ONLY_TABLE_COLUMNS_COUNT;
-    const [rowEditState, setRowEditState] = useState<RowEditState | null>(null);
-    const [savingRecordId, setSavingRecordId] = useState<number | null>(null);
     const { tableWrapperRef, isMoveToTopVisible, handleTableScroll, moveToTop } = useTableScrollToTop(records.length);
-    const isAnyRowEditing = rowEditState !== null;
-    const isSavingInProgress = savingRecordId !== null;
-
-    const setRowEditMode = useCallback(
-        (nextState: RowEditState | null) => {
-            setRowEditState(nextState);
-            onRowEditModeChange?.(nextState !== null);
-        },
-        [onRowEditModeChange],
-    );
+    const {
+        rowEditState,
+        setRowEditState,
+        savingRecordId,
+        setSavingRecordId,
+        isAnyRowEditing,
+        setRowEditMode,
+        renderAmountEditRow,
+    } = useTableRowAmountEdit<RowEditState>({
+        isEditing,
+        isRowActionsDisabled,
+        exchangeRate,
+        mismatchMessage: PROGRAM_EXPENSES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH,
+        isAcceptButtonDisabled,
+        onRowEditModeChange,
+    });
 
     const handleStartRowEdit = useCallback(
         (record: ProgramExpensesRecord) => {
@@ -115,16 +118,6 @@ export const ProgramExpensesTable = ({
         },
         [isRowActionsDisabled, rowEditState, setRowEditMode],
     );
-
-    const handleCloseRowEdit = useCallback(() => {
-        setRowEditMode(null);
-    }, [setRowEditMode]);
-
-    const { handleAmountChange, handleAmountBlur } = useFundsAmountEdit({
-        exchangeRate,
-        mismatchMessage: PROGRAM_EXPENSES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH,
-        setEditState: setRowEditState,
-    });
 
     const handleAcceptRowEdit = useCallback(
         async (record: ProgramExpensesRecord) => {
@@ -184,7 +177,7 @@ export const ProgramExpensesTable = ({
                 setSavingRecordId(null);
             }
         },
-        [onRecordSave, rowEditState, savingRecordId, setRowEditMode],
+        [onRecordSave, rowEditState, savingRecordId, setRowEditMode, setRowEditState, setSavingRecordId],
     );
 
     useEffect(() => {
@@ -266,56 +259,35 @@ export const ProgramExpensesTable = ({
                                 onAddProgramExpense={onAddProgramExpense}
                             />
                         ) : (
-                            records.map((record) => {
-                                const isEditedRow = rowEditState?.recordId === record.id;
-                                const isAnotherRowEditing =
-                                    (isAnyRowEditing && !isEditedRow) || isSavingInProgress || isRowActionsDisabled;
-                                const isSavingCurrentRow = savingRecordId === record.id;
-                                const isAcceptDisabled = !isEditedRow || isAcceptButtonDisabled(rowEditState);
-
-                                return (
-                                    <tr key={record.id} className={styles.tr}>
-                                        {isEditing && (
-                                            <td className={cn(styles.td, styles['checkbox-td'])}>
-                                                <input
-                                                    type="checkbox"
-                                                    disabled={isAnyRowEditing}
-                                                    className={styles['row-checkbox']}
-                                                    aria-label={`Select record ${record.id}`}
-                                                    checked={selectedRecordIds.includes(record.id)}
-                                                    onChange={() => onToggleRecordSelection?.(record.id)}
-                                                />
-                                            </td>
-                                        )}
-                                        <td className={styles.td}>{record.reportingYear}</td>
-                                        <td className={styles.td}>
-                                            <span className={styles['type-chip']}>
-                                                {PROGRAM_EXPENSES_TEXT.TABLE.TYPE_LABEL}
-                                            </span>
+                            records.map((record) => (
+                                <tr key={record.id} className={styles.tr}>
+                                    {isEditing && (
+                                        <td className={cn(styles.td, styles['checkbox-td'])}>
+                                            <input
+                                                type="checkbox"
+                                                disabled={isAnyRowEditing}
+                                                className={styles['row-checkbox']}
+                                                aria-label={`Select record ${record.id}`}
+                                                checked={selectedRecordIds.includes(record.id)}
+                                                onChange={() => onToggleRecordSelection?.(record.id)}
+                                            />
                                         </td>
-                                        <td className={styles.td}>{record.programName}</td>
-                                        <AmountEditRow
-                                            record={record}
-                                            isEditing={isEditing}
-                                            isEditedRow={isEditedRow}
-                                            amountUah={isEditedRow ? rowEditState.amountUah : record.amountUah}
-                                            amountUsd={isEditedRow ? rowEditState.amountUsd : record.amountUsd}
-                                            amountUahError={rowEditState?.errors.amountUah}
-                                            amountUsdError={rowEditState?.errors.amountUsd}
-                                            usdMismatchMessage={rowEditState?.usdMismatchMessage}
-                                            isSavingCurrentRow={isSavingCurrentRow}
-                                            isAcceptDisabled={isAcceptDisabled}
-                                            isAnotherRowEditing={isAnotherRowEditing}
-                                            onAmountChange={handleAmountChange}
-                                            onAmountBlur={handleAmountBlur}
-                                            onAccept={() => handleAcceptRowEdit(record)}
-                                            onClose={handleCloseRowEdit}
-                                            onEdit={() => handleStartRowEdit(record)}
-                                            onDelete={() => onDeleteRecord?.(record)}
-                                        />
-                                    </tr>
-                                );
-                            })
+                                    )}
+                                    <td className={styles.td}>{record.reportingYear}</td>
+                                    <td className={styles.td}>
+                                        <span className={styles['type-chip']}>
+                                            {PROGRAM_EXPENSES_TEXT.TABLE.TYPE_LABEL}
+                                        </span>
+                                    </td>
+                                    <td className={styles.td}>{record.programName}</td>
+                                    {renderAmountEditRow(
+                                        record,
+                                        () => handleAcceptRowEdit(record),
+                                        () => handleStartRowEdit(record),
+                                        () => onDeleteRecord?.(record),
+                                    )}
+                                </tr>
+                            ))
                         )}
                     </tbody>
                 </table>

@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useTableScrollToTop } from '@/hooks/admin/use-table-scroll-to-top/useTableScrollToTop';
+import { useTableRowAmountEdit } from '@/hooks/admin/use-table-row-amount-edit/useTableRowAmountEdit';
 import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
 import {
     FundsExpendituresTransactionType,
@@ -8,7 +9,6 @@ import {
 } from '@/types/admin/reports';
 import { ReactComponent as NotFoundIcon } from '@/assets/icons/not-found.svg';
 import { ReactComponent as ArrowUpIcon } from '@/assets/icons/arrow-up.svg';
-import { AmountEditRow } from '../../../amount-edit-row/AmountEditRow';
 import { Select } from '@/components/common/select/Select';
 import { SortIcon } from '@/pages/admin/reports/components/funds-expenditures-section/components/funds-expenditures-table/components/sort-icon';
 import {
@@ -16,7 +16,6 @@ import {
     validateFundsExpendituresAmount,
     validateFundsExpendituresCategory,
 } from '@/validation/admin/reports-schema/funds-expenditures-record-schema/funds-expenditures-record-schema';
-import { useFundsAmountEdit } from '@/hooks/admin/use-funds-amount-edit/useFundsAmountEdit';
 import { parseAmount } from '@/utils/functions/parse-amount/parse-amount';
 import cn from 'classnames';
 import styles from './FundsExpendituresTable.module.scss';
@@ -157,10 +156,24 @@ export const FundsExpendituresTable = ({
     onOpenBulkDelete,
 }: FundsExpendituresTableProps) => {
     const [sort, setSort] = useState<ColumnSort>({ column: null, direction: null });
-    const [rowEditState, setRowEditState] = useState<RowEditState | null>(null);
-    const [savingRecordId, setSavingRecordId] = useState<number | null>(null);
     const headerCheckboxRef = useRef<HTMLInputElement | null>(null);
     const { tableWrapperRef, isMoveToTopVisible, handleTableScroll, moveToTop } = useTableScrollToTop(records.length);
+    const {
+        rowEditState,
+        setRowEditState,
+        savingRecordId,
+        setSavingRecordId,
+        isAnyRowEditing,
+        setRowEditMode,
+        renderAmountEditRow,
+    } = useTableRowAmountEdit<RowEditState>({
+        isEditing,
+        isRowActionsDisabled,
+        exchangeRate,
+        mismatchMessage: FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH,
+        isAcceptButtonDisabled,
+        onRowEditModeChange,
+    });
 
     const typeInferenceSource = allRecordsForTypeInference ?? records;
 
@@ -168,14 +181,6 @@ export const FundsExpendituresTable = ({
         income: getCategoriesForType(categories, typeInferenceSource, 'income'),
         expense: getCategoriesForType(categories, typeInferenceSource, 'expense'),
     };
-
-    const setRowEditMode = useCallback(
-        (nextState: RowEditState | null) => {
-            setRowEditState(nextState);
-            onRowEditModeChange?.(nextState !== null);
-        },
-        [onRowEditModeChange],
-    );
 
     const getRowEditValidationError = useCallback(
         (
@@ -215,10 +220,6 @@ export const FundsExpendituresTable = ({
         [isRowActionsDisabled, rowEditState, setRowEditMode],
     );
 
-    const handleCloseRowEdit = useCallback(() => {
-        setRowEditMode(null);
-    }, [setRowEditMode]);
-
     const handleRowCategoryChange = useCallback(
         (record: EnrichedRecord, categoryId: number | undefined) => {
             const nextError = getRowEditValidationError(record, categoryId, 'change');
@@ -238,7 +239,7 @@ export const FundsExpendituresTable = ({
                 };
             });
         },
-        [getRowEditValidationError],
+        [getRowEditValidationError, setRowEditState],
     );
 
     const handleRowCategoryBlur = useCallback(
@@ -257,14 +258,8 @@ export const FundsExpendituresTable = ({
                 };
             });
         },
-        [getRowEditValidationError],
+        [getRowEditValidationError, setRowEditState],
     );
-
-    const { handleAmountChange, handleAmountBlur } = useFundsAmountEdit({
-        exchangeRate,
-        mismatchMessage: FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH,
-        setEditState: setRowEditState,
-    });
 
     const handleAcceptRowEdit = useCallback(
         async (record: EnrichedRecord) => {
@@ -340,7 +335,15 @@ export const FundsExpendituresTable = ({
                 setSavingRecordId(null);
             }
         },
-        [getRowEditValidationError, onRecordSave, rowEditState, savingRecordId, setRowEditMode],
+        [
+            getRowEditValidationError,
+            onRecordSave,
+            rowEditState,
+            savingRecordId,
+            setRowEditMode,
+            setRowEditState,
+            setSavingRecordId,
+        ],
     );
 
     const handleSort = useCallback(
@@ -366,8 +369,6 @@ export const FundsExpendituresTable = ({
         [moveToTop, rowEditState],
     );
 
-    const isAnyRowEditing = rowEditState !== null;
-    const isSavingInProgress = savingRecordId !== null;
     const sortedRecords = sortRecords(records, sort);
     const colSpan = isEditing ? 7 : 5;
 
@@ -492,11 +493,7 @@ export const FundsExpendituresTable = ({
                         ) : (
                             sortedRecords.map((record) => {
                                 const isEditedRow = rowEditState?.recordId === record.id;
-                                const isAnotherRowEditing =
-                                    (isAnyRowEditing && !isEditedRow) || isSavingInProgress || isRowActionsDisabled;
-                                const isSavingCurrentRow = savingRecordId === record.id;
                                 const editableCategories = categoriesByType[record.type];
-                                const isAcceptDisabled = !isEditedRow || isAcceptButtonDisabled(rowEditState);
 
                                 return (
                                     <tr key={record.id} className={styles.tr}>
@@ -570,25 +567,12 @@ export const FundsExpendituresTable = ({
                                                 record.categoryName
                                             )}
                                         </td>
-                                        <AmountEditRow
-                                            record={record}
-                                            isEditing={isEditing}
-                                            isEditedRow={isEditedRow}
-                                            amountUah={isEditedRow ? rowEditState.amountUah : record.amountUah}
-                                            amountUsd={isEditedRow ? rowEditState.amountUsd : record.amountUsd}
-                                            amountUahError={rowEditState?.errors.amountUah}
-                                            amountUsdError={rowEditState?.errors.amountUsd}
-                                            usdMismatchMessage={rowEditState?.usdMismatchMessage}
-                                            isSavingCurrentRow={isSavingCurrentRow}
-                                            isAcceptDisabled={isAcceptDisabled}
-                                            isAnotherRowEditing={isAnotherRowEditing}
-                                            onAmountChange={handleAmountChange}
-                                            onAmountBlur={handleAmountBlur}
-                                            onAccept={() => handleAcceptRowEdit(record)}
-                                            onClose={handleCloseRowEdit}
-                                            onEdit={() => handleStartRowEdit(record)}
-                                            onDelete={() => onDeleteRecord?.(record)}
-                                        />
+                                        {renderAmountEditRow(
+                                            record,
+                                            () => handleAcceptRowEdit(record),
+                                            () => handleStartRowEdit(record),
+                                            () => onDeleteRecord?.(record),
+                                        )}
                                     </tr>
                                 );
                             })

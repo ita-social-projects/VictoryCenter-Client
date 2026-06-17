@@ -15,6 +15,7 @@ export const PARTNERS_TEXT = {
         },
         MESSAGE: {
             FAIL_TO_DELETE_PARTNER_SECTION: 'Виникла помилка під час видалення секції партнерів',
+            DELETE_SECTION_WARNING: 'Всі партнери в секції будуть видалені. Бажаєте продовжити?',
         },
         IMAGE: {
             ADD_IMAGE_HERE: 'Додайте файл сюди',

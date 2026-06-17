@@ -42,12 +42,18 @@ export interface PartnerSectionsEditorRef {
     addSection: () => void;
 }
 
+enum DeletePhase {
+    IDLE = 'idle',
+    CONFIRM_SECTION = 'confirm_section',
+    CONFIRM_PARTNERS = 'confirm_partners',
+}
+
 export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, ref) => {
     const client = useAdminClient();
     const { addToast } = useToast();
     const [errors, setErrors] = useState<PartnerSectionErrors[]>([]);
     const [isPublishing, setIsPublishing] = useState<boolean>(false);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [deletePhase, setDeletePhase] = useState<DeletePhase>(DeletePhase.IDLE);
     const [sectionToDeleteId, setSectionToDeleteId] = useState<string | null>(null);
     const [localSections, setLocalSections] = useState<PartnerSectionFormValues[]>([]);
     const scrollAnchorRef = useRef<HTMLDivElement>(null);
@@ -201,19 +207,23 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
 
     const handleDeleteRequest = useCallback((localId: string) => {
         setSectionToDeleteId(localId);
-        setIsModalOpen(true);
+        setDeletePhase(DeletePhase.CONFIRM_SECTION);
     }, []);
 
     const handleCloseModal = useCallback(() => {
-        setIsModalOpen(false);
+        setDeletePhase(DeletePhase.IDLE);
         setSectionToDeleteId(null);
     }, []);
 
-    const handleConfirmDelete = useCallback(async () => {
+    const handleFirstConfirm = useCallback(() => {
+        setDeletePhase(DeletePhase.CONFIRM_PARTNERS);
+    }, []);
+
+    const handleFinalConfirmDelete = useCallback(async () => {
         if (!sectionToDeleteId) return;
 
         setIsPublishing(true);
-        setIsModalOpen(false);
+        setDeletePhase(DeletePhase.IDLE);
 
         try {
             const sectionToDelete = localSections.find((s) => s.localId === sectionToDeleteId);
@@ -316,10 +326,17 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
             <div ref={scrollAnchorRef} />
 
             <ConfirmationModal
-                isOpen={isModalOpen}
+                isOpen={deletePhase === DeletePhase.CONFIRM_SECTION}
                 onClose={handleCloseModal}
                 title={PARTNERS_TEXT.FORM.TITLE.DELETE_SECTION}
-                onConfirm={handleConfirmDelete}
+                onConfirm={handleFirstConfirm}
+                onCancel={handleCloseModal}
+            />
+            <ConfirmationModal
+                isOpen={deletePhase === DeletePhase.CONFIRM_PARTNERS}
+                onClose={handleCloseModal}
+                title={PARTNERS_TEXT.FORM.MESSAGE.DELETE_SECTION_WARNING}
+                onConfirm={handleFinalConfirmDelete}
                 onCancel={handleCloseModal}
             />
         </div>

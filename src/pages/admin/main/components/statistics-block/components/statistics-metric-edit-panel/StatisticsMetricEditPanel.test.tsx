@@ -72,6 +72,25 @@ describe('StatisticsMetricEditPanel', () => {
         expect(screen.getByTestId('metric-prefix-1')).toHaveAttribute('data-selected', String(MetricPrefix.Plus));
     });
 
+    it('uses base metric name as the Ukrainian field even when a UK localization exists', () => {
+        render(
+            <StatisticsMetricEditPanel
+                metric={createMetric({
+                    name: 'Base UA metric name',
+                    localizations: [
+                        { languageId: 1, name: 'UK localization name' } as any,
+                        { languageId: 2, name: 'EN metric name' } as any,
+                    ],
+                })}
+                onSave={jest.fn()}
+                onCancel={jest.fn()}
+            />,
+        );
+
+        expect(screen.getByTestId('metric-ua-1')).toHaveValue('Base UA metric name');
+        expect(screen.getByTestId('metric-en-1')).toHaveValue('EN metric name');
+    });
+
     it('submits trimmed values and parsed number', async () => {
         const onSave = jest.fn();
         render(<StatisticsMetricEditPanel metric={createMetric()} onSave={onSave} onCancel={jest.fn()} />);
@@ -88,7 +107,7 @@ describe('StatisticsMetricEditPanel', () => {
         expect(updatedMetric.prefix).toBe(MetricPrefix.Percent);
         expect(updatedMetric.localizations).toEqual([
             { languageId: 1, name: 'Нова UA' },
-            { languageId: 2, name: 'New EN' },
+            { languageId: 2, name: 'New EN', value: '2345' },
         ]);
     });
 
@@ -118,7 +137,7 @@ describe('StatisticsMetricEditPanel', () => {
         expect(screen.getByTestId('metric-prefix-1')).toHaveAttribute('data-selected', String(MetricPrefix.Percent));
     });
 
-    it('preserves non-target localizations when saving', async () => {
+    it('preserves non-target localizations and creates English localization when missing', async () => {
         const onSave = jest.fn();
         const metric = createMetric({
             localizations: [
@@ -137,6 +156,7 @@ describe('StatisticsMetricEditPanel', () => {
         expect(updatedMetric.localizations).toEqual([
             { languageId: 1, name: 'Нова UA' },
             { languageId: 3, name: 'Third Language' },
+            { entityId: 1, languageId: 2, name: 'Name EN', value: '1200' },
         ]);
     });
 
@@ -152,7 +172,7 @@ describe('StatisticsMetricEditPanel', () => {
         expect(updatedMetric.prefix).toBe(MetricPrefix.Plus);
     });
 
-    it('handles saving when localizations are undefined', async () => {
+    it('creates English localization when localizations are undefined', async () => {
         const onSave = jest.fn();
         const metric = createMetric({ localizations: undefined as any });
 
@@ -162,7 +182,7 @@ describe('StatisticsMetricEditPanel', () => {
         fireEvent.change(screen.getByTestId('metric-en-1'), { target: { value: 'EN Update' } });
 
         const updatedMetric = await submitForm(onSave);
-        expect(updatedMetric.localizations).toEqual([]);
+        expect(updatedMetric.localizations).toEqual([{ entityId: 1, languageId: 2, name: 'EN Update', value: '1200' }]);
     });
 
     it('uses default prefix option when provided prefix is invalid', () => {

@@ -368,6 +368,7 @@ describe('ProgramModal', () => {
             expect(screen.getByTestId('question-modal')).toBeInTheDocument();
             expect(screen.getByTestId('question-title')).toHaveTextContent(
                 COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE,
+                { normalizeWhitespace: false },
             );
 
             fireEvent.click(screen.getByTestId('question-confirm'));
@@ -443,6 +444,7 @@ describe('ProgramModal', () => {
 
             expect(screen.getByTestId('question-title')).toHaveTextContent(
                 COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE,
+                { normalizeWhitespace: false },
             );
         });
 
@@ -475,6 +477,7 @@ describe('ProgramModal', () => {
             expect(screen.getByTestId('question-modal')).toBeInTheDocument();
             expect(screen.getByTestId('question-title')).toHaveTextContent(
                 COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE,
+                { normalizeWhitespace: false },
             );
             expect(mockDiscardCallback).not.toHaveBeenCalled();
 
@@ -549,6 +552,7 @@ describe('ProgramModal', () => {
             expect(getQuestionModal()).toBeInTheDocument();
             expect(getQuestionTitle()).toHaveTextContent(
                 COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE,
+                { normalizeWhitespace: false },
             );
         });
 

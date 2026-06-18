@@ -29,9 +29,7 @@ describe('IntroSection', () => {
         expect(heading).toHaveTextContent('КОНІЗ ДОСВІДОМЗЦІЛЕННЯ');
         expect(heading.innerHTML).toContain('КОНІ<br>З ДОСВІДОМ<br>ЗЦІЛЕННЯ');
         expect(description).toHaveTextContent('Коли тіло та душа відновлюються— народжується справжня сила.');
-        expect(description?.innerHTML).toContain(
-            'Коли тіло та душа відновлюються<br>— народжується справжня сила.',
-        );
+        expect(description?.innerHTML).toContain('Коли тіло та душа відновлюються<br>— народжується справжня сила.');
 
         const image = container.querySelector('img');
 

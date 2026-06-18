@@ -46,7 +46,7 @@ $field-width: 366px;
 .delete-button {
     position: absolute;
     top: 32px;
-    left: calc(34px + #{$field-width} - 24px);
+    left: $field-width + 34px - 24px;
     width: 24px;
     height: 24px;
     border: none;

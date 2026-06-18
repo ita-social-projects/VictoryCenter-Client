@@ -62,7 +62,7 @@ export const PARTNER_BANNER_VALIDATION = {
     },
     description: {
         min: 10,
-        max: 50,
+        max: 30,
         getRequiredError: () => `Опис обов'язковий`,
     },
     image: {

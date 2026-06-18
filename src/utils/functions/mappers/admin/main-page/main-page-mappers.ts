@@ -139,12 +139,13 @@ export function mapFormValuesToMainPagePatch(
                     ? (formValues.statisticsImage.id as number)
                     : null,
             metrics: safeMetricsPayload,
-            localization: enLanguageId
-                ? {
-                      languageId: enLanguageId,
-                      title: statTitleEn || statTitleUk,
-                  }
-                : undefined,
+            localization:
+                enLanguageId && statTitleEn
+                    ? {
+                          languageId: enLanguageId,
+                          title: statTitleEn,
+                      }
+                    : undefined,
         },
     };
 }

@@ -266,7 +266,26 @@ describe('main-page-mappers', () => {
 
             expect(patch.impactStatistics?.metrics).toEqual([]);
             expect(patch.impactStatistics?.id).toBeUndefined();
-            expect(patch.impactStatistics?.localization).toEqual({ languageId: 2, title: '' });
+            expect(patch.impactStatistics?.localization).toBeUndefined();
+        });
+
+        it('does not write Ukrainian statistics title into English localization when EN title is empty', () => {
+            const formValues = {
+                ...MAIN_PAGE_FORM_DEFAULTS,
+                titleUa: 'UA Title',
+                descriptionUa: 'UA Desc',
+                aboutUsTitleUa: 'UA About',
+                aboutUsDescriptionUa: 'UA About Desc',
+                partnersTitleUa: 'UA Partners',
+                partnersDescriptionUa: 'UA Partners Desc',
+                statisticsTitleUa: 'Статистика впливу',
+                statisticsTitleEn: '   ',
+            };
+
+            const patch = mapFormValuesToMainPagePatch(formValues, null, languages);
+
+            expect(patch.impactStatistics?.title).toBe('Статистика впливу');
+            expect(patch.impactStatistics?.localization).toBeUndefined();
         });
 
         it('maps edited metrics to base Ukrainian fields and English localization payload', () => {
@@ -318,6 +337,54 @@ describe('main-page-mappers', () => {
                         languageId: 2,
                         name: 'Therapy hours',
                         value: '1200+',
+                    },
+                }),
+            ]);
+        });
+
+        it('uses default English language id and preserves metric localization without entity id when languages are missing', () => {
+            const formValues: MainPageFormValues = {
+                ...MAIN_PAGE_FORM_DEFAULTS,
+                titleUa: 'UA Title',
+                descriptionUa: 'UA Desc',
+                aboutUsTitleUa: 'UA About',
+                aboutUsDescriptionUa: 'UA About Desc',
+                partnersTitleUa: 'UA Partners',
+                partnersDescriptionUa: 'UA Partners Desc',
+                statisticsTitleUa: 'UA Stats',
+                statisticsTitleEn: 'EN Stats',
+                statisticsImage: { id: 77, url: 'stats.png' } as any,
+            };
+
+            const originalPage: MainPage = {
+                impactStatistics: {
+                    id: 9,
+                    metrics: [
+                        {
+                            value: 8,
+                            name: 'Програми',
+                            type: MetricType.Programs,
+                            isHidden: false,
+                            priority: 2,
+                            localizations: [{ language: { code: 'en' }, name: 'Programs', value: null } as any],
+                        } as any,
+                    ],
+                } as any,
+            } as any;
+
+            const patch = mapFormValuesToMainPagePatch(formValues, originalPage, undefined);
+
+            expect(patch.impactStatistics?.imageId).toBe(77);
+            expect(patch.impactStatistics?.localization).toEqual({ languageId: 2, title: 'EN Stats' });
+            expect(patch.impactStatistics?.metrics).toEqual([
+                expect.objectContaining({
+                    id: undefined,
+                    value: 8,
+                    name: 'Програми',
+                    localization: {
+                        languageId: 2,
+                        name: 'Programs',
+                        value: '8',
                     },
                 }),
             ]);

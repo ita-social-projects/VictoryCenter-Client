@@ -14,6 +14,7 @@ import {
     ReportFundsExpendituresRecord,
     ReportFundsExpendituresSettings,
     ReportFundsExpendituresSettingsLocalizationDto,
+    ProgramExpensesSummary,
 } from '@/types/admin/reports';
 import { LocalizationLanguage, TranslationStatus } from '@/types/common/language';
 
@@ -21,6 +22,7 @@ const MOCK_FUNDS_EXPENDITURES_SETTINGS: ReportFundsExpendituresSettings = {
     id: 1,
     disclaimerTitle: 'Фінансовий звіт Victory Center за поточний рік. Ми забезпечуємо прозорість кожної гривні.',
     exchangeRate: '42.18',
+    programExpendituresReportingYear: 2025,
 };
 
 const MOCK_FUNDS_EXPENDITURES_CATEGORIES: ReportFundsExpendituresCategory[] = [
@@ -378,18 +380,27 @@ jest.mock('./components/common/translate-disclaimer-modal/TranslateDisclaimerMod
     },
 }));
 
+const MOCK_EMPTY_PROGRAM_SUMMARY: ProgramExpensesSummary = { totalAmountUah: 0, totalAmountUsd: 0 };
+
 const setupMockDataFetch = (
     settings: ReportFundsExpendituresSettings | null = MOCK_FUNDS_EXPENDITURES_SETTINGS,
     categories: ReportFundsExpendituresCategory[] = MOCK_FUNDS_EXPENDITURES_CATEGORIES,
     records: ReportFundsExpendituresRecord[] = MOCK_FUNDS_EXPENDITURES_RECORDS,
     summary: FundsExpendituresSummary = MOCK_FUNDS_EXPENDITURES_SUMMARY,
     loadingBySlot: Partial<Record<number, boolean>> = {},
+    programExpenses: ProgramExpensesSummary = MOCK_EMPTY_PROGRAM_SUMMARY,
 ) => {
     let callIndex = 0;
     mockUseDataFetch.mockImplementation(({ initialData }: { initialData: unknown }) => {
         const callOrder = callIndex++;
-        const slot = callOrder % 4;
-        const slotDataMap: Record<number, unknown> = { 0: settings, 1: categories, 2: records, 3: summary };
+        const slot = callOrder % 5;
+        const slotDataMap: Record<number, unknown> = {
+            0: settings,
+            1: categories,
+            2: records,
+            3: summary,
+            4: programExpenses,
+        };
         const data = slotDataMap[slot];
         return {
             data: data ?? initialData,
@@ -507,7 +518,12 @@ describe('FundsExpenditureSection', () => {
     });
 
     it('should not render disclaimer if settings have no disclaimerTitle', () => {
-        setupMockDataFetch({ id: 1, disclaimerTitle: null, exchangeRate: '42.18' });
+        setupMockDataFetch({
+            id: 1,
+            disclaimerTitle: null,
+            exchangeRate: '42.18',
+            programExpendituresReportingYear: 2025,
+        });
         render(<FundsExpenditureSection />);
         expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.DISCLAIMER_LABEL)).not.toBeInTheDocument();
     });
@@ -708,7 +724,12 @@ describe('FundsExpenditureSection', () => {
         });
 
         it('should disable publish button when disclaimer is empty', () => {
-            setupMockDataFetch({ id: 1, disclaimerTitle: null, exchangeRate: '42' });
+            setupMockDataFetch({
+                id: 1,
+                disclaimerTitle: null,
+                exchangeRate: '42',
+                programExpendituresReportingYear: 2025,
+            });
             render(<FundsExpenditureSection />);
             enterEditMode();
             expect(getPublishButton()).toBeDisabled();
@@ -957,7 +978,12 @@ describe('FundsExpenditureSection', () => {
 });
 
 describe('FundsExpenditureSection bulk delete flow', () => {
-    const settingsMock = { id: 1, exchangeRate: '40', disclaimerTitle: 'Disclaimer' };
+    const settingsMock = {
+        id: 1,
+        exchangeRate: '40',
+        disclaimerTitle: 'Disclaimer',
+        programExpendituresReportingYear: 2025,
+    };
     const categoriesMock: ReportFundsExpendituresCategory[] = [
         { id: 1, name: 'A', type: 'income', localizations: [] },
         { id: 2, name: 'B', type: 'income', localizations: [] },

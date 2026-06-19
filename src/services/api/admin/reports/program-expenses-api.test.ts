@@ -238,4 +238,28 @@ describe('ProgramExpensesApi', () => {
             );
         });
     });
+
+    describe('getSummary', () => {
+        it('should GET summary and map to totals', async () => {
+            mockClient.get.mockResolvedValueOnce({ data: { totalAmountUah: 1500, totalAmountUsd: 1000 } });
+
+            const result = await ProgramExpensesApi.getSummary(mockClient);
+
+            expect(mockClient.get).toHaveBeenCalledWith(`${API_ROUTES.REPORTS.PROGRAM_EXPENDITURES_RECORDS}/summary`, {
+                signal: undefined,
+            });
+            expect(result).toEqual({ totalAmountUah: 1500, totalAmountUsd: 1000 });
+        });
+
+        it('should pass cancellation signal', async () => {
+            mockClient.get.mockResolvedValueOnce({ data: { totalAmountUah: 0, totalAmountUsd: 0 } });
+            const signal = new AbortController().signal;
+
+            await ProgramExpensesApi.getSummary(mockClient, { cancellationSignal: signal });
+
+            expect(mockClient.get).toHaveBeenCalledWith(`${API_ROUTES.REPORTS.PROGRAM_EXPENDITURES_RECORDS}/summary`, {
+                signal,
+            });
+        });
+    });
 });

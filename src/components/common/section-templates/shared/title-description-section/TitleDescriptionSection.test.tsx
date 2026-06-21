@@ -353,9 +353,16 @@ describe('TitleDescriptionSection', () => {
         });
     });
 
-    describe('CSS classes', () => {
+    describe('CSS classes and rendering', () => {
+        it('renders empty fields when title and description are empty in View mode', () => {
+            const { container } = renderComponent({ mode: SectionMode.View, title: '', description: '' });
+            expect(container.firstChild).not.toBeNull();
+            expect(getTitleHeading()).toBeInTheDocument();
+            expect(getTitleHeading()).toHaveTextContent('');
+        });
+
         it('applies custom className', () => {
-            const { container } = renderComponent({ className: 'custom-class' });
+            const { container } = renderComponent({ className: 'custom-class', title: 't' });
             expect(container.querySelector('.container')).toHaveClass('custom-class');
         });
 
@@ -370,7 +377,7 @@ describe('TitleDescriptionSection', () => {
         });
 
         it('does not apply form-container class when mode is View', () => {
-            const { container } = renderComponent({ mode: SectionMode.View });
+            const { container } = renderComponent({ mode: SectionMode.View, title: 't' });
             expect(container.querySelector('.container')).not.toHaveClass('form-container');
         });
     });

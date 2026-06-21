@@ -6,6 +6,7 @@ jest.mock('@/const/admin/history', () => ({
     HISTORY_TEXT: {
         BUTTON: {
             ADD_SECTION: 'Add History Section',
+            TRANSLATE: 'Translate History',
         },
     },
 }));
@@ -73,5 +74,48 @@ describe('HistoryPageToolbar', () => {
     it('should not render LocalizationStatuses when localizedEntity is NOT provided', () => {
         render(<HistoryPageToolbar {...mockProps} />);
         expect(screen.queryByTestId('localization-statuses')).not.toBeInTheDocument();
+    });
+
+    it('should render the translate icon button as enabled by default', () => {
+        render(<HistoryPageToolbar {...mockProps} />);
+
+        const translateButton = screen.getByRole('button', { name: /translate history/i });
+
+        expect(translateButton).toBeInTheDocument();
+        expect(translateButton).toBeEnabled();
+    });
+
+    it('should call onTranslate when the translate button is clicked and enabled', async () => {
+        render(<HistoryPageToolbar {...mockProps} />);
+
+        const translateButton = screen.getByRole('button', { name: /translate history/i });
+        await user.click(translateButton);
+
+        expect(mockProps.onTranslate).toHaveBeenCalledTimes(1);
+    });
+
+    it('should disable the translate icon button when isTranslateDisabled is true', () => {
+        render(<HistoryPageToolbar {...mockProps} isTranslateDisabled={true} />);
+
+        const translateButton = screen.getByRole('button', { name: /translate history/i });
+
+        expect(translateButton).toBeDisabled();
+    });
+
+    it('should not call onTranslate when the translate button is disabled', async () => {
+        render(<HistoryPageToolbar {...mockProps} isTranslateDisabled={true} />);
+
+        const translateButton = screen.getByRole('button', { name: /translate history/i });
+        await user.click(translateButton);
+
+        expect(mockProps.onTranslate).not.toHaveBeenCalled();
+    });
+
+    it('should enable the translate icon button when isTranslateDisabled is false', () => {
+        render(<HistoryPageToolbar {...mockProps} isTranslateDisabled={false} />);
+
+        const translateButton = screen.getByRole('button', { name: /translate history/i });
+
+        expect(translateButton).toBeEnabled();
     });
 });

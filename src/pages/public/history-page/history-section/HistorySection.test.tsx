@@ -231,5 +231,67 @@ describe('HistorySection', () => {
 
             expect(screen.queryByRole('heading')).not.toBeInTheDocument();
         });
+
+        it('should display Ukrainian title and description when EN language is active but no EN translation exists', () => {
+            mockedUseGetLocalization
+                .mockImplementationOnce((_locs, fallback) => fallback as ReturnType<typeof useGetLocalization>)
+                .mockImplementationOnce((_locs, fallback) => fallback as ReturnType<typeof useGetLocalization>);
+
+            const section = makeSection(SectionTemplate.TextOnly, {
+                contents: [
+                    makeContent(10, ContentType.Title, 0, { title: '2024 — Весна', localizations: [] }),
+                    makeContent(11, ContentType.Description, 1, { description: 'Опис події', localizations: [] }),
+                ],
+            });
+
+            render(<HistorySection section={section} />);
+
+            expect(screen.getByText('ВЕСНА')).toBeInTheDocument();
+            expect(screen.getByText('Опис події')).toBeInTheDocument();
+        });
+
+        it('should display Ukrainian title when EN language is active and localizations list is empty (SingleImageRight template)', () => {
+            mockedUseGetLocalization
+                .mockImplementationOnce((_locs, fallback) => fallback as ReturnType<typeof useGetLocalization>)
+                .mockImplementationOnce((_locs, fallback) => fallback as ReturnType<typeof useGetLocalization>);
+
+            const section = makeSection(SectionTemplate.SingleImageRight, {
+                contents: [
+                    makeContent(10, ContentType.Title, 0, { title: '2024 — Осінь', localizations: [] }),
+                    makeContent(11, ContentType.Description, 1, { description: 'Осінній опис', localizations: [] }),
+                    makeContent(12, ContentType.Image, 2, { image: TEST_IMAGE }),
+                ],
+            });
+
+            render(<HistorySection section={section} />);
+
+            expect(screen.getByText('ОСІНЬ')).toBeInTheDocument();
+            expect(screen.getByText('Осінній опис')).toBeInTheDocument();
+        });
+
+        it('should pass section localizations to useGetLocalization for title content', () => {
+            const titleLocalizations = [
+                {
+                    language: { id: 1, code: 'en' },
+                    translationStatus: 1,
+                    title: '2024 — Spring',
+                    description: null,
+                },
+            ];
+
+            const section = makeSection(SectionTemplate.TextOnly, {
+                contents: [
+                    makeContent(10, ContentType.Title, 0, { title: '2024 — Весна', localizations: titleLocalizations }),
+                    makeContent(11, ContentType.Description, 1, { description: 'Опис', localizations: [] }),
+                ],
+            });
+
+            render(<HistorySection section={section} />);
+
+            expect(mockedUseGetLocalization).toHaveBeenCalledWith(
+                titleLocalizations,
+                expect.objectContaining({ title: '2024 — Весна' }),
+            );
+        });
     });
 });

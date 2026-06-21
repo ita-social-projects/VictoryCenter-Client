@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { LocalizationModal } from '@/components/admin/localization-modal/LocalizationModal';
 import { TranslationControls } from '@/components/admin/translation-controls/TranslationControls';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -14,6 +14,34 @@ import {
 import { renderHistorySection } from '@/utils/functions/render-history-section';
 import { SectionMode } from '@/types/common/sections';
 import styles from './TranslateHistoryModal.module.scss';
+import { useMemo } from 'react';
+
+const getInitialData = (section: HistorySectionDto, languageId?: number): TranslateHistorySectionFormValues | null => {
+    if (!languageId) return null;
+
+    let title = '';
+    let description = '';
+    let hasData = false;
+
+    for (const content of section.contents) {
+        if (content.contentType === ContentType.Title) {
+            const loc = content.localizations?.find((l) => l.localizationInfoDto.id === languageId);
+            if (loc?.title) {
+                title = loc.title;
+                hasData = true;
+            }
+        }
+        if (content.contentType === ContentType.Description) {
+            const loc = content.localizations?.find((l) => l.localizationInfoDto.id === languageId);
+            if (loc?.description) {
+                description = loc.description;
+                hasData = true;
+            }
+        }
+    }
+
+    return hasData ? { title, description } : null;
+};
 
 interface TranslateHistoryModalProps {
     isOpen: boolean;
@@ -47,14 +75,37 @@ export const TranslateHistoryModal = ({
         })),
     );
 
-    const updatedSectionsRef = useRef<HistorySectionDto[]>([...sections]);
+    const { translateSections, isSubmitting } = useTranslateHistorySection({
+        sections,
+        language,
+        onSuccess: (updatedSections) => {
+            onSaved(updatedSections);
+            onClose();
+        },
+    });
 
     const isFormValid = sectionStates.every((s) => s.isFormValid);
     const isDirty = sectionStates.some((s) => s.isDirty);
 
     const updateSectionState = useCallback(
         (index: number, updates: Partial<Pick<SectionTranslationState, 'isFormValid' | 'isDirty'>>) => {
-            setSectionStates((prev) => prev.map((s, i) => (i === index ? { ...s, ...updates } : s)));
+            setSectionStates((prev) => {
+                const target = prev[index];
+                if (!target) return prev;
+
+                let hasChanges = false;
+                for (const key in updates) {
+                    const typedKey = key as keyof typeof updates;
+                    if (target[typedKey] !== updates[typedKey]) {
+                        hasChanges = true;
+                        break;
+                    }
+                }
+
+                if (!hasChanges) return prev;
+
+                return prev.map((s, i) => (i === index ? { ...s, ...updates } : s));
+            });
         },
         [],
     );
@@ -65,27 +116,40 @@ export const TranslateHistoryModal = ({
         for (const { formRef } of sectionStates) {
             if (formRef.current && !formRef.current.isValid()) return;
         }
-        for (const { formRef } of sectionStates) {
-            if (formRef.current) {
-                await formRef.current.submit();
+
+        const dataMap = [];
+        for (const { formRef, section } of sectionStates) {
+            if (formRef.current && section.id !== undefined) {
+                dataMap.push({ sectionId: section.id, data: formRef.current.getValues() });
             }
         }
+
+        await translateSections(dataMap);
     };
+
+    const isEditMode = useMemo(() => {
+        return sections.some((section) => getInitialData(section, language?.id) !== null);
+    }, [sections, language?.id]);
 
     return (
         <LocalizationModal
             isOpen={isOpen}
             onClose={onClose}
-            title={COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION}
+            title={
+                isEditMode
+                    ? COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.UPDATE_TRANSLATION
+                    : COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION
+            }
             onSave={handleSave}
-            isSubmitting={false}
+            isSubmitting={isSubmitting}
             isFormValid={isFormValid}
             checkIsDirty={checkIsDirty}
             isDirty={isDirty}
+            maxWidth="1200px"
         >
             <TranslationControls
                 selectedLanguage={language}
-                isSubmitting={false}
+                isSubmitting={isSubmitting}
                 languages={languages}
                 onLanguageChange={setLanguage}
             />
@@ -94,8 +158,6 @@ export const TranslateHistoryModal = ({
                 {sectionStates.map((state, index) => {
                     const { section, formRef } = state;
 
-                    const hasTitle = section.contents.some((c) => c.contentType === ContentType.Title);
-                    const hasDescription = section.contents.some((c) => c.contentType === ContentType.Description);
                     const hasImage = section.contents.some((c) => c.contentType === ContentType.Image);
 
                     const sectionPreview = hasImage
@@ -120,24 +182,13 @@ export const TranslateHistoryModal = ({
 
                     return (
                         <SectionTranslationRow
-                            key={section.id ?? index}
+                            key={`${section.id ?? index}-${language?.id}`}
                             index={index}
-                            section={section}
-                            language={language}
                             formRef={formRef}
                             sectionPreview={sectionPreview}
-                            hasTitle={hasTitle}
-                            hasDescription={hasDescription}
+                            section={section}
+                            languageId={language?.id}
                             updateSectionState={updateSectionState}
-                            onSuccess={(updatedSection) => {
-                                updatedSectionsRef.current = updatedSectionsRef.current.map((s, i) =>
-                                    i === index ? updatedSection : s,
-                                );
-                                if (index === sectionStates.length - 1) {
-                                    onSaved(updatedSectionsRef.current);
-                                    onClose();
-                                }
-                            }}
                         />
                     );
                 })}
@@ -148,31 +199,25 @@ export const TranslateHistoryModal = ({
 
 interface SectionTranslationRowProps {
     index: number;
-    section: HistorySectionDto;
-    language: LocalizationLanguage | null;
     formRef: React.RefObject<TranslateHistorySectionFormRef | null>;
     sectionPreview: React.ReactNode;
-    hasTitle: boolean;
-    hasDescription: boolean;
+    section: HistorySectionDto;
+    languageId?: number;
     updateSectionState: (
         index: number,
         updates: Partial<Pick<SectionTranslationState, 'isFormValid' | 'isDirty'>>,
     ) => void;
-    onSuccess: (updatedSection: HistorySectionDto) => void;
 }
 
 const SectionTranslationRow = ({
     index,
-    section,
-    language,
     formRef,
     sectionPreview,
-    hasTitle,
-    hasDescription,
+    section,
+    languageId,
     updateSectionState,
-    onSuccess,
 }: SectionTranslationRowProps) => {
-    const { translateSection } = useTranslateHistorySection({ section, language, onSuccess });
+    const initialData = useMemo(() => getInitialData(section, languageId), [section, languageId]);
 
     const handleValidationChange = useCallback(
         (isValid: boolean) => updateSectionState(index, { isFormValid: isValid }),
@@ -184,20 +229,15 @@ const SectionTranslationRow = ({
         [index, updateSectionState],
     );
 
-    const handleSubmit = async (data: TranslateHistorySectionFormValues) => {
-        await translateSection(data);
-    };
-
     return (
         <div className={styles['section-row']} data-testid="translate-section-row">
             {sectionPreview && <div className={styles['section-preview']}>{sectionPreview}</div>}
             <TranslateHistorySectionForm
                 ref={formRef}
-                onSubmit={handleSubmit}
+                initialData={initialData}
+                onSubmit={() => {}}
                 onValidationChange={handleValidationChange}
                 onDirtyChange={handleDirtyChange}
-                hasTitle={hasTitle}
-                hasDescription={hasDescription}
             />
         </div>
     );

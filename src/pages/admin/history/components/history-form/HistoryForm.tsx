@@ -23,7 +23,8 @@ interface SectionEditingState {
 
 export interface HistoryFormRef {
     addSection: (section: HistorySectionDto) => void;
-    replaceSection: (sectionIndex: number, newSection: HistorySectionDto) => void;
+    replaceSection: (sectionIndex: number, newSection: HistorySectionDto, silent?: boolean) => void;
+    updateSectionSilently: (sectionIndex: number, newSection: HistorySectionDto) => void;
     getSections: () => HistorySectionDto[];
 }
 
@@ -106,15 +107,7 @@ export const HistoryForm = forwardRef<HistoryFormRef, HistoryFormProps>(function
             }
             const additional = Array.from({ length: sections.length - prev.length }, () => {
                 nextSectionKeyRef.current += 1;
-                const sectionKey = `history-section-${nextSectionKeyRef.current}`;
-                return {
-                    sectionKey,
-                    isSaved: false,
-                    isEditing: true,
-                    isNew: true,
-                    isReplacing: false,
-                    isPersistedOnBackend: false,
-                };
+                return createSectionState(`history-section-${nextSectionKeyRef.current}`);
             });
 
             return [...prev, ...additional];
@@ -169,6 +162,15 @@ export const HistoryForm = forwardRef<HistoryFormRef, HistoryFormProps>(function
                             : state,
                     ),
                 );
+            },
+            updateSectionSilently(sectionIndex: number, newSection: HistorySectionDto) {
+                const newSections = [...localSectionsRef.current];
+                if (sectionIndex < 0 || sectionIndex >= newSections.length) {
+                    return;
+                }
+                newSections[sectionIndex] = newSection;
+                localSectionsRef.current = newSections;
+                setLocalSections(newSections);
             },
             getSections() {
                 return localSectionsRef.current;

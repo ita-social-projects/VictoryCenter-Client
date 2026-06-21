@@ -14,18 +14,20 @@ describe('HistoryLocalizationsApi', () => {
 
     describe('create', () => {
         it('should call POST with correct endpoint and payload', async () => {
-            const mockData = {
-                entityId: 1,
-                languageId: 2,
-                contents: [
-                    {
-                        entityId: 10,
-                        languageId: 2,
-                        title: 'Test Title',
-                        description: 'Test Description',
-                    },
-                ],
-            };
+            const mockData = [
+                {
+                    entityId: 1,
+                    languageId: 2,
+                    contents: [
+                        {
+                            entityId: 10,
+                            languageId: 2,
+                            title: 'Test Title',
+                            description: 'Test Description',
+                        },
+                    ],
+                },
+            ];
             const mockResponse = { data: null };
             (mockClient.post as jest.Mock).mockResolvedValue(mockResponse);
 

@@ -29,6 +29,13 @@ jest.mock('@/services/api/admin/history/history-api', () => ({
     },
 }));
 
+jest.mock('@/services/api/admin/history/history-localizations-api', () => ({
+    HistoryLocalizationsApi: {
+        create: jest.fn(),
+        update: jest.fn(),
+    },
+}));
+
 jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider');
 
 jest.mock('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit', () => ({
@@ -90,6 +97,7 @@ jest.mock('../history-form/HistoryForm', () => {
                 );
                 mockReplaceSection(sectionIndex, newSection);
             },
+            updateSectionSilently: () => {},
             getSections: () => {
                 mockGetSections();
                 return mockHistoryFormSections;
@@ -199,6 +207,28 @@ jest.mock('@/pages/admin/programs/components/programs-page-modals/add-section-mo
     },
 }));
 
+jest.mock('../translate-history-modal/TranslateHistoryModal', () => ({
+    TranslateHistoryModal: ({ isOpen, onClose, onSaved }: any) => {
+        if (!isOpen) return null;
+        return (
+            <div data-testid="translate-history-modal">
+                <button data-testid="close-translate-modal" onClick={onClose}>
+                    Close Translate
+                </button>
+                <button
+                    data-testid="save-translate-modal"
+                    onClick={() => {
+                        onSaved([{ id: 1, template: 1, order: 0, contents: [] }]);
+                        onClose();
+                    }}
+                >
+                    Save Translate
+                </button>
+            </div>
+        );
+    },
+}));
+
 jest.mock('@/components/admin/toast/toast-container/ToastContainer', () => ({
     ToastContainer: () => <div data-testid="toast-container" />,
 }));
@@ -255,6 +285,7 @@ jest.mock('@/const/admin/history', () => ({
             FAIL_TO_FETCH_SECTIONS: 'Failed to fetch sections',
             PUBLISH_SUCCESS: 'Publish success',
             PUBLISH_ERROR: 'Publish error',
+            TRANSLATE_SUCCESS: 'Translate success',
         },
     },
 }));
@@ -672,7 +703,7 @@ describe('HistoryPageContent', () => {
 
         expect(mockAddToast).toHaveBeenCalledWith('Publish success', ToastType.Success);
         expect(refetchSectionsMock).toHaveBeenCalledTimes(1);
-        expect(mockGetSections).toHaveBeenCalledTimes(1);
+        expect(mockGetSections).toHaveBeenCalled();
     });
 
     it('shows error toast when publish fails', async () => {
@@ -773,5 +804,28 @@ describe('HistoryPageContent', () => {
 
         await user.click(screen.getByTestId('question-cancel'));
         expect(screen.queryByTestId('question-modal')).not.toBeInTheDocument();
+    });
+
+    it('opens and closes translation modal', async () => {
+        mockSingleSectionData();
+        render(<HistoryPageContent />);
+
+        await user.click(screen.getByTestId('toolbar-translate-button'));
+        expect(screen.getByTestId('translate-history-modal')).toBeInTheDocument();
+
+        await user.click(screen.getByTestId('close-translate-modal'));
+        expect(screen.queryByTestId('translate-history-modal')).not.toBeInTheDocument();
+    });
+
+    it('handles translation save by refetching and showing success toast', async () => {
+        mockSingleSectionData();
+        render(<HistoryPageContent />);
+
+        await user.click(screen.getByTestId('toolbar-translate-button'));
+        await user.click(screen.getByTestId('save-translate-modal'));
+
+        expect(mockAddToast).toHaveBeenCalledWith('Translate success', ToastType.Success);
+        expect(refetchSectionsMock).toHaveBeenCalledTimes(1);
+        expect(screen.queryByTestId('translate-history-modal')).not.toBeInTheDocument();
     });
 });

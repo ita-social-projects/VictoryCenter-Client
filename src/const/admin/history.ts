@@ -9,7 +9,7 @@ export const HISTORY_TEXT = {
         FAIL_TO_FETCH_SECTIONS: 'Виникла помилка, не вдалося завантажити секції',
         PUBLISH_SUCCESS: 'Секції успішно опубліковано',
         PUBLISH_ERROR: 'Виникла помилка при публікації секцій',
-        TRANSLATE_SUCCESS: 'Переклад збережено успішно',
+        TRANSLATE_SUCCESS: 'Переклад опубліковано успішно',
         TRANSLATE_ERROR: 'Виникла помилка при збереженні перекладу',
     },
 };

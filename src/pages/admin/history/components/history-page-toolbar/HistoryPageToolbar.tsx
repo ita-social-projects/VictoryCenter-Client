@@ -19,6 +19,7 @@ import {
 export interface HistoryPageToolbarProps extends LocalizationToolkitProps {
     onAddSection: () => void;
     onTranslate: () => void;
+    isTranslateDisabled?: boolean;
     localizedEntity?: EntityWithLocalizations<EntityLocalization> | EntityWithTranslationStatuses;
     translationLanguages: LocalizationLanguage[];
 }
@@ -31,6 +32,7 @@ export const HistoryPageToolbar = ({
     onLanguageChange,
     onTranslationStatusFilterChange,
     onTranslate,
+    isTranslateDisabled = false,
 }: HistoryPageToolbarProps) => {
     return (
         <div className={styles['history-page-toolbar']}>
@@ -48,6 +50,7 @@ export const HistoryPageToolbar = ({
                     onClick={onTranslate}
                     aria-label={HISTORY_TEXT.BUTTON.TRANSLATE}
                     type="button"
+                    disabled={isTranslateDisabled}
                 />
                 <Button onClick={onAddSection} buttonStyle="primary">
                     {HISTORY_TEXT.BUTTON.ADD_SECTION}

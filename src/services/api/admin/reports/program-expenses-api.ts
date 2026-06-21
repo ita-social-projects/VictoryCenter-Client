@@ -36,12 +36,9 @@ const mapDtoToReadOnlyData = (
             return a.programName.localeCompare(b.programName, 'uk');
         });
 
-    const uniqueProgramsMap = new Map<number, ProgramExpensesProgram>();
-    mappedRecords.forEach((record) => {
-        uniqueProgramsMap.set(record.programId, { id: record.programId, name: record.programName });
-    });
-
-    const programs = Array.from(uniqueProgramsMap.values()).sort((a, b) => a.name.localeCompare(b.name, 'uk'));
+    const programs: ProgramExpensesProgram[] = categories
+        .map((category) => ({ id: category.id, name: category.name }))
+        .sort((a, b) => a.name.localeCompare(b.name, 'uk'));
 
     const summary = mappedRecords.reduce<ProgramExpensesSummary>(
         (acc, record) => ({

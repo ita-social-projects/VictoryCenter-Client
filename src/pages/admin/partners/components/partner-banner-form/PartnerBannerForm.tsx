@@ -19,6 +19,7 @@ import { InputError } from '@/components/admin/input-error/InputError';
 import BannerImage from '@/assets/images/horses.webp';
 import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
+import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 
 export interface PartnerBannerValues {
     title: string;
@@ -56,6 +57,7 @@ export const PartnerBanner = () => {
     const [errors, setErrors] = useState<PartnerBannerErrorState>({});
     const [touched, setTouched] = useState<{ title?: boolean; description?: boolean }>({});
     const [isPublishing, setIsPublishing] = useState(false);
+    const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
     const [titleKey, setTitleKey] = useState(0);
 
     const fetchBannerHandler = useCallback(() => {
@@ -131,9 +133,14 @@ export const PartnerBanner = () => {
         }));
     }, []);
 
-    const handlePublish = useCallback(async () => {
+    const handlePublishClick = useCallback(() => {
+        setIsPublishModalOpen(true);
+    }, []);
+
+    const handlePublishConfirm = useCallback(async () => {
         if (!values || !isFormValid(values, errors)) return;
 
+        setIsPublishModalOpen(false);
         setIsPublishing(true);
         try {
             const updatedBanner = await PartnersApi.updateBanner(client, {
@@ -262,7 +269,7 @@ export const PartnerBanner = () => {
                             <Button
                                 type="button"
                                 buttonStyle="primary"
-                                onClick={handlePublish}
+                                onClick={handlePublishClick}
                                 disabled={isDisabled || !isFormValid(values, errors)}
                             >
                                 {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
@@ -271,6 +278,16 @@ export const PartnerBanner = () => {
                     </div>
                 </div>
             )}
+
+            <ConfirmationModal
+                isOpen={isPublishModalOpen}
+                title={COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES}
+                onConfirm={handlePublishConfirm}
+                onCancel={() => setIsPublishModalOpen(false)}
+                onClose={() => setIsPublishModalOpen(false)}
+                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
+                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
+            />
         </div>
     );
 };

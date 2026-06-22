@@ -241,6 +241,7 @@ describe('FaqModal', () => {
             expect(getQuestionModal()).toBeInTheDocument();
             expect(getQuestionTitle()).toHaveTextContent(
                 COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE,
+                { normalizeWhitespace: false },
             );
         });
 

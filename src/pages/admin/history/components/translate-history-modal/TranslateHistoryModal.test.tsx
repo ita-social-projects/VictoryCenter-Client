@@ -235,7 +235,12 @@ describe('TranslateHistoryModal', () => {
     describe('Space management', () => {
         const testCases = [
             { name: 'strips leading spaces in real-time', input: '   Hello', expected: 'Hello', tab: false },
-            { name: 'collapses consecutive spaces into a single space in real-time', input: 'Hello  World', expected: 'Hello World', tab: false },
+            {
+                name: 'collapses consecutive spaces into a single space in real-time',
+                input: 'Hello  World',
+                expected: 'Hello World',
+                tab: false,
+            },
             { name: 'trims trailing spaces on blur', input: 'Hello   ', expected: 'Hello', tab: true },
         ];
 

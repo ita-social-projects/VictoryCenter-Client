@@ -297,6 +297,7 @@ export const HistoryPageContent = () => {
                 localizedEntity={localizedEntity}
                 onLanguageChange={onLanguageChange}
                 onTranslationStatusFilterChange={onTranslationStatusFilterChange}
+                isTranslateDisabled={canPublish || hasActiveSectionForm}
             />
             <div className={styles['sections-container']}>
                 {isSectionsLoading && (

@@ -781,40 +781,41 @@ describe('HistoryPageContent', () => {
         });
     });
 
-    it('closes add-section modal when onClose is called', async () => {
-        mockSingleSectionData();
+    describe('Modal opening and closing', () => {
+        const modalTestCases = [
+            {
+                name: 'closes add-section modal when onClose is called',
+                openAction: async () => await user.click(screen.getByTestId('toolbar-add-section-button')),
+                modalId: 'add-section-modal',
+                closeAction: async () => await user.click(screen.getByTestId('close-add-section-modal')),
+            },
+            {
+                name: 'closes publish confirmation modal when cancel is clicked',
+                openAction: async () => {
+                    await user.click(screen.getByTestId('mark-saved'));
+                    await user.click(screen.getByRole('button', { name: 'Publish' }));
+                },
+                modalId: 'question-modal',
+                closeAction: async () => await user.click(screen.getByTestId('question-cancel')),
+            },
+            {
+                name: 'opens and closes translation modal',
+                openAction: async () => await user.click(screen.getByTestId('toolbar-translate-button')),
+                modalId: 'translate-history-modal',
+                closeAction: async () => await user.click(screen.getByTestId('close-translate-modal')),
+            },
+        ];
 
-        render(<HistoryPageContent />);
+        it.each(modalTestCases)('$name', async ({ openAction, modalId, closeAction }) => {
+            mockSingleSectionData();
+            render(<HistoryPageContent />);
 
-        await user.click(screen.getByTestId('toolbar-add-section-button'));
-        expect(screen.getByTestId('add-section-modal')).toBeInTheDocument();
+            await openAction();
+            expect(screen.getByTestId(modalId)).toBeInTheDocument();
 
-        await user.click(screen.getByTestId('close-add-section-modal'));
-        expect(screen.queryByTestId('add-section-modal')).not.toBeInTheDocument();
-    });
-
-    it('closes publish confirmation modal when cancel is clicked', async () => {
-        mockSingleSectionData();
-
-        render(<HistoryPageContent />);
-
-        await user.click(screen.getByTestId('mark-saved'));
-        await user.click(screen.getByRole('button', { name: 'Publish' }));
-        expect(screen.getByTestId('question-modal')).toBeInTheDocument();
-
-        await user.click(screen.getByTestId('question-cancel'));
-        expect(screen.queryByTestId('question-modal')).not.toBeInTheDocument();
-    });
-
-    it('opens and closes translation modal', async () => {
-        mockSingleSectionData();
-        render(<HistoryPageContent />);
-
-        await user.click(screen.getByTestId('toolbar-translate-button'));
-        expect(screen.getByTestId('translate-history-modal')).toBeInTheDocument();
-
-        await user.click(screen.getByTestId('close-translate-modal'));
-        expect(screen.queryByTestId('translate-history-modal')).not.toBeInTheDocument();
+            await closeAction();
+            expect(screen.queryByTestId(modalId)).not.toBeInTheDocument();
+        });
     });
 
     it('handles translation save by refetching and showing success toast', async () => {

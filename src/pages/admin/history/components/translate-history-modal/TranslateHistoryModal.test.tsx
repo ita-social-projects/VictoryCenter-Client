@@ -233,40 +233,25 @@ describe('TranslateHistoryModal', () => {
     });
 
     describe('Space management', () => {
-        it('strips leading spaces in real-time', async () => {
+        const testCases = [
+            { name: 'strips leading spaces in real-time', input: '   Hello', expected: 'Hello', tab: false },
+            { name: 'collapses consecutive spaces into a single space in real-time', input: 'Hello  World', expected: 'Hello World', tab: false },
+            { name: 'trims trailing spaces on blur', input: 'Hello   ', expected: 'Hello', tab: true },
+        ];
+
+        it.each(testCases)('$name', async ({ input, expected, tab }) => {
             const user = userEvent.setup();
             renderModal();
 
             const titleInput = screen.getByRole('textbox', { name: /заголовок/i }) as HTMLInputElement;
-            await user.type(titleInput, '   Hello');
+            await user.type(titleInput, input);
+
+            if (tab) {
+                await user.tab();
+            }
 
             await waitFor(() => {
-                expect(titleInput.value).toBe('Hello');
-            });
-        });
-
-        it('collapses consecutive spaces into a single space in real-time', async () => {
-            const user = userEvent.setup();
-            renderModal();
-
-            const titleInput = screen.getByRole('textbox', { name: /заголовок/i }) as HTMLInputElement;
-            await user.type(titleInput, 'Hello  World');
-
-            await waitFor(() => {
-                expect(titleInput.value).toBe('Hello World');
-            });
-        });
-
-        it('trims trailing spaces on blur', async () => {
-            const user = userEvent.setup();
-            renderModal();
-
-            const titleInput = screen.getByRole('textbox', { name: /заголовок/i }) as HTMLInputElement;
-            await user.type(titleInput, 'Hello   ');
-            await user.tab();
-
-            await waitFor(() => {
-                expect(titleInput.value).toBe('Hello');
+                expect(titleInput.value).toBe(expected);
             });
         });
     });

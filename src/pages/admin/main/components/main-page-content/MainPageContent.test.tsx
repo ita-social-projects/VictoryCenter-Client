@@ -226,6 +226,11 @@ jest.mock('@/services/api/admin/main-page/main-page-localizations-api/main-page-
     },
 }));
 
+jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
+    __esModule: true,
+    RichTextInputGroup: require('@/utils/test-mocks/main-page-mocks').MockRichTextInputGroup,
+}));
+
 const getByExactText = (text: string) =>
     screen.getByText((_, el) => el?.children.length === 0 && el?.textContent === text);
 
@@ -872,8 +877,8 @@ describe('MainPageContent', () => {
 
         expect(titleInput.value).toBe('');
         expect(descriptionInput.value).toBe('');
-        expect(titleInput).toHaveAttribute('maxlength', '50');
-        expect(descriptionInput).toHaveAttribute('maxlength', '300');
+        expect(titleInput).toHaveAttribute('data-max-length', '50');
+        expect(descriptionInput).toHaveAttribute('data-max-length', '300');
         expect(getSaveTranslationButton()).toBeDisabled();
     });
 

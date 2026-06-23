@@ -19,6 +19,11 @@ jest.mock('@/services/api/admin/main-page/main-page-localizations-api/main-page-
     },
 }));
 
+jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
+    __esModule: true,
+    RichTextInputGroup: require('@/utils/test-mocks/main-page-mocks').MockRichTextInputGroup,
+}));
+
 const englishLanguage = { id: 2, code: 'en', name: 'Англійська' };
 
 const basePage: MainPage = {

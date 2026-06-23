@@ -18,6 +18,21 @@ export const MockTextAreaWithCharacterLimitGroup = ({ id, value, onChange, onBlu
     />
 );
 
+export const MockRichTextInputGroup = ({ id, value, onChange, onBlur, disabled, maxLength, error }: any) => (
+    <div>
+        <textarea
+            id={id}
+            data-testid={id}
+            data-max-length={maxLength}
+            value={value ?? ''}
+            onChange={(e) => onChange(e.target.value)}
+            onBlur={onBlur}
+            disabled={disabled}
+        />
+        {error && <span>{error}</span>}
+    </div>
+);
+
 export const MockSubmitButton = ({ children, buttonStyle: _buttonStyle, ...props }: any) => (
     <button data-testid="submit-btn" {...props}>
         {children}

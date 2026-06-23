@@ -1,11 +1,10 @@
-import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
-import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
+import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 import { MAIN_PAGE_TEXT } from '@/const/admin/main-page';
 import { useFormManager } from '@/hooks/admin/use-form-manager/useFormManager';
 import { VisibilityStatus } from '@/types/admin/common';
 import { MainPageFormValues } from '@/types/admin/main-page';
 import { MAIN_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/main-page-schema/main-page-schema';
-import { ChangeEvent, forwardRef, useEffect } from 'react';
+import { forwardRef, useEffect } from 'react';
 import styles from './TranslateMainPageBlockForm.module.scss';
 
 export interface TranslateMainPageBlockFormValues {
@@ -75,8 +74,7 @@ export const TranslateMainPageBlockForm = forwardRef<TranslateMainPageBlockFormR
             onDirtyChange?.(isDirty());
         }, [formState, isDirty, onDirtyChange]);
 
-        const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
-            const value = e.target.value;
+        const handleTitleChange = (value: string) => {
             setFormState((prev) => ({ ...prev, title: value }));
             setErrors((prev) => ({
                 ...prev,
@@ -84,8 +82,7 @@ export const TranslateMainPageBlockForm = forwardRef<TranslateMainPageBlockFormR
             }));
         };
 
-        const handleDescriptionChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-            const value = e.target.value;
+        const handleDescriptionChange = (value: string) => {
             setFormState((prev) => ({ ...prev, description: value }));
             setErrors((prev) => ({
                 ...prev,
@@ -112,7 +109,7 @@ export const TranslateMainPageBlockForm = forwardRef<TranslateMainPageBlockFormR
 
         return (
             <form className={styles.form} onSubmit={(e) => e.preventDefault()} noValidate>
-                <InputWithCharacterLimitGroup
+                <RichTextInputGroup
                     id="main-page-translation-title"
                     name="title"
                     label={MAIN_PAGE_TEXT.BLOCKS.TITLE.TITLE_LABEL}
@@ -125,7 +122,7 @@ export const TranslateMainPageBlockForm = forwardRef<TranslateMainPageBlockFormR
                     disabled={isSubmitting || formDisabled}
                 />
 
-                <TextAreaWithCharacterLimitGroup
+                <RichTextInputGroup
                     id="main-page-translation-description"
                     name="description"
                     label={MAIN_PAGE_TEXT.BLOCKS.TITLE.DESCRIPTION_LABEL}
@@ -136,8 +133,7 @@ export const TranslateMainPageBlockForm = forwardRef<TranslateMainPageBlockFormR
                     maxLength={validationConfig.descriptionMaxLength}
                     isRequired
                     disabled={isSubmitting || formDisabled}
-                    rows={5}
-                    className={styles.textarea}
+                    className={styles['rich-text-description']}
                 />
             </form>
         );

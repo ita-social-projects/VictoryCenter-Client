@@ -34,17 +34,3 @@ export interface EventsNews {
     slug: string;
     sections: HippotherapyProgramSectionDto[];
 }
-
-export interface DetailedProgramDto {
-    id: number;
-    name: string;
-    description: string;
-    // previewImage: Image | null;
-    // backgroundImage: Image | null;
-    location: string;
-    participantsCount: string;
-    meetingsCount: string;
-    // localizations: HippotherapyProgramLocalizationDto[];
-    // sections: HippotherapyProgramSectionDto[];
-    slug: string;
-}

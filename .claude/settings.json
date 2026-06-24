@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "PowerShell(npx craco test --watchAll=false --testPathPattern=\"DetailedEventNewsPage\" 2>&1)",
-      "PowerShell(npx craco test --watchAll=false --coverage --collectCoverageFrom=\"src/pages/public/events-news-page/events/single-event-news/SingleEventNews.tsx\" --testPathPattern=\"SingleEventNews\" 2>&1)"
-    ]
-  }
-}

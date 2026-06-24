@@ -3,13 +3,15 @@ import {
     EntityLocalizationDto,
     EntityWithDtoLocalizations,
     LocaleCode,
+    LocalizationInfo,
     LocalizationLanguage,
 } from '../../../../../types/common/language';
 
-type LocalizationWithLanguageCode = {
-    language?: { code?: string };
-    localizationInfoDto?: { code?: string };
-    languageId?: number;
+export type LocalizationLanguageSource = {
+    languageId?: number | null;
+    code?: string | null;
+    language?: Partial<LocalizationInfo> | null;
+    localizationInfoDto?: Partial<LocalizationInfo> | null;
 };
 
 export function mapLocalizationDtoToModel<TDto extends EntityLocalizationDto, TModel extends EntityLocalization>(
@@ -40,16 +42,33 @@ export function mapEntityWithLocalizations<
     };
 }
 
+export function getLocalizationLanguageId(localization: LocalizationLanguageSource): number | undefined {
+    const directLanguageId = localization.languageId ?? undefined;
+    const domainLanguageId = localization.language?.id ?? undefined;
+    const dtoLanguageId = localization.localizationInfoDto?.id ?? undefined;
+
+    return directLanguageId ?? domainLanguageId ?? dtoLanguageId;
+}
+
+export function getLocalizationLanguageCode(localization: LocalizationLanguageSource): string | undefined {
+    const domainLanguageCode = localization.language?.code ?? undefined;
+    const dtoLanguageCode = localization.localizationInfoDto?.code ?? undefined;
+    const directLanguageCode = localization.code ?? undefined;
+
+    return domainLanguageCode ?? dtoLanguageCode ?? directLanguageCode;
+}
+
 export function resolveLocaleCode(
-    loc: LocalizationWithLanguageCode,
+    loc: LocalizationLanguageSource,
     languages?: LocalizationLanguage[],
 ): LocaleCode | null {
-    const directCode = loc.language?.code ?? loc.localizationInfoDto?.code;
+    const directCode = getLocalizationLanguageCode(loc);
     if (directCode === 'uk' || directCode === 'en') return directCode;
 
     if (!languages?.length) return null;
 
-    const lang = languages.find((l) => l.id === loc.languageId);
+    const languageId = getLocalizationLanguageId(loc);
+    const lang = languages.find((l) => l.id === languageId);
     const code = lang?.code;
 
     return code === 'uk' || code === 'en' ? code : null;

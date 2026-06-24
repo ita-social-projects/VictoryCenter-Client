@@ -147,6 +147,53 @@ describe('TranslateMainPageBlockModal', () => {
         expect(saveButton()).toBeDisabled();
     });
 
+    it('renders edit mode with API-shaped localizationInfoDto values for nested blocks', () => {
+        renderModal({
+            block: MainPageLocalizationBlock.AboutUs,
+            page: {
+                ...basePage,
+                mainAboutUs: {
+                    ...basePage.mainAboutUs!,
+                    localizations: [
+                        {
+                            entityId: 10,
+                            localizationInfoDto: englishLanguage,
+                            title: 'About us and who we are',
+                            description: '<p>Victory Centre is a safe space.</p>',
+                            translationStatus: TranslationStatus.Relevant,
+                        } as any,
+                    ],
+                },
+            },
+        });
+
+        expect(screen.getByText('Редагувати переклад')).toBeInTheDocument();
+        expect(titleInput()).toHaveValue('About us and who we are');
+        expect(descriptionInput()).toHaveValue('<p>Victory Centre is a safe space.</p>');
+        expect(saveButton()).toBeDisabled();
+    });
+
+    it('renders edit mode with API-shaped root localizationInfoDto values', () => {
+        renderModal({
+            page: {
+                ...basePage,
+                localizations: [
+                    {
+                        entityId: 1,
+                        localizationInfoDto: englishLanguage,
+                        title: '<p>Horses with healing experience</p>',
+                        description: 'When body and soul recover, true strength is born.',
+                        translationStatus: TranslationStatus.Relevant,
+                    } as any,
+                ],
+            },
+        });
+
+        expect(screen.getByText('Редагувати переклад')).toBeInTheDocument();
+        expect(titleInput()).toHaveValue('<p>Horses with healing experience</p>');
+        expect(descriptionInput()).toHaveValue('When body and soul recover, true strength is born.');
+    });
+
     it('enables save after valid changes and creates localization with submitted data', async () => {
         jest.spyOn(axios, 'isAxiosError').mockReturnValue(true);
         (MainPageLocalizationsApi.getByLanguageId as jest.Mock).mockRejectedValue({ response: { status: 404 } });

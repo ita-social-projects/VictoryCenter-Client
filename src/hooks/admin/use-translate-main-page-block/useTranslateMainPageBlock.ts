@@ -13,6 +13,7 @@ import {
     UpdateMainPageLocalizationDto,
 } from '@/types/admin/main-page';
 import { LocalizationLanguage } from '@/types/common/language';
+import { getLocalizationLanguageId } from '@/utils/functions/mappers/common/localization/localization-mappers';
 
 interface UseTranslateMainPageBlockParams {
     page: MainPage | null;
@@ -20,9 +21,6 @@ interface UseTranslateMainPageBlockParams {
     language: LocalizationLanguage | null;
     onSuccess: (localization: MainPageLocalizationDto) => void | Promise<void>;
 }
-
-const getLocalizationLanguageId = (localization: { languageId?: number; language?: { id?: number } }) =>
-    localization.languageId ?? localization.language?.id;
 
 const getBlockEntityId = (page: MainPage, block: MainPageLocalizationBlock): number | null => {
     switch (block) {

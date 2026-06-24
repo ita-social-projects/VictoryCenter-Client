@@ -3,6 +3,7 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { $generateNodesFromDOM, $generateHtmlFromNodes } from '@lexical/html';
 import { $getRoot, $insertNodes } from 'lexical';
 import { sanitizeHtml } from './htmlSanitizer';
+import { normalizeRichTextInitialHtml } from './richTextInitialHtml';
 
 export interface InitialValuePluginProps {
     value: string;
@@ -39,7 +40,9 @@ export const InitialValuePlugin = ({ value }: InitialValuePluginProps) => {
 
         const normalizeHtml = (html: string) => html.replace(/>\s+</g, '><').trim();
 
-        if (normalizeHtml(currentHtmlSanitized) === normalizeHtml(value)) {
+        const nextHtml = normalizeRichTextInitialHtml(value);
+
+        if (normalizeHtml(currentHtmlSanitized) === normalizeHtml(nextHtml)) {
             lastValue.current = value;
             return;
         }
@@ -51,7 +54,7 @@ export const InitialValuePlugin = ({ value }: InitialValuePluginProps) => {
             const root = $getRoot();
 
             const parser = new DOMParser();
-            const dom = parser.parseFromString(value || '<p></p>', 'text/html');
+            const dom = parser.parseFromString(nextHtml, 'text/html');
             const nodes = $generateNodesFromDOM(editor, dom);
 
             root.clear();

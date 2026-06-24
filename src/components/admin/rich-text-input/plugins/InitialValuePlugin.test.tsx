@@ -47,7 +47,7 @@ describe('InitialValuePlugin', () => {
         });
 
         global.DOMParser = jest.fn().mockImplementation(() => ({
-            parseFromString: jest.fn(() => ({ body: { innerHTML: '' } })),
+            parseFromString: jest.fn((_value: string) => ({ body: { innerHTML: _value } })),
         })) as any;
     });
 
@@ -100,6 +100,21 @@ describe('InitialValuePlugin', () => {
 
         expect(mockGetRoot).toHaveBeenCalled();
         expect(mockInsertNodes).toHaveBeenCalled();
+    });
+
+    it('wraps plain text external values before importing them into Lexical', () => {
+        const { rerender } = render(<InitialValuePlugin value="<p>Original</p>" />);
+
+        mockGenerateHtmlFromNodes.mockReturnValue('<p>Original</p>');
+
+        rerender(<InitialValuePlugin value="About us and who we are" />);
+
+        const updateCallback = mockUpdate.mock.calls[0][0];
+        updateCallback();
+
+        const parser = (global.DOMParser as jest.Mock).mock.results[0].value;
+        expect(parser.parseFromString).toHaveBeenCalledWith('<p>About us and who we are</p>', 'text/html');
+        expect(mockGenerateNodesFromDOM.mock.calls[0][1].body.innerHTML).toBe('<p>About us and who we are</p>');
     });
 
     it('does not update editor when value changes but HTML content is the same', () => {

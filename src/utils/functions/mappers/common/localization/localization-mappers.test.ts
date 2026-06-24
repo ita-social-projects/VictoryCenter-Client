@@ -1,4 +1,10 @@
-import { mapLocalizationDtoToModel, mapEntityWithLocalizations } from './localization-mappers';
+import {
+    getLocalizationLanguageCode,
+    getLocalizationLanguageId,
+    mapLocalizationDtoToModel,
+    mapEntityWithLocalizations,
+    resolveLocaleCode,
+} from './localization-mappers';
 import { EntityLocalizationDto, EntityWithDtoLocalizations } from '../../../../../types/common/language';
 import { TranslationStatus } from '../../../../../types/common/language';
 
@@ -87,5 +93,54 @@ describe('mapEntityWithLocalizations', () => {
         expect(result.id).toBe(300);
         expect(result.name).toBe('Test Entity');
         expect(result.isActive).toBe(true);
+    });
+});
+
+describe('localization language helpers', () => {
+    it('resolves language id from direct, domain, and dto-shaped sources', () => {
+        expect(getLocalizationLanguageId({ languageId: 2 })).toBe(2);
+        expect(getLocalizationLanguageId({ language: { id: 3, code: 'en' } })).toBe(3);
+        expect(getLocalizationLanguageId({ localizationInfoDto: { id: 4, code: 'en' } })).toBe(4);
+    });
+
+    it('prefers direct language id before domain and dto sources', () => {
+        expect(
+            getLocalizationLanguageId({
+                languageId: 2,
+                language: { id: 3, code: 'en' },
+                localizationInfoDto: { id: 4, code: 'en' },
+            }),
+        ).toBe(2);
+    });
+
+    it('resolves language code from domain, dto-shaped, and direct sources', () => {
+        expect(getLocalizationLanguageCode({ language: { id: 2, code: 'en' } })).toBe('en');
+        expect(getLocalizationLanguageCode({ localizationInfoDto: { id: 1, code: 'uk' } })).toBe('uk');
+        expect(getLocalizationLanguageCode({ code: 'en' })).toBe('en');
+    });
+
+    it('uses language id and provided languages as resolveLocaleCode fallback', () => {
+        expect(
+            resolveLocaleCode({ localizationInfoDto: { id: 2 } }, [
+                { id: 1, code: 'uk', name: 'Ukrainian' },
+                { id: 2, code: 'en', name: 'English' },
+            ]),
+        ).toBe('en');
+    });
+
+    it('keeps direct language code priority before id-based language fallback', () => {
+        expect(
+            resolveLocaleCode(
+                {
+                    languageId: 2,
+                    language: { id: 1, code: 'uk' },
+                    localizationInfoDto: { id: 2, code: 'en' },
+                },
+                [
+                    { id: 1, code: 'uk', name: 'Ukrainian' },
+                    { id: 2, code: 'en', name: 'English' },
+                ],
+            ),
+        ).toBe('uk');
     });
 });

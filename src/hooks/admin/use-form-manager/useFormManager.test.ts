@@ -87,6 +87,21 @@ describe('useFormManager', () => {
         expect(result.current.formState).toEqual(defaultFormState);
     });
 
+    it('should validate initialData on first validation pass when initialData is provided', () => {
+        renderHook(() =>
+            useFormManager<FormValues, FormErrors>({
+                defaultFormState,
+                initialData,
+                validateForm,
+                onSubmit,
+                onValidationChange,
+            }),
+        );
+
+        expect(validateForm).toHaveBeenNthCalledWith(1, initialData, false);
+        expect(onValidationChange).toHaveBeenCalledWith(true);
+    });
+
     it('should track dirty state correctly', () => {
         const { result } = renderHook(() =>
             useFormManager<FormValues, FormErrors>({

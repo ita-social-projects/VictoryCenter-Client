@@ -9,6 +9,7 @@ import { useTranslateMainPageBlock } from '@/hooks/admin/use-translate-main-page
 import { ModalMode } from '@/types/admin/common';
 import { MainPage, MainPageLocalizationBlock } from '@/types/admin/main-page';
 import { LocalizationLanguage } from '@/types/common/language';
+import { getLocalizationLanguageId } from '@/utils/functions/mappers/common/localization/localization-mappers';
 import {
     TranslateMainPageBlockForm,
     TranslateMainPageBlockFormRef,
@@ -60,9 +61,6 @@ const isSupportedBlock = (
     block: MainPageLocalizationBlock | null,
 ): block is MainPageLocalizationBlock.Title | MainPageLocalizationBlock.AboutUs | MainPageLocalizationBlock.Partners =>
     block != null && SUPPORTED_BLOCKS.includes(block as (typeof SUPPORTED_BLOCKS)[number]);
-
-const getLocalizationLanguageId = (localization: { languageId?: number; language?: { id?: number } }) =>
-    localization.languageId ?? localization.language?.id;
 
 const getExistingTranslation = (
     page: MainPage | null,

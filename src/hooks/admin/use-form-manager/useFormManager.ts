@@ -36,9 +36,9 @@ export function useFormManager<TFormValues, TFormErrors extends Record<string, u
     onValidationChange,
     ref,
 }: UseFormManagerProps<TFormValues, TFormErrors>): UseFormManagerReturn<TFormValues, TFormErrors> {
-    const [formState, setFormState] = useState<TFormValues>(defaultFormState);
+    const [formState, setFormState] = useState<TFormValues>(() => initialData ?? defaultFormState);
     const [errors, setErrors] = useState<TFormErrors>({} as TFormErrors);
-    const [initialFormState, setInitialFormState] = useState<TFormValues>(defaultFormState);
+    const [initialFormState, setInitialFormState] = useState<TFormValues>(() => initialData ?? defaultFormState);
     const isSubmittingRef = useRef(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 

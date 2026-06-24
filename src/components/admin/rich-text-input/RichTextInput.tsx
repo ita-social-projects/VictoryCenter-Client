@@ -16,6 +16,7 @@ import {
     InitialValuePlugin,
     EnterKeyPlugin,
 } from './plugins';
+import { normalizeRichTextInitialHtml } from './plugins/richTextInitialHtml';
 
 export interface RichTextInputProps {
     value: string;
@@ -71,7 +72,8 @@ export const RichTextInput = ({
             editorState: (editor: LexicalEditor) => {
                 if (value) {
                     const parser = new DOMParser();
-                    const dom = parser.parseFromString(value, 'text/html');
+                    const normalizedValue = normalizeRichTextInitialHtml(value);
+                    const dom = parser.parseFromString(normalizedValue, 'text/html');
                     const nodes = $generateNodesFromDOM(editor, dom);
                     const root = $getRoot();
                     root.clear();

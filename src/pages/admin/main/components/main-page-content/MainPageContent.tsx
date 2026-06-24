@@ -42,6 +42,10 @@ import {
     mapFormValuesToMainPagePatch,
     mapMainPageToFormValues,
 } from '@/utils/functions/mappers/admin/main-page/main-page-mappers';
+import {
+    getLocalizationLanguageCode,
+    getLocalizationLanguageId,
+} from '@/utils/functions/mappers/common/localization/localization-mappers';
 import { MainPageValidationSchema } from '@/validation/admin/main-page-schema/main-page-schema';
 import { AboutUsBlockForm } from '../about-us-block/AboutUsBlockForm';
 import { MainPagePublishModal } from '../main-page-publish-modal/MainPagePublishModal';
@@ -84,12 +88,6 @@ const sanitizeMainPageFormValues = (values: MainPageFormValues): MainPageFormVal
     statisticsTitleUa: values.statisticsTitleUa ?? '',
     statisticsTitleEn: values.statisticsTitleEn ?? '',
 });
-
-const getLocalizationLanguageCode = (localization: EntityLocalization): string | undefined =>
-    localization.language?.code ?? (localization as EntityLocalization & { code?: string }).code;
-
-const getLocalizationLanguageId = (localization: EntityLocalization): number | undefined =>
-    localization.language?.id ?? (localization as EntityLocalization & { languageId?: number }).languageId;
 
 const isLocalizationForLanguage = (localization: EntityLocalization, language: LocalizationLanguage) =>
     getLocalizationLanguageId(localization) === language.id ||

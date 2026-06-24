@@ -119,6 +119,16 @@ describe('localization language helpers', () => {
         expect(getLocalizationLanguageCode({ code: 'en' })).toBe('en');
     });
 
+    it('prefers direct language code before domain and dto sources', () => {
+        expect(
+            getLocalizationLanguageCode({
+                code: 'en',
+                language: { id: 1, code: 'uk' },
+                localizationInfoDto: { id: 1, code: 'uk' },
+            }),
+        ).toBe('en');
+    });
+
     it('uses language id and provided languages as resolveLocaleCode fallback', () => {
         expect(
             resolveLocaleCode({ localizationInfoDto: { id: 2 } }, [

@@ -1,10 +1,12 @@
 import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
+import { sanitizeHtml } from '@/components/admin/rich-text-input/plugins/htmlSanitizer';
+import { normalizeRichTextInitialHtml } from '@/components/admin/rich-text-input/plugins/richTextInitialHtml';
 import { MAIN_PAGE_TEXT } from '@/const/admin/main-page';
 import { useFormManager } from '@/hooks/admin/use-form-manager/useFormManager';
 import { VisibilityStatus } from '@/types/admin/common';
 import { MainPageFormValues } from '@/types/admin/main-page';
 import { MAIN_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/main-page-schema/main-page-schema';
-import { forwardRef, useEffect } from 'react';
+import { forwardRef, useCallback, useEffect, useImperativeHandle } from 'react';
 import styles from './TranslateMainPageBlockForm.module.scss';
 
 export interface TranslateMainPageBlockFormValues {
@@ -45,6 +47,14 @@ const DEFAULT_FORM_STATE: TranslateMainPageBlockFormValues = {
     description: '',
 };
 
+const normalizeHtmlForDirtyCheck = (value: string) =>
+    sanitizeHtml(normalizeRichTextInitialHtml(value)).replace(/>\s+</g, '><').trim();
+
+const normalizeFormValuesForDirtyCheck = (values: TranslateMainPageBlockFormValues) => ({
+    title: normalizeHtmlForDirtyCheck(values.title),
+    description: normalizeHtmlForDirtyCheck(values.description),
+});
+
 const validateFormWithConfig = (
     formState: TranslateMainPageBlockFormValues,
     validationConfig: TranslateMainPageBlockValidationConfig,
@@ -58,7 +68,7 @@ export const TranslateMainPageBlockForm = forwardRef<TranslateMainPageBlockFormR
         { initialData = null, validationConfig, onSubmit, onValidationChange, onDirtyChange, formDisabled = false },
         ref,
     ) => {
-        const { formState, setFormState, errors, setErrors, isSubmitting, isDirty } = useFormManager<
+        const { formState, setFormState, errors, setErrors, isSubmitting, isValid, submit } = useFormManager<
             TranslateMainPageBlockFormValues,
             TranslateMainPageBlockFormErrors
         >({
@@ -66,9 +76,27 @@ export const TranslateMainPageBlockForm = forwardRef<TranslateMainPageBlockFormR
             initialData,
             validateForm: (values) => validateFormWithConfig(values, validationConfig),
             onValidationChange,
-            ref,
             onSubmit: (data) => onSubmit(data),
         });
+
+        const isDirty = useCallback(() => {
+            const initialFormState = initialData ?? DEFAULT_FORM_STATE;
+
+            return (
+                JSON.stringify(normalizeFormValuesForDirtyCheck(formState)) !==
+                JSON.stringify(normalizeFormValuesForDirtyCheck(initialFormState))
+            );
+        }, [formState, initialData]);
+
+        useImperativeHandle(
+            ref,
+            () => ({
+                submit: (status = VisibilityStatus.Published) => submit(status),
+                isValid,
+                isDirty,
+            }),
+            [submit, isValid, isDirty],
+        );
 
         useEffect(() => {
             onDirtyChange?.(isDirty());

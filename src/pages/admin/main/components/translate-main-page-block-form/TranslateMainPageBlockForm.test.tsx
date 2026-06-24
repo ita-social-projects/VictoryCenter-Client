@@ -71,6 +71,15 @@ describe('TranslateMainPageBlockForm', () => {
         expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
     });
 
+    it('keeps save disabled when rich text emits equivalent HTML for initial plain text', async () => {
+        render(<Harness initialData={{ title: 'Existing English title', description: 'Existing description' }} />);
+
+        fireEvent.change(titleInput(), { target: { value: 'Existing English title' } });
+        fireEvent.change(descriptionInput(), { target: { value: 'Existing description' } });
+
+        await waitFor(() => expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled());
+    });
+
     it('validates required fields while typing', async () => {
         render(<Harness />);
 

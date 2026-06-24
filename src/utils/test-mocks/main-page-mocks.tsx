@@ -18,14 +18,32 @@ export const MockTextAreaWithCharacterLimitGroup = ({ id, value, onChange, onBlu
     />
 );
 
+const escapeHtml = (value: string) =>
+    value
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+
+const isHtmlValue = (value: string) => /^<.+>$/.test(value.trim());
+
+const getPlainTextFromMockHtml = (value: string) => {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = value;
+    return tempDiv.innerText || tempDiv.textContent || '';
+};
+
+const toMockRichTextHtml = (value: string) => (isHtmlValue(value) ? value : `<p>${escapeHtml(value)}</p>`);
+
 export const MockRichTextInputGroup = ({ id, value, onChange, onBlur, disabled, maxLength, error }: any) => (
     <div>
         <textarea
             id={id}
             data-testid={id}
             data-max-length={maxLength}
-            value={value ?? ''}
-            onChange={(e) => onChange(e.target.value)}
+            value={getPlainTextFromMockHtml(value ?? '')}
+            onChange={(e) => onChange(toMockRichTextHtml(e.target.value))}
             onBlur={onBlur}
             disabled={disabled}
         />

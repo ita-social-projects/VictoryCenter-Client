@@ -40,7 +40,7 @@ export const InitialValuePlugin = ({ value }: InitialValuePluginProps) => {
 
         const normalizeHtml = (html: string) => html.replace(/>\s+</g, '><').trim();
 
-        const nextHtml = normalizeRichTextInitialHtml(value);
+        const nextHtml = sanitizeHtml(normalizeRichTextInitialHtml(value));
 
         if (normalizeHtml(currentHtmlSanitized) === normalizeHtml(nextHtml)) {
             lastValue.current = value;

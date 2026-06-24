@@ -988,8 +988,8 @@ describe('MainPageContent', () => {
 
         expect((MainPageLocalizationsApi.update as jest.Mock).mock.calls[0][3]).toEqual(
             expect.objectContaining({
-                title: 'Valid title text',
-                description: 'Valid description text',
+                title: '<p>Valid title text</p>',
+                description: '<p>Valid description text</p>',
                 mainAboutUs: {
                     title: 'Existing about title',
                     description: 'Existing about description',

@@ -7,8 +7,21 @@ describe('normalizeRichTextInitialHtml', () => {
         );
     });
 
+    it('keeps supported rich text HTML unchanged', () => {
+        expect(normalizeRichTextInitialHtml('<p>First<br><strong>Second</strong></p>')).toBe(
+            '<p>First<br><strong>Second</strong></p>',
+        );
+    });
+
     it('wraps plain text in a paragraph for Lexical import', () => {
         expect(normalizeRichTextInitialHtml('About us and who we are')).toBe('<p>About us and who we are</p>');
+    });
+
+    it('escapes supported tag substrings in plain text', () => {
+        expect(normalizeRichTextInitialHtml('Use <br> literally')).toBe('<p>Use &lt;br&gt; literally</p>');
+        expect(normalizeRichTextInitialHtml('Write <b>bold</b> in docs')).toBe(
+            '<p>Write &lt;b&gt;bold&lt;/b&gt; in docs</p>',
+        );
     });
 
     it('escapes plain text before wrapping it', () => {

@@ -169,7 +169,7 @@ describe('TranslateMainPageBlockModal', () => {
 
         expect(screen.getByText('Редагувати переклад')).toBeInTheDocument();
         expect(titleInput()).toHaveValue('About us and who we are');
-        expect(descriptionInput()).toHaveValue('<p>Victory Centre is a safe space.</p>');
+        expect(descriptionInput()).toHaveValue('Victory Centre is a safe space.');
         expect(saveButton()).toBeDisabled();
     });
 
@@ -190,7 +190,7 @@ describe('TranslateMainPageBlockModal', () => {
         });
 
         expect(screen.getByText('Редагувати переклад')).toBeInTheDocument();
-        expect(titleInput()).toHaveValue('<p>Horses with healing experience</p>');
+        expect(titleInput()).toHaveValue('Horses with healing experience');
         expect(descriptionInput()).toHaveValue('When body and soul recover, true strength is born.');
     });
 
@@ -212,8 +212,8 @@ describe('TranslateMainPageBlockModal', () => {
             expect.objectContaining({
                 entityId: 1,
                 languageId: englishLanguage.id,
-                title: 'Valid title text',
-                description: 'Valid description text',
+                title: '<p>Valid title text</p>',
+                description: '<p>Valid description text</p>',
             }),
         );
         expect(onTranslated).toHaveBeenCalled();
@@ -265,8 +265,8 @@ describe('TranslateMainPageBlockModal', () => {
             title: 'Existing title',
             description: 'Existing description',
             mainAboutUs: {
-                title: 'Updated about title',
-                description: 'Updated about description',
+                title: '<p>Updated about title</p>',
+                description: '<p>Updated about description</p>',
             },
             mainPartners: {
                 title: 'Existing partners title',

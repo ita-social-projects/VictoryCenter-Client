@@ -51,11 +51,11 @@ export function getLocalizationLanguageId(localization: LocalizationLanguageSour
 }
 
 export function getLocalizationLanguageCode(localization: LocalizationLanguageSource): string | undefined {
+    const directLanguageCode = localization.code ?? undefined;
     const domainLanguageCode = localization.language?.code ?? undefined;
     const dtoLanguageCode = localization.localizationInfoDto?.code ?? undefined;
-    const directLanguageCode = localization.code ?? undefined;
 
-    return domainLanguageCode ?? dtoLanguageCode ?? directLanguageCode;
+    return directLanguageCode ?? domainLanguageCode ?? dtoLanguageCode;
 }
 
 export function resolveLocaleCode(

@@ -47,7 +47,11 @@ describe('InitialValuePlugin', () => {
         });
 
         global.DOMParser = jest.fn().mockImplementation(() => ({
-            parseFromString: jest.fn((_value: string) => ({ body: { innerHTML: _value } })),
+            parseFromString: jest.fn((_value: string) => {
+                const parsedDocument = window.document.implementation.createHTMLDocument('');
+                parsedDocument.body.innerHTML = _value;
+                return parsedDocument;
+            }),
         })) as any;
     });
 
@@ -112,7 +116,8 @@ describe('InitialValuePlugin', () => {
         const updateCallback = mockUpdate.mock.calls[0][0];
         updateCallback();
 
-        const parser = (global.DOMParser as jest.Mock).mock.results[0].value;
+        const parserResults = (global.DOMParser as jest.Mock).mock.results;
+        const parser = parserResults[parserResults.length - 1].value;
         expect(parser.parseFromString).toHaveBeenCalledWith('<p>About us and who we are</p>', 'text/html');
         expect(mockGenerateNodesFromDOM.mock.calls[0][1].body.innerHTML).toBe('<p>About us and who we are</p>');
     });
@@ -123,6 +128,18 @@ describe('InitialValuePlugin', () => {
         mockGenerateHtmlFromNodes.mockReturnValue('<p>Content</p>');
 
         rerender(<InitialValuePlugin value="<p>Content</p>" />);
+
+        expect(mockUpdate).not.toHaveBeenCalled();
+    });
+
+    it('does not update editor when sanitized current and next HTML are the same', () => {
+        mockSanitizeHtml.mockImplementation((html: string) => html.replace(' class="external"', ''));
+
+        const { rerender } = render(<InitialValuePlugin value="<p>Content</p>" />);
+
+        mockGenerateHtmlFromNodes.mockReturnValue('<p>Content</p>');
+
+        rerender(<InitialValuePlugin value='<p class="external">Content</p>' />);
 
         expect(mockUpdate).not.toHaveBeenCalled();
     });

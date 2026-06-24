@@ -11,7 +11,6 @@ export const DetailedEventNewsPage = () => {
     const { slug } = useParams();
 
     const { program: eventNews, isLoading, error } = useProgramBySlug(EventNewsApi.get, slug);
-    console.log('eventNews', eventNews);
 
     if (isLoading || (!eventNews && !error)) {
         return (

@@ -24,6 +24,7 @@ const mockEventData: EventsNews = {
     tags: [{ id: '1', name: 'Media' }],
     resource: 'Test Source',
     slug: 'test-event',
+    sections: [],
 };
 
 describe('SingleEventNews', () => {
@@ -107,6 +108,7 @@ describe('SingleEventNews', () => {
             description: 'Minimal description',
             tags: [],
             slug: 'minimal-event',
+            sections: [],
         };
         render(<SingleEventNews {...minimalEventData} />);
         expect(screen.getByText('Minimal Event')).toBeInTheDocument();

@@ -1,4 +1,5 @@
 import { Image } from '../common/image';
+import { HippotherapyProgramSectionDto } from '../common/program-sections';
 export interface chooseProgramData {
     title: string;
     description: string;
@@ -31,6 +32,7 @@ export interface EventsNews {
     previewImage: Image | string | null; // string для моків, Image для реальних даних
     backgroundImage: Image | string | null; // string для моків, Image для реальних даних
     slug: string;
+    sections: HippotherapyProgramSectionDto[];
 }
 
 export interface DetailedProgramDto {

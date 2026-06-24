@@ -9,14 +9,21 @@ jest.mock('react-i18next', () => ({
     }),
 }));
 
+const mockNavigate = jest.fn();
+jest.mock('react-router-dom', () => ({
+    useNavigate: () => mockNavigate,
+}));
+
 const mockEventData: EventsNews = {
     id: '1',
-    title: 'Test Event',
+    name: 'Test Event',
     date: '2026-05-15',
     description: 'This is a test event description',
-    imageURL: 'https://example.com/image.jpg',
+    previewImage: 'https://example.com/image.jpg',
+    backgroundImage: 'https://example.com/image.jpg',
     tags: [{ id: '1', name: 'Media' }],
     resource: 'Test Source',
+    slug: 'test-event',
 };
 
 describe('SingleEventNews', () => {
@@ -29,9 +36,9 @@ describe('SingleEventNews', () => {
         const image = screen.getByRole('img', { name: /event/i });
 
         expect(image).toBeInTheDocument();
-        expect(image).toHaveAttribute('src', mockEventData.imageURL);
+        expect(image).toHaveAttribute('src', mockEventData.previewImage);
         expect(image).toHaveAttribute('alt', 'Event');
-        expect(screen.getByText(mockEventData.title)).toBeInTheDocument();
+        expect(screen.getByText(mockEventData.name)).toBeInTheDocument();
         expect(screen.getByText(new RegExp(mockEventData.date))).toBeInTheDocument();
         expect(screen.getByText(mockEventData.description)).toBeInTheDocument();
     });
@@ -48,10 +55,11 @@ describe('SingleEventNews', () => {
 
     it('should render a link button to the events and news page', () => {
         render(<SingleEventNews {...mockEventData} />);
-        const button = screen.getByRole('link', { name: /LINK_TO_ARTICLE/i });
+        const button = screen.getByRole('button', { name: /LINK_TO_ARTICLE/i });
 
         expect(button).toBeInTheDocument();
-        expect(button).toHaveAttribute('href', PUBLIC_ROUTES.EVENTS_AND_NEWS.FULL);
+        button.click();
+        expect(mockNavigate).toHaveBeenCalledWith(PUBLIC_ROUTES.EVENTS_NEWS_DETAIL.getPath(mockEventData.slug));
     });
 
     it('should not display separator when resource is empty', () => {
@@ -70,7 +78,7 @@ describe('SingleEventNews', () => {
             tags: [],
         };
         render(<SingleEventNews {...eventWithoutTags} />);
-        expect(screen.getByText(mockEventData.title)).toBeInTheDocument();
+        expect(screen.getByText(mockEventData.name)).toBeInTheDocument();
         expect(screen.getByText(mockEventData.description)).toBeInTheDocument();
     });
 
@@ -92,11 +100,13 @@ describe('SingleEventNews', () => {
     it('should use default values when optional props are not provided', () => {
         const minimalEventData: EventsNews = {
             id: '1',
-            title: 'Minimal Event',
+            name: 'Minimal Event',
             date: '2026-05-15',
-            imageURL: 'https://example.com/minimal.jpg',
+            previewImage: 'https://example.com/minimal.jpg',
+            backgroundImage: 'https://example.com/minimal.jpg',
             description: 'Minimal description',
             tags: [],
+            slug: 'minimal-event',
         };
         render(<SingleEventNews {...minimalEventData} />);
         expect(screen.getByText('Minimal Event')).toBeInTheDocument();
@@ -124,6 +134,34 @@ describe('SingleEventNews', () => {
         render(<SingleEventNews {...mockEventData} />);
         const heading = screen.getByRole('heading', { level: 4 });
         expect(heading).toBeInTheDocument();
-        expect(heading).toHaveTextContent(mockEventData.title);
+        expect(heading).toHaveTextContent(mockEventData.name);
+    });
+
+    it('should fall back to default values when props are undefined', () => {
+        const { container } = render(<SingleEventNews {...({} as EventsNews)} />);
+
+        const image = screen.getByRole('img', { name: /event/i });
+        expect(image.getAttribute('src')).toBeFalsy();
+
+        const heading = screen.getByRole('heading', { level: 4 });
+        expect(heading).toHaveTextContent('');
+
+        const description = container.querySelector('[class*="event-description"]');
+        expect(description).toHaveTextContent('');
+
+        expect(container.querySelectorAll('[class*="event-tag"]')).toHaveLength(0);
+    });
+
+    it('should not navigate when slug is not provided', () => {
+        const eventWithoutSlug = {
+            ...mockEventData,
+            slug: '',
+        };
+        render(<SingleEventNews {...eventWithoutSlug} />);
+        const button = screen.getByRole('button', { name: /LINK_TO_ARTICLE/i });
+
+        button.click();
+
+        expect(mockNavigate).not.toHaveBeenCalled();
     });
 });

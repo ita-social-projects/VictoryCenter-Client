@@ -1,3 +1,4 @@
+import { Image } from '../common/image';
 export interface chooseProgramData {
     title: string;
     description: string;
@@ -22,10 +23,26 @@ export interface EventsNewsPageData {
 
 export interface EventsNews {
     id: string;
-    title: string;
+    name: string;
     resource?: string;
     description: string;
     date: string;
     tags: Tag[];
-    imageURL: string;
+    previewImage: Image | string | null; // string для моків, Image для реальних даних
+    backgroundImage: Image | string | null; // string для моків, Image для реальних даних
+    slug: string;
+}
+
+export interface DetailedProgramDto {
+    id: number;
+    name: string;
+    description: string;
+    // previewImage: Image | null;
+    // backgroundImage: Image | null;
+    location: string;
+    participantsCount: string;
+    meetingsCount: string;
+    // localizations: HippotherapyProgramLocalizationDto[];
+    // sections: HippotherapyProgramSectionDto[];
+    slug: string;
 }

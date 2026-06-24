@@ -26,3 +26,15 @@ export const EventsNewsApi = {
         return getPaginatedEvents(tagId, offset, limit);
     },
 };
+
+export const EventNewsApi = {
+    get: async (): Promise<EventsNews> => {
+        // const response = await axiosInstance.get(`${API_ROUTES.EVENTS.BY_SLUG}/${slug}`);
+        // return response.data;
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve(eventsNewsMock.find((event) => event.slug === 'test-event') ?? eventsNewsMock[0]);
+            }, 200);
+        });
+    },
+};

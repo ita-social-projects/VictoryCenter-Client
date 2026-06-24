@@ -164,10 +164,7 @@ describe('DetailedEventNewsPage', () => {
     it('uses section template as fallback key when section.id is missing', () => {
         const eventNewsWithSectionsNoIds = {
             ...mockEventNews,
-            sections: [
-                { template: 'TextOnly' },
-                { template: 'SingleImageTop' },
-            ],
+            sections: [{ template: 'TextOnly' }, { template: 'SingleImageTop' }],
         };
 
         useParams.mockReturnValue({ slug: 'test-event' });

@@ -353,15 +353,6 @@ describe('RichTextInput', () => {
             expect($insertNodes).toHaveBeenCalledWith(['n1', 'n2']);
         });
 
-        it('wraps plain text initial values before generating Lexical nodes', () => {
-            ($generateNodesFromDOM as jest.Mock).mockImplementation(() => ['n1']);
-
-            renderRichTextInput({ value: 'About us and who we are' });
-
-            const dom = ($generateNodesFromDOM as jest.Mock).mock.calls[0][1] as Document;
-            expect(dom.body.innerHTML).toBe('<p>About us and who we are</p>');
-        });
-
         it('does not generate nodes when value is empty', () => {
             ($generateNodesFromDOM as jest.Mock).mockClear();
             ($insertNodes as jest.Mock).mockClear();

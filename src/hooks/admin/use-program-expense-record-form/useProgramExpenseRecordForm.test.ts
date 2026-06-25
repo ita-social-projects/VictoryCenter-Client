@@ -169,4 +169,89 @@ describe('useProgramExpenseRecordForm', () => {
 
         expect(result.current.formState.amountUah).toBe('100');
     });
+
+    describe('edit mode', () => {
+        const recordToEdit: ProgramExpensesRecord = {
+            id: 1,
+            programId: 1,
+            programName: 'Program A',
+            type: 'expense',
+            reportingYear: '2025',
+            amountUah: '100',
+            amountUsd: '10',
+        };
+
+        it('pre-fills form state with edited record values', () => {
+            const { result } = renderUseProgramExpenseForm({ recordToEdit });
+
+            expect(result.current.formState.reportingYear).toBe('2025');
+            expect(result.current.formState.programId).toBe(1);
+            expect(result.current.formState.amountUah).toBe('100');
+            expect(result.current.formState.amountUsd).toBe('10');
+            expect(result.current.isDirty).toBe(false);
+            expect(result.current.isSubmitDisabled).toBe(true);
+        });
+
+        it('updates isDirty and enables submit when field is changed and valid', () => {
+            const { result } = renderUseProgramExpenseForm({ recordToEdit });
+
+            act(() => {
+                result.current.handleReportingYearChange('2026');
+            });
+
+            expect(result.current.isDirty).toBe(true);
+            expect(result.current.isSubmitDisabled).toBe(false);
+
+            act(() => {
+                result.current.handleReportingYearChange('2025');
+            });
+
+            expect(result.current.isDirty).toBe(false);
+            expect(result.current.isSubmitDisabled).toBe(true);
+        });
+
+        it('does not trigger program unique validation error when choosing its own program ID', () => {
+            const { result } = renderUseProgramExpenseForm({ recordToEdit });
+
+            act(() => {
+                result.current.handleProgramChange(1);
+            });
+
+            expect(result.current.formState.errors.programId).toBeUndefined();
+        });
+
+        it('triggers program unique validation error when choosing another occupied program ID', () => {
+            const occupiedRecords: ProgramExpensesRecord[] = [
+                {
+                    id: 1,
+                    programId: 1,
+                    programName: 'Program A',
+                    type: 'expense',
+                    reportingYear: '2025',
+                    amountUah: '100',
+                    amountUsd: '10',
+                },
+                {
+                    id: 2,
+                    programId: 2,
+                    programName: 'Program B',
+                    type: 'expense',
+                    reportingYear: '2025',
+                    amountUah: '200',
+                    amountUsd: '20',
+                },
+            ];
+
+            const { result } = renderUseProgramExpenseForm({
+                recordToEdit: occupiedRecords[0],
+                records: occupiedRecords,
+            });
+
+            act(() => {
+                result.current.handleProgramChange(2);
+            });
+
+            expect(result.current.formState.errors.programId).toBe(PROGRAM_EXPENSES_TEXT.VALIDATION.PROGRAM_UNIQUE);
+        });
+    });
 });

@@ -1,5 +1,5 @@
 import { ChangeEvent, ComponentProps, ReactNode } from 'react';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FUNDS_EXPENDITURES_TEXT, PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
@@ -89,6 +89,7 @@ const renderModal = (props: Partial<ComponentProps<typeof AddProgramExpenseRecor
             records={RECORDS}
             exchangeRate="42.15"
             onClose={jest.fn()}
+            onSubmit={jest.fn().mockResolvedValue(true)}
             {...props}
         />,
     );
@@ -301,5 +302,62 @@ describe('AddProgramExpenseRecordModal', () => {
         fireEvent.blur(screen.getByTestId('add-program-expense-amount-usd'));
 
         expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).toBeInTheDocument();
+    });
+
+    describe('edit mode', () => {
+        const recordToEdit = {
+            id: 1,
+            programId: 1,
+            programName: 'Program A',
+            type: 'expense' as const,
+            reportingYear: '2025',
+            amountUah: '100',
+            amountUsd: '10',
+        };
+
+        it('renders edit mode titles and populates form with recordToEdit details', () => {
+            renderModal({ recordToEdit });
+
+            expect(screen.getByText(PROGRAM_EXPENSES_TEXT.MODAL.EDIT.TITLE)).toBeInTheDocument();
+            expect(screen.getByText(PROGRAM_EXPENSES_TEXT.MODAL.EDIT.SUBTITLE)).toBeInTheDocument();
+
+            expect(screen.getByRole('button', { name: '2025' })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: 'Program A' })).toBeInTheDocument();
+            expect(screen.getByTestId('add-program-expense-amount-uah')).toHaveValue('100');
+            expect(screen.getByTestId('add-program-expense-amount-usd')).toHaveValue('10');
+
+            expect(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.MODAL.EDIT.SUBMIT_BUTTON })).toBeDisabled();
+        });
+
+        it('calls onSubmit with modified data when save is clicked', async () => {
+            const onSubmit = jest.fn().mockResolvedValue(true);
+            renderModal({ recordToEdit, onSubmit });
+
+            fireEvent.change(screen.getByTestId('add-program-expense-amount-uah'), { target: { value: '200' } });
+            expect(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.MODAL.EDIT.SUBMIT_BUTTON })).toBeEnabled();
+
+            fireEvent.click(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.MODAL.EDIT.SUBMIT_BUTTON }));
+
+            await waitFor(() => {
+                expect(onSubmit).toHaveBeenCalledWith({
+                    programId: 1,
+                    reportingYear: '2025',
+                    amountUah: '200',
+                    amountUsd: '4,75', // auto calculated based on rate 42.15 and rounded up
+                });
+            });
+        });
+
+        it('displays correct confirmation close title when closing a dirty form in edit mode', () => {
+            const onClose = jest.fn();
+            renderModal({ recordToEdit, onClose });
+
+            fireEvent.change(screen.getByTestId('add-program-expense-amount-uah'), { target: { value: '200' } });
+            fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.CANCEL }));
+
+            expect(screen.getByTestId('close-confirmation')).toHaveTextContent(
+                PROGRAM_EXPENSES_TEXT.MODAL.EDIT.CONFIRM_CLOSE_TITLE,
+            );
+        });
     });
 });

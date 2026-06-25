@@ -26,6 +26,7 @@ interface UseProgramExpenseRecordFormParams {
     programs: ProgramExpensesProgram[];
     records: ProgramExpensesRecord[];
     exchangeRate: string | null;
+    recordToEdit?: ProgramExpensesRecord | null;
 }
 
 const INITIAL_STATE: ProgramExpenseFormState = {
@@ -41,6 +42,7 @@ export const useProgramExpenseRecordForm = ({
     programs,
     records,
     exchangeRate,
+    recordToEdit = null,
 }: UseProgramExpenseRecordFormParams) => {
     const [formState, setFormState] = useState<ProgramExpenseFormState>(INITIAL_STATE);
     const {
@@ -62,12 +64,12 @@ export const useProgramExpenseRecordForm = ({
     const getProgramError = useCallback(
         (programId: number | undefined, trigger: 'change' | 'blur'): string | undefined =>
             validateProgramExpenseProgram({
-                recordId: 0,
+                recordId: recordToEdit ? recordToEdit.id : 0,
                 programId,
                 records,
                 trigger,
             }),
-        [records],
+        [records, recordToEdit],
     );
 
     useEffect(() => {
@@ -76,6 +78,23 @@ export const useProgramExpenseRecordForm = ({
             setUsdMismatchMessage(undefined);
             return;
         }
+
+        if (recordToEdit) {
+            setFormState({
+                reportingYear: recordToEdit.reportingYear,
+                programId: recordToEdit.programId,
+                amountUah: recordToEdit.amountUah,
+                amountUsd: recordToEdit.amountUsd,
+                errors: {},
+            });
+        } else {
+            setFormState(INITIAL_STATE);
+        }
+        setUsdMismatchMessage(undefined);
+    }, [isOpen, recordToEdit, setUsdMismatchMessage]);
+
+    useEffect(() => {
+        if (!isOpen) return;
 
         const selectedProgramExists =
             formState.programId === undefined || programOptions.some((program) => program.id === formState.programId);
@@ -90,7 +109,7 @@ export const useProgramExpenseRecordForm = ({
                 },
             }));
         }
-    }, [formState.programId, isOpen, isProgramSelectDisabled, programOptions, setUsdMismatchMessage]);
+    }, [formState.programId, isOpen, isProgramSelectDisabled, programOptions]);
 
     const handleAmountChange = useCallback(
         (value: string) => {
@@ -164,17 +183,22 @@ export const useProgramExpenseRecordForm = ({
         }));
     }, [getProgramError]);
 
-    const isDirty =
-        Boolean(formState.reportingYear) ||
-        Boolean(formState.programId) ||
-        formState.amountUah.trim() !== '' ||
-        formState.amountUsd.trim() !== '';
+    const isDirty = recordToEdit
+        ? formState.reportingYear !== recordToEdit.reportingYear ||
+          formState.programId !== recordToEdit.programId ||
+          formState.amountUah !== recordToEdit.amountUah ||
+          formState.amountUsd !== recordToEdit.amountUsd
+        : Boolean(formState.reportingYear) ||
+          Boolean(formState.programId) ||
+          formState.amountUah.trim() !== '' ||
+          formState.amountUsd.trim() !== '';
 
     const isSubmitDisabled =
         Boolean(validateFundsExpendituresReportingYear(formState.reportingYear, 'save')) ||
         Boolean(getProgramError(formState.programId, 'blur')) ||
         Boolean(validateFundsExpendituresAmount(formState.amountUah, 'save')) ||
-        Boolean(validateFundsExpendituresAmount(formState.amountUsd, 'save'));
+        Boolean(validateFundsExpendituresAmount(formState.amountUsd, 'save')) ||
+        !isDirty;
 
     return {
         formState,

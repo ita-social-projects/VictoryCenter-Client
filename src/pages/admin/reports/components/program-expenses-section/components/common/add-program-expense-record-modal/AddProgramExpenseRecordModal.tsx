@@ -1,4 +1,4 @@
-import { ChangeEvent, FocusEvent, ReactNode, useEffect, useMemo, useRef } from 'react';
+import { ChangeEvent, FocusEvent, ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { Button } from '@/components/admin/button/Button';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import { InputWithCharacterLimit } from '@/components/admin/input-with-character-limit/InputWithCharacterLimit';
@@ -19,6 +19,13 @@ interface AddProgramExpenseRecordModalProps {
     records: ProgramExpensesRecord[];
     exchangeRate: string | null;
     onClose: () => void;
+    onSubmit: (submitData: {
+        programId: number;
+        reportingYear: string;
+        amountUah: string;
+        amountUsd: string;
+    }) => Promise<boolean>;
+    recordToEdit?: ProgramExpensesRecord | null;
 }
 
 const PROGRAM_EXPENSE_AMOUNT_MAX_LENGTH = 12;
@@ -82,9 +89,21 @@ interface AmountFieldProps {
     footer?: ReactNode;
     onChange: (event: ChangeEvent<HTMLInputElement>) => void;
     onBlur: () => void;
+    disabled?: boolean;
 }
 
-const AmountField = ({ id, name, label, value, error, headerAddon, footer, onChange, onBlur }: AmountFieldProps) => (
+const AmountField = ({
+    id,
+    name,
+    label,
+    value,
+    error,
+    headerAddon,
+    footer,
+    onChange,
+    onBlur,
+    disabled = false,
+}: AmountFieldProps) => (
     <div className={styles.field}>
         <div className={headerAddon ? styles['amount-usd-header'] : undefined}>
             <RequiredFieldLabel>{label}</RequiredFieldLabel>
@@ -101,6 +120,7 @@ const AmountField = ({ id, name, label, value, error, headerAddon, footer, onCha
             showCounter={false}
             className={styles.input}
             hasError={Boolean(error)}
+            disabled={disabled}
         />
         <FieldError message={error} />
         {footer}
@@ -113,7 +133,10 @@ export const AddProgramExpenseRecordModal = ({
     records,
     exchangeRate,
     onClose,
+    onSubmit,
+    recordToEdit = null,
 }: AddProgramExpenseRecordModalProps) => {
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const yearOptions = useMemo(() => getReportingYearOptions(), []);
     const reportingYearSelectRef = useRef<HTMLDivElement | null>(null);
     const programSelectRef = useRef<HTMLDivElement | null>(null);
@@ -136,13 +159,44 @@ export const AddProgramExpenseRecordModal = ({
         programs,
         records,
         exchangeRate,
+        recordToEdit,
     });
+
+    const isEditMode = Boolean(recordToEdit);
+    const titleText = isEditMode ? PROGRAM_EXPENSES_TEXT.MODAL.EDIT.TITLE : PROGRAM_EXPENSES_TEXT.MODAL.ADD.TITLE;
+    const subtitleText = isEditMode
+        ? PROGRAM_EXPENSES_TEXT.MODAL.EDIT.SUBTITLE
+        : PROGRAM_EXPENSES_TEXT.MODAL.ADD.SUBTITLE;
+    const submitText = isEditMode
+        ? PROGRAM_EXPENSES_TEXT.MODAL.EDIT.SUBMIT_BUTTON
+        : PROGRAM_EXPENSES_TEXT.MODAL.ADD.SUBMIT_BUTTON;
+    const confirmCloseTitle = isEditMode
+        ? PROGRAM_EXPENSES_TEXT.MODAL.EDIT.CONFIRM_CLOSE_TITLE
+        : PROGRAM_EXPENSES_TEXT.MODAL.ADD.CONFIRM_CLOSE_TITLE;
 
     const { isCloseConfirmOpen, handleRequestClose, handleConfirmClose, handleCancelClose } =
         useDirtyModalCloseConfirmation({
             isDirty,
             onClose,
         });
+
+    const handleSubmit = async () => {
+        if (formState.programId === undefined || formState.reportingYear === undefined) {
+            return;
+        }
+
+        setIsSubmitting(true);
+        try {
+            await onSubmit({
+                programId: formState.programId,
+                reportingYear: formState.reportingYear,
+                amountUah: formState.amountUah,
+                amountUsd: formState.amountUsd,
+            });
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     useEffect(() => {
         if (!isOpen) {
@@ -171,8 +225,8 @@ export const AddProgramExpenseRecordModal = ({
             <Modal isOpen={isOpen} onClose={handleRequestClose} className={styles.modal} maxWidth="650px">
                 <Modal.Title>
                     <div className={styles.header}>
-                        <h2 className={styles.title}>{PROGRAM_EXPENSES_TEXT.MODAL.ADD.TITLE}</h2>
-                        <p className={styles.subtitle}>{PROGRAM_EXPENSES_TEXT.MODAL.ADD.SUBTITLE}</p>
+                        <h2 className={styles.title}>{titleText}</h2>
+                        <p className={styles.subtitle}>{subtitleText}</p>
                     </div>
                 </Modal.Title>
                 <Modal.Content>
@@ -190,6 +244,7 @@ export const AddProgramExpenseRecordModal = ({
                                     placeholder={FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_PLACEHOLDER}
                                     className={styles.select}
                                     optionClassName={styles['select-option']}
+                                    disabled={isSubmitting}
                                 >
                                     {yearOptions.map((year) => (
                                         <Select.Option key={year} value={year} name={year} />
@@ -214,6 +269,7 @@ export const AddProgramExpenseRecordModal = ({
                                         placeholder={PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_PLACEHOLDER}
                                         className={styles.select}
                                         optionClassName={styles['select-option']}
+                                        disabled={isSubmitting}
                                     >
                                         {programOptions.map((program) => (
                                             <Select.Option key={program.id} value={program.id} name={program.name} />
@@ -230,6 +286,7 @@ export const AddProgramExpenseRecordModal = ({
                                 error={formState.errors.amountUah}
                                 onChange={(event) => handleAmountChange(event.target.value)}
                                 onBlur={() => handleAmountBlur('amountUah')}
+                                disabled={isSubmitting}
                             />
 
                             <AmountField
@@ -241,6 +298,7 @@ export const AddProgramExpenseRecordModal = ({
                                 headerAddon={<ExchangeRateChip exchangeRate={exchangeRate} />}
                                 onChange={(event) => handleUsdChange(event.target.value)}
                                 onBlur={() => handleAmountBlur('amountUsd')}
+                                disabled={isSubmitting}
                                 footer={
                                     usdMismatchMessage && (
                                         <div className={styles.info}>
@@ -253,10 +311,20 @@ export const AddProgramExpenseRecordModal = ({
                         </div>
 
                         <div className={styles.actions}>
-                            <Button buttonStyle="primary" disabled={isSubmitDisabled} className={styles.submit}>
-                                {PROGRAM_EXPENSES_TEXT.MODAL.ADD.SUBMIT_BUTTON}
+                            <Button
+                                buttonStyle="primary"
+                                disabled={isSubmitDisabled || isSubmitting}
+                                onClick={handleSubmit}
+                                className={styles.submit}
+                            >
+                                {submitText}
                             </Button>
-                            <Button buttonStyle="secondary" onClick={handleRequestClose} className={styles.cancel}>
+                            <Button
+                                buttonStyle="secondary"
+                                disabled={isSubmitting}
+                                onClick={handleRequestClose}
+                                className={styles.cancel}
+                            >
                                 {COMMON_TEXT_ADMIN.BUTTON.CANCEL}
                             </Button>
                         </div>
@@ -267,7 +335,7 @@ export const AddProgramExpenseRecordModal = ({
 
             <ConfirmationModal
                 isOpen={isCloseConfirmOpen}
-                title={PROGRAM_EXPENSES_TEXT.MODAL.ADD.CONFIRM_CLOSE_TITLE}
+                title={confirmCloseTitle}
                 onConfirm={handleConfirmClose}
                 onCancel={handleCancelClose}
                 onClose={handleCancelClose}

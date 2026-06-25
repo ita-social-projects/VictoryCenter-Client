@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
+import { PROGRAM_EXPENSES_TEXT, REPORTS_TEXT, FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
@@ -36,6 +36,7 @@ export const ProgramExpensesSection = ({ isEditing = false }: ProgramExpensesSec
     const { addToast } = useToast();
     const [selectedProgramIds, setSelectedProgramIds] = useState<number[]>([]);
     const [isAddProgramExpenseModalOpen, setIsAddProgramExpenseModalOpen] = useState(false);
+    const [recordToEdit, setRecordToEdit] = useState<ProgramExpensesRecord | null>(null);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [recordToDelete, setRecordToDelete] = useState<ProgramExpensesRecord | null>(null);
     const [isDeletingRecord, setIsDeletingRecord] = useState(false);
@@ -95,7 +96,55 @@ export const ProgramExpensesSection = ({ isEditing = false }: ProgramExpensesSec
 
     const handleCloseAddProgramExpenseModal = useCallback(() => {
         setIsAddProgramExpenseModalOpen(false);
+        setRecordToEdit(null);
     }, []);
+
+    const handleEditClick = useCallback((record: ProgramExpensesRecord) => {
+        setRecordToEdit(record);
+        setIsAddProgramExpenseModalOpen(true);
+    }, []);
+
+    const handleSubmitAddProgramExpense = useCallback(
+        async (submitData: { programId: number; reportingYear: string; amountUah: string; amountUsd: string }) => {
+            const reportingYear = Number.parseInt(submitData.reportingYear, 10);
+            const amountUah = Number.parseFloat(submitData.amountUah.replace(/\s/g, '').replace(',', '.'));
+            const amountUsd = Number.parseFloat(submitData.amountUsd.replace(/\s/g, '').replace(',', '.'));
+
+            if (!Number.isFinite(reportingYear) || !Number.isFinite(amountUah) || !Number.isFinite(amountUsd)) {
+                return false;
+            }
+
+            try {
+                const payload = {
+                    reportingYear,
+                    hippotherapyProgramCategoryId: submitData.programId,
+                    amountUah,
+                    amountUsd,
+                };
+
+                if (recordToEdit) {
+                    await ProgramExpensesApi.update(adminClient, recordToEdit.id, payload);
+                    addToast(REPORTS_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY, ToastType.Success);
+                } else {
+                    await ProgramExpensesApi.post(adminClient, payload);
+                    addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_CREATED_SUCCESSFULLY, ToastType.Success);
+                }
+
+                setIsAddProgramExpenseModalOpen(false);
+                setRecordToEdit(null);
+                refetchReadOnlyData();
+                return true;
+            } catch {
+                if (recordToEdit) {
+                    addToast(REPORTS_TEXT.MESSAGE.RECORD_UPDATE_FAILED_RETRY, ToastType.Error);
+                } else {
+                    addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_CREATE_FAILED_RETRY, ToastType.Error);
+                }
+                return false;
+            }
+        },
+        [adminClient, refetchReadOnlyData, addToast, recordToEdit],
+    );
 
     const handleDeleteClick = useCallback((record: ProgramExpensesRecord) => {
         setRecordToDelete(record);
@@ -198,6 +247,7 @@ export const ProgramExpensesSection = ({ isEditing = false }: ProgramExpensesSec
                     isEditing={isEditing}
                     isAddProgramExpenseDisabled={isAddProgramExpenseDisabled || !isEditing}
                     onAddProgramExpense={isEditing ? handleOpenAddProgramExpenseModal : undefined}
+                    onEditRecord={isEditing ? handleEditClick : undefined}
                     onDeleteRecord={isEditing ? handleDeleteClick : undefined}
                     selectedRecordIds={selectedRecordIds}
                     onToggleRecordSelection={toggleRecordSelection}
@@ -212,6 +262,8 @@ export const ProgramExpensesSection = ({ isEditing = false }: ProgramExpensesSec
                 records={data.records}
                 exchangeRate={exchangeRate}
                 onClose={handleCloseAddProgramExpenseModal}
+                onSubmit={handleSubmitAddProgramExpense}
+                recordToEdit={recordToEdit}
             />
 
             <DeleteRecordModal

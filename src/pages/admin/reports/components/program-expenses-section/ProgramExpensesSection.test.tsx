@@ -59,11 +59,15 @@ const EMPTY_PROGRAM_EXPENSES_DATA: ProgramExpensesReadOnlyData = {
 };
 
 const mockGetReadOnlyData = jest.fn();
+const mockPost = jest.fn();
+const mockUpdate = jest.fn();
 jest.mock('@/services/api/admin/reports/program-expenses-api', () => ({
     ProgramExpensesApi: {
         getReadOnlyData: (...args: unknown[]) => mockGetReadOnlyData(...args),
         delete: jest.fn(),
         bulkDelete: jest.fn(),
+        post: (...args: unknown[]) => mockPost(...args),
+        update: (...args: unknown[]) => mockUpdate(...args),
     },
 }));
 
@@ -101,9 +105,42 @@ jest.mock('@/assets/icons/plus.svg', () => ({
 }));
 
 jest.mock('./components/common/add-program-expense-record-modal/AddProgramExpenseRecordModal', () => ({
-    AddProgramExpenseRecordModal: ({ isOpen, exchangeRate }: { isOpen: boolean; exchangeRate: string | null }) => (
+    AddProgramExpenseRecordModal: ({
+        isOpen,
+        exchangeRate,
+        onSubmit,
+        recordToEdit,
+    }: {
+        isOpen: boolean;
+        exchangeRate: string | null;
+        onSubmit: (submitData: {
+            programId: number;
+            reportingYear: string;
+            amountUah: string;
+            amountUsd: string;
+        }) => Promise<boolean>;
+        recordToEdit: any;
+    }) => (
         <div data-testid="add-program-expense-modal" data-open={String(isOpen)} data-exchange-rate={exchangeRate ?? ''}>
             AddProgramExpenseRecordModal
+            {isOpen && (
+                <>
+                    {recordToEdit && <span data-testid="record-to-edit">{recordToEdit.id}</span>}
+                    <button
+                        data-testid="mock-submit-btn"
+                        onClick={() =>
+                            onSubmit({
+                                programId: recordToEdit ? recordToEdit.programId : 2,
+                                reportingYear: recordToEdit ? recordToEdit.reportingYear : '2026',
+                                amountUah: '1 000',
+                                amountUsd: '25',
+                            })
+                        }
+                    >
+                        Submit Modal
+                    </button>
+                </>
+            )}
         </div>
     ),
 }));
@@ -530,6 +567,64 @@ describe('ProgramExpensesSection', () => {
         await waitFor(() => {
             expect(mockAddToast).toHaveBeenCalledWith(PROGRAM_EXPENSES_TEXT.BULK.DELETE_FAILED, 'error', 5000);
             expect(screen.queryByTestId('delete-record-modal')).not.toBeInTheDocument();
+        });
+    });
+
+    describe('add and edit flow integration', () => {
+        beforeEach(() => {
+            mockPost.mockReset();
+            mockUpdate.mockReset();
+        });
+
+        it('should open modal in add mode, submit, call API.post and refetch', async () => {
+            mockPost.mockResolvedValueOnce(undefined);
+
+            render(<ProgramExpensesSection isEditing />);
+
+            fireEvent.click(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE }));
+
+            expect(screen.getByTestId('add-program-expense-modal')).toBeInTheDocument();
+            expect(screen.queryByTestId('record-to-edit')).not.toBeInTheDocument();
+
+            fireEvent.click(screen.getByTestId('mock-submit-btn'));
+
+            await waitFor(() => {
+                expect(mockPost).toHaveBeenCalledWith('mock-client', {
+                    reportingYear: 2026,
+                    hippotherapyProgramCategoryId: 2,
+                    amountUah: 1000,
+                    amountUsd: 25,
+                });
+                expect(mockAddToast).toHaveBeenCalledWith('Запис додано успішно', 'success');
+                expect(mockRefetch).toHaveBeenCalled();
+                expect(screen.getByTestId('add-program-expense-modal')).toHaveAttribute('data-open', 'false');
+            });
+        });
+
+        it('should open modal in edit mode, submit, call API.update and refetch', async () => {
+            mockUpdate.mockResolvedValueOnce(undefined);
+
+            render(<ProgramExpensesSection isEditing />);
+
+            // Click the edit button on the first record (id: 1)
+            fireEvent.click(screen.getByLabelText('Edit record 1'));
+
+            expect(screen.getByTestId('add-program-expense-modal')).toBeInTheDocument();
+            expect(screen.getByTestId('record-to-edit')).toHaveTextContent('1');
+
+            fireEvent.click(screen.getByTestId('mock-submit-btn'));
+
+            await waitFor(() => {
+                expect(mockUpdate).toHaveBeenCalledWith('mock-client', 1, {
+                    reportingYear: 2025, // recordToEdit value
+                    hippotherapyProgramCategoryId: 1, // recordToEdit value
+                    amountUah: 1000,
+                    amountUsd: 25,
+                });
+                expect(mockAddToast).toHaveBeenCalledWith('Зміни збережено успішно', 'success');
+                expect(mockRefetch).toHaveBeenCalled();
+                expect(screen.getByTestId('add-program-expense-modal')).toHaveAttribute('data-open', 'false');
+            });
         });
     });
 });

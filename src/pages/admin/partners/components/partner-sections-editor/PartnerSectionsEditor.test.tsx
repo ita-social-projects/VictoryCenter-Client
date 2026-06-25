@@ -316,19 +316,23 @@ describe('PartnerSectionsEditor', () => {
             mockPartnerSectionFormRender.mock.calls[mockPartnerSectionFormRender.mock.calls.length - 1][0];
 
         await act(async () => {
-            await latestProps.onPublish(populatedSection.localId);
+            latestProps.onPublish(populatedSection.localId);
         });
 
-        expect(mockedPartnersApi.postSection).toHaveBeenCalledWith('mock-client', {
-            title: 'New title',
-            description: 'New description',
-            partners: [
-                {
-                    description: 'Partner desc',
-                    image: { base64: 'base64', mimeType: 'image/png' },
-                    imageId: null,
-                },
-            ],
+        fireEvent.click(screen.getByTestId('confirm-delete'));
+
+        await waitFor(() => {
+            expect(mockedPartnersApi.postSection).toHaveBeenCalledWith('mock-client', {
+                title: 'New title',
+                description: 'New description',
+                partners: [
+                    {
+                        description: 'Partner desc',
+                        image: { base64: 'base64', mimeType: 'image/png' },
+                        imageId: null,
+                    },
+                ],
+            });
         });
 
         expect(addToastMock).toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.SECTION_CREATED, ToastType.Success);
@@ -373,19 +377,23 @@ describe('PartnerSectionsEditor', () => {
         const props = mockPartnerSectionFormRender.mock.calls[0][0];
 
         await act(async () => {
-            await props.onPublish(props.value.localId);
+            props.onPublish(props.value.localId);
         });
 
-        expect(mockedPartnersApi.updateSection).toHaveBeenCalledWith('mock-client', props.value.sectionId, {
-            title: props.value.title,
-            description: props.value.description,
-            partnersToUpdate: props.value.partners.map((partner: any) => ({
-                id: partner.partnerId,
-                description: partner.description,
-                image: partner.image,
-                imageId: partner.imageId,
-            })),
-            partnerIdsToDelete: props.value.deletedPartnerIds || [],
+        fireEvent.click(screen.getByTestId('confirm-delete'));
+
+        await waitFor(() => {
+            expect(mockedPartnersApi.updateSection).toHaveBeenCalledWith('mock-client', props.value.sectionId, {
+                title: props.value.title,
+                description: props.value.description,
+                partnersToUpdate: props.value.partners.map((partner: any) => ({
+                    id: partner.partnerId,
+                    description: partner.description,
+                    image: partner.image,
+                    imageId: partner.imageId,
+                })),
+                partnerIdsToDelete: props.value.deletedPartnerIds || [],
+            });
         });
 
         expect(addToastMock).toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.SECTION_PUBLISHED, ToastType.Success);
@@ -414,13 +422,16 @@ describe('PartnerSectionsEditor', () => {
             const props = mockPartnerSectionFormRender.mock.calls[0][0];
 
             await act(async () => {
-                await props.onPublish(props.value.localId);
+                props.onPublish(props.value.localId);
             });
+            fireEvent.click(screen.getByTestId('confirm-delete'));
         };
 
         // Test error toast on regular failure
         await setupAndPublish(new Error('publish failed'));
-        expect(addToastMock).toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.FAIL_TO_PUBLISH_SECTION, ToastType.Error);
+        await waitFor(() => {
+            expect(addToastMock).toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.FAIL_TO_PUBLISH_SECTION, ToastType.Error);
+        });
         const latestCallAfterError =
             mockPartnerSectionFormRender.mock.calls[mockPartnerSectionFormRender.mock.calls.length - 1][0];
         expect(latestCallAfterError.disabled).toBe(false);

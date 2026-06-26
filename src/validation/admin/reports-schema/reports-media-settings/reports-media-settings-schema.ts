@@ -35,6 +35,14 @@ export const REPORTS_COLLECTED_FUNDS_VALIDATION_FUNCTIONS = {
             return error.message;
         }
     },
+    validateTitleEn: (value: string): string | undefined => {
+        try {
+            collectedFundsSchema.validateSyncAt('title', { title: value });
+            return undefined;
+        } catch (error: any) {
+            return error.message;
+        }
+    },
 };
 
 const changedLivesSchema = Yup.object({
@@ -63,6 +71,14 @@ const changedLivesSchema = Yup.object({
 
 export const REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS = {
     validateTitle: (value: string): string | undefined => {
+        try {
+            changedLivesSchema.validateSyncAt('title', { title: value });
+            return undefined;
+        } catch (error: any) {
+            return error.message;
+        }
+    },
+    validateTitleEn: (value: string): string | undefined => {
         try {
             changedLivesSchema.validateSyncAt('title', { title: value });
             return undefined;

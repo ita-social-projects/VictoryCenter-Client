@@ -26,6 +26,7 @@ describe('reports-mapper', () => {
         it('should map dto with image correctly (without collected amount from API)', () => {
             const dto: ReportsMediaSettingsCollectedFundsDto = {
                 title: 'Зібрані кошти',
+                titleEn: 'Зібрані кошти УК',
                 image: { id: 10, url: 'https://img/cf.png', mimeType: 'image/png' },
                 imageId: 10,
             };
@@ -34,6 +35,7 @@ describe('reports-mapper', () => {
 
             expect(result).toEqual({
                 title: 'Зібрані кошти',
+                titleEn: 'Зібрані кошти УК',
                 image: dto.image,
                 imageId: 10,
             });
@@ -42,6 +44,7 @@ describe('reports-mapper', () => {
         it('should ignore legacy collectedAmount when present', () => {
             const dto: ReportsMediaSettingsCollectedFundsDto = {
                 title: 'Title',
+                titleEn: 'Title UK',
                 collectedAmount: 999,
                 image: { id: 5, url: 'https://img/5.png', mimeType: 'image/jpeg' },
                 imageId: 5,
@@ -51,6 +54,7 @@ describe('reports-mapper', () => {
 
             expect(result).toEqual({
                 title: 'Title',
+                titleEn: 'Title UK',
                 image: dto.image,
                 imageId: 5,
             });
@@ -59,6 +63,7 @@ describe('reports-mapper', () => {
         it('should set imageId from image.id when image is present', () => {
             const dto: ReportsMediaSettingsCollectedFundsDto = {
                 title: 'Title',
+                titleEn: 'Title UK',
                 image: { id: 42, url: 'https://img/42.png', mimeType: 'image/png' },
                 imageId: 99,
             };
@@ -71,6 +76,7 @@ describe('reports-mapper', () => {
         it('should set imageId to null when image is null', () => {
             const dto: ReportsMediaSettingsCollectedFundsDto = {
                 title: 'Title',
+                titleEn: 'Title UK',
                 image: null,
                 imageId: null,
             };
@@ -86,6 +92,7 @@ describe('reports-mapper', () => {
         it('should map dto with image correctly', () => {
             const dto: ReportsMediaSettingsChangedLivesDto = {
                 title: 'Змінені життя',
+                titleEn: 'Змінені життя УК',
                 changedLives: 56,
                 image: { id: 20, url: 'https://img/cl.png', mimeType: 'image/png' },
                 imageId: 20,
@@ -95,6 +102,7 @@ describe('reports-mapper', () => {
 
             expect(result).toEqual({
                 title: 'Змінені життя',
+                titleEn: 'Змінені життя УК',
                 changedLives: 56,
                 image: dto.image,
                 imageId: 20,
@@ -104,6 +112,7 @@ describe('reports-mapper', () => {
         it('should set imageId from image.id when image is present', () => {
             const dto: ReportsMediaSettingsChangedLivesDto = {
                 title: 'Title',
+                titleEn: 'Title UK',
                 changedLives: 10,
                 image: { id: 33, url: 'https://img/33.png', mimeType: 'image/jpeg' },
                 imageId: 50,
@@ -117,6 +126,7 @@ describe('reports-mapper', () => {
         it('should set imageId to null when image is null', () => {
             const dto: ReportsMediaSettingsChangedLivesDto = {
                 title: 'Title',
+                titleEn: 'Title UK',
                 changedLives: 0,
                 image: null,
                 imageId: null,
@@ -134,11 +144,13 @@ describe('reports-mapper', () => {
             const dto: ReportsMediaSettingsDto = {
                 collectedFundsBlock: {
                     title: 'CF Title',
+                    titleEn: 'CF Title UK',
                     image: { id: 1, url: 'https://img/1.png', mimeType: 'image/png' },
                     imageId: 1,
                 },
                 changedLivesBlock: {
                     title: 'CL Title',
+                    titleEn: 'CL Title UK',
                     changedLives: 100,
                     image: { id: 2, url: 'https://img/2.png', mimeType: 'image/jpeg' },
                     imageId: 2,
@@ -150,11 +162,13 @@ describe('reports-mapper', () => {
             expect(result).toEqual({
                 collectedFunds: {
                     title: 'CF Title',
+                    titleEn: 'CF Title UK',
                     image: dto.collectedFundsBlock.image,
                     imageId: 1,
                 },
                 changedLives: {
                     title: 'CL Title',
+                    titleEn: 'CL Title UK',
                     changedLives: 100,
                     image: dto.changedLivesBlock.image,
                     imageId: 2,
@@ -166,11 +180,13 @@ describe('reports-mapper', () => {
             const dto: ReportsMediaSettingsDto = {
                 collectedFundsBlock: {
                     title: 'Empty CF',
+                    titleEn: 'Empty CF UK',
                     image: null,
                     imageId: null,
                 },
                 changedLivesBlock: {
                     title: 'Empty CL',
+                    titleEn: 'Empty CL UK',
                     changedLives: 0,
                     image: null,
                     imageId: null,

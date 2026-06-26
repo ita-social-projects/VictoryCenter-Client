@@ -30,10 +30,12 @@ export const ReportsApi = {
         const dto: UpdateReportsMediaSettingsDto = {
             collectedFundsBlock: {
                 title: request.collectedFunds.title,
+                titleEn: request.collectedFunds.titleEn,
                 imageId: finalImageIdCollectedFunds ?? null,
             },
             changedLivesBlock: {
                 title: request.changedLives.title,
+                titleEn: request.changedLives.titleEn,
                 changedLives: request.changedLives.changedLives,
                 imageId: finalImageIdChangedLives ?? null,
             },

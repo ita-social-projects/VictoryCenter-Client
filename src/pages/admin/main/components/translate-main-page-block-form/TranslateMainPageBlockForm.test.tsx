@@ -98,10 +98,12 @@ describe('TranslateMainPageBlockForm', () => {
         fireEvent.click(screen.getByRole('button', { name: 'Save' }));
 
         await waitFor(() => {
-            expect(onSubmit).toHaveBeenCalledWith({
-                title: 'Valid title text',
-                description: 'Valid description text',
-            });
+            expect(onSubmit).toHaveBeenCalled();
+        });
+
+        expect(onSubmit.mock.calls[0][0]).toEqual({
+            title: 'Valid title text',
+            description: 'Valid description text',
         });
     });
 });

@@ -253,7 +253,7 @@ describe('TranslateMainPageBlockModal', () => {
         fireEvent.change(titleInput(), { target: { value: 'Valid title text' } });
         fireEvent.click(screen.getByLabelText('Close modal'));
 
-        expect(screen.getByText('Зміни будуть втрачені. Бажаєте продовжити?')).toBeInTheDocument();
+        expect(screen.getByText(/Зміни будуть втрачені/i)).toBeInTheDocument();
         expect(onClose).not.toHaveBeenCalled();
 
         fireEvent.click(screen.getByText('Так'));

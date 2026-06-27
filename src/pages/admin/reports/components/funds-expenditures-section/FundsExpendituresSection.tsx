@@ -102,6 +102,7 @@ export const FundsExpenditureSection = ({
     const [disclaimerError, setDisclaimerError] = useState<string | undefined>(undefined);
     const [exchangeRateValue, setExchangeRateValue] = useState('');
     const [exchangeRateError, setExchangeRateError] = useState<string | undefined>(undefined);
+    const [programYearValue, setProgramYearValue] = useState<number>(new Date().getFullYear());
 
     const [selectedType, setSelectedType] = useState<TypeFilterValue>(undefined);
     const [selectedCategoryId, setSelectedCategoryId] = useState<CategoryFilterValue>(undefined);
@@ -311,6 +312,12 @@ export const FundsExpenditureSection = ({
         }
     }, [draftExchangeRate, settings, isEditing]);
 
+    useEffect(() => {
+        if (settings?.programExpendituresReportingYear != null) {
+            setProgramYearValue(settings.programExpendituresReportingYear);
+        }
+    }, [settings?.programExpendituresReportingYear]);
+
     const enrichedRecords = useMemo(() => enrichRecords(recordsState, categories), [recordsState, categories]);
 
     const filteredCategories = useMemo(
@@ -341,24 +348,24 @@ export const FundsExpenditureSection = ({
     const currentExchangeRate = isEditing ? exchangeRateValue : (settings?.exchangeRate ?? null);
 
     const programAggregateRow = useMemo<ProgramAggregateRow>(() => {
-        const reportingYear = settings?.programExpendituresReportingYear || new Date().getFullYear();
-
         return {
-            reportingYear: String(reportingYear),
+            reportingYear: String(programYearValue),
             categoryName: PROGRAM_EXPENSES_TEXT.TABLE.TYPE_LABEL,
             amountUah: formatNumberDecimalComma(programSummary.totalAmountUah),
             amountUsd: formatNumberDecimalComma(programSummary.totalAmountUsd),
         };
-    }, [programSummary, settings?.programExpendituresReportingYear]);
+    }, [programSummary, programYearValue]);
 
     const handleProgramYearSave = useCallback(
         async (reportingYear: string): Promise<boolean> => {
+            const yearNumber = Number.parseInt(reportingYear, 10);
             try {
                 await FundsExpendituresApi.updateSettings(adminClient, {
                     disclaimerTitle: settings?.disclaimerTitle ?? '',
                     exchangeRate: settings?.exchangeRate ?? null,
-                    programExpendituresReportingYear: Number.parseInt(reportingYear, 10),
+                    programExpendituresReportingYear: yearNumber,
                 });
+                setProgramYearValue(yearNumber);
                 refetchSettings();
                 refetchProgramSummary();
                 addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY, ToastType.Success);
@@ -564,8 +571,7 @@ export const FundsExpenditureSection = ({
             const updatedSettings = await FundsExpendituresApi.updateSettings(adminClient, {
                 disclaimerTitle: disclaimerValue,
                 exchangeRate: exchangeRateValue,
-                programExpendituresReportingYear:
-                    settings?.programExpendituresReportingYear ?? new Date().getFullYear(),
+                programExpendituresReportingYear: programYearValue,
             });
 
             setDisclaimerValue(updatedSettings.disclaimerTitle ?? '');
@@ -590,7 +596,7 @@ export const FundsExpenditureSection = ({
         onEditModeChange,
         onExchangeRateValueChange,
         refetchSettings,
-        settings,
+        programYearValue,
     ]);
 
     if (isInitialLoading) {

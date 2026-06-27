@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import { CategoryBar } from '@/components/admin/category-bar/CategoryBar';
+import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import { IconButton } from '@/components/admin/icon-button/IconButton';
 import { LanguageToolkit } from '@/components/admin/language-toolkit/LanguageToolkit';
 import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
@@ -24,8 +25,8 @@ import {
     ImpactStatistic,
     MAIN_PAGE_FORM_DEFAULTS,
     MainPage,
-    MainPageLocalization,
     MainPageFormValues,
+    MainPageLocalization,
     MainPageLocalizationBlock,
     MainPageTranslationStatusDto,
     Metric,
@@ -140,6 +141,8 @@ export const MainPageContent = () => {
     const [translationBlock, setTranslationBlock] = useState<MainPageLocalizationBlock | null>(null);
     const [isPublishing, setIsPublishing] = useState(false);
     const [pendingPublishData, setPendingPublishData] = useState<MainPageFormValues | null>(null);
+
+    const [pendingGlobalLanguage, setPendingGlobalLanguage] = useState<string | null>(null);
 
     const [currentMetrics, setCurrentMetrics] = useState<Metric[]>([]);
     const [translationStatuses, setTranslationStatuses] = useState<MainPageTranslationStatusDto[]>([]);
@@ -301,6 +304,25 @@ export const MainPageContent = () => {
         };
     }, [client, originalData, selectedLanguage, translationLanguages, allLanguages, methods, addToast]);
 
+    const handleGlobalLanguageChange = (code: string) => {
+        if (methods.formState.isDirty) {
+            setPendingGlobalLanguage(code);
+        } else {
+            onLanguageChange(code);
+        }
+    };
+
+    const handleConfirmGlobalLanguageSwitch = () => {
+        if (pendingGlobalLanguage) {
+            onLanguageChange(pendingGlobalLanguage);
+        }
+        setPendingGlobalLanguage(null);
+    };
+
+    const handleCancelGlobalLanguageSwitch = () => {
+        setPendingGlobalLanguage(null);
+    };
+
     const handlePublishClick = (data: MainPageFormValues) => {
         setPendingPublishData(data);
         setIsPublishModalOpen(true);
@@ -444,7 +466,8 @@ export const MainPageContent = () => {
         <div className={styles.wrapper}>
             <div className={styles.toolbar}>
                 <div className={styles['toolbar-top']}>
-                    <LanguageToolkit languages={allLanguages} onLanguageChange={onLanguageChange} />
+                    {/* Використовуємо наш інтерцептор handleGlobalLanguageChange */}
+                    <LanguageToolkit languages={allLanguages} onLanguageChange={handleGlobalLanguageChange} />
                 </div>
                 <div className={styles['toolbar-bottom']}>
                     <div className={styles['tabs-wrapper']}>
@@ -531,6 +554,14 @@ export const MainPageContent = () => {
                 block={translationBlock}
                 translatedLanguages={translationLanguages}
                 onTranslated={handleTranslationSuccess}
+            />
+
+            <ConfirmationModal
+                isOpen={!!pendingGlobalLanguage}
+                onClose={handleCancelGlobalLanguageSwitch}
+                title={COMMON_TEXT_ADMIN.QUESTION.CHANGE_LANGUAGE_UNSAVED_CHANGES}
+                onConfirm={handleConfirmGlobalLanguageSwitch}
+                onCancel={handleCancelGlobalLanguageSwitch}
             />
 
             <ToastContainer />

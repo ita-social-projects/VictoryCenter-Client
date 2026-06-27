@@ -466,7 +466,6 @@ export const MainPageContent = () => {
         <div className={styles.wrapper}>
             <div className={styles.toolbar}>
                 <div className={styles['toolbar-top']}>
-                    {/* Використовуємо наш інтерцептор handleGlobalLanguageChange */}
                     <LanguageToolkit languages={allLanguages} onLanguageChange={handleGlobalLanguageChange} />
                 </div>
                 <div className={styles['toolbar-bottom']}>

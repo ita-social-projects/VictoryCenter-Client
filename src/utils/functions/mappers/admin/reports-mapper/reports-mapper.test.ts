@@ -204,12 +204,14 @@ describe('reports-mapper', () => {
                 id: 1,
                 disclaimerTitle: 'Disclaimer',
                 exchangeRate: 42.18,
+                programExpendituresReportingYear: 2025,
             };
 
             expect(mapReportFundsExpendituresSettingsDtoToSettings(dto)).toEqual({
                 id: 1,
                 disclaimerTitle: 'Disclaimer',
                 exchangeRate: '42,18',
+                programExpendituresReportingYear: 2025,
             });
         });
 

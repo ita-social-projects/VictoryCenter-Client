@@ -73,6 +73,18 @@ export const ProgramExpensesApi = {
         return mapDtoToReadOnlyData(recordsResponse.data, categoriesResponse.data, exchangeRate);
     },
 
+    getSummary: async (client: AxiosInstance, options: RequestOptions = {}): Promise<ProgramExpensesSummary> => {
+        const response = await client.get<{ totalAmountUah: number; totalAmountUsd: number }>(
+            `${API_ROUTES.REPORTS.PROGRAM_EXPENDITURES_RECORDS}/summary`,
+            { signal: options.cancellationSignal },
+        );
+
+        return {
+            totalAmountUah: response.data.totalAmountUah,
+            totalAmountUsd: response.data.totalAmountUsd,
+        };
+    },
+
     getAll: async (client: AxiosInstance): Promise<ReportProgramExpendituresRecordDto[]> => {
         const response = await client.get<ReportProgramExpendituresRecordDto[]>(
             API_ROUTES.REPORTS.PROGRAM_EXPENDITURES_RECORDS,

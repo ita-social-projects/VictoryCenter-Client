@@ -89,11 +89,13 @@ export interface ReportFundsExpendituresSettingsDto {
     id: number;
     disclaimerTitle: string;
     exchangeRate: number;
+    programExpendituresReportingYear: number;
 }
 
 export interface UpdateReportFundsExpendituresSettingsDto {
     disclaimerTitle: string;
     exchangeRate: number;
+    programExpendituresReportingYear: number;
 }
 
 export interface ReportFundsExpendituresCategoryDto
@@ -151,6 +153,7 @@ export interface ReportFundsExpendituresSettings {
     id: number;
     disclaimerTitle: string | null;
     exchangeRate: string | null;
+    programExpendituresReportingYear: number | null;
 }
 
 export interface ReportFundsExpendituresCategoryLocalizableFields {

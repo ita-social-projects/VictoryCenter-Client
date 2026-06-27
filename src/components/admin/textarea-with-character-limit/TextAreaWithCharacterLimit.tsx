@@ -85,20 +85,31 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
 
         useEffect(() => {
             const textarea = internalRef.current;
-            if (!autoGrow || !textarea) {
-                return;
-            }
-
-            const parsedLineHeight = Number.parseInt(globalThis.getComputedStyle(textarea).lineHeight, 10);
-
-            if (Number.isNaN(parsedLineHeight)) return;
-
-            const maxHeight = parsedLineHeight * maxRows;
+            if (!autoGrow || !textarea) return;
 
             textarea.style.height = 'auto';
-            textarea.style.height = `${Math.min(textarea.scrollHeight, maxHeight)}px`;
-            textarea.style.overflowY = textarea.scrollHeight > maxHeight ? 'auto' : 'hidden';
-        }, [localValue, autoGrow, maxRows]);
+            const computedStyle = globalThis.getComputedStyle(textarea);
+
+            let parsedLineHeight = Number.parseFloat(computedStyle.lineHeight);
+            if (Number.isNaN(parsedLineHeight)) {
+                const parsedFontSize = Number.parseFloat(computedStyle.fontSize) || 16;
+                parsedLineHeight = parsedFontSize * 1.2;
+            }
+
+            const paddingTop = Number.parseFloat(computedStyle.paddingTop) || 0;
+            const paddingBottom = Number.parseFloat(computedStyle.paddingBottom) || 0;
+            const borderTop = Number.parseFloat(computedStyle.borderTopWidth) || 0;
+            const borderBottom = Number.parseFloat(computedStyle.borderBottomWidth) || 0;
+
+            const maxHeight = maxRows
+                ? parsedLineHeight * maxRows + paddingTop + paddingBottom + borderTop + borderBottom
+                : Infinity;
+
+            const finalTargetHeight = textarea.scrollHeight + borderTop + borderBottom;
+
+            textarea.style.height = `${Math.min(finalTargetHeight, maxHeight)}px`;
+            textarea.style.overflowY = finalTargetHeight > maxHeight ? 'auto' : 'hidden';
+        }, [value, autoGrow, maxRows]);
 
         return (
             <div className="char-limit-textarea">

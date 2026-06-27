@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import { LocalizationModal } from '@/components/admin/localization-modal/LocalizationModal';
 import { Select } from '@/components/common/select/Select';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -26,10 +27,15 @@ interface TranslateMainPageBlockModalProps {
     onTranslated: () => void | Promise<void>;
 }
 
-const BLOCK_VALIDATION_CONFIG: Record<
-    MainPageLocalizationBlock.Title | MainPageLocalizationBlock.AboutUs | MainPageLocalizationBlock.Partners,
-    TranslateMainPageBlockValidationConfig
-> = {
+const SUPPORTED_BLOCKS = [
+    MainPageLocalizationBlock.Title,
+    MainPageLocalizationBlock.AboutUs,
+    MainPageLocalizationBlock.Partners,
+] as const;
+
+type SupportedBlock = (typeof SUPPORTED_BLOCKS)[number];
+
+const BLOCK_VALIDATION_CONFIG: Record<SupportedBlock, TranslateMainPageBlockValidationConfig> = {
     [MainPageLocalizationBlock.Title]: {
         titleField: 'titleUa',
         descriptionField: 'descriptionUa',
@@ -50,16 +56,8 @@ const BLOCK_VALIDATION_CONFIG: Record<
     },
 };
 
-const SUPPORTED_BLOCKS = [
-    MainPageLocalizationBlock.Title,
-    MainPageLocalizationBlock.AboutUs,
-    MainPageLocalizationBlock.Partners,
-] as const;
-
-const isSupportedBlock = (
-    block: MainPageLocalizationBlock | null,
-): block is MainPageLocalizationBlock.Title | MainPageLocalizationBlock.AboutUs | MainPageLocalizationBlock.Partners =>
-    block != null && SUPPORTED_BLOCKS.includes(block as (typeof SUPPORTED_BLOCKS)[number]);
+const isSupportedBlock = (block: MainPageLocalizationBlock | null): block is SupportedBlock =>
+    block != null && SUPPORTED_BLOCKS.includes(block as SupportedBlock);
 
 const getLocalizationLanguageId = (localization: { languageId?: number; language?: { id?: number } }) =>
     localization.languageId ?? localization.language?.id;
@@ -121,16 +119,21 @@ export const TranslateMainPageBlockModal = ({
     const formRef = useRef<TranslateMainPageBlockFormRef>(null);
     const [isFormValid, setIsFormValid] = useState(false);
     const [isDirty, setIsDirty] = useState(false);
+    const [pendingLanguageCode, setPendingLanguageCode] = useState<string | null>(null);
     const [language, setLanguage] = useState<LocalizationLanguage | null>(() => {
         if (!translatedLanguages.length) return null;
         return translatedLanguages.find((lang) => lang.code !== DEFAULT_LOCALE) || translatedLanguages[0];
     });
 
     useEffect(() => {
+        if (!isOpen) {
+            setPendingLanguageCode(null);
+            return;
+        }
         if (translatedLanguages.length > 0 && !language) {
             setLanguage(translatedLanguages.find((lang) => lang.code !== DEFAULT_LOCALE) || translatedLanguages[0]);
         }
-    }, [language, translatedLanguages]);
+    }, [isOpen, language, translatedLanguages]);
 
     const existingTranslation = useMemo(() => getExistingTranslation(page, block, language), [block, language, page]);
 
@@ -152,12 +155,32 @@ export const TranslateMainPageBlockModal = ({
 
     const checkIsDirty = () => formRef.current?.isDirty() ?? false;
 
-    const handleSubmit = async (data: TranslateMainPageBlockFormValues) => {
-        try {
-            await translateMainPageBlock(data);
-        } catch {
-            // Error text is provided by useTranslateMainPageBlock and rendered in this modal.
+    const handleLanguageChange = (code: string) => {
+        if (checkIsDirty()) {
+            setPendingLanguageCode(code);
+            return;
         }
+        applyLanguageChange(code);
+    };
+
+    const applyLanguageChange = (code: string) => {
+        const newLang = translatedLanguages.find((lang) => lang.code === code);
+        if (newLang) setLanguage(newLang);
+    };
+
+    const handleConfirmLanguageSwitch = () => {
+        if (pendingLanguageCode) {
+            applyLanguageChange(pendingLanguageCode);
+        }
+        setPendingLanguageCode(null);
+    };
+
+    const handleCancelLanguageSwitch = () => {
+        setPendingLanguageCode(null);
+    };
+
+    const handleSubmit = async (data: TranslateMainPageBlockFormValues) => {
+        await translateMainPageBlock(data);
     };
 
     if (!page || !validationConfig || !isOpen) {
@@ -169,47 +192,54 @@ export const TranslateMainPageBlockModal = ({
         : COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION;
 
     return (
-        <LocalizationModal
-            isOpen={isOpen}
-            onClose={onClose}
-            title={modalTitle}
-            onSave={handleSaveClick}
-            isSubmitting={isSubmitting}
-            isFormValid={isFormValid}
-            checkIsDirty={checkIsDirty}
-            isDirty={isDirty}
-        >
-            <div className={styles['language-select']}>
-                {language && (
-                    <Select<string>
-                        className="language-select"
-                        headClassName={styles['language-select-head']}
-                        value={language.code}
-                        onValueChange={(code) => {
-                            const newLang = translatedLanguages.find((lang) => lang.code === code);
-                            if (newLang) setLanguage(newLang);
-                        }}
-                        placeholder="Англійська"
-                    >
-                        {translatedLanguages.map((lang) => (
-                            <Select.Option key={lang.id} value={lang.code} name={lang.name} />
-                        ))}
-                    </Select>
-                )}
-            </div>
+        <>
+            <LocalizationModal
+                isOpen={isOpen}
+                onClose={onClose}
+                title={modalTitle}
+                onSave={handleSaveClick}
+                isSubmitting={isSubmitting}
+                isFormValid={isFormValid}
+                checkIsDirty={checkIsDirty}
+                isDirty={isDirty}
+            >
+                <div className={styles['language-select']}>
+                    {language && (
+                        <Select<string>
+                            className="language-select"
+                            headClassName={styles['language-select-head']}
+                            value={language.code}
+                            onValueChange={handleLanguageChange}
+                            placeholder="Англійська"
+                        >
+                            {translatedLanguages.map((lang) => (
+                                <Select.Option key={lang.id} value={lang.code} name={lang.name} />
+                            ))}
+                        </Select>
+                    )}
+                </div>
 
-            {error && <div className={styles.error}>{error}</div>}
+                {error && <div className={styles.error}>{error}</div>}
 
-            <TranslateMainPageBlockForm
-                key={`${block}-${language?.id}-${mode}`}
-                ref={formRef}
-                initialData={existingTranslation}
-                validationConfig={validationConfig}
-                onSubmit={handleSubmit}
-                onValidationChange={setIsFormValid}
-                onDirtyChange={setIsDirty}
-                formDisabled={isSubmitting}
+                <TranslateMainPageBlockForm
+                    key={`${block}-${language?.id}`}
+                    ref={formRef}
+                    initialData={existingTranslation}
+                    validationConfig={validationConfig}
+                    onSubmit={handleSubmit}
+                    onValidationChange={setIsFormValid}
+                    onDirtyChange={setIsDirty}
+                    formDisabled={isSubmitting}
+                />
+            </LocalizationModal>
+
+            <ConfirmationModal
+                isOpen={!!pendingLanguageCode}
+                onClose={handleCancelLanguageSwitch}
+                title={COMMON_TEXT_ADMIN.QUESTION.CHANGE_LANGUAGE_UNSAVED_CHANGES}
+                onConfirm={handleConfirmLanguageSwitch}
+                onCancel={handleCancelLanguageSwitch}
             />
-        </LocalizationModal>
+        </>
     );
 };

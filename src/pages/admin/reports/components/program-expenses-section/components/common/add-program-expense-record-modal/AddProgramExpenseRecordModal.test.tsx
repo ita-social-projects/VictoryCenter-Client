@@ -51,11 +51,13 @@ jest.mock('@/components/admin/input-with-character-limit/InputWithCharacterLimit
         id,
         value,
         onChange,
+        onBlur,
     }: {
         id: string;
         value: string;
         onChange: (event: ChangeEvent<HTMLInputElement>) => void;
-    }) => <input data-testid={id} value={value} onChange={onChange} />,
+        onBlur?: () => void;
+    }) => <input data-testid={id} value={value} onChange={onChange} onBlur={onBlur} />,
 }));
 
 jest.mock('@/utils/functions/get-reporting-year-options/get-reporting-year-options', () => ({
@@ -67,9 +69,29 @@ const PROGRAMS = [
     { id: 1, name: 'Program A' },
 ];
 
+const RECORDS = [
+    {
+        id: 1,
+        programId: 1,
+        programName: 'Program A',
+        type: 'expense' as const,
+        reportingYear: '2025',
+        amountUah: '100',
+        amountUsd: '10',
+    },
+];
+
 const renderModal = (props: Partial<ComponentProps<typeof AddProgramExpenseRecordModal>> = {}) =>
     render(
-        <AddProgramExpenseRecordModal isOpen programs={PROGRAMS} exchangeRate="42.15" onClose={jest.fn()} {...props} />,
+        <AddProgramExpenseRecordModal
+            isOpen
+            programs={PROGRAMS}
+            records={RECORDS}
+            exchangeRate="42.15"
+            onClose={jest.fn()}
+            onSubmit={jest.fn().mockResolvedValue(true)}
+            {...(props as any)}
+        />,
     );
 
 const getSelectToggle = (displayValue: string): HTMLButtonElement => {
@@ -111,21 +133,38 @@ describe('AddProgramExpenseRecordModal', () => {
         expect(screen.queryByText(PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_PLACEHOLDER)).not.toBeInTheDocument();
     });
 
-    it('normalizes program expense amount inputs', () => {
+    it('validates program expense amount inputs on change and blur', () => {
         renderModal();
 
         const amountUahInput = screen.getByTestId('add-program-expense-amount-uah');
         const amountUsdInput = screen.getByTestId('add-program-expense-amount-usd');
 
-        fireEvent.change(amountUahInput, { target: { value: '123 456 789 0' } });
-        fireEvent.change(amountUsdInput, { target: { value: '12.345abc' } });
+        fireEvent.change(amountUahInput, { target: { value: '1234567890' } });
+        fireEvent.change(amountUsdInput, { target: { value: 'abc' } });
 
-        expect(amountUahInput).toHaveValue('123456789');
-        expect(amountUsdInput).toHaveValue('12,34');
+        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_MAX_DIGITS)).toBeInTheDocument();
+        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER)).toBeInTheDocument();
 
-        fireEvent.change(amountUsdInput, { target: { value: ',50' } });
+        fireEvent.change(amountUsdInput, { target: { value: '0' } });
 
-        expect(amountUsdInput).toHaveValue('');
+        expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_NOT_ZERO)).not.toBeInTheDocument();
+
+        fireEvent.change(amountUahInput, { target: { value: '0' } });
+        fireEvent.blur(amountUahInput);
+        fireEvent.blur(amountUsdInput);
+
+        expect(screen.getAllByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_NOT_ZERO)).toHaveLength(2);
+    });
+
+    it('normalizes UAH amount on blur', () => {
+        renderModal();
+
+        const amountUahInput = screen.getByTestId('add-program-expense-amount-uah');
+
+        fireEvent.change(amountUahInput, { target: { value: ' 100.50 ' } });
+        fireEvent.blur(amountUahInput);
+
+        expect(amountUahInput).toHaveValue('100,50');
     });
 
     it('updates selected program value', () => {
@@ -134,6 +173,48 @@ describe('AddProgramExpenseRecordModal', () => {
         selectOption(PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_PLACEHOLDER, 'Program A');
 
         expect(getSelectToggle('Program A')).toBeInTheDocument();
+    });
+
+    it('shows required errors on blur for empty selects', () => {
+        renderModal();
+
+        fireEvent.blur(getSelectToggle(FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_PLACEHOLDER));
+        fireEvent.blur(getSelectToggle(PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_PLACEHOLDER));
+
+        expect(screen.getAllByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED)).toHaveLength(2);
+    });
+
+    it('does not validate selects when focus stays inside the select field', () => {
+        renderModal();
+
+        const reportingYearToggle = getSelectToggle(FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_PLACEHOLDER);
+        const programToggle = getSelectToggle(PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_PLACEHOLDER);
+
+        fireEvent.blur(reportingYearToggle, { relatedTarget: reportingYearToggle });
+        fireEvent.blur(programToggle, { relatedTarget: programToggle });
+
+        expect(screen.queryByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED)).not.toBeInTheDocument();
+    });
+
+    it('shows duplicate program category error and keeps submit disabled', () => {
+        renderModal();
+
+        selectOption(FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_PLACEHOLDER, '2026');
+        selectOption(PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_PLACEHOLDER, 'Program A');
+        fireEvent.change(screen.getByTestId('add-program-expense-amount-uah'), { target: { value: '100' } });
+
+        expect(screen.getByText(PROGRAM_EXPENSES_TEXT.VALIDATION.PROGRAM_UNIQUE)).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.MODAL.ADD.SUBMIT_BUTTON })).toBeDisabled();
+    });
+
+    it('enables submit when all validation rules pass', () => {
+        renderModal();
+
+        selectOption(FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_PLACEHOLDER, '2026');
+        selectOption(PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_PLACEHOLDER, 'Program B');
+        fireEvent.change(screen.getByTestId('add-program-expense-amount-uah'), { target: { value: '100' } });
+
+        expect(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.MODAL.ADD.SUBMIT_BUTTON })).toBeEnabled();
     });
 
     it('closes immediately when the form is clean', () => {
@@ -170,7 +251,14 @@ describe('AddProgramExpenseRecordModal', () => {
 
     it('resets form state and close confirmation when modal closes', () => {
         const { rerender } = render(
-            <AddProgramExpenseRecordModal isOpen programs={PROGRAMS} exchangeRate={null} onClose={jest.fn()} />,
+            <AddProgramExpenseRecordModal
+                isOpen
+                programs={PROGRAMS}
+                records={RECORDS}
+                exchangeRate={null}
+                onClose={jest.fn()}
+                onSubmit={jest.fn().mockResolvedValue(true)}
+            />,
         );
 
         const amountUahInput = screen.getByTestId('add-program-expense-amount-uah');
@@ -181,12 +269,41 @@ describe('AddProgramExpenseRecordModal', () => {
         expect(screen.getByTestId('close-confirmation')).toBeInTheDocument();
 
         rerender(
-            <AddProgramExpenseRecordModal isOpen={false} programs={PROGRAMS} exchangeRate={null} onClose={jest.fn()} />,
+            <AddProgramExpenseRecordModal
+                isOpen={false}
+                programs={PROGRAMS}
+                records={RECORDS}
+                exchangeRate={null}
+                onClose={jest.fn()}
+                onSubmit={jest.fn().mockResolvedValue(true)}
+            />,
         );
-        rerender(<AddProgramExpenseRecordModal isOpen programs={PROGRAMS} exchangeRate={null} onClose={jest.fn()} />);
+        rerender(
+            <AddProgramExpenseRecordModal
+                isOpen
+                programs={PROGRAMS}
+                records={RECORDS}
+                exchangeRate={null}
+                onClose={jest.fn()}
+                onSubmit={jest.fn().mockResolvedValue(true)}
+            />,
+        );
 
         expect(screen.getByTestId('add-program-expense-amount-uah')).toHaveValue('');
         expect(screen.queryByTestId('close-confirmation')).not.toBeInTheDocument();
         expect(screen.getByLabelText(FUNDS_EXPENDITURES_TEXT.EXCHANGE_RATE_LABEL)).toHaveValue('');
+    });
+
+    it('auto-fills USD when UAH is entered and shows mismatch message on manual USD change', () => {
+        renderModal({ exchangeRate: '40' });
+
+        fireEvent.change(screen.getByTestId('add-program-expense-amount-uah'), { target: { value: '100' } });
+
+        expect(screen.getByTestId('add-program-expense-amount-usd')).not.toHaveValue('');
+
+        fireEvent.change(screen.getByTestId('add-program-expense-amount-usd'), { target: { value: '999' } });
+        fireEvent.blur(screen.getByTestId('add-program-expense-amount-usd'));
+
+        expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).toBeInTheDocument();
     });
 });

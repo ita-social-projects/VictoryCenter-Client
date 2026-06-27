@@ -174,39 +174,27 @@ describe('useTranslateMainPageBlock', () => {
         );
     });
 
-    it('sets error and rethrows when loading current localization fails with non-404', async () => {
+    it('sets error when loading current localization fails with non-404', async () => {
         (MainPageLocalizationsApi.getByLanguageId as jest.Mock).mockRejectedValue(new Error('failed'));
         const { result } = renderTranslateHook();
-        let caughtError: unknown;
 
         await act(async () => {
-            try {
-                await result.current.translateMainPageBlock({ title: 'Title', description: 'Description' });
-            } catch (error) {
-                caughtError = error;
-            }
+            await result.current.translateMainPageBlock({ title: 'Title', description: 'Description' });
         });
 
-        expect(caughtError).toEqual(new Error('failed'));
         await waitFor(() => expect(result.current.error).toBe('Помилка збереження перекладу'));
     });
 
-    it('sets error and rethrows when save fails', async () => {
+    it('sets error when save fails', async () => {
         jest.spyOn(axios, 'isAxiosError').mockReturnValue(true);
         (MainPageLocalizationsApi.getByLanguageId as jest.Mock).mockRejectedValue({ response: { status: 404 } });
         (MainPageLocalizationsApi.create as jest.Mock).mockRejectedValue(new Error('save failed'));
         const { result } = renderTranslateHook();
-        let caughtError: unknown;
 
         await act(async () => {
-            try {
-                await result.current.translateMainPageBlock({ title: 'Title', description: 'Description' });
-            } catch (error) {
-                caughtError = error;
-            }
+            await result.current.translateMainPageBlock({ title: 'Title', description: 'Description' });
         });
 
-        expect(caughtError).toEqual(new Error('save failed'));
         await waitFor(() => expect(result.current.error).toBe('Помилка збереження перекладу'));
     });
 });

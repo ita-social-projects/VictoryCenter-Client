@@ -5,6 +5,7 @@ import {
     FundsExpendituresTransactionType,
     ReportFundsExpendituresCategory,
     ReportFundsExpendituresCategoryDto,
+    ReportFundsExpendituresCategoryLocalization,
     ReportFundsExpendituresRecord,
     ReportFundsExpendituresRecordDto,
     ReportFundsExpendituresSettings,
@@ -22,6 +23,7 @@ import {
     UpdateReportFundsExpendituresSettingsDto,
 } from '@/types/admin/reports';
 
+import { mapLocalizationDtoToModel } from '@/utils/functions/mappers/common/localization/localization-mappers';
 import { formatNumberDecimalComma } from '@/utils/functions/formatters/format-number';
 
 export const mapReportsMediaSettingsDtoToMediaSettings = (dto: ReportsMediaSettingsDto): ReportsMediaSettings => ({
@@ -70,13 +72,18 @@ export const mapReportFundsExpendituresSettingsDtoToSettings = (
     id: dto.id,
     disclaimerTitle: dto.disclaimerTitle,
     exchangeRate: formatNumberDecimalComma(dto.exchangeRate),
+    programExpendituresReportingYear: dto.programExpendituresReportingYear,
 });
 
 export const mapReportFundsExpendituresSettingsToUpdateDto = (
-    settings: Pick<ReportFundsExpendituresSettings, 'disclaimerTitle' | 'exchangeRate'>,
+    settings: Pick<
+        ReportFundsExpendituresSettings,
+        'disclaimerTitle' | 'exchangeRate' | 'programExpendituresReportingYear'
+    >,
 ): UpdateReportFundsExpendituresSettingsDto => ({
     disclaimerTitle: settings.disclaimerTitle ?? '',
     exchangeRate: Number.parseFloat((settings.exchangeRate ?? '0').replace(',', '.')) || 0,
+    programExpendituresReportingYear: settings.programExpendituresReportingYear ?? new Date().getFullYear(),
 });
 
 export const mapReportFundsExpendituresCategoryDtoToCategory = (
@@ -85,6 +92,9 @@ export const mapReportFundsExpendituresCategoryDtoToCategory = (
     id: dto.id,
     name: dto.name,
     type: mapFundsExpendituresTypeDtoToTransactionType(dto.type),
+    localizations: dto.localizations.map((loc) =>
+        mapLocalizationDtoToModel<typeof loc, ReportFundsExpendituresCategoryLocalization>(loc),
+    ),
 });
 
 export const mapReportFundsExpendituresCategoryToCreateDto = (

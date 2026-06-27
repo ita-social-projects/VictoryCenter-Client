@@ -126,7 +126,6 @@
     :global(.char-limit-input) {
         width: 100%;
         height: 50px;
-        border: 1px solid c.$grey-700;
         border-radius: 8px;
         padding: 10px 17px 10px 10px;
         background: c.$white;
@@ -137,7 +136,20 @@
 .label {
     @include type.body-2-regular;
 
+    display: inline-flex;
+    gap: 2px;
     color: c.$grey-900;
+}
+
+.required {
+    color: c.$error;
+}
+
+.error {
+    @include type.small-text-regular;
+
+    margin: 0;
+    color: c.$error;
 }
 
 .input {
@@ -303,4 +315,26 @@
     .cancel {
         width: 100%;
     }
+}
+
+.info {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.info-icon {
+    width: 18px;
+    height: 18px;
+
+    path {
+        stroke: c.$blue-500;
+    }
+}
+
+.info-text {
+    @include type.small-text-medium;
+    margin: 0;
+    color: c.$blue-500;
+    white-space: nowrap;
 }

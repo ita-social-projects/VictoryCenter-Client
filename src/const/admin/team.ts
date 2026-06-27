@@ -11,7 +11,7 @@ export const TEAM_MEMBERS_TEXT = {
     MESSAGE: {
         FAIL_TO_FETCH_MEMBERS: 'Виникла помилка, не вдалось завантажити учасників команди',
         FAIL_TO_REORDER_MEMBERS: 'Виникла помилка, не вдалось змінити пріоритет учасників команди',
-        DONT_FORGET_TO_ORDER: 'Не забудь встановити порядок відображення',
+        DONT_FORGET_TO_ORDER: 'Не забудьте налаштувати порядок відображення члена команди на сайті',
     },
 
     QUESTION: {
@@ -73,7 +73,6 @@ export const TEAM_MEMBER_VALIDATION = {
         getRequiredWhenPublishingError: () => "Опис обов'язковий при публікації",
         getMinError: () => `Не менше ${TEAM_MEMBER_VALIDATION.description.min} символів`,
         getMaxError: () => `Не більше ${TEAM_MEMBER_VALIDATION.description.max} символів`,
-        getMultipleSpacesError: () => `Не можна використовувати більше одного пробіла`,
     },
     category: {
         getRequiredError: () => "Поле обов'язкове",

@@ -68,7 +68,7 @@ export const TranslateMainPageBlockForm = forwardRef<TranslateMainPageBlockFormR
             validateForm: (values) => validateFormWithConfig(values, validationConfig),
             onValidationChange,
             ref,
-            onSubmit: (data) => onSubmit(data),
+            onSubmit,
         });
 
         useEffect(() => {

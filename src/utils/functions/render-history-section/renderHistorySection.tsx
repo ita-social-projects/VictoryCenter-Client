@@ -52,6 +52,7 @@ const createItem = (
     title: type === ContentType.Title ? '' : null,
     description: type === ContentType.Description ? '' : null,
     image: null,
+    localizations: [],
     ...overrides,
 });
 

@@ -4,11 +4,12 @@
 .donateSection {
     background-color: white;
     max-width: 27rem;
-    height: 21.125rem;
+    height: auto;
     display: flex;
     flex-direction: column;
     align-content: center;
     box-shadow: 0 1rem 1.5rem -1rem rgba(colors.$donate-box-shadow, 0.75);
+    padding-bottom: 1.5rem;
 
     .donateTabsContainer {
         display: flex;
@@ -24,7 +25,8 @@
             font-size: 1.125rem;
             font-weight: 600;
             color: colors.$grey-700;
-            min-width: 12rem;
+            flex: 1;
+            min-width: 0;
             min-height: 2.68rem;
             border: none;
             cursor: pointer;
@@ -50,10 +52,13 @@
         flex-direction: row;
         align-items: flex-end;
         border-bottom: 0.125rem solid colors.$grey-900;
+        overflow: hidden;
 
         .donateAmountInput {
             padding-left: 1rem;
             border: none;
+            flex: 1;
+            min-width: 0;
             max-width: 16rem;
             min-height: 5rem;
             font-size: 4rem;
@@ -75,6 +80,7 @@
             color: colors.$grey-700;
             cursor: pointer;
             margin-bottom: 0.75rem;
+            flex-shrink: 0;
         }
 
         .currencySelector select {
@@ -124,11 +130,14 @@
         justify-content: center;
         gap: 0.5rem;
         margin-top: 1.5rem;
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
 
         .donateFastOptionButton {
             background-color: white;
             border-radius: 2.69rem;
-            width: 7.67rem;
+            flex: 1;
+            min-width: 0;
             height: 3.19rem;
             font-family: fonts.$mulish-regular-font;
             font-size: 1.125rem;
@@ -201,4 +210,10 @@
 .tooltip-container:hover .tooltip-text {
     visibility: visible;
     opacity: 1;
+}
+
+@media (max-width: 900px) {
+    .donateSection {
+        width: 100%;
+    }
 }

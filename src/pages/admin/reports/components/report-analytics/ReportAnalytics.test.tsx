@@ -1,6 +1,22 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { localizationLanguagesDataFetch } from '@/services/api/public/localization/languages/languages-api';
+import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { ReportAnalytics } from './ReportAnalytics';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FUNDS_EXPENDITURES_TEXT, REPORTS_TEXT } from '@/const/admin/reports';
+
+jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider', () => ({
+    useToast: jest.fn(),
+}));
+
+const mockAddToast = jest.fn();
+const mockedUseToast = useToast as jest.MockedFunction<typeof useToast>;
+
+jest.mock('@/services/api/public/localization/languages/languages-api', () => ({
+    localizationLanguagesDataFetch: jest.fn(),
+}));
+
+const mockLocalizationLanguagesDataFetch = localizationLanguagesDataFetch as jest.Mock;
 
 jest.mock('../pdf-files-section/PdfFilesSection', () => ({
     PdfFilesSection: () => <div data-testid="pdf-files-section">PdfFilesSection</div>,
@@ -14,6 +30,11 @@ jest.mock('../funds-expenditures-section/FundsExpendituresSection', () => ({
         onExchangeRateValueChange,
         isAddCategoryModalOpen,
         onAddCategoryModalClose,
+        isEditCategoryModalOpen,
+        onEditCategoryModalClose,
+        isDeleteCategoryModalOpen,
+        onDeleteCategoryModalClose,
+        onCategoriesLoaded,
     }: {
         initialIsEditing?: boolean;
         draftExchangeRate?: string | null;
@@ -21,12 +42,19 @@ jest.mock('../funds-expenditures-section/FundsExpendituresSection', () => ({
         onExchangeRateValueChange?: (exchangeRate: string | null) => void;
         isAddCategoryModalOpen?: boolean;
         onAddCategoryModalClose?: () => void;
+        isEditCategoryModalOpen?: boolean;
+        onEditCategoryModalClose?: () => void;
+        isDeleteCategoryModalOpen?: boolean;
+        onDeleteCategoryModalClose?: () => void;
+        onCategoriesLoaded?: (cats: any[]) => void;
     }) => (
         <div
             data-testid="funds-expenditure-section"
             data-initial-editing={String(initialIsEditing)}
             data-draft-exchange-rate={draftExchangeRate ?? ''}
             data-category-modal-open={String(isAddCategoryModalOpen ?? false)}
+            data-edit-category-modal-open={String(isEditCategoryModalOpen ?? false)}
+            data-delete-category-modal-open={String(isDeleteCategoryModalOpen ?? false)}
         >
             FundsExpenditureSection
             <button
@@ -52,9 +80,57 @@ jest.mock('../funds-expenditures-section/FundsExpendituresSection', () => ({
             <button type="button" data-testid="close-category-modal" onClick={() => onAddCategoryModalClose?.()}>
                 Close category modal
             </button>
+            <button type="button" data-testid="close-edit-category-modal" onClick={() => onEditCategoryModalClose?.()}>
+                Close edit modal
+            </button>
+            <button
+                type="button"
+                data-testid="close-delete-category-modal"
+                onClick={() => onDeleteCategoryModalClose?.()}
+            >
+                Close delete modal
+            </button>
+            <button
+                type="button"
+                data-testid="trigger-categories-loaded"
+                onClick={() => onCategoriesLoaded?.([{ id: 1, name: 'Cat', type: 'income', localizations: [] }])}
+            >
+                Load categories
+            </button>
         </div>
     ),
 }));
+
+jest.mock(
+    '../funds-expenditures-section/components/common/translate-reports-category-modal/TranslateReportsCategoryModal',
+    () => ({
+        TranslateReportsCategoryModal: ({
+            isOpen,
+            onClose,
+            onTranslateCategory,
+            categories,
+        }: {
+            isOpen?: boolean;
+            onClose?: () => void;
+            onTranslateCategory?: (cat: any) => void;
+            categories?: any[];
+        }) => (
+            <div data-testid="translate-category-modal" data-open={String(isOpen ?? false)}>
+                <button type="button" data-testid="translate-modal-close" onClick={() => onClose?.()}>
+                    Close
+                </button>
+                <button
+                    type="button"
+                    data-testid="translate-modal-submit"
+                    onClick={() => onTranslateCategory?.({ id: 1, name: 'Updated', type: 'income', localizations: [] })}
+                >
+                    Submit
+                </button>
+                <span data-testid="translate-modal-categories-count">{categories?.length ?? 0}</span>
+            </div>
+        ),
+    }),
+);
 
 jest.mock('../program-expenses-section/ProgramExpensesSection', () => ({
     ProgramExpensesSection: ({ isEditing = false }: { isEditing?: boolean }) => (
@@ -65,10 +141,28 @@ jest.mock('../program-expenses-section/ProgramExpensesSection', () => ({
 }));
 
 describe('ReportAnalytics', () => {
+    beforeEach(() => {
+        mockLocalizationLanguagesDataFetch.mockResolvedValue([]);
+        mockedUseToast.mockReturnValue({ addToast: mockAddToast } as any);
+    });
+
     it('should render the component with correct title', () => {
         render(<ReportAnalytics />);
 
         expect(screen.getByText(REPORTS_TEXT.REPORT_AND_ANALYTICS.TITLE)).toBeInTheDocument();
+    });
+
+    it('should show error toast when language fetch fails', async () => {
+        mockLocalizationLanguagesDataFetch.mockRejectedValue(new Error('Network error'));
+
+        render(<ReportAnalytics />);
+
+        await waitFor(() => {
+            expect(mockAddToast).toHaveBeenCalledWith(
+                COMMON_TEXT_ADMIN.LOCALIZATION.LANGUAGES.MESSAGE.FAILED_TO_FETCH_LANGUAGES,
+                'error',
+            );
+        });
     });
 
     it('should show first tab as active by default', () => {
@@ -173,6 +267,99 @@ describe('ReportAnalytics', () => {
                 'data-category-modal-open',
                 'false',
             );
+        });
+    });
+
+    describe('edit category modal', () => {
+        it('should open edit category modal when "Редагувати категорію" option is selected', () => {
+            render(<ReportAnalytics />);
+
+            fireEvent.click(screen.getByTestId('context-menu'));
+            fireEvent.click(screen.getByRole('menuitem', { name: FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT_CATEGORY }));
+
+            expect(screen.getByTestId('funds-expenditure-section')).toHaveAttribute(
+                'data-edit-category-modal-open',
+                'true',
+            );
+        });
+
+        it('should close edit category modal when onEditCategoryModalClose is called', () => {
+            render(<ReportAnalytics />);
+
+            fireEvent.click(screen.getByTestId('context-menu'));
+            fireEvent.click(screen.getByRole('menuitem', { name: FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT_CATEGORY }));
+            fireEvent.click(screen.getByTestId('close-edit-category-modal'));
+
+            expect(screen.getByTestId('funds-expenditure-section')).toHaveAttribute(
+                'data-edit-category-modal-open',
+                'false',
+            );
+        });
+    });
+
+    describe('delete category modal', () => {
+        it('should open delete category modal when "Видалити категорію" option is selected', () => {
+            render(<ReportAnalytics />);
+
+            fireEvent.click(screen.getByTestId('context-menu'));
+            fireEvent.click(screen.getByRole('menuitem', { name: FUNDS_EXPENDITURES_TEXT.BUTTON.DELETE_CATEGORY }));
+
+            expect(screen.getByTestId('funds-expenditure-section')).toHaveAttribute(
+                'data-delete-category-modal-open',
+                'true',
+            );
+        });
+
+        it('should close delete category modal when onDeleteCategoryModalClose is called', () => {
+            render(<ReportAnalytics />);
+
+            fireEvent.click(screen.getByTestId('context-menu'));
+            fireEvent.click(screen.getByRole('menuitem', { name: FUNDS_EXPENDITURES_TEXT.BUTTON.DELETE_CATEGORY }));
+            fireEvent.click(screen.getByTestId('close-delete-category-modal'));
+
+            expect(screen.getByTestId('funds-expenditure-section')).toHaveAttribute(
+                'data-delete-category-modal-open',
+                'false',
+            );
+        });
+    });
+
+    describe('translate category modal', () => {
+        it('should open translate category modal when "Перекласти категорію" option is selected', () => {
+            render(<ReportAnalytics />);
+
+            fireEvent.click(screen.getByTestId('context-menu'));
+            fireEvent.click(screen.getByRole('menuitem', { name: FUNDS_EXPENDITURES_TEXT.BUTTON.TRANSLATE_CATEGORY }));
+
+            expect(screen.getByTestId('translate-category-modal')).toHaveAttribute('data-open', 'true');
+        });
+
+        it('should close translate category modal when onClose is called', () => {
+            render(<ReportAnalytics />);
+
+            fireEvent.click(screen.getByTestId('context-menu'));
+            fireEvent.click(screen.getByRole('menuitem', { name: FUNDS_EXPENDITURES_TEXT.BUTTON.TRANSLATE_CATEGORY }));
+            fireEvent.click(screen.getByTestId('translate-modal-close'));
+
+            expect(screen.getByTestId('translate-category-modal')).toHaveAttribute('data-open', 'false');
+        });
+
+        it('should pass categories loaded from FundsExpenditureSection to TranslateReportsCategoryModal', () => {
+            render(<ReportAnalytics />);
+
+            fireEvent.click(screen.getByTestId('trigger-categories-loaded'));
+
+            expect(screen.getByTestId('translate-modal-categories-count')).toHaveTextContent('1');
+        });
+
+        it('should update categories and show toast when handleTranslateCategory is called', () => {
+            render(<ReportAnalytics />);
+
+            fireEvent.click(screen.getByTestId('trigger-categories-loaded'));
+            fireEvent.click(screen.getByTestId('translate-modal-submit'));
+
+            expect(screen.getByTestId('translate-modal-categories-count')).toHaveTextContent('1');
+            expect(mockAddToast).toHaveBeenCalled();
         });
     });
 });

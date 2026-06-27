@@ -10,6 +10,7 @@ import {
 } from '@/utils/functions/section-cancel-flow/section-cancel-flow';
 import { HistorySectionForm, SectionCancelOptions } from '../history-section-form/HistorySectionForm';
 import styles from './HistoryForm.module.scss';
+import { LocalizationLanguage } from '@/types/common/language';
 
 interface SectionEditingState {
     sectionKey: string;
@@ -36,6 +37,7 @@ export interface HistoryFormProps {
     onSectionDeleted?: (remainingSections: HistorySectionDto[]) => void;
     onRequestCancelSection?: (request: { type: SectionCancelActionType; onDiscard: () => void }) => void;
     onRequestSaveSection?: (request: { onConfirm: () => void }) => void;
+    language?: LocalizationLanguage;
 }
 
 const createSectionState = (sectionKey: string): SectionEditingState => ({
@@ -69,6 +71,7 @@ export const HistoryForm = forwardRef<HistoryFormRef, HistoryFormProps>(function
         onSectionDeleted,
         onRequestCancelSection,
         onRequestSaveSection,
+        language,
     },
     ref,
 ) {
@@ -400,6 +403,7 @@ export const HistoryForm = forwardRef<HistoryFormRef, HistoryFormProps>(function
                             onMoveUpSection={() => handleMoveUpSection(sectionKey)}
                             onMoveDownSection={() => handleMoveDownSection(sectionKey)}
                             onRequestSaveSection={onRequestSaveSection}
+                            language={language}
                         />
                         <div className={styles['sections-divider']} />
                     </React.Fragment>

@@ -20,7 +20,7 @@ interface TranslateDisclaimerModalProps {
     onClose: () => void;
     settings: ReportFundsExpendituresSettings | null;
     translationLanguages: LocalizationLanguage[];
-    existingLocalization: ReportFundsExpendituresSettingsLocalization | null;
+    existingLocalizations: ReportFundsExpendituresSettingsLocalization[];
     onTranslateSuccess: (localization: ReportFundsExpendituresSettingsLocalization) => void;
 }
 
@@ -29,7 +29,7 @@ export const TranslateDisclaimerModal = ({
     onClose,
     settings,
     translationLanguages,
-    existingLocalization,
+    existingLocalizations,
     onTranslateSuccess,
 }: TranslateDisclaimerModalProps) => {
     const formRef = useRef<TranslateDisclaimerFormRef>(null);
@@ -43,6 +43,11 @@ export const TranslateDisclaimerModal = ({
             (prev) => prev ?? translationLanguages.find((l) => l.code !== DEFAULT_LOCALE) ?? translationLanguages[0],
         );
     }, [translationLanguages]);
+
+    const existingLocalization = useMemo(
+        () => existingLocalizations.find((l) => l.language.id === selectedLanguage?.id) ?? null,
+        [existingLocalizations, selectedLanguage],
+    );
 
     const mode = existingLocalization ? ModalMode.Edit : ModalMode.Add;
 

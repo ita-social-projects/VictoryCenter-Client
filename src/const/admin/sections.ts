@@ -54,7 +54,7 @@ export const SECTIONS_TEXT = {
                 },
                 DESCRIPTION: {
                     TEXT: 'Опис',
-                    PLACEHOLDER: 'Введіть текст',
+                    PLACEHOLDER: 'Введіть опис',
                 },
                 AUTHOR: {
                     TEXT: "Ім'я",

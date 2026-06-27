@@ -4,8 +4,8 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { ImageUploadForm } from './ImageUploadForm';
 
 jest.mock('@/components/admin/image-input/ImageInput', () => ({
-    ImageInput: ({ onChange, setError, value }: any) => (
-        <div data-testid="image-input-mock">
+    ImageInput: ({ onChange, setError, value, disabled }: any) => (
+        <div data-testid="image-input-mock" data-disabled={disabled ? 'true' : 'false'}>
             <button data-testid="trigger-image-error" type="button" onClick={() => setError('Image size error')}>
                 Set Error
             </button>
@@ -150,5 +150,28 @@ describe('ImageUploadForm', () => {
         await waitFor(() => {
             expect(formMethods!.getValues('customImage')).toEqual({ id: 1, url: 'test.jpg' });
         });
+    });
+
+    it('passes disabled state to ImageInput', () => {
+        const DisabledWrapper = () => {
+            const methods = useForm<FormValues>({ defaultValues: { image: null } });
+
+            return (
+                <FormProvider {...methods}>
+                    <ImageUploadForm<FormValues>
+                        control={methods.control}
+                        errors={{}}
+                        imageError={null}
+                        setImageError={jest.fn()}
+                        imageConfig={IMAGE_CONFIG}
+                        disabled
+                    />
+                </FormProvider>
+            );
+        };
+
+        render(<DisabledWrapper />);
+
+        expect(screen.getByTestId('image-input-mock')).toHaveAttribute('data-disabled', 'true');
     });
 });

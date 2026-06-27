@@ -1,19 +1,21 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
-import { Button } from '@/components/admin/button/Button';
-import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { MultiSelectInput } from '@/components/admin/multi-select-input/MultiSelectInput';
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { MAIN_PAGE_TEXT, MAIN_PAGE_VALIDATION } from '@/const/admin/main-page';
+import { MAIN_PAGE_TEXT } from '@/const/admin/main-page';
 import { Metric, MetricPrefix } from '@/types/admin/main-page';
-import { formatNumberInput, formatWithSpaces } from '@/utils/functions/formatters/format-number';
+import {
+    formatCurrencyInput,
+    formatWithSpaces,
+    parseFormattedNumber,
+} from '@/utils/functions/formatters/format-number';
 import {
     MetricFormValues,
     metricEditSchema,
 } from '@/validation/admin/main-page-schema/metric-edit-schema/metric-edit-schema';
+import { MetricEditActions } from '../common/metric-edit-actions/MetricEditActions';
+import { MetricNameFields } from '../common/metric-name-fields/MetricNameFields';
 
 import styles from './StatisticsMetricEditPanel.module.scss';
 
@@ -30,22 +32,37 @@ const PREFIX_OPTIONS = [
 ];
 
 export const StatisticsMetricEditPanel = ({ metric, onSave, onCancel }: StatisticsMetricEditPanelProps) => {
-    const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+    const defaultNameUa = metric.name || '';
+    const defaultNameEn = metric.localizations?.find((l) => l.languageId === 2)?.name || '';
+    const defaultValueStr = formatWithSpaces(metric.value ?? 0);
+    const defaultPrefix = metric.prefix ?? MetricPrefix.None;
 
     const {
         control,
         handleSubmit,
-        formState: { errors, isDirty, isValid },
+        watch,
+        formState: { errors, isValid },
     } = useForm<MetricFormValues>({
         mode: 'onBlur',
         resolver: yupResolver(metricEditSchema),
         defaultValues: {
-            nameUa: metric.name || '',
-            nameEn: metric.localizations?.find((l) => l.languageId === 2)?.name || '',
-            value: formatWithSpaces(metric.value ?? 0),
-            prefix: metric.prefix ?? MetricPrefix.None,
+            nameUa: defaultNameUa,
+            nameEn: defaultNameEn,
+            value: defaultValueStr,
+            prefix: defaultPrefix,
         },
     });
+
+    const currentNameUa = watch('nameUa');
+    const currentNameEn = watch('nameEn');
+    const currentValue = watch('value');
+    const currentPrefix = watch('prefix');
+
+    const isFormDirty =
+        currentNameUa.trim() !== defaultNameUa.trim() ||
+        currentNameEn.trim() !== defaultNameEn.trim() ||
+        currentValue !== defaultValueStr ||
+        currentPrefix !== defaultPrefix;
 
     const onValidSubmit = (data: MetricFormValues) => {
         const updatedLocalizations =
@@ -58,7 +75,7 @@ export const StatisticsMetricEditPanel = ({ metric, onSave, onCancel }: Statisti
         const updatedMetric: Metric = {
             ...metric,
             name: data.nameUa.trim(),
-            value: parseInt(data.value.replace(/\s/g, ''), 10),
+            value: parseFormattedNumber(data.value) ?? 0,
             prefix: data.prefix,
             localizations: updatedLocalizations,
         };
@@ -71,41 +88,7 @@ export const StatisticsMetricEditPanel = ({ metric, onSave, onCancel }: Statisti
             <div className={styles.header}>{MAIN_PAGE_TEXT.BLOCKS.EDIT_PANEL.TITLE}</div>
 
             <div className={styles.formGrid}>
-                <Controller
-                    name="nameUa"
-                    control={control}
-                    render={({ field: { onChange, onBlur, value, name } }) => (
-                        <InputWithCharacterLimitGroup
-                            id={`metric-ua-${metric.id}`}
-                            name={name}
-                            label={MAIN_PAGE_TEXT.BLOCKS.EDIT_PANEL.UKR_NAME_LABEL}
-                            value={value}
-                            onChange={onChange}
-                            onBlur={onBlur}
-                            error={errors.nameUa?.message}
-                            maxLength={MAIN_PAGE_VALIDATION.editPanel.name.max}
-                            isRequired
-                        />
-                    )}
-                />
-
-                <Controller
-                    name="nameEn"
-                    control={control}
-                    render={({ field: { onChange, onBlur, value, name } }) => (
-                        <InputWithCharacterLimitGroup
-                            id={`metric-en-${metric.id}`}
-                            name={name}
-                            label={MAIN_PAGE_TEXT.BLOCKS.EDIT_PANEL.ENG_NAME_LABEL}
-                            value={value}
-                            onChange={onChange}
-                            onBlur={onBlur}
-                            error={errors.nameEn?.message}
-                            maxLength={MAIN_PAGE_VALIDATION.editPanel.name.max}
-                            isRequired
-                        />
-                    )}
-                />
+                <MetricNameFields metricId={metric.id} control={control} errors={errors} />
 
                 <Controller
                     name="value"
@@ -116,7 +99,7 @@ export const StatisticsMetricEditPanel = ({ metric, onSave, onCancel }: Statisti
                             name={name}
                             label={MAIN_PAGE_TEXT.BLOCKS.EDIT_PANEL.VALUE_LABEL}
                             value={value}
-                            onChange={(e) => onChange(formatNumberInput(e.target.value))}
+                            onChange={(e) => onChange(formatCurrencyInput(e.target.value))}
                             onBlur={onBlur}
                             error={errors.value?.message}
                             maxLength={15}
@@ -147,26 +130,11 @@ export const StatisticsMetricEditPanel = ({ metric, onSave, onCancel }: Statisti
                 </div>
             </div>
 
-            <div className={styles.actions}>
-                <Button buttonStyle="secondary" onClick={() => (isDirty ? setIsCancelModalOpen(true) : onCancel())}>
-                    {MAIN_PAGE_TEXT.BUTTONS.CANCEL}
-                </Button>
-                <Button buttonStyle="primary" onClick={handleSubmit(onValidSubmit)} disabled={!isDirty || !isValid}>
-                    {MAIN_PAGE_TEXT.BUTTONS.SAVE}
-                </Button>
-            </div>
-
-            <ConfirmationModal
-                isOpen={isCancelModalOpen}
-                onClose={() => setIsCancelModalOpen(false)}
-                title={MAIN_PAGE_TEXT.BLOCKS.EDIT_PANEL.CANCEL_MODAL_TITLE}
-                onConfirm={() => {
-                    setIsCancelModalOpen(false);
-                    onCancel();
-                }}
-                onCancel={() => setIsCancelModalOpen(false)}
-                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
-                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
+            <MetricEditActions
+                isFormDirty={isFormDirty}
+                isValid={isValid}
+                onCancel={onCancel}
+                onSave={handleSubmit(onValidSubmit)}
             />
         </div>
     );

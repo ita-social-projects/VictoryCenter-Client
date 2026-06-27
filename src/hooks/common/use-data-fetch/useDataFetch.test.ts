@@ -81,7 +81,7 @@ describe('useDataFetch', () => {
         expect(result.current.error).toBeNull();
     });
 
-    it('should handle fetch error', async () => {
+    it('should handle fetch error and rethrow', async () => {
         const fetchHandler = createFailFetch();
         const initialData: TestEntity[] = [];
 
@@ -93,13 +93,12 @@ describe('useDataFetch', () => {
             }),
         );
 
-        act(() => {
-            result.current.refetch();
+        await act(async () => {
+            await expect(result.current.refetch(true)).rejects.toThrow('Failed');
         });
 
-        await waitFor(() => expect(result.current.isLoading).toBe(false));
-
         expect(result.current.error).toEqual(new Error('Failed'));
+        expect(result.current.isLoading).toBe(false);
     });
 
     it('should ignore CanceledError', async () => {

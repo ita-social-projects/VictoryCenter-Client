@@ -1,0 +1,66 @@
+@use '@/assets/sass/mixins/typography.mixins' as type;
+@use '@/assets/sass/variables/colors' as colors;
+
+.container {
+    padding-bottom: 64px;
+    margin-right: 56px;
+    margin-left: 56px;
+}
+
+.title {
+    @include type.h2-bold;
+    color: colors.$blue-900;
+    text-align: center;
+    margin-bottom: 32px;
+}
+.articleTitle {
+    @include type.subtitle-2-semibold;
+    color: colors.$blue-900;
+    margin-bottom: 8px;
+}
+.articleLink {
+    @include type.body-2-medium;
+    color: colors.$blue-900;
+    display: flex;
+    border-bottom: 1px solid colors.$blue-900;
+    width: fit-content;
+    cursor: pointer;
+
+    span {
+        margin-right: 8px;
+        margin-bottom: 8px;
+    }
+}
+.articles {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    margin: 0 auto;
+    max-width: 100%;
+
+    .article:nth-child(n + 2) {
+        display: none;
+    }
+
+    @media (min-width: 1400px) {
+        grid-template-columns: repeat(2, 1fr);
+        max-width: 1440px;
+
+        .article:nth-child(n + 2) {
+            display: flex;
+        }
+    }
+}
+
+.article {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.articleImage {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+}

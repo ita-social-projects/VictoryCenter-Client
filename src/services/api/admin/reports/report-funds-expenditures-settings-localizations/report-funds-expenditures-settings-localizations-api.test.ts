@@ -14,9 +14,48 @@ const mockLocalizationDto: ReportFundsExpendituresSettingsLocalizationDto = {
     translationStatus: TranslationStatus.Relevant,
 };
 
+const { getByEntityId: fetchByEntityId, create, update } = ReportFundsExpendituresSettingsLocalizationsApi;
+
 describe('ReportFundsExpendituresSettingsLocalizationsApi', () => {
     afterEach(() => {
         jest.clearAllMocks();
+    });
+
+    describe('fetchByEntityId', () => {
+        it('should call client.get with correct url and return response data', async () => {
+            const mockClient = { get: jest.fn().mockResolvedValueOnce({ data: [mockLocalizationDto] }) };
+
+            const result = await fetchByEntityId(mockClient as any, 1);
+
+            expect(mockClient.get).toHaveBeenCalledTimes(1);
+            expect(mockClient.get).toHaveBeenCalledWith(
+                `${API_ROUTES.REPORT_FUNDS_EXPENDITURES_SETTINGS_LOCALIZATIONS.BASE}/1`,
+                { signal: undefined },
+            );
+            expect(result).toEqual([mockLocalizationDto]);
+        });
+
+        it('should forward the cancellation signal when provided', async () => {
+            const controller = new AbortController();
+            const mockClient = { get: jest.fn().mockResolvedValueOnce({ data: [] }) };
+
+            await fetchByEntityId(mockClient as any, 2, {
+                cancellationSignal: controller.signal,
+            });
+
+            expect(mockClient.get).toHaveBeenCalledWith(
+                `${API_ROUTES.REPORT_FUNDS_EXPENDITURES_SETTINGS_LOCALIZATIONS.BASE}/2`,
+                { signal: controller.signal },
+            );
+        });
+
+        it('should return an empty array when the server returns no localizations', async () => {
+            const mockClient = { get: jest.fn().mockResolvedValueOnce({ data: [] }) };
+
+            const result = await fetchByEntityId(mockClient as any, 1);
+
+            expect(result).toEqual([]);
+        });
     });
 
     describe('create', () => {
@@ -29,7 +68,7 @@ describe('ReportFundsExpendituresSettingsLocalizationsApi', () => {
                 disclaimerTitle: 'Translated disclaimer',
             };
 
-            const result = await ReportFundsExpendituresSettingsLocalizationsApi.create(mockClient as any, payload);
+            const result = await create(mockClient as any, payload);
 
             expect(mockClient.post).toHaveBeenCalledTimes(1);
             expect(mockClient.post).toHaveBeenCalledWith(
@@ -50,12 +89,7 @@ describe('ReportFundsExpendituresSettingsLocalizationsApi', () => {
                 disclaimerTitle: 'Updated disclaimer',
             };
 
-            const result = await ReportFundsExpendituresSettingsLocalizationsApi.update(
-                mockClient as any,
-                entityId,
-                languageId,
-                payload,
-            );
+            const result = await update(mockClient as any, entityId, languageId, payload);
 
             expect(mockClient.put).toHaveBeenCalledTimes(1);
             expect(mockClient.put).toHaveBeenCalledWith(

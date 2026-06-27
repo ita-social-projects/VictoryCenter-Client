@@ -37,7 +37,13 @@ jest.mock('./components/statistics-preview/StatisticsPreview', () => ({
 }));
 
 jest.mock('./components/statistics-metrics-list/StatisticsMetricsList', () => ({
-    StatisticsMetricsList: ({ metrics, onToggleVisibility, onReorder, onMetricUpdate }: any) => {
+    StatisticsMetricsList: ({
+        metrics,
+        onToggleVisibility,
+        onReorder,
+        onMetricUpdate,
+        onRaisedFundsSyncErrorChange,
+    }: any) => {
         const { MetricPrefix } = require('@/types/admin/main-page');
         return (
             <div data-testid="metrics-list">
@@ -88,6 +94,16 @@ jest.mock('./components/statistics-metrics-list/StatisticsMetricsList', () => ({
                             },
                         ])
                     }
+                    type="button"
+                />
+                <button
+                    data-testid="trigger-raised-sync-error"
+                    onClick={() => onRaisedFundsSyncErrorChange?.(true)}
+                    type="button"
+                />
+                <button
+                    data-testid="clear-raised-sync-error"
+                    onClick={() => onRaisedFundsSyncErrorChange?.(false)}
                     type="button"
                 />
             </div>
@@ -371,11 +387,10 @@ describe('StatisticsBlockForm', () => {
 
     it('does not keep form dirty when prefix is reverted to initial value', async () => {
         const setValueSpy = jest.fn();
+        const initialMetrics = mockInitialData.impactStatistics?.metrics ?? [];
+
         render(
-            <FormWrapper
-                defaultValues={{ metrics: mockInitialData.impactStatistics?.metrics ?? [] }}
-                onSetValue={setValueSpy}
-            >
+            <FormWrapper defaultValues={{ metrics: initialMetrics }} onSetValue={setValueSpy}>
                 <StatisticsBlockForm
                     initialData={mockInitialData}
                     isPublishDisabled={false}
@@ -394,8 +409,12 @@ describe('StatisticsBlockForm', () => {
 
         await waitFor(() => {
             const lastCall = setValueSpy.mock.calls[setValueSpy.mock.calls.length - 1];
-            const options = lastCall?.[2];
-            expect(options?.shouldDirty).toBe(false);
+            const passedMetrics = lastCall[1];
+            const options = lastCall[2];
+
+            expect(options?.shouldDirty).toBe(true);
+
+            expect(passedMetrics).toEqual(initialMetrics);
         });
     });
 
@@ -491,6 +510,41 @@ describe('StatisticsBlockForm', () => {
                 ]),
             );
         });
+    });
+
+    it('shows and clears raised funds sync error message from metrics list flow', async () => {
+        renderComponent();
+
+        fireEvent.click(screen.getByTestId('trigger-raised-sync-error'));
+
+        expect(screen.getByText(MAIN_PAGE_TEXT.ERRORS.RAISED_FUNDS_SYNC_FAILED)).toBeInTheDocument();
+
+        fireEvent.click(screen.getByTestId('clear-raised-sync-error'));
+
+        await waitFor(() => {
+            expect(screen.queryByText(MAIN_PAGE_TEXT.ERRORS.RAISED_FUNDS_SYNC_FAILED)).not.toBeInTheDocument();
+        });
+    });
+
+    it('shows raised funds sync error when it is returned with the metric data', async () => {
+        const dataWithSyncError: MainPage = {
+            ...mockInitialData,
+            impactStatistics: {
+                ...mockInitialData.impactStatistics!,
+                metrics: [
+                    {
+                        ...mockInitialData.impactStatistics!.metrics[0],
+                        type: MetricType.Raised,
+                        isAutoSynced: true,
+                        isAutoSyncFailed: true,
+                    },
+                ],
+            },
+        };
+
+        renderComponent({ initialData: dataWithSyncError });
+
+        expect(screen.getByText(MAIN_PAGE_TEXT.ERRORS.RAISED_FUNDS_SYNC_FAILED)).toBeInTheDocument();
     });
 
     it('handles metrics with empty localizations arrays', async () => {

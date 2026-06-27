@@ -82,6 +82,35 @@ const mockedUseToast = useToast as jest.Mock;
 const addToastMock = jest.fn();
 const uuidMock = jest.fn();
 
+const mockDataFetch = (data: any[], isLoading = false, error: any = null) => {
+    mockedUseDataFetch.mockReturnValue({
+        data,
+        isLoading,
+        error,
+        refetch: jest.fn(),
+        setData: jest.fn(),
+    });
+};
+
+const getLatestProps = () =>
+    mockPartnerSectionFormRender.mock.calls[mockPartnerSectionFormRender.mock.calls.length - 1][0];
+
+const renderWithSection = async (sectionData: Record<string, any> = {}) => {
+    mockDataFetch([{ id: 1, title: 'Test', description: 'Desc', partners: [], ...sectionData }]);
+    render(<PartnerSectionsEditor />);
+    await waitFor(() => expect(mockPartnerSectionFormRender).toHaveBeenCalled());
+    return getLatestProps();
+};
+
+const performTwoStepDelete = async (props: any) => {
+    await act(async () => {
+        props.onDelete(props.value.localId);
+    });
+    fireEvent.click(screen.getByTestId('confirm-delete'));
+    await screen.findByText(PARTNERS_TEXT.FORM.MESSAGE.DELETE_SECTION_WARNING);
+    fireEvent.click(screen.getByTestId('confirm-delete'));
+};
+
 beforeAll(() => {
     Object.defineProperty(globalThis, 'crypto', {
         value: {
@@ -349,16 +378,16 @@ describe('PartnerSectionsEditor', () => {
         await openPublishModal(props);
         await confirmPublish();
 
-        expect(mockedPartnersApi.updateSection).toHaveBeenCalledWith('mock-client', props.value.sectionId, {
-            title: props.value.title,
-            description: props.value.description,
-            partnersToUpdate: props.value.partners.map((partner: any) => ({
+        expect(mockedPartnersApi.updateSection).toHaveBeenCalledWith('mock-client', view.value.sectionId, {
+            title: view.value.title,
+            description: view.value.description,
+            partnersToUpdate: view.value.partners.map((partner: any) => ({
                 id: partner.partnerId,
                 description: partner.description,
                 image: partner.image,
                 imageId: partner.imageId,
             })),
-            partnerIdsToDelete: props.value.deletedPartnerIds || [],
+            partnerIdsToDelete: view.value.deletedPartnerIds || [],
         });
 
         await waitFor(() => {

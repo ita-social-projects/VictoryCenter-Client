@@ -121,6 +121,7 @@ export const PDF_FILES_SECTION_TEXT = {
     },
     ACTIONS: {
         EDIT: 'Редагувати основну інформацію',
+        TRANSLATE: 'Перекласти',
         FILE: {
             EDIT: 'Редагувати назву файлу',
             VIEW: 'Переглянути файл',
@@ -129,14 +130,18 @@ export const PDF_FILES_SECTION_TEXT = {
             CANCEL_RENAME: 'Скасувати',
         },
     },
+    MESSAGE: {
+        RENAME_SUCCESS: 'Назву файлу успішно змінено',
+        RENAME_ERROR: 'Не вдалося змінити назву файлу. Спробуйте ще раз.',
+        DELETE_SUCCESS: 'Файл успішно видалено',
+        DELETE_ERROR: 'Не вдалося видалити файл. Спробуйте ще раз.',
+        VIEW_ERROR: 'Не вдалося завантажити файл для перегляду. Спробуйте ще раз.',
+        FAIL_TO_CREATE_TRANSLATION: 'Виникла помилка під час додавання перекладу для PDF секції',
+        FAIL_TO_UPDATE_TRANSLATION: 'Виникла помилка під час оновлення перекладу для PDF секції',
+    },
     DELETE_CONFIRMATION: {
         TITLE: 'Файл буде видалено. Бажаєте продовжити?',
     },
-    RENAME_SUCCESS: 'Назву файлу успішно змінено',
-    RENAME_ERROR: 'Не вдалося змінити назву файлу. Спробуйте ще раз.',
-    DELETE_SUCCESS: 'Файл успішно видалено',
-    DELETE_ERROR: 'Не вдалося видалити файл. Спробуйте ще раз.',
-    VIEW_ERROR: 'Не вдалося завантажити файл для перегляду. Спробуйте ще раз.',
 };
 
 export const FUNDS_EXPENDITURES_VALIDATION = {
@@ -148,6 +153,23 @@ export const FUNDS_EXPENDITURES_VALIDATION = {
     maxCategoriesPerType: 4,
     categoryNameMin: 5,
     categoryNameMax: 200,
+};
+
+export const PDF_SECTION_LOCALIZATION_VALIDATION = {
+    title: {
+        min: 2,
+        max: 200,
+        getRequiredError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED,
+        getMinError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(2),
+        getMaxError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(200),
+    },
+    description: {
+        min: 2,
+        max: 200,
+        getRequiredError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED,
+        getMinError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(2),
+        getMaxError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(200),
+    },
 };
 
 export const FUNDS_EXPENDITURES_TEXT = {
@@ -320,8 +342,12 @@ export const PROGRAM_EXPENSES_TEXT = {
             PROGRAM_LABEL: 'Категорія програми',
             PROGRAM_PLACEHOLDER: 'Оберіть програму',
             SUBMIT_BUTTON: 'Додати витрату',
-            CONFIRM_CLOSE_TITLE: 'Дані буде втрачено. Бажаєте продовжити?',
+            CONFIRM_ADD_TITLE: 'Додати нову витрату?',
+            CONFIRM_CLOSE_TITLE: 'Зміни будуть втрачені. Бажаєте продовжити?',
             PROGRAM_NO_AVAILABLE: 'Немає доступних програм',
+        },
+        DELETE: {
+            TITLE: 'Видалити запис?',
         },
     },
     VALIDATION: {
@@ -344,5 +370,18 @@ export const PROGRAM_EXPENSES_TEXT = {
             PROGRAM: 'Програма',
             ACTIONS: 'Дії',
         },
+    },
+    MESSAGE: {
+        RECORD_CREATED_SUCCESSFULLY: 'Новий запис успішно додано',
+        RECORD_CREATE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
+        RECORD_DELETED_SUCCESSFULLY: 'Запис успішно видалено',
+        RECORD_DELETE_FAILED_RETRY: 'Не вдалося видалити запис. Спробуйте ще раз',
+    },
+    BULK: {
+        getSelectedLabel: (selected: number, total: number) => `Вибрано ${selected} з ${total}`,
+        DELETE_BUTTON: 'Видалити вибрані',
+        DELETE_CONFIRM_TITLE: 'Видалити обрані записи?',
+        DELETE_SUCCESS: 'Записи видалені успішно',
+        DELETE_FAILED: 'Помилка при видаленні записів. Спробуйте ще раз.',
     },
 };

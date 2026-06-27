@@ -55,6 +55,8 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
     const [isPublishing, setIsPublishing] = useState<boolean>(false);
     const [deletePhase, setDeletePhase] = useState<DeletePhase>(DeletePhase.IDLE);
     const [sectionToDeleteId, setSectionToDeleteId] = useState<string | null>(null);
+    const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
+    const [sectionToPublishId, setSectionToPublishId] = useState<string | null>(null);
     const [localSections, setLocalSections] = useState<PartnerSectionFormValues[]>([]);
     const scrollAnchorRef = useRef<HTMLDivElement>(null);
 
@@ -131,79 +133,92 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
         [localSections, setLocalSections],
     );
 
-    const handlePublish = useCallback(
-        async (localId: string) => {
-            setIsPublishing(true);
-            try {
-                const sectionToPublish = localSections.find((s) => s.localId === localId);
-                if (!sectionToPublish) return;
+    const handlePublishRequest = useCallback((localId: string) => {
+        setSectionToPublishId(localId);
+        setIsPublishModalOpen(true);
+    }, []);
 
-                let savedSection: PartnerSection;
+    const handleClosePublishModal = useCallback(() => {
+        setIsPublishModalOpen(false);
+        setSectionToPublishId(null);
+    }, []);
 
-                if (sectionToPublish.sectionId === null) {
-                    const createRequest: PartnersSectionCreateRequest = {
-                        title: sectionToPublish.title,
-                        description: sectionToPublish.description,
-                        partners: sectionToPublish.partners.map((p) => ({
-                            description: p.description,
-                            image: p.image,
-                            imageId: p.imageId,
-                        })),
-                    };
+    const handleConfirmPublish = useCallback(async () => {
+        if (!sectionToPublishId) return;
 
-                    savedSection = await PartnersApi.postSection(client, createRequest);
-                    addToast(PARTNERS_TEXT.MESSAGE.SECTION_CREATED, ToastType.Success);
-                } else {
-                    const updateRequest: PartnersSectionUpdateRequest = {
-                        title: sectionToPublish.title,
-                        description: sectionToPublish.description,
-                        partnersToUpdate: sectionToPublish.partners.map((p) => ({
-                            id: p.partnerId,
-                            description: p.description,
-                            image: p.image,
-                            imageId: p.imageId,
-                        })),
-                        partnerIdsToDelete: sectionToPublish.deletedPartnerIds || [],
-                    };
+        const localId = sectionToPublishId;
+        setIsPublishModalOpen(false);
+        setSectionToPublishId(null);
+        setIsPublishing(true);
 
-                    savedSection = await PartnersApi.updateSection(client, sectionToPublish.sectionId, updateRequest);
-                    addToast(PARTNERS_TEXT.MESSAGE.SECTION_PUBLISHED, ToastType.Success);
-                }
+        try {
+            const sectionToPublish = localSections.find((s) => s.localId === localId);
+            if (!sectionToPublish) return;
 
-                const mapPartnerToFormValue = (p: Partner) => ({
-                    localId: crypto.randomUUID(),
-                    partnerId: p.id,
-                    description: p.description,
-                    image: p.image,
-                    imageId: p.imageId,
-                });
+            let savedSection: PartnerSection;
 
-                const updateSectionInList = (s: PartnerSectionFormValues) => {
-                    if (s.localId === localId) {
-                        return {
-                            ...s,
-                            sectionId: savedSection.id,
-                            title: savedSection.title,
-                            description: savedSection.description,
-                            deletedPartnerIds: [],
-                            partners: savedSection.partners.map(mapPartnerToFormValue),
-                        };
-                    }
-                    return s;
+            if (sectionToPublish.sectionId === null) {
+                const createRequest: PartnersSectionCreateRequest = {
+                    title: sectionToPublish.title,
+                    description: sectionToPublish.description,
+                    partners: sectionToPublish.partners.map((p) => ({
+                        description: p.description,
+                        image: p.image,
+                        imageId: p.imageId,
+                    })),
                 };
 
-                setLocalSections((currentSections) => currentSections.map(updateSectionInList));
-            } catch (error: any) {
-                if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {
-                    return;
-                }
-                addToast(PARTNERS_TEXT.MESSAGE.FAIL_TO_PUBLISH_SECTION, ToastType.Error);
-            } finally {
-                setIsPublishing(false);
+                savedSection = await PartnersApi.postSection(client, createRequest);
+                addToast(PARTNERS_TEXT.MESSAGE.SECTION_CREATED, ToastType.Success);
+            } else {
+                const updateRequest: PartnersSectionUpdateRequest = {
+                    title: sectionToPublish.title,
+                    description: sectionToPublish.description,
+                    partnersToUpdate: sectionToPublish.partners.map((p) => ({
+                        id: p.partnerId,
+                        description: p.description,
+                        image: p.image,
+                        imageId: p.imageId,
+                    })),
+                    partnerIdsToDelete: sectionToPublish.deletedPartnerIds || [],
+                };
+
+                savedSection = await PartnersApi.updateSection(client, sectionToPublish.sectionId, updateRequest);
+                addToast(PARTNERS_TEXT.MESSAGE.SECTION_PUBLISHED, ToastType.Success);
             }
-        },
-        [localSections, addToast, client, setLocalSections],
-    );
+
+            const mapPartnerToFormValue = (p: Partner) => ({
+                localId: crypto.randomUUID(),
+                partnerId: p.id,
+                description: p.description,
+                image: p.image,
+                imageId: p.imageId,
+            });
+
+            const updateSectionInList = (s: PartnerSectionFormValues) => {
+                if (s.localId === localId) {
+                    return {
+                        ...s,
+                        sectionId: savedSection.id,
+                        title: savedSection.title,
+                        description: savedSection.description,
+                        deletedPartnerIds: [],
+                        partners: savedSection.partners.map(mapPartnerToFormValue),
+                    };
+                }
+                return s;
+            };
+
+            setLocalSections((currentSections) => currentSections.map(updateSectionInList));
+        } catch (error: any) {
+            if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {
+                return;
+            }
+            addToast(PARTNERS_TEXT.MESSAGE.FAIL_TO_PUBLISH_SECTION, ToastType.Error);
+        } finally {
+            setIsPublishing(false);
+        }
+    }, [sectionToPublishId, localSections, addToast, client, setLocalSections]);
 
     const handleDeleteRequest = useCallback((localId: string) => {
         setSectionToDeleteId(localId);
@@ -320,7 +335,7 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
                     disabled={isSectionsLoading || isPublishing}
                     onChange={handleChange}
                     onDelete={handleDeleteRequest}
-                    onPublish={handlePublish}
+                    onPublish={handlePublishRequest}
                 />
             ))}
             <div ref={scrollAnchorRef} />
@@ -338,6 +353,14 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
                 title={PARTNERS_TEXT.FORM.MESSAGE.DELETE_SECTION_WARNING}
                 onConfirm={handleFinalConfirmDelete}
                 onCancel={handleCloseModal}
+            />
+
+            <ConfirmationModal
+                isOpen={isPublishModalOpen}
+                onClose={handleClosePublishModal}
+                title={PARTNERS_TEXT.FORM.TITLE.PUBLISH_SECTION}
+                onConfirm={handleConfirmPublish}
+                onCancel={handleClosePublishModal}
             />
         </div>
     );

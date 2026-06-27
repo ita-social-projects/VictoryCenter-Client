@@ -106,4 +106,42 @@ describe('TranslateMainPageBlockForm', () => {
             description: 'Valid description text',
         });
     });
+
+    it('validates the title field on blur', async () => {
+        render(<Harness />);
+
+        fireEvent.blur(titleInput());
+
+        expect(await screen.findByText("Поле обов'язкове")).toBeInTheDocument();
+    });
+
+    it('clears the title blur error once a valid value is entered', async () => {
+        render(<Harness />);
+
+        fireEvent.blur(titleInput());
+        expect(await screen.findByText("Поле обов'язкове")).toBeInTheDocument();
+
+        fireEvent.change(titleInput(), { target: { value: 'Valid title text' } });
+        fireEvent.blur(titleInput());
+
+        await waitFor(() => expect(screen.queryByText("Поле обов'язкове")).not.toBeInTheDocument());
+    });
+
+    it('validates the description field on blur', async () => {
+        render(<Harness />);
+
+        fireEvent.blur(descriptionInput());
+
+        expect(await screen.findByText("Поле обов'язкове")).toBeInTheDocument();
+    });
+
+    it('prevents the native form submission default behaviour', () => {
+        const onSubmit = jest.fn();
+        render(<Harness onSubmit={onSubmit} />);
+
+        const form = titleInput().closest('form') as HTMLFormElement;
+
+        expect(() => fireEvent.submit(form)).not.toThrow();
+        expect(onSubmit).not.toHaveBeenCalled();
+    });
 });

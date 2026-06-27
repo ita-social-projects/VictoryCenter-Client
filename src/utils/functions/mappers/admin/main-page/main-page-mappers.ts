@@ -69,7 +69,11 @@ export function mapFormValuesToMainPagePatch(
         ? never
         : NonNullable<MainPage['impactStatistics']>['metrics'],
 ): UpdateMainPageDto {
-    const enLanguageId = getLanguageIdByCode(languages, 'en') ?? 2;
+    const enLanguageId = getLanguageIdByCode(languages, 'en');
+
+    if (enLanguageId == null) {
+        throw new Error('Could not resolve English language ID. Check languages configuration.');
+    }
 
     const str = (val?: string) => (val ?? '').trim();
 
@@ -93,9 +97,7 @@ export function mapFormValuesToMainPagePatch(
 
     const safeMetricsPayload: UpdateMetricDto[] = existingMetrics.map((m) => {
         const enLoc = m.localizations?.find(
-            (l) =>
-                (enLanguageId != null && l.languageId === enLanguageId) ||
-                resolveLocaleCode(l as any, languages) === 'en',
+            (l) => l.languageId === enLanguageId || resolveLocaleCode(l as any, languages) === 'en',
         );
 
         return {
@@ -108,7 +110,7 @@ export function mapFormValuesToMainPagePatch(
             localization: enLoc
                 ? {
                       ...(m.id ? { entityId: m.id } : {}),
-                      ...(enLanguageId ? { languageId: enLanguageId } : {}),
+                      languageId: enLanguageId,
                       name: enLoc.name,
                       value: enLoc.value ?? String(m.value),
                   }
@@ -139,13 +141,12 @@ export function mapFormValuesToMainPagePatch(
                     ? (formValues.statisticsImage.id as number)
                     : null,
             metrics: safeMetricsPayload,
-            localization:
-                enLanguageId && statTitleEn
-                    ? {
-                          languageId: enLanguageId,
-                          title: statTitleEn,
-                      }
-                    : undefined,
+            localization: statTitleEn
+                ? {
+                      languageId: enLanguageId,
+                      title: statTitleEn,
+                  }
+                : undefined,
         },
     };
 }

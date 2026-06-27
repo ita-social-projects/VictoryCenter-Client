@@ -129,4 +129,26 @@ describe('PartnersBlockForm', () => {
             expect(errorMessage).toBeInTheDocument();
         });
     });
+
+    it('renders translated fields as disabled and hides publish button in read-only mode', () => {
+        const { container } = render(
+            <TestWrapper
+                defaultValues={{
+                    partnersTitleEn: 'Partners title',
+                    partnersDescriptionEn: 'Partners description',
+                }}
+            >
+                <PartnersBlockForm isPublishDisabled={false} onPublish={mockOnPublish} isReadOnly />
+            </TestWrapper>,
+        );
+
+        const titleInput = container.querySelector('#partners-block-title') as HTMLInputElement;
+        const descriptionInput = container.querySelector('#partners-block-description') as HTMLTextAreaElement;
+
+        expect(titleInput.value).toBe('Partners title');
+        expect(titleInput).toBeDisabled();
+        expect(descriptionInput.value).toBe('Partners description');
+        expect(descriptionInput).toBeDisabled();
+        expect(screen.queryByRole('button', { name: /опублікувати/i })).not.toBeInTheDocument();
+    });
 });

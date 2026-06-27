@@ -13,3 +13,55 @@
 .w-100 {
     width: 100% !important;
 }
+
+.hide-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+    .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+.program-form-main {
+    overflow-y: visible;
+
+    .singleselect-options {
+        max-height: 120px;
+        overflow-y: scroll;
+        scrollbar-color: #a4a49b transparent;
+
+        &::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: transparent;
+            border-radius: 8px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background-color: #a4a49b;
+            border-radius: 8px;
+
+            &:hover {
+                background-color: #8c8c84;
+            }
+        }
+    }
+
+    &.expandable-dropdown {
+        .singleselect-options {
+            position: absolute;
+            z-index: 100;
+        }
+
+        .input-group:has(.singleselect-options) {
+            margin-bottom: 126px;
+        }
+    }
+
+    .input-group {
+        margin-bottom: 6px;
+    }
+}

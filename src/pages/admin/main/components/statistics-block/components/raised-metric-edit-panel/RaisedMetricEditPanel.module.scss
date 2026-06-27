@@ -28,20 +28,24 @@
     }
 }
 
-.prefixGroup {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+.divider {
+    height: 1px;
+    background-color: c.$grey-300;
+    width: 100%;
+    margin: 4px 0;
 }
 
-.prefixLabel {
+.syncRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 4px;
+}
+
+.syncText {
     font-size: 14px;
-    color: c.$donate-tooltip-color;
-}
-
-.actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-    margin-top: 8px;
+    color: c.$grey-900;
+    line-height: 1.4;
+    flex: 1;
 }

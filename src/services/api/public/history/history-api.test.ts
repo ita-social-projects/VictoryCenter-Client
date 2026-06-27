@@ -88,7 +88,6 @@ describe('PublicHistoryApi', () => {
                             localizations: [
                                 {
                                     entityId: 10,
-                                    languageId: 1,
                                     localizationInfoDto: { id: 1, code: 'en' },
                                     title: 'Our History',
                                     description: null,

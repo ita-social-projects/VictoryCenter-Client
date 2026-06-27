@@ -55,6 +55,7 @@ export const COMMON_TEXT_ADMIN = {
     QUESTION: {
         SAVE_CHANGES: 'Зберегти зміни?',
         CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE: 'Зміни будуть втрачені\nБажаєте продовжити?',
+        CHANGE_LANGUAGE_UNSAVED_CHANGES: 'Зміни будуть втрачені\nБажаєте змінити мову?',
         REMOVE_FROM_PUBLICATION: 'Зняти з публікації?',
         PUBLISH_CHANGES: 'Опублікувати зміни?',
     },

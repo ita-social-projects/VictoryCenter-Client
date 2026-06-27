@@ -142,7 +142,7 @@ export const MainPageContent = () => {
     const [isPublishing, setIsPublishing] = useState(false);
     const [pendingPublishData, setPendingPublishData] = useState<MainPageFormValues | null>(null);
 
-    const [pendingGlobalLanguage, setPendingGlobalLanguage] = useState<string | null>(null);
+    const [pendingGlobalLanguage, setPendingGlobalLanguage] = useState<LocalizationLanguage | null>(null);
 
     const [currentMetrics, setCurrentMetrics] = useState<Metric[]>([]);
     const [translationStatuses, setTranslationStatuses] = useState<MainPageTranslationStatusDto[]>([]);
@@ -304,11 +304,11 @@ export const MainPageContent = () => {
         };
     }, [client, originalData, selectedLanguage, translationLanguages, allLanguages, methods, addToast]);
 
-    const handleGlobalLanguageChange = (code: string) => {
+    const handleGlobalLanguageChange = (language: LocalizationLanguage) => {
         if (methods.formState.isDirty) {
-            setPendingGlobalLanguage(code);
+            setPendingGlobalLanguage(language);
         } else {
-            onLanguageChange(code);
+            onLanguageChange(language);
         }
     };
 

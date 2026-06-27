@@ -169,7 +169,7 @@ export const PartnerBanner = () => {
         return (
             <div className={styles.error}>
                 <p>{PARTNERS_TEXT.MESSAGE.FAIL_TO_LOAD_BANNER}</p>
-                <Button onClick={refetchBanner} buttonStyle="primary">
+                <Button onClick={() => refetchBanner()} buttonStyle="primary">
                     {PARTNERS_TEXT.BUTTON.TRY_AGAIN}
                 </Button>
             </div>
@@ -189,7 +189,7 @@ export const PartnerBanner = () => {
             {fetchError && !isLoadingData && (
                 <div className={styles.error}>
                     <p>{PARTNERS_TEXT.MESSAGE.FAIL_TO_LOAD_BANNER}</p>
-                    <Button onClick={refetchBanner} buttonStyle="primary">
+                    <Button onClick={() => refetchBanner()} buttonStyle="primary">
                         {PARTNERS_TEXT.BUTTON.TRY_AGAIN}
                     </Button>
                 </div>

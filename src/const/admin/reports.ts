@@ -332,10 +332,6 @@ export const FUNDS_EXPENDITURES_TEXT = {
 };
 
 export const PROGRAM_EXPENSES_TEXT = {
-    MESSAGE: {
-        RECORD_DELETED_SUCCESSFULLY: 'Запис успішно видалено',
-        RECORD_DELETE_FAILED_RETRY: 'Не вдалося видалити запис. Спробуйте ще раз',
-    },
     BUTTON: {
         ADD_PROGRAM_EXPENSE: 'Витрата по програмі',
     },
@@ -346,6 +342,7 @@ export const PROGRAM_EXPENSES_TEXT = {
             PROGRAM_LABEL: 'Категорія програми',
             PROGRAM_PLACEHOLDER: 'Оберіть програму',
             SUBMIT_BUTTON: 'Додати витрату',
+            CONFIRM_ADD_TITLE: 'Додати нову витрату?',
             CONFIRM_CLOSE_TITLE: 'Зміни будуть втрачені. Бажаєте продовжити?',
             PROGRAM_NO_AVAILABLE: 'Немає доступних програм',
         },
@@ -373,6 +370,12 @@ export const PROGRAM_EXPENSES_TEXT = {
             PROGRAM: 'Програма',
             ACTIONS: 'Дії',
         },
+    },
+    MESSAGE: {
+        RECORD_CREATED_SUCCESSFULLY: 'Новий запис успішно додано',
+        RECORD_CREATE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
+        RECORD_DELETED_SUCCESSFULLY: 'Запис успішно видалено',
+        RECORD_DELETE_FAILED_RETRY: 'Не вдалося видалити запис. Спробуйте ще раз',
     },
     BULK: {
         getSelectedLabel: (selected: number, total: number) => `Вибрано ${selected} з ${total}`,

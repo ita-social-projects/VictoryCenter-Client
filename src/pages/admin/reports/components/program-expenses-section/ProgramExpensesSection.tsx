@@ -1,18 +1,18 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
+import { ToastType } from '@/types/admin/toast';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
 import { ProgramExpensesApi } from '@/services/api/admin/reports/program-expenses-api';
 import { ProgramExpensesReadOnlyData, ProgramExpensesRecord } from '@/types/admin/reports';
-import { ToastType } from '@/types/admin/toast';
 import { ProgramExpensesToolbar } from './components/program-expenses-toolbar/ProgramExpensesToolbar';
 import { ProgramExpensesSummaryCard } from './components/program-expenses-summary-card/ProgramExpensesSummaryCard';
 import { ProgramExpensesTable } from './components/program-expenses-table/ProgramExpensesTable';
 import { AddProgramExpenseRecordModal } from './components/common/add-program-expense-record-modal/AddProgramExpenseRecordModal';
 import { DeleteRecordModal } from '../funds-expenditures-section/components/common/delete-record-modal/DeleteRecordModal';
-import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import styles from './ProgramExpensesSection.module.scss';
 
 const INITIAL_PROGRAM_EXPENSES_DATA: ProgramExpensesReadOnlyData = {
@@ -97,6 +97,42 @@ export const ProgramExpensesSection = ({ isEditing = false }: ProgramExpensesSec
         setIsAddProgramExpenseModalOpen(false);
     }, []);
 
+    const handleSubmitAddProgramExpense = useCallback(
+        async (submitData: { programId: number; reportingYear: string; amountUah: string; amountUsd: string }) => {
+            const reportingYear = Number.parseInt(submitData.reportingYear, 10);
+            const amountUah = Number.parseFloat(submitData.amountUah.replace(',', '.'));
+            const amountUsd = Number.parseFloat(submitData.amountUsd.replace(',', '.'));
+
+            if (!Number.isFinite(reportingYear) || !Number.isFinite(amountUah) || !Number.isFinite(amountUsd)) {
+                return false;
+            }
+
+            try {
+                const payload = {
+                    reportingYear,
+                    hippotherapyProgramCategoryId: submitData.programId,
+                    amountUah,
+                    amountUsd,
+                };
+                await ProgramExpensesApi.post(adminClient, payload);
+                setIsAddProgramExpenseModalOpen(false);
+                addToast(PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_CREATED_SUCCESSFULLY, ToastType.Success);
+
+                try {
+                    await refetchReadOnlyData(true);
+                } catch {
+                    // Refetch error handled by useDataFetch
+                }
+
+                return true;
+            } catch {
+                addToast(PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_CREATE_FAILED_RETRY, ToastType.Error);
+                return false;
+            }
+        },
+        [adminClient, refetchReadOnlyData, addToast],
+    );
+
     const handleDeleteClick = useCallback((record: ProgramExpensesRecord) => {
         setRecordToDelete(record);
         setIsDeleteModalOpen(true);
@@ -109,9 +145,14 @@ export const ProgramExpensesSection = ({ isEditing = false }: ProgramExpensesSec
 
         try {
             await ProgramExpensesApi.delete(adminClient, recordToDelete.id);
-            refetchReadOnlyData();
             addToast(PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_DELETED_SUCCESSFULLY, ToastType.Success);
             setIsDeleteModalOpen(false);
+
+            try {
+                await refetchReadOnlyData(true);
+            } catch {
+                // Refetch error handled by useDataFetch
+            }
         } catch {
             addToast(PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_DELETE_FAILED_RETRY, ToastType.Error);
         } finally {
@@ -212,6 +253,7 @@ export const ProgramExpensesSection = ({ isEditing = false }: ProgramExpensesSec
                 records={data.records}
                 exchangeRate={exchangeRate}
                 onClose={handleCloseAddProgramExpenseModal}
+                onSubmit={handleSubmitAddProgramExpense}
             />
 
             <DeleteRecordModal

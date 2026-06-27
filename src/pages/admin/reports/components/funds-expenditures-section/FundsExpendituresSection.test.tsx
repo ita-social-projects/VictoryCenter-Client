@@ -333,6 +333,13 @@ jest.mock('@/services/api/admin/reports/funds-expenditures-api', () => ({
     },
 }));
 
+const mockProgramExpensesSummaryGet = jest.fn();
+jest.mock('@/services/api/admin/reports/program-expenses-api', () => ({
+    ProgramExpensesApi: {
+        getSummary: (...args: unknown[]) => mockProgramExpensesSummaryGet(...args),
+    },
+}));
+
 const mockGetByEntityId = jest.fn();
 jest.mock(
     '@/services/api/admin/reports/report-funds-expenditures-settings-localizations/report-funds-expenditures-settings-localizations-api',
@@ -1281,5 +1288,32 @@ describe('FundsExpenditureSection handleProgramYearSave', () => {
             stableAdminClient,
             expect.objectContaining({ programExpendituresReportingYear: 2024 }),
         );
+    });
+});
+
+describe('FundsExpenditureSection fetch handler delegation', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+        setupMockDataFetch();
+        mockGetByEntityId.mockResolvedValue([]);
+    });
+
+    it('fetchProgramSummary calls ProgramExpensesApi.getSummary with the admin client', async () => {
+        const capturedFetchHandlers: Array<(opts?: object) => unknown> = [];
+        // Wrap the slot-based impl so stable data refs are preserved (avoids infinite re-renders)
+        const slotImpl = mockUseDataFetch.getMockImplementation()!;
+        mockUseDataFetch.mockImplementation((props: any) => {
+            capturedFetchHandlers.push(props.fetchHandler);
+            return slotImpl(props);
+        });
+
+        mockProgramExpensesSummaryGet.mockResolvedValueOnce({ totalAmountUah: 500, totalAmountUsd: 200 });
+        render(<FundsExpenditureSection />);
+
+        // slot 4 = fetchProgramSummary (5th useDataFetch call in the component)
+        const result = await capturedFetchHandlers[4]({});
+
+        expect(mockProgramExpensesSummaryGet).toHaveBeenCalledWith(stableAdminClient, {});
+        expect(result).toEqual({ totalAmountUah: 500, totalAmountUsd: 200 });
     });
 });

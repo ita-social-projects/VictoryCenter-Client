@@ -220,6 +220,7 @@ jest.mock('./components/funds-expenditures-table/FundsExpendituresTable', () => 
         onSelectAllToggle,
         onToggleRecordSelection,
         onOpenBulkDelete,
+        onProgramYearSave,
     }: any) => {
         const { FUNDS_EXPENDITURES_TEXT: FET } = require('@/const/admin/reports');
         return (
@@ -241,6 +242,9 @@ jest.mock('./components/funds-expenditures-table/FundsExpendituresTable', () => 
                     onClick={() => onRecordSave?.(1, { categoryId: 1, amountUah: '7300', amountUsd: '173.81' })}
                 >
                     Save row
+                </button>
+                <button data-testid="trigger-program-year-save" onClick={() => void onProgramYearSave?.('2024')}>
+                    Save program year
                 </button>
                 <button data-testid="row-edit-on" onClick={() => onRowEditModeChange?.(true)}>
                     Row edit on
@@ -393,6 +397,9 @@ const setupMockDataFetch = (
     let callIndex = 0;
     mockUseDataFetch.mockImplementation(({ initialData }: { initialData: unknown }) => {
         const callOrder = callIndex++;
+        // IMPORTANT: slot order must match the order useDataFetch is called in
+        // FundsExpendituresSection: 0=settings, 1=categories, 2=records, 3=summary, 4=programExpenses
+        // If a new useDataFetch call is added to the component, add a slot here in the same position.
         const slot = callOrder % 5;
         const slotDataMap: Record<number, unknown> = {
             0: settings,
@@ -1201,5 +1208,78 @@ describe('FundsExpenditureSection disclaimer localizations', () => {
         });
 
         expect(mockGetByEntityId).not.toHaveBeenCalled();
+    });
+});
+
+describe('FundsExpenditureSection handleProgramYearSave', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+        setupMockDataFetch();
+        mockGetByEntityId.mockResolvedValue([]);
+    });
+
+    it('should call updateSettings with the new year and current settings values', async () => {
+        mockUpdateSettings.mockResolvedValueOnce(MOCK_FUNDS_EXPENDITURES_SETTINGS);
+
+        render(<FundsExpenditureSection />);
+        fireEvent.click(screen.getByTestId('trigger-program-year-save'));
+
+        await waitFor(() => {
+            expect(mockUpdateSettings).toHaveBeenCalledWith(stableAdminClient, {
+                disclaimerTitle: MOCK_FUNDS_EXPENDITURES_SETTINGS.disclaimerTitle,
+                exchangeRate: MOCK_FUNDS_EXPENDITURES_SETTINGS.exchangeRate,
+                programExpendituresReportingYear: 2024,
+            });
+        });
+    });
+
+    it('should show success toast after year is saved', async () => {
+        mockUpdateSettings.mockResolvedValueOnce(MOCK_FUNDS_EXPENDITURES_SETTINGS);
+
+        render(<FundsExpenditureSection />);
+        fireEvent.click(screen.getByTestId('trigger-program-year-save'));
+
+        await waitFor(() => {
+            expect(mockAddToast).toHaveBeenCalledWith(
+                FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY,
+                'success',
+            );
+        });
+    });
+
+    it('should show error toast when year save fails', async () => {
+        mockUpdateSettings.mockRejectedValueOnce(new Error('update failed'));
+
+        render(<FundsExpenditureSection />);
+        fireEvent.click(screen.getByTestId('trigger-program-year-save'));
+
+        await waitFor(() => {
+            expect(mockAddToast).toHaveBeenCalledWith(
+                FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_UPDATE_FAILED_RETRY,
+                'error',
+            );
+        });
+    });
+
+    it('should use the newly saved year in handlePublish, not the stale settings value', async () => {
+        // Settings has year 2025; user saves year 2024 via the aggregate row edit.
+        // Without the fix, handlePublish would read the stale settings.programExpendituresReportingYear (2025).
+        // With the fix it reads programYearValue (2024) which was updated immediately on save.
+        mockUpdateSettings.mockResolvedValueOnce(MOCK_FUNDS_EXPENDITURES_SETTINGS); // year save
+        mockUpdateSettings.mockResolvedValueOnce(MOCK_FUNDS_EXPENDITURES_SETTINGS); // publish
+
+        render(<FundsExpenditureSection />);
+
+        fireEvent.click(screen.getByTestId('trigger-program-year-save'));
+        await waitFor(() => expect(mockUpdateSettings).toHaveBeenCalledTimes(1));
+
+        fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT));
+        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED));
+
+        await waitFor(() => expect(mockUpdateSettings).toHaveBeenCalledTimes(2));
+        expect(mockUpdateSettings).toHaveBeenLastCalledWith(
+            stableAdminClient,
+            expect.objectContaining({ programExpendituresReportingYear: 2024 }),
+        );
     });
 });

@@ -9,8 +9,10 @@ import {
     donateUk,
     reportsPageUk,
     partnersPageUk,
+    successPageUk,
     globalUk,
     contactUsPageUk,
+    historyPageUk,
 } from '../../locales/uk';
 
 declare module 'i18next' {
@@ -20,13 +22,16 @@ declare module 'i18next' {
             hippotherapy: typeof hippotherapyUk;
             footer: typeof footerUk;
             aboutUsPage: typeof aboutUsPageUk;
+            eventsNewsPage: typeof eventsNewsUk;
             programsPage: typeof programsPageUk;
             detailedProgramPage: typeof detailedProgramPageUk;
             donatePage: typeof donateUk;
             reportsPage: typeof reportsPageUk;
             partnersPage: typeof partnersPageUk;
+            successPage: typeof successPageUk;
             global: typeof globalUk;
             contactUsPage: typeof contactUsPageUk;
+            historyPage: typeof historyPageUk;
         };
     }
 }

@@ -42,7 +42,7 @@ export const IMAGE_VALIDATION_FUNCTIONS = {
         file: File,
         minWidth = 1920,
         minHeight = 1080,
-        maxSizeMB = 3,
+        maxSizeMB = 5,
     ): Promise<string | undefined> => {
         try {
             const schema = getImageValidationSchema(minWidth, minHeight, maxSizeMB);

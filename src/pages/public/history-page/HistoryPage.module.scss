@@ -1,0 +1,21 @@
+@use '@/assets/sass/variables/colors' as c;
+
+.page {
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    background-color: c.$grey-50;
+    overflow-x: hidden;
+}
+
+.sections-list {
+    display: flex;
+    flex-direction: column;
+    gap: 80px;
+    padding: 40px 0 100px;
+
+    @media (min-width: 1440px) {
+        gap: 0;
+        padding: 0 0 150px;
+    }
+}

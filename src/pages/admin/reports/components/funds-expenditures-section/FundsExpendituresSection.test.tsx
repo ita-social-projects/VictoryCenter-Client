@@ -13,7 +13,9 @@ import {
     ReportFundsExpendituresCategory,
     ReportFundsExpendituresRecord,
     ReportFundsExpendituresSettings,
+    ReportFundsExpendituresSettingsLocalizationDto,
 } from '@/types/admin/reports';
+import { LocalizationLanguage, TranslationStatus } from '@/types/common/language';
 
 const MOCK_FUNDS_EXPENDITURES_SETTINGS: ReportFundsExpendituresSettings = {
     id: 1,
@@ -22,14 +24,14 @@ const MOCK_FUNDS_EXPENDITURES_SETTINGS: ReportFundsExpendituresSettings = {
 };
 
 const MOCK_FUNDS_EXPENDITURES_CATEGORIES: ReportFundsExpendituresCategory[] = [
-    { id: 1, name: 'Грантові кошти', type: 'income' },
-    { id: 2, name: 'Благодійні внески', type: 'income' },
-    { id: 3, name: 'Власні надходження', type: 'income' },
-    { id: 4, name: 'Інші надходження', type: 'income' },
-    { id: 5, name: 'Адміністративні витрати', type: 'expense' },
-    { id: 6, name: 'Програмні витрати', type: 'expense' },
-    { id: 7, name: 'Обладнання', type: 'expense' },
-    { id: 8, name: 'Заробітна плата', type: 'expense' },
+    { id: 1, name: 'Грантові кошти', type: 'income', localizations: [] },
+    { id: 2, name: 'Благодійні внески', type: 'income', localizations: [] },
+    { id: 3, name: 'Власні надходження', type: 'income', localizations: [] },
+    { id: 4, name: 'Інші надходження', type: 'income', localizations: [] },
+    { id: 5, name: 'Адміністративні витрати', type: 'expense', localizations: [] },
+    { id: 6, name: 'Програмні витрати', type: 'expense', localizations: [] },
+    { id: 7, name: 'Обладнання', type: 'expense', localizations: [] },
+    { id: 8, name: 'Заробітна плата', type: 'expense', localizations: [] },
 ];
 
 const MOCK_FUNDS_EXPENDITURES_RECORDS: ReportFundsExpendituresRecord[] = [
@@ -54,6 +56,7 @@ const MOCK_FUNDS_EXPENDITURES_SUMMARY: FundsExpendituresSummary = {
 jest.mock('./FundsExpendituresSection.module.scss', () => ({
     section: 'section',
     disclaimer: 'disclaimer',
+    'disclaimer-top-row': 'disclaimer-top-row',
     'disclaimer-label': 'disclaimer-label',
     'disclaimer-text-area': 'disclaimer-text-area',
     'disclaimer-text': 'disclaimer-text',
@@ -64,10 +67,12 @@ jest.mock('./FundsExpendituresSection.module.scss', () => ({
     'edit-icon': 'edit-icon',
     'section-footer': 'section-footer',
     'footer-button': 'footer-button',
+    'translate-btn': 'translate-btn',
 }));
 
+const stableAdminClient = {};
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
-    useAdminClient: () => ({}),
+    useAdminClient: () => stableAdminClient,
 }));
 
 const mockAddToast = jest.fn();
@@ -322,6 +327,57 @@ jest.mock('@/services/api/admin/reports/funds-expenditures-api', () => ({
     },
 }));
 
+const mockGetByEntityId = jest.fn();
+jest.mock(
+    '@/services/api/admin/reports/report-funds-expenditures-settings-localizations/report-funds-expenditures-settings-localizations-api',
+    () => ({
+        ReportFundsExpendituresSettingsLocalizationsApi: {
+            getByEntityId: (...args: unknown[]) => mockGetByEntityId(...args),
+        },
+    }),
+);
+
+jest.mock('@/utils/functions/mappers/common/localization/localization-mappers', () => ({
+    mapLocalizationDtoToModel: (dto: ReportFundsExpendituresSettingsLocalizationDto) => ({
+        ...dto,
+        language: dto.localizationInfoDto,
+    }),
+}));
+
+jest.mock('@/components/admin/localization-statuses/LocalizationStatuses', () => ({
+    LocalizationStatuses: ({ localizedEntity }: { localizedEntity: { translationStatuses: unknown[] } }) => (
+        <div data-testid="localization-statuses" data-status-count={localizedEntity.translationStatuses.length} />
+    ),
+}));
+
+const mockTranslateDisclaimerModalOnTranslateSuccess = jest.fn();
+jest.mock('./components/common/translate-disclaimer-modal/TranslateDisclaimerModal', () => ({
+    TranslateDisclaimerModal: ({
+        isOpen,
+        onClose,
+        existingLocalizations,
+        onTranslateSuccess,
+    }: {
+        isOpen: boolean;
+        onClose: () => void;
+        existingLocalizations: unknown[];
+        onTranslateSuccess: (loc: unknown) => void;
+    }) => {
+        mockTranslateDisclaimerModalOnTranslateSuccess.mockImplementation(onTranslateSuccess);
+        return (
+            <div
+                data-testid="translate-disclaimer-modal"
+                data-open={String(isOpen)}
+                data-existing-count={existingLocalizations.length}
+            >
+                <button data-testid="translate-modal-close" onClick={onClose}>
+                    Close
+                </button>
+            </div>
+        );
+    },
+}));
+
 const setupMockDataFetch = (
     settings: ReportFundsExpendituresSettings | null = MOCK_FUNDS_EXPENDITURES_SETTINGS,
     categories: ReportFundsExpendituresCategory[] = MOCK_FUNDS_EXPENDITURES_CATEGORIES,
@@ -348,6 +404,7 @@ describe('FundsExpenditureSection', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         setupMockDataFetch();
+        mockGetByEntityId.mockResolvedValue([]);
     });
 
     it('should show success toast when record is saved from table', async () => {
@@ -902,9 +959,9 @@ describe('FundsExpenditureSection', () => {
 describe('FundsExpenditureSection bulk delete flow', () => {
     const settingsMock = { id: 1, exchangeRate: '40', disclaimerTitle: 'Disclaimer' };
     const categoriesMock: ReportFundsExpendituresCategory[] = [
-        { id: 1, name: 'A', type: 'income' },
-        { id: 2, name: 'B', type: 'income' },
-        { id: 3, name: PROGRAM_EXPENSES_TEXT.TABLE.TYPE_LABEL, type: 'expense' },
+        { id: 1, name: 'A', type: 'income', localizations: [] },
+        { id: 2, name: 'B', type: 'income', localizations: [] },
+        { id: 3, name: PROGRAM_EXPENSES_TEXT.TABLE.TYPE_LABEL, type: 'expense', localizations: [] },
     ];
     const recordsMock: ReportFundsExpendituresRecord[] = [
         { id: 1, categoryId: 1, type: 'income', reportingYear: '2025', amountUah: '100', amountUsd: '10' },
@@ -923,6 +980,7 @@ describe('FundsExpenditureSection bulk delete flow', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         setupMockDataFetch(settingsMock, categoriesMock, recordsMock, summaryMock);
+        mockGetByEntityId.mockResolvedValue([]);
     });
 
     it('select all via header checkbox and cancel bulk delete clears selection', async () => {
@@ -964,5 +1022,158 @@ describe('FundsExpenditureSection bulk delete flow', () => {
             expect(mockBulkDelete).toHaveBeenCalledWith(expect.anything(), [1, 2]);
             expect(mockAddToast).toHaveBeenCalledWith(FUNDS_EXPENDITURES_TEXT.BULK.DELETE_SUCCESS, 'success');
         });
+    });
+});
+
+const MOCK_LANG_EN: LocalizationLanguage = { id: 2, code: 'en', name: 'Англійська' };
+
+const MOCK_LOCALIZATION_DTO: ReportFundsExpendituresSettingsLocalizationDto = {
+    entityId: 1,
+    disclaimerTitle: 'Financial report',
+    localizationInfoDto: { id: 2, code: 'en' },
+    translationStatus: TranslationStatus.Relevant,
+};
+
+describe('FundsExpenditureSection disclaimer localizations', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+        setupMockDataFetch();
+        mockGetByEntityId.mockResolvedValue([]);
+    });
+
+    it('fetches disclaimer localizations on mount when settings are loaded', async () => {
+        render(<FundsExpenditureSection />);
+
+        await waitFor(() => {
+            expect(mockGetByEntityId).toHaveBeenCalledWith(expect.anything(), MOCK_FUNDS_EXPENDITURES_SETTINGS.id);
+        });
+    });
+
+    it('does not fetch disclaimer localizations when settings have no id', async () => {
+        setupMockDataFetch(null);
+        render(<FundsExpenditureSection />);
+
+        await waitFor(() => {
+            expect(mockGetByEntityId).not.toHaveBeenCalled();
+        });
+    });
+
+    it('renders localization-statuses indicator when disclaimer is visible', async () => {
+        render(<FundsExpenditureSection />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('localization-statuses')).toBeInTheDocument();
+        });
+    });
+
+    it('passes fetched localizations to the indicator', async () => {
+        mockGetByEntityId.mockResolvedValue([MOCK_LOCALIZATION_DTO]);
+
+        render(<FundsExpenditureSection translationLanguages={[MOCK_LANG_EN]} />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('localization-statuses')).toHaveAttribute('data-status-count', '1');
+        });
+    });
+
+    it('renders translate disclaimer modal closed by default', () => {
+        render(<FundsExpenditureSection />);
+
+        expect(screen.getByTestId('translate-disclaimer-modal')).toHaveAttribute('data-open', 'false');
+    });
+
+    it('passes existing localizations to the translate modal', async () => {
+        mockGetByEntityId.mockResolvedValue([MOCK_LOCALIZATION_DTO]);
+
+        render(<FundsExpenditureSection translationLanguages={[MOCK_LANG_EN]} />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('translate-disclaimer-modal')).toHaveAttribute('data-existing-count', '1');
+        });
+    });
+
+    it('updates localization indicator when translate success fires', async () => {
+        mockGetByEntityId.mockResolvedValue([]);
+
+        render(<FundsExpenditureSection translationLanguages={[MOCK_LANG_EN]} />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('localization-statuses')).toHaveAttribute('data-status-count', '0');
+        });
+
+        const newLocalization = {
+            disclaimerTitle: 'Financial report',
+            language: { id: 2, code: 'en' },
+            translationStatus: TranslationStatus.Relevant,
+        };
+        mockTranslateDisclaimerModalOnTranslateSuccess(newLocalization);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('localization-statuses')).toHaveAttribute('data-status-count', '1');
+        });
+    });
+
+    it('replaces localization in indicator when same language is re-translated', async () => {
+        const outdatedDto: ReportFundsExpendituresSettingsLocalizationDto = {
+            ...MOCK_LOCALIZATION_DTO,
+            translationStatus: TranslationStatus.Outdated,
+        };
+        mockGetByEntityId.mockResolvedValue([outdatedDto]);
+
+        render(<FundsExpenditureSection translationLanguages={[MOCK_LANG_EN]} />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('localization-statuses')).toHaveAttribute('data-status-count', '1');
+        });
+
+        const updatedLocalization = {
+            disclaimerTitle: 'Updated report',
+            language: { id: 2, code: 'en' },
+            translationStatus: TranslationStatus.Relevant,
+        };
+        mockTranslateDisclaimerModalOnTranslateSuccess(updatedLocalization);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('localization-statuses')).toHaveAttribute('data-status-count', '1');
+        });
+    });
+
+    it('refetches disclaimer localizations after successful publish', async () => {
+        mockUpdateSettings.mockResolvedValueOnce({
+            id: 1,
+            disclaimerTitle: 'Updated disclaimer',
+            exchangeRate: '44.00',
+        });
+
+        render(<FundsExpenditureSection />);
+
+        await waitFor(() => {
+            expect(mockGetByEntityId).toHaveBeenCalled();
+        });
+        const callsAfterMount = mockGetByEntityId.mock.calls.length;
+
+        fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT));
+        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED));
+
+        await waitFor(() => {
+            expect(mockGetByEntityId.mock.calls.length).toBeGreaterThan(callsAfterMount);
+        });
+    });
+
+    it('does not refetch disclaimer localizations when publish fails', async () => {
+        mockUpdateSettings.mockRejectedValueOnce(new Error('publish failed'));
+
+        render(<FundsExpenditureSection />);
+
+        fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT));
+
+        mockGetByEntityId.mockClear();
+        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED));
+
+        await waitFor(() => {
+            expect(mockAddToast).toHaveBeenCalledWith(REPORTS_TEXT.MESSAGE.FAIL_TO_UPDATE_REPORT, 'error');
+        });
+
+        expect(mockGetByEntityId).not.toHaveBeenCalled();
     });
 });

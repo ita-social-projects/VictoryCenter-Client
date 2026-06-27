@@ -1,3 +1,9 @@
+import {
+    EntityLocalization,
+    EntityLocalizationDto,
+    EntityWithDtoLocalizations,
+    EntityWithLocalizations,
+} from '../common/language';
 import { Image, ImageValues } from '../common/image';
 
 export interface ReportsMediaSettingsCollectedFundsDto {
@@ -90,7 +96,8 @@ export interface UpdateReportFundsExpendituresSettingsDto {
     exchangeRate: number;
 }
 
-export interface ReportFundsExpendituresCategoryDto {
+export interface ReportFundsExpendituresCategoryDto
+    extends EntityWithDtoLocalizations<ReportFundsExpendituresCategoryLocalizationDto> {
     id: number;
     name: string;
     type: ReportFundsExpendituresTypeDto;
@@ -146,7 +153,56 @@ export interface ReportFundsExpendituresSettings {
     exchangeRate: string | null;
 }
 
-export interface ReportFundsExpendituresCategory {
+export interface ReportFundsExpendituresCategoryLocalizableFields {
+    name: string;
+}
+
+export interface ReportFundsExpendituresCategoryLocalizationDto
+    extends EntityLocalizationDto,
+        ReportFundsExpendituresCategoryLocalizableFields {
+    entityId: number;
+}
+
+export interface ReportFundsExpendituresCategoryLocalization
+    extends EntityLocalization,
+        ReportFundsExpendituresCategoryLocalizableFields {}
+
+export interface CreateReportFundsExpendituresCategoryLocalizationDto {
+    entityId: number;
+    languageId: number;
+    name: string;
+}
+
+export interface UpdateReportFundsExpendituresCategoryLocalizationDto {
+    name: string;
+}
+
+export interface ReportFundsExpendituresSettingsLocalizableFields {
+    disclaimerTitle: string;
+}
+
+export interface ReportFundsExpendituresSettingsLocalizationDto
+    extends EntityLocalizationDto,
+        ReportFundsExpendituresSettingsLocalizableFields {
+    entityId: number;
+}
+
+export interface ReportFundsExpendituresSettingsLocalization
+    extends EntityLocalization,
+        ReportFundsExpendituresSettingsLocalizableFields {}
+
+export interface CreateReportFundsExpendituresSettingsLocalizationDto {
+    entityId: number;
+    languageId: number;
+    disclaimerTitle: string;
+}
+
+export interface UpdateReportFundsExpendituresSettingsLocalizationDto {
+    disclaimerTitle: string;
+}
+
+export interface ReportFundsExpendituresCategory
+    extends EntityWithLocalizations<ReportFundsExpendituresCategoryLocalization> {
     id: number;
     name: string;
     type: FundsExpendituresTransactionType;

@@ -1,5 +1,5 @@
 /* eslint-disable testing-library/render-result-naming-convention */
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, getDefaultNormalizer } from '@testing-library/react';
 import { createGenericForm, GenericFormField, GenericFormMode, GenericFormProps } from './GenericForm';
 import { DONATE_TEXT } from '@/const/admin/donate';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -99,11 +99,19 @@ const confirmModal = async () => clickButton(getYesButton());
 const cancelModal = () => clickButton(getNoButton());
 
 const expectModalVisible = (text: string) => {
-    expect(screen.getByText(text)).toBeInTheDocument();
+    expect(
+        screen.getByText(text, {
+            normalizer: getDefaultNormalizer({ collapseWhitespace: false }),
+        }),
+    ).toBeInTheDocument();
 };
 
 const expectModalNotVisible = (text: string) => {
-    expect(screen.queryByText(text)).not.toBeInTheDocument();
+    expect(
+        screen.queryByText(text, {
+            normalizer: getDefaultNormalizer({ collapseWhitespace: false }),
+        }),
+    ).not.toBeInTheDocument();
 };
 
 const expectButtonDisabled = (button: HTMLButtonElement, disabled: boolean = true) => {

@@ -453,7 +453,7 @@ See **[MCP_SETUP.md](MCP_SETUP.md)** for detailed setup instructions for both Cl
 
 #### Step 2
 
-- **HACK AWAY!** 🔨🔨🔨
+- **HACK AWAY!** 🔨🔨🔨 
 
 #### Step 3
 

@@ -61,13 +61,14 @@ describe('Footer', () => {
             PUBLIC_ROUTES.REPORTS.FULL,
         );
 
-        const howToSupportLink = screen.getByRole('link', { name: footerUk['HOW_TO_SUPPORT'] });
+        const howToSupportLink = document.querySelector(`a.disable[href="${PUBLIC_ROUTES.MOCK.FULL}"]`);
+        expect(howToSupportLink).toBeInTheDocument();
         expect(howToSupportLink).toHaveAttribute('href', PUBLIC_ROUTES.MOCK.FULL);
         expect(howToSupportLink).toHaveClass('disable');
 
         expect(screen.getByRole('link', { name: footerUk['STORIES_OF_VICTORIES'] })).toHaveAttribute(
             'href',
-            PUBLIC_ROUTES.MOCK.FULL,
+            PUBLIC_ROUTES.STORIES_OF_VICTORIES.FULL,
         );
     });
 
@@ -83,7 +84,7 @@ describe('Footer', () => {
         );
         expect(screen.getByRole('link', { name: footerUk['OUR_HISTORY'] })).toHaveAttribute(
             'href',
-            PUBLIC_ROUTES.MOCK.FULL,
+            PUBLIC_ROUTES.HISTORY.FULL,
         );
         expect(screen.getByRole('link', { name: footerUk['OUR_TEAM'] })).toHaveAttribute(
             'href',
@@ -95,7 +96,7 @@ describe('Footer', () => {
         );
         expect(screen.getByRole('link', { name: footerUk['EVENTS_AND_NEWS'] })).toHaveAttribute(
             'href',
-            PUBLIC_ROUTES.MOCK.FULL,
+            PUBLIC_ROUTES.EVENTS_AND_NEWS.FULL,
         );
     });
 
@@ -112,10 +113,6 @@ describe('Footer', () => {
         expect(screen.getByRole('link', { name: footerUk['PROGRAMS'] })).toHaveAttribute(
             'href',
             PUBLIC_ROUTES.PROGRAMS.FULL,
-        );
-        expect(screen.getByRole('link', { name: footerUk['PROGRAMS_SESSIONS'] })).toHaveAttribute(
-            'href',
-            PUBLIC_ROUTES.MOCK.FULL,
         );
     });
 

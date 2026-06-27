@@ -19,9 +19,9 @@ import cn from 'classnames';
 import { ACTION_ICONS } from '@/const/common/action-icons';
 import { IconButton } from '@/components/admin/icon-button/IconButton';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
 import { LocalizationLanguage } from '@/types/common/language';
 import { PdfSectionLocalizationDto } from '@/types/admin/pdf-section';
-import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
 
 interface PdfSectionContent {
     title: string;
@@ -33,6 +33,7 @@ interface PdfSectionContentBlockProps {
     content: PdfSectionContent;
     onAfterSave?: () => Promise<void>;
     translationLanguages: LocalizationLanguage[];
+    onTranslateClick?: () => void;
 }
 
 type ConfirmationModalType = 'publish' | 'cancel' | null;
@@ -41,6 +42,7 @@ export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({
     content,
     onAfterSave,
     translationLanguages,
+    onTranslateClick,
 }) => {
     const client = useAdminClient();
     const [isEditMode, setIsEditMode] = useState(false);
@@ -106,24 +108,26 @@ export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({
 
     const handleSaveConfirmed = useCallback(async () => {
         setIsSaving(true);
+        let apiSucceeded = false;
         try {
             const normalizedData = {
                 title: getNormalizedInputText(formData.title),
                 description: getNormalizedInputText(formData.description),
             };
-
             await PdfSectionApi.updatePdfSection(client, normalizedData);
-
-            if (onAfterSave) {
-                await onAfterSave();
-            }
-
+            apiSucceeded = true;
             setIsEditMode(false);
             addToast(COMMON_TEXT_ADMIN.MESSAGE.UPDATES_SUCCESSFULLY_PUBLISHED, ToastType.Success);
         } catch {
             addToast(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_PUBLISH_CHANGES, ToastType.Error);
         } finally {
             setIsSaving(false);
+        }
+
+        if (apiSucceeded && onAfterSave) {
+            try {
+                await onAfterSave();
+            } catch {}
         }
     }, [formData.title, formData.description, client, onAfterSave, addToast]);
 
@@ -220,14 +224,23 @@ export const PdfSectionContentBlock: React.FC<PdfSectionContentBlockProps> = ({
                             })),
                         }}
                     />
-                    <IconButton
-                        aria-label={PDF_FILES_SECTION_TEXT.ACTIONS.EDIT}
-                        type="button"
-                        onClick={handleEditClick}
-                        className={styles['edit-button']}
-                        DefaultIcon={ACTION_ICONS.edit.default}
-                        FilledIcon={ACTION_ICONS.edit.hover}
-                    />
+                    <div className={styles['action-buttons']}>
+                        <IconButton
+                            aria-label={PDF_FILES_SECTION_TEXT.ACTIONS.TRANSLATE}
+                            type="button"
+                            className={styles['translate-button']}
+                            onClick={onTranslateClick}
+                            DefaultIcon={ACTION_ICONS.translate.default}
+                        />
+                        <IconButton
+                            aria-label={PDF_FILES_SECTION_TEXT.ACTIONS.EDIT}
+                            type="button"
+                            onClick={handleEditClick}
+                            className={styles['edit-button']}
+                            DefaultIcon={ACTION_ICONS.edit.default}
+                            FilledIcon={ACTION_ICONS.edit.hover}
+                        />
+                    </div>
                 </div>
                 <div className={styles['content-container']}>
                     <div className={styles['view-field']}>

@@ -88,8 +88,8 @@ describe('DeleteProgramModal', () => {
     const renderDeleteProgramModal = (overrideProps: Partial<DeleteProgramModalProps> = {}) =>
         render(<DeleteProgramModal {...defaultProps} {...overrideProps} />);
 
-    const getCancelButton = () => screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL);
-    const getDeleteButton = () => screen.getByText(COMMON_TEXT_ADMIN.BUTTON.DELETE);
+    const getCancelButton = () => screen.getByText(COMMON_TEXT_ADMIN.BUTTON.NO);
+    const getDeleteButton = () => screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES);
     const getModal = () => screen.queryByTestId('delete-program-modal');
     const getErrorMessage = () => screen.queryByText(PROGRAMS_TEXT.FORM.MESSAGE.FAIL_TO_DELETE_PROGRAM);
     const getTitle = () => screen.queryByText(PROGRAMS_TEXT.FORM.TITLE.DELETE_PROGRAM);

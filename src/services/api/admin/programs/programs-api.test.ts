@@ -902,7 +902,7 @@ describe('fetchProgramSearchItems', () => {
 
         mockClient.get.mockResolvedValueOnce({
             data: {
-                items: [...mockPrograms, programWithNameMatch, programWithCategoryMatch],
+                items: [...mockPrograms, programWithCategoryMatch, programWithNameMatch],
                 totalItemsCount: 5,
             },
         });
@@ -917,6 +917,30 @@ describe('fetchProgramSearchItems', () => {
         expect(nameMatchIndex).toBeGreaterThan(-1);
         expect(categoryMatchIndex).toBeGreaterThan(-1);
         expect(nameMatchIndex).toBeLessThan(categoryMatchIndex);
+    });
+
+    it('correctly sorts matches: starts with > includes > alphabetical', async () => {
+        const searchTerm = 'program';
+        const items: HippotherapyProgramDto[] = [
+            { id: 1, name: 'ZZZ program', categories: [] } as any,
+            { id: 2, name: 'program AAA', categories: [] } as any,
+            { id: 3, name: 'AAA program', categories: [] } as any,
+            { id: 4, name: 'program ZZZ', categories: [] } as any,
+        ];
+
+        mockClient.get.mockResolvedValueOnce({
+            data: { items, totalItemsCount: 4 },
+        });
+
+        const result = await ProgramsApi.fetchProgramSearchItems(mockClient, searchTerm, 0, 10);
+        const names = result.items.map((i) => i.name);
+
+        // Expected:
+        // 1. program AAA (starts with, alphabetical)
+        // 2. program ZZZ (starts with, alphabetical)
+        // 3. AAA program (includes, alphabetical)
+        // 4. ZZZ program (includes, alphabetical)
+        expect(names).toEqual(['program AAA', 'program ZZZ', 'AAA program', 'ZZZ program']);
     });
 
     it('handles pagination', async () => {
@@ -1042,7 +1066,7 @@ describe('fetchProgramSearchItems', () => {
         const result = await ProgramsApi.fetchProgramSearchItems(mockClient, searchTerm, 2, 7, signal);
 
         expect(mockClient.get).toHaveBeenCalledWith(`${API_ROUTES.PROGRAMS.SEARCH}`, {
-            params: { SearchQuery: searchTerm, offset: 2, limit: 7 },
+            params: { searchQuery: searchTerm, offset: 2, limit: 7 },
             signal,
         });
 

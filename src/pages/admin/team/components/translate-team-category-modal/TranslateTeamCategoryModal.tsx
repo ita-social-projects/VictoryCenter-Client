@@ -33,7 +33,7 @@ export const TranslateTeamCategoryModal = ({
     const formRef = useRef<TranslateTeamCategoryFormRef>(null);
     const [isFormValid, setIsFormValid] = useState(false);
     const [isDirty, setIsDirty] = useState(false);
-    const [selectedCategory, setSelectedCategory] = useState<TeamCategory | null>(null);
+    const [selectedCategory, setSelectedCategory] = useState<TeamCategory | null>(categoryToTranslate);
 
     const [language, setLanguage] = useState<LocalizationLanguage | null>(() => {
         if (!translatedLanguages?.length) return null;
@@ -107,6 +107,7 @@ export const TranslateTeamCategoryModal = ({
             <TranslateTeamCategoryForm
                 ref={formRef}
                 categories={categories}
+                selectedCategory={selectedCategory}
                 initialData={initialData}
                 onCategoryChange={setSelectedCategory}
                 onValidationChange={setIsFormValid}

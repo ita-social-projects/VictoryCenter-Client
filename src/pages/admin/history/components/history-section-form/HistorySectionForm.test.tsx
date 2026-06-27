@@ -7,10 +7,21 @@ import { ContentType } from '@/types/common/section-contents';
 import { SectionMode, SectionTemplate } from '@/types/common/sections';
 import type { HistorySectionDto } from '@/types/common/history-sections';
 import type { ImageValues } from '@/types/common/image';
+import type { LocalizationLanguage } from '@/types/common/language';
 
 const mockRenderHistorySection = jest.fn();
 const mockGetInitialHistorySectionContents = jest.fn();
 const mockIsHistoryTemplate = jest.fn();
+const mockMapHistorySectionContentDtoToModel = jest.fn();
+const mockReturnDisplayedLocalization = jest.fn();
+
+jest.mock('@/utils/functions/mappers/admin/history/history-mappers', () => ({
+    mapHistorySectionContentDtoToModel: (...args: unknown[]) => mockMapHistorySectionContentDtoToModel(...args),
+}));
+
+jest.mock('@/utils/functions/localization/localization', () => ({
+    returnDisplayedLocalization: (...args: unknown[]) => mockReturnDisplayedLocalization(...args),
+}));
 
 jest.mock('@/utils/functions/render-history-section', () => ({
     renderHistorySection: (...args: unknown[]) => mockRenderHistorySection(...args),
@@ -71,6 +82,7 @@ const createSection = (): HistorySectionDto => ({
             contentType: ContentType.Title,
             order: 0,
             title: 'Original title',
+            localizations: [],
         },
         {
             id: 2,
@@ -78,6 +90,7 @@ const createSection = (): HistorySectionDto => ({
             contentType: ContentType.Description,
             order: 1,
             description: 'Original description',
+            localizations: [],
         },
         {
             id: 3,
@@ -85,6 +98,7 @@ const createSection = (): HistorySectionDto => ({
             contentType: ContentType.Image,
             order: 2,
             image: { id: 3, url: 'image.jpg', mimeType: 'image/jpeg' },
+            localizations: [],
         },
     ],
 });
@@ -106,11 +120,43 @@ const createProps = (
     ...overrides,
 });
 
+const createDenormalizedSection = (): HistorySectionDto => ({
+    ...createSection(),
+    contents: [
+        {
+            id: 3,
+            sectionId: 1,
+            contentType: ContentType.Image,
+            order: 0,
+            image: { id: 3, url: 'image.jpg', mimeType: 'image/jpeg' },
+            localizations: [],
+        },
+        {
+            id: 1,
+            sectionId: 1,
+            contentType: ContentType.Title,
+            order: 1,
+            title: 'Original title',
+            localizations: [],
+        },
+        {
+            id: 2,
+            sectionId: 1,
+            contentType: ContentType.Description,
+            order: 2,
+            description: 'Original description',
+            localizations: [],
+        },
+    ],
+});
+
 describe('HistorySectionForm', () => {
     beforeEach(() => {
         jest.clearAllMocks();
 
         mockIsHistoryTemplate.mockReturnValue(true);
+        mockMapHistorySectionContentDtoToModel.mockReturnValue({});
+        mockReturnDisplayedLocalization.mockReturnValue(null);
         mockGetInitialHistorySectionContents.mockReturnValue([
             {
                 contentType: ContentType.Title,
@@ -374,32 +420,7 @@ describe('HistorySectionForm', () => {
     });
 
     it('emits a normalized section via onSectionChange when the incoming section needs normalization', () => {
-        const denormalizedSection: HistorySectionDto = {
-            ...createSection(),
-            contents: [
-                {
-                    id: 3,
-                    sectionId: 1,
-                    contentType: ContentType.Image,
-                    order: 0,
-                    image: { id: 3, url: 'image.jpg', mimeType: 'image/jpeg' },
-                },
-                {
-                    id: 1,
-                    sectionId: 1,
-                    contentType: ContentType.Title,
-                    order: 1,
-                    title: 'Original title',
-                },
-                {
-                    id: 2,
-                    sectionId: 1,
-                    contentType: ContentType.Description,
-                    order: 2,
-                    description: 'Original description',
-                },
-            ],
-        };
+        const denormalizedSection = createDenormalizedSection();
 
         const props = createProps({ section: denormalizedSection });
 
@@ -539,6 +560,7 @@ describe('HistorySectionForm', () => {
                     contentType: ContentType.Title,
                     order: 0,
                     title: 'Original title',
+                    localizations: [],
                 },
             ],
         };
@@ -576,32 +598,7 @@ describe('HistorySectionForm', () => {
     });
 
     it('skips processing when rerendered with previously emitted section object', () => {
-        const sectionNeedingNormalization: HistorySectionDto = {
-            ...createSection(),
-            contents: [
-                {
-                    id: 3,
-                    sectionId: 1,
-                    contentType: ContentType.Image,
-                    order: 0,
-                    image: { id: 3, url: 'image.jpg', mimeType: 'image/jpeg' },
-                },
-                {
-                    id: 1,
-                    sectionId: 1,
-                    contentType: ContentType.Title,
-                    order: 1,
-                    title: 'Original title',
-                },
-                {
-                    id: 2,
-                    sectionId: 1,
-                    contentType: ContentType.Description,
-                    order: 2,
-                    description: 'Original description',
-                },
-            ],
-        };
+        const sectionNeedingNormalization = createDenormalizedSection();
 
         const props = createProps({ section: sectionNeedingNormalization });
 
@@ -614,6 +611,43 @@ describe('HistorySectionForm', () => {
         rerender(<HistorySectionForm {...props} section={emittedNormalizedSection} />);
 
         expect(props.onSectionChange).not.toHaveBeenCalled();
+    });
+
+    it('applies localized text fields when language prop is provided', () => {
+        const language: LocalizationLanguage = { id: 1, code: 'en', name: 'English' };
+
+        mockReturnDisplayedLocalization
+            .mockReturnValueOnce({
+                title: 'EN Title',
+                description: null,
+                language: { id: 1, code: 'en' },
+                translationStatus: 'TRANSLATED',
+            })
+            .mockReturnValueOnce({
+                title: null,
+                description: 'EN Description',
+                language: { id: 1, code: 'en' },
+                translationStatus: 'TRANSLATED',
+            });
+
+        const props = createProps({ language });
+
+        render(<HistorySectionForm {...props} />);
+
+        expect(mockMapHistorySectionContentDtoToModel).toHaveBeenCalled();
+        expect(mockReturnDisplayedLocalization).toHaveBeenCalledWith(expect.anything(), 'en');
+    });
+
+    it('allows save when isReplacingTemplate is true even when an existing image is removed', () => {
+        const props = createProps({ isReplacingTemplate: true });
+
+        render(<HistorySectionForm {...props} />);
+
+        // Component already starts in Edit mode due to isReplacingTemplate=true
+        fireEvent.click(screen.getByTestId('remove-image'));
+
+        // isReplacingTemplate=true overrides the deleted-image restriction
+        expect(screen.getByRole('button', { name: SECTIONS_TEXT.BUTTON.SAVE })).not.toBeDisabled();
     });
 
     it('does not reset the draft when only the onSectionChange callback identity changes', () => {

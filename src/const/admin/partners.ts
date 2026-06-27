@@ -12,7 +12,7 @@ export const PARTNERS_TEXT = {
         },
         TITLE: {
             DELETE_SECTION: 'Видалити секцію',
-            PUBLISH_SECTION: 'Опублікувати нову секцію?',
+            PUBLISH_SECTION: 'Опублікувати зміни?',
         },
         MESSAGE: {
             FAIL_TO_DELETE_PARTNER_SECTION: 'Виникла помилка під час видалення секції партнерів',

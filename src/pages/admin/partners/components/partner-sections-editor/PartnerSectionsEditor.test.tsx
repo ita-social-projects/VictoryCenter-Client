@@ -302,16 +302,18 @@ describe('PartnerSectionsEditor', () => {
         await openPublishModal(getLatestFormProps());
         await confirmPublish();
 
-        expect(mockedPartnersApi.postSection).toHaveBeenCalledWith('mock-client', {
-            title: 'New title',
-            description: 'New description',
-            partners: [
-                {
-                    description: 'Partner desc',
-                    image: { base64: 'base64', mimeType: 'image/png' },
-                    imageId: null,
-                },
-            ],
+        await waitFor(() => {
+            expect(mockedPartnersApi.postSection).toHaveBeenCalledWith('mock-client', {
+                title: 'New title',
+                description: 'New description',
+                partners: [
+                    {
+                        description: 'Partner desc',
+                        image: { base64: 'base64', mimeType: 'image/png' },
+                        imageId: null,
+                    },
+                ],
+            });
         });
 
         await waitFor(() => {
@@ -349,16 +351,18 @@ describe('PartnerSectionsEditor', () => {
         await openPublishModal(props);
         await confirmPublish();
 
-        expect(mockedPartnersApi.updateSection).toHaveBeenCalledWith('mock-client', props.value.sectionId, {
-            title: props.value.title,
-            description: props.value.description,
-            partnersToUpdate: props.value.partners.map((partner: any) => ({
-                id: partner.partnerId,
-                description: partner.description,
-                image: partner.image,
-                imageId: partner.imageId,
-            })),
-            partnerIdsToDelete: props.value.deletedPartnerIds || [],
+        await waitFor(() => {
+            expect(mockedPartnersApi.updateSection).toHaveBeenCalledWith('mock-client', props.value.sectionId, {
+                title: props.value.title,
+                description: props.value.description,
+                partnersToUpdate: props.value.partners.map((partner: any) => ({
+                    id: partner.partnerId,
+                    description: partner.description,
+                    image: partner.image,
+                    imageId: partner.imageId,
+                })),
+                partnerIdsToDelete: props.value.deletedPartnerIds || [],
+            });
         });
 
         await waitFor(() => {

@@ -146,13 +146,10 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
     const handleConfirmPublish = useCallback(async () => {
         if (!sectionToPublishId) return;
 
-        const localId = sectionToPublishId;
-        setIsPublishModalOpen(false);
-        setSectionToPublishId(null);
         setIsPublishing(true);
-
+        setIsPublishModalOpen(false);
         try {
-            const sectionToPublish = localSections.find((s) => s.localId === localId);
+            const sectionToPublish = localSections.find((s) => s.localId === sectionToPublishId);
             if (!sectionToPublish) return;
 
             let savedSection: PartnerSection;
@@ -196,7 +193,7 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
             });
 
             const updateSectionInList = (s: PartnerSectionFormValues) => {
-                if (s.localId === localId) {
+                if (s.localId === sectionToPublishId) {
                     return {
                         ...s,
                         sectionId: savedSection.id,
@@ -217,8 +214,9 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
             addToast(PARTNERS_TEXT.MESSAGE.FAIL_TO_PUBLISH_SECTION, ToastType.Error);
         } finally {
             setIsPublishing(false);
+            setSectionToPublishId(null);
         }
-    }, [sectionToPublishId, localSections, addToast, client, setLocalSections]);
+    }, [localSections, addToast, client, setLocalSections, sectionToPublishId]);
 
     const handleDeleteRequest = useCallback((localId: string) => {
         setSectionToDeleteId(localId);

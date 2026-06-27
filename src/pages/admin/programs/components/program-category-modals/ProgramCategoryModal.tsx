@@ -262,7 +262,11 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
             <Modal isOpen={isOpen} onClose={handleClose}>
                 <Modal.Title>{getTitle()}</Modal.Title>
                 <Modal.Content>
-                    <form onSubmit={(e) => e.preventDefault()} className="program-form-main" id={getFormId()}>
+                    <form
+                        onSubmit={(e) => e.preventDefault()}
+                        className="program-form-main hide-scrollbar"
+                        id={getFormId()}
+                    >
                         {mode === 'edit' && (
                             <SingleSelectInputGroup
                                 id={getFieldId('select')}

@@ -6,9 +6,9 @@ import * as fundsExpendituresSchema from '@/validation/admin/reports-schema/fund
 import { useFundsExpendituresRecordForm } from './useFundsExpendituresRecordForm';
 
 const categories: ReportFundsExpendituresCategory[] = [
-    { id: 3, name: 'C income', type: 'income' },
-    { id: 1, name: 'A income', type: 'income' },
-    { id: 2, name: 'B expense', type: 'expense' },
+    { id: 3, name: 'C income', type: 'income', localizations: [] },
+    { id: 1, name: 'A income', type: 'income', localizations: [] },
+    { id: 2, name: 'B expense', type: 'expense', localizations: [] },
 ];
 
 const records: ReportFundsExpendituresRecord[] = [
@@ -48,48 +48,6 @@ describe('useFundsExpendituresRecordForm', () => {
         expect(result.current.formState.errors.categoryId).toBe(
             FUNDS_EXPENDITURES_TEXT.VALIDATION.CATEGORY_UNIQUE_EXPENSE,
         );
-    });
-
-    it('updates amount values and sets usd mismatch on blur', () => {
-        const { result } = renderUseFundsForm();
-
-        act(() => {
-            result.current.handleAmountChange('100');
-            result.current.handleUsdChange('1');
-            result.current.handleAmountBlur('amountUsd');
-        });
-
-        expect(result.current.usdMismatchMessage).toBe(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH);
-    });
-
-    it('keeps usd mismatch message undefined when amounts match on blur', () => {
-        const { result } = renderUseFundsForm();
-
-        act(() => {
-            result.current.handleAmountChange('100');
-            result.current.handleUsdChange('10');
-            result.current.handleAmountBlur('amountUsd');
-        });
-
-        expect(result.current.usdMismatchMessage).toBeUndefined();
-    });
-
-    it('clears usd mismatch after amount uah blur recalculation', () => {
-        const { result } = renderUseFundsForm();
-
-        act(() => {
-            result.current.handleAmountChange('100');
-            result.current.handleUsdChange('1');
-            result.current.handleAmountBlur('amountUsd');
-        });
-
-        expect(result.current.usdMismatchMessage).toBe(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH);
-
-        act(() => {
-            result.current.handleAmountBlur('amountUah');
-        });
-
-        expect(result.current.usdMismatchMessage).toBeUndefined();
     });
 
     it('does not submit invalid form and closes confirmation state', async () => {

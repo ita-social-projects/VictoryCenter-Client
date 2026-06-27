@@ -14,7 +14,6 @@ describe('HippotherapyPage', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         MockLoadableContent.mockImplementation(() => <div></div>);
-        // MockHippotherapyIntro.mockImplementation(() => <div></div>);
     });
 
     it('should render LoadableContent component', async () => {

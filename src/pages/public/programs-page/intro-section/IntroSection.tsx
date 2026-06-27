@@ -8,10 +8,10 @@ export const IntroSection: React.FC = () => {
     return (
         <div className={styles['intro-section']}>
             <h1>
-                <p>{t('MAIN_TITLE.PREFIX')}</p>
-                <span>{t('MAIN_TITLE.FIRST_HIGHLIGHT')}</span>
-                {t('MAIN_TITLE.MIDDLE')}
-                <span>{t('MAIN_TITLE.SECOND_HIGHLIGHT')}</span>
+                <span>{t('MAIN_TITLE.PREFIX')}</span>
+                <span className={styles['highlight-yellow']}>{t('MAIN_TITLE.FIRST_HIGHLIGHT')}</span>
+                <span>{t('MAIN_TITLE.MIDDLE')}</span>
+                <span className={styles['highlight-blue']}>{t('MAIN_TITLE.SECOND_HIGHLIGHT')}</span>
             </h1>
             <div className={styles['additional-info']}>
                 <p>

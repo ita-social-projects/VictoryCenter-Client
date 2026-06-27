@@ -82,17 +82,17 @@ describe('DescriptionAuthorPairCard', () => {
         expect(screen.queryByTestId('textarea-pair-author-0')).not.toBeInTheDocument();
     });
 
-    it('renders editable inputs and hides delete for first card', () => {
-        renderCard({ index: 0 });
+    it('renders editable inputs and hides delete when canDelete is false', () => {
+        renderCard({ canDelete: false });
 
         expect(screen.getByTestId('textarea-pair-description-0')).toBeInTheDocument();
         expect(screen.getByTestId('textarea-pair-author-0')).toBeInTheDocument();
         expect(screen.queryByLabelText('delete')).not.toBeInTheDocument();
     });
 
-    it('renders delete for cards after the first and calls onDelete', () => {
+    it('renders delete when canDelete is true and calls onDelete', () => {
         const onDelete = jest.fn();
-        renderCard({ index: 2, onDelete });
+        renderCard({ index: 2, canDelete: true, onDelete });
 
         fireEvent.click(screen.getByLabelText('delete'));
 
@@ -101,7 +101,7 @@ describe('DescriptionAuthorPairCard', () => {
     });
 
     it('does not throw when delete clicked without onDelete', () => {
-        renderCard({ index: 1, onDelete: undefined });
+        renderCard({ index: 1, canDelete: true, onDelete: undefined });
 
         fireEvent.click(screen.getByLabelText('delete'));
 

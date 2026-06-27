@@ -6,11 +6,11 @@ export interface UseDataFetchResult<TResult> {
     data: TResult;
     isLoading: boolean;
     error: any | null;
-    refetch: () => Promise<void>;
+    refetch: (shouldRethrow?: boolean | unknown) => Promise<void>;
     setData: Dispatch<SetStateAction<TResult>>;
 }
 
-export interface useDataFetchProps<TResult> {
+export interface UseDataFetchParams<TResult> {
     initialData: TResult;
     fetchHandler: (options: RequestOptions) => Promise<TResult>;
     autoFetchDependencies?: any[];
@@ -22,39 +22,46 @@ export const useDataFetch = <TResult>({
     fetchHandler,
     autoFetchDependencies = [],
     autoFetchDisabled = false,
-}: useDataFetchProps<TResult>): UseDataFetchResult<TResult> => {
+}: UseDataFetchParams<TResult>): UseDataFetchResult<TResult> => {
     const [fetchedData, setFetchedData] = useState<TResult>(initialData);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState<boolean>(!autoFetchDisabled);
     const [error, setError] = useState<any | null>(null);
     const abortControllerRef = useRef<AbortController | null>(null);
 
-    const fetchData = useCallback(async () => {
-        abortControllerRef.current?.abort();
-        const newAbortController = new AbortController();
-        abortControllerRef.current = newAbortController;
+    const fetchData = useCallback(
+        async (shouldRethrow: boolean | unknown = false) => {
+            const effectiveShouldRethrow = shouldRethrow === true;
+            abortControllerRef.current?.abort();
+            const newAbortController = new AbortController();
+            abortControllerRef.current = newAbortController;
 
-        setIsLoading(true);
-        setError(null);
+            setIsLoading(true);
+            setError(null);
 
-        const apiOptions: RequestOptions = { cancellationSignal: newAbortController.signal };
+            const apiOptions: RequestOptions = { cancellationSignal: newAbortController.signal };
 
-        try {
-            const result = await fetchHandler(apiOptions);
+            try {
+                const result = await fetchHandler(apiOptions);
 
-            if (newAbortController.signal.aborted) return;
+                if (newAbortController.signal.aborted) return;
 
-            setFetchedData(result);
-        } catch (error: any) {
-            if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {
-                return;
+                setFetchedData(result);
+            } catch (error: any) {
+                if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {
+                    return;
+                }
+                setError(error);
+                if (effectiveShouldRethrow) {
+                    throw error;
+                }
+            } finally {
+                if (!newAbortController.signal.aborted) {
+                    setIsLoading(false);
+                }
             }
-            setError(error);
-        } finally {
-            if (!newAbortController.signal.aborted) {
-                setIsLoading(false);
-            }
-        }
-    }, [fetchHandler]);
+        },
+        [fetchHandler],
+    );
 
     useEffect(() => {
         if (autoFetchDisabled) {

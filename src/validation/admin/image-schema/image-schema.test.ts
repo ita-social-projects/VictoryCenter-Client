@@ -14,7 +14,7 @@ const createTestFile = (size: number, type: string = 'image/jpeg', name: string 
 describe('ImageValidationSchema', () => {
     const MIN_WIDTH = 1920;
     const MIN_HEIGHT = 1080;
-    const MAX_SIZE_MB = 3;
+    const MAX_SIZE_MB = 5;
     const validationSchema = getImageValidationSchema(MIN_WIDTH, MIN_HEIGHT, MAX_SIZE_MB);
 
     beforeAll(() => {

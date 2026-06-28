@@ -1,3 +1,11 @@
+@use '@/assets/sass/variables/colors.scss' as c;
+
 .loader {
     width: 100%;
+}
+
+.error {
+    color: c.$error;
+    margin-top: 128px;
+    text-align: center;
 }

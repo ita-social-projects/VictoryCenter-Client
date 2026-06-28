@@ -14,12 +14,14 @@ describe('IntroSection', () => {
         expect(firstParagraph).toBeInTheDocument();
         expect(secondParagraph).toBeInTheDocument();
     });
-    test('should contain two special spans', () => {
+    test('should contain four spans with correct text', () => {
         const { container } = render(<IntroSection />);
         const spans = container.querySelectorAll('span');
-        expect(spans.length).toEqual(2);
-        expect(spans[0]).toHaveTextContent('простори,');
-        expect(spans[1]).toHaveTextContent('зцілення');
+        expect(spans.length).toEqual(4);
+        expect(spans[0]).toHaveTextContent('Ми створюємо');
+        expect(spans[1]).toHaveTextContent('простори,');
+        expect(spans[2]).toHaveTextContent('де можливе');
+        expect(spans[3]).toHaveTextContent('зцілення');
     });
     test('should have correct class names', () => {
         const { container } = render(<IntroSection />);

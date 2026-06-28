@@ -71,7 +71,7 @@ export const DeleteCategoryModal = ({ isOpen, onClose, onDeleteCategory, categor
         <Modal isOpen={isOpen} onClose={handleClose}>
             <Modal.Title>{COMMON_TEXT_ADMIN.CATEGORIES.FORM.TITLE.DELETE_CATEGORY}</Modal.Title>
             <Modal.Content>
-                <div className="program-form-main">
+                <div className="program-form-main hide-scrollbar expandable-dropdown">
                     <SingleSelectInputGroup
                         id="delete-category-select"
                         label={PROGRAM_CATEGORY_TEXT.FORM.LABEL.CATEGORY}

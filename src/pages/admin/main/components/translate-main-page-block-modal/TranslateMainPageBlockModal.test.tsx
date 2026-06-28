@@ -24,6 +24,22 @@ jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGr
     RichTextInputGroup: require('@/utils/test-mocks/main-page-mocks').MockRichTextInputGroup,
 }));
 
+jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
+    __esModule: true,
+    ConfirmationModal: ({ isOpen, title, onConfirm, onCancel }: any) =>
+        isOpen ? (
+            <div data-testid="language-switch-confirmation">
+                <span>{title}</span>
+                <button data-testid="confirm-language-switch" onClick={onConfirm}>
+                    Так
+                </button>
+                <button data-testid="cancel-language-switch" onClick={onCancel}>
+                    Ні
+                </button>
+            </div>
+        ) : null,
+}));
+
 const englishLanguage = { id: 2, code: 'en', name: 'Англійська' };
 
 const basePage: MainPage = {
@@ -305,11 +321,99 @@ describe('TranslateMainPageBlockModal', () => {
         fireEvent.change(titleInput(), { target: { value: 'Valid title text' } });
         fireEvent.click(screen.getByLabelText('Close modal'));
 
-        expect(screen.getByText('Зміни будуть втрачені. Бажаєте продовжити?')).toBeInTheDocument();
+        expect(screen.getByText(/Зміни будуть втрачені/i)).toBeInTheDocument();
         expect(onClose).not.toHaveBeenCalled();
 
         fireEvent.click(screen.getByText('Так'));
 
         await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
+    });
+
+    it('renders edit mode with existing partners localization for partners block', () => {
+        renderModal({
+            block: MainPageLocalizationBlock.Partners,
+            page: {
+                ...basePage,
+                mainPartners: {
+                    ...basePage.mainPartners!,
+                    localizations: [
+                        {
+                            languageId: englishLanguage.id,
+                            language: englishLanguage,
+                            title: 'Existing partners title',
+                            description: 'Existing partners description',
+                            translationStatus: TranslationStatus.Relevant,
+                        },
+                    ],
+                },
+            },
+        });
+
+        expect(screen.getByText('Редагувати переклад')).toBeInTheDocument();
+        expect(titleInput()).toHaveValue('Existing partners title');
+        expect(descriptionInput()).toHaveValue('Existing partners description');
+    });
+
+    it('auto-selects the first available language once translated languages load while the modal is open', async () => {
+        const { rerender } = render(
+            <TranslateMainPageBlockModal
+                isOpen
+                onClose={jest.fn()}
+                page={basePage}
+                block={MainPageLocalizationBlock.Title}
+                translatedLanguages={[]}
+                onTranslated={jest.fn()}
+            />,
+        );
+
+        expect(screen.queryByText('Англійська')).not.toBeInTheDocument();
+
+        rerender(
+            <TranslateMainPageBlockModal
+                isOpen
+                onClose={jest.fn()}
+                page={basePage}
+                block={MainPageLocalizationBlock.Title}
+                translatedLanguages={[englishLanguage]}
+                onTranslated={jest.fn()}
+            />,
+        );
+
+        expect(await screen.findByText('Англійська')).toBeInTheDocument();
+    });
+
+    it('shows a confirmation and switches language when confirmed while the form is dirty', async () => {
+        const frenchLanguage = { id: 3, code: 'fr', name: 'Французька' };
+        renderModal({ translatedLanguages: [englishLanguage, frenchLanguage] });
+
+        fireEvent.change(titleInput(), { target: { value: 'Dirty title text' } });
+
+        fireEvent.click(screen.getByText('Англійська'));
+        fireEvent.click(screen.getByText('Французька'));
+
+        expect(await screen.findByTestId('language-switch-confirmation')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByTestId('confirm-language-switch'));
+
+        expect(await screen.findByText('Французька')).toBeInTheDocument();
+        expect(screen.queryByTestId('language-switch-confirmation')).not.toBeInTheDocument();
+    });
+
+    it('keeps the original language and clears the confirmation when language switch is cancelled', async () => {
+        const frenchLanguage = { id: 3, code: 'fr', name: 'Французька' };
+        renderModal({ translatedLanguages: [englishLanguage, frenchLanguage] });
+
+        fireEvent.change(titleInput(), { target: { value: 'Dirty title text' } });
+
+        fireEvent.click(screen.getByText('Англійська'));
+        fireEvent.click(screen.getByText('Французька'));
+
+        expect(await screen.findByTestId('language-switch-confirmation')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByTestId('cancel-language-switch'));
+
+        await waitFor(() => expect(screen.queryByTestId('language-switch-confirmation')).not.toBeInTheDocument());
+        expect(screen.getByText('Англійська')).toBeInTheDocument();
+        expect(titleInput()).toHaveValue('Dirty title text');
     });
 });

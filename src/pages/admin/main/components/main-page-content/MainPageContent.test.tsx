@@ -73,6 +73,22 @@ jest.mock('@/components/admin/localization-statuses/LocalizationStatuses', () =>
     ),
 }));
 
+jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
+    __esModule: true,
+    ConfirmationModal: ({ isOpen, title, onConfirm, onCancel }: any) =>
+        isOpen ? (
+            <div data-testid="confirmation-modal">
+                <span>{title}</span>
+                <button data-testid="confirmation-confirm" onClick={onConfirm}>
+                    Так
+                </button>
+                <button data-testid="confirmation-cancel" onClick={onCancel}>
+                    Ні
+                </button>
+            </div>
+        ) : null,
+}));
+
 const MockFormBlock = ({ testId, btnTestId, onPublish, isPublishDisabled }: any) => {
     const { useFormContext } = require('react-hook-form');
     const { setValue } = useFormContext();
@@ -1118,5 +1134,63 @@ describe('MainPageContent', () => {
         await waitFor(() => {
             expect(mockAddToast).toHaveBeenCalledWith('Зміни успішно опубліковано', 'success', 3000);
         });
+    });
+
+    it('switches language immediately without confirmation when form is not dirty', async () => {
+        await renderAndLoadContent();
+
+        fireEvent.click(screen.getByTestId('language-en'));
+
+        expect(mockLocalizationToolkitState.onLanguageChange).toHaveBeenCalledWith(
+            expect.objectContaining({ code: 'en' }),
+        );
+        expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
+    });
+
+    it('asks for confirmation before switching language when there are unsaved changes, and switches on confirm', async () => {
+        await renderAndLoadContent();
+
+        fireEvent.click(screen.getByTestId('publish-btn-dirty'));
+        await waitFor(() => expect(screen.getByTestId('publish-btn')).not.toBeDisabled());
+
+        fireEvent.click(screen.getByTestId('language-en'));
+
+        expect(await screen.findByTestId('confirmation-modal')).toBeInTheDocument();
+        expect(mockLocalizationToolkitState.onLanguageChange).not.toHaveBeenCalled();
+
+        fireEvent.click(screen.getByTestId('confirmation-confirm'));
+
+        expect(mockLocalizationToolkitState.onLanguageChange).toHaveBeenCalledWith(
+            expect.objectContaining({ code: 'en' }),
+        );
+        await waitFor(() => expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument());
+    });
+
+    it('keeps the current language and hides the confirmation when the language switch is cancelled', async () => {
+        await renderAndLoadContent();
+
+        fireEvent.click(screen.getByTestId('publish-btn-dirty'));
+        await waitFor(() => expect(screen.getByTestId('publish-btn')).not.toBeDisabled());
+
+        fireEvent.click(screen.getByTestId('language-en'));
+        expect(await screen.findByTestId('confirmation-modal')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByTestId('confirmation-cancel'));
+
+        expect(mockLocalizationToolkitState.onLanguageChange).not.toHaveBeenCalled();
+        await waitFor(() => expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument());
+    });
+
+    it('closes the translation modal via the close button without an unsaved-changes prompt', async () => {
+        mockLocalizationToolkitState.translationLanguages = [{ id: 2, code: 'en', name: 'Англійська' }];
+
+        await renderAndLoadContent();
+
+        fireEvent.click(screen.getByLabelText('Додати переклад'));
+        expect(await screen.findByText('Додати переклад')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByLabelText('Close modal'));
+
+        await waitFor(() => expect(screen.queryByText('Додати переклад')).not.toBeInTheDocument());
     });
 });

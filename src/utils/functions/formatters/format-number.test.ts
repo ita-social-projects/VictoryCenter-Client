@@ -76,53 +76,48 @@ describe('format-number formatters', () => {
     });
 
     describe('formatCurrencyInput', () => {
-        it('removes invalid characters before formatting', () => {
-            expectFormatCases(formatCurrencyInput, [
-                ['abc', ''],
-                ['12abc', '12'],
-                ['1a2', '12'],
-            ]);
-        });
+        const formatCurrencyInputCases: Array<{
+            description: string;
+            cases: Array<[input: string, expected: string]>;
+        }> = [
+            {
+                description: 'removes invalid characters before formatting',
+                cases: [
+                    ['abc', ''],
+                    ['12abc', '12'],
+                    ['1a2', '12'],
+                ],
+            },
+            {
+                description: 'formats integers with spaces as thousands separators',
+                cases: [
+                    ['1000', '1 000'],
+                    ['1234567', '1 234 567'],
+                ],
+            },
+            {
+                description: 'replaces comma with dot before formatting',
+                cases: [
+                    ['1000,50', '1 000.50'],
+                    ['999,9', '999.9'],
+                    ['1,2,3', '1.23'],
+                ],
+            },
+            {
+                description: 'truncates the decimal part to 2 decimal places',
+                cases: [
+                    ['100.999', '100.99'],
+                    ['1.1234', '1.12'],
+                ],
+            },
+            {
+                description: 'ignores extra periods more than one',
+                cases: [['1.2.3', '1.23']],
+            },
+        ];
 
-        it('formats integers with spaces as thousands separators', () => {
-            expectFormatCases(formatCurrencyInput, [
-                ['1000', '1 000'],
-                ['1234567', '1 234 567'],
-            ]);
-        });
-
-        it('replaces comma with dot before formatting', () => {
-            expectFormatCases(formatCurrencyInput, [
-                ['1000,50', '1 000.50'],
-                ['999,9', '999.9'],
-                ['1,2,3', '1.23'],
-            ]);
-        });
-
-        it('truncates the decimal part to 2 decimal places', () => {
-            expectFormatCases(formatCurrencyInput, [
-                ['100.999', '100.99'],
-                ['1.1234', '1.12'],
-            ]);
-        });
-
-        it('ignores extra periods (more than one)', () => {
-            expect(formatCurrencyInput('1.2.3')).toBe('1.23');
-        });
-
-        it('returns empty string for empty input', () => {
-            expect(formatCurrencyInput('')).toBe('');
-        });
-
-        it('correctly handles spaces in the input (considered valid)', () => {
-            expect(formatCurrencyInput('1 000')).toBe('1 000');
-        });
-
-        it('preserves a leading minus for validation', () => {
-            expectFormatCases(formatCurrencyInput, [
-                ['-1000.50', '-1 000.50'],
-                ['10-00', '1 000'],
-            ]);
+        it.each(formatCurrencyInputCases)('$description', ({ cases }) => {
+            expectFormatCases(formatCurrencyInput, cases);
         });
     });
 

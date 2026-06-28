@@ -224,7 +224,8 @@ export const useTranslateMainPageBlock = ({ page, block, language, onSuccess }: 
     const [error, setError] = useState('');
 
     const translateMainPageBlock = async (data: TranslateMainPageBlockFormValues) => {
-        if (page?.id == null || block == null || !language) {
+        if (page?.id == null || language?.id == null || block == null) {
+            setError(MAIN_PAGE_TEXT.ERRORS.TRANSLATION_SAVE_FAILED);
             return;
         }
 
@@ -265,9 +266,8 @@ export const useTranslateMainPageBlock = ({ page, block, language, onSuccess }: 
                   );
 
             await onSuccess(savedLocalization);
-        } catch (saveError) {
+        } catch {
             setError(MAIN_PAGE_TEXT.ERRORS.TRANSLATION_SAVE_FAILED);
-            throw saveError;
         } finally {
             setIsSubmitting(false);
         }

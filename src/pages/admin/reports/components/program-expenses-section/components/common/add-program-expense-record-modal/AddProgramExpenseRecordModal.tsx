@@ -186,6 +186,11 @@ export const AddProgramExpenseRecordModal = ({
             onClose,
         });
 
+    const handleClose = () => {
+        if (isSubmitting) return;
+        handleRequestClose();
+    };
+
     useEffect(() => {
         if (!isOpen) {
             handleCancelClose();
@@ -210,7 +215,7 @@ export const AddProgramExpenseRecordModal = ({
 
     return (
         <>
-            <Modal isOpen={isOpen} onClose={handleRequestClose} className={styles.modal} maxWidth="650px">
+            <Modal isOpen={isOpen} onClose={handleClose} className={styles.modal} maxWidth="650px">
                 <Modal.Title>
                     <div className={styles.header}>
                         <h2 className={styles.title}>{titleText}</h2>

@@ -11,8 +11,17 @@ interface ModalProps {
 }
 
 jest.mock('@/components/common/modal/Modal', () => {
-    const Modal = ({ children, isOpen }: ModalProps) =>
-        isOpen ? <div data-testid="add-program-expense-modal">{children}</div> : null;
+    const Modal = ({ children, isOpen, onClose }: ModalProps & { onClose?: () => void }) =>
+        isOpen ? (
+            <div data-testid="add-program-expense-modal">
+                {children}
+                {onClose && (
+                    <button data-testid="mock-modal-close-btn" onClick={onClose}>
+                        Mock Close
+                    </button>
+                )}
+            </div>
+        ) : null;
 
     Modal.Title = ({ children }: { children: ReactNode }) => <div data-testid="modal-title">{children}</div>;
     Modal.Content = ({ children }: { children: ReactNode }) => <div data-testid="modal-content">{children}</div>;
@@ -361,6 +370,28 @@ describe('AddProgramExpenseRecordModal', () => {
             expect(screen.getByTestId('close-confirmation')).toHaveTextContent(
                 PROGRAM_EXPENSES_TEXT.MODAL.EDIT.CONFIRM_CLOSE_TITLE,
             );
+        });
+
+        it('blocks close requests when submitting is pending', async () => {
+            const onClose = jest.fn();
+            let resolveSubmit!: (val: boolean) => void;
+            const onSubmit = jest.fn().mockImplementation(() => new Promise((resolve) => {
+                resolveSubmit = resolve;
+            }));
+
+            renderModal({ recordToEdit, onSubmit, onClose });
+
+            fireEvent.change(screen.getByTestId('add-program-expense-amount-uah'), { target: { value: '200' } });
+            fireEvent.click(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.MODAL.EDIT.SUBMIT_BUTTON }));
+
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.CANCEL })).toBeDisabled();
+
+            fireEvent.click(screen.getByTestId('mock-modal-close-btn'));
+
+            expect(onClose).not.toHaveBeenCalled();
+            expect(screen.queryByTestId('close-confirmation')).not.toBeInTheDocument();
+
+            resolveSubmit(true);
         });
     });
 });

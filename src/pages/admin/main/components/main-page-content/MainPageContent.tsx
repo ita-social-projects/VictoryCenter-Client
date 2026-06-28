@@ -4,12 +4,16 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import { CategoryBar } from '@/components/admin/category-bar/CategoryBar';
+import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
+import { IconButton } from '@/components/admin/icon-button/IconButton';
 import { LanguageToolkit } from '@/components/admin/language-toolkit/LanguageToolkit';
 import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
 import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
 import { PageLoader } from '@/components/common/page-loader/PageLoader';
 
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { MAIN_PAGE_TEXT } from '@/const/admin/main-page';
+import { ACTION_ICONS } from '@/const/common/action-icons';
 import { DEFAULT_LOCALE } from '@/const/common/locales';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
@@ -21,8 +25,8 @@ import {
     ImpactStatistic,
     MAIN_PAGE_FORM_DEFAULTS,
     MainPage,
-    MainPageLocalization,
     MainPageFormValues,
+    MainPageLocalization,
     MainPageLocalizationBlock,
     MainPageTranslationStatusDto,
     Metric,
@@ -45,6 +49,7 @@ import { MainPagePublishModal } from '../main-page-publish-modal/MainPagePublish
 import { PartnersBlockForm } from '../partners-block/PartnersBlockForm';
 import { StatisticsBlockForm } from '../statistics-block/StatisticsBlockForm';
 import { TitleBlockForm } from '../title-block/TitleBlockForm';
+import { TranslateMainPageBlockModal } from '../translate-main-page-block-modal/TranslateMainPageBlockModal';
 import styles from './MainPageContent.module.scss';
 
 type TabType = 'title' | 'about' | 'statistics' | 'donations' | 'partners';
@@ -68,6 +73,12 @@ const TABS: TabItem[] = [
     { id: 'donations', label: MAIN_PAGE_TEXT.TABS.DONATIONS },
     { id: 'partners', label: MAIN_PAGE_TEXT.TABS.PARTNERS, localizationBlock: MainPageLocalizationBlock.Partners },
 ];
+
+const TRANSLATABLE_BLOCKS = new Set<MainPageLocalizationBlock>([
+    MainPageLocalizationBlock.Title,
+    MainPageLocalizationBlock.AboutUs,
+    MainPageLocalizationBlock.Partners,
+]);
 
 const sanitizeMainPageFormValues = (values: MainPageFormValues): MainPageFormValues => ({
     ...values,
@@ -127,13 +138,17 @@ export const MainPageContent = () => {
     const [hasLoadError, setHasLoadError] = useState(false);
 
     const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
+    const [translationBlock, setTranslationBlock] = useState<MainPageLocalizationBlock | null>(null);
     const [isPublishing, setIsPublishing] = useState(false);
     const [pendingPublishData, setPendingPublishData] = useState<MainPageFormValues | null>(null);
+
+    const [pendingGlobalLanguage, setPendingGlobalLanguage] = useState<LocalizationLanguage | null>(null);
 
     const [currentMetrics, setCurrentMetrics] = useState<Metric[]>([]);
     const [translationStatuses, setTranslationStatuses] = useState<MainPageTranslationStatusDto[]>([]);
 
     const savedValuesRef = useRef<MainPageFormValues>(MAIN_PAGE_FORM_DEFAULTS);
+    const isMountedRef = useRef(true);
 
     const methods = useForm<MainPageFormValues>({
         mode: 'onBlur',
@@ -142,6 +157,38 @@ export const MainPageContent = () => {
         resolver: yupResolver(MainPageValidationSchema),
         shouldFocusError: true,
     });
+
+    const loadMainPageData = useCallback(
+        async (showLoader = true) => {
+            if (showLoader) {
+                setIsLoading(true);
+            }
+
+            try {
+                const { page, languages } = await MainPageApi.get(client);
+                if (!isMountedRef.current) return;
+
+                setHasLoadError(false);
+                setOriginalData(page);
+
+                const values = mapMainPageToFormValues(page, languages);
+                const sanitizedValues = sanitizeMainPageFormValues(values);
+
+                savedValuesRef.current = sanitizedValues;
+                methods.reset(sanitizedValues, { keepDefaultValues: false });
+            } catch (error) {
+                if (!isMountedRef.current) return;
+
+                setHasLoadError(true);
+                addToast('Помилка завантаження даних', ToastType.Error, 3000);
+            } finally {
+                if (showLoader && isMountedRef.current) {
+                    setIsLoading(false);
+                }
+            }
+        },
+        [addToast, client, methods],
+    );
 
     const handleTabSelect = (tab: TabItem) => {
         setActiveTab(tab.id);
@@ -159,37 +206,18 @@ export const MainPageContent = () => {
     });
 
     useEffect(() => {
-        let isMounted = true;
+        isMountedRef.current = true;
 
         const loadData = async () => {
-            setIsLoading(true);
-            try {
-                const { page, languages } = await MainPageApi.get(client);
-                if (!isMounted) return;
-                setHasLoadError(false);
-                setOriginalData(page);
-
-                const values = mapMainPageToFormValues(page, languages);
-
-                const sanitizedValues = sanitizeMainPageFormValues(values);
-
-                savedValuesRef.current = sanitizedValues;
-
-                methods.reset(sanitizedValues, { keepDefaultValues: false });
-            } catch (error) {
-                setHasLoadError(true);
-                addToast('Помилка завантаження даних', ToastType.Error, 3000);
-            } finally {
-                if (isMounted) setIsLoading(false);
-            }
+            await loadMainPageData();
         };
 
         void loadData();
 
         return () => {
-            isMounted = false;
+            isMountedRef.current = false;
         };
-    }, [client, methods, addToast]);
+    }, [loadMainPageData]);
 
     useEffect(() => {
         if (!originalData?.id || !selectedLanguage || !translationLanguages.length) {
@@ -276,6 +304,25 @@ export const MainPageContent = () => {
         };
     }, [client, originalData, selectedLanguage, translationLanguages, allLanguages, methods, addToast]);
 
+    const handleGlobalLanguageChange = (language: LocalizationLanguage) => {
+        if (methods.formState.isDirty) {
+            setPendingGlobalLanguage(language);
+        } else {
+            onLanguageChange(language);
+        }
+    };
+
+    const handleConfirmGlobalLanguageSwitch = () => {
+        if (pendingGlobalLanguage) {
+            onLanguageChange(pendingGlobalLanguage);
+        }
+        setPendingGlobalLanguage(null);
+    };
+
+    const handleCancelGlobalLanguageSwitch = () => {
+        setPendingGlobalLanguage(null);
+    };
+
     const handlePublishClick = (data: MainPageFormValues) => {
         setPendingPublishData(data);
         setIsPublishModalOpen(true);
@@ -335,6 +382,33 @@ export const MainPageContent = () => {
     };
 
     const selectedTab = TABS.find((tab) => tab.id === activeTab) || TABS[0];
+    const canTranslateActiveBlock =
+        translationLanguages.length > 0 &&
+        selectedTab.localizationBlock != null &&
+        TRANSLATABLE_BLOCKS.has(selectedTab.localizationBlock);
+
+    const handleOpenTranslationModal = () => {
+        if (
+            translationLanguages.length === 0 ||
+            selectedTab.localizationBlock == null ||
+            !TRANSLATABLE_BLOCKS.has(selectedTab.localizationBlock)
+        ) {
+            return;
+        }
+
+        setTranslationBlock(selectedTab.localizationBlock);
+    };
+
+    const handleCloseTranslationModal = () => {
+        setTranslationBlock(null);
+    };
+
+    const handleTranslationSuccess = async () => {
+        await loadMainPageData(false);
+        setTranslationBlock(null);
+        addToast(COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_PUBLISHED_SUCCESS, ToastType.Success, 3000);
+    };
+
     const isReadOnlyLanguage = selectedLanguage ? selectedLanguage.code !== DEFAULT_LOCALE : false;
     const getBlockTranslationStatus = (block: MainPageLocalizationBlock) =>
         translationStatuses.find((status) => status.block === block)?.translationStatus;
@@ -392,7 +466,7 @@ export const MainPageContent = () => {
         <div className={styles.wrapper}>
             <div className={styles.toolbar}>
                 <div className={styles['toolbar-top']}>
-                    <LanguageToolkit languages={allLanguages} onLanguageChange={onLanguageChange} />
+                    <LanguageToolkit languages={allLanguages} onLanguageChange={handleGlobalLanguageChange} />
                 </div>
                 <div className={styles['toolbar-bottom']}>
                     <div className={styles['tabs-wrapper']}>
@@ -418,6 +492,17 @@ export const MainPageContent = () => {
             </div>
 
             <div className={styles['main-content']}>
+                {canTranslateActiveBlock && (
+                    <div className={styles['content-actions']}>
+                        <IconButton
+                            aria-label={COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION}
+                            type="button"
+                            onClick={handleOpenTranslationModal}
+                            DefaultIcon={ACTION_ICONS.translate.default}
+                        />
+                    </div>
+                )}
+
                 <FormProvider {...methods}>
                     <div className={styles['main-page-form']}>
                         {activeTab === 'title' && (
@@ -459,6 +544,23 @@ export const MainPageContent = () => {
                 onConfirm={handleConfirmPublish}
                 onCancel={handleCancelPublish}
                 isButtonsDisabled={isPublishing}
+            />
+
+            <TranslateMainPageBlockModal
+                isOpen={translationBlock != null}
+                onClose={handleCloseTranslationModal}
+                page={originalData}
+                block={translationBlock}
+                translatedLanguages={translationLanguages}
+                onTranslated={handleTranslationSuccess}
+            />
+
+            <ConfirmationModal
+                isOpen={!!pendingGlobalLanguage}
+                onClose={handleCancelGlobalLanguageSwitch}
+                title={COMMON_TEXT_ADMIN.QUESTION.CHANGE_LANGUAGE_UNSAVED_CHANGES}
+                onConfirm={handleConfirmGlobalLanguageSwitch}
+                onCancel={handleCancelGlobalLanguageSwitch}
             />
 
             <ToastContainer />

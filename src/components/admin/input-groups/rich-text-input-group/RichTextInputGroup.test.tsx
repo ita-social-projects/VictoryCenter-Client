@@ -263,8 +263,8 @@ describe('RichTextInputGroup', () => {
 
         it('does not set hideToolbar when hideToolbar prop is not provided', () => {
             renderRichTextInputGroup();
-            const hideToolbarAttr = getRichTextInput().getAttribute('data-hide-toolbar');
-            expect(hideToolbarAttr === null || hideToolbarAttr === 'undefined').toBe(true);
+            const hideToolbarAttr = (getRichTextInput() as HTMLElement).dataset.hideToolbar;
+            expect(hideToolbarAttr === undefined || hideToolbarAttr === 'undefined').toBe(true);
         });
     });
 
@@ -282,8 +282,8 @@ describe('RichTextInputGroup', () => {
 
         it('handles undefined placeholder', () => {
             renderRichTextInputGroup({ placeholder: undefined });
-            const placeholderAttr = getRichTextInput().getAttribute('data-placeholder');
-            expect(placeholderAttr === null || placeholderAttr === 'undefined').toBe(true);
+            const placeholderAttr = (getRichTextInput() as HTMLElement).dataset.disabled;
+            expect(placeholderAttr === undefined || placeholderAttr === 'undefined').toBe(true);
         });
 
         it('handles all props together', () => {

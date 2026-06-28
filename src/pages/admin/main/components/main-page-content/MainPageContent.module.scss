@@ -44,3 +44,19 @@
     flex-direction: column;
     overflow-y: auto;
 }
+
+.content-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-right: 16px;
+    margin-bottom: 16px;
+
+    button {
+        border: none;
+
+        &:focus-visible {
+            outline: 2px solid c.$blue-500;
+            outline-offset: 2px;
+        }
+    }
+}

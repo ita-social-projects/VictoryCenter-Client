@@ -44,18 +44,27 @@ describe('FundsExpendituresApi', () => {
 
     describe('updateSettings', () => {
         it('should send update payload and map response', async () => {
-            mockClient.put.mockResolvedValueOnce({ data: { id: 1, disclaimerTitle: 'Updated', exchangeRate: 40 } });
+            mockClient.put.mockResolvedValueOnce({
+                data: { id: 1, disclaimerTitle: 'Updated', exchangeRate: 40, programExpendituresReportingYear: 2025 },
+            });
 
             const result = await FundsExpendituresApi.updateSettings(mockClient, {
                 disclaimerTitle: 'Updated',
                 exchangeRate: '40',
+                programExpendituresReportingYear: 2025,
             });
 
             expect(mockClient.put).toHaveBeenCalledWith(API_ROUTES.REPORTS.FUNDS_EXPENDITURES.SETTINGS, {
                 disclaimerTitle: 'Updated',
                 exchangeRate: 40,
+                programExpendituresReportingYear: 2025,
             });
-            expect(result).toEqual({ id: 1, disclaimerTitle: 'Updated', exchangeRate: '40' });
+            expect(result).toEqual({
+                id: 1,
+                disclaimerTitle: 'Updated',
+                exchangeRate: '40',
+                programExpendituresReportingYear: 2025,
+            });
         });
     });
 

@@ -1,0 +1,147 @@
+import '@testing-library/jest-dom';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { useRef, useState } from 'react';
+
+import { MAIN_PAGE_VALIDATION } from '@/const/admin/main-page';
+import {
+    TranslateMainPageBlockForm,
+    TranslateMainPageBlockFormRef,
+    TranslateMainPageBlockFormValues,
+} from './TranslateMainPageBlockForm';
+
+const titleInput = () => document.getElementById('main-page-translation-title') as HTMLInputElement;
+const descriptionInput = () => document.getElementById('main-page-translation-description') as HTMLTextAreaElement;
+
+const validationConfig = {
+    titleField: 'titleUa' as const,
+    descriptionField: 'descriptionUa' as const,
+    titleMaxLength: MAIN_PAGE_VALIDATION.titleBlock.title.max,
+    descriptionMaxLength: MAIN_PAGE_VALIDATION.titleBlock.description.max,
+};
+
+interface HarnessProps {
+    initialData?: TranslateMainPageBlockFormValues | null;
+    onSubmit?: jest.Mock;
+    config?: typeof validationConfig;
+}
+
+const Harness = ({ initialData = null, onSubmit = jest.fn(), config = validationConfig }: HarnessProps) => {
+    const formRef = useRef<TranslateMainPageBlockFormRef>(null);
+    const [isValid, setIsValid] = useState(false);
+    const [isDirty, setIsDirty] = useState(false);
+
+    return (
+        <>
+            <TranslateMainPageBlockForm
+                ref={formRef}
+                initialData={initialData}
+                validationConfig={config}
+                onSubmit={onSubmit}
+                onValidationChange={setIsValid}
+                onDirtyChange={setIsDirty}
+            />
+            <button type="button" disabled={!isValid || !isDirty} onClick={() => formRef.current?.submit()}>
+                Save
+            </button>
+        </>
+    );
+};
+
+describe('TranslateMainPageBlockForm', () => {
+    it('renders empty fields in add mode and keeps save disabled initially', () => {
+        render(<Harness />);
+
+        expect(titleInput()).toHaveValue('');
+        expect(descriptionInput()).toHaveValue('');
+        expect(titleInput()).toHaveAttribute('maxlength', '50');
+        expect(descriptionInput()).toHaveAttribute('maxlength', '300');
+        expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
+    });
+
+    it('renders prefilled fields in edit mode and keeps save disabled until changed', () => {
+        render(<Harness initialData={{ title: 'Existing English title', description: 'Existing description' }} />);
+
+        expect(titleInput()).toHaveValue('Existing English title');
+        expect(descriptionInput()).toHaveValue('Existing description');
+        expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
+    });
+
+    it('validates required fields while typing', async () => {
+        render(<Harness />);
+
+        fireEvent.change(titleInput(), { target: { value: 'Valid title' } });
+        fireEvent.change(titleInput(), { target: { value: '' } });
+
+        expect(await screen.findByText("Поле обов'язкове")).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
+    });
+
+    it('prevents entering more than the max length while typing', async () => {
+        render(<Harness config={{ ...validationConfig, titleMaxLength: 50 }} />);
+
+        fireEvent.change(titleInput(), { target: { value: 'x'.repeat(51) } });
+
+        await waitFor(() => expect(titleInput()).toHaveValue('x'.repeat(50)));
+        expect(screen.getByText('50/50')).toBeInTheDocument();
+        expect(screen.queryByText('Не більше 50 символів')).not.toBeInTheDocument();
+    });
+
+    it('enables save after valid changes and submits values', async () => {
+        const onSubmit = jest.fn();
+        render(<Harness onSubmit={onSubmit} />);
+
+        fireEvent.change(titleInput(), { target: { value: 'Valid title text' } });
+        fireEvent.change(descriptionInput(), { target: { value: 'Valid description text' } });
+
+        await waitFor(() => expect(screen.getByRole('button', { name: 'Save' })).not.toBeDisabled());
+
+        fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+
+        await waitFor(() => {
+            expect(onSubmit).toHaveBeenCalled();
+        });
+
+        expect(onSubmit.mock.calls[0][0]).toEqual({
+            title: 'Valid title text',
+            description: 'Valid description text',
+        });
+    });
+
+    it('validates the title field on blur', async () => {
+        render(<Harness />);
+
+        fireEvent.blur(titleInput());
+
+        expect(await screen.findByText("Поле обов'язкове")).toBeInTheDocument();
+    });
+
+    it('clears the title blur error once a valid value is entered', async () => {
+        render(<Harness />);
+
+        fireEvent.blur(titleInput());
+        expect(await screen.findByText("Поле обов'язкове")).toBeInTheDocument();
+
+        fireEvent.change(titleInput(), { target: { value: 'Valid title text' } });
+        fireEvent.blur(titleInput());
+
+        await waitFor(() => expect(screen.queryByText("Поле обов'язкове")).not.toBeInTheDocument());
+    });
+
+    it('validates the description field on blur', async () => {
+        render(<Harness />);
+
+        fireEvent.blur(descriptionInput());
+
+        expect(await screen.findByText("Поле обов'язкове")).toBeInTheDocument();
+    });
+
+    it('prevents the native form submission default behaviour', () => {
+        const onSubmit = jest.fn();
+        render(<Harness onSubmit={onSubmit} />);
+
+        const form = titleInput().closest('form') as HTMLFormElement;
+
+        expect(() => fireEvent.submit(form)).not.toThrow();
+        expect(onSubmit).not.toHaveBeenCalled();
+    });
+});

@@ -185,7 +185,7 @@ describe('TranslateProgramModal', () => {
         rerender(<TranslateProgramModal {...createModalProps({ translatedLanguages: nextLanguages })} />);
     };
 
-    const getInitialDataFromForm = () => JSON.parse(screen.getByTestId('translate-form').getAttribute('data-initial')!);
+    const getInitialDataFromForm = () => JSON.parse(screen.getByTestId('translate-form').dataset.initial!);
 
     const expectLastHookLanguageCode = async (code: string) => {
         await waitFor(() => {

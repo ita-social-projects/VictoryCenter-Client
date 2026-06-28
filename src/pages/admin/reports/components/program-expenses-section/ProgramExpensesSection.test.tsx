@@ -595,7 +595,10 @@ describe('ProgramExpensesSection', () => {
                     amountUah: 1000,
                     amountUsd: 25,
                 });
-                expect(mockAddToast).toHaveBeenCalledWith('Запис додано успішно', 'success');
+                expect(mockAddToast).toHaveBeenCalledWith(
+                    PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_CREATED_SUCCESSFULLY,
+                    'success',
+                );
                 expect(mockRefetch).toHaveBeenCalled();
                 expect(screen.getByTestId('add-program-expense-modal')).toHaveAttribute('data-open', 'false');
             });

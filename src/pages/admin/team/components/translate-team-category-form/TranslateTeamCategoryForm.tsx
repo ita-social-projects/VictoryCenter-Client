@@ -33,6 +33,7 @@ export interface TranslateTeamCategoryFormProps {
     onCategoryChange?: (category: TeamCategory | null) => void;
     onValidationChange?: (isValid: boolean) => void;
     onDirtyChange?: (isDirty: boolean) => void;
+    selectedCategory?: TeamCategory | null;
 }
 
 const DEFAULT_FORM_STATE: TranslateTeamCategoryFormValues = {
@@ -59,6 +60,7 @@ export const TranslateTeamCategoryForm = forwardRef<TranslateTeamCategoryFormRef
             onCategoryChange,
             onValidationChange,
             onDirtyChange,
+            selectedCategory,
         }: TranslateTeamCategoryFormProps,
         ref,
     ) => {
@@ -73,7 +75,8 @@ export const TranslateTeamCategoryForm = forwardRef<TranslateTeamCategoryFormRef
             ref,
             onSubmit: (data, _status) => onSubmit(data),
         });
-        const [selectedCategory, setSelectedCategory] = useState<TeamCategory | null>(null);
+        const [localSelectedCategory, setLocalSelectedCategory] = useState<TeamCategory | null>(null);
+        const activeCategory = selectedCategory !== undefined ? selectedCategory : localSelectedCategory;
 
         useEffect(() => {
             const isDirty = JSON.stringify(formState) !== JSON.stringify(initialData);
@@ -84,7 +87,9 @@ export const TranslateTeamCategoryForm = forwardRef<TranslateTeamCategoryFormRef
             setFormState((prev) => ({ ...prev, name: e.target.value }));
         };
         const handleCategoryChange = (category: TeamCategory | null) => {
-            setSelectedCategory(category);
+            if (selectedCategory === undefined) {
+                setLocalSelectedCategory(category);
+            }
             onCategoryChange?.(category);
         };
 
@@ -117,7 +122,7 @@ export const TranslateTeamCategoryForm = forwardRef<TranslateTeamCategoryFormRef
                     getOptionName={(c) => c.name}
                     disabled={isSubmitting || formDisabled}
                     onChange={handleCategoryChange}
-                    value={selectedCategory || undefined}
+                    value={activeCategory || undefined}
                     placeholder="Оберіть категорію"
                     id={'category-select'}
                 />
@@ -129,7 +134,7 @@ export const TranslateTeamCategoryForm = forwardRef<TranslateTeamCategoryFormRef
                     value={formState.name}
                     onChange={handleNameChange}
                     onBlur={handleNameBlur}
-                    disabled={isSubmitting || !selectedCategory}
+                    disabled={isSubmitting || !activeCategory}
                     maxLength={TEAM_CATEGORY_VALIDATION.name.max}
                     name={'name'}
                     id={'name'}
@@ -142,7 +147,7 @@ export const TranslateTeamCategoryForm = forwardRef<TranslateTeamCategoryFormRef
                     onChange={handleDescriptionChange}
                     onBlur={handleDescriptionBlur}
                     isRequired
-                    disabled={isSubmitting || !selectedCategory}
+                    disabled={isSubmitting || !activeCategory}
                     rows={5}
                     maxLength={TEAM_CATEGORY_VALIDATION.description.max}
                     name={'description'}

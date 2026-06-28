@@ -1,4 +1,4 @@
-import { ChangeEvent, FocusEvent, ReactNode, useEffect, useMemo, useRef, useState } from 'react';
+import { ChangeEvent, FocusEvent, ReactNode, useEffect, useMemo, useRef } from 'react';
 import { Button } from '@/components/admin/button/Button';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import { InputWithCharacterLimit } from '@/components/admin/input-with-character-limit/InputWithCharacterLimit';
@@ -19,7 +19,7 @@ interface AddProgramExpenseRecordModalProps {
     records: ProgramExpensesRecord[];
     exchangeRate: string | null;
     onClose: () => void;
-    onSubmit: (submitData: {
+    onSubmit: (data: {
         programId: number;
         reportingYear: string;
         amountUah: string;
@@ -136,7 +136,6 @@ export const AddProgramExpenseRecordModal = ({
     onSubmit,
     recordToEdit = null,
 }: AddProgramExpenseRecordModalProps) => {
-    const [isSubmitting, setIsSubmitting] = useState(false);
     const yearOptions = useMemo(() => getReportingYearOptions(), []);
     const reportingYearSelectRef = useRef<HTMLDivElement | null>(null);
     const programSelectRef = useRef<HTMLDivElement | null>(null);
@@ -146,6 +145,8 @@ export const AddProgramExpenseRecordModal = ({
         isProgramSelectDisabled,
         isDirty,
         isSubmitDisabled,
+        isSubmitting,
+        isAddConfirmationOpen,
         usdMismatchMessage,
         handleReportingYearChange,
         handleReportingYearBlur,
@@ -154,12 +155,17 @@ export const AddProgramExpenseRecordModal = ({
         handleAmountChange,
         handleUsdChange,
         handleAmountBlur,
+        handleOpenAddConfirmation,
+        handleCloseConfirmation,
+        handleConfirmAdd,
+        handleSave,
     } = useProgramExpenseRecordForm({
         isOpen,
         programs,
         records,
         exchangeRate,
         recordToEdit,
+        onSubmit,
     });
 
     const isEditMode = Boolean(recordToEdit);
@@ -179,24 +185,6 @@ export const AddProgramExpenseRecordModal = ({
             isDirty,
             onClose,
         });
-
-    const handleSubmit = async () => {
-        if (formState.programId === undefined || formState.reportingYear === undefined) {
-            return;
-        }
-
-        setIsSubmitting(true);
-        try {
-            await onSubmit({
-                programId: formState.programId,
-                reportingYear: formState.reportingYear,
-                amountUah: formState.amountUah,
-                amountUsd: formState.amountUsd,
-            });
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
 
     useEffect(() => {
         if (!isOpen) {
@@ -313,9 +301,9 @@ export const AddProgramExpenseRecordModal = ({
                         <div className={styles.actions}>
                             <Button
                                 buttonStyle="primary"
-                                disabled={isSubmitDisabled || isSubmitting}
-                                onClick={handleSubmit}
+                                disabled={isSubmitDisabled}
                                 className={styles.submit}
+                                onClick={isEditMode ? handleSave : handleOpenAddConfirmation}
                             >
                                 {submitText}
                             </Button>
@@ -339,6 +327,17 @@ export const AddProgramExpenseRecordModal = ({
                 onConfirm={handleConfirmClose}
                 onCancel={handleCancelClose}
                 onClose={handleCancelClose}
+            />
+
+            <ConfirmationModal
+                isOpen={isAddConfirmationOpen}
+                title={PROGRAM_EXPENSES_TEXT.MODAL.ADD.CONFIRM_ADD_TITLE}
+                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
+                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
+                onConfirm={handleConfirmAdd}
+                onCancel={handleCloseConfirmation}
+                onClose={handleCloseConfirmation}
+                isButtonsDisabled={isSubmitting}
             />
         </>
     );

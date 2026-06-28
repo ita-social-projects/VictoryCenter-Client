@@ -1,5 +1,21 @@
 import DOMPurify from 'dompurify';
 
+const removeEmptyTags = (container: Element): void => {
+    container.querySelectorAll('strong, em, b, i').forEach((el) => {
+        const text = el.textContent ?? '';
+        if (!text.trim()) {
+            el.replaceWith(document.createTextNode(text));
+        }
+    });
+
+    container.querySelectorAll('p').forEach((p) => {
+        const text = p.textContent ?? '';
+        if (!text.trim()) {
+            p.remove();
+        }
+    });
+};
+
 export const sanitizeHtml = (html: string): string => {
     if (!html) return '';
 
@@ -53,5 +69,9 @@ export const sanitizeHtml = (html: string): string => {
         ALLOWED_ATTR: [],
     });
 
-    return cleanHtml;
+    const resultDiv = document.createElement('div');
+    resultDiv.innerHTML = cleanHtml;
+    removeEmptyTags(resultDiv);
+
+    return resultDiv.innerHTML;
 };

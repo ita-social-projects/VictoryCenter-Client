@@ -1,0 +1,11 @@
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.textarea {
+    textarea {
+        min-height: 116px;
+    }
+}

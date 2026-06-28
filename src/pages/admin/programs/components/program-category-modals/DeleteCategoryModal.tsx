@@ -118,7 +118,6 @@ export const DeleteCategoryModal = ({ isOpen, onClose, onDeleteCategory, categor
                     </Button>
                 </Modal.Actions>
             </Modal>
-
             <DeleteCategoryConfirmModal
                 isOpen={!!categoryToConfirm}
                 onClose={handleConfirmClose}

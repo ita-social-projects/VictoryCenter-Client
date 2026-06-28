@@ -27,6 +27,8 @@ const createHookParams = (
     isOpen: true,
     programs,
     records,
+    exchangeRate: '40',
+    onSubmit: jest.fn().mockResolvedValue(true),
     ...overrides,
 });
 
@@ -58,8 +60,8 @@ describe('useProgramExpenseRecordForm', () => {
         act(() => {
             result.current.handleReportingYearChange('2026');
             result.current.handleProgramChange(1);
-            result.current.handleAmountChange('amountUah', '100');
-            result.current.handleAmountChange('amountUsd', '10');
+            result.current.handleAmountChange('100');
+            result.current.handleUsdChange('10');
         });
 
         expect(result.current.formState.errors.programId).toBe(PROGRAM_EXPENSES_TEXT.VALIDATION.PROGRAM_UNIQUE);
@@ -72,8 +74,8 @@ describe('useProgramExpenseRecordForm', () => {
         act(() => {
             result.current.handleReportingYearChange('2026');
             result.current.handleProgramChange(2);
-            result.current.handleAmountChange('amountUah', '100');
-            result.current.handleAmountChange('amountUsd', '10');
+            result.current.handleAmountChange('100');
+            result.current.handleUsdChange('10');
         });
 
         expect(result.current.isSubmitDisabled).toBe(false);
@@ -83,8 +85,8 @@ describe('useProgramExpenseRecordForm', () => {
         const { result } = renderUseProgramExpenseForm();
 
         act(() => {
-            result.current.handleAmountChange('amountUah', '1234567890');
-            result.current.handleAmountChange('amountUsd', '0');
+            result.current.handleAmountChange('1234567890');
+            result.current.handleUsdChange('0');
         });
 
         expect(result.current.formState.errors.amountUah).toBe(FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_MAX_DIGITS);
@@ -97,13 +99,15 @@ describe('useProgramExpenseRecordForm', () => {
         expect(result.current.formState.errors.amountUsd).toBe(FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_NOT_ZERO);
     });
 
-    it('resets values when modal closes', () => {
+    it('resets form state when modal closes', () => {
         const { result, rerender } = renderHook(
             ({ isOpen }) =>
                 useProgramExpenseRecordForm({
                     isOpen,
                     programs,
                     records,
+                    exchangeRate: '40',
+                    onSubmit: jest.fn().mockResolvedValue(true),
                 }),
             { initialProps: { isOpen: true } },
         );
@@ -111,7 +115,7 @@ describe('useProgramExpenseRecordForm', () => {
         act(() => {
             result.current.handleReportingYearChange('2026');
             result.current.handleProgramChange(2);
-            result.current.handleAmountChange('amountUah', '100');
+            result.current.handleAmountChange('100');
         });
 
         expect(result.current.isDirty).toBe(true);
@@ -131,6 +135,8 @@ describe('useProgramExpenseRecordForm', () => {
                     isOpen: true,
                     programs: nextPrograms,
                     records,
+                    exchangeRate: '40',
+                    onSubmit: jest.fn().mockResolvedValue(true),
                 }),
             { initialProps: { nextPrograms: programs } },
         );
@@ -144,5 +150,26 @@ describe('useProgramExpenseRecordForm', () => {
         rerender({ nextPrograms: programs.filter((program) => program.id !== 2) });
 
         expect(result.current.formState.programId).toBeUndefined();
+    });
+
+    it('automatically converts UAH to USD when UAH amount is entered', () => {
+        const { result } = renderUseProgramExpenseForm({ exchangeRate: '40' });
+
+        act(() => {
+            result.current.handleAmountChange('100');
+        });
+
+        expect(result.current.formState.amountUsd).toBe('2,5');
+    });
+
+    it('does not recalculate UAH when USD is changed manually', () => {
+        const { result } = renderUseProgramExpenseForm({ exchangeRate: '40' });
+
+        act(() => {
+            result.current.handleAmountChange('100');
+            result.current.handleUsdChange('999');
+        });
+
+        expect(result.current.formState.amountUah).toBe('100');
     });
 });

@@ -37,9 +37,17 @@ export const PUBLIC_ROUTES = {
         PATH: 'reports',
         FULL: '/reports',
     },
+    STORIES_OF_VICTORIES: {
+        PATH: 'stories',
+        FULL: '/stories',
+    },
     CONTACT_US: {
         PATH: 'contact-us',
         FULL: '/contact-us',
+    },
+    HISTORY: {
+        PATH: 'history',
+        FULL: '/history',
     },
     MOCK: {
         PATH: 'about-us',

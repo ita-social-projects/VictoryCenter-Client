@@ -26,11 +26,38 @@
     gap: 20px;
 }
 
+.disclaimer-top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
 .disclaimer-label {
     @include type.subtitle-1-medium;
-    font-weight: 700;
+    font-weight: 500;
     line-height: 24px;
     color: c.$grey-900;
+}
+
+.translate-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    color: c.$blue-500;
+
+    svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    &:hover {
+        color: c.$blue-700;
+    }
 }
 
 .disclaimer-text-area {

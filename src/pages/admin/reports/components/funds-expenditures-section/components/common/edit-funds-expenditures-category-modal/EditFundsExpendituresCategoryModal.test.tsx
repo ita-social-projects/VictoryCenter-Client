@@ -19,8 +19,8 @@ const DUPLICATE_ERROR = FUNDS_EXPENDITURES_TEXT.MODAL.CATEGORY.ERROR.NAME_DUPLIC
 const YES_BUTTON = COMMON_TEXT_ADMIN.BUTTON.YES;
 const NO_BUTTON = COMMON_TEXT_ADMIN.BUTTON.NO;
 
-const incomeCategory: ReportFundsExpendituresCategory = { id: 1, name: 'Донори', type: 'income' };
-const expenseCategory: ReportFundsExpendituresCategory = { id: 2, name: 'Оренда', type: 'expense' };
+const incomeCategory: ReportFundsExpendituresCategory = { id: 1, name: 'Донори', type: 'income', localizations: [] };
+const expenseCategory: ReportFundsExpendituresCategory = { id: 2, name: 'Оренда', type: 'expense', localizations: [] };
 
 const renderModal = (
     overrides: Partial<{
@@ -114,7 +114,11 @@ describe('EditFundsExpendituresCategoryModal', () => {
         });
 
         it('is disabled when name duplicates another category of the same type', () => {
-            const categories = [incomeCategory, expenseCategory, { id: 3, name: 'Гранти', type: 'income' as const }];
+            const categories = [
+                incomeCategory,
+                expenseCategory,
+                { id: 3, name: 'Гранти', type: 'income' as const, localizations: [] },
+            ];
             renderModal({ categories });
             selectCategory(incomeCategory.name);
             typeName('Гранти');
@@ -138,7 +142,11 @@ describe('EditFundsExpendituresCategoryModal', () => {
         });
 
         it('shows duplicate error when name matches another category of the same type', () => {
-            const categories = [incomeCategory, expenseCategory, { id: 3, name: 'Гранти', type: 'income' as const }];
+            const categories = [
+                incomeCategory,
+                expenseCategory,
+                { id: 3, name: 'Гранти', type: 'income' as const, localizations: [] },
+            ];
             renderModal({ categories });
             selectCategory(incomeCategory.name);
             typeName('Гранти');

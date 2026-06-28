@@ -1,5 +1,6 @@
 import { MAIN_PAGE_TEXT } from '@/const/admin/main-page';
-import { Metric, MetricPrefix } from '@/types/admin/main-page';
+import { Metric } from '@/types/admin/main-page';
+import { formatMetricValue, getMetricName } from '@/utils/functions/formatters/metric-formatters';
 import styles from './StatisticsPreview.module.scss';
 
 interface StatisticsPreviewProps {
@@ -8,24 +9,6 @@ interface StatisticsPreviewProps {
     metrics: Metric[];
     hiddenMetricIds: number[];
 }
-
-const getMetricName = (metric: Metric, language: 'UA' | 'EN') => {
-    const code = language === 'UA' ? 'uk' : 'en';
-    return metric.localizations?.find((l) => l.language.code === code)?.name ?? metric.name;
-};
-
-const formatMetricValue = (metric: Metric, language: 'UA' | 'EN') => {
-    const locale = language === 'UA' ? 'uk-UA' : 'en-US';
-    const value = metric.value.toLocaleString(locale);
-    switch (metric.prefix) {
-        case MetricPrefix.Plus:
-            return `${value}+`;
-        case MetricPrefix.Percent:
-            return `${value}%`;
-        default:
-            return value;
-    }
-};
 
 export const StatisticsPreview = ({ language, onLanguageChange, metrics, hiddenMetricIds }: StatisticsPreviewProps) => {
     const visibleMetrics = metrics.filter((metric) => !hiddenMetricIds.includes(metric.id ?? 0));

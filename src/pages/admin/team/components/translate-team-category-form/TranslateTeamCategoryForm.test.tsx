@@ -137,6 +137,14 @@ describe('TranslateTeamCategoryForm', () => {
         expect(screen.getByTestId('textarea-description')).toHaveValue('Existing description');
     });
 
+    it('pre-selects the category when selectedCategory prop is provided', () => {
+        renderForm({ selectedCategory: mockCategories[1] });
+
+        expect(screen.getByTestId('category-select')).toHaveValue('2');
+        expect(screen.getByTestId('input-name')).toBeEnabled();
+        expect(screen.getByTestId('textarea-description')).toBeEnabled();
+    });
+
     it('disables text inputs until category is selected', () => {
         renderForm();
 

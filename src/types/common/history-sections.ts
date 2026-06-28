@@ -1,8 +1,16 @@
 import { Image, ImageValues } from '../common/image';
+import {
+    EntityLocalization,
+    EntityLocalizationDto,
+    EntityWithDtoLocalizations,
+    EntityWithLocalizations,
+} from './language';
 import { ContentType } from './section-contents';
 import { SectionTemplate } from './sections';
 
-export interface HistorySectionContentDto {
+export interface HistorySectionContentDto
+    extends HistorySectionContentLocalizableFields,
+        EntityWithDtoLocalizations<HistorySectionContentLocalizationDto> {
     id?: number;
     sectionId?: number;
     contentType: ContentType;
@@ -12,6 +20,22 @@ export interface HistorySectionContentDto {
     image?: Image | ImageValues | null;
     imageId?: number | null;
 }
+export interface HistorySectionContent
+    extends HistorySectionContentLocalizableFields,
+        EntityWithLocalizations<HistorySectionContentLocalization> {
+    id?: number;
+    sectionId?: number;
+    contentType: ContentType;
+    order: number;
+    title?: string | null;
+    description?: string | null;
+    image?: Image | ImageValues | null;
+    imageId?: number | null;
+}
+export interface HistorySectionContentLocalizableFields {
+    title?: string | null;
+    description?: string | null;
+}
 
 export interface HistorySectionDto {
     id?: number;
@@ -20,6 +44,20 @@ export interface HistorySectionDto {
     order: number;
     contents: HistorySectionContentDto[];
 }
+export interface HistorySection {
+    id?: number;
+    programId?: number;
+    template: SectionTemplate;
+    order: number;
+    contents: HistorySectionContent[];
+}
+
+export interface HistorySectionContentLocalizationDto
+    extends EntityLocalizationDto,
+        HistorySectionContentLocalizableFields {
+    entityId: number;
+}
+export interface HistorySectionContentLocalization extends EntityLocalization, HistorySectionContentLocalizableFields {}
 
 export interface CreateUpdateHistorySectionDto {
     template: SectionTemplate;

@@ -1,0 +1,214 @@
+@use '@/assets/sass/mixins/typography.mixins' as type;
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/variables/typography' as t;
+
+.timeline {
+    width: 100%;
+    background: c.$light-blue-50;
+    padding: 12px 16px;
+    position: relative;
+    flex-shrink: 0;
+
+    @media (min-width: 1440px) {
+        padding: 12px 56px;
+    }
+}
+
+.dates-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    white-space: nowrap;
+
+    @media (max-width: 559px) {
+        justify-content: space-between;
+
+        .date:nth-child(n + 5) {
+            display: none;
+        }
+    }
+
+    @media (min-width: 560px) and (max-width: 767px) {
+        justify-content: space-between;
+
+        .date:nth-child(n + 8) {
+            display: none;
+        }
+    }
+
+    @media (min-width: 768px) and (max-width: 1439px) {
+        justify-content: space-between;
+
+        .date:nth-child(n + 11) {
+            display: none;
+        }
+    }
+
+    @media (min-width: 768px) {
+        gap: 19px;
+    }
+}
+
+.date {
+    @include type.small-text-regular;
+    color: c.$light-blue-700;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.date--active {
+    @include type.small-text-bold;
+    font-style: italic;
+    color: c.$light-blue-900;
+}
+
+.date--line-all .date-line {
+    display: block;
+}
+
+.date--line-all .photo-card {
+    display: flex;
+}
+
+.date--line-tablet .date-line {
+    display: none;
+
+    @media (min-width: 768px) {
+        display: block;
+    }
+}
+
+.date--line-tablet .photo-card {
+    display: none;
+
+    @media (min-width: 768px) {
+        display: flex;
+    }
+}
+
+.date--line-desktop .date-line {
+    display: none;
+
+    @media (min-width: 1440px) {
+        display: block;
+    }
+}
+
+.date--line-desktop .photo-card {
+    display: none;
+
+    @media (min-width: 1440px) {
+        display: flex;
+    }
+}
+
+.date--line-top-anchor .date-line {
+    height: var(--safe-topanchor-line, var(--line-mobile, 0px));
+
+    @media (min-width: 1440px) {
+        height: var(--line-xl);
+    }
+}
+
+.date--line-top-anchor .photo-card {
+    bottom: calc(100% + 2px + var(--safe-topanchor-line, var(--line-mobile, 0px)));
+
+    @media (min-width: 1440px) {
+        bottom: calc(100% + 2px + var(--line-xl));
+    }
+}
+
+.date-line {
+    position: absolute;
+    bottom: calc(100% + 12px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    background-color: c.$light-blue-500;
+    height: var(--safe-director-line, var(--line-mobile, 0px));
+
+    @media (min-width: 1440px) {
+        height: var(--line-xl);
+    }
+}
+
+.photo-card {
+    position: absolute;
+    bottom: calc(100% + 2px + var(--safe-director-line, var(--line-mobile, 0px)));
+    left: 50%;
+    flex-direction: column;
+    gap: 4px;
+    display: none;
+
+    @media (min-width: 1440px) {
+        bottom: calc(100% + 2px + var(--line-xl));
+    }
+}
+
+.photo-card--left {
+    transform: translateX(-4px);
+    align-items: flex-start;
+}
+
+.photo-card--right {
+    transform: translateX(calc(-100% + 4px));
+    align-items: flex-end;
+}
+
+.photo-img {
+    display: block;
+    filter: grayscale(100%);
+    object-fit: cover;
+    width: var(--photo-w-mobile, 170px);
+    height: var(--photo-h-mobile, 113px);
+
+    @media (min-width: 768px) {
+        width: var(--photo-w-tablet, var(--photo-w-mobile, 195px));
+        height: var(--photo-h-tablet, var(--photo-h-mobile, 130px));
+    }
+
+    @media (min-width: 1440px) {
+        width: var(--photo-w-desktop);
+        height: var(--photo-h-desktop);
+        transform: translateX(var(--img-offset-desktop, 0px));
+    }
+}
+
+.photo-caption-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.photo-dot {
+    flex-shrink: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: c.$light-blue-500;
+}
+
+.photo-caption {
+    @include type.small-text-regular;
+    font-style: italic;
+    font-weight: t.$fw-semibold;
+    color: c.$light-blue-700;
+    white-space: nowrap;
+    margin: 0;
+}
+
+.dates-ellipsis {
+    @include type.small-text-regular;
+    color: c.$grey-700;
+    flex-shrink: 0;
+}
+
+@media (max-height: 644px) {
+    .date-line {
+        display: none !important;
+    }
+
+    .photo-card {
+        display: none !important;
+    }
+}

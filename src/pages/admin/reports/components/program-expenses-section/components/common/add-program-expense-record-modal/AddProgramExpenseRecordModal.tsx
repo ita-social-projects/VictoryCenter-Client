@@ -11,6 +11,7 @@ import { useProgramExpenseRecordForm } from '@/hooks/admin/use-program-expense-r
 import { ProgramExpensesProgram, ProgramExpensesRecord } from '@/types/admin/reports';
 import { getReportingYearOptions } from '@/utils/functions/get-reporting-year-options/get-reporting-year-options';
 import styles from './AddProgramExpenseRecordModal.module.scss';
+import { ReactComponent as InfoIcon } from '@/assets/icons/info.svg';
 
 interface AddProgramExpenseRecordModalProps {
     isOpen: boolean;
@@ -18,6 +19,12 @@ interface AddProgramExpenseRecordModalProps {
     records: ProgramExpensesRecord[];
     exchangeRate: string | null;
     onClose: () => void;
+    onSubmit: (data: {
+        programId: number;
+        reportingYear: string;
+        amountUah: string;
+        amountUsd: string;
+    }) => Promise<boolean>;
 }
 
 const PROGRAM_EXPENSE_AMOUNT_MAX_LENGTH = 12;
@@ -78,11 +85,12 @@ interface AmountFieldProps {
     value: string;
     error?: string;
     headerAddon?: ReactNode;
+    footer?: ReactNode;
     onChange: (event: ChangeEvent<HTMLInputElement>) => void;
     onBlur: () => void;
 }
 
-const AmountField = ({ id, name, label, value, error, headerAddon, onChange, onBlur }: AmountFieldProps) => (
+const AmountField = ({ id, name, label, value, error, headerAddon, footer, onChange, onBlur }: AmountFieldProps) => (
     <div className={styles.field}>
         <div className={headerAddon ? styles['amount-usd-header'] : undefined}>
             <RequiredFieldLabel>{label}</RequiredFieldLabel>
@@ -101,6 +109,7 @@ const AmountField = ({ id, name, label, value, error, headerAddon, onChange, onB
             hasError={Boolean(error)}
         />
         <FieldError message={error} />
+        {footer}
     </div>
 );
 
@@ -110,6 +119,7 @@ export const AddProgramExpenseRecordModal = ({
     records,
     exchangeRate,
     onClose,
+    onSubmit,
 }: AddProgramExpenseRecordModalProps) => {
     const yearOptions = useMemo(() => getReportingYearOptions(), []);
     const reportingYearSelectRef = useRef<HTMLDivElement | null>(null);
@@ -120,16 +130,25 @@ export const AddProgramExpenseRecordModal = ({
         isProgramSelectDisabled,
         isDirty,
         isSubmitDisabled,
+        isSubmitting,
+        isAddConfirmationOpen,
+        usdMismatchMessage,
         handleReportingYearChange,
         handleReportingYearBlur,
         handleProgramChange,
         handleProgramBlur,
         handleAmountChange,
+        handleUsdChange,
         handleAmountBlur,
+        handleOpenAddConfirmation,
+        handleCloseConfirmation,
+        handleConfirmAdd,
     } = useProgramExpenseRecordForm({
         isOpen,
         programs,
         records,
+        exchangeRate,
+        onSubmit,
     });
 
     const { isCloseConfirmOpen, handleRequestClose, handleConfirmClose, handleCancelClose } =
@@ -222,7 +241,7 @@ export const AddProgramExpenseRecordModal = ({
                                 label={FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.AMOUNT_UAH_LABEL}
                                 value={formState.amountUah}
                                 error={formState.errors.amountUah}
-                                onChange={(event) => handleAmountChange('amountUah', event.target.value)}
+                                onChange={(event) => handleAmountChange(event.target.value)}
                                 onBlur={() => handleAmountBlur('amountUah')}
                             />
 
@@ -233,13 +252,26 @@ export const AddProgramExpenseRecordModal = ({
                                 value={formState.amountUsd}
                                 error={formState.errors.amountUsd}
                                 headerAddon={<ExchangeRateChip exchangeRate={exchangeRate} />}
-                                onChange={(event) => handleAmountChange('amountUsd', event.target.value)}
+                                onChange={(event) => handleUsdChange(event.target.value)}
                                 onBlur={() => handleAmountBlur('amountUsd')}
+                                footer={
+                                    usdMismatchMessage && (
+                                        <div className={styles.info}>
+                                            <InfoIcon className={styles['info-icon']} aria-hidden="true" />
+                                            <p className={styles['info-text']}>{usdMismatchMessage}</p>
+                                        </div>
+                                    )
+                                }
                             />
                         </div>
 
                         <div className={styles.actions}>
-                            <Button buttonStyle="primary" disabled={isSubmitDisabled} className={styles.submit}>
+                            <Button
+                                buttonStyle="primary"
+                                disabled={isSubmitDisabled}
+                                className={styles.submit}
+                                onClick={handleOpenAddConfirmation}
+                            >
                                 {PROGRAM_EXPENSES_TEXT.MODAL.ADD.SUBMIT_BUTTON}
                             </Button>
                             <Button buttonStyle="secondary" onClick={handleRequestClose} className={styles.cancel}>
@@ -257,6 +289,17 @@ export const AddProgramExpenseRecordModal = ({
                 onConfirm={handleConfirmClose}
                 onCancel={handleCancelClose}
                 onClose={handleCancelClose}
+            />
+
+            <ConfirmationModal
+                isOpen={isAddConfirmationOpen}
+                title={PROGRAM_EXPENSES_TEXT.MODAL.ADD.CONFIRM_ADD_TITLE}
+                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
+                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
+                onConfirm={handleConfirmAdd}
+                onCancel={handleCloseConfirmation}
+                onClose={handleCloseConfirmation}
+                isButtonsDisabled={isSubmitting}
             />
         </>
     );

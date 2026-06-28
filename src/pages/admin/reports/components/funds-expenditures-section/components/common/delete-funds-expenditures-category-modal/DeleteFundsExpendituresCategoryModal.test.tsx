@@ -10,8 +10,8 @@ const CANCEL_BUTTON_NAME = COMMON_TEXT_ADMIN.BUTTON.CANCEL;
 const YES_BUTTON = COMMON_TEXT_ADMIN.BUTTON.YES;
 const NO_BUTTON = COMMON_TEXT_ADMIN.BUTTON.NO;
 
-const incomeCategory: ReportFundsExpendituresCategory = { id: 1, name: 'Донори', type: 'income' };
-const expenseCategory: ReportFundsExpendituresCategory = { id: 2, name: 'Оренда', type: 'expense' };
+const incomeCategory: ReportFundsExpendituresCategory = { id: 1, name: 'Донори', type: 'income', localizations: [] };
+const expenseCategory: ReportFundsExpendituresCategory = { id: 2, name: 'Оренда', type: 'expense', localizations: [] };
 
 const incomeRecord: ReportFundsExpendituresRecord = {
     id: 10,

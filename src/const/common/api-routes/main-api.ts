@@ -7,6 +7,13 @@ export const API_ROUTES = {
         LOGOUT: 'auth/logout',
         REFRESH_TOKEN: 'auth/refresh-token',
     },
+    MAIN_PAGE: {
+        BASE: 'MainPage',
+        PUBLIC: 'MainPage',
+    },
+    MAIN_PAGE_LOCALIZATIONS: {
+        BASE: 'MainPageLocalizations',
+    },
     COMPANY_PROFILE: {
         BASE: 'CompanyProfile',
         PUBLIC: 'CompanyProfile',
@@ -103,13 +110,25 @@ export const API_ROUTES = {
         BASE: 'PdfSection',
         CONTENT: 'PdfSection/pdf-section',
     },
+    PDF_SECTION_LOCALIZATIONS: {
+        BASE: 'PdfSectionLocalizations',
+    },
     PDF_REPORTS: {
         BASE: 'PdfReports',
+        BY_LANGUAGE_ID: 'PdfReports/languageId',
     },
     FAQ_LOCALIZATIONS: {
         BASE: 'FaqQuestionLocalizations',
     },
+    REPORT_FUNDS_EXPENDITURES_CATEGORY_LOCALIZATIONS: {
+        BASE: 'ReportFundsExpendituresCategoryLocalizations',
+    },
+    REPORT_FUNDS_EXPENDITURES_SETTINGS_LOCALIZATIONS: {
+        BASE: 'ReportFundsExpendituresSettingsLocalizations',
+    },
     HISTORY: {
         BASE: 'History',
+        PUBLIC: 'History',
     },
+    CONTACT_US: 'ContactUs',
 };

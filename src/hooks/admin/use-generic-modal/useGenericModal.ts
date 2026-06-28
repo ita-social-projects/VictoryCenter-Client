@@ -122,10 +122,9 @@ export const useGenericModal = <
 
     const handleCancelConfirmation = useCallback(() => {
         setShowFormConfirmModal(false);
-        onClose();
         resetPendingState();
         setIsSubmitting(false);
-    }, [onClose, resetPendingState]);
+    }, [resetPendingState]);
 
     const handleConfirmAction = useCallback(async () => {
         if (!pendingFormData || pendingAction === null) return;

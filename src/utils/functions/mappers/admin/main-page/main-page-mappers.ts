@@ -12,6 +12,8 @@ import {
     resolveLocaleCode,
 } from '@/utils/functions/mappers/common/localization/localization-mappers';
 
+const DEFAULT_ENGLISH_LANGUAGE_ID = 2;
+
 const findLocalizationByCode = <TLocalization extends LocalizationLanguageSource>(
     localizations: TLocalization[] | undefined,
     code: 'uk' | 'en',
@@ -70,7 +72,7 @@ export function mapFormValuesToMainPagePatch(
         ? never
         : NonNullable<MainPage['impactStatistics']>['metrics'],
 ): UpdateMainPageDto {
-    const enLanguageId = getLanguageIdByCode(languages, 'en') ?? 2;
+    const enLanguageId = getLanguageIdByCode(languages, 'en') ?? DEFAULT_ENGLISH_LANGUAGE_ID;
 
     const str = (val?: string) => (val ?? '').trim();
 
@@ -94,7 +96,7 @@ export function mapFormValuesToMainPagePatch(
 
     const safeMetricsPayload: UpdateMetricDto[] = existingMetrics.map((m) => {
         const enLoc = m.localizations?.find(
-            (l) => (enLanguageId != null && l.languageId === enLanguageId) || resolveLocaleCode(l, languages) === 'en',
+            (l) => l.languageId === enLanguageId || resolveLocaleCode(l, languages) === 'en',
         );
 
         return {

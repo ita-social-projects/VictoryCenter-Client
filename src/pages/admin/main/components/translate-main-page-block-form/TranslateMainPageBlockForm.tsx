@@ -58,7 +58,8 @@ const areRichTextValuesEqual = (
     currentValues: TranslateMainPageBlockFormValues,
     initialValues: TranslateMainPageBlockFormValues,
 ) =>
-    normalizeRichTextHtmlForComparison(currentValues.title) === normalizeRichTextHtmlForComparison(initialValues.title) &&
+    normalizeRichTextHtmlForComparison(currentValues.title) ===
+        normalizeRichTextHtmlForComparison(initialValues.title) &&
     normalizeRichTextHtmlForComparison(currentValues.description) ===
         normalizeRichTextHtmlForComparison(initialValues.description);
 

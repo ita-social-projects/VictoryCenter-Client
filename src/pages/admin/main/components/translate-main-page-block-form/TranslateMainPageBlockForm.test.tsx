@@ -107,8 +107,8 @@ describe('TranslateMainPageBlockForm', () => {
         });
 
         expect(onSubmit.mock.calls[0][0]).toEqual({
-            title: 'Valid title text',
-            description: 'Valid description text',
+            title: '<p><strong>Valid title text</strong></p>',
+            description: '<p><em>Valid description text</em></p>',
         });
     });
 

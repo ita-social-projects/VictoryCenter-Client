@@ -71,7 +71,8 @@ export function mapFormValuesToMainPagePatch(
         ? never
         : NonNullable<MainPage['impactStatistics']>['metrics'],
 ): UpdateMainPageDto {
-    const enLanguageId = getLanguageIdByCode(languages, 'en') ?? (!languages?.length ? DEFAULT_ENGLISH_LANGUAGE_ID : null);
+    const enLanguageId =
+        getLanguageIdByCode(languages, 'en') ?? (!languages?.length ? DEFAULT_ENGLISH_LANGUAGE_ID : null);
 
     if (enLanguageId == null) {
         throw new Error('Could not resolve English language ID. Check languages configuration.');

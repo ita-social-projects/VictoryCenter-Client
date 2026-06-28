@@ -1,4 +1,4 @@
-import React, { RefObject, useState } from 'react';
+import React, { RefObject, useEffect, useState } from 'react';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ReactComponent as ArrowDown } from '@/assets/icons/chevron-down.svg';
 import { ReactComponent as ArrowUp } from '@/assets/icons/chevron-up.svg';
@@ -39,6 +39,12 @@ export const Select = <TValue,>({
     }) as React.ReactElement<SelectOptionProps<TValue>>[];
 
     const [isOpen, setIsOpen] = useState(false);
+
+    useEffect(() => {
+        if (disabled) {
+            setIsOpen(false);
+        }
+    }, [disabled]);
 
     const selectedOption = options.find((opt) => opt.props.value === value);
     const hasValue = value !== null && value !== undefined;
@@ -104,7 +110,7 @@ export const Select = <TValue,>({
                 </span>
                 {isOpen ? <ArrowUp /> : <ArrowDown />}
             </button>
-            {isOpen && (
+            {isOpen && !disabled && (
                 <div className={'select-options'}>
                     {options.map((opt, index) => {
                         const { name, value: optValue } = opt.props;
@@ -115,6 +121,7 @@ export const Select = <TValue,>({
                                     'select-options-selected': !isAutocomplete && value === optValue,
                                 })}
                                 onClick={(e) => handleOptionClick(e, optValue)}
+                                disabled={disabled}
                             >
                                 <span>{name}</span>
                             </button>

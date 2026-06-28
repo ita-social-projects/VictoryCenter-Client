@@ -107,10 +107,13 @@ export const useProgramExpenseRecordForm = ({
     useEffect(() => {
         if (!isOpen) return;
 
+        const isEditBaseline = recordToEdit !== null && formState.programId === recordToEdit.programId;
         const selectedProgramExists =
-            formState.programId === undefined || programOptions.some((program) => program.id === formState.programId);
+            formState.programId === undefined ||
+            programOptions.some((program) => program.id === formState.programId) ||
+            isEditBaseline;
 
-        if (isProgramSelectDisabled || !selectedProgramExists) {
+        if (!isEditBaseline && (isProgramSelectDisabled || !selectedProgramExists)) {
             setFormState((previousState) => ({
                 ...previousState,
                 programId: undefined,
@@ -120,7 +123,7 @@ export const useProgramExpenseRecordForm = ({
                 },
             }));
         }
-    }, [formState.programId, isOpen, isProgramSelectDisabled, programOptions]);
+    }, [formState.programId, isOpen, isProgramSelectDisabled, programOptions, recordToEdit]);
 
     const handleAmountChange = useCallback(
         (value: string) => {

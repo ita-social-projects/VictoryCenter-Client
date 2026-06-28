@@ -130,10 +130,10 @@ jest.mock('./components/common/add-program-expense-record-modal/AddProgramExpens
                         data-testid="mock-submit-btn"
                         onClick={() =>
                             onSubmit({
-                                programId: recordToEdit ? recordToEdit.programId : 2,
-                                reportingYear: recordToEdit ? recordToEdit.reportingYear : '2026',
-                                amountUah: '1 000',
-                                amountUsd: '25',
+                                programId: recordToEdit ? 3 : 2,
+                                reportingYear: recordToEdit ? '2027' : '2026',
+                                amountUah: recordToEdit ? '2 000' : '1 000',
+                                amountUsd: recordToEdit ? '50' : '25',
                             })
                         }
                     >
@@ -619,10 +619,10 @@ describe('ProgramExpensesSection', () => {
 
             await waitFor(() => {
                 expect(mockUpdate).toHaveBeenCalledWith('mock-client', 1, {
-                    reportingYear: 2025, // recordToEdit value
-                    hippotherapyProgramCategoryId: 1, // recordToEdit value
-                    amountUah: 1000,
-                    amountUsd: 25,
+                    reportingYear: 2027,
+                    hippotherapyProgramCategoryId: 3,
+                    amountUah: 2000,
+                    amountUsd: 50,
                 });
                 expect(mockAddToast).toHaveBeenCalledWith('Зміни збережено успішно', 'success');
                 expect(mockRefetch).toHaveBeenCalled();

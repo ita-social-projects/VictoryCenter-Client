@@ -73,6 +73,7 @@ export const ProgramExpensesSection = ({ isEditing = false }: ProgramExpensesSec
         if (!isEditing) {
             setIsAddProgramExpenseModalOpen(false);
             setSelectedRecordIds([]);
+            setRecordToEdit(null);
         }
     }, [isEditing]);
 

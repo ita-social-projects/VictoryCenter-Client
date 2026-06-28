@@ -629,5 +629,19 @@ describe('ProgramExpensesSection', () => {
                 expect(screen.getByTestId('add-program-expense-modal')).toHaveAttribute('data-open', 'false');
             });
         });
+
+        it('should clear recordToEdit when isEditing turns off', () => {
+            const { rerender } = render(<ProgramExpensesSection isEditing />);
+
+            fireEvent.click(screen.getByLabelText('Edit record 1'));
+            expect(screen.getByTestId('record-to-edit')).toHaveTextContent('1');
+
+            rerender(<ProgramExpensesSection isEditing={false} />);
+
+            rerender(<ProgramExpensesSection isEditing />);
+            fireEvent.click(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE }));
+
+            expect(screen.queryByTestId('record-to-edit')).not.toBeInTheDocument();
+        });
     });
 });

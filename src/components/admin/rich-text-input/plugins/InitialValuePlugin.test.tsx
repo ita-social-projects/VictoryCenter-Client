@@ -77,6 +77,18 @@ describe('InitialValuePlugin', () => {
         expect(mockUpdate).toHaveBeenCalledTimes(1);
     });
 
+    it('updates editor for consecutive external value changes', () => {
+        const { rerender } = render(<InitialValuePlugin value="<p>First</p>" />);
+
+        mockGenerateHtmlFromNodes.mockReturnValue('<p>First</p>');
+        rerender(<InitialValuePlugin value="<p>Second</p>" />);
+
+        mockGenerateHtmlFromNodes.mockReturnValue('<p>Second</p>');
+        rerender(<InitialValuePlugin value="<p>Third</p>" />);
+
+        expect(mockUpdate).toHaveBeenCalledTimes(2);
+    });
+
     it('does not update when value remains the same', () => {
         const { rerender } = render(<InitialValuePlugin value="<p>Same content</p>" />);
 

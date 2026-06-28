@@ -120,6 +120,33 @@ describe('useFormManager', () => {
         expect(result.current.isDirty()).toBe(true);
     });
 
+    it('should use a custom equality comparator for dirty state', () => {
+        const customInitialData = { name: 'Alice', age: 30 };
+
+        const { result } = renderHook(() =>
+            useFormManager<FormValues, FormErrors>({
+                defaultFormState,
+                initialData: customInitialData,
+                validateForm,
+                onSubmit,
+                isEqual: (currentValues, initialValues) =>
+                    currentValues.name.trim() === initialValues.name.trim() && currentValues.age === initialValues.age,
+            }),
+        );
+
+        act(() => {
+            result.current.setFormState({ name: 'Alice ', age: 30 });
+        });
+
+        expect(result.current.isDirty()).toBe(false);
+
+        act(() => {
+            result.current.setFormState({ name: 'Bob', age: 30 });
+        });
+
+        expect(result.current.isDirty()).toBe(true);
+    });
+
     it('should validate form correctly', () => {
         const { result } = renderHook(() =>
             useFormManager<FormValues, FormErrors>({

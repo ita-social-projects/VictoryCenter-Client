@@ -3,6 +3,7 @@ import { MAIN_PAGE_TEXT } from '@/const/admin/main-page';
 import { useFormManager } from '@/hooks/admin/use-form-manager/useFormManager';
 import { VisibilityStatus } from '@/types/admin/common';
 import { MainPageFormValues } from '@/types/admin/main-page';
+import { normalizeRichTextHtmlForComparison } from '@/utils/functions/normalize-html/normalize-html';
 import { MAIN_PAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/main-page-schema/main-page-schema';
 import { forwardRef, useEffect } from 'react';
 import styles from './TranslateMainPageBlockForm.module.scss';
@@ -53,6 +54,14 @@ const validateFormWithConfig = (
     description: MAIN_PAGE_VALIDATION_FUNCTIONS.validateField(validationConfig.descriptionField, formState.description),
 });
 
+const areRichTextValuesEqual = (
+    currentValues: TranslateMainPageBlockFormValues,
+    initialValues: TranslateMainPageBlockFormValues,
+) =>
+    normalizeRichTextHtmlForComparison(currentValues.title) === normalizeRichTextHtmlForComparison(initialValues.title) &&
+    normalizeRichTextHtmlForComparison(currentValues.description) ===
+        normalizeRichTextHtmlForComparison(initialValues.description);
+
 export const TranslateMainPageBlockForm = forwardRef<TranslateMainPageBlockFormRef, TranslateMainPageBlockFormProps>(
     (
         { initialData = null, validationConfig, onSubmit, onValidationChange, onDirtyChange, formDisabled = false },
@@ -68,6 +77,7 @@ export const TranslateMainPageBlockForm = forwardRef<TranslateMainPageBlockFormR
             onValidationChange,
             ref,
             onSubmit,
+            isEqual: areRichTextValuesEqual,
         });
 
         useEffect(() => {

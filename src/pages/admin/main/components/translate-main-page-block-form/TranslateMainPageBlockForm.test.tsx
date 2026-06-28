@@ -71,6 +71,21 @@ describe('TranslateMainPageBlockForm', () => {
         expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
     });
 
+    it('does not mark normalized rich text HTML as dirty in edit mode', async () => {
+        render(
+            <Harness
+                initialData={{
+                    title: '<p class="editor"><strong>Valid title text</strong> </p>',
+                    description: '<p><em>Valid description text</em></p>',
+                }}
+            />,
+        );
+
+        fireEvent.change(titleInput(), { target: { value: '<p><strong>Valid title text</strong></p>' } });
+
+        await waitFor(() => expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled());
+    });
+
     it('validates required fields while typing', async () => {
         render(<Harness />);
 

@@ -13,6 +13,7 @@ export interface UseFormManagerProps<TFormValues, TFormErrors> {
     validateForm: (values: TFormValues, isPublishing: boolean) => TFormErrors;
     onSubmit: (data: TFormValues, status: VisibilityStatus) => Promise<void> | void;
     onValidationChange?: (isValid: boolean) => void;
+    isEqual?: (currentValues: TFormValues, initialValues: TFormValues) => boolean;
     ref?: React.Ref<FormManagerRef>;
 }
 
@@ -34,6 +35,7 @@ export function useFormManager<TFormValues, TFormErrors extends Record<string, u
     validateForm,
     onSubmit,
     onValidationChange,
+    isEqual,
     ref,
 }: UseFormManagerProps<TFormValues, TFormErrors>): UseFormManagerReturn<TFormValues, TFormErrors> {
     const [formState, setFormState] = useState<TFormValues>(() => initialData ?? defaultFormState);
@@ -53,8 +55,12 @@ export function useFormManager<TFormValues, TFormErrors extends Record<string, u
     );
 
     const isDirty = useCallback(() => {
+        if (isEqual) {
+            return !isEqual(formState, initialFormState);
+        }
+
         return JSON.stringify(formState) !== JSON.stringify(initialFormState);
-    }, [formState, initialFormState]);
+    }, [formState, initialFormState, isEqual]);
 
     const isValid = useCallback(
         (isPublishing = false) => {

@@ -4,3 +4,4 @@ export { InitialValuePlugin } from './InitialValuePlugin';
 export { FocusPlugin } from './FocusPlugin';
 export { ToolbarPlugin } from './ToolbarPlugin';
 export { EnterKeyPlugin } from './EnterKeyPlugin';
+export { EditablePlugin } from './EditablePlugin';

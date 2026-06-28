@@ -89,11 +89,14 @@ jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
         ) : null,
 }));
 
-const MockFormBlock = ({ testId, btnTestId, onPublish, isPublishDisabled }: any) => {
+const MockFormBlock = ({ testId, btnTestId, onPublish, isPublishDisabled, isReadOnly }: any) => {
     const { useFormContext } = require('react-hook-form');
-    const { setValue } = useFormContext();
+    const { setValue, watch } = useFormContext();
+    const displayedTitle = watch(isReadOnly ? 'titleEn' : 'titleUa');
+
     return (
         <div data-testid={testId}>
+            <span data-testid={`${btnTestId}-displayed-title`}>{displayedTitle}</span>
             <button
                 data-testid={`${btnTestId}-dirty`}
                 onClick={() => {
@@ -102,6 +105,14 @@ const MockFormBlock = ({ testId, btnTestId, onPublish, isPublishDisabled }: any)
                 }}
             >
                 Make Dirty
+            </button>
+            <button
+                data-testid={`${btnTestId}-normalized-dirty`}
+                onClick={() => {
+                    setValue('titleUa', '<p>Test Title</p>', { shouldDirty: true, shouldValidate: true });
+                }}
+            >
+                Normalize Dirty
             </button>
             <button data-testid={btnTestId} onClick={onPublish} disabled={isPublishDisabled}>
                 Publish
@@ -1138,6 +1149,51 @@ describe('MainPageContent', () => {
 
     it('switches language immediately without confirmation when form is not dirty', async () => {
         await renderAndLoadContent();
+
+        fireEvent.click(screen.getByTestId('language-en'));
+
+        expect(mockLocalizationToolkitState.onLanguageChange).toHaveBeenCalledWith(
+            expect.objectContaining({ code: 'en' }),
+        );
+        expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
+    });
+
+    it('updates displayed form values when switching from translated language back to default language', async () => {
+        const { rerender } = render(<MainPageContent />);
+
+        expect(await screen.findByTestId('category-bar')).toBeInTheDocument();
+        expect(screen.getByTestId('publish-btn-displayed-title')).toHaveTextContent('Test Title');
+
+        mockLocalizationToolkitState.selectedLanguage = { id: 2, code: 'en', name: 'EN' };
+        rerender(<MainPageContent />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('publish-btn-displayed-title')).toHaveTextContent('Localized title');
+        });
+        expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
+
+        mockLocalizationToolkitState.selectedLanguage = { id: 1, code: 'uk', name: 'UA' };
+        rerender(<MainPageContent />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('publish-btn-displayed-title')).toHaveTextContent('Test Title');
+        });
+        expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
+    });
+
+    it('switches language without confirmation when rich text normalization is the only form change', async () => {
+        (MainPageApi.get as jest.Mock).mockResolvedValue({
+            ...mockPageData,
+            page: {
+                ...mockPageData.page,
+                title: '<p class="editor">Test Title </p>',
+            },
+        });
+
+        await renderAndLoadContent();
+
+        fireEvent.click(screen.getByTestId('publish-btn-normalized-dirty'));
+        await waitFor(() => expect(screen.getByTestId('publish-btn')).toBeDisabled());
 
         fireEvent.click(screen.getByTestId('language-en'));
 

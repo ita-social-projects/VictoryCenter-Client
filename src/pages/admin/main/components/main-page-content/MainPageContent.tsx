@@ -47,6 +47,7 @@ import {
     getLocalizationLanguageCode,
     getLocalizationLanguageId,
 } from '@/utils/functions/mappers/common/localization/localization-mappers';
+import { normalizeRichTextHtmlForComparison } from '@/utils/functions/normalize-html/normalize-html';
 import { MainPageValidationSchema } from '@/validation/admin/main-page-schema/main-page-schema';
 import { AboutUsBlockForm } from '../about-us-block/AboutUsBlockForm';
 import { MainPagePublishModal } from '../main-page-publish-modal/MainPagePublishModal';
@@ -89,6 +90,35 @@ const sanitizeMainPageFormValues = (values: MainPageFormValues): MainPageFormVal
     statisticsTitleUa: values.statisticsTitleUa ?? '',
     statisticsTitleEn: values.statisticsTitleEn ?? '',
 });
+
+const RICH_TEXT_FORM_FIELDS: Array<keyof MainPageFormValues> = [
+    'titleUa',
+    'titleEn',
+    'descriptionUa',
+    'descriptionEn',
+    'aboutUsTitleUa',
+    'aboutUsTitleEn',
+    'aboutUsDescriptionUa',
+    'aboutUsDescriptionEn',
+    'partnersTitleUa',
+    'partnersTitleEn',
+    'partnersDescriptionUa',
+    'partnersDescriptionEn',
+];
+
+const normalizeMainPageFormValuesForDirty = (values: MainPageFormValues): MainPageFormValues => {
+    const normalizedValues = { ...values };
+
+    RICH_TEXT_FORM_FIELDS.forEach((field) => {
+        normalizedValues[field] = normalizeRichTextHtmlForComparison(String(values[field] ?? '')) as never;
+    });
+
+    return normalizedValues;
+};
+
+const areMainPageFormValuesEqual = (currentValues: MainPageFormValues, savedValues: MainPageFormValues) =>
+    JSON.stringify(normalizeMainPageFormValuesForDirty(currentValues)) ===
+    JSON.stringify(normalizeMainPageFormValuesForDirty(savedValues));
 
 const isLocalizationForLanguage = (localization: EntityLocalization, language: LocalizationLanguage) =>
     getLocalizationLanguageId(localization) === language.id ||
@@ -300,8 +330,11 @@ export const MainPageContent = () => {
         };
     }, [client, originalData, selectedLanguage, translationLanguages, allLanguages, methods, addToast]);
 
+    const isMainPageDirty =
+        methods.formState.isDirty && !areMainPageFormValuesEqual(methods.getValues(), savedValuesRef.current);
+
     const handleGlobalLanguageChange = (language: LocalizationLanguage) => {
-        if (methods.formState.isDirty) {
+        if (isMainPageDirty) {
             setPendingGlobalLanguage(language);
         } else {
             onLanguageChange(language);
@@ -455,7 +488,7 @@ export const MainPageContent = () => {
         return hasLoadError ? <div>{MAIN_PAGE_TEXT.ERRORS.LOAD_FAILED}</div> : <PageLoader />;
     }
 
-    const isPublishDisabled = !methods.formState.isDirty || !methods.formState.isValid || isPublishing;
+    const isPublishDisabled = !isMainPageDirty || !methods.formState.isValid || isPublishing;
     const onPublish = methods.handleSubmit(handlePublishClick);
 
     return (

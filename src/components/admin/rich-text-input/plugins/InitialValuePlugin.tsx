@@ -12,7 +12,6 @@ export const InitialValuePlugin = ({ value }: InitialValuePluginProps) => {
     const [editor] = useLexicalComposerContext();
     const isFirstRender = useRef(true);
     const lastValue = useRef(value);
-    const isInternalUpdate = useRef(false);
 
     useEffect(() => {
         if (isFirstRender.current) {
@@ -22,12 +21,6 @@ export const InitialValuePlugin = ({ value }: InitialValuePluginProps) => {
         }
 
         if (lastValue.current === value) {
-            return;
-        }
-
-        if (isInternalUpdate.current) {
-            isInternalUpdate.current = false;
-            lastValue.current = value;
             return;
         }
 
@@ -47,7 +40,6 @@ export const InitialValuePlugin = ({ value }: InitialValuePluginProps) => {
         }
 
         lastValue.current = value;
-        isInternalUpdate.current = true;
 
         editor.update(() => {
             const root = $getRoot();

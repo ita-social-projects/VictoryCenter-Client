@@ -84,9 +84,7 @@ describe('normalizeHtml', () => {
 
     it('removes editor-only wrappers for rich text comparison', () => {
         const input = '<p><span>Text <b><strong>Bold</strong></b> and <i><em>italic</em></i></span></p>';
-        expect(normalizeRichTextHtmlForComparison(input)).toBe(
-            '<p>Text <strong>Bold</strong> and <em>italic</em></p>',
-        );
+        expect(normalizeRichTextHtmlForComparison(input)).toBe('<p>Text <strong>Bold</strong> and <em>italic</em></p>');
     });
 
     it('preserves formatting differences for rich text comparison', () => {

@@ -257,6 +257,7 @@ describe('AddProgramExpenseRecordModal', () => {
                 records={RECORDS}
                 exchangeRate={null}
                 onClose={jest.fn()}
+                onSubmit={jest.fn().mockResolvedValue(true)}
             />,
         );
 
@@ -274,6 +275,7 @@ describe('AddProgramExpenseRecordModal', () => {
                 records={RECORDS}
                 exchangeRate={null}
                 onClose={jest.fn()}
+                onSubmit={jest.fn().mockResolvedValue(true)}
             />,
         );
         rerender(
@@ -283,6 +285,7 @@ describe('AddProgramExpenseRecordModal', () => {
                 records={RECORDS}
                 exchangeRate={null}
                 onClose={jest.fn()}
+                onSubmit={jest.fn().mockResolvedValue(true)}
             />,
         );
 

@@ -375,9 +375,12 @@ describe('AddProgramExpenseRecordModal', () => {
         it('blocks close requests when submitting is pending', async () => {
             const onClose = jest.fn();
             let resolveSubmit!: (val: boolean) => void;
-            const onSubmit = jest.fn().mockImplementation(() => new Promise((resolve) => {
-                resolveSubmit = resolve;
-            }));
+            const onSubmit = jest.fn().mockImplementation(
+                () =>
+                    new Promise((resolve) => {
+                        resolveSubmit = resolve;
+                    }),
+            );
 
             renderModal({ recordToEdit, onSubmit, onClose });
 

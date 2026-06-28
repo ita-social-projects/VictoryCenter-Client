@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { DeleteCategoryModal } from './DeleteCategoryModal';
 import { ProgramsCategoriesApi } from '@/services/api/admin/programs/programs-api';
@@ -62,6 +62,20 @@ jest.mock('@/components/admin/hint-box/HintBox', () => ({
     ),
 }));
 
+jest.mock('./DeleteCategoryConfirmModal', () => ({
+    DeleteCategoryConfirmModal: ({ isOpen, onConfirm, onClose, isSubmitting }: any) =>
+        isOpen ? (
+            <div data-testid="confirm-modal">
+                <button onClick={onConfirm} disabled={isSubmitting} data-testid="confirm-delete-button">
+                    Видалити
+                </button>
+                <button onClick={onClose} disabled={isSubmitting} data-testid="confirm-cancel-button">
+                    Відмінити
+                </button>
+            </div>
+        ) : null,
+}));
+
 describe('DeleteCategoryModal', () => {
     const mockCategories: ProgramCategory[] = [
         { id: 1, name: 'Category without programs', programsCount: 0 },
@@ -80,9 +94,12 @@ describe('DeleteCategoryModal', () => {
         render(<DeleteCategoryModal {...defaultProps} {...overrideProps} />);
 
     const getModal = () => screen.queryByTestId('modal');
+    const getFirstModal = () => screen.getAllByTestId('modal')[0];
     const getTitle = () => screen.queryByText(COMMON_TEXT_ADMIN.CATEGORIES.FORM.TITLE.DELETE_CATEGORY);
-    const getCancelButton = () => screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL);
-    const getDeleteButton = () => screen.getByText(COMMON_TEXT_ADMIN.BUTTON.DELETE);
+    const getCancelButton = () => within(getFirstModal()).getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL);
+    const getDeleteButton = () => within(getFirstModal()).getByText(COMMON_TEXT_ADMIN.BUTTON.DELETE);
+    const getConfirmModal = () => screen.queryByTestId('confirm-modal');
+    const getConfirmDeleteButton = () => screen.getByTestId('confirm-delete-button');
     const getHintBox = () => screen.queryByTestId('hint-box');
     const getErrorMessage = () => screen.queryByText(COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.FAIL_TO_DELETE_CATEGORY);
     const getHasProgramsError = (programsCount: number) =>
@@ -90,6 +107,7 @@ describe('DeleteCategoryModal', () => {
 
     const clickCancelButton = () => fireEvent.click(getCancelButton());
     const clickDeleteButton = () => fireEvent.click(getDeleteButton());
+    const clickConfirmDeleteButton = () => fireEvent.click(getConfirmDeleteButton());
     const getCategorySelectButton = () => screen.getByRole('button', { expanded: false });
     const openCategorySelect = () => fireEvent.click(getCategorySelectButton());
     const getCategoryOption = (categoryId: number) =>
@@ -152,11 +170,29 @@ describe('DeleteCategoryModal', () => {
         expectModalClosed();
     });
 
+    it('should open confirmation modal when delete button is clicked', () => {
+        renderDeleteCategoryModal();
+
+        clickDeleteButton();
+
+        expect(getConfirmModal()).toBeInTheDocument();
+    });
+
+    it('should not open confirmation modal when category has programs', () => {
+        renderDeleteCategoryModal();
+
+        changeCategorySelect(mockCategories[1].id);
+        clickDeleteButton();
+
+        expect(getConfirmModal()).not.toBeInTheDocument();
+    });
+
     it('should handle successful category deletion', async () => {
         mockedProgramsCategoriesApi.deleteProgramCategory.mockResolvedValue(undefined);
         renderDeleteCategoryModal();
 
         clickDeleteButton();
+        clickConfirmDeleteButton();
 
         await waitFor(() => {
             expectDeleteApiCalled(mockCategories[0].id);
@@ -171,6 +207,7 @@ describe('DeleteCategoryModal', () => {
         renderDeleteCategoryModal();
 
         clickDeleteButton();
+        clickConfirmDeleteButton();
 
         expect(
             await screen.findByText(COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.FAIL_TO_DELETE_CATEGORY),
@@ -208,17 +245,14 @@ describe('DeleteCategoryModal', () => {
         mockedProgramsCategoriesApi.deleteProgramCategory.mockReturnValue(longRunningPromise);
 
         renderDeleteCategoryModal();
-
-        const deleteButton = getDeleteButton();
-        const cancelButton = getCancelButton();
-        const selectButton = getCategorySelectButton();
+        clickDeleteButton();
+        clickConfirmDeleteButton();
 
         clickDeleteButton();
 
         await waitFor(() => {
-            expect(deleteButton).toBeDisabled();
-            expect(cancelButton).toBeDisabled();
-            expect(selectButton).toBeDisabled();
+            expect(screen.getByTestId('confirm-delete-button')).toBeDisabled();
+            expect(screen.getByTestId('confirm-cancel-button')).toBeDisabled();
         });
 
         resolveRequest();
@@ -232,6 +266,7 @@ describe('DeleteCategoryModal', () => {
         const { rerender } = renderDeleteCategoryModal();
 
         clickDeleteButton();
+        clickConfirmDeleteButton();
         await screen.findByText(COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.FAIL_TO_DELETE_CATEGORY);
 
         rerender(<DeleteCategoryModal {...defaultProps} isOpen={false} />);

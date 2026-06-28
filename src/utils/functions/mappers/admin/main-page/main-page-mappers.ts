@@ -11,6 +11,8 @@ import {
     resolveLocaleCode,
 } from '@/utils/functions/mappers/common/localization/localization-mappers';
 
+const DEFAULT_ENGLISH_LANGUAGE_ID = 2;
+
 const findLocalizationByCode = <TLocalization>(
     localizations: TLocalization[] | undefined,
     code: 'uk' | 'en',
@@ -69,7 +71,7 @@ export function mapFormValuesToMainPagePatch(
         ? never
         : NonNullable<MainPage['impactStatistics']>['metrics'],
 ): UpdateMainPageDto {
-    const enLanguageId = getLanguageIdByCode(languages, 'en');
+    const enLanguageId = getLanguageIdByCode(languages, 'en') ?? (!languages?.length ? DEFAULT_ENGLISH_LANGUAGE_ID : null);
 
     if (enLanguageId == null) {
         throw new Error('Could not resolve English language ID. Check languages configuration.');

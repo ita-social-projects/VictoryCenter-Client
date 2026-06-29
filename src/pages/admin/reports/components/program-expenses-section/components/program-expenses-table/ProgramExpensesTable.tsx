@@ -17,7 +17,7 @@ import styles from './ProgramExpensesTable.module.scss';
 
 export interface ProgramExpensesTableProps {
     records: ProgramExpensesRecord[];
-    programs: ProgramExpensesProgram[];
+    programs?: ProgramExpensesProgram[];
     hasAnyProgramExpenseRecords: boolean;
     isEditing?: boolean;
     isAddProgramExpenseDisabled?: boolean;
@@ -239,7 +239,9 @@ export const ProgramExpensesTable = ({
                                                     <Select<number | undefined>
                                                         value={editProgramId}
                                                         onValueChange={(value) => handleProgramChange(record.id, value)}
-                                                        placeholder={PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_PLACEHOLDER}
+                                                        placeholder={
+                                                            PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_PLACEHOLDER
+                                                        }
                                                         className={styles['category-edit-select']}
                                                         optionClassName={styles['category-edit-option']}
                                                     >
@@ -256,9 +258,7 @@ export const ProgramExpensesTable = ({
                                                         ))}
                                                     </Select>
                                                     {programError && (
-                                                        <p className={styles['category-edit-error']}>
-                                                            {programError}
-                                                        </p>
+                                                        <p className={styles['category-edit-error']}>{programError}</p>
                                                     )}
                                                 </div>
                                             ) : (

@@ -288,5 +288,106 @@ describe('TranslateHistoryModal', () => {
             );
             expect(screen.getByTestId('translate-history-section-form')).toBeInTheDocument();
         });
+
+        it('pre-fills form with existing title and description localizations', () => {
+            const sectionsWithLocalizations: HistorySectionDto[] = [
+                {
+                    id: 1,
+                    template: 1,
+                    order: 0,
+                    contents: [
+                        {
+                            id: 10,
+                            sectionId: 1,
+                            contentType: ContentType.Title,
+                            title: 'UA Title',
+                            order: 0,
+                            localizations: [
+                                {
+                                    entityId: 10,
+                                    localizationInfoDto: { id: 1, code: 'en' },
+                                    translationStatus: 1,
+                                    title: 'Existing EN Title',
+                                    description: null,
+                                },
+                            ],
+                        },
+                        {
+                            id: 11,
+                            sectionId: 1,
+                            contentType: ContentType.Description,
+                            description: 'UA Desc',
+                            order: 1,
+                            localizations: [
+                                {
+                                    entityId: 11,
+                                    localizationInfoDto: { id: 1, code: 'en' },
+                                    translationStatus: 1,
+                                    title: null,
+                                    description: 'Existing EN Description',
+                                },
+                            ],
+                        },
+                    ],
+                },
+            ];
+
+            render(
+                <TranslateHistoryModal
+                    isOpen={true}
+                    onClose={mockOnClose}
+                    sections={sectionsWithLocalizations}
+                    languages={mockLanguages}
+                    onSaved={mockOnSaved}
+                />,
+            );
+
+            const titleInput = screen.getByRole('textbox', { name: /заголовок/i }) as HTMLInputElement;
+            const descInput = screen.getByRole('textbox', { name: /опис/i }) as HTMLInputElement;
+
+            expect(titleInput.value).toBe('Existing EN Title');
+            expect(descInput.value).toBe('Existing EN Description');
+            expect(screen.getByText(COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.UPDATE_TRANSLATION)).toBeInTheDocument();
+        });
+
+        it('renders a section row when section has image content', () => {
+            const sectionWithImage: HistorySectionDto[] = [
+                {
+                    id: 3,
+                    template: 2,
+                    order: 0,
+                    contents: [
+                        {
+                            id: 30,
+                            sectionId: 3,
+                            contentType: ContentType.Image,
+                            order: 0,
+                            localizations: [],
+                        },
+                        {
+                            id: 31,
+                            sectionId: 3,
+                            contentType: ContentType.Title,
+                            title: 'Image Section Title',
+                            order: 1,
+                            localizations: [],
+                        },
+                    ],
+                },
+            ];
+
+            render(
+                <TranslateHistoryModal
+                    isOpen={true}
+                    onClose={mockOnClose}
+                    sections={sectionWithImage}
+                    languages={mockLanguages}
+                    onSaved={mockOnSaved}
+                />,
+            );
+
+            expect(screen.getByTestId('translate-section-row')).toBeInTheDocument();
+            expect(screen.getByTestId('translate-history-section-form')).toBeInTheDocument();
+        });
     });
 });

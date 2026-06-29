@@ -358,7 +358,7 @@ describe('TitleDescriptionSection', () => {
             const { container } = renderComponent({ mode: SectionMode.View, title: '', description: '' });
             expect(container.firstChild).not.toBeNull();
             expect(getTitleHeading()).toBeInTheDocument();
-            expect(getTitleHeading()).toHaveTextContent('');
+            expect(getTitleHeading()).toBeEmptyDOMElement();
         });
 
         it('applies custom className', () => {

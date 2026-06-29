@@ -268,6 +268,86 @@ describe('useTranslateHistorySection', () => {
                 ],
             },
         ]);
+
+        expect(mockOnSuccess).toHaveBeenCalledTimes(1);
+        const updatedSections = mockOnSuccess.mock.calls[0][0] as HistorySectionDto[];
+
+        expect(updatedSections[0].contents[0].localizations).toHaveLength(1);
+        expect(updatedSections[0].contents[0].localizations?.[0]).toEqual(
+            expect.objectContaining({
+                title: 'New EN Title',
+            }),
+        );
+    });
+
+    it('handles optimistic update correctly when localizations array is undefined', async () => {
+        const mockSectionsUndefinedLocalizations: HistorySectionDto[] = [
+            {
+                id: 20,
+                template: 1,
+                order: 0,
+                contents: [
+                    {
+                        id: 200,
+                        sectionId: 20,
+                        contentType: ContentType.Title,
+                        title: 'UA Title',
+                        order: 0,
+                        localizations: undefined as any,
+                    },
+                ],
+            },
+        ];
+
+        const { result } = renderHook(() =>
+            useTranslateHistorySection({
+                sections: mockSectionsUndefinedLocalizations,
+                language: mockLanguage,
+                onSuccess: mockOnSuccess,
+            }),
+        );
+
+        await act(async () => {
+            await result.current.translateSections([
+                {
+                    sectionId: 20,
+                    data: { title: 'EN Title', description: '' },
+                },
+            ]);
+        });
+
+        expect(mockOnSuccess).toHaveBeenCalledTimes(1);
+        const updatedSections = mockOnSuccess.mock.calls[0][0] as HistorySectionDto[];
+
+        expect(updatedSections[0].contents[0].localizations).toHaveLength(1);
+        expect(updatedSections[0].contents[0].localizations?.[0]).toEqual(
+            expect.objectContaining({
+                title: 'EN Title',
+            }),
+        );
+    });
+
+    it('returns early if language is undefined', async () => {
+        const { result } = renderHook(() =>
+            useTranslateHistorySection({
+                sections: mockSections,
+                language: null,
+                onSuccess: mockOnSuccess,
+            }),
+        );
+
+        await act(async () => {
+            await result.current.translateSections([
+                {
+                    sectionId: 10,
+                    data: { title: 'EN Title', description: '' },
+                },
+            ]);
+        });
+
+        expect(HistoryLocalizationsApi.create).not.toHaveBeenCalled();
+        expect(HistoryLocalizationsApi.update).not.toHaveBeenCalled();
+        expect(mockOnSuccess).not.toHaveBeenCalled();
     });
 
     it('normalizes spaces in title and description when saving (trims ends + collapses consecutive spaces)', async () => {

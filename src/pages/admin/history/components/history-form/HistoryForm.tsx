@@ -23,7 +23,7 @@ interface SectionEditingState {
 
 export interface HistoryFormRef {
     addSection: (section: HistorySectionDto) => void;
-    replaceSection: (sectionIndex: number, newSection: HistorySectionDto, silent?: boolean) => void;
+    replaceSection: (sectionIndex: number, newSection: HistorySectionDto) => void;
     updateSectionSilently: (sectionIndex: number, newSection: HistorySectionDto) => void;
     getSections: () => HistorySectionDto[];
 }

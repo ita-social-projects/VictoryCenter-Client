@@ -97,7 +97,9 @@ export const useTranslateHistorySection = ({ sections, language, onSuccess }: Us
                             return {
                                 ...content,
                                 localizations: [
-                                    ...(content.localizations ?? []),
+                                    ...(content.localizations ?? []).filter(
+                                        (l) => l.localizationInfoDto.id !== language.id,
+                                    ),
                                     {
                                         entityId: content.id!,
                                         languageId: language.id,
@@ -121,7 +123,9 @@ export const useTranslateHistorySection = ({ sections, language, onSuccess }: Us
                             return {
                                 ...content,
                                 localizations: [
-                                    ...(content.localizations ?? []),
+                                    ...(content.localizations ?? []).filter(
+                                        (l) => l.localizationInfoDto.id !== language.id,
+                                    ),
                                     {
                                         entityId: content.id!,
                                         languageId: language.id,

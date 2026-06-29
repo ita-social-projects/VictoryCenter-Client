@@ -416,9 +416,13 @@ export const HistoryPageContent = () => {
                     sections={normalizedSections}
                     languages={translationLanguages}
                     onSaved={async (updatedSections) => {
-                        if (historyFormRef.current) {
-                            historyFormRef.current.getSections().forEach((_, idx) => {
-                                historyFormRef.current?.updateSectionSilently(idx, updatedSections[idx]);
+                        const form = historyFormRef.current;
+                        if (form) {
+                            form.getSections().forEach((formSection, idx) => {
+                                const updated = updatedSections.find((s) => s.id === formSection.id);
+                                if (updated) {
+                                    form.updateSectionSilently(idx, updated);
+                                }
                             });
                         }
                         await refetchSections();

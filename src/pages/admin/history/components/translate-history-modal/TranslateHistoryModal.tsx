@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { LocalizationModal } from '@/components/admin/localization-modal/LocalizationModal';
 import { TranslationControls } from '@/components/admin/translation-controls/TranslationControls';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -14,7 +14,6 @@ import {
 import { renderHistorySection } from '@/utils/functions/render-history-section';
 import { SectionMode } from '@/types/common/sections';
 import styles from './TranslateHistoryModal.module.scss';
-import { useMemo } from 'react';
 
 const getInitialData = (section: HistorySectionDto, languageId?: number): TranslateHistorySectionFormValues | null => {
     if (!languageId) return null;

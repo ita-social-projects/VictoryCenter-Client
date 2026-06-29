@@ -36,26 +36,31 @@ export const HistoryPageToolbar = ({
 }: HistoryPageToolbarProps) => {
     return (
         <div className={styles['history-page-toolbar']}>
-            {localizedEntity && (
-                <LocalizationStatuses languages={translationLanguages} localizedEntity={localizedEntity} />
-            )}
-            <LocalizationToolkit
-                languages={languages}
-                onLanguageChange={onLanguageChange}
-                onTranslationStatusFilterChange={onTranslationStatusFilterChange}
-            />
-            <div className={styles['actions-wrapper']}>
+            <div className={styles['toolbar-controls']}>
+                {localizedEntity && (
+                    <LocalizationStatuses languages={translationLanguages} localizedEntity={localizedEntity} />
+                )}
+                <LocalizationToolkit
+                    languages={languages}
+                    onLanguageChange={onLanguageChange}
+                    onTranslationStatusFilterChange={onTranslationStatusFilterChange}
+                />
+                <div className={styles['actions-wrapper']}>
+                    <Button onClick={onAddSection} buttonStyle="primary">
+                        {HISTORY_TEXT.BUTTON.ADD_SECTION}
+                        <PlusIcon />
+                    </Button>
+                </div>
+            </div>
+            <div className={styles['translate-icon-row']}>
                 <IconButton
                     DefaultIcon={ACTION_ICONS.translate.default}
                     onClick={onTranslate}
                     aria-label={HISTORY_TEXT.BUTTON.TRANSLATE}
                     type="button"
                     disabled={isTranslateDisabled}
+                    className={styles['translate-btn']}
                 />
-                <Button onClick={onAddSection} buttonStyle="primary">
-                    {HISTORY_TEXT.BUTTON.ADD_SECTION}
-                    <PlusIcon />
-                </Button>
             </div>
         </div>
     );

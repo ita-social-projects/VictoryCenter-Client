@@ -478,12 +478,22 @@ When working on this codebase:
 - **README**: `README.md` - Setup instructions
 - **Contributing**: `CONTRIBUTING.md` - Contribution guidelines
 - **CLAUDE.md**: Claude-specific context (similar to this file)
+- **Codex**: `.codex/` - OpenAI Codex-specific project config, rules, and skills
 - **Frontend Repo**: https://github.com/ita-social-projects/VictoryCenter-Client
 - **Backend Repo**: https://github.com/ita-social-projects/VictoryCenter-Back
 
 ---
 
-**Last Updated**: 2026-02-07
+## Codex-Specific Guidance
+
+OpenAI Codex should treat this file as the shared project guidance and use
+`.codex/` only for Codex-specific workflow, review, and command-approval
+details. Do not change `.claude/`, `.github/` Copilot instructions, or
+`CLAUDE.md` unless the user explicitly asks for those assistant-specific files.
+
+---
+
+**Last Updated**: 2026-06-29
 **Maintained By**: Development team
 
 *This file should be updated when significant changes are made to project structure, tech stack, or coding conventions.*

@@ -71,8 +71,10 @@ describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
             expect(validateFundsExpendituresAmount('1 200,50', 'save')).toBeUndefined();
         });
 
-        it('should not return an error when user types more than two decimal digits', () => {
-            expect(validateFundsExpendituresAmount('1 200,123', 'change')).toBeUndefined();
+        it('should return error when user types more than two decimal digits', () => {
+            expect(validateFundsExpendituresAmount('1 200,123', 'change')).toBe(
+                FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_MAX_DECIMALS,
+            );
         });
 
         it('should support dot input by normalizing it to comma', () => {

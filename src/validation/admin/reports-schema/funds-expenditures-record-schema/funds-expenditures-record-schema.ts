@@ -40,6 +40,17 @@ export const validateFundsExpendituresAmount = (
     value: string,
     trigger: FundsExpendituresAmountValidationTrigger = 'change',
 ): string | undefined => {
+    if (value) {
+        const withCommaSeparator = value.replaceAll(/\s+/g, ' ').trimStart().replaceAll('.', ',');
+        const firstCommaIndex = withCommaSeparator.indexOf(',');
+        if (firstCommaIndex !== -1) {
+            const rawDecimalPart = withCommaSeparator.slice(firstCommaIndex + 1).replaceAll(',', '');
+            if (rawDecimalPart.length > 2) {
+                return FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_MAX_DECIMALS;
+            }
+        }
+    }
+
     const normalized = normalizeFundsExpendituresAmountInput(value, true);
 
     if (!normalized) {

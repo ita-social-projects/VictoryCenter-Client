@@ -637,8 +637,8 @@ describe('FundsExpendituresTable', () => {
                     categoryName: 'Грантові кошти',
                     type: 'income',
                     reportingYear: '2025',
-                    amountUah: '7 265,123',
-                    amountUsd: '173,221',
+                    amountUah: '7 265,12',
+                    amountUsd: '173,22',
                 },
             ];
 
@@ -650,8 +650,8 @@ describe('FundsExpendituresTable', () => {
 
             expect(onRecordSave).toHaveBeenCalledWith(1, {
                 categoryId: 2,
-                amountUah: '7 265,123',
-                amountUsd: '173,221',
+                amountUah: '7 265,12',
+                amountUsd: '173,22',
             });
         });
 

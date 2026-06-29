@@ -72,13 +72,18 @@ export const mapReportFundsExpendituresSettingsDtoToSettings = (
     id: dto.id,
     disclaimerTitle: dto.disclaimerTitle,
     exchangeRate: formatNumberDecimalComma(dto.exchangeRate),
+    programExpendituresReportingYear: dto.programExpendituresReportingYear,
 });
 
 export const mapReportFundsExpendituresSettingsToUpdateDto = (
-    settings: Pick<ReportFundsExpendituresSettings, 'disclaimerTitle' | 'exchangeRate'>,
+    settings: Pick<
+        ReportFundsExpendituresSettings,
+        'disclaimerTitle' | 'exchangeRate' | 'programExpendituresReportingYear'
+    >,
 ): UpdateReportFundsExpendituresSettingsDto => ({
     disclaimerTitle: settings.disclaimerTitle ?? '',
     exchangeRate: Number.parseFloat((settings.exchangeRate ?? '0').replace(',', '.')) || 0,
+    programExpendituresReportingYear: settings.programExpendituresReportingYear ?? new Date().getFullYear(),
 });
 
 export const mapReportFundsExpendituresCategoryDtoToCategory = (

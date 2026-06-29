@@ -54,7 +54,8 @@ export const COMMON_TEXT_ADMIN = {
 
     QUESTION: {
         SAVE_CHANGES: 'Зберегти зміни?',
-        CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE: 'Зміни будуть втрачені. Бажаєте продовжити?',
+        CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE: 'Зміни будуть втрачені\nБажаєте продовжити?',
+        CHANGE_LANGUAGE_UNSAVED_CHANGES: 'Зміни будуть втрачені\nБажаєте змінити мову?',
         REMOVE_FROM_PUBLICATION: 'Зняти з публікації?',
         PUBLISH_CHANGES: 'Опублікувати зміни?',
     },
@@ -112,6 +113,7 @@ export const COMMON_TEXT_ADMIN = {
                 ADD_CATEGORY: 'Додати категорію',
                 EDIT_CATEGORY: 'Редагувати категорію',
                 DELETE_CATEGORY: 'Видалити категорію',
+                DELETE_CATEGORY_CONFIRM: 'Видалити категорію?',
             },
             MESSAGE: {
                 ALREADY_CONTAIN_CATEGORY_WITH_NAME: 'Категорія з такою назвою вже існує',

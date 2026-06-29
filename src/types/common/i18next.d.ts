@@ -9,6 +9,7 @@ import {
     donateUk,
     reportsPageUk,
     partnersPageUk,
+    successPageUk,
     globalUk,
     contactUsPageUk,
     historyPageUk,
@@ -27,6 +28,7 @@ declare module 'i18next' {
             donatePage: typeof donateUk;
             reportsPage: typeof reportsPageUk;
             partnersPage: typeof partnersPageUk;
+            successPage: typeof successPageUk;
             global: typeof globalUk;
             contactUsPage: typeof contactUsPageUk;
             historyPage: typeof historyPageUk;

@@ -114,7 +114,7 @@ export const ProgramsApi = {
     ): Promise<PaginationResult<ProgramSearchItemData>> => {
         const response = await client.get<PaginationResult<HippotherapyProgramDto>>(`${API_ROUTES.PROGRAMS.SEARCH}`, {
             params: {
-                SearchQuery: searchTerm,
+                searchQuery: searchTerm,
                 offset: offset,
                 limit: limit,
             },
@@ -122,6 +122,26 @@ export const ProgramsApi = {
         });
 
         const suggestions = response.data.items.map(convertProgramToSuggestion);
+
+        const lowerSearchTerm = searchTerm.toLowerCase();
+        suggestions.sort((a, b) => {
+            const aName = a.name.toLowerCase();
+            const bName = b.name.toLowerCase();
+
+            const aStartsWith = aName.startsWith(lowerSearchTerm);
+            const bStartsWith = bName.startsWith(lowerSearchTerm);
+
+            if (aStartsWith && !bStartsWith) return -1;
+            if (!aStartsWith && bStartsWith) return 1;
+
+            const aIncludes = aName.includes(lowerSearchTerm);
+            const bIncludes = bName.includes(lowerSearchTerm);
+
+            if (aIncludes && !bIncludes) return -1;
+            if (!aIncludes && bIncludes) return 1;
+
+            return aName.localeCompare(bName);
+        });
 
         return {
             items: suggestions,

@@ -180,6 +180,7 @@ describe('main-page-mappers', () => {
                             name: 'UA Metric',
                             type: MetricType.Partners,
                             prefix: MetricPrefix.Plus,
+                            isAutoSynced: true,
                             localizations: [{ localizationInfoDto: { code: 'en' }, name: 'EN Metric' } as any],
                         } as any,
                         {
@@ -218,6 +219,7 @@ describe('main-page-mappers', () => {
                 name: 'UA Metric',
                 type: MetricType.Partners,
                 prefix: 1, // MetricPrefix.Plus is 1
+                isAutoSynced: true,
                 localization: undefined,
             });
 

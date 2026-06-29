@@ -48,7 +48,7 @@ export const TeamPageContent = () => {
     const [statusFilter, setStatusFilter] = useState<VisibilityStatus | undefined>();
     const [error, setError] = useState<ErrorState>({ message: null, type: null });
     const modalsStateControl = useModalsState<TeamMember>();
-    const { isAnyModalOpened, openModalActions, closeModalActions } = modalsStateControl;
+    const { isAnyModalOpened, openModalActions, closeModalActions, modalState } = modalsStateControl;
 
     const [selectedSearchMember, setSelectedSearchMember] = useState<TeamMember | null>(null);
 
@@ -433,20 +433,28 @@ export const TeamPageContent = () => {
             if (mappedMember.image && 'url' in mappedMember.image)
                 mappedMember.image.url = `${mappedMember.image.url}?cb=${Date.now()}`;
 
+            const isPublishingForFirstTime =
+                mappedMember.status === VisibilityStatus.Published &&
+                modalState.itemToEdit?.status !== VisibilityStatus.Published;
+
+            if (isPublishingForFirstTime) {
+                addToast(TEAM_MEMBERS_TEXT.MESSAGE.DONT_FORGET_TO_ORDER, ToastType.Info);
+            }
+
             setMembers((prevMembers) =>
                 prevMembers.map((member) => (member.id === mappedMember.id ? mappedMember : member)),
             );
 
-            if (mappedMember.categoryId !== selectedCategory!.id) {
+            if (selectedCategory && mappedMember.categoryId !== selectedCategory.id) {
                 setMembers((prev) => prev.filter((m) => m.id !== mappedMember.id));
                 setCategories((prevCategories) =>
-                    updateCategoryMemberCounts(prevCategories, selectedCategory!.id, mappedMember),
+                    updateCategoryMemberCounts(prevCategories, selectedCategory.id, mappedMember),
                 );
             }
 
             closeModalActions.closeEditItemModal();
         },
-        [closeModalActions, selectedCategory],
+        [closeModalActions, selectedCategory, addToast, modalState.itemToEdit],
     );
 
     const handleDeleteMember = useCallback(

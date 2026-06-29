@@ -9,5 +9,9 @@
         font-weight: 700;
         font-size: 4rem;
         text-align: center;
+
+        @media (max-width: 900px) {
+            font-size: 2rem;
+        }
     }
 }

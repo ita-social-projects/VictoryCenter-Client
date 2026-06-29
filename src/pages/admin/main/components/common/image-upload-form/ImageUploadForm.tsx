@@ -20,6 +20,7 @@ interface ImageUploadFormProps<TFormValues extends FieldValues> {
     imageConfig: ImageUploadConfig;
     variant?: ImageInputVariant;
     name?: string;
+    disabled?: boolean;
 }
 
 export const ImageUploadForm = <TFormValues extends FieldValues>({
@@ -30,6 +31,7 @@ export const ImageUploadForm = <TFormValues extends FieldValues>({
     imageConfig,
     variant = 'whoWeAre',
     name = 'image',
+    disabled = false,
 }: ImageUploadFormProps<TFormValues>) => {
     const { setValue } = useFormContext();
 
@@ -51,6 +53,7 @@ export const ImageUploadForm = <TFormValues extends FieldValues>({
                             }}
                             setError={setImageError}
                             variant={variant}
+                            disabled={disabled}
                             {...imageConfig}
                             style={{ ...imageConfig.style, width: '100%' }}
                         />

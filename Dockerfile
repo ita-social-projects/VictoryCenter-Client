@@ -5,6 +5,9 @@ RUN npm install
 RUN npm install --global serve
 COPY ./ ./
 ENV REACT_APP_BACKEND_URL="https://backend.victorycenter.online/api"
+ARG REACT_APP_CF_TURNSTILE_SITE_KEY
+ENV REACT_APP_CF_TURNSTILE_SITE_KEY=$REACT_APP_CF_TURNSTILE_SITE_KEY
+RUN test -n "$REACT_APP_CF_TURNSTILE_SITE_KEY" || { echo "Missing REACT_APP_CF_TURNSTILE_SITE_KEY"; exit 1; }
 RUN npm run build
 
 

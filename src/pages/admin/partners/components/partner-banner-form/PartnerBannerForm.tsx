@@ -184,6 +184,12 @@ export const PartnerBanner = () => {
     }
 
     const isDisabled = isPublishing;
+    const isDirty =
+        values && bannerData
+            ? values.title !== bannerData.title ||
+              values.description !== bannerData.description ||
+              values.image !== bannerData.image
+            : false;
 
     return (
         <div className={styles.root}>
@@ -270,7 +276,7 @@ export const PartnerBanner = () => {
                                 type="button"
                                 buttonStyle="primary"
                                 onClick={handlePublishClick}
-                                disabled={isDisabled || !isFormValid(values, errors)}
+                                disabled={isDisabled || !isFormValid(values, errors) || !isDirty}
                             >
                                 {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
                             </Button>

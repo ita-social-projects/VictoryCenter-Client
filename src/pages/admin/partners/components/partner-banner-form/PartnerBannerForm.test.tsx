@@ -272,7 +272,12 @@ describe('PartnerBanner', () => {
         render(<PartnerBanner />);
 
         const publishButton = getPublishButton();
-        expect(publishButton).toBeEnabled();
+        expect(publishButton).toBeDisabled();
+
+        changeDescriptionValue('New Description');
+        await waitFor(() => {
+            expect(publishButton).toBeEnabled();
+        });
 
         changeDescriptionValue('');
 
@@ -326,13 +331,14 @@ describe('PartnerBanner', () => {
 
         render(<PartnerBanner />);
 
+        changeDescriptionValue('New Description');
         clickPublish();
         clickConfirmPublish();
 
         await waitFor(() => {
             expect(mockedPartnersApi.updateBanner).toHaveBeenCalledWith('mock-client', {
                 title: defaultBannerData.title,
-                description: defaultBannerData.description,
+                description: 'New Description',
                 image: defaultBannerData.image,
                 imageId: defaultBannerData.imageId,
             });
@@ -363,7 +369,7 @@ describe('PartnerBanner', () => {
         const createDelayedPromise = () => {
             return new Promise<typeof defaultBannerData>((resolve) => {
                 setTimeout(() => {
-                    resolve(defaultBannerData);
+                    resolve({ ...defaultBannerData, description: 'New Description' });
                 }, 100);
             });
         };
@@ -372,6 +378,7 @@ describe('PartnerBanner', () => {
 
         render(<PartnerBanner />);
 
+        changeDescriptionValue('New Description');
         clickPublish();
         clickConfirmPublish();
 
@@ -392,7 +399,12 @@ describe('PartnerBanner', () => {
         render(<PartnerBanner />);
 
         const publishButton = getPublishButton();
-        expect(publishButton).toBeEnabled();
+        expect(publishButton).toBeDisabled();
+
+        changeDescriptionValue('New Description');
+        await waitFor(() => {
+            expect(publishButton).toBeEnabled();
+        });
 
         fireEvent.click(screen.getByRole('button', { name: 'Trigger image error' }));
 
@@ -514,13 +526,14 @@ describe('PartnerBanner', () => {
 
     it('prevents multiple simultaneous publish attempts', async () => {
         const delayedPromise = new Promise<typeof defaultBannerData>((resolve) => {
-            setTimeout(() => resolve(defaultBannerData), 100);
+            setTimeout(() => resolve({ ...defaultBannerData, description: 'New Description' }), 100);
         });
 
         mockedPartnersApi.updateBanner.mockReturnValue(delayedPromise as any);
 
         render(<PartnerBanner />);
 
+        changeDescriptionValue('New Description');
         clickPublish();
         clickConfirmPublish();
 
@@ -541,6 +554,8 @@ describe('PartnerBanner', () => {
         mockValidateDescription.mockReturnValue(undefined);
 
         render(<PartnerBanner />);
+
+        changeDescriptionValue('New Description');
 
         await waitFor(() => {
             expect(getPublishButton()).toBeEnabled();
@@ -602,6 +617,7 @@ describe('PartnerBanner', () => {
 
         render(<PartnerBanner />);
 
+        changeDescriptionValue('New Description');
         clickPublish();
         clickConfirmPublish();
 

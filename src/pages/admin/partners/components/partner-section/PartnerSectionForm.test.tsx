@@ -310,6 +310,7 @@ describe('PartnerSectionForm', () => {
                 value={defaultSectionValue}
                 errors={defaultSectionErrors}
                 disabled={false}
+                isDirty={true}
                 onChange={jest.fn()}
                 onDelete={jest.fn()}
                 onPublish={jest.fn()}
@@ -325,6 +326,7 @@ describe('PartnerSectionForm', () => {
                 value={defaultSectionValue}
                 errors={defaultSectionErrors}
                 disabled={false}
+                isDirty={true}
                 onChange={jest.fn()}
                 onDelete={jest.fn()}
                 onPublish={jest.fn()}
@@ -332,6 +334,22 @@ describe('PartnerSectionForm', () => {
         );
 
         expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeEnabled();
+    });
+
+    it('disables publish button when form is not dirty', () => {
+        render(
+            <PartnerSectionForm
+                value={defaultSectionValue}
+                errors={defaultSectionErrors}
+                disabled={false}
+                isDirty={false}
+                onChange={jest.fn()}
+                onDelete={jest.fn()}
+                onPublish={jest.fn()}
+            />,
+        );
+
+        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
     });
 
     it('disables publish when partner description validation fails', () => {
@@ -342,6 +360,7 @@ describe('PartnerSectionForm', () => {
                 value={defaultSectionValue}
                 errors={defaultSectionErrors}
                 disabled={false}
+                isDirty={true}
                 onChange={jest.fn()}
                 onDelete={jest.fn()}
                 onPublish={jest.fn()}
@@ -380,6 +399,7 @@ describe('PartnerSectionForm', () => {
                 value={defaultSectionValue}
                 errors={errorsWithImageIssue}
                 disabled={false}
+                isDirty={true}
                 onChange={jest.fn()}
                 onDelete={jest.fn()}
                 onPublish={jest.fn()}
@@ -415,6 +435,7 @@ describe('PartnerSectionForm', () => {
                 value={defaultSectionValue}
                 errors={defaultSectionErrors}
                 disabled={false}
+                isDirty={true}
                 onChange={jest.fn()}
                 onDelete={onDelete}
                 onPublish={onPublish}

@@ -38,6 +38,37 @@ const isSectionEmpty = (section: PartnerSectionFormValues): boolean => {
     return titleEmpty && descriptionEmpty && allPartnersEmpty;
 };
 
+const checkSectionDirty = (localSection: PartnerSectionFormValues, originalSections: PartnerSection[]): boolean => {
+    if (localSection.sectionId === null) {
+        return true;
+    }
+
+    const original = originalSections.find((s) => s.id === localSection.sectionId);
+    if (!original) {
+        return true;
+    }
+
+    if (localSection.title !== original.title) return true;
+    if (localSection.description !== original.description) return true;
+
+    if (localSection.deletedPartnerIds && localSection.deletedPartnerIds.length > 0) return true;
+
+    if (localSection.partners.length !== original.partners.length) return true;
+
+    for (const localPartner of localSection.partners) {
+        if (localPartner.partnerId === null) return true;
+
+        const originalPartner = original.partners.find((p) => p.id === localPartner.partnerId);
+        if (!originalPartner) return true;
+
+        if (localPartner.description !== originalPartner.description) return true;
+        if (localPartner.imageId !== originalPartner.imageId) return true;
+        if (localPartner.image !== originalPartner.image) return true;
+    }
+
+    return false;
+};
+
 export interface PartnerSectionsEditorRef {
     addSection: () => void;
 }
@@ -325,17 +356,21 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
 
     return (
         <div className={styles.root}>
-            {localSections.map((section, index) => (
-                <PartnerSectionForm
-                    key={section.localId}
-                    value={section}
-                    errors={errors[index] || { partners: [] }}
-                    disabled={isSectionsLoading || isPublishing}
-                    onChange={handleChange}
-                    onDelete={handleDeleteRequest}
-                    onPublish={handlePublishRequest}
-                />
-            ))}
+            {localSections.map((section, index) => {
+                const isDirty = checkSectionDirty(section, fetchedSections);
+                return (
+                    <PartnerSectionForm
+                        key={section.localId}
+                        value={section}
+                        errors={errors[index] || { partners: [] }}
+                        disabled={isSectionsLoading || isPublishing}
+                        isDirty={isDirty}
+                        onChange={handleChange}
+                        onDelete={handleDeleteRequest}
+                        onPublish={handlePublishRequest}
+                    />
+                );
+            })}
             <div ref={scrollAnchorRef} />
 
             <ConfirmationModal

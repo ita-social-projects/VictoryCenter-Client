@@ -680,10 +680,7 @@ describe('ProgramExpensesSection', () => {
                     amountUah: 50000,
                     amountUsd: 1200,
                 });
-                expect(mockAddToast).toHaveBeenCalledWith(
-                    REPORTS_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY,
-                    'success',
-                );
+                expect(mockAddToast).toHaveBeenCalledWith(REPORTS_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY, 'success');
                 expect(mockRefetch).toHaveBeenCalled();
             });
         });

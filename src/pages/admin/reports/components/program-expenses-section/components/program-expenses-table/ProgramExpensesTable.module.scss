@@ -263,20 +263,22 @@
 .category-edit-select {
     width: 240px;
 
-    :global(.select-head) {
-        min-height: 55px;
-        padding: 10px 17px;
-        border: 1px solid c.$grey-700;
-        border-radius: 8px;
-        background-color: c.$white;
-    }
+    :global {
+        .select-head {
+            min-height: 55px;
+            padding: 10px 17px;
+            border: 1px solid c.$grey-700;
+            border-radius: 8px;
+            background-color: c.$white;
+        }
 
-    :global(.select-options) {
-        min-width: 240px;
-        border: 1px solid c.$grey-500;
-        border-radius: 8px;
-        background-color: c.$white;
-        box-shadow: 0 6px 18px rgba(c.$black, 0.14);
+        .select-options {
+            min-width: 240px;
+            border: 1px solid c.$grey-500;
+            border-radius: 8px;
+            background-color: c.$white;
+            box-shadow: 0 6px 18px rgba(c.$black, 0.14);
+        }
     }
 }
 

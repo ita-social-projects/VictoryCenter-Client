@@ -17,12 +17,19 @@ import styles from './ProgramExpensesTable.module.scss';
 
 export interface ProgramExpensesTableProps {
     records: ProgramExpensesRecord[];
+    allRecords?: ProgramExpensesRecord[];
     programs?: ProgramExpensesProgram[];
     hasAnyProgramExpenseRecords: boolean;
     isEditing?: boolean;
     isAddProgramExpenseDisabled?: boolean;
     onAddProgramExpense?: () => void;
-    onRecordSave?: (recordId: number, programId: number) => Promise<boolean>;
+    onRecordSave?: (
+        recordId: number,
+        programId: number,
+        reportingYear: string,
+        amountUah: string,
+        amountUsd: string,
+    ) => Promise<boolean>;
     onRowEditModeChange?: (isEditing: boolean) => void;
     onDeleteRecord?: (record: ProgramExpensesRecord) => void;
     selectedRecordIds?: number[];
@@ -36,6 +43,7 @@ const EDITING_TABLE_COLUMNS_COUNT = 7;
 
 export const ProgramExpensesTable = ({
     records,
+    allRecords,
     programs = [],
     hasAnyProgramExpenseRecords,
     isEditing = false,
@@ -94,7 +102,7 @@ export const ProgramExpensesTable = ({
         const error = validateProgramExpenseProgram({
             recordId,
             programId: value,
-            records,
+            records: allRecords ?? records,
             trigger: 'change',
         });
         setProgramError(error);
@@ -104,7 +112,7 @@ export const ProgramExpensesTable = ({
         const error = validateProgramExpenseProgram({
             recordId,
             programId: editProgramId,
-            records,
+            records: allRecords ?? records,
             trigger: 'blur',
         });
         setProgramError(error);
@@ -112,9 +120,18 @@ export const ProgramExpensesTable = ({
 
     const handleSave = async (recordId: number) => {
         if (editProgramId === undefined || programError || editProgramId === originalProgramId) return;
+        const record = records.find((r) => r.id === recordId);
+        if (!record) return;
+
         setIsSaving(true);
         try {
-            const success = await onRecordSave?.(recordId, editProgramId);
+            const success = await onRecordSave?.(
+                recordId,
+                editProgramId,
+                record.reportingYear,
+                record.amountUah,
+                record.amountUsd,
+            );
             if (success) {
                 setEditingRecordId(null);
                 setEditProgramId(undefined);

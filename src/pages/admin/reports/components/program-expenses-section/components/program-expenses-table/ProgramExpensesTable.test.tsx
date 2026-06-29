@@ -134,7 +134,7 @@ describe('ProgramExpensesTable', () => {
                 hasAnyProgramExpenseRecords
                 isEditing
                 {...props}
-            />
+            />,
         );
     };
 
@@ -250,7 +250,7 @@ describe('ProgramExpensesTable', () => {
         fireEvent.click(acceptButton);
 
         await waitFor(() => {
-            expect(onRecordSave).toHaveBeenCalledWith(1, 102);
+            expect(onRecordSave).toHaveBeenCalledWith(1, 102, '2025', '7 265', '4 200.5');
         });
     });
 

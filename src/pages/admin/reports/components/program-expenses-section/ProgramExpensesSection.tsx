@@ -42,6 +42,7 @@ export const ProgramExpensesSection = ({
     const { addToast } = useToast();
     const [selectedProgramIds, setSelectedProgramIds] = useState<number[]>([]);
     const [isAddProgramExpenseModalOpen, setIsAddProgramExpenseModalOpen] = useState(false);
+    const [recordToEdit, setRecordToEdit] = useState<ProgramExpensesRecord | null>(null);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [recordToDelete, setRecordToDelete] = useState<ProgramExpensesRecord | null>(null);
     const [isDeletingRecord, setIsDeletingRecord] = useState(false);
@@ -88,6 +89,7 @@ export const ProgramExpensesSection = ({
         if (!isEditing) {
             setIsAddProgramExpenseModalOpen(false);
             setSelectedRecordIds([]);
+            setRecordToEdit(null);
         }
     }, [isEditing]);
 
@@ -111,19 +113,23 @@ export const ProgramExpensesSection = ({
 
     const handleCloseAddProgramExpenseModal = useCallback(() => {
         setIsAddProgramExpenseModalOpen(false);
+        setRecordToEdit(null);
     }, []);
 
     const handleRecordSave = useCallback(
-        async (recordId: number, programId: number): Promise<boolean> => {
-            const existingRecord = data.records.find((record) => record.id === recordId);
-            if (!existingRecord) return false;
-
+        async (
+            recordId: number,
+            programId: number,
+            reportingYear: string,
+            amountUah: string,
+            amountUsd: string,
+        ): Promise<boolean> => {
             try {
                 const payload = {
-                    reportingYear: Number.parseInt(existingRecord.reportingYear, 10),
+                    reportingYear: Number.parseInt(reportingYear, 10),
                     hippotherapyProgramCategoryId: programId,
-                    amountUah: Number.parseFloat(existingRecord.amountUah.replace(/\s/g, '').replace(',', '.')),
-                    amountUsd: Number.parseFloat(existingRecord.amountUsd.replace(/\s/g, '').replace(',', '.')),
+                    amountUah: Number.parseFloat(amountUah.replace(/\s/g, '').replace(',', '.')),
+                    amountUsd: Number.parseFloat(amountUsd.replace(/\s/g, '').replace(',', '.')),
                 };
 
                 await ProgramExpensesApi.update(adminClient, recordId, payload);
@@ -141,7 +147,7 @@ export const ProgramExpensesSection = ({
                 return false;
             }
         },
-        [adminClient, refetchReadOnlyData, addToast, data.records],
+        [adminClient, refetchReadOnlyData, addToast],
     );
 
     const handleSubmitAddProgramExpense = useCallback(
@@ -162,10 +168,16 @@ export const ProgramExpensesSection = ({
                     amountUsd,
                 };
 
-                await ProgramExpensesApi.post(adminClient, payload);
-                addToast(PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_CREATED_SUCCESSFULLY, ToastType.Success);
+                if (recordToEdit) {
+                    await ProgramExpensesApi.update(adminClient, recordToEdit.id, payload);
+                    addToast(REPORTS_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY, ToastType.Success);
+                } else {
+                    await ProgramExpensesApi.post(adminClient, payload);
+                    addToast(PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_CREATED_SUCCESSFULLY, ToastType.Success);
+                }
 
                 setIsAddProgramExpenseModalOpen(false);
+                setRecordToEdit(null);
 
                 try {
                     await refetchReadOnlyData(true);
@@ -175,11 +187,15 @@ export const ProgramExpensesSection = ({
 
                 return true;
             } catch {
-                addToast(PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_CREATE_FAILED_RETRY, ToastType.Error);
+                if (recordToEdit) {
+                    addToast(REPORTS_TEXT.MESSAGE.RECORD_UPDATE_FAILED_RETRY, ToastType.Error);
+                } else {
+                    addToast(PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_CREATE_FAILED_RETRY, ToastType.Error);
+                }
                 return false;
             }
         },
-        [adminClient, refetchReadOnlyData, addToast],
+        [adminClient, refetchReadOnlyData, addToast, recordToEdit],
     );
 
     const handleDeleteClick = useCallback((record: ProgramExpensesRecord) => {
@@ -285,6 +301,7 @@ export const ProgramExpensesSection = ({
                 />
                 <ProgramExpensesTable
                     records={filteredRecords}
+                    allRecords={data.records}
                     programs={data.programs}
                     hasAnyProgramExpenseRecords={hasAnyProgramExpenseRecords}
                     isEditing={isEditing}
@@ -307,7 +324,7 @@ export const ProgramExpensesSection = ({
                 exchangeRate={exchangeRate}
                 onClose={handleCloseAddProgramExpenseModal}
                 onSubmit={handleSubmitAddProgramExpense}
-                recordToEdit={null}
+                recordToEdit={recordToEdit}
             />
 
             <DeleteRecordModal

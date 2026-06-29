@@ -316,6 +316,38 @@ describe('AddProgramExpenseRecordModal', () => {
         expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).toBeInTheDocument();
     });
 
+    it('blocks closing the add confirmation dialog when submitting is pending', async () => {
+        let resolveSubmit!: (val: boolean) => void;
+        const onSubmit = jest.fn().mockImplementation(
+            () =>
+                new Promise((resolve) => {
+                    resolveSubmit = resolve;
+                }),
+        );
+
+        renderModal({ exchangeRate: '40', onSubmit });
+
+        selectOption(FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_PLACEHOLDER, '2026');
+        selectOption(PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_PLACEHOLDER, 'Program B');
+        fireEvent.change(screen.getByTestId('add-program-expense-amount-uah'), { target: { value: '100' } });
+        fireEvent.change(screen.getByTestId('add-program-expense-amount-usd'), { target: { value: '999' } });
+        fireEvent.blur(screen.getByTestId('add-program-expense-amount-usd'));
+
+        fireEvent.click(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.MODAL.ADD.SUBMIT_BUTTON }));
+
+        expect(screen.getByTestId('close-confirmation')).toHaveTextContent(
+            PROGRAM_EXPENSES_TEXT.MODAL.ADD.CONFIRM_ADD_TITLE,
+        );
+
+        fireEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+
+        fireEvent.click(screen.getByRole('button', { name: 'Cancel confirmation' }));
+
+        expect(screen.getByTestId('close-confirmation')).toBeInTheDocument();
+
+        resolveSubmit(true);
+    });
+
     describe('edit mode', () => {
         const recordToEdit = {
             id: 1,

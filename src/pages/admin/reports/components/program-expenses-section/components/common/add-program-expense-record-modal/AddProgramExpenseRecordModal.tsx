@@ -191,6 +191,11 @@ export const AddProgramExpenseRecordModal = ({
         handleRequestClose();
     };
 
+    const handleCloseAddConfirmation = () => {
+        if (isSubmitting) return;
+        handleCloseConfirmation();
+    };
+
     useEffect(() => {
         if (!isOpen) {
             handleCancelClose();
@@ -340,8 +345,8 @@ export const AddProgramExpenseRecordModal = ({
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
                 onConfirm={handleConfirmAdd}
-                onCancel={handleCloseConfirmation}
-                onClose={handleCloseConfirmation}
+                onCancel={handleCloseAddConfirmation}
+                onClose={handleCloseAddConfirmation}
                 isButtonsDisabled={isSubmitting}
             />
         </>

@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { FUNDS_EXPENDITURES_TEXT, PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
 import { ProgramExpensesTable, ProgramExpensesTableProps } from './ProgramExpensesTable';
@@ -21,12 +21,69 @@ jest.mock(
 );
 
 jest.mock('@/components/admin/icon-button/IconButton', () => ({
-    IconButton: ({ 'aria-label': ariaLabel, onClick }: { 'aria-label': string; onClick?: () => void }) => (
-        <button type="button" aria-label={ariaLabel} onClick={onClick}>
+    IconButton: ({
+        'aria-label': ariaLabel,
+        onClick,
+        disabled,
+    }: {
+        'aria-label': string;
+        onClick?: () => void;
+        disabled?: boolean;
+    }) => (
+        <button type="button" aria-label={ariaLabel} onClick={onClick} disabled={disabled}>
             {ariaLabel}
         </button>
     ),
 }));
+
+jest.mock('@/components/common/select/Select', () => {
+    const React = require('react');
+
+    const stringifyValueForTestId = (value: unknown): string => {
+        if (value === undefined) return 'undefined';
+        if (value === null) return 'null';
+
+        if (typeof value === 'string') return value;
+        if (typeof value === 'number' || typeof value === 'boolean') return value.toString();
+
+        return 'non-primitive';
+    };
+
+    const SelectOption = (_props: { value: unknown; name: string }) => null;
+
+    const MockSelect = ({
+        children,
+        onValueChange,
+        placeholder,
+    }: {
+        children: React.ReactNode;
+        onValueChange: (value: unknown) => void;
+        placeholder?: string;
+    }) => {
+        const options = React.Children.toArray(children).filter(Boolean) as Array<{
+            props: { value: unknown; name: string };
+        }>;
+
+        return (
+            <div data-testid={`select-${placeholder}`}>
+                {options.map((option, index) => (
+                    <button
+                        key={`${option.props.name}-${index}`}
+                        type="button"
+                        data-testid={`select-option-${option.props.name}-${stringifyValueForTestId(option.props.value)}`}
+                        onClick={() => onValueChange(option.props.value)}
+                    >
+                        {option.props.name}
+                    </button>
+                ))}
+            </div>
+        );
+    };
+
+    MockSelect.Option = SelectOption;
+
+    return { Select: MockSelect };
+});
 
 const getEmptyState = () => screen.getByTestId('program-expenses-empty-state');
 const getEmptyStateCell = () => screen.getByTestId('program-expenses-empty-state-cell');
@@ -61,10 +118,24 @@ describe('ProgramExpensesTable', () => {
         },
     ];
 
+    const mockPrograms = [
+        { id: 100, name: 'Program A' },
+        { id: 101, name: 'Program B' },
+        { id: 102, name: 'Program C' },
+    ];
+
     const normalizeText = (value: string) => value.replaceAll('\u00A0', ' ').replaceAll(/\s+/g, ' ').trim();
 
     const renderTable = (props: Partial<ProgramExpensesTableProps> = {}) => {
-        return render(<ProgramExpensesTable records={records} hasAnyProgramExpenseRecords isEditing {...props} />);
+        return render(
+            <ProgramExpensesTable
+                records={records}
+                programs={mockPrograms}
+                hasAnyProgramExpenseRecords
+                isEditing
+                {...props}
+            />
+        );
     };
 
     it('should render table headers', () => {
@@ -133,17 +204,54 @@ describe('ProgramExpensesTable', () => {
         expect(onToggleRecordSelection).toHaveBeenCalledWith(1);
     });
 
-    it('should call edit and delete callbacks from row action icons', () => {
-        const onEditRecord = jest.fn();
+    it('should start inline edit and show accept/cancel buttons, disabling other checkboxes and buttons', () => {
         const onDeleteRecord = jest.fn();
 
-        renderTable({ onEditRecord, onDeleteRecord });
+        renderTable({ onDeleteRecord });
 
         fireEvent.click(screen.getByRole('button', { name: 'Edit record 1' }));
+
+        expect(screen.getByLabelText('Accept record changes')).toBeInTheDocument();
+        expect(screen.getByLabelText('Cancel record editing')).toBeInTheDocument();
+
+        // Checkboxes and other edit buttons should be disabled
+        expect(screen.getByRole('checkbox', { name: 'Select record 1' })).toBeDisabled();
+        expect(screen.getByRole('checkbox', { name: 'Select record 2' })).toBeDisabled();
+        expect(screen.getByRole('button', { name: 'Edit record 2' })).toBeDisabled();
+        expect(screen.getByRole('button', { name: 'Delete record 2' })).toBeDisabled();
+    });
+
+    it('should call onDeleteRecord when delete button is clicked', () => {
+        const onDeleteRecord = jest.fn();
+
+        renderTable({ onDeleteRecord });
+
         fireEvent.click(screen.getByRole('button', { name: 'Delete record 1' }));
 
-        expect(onEditRecord).toHaveBeenCalledWith(records[0]);
         expect(onDeleteRecord).toHaveBeenCalledWith(records[0]);
+    });
+
+    it('should enable accept button when category is changed and call onRecordSave upon clicking accept', async () => {
+        const onRecordSave = jest.fn().mockResolvedValue(true);
+
+        renderTable({ onRecordSave });
+
+        fireEvent.click(screen.getByRole('button', { name: 'Edit record 1' }));
+
+        const acceptButton = screen.getByLabelText('Accept record changes');
+        // Originally selected program is 100, so accept should be disabled as no change yet
+        expect(acceptButton).toBeDisabled();
+
+        // Select Program C (id: 102)
+        fireEvent.click(screen.getByTestId('select-option-Program C-102'));
+
+        expect(acceptButton).not.toBeDisabled();
+
+        fireEvent.click(acceptButton);
+
+        await waitFor(() => {
+            expect(onRecordSave).toHaveBeenCalledWith(1, 102);
+        });
     });
 
     it('should use edit-mode colSpan for empty state', () => {

@@ -13,6 +13,7 @@ interface ProgramExpensesToolbarProps {
     isAddProgramExpenseDisabled?: boolean;
     onProgramChange: (value: number[]) => void;
     onAddProgramExpense?: () => void;
+    disabled?: boolean;
 }
 
 const ALL_PROGRAMS_FILTER_OPTION_ID = 0;
@@ -41,6 +42,7 @@ export const ProgramExpensesToolbar = ({
     isAddProgramExpenseDisabled = false,
     onProgramChange,
     onAddProgramExpense,
+    disabled = false,
 }: ProgramExpensesToolbarProps) => {
     const selectedPrograms = programs.filter((program) => selectedProgramIds.includes(program.id));
     const programOptions = [ALL_PROGRAMS_FILTER_OPTION, ...programs];
@@ -74,6 +76,7 @@ export const ProgramExpensesToolbar = ({
                     }
                     onChange={handleProgramChange}
                     placeholder={placeholder}
+                    disabled={disabled}
                 />
             </div>
 

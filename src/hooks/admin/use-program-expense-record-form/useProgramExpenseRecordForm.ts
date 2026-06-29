@@ -197,23 +197,36 @@ export const useProgramExpenseRecordForm = ({
         }));
     }, [getProgramError]);
 
-    const isDirty = recordToEdit
-        ? formState.reportingYear !== recordToEdit.reportingYear ||
-          formState.programId !== recordToEdit.programId ||
-          formState.amountUah !== recordToEdit.amountUah ||
-          formState.amountUsd !== recordToEdit.amountUsd
-        : Boolean(formState.reportingYear) ||
-          Boolean(formState.programId) ||
-          formState.amountUah.trim() !== '' ||
-          formState.amountUsd.trim() !== '';
+    const isEditModeDirty = () => {
+        if (!recordToEdit) return false;
+        return (
+            formState.reportingYear !== recordToEdit.reportingYear ||
+            formState.programId !== recordToEdit.programId ||
+            formState.amountUah !== recordToEdit.amountUah ||
+            formState.amountUsd !== recordToEdit.amountUsd
+        );
+    };
 
-    const isSubmitDisabled =
-        Boolean(validateProgramExpenseReportingYear(formState.reportingYear, 'save')) ||
-        Boolean(getProgramError(formState.programId, 'blur')) ||
-        Boolean(validateProgramExpenseAmount(formState.amountUah, 'save')) ||
-        Boolean(validateProgramExpenseAmount(formState.amountUsd, 'save')) ||
-        isSubmitting ||
-        !isDirty;
+    const isCreateModeDirty = () => {
+        return (
+            Boolean(formState.reportingYear) ||
+            Boolean(formState.programId) ||
+            formState.amountUah.trim() !== '' ||
+            formState.amountUsd.trim() !== ''
+        );
+    };
+
+    const isDirty = recordToEdit ? isEditModeDirty() : isCreateModeDirty();
+
+    const isSubmitEnabled =
+        !validateProgramExpenseReportingYear(formState.reportingYear, 'save') &&
+        !getProgramError(formState.programId, 'blur') &&
+        !validateProgramExpenseAmount(formState.amountUah, 'save') &&
+        !validateProgramExpenseAmount(formState.amountUsd, 'save') &&
+        !isSubmitting &&
+        isDirty;
+
+    const isSubmitDisabled = !isSubmitEnabled;
 
     const handleOpenAddConfirmation = useCallback(() => {
         setIsAddConfirmationOpen(true);
@@ -223,28 +236,7 @@ export const useProgramExpenseRecordForm = ({
         setIsAddConfirmationOpen(false);
     }, []);
 
-    const handleConfirmAdd = useCallback(async () => {
-        if (!formState.programId || !formState.reportingYear || isSubmitting) return;
-
-        setIsSubmitting(true);
-        try {
-            const success = await onSubmit({
-                programId: formState.programId,
-                reportingYear: formState.reportingYear,
-                amountUah: formState.amountUah,
-                amountUsd: formState.amountUsd,
-            });
-
-            if (success) {
-                setIsAddConfirmationOpen(false);
-                setFormState(INITIAL_STATE);
-            }
-        } finally {
-            setIsSubmitting(false);
-        }
-    }, [formState, isSubmitting, onSubmit]);
-
-    const handleSave = useCallback(async () => {
+    const submitRecord = useCallback(async (): Promise<boolean> => {
         if (!formState.programId || !formState.reportingYear || isSubmitting) return false;
 
         setIsSubmitting(true);
@@ -260,6 +252,18 @@ export const useProgramExpenseRecordForm = ({
             setIsSubmitting(false);
         }
     }, [formState, isSubmitting, onSubmit]);
+
+    const handleConfirmAdd = useCallback(async () => {
+        const success = await submitRecord();
+        if (success) {
+            setIsAddConfirmationOpen(false);
+            setFormState(INITIAL_STATE);
+        }
+    }, [submitRecord]);
+
+    const handleSave = useCallback(async () => {
+        return submitRecord();
+    }, [submitRecord]);
 
     return {
         formState,

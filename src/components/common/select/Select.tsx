@@ -52,7 +52,6 @@ export const Select = <TValue,>({
         hasValue && selectedOption ? selectedOption.props.name : (placeholder ?? COMMON_TEXT_ADMIN.STATUS.DEFAULT);
 
     const handleOpenSelect = (e: React.MouseEvent) => {
-        if (disabled) return;
         if (openOnHover && e.detail !== 0) return;
         setIsOpen(!isOpen);
     };
@@ -93,7 +92,6 @@ export const Select = <TValue,>({
                 onClick={handleOpenSelect}
                 disabled={disabled}
                 onKeyDown={(e) => {
-                    if (disabled) return;
                     if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
                         setIsOpen((prev) => !prev);

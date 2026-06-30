@@ -142,7 +142,16 @@ jest.mock('../program-expenses-section/ProgramExpensesSection', () => ({
 
 describe('ReportAnalytics', () => {
     beforeEach(() => {
-        mockLocalizationLanguagesDataFetch.mockResolvedValue([]);
+        mockLocalizationLanguagesDataFetch.mockImplementation(() => {
+            const thenable = {
+                then: (resolve: any) => {
+                    resolve([]);
+                    return thenable;
+                },
+                catch: () => thenable,
+            };
+            return thenable;
+        });
         mockedUseToast.mockReturnValue({ addToast: mockAddToast } as any);
     });
 

@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import styles from './ReviewArticlesSection.module.scss';
 import { StoriesOfVictoryReviewArticle } from '@/types/public/stories-of-victory';
-import { ReactComponent as SquareArrow } from '@/assets/icons/square-arrow-out-up-right.svg';
 
 interface ReviewArticlesSectionProps {
     content: StoriesOfVictoryReviewArticle[] | null;
@@ -18,7 +16,6 @@ const truncateText = (text: string, length: number): { truncated: string; isTrun
 };
 
 export const ReviewArticlesSection: React.FC<ReviewArticlesSectionProps> = ({ content }) => {
-    const { t } = useTranslation('successPage');
     const [hoveredArticleId, setHoveredArticleId] = useState<number | null>(null);
 
     return (
@@ -26,7 +23,7 @@ export const ReviewArticlesSection: React.FC<ReviewArticlesSectionProps> = ({ co
             {content && content.length > 0 && (
                 <div className={styles.articles}>
                     {content.map((article) => {
-                        const { truncated, isTruncated } = truncateText(article.title, TRUNCATE_LENGTH);
+                        const { truncated } = truncateText(article.title, TRUNCATE_LENGTH);
                         const isHovered = hoveredArticleId === article.id;
 
                         return (

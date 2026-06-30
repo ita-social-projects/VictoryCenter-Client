@@ -3,12 +3,7 @@ import { SloganSection } from './components/slogan/SloganSection';
 import { LoadableContent } from '@/components/common/loadable-content/LoadableContent';
 import { ReviewsSection } from './components/reviews/ReviewsSection';
 import { ReviewArticlesSection } from './components/review-articles/ReviewArticlesSection';
-import { VideoReviewsSection } from './components/video-reviews/VideoReviewsSection';
-import {
-    StoriesOfVictoryReview,
-    StoriesOfVictoryReviewArticle,
-    StoriesOfVictoryReviewVideo,
-} from '@/types/public/stories-of-victory';
+import { StoriesOfVictoryReview, StoriesOfVictoryReviewArticle } from '@/types/public/stories-of-victory';
 import girlHugHorse from '@/assets/images/girl-hug-horse.webp';
 
 interface StoriesOfVictoryPageProps {
@@ -61,13 +56,13 @@ const reviewArticles: StoriesOfVictoryReviewArticle[] = [
     },
 ];
 
-const reviewVideos: StoriesOfVictoryReviewVideo[] = [
-    { id: 1, title: 'Коні лікують 2025', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-    { id: 2, title: 'Коні лікують 2025', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-    { id: 3, title: 'Коні лікують 2025', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-    { id: 4, title: 'Коні лікують 2025', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-    { id: 5, title: 'Коні лікують 2025', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-];
+// const reviewVideos: StoriesOfVictoryReviewVideo[] = [
+//     { id: 1, title: 'Коні лікують 2025', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
+//     { id: 2, title: 'Коні лікують 2025', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
+//     { id: 3, title: 'Коні лікують 2025', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
+//     { id: 4, title: 'Коні лікують 2025', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
+//     { id: 5, title: 'Коні лікують 2025', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
+// ];
 
 export const StoriesOfVictoryPage: React.FC<StoriesOfVictoryPageProps> = () => {
     return (

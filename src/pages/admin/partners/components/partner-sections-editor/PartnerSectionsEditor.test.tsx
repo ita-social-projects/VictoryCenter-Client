@@ -886,6 +886,12 @@ describe('PartnerSectionsEditor', () => {
                     },
                 ],
             },
+            {
+                id: 2,
+                title: 'Another Section',
+                description: 'Description 2',
+                partners: [],
+            },
         ]);
 
         await renderEditor();
@@ -931,5 +937,42 @@ describe('PartnerSectionsEditor', () => {
         await waitFor(() => {
             expect(getLatestFormProps().isDirty).toBe(false);
         });
+    });
+
+    it('covers fetchSectionsHandler callback', async () => {
+        mockSections([{ id: 1, title: 'Title', description: 'Desc', partners: [] }]);
+        await renderEditor();
+        const fetchHandler = mockedUseDataFetch.mock.calls[0][0].fetchHandler;
+        mockedPartnersApi.getSections.mockResolvedValueOnce([]);
+        const result = await fetchHandler({ cancellationSignal: new AbortController().signal });
+        expect(result).toEqual([]);
+        expect(mockedPartnersApi.getSections).toHaveBeenCalledWith('mock-client', expect.any(Object));
+    });
+
+    it('handles section publish cancellation errors gracefully without toast', async () => {
+        mockSections([
+            {
+                id: 1,
+                title: 'Original Title',
+                description: 'Original Description',
+                partners: [],
+            },
+        ]);
+        await renderEditor();
+        const props = getLatestFormProps();
+
+        // Make section dirty
+        await act(async () => {
+            props.onChange({ ...props.value, title: 'Modified Title' }, props.errors);
+        });
+
+        mockedPartnersApi.updateSection.mockRejectedValueOnce({ name: 'AbortError' });
+
+        await openPublishModal(getLatestFormProps());
+        await act(async () => {
+            await confirmPublish();
+        });
+
+        expect(addToastMock).not.toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.FAIL_TO_PUBLISH_SECTION, ToastType.Error);
     });
 });

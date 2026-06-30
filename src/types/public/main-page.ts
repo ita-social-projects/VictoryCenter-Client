@@ -104,3 +104,10 @@ export interface PublicMainPageContent {
     partners: PublicPartnersBlock | null;
     statistics: PublicImpactStatisticsBlock | null;
 }
+
+export interface MainIntroData {
+    title: string;
+    description: string;
+    buttonText: string;
+    image: string;
+}

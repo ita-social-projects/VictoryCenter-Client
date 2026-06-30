@@ -263,14 +263,12 @@ export const MainPageContent = () => {
 
                 const localizedValues = sanitizeMainPageFormValues({
                     ...baseValues,
-                    titleEn: localization.title ?? originalData.title ?? '',
-                    descriptionEn: localization.description ?? originalData.description ?? '',
-                    aboutUsTitleEn: localization.mainAboutUs?.title ?? originalData.mainAboutUs?.title ?? '',
-                    aboutUsDescriptionEn:
-                        localization.mainAboutUs?.description ?? originalData.mainAboutUs?.description ?? '',
-                    partnersTitleEn: localization.mainPartners?.title ?? originalData.mainPartners?.title ?? '',
-                    partnersDescriptionEn:
-                        localization.mainPartners?.description ?? originalData.mainPartners?.description ?? '',
+                    titleEn: localization.title ?? baseValues.titleEn,
+                    descriptionEn: localization.description ?? baseValues.descriptionEn,
+                    aboutUsTitleEn: localization.mainAboutUs?.title ?? baseValues.aboutUsTitleEn,
+                    aboutUsDescriptionEn: localization.mainAboutUs?.description ?? baseValues.aboutUsDescriptionEn,
+                    partnersTitleEn: localization.mainPartners?.title ?? baseValues.partnersTitleEn,
+                    partnersDescriptionEn: localization.mainPartners?.description ?? baseValues.partnersDescriptionEn,
                 });
 
                 savedValuesRef.current = localizedValues;
@@ -281,12 +279,12 @@ export const MainPageContent = () => {
 
                     const fallbackValues = sanitizeMainPageFormValues({
                         ...baseValues,
-                        titleEn: originalData.title ?? '',
-                        descriptionEn: originalData.description ?? '',
-                        aboutUsTitleEn: originalData.mainAboutUs?.title ?? '',
-                        aboutUsDescriptionEn: originalData.mainAboutUs?.description ?? '',
-                        partnersTitleEn: originalData.mainPartners?.title ?? '',
-                        partnersDescriptionEn: originalData.mainPartners?.description ?? '',
+                        titleEn: baseValues.titleEn,
+                        descriptionEn: baseValues.descriptionEn,
+                        aboutUsTitleEn: baseValues.aboutUsTitleEn,
+                        aboutUsDescriptionEn: baseValues.aboutUsDescriptionEn,
+                        partnersTitleEn: baseValues.partnersTitleEn,
+                        partnersDescriptionEn: baseValues.partnersDescriptionEn,
                     });
 
                     savedValuesRef.current = fallbackValues;

@@ -64,9 +64,9 @@ describe('reports-media-settings-schema', () => {
                 expect(result).toBeUndefined();
             });
 
-            it('should return error when validating a non-string value', () => {
+            it('should return required error when validating a non-string value', () => {
                 const result = REPORTS_COLLECTED_FUNDS_VALIDATION_FUNCTIONS.validateTitle(null as any);
-                expect(result).toBeDefined();
+                expect(result).toBe(REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION.title.getRequiredError());
             });
         });
     });
@@ -125,9 +125,9 @@ describe('reports-media-settings-schema', () => {
                 expect(result).toBeUndefined();
             });
 
-            it('should return error when validating a non-string value', () => {
+            it('should return required error when validating a non-string value', () => {
                 const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateTitle(null as any);
-                expect(result).toBeDefined();
+                expect(result).toBe(REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.title.getRequiredError());
             });
         });
 

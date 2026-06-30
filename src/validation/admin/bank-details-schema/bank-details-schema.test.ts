@@ -1,4 +1,8 @@
-import { BANK_DETAILS_VALIDATION_FUNCTIONS, SUPPORT_OPTIONS_VALIDATION_FUNCTIONS } from './bank-details-schema';
+import {
+    BANK_DETAILS_VALIDATION_FUNCTIONS,
+    SUPPORT_OPTIONS_VALIDATION_FUNCTIONS,
+    BankDetailsValidationSchema,
+} from './bank-details-schema';
 import { DONATE_VALIDATION } from '@/const/admin/donate';
 
 describe('BANK_DETAILS_VALIDATION_FUNCTIONS', () => {
@@ -132,6 +136,21 @@ describe('BANK_DETAILS_VALIDATION_FUNCTIONS', () => {
             expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateAccount(longString)).toBe(
                 DONATE_VALIDATION.account.getMaxError(),
             );
+        });
+    });
+
+    describe('unexpected errors', () => {
+        it('returns fallback message when validation throws an unexpected error', () => {
+            const originalValidate = BankDetailsValidationSchema.validateSyncAt;
+            try {
+                BankDetailsValidationSchema.validateSyncAt = () => {
+                    throw new Error('Unexpected mock error');
+                };
+                const result = BANK_DETAILS_VALIDATION_FUNCTIONS.validateName('test');
+                expect(result).toBe('An unexpected validation error occurred.');
+            } finally {
+                BankDetailsValidationSchema.validateSyncAt = originalValidate;
+            }
         });
     });
 });

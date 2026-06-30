@@ -181,17 +181,27 @@ describe('PartnerBanner', () => {
         if (button) fireEvent.click(button);
     };
 
+    let currentBanner = defaultBannerData;
+
     beforeEach(() => {
         jest.clearAllMocks();
+        currentBanner = defaultBannerData;
         mockedUseAdminClient.mockReturnValue('mock-client');
         mockedUseToast.mockReturnValue({ addToast: mockAddToast });
-        mockedUseDataFetch.mockReturnValue({
-            data: defaultBannerData,
+        mockedUseDataFetch.mockImplementation(() => ({
+            data: currentBanner,
             isLoading: false,
             error: null,
             refetch: mockRefetch,
-            setData: mockSetData,
-        });
+            setData: (action: any) => {
+                mockSetData(action);
+                if (typeof action === 'function') {
+                    currentBanner = action(currentBanner);
+                } else {
+                    currentBanner = action;
+                }
+            },
+        }));
 
         mockValidateTitle.mockImplementation((value: string) => (value ? undefined : 'Title is required'));
         mockValidateDescription.mockImplementation((value: string) => (value ? undefined : 'Description is required'));
@@ -391,7 +401,7 @@ describe('PartnerBanner', () => {
         await waitFor(() => {
             expect(getTitleInput()).toHaveAttribute('contentEditable', 'true');
             expect(getDescriptionInput()).toBeEnabled();
-            expect(getPublishButton()).toBeEnabled();
+            expect(getPublishButton()).toBeDisabled();
         });
     });
 

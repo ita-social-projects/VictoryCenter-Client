@@ -431,11 +431,10 @@ export const FundsExpendituresTable = ({
 
             moveToTop();
         },
-        [moveToTop, rowEditState],
+        [moveToTop, rowEditState, programYearEdit],
     );
 
     const isProgramYearEditing = programYearEdit !== null;
-    const isAnyEditingActive = isAnyRowEditing || isProgramYearEditing;
     const isSavingInProgress = savingRecordId !== null;
     const sortedRecords = sortRecords(records, sort);
     const colSpan = isEditing ? 7 : 5;
@@ -657,9 +656,6 @@ export const FundsExpendituresTable = ({
                         ) : (
                             sortedRecords.map((record) => {
                                 const isEditedRow = rowEditState?.recordId === record.id;
-                                const isAnotherRowEditing =
-                                    (isAnyEditingActive && !isEditedRow) || isSavingInProgress || isRowActionsDisabled;
-                                const isSavingCurrentRow = savingRecordId === record.id;
                                 const editableCategories = categoriesByType[record.type];
 
                                 return (

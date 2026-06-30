@@ -14,12 +14,10 @@ export const teamMemberValidationSchema = Yup.object({
         .min(TEAM_MEMBER_VALIDATION.fullName.min, TEAM_MEMBER_VALIDATION.fullName.getMinError())
         .max(TEAM_MEMBER_VALIDATION.fullName.max, TEAM_MEMBER_VALIDATION.fullName.getMaxError())
         .test('no-digits', TEAM_MEMBER_VALIDATION.fullName.getDigitsError(), (value) => {
-            if (!value) return true;
-            return !TEAM_MEMBER_VALIDATION.fullName.digitsPattern.test(value);
+            return !TEAM_MEMBER_VALIDATION.fullName.digitsPattern.test(value!);
         })
         .test('allowed-chars', TEAM_MEMBER_VALIDATION.fullName.getInvalidCharsError(), (value) => {
-            if (!value) return true;
-            return TEAM_MEMBER_VALIDATION.fullName.allowedCharsPattern.test(value);
+            return TEAM_MEMBER_VALIDATION.fullName.allowedCharsPattern.test(value!);
         }),
 
     description: Yup.string()

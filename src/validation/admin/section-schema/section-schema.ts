@@ -27,8 +27,8 @@ const createTemplateTextSchema = (type: ContentType) =>
         .trim()
         .required(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED)
         .test('template-length', function (value) {
-            const ctx = (this.options.context ?? {}) as SectionValidationContext;
-            const template = ctx.template;
+            const ctx = this.options.context as SectionValidationContext;
+            const template = ctx?.template;
             if (!template) return true;
 
             const rules = getTemplateRules(template);
@@ -36,8 +36,7 @@ const createTemplateTextSchema = (type: ContentType) =>
 
             if (!req) return true;
 
-            const text = (value ?? '').trim();
-            if (!text) return true;
+            const text = value!.trim();
 
             if (text.length > req.max) {
                 return this.createError({ message: COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(req.max) });

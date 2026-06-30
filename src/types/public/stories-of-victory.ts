@@ -19,7 +19,6 @@ export type StoriesOfVictoryReviewVideo = {
 
 export type StoriesOfVictoryReviewArticle = {
     id: number;
-    title: string | null;
-    text: string[] | null;
+    title: string;
     image: string | null;
 };

@@ -1,5 +1,6 @@
+import { TEAM_MEMBER_VALIDATION_FUNCTIONS, teamMemberValidationSchema } from './team-member-schema';
 import { TEAM_MEMBER_VALIDATION } from '@/const/admin/team';
-import { TEAM_MEMBER_VALIDATION_FUNCTIONS } from './team-member-schema';
+import * as Yup from 'yup';
 
 describe('teamMemberValidationSchema', () => {
     const validFullName = 'John Doe';
@@ -42,6 +43,28 @@ describe('teamMemberValidationSchema', () => {
             expect(errors).toHaveLength(2);
             expect(errors).toContain(TEAM_MEMBER_VALIDATION.fullName.getDigitsError());
             expect(errors).toContain(TEAM_MEMBER_VALIDATION.fullName.getInvalidCharsError());
+        });
+
+        it('covers the fallback success path when validation is mocked', () => {
+            const originalValidate = teamMemberValidationSchema.validateSyncAt;
+            try {
+                let callCount = 0;
+                teamMemberValidationSchema.validateSyncAt = (path: any, value: any, options: any) => {
+                    callCount++;
+                    if (callCount === 1) {
+                        const err = new Yup.ValidationError('Initial error', value, path);
+                        err.type = 'no-digits';
+                        throw err;
+                    }
+                    // Second call succeeds
+                    return undefined as any;
+                };
+
+                const errors = TEAM_MEMBER_VALIDATION_FUNCTIONS.validateFullName('invalidFullName', false);
+                expect(errors).toBeUndefined();
+            } finally {
+                teamMemberValidationSchema.validateSyncAt = originalValidate;
+            }
         });
     });
 

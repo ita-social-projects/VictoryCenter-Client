@@ -49,7 +49,7 @@ describe('teamMemberValidationSchema', () => {
             const originalValidate = teamMemberValidationSchema.validateSyncAt;
             try {
                 let callCount = 0;
-                teamMemberValidationSchema.validateSyncAt = (path: any, value: any, options: any) => {
+                teamMemberValidationSchema.validateSyncAt = (path: any, value: any, _options: any) => {
                     callCount++;
                     if (callCount === 1) {
                         const err = new Yup.ValidationError('Initial error', value, path);

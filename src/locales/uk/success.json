@@ -7,15 +7,10 @@
         "FIFTH_TEXT": "історії",
         "SIXTH_TEXT": "успіху"
     },
-    "REVIEWS":{
+    "REVIEWS": {
         "TITLE": "Що кажуть учасники"
-    
-    },
-    "ARTICLES": {
-        "READ_STORY": "Прочитати історію"
     },
     "VIDEO_SECTION": {
         "TITLE": "Відеовідгуки"
     }
 }
-  

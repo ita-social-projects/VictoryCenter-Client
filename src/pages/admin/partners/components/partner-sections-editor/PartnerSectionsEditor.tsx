@@ -92,6 +92,7 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
     const [sectionToPublishId, setSectionToPublishId] = useState<string | null>(null);
     const [localSections, setLocalSections] = useState<PartnerSectionFormValues[]>([]);
     const scrollAnchorRef = useRef<HTMLDivElement>(null);
+    const isPublishingRef = useRef(false);
 
     const fetchSectionsHandler = useCallback(
         async (options: RequestOptions): Promise<PartnerSection[]> => {
@@ -105,6 +106,7 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
         isLoading: isSectionsLoading,
         error: sectionsFetchError,
         refetch: refetchSections,
+        setData: setFetchedSections,
     } = useDataFetch<PartnerSection[]>({
         initialData: [],
         fetchHandler: fetchSectionsHandler,
@@ -112,6 +114,11 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
     });
 
     useEffect(() => {
+        if (isPublishingRef.current) {
+            isPublishingRef.current = false;
+            return;
+        }
+
         setLocalSections(
             fetchedSections.map((section: PartnerSection) => ({
                 localId: crypto.randomUUID(),
@@ -239,6 +246,15 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
                 return s;
             };
 
+            isPublishingRef.current = true;
+            setFetchedSections((currentFetched) => {
+                const exists = currentFetched.some((s) => s.id === savedSection.id);
+                if (exists) {
+                    return currentFetched.map((s) => (s.id === savedSection.id ? savedSection : s));
+                }
+                return [...currentFetched, savedSection];
+            });
+
             setLocalSections((currentSections) => currentSections.map(updateSectionInList));
         } catch (error: any) {
             if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {
@@ -249,7 +265,7 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
             setIsPublishing(false);
             setSectionToPublishId(null);
         }
-    }, [localSections, addToast, client, setLocalSections, sectionToPublishId]);
+    }, [localSections, addToast, client, setLocalSections, sectionToPublishId, setFetchedSections]);
 
     const handleDeleteRequest = useCallback((localId: string) => {
         setSectionToDeleteId(localId);

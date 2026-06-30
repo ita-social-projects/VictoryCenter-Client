@@ -382,6 +382,7 @@ describe('PartnerSectionForm', () => {
                 value={valueWithoutImage}
                 errors={errorsWithImageIssue}
                 disabled={false}
+                isDirty={true}
                 onChange={jest.fn()}
                 onDelete={jest.fn()}
                 onPublish={jest.fn()}

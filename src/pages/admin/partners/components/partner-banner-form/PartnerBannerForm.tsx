@@ -69,6 +69,7 @@ export const PartnerBanner = () => {
         isLoading: isLoadingData,
         error: fetchError,
         refetch: refetchBanner,
+        setData: setBannerData,
     } = useDataFetch<PartnerBannerType>({
         initialData: { title: '', description: '', image: null, imageId: null },
         fetchHandler: fetchBannerHandler,
@@ -150,6 +151,7 @@ export const PartnerBanner = () => {
                 imageId: values.imageId,
             });
 
+            setBannerData(updatedBanner);
             setValues(updatedBanner);
             setTouched({});
             setErrors({});
@@ -162,7 +164,7 @@ export const PartnerBanner = () => {
         } finally {
             setIsPublishing(false);
         }
-    }, [values, errors, client, addToast]);
+    }, [values, errors, client, addToast, setBannerData]);
 
     if (isLoadingData) {
         return (
@@ -184,6 +186,8 @@ export const PartnerBanner = () => {
     }
 
     const isDisabled = isPublishing;
+    // Note: values.image !== bannerData.image is intentionally a shallow reference comparison,
+    // since handleImageChange currently creates new image object references.
     const isDirty =
         values && bannerData
             ? values.title !== bannerData.title ||

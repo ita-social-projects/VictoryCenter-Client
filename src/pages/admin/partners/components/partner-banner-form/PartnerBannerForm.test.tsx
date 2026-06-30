@@ -590,9 +590,10 @@ describe('PartnerBanner', () => {
             expect(mockedPartnersApi.updateBanner).toHaveBeenCalled();
         });
 
-        // After successful publish, errors should be cleared
+        // After successful publish, errors should be cleared and the publish button should be disabled again
         await waitFor(() => {
             expect(screen.queryByTestId('input-error')).not.toBeInTheDocument();
+            expect(getPublishButton()).toBeDisabled();
         });
     });
 
@@ -778,10 +779,7 @@ describe('PartnerBanner', () => {
         fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES }));
 
         await waitFor(() => {
-            expect(mockAddToast).not.toHaveBeenCalledWith(
-                PARTNERS_TEXT.MESSAGE.FAIL_TO_UPDATE_BANNER,
-                ToastType.Error,
-            );
+            expect(mockAddToast).not.toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.FAIL_TO_UPDATE_BANNER, ToastType.Error);
         });
     });
 });

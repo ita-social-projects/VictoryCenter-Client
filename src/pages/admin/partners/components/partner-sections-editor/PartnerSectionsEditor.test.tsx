@@ -133,13 +133,20 @@ beforeEach(() => {
 });
 
 function mockSections(sections: any[], overrides: { isLoading?: boolean; error?: any; refetch?: jest.Mock } = {}) {
-    mockedUseDataFetch.mockReturnValue({
-        data: sections,
+    let currentSections = sections;
+    mockedUseDataFetch.mockImplementation(() => ({
+        data: currentSections,
         isLoading: overrides.isLoading ?? false,
         error: overrides.error ?? null,
         refetch: overrides.refetch ?? jest.fn(),
-        setData: jest.fn(),
-    });
+        setData: (action: any) => {
+            if (typeof action === 'function') {
+                currentSections = action(currentSections);
+            } else {
+                currentSections = action;
+            }
+        },
+    }));
 }
 
 async function renderEditor(ui: React.ReactElement = <PartnerSectionsEditor />) {
@@ -861,6 +868,61 @@ describe('PartnerSectionsEditor', () => {
         });
         await waitFor(() => {
             expect(getLatestFormProps().isDirty).toBe(true);
+        });
+    });
+
+    it('sets isDirty to false after successfully publishing a modified section', async () => {
+        mockSections([
+            {
+                id: 1,
+                title: 'Original Title',
+                description: 'Original Description',
+                partners: [{ id: 10, description: 'Original Desc', imageId: 1, image: { id: 1, url: 'a.jpg' } }],
+            },
+        ]);
+
+        await renderEditor();
+        const initialProps = getLatestFormProps();
+        expect(initialProps.isDirty).toBe(false);
+
+        // Modify section to make it dirty
+        const modifiedSection = {
+            ...initialProps.value,
+            title: 'Modified Title',
+        };
+
+        await act(async () => {
+            initialProps.onChange(modifiedSection, initialProps.errors);
+        });
+
+        await waitFor(() => {
+            expect(getLatestFormProps().isDirty).toBe(true);
+        });
+
+        // Mock savedSection returned from server with modified values
+        mockedPartnersApi.updateSection.mockResolvedValueOnce({
+            id: 1,
+            title: 'Modified Title',
+            description: 'Original Description',
+            partners: [
+                {
+                    id: 10,
+                    description: 'Original Desc',
+                    imageId: 1,
+                    image: { id: 1, url: 'a.jpg' },
+                },
+            ],
+        });
+
+        // Trigger publish
+        await openPublishModal(getLatestFormProps());
+        await act(async () => {
+            await confirmPublish();
+        });
+
+        // Verify isDirty becomes false after publish succeeds
+        await waitFor(() => {
+            expect(getLatestFormProps().isDirty).toBe(false);
         });
     });
 });

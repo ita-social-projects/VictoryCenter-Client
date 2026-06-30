@@ -766,7 +766,7 @@ describe('PartnerBanner', () => {
         expect(screen.queryByTestId('input-error')).not.toBeInTheDocument();
 
         fireEvent.blur(titleInput);
-        
+
         await waitFor(() => {
             const errorElement = screen.queryByTestId('input-error');
             expect(errorElement).toBeInTheDocument();

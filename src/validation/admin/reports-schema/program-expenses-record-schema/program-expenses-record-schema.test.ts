@@ -1,7 +1,11 @@
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
 import { ProgramExpensesRecord } from '@/types/admin/reports';
-import { validateProgramExpenseProgram } from './program-expenses-record-schema';
+import {
+    validateProgramExpenseProgram,
+    validateProgramExpenseAmount,
+    validateProgramExpenseReportingYear,
+} from './program-expenses-record-schema';
 
 describe('PROGRAM_EXPENSES_RECORD_VALIDATION_FUNCTIONS', () => {
     const records: ProgramExpensesRecord[] = [
@@ -68,5 +72,19 @@ describe('PROGRAM_EXPENSES_RECORD_VALIDATION_FUNCTIONS', () => {
                 records,
             }),
         ).toBeUndefined();
+    });
+
+    describe('validateProgramExpenseAmount', () => {
+        it('validates amount value', () => {
+            expect(validateProgramExpenseAmount('100')).toBeUndefined();
+            expect(validateProgramExpenseAmount('0', 'blur')).toBeDefined();
+        });
+    });
+
+    describe('validateProgramExpenseReportingYear', () => {
+        it('validates reporting year', () => {
+            expect(validateProgramExpenseReportingYear('2025')).toBeUndefined();
+            expect(validateProgramExpenseReportingYear(undefined, 'blur')).toBeDefined();
+        });
     });
 });

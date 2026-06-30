@@ -6,16 +6,12 @@ import {
     SocialPlatform,
 } from '@/types/admin/company-profile';
 
-const requiredTrimmed = (max?: number) => {
-    let s = Yup.string().trim().required(COMPANY_PROFILE_VALIDATION.common.REQUIRED);
-    if (typeof max === 'number') s = s.max(max);
-    return s;
+const requiredTrimmed = (max: number) => {
+    return Yup.string().trim().required(COMPANY_PROFILE_VALIDATION.common.REQUIRED).max(max);
 };
 
-const optionalTrimmed = (max?: number) => {
-    let s = Yup.string().trim().defined();
-    if (typeof max === 'number') s = s.max(max);
-    return s;
+const optionalTrimmed = (max: number) => {
+    return Yup.string().trim().defined().max(max);
 };
 
 const SocialContactSchema = Yup.object({

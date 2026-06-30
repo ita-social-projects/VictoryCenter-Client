@@ -9,6 +9,11 @@ import {
 } from '@/types/admin/reports';
 import { ReactComponent as NotFoundIcon } from '@/assets/icons/not-found.svg';
 import { ReactComponent as ArrowUpIcon } from '@/assets/icons/arrow-up.svg';
+import { ReactComponent as CheckmarkIcon } from '@/assets/icons/checkmark.svg';
+import { ReactComponent as CrossIcon } from '@/assets/icons/cross.svg';
+import { IconButton } from '@/components/admin/icon-button/IconButton';
+import { ACTION_ICONS } from '@/const/common/action-icons';
+import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import { Select } from '@/components/common/select/Select';
 import { SortIcon } from '@/pages/admin/reports/components/funds-expenditures-section/components/funds-expenditures-table/components/sort-icon';
 import {

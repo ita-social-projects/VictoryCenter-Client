@@ -63,6 +63,11 @@ describe('reports-media-settings-schema', () => {
                 const result = REPORTS_COLLECTED_FUNDS_VALIDATION_FUNCTIONS.validateTitle('Valid   title   text');
                 expect(result).toBeUndefined();
             });
+
+            it('should return error when validating a non-string value', () => {
+                const result = REPORTS_COLLECTED_FUNDS_VALIDATION_FUNCTIONS.validateTitle(null as any);
+                expect(result).toBeDefined();
+            });
         });
     });
 
@@ -119,6 +124,11 @@ describe('reports-media-settings-schema', () => {
                 const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateTitle('Valid   title   text');
                 expect(result).toBeUndefined();
             });
+
+            it('should return error when validating a non-string value', () => {
+                const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateTitle(null as any);
+                expect(result).toBeDefined();
+            });
         });
 
         describe('validateChangedLives', () => {
@@ -157,6 +167,11 @@ describe('reports-media-settings-schema', () => {
                     REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.changedLives.max,
                 );
                 expect(result).toBeUndefined();
+            });
+
+            it('should return error when validating undefined lives count', () => {
+                const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateChangedLives(undefined as any);
+                expect(result).toBe(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED);
             });
         });
     });

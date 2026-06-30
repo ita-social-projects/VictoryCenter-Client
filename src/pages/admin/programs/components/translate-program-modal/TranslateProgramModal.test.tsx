@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, getDefaultNormalizer } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { TranslateProgramModal } from './TranslateProgramModal';
 import { HippotherapyProgram } from '@/types/admin/programs';
@@ -185,7 +185,7 @@ describe('TranslateProgramModal', () => {
         rerender(<TranslateProgramModal {...createModalProps({ translatedLanguages: nextLanguages })} />);
     };
 
-    const getInitialDataFromForm = () => JSON.parse(screen.getByTestId('translate-form').getAttribute('data-initial')!);
+    const getInitialDataFromForm = () => JSON.parse(screen.getByTestId('translate-form').dataset.initial!);
 
     const expectLastHookLanguageCode = async (code: string) => {
         await waitFor(() => {
@@ -307,7 +307,9 @@ describe('TranslateProgramModal', () => {
 
         await waitFor(() => {
             expect(
-                screen.getByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE),
+                screen.getByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE, {
+                    normalizer: getDefaultNormalizer({ collapseWhitespace: false }),
+                }),
             ).toBeInTheDocument();
         });
     });
@@ -322,7 +324,9 @@ describe('TranslateProgramModal', () => {
 
         expect(onClose).toHaveBeenCalledTimes(1);
         expect(
-            screen.queryByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE),
+            screen.queryByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE, {
+                normalizer: getDefaultNormalizer({ collapseWhitespace: false }),
+            }),
         ).not.toBeInTheDocument();
     });
 
@@ -335,7 +339,9 @@ describe('TranslateProgramModal', () => {
 
         await waitFor(() => {
             expect(
-                screen.getByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE),
+                screen.getByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE, {
+                    normalizer: getDefaultNormalizer({ collapseWhitespace: false }),
+                }),
             ).toBeInTheDocument();
         });
 
@@ -345,7 +351,9 @@ describe('TranslateProgramModal', () => {
         fireEvent.click(screen.getByLabelText('Close modal'));
         await waitFor(() => {
             expect(
-                screen.getByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE),
+                screen.getByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE, {
+                    normalizer: getDefaultNormalizer({ collapseWhitespace: false }),
+                }),
             ).toBeInTheDocument();
         });
 

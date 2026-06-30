@@ -3,6 +3,8 @@ import {
     EntityLocalizationDto,
     EntityWithDtoLocalizations,
     EntityWithLocalizations,
+    LocalizationInfo,
+    TranslationStatus,
 } from '@/types/common/language';
 import { Image, ImageValues } from '../common/image';
 
@@ -17,6 +19,18 @@ export enum MetricType {
     Programs = 1,
     Raised = 2,
     TherapyHours = 3,
+}
+
+export enum MainPageLocalizationBlock {
+    Title = 0,
+    AboutUs = 1,
+    Partners = 2,
+    Donations = 3,
+    ImpactStatistics = 4,
+    MetricPartners = 5,
+    MetricPrograms = 6,
+    MetricRaised = 7,
+    MetricTherapyHours = 8,
 }
 
 // Domain/UI Localizations
@@ -102,19 +116,19 @@ export interface MainPage extends EntityWithLocalizations<MainPageLocalization> 
 
 // GET DTOs
 
-export interface MainPageLocalizationDto extends EntityLocalizationDto {
+export interface MainPageEmbeddedLocalizationDto extends EntityLocalizationDto {
     entityId?: number;
     title?: string | null;
     description?: string | null;
 }
 
-export interface MainAboutUsLocalizationDto extends EntityLocalizationDto {
+export interface MainAboutUsEmbeddedLocalizationDto extends EntityLocalizationDto {
     entityId?: number;
     title?: string | null;
     description?: string | null;
 }
 
-export interface MainPartnersLocalizationDto extends EntityLocalizationDto {
+export interface MainPartnersEmbeddedLocalizationDto extends EntityLocalizationDto {
     entityId?: number;
     title?: string | null;
     description?: string | null;
@@ -152,19 +166,19 @@ export interface ImpactStatisticDto extends EntityWithDtoLocalizations<ImpactSta
     metrics?: MetricDto[] | null;
 }
 
-export interface MainAboutUsDto extends EntityWithDtoLocalizations<MainAboutUsLocalizationDto> {
+export interface MainAboutUsDto extends EntityWithDtoLocalizations<MainAboutUsEmbeddedLocalizationDto> {
     id?: number;
     title?: string | null;
     description?: string | null;
 }
 
-export interface MainPartnersDto extends EntityWithDtoLocalizations<MainPartnersLocalizationDto> {
+export interface MainPartnersDto extends EntityWithDtoLocalizations<MainPartnersEmbeddedLocalizationDto> {
     id?: number;
     title?: string | null;
     description?: string | null;
 }
 
-export interface MainPageDto extends EntityWithDtoLocalizations<MainPageLocalizationDto> {
+export interface MainPageDto extends EntityWithDtoLocalizations<MainPageEmbeddedLocalizationDto> {
     id?: number;
     title?: string | null;
     description?: string | null;
@@ -174,9 +188,44 @@ export interface MainPageDto extends EntityWithDtoLocalizations<MainPageLocaliza
     impactStatistics?: ImpactStatisticDto | null;
 }
 
+// Dedicated localization API DTOs
+
+export interface MainPageTranslationStatusDto {
+    block: MainPageLocalizationBlock;
+    entityId: number | null;
+    languageId: number;
+    translationStatus: TranslationStatus | null;
+}
+
+export interface BaseMainPageLocalizationDto {
+    title: string | null;
+    description: string | null;
+}
+
+export interface MainAboutUsLocalizationDto extends BaseMainPageLocalizationDto {
+    entityId: number;
+    translationStatus: TranslationStatus;
+    localizationInfoDto: LocalizationInfo;
+}
+
+export interface MainPartnersLocalizationDto extends BaseMainPageLocalizationDto {
+    entityId: number;
+    translationStatus: TranslationStatus;
+    localizationInfoDto: LocalizationInfo;
+}
+
+export interface MainPageLocalizationDto extends BaseMainPageLocalizationDto {
+    entityId: number;
+    translationStatus: TranslationStatus;
+    localizationInfoDto: LocalizationInfo;
+    mainAboutUs: MainAboutUsLocalizationDto | null;
+    mainPartners: MainPartnersLocalizationDto | null;
+}
+
 // POST DTOs
 
 export interface CreateMetricLocalizationDto {
+    entityId?: number;
     languageId?: number;
     name?: string;
     value?: string | null;
@@ -222,9 +271,25 @@ export interface CreateMainPageDto {
     impactStatistics?: CreateImpactStatisticDto | null;
 }
 
+export interface CreateMainAboutUsLocalizationDto extends BaseMainPageLocalizationDto {
+    entityId: number;
+}
+
+export interface CreateMainPartnersLocalizationDto extends BaseMainPageLocalizationDto {
+    entityId: number;
+}
+
+export interface CreateMainPageLocalizationDto extends BaseMainPageLocalizationDto {
+    entityId: number;
+    languageId: number;
+    mainAboutUs: CreateMainAboutUsLocalizationDto | null;
+    mainPartners: CreateMainPartnersLocalizationDto | null;
+}
+
 // PUT DTOs
 
 export interface UpdateMetricLocalizationDto {
+    entityId?: number;
     languageId?: number;
     name?: string;
     value?: string | null;
@@ -235,22 +300,31 @@ export interface UpdateImpactStatisticLocalizationDto {
     title?: string;
 }
 
-export interface UpdateMainAboutUsLocalizationDto {
+export interface UpdateMainAboutUsInlineLocalizationDto {
     languageId?: number;
     title?: string;
     description?: string;
 }
 
-export interface UpdateMainPartnersLocalizationDto {
+export interface UpdateMainPartnersInlineLocalizationDto {
     languageId?: number;
     title?: string;
     description?: string;
 }
 
-export interface UpdateMainPageLocalizationDto {
+export interface UpdateMainPageInlineLocalizationDto {
     languageId?: number;
     title?: string;
     description?: string;
+}
+
+export interface UpdateMainAboutUsLocalizationDto extends BaseMainPageLocalizationDto {}
+
+export interface UpdateMainPartnersLocalizationDto extends BaseMainPageLocalizationDto {}
+
+export interface UpdateMainPageLocalizationDto extends BaseMainPageLocalizationDto {
+    mainAboutUs: UpdateMainAboutUsLocalizationDto | null;
+    mainPartners: UpdateMainPartnersLocalizationDto | null;
 }
 
 export interface UpdateMetricDto {
@@ -268,26 +342,26 @@ export interface UpdateImpactStatisticDto {
     title: string;
     imageId?: number | null;
     metrics: UpdateMetricDto[];
-    localizations?: UpdateImpactStatisticLocalizationDto[];
+    localization?: UpdateImpactStatisticLocalizationDto;
 }
 
 export interface UpdateMainAboutUsDto {
     title: string;
     description: string;
-    localizations?: UpdateMainAboutUsLocalizationDto[];
+    localizations?: UpdateMainAboutUsInlineLocalizationDto[];
 }
 
 export interface UpdateMainPartnersDto {
     title: string;
     description: string;
-    localizations?: UpdateMainPartnersLocalizationDto[];
+    localizations?: UpdateMainPartnersInlineLocalizationDto[];
 }
 
 export interface UpdateMainPageDto {
     title: string;
     description: string;
     imageId?: number | null;
-    localizations?: UpdateMainPageLocalizationDto[];
+    localizations?: UpdateMainPageInlineLocalizationDto[];
     mainAboutUs?: UpdateMainAboutUsDto | null;
     mainPartners?: UpdateMainPartnersDto | null;
     impactStatistics?: UpdateImpactStatisticDto | null;

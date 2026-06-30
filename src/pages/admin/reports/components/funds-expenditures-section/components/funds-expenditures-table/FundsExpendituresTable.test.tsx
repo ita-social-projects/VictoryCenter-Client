@@ -804,3 +804,47 @@ describe('FundsExpendituresTable', () => {
         });
     });
 });
+
+describe('FundsExpendituresTable program aggregate row', () => {
+    const currentYear = new Date().getFullYear();
+    const nextYear = String(currentYear + 1);
+    const programAggregateRow = {
+        reportingYear: String(currentYear),
+        categoryName: 'Програмні',
+        amountUah: '4 200',
+        amountUsd: '4 200',
+    };
+
+    it('renders the disabled aggregate row with an edit control when editing', () => {
+        renderTable({ programAggregateRow, isEditing: true });
+
+        expect(screen.getByTestId('program-aggregate-row')).toBeInTheDocument();
+        expect(screen.getByText('Програмні')).toBeInTheDocument();
+        expect(screen.getByLabelText('Edit program reporting year')).toBeInTheDocument();
+    });
+
+    it('keeps accept disabled until the year changes, then saves the new year', async () => {
+        const onProgramYearSave = jest.fn().mockResolvedValue(true);
+        renderTable({ programAggregateRow, isEditing: true, onProgramYearSave });
+
+        fireEvent.click(screen.getByLabelText('Edit program reporting year'));
+        expect(screen.getByLabelText('Accept program reporting year')).toBeDisabled();
+
+        fireEvent.click(screen.getByTestId(`select-option-${nextYear}-${nextYear}`));
+        expect(screen.getByLabelText('Accept program reporting year')).not.toBeDisabled();
+
+        fireEvent.click(screen.getByLabelText('Accept program reporting year'));
+        await waitFor(() => expect(onProgramYearSave).toHaveBeenCalledWith(nextYear));
+    });
+
+    it('closes the year edit without saving', () => {
+        const onProgramYearSave = jest.fn();
+        renderTable({ programAggregateRow, isEditing: true, onProgramYearSave });
+
+        fireEvent.click(screen.getByLabelText('Edit program reporting year'));
+        fireEvent.click(screen.getByLabelText('Close program reporting year edit'));
+
+        expect(screen.queryByLabelText('Accept program reporting year')).not.toBeInTheDocument();
+        expect(onProgramYearSave).not.toHaveBeenCalled();
+    });
+});

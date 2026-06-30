@@ -3,7 +3,8 @@ import { COMMON_TEXT_ADMIN } from './common';
 export const REPORTS_TEXT = {
     FORM: {
         LABEL: {
-            TITLE: 'Заголовок/EN',
+            TITLE: 'Заголовок',
+            TITLE_EN: 'Заголовок/EN',
             COLLECTED_FUNDS_WINDOW: 'Вікно 1: Зібрано коштів',
             CHANGED_LIVES_WINDOW: 'Вікно 2: Змінено життів',
             COLLECTED_FUNDS: 'Зібрані кошти',
@@ -332,13 +333,6 @@ export const FUNDS_EXPENDITURES_TEXT = {
 };
 
 export const PROGRAM_EXPENSES_TEXT = {
-    MESSAGE: {
-        RECORD_DELETED_SUCCESSFULLY: 'Запис успішно видалено',
-        RECORD_DELETE_FAILED_RETRY: 'Не вдалося видалити запис. Спробуйте ще раз',
-        RECORD_UPDATED_SUCCESSFULLY: 'Зміни збережено успішно',
-        RECORD_UPDATE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
-        AMOUNT_USD_NOT_MATCH: 'Сума в USD не відповідає сумі в UAH',
-    },
     BUTTON: {
         ADD_PROGRAM_EXPENSE: 'Витрата по програмі',
     },
@@ -349,6 +343,7 @@ export const PROGRAM_EXPENSES_TEXT = {
             PROGRAM_LABEL: 'Категорія програми',
             PROGRAM_PLACEHOLDER: 'Оберіть програму',
             SUBMIT_BUTTON: 'Додати витрату',
+            CONFIRM_ADD_TITLE: 'Додати нову витрату?',
             CONFIRM_CLOSE_TITLE: 'Зміни будуть втрачені. Бажаєте продовжити?',
             PROGRAM_NO_AVAILABLE: 'Немає доступних програм',
         },
@@ -376,6 +371,15 @@ export const PROGRAM_EXPENSES_TEXT = {
             PROGRAM: 'Програма',
             ACTIONS: 'Дії',
         },
+    },
+    MESSAGE: {
+        RECORD_CREATED_SUCCESSFULLY: 'Новий запис успішно додано',
+        RECORD_CREATE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
+        RECORD_UPDATED_SUCCESSFULLY: 'Зміни збережено успішно',
+        RECORD_UPDATE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
+        RECORD_DELETED_SUCCESSFULLY: 'Запис успішно видалено',
+        RECORD_DELETE_FAILED_RETRY: 'Не вдалося видалити запис. Спробуйте ще раз',
+        AMOUNT_USD_NOT_MATCH: 'Сума в USD не відповідає сумі в UAH',
     },
     BULK: {
         getSelectedLabel: (selected: number, total: number) => `Вибрано ${selected} з ${total}`,

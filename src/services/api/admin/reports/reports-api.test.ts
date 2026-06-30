@@ -12,6 +12,7 @@ jest.mock('../image/image-api');
 
 const createCollectedFundsBlockDto = (overrides: Partial<ReportsMediaSettingsDto['collectedFundsBlock']> = {}) => ({
     title: 'CF Title',
+    titleEn: 'CF Title UK',
     image: { id: 10, url: 'https://img/cf.png', mimeType: 'image/png' } as Image,
     imageId: 10,
     ...overrides,
@@ -19,6 +20,7 @@ const createCollectedFundsBlockDto = (overrides: Partial<ReportsMediaSettingsDto
 
 const createChangedLivesBlockDto = (overrides: Partial<ReportsMediaSettingsDto['changedLivesBlock']> = {}) => ({
     title: 'CL Title',
+    titleEn: 'CL Title UK',
     changedLives: 56,
     image: { id: 20, url: 'https://img/cl.png', mimeType: 'image/png' } as Image,
     imageId: 20,
@@ -59,11 +61,13 @@ describe('ReportsApi', () => {
             const expected: ReportsMediaSettings = {
                 collectedFunds: {
                     title: 'CF Title',
+                    titleEn: 'CF Title UK',
                     image: dto.collectedFundsBlock.image,
                     imageId: 10,
                 },
                 changedLives: {
                     title: 'CL Title',
+                    titleEn: 'CL Title UK',
                     changedLives: 56,
                     image: dto.changedLivesBlock.image,
                     imageId: 20,
@@ -74,16 +78,16 @@ describe('ReportsApi', () => {
 
         it('should handle null images in response', async () => {
             const dto = createResponseDto(
-                { title: 'Title', image: null, imageId: null },
-                { title: 'Title 2', changedLives: 0, image: null, imageId: null },
+                { title: 'Title', titleEn: '', image: null, imageId: null },
+                { title: 'Title 2', titleEn: '', changedLives: 0, image: null, imageId: null },
             );
             mockClient.get.mockResolvedValueOnce({ data: dto });
 
             const result = await ReportsApi.getMediaSettings(mockClient);
 
             expect(result).toEqual({
-                collectedFunds: { title: 'Title', image: null, imageId: null },
-                changedLives: { title: 'Title 2', changedLives: 0, image: null, imageId: null },
+                collectedFunds: { title: 'Title', titleEn: '', image: null, imageId: null },
+                changedLives: { title: 'Title 2', titleEn: '', changedLives: 0, image: null, imageId: null },
             });
         });
     });
@@ -93,11 +97,13 @@ describe('ReportsApi', () => {
             const request: ReportsMediaSettingsUpdateRequest = {
                 collectedFunds: {
                     title: 'New CF Title',
+                    titleEn: 'New CF Title UK',
                     image: { base64: 'cf-base64', mimeType: 'image/png' },
                     imageId: 10,
                 },
                 changedLives: {
                     title: 'New CL Title',
+                    titleEn: 'New CL Title UK',
                     changedLives: 100,
                     image: { base64: 'cl-base64', mimeType: 'image/jpeg' },
                     imageId: 20,
@@ -111,11 +117,13 @@ describe('ReportsApi', () => {
             const responseDto = createResponseDto(
                 {
                     title: 'New CF Title',
+                    titleEn: 'New CF Title UK',
                     image: { id: 11, url: 'https://img/cf-new.png', mimeType: 'image/png' },
                     imageId: 11,
                 },
                 {
                     title: 'New CL Title',
+                    titleEn: 'New CL Title UK',
                     changedLives: 100,
                     image: { id: 21, url: 'https://img/cl-new.png', mimeType: 'image/jpeg' },
                     imageId: 21,
@@ -138,8 +146,13 @@ describe('ReportsApi', () => {
             );
 
             expect(mockClient.put).toHaveBeenCalledWith(API_ROUTES.REPORTS.MEDIA_SETTINGS, {
-                collectedFundsBlock: { title: 'New CF Title', imageId: 11 },
-                changedLivesBlock: { title: 'New CL Title', changedLives: 100, imageId: 21 },
+                collectedFundsBlock: { title: 'New CF Title', titleEn: 'New CF Title UK', imageId: 11 },
+                changedLivesBlock: {
+                    title: 'New CL Title',
+                    titleEn: 'New CL Title UK',
+                    changedLives: 100,
+                    imageId: 21,
+                },
             });
 
             expect(mockedImageApi.delete).toHaveBeenCalledWith(mockClient, 10);
@@ -148,11 +161,13 @@ describe('ReportsApi', () => {
             expect(result).toEqual({
                 collectedFunds: {
                     title: 'New CF Title',
+                    titleEn: 'New CF Title UK',
                     image: responseDto.collectedFundsBlock.image,
                     imageId: 11,
                 },
                 changedLives: {
                     title: 'New CL Title',
+                    titleEn: 'New CL Title UK',
                     changedLives: 100,
                     image: responseDto.changedLivesBlock.image,
                     imageId: 21,
@@ -162,8 +177,8 @@ describe('ReportsApi', () => {
 
         it('should not delete images when there is nothing to remove', async () => {
             const request: ReportsMediaSettingsUpdateRequest = {
-                collectedFunds: { title: 'Keep Title', image: null, imageId: null },
-                changedLives: { title: 'Keep CL', changedLives: 10, image: null, imageId: null },
+                collectedFunds: { title: 'Keep Title', titleEn: 'Keep Title UK', image: null, imageId: null },
+                changedLives: { title: 'Keep CL', titleEn: 'Keep CL UK', changedLives: 10, image: null, imageId: null },
             };
 
             mockedImageApi.getUpdateImageId
@@ -185,11 +200,13 @@ describe('ReportsApi', () => {
             const request: ReportsMediaSettingsUpdateRequest = {
                 collectedFunds: {
                     title: 'CF Title',
+                    titleEn: 'CF Title UK',
                     image: { base64: 'new-cf', mimeType: 'image/png' },
                     imageId: 5,
                 },
                 changedLives: {
                     title: 'CL Title',
+                    titleEn: 'CL Title UK',
                     changedLives: 30,
                     image: { id: 20, url: 'https://img/cl.png', mimeType: 'image/png' },
                     imageId: 20,
@@ -218,8 +235,8 @@ describe('ReportsApi', () => {
 
         it('should send null imageId when finalImageId is null', async () => {
             const request: ReportsMediaSettingsUpdateRequest = {
-                collectedFunds: { title: 'Title', image: null, imageId: 7 },
-                changedLives: { title: 'Title 2', changedLives: 0, image: null, imageId: 8 },
+                collectedFunds: { title: 'Title', titleEn: 'Title UK', image: null, imageId: 7 },
+                changedLives: { title: 'Title 2', titleEn: 'Title 2 UK', changedLives: 0, image: null, imageId: 8 },
             };
 
             mockedImageApi.getUpdateImageId
@@ -235,8 +252,8 @@ describe('ReportsApi', () => {
             await ReportsApi.updateMediaSettings(mockClient, request);
 
             expect(mockClient.put).toHaveBeenCalledWith(API_ROUTES.REPORTS.MEDIA_SETTINGS, {
-                collectedFundsBlock: { title: 'Title', imageId: null },
-                changedLivesBlock: { title: 'Title 2', changedLives: 0, imageId: null },
+                collectedFundsBlock: { title: 'Title', titleEn: 'Title UK', imageId: null },
+                changedLivesBlock: { title: 'Title 2', titleEn: 'Title 2 UK', changedLives: 0, imageId: null },
             });
         });
     });

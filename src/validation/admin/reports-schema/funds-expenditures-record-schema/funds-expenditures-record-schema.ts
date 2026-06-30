@@ -14,7 +14,10 @@ interface ValidateFundsExpendituresCategoryParams {
     trigger?: FundsExpendituresCategoryValidationTrigger;
 }
 
-export const normalizeFundsExpendituresAmountInput = (value: string, trimEnd = false): string => {
+export const normalizeFundsExpendituresAmountInput = (value: string | undefined | null, trimEnd = false): string => {
+    if (!value) {
+        return '';
+    }
     const withNormalizedSpaces = value.replaceAll(/\s+/g, ' ').trimStart();
     const withCommaSeparator = withNormalizedSpaces.replaceAll('.', ',');
     const firstCommaIndex = withCommaSeparator.indexOf(',');

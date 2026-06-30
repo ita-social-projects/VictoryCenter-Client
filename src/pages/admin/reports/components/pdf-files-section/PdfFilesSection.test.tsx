@@ -136,9 +136,14 @@ describe('PdfFilesSection', () => {
         (useAdminClient as jest.Mock).mockReturnValue(mockClient);
         (useToast as jest.Mock).mockReturnValue({ addToast: mockAddToast });
         const { useLocalizationToolkit } = require('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit');
-        (useLocalizationToolkit as jest.Mock).mockReturnValue({ translationLanguages: [] });
+        (useLocalizationToolkit as jest.Mock).mockReturnValue({
+            translationLanguages: [],
+            allLanguages: [
+                { id: 1, code: 'uk', name: 'Ukrainian' },
+                { id: 2, code: 'en', name: 'English' },
+            ],
+        });
         mockCreateObjectURL.mockReturnValue('blob:http://localhost/mock-blob-url');
-        (useLocalizationToolkit as jest.Mock).mockReturnValue({ translationLanguages: [] });
     });
 
     afterEach(() => {
@@ -190,7 +195,7 @@ describe('PdfFilesSection', () => {
         (PdfReportsApi.getAll as jest.Mock).mockResolvedValueOnce(mockFilesResponse);
         const filesResult = await capturedFetchFiles();
 
-        expect(PdfReportsApi.getAll).toHaveBeenCalledWith(mockClient, { offset: 0, limit: 1000 });
+        expect(PdfReportsApi.getAll).toHaveBeenCalledWith(mockClient, { offset: 0, limit: 1000, languageId: 1 });
         expect(filesResult).toEqual(mockFilesResponse.items);
     });
 

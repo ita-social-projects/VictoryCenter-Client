@@ -12,6 +12,7 @@ import {
     successPageUk,
     globalUk,
     contactUsPageUk,
+    mainPageUk,
     historyPageUk,
 } from '../../locales/uk';
 
@@ -31,6 +32,7 @@ declare module 'i18next' {
             successPage: typeof successPageUk;
             global: typeof globalUk;
             contactUsPage: typeof contactUsPageUk;
+            mainPage: typeof mainPageUk;
             historyPage: typeof historyPageUk;
         };
     }

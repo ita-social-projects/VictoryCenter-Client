@@ -96,8 +96,8 @@
 }
 
 .type-chip-expense {
-    background-color: #8b4459;
-    border: 1px solid #5e1e2f;
+    background-color: c.$expense-maroon;
+    border: 1px solid c.$expense-maroon-dark;
     color: c.$white;
 }
 
@@ -206,7 +206,90 @@
     box-shadow: none;
 }
 
-.category-edit-td {
+.action-icon {
+    width: 20px;
+    height: 20px;
+    transition: color 0.15s ease;
+}
+
+.edit-icon-button,
+.delete-icon-button {
+    display: inline-grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+
+    :global(.icon-default),
+    :global(.icon-filled) {
+        width: 24px;
+        height: 24px;
+        flex-shrink: 0;
+    }
+}
+
+.accept-icon-button {
+    .action-icon {
+        color: c.$green;
+
+        path {
+            stroke: c.$green;
+        }
+    }
+
+    &:disabled {
+        .action-icon {
+            color: c.$grey-700;
+
+            path {
+                stroke: c.$grey-700;
+            }
+        }
+    }
+}
+
+.close-icon-button {
+    .action-icon {
+        color: c.$error;
+
+        path {
+            stroke: c.$error;
+        }
+    }
+}
+
+.program-aggregate-row {
+    background-color: c.$light-blue-25;
+    opacity: 0.65;
+
+    .td {
+        border-top: 1px solid c.$grey-900;
+        border-bottom: 1px solid c.$grey-900;
+    }
+
+    .td:first-child {
+        border-left: 4px solid c.$expense-maroon;
+    }
+
+    &:hover {
+        background-color: c.$light-blue-25;
+    }
+
+    .icon-button:not(:disabled) {
+        opacity: 1;
+    }
+}
+
+.program-aggregate-row:last-child .td {
+    border-bottom: none;
+}
+
+.program-aggregate-row-editing {
+    opacity: 1;
+}
+
+.category-edit-td,
+.amount-edit-td {
     position: relative;
     overflow: visible;
     height: auto;

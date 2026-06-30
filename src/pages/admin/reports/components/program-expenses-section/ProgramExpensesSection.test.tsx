@@ -63,6 +63,7 @@ jest.mock('@/services/api/admin/reports/program-expenses-api', () => ({
     ProgramExpensesApi: {
         getReadOnlyData: (...args: unknown[]) => mockGetReadOnlyData(...args),
         delete: jest.fn(),
+        post: jest.fn(),
         bulkDelete: jest.fn(),
     },
 }));

@@ -93,3 +93,14 @@
         opacity: 0.9;
     }
 }
+
+.toast-container {
+    position: fixed;
+    top: 13%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 1000;
+}

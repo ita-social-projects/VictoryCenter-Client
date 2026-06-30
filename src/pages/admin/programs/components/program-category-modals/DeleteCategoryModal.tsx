@@ -7,6 +7,7 @@ import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '@/const/admi
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ProgramsCategoriesApi } from '@/services/api/admin/programs/programs-api';
 import { ProgramCategory } from '@/types/admin/programs';
+import { DeleteCategoryConfirmModal } from './DeleteCategoryConfirmModal';
 import './ProgramCategoryModal.scss';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 
@@ -22,21 +23,25 @@ export const DeleteCategoryModal = ({ isOpen, onClose, onDeleteCategory, categor
     const [categoryId, setCategoryId] = useState<number>(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState('');
+    const [categoryToConfirm, setCategoryToConfirm] = useState<ProgramCategory | null>(null);
 
     const selectedCategory = categories.find((cat) => cat.id === categoryId);
 
-    const handleSubmit = async () => {
+    const handleSubmit = () => {
         if (isSubmitting || !selectedCategory || selectedCategory.programsCount > 0) return;
+        setCategoryToConfirm(selectedCategory);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!categoryToConfirm) return;
 
         setError('');
-
         try {
             setIsSubmitting(true);
-
-            await ProgramsCategoriesApi.deleteProgramCategory(selectedCategory.id, client);
-
-            onDeleteCategory(selectedCategory.id);
+            await ProgramsCategoriesApi.deleteProgramCategory(categoryToConfirm.id, client);
+            onDeleteCategory(categoryToConfirm.id);
             setCategoryId(0);
+            setCategoryToConfirm(null);
             onClose();
         } catch {
             setError(COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.FAIL_TO_DELETE_CATEGORY);
@@ -49,6 +54,10 @@ export const DeleteCategoryModal = ({ isOpen, onClose, onDeleteCategory, categor
         if (isSubmitting) return;
         setCategoryId(0);
         onClose();
+    };
+
+    const handleConfirmClose = () => {
+        setCategoryToConfirm(null);
     };
 
     useEffect(() => {
@@ -68,45 +77,53 @@ export const DeleteCategoryModal = ({ isOpen, onClose, onDeleteCategory, categor
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={handleClose}>
-            <Modal.Title>{COMMON_TEXT_ADMIN.CATEGORIES.FORM.TITLE.DELETE_CATEGORY}</Modal.Title>
-            <Modal.Content>
-                <div className="program-form-main">
-                    <SingleSelectInputGroup
-                        id="delete-category-select"
-                        label={PROGRAM_CATEGORY_TEXT.FORM.LABEL.CATEGORY}
-                        isRequired={true}
-                        options={categories}
-                        getOptionId={(c) => c.id}
-                        getOptionName={(c) => c.name}
-                        placeholder=""
-                        onChange={handleCategoryChange}
-                        disabled={isSubmitting}
-                        value={selectedCategory}
-                    />
-                    {selectedCategory && selectedCategory.programsCount > 0 && (
-                        <HintBox
-                            title={PROGRAM_CATEGORY_VALIDATION.programsCount.getHasProgramsCountError(
-                                selectedCategory.programsCount,
-                            )}
-                            text={PROGRAM_CATEGORY_VALIDATION.programsCount.getRelocationOrRemovalHint()}
+        <>
+            <Modal isOpen={isOpen} onClose={handleClose}>
+                <Modal.Title>{COMMON_TEXT_ADMIN.CATEGORIES.FORM.TITLE.DELETE_CATEGORY}</Modal.Title>
+                <Modal.Content>
+                    <div className="program-form-main hide-scrollbar expandable-dropdown">
+                        <SingleSelectInputGroup
+                            id="delete-category-select"
+                            label={PROGRAM_CATEGORY_TEXT.FORM.LABEL.CATEGORY}
+                            isRequired={true}
+                            options={categories}
+                            getOptionId={(c) => c.id}
+                            getOptionName={(c) => c.name}
+                            placeholder=""
+                            onChange={handleCategoryChange}
+                            disabled={isSubmitting}
+                            value={selectedCategory}
                         />
-                    )}
-                    {error && <div className="program-category-modal-error-container">{error}</div>}
-                </div>
-            </Modal.Content>
-            <Modal.Actions>
-                <Button buttonStyle="secondary" onClick={handleClose} disabled={isSubmitting}>
-                    {COMMON_TEXT_ADMIN.BUTTON.CANCEL}
-                </Button>
-                <Button
-                    buttonStyle="primary"
-                    onClick={handleSubmit}
-                    disabled={(!!selectedCategory && selectedCategory.programsCount > 0) || isSubmitting}
-                >
-                    {COMMON_TEXT_ADMIN.BUTTON.DELETE}
-                </Button>
-            </Modal.Actions>
-        </Modal>
+                        {selectedCategory && selectedCategory.programsCount > 0 && (
+                            <HintBox
+                                title={PROGRAM_CATEGORY_VALIDATION.programsCount.getHasProgramsCountError(
+                                    selectedCategory.programsCount,
+                                )}
+                                text={PROGRAM_CATEGORY_VALIDATION.programsCount.getRelocationOrRemovalHint()}
+                            />
+                        )}
+                        {error && <div className="program-category-modal-error-container">{error}</div>}
+                    </div>
+                </Modal.Content>
+                <Modal.Actions>
+                    <Button buttonStyle="secondary" onClick={handleClose} disabled={isSubmitting}>
+                        {COMMON_TEXT_ADMIN.BUTTON.CANCEL}
+                    </Button>
+                    <Button
+                        buttonStyle="primary"
+                        onClick={handleSubmit}
+                        disabled={(!!selectedCategory && selectedCategory.programsCount > 0) || isSubmitting}
+                    >
+                        {COMMON_TEXT_ADMIN.BUTTON.DELETE}
+                    </Button>
+                </Modal.Actions>
+            </Modal>
+            <DeleteCategoryConfirmModal
+                isOpen={!!categoryToConfirm}
+                onClose={handleConfirmClose}
+                onConfirm={handleConfirmDelete}
+                isSubmitting={isSubmitting}
+            />
+        </>
     );
 };

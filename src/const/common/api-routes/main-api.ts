@@ -11,6 +11,9 @@ export const API_ROUTES = {
         BASE: 'MainPage',
         PUBLIC: 'MainPage',
     },
+    MAIN_PAGE_LOCALIZATIONS: {
+        BASE: 'MainPageLocalizations',
+    },
     COMPANY_PROFILE: {
         BASE: 'CompanyProfile',
         PUBLIC: 'CompanyProfile',
@@ -112,6 +115,7 @@ export const API_ROUTES = {
     },
     PDF_REPORTS: {
         BASE: 'PdfReports',
+        BY_LANGUAGE_ID: 'PdfReports/languageId',
     },
     FAQ_LOCALIZATIONS: {
         BASE: 'FaqQuestionLocalizations',
@@ -126,4 +130,5 @@ export const API_ROUTES = {
         BASE: 'History',
         PUBLIC: 'History',
     },
+    CONTACT_US: 'ContactUs',
 };

@@ -66,6 +66,22 @@ describe('RaisedMetricEditPanel', () => {
         expect(screen.getByRole('switch')).not.toBeChecked();
     });
 
+    it('uses base metric name as the Ukrainian field even when a UK localization exists', () => {
+        const metric = createMetric({
+            name: 'Base raised name',
+            localizations: [
+                { languageId: 1, name: 'UK localization raised name' },
+                { languageId: 2, name: 'Funds raised', value: '25000' },
+            ] as MetricLocalization[],
+        });
+
+        render(<RaisedMetricEditPanel metric={metric} onCancel={jest.fn()} />);
+
+        expect(screen.getByLabelText(MAIN_PAGE_TEXT.BLOCKS.EDIT_PANEL.UKR_NAME_LABEL, { exact: false })).toHaveValue(
+            'Base raised name',
+        );
+    });
+
     it('renders formatted saved USD localization without blanking the field', () => {
         const metric = createMetric({
             localizations: [

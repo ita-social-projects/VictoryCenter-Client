@@ -591,4 +591,244 @@ describe('PartnerSectionsEditor', () => {
 
         expect(mockPartnerSectionFormRender).toHaveBeenCalledTimes(1);
     });
+
+    it('sets isDirty to true if sectionId is null', async () => {
+        mockSections([]);
+        const ref = createRef<PartnerSectionsEditorRef>();
+        render(<PartnerSectionsEditor ref={ref} />);
+        await act(async () => {
+            ref.current?.addSection();
+        });
+        await waitFor(() => {
+            const props = getLatestFormProps();
+            expect(props.isDirty).toBe(true);
+        });
+    });
+
+    it('sets isDirty to true if original section is not found', async () => {
+        mockSections([
+            {
+                id: 1,
+                title: 'Title',
+                description: 'Description',
+                partners: [],
+            },
+        ]);
+        await renderEditor();
+        const props = getLatestFormProps();
+        await act(async () => {
+            props.onChange({ ...props.value, sectionId: 999 }, props.errors);
+        });
+        await waitFor(() => {
+            expect(getLatestFormProps().isDirty).toBe(true);
+        });
+    });
+
+    it('sets isDirty to true if title is modified', async () => {
+        mockSections([
+            {
+                id: 1,
+                title: 'Original Title',
+                description: 'Original Description',
+                partners: [],
+            },
+        ]);
+        await renderEditor();
+        const props = getLatestFormProps();
+        expect(props.isDirty).toBe(false);
+        await act(async () => {
+            props.onChange({ ...props.value, title: 'Original Title Changed' }, props.errors);
+        });
+        await waitFor(() => {
+            expect(getLatestFormProps().isDirty).toBe(true);
+        });
+    });
+
+    it('sets isDirty to true if description is modified', async () => {
+        mockSections([
+            {
+                id: 1,
+                title: 'Original Title',
+                description: 'Original Description',
+                partners: [],
+            },
+        ]);
+        await renderEditor();
+        const props = getLatestFormProps();
+        expect(props.isDirty).toBe(false);
+        await act(async () => {
+            props.onChange({ ...props.value, description: 'Original Description Changed' }, props.errors);
+        });
+        await waitFor(() => {
+            expect(getLatestFormProps().isDirty).toBe(true);
+        });
+    });
+
+    it('sets isDirty to true if deletedPartnerIds is not empty', async () => {
+        mockSections([
+            {
+                id: 1,
+                title: 'Original Title',
+                description: 'Original Description',
+                partners: [],
+            },
+        ]);
+        await renderEditor();
+        const props = getLatestFormProps();
+        expect(props.isDirty).toBe(false);
+        await act(async () => {
+            props.onChange({ ...props.value, deletedPartnerIds: [123] }, props.errors);
+        });
+        await waitFor(() => {
+            expect(getLatestFormProps().isDirty).toBe(true);
+        });
+    });
+
+    it('sets isDirty to true if partner count is different', async () => {
+        mockSections([
+            {
+                id: 1,
+                title: 'Original Title',
+                description: 'Original Description',
+                partners: [],
+            },
+        ]);
+        await renderEditor();
+        const props = getLatestFormProps();
+        expect(props.isDirty).toBe(false);
+        await act(async () => {
+            props.onChange({
+                ...props.value,
+                partners: [{ localId: 'p1', partnerId: 10, description: 'Desc', image: null, imageId: 1 }],
+            }, props.errors);
+        });
+        await waitFor(() => {
+            expect(getLatestFormProps().isDirty).toBe(true);
+        });
+    });
+
+    it('sets isDirty to true if a partner has null partnerId', async () => {
+        mockSections([
+            {
+                id: 1,
+                title: 'Original Title',
+                description: 'Original Description',
+                partners: [
+                    { id: 10, description: 'Desc', imageId: 1, image: { id: 1, url: 'a.jpg' } },
+                ],
+            },
+        ]);
+        await renderEditor();
+        const props = getLatestFormProps();
+        expect(props.isDirty).toBe(false);
+        await act(async () => {
+            props.onChange({
+                ...props.value,
+                partners: [{ localId: 'p1', partnerId: null, description: 'Desc', image: null, imageId: 1 }],
+            }, props.errors);
+        });
+        await waitFor(() => {
+            expect(getLatestFormProps().isDirty).toBe(true);
+        });
+    });
+
+    it('sets isDirty to true if a partner ID cannot be found in original', async () => {
+        mockSections([
+            {
+                id: 1,
+                title: 'Original Title',
+                description: 'Original Description',
+                partners: [
+                    { id: 10, description: 'Desc', imageId: 1, image: { id: 1, url: 'a.jpg' } },
+                ],
+            },
+        ]);
+        await renderEditor();
+        const props = getLatestFormProps();
+        expect(props.isDirty).toBe(false);
+        await act(async () => {
+            props.onChange({
+                ...props.value,
+                partners: [{ localId: 'p1', partnerId: 999, description: 'Desc', image: null, imageId: 1 }],
+            }, props.errors);
+        });
+        await waitFor(() => {
+            expect(getLatestFormProps().isDirty).toBe(true);
+        });
+    });
+
+    it('sets isDirty to true if a partner description is modified', async () => {
+        mockSections([
+            {
+                id: 1,
+                title: 'Original Title',
+                description: 'Original Description',
+                partners: [
+                    { id: 10, description: 'Original Desc', imageId: 1, image: { id: 1, url: 'a.jpg' } },
+                ],
+            },
+        ]);
+        await renderEditor();
+        const props = getLatestFormProps();
+        expect(props.isDirty).toBe(false);
+        await act(async () => {
+            props.onChange({
+                ...props.value,
+                partners: [{ localId: 'p1', partnerId: 10, description: 'Modified Desc', imageId: 1, image: { id: 1, url: 'a.jpg' } }],
+            }, props.errors);
+        });
+        await waitFor(() => {
+            expect(getLatestFormProps().isDirty).toBe(true);
+        });
+    });
+
+    it('sets isDirty to true if a partner imageId is modified', async () => {
+        mockSections([
+            {
+                id: 1,
+                title: 'Original Title',
+                description: 'Original Description',
+                partners: [
+                    { id: 10, description: 'Desc', imageId: 1, image: { id: 1, url: 'a.jpg' } },
+                ],
+            },
+        ]);
+        await renderEditor();
+        const props = getLatestFormProps();
+        expect(props.isDirty).toBe(false);
+        await act(async () => {
+            props.onChange({
+                ...props.value,
+                partners: [{ localId: 'p1', partnerId: 10, description: 'Desc', imageId: 999, image: { id: 1, url: 'a.jpg' } }],
+            }, props.errors);
+        });
+        await waitFor(() => {
+            expect(getLatestFormProps().isDirty).toBe(true);
+        });
+    });
+
+    it('sets isDirty to true if a partner image object is modified', async () => {
+        mockSections([
+            {
+                id: 1,
+                title: 'Original Title',
+                description: 'Original Description',
+                partners: [
+                    { id: 10, description: 'Desc', imageId: 1, image: { id: 1, url: 'a.jpg' } },
+                ],
+            },
+        ]);
+        await renderEditor();
+        const props = getLatestFormProps();
+        expect(props.isDirty).toBe(false);
+        await act(async () => {
+            props.onChange({
+                ...props.value,
+                partners: [{ localId: 'p1', partnerId: 10, description: 'Desc', imageId: 1, image: { id: 2, url: 'b.jpg' } }],
+            }, props.errors);
+        });
+        await waitFor(() => {
+            expect(getLatestFormProps().isDirty).toBe(true);
+        });
+    });
 });

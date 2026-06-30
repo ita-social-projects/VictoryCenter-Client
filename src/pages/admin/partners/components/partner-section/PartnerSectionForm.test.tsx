@@ -468,4 +468,44 @@ describe('PartnerSectionForm', () => {
 
         expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ deletedPartnerIds: [] }), expect.anything());
     });
+
+    it('disables publish button when partner list is empty', () => {
+        render(
+            <PartnerSectionForm
+                value={{ ...defaultSectionValue, partners: [] }}
+                errors={{ partners: [] }}
+                disabled={false}
+                isDirty={true}
+                onChange={jest.fn()}
+                onDelete={jest.fn()}
+                onPublish={jest.fn()}
+            />,
+        );
+
+        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
+    });
+
+    it('expands errors array when partner form changes and errors array is shorter', () => {
+        const onChange = jest.fn();
+
+        render(
+            <PartnerSectionForm
+                value={defaultSectionValue}
+                errors={{ partners: [] }}
+                disabled={false}
+                onChange={onChange}
+                onDelete={jest.fn()}
+                onPublish={jest.fn()}
+            />,
+        );
+
+        fireEvent.click(screen.getByTestId(`partner-change-${defaultPartner.localId}`));
+
+        expect(onChange).toHaveBeenCalledWith(
+            expect.any(Object),
+            expect.objectContaining({
+                partners: [{ description: 'desc error' }]
+            })
+        );
+    });
 });

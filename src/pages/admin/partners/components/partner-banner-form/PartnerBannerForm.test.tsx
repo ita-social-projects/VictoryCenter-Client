@@ -760,8 +760,13 @@ describe('PartnerBanner', () => {
         mockValidateTitle.mockReturnValue('Title is required');
         render(<PartnerBanner />);
         const titleInput = getTitleInput();
-        fireEvent.blur(titleInput);
+        titleInput.innerHTML = '';
+        fireEvent.input(titleInput);
 
+        expect(screen.queryByTestId('input-error')).not.toBeInTheDocument();
+
+        fireEvent.blur(titleInput);
+        
         await waitFor(() => {
             const errorElement = screen.queryByTestId('input-error');
             expect(errorElement).toBeInTheDocument();

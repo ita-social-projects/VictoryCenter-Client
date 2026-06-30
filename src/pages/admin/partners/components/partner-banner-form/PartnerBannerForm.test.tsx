@@ -757,10 +757,16 @@ describe('PartnerBanner', () => {
     });
 
     it('triggers title blur to mark as touched', async () => {
+        mockValidateTitle.mockReturnValue('Title is required');
         render(<PartnerBanner />);
         const titleInput = getTitleInput();
         fireEvent.blur(titleInput);
-        // Assert state updated without crash
+
+        await waitFor(() => {
+            const errorElement = screen.queryByTestId('input-error');
+            expect(errorElement).toBeInTheDocument();
+            expect(errorElement).toHaveTextContent('Title is required');
+        });
     });
 
     it('handles publish cancellation errors gracefully without toast', async () => {

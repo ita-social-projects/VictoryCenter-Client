@@ -877,7 +877,14 @@ describe('PartnerSectionsEditor', () => {
                 id: 1,
                 title: 'Original Title',
                 description: 'Original Description',
-                partners: [{ id: 10, description: 'Original Desc', imageId: 1, image: { id: 1, url: 'a.jpg' } }],
+                partners: [
+                    {
+                        id: 10,
+                        description: 'Original Desc',
+                        imageId: 1,
+                        image: { id: 1, url: 'a.jpg', mimeType: 'image/jpeg' },
+                    },
+                ],
             },
         ]);
 
@@ -909,7 +916,7 @@ describe('PartnerSectionsEditor', () => {
                     id: 10,
                     description: 'Original Desc',
                     imageId: 1,
-                    image: { id: 1, url: 'a.jpg' },
+                    image: { id: 1, url: 'a.jpg', mimeType: 'image/jpeg' },
                 },
             ],
         });

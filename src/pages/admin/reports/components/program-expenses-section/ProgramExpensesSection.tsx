@@ -51,7 +51,7 @@ export const ProgramExpensesSection = ({
     const [isBulkDeleting, setIsBulkDeleting] = useState(false);
 
     const [localIsRowEditMode, setLocalIsRowEditMode] = useState(false);
-    const isRowEditMode = propIsRowEditMode !== undefined ? propIsRowEditMode : localIsRowEditMode;
+    const isRowEditMode = propIsRowEditMode ?? localIsRowEditMode;
     const handleRowEditModeChange = useCallback(
         (val: boolean) => {
             setLocalIsRowEditMode(val);

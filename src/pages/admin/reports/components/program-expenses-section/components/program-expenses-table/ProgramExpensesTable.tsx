@@ -256,6 +256,7 @@ export const ProgramExpensesTable = ({
                                                     <Select<number | undefined>
                                                         value={editProgramId}
                                                         onValueChange={(value) => handleProgramChange(record.id, value)}
+                                                        disabled={isSaving}
                                                         placeholder={
                                                             PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_PLACEHOLDER
                                                         }

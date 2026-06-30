@@ -92,6 +92,7 @@ export const Select = <TValue,>({
                 onClick={handleOpenSelect}
                 disabled={disabled}
                 onKeyDown={(e) => {
+                    if (disabled) return;
                     if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
                         setIsOpen((prev) => !prev);

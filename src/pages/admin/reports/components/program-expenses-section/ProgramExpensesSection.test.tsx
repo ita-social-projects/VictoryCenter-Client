@@ -694,5 +694,22 @@ describe('ProgramExpensesSection', () => {
             rerender(<ProgramExpensesSection isEditing={false} />);
             expect(screen.queryByLabelText('Accept record changes')).not.toBeInTheDocument();
         });
+
+        it('should clear bulk selection and hide bulk selection bar when row edit starts', async () => {
+            render(<ProgramExpensesSection isEditing />);
+
+            fireEvent.click(screen.getByRole('checkbox', { name: 'Select record 1' }));
+            expect(screen.getByText(PROGRAM_EXPENSES_TEXT.BULK.DELETE_BUTTON)).toBeInTheDocument();
+
+            fireEvent.click(screen.getByLabelText('Edit record 1'));
+
+            await waitFor(() => {
+                const deleteButton = screen.getByText(PROGRAM_EXPENSES_TEXT.BULK.DELETE_BUTTON);
+                const selectionRow = deleteButton.closest('div')?.parentElement;
+                expect(selectionRow).toHaveAttribute('aria-hidden', 'true');
+                expect(screen.getByRole('checkbox', { name: 'Select record 1' })).not.toBeChecked();
+                expect(screen.getByRole('checkbox', { name: 'Select record 1' })).toBeDisabled();
+            });
+        });
     });
 });

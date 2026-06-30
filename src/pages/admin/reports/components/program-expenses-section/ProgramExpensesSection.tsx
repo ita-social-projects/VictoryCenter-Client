@@ -56,8 +56,11 @@ export const ProgramExpensesSection = ({
         (val: boolean) => {
             setLocalIsRowEditMode(val);
             onRowEditModeChange?.(val);
+            if (val) {
+                setSelectedRecordIds([]);
+            }
         },
-        [onRowEditModeChange],
+        [onRowEditModeChange, setSelectedRecordIds],
     );
 
     const fetchReadOnlyData = useCallback(

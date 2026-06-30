@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { PartnerBanner } from './PartnerBannerForm';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
@@ -556,6 +556,10 @@ describe('PartnerBanner', () => {
 
         await waitFor(() => {
             expect(mockedPartnersApi.updateBanner).toHaveBeenCalledTimes(1);
+        });
+
+        await act(async () => {
+            await delayedPromise;
         });
     });
 

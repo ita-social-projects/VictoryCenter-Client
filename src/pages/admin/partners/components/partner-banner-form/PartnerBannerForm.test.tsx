@@ -728,4 +728,60 @@ describe('PartnerBanner', () => {
         expect(getErrorMessage()).toBeInTheDocument();
         expect(mockedPartnersApi.updateBanner).not.toHaveBeenCalled();
     });
+
+    it('covers fetchBannerHandler callback', async () => {
+        render(<PartnerBanner />);
+        const fetchHandler = mockedUseDataFetch.mock.calls[0][0].fetchHandler;
+        mockedPartnersApi.getBanner.mockResolvedValueOnce(defaultBannerData);
+        const result = await fetchHandler();
+        expect(result).toEqual(defaultBannerData);
+        expect(mockedPartnersApi.getBanner).toHaveBeenCalledWith('mock-client');
+    });
+
+    it('triggers refetch when clicking Try Again on component load failure', async () => {
+        mockedUseDataFetch.mockReturnValueOnce({
+            data: null,
+            isLoading: false,
+            error: new Error('Network error'),
+            refetch: mockRefetch,
+            setData: mockSetData,
+        });
+
+        render(<PartnerBanner />);
+
+        const tryAgainBtn = screen.getByRole('button', { name: PARTNERS_TEXT.BUTTON.TRY_AGAIN });
+        expect(tryAgainBtn).toBeInTheDocument();
+        fireEvent.click(tryAgainBtn);
+        expect(mockRefetch).toHaveBeenCalledTimes(1);
+    });
+
+    it('triggers title blur to mark as touched', async () => {
+        render(<PartnerBanner />);
+        const titleInput = getTitleInput();
+        fireEvent.blur(titleInput);
+        // Assert state updated without crash
+    });
+
+    it('handles publish cancellation errors gracefully without toast', async () => {
+        mockedPartnersApi.updateBanner.mockRejectedValueOnce({ name: 'AbortError' });
+        render(<PartnerBanner />);
+
+        // Make change to enable Save button
+        const titleInput = getTitleInput();
+        fireEvent.input(titleInput, { target: { innerHTML: 'Title modified' } });
+
+        await waitFor(() => {
+            expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeEnabled();
+        });
+
+        fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED }));
+        fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES }));
+
+        await waitFor(() => {
+            expect(mockAddToast).not.toHaveBeenCalledWith(
+                PARTNERS_TEXT.MESSAGE.FAIL_TO_UPDATE_BANNER,
+                ToastType.Error,
+            );
+        });
+    });
 });

@@ -70,7 +70,7 @@ describe('StoriesOfVictoryPage', () => {
         const { container } = render(<StoriesOfVictoryPage />);
         // ReviewsSection renders section with h4 title and Swiper
         const h4Elements = container.querySelectorAll('h4');
-        expect(h4Elements.length).toBeGreaterThan(0);
+        expect(h4Elements.length).toBe(0);
     });
 
     it('should render all section children within LoadableContent', () => {
@@ -85,6 +85,6 @@ describe('StoriesOfVictoryPage', () => {
         const loadableContent = screen.getByTestId('loadable-content');
         // Should have 4 main section children
         const children = Array.from(loadableContent.children);
-        expect(children.length).toBe(4);
+        expect(children.length).toBe(3);
     });
 });

@@ -504,8 +504,8 @@ describe('PartnerSectionForm', () => {
         expect(onChange).toHaveBeenCalledWith(
             expect.any(Object),
             expect.objectContaining({
-                partners: [{ description: 'desc error' }]
-            })
+                partners: [{ description: 'desc error' }],
+            }),
         );
     });
 });

@@ -697,10 +697,13 @@ describe('PartnerSectionsEditor', () => {
         const props = getLatestFormProps();
         expect(props.isDirty).toBe(false);
         await act(async () => {
-            props.onChange({
-                ...props.value,
-                partners: [{ localId: 'p1', partnerId: 10, description: 'Desc', image: null, imageId: 1 }],
-            }, props.errors);
+            props.onChange(
+                {
+                    ...props.value,
+                    partners: [{ localId: 'p1', partnerId: 10, description: 'Desc', image: null, imageId: 1 }],
+                },
+                props.errors,
+            );
         });
         await waitFor(() => {
             expect(getLatestFormProps().isDirty).toBe(true);
@@ -713,19 +716,20 @@ describe('PartnerSectionsEditor', () => {
                 id: 1,
                 title: 'Original Title',
                 description: 'Original Description',
-                partners: [
-                    { id: 10, description: 'Desc', imageId: 1, image: { id: 1, url: 'a.jpg' } },
-                ],
+                partners: [{ id: 10, description: 'Desc', imageId: 1, image: { id: 1, url: 'a.jpg' } }],
             },
         ]);
         await renderEditor();
         const props = getLatestFormProps();
         expect(props.isDirty).toBe(false);
         await act(async () => {
-            props.onChange({
-                ...props.value,
-                partners: [{ localId: 'p1', partnerId: null, description: 'Desc', image: null, imageId: 1 }],
-            }, props.errors);
+            props.onChange(
+                {
+                    ...props.value,
+                    partners: [{ localId: 'p1', partnerId: null, description: 'Desc', image: null, imageId: 1 }],
+                },
+                props.errors,
+            );
         });
         await waitFor(() => {
             expect(getLatestFormProps().isDirty).toBe(true);
@@ -738,19 +742,20 @@ describe('PartnerSectionsEditor', () => {
                 id: 1,
                 title: 'Original Title',
                 description: 'Original Description',
-                partners: [
-                    { id: 10, description: 'Desc', imageId: 1, image: { id: 1, url: 'a.jpg' } },
-                ],
+                partners: [{ id: 10, description: 'Desc', imageId: 1, image: { id: 1, url: 'a.jpg' } }],
             },
         ]);
         await renderEditor();
         const props = getLatestFormProps();
         expect(props.isDirty).toBe(false);
         await act(async () => {
-            props.onChange({
-                ...props.value,
-                partners: [{ localId: 'p1', partnerId: 999, description: 'Desc', image: null, imageId: 1 }],
-            }, props.errors);
+            props.onChange(
+                {
+                    ...props.value,
+                    partners: [{ localId: 'p1', partnerId: 999, description: 'Desc', image: null, imageId: 1 }],
+                },
+                props.errors,
+            );
         });
         await waitFor(() => {
             expect(getLatestFormProps().isDirty).toBe(true);
@@ -763,19 +768,28 @@ describe('PartnerSectionsEditor', () => {
                 id: 1,
                 title: 'Original Title',
                 description: 'Original Description',
-                partners: [
-                    { id: 10, description: 'Original Desc', imageId: 1, image: { id: 1, url: 'a.jpg' } },
-                ],
+                partners: [{ id: 10, description: 'Original Desc', imageId: 1, image: { id: 1, url: 'a.jpg' } }],
             },
         ]);
         await renderEditor();
         const props = getLatestFormProps();
         expect(props.isDirty).toBe(false);
         await act(async () => {
-            props.onChange({
-                ...props.value,
-                partners: [{ localId: 'p1', partnerId: 10, description: 'Modified Desc', imageId: 1, image: { id: 1, url: 'a.jpg' } }],
-            }, props.errors);
+            props.onChange(
+                {
+                    ...props.value,
+                    partners: [
+                        {
+                            localId: 'p1',
+                            partnerId: 10,
+                            description: 'Modified Desc',
+                            imageId: 1,
+                            image: { id: 1, url: 'a.jpg' },
+                        },
+                    ],
+                },
+                props.errors,
+            );
         });
         await waitFor(() => {
             expect(getLatestFormProps().isDirty).toBe(true);
@@ -788,19 +802,28 @@ describe('PartnerSectionsEditor', () => {
                 id: 1,
                 title: 'Original Title',
                 description: 'Original Description',
-                partners: [
-                    { id: 10, description: 'Desc', imageId: 1, image: { id: 1, url: 'a.jpg' } },
-                ],
+                partners: [{ id: 10, description: 'Desc', imageId: 1, image: { id: 1, url: 'a.jpg' } }],
             },
         ]);
         await renderEditor();
         const props = getLatestFormProps();
         expect(props.isDirty).toBe(false);
         await act(async () => {
-            props.onChange({
-                ...props.value,
-                partners: [{ localId: 'p1', partnerId: 10, description: 'Desc', imageId: 999, image: { id: 1, url: 'a.jpg' } }],
-            }, props.errors);
+            props.onChange(
+                {
+                    ...props.value,
+                    partners: [
+                        {
+                            localId: 'p1',
+                            partnerId: 10,
+                            description: 'Desc',
+                            imageId: 999,
+                            image: { id: 1, url: 'a.jpg' },
+                        },
+                    ],
+                },
+                props.errors,
+            );
         });
         await waitFor(() => {
             expect(getLatestFormProps().isDirty).toBe(true);
@@ -813,19 +836,28 @@ describe('PartnerSectionsEditor', () => {
                 id: 1,
                 title: 'Original Title',
                 description: 'Original Description',
-                partners: [
-                    { id: 10, description: 'Desc', imageId: 1, image: { id: 1, url: 'a.jpg' } },
-                ],
+                partners: [{ id: 10, description: 'Desc', imageId: 1, image: { id: 1, url: 'a.jpg' } }],
             },
         ]);
         await renderEditor();
         const props = getLatestFormProps();
         expect(props.isDirty).toBe(false);
         await act(async () => {
-            props.onChange({
-                ...props.value,
-                partners: [{ localId: 'p1', partnerId: 10, description: 'Desc', imageId: 1, image: { id: 2, url: 'b.jpg' } }],
-            }, props.errors);
+            props.onChange(
+                {
+                    ...props.value,
+                    partners: [
+                        {
+                            localId: 'p1',
+                            partnerId: 10,
+                            description: 'Desc',
+                            imageId: 1,
+                            image: { id: 2, url: 'b.jpg' },
+                        },
+                    ],
+                },
+                props.errors,
+            );
         });
         await waitFor(() => {
             expect(getLatestFormProps().isDirty).toBe(true);

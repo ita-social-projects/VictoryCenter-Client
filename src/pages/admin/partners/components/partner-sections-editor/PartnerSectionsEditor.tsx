@@ -38,6 +38,19 @@ const isSectionEmpty = (section: PartnerSectionFormValues): boolean => {
     return titleEmpty && descriptionEmpty && allPartnersEmpty;
 };
 
+const checkPartnerDirty = (localPartner: PartnerFormValues, originalPartners: Partner[]): boolean => {
+    if (localPartner.partnerId === null) return true;
+
+    const originalPartner = originalPartners.find((p) => p.id === localPartner.partnerId);
+    if (!originalPartner) return true;
+
+    return (
+        localPartner.description !== originalPartner.description ||
+        localPartner.imageId !== originalPartner.imageId ||
+        localPartner.image !== originalPartner.image
+    );
+};
+
 const checkSectionDirty = (localSection: PartnerSectionFormValues, originalSections: PartnerSection[]): boolean => {
     if (localSection.sectionId === null) {
         return true;
@@ -55,18 +68,7 @@ const checkSectionDirty = (localSection: PartnerSectionFormValues, originalSecti
 
     if (localSection.partners.length !== original.partners.length) return true;
 
-    for (const localPartner of localSection.partners) {
-        if (localPartner.partnerId === null) return true;
-
-        const originalPartner = original.partners.find((p) => p.id === localPartner.partnerId);
-        if (!originalPartner) return true;
-
-        if (localPartner.description !== originalPartner.description) return true;
-        if (localPartner.imageId !== originalPartner.imageId) return true;
-        if (localPartner.image !== originalPartner.image) return true;
-    }
-
-    return false;
+    return localSection.partners.some((lp) => checkPartnerDirty(lp, original.partners));
 };
 
 export interface PartnerSectionsEditorRef {

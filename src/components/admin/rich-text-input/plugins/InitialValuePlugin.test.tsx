@@ -14,6 +14,7 @@ const mockInsertNodes = jest.fn();
 const mockGenerateNodesFromDOM = jest.fn();
 const mockGenerateHtmlFromNodes = jest.fn();
 const mockSanitizeHtml = jest.fn();
+const mockParseFromString = jest.fn();
 
 jest.mock('@lexical/react/LexicalComposerContext', () => ({
     useLexicalComposerContext: () => [mockEditor],
@@ -46,12 +47,14 @@ describe('InitialValuePlugin', () => {
             read: (callback: () => any) => callback(),
         });
 
+        mockParseFromString.mockImplementation((_value: string) => {
+            const parsedDocument = window.document.implementation.createHTMLDocument('');
+            parsedDocument.body.innerHTML = _value;
+            return parsedDocument;
+        });
+
         global.DOMParser = jest.fn().mockImplementation(() => ({
-            parseFromString: jest.fn((_value: string) => {
-                const parsedDocument = window.document.implementation.createHTMLDocument('');
-                parsedDocument.body.innerHTML = _value;
-                return parsedDocument;
-            }),
+            parseFromString: mockParseFromString,
         })) as any;
     });
 
@@ -129,15 +132,34 @@ describe('InitialValuePlugin', () => {
     });
 
     it('does not update editor when sanitized current and next HTML are the same', () => {
-        mockSanitizeHtml.mockImplementation((html: string) => html.replace(' class="external"', ''));
+        mockSanitizeHtml.mockImplementation((html: string) =>
+            html.replace(' class="current"', '').replace(' data-editor="true"', ''),
+        );
 
         const { rerender } = render(<InitialValuePlugin value="<p>Content</p>" />);
 
-        mockGenerateHtmlFromNodes.mockReturnValue('<p>Content</p>');
+        mockGenerateHtmlFromNodes.mockReturnValue('<p class="current">Content</p>');
 
-        rerender(<InitialValuePlugin value='<p class="external">Content</p>' />);
+        rerender(<InitialValuePlugin value='<p data-editor="true">Content</p>' />);
 
         expect(mockUpdate).not.toHaveBeenCalled();
+    });
+
+    it('parses a fallback paragraph when sanitized next HTML is empty', () => {
+        mockSanitizeHtml.mockImplementation((html: string) => (html.includes('<script>') ? '' : html));
+
+        const { rerender } = render(<InitialValuePlugin value="<p>Original</p>" />);
+
+        mockGenerateHtmlFromNodes.mockReturnValue('<p>Original</p>');
+
+        rerender(<InitialValuePlugin value="<script>alert(1)</script>" />);
+
+        expect(mockUpdate).toHaveBeenCalledTimes(1);
+
+        const updateCallback = mockUpdate.mock.calls[0][0];
+        updateCallback();
+
+        expect(mockParseFromString).toHaveBeenCalledWith('<p></p>', 'text/html');
     });
 
     it('handles whitespace differences in HTML comparison', () => {

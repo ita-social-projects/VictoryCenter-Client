@@ -106,19 +106,41 @@ const RICH_TEXT_FORM_FIELDS: Array<keyof MainPageFormValues> = [
     'partnersDescriptionEn',
 ];
 
-const normalizeMainPageFormValuesForDirty = (values: MainPageFormValues): MainPageFormValues => {
-    const normalizedValues = { ...values };
+const RICH_TEXT_FORM_FIELD_SET = new Set<keyof MainPageFormValues>(RICH_TEXT_FORM_FIELDS);
 
-    RICH_TEXT_FORM_FIELDS.forEach((field) => {
-        normalizedValues[field] = normalizeRichTextHtmlForComparison(String(values[field] ?? '')) as never;
+const isMainPageFormField = (field: string): field is keyof MainPageFormValues => field in MAIN_PAGE_FORM_DEFAULTS;
+
+const areRichTextFieldValuesEqual = (
+    field: keyof MainPageFormValues,
+    currentValues: MainPageFormValues,
+    savedValues: MainPageFormValues,
+) =>
+    normalizeRichTextHtmlForComparison(String(currentValues[field] ?? '')) ===
+    normalizeRichTextHtmlForComparison(String(savedValues[field] ?? ''));
+
+const hasRelevantMainPageDirtyFields = (
+    dirtyFields: Partial<Record<keyof MainPageFormValues, unknown>>,
+    currentValues: MainPageFormValues,
+    savedValues: MainPageFormValues,
+) => {
+    const dirtyFieldNames = Object.keys(dirtyFields);
+
+    if (!dirtyFieldNames.length) {
+        return false;
+    }
+
+    return dirtyFieldNames.some((fieldName) => {
+        if (!isMainPageFormField(fieldName)) {
+            return true;
+        }
+
+        if (!RICH_TEXT_FORM_FIELD_SET.has(fieldName)) {
+            return true;
+        }
+
+        return !areRichTextFieldValuesEqual(fieldName, currentValues, savedValues);
     });
-
-    return normalizedValues;
 };
-
-const areMainPageFormValuesEqual = (currentValues: MainPageFormValues, savedValues: MainPageFormValues) =>
-    JSON.stringify(normalizeMainPageFormValuesForDirty(currentValues)) ===
-    JSON.stringify(normalizeMainPageFormValuesForDirty(savedValues));
 
 const isLocalizationForLanguage = (localization: EntityLocalization, language: LocalizationLanguage) =>
     getLocalizationLanguageId(localization) === language.id ||
@@ -331,7 +353,8 @@ export const MainPageContent = () => {
     }, [client, originalData, selectedLanguage, translationLanguages, allLanguages, methods, addToast]);
 
     const isMainPageDirty =
-        methods.formState.isDirty && !areMainPageFormValuesEqual(methods.getValues(), savedValuesRef.current);
+        methods.formState.isDirty &&
+        hasRelevantMainPageDirtyFields(methods.formState.dirtyFields, methods.getValues(), savedValuesRef.current);
 
     const handleGlobalLanguageChange = (language: LocalizationLanguage) => {
         if (isMainPageDirty) {

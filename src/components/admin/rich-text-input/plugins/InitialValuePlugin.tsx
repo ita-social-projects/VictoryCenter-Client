@@ -28,13 +28,12 @@ export const InitialValuePlugin = ({ value }: InitialValuePluginProps) => {
             return $generateHtmlFromNodes(editor);
         });
 
-        const currentHtmlSanitized = sanitizeHtml(currentHtmlRaw);
-
         const normalizeHtml = (html: string) => html.replace(/>\s+</g, '><').trim();
 
-        const nextHtml = sanitizeHtml(value);
+        const currentHtml = normalizeHtml(sanitizeHtml(currentHtmlRaw));
+        const nextHtml = normalizeHtml(sanitizeHtml(value));
 
-        if (normalizeHtml(currentHtmlSanitized) === normalizeHtml(nextHtml)) {
+        if (currentHtml === nextHtml) {
             lastValue.current = value;
             return;
         }
@@ -45,7 +44,7 @@ export const InitialValuePlugin = ({ value }: InitialValuePluginProps) => {
             const root = $getRoot();
 
             const parser = new DOMParser();
-            const dom = parser.parseFromString(nextHtml, 'text/html');
+            const dom = parser.parseFromString(nextHtml || '<p></p>', 'text/html');
             const nodes = $generateNodesFromDOM(editor, dom);
 
             root.clear();

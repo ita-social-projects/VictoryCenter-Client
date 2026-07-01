@@ -29,9 +29,14 @@
         height: 1.5rem;
         background: none;
         border: none;
+        color: colors.$grey-900;
 
         &--clear {
             cursor: pointer;
+
+            &:hover {
+                color: colors.$blue-500;
+            }
         }
     }
 

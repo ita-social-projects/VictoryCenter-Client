@@ -850,4 +850,79 @@ describe('PROGRAM_VALIDATION_FUNCTIONS', () => {
             expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateMeetingCount(longCount, false)).toBe('max 20');
         });
     });
+
+    describe('validateFaqQuestion and validateFaqAnswer', () => {
+        it('returns required message for empty values', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateFaqQuestion('')).toBeDefined();
+            expect(m.PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateFaqAnswer('')).toBeDefined();
+        });
+
+        it('returns min/max errors correctly', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateFaqQuestion('a')).toBeDefined();
+            expect(m.PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateFaqAnswer('a')).toBeDefined();
+
+            const longStr = 'a'.repeat(10000);
+            expect(m.PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateFaqQuestion(longStr)).toBeDefined();
+            expect(m.PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateFaqAnswer(longStr)).toBeDefined();
+        });
+
+        it('returns undefined for valid values', () => {
+            const m = loadSchema();
+            const validQuestion = 'What is the program?';
+            const validAnswer = 'This is a description of the program that is sufficiently long.';
+            expect(m.PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateFaqQuestion(validQuestion)).toBeUndefined();
+            expect(m.PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateFaqAnswer(validAnswer)).toBeUndefined();
+        });
+    });
+
+    describe('validateSections and validateProgramSections coverage', () => {
+        it('covers validateSections and returns undefined when valid', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateSections([], false)).toBeUndefined();
+        });
+
+        it('covers getTextValue for ContentType.Author and validateProgramSections branches', () => {
+            const m = loadSchema();
+            const sections = [
+                {
+                    template: SectionTemplate.SingleTitleDescriptionAuthorPairs,
+                    contents: [
+                        { contentType: ContentType.Title, title: 'Title' },
+                        { contentType: ContentType.Description, description: 'Desc', groupIndex: 0 },
+                        { contentType: ContentType.Author, author: 'Auth', groupIndex: 0 }
+                    ]
+                }
+            ] as any[];
+
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateSections(sections, false)).toBeUndefined();
+        });
+
+        it('covers actual > req.max in validateProgramSections when isPublishing is false', () => {
+            const m = loadSchema();
+            const sections = [
+                {
+                    template: SectionTemplate.DualTitleDescriptionPairs,
+                    contents: [
+                        { contentType: ContentType.Title, title: 'Title 1', groupIndex: 0 },
+                        { contentType: ContentType.Description, description: 'Desc 1', groupIndex: 0 },
+                        { contentType: ContentType.Title, title: 'Title 2', groupIndex: 1 },
+                        { contentType: ContentType.Description, description: 'Desc 2', groupIndex: 1 },
+                        { contentType: ContentType.Title, title: 'Title 3', groupIndex: 2 },
+                        { contentType: ContentType.Description, description: 'Desc 3', groupIndex: 2 }
+                    ]
+                }
+            ] as any[];
+
+            expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateSections(sections, false)).toBeDefined();
+        });
+
+        it('covers createTemplateTextSchema return true when template is not present', () => {
+            const m = loadSchema();
+            expect(m.PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateContentText('Valid Text', ContentType.Title, false)).toBeUndefined();
+            expect(m.PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateContentText('Val', ContentType.Title, false, SectionTemplate.TextOnly)).toBeUndefined();
+        });
+    });
 });
+

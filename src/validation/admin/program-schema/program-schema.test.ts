@@ -891,9 +891,9 @@ describe('PROGRAM_VALIDATION_FUNCTIONS', () => {
                     contents: [
                         { contentType: ContentType.Title, title: 'Title' },
                         { contentType: ContentType.Description, description: 'Desc', groupIndex: 0 },
-                        { contentType: ContentType.Author, author: 'Auth', groupIndex: 0 }
-                    ]
-                }
+                        { contentType: ContentType.Author, author: 'Auth', groupIndex: 0 },
+                    ],
+                },
             ] as any[];
 
             expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateSections(sections, false)).toBeUndefined();
@@ -910,9 +910,9 @@ describe('PROGRAM_VALIDATION_FUNCTIONS', () => {
                         { contentType: ContentType.Title, title: 'Title 2', groupIndex: 1 },
                         { contentType: ContentType.Description, description: 'Desc 2', groupIndex: 1 },
                         { contentType: ContentType.Title, title: 'Title 3', groupIndex: 2 },
-                        { contentType: ContentType.Description, description: 'Desc 3', groupIndex: 2 }
-                    ]
-                }
+                        { contentType: ContentType.Description, description: 'Desc 3', groupIndex: 2 },
+                    ],
+                },
             ] as any[];
 
             expect(m.PROGRAM_VALIDATION_FUNCTIONS.validateSections(sections, false)).toBeDefined();
@@ -920,9 +920,17 @@ describe('PROGRAM_VALIDATION_FUNCTIONS', () => {
 
         it('covers createTemplateTextSchema return true when template is not present', () => {
             const m = loadSchema();
-            expect(m.PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateContentText('Valid Text', ContentType.Title, false)).toBeUndefined();
-            expect(m.PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateContentText('Val', ContentType.Title, false, SectionTemplate.TextOnly)).toBeUndefined();
+            expect(
+                m.PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateContentText('Valid Text', ContentType.Title, false),
+            ).toBeUndefined();
+            expect(
+                m.PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateContentText(
+                    'Val',
+                    ContentType.Title,
+                    false,
+                    SectionTemplate.TextOnly,
+                ),
+            ).toBeUndefined();
         });
     });
 });
-

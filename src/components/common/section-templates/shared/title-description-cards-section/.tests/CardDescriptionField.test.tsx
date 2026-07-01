@@ -24,7 +24,9 @@ jest.mock('@/components/admin/input-error-with-character-counter/InputErrorWithC
 }));
 
 jest.mock('@/components/admin/textarea-with-bullets/TextAreaWithBulletBehavior', () => ({
-    TextAreaWithBulletBehavior: (props: any) => <textarea data-testid="textarea" {...props} />,
+    TextAreaWithBulletBehavior: ({ hasError, ...props }: any) => (
+        <textarea data-testid="textarea" data-has-error={hasError ? 'true' : 'false'} {...props} />
+    ),
 }));
 
 describe('CardDescriptionField', () => {
@@ -108,5 +110,13 @@ describe('CardDescriptionField', () => {
 
         expect(screen.getByTestId('counter-id')).toHaveTextContent('description-character-count');
         expect(screen.getByTestId('counter-for')).toHaveTextContent('description');
+    });
+
+    it('passes hasError prop to TextAreaWithBulletBehavior when error is provided', () => {
+        const { rerender } = render(<CardDescriptionField {...baseProps} />);
+        expect(screen.getByTestId('textarea')).toHaveAttribute('data-has-error', 'false');
+
+        rerender(<CardDescriptionField {...baseProps} error="Error msg" />);
+        expect(screen.getByTestId('textarea')).toHaveAttribute('data-has-error', 'true');
     });
 });

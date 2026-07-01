@@ -1,7 +1,7 @@
 import React from 'react';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { HistoryForm } from './HistoryForm';
+import { HistoryForm, HistoryFormRef } from './HistoryForm';
 import { SectionCancelActionType } from '@/types/admin/programs';
 import { ContentType } from '@/types/common/section-contents';
 import { SectionTemplate } from '@/types/common/sections';
@@ -404,6 +404,35 @@ describe('HistoryForm', () => {
         );
     });
 
+    it('supports imperative ref method updateSectionSilently', () => {
+        const sections = createSections();
+        const ref = React.createRef<{ updateSectionSilently: Function; getSections: Function }>();
+
+        render(<HistoryForm ref={ref as any} sections={sections} />);
+
+        const silentUpdate = createSection(30, SectionTemplate.TextOnly, 0);
+        act(() => {
+            ref.current?.updateSectionSilently(0, silentUpdate);
+        });
+
+        expect(ref.current?.getSections()).toEqual(
+            expect.arrayContaining([expect.objectContaining({ id: 30 }), expect.objectContaining({ id: 2 })]),
+        );
+    });
+
+    it('ignores imperative updateSectionSilently for out-of-bounds indexes', () => {
+        const sections = createSections();
+        const ref = React.createRef<{ updateSectionSilently: Function; getSections: Function }>();
+
+        render(<HistoryForm ref={ref as any} sections={sections} />);
+
+        const before = ref.current?.getSections();
+        ref.current?.updateSectionSilently(-1, createSection(999, SectionTemplate.TextOnly, 0));
+        ref.current?.updateSectionSilently(100, createSection(1000, SectionTemplate.TextOnly, 1));
+
+        expect(ref.current?.getSections()).toEqual(before);
+    });
+
     it('ignores imperative replaceSection for out-of-bounds indexes', () => {
         const sections = createSections();
         const ref = React.createRef<{ replaceSection: Function; getSections: Function }>();
@@ -518,5 +547,49 @@ describe('HistoryForm', () => {
         render(<HistoryForm sections={sections} language={language} />);
 
         expect(mockHistorySectionFormProps).toHaveBeenCalledWith(expect.objectContaining({ language }));
+    });
+
+    it('exposes imperative ref methods (getSections, updateSectionSilently, replaceSection, addSection)', () => {
+        const sections = createSections();
+        const ref = React.createRef<HistoryFormRef>();
+        const onSectionsChange = jest.fn();
+
+        render(<HistoryForm ref={ref} sections={sections} onSectionsChange={onSectionsChange} />);
+
+        expect(ref.current).toBeDefined();
+
+        // getSections
+        const currentSections = ref.current?.getSections();
+        expect(currentSections).toEqual(sections);
+
+        // updateSectionSilently
+        const updatedSection = { ...sections[0], template: 99 };
+        act(() => {
+            ref.current?.updateSectionSilently(0, updatedSection);
+        });
+        expect(ref.current?.getSections()[0].template).toBe(99);
+        expect(onSectionsChange).not.toHaveBeenCalled();
+
+        // replaceSection
+        const replacedSection = { ...sections[1], template: 88 };
+        act(() => {
+            ref.current?.replaceSection(1, replacedSection);
+        });
+        expect(ref.current?.getSections()[1].template).toBe(88);
+        expect(onSectionsChange).toHaveBeenCalled();
+
+        // out of bounds ignores
+        act(() => {
+            ref.current?.updateSectionSilently(-1, updatedSection);
+            ref.current?.replaceSection(99, replacedSection);
+        });
+        expect(ref.current?.getSections().length).toBe(2);
+
+        // addSection
+        const newSection = { id: 3, template: 3, order: 2, contents: [] };
+        act(() => {
+            ref.current?.addSection(newSection);
+        });
+        expect(ref.current?.getSections().length).toBe(3);
     });
 });

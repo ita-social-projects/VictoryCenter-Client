@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { VisibilityStatus } from '@/types/admin/common';
 
-export interface FormManagerRef {
+export interface FormManagerRef<TFormValues = any> {
     submit: (status: VisibilityStatus) => Promise<void>;
     isValid: (isPublishing?: boolean) => boolean;
     isDirty: () => boolean;
+    getValues: () => TFormValues;
 }
 
 export interface UseFormManagerProps<TFormValues, TFormErrors> {
@@ -13,7 +14,7 @@ export interface UseFormManagerProps<TFormValues, TFormErrors> {
     validateForm: (values: TFormValues, isPublishing: boolean) => TFormErrors;
     onSubmit: (data: TFormValues, status: VisibilityStatus) => Promise<void> | void;
     onValidationChange?: (isValid: boolean) => void;
-    ref?: React.Ref<FormManagerRef>;
+    ref?: React.Ref<any>;
 }
 
 export interface UseFormManagerReturn<TFormValues, TFormErrors> {
@@ -99,8 +100,9 @@ export function useFormManager<TFormValues, TFormErrors extends Record<string, u
             submit,
             isValid,
             isDirty,
+            getValues: () => formState,
         }),
-        [submit, isValid, isDirty],
+        [submit, isValid, isDirty, formState],
     );
 
     return {

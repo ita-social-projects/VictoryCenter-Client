@@ -26,6 +26,7 @@ import { ToastType } from '@/types/admin/toast';
 import { AddSectionModal } from '@/pages/admin/programs/components/programs-page-modals/add-section-modal/AddSectionModal';
 import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
+import { TranslateHistoryModal } from '../translate-history-modal/TranslateHistoryModal';
 import { mapHistorySectionDtoToModel } from '@/utils/functions/mappers/admin/history/history-mappers';
 import { ContentType } from '@/types/common/section-contents';
 import {
@@ -54,6 +55,21 @@ export const HistoryPageContent = () => {
     const [isPublishing, setIsPublishing] = useState(false);
     const [localSectionsCount, setLocalSectionsCount] = useState<number | null>(null);
     const [hasActiveSectionForm, setHasActiveSectionForm] = useState(false);
+    const [isTranslateModalOpen, setIsTranslateModalOpen] = useState(false);
+    const [, setLocalizationError] = useState<HistoryErrorState>({ message: null, type: null });
+
+    const setErrorState = useCallback((message: string, type: HistoryErrorType) => {
+        setLocalizationError({ message, type });
+    }, []);
+
+    const {
+        allLanguages,
+        translationLanguages,
+        selectedLanguage,
+        onLanguageChange,
+        translationStatusFilter,
+        onTranslationStatusFilterChange,
+    } = useLocalizationToolkit({ setErrorState });
     const {
         isSectionRemoveModalOpen,
         isSectionRevertModalOpen,
@@ -151,9 +167,11 @@ export const HistoryPageContent = () => {
         async (remainingSections: HistorySectionDto[]) => {
             try {
                 const payload: CreateUpdateHistorySectionDto[] = remainingSections.map((s: HistorySectionDto) => ({
+                    id: s.id,
                     template: s.template,
                     order: s.order,
                     contents: s.contents.map((c) => ({
+                        id: c.id,
                         contentType: c.contentType,
                         order: c.order,
                         title: c.title,
@@ -176,11 +194,12 @@ export const HistoryPageContent = () => {
         setIsPublishing(true);
         try {
             const currentSections = historyFormRef.current?.getSections() ?? [];
-
             const payload: CreateUpdateHistorySectionDto[] = currentSections.map((s: HistorySectionDto) => ({
+                id: s.id,
                 template: s.template,
                 order: s.order,
                 contents: s.contents.map((c) => ({
+                    id: c.id,
                     contentType: c.contentType,
                     order: c.order,
                     title: c.title,
@@ -201,21 +220,6 @@ export const HistoryPageContent = () => {
         }
     }, [client, refetchSections, addToast]);
 
-    const [, setLocalizationError] = useState<HistoryErrorState>({ message: null, type: null });
-
-    const setErrorState = useCallback((message: string, type: HistoryErrorType) => {
-        setLocalizationError({ message, type });
-    }, []);
-
-    const {
-        allLanguages,
-        translationLanguages,
-        selectedLanguage,
-        onLanguageChange,
-        translationStatusFilter,
-        onTranslationStatusFilterChange,
-    } = useLocalizationToolkit({ setErrorState });
-
     const localizedEntity = useMemo((): EntityWithTranslationStatuses | undefined => {
         const translationStatuses: TranslationStatusInfo[] = [];
 
@@ -223,6 +227,7 @@ export const HistoryPageContent = () => {
             let hasMissing = false;
             let hasOutdated = false;
             let hasLocalizableContent = false;
+            let hasAtLeastOneLocalization = false;
 
             for (const section of normalizedSections) {
                 const mappedSection = mapHistorySectionDtoToModel(section);
@@ -232,17 +237,21 @@ export const HistoryPageContent = () => {
                         const loc = content.localizations?.find((l) => l.language.id === lang.id);
                         if (!loc) {
                             hasMissing = true;
-                        } else if (loc.translationStatus === TranslationStatus.Outdated) {
-                            hasOutdated = true;
+                        } else {
+                            hasAtLeastOneLocalization = true;
+                            if (loc.translationStatus === TranslationStatus.Outdated) {
+                                hasOutdated = true;
+                            }
                         }
                     }
                 }
             }
 
-            if (hasLocalizableContent && !hasMissing) {
+            if (hasLocalizableContent && hasAtLeastOneLocalization) {
                 translationStatuses.push({
                     languageId: lang.id,
-                    translationStatus: hasOutdated ? TranslationStatus.Outdated : TranslationStatus.Relevant,
+                    translationStatus:
+                        hasMissing || hasOutdated ? TranslationStatus.Outdated : TranslationStatus.Relevant,
                 });
             }
         }
@@ -282,11 +291,13 @@ export const HistoryPageContent = () => {
         <div className={styles['history-page-wrapper']} data-testid="history-page-content">
             <HistoryPageToolbar
                 onAddSection={handleAddSection}
+                onTranslate={() => setIsTranslateModalOpen(true)}
                 translationLanguages={translationLanguages}
                 languages={allLanguages}
                 localizedEntity={localizedEntity}
                 onLanguageChange={onLanguageChange}
                 onTranslationStatusFilterChange={onTranslationStatusFilterChange}
+                isTranslateDisabled={canPublish || hasActiveSectionForm}
             />
             <div className={styles['sections-container']}>
                 {isSectionsLoading && (
@@ -398,6 +409,27 @@ export const HistoryPageContent = () => {
                 onConfirm={handlePublish}
                 onCancel={() => setConfirmationModalOpen(false)}
             />
+            {isTranslateModalOpen && (
+                <TranslateHistoryModal
+                    isOpen={isTranslateModalOpen}
+                    onClose={() => setIsTranslateModalOpen(false)}
+                    sections={normalizedSections}
+                    languages={translationLanguages}
+                    onSaved={async (updatedSections) => {
+                        const form = historyFormRef.current;
+                        if (form) {
+                            form.getSections().forEach((formSection, idx) => {
+                                const updated = updatedSections.find((s) => s.id === formSection.id);
+                                if (updated) {
+                                    form.updateSectionSilently(idx, updated);
+                                }
+                            });
+                        }
+                        await refetchSections();
+                        addToast(HISTORY_TEXT.MESSAGE.TRANSLATE_SUCCESS, ToastType.Success);
+                    }}
+                />
+            )}
             <ToastContainer />
         </div>
     );

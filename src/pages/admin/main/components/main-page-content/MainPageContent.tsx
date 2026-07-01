@@ -71,13 +71,14 @@ const TABS: TabItem[] = [
         label: MAIN_PAGE_TEXT.TABS.STATISTICS,
         localizationBlock: MainPageLocalizationBlock.ImpactStatistics,
     },
-    { id: 'donations', label: MAIN_PAGE_TEXT.TABS.DONATIONS },
+    { id: 'donations', label: MAIN_PAGE_TEXT.TABS.DONATIONS, localizationBlock: MainPageLocalizationBlock.Donations },
     { id: 'partners', label: MAIN_PAGE_TEXT.TABS.PARTNERS, localizationBlock: MainPageLocalizationBlock.Partners },
 ];
 
 const TRANSLATABLE_BLOCKS = new Set<MainPageLocalizationBlock>([
     MainPageLocalizationBlock.Title,
     MainPageLocalizationBlock.AboutUs,
+    MainPageLocalizationBlock.Donations,
     MainPageLocalizationBlock.Partners,
 ]);
 
@@ -269,6 +270,9 @@ export const MainPageContent = () => {
                     aboutUsTitleEn: localization.mainAboutUs?.title ?? originalData.mainAboutUs?.title ?? '',
                     aboutUsDescriptionEn:
                         localization.mainAboutUs?.description ?? originalData.mainAboutUs?.description ?? '',
+                    donationsTitleEn: localization.mainDonations?.title ?? originalData.mainDonations?.title ?? '',
+                    donationsDescriptionEn:
+                        localization.mainDonations?.description ?? originalData.mainDonations?.description ?? '',
                     partnersTitleEn: localization.mainPartners?.title ?? originalData.mainPartners?.title ?? '',
                     partnersDescriptionEn:
                         localization.mainPartners?.description ?? originalData.mainPartners?.description ?? '',
@@ -286,6 +290,8 @@ export const MainPageContent = () => {
                         descriptionEn: originalData.description ?? '',
                         aboutUsTitleEn: originalData.mainAboutUs?.title ?? '',
                         aboutUsDescriptionEn: originalData.mainAboutUs?.description ?? '',
+                        donationsTitleEn: originalData.mainDonations?.title ?? '',
+                        donationsDescriptionEn: originalData.mainDonations?.description ?? '',
                         partnersTitleEn: originalData.mainPartners?.title ?? '',
                         partnersDescriptionEn: originalData.mainPartners?.description ?? '',
                     });
@@ -424,6 +430,8 @@ export const MainPageContent = () => {
                 return getLocalizationStatus<MainPageLocalization>(originalData?.localizations, language);
             case MainPageLocalizationBlock.AboutUs:
                 return getLocalizationStatus(originalData?.mainAboutUs?.localizations, language);
+            case MainPageLocalizationBlock.Donations:
+                return getLocalizationStatus(originalData?.mainDonations?.localizations, language);
             case MainPageLocalizationBlock.Partners:
                 return getLocalizationStatus(originalData?.mainPartners?.localizations, language);
             case MainPageLocalizationBlock.ImpactStatistics:
@@ -534,7 +542,11 @@ export const MainPageContent = () => {
                             />
                         )}
                         {activeTab === 'donations' && (
-                            <DonationsBlockForm isPublishDisabled={isPublishDisabled} onPublish={onPublish} />
+                            <DonationsBlockForm
+                                isPublishDisabled={isPublishDisabled}
+                                onPublish={onPublish}
+                                isReadOnly={isReadOnlyLanguage}
+                            />
                         )}
                         {activeTab === 'partners' && (
                             <PartnersBlockForm

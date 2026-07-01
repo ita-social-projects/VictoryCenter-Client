@@ -1,6 +1,5 @@
 import DefaultPlaceholder from '@/assets/images/man-facing-horse-forehead.webp';
 import { Button } from '@/components/admin/button/Button';
-
 import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { MAIN_PAGE_TEXT, MAIN_PAGE_VALIDATION } from '@/const/admin/main-page';
@@ -31,15 +30,19 @@ const IMAGE_CONFIG = {
 interface DonationsBlockFormProps {
     isPublishDisabled: boolean;
     onPublish: () => void;
+    isReadOnly?: boolean;
 }
 
-export const DonationsBlockForm = ({ isPublishDisabled, onPublish }: DonationsBlockFormProps) => {
+export const DonationsBlockForm = ({ isPublishDisabled, onPublish, isReadOnly = false }: DonationsBlockFormProps) => {
     const [imageError, setImageError] = useState<string | null>(null);
 
     const {
         control,
         formState: { errors },
     } = useFormContext<MainPageFormValues>();
+
+    const titleName = isReadOnly ? 'donationsTitleEn' : 'donationsTitleUa';
+    const descriptionName = isReadOnly ? 'donationsDescriptionEn' : 'donationsDescriptionUa';
 
     return (
         <div className={styles.form}>
@@ -52,11 +55,12 @@ export const DonationsBlockForm = ({ isPublishDisabled, onPublish }: DonationsBl
                     imageConfig={IMAGE_CONFIG}
                     variant="whoWeAre"
                     name="donationsImage"
+                    disabled={isReadOnly}
                 />
 
                 <div className={styles['text-section']}>
                     <Controller
-                        name="donationsTitleUa"
+                        name={titleName}
                         control={control}
                         render={({ field: { onChange, value, onBlur } }) => (
                             <RichTextInputGroup
@@ -66,15 +70,16 @@ export const DonationsBlockForm = ({ isPublishDisabled, onPublish }: DonationsBl
                                 value={value}
                                 onChange={onChange}
                                 onBlur={onBlur}
-                                error={errors.donationsTitleUa?.message}
+                                error={isReadOnly ? undefined : errors.donationsTitleUa?.message}
                                 maxLength={MAIN_PAGE_VALIDATION.donationsBlock.title.max}
                                 isRequired={true}
+                                disabled={isReadOnly}
                             />
                         )}
                     />
 
                     <Controller
-                        name="donationsDescriptionUa"
+                        name={descriptionName}
                         control={control}
                         render={({ field: { onChange, value, onBlur } }) => (
                             <RichTextInputGroup
@@ -84,27 +89,30 @@ export const DonationsBlockForm = ({ isPublishDisabled, onPublish }: DonationsBl
                                 value={value}
                                 onChange={onChange}
                                 onBlur={onBlur}
-                                error={errors.donationsDescriptionUa?.message}
+                                error={isReadOnly ? undefined : errors.donationsDescriptionUa?.message}
                                 maxLength={MAIN_PAGE_VALIDATION.donationsBlock.description.max}
                                 isRequired={true}
                                 className={styles['rich-text-custom']}
+                                disabled={isReadOnly}
                             />
                         )}
                     />
                 </div>
             </div>
 
-            <div className={styles.actions}>
-                <Button
-                    type="button"
-                    buttonStyle="primary"
-                    disabled={isPublishDisabled || !!imageError}
-                    className={styles['publish-button']}
-                    onClick={onPublish}
-                >
-                    {MAIN_PAGE_TEXT.BUTTONS.PUBLISH}
-                </Button>
-            </div>
+            {!isReadOnly && (
+                <div className={styles.actions}>
+                    <Button
+                        type="button"
+                        buttonStyle="primary"
+                        disabled={isPublishDisabled || !!imageError}
+                        className={styles['publish-button']}
+                        onClick={onPublish}
+                    >
+                        {MAIN_PAGE_TEXT.BUTTONS.PUBLISH}
+                    </Button>
+                </div>
+            )}
         </div>
     );
 };

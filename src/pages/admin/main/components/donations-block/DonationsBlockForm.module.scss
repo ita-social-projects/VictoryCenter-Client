@@ -22,9 +22,11 @@
     gap: 24px;
 }
 
-.rich-text-custom :global(.editor-field),
-.rich-text-custom :global([contenteditable]) {
-    min-height: 180px;
+.rich-text-custom {
+    :global(.editor-field),
+    :global([contenteditable]) {
+        min-height: 180px;
+    }
 }
 
 .actions {

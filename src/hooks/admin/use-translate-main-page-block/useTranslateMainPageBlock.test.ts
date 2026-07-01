@@ -40,6 +40,13 @@ const page: MainPage = {
         description: 'Опис про нас',
         localizations: [],
     },
+    mainDonations: {
+        id: 30,
+        title: 'Донати',
+        description: 'Опис донатів',
+        image: null,
+        localizations: [],
+    },
     mainPartners: {
         id: 20,
         title: 'Партнери',
@@ -54,7 +61,6 @@ const page: MainPage = {
             },
         ],
     },
-    mainDonations: null,
     impactStatistics: null,
 };
 
@@ -130,10 +136,53 @@ describe('useTranslateMainPageBlock', () => {
                 languageId: englishLanguage.id,
                 title: 'Existing title',
                 description: 'Existing description',
+                mainDonations: null,
                 mainPartners: {
                     entityId: 20,
                     title: 'New partners title',
                     description: 'New partners description',
+                },
+            }),
+        );
+        expect(onSuccess).toHaveBeenCalled();
+    });
+
+    it('creates localization for donations block and includes it in the payload', async () => {
+        jest.spyOn(axios, 'isAxiosError').mockReturnValue(true);
+        (MainPageLocalizationsApi.getByLanguageId as jest.Mock).mockRejectedValue({ response: { status: 404 } });
+        const pageWithDonations = {
+            ...page,
+            mainDonations: {
+                id: 30,
+                title: 'Донати',
+                description: 'Опис донатів',
+                image: null,
+                localizations: [],
+            },
+        };
+        const { result, onSuccess } = renderTranslateHook({
+            page: pageWithDonations,
+            block: MainPageLocalizationBlock.Donations,
+        });
+
+        await act(async () => {
+            await result.current.translateMainPageBlock({
+                title: 'New donations title',
+                description: 'New donations description',
+            });
+        });
+
+        expect(MainPageLocalizationsApi.create).toHaveBeenCalledWith(
+            expect.any(Object),
+            expect.objectContaining({
+                entityId: page.id,
+                languageId: englishLanguage.id,
+                title: 'Existing title',
+                description: 'Existing description',
+                mainDonations: {
+                    entityId: 30,
+                    title: 'New donations title',
+                    description: 'New donations description',
                 },
             }),
         );

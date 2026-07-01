@@ -143,13 +143,7 @@ export interface MainAboutUsEmbeddedLocalizationDto extends EntityLocalizationDt
     description?: string | null;
 }
 
-export interface MainDonationsLocalizationDto extends EntityLocalizationDto {
-    entityId?: number;
-    title?: string | null;
-    description?: string | null;
-}
-
-export interface MainDonationsLocalizationDto extends EntityLocalizationDto {
+export interface MainDonationsEmbeddedLocalizationDto extends EntityLocalizationDto {
     entityId?: number;
     title?: string | null;
     description?: string | null;
@@ -199,14 +193,7 @@ export interface MainAboutUsDto extends EntityWithDtoLocalizations<MainAboutUsEm
     description?: string | null;
 }
 
-export interface MainDonationsDto extends EntityWithDtoLocalizations<MainDonationsLocalizationDto> {
-    id?: number;
-    title?: string | null;
-    description?: string | null;
-    image?: Image | ImageValues | null;
-}
-
-export interface MainDonationsDto extends EntityWithDtoLocalizations<MainDonationsLocalizationDto> {
+export interface MainDonationsDto extends EntityWithDtoLocalizations<MainDonationsEmbeddedLocalizationDto> {
     id?: number;
     title?: string | null;
     description?: string | null;
@@ -250,6 +237,12 @@ export interface MainAboutUsLocalizationDto extends BaseMainPageLocalizationDto 
     localizationInfoDto: LocalizationInfo;
 }
 
+export interface MainDonationsLocalizationDto extends BaseMainPageLocalizationDto {
+    entityId: number;
+    translationStatus: TranslationStatus;
+    localizationInfoDto: LocalizationInfo;
+}
+
 export interface MainPartnersLocalizationDto extends BaseMainPageLocalizationDto {
     entityId: number;
     translationStatus: TranslationStatus;
@@ -261,6 +254,7 @@ export interface MainPageLocalizationDto extends BaseMainPageLocalizationDto {
     translationStatus: TranslationStatus;
     localizationInfoDto: LocalizationInfo;
     mainAboutUs: MainAboutUsLocalizationDto | null;
+    mainDonations: MainDonationsLocalizationDto | null;
     mainPartners: MainPartnersLocalizationDto | null;
 }
 
@@ -323,6 +317,10 @@ export interface CreateMainAboutUsLocalizationDto extends BaseMainPageLocalizati
     entityId: number;
 }
 
+export interface CreateMainDonationsLocalizationDto extends BaseMainPageLocalizationDto {
+    entityId: number;
+}
+
 export interface CreateMainPartnersLocalizationDto extends BaseMainPageLocalizationDto {
     entityId: number;
 }
@@ -331,6 +329,7 @@ export interface CreateMainPageLocalizationDto extends BaseMainPageLocalizationD
     entityId: number;
     languageId: number;
     mainAboutUs: CreateMainAboutUsLocalizationDto | null;
+    mainDonations: CreateMainDonationsLocalizationDto | null;
     mainPartners: CreateMainPartnersLocalizationDto | null;
 }
 
@@ -353,13 +352,7 @@ export interface UpdateMainAboutUsInlineLocalizationDto {
     description?: string;
 }
 
-export interface UpdateMainDonationsLocalizationDto {
-    languageId?: number;
-    title?: string;
-    description?: string;
-}
-
-export interface UpdateMainDonationsLocalizationDto {
+export interface UpdateMainDonationsInlineLocalizationDto {
     languageId?: number;
     title?: string;
     description?: string;
@@ -379,10 +372,13 @@ export interface UpdateMainPageInlineLocalizationDto {
 
 export interface UpdateMainAboutUsLocalizationDto extends BaseMainPageLocalizationDto {}
 
+export interface UpdateMainDonationsLocalizationDto extends BaseMainPageLocalizationDto {}
+
 export interface UpdateMainPartnersLocalizationDto extends BaseMainPageLocalizationDto {}
 
 export interface UpdateMainPageLocalizationDto extends BaseMainPageLocalizationDto {
     mainAboutUs: UpdateMainAboutUsLocalizationDto | null;
+    mainDonations: UpdateMainDonationsLocalizationDto | null;
     mainPartners: UpdateMainPartnersLocalizationDto | null;
 }
 
@@ -414,14 +410,7 @@ export interface UpdateMainDonationsDto {
     title: string;
     description: string;
     imageId?: number | null;
-    localizations?: UpdateMainDonationsLocalizationDto[];
-}
-
-export interface UpdateMainDonationsDto {
-    title: string;
-    description: string;
-    imageId?: number | null;
-    localizations?: UpdateMainDonationsLocalizationDto[];
+    localizations?: UpdateMainDonationsInlineLocalizationDto[];
 }
 
 export interface UpdateMainPartnersDto {

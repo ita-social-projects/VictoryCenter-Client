@@ -185,7 +185,10 @@ jest.mock('../statistics-block/StatisticsBlockForm', () => ({
 jest.mock('../donations-block/DonationsBlockForm', () => ({
     __esModule: true,
     DonationsBlockForm: (props: any) => (
-        <MockFormBlock testId="donations-block-form" btnTestId="publish-btn-donations" {...props} />
+        <div>
+            <MockFormBlock testId="donations-block-form" btnTestId="publish-btn-donations" {...props} />
+            <span data-testid="donations-block-form-read-only">{String(props.isReadOnly)}</span>
+        </div>
     ),
 }));
 
@@ -862,6 +865,7 @@ describe('MainPageContent', () => {
     it.each([
         ['title', 'title-block-form'],
         ['about', 'about-us-block-form'],
+        ['donations', 'donations-block-form'],
         ['partners', 'partners-block-form'],
     ])('shows translation action in the content top-right for %s block', async (tabId, formTestId) => {
         mockLocalizationToolkitState.translationLanguages = [{ id: 2, code: 'en', name: 'Англійська' }];
@@ -873,7 +877,7 @@ describe('MainPageContent', () => {
         expect(screen.getByLabelText('Додати переклад')).toBeInTheDocument();
     });
 
-    it.each(['statistics', 'donations'])('does not show translation action for %s block', async (tabId) => {
+    it.each(['statistics'])('does not show translation action for %s block', async (tabId) => {
         await renderAndLoadContent();
 
         fireEvent.click(screen.getByTestId(`tab-btn-${tabId}`));

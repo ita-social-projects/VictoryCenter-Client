@@ -49,13 +49,19 @@ const basePage: MainPage = {
         description: 'Опис про нас',
         localizations: [],
     },
+    mainDonations: {
+        id: 30,
+        title: 'Донати',
+        description: 'Опис донатів',
+        image: null,
+        localizations: [],
+    },
     mainPartners: {
         id: 20,
         title: 'Партнери',
         description: 'Опис партнерів',
         localizations: [],
     },
-    mainDonations: null,
     impactStatistics: null,
 };
 
@@ -93,6 +99,7 @@ describe('TranslateMainPageBlockModal', () => {
             translationStatus: TranslationStatus.Relevant,
             localizationInfoDto: englishLanguage,
             mainAboutUs: null,
+            mainDonations: null,
             mainPartners: null,
         });
         (MainPageLocalizationsApi.update as jest.Mock).mockResolvedValue({
@@ -102,6 +109,7 @@ describe('TranslateMainPageBlockModal', () => {
             translationStatus: TranslationStatus.Relevant,
             localizationInfoDto: englishLanguage,
             mainAboutUs: null,
+            mainDonations: null,
             mainPartners: null,
         });
     });
@@ -233,11 +241,37 @@ describe('TranslateMainPageBlockModal', () => {
                 title: 'Updated about title',
                 description: 'Updated about description',
             },
+            mainDonations: null,
             mainPartners: {
                 title: 'Existing partners title',
                 description: 'Existing partners description',
             },
         });
+    });
+
+    it('renders edit mode with existing donations localization for donations block', () => {
+        renderModal({
+            block: MainPageLocalizationBlock.Donations,
+            page: {
+                ...basePage,
+                mainDonations: {
+                    ...basePage.mainDonations!,
+                    localizations: [
+                        {
+                            languageId: englishLanguage.id,
+                            language: englishLanguage,
+                            title: 'Existing donations title',
+                            description: 'Existing donations description',
+                            translationStatus: TranslationStatus.Relevant,
+                        },
+                    ],
+                },
+            },
+        });
+
+        expect(screen.getByText('Редагувати переклад')).toBeInTheDocument();
+        expect(titleInput()).toHaveValue('Existing donations title');
+        expect(descriptionInput()).toHaveValue('Existing donations description');
     });
 
     it('shows save error when translation request fails', async () => {

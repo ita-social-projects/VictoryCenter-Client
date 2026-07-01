@@ -143,10 +143,13 @@ describe('BANK_DETAILS_VALIDATION_FUNCTIONS', () => {
                     throw new Error('Unrelated');
                 });
 
-            expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateName('Name')).toBe(
-                'An unexpected validation error occurred.',
-            );
-            spy.mockRestore();
+            try {
+                expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateName('Name')).toBe(
+                    'An unexpected validation error occurred.',
+                );
+            } finally {
+                spy.mockRestore();
+            }
         });
     });
 });

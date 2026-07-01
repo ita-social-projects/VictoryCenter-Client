@@ -77,6 +77,11 @@ describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
             );
         });
 
+        it('should ignore spaces when counting fractional digits', () => {
+            expect(validateFundsExpendituresAmount('1 200, 12', 'change')).toBeUndefined();
+            expect(validateFundsExpendituresAmount('1 200 , 12', 'change')).toBeUndefined();
+        });
+
         it('should support dot input by normalizing it to comma', () => {
             expect(validateFundsExpendituresAmount('1 200.50', 'save')).toBeUndefined();
         });

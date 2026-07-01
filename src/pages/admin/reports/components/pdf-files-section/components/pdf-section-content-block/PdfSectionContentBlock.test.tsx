@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, getDefaultNormalizer } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { PdfSectionContentBlock } from './PdfSectionContentBlock';
 import { PDF_FILES_SECTION_TEXT } from '@/const/admin/reports';
@@ -238,7 +238,9 @@ describe('PdfSectionContentBlock', () => {
             await utils.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.CANCEL }));
             expect(await screen.findByTestId('confirmation-modal')).toBeInTheDocument();
             expect(
-                screen.getByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE),
+                screen.getByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE, {
+                    normalizer: getDefaultNormalizer({ collapseWhitespace: false }),
+                }),
             ).toBeInTheDocument();
         });
 

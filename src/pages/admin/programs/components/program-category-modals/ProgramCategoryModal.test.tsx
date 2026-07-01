@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act, getDefaultNormalizer } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ProgramCategoryModal, ProgramCategoryModalProps } from './ProgramCategoryModal';
 import { ProgramsCategoriesApi } from '@/services/api/admin/programs/programs-api';
@@ -228,11 +228,17 @@ describe('ProgramCategoryModal - Add Mode', () => {
         typeName('Dirty name');
         fireEvent.click(screen.getByTestId('modal-close-btn'));
 
-        expect(screen.getByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE)).toBeInTheDocument();
+        expect(
+            screen.getByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE, {
+                normalizer: getDefaultNormalizer({ collapseWhitespace: false }),
+            }),
+        ).toBeInTheDocument();
 
         fireEvent.click(screen.getByText('No'));
         expect(
-            screen.queryByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE),
+            screen.queryByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE, {
+                normalizer: getDefaultNormalizer({ collapseWhitespace: false }),
+            }),
         ).not.toBeInTheDocument();
         expect(onClose).not.toHaveBeenCalled();
 
@@ -397,6 +403,9 @@ describe('ProgramCategoryModal - Closing Behavior', () => {
         expect(screen.getByTestId('confirm-modal')).toBeInTheDocument();
         expect(screen.getByTestId('confirm-title')).toHaveTextContent(
             COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE,
+            {
+                normalizeWhitespace: false,
+            },
         );
     });
 

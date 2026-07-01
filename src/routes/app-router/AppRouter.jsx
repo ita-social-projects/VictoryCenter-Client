@@ -31,12 +31,13 @@ import { ReportsPanelContent } from '@/pages/admin/reports/components/reports-pa
 import { StoriesOfVictoryPage } from '@/pages/public/stories-of-victory-page';
 import { HistoryPageContent } from '@/pages/admin/history/components/history-page-content/HistoryPageContent';
 import { MainPageContent } from '@/pages/admin/main/components/main-page-content/MainPageContent';
+import { MainPage } from '@/pages/public/main-page/MainPage';
 import { HistoryPage } from '@/pages/public/history-page/HistoryPage';
 
 export const AppRouter = () => {
     const PublicContent = () => (
         <Routes>
-            <Route index element={<AboutUsPage />} />
+            <Route index element={<MainPage />} />
             <Route path={PUBLIC_ROUTES.TEAM.PATH} element={<TeamPage />} />
             <Route path={PUBLIC_ROUTES.PROGRAMS.PATH} element={<ProgramsPage />} />
             <Route path={PUBLIC_ROUTES.PROGRAM_DETAIL.FULL} element={<DetailedProgramPage />} />

@@ -1,18 +1,12 @@
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
+import { axiosInstance } from '@/services/api/axios';
 import { PublicMainPageDto } from '@/types/public/main-page';
-import { AxiosInstance } from 'axios';
 import { PublicMainPageApi } from './main-page-api';
 
+jest.mock('@/services/api/axios');
+
 describe('PublicMainPageApi', () => {
-    let mockClient: jest.Mocked<Partial<AxiosInstance>>;
-
     beforeEach(() => {
-        mockClient = {
-            get: jest.fn(),
-        };
-    });
-
-    afterEach(() => {
         jest.clearAllMocks();
     });
 
@@ -33,27 +27,27 @@ describe('PublicMainPageApi', () => {
             localizations: [],
         };
 
-        (mockClient.get as jest.Mock).mockResolvedValueOnce({ data: mockData });
+        (axiosInstance.get as jest.Mock).mockResolvedValueOnce({ data: mockData });
 
-        const result = await PublicMainPageApi.get(mockClient as AxiosInstance);
+        const result = await PublicMainPageApi.get();
 
-        expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.MAIN_PAGE.PUBLIC);
-        expect(mockClient.get).toHaveBeenCalledTimes(1);
+        expect(axiosInstance.get).toHaveBeenCalledWith(API_ROUTES.MAIN_PAGE.PUBLIC);
+        expect(axiosInstance.get).toHaveBeenCalledTimes(1);
         expect(result).toEqual(mockData);
     });
 
     it('should handle a null/empty response', async () => {
-        (mockClient.get as jest.Mock).mockResolvedValueOnce({ data: null });
+        (axiosInstance.get as jest.Mock).mockResolvedValueOnce({ data: null });
 
-        const result = await PublicMainPageApi.get(mockClient as AxiosInstance);
+        const result = await PublicMainPageApi.get();
 
         expect(result).toBeNull();
     });
 
     it('should propagate errors from the client', async () => {
         const error = new Error('Network Error');
-        (mockClient.get as jest.Mock).mockRejectedValueOnce(error);
+        (axiosInstance.get as jest.Mock).mockRejectedValueOnce(error);
 
-        await expect(PublicMainPageApi.get(mockClient as AxiosInstance)).rejects.toThrow('Network Error');
+        await expect(PublicMainPageApi.get()).rejects.toThrow('Network Error');
     });
 });

@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, getDefaultNormalizer } from '@testing-library/react';
 import { SupportOptionItem, SupportOptionItemMode } from './SupportOptionItem';
 import { DONATE_TEXT } from '@/const/admin/donate';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -390,7 +390,9 @@ describe('SupportOptionItem', () => {
             clickButton(getCancelButton());
 
             expect(
-                screen.getByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE),
+                screen.getByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE, {
+                    normalizer: getDefaultNormalizer({ collapseWhitespace: false }),
+                }),
             ).toBeInTheDocument();
 
             cancelModal();

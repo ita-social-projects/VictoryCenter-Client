@@ -44,6 +44,7 @@ export interface MediaSettingsRef {
 
 const INITIAL_BLOCK_VALUES: ReportsMediaBlockValues = {
     title: '',
+    titleEn: '',
     totalAmount: 0,
     image: null,
     imageId: null,
@@ -54,12 +55,14 @@ const INITIAL_BLOCK_ERRORS: ReportsMediaBlockErrors = {};
 const syncValuesFromData = (data: ReportsMediaSettings) => ({
     collectedFunds: {
         title: data.collectedFunds.title ?? '',
+        titleEn: data.collectedFunds.titleEn ?? '',
         totalAmount: 0,
         image: data.collectedFunds.image ?? null,
         imageId: data.collectedFunds.imageId ?? null,
     } satisfies ReportsMediaBlockValues,
     changedLives: {
         title: data.changedLives.title ?? '',
+        titleEn: data.changedLives.titleEn ?? '',
         totalAmount: data.changedLives.changedLives ?? 0,
         image: data.changedLives.image ?? null,
         imageId: data.changedLives.imageId ?? null,
@@ -86,8 +89,8 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
             refetch,
         } = useDataFetch<ReportsMediaSettings>({
             initialData: {
-                collectedFunds: { title: '', image: null, imageId: null },
-                changedLives: { title: '', changedLives: 0, image: null, imageId: null },
+                collectedFunds: { title: '', titleEn: '', image: null, imageId: null },
+                changedLives: { title: '', titleEn: '', changedLives: 0, image: null, imageId: null },
             },
             fetchHandler: fetchMediaSettingsHandler,
             autoFetchDisabled: false,
@@ -133,8 +136,14 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
         );
 
         const validateCurrentValues = useCallback((): boolean => {
+            const collectedFundsTitleEnError = REPORTS_COLLECTED_FUNDS_VALIDATION_FUNCTIONS.validateTitleEn(
+                collectedFundsValues.titleEn,
+            );
             const collectedFundsTitleError = REPORTS_COLLECTED_FUNDS_VALIDATION_FUNCTIONS.validateTitle(
                 collectedFundsValues.title,
+            );
+            const changedLivesTitleEnError = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateTitleEn(
+                changedLivesValues.titleEn,
             );
             const changedLivesTitleError = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateTitle(
                 changedLivesValues.title,
@@ -144,16 +153,25 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
             );
 
             const hasValidationErrors = Boolean(
-                collectedFundsTitleError || changedLivesTitleError || changedLivesValueError,
+                collectedFundsTitleEnError ||
+                    collectedFundsTitleError ||
+                    changedLivesTitleEnError ||
+                    changedLivesTitleError ||
+                    changedLivesValueError,
             );
 
             if (!hasValidationErrors) {
                 return true;
             }
 
-            setCollectedFundsErrors((prev) => ({ ...prev, title: collectedFundsTitleError }));
+            setCollectedFundsErrors((prev) => ({
+                ...prev,
+                titleEn: collectedFundsTitleEnError,
+                title: collectedFundsTitleError,
+            }));
             setChangedLivesErrors((prev) => ({
                 ...prev,
+                titleEn: changedLivesTitleEnError,
                 title: changedLivesTitleError,
                 totalAmount: changedLivesValueError,
             }));
@@ -192,11 +210,13 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
                 const updated = await ReportsApi.updateMediaSettings(client, {
                     collectedFunds: {
                         title: collectedFundsValues.title,
+                        titleEn: collectedFundsValues.titleEn,
                         image: collectedFundsImage,
                         imageId: collectedFundsImageId,
                     },
                     changedLives: {
                         title: changedLivesValues.title,
+                        titleEn: changedLivesValues.titleEn,
                         changedLives: changedLivesValues.totalAmount,
                         image: changedLivesImage,
                         imageId: changedLivesImageId,
@@ -209,9 +229,14 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
                 setChangedLivesValues(changedLives);
                 setChangedLivesErrors(INITIAL_BLOCK_ERRORS);
 
-                await refetch();
-
                 addToast(COMMON_TEXT_ADMIN.MESSAGE.SUCCESSFULLY_PUBLISHED, ToastType.Success);
+
+                try {
+                    await refetch(true);
+                } catch {
+                    // Refetch error handled by useDataFetch
+                }
+
                 return true;
             } catch (error: any) {
                 if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {
@@ -234,7 +259,7 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
                 {fetchError && !isLoading && (
                     <div className={styles.error}>
                         <p>{REPORTS_TEXT.MESSAGE.FAIL_TO_FETCH_REPORTS}</p>
-                        <Button onClick={refetch} buttonStyle="primary" className={styles['error-button']}>
+                        <Button onClick={() => refetch()} buttonStyle="primary" className={styles['error-button']}>
                             {REPORTS_TEXT.BUTTON.TRY_AGAIN}
                         </Button>
                     </div>

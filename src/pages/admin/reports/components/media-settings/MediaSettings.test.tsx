@@ -55,9 +55,11 @@ jest.mock('@/utils/functions/fetch-default-image/fetch-default-image');
 jest.mock('@/validation/admin/reports-schema/reports-media-settings/reports-media-settings-schema', () => ({
     REPORTS_COLLECTED_FUNDS_VALIDATION_FUNCTIONS: {
         validateTitle: jest.fn(),
+        validateTitleEn: jest.fn(),
     },
     REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS: {
         validateTitle: jest.fn(),
+        validateTitleEn: jest.fn(),
         validateChangedLives: jest.fn(),
     },
 }));
@@ -87,11 +89,13 @@ describe('MediaSettings', () => {
     const defaultMediaSettingsData = {
         collectedFunds: {
             title: 'Зібрано коштів',
+            titleEn: 'Зібрано коштів УК',
             image: { id: 1, url: 'collected-image.jpg', mimeType: 'image/jpeg' },
             imageId: 1,
         },
         changedLives: {
             title: 'Змінено життів',
+            titleEn: 'Змінено життів УК',
             changedLives: 56,
             image: { id: 2, url: 'changed-lives-image.jpg', mimeType: 'image/jpeg' },
             imageId: 2,
@@ -278,7 +282,13 @@ describe('MediaSettings', () => {
         it('should call onDirtyChange(true) when collected funds values change', () => {
             renderComponent();
 
-            const newValues = { title: 'New Title', totalAmount: 300000, image: null, imageId: null };
+            const newValues = {
+                title: 'New Title',
+                titleEn: 'New Title UK',
+                totalAmount: 300000,
+                image: null,
+                imageId: null,
+            };
             const newErrors = {};
 
             act(() => {
@@ -291,7 +301,13 @@ describe('MediaSettings', () => {
         it('should call onDirtyChange(true) when changed lives values change', () => {
             renderComponent();
 
-            const newValues = { title: 'New Title', totalAmount: 100, image: null, imageId: null };
+            const newValues = {
+                title: 'New Title',
+                titleEn: 'New Title UK',
+                totalAmount: 100,
+                image: null,
+                imageId: null,
+            };
             const newErrors = {};
 
             act(() => {
@@ -317,7 +333,13 @@ describe('MediaSettings', () => {
         it('should update collected funds block values after change', () => {
             renderComponent();
 
-            const newValues = { title: 'Updated Title', totalAmount: 500000, image: null, imageId: null };
+            const newValues = {
+                title: 'Updated Title',
+                titleEn: 'Updated Title UK',
+                totalAmount: 500000,
+                image: null,
+                imageId: null,
+            };
             const newErrors = { title: 'Some error' };
 
             act(() => {
@@ -331,7 +353,13 @@ describe('MediaSettings', () => {
         it('should update changed lives block values after change', () => {
             renderComponent();
 
-            const newValues = { title: 'Updated Lives', totalAmount: 99, image: null, imageId: null };
+            const newValues = {
+                title: 'Updated Lives',
+                titleEn: 'Updated Lives UK',
+                totalAmount: 99,
+                image: null,
+                imageId: null,
+            };
             const newErrors = { totalAmount: 'Invalid' };
 
             act(() => {
@@ -550,11 +578,13 @@ describe('MediaSettings', () => {
             const updatedData = {
                 collectedFunds: {
                     title: 'Updated CF Title',
+                    titleEn: 'Updated CF Title UK',
                     image: { id: 3, url: 'new-cf.jpg', mimeType: 'image/jpeg' },
                     imageId: 3,
                 },
                 changedLives: {
                     title: 'Updated CL Title',
+                    titleEn: 'Updated CL Title UK',
                     changedLives: 100,
                     image: { id: 4, url: 'new-cl.jpg', mimeType: 'image/jpeg' },
                     imageId: 4,

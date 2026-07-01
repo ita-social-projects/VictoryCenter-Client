@@ -27,6 +27,7 @@ const settingsMock: ReportFundsExpendituresSettings = {
     id: 1,
     disclaimerTitle: 'Original disclaimer',
     exchangeRate: null,
+    programExpendituresReportingYear: 2025,
 };
 
 const languageMock: LocalizationLanguage = {

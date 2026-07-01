@@ -36,12 +36,9 @@ const mapDtoToReadOnlyData = (
             return a.programName.localeCompare(b.programName, 'uk');
         });
 
-    const uniqueProgramsMap = new Map<number, ProgramExpensesProgram>();
-    mappedRecords.forEach((record) => {
-        uniqueProgramsMap.set(record.programId, { id: record.programId, name: record.programName });
-    });
-
-    const programs = Array.from(uniqueProgramsMap.values()).sort((a, b) => a.name.localeCompare(b.name, 'uk'));
+    const programs: ProgramExpensesProgram[] = categories
+        .map((category) => ({ id: category.id, name: category.name }))
+        .sort((a, b) => a.name.localeCompare(b.name, 'uk'));
 
     const summary = mappedRecords.reduce<ProgramExpensesSummary>(
         (acc, record) => ({
@@ -74,6 +71,18 @@ export const ProgramExpensesApi = {
         const exchangeRate = formatNumberDecimalComma(settingsResponse.data.exchangeRate) || null;
 
         return mapDtoToReadOnlyData(recordsResponse.data, categoriesResponse.data, exchangeRate);
+    },
+
+    getSummary: async (client: AxiosInstance, options: RequestOptions = {}): Promise<ProgramExpensesSummary> => {
+        const response = await client.get<{ totalAmountUah: number; totalAmountUsd: number }>(
+            `${API_ROUTES.REPORTS.PROGRAM_EXPENDITURES_RECORDS}/summary`,
+            { signal: options.cancellationSignal },
+        );
+
+        return {
+            totalAmountUah: response.data.totalAmountUah,
+            totalAmountUsd: response.data.totalAmountUsd,
+        };
     },
 
     getAll: async (client: AxiosInstance): Promise<ReportProgramExpendituresRecordDto[]> => {

@@ -39,6 +39,8 @@ const FormWrapper = ({
         defaultValues: {
             titleUa: '',
             descriptionUa: '',
+            titleEn: '',
+            descriptionEn: '',
             ...defaultValues,
         } as MainPageFormValues,
     });
@@ -135,5 +137,23 @@ describe('TitleBlockForm', () => {
         fireEvent.change(titleInput, { target: { value: 'Новий змінений заголовок' } });
 
         expect(titleInput.value).toBe('Новий змінений заголовок');
+    });
+
+    it('renders translated fields as disabled and hides publish button in read-only mode', () => {
+        render(
+            <FormWrapper defaultValues={{ titleEn: 'English title', descriptionEn: 'English description' }}>
+                <TitleBlockForm isPublishDisabled={false} onPublish={mockOnPublish} isReadOnly />
+            </FormWrapper>,
+        );
+
+        const titleInput = screen.getByTestId('title-block-title') as HTMLInputElement;
+        const descriptionInput = screen.getByTestId('title-block-description') as HTMLTextAreaElement;
+
+        expect(titleInput).toHaveValue('English title');
+        expect(titleInput).toBeDisabled();
+        expect(descriptionInput).toHaveValue('English description');
+        expect(descriptionInput).toBeDisabled();
+        expect(screen.getByTestId('image-upload-form')).toHaveAttribute('data-disabled', 'true');
+        expect(screen.queryByTestId('submit-btn')).not.toBeInTheDocument();
     });
 });

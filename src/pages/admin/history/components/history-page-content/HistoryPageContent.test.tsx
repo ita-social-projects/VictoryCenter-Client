@@ -572,6 +572,7 @@ describe('HistoryPageContent', () => {
 
         expect(screen.getByTestId('question-title')).toHaveTextContent(
             COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE,
+            { normalizeWhitespace: false },
         );
 
         await user.click(screen.getByTestId('question-cancel'));

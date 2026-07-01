@@ -97,48 +97,6 @@ jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
     InlineLoader: ({ size }: { size?: number }) => <div data-testid="inline-loader">loader-{size ?? 2}</div>,
 }));
 
-jest.mock(
-    '@/pages/admin/reports/components/funds-expenditures-section/components/common/funds-record-actions/FundsRecordActions',
-    () => ({
-        FundsRecordActions: ({
-            onAddIncome,
-            onAddExpense,
-            isAddIncomeDisabled,
-            isAddExpenseDisabled,
-            testId,
-        }: {
-            onAddIncome?: () => void;
-            onAddExpense?: () => void;
-            isAddIncomeDisabled?: boolean;
-            isAddExpenseDisabled?: boolean;
-            testId?: string;
-        }) => {
-            const { FUNDS_EXPENDITURES_TEXT: mockFundsExpendituresText } = require('@/const/admin/reports');
-
-            return (
-                <div data-testid={testId ?? 'editing-actions'}>
-                    <button
-                        type="button"
-                        data-testid="mock-add-expense"
-                        onClick={onAddExpense}
-                        disabled={Boolean(isAddExpenseDisabled)}
-                    >
-                        {mockFundsExpendituresText.BUTTON.ADD_EXPENSE}
-                    </button>
-                    <button
-                        type="button"
-                        data-testid="mock-add-income"
-                        onClick={onAddIncome}
-                        disabled={Boolean(isAddIncomeDisabled)}
-                    >
-                        {mockFundsExpendituresText.BUTTON.ADD_INCOME}
-                    </button>
-                </div>
-            );
-        },
-    }),
-);
-
 jest.mock('@/components/common/select/Select', () => {
     const React = require('react');
 
@@ -682,6 +640,24 @@ describe('FundsExpendituresTable', () => {
             });
         });
 
+        it('should show validation error and skip saving when Accept is clicked before blurring an invalid zero amount', () => {
+            const onRecordSave = jest.fn();
+
+            renderTable({ isEditing: true, onRecordSave });
+
+            fireEvent.click(screen.getByLabelText('Edit record 1'));
+            fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '0' } });
+
+            const acceptButton = screen.getByLabelText('Accept record 1');
+            expect(acceptButton).not.toBeDisabled();
+
+            fireEvent.click(acceptButton);
+
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_NOT_ZERO)).toBeInTheDocument();
+            expect(onRecordSave).not.toHaveBeenCalled();
+            expect(screen.getByLabelText('Accept record 1')).toBeInTheDocument();
+        });
+
         it('should show numeric validation for non-number amount', () => {
             renderTable({ isEditing: true });
 
@@ -846,5 +822,53 @@ describe('FundsExpendituresTable program aggregate row', () => {
 
         expect(screen.queryByLabelText('Accept program reporting year')).not.toBeInTheDocument();
         expect(onProgramYearSave).not.toHaveBeenCalled();
+    });
+
+    it('keeps the year edit open and does not reset state when the save is rejected by the parent', async () => {
+        const onProgramYearSave = jest.fn().mockResolvedValue(false);
+        renderTable({ programAggregateRow, isEditing: true, onProgramYearSave });
+
+        fireEvent.click(screen.getByLabelText('Edit program reporting year'));
+        fireEvent.click(screen.getByTestId(`select-option-${nextYear}-${nextYear}`));
+        fireEvent.click(screen.getByLabelText('Accept program reporting year'));
+
+        await waitFor(() => expect(onProgramYearSave).toHaveBeenCalledWith(nextYear));
+
+        expect(screen.getByLabelText('Accept program reporting year')).toBeInTheDocument();
+        expect(screen.getByLabelText('Close program reporting year edit')).toBeInTheDocument();
+    });
+
+    it('shows a saving indicator and disables year edit controls while the save is in progress', async () => {
+        let resolveSave: (() => void) | undefined;
+        const onProgramYearSave = jest.fn(
+            () =>
+                new Promise<boolean>((resolve) => {
+                    resolveSave = () => resolve(true);
+                }),
+        );
+
+        renderTable({ programAggregateRow, isEditing: true, onProgramYearSave });
+
+        fireEvent.click(screen.getByLabelText('Edit program reporting year'));
+        fireEvent.click(screen.getByTestId(`select-option-${nextYear}-${nextYear}`));
+        fireEvent.click(screen.getByLabelText('Accept program reporting year'));
+
+        expect(screen.getByTestId('inline-loader')).toBeInTheDocument();
+        expect(screen.getByLabelText('Accept program reporting year')).toBeDisabled();
+        expect(screen.getByLabelText('Close program reporting year edit')).toBeDisabled();
+
+        resolveSave?.();
+
+        await waitFor(() => {
+            expect(screen.queryByTestId('inline-loader')).not.toBeInTheDocument();
+        });
+    });
+
+    it('disables the program reporting year edit button while a row is being edited', () => {
+        renderTable({ programAggregateRow, isEditing: true });
+
+        fireEvent.click(screen.getByLabelText('Edit record 1'));
+
+        expect(screen.getByLabelText('Edit program reporting year')).toBeDisabled();
     });
 });

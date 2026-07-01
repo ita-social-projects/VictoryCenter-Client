@@ -1,5 +1,11 @@
 @use '@/assets/sass/variables/colors.scss' as c;
 
+.page {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
 .loader {
     width: 100%;
 }

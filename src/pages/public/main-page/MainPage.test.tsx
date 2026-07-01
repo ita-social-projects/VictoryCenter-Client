@@ -46,6 +46,10 @@ jest.mock('./intro-section/IntroSection', () => ({
     )),
 }));
 
+jest.mock('./main-programs-section/MainProgramsSection', () => ({
+    MainProgramsSection: () => <div data-testid="main-programs-section" />,
+}));
+
 const mockedUseDataFetch = useDataFetch as jest.Mock;
 const mockedUseLocale = useLocale as jest.Mock;
 const MockedIntroSection = IntroSection as jest.Mock;

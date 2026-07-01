@@ -113,6 +113,7 @@ export const COMMON_TEXT_ADMIN = {
                 ADD_CATEGORY: 'Додати категорію',
                 EDIT_CATEGORY: 'Редагувати категорію',
                 DELETE_CATEGORY: 'Видалити категорію',
+                DELETE_CATEGORY_CONFIRM: 'Видалити категорію?',
             },
             MESSAGE: {
                 ALREADY_CONTAIN_CATEGORY_WITH_NAME: 'Категорія з такою назвою вже існує',

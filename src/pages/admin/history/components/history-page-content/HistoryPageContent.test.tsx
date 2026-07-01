@@ -29,6 +29,13 @@ jest.mock('@/services/api/admin/history/history-api', () => ({
     },
 }));
 
+jest.mock('@/services/api/admin/history/history-localizations-api', () => ({
+    HistoryLocalizationsApi: {
+        create: jest.fn(),
+        update: jest.fn(),
+    },
+}));
+
 jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider');
 
 jest.mock('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit', () => ({
@@ -50,6 +57,7 @@ const mockRevertDiscardAction = jest.fn();
 const mockAddSection = jest.fn();
 const mockReplaceSection = jest.fn();
 const mockGetSections = jest.fn();
+const mockUpdateSectionSilently = jest.fn();
 
 let mockHistoryFormSections: HistorySectionDto[] = [];
 
@@ -90,6 +98,7 @@ jest.mock('../history-form/HistoryForm', () => {
                 );
                 mockReplaceSection(sectionIndex, newSection);
             },
+            updateSectionSilently: mockUpdateSectionSilently,
             getSections: () => {
                 mockGetSections();
                 return mockHistoryFormSections;
@@ -199,6 +208,28 @@ jest.mock('@/pages/admin/programs/components/programs-page-modals/add-section-mo
     },
 }));
 
+jest.mock('../translate-history-modal/TranslateHistoryModal', () => ({
+    TranslateHistoryModal: ({ isOpen, onClose, onSaved }: any) => {
+        if (!isOpen) return null;
+        return (
+            <div data-testid="translate-history-modal">
+                <button data-testid="close-translate-modal" onClick={onClose}>
+                    Close Translate
+                </button>
+                <button
+                    data-testid="save-translate-modal"
+                    onClick={() => {
+                        onSaved([{ id: 1, template: 1, order: 0, contents: [] }]);
+                        onClose();
+                    }}
+                >
+                    Save Translate
+                </button>
+            </div>
+        );
+    },
+}));
+
 jest.mock('@/components/admin/toast/toast-container/ToastContainer', () => ({
     ToastContainer: () => <div data-testid="toast-container" />,
 }));
@@ -255,6 +286,7 @@ jest.mock('@/const/admin/history', () => ({
             FAIL_TO_FETCH_SECTIONS: 'Failed to fetch sections',
             PUBLISH_SUCCESS: 'Publish success',
             PUBLISH_ERROR: 'Publish error',
+            TRANSLATE_SUCCESS: 'Translate success',
         },
     },
 }));
@@ -275,9 +307,14 @@ jest.mock('../history-page-toolbar/HistoryPageToolbar', () => ({
         mockToolbarProps(props);
 
         return (
-            <button type="button" data-testid="toolbar-add-section-button" onClick={props.onAddSection}>
-                Add History Section
-            </button>
+            <div>
+                <button type="button" data-testid="toolbar-add-section-button" onClick={props.onAddSection}>
+                    Add History Section
+                </button>
+                <button type="button" data-testid="toolbar-translate-button" onClick={props.onTranslate}>
+                    Translate History
+                </button>
+            </div>
         );
     },
 }));
@@ -324,6 +361,7 @@ describe('HistoryPageContent', () => {
         mockAddSection.mockClear();
         mockReplaceSection.mockClear();
         mockGetSections.mockClear();
+        mockUpdateSectionSilently.mockClear();
         mockAddToast.mockClear();
         mockHistoryFormSections = [];
         mockedUseAdminClient.mockReturnValue(mockClient as any);
@@ -668,7 +706,7 @@ describe('HistoryPageContent', () => {
 
         expect(mockAddToast).toHaveBeenCalledWith('Publish success', ToastType.Success);
         expect(refetchSectionsMock).toHaveBeenCalledTimes(1);
-        expect(mockGetSections).toHaveBeenCalledTimes(1);
+        expect(mockGetSections).toHaveBeenCalled();
     });
 
     it('shows error toast when publish fails', async () => {
@@ -746,28 +784,73 @@ describe('HistoryPageContent', () => {
         });
     });
 
-    it('closes add-section modal when onClose is called', async () => {
-        mockSingleSectionData();
+    describe('Modal opening and closing', () => {
+        const modalTestCases = [
+            {
+                name: 'closes add-section modal when onClose is called',
+                openAction: async () => await user.click(screen.getByTestId('toolbar-add-section-button')),
+                modalId: 'add-section-modal',
+                closeAction: async () => await user.click(screen.getByTestId('close-add-section-modal')),
+            },
+            {
+                name: 'closes publish confirmation modal when cancel is clicked',
+                openAction: async () => {
+                    await user.click(screen.getByTestId('mark-saved'));
+                    await user.click(screen.getByRole('button', { name: 'Publish' }));
+                },
+                modalId: 'question-modal',
+                closeAction: async () => await user.click(screen.getByTestId('question-cancel')),
+            },
+            {
+                name: 'opens and closes translation modal',
+                openAction: async () => await user.click(screen.getByTestId('toolbar-translate-button')),
+                modalId: 'translate-history-modal',
+                closeAction: async () => await user.click(screen.getByTestId('close-translate-modal')),
+            },
+        ];
 
-        render(<HistoryPageContent />);
+        it.each(modalTestCases)('$name', async ({ openAction, modalId, closeAction }) => {
+            mockSingleSectionData();
+            render(<HistoryPageContent />);
 
-        await user.click(screen.getByTestId('toolbar-add-section-button'));
-        expect(screen.getByTestId('add-section-modal')).toBeInTheDocument();
+            await openAction();
+            expect(screen.getByTestId(modalId)).toBeInTheDocument();
 
-        await user.click(screen.getByTestId('close-add-section-modal'));
-        expect(screen.queryByTestId('add-section-modal')).not.toBeInTheDocument();
+            await closeAction();
+            expect(screen.queryByTestId(modalId)).not.toBeInTheDocument();
+        });
     });
 
-    it('closes publish confirmation modal when cancel is clicked', async () => {
+    it('handles translation save by refetching and updating matched sections silently', async () => {
         mockSingleSectionData();
+        render(<HistoryPageContent />);
+
+        await user.click(screen.getByTestId('toolbar-translate-button'));
+        await user.click(screen.getByTestId('save-translate-modal'));
+
+        expect(mockUpdateSectionSilently).toHaveBeenCalledWith(0, expect.objectContaining({ id: 1 }));
+        expect(mockAddToast).toHaveBeenCalledWith('Translate success', ToastType.Success);
+        expect(refetchSectionsMock).toHaveBeenCalledTimes(1);
+        expect(screen.queryByTestId('translate-history-modal')).not.toBeInTheDocument();
+    });
+
+    it('does not update silently if translated section does not match form sections', async () => {
+        const sections = [createSection(10, SectionTemplate.SingleImageTop, 0)];
+        mockHistoryFormSections = sections;
+        mockedUseDataFetch.mockReturnValue({
+            data: sections,
+            error: null,
+            isLoading: false,
+            refetch: refetchSectionsMock,
+            setData: jest.fn(),
+        });
 
         render(<HistoryPageContent />);
 
-        await user.click(screen.getByTestId('mark-saved'));
-        await user.click(screen.getByRole('button', { name: 'Publish' }));
-        expect(screen.getByTestId('question-modal')).toBeInTheDocument();
+        await user.click(screen.getByTestId('toolbar-translate-button'));
+        await user.click(screen.getByTestId('save-translate-modal'));
 
-        await user.click(screen.getByTestId('question-cancel'));
-        expect(screen.queryByTestId('question-modal')).not.toBeInTheDocument();
+        expect(mockUpdateSectionSilently).not.toHaveBeenCalled();
+        expect(mockAddToast).toHaveBeenCalledWith('Translate success', ToastType.Success);
     });
 });

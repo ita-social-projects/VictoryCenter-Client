@@ -18,6 +18,10 @@
             border-color: colors.$blue-500;
         }
 
+        &--error {
+            border-color: colors.$error;
+        }
+
         &--disabled {
             background-color: colors.$grey-600;
             border-color: colors.$grey-900;
@@ -72,8 +76,14 @@
             fill: colors.$blue-500;
         }
 
-        &--error svg path {
-            fill: colors.$error;
+        &--error {
+            svg path {
+                fill: colors.$error;
+            }
+
+            &:hover svg path {
+                fill: colors.$error;
+            }
         }
     }
 

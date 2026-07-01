@@ -252,9 +252,6 @@ jest.mock('@/services/api/admin/main-page/main-page-localizations-api/main-page-
     },
 }));
 
-const getByExactText = (text: string) =>
-    screen.getByText((_, el) => el?.children.length === 0 && el?.textContent === text);
-
 const getTranslationTitleInput = () => document.getElementById('main-page-translation-title') as HTMLInputElement;
 const getTranslationDescriptionInput = () =>
     document.getElementById('main-page-translation-description') as HTMLTextAreaElement;

@@ -50,7 +50,7 @@ export const InputWithCharacterLimit = ({
 
     useLayoutEffect(() => {
         valueRef.current = value;
-    });
+    }, [value]);
 
     useEffect(() => {
         setLocalValue(value ?? '');

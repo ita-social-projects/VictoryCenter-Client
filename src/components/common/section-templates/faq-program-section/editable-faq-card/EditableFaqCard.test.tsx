@@ -74,12 +74,20 @@ describe('EditableFaqCard', () => {
         const deleteBtn = screen.getByLabelText('Delete question');
         fireEvent.click(deleteBtn);
 
-        expect(screen.getByText(SECTIONS_TEXT.SECTION.SINGLE_TITLE_QUESTION_ANSWER_PAIRS.MODAL.DELETE_QUESTION_CONFIRMATION)).toBeInTheDocument();
+        expect(
+            screen.getByText(
+                SECTIONS_TEXT.SECTION.SINGLE_TITLE_QUESTION_ANSWER_PAIRS.MODAL.DELETE_QUESTION_CONFIRMATION,
+            ),
+        ).toBeInTheDocument();
 
         const cancelBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.NO });
         fireEvent.click(cancelBtn);
 
-        expect(screen.queryByText(SECTIONS_TEXT.SECTION.SINGLE_TITLE_QUESTION_ANSWER_PAIRS.MODAL.DELETE_QUESTION_CONFIRMATION)).not.toBeInTheDocument();
+        expect(
+            screen.queryByText(
+                SECTIONS_TEXT.SECTION.SINGLE_TITLE_QUESTION_ANSWER_PAIRS.MODAL.DELETE_QUESTION_CONFIRMATION,
+            ),
+        ).not.toBeInTheDocument();
         expect(mockOnDelete).not.toHaveBeenCalled();
     });
 

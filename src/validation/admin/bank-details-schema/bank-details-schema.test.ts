@@ -134,6 +134,21 @@ describe('BANK_DETAILS_VALIDATION_FUNCTIONS', () => {
             );
         });
     });
+
+    describe('unexpected validation error', () => {
+        it('should return unexpected error message when validation throws non-Yup error', () => {
+            const spy = jest
+                .spyOn(require('./bank-details-schema').BankDetailsValidationSchema, 'validateSyncAt')
+                .mockImplementation(() => {
+                    throw new Error('Unrelated');
+                });
+
+            expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateName('Name')).toBe(
+                'An unexpected validation error occurred.',
+            );
+            spy.mockRestore();
+        });
+    });
 });
 
 describe('SUPPORT_OPTIONS_VALIDATION_FUNCTIONS', () => {

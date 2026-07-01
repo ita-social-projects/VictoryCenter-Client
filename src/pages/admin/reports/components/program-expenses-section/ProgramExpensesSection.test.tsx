@@ -168,7 +168,7 @@ jest.mock('./components/common/add-program-expense-record-modal/AddProgramExpens
             amountUah: string;
             amountUsd: string;
         }) => Promise<boolean>;
-        recordToEdit: any;
+        recordToEdit?: { id: number } | null;
     }) => (
         <div data-testid="add-program-expense-modal" data-open={String(isOpen)} data-exchange-rate={exchangeRate ?? ''}>
             AddProgramExpenseRecordModal

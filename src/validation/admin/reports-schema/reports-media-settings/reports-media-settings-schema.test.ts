@@ -73,6 +73,13 @@ describe('reports-media-settings-schema', () => {
                     ),
                 );
             });
+
+            it('should skip normalization and return required error when value is not a string', () => {
+                const result = REPORTS_COLLECTED_FUNDS_VALIDATION_FUNCTIONS.validateTitle(
+                    undefined as unknown as string,
+                );
+                expect(result).toBe(REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION.title.getRequiredError());
+            });
         });
 
         describe('validateTitleEn', () => {
@@ -170,6 +177,11 @@ describe('reports-media-settings-schema', () => {
             it('should normalize consecutive spaces and validate successfully', () => {
                 const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateTitle('Valid   title   text');
                 expect(result).toBeUndefined();
+            });
+
+            it('should skip normalization and return required error when value is not a string', () => {
+                const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateTitle(undefined as unknown as string);
+                expect(result).toBe(REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.title.getRequiredError());
             });
         });
 

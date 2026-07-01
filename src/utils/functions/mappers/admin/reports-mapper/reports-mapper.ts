@@ -35,6 +35,7 @@ export const mapReportsMediaSettingsCollectedFundsDtoToCollectedFunds = (
     dto: ReportsMediaSettingsCollectedFundsDto,
 ): ReportsMediaSettingsCollectedFunds => ({
     title: dto.title,
+    titleEn: dto.titleEn,
     image: dto.image,
     imageId: dto.image?.id ?? null,
 });
@@ -43,6 +44,7 @@ export const mapReportsMediaSettingsChangedLivesDtoToChangedLives = (
     dto: ReportsMediaSettingsChangedLivesDto,
 ): ReportsMediaSettingsChangedLives => ({
     title: dto.title,
+    titleEn: dto.titleEn,
     changedLives: dto.changedLives,
     image: dto.image,
     imageId: dto.image?.id ?? null,

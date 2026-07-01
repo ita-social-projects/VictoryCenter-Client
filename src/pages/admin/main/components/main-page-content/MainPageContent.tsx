@@ -265,17 +265,15 @@ export const MainPageContent = () => {
 
                 const localizedValues = sanitizeMainPageFormValues({
                     ...baseValues,
-                    titleEn: localization.title ?? originalData.title ?? '',
-                    descriptionEn: localization.description ?? originalData.description ?? '',
-                    aboutUsTitleEn: localization.mainAboutUs?.title ?? originalData.mainAboutUs?.title ?? '',
-                    aboutUsDescriptionEn:
-                        localization.mainAboutUs?.description ?? originalData.mainAboutUs?.description ?? '',
+                    titleEn: localization.title ?? baseValues.titleEn,
+                    descriptionEn: localization.description ?? baseValues.descriptionEn,
+                    aboutUsTitleEn: localization.mainAboutUs?.title ?? baseValues.aboutUsTitleEn,
+                    aboutUsDescriptionEn: localization.mainAboutUs?.description ?? baseValues.aboutUsDescriptionEn,
                     donationsTitleEn: localization.mainDonations?.title ?? originalData.mainDonations?.title ?? '',
                     donationsDescriptionEn:
                         localization.mainDonations?.description ?? originalData.mainDonations?.description ?? '',
-                    partnersTitleEn: localization.mainPartners?.title ?? originalData.mainPartners?.title ?? '',
-                    partnersDescriptionEn:
-                        localization.mainPartners?.description ?? originalData.mainPartners?.description ?? '',
+                    partnersTitleEn: localization.mainPartners?.title ?? baseValues.partnersTitleEn,
+                    partnersDescriptionEn: localization.mainPartners?.description ?? baseValues.partnersDescriptionEn,
                 });
 
                 savedValuesRef.current = localizedValues;
@@ -286,14 +284,14 @@ export const MainPageContent = () => {
 
                     const fallbackValues = sanitizeMainPageFormValues({
                         ...baseValues,
-                        titleEn: originalData.title ?? '',
-                        descriptionEn: originalData.description ?? '',
-                        aboutUsTitleEn: originalData.mainAboutUs?.title ?? '',
-                        aboutUsDescriptionEn: originalData.mainAboutUs?.description ?? '',
+                        titleEn: baseValues.titleEn,
+                        descriptionEn: baseValues.descriptionEn,
+                        aboutUsTitleEn: baseValues.aboutUsTitleEn,
+                        aboutUsDescriptionEn: baseValues.aboutUsDescriptionEn,
                         donationsTitleEn: originalData.mainDonations?.title ?? '',
                         donationsDescriptionEn: originalData.mainDonations?.description ?? '',
-                        partnersTitleEn: originalData.mainPartners?.title ?? '',
-                        partnersDescriptionEn: originalData.mainPartners?.description ?? '',
+                        partnersTitleEn: baseValues.partnersTitleEn,
+                        partnersDescriptionEn: baseValues.partnersDescriptionEn,
                     });
 
                     savedValuesRef.current = fallbackValues;
@@ -454,9 +452,9 @@ export const MainPageContent = () => {
                 return translationStatus == null
                     ? null
                     : {
-                          languageId: language.id,
-                          translationStatus,
-                      };
+                        languageId: language.id,
+                        translationStatus,
+                    };
             })
             .filter((status): status is NonNullable<typeof status> => status != null);
 

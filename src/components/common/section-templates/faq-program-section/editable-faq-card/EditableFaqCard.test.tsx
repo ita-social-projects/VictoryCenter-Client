@@ -1,163 +1,134 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { EditableFaqCard } from './EditableFaqCard';
-import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
+import { SECTIONS_TEXT } from '@/const/admin/sections';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
-jest.mock(
-    '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
-    () => ({
-        TextAreaWithCharacterLimitGroup: ({ label, id, value, onChange, onBlur, error }: any) => (
-            <div data-testid={`textarea-${id}`}>
-                <label>{label}</label>
-                <textarea data-testid={id} value={value} onChange={onChange} onBlur={onBlur} />
-                {error && <span data-testid={`error-${id}`}>{error}</span>}
-            </div>
-        ),
-    }),
-);
+const mockOnQuestionChange = jest.fn();
+const mockOnAnswerChange = jest.fn();
+const mockOnDelete = jest.fn();
+const mockOnExpandToggle = jest.fn();
 
-jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
-    ConfirmationModal: ({ isOpen, onConfirm, onCancel, title }: any) =>
-        isOpen ? (
-            <div data-testid="confirmation-modal">
-                <h2>{title}</h2>
-                <button data-testid="confirm-delete-btn" onClick={onConfirm}>
-                    Yes
-                </button>
-                <button data-testid="cancel-delete-btn" onClick={onCancel}>
-                    No
-                </button>
-            </div>
-        ) : null,
-}));
-
-jest.mock('@/assets/icons/arrow-up-right.svg', () => ({
-    ReactComponent: (props: any) => <svg data-testid="arrow-icon" {...props} />,
-}));
-jest.mock('@/assets/icons/cross.svg', () => ({
-    ReactComponent: (props: any) => <svg data-testid="close-icon" {...props} />,
-}));
-
-jest.mock('@/const/common/action-icons', () => ({
-    ACTION_ICONS: {
-        delete: {
-            hover: (props: any) => <svg data-testid="delete-icon" {...props} />,
-        },
-    },
-}));
-
-jest.mock('@/validation/admin/program-schema/program-schema', () => ({
-    PROGRAM_SECTION_VALIDATION_FUNCTIONS: {
-        validateFaqQuestion: jest.fn((val) => (val ? undefined : 'Question is required')),
-        validateFaqAnswer: jest.fn((val) => (val ? undefined : 'Answer is required')),
-    },
-}));
+const defaultProps = {
+    index: 0,
+    idPrefix: 'test',
+    questionText: 'Test Question',
+    answerText: 'Test Answer',
+    isExpanded: false,
+    onQuestionChange: mockOnQuestionChange,
+    onAnswerChange: mockOnAnswerChange,
+    onDelete: mockOnDelete,
+    onExpandToggle: mockOnExpandToggle,
+};
 
 describe('EditableFaqCard', () => {
-    const defaultProps = {
-        index: 0,
-        idPrefix: 'test',
-        questionText: 'Test Question',
-        answerText: 'Test Answer',
-        isExpanded: true,
-        autoFocus: false,
-        canDelete: true,
-        onQuestionChange: jest.fn(),
-        onAnswerChange: jest.fn(),
-        onDelete: jest.fn(),
-        onExpandToggle: jest.fn(),
-    };
-
     beforeEach(() => {
         jest.clearAllMocks();
     });
 
-    it('renders correctly', () => {
+    it('renders closed card correctly', () => {
         render(<EditableFaqCard {...defaultProps} />);
 
-        expect(screen.getByTestId('test-faq-question-0')).toHaveValue('Test Question');
-        expect(screen.getByTestId('test-faq-answer-0')).toHaveValue('Test Answer');
-        expect(screen.getByTestId('delete-icon')).toBeInTheDocument();
+        expect(screen.getByLabelText('Delete question')).toBeInTheDocument();
+        expect(screen.getByDisplayValue('Test Question')).toBeInTheDocument();
+        expect(screen.queryByDisplayValue('Test Answer')).not.toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Expand answer' })).toBeInTheDocument();
     });
 
-    it('does not render delete button when canDelete is false', () => {
-        render(<EditableFaqCard {...defaultProps} canDelete={false} />);
-        expect(screen.queryByTestId('delete-icon')).not.toBeInTheDocument();
-    });
+    it('renders expanded card correctly', () => {
+        render(<EditableFaqCard {...defaultProps} isExpanded={true} />);
 
-    it('does not render answer field when isExpanded is false', () => {
-        render(<EditableFaqCard {...defaultProps} isExpanded={false} />);
-        expect(screen.queryByTestId('test-faq-answer-0')).not.toBeInTheDocument();
+        expect(screen.getByDisplayValue('Test Answer')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Collapse answer' })).toBeInTheDocument();
     });
 
     it('calls onExpandToggle when expand button is clicked', () => {
-        render(<EditableFaqCard {...defaultProps} isExpanded={false} />);
-        const button = screen.getByLabelText('Expand answer');
-        fireEvent.click(button);
-        expect(defaultProps.onExpandToggle).toHaveBeenCalledWith(0);
+        render(<EditableFaqCard {...defaultProps} />);
+
+        const expandButton = screen.getByRole('button', { name: 'Expand answer' });
+        fireEvent.click(expandButton);
+
+        expect(mockOnExpandToggle).toHaveBeenCalledWith(0);
     });
 
     it('calls onQuestionChange when question is modified', () => {
         render(<EditableFaqCard {...defaultProps} />);
-        const textarea = screen.getByTestId('test-faq-question-0');
-        fireEvent.change(textarea, { target: { value: 'New Question' } });
-        expect(defaultProps.onQuestionChange).toHaveBeenCalledWith(0, 'New Question');
+
+        const questionInput = screen.getByDisplayValue('Test Question');
+        fireEvent.change(questionInput, { target: { value: 'New Question' } });
+
+        expect(mockOnQuestionChange).toHaveBeenCalledWith(0, 'New Question');
     });
 
     it('calls onAnswerChange when answer is modified', () => {
+        render(<EditableFaqCard {...defaultProps} isExpanded={true} />);
+
+        const answerInput = screen.getByDisplayValue('Test Answer');
+        fireEvent.change(answerInput, { target: { value: 'New Answer' } });
+
+        expect(mockOnAnswerChange).toHaveBeenCalledWith(0, 'New Answer');
+    });
+
+    it('shows delete modal and handles cancel', () => {
         render(<EditableFaqCard {...defaultProps} />);
-        const textarea = screen.getByTestId('test-faq-answer-0');
-        fireEvent.change(textarea, { target: { value: 'New Answer' } });
-        expect(defaultProps.onAnswerChange).toHaveBeenCalledWith(0, 'New Answer');
-    });
 
-    it('validates question on blur', async () => {
-        render(<EditableFaqCard {...defaultProps} questionText="" />);
-        const textarea = screen.getByTestId('test-faq-question-0');
-        fireEvent.blur(textarea);
-        expect(PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateFaqQuestion).toHaveBeenCalled();
-    });
-
-    it('validates answer on blur', async () => {
-        render(<EditableFaqCard {...defaultProps} answerText="" />);
-        const textarea = screen.getByTestId('test-faq-answer-0');
-        fireEvent.blur(textarea);
-        expect(PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateFaqAnswer).toHaveBeenCalled();
-    });
-
-    it('opens delete modal when delete button is clicked', () => {
-        render(<EditableFaqCard {...defaultProps} />);
-        const deleteBtn = screen.getByLabelText('Delete question');
-        fireEvent.click(deleteBtn);
-        expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
-    });
-
-    it('calls onDelete when delete is confirmed', () => {
-        render(<EditableFaqCard {...defaultProps} />);
         const deleteBtn = screen.getByLabelText('Delete question');
         fireEvent.click(deleteBtn);
 
-        const confirmBtn = screen.getByTestId('confirm-delete-btn');
-        fireEvent.click(confirmBtn);
+        expect(
+            screen.getByText(
+                SECTIONS_TEXT.SECTION.SINGLE_TITLE_QUESTION_ANSWER_PAIRS.MODAL.DELETE_QUESTION_CONFIRMATION,
+            ),
+        ).toBeInTheDocument();
 
-        expect(defaultProps.onDelete).toHaveBeenCalledWith(0);
-        expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
-    });
-
-    it('closes delete modal when cancel is clicked', () => {
-        render(<EditableFaqCard {...defaultProps} />);
-        const deleteBtn = screen.getByLabelText('Delete question');
-        fireEvent.click(deleteBtn);
-
-        const cancelBtn = screen.getByTestId('cancel-delete-btn');
+        const cancelBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.NO });
         fireEvent.click(cancelBtn);
 
-        expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
+        expect(
+            screen.queryByText(
+                SECTIONS_TEXT.SECTION.SINGLE_TITLE_QUESTION_ANSWER_PAIRS.MODAL.DELETE_QUESTION_CONFIRMATION,
+            ),
+        ).not.toBeInTheDocument();
+        expect(mockOnDelete).not.toHaveBeenCalled();
     });
 
-    it('focuses textarea on mount if autoFocus is true', () => {
+    it('shows delete modal and handles confirm', () => {
+        render(<EditableFaqCard {...defaultProps} />);
+
+        const deleteBtn = screen.getByLabelText('Delete question');
+        fireEvent.click(deleteBtn);
+
+        const confirmBtn = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES });
+        fireEvent.click(confirmBtn);
+
+        expect(mockOnDelete).toHaveBeenCalledWith(0);
+    });
+
+    it('validates question on blur', () => {
+        render(<EditableFaqCard {...defaultProps} questionText="" />);
+
+        const questionInput = screen.getAllByRole('textbox')[0];
+        fireEvent.blur(questionInput);
+
+        expect(screen.getByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED)).toBeInTheDocument();
+    });
+
+    it('validates answer on blur', () => {
+        render(<EditableFaqCard {...defaultProps} answerText="" isExpanded={true} />);
+
+        const answerInput = screen.getAllByRole('textbox')[1];
+        fireEvent.blur(answerInput);
+
+        expect(screen.getByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED)).toBeInTheDocument();
+    });
+
+    it('focuses question text area on mount if autoFocus is true', () => {
         render(<EditableFaqCard {...defaultProps} autoFocus={true} />);
-        const textarea = screen.getByTestId('test-faq-question-0');
-        expect(textarea).toHaveFocus();
+        const questionInput = screen.getAllByRole('textbox')[0];
+        expect(questionInput).toHaveFocus();
+    });
+
+    it('does not render delete button if canDelete is false', () => {
+        render(<EditableFaqCard {...defaultProps} canDelete={false} />);
+        expect(screen.queryByLabelText('Delete question')).not.toBeInTheDocument();
     });
 });

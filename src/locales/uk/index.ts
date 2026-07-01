@@ -11,6 +11,7 @@ import reportsPageUk from './reports.json';
 import partnersPageUk from './partners.json';
 import successPageUk from './success.json';
 import contactUsPageUk from './contact-us.json';
+import mainPageUk from './main-page.json';
 import historyPageUk from './history.json';
 
 export {
@@ -27,5 +28,6 @@ export {
     successPageUk,
     globalUk,
     contactUsPageUk,
+    mainPageUk,
     historyPageUk,
 };

@@ -261,6 +261,7 @@ export interface MainPageLocalizationDto extends BaseMainPageLocalizationDto {
 // POST DTOs
 
 export interface CreateMetricLocalizationDto {
+    entityId?: number;
     languageId?: number;
     name?: string;
     value?: string | null;
@@ -336,6 +337,7 @@ export interface CreateMainPageLocalizationDto extends BaseMainPageLocalizationD
 // PUT DTOs
 
 export interface UpdateMetricLocalizationDto {
+    entityId?: number;
     languageId?: number;
     name?: string;
     value?: string | null;
@@ -397,7 +399,7 @@ export interface UpdateImpactStatisticDto {
     title: string;
     imageId?: number | null;
     metrics: UpdateMetricDto[];
-    localizations?: UpdateImpactStatisticLocalizationDto[];
+    localization?: UpdateImpactStatisticLocalizationDto;
 }
 
 export interface UpdateMainAboutUsDto {

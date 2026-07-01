@@ -63,6 +63,11 @@ describe('reports-media-settings-schema', () => {
                 const result = REPORTS_COLLECTED_FUNDS_VALIDATION_FUNCTIONS.validateTitle('Valid   title   text');
                 expect(result).toBeUndefined();
             });
+
+            it('should handle non-string values gracefully', () => {
+                const result = REPORTS_COLLECTED_FUNDS_VALIDATION_FUNCTIONS.validateTitle(null as any);
+                expect(result).toBe(REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION.title.getRequiredError());
+            });
         });
     });
 
@@ -118,6 +123,11 @@ describe('reports-media-settings-schema', () => {
             it('should normalize consecutive spaces and validate successfully', () => {
                 const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateTitle('Valid   title   text');
                 expect(result).toBeUndefined();
+            });
+
+            it('should handle non-string values gracefully', () => {
+                const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateTitle(null as any);
+                expect(result).toBe(REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.title.getRequiredError());
             });
         });
 

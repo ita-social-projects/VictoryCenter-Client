@@ -42,7 +42,6 @@ export const ProgramExpensesSection = ({
     const { addToast } = useToast();
     const [selectedProgramIds, setSelectedProgramIds] = useState<number[]>([]);
     const [isAddProgramExpenseModalOpen, setIsAddProgramExpenseModalOpen] = useState(false);
-    const [recordToEdit, setRecordToEdit] = useState<ProgramExpensesRecord | null>(null);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [recordToDelete, setRecordToDelete] = useState<ProgramExpensesRecord | null>(null);
     const [isDeletingRecord, setIsDeletingRecord] = useState(false);
@@ -92,7 +91,6 @@ export const ProgramExpensesSection = ({
         if (!isEditing) {
             setIsAddProgramExpenseModalOpen(false);
             setSelectedRecordIds([]);
-            setRecordToEdit(null);
         }
     }, [isEditing]);
 
@@ -116,7 +114,6 @@ export const ProgramExpensesSection = ({
 
     const handleCloseAddProgramExpenseModal = useCallback(() => {
         setIsAddProgramExpenseModalOpen(false);
-        setRecordToEdit(null);
     }, []);
 
     const handleRecordSave = useCallback(
@@ -171,16 +168,10 @@ export const ProgramExpensesSection = ({
                     amountUsd,
                 };
 
-                if (recordToEdit) {
-                    await ProgramExpensesApi.update(adminClient, recordToEdit.id, payload);
-                    addToast(REPORTS_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY, ToastType.Success);
-                } else {
-                    await ProgramExpensesApi.post(adminClient, payload);
-                    addToast(PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_CREATED_SUCCESSFULLY, ToastType.Success);
-                }
+                await ProgramExpensesApi.post(adminClient, payload);
+                addToast(PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_CREATED_SUCCESSFULLY, ToastType.Success);
 
                 setIsAddProgramExpenseModalOpen(false);
-                setRecordToEdit(null);
 
                 try {
                     await refetchReadOnlyData(true);
@@ -190,15 +181,11 @@ export const ProgramExpensesSection = ({
 
                 return true;
             } catch {
-                if (recordToEdit) {
-                    addToast(REPORTS_TEXT.MESSAGE.RECORD_UPDATE_FAILED_RETRY, ToastType.Error);
-                } else {
-                    addToast(PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_CREATE_FAILED_RETRY, ToastType.Error);
-                }
+                addToast(PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_CREATE_FAILED_RETRY, ToastType.Error);
                 return false;
             }
         },
-        [adminClient, refetchReadOnlyData, addToast, recordToEdit],
+        [adminClient, refetchReadOnlyData, addToast],
     );
 
     const handleDeleteClick = useCallback((record: ProgramExpensesRecord) => {
@@ -327,7 +314,6 @@ export const ProgramExpensesSection = ({
                 exchangeRate={exchangeRate}
                 onClose={handleCloseAddProgramExpenseModal}
                 onSubmit={handleSubmitAddProgramExpense}
-                recordToEdit={recordToEdit}
             />
 
             <DeleteRecordModal

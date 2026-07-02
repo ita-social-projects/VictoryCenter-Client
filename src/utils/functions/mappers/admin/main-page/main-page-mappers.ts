@@ -12,6 +12,7 @@ import {
 } from '@/utils/functions/mappers/common/localization/localization-mappers';
 
 const DEFAULT_ENGLISH_LANGUAGE_ID = 2;
+const DEFAULT_UKRAINIAN_LANGUAGE_ID = 1;
 
 const findLocalizationByCode = <TLocalization>(
     localizations: TLocalization[] | undefined,
@@ -54,10 +55,10 @@ export function mapMainPageToFormValues(page: MainPage, languages?: Localization
         aboutUsDescriptionEn: aboutUsEnLoc?.description ?? '',
 
         // Donations Block
-        donationsTitleUa: page.mainDonations?.title ?? '',
-        donationsTitleEn: donationsEnLoc?.title ?? page.mainDonations?.title ?? '',
-        donationsDescriptionUa: page.mainDonations?.description ?? '',
-        donationsDescriptionEn: donationsEnLoc?.description ?? page.mainDonations?.description ?? '',
+        donationsTitleUa: page.mainDonations?.title ?? donationsUkLoc?.title ?? '',
+        donationsTitleEn: donationsEnLoc?.title ?? '',
+        donationsDescriptionUa: page.mainDonations?.description ?? donationsUkLoc?.description ?? '',
+        donationsDescriptionEn: donationsEnLoc?.description ?? '',
         donationsImage: page.mainDonations?.image ?? null,
         // Partners Block
         partnersTitleUa: page.mainPartners?.title ?? partnersUkLoc?.title ?? '',
@@ -82,6 +83,8 @@ export function mapFormValuesToMainPagePatch(
 ): UpdateMainPageDto {
     const enLanguageId =
         getLanguageIdByCode(languages, 'en') ?? (!languages?.length ? DEFAULT_ENGLISH_LANGUAGE_ID : null);
+    const ukLanguageId =
+        getLanguageIdByCode(languages, 'uk') ?? (!languages?.length ? DEFAULT_UKRAINIAN_LANGUAGE_ID : null);
 
     if (enLanguageId == null) {
         throw new Error('Could not resolve English language ID. Check languages configuration.');
@@ -96,7 +99,6 @@ export function mapFormValuesToMainPagePatch(
     // About Us Block
     const aboutTitleUk = str(formValues.aboutUsTitleUa);
     const aboutDescUk = str(formValues.aboutUsDescriptionUa);
-    const aboutDescEn = str(formValues.aboutUsDescriptionEn);
 
     // Donations Block
     const donationsTitleUk = str(formValues.donationsTitleUa);
@@ -128,11 +130,11 @@ export function mapFormValuesToMainPagePatch(
             isAutoSynced: m.isAutoSynced,
             localization: enLoc
                 ? {
-                    ...(m.id ? { entityId: m.id } : {}),
-                    languageId: enLanguageId,
-                    name: enLoc.name,
-                    value: enLoc.value ?? String(m.value),
-                }
+                      ...(m.id ? { entityId: m.id } : {}),
+                      languageId: enLanguageId,
+                      name: enLoc.name,
+                      value: enLoc.value ?? String(m.value),
+                  }
                 : undefined,
         } as UpdateMetricDto;
     });
@@ -145,27 +147,6 @@ export function mapFormValuesToMainPagePatch(
         mainAboutUs: {
             title: aboutTitleUk,
             description: aboutDescUk,
-        },
-
-        mainDonations: {
-            title: donationsTitleUk,
-            description: donationsDescUk,
-            imageId:
-                formValues.donationsImage && 'id' in formValues.donationsImage
-                    ? (formValues.donationsImage.id as number)
-                    : null,
-            localizations: [
-                {
-                    ...(ukLanguageId ? { languageId: ukLanguageId } : {}),
-                    title: donationsTitleUk,
-                    description: donationsDescUk,
-                },
-                {
-                    ...(enLanguageId ? { languageId: enLanguageId } : {}),
-                    title: donationsTitleEn || donationsTitleUk,
-                    description: donationsDescEn || donationsDescUk,
-                },
-            ],
         },
 
         mainDonations: {
@@ -204,9 +185,9 @@ export function mapFormValuesToMainPagePatch(
             metrics: safeMetricsPayload,
             localization: statTitleEn
                 ? {
-                    languageId: enLanguageId,
-                    title: statTitleEn,
-                }
+                      languageId: enLanguageId,
+                      title: statTitleEn,
+                  }
                 : undefined,
         },
     };

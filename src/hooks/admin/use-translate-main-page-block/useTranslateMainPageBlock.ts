@@ -130,7 +130,9 @@ const resolveNestedValues = (
             ? currentLocalization?.mainAboutUs
             : targetBlock === MainPageLocalizationBlock.Donations
               ? currentLocalization?.mainDonations
-              : currentLocalization?.mainPartners;
+              : targetBlock === MainPageLocalizationBlock.Partners
+                ? currentLocalization?.mainPartners
+                : null;
     const existingValues = getExistingBlockValues(page, targetBlock, language);
 
     if (!nestedLocalization && !existingValues) {

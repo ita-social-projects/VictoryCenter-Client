@@ -269,9 +269,8 @@ export const MainPageContent = () => {
                     descriptionEn: localization.description ?? baseValues.descriptionEn,
                     aboutUsTitleEn: localization.mainAboutUs?.title ?? baseValues.aboutUsTitleEn,
                     aboutUsDescriptionEn: localization.mainAboutUs?.description ?? baseValues.aboutUsDescriptionEn,
-                    donationsTitleEn: localization.mainDonations?.title ?? originalData.mainDonations?.title ?? '',
-                    donationsDescriptionEn:
-                        localization.mainDonations?.description ?? originalData.mainDonations?.description ?? '',
+                    donationsTitleEn: localization.mainDonations?.title ?? baseValues.donationsTitleEn,
+                    donationsDescriptionEn: localization.mainDonations?.description ?? baseValues.donationsDescriptionEn,
                     partnersTitleEn: localization.mainPartners?.title ?? baseValues.partnersTitleEn,
                     partnersDescriptionEn: localization.mainPartners?.description ?? baseValues.partnersDescriptionEn,
                 });

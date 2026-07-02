@@ -120,12 +120,6 @@ describe('main-page-mappers', () => {
                 donationsDescriptionEn: 'EN Donations Desc',
                 donationsImage: { id: 15, url: 'img-donations.png' },
 
-                donationsTitleUa: 'UA Donations',
-                donationsTitleEn: 'EN Donations',
-                donationsDescriptionUa: 'UA Donations Desc',
-                donationsDescriptionEn: 'EN Donations Desc',
-                donationsImage: { id: 15, url: 'img-donations.png' },
-
                 partnersTitleUa: 'Base Partners',
                 partnersTitleEn: 'EN Partners',
                 partnersDescriptionUa: 'Base Partners Desc',
@@ -149,6 +143,13 @@ describe('main-page-mappers', () => {
                     description: null,
                     localizations: [{ languageId: 1, title: 'UK Loc About', description: 'UK Loc About Desc' } as any],
                 } as any,
+                mainDonations: {
+                    title: null,
+                    description: null,
+                    localizations: [
+                        { languageId: 1, title: 'UK Loc Donations', description: 'UK Loc Donations Desc' } as any,
+                    ],
+                } as any,
                 mainPartners: {
                     title: null,
                     description: null,
@@ -169,6 +170,8 @@ describe('main-page-mappers', () => {
             expect(result.titleEn).toBe('');
             expect(result.aboutUsTitleUa).toBe('UK Loc About');
             expect(result.aboutUsTitleEn).toBe('');
+            expect(result.donationsTitleUa).toBe('UK Loc Donations');
+            expect(result.donationsTitleEn).toBe('');
             expect(result.partnersTitleUa).toBe('UK Loc Partners');
             expect(result.partnersTitleEn).toBe('');
             expect(result.statisticsTitleUa).toBe('UK Loc Stats');
@@ -334,21 +337,21 @@ describe('main-page-mappers', () => {
             const currentMetrics: MainPage['impactStatistics'] extends null | undefined
                 ? never
                 : NonNullable<MainPage['impactStatistics']>['metrics'] = [
-                    {
-                        id: 4,
-                        value: 1200,
-                        name: 'Години терапії',
-                        type: MetricType.TherapyHours,
-                        prefix: MetricPrefix.Plus,
-                        isAutoSynced: false,
-                        isHidden: false,
-                        priority: 1,
-                        localizations: [
-                            { languageId: 1, entityId: 4, name: 'UK loc should not be base', value: '1200+' } as any,
-                            { languageId: 2, entityId: 4, name: 'Therapy hours', value: '1200+' } as any,
-                        ],
-                    },
-                ];
+                {
+                    id: 4,
+                    value: 1200,
+                    name: 'Години терапії',
+                    type: MetricType.TherapyHours,
+                    prefix: MetricPrefix.Plus,
+                    isAutoSynced: false,
+                    isHidden: false,
+                    priority: 1,
+                    localizations: [
+                        { languageId: 1, entityId: 4, name: 'UK loc should not be base', value: '1200+' } as any,
+                        { languageId: 2, entityId: 4, name: 'Therapy hours', value: '1200+' } as any,
+                    ],
+                },
+            ];
 
             const patch = mapFormValuesToMainPagePatch(
                 formValues,

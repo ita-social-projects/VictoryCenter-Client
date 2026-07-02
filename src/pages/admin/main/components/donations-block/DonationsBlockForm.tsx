@@ -33,25 +33,49 @@ interface DonationsBlockFormProps {
     isReadOnly?: boolean;
 }
 
+const useDonationsFormState = () => {
+    const context = useFormContext<MainPageFormValues>();
+    const [imgError, setImgError] = useState<string | null>(null);
+
+    return {
+        formControl: context.control,
+        formErrors: context.formState.errors,
+        imgError,
+        setImgError,
+    };
+};
+
 export const DonationsBlockForm = ({ isPublishDisabled, onPublish, isReadOnly = false }: DonationsBlockFormProps) => {
-    const [imageError, setImageError] = useState<string | null>(null);
+    const { formControl, formErrors, imgError, setImgError } = useDonationsFormState();
 
-    const {
-        control,
-        formState: { errors },
-    } = useFormContext<MainPageFormValues>();
+    const titleField = isReadOnly ? 'donationsTitleEn' : 'donationsTitleUa';
+    const descriptionField = isReadOnly ? 'donationsDescriptionEn' : 'donationsDescriptionUa';
 
-    const titleName = isReadOnly ? 'donationsTitleEn' : 'donationsTitleUa';
-    const descriptionName = isReadOnly ? 'donationsDescriptionEn' : 'donationsDescriptionUa';
+    const renderActions = () => {
+        if (isReadOnly) return null;
+        return (
+            <div className={styles.actions}>
+                <Button
+                    type="button"
+                    buttonStyle="primary"
+                    disabled={isPublishDisabled || !!imgError}
+                    className={styles['publish-button']}
+                    onClick={onPublish}
+                >
+                    {MAIN_PAGE_TEXT.BUTTONS.PUBLISH}
+                </Button>
+            </div>
+        );
+    };
 
     return (
         <div className={styles.form}>
             <div className={styles.content}>
                 <ImageUploadForm
-                    control={control as any}
-                    errors={errors}
-                    imageError={imageError}
-                    setImageError={setImageError}
+                    control={formControl as any}
+                    errors={formErrors}
+                    imageError={imgError}
+                    setImageError={setImgError}
                     imageConfig={IMAGE_CONFIG}
                     variant="whoWeAre"
                     name="donationsImage"
@@ -60,8 +84,8 @@ export const DonationsBlockForm = ({ isPublishDisabled, onPublish, isReadOnly = 
 
                 <div className={styles['text-section']}>
                     <Controller
-                        name={titleName}
-                        control={control}
+                        name={titleField}
+                        control={formControl}
                         render={({ field: { onChange, value, onBlur } }) => (
                             <RichTextInputGroup
                                 id="donations-block-title"
@@ -70,7 +94,7 @@ export const DonationsBlockForm = ({ isPublishDisabled, onPublish, isReadOnly = 
                                 value={value}
                                 onChange={onChange}
                                 onBlur={onBlur}
-                                error={isReadOnly ? undefined : errors.donationsTitleUa?.message}
+                                error={isReadOnly ? undefined : formErrors.donationsTitleUa?.message}
                                 maxLength={MAIN_PAGE_VALIDATION.donationsBlock.title.max}
                                 isRequired={true}
                                 disabled={isReadOnly}
@@ -79,8 +103,8 @@ export const DonationsBlockForm = ({ isPublishDisabled, onPublish, isReadOnly = 
                     />
 
                     <Controller
-                        name={descriptionName}
-                        control={control}
+                        name={descriptionField}
+                        control={formControl}
                         render={({ field: { onChange, value, onBlur } }) => (
                             <RichTextInputGroup
                                 id="donations-block-description"
@@ -89,7 +113,7 @@ export const DonationsBlockForm = ({ isPublishDisabled, onPublish, isReadOnly = 
                                 value={value}
                                 onChange={onChange}
                                 onBlur={onBlur}
-                                error={isReadOnly ? undefined : errors.donationsDescriptionUa?.message}
+                                error={isReadOnly ? undefined : formErrors.donationsDescriptionUa?.message}
                                 maxLength={MAIN_PAGE_VALIDATION.donationsBlock.description.max}
                                 isRequired={true}
                                 className={styles['rich-text-custom']}
@@ -100,19 +124,7 @@ export const DonationsBlockForm = ({ isPublishDisabled, onPublish, isReadOnly = 
                 </div>
             </div>
 
-            {!isReadOnly && (
-                <div className={styles.actions}>
-                    <Button
-                        type="button"
-                        buttonStyle="primary"
-                        disabled={isPublishDisabled || !!imageError}
-                        className={styles['publish-button']}
-                        onClick={onPublish}
-                    >
-                        {MAIN_PAGE_TEXT.BUTTONS.PUBLISH}
-                    </Button>
-                </div>
-            )}
+            {renderActions()}
         </div>
     );
 };

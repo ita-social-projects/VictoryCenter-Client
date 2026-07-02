@@ -270,7 +270,8 @@ export const MainPageContent = () => {
                     aboutUsTitleEn: localization.mainAboutUs?.title ?? baseValues.aboutUsTitleEn,
                     aboutUsDescriptionEn: localization.mainAboutUs?.description ?? baseValues.aboutUsDescriptionEn,
                     donationsTitleEn: localization.mainDonations?.title ?? baseValues.donationsTitleEn,
-                    donationsDescriptionEn: localization.mainDonations?.description ?? baseValues.donationsDescriptionEn,
+                    donationsDescriptionEn:
+                        localization.mainDonations?.description ?? baseValues.donationsDescriptionEn,
                     partnersTitleEn: localization.mainPartners?.title ?? baseValues.partnersTitleEn,
                     partnersDescriptionEn: localization.mainPartners?.description ?? baseValues.partnersDescriptionEn,
                 });
@@ -451,9 +452,9 @@ export const MainPageContent = () => {
                 return translationStatus == null
                     ? null
                     : {
-                        languageId: language.id,
-                        translationStatus,
-                    };
+                          languageId: language.id,
+                          translationStatus,
+                      };
             })
             .filter((status): status is NonNullable<typeof status> => status != null);
 

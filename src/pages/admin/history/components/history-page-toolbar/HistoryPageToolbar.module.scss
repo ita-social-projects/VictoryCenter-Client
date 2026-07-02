@@ -2,10 +2,35 @@
 
 .history-page-toolbar {
     display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding-bottom: 30px;
+    border-bottom: 1px solid c.$grey-700;
+}
+
+.toolbar-controls {
+    display: flex;
     justify-content: flex-end;
     align-items: center;
     gap: 20px;
     width: 100%;
-    padding-bottom: 80px;
-    border-bottom: 1px solid c.$grey-700;
+}
+
+.actions-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.translate-icon-row {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    margin-top: 30px;
+}
+
+.translate-btn {
+    width: 24px;
+    height: 24px;
+    border: none;
 }

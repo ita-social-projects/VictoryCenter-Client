@@ -71,8 +71,14 @@
             fill: colors.$blue-500;
         }
 
-        &--error svg path {
-            fill: colors.$error;
+        &--error {
+            svg path {
+                fill: colors.$error;
+            }
+
+            &:hover svg path {
+                fill: colors.$error;
+            }
         }
 
         &--hidden {

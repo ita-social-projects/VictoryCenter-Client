@@ -4,6 +4,7 @@ import {
     EntityLocalizationDto,
     EntityWithDtoLocalizations,
     EntityWithLocalizations,
+    TranslationStatus,
 } from './language';
 import { ContentType } from './section-contents';
 import { SectionTemplate } from './sections';
@@ -60,16 +61,32 @@ export interface HistorySectionContentLocalizationDto
 export interface HistorySectionContentLocalization extends EntityLocalization, HistorySectionContentLocalizableFields {}
 
 export interface CreateUpdateHistorySectionDto {
+    id?: number;
     template: SectionTemplate;
     order: number;
     contents: CreateHistorySectionContentDto[];
 }
 
 export interface CreateHistorySectionContentDto {
+    id?: number;
     contentType: ContentType;
     order: number;
     title?: string | null;
     description?: string | null;
     image?: Image | ImageValues | null;
     imageId?: number | null;
+}
+
+export interface CreateHistorySectionContentLocalizationDto {
+    entityId: number;
+    languageId: number;
+    title?: string | null;
+    description?: string | null;
+    translationStatus?: TranslationStatus;
+}
+
+export interface CreateHistorySectionLocalizationDto {
+    entityId: number;
+    languageId: number;
+    contents: CreateHistorySectionContentLocalizationDto[];
 }

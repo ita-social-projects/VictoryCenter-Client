@@ -56,4 +56,46 @@ describe('useGetLocalization (uk default)', () => {
             description: 'English description',
         });
     });
+
+    it('повертає fallback (uk), якщо мова en, але переклад відсутній', () => {
+        mockUseLocale.mockReturnValue({ currentLanguage: 'en' });
+
+        const { result } = renderHook(() => useGetLocalization([], fallbackUk));
+
+        expect(result.current).toEqual({
+            fullName: 'Оригінальне імʼя',
+            description: 'Оригінальний опис',
+        });
+    });
+
+    it('повертає fallback (uk), якщо localizations є undefined', () => {
+        mockUseLocale.mockReturnValue({ currentLanguage: 'en' });
+
+        const { result } = renderHook(() => useGetLocalization(undefined, fallbackUk));
+
+        expect(result.current).toEqual({
+            fullName: 'Оригінальне імʼя',
+            description: 'Оригінальний опис',
+        });
+    });
+
+    it('повертає fallback (uk) коли localizations містять лише uk запис і мова en', () => {
+        mockUseLocale.mockReturnValue({ currentLanguage: 'en' });
+
+        const ukOnlyLocalizations: Localized<Fields>[] = [
+            {
+                language: { id: 2, code: 'uk' },
+                translationStatus: TranslationStatus.Relevant,
+                fullName: 'Українське імʼя',
+                description: 'Український опис',
+            },
+        ];
+
+        const { result } = renderHook(() => useGetLocalization(ukOnlyLocalizations, fallbackUk));
+
+        expect(result.current).toEqual({
+            fullName: 'Оригінальне імʼя',
+            description: 'Оригінальний опис',
+        });
+    });
 });

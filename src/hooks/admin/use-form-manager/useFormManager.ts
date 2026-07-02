@@ -8,6 +8,9 @@ export interface FormManagerRef<TFormValues = any> {
     getValues: () => TFormValues;
 }
 
+type FormManagerExternalRef<TFormValues = any> = Pick<FormManagerRef<TFormValues>, 'submit' | 'isValid' | 'isDirty'> &
+    Partial<Pick<FormManagerRef<TFormValues>, 'getValues'>>;
+
 export interface UseFormManagerProps<TFormValues, TFormErrors> {
     defaultFormState: TFormValues;
     initialData?: TFormValues | null;
@@ -15,7 +18,7 @@ export interface UseFormManagerProps<TFormValues, TFormErrors> {
     onSubmit: (data: TFormValues, status: VisibilityStatus) => Promise<void> | void;
     onValidationChange?: (isValid: boolean) => void;
     isEqual?: (currentValues: TFormValues, initialValues: TFormValues) => boolean;
-    ref?: React.Ref<FormManagerRef<TFormValues>>;
+    ref?: React.Ref<FormManagerExternalRef<TFormValues>>;
 }
 
 export interface UseFormManagerReturn<TFormValues, TFormErrors> {

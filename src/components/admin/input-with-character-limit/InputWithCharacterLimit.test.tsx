@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, createEvent } from '@testing-library/react';
+import { act, render, screen, fireEvent, createEvent } from '@testing-library/react';
 import { InputWithCharacterLimit, InputWithCharacterLimitProps } from './InputWithCharacterLimit';
 
 describe('InputWithCharacterLimit', () => {
@@ -199,5 +199,34 @@ describe('InputWithCharacterLimit', () => {
     it('sets aria-invalid on textarea when rows provided and length exceeds maxLength', () => {
         renderInputWithCharacterLimit({ rows: 3, value: 'abcd', maxLength: 3 });
         expect(screen.getByRole('textbox')).toHaveAttribute('aria-invalid', 'true');
+    });
+
+    it('resets localValue to the value prop via microtask when parent onChange does not update state', async () => {
+        const cappedValue = '100,12';
+        const onChange = jest.fn();
+
+        render(
+            <InputWithCharacterLimit
+                value={cappedValue}
+                onChange={onChange}
+                name="amountUah"
+                id="amount-uah"
+                maxLength={20}
+                showCounter={false}
+            />,
+        );
+
+        const input = screen.getByRole('textbox') as HTMLInputElement;
+        expect(input.value).toBe(cappedValue);
+
+        fireEvent.change(input, { target: { value: '100,123' } });
+
+        expect(input.value).toBe('100,123');
+
+        await act(async () => {
+            await Promise.resolve();
+        });
+
+        expect(input.value).toBe(cappedValue);
     });
 });

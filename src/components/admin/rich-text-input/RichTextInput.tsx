@@ -16,6 +16,7 @@ import {
     ToolbarPlugin,
     InitialValuePlugin,
     EnterKeyPlugin,
+    EditablePlugin,
 } from './plugins';
 
 export interface RichTextInputProps {
@@ -109,6 +110,8 @@ export const RichTextInput = ({
                                 id={id}
                                 className={cn(styles.field, className)}
                                 aria-label="Rich text editor"
+                                aria-disabled={disabled}
+                                tabIndex={disabled ? -1 : undefined}
                             />
                         }
                         placeholder={<div className={styles.placeholder}>{placeholder}</div>}
@@ -120,6 +123,7 @@ export const RichTextInput = ({
                 <MaxLengthPlugin maxLength={maxLength} onLengthChange={handleLengthChange} />
                 <FocusPlugin onFocus={onFocus} onBlur={onBlur} onFocusChange={handleFocusChange} />
                 <InitialValuePlugin value={value} />
+                <EditablePlugin disabled={disabled} />
                 <EnterKeyPlugin />
             </LexicalComposer>
             <div className={styles.footer}>

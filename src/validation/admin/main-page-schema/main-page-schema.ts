@@ -1,6 +1,8 @@
 import { MAIN_PAGE_VALIDATION } from '@/const/admin/main-page';
 import { MainPageFormValues } from '@/types/admin/main-page';
 import { Image, ImageValues } from '@/types/common/image';
+import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
+import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
 import * as Yup from 'yup';
 
 const buildStringValidation = (config: {
@@ -11,24 +13,17 @@ const buildStringValidation = (config: {
 }) => {
     return Yup.string()
         .required(MAIN_PAGE_VALIDATION.common.REQUIRED)
-        .test('min-length', config.getMinError(), function (value) {
-            if (!value || value === '<p><br></p>') return false;
-            const plainText = value
-                .replace(/<[^>]*>/g, '')
-                .replace(/&nbsp;/g, ' ')
-                .trim();
-            if (plainText.length === 0) {
-                return this.createError({ message: MAIN_PAGE_VALIDATION.common.REQUIRED });
-            }
-            return plainText.length >= config.min;
+        .test('required-plain-text', MAIN_PAGE_VALIDATION.common.REQUIRED, (value) => {
+            const normalizedValue = getNormalizedInputText(getPlainTextFromHtml(value ?? ''));
+            return normalizedValue.length > 0;
         })
-        .test('max-length', config.getMaxError(), (value) => {
-            if (!value) return true;
-            const plainText = value
-                .replace(/<[^>]*>/g, '')
-                .replace(/&nbsp;/g, ' ')
-                .trim();
-            return plainText.length <= config.max;
+        .test('min-plain-text', config.getMinError(), (value) => {
+            const normalizedValue = getNormalizedInputText(getPlainTextFromHtml(value ?? ''));
+            return normalizedValue.length === 0 || normalizedValue.length >= config.min;
+        })
+        .test('max-plain-text', config.getMaxError(), (value) => {
+            const normalizedValue = getNormalizedInputText(getPlainTextFromHtml(value ?? ''));
+            return normalizedValue.length <= config.max;
         });
 };
 

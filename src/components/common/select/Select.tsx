@@ -1,4 +1,4 @@
-import React, { RefObject, useState } from 'react';
+import React, { RefObject, useEffect, useState } from 'react';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ReactComponent as ArrowDown } from '@/assets/icons/chevron-down.svg';
 import { ReactComponent as ArrowUp } from '@/assets/icons/chevron-up.svg';
@@ -17,6 +17,7 @@ export type SelectProps<TValue> = {
     isAutocomplete?: boolean;
     icon?: React.ElementType<React.SVGProps<SVGSVGElement>>;
     openOnHover?: boolean;
+    disabled?: boolean;
 };
 
 export const Select = <TValue,>({
@@ -31,12 +32,19 @@ export const Select = <TValue,>({
     isAutocomplete = false,
     icon: Icon,
     openOnHover = false,
+    disabled = false,
 }: SelectProps<TValue>) => {
     const options = React.Children.toArray(children).filter((child) => {
         return React.isValidElement(child) && child.type === Select.Option;
     }) as React.ReactElement<SelectOptionProps<TValue>>[];
 
     const [isOpen, setIsOpen] = useState(false);
+
+    useEffect(() => {
+        if (disabled) {
+            setIsOpen(false);
+        }
+    }, [disabled]);
 
     const selectedOption = options.find((opt) => opt.props.value === value);
     const hasValue = value !== null && value !== undefined;
@@ -59,6 +67,7 @@ export const Select = <TValue,>({
     };
 
     const handleMouseEnter = () => {
+        if (disabled) return;
         if (openOnHover) setIsOpen(true);
     };
 
@@ -72,6 +81,7 @@ export const Select = <TValue,>({
             className={classNames('select', className, {
                 'select-opened': isOpen,
                 'select-closed': !isOpen,
+                'select-disabled': disabled,
             })}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
@@ -80,7 +90,9 @@ export const Select = <TValue,>({
                 type="button"
                 className={classNames('select-head', headClassName)}
                 onClick={handleOpenSelect}
+                disabled={disabled}
                 onKeyDown={(e) => {
+                    if (disabled) return;
                     if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
                         setIsOpen((prev) => !prev);
@@ -97,7 +109,7 @@ export const Select = <TValue,>({
                 </span>
                 {isOpen ? <ArrowUp /> : <ArrowDown />}
             </button>
-            {isOpen && (
+            {isOpen && !disabled && (
                 <div className={'select-options'}>
                     {options.map((opt, index) => {
                         const { name, value: optValue } = opt.props;
@@ -108,6 +120,7 @@ export const Select = <TValue,>({
                                     'select-options-selected': !isAutocomplete && value === optValue,
                                 })}
                                 onClick={(e) => handleOptionClick(e, optValue)}
+                                disabled={disabled}
                             >
                                 <span>{name}</span>
                             </button>

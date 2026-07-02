@@ -448,6 +448,39 @@ describe('Select Component', () => {
         fireEvent.click(screen.getByRole('button', { name: 'Option 1' }));
         expect(selectContainer).toHaveClass('select-closed');
     });
+
+    it('behaves correctly when disabled', () => {
+        const { container, rerender } = render(<Select {...defaultProps} disabled={true} />);
+        const selectContainer = container.firstChild as HTMLElement;
+        const selectButton = container.querySelector('.select-head') as HTMLElement;
+
+        expect(selectContainer).toHaveClass('select-disabled');
+        expect(selectButton).toBeDisabled();
+
+        fireEvent.click(selectButton);
+        expect(selectContainer).toHaveClass('select-closed');
+        expect(screen.queryByText('Option 1')).not.toBeInTheDocument();
+
+        fireEvent.keyDown(selectButton, { key: ' ', code: 'Space', charCode: 32 });
+        expect(selectContainer).toHaveClass('select-closed');
+
+        rerender(<Select {...defaultProps} disabled={true} openOnHover={true} />);
+        fireEvent.mouseEnter(selectContainer);
+        expect(selectContainer).toHaveClass('select-closed');
+    });
+
+    it('closes the dropdown automatically when disabled prop becomes true', () => {
+        const { container, rerender } = render(<Select {...defaultProps} disabled={false} />);
+        const selectContainer = container.firstChild as HTMLElement;
+        const selectButton = container.querySelector('.select-head') as HTMLElement;
+
+        fireEvent.click(selectButton);
+        expect(selectContainer).toHaveClass('select-opened');
+
+        rerender(<Select {...defaultProps} disabled={true} />);
+        expect(selectContainer).toHaveClass('select-closed');
+        expect(selectContainer).toHaveClass('select-disabled');
+    });
 });
 
 describe('Select Component (openOnHover coverage)', () => {

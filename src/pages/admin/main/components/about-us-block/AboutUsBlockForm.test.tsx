@@ -5,6 +5,16 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { AboutUsBlockForm } from './AboutUsBlockForm';
 
+jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
+    __esModule: true,
+    RichTextInputGroup: require('@/utils/test-mocks/main-page-mocks').MockRichTextInputGroup,
+}));
+
+jest.mock('@/components/admin/button/Button', () => ({
+    __esModule: true,
+    Button: require('@/utils/test-mocks/main-page-mocks').MockSubmitButton,
+}));
+
 const FormWrapper = ({
     children,
     defaultValues,

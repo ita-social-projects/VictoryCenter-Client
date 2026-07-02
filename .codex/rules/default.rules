@@ -1,0 +1,54 @@
+# Conservative project-local Codex command rules.
+# These rules affect commands requested outside the sandbox after the project
+# .codex layer is trusted.
+
+prefix_rule(
+    pattern = ["npm", "run", ["lint", "build", "test:cover"]],
+    decision = "prompt",
+    justification = "Project quality checks are useful but can be long-running.",
+    match = [
+        "npm run lint",
+        "npm run build",
+        "npm run test:cover",
+    ],
+)
+
+prefix_rule(
+    pattern = ["npm", "run", "lint:fix"],
+    decision = "prompt",
+    justification = "Auto-fix commands modify files and should be approved.",
+    match = [
+        "npm run lint:fix",
+    ],
+)
+
+prefix_rule(
+    pattern = ["npx", "craco", "test"],
+    decision = "prompt",
+    justification = "Targeted Jest runs are expected for touched code.",
+    match = [
+        "npx craco test --watchAll=false --forceExit",
+        "npx craco test --watchAll=false --forceExit --testPathPattern=ProgramForm",
+    ],
+)
+
+prefix_rule(
+    pattern = ["npx", "tsc"],
+    decision = "prompt",
+    justification = "TypeScript checks are useful verification for source changes.",
+    match = [
+        "npx tsc --noEmit",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", ["reset", "checkout", "clean"]],
+    decision = "forbidden",
+    justification = "Do not discard user work. Use git status and targeted edits instead.",
+    match = [
+        "git reset --hard",
+        "git checkout -- src/file.ts",
+        "git clean -fd",
+    ],
+)
+

@@ -1,7 +1,6 @@
 import DefaultPlaceholder from '@/assets/images/man-facing-horse-forehead.webp';
 import { Button } from '@/components/admin/button/Button';
-import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
-import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
+import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { MAIN_PAGE_TEXT, MAIN_PAGE_VALIDATION } from '@/const/admin/main-page';
 import { ImageUploadForm } from '@/pages/admin/main/components/common/image-upload-form/ImageUploadForm';
@@ -63,7 +62,7 @@ export const TitleBlockForm = ({ isPublishDisabled, onPublish, isReadOnly = fals
                         name={titleName}
                         control={control}
                         render={({ field: { onChange, value, onBlur } }) => (
-                            <InputWithCharacterLimitGroup
+                            <RichTextInputGroup
                                 id="title-block-title"
                                 name={COMMON_TEXT_ADMIN.TYPE.TITLE}
                                 label={MAIN_PAGE_TEXT.BLOCKS.TITLE.TITLE_LABEL}
@@ -82,7 +81,7 @@ export const TitleBlockForm = ({ isPublishDisabled, onPublish, isReadOnly = fals
                         name={descriptionName}
                         control={control}
                         render={({ field: { onChange, value, onBlur } }) => (
-                            <TextAreaWithCharacterLimitGroup
+                            <RichTextInputGroup
                                 id="title-block-description"
                                 name={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
                                 label={MAIN_PAGE_TEXT.BLOCKS.TITLE.DESCRIPTION_LABEL}
@@ -92,7 +91,7 @@ export const TitleBlockForm = ({ isPublishDisabled, onPublish, isReadOnly = fals
                                 error={isReadOnly ? undefined : errors.descriptionUa?.message}
                                 maxLength={MAIN_PAGE_VALIDATION.titleBlock.description.max}
                                 isRequired={true}
-                                className={styles['textarea-custom']}
+                                className={styles['rich-text-custom']}
                                 disabled={isReadOnly}
                             />
                         )}

@@ -19,8 +19,8 @@
     z-index: 2;
 
     svg {
-        width: 14px;
-        height: 14px;
+        width: 24px;
+        height: 24px;
     }
 
     svg :global(path) {
@@ -29,17 +29,17 @@
 }
 
 .left {
-    left: 0;
+    left: 20px;
 }
 
 .right {
-    right: 0;
+    right: 20px;
 }
 
 .template.left {
-    left: 24px;
+    left: 20px;
 }
 
 .template.right {
-    right: 24px;
+    right: 20px;
 }

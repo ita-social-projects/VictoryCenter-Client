@@ -14,7 +14,7 @@
     --pair-card-width: 432px;
     --pair-card-height: 259px;
 
-    --gap: 24px;
+    --gap: 16px;
     --peek: 0.55;
 
     --carousel-max-width: calc(
@@ -22,7 +22,7 @@
     );
 
     @media (min-width: 560px) {
-        padding: 64px 0px 64px 64px;
+        padding: 64px 0px 64px 0;
     }
 }
 
@@ -39,7 +39,7 @@
 }
 
 .editable {
-    padding: 64px clamp(16px, 3vw, 0px);
+    padding: 64px 0 64px 0;
     box-sizing: border-box;
 
     --pair-card-width: 432px;
@@ -47,7 +47,7 @@
 }
 
 .title-block {
-    margin-bottom: 24px;
+    margin-bottom: 18px;
 }
 
 .container:not(.editable) .title-block {
@@ -58,6 +58,7 @@
     @include type.h3-bold;
     color: c.$blue-900;
     text-transform: uppercase;
+    padding-left: 56px;
 }
 
 .template .title {
@@ -66,7 +67,7 @@
 
 .title-input-group {
     width: 721px;
-    margin-left: 50px;
+    margin-left: 56px;
     margin-bottom: 50px;
 
     :global(.char-limit-textarea) {

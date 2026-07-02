@@ -105,7 +105,6 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
                 ? parsedLineHeight * maxRows + paddingTop + paddingBottom + borderTop + borderBottom
                 : Infinity;
 
-            // Use requestAnimationFrame to ensure browser has calculated layout with word-wrap
             requestAnimationFrame(() => {
                 const finalTargetHeight = textarea.scrollHeight + borderTop + borderBottom;
                 textarea.style.height = `${Math.min(finalTargetHeight, maxHeight)}px`;

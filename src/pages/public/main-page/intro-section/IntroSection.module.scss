@@ -81,22 +81,18 @@
     @include type.h3-semibold-uppercase;
 
     margin: 0;
-    max-width: 340px;
+    max-width: 270px;
 
     @media (min-width: 560px) {
         @include type.h2-bold-uppercase;
 
-        max-width: 650px;
-    }
-
-    @media (min-width: 768px) {
-        max-width: 520px;
+        max-width: 445px;
     }
 
     @media (min-width: 1440px) {
         @include type.h1-bold-uppercase;
 
-        max-width: 560px;
+        max-width: 650px;
     }
 }
 

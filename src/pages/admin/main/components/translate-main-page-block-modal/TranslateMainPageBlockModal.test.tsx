@@ -19,6 +19,11 @@ jest.mock('@/services/api/admin/main-page/main-page-localizations-api/main-page-
     },
 }));
 
+jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
+    __esModule: true,
+    RichTextInputGroup: require('@/utils/test-mocks/main-page-mocks').MockRichTextInputGroup,
+}));
+
 jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
     __esModule: true,
     ConfirmationModal: ({ isOpen, title, onConfirm, onCancel }: any) =>
@@ -158,6 +163,53 @@ describe('TranslateMainPageBlockModal', () => {
         expect(saveButton()).toBeDisabled();
     });
 
+    it('renders edit mode with API-shaped localizationInfoDto values for nested blocks', () => {
+        renderModal({
+            block: MainPageLocalizationBlock.AboutUs,
+            page: {
+                ...basePage,
+                mainAboutUs: {
+                    ...basePage.mainAboutUs!,
+                    localizations: [
+                        {
+                            entityId: 10,
+                            localizationInfoDto: englishLanguage,
+                            title: 'About us and who we are',
+                            description: '<p>Victory Centre is a safe space.</p>',
+                            translationStatus: TranslationStatus.Relevant,
+                        } as any,
+                    ],
+                },
+            },
+        });
+
+        expect(screen.getByText('Редагувати переклад')).toBeInTheDocument();
+        expect(titleInput()).toHaveValue('About us and who we are');
+        expect(descriptionInput()).toHaveValue('Victory Centre is a safe space.');
+        expect(saveButton()).toBeDisabled();
+    });
+
+    it('renders edit mode with API-shaped root localizationInfoDto values', () => {
+        renderModal({
+            page: {
+                ...basePage,
+                localizations: [
+                    {
+                        entityId: 1,
+                        localizationInfoDto: englishLanguage,
+                        title: '<p>Horses with healing experience</p>',
+                        description: 'When body and soul recover, true strength is born.',
+                        translationStatus: TranslationStatus.Relevant,
+                    } as any,
+                ],
+            },
+        });
+
+        expect(screen.getByText('Редагувати переклад')).toBeInTheDocument();
+        expect(titleInput()).toHaveValue('Horses with healing experience');
+        expect(descriptionInput()).toHaveValue('When body and soul recover, true strength is born.');
+    });
+
     it('enables save after valid changes and creates localization with submitted data', async () => {
         jest.spyOn(axios, 'isAxiosError').mockReturnValue(true);
         (MainPageLocalizationsApi.getByLanguageId as jest.Mock).mockRejectedValue({ response: { status: 404 } });
@@ -176,8 +228,8 @@ describe('TranslateMainPageBlockModal', () => {
             expect.objectContaining({
                 entityId: 1,
                 languageId: englishLanguage.id,
-                title: 'Valid title text',
-                description: 'Valid description text',
+                title: '<p>Valid title text</p>',
+                description: '<p>Valid description text</p>',
             }),
         );
         expect(onTranslated).toHaveBeenCalled();
@@ -229,8 +281,8 @@ describe('TranslateMainPageBlockModal', () => {
             title: 'Existing title',
             description: 'Existing description',
             mainAboutUs: {
-                title: 'Updated about title',
-                description: 'Updated about description',
+                title: '<p>Updated about title</p>',
+                description: '<p>Updated about description</p>',
             },
             mainPartners: {
                 title: 'Existing partners title',

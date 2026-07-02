@@ -9,6 +9,11 @@ import {
     TranslateMainPageBlockFormValues,
 } from './TranslateMainPageBlockForm';
 
+jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
+    __esModule: true,
+    RichTextInputGroup: require('@/utils/test-mocks/main-page-mocks').MockRichTextInputGroup,
+}));
+
 const titleInput = () => document.getElementById('main-page-translation-title') as HTMLInputElement;
 const descriptionInput = () => document.getElementById('main-page-translation-description') as HTMLTextAreaElement;
 
@@ -53,8 +58,8 @@ describe('TranslateMainPageBlockForm', () => {
 
         expect(titleInput()).toHaveValue('');
         expect(descriptionInput()).toHaveValue('');
-        expect(titleInput()).toHaveAttribute('maxlength', '50');
-        expect(descriptionInput()).toHaveAttribute('maxlength', '300');
+        expect(titleInput()).toHaveAttribute('data-max-length', '50');
+        expect(descriptionInput()).toHaveAttribute('data-max-length', '300');
         expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
     });
 
@@ -64,6 +69,21 @@ describe('TranslateMainPageBlockForm', () => {
         expect(titleInput()).toHaveValue('Existing English title');
         expect(descriptionInput()).toHaveValue('Existing description');
         expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
+    });
+
+    it('does not mark normalized rich text HTML as dirty in edit mode', async () => {
+        render(
+            <Harness
+                initialData={{
+                    title: '<p class="editor"><strong>Valid title text</strong> </p>',
+                    description: '<p><em>Valid description text</em></p>',
+                }}
+            />,
+        );
+
+        fireEvent.change(titleInput(), { target: { value: '<p><strong>Valid title text</strong></p>' } });
+
+        await waitFor(() => expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled());
     });
 
     it('validates required fields while typing', async () => {
@@ -76,22 +96,22 @@ describe('TranslateMainPageBlockForm', () => {
         expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
     });
 
-    it('prevents entering more than the max length while typing', async () => {
+    it('validates text length by plain text content from rich text HTML', async () => {
         render(<Harness config={{ ...validationConfig, titleMaxLength: 50 }} />);
 
-        fireEvent.change(titleInput(), { target: { value: 'x'.repeat(51) } });
+        fireEvent.change(titleInput(), { target: { value: `<p>${'x'.repeat(51)}</p>` } });
+        fireEvent.blur(titleInput());
 
-        await waitFor(() => expect(titleInput()).toHaveValue('x'.repeat(50)));
-        expect(screen.getByText('50/50')).toBeInTheDocument();
-        expect(screen.queryByText('Не більше 50 символів')).not.toBeInTheDocument();
+        expect(await screen.findByText('Не більше 50 символів')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
     });
 
-    it('enables save after valid changes and submits values', async () => {
+    it('enables save after valid rich text changes and submits HTML values', async () => {
         const onSubmit = jest.fn();
         render(<Harness onSubmit={onSubmit} />);
 
-        fireEvent.change(titleInput(), { target: { value: 'Valid title text' } });
-        fireEvent.change(descriptionInput(), { target: { value: 'Valid description text' } });
+        fireEvent.change(titleInput(), { target: { value: '<p><strong>Valid title text</strong></p>' } });
+        fireEvent.change(descriptionInput(), { target: { value: '<p><em>Valid description text</em></p>' } });
 
         await waitFor(() => expect(screen.getByRole('button', { name: 'Save' })).not.toBeDisabled());
 
@@ -102,8 +122,8 @@ describe('TranslateMainPageBlockForm', () => {
         });
 
         expect(onSubmit.mock.calls[0][0]).toEqual({
-            title: 'Valid title text',
-            description: 'Valid description text',
+            title: '<p><strong>Valid title text</strong></p>',
+            description: '<p><em>Valid description text</em></p>',
         });
     });
 

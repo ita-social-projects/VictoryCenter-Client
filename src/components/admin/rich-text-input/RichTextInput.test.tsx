@@ -73,6 +73,7 @@ let mockMaxLengthPluginProps: any = null;
 let mockOnChangePluginProps: any = null;
 let mockFocusPluginProps: any = null;
 let mockInitialValuePluginProps: any = null;
+let mockEditablePluginProps: any = null;
 
 jest.mock('./plugins', () => {
     const MockMaxLengthPlugin = (props: any) => {
@@ -109,6 +110,10 @@ jest.mock('./plugins', () => {
             <div data-testid="initial-value-content" dangerouslySetInnerHTML={{ __html: props.value }} />
         ) : null;
     };
+    const MockEditablePlugin = (props: any) => {
+        mockEditablePluginProps = props;
+        return null;
+    };
     const MockEnterKeyPlugin = () => null;
     return {
         MaxLengthPlugin: MockMaxLengthPlugin,
@@ -116,6 +121,7 @@ jest.mock('./plugins', () => {
         FocusPlugin: MockFocusPlugin,
         ToolbarPlugin: MockToolbarPlugin,
         InitialValuePlugin: MockInitialValuePlugin,
+        EditablePlugin: MockEditablePlugin,
         EnterKeyPlugin: MockEnterKeyPlugin,
     };
 });
@@ -151,6 +157,7 @@ describe('RichTextInput', () => {
         (mockOnChangePluginProps as any) = null;
         (mockFocusPluginProps as any) = null;
         (mockInitialValuePluginProps as any) = null;
+        (mockEditablePluginProps as any) = null;
 
         ($generateNodesFromDOM as jest.Mock).mockImplementation(() => []);
         ($getRoot as jest.Mock).mockImplementation(() => ({ clear: jest.fn() }));
@@ -210,6 +217,12 @@ describe('RichTextInput', () => {
         it('applies disabled class to root element', () => {
             const { container } = renderRichTextInput({ disabled: true });
             expect(container.firstChild).toHaveClass('root--disabled');
+        });
+
+        it('marks the content editable as disabled for keyboard and assistive tech', () => {
+            renderRichTextInput({ disabled: true });
+            expect(screen.getByTestId('content-editable')).toHaveAttribute('aria-disabled', 'true');
+            expect(screen.getByTestId('content-editable')).toHaveAttribute('tabIndex', '-1');
         });
     });
 
@@ -279,6 +292,15 @@ describe('RichTextInput', () => {
             renderRichTextInput({ value: '' });
             expect(mockInitialValuePluginProps).not.toBeNull();
             expect(mockInitialValuePluginProps.value).toBe('');
+        });
+
+        it('passes disabled state to EditablePlugin', () => {
+            const { rerender } = renderRichTextInput({ disabled: false });
+            expect(mockEditablePluginProps).not.toBeNull();
+            expect(mockEditablePluginProps.disabled).toBe(false);
+
+            rerender(<RichTextInput {...defaultProps} disabled />);
+            expect(mockEditablePluginProps.disabled).toBe(true);
         });
     });
 

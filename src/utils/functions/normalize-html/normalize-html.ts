@@ -23,6 +23,35 @@ const trimTrailingWhitespace = (container: Node): void => {
     }
 };
 
+const removeEditorArtifacts = (container: HTMLElement): void => {
+    container.querySelectorAll('[class], [style]').forEach((el) => {
+        el.removeAttribute('class');
+        el.removeAttribute('style');
+    });
+
+    container.querySelectorAll('b > strong').forEach((strong) => {
+        const bTag = strong.parentElement;
+        if (bTag?.tagName === 'B') {
+            bTag.replaceWith(strong);
+        }
+    });
+
+    container.querySelectorAll('i > em').forEach((em) => {
+        const iTag = em.parentElement;
+        if (iTag?.tagName === 'I') {
+            iTag.replaceWith(em);
+        }
+    });
+
+    container.querySelectorAll('span').forEach((span) => {
+        const parent = span.parentNode;
+        while (span.firstChild) {
+            parent?.insertBefore(span.firstChild, span);
+        }
+        span.remove();
+    });
+};
+
 export const normalizeHtml = (html: string): string => {
     if (!html) return '';
 
@@ -38,4 +67,23 @@ export const normalizeHtml = (html: string): string => {
     trimTrailingWhitespace(tempDiv);
 
     return tempDiv.innerHTML;
+};
+
+export const normalizeRichTextHtmlForComparison = (html: string): string => {
+    const normalizedHtml = normalizeHtml(html);
+
+    if (!normalizedHtml) return '';
+
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = normalizedHtml;
+    removeEditorArtifacts(tempDiv);
+
+    if (tempDiv.children.length === 0) {
+        const paragraph = document.createElement('p');
+        paragraph.textContent = normalizedHtml;
+        tempDiv.textContent = '';
+        tempDiv.appendChild(paragraph);
+    }
+
+    return tempDiv.innerHTML.replace(/>\s+</g, '><').trim();
 };

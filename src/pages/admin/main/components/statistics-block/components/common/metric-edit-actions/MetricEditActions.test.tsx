@@ -14,11 +14,12 @@ jest.mock('@/components/admin/button/Button', () => ({
 }));
 
 jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
-    ConfirmationModal: ({ isOpen, onConfirm, onCancel, title }: any) => {
+    ConfirmationModal: ({ isOpen, onClose, onConfirm, onCancel, title }: any) => {
         if (!isOpen) return null;
         return (
             <div data-testid="mock-modal">
                 <p>{title}</p>
+                <button onClick={onClose}>Close</button>
                 <button onClick={onConfirm}>Yes</button>
                 <button onClick={onCancel}>No</button>
             </div>
@@ -107,6 +108,16 @@ describe('MetricEditActions', () => {
             fireEvent.click(screen.getByRole('button', { name: MAIN_PAGE_TEXT.BUTTONS.CANCEL }));
 
             fireEvent.click(screen.getByText('No'));
+
+            expect(defaultProps.onCancel).not.toHaveBeenCalled();
+            expect(screen.queryByTestId('mock-modal')).not.toBeInTheDocument();
+        });
+
+        it('does NOT call onCancel and closes modal when dismissed', () => {
+            render(<MetricEditActions {...defaultProps} isFormDirty={true} />);
+
+            fireEvent.click(screen.getByRole('button', { name: MAIN_PAGE_TEXT.BUTTONS.CANCEL }));
+            fireEvent.click(screen.getByText('Close'));
 
             expect(defaultProps.onCancel).not.toHaveBeenCalled();
             expect(screen.queryByTestId('mock-modal')).not.toBeInTheDocument();

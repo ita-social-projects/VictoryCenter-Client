@@ -8,16 +8,17 @@ import {
 import type { LocalizationLanguage } from '@/types/common/language';
 import {
     getLanguageIdByCode,
+    LocalizationLanguageSource,
     resolveLocaleCode,
 } from '@/utils/functions/mappers/common/localization/localization-mappers';
 
 const DEFAULT_ENGLISH_LANGUAGE_ID = 2;
 
-const findLocalizationByCode = <TLocalization>(
+const findLocalizationByCode = <TLocalization extends LocalizationLanguageSource>(
     localizations: TLocalization[] | undefined,
     code: 'uk' | 'en',
     languages?: LocalizationLanguage[],
-): TLocalization | undefined => (localizations ?? []).find((loc) => resolveLocaleCode(loc as any, languages) === code);
+): TLocalization | undefined => (localizations ?? []).find((loc) => resolveLocaleCode(loc, languages) === code);
 
 export function mapMainPageToFormValues(page: MainPage, languages?: LocalizationLanguage[]): MainPageFormValues {
     const pageLocalizations = page.localizations ?? [];
@@ -100,7 +101,7 @@ export function mapFormValuesToMainPagePatch(
 
     const safeMetricsPayload: UpdateMetricDto[] = existingMetrics.map((m) => {
         const enLoc = m.localizations?.find(
-            (l) => l.languageId === enLanguageId || resolveLocaleCode(l as any, languages) === 'en',
+            (l) => l.languageId === enLanguageId || resolveLocaleCode(l, languages) === 'en',
         );
 
         return {

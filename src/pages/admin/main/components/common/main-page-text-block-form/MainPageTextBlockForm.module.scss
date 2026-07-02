@@ -19,9 +19,8 @@
     flex-direction: column;
 }
 
-.textarea-custom textarea {
+.rich-text-custom [contenteditable='true'] {
     min-height: 349px;
-    resize: none;
 }
 
 .actions {

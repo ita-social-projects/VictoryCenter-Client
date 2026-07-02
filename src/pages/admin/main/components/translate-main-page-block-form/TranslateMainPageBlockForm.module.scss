@@ -4,8 +4,8 @@
     gap: 18px;
 }
 
-.textarea {
-    textarea {
+.rich-text-description {
+    [contenteditable='true'] {
         min-height: 116px;
     }
 }

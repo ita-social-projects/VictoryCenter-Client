@@ -139,6 +139,64 @@ describe('useTranslateMainPageBlock', () => {
         expect(onSuccess).toHaveBeenCalled();
     });
 
+    it('preserves existing values from API-shaped localizationInfoDto localizations', async () => {
+        jest.spyOn(axios, 'isAxiosError').mockReturnValue(true);
+        (MainPageLocalizationsApi.getByLanguageId as jest.Mock).mockRejectedValue({ response: { status: 404 } });
+
+        const { result } = renderTranslateHook({
+            block: MainPageLocalizationBlock.AboutUs,
+            page: {
+                ...page,
+                localizations: [
+                    {
+                        entityId: 1,
+                        localizationInfoDto: englishLanguage,
+                        title: '<p>Horses with healing experience</p>',
+                        description: 'When body and soul recover, true strength is born.',
+                        translationStatus: TranslationStatus.Relevant,
+                    } as any,
+                ],
+                mainPartners: {
+                    ...page.mainPartners!,
+                    localizations: [
+                        {
+                            entityId: 20,
+                            localizationInfoDto: englishLanguage,
+                            title: 'The Foundation’s trusted partners',
+                            description: '<p>The organisations and benefactors.</p>',
+                            translationStatus: TranslationStatus.Relevant,
+                        } as any,
+                    ],
+                },
+            },
+        });
+
+        await act(async () => {
+            await result.current.translateMainPageBlock({
+                title: 'About us and who we are',
+                description: 'Victory Centre is a safe space.',
+            });
+        });
+
+        expect(MainPageLocalizationsApi.create).toHaveBeenCalledWith(
+            expect.any(Object),
+            expect.objectContaining({
+                title: '<p>Horses with healing experience</p>',
+                description: 'When body and soul recover, true strength is born.',
+                mainAboutUs: {
+                    entityId: 10,
+                    title: 'About us and who we are',
+                    description: 'Victory Centre is a safe space.',
+                },
+                mainPartners: {
+                    entityId: 20,
+                    title: 'The Foundation’s trusted partners',
+                    description: '<p>The organisations and benefactors.</p>',
+                },
+            }),
+        );
+    });
+
     it('treats zero entity ids as valid ids', async () => {
         jest.spyOn(axios, 'isAxiosError').mockReturnValue(true);
         (MainPageLocalizationsApi.getByLanguageId as jest.Mock).mockRejectedValue({ response: { status: 404 } });

@@ -43,6 +43,11 @@ import {
     mapFormValuesToMainPagePatch,
     mapMainPageToFormValues,
 } from '@/utils/functions/mappers/admin/main-page/main-page-mappers';
+import {
+    getLocalizationLanguageCode,
+    getLocalizationLanguageId,
+} from '@/utils/functions/mappers/common/localization/localization-mappers';
+import { normalizeRichTextHtmlForComparison } from '@/utils/functions/normalize-html/normalize-html';
 import { MainPageValidationSchema } from '@/validation/admin/main-page-schema/main-page-schema';
 import { AboutUsBlockForm } from '../about-us-block/AboutUsBlockForm';
 import { MainPagePublishModal } from '../main-page-publish-modal/MainPagePublishModal';
@@ -86,11 +91,56 @@ const sanitizeMainPageFormValues = (values: MainPageFormValues): MainPageFormVal
     statisticsTitleEn: values.statisticsTitleEn ?? '',
 });
 
-const getLocalizationLanguageCode = (localization: EntityLocalization): string | undefined =>
-    localization.language?.code ?? (localization as EntityLocalization & { code?: string }).code;
+const RICH_TEXT_FORM_FIELDS: Array<keyof MainPageFormValues> = [
+    'titleUa',
+    'titleEn',
+    'descriptionUa',
+    'descriptionEn',
+    'aboutUsTitleUa',
+    'aboutUsTitleEn',
+    'aboutUsDescriptionUa',
+    'aboutUsDescriptionEn',
+    'partnersTitleUa',
+    'partnersTitleEn',
+    'partnersDescriptionUa',
+    'partnersDescriptionEn',
+];
 
-const getLocalizationLanguageId = (localization: EntityLocalization): number | undefined =>
-    localization.language?.id ?? (localization as EntityLocalization & { languageId?: number }).languageId;
+const RICH_TEXT_FORM_FIELD_SET = new Set<keyof MainPageFormValues>(RICH_TEXT_FORM_FIELDS);
+
+const isMainPageFormField = (field: string): field is keyof MainPageFormValues => field in MAIN_PAGE_FORM_DEFAULTS;
+
+const areRichTextFieldValuesEqual = (
+    field: keyof MainPageFormValues,
+    currentValues: MainPageFormValues,
+    savedValues: MainPageFormValues,
+) =>
+    normalizeRichTextHtmlForComparison(String(currentValues[field] ?? '')) ===
+    normalizeRichTextHtmlForComparison(String(savedValues[field] ?? ''));
+
+const hasRelevantMainPageDirtyFields = (
+    dirtyFields: Partial<Record<keyof MainPageFormValues, unknown>>,
+    currentValues: MainPageFormValues,
+    savedValues: MainPageFormValues,
+) => {
+    const dirtyFieldNames = Object.keys(dirtyFields);
+
+    if (!dirtyFieldNames.length) {
+        return false;
+    }
+
+    return dirtyFieldNames.some((fieldName) => {
+        if (!isMainPageFormField(fieldName)) {
+            return true;
+        }
+
+        if (!RICH_TEXT_FORM_FIELD_SET.has(fieldName)) {
+            return true;
+        }
+
+        return !areRichTextFieldValuesEqual(fieldName, currentValues, savedValues);
+    });
+};
 
 const isLocalizationForLanguage = (localization: EntityLocalization, language: LocalizationLanguage) =>
     getLocalizationLanguageId(localization) === language.id ||
@@ -302,8 +352,12 @@ export const MainPageContent = () => {
         };
     }, [client, originalData, selectedLanguage, translationLanguages, allLanguages, methods, addToast]);
 
+    const isMainPageDirty =
+        methods.formState.isDirty &&
+        hasRelevantMainPageDirtyFields(methods.formState.dirtyFields, methods.getValues(), savedValuesRef.current);
+
     const handleGlobalLanguageChange = (language: LocalizationLanguage) => {
-        if (methods.formState.isDirty) {
+        if (isMainPageDirty) {
             setPendingGlobalLanguage(language);
         } else {
             onLanguageChange(language);
@@ -457,7 +511,7 @@ export const MainPageContent = () => {
         return hasLoadError ? <div>{MAIN_PAGE_TEXT.ERRORS.LOAD_FAILED}</div> : <PageLoader />;
     }
 
-    const isPublishDisabled = !methods.formState.isDirty || !methods.formState.isValid || isPublishing;
+    const isPublishDisabled = !isMainPageDirty || !methods.formState.isValid || isPublishing;
     const onPublish = methods.handleSubmit(handlePublishClick);
 
     return (

@@ -65,6 +65,7 @@ jest.mock('@/services/api/admin/reports/program-expenses-api', () => ({
         delete: jest.fn(),
         post: jest.fn(),
         bulkDelete: jest.fn(),
+        update: jest.fn(),
     },
 }));
 
@@ -365,6 +366,52 @@ describe('ProgramExpensesSection', () => {
 
         expect(screen.getByText('41.25')).toBeInTheDocument();
         expect(screen.getByTestId('add-program-expense-modal')).toHaveAttribute('data-exchange-rate', '41.25');
+    });
+
+    it('should save edited record and show success toast', async () => {
+        (ProgramExpensesApi.update as jest.Mock).mockResolvedValueOnce(undefined);
+
+        render(<ProgramExpensesSection isEditing />);
+
+        fireEvent.click(screen.getByLabelText('Edit record 1'));
+        fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '50 100' } });
+        fireEvent.click(screen.getByRole('button', { name: 'Accept record 1' }));
+
+        await waitFor(() => {
+            expect(ProgramExpensesApi.update).toHaveBeenCalledWith('mock-client', 1, {
+                amountUah: 50100,
+                amountUsd: 1214.55,
+                hippotherapyProgramCategoryId: 1,
+            });
+        });
+
+        expect(mockRefetch).toHaveBeenCalled();
+        expect(mockAddToast).toHaveBeenCalledWith(PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY, 'success');
+
+        await waitFor(() => {
+            expect(screen.getByRole('button', { name: 'Edit record 1' })).toBeInTheDocument();
+        });
+    });
+
+    it('should show error toast and keep row in edit mode when record save fails', async () => {
+        (ProgramExpensesApi.update as jest.Mock).mockRejectedValueOnce(new Error('update failed'));
+
+        render(<ProgramExpensesSection isEditing />);
+
+        fireEvent.click(screen.getByLabelText('Edit record 1'));
+        fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '50 100' } });
+        fireEvent.click(screen.getByRole('button', { name: 'Accept record 1' }));
+
+        await waitFor(() => {
+            expect(ProgramExpensesApi.update).toHaveBeenCalledWith('mock-client', 1, {
+                amountUah: 50100,
+                amountUsd: 1214.55,
+                hippotherapyProgramCategoryId: 1,
+            });
+        });
+
+        expect(mockAddToast).toHaveBeenCalledWith(PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_UPDATE_FAILED_RETRY, 'error');
+        expect(screen.getByLabelText('Amount UAH record 1')).toBeInTheDocument();
     });
 
     it('should disable add program expense button when four records exist', () => {

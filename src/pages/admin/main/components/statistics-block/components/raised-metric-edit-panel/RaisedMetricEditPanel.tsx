@@ -35,7 +35,7 @@ export const RaisedMetricEditPanel = ({ metric, onSave, onCancel, onSyncErrorCha
     const [isSyncConfirmOpen, setIsSyncConfirmOpen] = useState(false);
     const [isFetchingSyncPreview, setIsFetchingSyncPreview] = useState(false);
 
-    const defaultNameUa = metric.name || '';
+    const defaultNameUa = metric.name || metric.localizations?.find((l) => l.languageId === 1)?.name || '';
     const usdLocalization = metric.localizations?.find((l) => l.languageId === 2);
     const defaultNameEn = usdLocalization?.name || '';
 
@@ -94,6 +94,7 @@ export const RaisedMetricEditPanel = ({ metric, onSave, onCancel, onSyncErrorCha
 
         if (!updatedLocalizations.some((l) => l.languageId === 2)) {
             updatedLocalizations.push({
+                entityId: metric.id,
                 languageId: 2,
                 name: data.nameEn.trim(),
                 value: cleanUsdValue,

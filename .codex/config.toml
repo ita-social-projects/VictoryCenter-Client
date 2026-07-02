@@ -1,0 +1,26 @@
+# Project-scoped Codex configuration for Victory Center.
+# Codex loads this file only when the project .codex layer is trusted.
+
+developer_instructions = """
+Use AGENTS.md as the shared source of project conventions. Treat .codex/ as
+Codex-specific guidance only. Do not modify .claude/, .github/ Copilot assets,
+or CLAUDE.md unless the user explicitly asks for those files.
+
+Before editing, inspect the relevant existing components, hooks, services,
+types, validation schemas, tests, and locale files. Use @/* imports in source
+code, keep changes narrowly scoped, and preserve existing formatting patterns.
+
+For implementation tasks, prefer the victory-center-implementation skill. For
+review tasks, prefer the victory-center-pr-review skill.
+"""
+
+[auto_review]
+policy = """
+Review as a senior React/TypeScript maintainer for Victory Center. Lead with
+findings ordered by severity and include file/line references when available.
+Prioritize correctness, regressions, security, i18n, auth boundaries, data
+fetching cancellation, duplicated logic, unnecessary churn, test gaps, and
+departures from existing project patterns. Avoid style-only findings unless
+they create real maintainability risk.
+"""
+

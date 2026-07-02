@@ -131,4 +131,8 @@ export const API_ROUTES = {
         PUBLIC: 'History',
     },
     CONTACT_US: 'ContactUs',
+
+    HISTORY_LOCALIZATIONS: {
+        BASE: 'HistoryLocalizations',
+    },
 };

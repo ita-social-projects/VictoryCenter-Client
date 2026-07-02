@@ -85,6 +85,28 @@ jest.mock('@/components/common/select/Select', () => {
     return { Select: MockSelect };
 });
 
+jest.mock(
+    '@/validation/admin/reports-schema/funds-expenditures-record-schema/funds-expenditures-record-schema',
+    () => ({
+        normalizeFundsExpendituresAmountInput: (value: string) => value.trim(),
+        validateFundsExpendituresAmount: (value: string) => (value === 'invalid' ? 'Invalid amount' : undefined),
+    }),
+);
+
+jest.mock('@/utils/functions/update-funds-amounts/update-funds-amounts', () => ({
+    updateFundsAmounts:
+        (field: 'amountUah' | 'amountUsd', value: string) =>
+        (state: { amountUah: string; amountUsd: string; errors: Record<string, string | undefined> }) => ({
+            amountUah: field === 'amountUah' ? value : state.amountUah,
+            amountUsd: field === 'amountUsd' ? value : state.amountUsd,
+            errors: { amountUah: undefined, amountUsd: undefined },
+        }),
+}));
+
+jest.mock('@/utils/functions/validate-usd-amount-mismatch/validate-usd-amount-mismatch', () => ({
+    isUsdAmountMismatch: jest.fn(() => false),
+}));
+
 const getEmptyState = () => screen.getByTestId('program-expenses-empty-state');
 const getEmptyStateCell = () => screen.getByTestId('program-expenses-empty-state-cell');
 
@@ -175,6 +197,12 @@ describe('ProgramExpensesTable', () => {
         expectEmptyState('program-expenses');
     });
 
+    it('should use edit-mode colSpan for empty state', () => {
+        render(<ProgramExpensesTable records={[]} hasAnyProgramExpenseRecords={false} isEditing />);
+
+        expectEmptyState('program-expenses', '7');
+    });
+
     it('should render checkboxes and action column in edit mode', () => {
         renderTable();
 
@@ -211,24 +239,14 @@ describe('ProgramExpensesTable', () => {
 
         fireEvent.click(screen.getByRole('button', { name: 'Edit record 1' }));
 
-        expect(screen.getByLabelText('Accept record changes')).toBeInTheDocument();
-        expect(screen.getByLabelText('Cancel record editing')).toBeInTheDocument();
+        expect(screen.getByLabelText('Accept record 1')).toBeInTheDocument();
+        expect(screen.getByLabelText('Close edit for record 1')).toBeInTheDocument();
 
         // Checkboxes and other edit buttons should be disabled
         expect(screen.getByRole('checkbox', { name: 'Select record 1' })).toBeDisabled();
         expect(screen.getByRole('checkbox', { name: 'Select record 2' })).toBeDisabled();
         expect(screen.getByRole('button', { name: 'Edit record 2' })).toBeDisabled();
         expect(screen.getByRole('button', { name: 'Delete record 2' })).toBeDisabled();
-    });
-
-    it('should call onDeleteRecord when delete button is clicked', () => {
-        const onDeleteRecord = jest.fn();
-
-        renderTable({ onDeleteRecord });
-
-        fireEvent.click(screen.getByRole('button', { name: 'Delete record 1' }));
-
-        expect(onDeleteRecord).toHaveBeenCalledWith(records[0]);
     });
 
     it('should enable accept button when category is changed and call onRecordSave upon clicking accept', async () => {
@@ -238,7 +256,7 @@ describe('ProgramExpensesTable', () => {
 
         fireEvent.click(screen.getByRole('button', { name: 'Edit record 1' }));
 
-        const acceptButton = screen.getByLabelText('Accept record changes');
+        const acceptButton = screen.getByLabelText('Accept record 1');
         // Originally selected program is 100, so accept should be disabled as no change yet
         expect(acceptButton).toBeDisabled();
 
@@ -259,7 +277,6 @@ describe('ProgramExpensesTable', () => {
 
         expectEmptyState('program-expenses', '7');
     });
-
     it('should show selection bar with count and delete button when records are selected', () => {
         const onOpenBulkDelete = jest.fn();
 
@@ -270,5 +287,144 @@ describe('ProgramExpensesTable', () => {
         fireEvent.click(screen.getByText(PROGRAM_EXPENSES_TEXT.BULK.DELETE_BUTTON));
 
         expect(onOpenBulkDelete).toHaveBeenCalled();
+    });
+
+    it('should set header checkbox indeterminate state when some but not all records are selected', () => {
+        renderTable({ selectedRecordIds: [1] });
+
+        const headerCheckbox = screen.getByRole('checkbox', {
+            name: 'Select all program expense records',
+        }) as HTMLInputElement;
+
+        expect(headerCheckbox.indeterminate).toBe(true);
+    });
+
+    it('should call onDeleteRecord when delete icon is clicked', () => {
+        const onDeleteRecord = jest.fn();
+
+        renderTable({ onDeleteRecord });
+
+        fireEvent.click(screen.getByRole('button', { name: 'Delete record 1' }));
+
+        expect(onDeleteRecord).toHaveBeenCalledWith(records[0]);
+    });
+
+    it('should enter row edit mode with amount inputs and accept/close buttons when edit icon is clicked', () => {
+        const onRowEditModeChange = jest.fn();
+
+        renderTable({ onRowEditModeChange });
+
+        fireEvent.click(screen.getByRole('button', { name: 'Edit record 1' }));
+
+        expect(onRowEditModeChange).toHaveBeenCalledWith(true);
+        expect(screen.getByLabelText('Amount UAH record 1')).toHaveValue('7 265');
+        expect(screen.getByLabelText('Amount USD record 1')).toHaveValue('4 200.5');
+        expect(screen.getByRole('button', { name: 'Accept record 1' })).toBeDisabled();
+        expect(screen.getByRole('button', { name: 'Close edit for record 1' })).toBeEnabled();
+        expect(screen.queryByRole('button', { name: 'Edit record 1' })).not.toBeInTheDocument();
+    });
+
+    it('should close row edit mode without saving when close icon is clicked', () => {
+        const onRowEditModeChange = jest.fn();
+        const onRecordSave = jest.fn();
+
+        renderTable({ onRowEditModeChange, onRecordSave });
+
+        fireEvent.click(screen.getByRole('button', { name: 'Edit record 1' }));
+        fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '8000' } });
+        fireEvent.click(screen.getByRole('button', { name: 'Close edit for record 1' }));
+
+        expect(onRowEditModeChange).toHaveBeenLastCalledWith(false);
+        expect(onRecordSave).not.toHaveBeenCalled();
+        expect(screen.queryByLabelText('Amount UAH record 1')).not.toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Edit record 1' })).toBeInTheDocument();
+    });
+
+    it('should enable accept button only after an amount value changes', () => {
+        renderTable();
+
+        fireEvent.click(screen.getByRole('button', { name: 'Edit record 1' }));
+        expect(screen.getByRole('button', { name: 'Accept record 1' })).toBeDisabled();
+
+        fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '8000' } });
+        expect(screen.getByRole('button', { name: 'Accept record 1' })).toBeEnabled();
+    });
+
+    it('should call onRecordSave with trimmed amounts and close edit mode on success', async () => {
+        const onRecordSave = jest.fn().mockResolvedValue(true);
+
+        renderTable({ onRecordSave });
+
+        fireEvent.click(screen.getByRole('button', { name: 'Edit record 1' }));
+        fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '8000' } });
+        fireEvent.click(screen.getByRole('button', { name: 'Accept record 1' }));
+
+        await waitFor(() => {
+            expect(onRecordSave).toHaveBeenCalledWith(1, { amountUah: '8000', amountUsd: '4 200.5' });
+        });
+
+        await waitFor(() => {
+            expect(screen.queryByLabelText('Amount UAH record 1')).not.toBeInTheDocument();
+        });
+        expect(screen.getByRole('button', { name: 'Edit record 1' })).toBeInTheDocument();
+    });
+
+    it('should keep row in edit mode when onRecordSave resolves false', async () => {
+        const onRecordSave = jest.fn().mockResolvedValue(false);
+
+        renderTable({ onRecordSave });
+
+        fireEvent.click(screen.getByRole('button', { name: 'Edit record 1' }));
+        fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '8000' } });
+        fireEvent.click(screen.getByRole('button', { name: 'Accept record 1' }));
+
+        await waitFor(() => {
+            expect(onRecordSave).toHaveBeenCalled();
+        });
+
+        expect(screen.getByLabelText('Amount UAH record 1')).toBeInTheDocument();
+    });
+
+    it('should show validation error and disable accept button for an invalid amount', () => {
+        const onRecordSave = jest.fn();
+
+        renderTable({ onRecordSave });
+
+        fireEvent.click(screen.getByRole('button', { name: 'Edit record 1' }));
+        fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: 'invalid' } });
+        fireEvent.click(screen.getByRole('button', { name: 'Accept record 1' }));
+
+        expect(screen.getByText('Invalid amount')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Accept record 1' })).toBeDisabled();
+        expect(onRecordSave).not.toHaveBeenCalled();
+    });
+
+    it('should disable edit, delete and checkbox controls for other rows while a row is being edited', () => {
+        renderTable();
+
+        fireEvent.click(screen.getByRole('button', { name: 'Edit record 1' }));
+
+        expect(screen.getByRole('button', { name: 'Edit record 2' })).toBeDisabled();
+        expect(screen.getByRole('button', { name: 'Delete record 2' })).toBeDisabled();
+        expect(screen.getByRole('checkbox', { name: 'Select record 1' })).toBeDisabled();
+        expect(screen.getByRole('checkbox', { name: 'Select record 2' })).toBeDisabled();
+    });
+
+    it('should disable all edit and delete buttons when isRowActionsDisabled is true', () => {
+        renderTable({ isRowActionsDisabled: true });
+
+        expect(screen.getByRole('button', { name: 'Edit record 1' })).toBeDisabled();
+        expect(screen.getByRole('button', { name: 'Delete record 1' })).toBeDisabled();
+        expect(screen.getByRole('button', { name: 'Edit record 2' })).toBeDisabled();
+        expect(screen.getByRole('button', { name: 'Delete record 2' })).toBeDisabled();
+    });
+
+    it('should render the scroll-to-top button hidden by default', () => {
+        renderTable();
+
+        const toTopButton = screen.getByTestId('program-expenses-table-to-top');
+
+        expect(toTopButton).toHaveAttribute('aria-hidden', 'true');
+        expect(toTopButton).toHaveAttribute('tabIndex', '-1');
     });
 });

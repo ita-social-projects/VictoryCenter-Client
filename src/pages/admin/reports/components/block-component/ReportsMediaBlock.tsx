@@ -11,6 +11,7 @@ import './ReportsMediaBlock.scss';
 
 export interface ReportsMediaBlockValues {
     title: string;
+    titleEn: string;
     totalAmount: number;
     image: ImageValues | Image | null;
     imageId: number | null;
@@ -18,12 +19,14 @@ export interface ReportsMediaBlockValues {
 
 export interface ReportsMediaBlockErrors {
     title?: string;
+    titleEn?: string;
     totalAmount?: string;
     image?: string;
 }
 
 export interface ReportsMediaBlockValidationFunctions {
     validateTitle: (value: string) => string | undefined;
+    validateTitleEn: (value: string) => string | undefined;
     validateTotalAmount?: (value: number) => string | undefined;
 }
 
@@ -70,6 +73,24 @@ export const ReportsMediaBlock = ({
             const normalizedTitle = getNormalizedInputText(values.title);
             const error = validationFunctions.validateTitle(normalizedTitle);
             onValuesChange({ ...values, title: normalizedTitle }, { ...errors, title: error });
+        },
+        [onValuesChange, values, errors, validationFunctions],
+    );
+
+    const handleTitleEnChange = useCallback(
+        (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+            const value = e.target.value;
+            const error = validationFunctions.validateTitleEn(value);
+            onValuesChange({ ...values, titleEn: value }, { ...errors, titleEn: error });
+        },
+        [onValuesChange, values, errors, validationFunctions],
+    );
+
+    const handleTitleEnBlur = useCallback(
+        (_e: React.FocusEvent<HTMLTextAreaElement>) => {
+            const normalizedTitle = getNormalizedInputText(values.titleEn);
+            const error = validationFunctions.validateTitleEn(normalizedTitle);
+            onValuesChange({ ...values, titleEn: normalizedTitle }, { ...errors, titleEn: error });
         },
         [onValuesChange, values, errors, validationFunctions],
     );
@@ -127,6 +148,25 @@ export const ReportsMediaBlock = ({
                                 REPORTS_TEXT.FORM.MAX_LENGTH.TITLE,
                             )}
                             error={errors.title}
+                            rows={1}
+                            isRequired={true}
+                            errorCounterContainerClassName={styles['error-counter']}
+                        />
+                    </div>
+
+                    <div className={styles['title-input']}>
+                        <TextAreaWithCharacterLimitGroup
+                            label={REPORTS_TEXT.FORM.LABEL.TITLE_EN}
+                            id={`${windowTitle}-title-en`}
+                            name={`${windowTitle}-title-en`}
+                            value={values.titleEn}
+                            onChange={handleTitleEnChange}
+                            onBlur={handleTitleEnBlur}
+                            maxLength={REPORTS_TEXT.FORM.MAX_LENGTH.TITLE}
+                            maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
+                                REPORTS_TEXT.FORM.MAX_LENGTH.TITLE,
+                            )}
+                            error={errors.titleEn}
                             rows={1}
                             isRequired={true}
                             errorCounterContainerClassName={styles['error-counter']}

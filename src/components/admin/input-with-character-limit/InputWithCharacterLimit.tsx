@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useLayoutEffect } from 'react';
 import cn from 'classnames';
 import { ReactComponent as RemoveIcon } from '@/assets/icons/remove-query.svg';
 import { useInputWithCharacterLimit } from '@/hooks/admin/use-input-with-character-limit/useInputWithCharacterLimit';
@@ -46,6 +46,11 @@ export const InputWithCharacterLimit = ({
     maxRows,
 }: InputWithCharacterLimitProps) => {
     const [localValue, setLocalValue] = useState(value ?? '');
+    const valueRef = useRef(value);
+
+    useLayoutEffect(() => {
+        valueRef.current = value;
+    }, [value]);
 
     useEffect(() => {
         setLocalValue(value ?? '');
@@ -76,6 +81,9 @@ export const InputWithCharacterLimit = ({
     const onInternalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setLocalValue(e.target.value);
         handleChange(e);
+        Promise.resolve().then(() => {
+            setLocalValue(valueRef.current ?? '');
+        });
     };
 
     const textareaRef = useRef<HTMLTextAreaElement>(null);

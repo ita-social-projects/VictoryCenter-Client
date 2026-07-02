@@ -317,6 +317,7 @@ export const FUNDS_EXPENDITURES_TEXT = {
         CATEGORY_UNIQUE_EXPENSE: 'Категорія вже додана до витрат',
         AMOUNT_ONLY_NUMBER: 'Дозволено лише цифри',
         AMOUNT_MAX_DIGITS: 'Не більше 9 цифр до коми',
+        AMOUNT_MAX_DECIMALS: 'Не більше 2 цифр після коми',
         AMOUNT_NOT_NEGATIVE: "Сума не може бути від'ємною",
         AMOUNT_NOT_ZERO: 'Сума не може дорівнювати 0',
         EXCHANGE_RATE_ONLY_NUMERIC: 'Дозволено тільки числові значення десяткові та цілі',

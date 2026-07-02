@@ -36,6 +36,55 @@ jest.mock('@/components/admin/icon-button/IconButton', () => ({
     ),
 }));
 
+jest.mock('@/components/common/select/Select', () => {
+    const React = require('react');
+
+    const stringifyValueForTestId = (value: unknown): string => {
+        if (value === undefined) return 'undefined';
+        if (value === null) return 'null';
+
+        if (typeof value === 'string') return value;
+        if (typeof value === 'number' || typeof value === 'boolean') return value.toString();
+
+        return 'non-primitive';
+    };
+
+    const SelectOption = (_props: { value: unknown; name: string }) => null;
+
+    const MockSelect = ({
+        children,
+        onValueChange,
+        placeholder,
+    }: {
+        children: React.ReactNode;
+        onValueChange: (value: unknown) => void;
+        placeholder?: string;
+    }) => {
+        const options = React.Children.toArray(children).filter(Boolean) as Array<{
+            props: { value: unknown; name: string };
+        }>;
+
+        return (
+            <div data-testid={`select-${placeholder}`}>
+                {options.map((option, index) => (
+                    <button
+                        key={`${option.props.name}-${index}`}
+                        type="button"
+                        data-testid={`select-option-${option.props.name}-${stringifyValueForTestId(option.props.value)}`}
+                        onClick={() => onValueChange(option.props.value)}
+                    >
+                        {option.props.name}
+                    </button>
+                ))}
+            </div>
+        );
+    };
+
+    MockSelect.Option = SelectOption;
+
+    return { Select: MockSelect };
+});
+
 jest.mock(
     '@/validation/admin/reports-schema/funds-expenditures-record-schema/funds-expenditures-record-schema',
     () => ({
@@ -91,10 +140,24 @@ describe('ProgramExpensesTable', () => {
         },
     ];
 
+    const mockPrograms = [
+        { id: 100, name: 'Program A' },
+        { id: 101, name: 'Program B' },
+        { id: 102, name: 'Program C' },
+    ];
+
     const normalizeText = (value: string) => value.replaceAll('\u00A0', ' ').replaceAll(/\s+/g, ' ').trim();
 
     const renderTable = (props: Partial<ProgramExpensesTableProps> = {}) => {
-        return render(<ProgramExpensesTable records={records} hasAnyProgramExpenseRecords isEditing {...props} />);
+        return render(
+            <ProgramExpensesTable
+                records={records}
+                programs={mockPrograms}
+                hasAnyProgramExpenseRecords
+                isEditing
+                {...props}
+            />,
+        );
     };
 
     it('should render table headers', () => {
@@ -167,6 +230,46 @@ describe('ProgramExpensesTable', () => {
         fireEvent.click(screen.getByRole('checkbox', { name: 'Select record 1' }));
 
         expect(onToggleRecordSelection).toHaveBeenCalledWith(1);
+    });
+
+    it('should start inline edit and show accept/cancel buttons, disabling other checkboxes and buttons', () => {
+        const onDeleteRecord = jest.fn();
+
+        renderTable({ onDeleteRecord });
+
+        fireEvent.click(screen.getByRole('button', { name: 'Edit record 1' }));
+
+        expect(screen.getByLabelText('Accept record 1')).toBeInTheDocument();
+        expect(screen.getByLabelText('Close edit for record 1')).toBeInTheDocument();
+
+        // Checkboxes and other edit buttons should be disabled
+        expect(screen.getByRole('checkbox', { name: 'Select record 1' })).toBeDisabled();
+        expect(screen.getByRole('checkbox', { name: 'Select record 2' })).toBeDisabled();
+        expect(screen.getByRole('button', { name: 'Edit record 2' })).toBeDisabled();
+        expect(screen.getByRole('button', { name: 'Delete record 2' })).toBeDisabled();
+    });
+
+    it('should enable accept button when category is changed and call onRecordSave upon clicking accept', async () => {
+        const onRecordSave = jest.fn().mockResolvedValue(true);
+
+        renderTable({ onRecordSave });
+
+        fireEvent.click(screen.getByRole('button', { name: 'Edit record 1' }));
+
+        const acceptButton = screen.getByLabelText('Accept record 1');
+        // Originally selected program is 100, so accept should be disabled as no change yet
+        expect(acceptButton).toBeDisabled();
+
+        // Select Program C (id: 102)
+        fireEvent.click(screen.getByTestId('select-option-Program C-102'));
+
+        expect(acceptButton).not.toBeDisabled();
+
+        fireEvent.click(acceptButton);
+
+        await waitFor(() => {
+            expect(onRecordSave).toHaveBeenCalledWith(1, 102, '2025', '7 265', '4 200.5');
+        });
     });
 
     it('should show selection bar with count and delete button when records are selected', () => {
@@ -252,7 +355,7 @@ describe('ProgramExpensesTable', () => {
         fireEvent.click(screen.getByRole('button', { name: 'Accept record 1' }));
 
         await waitFor(() => {
-            expect(onRecordSave).toHaveBeenCalledWith(1, { amountUah: '8000', amountUsd: '4 200.5' });
+            expect(onRecordSave).toHaveBeenCalledWith(1, 100, '2025', '8000', '4 200.5');
         });
 
         await waitFor(() => {

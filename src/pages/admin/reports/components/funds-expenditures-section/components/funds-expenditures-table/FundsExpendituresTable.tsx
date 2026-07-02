@@ -563,6 +563,7 @@ export const FundsExpendituresTable = ({
                                             <Select<string>
                                                 value={programYearEdit?.year}
                                                 onValueChange={handleProgramYearChange}
+                                                disabled={isSavingProgramYear}
                                                 placeholder={
                                                     FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_PLACEHOLDER
                                                 }
@@ -702,6 +703,7 @@ export const FundsExpendituresTable = ({
                                                         onValueChange={(value) =>
                                                             handleRowCategoryChange(record, value)
                                                         }
+                                                        disabled={savingRecordId === record.id}
                                                         placeholder={
                                                             FUNDS_EXPENDITURES_TEXT.FILTER.CATEGORY_PLACEHOLDER
                                                         }

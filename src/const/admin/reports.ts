@@ -348,6 +348,12 @@ export const PROGRAM_EXPENSES_TEXT = {
             CONFIRM_CLOSE_TITLE: 'Зміни будуть втрачені. Бажаєте продовжити?',
             PROGRAM_NO_AVAILABLE: 'Немає доступних програм',
         },
+        EDIT: {
+            TITLE: 'Редагувати витрату по програмі',
+            SUBTITLE: 'Розподіл програмних витрат по програмах',
+            SUBMIT_BUTTON: 'Зберегти',
+            CONFIRM_CLOSE_TITLE: 'Зміни будуть втрачені. Бажаєте продовжити?',
+        },
         DELETE: {
             TITLE: 'Видалити запис?',
         },

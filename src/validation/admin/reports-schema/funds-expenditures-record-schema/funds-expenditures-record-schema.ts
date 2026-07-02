@@ -44,7 +44,7 @@ export const validateFundsExpendituresAmount = (
         const withCommaSeparator = value.replaceAll(/\s+/g, ' ').trimStart().replaceAll('.', ',');
         const firstCommaIndex = withCommaSeparator.indexOf(',');
         if (firstCommaIndex !== -1) {
-            const rawDecimalPart = withCommaSeparator.slice(firstCommaIndex + 1).replaceAll(/[\s,]/g, '');
+            const rawDecimalPart = withCommaSeparator.slice(firstCommaIndex + 1).replace(/[^\d]/g, '');
             if (rawDecimalPart.length > 2) {
                 return FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_MAX_DECIMALS;
             }

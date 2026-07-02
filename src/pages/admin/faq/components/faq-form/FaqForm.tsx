@@ -26,6 +26,7 @@ export interface FaqFormRef {
     submit: (status: VisibilityStatus) => Promise<void>;
     isValid: (isPublishing?: boolean) => boolean;
     isDirty: () => boolean;
+    getValues: () => FaqFormValues;
 }
 
 export interface FaqFormProps {

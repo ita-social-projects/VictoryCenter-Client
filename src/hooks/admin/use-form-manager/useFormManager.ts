@@ -15,7 +15,12 @@ export interface UseFormManagerProps<TFormValues, TFormErrors> {
     onSubmit: (data: TFormValues, status: VisibilityStatus) => Promise<void> | void;
     onValidationChange?: (isValid: boolean) => void;
     isEqual?: (currentValues: TFormValues, initialValues: TFormValues) => boolean;
-    ref?: React.Ref<FormManagerRef<TFormValues>>;
+    ref?: React.Ref<{
+        submit: (...args: any[]) => Promise<void>;
+        isValid: (...args: any[]) => boolean;
+        isDirty: () => boolean;
+        getValues?: () => TFormValues;
+    }>;
 }
 
 export interface UseFormManagerReturn<TFormValues, TFormErrors> {

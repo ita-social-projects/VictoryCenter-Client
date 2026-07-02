@@ -3,10 +3,24 @@ import { useContainerSizeFromChildren, UseContainerSizeFromChildrenProps } from 
 
 const createMockElement = (size: number, axis: 'height' | 'width') => {
     const element = document.createElement('div');
+
+    element.getBoundingClientRect = () => ({
+        width: axis === 'width' ? size : 0,
+        height: axis === 'height' ? size : 0,
+        top: 0,
+        left: 0,
+        bottom: axis === 'height' ? size : 0,
+        right: axis === 'width' ? size : 0,
+        x: 0,
+        y: 0,
+        toJSON: () => { },
+    } as DOMRect);
+
     Object.defineProperty(element, axis === 'height' ? 'offsetHeight' : 'offsetWidth', {
         configurable: true,
         get: () => size,
     });
+
     return element;
 };
 

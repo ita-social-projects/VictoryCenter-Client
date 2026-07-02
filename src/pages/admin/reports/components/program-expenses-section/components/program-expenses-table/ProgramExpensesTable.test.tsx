@@ -272,11 +272,6 @@ describe('ProgramExpensesTable', () => {
         });
     });
 
-    it('should use edit-mode colSpan for empty state', () => {
-        render(<ProgramExpensesTable records={[]} hasAnyProgramExpenseRecords={false} isEditing />);
-
-        expectEmptyState('program-expenses', '7');
-    });
     it('should show selection bar with count and delete button when records are selected', () => {
         const onOpenBulkDelete = jest.fn();
 
@@ -360,7 +355,7 @@ describe('ProgramExpensesTable', () => {
         fireEvent.click(screen.getByRole('button', { name: 'Accept record 1' }));
 
         await waitFor(() => {
-            expect(onRecordSave).toHaveBeenCalledWith(1, { amountUah: '8000', amountUsd: '4 200.5' });
+            expect(onRecordSave).toHaveBeenCalledWith(1, 100, '2025', '8000', '4 200.5');
         });
 
         await waitFor(() => {

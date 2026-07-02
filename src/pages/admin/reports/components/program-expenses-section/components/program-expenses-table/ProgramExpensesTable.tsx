@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { useTableScrollToTop } from '@/hooks/admin/use-table-scroll-to-top/useTableScrollToTop';
 import { useTableRowAmountEdit } from '@/hooks/admin/use-table-row-amount-edit/useTableRowAmountEdit';
 import { ProgramExpensesEmptyState } from '@/pages/admin/reports/components/program-expenses-section/components/program-expenses-empty-state/ProgramExpensesEmptyState';
@@ -71,10 +71,10 @@ const isAcceptButtonDisabled = (rowEditState: ProgramExpenseRowEditState | null)
         Boolean(rowEditState.errors.amountUah) ||
         Boolean(rowEditState.errors.amountUsd) ||
         Boolean(rowEditState.errors.programId);
-        
+
     const programIdUndefined = rowEditState.programId === undefined;
     const amountsEmpty = normalizedUah === '' || normalizedUsd === '';
-    
+
     const noChanges =
         normalizedUah === normalizedOriginalUah &&
         normalizedUsd === normalizedOriginalUsd &&
@@ -109,7 +109,7 @@ export const ProgramExpensesTable = ({
     const hasSelectedVisibleRecords = selectedVisibleRecordIds.length > 0;
     const tableColumnsCount = isEditing ? EDITING_TABLE_COLUMNS_COUNT : READ_ONLY_TABLE_COLUMNS_COUNT;
     const { tableWrapperRef, isMoveToTopVisible, handleTableScroll, moveToTop } = useTableScrollToTop(records.length);
-    
+
     const {
         rowEditState,
         setRowEditState,
@@ -146,48 +146,54 @@ export const ProgramExpensesTable = ({
         [isRowActionsDisabled, rowEditState, setRowEditMode],
     );
 
-    const handleProgramChange = useCallback((recordId: number, value: number | undefined) => {
-        setRowEditState((prev) => {
-            if (prev?.recordId !== recordId) return prev;
-            
-            const error = validateProgramExpenseProgram({
-                recordId,
-                programId: value,
-                records: allRecords ?? records,
-                trigger: 'change',
-            });
-            
-            return {
-                ...prev,
-                programId: value,
-                errors: {
-                    ...prev.errors,
-                    programId: error,
-                },
-            };
-        });
-    }, [allRecords, records, setRowEditState]);
+    const handleProgramChange = useCallback(
+        (recordId: number, value: number | undefined) => {
+            setRowEditState((prev) => {
+                if (prev?.recordId !== recordId) return prev;
 
-    const handleProgramBlur = useCallback((recordId: number) => {
-        setRowEditState((prev) => {
-            if (prev?.recordId !== recordId) return prev;
-            
-            const error = validateProgramExpenseProgram({
-                recordId,
-                programId: prev.programId,
-                records: allRecords ?? records,
-                trigger: 'blur',
+                const error = validateProgramExpenseProgram({
+                    recordId,
+                    programId: value,
+                    records: allRecords ?? records,
+                    trigger: 'change',
+                });
+
+                return {
+                    ...prev,
+                    programId: value,
+                    errors: {
+                        ...prev.errors,
+                        programId: error,
+                    },
+                };
             });
-            
-            return {
-                ...prev,
-                errors: {
-                    ...prev.errors,
-                    programId: error,
-                },
-            };
-        });
-    }, [allRecords, records, setRowEditState]);
+        },
+        [allRecords, records, setRowEditState],
+    );
+
+    const handleProgramBlur = useCallback(
+        (recordId: number) => {
+            setRowEditState((prev) => {
+                if (prev?.recordId !== recordId) return prev;
+
+                const error = validateProgramExpenseProgram({
+                    recordId,
+                    programId: prev.programId,
+                    records: allRecords ?? records,
+                    trigger: 'blur',
+                });
+
+                return {
+                    ...prev,
+                    errors: {
+                        ...prev.errors,
+                        programId: error,
+                    },
+                };
+            });
+        },
+        [allRecords, records, setRowEditState],
+    );
 
     const handleAcceptRowEdit = useCallback(
         async (record: ProgramExpensesRecord) => {
@@ -209,7 +215,7 @@ export const ProgramExpensesTable = ({
                 records: allRecords ?? records,
                 trigger: 'blur',
             });
-            
+
             const isUnchanged =
                 normalizeFundsExpendituresAmountInput(rowEditState.originalAmountUah, true) ===
                     normalizeFundsExpendituresAmountInput(preparedAmountUah, true) &&
@@ -217,7 +223,13 @@ export const ProgramExpensesTable = ({
                     normalizeFundsExpendituresAmountInput(preparedAmountUsd, true) &&
                 rowEditState.programId === rowEditState.originalProgramId;
 
-            if (amountUahError || amountUsdError || programError || isUnchanged || rowEditState.programId === undefined) {
+            if (
+                amountUahError ||
+                amountUsdError ||
+                programError ||
+                isUnchanged ||
+                rowEditState.programId === undefined
+            ) {
                 setRowEditState((prev) => {
                     if (prev?.recordId !== record.id) {
                         return prev;
@@ -259,7 +271,16 @@ export const ProgramExpensesTable = ({
                 setSavingRecordId(null);
             }
         },
-        [onRecordSave, rowEditState, savingRecordId, setRowEditMode, setRowEditState, setSavingRecordId, allRecords, records],
+        [
+            onRecordSave,
+            rowEditState,
+            savingRecordId,
+            setRowEditMode,
+            setRowEditState,
+            setSavingRecordId,
+            allRecords,
+            records,
+        ],
     );
 
     useEffect(() => {

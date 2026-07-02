@@ -662,13 +662,13 @@ describe('ProgramExpensesSection', () => {
             fireEvent.click(screen.getByLabelText('Edit record 1'));
 
             // The row action buttons should switch to Accept/Cancel
-            expect(screen.getByLabelText('Accept record changes')).toBeInTheDocument();
-            expect(screen.getByLabelText('Cancel record editing')).toBeInTheDocument();
+            expect(screen.getByLabelText('Accept record 1')).toBeInTheDocument();
+            expect(screen.getByLabelText('Close edit for record 1')).toBeInTheDocument();
 
             // Select program C (id: 3)
             fireEvent.click(screen.getByTestId('select-option-Program C-3'));
 
-            const acceptButton = screen.getByLabelText('Accept record changes');
+            const acceptButton = screen.getByLabelText('Accept record 1');
             expect(acceptButton).not.toBeDisabled();
 
             fireEvent.click(acceptButton);
@@ -689,10 +689,10 @@ describe('ProgramExpensesSection', () => {
             const { rerender } = render(<ProgramExpensesSection isEditing />);
 
             fireEvent.click(screen.getByLabelText('Edit record 1'));
-            expect(screen.getByLabelText('Accept record changes')).toBeInTheDocument();
+            expect(screen.getByLabelText('Accept record 1')).toBeInTheDocument();
 
             rerender(<ProgramExpensesSection isEditing={false} />);
-            expect(screen.queryByLabelText('Accept record changes')).not.toBeInTheDocument();
+            expect(screen.queryByLabelText('Accept record 1')).not.toBeInTheDocument();
         });
 
         it('should clear bulk selection and hide bulk selection bar when row edit starts', async () => {

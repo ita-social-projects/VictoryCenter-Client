@@ -243,7 +243,7 @@ describe('useFormManager', () => {
         expect(delayedSubmit).toHaveBeenCalledTimes(1);
     });
 
-    it('should expose submit, isValid, isDirty via ref', () => {
+    it('should expose submit, isValid, isDirty and getValues via ref', () => {
         const ref = React.createRef<FormManagerRef>();
         renderHook(() =>
             useFormManager<FormValues, FormErrors>({
@@ -258,6 +258,8 @@ describe('useFormManager', () => {
         expect(ref.current?.submit).toBeDefined();
         expect(ref.current?.isValid).toBeDefined();
         expect(ref.current?.isDirty).toBeDefined();
+        expect(ref.current?.getValues).toBeDefined();
         expect(ref.current?.isDirty()).toBe(false);
+        expect(ref.current?.getValues?.()).toEqual(defaultFormState);
     });
 });

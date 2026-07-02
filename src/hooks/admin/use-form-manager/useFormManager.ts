@@ -5,7 +5,7 @@ export interface FormManagerRef<TFormValues = any> {
     submit: (status: VisibilityStatus) => Promise<void>;
     isValid: (isPublishing?: boolean) => boolean;
     isDirty: () => boolean;
-    getValues: () => TFormValues;
+    getValues?: () => TFormValues;
 }
 
 export interface UseFormManagerProps<TFormValues, TFormErrors> {

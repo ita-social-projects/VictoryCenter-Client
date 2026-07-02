@@ -1,0 +1,88 @@
+@use '@/assets/sass/variables/colors' as c;
+
+.row-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.icon-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: none;
+    background-color: transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    padding: 4px;
+    transition: background-color 0.15s ease;
+
+    &:hover {
+        background-color: c.$light-blue-50;
+    }
+
+    &:active {
+        background-color: c.$grey-300;
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.45;
+        background-color: transparent;
+    }
+}
+
+.edit-icon-button,
+.delete-icon-button {
+    display: inline-grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+
+    :global(.icon-default),
+    :global(.icon-filled) {
+        width: 24px;
+        height: 24px;
+        flex-shrink: 0;
+    }
+}
+
+.action-icon {
+    width: 20px;
+    height: 20px;
+    transition: color 0.15s ease;
+}
+
+.accept-icon-button {
+    .action-icon {
+        color: c.$green;
+
+        path {
+            stroke: c.$green;
+        }
+    }
+
+    &:disabled {
+        .action-icon {
+            color: c.$grey-700;
+
+            path {
+                stroke: c.$grey-700;
+            }
+        }
+    }
+}
+
+.close-icon-button {
+    .action-icon {
+        color: c.$error;
+
+        path {
+            stroke: c.$error;
+        }
+    }
+}

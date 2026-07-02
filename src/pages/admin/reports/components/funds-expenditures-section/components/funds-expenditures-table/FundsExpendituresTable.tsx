@@ -1,4 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { useTableScrollToTop } from '@/hooks/admin/use-table-scroll-to-top/useTableScrollToTop';
+import { useTableRowAmountEdit } from '@/hooks/admin/use-table-row-amount-edit/useTableRowAmountEdit';
 import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
 import {
     FundsExpendituresTransactionType,
@@ -9,9 +11,9 @@ import { ReactComponent as NotFoundIcon } from '@/assets/icons/not-found.svg';
 import { ReactComponent as ArrowUpIcon } from '@/assets/icons/arrow-up.svg';
 import { ReactComponent as CheckmarkIcon } from '@/assets/icons/checkmark.svg';
 import { ReactComponent as CrossIcon } from '@/assets/icons/cross.svg';
-import { ReactComponent as InfoIcon } from '@/assets/icons/info.svg';
 import { IconButton } from '@/components/admin/icon-button/IconButton';
 import { ACTION_ICONS } from '@/const/common/action-icons';
+import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import { Select } from '@/components/common/select/Select';
 import { SortIcon } from '@/pages/admin/reports/components/funds-expenditures-section/components/funds-expenditures-table/components/sort-icon';
 import {
@@ -19,11 +21,8 @@ import {
     validateFundsExpendituresAmount,
     validateFundsExpendituresCategory,
 } from '@/validation/admin/reports-schema/funds-expenditures-record-schema/funds-expenditures-record-schema';
-import { updateFundsAmounts } from '@/utils/functions/update-funds-amounts/update-funds-amounts';
 import { getProgramReportingYearOptions } from '@/utils/functions/get-reporting-year-options/get-reporting-year-options';
 import { parseAmount } from '@/utils/functions/parse-amount/parse-amount';
-import { isUsdAmountMismatch } from '@/utils/functions/validate-usd-amount-mismatch/validate-usd-amount-mismatch';
-import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import cn from 'classnames';
 import styles from './FundsExpendituresTable.module.scss';
 import { Button } from '@/components/admin/button/Button';
@@ -174,13 +173,26 @@ export const FundsExpendituresTable = ({
     onOpenBulkDelete,
 }: FundsExpendituresTableProps) => {
     const [sort, setSort] = useState<ColumnSort>({ column: null, direction: null });
-    const [rowEditState, setRowEditState] = useState<RowEditState | null>(null);
-    const [savingRecordId, setSavingRecordId] = useState<number | null>(null);
     const [programYearEdit, setProgramYearEdit] = useState<{ year: string; originalYear: string } | null>(null);
     const [isSavingProgramYear, setIsSavingProgramYear] = useState(false);
-    const [isMoveToTopVisible, setIsMoveToTopVisible] = useState(false);
-    const tableWrapperRef = useRef<HTMLDivElement>(null);
     const headerCheckboxRef = useRef<HTMLInputElement | null>(null);
+    const { tableWrapperRef, isMoveToTopVisible, handleTableScroll, moveToTop } = useTableScrollToTop(records.length);
+    const {
+        rowEditState,
+        setRowEditState,
+        savingRecordId,
+        setSavingRecordId,
+        isAnyRowEditing,
+        setRowEditMode,
+        renderAmountEditRow,
+    } = useTableRowAmountEdit<RowEditState>({
+        isEditing,
+        isRowActionsDisabled,
+        exchangeRate,
+        mismatchMessage: FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH,
+        isAcceptButtonDisabled,
+        onRowEditModeChange,
+    });
 
     const typeInferenceSource = allRecordsForTypeInference ?? records;
 
@@ -188,38 +200,6 @@ export const FundsExpendituresTable = ({
         income: getCategoriesForType(categories, typeInferenceSource, 'income'),
         expense: getCategoriesForType(categories, typeInferenceSource, 'expense'),
     };
-
-    const updateMoveToTopVisibility = useCallback(() => {
-        const tableWrapper = tableWrapperRef.current;
-        if (!tableWrapper) return;
-
-        const isScrollable = tableWrapper.scrollHeight > tableWrapper.clientHeight;
-        setIsMoveToTopVisible(isScrollable && tableWrapper.scrollTop > 0);
-    }, []);
-
-    const moveToTop = useCallback(() => {
-        const tableWrapper = tableWrapperRef.current;
-        if (!tableWrapper) return;
-
-        tableWrapper.scrollTop = 0;
-        setIsMoveToTopVisible(false);
-    }, []);
-
-    const handleTableScroll = useCallback(() => {
-        updateMoveToTopVisibility();
-    }, [updateMoveToTopVisibility]);
-
-    useEffect(() => {
-        updateMoveToTopVisibility();
-    }, [records.length, updateMoveToTopVisibility]);
-
-    const setRowEditMode = useCallback(
-        (nextState: RowEditState | null) => {
-            setRowEditState(nextState);
-            onRowEditModeChange?.(nextState !== null);
-        },
-        [onRowEditModeChange],
-    );
 
     const getRowEditValidationError = useCallback(
         (
@@ -258,10 +238,6 @@ export const FundsExpendituresTable = ({
         },
         [isRowActionsDisabled, rowEditState, setRowEditMode],
     );
-
-    const handleCloseRowEdit = useCallback(() => {
-        setRowEditMode(null);
-    }, [setRowEditMode]);
 
     const handleStartProgramYearEdit = useCallback(() => {
         if (rowEditState || programYearEdit || isRowActionsDisabled || !programAggregateRow) {
@@ -328,7 +304,7 @@ export const FundsExpendituresTable = ({
                 };
             });
         },
-        [getRowEditValidationError],
+        [getRowEditValidationError, setRowEditState],
     );
 
     const handleRowCategoryBlur = useCallback(
@@ -347,84 +323,7 @@ export const FundsExpendituresTable = ({
                 };
             });
         },
-        [getRowEditValidationError],
-    );
-
-    const applyAmountUpdate = useCallback(
-        (prev: RowEditState, field: 'amountUah' | 'amountUsd', value: string, trigger: 'change' | 'blur') => {
-            const updatedAmounts = updateFundsAmounts(
-                field,
-                value,
-                exchangeRate ?? null,
-                trigger,
-            )({
-                amountUah: prev.amountUah,
-                amountUsd: prev.amountUsd,
-                errors: {
-                    amountUah: prev.errors.amountUah,
-                    amountUsd: prev.errors.amountUsd,
-                },
-            });
-
-            return {
-                ...prev,
-                amountUah: updatedAmounts.amountUah,
-                amountUsd: updatedAmounts.amountUsd,
-                errors: {
-                    ...prev.errors,
-                    amountUah: updatedAmounts.errors.amountUah,
-                    amountUsd: updatedAmounts.errors.amountUsd,
-                },
-            };
-        },
-        [exchangeRate],
-    );
-
-    const handleAmountChange = useCallback(
-        (recordId: number, field: 'amountUah' | 'amountUsd', nextValue: string) => {
-            setRowEditState((prev) => {
-                if (prev?.recordId !== recordId) {
-                    return prev;
-                }
-
-                const nextState = applyAmountUpdate(prev, field, nextValue, 'change');
-
-                return {
-                    ...nextState,
-                    usdMismatchMessage: undefined,
-                };
-            });
-        },
-        [applyAmountUpdate],
-    );
-
-    const handleAmountBlur = useCallback(
-        (recordId: number, field: 'amountUah' | 'amountUsd') => {
-            setRowEditState((prev) => {
-                if (prev?.recordId !== recordId) {
-                    return prev;
-                }
-
-                const nextState = applyAmountUpdate(prev, field, prev[field], 'blur');
-
-                if (field === 'amountUsd') {
-                    const hasMismatch = isUsdAmountMismatch(nextState.amountUah, nextState.amountUsd, exchangeRate);
-
-                    return {
-                        ...nextState,
-                        usdMismatchMessage: hasMismatch
-                            ? FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH
-                            : undefined,
-                    };
-                }
-
-                return {
-                    ...nextState,
-                    usdMismatchMessage: undefined,
-                };
-            });
-        },
-        [applyAmountUpdate, exchangeRate],
+        [getRowEditValidationError, setRowEditState],
     );
 
     const handleAcceptRowEdit = useCallback(
@@ -501,7 +400,15 @@ export const FundsExpendituresTable = ({
                 setSavingRecordId(null);
             }
         },
-        [getRowEditValidationError, onRecordSave, rowEditState, savingRecordId, setRowEditMode],
+        [
+            getRowEditValidationError,
+            onRecordSave,
+            rowEditState,
+            savingRecordId,
+            setRowEditMode,
+            setRowEditState,
+            setSavingRecordId,
+        ],
     );
 
     const handleSort = useCallback(
@@ -522,18 +429,12 @@ export const FundsExpendituresTable = ({
                 return { column: null, direction: null };
             });
 
-            const tableWrapper = tableWrapperRef.current;
-            if (tableWrapper) {
-                tableWrapper.scrollTop = 0;
-                setIsMoveToTopVisible(false);
-            }
+            moveToTop();
         },
-        [rowEditState, programYearEdit],
+        [moveToTop, rowEditState, programYearEdit],
     );
 
-    const isAnyRowEditing = rowEditState !== null;
     const isProgramYearEditing = programYearEdit !== null;
-    const isAnyEditingActive = isAnyRowEditing || isProgramYearEditing;
     const isSavingInProgress = savingRecordId !== null;
     const sortedRecords = sortRecords(records, sort);
     const colSpan = isEditing ? 7 : 5;
@@ -755,11 +656,7 @@ export const FundsExpendituresTable = ({
                         ) : (
                             sortedRecords.map((record) => {
                                 const isEditedRow = rowEditState?.recordId === record.id;
-                                const isAnotherRowEditing =
-                                    (isAnyEditingActive && !isEditedRow) || isSavingInProgress || isRowActionsDisabled;
-                                const isSavingCurrentRow = savingRecordId === record.id;
                                 const editableCategories = categoriesByType[record.type];
-                                const isAcceptDisabled = !isEditedRow || isAcceptButtonDisabled(rowEditState);
 
                                 return (
                                     <tr key={record.id} className={styles.tr}>
@@ -833,143 +730,11 @@ export const FundsExpendituresTable = ({
                                                 record.categoryName
                                             )}
                                         </td>
-                                        <td className={cn(styles.td, { [styles['amount-edit-td']]: isEditedRow })}>
-                                            {isEditedRow ? (
-                                                <div className={styles['amount-edit-wrapper']}>
-                                                    <input
-                                                        type="text"
-                                                        className={cn(styles['amount-edit-input'], {
-                                                            [styles['amount-edit-input-error']]:
-                                                                rowEditState.errors.amountUah,
-                                                        })}
-                                                        value={rowEditState.amountUah}
-                                                        aria-label={`Amount UAH record ${record.id}`}
-                                                        onChange={(event) =>
-                                                            handleAmountChange(
-                                                                record.id,
-                                                                'amountUah',
-                                                                event.target.value,
-                                                            )
-                                                        }
-                                                        onBlur={() => handleAmountBlur(record.id, 'amountUah')}
-                                                        disabled={isSavingCurrentRow}
-                                                    />
-                                                    {rowEditState.errors.amountUah && (
-                                                        <p className={styles['amount-edit-error']}>
-                                                            {rowEditState.errors.amountUah}
-                                                        </p>
-                                                    )}
-                                                </div>
-                                            ) : (
-                                                record.amountUah
-                                            )}
-                                        </td>
-                                        <td className={cn(styles.td, { [styles['amount-edit-td']]: isEditedRow })}>
-                                            {isEditedRow ? (
-                                                <div className={styles['amount-edit-wrapper']}>
-                                                    <input
-                                                        type="text"
-                                                        className={cn(styles['amount-edit-input'], {
-                                                            [styles['amount-edit-input-error']]:
-                                                                rowEditState.errors.amountUsd,
-                                                        })}
-                                                        value={rowEditState.amountUsd}
-                                                        aria-label={`Amount USD record ${record.id}`}
-                                                        onChange={(event) =>
-                                                            handleAmountChange(
-                                                                record.id,
-                                                                'amountUsd',
-                                                                event.target.value,
-                                                            )
-                                                        }
-                                                        onBlur={() => handleAmountBlur(record.id, 'amountUsd')}
-                                                        disabled={isSavingCurrentRow}
-                                                    />
-                                                    {rowEditState.errors.amountUsd && (
-                                                        <p className={styles['amount-edit-error']}>
-                                                            {rowEditState.errors.amountUsd}
-                                                        </p>
-                                                    )}
-                                                    {rowEditState.usdMismatchMessage && (
-                                                        <div className={styles['amount-edit-info']}>
-                                                            <InfoIcon
-                                                                className={styles['amount-edit-info-icon']}
-                                                                aria-hidden="true"
-                                                            />
-                                                            <p className={styles['amount-edit-info-text']}>
-                                                                {rowEditState.usdMismatchMessage}
-                                                            </p>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            ) : (
-                                                record.amountUsd
-                                            )}
-                                        </td>
-                                        {isEditing && (
-                                            <td className={cn(styles.td, styles['actions-td'])}>
-                                                <div className={styles['row-actions']}>
-                                                    {isEditedRow ? (
-                                                        <>
-                                                            <button
-                                                                type="button"
-                                                                className={cn(
-                                                                    styles['icon-button'],
-                                                                    styles['accept-icon-button'],
-                                                                )}
-                                                                aria-label={`Accept record ${record.id}`}
-                                                                onClick={() => handleAcceptRowEdit(record)}
-                                                                disabled={isAcceptDisabled || isSavingCurrentRow}
-                                                            >
-                                                                {isSavingCurrentRow ? (
-                                                                    <InlineLoader size={1.2} />
-                                                                ) : (
-                                                                    <CheckmarkIcon className={styles['action-icon']} />
-                                                                )}
-                                                            </button>
-                                                            <button
-                                                                type="button"
-                                                                className={cn(
-                                                                    styles['icon-button'],
-                                                                    styles['close-icon-button'],
-                                                                )}
-                                                                aria-label={`Close edit for record ${record.id}`}
-                                                                onClick={handleCloseRowEdit}
-                                                                disabled={isSavingCurrentRow}
-                                                            >
-                                                                <CrossIcon className={styles['action-icon']} />
-                                                            </button>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <IconButton
-                                                                type="button"
-                                                                className={cn(
-                                                                    styles['icon-button'],
-                                                                    styles['edit-icon-button'],
-                                                                )}
-                                                                aria-label={`Edit record ${record.id}`}
-                                                                onClick={() => handleStartRowEdit(record)}
-                                                                disabled={isAnotherRowEditing}
-                                                                DefaultIcon={ACTION_ICONS.edit.default}
-                                                                FilledIcon={ACTION_ICONS.edit.hover}
-                                                            />
-                                                            <IconButton
-                                                                type="button"
-                                                                className={cn(
-                                                                    styles['icon-button'],
-                                                                    styles['delete-icon-button'],
-                                                                )}
-                                                                aria-label={`Delete record ${record.id}`}
-                                                                onClick={() => onDeleteRecord?.(record)}
-                                                                disabled={isAnotherRowEditing}
-                                                                DefaultIcon={ACTION_ICONS.delete.default}
-                                                                FilledIcon={ACTION_ICONS.delete.hover}
-                                                            />
-                                                        </>
-                                                    )}
-                                                </div>
-                                            </td>
+                                        {renderAmountEditRow(
+                                            record,
+                                            () => handleAcceptRowEdit(record),
+                                            () => handleStartRowEdit(record),
+                                            () => onDeleteRecord?.(record),
                                         )}
                                     </tr>
                                 );

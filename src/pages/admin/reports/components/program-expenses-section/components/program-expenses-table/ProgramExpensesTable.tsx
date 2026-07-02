@@ -1,11 +1,14 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
+import { useTableScrollToTop } from '@/hooks/admin/use-table-scroll-to-top/useTableScrollToTop';
+import { useTableRowAmountEdit } from '@/hooks/admin/use-table-row-amount-edit/useTableRowAmountEdit';
 import { ProgramExpensesEmptyState } from '@/pages/admin/reports/components/program-expenses-section/components/program-expenses-empty-state/ProgramExpensesEmptyState';
 import { FUNDS_EXPENDITURES_TEXT, PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
+import { ReactComponent as ArrowUpIcon } from '@/assets/icons/arrow-up.svg';
+import {
+    normalizeFundsExpendituresAmountInput,
+    validateFundsExpendituresAmount,
+} from '@/validation/admin/reports-schema/funds-expenditures-record-schema/funds-expenditures-record-schema';
 import { ProgramExpensesRecord } from '@/types/admin/reports';
-import { formatSummaryAmount } from '@/utils/functions/format-summary-amount/format-summary-amount';
-import { parseAmount } from '@/utils/functions/parse-amount/parse-amount';
-import { IconButton } from '@/components/admin/icon-button/IconButton';
-import { ACTION_ICONS } from '@/const/common/action-icons';
 import { Button } from '@/components/admin/button/Button';
 import cn from 'classnames';
 import styles from './ProgramExpensesTable.module.scss';
@@ -16,16 +19,47 @@ export interface ProgramExpensesTableProps {
     isEditing?: boolean;
     isAddProgramExpenseDisabled?: boolean;
     onAddProgramExpense?: () => void;
-    onEditRecord?: (record: ProgramExpensesRecord) => void;
     onDeleteRecord?: (record: ProgramExpensesRecord) => void;
     selectedRecordIds?: number[];
     onToggleRecordSelection?: (id: number) => void;
     onSelectAllToggle?: (checked: boolean) => void;
     onOpenBulkDelete?: () => void;
+    exchangeRate?: string | null;
+    isRowActionsDisabled?: boolean;
+    onRowEditModeChange?: (isEditMode: boolean) => void;
+    onRecordSave?: (recordId: number, data: { amountUah: string; amountUsd: string }) => boolean | Promise<boolean>;
+}
+
+interface RowEditState {
+    recordId: number;
+    originalAmountUah: string;
+    originalAmountUsd: string;
+    amountUah: string;
+    amountUsd: string;
+    errors: {
+        amountUah?: string;
+        amountUsd?: string;
+    };
+    usdMismatchMessage?: string;
 }
 
 const READ_ONLY_TABLE_COLUMNS_COUNT = 5;
 const EDITING_TABLE_COLUMNS_COUNT = 7;
+
+const isAcceptButtonDisabled = (rowEditState: RowEditState | null): boolean => {
+    if (!rowEditState) return true;
+
+    const normalizedUah = normalizeFundsExpendituresAmountInput(rowEditState.amountUah, true);
+    const normalizedUsd = normalizeFundsExpendituresAmountInput(rowEditState.amountUsd, true);
+    const normalizedOriginalUah = normalizeFundsExpendituresAmountInput(rowEditState.originalAmountUah, true);
+    const normalizedOriginalUsd = normalizeFundsExpendituresAmountInput(rowEditState.originalAmountUsd, true);
+
+    const hasErrors = Boolean(rowEditState.errors.amountUah) || Boolean(rowEditState.errors.amountUsd);
+    const amountsEmpty = normalizedUah === '' || normalizedUsd === '';
+    const noChanges = normalizedUah === normalizedOriginalUah && normalizedUsd === normalizedOriginalUsd;
+
+    return hasErrors || amountsEmpty || noChanges;
+};
 
 export const ProgramExpensesTable = ({
     records,
@@ -33,12 +67,15 @@ export const ProgramExpensesTable = ({
     isEditing = false,
     isAddProgramExpenseDisabled = false,
     onAddProgramExpense,
-    onEditRecord,
     onDeleteRecord,
     selectedRecordIds = [],
     onToggleRecordSelection,
     onSelectAllToggle,
     onOpenBulkDelete,
+    exchangeRate,
+    isRowActionsDisabled = false,
+    onRowEditModeChange,
+    onRecordSave,
 }: ProgramExpensesTableProps) => {
     const headerCheckboxRef = useRef<HTMLInputElement>(null);
     const hasNoRecords = records.length === 0;
@@ -47,11 +84,105 @@ export const ProgramExpensesTable = ({
     const areAllVisibleRecordsSelected = records.length > 0 && selectedVisibleRecordIds.length === records.length;
     const hasSelectedVisibleRecords = selectedVisibleRecordIds.length > 0;
     const tableColumnsCount = isEditing ? EDITING_TABLE_COLUMNS_COUNT : READ_ONLY_TABLE_COLUMNS_COUNT;
+    const { tableWrapperRef, isMoveToTopVisible, handleTableScroll, moveToTop } = useTableScrollToTop(records.length);
+    const {
+        rowEditState,
+        setRowEditState,
+        savingRecordId,
+        setSavingRecordId,
+        isAnyRowEditing,
+        setRowEditMode,
+        renderAmountEditRow,
+    } = useTableRowAmountEdit<RowEditState>({
+        isEditing,
+        isRowActionsDisabled,
+        exchangeRate,
+        mismatchMessage: PROGRAM_EXPENSES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH,
+        isAcceptButtonDisabled,
+        onRowEditModeChange,
+    });
+
+    const handleStartRowEdit = useCallback(
+        (record: ProgramExpensesRecord) => {
+            if (rowEditState || isRowActionsDisabled) return;
+
+            setRowEditMode({
+                recordId: record.id,
+                originalAmountUah: record.amountUah,
+                originalAmountUsd: record.amountUsd,
+                amountUah: record.amountUah,
+                amountUsd: record.amountUsd,
+                errors: {},
+                usdMismatchMessage: undefined,
+            });
+        },
+        [isRowActionsDisabled, rowEditState, setRowEditMode],
+    );
+
+    const handleAcceptRowEdit = useCallback(
+        async (record: ProgramExpensesRecord) => {
+            if (rowEditState?.recordId !== record.id) {
+                return;
+            }
+
+            if (savingRecordId !== null) {
+                return;
+            }
+
+            const preparedAmountUah = rowEditState.amountUah.trim();
+            const preparedAmountUsd = rowEditState.amountUsd.trim();
+            const amountUahError = validateFundsExpendituresAmount(preparedAmountUah, 'save');
+            const amountUsdError = validateFundsExpendituresAmount(preparedAmountUsd, 'save');
+            const isAmountsUnchanged =
+                normalizeFundsExpendituresAmountInput(rowEditState.originalAmountUah, true) ===
+                    normalizeFundsExpendituresAmountInput(preparedAmountUah, true) &&
+                normalizeFundsExpendituresAmountInput(rowEditState.originalAmountUsd, true) ===
+                    normalizeFundsExpendituresAmountInput(preparedAmountUsd, true);
+
+            if (amountUahError || amountUsdError || isAmountsUnchanged) {
+                setRowEditState((prev) => {
+                    if (prev?.recordId !== record.id) {
+                        return prev;
+                    }
+
+                    return {
+                        ...prev,
+                        amountUah: preparedAmountUah,
+                        amountUsd: preparedAmountUsd,
+                        errors: {
+                            ...prev.errors,
+                            amountUah: amountUahError,
+                            amountUsd: amountUsdError,
+                        },
+                    };
+                });
+
+                return;
+            }
+
+            setSavingRecordId(record.id);
+
+            try {
+                const isSaved = await onRecordSave?.(record.id, {
+                    amountUah: preparedAmountUah,
+                    amountUsd: preparedAmountUsd,
+                });
+
+                if (isSaved === false) {
+                    return;
+                }
+
+                setRowEditMode(null);
+            } finally {
+                setSavingRecordId(null);
+            }
+        },
+        [onRecordSave, rowEditState, savingRecordId, setRowEditMode, setRowEditState, setSavingRecordId],
+    );
 
     useEffect(() => {
-        if (headerCheckboxRef.current) {
-            headerCheckboxRef.current.indeterminate = hasSelectedVisibleRecords && !areAllVisibleRecordsSelected;
-        }
+        if (!headerCheckboxRef.current) return;
+        headerCheckboxRef.current.indeterminate = hasSelectedVisibleRecords && !areAllVisibleRecordsSelected;
     }, [areAllVisibleRecordsSelected, hasSelectedVisibleRecords]);
 
     return (
@@ -76,7 +207,13 @@ export const ProgramExpensesTable = ({
                 </div>
             </div>
 
-            <div className={styles['table-wrapper']}>
+            <div
+                ref={tableWrapperRef}
+                className={styles['table-wrapper']}
+                data-testid="program-expenses-table"
+                data-record-count={records.length}
+                onScroll={handleTableScroll}
+            >
                 <table className={styles.table}>
                     <colgroup>
                         {isEditing && <col className={styles['column-checkbox']} />}
@@ -97,7 +234,7 @@ export const ProgramExpensesTable = ({
                                         className={styles['row-checkbox']}
                                         aria-label="Select all program expense records"
                                         checked={areAllVisibleRecordsSelected}
-                                        onChange={(event) => onSelectAllToggle?.(event.target.checked)}
+                                        onChange={(e) => onSelectAllToggle?.(e.target.checked)}
                                     />
                                 </th>
                             )}
@@ -128,6 +265,7 @@ export const ProgramExpensesTable = ({
                                         <td className={cn(styles.td, styles['checkbox-td'])}>
                                             <input
                                                 type="checkbox"
+                                                disabled={isAnyRowEditing}
                                                 className={styles['row-checkbox']}
                                                 aria-label={`Select record ${record.id}`}
                                                 checked={selectedRecordIds.includes(record.id)}
@@ -142,29 +280,11 @@ export const ProgramExpensesTable = ({
                                         </span>
                                     </td>
                                     <td className={styles.td}>{record.programName}</td>
-                                    <td className={styles.td}>{formatSummaryAmount(parseAmount(record.amountUah))}</td>
-                                    <td className={styles.td}>{formatSummaryAmount(parseAmount(record.amountUsd))}</td>
-                                    {isEditing && (
-                                        <td className={cn(styles.td, styles['actions-td'])}>
-                                            <div className={styles['row-actions']}>
-                                                <IconButton
-                                                    type="button"
-                                                    className={cn(styles['icon-button'], styles['edit-icon-button'])}
-                                                    aria-label={`Edit record ${record.id}`}
-                                                    onClick={() => onEditRecord?.(record)}
-                                                    DefaultIcon={ACTION_ICONS.edit.default}
-                                                    FilledIcon={ACTION_ICONS.edit.hover}
-                                                />
-                                                <IconButton
-                                                    type="button"
-                                                    className={cn(styles['icon-button'], styles['delete-icon-button'])}
-                                                    aria-label={`Delete record ${record.id}`}
-                                                    onClick={() => onDeleteRecord?.(record)}
-                                                    DefaultIcon={ACTION_ICONS.delete.default}
-                                                    FilledIcon={ACTION_ICONS.delete.hover}
-                                                />
-                                            </div>
-                                        </td>
+                                    {renderAmountEditRow(
+                                        record,
+                                        () => handleAcceptRowEdit(record),
+                                        () => handleStartRowEdit(record),
+                                        () => onDeleteRecord?.(record),
                                     )}
                                 </tr>
                             ))
@@ -172,6 +292,19 @@ export const ProgramExpensesTable = ({
                     </tbody>
                 </table>
             </div>
+            <button
+                type="button"
+                className={cn(styles['to-top-button'], {
+                    [styles['to-top-button-visible']]: isMoveToTopVisible,
+                })}
+                data-testid="program-expenses-table-to-top"
+                onClick={moveToTop}
+                aria-label="Scroll table to top"
+                aria-hidden={!isMoveToTopVisible}
+                tabIndex={isMoveToTopVisible ? 0 : -1}
+            >
+                <ArrowUpIcon className={styles['to-top-icon']} />
+            </button>
         </div>
     );
 };

@@ -375,8 +375,11 @@ export const PROGRAM_EXPENSES_TEXT = {
     MESSAGE: {
         RECORD_CREATED_SUCCESSFULLY: 'Новий запис успішно додано',
         RECORD_CREATE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
+        RECORD_UPDATED_SUCCESSFULLY: 'Зміни збережено успішно',
+        RECORD_UPDATE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
         RECORD_DELETED_SUCCESSFULLY: 'Запис успішно видалено',
         RECORD_DELETE_FAILED_RETRY: 'Не вдалося видалити запис. Спробуйте ще раз',
+        AMOUNT_USD_NOT_MATCH: 'Сума в USD не відповідає сумі в UAH',
     },
     BULK: {
         getSelectedLabel: (selected: number, total: number) => `Вибрано ${selected} з ${total}`,

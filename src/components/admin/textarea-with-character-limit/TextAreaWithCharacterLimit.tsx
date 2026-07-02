@@ -105,11 +105,9 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
                 ? parsedLineHeight * maxRows + paddingTop + paddingBottom + borderTop + borderBottom
                 : Infinity;
 
-            requestAnimationFrame(() => {
-                const finalTargetHeight = textarea.scrollHeight + borderTop + borderBottom;
-                textarea.style.height = `${Math.min(finalTargetHeight, maxHeight)}px`;
-                textarea.style.overflowY = finalTargetHeight > maxHeight ? 'auto' : 'hidden';
-            });
+            const finalTargetHeight = textarea.scrollHeight + borderTop + borderBottom;
+            textarea.style.height = `${Math.min(finalTargetHeight, maxHeight)}px`;
+            textarea.style.overflowY = finalTargetHeight > maxHeight ? 'auto' : 'hidden';
         }, [localValue, autoGrow, maxRows]);
 
         return (

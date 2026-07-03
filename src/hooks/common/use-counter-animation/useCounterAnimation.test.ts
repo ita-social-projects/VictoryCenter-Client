@@ -14,7 +14,7 @@ describe('useCounterAnimation', () => {
             return ++rafId;
         });
 
-        jest.spyOn(globalThis, 'cancelAnimationFrame').mockImplementation(() => { });
+        jest.spyOn(globalThis, 'cancelAnimationFrame').mockImplementation(() => {});
     });
 
     afterEach(() => {

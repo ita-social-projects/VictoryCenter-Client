@@ -123,8 +123,8 @@ describe('MainProgramsSection', () => {
         const refetch = jest.fn();
         mockedUseDataFetch.mockReturnValue({ data: null, isLoading: false, error: new Error('fail'), refetch });
 
-        const { getByRole } = render(<MainProgramsSection />);
-        getByRole('button', { name: 'Спробувати ще раз' }).click();
+        render(<MainProgramsSection />);
+        screen.getByRole('button', { name: 'Спробувати ще раз' }).click();
 
         expect(refetch).toHaveBeenCalledTimes(1);
     });

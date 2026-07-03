@@ -3,8 +3,6 @@ import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { ProgramsPageData } from '@/types/public/programs-page';
 import { MainProgramsSection } from './MainProgramsSection';
 
-// ── Mocks ────────────────────────────────────────────────────────────────────
-
 jest.mock('react-i18next', () => ({
     useTranslation: () => ({
         t: (key: string) => {
@@ -22,13 +20,17 @@ jest.mock('@/hooks/common/use-data-fetch/useDataFetch', () => ({
 }));
 
 jest.mock('@/components/public/program-card/ProgramCard', () => ({
-    ProgramCard: ({ program }: { program: { name: string } }) => (
-        <div data-testid="program-card">{program.name}</div>
-    ),
+    ProgramCard: ({ program }: { program: { name: string } }) => <div data-testid="program-card">{program.name}</div>,
 }));
 
 jest.mock('@/components/public/swiper/Swiper', () => ({
-    Swiper: ({ items, renderItem }: { items: unknown[] | null; renderItem: (item: unknown, index: number) => React.ReactNode }) => {
+    Swiper: ({
+        items,
+        renderItem,
+    }: {
+        items: unknown[] | null;
+        renderItem: (item: unknown, index: number) => React.ReactNode;
+    }) => {
         if (!items || items.length === 0) return null;
         return (
             <div data-testid="swiper">
@@ -54,8 +56,6 @@ jest.mock('./MainProgramsSection.module.scss', () => ({
     error: 'error',
 }));
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
 const mockedUseDataFetch = useDataFetch as jest.Mock;
 
 const createMockProgram = (id: number, name: string) => ({
@@ -68,15 +68,9 @@ const createMockProgram = (id: number, name: string) => ({
     localizations: [],
 });
 
-const mockFetch = (
-    data: ProgramsPageData | null,
-    isLoading = false,
-    error: Error | null = null,
-) => {
+const mockFetch = (data: ProgramsPageData | null, isLoading = false, error: Error | null = null) => {
     mockedUseDataFetch.mockReturnValue({ data, isLoading, error });
 };
-
-// ── Tests ─────────────────────────────────────────────────────────────────────
 
 describe('MainProgramsSection', () => {
     beforeEach(() => {

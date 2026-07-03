@@ -1,6 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import { useLocale } from '@/hooks/common/use-locale/useLocale';
 import { useScrollAnimation } from '@/hooks/common/use-scroll-animation/useScrollAnimation';
+import { useCounterAnimation } from '@/hooks/common/use-counter-animation/useCounterAnimation';
 import { PublicImpactStatisticDto, PublicMetricDto, MetricPrefix, MetricType } from '@/types/public/main-page';
 import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 import fallbackImage from '@/assets/images/two-horses-gray.webp';
@@ -10,22 +11,21 @@ interface MainStatisticsSectionProps {
     impactStatistics: PublicImpactStatisticDto | null | undefined;
 }
 
-const COUNTER_DURATION_MS = 1800;
-const COUNTER_STEPS = 60;
-
 const getMetricLocalizedName = (metric: PublicMetricDto, currentLanguage: string): string => {
     const loc = metric.localizations?.find((l) => l.localizationInfoDto?.code === currentLanguage);
     return loc?.name ?? metric.name ?? '';
 };
 
-const formatValue = (metric: PublicMetricDto, displayValue: number): string => {
-    const suffix = metric.type === MetricType.Raised ? ' грн' : '';
-    const prefix = metric.prefix === MetricPrefix.Plus ? '+' : metric.prefix === MetricPrefix.Percent ? '%' : '';
-    const formatted = displayValue.toLocaleString('uk-UA');
-    if (metric.prefix === MetricPrefix.Percent) {
-        return `${formatted}${prefix}${suffix}`;
-    }
-    return `${formatted}${prefix}${suffix}`;
+const formatMetricValue = (value: number, prefix: MetricPrefix | null | undefined, type: MetricType): string => {
+    const formatted = value.toLocaleString('uk-UA');
+    const prefixStr = prefix === MetricPrefix.Plus ? '+' : prefix === MetricPrefix.Percent ? '%' : '';
+    const suffix = type === MetricType.Raised ? ' грн' : '';
+    return `${formatted}${prefixStr}${suffix}`;
+};
+
+const getStatisticTitle = (statistic: PublicImpactStatisticDto, currentLanguage: string): string => {
+    const loc = statistic.localizations?.find((l) => l.localizationInfoDto?.code === currentLanguage);
+    return loc?.title ?? statistic.title ?? '';
 };
 
 interface AnimatedCounterProps {
@@ -35,51 +35,20 @@ interface AnimatedCounterProps {
 }
 
 const AnimatedCounter: React.FC<AnimatedCounterProps> = ({ metric, currentLanguage, isVisible }) => {
-    const [displayValue, setDisplayValue] = useState(0);
-    const animatedRef = useRef(false);
-
-    useEffect(() => {
-        if (!isVisible || animatedRef.current) return;
-        animatedRef.current = true;
-
-        const target = metric.value;
-        const stepValue = target / COUNTER_STEPS;
-        const stepDuration = COUNTER_DURATION_MS / COUNTER_STEPS;
-        let current = 0;
-        let step = 0;
-
-        const timer = setInterval(() => {
-            step += 1;
-            current = Math.min(Math.round(stepValue * step), target);
-            setDisplayValue(current);
-            if (current >= target) {
-                clearInterval(timer);
-            }
-        }, stepDuration);
-
-        return () => clearInterval(timer);
-    }, [isVisible, metric.value]);
+    const displayValue = useCounterAnimation(metric.value, isVisible);
 
     const name = getMetricLocalizedName(metric, currentLanguage);
-    const prefix = metric.prefix === MetricPrefix.Plus ? '+' : metric.prefix === MetricPrefix.Percent ? '%' : '';
-    const suffix = metric.type === MetricType.Raised ? ' грн' : '';
-    const formatted = displayValue.toLocaleString('uk-UA');
-    const valueText =
-        metric.prefix === MetricPrefix.Percent ? `${formatted}${prefix}${suffix}` : `${formatted}${prefix}${suffix}`;
+    const valueText = formatMetricValue(displayValue, metric.prefix, metric.type);
+    const finalValueText = formatMetricValue(metric.value, metric.prefix, metric.type);
 
     return (
-        <div className={styles.metric} role="figure" aria-label={`${name}: ${formatValue(metric, metric.value)}`}>
+        <div className={styles.metric} role="figure" aria-label={`${name}: ${finalValueText}`}>
             <span className={styles['metric-value']} aria-hidden="true">
                 {valueText}
             </span>
             <span className={styles['metric-name']}>{name}</span>
         </div>
     );
-};
-
-const getStatisticTitle = (statistic: PublicImpactStatisticDto, currentLanguage: string): string => {
-    const loc = statistic.localizations?.find((l) => l.localizationInfoDto?.code === currentLanguage);
-    return loc?.title ?? statistic.title ?? '';
 };
 
 export const MainStatisticsSection: React.FC<MainStatisticsSectionProps> = ({ impactStatistics }) => {
@@ -103,7 +72,7 @@ export const MainStatisticsSection: React.FC<MainStatisticsSectionProps> = ({ im
         >
             {imageSrc && (
                 <div className={styles['image-wrapper']}>
-                    <img src={imageSrc} alt="" className={styles.image} aria-hidden="true" />
+                    <img src={imageSrc} alt="" className={styles.image} loading="lazy" aria-hidden="true" />
                 </div>
             )}
             <div className={styles['content-block']}>

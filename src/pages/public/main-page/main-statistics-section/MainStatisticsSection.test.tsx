@@ -6,10 +6,6 @@ jest.mock('@/hooks/common/use-locale/useLocale', () => ({
     useLocale: () => ({ currentLanguage: 'uk' }),
 }));
 
-let ioCallback: (entries: Partial<IntersectionObserverEntry>[]) => void;
-const mockObserve = jest.fn();
-const mockDisconnect = jest.fn();
-
 jest.mock('@/hooks/common/use-scroll-animation/useScrollAnimation', () => ({
     useScrollAnimation: () => {
         const React = require('react');
@@ -18,6 +14,10 @@ jest.mock('@/hooks/common/use-scroll-animation/useScrollAnimation', () => ({
         (globalThis as any).__triggerVisible = () => setIsVisible(true);
         return { ref, isVisible };
     },
+}));
+
+jest.mock('@/hooks/common/use-counter-animation/useCounterAnimation', () => ({
+    useCounterAnimation: (target: number, isVisible: boolean) => (isVisible ? target : 0),
 }));
 
 jest.mock('@/utils/functions/image-helper/image-helper', () => ({
@@ -68,12 +68,7 @@ const makeStatistics = (overrides: Partial<PublicImpactStatisticDto> = {}): Publ
 });
 
 describe('MainStatisticsSection', () => {
-    beforeEach(() => {
-        jest.useFakeTimers();
-    });
-
     afterEach(() => {
-        jest.useRealTimers();
         jest.clearAllMocks();
     });
 
@@ -133,10 +128,6 @@ describe('MainStatisticsSection', () => {
             (globalThis as any).__triggerVisible();
         });
 
-        act(() => {
-            jest.runAllTimers();
-        });
-
         expect(screen.getByText('20+')).toBeInTheDocument();
         expect(screen.getByText('21')).toBeInTheDocument();
         expect(screen.getByText('140+')).toBeInTheDocument();
@@ -147,9 +138,6 @@ describe('MainStatisticsSection', () => {
 
         act(() => {
             (globalThis as any).__triggerVisible();
-        });
-        act(() => {
-            jest.runAllTimers();
         });
 
         expect(screen.getByText(/грн/)).toBeInTheDocument();

@@ -33,6 +33,21 @@
     width: 100%;
 }
 
+.skeleton-grid {
+    display: flex;
+    gap: 16px;
+    padding: 0 16px;
+    overflow: hidden;
+
+    @media (min-width: 768px) {
+        padding: 0 32px;
+    }
+
+    @media (min-width: 1440px) {
+        padding: 0 56px;
+    }
+}
+
 .swiper-slide {
     width: 320px;
 
@@ -97,6 +112,26 @@
 }
 
 .error {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
     color: c.$error;
     padding: 16px;
+}
+
+.retry-button {
+    @include type.body-2-regular;
+    color: c.$blue-900;
+    background: none;
+    border: 1.5px solid c.$blue-900;
+    border-radius: 4px;
+    padding: 8px 20px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+
+    &:hover {
+        background-color: c.$blue-900;
+        color: c.$white;
+    }
 }

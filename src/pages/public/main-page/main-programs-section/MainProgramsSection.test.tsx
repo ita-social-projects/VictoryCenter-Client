@@ -9,6 +9,7 @@ jest.mock('react-i18next', () => ({
             const map: Record<string, string> = {
                 PROGRAMS: 'Програми',
                 FAILED_TO_LOAD_THE_PROGRAMS: 'Не вдалося завантажити дані програм.',
+                RETRY: 'Спробувати ще раз',
             };
             return map[key] ?? key;
         },
@@ -21,6 +22,10 @@ jest.mock('@/hooks/common/use-data-fetch/useDataFetch', () => ({
 
 jest.mock('@/components/public/program-card/ProgramCard', () => ({
     ProgramCard: ({ program }: { program: { name: string } }) => <div data-testid="program-card">{program.name}</div>,
+}));
+
+jest.mock('@/components/public/program-card/ProgramCardSkeleton', () => ({
+    ProgramCardSkeleton: () => <div data-testid="program-card-skeleton" />,
 }));
 
 jest.mock('@/components/public/swiper/Swiper', () => ({
@@ -48,12 +53,14 @@ jest.mock('./MainProgramsSection.module.scss', () => ({
     root: 'root',
     heading: 'heading',
     'swiper-wrapper': 'swiper-wrapper',
+    'skeleton-grid': 'skeleton-grid',
     'swiper-slide': 'swiper-slide',
     scrollbar: 'scrollbar',
     line: 'line',
     drag: 'drag',
     right: 'right',
     error: 'error',
+    'retry-button': 'retry-button',
 }));
 
 const mockedUseDataFetch = useDataFetch as jest.Mock;
@@ -85,12 +92,12 @@ describe('MainProgramsSection', () => {
         expect(screen.getByText('Програми')).toBeInTheDocument();
     });
 
-    it('renders a loading indicator while fetching', () => {
+    it('renders skeleton cards while loading', () => {
         mockFetch(null, true);
 
         render(<MainProgramsSection />);
 
-        expect(screen.getByRole('progressbar')).toBeInTheDocument();
+        expect(screen.getAllByTestId('program-card-skeleton')).toHaveLength(3);
         expect(screen.queryByTestId('swiper')).not.toBeInTheDocument();
     });
 
@@ -102,6 +109,24 @@ describe('MainProgramsSection', () => {
         expect(screen.getByRole('alert')).toBeInTheDocument();
         expect(screen.getByText('Не вдалося завантажити дані програм.')).toBeInTheDocument();
         expect(screen.queryByTestId('swiper')).not.toBeInTheDocument();
+    });
+
+    it('renders a retry button when fetch fails', () => {
+        mockFetch(null, false, new Error('Network error'));
+
+        render(<MainProgramsSection />);
+
+        expect(screen.getByRole('button', { name: 'Спробувати ще раз' })).toBeInTheDocument();
+    });
+
+    it('calls refetch when the retry button is clicked', async () => {
+        const refetch = jest.fn();
+        mockedUseDataFetch.mockReturnValue({ data: null, isLoading: false, error: new Error('fail'), refetch });
+
+        const { getByRole } = render(<MainProgramsSection />);
+        getByRole('button', { name: 'Спробувати ще раз' }).click();
+
+        expect(refetch).toHaveBeenCalledTimes(1);
     });
 
     it('renders nothing in the swiper area when data is null', () => {

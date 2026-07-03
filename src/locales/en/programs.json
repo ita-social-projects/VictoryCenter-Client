@@ -14,5 +14,6 @@
     "MAIN_TITLE.FIRST_HIGHLIGHT": "spaces",
     "MAIN_TITLE.MIDDLE": " where healing ",
     "MAIN_TITLE.SECOND_HIGHLIGHT": "is possible",
-    "FAILED_TO_LOAD_THE_PROGRAMS": "Failed to load application data. Please try again later."
+    "FAILED_TO_LOAD_THE_PROGRAMS": "Failed to load application data. Please try again later.",
+    "RETRY": "Try again"
 }

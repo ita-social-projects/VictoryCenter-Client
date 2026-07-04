@@ -7,11 +7,17 @@ export interface ProgramSearchItemProps {
     item: ProgramSearchItemData;
 }
 
+const MAX_NAME_LENGTH = 50;
+
 export const ProgramSearchItem = forwardRef<SearchItemContentRef, ProgramSearchItemProps>(({ item }, ref) => {
     const nameRef = useRef<HTMLSpanElement>(null);
     const categoriesRef = useRef<HTMLSpanElement>(null);
 
     const categoriesText = useMemo(() => item.categories.join(', '), [item.categories]);
+
+    const displayName = useMemo(() => {
+        return item.name.length > MAX_NAME_LENGTH ? `${item.name.substring(0, MAX_NAME_LENGTH)}...` : item.name;
+    }, [item.name]);
 
     const tooltipContent = useMemo(
         () => (
@@ -28,18 +34,20 @@ export const ProgramSearchItem = forwardRef<SearchItemContentRef, ProgramSearchI
             const nameElement = nameRef.current;
             const categoriesElement = categoriesRef.current;
 
+            const isManuallyTruncated = item.name.length > MAX_NAME_LENGTH;
+
             const isOverflowing =
                 (nameElement && nameElement.scrollWidth > nameElement.clientWidth) ||
                 (categoriesElement && categoriesElement.scrollWidth > categoriesElement.clientWidth);
 
-            return isOverflowing ? tooltipContent : null;
+            return isManuallyTruncated || isOverflowing ? tooltipContent : null;
         },
     }));
 
     return (
         <div className="program-search-item">
             <span ref={nameRef} className="program-search-item__name">
-                {item.name}
+                {displayName}
             </span>
             <span ref={categoriesRef} className="program-search-item__categories">
                 {categoriesText}

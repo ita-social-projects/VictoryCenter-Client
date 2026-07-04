@@ -80,7 +80,11 @@ describe('ProgramSuggestionItem', () => {
         };
         const { ref } = renderComponent({ item: testItem });
 
-        const nameElement: HTMLElement = screen.getByText(testName);
+        const MAX_NAME_LENGTH = 50;
+        const expectedText =
+            testName.length > MAX_NAME_LENGTH ? `${testName.substring(0, MAX_NAME_LENGTH)}...` : testName;
+
+        const nameElement: HTMLElement = screen.getByText(expectedText);
         const categoriesElement: HTMLElement = screen.getByText('Category 1, Category 2');
 
         Object.defineProperty(nameElement, 'scrollWidth', { value: 200 });

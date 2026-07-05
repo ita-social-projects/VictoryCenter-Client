@@ -44,13 +44,15 @@ export const useContainerSizeFromChildren = ({
             return;
         }
 
-        const dimension: 'offsetHeight' | 'offsetWidth' =
-            calculationDimension === 'height' ? 'offsetHeight' : 'offsetWidth';
+        const getExactSize = (el: HTMLElement, dim: Dimension): number => {
+            const rect = el.getBoundingClientRect();
+            return dim === 'height' ? rect.height : rect.width;
+        };
         let finalSize: number | undefined;
 
         if (calculationStrategy === 'basedOnFirstElement') {
             const firstElement = containerEl.children[0] as HTMLElement;
-            const firstElementSize = firstElement?.[dimension] ?? 0;
+            const firstElementSize = firstElement ? getExactSize(firstElement, calculationDimension) : 0;
             finalSize = firstElementSize * targetVisibleElementsCount;
         } else if (calculationStrategy === 'sumOfElements') {
             const childElements = Array.from(containerEl.children) as HTMLElement[];
@@ -65,14 +67,19 @@ export const useContainerSizeFromChildren = ({
             const elementsToMeasure = childElements.slice(0, wholeElementsCount + (fractionalPart > 0 ? 1 : 0));
 
             finalSize = elementsToMeasure.reduce((accumulator, element, index) => {
+                const exactSize = getExactSize(element, calculationDimension);
                 if (index < wholeElementsCount) {
-                    return accumulator + element[dimension];
+                    return accumulator + exactSize;
                 }
-                return accumulator + element[dimension] * fractionalPart;
+                return accumulator + exactSize * fractionalPart;
             }, 0);
         }
 
-        setCalculatedSize(finalSize);
+        if (finalSize !== undefined) {
+            setCalculatedSize(Math.ceil(finalSize));
+        } else {
+            setCalculatedSize(undefined);
+        }
 
         if (finalSize !== undefined && isDisabledAfterFirstSuccess) {
             setHasCalculated(true);

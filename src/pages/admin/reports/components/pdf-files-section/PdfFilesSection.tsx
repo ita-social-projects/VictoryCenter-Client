@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { PdfSectionContentBlock } from './components/pdf-section-content-block/PdfSectionContentBlock';
 import { PdfFilesTable } from './components/pdf-files-table/PdfFilesTable';
 import styles from './PdfFilesSection.module.scss';
@@ -43,11 +43,11 @@ export const PdfFilesSection = () => {
         return PdfSectionApi.getPdfSection(client);
     }, [client]);
 
-    const fetchFiles = useCallback(async () => {
-        if (!activeLanguageId) return [];
-        const data = await PdfReportsApi.getAll(client, { offset: 0, limit: 1000, languageId: activeLanguageId });
-        return data.items;
-    }, [client, activeLanguageId]);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const [totalCount, setTotalCount] = useState(0);
+    const LIMIT = 20;
+
+    const fetchedFilesRef = useRef<PdfReportDto[]>([]);
 
     const {
         data: sectionData,
@@ -60,19 +60,81 @@ export const PdfFilesSection = () => {
         autoFetchDependencies: [fetchSection],
     });
 
+    const fetchFiles = useCallback(async () => {
+        if (!activeLanguageId) return [];
+        const currentLimit = Math.max(LIMIT, fetchedFilesRef.current?.length ?? 0);
+        const data = await PdfReportsApi.getAll(client, {
+            offset: 0,
+            limit: currentLimit,
+            languageId: activeLanguageId,
+        });
+        setTotalCount(data.totalItemsCount);
+        return data.items;
+    }, [client, activeLanguageId]);
+
     const {
         data: fetchedFiles,
         isLoading: isFilesLoading,
         refetch: refetchFiles,
+        setData: setFetchedFiles,
     } = useDataFetch<PdfReportDto[]>({
         initialData: [],
         fetchHandler: fetchFiles,
         autoFetchDependencies: [fetchFiles],
     });
 
-    const handleUploaded = useCallback((newFile: PdfReportDto) => {
-        setUploadedFiles((prev) => [...prev, newFile]);
+    useEffect(() => {
+        fetchedFilesRef.current = fetchedFiles;
+    }, [fetchedFiles]);
+
+    const handleLanguageChange = useCallback((lang: 'uk' | 'en') => {
+        setCurrentLanguage(lang);
+        setUploadedFiles([]);
+        setTotalCount(0);
     }, []);
+
+    const handleLoadMore = useCallback(async () => {
+        if (!activeLanguageId || isLoadingMore || isFilesLoading) return;
+        const currentLength = fetchedFiles?.length ?? 0;
+        if (currentLength >= totalCount) return;
+
+        setIsLoadingMore(true);
+        try {
+            const currentOffset = currentLength;
+            const data = await PdfReportsApi.getAll(client, {
+                offset: currentOffset,
+                limit: LIMIT,
+                languageId: activeLanguageId,
+            });
+            setFetchedFiles((prev) => {
+                const map = new Map((prev ?? []).map((f) => [f.id, f]));
+                data.items.forEach((f) => map.set(f.id, f));
+                return Array.from(map.values());
+            });
+            setTotalCount(data.totalItemsCount);
+        } catch {
+            addToast(PDF_FILES_SECTION_TEXT.MESSAGE.LOAD_ERROR, ToastType.Error);
+        } finally {
+            setIsLoadingMore(false);
+        }
+    }, [
+        client,
+        activeLanguageId,
+        fetchedFiles?.length,
+        totalCount,
+        isLoadingMore,
+        isFilesLoading,
+        setFetchedFiles,
+        addToast,
+    ]);
+
+    const handleUploaded = useCallback(
+        (newFile: PdfReportDto) => {
+            setUploadedFiles((prev) => [...prev, newFile]);
+            refetchFiles();
+        },
+        [refetchFiles],
+    );
 
     const handleSaveSection = useCallback(async () => {
         await refetchSection();
@@ -173,7 +235,7 @@ export const PdfFilesSection = () => {
                 />
             </div>
             <div className={styles['language-switcher-container']}>
-                <LanguageSwitcherButtons currentLanguage={currentLanguage} onLanguageChange={setCurrentLanguage} />
+                <LanguageSwitcherButtons currentLanguage={currentLanguage} onLanguageChange={handleLanguageChange} />
             </div>
             <PdfDropzone onUploaded={handleUploaded} languageId={activeLanguageId} />
             <PdfFilesTable
@@ -183,6 +245,8 @@ export const PdfFilesSection = () => {
                 onRenameFile={handleRenameFile}
                 isDeleting={isDeleting}
                 isRenaming={isRenaming}
+                isLoadingMore={isLoadingMore}
+                onLoadMore={handleLoadMore}
             />
             <TranslatePdfSectionModal
                 isOpen={isTranslateModalOpen}

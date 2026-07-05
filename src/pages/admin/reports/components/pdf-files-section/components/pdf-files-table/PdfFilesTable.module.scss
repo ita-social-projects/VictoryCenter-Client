@@ -1,4 +1,5 @@
 @use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/variables/z-index';
 
 .table-container {
     overflow-x: auto;
@@ -211,4 +212,50 @@
     font-size: 14px;
     color: c.$error;
     font-weight: 400;
+}
+
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: 60vh;
+    scroll-behavior: smooth;
+}
+
+.to-top-button {
+    display: inline-flex;
+    margin-top: 20px;
+    margin-left: auto;
+    margin-right: 28px;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    border: none;
+    border-radius: 50%;
+    background-color: c.$blue-500;
+    box-shadow: 0 2px 8px rgba(c.$blue-50, 0.15);
+    cursor: pointer;
+    z-index: z-index.admin(infinite-scroll-list-arrow-up);
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.to-top-button-visible {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.to-top-icon path {
+    stroke: c.$white;
+}
+
+.loading-more-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px 0;
 }

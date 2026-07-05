@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { PdfFilesTable } from './PdfFilesTable';
 import { PDF_FILES_SECTION_TEXT } from '@/const/admin/reports';
@@ -42,6 +42,10 @@ jest.mock('@/components/admin/icon-button/IconButton', () => ({
     IconButton: ({ onClick, disabled, 'aria-label': ariaLabel }: any) => (
         <button onClick={onClick} disabled={disabled} aria-label={ariaLabel} />
     ),
+}));
+
+jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
+    InlineLoader: () => <div data-testid="inline-loader" />,
 }));
 
 jest.mock('@/validation/admin/reports-schema/pdf-file-rename-schema/pdf-file-rename-schema', () => ({
@@ -429,6 +433,36 @@ describe('PdfFilesTable', () => {
                 PDF_FILES_SECTION_TEXT.ACTIONS.FILE.ACCEPT_RENAME,
             ) as HTMLButtonElement;
             expect(acceptButton).toBeDisabled();
+        });
+    });
+
+    describe('Infinite Scroll and Scroll to Top', () => {
+        it('should render the table-wrapper and handle scroll to bottom', async () => {
+            const mockOnLoadMore = jest.fn();
+            render(<PdfFilesTable {...defaultProps} onLoadMore={mockOnLoadMore} />);
+
+            const wrapper = screen.getByTestId('pdf-files-table-wrapper');
+            expect(wrapper).toBeInTheDocument();
+
+            // Simulate scroll to bottom
+            Object.defineProperty(wrapper, 'scrollHeight', { value: 500, configurable: true });
+            Object.defineProperty(wrapper, 'clientHeight', { value: 100, configurable: true });
+            Object.defineProperty(wrapper, 'scrollTop', { value: 400, configurable: true });
+
+            fireEvent.scroll(wrapper);
+
+            expect(mockOnLoadMore).toHaveBeenCalled();
+        });
+
+        it('should render inline loader when isLoadingMore is true', () => {
+            render(<PdfFilesTable {...defaultProps} isLoadingMore={true} />);
+            expect(screen.getByTestId('inline-loader')).toBeInTheDocument();
+        });
+
+        it('should render scroll-to-top button', () => {
+            render(<PdfFilesTable {...defaultProps} />);
+            const btn = screen.getByTestId('pdf-files-table-to-top');
+            expect(btn).toBeInTheDocument();
         });
     });
 });

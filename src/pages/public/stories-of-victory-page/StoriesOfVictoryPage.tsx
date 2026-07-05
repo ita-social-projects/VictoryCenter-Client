@@ -56,14 +56,6 @@ const reviewArticles: StoriesOfVictoryReviewArticle[] = [
     },
 ];
 
-// const reviewVideos: StoriesOfVictoryReviewVideo[] = [
-//     { id: 1, title: 'Коні лікують 2025', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-//     { id: 2, title: 'Коні лікують 2025', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-//     { id: 3, title: 'Коні лікують 2025', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-//     { id: 4, title: 'Коні лікують 2025', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-//     { id: 5, title: 'Коні лікують 2025', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
-// ];
-
 export const StoriesOfVictoryPage: React.FC<StoriesOfVictoryPageProps> = () => {
     return (
         <LoadableContent isLoading={false} error={false}>
@@ -71,7 +63,6 @@ export const StoriesOfVictoryPage: React.FC<StoriesOfVictoryPageProps> = () => {
                 <>
                     <SloganSection />
                     <ReviewArticlesSection content={reviewArticles} />
-                    {/* <VideoReviewsSection content={reviewVideos} /> */}
                     <ReviewsSection content={reviews} />
                 </>
             }

@@ -1,8 +1,9 @@
 import { TranslationStatus } from '@/types/common/language';
 import { AboutUsContentLocalizableFields } from '@/types/public/about-us-page';
+import { DEFAULT_UKRAINIAN_LANGUAGE_ID } from '@/const/common/locales';
 
 export const createRelevantAboutUsUkLocalization = (content: AboutUsContentLocalizableFields) => ({
-    language: { id: 1, code: 'uk' },
+    language: { id: DEFAULT_UKRAINIAN_LANGUAGE_ID, code: 'uk' },
     translationStatus: TranslationStatus.Relevant,
     ...content,
 });

@@ -28,6 +28,7 @@ export const RichTextInputGroup = ({
     placeholder,
     error,
     className,
+    trimOnBlur,
 }: RichTextInputGroupProps) => {
     return (
         <div className={cn('input-group', className)}>
@@ -44,6 +45,7 @@ export const RichTextInputGroup = ({
                 hideToolbar={hideToolbar}
                 placeholder={placeholder}
                 hasError={!!error}
+                trimOnBlur={trimOnBlur}
             />
             <InputError error={error} />
         </div>

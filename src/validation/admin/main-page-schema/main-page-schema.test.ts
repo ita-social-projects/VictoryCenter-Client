@@ -228,16 +228,12 @@ describe('MAIN_PAGE_VALIDATION_FUNCTIONS', () => {
             expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateStatisticsTitleEn('Changes you can measure')).toBeUndefined();
         });
 
-        it('returns required error for empty EN title', () => {
-            expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateStatisticsTitleEn('')).toBe(
-                MAIN_PAGE_VALIDATION.common.REQUIRED,
-            );
+        it('returns undefined for empty EN title since it is optional', () => {
+            expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateStatisticsTitleEn('')).toBeUndefined();
         });
 
-        it('treats spaces as empty and returns required error for EN title', () => {
-            expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateStatisticsTitleEn('   ')).toBe(
-                MAIN_PAGE_VALIDATION.common.REQUIRED,
-            );
+        it('treats spaces as empty and returns undefined for EN title since it is optional', () => {
+            expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateStatisticsTitleEn('   ')).toBeUndefined();
         });
 
         it('returns min error for EN title shorter than min', () => {

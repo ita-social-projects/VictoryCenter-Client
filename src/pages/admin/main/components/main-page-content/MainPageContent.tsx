@@ -102,10 +102,16 @@ const RICH_TEXT_FORM_FIELDS: Array<keyof MainPageFormValues> = [
     'aboutUsTitleEn',
     'aboutUsDescriptionUa',
     'aboutUsDescriptionEn',
+    'donationsTitleUa',
+    'donationsTitleEn',
+    'donationsDescriptionUa',
+    'donationsDescriptionEn',
     'partnersTitleUa',
     'partnersTitleEn',
     'partnersDescriptionUa',
     'partnersDescriptionEn',
+    'statisticsTitleUa',
+    'statisticsTitleEn',
 ];
 
 const RICH_TEXT_FORM_FIELD_SET = new Set<keyof MainPageFormValues>(RICH_TEXT_FORM_FIELDS);
@@ -395,22 +401,29 @@ export const MainPageContent = () => {
 
         try {
             const { languages } = await MainPageApi.get(client);
-            let dataToPublish = { ...pendingPublishData };
+            const uploadImage = async (imageField: any) => {
+                if (imageField && typeof imageField === 'object' && !('id' in imageField)) {
+                    try {
+                        return await ImageApi.post(client, imageField as ImageValues);
+                    } catch (error) {
+                        throw error;
+                    }
+                }
+                return imageField;
+            };
 
-            if (dataToPublish.image && !('id' in dataToPublish.image)) {
-                const uploaded = await ImageApi.post(client, dataToPublish.image as ImageValues);
-                dataToPublish.image = uploaded;
-            }
+            const [image, statisticsImage, donationsImage] = await Promise.all([
+                uploadImage(pendingPublishData.image),
+                uploadImage(pendingPublishData.statisticsImage),
+                uploadImage(pendingPublishData.donationsImage),
+            ]);
 
-            if (dataToPublish.statisticsImage && !('id' in dataToPublish.statisticsImage)) {
-                const uploaded = await ImageApi.post(client, dataToPublish.statisticsImage as ImageValues);
-                dataToPublish.statisticsImage = uploaded;
-            }
-
-            if (dataToPublish.donationsImage && !('id' in dataToPublish.donationsImage)) {
-                const uploaded = await ImageApi.post(client, dataToPublish.donationsImage as ImageValues);
-                dataToPublish.donationsImage = uploaded;
-            }
+            const dataToPublish = {
+                ...pendingPublishData,
+                image,
+                statisticsImage,
+                donationsImage,
+            };
 
             const patch = mapFormValuesToMainPagePatch(
                 dataToPublish,

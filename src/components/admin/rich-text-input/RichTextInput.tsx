@@ -32,6 +32,11 @@ export interface RichTextInputProps {
     placeholder?: string;
     className?: string;
     hasError?: boolean;
+    /**
+     * If true, automatically trims leading and trailing whitespace from the editor's
+     * text content when the input loses focus.
+     */
+    trimOnBlur?: boolean;
 }
 
 const theme = {
@@ -58,6 +63,7 @@ export const RichTextInput = ({
     placeholder = 'Enter text...',
     className,
     hasError = false,
+    trimOnBlur = false,
 }: RichTextInputProps) => {
     const [isFocused, setIsFocused] = useState(false);
     const [currentLength, setCurrentLength] = useState(0);
@@ -121,7 +127,12 @@ export const RichTextInput = ({
                 <HistoryPlugin />
                 <OnChangePlugin onChange={onChange} />
                 <MaxLengthPlugin maxLength={maxLength} onLengthChange={handleLengthChange} />
-                <FocusPlugin onFocus={onFocus} onBlur={onBlur} onFocusChange={handleFocusChange} />
+                <FocusPlugin
+                    onFocus={onFocus}
+                    onBlur={onBlur}
+                    onFocusChange={handleFocusChange}
+                    trimOnBlur={trimOnBlur}
+                />
                 <InitialValuePlugin value={value} />
                 <EditablePlugin disabled={disabled} />
                 <EnterKeyPlugin />

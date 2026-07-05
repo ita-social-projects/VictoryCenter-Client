@@ -6,9 +6,14 @@ export interface FocusPluginProps {
     onFocus?: () => void;
     onBlur?: () => void;
     onFocusChange?: (isFocused: boolean) => void;
+    /**
+     * If true, automatically trims leading and trailing whitespace from the editor's
+     * text content when the input loses focus.
+     */
+    trimOnBlur?: boolean;
 }
 
-export const FocusPlugin = ({ onFocus, onBlur, onFocusChange }: FocusPluginProps) => {
+export const FocusPlugin = ({ onFocus, onBlur, onFocusChange, trimOnBlur = false }: FocusPluginProps) => {
     const [editor] = useLexicalComposerContext();
 
     useEffect(() => {
@@ -25,25 +30,27 @@ export const FocusPlugin = ({ onFocus, onBlur, onFocusChange }: FocusPluginProps
         const unregisterBlur = editor.registerCommand(
             BLUR_COMMAND,
             () => {
-                editor.update(() => {
-                    const root = $getRoot();
-                    const textNodes = root.getAllTextNodes() as TextNode[];
+                if (trimOnBlur) {
+                    editor.update(() => {
+                        const root = $getRoot();
+                        const textNodes = root.getAllTextNodes() as TextNode[];
 
-                    if (textNodes.length === 0) return;
+                        if (textNodes.length === 0) return;
 
-                    const first = textNodes[0];
-                    const firstText = first.getTextContent();
-                    const trimmedFirst = firstText.replace(/^ +/, '');
-                    if (trimmedFirst !== firstText) {
-                        first.setTextContent(trimmedFirst);
-                    }
-                    const last = textNodes[textNodes.length - 1];
-                    const lastText = last.getTextContent();
-                    const trimmedLast = lastText.replace(/ +$/, '');
-                    if (trimmedLast !== lastText) {
-                        last.setTextContent(trimmedLast);
-                    }
-                });
+                        const first = textNodes[0];
+                        const firstText = first.getTextContent();
+                        const trimmedFirst = firstText.replace(/^ +/, '');
+                        if (trimmedFirst !== firstText) {
+                            first.setTextContent(trimmedFirst);
+                        }
+                        const last = textNodes[textNodes.length - 1];
+                        const lastText = last.getTextContent();
+                        const trimmedLast = lastText.replace(/ +$/, '');
+                        if (trimmedLast !== lastText) {
+                            last.setTextContent(trimmedLast);
+                        }
+                    });
+                }
 
                 onBlur?.();
                 onFocusChange?.(false);
@@ -56,7 +63,7 @@ export const FocusPlugin = ({ onFocus, onBlur, onFocusChange }: FocusPluginProps
             unregisterFocus();
             unregisterBlur();
         };
-    }, [editor, onFocus, onBlur, onFocusChange]);
+    }, [editor, onFocus, onBlur, onFocusChange, trimOnBlur]);
 
     return null;
 };

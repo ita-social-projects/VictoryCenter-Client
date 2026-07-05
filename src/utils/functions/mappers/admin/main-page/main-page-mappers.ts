@@ -11,9 +11,7 @@ import {
     LocalizationLanguageSource,
     resolveLocaleCode,
 } from '@/utils/functions/mappers/common/localization/localization-mappers';
-
-const DEFAULT_ENGLISH_LANGUAGE_ID = 2;
-const DEFAULT_UKRAINIAN_LANGUAGE_ID = 1;
+import { DEFAULT_ENGLISH_LANGUAGE_ID, DEFAULT_UKRAINIAN_LANGUAGE_ID } from '@/const/common/locales';
 
 const findLocalizationByCode = <TLocalization extends LocalizationLanguageSource>(
     localizations: TLocalization[] | undefined,
@@ -89,6 +87,10 @@ export function mapFormValuesToMainPagePatch(
 
     if (enLanguageId == null) {
         throw new Error('Could not resolve English language ID. Check languages configuration.');
+    }
+
+    if (ukLanguageId == null) {
+        throw new Error('Could not resolve Ukrainian language ID. Check languages configuration.');
     }
 
     const str = (val?: string) => (val ?? '').trim();

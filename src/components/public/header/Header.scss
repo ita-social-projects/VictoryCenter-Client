@@ -166,3 +166,25 @@ $header-height: 4rem;
         }
     }
 }
+
+@media (max-width: 480px) {
+    .header-block {
+        .header-content-container {
+            .button-container {
+                .contact-us-button,
+                .language-switcher {
+                    display: none;
+                }
+            }
+        }
+    }
+
+    .mobile-menu {
+        .mobile-language-switcher {
+            display: flex;
+            padding: 1rem 1rem;
+            color: black;
+            font-weight: 600;
+        }
+    }
+}

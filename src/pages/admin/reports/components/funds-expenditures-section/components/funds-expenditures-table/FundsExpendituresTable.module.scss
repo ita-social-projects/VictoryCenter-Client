@@ -96,8 +96,8 @@
 }
 
 .type-chip-expense {
-    background-color: #8b4459;
-    border: 1px solid #5e1e2f;
+    background-color: c.$expense-maroon;
+    border: 1px solid c.$expense-maroon-dark;
     color: c.$white;
 }
 
@@ -158,45 +158,9 @@
     accent-color: c.$blue-500;
 }
 
-.actions-th,
-.actions-td {
+.actions-th {
     width: 80px;
     padding: 0 8px;
-}
-
-.row-actions {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    justify-content: flex-end;
-}
-
-.icon-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    border: none;
-    background-color: transparent;
-    border-radius: 6px;
-    cursor: pointer;
-    padding: 4px;
-    transition: background-color 0.15s ease;
-
-    &:hover {
-        background-color: c.$light-blue-50;
-    }
-
-    &:active {
-        background-color: c.$grey-300;
-    }
-
-    &:disabled {
-        cursor: not-allowed;
-        opacity: 0.45;
-        background-color: transparent;
-    }
 }
 
 .selection-row {
@@ -294,6 +258,36 @@
     }
 }
 
+.program-aggregate-row {
+    background-color: c.$light-blue-25;
+    opacity: 0.65;
+
+    .td {
+        border-top: 1px solid c.$grey-900;
+        border-bottom: 1px solid c.$grey-900;
+    }
+
+    .td:first-child {
+        border-left: 4px solid c.$expense-maroon;
+    }
+
+    &:hover {
+        background-color: c.$light-blue-25;
+    }
+
+    .icon-button:not(:disabled) {
+        opacity: 1;
+    }
+}
+
+.program-aggregate-row:last-child .td {
+    border-bottom: none;
+}
+
+.program-aggregate-row-editing {
+    opacity: 1;
+}
+
 .category-edit-td,
 .amount-edit-td {
     position: relative;
@@ -309,17 +303,6 @@
     height: 80px;
     overflow: visible;
     position: relative;
-}
-
-.amount-edit-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-    height: 72px;
-    overflow: visible;
-    position: relative;
-    width: 128px;
 }
 
 .category-edit-select {
@@ -348,32 +331,6 @@
     border-radius: 6px;
 }
 
-.amount-edit-info {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    position: absolute;
-    top: 64px;
-    left: 0;
-}
-
-.amount-edit-info-icon {
-    width: 18px;
-    height: 18px;
-    flex-shrink: 0;
-
-    path {
-        stroke: c.$blue-500;
-    }
-}
-
-.amount-edit-info-text {
-    @include type.small-text-regular;
-    margin: 0;
-    color: c.$blue-500;
-    white-space: nowrap;
-}
-
 .category-edit-error {
     @include type.small-text-regular;
     position: absolute;
@@ -392,28 +349,6 @@
     margin: 0;
     color: c.$error;
     white-space: nowrap;
-}
-
-.amount-edit-input {
-    @include type.subtitle-2-medium;
-    width: 128px;
-    min-height: 48px;
-    padding: 10px 17px;
-    border: 1px solid c.$grey-700;
-    border-radius: 8px;
-    color: c.$graphite-black;
-    background-color: c.$white;
-    box-shadow: 0 1px 2px rgba(c.$bluish-black, 0.05);
-    outline: none;
-
-    &:focus {
-        border-color: c.$blue-500;
-        box-shadow: 0 0 0 2px rgba(c.$blue-500, 0.12);
-    }
-}
-
-.amount-edit-input-error {
-    border-color: c.$error;
 }
 
 .to-top-button {

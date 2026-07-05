@@ -14,7 +14,10 @@ interface ValidateFundsExpendituresCategoryParams {
     trigger?: FundsExpendituresCategoryValidationTrigger;
 }
 
-export const normalizeFundsExpendituresAmountInput = (value: string, trimEnd = false): string => {
+export const normalizeFundsExpendituresAmountInput = (value: string | undefined | null, trimEnd = false): string => {
+    if (!value) {
+        return '';
+    }
     const withNormalizedSpaces = value.replaceAll(/\s+/g, ' ').trimStart();
     const withCommaSeparator = withNormalizedSpaces.replaceAll('.', ',');
     const firstCommaIndex = withCommaSeparator.indexOf(',');
@@ -26,7 +29,7 @@ export const normalizeFundsExpendituresAmountInput = (value: string, trimEnd = f
     const integerPart = withCommaSeparator.slice(0, firstCommaIndex);
     const decimalPart = withCommaSeparator
         .slice(firstCommaIndex + 1)
-        .replaceAll(',', '')
+        .replaceAll(/[\s,]/g, '')
         .slice(0, 2);
     const normalized = `${integerPart},${decimalPart}`;
 
@@ -37,6 +40,17 @@ export const validateFundsExpendituresAmount = (
     value: string,
     trigger: FundsExpendituresAmountValidationTrigger = 'change',
 ): string | undefined => {
+    if (value) {
+        const withCommaSeparator = value.replaceAll(/\s+/g, ' ').trimStart().replaceAll('.', ',');
+        const firstCommaIndex = withCommaSeparator.indexOf(',');
+        if (firstCommaIndex !== -1) {
+            const rawDecimalPart = withCommaSeparator.slice(firstCommaIndex + 1).replace(/[^\d]/g, '');
+            if (rawDecimalPart.length > 2) {
+                return FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_MAX_DECIMALS;
+            }
+        }
+    }
+
     const normalized = normalizeFundsExpendituresAmountInput(value, true);
 
     if (!normalized) {

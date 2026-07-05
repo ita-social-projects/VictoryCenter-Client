@@ -106,10 +106,9 @@ export const TextAreaWithCharacterLimit = forwardRef<HTMLTextAreaElement, TextAr
                 : Infinity;
 
             const finalTargetHeight = textarea.scrollHeight + borderTop + borderBottom;
-
             textarea.style.height = `${Math.min(finalTargetHeight, maxHeight)}px`;
             textarea.style.overflowY = finalTargetHeight > maxHeight ? 'auto' : 'hidden';
-        }, [value, autoGrow, maxRows]);
+        }, [localValue, autoGrow, maxRows]);
 
         return (
             <div className="char-limit-textarea">

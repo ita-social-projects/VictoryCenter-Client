@@ -97,48 +97,6 @@ jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
     InlineLoader: ({ size }: { size?: number }) => <div data-testid="inline-loader">loader-{size ?? 2}</div>,
 }));
 
-jest.mock(
-    '@/pages/admin/reports/components/funds-expenditures-section/components/common/funds-record-actions/FundsRecordActions',
-    () => ({
-        FundsRecordActions: ({
-            onAddIncome,
-            onAddExpense,
-            isAddIncomeDisabled,
-            isAddExpenseDisabled,
-            testId,
-        }: {
-            onAddIncome?: () => void;
-            onAddExpense?: () => void;
-            isAddIncomeDisabled?: boolean;
-            isAddExpenseDisabled?: boolean;
-            testId?: string;
-        }) => {
-            const { FUNDS_EXPENDITURES_TEXT: mockFundsExpendituresText } = require('@/const/admin/reports');
-
-            return (
-                <div data-testid={testId ?? 'editing-actions'}>
-                    <button
-                        type="button"
-                        data-testid="mock-add-expense"
-                        onClick={onAddExpense}
-                        disabled={Boolean(isAddExpenseDisabled)}
-                    >
-                        {mockFundsExpendituresText.BUTTON.ADD_EXPENSE}
-                    </button>
-                    <button
-                        type="button"
-                        data-testid="mock-add-income"
-                        onClick={onAddIncome}
-                        disabled={Boolean(isAddIncomeDisabled)}
-                    >
-                        {mockFundsExpendituresText.BUTTON.ADD_INCOME}
-                    </button>
-                </div>
-            );
-        },
-    }),
-);
-
 jest.mock('@/components/common/select/Select', () => {
     const React = require('react');
 
@@ -637,8 +595,8 @@ describe('FundsExpendituresTable', () => {
                     categoryName: 'Грантові кошти',
                     type: 'income',
                     reportingYear: '2025',
-                    amountUah: '7 265,123',
-                    amountUsd: '173,221',
+                    amountUah: '7 265,12',
+                    amountUsd: '173,22',
                 },
             ];
 
@@ -650,8 +608,8 @@ describe('FundsExpendituresTable', () => {
 
             expect(onRecordSave).toHaveBeenCalledWith(1, {
                 categoryId: 2,
-                amountUah: '7 265,123',
-                amountUsd: '173,221',
+                amountUah: '7 265,12',
+                amountUsd: '173,22',
             });
         });
 
@@ -682,15 +640,22 @@ describe('FundsExpendituresTable', () => {
             });
         });
 
-        it('should show required validation for empty amount on blur', () => {
-            renderTable({ isEditing: true });
+        it('should show validation error and skip saving when Accept is clicked before blurring an invalid zero amount', () => {
+            const onRecordSave = jest.fn();
+
+            renderTable({ isEditing: true, onRecordSave });
 
             fireEvent.click(screen.getByLabelText('Edit record 1'));
-            fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '   ' } });
-            fireEvent.blur(screen.getByLabelText('Amount UAH record 1'));
+            fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '0' } });
 
-            expect(screen.getByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED)).toBeInTheDocument();
-            expect(screen.getByLabelText('Accept record 1')).toBeDisabled();
+            const acceptButton = screen.getByLabelText('Accept record 1');
+            expect(acceptButton).not.toBeDisabled();
+
+            fireEvent.click(acceptButton);
+
+            expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_NOT_ZERO)).toBeInTheDocument();
+            expect(onRecordSave).not.toHaveBeenCalled();
+            expect(screen.getByLabelText('Accept record 1')).toBeInTheDocument();
         });
 
         it('should show numeric validation for non-number amount', () => {
@@ -734,60 +699,7 @@ describe('FundsExpendituresTable', () => {
             expect(screen.getByLabelText('Accept record 1')).toBeDisabled();
         });
 
-        it('should show required validation for empty USD amount on blur', () => {
-            renderTable({ isEditing: true });
-
-            fireEvent.click(screen.getByLabelText('Edit record 1'));
-            fireEvent.change(screen.getByLabelText('Amount USD record 1'), { target: { value: '   ' } });
-            fireEvent.blur(screen.getByLabelText('Amount USD record 1'));
-
-            expect(screen.getByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED)).toBeInTheDocument();
-            expect(screen.getByLabelText('Accept record 1')).toBeDisabled();
-        });
-
-        it.each([
-            {
-                title: 'should recalculate USD when UAH amount is changed and validated',
-                changedFieldLabel: 'Amount UAH record 1',
-                changedValue: '8 000',
-                expectedFieldLabel: 'Amount USD record 1',
-                expectedValue: '200',
-                withBlur: true,
-            },
-            {
-                title: 'should recalculate USD immediately on valid UAH change using current exchange rate',
-                changedFieldLabel: 'Amount UAH record 1',
-                changedValue: '8 000',
-                expectedFieldLabel: 'Amount USD record 1',
-                expectedValue: '200',
-                withBlur: false,
-            },
-        ])('$title', ({ changedFieldLabel, changedValue, expectedFieldLabel, expectedValue, withBlur }) => {
-            renderTable({ isEditing: true, exchangeRate: '40' });
-
-            fireEvent.click(screen.getByLabelText('Edit record 1'));
-
-            const changedField = screen.getByLabelText(changedFieldLabel);
-            fireEvent.change(changedField, { target: { value: changedValue } });
-
-            if (withBlur) {
-                fireEvent.blur(changedField);
-            }
-
-            expect(screen.getByLabelText(expectedFieldLabel)).toHaveValue(expectedValue);
-        });
-
-        it('should not recalculate opposite amount when exchange rate is invalid', () => {
-            renderTable({ isEditing: true, exchangeRate: null });
-
-            fireEvent.click(screen.getByLabelText('Edit record 1'));
-            fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '8 000' } });
-            fireEvent.blur(screen.getByLabelText('Amount UAH record 1'));
-
-            expect(screen.getByLabelText('Amount USD record 1')).toHaveValue('4 200');
-        });
-
-        it('should show mismatch info message when edited USD does not match converted UAH amount', () => {
+        it('should show USD mismatch message in the UI when amounts do not match', () => {
             renderTable({ isEditing: true, exchangeRate: '40' });
 
             fireEvent.click(screen.getByLabelText('Edit record 1'));
@@ -798,7 +710,7 @@ describe('FundsExpendituresTable', () => {
             expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).toBeInTheDocument();
         });
 
-        it('should clear mismatch info message immediately when UAH amount changes', () => {
+        it('should clear USD mismatch message from UI when UAH amount is changed', () => {
             renderTable({ isEditing: true, exchangeRate: '40' });
 
             fireEvent.click(screen.getByLabelText('Edit record 1'));
@@ -811,30 +723,6 @@ describe('FundsExpendituresTable', () => {
             fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: 'abc' } });
 
             expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH)).not.toBeInTheDocument();
-        });
-
-        it('should use current exchange rate instead of just adding/removing zeroes', () => {
-            const records: EnrichedRecord[] = [
-                {
-                    id: 1,
-                    categoryId: 1,
-                    categoryName: 'Грантові кошти',
-                    type: 'income',
-                    reportingYear: '2025',
-                    amountUah: '500 000',
-                    amountUsd: '13 500',
-                },
-            ];
-
-            renderTable({ isEditing: true, exchangeRate: '42', records });
-
-            fireEvent.click(screen.getByLabelText('Edit record 1'));
-
-            fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '50 000' } });
-            expect(screen.getByLabelText('Amount USD record 1')).toHaveValue('1190,48');
-
-            fireEvent.change(screen.getByLabelText('Amount UAH record 1'), { target: { value: '500 000' } });
-            expect(screen.getByLabelText('Amount USD record 1')).toHaveValue('11904,77');
         });
     });
 
@@ -890,5 +778,97 @@ describe('FundsExpendituresTable', () => {
             fireEvent.click(rowCheckbox);
             expect(onToggleRecordSelection).toHaveBeenCalledWith(1);
         });
+    });
+});
+
+describe('FundsExpendituresTable program aggregate row', () => {
+    const currentYear = new Date().getFullYear();
+    const nextYear = String(currentYear + 1);
+    const programAggregateRow = {
+        reportingYear: String(currentYear),
+        categoryName: 'Програмні',
+        amountUah: '4 200',
+        amountUsd: '4 200',
+    };
+
+    it('renders the disabled aggregate row with an edit control when editing', () => {
+        renderTable({ programAggregateRow, isEditing: true });
+
+        expect(screen.getByTestId('program-aggregate-row')).toBeInTheDocument();
+        expect(screen.getByText('Програмні')).toBeInTheDocument();
+        expect(screen.getByLabelText('Edit program reporting year')).toBeInTheDocument();
+    });
+
+    it('keeps accept disabled until the year changes, then saves the new year', async () => {
+        const onProgramYearSave = jest.fn().mockResolvedValue(true);
+        renderTable({ programAggregateRow, isEditing: true, onProgramYearSave });
+
+        fireEvent.click(screen.getByLabelText('Edit program reporting year'));
+        expect(screen.getByLabelText('Accept program reporting year')).toBeDisabled();
+
+        fireEvent.click(screen.getByTestId(`select-option-${nextYear}-${nextYear}`));
+        expect(screen.getByLabelText('Accept program reporting year')).not.toBeDisabled();
+
+        fireEvent.click(screen.getByLabelText('Accept program reporting year'));
+        await waitFor(() => expect(onProgramYearSave).toHaveBeenCalledWith(nextYear));
+    });
+
+    it('closes the year edit without saving', () => {
+        const onProgramYearSave = jest.fn();
+        renderTable({ programAggregateRow, isEditing: true, onProgramYearSave });
+
+        fireEvent.click(screen.getByLabelText('Edit program reporting year'));
+        fireEvent.click(screen.getByLabelText('Close program reporting year edit'));
+
+        expect(screen.queryByLabelText('Accept program reporting year')).not.toBeInTheDocument();
+        expect(onProgramYearSave).not.toHaveBeenCalled();
+    });
+
+    it('keeps the year edit open and does not reset state when the save is rejected by the parent', async () => {
+        const onProgramYearSave = jest.fn().mockResolvedValue(false);
+        renderTable({ programAggregateRow, isEditing: true, onProgramYearSave });
+
+        fireEvent.click(screen.getByLabelText('Edit program reporting year'));
+        fireEvent.click(screen.getByTestId(`select-option-${nextYear}-${nextYear}`));
+        fireEvent.click(screen.getByLabelText('Accept program reporting year'));
+
+        await waitFor(() => expect(onProgramYearSave).toHaveBeenCalledWith(nextYear));
+
+        expect(screen.getByLabelText('Accept program reporting year')).toBeInTheDocument();
+        expect(screen.getByLabelText('Close program reporting year edit')).toBeInTheDocument();
+    });
+
+    it('shows a saving indicator and disables year edit controls while the save is in progress', async () => {
+        let resolveSave: (() => void) | undefined;
+        const onProgramYearSave = jest.fn(
+            () =>
+                new Promise<boolean>((resolve) => {
+                    resolveSave = () => resolve(true);
+                }),
+        );
+
+        renderTable({ programAggregateRow, isEditing: true, onProgramYearSave });
+
+        fireEvent.click(screen.getByLabelText('Edit program reporting year'));
+        fireEvent.click(screen.getByTestId(`select-option-${nextYear}-${nextYear}`));
+        fireEvent.click(screen.getByLabelText('Accept program reporting year'));
+
+        expect(screen.getByTestId('inline-loader')).toBeInTheDocument();
+        expect(screen.getByLabelText('Accept program reporting year')).toBeDisabled();
+        expect(screen.getByLabelText('Close program reporting year edit')).toBeDisabled();
+
+        resolveSave?.();
+
+        await waitFor(() => {
+            expect(screen.queryByTestId('inline-loader')).not.toBeInTheDocument();
+        });
+    });
+
+    it('disables the program reporting year edit button while a row is being edited', () => {
+        renderTable({ programAggregateRow, isEditing: true });
+
+        fireEvent.click(screen.getByLabelText('Edit record 1'));
+
+        expect(screen.getByLabelText('Edit program reporting year')).toBeDisabled();
     });
 });

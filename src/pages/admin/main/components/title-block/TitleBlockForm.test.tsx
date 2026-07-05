@@ -4,19 +4,10 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { TitleBlockForm } from './TitleBlockForm';
 
-jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
+jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
     __esModule: true,
-    InputWithCharacterLimitGroup: require('@/utils/test-mocks/main-page-mocks').MockInputWithCharacterLimitGroup,
+    RichTextInputGroup: require('@/utils/test-mocks/main-page-mocks').MockRichTextInputGroup,
 }));
-
-jest.mock(
-    '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
-    () => ({
-        __esModule: true,
-        TextAreaWithCharacterLimitGroup: require('@/utils/test-mocks/main-page-mocks')
-            .MockTextAreaWithCharacterLimitGroup,
-    }),
-);
 
 jest.mock('@/components/admin/button/Button', () => ({
     __esModule: true,
@@ -39,6 +30,8 @@ const FormWrapper = ({
         defaultValues: {
             titleUa: '',
             descriptionUa: '',
+            titleEn: '',
+            descriptionEn: '',
             ...defaultValues,
         } as MainPageFormValues,
     });
@@ -135,5 +128,23 @@ describe('TitleBlockForm', () => {
         fireEvent.change(titleInput, { target: { value: 'Новий змінений заголовок' } });
 
         expect(titleInput.value).toBe('Новий змінений заголовок');
+    });
+
+    it('renders translated fields as disabled and hides publish button in read-only mode', () => {
+        render(
+            <FormWrapper defaultValues={{ titleEn: 'English title', descriptionEn: 'English description' }}>
+                <TitleBlockForm isPublishDisabled={false} onPublish={mockOnPublish} isReadOnly />
+            </FormWrapper>,
+        );
+
+        const titleInput = screen.getByTestId('title-block-title') as HTMLInputElement;
+        const descriptionInput = screen.getByTestId('title-block-description') as HTMLTextAreaElement;
+
+        expect(titleInput).toHaveValue('English title');
+        expect(titleInput).toBeDisabled();
+        expect(descriptionInput).toHaveValue('English description');
+        expect(descriptionInput).toBeDisabled();
+        expect(screen.getByTestId('image-upload-form')).toHaveAttribute('data-disabled', 'true');
+        expect(screen.queryByTestId('submit-btn')).not.toBeInTheDocument();
     });
 });

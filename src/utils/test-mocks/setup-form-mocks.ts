@@ -16,3 +16,8 @@ jest.mock('@/components/admin/button/Button', () => ({
     __esModule: true,
     Button: require('@/utils/test-mocks/main-page-mocks').MockSubmitButton,
 }));
+
+jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
+    __esModule: true,
+    RichTextInputGroup: require('@/utils/test-mocks/main-page-mocks').MockRichTextInputGroup,
+}));

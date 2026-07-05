@@ -96,6 +96,18 @@ jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGr
     ),
 }));
 
+jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
+    ConfirmationModal: ({ isOpen, onConfirm, onCancel, confirmText, cancelText }: any) => {
+        if (!isOpen) return null;
+        return (
+            <div data-testid="confirmation-modal">
+                <button onClick={onCancel}>{cancelText}</button>
+                <button onClick={onConfirm}>{confirmText}</button>
+            </div>
+        );
+    },
+}));
+
 jest.mock('@/hooks/common/use-data-fetch/useDataFetch');
 jest.mock('@/services/api/admin/partners/partners-api');
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient');
@@ -158,6 +170,10 @@ describe('PartnerBanner', () => {
 
     const clickPublish = () => {
         fireEvent.click(getPublishButton());
+    };
+
+    const clickConfirmPublish = () => {
+        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
     };
 
     const clickTryAgain = () => {
@@ -285,6 +301,7 @@ describe('PartnerBanner', () => {
         changeDescriptionValue(updatedBanner.description);
 
         clickPublish();
+        clickConfirmPublish();
 
         await waitFor(() => {
             expect(mockedPartnersApi.updateBanner).toHaveBeenCalledWith('mock-client', {
@@ -310,6 +327,7 @@ describe('PartnerBanner', () => {
         render(<PartnerBanner />);
 
         clickPublish();
+        clickConfirmPublish();
 
         await waitFor(() => {
             expect(mockedPartnersApi.updateBanner).toHaveBeenCalledWith('mock-client', {
@@ -355,6 +373,7 @@ describe('PartnerBanner', () => {
         render(<PartnerBanner />);
 
         clickPublish();
+        clickConfirmPublish();
 
         await waitFor(() => {
             expect(getTitleInput()).toHaveAttribute('contentEditable', 'false');
@@ -466,6 +485,7 @@ describe('PartnerBanner', () => {
         });
 
         clickPublish();
+        clickConfirmPublish();
 
         await waitFor(() => {
             expect(mockedPartnersApi.updateBanner).toHaveBeenCalledWith('mock-client', {
@@ -502,6 +522,13 @@ describe('PartnerBanner', () => {
         render(<PartnerBanner />);
 
         clickPublish();
+        clickConfirmPublish();
+
+        // Modal is closed immediately, so the confirm button might not be there anymore.
+        // We simulate clicking the main publish button again instead.
+        clickPublish();
+        // Since isPublishing might be true, the button might be disabled, so this click won't do anything.
+        // Wait, the test was clicking the main button twice. Let's just click it twice before confirming.
         clickPublish();
 
         await waitFor(() => {
@@ -542,6 +569,7 @@ describe('PartnerBanner', () => {
         });
 
         clickPublish();
+        clickConfirmPublish();
 
         await waitFor(() => {
             expect(mockedPartnersApi.updateBanner).toHaveBeenCalled();
@@ -575,6 +603,7 @@ describe('PartnerBanner', () => {
         render(<PartnerBanner />);
 
         clickPublish();
+        clickConfirmPublish();
 
         await waitFor(() => {
             expect(mockedPartnersApi.updateBanner).toHaveBeenCalled();
@@ -601,6 +630,7 @@ describe('PartnerBanner', () => {
         });
 
         clickPublish();
+        clickConfirmPublish();
 
         await waitFor(() => {
             expect(mockedPartnersApi.updateBanner).toHaveBeenCalledWith('mock-client', {

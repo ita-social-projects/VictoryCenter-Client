@@ -217,8 +217,8 @@ export const SearchBar = <T,>({
 
     const { calculatedSize: dropdownMaxHeight } = useContainerSizeFromChildren({
         elementsContainerRef: suggestionsListRef,
-        targetVisibleElementsCount: 4.5,
-        calculationStrategy: 'basedOnFirstElement',
+        targetVisibleElementsCount: 5,
+        calculationStrategy: 'sumOfElements',
         calculationDimension: 'height',
         dependencies: [searchItems],
         isDisabledAfterFirstSuccess: true,

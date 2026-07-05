@@ -12,9 +12,11 @@ export const PARTNERS_TEXT = {
         },
         TITLE: {
             DELETE_SECTION: 'Видалити секцію',
+            PUBLISH_SECTION: 'Опублікувати зміни?',
         },
         MESSAGE: {
             FAIL_TO_DELETE_PARTNER_SECTION: 'Виникла помилка під час видалення секції партнерів',
+            DELETE_SECTION_WARNING: 'Всі партнери в секції будуть видалені. Бажаєте продовжити?',
         },
         IMAGE: {
             ADD_IMAGE_HERE: 'Додайте файл сюди',
@@ -61,7 +63,7 @@ export const PARTNER_BANNER_VALIDATION = {
     },
     description: {
         min: 10,
-        max: 50,
+        max: 30,
         getRequiredError: () => `Опис обов'язковий`,
     },
     image: {
@@ -95,7 +97,7 @@ export const PARTNER_VALIDATION = {
         getRequiredError: () => `Опис обов'язковий`,
     },
     image: {
-        width: 208,
-        height: 208,
+        width: 200,
+        height: 200,
     },
 };

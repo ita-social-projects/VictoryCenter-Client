@@ -5,6 +5,16 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { AboutUsBlockForm } from './AboutUsBlockForm';
 
+jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
+    __esModule: true,
+    RichTextInputGroup: require('@/utils/test-mocks/main-page-mocks').MockRichTextInputGroup,
+}));
+
+jest.mock('@/components/admin/button/Button', () => ({
+    __esModule: true,
+    Button: require('@/utils/test-mocks/main-page-mocks').MockSubmitButton,
+}));
+
 const FormWrapper = ({
     children,
     defaultValues,
@@ -16,6 +26,8 @@ const FormWrapper = ({
         defaultValues: {
             aboutUsTitleUa: '',
             aboutUsDescriptionUa: '',
+            aboutUsTitleEn: '',
+            aboutUsDescriptionEn: '',
             ...defaultValues,
         } as MainPageFormValues,
     });
@@ -91,5 +103,27 @@ describe('AboutUsBlockForm', () => {
         fireEvent.change(titleInput, { target: { value: 'Новий заголовок' } });
 
         expect(titleInput.value).toBe('Новий заголовок');
+    });
+
+    it('renders translated fields as disabled and hides publish button in read-only mode', () => {
+        render(
+            <FormWrapper
+                defaultValues={{
+                    aboutUsTitleEn: 'About us title',
+                    aboutUsDescriptionEn: 'About us description',
+                }}
+            >
+                <AboutUsBlockForm isPublishDisabled={false} onPublish={mockOnPublish} isReadOnly />
+            </FormWrapper>,
+        );
+
+        const titleInput = document.querySelector('#about-us-block-title') as HTMLInputElement;
+        const descriptionInput = document.querySelector('#about-us-block-description') as HTMLTextAreaElement;
+
+        expect(titleInput.value).toBe('About us title');
+        expect(titleInput).toBeDisabled();
+        expect(descriptionInput.value).toBe('About us description');
+        expect(descriptionInput).toBeDisabled();
+        expect(screen.queryByRole('button', { name: MAIN_PAGE_TEXT.BUTTONS.PUBLISH })).not.toBeInTheDocument();
     });
 });

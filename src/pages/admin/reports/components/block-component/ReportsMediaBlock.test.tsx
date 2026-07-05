@@ -119,10 +119,12 @@ jest.mock('./ReportsMediaBlock.module.scss', () => ({
 describe('ReportsMediaBlock', () => {
     const mockOnValuesChange = jest.fn();
     const mockValidateTitle = jest.fn();
+    const mockValidateTitleEn = jest.fn();
     const mockValidateTotalAmount = jest.fn();
 
     const defaultValues: ReportsMediaBlockValues = {
         title: 'Test Title',
+        titleEn: 'Test Title UK',
         totalAmount: 250000,
         image: null,
         imageId: null,
@@ -132,6 +134,7 @@ describe('ReportsMediaBlock', () => {
 
     const defaultValidationFunctions: ReportsMediaBlockValidationFunctions = {
         validateTitle: mockValidateTitle,
+        validateTitleEn: mockValidateTitleEn,
         validateTotalAmount: mockValidateTotalAmount,
     };
 
@@ -320,7 +323,7 @@ describe('ReportsMediaBlock', () => {
         it('should work without validateTotalAmount function', () => {
             renderComponent({
                 isValueEditable: true,
-                validationFunctions: { validateTitle: mockValidateTitle },
+                validationFunctions: { validateTitle: mockValidateTitle, validateTitleEn: mockValidateTitleEn },
             });
 
             const valueInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-value');

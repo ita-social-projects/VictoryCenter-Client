@@ -1,7 +1,6 @@
 import DefaultPlaceholder from '@/assets/images/man-facing-horse-forehead.webp';
 import { Button } from '@/components/admin/button/Button';
-import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
-import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
+import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { MAIN_PAGE_TEXT, MAIN_PAGE_VALIDATION } from '@/const/admin/main-page';
 import { ImageUploadForm } from '@/pages/admin/main/components/common/image-upload-form/ImageUploadForm';
@@ -30,15 +29,19 @@ const IMAGE_CONFIG = {
 interface TitleBlockFormProps {
     isPublishDisabled: boolean;
     onPublish: () => void;
+    isReadOnly?: boolean;
 }
 
-export const TitleBlockForm = ({ isPublishDisabled, onPublish }: TitleBlockFormProps) => {
+export const TitleBlockForm = ({ isPublishDisabled, onPublish, isReadOnly = false }: TitleBlockFormProps) => {
     const [imageError, setImageError] = useState<string | null>(null);
 
     const {
         control,
         formState: { errors },
     } = useFormContext<MainPageFormValues>();
+
+    const titleName = isReadOnly ? 'titleEn' : 'titleUa';
+    const descriptionName = isReadOnly ? 'descriptionEn' : 'descriptionUa';
 
     return (
         <div className={styles.form}>
@@ -51,59 +54,64 @@ export const TitleBlockForm = ({ isPublishDisabled, onPublish }: TitleBlockFormP
                     imageConfig={IMAGE_CONFIG}
                     variant="whoWeAre"
                     name="image"
+                    disabled={isReadOnly}
                 />
 
                 <div className={styles['text-section']}>
                     <Controller
-                        name="titleUa"
+                        name={titleName}
                         control={control}
                         render={({ field: { onChange, value, onBlur } }) => (
-                            <InputWithCharacterLimitGroup
+                            <RichTextInputGroup
                                 id="title-block-title"
                                 name={COMMON_TEXT_ADMIN.TYPE.TITLE}
                                 label={MAIN_PAGE_TEXT.BLOCKS.TITLE.TITLE_LABEL}
                                 value={value}
                                 onChange={onChange}
                                 onBlur={onBlur}
-                                error={errors.titleUa?.message}
+                                error={isReadOnly ? undefined : errors.titleUa?.message}
                                 maxLength={MAIN_PAGE_VALIDATION.titleBlock.title.max}
                                 isRequired={true}
+                                disabled={isReadOnly}
                             />
                         )}
                     />
 
                     <Controller
-                        name="descriptionUa"
+                        name={descriptionName}
                         control={control}
                         render={({ field: { onChange, value, onBlur } }) => (
-                            <TextAreaWithCharacterLimitGroup
+                            <RichTextInputGroup
                                 id="title-block-description"
                                 name={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
                                 label={MAIN_PAGE_TEXT.BLOCKS.TITLE.DESCRIPTION_LABEL}
                                 value={value}
                                 onChange={onChange}
                                 onBlur={onBlur}
-                                error={errors.descriptionUa?.message}
+                                error={isReadOnly ? undefined : errors.descriptionUa?.message}
                                 maxLength={MAIN_PAGE_VALIDATION.titleBlock.description.max}
                                 isRequired={true}
-                                className={styles['textarea-custom']}
+                                className={styles['rich-text-custom']}
+                                disabled={isReadOnly}
                             />
                         )}
                     />
                 </div>
             </div>
 
-            <div className={styles.actions}>
-                <Button
-                    type="button"
-                    buttonStyle="primary"
-                    disabled={isPublishDisabled || !!imageError}
-                    className={styles['publish-button']}
-                    onClick={onPublish}
-                >
-                    {MAIN_PAGE_TEXT.BUTTONS.PUBLISH}
-                </Button>
-            </div>
+            {!isReadOnly && (
+                <div className={styles.actions}>
+                    <Button
+                        type="button"
+                        buttonStyle="primary"
+                        disabled={isPublishDisabled || !!imageError}
+                        className={styles['publish-button']}
+                        onClick={onPublish}
+                    >
+                        {MAIN_PAGE_TEXT.BUTTONS.PUBLISH}
+                    </Button>
+                </div>
+            )}
         </div>
     );
 };

@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ProgramExpensesSection } from './ProgramExpensesSection';
-import { FUNDS_EXPENDITURES_TEXT, PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
+import { FUNDS_EXPENDITURES_TEXT, PROGRAM_EXPENSES_TEXT, REPORTS_TEXT } from '@/const/admin/reports';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ProgramExpensesReadOnlyData } from '@/types/admin/reports';
 import { ProgramExpensesApi } from '@/services/api/admin/reports/program-expenses-api';
@@ -59,17 +59,70 @@ const EMPTY_PROGRAM_EXPENSES_DATA: ProgramExpensesReadOnlyData = {
 };
 
 const mockGetReadOnlyData = jest.fn();
+const mockPost = jest.fn();
+const mockUpdate = jest.fn();
 jest.mock('@/services/api/admin/reports/program-expenses-api', () => ({
     ProgramExpensesApi: {
         getReadOnlyData: (...args: unknown[]) => mockGetReadOnlyData(...args),
         delete: jest.fn(),
         bulkDelete: jest.fn(),
+        post: (...args: unknown[]) => mockPost(...args),
+        update: (...args: unknown[]) => mockUpdate(...args),
     },
 }));
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: () => 'mock-client',
 }));
+
+jest.mock('@/components/common/select/Select', () => {
+    const React = require('react');
+
+    const stringifyValueForTestId = (value: unknown): string => {
+        if (value === undefined) return 'undefined';
+        if (value === null) return 'null';
+
+        if (typeof value === 'string') return value;
+        if (typeof value === 'number' || typeof value === 'boolean') return value.toString();
+
+        return 'non-primitive';
+    };
+
+    const SelectOption = (_props: { value: unknown; name: string }) => null;
+
+    const MockSelect = ({
+        children,
+        onValueChange,
+        placeholder,
+    }: {
+        children: React.ReactNode;
+        onValueChange: (value: unknown) => void;
+        placeholder?: string;
+    }) => {
+        const options = React.Children.toArray(children).filter(Boolean) as Array<{
+            props: { value: unknown; name: string };
+        }>;
+
+        return (
+            <div data-testid={`select-${placeholder}`}>
+                {options.map((option, index) => (
+                    <button
+                        key={`${option.props.name}-${index}`}
+                        type="button"
+                        data-testid={`select-option-${option.props.name}-${stringifyValueForTestId(option.props.value)}`}
+                        onClick={() => onValueChange(option.props.value)}
+                    >
+                        {option.props.name}
+                    </button>
+                ))}
+            </div>
+        );
+    };
+
+    MockSelect.Option = SelectOption;
+
+    return { Select: MockSelect };
+});
 
 const mockAddToast = jest.fn();
 jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider', () => ({
@@ -101,9 +154,42 @@ jest.mock('@/assets/icons/plus.svg', () => ({
 }));
 
 jest.mock('./components/common/add-program-expense-record-modal/AddProgramExpenseRecordModal', () => ({
-    AddProgramExpenseRecordModal: ({ isOpen, exchangeRate }: { isOpen: boolean; exchangeRate: string | null }) => (
+    AddProgramExpenseRecordModal: ({
+        isOpen,
+        exchangeRate,
+        onSubmit,
+        recordToEdit,
+    }: {
+        isOpen: boolean;
+        exchangeRate: string | null;
+        onSubmit: (submitData: {
+            programId: number;
+            reportingYear: string;
+            amountUah: string;
+            amountUsd: string;
+        }) => Promise<boolean>;
+        recordToEdit?: { id: number } | null;
+    }) => (
         <div data-testid="add-program-expense-modal" data-open={String(isOpen)} data-exchange-rate={exchangeRate ?? ''}>
             AddProgramExpenseRecordModal
+            {isOpen && (
+                <>
+                    {recordToEdit && <span data-testid="record-to-edit">{recordToEdit.id}</span>}
+                    <button
+                        data-testid="mock-submit-btn"
+                        onClick={() =>
+                            onSubmit({
+                                programId: recordToEdit ? 3 : 2,
+                                reportingYear: recordToEdit ? '2027' : '2026',
+                                amountUah: recordToEdit ? '2 000' : '1 000',
+                                amountUsd: recordToEdit ? '50' : '25',
+                            })
+                        }
+                    >
+                        Submit Modal
+                    </button>
+                </>
+            )}
         </div>
     ),
 }));
@@ -530,6 +616,100 @@ describe('ProgramExpensesSection', () => {
         await waitFor(() => {
             expect(mockAddToast).toHaveBeenCalledWith(PROGRAM_EXPENSES_TEXT.BULK.DELETE_FAILED, 'error', 5000);
             expect(screen.queryByTestId('delete-record-modal')).not.toBeInTheDocument();
+        });
+    });
+
+    describe('add and edit flow integration', () => {
+        beforeEach(() => {
+            mockPost.mockReset();
+            mockUpdate.mockReset();
+        });
+
+        it('should open modal in add mode, submit, call API.post and refetch', async () => {
+            mockPost.mockResolvedValueOnce(undefined);
+
+            render(<ProgramExpensesSection isEditing />);
+
+            fireEvent.click(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE }));
+
+            expect(screen.getByTestId('add-program-expense-modal')).toBeInTheDocument();
+            expect(screen.queryByTestId('record-to-edit')).not.toBeInTheDocument();
+
+            fireEvent.click(screen.getByTestId('mock-submit-btn'));
+
+            await waitFor(() => {
+                expect(mockPost).toHaveBeenCalledWith('mock-client', {
+                    reportingYear: 2026,
+                    hippotherapyProgramCategoryId: 2,
+                    amountUah: 1000,
+                    amountUsd: 25,
+                });
+                expect(mockAddToast).toHaveBeenCalledWith(
+                    PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_CREATED_SUCCESSFULLY,
+                    'success',
+                );
+                expect(mockRefetch).toHaveBeenCalled();
+                expect(screen.getByTestId('add-program-expense-modal')).toHaveAttribute('data-open', 'false');
+            });
+        });
+
+        it('should start inline row edit mode, select program category, click accept, call API.update and refetch', async () => {
+            mockUpdate.mockResolvedValueOnce(undefined);
+
+            render(<ProgramExpensesSection isEditing />);
+
+            // Click the edit button on the first record (id: 1)
+            fireEvent.click(screen.getByLabelText('Edit record 1'));
+
+            // The row action buttons should switch to Accept/Cancel
+            expect(screen.getByLabelText('Accept record 1')).toBeInTheDocument();
+            expect(screen.getByLabelText('Close edit for record 1')).toBeInTheDocument();
+
+            // Select program C (id: 3)
+            fireEvent.click(screen.getByTestId('select-option-Program C-3'));
+
+            const acceptButton = screen.getByLabelText('Accept record 1');
+            expect(acceptButton).not.toBeDisabled();
+
+            fireEvent.click(acceptButton);
+
+            await waitFor(() => {
+                expect(mockUpdate).toHaveBeenCalledWith('mock-client', 1, {
+                    reportingYear: 2025,
+                    hippotherapyProgramCategoryId: 3,
+                    amountUah: 50000,
+                    amountUsd: 1200,
+                });
+                expect(mockAddToast).toHaveBeenCalledWith(REPORTS_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY, 'success');
+                expect(mockRefetch).toHaveBeenCalled();
+            });
+        });
+
+        it('should cancel inline edit when isEditing turns off', () => {
+            const { rerender } = render(<ProgramExpensesSection isEditing />);
+
+            fireEvent.click(screen.getByLabelText('Edit record 1'));
+            expect(screen.getByLabelText('Accept record 1')).toBeInTheDocument();
+
+            rerender(<ProgramExpensesSection isEditing={false} />);
+            expect(screen.queryByLabelText('Accept record 1')).not.toBeInTheDocument();
+        });
+
+        it('should clear bulk selection and hide bulk selection bar when row edit starts', async () => {
+            render(<ProgramExpensesSection isEditing />);
+
+            fireEvent.click(screen.getByRole('checkbox', { name: 'Select record 1' }));
+            expect(screen.getByText(PROGRAM_EXPENSES_TEXT.BULK.DELETE_BUTTON)).toBeInTheDocument();
+
+            fireEvent.click(screen.getByLabelText('Edit record 1'));
+
+            await waitFor(() => {
+                const deleteButton = screen.getByText(PROGRAM_EXPENSES_TEXT.BULK.DELETE_BUTTON);
+                const selectionRow = deleteButton.closest('div')?.parentElement;
+                expect(selectionRow).toHaveAttribute('aria-hidden', 'true');
+                expect(screen.getByRole('checkbox', { name: 'Select record 1' })).not.toBeChecked();
+                expect(screen.getByRole('checkbox', { name: 'Select record 1' })).toBeDisabled();
+            });
         });
     });
 });

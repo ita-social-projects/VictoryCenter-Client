@@ -87,6 +87,21 @@ describe('useFormManager', () => {
         expect(result.current.formState).toEqual(defaultFormState);
     });
 
+    it('should validate initialData on first validation pass when initialData is provided', () => {
+        renderHook(() =>
+            useFormManager<FormValues, FormErrors>({
+                defaultFormState,
+                initialData,
+                validateForm,
+                onSubmit,
+                onValidationChange,
+            }),
+        );
+
+        expect(validateForm).toHaveBeenNthCalledWith(1, initialData, false);
+        expect(onValidationChange).toHaveBeenCalledWith(true);
+    });
+
     it('should track dirty state correctly', () => {
         const { result } = renderHook(() =>
             useFormManager<FormValues, FormErrors>({
@@ -100,6 +115,33 @@ describe('useFormManager', () => {
 
         act(() => {
             result.current.setFormState({ name: 'Changed', age: 0 });
+        });
+
+        expect(result.current.isDirty()).toBe(true);
+    });
+
+    it('should use a custom equality comparator for dirty state', () => {
+        const customInitialData = { name: 'Alice', age: 30 };
+
+        const { result } = renderHook(() =>
+            useFormManager<FormValues, FormErrors>({
+                defaultFormState,
+                initialData: customInitialData,
+                validateForm,
+                onSubmit,
+                isEqual: (currentValues, initialValues) =>
+                    currentValues.name.trim() === initialValues.name.trim() && currentValues.age === initialValues.age,
+            }),
+        );
+
+        act(() => {
+            result.current.setFormState({ name: 'Alice ', age: 30 });
+        });
+
+        expect(result.current.isDirty()).toBe(false);
+
+        act(() => {
+            result.current.setFormState({ name: 'Bob', age: 30 });
         });
 
         expect(result.current.isDirty()).toBe(true);
@@ -201,7 +243,7 @@ describe('useFormManager', () => {
         expect(delayedSubmit).toHaveBeenCalledTimes(1);
     });
 
-    it('should expose submit, isValid, isDirty via ref', () => {
+    it('should expose submit, isValid, isDirty, and getValues via ref', () => {
         const ref = React.createRef<FormManagerRef>();
         renderHook(() =>
             useFormManager<FormValues, FormErrors>({
@@ -216,6 +258,8 @@ describe('useFormManager', () => {
         expect(ref.current?.submit).toBeDefined();
         expect(ref.current?.isValid).toBeDefined();
         expect(ref.current?.isDirty).toBeDefined();
+        expect(ref.current?.getValues).toBeDefined();
         expect(ref.current?.isDirty()).toBe(false);
+        expect(ref.current?.getValues?.()).toEqual(defaultFormState);
     });
 });

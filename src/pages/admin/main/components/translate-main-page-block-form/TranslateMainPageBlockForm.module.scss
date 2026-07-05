@@ -1,0 +1,11 @@
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.rich-text-description {
+    [contenteditable='true'] {
+        min-height: 116px;
+    }
+}

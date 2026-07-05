@@ -10,6 +10,7 @@ import {
 } from '@/utils/functions/section-cancel-flow/section-cancel-flow';
 import { HistorySectionForm, SectionCancelOptions } from '../history-section-form/HistorySectionForm';
 import styles from './HistoryForm.module.scss';
+import { LocalizationLanguage } from '@/types/common/language';
 
 interface SectionEditingState {
     sectionKey: string;
@@ -23,6 +24,7 @@ interface SectionEditingState {
 export interface HistoryFormRef {
     addSection: (section: HistorySectionDto) => void;
     replaceSection: (sectionIndex: number, newSection: HistorySectionDto) => void;
+    updateSectionSilently: (sectionIndex: number, newSection: HistorySectionDto) => void;
     getSections: () => HistorySectionDto[];
 }
 
@@ -36,6 +38,7 @@ export interface HistoryFormProps {
     onSectionDeleted?: (remainingSections: HistorySectionDto[]) => void;
     onRequestCancelSection?: (request: { type: SectionCancelActionType; onDiscard: () => void }) => void;
     onRequestSaveSection?: (request: { onConfirm: () => void }) => void;
+    language?: LocalizationLanguage;
 }
 
 const createSectionState = (sectionKey: string): SectionEditingState => ({
@@ -69,6 +72,7 @@ export const HistoryForm = forwardRef<HistoryFormRef, HistoryFormProps>(function
         onSectionDeleted,
         onRequestCancelSection,
         onRequestSaveSection,
+        language,
     },
     ref,
 ) {
@@ -103,15 +107,7 @@ export const HistoryForm = forwardRef<HistoryFormRef, HistoryFormProps>(function
             }
             const additional = Array.from({ length: sections.length - prev.length }, () => {
                 nextSectionKeyRef.current += 1;
-                const sectionKey = `history-section-${nextSectionKeyRef.current}`;
-                return {
-                    sectionKey,
-                    isSaved: false,
-                    isEditing: true,
-                    isNew: true,
-                    isReplacing: false,
-                    isPersistedOnBackend: false,
-                };
+                return createSectionState(`history-section-${nextSectionKeyRef.current}`);
             });
 
             return [...prev, ...additional];
@@ -166,6 +162,15 @@ export const HistoryForm = forwardRef<HistoryFormRef, HistoryFormProps>(function
                             : state,
                     ),
                 );
+            },
+            updateSectionSilently(sectionIndex: number, newSection: HistorySectionDto) {
+                const newSections = [...localSectionsRef.current];
+                if (sectionIndex < 0 || sectionIndex >= newSections.length) {
+                    return;
+                }
+                newSections[sectionIndex] = newSection;
+                localSectionsRef.current = newSections;
+                setLocalSections(newSections);
             },
             getSections() {
                 return localSectionsRef.current;
@@ -400,6 +405,7 @@ export const HistoryForm = forwardRef<HistoryFormRef, HistoryFormProps>(function
                             onMoveUpSection={() => handleMoveUpSection(sectionKey)}
                             onMoveDownSection={() => handleMoveDownSection(sectionKey)}
                             onRequestSaveSection={onRequestSaveSection}
+                            language={language}
                         />
                         <div className={styles['sections-divider']} />
                     </React.Fragment>

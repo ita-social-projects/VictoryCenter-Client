@@ -1,0 +1,17 @@
+@use '@/assets/sass/variables/colors.scss' as c;
+
+.page {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.loader {
+    width: 100%;
+}
+
+.error {
+    color: c.$error;
+    margin-top: 128px;
+    text-align: center;
+}

@@ -98,7 +98,7 @@
     .highlight-yellow {
         background-color: colors.$yellow-400;
         position: relative;
-        
+
         &::before {
             content: '';
             position: absolute;
@@ -114,7 +114,7 @@
         background-color: colors.$light-blue-200;
         position: relative;
         z-index: z-index.public(programs-page-intro-section-text);
-        
+
         &::after {
             content: '';
             position: absolute;

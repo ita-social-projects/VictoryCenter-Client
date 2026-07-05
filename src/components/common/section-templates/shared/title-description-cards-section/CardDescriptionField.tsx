@@ -61,6 +61,7 @@ export const CardDescriptionField = ({
                 rows={rows}
                 autoGrow={autoGrow}
                 maxRows={maxRows}
+                hasError={!!error || !!localWarning}
                 maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(maxLength)}
                 onWarningChange={setLocalWarning}
             />

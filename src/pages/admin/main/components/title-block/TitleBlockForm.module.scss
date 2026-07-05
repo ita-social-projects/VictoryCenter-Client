@@ -39,9 +39,8 @@
     gap: 24px;
 }
 
-.textarea-custom textarea {
+.rich-text-custom [contenteditable='true'] {
     height: 200px;
-    resize: none;
 }
 
 .actions {

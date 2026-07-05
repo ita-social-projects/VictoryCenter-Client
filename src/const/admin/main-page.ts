@@ -59,6 +59,7 @@ export const MAIN_PAGE_TEXT = {
         TOGGLE_VISIBILITY_FAILED: 'Не вдалося змінити видимість',
         REORDER_FAILED: 'Не вдалося зберегти порядок',
         RAISED_FUNDS_SYNC_FAILED: 'Не вдалося оновити суми зібраних коштів.',
+        TRANSLATION_SAVE_FAILED: 'Помилка збереження перекладу',
     },
 } as const;
 

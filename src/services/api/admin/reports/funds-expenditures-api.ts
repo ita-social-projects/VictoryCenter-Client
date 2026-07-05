@@ -40,7 +40,10 @@ export const FundsExpendituresApi = {
 
     updateSettings: async (
         client: AxiosInstance,
-        settings: Pick<ReportFundsExpendituresSettings, 'disclaimerTitle' | 'exchangeRate'>,
+        settings: Pick<
+            ReportFundsExpendituresSettings,
+            'disclaimerTitle' | 'exchangeRate' | 'programExpendituresReportingYear'
+        >,
     ): Promise<ReportFundsExpendituresSettings> => {
         const response = await client.put<ReportFundsExpendituresSettingsDto>(
             API_ROUTES.REPORTS.FUNDS_EXPENDITURES.SETTINGS,

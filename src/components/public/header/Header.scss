@@ -58,7 +58,6 @@ $header-height: 4rem;
                 margin-right: 1rem;
             }
         }
-
     }
 }
 
@@ -144,7 +143,7 @@ $header-height: 4rem;
     }
 }
 
-@media (max-width: 568px) {
+@media (max-width: 559px) {
     .header-block {
         .header-content-container {
             padding-left: 0.75rem;
@@ -154,15 +153,23 @@ $header-height: 4rem;
                 gap: 0.25rem;
 
                 .language-switcher {
-                    margin-right: 0.25rem;
+                    display: none;
+                }
+
+                .contact-us-button {
+                    display: none;
                 }
             }
         }
     }
 
     .mobile-menu {
+        width: 100%;
+
         .mobile-language-switcher {
-            display: none;
+            display: flex;
+            padding: 1rem;
+            border-top: 1px solid colors.$blue-50;
         }
     }
 }

@@ -22,7 +22,7 @@ export const updateFundsAmounts = (
     return (prev: FundsAmountsState) => {
         const shouldNormalize = trigger === 'blur';
         const normalized = normalizeFundsExpendituresAmountInput(value, shouldNormalize);
-        const currentFieldError = validateFundsExpendituresAmount(normalized, trigger);
+        const currentFieldError = validateFundsExpendituresAmount(value, trigger);
 
         let nextAmountUah = field === 'amountUah' ? normalized : prev.amountUah;
         let nextAmountUsd = field === 'amountUsd' ? normalized : prev.amountUsd;

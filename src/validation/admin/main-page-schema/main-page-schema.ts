@@ -2,6 +2,7 @@ import { MAIN_PAGE_VALIDATION } from '@/const/admin/main-page';
 import { MainPageFormValues } from '@/types/admin/main-page';
 import { Image, ImageValues } from '@/types/common/image';
 import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
+import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
 import * as Yup from 'yup';
 
 const buildStringValidation = (config: {
@@ -11,10 +12,19 @@ const buildStringValidation = (config: {
     getMaxError: () => string;
 }) => {
     return Yup.string()
-        .transform((value) => (value ? getNormalizedInputText(value) : value))
         .required(MAIN_PAGE_VALIDATION.common.REQUIRED)
-        .min(config.min, config.getMinError())
-        .max(config.max, config.getMaxError());
+        .test('required-plain-text', MAIN_PAGE_VALIDATION.common.REQUIRED, (value) => {
+            const normalizedValue = getNormalizedInputText(getPlainTextFromHtml(value ?? ''));
+            return normalizedValue.length > 0;
+        })
+        .test('min-plain-text', config.getMinError(), (value) => {
+            const normalizedValue = getNormalizedInputText(getPlainTextFromHtml(value ?? ''));
+            return normalizedValue.length === 0 || normalizedValue.length >= config.min;
+        })
+        .test('max-plain-text', config.getMaxError(), (value) => {
+            const normalizedValue = getNormalizedInputText(getPlainTextFromHtml(value ?? ''));
+            return normalizedValue.length <= config.max;
+        });
 };
 
 const imageSchema = Yup.mixed<Image | ImageValues>()

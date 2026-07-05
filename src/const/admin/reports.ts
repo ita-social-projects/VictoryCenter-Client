@@ -3,7 +3,8 @@ import { COMMON_TEXT_ADMIN } from './common';
 export const REPORTS_TEXT = {
     FORM: {
         LABEL: {
-            TITLE: 'Заголовок/EN',
+            TITLE: 'Заголовок',
+            TITLE_EN: 'Заголовок/EN',
             COLLECTED_FUNDS_WINDOW: 'Вікно 1: Зібрано коштів',
             CHANGED_LIVES_WINDOW: 'Вікно 2: Змінено життів',
             COLLECTED_FUNDS: 'Зібрані кошти',
@@ -316,6 +317,7 @@ export const FUNDS_EXPENDITURES_TEXT = {
         CATEGORY_UNIQUE_EXPENSE: 'Категорія вже додана до витрат',
         AMOUNT_ONLY_NUMBER: 'Дозволено лише цифри',
         AMOUNT_MAX_DIGITS: 'Не більше 9 цифр до коми',
+        AMOUNT_MAX_DECIMALS: 'Не більше 2 цифр після коми',
         AMOUNT_NOT_NEGATIVE: "Сума не може бути від'ємною",
         AMOUNT_NOT_ZERO: 'Сума не може дорівнювати 0',
         EXCHANGE_RATE_ONLY_NUMERIC: 'Дозволено тільки числові значення десяткові та цілі',
@@ -332,10 +334,6 @@ export const FUNDS_EXPENDITURES_TEXT = {
 };
 
 export const PROGRAM_EXPENSES_TEXT = {
-    MESSAGE: {
-        RECORD_DELETED_SUCCESSFULLY: 'Запис успішно видалено',
-        RECORD_DELETE_FAILED_RETRY: 'Не вдалося видалити запис. Спробуйте ще раз',
-    },
     BUTTON: {
         ADD_PROGRAM_EXPENSE: 'Витрата по програмі',
     },
@@ -346,8 +344,15 @@ export const PROGRAM_EXPENSES_TEXT = {
             PROGRAM_LABEL: 'Категорія програми',
             PROGRAM_PLACEHOLDER: 'Оберіть програму',
             SUBMIT_BUTTON: 'Додати витрату',
+            CONFIRM_ADD_TITLE: 'Додати нову витрату?',
             CONFIRM_CLOSE_TITLE: 'Зміни будуть втрачені. Бажаєте продовжити?',
             PROGRAM_NO_AVAILABLE: 'Немає доступних програм',
+        },
+        EDIT: {
+            TITLE: 'Редагувати витрату по програмі',
+            SUBTITLE: 'Розподіл програмних витрат по програмах',
+            SUBMIT_BUTTON: 'Зберегти',
+            CONFIRM_CLOSE_TITLE: 'Зміни будуть втрачені. Бажаєте продовжити?',
         },
         DELETE: {
             TITLE: 'Видалити запис?',
@@ -373,6 +378,15 @@ export const PROGRAM_EXPENSES_TEXT = {
             PROGRAM: 'Програма',
             ACTIONS: 'Дії',
         },
+    },
+    MESSAGE: {
+        RECORD_CREATED_SUCCESSFULLY: 'Новий запис успішно додано',
+        RECORD_CREATE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
+        RECORD_UPDATED_SUCCESSFULLY: 'Зміни збережено успішно',
+        RECORD_UPDATE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
+        RECORD_DELETED_SUCCESSFULLY: 'Запис успішно видалено',
+        RECORD_DELETE_FAILED_RETRY: 'Не вдалося видалити запис. Спробуйте ще раз',
+        AMOUNT_USD_NOT_MATCH: 'Сума в USD не відповідає сумі в UAH',
     },
     BULK: {
         getSelectedLabel: (selected: number, total: number) => `Вибрано ${selected} з ${total}`,

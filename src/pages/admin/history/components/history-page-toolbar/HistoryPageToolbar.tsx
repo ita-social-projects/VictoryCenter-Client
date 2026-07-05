@@ -1,19 +1,67 @@
 import { Button } from '@/components/admin/button/Button';
 import { HISTORY_TEXT } from '@/const/admin/history';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
+import { ACTION_ICONS } from '@/const/common/action-icons';
+import { IconButton } from '@/components/admin/icon-button/IconButton';
 import styles from './HistoryPageToolbar.module.scss';
+import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
+import {
+    LocalizationToolkit,
+    LocalizationToolkitProps,
+} from '@/components/admin/localization-toolkit/LocalizationToolkit';
+import {
+    EntityLocalization,
+    EntityWithLocalizations,
+    EntityWithTranslationStatuses,
+    LocalizationLanguage,
+} from '@/types/common/language';
 
-export interface HistoryPageToolbarProps {
+export interface HistoryPageToolbarProps extends LocalizationToolkitProps {
     onAddSection: () => void;
+    onTranslate: () => void;
+    isTranslateDisabled?: boolean;
+    localizedEntity?: EntityWithLocalizations<EntityLocalization> | EntityWithTranslationStatuses;
+    translationLanguages: LocalizationLanguage[];
 }
 
-export const HistoryPageToolbar = ({ onAddSection }: HistoryPageToolbarProps) => {
+export const HistoryPageToolbar = ({
+    translationLanguages,
+    onAddSection,
+    languages,
+    localizedEntity,
+    onLanguageChange,
+    onTranslationStatusFilterChange,
+    onTranslate,
+    isTranslateDisabled = false,
+}: HistoryPageToolbarProps) => {
     return (
         <div className={styles['history-page-toolbar']}>
-            <Button onClick={onAddSection} buttonStyle="primary">
-                {HISTORY_TEXT.BUTTON.ADD_SECTION}
-                <PlusIcon />
-            </Button>
+            <div className={styles['toolbar-controls']}>
+                {localizedEntity && (
+                    <LocalizationStatuses languages={translationLanguages} localizedEntity={localizedEntity} />
+                )}
+                <LocalizationToolkit
+                    languages={languages}
+                    onLanguageChange={onLanguageChange}
+                    onTranslationStatusFilterChange={onTranslationStatusFilterChange}
+                />
+                <div className={styles['actions-wrapper']}>
+                    <Button onClick={onAddSection} buttonStyle="primary">
+                        {HISTORY_TEXT.BUTTON.ADD_SECTION}
+                        <PlusIcon />
+                    </Button>
+                </div>
+            </div>
+            <div className={styles['translate-icon-row']}>
+                <IconButton
+                    DefaultIcon={ACTION_ICONS.translate.default}
+                    onClick={onTranslate}
+                    aria-label={HISTORY_TEXT.BUTTON.TRANSLATE}
+                    type="button"
+                    disabled={isTranslateDisabled}
+                    className={styles['translate-btn']}
+                />
+            </div>
         </div>
     );
 };

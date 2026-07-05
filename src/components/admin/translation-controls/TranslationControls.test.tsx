@@ -93,7 +93,7 @@ describe('TranslationControls', () => {
     it('calls onLanguageChange when a new language is selected', () => {
         const languages = [
             { id: 1, code: 'fr', name: 'French' },
-            { id: 1, code: 'en', name: 'English' },
+            { id: 2, code: 'en', name: 'English' },
         ];
         const onLanguageChangeMock = jest.fn();
 
@@ -101,6 +101,28 @@ describe('TranslationControls', () => {
         const select = screen.getByTestId('language-select');
         fireEvent.click(select);
         expect(onLanguageChangeMock).toHaveBeenCalledWith(languages[1]);
+    });
+
+    it('does not call onLanguageChange when selected code is unavailable', () => {
+        const onLanguageChangeMock = jest.fn();
+
+        render(
+            <TranslationControls
+                {...defaultProps}
+                languages={[{ id: 1, code: 'fr', name: 'French' }]}
+                onLanguageChange={onLanguageChangeMock}
+            />,
+        );
+
+        fireEvent.click(screen.getByTestId('language-select'));
+
+        expect(onLanguageChangeMock).not.toHaveBeenCalled();
+    });
+
+    it('does not render language select before language is selected', () => {
+        render(<TranslationControls {...defaultProps} selectedLanguage={null} />);
+
+        expect(screen.queryByTestId('language-select')).not.toBeInTheDocument();
     });
 
     it.skip('does not crash if onGenerate is undefined and button is clicked', () => {

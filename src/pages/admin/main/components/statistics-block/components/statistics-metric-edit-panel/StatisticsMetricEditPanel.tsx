@@ -4,7 +4,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { MultiSelectInput } from '@/components/admin/multi-select-input/MultiSelectInput';
 import { MAIN_PAGE_TEXT } from '@/const/admin/main-page';
-import { Metric, MetricPrefix } from '@/types/admin/main-page';
+import { Metric, MetricLocalization, MetricPrefix } from '@/types/admin/main-page';
 import {
     formatCurrencyInput,
     formatWithSpaces,
@@ -32,7 +32,7 @@ const PREFIX_OPTIONS = [
 ];
 
 export const StatisticsMetricEditPanel = ({ metric, onSave, onCancel }: StatisticsMetricEditPanelProps) => {
-    const defaultNameUa = metric.name || '';
+    const defaultNameUa = metric.name || metric.localizations?.find((l) => l.languageId === 1)?.name || '';
     const defaultNameEn = metric.localizations?.find((l) => l.languageId === 2)?.name || '';
     const defaultValueStr = formatWithSpaces(metric.value ?? 0);
     const defaultPrefix = metric.prefix ?? MetricPrefix.None;
@@ -65,17 +65,28 @@ export const StatisticsMetricEditPanel = ({ metric, onSave, onCancel }: Statisti
         currentPrefix !== defaultPrefix;
 
     const onValidSubmit = (data: MetricFormValues) => {
+        const parsedValue = parseFormattedNumber(data.value) ?? 0;
+        const cleanEnName = data.nameEn.trim();
         const updatedLocalizations =
             metric.localizations?.map((loc) => {
                 if (loc.languageId === 1) return { ...loc, name: data.nameUa.trim() };
-                if (loc.languageId === 2) return { ...loc, name: data.nameEn.trim() };
+                if (loc.languageId === 2) return { ...loc, name: cleanEnName, value: loc.value ?? String(parsedValue) };
                 return loc;
             }) || [];
+
+        if (!updatedLocalizations.some((l) => l.languageId === 2)) {
+            updatedLocalizations.push({
+                entityId: metric.id,
+                languageId: 2,
+                name: cleanEnName,
+                value: String(parsedValue),
+            } as MetricLocalization);
+        }
 
         const updatedMetric: Metric = {
             ...metric,
             name: data.nameUa.trim(),
-            value: parseFormattedNumber(data.value) ?? 0,
+            value: parsedValue,
             prefix: data.prefix,
             localizations: updatedLocalizations,
         };

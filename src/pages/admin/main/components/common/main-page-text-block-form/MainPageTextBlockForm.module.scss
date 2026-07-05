@@ -1,5 +1,3 @@
-@use '@/assets/sass/variables/colors' as c;
-
 .form {
     display: flex;
     flex-direction: column;
@@ -21,9 +19,8 @@
     flex-direction: column;
 }
 
-.textarea-custom textarea {
+.rich-text-custom [contenteditable='true'] {
     min-height: 349px;
-    resize: none;
 }
 
 .actions {

@@ -41,13 +41,6 @@ const sync = (viewport: HTMLElement, metrics: { scrollLeft: number; clientWidth:
     fireEvent.scroll(viewport);
 };
 
-const mockCssVars = (vars: Record<string, string>) => {
-    window.getComputedStyle = (() =>
-        ({
-            getPropertyValue: (name: string) => vars[name] ?? '',
-        }) as any) as any;
-};
-
 const setupScrollMock = (gapValue: string, initialScrollLeft: number) => {
     const { viewport } = setup();
 

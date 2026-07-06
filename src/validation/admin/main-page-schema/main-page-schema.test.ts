@@ -109,6 +109,10 @@ describe('MAIN_PAGE_VALIDATION_FUNCTIONS', () => {
                 partnersTitleEn: '<p>Trusted foundation partners</p>',
                 partnersDescriptionUa: '<p>Детальний опис для блоку наших партнерів.</p>',
                 partnersDescriptionEn: '<p>Detailed description for our partners block.</p>',
+                donationsTitleUa: '<p>Підтримати нас</p>',
+                donationsTitleEn: '<p>Support us</p>',
+                donationsDescriptionUa: '<p>Опис для блоку пожертв.</p>',
+                donationsDescriptionEn: '<p>Description for donations block.</p>',
                 statisticsTitleUa: 'Зміни, які можна виміряти',
                 statisticsTitleEn: 'Changes you can measure',
             };
@@ -118,6 +122,8 @@ describe('MAIN_PAGE_VALIDATION_FUNCTIONS', () => {
                 descriptionUa: values.descriptionUa,
                 aboutUsDescriptionEn: values.aboutUsDescriptionEn,
                 partnersDescriptionUa: values.partnersDescriptionUa,
+                donationsTitleUa: values.donationsTitleUa,
+                donationsDescriptionUa: values.donationsDescriptionUa,
             });
         });
     });
@@ -222,16 +228,12 @@ describe('MAIN_PAGE_VALIDATION_FUNCTIONS', () => {
             expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateStatisticsTitleEn('Changes you can measure')).toBeUndefined();
         });
 
-        it('returns required error for empty EN title', () => {
-            expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateStatisticsTitleEn('')).toBe(
-                MAIN_PAGE_VALIDATION.common.REQUIRED,
-            );
+        it('returns undefined for empty EN title since it is optional', () => {
+            expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateStatisticsTitleEn('')).toBeUndefined();
         });
 
-        it('treats spaces as empty and returns required error for EN title', () => {
-            expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateStatisticsTitleEn('   ')).toBe(
-                MAIN_PAGE_VALIDATION.common.REQUIRED,
-            );
+        it('treats spaces as empty and returns undefined for EN title since it is optional', () => {
+            expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateStatisticsTitleEn('   ')).toBeUndefined();
         });
 
         it('returns min error for EN title shorter than min', () => {

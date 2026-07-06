@@ -1,5 +1,6 @@
 import { Metric, MetricPrefix, MetricType } from '@/types/admin/main-page';
 import { TranslationStatus } from '@/types/common/language';
+import { DEFAULT_ENGLISH_LANGUAGE_ID, DEFAULT_UKRAINIAN_LANGUAGE_ID } from '@/const/common/locales';
 
 export const metricPartners: Metric = {
     id: 1,
@@ -10,8 +11,16 @@ export const metricPartners: Metric = {
     isHidden: false,
     priority: 1,
     localizations: [
-        { language: { id: 1, code: 'uk' }, translationStatus: TranslationStatus.Relevant, name: 'Партнерів' },
-        { language: { id: 2, code: 'en' }, translationStatus: TranslationStatus.Relevant, name: 'Partners' },
+        {
+            language: { id: DEFAULT_UKRAINIAN_LANGUAGE_ID, code: 'uk' },
+            translationStatus: TranslationStatus.Relevant,
+            name: 'Партнерів',
+        },
+        {
+            language: { id: DEFAULT_ENGLISH_LANGUAGE_ID, code: 'en' },
+            translationStatus: TranslationStatus.Relevant,
+            name: 'Partners',
+        },
     ],
 };
 
@@ -23,7 +32,7 @@ export const metricRaised: Metric = {
     prefix: MetricPrefix.None,
     isHidden: false,
     priority: 2,
-    localizations: [{ languageId: 2, name: 'Raised', value: '125000' } as any],
+    localizations: [{ languageId: DEFAULT_ENGLISH_LANGUAGE_ID, name: 'Raised', value: '125000' } as any],
 };
 
 export const metricEngagement: Metric = {

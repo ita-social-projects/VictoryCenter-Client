@@ -40,7 +40,7 @@
         opacity: 0;
         transition: opacity 0.3s ease;
         z-index: z-index.admin('who-we-are-page-image-preview');
-        cursor: pointer;
+        pointer-events: none;
     }
 
     &:hover {
@@ -60,7 +60,6 @@
     width: 5rem;
     height: 5rem;
     aspect-ratio: 1 / 1;
-    opacity: 0.8;
     z-index: z-index.admin('image-input-action-buttons');
     cursor: pointer;
 }

@@ -18,6 +18,7 @@ describe('MainPageLocalizationsApi', () => {
         translationStatus: TranslationStatus.Relevant,
         localizationInfoDto: { id: languageId, code: 'en', name: 'English' } as LocalizationInfo,
         mainAboutUs: null,
+        mainDonations: null,
         mainPartners: null,
     };
 
@@ -67,6 +68,7 @@ describe('MainPageLocalizationsApi', () => {
             title: 'Title',
             description: 'Description',
             mainAboutUs: null,
+            mainDonations: null,
             mainPartners: null,
         };
         const mockClient = {
@@ -84,6 +86,7 @@ describe('MainPageLocalizationsApi', () => {
             title: 'Updated title',
             description: 'Updated description',
             mainAboutUs: null,
+            mainDonations: null,
             mainPartners: null,
         };
         const mockClient = {

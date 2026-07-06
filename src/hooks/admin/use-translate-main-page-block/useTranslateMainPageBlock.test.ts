@@ -40,6 +40,13 @@ const page: MainPage = {
         description: 'Опис про нас',
         localizations: [],
     },
+    mainDonations: {
+        id: 30,
+        title: 'Донати',
+        description: 'Опис донатів',
+        image: null,
+        localizations: [],
+    },
     mainPartners: {
         id: 20,
         title: 'Партнери',
@@ -129,6 +136,7 @@ describe('useTranslateMainPageBlock', () => {
                 languageId: englishLanguage.id,
                 title: 'Existing title',
                 description: 'Existing description',
+                mainDonations: null,
                 mainPartners: {
                     entityId: 20,
                     title: 'New partners title',
@@ -193,6 +201,207 @@ describe('useTranslateMainPageBlock', () => {
                     title: 'The Foundation’s trusted partners',
                     description: '<p>The organisations and benefactors.</p>',
                 },
+            }),
+        );
+    });
+
+    it('creates localization for donations block and includes it in the payload', async () => {
+        jest.spyOn(axios, 'isAxiosError').mockReturnValue(true);
+        (MainPageLocalizationsApi.getByLanguageId as jest.Mock).mockRejectedValue({ response: { status: 404 } });
+        const pageWithDonations = {
+            ...page,
+            mainDonations: {
+                id: 30,
+                title: 'Донати',
+                description: 'Опис донатів',
+                image: null,
+                localizations: [],
+            },
+        };
+        const { result, onSuccess } = renderTranslateHook({
+            page: pageWithDonations,
+            block: MainPageLocalizationBlock.Donations,
+        });
+
+        await act(async () => {
+            await result.current.translateMainPageBlock({
+                title: 'New donations title',
+                description: 'New donations description',
+            });
+        });
+
+        expect(MainPageLocalizationsApi.create).toHaveBeenCalledWith(
+            expect.any(Object),
+            expect.objectContaining({
+                entityId: page.id,
+                languageId: englishLanguage.id,
+                title: 'Existing title',
+                description: 'Existing description',
+                mainDonations: {
+                    entityId: 30,
+                    title: 'New donations title',
+                    description: 'New donations description',
+                },
+            }),
+        );
+        expect(onSuccess).toHaveBeenCalled();
+    });
+
+    it('creates donations translation when aboutUs and partners translations already exist', async () => {
+        jest.spyOn(axios, 'isAxiosError').mockReturnValue(true);
+        (MainPageLocalizationsApi.getByLanguageId as jest.Mock).mockRejectedValue({ response: { status: 404 } });
+
+        const pageWithExistingTranslations = {
+            ...page,
+            mainDonations: {
+                id: 30,
+                title: 'Донати',
+                description: 'Опис донатів',
+                image: null,
+                localizations: [],
+            },
+            mainAboutUs: {
+                ...page.mainAboutUs!,
+                localizations: [
+                    {
+                        languageId: englishLanguage.id,
+                        language: englishLanguage,
+                        title: 'Existing about us',
+                        description: 'Existing about us desc',
+                        translationStatus: TranslationStatus.Relevant,
+                    } as any,
+                ],
+            },
+        };
+
+        const { result, onSuccess } = renderTranslateHook({
+            page: pageWithExistingTranslations,
+            block: MainPageLocalizationBlock.Donations,
+        });
+
+        await act(async () => {
+            await result.current.translateMainPageBlock({
+                title: 'New donations title',
+                description: 'New donations description',
+            });
+        });
+
+        expect(MainPageLocalizationsApi.create).toHaveBeenCalledWith(
+            expect.any(Object),
+            expect.objectContaining({
+                entityId: pageWithExistingTranslations.id,
+                languageId: englishLanguage.id,
+                mainDonations: {
+                    entityId: 30,
+                    title: 'New donations title',
+                    description: 'New donations description',
+                },
+                mainAboutUs: {
+                    entityId: 10,
+                    title: 'Existing about us',
+                    description: 'Existing about us desc',
+                },
+                mainPartners: {
+                    entityId: 20,
+                    title: 'Existing partners title',
+                    description: 'Existing partners description',
+                },
+            }),
+        );
+        expect(onSuccess).toHaveBeenCalled();
+    });
+
+    it('updates existing donations translation', async () => {
+        const currentLocalization = {
+            id: 100,
+            languageId: englishLanguage.id,
+            title: 'Title',
+            description: 'Desc',
+            mainDonations: {
+                id: 200,
+                title: 'Old donations title',
+                description: 'Old donations description',
+            },
+            mainAboutUs: null,
+            mainPartners: null,
+        };
+        (MainPageLocalizationsApi.getByLanguageId as jest.Mock).mockResolvedValue(currentLocalization);
+
+        const pageWithDonations = {
+            ...page,
+            mainDonations: {
+                id: 30,
+                title: 'Донати',
+                description: 'Опис донатів',
+                image: null,
+                localizations: [],
+            },
+        };
+
+        const { result, onSuccess } = renderTranslateHook({
+            page: pageWithDonations,
+            block: MainPageLocalizationBlock.Donations,
+        });
+
+        await act(async () => {
+            await result.current.translateMainPageBlock({
+                title: 'Updated donations title',
+                description: 'Updated donations description',
+            });
+        });
+
+        expect(MainPageLocalizationsApi.update).toHaveBeenCalledWith(
+            expect.any(Object),
+            pageWithDonations.id,
+            englishLanguage.id,
+            expect.objectContaining({
+                title: 'Title',
+                description: 'Desc',
+                mainDonations: {
+                    title: 'Updated donations title',
+                    description: 'Updated donations description',
+                },
+            }),
+        );
+        expect(onSuccess).toHaveBeenCalled();
+    });
+
+    it('handles edge case where mainDonations is null but other blocks are present during translation of another block', async () => {
+        jest.spyOn(axios, 'isAxiosError').mockReturnValue(true);
+        (MainPageLocalizationsApi.getByLanguageId as jest.Mock).mockRejectedValue({ response: { status: 404 } });
+
+        const pageWithoutDonations = {
+            ...page,
+            mainDonations: null,
+        };
+
+        const { result } = renderTranslateHook({
+            page: pageWithoutDonations,
+            block: MainPageLocalizationBlock.AboutUs,
+        });
+
+        await act(async () => {
+            await result.current.translateMainPageBlock({
+                title: 'New about title',
+                description: 'New about description',
+            });
+        });
+
+        expect(MainPageLocalizationsApi.create).toHaveBeenCalledWith(
+            expect.any(Object),
+            expect.objectContaining({
+                entityId: pageWithoutDonations.id,
+                mainAboutUs: {
+                    entityId: 10,
+                    title: 'New about title',
+                    description: 'New about description',
+                },
+                mainPartners: {
+                    entityId: 20,
+                    title: 'Existing partners title',
+                    description: 'Existing partners description',
+                },
+                mainDonations: null,
             }),
         );
     });

@@ -28,6 +28,8 @@ const getBlockEntityId = (page: MainPage, block: MainPageLocalizationBlock): num
             return page.id ?? null;
         case MainPageLocalizationBlock.AboutUs:
             return page.mainAboutUs?.id ?? null;
+        case MainPageLocalizationBlock.Donations:
+            return page.mainDonations?.id ?? null;
         case MainPageLocalizationBlock.Partners:
             return page.mainPartners?.id ?? null;
         default:
@@ -54,6 +56,17 @@ const getExistingBlockValues = (
         }
         case MainPageLocalizationBlock.AboutUs: {
             const localization = page.mainAboutUs?.localizations?.find(
+                (loc) => getLocalizationLanguageId(loc) === languageId,
+            );
+            return localization
+                ? {
+                      title: localization.title ?? '',
+                      description: localization.description ?? '',
+                  }
+                : null;
+        }
+        case MainPageLocalizationBlock.Donations: {
+            const localization = page.mainDonations?.localizations?.find(
                 (loc) => getLocalizationLanguageId(loc) === languageId,
             );
             return localization
@@ -113,7 +126,11 @@ const resolveNestedValues = (
     const nestedLocalization =
         targetBlock === MainPageLocalizationBlock.AboutUs
             ? currentLocalization?.mainAboutUs
-            : currentLocalization?.mainPartners;
+            : targetBlock === MainPageLocalizationBlock.Donations
+              ? currentLocalization?.mainDonations
+              : targetBlock === MainPageLocalizationBlock.Partners
+                ? currentLocalization?.mainPartners
+                : null;
     const existingValues = getExistingBlockValues(page, targetBlock, language);
 
     if (!nestedLocalization && !existingValues) {
@@ -142,6 +159,14 @@ const buildCreatePayload = (
         MainPageLocalizationBlock.AboutUs,
         data,
     );
+    const donationsValues = resolveNestedValues(
+        page,
+        language,
+        currentLocalization,
+        block,
+        MainPageLocalizationBlock.Donations,
+        data,
+    );
     const partnersValues = resolveNestedValues(
         page,
         language,
@@ -162,6 +187,14 @@ const buildCreatePayload = (
                       entityId: page.mainAboutUs.id,
                       title: aboutUsValues.title,
                       description: aboutUsValues.description,
+                  }
+                : null,
+        mainDonations:
+            donationsValues && page.mainDonations?.id != null
+                ? {
+                      entityId: page.mainDonations.id,
+                      title: donationsValues.title,
+                      description: donationsValues.description,
                   }
                 : null,
         mainPartners:
@@ -191,6 +224,14 @@ const buildUpdatePayload = (
         MainPageLocalizationBlock.AboutUs,
         data,
     );
+    const donationsValues = resolveNestedValues(
+        page,
+        language,
+        currentLocalization,
+        block,
+        MainPageLocalizationBlock.Donations,
+        data,
+    );
     const partnersValues = resolveNestedValues(
         page,
         language,
@@ -207,6 +248,12 @@ const buildUpdatePayload = (
             ? {
                   title: aboutUsValues.title,
                   description: aboutUsValues.description,
+              }
+            : null,
+        mainDonations: donationsValues
+            ? {
+                  title: donationsValues.title,
+                  description: donationsValues.description,
               }
             : null,
         mainPartners: partnersValues

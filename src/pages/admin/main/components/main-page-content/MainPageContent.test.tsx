@@ -193,6 +193,16 @@ jest.mock('../statistics-block/StatisticsBlockForm', () => ({
     },
 }));
 
+jest.mock('../donations-block/DonationsBlockForm', () => ({
+    __esModule: true,
+    DonationsBlockForm: (props: any) => (
+        <div>
+            <MockFormBlock testId="donations-block-form" btnTestId="publish-btn-donations" {...props} />
+            <span data-testid="donations-block-form-read-only">{String(props.isReadOnly)}</span>
+        </div>
+    ),
+}));
+
 jest.mock('../main-page-publish-modal/MainPagePublishModal', () => ({
     __esModule: true,
     MainPagePublishModal: ({ isOpen, onConfirm, onCancel, isButtonsDisabled }: any) =>
@@ -258,8 +268,10 @@ jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGr
     RichTextInputGroup: require('@/utils/test-mocks/main-page-mocks').MockRichTextInputGroup,
 }));
 
-const getByExactText = (text: string) =>
-    screen.getByText((_, el) => el?.children.length === 0 && el?.textContent === text);
+jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
+    __esModule: true,
+    RichTextInputGroup: require('@/utils/test-mocks/main-page-mocks').MockRichTextInputGroup,
+}));
 
 const getTranslationTitleInput = () => document.getElementById('main-page-translation-title') as HTMLInputElement;
 const getTranslationDescriptionInput = () =>
@@ -856,7 +868,8 @@ describe('MainPageContent', () => {
         await renderAndLoadContent();
 
         fireEvent.click(screen.getByTestId('tab-btn-donations'));
-        expect(getByExactText(`Блок "${MAIN_PAGE_TEXT.TABS.DONATIONS}" в розробці`)).toBeInTheDocument();
+        expect(screen.getByTestId('donations-block-form')).toBeInTheDocument();
+        expect(screen.queryByTestId('title-block-form')).not.toBeInTheDocument();
     });
 
     it('renders partners tab content', async () => {
@@ -870,6 +883,7 @@ describe('MainPageContent', () => {
     it.each([
         ['title', 'title-block-form'],
         ['about', 'about-us-block-form'],
+        ['donations', 'donations-block-form'],
         ['partners', 'partners-block-form'],
     ])('shows translation action in the content top-right for %s block', async (tabId, formTestId) => {
         mockLocalizationToolkitState.translationLanguages = [{ id: 2, code: 'en', name: 'Англійська' }];
@@ -881,7 +895,7 @@ describe('MainPageContent', () => {
         expect(screen.getByLabelText('Додати переклад')).toBeInTheDocument();
     });
 
-    it.each(['statistics', 'donations'])('does not show translation action for %s block', async (tabId) => {
+    it.each(['statistics'])('does not show translation action for %s block', async (tabId) => {
         await renderAndLoadContent();
 
         fireEvent.click(screen.getByTestId(`tab-btn-${tabId}`));

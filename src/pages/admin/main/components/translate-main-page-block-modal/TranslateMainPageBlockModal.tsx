@@ -31,6 +31,7 @@ interface TranslateMainPageBlockModalProps {
 const SUPPORTED_BLOCKS = [
     MainPageLocalizationBlock.Title,
     MainPageLocalizationBlock.AboutUs,
+    MainPageLocalizationBlock.Donations,
     MainPageLocalizationBlock.Partners,
 ] as const;
 
@@ -48,6 +49,12 @@ const BLOCK_VALIDATION_CONFIG: Record<SupportedBlock, TranslateMainPageBlockVali
         descriptionField: 'aboutUsDescriptionUa',
         titleMaxLength: MAIN_PAGE_VALIDATION.aboutUsBlock.title.max,
         descriptionMaxLength: MAIN_PAGE_VALIDATION.aboutUsBlock.description.max,
+    },
+    [MainPageLocalizationBlock.Donations]: {
+        titleField: 'donationsTitleUa',
+        descriptionField: 'donationsDescriptionUa',
+        titleMaxLength: MAIN_PAGE_VALIDATION.donationsBlock.title.max,
+        descriptionMaxLength: MAIN_PAGE_VALIDATION.donationsBlock.description.max,
     },
     [MainPageLocalizationBlock.Partners]: {
         titleField: 'partnersTitleUa',
@@ -81,6 +88,17 @@ const getExistingTranslation = (
         }
         case MainPageLocalizationBlock.AboutUs: {
             const localization = page.mainAboutUs?.localizations?.find(
+                (loc) => getLocalizationLanguageId(loc) === language.id,
+            );
+            return localization
+                ? {
+                      title: localization.title ?? '',
+                      description: localization.description ?? '',
+                  }
+                : null;
+        }
+        case MainPageLocalizationBlock.Donations: {
+            const localization = page.mainDonations?.localizations?.find(
                 (loc) => getLocalizationLanguageId(loc) === language.id,
             );
             return localization

@@ -459,10 +459,35 @@ describe('PdfFilesTable', () => {
             expect(screen.getByTestId('inline-loader')).toBeInTheDocument();
         });
 
-        it('should render scroll-to-top button', () => {
+        it('should show scroll-to-top button on scroll and scroll to top on click', async () => {
             render(<PdfFilesTable {...defaultProps} />);
+            const wrapper = screen.getByTestId('pdf-files-table-wrapper');
             const btn = screen.getByTestId('pdf-files-table-to-top');
-            expect(btn).toBeInTheDocument();
+
+            expect(btn).not.toHaveClass('to-top-button-visible');
+
+            // Simulate scroll down
+            Object.defineProperty(wrapper, 'scrollHeight', { value: 500, configurable: true, writable: true });
+            Object.defineProperty(wrapper, 'clientHeight', { value: 100, configurable: true, writable: true });
+            Object.defineProperty(wrapper, 'scrollTop', { value: 50, configurable: true, writable: true });
+
+            fireEvent.scroll(wrapper);
+
+            await waitFor(() => {
+                expect(btn).toHaveClass('to-top-button-visible');
+            });
+
+            // Spy on scrollTop setter to verify click scrolls to top
+            const scrollTopSpy = jest.fn();
+            Object.defineProperty(wrapper, 'scrollTop', {
+                set: scrollTopSpy,
+                get: () => 50,
+                configurable: true,
+            });
+
+            fireEvent.click(btn);
+
+            expect(scrollTopSpy).toHaveBeenCalledWith(0);
         });
     });
 });

@@ -47,12 +47,12 @@ export const PdfFilesTable: React.FC<PdfFilesTableProps> = ({
         (e: React.UIEvent<HTMLDivElement>) => {
             const target = e.currentTarget;
             const isNearBottom = target.scrollHeight - target.scrollTop <= target.clientHeight + 50;
-            if (isNearBottom && onLoadMore) {
+            if (isNearBottom && !isLoadingMore && onLoadMore) {
                 onLoadMore();
             }
             handleTableScroll();
         },
-        [onLoadMore, handleTableScroll],
+        [onLoadMore, handleTableScroll, isLoadingMore],
     );
 
     const [deleteConfirmation, setDeleteConfirmation] = useState<{ isOpen: boolean; fileId: number | null }>({
@@ -139,7 +139,7 @@ export const PdfFilesTable: React.FC<PdfFilesTableProps> = ({
     }, []);
 
     return (
-        <>
+        <div className={styles.container}>
             <div className={styles['table-container']}>
                 <div
                     className={styles['table-wrapper']}
@@ -283,7 +283,7 @@ export const PdfFilesTable: React.FC<PdfFilesTableProps> = ({
                 })}
                 data-testid="pdf-files-table-to-top"
                 onClick={moveToTop}
-                aria-label="Scroll table to top"
+                aria-label={PDF_FILES_SECTION_TEXT.TABLE.SCROLL_TO_TOP}
                 aria-hidden={!isMoveToTopVisible}
                 tabIndex={isMoveToTopVisible ? 0 : -1}
             >
@@ -298,6 +298,6 @@ export const PdfFilesTable: React.FC<PdfFilesTableProps> = ({
                 isButtonsDisabled={isDeleting}
                 className="delete-file-confirmation-modal"
             />
-        </>
+        </div>
     );
 };

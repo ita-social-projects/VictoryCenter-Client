@@ -48,6 +48,7 @@ export const PdfFilesSection = () => {
     const LIMIT = 20;
 
     const fetchedFilesRef = useRef<PdfReportDto[]>([]);
+    const loadMoreAbortControllerRef = useRef<AbortController | null>(null);
 
     const {
         data: sectionData,
@@ -87,16 +88,32 @@ export const PdfFilesSection = () => {
         fetchedFilesRef.current = fetchedFiles;
     }, [fetchedFiles]);
 
-    const handleLanguageChange = useCallback((lang: 'uk' | 'en') => {
-        setCurrentLanguage(lang);
-        setUploadedFiles([]);
-        setTotalCount(0);
-    }, []);
+    useEffect(() => {
+        return () => {
+            loadMoreAbortControllerRef.current?.abort();
+        };
+    }, [activeLanguageId]);
+
+    const handleLanguageChange = useCallback(
+        (lang: 'uk' | 'en') => {
+            loadMoreAbortControllerRef.current?.abort();
+            setCurrentLanguage(lang);
+            setUploadedFiles([]);
+            setTotalCount(0);
+            fetchedFilesRef.current = [];
+            setFetchedFiles([]);
+        },
+        [setFetchedFiles],
+    );
 
     const handleLoadMore = useCallback(async () => {
         if (!activeLanguageId || isLoadingMore || isFilesLoading) return;
         const currentLength = fetchedFiles?.length ?? 0;
         if (currentLength >= totalCount) return;
+
+        loadMoreAbortControllerRef.current?.abort();
+        const abortController = new AbortController();
+        loadMoreAbortControllerRef.current = abortController;
 
         setIsLoadingMore(true);
         try {
@@ -106,16 +123,23 @@ export const PdfFilesSection = () => {
                 limit: LIMIT,
                 languageId: activeLanguageId,
             });
+
+            if (abortController.signal.aborted) return;
+
             setFetchedFiles((prev) => {
                 const map = new Map((prev ?? []).map((f) => [f.id, f]));
                 data.items.forEach((f) => map.set(f.id, f));
                 return Array.from(map.values());
             });
             setTotalCount(data.totalItemsCount);
-        } catch {
-            addToast(PDF_FILES_SECTION_TEXT.MESSAGE.LOAD_ERROR, ToastType.Error);
+        } catch (error: any) {
+            if (error?.name !== 'CanceledError' && error?.name !== 'AbortError') {
+                addToast(PDF_FILES_SECTION_TEXT.MESSAGE.LOAD_ERROR, ToastType.Error);
+            }
         } finally {
-            setIsLoadingMore(false);
+            if (!abortController.signal.aborted) {
+                setIsLoadingMore(false);
+            }
         }
     }, [
         client,
@@ -130,6 +154,7 @@ export const PdfFilesSection = () => {
 
     const handleUploaded = useCallback(
         (newFile: PdfReportDto) => {
+            loadMoreAbortControllerRef.current?.abort();
             setUploadedFiles((prev) => [...prev, newFile]);
             refetchFiles();
         },
@@ -150,6 +175,7 @@ export const PdfFilesSection = () => {
 
     const handleDeleteFile = useCallback(
         async (fileId: number) => {
+            loadMoreAbortControllerRef.current?.abort();
             setIsDeleting(true);
             try {
                 await PdfReportsApi.delete(client, fileId);
@@ -188,6 +214,7 @@ export const PdfFilesSection = () => {
 
     const handleRenameFile = useCallback(
         async (fileId: number, newName: string) => {
+            loadMoreAbortControllerRef.current?.abort();
             setIsRenaming(true);
             try {
                 const updatedFile = await PdfReportsApi.rename(client, fileId, newName);

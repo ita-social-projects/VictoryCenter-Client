@@ -111,6 +111,7 @@ export const PDF_FILES_SECTION_TEXT = {
             DOWNLOAD: 'Завантажити',
         },
         NO_FILES: 'PDF файли відсутні',
+        SCROLL_TO_TOP: 'Вгору',
     },
     DROPZONE: {
         TITLE: 'Натисніть або перетягніть PDF файл сюди',

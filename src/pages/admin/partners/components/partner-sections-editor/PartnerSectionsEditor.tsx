@@ -38,6 +38,31 @@ const isSectionEmpty = (section: PartnerSectionFormValues): boolean => {
     return titleEmpty && descriptionEmpty && allPartnersEmpty;
 };
 
+const isSectionDirty = (section: PartnerSectionFormValues, fetchedSections: PartnerSection[]): boolean => {
+    if (section.sectionId === null) return true;
+
+    const originalSection = fetchedSections.find((s) => s.id === section.sectionId);
+    if (!originalSection) return true;
+
+    if (section.title !== originalSection.title) return true;
+    if (section.description !== originalSection.description) return true;
+    if (section.deletedPartnerIds && section.deletedPartnerIds.length > 0) return true;
+    if (section.partners.length !== originalSection.partners.length) return true;
+
+    for (const partner of section.partners) {
+        if (partner.partnerId === null) return true;
+
+        const originalPartner = originalSection.partners.find((p) => p.id === partner.partnerId);
+        if (!originalPartner) return true;
+
+        if (partner.description !== originalPartner.description) return true;
+        if (partner.imageId !== originalPartner.imageId) return true;
+        if (partner.image !== originalPartner.image) return true;
+    }
+
+    return false;
+};
+
 export interface PartnerSectionsEditorRef {
     addSection: () => void;
 }
@@ -72,6 +97,7 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
         isLoading: isSectionsLoading,
         error: sectionsFetchError,
         refetch: refetchSections,
+        setData: setFetchedSections,
     } = useDataFetch<PartnerSection[]>({
         initialData: [],
         fetchHandler: fetchSectionsHandler,
@@ -207,6 +233,16 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
             };
 
             setLocalSections((currentSections) => currentSections.map(updateSectionInList));
+            setFetchedSections((current) => {
+                const currentArray = current || [];
+                const existingIndex = currentArray.findIndex((s) => s.id === savedSection.id);
+                if (existingIndex >= 0) {
+                    const newArray = [...currentArray];
+                    newArray[existingIndex] = savedSection;
+                    return newArray;
+                }
+                return [...currentArray, savedSection];
+            });
         } catch (error: any) {
             if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {
                 return;
@@ -216,7 +252,7 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
             setIsPublishing(false);
             setSectionToPublishId(null);
         }
-    }, [localSections, addToast, client, setLocalSections, sectionToPublishId]);
+    }, [localSections, addToast, client, setLocalSections, sectionToPublishId, setFetchedSections]);
 
     const handleDeleteRequest = useCallback((localId: string) => {
         setSectionToDeleteId(localId);
@@ -249,6 +285,10 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
             setLocalSections((current) => current.filter((s) => s.localId !== sectionToDeleteId));
             setErrors((current) => current.filter((_, i) => i !== indexToDelete));
 
+            if (sectionToDelete && sectionToDelete.sectionId) {
+                setFetchedSections((current) => (current || []).filter((s) => s.id !== sectionToDelete.sectionId));
+            }
+
             addToast(PARTNERS_TEXT.MESSAGE.SECTION_DELETED, ToastType.Success);
         } catch (error: any) {
             if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {
@@ -259,7 +299,7 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
             setIsPublishing(false);
             setSectionToDeleteId(null);
         }
-    }, [localSections, client, setLocalSections, sectionToDeleteId, addToast]);
+    }, [localSections, client, setLocalSections, sectionToDeleteId, addToast, setFetchedSections]);
 
     const addSection = useCallback(() => {
         if (isPublishing || isSectionsLoading) {
@@ -331,6 +371,7 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
                     value={section}
                     errors={errors[index] || { partners: [] }}
                     disabled={isSectionsLoading || isPublishing}
+                    isDirty={isSectionDirty(section, fetchedSections)}
                     onChange={handleChange}
                     onDelete={handleDeleteRequest}
                     onPublish={handlePublishRequest}

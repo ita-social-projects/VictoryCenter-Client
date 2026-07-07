@@ -34,6 +34,7 @@ export interface PartnerSectionProps {
     onChange: (value: PartnerSectionFormValues, errors: PartnerSectionErrors) => void;
     onDelete: (localId: string) => void;
     onPublish: (localId: string) => void;
+    isDirty: boolean;
 }
 
 const PartnerSectionComponent = ({
@@ -43,6 +44,7 @@ const PartnerSectionComponent = ({
     onPublish,
     disabled = false,
     errors,
+    isDirty,
 }: PartnerSectionProps) => {
     const handleTitleChange = useCallback(
         (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -218,7 +220,7 @@ const PartnerSectionComponent = ({
                 <Button buttonStyle="secondary" onClick={handleDelete} disabled={disabled}>
                     {PARTNERS_TEXT.SECTION.DELETE_SECTION}
                 </Button>
-                <Button buttonStyle="primary" onClick={handlePublish} disabled={disabled || !isFormValid()}>
+                <Button buttonStyle="primary" onClick={handlePublish} disabled={disabled || !isDirty || !isFormValid()}>
                     {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
                 </Button>
             </div>

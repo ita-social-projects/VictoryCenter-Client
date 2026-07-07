@@ -54,6 +54,7 @@ export const PartnerBanner = () => {
     const client = useAdminClient();
     const { addToast } = useToast();
     const [values, setValues] = useState<PartnerBannerValues | null>(null);
+    const [savedValues, setSavedValues] = useState<PartnerBannerValues | null>(null);
     const [errors, setErrors] = useState<PartnerBannerErrorState>({});
     const [touched, setTouched] = useState<{ title?: boolean; description?: boolean }>({});
     const [isPublishing, setIsPublishing] = useState(false);
@@ -75,9 +76,20 @@ export const PartnerBanner = () => {
         autoFetchDisabled: false,
     });
 
+    const isDirty = React.useMemo(() => {
+        if (!savedValues || !values) return false;
+        return (
+            savedValues.title !== values.title ||
+            savedValues.description !== values.description ||
+            savedValues.imageId !== values.imageId ||
+            savedValues.image !== values.image
+        );
+    }, [savedValues, values]);
+
     useEffect(() => {
         if (!isLoadingData && bannerData && bannerData.title) {
             setValues(bannerData);
+            setSavedValues(bannerData);
             setTouched({});
             setErrors({});
             setTitleKey((prev) => prev + 1);
@@ -151,6 +163,7 @@ export const PartnerBanner = () => {
             });
 
             setValues(updatedBanner);
+            setSavedValues(updatedBanner);
             setTouched({});
             setErrors({});
             addToast(PARTNERS_TEXT.MESSAGE.BANNER_SAVED, ToastType.Success);
@@ -270,7 +283,7 @@ export const PartnerBanner = () => {
                                 type="button"
                                 buttonStyle="primary"
                                 onClick={handlePublishClick}
-                                disabled={isDisabled || !isFormValid(values, errors)}
+                                disabled={isDisabled || !isDirty || !isFormValid(values, errors)}
                             >
                                 {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
                             </Button>

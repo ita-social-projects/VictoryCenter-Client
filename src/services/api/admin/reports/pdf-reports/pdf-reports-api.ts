@@ -27,6 +27,13 @@ export const PdfReportsApi = {
         return response.data;
     },
 
+    reorder: async (client: AxiosInstance, languageId: number, orderedIds: number[]): Promise<void> => {
+        await client.put(`${API_ROUTES.PDF_REPORTS.BASE}/reorder`, {
+            languageId,
+            orderedIds,
+        });
+    },
+
     getAll: async (
         client: AxiosInstance,
         filter: { offset: number; limit: number; languageId?: number },

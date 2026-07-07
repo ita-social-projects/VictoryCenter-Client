@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { PdfFilesTable } from './PdfFilesTable';
 import { PDF_FILES_SECTION_TEXT } from '@/const/admin/reports';
@@ -37,6 +37,9 @@ jest.mock('@/assets/icons/checkmark.svg', () => ({
 }));
 jest.mock('@/assets/icons/cross.svg', () => ({
     ReactComponent: () => <svg data-testid="cross-icon" />,
+}));
+jest.mock('@/assets/icons/dragger.svg', () => ({
+    ReactComponent: () => <svg data-testid="drag-icon" />,
 }));
 jest.mock('@/components/admin/icon-button/IconButton', () => ({
     IconButton: ({ onClick, disabled, 'aria-label': ariaLabel }: any) => (
@@ -429,6 +432,51 @@ describe('PdfFilesTable', () => {
                 PDF_FILES_SECTION_TEXT.ACTIONS.FILE.ACCEPT_RENAME,
             ) as HTMLButtonElement;
             expect(acceptButton).toBeDisabled();
+        });
+    });
+
+    describe('Drag and Drop Reordering', () => {
+        it('should display the drag-and-drop icons when files.length > 1', () => {
+            render(<PdfFilesTable {...defaultProps} />);
+            const dragIcons = screen.getAllByTestId('drag-icon');
+            expect(dragIcons.length).toBe(mockFiles.length);
+        });
+
+        it('should not display the drag-and-drop icon when files.length <= 1', () => {
+            render(<PdfFilesTable {...defaultProps} files={[mockFiles[0]]} />);
+            expect(screen.queryByTestId('drag-icon')).not.toBeInTheDocument();
+        });
+
+        it('should handle dragstart, dragover, drop, and dragend events correctly', () => {
+            const onReorderFilesMock = jest.fn();
+            render(<PdfFilesTable {...defaultProps} onReorderFiles={onReorderFilesMock} />);
+
+            const rows = screen.getAllByRole('row');
+            // rows[0] is table header, rows[1] is file 1, rows[2] is file 2
+            const dragRow = rows[1];
+            const dropRow = rows[2];
+
+            const mockDataTransfer = {
+                setData: jest.fn(),
+                getData: jest.fn().mockReturnValue('1'),
+                effectAllowed: '',
+                dropEffect: '',
+            };
+
+            // Trigger dragstart
+            fireEvent.dragStart(dragRow, { dataTransfer: mockDataTransfer });
+            expect(mockDataTransfer.setData).toHaveBeenCalledWith('text/plain', '1');
+
+            // Trigger dragover
+            fireEvent.dragOver(dropRow, { dataTransfer: mockDataTransfer });
+            expect(mockDataTransfer.dropEffect).toBe('move');
+
+            // Trigger drop
+            fireEvent.drop(dropRow, { dataTransfer: mockDataTransfer });
+            expect(onReorderFilesMock).toHaveBeenCalledWith([mockFiles[1], mockFiles[0]]);
+
+            // Trigger dragend
+            fireEvent.dragEnd(dragRow);
         });
     });
 });

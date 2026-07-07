@@ -4,6 +4,7 @@ import { ReactComponent as FileIcon } from '@/assets/icons/file.svg';
 import { ReactComponent as NotFoundIcon } from '@/assets/icons/not-found.svg';
 import { ReactComponent as CheckmarkIcon } from '@/assets/icons/checkmark.svg';
 import { ReactComponent as CrossIcon } from '@/assets/icons/cross.svg';
+import { ReactComponent as DragIcon } from '@/assets/icons/dragger.svg';
 import { PDF_FILES_SECTION_TEXT } from '@/const/admin/reports';
 import cn from 'classnames';
 import styles from './PdfFilesTable.module.scss';
@@ -18,6 +19,7 @@ interface PdfFilesTableProps {
     onViewFile: (file: PdfReportDto) => void;
     onDeleteFile: (id: number) => Promise<void>;
     onRenameFile: (id: number, newName: string) => Promise<void>;
+    onReorderFiles?: (reorderedFiles: PdfReportDto[]) => void;
     isDeleting?: boolean;
     isRenaming?: boolean;
 }
@@ -31,9 +33,48 @@ export const PdfFilesTable: React.FC<PdfFilesTableProps> = ({
     onDeleteFile,
     onViewFile,
     onRenameFile,
+    onReorderFiles,
     isDeleting = false,
     isRenaming = false,
 }) => {
+    const [draggingId, setDraggingId] = useState<number | null>(null);
+
+    const handleDragStart = useCallback((e: React.DragEvent<HTMLTableRowElement>, id: number) => {
+        setDraggingId(id);
+        e.dataTransfer.setData('text/plain', id.toString());
+        e.dataTransfer.effectAllowed = 'move';
+    }, []);
+
+    const handleDragOver = useCallback((e: React.DragEvent<HTMLTableRowElement>) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+    }, []);
+
+    const handleDrop = useCallback(
+        (e: React.DragEvent<HTMLTableRowElement>, targetId: number) => {
+            e.preventDefault();
+            const sourceIdStr = e.dataTransfer.getData('text/plain');
+            if (!sourceIdStr) return;
+            const sourceId = Number(sourceIdStr);
+            if (sourceId === targetId) return;
+
+            const updatedFiles = [...files];
+            const fromIndex = updatedFiles.findIndex((f) => f.id === sourceId);
+            const toIndex = updatedFiles.findIndex((f) => f.id === targetId);
+
+            if (fromIndex !== -1 && toIndex !== -1) {
+                const [draggedItem] = updatedFiles.splice(fromIndex, 1);
+                updatedFiles.splice(toIndex, 0, draggedItem);
+                onReorderFiles?.(updatedFiles);
+            }
+        },
+        [files, onReorderFiles],
+    );
+
+    const handleDragEnd = useCallback(() => {
+        setDraggingId(null);
+    }, []);
+
     const [deleteConfirmation, setDeleteConfirmation] = useState<{ isOpen: boolean; fileId: number | null }>({
         isOpen: false,
         fileId: null,
@@ -123,6 +164,7 @@ export const PdfFilesTable: React.FC<PdfFilesTableProps> = ({
                 <table className={styles.table}>
                     <thead>
                         <tr className={styles['header-row']}>
+                            {files.length > 1 && <th className={cn(styles.cell, styles['drag-header-cell'])} />}
                             <th className={cn(styles.cell, styles['name-cell'])}>
                                 {PDF_FILES_SECTION_TEXT.TABLE.HEADER.NAME}
                             </th>
@@ -149,7 +191,24 @@ export const PdfFilesTable: React.FC<PdfFilesTableProps> = ({
                             </tr>
                         ) : (
                             files.map((file) => (
-                                <tr key={file.id} className={styles.row}>
+                                <tr
+                                    key={file.id}
+                                    className={cn(styles.row, {
+                                        [styles['row-dragging']]: draggingId === file.id,
+                                    })}
+                                    draggable={files.length > 1}
+                                    onDragStart={(e) => handleDragStart(e, file.id)}
+                                    onDragOver={handleDragOver}
+                                    onDrop={(e) => handleDrop(e, file.id)}
+                                    onDragEnd={handleDragEnd}
+                                >
+                                    {files.length > 1 && (
+                                        <td className={cn(styles.cell, styles['drag-cell'])}>
+                                            <div className={styles['drag-handle-wrapper']}>
+                                                <DragIcon className={styles['drag-handle-icon']} />
+                                            </div>
+                                        </td>
+                                    )}
                                     <td className={cn(styles.cell, styles['name-cell'])}>
                                         {editingFileId === file.id ? (
                                             <div className={styles['rename-input-container']}>

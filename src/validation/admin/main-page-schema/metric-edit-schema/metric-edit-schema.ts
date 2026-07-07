@@ -3,10 +3,6 @@ import { MetricPrefix } from '@/types/admin/main-page';
 import { normalizeFormattedNumber, parseFormattedNumber } from '@/utils/functions/formatters/format-number';
 import * as Yup from 'yup';
 
-const parseThousands = (value: string): number => {
-    return parseFormattedNumber(value || '') ?? 0;
-};
-
 const raisedFundsValidator = Yup.string()
     .required(MAIN_PAGE_VALIDATION.raisedFunds.REQUIRED)
     .test('not-empty', MAIN_PAGE_VALIDATION.raisedFunds.REQUIRED, (val) => {
@@ -46,7 +42,17 @@ export const metricEditSchema = Yup.object({
         .max(MAIN_PAGE_VALIDATION.editPanel.name.max, MAIN_PAGE_VALIDATION.editPanel.name.getMaxError()),
     value: Yup.string()
         .required(MAIN_PAGE_VALIDATION.common.REQUIRED)
-        .test('is-positive', MAIN_PAGE_VALIDATION.common.REQUIRED, (val) => parseThousands(val || '') > 0),
+        .test('only-numbers', MAIN_PAGE_VALIDATION.editPanel.value.ONLY_NUMBERS, (val) => {
+            if (!val) return false;
+            const stripped = val.replace(/\s/g, '');
+            return /^-?\d+$/.test(stripped);
+        })
+        .test('is-positive', MAIN_PAGE_VALIDATION.editPanel.value.ONLY_POSITIVE, (val) => {
+            if (!val) return false;
+            const stripped = val.replace(/\s/g, '');
+            const num = Number(stripped);
+            return !Number.isNaN(num) && num > 0;
+        }),
     prefix: Yup.mixed<MetricPrefix>().required(MAIN_PAGE_VALIDATION.common.REQUIRED),
 });
 

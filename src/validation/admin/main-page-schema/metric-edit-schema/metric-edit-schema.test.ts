@@ -42,7 +42,13 @@ describe('metricEditSchema', () => {
 
     it('requires positive value', async () => {
         await expect(metricEditSchema.validate({ ...validPayload, value: '0' })).rejects.toThrow(
-            MAIN_PAGE_VALIDATION.common.REQUIRED,
+            MAIN_PAGE_VALIDATION.editPanel.value.ONLY_POSITIVE,
+        );
+    });
+
+    it('rejects non-numeric value', async () => {
+        await expect(metricEditSchema.validate({ ...validPayload, value: 'abc' })).rejects.toThrow(
+            MAIN_PAGE_VALIDATION.editPanel.value.ONLY_NUMBERS,
         );
     });
 

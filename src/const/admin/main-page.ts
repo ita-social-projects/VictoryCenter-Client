@@ -42,6 +42,10 @@ export const MAIN_PAGE_TEXT = {
             SYNC_OFF_TEXT: 'Коли перемикач вимкнено, дані не синхронізуються автоматично і задаються вручну.',
             SYNC_CONFIRM_TITLE: 'Оновити суми зібраних коштів відповідно до сторінки "Звітність"?',
         },
+        DONATIONS: {
+            TITLE_LABEL: COMMON_TEXT_ADMIN.TYPE.TITLE,
+            DESCRIPTION_LABEL: COMMON_TEXT_ADMIN.TYPE.DESCRIPTION,
+        },
         PARTNERS: {
             TITLE_LABEL: COMMON_TEXT_ADMIN.TYPE.TITLE,
             DESCRIPTION_LABEL: COMMON_TEXT_ADMIN.TYPE.DESCRIPTION,
@@ -84,6 +88,21 @@ export const MAIN_PAGE_VALIDATION = {
     },
 
     aboutUsBlock: {
+        title: {
+            min: 10,
+            max: 50,
+            getMinError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(10),
+            getMaxError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(50),
+        },
+        description: {
+            min: 10,
+            max: 1000,
+            getMinError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(10),
+            getMaxError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(1000),
+        },
+    },
+
+    donationsBlock: {
         title: {
             min: 10,
             max: 50,

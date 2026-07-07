@@ -49,6 +49,13 @@ export interface MainAboutUsLocalization extends EntityLocalization {
     description?: string;
 }
 
+export interface MainDonationsLocalization extends EntityLocalization {
+    entityId?: number;
+    languageId?: number;
+    title?: string;
+    description?: string;
+}
+
 export interface MainPartnersLocalization extends EntityLocalization {
     entityId?: number;
     languageId?: number;
@@ -98,6 +105,13 @@ export interface MainAboutUs extends EntityWithLocalizations<MainAboutUsLocaliza
     description: string;
 }
 
+export interface MainDonations extends EntityWithLocalizations<MainDonationsLocalization> {
+    id?: number;
+    title: string;
+    description: string;
+    image?: Image | ImageValues | null;
+}
+
 export interface MainPartners extends EntityWithLocalizations<MainPartnersLocalization> {
     id?: number;
     title: string;
@@ -110,6 +124,7 @@ export interface MainPage extends EntityWithLocalizations<MainPageLocalization> 
     description: string;
     image: Image | ImageValues | null;
     mainAboutUs: MainAboutUs | null;
+    mainDonations: MainDonations | null;
     mainPartners: MainPartners | null;
     impactStatistics: ImpactStatistic | null;
 }
@@ -123,6 +138,12 @@ export interface MainPageEmbeddedLocalizationDto extends EntityLocalizationDto {
 }
 
 export interface MainAboutUsEmbeddedLocalizationDto extends EntityLocalizationDto {
+    entityId?: number;
+    title?: string | null;
+    description?: string | null;
+}
+
+export interface MainDonationsEmbeddedLocalizationDto extends EntityLocalizationDto {
     entityId?: number;
     title?: string | null;
     description?: string | null;
@@ -172,6 +193,13 @@ export interface MainAboutUsDto extends EntityWithDtoLocalizations<MainAboutUsEm
     description?: string | null;
 }
 
+export interface MainDonationsDto extends EntityWithDtoLocalizations<MainDonationsEmbeddedLocalizationDto> {
+    id?: number;
+    title?: string | null;
+    description?: string | null;
+    image?: Image | ImageValues | null;
+}
+
 export interface MainPartnersDto extends EntityWithDtoLocalizations<MainPartnersEmbeddedLocalizationDto> {
     id?: number;
     title?: string | null;
@@ -184,6 +212,7 @@ export interface MainPageDto extends EntityWithDtoLocalizations<MainPageEmbedded
     description?: string | null;
     image?: Image | ImageValues | null;
     mainAboutUs?: MainAboutUsDto | null;
+    mainDonations?: MainDonationsDto | null;
     mainPartners?: MainPartnersDto | null;
     impactStatistics?: ImpactStatisticDto | null;
 }
@@ -208,6 +237,12 @@ export interface MainAboutUsLocalizationDto extends BaseMainPageLocalizationDto 
     localizationInfoDto: LocalizationInfo;
 }
 
+export interface MainDonationsLocalizationDto extends BaseMainPageLocalizationDto {
+    entityId: number;
+    translationStatus: TranslationStatus;
+    localizationInfoDto: LocalizationInfo;
+}
+
 export interface MainPartnersLocalizationDto extends BaseMainPageLocalizationDto {
     entityId: number;
     translationStatus: TranslationStatus;
@@ -219,6 +254,7 @@ export interface MainPageLocalizationDto extends BaseMainPageLocalizationDto {
     translationStatus: TranslationStatus;
     localizationInfoDto: LocalizationInfo;
     mainAboutUs: MainAboutUsLocalizationDto | null;
+    mainDonations: MainDonationsLocalizationDto | null;
     mainPartners: MainPartnersLocalizationDto | null;
 }
 
@@ -257,6 +293,12 @@ export interface CreateMainAboutUsDto {
     description: string;
 }
 
+export interface CreateMainDonationsDto {
+    title: string;
+    description: string;
+    imageId?: number | null;
+}
+
 export interface CreateMainPartnersDto {
     title: string;
     description: string;
@@ -267,11 +309,16 @@ export interface CreateMainPageDto {
     description: string;
     imageId?: number | null;
     mainAboutUs?: CreateMainAboutUsDto | null;
+    mainDonations?: CreateMainDonationsDto | null;
     mainPartners?: CreateMainPartnersDto | null;
     impactStatistics?: CreateImpactStatisticDto | null;
 }
 
 export interface CreateMainAboutUsLocalizationDto extends BaseMainPageLocalizationDto {
+    entityId: number;
+}
+
+export interface CreateMainDonationsLocalizationDto extends BaseMainPageLocalizationDto {
     entityId: number;
 }
 
@@ -283,6 +330,7 @@ export interface CreateMainPageLocalizationDto extends BaseMainPageLocalizationD
     entityId: number;
     languageId: number;
     mainAboutUs: CreateMainAboutUsLocalizationDto | null;
+    mainDonations: CreateMainDonationsLocalizationDto | null;
     mainPartners: CreateMainPartnersLocalizationDto | null;
 }
 
@@ -306,6 +354,12 @@ export interface UpdateMainAboutUsInlineLocalizationDto {
     description?: string;
 }
 
+export interface UpdateMainDonationsInlineLocalizationDto {
+    languageId?: number;
+    title?: string;
+    description?: string;
+}
+
 export interface UpdateMainPartnersInlineLocalizationDto {
     languageId?: number;
     title?: string;
@@ -320,10 +374,13 @@ export interface UpdateMainPageInlineLocalizationDto {
 
 export interface UpdateMainAboutUsLocalizationDto extends BaseMainPageLocalizationDto {}
 
+export interface UpdateMainDonationsLocalizationDto extends BaseMainPageLocalizationDto {}
+
 export interface UpdateMainPartnersLocalizationDto extends BaseMainPageLocalizationDto {}
 
 export interface UpdateMainPageLocalizationDto extends BaseMainPageLocalizationDto {
     mainAboutUs: UpdateMainAboutUsLocalizationDto | null;
+    mainDonations: UpdateMainDonationsLocalizationDto | null;
     mainPartners: UpdateMainPartnersLocalizationDto | null;
 }
 
@@ -351,6 +408,13 @@ export interface UpdateMainAboutUsDto {
     localizations?: UpdateMainAboutUsInlineLocalizationDto[];
 }
 
+export interface UpdateMainDonationsDto {
+    title: string;
+    description: string;
+    imageId?: number | null;
+    localizations?: UpdateMainDonationsInlineLocalizationDto[];
+}
+
 export interface UpdateMainPartnersDto {
     title: string;
     description: string;
@@ -363,6 +427,7 @@ export interface UpdateMainPageDto {
     imageId?: number | null;
     localizations?: UpdateMainPageInlineLocalizationDto[];
     mainAboutUs?: UpdateMainAboutUsDto | null;
+    mainDonations?: UpdateMainDonationsDto | null;
     mainPartners?: UpdateMainPartnersDto | null;
     impactStatistics?: UpdateImpactStatisticDto | null;
 }
@@ -394,6 +459,13 @@ export interface MainPageFormValues {
     aboutUsDescriptionUa: string;
     aboutUsDescriptionEn: string;
 
+    // Donations Block
+    donationsTitleUa: string;
+    donationsTitleEn: string;
+    donationsDescriptionUa: string;
+    donationsDescriptionEn: string;
+    donationsImage: Image | ImageValues | null;
+
     // Partners Block
     partnersTitleUa: string;
     partnersTitleEn: string;
@@ -418,6 +490,12 @@ export const MAIN_PAGE_FORM_DEFAULTS: MainPageFormValues = {
     aboutUsTitleEn: '',
     aboutUsDescriptionUa: '',
     aboutUsDescriptionEn: '',
+
+    donationsTitleUa: '',
+    donationsTitleEn: '',
+    donationsDescriptionUa: '',
+    donationsDescriptionEn: '',
+    donationsImage: null,
 
     partnersTitleUa: '',
     partnersTitleEn: '',

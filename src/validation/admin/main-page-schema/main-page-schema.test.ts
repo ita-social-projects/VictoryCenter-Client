@@ -1,5 +1,6 @@
 import { MAIN_PAGE_VALIDATION } from '@/const/admin/main-page';
-import { MAIN_PAGE_VALIDATION_FUNCTIONS } from './main-page-schema';
+import { MAIN_PAGE_VALIDATION_FUNCTIONS, MainPageValidationSchema } from './main-page-schema';
+import { MAIN_PAGE_FORM_DEFAULTS } from '@/types/admin/main-page';
 
 describe('MAIN_PAGE_VALIDATION_FUNCTIONS', () => {
     describe('validateTitle', () => {
@@ -7,8 +8,20 @@ describe('MAIN_PAGE_VALIDATION_FUNCTIONS', () => {
             expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateTitle('Коні з досвідом зцілення')).toBeUndefined();
         });
 
+        it('validates rich text HTML by plain text length', () => {
+            expect(
+                MAIN_PAGE_VALIDATION_FUNCTIONS.validateTitle('<p><strong>Коні з досвідом</strong></p>'),
+            ).toBeUndefined();
+        });
+
         it('returns required error for an empty title', () => {
             expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateTitle('')).toBe(MAIN_PAGE_VALIDATION.common.REQUIRED);
+        });
+
+        it('returns required error for empty rich text HTML', () => {
+            expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateTitle('<p><br></p>')).toBe(
+                MAIN_PAGE_VALIDATION.common.REQUIRED,
+            );
         });
 
         it('treats spaces as empty and returns required error', () => {
@@ -77,6 +90,41 @@ describe('MAIN_PAGE_VALIDATION_FUNCTIONS', () => {
                 url: 'http://example.com/image.jpg',
             };
             expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateImage(mockImage as any)).toBeUndefined();
+        });
+    });
+
+    describe('MainPageValidationSchema', () => {
+        it('preserves rich text HTML values after validation', async () => {
+            const values = {
+                ...MAIN_PAGE_FORM_DEFAULTS,
+                titleUa: '<p><strong>Коні з досвідом</strong></p>',
+                titleEn: '<p><strong>Horses with experience</strong></p>',
+                descriptionUa: '<p>Це коректний опис для блоку.</p>',
+                descriptionEn: '<p>This is a valid description.</p>',
+                aboutUsTitleUa: '<p>Про центр допомоги</p>',
+                aboutUsTitleEn: '<p>About the support center</p>',
+                aboutUsDescriptionUa: '<p>Детальний опис про нас для головної сторінки.</p>',
+                aboutUsDescriptionEn: '<p>Detailed about us description for the main page.</p>',
+                partnersTitleUa: '<p>Надійні партнери фонду</p>',
+                partnersTitleEn: '<p>Trusted foundation partners</p>',
+                partnersDescriptionUa: '<p>Детальний опис для блоку наших партнерів.</p>',
+                partnersDescriptionEn: '<p>Detailed description for our partners block.</p>',
+                donationsTitleUa: '<p>Підтримати нас</p>',
+                donationsTitleEn: '<p>Support us</p>',
+                donationsDescriptionUa: '<p>Опис для блоку пожертв.</p>',
+                donationsDescriptionEn: '<p>Description for donations block.</p>',
+                statisticsTitleUa: 'Зміни, які можна виміряти',
+                statisticsTitleEn: 'Changes you can measure',
+            };
+
+            await expect(MainPageValidationSchema.validate(values)).resolves.toMatchObject({
+                titleUa: values.titleUa,
+                descriptionUa: values.descriptionUa,
+                aboutUsDescriptionEn: values.aboutUsDescriptionEn,
+                partnersDescriptionUa: values.partnersDescriptionUa,
+                donationsTitleUa: values.donationsTitleUa,
+                donationsDescriptionUa: values.donationsDescriptionUa,
+            });
         });
     });
 
@@ -180,16 +228,12 @@ describe('MAIN_PAGE_VALIDATION_FUNCTIONS', () => {
             expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateStatisticsTitleEn('Changes you can measure')).toBeUndefined();
         });
 
-        it('returns required error for empty EN title', () => {
-            expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateStatisticsTitleEn('')).toBe(
-                MAIN_PAGE_VALIDATION.common.REQUIRED,
-            );
+        it('returns undefined for empty EN title since it is optional', () => {
+            expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateStatisticsTitleEn('')).toBeUndefined();
         });
 
-        it('treats spaces as empty and returns required error for EN title', () => {
-            expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateStatisticsTitleEn('   ')).toBe(
-                MAIN_PAGE_VALIDATION.common.REQUIRED,
-            );
+        it('treats spaces as empty and returns undefined for EN title since it is optional', () => {
+            expect(MAIN_PAGE_VALIDATION_FUNCTIONS.validateStatisticsTitleEn('   ')).toBeUndefined();
         });
 
         it('returns min error for EN title shorter than min', () => {

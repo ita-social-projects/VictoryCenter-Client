@@ -68,6 +68,18 @@ describe('main-page-mappers', () => {
                         { languageId: 2, title: 'EN About', description: 'EN About Desc' } as any,
                     ],
                 } as any,
+                mainDonations: {
+                    title: 'UA Donations',
+                    description: 'UA Donations Desc',
+                    image: { id: 15, url: 'img-donations.png' } as any,
+                    localizations: [
+                        {
+                            localizationInfoDto: { code: 'en' },
+                            title: 'EN Donations',
+                            description: 'EN Donations Desc',
+                        } as any,
+                    ],
+                } as any,
                 mainPartners: {
                     title: 'Base Partners',
                     description: 'Base Partners Desc',
@@ -102,6 +114,12 @@ describe('main-page-mappers', () => {
                 aboutUsDescriptionUa: 'Base About Desc',
                 aboutUsDescriptionEn: 'EN About Desc',
 
+                donationsTitleUa: 'UA Donations',
+                donationsTitleEn: 'EN Donations',
+                donationsDescriptionUa: 'UA Donations Desc',
+                donationsDescriptionEn: 'EN Donations Desc',
+                donationsImage: { id: 15, url: 'img-donations.png' },
+
                 partnersTitleUa: 'Base Partners',
                 partnersTitleEn: 'EN Partners',
                 partnersDescriptionUa: 'Base Partners Desc',
@@ -125,6 +143,13 @@ describe('main-page-mappers', () => {
                     description: null,
                     localizations: [{ languageId: 1, title: 'UK Loc About', description: 'UK Loc About Desc' } as any],
                 } as any,
+                mainDonations: {
+                    title: null,
+                    description: null,
+                    localizations: [
+                        { languageId: 1, title: 'UK Loc Donations', description: 'UK Loc Donations Desc' } as any,
+                    ],
+                } as any,
                 mainPartners: {
                     title: null,
                     description: null,
@@ -145,6 +170,8 @@ describe('main-page-mappers', () => {
             expect(result.titleEn).toBe('');
             expect(result.aboutUsTitleUa).toBe('UK Loc About');
             expect(result.aboutUsTitleEn).toBe('');
+            expect(result.donationsTitleUa).toBe('UK Loc Donations');
+            expect(result.donationsTitleEn).toBe('');
             expect(result.partnersTitleUa).toBe('UK Loc Partners');
             expect(result.partnersTitleEn).toBe('');
             expect(result.statisticsTitleUa).toBe('UK Loc Stats');
@@ -181,6 +208,12 @@ describe('main-page-mappers', () => {
                 aboutUsTitleEn: '',
                 aboutUsDescriptionUa: 'UA About Desc',
                 aboutUsDescriptionEn: 'EN About Desc',
+
+                donationsTitleUa: 'UA Donations',
+                donationsTitleEn: 'EN Donations',
+                donationsDescriptionUa: 'UA Donations Desc',
+                donationsDescriptionEn: 'EN Donations Desc',
+                donationsImage: { id: 16, mimeType: 'image/png' } as any,
 
                 partnersTitleUa: 'UA Partners',
                 partnersTitleEn: 'EN Partners',

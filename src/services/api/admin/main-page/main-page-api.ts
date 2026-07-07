@@ -14,6 +14,7 @@ const toDomainMainPage = (dto: MainPageDto): MainPage => {
     return {
         ...mapEntityWithLocalizations(dto),
         mainAboutUs: dto.mainAboutUs ? mapEntityWithLocalizations(dto.mainAboutUs) : null,
+        mainDonations: dto.mainDonations ? mapEntityWithLocalizations(dto.mainDonations) : null,
         mainPartners: dto.mainPartners ? mapEntityWithLocalizations(dto.mainPartners) : null,
         impactStatistics: dto.impactStatistics
             ? {

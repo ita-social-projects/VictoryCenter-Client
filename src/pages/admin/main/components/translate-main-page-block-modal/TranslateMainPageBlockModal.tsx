@@ -10,6 +10,7 @@ import { useTranslateMainPageBlock } from '@/hooks/admin/use-translate-main-page
 import { ModalMode } from '@/types/admin/common';
 import { MainPage, MainPageLocalizationBlock } from '@/types/admin/main-page';
 import { LocalizationLanguage } from '@/types/common/language';
+import { getLocalizationLanguageId } from '@/utils/functions/mappers/common/localization/localization-mappers';
 import {
     TranslateMainPageBlockForm,
     TranslateMainPageBlockFormRef,
@@ -30,6 +31,7 @@ interface TranslateMainPageBlockModalProps {
 const SUPPORTED_BLOCKS = [
     MainPageLocalizationBlock.Title,
     MainPageLocalizationBlock.AboutUs,
+    MainPageLocalizationBlock.Donations,
     MainPageLocalizationBlock.Partners,
 ] as const;
 
@@ -48,6 +50,12 @@ const BLOCK_VALIDATION_CONFIG: Record<SupportedBlock, TranslateMainPageBlockVali
         titleMaxLength: MAIN_PAGE_VALIDATION.aboutUsBlock.title.max,
         descriptionMaxLength: MAIN_PAGE_VALIDATION.aboutUsBlock.description.max,
     },
+    [MainPageLocalizationBlock.Donations]: {
+        titleField: 'donationsTitleUa',
+        descriptionField: 'donationsDescriptionUa',
+        titleMaxLength: MAIN_PAGE_VALIDATION.donationsBlock.title.max,
+        descriptionMaxLength: MAIN_PAGE_VALIDATION.donationsBlock.description.max,
+    },
     [MainPageLocalizationBlock.Partners]: {
         titleField: 'partnersTitleUa',
         descriptionField: 'partnersDescriptionUa',
@@ -58,9 +66,6 @@ const BLOCK_VALIDATION_CONFIG: Record<SupportedBlock, TranslateMainPageBlockVali
 
 const isSupportedBlock = (block: MainPageLocalizationBlock | null): block is SupportedBlock =>
     block != null && SUPPORTED_BLOCKS.includes(block as SupportedBlock);
-
-const getLocalizationLanguageId = (localization: { languageId?: number; language?: { id?: number } }) =>
-    localization.languageId ?? localization.language?.id;
 
 const getExistingTranslation = (
     page: MainPage | null,
@@ -83,6 +88,17 @@ const getExistingTranslation = (
         }
         case MainPageLocalizationBlock.AboutUs: {
             const localization = page.mainAboutUs?.localizations?.find(
+                (loc) => getLocalizationLanguageId(loc) === language.id,
+            );
+            return localization
+                ? {
+                      title: localization.title ?? '',
+                      description: localization.description ?? '',
+                  }
+                : null;
+        }
+        case MainPageLocalizationBlock.Donations: {
+            const localization = page.mainDonations?.localizations?.find(
                 (loc) => getLocalizationLanguageId(loc) === language.id,
             );
             return localization

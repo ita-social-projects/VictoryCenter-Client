@@ -1,6 +1,5 @@
 import { Button } from '@/components/admin/button/Button';
-import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
-import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
+import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 import { MAIN_PAGE_TEXT } from '@/const/admin/main-page';
 import { MainPageFormValues } from '@/types/admin/main-page';
 import { Control, Controller, FieldPathByValue } from 'react-hook-form';
@@ -49,7 +48,7 @@ export const MainPageTextBlockForm = ({
                     name={titleName}
                     control={control}
                     render={({ field: { onChange, value, onBlur, name } }) => (
-                        <InputWithCharacterLimitGroup
+                        <RichTextInputGroup
                             id={titleId}
                             name={name}
                             label={titleLabel}
@@ -70,7 +69,7 @@ export const MainPageTextBlockForm = ({
                     name={descriptionName}
                     control={control}
                     render={({ field: { onChange, value, onBlur, name } }) => (
-                        <TextAreaWithCharacterLimitGroup
+                        <RichTextInputGroup
                             id={descriptionId}
                             name={name}
                             label={descriptionLabel}
@@ -80,8 +79,7 @@ export const MainPageTextBlockForm = ({
                             error={descriptionError}
                             maxLength={descriptionMaxLength}
                             isRequired={true}
-                            rows={14}
-                            className={styles['textarea-custom']}
+                            className={styles['rich-text-custom']}
                             disabled={isReadOnly}
                         />
                     )}

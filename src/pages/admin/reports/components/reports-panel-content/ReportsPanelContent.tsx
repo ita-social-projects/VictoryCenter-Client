@@ -39,20 +39,17 @@ export const ReportsPanelContent = () => {
                 <ReportsPageToolbar selectedTab={selectedTab} onTabSelect={handleTabSelect} />
             </div>
             <div className={styles.content}>
-                {isMediaSettingsTab ? (
-                    <MediaSettings
-                        ref={mediaSettingsRef}
-                        resetCounter={resetCounter}
-                        onDirtyChange={handleDirtyChange}
-                        onCancel={handleCancel}
-                        onPublish={handlePublish}
-                        isPublishDisabled={!isDirty}
-                        isCancelDisabled={!isDirty}
-                        isActive={isMediaSettingsTab}
-                    />
-                ) : (
-                    <ReportAnalytics />
-                )}
+                <MediaSettings
+                    ref={mediaSettingsRef}
+                    resetCounter={resetCounter}
+                    onDirtyChange={handleDirtyChange}
+                    onCancel={handleCancel}
+                    onPublish={handlePublish}
+                    isPublishDisabled={!isDirty}
+                    isCancelDisabled={!isDirty}
+                    isActive={isMediaSettingsTab}
+                />
+                {!isMediaSettingsTab && <ReportAnalytics />}
             </div>
             <ToastContainer />
         </div>

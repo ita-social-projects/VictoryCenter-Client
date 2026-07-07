@@ -1,0 +1,23 @@
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
+
+.td {
+    @include type.subtitle-2-medium;
+    box-sizing: border-box;
+    height: 72px;
+    padding: 13px 20px;
+    vertical-align: middle;
+    color: c.$graphite-black;
+    white-space: nowrap;
+}
+
+.amount-edit-td {
+    position: relative;
+    overflow: visible;
+    height: auto;
+}
+
+.actions-td {
+    width: 80px;
+    padding: 0 8px;
+}

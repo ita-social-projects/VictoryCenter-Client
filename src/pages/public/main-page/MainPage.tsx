@@ -8,6 +8,8 @@ import { PublicMainPageApi } from '@/services/api/public/main-page/main-page-api
 import { PublicMainPageDto, PublicMainPageLocalizationDto, MainIntroData } from '@/types/public/main-page';
 import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 import { IntroSection } from './intro-section/IntroSection';
+import { MainProgramsSection } from './main-programs-section/MainProgramsSection';
+import { MainStatisticsSection } from './main-statistics-section/MainStatisticsSection';
 import styles from './MainPage.module.scss';
 
 const getFilledText = (...values: Array<string | null | undefined>): string => {
@@ -59,5 +61,11 @@ export const MainPage = () => {
         image: imageSrc,
     };
 
-    return <IntroSection introData={introData} buttonHref={PUBLIC_ROUTES.PROGRAMS.FULL} />;
+    return (
+        <div className={styles.page}>
+            <IntroSection introData={introData} buttonHref={PUBLIC_ROUTES.PROGRAMS.FULL} />
+            <MainProgramsSection />
+            <MainStatisticsSection impactStatistics={mainPageData?.impactStatistics} />
+        </div>
+    );
 };

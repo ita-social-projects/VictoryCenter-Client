@@ -97,7 +97,7 @@ export const PARTNER_VALIDATION = {
         getRequiredError: () => `Опис обов'язковий`,
     },
     image: {
-        width: 208,
-        height: 208,
+        width: 200,
+        height: 200,
     },
 };

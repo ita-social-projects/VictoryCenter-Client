@@ -13,14 +13,10 @@ export interface CardCarouselProps {
     variant?: 'default' | 'template' | 'editable';
 }
 
-const readPxVar = (cs: CSSStyleDeclaration, name: string) => {
-    const raw = cs.getPropertyValue(name).trim();
-    const value = Number.parseFloat(raw);
-    return Number.isFinite(value) ? value : 0;
-};
-
 export const CardCarousel = ({ children, itemsCount, LeftIcon, RightIcon, variant = 'default' }: CardCarouselProps) => {
     const viewportRef = useRef<HTMLDivElement | null>(null);
+    const targetScroll = useRef<number | null>(null);
+    const scrollTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
     const [canLeft, setCanLeft] = useState(false);
     const [canRight, setCanRight] = useState(false);
 
@@ -42,7 +38,10 @@ export const CardCarousel = ({ children, itemsCount, LeftIcon, RightIcon, varian
     useEffect(() => {
         const onResize = () => syncNav();
         window.addEventListener('resize', onResize);
-        return () => window.removeEventListener('resize', onResize);
+        return () => {
+            window.removeEventListener('resize', onResize);
+            if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+        };
     }, [syncNav]);
 
     const scrollByCard = useCallback(
@@ -50,11 +49,36 @@ export const CardCarousel = ({ children, itemsCount, LeftIcon, RightIcon, varian
             const el = viewportRef.current;
             if (!el) return;
 
-            const cs = getComputedStyle(el);
-            const step = readPxVar(cs, '--pair-card-width') + readPxVar(cs, '--gap');
+            const track = el.firstElementChild as HTMLElement;
+            if (!track) return;
 
-            el.scrollBy({ left: dir * step, behavior: 'smooth' });
+            const firstCard = track.firstElementChild as HTMLElement;
+            if (!firstCard) return;
+
+            const cardWidth = firstCard.getBoundingClientRect().width;
+
+            const trackStyle = getComputedStyle(track);
+            const gap = Number.parseFloat(trackStyle.gap) || 0;
+
+            const step = cardWidth + gap;
+
+            const maxScroll = el.scrollWidth - el.clientWidth;
+            const currentScroll = targetScroll.current ?? el.scrollLeft;
+
+            const currentIndex = Math.round(currentScroll / step);
+            let nextScroll = (currentIndex + dir) * step;
+
+            if (nextScroll < 0) nextScroll = 0;
+            if (nextScroll > maxScroll) nextScroll = maxScroll;
+
+            targetScroll.current = nextScroll;
+            el.scrollTo({ left: nextScroll, behavior: 'smooth' });
             requestAnimationFrame(syncNav);
+
+            if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+            scrollTimeout.current = setTimeout(() => {
+                targetScroll.current = null;
+            }, 500);
         },
         [syncNav],
     );

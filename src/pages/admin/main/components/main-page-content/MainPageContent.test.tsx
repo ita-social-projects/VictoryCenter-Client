@@ -89,11 +89,14 @@ jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
         ) : null,
 }));
 
-const MockFormBlock = ({ testId, btnTestId, onPublish, isPublishDisabled }: any) => {
+const MockFormBlock = ({ testId, btnTestId, onPublish, isPublishDisabled, isReadOnly }: any) => {
     const { useFormContext } = require('react-hook-form');
-    const { setValue } = useFormContext();
+    const { setValue, watch } = useFormContext();
+    const displayedTitle = watch(isReadOnly ? 'titleEn' : 'titleUa');
+
     return (
         <div data-testid={testId}>
+            <span data-testid={`${btnTestId}-displayed-title`}>{displayedTitle}</span>
             <button
                 data-testid={`${btnTestId}-dirty`}
                 onClick={() => {
@@ -102,6 +105,14 @@ const MockFormBlock = ({ testId, btnTestId, onPublish, isPublishDisabled }: any)
                 }}
             >
                 Make Dirty
+            </button>
+            <button
+                data-testid={`${btnTestId}-normalized-dirty`}
+                onClick={() => {
+                    setValue('titleUa', '<p>Test Title</p>', { shouldDirty: true, shouldValidate: true });
+                }}
+            >
+                Normalize Dirty
             </button>
             <button data-testid={btnTestId} onClick={onPublish} disabled={isPublishDisabled}>
                 Publish
@@ -182,6 +193,16 @@ jest.mock('../statistics-block/StatisticsBlockForm', () => ({
     },
 }));
 
+jest.mock('../donations-block/DonationsBlockForm', () => ({
+    __esModule: true,
+    DonationsBlockForm: (props: any) => (
+        <div>
+            <MockFormBlock testId="donations-block-form" btnTestId="publish-btn-donations" {...props} />
+            <span data-testid="donations-block-form-read-only">{String(props.isReadOnly)}</span>
+        </div>
+    ),
+}));
+
 jest.mock('../main-page-publish-modal/MainPagePublishModal', () => ({
     __esModule: true,
     MainPagePublishModal: ({ isOpen, onConfirm, onCancel, isButtonsDisabled }: any) =>
@@ -242,8 +263,15 @@ jest.mock('@/services/api/admin/main-page/main-page-localizations-api/main-page-
     },
 }));
 
-const getByExactText = (text: string) =>
-    screen.getByText((_, el) => el?.children.length === 0 && el?.textContent === text);
+jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
+    __esModule: true,
+    RichTextInputGroup: require('@/utils/test-mocks/main-page-mocks').MockRichTextInputGroup,
+}));
+
+jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
+    __esModule: true,
+    RichTextInputGroup: require('@/utils/test-mocks/main-page-mocks').MockRichTextInputGroup,
+}));
 
 const getTranslationTitleInput = () => document.getElementById('main-page-translation-title') as HTMLInputElement;
 const getTranslationDescriptionInput = () =>
@@ -840,7 +868,8 @@ describe('MainPageContent', () => {
         await renderAndLoadContent();
 
         fireEvent.click(screen.getByTestId('tab-btn-donations'));
-        expect(getByExactText(`Блок "${MAIN_PAGE_TEXT.TABS.DONATIONS}" в розробці`)).toBeInTheDocument();
+        expect(screen.getByTestId('donations-block-form')).toBeInTheDocument();
+        expect(screen.queryByTestId('title-block-form')).not.toBeInTheDocument();
     });
 
     it('renders partners tab content', async () => {
@@ -854,6 +883,7 @@ describe('MainPageContent', () => {
     it.each([
         ['title', 'title-block-form'],
         ['about', 'about-us-block-form'],
+        ['donations', 'donations-block-form'],
         ['partners', 'partners-block-form'],
     ])('shows translation action in the content top-right for %s block', async (tabId, formTestId) => {
         mockLocalizationToolkitState.translationLanguages = [{ id: 2, code: 'en', name: 'Англійська' }];
@@ -865,7 +895,7 @@ describe('MainPageContent', () => {
         expect(screen.getByLabelText('Додати переклад')).toBeInTheDocument();
     });
 
-    it.each(['statistics', 'donations'])('does not show translation action for %s block', async (tabId) => {
+    it.each(['statistics'])('does not show translation action for %s block', async (tabId) => {
         await renderAndLoadContent();
 
         fireEvent.click(screen.getByTestId(`tab-btn-${tabId}`));
@@ -888,8 +918,8 @@ describe('MainPageContent', () => {
 
         expect(titleInput.value).toBe('');
         expect(descriptionInput.value).toBe('');
-        expect(titleInput).toHaveAttribute('maxlength', '50');
-        expect(descriptionInput).toHaveAttribute('maxlength', '300');
+        expect(titleInput).toHaveAttribute('data-max-length', '50');
+        expect(descriptionInput).toHaveAttribute('data-max-length', '300');
         expect(getSaveTranslationButton()).toBeDisabled();
     });
 
@@ -999,8 +1029,8 @@ describe('MainPageContent', () => {
 
         expect((MainPageLocalizationsApi.update as jest.Mock).mock.calls[0][3]).toEqual(
             expect.objectContaining({
-                title: 'Valid title text',
-                description: 'Valid description text',
+                title: '<p>Valid title text</p>',
+                description: '<p>Valid description text</p>',
                 mainAboutUs: {
                     title: 'Existing about title',
                     description: 'Existing about description',
@@ -1133,6 +1163,51 @@ describe('MainPageContent', () => {
 
     it('switches language immediately without confirmation when form is not dirty', async () => {
         await renderAndLoadContent();
+
+        fireEvent.click(screen.getByTestId('language-en'));
+
+        expect(mockLocalizationToolkitState.onLanguageChange).toHaveBeenCalledWith(
+            expect.objectContaining({ code: 'en' }),
+        );
+        expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
+    });
+
+    it('updates displayed form values when switching from translated language back to default language', async () => {
+        const { rerender } = render(<MainPageContent />);
+
+        expect(await screen.findByTestId('category-bar')).toBeInTheDocument();
+        expect(screen.getByTestId('publish-btn-displayed-title')).toHaveTextContent('Test Title');
+
+        mockLocalizationToolkitState.selectedLanguage = { id: 2, code: 'en', name: 'EN' };
+        rerender(<MainPageContent />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('publish-btn-displayed-title')).toHaveTextContent('Localized title');
+        });
+        expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
+
+        mockLocalizationToolkitState.selectedLanguage = { id: 1, code: 'uk', name: 'UA' };
+        rerender(<MainPageContent />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('publish-btn-displayed-title')).toHaveTextContent('Test Title');
+        });
+        expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
+    });
+
+    it('switches language without confirmation when rich text normalization is the only form change', async () => {
+        (MainPageApi.get as jest.Mock).mockResolvedValue({
+            ...mockPageData,
+            page: {
+                ...mockPageData.page,
+                title: '<p class="editor">Test Title </p>',
+            },
+        });
+
+        await renderAndLoadContent();
+
+        fireEvent.click(screen.getByTestId('publish-btn-normalized-dirty'));
+        await waitFor(() => expect(screen.getByTestId('publish-btn')).toBeDisabled());
 
         fireEvent.click(screen.getByTestId('language-en'));
 

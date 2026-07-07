@@ -119,7 +119,10 @@ export const TranslateHistoryModal = ({
         const dataMap = [];
         for (const { formRef, section } of sectionStates) {
             if (formRef.current && section.id !== undefined) {
-                dataMap.push({ sectionId: section.id, data: formRef.current.getValues() });
+                const data = formRef.current.getValues?.();
+                if (data !== undefined) {
+                    dataMap.push({ sectionId: section.id, data });
+                }
             }
         }
 

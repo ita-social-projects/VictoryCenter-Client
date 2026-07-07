@@ -1,4 +1,4 @@
-import { normalizeHtml } from './normalize-html';
+import { normalizeHtml, normalizeRichTextHtmlForComparison } from './normalize-html';
 
 describe('normalizeHtml', () => {
     it('returns the same string for plain text', () => {
@@ -60,5 +60,36 @@ describe('normalizeHtml', () => {
         const input = '<p>Text <strong>   </strong></p>';
         const output = '<p>Text</p>';
         expect(normalizeHtml(input)).toBe(output);
+    });
+
+    it('preserves attributes during basic normalization', () => {
+        const input = '<p class="editor-paragraph" style="margin: 0">Text</p>';
+        expect(normalizeHtml(input)).toBe(input);
+    });
+
+    it('preserves spans during basic normalization', () => {
+        const input = '<p><span>Text <strong>Bold</strong></span></p>';
+        expect(normalizeHtml(input)).toBe(input);
+    });
+
+    it('preserves nested bold and italic tags during basic normalization', () => {
+        const input = '<p><b><strong>Bold</strong></b> and <i><em>italic</em></i></p>';
+        expect(normalizeHtml(input)).toBe(input);
+    });
+
+    it('normalizes plain text and equivalent rich text paragraphs the same for rich text comparison', () => {
+        expect(normalizeRichTextHtmlForComparison('Text')).toBe('<p>Text</p>');
+        expect(normalizeRichTextHtmlForComparison('<p class="editor">Text </p>')).toBe('<p>Text</p>');
+    });
+
+    it('removes editor-only wrappers for rich text comparison', () => {
+        const input = '<p><span>Text <b><strong>Bold</strong></b> and <i><em>italic</em></i></span></p>';
+        expect(normalizeRichTextHtmlForComparison(input)).toBe('<p>Text <strong>Bold</strong> and <em>italic</em></p>');
+    });
+
+    it('preserves formatting differences for rich text comparison', () => {
+        expect(normalizeRichTextHtmlForComparison('<p><strong>Text</strong></p>')).not.toBe(
+            normalizeRichTextHtmlForComparison('<p><em>Text</em></p>'),
+        );
     });
 });

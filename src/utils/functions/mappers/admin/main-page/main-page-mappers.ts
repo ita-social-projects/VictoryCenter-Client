@@ -8,20 +8,21 @@ import {
 import type { LocalizationLanguage } from '@/types/common/language';
 import {
     getLanguageIdByCode,
+    LocalizationLanguageSource,
     resolveLocaleCode,
 } from '@/utils/functions/mappers/common/localization/localization-mappers';
+import { DEFAULT_ENGLISH_LANGUAGE_ID, DEFAULT_UKRAINIAN_LANGUAGE_ID } from '@/const/common/locales';
 
-const DEFAULT_ENGLISH_LANGUAGE_ID = 2;
-
-const findLocalizationByCode = <TLocalization>(
+const findLocalizationByCode = <TLocalization extends LocalizationLanguageSource>(
     localizations: TLocalization[] | undefined,
     code: 'uk' | 'en',
     languages?: LocalizationLanguage[],
-): TLocalization | undefined => (localizations ?? []).find((loc) => resolveLocaleCode(loc as any, languages) === code);
+): TLocalization | undefined => (localizations ?? []).find((loc) => resolveLocaleCode(loc, languages) === code);
 
 export function mapMainPageToFormValues(page: MainPage, languages?: LocalizationLanguage[]): MainPageFormValues {
     const pageLocalizations = page.localizations ?? [];
     const aboutUsLocalizations = page.mainAboutUs?.localizations ?? [];
+    const donationsLocalizations = page.mainDonations?.localizations ?? [];
     const partnersLocalizations = page.mainPartners?.localizations ?? [];
     const statLocalizations = page.impactStatistics?.localizations ?? [];
 
@@ -29,6 +30,8 @@ export function mapMainPageToFormValues(page: MainPage, languages?: Localization
     const pageEnLoc = findLocalizationByCode(pageLocalizations, 'en', languages);
     const aboutUsUkLoc = findLocalizationByCode(aboutUsLocalizations, 'uk', languages);
     const aboutUsEnLoc = findLocalizationByCode(aboutUsLocalizations, 'en', languages);
+    const donationsUkLoc = findLocalizationByCode(donationsLocalizations, 'uk', languages);
+    const donationsEnLoc = findLocalizationByCode(donationsLocalizations, 'en', languages);
     const partnersUkLoc = findLocalizationByCode(partnersLocalizations, 'uk', languages);
     const partnersEnLoc = findLocalizationByCode(partnersLocalizations, 'en', languages);
     const statUkLoc = findLocalizationByCode(statLocalizations, 'uk', languages);
@@ -50,6 +53,12 @@ export function mapMainPageToFormValues(page: MainPage, languages?: Localization
         aboutUsDescriptionUa: page.mainAboutUs?.description ?? aboutUsUkLoc?.description ?? '',
         aboutUsDescriptionEn: aboutUsEnLoc?.description ?? '',
 
+        // Donations Block
+        donationsTitleUa: page.mainDonations?.title ?? donationsUkLoc?.title ?? '',
+        donationsTitleEn: donationsEnLoc?.title ?? '',
+        donationsDescriptionUa: page.mainDonations?.description ?? donationsUkLoc?.description ?? '',
+        donationsDescriptionEn: donationsEnLoc?.description ?? '',
+        donationsImage: page.mainDonations?.image ?? null,
         // Partners Block
         partnersTitleUa: page.mainPartners?.title ?? partnersUkLoc?.title ?? '',
         partnersTitleEn: partnersEnLoc?.title ?? '',
@@ -73,9 +82,15 @@ export function mapFormValuesToMainPagePatch(
 ): UpdateMainPageDto {
     const enLanguageId =
         getLanguageIdByCode(languages, 'en') ?? (!languages?.length ? DEFAULT_ENGLISH_LANGUAGE_ID : null);
+    const ukLanguageId =
+        getLanguageIdByCode(languages, 'uk') ?? (!languages?.length ? DEFAULT_UKRAINIAN_LANGUAGE_ID : null);
 
     if (enLanguageId == null) {
         throw new Error('Could not resolve English language ID. Check languages configuration.');
+    }
+
+    if (ukLanguageId == null) {
+        throw new Error('Could not resolve Ukrainian language ID. Check languages configuration.');
     }
 
     const str = (val?: string) => (val ?? '').trim();
@@ -87,6 +102,12 @@ export function mapFormValuesToMainPagePatch(
     // About Us Block
     const aboutTitleUk = str(formValues.aboutUsTitleUa);
     const aboutDescUk = str(formValues.aboutUsDescriptionUa);
+
+    // Donations Block
+    const donationsTitleUk = str(formValues.donationsTitleUa);
+    const donationsTitleEn = str(formValues.donationsTitleEn);
+    const donationsDescUk = str(formValues.donationsDescriptionUa);
+    const donationsDescEn = str(formValues.donationsDescriptionEn);
 
     // Partners Block
     const partnersTitleUk = str(formValues.partnersTitleUa);
@@ -100,7 +121,7 @@ export function mapFormValuesToMainPagePatch(
 
     const safeMetricsPayload: UpdateMetricDto[] = existingMetrics.map((m) => {
         const enLoc = m.localizations?.find(
-            (l) => l.languageId === enLanguageId || resolveLocaleCode(l as any, languages) === 'en',
+            (l) => l.languageId === enLanguageId || resolveLocaleCode(l, languages) === 'en',
         );
 
         return {
@@ -129,6 +150,27 @@ export function mapFormValuesToMainPagePatch(
         mainAboutUs: {
             title: aboutTitleUk,
             description: aboutDescUk,
+        },
+
+        mainDonations: {
+            title: donationsTitleUk,
+            description: donationsDescUk,
+            imageId:
+                formValues.donationsImage && 'id' in formValues.donationsImage
+                    ? (formValues.donationsImage.id as number)
+                    : null,
+            localizations: [
+                {
+                    ...(ukLanguageId ? { languageId: ukLanguageId } : {}),
+                    title: donationsTitleUk,
+                    description: donationsDescUk,
+                },
+                {
+                    ...(enLanguageId ? { languageId: enLanguageId } : {}),
+                    title: donationsTitleEn || donationsTitleUk,
+                    description: donationsDescEn || donationsDescUk,
+                },
+            ],
         },
 
         mainPartners: {

@@ -64,9 +64,63 @@ describe('reports-media-settings-schema', () => {
                 expect(result).toBeUndefined();
             });
 
-            it('should handle non-string values gracefully', () => {
-                const result = REPORTS_COLLECTED_FUNDS_VALIDATION_FUNCTIONS.validateTitle(null as any);
+            it('should return min error when normalization collapses title below min length', () => {
+                const spacedTitle = `${'a'.repeat(REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION.title.min - 1)}${'  '.repeat(10)}`;
+                const result = REPORTS_COLLECTED_FUNDS_VALIDATION_FUNCTIONS.validateTitle(spacedTitle);
+                expect(result).toBe(
+                    COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(
+                        REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION.title.min,
+                    ),
+                );
+            });
+
+            it('should skip normalization and return required error when value is not a string', () => {
+                const result = REPORTS_COLLECTED_FUNDS_VALIDATION_FUNCTIONS.validateTitle(
+                    undefined as unknown as string,
+                );
                 expect(result).toBe(REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION.title.getRequiredError());
+            });
+        });
+
+        describe('validateTitleEn', () => {
+            it('should return undefined for a valid title', () => {
+                const result = REPORTS_COLLECTED_FUNDS_VALIDATION_FUNCTIONS.validateTitleEn('Valid title text');
+                expect(result).toBeUndefined();
+            });
+
+            it('should return required error for an empty string', () => {
+                const result = REPORTS_COLLECTED_FUNDS_VALIDATION_FUNCTIONS.validateTitleEn('');
+                expect(result).toBe(REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION.title.getRequiredError());
+            });
+
+            it('should return min error when title is too short', () => {
+                const shortTitle = 'a'.repeat(REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION.title.min - 1);
+                const result = REPORTS_COLLECTED_FUNDS_VALIDATION_FUNCTIONS.validateTitleEn(shortTitle);
+                expect(result).toBe(
+                    COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(
+                        REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION.title.min,
+                    ),
+                );
+            });
+
+            it('should return max error when title is too long', () => {
+                const longTitle = 'a'.repeat(REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION.title.max + 1);
+                const result = REPORTS_COLLECTED_FUNDS_VALIDATION_FUNCTIONS.validateTitleEn(longTitle);
+                expect(result).toBe(
+                    COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
+                        REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION.title.max,
+                    ),
+                );
+            });
+
+            it('should return required error for a whitespace-only title', () => {
+                const result = REPORTS_COLLECTED_FUNDS_VALIDATION_FUNCTIONS.validateTitleEn('     ');
+                expect(result).toBe(REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION.title.getRequiredError());
+            });
+
+            it('should normalize consecutive spaces and validate successfully', () => {
+                const result = REPORTS_COLLECTED_FUNDS_VALIDATION_FUNCTIONS.validateTitleEn('Valid   title   text');
+                expect(result).toBeUndefined();
             });
         });
     });
@@ -125,13 +179,62 @@ describe('reports-media-settings-schema', () => {
                 expect(result).toBeUndefined();
             });
 
-            it('should handle non-string values gracefully', () => {
-                const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateTitle(null as any);
+            it('should skip normalization and return required error when value is not a string', () => {
+                const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateTitle(undefined as unknown as string);
                 expect(result).toBe(REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.title.getRequiredError());
             });
         });
 
+        describe('validateTitleEn', () => {
+            it('should return undefined for a valid title', () => {
+                const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateTitleEn('Valid title text');
+                expect(result).toBeUndefined();
+            });
+
+            it('should return required error for an empty string', () => {
+                const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateTitleEn('');
+                expect(result).toBe(REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.title.getRequiredError());
+            });
+
+            it('should return min error when title is too short', () => {
+                const shortTitle = 'a'.repeat(REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.title.min - 1);
+                const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateTitleEn(shortTitle);
+                expect(result).toBe(
+                    COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(
+                        REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.title.min,
+                    ),
+                );
+            });
+
+            it('should return max error when title is too long', () => {
+                const longTitle = 'a'.repeat(REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.title.max + 1);
+                const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateTitleEn(longTitle);
+                expect(result).toBe(
+                    COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
+                        REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.title.max,
+                    ),
+                );
+            });
+
+            it('should return required error for a whitespace-only title', () => {
+                const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateTitleEn('     ');
+                expect(result).toBe(REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.title.getRequiredError());
+            });
+
+            it('should normalize consecutive spaces and validate successfully', () => {
+                const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateTitleEn('Valid   title   text');
+                expect(result).toBeUndefined();
+            });
+        });
+
         describe('validateChangedLives', () => {
+            it('should return required error for undefined value', () => {
+                const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateChangedLives(
+                    undefined as unknown as number,
+                );
+                expect(result).toBe(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED);
+            });
+
             it('should return undefined for a valid number', () => {
                 const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateChangedLives(5);
                 expect(result).toBeUndefined();
@@ -145,6 +248,11 @@ describe('reports-media-settings-schema', () => {
             it('should return error for negative number', () => {
                 const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateChangedLives(-1);
                 expect(result).toBe(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(2));
+            });
+
+            it('should return undefined for value at min (2)', () => {
+                const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateChangedLives(2);
+                expect(result).toBeUndefined();
             });
 
             it('should return error for non-integer number', () => {

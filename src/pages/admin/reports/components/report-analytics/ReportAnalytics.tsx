@@ -37,6 +37,7 @@ export const ReportAnalytics = () => {
     const [isTranslateCategoryModalOpen, setIsTranslateCategoryModalOpen] = useState(false);
     const [translationLanguages, setTranslationLanguages] = useState<LocalizationLanguage[]>([]);
     const [categories, setCategories] = useState<ReportFundsExpendituresCategory[]>([]);
+    const [isRowEditMode, setIsRowEditMode] = useState(false);
 
     useEffect(() => {
         localizationLanguagesDataFetch()
@@ -87,7 +88,11 @@ export const ReportAnalytics = () => {
                 selectedCategory={activeTab}
                 getCategoryDisplayName={(tab) => tab.label}
                 getCategoryKey={(tab) => tab.id}
-                onCategorySelect={setActiveTab}
+                onCategorySelect={(tab) => {
+                    if (!isRowEditMode) {
+                        setActiveTab(tab);
+                    }
+                }}
                 displayContextMenuButton={activeTab.id === 'income-expenses'}
                 contextMenuOptions={categoryContextMenuOptions}
                 onContextMenuOptionSelected={handleCategoryContextMenuOption}
@@ -108,9 +113,17 @@ export const ReportAnalytics = () => {
                         onDeleteCategoryModalClose={() => setIsDeleteCategoryModalOpen(false)}
                         onCategoriesLoaded={setCategories}
                         translationLanguages={translationLanguages}
+                        isRowEditMode={isRowEditMode}
+                        onRowEditModeChange={setIsRowEditMode}
                     />
                 )}
-                {activeTab.id === 'program-expenses' && <ProgramExpensesSection isEditing={isFundsEditing} />}
+                {activeTab.id === 'program-expenses' && (
+                    <ProgramExpensesSection
+                        isEditing={isFundsEditing}
+                        isRowEditMode={isRowEditMode}
+                        onRowEditModeChange={setIsRowEditMode}
+                    />
+                )}
             </div>
 
             <TranslateReportsCategoryModal

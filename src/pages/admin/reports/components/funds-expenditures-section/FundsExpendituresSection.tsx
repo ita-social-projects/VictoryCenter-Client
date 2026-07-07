@@ -78,6 +78,8 @@ interface FundsExpenditureSectionProps {
     onEditCategoryModalClose?: () => void;
     onCategoriesLoaded?: (categories: ReportFundsExpendituresCategory[]) => void;
     translationLanguages?: LocalizationLanguage[];
+    isRowEditMode?: boolean;
+    onRowEditModeChange?: (isEditing: boolean) => void;
 }
 
 export const FundsExpenditureSection = ({
@@ -93,6 +95,8 @@ export const FundsExpenditureSection = ({
     onEditCategoryModalClose,
     onCategoriesLoaded,
     translationLanguages = [],
+    isRowEditMode: propIsRowEditMode,
+    onRowEditModeChange,
 }: FundsExpenditureSectionProps = {}) => {
     const adminClient = useAdminClient();
     const { addToast } = useToast();
@@ -107,7 +111,17 @@ export const FundsExpenditureSection = ({
     const [selectedType, setSelectedType] = useState<TypeFilterValue>(undefined);
     const [selectedCategoryId, setSelectedCategoryId] = useState<CategoryFilterValue>(undefined);
     const [recordsState, setRecordsState] = useState<ReportFundsExpendituresRecord[]>([]);
-    const [isRowEditMode, setIsRowEditMode] = useState(false);
+
+    const [localIsRowEditMode, setLocalIsRowEditMode] = useState(false);
+    const isRowEditMode = propIsRowEditMode ?? localIsRowEditMode;
+    const handleRowEditModeChange = useCallback(
+        (val: boolean) => {
+            setLocalIsRowEditMode(val);
+            onRowEditModeChange?.(val);
+        },
+        [onRowEditModeChange],
+    );
+
     const [activeRecordModalType, setActiveRecordModalType] = useState<FundsExpendituresTransactionType | null>(null);
 
     const [isTranslateDisclaimerModalOpen, setIsTranslateDisclaimerModalOpen] = useState(false);
@@ -758,7 +772,7 @@ export const FundsExpenditureSection = ({
                 allRecordsForTypeInference={recordsState}
                 isEditing={isEditing}
                 isRowActionsDisabled={hasExchangeRateError}
-                onRowEditModeChange={setIsRowEditMode}
+                onRowEditModeChange={handleRowEditModeChange}
                 onRecordSave={handleRecordSave}
                 programAggregateRow={programAggregateRow}
                 onProgramYearSave={handleProgramYearSave}

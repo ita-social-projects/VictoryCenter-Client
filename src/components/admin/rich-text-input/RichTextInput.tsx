@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import cn from 'classnames';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
@@ -7,6 +7,7 @@ import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { $generateNodesFromDOM } from '@lexical/html';
 import { $getRoot, $insertNodes, LexicalEditor } from 'lexical';
+import { ReactComponent as RemoveIcon } from '@/assets/icons/remove-query.svg';
 import styles from './RichTextInput.module.scss';
 import {
     MaxLengthPlugin,
@@ -15,6 +16,7 @@ import {
     ToolbarPlugin,
     InitialValuePlugin,
     EnterKeyPlugin,
+    EditablePlugin,
 } from './plugins';
 
 export interface RichTextInputProps {
@@ -29,6 +31,12 @@ export interface RichTextInputProps {
     hideToolbar?: boolean;
     placeholder?: string;
     className?: string;
+    hasError?: boolean;
+    /**
+     * If true, automatically trims leading and trailing whitespace from the editor's
+     * text content when the input loses focus.
+     */
+    trimOnBlur?: boolean;
 }
 
 const theme = {
@@ -38,6 +46,10 @@ const theme = {
         italic: styles['text-italic'],
     },
 };
+
+const EMPTY_HTML = '<p><br></p>';
+
+const isEditorEmpty = (value: string) => !value || value === EMPTY_HTML;
 
 export const RichTextInput = ({
     value,
@@ -50,6 +62,8 @@ export const RichTextInput = ({
     hideToolbar = false,
     placeholder = 'Enter text...',
     className,
+    hasError = false,
+    trimOnBlur = false,
 }: RichTextInputProps) => {
     const [isFocused, setIsFocused] = useState(false);
     const [currentLength, setCurrentLength] = useState(0);
@@ -62,6 +76,10 @@ export const RichTextInput = ({
         setCurrentLength(length);
     }, []);
 
+    const showClearButton = isFocused && !isEditorEmpty(value) && !disabled;
+
+    const initialValueRef = useRef(value);
+
     const initialConfig = useMemo(
         () => ({
             namespace: 'RichTextInput-' + id,
@@ -69,9 +87,9 @@ export const RichTextInput = ({
             onError: () => {},
             editable: !disabled,
             editorState: (editor: LexicalEditor) => {
-                if (value) {
+                if (initialValueRef.current) {
                     const parser = new DOMParser();
-                    const dom = parser.parseFromString(value, 'text/html');
+                    const dom = parser.parseFromString(initialValueRef.current, 'text/html');
                     const nodes = $generateNodesFromDOM(editor, dom);
                     const root = $getRoot();
                     root.clear();
@@ -79,7 +97,7 @@ export const RichTextInput = ({
                 }
             },
         }),
-        [id, disabled, value],
+        [id, disabled],
     );
 
     return (
@@ -98,6 +116,8 @@ export const RichTextInput = ({
                                 id={id}
                                 className={cn(styles.field, className)}
                                 aria-label="Rich text editor"
+                                aria-disabled={disabled}
+                                tabIndex={disabled ? -1 : undefined}
                             />
                         }
                         placeholder={<div className={styles.placeholder}>{placeholder}</div>}
@@ -107,13 +127,35 @@ export const RichTextInput = ({
                 <HistoryPlugin />
                 <OnChangePlugin onChange={onChange} />
                 <MaxLengthPlugin maxLength={maxLength} onLengthChange={handleLengthChange} />
-                <FocusPlugin onFocus={onFocus} onBlur={onBlur} onFocusChange={handleFocusChange} />
+                <FocusPlugin
+                    onFocus={onFocus}
+                    onBlur={onBlur}
+                    onFocusChange={handleFocusChange}
+                    trimOnBlur={trimOnBlur}
+                />
                 <InitialValuePlugin value={value} />
+                <EditablePlugin disabled={disabled} />
                 <EnterKeyPlugin />
             </LexicalComposer>
-            <output className={styles.counter}>
-                {currentLength}/{maxLength}
-            </output>
+            <div className={styles.footer}>
+                <button
+                    type="button"
+                    className={cn(styles['clear-button'], {
+                        [styles['clear-button--hidden']]: !showClearButton,
+                        [styles['clear-button--error']]: hasError,
+                    })}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => onChange(EMPTY_HTML)}
+                    aria-label="Clear input"
+                    tabIndex={showClearButton ? 0 : -1}
+                    disabled={!showClearButton}
+                >
+                    <RemoveIcon />
+                </button>
+                <output className={styles.counter}>
+                    {currentLength}/{maxLength}
+                </output>
+            </div>
         </div>
     );
 };

@@ -43,8 +43,14 @@ import {
     mapFormValuesToMainPagePatch,
     mapMainPageToFormValues,
 } from '@/utils/functions/mappers/admin/main-page/main-page-mappers';
+import {
+    getLocalizationLanguageCode,
+    getLocalizationLanguageId,
+} from '@/utils/functions/mappers/common/localization/localization-mappers';
+import { normalizeRichTextHtmlForComparison } from '@/utils/functions/normalize-html/normalize-html';
 import { MainPageValidationSchema } from '@/validation/admin/main-page-schema/main-page-schema';
 import { AboutUsBlockForm } from '../about-us-block/AboutUsBlockForm';
+import { DonationsBlockForm } from '../donations-block/DonationsBlockForm';
 import { MainPagePublishModal } from '../main-page-publish-modal/MainPagePublishModal';
 import { PartnersBlockForm } from '../partners-block/PartnersBlockForm';
 import { StatisticsBlockForm } from '../statistics-block/StatisticsBlockForm';
@@ -70,13 +76,14 @@ const TABS: TabItem[] = [
         label: MAIN_PAGE_TEXT.TABS.STATISTICS,
         localizationBlock: MainPageLocalizationBlock.ImpactStatistics,
     },
-    { id: 'donations', label: MAIN_PAGE_TEXT.TABS.DONATIONS },
+    { id: 'donations', label: MAIN_PAGE_TEXT.TABS.DONATIONS, localizationBlock: MainPageLocalizationBlock.Donations },
     { id: 'partners', label: MAIN_PAGE_TEXT.TABS.PARTNERS, localizationBlock: MainPageLocalizationBlock.Partners },
 ];
 
 const TRANSLATABLE_BLOCKS = new Set<MainPageLocalizationBlock>([
     MainPageLocalizationBlock.Title,
     MainPageLocalizationBlock.AboutUs,
+    MainPageLocalizationBlock.Donations,
     MainPageLocalizationBlock.Partners,
 ]);
 
@@ -86,11 +93,62 @@ const sanitizeMainPageFormValues = (values: MainPageFormValues): MainPageFormVal
     statisticsTitleEn: values.statisticsTitleEn ?? '',
 });
 
-const getLocalizationLanguageCode = (localization: EntityLocalization): string | undefined =>
-    localization.language?.code ?? (localization as EntityLocalization & { code?: string }).code;
+const RICH_TEXT_FORM_FIELDS: Array<keyof MainPageFormValues> = [
+    'titleUa',
+    'titleEn',
+    'descriptionUa',
+    'descriptionEn',
+    'aboutUsTitleUa',
+    'aboutUsTitleEn',
+    'aboutUsDescriptionUa',
+    'aboutUsDescriptionEn',
+    'donationsTitleUa',
+    'donationsTitleEn',
+    'donationsDescriptionUa',
+    'donationsDescriptionEn',
+    'partnersTitleUa',
+    'partnersTitleEn',
+    'partnersDescriptionUa',
+    'partnersDescriptionEn',
+    'statisticsTitleUa',
+    'statisticsTitleEn',
+];
 
-const getLocalizationLanguageId = (localization: EntityLocalization): number | undefined =>
-    localization.language?.id ?? (localization as EntityLocalization & { languageId?: number }).languageId;
+const RICH_TEXT_FORM_FIELD_SET = new Set<keyof MainPageFormValues>(RICH_TEXT_FORM_FIELDS);
+
+const isMainPageFormField = (field: string): field is keyof MainPageFormValues => field in MAIN_PAGE_FORM_DEFAULTS;
+
+const areRichTextFieldValuesEqual = (
+    field: keyof MainPageFormValues,
+    currentValues: MainPageFormValues,
+    savedValues: MainPageFormValues,
+) =>
+    normalizeRichTextHtmlForComparison(String(currentValues[field] ?? '')) ===
+    normalizeRichTextHtmlForComparison(String(savedValues[field] ?? ''));
+
+const hasRelevantMainPageDirtyFields = (
+    dirtyFields: Partial<Record<keyof MainPageFormValues, unknown>>,
+    currentValues: MainPageFormValues,
+    savedValues: MainPageFormValues,
+) => {
+    const dirtyFieldNames = Object.keys(dirtyFields);
+
+    if (!dirtyFieldNames.length) {
+        return false;
+    }
+
+    return dirtyFieldNames.some((fieldName) => {
+        if (!isMainPageFormField(fieldName)) {
+            return true;
+        }
+
+        if (!RICH_TEXT_FORM_FIELD_SET.has(fieldName)) {
+            return true;
+        }
+
+        return !areRichTextFieldValuesEqual(fieldName, currentValues, savedValues);
+    });
+};
 
 const isLocalizationForLanguage = (localization: EntityLocalization, language: LocalizationLanguage) =>
     getLocalizationLanguageId(localization) === language.id ||
@@ -267,6 +325,9 @@ export const MainPageContent = () => {
                     descriptionEn: localization.description ?? baseValues.descriptionEn,
                     aboutUsTitleEn: localization.mainAboutUs?.title ?? baseValues.aboutUsTitleEn,
                     aboutUsDescriptionEn: localization.mainAboutUs?.description ?? baseValues.aboutUsDescriptionEn,
+                    donationsTitleEn: localization.mainDonations?.title ?? baseValues.donationsTitleEn,
+                    donationsDescriptionEn:
+                        localization.mainDonations?.description ?? baseValues.donationsDescriptionEn,
                     partnersTitleEn: localization.mainPartners?.title ?? baseValues.partnersTitleEn,
                     partnersDescriptionEn: localization.mainPartners?.description ?? baseValues.partnersDescriptionEn,
                 });
@@ -283,6 +344,8 @@ export const MainPageContent = () => {
                         descriptionEn: baseValues.descriptionEn,
                         aboutUsTitleEn: baseValues.aboutUsTitleEn,
                         aboutUsDescriptionEn: baseValues.aboutUsDescriptionEn,
+                        donationsTitleEn: originalData.mainDonations?.title ?? '',
+                        donationsDescriptionEn: originalData.mainDonations?.description ?? '',
                         partnersTitleEn: baseValues.partnersTitleEn,
                         partnersDescriptionEn: baseValues.partnersDescriptionEn,
                     });
@@ -302,8 +365,12 @@ export const MainPageContent = () => {
         };
     }, [client, originalData, selectedLanguage, translationLanguages, allLanguages, methods, addToast]);
 
+    const isMainPageDirty =
+        methods.formState.isDirty &&
+        hasRelevantMainPageDirtyFields(methods.formState.dirtyFields, methods.getValues(), savedValuesRef.current);
+
     const handleGlobalLanguageChange = (language: LocalizationLanguage) => {
-        if (methods.formState.isDirty) {
+        if (isMainPageDirty) {
             setPendingGlobalLanguage(language);
         } else {
             onLanguageChange(language);
@@ -334,17 +401,29 @@ export const MainPageContent = () => {
 
         try {
             const { languages } = await MainPageApi.get(client);
-            let dataToPublish = { ...pendingPublishData };
+            const uploadImage = async (imageField: any) => {
+                if (imageField && typeof imageField === 'object' && !('id' in imageField)) {
+                    try {
+                        return await ImageApi.post(client, imageField as ImageValues);
+                    } catch (error) {
+                        throw error;
+                    }
+                }
+                return imageField;
+            };
 
-            if (dataToPublish.image && !('id' in dataToPublish.image)) {
-                const uploaded = await ImageApi.post(client, dataToPublish.image as ImageValues);
-                dataToPublish.image = uploaded;
-            }
+            const [image, statisticsImage, donationsImage] = await Promise.all([
+                uploadImage(pendingPublishData.image),
+                uploadImage(pendingPublishData.statisticsImage),
+                uploadImage(pendingPublishData.donationsImage),
+            ]);
 
-            if (dataToPublish.statisticsImage && !('id' in dataToPublish.statisticsImage)) {
-                const uploaded = await ImageApi.post(client, dataToPublish.statisticsImage as ImageValues);
-                dataToPublish.statisticsImage = uploaded;
-            }
+            const dataToPublish = {
+                ...pendingPublishData,
+                image,
+                statisticsImage,
+                donationsImage,
+            };
 
             const patch = mapFormValuesToMainPagePatch(
                 dataToPublish,
@@ -416,6 +495,8 @@ export const MainPageContent = () => {
                 return getLocalizationStatus<MainPageLocalization>(originalData?.localizations, language);
             case MainPageLocalizationBlock.AboutUs:
                 return getLocalizationStatus(originalData?.mainAboutUs?.localizations, language);
+            case MainPageLocalizationBlock.Donations:
+                return getLocalizationStatus(originalData?.mainDonations?.localizations, language);
             case MainPageLocalizationBlock.Partners:
                 return getLocalizationStatus(originalData?.mainPartners?.localizations, language);
             case MainPageLocalizationBlock.ImpactStatistics:
@@ -457,7 +538,7 @@ export const MainPageContent = () => {
         return hasLoadError ? <div>{MAIN_PAGE_TEXT.ERRORS.LOAD_FAILED}</div> : <PageLoader />;
     }
 
-    const isPublishDisabled = !methods.formState.isDirty || !methods.formState.isValid || isPublishing;
+    const isPublishDisabled = !isMainPageDirty || !methods.formState.isValid || isPublishing;
     const onPublish = methods.handleSubmit(handlePublishClick);
 
     return (
@@ -525,7 +606,13 @@ export const MainPageContent = () => {
                                 onMetricsChange={setCurrentMetrics}
                             />
                         )}
-                        {activeTab === 'donations' && <div>Блок "{MAIN_PAGE_TEXT.TABS.DONATIONS}" в розробці</div>}
+                        {activeTab === 'donations' && (
+                            <DonationsBlockForm
+                                isPublishDisabled={isPublishDisabled}
+                                onPublish={onPublish}
+                                isReadOnly={isReadOnlyLanguage}
+                            />
+                        )}
                         {activeTab === 'partners' && (
                             <PartnersBlockForm
                                 isPublishDisabled={isPublishDisabled}

@@ -5,6 +5,7 @@ import {
     ReorderMetricsDto,
     UpdateMainPageDto,
     UpdateMetricVisibilityDto,
+    UpdateSingleMetricDto,
 } from '@/types/admin/main-page';
 import type { LocalizationLanguage } from '@/types/common/language';
 import { mapEntityWithLocalizations } from '@/utils/functions/mappers/common/localization/localization-mappers';
@@ -62,6 +63,10 @@ export const MainPageApi = {
         dto: UpdateMetricVisibilityDto,
     ): Promise<void> => {
         await client.put(`${API_ROUTES.MAIN_PAGE.BASE}/metrics/${id}/visibility`, dto);
+    },
+
+    updateMetric: async (client: AxiosInstance, id: number, dto: UpdateSingleMetricDto): Promise<void> => {
+        await client.patch(`${API_ROUTES.MAIN_PAGE.BASE}/metrics/${id}`, dto);
     },
 
     reorderMetrics: async (client: AxiosInstance, dto: ReorderMetricsDto): Promise<void> => {

@@ -4,7 +4,11 @@ import { ReactComponent as EyeOpenedIcon } from '@/assets/icons/eye-opened.svg';
 import { DraggableListItem } from '@/components/admin/draggable-list-item/DraggableListItem';
 import { IconButton } from '@/components/admin/icon-button/IconButton';
 import { MAIN_PAGE_TEXT } from '@/const/admin/main-page';
-import { Metric, MetricType } from '@/types/admin/main-page';
+import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { MainPageApi } from '@/services/api/admin/main-page/main-page-api';
+import { ToastType } from '@/types/admin/toast';
+import { Metric, MetricType, UpdateSingleMetricDto } from '@/types/admin/main-page';
 import { formatMetricValue, getMetricName } from '@/utils/functions/formatters/metric-formatters';
 import { useState } from 'react';
 import { RaisedMetricEditPanel } from '../raised-metric-edit-panel/RaisedMetricEditPanel';
@@ -28,13 +32,55 @@ export const StatisticsMetricsList = ({
     onMetricUpdate,
     onRaisedFundsSyncErrorChange,
 }: StatisticsMetricsListProps) => {
+    const client = useAdminClient();
+    const { addToast } = useToast();
     const [editingMetricId, setEditingMetricId] = useState<number | null>(null);
     const visibleMetricsCount = metrics.length - hiddenMetricIds.length;
 
-    const handleSaveMetric = (updatedMetric: Metric) => {
-        const newMetrics = metrics.map((m) => (m.id === updatedMetric.id ? updatedMetric : m));
-        onMetricUpdate(newMetrics);
-        setEditingMetricId(null);
+    const getMetricDiff = (original: Metric, updated: Metric): UpdateSingleMetricDto => {
+        const patch: UpdateSingleMetricDto = {};
+        if (original.value !== updated.value) patch.value = updated.value;
+        if (original.name !== updated.name) patch.name = updated.name;
+        if (original.prefix !== updated.prefix) patch.prefix = updated.prefix;
+        if (original.isAutoSynced !== updated.isAutoSynced) patch.isAutoSynced = updated.isAutoSynced;
+
+        const origEn = original.localizations?.find((l) => l.languageId === 2);
+        const updatedEn = updated.localizations?.find((l) => l.languageId === 2);
+
+        if (origEn?.name !== updatedEn?.name || origEn?.value !== updatedEn?.value) {
+            patch.localization = {
+                languageId: 2,
+                name: updatedEn?.name,
+                value: updatedEn?.value,
+            };
+        }
+
+        return patch;
+    };
+
+    const handleSaveMetric = async (updatedMetric: Metric) => {
+        const originalMetric = metrics.find((m) => m.id === updatedMetric.id);
+        if (!originalMetric || !updatedMetric.id) {
+            setEditingMetricId(null);
+            return;
+        }
+
+        const patch = getMetricDiff(originalMetric, updatedMetric);
+        if (Object.keys(patch).length === 0) {
+            setEditingMetricId(null);
+            return;
+        }
+
+        try {
+            await MainPageApi.updateMetric(client, updatedMetric.id, patch);
+
+            const newMetrics = metrics.map((m) => (m.id === updatedMetric.id ? updatedMetric : m));
+            onMetricUpdate(newMetrics);
+            setEditingMetricId(null);
+            addToast('Зміни збережено успішно', ToastType.Success, 3000);
+        } catch (error) {
+            addToast('Виникла помилка, спробуйте ще раз', ToastType.Error, 3000);
+        }
     };
 
     const renderRow = (metric: Metric) => {

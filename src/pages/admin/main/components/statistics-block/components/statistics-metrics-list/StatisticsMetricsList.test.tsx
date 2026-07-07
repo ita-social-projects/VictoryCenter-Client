@@ -1,8 +1,11 @@
 import { Metric } from '@/types/admin/main-page';
 import { metricPartners, metricRaised } from '@/utils/test-mocks/statistics-block-mocks';
 import '@testing-library/jest-dom';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { StatisticsMetricsList } from './StatisticsMetricsList';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
+import { MainPageApi } from '@/services/api/admin/main-page/main-page-api';
 
 const normalizeSpaces = (value: string) => value.replace(/\u00a0/g, ' ');
 
@@ -16,6 +19,10 @@ jest.mock('@/components/admin/draggable-list-item/DraggableListItem', () => ({
         );
     },
 }));
+
+jest.mock('@/hooks/admin/use-admin-client/useAdminClient');
+jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider');
+jest.mock('@/services/api/admin/main-page/main-page-api');
 
 jest.mock('@/components/admin/icon-button/IconButton', () => ({
     IconButton: ({ onClick, disabled, 'aria-label': ariaLabel }: any) => (
@@ -69,6 +76,10 @@ const metrics: Metric[] = [metricPartners, metricRaised];
 
 describe('StatisticsMetricsList', () => {
     const setup = (propsOverrides: Partial<React.ComponentProps<typeof StatisticsMetricsList>> = {}) => {
+        (useAdminClient as jest.Mock).mockReturnValue({});
+        (useToast as jest.Mock).mockReturnValue({ addToast: jest.fn() });
+        MainPageApi.updateMetric = jest.fn().mockResolvedValue(undefined);
+
         const defaultProps = {
             metrics,
             hiddenMetricIds: [],
@@ -145,35 +156,39 @@ describe('StatisticsMetricsList', () => {
         expect(onToggleVisibility).not.toHaveBeenCalled();
     });
 
-    it('renders standard edit panel and saves updated metric', () => {
+    it('renders standard edit panel and saves updated metric', async () => {
         const { onMetricUpdate } = setup();
 
         fireEvent.click(screen.getAllByTestId('icon-Edit metric')[0]);
         expect(screen.getByTestId('metric-edit-panel')).toBeInTheDocument();
 
         fireEvent.click(screen.getByTestId('save-edit'));
-        expect(onMetricUpdate).toHaveBeenCalledWith([{ ...metrics[0], name: 'Updated Metric' }, metrics[1]]);
+        await waitFor(() => {
+            expect(onMetricUpdate).toHaveBeenCalledWith([{ ...metrics[0], name: 'Updated Metric' }, metrics[1]]);
+        });
     });
 
-    it('renders raised edit panel and saves updated metric', () => {
+    it('renders raised edit panel and saves updated metric', async () => {
         const { onMetricUpdate } = setup();
 
         fireEvent.click(screen.getAllByTestId('icon-Edit metric')[1]);
         expect(screen.getByTestId('raised-edit-panel')).toBeInTheDocument();
 
         fireEvent.click(screen.getByTestId('save-raised-edit'));
-        expect(screen.queryByTestId('raised-edit-panel')).not.toBeInTheDocument();
-        expect(onMetricUpdate).toHaveBeenCalledWith([
-            metrics[0],
-            {
-                ...metrics[1],
-                name: 'Updated Raised',
-                isAutoSynced: true,
-                localizations: metrics[1].localizations?.map((loc: any) =>
-                    loc.languageId === 1 ? { ...loc, name: 'Updated Raised' } : loc,
-                ),
-            },
-        ]);
+        await waitFor(() => {
+            expect(screen.queryByTestId('raised-edit-panel')).not.toBeInTheDocument();
+            expect(onMetricUpdate).toHaveBeenCalledWith([
+                metrics[0],
+                {
+                    ...metrics[1],
+                    name: 'Updated Raised',
+                    isAutoSynced: true,
+                    localizations: metrics[1].localizations?.map((loc: any) =>
+                        loc.languageId === 1 ? { ...loc, name: 'Updated Raised' } : loc,
+                    ),
+                },
+            ]);
+        });
     });
 
     it('passes raised funds sync error state changes from edit panel to parent', () => {

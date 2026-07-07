@@ -443,6 +443,14 @@ export interface UpdateMetricVisibilityDto {
     isHidden: boolean;
 }
 
+export interface UpdateSingleMetricDto {
+    value?: number;
+    name?: string;
+    prefix?: MetricPrefix | null;
+    isAutoSynced?: boolean;
+    localization?: UpdateMetricLocalizationDto | null;
+}
+
 // Form Values & Defaults
 
 export interface MainPageFormValues {

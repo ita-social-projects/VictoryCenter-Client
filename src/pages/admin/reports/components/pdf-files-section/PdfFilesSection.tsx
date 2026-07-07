@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { PdfSectionContentBlock } from './components/pdf-section-content-block/PdfSectionContentBlock';
 import { PdfFilesTable } from './components/pdf-files-table/PdfFilesTable';
 import styles from './PdfFilesSection.module.scss';
@@ -43,11 +43,12 @@ export const PdfFilesSection = () => {
         return PdfSectionApi.getPdfSection(client);
     }, [client]);
 
-    const fetchFiles = useCallback(async () => {
-        if (!activeLanguageId) return [];
-        const data = await PdfReportsApi.getAll(client, { offset: 0, limit: 1000, languageId: activeLanguageId });
-        return data.items;
-    }, [client, activeLanguageId]);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const [totalCount, setTotalCount] = useState(0);
+    const LIMIT = 20;
+
+    const fetchedFilesRef = useRef<PdfReportDto[]>([]);
+    const loadMoreAbortControllerRef = useRef<AbortController | null>(null);
 
     const {
         data: sectionData,
@@ -60,19 +61,105 @@ export const PdfFilesSection = () => {
         autoFetchDependencies: [fetchSection],
     });
 
+    const fetchFiles = useCallback(async () => {
+        if (!activeLanguageId) return [];
+        const currentLimit = Math.max(LIMIT, fetchedFilesRef.current?.length ?? 0);
+        const data = await PdfReportsApi.getAll(client, {
+            offset: 0,
+            limit: currentLimit,
+            languageId: activeLanguageId,
+        });
+        setTotalCount(data.totalItemsCount);
+        return data.items;
+    }, [client, activeLanguageId]);
+
     const {
         data: fetchedFiles,
         isLoading: isFilesLoading,
         refetch: refetchFiles,
+        setData: setFetchedFiles,
     } = useDataFetch<PdfReportDto[]>({
         initialData: [],
         fetchHandler: fetchFiles,
         autoFetchDependencies: [fetchFiles],
     });
 
-    const handleUploaded = useCallback((newFile: PdfReportDto) => {
-        setUploadedFiles((prev) => [...prev, newFile]);
-    }, []);
+    useEffect(() => {
+        fetchedFilesRef.current = fetchedFiles;
+    }, [fetchedFiles]);
+
+    useEffect(() => {
+        return () => {
+            loadMoreAbortControllerRef.current?.abort();
+        };
+    }, [activeLanguageId]);
+
+    const handleLanguageChange = useCallback(
+        (lang: 'uk' | 'en') => {
+            loadMoreAbortControllerRef.current?.abort();
+            setCurrentLanguage(lang);
+            setUploadedFiles([]);
+            setTotalCount(0);
+            fetchedFilesRef.current = [];
+            setFetchedFiles([]);
+        },
+        [setFetchedFiles],
+    );
+
+    const handleLoadMore = useCallback(async () => {
+        if (!activeLanguageId || isLoadingMore || isFilesLoading) return;
+        const currentLength = fetchedFiles?.length ?? 0;
+        if (currentLength >= totalCount) return;
+
+        loadMoreAbortControllerRef.current?.abort();
+        const abortController = new AbortController();
+        loadMoreAbortControllerRef.current = abortController;
+
+        setIsLoadingMore(true);
+        try {
+            const currentOffset = currentLength;
+            const data = await PdfReportsApi.getAll(client, {
+                offset: currentOffset,
+                limit: LIMIT,
+                languageId: activeLanguageId,
+            });
+
+            if (abortController.signal.aborted) return;
+
+            setFetchedFiles((prev) => {
+                const map = new Map((prev ?? []).map((f) => [f.id, f]));
+                data.items.forEach((f) => map.set(f.id, f));
+                return Array.from(map.values());
+            });
+            setTotalCount(data.totalItemsCount);
+        } catch (error: any) {
+            if (error?.name !== 'CanceledError' && error?.name !== 'AbortError') {
+                addToast(PDF_FILES_SECTION_TEXT.MESSAGE.LOAD_ERROR, ToastType.Error);
+            }
+        } finally {
+            if (!abortController.signal.aborted) {
+                setIsLoadingMore(false);
+            }
+        }
+    }, [
+        client,
+        activeLanguageId,
+        fetchedFiles?.length,
+        totalCount,
+        isLoadingMore,
+        isFilesLoading,
+        setFetchedFiles,
+        addToast,
+    ]);
+
+    const handleUploaded = useCallback(
+        (newFile: PdfReportDto) => {
+            loadMoreAbortControllerRef.current?.abort();
+            setUploadedFiles((prev) => [...prev, newFile]);
+            refetchFiles();
+        },
+        [refetchFiles],
+    );
 
     const handleSaveSection = useCallback(async () => {
         await refetchSection();
@@ -88,6 +175,7 @@ export const PdfFilesSection = () => {
 
     const handleDeleteFile = useCallback(
         async (fileId: number) => {
+            loadMoreAbortControllerRef.current?.abort();
             setIsDeleting(true);
             try {
                 await PdfReportsApi.delete(client, fileId);
@@ -126,6 +214,7 @@ export const PdfFilesSection = () => {
 
     const handleRenameFile = useCallback(
         async (fileId: number, newName: string) => {
+            loadMoreAbortControllerRef.current?.abort();
             setIsRenaming(true);
             try {
                 const updatedFile = await PdfReportsApi.rename(client, fileId, newName);
@@ -173,7 +262,7 @@ export const PdfFilesSection = () => {
                 />
             </div>
             <div className={styles['language-switcher-container']}>
-                <LanguageSwitcherButtons currentLanguage={currentLanguage} onLanguageChange={setCurrentLanguage} />
+                <LanguageSwitcherButtons currentLanguage={currentLanguage} onLanguageChange={handleLanguageChange} />
             </div>
             <PdfDropzone onUploaded={handleUploaded} languageId={activeLanguageId} />
             <PdfFilesTable
@@ -183,6 +272,8 @@ export const PdfFilesSection = () => {
                 onRenameFile={handleRenameFile}
                 isDeleting={isDeleting}
                 isRenaming={isRenaming}
+                isLoadingMore={isLoadingMore}
+                onLoadMore={handleLoadMore}
             />
             <TranslatePdfSectionModal
                 isOpen={isTranslateModalOpen}

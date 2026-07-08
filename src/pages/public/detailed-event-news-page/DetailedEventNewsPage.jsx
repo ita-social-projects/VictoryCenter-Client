@@ -6,6 +6,7 @@ import { DetailedProgramSection } from '@/components/public/detailed-program-sec
 import { useProgramBySlug } from '@/hooks/common/use-get-program-by-slug/useGetProgramBySlug';
 import { EventNewsApi } from '@/services/api/public/events-news/events-news-api';
 import styles from './DetailedEventNewsPage.module.scss';
+import { RecommendedArticles } from './recommended-articles/RecommendedArticles';
 
 export const DetailedEventNewsPage = () => {
     const { slug } = useParams();
@@ -36,6 +37,7 @@ export const DetailedEventNewsPage = () => {
                     ))}
                 </div>
             )}
+            <RecommendedArticles />
         </div>
     );
 };

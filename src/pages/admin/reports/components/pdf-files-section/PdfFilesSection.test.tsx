@@ -30,26 +30,31 @@ jest.mock('./components/pdf-section-content-block/PdfSectionContentBlock', () =>
     ),
 }));
 
+let capturedOnReorderFiles: ((reordered: any[]) => void) | undefined;
+
 jest.mock('./components/pdf-files-table/PdfFilesTable', () => ({
-    PdfFilesTable: ({ files, onDeleteFile, onViewFile, onRenameFile, onReorderFiles, isDeleting, isRenaming }: any) => (
-        <div data-testid="files-table">
-            Files Count: {files?.length ?? 0}
-            {isDeleting && <span data-testid="is-deleting">Deleting...</span>}
-            {isRenaming && <span data-testid="is-renaming">Renaming...</span>}
-            <button onClick={() => onDeleteFile && onDeleteFile(1)} data-testid="delete-btn">
-                Delete
-            </button>
-            <button onClick={() => onViewFile && onViewFile(files?.[0])} data-testid="view-btn">
-                View
-            </button>
-            <button onClick={() => onRenameFile && onRenameFile(1, 'New Name')} data-testid="rename-btn">
-                Rename
-            </button>
-            <button onClick={() => onReorderFiles && onReorderFiles(files)} data-testid="reorder-btn">
-                Reorder
-            </button>
-        </div>
-    ),
+    PdfFilesTable: ({ files, onDeleteFile, onViewFile, onRenameFile, onReorderFiles, isDeleting, isRenaming }: any) => {
+        capturedOnReorderFiles = onReorderFiles;
+        return (
+            <div data-testid="files-table">
+                Files Count: {files?.length ?? 0}
+                {isDeleting && <span data-testid="is-deleting">Deleting...</span>}
+                {isRenaming && <span data-testid="is-renaming">Renaming...</span>}
+                <button onClick={() => onDeleteFile && onDeleteFile(1)} data-testid="delete-btn">
+                    Delete
+                </button>
+                <button onClick={() => onViewFile && onViewFile(files?.[0])} data-testid="view-btn">
+                    View
+                </button>
+                <button onClick={() => onRenameFile && onRenameFile(1, 'New Name')} data-testid="rename-btn">
+                    Rename
+                </button>
+                <button onClick={() => onReorderFiles && onReorderFiles(files)} data-testid="reorder-btn">
+                    Reorder
+                </button>
+            </div>
+        );
+    },
 }));
 
 jest.mock('./components/language-switcher-buttons/LanguageSwitcherButtons', () => ({
@@ -494,16 +499,37 @@ describe('PdfFilesSection', () => {
     });
 
     it('should show error toast and revert on reorder failure', async () => {
-        setupDataFetchMock();
-        (PdfReportsApi.reorder as jest.Mock).mockRejectedValueOnce(new Error('Reorder failed'));
+        const mockSetFilesData = jest.fn();
+        setupDataFetchMock({ setFilesData: mockSetFilesData });
+
+        let rejectReorder: (reason: any) => void = () => {};
+        const reorderPromise = new Promise((_, reject) => {
+            rejectReorder = reject;
+        });
+        (PdfReportsApi.reorder as jest.Mock).mockReturnValueOnce(reorderPromise);
 
         render(<PdfFilesSection />);
 
-        const reorderBtn = screen.getByTestId('reorder-btn');
-        fireEvent.click(reorderBtn);
+        const reordered = [mockFilesResponse.items[1], mockFilesResponse.items[0]];
+
+        // Call the reorder handler with the reversed files list
+        await act(async () => {
+            capturedOnReorderFiles!(reordered);
+        });
+
+        // Verify optimistic update is applied first
+        expect(mockSetFilesData).toHaveBeenCalledWith(reordered);
+        expect(mockSetFilesData).toHaveBeenCalledTimes(1);
+
+        // Reject the API call
+        await act(async () => {
+            rejectReorder(new Error('Reorder failed'));
+        });
 
         await waitFor(() => {
-            expect(PdfReportsApi.reorder).toHaveBeenCalled();
+            // Verify original order is restored
+            expect(mockSetFilesData).toHaveBeenLastCalledWith(mockFilesResponse.items);
+            expect(mockSetFilesData).toHaveBeenCalledTimes(2);
             expect(mockAddToast).toHaveBeenCalledWith(PDF_FILES_SECTION_TEXT.MESSAGE.REORDER_ERROR, ToastType.Error);
         });
     });

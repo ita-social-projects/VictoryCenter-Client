@@ -8,12 +8,8 @@ interface ReviewArticlesSectionProps {
 
 const TRUNCATE_LENGTH = 100;
 
-const truncateText = (text: string, length: number): { truncated: string; isTruncated: boolean } => {
-    if (text.length > length) {
-        return { truncated: text.substring(0, length) + '...', isTruncated: true };
-    }
-    return { truncated: text, isTruncated: false };
-};
+const truncateText = (text: string, length: number): string =>
+    text.length > length ? text.substring(0, length) + '...' : text;
 
 export const ReviewArticlesSection: React.FC<ReviewArticlesSectionProps> = ({ content }) => {
     const [hoveredArticleId, setHoveredArticleId] = useState<number | null>(null);
@@ -23,7 +19,7 @@ export const ReviewArticlesSection: React.FC<ReviewArticlesSectionProps> = ({ co
             {content && content.length > 0 && (
                 <div className={styles.articles}>
                     {content.map((article) => {
-                        const { truncated } = truncateText(article.title, TRUNCATE_LENGTH);
+                        const truncated = truncateText(article.title, TRUNCATE_LENGTH);
                         const isHovered = hoveredArticleId === article.id;
 
                         return (

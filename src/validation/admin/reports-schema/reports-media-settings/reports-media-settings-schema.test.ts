@@ -227,42 +227,57 @@ describe('reports-media-settings-schema', () => {
             });
         });
 
-        describe('validateChangedLives', () => {
+        describe('validateTotalAmount', () => {
             it('should return required error for undefined value', () => {
-                const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateChangedLives(
+                const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateTotalAmount(
                     undefined as unknown as number,
                 );
                 expect(result).toBe(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED);
             });
 
+            it('should return required error for empty string', () => {
+                const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateTotalAmount('');
+                expect(result).toBe(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED);
+            });
+
             it('should return undefined for a valid number', () => {
-                const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateChangedLives(5);
+                const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateTotalAmount(15);
                 expect(result).toBeUndefined();
             });
 
-            it('should return error for less than 2', () => {
-                const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateChangedLives(0);
+            it('should return min error for 0', () => {
+                const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateTotalAmount(0);
+                expect(result).toBe(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(2));
+            });
+
+            it('should return min error for 1-digit number', () => {
+                const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateTotalAmount(5);
                 expect(result).toBe(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(2));
             });
 
             it('should return error for negative number', () => {
-                const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateChangedLives(-1);
+                const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateTotalAmount(-1);
                 expect(result).toBe(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(2));
             });
 
-            it('should return undefined for value at min (2)', () => {
-                const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateChangedLives(2);
+            it('should return undefined for value at min (10)', () => {
+                const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateTotalAmount(10);
                 expect(result).toBeUndefined();
             });
 
             it('should return error for non-integer number', () => {
-                const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateChangedLives(3.5);
+                const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateTotalAmount(3.5);
+                expect(result).toBe(REPORTS_TEXT.MESSAGE.INVALID_VALUE);
+            });
+
+            it('should return type error for non-numeric string', () => {
+                const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateTotalAmount('abc');
                 expect(result).toBe(REPORTS_TEXT.MESSAGE.INVALID_VALUE);
             });
 
             it('should return max error when value exceeds max numeric bound', () => {
                 const overMax = 10 ** REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.changedLives.max;
-                const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateChangedLives(overMax);
+                const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateTotalAmount(overMax);
                 expect(result).toBe(
                     COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
                         REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.changedLives.max,
@@ -272,13 +287,13 @@ describe('reports-media-settings-schema', () => {
 
             it('should return undefined for value exactly at numeric max bound (10 digits)', () => {
                 const maxVal = 10 ** REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.changedLives.max - 1;
-                const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateChangedLives(maxVal);
+                const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateTotalAmount(maxVal);
                 expect(result).toBeUndefined();
             });
 
             it('should return undefined for value just below numeric max bound (9 digits)', () => {
                 const justBelowMax = 10 ** (REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.changedLives.max - 1) - 1;
-                const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateChangedLives(justBelowMax);
+                const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateTotalAmount(justBelowMax);
                 expect(result).toBeUndefined();
             });
         });

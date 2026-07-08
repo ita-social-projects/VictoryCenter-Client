@@ -148,7 +148,7 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
             const changedLivesTitleError = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateTitle(
                 changedLivesValues.title,
             );
-            const changedLivesValueError = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateChangedLives(
+            const changedLivesValueError = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateTotalAmount(
                 changedLivesValues.totalAmount,
             );
 
@@ -217,7 +217,7 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
                     changedLives: {
                         title: changedLivesValues.title,
                         titleEn: changedLivesValues.titleEn,
-                        changedLives: changedLivesValues.totalAmount,
+                        changedLives: Number(changedLivesValues.totalAmount),
                         image: changedLivesImage,
                         imageId: changedLivesImageId,
                     },

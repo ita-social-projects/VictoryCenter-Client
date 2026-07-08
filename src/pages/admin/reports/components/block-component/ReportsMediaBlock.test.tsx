@@ -288,9 +288,9 @@ describe('ReportsMediaBlock', () => {
             const valueInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-value');
             fireEvent.change(valueInput, { target: { value: '300000' } });
 
-            expect(mockValidateTotalAmount).toHaveBeenCalledWith(300000);
+            expect(mockValidateTotalAmount).toHaveBeenCalledWith('300000');
             expect(mockOnValuesChange).toHaveBeenCalledWith(
-                { ...defaultValues, totalAmount: 300000 },
+                { ...defaultValues, totalAmount: '300000' },
                 { totalAmount: undefined },
             );
         });
@@ -304,7 +304,7 @@ describe('ReportsMediaBlock', () => {
             fireEvent.change(valueInput, { target: { value: 'abc' } });
 
             expect(mockOnValuesChange).toHaveBeenCalledWith(
-                { ...defaultValues, totalAmount: NaN },
+                { ...defaultValues, totalAmount: 'abc' },
                 { totalAmount: valueError },
             );
         });
@@ -316,8 +316,11 @@ describe('ReportsMediaBlock', () => {
             const valueInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-value');
             fireEvent.blur(valueInput);
 
-            expect(mockValidateTotalAmount).toHaveBeenCalledWith(250000);
-            expect(mockOnValuesChange).toHaveBeenCalledWith({ ...defaultValues }, { totalAmount: undefined });
+            expect(mockValidateTotalAmount).toHaveBeenCalledWith('250000');
+            expect(mockOnValuesChange).toHaveBeenCalledWith(
+                { ...defaultValues, totalAmount: '250000' },
+                { totalAmount: undefined },
+            );
         });
 
         it('should work without validateTotalAmount function', () => {
@@ -330,7 +333,7 @@ describe('ReportsMediaBlock', () => {
             fireEvent.change(valueInput, { target: { value: '500' } });
 
             expect(mockOnValuesChange).toHaveBeenCalledWith(
-                { ...defaultValues, totalAmount: 500 },
+                { ...defaultValues, totalAmount: '500' },
                 { totalAmount: undefined },
             );
         });

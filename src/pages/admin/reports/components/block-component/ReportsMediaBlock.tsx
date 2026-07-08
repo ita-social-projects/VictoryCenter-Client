@@ -1,5 +1,5 @@
 import { Image, ImageValues } from '@/types/common/image';
-import { useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styles from './ReportsMediaBlock.module.scss';
 import { InputError } from '@/components/admin/input-error/InputError';
 import { REPORTS_TEXT } from '@/const/admin/reports';
@@ -12,7 +12,7 @@ import './ReportsMediaBlock.scss';
 export interface ReportsMediaBlockValues {
     title: string;
     titleEn: string;
-    totalAmount: number;
+    totalAmount: number | string;
     image: ImageValues | Image | null;
     imageId: number | null;
 }
@@ -27,7 +27,7 @@ export interface ReportsMediaBlockErrors {
 export interface ReportsMediaBlockValidationFunctions {
     validateTitle: (value: string) => string | undefined;
     validateTitleEn: (value: string) => string | undefined;
-    validateTotalAmount?: (value: number) => string | undefined;
+    validateTotalAmount?: (value: number | string) => string | undefined;
 }
 
 export interface ReportsMediaBlockProps {
@@ -59,6 +59,11 @@ export const ReportsMediaBlock = ({
     validationFunctions,
     onValuesChange,
 }: ReportsMediaBlockProps) => {
+    const [localTotalAmount, setLocalTotalAmount] = useState<string>(values.totalAmount.toString());
+
+    useEffect(() => {
+        setLocalTotalAmount(values.totalAmount.toString());
+    }, [values.totalAmount]);
     const handleTitleChange = useCallback(
         (e: React.ChangeEvent<HTMLTextAreaElement>) => {
             const value = e.target.value;
@@ -97,17 +102,19 @@ export const ReportsMediaBlock = ({
 
     const handleTotalAmountChange = useCallback(
         (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-            const value = Number(e.target.value);
-            const error = validationFunctions.validateTotalAmount?.(value);
-            onValuesChange({ ...values, totalAmount: value }, { ...errors, totalAmount: error });
+            const rawValue = e.target.value;
+            setLocalTotalAmount(rawValue);
+
+            const error = validationFunctions.validateTotalAmount?.(rawValue);
+            onValuesChange({ ...values, totalAmount: rawValue }, { ...errors, totalAmount: error });
         },
         [onValuesChange, values, errors, validationFunctions],
     );
 
     const handleTotalAmountBlur = useCallback(() => {
-        const error = validationFunctions.validateTotalAmount?.(values.totalAmount);
-        onValuesChange({ ...values }, { ...errors, totalAmount: error });
-    }, [onValuesChange, values, errors, validationFunctions]);
+        const error = validationFunctions.validateTotalAmount?.(localTotalAmount);
+        onValuesChange({ ...values, totalAmount: localTotalAmount }, { ...errors, totalAmount: error });
+    }, [onValuesChange, values, errors, validationFunctions, localTotalAmount]);
 
     const handleImageChange = useCallback(
         (value: ImageValues | null) => {
@@ -178,7 +185,7 @@ export const ReportsMediaBlock = ({
                             label={descriptionTitle}
                             id={`${windowTitle}-value`}
                             name={`${windowTitle}-value`}
-                            value={values.totalAmount.toString()}
+                            value={localTotalAmount}
                             onChange={handleTotalAmountChange}
                             onBlur={handleTotalAmountBlur}
                             maxLength={totalAmountMaxLength}

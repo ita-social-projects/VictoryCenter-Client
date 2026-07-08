@@ -271,6 +271,7 @@ describe('PartnerBanner', () => {
 
         render(<PartnerBanner />);
 
+        changeDescriptionValue('Changed Description');
         const publishButton = getPublishButton();
         expect(publishButton).toBeEnabled();
 
@@ -326,13 +327,14 @@ describe('PartnerBanner', () => {
 
         render(<PartnerBanner />);
 
+        changeDescriptionValue('Changed');
         clickPublish();
         clickConfirmPublish();
 
         await waitFor(() => {
             expect(mockedPartnersApi.updateBanner).toHaveBeenCalledWith('mock-client', {
                 title: defaultBannerData.title,
-                description: defaultBannerData.description,
+                description: 'Changed',
                 image: defaultBannerData.image,
                 imageId: defaultBannerData.imageId,
             });
@@ -372,6 +374,7 @@ describe('PartnerBanner', () => {
 
         render(<PartnerBanner />);
 
+        changeDescriptionValue('Changed');
         clickPublish();
         clickConfirmPublish();
 
@@ -384,13 +387,14 @@ describe('PartnerBanner', () => {
         await waitFor(() => {
             expect(getTitleInput()).toHaveAttribute('contentEditable', 'true');
             expect(getDescriptionInput()).toBeEnabled();
-            expect(getPublishButton()).toBeEnabled();
+            expect(getPublishButton()).toBeDisabled(); // Disabled because form is no longer dirty after publish
         });
     });
 
     it('shows image error and disables publish until resolved', async () => {
         render(<PartnerBanner />);
 
+        changeDescriptionValue('Changed');
         const publishButton = getPublishButton();
         expect(publishButton).toBeEnabled();
 
@@ -521,6 +525,7 @@ describe('PartnerBanner', () => {
 
         render(<PartnerBanner />);
 
+        changeDescriptionValue('Changed');
         clickPublish();
         clickConfirmPublish();
 
@@ -542,6 +547,7 @@ describe('PartnerBanner', () => {
 
         render(<PartnerBanner />);
 
+        changeDescriptionValue('Changed');
         await waitFor(() => {
             expect(getPublishButton()).toBeEnabled();
         });
@@ -602,6 +608,7 @@ describe('PartnerBanner', () => {
 
         render(<PartnerBanner />);
 
+        changeDescriptionValue('Changed');
         clickPublish();
         clickConfirmPublish();
 

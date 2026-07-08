@@ -152,10 +152,8 @@ describe('reports-media-settings-schema', () => {
                 expect(result).toBe(REPORTS_TEXT.MESSAGE.INVALID_VALUE);
             });
 
-            it('should return max error when value length exceeds max', () => {
-                const overMax = Number(
-                    '1'.repeat(REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.changedLives.max + 1),
-                );
+            it('should return max error when value exceeds max numeric bound', () => {
+                const overMax = 10 ** REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.changedLives.max;
                 const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateChangedLives(overMax);
                 expect(result).toBe(
                     COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
@@ -164,9 +162,15 @@ describe('reports-media-settings-schema', () => {
                 );
             });
 
-            it('should return undefined for value length at max', () => {
-                const maxVal = Number('1'.repeat(REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.changedLives.max));
+            it('should return undefined for value exactly at numeric max bound (10 digits)', () => {
+                const maxVal = 10 ** REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.changedLives.max - 1;
                 const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateChangedLives(maxVal);
+                expect(result).toBeUndefined();
+            });
+
+            it('should return undefined for value just below numeric max bound (9 digits)', () => {
+                const justBelowMax = 10 ** (REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.changedLives.max - 1) - 1;
+                const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateChangedLives(justBelowMax);
                 expect(result).toBeUndefined();
             });
         });

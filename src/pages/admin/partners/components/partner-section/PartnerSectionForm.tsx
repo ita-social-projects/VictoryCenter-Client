@@ -33,7 +33,7 @@ export interface PartnerSectionProps {
     disabled: boolean;
     onChange: (value: PartnerSectionFormValues, errors: PartnerSectionErrors) => void;
     onDelete: (localId: string) => void;
-    onPublish: (localId: string) => void;
+    onPublish: (localId: string, sectionData: PartnerSectionFormValues) => void;
     isDirty: boolean;
 }
 
@@ -129,8 +129,8 @@ const PartnerSectionComponent = ({
     }, [onDelete, value.localId]);
 
     const handlePublish = useCallback(() => {
-        onPublish(value.localId);
-    }, [onPublish, value.localId]);
+        onPublish(value.localId, value);
+    }, [onPublish, value]);
 
     const isFormValid = (): boolean => {
         if (PARTNER_SECTION_VALIDATION_FUNCTIONS.validateTitle(value.title)) {

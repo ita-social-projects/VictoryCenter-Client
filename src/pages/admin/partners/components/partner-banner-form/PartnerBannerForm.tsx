@@ -50,11 +50,26 @@ const isFormValid = (values: PartnerBannerValues, errors: PartnerBannerErrorStat
     return !titleError && !descError && !errors.image;
 };
 
+interface FormState {
+    values: PartnerBannerValues | null;
+    savedValues: PartnerBannerValues | null;
+}
+
+const isImageEqual = (img1: ImageValues | Image | null, img2: ImageValues | Image | null) => {
+    if (img1 === img2) return true;
+    if (!img1 || !img2) return false;
+    if ('url' in img1 && 'url' in img2) return img1.url === img2.url;
+    if ('base64' in img1 && 'base64' in img2) return img1.base64 === img2.base64;
+    return false;
+};
+
 export const PartnerBanner = () => {
     const client = useAdminClient();
     const { addToast } = useToast();
-    const [values, setValues] = useState<PartnerBannerValues | null>(null);
-    const [savedValues, setSavedValues] = useState<PartnerBannerValues | null>(null);
+    const [formState, setFormState] = useState<FormState>({
+        values: null,
+        savedValues: null,
+    });
     const [errors, setErrors] = useState<PartnerBannerErrorState>({});
     const [touched, setTouched] = useState<{ title?: boolean; description?: boolean }>({});
     const [isPublishing, setIsPublishing] = useState(false);
@@ -76,20 +91,21 @@ export const PartnerBanner = () => {
         autoFetchDisabled: false,
     });
 
+    const { values, savedValues } = formState;
+
     const isDirty = React.useMemo(() => {
         if (!savedValues || !values) return false;
         return (
             savedValues.title !== values.title ||
             savedValues.description !== values.description ||
             savedValues.imageId !== values.imageId ||
-            savedValues.image !== values.image
+            !isImageEqual(savedValues.image, values.image)
         );
     }, [savedValues, values]);
 
     useEffect(() => {
         if (!isLoadingData && bannerData && bannerData.title) {
-            setValues(bannerData);
-            setSavedValues(bannerData);
+            setFormState({ values: bannerData, savedValues: bannerData });
             setTouched({});
             setErrors({});
             setTitleKey((prev) => prev + 1);
@@ -110,7 +126,10 @@ export const PartnerBanner = () => {
     }, [fetchError, addToast]);
 
     const handleTitleChange = useCallback((newValue: string) => {
-        setValues((prev) => (prev ? { ...prev, title: newValue } : null));
+        setFormState((prev) => ({
+            ...prev,
+            values: prev.values ? { ...prev.values, title: newValue } : null,
+        }));
 
         const plainText = getPlainTextFromHtml(newValue);
 
@@ -126,7 +145,10 @@ export const PartnerBanner = () => {
 
     const handleDescriptionChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const newValue = e.target.value;
-        setValues((prev) => (prev ? { ...prev, description: newValue } : null));
+        setFormState((prev) => ({
+            ...prev,
+            values: prev.values ? { ...prev.values, description: newValue } : null,
+        }));
         setTouched((prev) => ({ ...prev, description: true }));
         setErrors((prev) => ({
             ...prev,
@@ -135,7 +157,10 @@ export const PartnerBanner = () => {
     }, []);
 
     const handleImageChange = useCallback((value: ImageValues | null) => {
-        setValues((prev) => (prev ? { ...prev, image: value, imageId: value ? prev.imageId : null } : null));
+        setFormState((prev) => ({
+            ...prev,
+            values: prev.values ? { ...prev.values, image: value, imageId: value ? prev.values.imageId : null } : null,
+        }));
     }, []);
 
     const handleImageError = useCallback((error: string | null) => {
@@ -162,8 +187,7 @@ export const PartnerBanner = () => {
                 imageId: values.imageId,
             });
 
-            setValues(updatedBanner);
-            setSavedValues(updatedBanner);
+            setFormState({ values: updatedBanner, savedValues: updatedBanner });
             setTouched({});
             setErrors({});
             addToast(PARTNERS_TEXT.MESSAGE.BANNER_SAVED, ToastType.Success);

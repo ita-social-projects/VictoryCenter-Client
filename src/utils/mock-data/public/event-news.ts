@@ -88,6 +88,12 @@ const textOnlySections: HippotherapyProgramSectionDto[] = [
     },
 ];
 
+const tags = [
+    { id: '1', name: 'Новини' },
+    { id: '2', name: 'Медіа' },
+    { id: '3', name: 'Програми' },
+];
+
 export const eventsNewsPageMock: EventsNewsPageData = {
     description:
         'Цей розділ — про ті моменти, коли те, у що ми віримо, стає реальністю. Тут ти знайдеш все: від маленьких зустрічей до великих відкриттів, від перших кроків дітей у стайні до глибоких переживань ветеранів у сідлі.',
@@ -99,28 +105,9 @@ export const eventsNewsPageMock: EventsNewsPageData = {
     },
     eventsData: {
         title: 'Що відбувалось',
-        tags: [
-            { id: '1', name: 'Новини' },
-            { id: '2', name: 'Медіа' },
-            { id: '3', name: 'Програми' },
-        ],
+        tags,
     },
 };
-
-const tags = [
-    {
-        id: '1',
-        name: 'Новини',
-    },
-    {
-        id: '2',
-        name: 'Медіа',
-    },
-    {
-        id: '3',
-        name: 'Програми',
-    },
-];
 
 export const eventsNewsMock: EventsNews[] = [
     {
@@ -140,7 +127,7 @@ export const eventsNewsMock: EventsNews[] = [
         id: '2',
         name: 'Як коні допомагають дітям і ветеранам',
         description:
-            'На NV.ua вийшов великий матеріал про нашу роботу з ветеранами й дітьми. Журналісти побували на сесіях і побачили, як відбувається зцілення через довіру, тишу й спільність.',
+            'NV.ua підготував розгорнену публікацію про наші заняття з ветеранами й дітьми. Кореспонденти відвідали сеанси іпотерапії та стали свідками відновлення через взаєморозуміння, спокій і єдність.',
         date: '16/02/2025',
         tags: [tags[2]],
         resource: 'NV',
@@ -236,45 +223,6 @@ export const eventsNewsMock: EventsNews[] = [
         previewImage: peopleCircle,
         backgroundImage: peopleCircle,
         slug: 'how-horses-support-children-and-veterans',
-        sections: textOnlySections,
-    },
-    {
-        id: '10',
-        name: 'Трансформація через контакт: історії учасників нашої програми',
-        description:
-            'Інтимний погляд на те, як заняття з конями змінюють внутрішній світ дітей та військовослужбовців. Рідкісні моменти відкритого спілкування про те, що важко передати словами.',
-        date: '15/02/2025',
-        tags: [tags[1]],
-        resource: 'NV',
-        previewImage: oldManHorse,
-        backgroundImage: oldManHorse,
-        slug: 'transformation-through-contact-stories-of-participants-in-our-program',
-        sections: textOnlySections,
-    },
-    {
-        id: '11',
-        name: '«Коні — це тварини, які лікують без слів»',
-        description:
-            'NV.ua опублікував великий репортаж про нашу роботу з дітьми та ветеранами. Журналісти побували на заходах і відчули, як відбувається відновлення через довіру, тишу і спільне переживання. :)',
-        date: '15/02/2025',
-        tags: [tags[1]],
-        resource: 'NV Live',
-        previewImage: team,
-        backgroundImage: team,
-        slug: 'horses-are-animals-that-heal-without-words',
-        sections: textOnlySections,
-    },
-    {
-        id: '12',
-        name: 'Гутірка #2 Оксана Грушка',
-        description:
-            'Розмова з експертом про психологічні аспекти іпотерапії. Оксана поділяється знаннями про те, як розвивається довіра між людиною та конем.',
-        date: '15/02/2025',
-        tags: [tags[1]],
-        resource: 'Оксана Грушка',
-        previewImage: hutirka,
-        backgroundImage: hutirka,
-        slug: 'hutirka-2-oksana-grushka',
         sections: textOnlySections,
     },
 ];

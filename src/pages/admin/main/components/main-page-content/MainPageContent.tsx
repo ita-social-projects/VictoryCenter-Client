@@ -126,6 +126,50 @@ const areRichTextFieldValuesEqual = (
     normalizeRichTextHtmlForComparison(String(currentValues[field] ?? '')) ===
     normalizeRichTextHtmlForComparison(String(savedValues[field] ?? ''));
 
+const BLOCK_TEXT_FIELDS: Partial<Record<MainPageLocalizationBlock, Array<keyof MainPageFormValues>>> = {
+    [MainPageLocalizationBlock.Title]: ['titleUa', 'titleEn', 'descriptionUa', 'descriptionEn'],
+    [MainPageLocalizationBlock.AboutUs]: [
+        'aboutUsTitleUa',
+        'aboutUsTitleEn',
+        'aboutUsDescriptionUa',
+        'aboutUsDescriptionEn',
+    ],
+    [MainPageLocalizationBlock.Donations]: [
+        'donationsTitleUa',
+        'donationsTitleEn',
+        'donationsDescriptionUa',
+        'donationsDescriptionEn',
+    ],
+    [MainPageLocalizationBlock.Partners]: [
+        'partnersTitleUa',
+        'partnersTitleEn',
+        'partnersDescriptionUa',
+        'partnersDescriptionEn',
+    ],
+};
+
+const hasBlockDirtyTextFields = (
+    block: MainPageLocalizationBlock | undefined,
+    dirtyFields: Partial<Record<keyof MainPageFormValues, unknown>>,
+    currentValues: MainPageFormValues,
+    savedValues: MainPageFormValues,
+) => {
+    if (block == null) return false;
+
+    const blockFields = BLOCK_TEXT_FIELDS[block];
+    if (!blockFields) return false;
+
+    return blockFields.some((fieldName) => {
+        if (!dirtyFields[fieldName]) return false;
+
+        if (RICH_TEXT_FORM_FIELD_SET.has(fieldName)) {
+            return !areRichTextFieldValuesEqual(fieldName, currentValues, savedValues);
+        }
+
+        return currentValues[fieldName] !== savedValues[fieldName];
+    });
+};
+
 const hasRelevantMainPageDirtyFields = (
     dirtyFields: Partial<Record<keyof MainPageFormValues, unknown>>,
     currentValues: MainPageFormValues,
@@ -464,8 +508,18 @@ export const MainPageContent = () => {
         selectedTab.localizationBlock != null &&
         TRANSLATABLE_BLOCKS.has(selectedTab.localizationBlock);
 
+    const isTranslateButtonDisabled =
+        canTranslateActiveBlock &&
+        hasBlockDirtyTextFields(
+            selectedTab.localizationBlock,
+            methods.formState.dirtyFields,
+            methods.getValues(),
+            savedValuesRef.current,
+        );
+
     const handleOpenTranslationModal = () => {
         if (
+            isTranslateButtonDisabled ||
             translationLanguages.length === 0 ||
             selectedTab.localizationBlock == null ||
             !TRANSLATABLE_BLOCKS.has(selectedTab.localizationBlock)
@@ -578,6 +632,7 @@ export const MainPageContent = () => {
                             type="button"
                             onClick={handleOpenTranslationModal}
                             DefaultIcon={ACTION_ICONS.translate.default}
+                            disabled={isTranslateButtonDisabled}
                         />
                     </div>
                 )}

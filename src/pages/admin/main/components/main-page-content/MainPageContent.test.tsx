@@ -1263,4 +1263,19 @@ describe('MainPageContent', () => {
 
         await waitFor(() => expect(screen.queryByText('Додати переклад')).not.toBeInTheDocument());
     });
+
+    it('disables the translation icon when text input fields have unpublished changes', async () => {
+        mockLocalizationToolkitState.translationLanguages = [{ id: 2, code: 'en', name: 'Англійська' }];
+
+        await renderAndLoadContent();
+
+        const translateIcon = screen.getByLabelText('Додати переклад');
+        expect(translateIcon).not.toBeDisabled();
+
+        fireEvent.click(screen.getByTestId('publish-btn-dirty'));
+
+        await waitFor(() => {
+            expect(translateIcon).toBeDisabled();
+        });
+    });
 });

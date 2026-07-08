@@ -47,6 +47,10 @@ jest.mock('@/components/admin/icon-button/IconButton', () => ({
     ),
 }));
 
+jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
+    InlineLoader: () => <div data-testid="inline-loader" />,
+}));
+
 jest.mock('@/validation/admin/reports-schema/pdf-file-rename-schema/pdf-file-rename-schema', () => ({
     PDF_FILE_RENAME_VALIDATION_FUNCTIONS: {
         validateName: jest.fn((value) => {
@@ -477,6 +481,61 @@ describe('PdfFilesTable', () => {
 
             // Trigger dragend
             fireEvent.dragEnd(dragRow);
+        });
+    });
+
+    describe('Infinite Scroll and Scroll to Top', () => {
+        it('should render the table-wrapper and handle scroll to bottom', async () => {
+            const mockOnLoadMore = jest.fn();
+            render(<PdfFilesTable {...defaultProps} onLoadMore={mockOnLoadMore} />);
+
+            const wrapper = screen.getByTestId('pdf-files-table-wrapper');
+            expect(wrapper).toBeInTheDocument();
+
+            // Simulate scroll to bottom
+            Object.defineProperty(wrapper, 'scrollHeight', { value: 500, configurable: true });
+            Object.defineProperty(wrapper, 'clientHeight', { value: 100, configurable: true });
+            Object.defineProperty(wrapper, 'scrollTop', { value: 400, configurable: true });
+
+            fireEvent.scroll(wrapper);
+
+            expect(mockOnLoadMore).toHaveBeenCalled();
+        });
+
+        it('should render inline loader when isLoadingMore is true', () => {
+            render(<PdfFilesTable {...defaultProps} isLoadingMore={true} />);
+            expect(screen.getByTestId('inline-loader')).toBeInTheDocument();
+        });
+
+        it('should show scroll-to-top button on scroll and scroll to top on click', async () => {
+            render(<PdfFilesTable {...defaultProps} />);
+            const wrapper = screen.getByTestId('pdf-files-table-wrapper');
+            const btn = screen.getByTestId('pdf-files-table-to-top');
+
+            expect(btn).not.toHaveClass('to-top-button-visible');
+
+            // Simulate scroll down
+            Object.defineProperty(wrapper, 'scrollHeight', { value: 500, configurable: true, writable: true });
+            Object.defineProperty(wrapper, 'clientHeight', { value: 100, configurable: true, writable: true });
+            Object.defineProperty(wrapper, 'scrollTop', { value: 50, configurable: true, writable: true });
+
+            fireEvent.scroll(wrapper);
+
+            await waitFor(() => {
+                expect(btn).toHaveClass('to-top-button-visible');
+            });
+
+            // Spy on scrollTop setter to verify click scrolls to top
+            const scrollTopSpy = jest.fn();
+            Object.defineProperty(wrapper, 'scrollTop', {
+                set: scrollTopSpy,
+                get: () => 50,
+                configurable: true,
+            });
+
+            fireEvent.click(btn);
+
+            expect(scrollTopSpy).toHaveBeenCalledWith(0);
         });
     });
 });

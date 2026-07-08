@@ -111,6 +111,7 @@ export const PDF_FILES_SECTION_TEXT = {
             DOWNLOAD: 'Завантажити',
         },
         NO_FILES: 'PDF файли відсутні',
+        SCROLL_TO_TOP: 'Вгору',
     },
     DROPZONE: {
         TITLE: 'Натисніть або перетягніть PDF файл сюди',
@@ -137,6 +138,7 @@ export const PDF_FILES_SECTION_TEXT = {
         DELETE_SUCCESS: 'Файл успішно видалено',
         DELETE_ERROR: 'Не вдалося видалити файл. Спробуйте ще раз.',
         VIEW_ERROR: 'Не вдалося завантажити файл для перегляду. Спробуйте ще раз.',
+        LOAD_ERROR: 'Не вдалося завантажити файли. Спробуйте ще раз.',
         FAIL_TO_CREATE_TRANSLATION: 'Виникла помилка під час додавання перекладу для PDF секції',
         FAIL_TO_UPDATE_TRANSLATION: 'Виникла помилка під час оновлення перекладу для PDF секції',
         REORDER_SUCCESS: 'Порядок файлів успішно змінено',

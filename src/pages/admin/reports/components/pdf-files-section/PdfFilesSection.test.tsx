@@ -1,4 +1,4 @@
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
 import { PdfFilesSection } from './PdfFilesSection';
 import { PdfSectionApi } from '@/services/api/admin/reports/pdf-section/pdf-section-api';
 import { PdfReportsApi } from '@/services/api/admin/reports/pdf-reports/pdf-reports-api';
@@ -207,9 +207,12 @@ describe('PdfFilesSection', () => {
         expect(PdfSectionApi.getPdfSection).toHaveBeenCalledWith(mockClient);
 
         (PdfReportsApi.getAll as jest.Mock).mockResolvedValueOnce(mockFilesResponse);
-        const filesResult = await capturedFetchFiles();
+        let filesResult;
+        await act(async () => {
+            filesResult = await capturedFetchFiles();
+        });
 
-        expect(PdfReportsApi.getAll).toHaveBeenCalledWith(mockClient, { offset: 0, limit: 1000, languageId: 1 });
+        expect(PdfReportsApi.getAll).toHaveBeenCalledWith(mockClient, { offset: 0, limit: 20, languageId: 1 });
         expect(filesResult).toEqual(mockFilesResponse.items);
     });
 

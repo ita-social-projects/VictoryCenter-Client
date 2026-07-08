@@ -250,6 +250,10 @@
     background-color: c.$grey-500;
 }
 
+.row-drop-target {
+    border-top: 2px solid c.$blue-500 !important;
+}
+
 .container {
     display: flex;
     flex-direction: column;

@@ -451,6 +451,13 @@ describe('PdfFilesTable', () => {
             expect(screen.queryByTestId('drag-icon')).not.toBeInTheDocument();
         });
 
+        it('should disable dragging when isReordering is true', () => {
+            render(<PdfFilesTable {...defaultProps} isReordering={true} />);
+            const rows = screen.getAllByRole('row');
+            const fileRow = rows[1];
+            expect(fileRow.getAttribute('draggable')).toBe('false');
+        });
+
         it('should handle dragstart, dragover, drop, and dragend events correctly', () => {
             const onReorderFilesMock = jest.fn();
             render(<PdfFilesTable {...defaultProps} onReorderFiles={onReorderFilesMock} />);
@@ -481,6 +488,66 @@ describe('PdfFilesTable', () => {
 
             // Trigger dragend
             fireEvent.dragEnd(dragRow);
+        });
+
+        it('should highlight drop target row on dragover and clear on dragleave/drop', () => {
+            render(<PdfFilesTable {...defaultProps} />);
+            const rows = screen.getAllByRole('row');
+            const dragRow = rows[1];
+            const dropRow = rows[2];
+
+            const mockDataTransfer = {
+                setData: jest.fn(),
+                getData: jest.fn().mockReturnValue('1'),
+                effectAllowed: '',
+                dropEffect: '',
+            };
+
+            // Start drag on row 1
+            fireEvent.dragStart(dragRow, { dataTransfer: mockDataTransfer });
+            expect(dragRow).toHaveClass('row-dragging');
+
+            // Drag over row 2
+            fireEvent.dragOver(dropRow, { dataTransfer: mockDataTransfer });
+            expect(dropRow).toHaveClass('row-drop-target');
+
+            // Drag leave row 2
+            fireEvent.dragLeave(dropRow);
+            expect(dropRow).not.toHaveClass('row-drop-target');
+
+            // Drag over row 2 again
+            fireEvent.dragOver(dropRow, { dataTransfer: mockDataTransfer });
+            expect(dropRow).toHaveClass('row-drop-target');
+
+            // Drop on row 2
+            fireEvent.drop(dropRow, { dataTransfer: mockDataTransfer });
+            expect(dropRow).not.toHaveClass('row-drop-target');
+        });
+
+        it('should reset dragging state if the dragged file is removed from files list', () => {
+            const { rerender } = render(<PdfFilesTable {...defaultProps} />);
+            const rows = screen.getAllByRole('row');
+            const dragRow = rows[1];
+
+            const mockDataTransfer = {
+                setData: jest.fn(),
+                getData: jest.fn(),
+                effectAllowed: '',
+                dropEffect: '',
+            };
+
+            // Start dragging
+            fireEvent.dragStart(dragRow, { dataTransfer: mockDataTransfer });
+            expect(dragRow).toHaveClass('row-dragging');
+
+            // Rerender with the file removed
+            rerender(<PdfFilesTable {...defaultProps} files={[mockFiles[1]]} />);
+            
+            // Check that it's no longer marked as dragging
+            const newRows = screen.getAllByRole('row');
+            // Since mockFiles[0] was removed, the only file is mockFiles[1] (which corresponds to row index 1)
+            const remainingRow = newRows[1];
+            expect(remainingRow).not.toHaveClass('row-dragging');
         });
     });
 

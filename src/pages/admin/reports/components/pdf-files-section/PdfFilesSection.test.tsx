@@ -489,6 +489,7 @@ describe('PdfFilesSection', () => {
                 PDF_FILES_SECTION_TEXT.MESSAGE.REORDER_SUCCESS,
                 ToastType.Success,
             );
+            expect(mockRefetch).toHaveBeenCalled();
         });
     });
 

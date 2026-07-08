@@ -12,7 +12,7 @@ import cn from 'classnames';
 import styles from './PdfFilesTable.module.scss';
 import './PdfFilesTable.scss';
 import { PdfReportDto } from '@/types/admin/pdf-section';
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import { PDF_FILE_RENAME_VALIDATION_FUNCTIONS } from '@/validation/admin/reports-schema/pdf-file-rename-schema/pdf-file-rename-schema';
 import { useTableScrollToTop } from '@/hooks/admin/use-table-scroll-to-top/useTableScrollToTop';
@@ -25,6 +25,7 @@ interface PdfFilesTableProps {
     onReorderFiles?: (reorderedFiles: PdfReportDto[]) => void;
     isDeleting?: boolean;
     isRenaming?: boolean;
+    isReordering?: boolean;
     isLoadingMore?: boolean;
     onLoadMore?: () => void;
 }
@@ -41,10 +42,18 @@ export const PdfFilesTable: React.FC<PdfFilesTableProps> = ({
     onReorderFiles,
     isDeleting = false,
     isRenaming = false,
+    isReordering = false,
     isLoadingMore = false,
     onLoadMore,
 }) => {
     const [draggingId, setDraggingId] = useState<number | null>(null);
+    const [dropTargetId, setDropTargetId] = useState<number | null>(null);
+
+    useEffect(() => {
+        if (draggingId && !files.some((f) => f.id === draggingId)) {
+            setDraggingId(null);
+        }
+    }, [files, draggingId]);
 
     const handleDragStart = useCallback((e: React.DragEvent<HTMLTableRowElement>, id: number) => {
         setDraggingId(id);
@@ -52,14 +61,20 @@ export const PdfFilesTable: React.FC<PdfFilesTableProps> = ({
         e.dataTransfer.effectAllowed = 'move';
     }, []);
 
-    const handleDragOver = useCallback((e: React.DragEvent<HTMLTableRowElement>) => {
+    const handleDragOver = useCallback((e: React.DragEvent<HTMLTableRowElement>, id: number) => {
         e.preventDefault();
+        setDropTargetId(id);
         e.dataTransfer.dropEffect = 'move';
+    }, []);
+
+    const handleDragLeave = useCallback(() => {
+        setDropTargetId(null);
     }, []);
 
     const handleDrop = useCallback(
         (e: React.DragEvent<HTMLTableRowElement>, targetId: number) => {
             e.preventDefault();
+            setDropTargetId(null);
             const sourceIdStr = e.dataTransfer.getData('text/plain');
             if (!sourceIdStr) return;
             const sourceId = Number(sourceIdStr);
@@ -80,6 +95,7 @@ export const PdfFilesTable: React.FC<PdfFilesTableProps> = ({
 
     const handleDragEnd = useCallback(() => {
         setDraggingId(null);
+        setDropTargetId(null);
     }, []);
 
     const { tableWrapperRef, isMoveToTopVisible, handleTableScroll, moveToTop } = useTableScrollToTop(files.length);
@@ -224,10 +240,12 @@ export const PdfFilesTable: React.FC<PdfFilesTableProps> = ({
                                         key={file.id}
                                         className={cn(styles.row, {
                                             [styles['row-dragging']]: draggingId === file.id,
+                                            [styles['row-drop-target']]: dropTargetId === file.id && draggingId !== file.id,
                                         })}
-                                        draggable={files.length > 1}
+                                        draggable={files.length > 1 && !isDeleting && !isRenaming && !isReordering}
                                         onDragStart={(e) => handleDragStart(e, file.id)}
-                                        onDragOver={handleDragOver}
+                                        onDragOver={(e) => handleDragOver(e, file.id)}
+                                        onDragLeave={handleDragLeave}
                                         onDrop={(e) => handleDrop(e, file.id)}
                                         onDragEnd={handleDragEnd}
                                     >

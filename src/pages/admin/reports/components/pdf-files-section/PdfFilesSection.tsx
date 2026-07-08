@@ -254,6 +254,7 @@ export const PdfFilesSection = () => {
             const currentFiles = fetchedFilesRef.current;
             const currentDedupedCount = new Set([...currentFiles, ...uploadedFilesRef.current].map((f) => f.id)).size;
             if (reorderedFiles.length !== currentDedupedCount) {
+                // eslint-disable-next-line no-console
                 console.error('File count mismatch during reorder');
                 return;
             }

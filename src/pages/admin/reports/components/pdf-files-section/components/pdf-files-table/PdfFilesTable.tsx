@@ -240,7 +240,8 @@ export const PdfFilesTable: React.FC<PdfFilesTableProps> = ({
                                         key={file.id}
                                         className={cn(styles.row, {
                                             [styles['row-dragging']]: draggingId === file.id,
-                                            [styles['row-drop-target']]: dropTargetId === file.id && draggingId !== file.id,
+                                            [styles['row-drop-target']]:
+                                                dropTargetId === file.id && draggingId !== file.id,
                                         })}
                                         draggable={files.length > 1 && !isDeleting && !isRenaming && !isReordering}
                                         onDragStart={(e) => handleDragStart(e, file.id)}

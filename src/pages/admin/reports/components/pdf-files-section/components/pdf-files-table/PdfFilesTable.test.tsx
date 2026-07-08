@@ -542,7 +542,7 @@ describe('PdfFilesTable', () => {
 
             // Rerender with the file removed
             rerender(<PdfFilesTable {...defaultProps} files={[mockFiles[1]]} />);
-            
+
             // Check that it's no longer marked as dragging
             const newRows = screen.getAllByRole('row');
             // Since mockFiles[0] was removed, the only file is mockFiles[1] (which corresponds to row index 1)

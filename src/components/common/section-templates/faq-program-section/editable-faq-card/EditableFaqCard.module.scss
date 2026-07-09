@@ -30,23 +30,12 @@
 }
 
 .delete-button {
-    display: flex;
     justify-self: flex-end;
     cursor: pointer;
     border: none;
     width: 24px;
     height: 24px;
     background: transparent;
-
-    path {
-        transition: 0.2s ease;
-    }
-
-    &:hover {
-        path {
-            fill: c.$blue-100;
-        }
-    }
 }
 
 .expand-container {

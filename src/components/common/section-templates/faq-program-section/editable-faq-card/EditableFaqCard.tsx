@@ -10,6 +10,7 @@ import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program
 import { ReactComponent as ArrowIcon } from '@/assets/icons/arrow-up-right.svg';
 import { ReactComponent as CloseIcon } from '@/assets/icons/cross.svg';
 import { ACTION_ICONS } from '@/const/common/action-icons';
+import { IconButton } from '@/components/admin/icon-button/IconButton';
 import styles from './EditableFaqCard.module.scss';
 
 const { validateFaqQuestion, validateFaqAnswer } = PROGRAM_SECTION_VALIDATION_FUNCTIONS;
@@ -41,7 +42,6 @@ export const EditableFaqCard = ({
     onDelete,
     onExpandToggle,
 }: EditableFaqCardProps) => {
-    const DeleteFilledIcon = ACTION_ICONS.delete.hover;
     const cardRef = useRef<HTMLDivElement>(null);
     const [questionError, setQuestionError] = useState<string | undefined>(undefined);
     const [answerError, setAnswerError] = useState<string | undefined>(undefined);
@@ -101,14 +101,14 @@ export const EditableFaqCard = ({
         <div ref={cardRef} className={cn(styles['card'], { [styles['card--expanded']]: isExpanded })}>
             <div className={styles['card-top-row']}>
                 {canDelete && (
-                    <button
+                    <IconButton
                         type="button"
                         className={styles['delete-button']}
                         onClick={handleDeleteClick}
-                        aria-label="Delete question"
-                    >
-                        <DeleteFilledIcon />
-                    </button>
+                        aria-label="delete"
+                        DefaultIcon={ACTION_ICONS.delete.default}
+                        FilledIcon={ACTION_ICONS.delete.hover}
+                    />
                 )}
             </div>
             <div className={styles['card-header']}>

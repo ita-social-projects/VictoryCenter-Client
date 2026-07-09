@@ -105,7 +105,7 @@ export const EditableFaqCard = ({
                         type="button"
                         className={styles['delete-button']}
                         onClick={handleDeleteClick}
-                        aria-label="delete"
+                        aria-label="Delete question"
                         DefaultIcon={ACTION_ICONS.delete.default}
                         FilledIcon={ACTION_ICONS.delete.hover}
                     />

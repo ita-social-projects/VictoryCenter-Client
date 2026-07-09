@@ -39,7 +39,7 @@ export const StatisticsMetricEditPanel = ({ metric, onSave, onCancel }: Statisti
         watch,
         formState: { errors, isValid },
     } = useForm<MetricFormValues>({
-        mode: 'all',
+        mode: 'onTouched',
         resolver: yupResolver(metricEditSchema),
         defaultValues: {
             nameUa: defaultNameUa,
@@ -60,14 +60,13 @@ export const StatisticsMetricEditPanel = ({ metric, onSave, onCancel }: Statisti
         currentValue !== defaultValueStr ||
         currentPrefix !== defaultPrefix;
 
-    const handleValueChange = (raw: string) => {
+    const handleValueChange = (raw: string, currentValue: string) => {
         if (!raw) return '';
         const stripped = raw.replace(/\s/g, '');
-        if (stripped === '-') return '-';
-        if (/^-?\d+$/.test(stripped)) {
+        if (/^\d+$/.test(stripped)) {
             return formatWithSpaces(stripped);
         }
-        return raw;
+        return currentValue;
     };
 
     const onValidSubmit = (data: MetricFormValues) => {
@@ -116,7 +115,7 @@ export const StatisticsMetricEditPanel = ({ metric, onSave, onCancel }: Statisti
                             name={name}
                             label={MAIN_PAGE_TEXT.BLOCKS.EDIT_PANEL.VALUE_LABEL}
                             value={value}
-                            onChange={(e) => onChange(handleValueChange(e.target.value))}
+                            onChange={(e) => onChange(handleValueChange(e.target.value, value))}
                             onBlur={onBlur}
                             error={errors.value?.message}
                             maxLength={15}

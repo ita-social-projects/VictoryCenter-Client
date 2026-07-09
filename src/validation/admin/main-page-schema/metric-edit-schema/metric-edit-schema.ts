@@ -45,7 +45,7 @@ export const metricEditSchema = Yup.object({
         .test('only-numbers', MAIN_PAGE_VALIDATION.editPanel.value.ONLY_NUMBERS, (val) => {
             if (!val) return false;
             const stripped = val.replace(/\s/g, '');
-            return /^-?\d+$/.test(stripped);
+            return /^[1-9]\d*$/.test(stripped) || stripped === '0';
         })
         .test('is-positive', MAIN_PAGE_VALIDATION.editPanel.value.ONLY_POSITIVE, (val) => {
             if (!val) return false;

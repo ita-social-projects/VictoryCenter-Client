@@ -52,7 +52,7 @@ export const RaisedMetricEditPanel = ({ metric, onSave, onCancel, onSyncErrorCha
         setValue,
         formState: { errors, isValid },
     } = useForm<RaisedMetricFormValues>({
-        mode: 'onChange',
+        mode: 'onTouched',
         resolver: yupResolver(raisedMetricEditSchema),
         defaultValues: {
             nameUa: defaultNameUa,

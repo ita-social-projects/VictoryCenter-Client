@@ -89,6 +89,7 @@ export interface Metric extends EntityWithLocalizations<MetricLocalization> {
     autoSyncError?: string | null;
     syncError?: string | null;
     isHidden: boolean;
+    rowVersion?: string;
     priority: number;
 }
 
@@ -443,12 +444,24 @@ export interface UpdateMetricVisibilityDto {
     isHidden: boolean;
 }
 
-export interface UpdateSingleMetricDto {
+export type UpdateSingleMetricDto = (
+    | { value: number }
+    | { name: string }
+    | { prefix: MetricPrefix | null }
+    | { isAutoSynced: boolean }
+    | { localization: UpdateMetricLocalizationDto | null }
+) & {
     value?: number;
     name?: string;
     prefix?: MetricPrefix | null;
     isAutoSynced?: boolean;
     localization?: UpdateMetricLocalizationDto | null;
+    expectedVersion?: string;
+};
+
+export interface UpdateMetricResult {
+    wasModified: boolean;
+    updatedFields: string[];
 }
 
 // Form Values & Defaults

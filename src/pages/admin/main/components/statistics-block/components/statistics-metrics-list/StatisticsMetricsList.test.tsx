@@ -78,7 +78,7 @@ describe('StatisticsMetricsList', () => {
     const setup = (propsOverrides: Partial<React.ComponentProps<typeof StatisticsMetricsList>> = {}) => {
         (useAdminClient as jest.Mock).mockReturnValue({});
         (useToast as jest.Mock).mockReturnValue({ addToast: jest.fn() });
-        MainPageApi.updateMetric = jest.fn().mockResolvedValue(undefined);
+        MainPageApi.updateMetric = jest.fn().mockResolvedValue({ wasModified: true, updatedFields: [] });
 
         const defaultProps = {
             metrics,

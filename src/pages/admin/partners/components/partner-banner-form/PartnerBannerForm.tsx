@@ -181,8 +181,8 @@ export const PartnerBanner = () => {
         setIsPublishing(true);
         try {
             const updatedBanner = await PartnersApi.updateBanner(client, {
-                title: values.title,
-                description: values.description,
+                title: getPlainTextFromHtml(values.title),
+                description: getPlainTextFromHtml(values.description),
                 image: values.image,
                 imageId: values.imageId,
             });

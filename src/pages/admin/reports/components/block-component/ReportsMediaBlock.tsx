@@ -112,8 +112,9 @@ export const ReportsMediaBlock = ({
     );
 
     const handleTotalAmountBlur = useCallback(() => {
-        const error = validationFunctions.validateTotalAmount?.(localTotalAmount);
-        onValuesChange({ ...values, totalAmount: localTotalAmount }, { ...errors, totalAmount: error });
+        const normalizedAmount = typeof localTotalAmount === 'string' ? localTotalAmount.trim() : localTotalAmount;
+        const error = validationFunctions.validateTotalAmount?.(normalizedAmount);
+        onValuesChange({ ...values, totalAmount: normalizedAmount }, { ...errors, totalAmount: error });
     }, [onValuesChange, values, errors, validationFunctions, localTotalAmount]);
 
     const handleImageChange = useCallback(

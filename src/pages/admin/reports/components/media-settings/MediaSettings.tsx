@@ -217,7 +217,11 @@ export const MediaSettings = forwardRef<MediaSettingsRef, MediaSettingsProps>(
                     changedLives: {
                         title: changedLivesValues.title,
                         titleEn: changedLivesValues.titleEn,
-                        changedLives: Number(changedLivesValues.totalAmount),
+                        changedLives: (() => {
+                            const parsed = parseInt(String(changedLivesValues.totalAmount).trim(), 10);
+                            if (isNaN(parsed)) throw new Error('changedLives is not a valid integer');
+                            return parsed;
+                        })(),
                         image: changedLivesImage,
                         imageId: changedLivesImageId,
                     },

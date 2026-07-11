@@ -63,6 +63,8 @@ export const REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION = {
     changedLives: {
         min: 2,
         max: 10,
+        getMinError: () => 'Не менше 2 цифр',
+        getMaxError: () => 'Не більше 10 цифр',
     },
     image: {
         width: 280,

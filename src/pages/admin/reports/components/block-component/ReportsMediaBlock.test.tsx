@@ -314,11 +314,15 @@ describe('ReportsMediaBlock', () => {
             renderComponent({ isValueEditable: true });
 
             const valueInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-value');
+            fireEvent.change(valueInput, { target: { value: '250000' } });
+            jest.clearAllMocks();
+            fireEvent.change(valueInput, { target: { value: '250000 ' } });
+            jest.clearAllMocks();
             fireEvent.blur(valueInput);
 
-            expect(mockValidateTotalAmount).toHaveBeenCalledWith('250000');
+            expect(mockValidateTotalAmount).toHaveBeenCalledWith('250000 ');
             expect(mockOnValuesChange).toHaveBeenCalledWith(
-                { ...defaultValues, totalAmount: '250000' },
+                { ...defaultValues, totalAmount: '250000 ' },
                 { totalAmount: undefined },
             );
         });

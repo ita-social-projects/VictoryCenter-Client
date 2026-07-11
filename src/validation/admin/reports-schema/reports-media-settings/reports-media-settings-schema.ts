@@ -64,15 +64,11 @@ const changedLivesSchema = Yup.object({
         .integer(REPORTS_TEXT.MESSAGE.INVALID_VALUE)
         .min(
             10 ** (REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.changedLives.min - 1),
-            COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(
-                REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.changedLives.min,
-            ),
+            REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.changedLives.getMinError(),
         )
         .max(
             10 ** REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.changedLives.max - 1,
-            COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
-                REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.changedLives.max,
-            ),
+            REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.changedLives.getMaxError(),
         ),
 });
 

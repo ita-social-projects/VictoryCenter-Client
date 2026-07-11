@@ -247,17 +247,17 @@ describe('reports-media-settings-schema', () => {
 
             it('should return min error for 0', () => {
                 const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateTotalAmount(0);
-                expect(result).toBe(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(2));
+                expect(result).toBe(REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.changedLives.getMinError());
             });
 
             it('should return min error for 1-digit number', () => {
                 const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateTotalAmount(5);
-                expect(result).toBe(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(2));
+                expect(result).toBe(REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.changedLives.getMinError());
             });
 
             it('should return error for negative number', () => {
                 const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateTotalAmount(-1);
-                expect(result).toBe(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(2));
+                expect(result).toBe(REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.changedLives.getMinError());
             });
 
             it('should return undefined for value at min (10)', () => {
@@ -278,11 +278,7 @@ describe('reports-media-settings-schema', () => {
             it('should return max error when value exceeds max numeric bound', () => {
                 const overMax = 10 ** REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.changedLives.max;
                 const result = REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS.validateTotalAmount(overMax);
-                expect(result).toBe(
-                    COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
-                        REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.changedLives.max,
-                    ),
-                );
+                expect(result).toBe(REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.changedLives.getMaxError());
             });
 
             it('should return undefined for value exactly at numeric max bound (10 digits)', () => {

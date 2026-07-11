@@ -8,11 +8,14 @@ import {
 } from '../reports-page-toolbar/ReportsPageToolbar';
 import { MediaSettings, MediaSettingsRef } from '../media-settings/MediaSettings';
 import { ReportAnalytics } from '../report-analytics/ReportAnalytics';
+import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
 export const ReportsPanelContent = () => {
     const [selectedTab, setSelectedTab] = useState<ReportsToolbarTab>(REPORTS_TOOLBAR_TABS[0]);
     const [isDirty, setIsDirty] = useState(false);
     const [resetCounter, setResetCounter] = useState(0);
+    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const mediaSettingsRef = useRef<MediaSettingsRef>(null);
 
     const handleCancel = useCallback(() => {
@@ -23,12 +26,23 @@ export const ReportsPanelContent = () => {
     const handleTabSelect = useCallback((tab: ReportsToolbarTab) => {
         setSelectedTab(tab);
     }, []);
-    const handlePublish = useCallback(async () => {
+
+    const handlePublish = useCallback(() => {
+        setIsConfirmOpen(true);
+    }, []);
+
+    const handleConfirmPublish = useCallback(async () => {
+        setIsConfirmOpen(false);
         const result = await mediaSettingsRef.current?.submit();
         if (result) {
             setIsDirty(false);
         }
     }, []);
+
+    const handleCloseConfirm = useCallback(() => {
+        setIsConfirmOpen(false);
+    }, []);
+
     const handleDirtyChange = useCallback((dirty: boolean) => setIsDirty(dirty), []);
 
     const isMediaSettingsTab = selectedTab.id === 'media-settings';
@@ -51,6 +65,13 @@ export const ReportsPanelContent = () => {
                 />
                 {!isMediaSettingsTab && <ReportAnalytics />}
             </div>
+            <ConfirmationModal
+                isOpen={isConfirmOpen}
+                onClose={handleCloseConfirm}
+                title={COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES}
+                onConfirm={handleConfirmPublish}
+                onCancel={handleCloseConfirm}
+            />
             <ToastContainer />
         </div>
     );

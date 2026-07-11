@@ -51,6 +51,21 @@ jest.mock('@/components/admin/toast/toast-container/ToastContainer', () => ({
     ToastContainer: () => <div data-testid="mock-toast-container" />,
 }));
 
+jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
+    ConfirmationModal: (props: any) =>
+        props.isOpen ? (
+            <div data-testid="mock-confirmation-modal">
+                <span data-testid="confirmation-title">{props.title}</span>
+                <button data-testid="confirm-yes" onClick={props.onConfirm}>
+                    ТАК
+                </button>
+                <button data-testid="confirm-no" onClick={props.onCancel}>
+                    НІ
+                </button>
+            </div>
+        ) : null,
+}));
+
 jest.mock('./ReportsPanelContent.module.scss', () => ({
     root: 'root',
     toolbar: 'toolbar',
@@ -63,6 +78,8 @@ const clickMsCancel = () => fireEvent.click(screen.getByTestId('ms-cancel'));
 const clickMsPublish = () => fireEvent.click(screen.getByTestId('ms-publish'));
 const markDirty = () => fireEvent.click(screen.getByTestId('ms-dirty-true'));
 const markClean = () => fireEvent.click(screen.getByTestId('ms-dirty-false'));
+const confirmInDialog = () => fireEvent.click(screen.getByTestId('confirm-yes'));
+const cancelInDialog = () => fireEvent.click(screen.getByTestId('confirm-no'));
 
 const expectPublishDisabled = (value: boolean) =>
     expect(screen.getByTestId('ms-publish-disabled')).toHaveTextContent(String(value));
@@ -151,6 +168,38 @@ describe('ReportsPanelContent', () => {
         });
     });
 
+    describe('Publish confirmation dialog', () => {
+        it('should show confirmation dialog when publish button is clicked', () => {
+            renderComponent();
+
+            expect(screen.queryByTestId('mock-confirmation-modal')).not.toBeInTheDocument();
+
+            clickMsPublish();
+
+            expect(screen.getByTestId('mock-confirmation-modal')).toBeInTheDocument();
+            expect(screen.getByTestId('confirmation-title')).toHaveTextContent('Опублікувати зміни?');
+        });
+
+        it('should close confirmation dialog when НІ is clicked without calling submit', () => {
+            renderComponent();
+
+            clickMsPublish();
+            expect(screen.getByTestId('mock-confirmation-modal')).toBeInTheDocument();
+
+            cancelInDialog();
+
+            expect(screen.queryByTestId('mock-confirmation-modal')).not.toBeInTheDocument();
+            expect(mockSubmit).not.toHaveBeenCalled();
+        });
+
+        it('should not call submit until ТАК is clicked in the dialog', () => {
+            renderComponent();
+
+            clickMsPublish();
+            expect(mockSubmit).not.toHaveBeenCalled();
+        });
+    });
+
     describe('Publish', () => {
         it('should reset dirty state after successful publish', async () => {
             renderComponent();
@@ -160,6 +209,7 @@ describe('ReportsPanelContent', () => {
             expectCancelDisabled(false);
 
             clickMsPublish();
+            confirmInDialog();
 
             await waitFor(() => {
                 expectPublishDisabled(true);
@@ -173,10 +223,25 @@ describe('ReportsPanelContent', () => {
 
             markDirty();
             clickMsPublish();
+            confirmInDialog();
 
             await waitFor(() => {
                 expectPublishDisabled(false);
                 expectCancelDisabled(false);
+            });
+        });
+
+        it('should close the confirmation dialog after confirming publish', async () => {
+            renderComponent();
+
+            markDirty();
+            clickMsPublish();
+            expect(screen.getByTestId('mock-confirmation-modal')).toBeInTheDocument();
+
+            confirmInDialog();
+
+            await waitFor(() => {
+                expect(screen.queryByTestId('mock-confirmation-modal')).not.toBeInTheDocument();
             });
         });
     });

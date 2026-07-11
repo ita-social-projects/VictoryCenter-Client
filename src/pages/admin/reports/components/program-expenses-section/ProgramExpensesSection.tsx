@@ -28,16 +28,15 @@ const INITIAL_PROGRAM_EXPENSES_DATA: ProgramExpensesReadOnlyData = {
 const MAX_PROGRAM_EXPENSE_RECORDS = 4;
 
 interface ProgramExpensesSectionProps {
-    isEditing?: boolean;
     isRowEditMode?: boolean;
     onRowEditModeChange?: (isEditing: boolean) => void;
 }
 
 export const ProgramExpensesSection = ({
-    isEditing = false,
     isRowEditMode: propIsRowEditMode,
     onRowEditModeChange,
 }: ProgramExpensesSectionProps) => {
+    const isEditing = true;
     const adminClient = useAdminClient();
     const { addToast } = useToast();
     const [selectedProgramIds, setSelectedProgramIds] = useState<number[]>([]);
@@ -86,13 +85,6 @@ export const ProgramExpensesSection = ({
                 : validSelectedProgramIds;
         });
     }, [data.programs]);
-
-    useEffect(() => {
-        if (!isEditing) {
-            setIsAddProgramExpenseModalOpen(false);
-            setSelectedRecordIds([]);
-        }
-    }, [isEditing]);
 
     const filteredRecords = useMemo(() => {
         if (selectedProgramIds.length === 0) {

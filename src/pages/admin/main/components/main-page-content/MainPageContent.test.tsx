@@ -114,6 +114,14 @@ const MockFormBlock = ({ testId, btnTestId, onPublish, isPublishDisabled, isRead
             >
                 Normalize Dirty
             </button>
+            <button
+                data-testid={`${btnTestId}-clean-text`}
+                onClick={() => {
+                    setValue('titleUa', 'Test Title', { shouldDirty: true, shouldValidate: true });
+                }}
+            >
+                Clean Text
+            </button>
             <button data-testid={btnTestId} onClick={onPublish} disabled={isPublishDisabled}>
                 Publish
             </button>
@@ -1276,6 +1284,24 @@ describe('MainPageContent', () => {
 
         await waitFor(() => {
             expect(translateIcon).toBeDisabled();
+        });
+    });
+
+    it('re-enables translation icon when changes are reverted', async () => {
+        mockLocalizationToolkitState.translationLanguages = [{ id: 2, code: 'en', name: 'Англійська' }];
+
+        await renderAndLoadContent();
+
+        const translateIcon = screen.getByLabelText('Додати переклад');
+
+        fireEvent.click(screen.getByTestId('publish-btn-dirty'));
+        await waitFor(() => {
+            expect(translateIcon).toBeDisabled();
+        });
+
+        fireEvent.click(screen.getByTestId('publish-btn-clean-text'));
+        await waitFor(() => {
+            expect(translateIcon).not.toBeDisabled();
         });
     });
 });

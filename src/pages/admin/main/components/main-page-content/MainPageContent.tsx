@@ -80,13 +80,6 @@ const TABS: TabItem[] = [
     { id: 'partners', label: MAIN_PAGE_TEXT.TABS.PARTNERS, localizationBlock: MainPageLocalizationBlock.Partners },
 ];
 
-const TRANSLATABLE_BLOCKS = new Set<MainPageLocalizationBlock>([
-    MainPageLocalizationBlock.Title,
-    MainPageLocalizationBlock.AboutUs,
-    MainPageLocalizationBlock.Donations,
-    MainPageLocalizationBlock.Partners,
-]);
-
 const sanitizeMainPageFormValues = (values: MainPageFormValues): MainPageFormValues => ({
     ...values,
     statisticsTitleUa: values.statisticsTitleUa ?? '',
@@ -126,7 +119,16 @@ const areRichTextFieldValuesEqual = (
     normalizeRichTextHtmlForComparison(String(currentValues[field] ?? '')) ===
     normalizeRichTextHtmlForComparison(String(savedValues[field] ?? ''));
 
-const BLOCK_TEXT_FIELDS: Partial<Record<MainPageLocalizationBlock, Array<keyof MainPageFormValues>>> = {
+const TRANSLATABLE_BLOCKS_ARRAY = [
+    MainPageLocalizationBlock.Title,
+    MainPageLocalizationBlock.AboutUs,
+    MainPageLocalizationBlock.Donations,
+    MainPageLocalizationBlock.Partners,
+] as const;
+
+type TranslatableBlock = (typeof TRANSLATABLE_BLOCKS_ARRAY)[number];
+
+const BLOCK_TEXT_FIELDS: Record<TranslatableBlock, Array<keyof MainPageFormValues>> = {
     [MainPageLocalizationBlock.Title]: ['titleUa', 'titleEn', 'descriptionUa', 'descriptionEn'],
     [MainPageLocalizationBlock.AboutUs]: [
         'aboutUsTitleUa',
@@ -148,6 +150,8 @@ const BLOCK_TEXT_FIELDS: Partial<Record<MainPageLocalizationBlock, Array<keyof M
     ],
 };
 
+const TRANSLATABLE_BLOCKS = new Set<MainPageLocalizationBlock>(TRANSLATABLE_BLOCKS_ARRAY);
+
 const hasBlockDirtyTextFields = (
     block: MainPageLocalizationBlock | undefined,
     dirtyFields: Partial<Record<keyof MainPageFormValues, unknown>>,
@@ -156,7 +160,7 @@ const hasBlockDirtyTextFields = (
 ) => {
     if (block == null) return false;
 
-    const blockFields = BLOCK_TEXT_FIELDS[block];
+    const blockFields = BLOCK_TEXT_FIELDS[block as TranslatableBlock];
     if (!blockFields) return false;
 
     return blockFields.some((fieldName) => {
@@ -518,12 +522,7 @@ export const MainPageContent = () => {
         );
 
     const handleOpenTranslationModal = () => {
-        if (
-            isTranslateButtonDisabled ||
-            translationLanguages.length === 0 ||
-            selectedTab.localizationBlock == null ||
-            !TRANSLATABLE_BLOCKS.has(selectedTab.localizationBlock)
-        ) {
+        if (isTranslateButtonDisabled || !canTranslateActiveBlock || selectedTab.localizationBlock == null) {
             return;
         }
 

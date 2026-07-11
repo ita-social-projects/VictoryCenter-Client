@@ -703,4 +703,47 @@ describe('ProgramExpensesSection', () => {
             });
         });
     });
+
+    it('should show error toast if inline record update fails (catch branch)', async () => {
+        const spyUpdate = jest.spyOn(ProgramExpensesApi, 'update').mockRejectedValueOnce(new Error('Network error'));
+
+        render(<ProgramExpensesSection />);
+
+        fireEvent.click(screen.getByLabelText('Edit record 1'));
+
+        fireEvent.click(screen.getByTestId('select-option-Program C-3'));
+
+        const uahInput = screen.getByLabelText('Amount UAH record 1');
+        fireEvent.change(uahInput, { target: { value: '99999' } });
+
+        fireEvent.click(screen.getByLabelText('Accept record 1'));
+
+        await waitFor(() => {
+            expect(mockAddToast).toHaveBeenCalledWith(
+                REPORTS_TEXT.MESSAGE.RECORD_UPDATE_FAILED_RETRY,
+                expect.anything(),
+            );
+        });
+
+        spyUpdate.mockRestore();
+    });
+
+    it('should show error toast if adding a new program expense fails (catch branch)', async () => {
+        const spyPost = jest.spyOn(ProgramExpensesApi, 'post').mockRejectedValueOnce(new Error('API failed'));
+
+        render(<ProgramExpensesSection />);
+
+        fireEvent.click(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE }));
+
+        fireEvent.click(screen.getByTestId('mock-submit-btn'));
+
+        await waitFor(() => {
+            expect(mockAddToast).toHaveBeenCalledWith(
+                PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_CREATE_FAILED_RETRY,
+                expect.anything(),
+            );
+        });
+
+        spyPost.mockRestore();
+    });
 });

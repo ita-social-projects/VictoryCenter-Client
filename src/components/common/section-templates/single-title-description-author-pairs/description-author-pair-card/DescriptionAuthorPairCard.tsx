@@ -109,11 +109,11 @@ export const DescriptionAuthorPairCard = ({
                         onChange={handleDescriptionChange}
                         onBlur={handleDescriptionBlur}
                         maxLength={descriptionMaxLength}
-                        rows={4}
+                        rows={2}
                         placeholder={SECTIONS_TEXT.SECTION.CARD.FORM.DESCRIPTION.PLACEHOLDER}
                         error={descriptionError}
                         maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(descriptionMaxLength)}
-                        autoGrow={true}
+                        autoGrow={false}
                     />
                 </div>
 
@@ -132,7 +132,7 @@ export const DescriptionAuthorPairCard = ({
                         error={authorError}
                         maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(authorMaxLength)}
                         rows={1}
-                        autoGrow={true}
+                        autoGrow={false}
                         maxRows={4}
                     />
                 </div>

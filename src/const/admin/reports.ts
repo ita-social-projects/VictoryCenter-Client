@@ -155,7 +155,7 @@ export const FUNDS_EXPENDITURES_VALIDATION = {
     },
     maxCategoriesPerType: 4,
     categoryNameMin: 5,
-    categoryNameMax: 200,
+    categoryNameMax: 100,
 };
 
 export const PDF_SECTION_LOCALIZATION_VALIDATION = {

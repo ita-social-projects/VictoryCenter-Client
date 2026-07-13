@@ -1,9 +1,8 @@
 import { useCallback, useMemo, useState } from 'react';
-import cn from 'classnames';
 import { FUNDS_EXPENDITURES_TEXT, FUNDS_EXPENDITURES_VALIDATION } from '@/const/admin/reports';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { InputWithCharacterLimit } from '@/components/admin/input-with-character-limit/InputWithCharacterLimit';
-import { Select } from '@/components/common/select/Select';
+import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
+import { SingleSelectInputGroup } from '@/components/admin/input-groups/single-select-input-group/SingleSelectInputGroup';
 import { Modal } from '@/components/common/modal/Modal';
 import { Button } from '@/components/admin/button/Button';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
@@ -11,18 +10,6 @@ import { ReportFundsExpendituresCategory } from '@/types/admin/reports';
 import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
 import { validateFundsExpendituresCategoryName } from '@/validation/admin/reports-schema/funds-expenditures-category-schema/funds-expenditures-category-schema';
 import styles from './EditFundsExpendituresCategoryModal.module.scss';
-
-const renderInputWithError = (
-    input: React.ReactNode,
-    error?: string,
-    inputErrorClass?: string,
-    errorClass?: string,
-) => (
-    <>
-        <div className={cn({ [inputErrorClass || '']: Boolean(error) })}>{input}</div>
-        <p className={cn(errorClass, { [styles.errorHidden]: !error })}>{error ?? ' '}</p>
-    </>
-);
 
 interface EditFundsExpendituresCategoryModalProps {
     isOpen: boolean;
@@ -73,7 +60,7 @@ export const EditFundsExpendituresCategoryModal = ({
     }, []);
 
     const handleCategoryChange = useCallback(
-        (id: number) => {
+        (id: number | undefined) => {
             setSelectedCategoryId(id);
             if (hasNameBeenBlurred) {
                 const newSelected = categories.find((c) => c.id === id);
@@ -145,57 +132,44 @@ export const EditFundsExpendituresCategoryModal = ({
                         <div className={styles.panel}>
                             <div className={styles.form}>
                                 <div className={styles.field}>
-                                    <div className={styles.labelRow}>
-                                        <label className={styles.label}>
-                                            <span className={styles.required}>*</span>
-                                            {FUNDS_EXPENDITURES_TEXT.MODAL.EDIT_CATEGORY.CATEGORY_LABEL}
-                                        </label>
-                                        {selectedCategory && (
-                                            <span className={styles.type}>
-                                                {selectedCategory.type === 'income'
-                                                    ? FUNDS_EXPENDITURES_TEXT.TABLE.TYPE_LABELS.INCOME
-                                                    : FUNDS_EXPENDITURES_TEXT.TABLE.TYPE_LABELS.EXPENSE}
-                                            </span>
-                                        )}
-                                    </div>
-                                    <Select<number | undefined>
-                                        value={selectedCategoryId}
-                                        onValueChange={(val) => handleCategoryChange(val as number)}
+                                    <SingleSelectInputGroup<ReportFundsExpendituresCategory>
+                                        id="edit-category-select"
+                                        label={FUNDS_EXPENDITURES_TEXT.MODAL.EDIT_CATEGORY.CATEGORY_LABEL}
+                                        isRequired
+                                        options={categories}
+                                        value={selectedCategory}
+                                        onChange={(val) => handleCategoryChange(val?.id)}
+                                        getOptionId={(c) => c.id}
+                                        getOptionName={(c) => c.name}
                                         placeholder={FUNDS_EXPENDITURES_TEXT.MODAL.EDIT_CATEGORY.CATEGORY_PLACEHOLDER}
-                                        className={styles.selectContainer}
-                                        headClassName={styles.selectHead}
-                                    >
-                                        {categories.map((c) => (
-                                            <Select.Option key={c.id} value={c.id} name={c.name} />
-                                        ))}
-                                    </Select>
+                                    />
+                                    {selectedCategory && (
+                                        <span className={styles.type}>
+                                            {selectedCategory.type === 'income'
+                                                ? FUNDS_EXPENDITURES_TEXT.TABLE.TYPE_LABELS.INCOME
+                                                : FUNDS_EXPENDITURES_TEXT.TABLE.TYPE_LABELS.EXPENSE}
+                                        </span>
+                                    )}
                                 </div>
 
                                 <div className={styles.field}>
-                                    <label className={styles.label}>
-                                        <span className={styles.required}>*</span>
-                                        {FUNDS_EXPENDITURES_TEXT.MODAL.EDIT_CATEGORY.NAME_LABEL}
-                                    </label>
-                                    {renderInputWithError(
-                                        <InputWithCharacterLimit
-                                            id="edit-category-name"
-                                            name="editCategoryName"
-                                            value={name}
-                                            onChange={(e) => setName(e.target.value)}
-                                            onBlur={handleNameBlur}
-                                            maxLength={FUNDS_EXPENDITURES_VALIDATION.categoryNameMax}
-                                            maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
-                                                FUNDS_EXPENDITURES_VALIDATION.categoryNameMax,
-                                            )}
-                                            placeholder={FUNDS_EXPENDITURES_TEXT.MODAL.EDIT_CATEGORY.NAME_PLACEHOLDER}
-                                            showCounter={true}
-                                            hasError={Boolean(nameError)}
-                                            className={styles.input}
-                                        />,
-                                        nameError,
-                                        styles.inputError,
-                                        styles.error,
-                                    )}
+                                    <TextAreaWithCharacterLimitGroup
+                                        label={FUNDS_EXPENDITURES_TEXT.MODAL.EDIT_CATEGORY.NAME_LABEL}
+                                        isRequired
+                                        id="edit-category-name"
+                                        name="editCategoryName"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        onBlur={handleNameBlur}
+                                        maxLength={FUNDS_EXPENDITURES_VALIDATION.categoryNameMax}
+                                        maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
+                                            FUNDS_EXPENDITURES_VALIDATION.categoryNameMax,
+                                        )}
+                                        placeholder={FUNDS_EXPENDITURES_TEXT.MODAL.EDIT_CATEGORY.NAME_PLACEHOLDER}
+                                        error={nameError}
+                                        className={styles.input}
+                                        rows={1}
+                                    />
                                 </div>
                             </div>
                         </div>

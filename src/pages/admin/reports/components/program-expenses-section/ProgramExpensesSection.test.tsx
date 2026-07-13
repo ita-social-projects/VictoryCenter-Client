@@ -279,6 +279,10 @@ jest.mock('@/components/admin/multi-select-input/MultiSelectInput', () => ({
     },
 }));
 
+afterEach(() => {
+    jest.restoreAllMocks();
+});
+
 describe('ProgramExpensesSection', () => {
     beforeEach(() => {
         jest.clearAllMocks();
@@ -705,7 +709,7 @@ describe('ProgramExpensesSection', () => {
     });
 
     it('should show error toast if inline record update fails (catch branch)', async () => {
-        const spyUpdate = jest.spyOn(ProgramExpensesApi, 'update').mockRejectedValueOnce(new Error('Network error'));
+        jest.spyOn(ProgramExpensesApi, 'update').mockRejectedValueOnce(new Error('Network error'));
 
         render(<ProgramExpensesSection />);
 
@@ -724,8 +728,6 @@ describe('ProgramExpensesSection', () => {
                 expect.anything(),
             );
         });
-
-        spyUpdate.mockRestore();
     });
 
     it('should show error toast if adding a new program expense fails (catch branch)', async () => {

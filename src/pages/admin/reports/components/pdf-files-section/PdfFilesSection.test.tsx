@@ -115,15 +115,23 @@ describe('PdfFilesSection', () => {
 
     const setupDataFetchMock = (options: { setData?: jest.Mock; filesData?: any[] } = {}) => {
         (useDataFetch as jest.Mock).mockImplementation(({ initialData }) => {
+            const React = require('react');
             if (initialData === null) {
+                const [data, setData] = React.useState(mockSectionData);
                 return {
-                    data: mockSectionData,
+                    data,
                     isLoading: false,
                     refetch: mockRefetch,
-                    setData: options.setData ?? jest.fn(),
+                    setData: options.setData ?? setData,
                 };
             }
-            return { data: options.filesData ?? mockFilesResponse.items, isLoading: false, refetch: mockRefetch };
+            const [data, setData] = React.useState(options.filesData ?? mockFilesResponse.items);
+            return {
+                data,
+                isLoading: false,
+                refetch: mockRefetch,
+                setData,
+            };
         });
     };
 
@@ -158,6 +166,7 @@ describe('PdfFilesSection', () => {
             data: null,
             isLoading: true,
             refetch: mockRefetch,
+            setData: jest.fn(),
         });
 
         render(<PdfFilesSection />);
@@ -166,8 +175,13 @@ describe('PdfFilesSection', () => {
 
     it('should render all components when data is loaded', () => {
         (useDataFetch as jest.Mock)
-            .mockReturnValueOnce({ data: mockSectionData, isLoading: false, refetch: mockRefetch })
-            .mockReturnValueOnce({ data: mockFilesResponse.items, isLoading: false, refetch: mockRefetch });
+            .mockReturnValueOnce({ data: mockSectionData, isLoading: false, refetch: mockRefetch, setData: jest.fn() })
+            .mockReturnValueOnce({
+                data: mockFilesResponse.items,
+                isLoading: false,
+                refetch: mockRefetch,
+                setData: jest.fn(),
+            });
 
         render(<PdfFilesSection />);
 
@@ -184,7 +198,7 @@ describe('PdfFilesSection', () => {
         (useDataFetch as jest.Mock).mockImplementation(({ fetchHandler }) => {
             if (!capturedFetchSection) capturedFetchSection = fetchHandler;
             else capturedFetchFiles = fetchHandler;
-            return { data: [], isLoading: false, refetch: mockRefetch };
+            return { data: [], isLoading: false, refetch: mockRefetch, setData: jest.fn() };
         });
 
         render(<PdfFilesSection />);
@@ -204,8 +218,8 @@ describe('PdfFilesSection', () => {
 
     it('should provide default empty content if sectionData is null', () => {
         (useDataFetch as jest.Mock)
-            .mockReturnValueOnce({ data: null, isLoading: false, refetch: mockRefetch })
-            .mockReturnValueOnce({ data: [], isLoading: false, refetch: mockRefetch });
+            .mockReturnValueOnce({ data: null, isLoading: false, refetch: mockRefetch, setData: jest.fn() })
+            .mockReturnValueOnce({ data: [], isLoading: false, refetch: mockRefetch, setData: jest.fn() });
 
         render(<PdfFilesSection />);
 
@@ -404,7 +418,7 @@ describe('PdfFilesSection', () => {
                 if (initialData === null) {
                     return { data: mockSectionData, isLoading: false, refetch: mockRefetch, setData: mockSetData };
                 }
-                return { data: mockFilesResponse.items, isLoading: false, refetch: mockRefetch };
+                return { data: mockFilesResponse.items, isLoading: false, refetch: mockRefetch, setData: jest.fn() };
             });
 
             render(<PdfFilesSection />);

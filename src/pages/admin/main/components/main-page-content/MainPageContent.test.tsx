@@ -114,6 +114,30 @@ const MockFormBlock = ({ testId, btnTestId, onPublish, isPublishDisabled, isRead
             >
                 Normalize Dirty
             </button>
+            <button
+                data-testid={`${btnTestId}-clean-text`}
+                onClick={() => {
+                    setValue('titleUa', 'Test Title', { shouldDirty: true, shouldValidate: true });
+                }}
+            >
+                Clean Text
+            </button>
+            <button
+                data-testid={`${btnTestId}-image-dirty`}
+                onClick={() => {
+                    setValue('image', { url: 'blob:no-id' }, { shouldDirty: true, shouldValidate: true });
+                }}
+            >
+                Make Image Dirty
+            </button>
+            <button
+                data-testid={`${btnTestId}-non-existent-dirty`}
+                onClick={() => {
+                    setValue('nonExistentField', 'value', { shouldDirty: true, shouldValidate: true });
+                }}
+            >
+                Make Non Existent Dirty
+            </button>
             <button data-testid={btnTestId} onClick={onPublish} disabled={isPublishDisabled}>
                 Publish
             </button>
@@ -1262,5 +1286,78 @@ describe('MainPageContent', () => {
         fireEvent.click(screen.getByLabelText('Close modal'));
 
         await waitFor(() => expect(screen.queryByText('Додати переклад')).not.toBeInTheDocument());
+    });
+
+    it('disables the translation icon when text input fields have unpublished changes', async () => {
+        mockLocalizationToolkitState.translationLanguages = [{ id: 2, code: 'en', name: 'Англійська' }];
+
+        await renderAndLoadContent();
+
+        const translateIcon = screen.getByLabelText('Додати переклад');
+        expect(translateIcon).not.toBeDisabled();
+
+        fireEvent.click(screen.getByTestId('publish-btn-dirty'));
+
+        await waitFor(() => {
+            expect(translateIcon).toBeDisabled();
+        });
+    });
+
+    it('re-enables translation icon when changes are reverted', async () => {
+        mockLocalizationToolkitState.translationLanguages = [{ id: 2, code: 'en', name: 'Англійська' }];
+
+        await renderAndLoadContent();
+
+        const translateIcon = screen.getByLabelText('Додати переклад');
+
+        fireEvent.click(screen.getByTestId('publish-btn-dirty'));
+        await waitFor(() => {
+            expect(translateIcon).toBeDisabled();
+        });
+
+        fireEvent.click(screen.getByTestId('publish-btn-clean-text'));
+        await waitFor(() => {
+            expect(translateIcon).not.toBeDisabled();
+        });
+    });
+
+    it('shows error toast when image upload fails during publish', async () => {
+        (ImageApi.post as jest.Mock).mockRejectedValue(new Error('Upload failed'));
+        await renderAndLoadContent();
+
+        await triggerFormDirtyAndOpenModal('publish-btn');
+        fireEvent.click(screen.getByTestId('confirm-publish'));
+
+        await waitFor(() => {
+            expect(mockAddToast).toHaveBeenCalledWith('Помилка під час публікації змін', 'error', 3000);
+        });
+    });
+
+    it('returns empty translation statuses for tab without localizationBlock', async () => {
+        (globalThis as any).__MAIN_PAGE_EXTRA_TABS__ = [
+            {
+                id: 'no-localization',
+                label: 'No Localization',
+                localizationBlock: null,
+            },
+        ];
+
+        await renderAndLoadContent();
+
+        expect(screen.getByTestId('category-bar')).toBeInTheDocument();
+    });
+
+    it('shows publish modal when only non-rich-text field is dirty', async () => {
+        await renderAndLoadContent();
+        fireEvent.click(screen.getByTestId('publish-btn-image-dirty'));
+        const publishBtn = screen.getByTestId('publish-btn');
+        await waitFor(() => expect(publishBtn).not.toBeDisabled());
+    });
+
+    it('shows publish modal when non-existent field is dirty', async () => {
+        await renderAndLoadContent();
+        fireEvent.click(screen.getByTestId('publish-btn-non-existent-dirty'));
+        const publishBtn = screen.getByTestId('publish-btn');
+        await waitFor(() => expect(publishBtn).not.toBeDisabled());
     });
 });

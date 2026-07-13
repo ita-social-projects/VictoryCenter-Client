@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { PdfFilesTable } from './PdfFilesTable';
 import { PDF_FILES_SECTION_TEXT } from '@/const/admin/reports';
@@ -38,10 +38,17 @@ jest.mock('@/assets/icons/checkmark.svg', () => ({
 jest.mock('@/assets/icons/cross.svg', () => ({
     ReactComponent: () => <svg data-testid="cross-icon" />,
 }));
+jest.mock('@/assets/icons/dragger.svg', () => ({
+    ReactComponent: () => <svg data-testid="drag-icon" />,
+}));
 jest.mock('@/components/admin/icon-button/IconButton', () => ({
     IconButton: ({ onClick, disabled, 'aria-label': ariaLabel }: any) => (
         <button onClick={onClick} disabled={disabled} aria-label={ariaLabel} />
     ),
+}));
+
+jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
+    InlineLoader: () => <div data-testid="inline-loader" />,
 }));
 
 jest.mock('@/validation/admin/reports-schema/pdf-file-rename-schema/pdf-file-rename-schema', () => ({
@@ -429,6 +436,173 @@ describe('PdfFilesTable', () => {
                 PDF_FILES_SECTION_TEXT.ACTIONS.FILE.ACCEPT_RENAME,
             ) as HTMLButtonElement;
             expect(acceptButton).toBeDisabled();
+        });
+    });
+
+    describe('Drag and Drop Reordering', () => {
+        it('should display the drag-and-drop icons when files.length > 1', () => {
+            render(<PdfFilesTable {...defaultProps} />);
+            const dragIcons = screen.getAllByTestId('drag-icon');
+            expect(dragIcons.length).toBe(mockFiles.length);
+        });
+
+        it('should not display the drag-and-drop icon when files.length <= 1', () => {
+            render(<PdfFilesTable {...defaultProps} files={[mockFiles[0]]} />);
+            expect(screen.queryByTestId('drag-icon')).not.toBeInTheDocument();
+        });
+
+        it('should disable dragging when isReordering is true', () => {
+            render(<PdfFilesTable {...defaultProps} isReordering={true} />);
+            const rows = screen.getAllByRole('row');
+            const fileRow = rows[1];
+            expect(fileRow.getAttribute('draggable')).toBe('false');
+        });
+
+        it('should handle dragstart, dragover, drop, and dragend events correctly', () => {
+            const onReorderFilesMock = jest.fn();
+            render(<PdfFilesTable {...defaultProps} onReorderFiles={onReorderFilesMock} />);
+
+            const rows = screen.getAllByRole('row');
+            // rows[0] is table header, rows[1] is file 1, rows[2] is file 2
+            const dragRow = rows[1];
+            const dropRow = rows[2];
+
+            const mockDataTransfer = {
+                setData: jest.fn(),
+                getData: jest.fn().mockReturnValue('1'),
+                effectAllowed: '',
+                dropEffect: '',
+            };
+
+            // Trigger dragstart
+            fireEvent.dragStart(dragRow, { dataTransfer: mockDataTransfer });
+            expect(mockDataTransfer.setData).toHaveBeenCalledWith('text/plain', '1');
+
+            // Trigger dragover
+            fireEvent.dragOver(dropRow, { dataTransfer: mockDataTransfer });
+            expect(mockDataTransfer.dropEffect).toBe('move');
+
+            // Trigger drop
+            fireEvent.drop(dropRow, { dataTransfer: mockDataTransfer });
+            expect(onReorderFilesMock).toHaveBeenCalledWith([mockFiles[1], mockFiles[0]]);
+
+            // Trigger dragend
+            fireEvent.dragEnd(dragRow);
+        });
+
+        it('should highlight drop target row on dragover and clear on dragleave/drop', () => {
+            render(<PdfFilesTable {...defaultProps} />);
+            const rows = screen.getAllByRole('row');
+            const dragRow = rows[1];
+            const dropRow = rows[2];
+
+            const mockDataTransfer = {
+                setData: jest.fn(),
+                getData: jest.fn().mockReturnValue('1'),
+                effectAllowed: '',
+                dropEffect: '',
+            };
+
+            // Start drag on row 1
+            fireEvent.dragStart(dragRow, { dataTransfer: mockDataTransfer });
+            expect(dragRow).toHaveClass('row-dragging');
+
+            // Drag over row 2
+            fireEvent.dragOver(dropRow, { dataTransfer: mockDataTransfer });
+            expect(dropRow).toHaveClass('row-drop-target');
+
+            // Drag leave row 2
+            fireEvent.dragLeave(dropRow);
+            expect(dropRow).not.toHaveClass('row-drop-target');
+
+            // Drag over row 2 again
+            fireEvent.dragOver(dropRow, { dataTransfer: mockDataTransfer });
+            expect(dropRow).toHaveClass('row-drop-target');
+
+            // Drop on row 2
+            fireEvent.drop(dropRow, { dataTransfer: mockDataTransfer });
+            expect(dropRow).not.toHaveClass('row-drop-target');
+        });
+
+        it('should reset dragging state if the dragged file is removed from files list', () => {
+            const { rerender } = render(<PdfFilesTable {...defaultProps} />);
+            const rows = screen.getAllByRole('row');
+            const dragRow = rows[1];
+
+            const mockDataTransfer = {
+                setData: jest.fn(),
+                getData: jest.fn(),
+                effectAllowed: '',
+                dropEffect: '',
+            };
+
+            // Start dragging
+            fireEvent.dragStart(dragRow, { dataTransfer: mockDataTransfer });
+            expect(dragRow).toHaveClass('row-dragging');
+
+            // Rerender with the file removed
+            rerender(<PdfFilesTable {...defaultProps} files={[mockFiles[1]]} />);
+
+            // Check that it's no longer marked as dragging
+            const newRows = screen.getAllByRole('row');
+            // Since mockFiles[0] was removed, the only file is mockFiles[1] (which corresponds to row index 1)
+            const remainingRow = newRows[1];
+            expect(remainingRow).not.toHaveClass('row-dragging');
+        });
+    });
+
+    describe('Infinite Scroll and Scroll to Top', () => {
+        it('should render the table-wrapper and handle scroll to bottom', async () => {
+            const mockOnLoadMore = jest.fn();
+            render(<PdfFilesTable {...defaultProps} onLoadMore={mockOnLoadMore} />);
+
+            const wrapper = screen.getByTestId('pdf-files-table-wrapper');
+            expect(wrapper).toBeInTheDocument();
+
+            // Simulate scroll to bottom
+            Object.defineProperty(wrapper, 'scrollHeight', { value: 500, configurable: true });
+            Object.defineProperty(wrapper, 'clientHeight', { value: 100, configurable: true });
+            Object.defineProperty(wrapper, 'scrollTop', { value: 400, configurable: true });
+
+            fireEvent.scroll(wrapper);
+
+            expect(mockOnLoadMore).toHaveBeenCalled();
+        });
+
+        it('should render inline loader when isLoadingMore is true', () => {
+            render(<PdfFilesTable {...defaultProps} isLoadingMore={true} />);
+            expect(screen.getByTestId('inline-loader')).toBeInTheDocument();
+        });
+
+        it('should show scroll-to-top button on scroll and scroll to top on click', async () => {
+            render(<PdfFilesTable {...defaultProps} />);
+            const wrapper = screen.getByTestId('pdf-files-table-wrapper');
+            const btn = screen.getByTestId('pdf-files-table-to-top');
+
+            expect(btn).not.toHaveClass('to-top-button-visible');
+
+            // Simulate scroll down
+            Object.defineProperty(wrapper, 'scrollHeight', { value: 500, configurable: true, writable: true });
+            Object.defineProperty(wrapper, 'clientHeight', { value: 100, configurable: true, writable: true });
+            Object.defineProperty(wrapper, 'scrollTop', { value: 50, configurable: true, writable: true });
+
+            fireEvent.scroll(wrapper);
+
+            await waitFor(() => {
+                expect(btn).toHaveClass('to-top-button-visible');
+            });
+
+            // Spy on scrollTop setter to verify click scrolls to top
+            const scrollTopSpy = jest.fn();
+            Object.defineProperty(wrapper, 'scrollTop', {
+                set: scrollTopSpy,
+                get: () => 50,
+                configurable: true,
+            });
+
+            fireEvent.click(btn);
+
+            expect(scrollTopSpy).toHaveBeenCalledWith(0);
         });
     });
 });

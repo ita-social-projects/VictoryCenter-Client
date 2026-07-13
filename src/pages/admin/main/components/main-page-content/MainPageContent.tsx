@@ -166,11 +166,7 @@ const hasBlockDirtyTextFields = (
     return blockFields.some((fieldName) => {
         if (!dirtyFields[fieldName]) return false;
 
-        if (RICH_TEXT_FORM_FIELD_SET.has(fieldName)) {
-            return !areRichTextFieldValuesEqual(fieldName, currentValues, savedValues);
-        }
-
-        return currentValues[fieldName] !== savedValues[fieldName];
+        return !areRichTextFieldValuesEqual(fieldName, currentValues, savedValues);
     });
 };
 
@@ -180,10 +176,6 @@ const hasRelevantMainPageDirtyFields = (
     savedValues: MainPageFormValues,
 ) => {
     const dirtyFieldNames = Object.keys(dirtyFields);
-
-    if (!dirtyFieldNames.length) {
-        return false;
-    }
 
     return dirtyFieldNames.some((fieldName) => {
         if (!isMainPageFormField(fieldName)) {
@@ -522,11 +514,7 @@ export const MainPageContent = () => {
         );
 
     const handleOpenTranslationModal = () => {
-        if (isTranslateButtonDisabled || !canTranslateActiveBlock || selectedTab.localizationBlock == null) {
-            return;
-        }
-
-        setTranslationBlock(selectedTab.localizationBlock);
+        setTranslationBlock(selectedTab.localizationBlock as MainPageLocalizationBlock);
     };
 
     const handleCloseTranslationModal = () => {

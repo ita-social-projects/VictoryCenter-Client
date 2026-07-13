@@ -141,6 +141,8 @@ export const PDF_FILES_SECTION_TEXT = {
         LOAD_ERROR: 'Не вдалося завантажити файли. Спробуйте ще раз.',
         FAIL_TO_CREATE_TRANSLATION: 'Виникла помилка під час додавання перекладу для PDF секції',
         FAIL_TO_UPDATE_TRANSLATION: 'Виникла помилка під час оновлення перекладу для PDF секції',
+        REORDER_SUCCESS: 'Порядок файлів успішно змінено',
+        REORDER_ERROR: 'Не вдалося змінити порядок файлів. Спробуйте ще раз.',
     },
     DELETE_CONFIRMATION: {
         TITLE: 'Файл буде видалено. Бажаєте продовжити?',

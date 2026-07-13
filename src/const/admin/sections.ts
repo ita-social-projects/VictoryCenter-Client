@@ -37,7 +37,7 @@ export const SECTIONS_TEXT = {
         FORM: {
             TITLE: {
                 TEXT: 'Заголовок',
-                PLACEHOLDER: 'ВВЕДІТЬ НАЗВУ',
+                PLACEHOLDER: 'ВВЕДІТЬ ЗАГОЛОВОК',
             },
             DESCRIPTION: {
                 TEXT: 'Опис',

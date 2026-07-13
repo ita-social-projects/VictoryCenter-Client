@@ -4,13 +4,20 @@ import { FUNDS_EXPENDITURES_TEXT, FUNDS_EXPENDITURES_VALIDATION } from '@/const/
 import { ReportFundsExpendituresCategory } from '@/types/admin/reports';
 import { EditFundsExpendituresCategoryModal } from './EditFundsExpendituresCategoryModal';
 
-jest.mock('@/components/admin/input-with-character-limit/InputWithCharacterLimit', () => ({
-    InputWithCharacterLimit: ({ id, value, onChange, onBlur, placeholder }: any) => (
-        <input data-testid={id} value={value} onChange={onChange} onBlur={onBlur} placeholder={placeholder} />
-    ),
-}));
+jest.mock(
+    '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
+    () => ({
+        TextAreaWithCharacterLimitGroup: ({ id, value, onChange, onBlur, placeholder, error }: any) => (
+            <div>
+                <input data-testid={id} value={value} onChange={onChange} onBlur={onBlur} placeholder={placeholder} />
+                {error && <span>{error}</span>}
+            </div>
+        ),
+    }),
+);
 
-const CATEGORY_SELECT = FUNDS_EXPENDITURES_TEXT.MODAL.EDIT_CATEGORY.CATEGORY_PLACEHOLDER;
+const CATEGORY_PLACEHOLDER = FUNDS_EXPENDITURES_TEXT.MODAL.EDIT_CATEGORY.CATEGORY_PLACEHOLDER;
+const CATEGORY_LABEL = FUNDS_EXPENDITURES_TEXT.MODAL.EDIT_CATEGORY.CATEGORY_LABEL;
 const NAME_INPUT = 'edit-category-name';
 const SAVE_BUTTON = FUNDS_EXPENDITURES_TEXT.MODAL.EDIT_CATEGORY.SUBMIT_BUTTON;
 const MIN_ERROR = COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(FUNDS_EXPENDITURES_VALIDATION.categoryNameMin);
@@ -43,8 +50,10 @@ const renderModal = (
 const getSaveButton = () => screen.getByRole('button', { name: SAVE_BUTTON });
 
 const selectCategory = (name: string) => {
-    fireEvent.click(screen.getByRole('button', { name: CATEGORY_SELECT }));
-    fireEvent.click(screen.getByRole('button', { name }));
+    fireEvent.click(screen.getByLabelText(new RegExp(CATEGORY_LABEL, 'i')));
+
+    const options = screen.getAllByText(name);
+    fireEvent.click(options[options.length - 1]);
 };
 
 const typeName = (value: string) => {
@@ -78,7 +87,8 @@ describe('EditFundsExpendituresCategoryModal', () => {
 
     it('renders category select, name input and save button', () => {
         renderModal();
-        expect(screen.getByRole('button', { name: CATEGORY_SELECT })).toBeInTheDocument();
+        expect(screen.getByLabelText(new RegExp(CATEGORY_LABEL, 'i'))).toBeInTheDocument();
+        expect(screen.getByText(CATEGORY_PLACEHOLDER)).toBeInTheDocument();
         expect(screen.getByTestId(NAME_INPUT)).toBeInTheDocument();
         expect(getSaveButton()).toBeInTheDocument();
     });

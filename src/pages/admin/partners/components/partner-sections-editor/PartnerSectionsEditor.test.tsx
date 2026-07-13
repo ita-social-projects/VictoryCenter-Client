@@ -33,7 +33,7 @@ const mockPartnerSectionFormRender = jest.fn((props: any) => {
             <button
                 type="button"
                 data-testid={`section-publish-${value.localId}`}
-                onClick={() => onPublish(value.localId)}
+                onClick={() => onPublish(value.localId, value)}
                 disabled={disabled}
             >
                 Publish Section
@@ -154,7 +154,7 @@ function getLatestFormProps() {
 
 function openPublishModal(props: any) {
     act(() => {
-        props.onPublish(props.value.localId);
+        props.onPublish(props.value.localId, props.value);
     });
     expect(screen.getByTestId(`confirm-${PARTNERS_TEXT.FORM.TITLE.PUBLISH_SECTION}`)).toBeInTheDocument();
 }

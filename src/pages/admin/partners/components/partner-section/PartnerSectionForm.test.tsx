@@ -139,6 +139,7 @@ describe('PartnerSectionForm', () => {
             <PartnerSectionForm
                 value={defaultSectionValue}
                 errors={defaultSectionErrors}
+                isDirty={true}
                 disabled={false}
                 onChange={jest.fn()}
                 onDelete={jest.fn()}
@@ -164,6 +165,7 @@ describe('PartnerSectionForm', () => {
             <PartnerSectionForm
                 value={defaultSectionValue}
                 errors={defaultSectionErrors}
+                isDirty={true}
                 disabled={false}
                 onChange={onChange}
                 onDelete={jest.fn()}
@@ -190,6 +192,7 @@ describe('PartnerSectionForm', () => {
             <PartnerSectionForm
                 value={defaultSectionValue}
                 errors={defaultSectionErrors}
+                isDirty={true}
                 disabled={false}
                 onChange={onChange}
                 onDelete={jest.fn()}
@@ -215,6 +218,7 @@ describe('PartnerSectionForm', () => {
             <PartnerSectionForm
                 value={defaultSectionValue}
                 errors={defaultSectionErrors}
+                isDirty={true}
                 disabled={false}
                 onChange={onChange}
                 onDelete={jest.fn()}
@@ -250,6 +254,7 @@ describe('PartnerSectionForm', () => {
             <PartnerSectionForm
                 value={defaultSectionValue}
                 errors={defaultSectionErrors}
+                isDirty={true}
                 disabled={false}
                 onChange={onChange}
                 onDelete={jest.fn()}
@@ -283,6 +288,7 @@ describe('PartnerSectionForm', () => {
             <PartnerSectionForm
                 value={defaultSectionValue}
                 errors={defaultSectionErrors}
+                isDirty={true}
                 disabled={false}
                 onChange={onChange}
                 onDelete={jest.fn()}
@@ -309,6 +315,7 @@ describe('PartnerSectionForm', () => {
             <PartnerSectionForm
                 value={defaultSectionValue}
                 errors={defaultSectionErrors}
+                isDirty={true}
                 disabled={false}
                 onChange={jest.fn()}
                 onDelete={jest.fn()}
@@ -324,6 +331,7 @@ describe('PartnerSectionForm', () => {
             <PartnerSectionForm
                 value={defaultSectionValue}
                 errors={defaultSectionErrors}
+                isDirty={true}
                 disabled={false}
                 onChange={jest.fn()}
                 onDelete={jest.fn()}
@@ -341,6 +349,7 @@ describe('PartnerSectionForm', () => {
             <PartnerSectionForm
                 value={defaultSectionValue}
                 errors={defaultSectionErrors}
+                isDirty={true}
                 disabled={false}
                 onChange={jest.fn()}
                 onDelete={jest.fn()}
@@ -362,6 +371,7 @@ describe('PartnerSectionForm', () => {
             <PartnerSectionForm
                 value={valueWithoutImage}
                 errors={errorsWithImageIssue}
+                isDirty={true}
                 disabled={false}
                 onChange={jest.fn()}
                 onDelete={jest.fn()}
@@ -379,6 +389,7 @@ describe('PartnerSectionForm', () => {
             <PartnerSectionForm
                 value={defaultSectionValue}
                 errors={errorsWithImageIssue}
+                isDirty={true}
                 disabled={false}
                 onChange={jest.fn()}
                 onDelete={jest.fn()}
@@ -394,6 +405,7 @@ describe('PartnerSectionForm', () => {
             <PartnerSectionForm
                 value={defaultSectionValue}
                 errors={defaultSectionErrors}
+                isDirty={true}
                 disabled={true}
                 onChange={jest.fn()}
                 onDelete={jest.fn()}
@@ -414,6 +426,7 @@ describe('PartnerSectionForm', () => {
             <PartnerSectionForm
                 value={defaultSectionValue}
                 errors={defaultSectionErrors}
+                isDirty={true}
                 disabled={false}
                 onChange={jest.fn()}
                 onDelete={onDelete}
@@ -425,7 +438,7 @@ describe('PartnerSectionForm', () => {
         fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED }));
 
         expect(onDelete).toHaveBeenCalledWith(defaultSectionValue.localId);
-        expect(onPublish).toHaveBeenCalledWith(defaultSectionValue.localId);
+        expect(onPublish).toHaveBeenCalledWith(defaultSectionValue.localId, defaultSectionValue);
     });
 
     it('does not push deleted id when partner has no persisted id', () => {
@@ -436,6 +449,7 @@ describe('PartnerSectionForm', () => {
             <PartnerSectionForm
                 value={{ ...defaultSectionValue, partners: [partnerWithoutId] }}
                 errors={defaultSectionErrors}
+                isDirty={true}
                 disabled={false}
                 onChange={onChange}
                 onDelete={jest.fn()}
@@ -446,5 +460,48 @@ describe('PartnerSectionForm', () => {
         fireEvent.click(screen.getByTestId(`partner-delete-${partnerWithoutId.localId}`));
 
         expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ deletedPartnerIds: [] }), expect.anything());
+    });
+
+    it('disables publish button when not dirty', () => {
+        render(
+            <PartnerSectionForm
+                value={defaultSectionValue}
+                errors={defaultSectionErrors}
+                isDirty={false}
+                disabled={false}
+                onChange={jest.fn()}
+                onDelete={jest.fn()}
+                onPublish={jest.fn()}
+            />,
+        );
+        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
+    });
+
+    it('enables publish button only when dirty and valid', () => {
+        const { rerender } = render(
+            <PartnerSectionForm
+                value={defaultSectionValue}
+                errors={defaultSectionErrors}
+                isDirty={false}
+                disabled={false}
+                onChange={jest.fn()}
+                onDelete={jest.fn()}
+                onPublish={jest.fn()}
+            />,
+        );
+        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
+
+        rerender(
+            <PartnerSectionForm
+                value={defaultSectionValue}
+                errors={defaultSectionErrors}
+                isDirty={true}
+                disabled={false}
+                onChange={jest.fn()}
+                onDelete={jest.fn()}
+                onPublish={jest.fn()}
+            />,
+        );
+        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeEnabled();
     });
 });

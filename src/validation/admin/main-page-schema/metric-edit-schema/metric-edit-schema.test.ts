@@ -55,6 +55,24 @@ describe('metricEditSchema', () => {
     it('requires prefix', async () => {
         await expect(metricEditSchema.validate({ ...validPayload, prefix: undefined })).rejects.toThrow();
     });
+
+    it('rejects empty string value and hits all internal test empty branches', async () => {
+        await expect(
+            metricEditSchema.validate({ ...validPayload, value: '' }, { abortEarly: false }),
+        ).rejects.toThrow();
+    });
+
+    it('rejects undefined value and hits all internal test empty branches', async () => {
+        await expect(
+            metricEditSchema.validate({ ...validPayload, value: undefined }, { abortEarly: false }),
+        ).rejects.toThrow();
+    });
+
+    it('rejects value with leading zero followed by digits', async () => {
+        await expect(metricEditSchema.validate({ ...validPayload, value: '01' })).rejects.toThrow(
+            MAIN_PAGE_VALIDATION.editPanel.value.ONLY_NUMBERS,
+        );
+    });
 });
 
 describe('raisedMetricEditSchema', () => {
@@ -95,6 +113,18 @@ describe('raisedMetricEditSchema', () => {
         await expect(raisedMetricEditSchema.validate({ ...validRaisedPayload, valueUah: '0' })).rejects.toThrow(
             MAIN_PAGE_VALIDATION.raisedFunds.ZERO,
         );
+    });
+
+    it('rejects empty string valueUah and hits all internal test empty branches', async () => {
+        await expect(
+            raisedMetricEditSchema.validate({ ...validRaisedPayload, valueUah: '' }, { abortEarly: false }),
+        ).rejects.toThrow();
+    });
+
+    it('rejects undefined valueUah and hits all internal test empty branches', async () => {
+        await expect(
+            raisedMetricEditSchema.validate({ ...validRaisedPayload, valueUah: undefined }, { abortEarly: false }),
+        ).rejects.toThrow();
     });
 
     it('rejects negative USD value with negative-specific message', async () => {

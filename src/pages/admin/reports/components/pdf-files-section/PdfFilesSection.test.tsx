@@ -33,7 +33,16 @@ jest.mock('./components/pdf-section-content-block/PdfSectionContentBlock', () =>
 let capturedOnReorderFiles: ((reordered: any[]) => void) | undefined;
 
 jest.mock('./components/pdf-files-table/PdfFilesTable', () => ({
-    PdfFilesTable: ({ files, onDeleteFile, onViewFile, onRenameFile, onReorderFiles, isDeleting, isRenaming }: any) => {
+    PdfFilesTable: ({
+        files,
+        onDeleteFile,
+        onViewFile,
+        onRenameFile,
+        onReorderFiles,
+        isDeleting,
+        isRenaming,
+        onLoadMore,
+    }: any) => {
         capturedOnReorderFiles = onReorderFiles;
         return (
             <div data-testid="files-table">
@@ -52,13 +61,20 @@ jest.mock('./components/pdf-files-table/PdfFilesTable', () => ({
                 <button onClick={() => onReorderFiles && onReorderFiles(files)} data-testid="reorder-btn">
                     Reorder
                 </button>
+                <button onClick={() => onLoadMore && onLoadMore()} data-testid="load-more-btn">
+                    Load More
+                </button>
             </div>
         );
     },
 }));
 
 jest.mock('./components/language-switcher-buttons/LanguageSwitcherButtons', () => ({
-    LanguageSwitcherButtons: () => <div data-testid="lang-switcher">LanguageSwitcher</div>,
+    LanguageSwitcherButtons: ({ onLanguageChange }: any) => (
+        <button data-testid="lang-switcher" onClick={() => onLanguageChange('en')}>
+            LanguageSwitcher
+        </button>
+    ),
 }));
 
 jest.mock('./components/pdf-dropzone/PdfDropzone', () => ({
@@ -543,5 +559,158 @@ describe('PdfFilesSection', () => {
             expect(mockSetFilesData).toHaveBeenCalledTimes(2);
             expect(mockAddToast).toHaveBeenCalledWith(PDF_FILES_SECTION_TEXT.MESSAGE.REORDER_ERROR, ToastType.Error);
         });
+    });
+
+    it('should call addToast when useLocalizationToolkit triggers setErrorState', () => {
+        let capturedSetErrorState: any;
+        const { useLocalizationToolkit } = require('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit');
+        (useLocalizationToolkit as jest.Mock).mockImplementation((options) => {
+            capturedSetErrorState = options.setErrorState;
+            return { translationLanguages: [], allLanguages: [{ id: 1, code: 'uk', name: 'Ukrainian' }] };
+        });
+
+        setupDataFetchMock();
+        render(<PdfFilesSection />);
+        act(() => {
+            capturedSetErrorState('Test Error Message');
+        });
+        expect(mockAddToast).toHaveBeenCalledWith('Test Error Message', ToastType.Error);
+    });
+
+    it('should handle language change correctly', async () => {
+        setupDataFetchMock();
+        render(<PdfFilesSection />);
+
+        fireEvent.click(screen.getByTestId('lang-switcher'));
+
+        await waitFor(() => {
+            expect(screen.getByTestId('files-table')).toHaveTextContent('Files Count: 0');
+        });
+    });
+
+    it('should load more files successfully', async () => {
+        let filesFetchHandler: any;
+
+        (useDataFetch as jest.Mock).mockImplementation(({ initialData, fetchHandler }) => {
+            if (initialData === null) {
+                return { data: mockSectionData, isLoading: false, refetch: mockRefetch, setData: jest.fn() };
+            }
+            filesFetchHandler = fetchHandler;
+            return { data: [{ id: 1 }], isLoading: false, refetch: mockRefetch, setData: jest.fn() };
+        });
+
+        render(<PdfFilesSection />);
+
+        (PdfReportsApi.getAll as jest.Mock).mockResolvedValueOnce({ items: [{ id: 1 }], totalItemsCount: 5 });
+
+        await act(async () => {
+            await filesFetchHandler();
+        });
+
+        (PdfReportsApi.getAll as jest.Mock).mockResolvedValueOnce({
+            items: [{ id: 2 }, { id: 3 }],
+            totalItemsCount: 5,
+        });
+
+        fireEvent.click(screen.getByTestId('load-more-btn'));
+
+        await waitFor(() => {
+            expect(PdfReportsApi.getAll).toHaveBeenCalledWith(mockClient, { offset: 1, limit: 20, languageId: 1 });
+        });
+    });
+
+    it('should handle load more error gracefully', async () => {
+        let filesFetchHandler: any;
+
+        (useDataFetch as jest.Mock).mockImplementation(({ initialData, fetchHandler }) => {
+            if (initialData === null) {
+                return { data: mockSectionData, isLoading: false, refetch: mockRefetch, setData: jest.fn() };
+            }
+            filesFetchHandler = fetchHandler;
+            return { data: [{ id: 1 }], isLoading: false, refetch: mockRefetch, setData: jest.fn() };
+        });
+
+        render(<PdfFilesSection />);
+
+        (PdfReportsApi.getAll as jest.Mock).mockResolvedValueOnce({ items: [{ id: 1 }], totalItemsCount: 5 });
+
+        await act(async () => {
+            await filesFetchHandler();
+        });
+
+        (PdfReportsApi.getAll as jest.Mock).mockRejectedValueOnce(new Error('Load more failed'));
+
+        fireEvent.click(screen.getByTestId('load-more-btn'));
+
+        await waitFor(() => {
+            expect(mockAddToast).toHaveBeenCalledWith(PDF_FILES_SECTION_TEXT.MESSAGE.LOAD_ERROR, ToastType.Error);
+        });
+    });
+
+    it('should not load more if currentLength >= totalCount', async () => {
+        let filesFetchHandler: any;
+
+        (useDataFetch as jest.Mock).mockImplementation(({ initialData, fetchHandler }) => {
+            if (initialData === null) {
+                return { data: mockSectionData, isLoading: false, refetch: mockRefetch, setData: jest.fn() };
+            }
+            filesFetchHandler = fetchHandler;
+            return { data: [{ id: 1 }, { id: 2 }], isLoading: false, refetch: mockRefetch, setData: jest.fn() };
+        });
+
+        render(<PdfFilesSection />);
+
+        (PdfReportsApi.getAll as jest.Mock).mockResolvedValueOnce({
+            items: [{ id: 1 }, { id: 2 }],
+            totalItemsCount: 2,
+        });
+
+        await act(async () => {
+            await filesFetchHandler();
+        });
+
+        (PdfReportsApi.getAll as jest.Mock).mockClear();
+
+        fireEvent.click(screen.getByTestId('load-more-btn'));
+
+        expect(PdfReportsApi.getAll).not.toHaveBeenCalled();
+    });
+
+    it('should revert optimistic update if refetchFiles fails after upload', async () => {
+        const mockFailingRefetch = jest.fn().mockRejectedValue(new Error('Refetch failed'));
+
+        let filesDataState: any[] = [];
+        const setFilesData = jest.fn((action) => {
+            filesDataState = typeof action === 'function' ? action(filesDataState) : action;
+        });
+
+        (useDataFetch as jest.Mock).mockImplementation(({ initialData }) => {
+            if (initialData === null) {
+                return { data: mockSectionData, isLoading: false, refetch: mockRefetch, setData: jest.fn() };
+            }
+            return { data: filesDataState, isLoading: false, refetch: mockFailingRefetch, setData: setFilesData };
+        });
+
+        render(<PdfFilesSection />);
+
+        fireEvent.click(screen.getByTestId('dropzone'));
+
+        await waitFor(() => {
+            expect(filesDataState.length).toBe(0);
+        });
+    });
+
+    it('should console.error and return if reordered files count mismatches', async () => {
+        setupDataFetchMock({ filesData: [{ id: 1 }, { id: 2 }] });
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+
+        render(<PdfFilesSection />);
+
+        await act(async () => {
+            capturedOnReorderFiles!([{ id: 1 }]);
+        });
+
+        expect(consoleSpy).toHaveBeenCalledWith('File count mismatch during reorder');
+        consoleSpy.mockRestore();
     });
 });

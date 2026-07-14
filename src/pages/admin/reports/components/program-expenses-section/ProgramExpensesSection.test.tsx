@@ -279,10 +279,6 @@ jest.mock('@/components/admin/multi-select-input/MultiSelectInput', () => ({
     },
 }));
 
-afterEach(() => {
-    jest.restoreAllMocks();
-});
-
 describe('ProgramExpensesSection', () => {
     beforeEach(() => {
         jest.clearAllMocks();
@@ -703,7 +699,7 @@ describe('ProgramExpensesSection', () => {
                 const selectionRow = deleteButton.closest('div')?.parentElement;
                 expect(selectionRow).toHaveAttribute('aria-hidden', 'true');
                 expect(screen.getByRole('checkbox', { name: 'Select record 1' })).not.toBeChecked();
-                expect(screen.getByRole('checkbox', { name: 'Select record 1' })).toBeEnabled();
+                expect(screen.getByRole('checkbox', { name: 'Select record 1' })).toBeDisabled();
             });
         });
     });
@@ -731,7 +727,7 @@ describe('ProgramExpensesSection', () => {
     });
 
     it('should show error toast if adding a new program expense fails (catch branch)', async () => {
-        const spyPost = jest.spyOn(ProgramExpensesApi, 'post').mockRejectedValueOnce(new Error('API failed'));
+        jest.spyOn(ProgramExpensesApi, 'post').mockRejectedValueOnce(new Error('API failed'));
 
         render(<ProgramExpensesSection />);
 
@@ -745,7 +741,5 @@ describe('ProgramExpensesSection', () => {
                 expect.anything(),
             );
         });
-
-        spyPost.mockRestore();
     });
 });

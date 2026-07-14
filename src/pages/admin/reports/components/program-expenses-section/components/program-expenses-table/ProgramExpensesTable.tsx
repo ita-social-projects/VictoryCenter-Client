@@ -372,7 +372,7 @@ export const ProgramExpensesTable = ({
                                             <td className={cn(styles.td, styles['checkbox-td'])}>
                                                 <input
                                                     type="checkbox"
-                                                    disabled={isAnyRowEditing && !isEditedRow}
+                                                    disabled={isAnyRowEditing}
                                                     className={styles['row-checkbox']}
                                                     aria-label={`Select record ${record.id}`}
                                                     checked={selectedRecordIds.includes(record.id)}

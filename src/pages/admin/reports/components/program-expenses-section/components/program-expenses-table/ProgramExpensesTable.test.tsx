@@ -243,7 +243,7 @@ describe('ProgramExpensesTable', () => {
         expect(screen.getByLabelText('Close edit for record 1')).toBeInTheDocument();
 
         // Checkboxes and other edit buttons should be disabled
-        expect(screen.getByRole('checkbox', { name: 'Select record 1' })).toBeEnabled();
+        expect(screen.getByRole('checkbox', { name: 'Select record 1' })).toBeDisabled();
         expect(screen.getByRole('checkbox', { name: 'Select record 2' })).toBeDisabled();
         expect(screen.getByRole('button', { name: 'Edit record 2' })).toBeDisabled();
         expect(screen.getByRole('button', { name: 'Delete record 2' })).toBeDisabled();
@@ -401,7 +401,7 @@ describe('ProgramExpensesTable', () => {
 
         expect(screen.getByRole('button', { name: 'Edit record 2' })).toBeDisabled();
         expect(screen.getByRole('button', { name: 'Delete record 2' })).toBeDisabled();
-        expect(screen.getByRole('checkbox', { name: 'Select record 1' })).toBeEnabled();
+        expect(screen.getByRole('checkbox', { name: 'Select record 1' })).toBeDisabled();
         expect(screen.getByRole('checkbox', { name: 'Select record 2' })).toBeDisabled();
     });
 

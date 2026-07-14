@@ -505,7 +505,7 @@ describe('PdfFilesSection', () => {
         const mockSetFilesData = jest.fn();
         setupDataFetchMock({ setFilesData: mockSetFilesData });
 
-        let rejectReorder: (reason: any) => void = () => { };
+        let rejectReorder: (reason: any) => void = () => {};
         const reorderPromise = new Promise((_, reject) => {
             rejectReorder = reject;
         });

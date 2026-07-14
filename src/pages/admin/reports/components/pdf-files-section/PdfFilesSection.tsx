@@ -190,7 +190,7 @@ export const PdfFilesSection = () => {
 
             try {
                 await refetchFiles();
-            } catch { }
+            } catch {}
         },
         [client, addToast, refetchFiles, setFetchedFiles],
     );

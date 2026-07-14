@@ -1,5 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
 import { useCommonMemberFields } from './useCommonMemberFields';
+import { TEAM_MEMBER_VALIDATION } from '@/const/admin/team';
 
 describe('useCommonMemberFields', () => {
     const initialFormState = {
@@ -75,6 +76,108 @@ describe('useCommonMemberFields', () => {
         const newState = updaterFn({ fullName: '', description: '' });
         expect(newState.fullName).toBe('');
         expect(newState.description).toBe('Test description');
+    });
+
+    it('should report digits error immediately on fullName change, without blur', () => {
+        const { result } = renderHook(() =>
+            useCommonMemberFields({
+                formState: initialFormState,
+                setFormState,
+                setErrors,
+            }),
+        );
+
+        act(() => {
+            result.current.handleFullNameChange({
+                target: { value: 'John123' },
+            } as React.ChangeEvent<HTMLInputElement>);
+        });
+
+        expect(setErrors).toHaveBeenCalledWith(expect.any(Function));
+
+        const updaterFn = setErrors.mock.calls[0][0];
+        const newErrors = updaterFn({});
+        expect(newErrors.fullName).toEqual([TEAM_MEMBER_VALIDATION.fullName.getDigitsError()]);
+    });
+
+    it('should report invalid-chars error immediately on fullName change, without blur', () => {
+        const { result } = renderHook(() =>
+            useCommonMemberFields({
+                formState: initialFormState,
+                setFormState,
+                setErrors,
+            }),
+        );
+
+        act(() => {
+            result.current.handleFullNameChange({
+                target: { value: 'John#Doe' },
+            } as React.ChangeEvent<HTMLInputElement>);
+        });
+
+        const updaterFn = setErrors.mock.calls[0][0];
+        const newErrors = updaterFn({});
+        expect(newErrors.fullName).toEqual([TEAM_MEMBER_VALIDATION.fullName.getInvalidCharsError()]);
+    });
+
+    it('should clear fullName error on change when value becomes valid', () => {
+        const { result } = renderHook(() =>
+            useCommonMemberFields({
+                formState: initialFormState,
+                setFormState,
+                setErrors,
+            }),
+        );
+
+        act(() => {
+            result.current.handleFullNameChange({
+                target: { value: 'John Doe' },
+            } as React.ChangeEvent<HTMLInputElement>);
+        });
+
+        const updaterFn = setErrors.mock.calls[0][0];
+        const newErrors = updaterFn({ fullName: [TEAM_MEMBER_VALIDATION.fullName.getDigitsError()] });
+        expect(newErrors.fullName).toBeUndefined();
+    });
+
+    it('should report min-length error immediately on description change, without blur', () => {
+        const { result } = renderHook(() =>
+            useCommonMemberFields({
+                formState: initialFormState,
+                setFormState,
+                setErrors,
+            }),
+        );
+
+        act(() => {
+            result.current.handleDescriptionChange({
+                target: { value: 'short' },
+            } as React.ChangeEvent<HTMLTextAreaElement>);
+        });
+
+        const updaterFn = setErrors.mock.calls[0][0];
+        const newErrors = updaterFn({});
+        expect(newErrors.description).toBe(TEAM_MEMBER_VALIDATION.description.getMinError());
+    });
+
+    it('should clear description error on change when value becomes valid', () => {
+        const { result } = renderHook(() =>
+            useCommonMemberFields({
+                formState: initialFormState,
+                setFormState,
+                setErrors,
+            }),
+        );
+
+        act(() => {
+            result.current.handleDescriptionChange({
+                target: { value: 'Valid description text' },
+            } as React.ChangeEvent<HTMLTextAreaElement>);
+        });
+
+        const updaterFn = setErrors.mock.calls[0][0];
+        const newErrors = updaterFn({ description: TEAM_MEMBER_VALIDATION.description.getMinError() });
+        expect(newErrors.description).toBeUndefined();
     });
 
     it('should call handleFullNameBlur without errors', () => {

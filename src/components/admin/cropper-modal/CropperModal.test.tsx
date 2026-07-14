@@ -207,6 +207,11 @@ describe('CropModal', () => {
         expect(imgElement).toHaveAttribute('src', `data:${MockImageValue.mimeType};base64,${MockImageValue.base64}`);
     });
 
+    it('Renders the crop target size text below the image', () => {
+        render(<CropModal {...defaultProps} width={1440} height={860} />);
+        expect(screen.getByText('Розмір фото: 1440x860')).toBeInTheDocument();
+    });
+
     it('Calls onCancel when "Cancel" button is clicked', () => {
         render(<CropModal {...defaultProps} />);
         const cancelButton = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.NO);

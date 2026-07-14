@@ -87,6 +87,13 @@ export const ProgramExpensesSection = ({
         });
     }, [data.programs]);
 
+    useEffect(() => {
+        if (!isEditing) {
+            setIsAddProgramExpenseModalOpen(false);
+            setSelectedRecordIds([]);
+        }
+    }, [isEditing]);
+
     const filteredRecords = useMemo(() => {
         if (selectedProgramIds.length === 0) {
             return data.records;

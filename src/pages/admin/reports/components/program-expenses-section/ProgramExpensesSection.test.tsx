@@ -494,6 +494,12 @@ describe('ProgramExpensesSection', () => {
         expect(screen.getByText(PROGRAM_EXPENSES_TEXT.MODAL.DELETE.TITLE)).toBeInTheDocument();
     });
 
+    it('should not show delete icons when not in edit mode', () => {
+        render(<ProgramExpensesSection isEditing={false} />);
+
+        expect(screen.queryByLabelText('Delete record 1')).not.toBeInTheDocument();
+    });
+
     it('should close delete modal when Cancel is clicked without calling API', () => {
         render(<ProgramExpensesSection />);
 
@@ -684,6 +690,16 @@ describe('ProgramExpensesSection', () => {
                 expect(mockAddToast).toHaveBeenCalledWith(REPORTS_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY, 'success');
                 expect(mockRefetch).toHaveBeenCalled();
             });
+        });
+
+        it('should cancel inline edit when isEditing turns off', () => {
+            const { rerender } = render(<ProgramExpensesSection isEditing />);
+
+            fireEvent.click(screen.getByLabelText('Edit record 1'));
+            expect(screen.getByLabelText('Accept record 1')).toBeInTheDocument();
+
+            rerender(<ProgramExpensesSection isEditing={false} />);
+            expect(screen.queryByLabelText('Accept record 1')).not.toBeInTheDocument();
         });
 
         it('should clear bulk selection and hide bulk selection bar when row edit starts', async () => {

@@ -58,14 +58,17 @@ const changedLivesSchema = Yup.object({
             COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.title.max),
         ),
     changedLives: Yup.number()
+        .typeError(REPORTS_TEXT.MESSAGE.INVALID_VALUE)
+        .transform((value, originalValue) => (String(originalValue).trim() === '' ? undefined : value))
         .required(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED)
         .integer(REPORTS_TEXT.MESSAGE.INVALID_VALUE)
-        .min(2, COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(2))
+        .min(
+            10 ** (REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.changedLives.min - 1),
+            REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.changedLives.getMinError(),
+        )
         .max(
             10 ** REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.changedLives.max - 1,
-            COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
-                REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.changedLives.max,
-            ),
+            REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION.changedLives.getMaxError(),
         ),
 });
 
@@ -86,7 +89,7 @@ export const REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS = {
             return error.message;
         }
     },
-    validateChangedLives: (value: number): string | undefined => {
+    validateTotalAmount: (value: number | string): string | undefined => {
         try {
             changedLivesSchema.validateSyncAt('changedLives', { changedLives: value });
             return undefined;

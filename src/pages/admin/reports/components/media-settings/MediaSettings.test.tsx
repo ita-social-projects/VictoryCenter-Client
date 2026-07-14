@@ -60,7 +60,7 @@ jest.mock('@/validation/admin/reports-schema/reports-media-settings/reports-medi
     REPORTS_CHANGED_LIVES_VALIDATION_FUNCTIONS: {
         validateTitle: jest.fn(),
         validateTitleEn: jest.fn(),
-        validateChangedLives: jest.fn(),
+        validateTotalAmount: jest.fn(),
     },
 }));
 

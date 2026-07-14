@@ -27,7 +27,7 @@ export const REPORTS_TEXT = {
         SUCCESSFULLY_PUBLISHED: 'Успішно опубліковано',
         RECORD_UPDATED_SUCCESSFULLY: 'Зміни збережено успішно',
         RECORD_UPDATE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
-        INVALID_VALUE: 'Значення повинно бути числом',
+        INVALID_VALUE: 'Поле може містити лише цілі цифри',
     },
     REPORT_AND_ANALYTICS: {
         TITLE: 'Управління фінансами',
@@ -61,7 +61,10 @@ export const REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION = {
         getRequiredError: () => `Заголовок обов'язковий`,
     },
     changedLives: {
+        min: 2,
         max: 10,
+        getMinError: () => 'Не менше 2 цифр',
+        getMaxError: () => 'Не більше 10 цифр',
     },
     image: {
         width: 280,

@@ -138,7 +138,7 @@ describe('PdfFilesSection', () => {
                 data,
                 isLoading: false,
                 refetch: mockRefetch,
-                setData,
+                setData: options.setFilesData ?? setData,
             };
         });
     };

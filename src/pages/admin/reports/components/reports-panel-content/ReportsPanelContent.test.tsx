@@ -51,20 +51,23 @@ jest.mock('@/components/admin/toast/toast-container/ToastContainer', () => ({
     ToastContainer: () => <div data-testid="mock-toast-container" />,
 }));
 
-jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
-    ConfirmationModal: (props: any) =>
-        props.isOpen ? (
-            <div data-testid="mock-confirmation-modal">
-                <span data-testid="confirmation-title">{props.title}</span>
-                <button data-testid="confirm-yes" onClick={props.onConfirm}>
-                    ТАК
-                </button>
-                <button data-testid="confirm-no" onClick={props.onCancel}>
-                    НІ
-                </button>
-            </div>
-        ) : null,
-}));
+jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => {
+    const { COMMON_TEXT_ADMIN } = require('@/const/admin/common');
+    return {
+        ConfirmationModal: (props: any) =>
+            props.isOpen ? (
+                <div data-testid="mock-confirmation-modal">
+                    <span data-testid="confirmation-title">{props.title}</span>
+                    <button data-testid="confirm-yes" onClick={props.onConfirm}>
+                        {COMMON_TEXT_ADMIN.BUTTON.YES}
+                    </button>
+                    <button data-testid="confirm-no" onClick={props.onCancel}>
+                        {COMMON_TEXT_ADMIN.BUTTON.NO}
+                    </button>
+                </div>
+            ) : null,
+    };
+});
 
 jest.mock('./ReportsPanelContent.module.scss', () => ({
     root: 'root',
@@ -201,7 +204,7 @@ describe('ReportsPanelContent', () => {
     });
 
     describe('Publish', () => {
-        it('should reset dirty state after successful publish', async () => {
+        it('should reset dirty state after successfully confirming publish', async () => {
             renderComponent();
 
             markDirty();
@@ -217,7 +220,7 @@ describe('ReportsPanelContent', () => {
             });
         });
 
-        it('should keep dirty state when publish fails', async () => {
+        it('should keep dirty state when confirmed publish fails', async () => {
             mockSubmit.mockResolvedValue(false);
             renderComponent();
 

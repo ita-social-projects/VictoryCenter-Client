@@ -27,15 +27,18 @@ export const ReportsPanelContent = () => {
         setSelectedTab(tab);
     }, []);
 
-    const handlePublish = useCallback(() => {
+    const handlePublishClick = useCallback(() => {
         setIsConfirmOpen(true);
     }, []);
 
     const handleConfirmPublish = useCallback(async () => {
-        setIsConfirmOpen(false);
-        const result = await mediaSettingsRef.current?.submit();
-        if (result) {
-            setIsDirty(false);
+        try {
+            const result = await mediaSettingsRef.current?.submit();
+            if (result) {
+                setIsDirty(false);
+            }
+        } finally {
+            setIsConfirmOpen(false);
         }
     }, []);
 
@@ -58,7 +61,7 @@ export const ReportsPanelContent = () => {
                     resetCounter={resetCounter}
                     onDirtyChange={handleDirtyChange}
                     onCancel={handleCancel}
-                    onPublish={handlePublish}
+                    onPublish={handlePublishClick}
                     isPublishDisabled={!isDirty}
                     isCancelDisabled={!isDirty}
                     isActive={isMediaSettingsTab}

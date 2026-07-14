@@ -154,12 +154,22 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate, templates }
             });
         }
 
+        const getSectionTitle = () => {
+            if (templateId === SectionTemplate.SingleTitleDescriptionAuthorPairs) {
+                return SECTIONS_TEXT.SECTION.SINGLE_TITLE_DESCRIPTION_AUTHOR_PAIRS.DEFAULT_TITLE;
+            }
+            return SECTIONS_TEXT.SECTION.TITLE_SAMPLE_TEXT;
+        };
+
         return renderProgramSection({
             templateId,
             data: cards
-                ? { cards }
+                ? {
+                      cards,
+                      title: getSectionTitle(),
+                  }
                 : {
-                      title: SECTIONS_TEXT.SECTION.TITLE_SAMPLE_TEXT,
+                      title: getSectionTitle(),
                       description: SECTIONS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT,
                       descriptions: getPlaceholderDescriptions(templateId),
                       images: getPlaceholderImages(templateId),

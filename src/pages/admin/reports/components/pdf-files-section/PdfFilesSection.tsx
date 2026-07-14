@@ -49,6 +49,7 @@ export const PdfFilesSection = () => {
 
     const fetchedFilesRef = useRef<PdfReportDto[]>([]);
     const loadMoreAbortControllerRef = useRef<AbortController | null>(null);
+    const hasCompletedInitialFilesFetch = useRef(false);
 
     const {
         data: sectionData,
@@ -87,6 +88,12 @@ export const PdfFilesSection = () => {
     useEffect(() => {
         fetchedFilesRef.current = fetchedFiles;
     }, [fetchedFiles]);
+
+    useEffect(() => {
+        if (!isFilesLoading && !hasCompletedInitialFilesFetch.current) {
+            hasCompletedInitialFilesFetch.current = true;
+        }
+    }, [isFilesLoading]);
 
     useEffect(() => {
         return () => {
@@ -152,11 +159,16 @@ export const PdfFilesSection = () => {
     ]);
 
     const handleUploaded = useCallback(
-        (newFile: PdfReportDto) => {
+        async (newFile: PdfReportDto) => {
             loadMoreAbortControllerRef.current?.abort();
             setFetchedFiles((prev) => [newFile, ...(prev ?? [])]);
             setTotalCount((prev) => prev + 1);
-            refetchFiles();
+            try {
+                await refetchFiles(true);
+            } catch {
+                setFetchedFiles((prev) => (prev ?? []).filter((f) => f.id !== newFile.id));
+                setTotalCount((prev) => (prev > 0 ? prev - 1 : 0));
+            }
         },
         [refetchFiles, setFetchedFiles],
     );
@@ -270,7 +282,7 @@ export const PdfFilesSection = () => {
         [client, activeLanguageId, isReordering, setFetchedFiles, refetchFiles, addToast],
     );
 
-    const isInitialFilesLoading = isFilesLoading && (!fetchedFiles || fetchedFiles.length === 0) && totalCount === 0;
+    const isInitialFilesLoading = isFilesLoading && !hasCompletedInitialFilesFetch.current;
 
     if (isSectionLoading || isInitialFilesLoading || !activeLanguageId) {
         return (

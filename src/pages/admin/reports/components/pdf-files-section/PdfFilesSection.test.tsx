@@ -122,23 +122,31 @@ describe('PdfFilesSection', () => {
     let originalWindowOpen: any;
 
     const setupDataFetchMock = (options: { setData?: jest.Mock; filesData?: any[]; setFilesData?: jest.Mock } = {}) => {
+        let sectionDataState = mockSectionData;
+        let filesDataState = options.filesData ?? mockFilesResponse.items;
+
+        const defaultSetData = jest.fn((action) => {
+            sectionDataState = typeof action === 'function' ? action(sectionDataState) : action;
+        });
+
+        const defaultSetFilesData = jest.fn((action) => {
+            filesDataState = typeof action === 'function' ? action(filesDataState) : action;
+        });
+
         (useDataFetch as jest.Mock).mockImplementation(({ initialData }) => {
-            const React = require('react');
             if (initialData === null) {
-                const [data, setData] = React.useState(mockSectionData);
                 return {
-                    data,
+                    data: sectionDataState,
                     isLoading: false,
                     refetch: mockRefetch,
-                    setData: options.setData ?? setData,
+                    setData: options.setData ?? defaultSetData,
                 };
             }
-            const [data, setData] = React.useState(options.filesData ?? mockFilesResponse.items);
             return {
-                data,
+                data: filesDataState,
                 isLoading: false,
                 refetch: mockRefetch,
-                setData: options.setFilesData ?? setData,
+                setData: options.setFilesData ?? defaultSetFilesData,
             };
         });
     };

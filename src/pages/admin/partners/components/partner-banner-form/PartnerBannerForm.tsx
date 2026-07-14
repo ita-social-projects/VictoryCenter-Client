@@ -287,6 +287,7 @@ export const PartnerBanner = () => {
                                 maxLength={PARTNER_BANNER_VALIDATION.title.max}
                                 disabled={isDisabled}
                                 isRequired={true}
+                                trimOnBlur={true}
                             />
 
                             <InputWithCharacterLimitGroup

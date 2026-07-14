@@ -5,11 +5,7 @@ import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/in
 import { MultiSelectInput } from '@/components/admin/multi-select-input/MultiSelectInput';
 import { MAIN_PAGE_TEXT } from '@/const/admin/main-page';
 import { Metric, MetricLocalization, MetricPrefix } from '@/types/admin/main-page';
-import {
-    formatCurrencyInput,
-    formatWithSpaces,
-    parseFormattedNumber,
-} from '@/utils/functions/formatters/format-number';
+import { formatWithSpaces, parseFormattedNumber } from '@/utils/functions/formatters/format-number';
 import {
     MetricFormValues,
     metricEditSchema,
@@ -43,7 +39,7 @@ export const StatisticsMetricEditPanel = ({ metric, onSave, onCancel }: Statisti
         watch,
         formState: { errors, isValid },
     } = useForm<MetricFormValues>({
-        mode: 'onBlur',
+        mode: 'onTouched',
         resolver: yupResolver(metricEditSchema),
         defaultValues: {
             nameUa: defaultNameUa,
@@ -63,6 +59,15 @@ export const StatisticsMetricEditPanel = ({ metric, onSave, onCancel }: Statisti
         currentNameEn.trim() !== defaultNameEn.trim() ||
         currentValue !== defaultValueStr ||
         currentPrefix !== defaultPrefix;
+
+    const handleValueChange = (raw: string, currentValue: string) => {
+        if (!raw) return '';
+        const stripped = raw.replace(/\s/g, '');
+        if (/^\d+$/.test(stripped)) {
+            return formatWithSpaces(stripped);
+        }
+        return currentValue;
+    };
 
     const onValidSubmit = (data: MetricFormValues) => {
         const parsedValue = parseFormattedNumber(data.value) ?? 0;
@@ -110,7 +115,7 @@ export const StatisticsMetricEditPanel = ({ metric, onSave, onCancel }: Statisti
                             name={name}
                             label={MAIN_PAGE_TEXT.BLOCKS.EDIT_PANEL.VALUE_LABEL}
                             value={value}
-                            onChange={(e) => onChange(formatCurrencyInput(e.target.value))}
+                            onChange={(e) => onChange(handleValueChange(e.target.value, value))}
                             onBlur={onBlur}
                             error={errors.value?.message}
                             maxLength={15}

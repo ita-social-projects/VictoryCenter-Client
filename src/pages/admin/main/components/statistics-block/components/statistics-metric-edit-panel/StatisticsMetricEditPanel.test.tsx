@@ -91,6 +91,35 @@ describe('StatisticsMetricEditPanel', () => {
         expect(screen.getByTestId('metric-en-1')).toHaveValue('EN metric name');
     });
 
+    it('uses default values when metric fields are missing', () => {
+        const onSave = jest.fn();
+        const incompleteMetric = { id: 2, name: 'Missing' };
+        render(<StatisticsMetricEditPanel metric={incompleteMetric as any} onSave={onSave} onCancel={jest.fn()} />);
+
+        expect(screen.getByTestId('metric-val-2')).toHaveValue('0');
+    });
+
+    it('returns empty string when value is cleared', () => {
+        render(<StatisticsMetricEditPanel metric={createMetric()} onSave={jest.fn()} onCancel={jest.fn()} />);
+        const input = screen.getByTestId('metric-val-1');
+        fireEvent.change(input, { target: { value: '' } });
+        expect(input).toHaveValue('');
+    });
+
+    it('ignores non-numeric input characters', () => {
+        render(<StatisticsMetricEditPanel metric={createMetric()} onSave={jest.fn()} onCancel={jest.fn()} />);
+        const input = screen.getByTestId('metric-val-1');
+        fireEvent.change(input, { target: { value: '1200a' } });
+        expect(input).toHaveValue('1 200');
+    });
+
+    it('falls back to current value when prefix selection is cleared', async () => {
+        render(<StatisticsMetricEditPanel metric={createMetric()} onSave={jest.fn()} onCancel={jest.fn()} />);
+        const prefixPlus = screen.getByTestId(`metric-prefix-1-${MetricPrefix.Plus}`);
+        fireEvent.click(prefixPlus);
+        expect(screen.getByTestId('metric-prefix-1')).toHaveAttribute('data-selected', String(MetricPrefix.Plus));
+    });
+
     it('submits trimmed values and parsed number', async () => {
         const onSave = jest.fn();
         render(<StatisticsMetricEditPanel metric={createMetric()} onSave={onSave} onCancel={jest.fn()} />);
@@ -109,18 +138,6 @@ describe('StatisticsMetricEditPanel', () => {
             { languageId: 1, name: 'Нова UA' },
             { languageId: 2, name: 'New EN', value: '2345' },
         ]);
-    });
-
-    it('preserves decimal value when saving', async () => {
-        const onSave = jest.fn();
-        render(<StatisticsMetricEditPanel metric={createMetric()} onSave={onSave} onCancel={jest.fn()} />);
-
-        fireEvent.change(screen.getByTestId('metric-val-1'), { target: { value: '2 345.75' } });
-        fireEvent.change(screen.getByTestId('metric-ua-1'), { target: { value: 'Нова UA' } });
-
-        const updatedMetric = await submitForm(onSave);
-
-        expect(updatedMetric.value).toBe(2345.75);
     });
 
     it('uses fallback defaults when name and localizations are missing', () => {

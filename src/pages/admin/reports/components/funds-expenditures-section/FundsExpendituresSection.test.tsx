@@ -36,6 +36,13 @@ const MOCK_FUNDS_EXPENDITURES_CATEGORIES: ReportFundsExpendituresCategory[] = [
     { id: 8, name: 'Заробітна плата', type: 'expense', localizations: [] },
 ];
 
+const RESERVED_LOOKING_CATEGORIES: ReportFundsExpendituresCategory[] = [
+    { id: 101, name: 'ПРОГРАМНІ', type: 'expense', localizations: [] },
+    { id: 102, name: 'програмні тест', type: 'expense', localizations: [] },
+    { id: 103, name: 'Програмні тест 2', type: 'expense', localizations: [] },
+    { id: 104, name: 'Адміністративні витрати', type: 'expense', localizations: [] },
+];
+
 const MOCK_FUNDS_EXPENDITURES_RECORDS: ReportFundsExpendituresRecord[] = [
     { id: 1, categoryId: 1, type: 'income', reportingYear: '2025', amountUah: '7265', amountUsd: '4200' },
     { id: 2, categoryId: 5, type: 'expense', reportingYear: '2025', amountUah: '3100', amountUsd: '1800' },
@@ -987,6 +994,42 @@ describe('FundsExpenditureSection', () => {
             fireEvent.click(screen.getByTestId('add-category-modal-close'));
 
             expect(mockClose).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe('delete category modal', () => {
+        it('excludes real-world reserved "Програмні"-like category names from the category dropdown', () => {
+            setupMockDataFetch(undefined, RESERVED_LOOKING_CATEGORIES);
+            render(<FundsExpenditureSection isDeleteCategoryModalOpen onDeleteCategoryModalClose={jest.fn()} />);
+
+            fireEvent.click(
+                screen.getByRole('button', {
+                    name: FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.CATEGORY_PLACEHOLDER,
+                }),
+            );
+
+            expect(screen.queryByRole('button', { name: 'ПРОГРАМНІ' })).not.toBeInTheDocument();
+            expect(screen.queryByRole('button', { name: 'програмні тест' })).not.toBeInTheDocument();
+            expect(screen.queryByRole('button', { name: 'Програмні тест 2' })).not.toBeInTheDocument();
+            expect(screen.getByRole('button', { name: 'Адміністративні витрати' })).toBeInTheDocument();
+        });
+    });
+
+    describe('edit category modal', () => {
+        it('excludes real-world reserved "Програмні"-like category names from the category dropdown', () => {
+            setupMockDataFetch(undefined, RESERVED_LOOKING_CATEGORIES);
+            render(<FundsExpenditureSection isEditCategoryModalOpen onEditCategoryModalClose={jest.fn()} />);
+
+            fireEvent.click(
+                screen.getByRole('button', {
+                    name: FUNDS_EXPENDITURES_TEXT.MODAL.EDIT_CATEGORY.CATEGORY_PLACEHOLDER,
+                }),
+            );
+
+            expect(screen.queryByRole('button', { name: 'ПРОГРАМНІ' })).not.toBeInTheDocument();
+            expect(screen.queryByRole('button', { name: 'програмні тест' })).not.toBeInTheDocument();
+            expect(screen.queryByRole('button', { name: 'Програмні тест 2' })).not.toBeInTheDocument();
+            expect(screen.getByRole('button', { name: 'Адміністративні витрати' })).toBeInTheDocument();
         });
     });
 });

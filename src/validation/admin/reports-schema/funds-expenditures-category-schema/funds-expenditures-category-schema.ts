@@ -3,6 +3,7 @@ import { FUNDS_EXPENDITURES_TEXT, FUNDS_EXPENDITURES_VALIDATION } from '@/const/
 import { FundsExpendituresTransactionType, ReportFundsExpendituresCategory } from '@/types/admin/reports';
 import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
 import { normalizeForUnique } from '@/utils/functions/normalize-for-unique/normalize-for-unique';
+import { isReservedFundsExpendituresCategoryName } from '@/utils/functions/is-reserved-funds-expenditures-category-name/is-reserved-funds-expenditures-category-name';
 
 const isNameDuplicate = (
     name: string,
@@ -21,6 +22,8 @@ export const validateFundsExpendituresCategoryName = (
         return COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(FUNDS_EXPENDITURES_VALIDATION.categoryNameMin);
     if (normalized.length > FUNDS_EXPENDITURES_VALIDATION.categoryNameMax)
         return COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(FUNDS_EXPENDITURES_VALIDATION.categoryNameMax);
+    if (type && isReservedFundsExpendituresCategoryName(normalized, type))
+        return FUNDS_EXPENDITURES_TEXT.MODAL.CATEGORY.ERROR.NAME_RESERVED;
     if (type && isNameDuplicate(normalized, type, categories))
         return FUNDS_EXPENDITURES_TEXT.MODAL.CATEGORY.ERROR.NAME_DUPLICATE;
     return undefined;

@@ -22,7 +22,6 @@ const EMPTY_SECTION = { title: '', description: '', localizations: [] };
 export const PdfFilesSection = () => {
     const client = useAdminClient();
     const { addToast } = useToast();
-    const [uploadedFiles, setUploadedFiles] = useState<PdfReportDto[]>([]);
     const [currentLanguage, setCurrentLanguage] = useState<'uk' | 'en'>('uk');
     const [isDeleting, setIsDeleting] = useState(false);
     const [isRenaming, setIsRenaming] = useState(false);
@@ -49,8 +48,8 @@ export const PdfFilesSection = () => {
     const LIMIT = 20;
 
     const fetchedFilesRef = useRef<PdfReportDto[]>([]);
-    const uploadedFilesRef = useRef<PdfReportDto[]>([]);
     const loadMoreAbortControllerRef = useRef<AbortController | null>(null);
+    const hasCompletedInitialFilesFetch = useRef(false);
 
     const {
         data: sectionData,
@@ -91,8 +90,10 @@ export const PdfFilesSection = () => {
     }, [fetchedFiles]);
 
     useEffect(() => {
-        uploadedFilesRef.current = uploadedFiles;
-    }, [uploadedFiles]);
+        if (!isFilesLoading && !hasCompletedInitialFilesFetch.current) {
+            hasCompletedInitialFilesFetch.current = true;
+        }
+    }, [isFilesLoading]);
 
     useEffect(() => {
         return () => {
@@ -104,7 +105,6 @@ export const PdfFilesSection = () => {
         (lang: 'uk' | 'en') => {
             loadMoreAbortControllerRef.current?.abort();
             setCurrentLanguage(lang);
-            setUploadedFiles([]);
             setTotalCount(0);
             fetchedFilesRef.current = [];
             setFetchedFiles([]);
@@ -159,12 +159,18 @@ export const PdfFilesSection = () => {
     ]);
 
     const handleUploaded = useCallback(
-        (newFile: PdfReportDto) => {
+        async (newFile: PdfReportDto) => {
             loadMoreAbortControllerRef.current?.abort();
-            setUploadedFiles((prev) => [...prev, newFile]);
-            refetchFiles();
+            setFetchedFiles((prev) => [newFile, ...(prev ?? [])]);
+            setTotalCount((prev) => prev + 1);
+            try {
+                await refetchFiles(true);
+            } catch {
+                setFetchedFiles((prev) => (prev ?? []).filter((f) => f.id !== newFile.id));
+                setTotalCount((prev) => (prev > 0 ? prev - 1 : 0));
+            }
         },
-        [refetchFiles],
+        [refetchFiles, setFetchedFiles],
     );
 
     const handleSaveSection = useCallback(async () => {
@@ -185,7 +191,8 @@ export const PdfFilesSection = () => {
             setIsDeleting(true);
             try {
                 await PdfReportsApi.delete(client, fileId);
-                setUploadedFiles((prev) => prev.filter((f) => f.id !== fileId));
+                setFetchedFiles((prev) => (prev ?? []).filter((f) => f.id !== fileId));
+                setTotalCount((prev) => (prev > 0 ? prev - 1 : 0));
                 addToast(PDF_FILES_SECTION_TEXT.MESSAGE.DELETE_SUCCESS, ToastType.Success);
             } catch {
                 addToast(PDF_FILES_SECTION_TEXT.MESSAGE.DELETE_ERROR, ToastType.Error);
@@ -197,7 +204,7 @@ export const PdfFilesSection = () => {
                 await refetchFiles();
             } catch {}
         },
-        [client, addToast, refetchFiles],
+        [client, addToast, refetchFiles, setFetchedFiles],
     );
 
     const handleViewFile = useCallback(
@@ -224,10 +231,7 @@ export const PdfFilesSection = () => {
             setIsRenaming(true);
             try {
                 const updatedFile = await PdfReportsApi.rename(client, fileId, newName);
-                setUploadedFiles((prev) => {
-                    const exists = prev.some((f) => f.id === fileId);
-                    return exists ? prev.map((f) => (f.id === fileId ? updatedFile : f)) : [...prev, updatedFile];
-                });
+                setFetchedFiles((prev) => (prev ?? []).map((f) => (f.id === fileId ? updatedFile : f)));
                 addToast(PDF_FILES_SECTION_TEXT.MESSAGE.RENAME_SUCCESS, ToastType.Success);
             } catch {
                 addToast(PDF_FILES_SECTION_TEXT.MESSAGE.RENAME_ERROR, ToastType.Error);
@@ -242,7 +246,7 @@ export const PdfFilesSection = () => {
                 setIsRenaming(false);
             }
         },
-        [client, addToast, refetchFiles],
+        [client, addToast, refetchFiles, setFetchedFiles],
     );
 
     const handleReorderFiles = useCallback(
@@ -252,7 +256,7 @@ export const PdfFilesSection = () => {
             if (!reorderedFiles || reorderedFiles.length === 0) return;
 
             const currentFiles = fetchedFilesRef.current;
-            const currentDedupedCount = new Set([...currentFiles, ...uploadedFilesRef.current].map((f) => f.id)).size;
+            const currentDedupedCount = new Set(currentFiles.map((f) => f.id)).size;
             if (reorderedFiles.length !== currentDedupedCount) {
                 // eslint-disable-next-line no-console
                 console.error('File count mismatch during reorder');
@@ -278,17 +282,15 @@ export const PdfFilesSection = () => {
         [client, activeLanguageId, isReordering, setFetchedFiles, refetchFiles, addToast],
     );
 
-    if (isSectionLoading || isFilesLoading || !activeLanguageId) {
+    const isInitialFilesLoading = isFilesLoading && !hasCompletedInitialFilesFetch.current;
+
+    if (isSectionLoading || isInitialFilesLoading || !activeLanguageId) {
         return (
             <div className={styles.loader}>
                 <InlineLoader size={3} />
             </div>
         );
     }
-
-    const mergedDedupedFiles = Array.from(
-        new Map([...fetchedFiles, ...uploadedFiles].map((file) => [file.id, file])).values(),
-    );
 
     return (
         <div className={styles.root}>
@@ -305,7 +307,7 @@ export const PdfFilesSection = () => {
             </div>
             <PdfDropzone onUploaded={handleUploaded} languageId={activeLanguageId} />
             <PdfFilesTable
-                files={mergedDedupedFiles}
+                files={fetchedFiles ?? []}
                 onViewFile={handleViewFile}
                 onDeleteFile={handleDeleteFile}
                 onRenameFile={handleRenameFile}

@@ -133,11 +133,7 @@ jest.mock(
 );
 
 jest.mock('../program-expenses-section/ProgramExpensesSection', () => ({
-    ProgramExpensesSection: ({ isEditing = false }: { isEditing?: boolean }) => (
-        <div data-testid="program-expenses-section" data-editing={String(isEditing)}>
-            ProgramExpensesSection
-        </div>
-    ),
+    ProgramExpensesSection: () => <div data-testid="program-expenses-section">ProgramExpensesSection</div>,
 }));
 
 describe('ReportAnalytics', () => {
@@ -192,15 +188,6 @@ describe('ReportAnalytics', () => {
         const incomeTab = screen.getByText('Доходи та витрати');
         fireEvent.click(incomeTab);
         expect(screen.queryByTestId('pdf-files-section')).not.toBeInTheDocument();
-    });
-
-    it('sets program expenses section to editing mode when funds edit is activated', () => {
-        render(<ReportAnalytics />);
-
-        fireEvent.click(screen.getByTestId('activate-funds-edit'));
-        fireEvent.click(screen.getByText(REPORTS_TEXT.REPORT_AND_ANALYTICS.TAB.PROGRAM_EXPENSES));
-
-        expect(screen.getByTestId('program-expenses-section')).toHaveAttribute('data-editing', 'true');
     });
 
     it('should restore funds edit mode after returning from another tab', () => {

@@ -34,7 +34,7 @@ interface ProgramExpensesSectionProps {
 }
 
 export const ProgramExpensesSection = ({
-    isEditing = false,
+    isEditing = true,
     isRowEditMode: propIsRowEditMode,
     onRowEditModeChange,
 }: ProgramExpensesSectionProps) => {

@@ -118,11 +118,7 @@ export const ReportAnalytics = () => {
                     />
                 )}
                 {activeTab.id === 'program-expenses' && (
-                    <ProgramExpensesSection
-                        isEditing={isFundsEditing}
-                        isRowEditMode={isRowEditMode}
-                        onRowEditModeChange={setIsRowEditMode}
-                    />
+                    <ProgramExpensesSection isRowEditMode={isRowEditMode} onRowEditModeChange={setIsRowEditMode} />
                 )}
             </div>
 

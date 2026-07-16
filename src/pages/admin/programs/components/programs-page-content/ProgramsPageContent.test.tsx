@@ -67,10 +67,16 @@ jest.mock('@/components/admin/admin-panel-toolbar/AdminPageToolbar', () => ({
         fetchSearchItems,
     }: AdminPanelToolbarProps<any>) => (
         <div data-testid="programs-toolbar">
-            <button data-testid="select-program" onClick={() => onSuggestionSelect(1)}>
+            <button
+                data-testid="select-program"
+                onClick={() => onSuggestionSelect(1, { id: 1, name: 'Alpha', categories: ['Category A'] })}
+            >
                 Select Program
             </button>
-            <button data-testid="select-program-string" onClick={() => onSuggestionSelect('1')}>
+            <button
+                data-testid="select-program-string"
+                onClick={() => onSuggestionSelect('1', { id: 1, name: 'Alpha', categories: ['Category A'] })}
+            >
                 Select Program String
             </button>
             <button
@@ -1023,6 +1029,25 @@ describe('ProgramsPageContent', () => {
 
         await waitFor(() => {
             expect(screen.getByText('Category A Updated')).toBeInTheDocument();
+        });
+    });
+
+    it('switches category tab to the one assigned to selected search result', async () => {
+        await renderAndWaitForCategoryBar();
+
+        await waitFor(() => {
+            expect(screen.getByTestId('category-1')).toBeDisabled();
+            expect(screen.getByTestId('category-2')).not.toBeDisabled();
+        });
+
+        fireEvent.click(screen.getByTestId('category-2'));
+        await waitFor(() => expect(screen.getByTestId('category-2')).toBeDisabled());
+
+        fireEvent.click(screen.getByTestId('select-program'));
+
+        await waitFor(() => {
+            expect(screen.getByTestId('category-1')).toBeDisabled();
+            expect(screen.getByTestId('category-2')).not.toBeDisabled();
         });
     });
 });

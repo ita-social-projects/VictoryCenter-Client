@@ -23,6 +23,7 @@
 
 .label {
     @include type.small-text-medium;
+
     color: c.$bluish-black;
     margin-bottom: 8px;
 }
@@ -135,6 +136,7 @@
 
 .subtitle {
     @include type.small-text-regular;
+
     margin: 0;
     color: c.$grey-900;
 }
@@ -159,12 +161,14 @@
 
 .type {
     @include type.small-text-regular;
+
     margin: 0;
     color: c.$bluish-black;
 }
 
 .error {
     @include type.small-text-regular;
+
     margin: 4px 0 0;
     min-height: 20px;
     color: c.$error;
@@ -183,6 +187,7 @@
 
 .submit {
     @include type.subtitle-2-medium;
+
     height: 60px;
     width: 100%;
 }

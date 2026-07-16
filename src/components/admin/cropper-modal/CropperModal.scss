@@ -98,9 +98,9 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    align-items: center;
 
     .ReactCrop {
+        margin: 0 auto;
         --ReactCrop-overlay-color: rgba(255, 0, 0, 1) !important;
     }
 
@@ -110,6 +110,7 @@
         font-weight: 500;
         color: colors.$grey-800;
         text-align: center;
+        display: block;
     }
 
     img {

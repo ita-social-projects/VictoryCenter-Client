@@ -261,7 +261,6 @@ export const FUNDS_EXPENDITURES_TEXT = {
             SUBMIT_BUTTON: 'Зберегти',
             ERROR: {
                 NAME_DUPLICATE: 'Категорія з такою назвою вже існує',
-                NAME_RESERVED: 'Ця назва зарезервована системою',
             },
         },
         TRANSLATE_CATEGORY: {

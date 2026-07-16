@@ -10,7 +10,6 @@ const REQUIRED = COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED;
 const MIN_ERROR = COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(FUNDS_EXPENDITURES_VALIDATION.categoryNameMin);
 const MAX_ERROR = COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(FUNDS_EXPENDITURES_VALIDATION.categoryNameMax);
 const DUPLICATE_ERROR = FUNDS_EXPENDITURES_TEXT.MODAL.CATEGORY.ERROR.NAME_DUPLICATE;
-const RESERVED_ERROR = FUNDS_EXPENDITURES_TEXT.MODAL.CATEGORY.ERROR.NAME_RESERVED;
 
 const category = (name: string, type: 'income' | 'expense'): ReportFundsExpendituresCategory => ({
     id: 1,
@@ -59,22 +58,6 @@ describe('validateFundsExpendituresCategoryName', () => {
 
     it('returns undefined for valid name with no duplicates', () => {
         expect(validateFundsExpendituresCategoryName('Valid name', 'income', [])).toBeUndefined();
-    });
-
-    it.each(['ПРОГРАМНІ', 'програмні тест', 'Програмні тест 2'])(
-        'returns reserved error for real-world expense category name "%s"',
-        (name) => {
-            expect(validateFundsExpendituresCategoryName(name, 'expense', [])).toBe(RESERVED_ERROR);
-        },
-    );
-
-    it('returns undefined for income category name containing the reserved label', () => {
-        expect(validateFundsExpendituresCategoryName('Програмні тест 2', 'income', [])).toBeUndefined();
-    });
-
-    it('takes reserved-name error precedence over duplicate-name error', () => {
-        const categories = [category('Програмні тест 2', 'expense')];
-        expect(validateFundsExpendituresCategoryName('Програмні тест 2', 'expense', categories)).toBe(RESERVED_ERROR);
     });
 });
 

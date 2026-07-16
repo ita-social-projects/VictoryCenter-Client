@@ -12,18 +12,6 @@ import { getNormalizedInputText } from '@/utils/functions/formatters/text-format
 import { validateFundsExpendituresCategoryName } from '@/validation/admin/reports-schema/funds-expenditures-category-schema/funds-expenditures-category-schema';
 import styles from './EditFundsExpendituresCategoryModal.module.scss';
 
-const renderInputWithError = (
-    input: React.ReactNode,
-    error?: string,
-    inputErrorClass?: string,
-    errorClass?: string,
-) => (
-    <>
-        <div className={cn({ [inputErrorClass || '']: Boolean(error) })}>{input}</div>
-        <p className={cn(errorClass, { [styles.errorHidden]: !error })}>{error ?? ' '}</p>
-    </>
-);
-
 interface EditFundsExpendituresCategoryModalProps {
     isOpen: boolean;
     onClose: () => void;

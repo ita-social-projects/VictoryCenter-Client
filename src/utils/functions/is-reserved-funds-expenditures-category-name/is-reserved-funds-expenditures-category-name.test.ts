@@ -24,4 +24,9 @@ describe('isReservedFundsExpendituresCategoryName', () => {
         expect(isReservedFundsExpendituresCategoryName('Оренда', 'expense')).toBe(false);
         expect(isReservedFundsExpendituresCategoryName('Адміністративні витрати', 'expense')).toBe(false);
     });
+
+    it('returns false when the reserved word appears but not at the start of the name', () => {
+        expect(isReservedFundsExpendituresCategoryName('Непрограмні витрати', 'expense')).toBe(false);
+        expect(isReservedFundsExpendituresCategoryName('Витрати програмні', 'expense')).toBe(false);
+    });
 });

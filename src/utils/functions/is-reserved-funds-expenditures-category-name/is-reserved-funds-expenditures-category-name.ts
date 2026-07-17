@@ -6,4 +6,4 @@ export const isReservedFundsExpendituresCategoryName = (
     type: FundsExpendituresTransactionType,
 ): boolean =>
     type === 'expense' &&
-    name.trim().toLowerCase().includes(PROGRAM_EXPENSES_TEXT.TABLE.TYPE_LABEL.trim().toLowerCase());
+    name.trim().toLowerCase().startsWith(PROGRAM_EXPENSES_TEXT.TABLE.TYPE_LABEL.trim().toLowerCase());

@@ -475,6 +475,11 @@ export const FundsExpenditureSection = ({
 
     const handleCreateCategory = useCallback(
         async (data: { name: string; type: FundsExpendituresTransactionType }): Promise<boolean> => {
+            if (isReservedFundsExpendituresCategoryName(data.name, data.type)) {
+                addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_CREATE_FAILED_RETRY, ToastType.Error);
+                return false;
+            }
+
             try {
                 await FundsExpendituresApi.createCategory(adminClient, data);
                 addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_CREATED_SUCCESSFULLY, ToastType.Success);

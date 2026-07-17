@@ -36,6 +36,13 @@ const MOCK_FUNDS_EXPENDITURES_CATEGORIES: ReportFundsExpendituresCategory[] = [
     { id: 8, name: 'Заробітна плата', type: 'expense', localizations: [] },
 ];
 
+const RESERVED_LOOKING_CATEGORIES: ReportFundsExpendituresCategory[] = [
+    { id: 101, name: 'ПРОГРАМНІ', type: 'expense', localizations: [] },
+    { id: 102, name: 'програмні тест', type: 'expense', localizations: [] },
+    { id: 103, name: 'Програмні тест 2', type: 'expense', localizations: [] },
+    { id: 104, name: 'Адміністративні витрати', type: 'expense', localizations: [] },
+];
+
 const MOCK_FUNDS_EXPENDITURES_RECORDS: ReportFundsExpendituresRecord[] = [
     { id: 1, categoryId: 1, type: 'income', reportingYear: '2025', amountUah: '7265', amountUsd: '4200' },
     { id: 2, categoryId: 5, type: 'expense', reportingYear: '2025', amountUah: '3100', amountUsd: '1800' },
@@ -265,10 +272,30 @@ jest.mock('./components/funds-expenditures-table/FundsExpendituresTable', () => 
 }));
 
 jest.mock('./components/common/add-funds-expenditures-category-modal/AddFundsExpendituresCategoryModal', () => ({
-    AddFundsExpendituresCategoryModal: ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => (
+    AddFundsExpendituresCategoryModal: ({
+        isOpen,
+        onClose,
+        onSubmit,
+    }: {
+        isOpen: boolean;
+        onClose: () => void;
+        onSubmit: (data: { name: string; type: 'income' | 'expense' }) => Promise<boolean>;
+    }) => (
         <div data-testid="add-category-modal" data-open={String(isOpen)}>
             <button data-testid="add-category-modal-close" onClick={onClose}>
                 Close
+            </button>
+            <button
+                data-testid="add-category-submit-valid"
+                onClick={() => void onSubmit({ name: 'Оренда офісу', type: 'expense' })}
+            >
+                Submit valid category
+            </button>
+            <button
+                data-testid="add-category-submit-reserved"
+                onClick={() => void onSubmit({ name: 'Програмні тест 2', type: 'expense' })}
+            >
+                Submit reserved category
             </button>
         </div>
     ),
@@ -319,6 +346,7 @@ const mockCreateRecord = jest.fn();
 const mockUpdateSettings = jest.fn();
 const mockDeleteRecord = jest.fn();
 const mockBulkDelete = jest.fn();
+const mockCreateCategory = jest.fn();
 jest.mock('@/services/api/admin/reports/funds-expenditures-api', () => ({
     FundsExpendituresApi: {
         getSettings: jest.fn(),
@@ -330,6 +358,7 @@ jest.mock('@/services/api/admin/reports/funds-expenditures-api', () => ({
         updateRecord: (...args: unknown[]) => mockUpdateRecord(...args),
         deleteRecord: (...args: unknown[]) => mockDeleteRecord(...args),
         bulkDeleteRecords: (...args: unknown[]) => mockBulkDelete(...args),
+        createCategory: (...args: unknown[]) => mockCreateCategory(...args),
     },
 }));
 
@@ -987,6 +1016,80 @@ describe('FundsExpenditureSection', () => {
             fireEvent.click(screen.getByTestId('add-category-modal-close'));
 
             expect(mockClose).toHaveBeenCalledTimes(1);
+        });
+
+        it('rejects creating a category with a reserved name and does not call the API', async () => {
+            render(<FundsExpenditureSection isAddCategoryModalOpen onAddCategoryModalClose={jest.fn()} />);
+
+            fireEvent.click(screen.getByTestId('add-category-submit-reserved'));
+
+            await waitFor(() => {
+                expect(mockAddToast).toHaveBeenCalledWith(
+                    FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_CREATE_FAILED_RETRY,
+                    'error',
+                );
+            });
+            expect(mockCreateCategory).not.toHaveBeenCalled();
+        });
+
+        it('creates a category with a non-reserved name', async () => {
+            mockCreateCategory.mockResolvedValueOnce({
+                id: 1,
+                name: 'Оренда офісу',
+                type: 'expense',
+                localizations: [],
+            });
+
+            render(<FundsExpenditureSection isAddCategoryModalOpen onAddCategoryModalClose={jest.fn()} />);
+
+            fireEvent.click(screen.getByTestId('add-category-submit-valid'));
+
+            await waitFor(() => {
+                expect(mockCreateCategory).toHaveBeenCalledWith(stableAdminClient, {
+                    name: 'Оренда офісу',
+                    type: 'expense',
+                });
+            });
+            expect(mockAddToast).toHaveBeenCalledWith(
+                FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_CREATED_SUCCESSFULLY,
+                'success',
+            );
+        });
+    });
+
+    describe('delete category modal', () => {
+        it('excludes real-world reserved "Програмні"-like category names from the category dropdown', () => {
+            setupMockDataFetch(undefined, RESERVED_LOOKING_CATEGORIES);
+            render(<FundsExpenditureSection isDeleteCategoryModalOpen onDeleteCategoryModalClose={jest.fn()} />);
+
+            fireEvent.click(
+                screen.getByRole('button', {
+                    name: FUNDS_EXPENDITURES_TEXT.MODAL.DELETE_CATEGORY.CATEGORY_PLACEHOLDER,
+                }),
+            );
+
+            expect(screen.queryByRole('button', { name: 'ПРОГРАМНІ' })).not.toBeInTheDocument();
+            expect(screen.queryByRole('button', { name: 'програмні тест' })).not.toBeInTheDocument();
+            expect(screen.queryByRole('button', { name: 'Програмні тест 2' })).not.toBeInTheDocument();
+            expect(screen.getByRole('button', { name: 'Адміністративні витрати' })).toBeInTheDocument();
+        });
+    });
+
+    describe('edit category modal', () => {
+        it('excludes real-world reserved "Програмні"-like category names from the category dropdown', () => {
+            setupMockDataFetch(undefined, RESERVED_LOOKING_CATEGORIES);
+            render(<FundsExpenditureSection isEditCategoryModalOpen onEditCategoryModalClose={jest.fn()} />);
+
+            fireEvent.click(
+                screen.getByRole('button', {
+                    name: FUNDS_EXPENDITURES_TEXT.MODAL.EDIT_CATEGORY.CATEGORY_PLACEHOLDER,
+                }),
+            );
+
+            expect(screen.queryByRole('button', { name: 'ПРОГРАМНІ' })).not.toBeInTheDocument();
+            expect(screen.queryByRole('button', { name: 'програмні тест' })).not.toBeInTheDocument();
+            expect(screen.queryByRole('button', { name: 'Програмні тест 2' })).not.toBeInTheDocument();
+            expect(screen.getByRole('button', { name: 'Адміністративні витрати' })).toBeInTheDocument();
         });
     });
 });

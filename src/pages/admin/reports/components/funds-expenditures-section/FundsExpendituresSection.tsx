@@ -29,6 +29,7 @@ import {
 import { LocalizationLanguage } from '@/types/common/language';
 import { mapLocalizationDtoToModel } from '@/utils/functions/mappers/common/localization/localization-mappers';
 import { formatNumberDecimalComma } from '@/utils/functions/formatters/format-number';
+import { isReservedFundsExpendituresCategoryName } from '@/utils/functions/is-reserved-funds-expenditures-category-name/is-reserved-funds-expenditures-category-name';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
@@ -339,6 +340,12 @@ export const FundsExpenditureSection = ({
         [categories],
     );
 
+    const manageableCategories = useMemo(
+        (): ReportFundsExpendituresCategory[] =>
+            filteredCategories.filter((c) => !isReservedFundsExpendituresCategoryName(c.name, c.type)),
+        [filteredCategories],
+    );
+
     const filteredRecords = useMemo((): EnrichedRecord[] => {
         return enrichedRecords.filter((record) => {
             const typeMatch = selectedType === undefined || record.type === selectedType;
@@ -468,6 +475,11 @@ export const FundsExpenditureSection = ({
 
     const handleCreateCategory = useCallback(
         async (data: { name: string; type: FundsExpendituresTransactionType }): Promise<boolean> => {
+            if (isReservedFundsExpendituresCategoryName(data.name, data.type)) {
+                addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_CREATE_FAILED_RETRY, ToastType.Error);
+                return false;
+            }
+
             try {
                 await FundsExpendituresApi.createCategory(adminClient, data);
                 addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_CREATED_SUCCESSFULLY, ToastType.Success);
@@ -492,6 +504,15 @@ export const FundsExpenditureSection = ({
         async (categoryId: number, name: string): Promise<boolean> => {
             const category = categories.find((c) => c.id === categoryId);
             if (!category) return false;
+
+            if (
+                isReservedFundsExpendituresCategoryName(category.name, category.type) ||
+                isReservedFundsExpendituresCategoryName(name, category.type)
+            ) {
+                addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_UPDATE_FAILED_RETRY, ToastType.Error);
+                return false;
+            }
+
             try {
                 await FundsExpendituresApi.updateCategory(adminClient, categoryId, { name, type: category.type });
                 addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_UPDATED_SUCCESSFULLY, ToastType.Success);
@@ -514,6 +535,12 @@ export const FundsExpenditureSection = ({
 
     const handleDeleteCategory = useCallback(
         async (categoryId: number): Promise<boolean> => {
+            const target = categories.find((c) => c.id === categoryId);
+            if (target && isReservedFundsExpendituresCategoryName(target.name, target.type)) {
+                addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_DELETE_FAILED_RETRY, ToastType.Error);
+                return false;
+            }
+
             try {
                 await FundsExpendituresApi.deleteCategory(adminClient, categoryId);
                 addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_DELETED_SUCCESSFULLY, ToastType.Success);
@@ -531,7 +558,7 @@ export const FundsExpenditureSection = ({
                 return false;
             }
         },
-        [addToast, adminClient, refetchCategories, refetchSummary],
+        [addToast, adminClient, categories, refetchCategories, refetchSummary],
     );
 
     const handleDeleteClick = (record: ReportFundsExpendituresRecord) => {
@@ -820,14 +847,14 @@ export const FundsExpenditureSection = ({
             <EditFundsExpendituresCategoryModal
                 isOpen={isEditCategoryModalOpen}
                 onClose={onEditCategoryModalClose ?? (() => {})}
-                categories={categories}
+                categories={manageableCategories}
                 onSubmit={handleEditCategory}
             />
 
             <DeleteFundsExpendituresCategoryModal
                 isOpen={isDeleteCategoryModalOpen}
                 onClose={onDeleteCategoryModalClose ?? (() => {})}
-                categories={categories}
+                categories={manageableCategories}
                 records={recordsState}
                 onSubmit={handleDeleteCategory}
             />

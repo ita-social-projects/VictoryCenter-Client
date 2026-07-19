@@ -66,7 +66,11 @@ describe('DonationSection', () => {
 
     it('renders background image when donationData has an image', () => {
         const { container } = render(
-            <DonationSection donationData={createDonationData({ image: { url: '/uploaded-image.webp' } })} />,
+            <DonationSection
+                donationData={createDonationData({
+                    image: { id: 1, url: '/uploaded-image.webp', mimeType: 'image/webp' },
+                })}
+            />,
         );
 
         const image = screen.getByAltText('Donation Background');

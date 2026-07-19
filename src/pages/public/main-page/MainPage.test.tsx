@@ -70,6 +70,12 @@ const createMainPageData = (overrides: Partial<PublicMainPageDto> = {}): PublicM
     localizations: [],
     mainAboutUs: null,
     mainPartners: null,
+    mainDonations: {
+        id: 1,
+        title: 'API donation title',
+        description: 'API donation description',
+        image: null,
+    },
     impactStatistics: null,
     ...overrides,
 });

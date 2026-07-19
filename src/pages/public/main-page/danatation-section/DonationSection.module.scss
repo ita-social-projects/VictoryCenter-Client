@@ -1,0 +1,29 @@
+.donation-section {
+    width: 100%;
+    min-height: 886px;
+    padding: 64px 16px 128px;
+
+     @media (min-width: 560px) {
+        // height: 910px;
+        padding: 64px 64px 128px;
+    }
+
+    @media (min-width: 768px) {
+        // height: 1046px;
+        padding: 128px 56px 128px;
+    }
+
+//     @media (min-width: 1440px) {
+//         padding: 128px 56px 156px;
+//     }
+}
+
+.video-background-container {
+    margin: 0;
+    padding: 0;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: rgba(black, 0.5);
+}

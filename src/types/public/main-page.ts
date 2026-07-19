@@ -59,6 +59,14 @@ export interface PublicMainPartnersDto {
     localizations?: PublicMainPageLocalizationDto[];
 }
 
+export interface MainDonationDto {
+    id: number;
+    title?: string;
+    description?: string;
+    image: any;
+    localizations?: PublicMainPageLocalizationDto[];
+}
+
 export interface PublicMainPageDto {
     id: number;
     title?: string;
@@ -66,6 +74,7 @@ export interface PublicMainPageDto {
     image?: Image | ImageValues | null;
     mainAboutUs?: PublicMainAboutUsDto | null;
     mainPartners?: PublicMainPartnersDto | null;
+    mainDonations?: MainDonationDto;
     impactStatistics?: PublicImpactStatisticDto | null;
     localizations?: PublicMainPageLocalizationDto[];
 }

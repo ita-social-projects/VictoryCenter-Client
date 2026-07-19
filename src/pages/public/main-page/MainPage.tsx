@@ -10,7 +10,7 @@ import { getImageSrc } from '@/utils/functions/image-helper/image-helper';
 import { IntroSection } from './intro-section/IntroSection';
 import { MainProgramsSection } from './main-programs-section/MainProgramsSection';
 import { MainStatisticsSection } from './main-statistics-section/MainStatisticsSection';
-import { DonationSection } from './danatation-section/DonatationSection';
+import { DonationSection } from './danatation-section/DonationSection';
 import styles from './MainPage.module.scss';
 
 const getFilledText = (...values: Array<string | null | undefined>): string => {

@@ -1,21 +1,22 @@
-.donation-section {
-    width: 100%;
-    min-height: 886px;
-    padding: 64px 16px 128px;
+@use '@/assets/sass/mixins/typography.mixins' as type;
 
-     @media (min-width: 560px) {
-        // height: 910px;
-        padding: 64px 64px 128px;
+.donation-section {
+    position: relative;
+    width: 100%;
+    height: 886px;
+    color: white;
+
+    @media (min-width: 560px) {
+        height: 910px;
     }
 
     @media (min-width: 768px) {
-        // height: 1046px;
-        padding: 128px 56px 128px;
-    }
+        height: 1046px;
+    } 
 
-//     @media (min-width: 1440px) {
-//         padding: 128px 56px 156px;
-//     }
+    @media (min-width: 1440px) {
+        height: 720px;
+    }
 }
 
 .video-background-container {
@@ -26,4 +27,66 @@
     height: 100%;
     overflow: hidden;
     background: rgba(black, 0.5);
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 64px 16px 128px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 64px;
+
+    @media (min-width: 560px) {
+        padding: 64px 64px 128px;
+    }
+
+    @media (min-width: 768px) {
+        padding: 128px 56px 128px;
+    }
+
+    @media (min-width: 1440px) {
+        padding: 128px 136px 128px;
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 120px;
+    }
+
+    .heading {
+        align-self: flex-start;
+    }
+
+    .title {
+        @include type.h4-bold-uppercase;
+
+        @media (min-width: 560px) {
+            @include type.h3-bold-uppercase;
+        }
+
+        @media (min-width: 768px) {
+            @include type.h2-bold-uppercase;
+        }
+    }
+
+    .description {
+        @include type.body-2-semibold;
+        margin-top: 8px;
+    }
+}
+
+.donation {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    max-width: 432px;
+
+    .button {
+        width: 100%;
+    }
 }

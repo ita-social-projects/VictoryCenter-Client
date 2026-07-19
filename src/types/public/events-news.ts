@@ -12,7 +12,7 @@ export interface Tag {
 }
 
 export interface EventsData {
-    title: string;
+    title?: string;
     tags: Tag[];
 }
 

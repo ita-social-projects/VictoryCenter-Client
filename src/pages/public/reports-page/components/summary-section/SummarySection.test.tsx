@@ -7,6 +7,12 @@ jest.mock('@/hooks/common/use-locale/useLocale', () => ({
     useLocale: jest.fn(),
 }));
 
+jest.mock('react-i18next', () => ({
+    useTranslation: () => ({
+        t: (key: string) => key,
+    }),
+}));
+
 jest.mock('@/services/api/public/localization/languages/languages-api', () => ({
     localizationLanguagesDataFetch: jest.fn(),
 }));
@@ -24,7 +30,11 @@ const MOCK_DATA = {
     funding: { totalUah: 100000, totalUsd: 2352.94, items: [{ label: 'Funding 1', amountUah: 20, amountUsd: 0.47 }] },
     expenses: { totalUah: 10, totalUsd: 0.24, items: [{ label: 'Expense 1', amountUah: 10, amountUsd: 0.24 }] },
     programs: { items: [{ label: 'Program 1', amountUah: 30, amountUsd: 0.71 }] },
-    settings: { disclaimerTitle: 'Test currency disclaimer text' }
+    settings: { disclaimerTitle: 'Test currency disclaimer text' },
+    mediaSettings: {
+        collectedFunds: { title: 'Зібрано', imageUrl: null },
+        changedLives: { title: 'Змінених життів', imageUrl: null, value: 205 }
+    }
 };
 
 jest.mock('./stat-card', () => ({
@@ -148,5 +158,44 @@ describe('SummarySection', () => {
         const chart = await screen.findByTestId('programs-chart');
         const expectedData = [{ label: 'Program 1', amountUah: 30, amountUsd: 0.71, amount: 30 }];
         expect(chart).toHaveTextContent(JSON.stringify(expectedData));
+    });
+
+    it('renders error message when API returns non-404 error', async () => {
+        mockGetPublishedReports.mockRejectedValue(new Error('Network error'));
+        render(<SummarySection />);
+        expect(await screen.findByText('summary.error')).toBeInTheDocument();
+    });
+
+    it('calculates 0 percent when totalExpenses is 0', async () => {
+        mockGetPublishedReports.mockResolvedValue({
+            ...MOCK_DATA,
+            expenses: { totalUah: 0, totalUsd: 0, items: [{ label: 'Expense 1', amountUah: 0, amountUsd: 0 }] }
+        });
+        render(<SummarySection />);
+
+        const chart = await screen.findByTestId('expenses-chart');
+        const expectedData = [{ label: 'Expense 1', amountUah: 0, amountUsd: 0, amount: 0, percent: 0 }];
+        expect(chart).toHaveTextContent(JSON.stringify(expectedData));
+    });
+
+    it('uses fallback titles for collected and changed lives when missing', async () => {
+        mockGetPublishedReports.mockResolvedValue({
+            ...MOCK_DATA,
+            mediaSettings: {
+                collectedFunds: { title: '', imageUrl: null },
+                changedLives: { title: '', imageUrl: null, value: 0 }
+            }
+        });
+        render(<SummarySection />);
+
+        const cards = await screen.findAllByTestId('stat-card');
+        expect(cards[0]).toHaveTextContent('summary.collected: 100 000 грн');
+        expect(cards[1]).toHaveTextContent('summary.lives: 0');
+    });
+
+    it('handles when language is not found gracefully', async () => {
+        mockLocalizationLanguagesDataFetch.mockResolvedValue([{ id: 1, code: 'fr' }]); // No en or uk
+        render(<SummarySection />);
+        expect(screen.queryByText('summary.error')).not.toBeInTheDocument();
     });
 });

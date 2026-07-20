@@ -327,7 +327,14 @@ describe('ReportsMediaBlock', () => {
             );
         });
 
-        it('should work without validateTotalAmount function', () => {
+        it('should handle blur when totalAmount has not changed', () => {
+            renderComponent({ isValueEditable: true });
+            const valueInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-value');
+            fireEvent.blur(valueInput);
+            expect(mockOnValuesChange).not.toHaveBeenCalled();
+        });
+
+        it('should work without validateTotalAmount function on change and blur', () => {
             renderComponent({
                 isValueEditable: true,
                 validationFunctions: { validateTitle: mockValidateTitle, validateTitleEn: mockValidateTitleEn },
@@ -338,6 +345,15 @@ describe('ReportsMediaBlock', () => {
 
             expect(mockOnValuesChange).toHaveBeenCalledWith(
                 { ...defaultValues, totalAmount: '500' },
+                { totalAmount: undefined },
+            );
+
+            mockOnValuesChange.mockClear();
+            fireEvent.change(valueInput, { target: { value: '600' } });
+            fireEvent.blur(valueInput);
+
+            expect(mockOnValuesChange).toHaveBeenCalledWith(
+                { ...defaultValues, totalAmount: '600' },
                 { totalAmount: undefined },
             );
         });
@@ -427,7 +443,7 @@ describe('ReportsMediaBlock', () => {
             expect(screen.getByTestId('mock-image-value')).toHaveTextContent('has-value');
         });
 
-        it('should not show server image (with url) in ImageInput', () => {
+        it('should show server image (with url) in ImageInput', () => {
             const serverImage: Image = {
                 id: 1,
                 url: 'https://example.com/image.png',
@@ -435,7 +451,7 @@ describe('ReportsMediaBlock', () => {
             };
             renderComponent({ values: { ...defaultValues, image: serverImage } });
 
-            expect(screen.getByTestId('mock-image-value')).toHaveTextContent('no-value');
+            expect(screen.getByTestId('mock-image-value')).toHaveTextContent('has-value');
         });
 
         it('should show no-value when image is null', () => {

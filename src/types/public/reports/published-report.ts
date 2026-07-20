@@ -30,9 +30,21 @@ export interface PublishedProgramExpendituresGroupDto {
     items: PublishedProgramExpendituresItemDto[];
 }
 
+export interface PublishedMediaBlockDto {
+    title: string;
+    imageUrl: string | null;
+    value?: number;
+}
+
+export interface PublishedReportMediaSettingsDto {
+    collectedFunds: PublishedMediaBlockDto;
+    changedLives: PublishedMediaBlockDto;
+}
+
 export interface PublishedReportFundsExpendituresDto {
     settings: PublishedReportSettingsDto;
     funding: PublishedFundsExpendituresGroupDto;
     expenses: PublishedFundsExpendituresGroupDto;
     programs: PublishedProgramExpendituresGroupDto;
+    mediaSettings: PublishedReportMediaSettingsDto;
 }

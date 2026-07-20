@@ -105,7 +105,8 @@ export const SummarySection = () => {
                 className={styles.collected}
                 value={collectedAmount}
                 formattedValue={formattedCollectedValue}
-                label={t('summary.collected')}
+                label={data.mediaSettings.collectedFunds.title || t('summary.collected')}
+                imageUrl={data.mediaSettings.collectedFunds.imageUrl}
                 color="blue"
             />
             <div className={styles.expenses}>
@@ -119,8 +120,9 @@ export const SummarySection = () => {
             </div>
             <StatCard
                 className={styles.lives}
-                value={205} // Still mock as backend doesn't provide livesChanged yet
-                label={t('summary.lives')}
+                value={data.mediaSettings.changedLives.value || 0}
+                label={data.mediaSettings.changedLives.title || t('summary.lives')}
+                imageUrl={data.mediaSettings.changedLives.imageUrl}
                 color="yellow"
             />
             {data.settings.disclaimerTitle && <p className={styles.disclaimer}>{data.settings.disclaimerTitle}</p>}

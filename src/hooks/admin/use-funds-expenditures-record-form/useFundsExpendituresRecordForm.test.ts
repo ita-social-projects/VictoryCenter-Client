@@ -114,6 +114,27 @@ describe('useFundsExpendituresRecordForm', () => {
         expect(result.current.isSubmitDisabled).toBe(true);
     });
 
+    it('blocks handleConfirmAdd on mismatch even without a preceding USD blur', async () => {
+        const onSubmit = jest.fn().mockResolvedValue(true);
+        const { result } = renderUseFundsForm({ onSubmit });
+
+        act(() => {
+            result.current.handleReportingYearChange('2026');
+            result.current.handleCategoryChange(3);
+            result.current.handleAmountChange('100');
+            result.current.handleUsdChange('15');
+        });
+
+        expect(result.current.usdMismatchMessage).toBeUndefined();
+
+        await act(async () => {
+            await result.current.handleConfirmAdd();
+        });
+
+        expect(onSubmit).not.toHaveBeenCalled();
+        expect(result.current.usdMismatchMessage).toBe(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH);
+    });
+
     it('blocks submit and surfaces required error when reporting year is missing', async () => {
         const onSubmit = jest.fn().mockResolvedValue(true);
         const { result } = renderUseFundsForm({ onSubmit });

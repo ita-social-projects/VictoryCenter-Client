@@ -52,6 +52,9 @@ export const ReportAnalytics = () => {
     const [isFundsValid, setIsFundsValid] = useState(false);
     const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
     const [isPublishing, setIsPublishing] = useState(false);
+    const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+    const [isCancelling, setIsCancelling] = useState(false);
+    const [renderKey, setRenderKey] = useState(0);
     const saveSettingsCallbackRef = useRef<(() => Promise<boolean>) | null>(null);
 
     useEffect(() => {
@@ -138,6 +141,25 @@ export const ReportAnalytics = () => {
         }
     }, [adminClient, addToast]);
 
+    const handleCancelClick = useCallback(() => {
+        setIsCancelModalOpen(true);
+    }, []);
+
+    const handleCancelConfirm = useCallback(async () => {
+        setIsCancelling(true);
+        try {
+            await FundsExpendituresApi.cancelRecords(adminClient);
+            setHasUnpublishedChanges(false);
+            setIsFundsEditing(false);
+            setIsCancelModalOpen(false);
+            setRenderKey((prev) => prev + 1);
+        } catch (error) {
+            addToast('Не вдалося відмінити зміни', ToastType.Error);
+        } finally {
+            setIsCancelling(false);
+        }
+    }, [adminClient, addToast]);
+
     return (
         <div className={styles['report-analytics']}>
             <h2 className={styles.title}>{REPORTS_TEXT.REPORT_AND_ANALYTICS.TITLE}</h2>
@@ -156,7 +178,7 @@ export const ReportAnalytics = () => {
                 contextMenuOptions={categoryContextMenuOptions}
                 onContextMenuOptionSelected={handleCategoryContextMenuOption}
             />
-            <div className={styles['tab-content']}>
+            <div className={styles['tab-content']} key={renderKey}>
                 {activeTab.id === 'pdf-files' && <PdfFilesSection />}
                 <div style={{ display: activeTab.id === 'income-expenses' ? 'block' : 'none' }}>
                     <FundsExpenditureSection
@@ -209,7 +231,7 @@ export const ReportAnalytics = () => {
                     <Button
                         buttonStyle="secondary"
                         className={styles['footer-button']}
-                        onClick={() => setIsFundsEditing(false)}
+                        onClick={handleCancelClick}
                     >
                         {COMMON_TEXT_ADMIN.BUTTON.CANCEL}
                     </Button>
@@ -233,6 +255,16 @@ export const ReportAnalytics = () => {
                 onConfirm={handlePublishConfirm}
                 onCancel={() => setIsPublishModalOpen(false)}
                 onClose={() => setIsPublishModalOpen(false)}
+            />
+            <ConfirmationModal
+                isOpen={isCancelModalOpen}
+                title="Зміни будуть втрачені. Бажаєте продовжити?"
+                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
+                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
+                isButtonsDisabled={isCancelling}
+                onConfirm={handleCancelConfirm}
+                onCancel={() => setIsCancelModalOpen(false)}
+                onClose={() => setIsCancelModalOpen(false)}
             />
         </div>
     );

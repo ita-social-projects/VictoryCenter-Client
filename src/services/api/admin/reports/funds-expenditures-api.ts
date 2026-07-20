@@ -178,4 +178,7 @@ export const FundsExpendituresApi = {
     publishRecords: async (client: AxiosInstance): Promise<void> => {
         await client.post(API_ROUTES.REPORTS.FUNDS_EXPENDITURES.PUBLISH);
     },
+    cancelRecords: async (client: AxiosInstance): Promise<void> => {
+        await client.post(API_ROUTES.REPORTS.FUNDS_EXPENDITURES.CANCEL);
+    },
 };

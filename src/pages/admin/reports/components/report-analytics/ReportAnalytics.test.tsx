@@ -24,21 +24,26 @@ const mockLocalizationLanguagesDataFetch = localizationLanguagesDataFetch as jes
 
 const mockPublishRecords = jest.fn();
 const mockGetSettings = jest.fn();
+const mockCancelRecords = jest.fn();
 jest.mock('@/services/api/admin/reports/funds-expenditures-api', () => ({
     FundsExpendituresApi: {
         publishRecords: (...args: unknown[]) => mockPublishRecords(...args),
         getSettings: (...args: unknown[]) => mockGetSettings(...args),
+        cancelRecords: (...args: unknown[]) => mockCancelRecords(...args),
     },
 }));
 
 jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
-    ConfirmationModal: ({ isOpen, onConfirm, onCancel, onClose }: any) => (
-        <div data-testid="confirmation-modal" data-open={String(isOpen)}>
-            <button type="button" data-testid="confirm-modal" onClick={onConfirm}>Confirm</button>
-            <button type="button" data-testid="cancel-modal" onClick={onCancel}>Cancel</button>
-            <button type="button" data-testid="close-modal" onClick={onClose}>Close</button>
-        </div>
-    )
+    ConfirmationModal: ({ isOpen, onConfirm, onCancel, onClose, title }: any) => {
+        const idSuffix = title === 'Опублікувати зміни?' ? 'publish' : 'cancel';
+        return (
+            <div data-testid={`confirmation-modal-${idSuffix}`} data-open={String(isOpen)}>
+                <button type="button" data-testid={`confirm-modal-${idSuffix}`} onClick={onConfirm}>Confirm</button>
+                <button type="button" data-testid={`cancel-modal-${idSuffix}`} onClick={onCancel}>Cancel</button>
+                <button type="button" data-testid={`close-modal-${idSuffix}`} onClick={onClose}>Close</button>
+            </div>
+        );
+    }
 }));
 
 jest.mock('../pdf-files-section/PdfFilesSection', () => ({
@@ -204,6 +209,7 @@ jest.mock('../program-expenses-section/ProgramExpensesSection', () => ({
 
 describe('ReportAnalytics', () => {
     beforeEach(() => {
+        jest.clearAllMocks();
         mockLocalizationLanguagesDataFetch.mockResolvedValue([]);
         mockedUseToast.mockReturnValue({ addToast: mockAddToast } as any);
         mockGetSettings.mockResolvedValue({ hasUnpublishedChanges: false });
@@ -436,7 +442,7 @@ describe('ReportAnalytics', () => {
             fireEvent.click(screen.getByTestId('trigger-program-data'));
             
             fireEvent.click(screen.getByText('Опублікувати'));
-            expect(screen.getByTestId('confirmation-modal')).toHaveAttribute('data-open', 'true');
+            expect(screen.getByTestId('confirmation-modal-publish')).toHaveAttribute('data-open', 'true');
         });
 
         it('should handle publish confirm successfully', async () => {
@@ -447,7 +453,7 @@ describe('ReportAnalytics', () => {
             fireEvent.click(screen.getByTestId('trigger-program-data'));
             
             fireEvent.click(screen.getByText('Опублікувати'));
-            fireEvent.click(screen.getByTestId('confirm-modal'));
+            fireEvent.click(screen.getByTestId('confirm-modal-publish'));
             
             await waitFor(() => {
                 expect(mockPublishRecords).toHaveBeenCalled();
@@ -464,7 +470,7 @@ describe('ReportAnalytics', () => {
             fireEvent.click(screen.getByTestId('trigger-program-data'));
             
             fireEvent.click(screen.getByText('Опублікувати'));
-            fireEvent.click(screen.getByTestId('confirm-modal'));
+            fireEvent.click(screen.getByTestId('confirm-modal-publish'));
             
             await waitFor(() => {
                 expect(mockPublishRecords).not.toHaveBeenCalled(); 
@@ -479,7 +485,7 @@ describe('ReportAnalytics', () => {
             fireEvent.click(screen.getByTestId('trigger-program-data'));
             
             fireEvent.click(screen.getByText('Опублікувати'));
-            fireEvent.click(screen.getByTestId('confirm-modal'));
+            fireEvent.click(screen.getByTestId('confirm-modal-publish'));
             
             await waitFor(() => {
                 expect(mockAddToast).toHaveBeenCalledWith(REPORTS_TEXT.MESSAGE.FAIL_TO_UPDATE_REPORT, 'error');
@@ -493,9 +499,9 @@ describe('ReportAnalytics', () => {
             fireEvent.click(screen.getByTestId('trigger-program-data'));
             
             fireEvent.click(screen.getByText('Опублікувати'));
-            fireEvent.click(screen.getByTestId('cancel-modal'));
+            fireEvent.click(screen.getByTestId('cancel-modal-publish'));
             
-            expect(screen.getByTestId('confirmation-modal')).toHaveAttribute('data-open', 'false');
+            expect(screen.getByTestId('confirmation-modal-publish')).toHaveAttribute('data-open', 'false');
         });
 
         it('should close publish modal when close is clicked', () => {
@@ -505,18 +511,56 @@ describe('ReportAnalytics', () => {
             fireEvent.click(screen.getByTestId('trigger-program-data'));
             
             fireEvent.click(screen.getByText('Опублікувати'));
-            fireEvent.click(screen.getByTestId('close-modal'));
+            fireEvent.click(screen.getByTestId('close-modal-publish'));
             
-            expect(screen.getByTestId('confirmation-modal')).toHaveAttribute('data-open', 'false');
+            expect(screen.getByTestId('confirmation-modal-publish')).toHaveAttribute('data-open', 'false');
         });
+    });
 
-        it('should cancel edit mode when Cancel is clicked', () => {
+    describe('Cancel functionality', () => {
+        it('should open cancel modal when Cancel is clicked', () => {
             render(<ReportAnalytics />);
             fireEvent.click(screen.getByTestId('activate-funds-edit'));
             expect(screen.getByText('Опублікувати')).toBeInTheDocument();
             
             fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL));
+            expect(screen.getByTestId('confirmation-modal-cancel')).toHaveAttribute('data-open', 'true');
+        });
+
+        it('should close cancel modal when NO is clicked', () => {
+            render(<ReportAnalytics />);
+            fireEvent.click(screen.getByTestId('activate-funds-edit'));
+            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL));
+            
+            fireEvent.click(screen.getByTestId('cancel-modal-cancel'));
+            expect(screen.getByTestId('confirmation-modal-cancel')).toHaveAttribute('data-open', 'false');
+        });
+
+        it('should cancel records and exit edit mode when YES is clicked', async () => {
+            mockCancelRecords.mockResolvedValueOnce({});
+            render(<ReportAnalytics />);
+            fireEvent.click(screen.getByTestId('activate-funds-edit'));
+            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL));
+            
+            fireEvent.click(screen.getByTestId('confirm-modal-cancel'));
+            
+            await waitFor(() => {
+                expect(mockCancelRecords).toHaveBeenCalled();
+            });
             expect(screen.queryByText('Опублікувати')).not.toBeInTheDocument();
+        });
+
+        it('should show error toast if cancel records fails', async () => {
+            mockCancelRecords.mockRejectedValueOnce(new Error('fail'));
+            render(<ReportAnalytics />);
+            fireEvent.click(screen.getByTestId('activate-funds-edit'));
+            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL));
+            
+            fireEvent.click(screen.getByTestId('confirm-modal-cancel'));
+            
+            await waitFor(() => {
+                expect(mockAddToast).toHaveBeenCalledWith('Не вдалося відмінити зміни', 'error');
+            });
         });
     });
 });

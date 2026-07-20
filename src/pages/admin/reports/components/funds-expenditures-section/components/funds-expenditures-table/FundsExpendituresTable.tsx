@@ -21,6 +21,7 @@ import {
     validateFundsExpendituresAmount,
     validateFundsExpendituresCategory,
 } from '@/validation/admin/reports-schema/funds-expenditures-record-schema/funds-expenditures-record-schema';
+import { isUsdAmountMismatch } from '@/utils/functions/validate-usd-amount-mismatch/validate-usd-amount-mismatch';
 import { getProgramReportingYearOptions } from '@/utils/functions/get-reporting-year-options/get-reporting-year-options';
 import { parseAmount } from '@/utils/functions/parse-amount/parse-amount';
 import cn from 'classnames';
@@ -128,7 +129,7 @@ const getCategoriesForType = (
         .sort((a, b) => a.name.localeCompare(b.name, 'uk'));
 };
 
-const isAcceptButtonDisabled = (rowEditState: RowEditState | null): boolean => {
+const isAcceptButtonDisabled = (rowEditState: RowEditState | null, exchangeRate?: string | null): boolean => {
     if (!rowEditState) {
         return true;
     }
@@ -142,7 +143,9 @@ const isAcceptButtonDisabled = (rowEditState: RowEditState | null): boolean => {
         rowEditState.categoryId === undefined ||
         Boolean(rowEditState.errors.category) ||
         Boolean(rowEditState.errors.amountUah) ||
-        Boolean(rowEditState.errors.amountUsd);
+        Boolean(rowEditState.errors.amountUsd) ||
+        Boolean(rowEditState.usdMismatchMessage) ||
+        isUsdAmountMismatch(normalizedAmountUah, normalizedAmountUsd, exchangeRate);
 
     const amountsEmpty = normalizedAmountUah === '' || normalizedAmountUsd === '';
 
@@ -190,7 +193,7 @@ export const FundsExpendituresTable = ({
         isRowActionsDisabled,
         exchangeRate,
         mismatchMessage: FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH,
-        isAcceptButtonDisabled,
+        isAcceptButtonDisabled: (state) => isAcceptButtonDisabled(state, exchangeRate),
         onRowEditModeChange,
     });
 

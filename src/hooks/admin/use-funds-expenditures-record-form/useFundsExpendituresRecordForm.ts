@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
 import {
     FundsExpendituresTransactionType,
     ReportFundsExpendituresCategory,
     ReportFundsExpendituresRecord,
 } from '@/types/admin/reports';
 import { updateFundsAmounts } from '@/utils/functions/update-funds-amounts/update-funds-amounts';
+import { isUsdAmountMismatch } from '@/utils/functions/validate-usd-amount-mismatch/validate-usd-amount-mismatch';
 import {
     normalizeFundsExpendituresAmountInput,
     validateFundsExpendituresAmount,
@@ -157,6 +159,12 @@ export const useFundsExpendituresRecordForm = ({
             return;
         }
 
+        const isMismatch = isUsdAmountMismatch(normalizedAmountUah, normalizedAmountUsd, exchangeRate);
+        if (isMismatch) {
+            setUsdMismatchMessage(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH);
+            return;
+        }
+
         if (!formState.categoryId) {
             return;
         }
@@ -178,7 +186,7 @@ export const useFundsExpendituresRecordForm = ({
         } finally {
             setIsSubmitting(false);
         }
-    }, [formState, getCategoryError, onSubmit, transactionType, setUsdMismatchMessage]);
+    }, [formState, getCategoryError, onSubmit, transactionType, setUsdMismatchMessage, exchangeRate]);
 
     const isDirty =
         Boolean(formState.reportingYear) ||
@@ -199,7 +207,9 @@ export const useFundsExpendituresRecordForm = ({
         Boolean(amountUsdValidationError) ||
         Boolean(categoryValidationError) ||
         Boolean(formState.errors.amountUah) ||
-        Boolean(formState.errors.amountUsd);
+        Boolean(formState.errors.amountUsd) ||
+        Boolean(usdMismatchMessage) ||
+        isUsdAmountMismatch(formState.amountUah, formState.amountUsd, exchangeRate);
 
     const handleOpenAddConfirmation = useCallback(() => {
         setIsAddConfirmationOpen(true);

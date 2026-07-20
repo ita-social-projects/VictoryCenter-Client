@@ -14,7 +14,7 @@ const MOCK_PROGRAM_EXPENSES_DATA: ProgramExpensesReadOnlyData = {
         { id: 3, name: 'Program C' },
     ],
     summary: {
-        totalAmountUah: 125000,
+        totalAmountUah: 123750,
         totalAmountUsd: 3000,
     },
     records: [
@@ -24,7 +24,7 @@ const MOCK_PROGRAM_EXPENSES_DATA: ProgramExpensesReadOnlyData = {
             programName: 'Program A',
             type: 'expense',
             reportingYear: '2025',
-            amountUah: '50000',
+            amountUah: '49500',
             amountUsd: '1200',
         },
         {
@@ -33,7 +33,7 @@ const MOCK_PROGRAM_EXPENSES_DATA: ProgramExpensesReadOnlyData = {
             programName: 'Program A',
             type: 'expense',
             reportingYear: '2024',
-            amountUah: '25000',
+            amountUah: '24750',
             amountUsd: '600',
         },
         {
@@ -42,7 +42,7 @@ const MOCK_PROGRAM_EXPENSES_DATA: ProgramExpensesReadOnlyData = {
             programName: 'Program B',
             type: 'expense',
             reportingYear: '2025',
-            amountUah: '50000',
+            amountUah: '49500',
             amountUsd: '1200',
         },
     ],
@@ -684,7 +684,7 @@ describe('ProgramExpensesSection', () => {
                 expect(mockUpdate).toHaveBeenCalledWith('mock-client', 1, {
                     reportingYear: 2025,
                     hippotherapyProgramCategoryId: 3,
-                    amountUah: 50000,
+                    amountUah: 49500,
                     amountUsd: 1200,
                 });
                 expect(mockAddToast).toHaveBeenCalledWith(REPORTS_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY, 'success');

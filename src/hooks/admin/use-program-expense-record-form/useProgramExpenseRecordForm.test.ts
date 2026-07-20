@@ -16,7 +16,7 @@ const records: ProgramExpensesRecord[] = [
         programName: 'Program A',
         type: 'expense',
         reportingYear: '2025',
-        amountUah: '100',
+        amountUah: '400',
         amountUsd: '10',
     },
 ];
@@ -60,7 +60,7 @@ describe('useProgramExpenseRecordForm', () => {
         act(() => {
             result.current.handleReportingYearChange('2026');
             result.current.handleProgramChange(1);
-            result.current.handleAmountChange('100');
+            result.current.handleAmountChange('400');
             result.current.handleUsdChange('10');
         });
 
@@ -74,7 +74,7 @@ describe('useProgramExpenseRecordForm', () => {
         act(() => {
             result.current.handleReportingYearChange('2026');
             result.current.handleProgramChange(2);
-            result.current.handleAmountChange('100');
+            result.current.handleAmountChange('400');
             result.current.handleUsdChange('10');
         });
 
@@ -180,7 +180,7 @@ describe('useProgramExpenseRecordForm', () => {
             programName: 'Program A',
             type: 'expense',
             reportingYear: '2025',
-            amountUah: '100',
+            amountUah: '400',
             amountUsd: '10',
         };
 
@@ -189,7 +189,7 @@ describe('useProgramExpenseRecordForm', () => {
 
             expect(result.current.formState.reportingYear).toBe('2025');
             expect(result.current.formState.programId).toBe(1);
-            expect(result.current.formState.amountUah).toBe('100');
+            expect(result.current.formState.amountUah).toBe('400');
             expect(result.current.formState.amountUsd).toBe('10');
             expect(result.current.isDirty).toBe(false);
             expect(result.current.isSubmitDisabled).toBe(true);

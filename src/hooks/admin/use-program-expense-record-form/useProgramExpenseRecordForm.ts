@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
 import { ProgramExpensesProgram, ProgramExpensesRecord } from '@/types/admin/reports';
 import { updateFundsAmounts } from '@/utils/functions/update-funds-amounts/update-funds-amounts';
+import { isUsdAmountMismatch } from '@/utils/functions/validate-usd-amount-mismatch/validate-usd-amount-mismatch';
 import { useAmountBlur } from '@/hooks/admin/use-amount-blur/useAmountBlur';
 import {
     validateProgramExpenseAmount,
@@ -223,6 +225,8 @@ export const useProgramExpenseRecordForm = ({
         !getProgramError(formState.programId, 'blur') &&
         !validateProgramExpenseAmount(formState.amountUah, 'save') &&
         !validateProgramExpenseAmount(formState.amountUsd, 'save') &&
+        !usdMismatchMessage &&
+        !isUsdAmountMismatch(formState.amountUah, formState.amountUsd, exchangeRate) &&
         !isSubmitting &&
         isDirty;
 
@@ -237,6 +241,12 @@ export const useProgramExpenseRecordForm = ({
     }, []);
 
     const submitRecord = useCallback(async (): Promise<boolean> => {
+        const isMismatch = isUsdAmountMismatch(formState.amountUah, formState.amountUsd, exchangeRate);
+        if (isMismatch) {
+            setUsdMismatchMessage(PROGRAM_EXPENSES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH);
+            return false;
+        }
+
         if (!formState.programId || !formState.reportingYear || isSubmitting) return false;
 
         setIsSubmitting(true);
@@ -251,7 +261,7 @@ export const useProgramExpenseRecordForm = ({
         } finally {
             setIsSubmitting(false);
         }
-    }, [formState, isSubmitting, onSubmit]);
+    }, [formState, isSubmitting, onSubmit, exchangeRate, setUsdMismatchMessage]);
 
     const handleConfirmAdd = useCallback(async () => {
         const success = await submitRecord();

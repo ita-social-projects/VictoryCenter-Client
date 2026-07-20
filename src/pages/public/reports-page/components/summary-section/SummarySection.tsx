@@ -1,13 +1,13 @@
-import React from 'react';
+import React, { useCallback } from 'react';
+import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useLocale } from '@/hooks/common/use-locale/useLocale';
-import {
-    EXPENSES_DATA,
-    FUNDING_DATA,
-    PROGRAMS_ALLOCATION_DATA,
-    SUMMARY_DATA,
-} from '@/utils/mock-data/public/reports-page';
+import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { formatAllocationAmount, formatCollectedAmount } from '@/utils/functions/formatters/report-amount-formatters';
+import { localizationLanguagesDataFetch } from '@/services/api/public/localization/languages/languages-api';
+import { ReportsPublicApi } from '@/services/api/public/reports/reports-api';
+import { PublishedReportFundsExpendituresDto } from '@/types/public/reports';
+import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import { StatCard } from './stat-card';
 import { ExpensesBreakdownChart } from './expenses-breakdown-chart';
 import { FundingSourcesChart } from './funding-sources-chart';
@@ -19,31 +19,84 @@ const USD_LABEL = 'USD';
 
 export const SummarySection = () => {
     const { t } = useTranslation('reportsPage');
-    const { isEn } = useLocale();
+    const { isEn, currentLanguage } = useLocale();
+    const fetchHandler = useCallback(async () => {
+        try {
+            const languages = await localizationLanguagesDataFetch();
+            const langCode = currentLanguage?.startsWith('en') ? 'en' : 'uk';
+            const language = languages.find((l) => l.code === langCode);
 
-    const currencyKey: 'uah' | 'usd' = isEn ? 'usd' : 'uah';
+            if (!language) return null;
+
+            return await ReportsPublicApi.getPublishedReports(language.id);
+        } catch (err) {
+            if (axios.isAxiosError(err) && err.response?.status === 404) {
+                return null;
+            }
+            throw err;
+        }
+    }, [currentLanguage]);
+
+    const { data, isLoading, error } = useDataFetch<PublishedReportFundsExpendituresDto | null>({
+        initialData: null,
+        autoFetchDependencies: [currentLanguage],
+        fetchHandler,
+    });
+
     const currencyLabel = isEn ? USD_LABEL : UAH_LABEL;
 
     const formatItemAmount = (amount: number) => {
         return `${formatAllocationAmount(amount, isEn)} ${currencyLabel}`;
     };
 
-    const collectedAmount = SUMMARY_DATA.collected[currencyKey];
+    if (isLoading) {
+        return (
+            <div
+                className={styles.root}
+                style={{ minHeight: 400, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            >
+                <InlineLoader size={3} />
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div
+                className={styles.root}
+                style={{ minHeight: 400, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            >
+                <p style={{ color: 'var(--vc-error-main, #d32f2f)' }}>
+                    {t('summary.error', 'Unable to load reports. Please try again later.')}
+                </p>
+            </div>
+        );
+    }
+
+    if (!data) return null;
+
+    const collectedAmount = isEn ? data.funding.totalUsd : data.funding.totalUah;
     const formattedCollectedValue = `${formatCollectedAmount(collectedAmount)} ${currencyLabel}`;
 
-    const expensesItems = EXPENSES_DATA.items.map((item) => ({
+    const totalExpenses = isEn ? data.expenses.totalUsd : data.expenses.totalUah;
+    const expensesItems = data.expenses.items.map((item) => {
+        const amount = isEn ? item.amountUsd : item.amountUah;
+        const percent = totalExpenses > 0 ? (amount / totalExpenses) * 100 : 0;
+        return {
+            ...item,
+            amount,
+            percent,
+        };
+    });
+
+    const fundingItems = data.funding.items.map((item) => ({
         ...item,
-        amount: item.amount[currencyKey],
+        amount: isEn ? item.amountUsd : item.amountUah,
     }));
 
-    const fundingItems = FUNDING_DATA.items.map((item) => ({
+    const programsItems = data.programs.items.map((item) => ({
         ...item,
-        amount: item.amount[currencyKey],
-    }));
-
-    const programsItems = PROGRAMS_ALLOCATION_DATA.items.map((item) => ({
-        ...item,
-        amount: item.amount[currencyKey],
+        amount: isEn ? item.amountUsd : item.amountUah,
     }));
 
     return (
@@ -66,11 +119,11 @@ export const SummarySection = () => {
             </div>
             <StatCard
                 className={styles.lives}
-                value={SUMMARY_DATA.livesChanged}
+                value={205} // Still mock as backend doesn't provide livesChanged yet
                 label={t('summary.lives')}
                 color="yellow"
             />
-            {isEn && SUMMARY_DATA.disclaimer && <p className={styles.disclaimer}>{SUMMARY_DATA.disclaimer}</p>}
+            {data.settings.disclaimerTitle && <p className={styles.disclaimer}>{data.settings.disclaimerTitle}</p>}
         </section>
     );
 };

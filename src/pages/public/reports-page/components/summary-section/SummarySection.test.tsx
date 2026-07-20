@@ -7,16 +7,25 @@ jest.mock('@/hooks/common/use-locale/useLocale', () => ({
     useLocale: jest.fn(),
 }));
 
-jest.mock('@/utils/mock-data/public/reports-page', () => ({
-    SUMMARY_DATA: {
-        collected: { uah: 100000, usd: 2352.94 },
-        livesChanged: 42,
-        disclaimer: 'Test currency disclaimer text',
-    },
-    EXPENSES_DATA: { items: [{ label: 'Expense 1', amount: { uah: 10, usd: 0.24 }, percent: 10 }] },
-    FUNDING_DATA: { items: [{ label: 'Funding 1', amount: { uah: 20, usd: 0.47 } }] },
-    PROGRAMS_ALLOCATION_DATA: { items: [{ label: 'Program 1', amount: { uah: 30, usd: 0.71 } }] },
+jest.mock('@/services/api/public/localization/languages/languages-api', () => ({
+    localizationLanguagesDataFetch: jest.fn(),
 }));
+
+jest.mock('@/services/api/public/reports/reports-api', () => ({
+    ReportsPublicApi: {
+        getPublishedReports: jest.fn(),
+    },
+}));
+
+const mockLocalizationLanguagesDataFetch = require('@/services/api/public/localization/languages/languages-api').localizationLanguagesDataFetch;
+const mockGetPublishedReports = require('@/services/api/public/reports/reports-api').ReportsPublicApi.getPublishedReports;
+
+const MOCK_DATA = {
+    funding: { totalUah: 100000, totalUsd: 2352.94, items: [{ label: 'Funding 1', amountUah: 20, amountUsd: 0.47 }] },
+    expenses: { totalUah: 10, totalUsd: 0.24, items: [{ label: 'Expense 1', amountUah: 10, amountUsd: 0.24 }] },
+    programs: { items: [{ label: 'Program 1', amountUah: 30, amountUsd: 0.71 }] },
+    settings: { disclaimerTitle: 'Test currency disclaimer text' }
+};
 
 jest.mock('./stat-card', () => ({
     StatCard: ({ label, value, currency, formattedValue }: any) => (
@@ -57,87 +66,87 @@ const mockUseLocale = useLocale as jest.Mock;
 
 describe('SummarySection', () => {
     beforeEach(() => {
-        mockUseLocale.mockReturnValue({ isEn: false });
+        mockUseLocale.mockReturnValue({ isEn: false, currentLanguage: 'uk' });
+        mockLocalizationLanguagesDataFetch.mockResolvedValue([{ id: 1, code: 'uk' }, { id: 2, code: 'en' }]);
+        mockGetPublishedReports.mockResolvedValue(MOCK_DATA);
     });
 
     afterEach(() => {
         jest.clearAllMocks();
     });
 
-    it('renders collected stat card with UAH currency by default', () => {
+    it('renders collected stat card with UAH currency by default', async () => {
         render(<SummarySection />);
 
-        const cards = screen.getAllByTestId('stat-card');
+        const cards = await screen.findAllByTestId('stat-card');
         expect(cards[0]).toHaveTextContent('Зібрано: 100 000 грн');
     });
 
-    it('renders collected stat card with pre-formatted USD value when English is active', () => {
-        mockUseLocale.mockReturnValue({ isEn: true });
+    it('renders collected stat card with pre-formatted USD value when English is active', async () => {
+        mockUseLocale.mockReturnValue({ isEn: true, currentLanguage: 'en' });
 
         render(<SummarySection />);
 
-        const cards = screen.getAllByTestId('stat-card');
+        const cards = await screen.findAllByTestId('stat-card');
         expect(cards[0]).toHaveTextContent('Зібрано: 2 352 USD');
     });
 
-    it('renders lives changed card with static data', () => {
+    it('renders lives changed card with static data', async () => {
         render(<SummarySection />);
 
-        const cards = screen.getAllByTestId('stat-card');
-        expect(cards[1]).toHaveTextContent('Змінених життів: 42');
+        const cards = await screen.findAllByTestId('stat-card');
+        expect(cards[1]).toHaveTextContent('Змінених життів: 205');
     });
 
-    it('does not render disclaimer when UAH is active', () => {
+    it('does not render disclaimer when UAH is active', async () => {
+        mockUseLocale.mockReturnValue({ isEn: false, currentLanguage: 'uk' });
+        mockGetPublishedReports.mockResolvedValue({ ...MOCK_DATA, settings: { disclaimerTitle: null } });
+
         render(<SummarySection />);
 
+        await screen.findAllByTestId('stat-card');
         expect(screen.queryByText('Test currency disclaimer text')).not.toBeInTheDocument();
     });
 
-    it('renders disclaimer for the report summary', () => {
-        mockUseLocale.mockReturnValue({ isEn: true });
+    it('renders disclaimer for the report summary', async () => {
+        mockUseLocale.mockReturnValue({ isEn: true, currentLanguage: 'en' });
 
         render(<SummarySection />);
 
-        expect(screen.getByText('Test currency disclaimer text')).toBeInTheDocument();
+        expect(await screen.findByText('Test currency disclaimer text')).toBeInTheDocument();
     });
 
-    it('does not render disclaimer when English is active but disclaimer text is missing', () => {
-        mockUseLocale.mockReturnValue({ isEn: true });
-
-        const reportsPageMock = jest.requireMock('@/utils/mock-data/public/reports-page') as {
-            SUMMARY_DATA: { disclaimer?: string };
-        };
-        const originalDisclaimer = reportsPageMock.SUMMARY_DATA.disclaimer;
-        reportsPageMock.SUMMARY_DATA.disclaimer = undefined;
+    it('does not render disclaimer when English is active but disclaimer text is missing', async () => {
+        mockUseLocale.mockReturnValue({ isEn: true, currentLanguage: 'en' });
+        mockGetPublishedReports.mockResolvedValue({ ...MOCK_DATA, settings: { disclaimerTitle: null } });
 
         render(<SummarySection />);
 
+        await screen.findAllByTestId('stat-card');
         expect(screen.queryByText('Test currency disclaimer text')).not.toBeInTheDocument();
-
-        reportsPageMock.SUMMARY_DATA.disclaimer = originalDisclaimer;
     });
 
-    it('passes correct data to Expenses chart', () => {
+    it('passes correct data to Expenses chart', async () => {
         render(<SummarySection />);
 
-        const chart = screen.getByTestId('expenses-chart');
-        const expectedData = [{ label: 'Expense 1', amount: 10, percent: 10 }];
+        const chart = await screen.findByTestId('expenses-chart');
+        const expectedData = [{ label: 'Expense 1', amountUah: 10, amountUsd: 0.24, amount: 10, percent: 100 }];
         expect(chart).toHaveTextContent(JSON.stringify(expectedData));
     });
 
-    it('passes correct data to Funding chart', () => {
+    it('passes correct data to Funding chart', async () => {
         render(<SummarySection />);
 
-        const chart = screen.getByTestId('funding-chart');
-        const expectedData = [{ label: 'Funding 1', amount: 20 }];
+        const chart = await screen.findByTestId('funding-chart');
+        const expectedData = [{ label: 'Funding 1', amountUah: 20, amountUsd: 0.47, amount: 20 }];
         expect(chart).toHaveTextContent(JSON.stringify(expectedData));
     });
 
-    it('passes correct data to Programs chart', () => {
+    it('passes correct data to Programs chart', async () => {
         render(<SummarySection />);
 
-        const chart = screen.getByTestId('programs-chart');
-        const expectedData = [{ label: 'Program 1', amount: 30 }];
+        const chart = await screen.findByTestId('programs-chart');
+        const expectedData = [{ label: 'Program 1', amountUah: 30, amountUsd: 0.71, amount: 30 }];
         expect(chart).toHaveTextContent(JSON.stringify(expectedData));
     });
 });

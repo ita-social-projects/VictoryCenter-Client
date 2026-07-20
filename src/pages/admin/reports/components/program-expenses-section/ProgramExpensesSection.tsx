@@ -31,12 +31,16 @@ interface ProgramExpensesSectionProps {
     isEditing?: boolean;
     isRowEditMode?: boolean;
     onRowEditModeChange?: (isEditing: boolean) => void;
+    onCountsChange?: (count: number) => void;
+    onDataChange?: () => void;
 }
 
 export const ProgramExpensesSection = ({
     isEditing = true,
     isRowEditMode: propIsRowEditMode,
     onRowEditModeChange,
+    onCountsChange,
+    onDataChange,
 }: ProgramExpensesSectionProps) => {
     const adminClient = useAdminClient();
     const { addToast } = useToast();
@@ -108,6 +112,10 @@ export const ProgramExpensesSection = ({
     const exchangeRate = data.exchangeRate;
     const isAddProgramExpenseDisabled = programExpenseRecordsCount >= MAX_PROGRAM_EXPENSE_RECORDS || isRowEditMode;
 
+    useEffect(() => {
+        onCountsChange?.(programExpenseRecordsCount);
+    }, [programExpenseRecordsCount, onCountsChange]);
+
     const handleOpenAddProgramExpenseModal = useCallback(() => {
         setIsAddProgramExpenseModalOpen(true);
     }, []);
@@ -133,6 +141,7 @@ export const ProgramExpensesSection = ({
                 };
 
                 await ProgramExpensesApi.update(adminClient, recordId, payload);
+                onDataChange?.();
                 addToast(REPORTS_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY, ToastType.Success);
 
                 try {
@@ -147,7 +156,7 @@ export const ProgramExpensesSection = ({
                 return false;
             }
         },
-        [adminClient, refetchReadOnlyData, addToast],
+        [adminClient, refetchReadOnlyData, addToast, onDataChange],
     );
 
     const handleSubmitAddProgramExpense = useCallback(
@@ -169,6 +178,7 @@ export const ProgramExpensesSection = ({
                 };
 
                 await ProgramExpensesApi.post(adminClient, payload);
+                onDataChange?.();
                 addToast(PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_CREATED_SUCCESSFULLY, ToastType.Success);
 
                 setIsAddProgramExpenseModalOpen(false);
@@ -185,7 +195,7 @@ export const ProgramExpensesSection = ({
                 return false;
             }
         },
-        [adminClient, refetchReadOnlyData, addToast],
+        [adminClient, refetchReadOnlyData, addToast, onDataChange],
     );
 
     const handleDeleteClick = useCallback((record: ProgramExpensesRecord) => {
@@ -200,6 +210,7 @@ export const ProgramExpensesSection = ({
 
         try {
             await ProgramExpensesApi.delete(adminClient, recordToDelete.id);
+            onDataChange?.();
             addToast(PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_DELETED_SUCCESSFULLY, ToastType.Success);
             setIsDeleteModalOpen(false);
 
@@ -214,7 +225,7 @@ export const ProgramExpensesSection = ({
             setIsDeletingRecord(false);
             setRecordToDelete(null);
         }
-    }, [recordToDelete, adminClient, addToast, refetchReadOnlyData]);
+    }, [recordToDelete, adminClient, addToast, refetchReadOnlyData, onDataChange]);
 
     const handleCancelDelete = useCallback(() => {
         setIsDeleteModalOpen(false);
@@ -252,6 +263,7 @@ export const ProgramExpensesSection = ({
 
         try {
             await ProgramExpensesApi.bulkDelete(adminClient, selectedRecordIds);
+            onDataChange?.();
             setSelectedRecordIds([]);
             setIsBulkDeleteModalOpen(false);
             refetchReadOnlyData();
@@ -262,7 +274,7 @@ export const ProgramExpensesSection = ({
         } finally {
             setIsBulkDeleting(false);
         }
-    }, [adminClient, selectedRecordIds, refetchReadOnlyData, addToast]);
+    }, [adminClient, selectedRecordIds, refetchReadOnlyData, addToast, onDataChange]);
 
     if (isInitialLoading) {
         return (

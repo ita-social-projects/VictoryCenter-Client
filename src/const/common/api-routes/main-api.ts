@@ -103,6 +103,8 @@ export const API_ROUTES = {
             RECORDS: 'ReportFundsExpendituresRecords',
             SUMMARY: 'ReportFundsExpendituresRecords/summary',
             CATEGORIES: 'ReportFundsExpendituresCategories',
+            PUBLISH: 'admin/report-funds-expenditures/publish',
+            PUBLIC: 'ReportFundsExpenditures',
         },
         PROGRAM_EXPENDITURES_RECORDS: 'ReportProgramExpendituresRecords',
     },

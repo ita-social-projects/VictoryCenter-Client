@@ -98,6 +98,7 @@ export interface ReportFundsExpendituresSettingsDto {
     disclaimerTitle: string;
     exchangeRate: number;
     programExpendituresReportingYear: number;
+    hasUnpublishedChanges: boolean;
 }
 
 export interface UpdateReportFundsExpendituresSettingsDto {
@@ -162,6 +163,7 @@ export interface ReportFundsExpendituresSettings {
     disclaimerTitle: string | null;
     exchangeRate: string | null;
     programExpendituresReportingYear: number | null;
+    hasUnpublishedChanges: boolean;
 }
 
 export interface ReportFundsExpendituresCategoryLocalizableFields {

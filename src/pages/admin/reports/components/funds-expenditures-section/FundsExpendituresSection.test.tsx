@@ -23,6 +23,7 @@ const MOCK_FUNDS_EXPENDITURES_SETTINGS: ReportFundsExpendituresSettings = {
     disclaimerTitle: 'Фінансовий звіт Victory Center за поточний рік. Ми забезпечуємо прозорість кожної гривні.',
     exchangeRate: '42.18',
     programExpendituresReportingYear: 2025,
+    hasUnpublishedChanges: false,
 };
 
 const MOCK_FUNDS_EXPENDITURES_CATEGORIES: ReportFundsExpendituresCategory[] = [
@@ -540,6 +541,25 @@ describe('FundsExpenditureSection', () => {
         expect(screen.getByTestId('funds-table')).toBeInTheDocument();
     });
 
+    it('should call handleProgramYearSave when triggered from table', async () => {
+        mockUpdateSettings.mockResolvedValueOnce({ id: 1 });
+        render(<FundsExpenditureSection isEditing />);
+        fireEvent.click(screen.getByTestId('trigger-program-year-save'));
+        await waitFor(() => {
+            expect(mockUpdateSettings).toHaveBeenCalled();
+            expect(mockAddToast).toHaveBeenCalledWith(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY, 'success');
+        });
+    });
+
+    it('should show error when handleProgramYearSave fails', async () => {
+        mockUpdateSettings.mockRejectedValueOnce(new Error('fail'));
+        render(<FundsExpenditureSection isEditing />);
+        fireEvent.click(screen.getByTestId('trigger-program-year-save'));
+        await waitFor(() => {
+            expect(mockAddToast).toHaveBeenCalledWith(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_UPDATE_FAILED_RETRY, 'error');
+        });
+    });
+
     it('should render loader when funds and expenditures data is loading', () => {
         setupMockDataFetch(null, [], [], MOCK_FUNDS_EXPENDITURES_SUMMARY, {
             0: true,
@@ -566,6 +586,7 @@ describe('FundsExpenditureSection', () => {
             disclaimerTitle: null,
             exchangeRate: '42.18',
             programExpendituresReportingYear: 2025,
+            hasUnpublishedChanges: false,
         });
         render(<FundsExpenditureSection />);
         expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.DISCLAIMER_LABEL)).not.toBeInTheDocument();
@@ -644,6 +665,73 @@ describe('FundsExpenditureSection', () => {
             expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-editing', 'true');
         });
 
+        it('should show error when creating reserved category', async () => {
+            render(<FundsExpenditureSection isAddCategoryModalOpen />);
+            const submitBtn = screen.getByTestId('add-category-submit-reserved');
+            fireEvent.click(submitBtn);
+            expect(mockAddToast).toHaveBeenCalledWith(FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_CREATE_FAILED_RETRY, 'error');
+        });
+
+        it('should successfully create valid category', async () => {
+            render(<FundsExpenditureSection isAddCategoryModalOpen />);
+            mockCreateCategory.mockResolvedValueOnce({ id: 9 });
+            const submitBtn = screen.getByTestId('add-category-submit-valid');
+            fireEvent.click(submitBtn);
+            await waitFor(() => {
+                expect(mockAddToast).toHaveBeenCalledWith(FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_CREATED_SUCCESSFULLY, 'success');
+            });
+        });
+
+        it('should delete record successfully', async () => {
+            render(<FundsExpenditureSection isEditing />);
+            fireEvent.click(screen.getByTestId('trigger-record-delete'));
+            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
+            await waitFor(() => {
+                expect(mockDeleteRecord).toHaveBeenCalled();
+                expect(mockAddToast).toHaveBeenCalledWith(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_DELETED_SUCCESSFULLY, 'success');
+            });
+        });
+
+        it('should show error when deleting record fails', async () => {
+            mockDeleteRecord.mockRejectedValueOnce(new Error('fail'));
+            render(<FundsExpenditureSection isEditing />);
+            fireEvent.click(screen.getByTestId('trigger-record-delete'));
+            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
+            await waitFor(() => {
+                expect(mockAddToast).toHaveBeenCalledWith(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_DELETE_FAILED_RETRY, 'error');
+            });
+        });
+
+        it('should save settings when registered save function is called', async () => {
+            let saveFn: (() => Promise<boolean>) | undefined;
+            const registerSaveCallback = (fn: () => Promise<boolean>) => { saveFn = fn; };
+            render(<FundsExpenditureSection isEditing registerSaveCallback={registerSaveCallback} />);
+
+            mockUpdateSettings.mockResolvedValueOnce({
+                id: 1, disclaimerTitle: 'saved', exchangeRate: '42.18'
+            });
+
+            expect(saveFn).toBeDefined();
+            if (saveFn) {
+                const success = await saveFn();
+                expect(success).toBe(true);
+            }
+        });
+
+        it('should show error when registered save function fails', async () => {
+            let saveFn: (() => Promise<boolean>) | undefined;
+            const registerSaveCallback = (fn: () => Promise<boolean>) => { saveFn = fn; };
+            render(<FundsExpenditureSection isEditing registerSaveCallback={registerSaveCallback} />);
+
+            mockUpdateSettings.mockRejectedValueOnce(new Error('fail'));
+
+            if (saveFn) {
+                const success = await saveFn();
+                expect(success).toBe(false);
+                expect(mockAddToast).toHaveBeenCalledWith(REPORTS_TEXT.MESSAGE.FAIL_TO_UPDATE_REPORT, 'error');
+            }
+        });
+
         it('should propagate edit mode to table when edit button is clicked', () => {
             render(<FundsExpenditureSection />);
             fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT));
@@ -670,7 +758,7 @@ describe('FundsExpenditureSection', () => {
         });
 
         it('should initialize edit values from settings when mounted in edit mode', () => {
-            render(<FundsExpenditureSection initialIsEditing />);
+            render(<FundsExpenditureSection isEditing />);
 
             expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-editing', 'true');
             expect(screen.getByTestId('textarea-funds-disclaimer')).toHaveValue(
@@ -682,7 +770,7 @@ describe('FundsExpenditureSection', () => {
         });
 
         it('should initialize exchange rate from draft value when mounted in edit mode', () => {
-            render(<FundsExpenditureSection initialIsEditing draftExchangeRate="44.20" />);
+            render(<FundsExpenditureSection isEditing draftExchangeRate="44.20" />);
 
             expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-editing', 'true');
             expect(screen.getByTestId('exchange-rate')).toHaveTextContent('44.20');
@@ -694,17 +782,13 @@ describe('FundsExpenditureSection', () => {
             expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT)).not.toBeInTheDocument();
         });
 
-        it('should return to non-editing state when cancel is clicked', () => {
-            render(<FundsExpenditureSection />);
-            fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT));
-            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL));
-            expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-editing', 'false');
-        });
+        it('should return to read mode and show edit button when isEditing changes to false', () => {
+            const { rerender } = render(<FundsExpenditureSection isEditing={true} />);
+            expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-editing', 'true');
+            expect(screen.queryByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT)).not.toBeInTheDocument();
 
-        it('should show edit button again after cancel', () => {
-            render(<FundsExpenditureSection />);
-            fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT));
-            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL));
+            rerender(<FundsExpenditureSection isEditing={false} />);
+            expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-editing', 'false');
             expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT)).toBeInTheDocument();
         });
     });
@@ -717,7 +801,6 @@ describe('FundsExpenditureSection', () => {
 
         const enterEditMode = () => fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT));
         const getTextarea = () => screen.getByTestId('textarea-funds-disclaimer');
-        const getPublishButton = () => screen.getByText(COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED);
 
         it('should show required error when blurring an empty disclaimer', () => {
             render(<FundsExpenditureSection />);
@@ -766,106 +849,75 @@ describe('FundsExpenditureSection', () => {
             expect(getTextarea()).toHaveValue('leading and trailing');
         });
 
-        it('should disable publish button when disclaimer is empty', () => {
-            setupMockDataFetch({
-                id: 1,
-                disclaimerTitle: null,
-                exchangeRate: '42',
-                programExpendituresReportingYear: 2025,
-            });
-            render(<FundsExpenditureSection />);
-            enterEditMode();
-            expect(getPublishButton()).toBeDisabled();
+        it('should call onValidationChange with false when disclaimer is empty', () => {
+            const mockOnValidationChange = jest.fn();
+            render(<FundsExpenditureSection isEditing onValidationChange={mockOnValidationChange} />);
+            fireEvent.change(getTextarea(), { target: { value: '' } });
+            expect(mockOnValidationChange).toHaveBeenCalledWith(false);
         });
 
-        it('should disable publish button when disclaimer has only 1 character', () => {
-            render(<FundsExpenditureSection />);
-            enterEditMode();
+        it('should call onValidationChange with true when disclaimer is valid', () => {
+            const mockOnValidationChange = jest.fn();
+            render(<FundsExpenditureSection isEditing onValidationChange={mockOnValidationChange} />);
+            fireEvent.change(getTextarea(), { target: { value: 'valid text' } });
+            expect(mockOnValidationChange).toHaveBeenCalledWith(true);
+        });
+
+        it('should not throw if onValidationChange and onDataChange are omitted', () => {
+            render(<FundsExpenditureSection isEditing />);
+            fireEvent.change(getTextarea(), { target: { value: 'valid text' } });
+            fireEvent.click(screen.getByTestId('change-rate-invalid'));
+            // Implicitly asserts no error was thrown
+        });
+
+        it('should call onDataChange when disclaimer changes', () => {
+            const mockOnDataChange = jest.fn();
+            render(<FundsExpenditureSection isEditing onDataChange={mockOnDataChange} />);
+            fireEvent.change(getTextarea(), { target: { value: 'new text' } });
+            expect(mockOnDataChange).toHaveBeenCalled();
+        });
+
+        it('should call onDataChange when exchange rate changes', () => {
+            const mockOnDataChange = jest.fn();
+            render(<FundsExpenditureSection isEditing onDataChange={mockOnDataChange} />);
+            fireEvent.click(screen.getByTestId('change-rate-invalid'));
+            expect(mockOnDataChange).toHaveBeenCalled();
+        });
+
+        it('should call onValidationChange with false when disclaimer has only 1 character', () => {
+            const mockOnValidationChange = jest.fn();
+            render(<FundsExpenditureSection isEditing onValidationChange={mockOnValidationChange} />);
             fireEvent.change(getTextarea(), { target: { value: 'a' } });
-            expect(getPublishButton()).toBeDisabled();
+            expect(mockOnValidationChange).toHaveBeenCalledWith(false);
         });
 
-        it('should enable publish button when disclaimer has at least 2 characters', () => {
-            render(<FundsExpenditureSection />);
-            enterEditMode();
-            fireEvent.change(getTextarea(), { target: { value: 'ok' } });
-            expect(getPublishButton()).not.toBeDisabled();
+        it('should call onValidationChange with true when disclaimer already has a valid value from settings', () => {
+            const mockOnValidationChange = jest.fn();
+            render(<FundsExpenditureSection isEditing onValidationChange={mockOnValidationChange} />);
+            expect(mockOnValidationChange).toHaveBeenCalledWith(true);
         });
 
-        it('should enable publish button when disclaimer already has a valid value from settings', () => {
-            render(<FundsExpenditureSection />);
-            enterEditMode();
-            expect(getPublishButton()).not.toBeDisabled();
-        });
-
-        it('should disable publish button after a blur validation error', () => {
-            render(<FundsExpenditureSection />);
-            enterEditMode();
-            fireEvent.change(getTextarea(), { target: { value: 'a' } });
-            fireEvent.blur(getTextarea());
-            expect(getPublishButton()).toBeDisabled();
-        });
-
-        it('should reset disclaimer error when cancel is clicked', () => {
-            render(<FundsExpenditureSection />);
-            enterEditMode();
+        it('should reset disclaimer error when isEditing becomes false', () => {
+            const { rerender } = render(<FundsExpenditureSection isEditing={true} />);
             fireEvent.change(getTextarea(), { target: { value: '' } });
             fireEvent.blur(getTextarea());
             expect(screen.getByTestId('error-funds-disclaimer')).toBeInTheDocument();
 
-            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL));
-            fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT));
+            rerender(<FundsExpenditureSection isEditing={false} />);
+            rerender(<FundsExpenditureSection isEditing={true} />);
             expect(screen.queryByTestId('error-funds-disclaimer')).not.toBeInTheDocument();
         });
 
-        it('should disable publish button when table row edit mode is active', () => {
-            render(<FundsExpenditureSection />);
-            enterEditMode();
-
-            fireEvent.click(screen.getByTestId('row-edit-on'));
-            expect(getPublishButton()).toBeDisabled();
-
-            fireEvent.click(screen.getByTestId('row-edit-off'));
-            expect(getPublishButton()).not.toBeDisabled();
-        });
-
         it('should show exchange-rate error and disable add actions after invalid rate change and blur', () => {
-            render(<FundsExpenditureSection />);
-            enterEditMode();
+            const mockOnValidationChange = jest.fn();
+            render(<FundsExpenditureSection isEditing onValidationChange={mockOnValidationChange} />);
 
             fireEvent.click(screen.getByTestId('change-rate-invalid'));
             fireEvent.click(screen.getByTestId('blur-rate'));
 
             expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-add-income-disabled', 'true');
             expect(screen.getByTestId('funds-toolbar')).toHaveAttribute('data-add-expense-disabled', 'true');
-            expect(getPublishButton()).toBeDisabled();
-        });
-
-        it('should publish successfully and exit edit mode', async () => {
-            mockUpdateSettings.mockResolvedValueOnce({
-                disclaimerTitle: 'Оновлений дисклеймер',
-                exchangeRate: '44.00',
-            });
-
-            render(<FundsExpenditureSection />);
-            enterEditMode();
-
-            fireEvent.click(getPublishButton());
-
-            expect(await screen.findByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT)).toBeInTheDocument();
-            expect(mockAddToast).toHaveBeenCalledWith(COMMON_TEXT_ADMIN.MESSAGE.SUCCESSFULLY_PUBLISHED, 'success');
-        });
-
-        it('should show error toast when publish fails', async () => {
-            mockUpdateSettings.mockRejectedValueOnce(new Error('publish failed'));
-
-            render(<FundsExpenditureSection />);
-            enterEditMode();
-
-            fireEvent.click(getPublishButton());
-
-            expect(await screen.findByTestId('funds-toolbar')).toBeInTheDocument();
-            expect(mockAddToast).toHaveBeenCalledWith(REPORTS_TEXT.MESSAGE.FAIL_TO_UPDATE_REPORT, 'error');
+            expect(mockOnValidationChange).toHaveBeenCalledWith(false);
         });
 
         it('should open and close add income modal from toolbar controls', () => {
@@ -1100,6 +1152,7 @@ describe('FundsExpenditureSection bulk delete flow', () => {
         exchangeRate: '40',
         disclaimerTitle: 'Disclaimer',
         programExpendituresReportingYear: 2025,
+        hasUnpublishedChanges: false,
     };
     const categoriesMock: ReportFundsExpendituresCategory[] = [
         { id: 1, name: 'A', type: 'income', localizations: [] },
@@ -1127,7 +1180,7 @@ describe('FundsExpenditureSection bulk delete flow', () => {
     });
 
     it('select all via header checkbox and cancel bulk delete clears selection', async () => {
-        render(<FundsExpenditureSection initialIsEditing={true} />);
+        render(<FundsExpenditureSection isEditing={true} />);
 
         fireEvent.click(screen.getByLabelText('Select all records'));
 
@@ -1150,7 +1203,7 @@ describe('FundsExpenditureSection bulk delete flow', () => {
     it('confirms bulk delete calls API and shows success toast', async () => {
         mockBulkDelete.mockResolvedValue(undefined);
 
-        render(<FundsExpenditureSection initialIsEditing={true} />);
+        render(<FundsExpenditureSection isEditing={true} />);
 
         fireEvent.click(screen.getByLabelText('Select all records'));
 
@@ -1281,37 +1334,48 @@ describe('FundsExpenditureSection disclaimer localizations', () => {
         });
     });
 
-    it('refetches disclaimer localizations after successful publish', async () => {
+    it('refetches disclaimer localizations after successful save via registerSaveCallback', async () => {
+        let saveFn: (() => Promise<boolean>) | undefined;
+        const registerSaveCallback = (fn: () => Promise<boolean>) => { saveFn = fn; };
+
         mockUpdateSettings.mockResolvedValueOnce({
             id: 1,
             disclaimerTitle: 'Updated disclaimer',
             exchangeRate: '44.00',
         });
 
-        render(<FundsExpenditureSection />);
+        render(<FundsExpenditureSection isEditing registerSaveCallback={registerSaveCallback} />);
 
         await waitFor(() => {
             expect(mockGetByEntityId).toHaveBeenCalled();
         });
         const callsAfterMount = mockGetByEntityId.mock.calls.length;
 
-        fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT));
-        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED));
+        if (saveFn) {
+            await saveFn();
+        }
 
         await waitFor(() => {
             expect(mockGetByEntityId.mock.calls.length).toBeGreaterThan(callsAfterMount);
         });
     });
 
-    it('does not refetch disclaimer localizations when publish fails', async () => {
+    it('does not refetch disclaimer localizations when save via registerSaveCallback fails', async () => {
+        let saveFn: (() => Promise<boolean>) | undefined;
+        const registerSaveCallback = (fn: () => Promise<boolean>) => { saveFn = fn; };
+
         mockUpdateSettings.mockRejectedValueOnce(new Error('publish failed'));
 
-        render(<FundsExpenditureSection />);
+        render(<FundsExpenditureSection isEditing registerSaveCallback={registerSaveCallback} />);
 
-        fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT));
+        await waitFor(() => {
+            expect(mockGetByEntityId).toHaveBeenCalled();
+        });
 
         mockGetByEntityId.mockClear();
-        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED));
+        if (saveFn) {
+            await saveFn();
+        }
 
         await waitFor(() => {
             expect(mockAddToast).toHaveBeenCalledWith(REPORTS_TEXT.MESSAGE.FAIL_TO_UPDATE_REPORT, 'error');
@@ -1371,20 +1435,27 @@ describe('FundsExpenditureSection handleProgramYearSave', () => {
         });
     });
 
-    it('should use the newly saved year in handlePublish, not the stale settings value', async () => {
-        // Settings has year 2025; user saves year 2024 via the aggregate row edit.
-        // Without the fix, handlePublish would read the stale settings.programExpendituresReportingYear (2025).
-        // With the fix it reads programYearValue (2024) which was updated immediately on save.
+    it('should use the newly saved year in saveSettings, not the stale settings value', async () => {
+        let saveFn: (() => Promise<boolean>) | undefined;
+        const registerSaveCallback = (fn: () => Promise<boolean>) => { saveFn = fn; };
+
         mockUpdateSettings.mockResolvedValueOnce(MOCK_FUNDS_EXPENDITURES_SETTINGS); // year save
         mockUpdateSettings.mockResolvedValueOnce(MOCK_FUNDS_EXPENDITURES_SETTINGS); // publish
 
-        render(<FundsExpenditureSection />);
+        render(<FundsExpenditureSection isEditing registerSaveCallback={registerSaveCallback} />);
+        const initialSaveFn = saveFn;
 
         fireEvent.click(screen.getByTestId('trigger-program-year-save'));
-        await waitFor(() => expect(mockUpdateSettings).toHaveBeenCalledTimes(1));
+        
+        await waitFor(() => {
+            expect(mockUpdateSettings).toHaveBeenCalledTimes(1);
+            expect(saveFn).toBeDefined();
+            expect(saveFn).not.toBe(initialSaveFn);
+        });
 
-        fireEvent.click(screen.getByText(FUNDS_EXPENDITURES_TEXT.BUTTON.EDIT));
-        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED));
+        if (saveFn) {
+            await saveFn();
+        }
 
         await waitFor(() => expect(mockUpdateSettings).toHaveBeenCalledTimes(2));
         expect(mockUpdateSettings).toHaveBeenLastCalledWith(

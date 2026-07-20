@@ -1,9 +1,14 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import { CategoryBar, ContextMenuOption } from '@/components/admin/category-bar/CategoryBar';
+import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
+import { Button } from '@/components/admin/button/Button';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FUNDS_EXPENDITURES_TEXT, REPORTS_TEXT } from '@/const/admin/reports';
 import { DEFAULT_LOCALE } from '@/const/common/locales';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
+import { FundsExpendituresApi } from '@/services/api/admin/reports/funds-expenditures-api';
 import { localizationLanguagesDataFetch } from '@/services/api/public/localization/languages/languages-api';
 import { ReportFundsExpendituresCategory } from '@/types/admin/reports';
 import { ToastType } from '@/types/admin/toast';
@@ -39,6 +44,16 @@ export const ReportAnalytics = () => {
     const [categories, setCategories] = useState<ReportFundsExpendituresCategory[]>([]);
     const [isRowEditMode, setIsRowEditMode] = useState(false);
 
+    const adminClient = useAdminClient();
+    const [hasUnpublishedChanges, setHasUnpublishedChanges] = useState(false);
+    const [incomeCount, setIncomeCount] = useState(0);
+    const [expenseCount, setExpenseCount] = useState(0);
+    const [programRecordsCount, setProgramRecordsCount] = useState(0);
+    const [isFundsValid, setIsFundsValid] = useState(false);
+    const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
+    const [isPublishing, setIsPublishing] = useState(false);
+    const saveSettingsCallbackRef = useRef<(() => Promise<boolean>) | null>(null);
+
     useEffect(() => {
         localizationLanguagesDataFetch()
             .then((langs) => {
@@ -48,6 +63,19 @@ export const ReportAnalytics = () => {
                 addToast(COMMON_TEXT_ADMIN.LOCALIZATION.LANGUAGES.MESSAGE.FAILED_TO_FETCH_LANGUAGES, ToastType.Error);
             });
     }, [addToast]);
+
+    const fetchSettings = useCallback(() => FundsExpendituresApi.getSettings(adminClient), [adminClient]);
+    const { data: settingsData } = useDataFetch({
+        initialData: null,
+        fetchHandler: fetchSettings,
+        autoFetchDependencies: [adminClient],
+    });
+
+    useEffect(() => {
+        if (settingsData) {
+            setHasUnpublishedChanges(settingsData.hasUnpublishedChanges);
+        }
+    }, [settingsData]);
 
     const categoryContextMenuOptions: ContextMenuOption[] = useMemo(
         () => [
@@ -79,6 +107,37 @@ export const ReportAnalytics = () => {
         [addToast],
     );
 
+    const isPublishEnabled =
+        hasUnpublishedChanges && incomeCount >= 2 && expenseCount >= 2 && programRecordsCount >= 1 && isFundsValid;
+
+    const handlePublishClick = useCallback(() => {
+        setIsPublishModalOpen(true);
+    }, []);
+
+    const handlePublishConfirm = useCallback(async () => {
+        setIsPublishing(true);
+        try {
+            if (saveSettingsCallbackRef.current) {
+                const isSaved = await saveSettingsCallbackRef.current();
+                if (!isSaved) {
+                    setIsPublishing(false);
+                    return;
+                }
+            }
+
+            await FundsExpendituresApi.publishRecords(adminClient);
+
+            addToast('Зміни успішно опубліковано', ToastType.Success, 3000);
+            setHasUnpublishedChanges(false);
+            setIsFundsEditing(false);
+            setIsPublishModalOpen(false);
+        } catch (error) {
+            addToast(REPORTS_TEXT.MESSAGE.FAIL_TO_UPDATE_REPORT, ToastType.Error);
+        } finally {
+            setIsPublishing(false);
+        }
+    }, [adminClient, addToast]);
+
     return (
         <div className={styles['report-analytics']}>
             <h2 className={styles.title}>{REPORTS_TEXT.REPORT_AND_ANALYTICS.TITLE}</h2>
@@ -99,9 +158,9 @@ export const ReportAnalytics = () => {
             />
             <div className={styles['tab-content']}>
                 {activeTab.id === 'pdf-files' && <PdfFilesSection />}
-                {activeTab.id === 'income-expenses' && (
+                <div style={{ display: activeTab.id === 'income-expenses' ? 'block' : 'none' }}>
                     <FundsExpenditureSection
-                        initialIsEditing={isFundsEditing}
+                        isEditing={isFundsEditing}
                         draftExchangeRate={fundsExchangeRateDraft}
                         onEditModeChange={setIsFundsEditing}
                         onExchangeRateValueChange={setFundsExchangeRateDraft}
@@ -115,11 +174,26 @@ export const ReportAnalytics = () => {
                         translationLanguages={translationLanguages}
                         isRowEditMode={isRowEditMode}
                         onRowEditModeChange={setIsRowEditMode}
+                        onValidationChange={setIsFundsValid}
+                        onCountsChange={(counts) => {
+                            setIncomeCount(counts.income);
+                            setExpenseCount(counts.expense);
+                        }}
+                        onDataChange={() => setHasUnpublishedChanges(true)}
+                        registerSaveCallback={(saveFn) => {
+                            saveSettingsCallbackRef.current = saveFn;
+                        }}
                     />
-                )}
-                {activeTab.id === 'program-expenses' && (
-                    <ProgramExpensesSection isRowEditMode={isRowEditMode} onRowEditModeChange={setIsRowEditMode} />
-                )}
+                </div>
+                <div style={{ display: activeTab.id === 'program-expenses' ? 'block' : 'none' }}>
+                    <ProgramExpensesSection
+                        isEditing={isFundsEditing}
+                        isRowEditMode={isRowEditMode}
+                        onRowEditModeChange={setIsRowEditMode}
+                        onCountsChange={setProgramRecordsCount}
+                        onDataChange={() => setHasUnpublishedChanges(true)}
+                    />
+                </div>
             </div>
 
             <TranslateReportsCategoryModal
@@ -128,6 +202,37 @@ export const ReportAnalytics = () => {
                 categories={categories}
                 translatedLanguages={translationLanguages}
                 onTranslateCategory={handleTranslateCategory}
+            />
+
+            {isFundsEditing && activeTab.id !== 'pdf-files' && (
+                <div className={styles['section-footer']}>
+                    <Button
+                        buttonStyle="secondary"
+                        className={styles['footer-button']}
+                        onClick={() => setIsFundsEditing(false)}
+                    >
+                        {COMMON_TEXT_ADMIN.BUTTON.CANCEL}
+                    </Button>
+                    <Button
+                        buttonStyle="primary"
+                        className={styles['footer-button']}
+                        onClick={handlePublishClick}
+                        disabled={!isPublishEnabled || isRowEditMode}
+                    >
+                        Опублікувати
+                    </Button>
+                </div>
+            )}
+
+            <ConfirmationModal
+                isOpen={isPublishModalOpen}
+                title="Опублікувати зміни?"
+                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
+                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
+                isButtonsDisabled={isPublishing}
+                onConfirm={handlePublishConfirm}
+                onCancel={() => setIsPublishModalOpen(false)}
+                onClose={() => setIsPublishModalOpen(false)}
             />
         </div>
     );

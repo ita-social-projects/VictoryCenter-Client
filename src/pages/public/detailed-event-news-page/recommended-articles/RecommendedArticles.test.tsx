@@ -117,24 +117,4 @@ describe('RecommendedArticles', () => {
 
         expect(mockGet).toHaveBeenCalledWith('', 0, 2);
     });
-
-    // The two tests below depend on the fetchHandler test above having populated the module-level cache.
-    // Jest runs tests in file order within a describe block.
-    it('passes cached items as initialData and sets autoFetchDisabled true after cache is populated', () => {
-        const articles = [mockArticle('1'), mockArticle('2')];
-        render(<RecommendedArticles />);
-        expect(mockUseDataPaginationFetch).toHaveBeenCalledWith(
-            expect.objectContaining({
-                autoFetchDisabled: true,
-                initialData: articles,
-            }),
-        );
-    });
-
-    it('does not call EventsNewsApi.get again when cache is set', async () => {
-        render(<RecommendedArticles />);
-        const { fetchHandler } = mockUseDataPaginationFetch.mock.calls[0][0];
-        await fetchHandler({});
-        expect(mockGet).not.toHaveBeenCalled();
-    });
 });

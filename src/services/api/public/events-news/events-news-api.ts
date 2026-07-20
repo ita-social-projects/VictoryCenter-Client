@@ -28,12 +28,17 @@ export const EventsNewsApi = {
 };
 
 export const EventNewsApi = {
-    get: async (): Promise<EventsNews> => {
+    get: async (slug: string): Promise<EventsNews> => {
         // const response = await axiosInstance.get(`${API_ROUTES.EVENTS.BY_SLUG}/${slug}`);
         // return response.data;
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             setTimeout(() => {
-                resolve(eventsNewsMock.find((event) => event.slug === 'test-event') ?? eventsNewsMock[0]);
+                const event = eventsNewsMock.find((event) => event.slug === slug);
+                if (event) {
+                    resolve(event);
+                } else {
+                    reject(new Error('Event not found'));
+                }
             }, 200);
         });
     },

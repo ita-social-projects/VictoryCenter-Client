@@ -23,8 +23,10 @@ jest.mock('@/services/api/public/reports/reports-api', () => ({
     },
 }));
 
-const mockLocalizationLanguagesDataFetch = require('@/services/api/public/localization/languages/languages-api').localizationLanguagesDataFetch;
-const mockGetPublishedReports = require('@/services/api/public/reports/reports-api').ReportsPublicApi.getPublishedReports;
+const mockLocalizationLanguagesDataFetch =
+    require('@/services/api/public/localization/languages/languages-api').localizationLanguagesDataFetch;
+const mockGetPublishedReports = require('@/services/api/public/reports/reports-api').ReportsPublicApi
+    .getPublishedReports;
 
 const MOCK_DATA = {
     funding: { totalUah: 100000, totalUsd: 2352.94, items: [{ label: 'Funding 1', amountUah: 20, amountUsd: 0.47 }] },
@@ -33,8 +35,8 @@ const MOCK_DATA = {
     settings: { disclaimerTitle: 'Test currency disclaimer text' },
     mediaSettings: {
         collectedFunds: { title: 'Зібрано', imageUrl: null },
-        changedLives: { title: 'Змінених життів', imageUrl: null, value: 205 }
-    }
+        changedLives: { title: 'Змінених життів', imageUrl: null, value: 205 },
+    },
 };
 
 jest.mock('./stat-card', () => ({
@@ -77,7 +79,10 @@ const mockUseLocale = useLocale as jest.Mock;
 describe('SummarySection', () => {
     beforeEach(() => {
         mockUseLocale.mockReturnValue({ isEn: false, currentLanguage: 'uk' });
-        mockLocalizationLanguagesDataFetch.mockResolvedValue([{ id: 1, code: 'uk' }, { id: 2, code: 'en' }]);
+        mockLocalizationLanguagesDataFetch.mockResolvedValue([
+            { id: 1, code: 'uk' },
+            { id: 2, code: 'en' },
+        ]);
         mockGetPublishedReports.mockResolvedValue(MOCK_DATA);
     });
 
@@ -169,7 +174,7 @@ describe('SummarySection', () => {
     it('calculates 0 percent when totalExpenses is 0', async () => {
         mockGetPublishedReports.mockResolvedValue({
             ...MOCK_DATA,
-            expenses: { totalUah: 0, totalUsd: 0, items: [{ label: 'Expense 1', amountUah: 0, amountUsd: 0 }] }
+            expenses: { totalUah: 0, totalUsd: 0, items: [{ label: 'Expense 1', amountUah: 0, amountUsd: 0 }] },
         });
         render(<SummarySection />);
 
@@ -183,8 +188,8 @@ describe('SummarySection', () => {
             ...MOCK_DATA,
             mediaSettings: {
                 collectedFunds: { title: '', imageUrl: null },
-                changedLives: { title: '', imageUrl: null, value: 0 }
-            }
+                changedLives: { title: '', imageUrl: null, value: 0 },
+            },
         });
         render(<SummarySection />);
 

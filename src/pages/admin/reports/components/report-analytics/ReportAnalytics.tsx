@@ -228,11 +228,7 @@ export const ReportAnalytics = () => {
 
             {isFundsEditing && activeTab.id !== 'pdf-files' && (
                 <div className={styles['section-footer']}>
-                    <Button
-                        buttonStyle="secondary"
-                        className={styles['footer-button']}
-                        onClick={handleCancelClick}
-                    >
+                    <Button buttonStyle="secondary" className={styles['footer-button']} onClick={handleCancelClick}>
                         {COMMON_TEXT_ADMIN.BUTTON.CANCEL}
                     </Button>
                     <Button

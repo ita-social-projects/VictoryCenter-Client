@@ -15,7 +15,15 @@ interface StatCardProps {
     imageUrl?: string | null;
 }
 
-export const StatCard = ({ value, label, color = 'blue', currency, formattedValue, className, imageUrl }: StatCardProps) => {
+export const StatCard = ({
+    value,
+    label,
+    color = 'blue',
+    currency,
+    formattedValue,
+    className,
+    imageUrl,
+}: StatCardProps) => {
     const { i18n } = useTranslation();
 
     const displayValue = useMemo(() => {
@@ -30,7 +38,9 @@ export const StatCard = ({ value, label, color = 'blue', currency, formattedValu
     const rootClasses = cn(styles.card, className);
     const valueClasses = cn(styles.value, styles[`text-${color}`]);
 
-    const backgroundStyle = imageUrl ? { '--dynamic-bg-image': `url('${imageUrl}')` } as React.CSSProperties : undefined;
+    const backgroundStyle = imageUrl
+        ? ({ '--dynamic-bg-image': `url('${imageUrl}')` } as React.CSSProperties)
+        : undefined;
 
     return (
         <div className={rootClasses} style={backgroundStyle}>

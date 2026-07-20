@@ -547,7 +547,10 @@ describe('FundsExpenditureSection', () => {
         fireEvent.click(screen.getByTestId('trigger-program-year-save'));
         await waitFor(() => {
             expect(mockUpdateSettings).toHaveBeenCalled();
-            expect(mockAddToast).toHaveBeenCalledWith(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY, 'success');
+            expect(mockAddToast).toHaveBeenCalledWith(
+                FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY,
+                'success',
+            );
         });
     });
 
@@ -556,7 +559,10 @@ describe('FundsExpenditureSection', () => {
         render(<FundsExpenditureSection isEditing />);
         fireEvent.click(screen.getByTestId('trigger-program-year-save'));
         await waitFor(() => {
-            expect(mockAddToast).toHaveBeenCalledWith(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_UPDATE_FAILED_RETRY, 'error');
+            expect(mockAddToast).toHaveBeenCalledWith(
+                FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_UPDATE_FAILED_RETRY,
+                'error',
+            );
         });
     });
 
@@ -669,7 +675,10 @@ describe('FundsExpenditureSection', () => {
             render(<FundsExpenditureSection isAddCategoryModalOpen />);
             const submitBtn = screen.getByTestId('add-category-submit-reserved');
             fireEvent.click(submitBtn);
-            expect(mockAddToast).toHaveBeenCalledWith(FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_CREATE_FAILED_RETRY, 'error');
+            expect(mockAddToast).toHaveBeenCalledWith(
+                FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_CREATE_FAILED_RETRY,
+                'error',
+            );
         });
 
         it('should successfully create valid category', async () => {
@@ -678,7 +687,10 @@ describe('FundsExpenditureSection', () => {
             const submitBtn = screen.getByTestId('add-category-submit-valid');
             fireEvent.click(submitBtn);
             await waitFor(() => {
-                expect(mockAddToast).toHaveBeenCalledWith(FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_CREATED_SUCCESSFULLY, 'success');
+                expect(mockAddToast).toHaveBeenCalledWith(
+                    FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_CREATED_SUCCESSFULLY,
+                    'success',
+                );
             });
         });
 
@@ -688,7 +700,10 @@ describe('FundsExpenditureSection', () => {
             fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
             await waitFor(() => {
                 expect(mockDeleteRecord).toHaveBeenCalled();
-                expect(mockAddToast).toHaveBeenCalledWith(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_DELETED_SUCCESSFULLY, 'success');
+                expect(mockAddToast).toHaveBeenCalledWith(
+                    FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_DELETED_SUCCESSFULLY,
+                    'success',
+                );
             });
         });
 
@@ -698,38 +713,44 @@ describe('FundsExpenditureSection', () => {
             fireEvent.click(screen.getByTestId('trigger-record-delete'));
             fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
             await waitFor(() => {
-                expect(mockAddToast).toHaveBeenCalledWith(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_DELETE_FAILED_RETRY, 'error');
+                expect(mockAddToast).toHaveBeenCalledWith(
+                    FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_DELETE_FAILED_RETRY,
+                    'error',
+                );
             });
         });
 
         it('should save settings when registered save function is called', async () => {
             let saveFn: (() => Promise<boolean>) | undefined;
-            const registerSaveCallback = (fn: () => Promise<boolean>) => { saveFn = fn; };
+            const registerSaveCallback = (fn: () => Promise<boolean>) => {
+                saveFn = fn;
+            };
             render(<FundsExpenditureSection isEditing registerSaveCallback={registerSaveCallback} />);
 
             mockUpdateSettings.mockResolvedValueOnce({
-                id: 1, disclaimerTitle: 'saved', exchangeRate: '42.18'
+                id: 1,
+                disclaimerTitle: 'saved',
+                exchangeRate: '42.18',
             });
 
             expect(saveFn).toBeDefined();
-            if (saveFn) {
-                const success = await saveFn();
-                expect(success).toBe(true);
-            }
+            const success = await saveFn!();
+            expect(success).toBe(true);
         });
 
         it('should show error when registered save function fails', async () => {
             let saveFn: (() => Promise<boolean>) | undefined;
-            const registerSaveCallback = (fn: () => Promise<boolean>) => { saveFn = fn; };
+            const registerSaveCallback = (fn: () => Promise<boolean>) => {
+                saveFn = fn;
+            };
             render(<FundsExpenditureSection isEditing registerSaveCallback={registerSaveCallback} />);
 
             mockUpdateSettings.mockRejectedValueOnce(new Error('fail'));
 
-            if (saveFn) {
-                const success = await saveFn();
-                expect(success).toBe(false);
-                expect(mockAddToast).toHaveBeenCalledWith(REPORTS_TEXT.MESSAGE.FAIL_TO_UPDATE_REPORT, 'error');
-            }
+            expect(saveFn).toBeDefined();
+            const success = await saveFn!();
+            expect(success).toBe(false);
+            expect(mockAddToast).toHaveBeenCalledWith(REPORTS_TEXT.MESSAGE.FAIL_TO_UPDATE_REPORT, 'error');
         });
 
         it('should propagate edit mode to table when edit button is clicked', () => {
@@ -1336,7 +1357,9 @@ describe('FundsExpenditureSection disclaimer localizations', () => {
 
     it('refetches disclaimer localizations after successful save via registerSaveCallback', async () => {
         let saveFn: (() => Promise<boolean>) | undefined;
-        const registerSaveCallback = (fn: () => Promise<boolean>) => { saveFn = fn; };
+        const registerSaveCallback = (fn: () => Promise<boolean>) => {
+            saveFn = fn;
+        };
 
         mockUpdateSettings.mockResolvedValueOnce({
             id: 1,
@@ -1362,7 +1385,9 @@ describe('FundsExpenditureSection disclaimer localizations', () => {
 
     it('does not refetch disclaimer localizations when save via registerSaveCallback fails', async () => {
         let saveFn: (() => Promise<boolean>) | undefined;
-        const registerSaveCallback = (fn: () => Promise<boolean>) => { saveFn = fn; };
+        const registerSaveCallback = (fn: () => Promise<boolean>) => {
+            saveFn = fn;
+        };
 
         mockUpdateSettings.mockRejectedValueOnce(new Error('publish failed'));
 
@@ -1437,7 +1462,9 @@ describe('FundsExpenditureSection handleProgramYearSave', () => {
 
     it('should use the newly saved year in saveSettings, not the stale settings value', async () => {
         let saveFn: (() => Promise<boolean>) | undefined;
-        const registerSaveCallback = (fn: () => Promise<boolean>) => { saveFn = fn; };
+        const registerSaveCallback = (fn: () => Promise<boolean>) => {
+            saveFn = fn;
+        };
 
         mockUpdateSettings.mockResolvedValueOnce(MOCK_FUNDS_EXPENDITURES_SETTINGS); // year save
         mockUpdateSettings.mockResolvedValueOnce(MOCK_FUNDS_EXPENDITURES_SETTINGS); // publish
@@ -1446,7 +1473,7 @@ describe('FundsExpenditureSection handleProgramYearSave', () => {
         const initialSaveFn = saveFn;
 
         fireEvent.click(screen.getByTestId('trigger-program-year-save'));
-        
+
         await waitFor(() => {
             expect(mockUpdateSettings).toHaveBeenCalledTimes(1);
             expect(saveFn).toBeDefined();

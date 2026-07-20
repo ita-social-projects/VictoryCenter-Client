@@ -63,7 +63,7 @@ export interface MainDonationDto {
     id: number;
     title?: string;
     description?: string;
-    image: any;
+    image?: Image | ImageValues | null;
     localizations?: PublicMainPageLocalizationDto[];
 }
 
@@ -74,7 +74,7 @@ export interface PublicMainPageDto {
     image?: Image | ImageValues | null;
     mainAboutUs?: PublicMainAboutUsDto | null;
     mainPartners?: PublicMainPartnersDto | null;
-    mainDonations?: MainDonationDto;
+    mainDonations?: MainDonationDto | null;
     impactStatistics?: PublicImpactStatisticDto | null;
     localizations?: PublicMainPageLocalizationDto[];
 }

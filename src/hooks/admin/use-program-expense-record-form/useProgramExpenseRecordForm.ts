@@ -223,6 +223,7 @@ export const useProgramExpenseRecordForm = ({
         !getProgramError(formState.programId, 'blur') &&
         !validateProgramExpenseAmount(formState.amountUah, 'save') &&
         !validateProgramExpenseAmount(formState.amountUsd, 'save') &&
+        !usdMismatchMessage &&
         !isSubmitting &&
         isDirty;
 

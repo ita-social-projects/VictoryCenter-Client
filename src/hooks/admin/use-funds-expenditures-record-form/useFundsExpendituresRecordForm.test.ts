@@ -96,6 +96,24 @@ describe('useFundsExpendituresRecordForm', () => {
         expect(result.current.formState.amountUsd).toBe('');
     });
 
+    it('blocks submit when UAH and USD amounts mismatch the exchange rate', () => {
+        const { result } = renderUseFundsForm();
+
+        act(() => {
+            result.current.handleReportingYearChange('2026');
+            result.current.handleCategoryChange(3);
+            result.current.handleAmountChange('100');
+            result.current.handleUsdChange('15');
+        });
+
+        act(() => {
+            result.current.handleAmountBlur('amountUsd');
+        });
+
+        expect(result.current.usdMismatchMessage).toBe(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH);
+        expect(result.current.isSubmitDisabled).toBe(true);
+    });
+
     it('blocks submit and surfaces required error when reporting year is missing', async () => {
         const onSubmit = jest.fn().mockResolvedValue(true);
         const { result } = renderUseFundsForm({ onSubmit });

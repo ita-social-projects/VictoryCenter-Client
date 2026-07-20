@@ -81,6 +81,24 @@ describe('useProgramExpenseRecordForm', () => {
         expect(result.current.isSubmitDisabled).toBe(false);
     });
 
+    it('blocks submit when UAH and USD amounts mismatch the exchange rate', () => {
+        const { result } = renderUseProgramExpenseForm();
+
+        act(() => {
+            result.current.handleReportingYearChange('2026');
+            result.current.handleProgramChange(2);
+            result.current.handleAmountChange('100');
+            result.current.handleUsdChange('10');
+        });
+
+        act(() => {
+            result.current.handleAmountBlur('amountUsd');
+        });
+
+        expect(result.current.usdMismatchMessage).toBe(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH);
+        expect(result.current.isSubmitDisabled).toBe(true);
+    });
+
     it('validates amount fields on change and blur', () => {
         const { result } = renderUseProgramExpenseForm();
 

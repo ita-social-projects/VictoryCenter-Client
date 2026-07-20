@@ -330,7 +330,7 @@ describe('AddProgramExpenseRecordModal', () => {
         selectOption(FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_PLACEHOLDER, '2026');
         selectOption(PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_PLACEHOLDER, 'Program B');
         fireEvent.change(screen.getByTestId('add-program-expense-amount-uah'), { target: { value: '100' } });
-        fireEvent.change(screen.getByTestId('add-program-expense-amount-usd'), { target: { value: '999' } });
+        fireEvent.change(screen.getByTestId('add-program-expense-amount-usd'), { target: { value: '2.5' } });
         fireEvent.blur(screen.getByTestId('add-program-expense-amount-usd'));
 
         fireEvent.click(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.MODAL.ADD.SUBMIT_BUTTON }));

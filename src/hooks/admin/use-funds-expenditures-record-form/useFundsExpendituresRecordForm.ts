@@ -199,7 +199,8 @@ export const useFundsExpendituresRecordForm = ({
         Boolean(amountUsdValidationError) ||
         Boolean(categoryValidationError) ||
         Boolean(formState.errors.amountUah) ||
-        Boolean(formState.errors.amountUsd);
+        Boolean(formState.errors.amountUsd) ||
+        Boolean(usdMismatchMessage);
 
     const handleOpenAddConfirmation = useCallback(() => {
         setIsAddConfirmationOpen(true);

@@ -6,6 +6,7 @@ import { useLocale } from '@/hooks/common/use-locale/useLocale';
 import { TranslationStatus } from '@/types/common/language';
 import { PublicMainPageDto, PublicMainPageLocalizationDto } from '@/types/public/main-page';
 
+import { DonationSection } from './danatation-section/DonationSection';
 import { IntroSection } from './intro-section/IntroSection';
 import { MainPage } from './MainPage';
 
@@ -54,9 +55,14 @@ jest.mock('./main-statistics-section/MainStatisticsSection', () => ({
     MainStatisticsSection: () => <div data-testid="main-statistics-section" />,
 }));
 
+jest.mock('./danatation-section/DonationSection', () => ({
+    DonationSection: jest.fn(),
+}));
+
 const mockedUseDataFetch = useDataFetch as jest.Mock;
 const mockedUseLocale = useLocale as jest.Mock;
 const MockedIntroSection = IntroSection as jest.Mock;
+const MockedDonationSection = DonationSection as jest.Mock;
 
 const createMainPageData = (overrides: Partial<PublicMainPageDto> = {}): PublicMainPageDto => ({
     id: 1,
@@ -70,6 +76,12 @@ const createMainPageData = (overrides: Partial<PublicMainPageDto> = {}): PublicM
     localizations: [],
     mainAboutUs: null,
     mainPartners: null,
+    mainDonations: {
+        id: 1,
+        title: 'API donation title',
+        description: 'API donation description',
+        image: null,
+    },
     impactStatistics: null,
     ...overrides,
 });
@@ -102,6 +114,7 @@ describe('MainPage', () => {
                 <a href={buttonHref}>{introData.buttonText}</a>
             </section>
         ));
+        MockedDonationSection.mockImplementation(() => <div data-testid="donation-section" />);
     });
 
     it('renders a loader while main page data is loading', () => {
@@ -131,6 +144,34 @@ describe('MainPage', () => {
             }),
             undefined,
         );
+    });
+
+    it('renders DonationSection with mainDonations data from the API', () => {
+        mockUseDataFetchResult(createMainPageData());
+
+        render(<MainPage />);
+
+        expect(screen.getByTestId('donation-section')).toBeInTheDocument();
+        expect(MockedDonationSection).toHaveBeenCalledWith(
+            {
+                donationData: {
+                    id: 1,
+                    title: 'API donation title',
+                    description: 'API donation description',
+                    image: null,
+                },
+            },
+            undefined,
+        );
+    });
+
+    it('does not render DonationSection while main page data is loading', () => {
+        mockUseDataFetchResult(null, true);
+
+        render(<MainPage />);
+
+        expect(screen.queryByTestId('donation-section')).not.toBeInTheDocument();
+        expect(MockedDonationSection).not.toHaveBeenCalled();
     });
 
     it('uses current localization when it matches the active language', () => {

@@ -260,7 +260,6 @@ export const useProgramExpenseRecordForm = ({
     }, []);
 
     const submitRecord = useCallback(async (): Promise<boolean> => {
-
         if (!formState.programId || !formState.reportingYear || isSubmitting) return false;
 
         if (currentUsdMismatchMessage) {

@@ -7,19 +7,33 @@ import {
     validateFundsExpendituresAmount,
 } from '@/validation/admin/reports-schema/funds-expenditures-record-schema/funds-expenditures-record-schema';
 
+export const getUsdMismatchMessage = (
+    amountUah: string,
+    amountUsd: string,
+    exchangeRate: string | null | undefined,
+): string | undefined =>
+    isUsdAmountMismatch(amountUah, amountUsd, exchangeRate)
+        ? FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH
+        : undefined;
+
 export const useAmountBlur = (exchangeRate: string | null) => {
     const [usdMismatchMessage, setUsdMismatchMessage] = useState<string | undefined>();
 
     const handleAmountBlur = useCallback(
-        (field: 'amountUah' | 'amountUsd', setFormState: React.Dispatch<React.SetStateAction<any>>) => {
+        (
+            field: 'amountUah' | 'amountUsd',
+            setFormState: React.Dispatch<React.SetStateAction<any>>,
+            suppressMismatchCheck = false,
+        ) => {
             if (field === 'amountUsd') {
                 setFormState((prev: any) => {
                     const normalizedAmountUsd = normalizeFundsExpendituresAmountInput(prev.amountUsd, true);
                     const amountUsdError = validateFundsExpendituresAmount(normalizedAmountUsd, 'blur');
 
-                    const hasMismatch = isUsdAmountMismatch(prev.amountUah, normalizedAmountUsd, exchangeRate);
                     setUsdMismatchMessage(
-                        hasMismatch ? FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH : undefined,
+                        suppressMismatchCheck
+                            ? undefined
+                            : getUsdMismatchMessage(prev.amountUah, normalizedAmountUsd, exchangeRate),
                     );
 
                     return {

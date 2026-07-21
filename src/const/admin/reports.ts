@@ -46,7 +46,7 @@ export const REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION = {
         getRequiredError: () => `Заголовок обов'язковий`,
     },
     collectedAmount: {
-        max: 15,
+        max: 10,
     },
     image: {
         width: 600,

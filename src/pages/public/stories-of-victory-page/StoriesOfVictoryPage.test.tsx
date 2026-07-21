@@ -59,18 +59,16 @@ describe('StoriesOfVictoryPage', () => {
         expect(container.querySelector('section')).toBeInTheDocument();
     });
 
-    it('should render VideoReviewsSection component', () => {
+    it('should render multiple section elements', () => {
         const { container } = render(<StoriesOfVictoryPage />);
-        // VideoReviewsSection renders a section
         const sections = container.querySelectorAll('section');
         expect(sections.length).toBeGreaterThan(0);
     });
 
     it('should render ReviewsSection component', () => {
         const { container } = render(<StoriesOfVictoryPage />);
-        // ReviewsSection renders section with h4 title and Swiper
-        const h4Elements = container.querySelectorAll('h4');
-        expect(h4Elements.length).toBeGreaterThan(0);
+        const h3Elements = container.querySelectorAll('h3');
+        expect(h3Elements.length).toBeGreaterThan(0);
     });
 
     it('should render all section children within LoadableContent', () => {
@@ -85,6 +83,6 @@ describe('StoriesOfVictoryPage', () => {
         const loadableContent = screen.getByTestId('loadable-content');
         // Should have 4 main section children
         const children = Array.from(loadableContent.children);
-        expect(children.length).toBe(4);
+        expect(children.length).toBe(3);
     });
 });

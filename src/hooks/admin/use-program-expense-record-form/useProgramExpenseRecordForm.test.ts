@@ -75,10 +75,48 @@ describe('useProgramExpenseRecordForm', () => {
             result.current.handleReportingYearChange('2026');
             result.current.handleProgramChange(2);
             result.current.handleAmountChange('400');
-            result.current.handleUsdChange('10');
         });
 
+        expect(result.current.formState.amountUsd).toBe('10');
         expect(result.current.isSubmitDisabled).toBe(false);
+    });
+
+    it('blocks submit when UAH and USD amounts mismatch the exchange rate', () => {
+        const { result } = renderUseProgramExpenseForm();
+
+        act(() => {
+            result.current.handleReportingYearChange('2026');
+            result.current.handleProgramChange(2);
+            result.current.handleAmountChange('400');
+            result.current.handleUsdChange('999');
+        });
+
+        act(() => {
+            result.current.handleAmountBlur('amountUsd');
+        });
+
+        expect(result.current.usdMismatchMessage).toBe(PROGRAM_EXPENSES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH);
+        expect(result.current.isSubmitDisabled).toBe(true);
+    });
+
+    it('blocks submitRecord on mismatch even without a preceding USD blur', async () => {
+        const onSubmit = jest.fn().mockResolvedValue(true);
+        const { result } = renderUseProgramExpenseForm({ onSubmit });
+
+        act(() => {
+            result.current.handleReportingYearChange('2026');
+            result.current.handleProgramChange(2);
+            result.current.handleAmountChange('400');
+            result.current.handleUsdChange('999');
+        });
+
+        expect(result.current.usdMismatchMessage).toBeUndefined();
+
+        await act(async () => {
+            await result.current.handleSave();
+        });
+
+        expect(onSubmit).not.toHaveBeenCalled();
     });
 
     it('validates amount fields on change and blur', () => {
@@ -210,6 +248,49 @@ describe('useProgramExpenseRecordForm', () => {
             });
 
             expect(result.current.isDirty).toBe(false);
+            expect(result.current.isSubmitDisabled).toBe(true);
+        });
+
+        it('does not block saving a legacy record whose stored amounts mismatch the current exchange rate, as long as amounts are untouched', async () => {
+            const onSubmit = jest.fn().mockResolvedValue(true);
+            const { result } = renderUseProgramExpenseForm({ recordToEdit, onSubmit, exchangeRate: '40' });
+
+            act(() => {
+                result.current.handleAmountBlur('amountUsd');
+            });
+
+            expect(result.current.usdMismatchMessage).toBeUndefined();
+
+            act(() => {
+                result.current.handleReportingYearChange('2026');
+            });
+
+            expect(result.current.isSubmitDisabled).toBe(false);
+
+            await act(async () => {
+                await result.current.handleSave();
+            });
+
+            expect(onSubmit).toHaveBeenCalledWith({
+                programId: 1,
+                reportingYear: '2026',
+                amountUah: '400',
+                amountUsd: '10',
+            });
+        });
+
+        it('still blocks saving a legacy record once its amounts are actively edited to mismatch the current rate', () => {
+            const { result } = renderUseProgramExpenseForm({ recordToEdit, exchangeRate: '40' });
+
+            act(() => {
+                result.current.handleUsdChange('15');
+            });
+
+            act(() => {
+                result.current.handleAmountBlur('amountUsd');
+            });
+
+            expect(result.current.usdMismatchMessage).toBe(PROGRAM_EXPENSES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH);
             expect(result.current.isSubmitDisabled).toBe(true);
         });
 

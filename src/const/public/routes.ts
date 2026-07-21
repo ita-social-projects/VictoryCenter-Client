@@ -16,6 +16,11 @@ export const PUBLIC_ROUTES = {
         PATH: 'events-and-news',
         FULL: '/events-and-news',
     },
+    EVENTS_NEWS_DETAIL: {
+        PATH: 'events-and-news/:slug',
+        FULL: '/events-and-news/:slug',
+        getPath: (slug: string) => `/events-and-news/${slug}`,
+    },
     HIPPOTHERAPY: {
         PATH: 'hippotherapy',
         FULL: '/hippotherapy',

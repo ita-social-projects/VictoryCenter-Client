@@ -1,5 +1,5 @@
 import { ChangeEvent, ComponentProps, ReactNode } from 'react';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FUNDS_EXPENDITURES_TEXT, PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
@@ -345,7 +345,9 @@ describe('AddProgramExpenseRecordModal', () => {
 
         expect(screen.getByTestId('close-confirmation')).toBeInTheDocument();
 
-        resolveSubmit(true);
+        await act(async () => {
+            resolveSubmit(true);
+        });
     });
 
     describe('edit mode', () => {
@@ -426,7 +428,9 @@ describe('AddProgramExpenseRecordModal', () => {
             expect(onClose).not.toHaveBeenCalled();
             expect(screen.queryByTestId('close-confirmation')).not.toBeInTheDocument();
 
-            resolveSubmit(true);
+            await act(async () => {
+                resolveSubmit(true);
+            });
         });
     });
 });

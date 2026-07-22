@@ -11,12 +11,10 @@ export const getUsdMismatchMessage = (
     amountUah: string,
     amountUsd: string,
     exchangeRate: string | null | undefined,
-): string | undefined =>
-    isUsdAmountMismatch(amountUah, amountUsd, exchangeRate)
-        ? FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH
-        : undefined;
+    mismatchMessage: string = FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH,
+): string | undefined => (isUsdAmountMismatch(amountUah, amountUsd, exchangeRate) ? mismatchMessage : undefined);
 
-export const useAmountBlur = (exchangeRate: string | null) => {
+export const useAmountBlur = (exchangeRate: string | null, customMismatchMessage?: string) => {
     const [usdMismatchMessage, setUsdMismatchMessage] = useState<string | undefined>();
 
     const handleAmountBlur = useCallback(
@@ -33,7 +31,12 @@ export const useAmountBlur = (exchangeRate: string | null) => {
                     setUsdMismatchMessage(
                         suppressMismatchCheck
                             ? undefined
-                            : getUsdMismatchMessage(prev.amountUah, normalizedAmountUsd, exchangeRate),
+                            : getUsdMismatchMessage(
+                                  prev.amountUah,
+                                  normalizedAmountUsd,
+                                  exchangeRate,
+                                  customMismatchMessage,
+                              ),
                     );
 
                     return {
@@ -57,7 +60,7 @@ export const useAmountBlur = (exchangeRate: string | null) => {
                 return updated;
             });
         },
-        [exchangeRate],
+        [exchangeRate, customMismatchMessage],
     );
 
     return { usdMismatchMessage, setUsdMismatchMessage, handleAmountBlur };

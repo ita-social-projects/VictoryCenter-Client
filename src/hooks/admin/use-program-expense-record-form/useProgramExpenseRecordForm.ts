@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
 import { ProgramExpensesProgram, ProgramExpensesRecord } from '@/types/admin/reports';
 import { updateFundsAmounts } from '@/utils/functions/update-funds-amounts/update-funds-amounts';
 import { getUsdMismatchMessage, useAmountBlur } from '@/hooks/admin/use-amount-blur/useAmountBlur';
@@ -59,7 +60,7 @@ export const useProgramExpenseRecordForm = ({
         usdMismatchMessage,
         setUsdMismatchMessage,
         handleAmountBlur: handleAmountBlurBase,
-    } = useAmountBlur(exchangeRate);
+    } = useAmountBlur(exchangeRate, PROGRAM_EXPENSES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH);
 
     const programOptions = useMemo(
         () =>
@@ -232,7 +233,12 @@ export const useProgramExpenseRecordForm = ({
     );
     const currentUsdMismatchMessage = areAmountsUnchangedFromRecord
         ? undefined
-        : getUsdMismatchMessage(formState.amountUah, formState.amountUsd, exchangeRate);
+        : getUsdMismatchMessage(
+              formState.amountUah,
+              formState.amountUsd,
+              exchangeRate,
+              PROGRAM_EXPENSES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH,
+          );
 
     const isSubmitEnabled =
         !validateProgramExpenseReportingYear(formState.reportingYear, 'save') &&

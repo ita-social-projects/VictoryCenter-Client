@@ -16,7 +16,7 @@ const records: ProgramExpensesRecord[] = [
         programName: 'Program A',
         type: 'expense',
         reportingYear: '2025',
-        amountUah: '100',
+        amountUah: '400',
         amountUsd: '10',
     },
 ];
@@ -60,7 +60,7 @@ describe('useProgramExpenseRecordForm', () => {
         act(() => {
             result.current.handleReportingYearChange('2026');
             result.current.handleProgramChange(1);
-            result.current.handleAmountChange('100');
+            result.current.handleAmountChange('400');
             result.current.handleUsdChange('10');
         });
 
@@ -74,10 +74,10 @@ describe('useProgramExpenseRecordForm', () => {
         act(() => {
             result.current.handleReportingYearChange('2026');
             result.current.handleProgramChange(2);
-            result.current.handleAmountChange('100');
+            result.current.handleAmountChange('400');
         });
 
-        expect(result.current.formState.amountUsd).toBe('2,5');
+        expect(result.current.formState.amountUsd).toBe('10');
         expect(result.current.isSubmitDisabled).toBe(false);
     });
 
@@ -87,15 +87,15 @@ describe('useProgramExpenseRecordForm', () => {
         act(() => {
             result.current.handleReportingYearChange('2026');
             result.current.handleProgramChange(2);
-            result.current.handleAmountChange('100');
-            result.current.handleUsdChange('10');
+            result.current.handleAmountChange('400');
+            result.current.handleUsdChange('999');
         });
 
         act(() => {
             result.current.handleAmountBlur('amountUsd');
         });
 
-        expect(result.current.usdMismatchMessage).toBe(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH);
+        expect(result.current.usdMismatchMessage).toBe(PROGRAM_EXPENSES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH);
         expect(result.current.isSubmitDisabled).toBe(true);
     });
 
@@ -106,7 +106,7 @@ describe('useProgramExpenseRecordForm', () => {
         act(() => {
             result.current.handleReportingYearChange('2026');
             result.current.handleProgramChange(2);
-            result.current.handleAmountChange('100');
+            result.current.handleAmountChange('400');
             result.current.handleUsdChange('999');
         });
 
@@ -218,7 +218,7 @@ describe('useProgramExpenseRecordForm', () => {
             programName: 'Program A',
             type: 'expense',
             reportingYear: '2025',
-            amountUah: '100',
+            amountUah: '400',
             amountUsd: '10',
         };
 
@@ -227,7 +227,7 @@ describe('useProgramExpenseRecordForm', () => {
 
             expect(result.current.formState.reportingYear).toBe('2025');
             expect(result.current.formState.programId).toBe(1);
-            expect(result.current.formState.amountUah).toBe('100');
+            expect(result.current.formState.amountUah).toBe('400');
             expect(result.current.formState.amountUsd).toBe('10');
             expect(result.current.isDirty).toBe(false);
             expect(result.current.isSubmitDisabled).toBe(true);
@@ -274,7 +274,7 @@ describe('useProgramExpenseRecordForm', () => {
             expect(onSubmit).toHaveBeenCalledWith({
                 programId: 1,
                 reportingYear: '2026',
-                amountUah: '100',
+                amountUah: '400',
                 amountUsd: '10',
             });
         });
@@ -290,7 +290,7 @@ describe('useProgramExpenseRecordForm', () => {
                 result.current.handleAmountBlur('amountUsd');
             });
 
-            expect(result.current.usdMismatchMessage).toBe(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH);
+            expect(result.current.usdMismatchMessage).toBe(PROGRAM_EXPENSES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH);
             expect(result.current.isSubmitDisabled).toBe(true);
         });
 

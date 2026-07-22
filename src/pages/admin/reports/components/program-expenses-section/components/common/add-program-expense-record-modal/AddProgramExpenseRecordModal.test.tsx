@@ -1,5 +1,5 @@
 import { ChangeEvent, ComponentProps, ReactNode } from 'react';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FUNDS_EXPENDITURES_TEXT, PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
@@ -329,8 +329,8 @@ describe('AddProgramExpenseRecordModal', () => {
 
         selectOption(FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_PLACEHOLDER, '2026');
         selectOption(PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_PLACEHOLDER, 'Program B');
-        fireEvent.change(screen.getByTestId('add-program-expense-amount-uah'), { target: { value: '100' } });
-        fireEvent.change(screen.getByTestId('add-program-expense-amount-usd'), { target: { value: '2.5' } });
+        fireEvent.change(screen.getByTestId('add-program-expense-amount-uah'), { target: { value: '400' } });
+        fireEvent.change(screen.getByTestId('add-program-expense-amount-usd'), { target: { value: '10' } });
         fireEvent.blur(screen.getByTestId('add-program-expense-amount-usd'));
 
         fireEvent.click(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.MODAL.ADD.SUBMIT_BUTTON }));
@@ -345,7 +345,9 @@ describe('AddProgramExpenseRecordModal', () => {
 
         expect(screen.getByTestId('close-confirmation')).toBeInTheDocument();
 
-        resolveSubmit(true);
+        await act(async () => {
+            resolveSubmit(true);
+        });
     });
 
     describe('edit mode', () => {
@@ -426,7 +428,9 @@ describe('AddProgramExpenseRecordModal', () => {
             expect(onClose).not.toHaveBeenCalled();
             expect(screen.queryByTestId('close-confirmation')).not.toBeInTheDocument();
 
-            resolveSubmit(true);
+            await act(async () => {
+                resolveSubmit(true);
+            });
         });
     });
 });

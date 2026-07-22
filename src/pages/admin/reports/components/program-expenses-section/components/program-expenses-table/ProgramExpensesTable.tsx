@@ -11,6 +11,7 @@ import {
     normalizeFundsExpendituresAmountInput,
     validateFundsExpendituresAmount,
 } from '@/validation/admin/reports-schema/funds-expenditures-record-schema/funds-expenditures-record-schema';
+import { isUsdAmountMismatch } from '@/utils/functions/validate-usd-amount-mismatch/validate-usd-amount-mismatch';
 import { ProgramExpensesProgram, ProgramExpensesRecord } from '@/types/admin/reports';
 import cn from 'classnames';
 import styles from './ProgramExpensesTable.module.scss';
@@ -59,7 +60,10 @@ interface ProgramExpenseRowEditState {
 const READ_ONLY_TABLE_COLUMNS_COUNT = 5;
 const EDITING_TABLE_COLUMNS_COUNT = 7;
 
-const isAcceptButtonDisabled = (rowEditState: ProgramExpenseRowEditState | null): boolean => {
+const isAcceptButtonDisabled = (
+    rowEditState: ProgramExpenseRowEditState | null,
+    exchangeRate?: string | null,
+): boolean => {
     if (!rowEditState) return true;
 
     const normalizedUah = normalizeFundsExpendituresAmountInput(rowEditState.amountUah, true);
@@ -70,7 +74,9 @@ const isAcceptButtonDisabled = (rowEditState: ProgramExpenseRowEditState | null)
     const hasErrors =
         Boolean(rowEditState.errors.amountUah) ||
         Boolean(rowEditState.errors.amountUsd) ||
-        Boolean(rowEditState.errors.programId);
+        Boolean(rowEditState.errors.programId) ||
+        Boolean(rowEditState.usdMismatchMessage) ||
+        isUsdAmountMismatch(normalizedUah, normalizedUsd, exchangeRate);
 
     const programIdUndefined = rowEditState.programId === undefined;
     const amountsEmpty = normalizedUah === '' || normalizedUsd === '';
@@ -123,7 +129,7 @@ export const ProgramExpensesTable = ({
         isRowActionsDisabled,
         exchangeRate,
         mismatchMessage: PROGRAM_EXPENSES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH,
-        isAcceptButtonDisabled,
+        isAcceptButtonDisabled: (state) => isAcceptButtonDisabled(state, exchangeRate),
         onRowEditModeChange,
     });
 

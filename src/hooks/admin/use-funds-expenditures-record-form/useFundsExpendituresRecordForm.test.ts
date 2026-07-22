@@ -155,6 +155,28 @@ describe('useFundsExpendituresRecordForm', () => {
         expect(result.current.formState.errors.reportingYear).toBe(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED);
     });
 
+    it('disables submit button and blocks save when USD amount does not match UAH exchange rate', async () => {
+        const onSubmit = jest.fn().mockResolvedValue(true);
+        const { result } = renderUseFundsForm({ exchangeRate: '45.00', onSubmit });
+
+        act(() => {
+            result.current.handleReportingYearChange('2026');
+            result.current.handleCategoryChange(3);
+            result.current.handleAmountChange('450');
+            result.current.handleUsdChange('15');
+            result.current.handleAmountBlur('amountUsd');
+        });
+
+        expect(result.current.usdMismatchMessage).toBe(FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH);
+        expect(result.current.isSubmitDisabled).toBe(true);
+
+        await act(async () => {
+            await result.current.handleConfirmAdd();
+        });
+
+        expect(onSubmit).not.toHaveBeenCalled();
+    });
+
     it('sets reporting year required error on blur', () => {
         const { result } = renderUseFundsForm();
 

@@ -449,6 +449,65 @@ describe('TranslateProgramModal', () => {
         });
     });
 
+    it('mirrors replaced UA section structure and leaves untranslated content fields empty (issue-1513)', () => {
+        const programWithReplacedSection = {
+            ...TEST_DATA.program,
+            sections: [
+                {
+                    id: 701,
+                    template: 1,
+                    contents: [
+                        {
+                            id: 801,
+                            contentType: 0,
+                            title: 'Original section title',
+                            localizations: [
+                                {
+                                    localizationInfoDto: { id: 2 },
+                                    title: 'Localized section title',
+                                    description: 'Localized section description',
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    id: 702,
+                    template: 2,
+                    contents: [
+                        {
+                            id: 802,
+                            contentType: 0,
+                            title: 'Newly replaced section title (UA)',
+                            localizations: [],
+                        },
+                    ],
+                },
+            ],
+        } as any;
+
+        renderModal({
+            programToTranslate: programWithReplacedSection,
+            translatedLanguages: [TEST_DATA.language],
+        });
+
+        const parsed = getInitialDataFromForm();
+        expect(parsed.sections).toHaveLength(2);
+        expect(parsed.sections[0]).toMatchObject({ entityId: 701 });
+        expect(parsed.sections[0].contents[0]).toMatchObject({
+            entityId: 801,
+            title: 'Localized section title',
+            description: 'Localized section description',
+        });
+
+        expect(parsed.sections[1]).toMatchObject({ entityId: 702 });
+        expect(parsed.sections[1].contents[0]).toMatchObject({
+            entityId: 802,
+            title: null,
+            description: null,
+        });
+    });
+
     it('keeps language unchanged when unknown code is selected', () => {
         renderModal({
             translatedLanguages: [TEST_DATA.language],

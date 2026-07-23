@@ -132,7 +132,8 @@ export const DescriptionAuthorPairCard = ({
                         error={authorError}
                         maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(authorMaxLength)}
                         rows={1}
-                        autoGrow={false}
+                        autoGrow={true}
+                        maxRows={2}
                     />
                 </div>
             </div>

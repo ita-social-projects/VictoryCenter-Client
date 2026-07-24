@@ -166,6 +166,69 @@ describe('useProgramExpenseRecordForm', () => {
         expect(result.current.isDirty).toBe(false);
     });
 
+    it('matches typed text to an existing program option (case-insensitive, trimmed)', () => {
+        const { result } = renderUseProgramExpenseForm();
+
+        act(() => {
+            result.current.handleProgramInputChange('  program b  ');
+        });
+
+        expect(result.current.formState.programId).toBe(2);
+        expect(result.current.formState.programInputValue).toBe('  program b  ');
+        expect(result.current.formState.errors.programId).toBeUndefined();
+    });
+
+    it('treats typed text with no matching option as a pending custom category', () => {
+        const { result } = renderUseProgramExpenseForm();
+
+        act(() => {
+            result.current.handleProgramInputChange('XXXXXXXX');
+        });
+
+        expect(result.current.formState.programId).toBeUndefined();
+        expect(result.current.formState.programInputValue).toBe('XXXXXXXX');
+        expect(result.current.formState.errors.programId).toBeUndefined();
+    });
+
+    it('validates a too-short custom category name on blur', () => {
+        const { result } = renderUseProgramExpenseForm();
+
+        act(() => {
+            result.current.handleProgramInputChange('ab');
+        });
+        act(() => {
+            result.current.handleProgramBlur();
+        });
+
+        expect(result.current.formState.errors.programId).toBeDefined();
+        expect(result.current.isSubmitDisabled).toBe(true);
+    });
+
+    it('submits with programId undefined and the trimmed custom name when a new category is typed', async () => {
+        const onSubmit = jest.fn().mockResolvedValue(true);
+        const { result } = renderUseProgramExpenseForm({ onSubmit });
+
+        act(() => {
+            result.current.handleReportingYearChange('2026');
+            result.current.handleProgramInputChange('  New Category  ');
+            result.current.handleAmountChange('400');
+        });
+
+        expect(result.current.isSubmitDisabled).toBe(false);
+
+        await act(async () => {
+            await result.current.handleSave();
+        });
+
+        expect(onSubmit).toHaveBeenCalledWith({
+            programId: undefined,
+            programName: 'New Category',
+            reportingYear: '2026',
+            amountUah: '400',
+            amountUsd: '10',
+        });
+    });
+
     it('clears selected program when it is no longer available', () => {
         const { result, rerender } = renderHook(
             ({ nextPrograms }) =>
@@ -273,6 +336,7 @@ describe('useProgramExpenseRecordForm', () => {
 
             expect(onSubmit).toHaveBeenCalledWith({
                 programId: 1,
+                programName: 'Program A',
                 reportingYear: '2026',
                 amountUah: '400',
                 amountUsd: '10',

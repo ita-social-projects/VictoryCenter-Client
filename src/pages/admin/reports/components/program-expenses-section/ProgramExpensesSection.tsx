@@ -7,6 +7,7 @@ import { ToastType } from '@/types/admin/toast';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { PROGRAM_EXPENSES_TEXT, REPORTS_TEXT } from '@/const/admin/reports';
 import { ProgramExpensesApi } from '@/services/api/admin/reports/program-expenses-api';
+import { ProgramsCategoriesApi } from '@/services/api/admin/programs/programs-api';
 import { ProgramExpensesReadOnlyData, ProgramExpensesRecord } from '@/types/admin/reports';
 import { ProgramExpensesToolbar } from './components/program-expenses-toolbar/ProgramExpensesToolbar';
 import { ProgramExpensesSummaryCard } from './components/program-expenses-summary-card/ProgramExpensesSummaryCard';
@@ -151,7 +152,13 @@ export const ProgramExpensesSection = ({
     );
 
     const handleSubmitAddProgramExpense = useCallback(
-        async (submitData: { programId: number; reportingYear: string; amountUah: string; amountUsd: string }) => {
+        async (submitData: {
+            programId: number | undefined;
+            programName: string;
+            reportingYear: string;
+            amountUah: string;
+            amountUsd: string;
+        }) => {
             const reportingYear = Number.parseInt(submitData.reportingYear, 10);
             const amountUah = Number.parseFloat(submitData.amountUah.replace(/\s/g, '').replace(',', '.'));
             const amountUsd = Number.parseFloat(submitData.amountUsd.replace(/\s/g, '').replace(',', '.'));
@@ -161,9 +168,19 @@ export const ProgramExpensesSection = ({
             }
 
             try {
+                let categoryId = submitData.programId;
+
+                if (categoryId === undefined) {
+                    const createdCategory = await ProgramsCategoriesApi.addProgramCategory(
+                        { id: null, name: submitData.programName },
+                        adminClient,
+                    );
+                    categoryId = createdCategory.id;
+                }
+
                 const payload = {
                     reportingYear,
-                    hippotherapyProgramCategoryId: submitData.programId,
+                    hippotherapyProgramCategoryId: categoryId,
                     amountUah,
                     amountUsd,
                 };

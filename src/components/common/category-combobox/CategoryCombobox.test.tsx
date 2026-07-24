@@ -192,11 +192,31 @@ describe('CategoryCombobox', () => {
         expect(ref.current).toHaveClass('select');
     });
 
-    it('opens the dropdown when clicking anywhere on the head', () => {
+    it('associates the head label with the input so clicking anywhere on it focuses the input natively', () => {
         const { container } = renderCombobox();
+        const input = screen.getByPlaceholderText('Оберіть програму');
+        const label = container.querySelector('.select-head') as HTMLLabelElement;
 
-        fireEvent.click(container.querySelector('.select-head') as HTMLElement);
+        expect(label.tagName).toBe('LABEL');
+        expect(label).toHaveAttribute('for', input.id);
+        expect(input.id).not.toBe('');
+    });
 
-        expect(container.querySelector('.select')).toHaveClass('select-opened');
+    it('uses the explicit id prop for both the input and its label association when provided', () => {
+        const { container } = render(
+            <CategoryCombobox
+                id="add-program-expense-category"
+                options={OPTIONS}
+                inputValue=""
+                onInputValueChange={jest.fn()}
+                onOptionSelect={jest.fn()}
+                placeholder="Оберіть програму"
+            />,
+        );
+        const input = screen.getByPlaceholderText('Оберіть програму');
+        const label = container.querySelector('.select-head') as HTMLLabelElement;
+
+        expect(input).toHaveAttribute('id', 'add-program-expense-category');
+        expect(label).toHaveAttribute('for', 'add-program-expense-category');
     });
 });

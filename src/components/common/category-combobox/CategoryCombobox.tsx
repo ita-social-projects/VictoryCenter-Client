@@ -1,4 +1,4 @@
-import React, { KeyboardEvent, RefObject, useMemo, useRef, useState } from 'react';
+import React, { KeyboardEvent, RefObject, useId, useMemo, useRef, useState } from 'react';
 import { ReactComponent as ArrowDown } from '@/assets/icons/chevron-down.svg';
 import { ReactComponent as ArrowUp } from '@/assets/icons/chevron-up.svg';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -45,6 +45,8 @@ export const CategoryCombobox = ({
     const [highlightedIndex, setHighlightedIndex] = useState(-1);
     const inputRef = useRef<HTMLInputElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
+    const generatedId = useId();
+    const inputId = id ?? generatedId;
 
     const setContainerRef = (node: HTMLDivElement | null) => {
         containerRef.current = node;
@@ -126,17 +128,10 @@ export const CategoryCombobox = ({
                 'select-disabled': disabled,
             })}
         >
-            <div
-                className={classNames('select-head', headClassName)}
-                onClick={() => {
-                    if (disabled) return;
-                    inputRef.current?.focus();
-                    openDropdown();
-                }}
-            >
+            <label htmlFor={inputId} className={classNames('select-head', headClassName)}>
                 <input
                     ref={inputRef}
-                    id={id}
+                    id={inputId}
                     type="text"
                     value={inputValue}
                     onChange={handleInputChange}
@@ -147,7 +142,7 @@ export const CategoryCombobox = ({
                     autoComplete="off"
                 />
                 {isOpen ? <ArrowUp /> : <ArrowDown />}
-            </div>
+            </label>
 
             {isOpen && !disabled && (
                 <div className="select-options">

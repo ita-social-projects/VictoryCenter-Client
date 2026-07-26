@@ -115,7 +115,6 @@ describe('SummarySection', () => {
 
     it('does not render disclaimer when UAH is active', async () => {
         mockUseLocale.mockReturnValue({ isEn: false, currentLanguage: 'uk' });
-        mockGetPublishedReports.mockResolvedValue({ ...MOCK_DATA, settings: { disclaimerTitle: null } });
 
         render(<SummarySection />);
 

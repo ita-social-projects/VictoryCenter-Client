@@ -39,7 +39,7 @@ export const StatCard = ({
     const valueClasses = cn(styles.value, styles[`text-${color}`]);
 
     const backgroundStyle = imageUrl
-        ? ({ '--dynamic-bg-image': `url('${imageUrl}')` } as React.CSSProperties)
+        ? ({ '--dynamic-bg-image': `url('${imageUrl.replace(/'/g, "\\'")}')` } as React.CSSProperties)
         : undefined;
 
     return (

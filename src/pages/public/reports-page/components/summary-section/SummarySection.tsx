@@ -125,7 +125,9 @@ export const SummarySection = () => {
                 imageUrl={data.mediaSettings.changedLives.imageUrl}
                 color="yellow"
             />
-            {data.settings.disclaimerTitle && <p className={styles.disclaimer}>{data.settings.disclaimerTitle}</p>}
+            {isEn && data.settings.disclaimerTitle && (
+                <p className={styles.disclaimer}>{data.settings.disclaimerTitle}</p>
+            )}
         </section>
     );
 };

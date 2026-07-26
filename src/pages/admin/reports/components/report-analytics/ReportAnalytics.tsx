@@ -7,7 +7,6 @@ import { FUNDS_EXPENDITURES_TEXT, REPORTS_TEXT } from '@/const/admin/reports';
 import { DEFAULT_LOCALE } from '@/const/common/locales';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
-import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { FundsExpendituresApi } from '@/services/api/admin/reports/funds-expenditures-api';
 import { localizationLanguagesDataFetch } from '@/services/api/public/localization/languages/languages-api';
 import { ReportFundsExpendituresCategory } from '@/types/admin/reports';
@@ -56,6 +55,7 @@ export const ReportAnalytics = () => {
     const [isCancelling, setIsCancelling] = useState(false);
     const [renderKey, setRenderKey] = useState(0);
     const saveSettingsCallbackRef = useRef<(() => Promise<boolean>) | null>(null);
+    const refetchSettingsRef = useRef<(() => void) | null>(null);
 
     useEffect(() => {
         localizationLanguagesDataFetch()
@@ -66,19 +66,6 @@ export const ReportAnalytics = () => {
                 addToast(COMMON_TEXT_ADMIN.LOCALIZATION.LANGUAGES.MESSAGE.FAILED_TO_FETCH_LANGUAGES, ToastType.Error);
             });
     }, [addToast]);
-
-    const fetchSettings = useCallback(() => FundsExpendituresApi.getSettings(adminClient), [adminClient]);
-    const { data: settingsData } = useDataFetch({
-        initialData: null,
-        fetchHandler: fetchSettings,
-        autoFetchDependencies: [adminClient],
-    });
-
-    useEffect(() => {
-        if (settingsData) {
-            setHasUnpublishedChanges(settingsData.hasUnpublishedChanges);
-        }
-    }, [settingsData]);
 
     const categoryContextMenuOptions: ContextMenuOption[] = useMemo(
         () => [
@@ -134,7 +121,8 @@ export const ReportAnalytics = () => {
             setHasUnpublishedChanges(false);
             setIsFundsEditing(false);
             setIsPublishModalOpen(false);
-        } catch (error) {
+            refetchSettingsRef.current?.();
+        } catch {
             addToast(REPORTS_TEXT.MESSAGE.FAIL_TO_UPDATE_REPORT, ToastType.Error);
         } finally {
             setIsPublishing(false);
@@ -153,7 +141,8 @@ export const ReportAnalytics = () => {
             setIsFundsEditing(false);
             setIsCancelModalOpen(false);
             setRenderKey((prev) => prev + 1);
-        } catch (error) {
+            refetchSettingsRef.current?.();
+        } catch {
             addToast('Не вдалося відмінити зміни', ToastType.Error);
         } finally {
             setIsCancelling(false);
@@ -204,6 +193,10 @@ export const ReportAnalytics = () => {
                         onDataChange={() => setHasUnpublishedChanges(true)}
                         registerSaveCallback={(saveFn) => {
                             saveSettingsCallbackRef.current = saveFn;
+                        }}
+                        onUnpublishedChangesChange={setHasUnpublishedChanges}
+                        registerRefetchSettingsCallback={(fn) => {
+                            refetchSettingsRef.current = fn;
                         }}
                     />
                 </div>

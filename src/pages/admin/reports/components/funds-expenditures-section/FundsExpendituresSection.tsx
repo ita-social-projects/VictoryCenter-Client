@@ -85,6 +85,8 @@ interface FundsExpenditureSectionProps {
     onCountsChange?: (counts: { income: number; expense: number }) => void;
     onDataChange?: () => void;
     registerSaveCallback?: (saveFn: () => Promise<boolean>) => void;
+    onUnpublishedChangesChange?: (hasChanges: boolean) => void;
+    registerRefetchSettingsCallback?: (refetchFn: () => void) => void;
 }
 
 export const FundsExpenditureSection = ({
@@ -106,6 +108,8 @@ export const FundsExpenditureSection = ({
     onCountsChange,
     onDataChange,
     registerSaveCallback,
+    onUnpublishedChangesChange,
+    registerRefetchSettingsCallback,
 }: FundsExpenditureSectionProps = {}) => {
     const adminClient = useAdminClient();
     const { addToast } = useToast();
@@ -293,6 +297,16 @@ export const FundsExpenditureSection = ({
         if (!settings?.id) return;
         fetchDisclaimerLocalizations(settings.id);
     }, [fetchDisclaimerLocalizations, settings?.id]);
+
+    useEffect(() => {
+        if (settings) {
+            onUnpublishedChangesChange?.(settings.hasUnpublishedChanges);
+        }
+    }, [settings, onUnpublishedChangesChange]);
+
+    useEffect(() => {
+        registerRefetchSettingsCallback?.(() => refetchSettings());
+    }, [registerRefetchSettingsCallback, refetchSettings]);
 
     useEffect(() => {
         setRecordsState(allRecords);

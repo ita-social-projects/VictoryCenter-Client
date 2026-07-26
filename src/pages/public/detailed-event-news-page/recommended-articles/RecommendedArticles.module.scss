@@ -1,0 +1,52 @@
+@use '@/assets/sass/mixins/typography.mixins' as type;
+
+.recommendations-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    justify-content: space-between;
+    padding: 0 16px 64px;
+
+    @media (min-width: 560px) {
+        padding: 0 64px 64px;
+    }
+
+    @media (min-width: 768px) {
+        padding: 0 56px 64px;
+    }
+
+    @media (min-width: 1440px) {
+        padding: 0 56px 156px;
+    }
+}
+
+.heading {
+   @include type.subtitle-1-semibold;
+
+    @media (min-width: 560px) {
+        @include type.h4-semibold;
+    }
+
+    @media (min-width: 768px) {
+        @include type.subtitle-1-semibold;
+    }
+
+    @media (min-width: 1440px) {
+        @include type.h4-semibold;
+    }
+}
+
+.cards-grid {
+    max-width: 1440px;
+    margin: 0 auto;
+    display: grid;
+    gap: 64px;
+    grid-template-columns: 1fr;
+    width: 100%;
+
+        @media (min-width: 768px) {
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+    }

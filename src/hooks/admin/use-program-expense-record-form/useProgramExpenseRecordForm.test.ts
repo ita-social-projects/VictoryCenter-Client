@@ -16,7 +16,7 @@ const records: ProgramExpensesRecord[] = [
         programName: 'Program A',
         type: 'expense',
         reportingYear: '2025',
-        amountUah: '100',
+        amountUah: '400',
         amountUsd: '10',
     },
 ];
@@ -60,7 +60,7 @@ describe('useProgramExpenseRecordForm', () => {
         act(() => {
             result.current.handleReportingYearChange('2026');
             result.current.handleProgramChange(1);
-            result.current.handleAmountChange('100');
+            result.current.handleAmountChange('400');
             result.current.handleUsdChange('10');
         });
 
@@ -74,11 +74,49 @@ describe('useProgramExpenseRecordForm', () => {
         act(() => {
             result.current.handleReportingYearChange('2026');
             result.current.handleProgramChange(2);
-            result.current.handleAmountChange('100');
-            result.current.handleUsdChange('10');
+            result.current.handleAmountChange('400');
         });
 
+        expect(result.current.formState.amountUsd).toBe('10');
         expect(result.current.isSubmitDisabled).toBe(false);
+    });
+
+    it('blocks submit when UAH and USD amounts mismatch the exchange rate', () => {
+        const { result } = renderUseProgramExpenseForm();
+
+        act(() => {
+            result.current.handleReportingYearChange('2026');
+            result.current.handleProgramChange(2);
+            result.current.handleAmountChange('400');
+            result.current.handleUsdChange('999');
+        });
+
+        act(() => {
+            result.current.handleAmountBlur('amountUsd');
+        });
+
+        expect(result.current.usdMismatchMessage).toBe(PROGRAM_EXPENSES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH);
+        expect(result.current.isSubmitDisabled).toBe(true);
+    });
+
+    it('blocks submitRecord on mismatch even without a preceding USD blur', async () => {
+        const onSubmit = jest.fn().mockResolvedValue(true);
+        const { result } = renderUseProgramExpenseForm({ onSubmit });
+
+        act(() => {
+            result.current.handleReportingYearChange('2026');
+            result.current.handleProgramChange(2);
+            result.current.handleAmountChange('400');
+            result.current.handleUsdChange('999');
+        });
+
+        expect(result.current.usdMismatchMessage).toBeUndefined();
+
+        await act(async () => {
+            await result.current.handleSave();
+        });
+
+        expect(onSubmit).not.toHaveBeenCalled();
     });
 
     it('validates amount fields on change and blur', () => {
@@ -126,6 +164,69 @@ describe('useProgramExpenseRecordForm', () => {
         expect(result.current.formState.programId).toBeUndefined();
         expect(result.current.formState.amountUah).toBe('');
         expect(result.current.isDirty).toBe(false);
+    });
+
+    it('matches typed text to an existing program option (case-insensitive, trimmed)', () => {
+        const { result } = renderUseProgramExpenseForm();
+
+        act(() => {
+            result.current.handleProgramInputChange('  program b  ');
+        });
+
+        expect(result.current.formState.programId).toBe(2);
+        expect(result.current.formState.programInputValue).toBe('  program b  ');
+        expect(result.current.formState.errors.programId).toBeUndefined();
+    });
+
+    it('treats typed text with no matching option as a pending custom category', () => {
+        const { result } = renderUseProgramExpenseForm();
+
+        act(() => {
+            result.current.handleProgramInputChange('XXXXXXXX');
+        });
+
+        expect(result.current.formState.programId).toBeUndefined();
+        expect(result.current.formState.programInputValue).toBe('XXXXXXXX');
+        expect(result.current.formState.errors.programId).toBeUndefined();
+    });
+
+    it('validates a too-short custom category name on blur', () => {
+        const { result } = renderUseProgramExpenseForm();
+
+        act(() => {
+            result.current.handleProgramInputChange('ab');
+        });
+        act(() => {
+            result.current.handleProgramBlur();
+        });
+
+        expect(result.current.formState.errors.programId).toBeDefined();
+        expect(result.current.isSubmitDisabled).toBe(true);
+    });
+
+    it('submits with programId undefined and the trimmed custom name when a new category is typed', async () => {
+        const onSubmit = jest.fn().mockResolvedValue(true);
+        const { result } = renderUseProgramExpenseForm({ onSubmit });
+
+        act(() => {
+            result.current.handleReportingYearChange('2026');
+            result.current.handleProgramInputChange('  New Category  ');
+            result.current.handleAmountChange('400');
+        });
+
+        expect(result.current.isSubmitDisabled).toBe(false);
+
+        await act(async () => {
+            await result.current.handleSave();
+        });
+
+        expect(onSubmit).toHaveBeenCalledWith({
+            programId: undefined,
+            programName: 'New Category',
+            reportingYear: '2026',
+            amountUah: '400',
+            amountUsd: '10',
+        });
     });
 
     it('clears selected program when it is no longer available', () => {
@@ -180,7 +281,7 @@ describe('useProgramExpenseRecordForm', () => {
             programName: 'Program A',
             type: 'expense',
             reportingYear: '2025',
-            amountUah: '100',
+            amountUah: '400',
             amountUsd: '10',
         };
 
@@ -189,7 +290,7 @@ describe('useProgramExpenseRecordForm', () => {
 
             expect(result.current.formState.reportingYear).toBe('2025');
             expect(result.current.formState.programId).toBe(1);
-            expect(result.current.formState.amountUah).toBe('100');
+            expect(result.current.formState.amountUah).toBe('400');
             expect(result.current.formState.amountUsd).toBe('10');
             expect(result.current.isDirty).toBe(false);
             expect(result.current.isSubmitDisabled).toBe(true);
@@ -210,6 +311,50 @@ describe('useProgramExpenseRecordForm', () => {
             });
 
             expect(result.current.isDirty).toBe(false);
+            expect(result.current.isSubmitDisabled).toBe(true);
+        });
+
+        it('does not block saving a legacy record whose stored amounts mismatch the current exchange rate, as long as amounts are untouched', async () => {
+            const onSubmit = jest.fn().mockResolvedValue(true);
+            const { result } = renderUseProgramExpenseForm({ recordToEdit, onSubmit, exchangeRate: '40' });
+
+            act(() => {
+                result.current.handleAmountBlur('amountUsd');
+            });
+
+            expect(result.current.usdMismatchMessage).toBeUndefined();
+
+            act(() => {
+                result.current.handleReportingYearChange('2026');
+            });
+
+            expect(result.current.isSubmitDisabled).toBe(false);
+
+            await act(async () => {
+                await result.current.handleSave();
+            });
+
+            expect(onSubmit).toHaveBeenCalledWith({
+                programId: 1,
+                programName: 'Program A',
+                reportingYear: '2026',
+                amountUah: '400',
+                amountUsd: '10',
+            });
+        });
+
+        it('still blocks saving a legacy record once its amounts are actively edited to mismatch the current rate', () => {
+            const { result } = renderUseProgramExpenseForm({ recordToEdit, exchangeRate: '40' });
+
+            act(() => {
+                result.current.handleUsdChange('15');
+            });
+
+            act(() => {
+                result.current.handleAmountBlur('amountUsd');
+            });
+
+            expect(result.current.usdMismatchMessage).toBe(PROGRAM_EXPENSES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH);
             expect(result.current.isSubmitDisabled).toBe(true);
         });
 

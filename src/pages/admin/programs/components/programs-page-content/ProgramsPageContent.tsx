@@ -296,13 +296,20 @@ export const ProgramsPageContent = () => {
     );
 
     const handleProgramSuggestionSelect = useCallback(
-        (programId: string | number) => {
+        (programId: string | number, item: ProgramSearchItemData) => {
             setIsSearchResultView(true);
             setSearchProgramId(typeof programId === 'string' ? parseInt(programId, 10) : programId);
             setStatusFilter(undefined);
             resetProgramsList();
+
+            if (item?.categories?.length) {
+                const cat = categories.find((c) => item.categories.includes(c.name));
+                if (cat) {
+                    setSelectedCategory(cat);
+                }
+            }
         },
-        [resetProgramsList],
+        [resetProgramsList, categories],
     );
 
     const handleSearchClear = useCallback(() => {

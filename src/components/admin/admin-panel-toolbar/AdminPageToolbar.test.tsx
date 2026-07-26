@@ -209,7 +209,7 @@ describe('AdminPanelToolbar', () => {
             onSearchItemSelect(mockItems[0]);
         });
 
-        expect(mockOnSuggestionSelect).toHaveBeenCalledWith(1);
+        expect(mockOnSuggestionSelect).toHaveBeenCalledWith(1, { id: 1, name: 'Item 1' });
         expect(mockHookImplementation.resetList).toHaveBeenCalledTimes(1);
     });
 

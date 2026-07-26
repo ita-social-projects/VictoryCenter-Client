@@ -53,7 +53,6 @@ export const Events = ({ title, tags }: EventsData) => {
     return (
         <section className={styles.events}>
             <div className={styles['menu-block']}>
-                <h2 className={styles['header-title']}>{title}</h2>
                 <div className={styles['button-block']}>
                     {tags.map((tag) => (
                         <button
@@ -78,6 +77,8 @@ export const Events = ({ title, tags }: EventsData) => {
                         {t('ALL_MATERIALS')}
                     </button>
                 </div>
+
+                {title && <h2 className={styles['header-title']}>{title}</h2>}
             </div>
             <div className={styles['cards-block']}>
                 {error && (

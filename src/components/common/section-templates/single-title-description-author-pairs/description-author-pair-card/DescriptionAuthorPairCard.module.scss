@@ -5,7 +5,7 @@ $field-width: 366px;
 
 .card {
     width: var(--pair-card-width, 432px);
-    height: var(--pair-card-height, 259px);
+    min-height: var(--pair-card-height, 259px);
     background-color: c.$light-blue-50;
     border-radius: var(--card-radius, 20px);
     box-sizing: border-box;
@@ -67,7 +67,6 @@ $field-width: 366px;
     display: flex;
     flex-direction: column;
     gap: 18px;
-    height: 100%;
 }
 
 .description-field,
@@ -109,6 +108,8 @@ $field-width: 366px;
     }
 
     :global(.char-limit-textarea__field) {
+        box-sizing: border-box;
+        width: 100%;
         font-family: t.$font-family-base;
         font-weight: t.$fw-bold;
         font-size: 20px;

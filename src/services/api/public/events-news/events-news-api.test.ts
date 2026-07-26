@@ -1,7 +1,7 @@
-import { EventsNewsApi } from './events-news-api';
+import { EventsNewsApi, EventNewsApi } from './events-news-api';
 import { eventsNewsMock } from '@/utils/mock-data/public/event-news';
 
-describe('EventsNewsApi.get', () => {
+describe('events-news-api', () => {
     beforeEach(() => {
         jest.useFakeTimers();
     });
@@ -85,5 +85,25 @@ describe('EventsNewsApi.get', () => {
             items: eventsNewsMock.slice(0, 0),
             totalItemsCount: eventsNewsMock.length,
         });
+    });
+
+    it('resolves with the matching mock event when given a slug present in eventsNewsMock', async () => {
+        const targetEvent = eventsNewsMock[0];
+
+        const promise = EventNewsApi.get(targetEvent.slug);
+
+        jest.advanceTimersByTime(200);
+        await jest.runAllTimers();
+
+        await expect(promise).resolves.toEqual(targetEvent);
+    });
+
+    it('rejects with an Error when given a slug not present in eventsNewsMock', async () => {
+        const promise = EventNewsApi.get('non-existent-slug');
+
+        jest.advanceTimersByTime(200);
+        await jest.runAllTimers();
+
+        await expect(promise).rejects.toThrow('Event not found');
     });
 });

@@ -1,48 +1,27 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 import { ReviewArticlesSection } from './ReviewArticlesSection';
 import { StoriesOfVictoryReviewArticle } from '@/types/public/stories-of-victory';
 
-// Mock SVG icon FIRST
-jest.mock('@/assets/icons/square-arrow-out-up-right.svg', () => ({
-    ReactComponent: () => <svg data-testid="arrow-icon" />,
-}));
-
-// Mock react-i18next BEFORE importing components
-jest.mock('react-i18next', () => ({
-    useTranslation: jest.fn(),
-}));
-
 const article1: StoriesOfVictoryReviewArticle = {
     id: 1,
     title: 'Article 1',
-    text: ['Paragraph 1'],
     image: 'image1.jpg',
 };
 const article2: StoriesOfVictoryReviewArticle = {
     id: 2,
     title: 'Article 2',
-    text: ['Paragraph 2'],
     image: 'image2.jpg',
 };
 const article3: StoriesOfVictoryReviewArticle = {
     id: 3,
     title: 'Article 3',
-    text: ['Paragraph 3'],
     image: 'image3.jpg',
 };
 
 describe('ReviewArticlesSection', () => {
-    beforeEach(() => {
-        const { useTranslation } = require('react-i18next');
-        (useTranslation as jest.Mock).mockReturnValue({
-            t: (key: string) => (key === 'ARTICLES.READ_STORY' ? 'Read Story' : key),
-            i18n: { changeLanguage: jest.fn() },
-        });
-    });
-
     it('should render section when content is null', () => {
         const { container } = render(<ReviewArticlesSection content={null} />);
         expect(container.querySelector('section')).toBeInTheDocument();
@@ -82,29 +61,38 @@ describe('ReviewArticlesSection', () => {
         render(<ReviewArticlesSection content={[{ ...article1, title: 'Test Article Title' }]} />);
         const title = screen.getByText('"Test Article Title"');
         expect(title).toBeInTheDocument();
-        expect(title.tagName).toBe('H3');
-    });
-
-    it('should render article link with read story text', () => {
-        render(<ReviewArticlesSection content={[article1]} />);
-        expect(screen.getByText('Read Story')).toBeInTheDocument();
-    });
-
-    it('should render arrow icon for each article', () => {
-        render(<ReviewArticlesSection content={[article1, article2]} />);
-        const icons = screen.getAllByTestId('arrow-icon');
-        expect(icons).toHaveLength(2);
-    });
-
-    it('should call useTranslation with successPage namespace', () => {
-        const { useTranslation } = require('react-i18next');
-        render(<ReviewArticlesSection content={[article1]} />);
-        expect(useTranslation).toHaveBeenCalledWith('successPage');
+        expect(title.tagName).toBe('DIV');
     });
 
     it('should use article id as key for each article', () => {
         const { container } = render(<ReviewArticlesSection content={[article1, article2]} />);
         const articles = container.querySelectorAll('.article');
         expect(articles).toHaveLength(2);
+    });
+
+    it('should show truncated text by default when title exceeds 100 characters', () => {
+        const longTitle = 'A'.repeat(150);
+        render(<ReviewArticlesSection content={[{ id: 1, title: longTitle, image: 'img.jpg' }]} />);
+        expect(screen.getByText(`"${'A'.repeat(100)}..."`)).toBeInTheDocument();
+    });
+
+    it('should show full text on mouse enter', () => {
+        const longTitle = 'A'.repeat(150);
+        const { container } = render(
+            <ReviewArticlesSection content={[{ id: 1, title: longTitle, image: 'img.jpg' }]} />,
+        );
+        fireEvent.mouseEnter(container.querySelector('.article')!);
+        expect(screen.getByText(`"${longTitle}"`)).toBeInTheDocument();
+    });
+
+    it('should revert to truncated text on mouse leave', () => {
+        const longTitle = 'A'.repeat(150);
+        const { container } = render(
+            <ReviewArticlesSection content={[{ id: 1, title: longTitle, image: 'img.jpg' }]} />,
+        );
+        const article = container.querySelector('.article')!;
+        fireEvent.mouseEnter(article);
+        fireEvent.mouseLeave(article);
+        expect(screen.getByText(`"${'A'.repeat(100)}..."`)).toBeInTheDocument();
     });
 });

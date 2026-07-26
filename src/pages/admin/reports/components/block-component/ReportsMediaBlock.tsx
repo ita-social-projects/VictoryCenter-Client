@@ -1,5 +1,5 @@
 import { Image, ImageValues } from '@/types/common/image';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback } from 'react';
 import styles from './ReportsMediaBlock.module.scss';
 import { InputError } from '@/components/admin/input-error/InputError';
 import { REPORTS_TEXT } from '@/const/admin/reports';
@@ -17,22 +17,12 @@ export interface ReportsMediaBlockValues {
     imageId: number | null;
 }
 
-export interface ReportsMediaBlockErrors {
-    title?: string;
-    titleEn?: string;
-    totalAmount?: string;
-    image?: string;
-}
-
-export interface ReportsMediaBlockValidationFunctions {
-    validateTitle: (value: string) => string | undefined;
-    validateTitleEn: (value: string) => string | undefined;
-    validateTotalAmount?: (value: number | string) => string | undefined;
-}
-
 export interface ReportsMediaBlockProps {
     values: ReportsMediaBlockValues;
-    errors: ReportsMediaBlockErrors;
+    titleError?: string;
+    titleEnError?: string;
+    totalAmountError?: string;
+    imageError?: string;
     windowTitle: string;
     windowDescription: string;
     descriptionTitle: string;
@@ -41,13 +31,21 @@ export interface ReportsMediaBlockProps {
     imageUrl: string;
     isValueEditable: boolean;
     totalAmountMaxLength: number;
-    validationFunctions: ReportsMediaBlockValidationFunctions;
-    onValuesChange: (values: ReportsMediaBlockValues, errors: ReportsMediaBlockErrors) => void;
+    onTitleChange: (value: string) => void;
+    onTitleBlur: (normalizedValue: string) => void;
+    onTitleEnChange: (value: string) => void;
+    onTitleEnBlur: (normalizedValue: string) => void;
+    onTotalAmountChange: (value: string) => void;
+    onImageChange: (value: ImageValues | null) => void;
+    onImageError: (error: string | null) => void;
 }
 
 export const ReportsMediaBlock = ({
     values,
-    errors,
+    titleError,
+    titleEnError,
+    totalAmountError,
+    imageError,
     windowTitle,
     windowDescription,
     descriptionTitle,
@@ -56,81 +54,68 @@ export const ReportsMediaBlock = ({
     imageUrl,
     isValueEditable,
     totalAmountMaxLength,
-    validationFunctions,
-    onValuesChange,
+    onTitleChange,
+    onTitleBlur,
+    onTitleEnChange,
+    onTitleEnBlur,
+    onTotalAmountChange,
+    onImageChange,
+    onImageError,
 }: ReportsMediaBlockProps) => {
-    const [localTotalAmount, setLocalTotalAmount] = useState<string>(values.totalAmount.toString());
-
-    useEffect(() => {
-        setLocalTotalAmount(values.totalAmount.toString());
-    }, [values.totalAmount]);
     const handleTitleChange = useCallback(
         (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-            const value = e.target.value;
-            const error = validationFunctions.validateTitle(value);
-            onValuesChange({ ...values, title: value }, { ...errors, title: error });
+            onTitleChange(e.target.value);
         },
-        [onValuesChange, values, errors, validationFunctions],
+        [onTitleChange],
     );
 
     const handleTitleBlur = useCallback(
         (_e: React.FocusEvent<HTMLTextAreaElement>) => {
             const normalizedTitle = getNormalizedInputText(values.title);
-            const error = validationFunctions.validateTitle(normalizedTitle);
-            onValuesChange({ ...values, title: normalizedTitle }, { ...errors, title: error });
+            if (normalizedTitle !== values.title) {
+                onTitleBlur(normalizedTitle);
+            }
         },
-        [onValuesChange, values, errors, validationFunctions],
+        [onTitleBlur, values.title],
     );
 
     const handleTitleEnChange = useCallback(
         (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-            const value = e.target.value;
-            const error = validationFunctions.validateTitleEn(value);
-            onValuesChange({ ...values, titleEn: value }, { ...errors, titleEn: error });
+            onTitleEnChange(e.target.value);
         },
-        [onValuesChange, values, errors, validationFunctions],
+        [onTitleEnChange],
     );
 
     const handleTitleEnBlur = useCallback(
         (_e: React.FocusEvent<HTMLTextAreaElement>) => {
             const normalizedTitle = getNormalizedInputText(values.titleEn);
-            const error = validationFunctions.validateTitleEn(normalizedTitle);
-            onValuesChange({ ...values, titleEn: normalizedTitle }, { ...errors, titleEn: error });
+            if (normalizedTitle !== values.titleEn) {
+                onTitleEnBlur(normalizedTitle);
+            }
         },
-        [onValuesChange, values, errors, validationFunctions],
+        [onTitleEnBlur, values.titleEn],
     );
 
     const handleTotalAmountChange = useCallback(
         (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-            const rawValue = e.target.value;
-            setLocalTotalAmount(rawValue);
-
-            const error = validationFunctions.validateTotalAmount?.(rawValue);
-            onValuesChange({ ...values, totalAmount: rawValue }, { ...errors, totalAmount: error });
+            onTotalAmountChange(e.target.value);
         },
-        [onValuesChange, values, errors, validationFunctions],
+        [onTotalAmountChange],
     );
-
-    const handleTotalAmountBlur = useCallback(() => {
-        if (String(localTotalAmount) === String(values.totalAmount)) return;
-
-        const error = validationFunctions.validateTotalAmount?.(localTotalAmount);
-        onValuesChange({ ...values, totalAmount: localTotalAmount }, { ...errors, totalAmount: error });
-    }, [onValuesChange, values, errors, validationFunctions, localTotalAmount]);
 
     const handleImageChange = useCallback(
         (value: ImageValues | null) => {
-            onValuesChange({ ...values, image: value, imageId: null }, { ...errors, image: undefined });
+            onImageChange(value);
         },
-        [onValuesChange, values, errors],
+        [onImageChange],
     );
 
-    const handleImageError = useCallback(
+    const handleImageErrorInternal = useCallback(
         (error: string | null) => {
             if (!error) return;
-            onValuesChange({ ...values }, { ...errors, image: error });
+            onImageError(error);
         },
-        [onValuesChange, values, errors],
+        [onImageError],
     );
 
     return (
@@ -156,7 +141,7 @@ export const ReportsMediaBlock = ({
                             maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
                                 REPORTS_TEXT.FORM.MAX_LENGTH.TITLE,
                             )}
-                            error={errors.title}
+                            error={titleError}
                             rows={1}
                             isRequired={true}
                             errorCounterContainerClassName={styles['error-counter']}
@@ -175,7 +160,7 @@ export const ReportsMediaBlock = ({
                             maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
                                 REPORTS_TEXT.FORM.MAX_LENGTH.TITLE,
                             )}
-                            error={errors.titleEn}
+                            error={titleEnError}
                             rows={1}
                             isRequired={true}
                             errorCounterContainerClassName={styles['error-counter']}
@@ -187,12 +172,11 @@ export const ReportsMediaBlock = ({
                             label={descriptionTitle}
                             id={`${windowTitle}-value`}
                             name={`${windowTitle}-value`}
-                            value={localTotalAmount}
+                            value={String(values.totalAmount)}
                             onChange={handleTotalAmountChange}
-                            onBlur={handleTotalAmountBlur}
                             maxLength={totalAmountMaxLength}
                             disabled={!isValueEditable}
-                            error={errors.totalAmount}
+                            error={totalAmountError}
                             rows={1}
                             isRequired={true}
                             errorCounterContainerClassName={styles['error-counter']}
@@ -208,7 +192,7 @@ export const ReportsMediaBlock = ({
                             subText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(imageWidth, imageHeight)}
                             value={values.image}
                             onChange={handleImageChange}
-                            setError={handleImageError}
+                            setError={handleImageErrorInternal}
                             cropWidth={imageWidth}
                             cropHeight={imageHeight}
                             minWidth={imageWidth}
@@ -224,7 +208,7 @@ export const ReportsMediaBlock = ({
                             }}
                         />
                         <div className={styles['image-error']}>
-                            <InputError error={errors.image} />
+                            <InputError error={imageError} />
                         </div>
                     </div>
                 </div>

@@ -1,0 +1,26 @@
+@use '@/assets/sass/variables/colors' as c;
+
+.detailed-event-news-page {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    background-color: c.$white;
+}
+
+.sections-list {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    gap: 64px;
+    padding-top: 40px;
+    padding-bottom: 64px;
+
+    @media (min-width: 768px) {
+        gap: 80px;
+        padding-bottom: 80px;
+    }
+    @media (min-width: 1440px) {
+        gap: 128px;
+        padding-bottom: 128px;
+    }
+}

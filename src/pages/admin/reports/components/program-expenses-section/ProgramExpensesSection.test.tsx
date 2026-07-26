@@ -14,7 +14,7 @@ const MOCK_PROGRAM_EXPENSES_DATA: ProgramExpensesReadOnlyData = {
         { id: 3, name: 'Program C' },
     ],
     summary: {
-        totalAmountUah: 125000,
+        totalAmountUah: 123750,
         totalAmountUsd: 3000,
     },
     records: [
@@ -24,7 +24,7 @@ const MOCK_PROGRAM_EXPENSES_DATA: ProgramExpensesReadOnlyData = {
             programName: 'Program A',
             type: 'expense',
             reportingYear: '2025',
-            amountUah: '50000',
+            amountUah: '49500',
             amountUsd: '1200',
         },
         {
@@ -33,7 +33,7 @@ const MOCK_PROGRAM_EXPENSES_DATA: ProgramExpensesReadOnlyData = {
             programName: 'Program A',
             type: 'expense',
             reportingYear: '2024',
-            amountUah: '25000',
+            amountUah: '24750',
             amountUsd: '600',
         },
         {
@@ -42,7 +42,7 @@ const MOCK_PROGRAM_EXPENSES_DATA: ProgramExpensesReadOnlyData = {
             programName: 'Program B',
             type: 'expense',
             reportingYear: '2025',
-            amountUah: '50000',
+            amountUah: '49500',
             amountUsd: '1200',
         },
     ],
@@ -73,6 +73,13 @@ jest.mock('@/services/api/admin/reports/program-expenses-api', () => ({
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: () => 'mock-client',
+}));
+
+const mockAddProgramCategory = jest.fn();
+jest.mock('@/services/api/admin/programs/programs-api', () => ({
+    ProgramsCategoriesApi: {
+        addProgramCategory: (...args: unknown[]) => mockAddProgramCategory(...args),
+    },
 }));
 
 jest.mock('@/components/common/select/Select', () => {
@@ -163,7 +170,8 @@ jest.mock('./components/common/add-program-expense-record-modal/AddProgramExpens
         isOpen: boolean;
         exchangeRate: string | null;
         onSubmit: (submitData: {
-            programId: number;
+            programId: number | undefined;
+            programName: string;
             reportingYear: string;
             amountUah: string;
             amountUsd: string;
@@ -180,6 +188,7 @@ jest.mock('./components/common/add-program-expense-record-modal/AddProgramExpens
                         onClick={() =>
                             onSubmit({
                                 programId: recordToEdit ? 3 : 2,
+                                programName: recordToEdit ? 'Program C' : 'Program B',
                                 reportingYear: recordToEdit ? '2027' : '2026',
                                 amountUah: recordToEdit ? '2 000' : '1 000',
                                 amountUsd: recordToEdit ? '50' : '25',
@@ -187,6 +196,20 @@ jest.mock('./components/common/add-program-expense-record-modal/AddProgramExpens
                         }
                     >
                         Submit Modal
+                    </button>
+                    <button
+                        data-testid="mock-submit-new-category-btn"
+                        onClick={() =>
+                            onSubmit({
+                                programId: undefined,
+                                programName: 'New Category',
+                                reportingYear: '2026',
+                                amountUah: '1 000',
+                                amountUsd: '25',
+                            })
+                        }
+                    >
+                        Submit New Category
                     </button>
                 </>
             )}
@@ -630,6 +653,7 @@ describe('ProgramExpensesSection', () => {
         beforeEach(() => {
             mockPost.mockReset();
             mockUpdate.mockReset();
+            mockAddProgramCategory.mockReset();
         });
 
         it('should open modal in add mode, submit, call API.post and refetch', async () => {
@@ -651,12 +675,55 @@ describe('ProgramExpensesSection', () => {
                     amountUah: 1000,
                     amountUsd: 25,
                 });
+                expect(mockAddProgramCategory).not.toHaveBeenCalled();
                 expect(mockAddToast).toHaveBeenCalledWith(
                     PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_CREATED_SUCCESSFULLY,
                     'success',
                 );
                 expect(mockRefetch).toHaveBeenCalled();
                 expect(screen.getByTestId('add-program-expense-modal')).toHaveAttribute('data-open', 'false');
+            });
+        });
+
+        it('should create a new program category first when programId is undefined, then post the record', async () => {
+            mockAddProgramCategory.mockResolvedValueOnce({ id: 99, name: 'New Category', programsCount: 0 });
+            mockPost.mockResolvedValueOnce(undefined);
+
+            render(<ProgramExpensesSection />);
+
+            fireEvent.click(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE }));
+            fireEvent.click(screen.getByTestId('mock-submit-new-category-btn'));
+
+            await waitFor(() => {
+                expect(mockAddProgramCategory).toHaveBeenCalledWith({ id: null, name: 'New Category' }, 'mock-client');
+                expect(mockPost).toHaveBeenCalledWith('mock-client', {
+                    reportingYear: 2026,
+                    hippotherapyProgramCategoryId: 99,
+                    amountUah: 1000,
+                    amountUsd: 25,
+                });
+                expect(mockAddToast).toHaveBeenCalledWith(
+                    PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_CREATED_SUCCESSFULLY,
+                    'success',
+                );
+                expect(mockRefetch).toHaveBeenCalled();
+            });
+        });
+
+        it('should show error toast and not call API.post when creating the new category fails', async () => {
+            mockAddProgramCategory.mockRejectedValueOnce(new Error('failed to create category'));
+
+            render(<ProgramExpensesSection />);
+
+            fireEvent.click(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE }));
+            fireEvent.click(screen.getByTestId('mock-submit-new-category-btn'));
+
+            await waitFor(() => {
+                expect(mockPost).not.toHaveBeenCalled();
+                expect(mockAddToast).toHaveBeenCalledWith(
+                    PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_CREATE_FAILED_RETRY,
+                    'error',
+                );
             });
         });
 
@@ -684,7 +751,7 @@ describe('ProgramExpensesSection', () => {
                 expect(mockUpdate).toHaveBeenCalledWith('mock-client', 1, {
                     reportingYear: 2025,
                     hippotherapyProgramCategoryId: 3,
-                    amountUah: 50000,
+                    amountUah: 49500,
                     amountUsd: 1200,
                 });
                 expect(mockAddToast).toHaveBeenCalledWith(REPORTS_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY, 'success');

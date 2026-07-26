@@ -1,13 +1,6 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { useProgramBySlug } from './useGetProgramBySlug';
-import { fetchProgramBySlug } from '@/services/api/public/programs/programs-api';
 import { DetailedProgramDto } from '@/types/public/programs-page';
-
-jest.mock('@/services/api/public/programs/programs-api', () => ({
-    fetchProgramBySlug: jest.fn(),
-}));
-
-const mockedFetchProgramBySlug = fetchProgramBySlug as jest.MockedFunction<typeof fetchProgramBySlug>;
 
 const createMockProgram = (): DetailedProgramDto => ({
     id: 1,
@@ -24,24 +17,25 @@ const createMockProgram = (): DetailedProgramDto => ({
 });
 
 describe('useProgramBySlug', () => {
+    const callback = jest.fn();
     beforeEach(() => {
         jest.clearAllMocks();
     });
 
     it('should initialize with default state when no slug provided', () => {
-        const { result } = renderHook(() => useProgramBySlug(undefined));
+        const { result } = renderHook(() => useProgramBySlug(callback));
 
         expect(result.current.program).toBeNull();
         expect(result.current.isLoading).toBe(false);
         expect(result.current.error).toBeNull();
-        expect(mockedFetchProgramBySlug).not.toHaveBeenCalled();
+        expect(callback).not.toHaveBeenCalled();
     });
 
     it('should fetch program successfully when slug is provided', async () => {
         const mockProgram = createMockProgram();
-        mockedFetchProgramBySlug.mockResolvedValue(mockProgram);
+        callback.mockResolvedValue(mockProgram);
 
-        const { result } = renderHook(() => useProgramBySlug('test-program'));
+        const { result } = renderHook(() => useProgramBySlug(callback, 'test-program'));
 
         expect(result.current.isLoading).toBe(true);
 
@@ -51,14 +45,14 @@ describe('useProgramBySlug', () => {
 
         expect(result.current.program).toEqual(mockProgram);
         expect(result.current.error).toBeNull();
-        expect(mockedFetchProgramBySlug).toHaveBeenCalledWith('test-program');
+        expect(callback).toHaveBeenCalledWith('test-program');
     });
 
     it('should handle fetch error', async () => {
         const mockError = new Error('Failed to fetch program');
-        mockedFetchProgramBySlug.mockRejectedValue(mockError);
+        callback.mockRejectedValue(mockError);
 
-        const { result } = renderHook(() => useProgramBySlug('test-program'));
+        const { result } = renderHook(() => useProgramBySlug(callback, 'test-program'));
 
         await waitFor(() => {
             expect(result.current.isLoading).toBe(false);
@@ -72,9 +66,9 @@ describe('useProgramBySlug', () => {
         const mockProgram1 = createMockProgram();
         const mockProgram2 = { ...createMockProgram(), id: 2, slug: 'another-program', name: 'Another Program' };
 
-        mockedFetchProgramBySlug.mockResolvedValueOnce(mockProgram1).mockResolvedValueOnce(mockProgram2);
+        callback.mockResolvedValueOnce(mockProgram1).mockResolvedValueOnce(mockProgram2);
 
-        const { result, rerender } = renderHook(({ slug }) => useProgramBySlug(slug), {
+        const { result, rerender } = renderHook(({ slug }) => useProgramBySlug(callback, slug), {
             initialProps: { slug: 'test-program' },
         });
 
@@ -90,20 +84,20 @@ describe('useProgramBySlug', () => {
             expect(result.current.program).toEqual(mockProgram2);
         });
 
-        expect(mockedFetchProgramBySlug).toHaveBeenCalledTimes(2);
+        expect(callback).toHaveBeenCalledTimes(2);
     });
 
     it('should not update state if component unmounts during fetch', async () => {
         const mockProgram = createMockProgram();
         let resolvePromise: (value: DetailedProgramDto) => void;
 
-        mockedFetchProgramBySlug.mockReturnValue(
+        callback.mockReturnValue(
             new Promise<DetailedProgramDto>((resolve) => {
                 resolvePromise = resolve;
             }),
         );
 
-        const { result, unmount } = renderHook(() => useProgramBySlug('test-program'));
+        const { result, unmount } = renderHook(() => useProgramBySlug(callback, 'test-program'));
 
         expect(result.current.isLoading).toBe(true);
 

@@ -8,20 +8,27 @@ import {
 } from '@/types/common/language';
 import styles from './LocalizationStatuses.module.scss';
 
-export interface LocalizationStatusProps<TLocalization extends EntityLocalization> {
+export interface LocalizationStatusProps<TLocalization extends EntityLocalization = EntityLocalization> {
     languages: LocalizationLanguage[];
-    localizedEntity: EntityWithLocalizations<TLocalization> | EntityWithTranslationStatuses;
+    localizedEntity: Partial<EntityWithLocalizations<TLocalization>> | Partial<EntityWithTranslationStatuses>;
 }
 
 const getTranslationStatus = <TLocalization extends EntityLocalization>(
     language: LocalizationLanguage,
-    localizedEntity: EntityWithLocalizations<TLocalization> | EntityWithTranslationStatuses,
+    localizedEntity: Partial<EntityWithLocalizations<TLocalization>> | Partial<EntityWithTranslationStatuses>,
 ): TranslationStatus | undefined => {
-    if ('translationStatuses' in localizedEntity) {
-        return localizedEntity.translationStatuses?.find((loc) => loc.languageId === language.id)?.translationStatus;
+    if ('translationStatuses' in localizedEntity && localizedEntity.translationStatuses?.length) {
+        const found = localizedEntity.translationStatuses.find((loc) => loc.languageId === language.id);
+        if (found) {
+            return found.translationStatus;
+        }
     }
 
-    return localizedEntity.localizations?.find((loc) => loc.language?.code === language.code)?.translationStatus;
+    if ('localizations' in localizedEntity && localizedEntity.localizations?.length) {
+        return localizedEntity.localizations.find((loc) => loc.language?.code === language.code)?.translationStatus;
+    }
+
+    return undefined;
 };
 
 export const LocalizationStatuses = <TLocalization extends EntityLocalization>({

@@ -10,12 +10,15 @@ import {
     EntityLocalizationDto,
     EntityWithDtoLocalizations,
     EntityWithLocalizations,
+    TranslationStatusInfo,
 } from '../common/language';
 
 export interface ProgramCategory {
     id: number;
     name: string;
     programsCount: number;
+    localizations?: EntityLocalization[];
+    translationStatuses?: TranslationStatusInfo[];
 }
 
 export interface HippotherapyProgramDto

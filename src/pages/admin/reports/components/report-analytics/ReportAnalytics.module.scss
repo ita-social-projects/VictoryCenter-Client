@@ -5,3 +5,23 @@
     font-size: 36px;
     color: c.$blue-500;
 }
+
+.section-footer {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px 0;
+}
+
+.footer-button {
+    display: flex;
+    align-items: center;
+    @include type.subtitle-1-medium;
+    gap: 20px;
+    width: 311px;
+    height: 60px;
+    font-size: 24px;
+    padding: 8px 14px;
+    justify-content: center;
+}

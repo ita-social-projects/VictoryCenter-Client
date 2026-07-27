@@ -75,6 +75,7 @@ export const mapReportFundsExpendituresSettingsDtoToSettings = (
     disclaimerTitle: dto.disclaimerTitle,
     exchangeRate: formatNumberDecimalComma(dto.exchangeRate),
     programExpendituresReportingYear: dto.programExpendituresReportingYear,
+    hasUnpublishedChanges: dto.hasUnpublishedChanges,
 });
 
 export const mapReportFundsExpendituresSettingsToUpdateDto = (

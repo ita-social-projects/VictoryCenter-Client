@@ -28,6 +28,7 @@ const settingsMock: ReportFundsExpendituresSettings = {
     disclaimerTitle: 'Original disclaimer',
     exchangeRate: null,
     programExpendituresReportingYear: 2025,
+    hasUnpublishedChanges: false,
 };
 
 const languageMock: LocalizationLanguage = {

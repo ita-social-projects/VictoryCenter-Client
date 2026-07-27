@@ -67,7 +67,7 @@ const enrichRecords = (
 };
 
 interface FundsExpenditureSectionProps {
-    initialIsEditing?: boolean;
+    isEditing?: boolean;
     draftExchangeRate?: string | null;
     onEditModeChange?: (isEditing: boolean) => void;
     onExchangeRateValueChange?: (exchangeRate: string | null) => void;
@@ -81,10 +81,16 @@ interface FundsExpenditureSectionProps {
     translationLanguages?: LocalizationLanguage[];
     isRowEditMode?: boolean;
     onRowEditModeChange?: (isEditing: boolean) => void;
+    onValidationChange?: (isValid: boolean) => void;
+    onCountsChange?: (counts: { income: number; expense: number }) => void;
+    onDataChange?: () => void;
+    registerSaveCallback?: (saveFn: () => Promise<boolean>) => void;
+    onUnpublishedChangesChange?: (hasChanges: boolean) => void;
+    registerRefetchSettingsCallback?: (refetchFn: () => void) => void;
 }
 
 export const FundsExpenditureSection = ({
-    initialIsEditing = false,
+    isEditing: propIsEditing,
     draftExchangeRate,
     onEditModeChange,
     onExchangeRateValueChange,
@@ -98,11 +104,19 @@ export const FundsExpenditureSection = ({
     translationLanguages = [],
     isRowEditMode: propIsRowEditMode,
     onRowEditModeChange,
+    onValidationChange,
+    onCountsChange,
+    onDataChange,
+    registerSaveCallback,
+    onUnpublishedChangesChange,
+    registerRefetchSettingsCallback,
 }: FundsExpenditureSectionProps = {}) => {
     const adminClient = useAdminClient();
     const { addToast } = useToast();
 
-    const [isEditing, setIsEditing] = useState(initialIsEditing);
+    const [localIsEditing, setLocalIsEditing] = useState(false);
+    const isEditing = propIsEditing !== undefined ? propIsEditing : localIsEditing;
+
     const [disclaimerValue, setDisclaimerValue] = useState('');
     const [disclaimerError, setDisclaimerError] = useState<string | undefined>(undefined);
     const [exchangeRateValue, setExchangeRateValue] = useState('');
@@ -138,17 +152,14 @@ export const FundsExpenditureSection = ({
     const [isBulkDeleting, setIsBulkDeleting] = useState(false);
     const hasSeededEditingValuesRef = useRef(false);
 
-    const handleCancel = useCallback(() => {
-        setIsEditing(false);
-        onEditModeChange?.(false);
-        setDisclaimerError(undefined);
-        setExchangeRateError(undefined);
-    }, [onEditModeChange]);
-
-    const handleDisclaimerChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const normalized = e.target.value.replaceAll(/ {2,}/g, ' ');
-        setDisclaimerValue(normalized);
-    }, []);
+    const handleDisclaimerChange = useCallback(
+        (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+            const normalized = e.target.value.replaceAll(/ {2,}/g, ' ');
+            setDisclaimerValue(normalized);
+            onDataChange?.();
+        },
+        [onDataChange],
+    );
 
     const handleDisclaimerBlur = useCallback(() => {
         const trimmed = disclaimerValue.replaceAll(/\s+/g, ' ').trim();
@@ -162,8 +173,9 @@ export const FundsExpenditureSection = ({
             setExchangeRateValue(normalized);
             onExchangeRateValueChange?.(normalized);
             setExchangeRateError(validateFundsExpendituresExchangeRate(normalized, 'change'));
+            onDataChange?.();
         },
-        [onExchangeRateValueChange],
+        [onExchangeRateValueChange, onDataChange],
     );
 
     const handleExchangeRateBlur = useCallback(() => {
@@ -221,7 +233,7 @@ export const FundsExpenditureSection = ({
     });
 
     const handleEdit = useCallback(() => {
-        setIsEditing(true);
+        setLocalIsEditing(true);
         onEditModeChange?.(true);
         onExchangeRateValueChange?.(settings?.exchangeRate ?? null);
     }, [onEditModeChange, onExchangeRateValueChange, settings?.exchangeRate]);
@@ -287,6 +299,16 @@ export const FundsExpenditureSection = ({
     }, [fetchDisclaimerLocalizations, settings?.id]);
 
     useEffect(() => {
+        if (settings) {
+            onUnpublishedChangesChange?.(settings.hasUnpublishedChanges);
+        }
+    }, [settings, onUnpublishedChangesChange]);
+
+    useEffect(() => {
+        registerRefetchSettingsCallback?.(() => refetchSettings());
+    }, [registerRefetchSettingsCallback, refetchSettings]);
+
+    useEffect(() => {
         setRecordsState(allRecords);
     }, [allRecords]);
 
@@ -304,6 +326,17 @@ export const FundsExpenditureSection = ({
             !exchangeRateValidationError
         );
     }, [disclaimerValue, disclaimerError, exchangeRateValue]);
+
+    useEffect(() => {
+        onValidationChange?.(isPublishEnabled);
+    }, [isPublishEnabled, onValidationChange]);
+
+    useEffect(() => {
+        onCountsChange?.({
+            income: recordsState.filter((r) => r.type === 'income').length,
+            expense: recordsState.filter((r) => r.type === 'expense').length,
+        });
+    }, [recordsState, onCountsChange]);
 
     const hasExchangeRateError = Boolean(exchangeRateError);
 
@@ -419,6 +452,7 @@ export const FundsExpenditureSection = ({
                 });
 
                 setRecordsState((prev) => prev.map((record) => (record.id === recordId ? updatedRecord : record)));
+                onDataChange?.();
                 addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY, ToastType.Success);
 
                 try {
@@ -434,7 +468,7 @@ export const FundsExpenditureSection = ({
                 return false;
             }
         },
-        [addToast, adminClient, recordsState, refetchSummary],
+        [addToast, adminClient, recordsState, refetchSummary, onDataChange],
     );
 
     const handleCreateRecord = useCallback(
@@ -455,6 +489,7 @@ export const FundsExpenditureSection = ({
                 });
 
                 setRecordsState((prev) => [...prev, createdRecord]);
+                onDataChange?.();
                 addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_CREATED_SUCCESSFULLY, ToastType.Success);
                 setActiveRecordModalType(null);
 
@@ -470,7 +505,7 @@ export const FundsExpenditureSection = ({
                 return false;
             }
         },
-        [addToast, adminClient, refetchSummary],
+        [addToast, adminClient, refetchSummary, onDataChange],
     );
 
     const handleCreateCategory = useCallback(
@@ -482,6 +517,7 @@ export const FundsExpenditureSection = ({
 
             try {
                 await FundsExpendituresApi.createCategory(adminClient, data);
+                onDataChange?.();
                 addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_CREATED_SUCCESSFULLY, ToastType.Success);
 
                 try {
@@ -497,7 +533,7 @@ export const FundsExpenditureSection = ({
                 return false;
             }
         },
-        [addToast, adminClient, refetchCategories, refetchSummary],
+        [addToast, adminClient, refetchCategories, refetchSummary, onDataChange],
     );
 
     const handleEditCategory = useCallback(
@@ -515,6 +551,7 @@ export const FundsExpenditureSection = ({
 
             try {
                 await FundsExpendituresApi.updateCategory(adminClient, categoryId, { name, type: category.type });
+                onDataChange?.();
                 addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_UPDATED_SUCCESSFULLY, ToastType.Success);
 
                 try {
@@ -530,7 +567,7 @@ export const FundsExpenditureSection = ({
                 return false;
             }
         },
-        [addToast, adminClient, categories, refetchCategories, refetchSummary],
+        [addToast, adminClient, categories, refetchCategories, refetchSummary, onDataChange],
     );
 
     const handleDeleteCategory = useCallback(
@@ -543,6 +580,7 @@ export const FundsExpenditureSection = ({
 
             try {
                 await FundsExpendituresApi.deleteCategory(adminClient, categoryId);
+                onDataChange?.();
                 addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.CATEGORY_DELETED_SUCCESSFULLY, ToastType.Success);
 
                 try {
@@ -558,7 +596,7 @@ export const FundsExpenditureSection = ({
                 return false;
             }
         },
-        [addToast, adminClient, categories, refetchCategories, refetchSummary],
+        [addToast, adminClient, categories, refetchCategories, refetchSummary, onDataChange],
     );
 
     const handleDeleteClick = (record: ReportFundsExpendituresRecord) => {
@@ -598,6 +636,7 @@ export const FundsExpenditureSection = ({
         try {
             await FundsExpendituresApi.bulkDeleteRecords(adminClient, selectedRecordIds);
             setRecordsState((prev) => prev.filter((r) => !selectedRecordIds.includes(r.id)));
+            onDataChange?.();
             setSelectedRecordIds([]);
             setIsBulkDeleteModalOpen(false);
             await refetchSummary();
@@ -608,7 +647,7 @@ export const FundsExpenditureSection = ({
         } finally {
             setIsBulkDeleting(false);
         }
-    }, [adminClient, selectedRecordIds, refetchSummary, addToast]);
+    }, [adminClient, selectedRecordIds, refetchSummary, addToast, onDataChange]);
 
     const handleConfirmDelete = useCallback(async () => {
         if (!recordToDelete) return;
@@ -617,6 +656,7 @@ export const FundsExpenditureSection = ({
         try {
             await FundsExpendituresApi.deleteRecord(adminClient, recordToDelete.id);
             setRecordsState((prev) => prev.filter((r) => r.id !== recordToDelete.id));
+            onDataChange?.();
             await refetchSummary();
             addToast(FUNDS_EXPENDITURES_TEXT.MESSAGE.RECORD_DELETED_SUCCESSFULLY, ToastType.Success);
             setIsDeleteModalOpen(false);
@@ -625,7 +665,7 @@ export const FundsExpenditureSection = ({
         } finally {
             setIsDeletingRecord(false);
         }
-    }, [recordToDelete, adminClient, addToast, refetchSummary]);
+    }, [recordToDelete, adminClient, addToast, refetchSummary, onDataChange]);
 
     const handleTranslateDisclaimerSuccess = useCallback(
         (localization: ReportFundsExpendituresSettingsLocalization) => {
@@ -635,13 +675,14 @@ export const FundsExpenditureSection = ({
                     ? prev.map((l) => (l.language.id === localization.language.id ? localization : l))
                     : [...prev, localization];
             });
+            onDataChange?.();
             setIsTranslateDisclaimerModalOpen(false);
             addToast(COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS, ToastType.Success);
         },
-        [addToast],
+        [addToast, onDataChange],
     );
 
-    const handlePublish = useCallback(async () => {
+    const saveSettings = useCallback(async (): Promise<boolean> => {
         try {
             const updatedSettings = await FundsExpendituresApi.updateSettings(adminClient, {
                 disclaimerTitle: disclaimerValue,
@@ -652,20 +693,17 @@ export const FundsExpenditureSection = ({
             setDisclaimerValue(updatedSettings.disclaimerTitle ?? '');
             setExchangeRateValue(updatedSettings.exchangeRate ?? '');
             onExchangeRateValueChange?.(updatedSettings.exchangeRate ?? null);
-            setIsEditing(false);
-            onEditModeChange?.(false);
 
             fetchDisclaimerLocalizations(updatedSettings.id);
 
-            addToast(COMMON_TEXT_ADMIN.MESSAGE.SUCCESSFULLY_PUBLISHED, ToastType.Success);
-
             try {
                 await refetchSettings(true);
-            } catch {
-                // Refetch error handled by useDataFetch
-            }
+            } catch {}
+
+            return true;
         } catch {
             addToast(REPORTS_TEXT.MESSAGE.FAIL_TO_UPDATE_REPORT, ToastType.Error);
+            return false;
         }
     }, [
         addToast,
@@ -673,11 +711,16 @@ export const FundsExpenditureSection = ({
         disclaimerValue,
         exchangeRateValue,
         fetchDisclaimerLocalizations,
-        onEditModeChange,
         onExchangeRateValueChange,
         refetchSettings,
         programYearValue,
     ]);
+
+    useEffect(() => {
+        if (registerSaveCallback) {
+            registerSaveCallback(saveSettings);
+        }
+    }, [registerSaveCallback, saveSettings]);
 
     if (isInitialLoading) {
         return (
@@ -810,22 +853,6 @@ export const FundsExpenditureSection = ({
                 onSelectAllToggle={handleSelectAllToggle}
                 onOpenBulkDelete={handleOpenBulkDeleteModal}
             />
-
-            {isEditing && (
-                <div className={styles['section-footer']}>
-                    <Button buttonStyle="secondary" className={styles['footer-button']} onClick={handleCancel}>
-                        {COMMON_TEXT_ADMIN.BUTTON.CANCEL}
-                    </Button>
-                    <Button
-                        buttonStyle="primary"
-                        className={styles['footer-button']}
-                        onClick={handlePublish}
-                        disabled={!isPublishEnabled || isRowEditMode}
-                    >
-                        {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
-                    </Button>
-                </div>
-            )}
 
             <AddFundsExpendituresRecordModal
                 isOpen={activeRecordModalType !== null}

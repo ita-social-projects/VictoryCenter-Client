@@ -8,7 +8,7 @@ export const REPORTS_TEXT = {
             COLLECTED_FUNDS_WINDOW: 'Вікно 1: Зібрано коштів',
             CHANGED_LIVES_WINDOW: 'Вікно 2: Змінено життів',
             COLLECTED_FUNDS: 'Зібрані кошти',
-            CHANGED_LIVES: 'Кількість змінених життів',
+            CHANGED_LIVES: 'Змінених життів',
             WINDOW_DESCRIPTION: 'Фото «Репрезентативне фото»',
         },
         MAX_LENGTH: {

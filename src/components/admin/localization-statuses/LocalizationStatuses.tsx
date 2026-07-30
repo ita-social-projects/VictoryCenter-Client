@@ -17,15 +17,26 @@ const getTranslationStatus = <TLocalization extends EntityLocalization>(
     language: LocalizationLanguage,
     localizedEntity: Partial<EntityWithLocalizations<TLocalization>> | Partial<EntityWithTranslationStatuses>,
 ): TranslationStatus | undefined => {
-    if ('translationStatuses' in localizedEntity && localizedEntity.translationStatuses?.length) {
-        const found = localizedEntity.translationStatuses.find((loc) => loc.languageId === language.id);
-        if (found) {
-            return found.translationStatus;
-        }
+    if (
+        'translationStatuses' in localizedEntity &&
+        localizedEntity.translationStatuses &&
+        localizedEntity.translationStatuses.length > 0
+    ) {
+        return localizedEntity.translationStatuses.find((loc) => loc.languageId === language.id)?.translationStatus;
     }
 
-    if ('localizations' in localizedEntity && localizedEntity.localizations?.length) {
-        return localizedEntity.localizations.find((loc) => loc.language?.code === language.code)?.translationStatus;
+    if (
+        'localizations' in localizedEntity &&
+        localizedEntity.localizations &&
+        localizedEntity.localizations.length > 0
+    ) {
+        return localizedEntity.localizations.find(
+            (loc: any) =>
+                loc.language?.code === language.code ||
+                loc.localizationInfoDto?.code === language.code ||
+                loc.language?.id === language.id ||
+                loc.localizationInfoDto?.id === language.id,
+        )?.translationStatus;
     }
 
     return undefined;

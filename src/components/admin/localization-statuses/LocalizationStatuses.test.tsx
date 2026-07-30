@@ -88,4 +88,52 @@ describe('LocalizationStatuses component', () => {
 
         assertStatusBadges();
     });
+
+    it('falls back to localizations when translationStatuses is empty', () => {
+        const entityWithEmptyStatuses = {
+            translationStatuses: [],
+            localizations: translationStatusesByLanguage.map(({ languageId, languageCode, translationStatus }) => ({
+                language: { id: languageId, code: languageCode },
+                translationStatus,
+            })),
+        };
+
+        render(<LocalizationStatuses languages={languages} localizedEntity={entityWithEmptyStatuses} />);
+
+        assertStatusBadges();
+    });
+
+    it('renders default red badge for all languages when entity has neither translationStatuses nor localizations', () => {
+        render(<LocalizationStatuses languages={languages} localizedEntity={{}} />);
+
+        const enBadge = screen.getByText('EN');
+        const esBadge = screen.getByText('ES');
+        const plBadge = screen.getByText('PL');
+
+        expect(enBadge).not.toHaveClass(styles.relevant);
+        expect(enBadge).not.toHaveClass(styles.outdated);
+        expect(esBadge).not.toHaveClass(styles.relevant);
+        expect(esBadge).not.toHaveClass(styles.outdated);
+        expect(plBadge).not.toHaveClass(styles.relevant);
+        expect(plBadge).not.toHaveClass(styles.outdated);
+    });
+
+    it('handles localizations with localizationInfoDto property correctly', () => {
+        const entityWithDtoLocalizations = {
+            localizations: [
+                {
+                    localizationInfoDto: { id: 1, code: 'en' },
+                    translationStatus: TranslationStatus.Relevant,
+                },
+                {
+                    localizationInfoDto: { id: 2, code: 'es' },
+                    translationStatus: TranslationStatus.Outdated,
+                },
+            ],
+        };
+
+        render(<LocalizationStatuses languages={languages} localizedEntity={entityWithDtoLocalizations as any} />);
+
+        assertStatusBadges();
+    });
 });

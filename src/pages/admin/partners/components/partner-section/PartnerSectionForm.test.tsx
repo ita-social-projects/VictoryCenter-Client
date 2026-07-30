@@ -144,6 +144,9 @@ describe('PartnerSectionForm', () => {
                 onChange={jest.fn()}
                 onDelete={jest.fn()}
                 onPublish={jest.fn()}
+                onTranslate={jest.fn()}
+                localizations={[]}
+                translationLanguages={[]}
             />,
         );
 
@@ -170,6 +173,9 @@ describe('PartnerSectionForm', () => {
                 onChange={onChange}
                 onDelete={jest.fn()}
                 onPublish={jest.fn()}
+                onTranslate={jest.fn()}
+                localizations={[]}
+                translationLanguages={[]}
             />,
         );
 
@@ -197,6 +203,9 @@ describe('PartnerSectionForm', () => {
                 onChange={onChange}
                 onDelete={jest.fn()}
                 onPublish={jest.fn()}
+                onTranslate={jest.fn()}
+                localizations={[]}
+                translationLanguages={[]}
             />,
         );
 
@@ -223,6 +232,9 @@ describe('PartnerSectionForm', () => {
                 onChange={onChange}
                 onDelete={jest.fn()}
                 onPublish={jest.fn()}
+                onTranslate={jest.fn()}
+                localizations={[]}
+                translationLanguages={[]}
             />,
         );
 
@@ -259,6 +271,9 @@ describe('PartnerSectionForm', () => {
                 onChange={onChange}
                 onDelete={jest.fn()}
                 onPublish={jest.fn()}
+                onTranslate={jest.fn()}
+                localizations={[]}
+                translationLanguages={[]}
             />,
         );
 
@@ -293,6 +308,9 @@ describe('PartnerSectionForm', () => {
                 onChange={onChange}
                 onDelete={jest.fn()}
                 onPublish={jest.fn()}
+                onTranslate={jest.fn()}
+                localizations={[]}
+                translationLanguages={[]}
             />,
         );
 
@@ -320,6 +338,9 @@ describe('PartnerSectionForm', () => {
                 onChange={jest.fn()}
                 onDelete={jest.fn()}
                 onPublish={jest.fn()}
+                onTranslate={jest.fn()}
+                localizations={[]}
+                translationLanguages={[]}
             />,
         );
 
@@ -336,6 +357,9 @@ describe('PartnerSectionForm', () => {
                 onChange={jest.fn()}
                 onDelete={jest.fn()}
                 onPublish={jest.fn()}
+                onTranslate={jest.fn()}
+                localizations={[]}
+                translationLanguages={[]}
             />,
         );
 
@@ -354,6 +378,9 @@ describe('PartnerSectionForm', () => {
                 onChange={jest.fn()}
                 onDelete={jest.fn()}
                 onPublish={jest.fn()}
+                onTranslate={jest.fn()}
+                localizations={[]}
+                translationLanguages={[]}
             />,
         );
 
@@ -376,6 +403,9 @@ describe('PartnerSectionForm', () => {
                 onChange={jest.fn()}
                 onDelete={jest.fn()}
                 onPublish={jest.fn()}
+                onTranslate={jest.fn()}
+                localizations={[]}
+                translationLanguages={[]}
             />,
         );
 
@@ -394,6 +424,9 @@ describe('PartnerSectionForm', () => {
                 onChange={jest.fn()}
                 onDelete={jest.fn()}
                 onPublish={jest.fn()}
+                onTranslate={jest.fn()}
+                localizations={[]}
+                translationLanguages={[]}
             />,
         );
 
@@ -410,6 +443,9 @@ describe('PartnerSectionForm', () => {
                 onChange={jest.fn()}
                 onDelete={jest.fn()}
                 onPublish={jest.fn()}
+                onTranslate={jest.fn()}
+                localizations={[]}
+                translationLanguages={[]}
             />,
         );
 
@@ -431,6 +467,9 @@ describe('PartnerSectionForm', () => {
                 onChange={jest.fn()}
                 onDelete={onDelete}
                 onPublish={onPublish}
+                onTranslate={jest.fn()}
+                localizations={[]}
+                translationLanguages={[]}
             />,
         );
 
@@ -454,6 +493,9 @@ describe('PartnerSectionForm', () => {
                 onChange={onChange}
                 onDelete={jest.fn()}
                 onPublish={jest.fn()}
+                onTranslate={jest.fn()}
+                localizations={[]}
+                translationLanguages={[]}
             />,
         );
 
@@ -472,6 +514,9 @@ describe('PartnerSectionForm', () => {
                 onChange={jest.fn()}
                 onDelete={jest.fn()}
                 onPublish={jest.fn()}
+                onTranslate={jest.fn()}
+                localizations={[]}
+                translationLanguages={[]}
             />,
         );
         expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
@@ -487,6 +532,9 @@ describe('PartnerSectionForm', () => {
                 onChange={jest.fn()}
                 onDelete={jest.fn()}
                 onPublish={jest.fn()}
+                onTranslate={jest.fn()}
+                localizations={[]}
+                translationLanguages={[]}
             />,
         );
         expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
@@ -500,6 +548,9 @@ describe('PartnerSectionForm', () => {
                 onChange={jest.fn()}
                 onDelete={jest.fn()}
                 onPublish={jest.fn()}
+                onTranslate={jest.fn()}
+                localizations={[]}
+                translationLanguages={[]}
             />,
         );
         expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeEnabled();

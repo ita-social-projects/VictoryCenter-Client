@@ -9,6 +9,10 @@ import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups
 import { PartnerForm, PartnerFormErrors, PartnerFormValues } from '../partner-form/PartnerForm';
 import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import { Button } from '@/components/admin/button/Button';
+import { IconButton } from '@/components/admin/icon-button/IconButton';
+import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
+import { ACTION_ICONS } from '@/const/common/action-icons';
+import { EntityLocalization, LocalizationLanguage } from '@/types/common/language';
 import styles from './PartnerSectionForm.module.scss';
 import './PartnerSectionForm.scss';
 
@@ -34,7 +38,10 @@ export interface PartnerSectionProps {
     onChange: (value: PartnerSectionFormValues, errors: PartnerSectionErrors) => void;
     onDelete: (localId: string) => void;
     onPublish: (localId: string, sectionData: PartnerSectionFormValues) => void;
+    onTranslate: (sectionId: number) => void;
     isDirty: boolean;
+    localizations: EntityLocalization[];
+    translationLanguages: LocalizationLanguage[];
 }
 
 const PartnerSectionComponent = ({
@@ -42,9 +49,12 @@ const PartnerSectionComponent = ({
     onChange,
     onDelete,
     onPublish,
+    onTranslate,
     disabled = false,
     errors,
     isDirty,
+    localizations,
+    translationLanguages,
 }: PartnerSectionProps) => {
     const handleTitleChange = useCallback(
         (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -132,6 +142,11 @@ const PartnerSectionComponent = ({
         onPublish(value.localId, value);
     }, [onPublish, value]);
 
+    const handleTranslate = useCallback(() => {
+        if (value.sectionId === null) return;
+        onTranslate(value.sectionId);
+    }, [onTranslate, value.sectionId]);
+
     const isFormValid = (): boolean => {
         if (PARTNER_SECTION_VALIDATION_FUNCTIONS.validateTitle(value.title)) {
             return false;
@@ -155,6 +170,17 @@ const PartnerSectionComponent = ({
 
     return (
         <div className={styles.root}>
+            <div className={styles['status-bar']}>
+                <LocalizationStatuses languages={translationLanguages} localizedEntity={{ localizations }} />
+                <IconButton
+                    aria-label={COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION}
+                    type="button"
+                    onClick={handleTranslate}
+                    DefaultIcon={ACTION_ICONS.translate.default}
+                    disabled={disabled || isDirty || value.sectionId === null}
+                />
+            </div>
+
             <div className={styles.inputs}>
                 <div className={styles['title-group']}>
                     <TextAreaWithCharacterLimitGroup

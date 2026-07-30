@@ -186,6 +186,7 @@ describe('partner-mapper', () => {
                         image: mockImage2,
                     },
                 ],
+                localizations: [],
             };
 
             const result = mapSectionDtoToSection(dto);
@@ -208,6 +209,7 @@ describe('partner-mapper', () => {
                         imageId: 2,
                     },
                 ],
+                localizations: [],
             });
         });
 
@@ -217,6 +219,7 @@ describe('partner-mapper', () => {
                 title: 'Empty Section',
                 description: 'Section with no partners',
                 partners: [],
+                localizations: [],
             };
 
             const result = mapSectionDtoToSection(dto);
@@ -226,7 +229,32 @@ describe('partner-mapper', () => {
                 title: 'Empty Section',
                 description: 'Section with no partners',
                 partners: [],
+                localizations: [],
             });
+        });
+
+        it('maps localizations from EntityLocalizationDto to EntityLocalization', () => {
+            const dto: PartnersSectionDto = {
+                id: 3,
+                title: 'Section Title',
+                description: 'Section description',
+                partners: [],
+                localizations: [
+                    {
+                        localizationInfoDto: { id: 2, code: 'en' },
+                        translationStatus: TranslationStatus.Relevant,
+                    },
+                ],
+            };
+
+            const result = mapSectionDtoToSection(dto);
+
+            expect(result.localizations).toEqual([
+                {
+                    language: { id: 2, code: 'en' },
+                    translationStatus: TranslationStatus.Relevant,
+                },
+            ]);
         });
     });
 
@@ -252,6 +280,7 @@ describe('partner-mapper', () => {
                                 image: mockImage,
                             },
                         ],
+                        localizations: [],
                     },
                     {
                         id: 2,
@@ -264,6 +293,7 @@ describe('partner-mapper', () => {
                                 image: mockImage2,
                             },
                         ],
+                        localizations: [],
                     },
                 ],
             };
@@ -292,6 +322,7 @@ describe('partner-mapper', () => {
                                 imageId: 1,
                             },
                         ],
+                        localizations: [],
                     },
                     {
                         id: 2,
@@ -305,6 +336,7 @@ describe('partner-mapper', () => {
                                 imageId: 2,
                             },
                         ],
+                        localizations: [],
                     },
                 ],
             });

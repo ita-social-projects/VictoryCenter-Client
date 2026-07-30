@@ -24,10 +24,23 @@ export interface PartnerSection {
     title: string;
     description: string;
     partners: Partner[];
+    localizations?: PartnerSectionLocalizationDto[];
 }
 
 export interface Partner {
     id: number;
     description: string;
     image: Image;
+    localizations?: PartnerLocalizationDto[];
+}
+
+export interface PartnerLocalizationDto extends EntityLocalizationDto {
+    entityId: number;
+    description: string;
+}
+
+export interface PartnerSectionLocalizationDto extends EntityLocalizationDto {
+    entityId: number;
+    title: string;
+    description: string;
 }

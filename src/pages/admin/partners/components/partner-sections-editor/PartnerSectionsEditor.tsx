@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useImperativeHandle, useState, useEffect, useRef } from 'react';
+import React, { forwardRef, useCallback, useImperativeHandle, useState, useEffect, useMemo, useRef } from 'react';
 import {
     PartnerSectionForm,
     PartnerSectionErrors,
@@ -21,6 +21,8 @@ import {
     PartnersSectionCreateRequest,
     PartnersSectionUpdateRequest,
 } from '@/types/admin/partners';
+import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
+import { TranslatePartnerSectionModal } from '../translate-partner-section-modal/TranslatePartnerSectionModal';
 import styles from './PartnerSectionsEditor.module.scss';
 
 const isPartnerEmpty = (partner: PartnerFormValues): boolean => {
@@ -94,7 +96,17 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
     const [sectionToPublishId, setSectionToPublishId] = useState<string | null>(null);
     const [sectionToPublishData, setSectionToPublishData] = useState<PartnerSectionFormValues | null>(null);
     const [localSections, setLocalSections] = useState<PartnerSectionFormValues[]>([]);
+    const [translatingSectionId, setTranslatingSectionId] = useState<number | null>(null);
     const scrollAnchorRef = useRef<HTMLDivElement>(null);
+
+    const handleLocalizationError = useCallback(
+        (message: string) => {
+            addToast(message, ToastType.Error);
+        },
+        [addToast],
+    );
+
+    const { translationLanguages } = useLocalizationToolkit({ setErrorState: handleLocalizationError });
 
     const fetchSectionsHandler = useCallback(
         async (options: RequestOptions): Promise<PartnerSection[]> => {
@@ -267,6 +279,23 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
         }
     }, [sectionToPublishData, addToast, client, setLocalSections, sectionToPublishId, setFetchedSections]);
 
+    const handleOpenTranslate = useCallback((sectionId: number) => {
+        setTranslatingSectionId(sectionId);
+    }, []);
+
+    const handleCloseTranslate = useCallback(() => {
+        setTranslatingSectionId(null);
+    }, []);
+
+    const handleTranslated = useCallback(() => {
+        refetchSections();
+    }, [refetchSections]);
+
+    const sectionToTranslate = useMemo(
+        () => fetchedSections.find((s) => s.id === translatingSectionId) ?? null,
+        [fetchedSections, translatingSectionId],
+    );
+
     const handleDeleteRequest = useCallback((localId: string) => {
         setSectionToDeleteId(localId);
         setDeletePhase(DeletePhase.CONFIRM_SECTION);
@@ -393,6 +422,9 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
                     onChange={handleChange}
                     onDelete={handleDeleteRequest}
                     onPublish={handlePublishRequest}
+                    onTranslate={handleOpenTranslate}
+                    localizations={fetchedSections.find((s) => s.id === section.sectionId)?.localizations ?? []}
+                    translationLanguages={translationLanguages}
                 />
             ))}
             <div ref={scrollAnchorRef} />
@@ -418,6 +450,14 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
                 title={PARTNERS_TEXT.FORM.TITLE.PUBLISH_SECTION}
                 onConfirm={handleConfirmPublish}
                 onCancel={handleClosePublishModal}
+            />
+
+            <TranslatePartnerSectionModal
+                isOpen={translatingSectionId !== null}
+                onClose={handleCloseTranslate}
+                section={sectionToTranslate}
+                translatedLanguages={translationLanguages}
+                onTranslated={handleTranslated}
             />
         </div>
     );

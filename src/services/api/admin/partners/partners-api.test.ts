@@ -170,6 +170,7 @@ describe('PartnersApi (admin)', () => {
                                 imageId: dto.sections[0].partners[0].image?.id ?? null,
                             },
                         ],
+                        localizations: [],
                     },
                 ],
             };
@@ -204,6 +205,7 @@ describe('PartnersApi (admin)', () => {
                     title: 'First',
                     description: 'Desc',
                     partners: [{ id: 2, description: 'Partner', image: sectionsDto[0].partners[0].image, imageId: 3 }],
+                    localizations: [],
                 },
             ];
             expect(result).toEqual(expected);
@@ -269,6 +271,7 @@ describe('PartnersApi (admin)', () => {
                         imageId: responseDto.partners[0].image?.id ?? null,
                     },
                 ],
+                localizations: [],
             };
             expect(result).toEqual(expected);
         });
@@ -336,6 +339,7 @@ describe('PartnersApi (admin)', () => {
                     image: partner.image,
                     imageId: partner.image?.id ?? null,
                 })),
+                localizations: [],
             };
             expect(updated).toEqual(expected);
         });

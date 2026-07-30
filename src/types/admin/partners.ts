@@ -26,7 +26,7 @@ export type PartnerSection = {
     title: string;
     description: string;
     partners: Partner[];
-};
+} & EntityWithLocalizations<EntityLocalization>;
 
 export type PartnersPageData = {
     banner: PartnerBanner;
@@ -131,11 +131,42 @@ export interface PartnerDto {
     image: Image;
 }
 
-export interface PartnersSectionDto {
+export interface PartnersSectionDto extends EntityWithDtoLocalizations<EntityLocalizationDto> {
     id: number;
     title: string;
     description: string;
     partners: PartnerDto[];
+}
+
+export interface PartnerLocalizationDto {
+    partnerId: number;
+    description: string;
+}
+
+export interface PartnerLocalization {
+    entityId: number;
+    description: string;
+}
+
+export interface PartnerSectionLocalizationDto extends EntityLocalizationDto {
+    entityId: number;
+    title: string;
+    description: string;
+    partners: PartnerLocalizationDto[];
+}
+
+export interface CreatePartnerSectionLocalizationDto {
+    entityId: number;
+    languageId: number;
+    title: string;
+    description: string;
+    partners: PartnerLocalizationDto[];
+}
+
+export interface UpdatePartnerSectionLocalizationDto {
+    title: string;
+    description: string;
+    partners: PartnerLocalizationDto[];
 }
 
 export interface PartnersPageDataDto {

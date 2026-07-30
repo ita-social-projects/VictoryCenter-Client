@@ -22,6 +22,7 @@ export const mapSectionDtoToSection = (dto: PartnersSectionDto): PartnerSection 
     title: dto.title,
     description: dto.description,
     partners: dto.partners.map(mapPartnerDtoToPartner),
+    localizations: (dto.localizations ?? []).map(mapLocalizationDtoToModel),
 });
 
 export const mapBannerDtoToBanner = (dto: PartnerBannerDto): PartnerBanner => ({

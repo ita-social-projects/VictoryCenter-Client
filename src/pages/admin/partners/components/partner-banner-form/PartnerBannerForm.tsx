@@ -23,7 +23,9 @@ import { ConfirmationModal } from '@/components/admin/confirmation-modal/Confirm
 import { IconButton } from '@/components/admin/icon-button/IconButton';
 import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
 import { ACTION_ICONS } from '@/const/common/action-icons';
-import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
+import { LocalizationLanguage } from '@/types/common/language';
+import { DEFAULT_LOCALE } from '@/const/common/locales';
+import { returnDisplayedLocalization } from '@/utils/functions/localization/localization';
 import { TranslatePartnerBannerModal } from '../translate-partner-banner-modal/TranslatePartnerBannerModal';
 
 export interface PartnerBannerValues {
@@ -70,7 +72,12 @@ const isImageEqual = (img1: ImageValues | Image | null, img2: ImageValues | Imag
     return false;
 };
 
-export const PartnerBanner = () => {
+export interface PartnerBannerProps {
+    language: LocalizationLanguage;
+    translationLanguages: LocalizationLanguage[];
+}
+
+export const PartnerBanner = ({ language, translationLanguages }: PartnerBannerProps) => {
     const client = useAdminClient();
     const { addToast } = useToast();
     const [formState, setFormState] = useState<FormState>({
@@ -84,14 +91,7 @@ export const PartnerBanner = () => {
     const [titleKey, setTitleKey] = useState(0);
     const [isTranslateModalOpen, setIsTranslateModalOpen] = useState(false);
 
-    const handleLocalizationError = useCallback(
-        (message: string) => {
-            addToast(message, ToastType.Error);
-        },
-        [addToast],
-    );
-
-    const { translationLanguages } = useLocalizationToolkit({ setErrorState: handleLocalizationError });
+    const isBaseLanguage = language.code === DEFAULT_LOCALE;
 
     const fetchBannerHandler = useCallback(() => {
         return PartnersApi.getBanner(client);
@@ -142,50 +142,72 @@ export const PartnerBanner = () => {
         }
     }, [fetchError, addToast]);
 
-    const handleTitleChange = useCallback((newValue: string) => {
-        setFormState((prev) => ({
-            ...prev,
-            values: prev.values ? { ...prev.values, title: newValue } : null,
-        }));
+    const handleTitleChange = useCallback(
+        (newValue: string) => {
+            if (!isBaseLanguage) return;
 
-        const plainText = getPlainTextFromHtml(newValue);
+            setFormState((prev) => ({
+                ...prev,
+                values: prev.values ? { ...prev.values, title: newValue } : null,
+            }));
 
-        setErrors((prev) => ({
-            ...prev,
-            title: PARTNER_BANNER_VALIDATION_FUNCTIONS.validateTitle(plainText),
-        }));
-    }, []);
+            const plainText = getPlainTextFromHtml(newValue);
+
+            setErrors((prev) => ({
+                ...prev,
+                title: PARTNER_BANNER_VALIDATION_FUNCTIONS.validateTitle(plainText),
+            }));
+        },
+        [isBaseLanguage],
+    );
 
     const handleTitleBlur = useCallback(() => {
         setTouched((prev) => ({ ...prev, title: true }));
     }, []);
 
-    const handleDescriptionChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        const newValue = e.target.value;
-        setFormState((prev) => ({
-            ...prev,
-            values: prev.values ? { ...prev.values, description: newValue } : null,
-        }));
-        setTouched((prev) => ({ ...prev, description: true }));
-        setErrors((prev) => ({
-            ...prev,
-            description: PARTNER_BANNER_VALIDATION_FUNCTIONS.validateDescription(newValue),
-        }));
-    }, []);
+    const handleDescriptionChange = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            if (!isBaseLanguage) return;
 
-    const handleImageChange = useCallback((value: ImageValues | null) => {
-        setFormState((prev) => ({
-            ...prev,
-            values: prev.values ? { ...prev.values, image: value, imageId: value ? prev.values.imageId : null } : null,
-        }));
-    }, []);
+            const newValue = e.target.value;
+            setFormState((prev) => ({
+                ...prev,
+                values: prev.values ? { ...prev.values, description: newValue } : null,
+            }));
+            setTouched((prev) => ({ ...prev, description: true }));
+            setErrors((prev) => ({
+                ...prev,
+                description: PARTNER_BANNER_VALIDATION_FUNCTIONS.validateDescription(newValue),
+            }));
+        },
+        [isBaseLanguage],
+    );
 
-    const handleImageError = useCallback((error: string | null) => {
-        setErrors((prev) => ({
-            ...prev,
-            image: error ? error : undefined,
-        }));
-    }, []);
+    const handleImageChange = useCallback(
+        (value: ImageValues | null) => {
+            if (!isBaseLanguage) return;
+
+            setFormState((prev) => ({
+                ...prev,
+                values: prev.values
+                    ? { ...prev.values, image: value, imageId: value ? prev.values.imageId : null }
+                    : null,
+            }));
+        },
+        [isBaseLanguage],
+    );
+
+    const handleImageError = useCallback(
+        (error: string | null) => {
+            if (!isBaseLanguage) return;
+
+            setErrors((prev) => ({
+                ...prev,
+                image: error ? error : undefined,
+            }));
+        },
+        [isBaseLanguage],
+    );
 
     const handlePublishClick = useCallback(() => {
         setIsPublishModalOpen(true);
@@ -264,6 +286,9 @@ export const PartnerBanner = () => {
     }
 
     const isDisabled = isPublishing;
+    const displayedLocalization = isBaseLanguage ? null : returnDisplayedLocalization(values, language.code);
+    const displayedTitle = isBaseLanguage ? values.title : (displayedLocalization?.title ?? '');
+    const displayedDescription = isBaseLanguage ? values.description : (displayedLocalization?.description ?? '');
 
     return (
         <div className={styles.root}>
@@ -309,7 +334,7 @@ export const PartnerBanner = () => {
                                     onChange={handleImageChange}
                                     id="banner-image"
                                     name="banner-image"
-                                    disabled={isDisabled}
+                                    disabled={isDisabled || !isBaseLanguage}
                                     setError={handleImageError}
                                     style={{
                                         backgroundImage: `
@@ -331,43 +356,46 @@ export const PartnerBanner = () => {
                         <div className={styles.main}>
                             <div className={styles.fields}>
                                 <RichTextInputGroup
-                                    key={`title-${titleKey}`}
+                                    key={`title-${titleKey}-${language.code}`}
                                     label={PARTNERS_TEXT.FORM.LABEL.TITLE}
-                                    value={values.title}
+                                    value={displayedTitle}
                                     error={touched.title ? errors.title : undefined}
                                     onChange={handleTitleChange}
                                     onBlur={handleTitleBlur}
                                     name="title"
                                     id="title"
                                     maxLength={PARTNER_BANNER_VALIDATION.title.max}
-                                    disabled={isDisabled}
+                                    disabled={isDisabled || !isBaseLanguage}
+                                    hideToolbar={!isBaseLanguage}
                                     isRequired={true}
                                     trimOnBlur={true}
                                 />
 
                                 <InputWithCharacterLimitGroup
                                     label={PARTNERS_TEXT.FORM.LABEL.DESCRIPTION}
-                                    value={values.description}
+                                    value={displayedDescription}
                                     error={touched.description ? errors.description : undefined}
                                     onChange={handleDescriptionChange}
                                     id="description"
                                     name="description"
-                                    disabled={isDisabled}
+                                    disabled={isDisabled || !isBaseLanguage}
                                     maxLength={PARTNER_BANNER_VALIDATION.description.max}
                                     isRequired={true}
                                 />
                             </div>
 
-                            <div className={styles.actions}>
-                                <Button
-                                    type="button"
-                                    buttonStyle="primary"
-                                    onClick={handlePublishClick}
-                                    disabled={isDisabled || !isDirty || !isFormValid(values, errors)}
-                                >
-                                    {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
-                                </Button>
-                            </div>
+                            {isBaseLanguage && (
+                                <div className={styles.actions}>
+                                    <Button
+                                        type="button"
+                                        buttonStyle="primary"
+                                        onClick={handlePublishClick}
+                                        disabled={isDisabled || !isDirty || !isFormValid(values, errors)}
+                                    >
+                                        {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
+                                    </Button>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </>

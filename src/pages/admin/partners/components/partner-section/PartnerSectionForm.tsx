@@ -13,6 +13,8 @@ import { IconButton } from '@/components/admin/icon-button/IconButton';
 import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
 import { ACTION_ICONS } from '@/const/common/action-icons';
 import { EntityLocalization, LocalizationLanguage } from '@/types/common/language';
+import { PartnerSectionLocalizationDto } from '@/types/admin/partners';
+import { DEFAULT_LOCALE } from '@/const/common/locales';
 import styles from './PartnerSectionForm.module.scss';
 import './PartnerSectionForm.scss';
 
@@ -42,6 +44,9 @@ export interface PartnerSectionProps {
     isDirty: boolean;
     localizations: EntityLocalization[];
     translationLanguages: LocalizationLanguage[];
+    language: LocalizationLanguage;
+    translatedContent: PartnerSectionLocalizationDto | null;
+    disableStructuralActions?: boolean;
 }
 
 const PartnerSectionComponent = ({
@@ -55,28 +60,39 @@ const PartnerSectionComponent = ({
     isDirty,
     localizations,
     translationLanguages,
+    language,
+    translatedContent,
+    disableStructuralActions = false,
 }: PartnerSectionProps) => {
+    const isBaseLanguage = language.code === DEFAULT_LOCALE;
+    const displayedTitle = isBaseLanguage ? value.title : (translatedContent?.title ?? '');
+    const displayedDescription = isBaseLanguage ? value.description : (translatedContent?.description ?? '');
+
     const handleTitleChange = useCallback(
         (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+            if (!isBaseLanguage) return;
             const newTitle = e.target.value;
             const error = PARTNER_SECTION_VALIDATION_FUNCTIONS.validateTitle(newTitle);
 
             onChange({ ...value, title: newTitle }, { ...errors, title: error });
         },
-        [value, errors, onChange],
+        [value, errors, onChange, isBaseLanguage],
     );
 
     const handleDescriptionChange = useCallback(
         (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+            if (!isBaseLanguage) return;
             const newDescription = e.target.value;
             const error = PARTNER_SECTION_VALIDATION_FUNCTIONS.validateDescription(newDescription);
 
             onChange({ ...value, description: newDescription }, { ...errors, description: error });
         },
-        [value, errors, onChange],
+        [value, errors, onChange, isBaseLanguage],
     );
 
     const handleAddPartner = useCallback(() => {
+        if (disableStructuralActions) return;
+
         const newPartner: PartnerFormValues = {
             localId: crypto.randomUUID(),
             partnerId: null,
@@ -89,7 +105,7 @@ const PartnerSectionComponent = ({
         const newPartnerErrors = [...errors.partners, {}];
 
         onChange({ ...value, partners: newPartners }, { ...errors, partners: newPartnerErrors });
-    }, [value, errors, onChange]);
+    }, [value, errors, onChange, disableStructuralActions]);
 
     const handlePartnerChange = useCallback(
         (partnerValues: PartnerFormValues, partnerErrors: PartnerFormErrors) => {
@@ -113,6 +129,8 @@ const PartnerSectionComponent = ({
 
     const handlePartnerDelete = useCallback(
         (localId: string) => {
+            if (disableStructuralActions) return;
+
             const indexToDelete = value.partners.findIndex((p) => p.localId === localId);
             if (indexToDelete === -1) return;
 
@@ -131,12 +149,13 @@ const PartnerSectionComponent = ({
                 { ...errors, partners: newPartnerErrors },
             );
         },
-        [value, errors, onChange],
+        [value, errors, onChange, disableStructuralActions],
     );
 
     const handleDelete = useCallback(() => {
+        if (disableStructuralActions) return;
         onDelete(value.localId);
-    }, [onDelete, value.localId]);
+    }, [onDelete, value.localId, disableStructuralActions]);
 
     const handlePublish = useCallback(() => {
         onPublish(value.localId, value);
@@ -185,13 +204,13 @@ const PartnerSectionComponent = ({
                 <div className={styles['title-group']}>
                     <TextAreaWithCharacterLimitGroup
                         label={PARTNERS_TEXT.FORM.LABEL.TITLE}
-                        value={value.title}
+                        value={displayedTitle}
                         error={errors.title}
                         onChange={handleTitleChange}
                         name={`partner-section-title-${value.localId}`}
                         id={`partner-section-title-${value.localId}`}
                         isRequired={true}
-                        disabled={disabled}
+                        disabled={disabled || !isBaseLanguage}
                         placeholder={PARTNERS_TEXT.SECTION.TITLE_PLACEHOLDER}
                         maxLength={PARTNER_SECTION_VALIDATION.title.max}
                         rows={3}
@@ -200,13 +219,13 @@ const PartnerSectionComponent = ({
                 <div className={styles['description-group']}>
                     <TextAreaWithCharacterLimitGroup
                         label={PARTNERS_TEXT.FORM.LABEL.DESCRIPTION}
-                        value={value.description}
+                        value={displayedDescription}
                         error={errors.description}
                         onChange={handleDescriptionChange}
                         name={`partner-section-description-${value.localId}`}
                         id={`partner-section-description-${value.localId}`}
                         isRequired={true}
-                        disabled={disabled}
+                        disabled={disabled || !isBaseLanguage}
                         placeholder={PARTNERS_TEXT.SECTION.DESCRIPTION_PLACEHOLDER}
                         maxLength={PARTNER_SECTION_VALIDATION.description.max}
                         rows={3}
@@ -223,13 +242,22 @@ const PartnerSectionComponent = ({
                         disabled={disabled}
                         onValuesChange={handlePartnerChange}
                         onDelete={handlePartnerDelete}
+                        language={language}
+                        translatedDescription={
+                            translatedContent?.partners.find((p) => p.partnerId === partner.partnerId)?.description
+                        }
+                        disableStructuralActions={disableStructuralActions}
                     />
                 ))}
                 <div className={styles['add-card']}>
                     <button
                         type="button"
                         onClick={handleAddPartner}
-                        disabled={disabled || value.partners.length >= PARTNER_SECTION_VALIDATION.partners.max}
+                        disabled={
+                            disabled ||
+                            disableStructuralActions ||
+                            value.partners.length >= PARTNER_SECTION_VALIDATION.partners.max
+                        }
                     >
                         <span>{PARTNERS_TEXT.BUTTON.ADD_PARTNER}</span>
                     </button>
@@ -243,12 +271,18 @@ const PartnerSectionComponent = ({
             )}
 
             <div className={styles['actions']}>
-                <Button buttonStyle="secondary" onClick={handleDelete} disabled={disabled}>
+                <Button buttonStyle="secondary" onClick={handleDelete} disabled={disabled || disableStructuralActions}>
                     {PARTNERS_TEXT.SECTION.DELETE_SECTION}
                 </Button>
-                <Button buttonStyle="primary" onClick={handlePublish} disabled={disabled || !isDirty || !isFormValid()}>
-                    {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
-                </Button>
+                {isBaseLanguage && (
+                    <Button
+                        buttonStyle="primary"
+                        onClick={handlePublish}
+                        disabled={disabled || !isDirty || !isFormValid()}
+                    >
+                        {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
+                    </Button>
+                )}
             </div>
         </div>
     );

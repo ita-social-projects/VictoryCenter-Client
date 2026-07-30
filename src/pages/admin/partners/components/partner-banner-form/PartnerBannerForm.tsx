@@ -11,7 +11,7 @@ import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import { Button } from '@/components/admin/button/Button';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import axios from 'axios';
-import { PartnerBanner as PartnerBannerType } from '@/types/admin/partners';
+import { PartnerBanner as PartnerBannerType, PartnerBannerLocalization } from '@/types/admin/partners';
 import { PARTNER_BANNER_VALIDATION_FUNCTIONS } from '@/validation/admin/partner-schema/partner-schema';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ImageInput } from '@/components/admin/image-input/ImageInput';
@@ -20,12 +20,19 @@ import BannerImage from '@/assets/images/horses.webp';
 import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
 import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
+import { IconButton } from '@/components/admin/icon-button/IconButton';
+import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
+import { ACTION_ICONS } from '@/const/common/action-icons';
+import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
+import { TranslatePartnerBannerModal } from '../translate-partner-banner-modal/TranslatePartnerBannerModal';
 
 export interface PartnerBannerValues {
+    id: number;
     title: string;
     description: string;
     image: ImageValues | Image | null;
     imageId: number | null;
+    localizations: PartnerBannerLocalization[];
 }
 
 export interface PartnerBannerErrorState {
@@ -75,6 +82,16 @@ export const PartnerBanner = () => {
     const [isPublishing, setIsPublishing] = useState(false);
     const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
     const [titleKey, setTitleKey] = useState(0);
+    const [isTranslateModalOpen, setIsTranslateModalOpen] = useState(false);
+
+    const handleLocalizationError = useCallback(
+        (message: string) => {
+            addToast(message, ToastType.Error);
+        },
+        [addToast],
+    );
+
+    const { translationLanguages } = useLocalizationToolkit({ setErrorState: handleLocalizationError });
 
     const fetchBannerHandler = useCallback(() => {
         return PartnersApi.getBanner(client);
@@ -86,7 +103,7 @@ export const PartnerBanner = () => {
         error: fetchError,
         refetch: refetchBanner,
     } = useDataFetch<PartnerBannerType>({
-        initialData: { title: '', description: '', image: null, imageId: null },
+        initialData: { id: 0, title: '', description: '', image: null, imageId: null, localizations: [] },
         fetchHandler: fetchBannerHandler,
         autoFetchDisabled: false,
     });
@@ -187,7 +204,12 @@ export const PartnerBanner = () => {
                 imageId: values.imageId,
             });
 
-            setFormState({ values: updatedBanner, savedValues: updatedBanner });
+            const nextBanner: PartnerBannerType = {
+                ...updatedBanner,
+                localizations: updatedBanner.localizations.length ? updatedBanner.localizations : values.localizations,
+            };
+
+            setFormState({ values: nextBanner, savedValues: nextBanner });
             setTouched({});
             setErrors({});
             addToast(PARTNERS_TEXT.MESSAGE.BANNER_SAVED, ToastType.Success);
@@ -200,6 +222,27 @@ export const PartnerBanner = () => {
             setIsPublishing(false);
         }
     }, [values, errors, client, addToast]);
+
+    const handleOpenTranslateModal = useCallback(() => {
+        setIsTranslateModalOpen(true);
+    }, []);
+
+    const handleCloseTranslateModal = useCallback(() => {
+        setIsTranslateModalOpen(false);
+    }, []);
+
+    const handleTranslateBannerSuccess = useCallback(
+        (updatedBanner: PartnerBannerType) => {
+            setFormState((prev) => ({
+                values: prev.values ? { ...prev.values, localizations: updatedBanner.localizations } : prev.values,
+                savedValues: prev.savedValues
+                    ? { ...prev.savedValues, localizations: updatedBanner.localizations }
+                    : prev.savedValues,
+            }));
+            addToast(COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS, ToastType.Success);
+        },
+        [addToast],
+    );
 
     if (isLoadingData) {
         return (
@@ -240,81 +283,94 @@ export const PartnerBanner = () => {
             )}
 
             {!isLoadingData && !fetchError && values && (
-                <div className={styles.content}>
-                    <div className={styles.image}>
-                        <div className={styles['image-input']}>
-                            <ImageInput
-                                variant="partnerBanner"
-                                label={PARTNERS_TEXT.BANNER.ADD_IMAGE_HERE}
-                                subText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
-                                    PARTNER_BANNER_VALIDATION.image.height,
-                                    PARTNER_BANNER_VALIDATION.image.width,
-                                )}
-                                value={values.image}
-                                onChange={handleImageChange}
-                                id="banner-image"
-                                name="banner-image"
-                                disabled={isDisabled}
-                                setError={handleImageError}
-                                style={{
-                                    backgroundImage: `
+                <>
+                    <div className={styles['status-bar']}>
+                        <LocalizationStatuses languages={translationLanguages} localizedEntity={values} />
+                        <IconButton
+                            aria-label={COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION}
+                            type="button"
+                            onClick={handleOpenTranslateModal}
+                            DefaultIcon={ACTION_ICONS.translate.default}
+                            disabled={isDisabled || isDirty}
+                        />
+                    </div>
+
+                    <div className={styles.content}>
+                        <div className={styles.image}>
+                            <div className={styles['image-input']}>
+                                <ImageInput
+                                    variant="partnerBanner"
+                                    label={PARTNERS_TEXT.BANNER.ADD_IMAGE_HERE}
+                                    subText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
+                                        PARTNER_BANNER_VALIDATION.image.height,
+                                        PARTNER_BANNER_VALIDATION.image.width,
+                                    )}
+                                    value={values.image}
+                                    onChange={handleImageChange}
+                                    id="banner-image"
+                                    name="banner-image"
+                                    disabled={isDisabled}
+                                    setError={handleImageError}
+                                    style={{
+                                        backgroundImage: `
                                 linear-gradient(rgba(245, 245, 245, 0.85), rgba(245, 245, 245, 0.85)),
                                 url(${BannerImage})
                               `,
-                                }}
-                                cropWidth={PARTNER_BANNER_VALIDATION.image.width}
-                                cropHeight={PARTNER_BANNER_VALIDATION.image.height}
-                                minWidth={PARTNER_BANNER_VALIDATION.image.width}
-                                minHeight={PARTNER_BANNER_VALIDATION.image.height}
-                            />
+                                    }}
+                                    cropWidth={PARTNER_BANNER_VALIDATION.image.width}
+                                    cropHeight={PARTNER_BANNER_VALIDATION.image.height}
+                                    minWidth={PARTNER_BANNER_VALIDATION.image.width}
+                                    minHeight={PARTNER_BANNER_VALIDATION.image.height}
+                                />
+                            </div>
+                            <div className={styles['image-error']}>
+                                <InputError error={errors.image} />
+                            </div>
                         </div>
-                        <div className={styles['image-error']}>
-                            <InputError error={errors.image} />
+
+                        <div className={styles.main}>
+                            <div className={styles.fields}>
+                                <RichTextInputGroup
+                                    key={`title-${titleKey}`}
+                                    label={PARTNERS_TEXT.FORM.LABEL.TITLE}
+                                    value={values.title}
+                                    error={touched.title ? errors.title : undefined}
+                                    onChange={handleTitleChange}
+                                    onBlur={handleTitleBlur}
+                                    name="title"
+                                    id="title"
+                                    maxLength={PARTNER_BANNER_VALIDATION.title.max}
+                                    disabled={isDisabled}
+                                    isRequired={true}
+                                    trimOnBlur={true}
+                                />
+
+                                <InputWithCharacterLimitGroup
+                                    label={PARTNERS_TEXT.FORM.LABEL.DESCRIPTION}
+                                    value={values.description}
+                                    error={touched.description ? errors.description : undefined}
+                                    onChange={handleDescriptionChange}
+                                    id="description"
+                                    name="description"
+                                    disabled={isDisabled}
+                                    maxLength={PARTNER_BANNER_VALIDATION.description.max}
+                                    isRequired={true}
+                                />
+                            </div>
+
+                            <div className={styles.actions}>
+                                <Button
+                                    type="button"
+                                    buttonStyle="primary"
+                                    onClick={handlePublishClick}
+                                    disabled={isDisabled || !isDirty || !isFormValid(values, errors)}
+                                >
+                                    {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
+                                </Button>
+                            </div>
                         </div>
                     </div>
-
-                    <div className={styles.main}>
-                        <div className={styles.fields}>
-                            <RichTextInputGroup
-                                key={`title-${titleKey}`}
-                                label={PARTNERS_TEXT.FORM.LABEL.TITLE}
-                                value={values.title}
-                                error={touched.title ? errors.title : undefined}
-                                onChange={handleTitleChange}
-                                onBlur={handleTitleBlur}
-                                name="title"
-                                id="title"
-                                maxLength={PARTNER_BANNER_VALIDATION.title.max}
-                                disabled={isDisabled}
-                                isRequired={true}
-                                trimOnBlur={true}
-                            />
-
-                            <InputWithCharacterLimitGroup
-                                label={PARTNERS_TEXT.FORM.LABEL.DESCRIPTION}
-                                value={values.description}
-                                error={touched.description ? errors.description : undefined}
-                                onChange={handleDescriptionChange}
-                                id="description"
-                                name="description"
-                                disabled={isDisabled}
-                                maxLength={PARTNER_BANNER_VALIDATION.description.max}
-                                isRequired={true}
-                            />
-                        </div>
-
-                        <div className={styles.actions}>
-                            <Button
-                                type="button"
-                                buttonStyle="primary"
-                                onClick={handlePublishClick}
-                                disabled={isDisabled || !isDirty || !isFormValid(values, errors)}
-                            >
-                                {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
-                            </Button>
-                        </div>
-                    </div>
-                </div>
+                </>
             )}
 
             <ConfirmationModal
@@ -325,6 +381,14 @@ export const PartnerBanner = () => {
                 onClose={() => setIsPublishModalOpen(false)}
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
+            />
+
+            <TranslatePartnerBannerModal
+                isOpen={isTranslateModalOpen}
+                onClose={handleCloseTranslateModal}
+                banner={values}
+                onTranslateBanner={handleTranslateBannerSuccess}
+                translatedLanguages={translationLanguages}
             />
         </div>
     );

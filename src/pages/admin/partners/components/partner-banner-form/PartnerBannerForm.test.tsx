@@ -14,6 +14,7 @@ import { ButtonProps } from '@/components/admin/button/Button';
 import { ImageInputProps } from '@/components/admin/image-input/ImageInput';
 import { InputErrorProps } from '@/components/admin/input-error/InputError';
 import { InputWithCharacterLimitGroupProps } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
+import localizationStatusesStyles from '@/components/admin/localization-statuses/LocalizationStatuses.module.scss';
 
 jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
     InlineLoader: ({ size }: { size: number }) => <div data-testid="inline-loader">Loader size {size}</div>,
@@ -120,6 +121,46 @@ jest.mock('@/validation/admin/partner-schema/partner-schema', () => ({
     },
 }));
 
+const mockTranslationLanguages = [{ id: 2, code: 'en', name: 'English' }];
+
+jest.mock('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit', () => ({
+    useLocalizationToolkit: () => ({
+        allLanguages: mockTranslationLanguages,
+        translationLanguages: mockTranslationLanguages,
+        selectedLanguage: mockTranslationLanguages[0],
+        onLanguageChange: jest.fn(),
+        translationStatusFilter: undefined,
+        onTranslationStatusFilterChange: jest.fn(),
+        retryFetchLanguages: jest.fn(),
+    }),
+}));
+
+jest.mock('../translate-partner-banner-modal/TranslatePartnerBannerModal', () => ({
+    TranslatePartnerBannerModal: ({ isOpen, onClose, banner, onTranslateBanner }: any) =>
+        isOpen ? (
+            <div data-testid="translate-partner-banner-modal">
+                <button
+                    onClick={() =>
+                        onTranslateBanner({
+                            ...banner,
+                            localizations: [
+                                {
+                                    title: 'Banner title EN',
+                                    description: 'Banner description EN',
+                                    language: { id: 2, code: 'en' },
+                                    translationStatus: 1,
+                                },
+                            ],
+                        })
+                    }
+                >
+                    mock-translate-success
+                </button>
+                <button onClick={onClose}>mock-translate-close</button>
+            </div>
+        ) : null,
+}));
+
 const mockedUseDataFetch = useDataFetch as jest.Mock;
 const mockedPartnersApi = PartnersApi as jest.Mocked<typeof PartnersApi>;
 const mockedUseAdminClient = useAdminClient as jest.Mock;
@@ -134,10 +175,12 @@ describe('PartnerBanner', () => {
     const mockAddToast = jest.fn();
 
     const defaultBannerData = {
+        id: 1,
         title: 'Initial Title',
         description: 'Initial Description',
         image: { id: 1, url: 'initial.jpg', mimeType: 'image/jpeg' },
         imageId: 1,
+        localizations: [],
     };
 
     const getLoader = () => screen.queryByTestId('inline-loader');
@@ -321,6 +364,46 @@ describe('PartnerBanner', () => {
         await waitFor(() => {
             expect(getDescriptionInput()).toHaveValue(updatedBanner.description);
         });
+    });
+
+    it('keeps existing localizations when the update response omits them', async () => {
+        const bannerWithLocalization = {
+            ...defaultBannerData,
+            localizations: [
+                {
+                    title: 'Banner title EN',
+                    description: 'Banner description EN',
+                    language: { id: 2, code: 'en' },
+                    translationStatus: 1,
+                },
+            ],
+        };
+
+        mockedUseDataFetch.mockReturnValue({
+            data: bannerWithLocalization,
+            isLoading: false,
+            error: null,
+            refetch: mockRefetch,
+            setData: mockSetData,
+        });
+
+        mockedPartnersApi.updateBanner.mockResolvedValue({
+            ...bannerWithLocalization,
+            description: 'Published Description',
+            localizations: [],
+        });
+
+        render(<PartnerBanner />);
+
+        changeDescriptionValue('Published Description');
+        clickPublish();
+        clickConfirmPublish();
+
+        await waitFor(() => {
+            expect(mockAddToast).toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.BANNER_SAVED, ToastType.Success);
+        });
+
+        expect(screen.getByText('EN')).toHaveClass(localizationStatusesStyles.relevant);
     });
 
     it('shows error toast when publishing banner fails', async () => {
@@ -725,5 +808,59 @@ describe('PartnerBanner', () => {
         render(<PartnerBanner />);
         const titleInput = getTitleInput();
         expect(titleInput).toHaveAttribute('data-trimonblur', 'true');
+    });
+
+    it('opens the translate modal when the translate icon is clicked', () => {
+        render(<PartnerBanner />);
+
+        expect(screen.queryByTestId('translate-partner-banner-modal')).not.toBeInTheDocument();
+
+        fireEvent.click(
+            screen.getByRole('button', { name: COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION }),
+        );
+
+        expect(screen.getByTestId('translate-partner-banner-modal')).toBeInTheDocument();
+    });
+
+    it('disables the translate icon while there are unpublished changes', () => {
+        render(<PartnerBanner />);
+
+        const translateButton = screen.getByRole('button', {
+            name: COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION,
+        });
+        expect(translateButton).toBeEnabled();
+
+        changeDescriptionValue('Changed Description');
+
+        expect(translateButton).toBeDisabled();
+    });
+
+    it('merges updated localizations and shows success toast after translating', async () => {
+        render(<PartnerBanner />);
+
+        fireEvent.click(
+            screen.getByRole('button', { name: COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION }),
+        );
+        fireEvent.click(screen.getByText('mock-translate-success'));
+
+        await waitFor(() => {
+            expect(mockAddToast).toHaveBeenCalledWith(
+                COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS,
+                ToastType.Success,
+            );
+        });
+    });
+
+    it('closes the translate modal via onClose', () => {
+        render(<PartnerBanner />);
+
+        fireEvent.click(
+            screen.getByRole('button', { name: COMMON_TEXT_ADMIN.LOCALIZATION.FORM.TITLE.ADD_TRANSLATION }),
+        );
+        expect(screen.getByTestId('translate-partner-banner-modal')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByText('mock-translate-close'));
+
+        expect(screen.queryByTestId('translate-partner-banner-modal')).not.toBeInTheDocument();
     });
 });

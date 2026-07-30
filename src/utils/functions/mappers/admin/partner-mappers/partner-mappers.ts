@@ -8,6 +8,7 @@ import {
     Partner,
     PartnerSection,
 } from '@/types/admin/partners';
+import { mapLocalizationDtoToModel } from '@/utils/functions/mappers/common/localization/localization-mappers';
 
 export const mapPartnerDtoToPartner = (dto: PartnerDto): Partner => ({
     id: dto.id,
@@ -24,10 +25,12 @@ export const mapSectionDtoToSection = (dto: PartnersSectionDto): PartnerSection 
 });
 
 export const mapBannerDtoToBanner = (dto: PartnerBannerDto): PartnerBanner => ({
+    id: dto.id,
     title: dto.title,
     description: dto.description,
     image: dto.image,
     imageId: dto.image?.id ?? null,
+    localizations: (dto.localizations ?? []).map(mapLocalizationDtoToModel),
 });
 
 export const mapPartnerPageDataDtoToPageData = (dto: PartnersPageDataDto): PartnersPageData => ({

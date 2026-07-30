@@ -1,11 +1,18 @@
+import {
+    EntityLocalization,
+    EntityLocalizationDto,
+    EntityWithDtoLocalizations,
+    EntityWithLocalizations,
+} from '../common/language';
 import { Image, ImageValues } from '../common/image';
 
 export type PartnerBanner = {
+    id: number;
     title: string;
     description: string;
     image: Image | ImageValues | null;
     imageId: number | null;
-};
+} & EntityWithLocalizations<PartnerBannerLocalization>;
 
 export type Partner = {
     id: number;
@@ -88,11 +95,34 @@ export interface UpdatePartnerBannerDto {
 }
 
 // Response DTO
-export interface PartnerBannerDto {
+export interface PartnerBannerDto extends EntityWithDtoLocalizations<PartnerBannerLocalizationDto> {
     id: number;
     title: string;
     description: string;
     image: Image | null;
+}
+
+export interface PartnerBannerLocalization extends EntityLocalization {
+    title: string;
+    description: string;
+}
+
+export interface PartnerBannerLocalizationDto extends EntityLocalizationDto {
+    entityId: number;
+    title: string;
+    description: string;
+}
+
+export interface CreatePartnerBannerLocalizationDto {
+    entityId: number;
+    languageId: number;
+    title: string;
+    description: string;
+}
+
+export interface UpdatePartnerBannerLocalizationDto {
+    title: string;
+    description: string;
 }
 
 export interface PartnerDto {

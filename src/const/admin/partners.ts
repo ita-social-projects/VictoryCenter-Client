@@ -52,6 +52,8 @@ export const PARTNERS_TEXT = {
         FAIL_TO_PUBLISH_SECTION: 'Виникла помилка під час публікації секції',
         FAIL_TO_DELETE_SECTION: 'Виникла помилка під час видалення секції',
         FAIL_TO_LOAD_BANNER: 'Виникла помилка під час завантаження банеру',
+        FAIL_TO_TRANSLATE_BANNER: 'Виникла помилка під час додавання перекладу для банера',
+        FAIL_TO_UPDATE_TRANSLATION_FOR_BANNER: 'Виникла помилка під час оновлення перекладу для банера',
     },
 };
 

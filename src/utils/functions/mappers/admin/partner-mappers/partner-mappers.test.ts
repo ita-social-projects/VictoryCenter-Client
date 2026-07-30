@@ -6,6 +6,7 @@ import {
 } from './partner-mappers';
 import { PartnerBannerDto, PartnerDto, PartnersPageDataDto, PartnersSectionDto } from '@/types/admin/partners';
 import { Image } from '@/types/common/image';
+import { TranslationStatus } from '@/types/common/language';
 
 describe('partner-mapper', () => {
     const mockImage: Image = {
@@ -71,15 +72,18 @@ describe('partner-mapper', () => {
                 title: 'Banner Title',
                 description: 'Banner description',
                 image: mockImage,
+                localizations: [],
             };
 
             const result = mapBannerDtoToBanner(dto);
 
             expect(result).toEqual({
+                id: 1,
                 title: 'Banner Title',
                 description: 'Banner description',
                 image: mockImage,
                 imageId: 1,
+                localizations: [],
             });
         });
 
@@ -89,15 +93,18 @@ describe('partner-mapper', () => {
                 title: 'Banner without image',
                 description: 'Banner description',
                 image: null,
+                localizations: [],
             };
 
             const result = mapBannerDtoToBanner(dto);
 
             expect(result).toEqual({
+                id: 2,
                 title: 'Banner without image',
                 description: 'Banner description',
                 image: null,
                 imageId: null,
+                localizations: [],
             });
         });
 
@@ -111,11 +118,13 @@ describe('partner-mapper', () => {
                     url: 'https://example.com/image.jpg',
                     mimeType: 'image/jpeg',
                 },
+                localizations: [],
             };
 
             const result = mapBannerDtoToBanner(dto);
 
             expect(result).toEqual({
+                id: 3,
                 title: 'Banner Title',
                 description: 'Banner description',
                 image: {
@@ -124,7 +133,38 @@ describe('partner-mapper', () => {
                     mimeType: 'image/jpeg',
                 },
                 imageId: null,
+                localizations: [],
             });
+        });
+
+        it('maps localizations from PartnerBannerLocalizationDto to PartnerBannerLocalization', () => {
+            const dto: PartnerBannerDto = {
+                id: 4,
+                title: 'Banner Title',
+                description: 'Banner description',
+                image: mockImage,
+                localizations: [
+                    {
+                        entityId: 4,
+                        title: 'Banner Title EN',
+                        description: 'Banner description EN',
+                        localizationInfoDto: { id: 2, code: 'en' },
+                        translationStatus: TranslationStatus.Relevant,
+                    },
+                ],
+            };
+
+            const result = mapBannerDtoToBanner(dto);
+
+            expect(result.localizations).toEqual([
+                {
+                    entityId: 4,
+                    title: 'Banner Title EN',
+                    description: 'Banner description EN',
+                    language: { id: 2, code: 'en' },
+                    translationStatus: TranslationStatus.Relevant,
+                },
+            ]);
         });
     });
 
@@ -198,6 +238,7 @@ describe('partner-mapper', () => {
                     title: 'Banner Title',
                     description: 'Banner description',
                     image: mockImage,
+                    localizations: [],
                 },
                 sections: [
                     {
@@ -231,10 +272,12 @@ describe('partner-mapper', () => {
 
             expect(result).toEqual({
                 banner: {
+                    id: 1,
                     title: 'Banner Title',
                     description: 'Banner description',
                     image: mockImage,
                     imageId: 1,
+                    localizations: [],
                 },
                 sections: [
                     {
@@ -274,6 +317,7 @@ describe('partner-mapper', () => {
                     title: 'Banner Title',
                     description: 'Banner description',
                     image: null,
+                    localizations: [],
                 },
                 sections: [],
             };
@@ -282,10 +326,12 @@ describe('partner-mapper', () => {
 
             expect(result).toEqual({
                 banner: {
+                    id: 1,
                     title: 'Banner Title',
                     description: 'Banner description',
                     image: null,
                     imageId: null,
+                    localizations: [],
                 },
                 sections: [],
             });
@@ -298,6 +344,7 @@ describe('partner-mapper', () => {
                     title: 'Banner Title',
                     description: 'Banner description',
                     image: mockImage,
+                    localizations: [],
                 },
                 sections: [],
             };
@@ -306,10 +353,12 @@ describe('partner-mapper', () => {
 
             expect(result).toEqual({
                 banner: {
+                    id: 1,
                     title: 'Banner Title',
                     description: 'Banner description',
                     image: mockImage,
                     imageId: 1,
+                    localizations: [],
                 },
                 sections: [],
             });

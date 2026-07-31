@@ -1,4 +1,4 @@
-import { HippotherapyProgramDto, HippotherapyProgram } from '@/types/admin/programs';
+import { HippotherapyProgramDto, HippotherapyProgram, ProgramCategory } from '@/types/admin/programs';
 import { mapLocalizationDtoToModel } from '@/utils/functions/mappers/common/localization/localization-mappers';
 
 export function mapHippotherapyProgramDtoToModel(dto: HippotherapyProgramDto): HippotherapyProgram {
@@ -18,5 +18,19 @@ export function mapHippotherapyProgramDtoToModel(dto: HippotherapyProgramDto): H
         sections: dto.sections,
         slug: dto.slug,
         localizations: mappedLocalizations,
+    };
+}
+
+export function mapProgramCategoryDtoToModel(dto: any): ProgramCategory {
+    const mappedLocalizations = dto.localizations
+        ? dto.localizations.map((loc: any) => ('localizationInfoDto' in loc ? mapLocalizationDtoToModel(loc) : loc))
+        : undefined;
+
+    return {
+        id: dto.id,
+        name: dto.name,
+        programsCount: dto.programsCount ?? dto.programs?.length ?? 0,
+        localizations: mappedLocalizations,
+        translationStatuses: dto.translationStatuses,
     };
 }

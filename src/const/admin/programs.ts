@@ -113,9 +113,9 @@ export const PROGRAM_VALIDATION = {
 
 export const PROGRAM_CATEGORY_VALIDATION = {
     name: {
-        min: 5,
+        min: 2,
         max: 20,
-        getRequiredError: () => "Назва обов'язкова",
+        getRequiredError: () => "Поле обов'язкове",
         getCategoryWithThisNameAlreadyExistsError: () =>
             COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.ALREADY_CONTAIN_CATEGORY_WITH_NAME,
     },

@@ -31,8 +31,8 @@ describe('DeleteCategoryConfirmModal', () => {
     const renderModal = (overrideProps = {}) =>
         render(<DeleteCategoryConfirmModal {...defaultProps} {...overrideProps} />);
 
-    const getDeleteButton = () => screen.getByText(COMMON_TEXT_ADMIN.BUTTON.DELETE);
-    const getCancelButton = () => screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL);
+    const getDeleteButton = () => screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES);
+    const getCancelButton = () => screen.getByText(COMMON_TEXT_ADMIN.BUTTON.NO);
 
     beforeEach(() => {
         jest.clearAllMocks();

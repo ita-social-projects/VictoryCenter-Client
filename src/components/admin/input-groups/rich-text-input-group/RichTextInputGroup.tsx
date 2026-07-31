@@ -6,7 +6,7 @@ import { RichTextInput, RichTextInputProps } from '@/components/admin/rich-text-
 import '../input-group.scss';
 import cn from 'classnames';
 
-export interface RichTextInputGroupProps extends Omit<RichTextInputProps, 'onChange' | 'hasError'> {
+export interface RichTextInputGroupProps extends Omit<RichTextInputProps, 'onChange' | 'hasError' | 'showCounter'> {
     label: InputLabelProps['text'];
     isRequired?: InputLabelProps['isRequired'];
     error?: InputErrorProps['error'];
@@ -38,8 +38,9 @@ export const RichTextInputGroup = ({
     const counterId = `${id}-character-count`;
 
     const plainTextValue = useMemo(() => {
-        if (!value || value === '<p><br></p>') return '';
-        return value.replace(/<[^>]*>?/gm, '');
+        if (!value) return '';
+        const parsedDocument = new DOMParser().parseFromString(value, 'text/html');
+        return parsedDocument.body.textContent ?? '';
     }, [value]);
 
     return (

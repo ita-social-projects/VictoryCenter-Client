@@ -8,7 +8,7 @@ export const REPORTS_TEXT = {
             COLLECTED_FUNDS_WINDOW: 'Вікно 1: Зібрано коштів',
             CHANGED_LIVES_WINDOW: 'Вікно 2: Змінено життів',
             COLLECTED_FUNDS: 'Зібрані кошти',
-            CHANGED_LIVES: 'Кількість змінених життів',
+            CHANGED_LIVES: 'Змінених життів',
             WINDOW_DESCRIPTION: 'Фото «Репрезентативне фото»',
         },
         MAX_LENGTH: {
@@ -27,7 +27,7 @@ export const REPORTS_TEXT = {
         SUCCESSFULLY_PUBLISHED: 'Успішно опубліковано',
         RECORD_UPDATED_SUCCESSFULLY: 'Зміни збережено успішно',
         RECORD_UPDATE_FAILED_RETRY: 'Виникла помилка, спробуйте ще раз',
-        INVALID_VALUE: 'Значення повинно бути числом',
+        INVALID_VALUE: 'Поле може містити лише цілі цифри',
     },
     REPORT_AND_ANALYTICS: {
         TITLE: 'Управління фінансами',
@@ -46,7 +46,7 @@ export const REPORTS_MEDIA_SETTINGS_COLLECTED_FUNDS_VALIDATION = {
         getRequiredError: () => `Заголовок обов'язковий`,
     },
     collectedAmount: {
-        max: 15,
+        max: 10,
     },
     image: {
         width: 600,
@@ -61,7 +61,10 @@ export const REPORTS_MEDIA_SETTINGS_CHANGED_LIVES_VALIDATION = {
         getRequiredError: () => `Заголовок обов'язковий`,
     },
     changedLives: {
+        min: 2,
         max: 10,
+        getMinError: () => 'Не менше 2 цифр',
+        getMaxError: () => 'Не більше 10 цифр',
     },
     image: {
         width: 280,
@@ -141,6 +144,8 @@ export const PDF_FILES_SECTION_TEXT = {
         LOAD_ERROR: 'Не вдалося завантажити файли. Спробуйте ще раз.',
         FAIL_TO_CREATE_TRANSLATION: 'Виникла помилка під час додавання перекладу для PDF секції',
         FAIL_TO_UPDATE_TRANSLATION: 'Виникла помилка під час оновлення перекладу для PDF секції',
+        REORDER_SUCCESS: 'Порядок файлів успішно змінено',
+        REORDER_ERROR: 'Не вдалося змінити порядок файлів. Спробуйте ще раз.',
     },
     DELETE_CONFIRMATION: {
         TITLE: 'Файл буде видалено. Бажаєте продовжити?',
@@ -155,7 +160,7 @@ export const FUNDS_EXPENDITURES_VALIDATION = {
     },
     maxCategoriesPerType: 4,
     categoryNameMin: 5,
-    categoryNameMax: 200,
+    categoryNameMax: 100,
 };
 
 export const PDF_SECTION_LOCALIZATION_VALIDATION = {

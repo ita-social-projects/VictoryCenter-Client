@@ -213,17 +213,21 @@ $desc-input-height: 115px;
         color: c.$grey-700;
     }
 
-    :global(textarea) {
+    :global(.char-limit-textarea__field) {
         width: $desc-input-width;
         height: $desc-input-height;
         box-sizing: border-box;
 
         background-color: c.$white;
+        background-image: radial-gradient(circle, #{c.$blue-900} 45%, transparent 55%);
+        background-size: 6px 6px;
+        background-position: 16px 20px;
+        background-repeat: no-repeat;
+        background-attachment: local;
         border: none;
         outline: none;
         border-radius: 8px;
-
-        padding: 12px 16px;
+        padding: 12px 16px 12px 32px;
         resize: none;
 
         font-family: t.$font-family-base;

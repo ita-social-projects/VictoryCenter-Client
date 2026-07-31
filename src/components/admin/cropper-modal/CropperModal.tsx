@@ -151,31 +151,34 @@ export const CropModal = ({ src, onChange, width, height, onCancel, isOpen }: Cr
         >
             <Modal.Title>{CROPPER_CONSTANTS.TITLE}</Modal.Title>
             <Modal.Content>
-                <div className="cropper-container" style={{ display: 'flex', justifyContent: 'center' }}>
+                <div className="cropper-container">
                     {displaySrc ? (
-                        <ReactCrop
-                            crop={crop}
-                            onChange={onCropChange}
-                            onComplete={(pixelCrop) => {
-                                setCompletedCrop(pixelCrop);
-                            }}
-                            minWidth={crop?.width}
-                            maxWidth={crop?.width}
-                            minHeight={crop?.height}
-                            maxHeight={crop?.height}
-                            keepSelection
-                            aspect={aspectRatio}
-                            locked
-                        >
-                            <img
-                                ref={imgRef}
-                                src={displaySrc}
-                                crossOrigin="anonymous"
-                                alt="Crop target"
-                                onLoad={(e) => onImageLoaded(e.currentTarget)}
-                                style={{ maxWidth: '100%', maxHeight: '70vh' }}
-                            />
-                        </ReactCrop>
+                        <>
+                            <ReactCrop
+                                crop={crop}
+                                onChange={onCropChange}
+                                onComplete={(pixelCrop) => {
+                                    setCompletedCrop(pixelCrop);
+                                }}
+                                minWidth={crop?.width}
+                                maxWidth={crop?.width}
+                                minHeight={crop?.height}
+                                maxHeight={crop?.height}
+                                keepSelection
+                                aspect={aspectRatio}
+                                locked
+                            >
+                                <img
+                                    ref={imgRef}
+                                    src={displaySrc}
+                                    crossOrigin="anonymous"
+                                    alt="Crop target"
+                                    onLoad={(e) => onImageLoaded(e.currentTarget)}
+                                    style={{ maxWidth: '100%', maxHeight: '70vh' }}
+                                />
+                            </ReactCrop>
+                            <span className="cropper-size-text">{CROPPER_CONSTANTS.SIZE_LABEL(width, height)}</span>
+                        </>
                     ) : (
                         <InlineLoader size={8} />
                     )}

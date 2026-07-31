@@ -1,5 +1,5 @@
 import { ChangeEvent, ComponentProps, ReactNode } from 'react';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FUNDS_EXPENDITURES_TEXT, PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
@@ -118,6 +118,25 @@ const selectOption = (currentDisplayValue: string, nextDisplayValue: string) => 
     fireEvent.click(screen.getByRole('button', { name: nextDisplayValue }));
 };
 
+const getCategoryInput = (): HTMLInputElement => {
+    const input = screen.getByPlaceholderText(PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_PLACEHOLDER);
+
+    if (!(input instanceof HTMLInputElement)) {
+        throw new Error('Category combobox input was not found');
+    }
+
+    return input;
+};
+
+const selectCategoryOption = (optionName: string) => {
+    fireEvent.focus(getCategoryInput());
+    fireEvent.click(screen.getByRole('button', { name: optionName }));
+};
+
+const typeCategory = (text: string) => {
+    fireEvent.change(getCategoryInput(), { target: { value: text } });
+};
+
 describe('AddProgramExpenseRecordModal', () => {
     it('renders modal content, disabled submit button and sorted programs', () => {
         renderModal();
@@ -127,7 +146,7 @@ describe('AddProgramExpenseRecordModal', () => {
         expect(screen.getByLabelText(FUNDS_EXPENDITURES_TEXT.EXCHANGE_RATE_LABEL)).toHaveValue('42.15');
         expect(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.MODAL.ADD.SUBMIT_BUTTON })).toBeDisabled();
 
-        fireEvent.click(getSelectToggle(PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_PLACEHOLDER));
+        fireEvent.focus(getCategoryInput());
         const programOptions = screen
             .getAllByRole('button', { name: /^Program [AB]$/ })
             .map((option) => option.textContent);
@@ -135,11 +154,22 @@ describe('AddProgramExpenseRecordModal', () => {
         expect(programOptions).toEqual(['Program A', 'Program B']);
     });
 
-    it('renders disabled program placeholder when programs are unavailable', () => {
+    it('allows typing a brand new category name when there are no existing categories yet', () => {
         renderModal({ programs: [] });
 
-        expect(screen.getByText(PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_NO_AVAILABLE)).toBeInTheDocument();
-        expect(screen.queryByText(PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_PLACEHOLDER)).not.toBeInTheDocument();
+        typeCategory('XXXXXXXX');
+
+        expect(getCategoryInput()).toHaveValue('XXXXXXXX');
+    });
+
+    it('accepts a custom category name that does not match any existing option', () => {
+        renderModal();
+
+        fireEvent.focus(getCategoryInput());
+        typeCategory('XXXXXXXX');
+
+        expect(getCategoryInput()).toHaveValue('XXXXXXXX');
+        expect(screen.getByText(COMMON_TEXT_ADMIN.LIST.NOT_FOUND)).toBeInTheDocument();
     });
 
     it('validates program expense amount inputs on change and blur', () => {
@@ -179,16 +209,16 @@ describe('AddProgramExpenseRecordModal', () => {
     it('updates selected program value', () => {
         renderModal();
 
-        selectOption(PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_PLACEHOLDER, 'Program A');
+        selectCategoryOption('Program A');
 
-        expect(getSelectToggle('Program A')).toBeInTheDocument();
+        expect(getCategoryInput()).toHaveValue('Program A');
     });
 
     it('shows required errors on blur for empty selects', () => {
         renderModal();
 
         fireEvent.blur(getSelectToggle(FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_PLACEHOLDER));
-        fireEvent.blur(getSelectToggle(PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_PLACEHOLDER));
+        fireEvent.blur(getCategoryInput());
 
         expect(screen.getAllByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED)).toHaveLength(2);
     });
@@ -197,10 +227,10 @@ describe('AddProgramExpenseRecordModal', () => {
         renderModal();
 
         const reportingYearToggle = getSelectToggle(FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_PLACEHOLDER);
-        const programToggle = getSelectToggle(PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_PLACEHOLDER);
+        const categoryInput = getCategoryInput();
 
         fireEvent.blur(reportingYearToggle, { relatedTarget: reportingYearToggle });
-        fireEvent.blur(programToggle, { relatedTarget: programToggle });
+        fireEvent.blur(categoryInput, { relatedTarget: categoryInput });
 
         expect(screen.queryByText(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED)).not.toBeInTheDocument();
     });
@@ -209,7 +239,7 @@ describe('AddProgramExpenseRecordModal', () => {
         renderModal();
 
         selectOption(FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_PLACEHOLDER, '2026');
-        selectOption(PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_PLACEHOLDER, 'Program A');
+        selectCategoryOption('Program A');
         fireEvent.change(screen.getByTestId('add-program-expense-amount-uah'), { target: { value: '100' } });
 
         expect(screen.getByText(PROGRAM_EXPENSES_TEXT.VALIDATION.PROGRAM_UNIQUE)).toBeInTheDocument();
@@ -220,10 +250,35 @@ describe('AddProgramExpenseRecordModal', () => {
         renderModal();
 
         selectOption(FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_PLACEHOLDER, '2026');
-        selectOption(PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_PLACEHOLDER, 'Program B');
+        selectCategoryOption('Program B');
         fireEvent.change(screen.getByTestId('add-program-expense-amount-uah'), { target: { value: '100' } });
 
         expect(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.MODAL.ADD.SUBMIT_BUTTON })).toBeEnabled();
+    });
+
+    it('enables submit with a brand new category name and submits programId undefined', async () => {
+        const onSubmit = jest.fn().mockResolvedValue(true);
+        renderModal({ onSubmit, exchangeRate: '40' });
+
+        selectOption(FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_PLACEHOLDER, '2026');
+        typeCategory('New Category');
+        fireEvent.change(screen.getByTestId('add-program-expense-amount-uah'), { target: { value: '400' } });
+
+        const submitButton = screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.MODAL.ADD.SUBMIT_BUTTON });
+        expect(submitButton).toBeEnabled();
+
+        fireEvent.click(submitButton);
+        fireEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+
+        await waitFor(() => {
+            expect(onSubmit).toHaveBeenCalledWith({
+                programId: undefined,
+                programName: 'New Category',
+                reportingYear: '2026',
+                amountUah: '400',
+                amountUsd: '10',
+            });
+        });
     });
 
     it('closes immediately when the form is clean', () => {
@@ -301,6 +356,7 @@ describe('AddProgramExpenseRecordModal', () => {
         expect(screen.getByTestId('add-program-expense-amount-uah')).toHaveValue('');
         expect(screen.queryByTestId('close-confirmation')).not.toBeInTheDocument();
         expect(screen.getByLabelText(FUNDS_EXPENDITURES_TEXT.EXCHANGE_RATE_LABEL)).toHaveValue('');
+        expect(getCategoryInput()).toHaveValue('');
     });
 
     it('auto-fills USD when UAH is entered and shows mismatch message on manual USD change', () => {
@@ -328,9 +384,9 @@ describe('AddProgramExpenseRecordModal', () => {
         renderModal({ exchangeRate: '40', onSubmit });
 
         selectOption(FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_PLACEHOLDER, '2026');
-        selectOption(PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_PLACEHOLDER, 'Program B');
-        fireEvent.change(screen.getByTestId('add-program-expense-amount-uah'), { target: { value: '100' } });
-        fireEvent.change(screen.getByTestId('add-program-expense-amount-usd'), { target: { value: '999' } });
+        selectCategoryOption('Program B');
+        fireEvent.change(screen.getByTestId('add-program-expense-amount-uah'), { target: { value: '400' } });
+        fireEvent.change(screen.getByTestId('add-program-expense-amount-usd'), { target: { value: '10' } });
         fireEvent.blur(screen.getByTestId('add-program-expense-amount-usd'));
 
         fireEvent.click(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.MODAL.ADD.SUBMIT_BUTTON }));
@@ -345,7 +401,9 @@ describe('AddProgramExpenseRecordModal', () => {
 
         expect(screen.getByTestId('close-confirmation')).toBeInTheDocument();
 
-        resolveSubmit(true);
+        await act(async () => {
+            resolveSubmit(true);
+        });
     });
 
     describe('edit mode', () => {
@@ -366,7 +424,7 @@ describe('AddProgramExpenseRecordModal', () => {
             expect(screen.getByText(PROGRAM_EXPENSES_TEXT.MODAL.EDIT.SUBTITLE)).toBeInTheDocument();
 
             expect(screen.getByRole('button', { name: '2025' })).toBeInTheDocument();
-            expect(screen.getByRole('button', { name: 'Program A' })).toBeInTheDocument();
+            expect(getCategoryInput()).toHaveValue('Program A');
             expect(screen.getByTestId('add-program-expense-amount-uah')).toHaveValue('100');
             expect(screen.getByTestId('add-program-expense-amount-usd')).toHaveValue('10');
 
@@ -385,6 +443,7 @@ describe('AddProgramExpenseRecordModal', () => {
             await waitFor(() => {
                 expect(onSubmit).toHaveBeenCalledWith({
                     programId: 1,
+                    programName: 'Program A',
                     reportingYear: '2025',
                     amountUah: '200',
                     amountUsd: '4,75', // auto calculated based on rate 42.15 and rounded up
@@ -426,7 +485,9 @@ describe('AddProgramExpenseRecordModal', () => {
             expect(onClose).not.toHaveBeenCalled();
             expect(screen.queryByTestId('close-confirmation')).not.toBeInTheDocument();
 
-            resolveSubmit(true);
+            await act(async () => {
+                resolveSubmit(true);
+            });
         });
     });
 });

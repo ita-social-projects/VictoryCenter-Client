@@ -12,7 +12,8 @@ interface ChartGraphicProps {
 
 export const ChartGraphic = ({ items, formatAmount }: ChartGraphicProps) => {
     const isDesktop = useMediaQuery('(min-width: 1440px)');
-    const { pathRefs, positions } = useChartGeometry(items.length, isDesktop);
+    const percents = React.useMemo(() => items.map((i) => i.percent), [items]);
+    const { pathRefs, positions } = useChartGeometry(items.length, isDesktop, percents);
     const config = isDesktop ? CHART_CONFIG.desktop : CHART_CONFIG.mobile;
 
     return (
@@ -35,6 +36,8 @@ export const ChartGraphic = ({ items, formatAmount }: ChartGraphicProps) => {
                                 fill="none"
                                 data-level={index}
                                 className={styles.arc}
+                                pathLength="100"
+                                strokeDasharray={`${item.percent} 100`}
                             />
                             {positions[index] && (
                                 <text x={positions[index].x} y={positions[index].y} className={styles.label}>

@@ -80,13 +80,6 @@ const TABS: TabItem[] = [
     { id: 'partners', label: MAIN_PAGE_TEXT.TABS.PARTNERS, localizationBlock: MainPageLocalizationBlock.Partners },
 ];
 
-const TRANSLATABLE_BLOCKS = new Set<MainPageLocalizationBlock>([
-    MainPageLocalizationBlock.Title,
-    MainPageLocalizationBlock.AboutUs,
-    MainPageLocalizationBlock.Donations,
-    MainPageLocalizationBlock.Partners,
-]);
-
 const sanitizeMainPageFormValues = (values: MainPageFormValues): MainPageFormValues => ({
     ...values,
     statisticsTitleUa: values.statisticsTitleUa ?? '',
@@ -126,16 +119,63 @@ const areRichTextFieldValuesEqual = (
     normalizeRichTextHtmlForComparison(String(currentValues[field] ?? '')) ===
     normalizeRichTextHtmlForComparison(String(savedValues[field] ?? ''));
 
+const TRANSLATABLE_BLOCKS_ARRAY = [
+    MainPageLocalizationBlock.Title,
+    MainPageLocalizationBlock.AboutUs,
+    MainPageLocalizationBlock.Donations,
+    MainPageLocalizationBlock.Partners,
+] as const;
+
+type TranslatableBlock = (typeof TRANSLATABLE_BLOCKS_ARRAY)[number];
+
+const BLOCK_TEXT_FIELDS: Record<TranslatableBlock, Array<keyof MainPageFormValues>> = {
+    [MainPageLocalizationBlock.Title]: ['titleUa', 'titleEn', 'descriptionUa', 'descriptionEn'],
+    [MainPageLocalizationBlock.AboutUs]: [
+        'aboutUsTitleUa',
+        'aboutUsTitleEn',
+        'aboutUsDescriptionUa',
+        'aboutUsDescriptionEn',
+    ],
+    [MainPageLocalizationBlock.Donations]: [
+        'donationsTitleUa',
+        'donationsTitleEn',
+        'donationsDescriptionUa',
+        'donationsDescriptionEn',
+    ],
+    [MainPageLocalizationBlock.Partners]: [
+        'partnersTitleUa',
+        'partnersTitleEn',
+        'partnersDescriptionUa',
+        'partnersDescriptionEn',
+    ],
+};
+
+const TRANSLATABLE_BLOCKS = new Set<MainPageLocalizationBlock>(TRANSLATABLE_BLOCKS_ARRAY);
+
+const hasBlockDirtyTextFields = (
+    block: MainPageLocalizationBlock | undefined,
+    dirtyFields: Partial<Record<keyof MainPageFormValues, unknown>>,
+    currentValues: MainPageFormValues,
+    savedValues: MainPageFormValues,
+) => {
+    if (block == null) return false;
+
+    const blockFields = BLOCK_TEXT_FIELDS[block as TranslatableBlock];
+    if (!blockFields) return false;
+
+    return blockFields.some((fieldName) => {
+        if (!dirtyFields[fieldName]) return false;
+
+        return !areRichTextFieldValuesEqual(fieldName, currentValues, savedValues);
+    });
+};
+
 const hasRelevantMainPageDirtyFields = (
     dirtyFields: Partial<Record<keyof MainPageFormValues, unknown>>,
     currentValues: MainPageFormValues,
     savedValues: MainPageFormValues,
 ) => {
     const dirtyFieldNames = Object.keys(dirtyFields);
-
-    if (!dirtyFieldNames.length) {
-        return false;
-    }
 
     return dirtyFieldNames.some((fieldName) => {
         if (!isMainPageFormField(fieldName)) {
@@ -464,16 +504,17 @@ export const MainPageContent = () => {
         selectedTab.localizationBlock != null &&
         TRANSLATABLE_BLOCKS.has(selectedTab.localizationBlock);
 
-    const handleOpenTranslationModal = () => {
-        if (
-            translationLanguages.length === 0 ||
-            selectedTab.localizationBlock == null ||
-            !TRANSLATABLE_BLOCKS.has(selectedTab.localizationBlock)
-        ) {
-            return;
-        }
+    const isTranslateButtonDisabled =
+        canTranslateActiveBlock &&
+        hasBlockDirtyTextFields(
+            selectedTab.localizationBlock,
+            methods.formState.dirtyFields,
+            methods.getValues(),
+            savedValuesRef.current,
+        );
 
-        setTranslationBlock(selectedTab.localizationBlock);
+    const handleOpenTranslationModal = () => {
+        setTranslationBlock(selectedTab.localizationBlock as MainPageLocalizationBlock);
     };
 
     const handleCloseTranslationModal = () => {
@@ -578,6 +619,7 @@ export const MainPageContent = () => {
                             type="button"
                             onClick={handleOpenTranslationModal}
                             DefaultIcon={ACTION_ICONS.translate.default}
+                            disabled={isTranslateButtonDisabled}
                         />
                     </div>
                 )}

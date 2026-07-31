@@ -24,6 +24,7 @@ import { ToastType } from '@/types/admin/toast';
 import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
 import { mapHippotherapyProgramDtoToModel } from '@/utils/functions/mappers/admin/programs/programs-mappers';
+import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
@@ -296,13 +297,20 @@ export const ProgramsPageContent = () => {
     );
 
     const handleProgramSuggestionSelect = useCallback(
-        (programId: string | number) => {
+        (programId: string | number, item: ProgramSearchItemData) => {
             setIsSearchResultView(true);
             setSearchProgramId(typeof programId === 'string' ? parseInt(programId, 10) : programId);
             setStatusFilter(undefined);
             resetProgramsList();
+
+            if (item?.categories?.length) {
+                const cat = categories.find((c) => item.categories.includes(c.name));
+                if (cat) {
+                    setSelectedCategory(cat);
+                }
+            }
         },
-        [resetProgramsList],
+        [resetProgramsList, categories],
     );
 
     const handleSearchClear = useCallback(() => {
@@ -534,6 +542,9 @@ export const ProgramsPageContent = () => {
                     displayContextMenuButton={true}
                     contextMenuOptions={categoryBarContextMenuOptions}
                     onContextMenuOptionSelected={onContextMenuOptionSelected}
+                    renderCategoryExtra={(category) => (
+                        <LocalizationStatuses languages={translationLanguages} localizedEntity={category} />
+                    )}
                 />
 
                 {error.message && (

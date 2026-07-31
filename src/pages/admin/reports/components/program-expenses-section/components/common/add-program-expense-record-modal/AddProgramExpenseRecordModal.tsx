@@ -3,6 +3,7 @@ import { Button } from '@/components/admin/button/Button';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import { InputWithCharacterLimit } from '@/components/admin/input-with-character-limit/InputWithCharacterLimit';
 import { Select } from '@/components/common/select/Select';
+import { CategoryCombobox } from '@/components/common/category-combobox/CategoryCombobox';
 import { Modal } from '@/components/common/modal/Modal';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FUNDS_EXPENDITURES_TEXT, PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
@@ -20,7 +21,8 @@ interface AddProgramExpenseRecordModalProps {
     exchangeRate: string | null;
     onClose: () => void;
     onSubmit: (data: {
-        programId: number;
+        programId: number | undefined;
+        programName: string;
         reportingYear: string;
         amountUah: string;
         amountUsd: string;
@@ -142,7 +144,6 @@ export const AddProgramExpenseRecordModal = ({
     const {
         formState,
         programOptions,
-        isProgramSelectDisabled,
         isDirty,
         isSubmitDisabled,
         isSubmitting,
@@ -151,6 +152,7 @@ export const AddProgramExpenseRecordModal = ({
         handleReportingYearChange,
         handleReportingYearBlur,
         handleProgramChange,
+        handleProgramInputChange,
         handleProgramBlur,
         handleAmountChange,
         handleUsdChange,
@@ -255,25 +257,18 @@ export const AddProgramExpenseRecordModal = ({
                                 error={formState.errors.programId}
                                 onBlurCapture={handleProgramFieldBlur}
                             >
-                                {isProgramSelectDisabled ? (
-                                    <div className={styles['disabled-select-placeholder']}>
-                                        {PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_NO_AVAILABLE}
-                                    </div>
-                                ) : (
-                                    <Select<number>
-                                        value={formState.programId}
-                                        onValueChange={handleProgramChange}
-                                        selectContainerRef={programSelectRef}
-                                        placeholder={PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_PLACEHOLDER}
-                                        className={styles.select}
-                                        optionClassName={styles['select-option']}
-                                        disabled={isSubmitting}
-                                    >
-                                        {programOptions.map((program) => (
-                                            <Select.Option key={program.id} value={program.id} name={program.name} />
-                                        ))}
-                                    </Select>
-                                )}
+                                <CategoryCombobox
+                                    id="add-program-expense-category"
+                                    options={programOptions}
+                                    inputValue={formState.programInputValue}
+                                    onInputValueChange={handleProgramInputChange}
+                                    onOptionSelect={(option) => handleProgramChange(option.id)}
+                                    selectContainerRef={programSelectRef}
+                                    placeholder={PROGRAM_EXPENSES_TEXT.MODAL.ADD.PROGRAM_PLACEHOLDER}
+                                    className={styles.select}
+                                    optionClassName={styles['select-option']}
+                                    disabled={isSubmitting}
+                                />
                             </SelectField>
 
                             <AmountField

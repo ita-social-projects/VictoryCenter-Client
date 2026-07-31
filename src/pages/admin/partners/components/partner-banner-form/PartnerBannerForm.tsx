@@ -288,6 +288,7 @@ export const PartnerBanner = () => {
                                 disabled={isDisabled}
                                 isRequired={true}
                                 showCounterBelow={true}
+                                trimOnBlur={true}
                             />
 
                             <InputWithCharacterLimitGroup

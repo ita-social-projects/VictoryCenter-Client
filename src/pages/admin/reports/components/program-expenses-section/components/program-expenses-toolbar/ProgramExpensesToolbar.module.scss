@@ -24,7 +24,7 @@
         box-shadow: none;
 
         &:hover {
-            background: c.$white;
+            background: rgba(c.$dropdown-hover, 0.3);
         }
     }
 
@@ -96,6 +96,28 @@
 
     :global(.multiselect__option--selected) {
         background: c.$dropdown-hover;
+    }
+}
+
+.program-select-disabled {
+    opacity: 1;
+    pointer-events: none;
+
+    :global(.multiselect__placeholder-container) {
+        background-color: rgba(c.$black, 0.04);
+        border-color: c.$grey-700;
+
+        &:hover {
+            background-color: rgba(c.$black, 0.04);
+        }
+    }
+
+    :global(.multiselect__placeholder-content) {
+        color: c.$grey-700;
+    }
+
+    :global(.multiselect__chevron svg path) {
+        stroke: c.$grey-700;
     }
 }
 

@@ -1,0 +1,32 @@
+@use '@/assets/sass/variables/colors';
+
+.select-head {
+    input {
+        flex: 1 1 auto;
+        min-width: 0;
+        border: none;
+        outline: none;
+        padding: 0;
+        background: transparent;
+        font: inherit;
+        color: colors.$blue-900;
+
+        &::placeholder {
+            color: colors.$grey-900;
+        }
+
+        &:disabled {
+            cursor: not-allowed;
+        }
+    }
+}
+
+.category-combobox-not-found {
+    padding: 8px 1rem;
+    color: colors.$grey-700;
+    font-size: 16px;
+}
+
+.select-options button.category-combobox-option-active {
+    background-color: colors.$blue-50;
+}

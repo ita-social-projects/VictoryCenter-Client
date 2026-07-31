@@ -1,4 +1,4 @@
-﻿@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/variables/colors' as c;
 
 .root {
     width: 13rem;
@@ -6,6 +6,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    margin-top: 1.875rem;
 }
 
 .header {

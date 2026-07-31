@@ -22,10 +22,10 @@ const EMPTY_SECTION = { title: '', description: '', localizations: [] };
 export const PdfFilesSection = () => {
     const client = useAdminClient();
     const { addToast } = useToast();
-    const [uploadedFiles, setUploadedFiles] = useState<PdfReportDto[]>([]);
     const [currentLanguage, setCurrentLanguage] = useState<'uk' | 'en'>('uk');
     const [isDeleting, setIsDeleting] = useState(false);
     const [isRenaming, setIsRenaming] = useState(false);
+    const [isReordering, setIsReordering] = useState(false);
     const [isTranslateModalOpen, setIsTranslateModalOpen] = useState(false);
 
     const { translationLanguages, allLanguages } = useLocalizationToolkit({
@@ -49,6 +49,7 @@ export const PdfFilesSection = () => {
 
     const fetchedFilesRef = useRef<PdfReportDto[]>([]);
     const loadMoreAbortControllerRef = useRef<AbortController | null>(null);
+    const hasCompletedInitialFilesFetch = useRef(false);
 
     const {
         data: sectionData,
@@ -89,6 +90,12 @@ export const PdfFilesSection = () => {
     }, [fetchedFiles]);
 
     useEffect(() => {
+        if (!isFilesLoading && !hasCompletedInitialFilesFetch.current) {
+            hasCompletedInitialFilesFetch.current = true;
+        }
+    }, [isFilesLoading]);
+
+    useEffect(() => {
         return () => {
             loadMoreAbortControllerRef.current?.abort();
         };
@@ -98,7 +105,6 @@ export const PdfFilesSection = () => {
         (lang: 'uk' | 'en') => {
             loadMoreAbortControllerRef.current?.abort();
             setCurrentLanguage(lang);
-            setUploadedFiles([]);
             setTotalCount(0);
             fetchedFilesRef.current = [];
             setFetchedFiles([]);
@@ -153,12 +159,18 @@ export const PdfFilesSection = () => {
     ]);
 
     const handleUploaded = useCallback(
-        (newFile: PdfReportDto) => {
+        async (newFile: PdfReportDto) => {
             loadMoreAbortControllerRef.current?.abort();
-            setUploadedFiles((prev) => [...prev, newFile]);
-            refetchFiles();
+            setFetchedFiles((prev) => [newFile, ...(prev ?? [])]);
+            setTotalCount((prev) => prev + 1);
+            try {
+                await refetchFiles(true);
+            } catch {
+                setFetchedFiles((prev) => (prev ?? []).filter((f) => f.id !== newFile.id));
+                setTotalCount((prev) => (prev > 0 ? prev - 1 : 0));
+            }
         },
-        [refetchFiles],
+        [refetchFiles, setFetchedFiles],
     );
 
     const handleSaveSection = useCallback(async () => {
@@ -179,7 +191,8 @@ export const PdfFilesSection = () => {
             setIsDeleting(true);
             try {
                 await PdfReportsApi.delete(client, fileId);
-                setUploadedFiles((prev) => prev.filter((f) => f.id !== fileId));
+                setFetchedFiles((prev) => (prev ?? []).filter((f) => f.id !== fileId));
+                setTotalCount((prev) => (prev > 0 ? prev - 1 : 0));
                 addToast(PDF_FILES_SECTION_TEXT.MESSAGE.DELETE_SUCCESS, ToastType.Success);
             } catch {
                 addToast(PDF_FILES_SECTION_TEXT.MESSAGE.DELETE_ERROR, ToastType.Error);
@@ -191,7 +204,7 @@ export const PdfFilesSection = () => {
                 await refetchFiles();
             } catch {}
         },
-        [client, addToast, refetchFiles],
+        [client, addToast, refetchFiles, setFetchedFiles],
     );
 
     const handleViewFile = useCallback(
@@ -218,10 +231,7 @@ export const PdfFilesSection = () => {
             setIsRenaming(true);
             try {
                 const updatedFile = await PdfReportsApi.rename(client, fileId, newName);
-                setUploadedFiles((prev) => {
-                    const exists = prev.some((f) => f.id === fileId);
-                    return exists ? prev.map((f) => (f.id === fileId ? updatedFile : f)) : [...prev, updatedFile];
-                });
+                setFetchedFiles((prev) => (prev ?? []).map((f) => (f.id === fileId ? updatedFile : f)));
                 addToast(PDF_FILES_SECTION_TEXT.MESSAGE.RENAME_SUCCESS, ToastType.Success);
             } catch {
                 addToast(PDF_FILES_SECTION_TEXT.MESSAGE.RENAME_ERROR, ToastType.Error);
@@ -236,20 +246,51 @@ export const PdfFilesSection = () => {
                 setIsRenaming(false);
             }
         },
-        [client, addToast, refetchFiles],
+        [client, addToast, refetchFiles, setFetchedFiles],
     );
 
-    if (isSectionLoading || isFilesLoading || !activeLanguageId) {
+    const handleReorderFiles = useCallback(
+        async (reorderedFiles: PdfReportDto[]) => {
+            if (!activeLanguageId || isReordering) return;
+
+            if (!reorderedFiles || reorderedFiles.length === 0) return;
+
+            const currentFiles = fetchedFilesRef.current;
+            const currentDedupedCount = new Set(currentFiles.map((f) => f.id)).size;
+            if (reorderedFiles.length !== currentDedupedCount) {
+                // eslint-disable-next-line no-console
+                console.error('File count mismatch during reorder');
+                return;
+            }
+
+            const previousState = fetchedFilesRef.current;
+            setIsReordering(true);
+
+            try {
+                setFetchedFiles(reorderedFiles);
+                const orderedIds = reorderedFiles.map((f) => f.id);
+                await PdfReportsApi.reorder(client, activeLanguageId, orderedIds);
+                await refetchFiles();
+                addToast(PDF_FILES_SECTION_TEXT.MESSAGE.REORDER_SUCCESS, ToastType.Success);
+            } catch {
+                setFetchedFiles(previousState ?? []);
+                addToast(PDF_FILES_SECTION_TEXT.MESSAGE.REORDER_ERROR, ToastType.Error);
+            } finally {
+                setIsReordering(false);
+            }
+        },
+        [client, activeLanguageId, isReordering, setFetchedFiles, refetchFiles, addToast],
+    );
+
+    const isInitialFilesLoading = isFilesLoading && !hasCompletedInitialFilesFetch.current;
+
+    if (isSectionLoading || isInitialFilesLoading || !activeLanguageId) {
         return (
             <div className={styles.loader}>
                 <InlineLoader size={3} />
             </div>
         );
     }
-
-    const mergedDedupedFiles = Array.from(
-        new Map([...fetchedFiles, ...uploadedFiles].map((file) => [file.id, file])).values(),
-    );
 
     return (
         <div className={styles.root}>
@@ -266,12 +307,14 @@ export const PdfFilesSection = () => {
             </div>
             <PdfDropzone onUploaded={handleUploaded} languageId={activeLanguageId} />
             <PdfFilesTable
-                files={mergedDedupedFiles}
+                files={fetchedFiles ?? []}
                 onViewFile={handleViewFile}
                 onDeleteFile={handleDeleteFile}
                 onRenameFile={handleRenameFile}
+                onReorderFiles={handleReorderFiles}
                 isDeleting={isDeleting}
                 isRenaming={isRenaming}
+                isReordering={isReordering}
                 isLoadingMore={isLoadingMore}
                 onLoadMore={handleLoadMore}
             />

@@ -101,6 +101,8 @@ export const TitleDescriptionCard = ({
                         maxLength={descriptionMax}
                         error={descriptionError}
                         placeholder="• "
+                        autoGrow={true}
+                        maxRows={0}
                     />
                 </div>
             </div>

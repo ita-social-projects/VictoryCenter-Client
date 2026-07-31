@@ -29,7 +29,7 @@ export const ConfirmationModal = ({
     className,
 }: ConfirmationModalProps) => {
     return (
-        <Modal isOpen={isOpen} onClose={onClose} className={className}>
+        <Modal isOpen={isOpen} onClose={onClose} className={`confirmation-modal ${className || ''}`.trim()}>
             <Modal.Title>
                 <span style={{ whiteSpace: 'pre-line' }}>{title}</span>
             </Modal.Title>

@@ -36,7 +36,7 @@ export interface AdminPanelToolbarProps<T> extends LocalizationToolkitProps {
     onStatusFilterChange: (statusFilter: VisibilityStatus | undefined) => void;
     onAddItem: () => void;
     AddItemButtonText: string;
-    onSuggestionSelect: (itemKey: string | number) => void;
+    onSuggestionSelect: (itemKey: string | number, item: T) => void;
     maxCharactersToSearch?: number;
 }
 
@@ -96,7 +96,7 @@ export const AdminPanelToolbar = <T,>({
 
     const onSuggestionSelected = useCallback(
         (suggestion: T) => {
-            onSuggestionSelect(getSearchItemKey(suggestion));
+            onSuggestionSelect(getSearchItemKey(suggestion), suggestion);
             resetSearchItemsList();
             setLocalSearchItems([]);
             setCurrentSearchTerm('');

@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { InputLabel, InputLabelProps } from '@/components/admin/input-label/InputLabel';
 import { InputError, InputErrorProps } from '@/components/admin/input-error/InputError';
+import { InputErrorWithCharacterCounter } from '@/components/admin/input-error-with-character-counter/InputErrorWithCharacterCounter';
 import { RichTextInput, RichTextInputProps } from '@/components/admin/rich-text-input/RichTextInput';
 import '../input-group.scss';
 import cn from 'classnames';
@@ -11,6 +12,8 @@ export interface RichTextInputGroupProps extends Omit<RichTextInputProps, 'onCha
     error?: InputErrorProps['error'];
     className?: string;
     onChange: (value: string) => void;
+    showCounterBelow?: boolean;
+    isWhiteLabel?: boolean;
 }
 
 export const RichTextInputGroup = ({
@@ -29,7 +32,16 @@ export const RichTextInputGroup = ({
     error,
     className,
     trimOnBlur,
+    showCounterBelow = false,
+    isWhiteLabel,
 }: RichTextInputGroupProps) => {
+    const counterId = `${id}-character-count`;
+
+    const plainTextValue = useMemo(() => {
+        if (!value || value === '<p><br></p>') return '';
+        return value.replace(/<[^>]*>?/gm, '');
+    }, [value]);
+
     return (
         <div className={cn('input-group', className)}>
             <InputLabel htmlFor={id} text={label} isRequired={isRequired} />
@@ -46,8 +58,20 @@ export const RichTextInputGroup = ({
                 placeholder={placeholder}
                 hasError={!!error}
                 trimOnBlur={trimOnBlur}
+                showCounter={!showCounterBelow}
             />
-            <InputError error={error} />
+            {showCounterBelow ? (
+                <InputErrorWithCharacterCounter
+                    error={error}
+                    maxLength={maxLength}
+                    counterId={counterId}
+                    htmlFor={id}
+                    value={plainTextValue}
+                    isWhiteLabel={isWhiteLabel}
+                />
+            ) : (
+                <InputError error={error} />
+            )}
         </div>
     );
 };

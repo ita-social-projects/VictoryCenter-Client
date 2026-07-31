@@ -287,6 +287,7 @@ export const PartnerBanner = () => {
                                 maxLength={PARTNER_BANNER_VALIDATION.title.max}
                                 disabled={isDisabled}
                                 isRequired={true}
+                                showCounterBelow={true}
                             />
 
                             <InputWithCharacterLimitGroup
@@ -298,6 +299,7 @@ export const PartnerBanner = () => {
                                 name="description"
                                 disabled={isDisabled}
                                 maxLength={PARTNER_BANNER_VALIDATION.description.max}
+                                showCounterBelow={true}
                                 isRequired={true}
                             />
                         </div>

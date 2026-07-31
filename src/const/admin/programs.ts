@@ -5,7 +5,7 @@ export const PROGRAMS_TEXT = {
         ADD_PROGRAM: 'Додати програму',
     },
     PLACEHOLDER: {
-        SEARCH_PROGRAMS: 'Шукати програми...',
+        SEARCH_PROGRAMS: 'Введіть назву',
         INSERT_PROGRAM_NAME: 'Введіть назву програми',
         INSERT_PROGRAM_LOCATION: 'Введіть місце проведення',
         INSERT_PROGRAM_PARTICIPANTS_COUNT: 'Введіть кількість учасників',

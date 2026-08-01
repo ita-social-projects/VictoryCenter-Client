@@ -107,7 +107,7 @@ export const TEAM_IMAGE_PLACEHOLDER = {
 
 export const TEAM_CATEGORY_VALIDATION = {
     name: {
-        min: 5,
+        min: 10,
         max: 20,
         getRequiredError: () => 'Назва обов’язкова',
         getMinError: () => `Не менше ${TEAM_CATEGORY_VALIDATION.name.min} символів`,

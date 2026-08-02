@@ -37,7 +37,7 @@ export const PartnersSection = ({ section }: PartnersSectionProps) => {
                 <div className={styles['partners-logos']}>
                     {section.partners.map((partner) => {
                         const translatedDescription = partner.localizations?.find(
-                            (localization) => localization.localizationInfoDto.code === currentLanguage,
+                            (localization) => localization.localizationInfoDto?.code === currentLanguage,
                         )?.description;
 
                         return (

@@ -10,7 +10,7 @@ import { TranslatePartnerBannerFormValues } from '@/pages/admin/partners/compone
 
 interface UseTranslatePartnerBannerParams {
     banner: PartnerBanner | null;
-    language: LocalizationLanguage;
+    language: LocalizationLanguage | null;
     onSuccess: (updatedBanner: PartnerBanner) => void;
     mode: ModalMode;
 }
@@ -23,7 +23,7 @@ export const useTranslatePartnerBanner = ({ banner, language, onSuccess, mode }:
     const isEditMode = mode === ModalMode.Edit;
 
     const translateBanner = async (data: TranslatePartnerBannerFormValues) => {
-        if (!banner) return;
+        if (!banner || !language) return;
 
         try {
             setIsSubmitting(true);

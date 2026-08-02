@@ -1,7 +1,6 @@
 import { LocalizationModal } from '@/components/admin/localization-modal/LocalizationModal';
 import { TranslationControls } from '@/components/admin/translation-controls/TranslationControls';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { DEFAULT_LOCALE } from '@/const/common/locales';
 import { useTranslatePartnerBanner } from '@/hooks/admin/use-translate-partner-banner/useTranslatePartnerBanner';
 import { ModalMode } from '@/types/admin/common';
 import { PartnerBanner } from '@/types/admin/partners';
@@ -32,10 +31,7 @@ export const TranslatePartnerBannerModal = ({
     const [isFormValid, setIsFormValid] = useState(false);
     const [isDirty, setIsDirty] = useState(false);
 
-    const [language, setLanguage] = useState<LocalizationLanguage | null>(() => {
-        if (!translatedLanguages?.length) return null;
-        return translatedLanguages.find((l) => l.code !== DEFAULT_LOCALE) || translatedLanguages[0];
-    });
+    const [language, setLanguage] = useState<LocalizationLanguage | null>(() => translatedLanguages?.[0] ?? null);
 
     const existingLocalization = useMemo(() => {
         if (!banner?.localizations || !language) return null;
@@ -56,7 +52,7 @@ export const TranslatePartnerBannerModal = ({
 
     const { translateBanner, isSubmitting, error } = useTranslatePartnerBanner({
         banner,
-        language: language as LocalizationLanguage,
+        language,
         onSuccess: (updatedBanner) => {
             onTranslateBanner(updatedBanner);
             onClose();

@@ -179,11 +179,13 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef, Partne
 
             let cancelled = false;
 
+            setSectionTranslations({});
+
             const fetchTranslations = async () => {
                 setIsLoadingTranslations(true);
                 try {
                     const sectionIds = fetchedSections.map((section) => section.id);
-                    const results = await Promise.all(
+                    const results = await Promise.allSettled(
                         sectionIds.map((sectionId) =>
                             PartnerSectionLocalizationApi.get(client, sectionId, language.id),
                         ),
@@ -191,15 +193,34 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef, Partne
 
                     if (cancelled) return;
 
+                    let hasFailure = false;
+
                     setSectionTranslations(
                         sectionIds.reduce<Record<number, PartnerSectionLocalizationDto | null>>(
                             (acc, sectionId, index) => {
-                                acc[sectionId] = results[index];
+                                const result = results[index];
+                                if (result.status === 'fulfilled') {
+                                    acc[sectionId] = result.value;
+                                } else {
+                                    const error = result.reason;
+                                    const isCancelError =
+                                        axios.isCancel?.(error) ||
+                                        error?.name === 'CanceledError' ||
+                                        error?.name === 'AbortError';
+                                    if (!isCancelError) {
+                                        hasFailure = true;
+                                    }
+                                    acc[sectionId] = null;
+                                }
                                 return acc;
                             },
                             {},
                         ),
                     );
+
+                    if (hasFailure) {
+                        addToast(PARTNERS_TEXT.MESSAGE.FAIL_TO_LOAD_PARTNERS, ToastType.Error);
+                    }
                 } catch (error: any) {
                     if (
                         cancelled ||

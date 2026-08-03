@@ -8,20 +8,38 @@ import {
 } from '@/types/common/language';
 import styles from './LocalizationStatuses.module.scss';
 
-export interface LocalizationStatusProps<TLocalization extends EntityLocalization> {
+export interface LocalizationStatusProps<TLocalization extends EntityLocalization = EntityLocalization> {
     languages: LocalizationLanguage[];
-    localizedEntity: EntityWithLocalizations<TLocalization> | EntityWithTranslationStatuses;
+    localizedEntity: Partial<EntityWithLocalizations<TLocalization>> | Partial<EntityWithTranslationStatuses>;
 }
 
 const getTranslationStatus = <TLocalization extends EntityLocalization>(
     language: LocalizationLanguage,
-    localizedEntity: EntityWithLocalizations<TLocalization> | EntityWithTranslationStatuses,
+    localizedEntity: Partial<EntityWithLocalizations<TLocalization>> | Partial<EntityWithTranslationStatuses>,
 ): TranslationStatus | undefined => {
-    if ('translationStatuses' in localizedEntity) {
-        return localizedEntity.translationStatuses?.find((loc) => loc.languageId === language.id)?.translationStatus;
+    if (
+        'translationStatuses' in localizedEntity &&
+        localizedEntity.translationStatuses &&
+        localizedEntity.translationStatuses.length > 0
+    ) {
+        return localizedEntity.translationStatuses.find((loc) => loc.languageId === language.id)?.translationStatus;
     }
 
-    return localizedEntity.localizations?.find((loc) => loc.language?.code === language.code)?.translationStatus;
+    if (
+        'localizations' in localizedEntity &&
+        localizedEntity.localizations &&
+        localizedEntity.localizations.length > 0
+    ) {
+        return localizedEntity.localizations.find(
+            (loc: any) =>
+                loc.language?.code === language.code ||
+                loc.localizationInfoDto?.code === language.code ||
+                loc.language?.id === language.id ||
+                loc.localizationInfoDto?.id === language.id,
+        )?.translationStatus;
+    }
+
+    return undefined;
 };
 
 export const LocalizationStatuses = <TLocalization extends EntityLocalization>({

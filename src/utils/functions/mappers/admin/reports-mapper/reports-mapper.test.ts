@@ -221,6 +221,7 @@ describe('reports-mapper', () => {
                 disclaimerTitle: 'Disclaimer',
                 exchangeRate: 42.18,
                 programExpendituresReportingYear: 2025,
+                hasUnpublishedChanges: true,
             };
 
             expect(mapReportFundsExpendituresSettingsDtoToSettings(dto)).toEqual({
@@ -228,6 +229,7 @@ describe('reports-mapper', () => {
                 disclaimerTitle: 'Disclaimer',
                 exchangeRate: '42,18',
                 programExpendituresReportingYear: 2025,
+                hasUnpublishedChanges: true,
             });
         });
 

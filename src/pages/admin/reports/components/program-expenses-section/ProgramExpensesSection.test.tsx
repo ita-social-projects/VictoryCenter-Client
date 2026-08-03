@@ -14,7 +14,7 @@ const MOCK_PROGRAM_EXPENSES_DATA: ProgramExpensesReadOnlyData = {
         { id: 3, name: 'Program C' },
     ],
     summary: {
-        totalAmountUah: 125000,
+        totalAmountUah: 123750,
         totalAmountUsd: 3000,
     },
     records: [
@@ -24,7 +24,7 @@ const MOCK_PROGRAM_EXPENSES_DATA: ProgramExpensesReadOnlyData = {
             programName: 'Program A',
             type: 'expense',
             reportingYear: '2025',
-            amountUah: '50000',
+            amountUah: '49500',
             amountUsd: '1200',
         },
         {
@@ -33,7 +33,7 @@ const MOCK_PROGRAM_EXPENSES_DATA: ProgramExpensesReadOnlyData = {
             programName: 'Program A',
             type: 'expense',
             reportingYear: '2024',
-            amountUah: '25000',
+            amountUah: '24750',
             amountUsd: '600',
         },
         {
@@ -42,7 +42,7 @@ const MOCK_PROGRAM_EXPENSES_DATA: ProgramExpensesReadOnlyData = {
             programName: 'Program B',
             type: 'expense',
             reportingYear: '2025',
-            amountUah: '50000',
+            amountUah: '49500',
             amountUsd: '1200',
         },
     ],
@@ -73,6 +73,13 @@ jest.mock('@/services/api/admin/reports/program-expenses-api', () => ({
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: () => 'mock-client',
+}));
+
+const mockAddProgramCategory = jest.fn();
+jest.mock('@/services/api/admin/programs/programs-api', () => ({
+    ProgramsCategoriesApi: {
+        addProgramCategory: (...args: unknown[]) => mockAddProgramCategory(...args),
+    },
 }));
 
 jest.mock('@/components/common/select/Select', () => {
@@ -163,7 +170,8 @@ jest.mock('./components/common/add-program-expense-record-modal/AddProgramExpens
         isOpen: boolean;
         exchangeRate: string | null;
         onSubmit: (submitData: {
-            programId: number;
+            programId: number | undefined;
+            programName: string;
             reportingYear: string;
             amountUah: string;
             amountUsd: string;
@@ -180,6 +188,7 @@ jest.mock('./components/common/add-program-expense-record-modal/AddProgramExpens
                         onClick={() =>
                             onSubmit({
                                 programId: recordToEdit ? 3 : 2,
+                                programName: recordToEdit ? 'Program C' : 'Program B',
                                 reportingYear: recordToEdit ? '2027' : '2026',
                                 amountUah: recordToEdit ? '2 000' : '1 000',
                                 amountUsd: recordToEdit ? '50' : '25',
@@ -187,6 +196,20 @@ jest.mock('./components/common/add-program-expense-record-modal/AddProgramExpens
                         }
                     >
                         Submit Modal
+                    </button>
+                    <button
+                        data-testid="mock-submit-new-category-btn"
+                        onClick={() =>
+                            onSubmit({
+                                programId: undefined,
+                                programName: 'New Category',
+                                reportingYear: '2026',
+                                amountUah: '1 000',
+                                amountUsd: '25',
+                            })
+                        }
+                    >
+                        Submit New Category
                     </button>
                 </>
             )}
@@ -403,7 +426,11 @@ describe('ProgramExpensesSection', () => {
         fireEvent.click(screen.getByTestId('program-select-no-records'));
 
         expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.MESSAGE)).toBeInTheDocument();
-        expect(screen.queryByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE })).toBeNull();
+
+        const table = screen.getByTestId('program-expenses-table');
+        expect(
+            within(table).queryByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE }),
+        ).toBeNull();
     });
 
     it('should render program expenses empty state when records are missing', () => {
@@ -417,7 +444,10 @@ describe('ProgramExpensesSection', () => {
 
         expect(screen.getByText(FUNDS_EXPENDITURES_TEXT.TABLE.EMPTY_STATE.TITLE)).toBeInTheDocument();
         expect(screen.getByText(PROGRAM_EXPENSES_TEXT.EMPTY_STATE.ADD_RECORD)).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE })).toBeDisabled();
+
+        const addButtons = screen.getAllByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE });
+        expect(addButtons[0]).toBeEnabled();
+        expect(addButtons[1]).toBeEnabled();
     });
 
     it('should pass fetch handler that calls ProgramExpensesApi.getReadOnlyData with client', async () => {
@@ -438,7 +468,7 @@ describe('ProgramExpensesSection', () => {
     });
 
     it('should render edit mode controls when edit mode is active', () => {
-        render(<ProgramExpensesSection isEditing />);
+        render(<ProgramExpensesSection />);
 
         expect(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE })).toBeEnabled();
         expect(screen.getByRole('checkbox', { name: 'Select all program expense records' })).toBeEnabled();
@@ -446,7 +476,7 @@ describe('ProgramExpensesSection', () => {
     });
 
     it('should display mock exchange rate in edit mode', () => {
-        render(<ProgramExpensesSection isEditing />);
+        render(<ProgramExpensesSection />);
 
         expect(screen.getByText('41.25')).toBeInTheDocument();
         expect(screen.getByTestId('add-program-expense-modal')).toHaveAttribute('data-exchange-rate', '41.25');
@@ -473,13 +503,13 @@ describe('ProgramExpensesSection', () => {
             refetch: mockRefetch,
         };
 
-        render(<ProgramExpensesSection isEditing />);
+        render(<ProgramExpensesSection />);
 
         expect(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE })).toBeDisabled();
     });
 
     it('should open delete confirmation modal when delete icon is clicked', () => {
-        render(<ProgramExpensesSection isEditing />);
+        render(<ProgramExpensesSection />);
 
         fireEvent.click(screen.getByLabelText('Delete record 1'));
 
@@ -488,13 +518,13 @@ describe('ProgramExpensesSection', () => {
     });
 
     it('should not show delete icons when not in edit mode', () => {
-        render(<ProgramExpensesSection />);
+        render(<ProgramExpensesSection isEditing={false} />);
 
         expect(screen.queryByLabelText('Delete record 1')).not.toBeInTheDocument();
     });
 
     it('should close delete modal when Cancel is clicked without calling API', () => {
-        render(<ProgramExpensesSection isEditing />);
+        render(<ProgramExpensesSection />);
 
         fireEvent.click(screen.getByLabelText('Delete record 1'));
         expect(screen.getByTestId('delete-record-modal')).toBeInTheDocument();
@@ -508,7 +538,7 @@ describe('ProgramExpensesSection', () => {
     it('should delete record after confirmation and show success toast', async () => {
         (ProgramExpensesApi.delete as jest.Mock).mockResolvedValueOnce(undefined);
 
-        render(<ProgramExpensesSection isEditing />);
+        render(<ProgramExpensesSection />);
 
         fireEvent.click(screen.getByLabelText('Delete record 1'));
         expect(screen.getByText(PROGRAM_EXPENSES_TEXT.MODAL.DELETE.TITLE)).toBeInTheDocument();
@@ -529,7 +559,7 @@ describe('ProgramExpensesSection', () => {
     it('should show error toast and keep modal open when delete fails', async () => {
         (ProgramExpensesApi.delete as jest.Mock).mockRejectedValueOnce(new Error('delete failed'));
 
-        render(<ProgramExpensesSection isEditing />);
+        render(<ProgramExpensesSection />);
 
         fireEvent.click(screen.getByLabelText('Delete record 1'));
         fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
@@ -553,7 +583,7 @@ describe('ProgramExpensesSection', () => {
                 }),
         );
 
-        render(<ProgramExpensesSection isEditing />);
+        render(<ProgramExpensesSection />);
 
         fireEvent.click(screen.getByLabelText('Delete record 1'));
         fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
@@ -567,7 +597,7 @@ describe('ProgramExpensesSection', () => {
     });
 
     it('should open bulk delete modal when delete selected button is clicked', () => {
-        render(<ProgramExpensesSection isEditing />);
+        render(<ProgramExpensesSection />);
 
         fireEvent.click(screen.getByRole('checkbox', { name: 'Select record 1' }));
         fireEvent.click(screen.getByText(PROGRAM_EXPENSES_TEXT.BULK.DELETE_BUTTON));
@@ -577,7 +607,7 @@ describe('ProgramExpensesSection', () => {
     });
 
     it('should close bulk delete modal and clear selection when cancel is clicked', () => {
-        render(<ProgramExpensesSection isEditing />);
+        render(<ProgramExpensesSection />);
 
         fireEvent.click(screen.getByRole('checkbox', { name: 'Select record 1' }));
         fireEvent.click(screen.getByText(PROGRAM_EXPENSES_TEXT.BULK.DELETE_BUTTON));
@@ -590,7 +620,7 @@ describe('ProgramExpensesSection', () => {
     it('should bulk delete selected records and show success toast', async () => {
         (ProgramExpensesApi.bulkDelete as jest.Mock).mockResolvedValueOnce(undefined);
 
-        render(<ProgramExpensesSection isEditing />);
+        render(<ProgramExpensesSection />);
 
         fireEvent.click(screen.getByRole('checkbox', { name: 'Select record 1' }));
         fireEvent.click(screen.getByText(PROGRAM_EXPENSES_TEXT.BULK.DELETE_BUTTON));
@@ -607,7 +637,7 @@ describe('ProgramExpensesSection', () => {
     it('should show error toast when bulk delete fails', async () => {
         (ProgramExpensesApi.bulkDelete as jest.Mock).mockRejectedValueOnce(new Error('failed'));
 
-        render(<ProgramExpensesSection isEditing />);
+        render(<ProgramExpensesSection />);
 
         fireEvent.click(screen.getByRole('checkbox', { name: 'Select record 1' }));
         fireEvent.click(screen.getByText(PROGRAM_EXPENSES_TEXT.BULK.DELETE_BUTTON));
@@ -623,12 +653,13 @@ describe('ProgramExpensesSection', () => {
         beforeEach(() => {
             mockPost.mockReset();
             mockUpdate.mockReset();
+            mockAddProgramCategory.mockReset();
         });
 
         it('should open modal in add mode, submit, call API.post and refetch', async () => {
             mockPost.mockResolvedValueOnce(undefined);
 
-            render(<ProgramExpensesSection isEditing />);
+            render(<ProgramExpensesSection />);
 
             fireEvent.click(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE }));
 
@@ -644,6 +675,7 @@ describe('ProgramExpensesSection', () => {
                     amountUah: 1000,
                     amountUsd: 25,
                 });
+                expect(mockAddProgramCategory).not.toHaveBeenCalled();
                 expect(mockAddToast).toHaveBeenCalledWith(
                     PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_CREATED_SUCCESSFULLY,
                     'success',
@@ -653,10 +685,52 @@ describe('ProgramExpensesSection', () => {
             });
         });
 
+        it('should create a new program category first when programId is undefined, then post the record', async () => {
+            mockAddProgramCategory.mockResolvedValueOnce({ id: 99, name: 'New Category', programsCount: 0 });
+            mockPost.mockResolvedValueOnce(undefined);
+
+            render(<ProgramExpensesSection />);
+
+            fireEvent.click(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE }));
+            fireEvent.click(screen.getByTestId('mock-submit-new-category-btn'));
+
+            await waitFor(() => {
+                expect(mockAddProgramCategory).toHaveBeenCalledWith({ id: null, name: 'New Category' }, 'mock-client');
+                expect(mockPost).toHaveBeenCalledWith('mock-client', {
+                    reportingYear: 2026,
+                    hippotherapyProgramCategoryId: 99,
+                    amountUah: 1000,
+                    amountUsd: 25,
+                });
+                expect(mockAddToast).toHaveBeenCalledWith(
+                    PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_CREATED_SUCCESSFULLY,
+                    'success',
+                );
+                expect(mockRefetch).toHaveBeenCalled();
+            });
+        });
+
+        it('should show error toast and not call API.post when creating the new category fails', async () => {
+            mockAddProgramCategory.mockRejectedValueOnce(new Error('failed to create category'));
+
+            render(<ProgramExpensesSection />);
+
+            fireEvent.click(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE }));
+            fireEvent.click(screen.getByTestId('mock-submit-new-category-btn'));
+
+            await waitFor(() => {
+                expect(mockPost).not.toHaveBeenCalled();
+                expect(mockAddToast).toHaveBeenCalledWith(
+                    PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_CREATE_FAILED_RETRY,
+                    'error',
+                );
+            });
+        });
+
         it('should start inline row edit mode, select program category, click accept, call API.update and refetch', async () => {
             mockUpdate.mockResolvedValueOnce(undefined);
 
-            render(<ProgramExpensesSection isEditing />);
+            render(<ProgramExpensesSection />);
 
             // Click the edit button on the first record (id: 1)
             fireEvent.click(screen.getByLabelText('Edit record 1'));
@@ -677,7 +751,7 @@ describe('ProgramExpensesSection', () => {
                 expect(mockUpdate).toHaveBeenCalledWith('mock-client', 1, {
                     reportingYear: 2025,
                     hippotherapyProgramCategoryId: 3,
-                    amountUah: 50000,
+                    amountUah: 49500,
                     amountUsd: 1200,
                 });
                 expect(mockAddToast).toHaveBeenCalledWith(REPORTS_TEXT.MESSAGE.RECORD_UPDATED_SUCCESSFULLY, 'success');
@@ -696,7 +770,7 @@ describe('ProgramExpensesSection', () => {
         });
 
         it('should clear bulk selection and hide bulk selection bar when row edit starts', async () => {
-            render(<ProgramExpensesSection isEditing />);
+            render(<ProgramExpensesSection />);
 
             fireEvent.click(screen.getByRole('checkbox', { name: 'Select record 1' }));
             expect(screen.getByText(PROGRAM_EXPENSES_TEXT.BULK.DELETE_BUTTON)).toBeInTheDocument();
@@ -710,6 +784,45 @@ describe('ProgramExpensesSection', () => {
                 expect(screen.getByRole('checkbox', { name: 'Select record 1' })).not.toBeChecked();
                 expect(screen.getByRole('checkbox', { name: 'Select record 1' })).toBeDisabled();
             });
+        });
+    });
+
+    it('should show error toast if inline record update fails (catch branch)', async () => {
+        jest.spyOn(ProgramExpensesApi, 'update').mockRejectedValueOnce(new Error('Network error'));
+
+        render(<ProgramExpensesSection />);
+
+        fireEvent.click(screen.getByLabelText('Edit record 1'));
+
+        fireEvent.click(screen.getByTestId('select-option-Program C-3'));
+
+        const uahInput = screen.getByLabelText('Amount UAH record 1');
+        fireEvent.change(uahInput, { target: { value: '99999' } });
+
+        fireEvent.click(screen.getByLabelText('Accept record 1'));
+
+        await waitFor(() => {
+            expect(mockAddToast).toHaveBeenCalledWith(
+                REPORTS_TEXT.MESSAGE.RECORD_UPDATE_FAILED_RETRY,
+                expect.anything(),
+            );
+        });
+    });
+
+    it('should show error toast if adding a new program expense fails (catch branch)', async () => {
+        jest.spyOn(ProgramExpensesApi, 'post').mockRejectedValueOnce(new Error('API failed'));
+
+        render(<ProgramExpensesSection />);
+
+        fireEvent.click(screen.getByRole('button', { name: PROGRAM_EXPENSES_TEXT.BUTTON.ADD_PROGRAM_EXPENSE }));
+
+        fireEvent.click(screen.getByTestId('mock-submit-btn'));
+
+        await waitFor(() => {
+            expect(mockAddToast).toHaveBeenCalledWith(
+                PROGRAM_EXPENSES_TEXT.MESSAGE.RECORD_CREATE_FAILED_RETRY,
+                expect.anything(),
+            );
         });
     });
 });

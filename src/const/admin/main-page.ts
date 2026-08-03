@@ -148,6 +148,10 @@ export const MAIN_PAGE_VALIDATION = {
             getMinError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(2),
             getMaxError: () => COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(20),
         },
+        value: {
+            ONLY_NUMBERS: 'Лише цифри',
+            ONLY_POSITIVE: 'Лише позитивні значення',
+        },
     },
 
     raisedFunds: {

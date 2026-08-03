@@ -67,10 +67,16 @@ jest.mock('@/components/admin/admin-panel-toolbar/AdminPageToolbar', () => ({
         fetchSearchItems,
     }: AdminPanelToolbarProps<any>) => (
         <div data-testid="programs-toolbar">
-            <button data-testid="select-program" onClick={() => onSuggestionSelect(1)}>
+            <button
+                data-testid="select-program"
+                onClick={() => onSuggestionSelect(1, { id: 1, name: 'Alpha', categories: ['Category A'] })}
+            >
                 Select Program
             </button>
-            <button data-testid="select-program-string" onClick={() => onSuggestionSelect('1')}>
+            <button
+                data-testid="select-program-string"
+                onClick={() => onSuggestionSelect('1', { id: 1, name: 'Alpha', categories: ['Category A'] })}
+            >
                 Select Program String
             </button>
             <button
@@ -97,7 +103,13 @@ jest.mock('@/components/admin/admin-panel-toolbar/AdminPageToolbar', () => ({
 }));
 
 jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
-    CategoryBar: ({ categories, selectedCategory, onCategorySelect, onContextMenuOptionSelected }: any) => (
+    CategoryBar: ({
+        categories,
+        selectedCategory,
+        onCategorySelect,
+        onContextMenuOptionSelected,
+        renderCategoryExtra,
+    }: any) => (
         <div data-testid="category-bar">
             {categories.map((cat: any) => (
                 <button
@@ -107,6 +119,7 @@ jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
                     disabled={selectedCategory?.id === cat.id}
                 >
                     {cat.name}
+                    {renderCategoryExtra?.(cat)}
                 </button>
             ))}
             <button data-testid="ctx-add" onClick={() => onContextMenuOptionSelected?.('add')}>
@@ -1023,6 +1036,34 @@ describe('ProgramsPageContent', () => {
 
         await waitFor(() => {
             expect(screen.getByText('Category A Updated')).toBeInTheDocument();
+        });
+    });
+
+    it('switches category tab to the one assigned to selected search result', async () => {
+        await renderAndWaitForCategoryBar();
+
+        await waitFor(() => {
+            expect(screen.getByTestId('category-1')).toBeDisabled();
+            expect(screen.getByTestId('category-2')).not.toBeDisabled();
+        });
+
+        fireEvent.click(screen.getByTestId('category-2'));
+        await waitFor(() => expect(screen.getByTestId('category-2')).toBeDisabled());
+
+        fireEvent.click(screen.getByTestId('select-program'));
+
+        await waitFor(() => {
+            expect(screen.getByTestId('category-1')).toBeDisabled();
+            expect(screen.getByTestId('category-2')).not.toBeDisabled();
+        });
+    });
+
+    it('renders localization statuses indicator for category tabs via renderCategoryExtra', async () => {
+        await renderAndWaitForCategoryBar();
+
+        await waitFor(() => {
+            const statuses = screen.getAllByTestId('localization-statuses');
+            expect(statuses.length).toBeGreaterThan(0);
         });
     });
 });

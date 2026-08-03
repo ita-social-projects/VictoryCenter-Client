@@ -5,7 +5,7 @@ export const PROGRAMS_TEXT = {
         ADD_PROGRAM: 'Додати програму',
     },
     PLACEHOLDER: {
-        SEARCH_PROGRAMS: 'Шукати програми...',
+        SEARCH_PROGRAMS: 'Введіть назву',
         INSERT_PROGRAM_NAME: 'Введіть назву програми',
         INSERT_PROGRAM_LOCATION: 'Введіть місце проведення',
         INSERT_PROGRAM_PARTICIPANTS_COUNT: 'Введіть кількість учасників',
@@ -113,9 +113,9 @@ export const PROGRAM_VALIDATION = {
 
 export const PROGRAM_CATEGORY_VALIDATION = {
     name: {
-        min: 5,
+        min: 2,
         max: 20,
-        getRequiredError: () => "Назва обов'язкова",
+        getRequiredError: () => "Поле обов'язкове",
         getCategoryWithThisNameAlreadyExistsError: () =>
             COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.ALREADY_CONTAIN_CATEGORY_WITH_NAME,
     },

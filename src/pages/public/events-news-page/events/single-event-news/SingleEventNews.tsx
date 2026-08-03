@@ -1,5 +1,6 @@
 import React, { memo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { ReactComponent as ArrowIcon } from '@/assets/icons/arrow-up-right.svg';
 import { EventsNews } from '@/types/public/events-news';
 import styles from './SingleEventNews.module.scss';
@@ -7,11 +8,27 @@ import { PUBLIC_ROUTES } from '@/const/public/routes';
 import { Button } from '@/components/public/ui/button/Button';
 
 export const SingleEventNews = memo(
-    ({ title = '', date = '', tags = [], description = '', resource = '', imageURL = '' }: EventsNews) => {
+    ({
+        name = '',
+        date = '',
+        tags = [],
+        description = '',
+        resource = '',
+        previewImage = '',
+        slug = '',
+    }: EventsNews) => {
         const { t } = useTranslation('eventsNewsPage');
+        const navigate = useNavigate();
+
+        const handleClick = () => {
+            if (slug) {
+                navigate(PUBLIC_ROUTES.EVENTS_NEWS_DETAIL.getPath(slug));
+            }
+        };
+
         return (
             <div className={styles['event-card']}>
-                <img src={imageURL} alt="Event" className={styles['event-image']} />
+                <img src={previewImage as string} alt="Event" className={styles['event-image']} />
                 <div className={styles['event-header']}>
                     {tags &&
                         tags.map((tag) => (
@@ -25,15 +42,10 @@ export const SingleEventNews = memo(
                     </span>
                 </div>
 
-                <h4 className={styles['event-title']}>{title}</h4>
+                <h4 className={styles['event-title']}>{name}</h4>
                 <p className={styles['event-description']}>{description}</p>
                 <div>
-                    <Button
-                        href={PUBLIC_ROUTES.EVENTS_AND_NEWS.FULL}
-                        icon={ArrowIcon}
-                        iconPosition="right"
-                        variant="tertiary"
-                    >
+                    <Button onClick={handleClick} icon={ArrowIcon} iconPosition="right" variant="tertiary">
                         {t('LINK_TO_ARTICLE')}
                     </Button>
                 </div>

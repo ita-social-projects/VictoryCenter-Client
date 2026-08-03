@@ -1,9 +1,11 @@
-import { fetchProgramBySlug } from '@/services/api/public/programs/programs-api';
-import { DetailedProgramDto } from '@/types/public/programs-page';
 import { useEffect, useState } from 'react';
 
-export const useProgramBySlug = (slug?: string) => {
-    const [program, setProgram] = useState<DetailedProgramDto | null>(null);
+interface fetchFunction<Program> {
+    (slug: string): Promise<Program>;
+}
+
+export const useProgramBySlug = <Program>(fetchFunc: fetchFunction<Program>, slug?: string) => {
+    const [program, setProgram] = useState<Program | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
 
@@ -19,7 +21,7 @@ export const useProgramBySlug = (slug?: string) => {
         const fetchProgram = async () => {
             try {
                 setIsLoading(true);
-                const data = await fetchProgramBySlug(slug);
+                const data = await fetchFunc(slug);
                 if (isMounted) {
                     setProgram(data);
                     setError(null);
@@ -40,7 +42,7 @@ export const useProgramBySlug = (slug?: string) => {
         return () => {
             isMounted = false;
         };
-    }, [slug]);
+    }, [fetchFunc, slug]);
 
     return { program, isLoading, error };
 };

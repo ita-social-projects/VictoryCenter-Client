@@ -29,12 +29,18 @@
 .template {
     height: 100%;
     width: 100%;
-    padding: clamp(48px, 6vh, 84px) 0;
+    padding: 48px 0;
     padding-left: 30px;
 
-    --pair-card-width: 400px;
-    --pair-card-height: 240px;
+    --pair-card-width: 270px;
+    --pair-card-height: 162px;
 
+    --card-padding: 24px;
+    --card-radius: 15px;
+    --desc-font-size: 14px;
+    --desc-line-height: 18px;
+    --auth-font-size: 15px;
+    --auth-line-height: 18px;
     --peek: 0.35;
 }
 
@@ -115,6 +121,18 @@
     :global(svg) {
         width: 12px;
         height: 12px;
+    }
+
+    &:not([disabled]):hover {
+        background-color: c.$yellow-500;
+
+        .add-card-text {
+            color: black;
+        }
+
+        .add-card-icon :global(path) {
+            stroke: black !important;
+        }
     }
 }
 

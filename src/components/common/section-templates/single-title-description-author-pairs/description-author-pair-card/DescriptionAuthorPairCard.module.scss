@@ -1,16 +1,15 @@
 @use '@/assets/sass/variables/colors' as c;
 @use '@/assets/sass/variables/typography' as t;
 
-$radius: 20px;
 $field-width: 366px;
 
 .card {
     width: var(--pair-card-width, 432px);
-    height: var(--pair-card-height, 259px);
+    min-height: var(--pair-card-height, 259px);
     background-color: c.$light-blue-50;
-    border-radius: $radius;
+    border-radius: var(--card-radius, 20px);
     box-sizing: border-box;
-    padding: 32px;
+    padding: var(--card-padding, 32px);
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -25,8 +24,8 @@ $field-width: 366px;
 .description {
     font-family: t.$font-family-base;
     font-weight: t.$fw-medium;
-    font-size: 18px;
-    line-height: 24px;
+    font-size: var(--desc-font-size, 18px);
+    line-height: var(--desc-line-height, 24px);
     color: c.$blue-900;
     display: -webkit-box;
     -webkit-line-clamp: 4;
@@ -38,8 +37,8 @@ $field-width: 366px;
     margin-top: auto;
     font-family: t.$font-family-base;
     font-weight: t.$fw-bold;
-    font-size: 20px;
-    line-height: 24px;
+    font-size: var(--auth-font-size, 20px);
+    line-height: var(--auth-line-height, 24px);
     color: c.$blue-900;
 }
 
@@ -68,7 +67,6 @@ $field-width: 366px;
     display: flex;
     flex-direction: column;
     gap: 18px;
-    height: 100%;
 }
 
 .description-field,
@@ -110,6 +108,8 @@ $field-width: 366px;
     }
 
     :global(.char-limit-textarea__field) {
+        box-sizing: border-box;
+        width: 100%;
         font-family: t.$font-family-base;
         font-weight: t.$fw-bold;
         font-size: 20px;

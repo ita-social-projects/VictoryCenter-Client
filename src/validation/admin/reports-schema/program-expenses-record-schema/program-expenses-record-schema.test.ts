@@ -1,6 +1,7 @@
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
 import { ProgramExpensesRecord } from '@/types/admin/reports';
+import { PROGRAM_CATEGORY_VALIDATION_FUNCTIONS } from '@/validation/admin/program-category-schema/program-category-schema';
 import { validateProgramExpenseProgram } from './program-expenses-record-schema';
 
 describe('PROGRAM_EXPENSES_RECORD_VALIDATION_FUNCTIONS', () => {
@@ -68,5 +69,36 @@ describe('PROGRAM_EXPENSES_RECORD_VALIDATION_FUNCTIONS', () => {
                 records,
             }),
         ).toBeUndefined();
+    });
+
+    it('validates a custom (not yet existing) category name using category name rules', () => {
+        expect(
+            validateProgramExpenseProgram({
+                recordId: 0,
+                programId: undefined,
+                programName: 'ab',
+                records,
+            }),
+        ).toBe(PROGRAM_CATEGORY_VALIDATION_FUNCTIONS.validateName('ab'));
+        expect(
+            validateProgramExpenseProgram({
+                recordId: 0,
+                programId: undefined,
+                programName: 'New Category',
+                records,
+            }),
+        ).toBeUndefined();
+    });
+
+    it('treats whitespace-only custom category name as empty', () => {
+        expect(
+            validateProgramExpenseProgram({
+                recordId: 0,
+                programId: undefined,
+                programName: '   ',
+                records,
+                trigger: 'blur',
+            }),
+        ).toBe(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.FIELD_REQUIRED);
     });
 });

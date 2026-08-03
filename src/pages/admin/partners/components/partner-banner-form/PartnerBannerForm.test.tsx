@@ -75,13 +75,14 @@ jest.mock('@/components/admin/input-groups/input-with-character-limit-group/Inpu
 }));
 
 jest.mock('@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup', () => ({
-    RichTextInputGroup: ({ label, value, onChange, onBlur, disabled, id, error }: any) => (
+    RichTextInputGroup: ({ label, value, onChange, onBlur, disabled, id, error, trimOnBlur }: any) => (
         <div>
             <label htmlFor={id}>{label}</label>
             <div
                 id={id}
                 contentEditable={!disabled}
                 data-testid={`${id}-rich-text`}
+                data-trimonblur={trimOnBlur ? 'true' : 'false'}
                 onInput={(e) => {
                     const target = e.target as HTMLElement;
                     onChange(target.innerHTML);
@@ -718,5 +719,11 @@ describe('PartnerBanner', () => {
 
         expect(getErrorMessage()).toBeInTheDocument();
         expect(mockedPartnersApi.updateBanner).not.toHaveBeenCalled();
+    });
+
+    it('passes trimOnBlur={true} to RichTextInputGroup for the title field', () => {
+        render(<PartnerBanner />);
+        const titleInput = getTitleInput();
+        expect(titleInput).toHaveAttribute('data-trimonblur', 'true');
     });
 });

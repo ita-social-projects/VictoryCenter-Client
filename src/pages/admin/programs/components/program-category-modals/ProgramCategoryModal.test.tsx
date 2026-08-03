@@ -191,7 +191,7 @@ describe('ProgramCategoryModal - Add Mode', () => {
     it('prevents submit when validation errors exist (e.g., too short)', () => {
         renderModal();
 
-        typeName('Abc');
+        typeName('A');
         fireEvent.click(getSaveButton());
 
         // Save does not proceed due to validation, API should not be called

@@ -12,6 +12,7 @@ import { AxiosInstance } from 'axios';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
 import { ImageApi } from '@/services/api/admin/image/image-api';
 import { TranslationStatusFilter } from '@/types/common/language';
+import { mapProgramCategoryDtoToModel } from '@/utils/functions/mappers/admin/programs/programs-mappers';
 
 const convertProgramToSuggestion = (program: HippotherapyProgramDto): ProgramSearchItemData => {
     return {
@@ -49,13 +50,8 @@ const mapProgramEditToProgram = async (
 
 export const ProgramsCategoriesApi = {
     fetchProgramCategories: async (client: AxiosInstance): Promise<ProgramCategory[]> => {
-        const response = await client.get<ProgramCategory[]>(API_ROUTES.PROGRAMCATEGORY.BASE);
-        return response.data.map((category: any) => {
-            return {
-                ...category,
-                programsCount: category.programs.length,
-            };
-        });
+        const response = await client.get<any[]>(API_ROUTES.PROGRAMCATEGORY.BASE);
+        return response.data.map(mapProgramCategoryDtoToModel);
     },
 
     addProgramCategory: async (

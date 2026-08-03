@@ -3,6 +3,7 @@ import { Button } from '@/components/admin/button/Button';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import { FUNDS_EXPENDITURES_TEXT, PROGRAM_EXPENSES_TEXT } from '@/const/admin/reports';
 import { ProgramExpensesProgram } from '@/types/admin/reports';
+import cn from 'classnames';
 import styles from './ProgramExpensesToolbar.module.scss';
 
 interface ProgramExpensesToolbarProps {
@@ -61,7 +62,11 @@ export const ProgramExpensesToolbar = ({
 
     return (
         <div className={styles['toolbar-row']}>
-            <div className={styles['program-select']}>
+            <div
+                className={cn(styles['program-select'], {
+                    [styles['program-select-disabled']]: disabled,
+                })}
+            >
                 <MultiSelectInput<ProgramExpensesProgram>
                     id="program-expenses-program-filter"
                     options={programOptions}

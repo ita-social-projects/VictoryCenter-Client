@@ -1,4 +1,4 @@
-import { mapHippotherapyProgramDtoToModel } from './programs-mappers';
+import { mapHippotherapyProgramDtoToModel, mapProgramCategoryDtoToModel } from './programs-mappers';
 import { VisibilityStatus } from '@/types/admin/common';
 import { HippotherapyProgramDto } from '@/types/admin/programs';
 import { TranslationStatus } from '@/types/common/language';
@@ -61,5 +61,55 @@ describe('mapHippotherapyProgramDtoToModel', () => {
         const dto = createMockDto({ localizations: [] });
         const result = mapHippotherapyProgramDtoToModel(dto);
         expect(result.localizations).toEqual([]);
+    });
+});
+
+describe('mapProgramCategoryDtoToModel', () => {
+    it('maps category DTO localizations with localizationInfoDto to language', () => {
+        const categoryDto = {
+            id: 1,
+            name: 'Rehabilitation',
+            programs: [{}, {}],
+            localizations: [
+                {
+                    localizationInfoDto: { id: 2, code: 'en' },
+                    translationStatus: TranslationStatus.Relevant,
+                },
+            ],
+        };
+
+        const result = mapProgramCategoryDtoToModel(categoryDto);
+
+        expect(result).toEqual({
+            id: 1,
+            name: 'Rehabilitation',
+            programsCount: 2,
+            localizations: [
+                {
+                    language: { id: 2, code: 'en' },
+                    translationStatus: TranslationStatus.Relevant,
+                },
+            ],
+            translationStatuses: undefined,
+        });
+    });
+
+    it('preserves existing language property if already mapped', () => {
+        const categoryDto = {
+            id: 2,
+            name: 'Therapy',
+            programsCount: 4,
+            localizations: [
+                {
+                    language: { id: 2, code: 'en' },
+                    translationStatus: TranslationStatus.Outdated,
+                },
+            ],
+        };
+
+        const result = mapProgramCategoryDtoToModel(categoryDto);
+
+        expect(result.programsCount).toBe(4);
+        expect(result.localizations?.[0].language).toEqual({ id: 2, code: 'en' });
     });
 });

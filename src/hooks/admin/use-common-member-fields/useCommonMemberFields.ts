@@ -26,9 +26,14 @@ export const useCommonMemberFields = <T extends CommonFormState, E extends Commo
 }: UseCommonMemberFieldsParams<T, E>) => {
     const handleFullNameChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
-            setFormState((prev) => ({ ...prev, fullName: e.target.value }));
+            const value = e.target.value;
+            setFormState((prev) => ({ ...prev, fullName: value }));
+            setErrors((prev) => ({
+                ...prev,
+                fullName: TEAM_MEMBER_VALIDATION_FUNCTIONS.validateFullName(value, false),
+            }));
         },
-        [setFormState],
+        [setFormState, setErrors],
     );
 
     const handleFullNameBlur = useCallback(() => {
@@ -40,9 +45,14 @@ export const useCommonMemberFields = <T extends CommonFormState, E extends Commo
 
     const handleDescriptionChange = useCallback(
         (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-            setFormState((prev) => ({ ...prev, description: e.target.value }));
+            const value = e.target.value;
+            setFormState((prev) => ({ ...prev, description: value }));
+            setErrors((prev) => ({
+                ...prev,
+                description: TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription(value, false),
+            }));
         },
-        [setFormState],
+        [setFormState, setErrors],
     );
 
     const handleDescriptionBlur = useCallback(() => {

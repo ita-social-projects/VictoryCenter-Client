@@ -1,8 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
-import cn from 'classnames';
 import { FUNDS_EXPENDITURES_TEXT, FUNDS_EXPENDITURES_VALIDATION } from '@/const/admin/reports';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { InputWithCharacterLimit } from '@/components/admin/input-with-character-limit/InputWithCharacterLimit';
+import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { Select } from '@/components/common/select/Select';
 import { Modal } from '@/components/common/modal/Modal';
 import { Button } from '@/components/admin/button/Button';
@@ -11,18 +10,6 @@ import { ReportFundsExpendituresCategory } from '@/types/admin/reports';
 import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
 import { validateFundsExpendituresCategoryName } from '@/validation/admin/reports-schema/funds-expenditures-category-schema/funds-expenditures-category-schema';
 import styles from './EditFundsExpendituresCategoryModal.module.scss';
-
-const renderInputWithError = (
-    input: React.ReactNode,
-    error?: string,
-    inputErrorClass?: string,
-    errorClass?: string,
-) => (
-    <>
-        <div className={cn({ [inputErrorClass || '']: Boolean(error) })}>{input}</div>
-        <p className={cn(errorClass, { [styles.errorHidden]: !error })}>{error ?? ' '}</p>
-    </>
-);
 
 interface EditFundsExpendituresCategoryModalProps {
     isOpen: boolean;
@@ -172,30 +159,23 @@ export const EditFundsExpendituresCategoryModal = ({
                                 </div>
 
                                 <div className={styles.field}>
-                                    <label className={styles.label}>
-                                        <span className={styles.required}>*</span>
-                                        {FUNDS_EXPENDITURES_TEXT.MODAL.EDIT_CATEGORY.NAME_LABEL}
-                                    </label>
-                                    {renderInputWithError(
-                                        <InputWithCharacterLimit
-                                            id="edit-category-name"
-                                            name="editCategoryName"
-                                            value={name}
-                                            onChange={(e) => setName(e.target.value)}
-                                            onBlur={handleNameBlur}
-                                            maxLength={FUNDS_EXPENDITURES_VALIDATION.categoryNameMax}
-                                            maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
-                                                FUNDS_EXPENDITURES_VALIDATION.categoryNameMax,
-                                            )}
-                                            placeholder={FUNDS_EXPENDITURES_TEXT.MODAL.EDIT_CATEGORY.NAME_PLACEHOLDER}
-                                            showCounter={true}
-                                            hasError={Boolean(nameError)}
-                                            className={styles.input}
-                                        />,
-                                        nameError,
-                                        styles.inputError,
-                                        styles.error,
-                                    )}
+                                    <InputWithCharacterLimitGroup
+                                        label={FUNDS_EXPENDITURES_TEXT.MODAL.EDIT_CATEGORY.NAME_LABEL}
+                                        isRequired={true}
+                                        id="edit-category-name"
+                                        name="editCategoryName"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        onBlur={handleNameBlur}
+                                        maxLength={FUNDS_EXPENDITURES_VALIDATION.categoryNameMax}
+                                        maxLimitWarning={COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(
+                                            FUNDS_EXPENDITURES_VALIDATION.categoryNameMax,
+                                        )}
+                                        placeholder={FUNDS_EXPENDITURES_TEXT.MODAL.EDIT_CATEGORY.NAME_PLACEHOLDER}
+                                        error={nameError}
+                                        showCounterBelow={true}
+                                        className={styles.input}
+                                    />
                                 </div>
                             </div>
                         </div>

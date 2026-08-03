@@ -12,11 +12,45 @@ jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider', () => 
 const mockAddToast = jest.fn();
 const mockedUseToast = useToast as jest.MockedFunction<typeof useToast>;
 
+jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
+    useAdminClient: () => ({ adminClient: {} }),
+}));
+
 jest.mock('@/services/api/public/localization/languages/languages-api', () => ({
     localizationLanguagesDataFetch: jest.fn(),
 }));
 
 const mockLocalizationLanguagesDataFetch = localizationLanguagesDataFetch as jest.Mock;
+
+const mockPublishRecords = jest.fn();
+const mockGetSettings = jest.fn();
+const mockCancelRecords = jest.fn();
+jest.mock('@/services/api/admin/reports/funds-expenditures-api', () => ({
+    FundsExpendituresApi: {
+        publishRecords: (...args: unknown[]) => mockPublishRecords(...args),
+        getSettings: (...args: unknown[]) => mockGetSettings(...args),
+        cancelRecords: (...args: unknown[]) => mockCancelRecords(...args),
+    },
+}));
+
+jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
+    ConfirmationModal: ({ isOpen, onConfirm, onCancel, onClose, title }: any) => {
+        const idSuffix = title === 'Опублікувати зміни?' ? 'publish' : 'cancel';
+        return (
+            <div data-testid={`confirmation-modal-${idSuffix}`} data-open={String(isOpen)}>
+                <button type="button" data-testid={`confirm-modal-${idSuffix}`} onClick={onConfirm}>
+                    Confirm
+                </button>
+                <button type="button" data-testid={`cancel-modal-${idSuffix}`} onClick={onCancel}>
+                    Cancel
+                </button>
+                <button type="button" data-testid={`close-modal-${idSuffix}`} onClick={onClose}>
+                    Close
+                </button>
+            </div>
+        );
+    },
+}));
 
 jest.mock('../pdf-files-section/PdfFilesSection', () => ({
     PdfFilesSection: () => <div data-testid="pdf-files-section">PdfFilesSection</div>,
@@ -24,7 +58,7 @@ jest.mock('../pdf-files-section/PdfFilesSection', () => ({
 
 jest.mock('../funds-expenditures-section/FundsExpendituresSection', () => ({
     FundsExpenditureSection: ({
-        initialIsEditing,
+        isEditing,
         draftExchangeRate,
         onEditModeChange,
         onExchangeRateValueChange,
@@ -35,8 +69,12 @@ jest.mock('../funds-expenditures-section/FundsExpendituresSection', () => ({
         isDeleteCategoryModalOpen,
         onDeleteCategoryModalClose,
         onCategoriesLoaded,
+        onValidationChange,
+        onCountsChange,
+        onDataChange,
+        registerSaveCallback,
     }: {
-        initialIsEditing?: boolean;
+        isEditing?: boolean;
         draftExchangeRate?: string | null;
         onEditModeChange?: (isEditing: boolean) => void;
         onExchangeRateValueChange?: (exchangeRate: string | null) => void;
@@ -47,10 +85,14 @@ jest.mock('../funds-expenditures-section/FundsExpendituresSection', () => ({
         isDeleteCategoryModalOpen?: boolean;
         onDeleteCategoryModalClose?: () => void;
         onCategoriesLoaded?: (cats: any[]) => void;
+        onValidationChange?: (valid: boolean) => void;
+        onCountsChange?: (counts: any) => void;
+        onDataChange?: () => void;
+        registerSaveCallback?: (cb: () => Promise<boolean>) => void;
     }) => (
         <div
             data-testid="funds-expenditure-section"
-            data-initial-editing={String(initialIsEditing)}
+            data-is-editing={String(isEditing)}
             data-draft-exchange-rate={draftExchangeRate ?? ''}
             data-category-modal-open={String(isAddCategoryModalOpen ?? false)}
             data-edit-category-modal-open={String(isEditCategoryModalOpen ?? false)}
@@ -97,6 +139,27 @@ jest.mock('../funds-expenditures-section/FundsExpendituresSection', () => ({
             >
                 Load categories
             </button>
+            <button
+                type="button"
+                data-testid="trigger-funds-data"
+                onClick={() => {
+                    onValidationChange?.(true);
+                    onCountsChange?.({ income: 2, expense: 2 });
+                    onDataChange?.();
+                    registerSaveCallback?.(async () => true);
+                }}
+            >
+                Set Valid Funds Data
+            </button>
+            <button
+                type="button"
+                data-testid="trigger-funds-save-fail"
+                onClick={() => {
+                    registerSaveCallback?.(async () => false);
+                }}
+            >
+                Set Fail Save
+            </button>
         </div>
     ),
 }));
@@ -133,17 +196,29 @@ jest.mock(
 );
 
 jest.mock('../program-expenses-section/ProgramExpensesSection', () => ({
-    ProgramExpensesSection: ({ isEditing = false }: { isEditing?: boolean }) => (
-        <div data-testid="program-expenses-section" data-editing={String(isEditing)}>
+    ProgramExpensesSection: ({ onCountsChange, onDataChange }: any) => (
+        <div data-testid="program-expenses-section">
             ProgramExpensesSection
+            <button
+                type="button"
+                data-testid="trigger-program-data"
+                onClick={() => {
+                    onCountsChange?.(1);
+                    onDataChange?.();
+                }}
+            >
+                Set Program Data
+            </button>
         </div>
     ),
 }));
 
 describe('ReportAnalytics', () => {
     beforeEach(() => {
+        jest.clearAllMocks();
         mockLocalizationLanguagesDataFetch.mockResolvedValue([]);
         mockedUseToast.mockReturnValue({ addToast: mockAddToast } as any);
+        mockGetSettings.mockResolvedValue({ hasUnpublishedChanges: false });
     });
 
     it('should render the component with correct title', () => {
@@ -194,15 +269,6 @@ describe('ReportAnalytics', () => {
         expect(screen.queryByTestId('pdf-files-section')).not.toBeInTheDocument();
     });
 
-    it('sets program expenses section to editing mode when funds edit is activated', () => {
-        render(<ReportAnalytics />);
-
-        fireEvent.click(screen.getByTestId('activate-funds-edit'));
-        fireEvent.click(screen.getByText(REPORTS_TEXT.REPORT_AND_ANALYTICS.TAB.PROGRAM_EXPENSES));
-
-        expect(screen.getByTestId('program-expenses-section')).toHaveAttribute('data-editing', 'true');
-    });
-
     it('should restore funds edit mode after returning from another tab', () => {
         render(<ReportAnalytics />);
 
@@ -210,7 +276,7 @@ describe('ReportAnalytics', () => {
         fireEvent.click(screen.getByText(REPORTS_TEXT.REPORT_AND_ANALYTICS.TAB.PROGRAM_EXPENSES));
         fireEvent.click(screen.getByText(REPORTS_TEXT.REPORT_AND_ANALYTICS.TAB.INCOME_EXPENSES));
 
-        expect(screen.getByTestId('funds-expenditure-section')).toHaveAttribute('data-initial-editing', 'true');
+        expect(screen.getByTestId('funds-expenditure-section')).toHaveAttribute('data-is-editing', 'true');
     });
 
     it('should restore funds exchange rate draft after returning from another tab', () => {
@@ -360,6 +426,147 @@ describe('ReportAnalytics', () => {
 
             expect(screen.getByTestId('translate-modal-categories-count')).toHaveTextContent('1');
             expect(mockAddToast).toHaveBeenCalled();
+        });
+    });
+
+    describe('Publish functionality', () => {
+        it('should enable publish button when data is valid and changes exist', () => {
+            render(<ReportAnalytics />);
+            fireEvent.click(screen.getByTestId('activate-funds-edit'));
+
+            fireEvent.click(screen.getByTestId('trigger-funds-data'));
+            fireEvent.click(screen.getByTestId('trigger-program-data'));
+
+            const publishButton = screen.getByText('Опублікувати');
+            expect(publishButton).not.toBeDisabled();
+        });
+
+        it('should open publish modal on publish click', () => {
+            render(<ReportAnalytics />);
+            fireEvent.click(screen.getByTestId('activate-funds-edit'));
+            fireEvent.click(screen.getByTestId('trigger-funds-data'));
+            fireEvent.click(screen.getByTestId('trigger-program-data'));
+
+            fireEvent.click(screen.getByText('Опублікувати'));
+            expect(screen.getByTestId('confirmation-modal-publish')).toHaveAttribute('data-open', 'true');
+        });
+
+        it('should handle publish confirm successfully', async () => {
+            mockPublishRecords.mockResolvedValueOnce({});
+            render(<ReportAnalytics />);
+            fireEvent.click(screen.getByTestId('activate-funds-edit'));
+            fireEvent.click(screen.getByTestId('trigger-funds-data'));
+            fireEvent.click(screen.getByTestId('trigger-program-data'));
+
+            fireEvent.click(screen.getByText('Опублікувати'));
+            fireEvent.click(screen.getByTestId('confirm-modal-publish'));
+
+            await waitFor(() => {
+                expect(mockPublishRecords).toHaveBeenCalled();
+                expect(mockAddToast).toHaveBeenCalledWith('Зміни успішно опубліковано', 'success', 3000);
+            });
+            expect(screen.queryByText('Опублікувати')).not.toBeInTheDocument(); // should exit edit mode
+        });
+
+        it('should handle publish save settings failure', async () => {
+            render(<ReportAnalytics />);
+            fireEvent.click(screen.getByTestId('activate-funds-edit'));
+            fireEvent.click(screen.getByTestId('trigger-funds-data'));
+            fireEvent.click(screen.getByTestId('trigger-funds-save-fail'));
+            fireEvent.click(screen.getByTestId('trigger-program-data'));
+
+            fireEvent.click(screen.getByText('Опублікувати'));
+            fireEvent.click(screen.getByTestId('confirm-modal-publish'));
+
+            await waitFor(() => {
+                expect(mockPublishRecords).not.toHaveBeenCalled();
+            });
+        });
+
+        it('should handle publish records API error', async () => {
+            mockPublishRecords.mockRejectedValueOnce(new Error('fail'));
+            render(<ReportAnalytics />);
+            fireEvent.click(screen.getByTestId('activate-funds-edit'));
+            fireEvent.click(screen.getByTestId('trigger-funds-data'));
+            fireEvent.click(screen.getByTestId('trigger-program-data'));
+
+            fireEvent.click(screen.getByText('Опублікувати'));
+            fireEvent.click(screen.getByTestId('confirm-modal-publish'));
+
+            await waitFor(() => {
+                expect(mockAddToast).toHaveBeenCalledWith(REPORTS_TEXT.MESSAGE.FAIL_TO_UPDATE_REPORT, 'error');
+            });
+        });
+
+        it('should close publish modal when cancelled', () => {
+            render(<ReportAnalytics />);
+            fireEvent.click(screen.getByTestId('activate-funds-edit'));
+            fireEvent.click(screen.getByTestId('trigger-funds-data'));
+            fireEvent.click(screen.getByTestId('trigger-program-data'));
+
+            fireEvent.click(screen.getByText('Опублікувати'));
+            fireEvent.click(screen.getByTestId('cancel-modal-publish'));
+
+            expect(screen.getByTestId('confirmation-modal-publish')).toHaveAttribute('data-open', 'false');
+        });
+
+        it('should close publish modal when close is clicked', () => {
+            render(<ReportAnalytics />);
+            fireEvent.click(screen.getByTestId('activate-funds-edit'));
+            fireEvent.click(screen.getByTestId('trigger-funds-data'));
+            fireEvent.click(screen.getByTestId('trigger-program-data'));
+
+            fireEvent.click(screen.getByText('Опублікувати'));
+            fireEvent.click(screen.getByTestId('close-modal-publish'));
+
+            expect(screen.getByTestId('confirmation-modal-publish')).toHaveAttribute('data-open', 'false');
+        });
+    });
+
+    describe('Cancel functionality', () => {
+        it('should open cancel modal when Cancel is clicked', () => {
+            render(<ReportAnalytics />);
+            fireEvent.click(screen.getByTestId('activate-funds-edit'));
+            expect(screen.getByText('Опублікувати')).toBeInTheDocument();
+
+            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL));
+            expect(screen.getByTestId('confirmation-modal-cancel')).toHaveAttribute('data-open', 'true');
+        });
+
+        it('should close cancel modal when NO is clicked', () => {
+            render(<ReportAnalytics />);
+            fireEvent.click(screen.getByTestId('activate-funds-edit'));
+            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL));
+
+            fireEvent.click(screen.getByTestId('cancel-modal-cancel'));
+            expect(screen.getByTestId('confirmation-modal-cancel')).toHaveAttribute('data-open', 'false');
+        });
+
+        it('should cancel records and exit edit mode when YES is clicked', async () => {
+            mockCancelRecords.mockResolvedValueOnce({});
+            render(<ReportAnalytics />);
+            fireEvent.click(screen.getByTestId('activate-funds-edit'));
+            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL));
+
+            fireEvent.click(screen.getByTestId('confirm-modal-cancel'));
+
+            await waitFor(() => {
+                expect(mockCancelRecords).toHaveBeenCalled();
+            });
+            expect(screen.queryByText('Опублікувати')).not.toBeInTheDocument();
+        });
+
+        it('should show error toast if cancel records fails', async () => {
+            mockCancelRecords.mockRejectedValueOnce(new Error('fail'));
+            render(<ReportAnalytics />);
+            fireEvent.click(screen.getByTestId('activate-funds-edit'));
+            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL));
+
+            fireEvent.click(screen.getByTestId('confirm-modal-cancel'));
+
+            await waitFor(() => {
+                expect(mockAddToast).toHaveBeenCalledWith('Не вдалося відмінити зміни', 'error');
+            });
         });
     });
 });

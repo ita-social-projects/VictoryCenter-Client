@@ -270,7 +270,7 @@ describe('AddSectionModal', () => {
         renderModal();
 
         const call = getCallByTemplate(SectionTemplate.SingleTitleDescriptionAuthorPairs);
-        expect(call?.data?.title).toBe(SECTIONS_TEXT.SECTION.TITLE_SAMPLE_TEXT);
+        expect(call?.data?.title).toBe(SECTIONS_TEXT.SECTION.SINGLE_TITLE_DESCRIPTION_AUTHOR_PAIRS.DEFAULT_TITLE);
         expect(call?.data?.description).toBe(SECTIONS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT);
     });
 

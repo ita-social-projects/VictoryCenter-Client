@@ -7,19 +7,36 @@ import {
     validateFundsExpendituresAmount,
 } from '@/validation/admin/reports-schema/funds-expenditures-record-schema/funds-expenditures-record-schema';
 
-export const useAmountBlur = (exchangeRate: string | null) => {
+export const getUsdMismatchMessage = (
+    amountUah: string,
+    amountUsd: string,
+    exchangeRate: string | null | undefined,
+    mismatchMessage: string = FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH,
+): string | undefined => (isUsdAmountMismatch(amountUah, amountUsd, exchangeRate) ? mismatchMessage : undefined);
+
+export const useAmountBlur = (exchangeRate: string | null, customMismatchMessage?: string) => {
     const [usdMismatchMessage, setUsdMismatchMessage] = useState<string | undefined>();
 
     const handleAmountBlur = useCallback(
-        (field: 'amountUah' | 'amountUsd', setFormState: React.Dispatch<React.SetStateAction<any>>) => {
+        (
+            field: 'amountUah' | 'amountUsd',
+            setFormState: React.Dispatch<React.SetStateAction<any>>,
+            suppressMismatchCheck = false,
+        ) => {
             if (field === 'amountUsd') {
                 setFormState((prev: any) => {
                     const normalizedAmountUsd = normalizeFundsExpendituresAmountInput(prev.amountUsd, true);
                     const amountUsdError = validateFundsExpendituresAmount(normalizedAmountUsd, 'blur');
 
-                    const hasMismatch = isUsdAmountMismatch(prev.amountUah, normalizedAmountUsd, exchangeRate);
                     setUsdMismatchMessage(
-                        hasMismatch ? FUNDS_EXPENDITURES_TEXT.MESSAGE.AMOUNT_USD_NOT_MATCH : undefined,
+                        suppressMismatchCheck
+                            ? undefined
+                            : getUsdMismatchMessage(
+                                  prev.amountUah,
+                                  normalizedAmountUsd,
+                                  exchangeRate,
+                                  customMismatchMessage,
+                              ),
                     );
 
                     return {
@@ -43,7 +60,7 @@ export const useAmountBlur = (exchangeRate: string | null) => {
                 return updated;
             });
         },
-        [exchangeRate],
+        [exchangeRate, customMismatchMessage],
     );
 
     return { usdMismatchMessage, setUsdMismatchMessage, handleAmountBlur };

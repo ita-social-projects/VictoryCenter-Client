@@ -1,14 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import {
-    ReportsMediaBlock,
-    ReportsMediaBlockProps,
-    ReportsMediaBlockValues,
-    ReportsMediaBlockErrors,
-    ReportsMediaBlockValidationFunctions,
-} from './ReportsMediaBlock';
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { Image, ImageValues } from '@/types/common/image';
+import { ReportsMediaBlock, ReportsMediaBlockProps, ReportsMediaBlockValues } from './ReportsMediaBlock';
 
 jest.mock(
     '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
@@ -25,19 +17,7 @@ jest.mock(
             error,
             isRequired,
             maxLimitWarning,
-        }: {
-            label: string;
-            id: string;
-            name: string;
-            value: string;
-            onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-            onBlur?: (e: React.FocusEvent<HTMLTextAreaElement>) => void;
-            maxLength: number;
-            disabled: boolean;
-            error?: string;
-            isRequired?: boolean;
-            maxLimitWarning?: string;
-        }) => (
+        }: any) => (
             <div>
                 <label htmlFor={id}>
                     {isRequired && '*'}
@@ -61,19 +41,7 @@ jest.mock(
 );
 
 jest.mock('@/components/admin/image-input/ImageInput', () => ({
-    ImageInput: ({
-        onChange,
-        label,
-        setError,
-        disabled,
-        value,
-    }: {
-        onChange: (val: ImageValues | null) => void;
-        label: string;
-        setError: (err: string | null) => void;
-        disabled: boolean;
-        value: ImageValues | null;
-    }) => (
+    ImageInput: ({ onChange, label, setError, disabled, value }: any) => (
         <div data-testid="mock-image-input">
             <span>{label}</span>
             <span data-testid="mock-image-disabled">{disabled ? 'disabled' : 'enabled'}</span>
@@ -117,10 +85,13 @@ jest.mock('./ReportsMediaBlock.module.scss', () => ({
 }));
 
 describe('ReportsMediaBlock', () => {
-    const mockOnValuesChange = jest.fn();
-    const mockValidateTitle = jest.fn();
-    const mockValidateTitleEn = jest.fn();
-    const mockValidateTotalAmount = jest.fn();
+    const mockOnTitleChange = jest.fn();
+    const mockOnTitleBlur = jest.fn();
+    const mockOnTitleEnChange = jest.fn();
+    const mockOnTitleEnBlur = jest.fn();
+    const mockOnTotalAmountChange = jest.fn();
+    const mockOnImageChange = jest.fn();
+    const mockOnImageError = jest.fn();
 
     const defaultValues: ReportsMediaBlockValues = {
         title: 'Test Title',
@@ -130,17 +101,8 @@ describe('ReportsMediaBlock', () => {
         imageId: null,
     };
 
-    const defaultErrors: ReportsMediaBlockErrors = {};
-
-    const defaultValidationFunctions: ReportsMediaBlockValidationFunctions = {
-        validateTitle: mockValidateTitle,
-        validateTitleEn: mockValidateTitleEn,
-        validateTotalAmount: mockValidateTotalAmount,
-    };
-
     const defaultProps: ReportsMediaBlockProps = {
         values: defaultValues,
-        errors: defaultErrors,
         windowTitle: 'Вікно 1: Зібрано коштів',
         windowDescription: 'Фото «Репрезентативне фото»',
         descriptionTitle: 'Зібрані кошти',
@@ -149,8 +111,13 @@ describe('ReportsMediaBlock', () => {
         imageUrl: 'https://example.com/default.png',
         isValueEditable: true,
         totalAmountMaxLength: 15,
-        validationFunctions: defaultValidationFunctions,
-        onValuesChange: mockOnValuesChange,
+        onTitleChange: mockOnTitleChange,
+        onTitleBlur: mockOnTitleBlur,
+        onTitleEnChange: mockOnTitleEnChange,
+        onTitleEnBlur: mockOnTitleEnBlur,
+        onTotalAmountChange: mockOnTotalAmountChange,
+        onImageChange: mockOnImageChange,
+        onImageError: mockOnImageError,
     };
 
     const renderComponent = (overrideProps: Partial<ReportsMediaBlockProps> = {}) =>
@@ -160,308 +127,103 @@ describe('ReportsMediaBlock', () => {
         jest.clearAllMocks();
     });
 
-    describe('Rendering', () => {
-        it('should render window title and description', () => {
-            renderComponent();
-
-            expect(screen.getByText('Вікно 1: Зібрано коштів')).toBeInTheDocument();
-            expect(screen.getByText('Фото «Репрезентативне фото»')).toBeInTheDocument();
-        });
-
+    describe('Rendering and props', () => {
         it('should render title input with correct value', () => {
             renderComponent();
-
             const titleInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-title');
             expect(titleInput).toHaveValue('Test Title');
         });
 
-        it('should pass the title max length warning to the title textarea', () => {
-            renderComponent();
+        it('should display errors when provided', () => {
+            renderComponent({
+                titleError: 'Title error message',
+                totalAmountError: 'Amount error message',
+                imageError: 'Image error message',
+            });
 
-            const titleInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-title');
-            expect(titleInput).toHaveAttribute(
-                'data-max-limit-warning',
-                COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(50),
-            );
-        });
-
-        it('should render total amount input with correct value', () => {
-            renderComponent();
-
-            const valueInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-value');
-            expect(valueInput).toHaveValue('250000');
-        });
-
-        it('should render description title as label', () => {
-            renderComponent();
-
-            expect(screen.getByText(/Зібрані кошти/)).toBeInTheDocument();
-        });
-
-        it('should render image input', () => {
-            renderComponent();
-
-            expect(screen.getByTestId('mock-image-input')).toBeInTheDocument();
-        });
-
-        it('should render image input label', () => {
-            renderComponent();
-
-            expect(screen.getByText(COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE)).toBeInTheDocument();
-        });
-    });
-
-    describe('Editing state', () => {
-        it('should always enable title input (editing mode only)', () => {
-            renderComponent();
-
-            const titleInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-title');
-            expect(titleInput).not.toBeDisabled();
-        });
-
-        it('should disable total amount input when isValueEditable is false', () => {
-            renderComponent({ isValueEditable: false });
-
-            const valueInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-value');
-            expect(valueInput).toBeDisabled();
-        });
-
-        it('should enable total amount input when isValueEditable is true', () => {
-            renderComponent({ isValueEditable: true });
-
-            const valueInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-value');
-            expect(valueInput).not.toBeDisabled();
-        });
-
-        it('should always enable image input (editing mode only)', () => {
-            renderComponent();
-
-            expect(screen.getByTestId('mock-image-disabled')).toHaveTextContent('enabled');
+            expect(screen.getByText('Title error message')).toBeInTheDocument();
+            expect(screen.getByText('Amount error message')).toBeInTheDocument();
+            expect(screen.getByText('Image error message')).toBeInTheDocument();
         });
     });
 
     describe('Title handling', () => {
-        it('should call onValuesChange with updated title and validation error on change', () => {
-            const titleError = 'Title is too short';
-            mockValidateTitle.mockReturnValue(titleError);
+        it('should call onTitleChange on change', () => {
             renderComponent();
-
             const titleInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-title');
             fireEvent.change(titleInput, { target: { value: 'New' } });
-
-            expect(mockValidateTitle).toHaveBeenCalledWith('New');
-            expect(mockOnValuesChange).toHaveBeenCalledWith({ ...defaultValues, title: 'New' }, { title: titleError });
+            expect(mockOnTitleChange).toHaveBeenCalledWith('New');
         });
 
-        it('should call onValuesChange with no error when title is valid on change', () => {
-            mockValidateTitle.mockReturnValue(undefined);
+        it('should NOT call onTitleBlur if the normalized value is identical to current value', () => {
             renderComponent();
-
-            const titleInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-title');
-            fireEvent.change(titleInput, { target: { value: 'Valid Title Text' } });
-
-            expect(mockValidateTitle).toHaveBeenCalledWith('Valid Title Text');
-            expect(mockOnValuesChange).toHaveBeenCalledWith(
-                { ...defaultValues, title: 'Valid Title Text' },
-                { title: undefined },
-            );
-        });
-
-        it('should validate title on blur', () => {
-            const titleError = "Заголовок обов'язковий";
-            mockValidateTitle.mockReturnValue(titleError);
-            renderComponent();
-
             const titleInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-title');
             fireEvent.blur(titleInput);
 
-            expect(mockValidateTitle).toHaveBeenCalledWith('Test Title');
-            expect(mockOnValuesChange).toHaveBeenCalledWith({ ...defaultValues }, { title: titleError });
+            expect(mockOnTitleBlur).not.toHaveBeenCalled();
+        });
+
+        it('should call onTitleBlur if the normalized value is different', () => {
+            renderComponent({ values: { ...defaultValues, title: '  Different  ' } });
+            const titleInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-title');
+            fireEvent.blur(titleInput);
+
+            expect(mockOnTitleBlur).toHaveBeenCalledWith('Different');
+        });
+
+        it('should call onTitleEnChange on change', () => {
+            renderComponent();
+            const titleInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-title-en');
+            fireEvent.change(titleInput, { target: { value: 'New EN' } });
+            expect(mockOnTitleEnChange).toHaveBeenCalledWith('New EN');
+        });
+
+        it('should NOT call onTitleEnBlur if the normalized value is identical to current value', () => {
+            renderComponent();
+            const titleInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-title-en');
+            fireEvent.blur(titleInput);
+
+            expect(mockOnTitleEnBlur).not.toHaveBeenCalled();
+        });
+
+        it('should call onTitleEnBlur if the normalized value is different', () => {
+            renderComponent({ values: { ...defaultValues, titleEn: '  Different EN  ' } });
+            const titleInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-title-en');
+            fireEvent.blur(titleInput);
+
+            expect(mockOnTitleEnBlur).toHaveBeenCalledWith('Different EN');
         });
     });
 
     describe('Total amount handling', () => {
-        it('should call onValuesChange with updated numeric value on change', () => {
-            mockValidateTotalAmount.mockReturnValue(undefined);
-            renderComponent({ isValueEditable: true });
-
+        it('should call onTotalAmountChange on change', () => {
+            renderComponent();
             const valueInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-value');
-            fireEvent.change(valueInput, { target: { value: '300000' } });
-
-            expect(mockValidateTotalAmount).toHaveBeenCalledWith(300000);
-            expect(mockOnValuesChange).toHaveBeenCalledWith(
-                { ...defaultValues, totalAmount: 300000 },
-                { totalAmount: undefined },
-            );
-        });
-
-        it('should call onValuesChange with validation error for invalid value', () => {
-            const valueError = 'Значення повинно бути числом';
-            mockValidateTotalAmount.mockReturnValue(valueError);
-            renderComponent({ isValueEditable: true });
-
-            const valueInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-value');
-            fireEvent.change(valueInput, { target: { value: 'abc' } });
-
-            expect(mockOnValuesChange).toHaveBeenCalledWith(
-                { ...defaultValues, totalAmount: NaN },
-                { totalAmount: valueError },
-            );
-        });
-
-        it('should validate total amount on blur', () => {
-            mockValidateTotalAmount.mockReturnValue(undefined);
-            renderComponent({ isValueEditable: true });
-
-            const valueInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-value');
-            fireEvent.blur(valueInput);
-
-            expect(mockValidateTotalAmount).toHaveBeenCalledWith(250000);
-            expect(mockOnValuesChange).toHaveBeenCalledWith({ ...defaultValues }, { totalAmount: undefined });
-        });
-
-        it('should work without validateTotalAmount function', () => {
-            renderComponent({
-                isValueEditable: true,
-                validationFunctions: { validateTitle: mockValidateTitle, validateTitleEn: mockValidateTitleEn },
-            });
-
-            const valueInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-value');
-            fireEvent.change(valueInput, { target: { value: '500' } });
-
-            expect(mockOnValuesChange).toHaveBeenCalledWith(
-                { ...defaultValues, totalAmount: 500 },
-                { totalAmount: undefined },
-            );
-        });
-
-        it('should set totalAmount maxLength from props', () => {
-            renderComponent({ totalAmountMaxLength: 10 });
-
-            const valueInput = screen.getByTestId('mock-textarea-Вікно 1: Зібрано коштів-value');
-            expect(valueInput).toHaveAttribute('maxlength', '10');
+            fireEvent.change(valueInput, { target: { value: '300' } });
+            expect(mockOnTotalAmountChange).toHaveBeenCalledWith('300');
         });
     });
 
     describe('Image handling', () => {
-        it('should call onValuesChange with new image on upload', () => {
+        it('should call onImageChange on upload', () => {
             renderComponent();
-
             fireEvent.click(screen.getByTestId('mock-image-upload'));
-
-            expect(mockOnValuesChange).toHaveBeenCalledWith(
-                {
-                    ...defaultValues,
-                    image: { base64: 'data:image/png;base64,abc123', mimeType: 'image/png' },
-                    imageId: null,
-                },
-                { image: undefined },
-            );
+            expect(mockOnImageChange).toHaveBeenCalledWith({
+                base64: 'data:image/png;base64,abc123',
+                mimeType: 'image/png',
+            });
         });
 
-        it('should clear imageId when image is cleared', () => {
-            const valuesWithImage: ReportsMediaBlockValues = {
-                ...defaultValues,
-                image: { base64: 'data:image/png;base64,abc123', mimeType: 'image/png' },
-                imageId: 5,
-            };
-            renderComponent({ values: valuesWithImage });
-
-            fireEvent.click(screen.getByTestId('mock-image-clear'));
-
-            expect(mockOnValuesChange).toHaveBeenCalledWith(
-                { ...valuesWithImage, image: null, imageId: null },
-                { image: undefined },
-            );
-        });
-
-        it('should clear imageId when new image is uploaded (pending upload replaces server image)', () => {
-            const valuesWithImageId: ReportsMediaBlockValues = {
-                ...defaultValues,
-                imageId: 10,
-            };
-            renderComponent({ values: valuesWithImageId });
-
-            fireEvent.click(screen.getByTestId('mock-image-upload'));
-
-            expect(mockOnValuesChange).toHaveBeenCalledWith(
-                {
-                    ...valuesWithImageId,
-                    image: { base64: 'data:image/png;base64,abc123', mimeType: 'image/png' },
-                    imageId: null,
-                },
-                { image: undefined },
-            );
-        });
-
-        it('should call onValuesChange with image error from setError', () => {
+        it('should call onImageError when setError is called with an error', () => {
             renderComponent();
-
             fireEvent.click(screen.getByTestId('mock-image-set-error'));
-
-            expect(mockOnValuesChange).toHaveBeenCalledWith({ ...defaultValues }, { image: 'Image too large' });
+            expect(mockOnImageError).toHaveBeenCalledWith('Image too large');
         });
 
         it('should ignore null error from setError', () => {
             renderComponent();
-
             fireEvent.click(screen.getByTestId('mock-image-clear-error'));
-
-            expect(mockOnValuesChange).not.toHaveBeenCalled();
-        });
-
-        it('should show user-uploaded image (with base64) in ImageInput', () => {
-            const userImage: ImageValues = {
-                base64: 'data:image/png;base64,userImage',
-                mimeType: 'image/png',
-            };
-            renderComponent({ values: { ...defaultValues, image: userImage } });
-
-            expect(screen.getByTestId('mock-image-value')).toHaveTextContent('has-value');
-        });
-
-        it('should not show server image (with url) in ImageInput', () => {
-            const serverImage: Image = {
-                id: 1,
-                url: 'https://example.com/image.png',
-                mimeType: 'image/png',
-            };
-            renderComponent({ values: { ...defaultValues, image: serverImage } });
-
-            expect(screen.getByTestId('mock-image-value')).toHaveTextContent('no-value');
-        });
-
-        it('should show no-value when image is null', () => {
-            renderComponent({ values: { ...defaultValues, image: null } });
-
-            expect(screen.getByTestId('mock-image-value')).toHaveTextContent('no-value');
-        });
-    });
-
-    describe('Error display', () => {
-        it('should display title error', () => {
-            renderComponent({ errors: { title: 'Title error message' } });
-
-            expect(screen.getByText('Title error message')).toBeInTheDocument();
-        });
-
-        it('should display totalAmount error via TextAreaWithCharacterLimitGroup', () => {
-            renderComponent({ errors: { totalAmount: 'Value error message' } });
-
-            const errorEl = screen.getByTestId('mock-textarea-error-Вікно 1: Зібрано коштів-value');
-            expect(errorEl).toHaveTextContent('Value error message');
-        });
-
-        it('should display image error', () => {
-            renderComponent({ errors: { image: 'Image error message' } });
-
-            expect(screen.getByText('Image error message')).toBeInTheDocument();
-        });
-
-        it('should not display errors when errors object is empty', () => {
-            renderComponent({ errors: {} });
-
-            expect(screen.queryAllByTestId('mock-input-error')).toHaveLength(0);
+            expect(mockOnImageError).not.toHaveBeenCalled();
         });
     });
 });

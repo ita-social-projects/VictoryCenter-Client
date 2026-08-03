@@ -4,5 +4,6 @@
         "DESCRIPTION": "When body and soul recover, true strength is born.",
         "BUTTON": "View programs"
     },
-    "DOWNLOAD_ERROR": "Failed to load main page data. Please try again later."
+    "DOWNLOAD_ERROR": "Failed to load main page data. Please try again later.",
+    "VIEW": "View details"
 }

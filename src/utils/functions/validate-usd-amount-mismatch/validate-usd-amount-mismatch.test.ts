@@ -1,8 +1,8 @@
 import { isUsdAmountMismatch } from '@/utils/functions/validate-usd-amount-mismatch/validate-usd-amount-mismatch';
 
 describe('isUsdAmountMismatch', () => {
-    it('returns false when USD matches UAH conversion rounded up to two decimals', () => {
-        expect(isUsdAmountMismatch('100', '2.39', '42')).toBe(false);
+    it('returns false when USD matches UAH conversion rounded to two decimals', () => {
+        expect(isUsdAmountMismatch('100', '2.38', '42')).toBe(false);
     });
 
     it('returns true when USD does not match UAH conversion', () => {
@@ -17,6 +17,6 @@ describe('isUsdAmountMismatch', () => {
     });
 
     it('supports spaces and comma decimal separator', () => {
-        expect(isUsdAmountMismatch('1 000,5', '23,83', '42')).toBe(false);
+        expect(isUsdAmountMismatch('1 000,5', '23,82', '42')).toBe(false);
     });
 });

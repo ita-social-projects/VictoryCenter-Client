@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useState } from 'react';
 import { InputLabel, InputLabelProps } from '@/components/admin/input-label/InputLabel';
 import { InputError, InputErrorProps } from '@/components/admin/input-error/InputError';
 import { InputErrorWithCharacterCounter } from '@/components/admin/input-error-with-character-counter/InputErrorWithCharacterCounter';
@@ -37,11 +37,7 @@ export const RichTextInputGroup = ({
 }: RichTextInputGroupProps) => {
     const counterId = `${id}-character-count`;
 
-    const plainTextValue = useMemo(() => {
-        if (!value) return '';
-        const parsedDocument = new DOMParser().parseFromString(value, 'text/html');
-        return parsedDocument.body.textContent ?? '';
-    }, [value]);
+    const [currentLength, setCurrentLength] = useState(0);
 
     return (
         <div className={cn('input-group', className)}>
@@ -60,6 +56,7 @@ export const RichTextInputGroup = ({
                 hasError={!!error}
                 trimOnBlur={trimOnBlur}
                 showCounter={!showCounterBelow}
+                onLengthChange={setCurrentLength}
             />
             {showCounterBelow ? (
                 <InputErrorWithCharacterCounter
@@ -67,7 +64,7 @@ export const RichTextInputGroup = ({
                     maxLength={maxLength}
                     counterId={counterId}
                     htmlFor={id}
-                    value={plainTextValue}
+                    currentLength={currentLength}
                     isWhiteLabel={isWhiteLabel}
                 />
             ) : (

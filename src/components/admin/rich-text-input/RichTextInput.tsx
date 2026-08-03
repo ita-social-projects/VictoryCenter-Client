@@ -38,6 +38,7 @@ export interface RichTextInputProps {
      */
     trimOnBlur?: boolean;
     showCounter?: boolean;
+    onLengthChange?: (length: number) => void;
 }
 
 const theme = {
@@ -66,6 +67,7 @@ export const RichTextInput = ({
     hasError = false,
     trimOnBlur = false,
     showCounter = true,
+    onLengthChange,
 }: RichTextInputProps) => {
     const [isFocused, setIsFocused] = useState(false);
     const [currentLength, setCurrentLength] = useState(0);
@@ -74,9 +76,13 @@ export const RichTextInput = ({
         setIsFocused(focused);
     }, []);
 
-    const handleLengthChange = useCallback((length: number) => {
-        setCurrentLength(length);
-    }, []);
+    const handleLengthChange = useCallback(
+        (length: number) => {
+            setCurrentLength(length);
+            onLengthChange?.(length);
+        },
+        [onLengthChange],
+    );
 
     const showClearButton = isFocused && !isEditorEmpty(value) && !disabled;
 

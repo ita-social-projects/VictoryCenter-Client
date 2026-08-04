@@ -1,7 +1,7 @@
 import { parseAmount } from '@/utils/functions/parse-amount/parse-amount';
 import { formatNumberDecimalComma } from '@/utils/functions/formatters/format-number';
 
-const roundToTwoDecimals = (value: number): number => Math.round(value * 100) / 100;
+const roundToTwoDecimals = (value: number): number => Math.round((value + Number.EPSILON) * 100) / 100;
 
 export const getConvertedAmount = (value: string, exchangeRate: string | null | undefined): string | null => {
     const parsedExchangeRate = parseAmount(exchangeRate ?? '');

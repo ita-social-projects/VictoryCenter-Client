@@ -14,6 +14,17 @@ jest.mock('@/components/admin/input-label/InputLabel', () => ({
     ),
 }));
 
+jest.mock('@/components/admin/input-error-with-character-counter/InputErrorWithCharacterCounter', () => ({
+    InputErrorWithCharacterCounter: ({ error, currentLength, maxLength }: any) => (
+        <div data-testid="mock-error-with-counter" data-current-length={currentLength}>
+            {error ? <span>{error}</span> : null}
+            <span>
+                {currentLength}/{maxLength}
+            </span>
+        </div>
+    ),
+}));
+
 jest.mock('@/components/admin/rich-text-input/RichTextInput', () => ({
     RichTextInput: ({
         id,
@@ -26,6 +37,8 @@ jest.mock('@/components/admin/rich-text-input/RichTextInput', () => ({
         disabled,
         hideToolbar,
         placeholder,
+        showCounter,
+        onLengthChange,
     }: {
         id: string;
         name: string;
@@ -37,6 +50,8 @@ jest.mock('@/components/admin/rich-text-input/RichTextInput', () => ({
         disabled?: boolean;
         hideToolbar?: boolean;
         placeholder?: string;
+        showCounter?: boolean;
+        onLengthChange?: (length: number) => void;
     }) => (
         <div
             data-testid="mock-rich-text-input"
@@ -47,6 +62,7 @@ jest.mock('@/components/admin/rich-text-input/RichTextInput', () => ({
             data-disabled={disabled}
             data-hide-toolbar={hideToolbar}
             data-placeholder={placeholder}
+            data-show-counter={showCounter}
         >
             <button data-testid="mock-on-change" onClick={() => onChange('<p>Changed</p>')}>
                 Change
@@ -56,6 +72,9 @@ jest.mock('@/components/admin/rich-text-input/RichTextInput', () => ({
             </button>
             <button data-testid="mock-on-focus" onClick={onFocus}>
                 Focus
+            </button>
+            <button data-testid="mock-length-change" onClick={() => onLengthChange?.(42)}>
+                Change Length
             </button>
         </div>
     ),
@@ -265,6 +284,33 @@ describe('RichTextInputGroup', () => {
             renderRichTextInputGroup();
             const hideToolbarAttr = (getRichTextInput() as HTMLElement).dataset.hideToolbar;
             expect(hideToolbarAttr === undefined || hideToolbarAttr === 'undefined').toBe(true);
+        });
+    });
+
+    describe('Counter below rendering (showCounterBelow)', () => {
+        it('renders standard InputError and shows internal counter by default', () => {
+            renderRichTextInputGroup({ error: 'Test error' });
+
+            expect(screen.getByTestId('mock-error')).toBeInTheDocument();
+            expect(screen.queryByTestId('mock-error-with-counter')).not.toBeInTheDocument();
+            expect(getRichTextInput()).toHaveAttribute('data-show-counter', 'true');
+        });
+
+        it('renders InputErrorWithCharacterCounter and passes lifted state when showCounterBelow is true', () => {
+            renderRichTextInputGroup({ showCounterBelow: true, maxLength: 50 });
+
+            expect(screen.queryByTestId('mock-error')).not.toBeInTheDocument();
+
+            const counterBelow = screen.getByTestId('mock-error-with-counter');
+            expect(counterBelow).toBeInTheDocument();
+
+            expect(getRichTextInput()).toHaveAttribute('data-show-counter', 'false');
+
+            expect(counterBelow).toHaveAttribute('data-current-length', '0');
+
+            fireEvent.click(screen.getByTestId('mock-length-change'));
+
+            expect(counterBelow).toHaveAttribute('data-current-length', '42');
         });
     });
 

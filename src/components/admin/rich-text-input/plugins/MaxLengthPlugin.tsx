@@ -12,6 +12,15 @@ export const MaxLengthPlugin = ({ maxLength, onLengthChange }: MaxLengthPluginPr
     const [editor] = useLexicalComposerContext();
 
     useEffect(() => {
+        return editor.registerUpdateListener(({ editorState }) => {
+            editorState.read(() => {
+                const textLength = $getRoot().getTextContent().length;
+                onLengthChange?.(textLength);
+            });
+        });
+    }, [editor, onLengthChange]);
+
+    useEffect(() => {
         return editor.registerNodeTransform(RootNode, (rootNode: RootNode) => {
             const selection = $getSelection();
             if (!$isRangeSelection(selection) || !selection.isCollapsed()) {
@@ -20,8 +29,6 @@ export const MaxLengthPlugin = ({ maxLength, onLengthChange }: MaxLengthPluginPr
 
             const prevTextContent = editor.getEditorState().read(() => $getRoot().getTextContent());
             const currentTextContent = rootNode.getTextContent();
-
-            onLengthChange?.(currentTextContent.length);
 
             if (prevTextContent !== currentTextContent) {
                 const textLength = currentTextContent.length;
@@ -32,7 +39,7 @@ export const MaxLengthPlugin = ({ maxLength, onLengthChange }: MaxLengthPluginPr
                 }
             }
         });
-    }, [editor, maxLength, onLengthChange]);
+    }, [editor, maxLength]);
 
     return null;
 };

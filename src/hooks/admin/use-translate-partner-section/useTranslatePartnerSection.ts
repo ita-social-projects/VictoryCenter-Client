@@ -34,9 +34,10 @@ export const useTranslatePartnerSection = ({
     const [error, setError] = useState<string>('');
 
     useEffect(() => {
+        setExistingTranslation(null);
+        setTranslationFetchError('');
+
         if (!isOpen || !section || !language) {
-            setExistingTranslation(null);
-            setTranslationFetchError('');
             return;
         }
 
@@ -44,7 +45,6 @@ export const useTranslatePartnerSection = ({
 
         const fetchTranslation = async () => {
             setIsLoadingTranslation(true);
-            setTranslationFetchError('');
 
             try {
                 const result = await PartnerSectionLocalizationApi.get(client, section.id, language.id);
@@ -100,12 +100,11 @@ export const useTranslatePartnerSection = ({
             }
 
             onSuccess();
-        } catch (err) {
+        } catch (_err) {
             const errorMessage = isEditMode
                 ? PARTNERS_TEXT.MESSAGE.FAIL_TO_UPDATE_TRANSLATION_FOR_SECTION
                 : PARTNERS_TEXT.MESSAGE.FAIL_TO_TRANSLATE_SECTION;
             setError(errorMessage);
-            throw err;
         } finally {
             setIsSubmitting(false);
         }

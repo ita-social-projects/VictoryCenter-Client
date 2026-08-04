@@ -72,12 +72,11 @@ export const useTranslatePartnerBanner = ({ banner, language, onSuccess, mode }:
                 };
                 onSuccess(updatedBanner);
             }
-        } catch (err) {
+        } catch (_err) {
             const errorMessage = isEditMode
                 ? PARTNERS_TEXT.MESSAGE.FAIL_TO_UPDATE_TRANSLATION_FOR_BANNER
                 : PARTNERS_TEXT.MESSAGE.FAIL_TO_TRANSLATE_BANNER;
             setError(errorMessage);
-            throw err;
         } finally {
             setIsSubmitting(false);
         }

@@ -31,8 +31,6 @@ jest.mock('@/components/admin/language-toolkit/LanguageToolkit', () => ({
     ),
 }));
 
-jest.mock('./PartnerPageToolbar.scss', () => ({}));
-
 describe('PartnerPageToolbar', () => {
     const user = userEvent.setup();
 

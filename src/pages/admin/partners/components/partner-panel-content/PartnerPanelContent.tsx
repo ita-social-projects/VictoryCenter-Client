@@ -1,10 +1,10 @@
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useState } from 'react';
 import { PartnerPageToolbar } from '../partner-page-toolbar/PartnerPageToolbar';
 import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
 import { PartnerSectionsEditor, PartnerSectionsEditorRef } from '../partner-sections-editor/PartnerSectionsEditor';
 import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
-import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
-import { ToastType } from '@/types/admin/toast';
+import { Button } from '@/components/admin/button/Button';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
 import { DEFAULT_LOCALE } from '@/const/common/locales';
 import styles from './PartnerPanelContent.module.scss';
@@ -12,18 +12,17 @@ import { PartnerBanner } from '../partner-banner-form/PartnerBannerForm';
 
 export const PartnerPanelContent = () => {
     const sectionsEditorRef = useRef<PartnerSectionsEditorRef>(null);
-    const { addToast } = useToast();
+    const [languagesError, setLanguagesError] = useState<string | null>(null);
 
-    const handleLocalizationError = useCallback(
-        (message: string) => {
-            addToast(message, ToastType.Error);
-        },
-        [addToast],
-    );
+    const { allLanguages, translationLanguages, selectedLanguage, onLanguageChange, retryFetchLanguages } =
+        useLocalizationToolkit({
+            setErrorState: setLanguagesError,
+        });
 
-    const { allLanguages, translationLanguages, selectedLanguage, onLanguageChange } = useLocalizationToolkit({
-        setErrorState: handleLocalizationError,
-    });
+    const handleRetryFetchLanguages = useCallback(() => {
+        setLanguagesError(null);
+        retryFetchLanguages();
+    }, [retryFetchLanguages]);
 
     const handleAddSection = useCallback(() => {
         sectionsEditorRef.current?.addSection();
@@ -41,7 +40,14 @@ export const PartnerPanelContent = () => {
             </div>
 
             <div className={styles['scrollable-area']}>
-                {selectedLanguage ? (
+                {languagesError ? (
+                    <div className={styles.error}>
+                        <p>{languagesError}</p>
+                        <Button onClick={handleRetryFetchLanguages} buttonStyle="primary">
+                            {COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN}
+                        </Button>
+                    </div>
+                ) : selectedLanguage ? (
                     <>
                         <PartnerBanner language={selectedLanguage} translationLanguages={translationLanguages} />
                         <PartnerSectionsEditor

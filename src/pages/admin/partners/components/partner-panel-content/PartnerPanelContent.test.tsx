@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { PartnerPanelContent } from './PartnerPanelContent';
 import { PartnerSectionsEditorRef } from '../partner-sections-editor/PartnerSectionsEditor';
@@ -114,5 +114,39 @@ describe('PartnerPanelContent', () => {
         render(<PartnerPanelContent />);
 
         expect(screen.getByText('Add Section')).toBeDisabled();
+    });
+
+    it('shows an error with a retry action when languages fail to load, instead of spinning forever', () => {
+        const retryFetchLanguages = jest.fn();
+        let capturedSetErrorState: (message: string) => void = () => {};
+
+        mockedUseLocalizationToolkit.mockImplementation(({ setErrorState }: any) => {
+            capturedSetErrorState = setErrorState;
+            return {
+                allLanguages: [],
+                translationLanguages: [],
+                selectedLanguage: undefined,
+                onLanguageChange: jest.fn(),
+                translationStatusFilter: undefined,
+                onTranslationStatusFilterChange: jest.fn(),
+                retryFetchLanguages,
+            };
+        });
+
+        render(<PartnerPanelContent />);
+
+        expect(screen.queryByTestId('partner-banner')).not.toBeInTheDocument();
+
+        act(() => {
+            capturedSetErrorState('Failed to load languages');
+        });
+
+        expect(screen.getByText('Failed to load languages')).toBeInTheDocument();
+        expect(screen.queryByTestId('partner-banner')).not.toBeInTheDocument();
+
+        fireEvent.click(screen.getByText('Спробувати ще раз'));
+
+        expect(retryFetchLanguages).toHaveBeenCalledTimes(1);
+        expect(screen.queryByText('Failed to load languages')).not.toBeInTheDocument();
     });
 });

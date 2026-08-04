@@ -261,6 +261,53 @@ describe('useTranslatePartnerSection', () => {
         expect(onSuccess).not.toHaveBeenCalled();
     });
 
+    it('clears the previous translation immediately when language changes while open, before the new fetch resolves', async () => {
+        const existingTranslationA: PartnerSectionLocalizationDto = {
+            entityId: 1,
+            title: 'Existing A title',
+            description: 'Existing A description',
+            partners: [],
+            localizationInfoDto: { id: 2, code: 'en' },
+            translationStatus: 1,
+        };
+        const languageB: LocalizationLanguage = { id: 3, code: 'pl', name: 'Polish' };
+
+        mockedGet.mockResolvedValueOnce(existingTranslationA);
+
+        const { result, rerender } = renderHook(
+            ({ language }: { language: LocalizationLanguage }) =>
+                useTranslatePartnerSection({
+                    section: sectionMock,
+                    language,
+                    isOpen: true,
+                    onSuccess: jest.fn(),
+                }),
+            { initialProps: { language: languageMock } },
+        );
+
+        await waitFor(() => {
+            expect(result.current.existingTranslation).toEqual(existingTranslationA);
+        });
+        expect(result.current.isEditMode).toBe(true);
+
+        let resolveSecondFetch: (value: PartnerSectionLocalizationDto | null) => void = () => {};
+        mockedGet.mockImplementationOnce(
+            () =>
+                new Promise((resolve) => {
+                    resolveSecondFetch = resolve;
+                }),
+        );
+
+        rerender({ language: languageB });
+
+        expect(result.current.existingTranslation).toBeNull();
+        expect(result.current.isEditMode).toBe(false);
+
+        await act(async () => {
+            resolveSecondFetch(null);
+        });
+    });
+
     it('should clear error', () => {
         const { result } = renderHook(() =>
             useTranslatePartnerSection({

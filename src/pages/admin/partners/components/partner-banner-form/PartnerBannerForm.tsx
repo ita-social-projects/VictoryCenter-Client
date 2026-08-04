@@ -234,7 +234,7 @@ export const PartnerBanner = ({ language, translationLanguages }: PartnerBannerP
             setFormState({ values: nextBanner, savedValues: nextBanner });
             setTouched({});
             setErrors({});
-            addToast(PARTNERS_TEXT.MESSAGE.BANNER_SAVED, ToastType.Success);
+            addToast(PARTNERS_TEXT.MESSAGE.BANNER_PUBLISHED, ToastType.Success, 3000);
         } catch (error: any) {
             if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {
                 return;
@@ -368,6 +368,7 @@ export const PartnerBanner = ({ language, translationLanguages }: PartnerBannerP
                                     disabled={isDisabled || !isBaseLanguage}
                                     hideToolbar={!isBaseLanguage}
                                     isRequired={true}
+                                    showCounterBelow={true}
                                     trimOnBlur={true}
                                 />
 
@@ -380,6 +381,7 @@ export const PartnerBanner = ({ language, translationLanguages }: PartnerBannerP
                                     name="description"
                                     disabled={isDisabled || !isBaseLanguage}
                                     maxLength={PARTNER_BANNER_VALIDATION.description.max}
+                                    showCounterBelow={true}
                                     isRequired={true}
                                 />
                             </div>

@@ -357,7 +357,7 @@ describe('PartnerBanner', () => {
         });
 
         await waitFor(() => {
-            expect(mockAddToast).toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.BANNER_SAVED, ToastType.Success);
+            expect(mockAddToast).toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.BANNER_PUBLISHED, ToastType.Success, 3000);
         });
 
         await waitFor(() => {
@@ -399,7 +399,7 @@ describe('PartnerBanner', () => {
         clickConfirmPublish();
 
         await waitFor(() => {
-            expect(mockAddToast).toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.BANNER_SAVED, ToastType.Success);
+            expect(mockAddToast).toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.BANNER_PUBLISHED, ToastType.Success, 3000);
         });
 
         expect(screen.getByText('EN')).toHaveClass(localizationStatusesStyles.relevant);

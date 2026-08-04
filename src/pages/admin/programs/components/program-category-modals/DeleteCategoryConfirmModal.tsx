@@ -21,10 +21,10 @@ export const DeleteCategoryConfirmModal = ({
             <Modal.Title>{COMMON_TEXT_ADMIN.CATEGORIES.FORM.TITLE.DELETE_CATEGORY_CONFIRM}</Modal.Title>
             <Modal.Actions>
                 <Button buttonStyle="secondary" onClick={onClose} disabled={isSubmitting}>
-                    {COMMON_TEXT_ADMIN.BUTTON.CANCEL}
+                    {COMMON_TEXT_ADMIN.BUTTON.NO}
                 </Button>
                 <Button buttonStyle="primary" onClick={onConfirm} disabled={isSubmitting}>
-                    {COMMON_TEXT_ADMIN.BUTTON.DELETE}
+                    {COMMON_TEXT_ADMIN.BUTTON.YES}
                 </Button>
             </Modal.Actions>
         </Modal>

@@ -6,7 +6,8 @@ export interface InputErrorWithCharacterCounterProps {
     maxLength: number;
     counterId: string;
     htmlFor: string;
-    value: string;
+    value?: string;
+    currentLength?: number;
     isWhiteLabel?: boolean;
     containerClassName?: string;
 }
@@ -16,11 +17,12 @@ export const InputErrorWithCharacterCounter = ({
     maxLength,
     counterId,
     htmlFor,
-    value,
+    value = '',
+    currentLength,
     isWhiteLabel,
     containerClassName,
 }: InputErrorWithCharacterCounterProps) => {
-    const normalizedLength = value.length;
+    const normalizedLength = currentLength !== undefined ? currentLength : value.length;
     return (
         <div className={cn(styles.container, containerClassName)}>
             <div className={styles['error-section']}>{error || ''}</div>

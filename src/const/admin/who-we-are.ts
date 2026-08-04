@@ -45,11 +45,11 @@ export const IMAGE_CONFIGS = {
         minHeight: 750,
     } as WhoWeAreImageConfigParams,
     WHO_WE_SUPPORT_CARDS: {
-        cropWidth: 500,
+        cropWidth: 540,
         cropHeight: 430,
-        minWidth: 500,
+        minWidth: 540,
         minHeight: 430,
-        displayWidth: 480,
+        displayWidth: 540,
         displayHeight: 430,
     } as WhoWeAreImageConfigParams,
     PEOPLE_CARDS: {

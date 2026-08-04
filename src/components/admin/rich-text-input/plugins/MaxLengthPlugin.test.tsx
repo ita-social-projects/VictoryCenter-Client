@@ -3,8 +3,10 @@ import '@testing-library/jest-dom';
 import { MaxLengthPlugin } from './MaxLengthPlugin';
 
 const mockRegisterNodeTransform = jest.fn();
+const mockRegisterUpdateListener = jest.fn();
 const mockEditor = {
     registerNodeTransform: mockRegisterNodeTransform,
+    registerUpdateListener: mockRegisterUpdateListener,
     getEditorState: jest.fn(),
 };
 
@@ -29,6 +31,7 @@ describe('MaxLengthPlugin', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         mockRegisterNodeTransform.mockReturnValue(jest.fn());
+        mockRegisterUpdateListener.mockReturnValue(jest.fn());
         mockGetRoot.mockReturnValue({
             getTextContent: jest.fn(() => 'current text'),
         });
@@ -49,23 +52,20 @@ describe('MaxLengthPlugin', () => {
 
     it('calls onLengthChange with current text length', () => {
         const onLengthChange = jest.fn();
-        const { $getSelection, $isRangeSelection } = require('lexical');
-
-        const mockSelection = {
-            isCollapsed: jest.fn(() => true),
-        };
-        $getSelection.mockReturnValue(mockSelection);
-        $isRangeSelection.mockReturnValue(true);
 
         render(<MaxLengthPlugin maxLength={100} onLengthChange={onLengthChange} />);
 
-        const transformCallback = mockRegisterNodeTransform.mock.calls[0][1];
+        const updateListenerCallback = mockRegisterUpdateListener.mock.calls[0][0];
 
-        const mockRootNode = {
-            getTextContent: jest.fn(() => 'test content'),
+        const mockEditorState = {
+            read: jest.fn((callback) => callback()),
         };
 
-        transformCallback(mockRootNode);
+        mockGetRoot.mockReturnValue({
+            getTextContent: jest.fn(() => 'test content'),
+        });
+
+        updateListenerCallback({ editorState: mockEditorState });
 
         expect(onLengthChange).toHaveBeenCalledWith(12);
     });
@@ -122,6 +122,7 @@ describe('MaxLengthPlugin', () => {
 
     it('handles selection that is not collapsed', () => {
         const { $getSelection, $isRangeSelection } = require('lexical');
+        const { trimTextContentFromAnchor } = require('@lexical/selection');
 
         const mockSelection = {
             isCollapsed: jest.fn(() => false),
@@ -129,8 +130,7 @@ describe('MaxLengthPlugin', () => {
         $getSelection.mockReturnValue(mockSelection);
         $isRangeSelection.mockReturnValue(true);
 
-        const onLengthChange = jest.fn();
-        render(<MaxLengthPlugin maxLength={100} onLengthChange={onLengthChange} />);
+        render(<MaxLengthPlugin maxLength={100} />);
 
         const transformCallback = mockRegisterNodeTransform.mock.calls[0][1];
         const mockRootNode = {
@@ -139,17 +139,17 @@ describe('MaxLengthPlugin', () => {
 
         transformCallback(mockRootNode);
 
-        expect(onLengthChange).not.toHaveBeenCalled();
+        expect(trimTextContentFromAnchor).not.toHaveBeenCalled();
     });
 
     it('handles non-range selection', () => {
         const { $getSelection, $isRangeSelection } = require('lexical');
+        const { trimTextContentFromAnchor } = require('@lexical/selection');
 
         $getSelection.mockReturnValue({});
         $isRangeSelection.mockReturnValue(false);
 
-        const onLengthChange = jest.fn();
-        render(<MaxLengthPlugin maxLength={100} onLengthChange={onLengthChange} />);
+        render(<MaxLengthPlugin maxLength={100} />);
 
         const transformCallback = mockRegisterNodeTransform.mock.calls[0][1];
         const mockRootNode = {
@@ -158,19 +158,24 @@ describe('MaxLengthPlugin', () => {
 
         transformCallback(mockRootNode);
 
-        expect(onLengthChange).not.toHaveBeenCalled();
+        expect(trimTextContentFromAnchor).not.toHaveBeenCalled();
     });
 
-    it('unregisters transform on unmount', () => {
-        const unregister = jest.fn();
-        mockRegisterNodeTransform.mockReturnValue(unregister);
+    it('unregisters transforms on unmount', () => {
+        const unregisterTransform = jest.fn();
+        const unregisterUpdate = jest.fn();
+
+        mockRegisterNodeTransform.mockReturnValue(unregisterTransform);
+        mockRegisterUpdateListener.mockReturnValue(unregisterUpdate);
 
         const { unmount } = render(<MaxLengthPlugin maxLength={100} />);
 
-        expect(unregister).not.toHaveBeenCalled();
+        expect(unregisterTransform).not.toHaveBeenCalled();
+        expect(unregisterUpdate).not.toHaveBeenCalled();
 
         unmount();
 
-        expect(unregister).toHaveBeenCalled();
+        expect(unregisterTransform).toHaveBeenCalled();
+        expect(unregisterUpdate).toHaveBeenCalled();
     });
 });

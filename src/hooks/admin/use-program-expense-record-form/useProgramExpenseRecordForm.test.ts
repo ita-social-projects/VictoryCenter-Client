@@ -194,7 +194,7 @@ describe('useProgramExpenseRecordForm', () => {
         const { result } = renderUseProgramExpenseForm();
 
         act(() => {
-            result.current.handleProgramInputChange('ab');
+            result.current.handleProgramInputChange('a');
         });
         act(() => {
             result.current.handleProgramBlur();

@@ -39,6 +39,22 @@ describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
             );
         });
 
+        it('should return numeric error for integer with a leading zero', () => {
+            expect(validateFundsExpendituresAmount('012345678', 'change')).toBe(
+                FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER,
+            );
+        });
+
+        it('should return numeric error for decimal with a leading zero before the comma', () => {
+            expect(validateFundsExpendituresAmount('01,50', 'change')).toBe(
+                FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER,
+            );
+        });
+
+        it('should accept a single zero integer part followed by a decimal', () => {
+            expect(validateFundsExpendituresAmount('0,50', 'change')).toBeUndefined();
+        });
+
         it('should return max digits error when integer part is too long', () => {
             expect(validateFundsExpendituresAmount('1234567890', 'change')).toBe(
                 FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_MAX_DIGITS,

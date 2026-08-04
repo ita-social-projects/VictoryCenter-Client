@@ -63,7 +63,7 @@ export const validateFundsExpendituresAmount = (
         return FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_NOT_NEGATIVE;
     }
 
-    if (!/^\d+(?:,\d{1,2})?$/.test(compact)) {
+    if (!/^(0|[1-9]\d*)(?:,\d{1,2})?$/.test(compact)) {
         return FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_ONLY_NUMBER;
     }
 

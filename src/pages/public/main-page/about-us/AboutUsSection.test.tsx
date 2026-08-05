@@ -78,9 +78,7 @@ describe('AboutUsSection', () => {
     });
 
     it('does not render the title or description when they are empty strings', () => {
-        const { container } = render(
-            <AboutUsSection mainAboutUs={createAboutUs({ title: '', description: '' })} />,
-        );
+        const { container } = render(<AboutUsSection mainAboutUs={createAboutUs({ title: '', description: '' })} />);
 
         expect(screen.queryByRole('heading', { level: 2 })).not.toBeInTheDocument();
         expect(container.querySelector('p')).not.toBeInTheDocument();

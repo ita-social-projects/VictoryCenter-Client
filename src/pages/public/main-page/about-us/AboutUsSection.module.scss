@@ -3,15 +3,16 @@
 .root {
     display: grid;
     grid-template-columns: 1fr;
+    margin: 48px 16px 63px;
     gap: 40px;
 
     @media (min-width: 560px) {
-        margin: 73px 64px 73px;
+        margin: 73px 64px 75px;
         gap: 96px;
     }
 
     @media (min-width: 768px) {
-        margin: 73px 56px 48px;
+        margin: 73px 56px 63px;
     }
 
     @media (min-width: 1440px) {

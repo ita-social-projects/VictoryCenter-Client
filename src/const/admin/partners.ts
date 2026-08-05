@@ -12,7 +12,7 @@ export const PARTNERS_TEXT = {
         },
         TITLE: {
             DELETE_SECTION: 'Видалити секцію',
-            PUBLISH_SECTION: 'Опублікувати зміни?',
+            PUBLISH_SECTION: 'Опублікувати нову секцію?',
         },
         MESSAGE: {
             FAIL_TO_DELETE_PARTNER_SECTION: 'Виникла помилка під час видалення секції партнерів',
@@ -45,7 +45,7 @@ export const PARTNERS_TEXT = {
         SECTION_UPDATED: 'Секція успішно оновлена',
         SECTION_DELETED: 'Секція успішно видалена',
         SECTION_PUBLISHED: 'Секція успішно опублікована',
-        BANNER_SAVED: 'Банер успішно збережено',
+        BANNER_PUBLISHED: 'Зміни успішно опубліковано',
         FAIL_TO_LOAD_PARTNERS: 'Виникла помилка, не вдалося завантажити партнерів',
         FAIL_TO_UPDATE_BANNER: 'Виникла помилка під час оновлення банера',
         FAIL_TO_CREATE_SECTION: 'Виникла помилка під час створення секції',

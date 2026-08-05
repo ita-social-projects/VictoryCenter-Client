@@ -190,7 +190,7 @@ export const PartnerBanner = () => {
             setFormState({ values: updatedBanner, savedValues: updatedBanner });
             setTouched({});
             setErrors({});
-            addToast(PARTNERS_TEXT.MESSAGE.BANNER_SAVED, ToastType.Success);
+            addToast(PARTNERS_TEXT.MESSAGE.BANNER_PUBLISHED, ToastType.Success, 3000);
         } catch (error: any) {
             if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {
                 return;
@@ -287,6 +287,7 @@ export const PartnerBanner = () => {
                                 maxLength={PARTNER_BANNER_VALIDATION.title.max}
                                 disabled={isDisabled}
                                 isRequired={true}
+                                showCounterBelow={true}
                                 trimOnBlur={true}
                             />
 
@@ -299,6 +300,7 @@ export const PartnerBanner = () => {
                                 name="description"
                                 disabled={isDisabled}
                                 maxLength={PARTNER_BANNER_VALIDATION.description.max}
+                                showCounterBelow={true}
                                 isRequired={true}
                             />
                         </div>

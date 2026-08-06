@@ -19,7 +19,14 @@ export const normalizeFundsExpendituresAmountInput = (value: string | undefined 
         return '';
     }
     const withNormalizedSpaces = value.replaceAll(/\s+/g, ' ').trimStart();
-    const withCommaSeparator = withNormalizedSpaces.replaceAll('.', ',');
+    let withCommaSeparator = withNormalizedSpaces.replaceAll('.', ',');
+
+    if (withCommaSeparator.startsWith(',')) {
+        withCommaSeparator = `0${withCommaSeparator}`;
+    } else if (withCommaSeparator.startsWith('-,')) {
+        withCommaSeparator = `-0,${withCommaSeparator.slice(2)}`;
+    }
+
     const firstCommaIndex = withCommaSeparator.indexOf(',');
 
     if (firstCommaIndex === -1) {

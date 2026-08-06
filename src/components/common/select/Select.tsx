@@ -1,4 +1,4 @@
-import React, { RefObject, useEffect, useState } from 'react';
+import React, { RefObject, useEffect, useState, useRef } from 'react';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ReactComponent as ArrowDown } from '@/assets/icons/chevron-down.svg';
 import { ReactComponent as ArrowUp } from '@/assets/icons/chevron-up.svg';
@@ -40,11 +40,30 @@ export const Select = <TValue,>({
 
     const [isOpen, setIsOpen] = useState(false);
 
+    const internalRef = useRef<HTMLDivElement>(null);
+    const containerRef = selectContainerRef || internalRef;
+
     useEffect(() => {
         if (disabled) {
             setIsOpen(false);
         }
     }, [disabled]);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (isOpen && containerRef.current && !containerRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+            }
+        };
+
+        if (isOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isOpen, containerRef]);
 
     const selectedOption = options.find((opt) => opt.props.value === value);
     const hasValue = value !== null && value !== undefined;
@@ -77,7 +96,7 @@ export const Select = <TValue,>({
 
     return (
         <div
-            ref={selectContainerRef}
+            ref={containerRef}
             className={classNames('select', className, {
                 'select-opened': isOpen,
                 'select-closed': !isOpen,

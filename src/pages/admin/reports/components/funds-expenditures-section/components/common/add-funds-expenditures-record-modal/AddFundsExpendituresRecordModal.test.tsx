@@ -44,27 +44,29 @@ jest.mock('@/components/admin/input-with-character-limit/InputWithCharacterLimit
 jest.mock('@/components/common/select/Select', () => {
     const React = require('react');
 
-    const Select = ({ value, onValueChange, placeholder, children }: any) => {
+    const Select = ({ value, onValueChange, placeholder, children, className }: any) => {
         const options = React.Children.toArray(children)
             .filter((child: any) => child?.props)
             .map((child: any) => ({ value: child.props.value, name: child.props.name }));
 
         return (
-            <select
-                data-testid={placeholder}
-                value={value ?? ''}
-                onChange={(event) => {
-                    const selected = options.find((item: any) => String(item.value) === event.target.value);
-                    onValueChange(selected?.value);
-                }}
-            >
-                <option value="">placeholder</option>
-                {options.map((option: any) => (
-                    <option key={String(option.value)} value={option.value}>
-                        {option.name}
-                    </option>
-                ))}
-            </select>
+            <div data-testid={`select-wrapper-${placeholder}`} className={className}>
+                <select
+                    data-testid={placeholder}
+                    value={value ?? ''}
+                    onChange={(event) => {
+                        const selected = options.find((item: any) => String(item.value) === event.target.value);
+                        onValueChange(selected?.value);
+                    }}
+                >
+                    <option value="">placeholder</option>
+                    {options.map((option: any) => (
+                        <option key={String(option.value)} value={option.value}>
+                            {option.name}
+                        </option>
+                    ))}
+                </select>
+            </div>
         );
     };
 
@@ -163,7 +165,7 @@ describe('AddFundsExpendituresRecordModal', () => {
         expect(screen.getByTestId('record-category-disabled-placeholder')).toBeInTheDocument();
     });
 
-    it('renders field errors and usd mismatch message', () => {
+    it('renders field errors and applies select-error class to dropdowns when errors exist', () => {
         mockedHook.mockReturnValue({
             ...baseHookResult,
             usdMismatchMessage: 'Mismatch',
@@ -178,13 +180,45 @@ describe('AddFundsExpendituresRecordModal', () => {
             },
         } as any);
 
-        renderComponent();
+        renderComponent('income');
 
         expect(screen.getByText('year error')).toBeInTheDocument();
         expect(screen.getByText('category error')).toBeInTheDocument();
         expect(screen.getByText('uah error')).toBeInTheDocument();
         expect(screen.getByText('usd error')).toBeInTheDocument();
         expect(screen.getByText('Mismatch')).toBeInTheDocument();
+
+        const yearSelectWrapper = screen.getByTestId(
+            `select-wrapper-${FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_PLACEHOLDER}`,
+        );
+        expect(yearSelectWrapper.className).toContain('select-error');
+
+        const categorySelectWrapper = screen.getByTestId(
+            `select-wrapper-${FUNDS_EXPENDITURES_TEXT.MODAL.INCOME.CATEGORY_PLACEHOLDER}`,
+        );
+        expect(categorySelectWrapper.className).toContain('select-error');
+    });
+
+    it('does not apply select-error class to dropdowns when no errors exist', () => {
+        mockedHook.mockReturnValue({
+            ...baseHookResult,
+            formState: {
+                ...baseHookResult.formState,
+                errors: {},
+            },
+        } as any);
+
+        renderComponent('income');
+
+        const yearSelectWrapper = screen.getByTestId(
+            `select-wrapper-${FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_PLACEHOLDER}`,
+        );
+        expect(yearSelectWrapper.className).not.toContain('select-error');
+
+        const categorySelectWrapper = screen.getByTestId(
+            `select-wrapper-${FUNDS_EXPENDITURES_TEXT.MODAL.INCOME.CATEGORY_PLACEHOLDER}`,
+        );
+        expect(categorySelectWrapper.className).not.toContain('select-error');
     });
 
     it('calls handlers from hook on interactions', () => {

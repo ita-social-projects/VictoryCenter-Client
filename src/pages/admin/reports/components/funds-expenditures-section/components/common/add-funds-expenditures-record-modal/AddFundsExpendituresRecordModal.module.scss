@@ -74,6 +74,36 @@
 
     :global(.select-options) {
         min-width: 100%;
+        max-height: 120px;
+        overflow-y: scroll;
+        scrollbar-color: #a4a49b transparent;
+        border-radius: 8px;
+        border: 1px solid c.$grey-700;
+        margin-top: 4px;
+
+        &::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: transparent;
+            border-radius: 8px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background-color: #a4a49b;
+            border-radius: 8px;
+
+            &:hover {
+                background-color: #8c8c84;
+            }
+        }
+    }
+}
+
+.select-error {
+    :global(.select-head) {
+        border-color: c.$error;
     }
 }
 

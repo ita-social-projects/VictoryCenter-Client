@@ -116,7 +116,7 @@ export const AddFundsExpendituresRecordModal = ({
                             onValueChange={handleReportingYearChange}
                             selectContainerRef={reportingYearSelectRef}
                             placeholder={FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_PLACEHOLDER}
-                            className={styles.select}
+                            className={`${styles.select} ${formState.errors.reportingYear ? styles['select-error'] : ''}`}
                             optionClassName={styles['select-option']}
                         >
                             {yearOptions.map((year) => (
@@ -146,7 +146,7 @@ export const AddFundsExpendituresRecordModal = ({
                                 onValueChange={handleCategoryChange}
                                 selectContainerRef={categorySelectRef}
                                 placeholder={modalConfig.CATEGORY_PLACEHOLDER}
-                                className={styles.select}
+                                className={`${styles.select} ${formState.errors.categoryId ? styles['select-error'] : ''}`}
                                 optionClassName={styles['select-option']}
                             >
                                 {filteredCategories.map((category) => (

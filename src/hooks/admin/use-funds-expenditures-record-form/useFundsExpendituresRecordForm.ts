@@ -110,9 +110,10 @@ export const useFundsExpendituresRecordForm = ({
 
     const handleAmountChange = useCallback(
         (value: string) => {
+            const valueWithoutSpaces = value.replace(/\s/g, '');
             setFormState((prev) => ({
                 ...prev,
-                ...updateFundsAmounts('amountUah', value, exchangeRate, 'change')(prev),
+                ...updateFundsAmounts('amountUah', valueWithoutSpaces, exchangeRate, 'change')(prev),
             }));
             setUsdMismatchMessage(undefined);
         },
@@ -126,9 +127,10 @@ export const useFundsExpendituresRecordForm = ({
 
     const handleUsdChange = useCallback(
         (value: string) => {
+            const valueWithoutSpaces = value.replace(/\s/g, '');
             setFormState((prev) => ({
                 ...prev,
-                ...updateFundsAmounts('amountUsd', value, exchangeRate, 'change')(prev),
+                ...updateFundsAmounts('amountUsd', valueWithoutSpaces, exchangeRate, 'change')(prev),
             }));
             setUsdMismatchMessage(undefined);
         },
@@ -136,8 +138,8 @@ export const useFundsExpendituresRecordForm = ({
     );
 
     const handleSubmit = useCallback(async () => {
-        const normalizedAmountUah = normalizeFundsExpendituresAmountInput(formState.amountUah, true);
-        const normalizedAmountUsd = normalizeFundsExpendituresAmountInput(formState.amountUsd, true);
+        const normalizedAmountUah = normalizeFundsExpendituresAmountInput(formState.amountUah, true, true);
+        const normalizedAmountUsd = normalizeFundsExpendituresAmountInput(formState.amountUsd, true, true);
 
         const nextErrors = {
             reportingYear: validateFundsExpendituresReportingYear(formState.reportingYear, 'save'),

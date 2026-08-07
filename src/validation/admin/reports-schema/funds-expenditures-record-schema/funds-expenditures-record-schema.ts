@@ -14,16 +14,22 @@ interface ValidateFundsExpendituresCategoryParams {
     trigger?: FundsExpendituresCategoryValidationTrigger;
 }
 
-export const normalizeFundsExpendituresAmountInput = (value: string | undefined | null, trimEnd = false): string => {
+export const normalizeFundsExpendituresAmountInput = (
+    value: string | undefined | null,
+    trimEnd = false,
+    removeAllSpaces = false,
+): string => {
     if (!value) {
         return '';
     }
-    const withNormalizedSpaces = value.replaceAll(/\s+/g, ' ').trimStart();
+    const withNormalizedSpaces = removeAllSpaces
+        ? value.replaceAll(/\s+/g, '')
+        : value.replaceAll(/\s+/g, ' ').trimStart();
     const withCommaSeparator = withNormalizedSpaces.replaceAll('.', ',');
     const firstCommaIndex = withCommaSeparator.indexOf(',');
 
     if (firstCommaIndex === -1) {
-        return trimEnd ? withCommaSeparator.trim() : withCommaSeparator;
+        return !removeAllSpaces && trimEnd ? withCommaSeparator.trim() : withCommaSeparator;
     }
 
     const integerPart = withCommaSeparator.slice(0, firstCommaIndex);
@@ -33,7 +39,7 @@ export const normalizeFundsExpendituresAmountInput = (value: string | undefined 
         .slice(0, 2);
     const normalized = `${integerPart},${decimalPart}`;
 
-    return trimEnd ? normalized.trim() : normalized;
+    return !removeAllSpaces && trimEnd ? normalized.trim() : normalized;
 };
 
 export const validateFundsExpendituresAmount = (

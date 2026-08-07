@@ -132,9 +132,10 @@ export const useProgramExpenseRecordForm = ({
 
     const handleAmountChange = useCallback(
         (value: string) => {
+            const valueWithoutSpaces = value.replace(/\s/g, '');
             setFormState((previousState) => ({
                 ...previousState,
-                ...updateFundsAmounts('amountUah', value, exchangeRate, 'change')(previousState),
+                ...updateFundsAmounts('amountUah', valueWithoutSpaces, exchangeRate, 'change')(previousState),
             }));
             setUsdMismatchMessage(undefined);
         },
@@ -143,9 +144,10 @@ export const useProgramExpenseRecordForm = ({
 
     const handleUsdChange = useCallback(
         (value: string) => {
+            const valueWithoutSpaces = value.replace(/\s/g, '');
             setFormState((previousState) => ({
                 ...previousState,
-                ...updateFundsAmounts('amountUsd', value, exchangeRate, 'change')(previousState),
+                ...updateFundsAmounts('amountUsd', valueWithoutSpaces, exchangeRate, 'change')(previousState),
             }));
             setUsdMismatchMessage(undefined);
         },

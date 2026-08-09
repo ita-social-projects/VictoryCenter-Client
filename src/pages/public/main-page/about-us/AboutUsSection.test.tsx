@@ -1,6 +1,4 @@
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { useNavigate } from 'react-router-dom';
 import { AboutUsSection } from './AboutUsSection';
 import { PUBLIC_ROUTES } from '@/const/public/routes';
 import { PublicMainAboutUsDto, PublicMainPageLocalizationDto } from '@/types/public/main-page';
@@ -28,8 +26,6 @@ jest.mock('@/hooks/common/use-locale/useLocale', () => ({
 }));
 
 const mockedUseLocale = useLocale as jest.Mock;
-const mockedUseNavigate = useNavigate as jest.Mock;
-const mockNavigate = jest.fn();
 
 const createLocalization = (overrides: Partial<PublicMainPageLocalizationDto> = {}): PublicMainPageLocalizationDto => ({
     entityId: 1,
@@ -50,7 +46,6 @@ describe('AboutUsSection', () => {
         jest.clearAllMocks();
         mockT.mockImplementation((key: string) => translations[key] ?? key);
         mockedUseLocale.mockReturnValue({ currentLanguage: 'uk' });
-        mockedUseNavigate.mockReturnValue(mockNavigate);
     });
 
     it('renders the title as a level 2 heading and the description as a paragraph', () => {
@@ -97,16 +92,15 @@ describe('AboutUsSection', () => {
 
         expect(screen.queryByRole('heading', { level: 2 })).not.toBeInTheDocument();
         expect(container.querySelector('p')).not.toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Get to know more' })).toBeInTheDocument();
+        expect(screen.getByRole('link', { name: 'Get to know more' })).toBeInTheDocument();
     });
 
-    it('navigates to the about us page when the button is clicked', async () => {
-        const user = userEvent.setup();
+    it('opens the about us page in a new tab and keeps the current page intact', () => {
         render(<AboutUsSection mainAboutUs={createAboutUs()} />);
 
-        await user.click(screen.getByRole('button', { name: 'Get to know more' }));
-
-        expect(mockNavigate).toHaveBeenCalledTimes(1);
-        expect(mockNavigate).toHaveBeenCalledWith(PUBLIC_ROUTES.ABOUT_US.FULL);
+        const link = screen.getByRole('link', { name: 'Get to know more' });
+        expect(link).toHaveAttribute('href', PUBLIC_ROUTES.ABOUT_US.FULL);
+        expect(link).toHaveAttribute('target', '_blank');
+        expect(link).toHaveAttribute('rel', 'noopener noreferrer');
     });
 });

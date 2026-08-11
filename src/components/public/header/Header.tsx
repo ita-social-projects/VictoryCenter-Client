@@ -73,7 +73,7 @@ export const Header = () => {
 
                         <Button
                             variant="tertiary"
-                            size="large"
+                            size="medium"
                             icon={BurgerIcon}
                             ariaLabel="Open menu"
                             onClick={toggleMenu}

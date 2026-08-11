@@ -45,6 +45,22 @@ describe('funds-expenditures-exchange-rate-schema', () => {
             );
         });
 
+        it('returns numeric validation for integer with a leading zero', () => {
+            expect(validateFundsExpendituresExchangeRate('012345678')).toBe(
+                FUNDS_EXPENDITURES_TEXT.VALIDATION.EXCHANGE_RATE_ONLY_NUMERIC,
+            );
+        });
+
+        it('returns numeric validation for decimal with a leading zero before the comma', () => {
+            expect(validateFundsExpendituresExchangeRate('01,5')).toBe(
+                FUNDS_EXPENDITURES_TEXT.VALIDATION.EXCHANGE_RATE_ONLY_NUMERIC,
+            );
+        });
+
+        it('accepts a single zero integer part followed by a decimal', () => {
+            expect(validateFundsExpendituresExchangeRate('0,5')).toBeUndefined();
+        });
+
         it('returns gt-zero validation for zero', () => {
             expect(validateFundsExpendituresExchangeRate('0')).toBe(
                 FUNDS_EXPENDITURES_TEXT.VALIDATION.EXCHANGE_RATE_GT_ZERO,

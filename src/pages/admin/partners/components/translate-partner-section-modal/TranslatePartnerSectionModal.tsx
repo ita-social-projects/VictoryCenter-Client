@@ -117,9 +117,10 @@ export const TranslatePartnerSectionModal = ({
             />
 
             {error && <div className={styles.error}>{error}</div>}
-            {translationFetchError && <div className={styles.error}>{translationFetchError}</div>}
 
-            {isLoadingTranslation || !initialData ? (
+            {translationFetchError ? (
+                <div className={styles.error}>{translationFetchError}</div>
+            ) : isLoadingTranslation || !initialData ? (
                 <div className={styles.loader}>
                     <InlineLoader size={2} />
                 </div>

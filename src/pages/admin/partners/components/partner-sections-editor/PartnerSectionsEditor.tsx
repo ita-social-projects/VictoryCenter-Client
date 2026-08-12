@@ -78,6 +78,38 @@ const isSectionDirty = (section: PartnerSectionFormValues, fetchedSections: Part
     return false;
 };
 
+const isSectionTextDirty = (section: PartnerSectionFormValues, fetchedSections: PartnerSection[]): boolean => {
+    if (section.sectionId === null) return true;
+
+    const originalSection = fetchedSections.find((s) => s.id === section.sectionId);
+    if (!originalSection) return true;
+
+    if (section.title !== originalSection.title) return true;
+    if (section.description !== originalSection.description) return true;
+
+    const originalPartnersMap = new Map(originalSection.partners.map((p) => [p.id, p]));
+
+    for (const partner of section.partners) {
+        if (partner.partnerId === null) continue;
+
+        const originalPartner = originalPartnersMap.get(partner.partnerId);
+        if (!originalPartner) continue;
+
+        if (partner.description !== originalPartner.description) return true;
+    }
+
+    return false;
+};
+
+const isCancelError = (error: unknown): boolean => {
+    if (axios.isCancel?.(error)) return true;
+    if (typeof error === 'object' && error !== null && 'name' in error) {
+        const { name } = error as { name?: unknown };
+        return name === 'CanceledError' || name === 'AbortError';
+    }
+    return false;
+};
+
 export interface PartnerSectionsEditorRef {
     addSection: () => void;
 }
@@ -221,13 +253,8 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef, Partne
                     if (hasFailure) {
                         addToast(PARTNERS_TEXT.MESSAGE.FAIL_TO_LOAD_PARTNERS, ToastType.Error);
                     }
-                } catch (error: any) {
-                    if (
-                        cancelled ||
-                        axios.isCancel?.(error) ||
-                        error.name === 'CanceledError' ||
-                        error.name === 'AbortError'
-                    ) {
+                } catch (error: unknown) {
+                    if (cancelled || isCancelError(error)) {
                         return;
                     }
                     addToast(PARTNERS_TEXT.MESSAGE.FAIL_TO_LOAD_PARTNERS, ToastType.Error);
@@ -348,8 +375,8 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef, Partne
                     }
                     return [...currentArray, savedSection];
                 });
-            } catch (error: any) {
-                if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {
+            } catch (error: unknown) {
+                if (isCancelError(error)) {
                     return;
                 }
                 addToast(PARTNERS_TEXT.MESSAGE.FAIL_TO_PUBLISH_SECTION, ToastType.Error);
@@ -413,8 +440,8 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef, Partne
                 }
 
                 addToast(PARTNERS_TEXT.MESSAGE.SECTION_DELETED, ToastType.Success);
-            } catch (error: any) {
-                if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {
+            } catch (error: unknown) {
+                if (isCancelError(error)) {
                     return;
                 }
                 addToast(PARTNERS_TEXT.MESSAGE.FAIL_TO_DELETE_SECTION, ToastType.Error);
@@ -472,6 +499,11 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef, Partne
             [localSections, fetchedSections],
         );
 
+        const sectionTextDirtyStates = React.useMemo(
+            () => localSections.map((section) => isSectionTextDirty(section, fetchedSections)),
+            [localSections, fetchedSections],
+        );
+
         if (isSectionsLoading && localSections.length === 0) {
             return (
                 <div className={styles.loader}>
@@ -500,6 +532,7 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef, Partne
                         errors={errors[index] || { partners: [] }}
                         disabled={isSectionsLoading || isPublishing || (!isBaseLanguage && isLoadingTranslations)}
                         isDirty={sectionDirtyStates[index]}
+                        isTextDirty={sectionTextDirtyStates[index]}
                         onChange={handleChange}
                         onDelete={handleDeleteRequest}
                         onPublish={handlePublishRequest}

@@ -42,6 +42,7 @@ export interface PartnerSectionProps {
     onPublish: (localId: string, sectionData: PartnerSectionFormValues) => void;
     onTranslate: (sectionId: number) => void;
     isDirty: boolean;
+    isTextDirty: boolean;
     localizations: EntityLocalization[];
     translationLanguages: LocalizationLanguage[];
     language: LocalizationLanguage;
@@ -58,6 +59,7 @@ const PartnerSectionComponent = ({
     disabled = false,
     errors,
     isDirty,
+    isTextDirty,
     localizations,
     translationLanguages,
     language,
@@ -196,7 +198,7 @@ const PartnerSectionComponent = ({
                     type="button"
                     onClick={handleTranslate}
                     DefaultIcon={ACTION_ICONS.translate.default}
-                    disabled={disabled || isDirty || value.sectionId === null}
+                    disabled={disabled || isTextDirty || value.sectionId === null}
                 />
             </div>
 

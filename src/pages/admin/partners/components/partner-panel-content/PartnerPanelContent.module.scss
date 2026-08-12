@@ -23,7 +23,7 @@
 .loader {
     display: flex;
     justify-content: center;
-    padding: 2rem 0;
+    padding: 32px 0;
 }
 
 .error {
@@ -31,6 +31,6 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 1rem;
-    padding: 2rem 0;
+    gap: 16px;
+    padding: 32px 0;
 }

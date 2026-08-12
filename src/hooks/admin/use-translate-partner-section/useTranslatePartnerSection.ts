@@ -100,7 +100,7 @@ export const useTranslatePartnerSection = ({
             }
 
             onSuccess();
-        } catch (_err) {
+        } catch {
             const errorMessage = isEditMode
                 ? PARTNERS_TEXT.MESSAGE.FAIL_TO_UPDATE_TRANSLATION_FOR_SECTION
                 : PARTNERS_TEXT.MESSAGE.FAIL_TO_TRANSLATE_SECTION;

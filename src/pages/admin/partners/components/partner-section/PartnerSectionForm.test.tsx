@@ -143,6 +143,7 @@ const renderComponent = (props: Partial<React.ComponentProps<typeof PartnerSecti
         value: defaultSectionValue,
         errors: defaultSectionErrors,
         isDirty: true,
+        isTextDirty: true,
         disabled: false,
         onChange: jest.fn(),
         onDelete: jest.fn(),
@@ -362,6 +363,7 @@ describe('PartnerSectionForm', () => {
                 value={defaultSectionValue}
                 errors={defaultSectionErrors}
                 isDirty={true}
+                isTextDirty={true}
                 disabled={false}
                 onChange={jest.fn()}
                 onDelete={jest.fn()}

@@ -27,7 +27,17 @@ export function useFieldHandlers<TFormValues, TFormErrors, TConfig extends Field
             const binding: FieldBinding = {
                 value,
                 onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-                    setFormState((prev) => ({ ...prev, [name]: e.target.value }) as TFormValues);
+                    const targetValue = e.target.value;
+                    setFormState((prev) => ({ ...prev, [name]: targetValue }) as TFormValues);
+                    if (validateFn) {
+                        const error = validateFn(targetValue, false);
+                        setErrors((prev) => {
+                            const currentError = (prev as Record<string, string | undefined>)[name];
+                            if (!currentError) return prev;
+
+                            return { ...prev, [name]: error } as TFormErrors;
+                        });
+                    }
                 },
                 onBlur: () => {
                     if (validateFn) {

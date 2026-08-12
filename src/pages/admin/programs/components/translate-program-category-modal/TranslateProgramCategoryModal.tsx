@@ -27,10 +27,7 @@ export const TranslateProgramCategoryModal = ({
     const [isFormValid, setIsFormValid] = useState(false);
     const [isDirty, setIsDirty] = useState(false);
 
-    const englishLanguages = useMemo(
-        () => translatedLanguages.filter((l) => l.code === 'en'),
-        [translatedLanguages],
-    );
+    const englishLanguages = useMemo(() => translatedLanguages.filter((l) => l.code === 'en'), [translatedLanguages]);
 
     const [language, setLanguage] = useState<LocalizationLanguage | null>(englishLanguages[0] ?? null);
 

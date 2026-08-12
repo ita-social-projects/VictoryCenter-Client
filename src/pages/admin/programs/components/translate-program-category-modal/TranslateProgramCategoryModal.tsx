@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { LocalizationModal } from '@/components/admin/localization-modal/LocalizationModal';
 import { TranslationControls } from '@/components/admin/translation-controls/TranslationControls';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -26,7 +26,13 @@ export const TranslateProgramCategoryModal = ({
     const formRef = useRef<TranslateProgramCategoryFormRef>(null);
     const [isFormValid, setIsFormValid] = useState(false);
     const [isDirty, setIsDirty] = useState(false);
-    const [language, setLanguage] = useState<LocalizationLanguage | null>(translatedLanguages[0] ?? null);
+
+    const englishLanguages = useMemo(
+        () => translatedLanguages.filter((l) => l.code === 'en'),
+        [translatedLanguages],
+    );
+
+    const [language, setLanguage] = useState<LocalizationLanguage | null>(englishLanguages[0] ?? null);
 
     const handleSaveClick = () => {
         if (!formRef.current?.isValid()) return;
@@ -55,7 +61,7 @@ export const TranslateProgramCategoryModal = ({
                 <TranslationControls
                     selectedLanguage={language}
                     isSubmitting={false}
-                    languages={translatedLanguages}
+                    languages={englishLanguages}
                     onLanguageChange={setLanguage}
                 />
             )}

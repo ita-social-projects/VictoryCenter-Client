@@ -114,8 +114,8 @@ describe('TranslateProgramCategoryModal', () => {
         );
     });
 
-    it('selects the first translated language by default', () => {
-        renderModal({ translatedLanguages: [EN_LANGUAGE, PL_LANGUAGE] });
+    it('selects English by default regardless of array order', () => {
+        renderModal({ translatedLanguages: [PL_LANGUAGE, EN_LANGUAGE] });
 
         expect(screen.getByTestId('selected-language')).toHaveTextContent('en');
     });
@@ -126,14 +126,20 @@ describe('TranslateProgramCategoryModal', () => {
         expect(screen.queryByTestId('translation-controls')).not.toBeInTheDocument();
     });
 
-    it('changes the selected language through translation controls', async () => {
+    it('does not render translation controls when English is not among translatedLanguages', () => {
+        renderModal({ translatedLanguages: [PL_LANGUAGE] });
+
+        expect(screen.queryByTestId('translation-controls')).not.toBeInTheDocument();
+    });
+
+    it('locks the language dropdown to English only, excluding other languages', () => {
         renderModal({ translatedLanguages: [EN_LANGUAGE, PL_LANGUAGE] });
+
+        expect(screen.getByTestId('languages-count')).toHaveTextContent('1');
 
         fireEvent.click(screen.getByTestId('choose-last-language'));
 
-        await waitFor(() => {
-            expect(screen.getByTestId('selected-language')).toHaveTextContent('pl');
-        });
+        expect(screen.getByTestId('selected-language')).toHaveTextContent('en');
     });
 
     it('submits the form when Save is clicked and the form is valid', async () => {

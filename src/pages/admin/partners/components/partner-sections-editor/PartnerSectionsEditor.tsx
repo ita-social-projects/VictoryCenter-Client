@@ -7,6 +7,7 @@ import {
 import { RequestOptions } from '@/types/common/api';
 import { ToastType } from '@/types/admin/toast';
 import { PARTNERS_TEXT } from '@/const/admin/partners';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import axios from 'axios';
 import { PartnerFormValues } from '../partner-form/PartnerForm';
 import { PartnersApi } from '@/services/api/admin/partners/partners-api';
@@ -397,7 +398,8 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef, Partne
 
         const handleTranslated = useCallback(() => {
             refetchSections();
-        }, [refetchSections]);
+            addToast(COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS, ToastType.Success);
+        }, [refetchSections, addToast]);
 
         const sectionToTranslate = useMemo(
             () => fetchedSections.find((s) => s.id === translatingSectionId) ?? null,

@@ -5,6 +5,7 @@ import { ImageValues, Image } from '@/types/common/image';
 import { InputLabel } from '@/components/admin/input-label/InputLabel';
 import { SingleSelectInput } from '@/components/common/single-select-input/SingleSelectInput';
 import { TEAM_IMAGE_PLACEHOLDER, TEAM_MEMBER_VALIDATION, TEAM_MEMBERS_TEXT } from '@/const/admin/team';
+import { IMAGE_VALIDATION } from '@/const/admin/image';
 import { ImageInput } from '@/components/admin/image-input/ImageInput';
 import './MemberForm.scss';
 import { useFormManager } from '@/hooks/admin/use-form-manager/useFormManager';
@@ -40,6 +41,15 @@ export interface MemberFormProps {
     categories: TeamCategory[];
     onValidationChange?: (isValid: boolean) => void;
 }
+
+const mapImageInputError = (error: string | null): string | undefined => {
+    // Removing only ImageDimensionsTooLargeError
+    if (!error || error === IMAGE_VALIDATION.ImageDimensionsTooLargeError) {
+        return undefined;
+    }
+
+    return error;
+};
 
 const validateForm = (formState: TeamMemberFormValues, isPublishing: boolean): TeamMemberFormErrorState => {
     return {
@@ -164,7 +174,7 @@ export const MemberForm = forwardRef<TeamMemberFormRef, MemberFormProps>(
                         setError={(error) =>
                             setErrors((prev) => ({
                                 ...prev,
-                                image: error || undefined,
+                                image: mapImageInputError(error),
                             }))
                         }
                     />

@@ -168,6 +168,32 @@ describe('TranslatePartnerBannerModal', () => {
         expect(screen.getByTestId('selected-language')).toHaveTextContent('uk');
     });
 
+    it('selects a language once it arrives after the modal has already mounted with no languages', () => {
+        const { rerender } = render(
+            <TranslatePartnerBannerModal
+                isOpen={true}
+                onClose={jest.fn()}
+                banner={BANNER_WITHOUT_LOCALIZATION}
+                onTranslateBanner={jest.fn()}
+                translatedLanguages={[]}
+            />,
+        );
+
+        expect(screen.getByTestId('selected-language')).toHaveTextContent('none');
+
+        rerender(
+            <TranslatePartnerBannerModal
+                isOpen={true}
+                onClose={jest.fn()}
+                banner={BANNER_WITHOUT_LOCALIZATION}
+                onTranslateBanner={jest.fn()}
+                translatedLanguages={[UK_LANGUAGE, EN_LANGUAGE]}
+            />,
+        );
+
+        expect(screen.getByTestId('selected-language')).toHaveTextContent('en');
+    });
+
     it('uses null selected language when translatedLanguages is empty', () => {
         renderModal({ translatedLanguages: [] });
 

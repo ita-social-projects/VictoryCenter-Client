@@ -6,7 +6,7 @@ import { useTranslatePartnerBanner } from '@/hooks/admin/use-translate-partner-b
 import { ModalMode } from '@/types/admin/common';
 import { PartnerBanner } from '@/types/admin/partners';
 import { LocalizationLanguage } from '@/types/common/language';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
     TranslatePartnerBannerForm,
     TranslatePartnerBannerFormRef,
@@ -36,6 +36,11 @@ export const TranslatePartnerBannerModal = ({
         if (!translatedLanguages?.length) return null;
         return translatedLanguages.find((l) => l.code !== DEFAULT_LOCALE) ?? translatedLanguages[0];
     });
+
+    useEffect(() => {
+        if (language || !translatedLanguages?.length) return;
+        setLanguage(translatedLanguages.find((l) => l.code !== DEFAULT_LOCALE) || translatedLanguages[0]);
+    }, [translatedLanguages, language]);
 
     const existingLocalization = useMemo(() => {
         if (!banner?.localizations || !language) return null;

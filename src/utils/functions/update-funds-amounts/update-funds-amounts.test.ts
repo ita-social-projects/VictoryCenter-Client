@@ -268,6 +268,39 @@ describe('updateFundsAmounts', () => {
             expect(result.amountUah).toBe('');
         });
 
+        it.each([
+            ['change', undefined],
+            ['blur', 'Field is required'],
+        ] as const)('should clear amountUsd when amountUah becomes empty on %s trigger', (trigger, uahError) => {
+            const stateWithUsd: FundsAmountsState = {
+                amountUah: '100',
+                amountUsd: '30',
+                errors: {
+                    amountUah: 'Previous UAH error',
+                    amountUsd: 'Previous USD error',
+                },
+            };
+
+            mockNormalizeFundsExpendituresAmountInput.mockReturnValue('');
+            mockValidateFundsExpendituresAmount.mockImplementation(
+                (value: string, currentTrigger?: 'change' | 'blur' | 'save') => {
+                    if (value === '') {
+                        return currentTrigger === 'blur' ? 'Field is required' : undefined;
+                    }
+
+                    return undefined;
+                },
+            );
+
+            const updater = updateFundsAmounts('amountUah', '', '33.5', trigger);
+            const result = updater(stateWithUsd);
+
+            expect(result.amountUah).toBe('');
+            expect(result.amountUsd).toBe('');
+            expect(result.errors.amountUsd).toBeUndefined();
+            expect(result.errors.amountUah).toBe(uahError);
+        });
+
         it('should handle very large amounts', () => {
             const largeAmount = '999999999.99';
             mockNormalizeFundsExpendituresAmountInput.mockReturnValue(largeAmount);

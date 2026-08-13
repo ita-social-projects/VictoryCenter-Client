@@ -65,6 +65,12 @@ export const Select = <TValue,>({
         };
     }, [isOpen, containerRef]);
 
+    const handleBlur = (e: React.FocusEvent<HTMLDivElement>) => {
+        if (isOpen && containerRef.current && !containerRef.current.contains(e.relatedTarget as Node)) {
+            setIsOpen(false);
+        }
+    };
+
     const selectedOption = options.find((opt) => opt.props.value === value);
     const hasValue = value !== null && value !== undefined;
     const displayLabel =
@@ -104,6 +110,7 @@ export const Select = <TValue,>({
             })}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
+            onBlurCapture={handleBlur}
         >
             <button
                 type="button"

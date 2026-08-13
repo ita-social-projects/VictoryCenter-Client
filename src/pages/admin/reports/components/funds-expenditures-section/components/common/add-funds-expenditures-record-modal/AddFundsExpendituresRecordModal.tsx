@@ -1,4 +1,5 @@
 import { FocusEvent, useMemo, useRef } from 'react';
+import classNames from 'classnames';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FUNDS_EXPENDITURES_TEXT } from '@/const/admin/reports';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
@@ -116,7 +117,9 @@ export const AddFundsExpendituresRecordModal = ({
                             onValueChange={handleReportingYearChange}
                             selectContainerRef={reportingYearSelectRef}
                             placeholder={FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_PLACEHOLDER}
-                            className={styles.select}
+                            className={classNames(styles.select, {
+                                [styles['select-error']]: formState.errors.reportingYear,
+                            })}
                             optionClassName={styles['select-option']}
                         >
                             {yearOptions.map((year) => (
@@ -146,7 +149,9 @@ export const AddFundsExpendituresRecordModal = ({
                                 onValueChange={handleCategoryChange}
                                 selectContainerRef={categorySelectRef}
                                 placeholder={modalConfig.CATEGORY_PLACEHOLDER}
-                                className={styles.select}
+                                className={classNames(styles.select, {
+                                    [styles['select-error']]: formState.errors.categoryId,
+                                })}
                                 optionClassName={styles['select-option']}
                             >
                                 {filteredCategories.map((category) => (

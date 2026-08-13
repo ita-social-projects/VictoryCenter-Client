@@ -17,19 +17,20 @@ interface ValidateFundsExpendituresCategoryParams {
 export const normalizeFundsExpendituresAmountInput = (
     value: string | undefined | null,
     trimEnd = false,
-    removeAllSpaces = false,
+    preserveSpaces = true,
 ): string => {
     if (!value) {
         return '';
     }
-    const withNormalizedSpaces = removeAllSpaces
-        ? value.replaceAll(/\s+/g, '')
-        : value.replaceAll(/\s+/g, ' ').trimStart();
+
+    const spaceReplacement = preserveSpaces ? ' ' : '';
+    const withNormalizedSpaces = value.replaceAll(/\s+/g, spaceReplacement).trimStart();
+
     const withCommaSeparator = withNormalizedSpaces.replaceAll('.', ',');
     const firstCommaIndex = withCommaSeparator.indexOf(',');
 
     if (firstCommaIndex === -1) {
-        return !removeAllSpaces && trimEnd ? withCommaSeparator.trim() : withCommaSeparator;
+        return trimEnd ? withCommaSeparator.trim() : withCommaSeparator;
     }
 
     const integerPart = withCommaSeparator.slice(0, firstCommaIndex);
@@ -37,9 +38,10 @@ export const normalizeFundsExpendituresAmountInput = (
         .slice(firstCommaIndex + 1)
         .replaceAll(/[\s,]/g, '')
         .slice(0, 2);
+
     const normalized = `${integerPart},${decimalPart}`;
 
-    return !removeAllSpaces && trimEnd ? normalized.trim() : normalized;
+    return trimEnd ? normalized.trim() : normalized;
 };
 
 export const validateFundsExpendituresAmount = (

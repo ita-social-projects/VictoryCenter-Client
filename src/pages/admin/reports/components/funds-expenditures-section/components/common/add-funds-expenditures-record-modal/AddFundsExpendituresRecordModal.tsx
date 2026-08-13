@@ -55,9 +55,8 @@ export const AddFundsExpendituresRecordModal = ({
         handleReportingYearBlur,
         handleCategoryChange,
         handleCategoryBlur,
-        handleAmountChange,
+        handleAmountFieldChange,
         handleAmountBlur,
-        handleUsdChange,
         handleOpenAddConfirmation,
         handleConfirmAdd,
         handleCloseConfirmation,
@@ -167,7 +166,7 @@ export const AddFundsExpendituresRecordModal = ({
                             name="amountUah"
                             type="text"
                             value={formState.amountUah}
-                            onChange={(event) => handleAmountChange(event.target.value)}
+                            onChange={(event) => handleAmountFieldChange('amountUah')(event.target.value)}
                             onBlur={() => handleAmountBlur('amountUah')}
                             maxLength={20}
                             showCounter={false}
@@ -200,7 +199,7 @@ export const AddFundsExpendituresRecordModal = ({
                             name="amountUsd"
                             type="text"
                             value={formState.amountUsd}
-                            onChange={(event) => handleUsdChange(event.target.value)}
+                            onChange={(event) => handleAmountFieldChange('amountUsd')(event.target.value)}
                             onBlur={() => handleAmountBlur('amountUsd')}
                             maxLength={20}
                             showCounter={false}

@@ -108,12 +108,13 @@ export const useFundsExpendituresRecordForm = ({
         [records, transactionType],
     );
 
-    const handleAmountChange = useCallback(
-        (value: string) => {
-            const valueWithoutSpaces = value.replace(/\s/g, '');
+    const handleAmountFieldChange = useCallback(
+        (field: 'amountUah' | 'amountUsd') => (value: string) => {
+            const normalizedValue = normalizeFundsExpendituresAmountInput(value, false, false);
+
             setFormState((prev) => ({
                 ...prev,
-                ...updateFundsAmounts('amountUah', valueWithoutSpaces, exchangeRate, 'change')(prev),
+                ...updateFundsAmounts(field, normalizedValue, exchangeRate, 'change')(prev),
             }));
             setUsdMismatchMessage(undefined);
         },
@@ -125,21 +126,9 @@ export const useFundsExpendituresRecordForm = ({
         [handleAmountBlurBase],
     );
 
-    const handleUsdChange = useCallback(
-        (value: string) => {
-            const valueWithoutSpaces = value.replace(/\s/g, '');
-            setFormState((prev) => ({
-                ...prev,
-                ...updateFundsAmounts('amountUsd', valueWithoutSpaces, exchangeRate, 'change')(prev),
-            }));
-            setUsdMismatchMessage(undefined);
-        },
-        [exchangeRate, setUsdMismatchMessage],
-    );
-
     const handleSubmit = useCallback(async () => {
-        const normalizedAmountUah = normalizeFundsExpendituresAmountInput(formState.amountUah, true, true);
-        const normalizedAmountUsd = normalizeFundsExpendituresAmountInput(formState.amountUsd, true, true);
+        const normalizedAmountUah = normalizeFundsExpendituresAmountInput(formState.amountUah, true);
+        const normalizedAmountUsd = normalizeFundsExpendituresAmountInput(formState.amountUsd, true);
 
         const nextErrors = {
             reportingYear: validateFundsExpendituresReportingYear(formState.reportingYear, 'save'),
@@ -282,9 +271,8 @@ export const useFundsExpendituresRecordForm = ({
         handleReportingYearBlur,
         handleCategoryChange,
         handleCategoryBlur,
-        handleAmountChange,
+        handleAmountFieldChange,
         handleAmountBlur,
-        handleUsdChange,
         handleOpenAddConfirmation,
         handleConfirmAdd,
         handleCloseConfirmation,

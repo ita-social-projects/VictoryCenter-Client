@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { LocalizationModal } from '@/components/admin/localization-modal/LocalizationModal';
 import { TranslationControls } from '@/components/admin/translation-controls/TranslationControls';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -30,6 +30,24 @@ export const TranslateProgramCategoryModal = ({
     const englishLanguages = useMemo(() => translatedLanguages.filter((l) => l.code === 'en'), [translatedLanguages]);
 
     const [language, setLanguage] = useState<LocalizationLanguage | null>(englishLanguages[0] ?? null);
+
+    // Keeps the selected language in sync when the modal reopens or `translatedLanguages` resolves after mount.
+    useEffect(() => {
+        if (!isOpen) return;
+        setLanguage(englishLanguages[0] ?? null);
+    }, [englishLanguages, isOpen]);
+
+    // Resets stale validity/dirty state left over from a previous open, without touching the initial mount
+    // (the form's own mount effect already reports its real initial validity/dirty state).
+    const wasOpenRef = useRef(isOpen);
+    useEffect(() => {
+        const wasOpen = wasOpenRef.current;
+        wasOpenRef.current = isOpen;
+        if (!wasOpen && isOpen) {
+            setIsFormValid(false);
+            setIsDirty(false);
+        }
+    }, [isOpen]);
 
     const handleSaveClick = () => {
         if (!formRef.current?.isValid()) return;

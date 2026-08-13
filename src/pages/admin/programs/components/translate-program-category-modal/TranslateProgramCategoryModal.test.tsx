@@ -126,6 +126,32 @@ describe('TranslateProgramCategoryModal', () => {
         expect(screen.queryByTestId('translation-controls')).not.toBeInTheDocument();
     });
 
+    it('renders translation controls once translatedLanguages resolves asynchronously after mount', () => {
+        const onClose = jest.fn();
+        const { rerender } = render(
+            <TranslateProgramCategoryModal
+                isOpen={true}
+                onClose={onClose}
+                translatedLanguages={[]}
+                categories={CATEGORY_LIST}
+            />,
+        );
+
+        expect(screen.queryByTestId('translation-controls')).not.toBeInTheDocument();
+
+        rerender(
+            <TranslateProgramCategoryModal
+                isOpen={true}
+                onClose={onClose}
+                translatedLanguages={[EN_LANGUAGE]}
+                categories={CATEGORY_LIST}
+            />,
+        );
+
+        expect(screen.getByTestId('translation-controls')).toBeInTheDocument();
+        expect(screen.getByTestId('selected-language')).toHaveTextContent('en');
+    });
+
     it('does not render translation controls when English is not among translatedLanguages', () => {
         renderModal({ translatedLanguages: [PL_LANGUAGE] });
 
@@ -190,5 +216,42 @@ describe('TranslateProgramCategoryModal', () => {
 
         fireEvent.click(screen.getByTestId('modal'));
         expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it('resets stale validity/dirty state when reopened after being closed', () => {
+        mockFormIsValid = true;
+        mockFormIsDirty = true;
+        const onClose = jest.fn();
+
+        const { rerender } = render(
+            <TranslateProgramCategoryModal
+                isOpen={true}
+                onClose={onClose}
+                translatedLanguages={[EN_LANGUAGE]}
+                categories={CATEGORY_LIST}
+            />,
+        );
+
+        expect(screen.getByTestId('save-localization-btn')).not.toBeDisabled();
+
+        rerender(
+            <TranslateProgramCategoryModal
+                isOpen={false}
+                onClose={onClose}
+                translatedLanguages={[EN_LANGUAGE]}
+                categories={CATEGORY_LIST}
+            />,
+        );
+
+        rerender(
+            <TranslateProgramCategoryModal
+                isOpen={true}
+                onClose={onClose}
+                translatedLanguages={[EN_LANGUAGE]}
+                categories={CATEGORY_LIST}
+            />,
+        );
+
+        expect(screen.getByTestId('save-localization-btn')).toBeDisabled();
     });
 });

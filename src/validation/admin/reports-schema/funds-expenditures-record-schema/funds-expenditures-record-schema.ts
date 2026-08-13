@@ -21,11 +21,13 @@ export const normalizeFundsExpendituresAmountInput = (value: string | undefined 
     const withNormalizedSpaces = value.replaceAll(/\s+/g, ' ').trimStart();
     let withCommaSeparator = withNormalizedSpaces.replaceAll('.', ',');
 
-    if (withCommaSeparator.startsWith(',')) {
-        withCommaSeparator = `0${withCommaSeparator}`;
-    } else if (withCommaSeparator.startsWith('-,')) {
-        withCommaSeparator = `-0,${withCommaSeparator.slice(2)}`;
-    }
+    withCommaSeparator = withCommaSeparator.replace(/^-\s+/, '-');
+
+    const isNegative = withCommaSeparator.startsWith('-');
+    const absoluteValue = isNegative ? withCommaSeparator.slice(1) : withCommaSeparator;
+    const normalizedPrefix = absoluteValue.startsWith(',') ? `0${absoluteValue}` : absoluteValue;
+
+    withCommaSeparator = isNegative ? `-${normalizedPrefix}` : normalizedPrefix;
 
     const firstCommaIndex = withCommaSeparator.indexOf(',');
 

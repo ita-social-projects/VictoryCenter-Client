@@ -40,6 +40,9 @@ describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
         it('should prepend zero for negative values starting with a comma', () => {
             expect(normalizeFundsExpendituresAmountInput('-,12')).toBe('-0,12');
         });
+        it('should handle dot with spaces before decimal digits', () => {
+            expect(normalizeFundsExpendituresAmountInput('. 12')).toBe('0,12');
+        });
     });
 
     describe('validateFundsExpendituresAmount', () => {
@@ -104,6 +107,11 @@ describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
 
         it('should pass valid value when user types dot and decimal digits without leading zero', () => {
             expect(validateFundsExpendituresAmount('.12', 'change')).toBeUndefined();
+        });
+        it('should validate negative comma-starting input and return negative error', () => {
+            expect(validateFundsExpendituresAmount('-,12', 'change')).toBe(
+                FUNDS_EXPENDITURES_TEXT.VALIDATION.AMOUNT_NOT_NEGATIVE,
+            );
         });
     });
 

@@ -36,7 +36,10 @@ export const updateFundsAmounts = (
             } else if (!currentFieldError) {
                 const convertedAmount = getConvertedAmount(normalized, exchangeRate);
 
-                if (convertedAmount !== null) {
+                if (convertedAmount === null) {
+                    nextAmountUsd = '';
+                    nextAmountUsdError = undefined;
+                } else {
                     nextAmountUsd = convertedAmount;
                     nextAmountUsdError = validateFundsExpendituresAmount(convertedAmount, trigger);
                 }

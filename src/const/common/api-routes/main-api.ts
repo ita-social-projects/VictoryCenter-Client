@@ -95,6 +95,12 @@ export const API_ROUTES = {
         SECTIONS: 'Partners/sections',
         PAGE: 'Partners/page',
     },
+    PARTNERS_PAGE_BANNER_LOCALIZATIONS: {
+        BASE: 'PartnersPageBannerLocalizations',
+    },
+    PARTNER_SECTION_LOCALIZATIONS: {
+        BASE: 'PartnerSectionLocalizations',
+    },
     REPORTS: {
         MEDIA_SETTINGS: 'Report/report',
         BASE: 'Report',

@@ -6,11 +6,12 @@ import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
 import { PartnersApi } from '@/services/api/admin/partners/partners-api';
+import { PartnerSectionLocalizationApi } from '@/services/api/admin/partners/partner-section-localizations-api';
 import { PARTNERS_TEXT } from '@/const/admin/partners';
 import { ToastType } from '@/types/admin/toast';
 
 const mockPartnerSectionFormRender = jest.fn((props: any) => {
-    const { value, errors, disabled, onChange, onDelete, onPublish } = props;
+    const { value, errors, disabled, onChange, onDelete, onPublish, onTranslate } = props;
     return (
         <div data-testid={`partner-section-${value.localId}`} data-disabled={disabled}>
             <span>{value.title}</span>
@@ -37,6 +38,14 @@ const mockPartnerSectionFormRender = jest.fn((props: any) => {
                 disabled={disabled}
             >
                 Publish Section
+            </button>
+            <button
+                type="button"
+                data-testid={`section-translate-${value.localId}`}
+                onClick={() => onTranslate(value.sectionId)}
+                disabled={disabled}
+            >
+                Translate Section
             </button>
         </div>
     );
@@ -71,11 +80,30 @@ jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
 
 jest.mock('@/hooks/common/use-data-fetch/useDataFetch');
 jest.mock('@/services/api/admin/partners/partners-api');
+jest.mock('@/services/api/admin/partners/partner-section-localizations-api');
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient');
 jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider');
 
+const UK_LANGUAGE = { id: 1, code: 'uk', name: 'Ukrainian' };
+const EN_LANGUAGE = { id: 2, code: 'en', name: 'English' };
+const mockTranslationLanguages = [EN_LANGUAGE];
+
+jest.mock('../translate-partner-section-modal/TranslatePartnerSectionModal', () => ({
+    TranslatePartnerSectionModal: ({ isOpen, onClose, section, onTranslated }: any) =>
+        isOpen ? (
+            <div data-testid="translate-partner-section-modal">
+                <span data-testid="translate-section-id">{section?.id ?? 'none'}</span>
+                <button onClick={onTranslated}>mock-translated-success</button>
+                <button onClick={onClose}>mock-translate-close</button>
+            </div>
+        ) : null,
+}));
+
 const mockedUseDataFetch = useDataFetch as jest.Mock;
 const mockedPartnersApi = PartnersApi as jest.Mocked<typeof PartnersApi>;
+const mockedPartnerSectionLocalizationApi = PartnerSectionLocalizationApi as jest.Mocked<
+    typeof PartnerSectionLocalizationApi
+>;
 const mockedUseAdminClient = useAdminClient as jest.Mock;
 const mockedUseToast = useToast as jest.Mock;
 
@@ -113,6 +141,7 @@ beforeEach(() => {
                 imageId: 301,
             },
         ],
+        localizations: [],
     });
 
     mockedPartnersApi.updateSection.mockResolvedValue({
@@ -127,9 +156,11 @@ beforeEach(() => {
                 imageId: 20,
             },
         ],
+        localizations: [],
     });
 
     mockedPartnersApi.deleteSection.mockResolvedValue();
+    mockedPartnerSectionLocalizationApi.get.mockResolvedValue(null);
 });
 
 function mockSections(sections: any[], overrides: { isLoading?: boolean; error?: any; refetch?: jest.Mock } = {}) {
@@ -142,7 +173,11 @@ function mockSections(sections: any[], overrides: { isLoading?: boolean; error?:
     });
 }
 
-async function renderEditor(ui: React.ReactElement = <PartnerSectionsEditor />) {
+async function renderEditor(
+    ui: React.ReactElement = (
+        <PartnerSectionsEditor language={UK_LANGUAGE} translationLanguages={mockTranslationLanguages} />
+    ),
+) {
     render(ui);
     await waitFor(() => expect(mockPartnerSectionFormRender).toHaveBeenCalled());
 }
@@ -174,7 +209,7 @@ describe('PartnerSectionsEditor', () => {
     it('shows loader when sections are loading and none are rendered yet', () => {
         mockSections([], { isLoading: true });
 
-        render(<PartnerSectionsEditor />);
+        render(<PartnerSectionsEditor language={UK_LANGUAGE} translationLanguages={mockTranslationLanguages} />);
 
         expect(screen.getByTestId('inline-loader-2')).toBeInTheDocument();
         expect(mockPartnerSectionFormRender).not.toHaveBeenCalled();
@@ -184,7 +219,7 @@ describe('PartnerSectionsEditor', () => {
         const refetchMock = jest.fn();
         mockSections([], { error: new Error('load error'), refetch: refetchMock });
 
-        render(<PartnerSectionsEditor />);
+        render(<PartnerSectionsEditor language={UK_LANGUAGE} translationLanguages={mockTranslationLanguages} />);
 
         expect(screen.getByText(PARTNERS_TEXT.MESSAGE.FAIL_TO_LOAD_PARTNERS)).toBeInTheDocument();
         fireEvent.click(screen.getByRole('button', { name: 'Спробувати ще' }));
@@ -249,7 +284,9 @@ describe('PartnerSectionsEditor', () => {
         mockSections([]);
 
         const ref = createRef<PartnerSectionsEditorRef>();
-        render(<PartnerSectionsEditor ref={ref} />);
+        render(
+            <PartnerSectionsEditor ref={ref} language={UK_LANGUAGE} translationLanguages={mockTranslationLanguages} />,
+        );
 
         await act(async () => {
             ref.current?.addSection();
@@ -268,7 +305,9 @@ describe('PartnerSectionsEditor', () => {
         mockSections([]);
 
         const ref = createRef<PartnerSectionsEditorRef>();
-        render(<PartnerSectionsEditor ref={ref} />);
+        render(
+            <PartnerSectionsEditor ref={ref} language={UK_LANGUAGE} translationLanguages={mockTranslationLanguages} />,
+        );
 
         await act(async () => {
             ref.current?.addSection();
@@ -461,7 +500,9 @@ describe('PartnerSectionsEditor', () => {
         mockSections([]);
 
         const ref = createRef<PartnerSectionsEditorRef>();
-        render(<PartnerSectionsEditor ref={ref} />);
+        render(
+            <PartnerSectionsEditor ref={ref} language={UK_LANGUAGE} translationLanguages={mockTranslationLanguages} />,
+        );
 
         await act(async () => {
             ref.current?.addSection();
@@ -488,7 +529,7 @@ describe('PartnerSectionsEditor', () => {
     it('does not toast when fetch error is a cancellation', () => {
         mockSections([], { error: { name: 'AbortError' } });
 
-        render(<PartnerSectionsEditor />);
+        render(<PartnerSectionsEditor language={UK_LANGUAGE} translationLanguages={mockTranslationLanguages} />);
 
         expect(addToastMock).not.toHaveBeenCalled();
     });
@@ -504,7 +545,9 @@ describe('PartnerSectionsEditor', () => {
         ]);
 
         const ref = createRef<PartnerSectionsEditorRef>();
-        render(<PartnerSectionsEditor ref={ref} />);
+        render(
+            <PartnerSectionsEditor ref={ref} language={UK_LANGUAGE} translationLanguages={mockTranslationLanguages} />,
+        );
 
         await waitFor(() => expect(mockPartnerSectionFormRender).toHaveBeenCalledTimes(1));
 
@@ -548,7 +591,7 @@ describe('PartnerSectionsEditor', () => {
             },
         ]);
 
-        render(<PartnerSectionsEditor />);
+        render(<PartnerSectionsEditor language={UK_LANGUAGE} translationLanguages={mockTranslationLanguages} />);
 
         const props = mockPartnerSectionFormRender.mock.calls[0][0];
 
@@ -567,6 +610,115 @@ describe('PartnerSectionsEditor', () => {
         });
     });
 
+    it('opens the translate modal for the clicked section and closes it', async () => {
+        const refetchMock = jest.fn();
+        mockSections(
+            [
+                {
+                    id: 4,
+                    title: 'Translatable section',
+                    description: 'Desc',
+                    partners: [],
+                },
+            ],
+            { refetch: refetchMock },
+        );
+
+        await renderEditor();
+
+        expect(screen.queryByTestId('translate-partner-section-modal')).not.toBeInTheDocument();
+
+        const props = getLatestFormProps();
+        act(() => {
+            props.onTranslate(props.value.sectionId);
+        });
+
+        expect(screen.getByTestId('translate-partner-section-modal')).toBeInTheDocument();
+        expect(screen.getByTestId('translate-section-id')).toHaveTextContent('4');
+
+        fireEvent.click(screen.getByText('mock-translate-close'));
+
+        expect(screen.queryByTestId('translate-partner-section-modal')).not.toBeInTheDocument();
+    });
+
+    it('refetches sections when a translation is saved', async () => {
+        const refetchMock = jest.fn();
+        mockSections(
+            [
+                {
+                    id: 4,
+                    title: 'Translatable section',
+                    description: 'Desc',
+                    partners: [],
+                },
+            ],
+            { refetch: refetchMock },
+        );
+
+        await renderEditor();
+
+        const props = getLatestFormProps();
+        act(() => {
+            props.onTranslate(props.value.sectionId);
+        });
+
+        fireEvent.click(screen.getByText('mock-translated-success'));
+
+        expect(refetchMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not fetch section translations when the base language is selected', async () => {
+        mockSections([{ id: 1, title: 'Section', description: 'Desc', partners: [] }]);
+
+        await renderEditor();
+
+        expect(mockedPartnerSectionLocalizationApi.get).not.toHaveBeenCalled();
+
+        const props = getLatestFormProps();
+        expect(props.language).toEqual(UK_LANGUAGE);
+        expect(props.translatedContent).toBeNull();
+        expect(props.disableStructuralActions).toBe(false);
+    });
+
+    it("fetches each visible section's translation when a non-base language is selected", async () => {
+        mockedPartnerSectionLocalizationApi.get.mockImplementation(async (_client: any, sectionId: number) => {
+            if (sectionId === 1) {
+                return {
+                    entityId: 1,
+                    title: 'Section 1 EN',
+                    description: 'Description 1 EN',
+                    partners: [],
+                    localizationInfoDto: { id: EN_LANGUAGE.id, code: EN_LANGUAGE.code },
+                    translationStatus: 1,
+                };
+            }
+            return null;
+        });
+
+        mockSections([
+            { id: 1, title: 'Section 1', description: 'Desc 1', partners: [] },
+            { id: 2, title: 'Section 2', description: 'Desc 2', partners: [] },
+        ]);
+
+        render(<PartnerSectionsEditor language={EN_LANGUAGE} translationLanguages={mockTranslationLanguages} />);
+
+        await waitFor(() => {
+            expect(mockedPartnerSectionLocalizationApi.get).toHaveBeenCalledWith('mock-client', 1, EN_LANGUAGE.id);
+            expect(mockedPartnerSectionLocalizationApi.get).toHaveBeenCalledWith('mock-client', 2, EN_LANGUAGE.id);
+        });
+
+        await waitFor(() => {
+            const calls = mockPartnerSectionFormRender.mock.calls;
+            const propsForSection1 = [...calls].reverse().find((call) => call[0].value.sectionId === 1)?.[0];
+            const propsForSection2 = [...calls].reverse().find((call) => call[0].value.sectionId === 2)?.[0];
+
+            expect(propsForSection1.language).toEqual(EN_LANGUAGE);
+            expect(propsForSection1.translatedContent?.title).toBe('Section 1 EN');
+            expect(propsForSection1.disableStructuralActions).toBe(true);
+            expect(propsForSection2.translatedContent).toBeNull();
+        });
+    });
+
     it('does not add section while sections are loading', async () => {
         mockSections(
             [
@@ -581,7 +733,9 @@ describe('PartnerSectionsEditor', () => {
         );
 
         const ref = createRef<PartnerSectionsEditorRef>();
-        render(<PartnerSectionsEditor ref={ref} />);
+        render(
+            <PartnerSectionsEditor ref={ref} language={UK_LANGUAGE} translationLanguages={mockTranslationLanguages} />,
+        );
 
         await waitFor(() => expect(mockPartnerSectionFormRender).toHaveBeenCalledTimes(1));
 

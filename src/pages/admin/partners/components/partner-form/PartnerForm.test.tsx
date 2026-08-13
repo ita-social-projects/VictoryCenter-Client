@@ -103,6 +103,9 @@ const cardHtmlId = defaultValues.localId;
 const descriptionTestId = `partner-form-description-${cardHtmlId}`;
 const imageTestId = `partner-form-image-${cardHtmlId}`;
 
+const UK_LANGUAGE = { id: 1, code: 'uk', name: 'Ukrainian' };
+const EN_LANGUAGE = { id: 2, code: 'en', name: 'English' };
+
 describe('PartnerForm', () => {
     let onValuesChange: jest.Mock;
     let onDelete: jest.Mock;
@@ -134,6 +137,7 @@ describe('PartnerForm', () => {
                 disabled={false}
                 onValuesChange={onValuesChange}
                 onDelete={onDelete}
+                language={UK_LANGUAGE}
                 {...props}
             />,
         );
@@ -252,5 +256,38 @@ describe('PartnerForm', () => {
         expect(getImageRemoveButton()).toBeDisabled();
         expect(getImageSetErrorButton()).toBeDisabled();
         expect(getDescriptionTextarea()).toBeDisabled();
+    });
+
+    it('shows the translated description and disables fields when a non-base language is selected', () => {
+        renderComponent({ language: EN_LANGUAGE, translatedDescription: 'Translated description' });
+
+        expect(getDescriptionTextarea()).toHaveValue('Translated description');
+        expect(getDescriptionTextarea()).toBeDisabled();
+        expect(getImageChangeButton()).toBeDisabled();
+        expect(getImageRemoveButton()).toBeDisabled();
+        expect(getImageSetErrorButton()).toBeDisabled();
+    });
+
+    it('falls back to an empty description when no translation exists yet', () => {
+        renderComponent({ language: EN_LANGUAGE, translatedDescription: undefined });
+
+        expect(getDescriptionTextarea()).toHaveValue('');
+    });
+
+    it('ignores description and image changes while a non-base language is selected', () => {
+        renderComponent({ language: EN_LANGUAGE });
+
+        fireEvent.change(getDescriptionTextarea(), { target: { value: 'Should be ignored' } });
+        clickImageChange();
+        clickImageRemove();
+        clickImageSetError();
+
+        expect(onValuesChange).not.toHaveBeenCalled();
+    });
+
+    it('disables the delete button when structural actions are disabled', () => {
+        renderComponent({ disableStructuralActions: true });
+
+        expect(getDeleteButton()).toBeDisabled();
     });
 });

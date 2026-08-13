@@ -89,6 +89,7 @@ describe('FUNDS_EXPENDITURES_RECORD_VALIDATION_FUNCTIONS', () => {
 
         it('should accept value with more than two decimal digits because they will be normalized', () => {
             expect(validateFundsExpendituresAmount('1 200,123', 'change')).toBeUndefined();
+            expect(normalizeFundsExpendituresAmountInput('1 200,123', true)).toBe('1 200,12');
         });
 
         it('should ignore spaces when counting fractional digits', () => {

@@ -43,7 +43,6 @@ export interface MemberFormProps {
 }
 
 const mapImageInputError = (error: string | null): string | undefined => {
-    // Removing only ImageDimensionsTooLargeError
     if (!error || error === IMAGE_VALIDATION.ImageDimensionsTooLargeError) {
         return undefined;
     }

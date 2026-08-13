@@ -59,12 +59,28 @@ describe('TranslationControls', () => {
         expect(button).toHaveAttribute('type', 'button');
     });
 
-    it('renders the generate button as disabled and hidden', () => {
+    it('renders the generate button as disabled and hidden by default', () => {
         render(<TranslationControls {...defaultProps} />);
 
         const button = screen.getByTestId('generate-btn');
         expect(button).toBeDisabled();
         expect(button).toHaveClass('disable');
+    });
+
+    it('renders the generate button as disabled and hidden when generateDisabled is true', () => {
+        render(<TranslationControls {...defaultProps} generateDisabled={true} />);
+
+        const button = screen.getByTestId('generate-btn');
+        expect(button).toBeDisabled();
+        expect(button).toHaveClass('disable');
+    });
+
+    it('renders the generate button as enabled and visible when generateDisabled is false', () => {
+        render(<TranslationControls {...defaultProps} generateDisabled={false} />);
+
+        const button = screen.getByTestId('generate-btn');
+        expect(button).toBeEnabled();
+        expect(button).not.toHaveClass('disable');
     });
 
     it.skip('disables the button when isSubmitting is true', () => {

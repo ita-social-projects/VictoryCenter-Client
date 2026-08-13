@@ -11,6 +11,7 @@ interface TranslationControlsProps {
     selectedLanguage: LocalizationLanguage | null;
     onLanguageChange: (language: LocalizationLanguage) => void;
     onGenerate?: () => void;
+    generateDisabled?: boolean;
 }
 
 export const TranslationControls = ({
@@ -18,6 +19,7 @@ export const TranslationControls = ({
     selectedLanguage,
     onLanguageChange,
     onGenerate,
+    generateDisabled = true,
 }: TranslationControlsProps) => {
     return (
         <div className={styles.container}>
@@ -40,9 +42,9 @@ export const TranslationControls = ({
                 )}
             </div>
             <Button
-                className={cn(styles['generate-button'], styles.disable)}
+                className={cn(styles['generate-button'], { [styles.disable]: generateDisabled })}
                 buttonStyle="primary"
-                disabled={true}
+                disabled={generateDisabled}
                 onClick={onGenerate}
                 type="button"
             >

@@ -17,8 +17,12 @@ export interface ProgramCategory {
     id: number;
     name: string;
     programsCount: number;
-    localizations?: EntityLocalization[];
+    localizations?: ProgramCategoryLocalization[];
     translationStatuses?: TranslationStatusInfo[];
+}
+
+export interface ProgramCategoryLocalization extends EntityLocalization {
+    name: string;
 }
 
 export interface HippotherapyProgramDto

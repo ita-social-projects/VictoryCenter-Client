@@ -6,7 +6,7 @@ import { useFormManager } from '@/hooks/admin/use-form-manager/useFormManager';
 import { VisibilityStatus } from '@/types/admin/common';
 import { ProgramCategory } from '@/types/admin/programs';
 import { PROGRAM_CATEGORY_VALIDATION_FUNCTIONS } from '@/validation/admin/program-category-schema/program-category-schema';
-import { forwardRef, useEffect, useMemo } from 'react';
+import { forwardRef, useEffect, useState } from 'react';
 
 export interface TranslateProgramCategoryFormValues {
     categoryId: number | null;
@@ -27,9 +27,12 @@ export interface TranslateProgramCategoryFormRef {
 export interface TranslateProgramCategoryFormProps {
     onSubmit: (data: TranslateProgramCategoryFormValues, status?: VisibilityStatus) => void | Promise<void>;
     categories: ProgramCategory[];
+    initialData?: TranslateProgramCategoryFormValues | null;
     formDisabled?: boolean;
+    onCategoryChange?: (category: ProgramCategory | null) => void;
     onValidationChange?: (isValid: boolean) => void;
     onDirtyChange?: (isDirty: boolean) => void;
+    selectedCategory?: ProgramCategory | null;
 }
 
 const DEFAULT_FORM_STATE: TranslateProgramCategoryFormValues = {
@@ -51,7 +54,16 @@ export const TranslateProgramCategoryForm = forwardRef<
     TranslateProgramCategoryFormProps
 >(
     (
-        { onSubmit, categories, formDisabled, onValidationChange, onDirtyChange }: TranslateProgramCategoryFormProps,
+        {
+            onSubmit,
+            categories,
+            initialData = null,
+            formDisabled,
+            onCategoryChange,
+            onValidationChange,
+            onDirtyChange,
+            selectedCategory,
+        }: TranslateProgramCategoryFormProps,
         ref,
     ) => {
         const { formState, setFormState, errors, setErrors, isSubmitting, isDirty } = useFormManager<
@@ -59,25 +71,27 @@ export const TranslateProgramCategoryForm = forwardRef<
             TranslateProgramCategoryFormErrorState
         >({
             defaultFormState: DEFAULT_FORM_STATE,
-            initialData: null,
+            initialData,
             validateForm,
             onValidationChange,
             ref,
             onSubmit: (data, _status) => onSubmit(data),
         });
 
-        const activeCategory = useMemo(
-            () => categories.find((category) => category.id === formState.categoryId),
-            [categories, formState.categoryId],
-        );
+        const [localSelectedCategory, setLocalSelectedCategory] = useState<ProgramCategory | null>(null);
+        const activeCategory = selectedCategory !== undefined ? selectedCategory : localSelectedCategory;
 
         useEffect(() => {
             onDirtyChange?.(isDirty());
         }, [formState, isDirty, onDirtyChange]);
 
         const handleCategoryChange = (category: ProgramCategory | null) => {
-            setFormState({ categoryId: category?.id ?? null, name: '' });
-            setErrors({ name: undefined });
+            if (selectedCategory === undefined) {
+                setLocalSelectedCategory(category);
+            }
+            setFormState((prev) => ({ ...prev, categoryId: category?.id ?? null }));
+            setErrors((prev) => ({ ...prev, name: undefined }));
+            onCategoryChange?.(category);
         };
 
         const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -104,7 +118,7 @@ export const TranslateProgramCategoryForm = forwardRef<
                     getOptionName={(category) => category.name}
                     disabled={isSubmitting || formDisabled}
                     onChange={handleCategoryChange}
-                    value={activeCategory}
+                    value={activeCategory || undefined}
                     placeholder={COMMON_TEXT_ADMIN.FILTER.CATEGORY.SELECT_CATEGORY}
                     id="translate-program-category-select"
                 />

@@ -34,6 +34,7 @@ export function useFieldHandlers<TFormValues, TFormErrors, TConfig extends Field
                         setErrors((prev) => {
                             const currentError = (prev as Record<string, string | undefined>)[name];
                             if (!currentError) return prev;
+                            if (currentError === error) return prev;
 
                             return { ...prev, [name]: error } as TFormErrors;
                         });

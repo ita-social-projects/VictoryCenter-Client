@@ -76,7 +76,7 @@
         min-width: 100%;
         max-height: 120px;
         overflow-y: scroll;
-        scrollbar-color: #a4a49b transparent;
+        scrollbar-color: c.$grey-700 transparent;
         border-radius: 8px;
         border: 1px solid c.$grey-700;
         margin-top: 4px;
@@ -91,11 +91,11 @@
         }
 
         &::-webkit-scrollbar-thumb {
-            background-color: #a4a49b;
+            background-color: c.$grey-700;
             border-radius: 8px;
 
             &:hover {
-                background-color: #8c8c84;
+                background-color: c.$grey-800;
             }
         }
     }

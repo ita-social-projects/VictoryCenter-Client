@@ -1,4 +1,4 @@
-import React, { RefObject, useEffect, useState, useRef } from 'react';
+import React, { RefObject, useEffect, useState, useRef, useMemo } from 'react';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ReactComponent as ArrowDown } from '@/assets/icons/chevron-down.svg';
 import { ReactComponent as ArrowUp } from '@/assets/icons/chevron-up.svg';
@@ -41,7 +41,7 @@ export const Select = <TValue,>({
     const [isOpen, setIsOpen] = useState(false);
 
     const internalRef = useRef<HTMLDivElement>(null);
-    const containerRef = selectContainerRef || internalRef;
+    const containerRef = useMemo(() => selectContainerRef || internalRef, [selectContainerRef]);
 
     useEffect(() => {
         if (disabled) {

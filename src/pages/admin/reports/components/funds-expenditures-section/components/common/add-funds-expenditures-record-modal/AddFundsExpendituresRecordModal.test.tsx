@@ -50,23 +50,22 @@ jest.mock('@/components/common/select/Select', () => {
             .map((child: any) => ({ value: child.props.value, name: child.props.name }));
 
         return (
-            <div data-testid={`select-wrapper-${placeholder}`} className={className}>
-                <select
-                    data-testid={placeholder}
-                    value={value ?? ''}
-                    onChange={(event) => {
-                        const selected = options.find((item: any) => String(item.value) === event.target.value);
-                        onValueChange(selected?.value);
-                    }}
-                >
-                    <option value="">placeholder</option>
-                    {options.map((option: any) => (
-                        <option key={String(option.value)} value={option.value}>
-                            {option.name}
-                        </option>
-                    ))}
-                </select>
-            </div>
+            <select
+                data-testid={placeholder}
+                className={className}
+                value={value ?? ''}
+                onChange={(event) => {
+                    const selected = options.find((item: any) => String(item.value) === event.target.value);
+                    onValueChange(selected?.value);
+                }}
+            >
+                <option value="">placeholder</option>
+                {options.map((option: any) => (
+                    <option key={String(option.value)} value={option.value}>
+                        {option.name}
+                    </option>
+                ))}
+            </select>
         );
     };
 
@@ -188,15 +187,11 @@ describe('AddFundsExpendituresRecordModal', () => {
         expect(screen.getByText('usd error')).toBeInTheDocument();
         expect(screen.getByText('Mismatch')).toBeInTheDocument();
 
-        const yearSelectWrapper = screen.getByTestId(
-            `select-wrapper-${FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_PLACEHOLDER}`,
-        );
-        expect(yearSelectWrapper.className).toContain('select-error');
+        const yearSelect = screen.getByTestId(FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_PLACEHOLDER);
+        expect(yearSelect.className).toContain('select-error');
 
-        const categorySelectWrapper = screen.getByTestId(
-            `select-wrapper-${FUNDS_EXPENDITURES_TEXT.MODAL.INCOME.CATEGORY_PLACEHOLDER}`,
-        );
-        expect(categorySelectWrapper.className).toContain('select-error');
+        const categorySelect = screen.getByTestId(FUNDS_EXPENDITURES_TEXT.MODAL.INCOME.CATEGORY_PLACEHOLDER);
+        expect(categorySelect.className).toContain('select-error');
     });
 
     it('does not apply select-error class to dropdowns when no errors exist', () => {
@@ -210,15 +205,11 @@ describe('AddFundsExpendituresRecordModal', () => {
 
         renderComponent('income');
 
-        const yearSelectWrapper = screen.getByTestId(
-            `select-wrapper-${FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_PLACEHOLDER}`,
-        );
-        expect(yearSelectWrapper.className).not.toContain('select-error');
+        const yearSelect = screen.getByTestId(FUNDS_EXPENDITURES_TEXT.MODAL.SHARED.REPORTING_YEAR_PLACEHOLDER);
+        expect(yearSelect.className).not.toContain('select-error');
 
-        const categorySelectWrapper = screen.getByTestId(
-            `select-wrapper-${FUNDS_EXPENDITURES_TEXT.MODAL.INCOME.CATEGORY_PLACEHOLDER}`,
-        );
-        expect(categorySelectWrapper.className).not.toContain('select-error');
+        const categorySelect = screen.getByTestId(FUNDS_EXPENDITURES_TEXT.MODAL.INCOME.CATEGORY_PLACEHOLDER);
+        expect(categorySelect.className).not.toContain('select-error');
     });
 
     it('calls handlers from hook on interactions', () => {

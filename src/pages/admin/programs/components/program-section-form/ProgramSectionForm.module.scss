@@ -3,6 +3,7 @@
 .container {
     background-color: #fff;
     position: relative;
+    isolation: isolate;
     width: clamp(200px, 100%, 1440px);
     display: flex;
     align-items: center;

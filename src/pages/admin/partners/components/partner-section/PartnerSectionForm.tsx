@@ -1,4 +1,4 @@
-import React, { useCallback, memo, useState } from 'react';
+import React, { useCallback, memo, useState, useEffect } from 'react';
 import {
     PARTNER_SECTION_VALIDATION_FUNCTIONS,
     PARTNER_VALIDATION_FUNCTIONS,
@@ -72,6 +72,12 @@ const PartnerSectionComponent = ({
     const displayedTitle = isBaseLanguage ? value.title : (translatedContent?.title ?? '');
     const displayedDescription = isBaseLanguage ? value.description : (translatedContent?.description ?? '');
 
+    useEffect(() => {
+        if (disabled && partnerToDeleteLocalId !== null) {
+            setPartnerToDeleteLocalId(null);
+        }
+    }, [disabled, partnerToDeleteLocalId]);
+
     const handleTitleChange = useCallback(
         (e: React.ChangeEvent<HTMLTextAreaElement>) => {
             if (!isBaseLanguage) return;
@@ -131,17 +137,20 @@ const PartnerSectionComponent = ({
         [value, errors, onChange],
     );
 
-    const handlePartnerDeleteRequest = useCallback((localId: string) => {
-        if (disableStructuralActions) return;
-        setPartnerToDeleteLocalId(localId);
-    }, [disableStructuralActions]);
+    const handlePartnerDeleteRequest = useCallback(
+        (localId: string) => {
+            if (disableStructuralActions) return;
+            setPartnerToDeleteLocalId(localId);
+        },
+        [disableStructuralActions],
+    );
 
     const handleCancelPartnerDelete = useCallback(() => {
         setPartnerToDeleteLocalId(null);
     }, []);
 
     const handleConfirmPartnerDelete = useCallback(() => {
-        if (disableStructuralActions || !partnerToDeleteLocalId) return;
+        if (disabled || disableStructuralActions || !partnerToDeleteLocalId) return;
 
         const indexToDelete = value.partners.findIndex((p) => p.localId === partnerToDeleteLocalId);
         if (indexToDelete === -1) {
@@ -165,7 +174,7 @@ const PartnerSectionComponent = ({
         );
 
         setPartnerToDeleteLocalId(null);
-    }, [value, errors, onChange, partnerToDeleteLocalId, disableStructuralActions]);
+    }, [value, errors, onChange, partnerToDeleteLocalId, disableStructuralActions, disabled]);
 
     const handleDelete = useCallback(() => {
         if (disableStructuralActions) return;

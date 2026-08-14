@@ -1,4 +1,4 @@
-import React, { useCallback, memo } from 'react';
+import React, { useCallback, memo, useState } from 'react';
 import {
     PARTNER_SECTION_VALIDATION_FUNCTIONS,
     PARTNER_VALIDATION_FUNCTIONS,
@@ -10,6 +10,7 @@ import { PartnerForm, PartnerFormErrors, PartnerFormValues } from '../partner-fo
 import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import { Button } from '@/components/admin/button/Button';
 import styles from './PartnerSectionForm.module.scss';
+import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import './PartnerSectionForm.scss';
 
 export interface PartnerSectionFormValues {
@@ -46,6 +47,8 @@ const PartnerSectionComponent = ({
     errors,
     isDirty,
 }: PartnerSectionProps) => {
+    const [partnerToDeleteLocalId, setPartnerToDeleteLocalId] = useState<string | null>(null);
+
     const handleTitleChange = useCallback(
         (e: React.ChangeEvent<HTMLTextAreaElement>) => {
             const newTitle = e.target.value;
@@ -101,28 +104,40 @@ const PartnerSectionComponent = ({
         [value, errors, onChange],
     );
 
-    const handlePartnerDelete = useCallback(
-        (localId: string) => {
-            const indexToDelete = value.partners.findIndex((p) => p.localId === localId);
-            if (indexToDelete === -1) return;
+    const handlePartnerDeleteRequest = useCallback((localId: string) => {
+        setPartnerToDeleteLocalId(localId);
+    }, []);
 
-            const partnerToDelete = value.partners[indexToDelete];
-            const updatedDeletedIds = [...(value.deletedPartnerIds || [])];
+    const handleCancelPartnerDelete = useCallback(() => {
+        setPartnerToDeleteLocalId(null);
+    }, []);
 
-            if (partnerToDelete.partnerId) {
-                updatedDeletedIds.push(partnerToDelete.partnerId);
-            }
+    const handleConfirmPartnerDelete = useCallback(() => {
+        if (!partnerToDeleteLocalId) return;
 
-            const newPartners = value.partners.filter((p) => p.localId !== localId);
-            const newPartnerErrors = errors.partners.filter((_, i) => i !== indexToDelete);
+        const indexToDelete = value.partners.findIndex((p) => p.localId === partnerToDeleteLocalId);
+        if (indexToDelete === -1) {
+            setPartnerToDeleteLocalId(null);
+            return;
+        }
 
-            onChange(
-                { ...value, partners: newPartners, deletedPartnerIds: updatedDeletedIds },
-                { ...errors, partners: newPartnerErrors },
-            );
-        },
-        [value, errors, onChange],
-    );
+        const partnerToDelete = value.partners[indexToDelete];
+        const updatedDeletedIds = [...(value.deletedPartnerIds || [])];
+
+        if (partnerToDelete.partnerId) {
+            updatedDeletedIds.push(partnerToDelete.partnerId);
+        }
+
+        const newPartners = value.partners.filter((p) => p.localId !== partnerToDeleteLocalId);
+        const newPartnerErrors = errors.partners.filter((_, i) => i !== indexToDelete);
+
+        onChange(
+            { ...value, partners: newPartners, deletedPartnerIds: updatedDeletedIds },
+            { ...errors, partners: newPartnerErrors },
+        );
+
+        setPartnerToDeleteLocalId(null);
+    }, [value, errors, onChange, partnerToDeleteLocalId]);
 
     const handleDelete = useCallback(() => {
         onDelete(value.localId);
@@ -196,7 +211,7 @@ const PartnerSectionComponent = ({
                         errors={errors.partners[index] || {}}
                         disabled={disabled}
                         onValuesChange={handlePartnerChange}
-                        onDelete={handlePartnerDelete}
+                        onDelete={handlePartnerDeleteRequest}
                     />
                 ))}
                 <div className={styles['add-card']}>
@@ -224,6 +239,14 @@ const PartnerSectionComponent = ({
                     {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
                 </Button>
             </div>
+
+            <ConfirmationModal
+                isOpen={partnerToDeleteLocalId !== null}
+                onClose={handleCancelPartnerDelete}
+                title={PARTNERS_TEXT.FORM.TITLE.DELETE_PARTNER}
+                onConfirm={handleConfirmPartnerDelete}
+                onCancel={handleCancelPartnerDelete}
+            />
         </div>
     );
 };
